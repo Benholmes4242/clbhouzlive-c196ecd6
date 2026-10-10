@@ -82,7 +82,7 @@
       }
     },
     "leaderboards": {
-      "featsFrom": "[~~Out of <n>{{holes}}</n> holes and <n>{{rounds}}</n> rounds tracked on clbhouz.~~]",
+      "featsFrom": "[~~Őúţ őƒ <n>{{holes}}</n> ĥőļéš áñđ <n>{{rounds}}</n> řőúñđš ţřáĉǩéđ őñ ĉļƀĥőúž.~~]",
       "featRarity": "[~~1 íñ éṽéřý {{n}} {{unit}}~~]",
       "feats": "[~~Ƒéáţš~~]",
       "allTime": "[~~Áļļ ţíɱé~~]",
@@ -90,7 +90,7 @@
         "holes": "[~~ĥőļéš~~]",
         "rounds": "[~~řőúñđš~~]"
       },
-      "top100": "[~~Ţőƥ 100 ćőúřšéš~~]",
+      "top100": "[~~Ţőƥ 100 ĉőúřšéš~~]",
       "theListHundred": "[~~Ţĥé {{list}} ĥúñđřéđ~~]",
       "feat": {
         "ace_one": "[~~Ĥőļé íñ őñé~~]",
@@ -125,15 +125,16 @@
       "top100Empty": "[~~Ñőƀőđý ĥáš ƥļáýéđ á ĉőúřšé őñ ţĥíš ļíšţ ýéţ.~~]",
       "whoLeads": "[~~Ŵĥő ļéáđš ŵĥáţ~~]",
       "tiedTop": "[~~Ţíéđ áţ ţĥé ţőƥ~~]",
-      "clearOf": "[~~{{n}} clear of {{name}}~~]",
-      "theField": "[~~The field~~]",
-      "whoLeadsWindow": "[~~Who leads what window~~]",
-      "whoLeadsEmptyYear": "[~~Nobody leads anything in {{year}} yet. Switch to {{allTime}} to see who leads overall.~~]",
+      "clearOf": "[~~{{n}} ĉļéář őƒ {{name}}~~]",
+      "theField": "[~~Ţĥé ƒíéļđ~~]",
+      "whoLeadsWindow": "[~~Ŵĥő ļéáđš ŵĥáţ ŵíñđőŵ~~]",
+      "whoLeadsEmptyYear": "[~~Ñőƀőđý ļéáđš áñýţĥíñĝ íñ {{year}} ýéţ. Šŵíţĉĥ ţő {{allTime}} ţő šéé ŵĥő ļéáđš őṽéřáļļ.~~]",
       "whoLeadsYou": {
-        "on": "[~~You <b>{{pos}}</b> · <b>{{value}}</b>~~]",
-        "lead": "[~~You lead this one~~]",
-        "absent": "[~~Not on this one yet~~]"
-      },      "climb": "[~~Ţĥé ĉļíɱƀ~~]",
+        "on": "[~~Ýőú <b>{{pos}}</b> · <b>{{value}}</b>~~]",
+        "lead": "[~~Ýőú ļéáđ ţĥíš őñé~~]",
+        "absent": "[~~Ñőţ őñ ţĥíš őñé ýéţ~~]"
+      },
+      "climb": "[~~Ţĥé ĉļíɱƀ~~]",
       "mostImproved": "[~~Ṁőšţ íɱƥřőṽéđ~~]",
       "improvedScope": "[~~Éṽéřýőñé · ţĥíš ýéář~~]",
       "indexChange": "[~~Íñđéẋ ĉĥáñĝé~~]",
@@ -146,7 +147,7 @@
       "nRounds_one": "[~~{{count}} řőúñđ~~]",
       "nRounds_other": "[~~{{count}} řőúñđš~~]",
       "basisSentence": {
-        "rounds": "[~~Éṽéřý řőúñđ {{scope}} ĥáš ƥőšţéđ {{window}}, ñéŵéšţ ƒířšţ — ñéţ ƒířšţ, ĝřőšš ƀéĥíñđ.~~]",
+        "rounds": "[~~Éṽéřý řőúñđ {{scope}} ĥáš ƥőšţéđ {{window}}, ñéŵéšţ ƒířšţ.~~]",
         "ranked": "[~~Řáñǩéđ őñ {{unit}} {{window}}. {{scopeLead}}, 18 ĥőļéš.~~]",
         "scope": {
           "everyone": "[~~éṽéřýőñé~~]",
@@ -166,62 +167,62 @@
           "birdies": "[~~ƀířđíéš~~]",
           "gross": "[~~ĝřőšš šĉőřé~~]"
         },
-        "roundsAll": "[~~Éṽéřý řőúñđ {{scope}} ĥáš éṽéř ƥőšţéđ, ñéŵéšţ ƒířšţ — ñéţ ƒířšţ, ĝřőšš ƀéĥíñđ.~~]",
+        "roundsAll": "[~~Éṽéřý řőúñđ {{scope}} ĥáš éṽéř ƥőšţéđ, ñéŵéšţ ƒířšţ.~~]",
         "rankedAll": "[~~Řáñǩéđ őñ {{unit}}, áļļ ţíɱé. {{scopeLead}}, 18 ĥőļéš.~~]"
       },
       "slab": {
         "you": "[~~Ýőú~~]",
         "onBoardRanked": "[~~{{you}}, őƒ {{pool}} íñ {{scope}}. {{course}}, {{date}}.~~]",
         "onBoardRounds": "[~~{{you}} ƥőšţéđ {{gross}} áţ {{course}}, {{date}}.~~]",
-        "indexSince": "[~~Ŷőűŕ íñđéx ĥáš ɱőṽéđ {{figure}} šíñčé.~~]"
+        "indexSince": "[~~Ýőúř íñđéẋ ĥáš ɱőṽéđ {{figure}} šíñĉé.~~]"
       },
-      "featsFromYear": "[~~Out of <n>{{holes}}</n> holes and <n>{{rounds}}</n> rounds tracked on clbhouz this year.~~]",
-      "featNone": "[~~None in {{n}} {{unit}}~~]",
-      "rarest": "[~~Rarest~~]",
-      "rarestFirst": "[~~Rarest first~~]",
+      "featsFromYear": "[~~Őúţ őƒ <n>{{holes}}</n> ĥőļéš áñđ <n>{{rounds}}</n> řőúñđš ţřáĉǩéđ őñ ĉļƀĥőúž ţĥíš ýéář.~~]",
+      "featNone": "[~~Ñőñé íñ {{n}} {{unit}}~~]",
+      "rarest": "[~~Řářéšţ~~]",
+      "rarestFirst": "[~~Řářéšţ ƒířšţ~~]",
       "featCompare": {
-        "more": "[~~More often than all time — <g>1 in {{n}} {{unit}}</g>~~]",
-        "less": "[~~Less often than all time — 1 in {{n}} {{unit}}~~]",
-        "tooFew": "[~~Too few to compare~~]"
+        "more": "[~~Ṁőřé őƒţéñ ţĥáñ áļļ ţíɱé — <g>1 íñ {{n}} {{unit}}</g>~~]",
+        "less": "[~~Ļéšš őƒţéñ ţĥáñ áļļ ţíɱé — 1 íñ {{n}} {{unit}}~~]",
+        "tooFew": "[~~Ţőő ƒéŵ ţő ĉőɱƥářé~~]"
       },
       "featLatest": {
-        "noneYear": "[~~None this year~~]",
-        "noneAll": "[~~Nobody yet~~]",
-        "lastOne": "[~~Last one {{date}}~~]"
+        "noneYear": "[~~Ñőñé ţĥíš ýéář~~]",
+        "noneAll": "[~~Ñőƀőđý ýéţ~~]",
+        "lastOne": "[~~Ļášţ őñé {{date}}~~]"
       },
       "featsYou": {
-        "has": "[~~<b>You</b> have {{list}}.~~]",
-        "none": "[~~<b>You</b> haven't had one of these yet.~~]",
+        "has": "[~~<b>Ýőú</b> ĥáṽé {{list}}.~~]",
+        "none": "[~~<b>Ýőú</b> ĥáṽéñ'ţ ĥáđ őñé őƒ ţĥéšé ýéţ.~~]",
         "item": {
-          "ace_one": "[~~a hole in one~~]",
-          "ace_other": "[~~{{count}} holes in one~~]",
-          "albatross_one": "[~~an albatross~~]",
-          "albatross_other": "[~~{{count}} albatrosses~~]",
-          "eagle_one": "[~~an eagle~~]",
-          "eagle_other": "[~~{{count}} eagles~~]",
-          "cleanCard_one": "[~~a bogey-free round~~]",
-          "cleanCard_other": "[~~{{count}} bogey-free rounds~~]"
+          "ace_one": "[~~á ĥőļé íñ őñé~~]",
+          "ace_other": "[~~{{count}} ĥőļéš íñ őñé~~]",
+          "albatross_one": "[~~áñ áļƀáţřőšš~~]",
+          "albatross_other": "[~~{{count}} áļƀáţřőššéš~~]",
+          "eagle_one": "[~~áñ éáĝļé~~]",
+          "eagle_other": "[~~{{count}} éáĝļéš~~]",
+          "cleanCard_one": "[~~á ƀőĝéý-ƒřéé řőúñđ~~]",
+          "cleanCard_other": "[~~{{count}} ƀőĝéý-ƒřéé řőúñđš~~]"
         }
       },
       "featName": {
-        "ace": "[~~Holes in one~~]",
-        "albatross": "[~~Albatrosses~~]",
-        "eagle": "[~~Eagles~~]",
-        "cleanCard": "[~~Bogey-free rounds~~]"
+        "ace": "[~~Ĥőļéš íñ őñé~~]",
+        "albatross": "[~~Áļƀáţřőššéš~~]",
+        "eagle": "[~~Éáĝļéš~~]",
+        "cleanCard": "[~~Ɓőĝéý-ƒřéé řőúñđš~~]"
       },
       "hundredSlab": {
-        "played": "[~~You have played <b>{{n}}</b> of the {{list}} Hundred — <b>{{pos}}</b> of <b>{{total}}</b> members.~~]",
-        "playedBehind": "[~~You have played <b>{{n}}</b> of the {{list}} Hundred — <b>{{pos}}</b> of <b>{{total}}</b> members, <b>{{gap}}</b> behind {{leader}}.~~]",
-        "playedClear": "[~~You have played <b>{{n}}</b> of the {{list}} Hundred — <b>{{pos}}</b> of <b>{{total}}</b> members, <b>{{gap}}</b> clear of {{second}}.~~]",
-        "absent": "[~~You haven't played one of the {{list}} Hundred yet.~~]",
-        "nobodyPast": "[~~Nobody past {{n}}~~]"
+        "played": "[~~Ýőú ĥáṽé ƥļáýéđ <b>{{n}}</b> őƒ ţĥé {{list}} Ĥúñđřéđ — <b>{{pos}}</b> őƒ <b>{{total}}</b> ɱéɱƀéřš.~~]",
+        "playedBehind": "[~~Ýőú ĥáṽé ƥļáýéđ <b>{{n}}</b> őƒ ţĥé {{list}} Ĥúñđřéđ — <b>{{pos}}</b> őƒ <b>{{total}}</b> ɱéɱƀéřš, <b>{{gap}}</b> ƀéĥíñđ {{leader}}.~~]",
+        "playedClear": "[~~Ýőú ĥáṽé ƥļáýéđ <b>{{n}}</b> őƒ ţĥé {{list}} Ĥúñđřéđ — <b>{{pos}}</b> őƒ <b>{{total}}</b> ɱéɱƀéřš, <b>{{gap}}</b> ĉļéář őƒ {{second}}.~~]",
+        "absent": "[~~Ýőú ĥáṽéñ'ţ ƥļáýéđ őñé őƒ ţĥé {{list}} Ĥúñđřéđ ýéţ.~~]",
+        "nobodyPast": "[~~Ñőƀőđý ƥášţ {{n}}~~]"
       },
-      "hundredBasis": "[~~Ranked on courses played from the <s>{{list}} Hundred</s>. Each member's latest is shown beneath their name.~~]",
-      "hundredPlayedCount": "[~~{{played}} of {{total}} played~~]",
-      "hundredPlayed": "[~~Played~~]",
-      "hundredNext": "[~~Next~~]",
-      "coursesOfList": "[~~Courses of {{n}}~~]",
-      "coursesPlayed": "[~~Courses played~~]"
+      "hundredBasis": "[~~Řáñǩéđ őñ ĉőúřšéš ƥļáýéđ ƒřőɱ ţĥé <s>{{list}} Ĥúñđřéđ</s>. Éáĉĥ ɱéɱƀéř'š ļáţéšţ íš šĥőŵñ ƀéñéáţĥ ţĥéíř ñáɱé.~~]",
+      "hundredPlayedCount": "[~~{{played}} őƒ {{total}} ƥļáýéđ~~]",
+      "hundredPlayed": "[~~Ƥļáýéđ~~]",
+      "hundredNext": "[~~Ñéẋţ~~]",
+      "coursesOfList": "[~~Ĉőúřšéš őƒ {{n}}~~]",
+      "coursesPlayed": "[~~Ĉőúřšéš ƥļáýéđ~~]"
     },
     "place": {
       "pair": "[~~{{place}}, {{nation}}~~]"
@@ -445,8 +446,8 @@
         "net": "[~~ÑÉŢ~~]",
         "par": "[~~ƤÁŘ~~]",
         "vsHcp": "[~~ṼŠ ĤĈƤ~~]",
-        "medals": "[~~ṀÉĎÁĻŠ~~]",
-        "awards": "[~~ÁŴÁŘĎŠ~~]",
+        "medals": "[~~ṀÉĐÁĻŠ~~]",
+        "awards": "[~~ÁŴÁŘĐŠ~~]",
         "gross": "[~~ĜŘŐŠŠ~~]"
       },
       "topar": {
@@ -455,7 +456,7 @@
         "under": "[~~{{n}} úñđéř ƥář~~]"
       },
       "view": {
-        "all": "[~~Ŀőmmůñíţŷ~~]",
+        "all": "[~~Ĉőɱɱúñíţý~~]",
         "scores": "[~~Ļéáđéřƀőářđš~~]",
         "watch": "[~~Ŵáţĉĥ~~]"
       },
@@ -472,7 +473,7 @@
       },
       "you": "[~~Ýőú~~]",
       "medals": {
-        "gold": "[~~{{count}} ĝőļď~~]",
+        "gold": "[~~{{count}} ĝőļđ~~]",
         "silver": "[~~{{count}} šíļṽéř~~]",
         "bronze": "[~~{{count}} ƀřőñžé~~]"
       }
@@ -1192,7 +1193,7 @@
       "strapline": "[~~Ţĥé šţáñđőúţ řőúñđ őƒ ţĥé ŵééǩ.~~]",
       "netFact": "[~~Ñéţ {{net}}~~]",
       "featuredPill": "[~~Ƒéáţúřéđ~~]",
-      "birdieRun": "[~~{{count}} ƀířđíéš íñ á řöŵ~~]",
+      "birdieRun": "[~~{{count}} ƀířđíéš íñ á řőŵ~~]",
       "courseRecordJoint": "[~~Ĵőíñţ ĉőúřšé řéĉőřđ~~]"
     }
   },
@@ -1202,7 +1203,7 @@
     "reviews": "[~~řéṽíéŵš~~]",
     "rounds": "[~~řőúñđš~~]",
     "yourPb": "[~~ýőúř ƥƀ~~]",
-    "rating": "[ŕàţîñĝ]"
+    "rating": "[~~řáţíñĝ~~]"
   },
   "directorySheet": {
     "addCourse": "[~~Áđđ \"{{query}}\"~~]",
@@ -1388,14 +1389,14 @@
         "year": "[~~ţĥíš ýéář~~]"
       },
       "featRounds": {
-        "ace_one": "[~~{{count}} round with a hole in one~~]",
-        "ace_other": "[~~{{count}} rounds with a hole in one~~]",
-        "albatross_one": "[~~{{count}} round with an albatross~~]",
-        "albatross_other": "[~~{{count}} rounds with an albatross~~]",
-        "eagle_one": "[~~{{count}} round with an eagle~~]",
-        "eagle_other": "[~~{{count}} rounds with an eagle~~]",
-        "cleanCard_one": "[~~{{count}} bogey-free round~~]",
-        "cleanCard_other": "[~~{{count}} bogey-free rounds~~]"
+        "ace_one": "[~~{{count}} řőúñđ ŵíţĥ á ĥőļé íñ őñé~~]",
+        "ace_other": "[~~{{count}} řőúñđš ŵíţĥ á ĥőļé íñ őñé~~]",
+        "albatross_one": "[~~{{count}} řőúñđ ŵíţĥ áñ áļƀáţřőšš~~]",
+        "albatross_other": "[~~{{count}} řőúñđš ŵíţĥ áñ áļƀáţřőšš~~]",
+        "eagle_one": "[~~{{count}} řőúñđ ŵíţĥ áñ éáĝļé~~]",
+        "eagle_other": "[~~{{count}} řőúñđš ŵíţĥ áñ éáĝļé~~]",
+        "cleanCard_one": "[~~{{count}} ƀőĝéý-ƒřéé řőúñđ~~]",
+        "cleanCard_other": "[~~{{count}} ƀőĝéý-ƒřéé řőúñđš~~]"
       }
     },
     "findGolfers": {
@@ -2532,7 +2533,7 @@
         "heading": "[~~Ƥĥőţőš áñđ á ƒéŵ ŵőřđš~~]",
         "lede": "[~~Áñýţĥíñĝ ƒřőɱ ýőúř đáý áţ {{course}}.~~]",
         "optionalNote": "[~~Őƥţíőñáļ. Éṽéřýţĥíñĝ ƀéļőŵ íš ţőő.~~]",
-        "photosEyebrow": "[~~Ƥĥőţőš~~]",
+        "photosEyebrow": "[~~Ƥĥőţőš áñđ ṽíđéőš~~]",
         "placeholder": "[~~Ŵĥáţ šĥőúļđ áñőţĥéř ĝőļƒéř ǩñőŵ ƀéƒőřé ţĥéý ƥļáý ĥéřé?~~]",
         "shareSub": "[~~Ýőúř řéṽíéŵ áƥƥéářš íñ ţĥé ƒééđ~~]",
         "shareTitle": "[~~Šĥářé ţő ţĥé Ĉļúƀĥőúšé~~]",
@@ -2544,14 +2545,14 @@
         "summaryWords": "[~~ýőúř ŵőřđš~~]",
         "teesEyebrow": "[~~Ţééš ƥļáýéđ~~]",
         "wordsEyebrow": "[~~Ýőúř ŵőřđš~~]",
-        "sayItTitle": "Say it",
-        "sayItSub": "Talk, we'll write it down",
-        "typeItTitle": "Type it",
-        "typeItSub": "Use the keyboard",
-        "recordingHint": "Keep going — tap stop when you're done. You can edit every word afterwards.",
-        "sayMore": "Say more",
-        "mediaEmptyTitle": "Add photos or videos",
-        "mediaEmptySub": "Up to {{count}} from your camera roll"
+        "sayItTitle": "[~~Šáý íţ~~]",
+        "sayItSub": "[~~Ţáļǩ, ŵé'ļļ ŵříţé íţ đőŵñ~~]",
+        "typeItTitle": "[~~Ţýƥé íţ~~]",
+        "typeItSub": "[~~Úšé ţĥé ǩéýƀőářđ~~]",
+        "recordingHint": "[~~Ǩééƥ ĝőíñĝ — ţáƥ šţőƥ ŵĥéñ ýőú'řé đőñé. Ýőú ĉáñ éđíţ éṽéřý ŵőřđ áƒţéřŵářđš.~~]",
+        "sayMore": "[~~Šáý ɱőřé~~]",
+        "mediaEmptyTitle": "[~~Áđđ ƥĥőţőš őř ṽíđéőš~~]",
+        "mediaEmptySub": "[~~Úƥ ţő {{count}} ƒřőɱ ýőúř ĉáɱéřá řőļļ~~]"
       },
       "step3": {
         "breakdownBody": "[~~Šĉőřé ţĥéšé őñ ţĥéíř őŵñ, ñőţ áĝáíñšţ ýőúř őṽéřáļļ. Á ĉőúřšé ĉáñ ƀé ƀříļļíáñţ ţő ƥļáý áñđ ţĥíñ őñ ƒáĉíļíţíéš — ţĥíš íš ŵĥéřé ţĥáţ šĥőŵš.~~]",
@@ -2669,7 +2670,7 @@
     "out": "[~~Őúţ~~]",
     "outN": "[~~ŐÚŢ {{n}}~~]",
     "par": "[~~Ƥář~~]",
-    "parN": "[~~ƥář {{n}}~~]",
+    "parN": "[~~Ƥář {{n}}~~]",
     "previousRound": "[~~Ƥřéṽíőúš řőúñđ~~]",
     "rankHere": "[~~Ýőúř {{ordinal}} ƀéšţ őƒ {{count}} řőúñđš ĥéřé.~~]",
     "rankHereNeutral": "[~~{{ordinal}} ƀéšţ őƒ {{count}} řőúñđš ĥéřé.~~]",
@@ -2744,7 +2745,7 @@
     "scopeTheir": "[~~ţĥéíř~~]",
     "scopeHave": "[~~ĥáṽé~~]",
     "scopeHas": "[~~ĥáš~~]",
-    "hcpLabel": "HCP"
+    "hcpLabel": "[~~ĤĈƤ~~]"
   },
   "search": {
     "yourRounds": "[~~Ýőúř řőúñđš~~]"
