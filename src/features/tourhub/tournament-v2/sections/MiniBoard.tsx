@@ -8,11 +8,11 @@ import { useTranslation } from 'react-i18next';
 
 import CountryFlag from '@/components/ui/country-flag';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { BOARD_GEOMETRY, computeBoardColumns, todayFromEntry, type BoardEntry } from '../../leaderboard/BoardTable';
+import { BOARD_GEOMETRY, boardMovementMap, computeBoardColumns, todayFromEntry, type BoardEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
-  WHITE_ALPHA_65, WHITE_ALPHA_12, WHITE_ALPHA_06, AMBER,
+  WHITE_ALPHA_65, WHITE_ALPHA_12, WHITE_ALPHA_06, AMBER, TREND_UP, TREND_DOWN,
 } from '../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { fmtScore } from '../../utils/fmtScore';
@@ -224,17 +224,27 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     if (todayFromEntry(row as unknown as Parameters<typeof todayFromEntry>[0], currentRound) == null) return false;
     return row.thru != null && row.thru < 18;
   });
+  /* MOVEMENT RANKS THE WHOLE FIELD on prior-round totals — computed over
+     `entries`, never the five-row slice, or the prior ranks are wrong. */
+  const movementMap = useMemo(
+    () => (theme === 'heroBoard' ? boardMovementMap(entries, currentRound ?? null) : new Map<string, number>()),
+    [theme, entries, currentRound],
+  );
   const heroColumnRule = heroBoardColumns({
     roundCount: heroCols.rounds.length,
     roundInProgress,
     completed: phase === 'completed',
+    hasMovement: movementMap.size > 0,
   });
+  const showHeroMov = theme === 'heroBoard' && heroColumnRule.mov;
+  const tieRoles = heroTieRoles(rows);
   const showHeroToday = theme === 'heroBoard' && heroColumnRule.today;
   const showHeroThru = theme === 'heroBoard' && heroColumnRule.thru;
   const showHeroRounds = theme === 'heroBoard' && heroHasRoundData && heroColumnRule.rounds;
   const heroRounds = showHeroRounds ? heroCols.rounds : [];
   const heroRoundTracks = heroRounds.map(() => `${BOARD_GEOMETRY.cell}px`).join(' ');
   const overviewGrid = [
+    showHeroMov ? `${BOARD_GEOMETRY.mov}px` : null,
     showOverviewPosition ? `${BOARD_GEOMETRY.pos}px` : null,
     'minmax(0, 1fr)',
     showHeroToday ? `${BOARD_GEOMETRY.today}px` : null,
@@ -290,6 +300,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
       <>
         <div style={{ background: T.surface, fontFamily: FONT }}>
           <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: BOARD_GEOMETRY.gap, minHeight: 26, padding: `3px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: T.faint, textTransform: 'uppercase' }}>
+            {showHeroMov ? <div style={{ textAlign: 'right' }}>{t('board.columns.mov')}</div> : null}
             {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>
             {showHeroToday ? <div style={{ textAlign: 'right' }}>{t('board.columns.today')}</div> : null}
@@ -301,8 +312,11 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             ))}
             <div style={{ textAlign: 'right' }}>{t('board.columns.tot')}</div>
           </div>
-          {rows.map((r) => {
+          {rows.map((r, rowIndex) => {
             const entity = resolveBoardEntity(r, needsInitials, nameTier);
+            const tieRole = tieRoles[rowIndex];
+            const demotedRow = ['MC', 'CUT', 'WD'].includes(r.status?.toUpperCase() ?? '');
+            const mov = showHeroMov && !demotedRow ? movementMap.get(r.player?.id ?? r.team?.id ?? r.id) : undefined;
             const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
               : r.status === 'WD' ? 'WD'
               : r.position == null ? BLANK
@@ -319,7 +333,41 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: BOARD_GEOMETRY.gap, width: '100%', minHeight: 34, padding: `${entity.kind === 'team' ? 6 : 5}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}
                 className={`${T.press} transition-colors`}
               >
-                {showOverviewPosition ? <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>{posText}</div> : null}
+                {showHeroMov ? (
+                  <div style={{ ...HERO_NUM, whiteSpace: 'nowrap' }}>
+                    {demotedRow ? null : mov == null || mov === 0 ? (
+                      <span style={{ fontSize: 10, fontWeight: 700, color: T.faint }}>{'\u2013'}</span>
+                    ) : (
+                      <span
+                        aria-label={mov > 0 ? t('board.movement.up', { count: Math.abs(mov) }) : t('board.movement.down', { count: Math.abs(mov) })}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 1, fontSize: 9.5, fontWeight: 700, color: mov > 0 ? TREND_UP : TREND_DOWN }}
+                      >
+                        <span aria-hidden>{mov > 0 ? '\u25B2' : '\u25BC'}</span>
+                        <span aria-hidden>{Math.abs(mov)}</span>
+                      </span>
+                    )}
+                  </div>
+                ) : null}
+                {showOverviewPosition ? (
+                  <div data-hero-tie={tieRole} style={{ position: 'relative', alignSelf: 'stretch', display: 'flex', alignItems: 'center', fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                    {/* ONE MARKER PER TIE: later rows carry it for screen readers only. */}
+                    {tieRole === 'middle' || tieRole === 'last' ? <span className="sr-only">{posText}</span> : posText}
+                    {tieRole !== 'solo' ? (
+                      <span
+                        aria-hidden
+                        data-hero-tie-bracket
+                        style={{
+                          position: 'absolute', right: 2, width: 1.5, borderRadius: 1, background: WHITE_ALPHA_12,
+                          /* Rows are padded, so the rule reaches through the padding
+                             to meet its neighbour: start under the marker, end at the
+                             last row's centre. */
+                          top: tieRole === 'first' ? '50%' : -6,
+                          bottom: tieRole === 'last' ? '50%' : -6,
+                        }}
+                      />
+                    ) : null}
+                  </div>
+                ) : null}
                 <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
                   {entity.kind === 'team' ? renderEntityName(entity, T.ink) : (
                     <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.15, fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em', color: T.ink }}>{overviewName(entity.lines[0])}</span>
