@@ -460,14 +460,14 @@
       "pickPlain": "[!! Our pick: {{player}}. !!]",
       "courseKicker": "[!! Çöürsë öf thë wëëk !!]",
       "top100Link": "[!! Töp 100 !!]",
-      "suspendedTieTwo": "[~~Pláy íš šúšpéñdéd íñ řőúñd {{round}}, wíth {{first}} áñd {{second}} šháříñg thé léád át {{score}}.~~]",
-      "suspendedTieMany": "[~~Pláy íš šúšpéñdéd íñ řőúñd {{round}}, wíth {{count}} pláyéřš šháříñg thé léád át {{score}}.~~]",
-      "suspendedMargin": "[~~Pláy íš šúšpéñdéd íñ řőúñd {{round}}, wíth {{leader}} léádíñg by {{count}} át {{score}}.~~]",
-      "suspendedLeader": "[~~Pláy íš šúšpéñdéd íñ řőúñd {{round}}, wíth {{leader}} léádíñg át {{score}}.~~]",
-      "suspendedPlain": "[~~Pláy íš šúšpéñdéd íñ řőúñd {{round}}.~~]",
-      "playoffTieTwo": "[~~{{first}} áñd {{second}} fíñíšhéd tíéd át {{score}}. Á pláyőff déĉídéš ít.~~]",
-      "playoffTieMany": "[~~{{count}} pláyéřš fíñíšhéd tíéd át {{score}}. Á pláyőff déĉídéš ít.~~]",
-      "playoffPending": "[~~Régúlátíőñ fíñíšhéd lévél. Á pláyőff déĉídéš ít.~~]"
+      "suspendedTieTwo": "[!! Play is suspended in round {{round}}, with {{first}} and {{second}} sharing the lead at {{score}}. !!]",
+      "suspendedTieMany": "[!! Play is suspended in round {{round}}, with {{count}} players sharing the lead at {{score}}. !!]",
+      "suspendedMargin": "[!! Play is suspended in round {{round}}, with {{leader}} leading by {{count}} at {{score}}. !!]",
+      "suspendedLeader": "[!! Play is suspended in round {{round}}, with {{leader}} leading at {{score}}. !!]",
+      "suspendedPlain": "[!! Play is suspended in round {{round}}. !!]",
+      "playoffTieTwo": "[!! {{first}} and {{second}} finished tied at {{score}}. A playoff decides it. !!]",
+      "playoffTieMany": "[!! {{count}} players finished tied at {{score}}. A playoff decides it. !!]",
+      "playoffPending": "[!! Regulation finished level. A playoff decides it. !!]"
     },
     "picksSheet": {
       "cardAria": "[Why we picked {{name}}]",
