@@ -776,7 +776,7 @@ function isPredictionStale(
  * Strips odds/betting language and caps at three. Never pads: a pick with one
  * real reason carries one reason.
  */
-function cleanReasons(reasons: string[]): string[] {
+export function cleanReasons(reasons: string[]): string[] {
   const cleaned = (reasons || []).filter(r =>
     r &&
     !/[+-]\d{3,}/.test(r) &&
