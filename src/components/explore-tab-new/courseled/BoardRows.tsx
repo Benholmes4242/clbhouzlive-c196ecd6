@@ -345,6 +345,7 @@ export function BoardHeaderRow({ board, hideValue }: { board: BoardKey; hideValu
         alignItems: 'center',
         gap: 10,
         padding: '0 2px 6px',
+        /* Survives Phase 5: it separates column labels from data, not a row from a row. */
         borderBottom: `1px solid ${A.BORDER}`,
       }}
     >
