@@ -36,7 +36,7 @@ interface ChampionStripProps {
   eyebrowIcon?: LucideIcon;
   /** Optional avatar URL — when missing, render a gradient placeholder */
   avatarUrl?: string | null;
-  /** Pass 3: per-round scores for the winner's trajectory sparkline. */
+  /** Per-round TO-PAR figures (round_N) for the winner's trajectory sparkline — not strokes. */
   rounds?: number[];
   /** Pass 5.5: italic editorial narrative beneath the name. */
   narrative?: string | null;
