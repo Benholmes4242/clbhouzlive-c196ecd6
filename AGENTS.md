@@ -11,3 +11,4 @@
 - The overview hero calls `useLeaderboardRealtime` with `invalidate: 'leaderboard'`, while TournamentPage keeps the default full set, because live sync rewrites every row of the field on each pass and the full set would rebuild the carousel once per row.
 
 - `useLeaderboardRealtime` coalesces row changes on one trailing window (`LEADERBOARD_REALTIME_COALESCE_MS`) for every caller and cancels a pending flush on unmount or tournament change, because live sync rewrites the whole field each cycle and each row would otherwise trigger its own invalidation.
+- The overview's one tournament sentence comes from `tournamentHeadline`/`tournamentHeadlineSegments` in `magazineCopy.ts`: `SituationBand` prints it on every state but a finished result, and on a finished result it lives only in ChampionStrip's narrative (stored narrative first), so one state never carries two prose blocks.
