@@ -10,6 +10,7 @@ import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAct
 import useContentReactions from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
+import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
 import type { StoryBeat } from '@/components/feed/injectWireStories';
 
 /**
@@ -37,12 +38,12 @@ export function WireFeedSlide({ story, beat = 'tour' }: { story: TourStory; beat
   const signedIn = !!viewerId;
 
   return (
-    <article style={{ height: 341, background: SLAB, fontFamily: FONT }} data-wire-slide data-wire-beat={beat}>
+    <article style={{ height: 356, background: SLAB, fontFamily: FONT }} data-wire-slide data-wire-beat={beat}>
       <button
         type="button"
         onClick={openStory}
         aria-label={`${t('news.readStory')}: ${story.headline}`}
-        style={{ display: 'grid', gridTemplateRows: '35px 212px 94px', width: '100%', height: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', cursor: 'pointer', font: 'inherit' }}
+        style={{ display: 'grid', gridTemplateRows: '35px 212px 109px', width: '100%', height: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', cursor: 'pointer', font: 'inherit' }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 14px' }}>
           <span style={{ minWidth: 0, color: AMBER, fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', lineHeight: 1.2 }}>
@@ -56,19 +57,19 @@ export function WireFeedSlide({ story, beat = 'tour' }: { story: TourStory; beat
           <div aria-hidden style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, transparent 22%, ${SLAB} 100%)` }} />
           <div style={{ position: 'absolute', left: 17, right: 17, bottom: 16 }}>
             {story.kicker && (
-              <span style={{ display: 'block', color: INK_SOFT, fontSize: 10, fontWeight: 700, lineHeight: 1.2, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
+              <span style={{ ...MASTHEAD_KICKER, display: 'block' }}>
                 {story.kicker}
               </span>
             )}
-            <div style={{ marginTop: story.kicker ? 6 : 0, color: INK, fontSize: 21, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.02em', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden' }}>
+            <div style={{ marginTop: story.kicker ? 6 : 0, color: INK, fontSize: 24, fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.028em', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden' }}>
               {story.headline}
             </div>
           </div>
         </div>
 
-        <div style={{ padding: '13px 17px 17px', overflow: 'hidden' }}>
-          <div style={{ height: 41 }}>
-            {story.standfirst && <p style={{ margin: 0, color: INK_MUTE, fontSize: 14, lineHeight: 1.45, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{story.standfirst}</p>}
+        <div style={{ padding: '0 17px 17px', overflow: 'hidden' }}>
+          <div style={{ height: 41, marginTop: 11, paddingTop: 11, borderTop: '1px solid rgba(255,255,255,0.14)', boxSizing: 'content-box' }}>
+            {story.standfirst && <p style={{ margin: 0, color: 'rgba(248,250,252,0.76)', fontSize: 13.5, lineHeight: 1.5, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{story.standfirst}</p>}
           </div>
           <div style={{ marginTop: story.standfirst ? 12 : 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
             <span style={{ color: INK_SOFT, fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', lineHeight: 1.2 }}>

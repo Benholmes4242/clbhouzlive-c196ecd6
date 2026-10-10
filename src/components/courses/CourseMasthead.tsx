@@ -17,6 +17,7 @@ export const MASTHEAD_KICKER: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 700,
   letterSpacing: '0.15em',
+  lineHeight: 1.2,
   textTransform: 'uppercase',
   color: A.AMBER,
   whiteSpace: 'nowrap',
