@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
-import { CHAMPION_STRIP_WASH, STATUS_NEGATIVE, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_65 } from '../../../_shared/tokens';
+import { CHAMPION_STRIP_WASH, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_65 } from '../../../_shared/tokens';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { TrajectorySparkline } from './TrajectorySparkline';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
