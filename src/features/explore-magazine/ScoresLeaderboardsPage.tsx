@@ -9,6 +9,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { MemberAvatar } from '@/components/explore-tab-new/courseled/MemberAvatar';
 import { ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMetrics';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
 import { BoardHeaderRow, BoardRowView, boardColumns } from '@/components/explore-tab-new/courseled/BoardRows';
@@ -337,25 +338,12 @@ function SeeAll({ label, onPress }: { label: string; onPress: () => void }) {
   );
 }
 
-function Avatar({ id, name, src, size }: { id: string; name: string; src: string | null; size: number }) {
-  return (
-    <SquircleAvatar
-      src={src}
-      alt={name}
-      userId={id}
-      fallback={getInitialsFromName(name).slice(0, 2)}
-      size={size}
-      hairlineRing
-    />
-  );
-}
-
-
 function CompactRow({
   pos,
   tie,
   id,
   name,
+  avatarName,
   photo,
   secondary,
   value,
@@ -370,6 +358,8 @@ function CompactRow({
   tie: boolean;
   id: string;
   name: string;
+  /** The member's real name, for initials; `name` may be placeholder copy. */
+  avatarName: string | null | undefined;
   photo: string | null;
   secondary: string | null;
   value: string;
@@ -408,7 +398,7 @@ function CompactRow({
         {tie ? `T${pos}` : pos}
       </span>
       <span style={{ flexShrink: 0 }}>
-        <Avatar id={id} name={name} src={photo} size={ROW_METRICS.avatar} />
+        <MemberAvatar userId={id} name={avatarName} photoUrl={photo} size={ROW_METRICS.avatar} />
       </span>
       <span style={{ flex: 1, minWidth: 0 }}>
         <span
@@ -607,6 +597,7 @@ export function ScoresLeaderboardsPage({
         tie={r.is_tie}
         id={r.user_id}
         name={nameOf(r.display_name)}
+        avatarName={r.display_name}
         photo={r.photo_url}
         secondary={journey}
         value={pair?.delta ? `${pair.delta.arrow}${pair.delta.text}` : '\u2014'}
@@ -691,6 +682,7 @@ export function ScoresLeaderboardsPage({
         tie={r.is_tie}
         id={r.user_id}
         name={nameOf(r.display_name)}
+        avatarName={r.display_name}
         photo={r.photo_url}
         secondary={secondary(r)}
         value={opts.fmt ? opts.fmt(r) : String(r.value)}
@@ -1123,7 +1115,7 @@ export function ScoresLeaderboardsPage({
                       {fmtCareerValue(c.metric, r.value)}
                     </span>
                     <span style={{ flexShrink: 0, display: 'flex' }}>
-                      <Avatar id={r.user_id} name={nameOf(r.display_name)} src={r.photo_url} size={30} />
+                      <MemberAvatar userId={r.user_id} name={r.display_name} photoUrl={r.photo_url} size={30} />
                     </span>
                   </span>
                   {margin != null ? (
@@ -1232,6 +1224,7 @@ export function ScoresLeaderboardsPage({
               tie={r.is_tie}
               id={r.user_id}
               name={nameOf(r.display_name)}
+              avatarName={r.display_name}
               photo={r.photo_url}
               secondary={top100Secondary(r)}
               value={String(r.value)}

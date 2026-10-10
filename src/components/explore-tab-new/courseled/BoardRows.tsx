@@ -1,4 +1,5 @@
 import { ROW_METRICS } from './rowMetrics';
+import { MemberAvatar } from './MemberAvatar';
 import { useTranslation } from 'react-i18next';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -257,20 +258,6 @@ export function gapText(
 /* S4 — THE FORK IS FOLDED BACK. The board no longer builds its own fallback
    tile: SquircleAvatar now carries the same hue, so the photo row and the
    fallback row finally share one geometry. */
-export function BoardAvatar({ row, size = 28 }: { row: Row; size?: number }) {
-  const { t } = useTranslation('courses');
-  return (
-    <SquircleAvatar
-      src={row.profile_photo_url ?? null}
-      alt={row.display_name ?? t('discover.aMember')}
-      userId={row.user_id}
-      fallback={getInitialsFromName(row.display_name).slice(0, 2)}
-      size={size}
-      hairlineRing
-    />
-  );
-}
-
 const POS_W = ROW_METRICS.posTrack;
 const VALUE_W = 58;
 const SECOND_W = 46;
@@ -445,7 +432,7 @@ export function BoardRowView({
       )}
 
       <span style={{ flexShrink: 0 }}>
-        <BoardAvatar row={row} size={avatar} />
+        <MemberAvatar userId={row.user_id} name={row.display_name} photoUrl={row.profile_photo_url} size={avatar} />
       </span>
       <span
         style={{
