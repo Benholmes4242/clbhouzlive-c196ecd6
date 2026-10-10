@@ -27,7 +27,7 @@ import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSe
 import { DEFAULT_FILTERS, type BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 import { A } from '@/components/explore-tab-new/courseled/tokens';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
-import type { AmateurBoardState } from '@/features/amateur/useAmateurBoardState';
+import { makeBoardState } from '@/test/factories/boardState';
 
 function render(ui: React.ReactElement) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -46,11 +46,10 @@ function row(pos: number, over: Partial<BoardRow> = {}): BoardRow {
 }
 
 function page(board: BoardKey, rows: BoardRow[], userId = 'viewer') {
-  const state = {
-    board, filters: DEFAULT_FILTERS, ready: true, total: rows.length, clubApplies: false,
-    sheetFilterCount: 0, changeScope: vi.fn(),
-    page: { data: { rows, total: rows.length, pool: { rounds: 0, courses: 0, members: 0 } }, isSuccess: true, isPending: false },
-  } as unknown as AmateurBoardState;
+  const state = makeBoardState({
+    board, total: rows.length,
+    page: { data: { rows, total: rows.length, pool: { rounds: 0, courses: 0, members: 0 } }, isSuccess: true, isPending: false } as never,
+  });
   return render(
     <ScoresLeaderboardsPage userId={userId} state={state} onOpenBoard={vi.fn()} onOpenFilters={vi.fn()}
       onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />,
@@ -58,6 +57,18 @@ function page(board: BoardKey, rows: BoardRow[], userId = 'viewer') {
 }
 
 const rowsOf = () => screen.getAllByRole('button').filter((b) => /Member \d|Viewer/.test(b.textContent ?? ''));
+
+describe('Board rail (Phase 1)', () => {
+  it('renders six named chips with no figures and nothing greyed when there is no counts object', () => {
+    const state = makeBoardState({ facets: undefined as never });
+    render(<ScoresLeaderboardsPage userId="v" state={state} onOpenFilters={vi.fn()}
+      onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />);
+    const chips = document.querySelectorAll('[data-board-chip]');
+    expect(chips.length).toBe(6);
+    chips.forEach((c) => expect((c as HTMLButtonElement).disabled).toBe(false));
+    expect(document.querySelector('[data-scores-board-rail]')?.textContent).not.toMatch(/\d/);
+  });
+});
 
 describe('Scores lead board (Phase 0)', () => {
   it('a ranked board renders positions and a podium on first', () => {
