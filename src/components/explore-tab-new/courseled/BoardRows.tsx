@@ -213,6 +213,10 @@ export function boardSecondary(r: Row, board: BoardKey): Cell | null {
  * a per-board formula here. 'recent' has no gap worth stating in strokes: the
  * distance is a number of ROUNDS, so it uses the positions instead.
  */
+/* RETAINED WITHOUT A CALLER (Leaderboards Phase 3.2): its last caller,
+   AmateurLeaderboardBlock, is gone. Kept because it states the distance between
+   two rows in the board's own unit — what the standing row will need to say how
+   far behind the member is. Do not delete as dead code. */
 export function gapText(
   board: BoardKey,
   mine: Row,
