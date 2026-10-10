@@ -2,6 +2,7 @@ import type { TFunction } from 'i18next';
 
 import type { HeroTournament } from '../hooks/useHeroCarouselData';
 import type { HeroState } from '../components/overview-v3/HybridHero.utils';
+import { surnameOf } from '../_shared/playerName';
 
 type BoardEntry = {
   score?: number | null;
@@ -11,12 +12,12 @@ type BoardEntry = {
   player?: { full_name?: string | null; first_name?: string | null; last_name?: string | null } | null;
 };
 
+/** Surname, matching the board and the picks. */
 function playerName(entry: BoardEntry | undefined): string | null {
   if (!entry?.player) return null;
-  const full = entry.player.full_name?.trim();
-  if (full) return full;
-  const joined = [entry.player.first_name, entry.player.last_name].filter(Boolean).join(' ').trim();
-  return joined || null;
+  const full = entry.player.full_name?.trim()
+    || [entry.player.first_name, entry.player.last_name].filter(Boolean).join(' ').trim();
+  return full ? surnameOf(full) || null : null;
 }
 
 function scoreOf(entry: BoardEntry | undefined): number | null {
@@ -31,8 +32,9 @@ export function spokenToPar(score: number, t: TFunction): string {
     : t('overview.magazine.scoreOver', { count: score });
 }
 
-function venueOf(tournament: HeroTournament): string | null {
-  return tournament.venueName || tournament.venueCourseName || tournament.venueCity || null;
+/** Prose numbers: one to nine are spelled, ten and above stay numerals. */
+export function spokenCount(n: number, t: TFunction): string {
+  return Number.isInteger(n) && n >= 1 && n <= 9 ? t(`overview.magazine.number${n}`) : String(n);
 }
 
 function marginFacts(entries: BoardEntry[]) {
@@ -56,6 +58,8 @@ type HeadlineArgs = {
   state: HeroState;
   leaderboard: BoardEntry[];
   t: TFunction;
+  /** Results only: the champion's gross final-round score, when known. */
+  closingRound?: number | null;
 };
 
 /**
@@ -66,29 +70,38 @@ type HeadlineArgs = {
 type HeadlineSpec = {
   key: string;
   values: Record<string, string | number>;
-  figures: Array<'score' | 'count'>;
+  figures: string[];
 };
 
-const spec = (key: string, values: Record<string, string | number> = {}, figures: HeadlineSpec['figures'] = []): HeadlineSpec => ({ key, values, figures });
+const spec = (key: string, values: Record<string, string | number> = {}, figures: string[] = []): HeadlineSpec => ({ key, values, figures });
 
-function headlineSpec({ tournament, state, leaderboard, t }: HeadlineArgs): HeadlineSpec {
-  const venue = venueOf(tournament);
+/** Two or three tied leaders are named; four or more become a spelled count. */
+function namedTie(leaders: BoardEntry[]) {
+  const names = leaders.map(playerName);
+  if (names.some((name) => !name)) return null;
+  if (leaders.length === 2) return { size: 'Two' as const, values: { first: names[0] as string, second: names[1] as string } };
+  if (leaders.length === 3) return { size: 'Three' as const, values: { first: names[0] as string, second: names[1] as string, third: names[2] as string } };
+  return null;
+}
+
+function headlineSpec({ tournament, state, leaderboard, t, closingRound }: HeadlineArgs): HeadlineSpec | null {
   const facts = marginFacts(leaderboard);
   const leader = playerName(facts.leaders[0]);
-  const first = playerName(facts.leaders[0]);
-  const second = playerName(facts.leaders[1]);
   const score = facts.score == null ? null : spokenToPar(facts.score, t);
   const hasMargin = facts.margin != null && facts.margin > 0;
+  const margin = hasMargin ? spokenCount(facts.margin as number, t) : '';
+  const tieCount = spokenCount(facts.leaders.length, t);
+  const tie = facts.leaders.length > 1 ? namedTie(facts.leaders) : null;
 
-  // Suspended — play has stopped; say where it stands in the live branch's
-  // own grammar. No reason exists in the data, so none is ever implied.
+  // Suspended — the pill no longer names the round, so this sentence does.
+  // No reason exists in the data, so none is ever implied.
   if (state.kind === 'suspended') {
-    const round = state.round;
+    const round = spokenCount(state.round, t);
     if (facts.leaders.length > 1 && score) {
-      if (facts.leaders.length === 2 && first && second) return spec('overview.magazine.suspendedTieTwo', { round, first, second, score }, ['score']);
-      return spec('overview.magazine.suspendedTieMany', { round, count: facts.leaders.length, score }, ['score']);
+      if (tie) return spec(`overview.magazine.suspendedTie${tie.size}`, { round, ...tie.values, score }, ['score']);
+      return spec('overview.magazine.suspendedTieMany', { round, n: tieCount, score }, ['score']);
     }
-    if (leader && score && hasMargin) return spec('overview.magazine.suspendedMargin', { round, leader, count: facts.margin as number, score }, ['count', 'score']);
+    if (leader && score && hasMargin) return spec('overview.magazine.suspendedMargin', { round, leader, margin, score }, ['margin', 'score']);
     if (leader && score) return spec('overview.magazine.suspendedLeader', { round, leader, score }, ['score']);
     return spec('overview.magazine.suspendedPlain', { round });
   }
@@ -96,65 +109,61 @@ function headlineSpec({ tournament, state, leaderboard, t }: HeadlineArgs): Head
   // Awaiting playoff — regulation finished level; a playoff decides it.
   if (state.kind === 'results' && state.variant === 'awaiting-playoff') {
     if (facts.leaders.length > 1 && score) {
-      if (facts.leaders.length === 2 && first && second) return spec('overview.magazine.playoffTieTwo', { first, second, score }, ['score']);
-      return spec('overview.magazine.playoffTieMany', { count: facts.leaders.length, score }, ['score']);
+      if (tie) return spec(`overview.magazine.playoffTie${tie.size}`, { ...tie.values, score }, ['score']);
+      return spec('overview.magazine.playoffTieMany', { n: tieCount, score }, ['score']);
     }
     return spec('overview.magazine.playoffPending');
   }
 
+  // Live — the photo band prints venue and round; the board prints the top
+  // five. The sentence says neither again.
   if (state.kind === 'live') {
     if (facts.leaders.length > 1) {
-      if (facts.leaders.length === 2 && first && second) {
-        if (venue && score) return spec('overview.magazine.liveTieTwoVenueScore', { first, second, venue, score }, ['score']);
-        if (venue) return spec('overview.magazine.liveTieTwoVenue', { first, second, venue });
-        if (score) return spec('overview.magazine.liveTieTwoScore', { first, second, score }, ['score']);
-        return spec('overview.magazine.liveTieTwo', { first, second });
-      }
-      if (venue && score) return spec('overview.magazine.liveTieManyVenueScore', { count: facts.leaders.length, venue, score }, ['score']);
-      if (venue) return spec('overview.magazine.liveTieManyVenue', { count: facts.leaders.length, venue });
-      return spec('overview.magazine.liveTieMany', { count: facts.leaders.length });
+      if (tie) return score
+        ? spec(`overview.magazine.liveTie${tie.size}Score`, { ...tie.values, score }, ['score'])
+        : spec(`overview.magazine.liveTie${tie.size}`, tie.values);
+      return score
+        ? spec('overview.magazine.liveTieManyScore', { n: tieCount, score }, ['score'])
+        : spec('overview.magazine.liveTieMany', { n: tieCount });
     }
     if (leader) {
-      const isFinalRound = state.round >= state.totalRounds;
-      if (isFinalRound && hasMargin) return spec('overview.magazine.liveFinalMargin', { leader, count: facts.margin as number }, ['count']);
-      if (isFinalRound) return spec('overview.magazine.liveFinal', { leader });
-      const remaining = state.round < state.totalRounds - 1
-        ? t('overview.magazine.remainingWeekend')
-        : t('overview.magazine.remainingLastDay');
-      if (hasMargin && venue) return spec('overview.magazine.liveMarginVenueRemaining', { leader, count: facts.margin as number, venue, remaining }, ['count']);
-      if (venue) return spec('overview.magazine.liveVenue', { leader, venue });
-      if (hasMargin) return spec('overview.magazine.liveMargin', { leader, count: facts.margin as number }, ['count']);
+      if (state.round >= state.totalRounds) {
+        return hasMargin
+          ? spec('overview.magazine.liveFinalMargin', { leader, margin }, ['margin'])
+          : spec('overview.magazine.liveFinal', { leader });
+      }
+      if (hasMargin && score) return spec('overview.magazine.liveMarginScore', { leader, margin, score }, ['margin', 'score']);
+      if (score) return spec('overview.magazine.liveLeaderScore', { leader, score }, ['score']);
+      if (hasMargin) return spec('overview.magazine.liveMargin', { leader, margin }, ['margin']);
       return spec('overview.magazine.livePlain', { leader });
     }
-    return venue
-      ? spec('overview.magazine.liveEventVenue', { event: tournament.name, venue })
-      : spec('overview.magazine.liveEvent', { event: tournament.name });
+    return spec('overview.magazine.liveEvent', { event: tournament.name });
   }
 
+  // Results fallback — renders inside ChampionStrip, which already prints the
+  // champion and the winning score, so this names neither. Nothing to add →
+  // nothing rendered.
   if (state.kind === 'results') {
-    const winner = tournament.winnerName || leader;
-    if (!winner) return spec('overview.magazine.completeEvent', { event: tournament.name });
     const playoff = state.variant === 'playoff' || facts.leaders.length > 1;
-    if (playoff && venue) return spec('overview.magazine.completePlayoffVenue', { winner, venue });
-    if (playoff) return spec('overview.magazine.completePlayoff', { winner });
-    if (hasMargin && venue) return spec('overview.magazine.completeMarginVenue', { winner, count: facts.margin as number, venue }, ['count']);
-    if (venue) return spec('overview.magazine.completeVenue', { winner, venue });
-    if (hasMargin) return spec('overview.magazine.completeMargin', { winner, count: facts.margin as number }, ['count']);
-    return spec('overview.magazine.completeWinnerEvent', { winner, event: tournament.name });
+    const closing = closingRound != null && Number.isFinite(closingRound) && closingRound > 0 ? String(closingRound) : null;
+    if (playoff) return closing
+      ? spec('overview.magazine.completePlayoffClosing', { closingRound: closing }, ['closingRound'])
+      : spec('overview.magazine.completePlayoff');
+    if (hasMargin) return closing
+      ? spec('overview.magazine.completeMarginClosing', { margin, closingRound: closing }, ['margin', 'closingRound'])
+      : spec('overview.magazine.completeMargin', { margin }, ['margin']);
+    return null;
   }
 
+  // Upcoming — the defending champion is the strongest thing this state has.
   const when = state.countdown || state.meta;
-  if (tournament.defendingChampion && when) {
-    return spec('overview.magazine.upcomingDefender', { champion: tournament.defendingChampion, event: tournament.name, when });
+  if (tournament.defendingChampion) {
+    return when
+      ? spec('overview.magazine.upcomingDefender', { champion: tournament.defendingChampion, event: tournament.name, when })
+      : spec('overview.magazine.upcomingDefenderPlain', { champion: tournament.defendingChampion, event: tournament.name });
   }
   if (when) return spec('overview.magazine.upcomingStarts', { event: tournament.name, when });
   return spec('overview.magazine.upcomingNext', { event: tournament.name });
-}
-
-/** The tournament's one sentence. Every branch ends in a keyed sentence, so it is never empty. */
-export function tournamentHeadline(args: HeadlineArgs): string {
-  const s = headlineSpec(args);
-  return args.t(s.key, s.values);
 }
 
 export type HeadlineSegment = { text: string; figure: boolean };
@@ -162,21 +171,22 @@ export type HeadlineSegment = { text: string; figure: boolean };
 // Private-use delimiters; they never occur in names, venues or copy.
 const OPEN = '\uE000';
 const CLOSE = '\uE001';
-// `count` also drives plural selection, so it cannot carry a string marker.
-// It is interpolated as this sentinel (plural category "other" in en) and
-// swapped for the marked real figure afterwards.
-const COUNT_SENTINEL = 987654321;
 
-/** The same sentence split so its key figures (score, margin) can be set apart. */
+/**
+ * The single source of the tournament sentence, split so its key figures
+ * (score, margin, closing round) can be set apart. Empty when there is
+ * nothing true to add (results with no margin and no playoff).
+ */
 export function tournamentHeadlineSegments(args: HeadlineArgs): HeadlineSegment[] {
   const s = headlineSpec(args);
-  const values = { ...s.values };
-  if (s.figures.includes('score') && values.score != null) values.score = `${OPEN}${values.score}${CLOSE}`;
-  const markCount = s.figures.includes('count') && values.count != null;
-  const realCount = values.count;
-  if (markCount) values.count = COUNT_SENTINEL;
-  let text = args.t(s.key, values) as string;
-  if (markCount) text = text.split(String(COUNT_SENTINEL)).join(`${OPEN}${realCount}${CLOSE}`);
+  if (!s) return [];
+  const values: Record<string, string | number> = { ...s.values };
+  for (const name of s.figures) {
+    if (values[name] != null && values[name] !== '') values[name] = `${OPEN}${values[name]}${CLOSE}`;
+  }
+  const raw = args.t(s.key, values) as string;
+  // A sentence may open on a spelled count ("Five share the lead").
+  const text = raw.replace(/^([\uE000]?)(\p{Ll})/u, (_m, mark: string, ch: string) => mark + ch.toLocaleUpperCase('en'));
   const segments: HeadlineSegment[] = [];
   for (const part of text.split(OPEN)) {
     const [inside, rest] = part.includes(CLOSE) ? part.split(CLOSE) : [null, part];
@@ -185,6 +195,13 @@ export function tournamentHeadlineSegments(args: HeadlineArgs): HeadlineSegment[
   }
   return segments;
 }
+
+/** The same sentence as plain text — derived from the segments, never chosen separately. */
+export function tournamentHeadline(args: HeadlineArgs): string | null {
+  const text = tournamentHeadlineSegments(args).map((segment) => segment.text).join('');
+  return text || null;
+}
+
 
 export function courseHeadline({
   rank,
