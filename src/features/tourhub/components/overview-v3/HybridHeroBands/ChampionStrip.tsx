@@ -130,7 +130,7 @@ export function ChampionStrip({
         </div>
         {rounds && rounds.length >= 2 ? (
           <div style={{ marginRight: 10, display: 'flex', alignItems: 'center' }}>
-            <TrajectorySparkline rounds={rounds} variant="champion" totalRounds={4} />
+            <TrajectorySparkline rounds={rounds} variant="champion" totalRounds={totalRounds} />
           </div>
         ) : null}
         <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
