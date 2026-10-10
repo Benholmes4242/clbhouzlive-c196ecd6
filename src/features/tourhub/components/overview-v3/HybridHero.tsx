@@ -81,6 +81,17 @@ export function overviewChampionScoreLabel(
   return undefined;
 }
 
+/**
+ * The champion's gross closing round. Stored round figures are gross strokes
+ * (the sparkline reads them against par); a small figure is read as to-par
+ * and added to the venue par. Absent → null, so the sentence omits it.
+ */
+function closingGross(round4: number | null | undefined, par: number | null | undefined): number | null {
+  if (typeof round4 !== 'number' || !Number.isFinite(round4)) return null;
+  if (round4 >= 50) return round4;
+  return typeof par === 'number' && par > 0 ? par + round4 : null;
+}
+
 export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroProps) {
   const { tournament } = slide;
   const { t } = useTranslation('tourhub');
@@ -145,9 +156,10 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
         ? [championEntry.round_1, championEntry.round_2, championEntry.round_3, championEntry.round_4]
             .filter((r): r is number => typeof r === 'number' && Number.isFinite(r) && r > 0)
         : [],
+      closingRound: closingGross(championEntry?.round_4, tournament.venuePar),
       country: championEntry?.player?.country_code || championEntry?.player?.country || undefined,
     };
-  }, [needsInitials, rows, state, top?.player, top?.score, top?.team, tournament.eventType, tournament.winnerId, tournament.winnerName]);
+  }, [needsInitials, rows, state, top?.player, top?.score, top?.team, tournament.eventType, tournament.winnerId, tournament.winnerName, tournament.venuePar]);
 
   const championAvatarUrl = champion
     ? resolvePlayerAvatarCandidates({
@@ -168,7 +180,7 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
   // Completed: ONE sentence, inside the champion strip — the stored narrative,
   // else the generator's results sentence. Never both.
   const championNarrative = champion
-    ? tournament.championNarrative?.trim() || tournamentHeadline({ tournament, state, leaderboard: rows, t })
+    ? tournament.championNarrative?.trim() || tournamentHeadline({ tournament, state, leaderboard: rows, t, closingRound: champion.closingRound })
     : null;
 
   const startDay = tournament.startDate
