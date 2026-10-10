@@ -20,17 +20,32 @@ interface Row {
   end_date: string;
 }
 
+/**
+ * Fixture dates are RELATIVE to today so they cannot rot as the calendar
+ * moves: the completed bucket keeps COMPLETED_BUCKET_DAYS against end_date and
+ * the upcoming bucket a forward window, so absolute dates fall out of both.
+ */
+function isoDaysFromToday(days: number): string {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+const CLOSED_START = isoDaysFromToday(-6);
+const CLOSED_END = isoDaysFromToday(-3);
+const SCHEDULED_START = isoDaysFromToday(5);
+const SCHEDULED_END = isoDaysFromToday(8);
+
 const ROWS: Row[] = [
   { id: 'cup-live', name: 'Presidents Cup', status: 'inprogress', event_type: 'cup', start_date: '2026-09-24', end_date: '2026-09-27' },
   { id: 'stroke-live', name: 'Procore Championship', status: 'inprogress', event_type: 'stroke', start_date: '2026-09-24', end_date: '2026-09-27' },
   { id: 'team-live', name: 'Zurich Classic', status: 'inprogress', event_type: 'team', start_date: '2026-09-24', end_date: '2026-09-27' },
   { id: 'match-live', name: 'T-Mobile Match Play', status: 'inprogress', event_type: 'match', start_date: '2026-09-24', end_date: '2026-09-27' },
-  { id: 'cup-closed', name: 'Ryder Cup', status: 'closed', event_type: 'cup', start_date: '2026-09-10', end_date: '2026-09-13' },
-  { id: 'stroke-closed', name: 'Tour Championship', status: 'closed', event_type: 'stroke', start_date: '2026-09-10', end_date: '2026-09-13' },
-  { id: 'team-closed', name: 'Dow Championship', status: 'closed', event_type: 'team', start_date: '2026-09-10', end_date: '2026-09-13' },
-  { id: 'cup-scheduled', name: 'Solheim Cup', status: 'scheduled', event_type: 'cup', start_date: '2099-01-01', end_date: '2099-01-04' },
-  { id: 'stroke-scheduled', name: 'Sanderson Farms', status: 'scheduled', event_type: 'stroke', start_date: '2099-01-01', end_date: '2099-01-04' },
-  { id: 'team-scheduled', name: 'Grant Thornton Invitational', status: 'scheduled', event_type: 'team', start_date: '2099-01-01', end_date: '2099-01-04' },
+  { id: 'cup-closed', name: 'Ryder Cup', status: 'closed', event_type: 'cup', start_date: CLOSED_START, end_date: CLOSED_END },
+  { id: 'stroke-closed', name: 'Tour Championship', status: 'closed', event_type: 'stroke', start_date: CLOSED_START, end_date: CLOSED_END },
+  { id: 'team-closed', name: 'Dow Championship', status: 'closed', event_type: 'team', start_date: CLOSED_START, end_date: CLOSED_END },
+  { id: 'cup-scheduled', name: 'Solheim Cup', status: 'scheduled', event_type: 'cup', start_date: SCHEDULED_START, end_date: SCHEDULED_END },
+  { id: 'stroke-scheduled', name: 'Sanderson Farms', status: 'scheduled', event_type: 'stroke', start_date: SCHEDULED_START, end_date: SCHEDULED_END },
+  { id: 'team-scheduled', name: 'Grant Thornton Invitational', status: 'scheduled', event_type: 'team', start_date: SCHEDULED_START, end_date: SCHEDULED_END },
 ];
 
 function makeQuery() {
