@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { PublicLanding } from './JoinLandingPage';
 import { supabase } from '@/integrations/supabase/client';
 
-const FALLBACK_URL = 'https://clbhouz.co.uk';
+const FALLBACK_URL = 'https://apps.apple.com/app/id6752538886';
 
 async function fetchDownloadUrl(): Promise<string> {
   try {
@@ -40,6 +40,7 @@ export default function InviteLandingPage() {
   return (
     <PublicLanding
       href={href}
+      inviteRef={inviteCode}
       eyebrow="you've been invited"
       eyebrowNote="A friend invited you to clbhouz. Discover courses, follow the tours, and compare rounds."
     />
