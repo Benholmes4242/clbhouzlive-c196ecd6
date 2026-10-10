@@ -57,7 +57,11 @@ import { formatToPar } from '../../../overview/data/liveRoundStats';
 import { useTournamentTeeTimes } from '../../../hooks/useTournamentTeeTimes';
 import { useTournamentDefendingChamp } from '../../../hooks/useTournamentDefendingChamp';
 import { useTournamentLastYearTop4 } from '../../../hooks/useTournamentLastYearTop4';
-import { useTournamentFieldStrength } from '../../../hooks/useTournamentFieldStrength';
+import { useTeeTimesAll } from '../../../tournament-v2/data/useTeeTimesAll';
+import { useDrawnRounds } from '../../../tournament-v2/data/useDrawnRounds';
+import { formatTimeHm } from '@/i18n/format';
+import { LastYearRow } from './LastYearRow';
+import { hasNextRound, leaderGroup, leaderOf, neededGross, nextDrawnRound } from './whatsNext';
 import { useTournamentVenueRecord } from '../../../overview/data/useTournamentVenueRecord';
 import { surnameOf } from '../../../_shared/playerName';
 import { r } from '@/lib/radius';
@@ -199,6 +203,8 @@ interface HeroBoardSectionProps {
   championSrId?: string | null;
   /** Team-event champions have no tournament winner_id, so members are matched by player id. */
   championPlayerIds?: string[];
+  /** Venue par (to-par → gross conversion for the picks sheet's required round). */
+  venuePar?: number | null;
   onFullLeaderboard: () => void;
   onRowTap?: (playerId: string) => void;
 }
@@ -277,6 +283,7 @@ export function HeroBoardSection({
   phase,
   championSrId,
   championPlayerIds = [],
+  venuePar = null,
   onFullLeaderboard,
   onRowTap,
 }: HeroBoardSectionProps) {
@@ -324,7 +331,6 @@ export function HeroBoardSection({
   const { data: teeTimes = [] } = useTournamentTeeTimes(tournamentId, showUpcomingFacts);
   const { data: defending } = useTournamentDefendingChamp(showUpcomingFacts ? tournamentId : null);
   const { data: lastYear } = useTournamentLastYearTop4(showUpcomingFacts ? tournamentId : null);
-  const { data: fieldStrength } = useTournamentFieldStrength(showUpcomingFacts ? tournamentId : null);
   const firstTeeCandidate = teeTimes[0] ?? null;
   const firstTee = firstTeeCandidate?.time && firstTeeCandidate.time !== '\u2014'
     ? firstTeeCandidate
@@ -332,11 +338,34 @@ export function HeroBoardSection({
   const priorWinner = lastYear?.find((row) => row.rank === '1' || row.rank === 'T1') ?? null;
   const priorScore = priorWinner?.score || defending?.score || null;
   const upcomingFacts = compactUpcomingFacts([
-    firstTee ? { label: t('overview.hero.firstTee'), value: firstTee.time, trailing: null, trailingColor: INK } : null,
     defending?.name ? { label: t('overview.hero.defending'), value: surnameOf(defending.name), trailing: priorScore, trailingColor: priorScore && /^[-−]/.test(priorScore) ? TOPAR_UNDER_DARK : INK } : null,
-    fieldStrength?.topRanked != null ? { label: t('overview.hero.field'), value: `${fieldStrength.topRanked} of top 20`, trailing: null, trailingColor: INK } : null,
+    firstTee ? { label: t('overview.hero.firstTee'), value: firstTee.time, trailing: null, trailingColor: INK } : null,
+    // FIELD (world top-20 count) is omitted: no entries data exists to derive it (Phase 4 §4.3).
   ]);
   const hasUpcomingFacts = showUpcomingFacts && upcomingFacts.length > 0;
+  const lastYearRows = showUpcomingFacts ? (lastYear ?? []).slice(0, 4) : [];
+
+  // §4.1 / §4.2 — live and suspended only (both map to phase 'live').
+  const inPlay = phase === 'live';
+  const leader = useMemo(() => (inPlay ? leaderOf(entries) : null), [inPlay, entries]);
+  const neededByPlayer = useMemo(() => {
+    const map = new Map<string, number>();
+    if (!inPlay || !leader) return map;
+    for (const p of picks) {
+      if (!p?.playerId) continue;
+      const g = neededGross(venuePar, leader.total, boardByPlayer.get(String(p.playerId))?.score ?? null);
+      if (g != null) map.set(String(p.playerId), g);
+    }
+    return map;
+  }, [inPlay, leader, picks, venuePar, boardByPlayer]);
+
+  // Gated: no draw request unless in play with a round still to come; no
+  // tee-time request unless that next round is actually drawn.
+  const drawGate = inPlay && hasNextRound(currentRound);
+  const { data: drawnRounds } = useDrawnRounds(tournamentId, { enabled: drawGate });
+  const nextRound = drawGate ? nextDrawnRound(currentRound, drawnRounds) : null;
+  const { data: nextGroups } = useTeeTimesAll(tournamentId, nextRound ?? 0, { enabled: nextRound != null });
+  const nextGroup = nextRound != null ? leaderGroup(nextGroups, leader?.playerId) : null;
 
   return (
     <div style={{ background: PAGE_CANVAS, fontFamily: FONT }}>
@@ -354,14 +383,36 @@ export function HeroBoardSection({
       ) : null}
 
       {hasUpcomingFacts ? (
-        <div data-overview-facts style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: '4px 6px', padding: '13px 20px', lineHeight: 1.3 }}>
-          {upcomingFacts.map((fact, index) => (
-            <span key={fact.label} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5, whiteSpace: 'nowrap' }}>
-              <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>{fact.label}</span>
-              <span style={{ fontSize: 14, fontWeight: 700, color: INK }}>{fact.value}</span>
-              {fact.trailing ? <span style={{ fontSize: 14, fontWeight: 700, color: fact.trailingColor }}>{fact.trailing}</span> : null}
-              {index < upcomingFacts.length - 1 ? <span aria-hidden style={{ marginLeft: 1, color: WHITE_ALPHA_65 }}>·</span> : null}
-            </span>
+        <div data-overview-facts style={{ display: 'flex', gap: 16, padding: '14px 20px' }}>
+          {upcomingFacts.map((fact) => (
+            <div key={fact.label} style={{ flex: '1 1 0', minWidth: 0 }}>
+              <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>{fact.label}</div>
+              <div style={{ marginTop: 3, display: 'flex', alignItems: 'baseline', gap: 6, fontSize: 17, fontWeight: 800, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...FIGS }}>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{fact.value}</span>
+                {fact.trailing ? <span style={{ color: fact.trailingColor }}>{fact.trailing}</span> : null}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {lastYearRows.length > 0 ? (
+        <div data-overview-last-year style={{ paddingBottom: 6 }}>
+          <div style={{ padding: '14px 20px 4px', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>
+            {t('overview.hero.lastYear')}
+          </div>
+          {lastYearRows.map((row, i) => (
+            <LastYearRow
+              key={`${row.rank}-${row.name}`}
+              rank={row.rank}
+              name={row.name}
+              country={row.country || null}
+              score={row.score}
+              year={row.year}
+              isWinner={row.rank === '1'}
+              avatarCandidates={[row.photoUrl]}
+              isLast={i === lastYearRows.length - 1}
+            />
           ))}
         </div>
       ) : null}
@@ -385,7 +436,23 @@ export function HeroBoardSection({
           predictions={predictions ?? null}
           eventName={predictions?.tournament?.name ?? ''}
           venueName={predictions?.tournament?.venueName || null}
+          neededByPlayer={neededByPlayer}
+          round={inPlay ? currentRound : null}
         />
+      ) : null}
+
+      {nextRound != null && nextGroup ? (
+        <div data-overview-next-round style={{ padding: '14px 20px', display: 'flex', alignItems: 'flex-start', gap: 16, borderTop: `1px solid ${WHITE_ALPHA_06}` }}>
+          <div style={{ flexShrink: 0 }}>
+            <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>
+              {t('overview.hero.leadersOut', { round: nextRound })}
+            </div>
+            <div style={{ marginTop: 3, fontSize: 17, fontWeight: 800, color: INK, ...FIGS }}>{formatTimeHm(new Date(nextGroup.teeTime))}</div>
+          </div>
+          <div style={{ minWidth: 0, paddingTop: 15, fontSize: 13, fontWeight: 600, lineHeight: 1.4, color: INK }}>
+            {nextGroup.players.map((p) => p.name).join(', ')}
+          </div>
+        </div>
       ) : null}
 
       <div

@@ -188,11 +188,11 @@
       "playoff": "playoff",
       "firstTee": "First tee",
       "defending": "Defending",
-      "field": "Field",
-      "worldRanked": "world ranked",
       "ourPicks": "OUR TOURNAMENT PICKS",
       "leaderLabel": "Leader",
-      "stateSuspended": "SUSPENDED"
+      "stateSuspended": "SUSPENDED",
+      "lastYear": "Last year",
+      "leadersOut": "Leaders out · R{{round}}"
     },
     "leaderboardBand": {
       "ctaUpcoming": "View tournament",
@@ -584,7 +584,8 @@
       "metaPickOnly": "Pick {{n}} of {{total}}",
       "eventVenue": "{{event}} · {{venue}}",
       "eventOnly": "{{event}}",
-      "courseFitValue": "{{score}} / 100"
+      "courseFitValue": "{{score}} / 100",
+      "needsRound": "Needs a {{gross}} in round {{round}} to reach the lead."
     }
   },
   "empty": {

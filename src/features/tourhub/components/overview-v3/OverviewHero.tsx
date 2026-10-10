@@ -338,6 +338,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
                 : null
             }
             championPlayerIds={championGate ? activeChampionMemberIds : []}
+            venuePar={activeSlide?.tournament.venuePar ?? null}
             onFullLeaderboard={() => {
               const target = tournamentRoute(bandTournamentId, { kind: 'overview' });
               navigate(target.to, { state: target.state });
