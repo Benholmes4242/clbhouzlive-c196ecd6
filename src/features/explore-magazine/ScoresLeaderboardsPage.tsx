@@ -741,7 +741,13 @@ export function ScoresLeaderboardsPage({
         }}
       >
         {OFFERED_RANKING_BOARD_KEYS.map((key) => {
-          const n = state.facets.countFor('board', key);
+          /* ONE GUARD, here where the rail reads: an absent counter is treated
+             exactly like an unarrived count (null) — names, no figures, nothing
+             greyed, because grey claims we counted and found zero. In
+             production useBoardFacets always returns an object (its useMemo
+             runs even while the query is disabled), so this is cheap insurance,
+             not a live-defect fix. */
+          const n = state.facets?.countFor?.('board', key) ?? null;
           const selected = state.board === key;
           const empty = n === 0 && !selected;
           return (
