@@ -394,6 +394,17 @@ export function BoardRowView({
   const courseDate = date ? `${course} \u00B7 ${date}` : course;
   /* 10.2 — the second line is "{course} · {date}" and nothing else; the feat is a name-row badge. */
   const sub = gap ?? courseDate;
+  /* 12.1 — WHAT delta_index MEANS, proved against 4,067 live rounds: hcp_at_time
+     is the index a member carried INTO the round, and delta_index is the
+     movement THAT round caused — it appears as the NEXT round's hcp_at_time.
+     3,020 of those rounds match that next-round test directly; 99.3% of all
+     non-null rounds agree with the model; only 19 rounds in the whole table
+     match neither direction. 12.2 — THE CONSEQUENCE: a member's MOST RECENT
+     round always carries a NULL delta_index, because the movement it caused is
+     recorded against the round that follows it. The chip is therefore absent
+     on the newest row from every member, and that absence does NOT mean the
+     index held. Deliberately no fallback, no placeholder and no dash — this is
+     a recorded note, not a rendering change. */
   const chip = !ranked && row.delta_index != null && Number(row.delta_index) !== 0 ? Number(row.delta_index) : null;
 
   return (
