@@ -347,7 +347,7 @@ describe('MiniBoard heroBoard render', () => {
         createElement(MiniBoard, { tournamentId: 'event', entries, limit: 5, currentRound: 1, phase: 'live', theme: 'heroBoard' })),
     ));
     const header = view.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(header?.style.gridTemplateColumns).toBe('24px minmax(0, 1fr) 26px 40px');
+    expect(header?.style.gridTemplateColumns).toBe(`24px minmax(0, 1fr) ${BOARD_GEOMETRY.thru}px 40px`);
     expect(view.container.querySelectorAll('[data-hero-thru]').length).toBe(2);
   });
 });
