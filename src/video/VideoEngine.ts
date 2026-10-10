@@ -18,6 +18,8 @@ import Hls, { type HlsConfig } from 'hls.js';
 import {
   ABR_MAX_KBPS,
   DEFAULT_LANE_IDS,
+  LAZY_LANE_IDS,
+  isFullscreenLane,
   HLS_CONFIG,
   RAIL_HLS_OVERRIDES,
   FULLSCREEN_HLS_OVERRIDES,
@@ -365,15 +367,10 @@ class VideoEngineImpl {
 
 
 
-  boot(laneIds: LaneId[] = DEFAULT_LANE_IDS): void {
-    if (this.booted) return;
-    this.booted = true;
-    this.saveDataGated = shouldGateForSaveData();
-    const host = ensureHiddenHost();
-    for (const id of laneIds) {
+  private createLane(id: LaneId, host: HTMLElement): Lane {
       const el = createLaneElement(id);
       host.appendChild(el);
-      this.lanes.set(id, {
+      const lane: Lane = {
         id,
         el,
         hls: null,
@@ -390,8 +387,17 @@ class VideoEngineImpl {
         audioPolicy: 'always-muted',
         loop: true,
         endedCount: 0,
-      });
-    }
+      };
+      this.lanes.set(id, lane);
+      return lane;
+  }
+
+  boot(laneIds: LaneId[] = DEFAULT_LANE_IDS): void {
+    if (this.booted) return;
+    this.booted = true;
+    this.saveDataGated = shouldGateForSaveData();
+    const host = ensureHiddenHost();
+    for (const id of laneIds) this.createLane(id, host);
     if (PAUSE_ON_HIDDEN && typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.onVisibility);
     }
@@ -479,7 +485,10 @@ class VideoEngineImpl {
 
   private getLane(laneId: LaneId): Lane {
     if (!this.booted) this.boot();
-    const lane = this.lanes.get(laneId);
+    let lane = this.lanes.get(laneId);
+    // §1 — lazy lanes are created on first use, so opens that never touch
+    // them (every single-media fullscreen open) allocate nothing.
+    if (!lane && LAZY_LANE_IDS.includes(laneId)) lane = this.createLane(laneId, ensureHiddenHost());
     if (!lane) throw new Error(`VideoEngine: unknown lane "${laneId}"`);
     return lane;
   }
@@ -849,7 +858,7 @@ class VideoEngineImpl {
         ...HLS_CONFIG,
         ...(isRail ? RAIL_HLS_OVERRIDES : {}),
         ...(isFeed ? FEED_HLS_OVERRIDES : {}),
-        ...(laneId === 'fullscreen' ? FULLSCREEN_HLS_OVERRIDES : {}),
+        ...(isFullscreenLane(laneId) ? FULLSCREEN_HLS_OVERRIDES : {}),
         startPosition,
         // hls.js expects bps. Prefer a real remembered measurement, else the
         // Network Information API / a sane default — a 500kbps seed opened
@@ -908,12 +917,12 @@ class VideoEngineImpl {
       // + known bandwidth instead of letting hls.js open on the 240p rung.
       // Rails stay on capLevelToPlayerSize (tile-sized) and are left alone.
       if (!isRail) {
-        const minHeight = lane.id === 'fullscreen' ? 720 : 540;
+        const minHeight = isFullscreenLane(lane.id) ? 720 : 540;
         const applied = applyStartLevel(
           hls as any,
           // Feed lanes open at the CARD's rendered height; only the
           // fullscreen lane opens at viewport height.
-          lane.id === 'fullscreen' ? viewportPixelHeight() : elementPixelHeight(lane.el),
+          isFullscreenLane(lane.id) ? viewportPixelHeight() : elementPixelHeight(lane.el),
           (lane as any)._seededBw ?? null,
           minHeight,
         );
@@ -988,7 +997,9 @@ class VideoEngineImpl {
     const norm = (k: string | null): string | null =>
       k == null ? null : (k.includes(':') ? k : `${k}:0`);
     try {
-      const activeLaneId = feedLaneRoles.laneForRole('active');
+      // The pager neighbour lane guards against the FULLSCREEN lane, not the
+      // feed's active role — the fullscreen page is what it must not evict.
+      const activeLaneId: LaneId = laneId === 'fullscreen-next' ? 'fullscreen' : feedLaneRoles.laneForRole('active');
       const activeSnap = this.snapshot(activeLaneId);
       const activeOwner = norm(activeSnap.postId);
       const incomingOwner = norm(postId);
@@ -1062,7 +1073,7 @@ class VideoEngineImpl {
       // reveal moving frames while the card scrolls in (previously the
       // lane played invisibly because firstFrame never flipped).
       if (
-        lane.id !== 'fullscreen' &&
+        !isFullscreenLane(lane.id) &&
         lane.id !== 'feed-active' &&
         lane.id !== 'feed-next' &&
         lane.id !== 'feed-prev' &&
@@ -1849,6 +1860,53 @@ class VideoEngineImpl {
     } catch {}
   }
 
+
+  /** True once a lane exists — lets callers release a lazy lane without creating it. */
+  hasLane(laneId: LaneId): boolean {
+    return this.lanes.has(laneId);
+  }
+
+  /**
+   * BRIEF_FULLSCREEN_PAGER_NEIGHBOUR_WARM §3 — exchange two lanes IN PLACE.
+   * The decoded element, its hls instance and every piece of per-source state
+   * trade places; the lane IDS stay put, and so do each id's subscribers
+   * (`listeners`), so every consumer reading 'fullscreen' by id (scrubber,
+   * top progress, speaker lookup, borrow return) keeps working and now sees
+   * the swapped-in media. Element event handlers close over the Lane OBJECT,
+   * so the object travels with its element and only its `id` is rewritten.
+   * The swapped-out side is paused, play-intent cleared and parked in the
+   * hidden host. Refuses (returns false) if either lane is borrowed.
+   */
+  swapLanes(a: LaneId, b: LaneId): boolean {
+    if (a === b) return false;
+    if (this.borrowedLanes.has(a) || this.borrowedLanes.has(b)) return false;
+    const la = this.getLane(a);
+    const lb = this.getLane(b);
+    const la2 = la.listeners;
+    const lb2 = lb.listeners;
+    // Objects swap slots; ids and listener sets stay with the slot.
+    la.id = b; la.listeners = lb2; la.el.dataset.laneId = b;
+    lb.id = a; lb.listeners = la2; lb.el.dataset.laneId = a;
+    this.lanes.set(a, lb);
+    this.lanes.set(b, la);
+    this.sameElementReturn.delete(a);
+    this.sameElementReturn.delete(b);
+    // The old 'a' content (now under id b) is paused and parked.
+    la.wantPlay = false;
+    this.clearPlayWatchdog(b);
+    if (!la.el.paused) la.el.pause();
+    const host = ensureHiddenHost();
+    if (la.el.parentElement !== host) host.appendChild(la.el);
+    la.mountedHost = null;
+    // Swapped-in side gets the full forward buffer back and its audio policy
+    // re-applied under its new id; the parked side keeps its own policy.
+    if (lb.hls) { try { lb.hls.config.maxBufferLength = HLS_CONFIG.maxBufferLength; } catch { /* noop */ } }
+    this.emit(lb);
+    this.emit(la);
+    this.reconcileAudio('lane-swap');
+    DBG('swapLanes', { a, b, aPostId: lb.postId, bPostId: la.postId });
+    return true;
+  }
 
   /** Release the current source but keep the element+instance for reuse. */
   release(laneId: LaneId): void {

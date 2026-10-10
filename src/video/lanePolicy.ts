@@ -10,6 +10,7 @@ export type LaneId =
   | 'feed-next'
   | 'feed-prev'
   | 'fullscreen'
+  | 'fullscreen-next'
   | 'rail-0'
   | 'rail-1'
   | 'rail-2';
@@ -26,6 +27,17 @@ export const DEFAULT_LANE_IDS: LaneId[] = [
 
 /** Budgeted rail-lane pool size (decoder ceiling — NOT one lane per rail). */
 export const RAIL_LANE_BUDGET = 3;
+/** BRIEF_FULLSCREEN_PAGER_NEIGHBOUR_WARM §1 — lanes created LAZILY on first
+ *  use rather than at boot, so a single-media fullscreen open never allocates
+ *  them. 'fullscreen-next' holds the multi-media pager's likely next page
+ *  decoded; it is configured like 'fullscreen' but is NEVER the speaker. */
+export const LAZY_LANE_IDS: LaneId[] = ['fullscreen-next'];
+
+/** 'fullscreen' and its pager neighbour share the viewport-sized config. */
+export function isFullscreenLane(id: LaneId): boolean {
+  return id === 'fullscreen' || id === 'fullscreen-next';
+}
+
 export const RAIL_LANE_IDS: LaneId[] = ['rail-0', 'rail-1', 'rail-2'];
 
 /** Max concurrent lanes actively loading a manifest. */
