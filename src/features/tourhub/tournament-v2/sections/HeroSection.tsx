@@ -12,6 +12,7 @@ import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import type { EventState } from '../../components/overview-v3/useTournamentPulse';
 import type { TournamentContest } from '../data/tournamentContest';
 import { DARK_CHROME_GLASS_MATERIAL } from '@/features/chrome-v2/ChromeIsland';
+import { HeroFigureCell, MASTHEAD_KICKER, MASTHEAD_NAME, MASTHEAD_PLACE } from '@/components/courses/CourseMasthead';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 const FALLBACK_BG = `linear-gradient(180deg, ${A.PANEL} 0%, ${A.CANVAS} 100%)`;
@@ -27,12 +28,7 @@ interface Props {
 }
 
 function Figure({ value, label, cjk }: { value: string; label: string; cjk: boolean }) {
-  return (
-    <div style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
-      <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>{value}</div>
-      <div style={{ marginTop: 5, fontSize: 10, fontWeight: 700, letterSpacing: cjk ? 0 : '0.13em', marginRight: cjk ? 0 : '-0.13em', textTransform: cjk ? 'none' : 'uppercase', color: INK_FAINT }}>{label}</div>
-    </div>
-  );
+  return <HeroFigureCell label={label} value={value} cjk={cjk} align="center" />;
 }
 
 export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCount }: Props) {
@@ -97,11 +93,11 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
             <span>{chipLabel}</span>
             {showLiveDot ? <span style={{ color: AMBER }}>{t('overview.hero.factRound')} {meta.current_round ?? 1}</span> : null}
           </div>
-          {tourLabel ? <div style={{ marginTop: 8, ...CAPS_10, color: INK_MUTE, letterSpacing: cjk ? 0 : '0.14em', textTransform: cjk ? 'none' : CAPS_10.textTransform }}>{tourLabel}</div> : null}
-          {/* Detail deliberately keeps the two-line clamp and clamp(20px, 6.4vw, 25px); weight, tracking and leading match PhotoBand. */}
-          <h1 style={{ fontSize: 'clamp(20px, 6.4vw, 25px)', fontWeight: 800, color: INK, lineHeight: 1.1, letterSpacing: 0, margin: '4px 0 0', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{meta.name}</h1>
-          {venueLine && <div style={{ marginTop: 5, fontSize: 13, color: HERO_VENUE_INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{venueLine}</div>}
-          {verdict && <div style={{ maxWidth: 320, marginTop: 10, fontSize: 15, fontWeight: 600, color: INK, lineHeight: 1.42, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden' }}>{verdict}</div>}
+          {tourLabel ? <div style={{ marginTop: 8, ...MASTHEAD_KICKER, letterSpacing: cjk ? 0 : MASTHEAD_KICKER.letterSpacing, textTransform: cjk ? 'none' : 'uppercase' }}>{tourLabel}</div> : null}
+          {/* Kicker, name and place come from the shared masthead (CourseMasthead), as on PhotoBand; the two-line clamp is this hero's own. */}
+          <h1 style={{ ...MASTHEAD_NAME, margin: '8px 0 0', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{meta.name}</h1>
+          {venueLine && <div style={MASTHEAD_PLACE}>{venueLine}</div>}
+          {verdict && <div style={{ maxWidth: 320, marginTop: 11, paddingTop: 11, borderTop: '1px solid rgba(255,255,255,0.16)', fontSize: 13.5, fontWeight: 500, color: 'rgba(255,255,255,0.78)', lineHeight: 1.5, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden' }}>{verdict}</div>}
         </div>
       </div>
       {figures.length > 0 && <div style={{ background: PAGE_CANVAS, padding: '12px 16px 14px', display: 'flex', alignItems: 'flex-start', gap: 8 }}>{figures.map((figure) => <Figure key={figure.label} {...figure} cjk={cjk} />)}</div>}
