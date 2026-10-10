@@ -125,6 +125,7 @@ export function BoardSeeAllSheet({
           justifyContent: 'space-between',
           gap: 12,
           padding: '10px 16px 12px',
+          /* Hairline clause: sheet controls from list. */
           borderBottom: `1px solid ${A.BORDER}`,
         }}
       >
@@ -142,7 +143,7 @@ export function BoardSeeAllSheet({
           {t('discover.filterBoard.done')}
         </button>
       </div>
-      <div style={{ flexShrink: 0, padding: '16px 16px 12px', borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS, ...FIGS }}>
+      <div style={{ flexShrink: 0, padding: '16px 16px 12px', /* Hairline clause: sheet controls from list. */ borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS, ...FIGS }}>
         <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 700, color: A.INK, textTransform: 'uppercase' }}>
           {boardCountsRounds(board)
             ? t('discover.filterBoard.nRounds', { count: total })

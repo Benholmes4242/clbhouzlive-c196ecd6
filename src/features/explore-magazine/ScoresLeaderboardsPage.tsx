@@ -4,11 +4,10 @@ import { Trans, useTranslation } from 'react-i18next';
 import { ChevronRight, Medal } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { getInitialsFromName } from '@/lib/avatarFallback';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { MemberAvatar } from '@/components/explore-tab-new/courseled/MemberAvatar';
 import { ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMetrics';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
 import { BoardHeaderRow, BoardRowView, boardColumns } from '@/components/explore-tab-new/courseled/BoardRows';
@@ -134,7 +133,7 @@ function BoardSheet({ open, onClose, titleId, title, subtitle, valueHeading, foo
       ariaLabelledBy={titleId}
       style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px 13px', borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px 13px', /* Hairline clause: sheet controls from list. */ borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <h2 id={titleId} style={{ margin: 0, fontFamily: SANS, fontSize: 14.5, fontWeight: 700, color: A.INK }}>{title}</h2>
           <div style={{ ...cap, marginTop: 2, color: A.DIM }}>{subtitle}</div>
@@ -337,25 +336,12 @@ function SeeAll({ label, onPress }: { label: string; onPress: () => void }) {
   );
 }
 
-function Avatar({ id, name, src, size }: { id: string; name: string; src: string | null; size: number }) {
-  return (
-    <SquircleAvatar
-      src={src}
-      alt={name}
-      userId={id}
-      fallback={getInitialsFromName(name).slice(0, 2)}
-      size={size}
-      hairlineRing
-    />
-  );
-}
-
-
 function CompactRow({
   pos,
   tie,
   id,
   name,
+  avatarName,
   photo,
   secondary,
   value,
@@ -370,6 +356,8 @@ function CompactRow({
   tie: boolean;
   id: string;
   name: string;
+  /** The member's real name, for initials; `name` may be placeholder copy. */
+  avatarName: string | null | undefined;
   photo: string | null;
   secondary: string | null;
   value: string;
@@ -408,7 +396,7 @@ function CompactRow({
         {tie ? `T${pos}` : pos}
       </span>
       <span style={{ flexShrink: 0 }}>
-        <Avatar id={id} name={name} src={photo} size={ROW_METRICS.avatar} />
+        <MemberAvatar userId={id} name={avatarName} photoUrl={photo} size={ROW_METRICS.avatar} />
       </span>
       <span style={{ flex: 1, minWidth: 0 }}>
         <span
@@ -607,6 +595,7 @@ export function ScoresLeaderboardsPage({
         tie={r.is_tie}
         id={r.user_id}
         name={nameOf(r.display_name)}
+        avatarName={r.display_name}
         photo={r.photo_url}
         secondary={journey}
         value={pair?.delta ? `${pair.delta.arrow}${pair.delta.text}` : '\u2014'}
@@ -691,11 +680,16 @@ export function ScoresLeaderboardsPage({
         tie={r.is_tie}
         id={r.user_id}
         name={nameOf(r.display_name)}
+        avatarName={r.display_name}
         photo={r.photo_url}
         secondary={secondary(r)}
         value={opts.fmt ? opts.fmt(r) : String(r.value)}
         caption={caption}
         self={!!r.is_viewer || r.user_id === userId}
+        /* Three facts, three devices, no overlap: the wash states rank and belongs
+           to 1st place whoever holds it; amber states identity and belongs to the
+           viewing member; this 12px gap states the sequence broke above this row.
+           A tint here would be a second identity device. */
         gapAbove={!!pin && r.user_id === pin.user_id && i === list.length - 1}
         onPress={() => onPress(r)}
       />
@@ -981,6 +975,8 @@ export function ScoresLeaderboardsPage({
           row count is shown and zero rows reads one quiet line. Only the
           DEFAULT list being empty (or failing) on load hides the section. */}
       {top100Defaulted && top100.isPending ? (
+        /* No pinned row: the skeleton cannot know if the viewer is in the top 3,
+           and the shorter shape grows downward (expand-outwards-only). */
         pending(150)
       ) : top100Defaulted && !(top100.isSuccess && top100Rows.length > 0) ? null : (
         <Section
@@ -1123,7 +1119,7 @@ export function ScoresLeaderboardsPage({
                       {fmtCareerValue(c.metric, r.value)}
                     </span>
                     <span style={{ flexShrink: 0, display: 'flex' }}>
-                      <Avatar id={r.user_id} name={nameOf(r.display_name)} src={r.photo_url} size={30} />
+                      <MemberAvatar userId={r.user_id} name={r.display_name} photoUrl={r.photo_url} size={30} />
                     </span>
                   </span>
                   {margin != null ? (
@@ -1213,7 +1209,7 @@ export function ScoresLeaderboardsPage({
           : RANK_SCOPE_LABEL[top100List]}
         valueHeading={t('amateur.leaderboards.coursesOf100')}
         above={
-        <div style={{ padding: '11px 16px', borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
+        <div style={{ padding: '11px 16px', /* Hairline clause: controls from list. */ borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
           <RailChips
             align="center-when-fit"
             ground="filled-selection"
@@ -1232,6 +1228,7 @@ export function ScoresLeaderboardsPage({
               tie={r.is_tie}
               id={r.user_id}
               name={nameOf(r.display_name)}
+              avatarName={r.display_name}
               photo={r.photo_url}
               secondary={top100Secondary(r)}
               value={String(r.value)}
