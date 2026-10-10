@@ -232,7 +232,9 @@
       "defending": "Defending",
       "field": "Field",
       "worldRanked": "world ranked",
-      "ourPicks": "OUR TOURNAMENT PICKS"
+      "ourPicks": "OUR TOURNAMENT PICKS",
+      "leaderLabel": "Leader",
+      "stateSuspended": "SUSPENDED"
     },
     "leaderboardBand": {
       "ctaLive": "OPEN LIVE LEADERBOARD",
@@ -553,7 +555,8 @@
       "basis_one": "From {{count}} rating by members who have played it.",
       "basis_other": "From {{count}} ratings by members who have played it.",
       "seeAction": "SEE THE COURSE",
-      "playedLabel": "Played it"
+      "playedLabel": "Played it",
+      "course": "Course"
     },
     "status": {
       "finished": "FINISHED",
