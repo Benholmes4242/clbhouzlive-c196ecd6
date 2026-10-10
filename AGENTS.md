@@ -12,3 +12,4 @@
 
 - `useLeaderboardRealtime` coalesces row changes on one trailing window (`LEADERBOARD_REALTIME_COALESCE_MS`) for every caller and cancels a pending flush on unmount or tournament change, because live sync rewrites the whole field each cycle and each row would otherwise trigger its own invalidation.
 - The overview's one tournament sentence comes from `tournamentHeadline`/`tournamentHeadlineSegments` in `magazineCopy.ts`: `SituationBand` prints it on every state but a finished result, and on a finished result it lives only in ChampionStrip's narrative (stored narrative first), so one state never carries two prose blocks.
+- The Explore Scores lead board renders every row through `BoardRowView` under `BoardHeaderRow`; the first-place podium is its `podium` prop gated on `boardColumns(board).ranked`, so figures come only from `boardValue`/`boardSecondary` and the page cannot disagree with the see-all sheet.

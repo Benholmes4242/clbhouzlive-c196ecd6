@@ -10,7 +10,7 @@ import { getInitialsFromName } from '@/lib/avatarFallback';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
-import { boardSecondary, boardValue, fmtToPar } from '@/components/explore-tab-new/courseled/BoardRows';
+import { BoardHeaderRow, BoardRowView, boardColumns } from '@/components/explore-tab-new/courseled/BoardRows';
 import { describeFilterParts } from '@/components/explore-tab-new/courseled/GolfThisWeek';
 import { type BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import {
@@ -20,7 +20,6 @@ import {
   type BoardKey,
   type FeatBoardKey,
   type WindowKey,
-  boardValueIsFigure,
 } from '@/components/explore-tab-new/courseled/boardFilters';
 import { REC } from '@/components/profile/handicap/whs/gam/trophy-room/career/tokens';
 import { MEDAL_BRONZE, MEDAL_GOLD, MEDAL_SILVER } from '@/lib/tokens/medals';
@@ -36,10 +35,8 @@ import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListPr
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
 import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
 
-/** Row value size; the leader's value drops to it when the board's value is a time. */
+/** CompactRow value size (the career, Top 100 and improvement sections). */
 export const ROW_VALUE_SIZE = 14;
-/** Leader value size on a board whose value is a figure (boardValueIsFigure). */
-export const LEADER_FIGURE_SIZE = 30;
 
 /**
  * THE LEADERBOARDS PAGE (BRIEF — THE LEADERBOARDS PAGE, structure A).
@@ -345,19 +342,6 @@ function Avatar({ id, name, src, size }: { id: string; name: string; src: string
   );
 }
 
-/* PAGE DATED, SHEET GROUPED: this flat board leads the second line with the date; BoardSeeAllSheet groups by period and prints the course alone. Deliberate — do not match one to the other. */
-/** "26 Sep" — the one date rule on this page. play_date is a calendar date, read in UTC so it never shifts a day. */
-function fmtDayMonth(d: string | null | undefined): string | null {
-  if (!d) return null;
-  const dt = new Date(d.length === 10 ? `${d}T00:00:00Z` : d);
-  if (Number.isNaN(dt.getTime())) return null;
-  return dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
-}
-
-/** §3 second line: date FIRST so the unbounded course name absorbs any ellipsis. */
-function roundLine(r: BoardRow): string | null {
-  return [fmtDayMonth(r.play_date), r.course_name].filter(Boolean).join(' \u00B7 ') || null;
-}
 
 function CompactRow({
   pos,
@@ -629,16 +613,12 @@ export function ScoresLeaderboardsPage({
   const leadMine = userId ? leadRows.find((r) => r.user_id === userId) ?? null : null;
   const leadPinned = !!leadMine && !leadVisible.some((r) => r.user_id === leadMine.user_id);
 
-  /** THE ONE SOURCE for §3's figures — leader card and compact rows alike.
-      Text AND tone come from boardValue()/boardSecondary() (the under-par
-      colour law lives there); this page applies no colour of its own. topar
-      and gross both read the 'gross' cells: strokes big, to-par small. */
-  const leaderFigures = (r: BoardRow) => {
-    const b: BoardKey = state.board === 'topar' || state.board === 'gross' ? 'gross' : state.board;
-    const big = boardValue(r, b, t as never);
-    const small = boardSecondary(r, b);
-    return { big: big.text, bigTone: big.tone, small: small?.text ?? null, smallTone: small?.tone };
-  };
+  /* leaderFigures IS GONE. It mapped 'topar' onto the gross cells, so this
+     page led with strokes where the see-all sheet led with to-par — two maps
+     for one board. get_board_page records the same fault in SQL: floors once
+     duplicated inline drifted, "so the facet counts and the rendered board
+     answered different questions". boardValue()/boardSecondary(), read inside
+     BoardRowView, are now the only figure map on this screen, podium included. */
 
   const boardTitle = t(BOARD_LABELS[state.board].i18n, BOARD_LABELS[state.board].label);
 
@@ -776,96 +756,20 @@ export function ScoresLeaderboardsPage({
           ) : (
             <>
           <div style={{ marginTop: 12 }}>
-          {(() => {
-            const f = leaderFigures(leader);
-            const self = leader.user_id === userId;
-            return (
-              <button
-                type="button"
-                onClick={() => onRowPress(leader)}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: 14,
-                  borderRadius: 16,
-                  border: `1px solid ${REC.AMBER_LINE}`,
-                  background: REC.AMBER_WASH,
-                  textAlign: 'left',
-                  fontFamily: SANS,
-                  cursor: 'pointer',
-                }}
-              >
-                <Avatar id={leader.user_id} name={nameOf(leader.display_name)} src={leader.profile_photo_url} size={46} />
-                <span style={{ flex: 1, minWidth: 0 }}>
-                  <span
-                    style={{
-                      display: 'block',
-                      fontSize: 16,
-                      fontWeight: 700,
-                      color: self ? A.AMBER : A.INK,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {nameOf(leader.display_name)}
-                  </span>
-                  <span
-                    style={{
-                      display: 'block',
-                      marginTop: 2,
-                      fontSize: 11.5,
-                      color: A.MUTE,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {roundLine(leader)}
-                  </span>
-                </span>
-                <span style={{ flexShrink: 0, textAlign: 'right' }}>
-                  <span
-                    className="tabular-nums"
-                    data-leader-value
-                    style={boardValueIsFigure(state.board)
-                      ? { display: 'block', fontSize: LEADER_FIGURE_SIZE, fontWeight: 700, letterSpacing: '-0.03em', color: self ? A.AMBER : f.bigTone, lineHeight: 1 }
-                      : { display: 'block', fontSize: ROW_VALUE_SIZE, fontWeight: 700, color: self ? A.AMBER : f.bigTone, lineHeight: 1 }}
-                  >
-                    {f.big}
-                  </span>
-                  {f.small ? (
-                    <span className="tabular-nums" style={{ display: 'block', marginTop: 4, fontSize: 12, fontWeight: 700, color: self ? A.AMBER : f.smallTone }}>
-                      {f.small}
-                    </span>
-                  ) : null}
-                </span>
-              </button>
-            );
-          })()}
-          </div>
-          <div style={{ marginTop: 6 }}>
+            <BoardHeaderRow board={state.board} />
             {(() => {
-              const rest = leadVisible.slice(1);
-              const list = leadPinned && leadMine ? [...rest, leadMine] : rest;
+              const list = leadPinned && leadMine ? [...leadVisible, leadMine] : leadVisible;
+              /* The podium is gated on rank: on 'recent' and the feat boards
+                 (date orders) the first row is an ordinary row. */
+              const ranked = boardColumns(state.board).ranked;
               return list.map((r, i) => (
-                <CompactRow
+                <BoardRowView
                   key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
-                  pos={r.pos}
-                  tie={r.is_tie}
-                  id={r.user_id}
-                  name={nameOf(r.display_name)}
-                  photo={r.profile_photo_url}
-                  secondary={roundLine(r)}
-                  value={leaderFigures(r).big}
-                  valueTone={leaderFigures(r).bigTone}
-                  caption={leaderFigures(r).small}
-                  captionTone={leaderFigures(r).smallTone}
-                  self={r.user_id === userId}
-                  divider={i < list.length - 1}
-                  onPress={() => onRowPress(r)}
+                  row={r}
+                  board={state.board}
+                  isSelf={r.user_id === userId}
+                  podium={ranked && i === 0 && r.pos === 1}
+                  onPress={onRowPress}
                 />
               ));
             })()}
