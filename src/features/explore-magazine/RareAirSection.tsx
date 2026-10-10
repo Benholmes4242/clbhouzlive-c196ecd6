@@ -97,6 +97,7 @@ export function RareAirRail({
             const rate = f.events > 0
               ? t('amateur.leaderboards.featRarity', { n: Math.round(f.denominator / f.events).toLocaleString(), unit })
               : t('amateur.leaderboards.featNone', { n: f.denominator.toLocaleString(), unit });
+            const allRate = all && all.events > 0 ? Math.round(all.denominator / all.events).toLocaleString() : null;
             const has = !!f.latest_play_date;
             const lastAll = all?.latest_play_date ?? null;
             return (
@@ -107,10 +108,12 @@ export function RareAirRail({
                 style={{
                   width: T.width, height: RARE_AIR_TILE_HEIGHT, boxSizing: 'border-box', flex: 'none', scrollSnapAlign: 'start', background: A.PANEL,
                   border: `1px solid ${A.BORDER}`, borderRadius: T.radius, overflow: 'hidden',
-                  padding: 0, paddingBottom: T.paddingBottom, textAlign: 'left', fontFamily: SANS, cursor: 'pointer',
+                  padding: 0, paddingBottom: T.paddingBottom, textAlign: 'left',
+                  // A <button> centres its content vertically; stack from the top so slack falls at the bottom.
+                  display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'stretch', fontFamily: SANS, cursor: 'pointer',
                 }}
               >
-                <span aria-hidden style={{ display: 'block', height: T.accentHeight, background: A.BORDER, position: 'relative' }}>
+                <span aria-hidden style={{ display: 'block', flex: 'none', height: T.accentHeight, background: A.BORDER, position: 'relative' }}>
                   {share > 0 ? (
                     <span style={{
                       position: 'absolute', left: 0, top: 0, bottom: 0, width: `${share * 100}%`,
@@ -145,15 +148,19 @@ export function RareAirRail({
                   </span>
                   <span className="tabular-nums" style={{ display: 'block', marginTop: T.rate.marginTop, fontSize: T.rate.fontSize, lineHeight: `${T.rate.lineHeight}px`, color: A.DIM }}>
                     <span style={{ display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600, color: A.MUTE }}>{rate}</span>
-                    <span style={{ display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {f.members > 0 ? t('amateur.leaderboards.nMembers', { count: f.members }) : null}
-                      {f.events === 0 ? null : cmp?.kind === 'commoner' ? (
-                        <span style={{ fontWeight: 700, color: A.GREEN }}>{f.members > 0 ? ' · ' : ''}{t('amateur.leaderboards.featCompare.commoner', { n: cmp.pct })}</span>
-                      ) : cmp?.kind === 'rarer' ? (
-                        <span style={{ fontWeight: 700, color: A.MUTE }}>{f.members > 0 ? ' · ' : ''}{t('amateur.leaderboards.featCompare.rarer', { n: cmp.pct })}</span>
-                      ) : cmp?.kind === 'tooFew' ? (
-                        <span style={{ fontWeight: 700, color: A.MUTE }}>{f.members > 0 ? ' · ' : ''}{t('amateur.leaderboards.featCompare.tooFew')}</span>
-                      ) : null}
+                    {/* Fixed line height even when empty, so the rate block never collapses. */}
+                    <span style={{ display: 'block', height: T.rate.lineHeight, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: A.MUTE }}>
+                      {f.events === 0 ? null : window === 'all'
+                        ? (f.members > 0 ? t('amateur.leaderboards.nMembers', { count: f.members }) : null)
+                        : cmp?.kind === 'tooFew' ? t('amateur.leaderboards.featCompare.tooFew')
+                        : cmp && allRate ? (
+                          <Trans
+                            ns="courses"
+                            i18nKey={cmp.kind === 'commoner' ? 'amateur.leaderboards.featCompare.more' : 'amateur.leaderboards.featCompare.less'}
+                            values={{ n: allRate, unit }}
+                            components={{ g: <span style={{ fontWeight: 700, color: A.GREEN }} /> }}
+                          />
+                        ) : null}
                     </span>
                   </span>
                 </span>
