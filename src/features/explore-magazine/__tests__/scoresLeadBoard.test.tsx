@@ -27,6 +27,9 @@ import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSe
 import { DEFAULT_FILTERS, type BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 import { A } from '@/components/explore-tab-new/courseled/tokens';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
+import { fireEvent } from '@testing-library/react';
+import { FiltersPill } from '@/features/explore-magazine/ScoresFilterHead';
+import { OFFERED_RANKING_BOARD_KEYS, boardValueIsFigure } from '@/components/explore-tab-new/courseled/boardFilters';
 import { makeBoardState } from '@/test/factories/boardState';
 
 function render(ui: React.ReactElement) {
@@ -51,7 +54,7 @@ function page(board: BoardKey, rows: BoardRow[], userId = 'viewer') {
     page: { data: { rows, total: rows.length, pool: { rounds: 0, courses: 0, members: 0 } }, isSuccess: true, isPending: false } as never,
   });
   return render(
-    <ScoresLeaderboardsPage userId={userId} state={state} onOpenBoard={vi.fn()} onOpenFilters={vi.fn()}
+    <ScoresLeaderboardsPage userId={userId} state={state} onOpenFilters={vi.fn()}
       onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />,
   );
 }
@@ -89,7 +92,32 @@ describe('Standing and basis (Phase 2)', () => {
   });
 });
 
-describe('Board rail (Phase 1)', () => {
+describe('Board rail (Phase 1, absorbs the retired BoardPicker tests)', () => {
+  it('offers exactly the six ranking boards in order, no feats, no retired gross', () => {
+    expect(OFFERED_RANKING_BOARD_KEYS).toEqual(['recent', 'topar', 'net', 'stableford', 'improved', 'birdies']);
+    render(<ScoresLeaderboardsPage userId="v" state={makeBoardState()} onOpenFilters={vi.fn()}
+      onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />);
+    expect([...document.querySelectorAll('[data-board-chip]')].map((c) => c.getAttribute('data-board-chip'))).toEqual(OFFERED_RANKING_BOARD_KEYS);
+  });
+  it('tapping a chip changes the board through changeBoard', () => {
+    const state = makeBoardState();
+    render(<ScoresLeaderboardsPage userId="v" state={state} onOpenFilters={vi.fn()}
+      onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />);
+    fireEvent.click(document.querySelector('[data-board-chip="net"]')!);
+    expect(state.changeBoard).toHaveBeenCalledWith('net');
+  });
+  it('the Filters pill still calls its own open handler', () => {
+    const onOpen = vi.fn();
+    render(<FiltersPill count={0} onOpen={onOpen} />);
+    fireEvent.click(screen.getByRole('button'));
+    expect(onOpen).toHaveBeenCalledTimes(1);
+  });
+  it('numeric boards get the large leader value; recent gets row size', () => {
+    expect(boardValueIsFigure('topar')).toBe(true);
+    expect(boardValueIsFigure('net')).toBe(true);
+    expect(boardValueIsFigure('recent')).toBe(false);
+  });
+
   it('renders six named chips with no figures and nothing greyed when there is no counts object', () => {
     const state = makeBoardState({ facets: undefined as never });
     render(<ScoresLeaderboardsPage userId="v" state={state} onOpenFilters={vi.fn()}
