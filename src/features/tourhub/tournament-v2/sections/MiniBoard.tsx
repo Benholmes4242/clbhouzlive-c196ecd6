@@ -348,7 +348,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               >
                 {showHeroMov ? (
                   <div style={{ display: 'flex', justifyContent: 'flex-end', minWidth: 0 }}>
-                    {demotedRow ? null : <MovementFigure movement={mov ?? null} variant="compact" />}
+                    {demotedRow ? null : <MovementFigure movement={mov ?? null} variant="compact" tone="ink" />}
                   </div>
                 ) : null}
                 {showOverviewPosition ? (

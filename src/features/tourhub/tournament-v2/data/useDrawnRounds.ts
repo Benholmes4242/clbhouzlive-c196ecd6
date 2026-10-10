@@ -9,10 +9,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export function useDrawnRounds(tournamentId: string | null | undefined) {
+export function useDrawnRounds(
+  tournamentId: string | null | undefined,
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: ['tourhub', 'tee-times', 'drawn-rounds', tournamentId],
-    enabled: !!tournamentId,
+    enabled: !!tournamentId && (options?.enabled ?? true),
     staleTime: 60_000,
     queryFn: async (): Promise<number[]> => {
       const { data, error } = await supabase
