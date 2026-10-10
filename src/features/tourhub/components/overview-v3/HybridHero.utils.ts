@@ -389,15 +389,18 @@ export function todayFromEntry(entry: BoardEntry | null | undefined): number | n
  * - 'faded':   finished worse than the trend predicted (Sunday collapse)
  * - 'steady':  finished close to the trend (no story)
  *
- * Method: compare final round to mean of prior rounds, both relative to par.
+ * Method: compare final round to mean of prior rounds.
  * Threshold: ±1.5 strokes from trend.
+ *
+ * Input is TO-PAR per round (sr_leaderboards.round_N). Do not subtract par:
+ * the old `r - par` conversion only gave right answers because the par term
+ * cancels in `finalRound - priorAvg`.
  */
 export function classifyTrajectory(
   rounds: number[],
-  par: number
 ): 'climbed' | 'steady' | 'faded' {
-  if (rounds.length < 3 || !par) return 'steady';
-  const rel = rounds.map(r => r - par);
+  if (rounds.length < 3) return 'steady';
+  const rel = rounds;
   const n = rel.length;
   const finalRound = rel[n - 1];
   const priorRounds = rel.slice(0, n - 1);

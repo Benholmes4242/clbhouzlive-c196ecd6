@@ -111,6 +111,8 @@ export interface BoardEntry {
   today?: number | null;
   today_round?: number | null;
   status?: string | null;
+  // round_1..round_4 are TO-PAR figures for each round (e.g. -8, 2, 0), NOT
+  // stroke counts: they sum to `score`. Add the venue par to get strokes.
   round_1?: number | null;
   round_2?: number | null;
   round_3?: number | null;

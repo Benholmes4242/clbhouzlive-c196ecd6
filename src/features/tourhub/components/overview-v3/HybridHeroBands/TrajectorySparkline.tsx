@@ -14,10 +14,12 @@ import { classifyTrajectory } from '../HybridHero.utils';
 import { TREND_UP, TREND_DOWN } from '../../../_shared/tokens';
 
 interface TrajectorySparklineProps {
-  /** Per-round scores, e.g. [66, 63, 65, 60]. 2+ entries required to render. */
+  /**
+   * Per-round TO-PAR figures, straight from sr_leaderboards.round_N — never
+   * stroke counts. e.g. [-8, -3, -2, 1] plots cumulative -8, -11, -13, -12.
+   * 2+ entries required to render.
+   */
   rounds: number[];
-  /** Course par per round (typically 70–72). Used to compute cumulative to-par. */
-  par: number;
   /** Visual variant — affects size + stroke weight. */
   variant?: 'solo' | 'tied' | 'champion';
   /** Number of total rounds expected (4 for standard, 3 for shortened). For aria-label only. */
@@ -38,25 +40,26 @@ const SIZING = {
   champion: { width: 44, height: 14, stroke: 1.5, dotR: 1.8 },
 } as const;
 
+/** Cumulative to-par after each round. Input is already to-par: no par term. */
+export function trajectoryPoints(rounds: number[]): number[] {
+  let cumulative = 0;
+  return rounds.map((r) => (cumulative += r));
+}
+
 export function TrajectorySparkline({
   rounds,
-  par,
   variant = 'solo',
   totalRounds,
   ariaHidden = false,
 }: TrajectorySparklineProps) {
   const { t } = useTranslation('tourhub');
-  if (rounds.length < 2 || !par || par <= 0) return null;
+  if (rounds.length < 2) return null;
 
   const { width, height, stroke, dotR } = SIZING[variant];
-  const classification = classifyTrajectory(rounds, par);
+  const classification = classifyTrajectory(rounds);
   const colour = COLOURS[classification];
 
-  let cumStrokes = 0;
-  const points = rounds.map((r, i) => {
-    cumStrokes += r;
-    return cumStrokes - par * (i + 1);
-  });
+  const points = trajectoryPoints(rounds);
 
   const minY = Math.min(...points);
   const maxY = Math.max(...points);

@@ -82,14 +82,14 @@ export function overviewChampionScoreLabel(
 }
 
 /**
- * The champion's gross closing round. Stored round figures are gross strokes
- * (the sparkline reads them against par); a small figure is read as to-par
- * and added to the venue par. Absent → null, so the sentence omits it.
+ * The champion's gross closing round. round_N is a TO-PAR figure, so the
+ * venue par is added to turn it into strokes. Either absent → null, and the
+ * sentence takes its variant without a closing round.
  */
 function closingGross(round4: number | null | undefined, par: number | null | undefined): number | null {
   if (typeof round4 !== 'number' || !Number.isFinite(round4)) return null;
-  if (round4 >= 50) return round4;
-  return typeof par === 'number' && par > 0 ? par + round4 : null;
+  if (typeof par !== 'number' || !Number.isFinite(par) || par <= 0) return null;
+  return par + round4;
 }
 
 export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroProps) {
@@ -154,7 +154,7 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
       playoff: Boolean(tiedAtTop),
       rounds: championEntry
         ? [championEntry.round_1, championEntry.round_2, championEntry.round_3, championEntry.round_4]
-            .filter((r): r is number => typeof r === 'number' && Number.isFinite(r) && r > 0)
+            .filter((r): r is number => typeof r === 'number' && Number.isFinite(r)) // to-par: 0 and negatives are real rounds
         : [],
       closingRound: closingGross(championEntry?.round_4, tournament.venuePar),
       country: championEntry?.player?.country_code || championEntry?.player?.country || undefined,
@@ -213,7 +213,6 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
           avatarUrl={championAvatarUrl}
           narrative={championNarrative}
           rounds={champion.rounds}
-          par={tournament.venuePar ?? undefined}
           country={champion.country}
         />
       ) : null}
