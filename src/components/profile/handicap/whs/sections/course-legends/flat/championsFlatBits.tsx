@@ -12,7 +12,7 @@ import React from 'react';
 import { Crown } from 'lucide-react';
 import { A, NUM, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { RailChips } from '@/components/ui/RailChips';
-import { BoardAvatar, formatChampionsWhen, formatToPar, toParColor, hasToPar } from '../drilldown/_shared/boardParts';
+import { CourseLegendsAvatar, formatChampionsWhen, formatToPar, toParColor, hasToPar } from '../drilldown/_shared/boardParts';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import type { TFunction } from 'i18next';
 
@@ -265,7 +265,7 @@ export const FlatBoardRow: React.FC<{
         )}
         <span style={{ ...NUM, fontSize: 12, color: row.isSelf ? A.AMBER : A.DIM }}>{pos}</span>
       </span>
-      <BoardAvatar photoUrl={row.photoUrl} name={row.name} size={34} />
+      <CourseLegendsAvatar photoUrl={row.photoUrl} name={row.name} size={34} />
       <span style={{ minWidth: 0 }}>
         <span
           style={{

@@ -48,7 +48,7 @@ const SQUIRCLE_MASK_URL =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E\")";
 
 /** 26px squircle with the canonical 1px traced hairline ring. */
-export const BoardAvatar: React.FC<{ photoUrl: string | null; name: string; size?: number }> = ({
+export const CourseLegendsAvatar: React.FC<{ photoUrl: string | null; name: string; size?: number }> = ({
   photoUrl,
   name,
   size = 26,
@@ -153,7 +153,7 @@ export const BoardRow: React.FC<{
         {showMovement && <span aria-hidden />}
         <span style={{ ...NUM, fontSize: 12.5, color: A.DIM, textAlign: 'center' }}>{row.rank}</span>
       </span>
-      <BoardAvatar photoUrl={row.photoUrl} name={row.name} />
+      <CourseLegendsAvatar photoUrl={row.photoUrl} name={row.name} />
       <span
         style={{
           fontSize: 13,
@@ -407,7 +407,7 @@ export const ChampionsRow: React.FC<{
         )}
         <span style={{ ...NUM, fontSize: 12.5, color: row.isSelf ? A.AMBER : A.DIM }}>{pos}</span>
       </span>
-      <BoardAvatar photoUrl={row.photoUrl} name={row.name} />
+      <CourseLegendsAvatar photoUrl={row.photoUrl} name={row.name} />
       <span style={{ minWidth: 0 }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
           <span
