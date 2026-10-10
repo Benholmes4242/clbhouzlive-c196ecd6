@@ -1,5 +1,5 @@
-/** Tour Overview's single 360px, three-state photographic hero. */
-import { useEffect, useMemo, useState } from 'react';
+/** Tour Overview's photographic hero. Renders the HeroState it is GIVEN (OverviewHero derives it once). */
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import '@/styles/hybrid-hero.css';
 
@@ -8,7 +8,7 @@ import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { VenueRotationLine } from './HybridHeroBands/VenueRotationLine';
 import { PhotoBand, type OverviewCountdownUnit } from './HybridHeroBands/PhotoBand';
-import { deriveHeroState, detectTopTie, fmtScore } from './HybridHero.utils';
+import { detectTopTie, fmtScore, isChampionResolvable, isInPlayState, type HeroState } from './HybridHero.utils';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { ChampionStrip } from './HybridHeroBands/ChampionStrip';
@@ -17,6 +17,10 @@ import { resolveBoardEntity, resolveChampionEntry, teamNamesNeedInitials } from 
 
 export interface HybridHeroProps {
   slide: HeroSlide;
+  /** The ONE state decision for this slide, derived in OverviewHero. */
+  state: HeroState;
+  /** Clock the state was derived against; drives the countdown. */
+  now: Date;
   activeTournamentId: string | null;
   onSelectTour: (tournamentId: string) => void;
   onOpenTournament: () => void;
@@ -76,17 +80,9 @@ export function overviewChampionScoreLabel(
   return undefined;
 }
 
-export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
+export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroProps) {
   const { tournament } = slide;
   const { t } = useTranslation('tourhub');
-  const [now, setNow] = useState(() => new Date());
-  const state = useMemo(() => deriveHeroState(tournament, now), [tournament, now]);
-
-  useEffect(() => {
-    if (state.kind === 'live') return;
-    const id = window.setInterval(() => setNow(new Date()), 60_000);
-    return () => window.clearInterval(id);
-  }, [state.kind]);
 
   useEffect(() => {
     setHeroFullBleed(true);
@@ -109,7 +105,7 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
   const tied = tiedCount > 1 ? { count: tiedCount } : null;
   const needsInitials = useMemo(() => teamNamesNeedInitials(rows), [rows]);
 
-  const leader = state.kind === 'live' && topPosition === 1 && top?.score != null
+  const leader = isInPlayState(state) && topPosition === 1 && top?.score != null
     ? {
         score: top.score,
         name: tied
@@ -121,7 +117,10 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
     : null;
 
   const champion = useMemo(() => {
-    if (state.kind !== 'results' || top?.score == null) return null;
+    // Champion gate — the SAME rule as the pick trophy in HeroBoardBand: only a
+    // genuinely finished event (isChampionResolvable) with an authoritative
+    // winner. Never by name or position on a live/suspended/playoff board.
+    if (!isChampionResolvable(state) || top?.score == null) return null;
     const championEntry = !tournament.winnerName
       // event_type comes from sr_tournaments via the slide — never inferred
       // from the shape of the top board row.
@@ -143,7 +142,7 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
       margin: tiedAtTop ? null : margin != null && margin > 0 ? margin : null,
       playoff: Boolean(tiedAtTop),
     };
-  }, [needsInitials, rows, state.kind, top?.player, top?.score, top?.team, tournament.eventType, tournament.winnerId, tournament.winnerName]);
+  }, [needsInitials, rows, state, top?.player, top?.score, top?.team, tournament.eventType, tournament.winnerId, tournament.winnerName]);
 
   const championAvatarUrl = champion
     ? resolvePlayerAvatarCandidates({
@@ -175,7 +174,7 @@ export function HybridHero({ slide, onOpenTournament }: HybridHeroProps) {
         onOpen={onOpenTournament}
       />
       <VenueRotationLine tournamentId={tournament.id} />
-      {state.kind === 'results' && champion ? (
+      {isChampionResolvable(state) && champion ? (
         <ChampionStrip
           name={champion.name}
           score={fmtScore(champion.score)}

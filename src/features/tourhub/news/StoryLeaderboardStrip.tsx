@@ -142,8 +142,11 @@ export function StoryLeaderboardStrip({ tournamentId }: { tournamentId: string }
     ? state.round
       ? t('news.liveRound', { defaultValue: 'LIVE \u00b7 ROUND {{n}}', n: state.round })
       : t('news.live', 'LIVE')
-    : state.kind === 'results'
-      ? t('news.finalResult', 'FINAL RESULT')
+    : state.kind === 'suspended'
+      // Play stopped mid-event: never FINAL RESULT.
+      ? t('overview.hero.stateSuspended')
+      : state.kind === 'results'
+        ? t('news.finalResult', 'FINAL RESULT')
       : t('news.tournament', 'TOURNAMENT');
 
   return (

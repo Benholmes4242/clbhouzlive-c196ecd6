@@ -62,6 +62,7 @@ import { useTournamentVenueRecord } from '../../../overview/data/useTournamentVe
 import { surnameOf } from '../../../_shared/playerName';
 import { r } from '@/lib/radius';
 import { PicksSheet } from './PicksSheet';
+import type { HeroState } from '../HybridHero.utils';
 
 /**
  * SIX rows. It was five while the board occupied the photo band, because the
@@ -184,9 +185,9 @@ interface HeroBoardSectionProps {
    */
   currentRound: number | null;
   /**
-   * The lifecycle phase of the slide, read off the hero carousel's own
-   * `slide.type` (§2). NO NEW QUERY: the pulse hook would be one, and the
-   * carousel already knows.
+   * The lifecycle phase of the slide, derived by `boardPhaseFor` from the ONE
+   * HeroState OverviewHero computes — never from the carousel's `slide.type`,
+   * so the photo and the board cannot describe the same event differently.
    */
   phase: 'live' | 'upcoming' | 'completed';
   /**
@@ -204,6 +205,22 @@ interface HeroBoardSectionProps {
 }
 
 /**
+ * The band's phase, read off the single HeroState. Suspended play keeps the
+ * live columns (its scores are live scores); every `results` variant is
+ * completed; upcoming is upcoming.
+ */
+export function boardPhaseFor(state: HeroState): HeroBoardSectionProps['phase'] {
+  if (state.kind === 'live' || state.kind === 'suspended') return 'live';
+  if (state.kind === 'results') return 'completed';
+  return 'upcoming';
+}
+
+/**
+ * Champion gate — the SAME rule as HybridHero's ChampionStrip: OverviewHero
+ * passes `championSrId` only when `isChampionResolvable(state)` holds, and the
+ * trophy is matched here by id alone. Never compared by name or by position
+ * (a T1 playoff loser is not the champion).
+ *
  * The champion's BOARD player id, resolved by id alone: the leaderboard row
  * whose player carries the champion's sr_id. Position is never consulted.
  */
@@ -393,7 +410,7 @@ export function HeroBoardSection({
             data-overview-course-cta
             style={{ flex: '1 1 0', minWidth: 0, minHeight: 48, margin: 0, padding: '0 12px', borderRadius: r.md, background: 'transparent', border: `1px solid ${WHITE_ALPHA_08}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: WHITE_ALPHA_65, fontFamily: FONT, fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.01em', cursor: 'pointer', whiteSpace: 'nowrap' }}
           >
-            {t('overview.venueRecord.course', 'Course')}
+            {t('overview.venueRecord.course')}
             <ChevronRight size={16} aria-hidden />
           </button>
         ) : null}

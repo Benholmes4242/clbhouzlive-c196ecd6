@@ -175,7 +175,9 @@
       "factThru": "[THRU]",
       "factMargin": "[MARGIN]",
       "factPlayoff": "[PLAYOFF]",
-      "ourPicks": "[OUR TOURNAMENT PICKS]"
+      "ourPicks": "[OUR TOURNAMENT PICKS]",
+      "leaderLabel": "[Leader]",
+      "stateSuspended": "[SUSPENDED]"
     },
     "leaderboardBand": {
       "ctaLive": "[~~ŐƤÉÑ ĻÍṼÉ ĻÉÁĐÉŘƁŐÁŘĐ~~]",
@@ -470,7 +472,8 @@
       "basis_one": "[From {{count}} rating by members who have played it.]",
       "basis_other": "[From {{count}} ratings by members who have played it.]",
       "seeAction": "[SEE THE COURSE]",
-      "playedLabel": "[Played it]"
+      "playedLabel": "[Played it]",
+      "course": "[Course]"
     },
     "magazine": {
       "scoreEven": "[!! level par !!]",

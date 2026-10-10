@@ -49,9 +49,15 @@ export function PhotoBand({
   const { t } = useTranslation('tourhub');
   const venueLine = [venueName, datesString].filter(Boolean).join(' · ');
   const isLive = state.kind === 'live';
+  const isSuspended = state.kind === 'suspended';
+  /** Live OR suspended: the scores are live scores, so the round and leader stay. */
+  const inPlay = isLive || isSuspended;
   const isUpcoming = state.kind === 'upcoming';
+  // FINAL is reachable ONLY from `results`; a suspended event can never print it.
   const stateLabel = isLive
     ? t('overview.hero.stateLive')
+    : isSuspended
+      ? t('overview.hero.stateSuspended')
     : isUpcoming && startDay
       ? t('overview.hero.starts', { day: startDay })
       : t('overview.hero.stateFinal');
@@ -109,7 +115,7 @@ export function PhotoBand({
           >
             {isLive ? <span style={{ width: 7, height: 7, borderRadius: 999, background: STATUS_LIVE_ON_DARK }} /> : null}
             <span>{stateLabel}</span>
-            {isLive ? <span style={{ color: AMBER }}>{t('overview.hero.factRound')} {state.round}</span> : null}
+            {inPlay ? <span style={{ color: AMBER }}>{t('overview.hero.factRound')} {state.round}</span> : null}
           </div>
           {tourLabel ? <div style={MASTHEAD_KICKER}>{tourLabel}</div> : null}
           <h1
@@ -127,9 +133,9 @@ export function PhotoBand({
           {venueLine ? <div style={MASTHEAD_PLACE}>{venueLine}</div> : null}
         </div>
 
-        {isLive && leader ? (
+        {inPlay && leader ? (
           <div style={{ flex: 'none', maxWidth: 150, alignSelf: 'flex-end', textAlign: 'right' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.58)', whiteSpace: 'nowrap' }}>{t('overview.hero.leaderLabel', { defaultValue: 'Leader' })}</div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.58)', whiteSpace: 'nowrap' }}>{t('overview.hero.leaderLabel')}</div>
             <div style={{ ...NUMERIC_STYLE, marginTop: 4, fontSize: 26, lineHeight: 1, fontWeight: 800, letterSpacing: '-0.02em', color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
             {leader.name ? <div data-overview-leader-name style={{ maxWidth: 150, marginTop: 4, marginLeft: 'auto', fontSize: 11, fontWeight: 600, lineHeight: 1.25, color: 'rgba(255,255,255,0.6)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{leader.name}</div> : null}
           </div>

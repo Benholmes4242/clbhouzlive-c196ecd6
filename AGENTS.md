@@ -7,3 +7,4 @@
 - Explore Scores renders `ScoresLeaderboardsPage`; its scope control and Filters pill are the shared `ScopeSegments`/`FiltersPill` exported from `ScoresFilterHead.tsx`, so the control exists once.
 - Explicitly selected Tour venue photos take precedence in both batch and single-venue image resolution, so Overview and Tournament Detail cannot display different catalogue photos.
 - Tour Hub OUR PICKS cards all open the one `PicksSheet`; pick reasons are never padded with filler, so the sheet only prints real model output.
+- The Tour overview hero's on-screen state is decided once by `deriveHeroState` in `OverviewHero` and passed down to photo and board; carousel `slide.type` only decides membership and order, so the photo and board cannot disagree.
