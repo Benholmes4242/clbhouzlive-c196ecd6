@@ -142,15 +142,8 @@
       "nRounds_one": "{{count}} round",
       "nRounds_other": "{{count}} rounds",
       "basisSentence": {
-        "rounds": "Every round {{scope}} has posted in {{window}}, newest first.",
-        "ranked": "Ranked on {{unit}} across {{window}}. {{scopeLead}}, 18 holes.",
-        "window": {
-          "14": "the last fortnight",
-          "30": "the last 30 days",
-          "90": "the last 90 days",
-          "year": "this year",
-          "all": "all time"
-        },
+        "rounds": "Every round {{scope}} has posted {{window}}, newest first — net first, gross behind.",
+        "ranked": "Ranked on {{unit}} {{window}}. {{scopeLead}}, 18 holes.",
         "scope": {
           "everyone": "everyone",
           "circle": "your circle",
@@ -162,18 +155,19 @@
           "club": "Your club"
         },
         "unit": {
-          "recent": "rounds posted",
           "topar": "score against par",
           "net": "net against par",
           "stableford": "stableford points",
           "improved": "index movement",
           "birdies": "birdies"
-        }
+        },
+        "roundsAll": "Every round {{scope}} has ever posted, newest first — net first, gross behind.",
+        "rankedAll": "Ranked on {{unit}}, all time. {{scopeLead}}, 18 holes."
       },
       "slab": {
         "you": "You",
-        "onBoard": "{{you}} last posted at {{course}}, {{date}}.",
-        "onBoardNoCourse": "{{you}} last posted on {{date}}."
+        "onBoardRanked": "{{you}}, of {{pool}} in {{scope}}. {{course}}, {{date}}.",
+        "onBoardRounds": "{{you}} posted {{gross}} at {{course}}, {{date}}."
       }
     },
     "place": {
@@ -1333,7 +1327,13 @@
         "cleanCard": "Bogey-free rounds"
       },
       "nRounds_one": "{{count}} round",
-      "nRounds_other": "{{count}} rounds"
+      "nRounds_other": "{{count}} rounds",
+      "windowSentence": {
+        "d14": "in the last fortnight",
+        "d30": "in the last 30 days",
+        "d90": "in the last 90 days",
+        "year": "this year"
+      }
     },
     "findGolfers": {
       "addFriend": "Add friend",
@@ -1827,7 +1827,13 @@
       "relYest": "yest",
       "today": "Today",
       "weeksAgo": "{{count}}w ago",
-      "yesterday": "Yesterday"
+      "yesterday": "Yesterday",
+      "ladder": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "thisWeek": "This week",
+        "lastWeek": "Last week"
+      }
     },
     "whereTheyPlayed": "Where they played in the last 14 days",
     "whosBeenPlaying": "Your Circle",

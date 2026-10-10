@@ -142,15 +142,8 @@
       "nRounds_one": "[~~{{count}} řőúñđ~~]",
       "nRounds_other": "[~~{{count}} řőúñđš~~]",
       "basisSentence": {
-        "rounds": "[~~Éṽéřý řőúñđ {{scope}} ĥáš ƥőšţéđ íñ {{window}}, ñéŵéšţ ƒířšţ.~~]",
-        "ranked": "[~~Řáñǩéđ őñ {{unit}} áĉřőšš {{window}}. {{scopeLead}}, 18 ĥőļéš.~~]",
-        "window": {
-          "14": "[~~ţĥé ļášţ ƒőřţñíĝĥţ~~]",
-          "30": "[~~ţĥé ļášţ 30 đáýš~~]",
-          "90": "[~~ţĥé ļášţ 90 đáýš~~]",
-          "year": "[~~ţĥíš ýéář~~]",
-          "all": "[~~áļļ ţíɱé~~]"
-        },
+        "rounds": "[Every round {{scope}} has posted {{window}}, newest first — net first, gross behind.]",
+        "ranked": "[Ranked on {{unit}} {{window}}. {{scopeLead}}, 18 holes.]",
         "scope": {
           "everyone": "[~~éṽéřýőñé~~]",
           "circle": "[~~ýőúř ĉířĉļé~~]",
@@ -162,18 +155,19 @@
           "club": "[~~Ýőúř ĉļúƀ~~]"
         },
         "unit": {
-          "recent": "[~~řőúñđš ƥőšţéđ~~]",
           "topar": "[~~šĉőřé áĝáíñšţ ƥář~~]",
           "net": "[~~ñéţ áĝáíñšţ ƥář~~]",
           "stableford": "[~~šţáƀļéƒőřđ ƥőíñţš~~]",
           "improved": "[~~íñđéẋ ɱőṽéɱéñţ~~]",
           "birdies": "[~~ƀířđíéš~~]"
-        }
+        },
+        "roundsAll": "[Every round {{scope}} has ever posted, newest first — net first, gross behind.]",
+        "rankedAll": "[Ranked on {{unit}}, all time. {{scopeLead}}, 18 holes.]"
       },
       "slab": {
         "you": "[~~Ýőú~~]",
-        "onBoard": "[~~{{you}} ļášţ ƥőšţéđ áţ {{course}}, {{date}}.~~]",
-        "onBoardNoCourse": "[~~{{you}} ļášţ ƥőšţéđ őñ {{date}}.~~]"
+        "onBoardRanked": "[{{you}}, of {{pool}} in {{scope}}. {{course}}, {{date}}.]",
+        "onBoardRounds": "[{{you}} posted {{gross}} at {{course}}, {{date}}.]"
       }
     },
     "place": {
@@ -1333,7 +1327,13 @@
         "cleanCard": "[~~Ɓőĝéý-ƒřéé řőúñđš~~]"
       },
       "nRounds_one": "[~~{{count}} řőúñđ~~]",
-      "nRounds_other": "[~~{{count}} řőúñđš~~]"
+      "nRounds_other": "[~~{{count}} řőúñđš~~]",
+      "windowSentence": {
+        "d14": "[in the last fortnight]",
+        "d30": "[in the last 30 days]",
+        "d90": "[in the last 90 days]",
+        "year": "[this year]"
+      }
     },
     "findGolfers": {
       "addFriend": "[~~Áđđ ƒříéñđ~~]",
@@ -1827,7 +1827,13 @@
       "relYest": "[~~ýéšţ~~]",
       "today": "[~~Ţőđáý~~]",
       "weeksAgo": "[~~{{count}}ŵ áĝő~~]",
-      "yesterday": "[~~Ýéšţéřđáý~~]"
+      "yesterday": "[~~Ýéšţéřđáý~~]",
+      "ladder": {
+        "today": "[Today]",
+        "yesterday": "[Yesterday]",
+        "thisWeek": "[This week]",
+        "lastWeek": "[Last week]"
+      }
     },
     "whereTheyPlayed": "[~~Ŵĥéřé ţĥéý ƥļáýéđ íñ ţĥé ļášţ 14 đáýš~~]",
     "whosBeenPlaying": "[~~Ýőúř Ĉířĉļé~~]",

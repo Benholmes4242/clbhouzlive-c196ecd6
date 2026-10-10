@@ -675,7 +675,7 @@ export function ScoresLeaderboardsPage({
      for one board. get_board_page records the same fault in SQL: floors once
      duplicated inline drifted, "so the facet counts and the rendered board
      answered different questions". boardValue()/boardSecondary(), read inside
-     BoardRowView, are now the only figure map on this screen, podium included. */
+     BoardRowView, are now the only figure map on this screen. */
 
   const boardTitle = t(BOARD_LABELS[state.board].i18n);
 
