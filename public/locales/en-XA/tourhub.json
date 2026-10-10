@@ -72,10 +72,6 @@
     }
   },
   "overview": {
-    "cancelled": {
-      "eyebrow": "[~~Ñő Řéšúļţ~~]",
-      "reasonDefault": "[~~Ţĥíš éṽéñţ đíđ ñőţ ĉőɱƥļéţé éñőúĝĥ řőúñđš ƒőř áñ őƒƒíĉíáļ řéšúļţ.~~]"
-    },
     "ticker": {
       "top10Label": "[~~ŢŐƤ 10~~]",
       "alsoOutLabel": "[ĀĻŠŐ ŌŨŢ]",
@@ -90,9 +86,6 @@
     "champion": {
       "scoreLabelToPar": "[~~ŢŐ ƤÁŘ~~]",
       "eyebrow": "[~~ĈĤÁṀƤÍŐÑ~~]"
-    },
-    "cancelledStrip": {
-      "eyebrow": "[~~ĈÁÑĈÉĻĻÉĐ~~]"
     },
     "playoff": {
       "eyebrow": "[~~ÁŴÁÍŢÍÑĜ ƤĻÁÝŐƑƑ~~]",

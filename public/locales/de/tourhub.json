@@ -72,10 +72,6 @@
     }
   },
   "overview": {
-    "cancelled": {
-      "eyebrow": "No Result",
-      "reasonDefault": "This event did not complete enough rounds for an official result."
-    },
     "ticker": {
       "top10Label": "TOP 10",
       "alsoOutLabel": "AUCH IM FELD",
@@ -90,9 +86,6 @@
     "champion": {
       "scoreLabelToPar": "TO PAR",
       "eyebrow": "CHAMPION"
-    },
-    "cancelledStrip": {
-      "eyebrow": "CANCELLED"
     },
     "playoff": {
       "eyebrow": "AWAITING PLAYOFF",

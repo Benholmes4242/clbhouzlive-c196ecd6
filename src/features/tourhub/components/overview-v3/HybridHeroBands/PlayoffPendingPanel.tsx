@@ -1,3 +1,4 @@
+// SALVAGED — claimed by Tour Overview rebuild Phase 2 (awaiting-playoff panel vs sentence decision). Do not sweep as unreachable.
 /**
  * PlayoffPendingPanel — Results · awaiting-playoff bottom band.
  * §6.4 of HYBRID_HERO_IMPLEMENTATION_BRIEF — tied players (gold tint) followed
