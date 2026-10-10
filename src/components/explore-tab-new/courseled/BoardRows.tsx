@@ -118,12 +118,9 @@ function netToParOf(r: Row): number | null {
   return r.net_score - r.course_par;
 }
 
-/** One decimal, true minus — the index-movement figure grammar. */
-function fmtCut(n: number | null): string {
-  if (n == null) return '\u2014';
-  const v = Math.abs(n);
-  return v.toFixed(1);
-}
+/** 18.5 — figure tracks: min-widths, right-aligned. */
+const MAIN_FIG_MIN_W = 36;
+const SECOND_FIG_MIN_W = 26;
 
 interface Cell {
   text: string;
@@ -156,15 +153,18 @@ export function boardValue(
         text: r.stableford_points != null ? String(r.stableford_points) : '\u2014',
         tone: A.INK,
       };
+    /* 18.4 — a cut is signed, true minus, in green: the same grammar as the chip. */
     case 'improved':
-      return { text: fmtCut(r.delta_index), tone: A.INK };
+      return r.delta_index == null
+        ? { text: '\u2014', tone: A.DIM }
+        : { text: fmtIndexMove(Number(r.delta_index)), tone: A.GREEN };
     case 'birdies':
       return { text: r.birdies != null ? String(r.birdies) : '\u2014', tone: A.INK };
-    /* Phase 9.10 — NET against par, red under par; with no net, GROSS against
-       par takes the main figure and there is no secondary. */
+    /* 18.1 — GROSS against par, red under par; the gross score sits behind it.
+       Net is not shown here: Lowest net is its own ranked chip. */
     case 'recent': {
-      const n = netToParOf(r) ?? toParOf(r);
-      return { text: fmtToPar(n), tone: n != null && n < 0 ? A.RED : A.INK };
+      const p = toParOf(r);
+      return { text: fmtToPar(p), tone: p != null && p < 0 ? A.RED : A.INK };
     }
     /* Feat boards: gross, plain, no tone. The date lives on the sub-line and in
        the day ladder, so it is no longer a figure. */
@@ -181,11 +181,9 @@ export function boardSecondary(r: Row, board: BoardKey): Cell | null {
     }
     case 'improved':
       return null;
-    /* A3.1/A3.3/A3.4 — TO PAR under the standard colour law; a round with no
-       usable par states an em-dash in A.DIM, never a zero and never a blank. */
-    /* Gross against par behind net; nothing when net is absent (it moved up). */
+    /* 18.1 — the gross score, plain and unsigned. */
     case 'recent':
-      return netToParOf(r) == null ? null : { text: fmtToPar(toParOf(r)), tone: FAINT };
+      return { text: r.gross_score != null ? String(r.gross_score) : '\u2014', tone: A.DIM };
     case 'topar':
     case 'net':
     case 'stableford':
@@ -361,12 +359,9 @@ export function BoardDaySeparator({ label }: { label: string }) {
   );
 }
 
-/** 9.11 — one decimal, true minus, always signed. */
 /** 15.1 — THE ONE SIGNED INDEX-MOVEMENT FORMATTER: one decimal, true minus for
- *  a cut, plus for a rise. The board-row index chip and the slab's "since"
- *  clause both read it. fmtCut stays unsigned on purpose: the improved board's
- *  floor is delta < 0, so every value there is a cut and a sign would be noise —
- *  do not merge the two. */
+ *  a cut, plus for a rise. The board-row index chip, the slab's "since" clause
+ *  and the improved board's figure all read it. */
 export function fmtIndexMove(n: number): string {
   const v = Math.abs(n).toFixed(1);
   return n < 0 ? `\u2212${v}` : `+${v}`;
@@ -396,9 +391,6 @@ export function BoardRowView({
   const feat = boardFeatMarker(row, board, t);
   const course = row.course_name ?? t('discover.unknownCourse');
   const date = playDateShort(row.play_date, i18n?.language);
-  const courseDate = date ? `${course} \u00B7 ${date}` : course;
-  /* 10.2 — the second line is "{course} · {date}" and nothing else; the feat is a name-row badge. */
-  const sub = gap ?? courseDate;
   /* 12.1 — WHAT delta_index MEANS, proved against 4,067 live rounds: hcp_at_time
      is the index a member carried INTO the round, and delta_index is the
      movement THAT round caused — it appears as the NEXT round's hcp_at_time.
@@ -490,44 +482,60 @@ export function BoardRowView({
               {feat}
             </span>
           ) : null}
+          {/* 18.3 — the chip is a fact about the member's handicap, not the
+              figure, so it sits in the name row: name, feat badge, chip. Only
+              the name shrinks. */}
+          {chip != null ? (
+            <span
+              data-index-chip
+              className="tabular-nums"
+              style={{
+                flexShrink: 0,
+                whiteSpace: 'nowrap',
+                fontSize: 10,
+                fontWeight: 700,
+                lineHeight: 1.2,
+                borderRadius: 999,
+                padding: '1px 5px',
+                color: chip < 0 ? A.GREEN : A.MUTE,
+                border: `1px solid ${chip < 0 ? INDEX_CUT_BORDER : A.BORDER}`,
+              }}
+            >
+              {fmtIndexMove(chip)}
+            </span>
+          ) : null}
         </span>
+        {/* 18.2 — two elements: the club takes the remaining width and
+            ellipsises; " · {date}" is pinned and never shrinks. */}
         <span
+          data-board-sub
           style={{
-            display: 'block',
+            display: 'flex',
+            minWidth: 0,
             marginTop: 1,
             fontSize: M.subSize,
             lineHeight: M.subLine,
             color: A.MUTE,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
           }}
         >
-          {sub}
+          <span data-board-sub-club style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {gap ?? course}
+          </span>
+          {!gap && date ? (
+            <span data-board-sub-date style={{ flexShrink: 0 }}>
+              {` \u00B7 ${date}`}
+            </span>
+          ) : null}
         </span>
       </span>
       <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 8 }}>
-        {chip != null ? (
-          <span
-            data-index-chip
-            className="tabular-nums"
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              borderRadius: 999,
-              padding: '1px 5px',
-              color: chip < 0 ? A.GREEN : A.MUTE,
-              border: `1px solid ${chip < 0 ? INDEX_CUT_BORDER : A.BORDER}`,
-            }}
-          >
-            {fmtIndexMove(chip)}
-          </span>
-        ) : null}
-        {/* S1.3 — THE FIGURE FOLLOWS THE COLOUR LAW, NEVER AMBER. */}
+        {/* S1.3 — THE FIGURE FOLLOWS THE COLOUR LAW, NEVER AMBER.
+            18.5 — fixed min-width tracks so right edges align. */}
         <span
           data-board-main
           className="tabular-nums"
-          style={{ fontSize: M.figureSize, fontWeight: M.figureWeight, letterSpacing: M.figureTracking, color: value.tone }}
+          style={{ minWidth: MAIN_FIG_MIN_W, textAlign: 'right', fontSize: M.figureSize, fontWeight: M.figureWeight, letterSpacing: M.figureTracking, color: value.tone }}
         >
           {value.text}
         </span>
@@ -535,7 +543,7 @@ export function BoardRowView({
           <span
             data-board-secondary
             className="tabular-nums"
-            style={{ fontSize: M.secondarySize, fontWeight: M.secondaryWeight, color: second.tone }}
+            style={{ minWidth: SECOND_FIG_MIN_W, textAlign: 'right', fontSize: M.secondarySize, fontWeight: M.secondaryWeight, color: second.tone }}
           >
             {second.text}
           </span>
