@@ -251,14 +251,14 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   // Champion gate — same rule as HybridHero's strip and the pick trophy:
   // a genuinely finished state AND an authoritative winner.
   const activeChampionEntry = championGate && !active.tournament.winnerName
-    ? resolveChampionEntry(boardEntries as any[], {
+    ? resolveChampionEntry(boardEntries, {
         winner_id: active.tournament.winnerId,
         // sr_tournaments.event_type, carried on the slide — never inferred from rows.
         event_type: active.tournament.eventType,
       })
     : null;
   const activeChampionMemberIds = activeChampionEntry?.team?.members
-    ?.map((member: any) => member.player?.id)
+    ?.map((member) => member.player?.id)
     .filter((id: unknown): id is string => typeof id === 'string' && id.length > 0) ?? [];
   // The frame follows its content in every state (wrapped champion name,
   // rotation line, whatever comes next). An explicit `height` prop still

@@ -63,6 +63,7 @@ import { surnameOf } from '../../../_shared/playerName';
 import { r } from '@/lib/radius';
 import { PicksSheet } from './PicksSheet';
 import type { HeroState } from '../HybridHero.utils';
+import type { BoardEntry } from '../../../leaderboard/BoardTable';
 
 /**
  * SIX rows. It was five while the board occupied the photo band, because the
@@ -178,7 +179,7 @@ function StatCell({
 
 interface HeroBoardSectionProps {
   tournamentId: string;
-  entries: any[];
+  entries: BoardEntry[];
   /**
    * Active round. NULL on an upcoming (or completed) slide, where the band
    * exists only to carry the picks row — TODAY is meaningless without it.
@@ -301,7 +302,7 @@ export function HeroBoardSection({
 
   const boardByPlayer = useMemo(() => {
     const map = new Map<string, { position: number | null; tied: boolean; score: number | null }>();
-    for (const entry of entries as any[]) {
+    for (const entry of entries) {
       const line = { position: entry.position ?? null, tied: Boolean(entry.position_tied), score: entry.score ?? null };
       const id = entry?.player?.id;
       if (id) {
@@ -317,7 +318,7 @@ export function HeroBoardSection({
   }, [entries]);
 
   const championPlayerId = useMemo(
-    () => resolveChampionPlayerId(entries as any[], championSrId, phase),
+    () => resolveChampionPlayerId(entries, championSrId, phase),
     [championSrId, entries, phase],
   );
 
