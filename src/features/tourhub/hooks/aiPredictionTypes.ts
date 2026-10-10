@@ -42,11 +42,6 @@ export interface TrackedPrediction {
   /** Absolute integer of position delta vs previous poll. 0 when flat. */
   moveSpots: number;
   country: string | null;
-  /**
-   * Phase C — Editorial layer: per-pick pulled-quote forwarded from
-   * `AITopContender.pulledQuote`. Component falls back to `reasons[0]`.
-   */
-  pulledQuote?: string | null;
 }
 
 export interface AccuracyMetrics {
@@ -60,8 +55,7 @@ export interface AccuracyMetrics {
 
 export interface PredictionTrackerData {
   predictions: TrackedPrediction[];
-  darkHorses: TrackedPrediction[];
-  /** Top 5 + dark horses in one list. */
+  /** The tracked picks; same list as `predictions` (dark horses are not tracked). */
   allPicks: TrackedPrediction[];
   accuracy: AccuracyMetrics;
   lastUpdated: string;

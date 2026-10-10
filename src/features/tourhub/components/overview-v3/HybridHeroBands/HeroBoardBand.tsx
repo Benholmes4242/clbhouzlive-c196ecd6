@@ -63,12 +63,11 @@ import { surnameOf } from '../../../_shared/playerName';
 import { r } from '@/lib/radius';
 import { PicksSheet } from './PicksSheet';
 import type { HeroState } from '../HybridHero.utils';
+import type { BoardEntry } from '../../../leaderboard/BoardTable';
 
 /**
- * SIX rows. It was five while the board occupied the photo band, because the
- * floating ChromeIsland overlays the top ~46px of the hero and a sixth row
- * would have buried the leader. Extending downward removes that constraint —
- * no chrome clearance applies here.
+ * FIVE rows: the leading positions shown on the hero board. The board sits
+ * below the photo band, so no chrome clearance applies here.
  */
 export const HERO_BOARD_ROWS = 5;
 
@@ -178,7 +177,7 @@ function StatCell({
 
 interface HeroBoardSectionProps {
   tournamentId: string;
-  entries: any[];
+  entries: BoardEntry[];
   /**
    * Active round. NULL on an upcoming (or completed) slide, where the band
    * exists only to carry the picks row — TODAY is meaningless without it.
@@ -301,7 +300,7 @@ export function HeroBoardSection({
 
   const boardByPlayer = useMemo(() => {
     const map = new Map<string, { position: number | null; tied: boolean; score: number | null }>();
-    for (const entry of entries as any[]) {
+    for (const entry of entries) {
       const line = { position: entry.position ?? null, tied: Boolean(entry.position_tied), score: entry.score ?? null };
       const id = entry?.player?.id;
       if (id) {
@@ -317,7 +316,7 @@ export function HeroBoardSection({
   }, [entries]);
 
   const championPlayerId = useMemo(
-    () => resolveChampionPlayerId(entries as any[], championSrId, phase),
+    () => resolveChampionPlayerId(entries, championSrId, phase),
     [championSrId, entries, phase],
   );
 
@@ -373,7 +372,6 @@ export function HeroBoardSection({
           tourCode={pickTourCode}
           phase={phase}
           boardByPlayer={boardByPlayer}
-          predictions={predictions ?? null}
           championPlayerId={championPlayerId}
           championPlayerIds={championPlayerIds}
           onOpenPick={() => setPicksOpen(true)}
@@ -420,16 +418,14 @@ export function HeroBoardSection({
 }
 
 /**
- * §3 — THE PICKS BLOCK. Amber OUR PICKS header, optional event-level editorial
- * line, a FIXED grid of up to three cards (never padded, never scrolling) and
- * a provenance line GATED ON isAIPowered. Each card opens PicksSheet.
+ * §3 — THE PICKS BLOCK. Amber OUR TOURNAMENT PICKS header and a FIXED grid of
+ * up to three cards (never padded, never scrolling). Each card opens PicksSheet.
  */
 function PicksBlock({
   picks,
   tourCode,
   phase,
   boardByPlayer,
-  predictions,
   championPlayerId,
   championPlayerIds,
   onOpenPick,
@@ -440,7 +436,6 @@ function PicksBlock({
   tourCode: string;
   phase: 'live' | 'upcoming' | 'completed';
   boardByPlayer: Map<string, { position: number | null; tied: boolean; score: number | null }>;
-  predictions: { editorialFraming?: string | null } | null;
   /** The champion, by player id — settledFigureFor can only see a POSITION,
    *  and a playoff winner's position is T1, so identity comes in separately. */
   championPlayerId: string | null;
@@ -457,12 +452,6 @@ function PicksBlock({
             key, so band and sheet cannot drift apart in translation. */}
         <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
       </div>
-
-      {predictions?.editorialFraming ? (
-        <div style={{ padding: '0 20px 10px', fontSize: 11, fontWeight: 500, lineHeight: 1.35, color: WHITE_ALPHA_65 }}>
-          {predictions.editorialFraming}
-        </div>
-      ) : null}
 
       <div style={{ padding: '0 16px 14px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
         {cards.map((p, i) => {

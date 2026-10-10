@@ -72,11 +72,6 @@
     }
   },
   "overview": {
-    "connectHandicap": {
-      "title": "Connect your handicap",
-      "description": "Sync WHS and see where you stand.",
-      "cta": "Connect"
-    },
     "cancelled": {
       "eyebrow": "No Result",
       "reasonDefault": "This event did not complete enough rounds for an official result."
@@ -94,9 +89,7 @@
     },
     "champion": {
       "scoreLabelToPar": "TO PAR",
-      "eyebrow": "CHAMPION",
-      "eyebrowPlayoff": "CHAMPION · PLAYOFF",
-      "resultPending": "Result pending"
+      "eyebrow": "CHAMPION"
     },
     "cancelledStrip": {
       "eyebrow": "CANCELLED"
@@ -104,14 +97,6 @@
     "playoff": {
       "eyebrow": "AWAITING PLAYOFF",
       "tiedAtTop": "{{count}} tied at the top"
-    },
-    "middleBand": {
-      "cancelledDefault": "No play — tournament cancelled."
-    },
-    "upcoming": {
-      "defendingEyebrow": "DEFENDING",
-      "previewTitle": "Tournament Preview",
-      "previewEyebrow": "PREVIEW"
     },
     "rankings": {
       "sectionEyebrow": "World rankings",
@@ -125,11 +110,6 @@
       },
       "seasonNo1Label": "Season No. 1",
       "movementBasis": "Positions moved over {{days}} days"
-    },
-    "teamWinnerStrip": {
-      "eyebrow": "TEAM WINNER",
-      "labelVsPar": "VS PAR",
-      "labelStrokes": "STROKES"
     },
     "leaderRow": {
       "tiedAtRank_one": "{{count}} tied at {{rank}}",
@@ -177,24 +157,8 @@
       "factPlayoff": "허파우별"
     },
     "leaderboardBand": {
-      "ctaLive": "OPEN LIVE LEADERBOARD",
-      "ctaCancelled": "VIEW TOUR SCHEDULE",
-      "ctaAwaitingPlayoff": "VIEW LIVE PLAYOFF",
-      "ctaResults": "VIEW FULL RESULTS",
-      "ctaImminent": "VIEW ALL TEE TIMES",
       "ctaUpcoming": "View tournament",
-      "inauguralPlaceholder": "INAUGURAL EVENT · NO PRIOR RESULTS",
-      "previewUnavailable": "Tournament preview not available.",
-      "fieldEyebrow": "Field",
-      "playersSuffix_one": " player",
-      "playersSuffix_other": " players"
-    },
-    "courseStats": {
-      "eyebrow": "COURSE",
-      "parLabel": "PAR",
-      "recordLabel": "Record: {{value}}",
-      "recordLabelWithHolder": "Record: {{value}} · {{holder}}",
-      "fallbackSummary": "Course preview"
+      "fieldEyebrow": "Field"
     },
     "comingUp": {
       "eyebrow": "What's coming up",
@@ -430,8 +394,6 @@
       "colTotal": "TOTAL",
       "colTotalShort": "TOT",
       "colThru": "THRU",
-      "colPurse": "PURSE",
-      "colYards": "YDS",
       "colYardsFull": "YARDS",
       "tiedForLead_one": "{{count}} tied for the lead",
       "tiedForLead_other": "{{count}} tied for the lead",

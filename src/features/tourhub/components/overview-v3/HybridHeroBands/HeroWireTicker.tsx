@@ -11,8 +11,8 @@
 /**
  * HeroWireTicker — Tour Hub hero leaderboard band.
  *
- * A dark wire ticker (36px tall, #15171F) that lives at the bottom of the
- * HybridHero, replacing the old MiddleBand + LeaderboardBand two-band stack.
+ * A dark wire ticker (36px tall). Its only importer is the News lead-story
+ * strip (StoryLeaderboardStrip); the overview hero does not render it.
  * Delegates to the shared `TickerShell` so behaviour matches the Explore-tab
  * WireTicker (seamless -50% loop, pause-on-touch, reduced-motion swap).
  *

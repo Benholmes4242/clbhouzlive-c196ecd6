@@ -14,7 +14,22 @@ import { supabase } from '@/integrations/supabase/client';
  * Subscribe to real-time leaderboard updates for a specific tournament.
  * Returns connection status for fallback polling.
  */
-export function useLeaderboardRealtime(tournamentId: string | null | undefined) {
+export interface LeaderboardRealtimeOptions {
+  /**
+   * Which caches a row change invalidates.
+   * - 'all' (default): every dependent key — TournamentPage's behaviour.
+   * - 'leaderboard': only ['tourhub','leaderboard',tid]. The overview hero
+   *   uses this: live sync upserts every row of the field each pass, so the
+   *   full set would rebuild the whole carousel (a five-request fan-out) once
+   *   per player per pass.
+   */
+  invalidate?: 'all' | 'leaderboard';
+}
+
+export function useLeaderboardRealtime(
+  tournamentId: string | null | undefined,
+  { invalidate = 'all' }: LeaderboardRealtimeOptions = {},
+) {
   const queryClient = useQueryClient();
   const [isConnected, setIsConnected] = useState(true);
 
@@ -32,9 +47,10 @@ export function useLeaderboardRealtime(tournamentId: string | null | undefined) 
           filter: `tournament_id=eq.${tournamentId}`,
         },
         () => {
+          queryClient.invalidateQueries({ queryKey: ['tourhub', 'leaderboard', tournamentId] });
+          if (invalidate === 'leaderboard') return;
           // Invalidate all queries that depend on this tournament's leaderboard
           queryClient.invalidateQueries({ queryKey: ['tournament-top-leaders', tournamentId] });
-          queryClient.invalidateQueries({ queryKey: ['tourhub', 'leaderboard', tournamentId] });
           queryClient.invalidateQueries({ queryKey: ['tourhub', 'pick-history'] });
           queryClient.invalidateQueries({ queryKey: ['prediction-tracker', tournamentId] });
           queryClient.invalidateQueries({ queryKey: ['tournament-leaders-winners'] });
@@ -51,7 +67,7 @@ export function useLeaderboardRealtime(tournamentId: string | null | undefined) 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [tournamentId, queryClient]);
+  }, [tournamentId, queryClient, invalidate]);
 
   return { isConnected };
 }

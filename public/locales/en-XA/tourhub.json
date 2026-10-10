@@ -72,11 +72,6 @@
     }
   },
   "overview": {
-    "connectHandicap": {
-      "title": "[~~Ĉőññéĉţ ýőúř ĥáñđíĉáƥ~~]",
-      "description": "[~~Šýñĉ ŴĤŠ áñđ šéé ŵĥéřé ýőú šţáñđ.~~]",
-      "cta": "[~~Ĉőññéĉţ~~]"
-    },
     "cancelled": {
       "eyebrow": "[~~Ñő Řéšúļţ~~]",
       "reasonDefault": "[~~Ţĥíš éṽéñţ đíđ ñőţ ĉőɱƥļéţé éñőúĝĥ řőúñđš ƒőř áñ őƒƒíĉíáļ řéšúļţ.~~]"
@@ -94,9 +89,7 @@
     },
     "champion": {
       "scoreLabelToPar": "[~~ŢŐ ƤÁŘ~~]",
-      "eyebrow": "[~~ĈĤÁṀƤÍŐÑ~~]",
-      "eyebrowPlayoff": "[~~ĈĤÁṀƤÍŐÑ · ƤĻÁÝŐƑƑ~~]",
-      "resultPending": "[~~Řéšúļţ ƥéñđíñĝ~~]"
+      "eyebrow": "[~~ĈĤÁṀƤÍŐÑ~~]"
     },
     "cancelledStrip": {
       "eyebrow": "[~~ĈÁÑĈÉĻĻÉĐ~~]"
@@ -104,14 +97,6 @@
     "playoff": {
       "eyebrow": "[~~ÁŴÁÍŢÍÑĜ ƤĻÁÝŐƑƑ~~]",
       "tiedAtTop": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]"
-    },
-    "middleBand": {
-      "cancelledDefault": "[~~Ñő ƥļáý — ţőúřñáɱéñţ ĉáñĉéļļéđ.~~]"
-    },
-    "upcoming": {
-      "defendingEyebrow": "[~~ĐÉƑÉÑĐÍÑĜ~~]",
-      "previewTitle": "[~~Ţőúřñáɱéñţ Ƥřéṽíéŵ~~]",
-      "previewEyebrow": "[~~ƤŘÉṼÍÉŴ~~]"
     },
     "rankings": {
       "sectionEyebrow": "[~~Ŵőřļđ řáñǩíñĝš~~]",
@@ -125,11 +110,6 @@
       },
       "seasonNo1Label": "[~~Season No. 1~~]",
       "movementBasis": "[~~Ƥőšíţíőñš mővéđ ővéř {{days}} đáýš~~]"
-    },
-    "teamWinnerStrip": {
-      "eyebrow": "[~~ŢÉÁṀ ŴÍÑÑÉŘ~~]",
-      "labelVsPar": "[~~ṼŠ ƤÁŘ~~]",
-      "labelStrokes": "[~~ŠŢŘŐǨÉŠ~~]"
     },
     "leaderRow": {
       "tiedAtRank_one": "[~~{{count}} ţíéđ áţ {{rank}}~~]",
@@ -180,24 +160,8 @@
       "stateSuspended": "[SUSPENDED]"
     },
     "leaderboardBand": {
-      "ctaLive": "[~~ŐƤÉÑ ĻÍṼÉ ĻÉÁĐÉŘƁŐÁŘĐ~~]",
-      "ctaCancelled": "[~~ṼÍÉŴ ŢŐÚŘ ŠĈĤÉĐÚĻÉ~~]",
-      "ctaAwaitingPlayoff": "[~~ṼÍÉŴ ĻÍṼÉ ƤĻÁÝŐƑƑ~~]",
-      "ctaResults": "[~~ṼÍÉŴ ƑÚĻĻ ŘÉŠÚĻŢŠ~~]",
-      "ctaImminent": "[~~ṼÍÉŴ ÁĻĻ ŢÉÉ ŢÍṀÉŠ~~]",
       "ctaUpcoming": "[~~View tournament~~]",
-      "inauguralPlaceholder": "[~~ÍÑÁÚĜÚŘÁĻ ÉṼÉÑŢ · ÑŐ ƤŘÍŐŘ ŘÉŠÚĻŢŠ~~]",
-      "previewUnavailable": "[~~Ţőúřñáɱéñţ ƥřéṽíéŵ ñőţ áṽáíļáƀļé.~~]",
-      "fieldEyebrow": "[~~Ƒíéļđ~~]",
-      "playersSuffix_one": "[~~ ƥļáýéř~~]",
-      "playersSuffix_other": "[~~ ƥļáýéřš~~]"
-    },
-    "courseStats": {
-      "eyebrow": "[~~ĈŐÚŘŠÉ~~]",
-      "parLabel": "[~~ƤÁŘ~~]",
-      "recordLabel": "[~~Řéĉőřđ: {{value}}~~]",
-      "recordLabelWithHolder": "[~~Řéĉőřđ: {{value}} · {{holder}}~~]",
-      "fallbackSummary": "[~~Ĉőúřšé ƥřéṽíéŵ~~]"
+      "fieldEyebrow": "[~~Ƒíéļđ~~]"
     },
     "comingUp": {
       "eyebrow": "[~~Ŵĥáţ'š ĉőɱíñĝ úƥ~~]",
@@ -435,8 +399,6 @@
       "colTotal": "[!! TÓTÁL !!]",
       "colTotalShort": "[!! TÓT !!]",
       "colThru": "[!! THRÚ !!]",
-      "colPurse": "[!! PÚRSÉ !!]",
-      "colYards": "[!! YDS !!]",
       "colYardsFull": "[!! YÁRDS !!]",
       "tiedForLead_one": "[!! {{count}} tíéd fór thé léád !!]",
       "tiedForLead_other": "[!! {{count}} tíéd fór thé léád !!]",

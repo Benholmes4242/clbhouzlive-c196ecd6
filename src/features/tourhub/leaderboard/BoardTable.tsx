@@ -121,6 +121,8 @@ export interface BoardEntry {
     id: string;
     sr_id?: string | null; // Sportradar id — matches sr_tournaments.winner_id
     full_name: string;
+    first_name?: string | null;
+    last_name?: string | null;
     country_code?: string | null;
     country?: string | null;
     photo_url?: string | null;

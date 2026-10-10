@@ -33,23 +33,6 @@ export interface AITopContender {
   reasons: string[];
   concern: string;
   promoted?: boolean;
-  /**
-   * Phase C — Editorial layer: per-pick pulled-quote rendered as the HeroPick's
-   * featured reasoning. Falls back to `reasons[0]` when not populated by the
-   * editorial pipeline.
-   */
-  pulledQuote?: string | null;
-}
-
-export interface AIDarkHorse {
-  playerId: string;
-  playerName: string;
-  photoUrl: string | null;
-  pgaTourId: string | null;
-  country: string;
-  worldRanking: number;
-  hook: string;
-  keyStat: string;
 }
 
 export interface CourseAnalysis {
@@ -75,19 +58,12 @@ export interface AIPredictionData {
     status: string;
   };
   topContenders: AITopContender[];
-  darkHorses: AIDarkHorse[];
   courseAnalysis: CourseAnalysis;
   confidence: number;
   generatedAt: string;
   isAIPowered: boolean;
   /** True when predictions are >24h old pre-tournament or flagged for regeneration */
   isStale: boolean;
-  /**
-   * Phase C — Editorial layer: per-tournament framing sentence rendered above
-   * the headline. Null until the editorial pipeline populates it; component
-   * gracefully omits the line in that case.
-   */
-  editorialFraming?: string | null;
 }
 
 export interface UseAIPredictionsResult {
@@ -711,7 +687,8 @@ function formatPredictions(
       status: tournament.status,
     },
     topContenders,
-    darkHorses: [],
+    // Stored dark_horses are used ONLY as withdrawal alternates in
+    // validatePicksAgainstField; they are not surfaced as their own list.
     // Every field empty on purpose: an absent analysis must read as absent.
     // A plausible default is worse than a missing row — nobody can tell it
     // apart from a real assessment.

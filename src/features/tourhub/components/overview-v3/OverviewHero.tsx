@@ -1,7 +1,7 @@
 /**
  * OverviewHero — Hero River. The carousel crosses ALL tours in the
  * editorial order returned by useHeroCarouselData (LIVE→majors→rest).
- * Swipe / chevrons change the tournament AND the tour. The picker becomes a
+ * Swipe changes the tournament AND the tour. The picker becomes a
   * jump-to shortcut via selectionNonce. The hero never changes the selected
   * lens. Display reporting is debounced 250ms
  * so a rapid multi-slide swipe doesn't fan out pulse/OTC/TI fetches per
@@ -163,7 +163,8 @@ export function OverviewHero({ height }: OverviewHeroProps) {
    * leaderboard row change in the database to filter client-side, for a
    * carousel that only ever shows one slide at a time.
    */
-  useLeaderboardRealtime(viewingLive ? viewingTid : null);
+  // Leaderboard key ONLY: see LeaderboardRealtimeOptions for the fan-out.
+  useLeaderboardRealtime(viewingLive ? viewingTid : null, { invalidate: 'leaderboard' });
 
   /**
    * The board below the hero reads the ACTIVE SLIDE directly — not the debounced
@@ -172,8 +173,8 @@ export function OverviewHero({ height }: OverviewHeroProps) {
    * HybridHero, so this costs no extra network.
    */
   // Fetch entries for LIVE and COMPLETED because the picks row resolves finishing
-  // positions from them. The board itself stays hidden on completed: hasBoard
-  // also requires currentRound, and boardRound remains live-only below. Same query
+  // positions from them. The board also renders on completed slides (final
+  // positions); boardRound is null there, so no TODAY. Same query
   // key as HybridHero.tsx, so a completed slide is a cache hit.
   const boardTournamentId = !heroState || heroState.kind === 'upcoming' ? null : viewingTid;
   const { data: boardLeaderboard } = useTourLeaderboard(boardTournamentId ?? '');
@@ -250,14 +251,14 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   // Champion gate — same rule as HybridHero's strip and the pick trophy:
   // a genuinely finished state AND an authoritative winner.
   const activeChampionEntry = championGate && !active.tournament.winnerName
-    ? resolveChampionEntry(boardEntries as any[], {
+    ? resolveChampionEntry(boardEntries, {
         winner_id: active.tournament.winnerId,
         // sr_tournaments.event_type, carried on the slide — never inferred from rows.
         event_type: active.tournament.eventType,
       })
     : null;
   const activeChampionMemberIds = activeChampionEntry?.team?.members
-    ?.map((member: any) => member.player?.id)
+    ?.map((member) => member.player?.id)
     .filter((id: unknown): id is string => typeof id === 'string' && id.length > 0) ?? [];
   // The frame follows its content in every state (wrapped champion name,
   // rotation line, whatever comes next). An explicit `height` prop still
@@ -265,8 +266,8 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   // wait-mode crossfade never collapses the frame between slides.
   const activeHeroHeight = height ?? 'auto';
 
-  // Chevron UI removed per micro-brief; swipe is the sole gesture and
-  // goPrev/goNext are retained for keyboard/a11y and COMMAND-jump paths.
+  // Chevron UI removed per micro-brief; swipe is the sole gesture. goPrev and
+  // goNext are NOT wired to anything today (no keyboard or a11y control).
 
   void goPrev;
   void goNext;
@@ -309,17 +310,12 @@ export function OverviewHero({ height }: OverviewHeroProps) {
 
 
 
-      {/* The live board EXTENDS the hero downward. It tracks the active slide and
-          cross-fades in place on swipe; on a results or upcoming slide it renders
-          nothing at all and the page below moves up. No collapse control. */}
-
     </div>
 
     {/* The band EXTENDS the hero downward. It tracks the active slide and
-        cross-fades in place on swipe. On a live slide it carries the board; on
-        an upcoming or completed slide it carries the picks row ALONE, and when
-        there are no picks either it renders nothing at all and the page below
-        moves up (§1). */}
+        cross-fades in place on swipe. On a live or completed slide it carries
+        the board; on an upcoming slide the upcoming facts and picks. The action
+        row always renders (§1). */}
     <AnimatePresence mode="wait" initial={false}>
       {bandTournamentId && (
         <motion.div

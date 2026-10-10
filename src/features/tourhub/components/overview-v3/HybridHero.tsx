@@ -6,7 +6,6 @@ import '@/styles/hybrid-hero.css';
 import type { HeroSlide } from '../../hooks/useHeroCarouselData';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
-import { VenueRotationLine } from './HybridHeroBands/VenueRotationLine';
 import { PhotoBand, type OverviewCountdownUnit } from './HybridHeroBands/PhotoBand';
 import { detectTopTie, fmtScore, isChampionResolvable, isInPlayState, type HeroState } from './HybridHero.utils';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
@@ -173,7 +172,6 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
         heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
         onOpen={onOpenTournament}
       />
-      <VenueRotationLine tournamentId={tournament.id} />
       {isChampionResolvable(state) && champion ? (
         <ChampionStrip
           name={champion.name}

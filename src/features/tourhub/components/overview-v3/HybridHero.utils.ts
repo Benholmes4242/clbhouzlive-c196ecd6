@@ -7,6 +7,7 @@ import { formatMonthDay } from '@/i18n/format';
 import type { HeroTournament } from '../../hooks/useHeroCarouselData';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { surnameOf } from '../../_shared/playerName';
+import type { BoardEntry } from '../../leaderboard/BoardTable';
 
 // ---------- Types -----------------------------------------------------------
 
@@ -151,12 +152,12 @@ export function formatRank(entry: { position?: number | null; position_tied?: bo
 
 // ---------- Tie detection ---------------------------------------------------
 
-export function detectTopTie(leaderboard: any[]): TopTie | null {
+export function detectTopTie(leaderboard: Array<Pick<BoardEntry, 'score'>>): TopTie | null {
   if (!leaderboard || leaderboard.length === 0) return null;
   const top = leaderboard[0];
-  const topScore = top?.score ?? top?.total;
+  const topScore = top?.score;
   if (topScore == null) return null;
-  const tied = leaderboard.filter(e => (e?.score ?? e?.total) === topScore);
+  const tied = leaderboard.filter(e => e?.score === topScore);
   if (tied.length < 2) return null;
   return { count: tied.length, score: fmtScore(topScore) };
 }
@@ -237,7 +238,7 @@ export function deriveHeroState(
       round: tournament.currentRound ?? 1,
       // 'scheduled' = the calendar has rolled over but today's round has not
       // teed off yet -> pill drops the LIVE treatment (see PhotoBand).
-      roundStatus: (tournament as any).currentRoundStatus === 'scheduled' ? 'scheduled' : 'live',
+      roundStatus: tournament.currentRoundStatus === 'scheduled' ? 'scheduled' : 'live',
       // INTERIM: no real num_rounds on HeroTournament yet. LPGA events are 54-hole
       // (3 rounds); everything else defaults to 4. Replace with tournament.num_rounds
       // when the cache exposes it.
@@ -348,7 +349,7 @@ export function deriveHeroState(
  * already shows the leading positions (see HERO_BOARD_ROWS) so no player ever
  * appears in both.
  */
-export function deriveTickerRows(leaderboard: any[], offset = 0): TickerRow[] {
+export function deriveTickerRows(leaderboard: BoardEntry[], offset = 0): TickerRow[] {
   if (!leaderboard) return [];
   return leaderboard.slice(offset, offset + 10).map(entry => {
     const player = entry.player;
@@ -362,63 +363,7 @@ export function deriveTickerRows(leaderboard: any[], offset = 0): TickerRow[] {
   });
 }
 
-// ---------- Leaderboard slot allocation (tie-collapse) ---------------------
-
-export type ChaserSlot =
-  | { kind: 'solo'; entry: any }
-  | { kind: 'tie'; rank: string; count: number; score: number; members: any[] };
-
-/**
- * Threshold at which a tie group collapses into a single TiedChasersRow even
- * when it would technically fit as individual rows. Rationale: 3+ identical
- * scores stacked dominate the snapshot and crowd out field depth. Collapsing
- * frees slots to show positions further down the leaderboard. Groups of 1 or
- * 2 always render individually.
- */
-const COLLAPSE_THRESHOLD = 3;
-
-export function buildLeaderboardSlots(chasers: any[], maxSlots = 4): ChaserSlot[] {
-  const slots: ChaserSlot[] = [];
-  let i = 0;
-  while (i < chasers.length && slots.length < maxSlots) {
-    const scoreOf = (e: any) => (e?.score ?? e?.total ?? 0);
-    const groupScore = scoreOf(chasers[i]);
-    let j = i;
-    while (j < chasers.length && scoreOf(chasers[j]) === groupScore) j++;
-    const group = chasers.slice(i, j);
-    const remaining = maxSlots - slots.length;
-    const rank = chasers[i]?.position != null ? `T${chasers[i].position}` : 'T—';
-
-    if (group.length >= COLLAPSE_THRESHOLD) {
-      // 3+ tie: collapse, whether or not it fits.
-      slots.push({ kind: 'tie', rank, count: group.length, score: groupScore, members: group });
-    } else if (group.length <= remaining) {
-      // 1 or 2 entries that fit: render individually.
-      for (const entry of group) slots.push({ kind: 'solo', entry });
-    } else if (group.length >= 2) {
-      // 2-way that doesn't fit (edge case at slot boundary): collapse.
-      slots.push({ kind: 'tie', rank, count: group.length, score: groupScore, members: group });
-    } else {
-      slots.push({ kind: 'solo', entry: group[0] });
-    }
-    i = j;
-  }
-  return slots;
-}
-
 // ---------- Today / thru helpers --------------------------------------------
-
-/**
- * Current-round score for a live leaderboard entry.
- * Reads from the Sportradar `raw_data.rounds` array when round is known.
- */
-export function entryToday(entry: any, round: number | undefined): number | null {
-  const rounds = entry?.raw_data?.rounds;
-  if (!Array.isArray(rounds) || !round || rounds.length < round) return null;
-  const r = rounds[round - 1];
-  if (!r || r.score == null) return null;
-  return r.score ?? null;
-}
 
 /**
  * Best-effort "today" score for any leaderboard entry.
@@ -426,7 +371,7 @@ export function entryToday(entry: any, round: number | undefined): number | null
  * Matches the BoardTable `todayFromEntry` semantics so the hero and the
  * full leaderboard read the same number.
  */
-export function todayFromEntry(entry: any): number | null {
+export function todayFromEntry(entry: BoardEntry | null | undefined): number | null {
   if (entry?.today != null) return entry.today;
   const rs = [entry?.round_1, entry?.round_2, entry?.round_3, entry?.round_4];
   const completed = rs.filter((r) => r != null);
@@ -436,17 +381,6 @@ export function todayFromEntry(entry: any): number | null {
 
 // ---------- Trajectory sparkline helpers (Pass 3) --------------------------
 
-/**
- * Extract clean round scores from a leaderboard entry.
- * Returns only completed rounds (non-null, > 0).
- */
-export function extractRounds(entry: any): number[] {
-  const r1 = entry?.round_1;
-  const r2 = entry?.round_2;
-  const r3 = entry?.round_3;
-  const r4 = entry?.round_4;
-  return [r1, r2, r3, r4].filter((v): v is number => typeof v === 'number' && v > 0);
-}
 
 /**
  * Classify a player's tournament arc for sparkline colour selection.

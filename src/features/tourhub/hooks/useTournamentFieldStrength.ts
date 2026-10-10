@@ -2,8 +2,8 @@
  * useTournamentFieldStrength — entries / world-ranking snapshot for an upcoming event.
  *
  * No `sr_tournament_entries` (or equivalent) table exists in the schema today, so this
- * hook is wired as a no-op stub that always returns `null`. The MiddleBand fallback
- * chain falls through to CourseStatsStrip in that case. When entries data lands in
+ * hook is wired as a no-op stub that always returns `null`; HeroBoardBand drops
+ * the field-strength fact when it is null. When entries data lands in
  * the schema, replace the queryFn body with the real lookup.
  *
  * Per TOUR_HUB_POLISH_PATCH_BRIEF §4.6.
