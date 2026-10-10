@@ -34,7 +34,6 @@ import { FiltersPill, ScopeSegments } from './ScoresFilterHead';
 import { handicapPairDisplay } from './circleHandicap';
 import { fmtHcp } from '@/lib/whs/format';
 import { BOARD_FLOOR_COPY } from '@/components/explore-tab-new/courseled/boardFloors';
-import { basisLine } from '@/features/amateur/basisLine';
 import { playDateAtLocalNoon } from '@/components/explore-tab-new/courseled/discoverWhen';
 import { useFeatsWindow, type FeatKind, type FeatWindow } from './useFeatsWindow';
 import { RailChips } from '@/components/ui/RailChips';
@@ -59,6 +58,25 @@ export const ROW_VALUE_SIZE = ROW_METRICS.figureSize;
  */
 
 const GUTTER = 16;
+/* Phase 8 head geometry: the rail, control row, basis and you slab sit 14 in. */
+const HEAD_GUTTER = 14;
+const CHIP_BG = 'rgba(255,255,255,0.04)';
+const CHIP_ACTIVE_BG = 'rgba(247,147,30,0.1)';
+const CHIP_ACTIVE_BORDER = 'rgba(247,147,30,0.55)';
+const SLAB_BG = 'rgba(255,255,255,0.05)';
+const VISUALLY_HIDDEN: React.CSSProperties = {
+  position: 'absolute', width: 1, height: 1, padding: 0, margin: -1,
+  overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0,
+};
+/* Interpolation markers: a styled phrase is spliced in after translation. */
+const MARK_W = '\u0001W\u0001';
+const MARK_U = '\u0001U\u0001';
+const MARK_Y = '\u0001Y\u0001';
+function splitMarks(text: string, map: Record<string, ReactNode>): ReactNode[] {
+  return text.split(/(\u0001[A-Z]\u0001)/).map((part, i) =>
+    part in map ? <span key={i}>{map[part]}</span> : part,
+  );
+}
 const LEAD_POSITIONS = 5;
 const SHORT_ROWS = 3;
 /** Faint ink: no separate token exists; DIM is the faintest analytical ink. */
@@ -510,7 +528,7 @@ export function ScoresLeaderboardsPage({
   onMemberTap: (userId: string) => void;
   onOpenCourse: (courseId: string) => void;
 }) {
-  const { t } = useTranslation('courses');
+  const { t, i18n } = useTranslation('courses');
   const nameOf = (n: string | null | undefined) => n || t('discover.aMember');
   const scope = state.filters.scope;
 
@@ -727,26 +745,25 @@ export function ScoresLeaderboardsPage({
         className="no-scrollbar"
         style={{
           display: 'flex',
-          gap: 8,
+          gap: 7,
           overflowX: 'auto',
           overflowY: 'hidden',
           overscrollBehaviorX: 'contain',
           touchAction: 'pan-x pan-y',
           willChange: 'transform',
-          paddingInline: GUTTER,
-          marginBottom: 16,
+          padding: `2px ${HEAD_GUTTER}px 12px`,
         }}
       >
         {OFFERED_RANKING_BOARD_KEYS.map((key) => {
           /* ONE GUARD, here where the rail reads: an absent counter is treated
              exactly like an unarrived count (null) — names, no figures, nothing
-             greyed, because grey claims we counted and found zero. In
-             production useBoardFacets always returns an object (its useMemo
-             runs even while the query is disabled), so this is cheap insurance,
-             not a live-defect fix. */
+             greyed, because grey claims we counted and found zero. */
           const n = state.facets?.countFor?.('board', key) ?? null;
           const selected = state.board === key;
           const empty = n === 0 && !selected;
+          /* 8.5 — figure and trailing word split so the word sits at 10.5/600 MUTE. */
+          const valueText = n == null ? null : boardCountText(key, n);
+          const m = valueText ? /^([^\s]+)\s+(.*)$/.exec(valueText) : null;
           return (
             <button
               key={key}
@@ -765,75 +782,152 @@ export function ScoresLeaderboardsPage({
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'flex-start',
-                gap: 2,
-                padding: '7px 12px',
+                gap: 3,
+                minWidth: 92,
+                padding: '8px 11px 9px',
                 borderRadius: 11,
-                background: 'transparent',
-                border: `1px solid ${selected ? A.AMBER : A.BORDER}`,
-                color: selected ? A.AMBER : empty ? A.DIM : A.MUTE,
+                background: selected ? CHIP_ACTIVE_BG : CHIP_BG,
+                border: `1px solid ${selected ? CHIP_ACTIVE_BORDER : A.BORDER}`,
                 opacity: empty ? 0.5 : 1,
                 cursor: empty ? 'default' : 'pointer',
                 fontFamily: SANS,
                 whiteSpace: 'nowrap',
+                textAlign: 'left',
               }}
             >
-              <span style={{ fontSize: 12.5, fontWeight: 700 }}>{t(BOARD_LABELS[key].i18n)}</span>
-              <span className="tabular-nums" style={{ fontSize: 10.5, fontWeight: 500, minHeight: 13 }}>
-                {n == null ? '\u00a0' : boardCountText(key, n)}
+              <span
+                data-chip-label
+                style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.11em', textTransform: 'uppercase', color: selected ? A.AMBER : A.DIM }}
+              >
+                {t(BOARD_LABELS[key].i18n)}
+              </span>
+              <span
+                data-chip-value
+                className="tabular-nums"
+                style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.02em', color: A.INK, minHeight: 19, lineHeight: '19px' }}
+              >
+                {valueText == null ? '\u00a0' : m ? (
+                  <>
+                    {m[1]}
+                    <span style={{ fontSize: 10.5, fontWeight: 600, letterSpacing: 0, color: A.MUTE, marginLeft: 4 }}>{m[2]}</span>
+                  </>
+                ) : valueText}
               </span>
             </button>
           );
         })}
       </div>
-      {/* §3 THE LEAD BOARD — no page head: the tab chip already names the page.
-          The same Section renders while loading, so title/Filters/scope stay put. */}
+      {/* §3 THE LEAD BOARD (Phase 8) — no visible eyebrow or title: the active
+          chip names the board and the basis sentence names the window. The
+          section keeps its labelled landmark through a visually-hidden h2. */}
       {leadLoading || (state.page.isSuccess && leader) ? (
-        <Section
-          first
-          contest
-          eyebrow={windowLabel(state.filters.window)}
-          /* 1.2 — the title is the HEADING of the board chosen in the rail, not
-             a control; its accessible name is the board's own name. */
-          title={
-            <h2
-              data-scores-board-title
-              style={{ margin: 0, fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-            >
-              {boardTitle}
-            </h2>
-          }
-          meta={
-            <span style={{ letterSpacing: 0, textTransform: 'none' }}>
-              <FiltersPill count={state.sheetFilterCount} onOpen={onOpenFilters} />
-            </span>
-          }
-        >
-          {/* The scope control sits on the board it governs. It lives OUTSIDE the
-              pending branch so the head never moves between loading and loaded.
-              No marginTop: Section already puts 12 above its children. */}
-          <ScopeSegments scope={scope} clubApplies={state.clubApplies} onScopeChange={state.changeScope} />
-          {/* 2.1 THE BASIS: what the board was DRAWN FROM (the filtered pool),
-              not how many are ON it — "from" carries that difference. */}
+        <section aria-labelledby="scores-lead-board-title" style={{ fontFamily: SANS, marginBottom: 24 }}>
+          <h2 id="scores-lead-board-title" data-scores-board-title style={VISUALLY_HIDDEN}>
+            {boardTitle}
+          </h2>
+          {/* 8.2 ONE CONTROL ROW: scope takes the remaining width, Filters at its
+              natural width. Outside the pending branch so the head never moves. */}
+          <div data-scores-control-row style={{ display: 'flex', alignItems: 'center', gap: 9, padding: `0 ${HEAD_GUTTER}px 12px` }}>
+            <ScopeSegments scope={scope} clubApplies={state.clubApplies} onScopeChange={state.changeScope} style={{ flex: 1, minWidth: 0 }} />
+            <FiltersPill count={state.sheetFilterCount} onOpen={onOpenFilters} />
+          </div>
+          {/* 8.3 THE BASIS SENTENCE — rounds form or ranked form by boardCountsRounds. */}
           {(() => {
-            const pool = state.page.data?.pool;
-            if (!pool) return null;
-            const n = boardCountsRounds(state.board) ? pool.rounds : pool.members;
+            const windowKey = state.filters.window;
+            const scopeKey = state.filters.scope;
+            const windowPhrase = t(`amateur.leaderboards.basisSentence.window.${windowKey}`);
+            const strong = (text: string) => (
+              <span style={{ color: A.MUTE, fontWeight: 600 }}>{text}</span>
+            );
+            const text = boardCountsRounds(state.board)
+              ? t('amateur.leaderboards.basisSentence.rounds', {
+                  scope: t(`amateur.leaderboards.basisSentence.scope.${scopeKey}`),
+                  window: MARK_W,
+                })
+              : t('amateur.leaderboards.basisSentence.ranked', {
+                  unit: MARK_U,
+                  window: MARK_W,
+                  scopeLead: t(`amateur.leaderboards.basisSentence.scopeLead.${scopeKey}`),
+                });
+            const unit = t(`amateur.leaderboards.basisSentence.unit.${state.board}`);
             return (
-              <div data-scores-basis className="tabular-nums" style={{ marginTop: 10, fontSize: 11.5, color: A.DIM }}>
-                {basisLine(
-                  t('amateur.leaderboards.basisFrom', { unit: boardCountText(state.board, n) }),
-                  state.filters,
-                  t as never,
-                )}
-              </div>
+              <p data-scores-basis style={{ margin: 0, padding: `0 ${HEAD_GUTTER}px 11px`, fontSize: 11.5, lineHeight: 1.45, color: A.DIM }}>
+                {splitMarks(text, { [MARK_W]: strong(windowPhrase), [MARK_U]: strong(unit) })}
+              </p>
             );
           })()}
+          {/* 8.4 THE YOU SLAB — always present for a signed-in member; three
+              states from fields already on the page, plus an empty shape while
+              the facets' `you` count is unresolved so the head does not move.
+              SAFE ON EVERY OFFERED SCOPE: every offered scope includes the
+              viewer, so a qualifying round means a place on the board. */}
+          {userId ? (() => {
+            const you = state.facets?.countFor?.('scope', 'you') ?? null;
+            let kind: 'on' | 'deeper' | 'none' | 'pending';
+            let figure: string | null = null;
+            let sentence: ReactNode = null;
+            if (leadMine) {
+              kind = 'on';
+              if (boardColumns(state.board).ranked) {
+                figure = String(leadMine.pos);
+              } else {
+                figure = leadMine.gross_score != null && leadMine.course_par != null
+                  ? fmtToPar(leadMine.gross_score - leadMine.course_par)
+                  : '\u2014';
+              }
+              const d = playDateAtLocalNoon(leadMine.play_date);
+              const date = d ? d.toLocaleDateString(i18n.language, { day: 'numeric', month: 'short' }) : '';
+              const youWord = <span style={{ color: A.INK, fontWeight: 700 }}>{t('amateur.leaderboards.slab.you')}</span>;
+              const raw = leadMine.course_name
+                ? t('amateur.leaderboards.slab.onBoard', { you: MARK_Y, course: leadMine.course_name, date })
+                : t('amateur.leaderboards.slab.onBoardNoCourse', { you: MARK_Y, date });
+              sentence = splitMarks(raw, { [MARK_Y]: youWord });
+            } else if (you == null) {
+              kind = 'pending';
+            } else if (you > 0) {
+              kind = 'deeper';
+              figure = '\u2014';
+              sentence = t('amateur.leaderboards.standing.deeper');
+            } else {
+              kind = 'none';
+              figure = '\u2014';
+              sentence = t(BOARD_FLOOR_COPY[state.board].i18n);
+            }
+            return (
+              <div
+                data-scores-standing={kind}
+                style={{
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  margin: `0 ${HEAD_GUTTER}px 12px`,
+                  minHeight: 44,
+                  padding: '11px 12px 11px 14.5px',
+                  borderRadius: 11,
+                  overflow: 'hidden',
+                  background: SLAB_BG,
+                }}
+              >
+                <span aria-hidden style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2.5, background: A.AMBER }} />
+                {figure != null ? (
+                  <span className="tabular-nums" style={{ flex: 'none', fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em', color: A.INK }}>
+                    {figure}
+                  </span>
+                ) : null}
+                {sentence != null ? (
+                  <span style={{ minWidth: 0, fontSize: 12, lineHeight: 1.4, color: A.MUTE }}>{sentence}</span>
+                ) : null}
+              </div>
+            );
+          })() : null}
+          <div style={{ paddingInline: GUTTER }}>
           {leadLoading || !leader ? (
             /* Rows area only — the head above is already final. */
-            <div aria-hidden style={{ marginTop: 12, height: 500 }} />
+            <div aria-hidden style={{ height: 500 }} />
           ) : (
             <>
-          <div style={{ marginTop: 12 }}>
+          <div>
             <BoardHeaderRow board={state.board} />
             {(() => {
               const list = leadPinned && leadMine ? [...leadVisible, leadMine] : leadVisible;
@@ -852,27 +946,6 @@ export function ScoresLeaderboardsPage({
               ));
             })()}
           </div>
-          {/* 2.2 WHERE THE MEMBER STANDS when their row is not in the fetch.
-              The facets' `you` scope count tells "deeper than fetched" from
-              "no qualifying round"; unresolved renders nothing.
-              SAFE ON EVERY OFFERED SCOPE: board_pool's circle is the people a
-              member follows UNION the member, club includes the viewer's own
-              primary club, everyone includes all — so the viewer is always in
-              the pool and a qualifying round means a place on the board. This
-              stops being true only if a scope that EXCLUDES the viewer from
-              their own board is offered ('you' is retired); re-gate it then. */}
-          {userId && !leadMine ? (() => {
-            const you = state.facets?.countFor?.('scope', 'you') ?? null;
-            if (you == null) return null;
-            const msg = you > 0
-              ? t('amateur.leaderboards.standing.deeper')
-              : t(BOARD_FLOOR_COPY[state.board].i18n);
-            return (
-              <div data-scores-standing={you > 0 ? 'deeper' : 'none'} style={{ marginTop: 12, fontSize: 12.5, lineHeight: 1.45, color: A.MUTE }}>
-                {msg}
-              </div>
-            );
-          })() : null}
           {state.total > leadVisible.length || (userId && !leadMine && (state.facets?.countFor?.('scope', 'you') ?? 0) > 0) ? (
             <SeeAll
               label={seeAllForBoard(state.board)}
@@ -884,7 +957,8 @@ export function ScoresLeaderboardsPage({
           ) : null}
             </>
           )}
-        </Section>
+          </div>
+        </section>
       ) : null}
 
       {/* §5 FEATS THIS YEAR — event counts; footnote is distinct members. */}
