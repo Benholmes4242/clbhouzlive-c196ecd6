@@ -74,8 +74,8 @@ const THEME_TOKENS = {
 } as const;
 
 /* THE HERO DEFINES NO WIDTH OF ITS OWN. Every track reads BOARD_GEOMETRY
-   from BoardTable, so the two boards cannot drift. TODAY takes the round-
-   cell width (it is one round's figure). The only deliberate difference is
+   from BoardTable, so the two boards cannot drift. TODAY has its own
+   `today` width (it is not a round). The only deliberate difference is
    row padding: 20 here, because this board aligns with the picks block and
    action row in the same band; BoardTable keeps 16 for its seven columns. */
 const HERO_PAD_X = 20;
