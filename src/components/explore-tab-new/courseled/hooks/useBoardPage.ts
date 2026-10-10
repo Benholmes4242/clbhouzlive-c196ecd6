@@ -34,6 +34,10 @@ export interface BoardRow {
   course_par: number | null;
   net_score: number | null;
   stableford_points: number | null;
+  /* 12.3 — delta_index: the movement THAT round caused (proved against 4,067
+     live rounds; it shows up as the NEXT round's hcp_at_time). A NULL here
+     means "not yet attributable" — the newest round from every member is in
+     this state until the round that follows it — and NEVER "no movement". */
   delta_index: number | null;
   birdies: number | null;
   holes_in_one: number | null;
