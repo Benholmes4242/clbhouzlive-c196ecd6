@@ -423,7 +423,7 @@ function PicksBlock({
   tourCode: string;
   phase: 'live' | 'upcoming' | 'completed';
   boardByPlayer: Map<string, { position: number | null; tied: boolean; score: number | null }>;
-  predictions: { isAIPowered?: boolean; isStale?: boolean; generatedAt?: string; editorialFraming?: string | null } | null;
+  predictions: { editorialFraming?: string | null } | null;
   /** The champion, by player id — settledFigureFor can only see a POSITION,
    *  and a playoff winner's position is T1, so identity comes in separately. */
   championPlayerId: string | null;
