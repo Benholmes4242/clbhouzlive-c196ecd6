@@ -10,7 +10,7 @@ import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { MemberAvatar } from '@/components/explore-tab-new/courseled/MemberAvatar';
 import { SEASON_ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMetrics';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
-import { BoardDaySeparator, BoardRowView, boardColumns, fmtToPar } from '@/components/explore-tab-new/courseled/BoardRows';
+import { BoardDaySeparator, BoardRowView, boardColumns, fmtIndexMove, fmtToPar } from '@/components/explore-tab-new/courseled/BoardRows';
 import { describeFilterParts } from '@/components/explore-tab-new/courseled/describeFilters';
 import { type BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import {
@@ -950,7 +950,7 @@ export function ScoresLeaderboardsPage({
               if (state.board === 'recent' && state.viewerIndex != null && leadMine.hcp_at_time != null) {
                 const moved = Math.round((Number(state.viewerIndex) - Number(leadMine.hcp_at_time)) * 10) / 10;
                 if (moved !== 0) {
-                  const text = moved < 0 ? `\u2212${Math.abs(moved).toFixed(1)}` : `+${moved.toFixed(1)}`;
+                  const text = fmtIndexMove(moved);
                   marks[MARK_F] = (
                     <span className="tabular-nums" style={{ color: moved < 0 ? A.GREEN : A.MUTE, fontWeight: 700 }}>{text}</span>
                   );

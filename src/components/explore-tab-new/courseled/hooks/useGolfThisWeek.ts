@@ -2,9 +2,7 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
-import { useUserJourneyCourses } from '@/hooks/useUserJourneyCourses';
-import { usePlayedUnratedCourses } from '@/hooks/usePlayedUnratedCourses';
-import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
+import { useCircleLatestRounds } from '@/hooks/gam/useCircleLatestRounds';
 
 /**
  * GOLF THIS WEEK — the data layer (BRIEF_GOLF_THIS_WEEK §1, extended by

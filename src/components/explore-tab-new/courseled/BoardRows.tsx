@@ -362,7 +362,12 @@ export function BoardDaySeparator({ label }: { label: string }) {
 }
 
 /** 9.11 — one decimal, true minus, always signed. */
-function fmtIndexChip(n: number): string {
+/** 15.1 — THE ONE SIGNED INDEX-MOVEMENT FORMATTER: one decimal, true minus for
+ *  a cut, plus for a rise. The board-row index chip and the slab's "since"
+ *  clause both read it. fmtCut stays unsigned on purpose: the improved board's
+ *  floor is delta < 0, so every value there is a cut and a sign would be noise —
+ *  do not merge the two. */
+export function fmtIndexMove(n: number): string {
   const v = Math.abs(n).toFixed(1);
   return n < 0 ? `\u2212${v}` : `+${v}`;
 }
@@ -515,7 +520,7 @@ export function BoardRowView({
               border: `1px solid ${chip < 0 ? INDEX_CUT_BORDER : A.BORDER}`,
             }}
           >
-            {fmtIndexChip(chip)}
+            {fmtIndexMove(chip)}
           </span>
         ) : null}
         {/* S1.3 — THE FIGURE FOLLOWS THE COLOUR LAW, NEVER AMBER. */}
