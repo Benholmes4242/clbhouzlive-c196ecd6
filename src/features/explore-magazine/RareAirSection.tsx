@@ -4,11 +4,11 @@ import { ChevronRight } from 'lucide-react';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { playDateShortDated } from '@/components/explore-tab-new/courseled/discoverWhen';
+import { playDateShort } from '@/components/explore-tab-new/courseled/discoverWhen';
 import type { FeatBoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 
 import type { FeatWindow, FeatYearRow } from './useFeatsWindow';
-import { FEAT_I18N, RARE_AIR, compareRates, rarityShare } from './rareAir';
+import { FEAT_I18N, RARE_AIR, RARE_AIR_TILE_HEIGHT, compareRates, rarityShare } from './rareAir';
 
 const T = RARE_AIR.tile;
 const L = T.latest;
@@ -104,7 +104,7 @@ export function RareAirRail({
                 type="button"
                 onClick={() => onOpen(f.feat_kind as FeatBoardKey)}
                 style={{
-                  width: T.width, flex: 'none', scrollSnapAlign: 'start', background: A.PANEL,
+                  width: T.width, height: RARE_AIR_TILE_HEIGHT, boxSizing: 'border-box', flex: 'none', scrollSnapAlign: 'start', background: A.PANEL,
                   border: `1px solid ${A.BORDER}`, borderRadius: T.radius, overflow: 'hidden',
                   padding: 0, paddingBottom: T.paddingBottom, textAlign: 'left', fontFamily: SANS, cursor: 'pointer',
                 }}
@@ -143,7 +143,7 @@ export function RareAirRail({
                     {f.events.toLocaleString()}
                   </span>
                   <span className="tabular-nums" style={{ display: 'block', marginTop: T.rate.marginTop, fontSize: T.rate.fontSize, lineHeight: `${T.rate.lineHeight}px`, color: A.DIM }}>
-                    <span style={{ display: 'block', fontWeight: 600, color: A.MUTE }}>{rate}</span>
+                    <span style={{ display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 600, color: A.MUTE }}>{rate}</span>
                     <span style={{ display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {t('amateur.leaderboards.nMembers', { count: f.members })}
                       {cmp?.kind === 'commoner' ? (
@@ -172,9 +172,9 @@ export function RareAirRail({
                       overflow: 'hidden', textOverflow: 'ellipsis', color: A.DIM,
                     }}>
                       {has
-                        ? [f.latest_course_name, playDateShortDated(f.latest_play_date, locale)].filter(Boolean).join(' · ')
+                        ? [f.latest_course_name, playDateShort(f.latest_play_date, locale)].filter(Boolean).join(' · ')
                         : lastAll
-                          ? t('amateur.leaderboards.featLatest.lastOne', { date: playDateShortDated(lastAll, locale) })
+                          ? t('amateur.leaderboards.featLatest.lastOne', { date: playDateShort(lastAll, locale) })
                           : '\u00A0'}
                     </span>
                   </span>
