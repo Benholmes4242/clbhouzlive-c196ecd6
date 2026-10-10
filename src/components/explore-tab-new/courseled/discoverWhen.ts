@@ -165,3 +165,12 @@ export function playDateShort(iso: string | null | undefined, locale?: string): 
   const d = playDateAtLocalNoon(iso);
   return d ? d.toLocaleDateString(locale, { day: 'numeric', month: 'short' }) : '';
 }
+
+/** playDateShort, plus the year when it is not the current year ("12 Jun 2024"). */
+export function playDateShortDated(iso: string | null | undefined, locale?: string, now: Date = new Date()): string {
+  const d = playDateAtLocalNoon(iso);
+  if (!d) return '';
+  return d.getFullYear() === now.getFullYear()
+    ? d.toLocaleDateString(locale, { day: 'numeric', month: 'short' })
+    : d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
+}
