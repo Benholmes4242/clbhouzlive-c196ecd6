@@ -12,6 +12,7 @@ export function makeBoardState(over: Partial<AmateurBoardState> = {}): AmateurBo
   const base: AmateurBoardState = {
     ready: true,
     clubApplies: false,
+    viewerIndex: null,
     board: 'recent',
     entryBoard: 'recent',
     filters: DEFAULT_FILTERS,
