@@ -2,14 +2,18 @@ import { describe, it, expect, vi } from 'vitest';
 import { render as rtlRender, screen, within, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (_k: string, d?: unknown) =>
-      typeof d === 'string' ? d : ((d as { defaultValue?: string; defaultValue_other?: string })?.defaultValue ?? (d as { defaultValue_other?: string })?.defaultValue_other ?? _k),
-  }),
-  initReactI18next: { type: '3rdParty', init: () => {} },
-  Trans: ({ children }: { children?: React.ReactNode }) => children ?? null,
-}));
+vi.mock('react-i18next', async () => {
+  /* Resolves against the real English catalogue: call sites carry no fallbacks. */
+  const en = (await import('../../../../public/locales/en/courses.json')).default as Record<string, unknown>;
+  const look = (k: string) => k.split('.').reduce<unknown>((o, p) => (o && typeof o === 'object' ? (o as Record<string, unknown>)[p] : undefined), en);
+  const t = (k: string, o?: unknown) => {
+    const opts = (typeof o === 'object' && o) ? (o as Record<string, unknown>) : {};
+    let v = typeof opts.count === 'number' ? look(`${k}_${opts.count === 1 ? 'one' : 'other'}`) ?? look(k) : look(k);
+    if (typeof v !== 'string') v = typeof o === 'string' ? o : k;
+    return (v as string).replace(/\{\{(\w+)\}\}/g, (_m, n) => String(opts[n] ?? ''));
+  };
+  return { useTranslation: () => ({ t }), initReactI18next: { type: '3rdParty', init: () => {} }, Trans: ({ children }: { children?: React.ReactNode }) => children ?? null };
+});
 
 const rpcRows: { current: unknown[] } = { current: [] };
 vi.mock('@/integrations/supabase/client', () => ({
