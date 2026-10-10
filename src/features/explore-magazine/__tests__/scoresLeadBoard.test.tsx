@@ -200,3 +200,21 @@ function toCss(c: string) {
   el.style.color = c;
   return el.style.color;
 }
+
+describe('Phase 14 — slab index clause', () => {
+  function slab(board: BoardKey, viewerIndex: number | null, hcp: number | null) {
+    const rows = [row(1), row(2, { user_id: 'viewer', display_name: 'Viewer', hcp_at_time: hcp })];
+    const state = makeBoardState({
+      board, total: 2, viewerIndex,
+      page: { data: { rows, total: 2, pool: { rounds: 2, courses: 1, members: 2 } }, isSuccess: true, isPending: false } as never,
+    });
+    const r = render(<ScoresLeaderboardsPage userId="viewer" state={state} onOpenFilters={vi.fn()}
+      onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />);
+    return r.container.querySelector('[data-scores-standing="on"]')?.textContent ?? '';
+  }
+  it('a cut reads with a true minus', () => expect(slab('recent', 12.1, 12.5)).toContain('Your index has moved \u22120.4 since.'));
+  it('a rise reads with a plus', () => expect(slab('recent', 12.8, 12.5)).toContain('Your index has moved +0.3 since.'));
+  it('zero movement omits the clause', () => expect(slab('recent', 12.5, 12.5)).not.toContain('Your index'));
+  it('a null index omits the clause', () => expect(slab('recent', null, 12.5)).not.toContain('Your index'));
+  it('a ranked board never carries it', () => expect(slab('stableford', 12.1, 12.5)).not.toContain('Your index'));
+});
