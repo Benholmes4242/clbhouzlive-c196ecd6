@@ -398,7 +398,9 @@
       "thru": "THRU {{n}}"
     },
     "board": {
-      "clbhouzPick": "[çlbhöûz pïçk]"
+      "clbhouzPick": "[çlbhöûz pïçk]",
+      "rowLabel": "[{{name}}, {{position}}, {{score}}]",
+      "teamName": "[{{team}}: {{members}}]"
     },
     "venueRecord": {
       "kicker": "[The record book]",

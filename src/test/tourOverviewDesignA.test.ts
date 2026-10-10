@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import i18n from 'i18next';
+import enTourhub from '../../public/locales/en/tourhub.json';
 import { resolveChampionPlayerId, pickWonTournament } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { render } from '@testing-library/react';
 import { createElement } from 'react';
@@ -379,6 +381,41 @@ describe('MiniBoard heroBoard render', () => {
     const header = view.container.querySelector<HTMLElement>('[data-overview-board-header]');
     expect(header?.style.gridTemplateColumns).toBe(`24px minmax(0, 1fr) ${BOARD_GEOMETRY.thru}px 40px`);
     expect(view.container.querySelectorAll('[data-hero-thru]').length).toBe(2);
+  });
+});
+
+describe('MiniBoard hero rows', () => {
+  i18n.addResourceBundle(i18n.language || 'en', 'tourhub', enTourhub, true, true);
+  const mount = (entries: BoardEntry[], currentRound: number, phase: 'live' | 'completed' = 'live') => render(createElement(
+    QueryClientProvider,
+    { client: new QueryClient({ defaultOptions: { queries: { retry: false } } }) },
+    createElement(MemoryRouter, null,
+      createElement(MiniBoard, { tournamentId: 'event', entries, limit: 5, currentRound, phase, theme: 'heroBoard' })),
+  ));
+  it('a team row with no player id is not a button', () => {
+    const entries = [
+      { id: 't', position: 1, score: -9, thru: 9, round_1: -5, team: { display_name: 'Team Lowry', members: [{ player: { full_name: 'Shane Lowry' } }, { player: { full_name: 'Rory McIlroy' } }] } },
+    ] as unknown as BoardEntry[];
+    const view = mount(entries, 1);
+    expect(view.container.querySelectorAll('button').length).toBe(0);
+    expect(view.container.querySelector('[role="group"]')?.getAttribute('aria-label')).toBe('Team Lowry: Shane Lowry, Rory McIlroy, 1, -9');
+  });
+  it('a player row is a button labelled name, position, score', () => {
+    const entries = [
+      { id: 'a', position: 2, position_tied: true, score: -4, thru: 9, round_1: -4, player: { id: 'pa', full_name: 'Player A' } },
+    ] as unknown as BoardEntry[];
+    const view = mount(entries, 1);
+    expect(view.container.querySelector('button')?.getAttribute('aria-label')).toBe('Player A, T2, -4');
+  });
+  it('live round two renders a MOV track before POS', () => {
+    const entries = [
+      { id: 'a', position: 1, score: -6, thru: 9, round_1: -1, round_2: -5, player: { id: 'pa', full_name: 'Player A' } },
+      { id: 'b', position: 2, score: -4, thru: 9, round_1: -4, round_2: 0, player: { id: 'pb', full_name: 'Player B' } },
+    ] as unknown as BoardEntry[];
+    const view = mount(entries, 2);
+    const header = view.container.querySelector<HTMLElement>('[data-overview-board-header]');
+    expect(header?.style.gridTemplateColumns.startsWith(`${BOARD_GEOMETRY.mov}px ${BOARD_GEOMETRY.pos}px`)).toBe(true);
+    expect(view.container.textContent).toContain('\u25B2 1');
   });
 });
 
