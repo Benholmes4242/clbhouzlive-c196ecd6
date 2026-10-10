@@ -3,7 +3,7 @@ import { formatNumber } from '@/i18n/format';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { formatPurse } from '../../_shared/formatPurse';
 import { fmtScore } from '../../utils/fmtScore';
-import { AMBER, CAPS_10, FONT, HERO_VENUE_INK, INK, INK_FAINT, INK_MUTE, STATUS_LIVE_ON_DARK, TOUR_HERO_PHOTO_H } from '../../_shared/tokens';
+import { AMBER, CAPS_10, FONT, INK, STATUS_LIVE_ON_DARK, TOUR_HERO_PHOTO_H } from '../../_shared/tokens';
 import { heroCanonBackground } from '../../_shared/heroGradient';
 import { hasStrokeBoard } from '../../_shared/eventFormat';
 import { resolveBoardEntity, resolveChampion, teamNamesNeedInitials } from '../../_shared/boardEntity';

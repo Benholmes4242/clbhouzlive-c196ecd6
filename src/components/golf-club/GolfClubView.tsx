@@ -22,7 +22,7 @@ import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sectio
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 import { useCourseStatsDetail, type CourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import CourseStatsSheet from '@/components/feed/CourseStatsSheet';
-import { CourseMasthead } from '@/components/courses/CourseMasthead';
+import { CourseMasthead, HeroFigureCell } from '@/components/courses/CourseMasthead';
 import { ratingPrintable } from '@/features/explore-magazine/courseRatingFloor';
 import { formatRatingValue } from '@/utils/formatters';
 import { useTranslation } from 'react-i18next';
