@@ -151,6 +151,7 @@ export interface WindowOption extends FixedOption<WindowKey> {
   sentence: { i18n: string; label: string } | null;
 }
 
+/* ARCHITECTURE RULE (moved from AGENTS.md): A window has one key and three renderings — the control label, the compact form, and the sentence phrase. All three live on the key here. A fourth rendering is a fork. */
 export const WINDOW_OPTIONS: WindowOption[] = [
   {
     key: '14', i18n: 'discover.filterBoard.window.d14', label: 'Last 14 days',
@@ -252,6 +253,7 @@ export const boardCountsRounds = (board: BoardKey) =>
 /** THE ROW FLOOR: fewer than four rows is not a leaderboard (S3.4). One rule,
     two readers — the landing ladder (does this scope hold a board?) and the
     Leaderboards page's season sections (is this list a board?). */
+/* ARCHITECTURE RULE (moved from AGENTS.md): BOARD_ROW_FLOOR is the one 'fewer rows is not a board' rule for the landing ladder and the Leaderboards page, so the probe and the sections cannot disagree. */
 export const BOARD_ROW_FLOOR = 4;
 
 /** The ONE rule for which ranking boards a member is offered: a ranking key,

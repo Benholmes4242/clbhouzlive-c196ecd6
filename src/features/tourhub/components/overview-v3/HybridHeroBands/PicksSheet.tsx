@@ -44,6 +44,7 @@ const HAIRLINE: React.CSSProperties = { height: 1, background: WHITE_ALPHA_08, b
 const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
 const nonEmpty = (v: unknown): v is string => typeof v === 'string' && v.trim().length > 0;
 
+/* ARCHITECTURE RULE (moved from AGENTS.md): Tour Hub OUR PICKS cards all open this one PicksSheet; pick reasons are never padded with filler, so the sheet only prints real model output. */
 export function PicksSheet({ open, onClose, picks, predictions, eventName, venueName, neededByPlayer }: PicksSheetProps) {
   const { t } = useTranslation('tourhub');
   const { viewingTourSlug } = useTourSelection();

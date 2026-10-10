@@ -1,3 +1,4 @@
+/* ARCHITECTURE RULE (moved from AGENTS.md): Full-width review cards retain the standard photo-overlay preset and share kind-owned height constants with their loading shells, so height adjustments cannot change composition or drift from placeholders. */
 /**
  * The height of a full-width review tile in the Explore feed. FIXED, not a
  * minimum — every review renders at exactly this height so no two reviews in

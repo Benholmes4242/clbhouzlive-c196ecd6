@@ -36,6 +36,7 @@ export interface LeaderboardRealtimeOptions {
  * so 4s is far tighter than its freshness budget, and a 4s delay on a golf
  * score is imperceptible. If the sync cycle changes, revisit this window.
  */
+/* ARCHITECTURE RULE (moved from AGENTS.md): useLeaderboardRealtime coalesces row changes on one trailing window (LEADERBOARD_REALTIME_COALESCE_MS) for every caller and cancels a pending flush on unmount or tournament change, because live sync rewrites the whole field each cycle. */
 export const LEADERBOARD_REALTIME_COALESCE_MS = 4000;
 
 export function useLeaderboardRealtime(

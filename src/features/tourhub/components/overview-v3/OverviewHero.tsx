@@ -164,6 +164,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
    * carousel that only ever shows one slide at a time.
    */
   // Leaderboard key ONLY: see LeaderboardRealtimeOptions for the fan-out.
+/* ARCHITECTURE RULE (moved from AGENTS.md): The overview hero calls useLeaderboardRealtime with invalidate: 'leaderboard', while TournamentPage keeps the default full set, because live sync rewrites every row of the field on each pass and the full set would rebuild the carousel once per row. */
   useLeaderboardRealtime(viewingLive ? viewingTid : null, { invalidate: 'leaderboard' });
 
   /**

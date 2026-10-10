@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { PAGE_CANVAS, inkWithAlpha } from '@/lib/tokens/surfaces';
+import { INK_ON_LIGHT, MEMBER_CELL, PAGE_CANVAS, inkWithAlpha } from '@/lib/tokens/surfaces';
+import { SURFACE } from '@/lib/tokens/surface';
 import wordmark from '@/assets/clbhouz-wordmark.png.asset.json';
 
 const AMBER = '#F7931E';
-const INK = '#F8FAFC';
-const INK_62 = inkWithAlpha(INK, 0.62);
+const INK = SURFACE.dark.ink;
+const INK_62 = SURFACE.dark.mute;
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const FALLBACK_URL = 'https://apps.apple.com/app/id6752538886';
 const MARK = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
@@ -66,7 +67,7 @@ function GetApp({ href, style }: { href: string; style?: React.CSSProperties }) 
         height: 56,
         borderRadius: 28,
         background: AMBER,
-        color: PAGE_CANVAS,
+        color: INK_ON_LIGHT,
         fontSize: 17,
         fontWeight: 700,
         textDecoration: 'none',
@@ -130,7 +131,7 @@ export function PublicLanding({
                   width: 28,
                   height: 28,
                   borderRadius: '50%',
-                  background: '#1E1E23',
+                  background: MEMBER_CELL,
                   border: `1px solid ${inkWithAlpha(INK, 0.12)}`,
                   display: 'flex',
                   alignItems: 'center',

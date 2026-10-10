@@ -231,6 +231,7 @@ export function roundsFromSchedule(startDate: string | null | undefined, endDate
   return span;
 }
 
+/* ARCHITECTURE RULE (moved from AGENTS.md): The Tour overview hero's on-screen state is decided once by deriveHeroState in OverviewHero and passed down to photo and board; carousel slide.type only decides membership and order, so the photo and board cannot disagree. */
 export function deriveHeroState(
   tournament: HeroTournament,
   now: Date = new Date(),
