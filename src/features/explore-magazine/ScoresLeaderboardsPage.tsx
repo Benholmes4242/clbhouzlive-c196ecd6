@@ -363,7 +363,7 @@ function CompactRow({
   captionTone,
   valueTone,
   self,
-  divider,
+  gapAbove,
   onPress,
 }: {
   pos: number;
@@ -378,7 +378,8 @@ function CompactRow({
   captionTone?: string;
   valueTone?: string;
   self: boolean;
-  divider: boolean;
+  /** Phase 5.2 — a broken sequence (the pinned self row) is marked by space, not a line. */
+  gapAbove?: boolean;
   onPress: () => void;
 }) {
   const ink = self ? A.AMBER : A.INK;
@@ -393,7 +394,7 @@ function CompactRow({
         gap: 10,
         padding: `${ROW_METRICS.padY}px 0`,
         border: 'none',
-        borderBottom: divider ? `1px solid ${A.SOFT}` : 'none',
+        marginTop: gapAbove ? ROW_METRICS.padY * 2 : 0,
         background: 'transparent',
         textAlign: 'left',
         fontFamily: SANS,
@@ -587,7 +588,7 @@ export function ScoresLeaderboardsPage({
   /* §4 row. start_index and current_index are FACTS from the RPC, so they are
      formatted directly — handicapJourneyDisplay derives an after-value from a
      round's delta and must not be used to re-derive numbers we already have. */
-  const improvedRow = (r: ImprovementRow, divider: boolean, inSheet: boolean) => {
+  const improvedRow = (r: ImprovementRow, inSheet: boolean) => {
     const pair = handicapPairDisplay({
       handicapIndex: r.current_index,
       deltaIndex: r.improvement == null ? null : -Number(r.improvement),
@@ -611,7 +612,6 @@ export function ScoresLeaderboardsPage({
         value={pair?.delta ? `${pair.delta.arrow}${pair.delta.text}` : '\u2014'}
         valueTone={pair?.delta?.tone}
         self={!!r.is_viewer || r.user_id === userId}
-        divider={divider}
         onPress={() => {
           if (inSheet) setImprovedSheet(false);
           onMemberTap(r.user_id);
@@ -696,7 +696,7 @@ export function ScoresLeaderboardsPage({
         value={opts.fmt ? opts.fmt(r) : String(r.value)}
         caption={caption}
         self={!!r.is_viewer || r.user_id === userId}
-        divider={i < list.length - 1}
+        gapAbove={!!pin && r.user_id === pin.user_id && i === list.length - 1}
         onPress={() => onPress(r)}
       />
     ));
@@ -981,7 +981,7 @@ export function ScoresLeaderboardsPage({
           row count is shown and zero rows reads one quiet line. Only the
           DEFAULT list being empty (or failing) on load hides the section. */}
       {top100Defaulted && top100.isPending ? (
-        pending(152)
+        pending(150)
       ) : top100Defaulted && !(top100.isSuccess && top100Rows.length > 0) ? null : (
         <Section
           contest
@@ -1142,7 +1142,7 @@ export function ScoresLeaderboardsPage({
 
       {/* §4 MOST IMPROVED — cumulative this year, not a single round's cut. */}
       {improved.isPending ? (
-        pending(182)
+        pending(180)
       ) : improved.isSuccess && improvedRows.length >= THIN_FLOOR ? (
         <Section
           contest
@@ -1150,7 +1150,7 @@ export function ScoresLeaderboardsPage({
           title={t('amateur.leaderboards.mostImproved')}
           meta={windowLabel('year')}
         >
-          {improvedRows.slice(0, SHORT_ROWS).map((r, i, arr) => improvedRow(r, i < arr.length - 1, false))}
+          {improvedRows.slice(0, SHORT_ROWS).map((r) => improvedRow(r, false))}
           <SeeAll
             label={seeAllMembers()}
             onPress={() => setImprovedSheet(true)}
@@ -1182,7 +1182,7 @@ export function ScoresLeaderboardsPage({
         valueHeading={t('amateur.leaderboards.indexChange')}
         footnote={t('amateur.leaderboards.improvedQualifier')}
       >
-        {improvedRows.map((r, i, arr) => improvedRow(r, i < arr.length - 1, true))}
+        {improvedRows.map((r) => improvedRow(r, true))}
       </BoardSheet>
 
       {(() => {
@@ -1225,7 +1225,7 @@ export function ScoresLeaderboardsPage({
         </div>
         }
       >
-          {top100Rows.map((r, i, arr) => (
+          {top100Rows.map((r) => (
             <CompactRow
               key={r.user_id}
               pos={r.pos}
@@ -1236,7 +1236,6 @@ export function ScoresLeaderboardsPage({
               secondary={top100Secondary(r)}
               value={String(r.value)}
               self={!!r.is_viewer || r.user_id === userId}
-              divider={i < arr.length - 1}
               onPress={() => {
                 setCareerSheet(false);
                 openTop100Sheet(r);
