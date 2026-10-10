@@ -22,7 +22,7 @@ import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sectio
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 import { useCourseStatsDetail, type CourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import CourseStatsSheet from '@/components/feed/CourseStatsSheet';
-import { CourseMasthead } from '@/components/courses/CourseMasthead';
+import { CourseMasthead, HeroFigureCell } from '@/components/courses/CourseMasthead';
 import { ratingPrintable } from '@/features/explore-magazine/courseRatingFloor';
 import { formatRatingValue } from '@/utils/formatters';
 import { useTranslation } from 'react-i18next';
@@ -441,34 +441,8 @@ interface CourseTitleOverlayProps {
   onOpenStats: () => void;
 }
 
-/* Hero FIGURE ROW cell. Local, not the round card's FigureCell: that cell is
-   9px label / 15px value, centred, on A.MUTE/A.INK; matching 10/19 left-aligned
-   over a photograph would mean forking its styling. */
-const FIG_LABEL: React.CSSProperties = {
-  fontSize: 10,
-  fontWeight: 700,
-  letterSpacing: '0.13em',
-  textTransform: 'uppercase',
-  color: 'rgba(255,255,255,0.58)',
-  whiteSpace: 'nowrap',
-};
-const FIG_VALUE: React.CSSProperties = {
-  fontSize: 19,
-  fontWeight: 800,
-  marginTop: 4,
-  lineHeight: 1,
-  letterSpacing: '-0.02em',
-  fontVariantNumeric: 'tabular-nums lining-nums',
-  fontFeatureSettings: '"zero" 0, "tnum" 1',
-  color: '#fff',
-};
-
-const HeroStatCell: React.FC<{ label: string; value: string; tone?: string }> = ({ label, value, tone }) => (
-  <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0 }}>
-    <span style={FIG_LABEL}>{label}</span>
-    <span style={{ ...FIG_VALUE, color: tone ?? FIG_VALUE.color }}>{value}</span>
-  </span>
-);
+/* Hero FIGURE ROW cell: the shared HeroFigureCell from CourseMasthead. */
+const HeroStatCell: React.FC<{ label: string; value: string; tone?: string }> = (p) => <HeroFigureCell {...p} />;
 
 const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   course,

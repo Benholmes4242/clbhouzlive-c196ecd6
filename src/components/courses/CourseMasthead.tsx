@@ -27,7 +27,7 @@ export const MASTHEAD_KICKER: React.CSSProperties = {
 };
 
 export const MASTHEAD_NAME: React.CSSProperties = {
-  fontSize: 30,
+  fontSize: 'clamp(24px, 7.7vw, 30px)',
   fontWeight: 800,
   lineHeight: 0.99,
   letterSpacing: '-0.032em',
@@ -44,6 +44,40 @@ export const MASTHEAD_PLACE: React.CSSProperties = {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
 };
+
+/**
+ * HERO FIGURE CELL — label above value, for every hero figure row. Not the
+ * round card's FigureCell: that one is 9px label / 15px value on card ground,
+ * and taking these sizes would change every round card.
+ */
+export const HERO_FIGURE_LABEL: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 700,
+  letterSpacing: '0.13em',
+  textTransform: 'uppercase',
+  color: 'rgba(248,250,252,0.58)',
+  whiteSpace: 'nowrap',
+};
+export const HERO_FIGURE_VALUE: React.CSSProperties = {
+  fontSize: 19,
+  fontWeight: 800,
+  marginTop: 4,
+  lineHeight: 1,
+  letterSpacing: '-0.02em',
+  fontVariantNumeric: 'tabular-nums lining-nums',
+  color: '#fff',
+};
+
+export function HeroFigureCell({ label, value, tone, cjk = false, align = 'start' }: {
+  label: string; value: React.ReactNode; tone?: string; cjk?: boolean; align?: 'start' | 'center';
+}) {
+  return (
+    <span style={{ display: 'flex', flexDirection: 'column', alignItems: align === 'center' ? 'center' : 'flex-start', minWidth: 0, flex: 1 }}>
+      <span style={{ ...HERO_FIGURE_LABEL, letterSpacing: cjk ? 0 : HERO_FIGURE_LABEL.letterSpacing, textTransform: cjk ? 'none' : 'uppercase' }}>{label}</span>
+      <span style={{ ...HERO_FIGURE_VALUE, color: tone ?? HERO_FIGURE_VALUE.color }}>{value}</span>
+    </span>
+  );
+}
 
 export interface CourseMastheadProps {
   kicker: string | null;
