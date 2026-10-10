@@ -511,7 +511,7 @@ export function BoardRowView({
         <span
           data-board-main
           className="tabular-nums"
-          style={{ fontSize: M.figureSize, fontWeight: M.figureWeight, letterSpacing: '-0.02em', color: value.tone }}
+          style={{ fontSize: M.figureSize, fontWeight: M.figureWeight, letterSpacing: M.figureTracking, color: value.tone }}
         >
           {value.text}
         </span>

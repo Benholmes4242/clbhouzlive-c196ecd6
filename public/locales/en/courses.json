@@ -159,7 +159,8 @@
           "net": "net against par",
           "stableford": "stableford points",
           "improved": "index movement",
-          "birdies": "birdies"
+          "birdies": "birdies",
+          "gross": "gross score"
         },
         "roundsAll": "Every round {{scope}} has ever posted, newest first — net first, gross behind.",
         "rankedAll": "Ranked on {{unit}}, all time. {{scopeLead}}, 18 holes."
