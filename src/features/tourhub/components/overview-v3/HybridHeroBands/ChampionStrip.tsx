@@ -38,8 +38,6 @@ interface ChampionStripProps {
   avatarUrl?: string | null;
   /** Pass 3: per-round scores for the winner's trajectory sparkline. */
   rounds?: number[];
-  /** Pass 3: course par used to render the sparkline. */
-  par?: number;
   /** Pass 5.5: italic editorial narrative beneath the name. */
   narrative?: string | null;
 }
@@ -66,7 +64,6 @@ export function ChampionStrip({
   eyebrowIcon: EyebrowIcon = Trophy,
   avatarUrl,
   rounds,
-  par,
   narrative,
 }: ChampionStripProps) {
   const { t } = useTranslation('tourhub');
@@ -131,9 +128,9 @@ export function ChampionStrip({
             {name}
           </div>
         </div>
-        {rounds && rounds.length >= 2 && par ? (
+        {rounds && rounds.length >= 2 ? (
           <div style={{ marginRight: 10, display: 'flex', alignItems: 'center' }}>
-            <TrajectorySparkline rounds={rounds} par={par} variant="champion" totalRounds={4} />
+            <TrajectorySparkline rounds={rounds} variant="champion" totalRounds={4} />
           </div>
         ) : null}
         <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
