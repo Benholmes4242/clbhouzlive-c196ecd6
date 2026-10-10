@@ -282,13 +282,13 @@ type BoardT = TFunction<'courses'>;
 function boardFeatLabel(feat: ExploreRoundFeat, t: BoardT): string {
   switch (feat.kind) {
     case 'ace':
-      return t('discover.filterBoard.featAce', { count: feat.count, defaultValue_one: 'HOLE IN ONE', defaultValue_other: '{{count}} HOLES IN ONE' });
+      return t('discover.filterBoard.featAce', { count: feat.count, });
     case 'albatross':
-      return t('discover.filterBoard.featAlbatross', { count: feat.count, defaultValue_one: 'ALBATROSS', defaultValue_other: '{{count}} ALBATROSSES' });
+      return t('discover.filterBoard.featAlbatross', { count: feat.count, });
     case 'eagle':
-      return t('discover.filterBoard.featEagle', { count: feat.count, defaultValue_one: 'EAGLE', defaultValue_other: '{{count}} EAGLES' });
+      return t('discover.filterBoard.featEagle', { count: feat.count, });
     case 'birdies':
-      return t('discover.filterBoard.featBirdies', { count: feat.count, defaultValue_one: '{{count}} BIRDIE', defaultValue_other: '{{count}} BIRDIES' });
+      return t('discover.filterBoard.featBirdies', { count: feat.count, });
     case 'clean':
       return t('discover.filterBoard.featClean');
   }
