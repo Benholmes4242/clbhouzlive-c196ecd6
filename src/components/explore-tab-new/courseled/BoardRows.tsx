@@ -1,4 +1,4 @@
-import { ROW_METRICS } from './rowMetrics';
+import { BOARD_ROW_METRICS } from './rowMetrics';
 import { MemberAvatar } from './MemberAvatar';
 import { useTranslation } from 'react-i18next';
 
@@ -300,7 +300,7 @@ export function boardFeatMarker(row: Row, board: BoardKey, t: BoardT): string | 
     : labels[0];
 }
 
-const M = ROW_METRICS;
+const M = BOARD_ROW_METRICS;
 /** 9.7 — two grammars, chosen by boardColumns(board).ranked. */
 function gridFor(ranked: boolean): string {
   return ranked

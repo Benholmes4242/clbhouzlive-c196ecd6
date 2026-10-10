@@ -8,7 +8,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { MemberAvatar } from '@/components/explore-tab-new/courseled/MemberAvatar';
-import { ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMetrics';
+import { SEASON_ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMetrics';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
 import { BoardDaySeparator, BoardRowView, boardColumns, fmtToPar } from '@/components/explore-tab-new/courseled/BoardRows';
 import { describeFilterParts } from '@/components/explore-tab-new/courseled/describeFilters';
@@ -45,7 +45,7 @@ import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
 import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
 
 /** CompactRow value size (the career, Top 100 and improvement sections). */
-export const ROW_VALUE_SIZE = ROW_METRICS.figureSize;
+export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
 
 /**
  * THE LEADERBOARDS PAGE (BRIEF — THE LEADERBOARDS PAGE, structure A).
@@ -432,11 +432,11 @@ function CompactRow({
         display: 'flex',
         alignItems: 'center',
         gap: 10,
-        padding: `${ROW_METRICS.padY}px 0`,
+        padding: `${SEASON_ROW_METRICS.padY}px 0`,
         border: 'none',
         /* 9.13 — a hairline beneath every row, the last included. */
         borderBottom: `1px solid ${A.SOFT}`,
-        marginTop: gapAbove ? ROW_METRICS.pinnedGap : 0,
+        marginTop: gapAbove ? SEASON_ROW_METRICS.pinnedGap : 0,
         background: self ? SELF_ROW_TINT : 'transparent',
         textAlign: 'left',
         fontFamily: SANS,
@@ -445,20 +445,20 @@ function CompactRow({
     >
       <span
         className="tabular-nums"
-        style={{ width: ROW_METRICS.posTrack, flexShrink: 0, textAlign: 'center', fontSize: ROW_METRICS.posSize, fontWeight: ROW_METRICS.posWeight, color: self ? A.AMBER : A.MUTE }}
+        style={{ width: SEASON_ROW_METRICS.posTrack, flexShrink: 0, textAlign: 'center', fontSize: SEASON_ROW_METRICS.posSize, fontWeight: SEASON_ROW_METRICS.posWeight, color: self ? A.AMBER : A.MUTE }}
       >
         {tie ? `T${pos}` : pos}
       </span>
       <span style={{ flexShrink: 0 }}>
-        <MemberAvatar userId={id} name={avatarName} photoUrl={photo} size={ROW_METRICS.avatar} />
+        <MemberAvatar userId={id} name={avatarName} photoUrl={photo} size={SEASON_ROW_METRICS.avatar} />
       </span>
       <span style={{ flex: 1, minWidth: 0 }}>
         <span
           style={{
             display: 'block',
-            fontSize: ROW_METRICS.nameSize,
-            fontWeight: ROW_METRICS.nameWeight,
-            lineHeight: ROW_METRICS.nameLine,
+            fontSize: SEASON_ROW_METRICS.nameSize,
+            fontWeight: SEASON_ROW_METRICS.nameWeight,
+            lineHeight: SEASON_ROW_METRICS.nameLine,
             color: ink,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -472,9 +472,9 @@ function CompactRow({
             style={{
               display: 'block',
               marginTop: 1,
-              fontSize: ROW_METRICS.subSize,
+              fontSize: SEASON_ROW_METRICS.subSize,
               fontWeight: 600,
-              lineHeight: ROW_METRICS.subLine,
+              lineHeight: SEASON_ROW_METRICS.subLine,
               color: A.DIM,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -486,11 +486,11 @@ function CompactRow({
         ) : null}
       </span>
       <span style={{ flexShrink: 0, textAlign: 'right' }}>
-        <span className="tabular-nums" style={{ display: 'block', fontSize: ROW_VALUE_SIZE, fontWeight: ROW_METRICS.figureWeight, letterSpacing: '-0.04em', color: self ? ink : valueTone ?? ink }}>
+        <span className="tabular-nums" style={{ display: 'block', fontSize: ROW_VALUE_SIZE, fontWeight: SEASON_ROW_METRICS.figureWeight, letterSpacing: '-0.04em', color: self ? ink : valueTone ?? ink }}>
           {value}
         </span>
         {caption ? (
-          <span className="tabular-nums" style={{ display: 'block', fontSize: ROW_METRICS.secondarySize, fontWeight: ROW_METRICS.secondaryWeight, color: !self && captionTone ? captionTone : A.DIM }}>
+          <span className="tabular-nums" style={{ display: 'block', fontSize: SEASON_ROW_METRICS.secondarySize, fontWeight: SEASON_ROW_METRICS.secondaryWeight, color: !self && captionTone ? captionTone : A.DIM }}>
             {caption}
           </span>
         ) : null}
