@@ -63,7 +63,7 @@ export const isFeatBoard = (board: BoardKey): board is FeatBoardKey =>
 /** All offered boards, in picker order (ten: 'gross' is retired). */
 export const BOARD_KEYS: BoardKey[] = [...RANKING_BOARD_KEYS, ...FEAT_BOARD_KEYS];
 
-export type ScopeKey = 'everyone' | 'circle' | 'club' | 'you';
+export type ScopeKey = 'everyone' | 'circle' | 'club';
 /** B3 — the COMPETITION axis, new and fully populated in production. */
 export type CompetitionKey = 'any' | 'competition' | 'social';
 export type WindowKey = '14' | '30' | '90' | 'year' | 'all';

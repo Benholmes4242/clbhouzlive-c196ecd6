@@ -11,7 +11,7 @@ import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
 import { BoardHeaderRow, BoardRowView, boardColumns } from '@/components/explore-tab-new/courseled/BoardRows';
-import { describeFilterParts } from '@/components/explore-tab-new/courseled/GolfThisWeek';
+import { describeFilterParts } from '@/components/explore-tab-new/courseled/describeFilters';
 import { type BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import {
   BOARD_LABELS,
