@@ -22,7 +22,7 @@ import { InlineVideo } from './InlineVideo';
 import { createTapHandler } from './mediaTap';
 import { isPerfEnabled } from '@/perf/navTiming';
 import { VideoEngine } from '@/video/VideoEngine';
-import { feedLaneRoles } from '@/video/feedLaneRoles';
+import { feedLaneRoles, carouselNeighbourOverride } from '@/video/feedLaneRoles';
 import { PrefetchController } from '@/video/PrefetchController';
 import type { LaneId } from '@/video/lanePolicy';
 import { SLAB } from './feedSurfaces';
@@ -101,6 +101,8 @@ export const MediaCarousel: React.FC<Props> = ({
   }, []);
 
   const settleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isCardActiveRef = useRef(isCardActive);
+  isCardActiveRef.current = isCardActive;
   const publishedRef = useRef<number>(active);
   const onIndexChangeRef = useRef(onIndexChange);
   onIndexChangeRef.current = onIndexChange;
@@ -114,9 +116,30 @@ export const MediaCarousel: React.FC<Props> = ({
     if (Math.abs(el.scrollLeft - idx * w) > 1) return;
     const safe = Math.max(0, Math.min(idx, items.length - 1));
     if (safe === publishedRef.current) return;
+    const from = publishedRef.current;
+    /* §3 — ROTATE ON SETTLE, never on the halfway flip. A one-step move onto a
+       VIDEO slide promotes the lane that was warming it ('next' / 'prev') to
+       'active' — pure bookkeeping, so InlineVideo resolves the same physical
+       lane and nothing reloads. No rotation onto an image, on a multi-slide
+       jump (dot tap), off-card, or while a fullscreen borrow holds a frozen lane. */
+    const step = safe - from;
+    if (
+      isCardActiveRef.current &&
+      Math.abs(step) === 1 &&
+      items[safe]?.type === 'video' &&
+      feedLaneRoles.snapshot().frozen.length === 0
+    ) {
+      const dir: 'down' | 'up' = step > 0 ? 'down' : 'up';
+      const recycledLane = feedLaneRoles.rotate(dir);
+      if (isPerfEnabled()) {
+        // eslint-disable-next-line no-console
+        console.info('[CAROUSEL2] rotate', { from, to: safe, dir, recycledLane });
+      }
+    }
     publishedRef.current = safe;
+    setSettled(safe);
     onIndexChangeRef.current?.(safe);
-  }, [items.length]);
+  }, [items]);
 
   const handleScroll = useCallback(() => {
     const el = trackRef.current;
@@ -413,8 +436,52 @@ export const MediaCarousel: React.FC<Props> = ({
         });
       }
       PrefetchController.request(owner, hlsUrl);
+      /* §1 — CAROUSEL WARM, mirroring CardFeed's: the neighbour is decoded into
+         the physical lane behind its role, so a settled swipe only rotates. */
+      if (mountVideo && postId) {
+        const role: 'next' | 'prev' = j > active ? 'next' : 'prev';
+        try {
+          VideoEngine.preload(feedLaneRoles.laneForRole(role), {
+            hlsUrl,
+            posterUrl: (it as any).thumbnailUrl ?? null,
+            postId: owner,
+            expectedActiveOwnerKey: ownerKeyOf(active),
+          });
+          if (perf) {
+            // eslint-disable-next-line no-console
+            console.info('[CAROUSEL2] warm.attempt', {
+              ownerKey: owner, method: 'preload', role,
+              outcome: 'issued:preload', isAnyLaneLoading,
+            });
+          }
+        } catch { /* engine not booted — safe to ignore */ }
+      }
     }
-  }, [active, isCardActive, items, ownerKeyOf]);
+  }, [active, isCardActive, items, ownerKeyOf, mountVideo, postId]);
+
+  /* §2 — PUBLISH WHICH LANES THIS CAROUSEL OWNS, on the SETTLED index (the
+     same moment the roles rotate), so CardFeed's card-level warm steps aside
+     for a video neighbour and takes the lane back at either end. */
+  const [settled, setSettled] = useState(active);
+  useEffect(() => {
+    if (!postId) return;
+    if (!isCardActive || !mountVideo) {
+      carouselNeighbourOverride.clear(postId);
+      return;
+    }
+    const hasVideo = (j: number) => {
+      const it = items[j];
+      const u = (it as any)?.hlsUrl;
+      return it?.type === 'video' && typeof u === 'string' && !!u && !u.startsWith('blob:');
+    };
+    carouselNeighbourOverride.set({
+      postId,
+      activeIndex: settled,
+      next: hasVideo(settled + 1),
+      prev: hasVideo(settled - 1),
+    });
+  }, [postId, isCardActive, mountVideo, items, settled]);
+  useEffect(() => () => { if (postId) carouselNeighbourOverride.clear(postId); }, [postId]);
 
 
 
