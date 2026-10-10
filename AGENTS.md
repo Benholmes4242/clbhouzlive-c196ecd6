@@ -6,3 +6,4 @@
 - Full-width review cards retain the standard photo-overlay preset and share kind-owned height constants with their loading shells, so height adjustments cannot change composition or drift from placeholders.
 - Explore Scores renders `ScoresLeaderboardsPage`; its scope control and Filters pill are the shared `ScopeSegments`/`FiltersPill` exported from `ScoresFilterHead.tsx`, so the control exists once.
 - Explicitly selected Tour venue photos take precedence in both batch and single-venue image resolution, so Overview and Tournament Detail cannot display different catalogue photos.
+- Tour Hub OUR PICKS cards all open the one `PicksSheet`; pick reasons are never padded with filler, so the sheet only prints real model output.
