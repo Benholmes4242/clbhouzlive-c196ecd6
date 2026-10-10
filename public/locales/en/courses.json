@@ -1206,7 +1206,14 @@
       "col": {
         "rounds": "ROUNDS",
         "pos": "POS",
-        "member": "MEMBER"
+        "member": "MEMBER",
+        "gross": "GROSS",
+        "toPar": "TO PAR",
+        "cut": "CUT",
+        "when": "WHEN",
+        "points": "PTS",
+        "net": "NET",
+        "birdies": "BIRDIES"
       },
       "featAce_one": "HOLE IN ONE",
       "featAce_other": "{{count}} HOLES IN ONE",
