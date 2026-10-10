@@ -431,7 +431,7 @@ function CompactRow({
         width: '100%',
         display: 'flex',
         alignItems: 'center',
-        gap: 10,
+        gap: SEASON_ROW_METRICS.colGap,
         padding: `${SEASON_ROW_METRICS.padY}px 0`,
         border: 'none',
         /* 9.13 — a hairline beneath every row, the last included. */
@@ -473,7 +473,7 @@ function CompactRow({
               display: 'block',
               marginTop: 1,
               fontSize: SEASON_ROW_METRICS.subSize,
-              fontWeight: 600,
+              fontWeight: SEASON_ROW_METRICS.subWeight,
               lineHeight: SEASON_ROW_METRICS.subLine,
               color: A.DIM,
               whiteSpace: 'nowrap',

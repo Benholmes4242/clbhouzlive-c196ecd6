@@ -392,8 +392,8 @@ export function BoardRowView({
   const course = row.course_name ?? t('discover.unknownCourse');
   const date = playDateShort(row.play_date, i18n?.language);
   const courseDate = date ? `${course} \u00B7 ${date}` : course;
-  /* The feat stays where it was: leading the second line on a feat board. */
-  const sub = gap ?? (feat && isFeatBoard(board) ? `${feat} \u00B7 ${courseDate}` : courseDate);
+  /* 10.2 — the second line is "{course} · {date}" and nothing else; the feat is a name-row badge. */
+  const sub = gap ?? courseDate;
   const chip = !ranked && row.delta_index != null && Number(row.delta_index) !== 0 ? Number(row.delta_index) : null;
 
   return (
@@ -437,9 +437,11 @@ export function BoardRowView({
         <MemberAvatar userId={row.user_id} name={row.display_name} photoUrl={row.profile_photo_url} size={M.avatar} />
       </span>
       <span style={{ minWidth: 0 }}>
-        <span
+        <span data-board-name-row style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+          <span
           style={{
             display: 'block',
+            minWidth: 0,
             fontSize: M.nameSize,
             fontWeight: M.nameWeight,
             letterSpacing: '-0.01em',
@@ -451,6 +453,27 @@ export function BoardRowView({
           }}
         >
           {row.display_name ?? t('discover.aMember')}
+        </span>
+          {feat ? (
+            <span
+              data-board-feat
+              style={{
+                flexShrink: 0,
+                fontSize: 8.5,
+                fontWeight: 800,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: A.DIM,
+                border: `1px solid ${A.BORDER}`,
+                borderRadius: 999,
+                padding: '1px 5px',
+                lineHeight: 1.2,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {feat}
+            </span>
+          ) : null}
         </span>
         <span
           style={{
