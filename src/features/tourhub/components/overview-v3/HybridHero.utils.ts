@@ -155,9 +155,9 @@ export function formatRank(entry: { position?: number | null; position_tied?: bo
 export function detectTopTie(leaderboard: Array<Pick<BoardEntry, 'score'>>): TopTie | null {
   if (!leaderboard || leaderboard.length === 0) return null;
   const top = leaderboard[0];
-  const topScore = top?.score ?? top?.total;
+  const topScore = top?.score;
   if (topScore == null) return null;
-  const tied = leaderboard.filter(e => (e?.score ?? e?.total) === topScore);
+  const tied = leaderboard.filter(e => e?.score === topScore);
   if (tied.length < 2) return null;
   return { count: tied.length, score: fmtScore(topScore) };
 }
