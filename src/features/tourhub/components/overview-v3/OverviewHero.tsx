@@ -28,6 +28,9 @@ import { PHOTO_BAND_HEIGHT, OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.cons
 import { useTourSelection } from '../../context/TourSelectionContext';
 import { OVERVIEW_HERO_LOADING_BG } from '../../_shared/tokens';
 import { resolveChampionEntry } from '../../_shared/boardEntity';
+import { deriveHeroState, isChampionResolvable, isInPlayState } from './HybridHero.utils';
+import { boardPhaseFor } from './HybridHeroBands/HeroBoardBand';
+import { useLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
 
 const NOOP = () => {};
 
@@ -129,7 +132,38 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   const activeSlide = count > 0 ? slides[Math.min(activeIndex, count - 1)] : undefined;
   const viewingSlug = activeSlide?.tournament.tourSlug;
   const viewingTid = activeSlide?.tournament.id ?? null;
-  const viewingLive = activeSlide?.type === 'live';
+
+  /**
+   * ONE SOURCE OF TRUTH FOR THE SLIDE'S STATE. deriveHeroState is the only
+   * decision about what the on-screen slide IS; the result flows DOWN to both
+   * HybridHero (photo, champion) and HeroBoardSection (board, picks, actions).
+   * `slide.type` is never consulted for this — see the bucketing note in
+   * useHeroCarouselData.
+   */
+  const [now, setNow] = useState(() => new Date());
+  const heroState = useMemo(
+    () => (activeSlide ? deriveHeroState(activeSlide.tournament, now) : null),
+    [activeSlide, now],
+  );
+  const heroKind = heroState?.kind;
+  useEffect(() => {
+    if (!heroKind || heroKind === 'live' || heroKind === 'suspended') return;
+    const id = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(id);
+  }, [heroKind]);
+
+  const viewingLive = heroState ? isInPlayState(heroState) : false;
+
+  /**
+   * LIVE SCORES UPDATE LIVE. One server-filtered channel on sr_leaderboards for
+   * the active slide's tournament, only while it is live or suspended. It
+   * invalidates ['tourhub','leaderboard',tid] — the exact key the board and
+   * the photo's leader read via useTourLeaderboard. Chosen over
+   * useMultiLeaderboardRealtime, whose unfiltered channel would deliver every
+   * leaderboard row change in the database to filter client-side, for a
+   * carousel that only ever shows one slide at a time.
+   */
+  useLeaderboardRealtime(viewingLive ? viewingTid : null);
 
   /**
    * The board below the hero reads the ACTIVE SLIDE directly — not the debounced
@@ -141,10 +175,10 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   // positions from them. The board itself stays hidden on completed: hasBoard
   // also requires currentRound, and boardRound remains live-only below. Same query
   // key as HybridHero.tsx, so a completed slide is a cache hit.
-  const boardTournamentId = activeSlide?.type === 'upcoming' ? null : viewingTid;
+  const boardTournamentId = !heroState || heroState.kind === 'upcoming' ? null : viewingTid;
   const { data: boardLeaderboard } = useTourLeaderboard(boardTournamentId ?? '');
   const boardEntries = boardTournamentId ? (boardLeaderboard ?? []) : [];
-  const boardRound = viewingLive ? (activeSlide?.tournament.currentRound ?? null) : null;
+  const boardRound = heroState && isInPlayState(heroState) ? heroState.round : null;
 
   /**
    * BRIEF_HERO_PICKS_ROW §1 — THE BAND MUST SURVIVE AN UPCOMING TOURNAMENT.
@@ -155,7 +189,8 @@ export function OverviewHero({ height }: OverviewHeroProps) {
    * null — no placeholder, no reserved height (HeroBoardBand).
    */
   const bandTournamentId = viewingTid;
-  const bandPhase = (activeSlide?.type ?? 'upcoming') as 'live' | 'upcoming' | 'completed';
+  const bandPhase = heroState ? boardPhaseFor(heroState) : 'upcoming';
+  const championGate = heroState ? isChampionResolvable(heroState) : false;
 
 
   // DEBOUNCED display reporting (4G guard). One trailing-edge write 250ms after
@@ -198,7 +233,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
     navigate(target.to, { state: target.state });
   }, [navigate, viewingTid]);
 
-  if (isLoading || count === 0) {
+  if (isLoading || count === 0 || !heroState) {
     return (
       <div
         style={{
@@ -212,7 +247,9 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   }
 
   const active = slides[Math.min(activeIndex, count - 1)];
-  const activeChampionEntry = active.type === 'completed' && !active.tournament.winnerName
+  // Champion gate — same rule as HybridHero's strip and the pick trophy:
+  // a genuinely finished state AND an authoritative winner.
+  const activeChampionEntry = championGate && !active.tournament.winnerName
     ? resolveChampionEntry(boardEntries as any[], {
         winner_id: active.tournament.winnerId,
         // sr_tournaments.event_type, carried on the slide — never inferred from rows.
@@ -261,6 +298,8 @@ export function OverviewHero({ height }: OverviewHeroProps) {
         >
           <HybridHero
             slide={active}
+            state={heroState}
+            now={now}
             activeTournamentId={active.tournament.id}
             onSelectTour={NOOP}
             onOpenTournament={openTournament}
@@ -298,11 +337,11 @@ export function OverviewHero({ height }: OverviewHeroProps) {
             /* The SAME champion the strip crowns: only passed once the winner
                gate has resolved a name, so a pending playoff marks nobody. */
             championSrId={
-              activeSlide?.type === 'completed' && activeSlide.tournament.winnerName
+              championGate && activeSlide?.tournament.winnerName
                 ? activeSlide.tournament.winnerId
                 : null
             }
-            championPlayerIds={activeSlide?.type === 'completed' ? activeChampionMemberIds : []}
+            championPlayerIds={championGate ? activeChampionMemberIds : []}
             onFullLeaderboard={() => {
               const target = tournamentRoute(bandTournamentId, { kind: 'overview' });
               navigate(target.to, { state: target.state });

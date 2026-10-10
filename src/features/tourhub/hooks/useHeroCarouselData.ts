@@ -443,7 +443,13 @@ export function useHeroCarouselData() {
         });
       }
 
-      // Build slides per tour based on priority logic
+      // Build slides per tour based on priority logic.
+      //
+      // BUCKETING DECIDES MEMBERSHIP AND ORDER ONLY. `slide.type` says which
+      // tournaments appear in the river and in what order. It is NOT consulted
+      // about what a slide IS once on screen: OverviewHero derives that once,
+      // via deriveHeroState, and passes it down to photo and board. Do not
+      // re-derive state from `slide.type`.
       const liveSlides: HeroSlide[] = [];
       const completedSlides: HeroSlide[] = [];
       const upcomingSlides: HeroSlide[] = [];
