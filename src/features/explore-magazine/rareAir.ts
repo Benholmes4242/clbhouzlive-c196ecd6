@@ -60,7 +60,7 @@ export const RARE_AIR_TILE_HEIGHT =
 /**
  * Placeholder = section top 24 + eyebrow 13 + 5 + title 23 + lede 8 + 18
  * + children gap 12 + (you slab 10 + 17 + 10 + 12 below = 49, signed in only)
- * + label 13 + rail 12 + tile 178 + 18 = 349 signed out, 398 signed in.
+ * + label 13 + rail 12 + tile 178 + 18 = 324 signed out, 373 signed in.
  */
 export function rareAirPlaceholderHeight(signedIn: boolean): number {
   const R = RARE_AIR.rail;

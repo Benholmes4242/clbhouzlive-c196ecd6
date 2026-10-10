@@ -106,7 +106,7 @@ export function RareAirRail({
                 style={{
                   width: T.width, flex: 'none', scrollSnapAlign: 'start', background: A.PANEL,
                   border: `1px solid ${A.BORDER}`, borderRadius: T.radius, overflow: 'hidden',
-                  paddingBottom: T.paddingBottom, textAlign: 'left', fontFamily: SANS, cursor: 'pointer', padding: 0,
+                  padding: 0, paddingBottom: T.paddingBottom, textAlign: 'left', fontFamily: SANS, cursor: 'pointer',
                 }}
               >
                 <span aria-hidden style={{ display: 'block', height: T.accentHeight, background: A.BORDER, position: 'relative' }}>
