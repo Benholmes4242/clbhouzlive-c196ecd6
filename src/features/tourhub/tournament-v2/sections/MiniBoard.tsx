@@ -12,12 +12,13 @@ import { BOARD_GEOMETRY, boardMovementMap, computeBoardColumns, todayFromEntry, 
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
-  WHITE_ALPHA_65, WHITE_ALPHA_12, WHITE_ALPHA_06, AMBER, TREND_UP, TREND_DOWN,
+  WHITE_ALPHA_65, WHITE_ALPHA_12, WHITE_ALPHA_06, AMBER,
 } from '../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { ClbhouzPickMark } from '../../_shared/ClbhouzPickMark';
+import { MovementFigure } from '../../_shared/movement';
 import { formatEarnings } from '../../_shared/formatEarnings';
 import { resolveBoardEntity, teamNamesNeedInitials, type BoardNameTier } from '../../_shared/boardEntity';
 
@@ -322,30 +323,32 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               : r.position == null ? BLANK
               : `${r.position_tied ? 'T' : ''}${r.position}`;
             const today = todayFromEntry(r as unknown as Parameters<typeof todayFromEntry>[0], currentRound);
+            /* A ROW OPENS ONLY WHAT IS BEHIND IT. The scorecard sheet is keyed by
+               one player's id; a team row has none, and a member's individual card
+               is not the team's round. So a team row is not a control at all. */
+            const tappable = !!r.player?.id;
+            const memberNames = (r.team?.members ?? []).map((m) => m.player?.full_name?.trim()).filter(Boolean).join(', ');
+            const teamTitle = r.team?.display_name?.trim() || r.team?.abbr_name?.trim() || '';
+            const labelName = entity.kind === 'team'
+              ? (teamTitle && memberNames ? t('overview.board.teamName', { team: teamTitle, members: memberNames }) : teamTitle || memberNames || entity.prose)
+              : entity.lines[0] ?? '';
+            const rowLabel = t('overview.board.rowLabel', { name: labelName, position: posText, score: r.score == null ? '' : fmtScore(r.score) });
+            const RowTag = (tappable ? 'button' : 'div') as 'button' | 'div';
             return (
-              <button
+              <RowTag
                 key={r.id}
-                type="button"
-                onClick={() => { if (!r.player?.id) return; onRowTap?.(r.player.id); setTarget({
-                  playerId: r.player.id, playerName: entity.lines[0] ?? '', countryCode: r.player?.country_code ?? r.player?.country ?? null,
+                {...(tappable ? { type: 'button' as const } : { role: 'group' })}
+                aria-label={rowLabel}
+                onClick={tappable ? () => { const pid = r.player!.id as string; onRowTap?.(pid); setTarget({
+                  playerId: pid, playerName: entity.lines[0] ?? '', countryCode: r.player?.country_code ?? r.player?.country ?? null,
                   position: r.position ?? null, positionTied: r.position_tied ?? null, total: r.score ?? null, today, thru: r.thru ?? null, status: r.status ?? null,
-                }); }}
-                style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: BOARD_GEOMETRY.gap, width: '100%', minHeight: 34, padding: `${entity.kind === 'team' ? 6 : 5}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: 'pointer' }}
-                className={`${T.press} transition-colors`}
+                }); } : undefined}
+                style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: BOARD_GEOMETRY.gap, width: '100%', minHeight: 34, padding: `${entity.kind === 'team' ? 6 : 5}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
+                className={tappable ? `${T.press} transition-colors` : undefined}
               >
                 {showHeroMov ? (
-                  <div style={{ ...HERO_NUM, whiteSpace: 'nowrap' }}>
-                    {demotedRow ? null : mov == null || mov === 0 ? (
-                      <span style={{ fontSize: 10, fontWeight: 700, color: T.faint }}>{'\u2013'}</span>
-                    ) : (
-                      <span
-                        aria-label={mov > 0 ? t('board.movement.up', { count: Math.abs(mov) }) : t('board.movement.down', { count: Math.abs(mov) })}
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: 1, fontSize: 9.5, fontWeight: 700, color: mov > 0 ? TREND_UP : TREND_DOWN }}
-                      >
-                        <span aria-hidden>{mov > 0 ? '\u25B2' : '\u25BC'}</span>
-                        <span aria-hidden>{Math.abs(mov)}</span>
-                      </span>
-                    )}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', minWidth: 0 }}>
+                    {demotedRow ? null : <MovementFigure movement={mov ?? null} variant="compact" />}
                   </div>
                 ) : null}
                 {showOverviewPosition ? (
@@ -392,7 +395,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   );
                 })}
                 <div style={{ ...HERO_NUM, fontSize: 15, fontWeight: 700, color: getScoreColor(r.score, scoreTheme) }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
-              </button>
+              </RowTag>
             );
           })}
         </div>
