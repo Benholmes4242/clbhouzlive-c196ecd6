@@ -325,3 +325,9 @@ export function ImageChip({
     </span>
   );
 }
+
+/* Leaderboards Phase 9 — the board row's three named tints. */
+/** The viewing member's own row, in both grammars and on the pinned copy. */
+export const SELF_ROW_TINT = 'rgba(247,147,30,0.07)';
+/** A cut on the index chip: A.GREEN's own hue at 35%. */
+export const INDEX_CUT_BORDER = 'rgba(52,211,153,0.35)';

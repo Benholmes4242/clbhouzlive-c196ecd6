@@ -1,23 +1,27 @@
 /**
- * ONE SET OF ROW METRICS (Leaderboards Phase 4.1).
+ * ONE SET OF ROW METRICS (Leaderboards Phase 4.1, values from the Phase 9 mock).
  *
  * Read by BoardRowView (board rows) and CompactRow (season rows on the
- * Leaderboards page) so two separate components share one geometry. Values are
- * the board row's. The podium keeps its own larger values in BoardRows.tsx.
+ * Leaderboards page) so two separate components share one geometry. The podium
+ * is gone (9.12): no row owns larger values.
  */
 export const ROW_METRICS = {
-  avatar: 28,
-  nameSize: 14,
-  nameWeight: 600,
-  nameLine: '14px',
-  subSize: 11,
-  subLine: '12px',
-  figureSize: 16,
-  figureWeight: 700,
-  secondarySize: 12.5,
-  secondaryWeight: 700,
+  avatar: 34,
+  nameSize: 14.5,
+  nameWeight: 700,
+  nameLine: '18px',
+  subSize: 11.5,
+  subLine: '14px',
+  figureSize: 18,
+  figureWeight: 800,
+  secondarySize: 12,
+  secondaryWeight: 600,
   posSize: 13,
-  posWeight: 700,
-  posTrack: 28,
-  padY: 6,
+  posWeight: 800,
+  posTrack: 20,
+  padY: 10,
+  padX: 16,
+  colGap: 11,
+  /** The pinned self row's break above it. */
+  pinnedGap: 12,
 } as const;
