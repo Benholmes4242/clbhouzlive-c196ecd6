@@ -45,7 +45,10 @@ Resolution order is now: persisted `clbhouz.locale` **if it is enabled** → `en
 disabled locale is removed on boot (`pruneStoredLocale`).
 
 New copy still goes through `t()` with an `en` value; new keys do not need
-`de`/`es`/`ja`/`ko` values. When a language is re-enabled, write its
+`de`/`es`/`ja`/`ko` values. Every new user-facing key DOES need an `en-XA` value, in its
+bracketed form. `en-XA` is a diagnostic rather than a language: a key missing
+from it renders plain English, which cannot be told apart from copy that was
+never keyed, and that distinction is the whole point of the file. When a language is re-enabled, write its
 "missing key / untranslated value" guard test then.
 
 ## Wave rollout
