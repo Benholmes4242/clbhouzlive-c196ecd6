@@ -125,8 +125,15 @@
       "top100Empty": "Nobody has played a course on this list yet.",
       "whoLeads": "Who leads what",
       "tiedTop": "Tied at the top",
-      "clearOf2nd": "{{n}} clear of 2nd",
-      "climb": "The climb",
+      "clearOf": "{{n}} clear of {{name}}",
+      "theField": "The field",
+      "whoLeadsWindow": "Who leads what window",
+      "whoLeadsEmptyYear": "Nobody leads anything in {{year}} yet. Switch to {{allTime}} to see who leads overall.",
+      "whoLeadsYou": {
+        "on": "You <b>{{pos}}</b> · <b>{{value}}</b>",
+        "lead": "You lead this one",
+        "absent": "Not on this one yet"
+      },      "climb": "The climb",
       "mostImproved": "Most improved",
       "improvedScope": "Everyone · this year",
       "indexChange": "Index change",

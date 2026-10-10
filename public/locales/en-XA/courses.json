@@ -125,8 +125,15 @@
       "top100Empty": "[~~Ñőƀőđý ĥáš ƥļáýéđ á ĉőúřšé őñ ţĥíš ļíšţ ýéţ.~~]",
       "whoLeads": "[~~Ŵĥő ļéáđš ŵĥáţ~~]",
       "tiedTop": "[~~Ţíéđ áţ ţĥé ţőƥ~~]",
-      "clearOf2nd": "[~~{{n}} ĉļéář őƒ 2ñđ~~]",
-      "climb": "[~~Ţĥé ĉļíɱƀ~~]",
+      "clearOf": "[~~{{n}} clear of {{name}}~~]",
+      "theField": "[~~The field~~]",
+      "whoLeadsWindow": "[~~Who leads what window~~]",
+      "whoLeadsEmptyYear": "[~~Nobody leads anything in {{year}} yet. Switch to {{allTime}} to see who leads overall.~~]",
+      "whoLeadsYou": {
+        "on": "[~~You <b>{{pos}}</b> · <b>{{value}}</b>~~]",
+        "lead": "[~~You lead this one~~]",
+        "absent": "[~~Not on this one yet~~]"
+      },      "climb": "[~~Ţĥé ĉļíɱƀ~~]",
       "mostImproved": "[~~Ṁőšţ íɱƥřőṽéđ~~]",
       "improvedScope": "[~~Éṽéřýőñé · ţĥíš ýéář~~]",
       "indexChange": "[~~Íñđéẋ ĉĥáñĝé~~]",
