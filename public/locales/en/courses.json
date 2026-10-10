@@ -172,7 +172,7 @@
         "indexSince": "Your index has moved {{figure}} since."
       },
       "featsFromYear": "Out of <n>{{holes}}</n> holes and <n>{{rounds}}</n> rounds tracked on clbhouz this year.",
-      "featNone": "none in {{n}} {{unit}}",
+      "featNone": "None in {{n}} {{unit}}",
       "rarest": "Rarest",
       "rarestFirst": "Rarest first",
       "featCompare": {
@@ -182,12 +182,12 @@
       },
       "featLatest": {
         "noneYear": "None this year",
-        "noneAll": "None yet",
+        "noneAll": "Nobody yet",
         "lastOne": "Last one {{date}}"
       },
       "featsYou": {
         "has": "<b>You</b> have {{list}}.",
-        "none": "<b>You</b> have none of these yet.",
+        "none": "<b>You</b> haven't had one of these yet.",
         "item": {
           "ace_one": "a hole in one",
           "ace_other": "{{count}} holes in one",
