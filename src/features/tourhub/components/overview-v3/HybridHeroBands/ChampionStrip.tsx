@@ -23,6 +23,7 @@ import { CHAMPION_STRIP_WASH, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_65 } from '..
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { TrajectorySparkline } from './TrajectorySparkline';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import CountryFlag from '@/components/ui/country-flag';
 
 interface ChampionStripProps {
   name: string;
@@ -114,18 +115,7 @@ export function ChampionStrip({
               <EyebrowIcon size={10} color={GOLD} strokeWidth={2.5} />
               {resolvedEyebrow}
             </span>
-            {country && (
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: 'rgba(255,255,255,0.50)',
-                  letterSpacing: '0.04em',
-                }}
-              >
-                · {country}
-              </span>
-            )}
+            {country && <CountryFlag country={country} size="sm" />}
           </div>
           <div
             style={{
