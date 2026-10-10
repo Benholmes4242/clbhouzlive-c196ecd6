@@ -21172,6 +21172,7 @@ export type Database = {
           unread_count: number
         }[]
       }
+      get_inviter_first_name: { Args: { p_ref: string }; Returns: string }
       get_leaderboard_countries: {
         Args: never
         Returns: {

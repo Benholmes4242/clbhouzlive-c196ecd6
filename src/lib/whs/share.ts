@@ -8,8 +8,8 @@ export async function shareInvite(invite: {
   if (typeof navigator !== 'undefined' && navigator.share) {
     try {
       await navigator.share({
-        title: `Invite ${invite.invitee_name} to Clbhouz`,
-        text: invite.share_message,
+        title: `Invite ${invite.invitee_name} to clbhouz`,
+        text: invite.share_message.split(invite.share_url).join('').trim(),
         url: invite.share_url,
       });
       toast.success(`Shared invite to ${firstName(invite.invitee_name)}`);
@@ -77,7 +77,7 @@ export async function shareInvitesBulk(
   if (typeof navigator !== 'undefined' && navigator.share) {
     try {
       await navigator.share({
-        title: `Invite ${invites.length} friends to Clbhouz`,
+        title: `Invite ${invites.length} friends to clbhouz`,
         text: combinedMessage,
       });
       toast.success(`Shared ${invites.length} invites`);
