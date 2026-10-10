@@ -37,7 +37,7 @@ describe('rare air keys', () => {
   });
   it('every <Trans> names the courses namespace', () => {
     const trans = [...src.matchAll(/<Trans\b[^>]*?(?:\/>|>)/gs)].map((m) => m[0]);
-    expect(trans.length).toBe(3);
+    expect(trans.length).toBe(4);
     expect(trans.filter((t) => !t.includes('ns="courses"'))).toEqual([]);
   });
   it('tile names are fixed category plurals, independent of count', () => {

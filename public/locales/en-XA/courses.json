@@ -173,9 +173,9 @@
       "rarest": "[~~Rarest~~]",
       "rarestFirst": "[~~Rarest first~~]",
       "featCompare": {
-        "commoner": "[~~{{n}}% commoner~~]",
-        "rarer": "[~~{{n}}% rarer~~]",
-        "tooFew": "[~~too few to compare~~]"
+        "more": "[~~More often than all time — <g>1 in {{n}} {{unit}}</g>~~]",
+        "less": "[~~Less often than all time — 1 in {{n}} {{unit}}~~]",
+        "tooFew": "[~~Too few to compare~~]"
       },
       "featLatest": {
         "noneYear": "[~~None this year~~]",
