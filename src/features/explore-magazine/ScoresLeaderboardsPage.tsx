@@ -17,6 +17,7 @@ import {
   BOARD_LABELS,
   DEFAULT_FILTERS,
   OFFERED_RANKING_BOARD_KEYS,
+  BOARD_ROW_FLOOR,
   boardCountsRounds,
   type BoardFilters,
   type BoardKey,
@@ -238,8 +239,8 @@ const TOP100_ORDER = Object.keys(TOP100_METRIC) as RankListSlug[];
 /** The list with the most members, and the one the section always showed. */
 const TOP100_DEFAULT: RankListSlug = 'gb-i';
 
-/** Matches AmateurLeaderboardBlock's THIN_FLOOR: fewer ranked rows is not a board. */
-const THIN_FLOOR = 4;
+/** Fewer ranked rows is not a board — the shared BOARD_ROW_FLOOR. */
+const THIN_FLOOR = BOARD_ROW_FLOOR;
 
 
 /* ------------------------------------------------------------ furniture */
