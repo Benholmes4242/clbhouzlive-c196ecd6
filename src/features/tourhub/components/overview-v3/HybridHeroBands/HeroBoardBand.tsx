@@ -203,6 +203,8 @@ interface HeroBoardSectionProps {
   championSrId?: string | null;
   /** Team-event champions have no tournament winner_id, so members are matched by player id. */
   championPlayerIds?: string[];
+  /** Rounds in this event, from the one HeroState derivation. Null off live/suspended. */
+  totalRounds?: number | null;
   /** Venue par (to-par → gross conversion for the picks sheet's required round). */
   venuePar?: number | null;
   onFullLeaderboard: () => void;
@@ -284,6 +286,7 @@ export function HeroBoardSection({
   championSrId,
   championPlayerIds = [],
   venuePar = null,
+  totalRounds = null,
   onFullLeaderboard,
   onRowTap,
 }: HeroBoardSectionProps) {
@@ -350,20 +353,20 @@ export function HeroBoardSection({
   const leader = useMemo(() => (inPlay ? leaderOf(entries) : null), [inPlay, entries]);
   const neededByPlayer = useMemo(() => {
     const map = new Map<string, number>();
-    if (!inPlay || !leader || !inRequiredRoundWindow(currentRound)) return map;
+    if (!inPlay || !leader || totalRounds == null || !inRequiredRoundWindow(currentRound, totalRounds)) return map;
     for (const p of picks) {
       if (!p?.playerId) continue;
       const g = neededGross(venuePar, leader.total, boardByPlayer.get(String(p.playerId))?.score ?? null);
       if (g != null) map.set(String(p.playerId), g);
     }
     return map;
-  }, [inPlay, leader, picks, venuePar, boardByPlayer, currentRound]);
+  }, [inPlay, leader, picks, venuePar, boardByPlayer, currentRound, totalRounds]);
 
   // Gated: no draw request unless in play with a round still to come; no
   // tee-time request unless that next round is actually drawn.
-  const drawGate = inPlay && hasNextRound(currentRound);
+  const drawGate = inPlay && totalRounds != null && hasNextRound(currentRound, totalRounds);
   const { data: drawnRounds } = useDrawnRounds(tournamentId, { enabled: drawGate });
-  const nextRound = drawGate ? nextDrawnRound(currentRound, drawnRounds) : null;
+  const nextRound = drawGate ? nextDrawnRound(currentRound, drawnRounds, totalRounds as number) : null;
   const { data: nextGroups } = useTeeTimesAll(tournamentId, nextRound ?? 0, { enabled: nextRound != null });
   const nextGroup = nextRound != null ? leaderGroup(nextGroups, leader?.playerId) : null;
 

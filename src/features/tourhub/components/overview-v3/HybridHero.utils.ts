@@ -211,6 +211,26 @@ export function isChampionResolvable(state: HeroState): boolean {
   return state.kind === 'results' && state.variant !== 'awaiting-playoff' && state.variant !== 'cancelled';
 }
 
+/** Fallback round count when the schedule span is not a standard one. */
+export const FALLBACK_ROUNDS = 4;
+
+/**
+ * HOW MANY ROUNDS — the one answer. sr_tournaments has no rounds column, so
+ * the count is the inclusive span of scheduled days: a professional event
+ * plays one round per scheduled day (Thu–Sun = 4, Fri–Sun = 3). That holds
+ * for essentially every professional event; it does NOT hold for a shortened
+ * or compressed schedule, a pro-am day folded into the range, or bad data —
+ * so a span below 2 or above 4 falls back to FALLBACK_ROUNDS. Clamp, never
+ * extrapolate.
+ */
+export function roundsFromSchedule(startDate: string | null | undefined, endDate: string | null | undefined): number {
+  if (!startDate || !endDate) return FALLBACK_ROUNDS;
+  const day = (iso: string) => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10));
+  const span = Math.round((day(endDate) - day(startDate)) / 86_400_000) + 1;
+  if (!Number.isFinite(span) || span < 2 || span > 4) return FALLBACK_ROUNDS;
+  return span;
+}
+
 export function deriveHeroState(
   tournament: HeroTournament,
   now: Date = new Date(),
@@ -237,10 +257,7 @@ export function deriveHeroState(
     return {
       kind: 'live',
       round: tournament.currentRound ?? 1,
-      // INTERIM: no real num_rounds on HeroTournament yet. LPGA events are 54-hole
-      // (3 rounds); everything else defaults to 4. Replace with tournament.num_rounds
-      // when the cache exposes it.
-      totalRounds: tournament.tourSlug === 'lpga' ? 3 : 4,
+      totalRounds: roundsFromSchedule(tournament.startDate, tournament.endDate),
     };
   }
 
@@ -250,7 +267,7 @@ export function deriveHeroState(
     return {
       kind: 'suspended',
       round: tournament.currentRound ?? 1,
-      totalRounds: tournament.tourSlug === 'lpga' ? 3 : 4,
+      totalRounds: roundsFromSchedule(tournament.startDate, tournament.endDate),
       reason: null,
     };
   }

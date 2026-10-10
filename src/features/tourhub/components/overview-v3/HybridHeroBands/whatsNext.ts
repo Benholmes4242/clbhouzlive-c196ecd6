@@ -34,9 +34,6 @@ export function neededGross(
   return gross;
 }
 
-/** Stroke-play events on the overview are four rounds. */
-export const TOTAL_ROUNDS = 4;
-
 /**
  * THE REQUIRED-ROUND WINDOW. A required round score is only a true statement
  * when exactly one full round remains: a gap spread over two or more rounds
@@ -46,7 +43,7 @@ export const TOTAL_ROUNDS = 4;
  */
 export function inRequiredRoundWindow(
   currentRound: number | null | undefined,
-  totalRounds: number = TOTAL_ROUNDS,
+  totalRounds: number,
 ): boolean {
   return isNum(currentRound) && currentRound === totalRounds - 1;
 }
@@ -71,16 +68,17 @@ export function leaderOf(
 export function nextDrawnRound(
   currentRound: number | null | undefined,
   drawnRounds: number[] | null | undefined,
+  totalRounds: number,
 ): number | null {
   if (!isNum(currentRound)) return null;
   const next = currentRound + 1;
-  if (next > 4) return null;
+  if (next > totalRounds) return null;
   return (drawnRounds ?? []).includes(next) ? next : null;
 }
 
 /** Whether a next round can exist at all — gates the draw query itself. */
-export function hasNextRound(currentRound: number | null | undefined): boolean {
-  return isNum(currentRound) && currentRound >= 1 && currentRound < 4;
+export function hasNextRound(currentRound: number | null | undefined, totalRounds: number): boolean {
+  return isNum(currentRound) && currentRound >= 1 && currentRound < totalRounds;
 }
 
 /** The group containing the leader, by player id — never "last off". */
