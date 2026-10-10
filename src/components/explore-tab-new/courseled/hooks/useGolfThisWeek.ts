@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
 import { useCircleLatestRounds } from '@/hooks/gam/useCircleLatestRounds';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
+import { useWhsConnection } from '@/lib/whs/hooks';
 
 /**
  * GOLF THIS WEEK — the data layer (BRIEF_GOLF_THIS_WEEK §1, extended by
@@ -82,12 +84,14 @@ export const DEFAULT_WEEK_SCOPE: WeekScope = 'worldwide';
 export const HANDICAP_BAND_STROKES = 4.0;
 
 /**
- * THE VIEWER'S INDEX (§S1.1): eg_handicap_index first, manual_handicap_index as
- * the fallback when there is no sync. NEITHER PRESENT = null, and a null index
+ * THE VIEWER'S INDEX (Phase 16): resolved by resolveDisplayHandicap, the app's
+ * one rule. A connected member gets their synced index or nothing (UNKNOWN, never
+ * the manual figure); an unconnected member gets the manual one. A null index
  * means the scope does not exist for this member at all (§S1.2).
  */
 export function useViewerHandicapIndex(userId: string | undefined) {
-  const query = useQuery<number | null>({
+  const whs = useWhsConnection(userId);
+  const query = useQuery({
     queryKey: ['courseled', 'viewer-handicap-index', userId ?? null],
     enabled: !!userId,
     staleTime: 5 * 60_000,
@@ -98,14 +102,18 @@ export function useViewerHandicapIndex(userId: string | undefined) {
         .eq('id', userId as string)
         .maybeSingle();
       if (error || !data) return null;
-      const eg = data.eg_handicap_index;
-      const manual = data.manual_handicap_index;
-      if (eg != null) return Number(eg);
-      if (manual != null) return Number(manual);
-      return null;
+      return data;
     },
   });
-  return { index: query.data ?? null, ready: !userId || !query.isPending };
+  const row = query.data ?? null;
+  const index = row
+    ? resolveDisplayHandicap({
+        egHandicapIndex: row.eg_handicap_index != null ? Number(row.eg_handicap_index) : null,
+        manualHandicapIndex: row.manual_handicap_index != null ? Number(row.manual_handicap_index) : null,
+        hasWhsConnection: !!whs.data,
+      }).value
+    : null;
+  return { index, ready: !userId || (!query.isPending && !whs.isPending) };
 }
 
 /**
