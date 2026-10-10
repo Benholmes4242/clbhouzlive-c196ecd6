@@ -88,6 +88,8 @@ export const MediaCarousel: React.FC<Props> = ({
     Math.max(0, Math.min(initialIndex || 0, items.length - 1)),
   );
   const rafRef = useRef<number | null>(null);
+  /** The index last published on settle — owns the 'active' lane role. */
+  const [settled, setSettled] = useState(active);
 
   // Jump to initial index on mount (without smooth-scroll)
   useEffect(() => {
@@ -442,7 +444,6 @@ export const MediaCarousel: React.FC<Props> = ({
   /* §2 — PUBLISH WHICH LANES THIS CAROUSEL OWNS, on the SETTLED index (the
      same moment the roles rotate), so CardFeed's card-level warm steps aside
      for a video neighbour and takes the lane back at either end. */
-  const [settled, setSettled] = useState(active);
   useEffect(() => {
     if (!postId) return;
     if (!isCardActive || !mountVideo) {
@@ -522,14 +523,18 @@ export const MediaCarousel: React.FC<Props> = ({
         {items.map((m, i) => {
           const url = m.imageUrl || m.thumbnailUrl || '';
           const isVideo = m.type === 'video';
-          const isActiveSlide = isCardActive && i === active;
-          // Adjacent-slide keep-warm: the i±1 slide of the active card mounts
-          // its lane paused-but-ready via earlyMotion (role='next'). Bounded
-          // to ≤2 warm neighbours per active card — total lanes for a multi-
-          // video carousel: i-1 + i + i+1 = 3, matching the feed's 3-lane
-          // pool (active/next/prev). Only when the CARD is active.
+          /* BRIEF_CAROUSEL_NEIGHBOUR_WARM §3/§4 — the feed's grammar: the
+             SETTLED slide holds 'active'; the slide the swipe is heading into
+             (halfway flip, `active`) plays early on the lane already warming
+             it ('next' / 'prev'), exactly like CardFeed's earlyIdx. Making it
+             isActive at the halfway point would resolve the 'active' lane
+             (still the outgoing slide's) and cold-load there — the poster
+             flash. The settled neighbours are bound but paused (isNear only). */
+          const isActiveSlide = isCardActive && i === settled;
+          const isIncomingSlide =
+            isCardActive && i === active && active !== settled;
           const isAdjacentSlide =
-            isCardActive && !isActiveSlide && Math.abs(i - active) === 1;
+            isCardActive && !isActiveSlide && Math.abs(i - settled) === 1;
           const slideOwnerKey = postId
             ? `${postId}:${i}`
             : `${m.id ?? 'noid'}:${i}`;
@@ -574,8 +579,8 @@ export const MediaCarousel: React.FC<Props> = ({
                   <InlineVideo
                     item={m}
                     isActive={isActiveSlide}
-                    isNear={isActiveSlide || isAdjacentSlide}
-                    earlyMotion={isAdjacentSlide}
+                    isNear={isActiveSlide || isAdjacentSlide || isIncomingSlide}
+                    earlyMotion={isIncomingSlide}
                     postId={postId ?? null}
                     ownerKey={slideOwnerKey}
                     objectFit="cover"
