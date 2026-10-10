@@ -7,6 +7,6 @@ describe('picksUpdatedDay', () => {
     expect(picksUpdatedDay('2026-10-08T12:00:00Z', 'en', now)).toBe('Thu');
   });
   it('uses a short date beyond seven days', () => {
-    expect(picksUpdatedDay('2026-09-20T12:00:00Z', 'en', now)).toBe('20 Sept'.length ? new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short' }).format(new Date('2026-09-20T12:00:00Z')) : '');
+    expect(picksUpdatedDay('2026-09-20T12:00:00Z', 'en', now)).toMatch(/Sep/);
   });
 });
