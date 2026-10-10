@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { TourStory } from './useTourStories';
 import { StoryRelativeTime } from './StoryImageText';
-import { AMBER, FONT, INK, INK_MUTE, INK_SOFT } from '../_shared/tokens';
+import { AMBER, FONT, INK, INK_SOFT } from '../_shared/tokens';
 import { SLAB } from '@/components/feed/feedSurfaces';
 import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
 import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAction';
