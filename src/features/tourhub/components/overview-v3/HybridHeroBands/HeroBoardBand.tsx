@@ -42,12 +42,12 @@
  * the route to the rest of the board.
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Trophy } from 'lucide-react';
 
-import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_08, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_08, WHITE_ALPHA_32, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useTourSelection } from '../../../context/TourSelectionContext';
@@ -61,6 +61,7 @@ import { useTournamentFieldStrength } from '../../../hooks/useTournamentFieldStr
 import { useTournamentVenueRecord } from '../../../overview/data/useTournamentVenueRecord';
 import { surnameOf } from '../../../_shared/playerName';
 import { r } from '@/lib/radius';
+import { PicksSheet } from './PicksSheet';
 
 /**
  * SIX rows. It was five while the board occupied the photo band, because the
@@ -274,6 +275,7 @@ export function HeroBoardSection({
   const { data: predictions } = useAIPredictions(picksTid);
   const picks = (predictions?.topContenders ?? []) as AITopContender[];
   const hasPicks = picks.length > 0;
+  const [picksOpen, setPicksOpen] = useState(false);
   const pickPlayerIds = useMemo(() => {
     const ids = new Set<string>();
     for (const p of picks) if (p?.playerId) ids.add(String(p.playerId));
@@ -357,6 +359,17 @@ export function HeroBoardSection({
           predictions={predictions ?? null}
           championPlayerId={championPlayerId}
           championPlayerIds={championPlayerIds}
+          onOpenPick={() => setPicksOpen(true)}
+        />
+      ) : null}
+      {hasPicks ? (
+        <PicksSheet
+          open={picksOpen}
+          onClose={() => setPicksOpen(false)}
+          picks={picks}
+          predictions={predictions ?? null}
+          eventName={predictions?.tournament?.name ?? ''}
+          venueName={predictions?.tournament?.venueName || null}
         />
       ) : null}
 
@@ -389,20 +402,10 @@ export function HeroBoardSection({
   );
 }
 
-/** The model's stated reason for a pick: editorial quote first, else its first reason. */
-export function pickReason(p: Pick<AITopContender, 'pulledQuote' | 'reasons'>): string | null {
-  return p.pulledQuote?.trim() || p.reasons?.[0]?.trim() || null;
-}
-
 /**
  * §3 — THE PICKS BLOCK. Amber OUR PICKS header, optional event-level editorial
  * line, a FIXED grid of up to three cards (never padded, never scrolling) and
- * a provenance line GATED ON isAIPowered.
- *
- * SEE ALL: the brief asked for a header chevron to the destination of the
- * overview picks carousel. No such carousel or full picks page exists in the
- * codebase, so there is no route and no chevron — add one here only when a
- * real destination exists. Do not point it nowhere.
+ * a provenance line GATED ON isAIPowered. Each card opens PicksSheet.
  */
 function PicksBlock({
   picks,
@@ -412,7 +415,9 @@ function PicksBlock({
   predictions,
   championPlayerId,
   championPlayerIds,
+  onOpenPick,
 }: {
+  onOpenPick: () => void;
   picks: AITopContender[];
   /** The event's tour, for the shared headshot resolver. */
   tourCode: string;
@@ -427,7 +432,6 @@ function PicksBlock({
   const { t } = useTranslation('tourhub');
   const cards = picks.slice(0, 3);
   const hasConfidence = predictions?.isAIPowered;
-  const anyReason = cards.some((p) => pickReason(p) != null);
 
   return (
     <div data-overview-picks style={{ background: PAGE_CANVAS }}>
@@ -453,7 +457,6 @@ function PicksBlock({
 
       <div style={{ padding: '0 16px 14px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
         {cards.map((p, i) => {
-          const reason = pickReason(p);
           const line = boardByPlayer.get(String(p.playerId));
           const settledRaw = phase === 'completed' ? settledFigureFor(line) : null;
           /* THE CHAMPION WEARS THE WIN, WHATEVER THE BOARD SAYS. A playoff
@@ -493,11 +496,16 @@ function PicksBlock({
           }
 
           return (
-            <div
+            <button
+              type="button"
               key={p.playerId || i}
               data-overview-pick-card
-              style={{ background: WHITE_ALPHA_06, border: `1px solid ${WHITE_ALPHA_06}`, borderRadius: r.sm, padding: '11px 10px', textAlign: 'center', minWidth: 0 }}
+              onClick={onOpenPick}
+              aria-label={t('overview.picksSheet.cardAria', { name: p.playerName, defaultValue: `Why we picked ${p.playerName}` })}
+              className="active:opacity-70 transition-opacity"
+              style={{ position: 'relative', margin: 0, fontFamily: FONT, color: 'inherit', cursor: 'pointer', background: WHITE_ALPHA_06, border: `1px solid ${WHITE_ALPHA_06}`, borderRadius: r.sm, padding: '11px 10px', textAlign: 'center', minWidth: 0 }}
             >
+              <ChevronRight size={12} strokeWidth={2.6} color={WHITE_ALPHA_32} aria-hidden style={{ position: 'absolute', top: 7, right: 7 }} />
               {/* The shared resolver walks the headshot folder chain itself;
                   photoUrl is tried FIRST when present. No second resolver. */}
               <div style={{ display: 'flex', justifyContent: 'center', margin: '0 auto 8px' }}>
@@ -515,15 +523,7 @@ function PicksBlock({
               <div style={{ marginTop: 5, fontSize: 12, fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4, ...FIGS }}>
                 {figureLine}
               </div>
-              {/* SYMMETRY: when any pick has a reason, every card reserves two
-                  lines so the figures stay on one baseline across the row.
-                  WHY + card tap are withheld: no picks destination exists yet. */}
-              {anyReason ? (
-                <div data-overview-pick-reason style={{ marginTop: 6, minHeight: 26, fontSize: 10, lineHeight: 1.3, color: WHITE_ALPHA_65, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                  {reason ?? ''}
-                </div>
-              ) : null}
-            </div>
+            </button>
           );
         })}
       </div>
