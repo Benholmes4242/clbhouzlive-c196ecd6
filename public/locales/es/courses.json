@@ -74,7 +74,6 @@
         "rounds": "vueltas"
       },
       "top100": "Top 100 campos",
-      "latestCourse": "Añadido · {{course}}",
       "theListHundred": "Los cien de {{list}}"
     },
     "place": {

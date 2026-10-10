@@ -515,7 +515,6 @@ function CompactRow({
   );
 }
 
-const TILE_HEAD = { fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase' } as const;
 
 function Rail({ children }: { children: ReactNode }) {
   return (
