@@ -221,7 +221,7 @@ export function gapText(
   board: BoardKey,
   mine: Row,
   leader: Row,
-  t: (k: string, d?: string, o?: object) => string,
+  t: (k: string, o?: object) => string,
 ): string | null {
   if (mine.pos <= 1) return null;
   if (boardCountsRounds(board)) {
