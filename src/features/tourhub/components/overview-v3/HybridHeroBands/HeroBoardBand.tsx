@@ -184,9 +184,9 @@ interface HeroBoardSectionProps {
    */
   currentRound: number | null;
   /**
-   * The lifecycle phase of the slide, read off the hero carousel's own
-   * `slide.type` (§2). NO NEW QUERY: the pulse hook would be one, and the
-   * carousel already knows.
+   * The lifecycle phase of the slide, derived by `boardPhaseFor` from the ONE
+   * HeroState OverviewHero computes — never from the carousel's `slide.type`,
+   * so the photo and the board cannot describe the same event differently.
    */
   phase: 'live' | 'upcoming' | 'completed';
   /**
@@ -204,6 +204,22 @@ interface HeroBoardSectionProps {
 }
 
 /**
+ * The band's phase, read off the single HeroState. Suspended play keeps the
+ * live columns (its scores are live scores); every `results` variant is
+ * completed; upcoming is upcoming.
+ */
+export function boardPhaseFor(state: HeroState): HeroBoardSectionProps['phase'] {
+  if (state.kind === 'live' || state.kind === 'suspended') return 'live';
+  if (state.kind === 'results') return 'completed';
+  return 'upcoming';
+}
+
+/**
+ * Champion gate — the SAME rule as HybridHero's ChampionStrip: OverviewHero
+ * passes `championSrId` only when `isChampionResolvable(state)` holds, and the
+ * trophy is matched here by id alone. Never compared by name or by position
+ * (a T1 playoff loser is not the champion).
+ *
  * The champion's BOARD player id, resolved by id alone: the leaderboard row
  * whose player carries the champion's sr_id. Position is never consulted.
  */
