@@ -22,7 +22,7 @@ export type ResultsVariant =
 export type UpcomingVariant = 'far' | 'imminent';
 
 export type HeroState =
-  | { kind: 'live'; round: number; totalRounds: number; }
+  | { kind: 'live'; round: number; totalRounds: number }
   /**
    * Play has STOPPED but the tournament has NOT finished (suspended, delayed,
    * weather, holdup). The scores on the board are live scores, so this state
