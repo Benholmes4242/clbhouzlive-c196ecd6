@@ -436,6 +436,8 @@ function PicksBlock({
     <div data-overview-picks style={{ background: PAGE_CANVAS }}>
       <div style={{ padding: '14px 20px 9px', display: 'flex', alignItems: 'center', gap: 8, borderTop: `1px solid ${WHITE_ALPHA_06}` }}>
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
+        {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
+            key, so band and sheet cannot drift apart in translation. */}
         <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
       </div>
 
