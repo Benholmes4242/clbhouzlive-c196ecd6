@@ -31,6 +31,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { FiltersPill, ScopeSegments } from './ScoresFilterHead';
 import { handicapPairDisplay } from './circleHandicap';
 import { fmtHcp } from '@/lib/whs/format';
+import { BOARD_FLOOR_COPY } from '@/components/explore-tab-new/courseled/boardFloors';
+import { basisLine } from '@/features/amateur/basisLine';
 import { playDateAtLocalNoon } from '@/components/explore-tab-new/courseled/discoverWhen';
 import { useFeatsWindow, type FeatKind, type FeatWindow } from './useFeatsWindow';
 import { RailChips } from '@/components/ui/RailChips';
@@ -815,6 +817,22 @@ export function ScoresLeaderboardsPage({
               pending branch so the head never moves between loading and loaded.
               No marginTop: Section already puts 12 above its children. */}
           <ScopeSegments scope={scope} clubApplies={state.clubApplies} onScopeChange={state.changeScope} />
+          {/* 2.1 THE BASIS: what the board was DRAWN FROM (the filtered pool),
+              not how many are ON it — "from" carries that difference. */}
+          {(() => {
+            const pool = state.page.data?.pool;
+            if (!pool) return null;
+            const n = boardCountsRounds(state.board) ? pool.rounds : pool.members;
+            return (
+              <div data-scores-basis className="tabular-nums" style={{ marginTop: 10, fontSize: 11.5, color: A.DIM }}>
+                {basisLine(
+                  t('amateur.leaderboards.basisFrom', 'from {{unit}}', { unit: boardCountText(state.board, n) }),
+                  state.filters,
+                  t as never,
+                )}
+              </div>
+            );
+          })()}
           {leadLoading || !leader ? (
             /* Rows area only — the head above is already final. */
             <div aria-hidden style={{ marginTop: 12, height: 500 }} />
@@ -839,7 +857,24 @@ export function ScoresLeaderboardsPage({
               ));
             })()}
           </div>
-          {state.total > leadVisible.length ? (
+          {/* 2.2 WHERE THE MEMBER STANDS when their row is not in the fetch.
+              The facets' `you` scope count tells "deeper than fetched" from
+              "no qualifying round"; unresolved renders nothing. */}
+          {userId && !leadMine ? (() => {
+            const you = state.facets?.countFor?.('scope', 'you') ?? null;
+            if (you == null) return null;
+            const msg = you > 0
+              ? t('amateur.leaderboards.standing.deeper', "You're on this board, further down than shown here. See all to find your place.")
+              : t('amateur.leaderboards.standing.none', "You don't have a qualifying round here yet — this board needs {{floor}}.", {
+                  floor: t(BOARD_FLOOR_COPY[state.board].i18n, BOARD_FLOOR_COPY[state.board].label),
+                });
+            return (
+              <div data-scores-standing={you > 0 ? 'deeper' : 'none'} style={{ marginTop: 12, fontSize: 12.5, lineHeight: 1.45, color: A.MUTE }}>
+                {msg}
+              </div>
+            );
+          })() : null}
+          {state.total > leadVisible.length || (userId && !leadMine && (state.facets?.countFor?.('scope', 'you') ?? 0) > 0) ? (
             <SeeAll
               label={seeAllForBoard(state.board)}
               onPress={() => {
