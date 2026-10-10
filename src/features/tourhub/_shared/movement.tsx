@@ -23,11 +23,20 @@ export function MovementFigure({
   movement,
   nullPlaceholder = 'dash',
   variant = 'column',
+  tone = 'colour',
 }: {
   movement: number | null;
   nullPlaceholder?: 'dash' | 'none';
   /** 'compact': the leaderboard MOV track (24px) — no min width, 9.5px figure. */
   variant?: 'column' | 'inline' | 'compact';
+  /**
+   * ON A TOUR SURFACE COLOUR ENCODES SCORE. Red belongs to the under-par ramp
+   * and green reads as the live marker, so a board that carries scores renders
+   * movement in 'ink' (full ink for a climb, muted ink for a fall) and lets the
+   * arrow carry direction. A surface with no score ramp, such as world
+   * rankings, may use the default 'colour'.
+   */
+  tone?: 'colour' | 'ink';
 }) {
   const inline = variant === 'inline';
   const base: React.CSSProperties = inline
@@ -61,7 +70,7 @@ export function MovementFigure({
 
   if (movement != null && movement !== 0) {
     return (
-      <Tag style={{ ...base, color: movement > 0 ? V4.up : V4.down }}>
+      <Tag style={{ ...base, color: tone === 'ink' ? (movement > 0 ? V4.ink : V4.inkMute) : movement > 0 ? V4.up : V4.down }}>
         {movement > 0 ? '\u25B2' : '\u25BC'} {Math.abs(movement)}
       </Tag>
     );
