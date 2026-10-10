@@ -42,6 +42,8 @@ import { RailChips } from '@/components/ui/RailChips';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
 import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
+import { THE_HUNDRED, HUNDRED_ROWS_HEIGHT, HUNDRED_SLAB_HEIGHT, hundredPlaceholderHeight, hundredSlab } from './theHundred';
+import { HundredBasis, HundredRail, HundredSubHead, HundredYou } from './TheHundredSection';
 
 /** CompactRow value size (the career, Top 100 and improvement sections). */
 export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
@@ -100,7 +102,7 @@ interface CareerRow {
   field_avg: number | null;
   /** Most recent round on a course in the SELECTED list — same scope as `value`. */
   last_course_name: string | null;
-  courses: number | null;
+  /* `courses` (always null from the RPC, never rendered) is deliberately not typed. */
   total_members: number;
   is_viewer: boolean | null;
 }
@@ -400,6 +402,7 @@ function CompactRow({
   secondary,
   value,
   caption,
+  progress,
   captionTone,
   valueTone,
   self,
@@ -416,6 +419,8 @@ function CompactRow({
   secondary: string | null;
   value: string;
   caption?: string | null;
+  /** OPTIONAL 0–1 bar under the name (Top 100 only). Absent = the row as before. */
+  progress?: number;
   /** Ignored on the viewer's own row: amber identity outranks par tone. */
   captionTone?: string;
   valueTone?: string;
@@ -486,6 +491,15 @@ function CompactRow({
             {secondary}
           </span>
         ) : null}
+        {progress != null ? (
+          <span
+            aria-hidden
+            data-row-progress
+            style={{ display: 'block', marginTop: THE_HUNDRED.row.progress.marginTop, height: THE_HUNDRED.row.progress.height, borderRadius: 999, background: THE_HUNDRED.row.progress.background, overflow: 'hidden' }}
+          >
+            <span style={{ display: 'block', width: `${Math.max(0, Math.min(1, progress)) * 100}%`, height: '100%', background: self ? A.AMBER : THE_HUNDRED.row.progress.fill }} />
+          </span>
+        ) : null}
       </span>
       <span style={{ flexShrink: 0, textAlign: 'right' }}>
         <span className="tabular-nums" style={{ display: 'block', fontSize: ROW_VALUE_SIZE, fontWeight: SEASON_ROW_METRICS.figureWeight, letterSpacing: SEASON_ROW_METRICS.figureTracking, color: self ? ink : valueTone ?? ink }}>
@@ -501,7 +515,6 @@ function CompactRow({
   );
 }
 
-const TILE_HEAD = { fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase' } as const;
 
 function Rail({ children }: { children: ReactNode }) {
   return (
@@ -608,7 +621,7 @@ export function ScoresLeaderboardsPage({
   };
 
   const [seeAll, setSeeAll] = useState<{ board: BoardKey; filters: BoardFilters } | null>(null);
-  const [careerSheet, setCareerSheet] = useState(false);
+  const [top100SeeAllSheet, setTop100SeeAllSheet] = useState(false);
 
   /* 3.3 ONE WINDOW VOCABULARY: WINDOW_OPTIONS (the filter list's own words)
      is the eyebrow too; WINDOW_SHORT survives only as its compact form for the
@@ -709,9 +722,9 @@ export function ScoresLeaderboardsPage({
   const shortBoard = (
     rows: CareerRow[],
     secondary: (r: CareerRow) => string | null,
-    caption: string,
+    caption: string | undefined,
     onPress: (r: CareerRow) => void = (r) => onMemberTap(r.user_id),
-    opts: { all?: boolean; fmt?: (r: CareerRow) => string } = {},
+    opts: { all?: boolean; fmt?: (r: CareerRow) => string; progress?: (r: CareerRow) => number | undefined } = {},
   ) => {
     const top = opts.all ? rows : rows.slice(0, SHORT_ROWS);
     const mine = rows.find((r) => r.is_viewer) ?? (userId ? rows.find((r) => r.user_id === userId) : undefined);
@@ -729,6 +742,7 @@ export function ScoresLeaderboardsPage({
         secondary={secondary(r)}
         value={opts.fmt ? opts.fmt(r) : String(r.value)}
         caption={caption}
+        progress={opts.progress?.(r)}
         self={!!r.is_viewer || r.user_id === userId}
         /* The pinned self row: 12px gap above, amber self tint (Phase 9.13). */
         gapAbove={!!pin && r.user_id === pin.user_id && i === list.length - 1}
@@ -739,15 +753,19 @@ export function ScoresLeaderboardsPage({
 
   const top100Rows = top100.data ?? [];
   /* last_course_name is scoped in SQL to the selected list, so it changes with
-     the chip alongside the count. Never fall back to home_club. */
-  const top100Secondary = (r: CareerRow): string | null =>
-    r.last_course_name ? t('amateur.leaderboards.latestCourse', { course: r.last_course_name }) : null;
+     the chip alongside the count. Never fall back to home_club. T.3 — the bare
+     course name; the basis sentence says what the line is. */
+  const top100Secondary = (r: CareerRow): string | null => r.last_course_name || null;
   /* Same call as the progress sheet (same query key) — the sheet opens from cache. */
   const listCourses = useTop100ListProgress(userId ? top100List : undefined, userId, userId);
   const listTiles = useMemo(
     () => [...(listCourses.data ?? [])].sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity)),
     [listCourses.data],
   );
+  /** The list's length is the fetched list's row count, never a literal 100. */
+  const listLength = listCourses.isSuccess && listTiles.length > 0 ? listTiles.length : null;
+  const top100Progress = (r: CareerRow): number | undefined =>
+    listLength != null ? Math.min(1, Number(r.value) / listLength) : undefined;
   const [top100Sheet, setTop100Sheet] = useState<CareerRow | null>(null);
   const openTop100Sheet = (r: CareerRow) => setTop100Sheet(r);
 
@@ -1103,7 +1121,7 @@ export function ScoresLeaderboardsPage({
       {top100Defaulted && top100.isPending ? (
         /* No pinned row: the skeleton cannot know if the viewer is in the top 3,
            and the shorter shape grows downward (expand-outwards-only). */
-        pending(150)
+        pending(hundredPlaceholderHeight(!!userId))
       ) : top100Defaulted && !(top100.isSuccess && top100Rows.length > 0) ? null : (
         <Section
           contest
@@ -1112,7 +1130,7 @@ export function ScoresLeaderboardsPage({
         >
           {/* §7 head is eyebrow + title only — meta (member count) and lede
               (field average) were dropped; See all is the only count surface. */}
-          <div style={{ marginBottom: 12 }}>
+          <div style={{ marginBottom: THE_HUNDRED.blockGap }}>
             <RailChips
               align="center-when-fit"
 
@@ -1123,74 +1141,52 @@ export function ScoresLeaderboardsPage({
               ariaLabel={t('amateur.leaderboards.top100List')}
             />
           </div>
+          {/* T.1 THE YOU SLAB — signed in only. Needs the board (n, pos, gap)
+              and the list (its length), so it holds its height until both land. */}
+          {userId ? (
+            top100.isPending || listCourses.isPending ? (
+              <div aria-hidden style={{ height: HUNDRED_SLAB_HEIGHT, marginBottom: THE_HUNDRED.blockGap }} />
+            ) : listLength != null ? (
+              <HundredYou
+                slab={hundredSlab(top100Rows, userId)}
+                list={RANK_SCOPE_LABEL[top100List]}
+                listLength={listLength}
+                leaderValue={top100Rows.length > 0 ? Number(top100Rows[0].value) : 0}
+                nameOf={nameOf}
+              />
+            ) : null
+          ) : null}
+          <HundredBasis list={RANK_SCOPE_LABEL[top100List]} />
           {/* A chip tap starts a fresh slug query. While it loads, reserve the
-              strip (caption + 76px tile row) instead of holding the old list:
+              strip (sub-head + tile row) instead of holding the old list:
               last list's photographs under the new list's caption is worse than
               a brief empty rail. Deliberately NOT placeholderData. */}
           {userId && listCourses.isPending ? (
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ marginTop: 16 }}>
-                <span style={{ ...TILE_HEAD, color: A.DIM }}>
-                  {t('amateur.leaderboards.theListHundred', { list: RANK_SCOPE_LABEL[top100List] })}
-                </span>
-              </div>
-              <div aria-hidden style={{ height: 76 }} />
+            <div style={{ marginBottom: THE_HUNDRED.blockGap }}>
+              <HundredSubHead list={RANK_SCOPE_LABEL[top100List]} count={null} />
+              <div aria-hidden style={{ height: THE_HUNDRED.tile.height }} />
             </div>
           ) : listCourses.isSuccess && listTiles.length > 0 ? (
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ marginTop: 16 }}>
-                <span style={{ ...TILE_HEAD, color: A.DIM }}>
-                  {t('amateur.leaderboards.theListHundred', { list: RANK_SCOPE_LABEL[top100List] })}
-                </span>
-              </div>
-              <Rail>
-                {listTiles.map((c) => (
-                  <button
-                    key={c.course_id}
-                    type="button"
-                    onClick={() => onOpenCourse(c.course_id)}
-                    aria-label={c.course_name}
-                    style={{
-                      width: 108, height: 76, borderRadius: 10, overflow: 'hidden', position: 'relative',
-                      flexShrink: 0, padding: 0, background: A.PANEL,
-                      border: c.thumbnail_image ? 'none' : `1px solid ${A.BORDER}`,
-                    }}
-                  >
-                    {c.thumbnail_image ? (
-                      <img src={c.thumbnail_image} alt="" loading="lazy" decoding="async"
-                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : null}
-                    <span aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.76))' }} />
-                    {c.rank != null ? (
-                      <span className="tabular-nums" style={{ position: 'absolute', left: 6, top: 5, fontSize: 9, fontWeight: 700, color: '#FFF', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
-                        {`#${c.rank}`}
-                      </span>
-                    ) : null}
-                    <span style={{
-                      position: 'absolute', left: 6, right: 6, bottom: 5, fontSize: 9, fontWeight: 700,
-                      letterSpacing: '0.04em', textTransform: 'uppercase', lineHeight: 1.15, color: '#FFF',
-                      textShadow: '0 1px 4px rgba(0,0,0,0.9)',
-                      display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden',
-                      textAlign: 'left',
-                    }}>
-                      {c.course_name}
-                    </span>
-                  </button>
-                ))}
-              </Rail>
+            <div style={{ marginBottom: THE_HUNDRED.blockGap }}>
+              <HundredSubHead
+                list={RANK_SCOPE_LABEL[top100List]}
+                count={{ played: listTiles.filter((c) => c.is_viewer_played).length, total: listTiles.length }}
+              />
+              {/* Keyed by list: a new list remounts the rail, which sets its scroll once. */}
+              <HundredRail key={top100List} tiles={listTiles} gutter={GUTTER} onOpenCourse={onOpenCourse} />
             </div>
           ) : null}
           {top100.isPending ? (
-            <div style={{ minHeight: 120 }} />
+            <div style={{ minHeight: HUNDRED_ROWS_HEIGHT }} />
           ) : top100Rows.length === 0 ? (
-            <p style={{ margin: 0, padding: '12px 0', fontFamily: SANS, fontSize: 13, color: A.MUTE }}>
+            <p style={{ margin: 0, padding: THE_HUNDRED.empty.padding, fontFamily: SANS, fontSize: THE_HUNDRED.empty.fontSize, color: A.MUTE }}>
               {t('amateur.leaderboards.top100Empty')}
             </p>
           ) : (
-            shortBoard(top100Rows, top100Secondary, t('amateur.leaderboards.of100'), openTop100Sheet)
+            shortBoard(top100Rows, top100Secondary, undefined, openTop100Sheet, { progress: top100Progress })
           )}
           {top100Rows.length > SHORT_ROWS ? (
-            <SeeAll label={seeAllMembers()} onPress={() => setCareerSheet(true)} />
+            <SeeAll label={seeAllMembers()} onPress={() => setTop100SeeAllSheet(true)} />
           ) : null}
         </Section>
       )}
@@ -1326,16 +1322,19 @@ export function ScoresLeaderboardsPage({
       })()}
 
       <BoardSheet
-        open={careerSheet}
-        onClose={() => setCareerSheet(false)}
-        titleId="career-see-all-title"
+        open={top100SeeAllSheet}
+        onClose={() => setTop100SeeAllSheet(false)}
+        titleId="top100-see-all-title"
         title={t('amateur.leaderboards.top100')}
         subtitle={top100Rows.length > 0
           ? `${RANK_SCOPE_LABEL[top100List]} · ${membersText(Number(top100Rows[0].total_members))}`
           : RANK_SCOPE_LABEL[top100List]}
-        valueHeading={t('amateur.leaderboards.coursesOf100')}
+        /* T.4 — the list's length from the same read the rail uses; no literal. */
+        valueHeading={listLength != null
+          ? t('amateur.leaderboards.coursesOfList', { n: listLength })
+          : t('amateur.leaderboards.coursesPlayed')}
         above={
-        <div style={{ padding: '11px 16px', /* Hairline clause: controls from list. */ borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
+        <div style={{ padding: THE_HUNDRED.sheetChips.padding, /* Hairline clause: controls from list. */ borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
           <RailChips
             align="center-when-fit"
             ground="filled-selection"
@@ -1358,9 +1357,10 @@ export function ScoresLeaderboardsPage({
               photo={r.photo_url}
               secondary={top100Secondary(r)}
               value={String(r.value)}
+              progress={top100Progress(r)}
               self={!!r.is_viewer || r.user_id === userId}
               onPress={() => {
-                setCareerSheet(false);
+                setTop100SeeAllSheet(false);
                 openTop100Sheet(r);
               }}
             />

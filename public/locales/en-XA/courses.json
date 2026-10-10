@@ -91,7 +91,6 @@
         "rounds": "[~~řőúñđš~~]"
       },
       "top100": "[~~Ţőƥ 100 ćőúřšéš~~]",
-      "latestCourse": "[~~Áďďéď · {{course}}~~]",
       "theListHundred": "[~~Ţĥé {{list}} ĥúñđřéđ~~]",
       "feat": {
         "ace_one": "[~~Ĥőļé íñ őñé~~]",
@@ -124,7 +123,6 @@
       "theHundred": "[~~Ţĥé ĥúñđřéđ~~]",
       "top100List": "[~~Ţőƥ 100 ļíšţ~~]",
       "top100Empty": "[~~Ñőƀőđý ĥáš ƥļáýéđ á ĉőúřšé őñ ţĥíš ļíšţ ýéţ.~~]",
-      "of100": "[~~őƒ 100~~]",
       "whoLeads": "[~~Ŵĥő ļéáđš ŵĥáţ~~]",
       "tiedTop": "[~~Ţíéđ áţ ţĥé ţőƥ~~]",
       "clearOf2nd": "[~~{{n}} ĉļéář őƒ 2ñđ~~]",
@@ -133,7 +131,6 @@
       "improvedScope": "[~~Éṽéřýőñé · ţĥíš ýéář~~]",
       "indexChange": "[~~Íñđéẋ ĉĥáñĝé~~]",
       "improvedQualifier": "[~~Ṁéɱƀéřš ŵíţĥ ƒíṽé őř ɱőřé řőúñđš ţĥíš ýéář.~~]",
-      "coursesOf100": "[~~Ĉőúřšéš őƒ 100~~]",
       "standing": {
         "deeper": "[~~Ýőú'řé őñ ţĥíš ƀőářđ, ƒúřţĥéř đőŵñ ţĥáñ šĥőŵñ ĥéřé. Šéé áļļ ţő ƒíñđ ýőúř ƥļáĉé.~~]"
       },
@@ -204,7 +201,20 @@
         "albatross": "[~~Albatrosses~~]",
         "eagle": "[~~Eagles~~]",
         "cleanCard": "[~~Bogey-free rounds~~]"
-      }
+      },
+      "hundredSlab": {
+        "played": "[~~You have played <b>{{n}}</b> of the {{list}} Hundred — <b>{{pos}}</b> of <b>{{total}}</b> members.~~]",
+        "playedBehind": "[~~You have played <b>{{n}}</b> of the {{list}} Hundred — <b>{{pos}}</b> of <b>{{total}}</b> members, <b>{{gap}}</b> behind {{leader}}.~~]",
+        "playedClear": "[~~You have played <b>{{n}}</b> of the {{list}} Hundred — <b>{{pos}}</b> of <b>{{total}}</b> members, <b>{{gap}}</b> clear of {{second}}.~~]",
+        "absent": "[~~You haven't played one of the {{list}} Hundred yet.~~]",
+        "nobodyPast": "[~~Nobody past {{n}}~~]"
+      },
+      "hundredBasis": "[~~Ranked on courses played from the <s>{{list}} Hundred</s>. Each member's latest is shown beneath their name.~~]",
+      "hundredPlayedCount": "[~~{{played}} of {{total}} played~~]",
+      "hundredPlayed": "[~~Played~~]",
+      "hundredNext": "[~~Next~~]",
+      "coursesOfList": "[~~Courses of {{n}}~~]",
+      "coursesPlayed": "[~~Courses played~~]"
     },
     "place": {
       "pair": "[~~{{place}}, {{nation}}~~]"

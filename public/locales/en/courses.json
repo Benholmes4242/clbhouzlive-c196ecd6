@@ -91,7 +91,6 @@
         "rounds": "rounds"
       },
       "top100": "Top 100 courses",
-      "latestCourse": "Added · {{course}}",
       "theListHundred": "The {{list}} hundred",
       "feat": {
         "ace_one": "Hole in one",
@@ -124,7 +123,6 @@
       "theHundred": "The hundred",
       "top100List": "Top 100 list",
       "top100Empty": "Nobody has played a course on this list yet.",
-      "of100": "of 100",
       "whoLeads": "Who leads what",
       "tiedTop": "Tied at the top",
       "clearOf2nd": "{{n}} clear of 2nd",
@@ -133,7 +131,6 @@
       "improvedScope": "Everyone · this year",
       "indexChange": "Index change",
       "improvedQualifier": "Members with five or more rounds this year.",
-      "coursesOf100": "Courses of 100",
       "standing": {
         "deeper": "You're on this board, further down than shown here. See all to find your place."
       },
@@ -204,7 +201,20 @@
         "albatross": "Albatrosses",
         "eagle": "Eagles",
         "cleanCard": "Bogey-free rounds"
-      }
+      },
+      "hundredSlab": {
+        "played": "You have played <b>{{n}}</b> of the {{list}} Hundred — <b>{{pos}}</b> of <b>{{total}}</b> members.",
+        "playedBehind": "You have played <b>{{n}}</b> of the {{list}} Hundred — <b>{{pos}}</b> of <b>{{total}}</b> members, <b>{{gap}}</b> behind {{leader}}.",
+        "playedClear": "You have played <b>{{n}}</b> of the {{list}} Hundred — <b>{{pos}}</b> of <b>{{total}}</b> members, <b>{{gap}}</b> clear of {{second}}.",
+        "absent": "You haven't played one of the {{list}} Hundred yet.",
+        "nobodyPast": "Nobody past {{n}}"
+      },
+      "hundredBasis": "Ranked on courses played from the <s>{{list}} Hundred</s>. Each member's latest is shown beneath their name.",
+      "hundredPlayedCount": "{{played}} of {{total}} played",
+      "hundredPlayed": "Played",
+      "hundredNext": "Next",
+      "coursesOfList": "Courses of {{n}}",
+      "coursesPlayed": "Courses played"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
