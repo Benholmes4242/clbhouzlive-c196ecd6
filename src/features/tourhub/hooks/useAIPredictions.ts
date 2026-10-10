@@ -117,6 +117,13 @@ export function useAIPredictions(tournamentIdArg?: string | null): UseAIPredicti
 
   // Scoped path: fetch for a specific tournament id (Tour Hub Intelligence
   // follows the hero's viewing tour). Legacy zero-arg path preserved below.
+  //
+  // ONE QUERY, POLLED AND READ. A separate `[..., 'poll']` key used to re-run
+  // this whole chain (tournament row, prediction row, a possible
+  // generate-predictions call, field validation, photo resolution) every three
+  // minutes into a cache entry nothing read. The poll now lives on the key the
+  // UI reads, conditioned exactly as before: only while the scoped result says
+  // the tournament is in progress.
   const scopedQuery = useQuery({
     queryKey: ['ai-predictions', 'scoped', scopedTid],
     queryFn: () => fetchScopedTournamentPredictions(scopedTid!),
@@ -125,14 +132,8 @@ export function useAIPredictions(tournamentIdArg?: string | null): UseAIPredicti
     gcTime: 60 * 60 * 1000,
     refetchOnWindowFocus: true,
     retry: 1,
-  });
-
-  const scopedIsLive = scopedQuery.data?.tournamentPhase === 'in-progress';
-  useQuery({
-    queryKey: ['ai-predictions', 'scoped', scopedTid, 'poll'],
-    queryFn: () => fetchScopedTournamentPredictions(scopedTid!),
-    enabled: scoped && !!scopedTid && scopedIsLive,
-    refetchInterval: scopedIsLive ? 3 * 60 * 1000 : false,
+    refetchInterval: (query) =>
+      query.state.data?.tournamentPhase === 'in-progress' ? 3 * 60 * 1000 : false,
   });
 
   const mainQuery = useQuery({
