@@ -7,7 +7,7 @@ import { A, SANS, FIGS, DISCOVER_FACT, PODIUM_ACCENT } from './tokens';
 import { type BoardFilters } from './boardFilters';
 /* S3.3 — THE SHEET STATES THE SAME APPLIED LINE AS THE PAGE, from the page's own
    formatter. No second wording lives here. */
-import { describeFilterParts } from './GolfThisWeek';
+import { describeFilterParts } from './describeFilters';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { r } from '@/lib/radius';
 import { useBoardCourses, type BoardCourseRow } from './hooks/useBoardCourses';

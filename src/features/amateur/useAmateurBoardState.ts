@@ -16,7 +16,7 @@ import { useWhsConnection } from '@/lib/whs/hooks';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 
 import { useViewerHomeClubId } from '@/components/explore-tab-new/courseled/hooks/useGolfThisWeek';
-import { CIRCLE_ROW_FLOOR } from '@/components/explore-tab-new/courseled/hooks/useDiscoverEntryBoard';
+import { BOARD_ROW_FLOOR as CIRCLE_ROW_FLOOR } from '@/components/explore-tab-new/courseled/boardFilters';
 import type { ScopeKey } from '@/components/explore-tab-new/courseled/boardFilters';
 
 import { useCircleSize } from './useCircleSize';

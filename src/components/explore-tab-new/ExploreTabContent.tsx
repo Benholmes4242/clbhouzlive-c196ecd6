@@ -11,7 +11,6 @@ import { getPageScrollTop, scrollPageTo, scrollPageToTop } from '@/lib/getScroll
 import { DiscoverHeader, type DiscoverTab } from './DiscoverHeader';
 import { NewsTabPage } from './NewsTabPage';
 import { GalleryTab } from './GalleryTab';
-import { ScoresTab } from './courseled/ScoresTab';
 
 import type { BoardRow } from './courseled/hooks/useBoardPage';
 import type { CommunityLibraryItem } from './courseled/hooks/useCommunityLibrary';
@@ -171,13 +170,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
             {/* BRIEF_SCORES_TWO_HALVES — one reference surface, two equal halves
                 under one filter. The hero and the duplicate course tiles are
                 gone; GolfThisWeek is no longer mounted here. */}
-            <ScoresTab
-              userId={user?.id}
-              onRowPress={handleBoardRow}
-              onCoursePress={(courseId) => navigate(`/courses/${courseId}`)}
-              onMemberPress={(memberId) => opener.openProfile(memberId)}
-              belowDiscoverHeader={!embedded}
-            />
+            {/* ScoresTab retired (Leaderboards Phase 3.2); this file is unrendered — pages/Discover is declared in App.tsx but never mounted. */}
           </div>
         </main>
       ) : activeTab === 'news' ? (

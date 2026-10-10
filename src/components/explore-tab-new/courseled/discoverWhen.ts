@@ -40,14 +40,13 @@ export function relativeDay(
   const then = playDateAtLocalNoon(iso)?.getTime() ?? NaN;
   if (!Number.isFinite(then)) return '';
   const days = Math.round((Date.now() - then) / 86_400_000);
-  if (days <= 0) return t('discover.when.today', 'Today');
-  if (days === 1) return t('discover.when.yesterday', 'Yesterday');
+  if (days <= 0) return t('discover.when.today');
+  if (days === 1) return t('discover.when.yesterday');
   if (days < 7) {
     return new Date(then).toLocaleDateString(undefined, { weekday });
   }
-  if (days < 14) return t('discover.when.lastWeek', 'Last week');
+  if (days < 14) return t('discover.when.lastWeek');
   return t('discover.when.weeksAgo', {
-    defaultValue: '{{count}}w ago',
     count: Math.floor(days / 7),
   });
 }
@@ -75,23 +74,20 @@ export function relativeDayCompact(
   const then = playDateAtLocalNoon(iso)?.getTime() ?? NaN;
   if (!Number.isFinite(then)) return '\u2014';
   const days = Math.max(0, Math.round((Date.now() - then) / 86_400_000));
-  if (days === 0) return t('discover.when.relToday', { defaultValue: 'today' });
-  if (days === 1) return t('discover.when.relYest', { defaultValue: 'yest' });
-  if (days < 7) return t('discover.when.relDaysAgo', { defaultValue: '{{n}}d ago', n: days });
+  if (days === 0) return t('discover.when.relToday');
+  if (days === 1) return t('discover.when.relYest');
+  if (days < 7) return t('discover.when.relDaysAgo', { n: days });
   if (days < 70) {
     return t('discover.when.relWeeksAgo', {
-      defaultValue: '{{n}}w ago',
       n: Math.max(1, Math.round(days / 7)),
     });
   }
   if (days < 365) {
     return t('discover.when.relMonthsAgo', {
-      defaultValue: '{{n}}m ago',
       n: Math.max(1, Math.round(days / 30.44)),
     });
   }
   return t('discover.when.relYearsAgo', {
-    defaultValue: '{{n}}y ago',
     n: Math.max(1, Math.round(days / 365.25)),
   });
 }
@@ -111,17 +107,17 @@ export function relativeDayFull(
   const then = playDateAtLocalNoon(iso)?.getTime() ?? NaN;
   if (!Number.isFinite(then)) return '\u2014';
   const days = Math.max(0, Math.round((Date.now() - then) / 86_400_000));
-  if (days === 0) return t('discover.when.today', { defaultValue: 'Today' });
-  if (days === 1) return t('discover.when.yesterday', { defaultValue: 'Yesterday' });
-  if (days < 7) return t('discover.when.fullDaysAgo', { defaultValue: '{{count}} days ago', count: days });
+  if (days === 0) return t('discover.when.today');
+  if (days === 1) return t('discover.when.yesterday');
+  if (days < 7) return t('discover.when.fullDaysAgo', { count: days });
   if (days < 70) {
     const n = Math.max(1, Math.round(days / 7));
-    return t('discover.when.fullWeeksAgo', { defaultValue: '{{count}} weeks ago', count: n });
+    return t('discover.when.fullWeeksAgo', { count: n });
   }
   if (days < 365) {
     const n = Math.max(1, Math.round(days / 30.44));
-    return t('discover.when.fullMonthsAgo', { defaultValue: '{{count}} months ago', count: n });
+    return t('discover.when.fullMonthsAgo', { count: n });
   }
   const n = Math.max(1, Math.round(days / 365.25));
-  return t('discover.when.fullYearsAgo', { defaultValue: '{{count}} years ago', count: n });
+  return t('discover.when.fullYearsAgo', { count: n });
 }

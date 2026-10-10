@@ -11,12 +11,14 @@ import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
 import { BoardHeaderRow, BoardRowView, boardColumns } from '@/components/explore-tab-new/courseled/BoardRows';
-import { describeFilterParts } from '@/components/explore-tab-new/courseled/GolfThisWeek';
+import { describeFilterParts } from '@/components/explore-tab-new/courseled/describeFilters';
 import { type BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import {
   BOARD_LABELS,
   DEFAULT_FILTERS,
   OFFERED_RANKING_BOARD_KEYS,
+  BOARD_ROW_FLOOR,
+  WINDOW_OPTIONS,
   boardCountsRounds,
   type BoardFilters,
   type BoardKey,
@@ -137,12 +139,12 @@ function BoardSheet({ open, onClose, titleId, title, subtitle, valueHeading, foo
           <div style={{ ...cap, marginTop: 2, color: A.DIM }}>{subtitle}</div>
         </div>
         <button type="button" onClick={onClose} style={{ ...cap, flex: 'none', background: 'none', border: 0, padding: 0, cursor: 'pointer', color: A.INK }}>
-          {t('common.done', 'Done')}
+          {t('common.done')}
         </button>
       </div>
       {above}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px 6px', fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, flexShrink: 0 }}>
-        <span>{t('amateur.leaderboards.member', 'Member')}</span>
+        <span>{t('amateur.leaderboards.member')}</span>
         <span>{valueHeading}</span>
       </div>
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 32px' }}>
@@ -238,8 +240,8 @@ const TOP100_ORDER = Object.keys(TOP100_METRIC) as RankListSlug[];
 /** The list with the most members, and the one the section always showed. */
 const TOP100_DEFAULT: RankListSlug = 'gb-i';
 
-/** Matches AmateurLeaderboardBlock's THIN_FLOOR: fewer ranked rows is not a board. */
-const THIN_FLOOR = 4;
+/** Fewer ranked rows is not a board — the shared BOARD_ROW_FLOOR. */
+const THIN_FLOOR = BOARD_ROW_FLOOR;
 
 
 /* ------------------------------------------------------------ furniture */
@@ -509,8 +511,6 @@ export function ScoresLeaderboardsPage({
 }: {
   userId: string | undefined;
   state: AmateurBoardState;
-  /** Unused since Phase 1: the rail changes the board; nothing on this page opens BoardPicker. */
-  onOpenBoard?: () => void;
   onOpenFilters: () => void;
   onRowPress: (row: BoardRow) => void;
   /** Resolves to compare, nudge or invite via useMemberTapResolver. NOT a profile page — the Top 100 sheet's Profile pill navigates to /profile/:id itself. */
@@ -518,7 +518,7 @@ export function ScoresLeaderboardsPage({
   onOpenCourse: (courseId: string) => void;
 }) {
   const { t } = useTranslation('courses');
-  const nameOf = (n: string | null | undefined) => n || t('discover.aMember', 'A member');
+  const nameOf = (n: string | null | undefined) => n || t('discover.aMember');
   const scope = state.filters.scope;
 
 
@@ -559,28 +559,25 @@ export function ScoresLeaderboardsPage({
   const [seeAll, setSeeAll] = useState<{ board: BoardKey; filters: BoardFilters } | null>(null);
   const [careerSheet, setCareerSheet] = useState(false);
 
-  const windowLabel = (w: WindowKey) =>
-    w === '14'
-      ? t('amateur.leaderboards.window.d14', 'This fortnight')
-      : w === '30'
-        ? t('amateur.leaderboards.window.d30', 'This month')
-        : w === '90'
-          ? t('amateur.leaderboards.window.d90', 'Last 90 days')
-          : w === 'year'
-            ? t('amateur.leaderboards.window.year', 'This year')
-            : t('amateur.leaderboards.window.all', 'All time');
+  /* 3.3 ONE WINDOW VOCABULARY: WINDOW_OPTIONS (the filter list's own words)
+     is the eyebrow too; WINDOW_SHORT survives only as its compact form for the
+     middot sample line, where the phrase follows a count ("19 members · 14 days"). */
+  const windowLabel = (w: WindowKey) => {
+    const o = WINDOW_OPTIONS.find((x) => x.key === w) ?? WINDOW_OPTIONS[0];
+    return t(o.i18n);
+  };
 
   const membersText = (n: number) =>
-    t('amateur.leaderboards.nMembers', { count: n, defaultValue_one: '{{count}} member', defaultValue_other: '{{count}} members' });
+    t('amateur.leaderboards.nMembers', { count: n });
   // Deliberately uncounted: "See all members" without a figure everywhere.
-  const seeAllMembers = () => t('amateur.leaderboards.seeAllMembers', 'See all members');
+  const seeAllMembers = () => t('amateur.leaderboards.seeAllMembers');
   /* The lead board's destination row follows the board's UNIT: rounds on
      Most recent (and any feat board), members on a ranked board. */
   const seeAllForBoard = (b: BoardKey) =>
-    boardCountsRounds(b) ? t('amateur.leaderboards.seeAllRounds', 'See all rounds') : seeAllMembers();
+    boardCountsRounds(b) ? t('amateur.leaderboards.seeAllRounds') : seeAllMembers();
   const boardCountText = (b: BoardKey, n: number) =>
     boardCountsRounds(b)
-      ? t('amateur.leaderboards.nRounds', { count: n, defaultValue_one: '{{count}} round', defaultValue_other: '{{count}} rounds' })
+      ? t('amateur.leaderboards.nRounds', { count: n })
       : membersText(n);
 
   /* §4 row. start_index and current_index are FACTS from the RPC, so they are
@@ -596,7 +593,7 @@ export function ScoresLeaderboardsPage({
       : null;
     const journey =
       r.start_index != null && r.current_index != null
-        ? `${fmtHcp(Number(r.start_index))} \u2192 ${fmtHcp(Number(r.current_index))}${month ? ` ${t('amateur.leaderboards.since', 'since {{month}}', { month })}` : ''}`
+        ? `${fmtHcp(Number(r.start_index))} \u2192 ${fmtHcp(Number(r.current_index))}${month ? ` ${t('amateur.leaderboards.since', { month })}` : ''}`
         : null;
     return (
       <CompactRow
@@ -633,7 +630,7 @@ export function ScoresLeaderboardsPage({
      answered different questions". boardValue()/boardSecondary(), read inside
      BoardRowView, are now the only figure map on this screen, podium included. */
 
-  const boardTitle = t(BOARD_LABELS[state.board].i18n, BOARD_LABELS[state.board].label);
+  const boardTitle = t(BOARD_LABELS[state.board].i18n);
 
   /* ------------------------------------------------------------ §5 feats */
   /* §5 reads get_feats_window: true event counts (eagles, not rounds with an
@@ -648,24 +645,24 @@ export function ScoresLeaderboardsPage({
   const featLabel = (k: FeatBoardKey, n: number) => {
     switch (k) {
       case 'ace':
-        return t('amateur.leaderboards.feat.ace', { count: n, defaultValue_one: 'Hole in one', defaultValue_other: 'Holes in one' });
+        return t('amateur.leaderboards.feat.ace', { count: n });
       case 'albatross':
-        return t('amateur.leaderboards.feat.albatross', { count: n, defaultValue_one: 'Albatross', defaultValue_other: 'Albatrosses' });
+        return t('amateur.leaderboards.feat.albatross', { count: n });
       case 'eagle':
-        return t('amateur.leaderboards.feat.eagle', { count: n, defaultValue_one: 'Eagle', defaultValue_other: 'Eagles' });
+        return t('amateur.leaderboards.feat.eagle', { count: n });
       default:
-        return t('amateur.leaderboards.feat.cleanCard', { count: n, defaultValue_one: 'Bogey-free round', defaultValue_other: 'Bogey-free rounds' });
+        return t('amateur.leaderboards.feat.cleanCard', { count: n });
     }
   };
 
   /* ------------------------------------------------------------ §6 career */
   const career = [
-    { metric: 'birdies', label: t('amateur.leaderboards.career.birdies', 'Birdies'), q: birdiesC },
-    { metric: 'rounds', label: t('amateur.leaderboards.career.rounds', 'Rounds'), q: roundsC },
-    { metric: 'sub_80', label: t('amateur.leaderboards.career.sub80', 'Sub-80 rounds'), q: sub80C },
-    { metric: 'eagles', label: t('amateur.leaderboards.career.eagles', 'Eagles'), q: eaglesC, noAvg: true },
-    { metric: 'best_stableford', label: t('amateur.leaderboards.career.bestStableford', 'Best stableford'), q: stablefordC },
-    { metric: 'best_score_diff', label: t('amateur.leaderboards.career.bestScoreDiff', 'Best to handicap'), q: scoreDiffC },
+    { metric: 'birdies', label: t('amateur.leaderboards.career.birdies'), q: birdiesC },
+    { metric: 'rounds', label: t('amateur.leaderboards.career.rounds'), q: roundsC },
+    { metric: 'sub_80', label: t('amateur.leaderboards.career.sub80'), q: sub80C },
+    { metric: 'eagles', label: t('amateur.leaderboards.career.eagles'), q: eaglesC, noAvg: true },
+    { metric: 'best_stableford', label: t('amateur.leaderboards.career.bestStableford'), q: stablefordC },
+    { metric: 'best_score_diff', label: t('amateur.leaderboards.career.bestScoreDiff'), q: scoreDiffC },
   ] as { metric: CareerMetric; label: string; q: typeof birdiesC; noAvg?: boolean }[];
   /* NOTHING ELSE JOINS THIS RAIL: holes in one / albatrosses are §5, lowest gross §3, bogey-free §5. */
   const careerSettled = career.every((c) => c.q.isFetched);
@@ -705,7 +702,7 @@ export function ScoresLeaderboardsPage({
   /* last_course_name is scoped in SQL to the selected list, so it changes with
      the chip alongside the count. Never fall back to home_club. */
   const top100Secondary = (r: CareerRow): string | null =>
-    r.last_course_name ? t('amateur.leaderboards.latestCourse', 'Added · {{course}}', { course: r.last_course_name }) : null;
+    r.last_course_name ? t('amateur.leaderboards.latestCourse', { course: r.last_course_name }) : null;
   /* Same call as the progress sheet (same query key) — the sheet opens from cache. */
   const listCourses = useTop100ListProgress(userId ? top100List : undefined, userId, userId);
   const listTiles = useMemo(
@@ -727,7 +724,7 @@ export function ScoresLeaderboardsPage({
           unresolved count (null) renders no figure and greys nothing. */}
       <div
         role="radiogroup"
-        aria-label={t('amateur.board.rail', 'Boards')}
+        aria-label={t('amateur.board.rail')}
         data-scores-board-rail
         className="no-scrollbar"
         style={{
@@ -782,7 +779,7 @@ export function ScoresLeaderboardsPage({
                 whiteSpace: 'nowrap',
               }}
             >
-              <span style={{ fontSize: 12.5, fontWeight: 700 }}>{t(BOARD_LABELS[key].i18n, BOARD_LABELS[key].label)}</span>
+              <span style={{ fontSize: 12.5, fontWeight: 700 }}>{t(BOARD_LABELS[key].i18n)}</span>
               <span className="tabular-nums" style={{ fontSize: 10.5, fontWeight: 500, minHeight: 13 }}>
                 {n == null ? '\u00a0' : boardCountText(key, n)}
               </span>
@@ -826,7 +823,7 @@ export function ScoresLeaderboardsPage({
             return (
               <div data-scores-basis className="tabular-nums" style={{ marginTop: 10, fontSize: 11.5, color: A.DIM }}>
                 {basisLine(
-                  t('amateur.leaderboards.basisFrom', 'from {{unit}}', { unit: boardCountText(state.board, n) }),
+                  t('amateur.leaderboards.basisFrom', { unit: boardCountText(state.board, n) }),
                   state.filters,
                   t as never,
                 )}
@@ -870,8 +867,8 @@ export function ScoresLeaderboardsPage({
             const you = state.facets?.countFor?.('scope', 'you') ?? null;
             if (you == null) return null;
             const msg = you > 0
-              ? t('amateur.leaderboards.standing.deeper', "You're on this board, further down than shown here. See all to find your place.")
-              : t(BOARD_FLOOR_COPY[state.board].i18n, BOARD_FLOOR_COPY[state.board].label);
+              ? t('amateur.leaderboards.standing.deeper')
+              : t(BOARD_FLOOR_COPY[state.board].i18n);
             return (
               <div data-scores-standing={you > 0 ? 'deeper' : 'none'} style={{ marginTop: 12, fontSize: 12.5, lineHeight: 1.45, color: A.MUTE }}>
                 {msg}
@@ -898,13 +895,13 @@ export function ScoresLeaderboardsPage({
       ) : featsShown.length > 0 ? (
         <Section
           contest={false}
-          eyebrow={t('amateur.leaderboards.rareAir', 'Rare air')}
-          title={t('amateur.leaderboards.feats', 'Feats')}
+          eyebrow={t('amateur.leaderboards.rareAir')}
+          title={t('amateur.leaderboards.feats')}
           metaAlign="center"
           meta={(
             <div
               role="radiogroup"
-              aria-label={t('amateur.leaderboards.featsWindow', 'Feats period')}
+              aria-label={t('amateur.leaderboards.featsWindow')}
               style={{
                 display: 'flex', gap: 3, padding: 3, borderRadius: 999, flex: 'none', alignSelf: 'center',
                 background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)',
@@ -912,7 +909,7 @@ export function ScoresLeaderboardsPage({
             >
               {([
                 ['year', String(new Date().getFullYear())],
-                ['all', t('amateur.leaderboards.allTime', 'All time')],
+                ['all', t('amateur.leaderboards.allTime')],
               ] as const).map(([key, label]) => {
                 const selected = featWindow === key;
                 return (
@@ -963,8 +960,7 @@ export function ScoresLeaderboardsPage({
                 <span className="tabular-nums" style={{ display: 'block', marginTop: 6, fontSize: 10.5, lineHeight: 1.3, color: A.MUTE }}>
                   {t('amateur.leaderboards.featRarity', {
                     n: Math.round(f.denominator / f.events).toLocaleString(),
-                    unit: t(`amateur.leaderboards.unit.${f.denominator_unit}`, f.denominator_unit),
-                    defaultValue: '1 in every {{n}} {{unit}}',
+                    unit: t(`amateur.leaderboards.unit.${f.denominator_unit}`),
                   })}
                 </span>
                 <span style={{ display: 'block', marginTop: 6, fontSize: 10.5, color: A.DIM }}>{membersText(f.members)}</span>
@@ -985,8 +981,8 @@ export function ScoresLeaderboardsPage({
       ) : top100Defaulted && !(top100.isSuccess && top100Rows.length > 0) ? null : (
         <Section
           contest
-          eyebrow={t('amateur.leaderboards.theHundred', 'The hundred')}
-          title={t('amateur.leaderboards.top100', 'Top 100 courses')}
+          eyebrow={t('amateur.leaderboards.theHundred')}
+          title={t('amateur.leaderboards.top100')}
         >
           {/* §7 head is eyebrow + title only — meta (member count) and lede
               (field average) were dropped; See all is the only count surface. */}
@@ -998,7 +994,7 @@ export function ScoresLeaderboardsPage({
               options={TOP100_ORDER.map((slug) => ({ id: slug, label: RANK_SCOPE_LABEL[slug] }))}
               value={top100List}
               onChange={pickTop100}
-              ariaLabel={t('amateur.leaderboards.top100List', 'Top 100 list')}
+              ariaLabel={t('amateur.leaderboards.top100List')}
             />
           </div>
           {/* A chip tap starts a fresh slug query. While it loads, reserve the
@@ -1009,7 +1005,7 @@ export function ScoresLeaderboardsPage({
             <div style={{ marginBottom: 12 }}>
               <div style={{ marginTop: 16 }}>
                 <span style={{ ...TILE_HEAD, color: A.DIM }}>
-                  {t('amateur.leaderboards.theListHundred', 'The {{list}} hundred', { list: RANK_SCOPE_LABEL[top100List] })}
+                  {t('amateur.leaderboards.theListHundred', { list: RANK_SCOPE_LABEL[top100List] })}
                 </span>
               </div>
               <div aria-hidden style={{ height: 76 }} />
@@ -1018,7 +1014,7 @@ export function ScoresLeaderboardsPage({
             <div style={{ marginBottom: 12 }}>
               <div style={{ marginTop: 16 }}>
                 <span style={{ ...TILE_HEAD, color: A.DIM }}>
-                  {t('amateur.leaderboards.theListHundred', 'The {{list}} hundred', { list: RANK_SCOPE_LABEL[top100List] })}
+                  {t('amateur.leaderboards.theListHundred', { list: RANK_SCOPE_LABEL[top100List] })}
                 </span>
               </div>
               <Rail>
@@ -1062,10 +1058,10 @@ export function ScoresLeaderboardsPage({
             <div style={{ minHeight: 120 }} />
           ) : top100Rows.length === 0 ? (
             <p style={{ margin: 0, padding: '12px 0', fontFamily: SANS, fontSize: 13, color: A.MUTE }}>
-              {t('amateur.leaderboards.top100Empty', 'Nobody has played a course on this list yet.')}
+              {t('amateur.leaderboards.top100Empty')}
             </p>
           ) : (
-            shortBoard(top100Rows, top100Secondary, t('amateur.leaderboards.of100', 'of 100'), openTop100Sheet)
+            shortBoard(top100Rows, top100Secondary, t('amateur.leaderboards.of100'), openTop100Sheet)
           )}
           {top100Rows.length > SHORT_ROWS ? (
             <SeeAll label={seeAllMembers()} onPress={() => setCareerSheet(true)} />
@@ -1085,7 +1081,7 @@ export function ScoresLeaderboardsPage({
         <Section
           contest
           eyebrow={String(new Date().getFullYear())}
-          title={t('amateur.leaderboards.whoLeads', 'Who leads what')}
+          title={t('amateur.leaderboards.whoLeads')}
         >
           <Rail>
             {careerShown.map((c) => {
@@ -1129,8 +1125,8 @@ export function ScoresLeaderboardsPage({
                   {margin != null ? (
                     <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, color: A.DIM }}>
                       {margin.zero
-                        ? t('amateur.leaderboards.tiedTop', 'Tied at the top')
-                        : t('amateur.leaderboards.clearOf2nd', '{{n}} clear of 2nd', { n: margin.text })}
+                        ? t('amateur.leaderboards.tiedTop')
+                        : t('amateur.leaderboards.clearOf2nd', { n: margin.text })}
                     </span>
                   ) : null}
                 </button>
@@ -1146,9 +1142,9 @@ export function ScoresLeaderboardsPage({
       ) : improved.isSuccess && improvedRows.length >= THIN_FLOOR ? (
         <Section
           contest
-          eyebrow={t('amateur.leaderboards.climb', 'The climb')}
-          title={t('amateur.leaderboards.mostImproved', 'Most improved')}
-          meta={t('amateur.leaderboards.window.year', 'This year')}
+          eyebrow={t('amateur.leaderboards.climb')}
+          title={t('amateur.leaderboards.mostImproved')}
+          meta={windowLabel('year')}
         >
           {improvedRows.slice(0, SHORT_ROWS).map((r, i, arr) => improvedRow(r, i < arr.length - 1, false))}
           <SeeAll
@@ -1166,7 +1162,7 @@ export function ScoresLeaderboardsPage({
           board={seeAll.board}
           filters={seeAll.filters}
           appliedParts={describeFilterParts(seeAll.filters, t as never)}
-          title={t(BOARD_LABELS[seeAll.board].i18n, BOARD_LABELS[seeAll.board].label)}
+          title={t(BOARD_LABELS[seeAll.board].i18n)}
           onRowPress={onRowPress}
         />
       ) : null}
@@ -1175,12 +1171,12 @@ export function ScoresLeaderboardsPage({
         open={improvedSheet}
         onClose={() => setImprovedSheet(false)}
         titleId="improved-see-all-title"
-        title={t('amateur.leaderboards.mostImproved', 'Most improved')}
+        title={t('amateur.leaderboards.mostImproved')}
         subtitle={improvedRows.length > 0
-          ? `${t('amateur.leaderboards.improvedScope', 'Everyone · this year')} · ${membersText(Number(improvedRows[0].total_members) || improvedRows.length)}`
-          : t('amateur.leaderboards.improvedScope', 'Everyone · this year')}
-        valueHeading={t('amateur.leaderboards.indexChange', 'Index change')}
-        footnote={t('amateur.leaderboards.improvedQualifier', 'Members with five or more rounds this year.')}
+          ? `${t('amateur.leaderboards.improvedScope')} · ${membersText(Number(improvedRows[0].total_members) || improvedRows.length)}`
+          : t('amateur.leaderboards.improvedScope')}
+        valueHeading={t('amateur.leaderboards.indexChange')}
+        footnote={t('amateur.leaderboards.improvedQualifier')}
       >
         {improvedRows.map((r, i, arr) => improvedRow(r, i < arr.length - 1, true))}
       </BoardSheet>
@@ -1188,7 +1184,7 @@ export function ScoresLeaderboardsPage({
       {(() => {
         const c = leaderSheet ? career.find((x) => x.metric === leaderSheet) : undefined;
         const rows = c?.q.data ?? [];
-        const scope = t('amateur.leaderboards.improvedScope', 'Everyone · this year');
+        const scope = t('amateur.leaderboards.improvedScope');
         return (
           <BoardSheet
             open={!!c}
@@ -1207,11 +1203,11 @@ export function ScoresLeaderboardsPage({
         open={careerSheet}
         onClose={() => setCareerSheet(false)}
         titleId="career-see-all-title"
-        title={t('amateur.leaderboards.top100', 'Top 100 courses')}
+        title={t('amateur.leaderboards.top100')}
         subtitle={top100Rows.length > 0
           ? `${RANK_SCOPE_LABEL[top100List]} · ${membersText(Number(top100Rows[0].total_members))}`
           : RANK_SCOPE_LABEL[top100List]}
-        valueHeading={t('amateur.leaderboards.coursesOf100', 'Courses of 100')}
+        valueHeading={t('amateur.leaderboards.coursesOf100')}
         above={
         <div style={{ padding: '11px 16px', borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
           <RailChips
@@ -1220,7 +1216,7 @@ export function ScoresLeaderboardsPage({
             options={TOP100_ORDER.map((slug) => ({ id: slug, label: RANK_SCOPE_LABEL[slug] }))}
             value={top100List}
             onChange={pickTop100}
-            ariaLabel={t('amateur.leaderboards.top100List', 'Top 100 list')}
+            ariaLabel={t('amateur.leaderboards.top100List')}
           />
         </div>
         }

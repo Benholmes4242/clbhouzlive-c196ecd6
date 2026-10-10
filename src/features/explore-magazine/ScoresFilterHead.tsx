@@ -1,77 +1,12 @@
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
 
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import {
-  BOARD_LABELS,
   SCOPE_OPTIONS,
-  type BoardKey,
   type ScopeKey,
 } from '@/components/explore-tab-new/courseled/boardFilters';
-
-/**
- * EXPLORE SCORES' HEAD (BRIEF_SCORES_RETIRE_THE_GEOGRAPHY_RAIL, option B).
- * Row 1: the board is the page subject, so it is the title; Filters on the right.
- * Row 2: scope as a real segmented control. The sheet no longer carries scope or
- * board for this surface, so each value has exactly one place to be set.
- */
-export function ScoresFilterHead({
-  board,
-  scope,
-  clubApplies,
-  filterCount,
-  onOpenBoard,
-  onOpenFilters,
-  onScopeChange,
-}: {
-  board: BoardKey;
-  scope: ScopeKey;
-  /** False for a member with no club: the Your club segment is not offered. */
-  clubApplies: boolean;
-  /** Sheet-only axes that differ from the default. Scope and board never count. */
-  filterCount: number;
-  onOpenBoard: () => void;
-  onOpenFilters: () => void;
-  onScopeChange: (next: ScopeKey) => void;
-}) {
-  const { t } = useTranslation('courses');
-  return (
-    <div style={{ padding: '0 16px', fontFamily: SANS }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <button
-          type="button"
-          data-scores-board-picker
-          onClick={onOpenBoard}
-          aria-label={t('amateur.board.openPicker', 'Choose a board')}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 7,
-            minWidth: 0,
-            padding: 0,
-            border: 'none',
-            background: 'transparent',
-            color: A.INK,
-            fontFamily: SANS,
-            fontSize: 20,
-            fontWeight: 700,
-            letterSpacing: '-0.02em',
-          }}
-        >
-          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {t(BOARD_LABELS[board].i18n, BOARD_LABELS[board].label)}
-          </span>
-          <ChevronDown size={16} color={A.MUTE} style={{ flexShrink: 0 }} />
-        </button>
-
-        <FiltersPill count={filterCount} onOpen={onOpenFilters} />
-      </div>
-
-      <ScopeSegments scope={scope} clubApplies={clubApplies} onScopeChange={onScopeChange} style={{ marginTop: 12 }} />
-    </div>
-  );
-}
 
 /** THE FILTERS PILL — one shape, shared by this head and the Leaderboards page. */
 export function FiltersPill({ count, onOpen }: { count: number; onOpen: () => void }) {
@@ -97,7 +32,7 @@ export function FiltersPill({ count, onOpen }: { count: number; onOpen: () => vo
       }}
     >
       <SlidersHorizontal size={14} />
-      {t('discover.filterBoard.filters', 'Filters')}
+      {t('discover.filterBoard.filters')}
       {count > 0 ? (
         <span
           className="tabular-nums"
@@ -138,7 +73,7 @@ export function ScopeSegments({
   return (
     <div
       role="radiogroup"
-      aria-label={t('amateur.stream.scopes', 'Scores scope')}
+      aria-label={t('amateur.stream.scopes')}
       style={{
         display: 'grid',
         gridTemplateColumns: `repeat(${options.length}, minmax(0,1fr))`,
@@ -183,7 +118,7 @@ export function ScopeSegments({
                 51px. Nothing clips today. en-XA pseudo-localisation will NOT
                 catch an overflow here. */}
             <span style={{ display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {t(o.i18n, o.label)}
+              {t(o.i18n)}
             </span>
           </button>
         );

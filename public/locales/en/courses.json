@@ -8,7 +8,18 @@
       "orBeyond": "Or look beyond your circle.",
       "seeEveryone": "See everyone",
       "thinCircle": "Only {{count}} rounds in your circle this fortnight.",
-      "widenedToEveryone": "Nobody in your circle has posted a round in the last fortnight, so this is everyone."
+      "widenedToEveryone": "Nobody in your circle has posted a round in the last fortnight, so this is everyone.",
+      "rail": "Boards",
+      "floor": {
+        "noRound": "You haven't posted a round in this window.",
+        "stableford": "You need a round of 36 points or better in this window.",
+        "birdies": "You need a round with three birdies or more in this window.",
+        "improved": "You need a round that cut your handicap index in this window.",
+        "ace": "You need a hole in one in this window.",
+        "albatross": "You need an albatross in this window.",
+        "eagle": "You need an eagle in this window.",
+        "cleanCard": "You need a bogey-free round in this window."
+      }
     },
     "courses": {
       "searchClear": "Clear search",
@@ -81,7 +92,55 @@
       },
       "top100": "Top 100 courses",
       "latestCourse": "Added · {{course}}",
-      "theListHundred": "The {{list}} hundred"
+      "theListHundred": "The {{list}} hundred",
+      "feat": {
+        "ace_one": "Hole in one",
+        "ace_other": "Holes in one",
+        "albatross_one": "Albatross",
+        "albatross_other": "Albatrosses",
+        "eagle_one": "Eagle",
+        "eagle_other": "Eagles",
+        "cleanCard_one": "Bogey-free round",
+        "cleanCard_other": "Bogey-free rounds"
+      },
+      "member": "Member",
+      "window": {
+        "year": "This year"
+      },
+      "seeAllMembers": "See all members",
+      "seeAllRounds": "See all rounds",
+      "since": "since {{month}}",
+      "career": {
+        "birdies": "Birdies",
+        "rounds": "Rounds",
+        "sub80": "Sub-80 rounds",
+        "eagles": "Eagles",
+        "bestStableford": "Best stableford",
+        "bestScoreDiff": "Best to handicap"
+      },
+      "basisFrom": "from {{unit}}",
+      "rareAir": "Rare air",
+      "featsWindow": "Feats period",
+      "theHundred": "The hundred",
+      "top100List": "Top 100 list",
+      "top100Empty": "Nobody has played a course on this list yet.",
+      "of100": "of 100",
+      "whoLeads": "Who leads what",
+      "tiedTop": "Tied at the top",
+      "clearOf2nd": "{{n}} clear of 2nd",
+      "climb": "The climb",
+      "mostImproved": "Most improved",
+      "improvedScope": "Everyone · this year",
+      "indexChange": "Index change",
+      "improvedQualifier": "Members with five or more rounds this year.",
+      "coursesOf100": "Courses of 100",
+      "standing": {
+        "deeper": "You're on this board, further down than shown here. See all to find your place."
+      },
+      "nMembers_one": "{{count}} member",
+      "nMembers_other": "{{count}} members",
+      "nRounds_one": "{{count}} round",
+      "nRounds_other": "{{count}} rounds"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
@@ -1145,7 +1204,16 @@
     },
     "filterBoard": {
       "col": {
-        "rounds": "ROUNDS"
+        "rounds": "ROUNDS",
+        "pos": "POS",
+        "member": "MEMBER",
+        "gross": "GROSS",
+        "toPar": "TO PAR",
+        "cut": "CUT",
+        "when": "WHEN",
+        "points": "PTS",
+        "net": "NET",
+        "birdies": "BIRDIES"
       },
       "featAce_one": "HOLE IN ONE",
       "featAce_other": "{{count}} HOLES IN ONE",
@@ -1166,7 +1234,72 @@
       "railMembers_one": "MEMBER",
       "railMembers_other": "MEMBERS",
       "railRounds_one": "ROUND",
-      "railRounds_other": "ROUNDS"
+      "railRounds_other": "ROUNDS",
+      "filters": "Filters",
+      "gapRounds": "{{count}} rounds back",
+      "gapPoints": "{{n}} points back",
+      "gapBirdies": "{{n}} birdies back",
+      "gapCut": "{{n}} off the lead",
+      "gapShots": "{{n}} shots back",
+      "done": "Done",
+      "nMembers": "{{count}} members",
+      "loading": "Loading",
+      "loadMore": "Load more",
+      "courses": {
+        "oneCourse": "one course",
+        "any": "All courses",
+        "top100": "Top 100",
+        "played": "Courses you have played"
+      },
+      "scope": {
+        "everyone": "Everyone",
+        "circle": "Your circle",
+        "club": "Your club"
+      },
+      "window": {
+        "d14": "Last 14 days",
+        "d30": "Last 30 days",
+        "d90": "Last 90 days",
+        "year": "This year",
+        "all": "All time"
+      },
+      "windowShort": {
+        "d14": "14 DAYS",
+        "d30": "30 DAYS",
+        "d90": "90 DAYS",
+        "year": "THIS YEAR",
+        "all": "ALL TIME"
+      },
+      "band": {
+        "all": "All handicaps",
+        "plus": "Plus",
+        "b0": "Scratch to 4.9",
+        "b5": "5 to 9.9",
+        "b10": "10 to 14.9",
+        "b15": "15 to 19.9",
+        "b20": "20 to 27.9",
+        "b28": "28 and above"
+      },
+      "competition": {
+        "any": "Any round",
+        "competition": "Competition",
+        "social": "Social"
+      },
+      "board": {
+        "gross": "Lowest gross",
+        "topar": "Lowest gross",
+        "net": "Lowest net",
+        "stableford": "Stableford",
+        "improved": "Most improved",
+        "birdies": "Most birdies",
+        "recent": "Most recent",
+        "ace": "Holes in one",
+        "albatross": "Albatrosses",
+        "eagle": "Eagles",
+        "cleanCard": "Bogey-free rounds"
+      },
+      "nRounds_one": "{{count}} round",
+      "nRounds_other": "{{count}} rounds"
     },
     "findGolfers": {
       "addFriend": "Add friend",
@@ -1696,7 +1829,15 @@
     },
     "worldwide": "Worldwide",
     "yards": "Yards",
-    "yourCircle": "Your circle"
+    "yourCircle": "Your circle",
+    "courseBoard": {
+      "played": "Most played",
+      "hardest": "Hardest",
+      "easiest": "Easiest",
+      "low": "Lowest round",
+      "new": "New this window",
+      "rated": "Best rated"
+    }
   },
   "explorer": {
     "allRegions": "All Regions",
@@ -2825,5 +2966,8 @@
     "trendNone": "One round here — no trend yet",
     "trendOffBest": "Worst",
     "vsYou": "VS YOU"
+  },
+  "common": {
+    "done": "Done"
   }
 }

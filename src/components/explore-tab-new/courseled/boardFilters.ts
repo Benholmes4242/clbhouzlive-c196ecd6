@@ -63,7 +63,7 @@ export const isFeatBoard = (board: BoardKey): board is FeatBoardKey =>
 /** All offered boards, in picker order (ten: 'gross' is retired). */
 export const BOARD_KEYS: BoardKey[] = [...RANKING_BOARD_KEYS, ...FEAT_BOARD_KEYS];
 
-export type ScopeKey = 'everyone' | 'circle' | 'club' | 'you';
+export type ScopeKey = 'everyone' | 'circle' | 'club';
 /** B3 — the COMPETITION axis, new and fully populated in production. */
 export type CompetitionKey = 'any' | 'competition' | 'social';
 export type WindowKey = '14' | '30' | '90' | 'year' | 'all';
@@ -216,6 +216,11 @@ export const BOARD_LABELS: Record<BoardKey, { i18n: string; label: string }> = {
  */
 export const boardCountsRounds = (board: BoardKey) =>
   board === 'recent' || isFeatBoard(board);
+
+/** THE ROW FLOOR: fewer than four rows is not a leaderboard (S3.4). One rule,
+    two readers — the landing ladder (does this scope hold a board?) and the
+    Leaderboards page's season sections (is this list a board?). */
+export const BOARD_ROW_FLOOR = 4;
 
 /** The ONE rule for which ranking boards a member is offered: a ranking key,
     not a feat, not the retired 'gross'. The board picker and the filter panel

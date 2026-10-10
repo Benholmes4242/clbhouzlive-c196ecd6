@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { CourseBoardRows } from '@/components/explore-tab-new/courseled/CourseBoardRows';
 import { CoursesPlayedSeeAllSheet } from '@/components/explore-tab-new/courseled/CoursesPlayedSeeAllSheet';
 import { ListTerminalRow } from '@/components/explore-tab-new/courseled/ListTerminalRow';
-import { describeFilterParts } from '@/components/explore-tab-new/courseled/GolfThisWeek';
+import { describeFilterParts } from '@/components/explore-tab-new/courseled/describeFilters';
 import { useBoardCourses } from '@/components/explore-tab-new/courseled/hooks/useBoardCourses';
 import {
   COURSE_BOARD_KEYS,
