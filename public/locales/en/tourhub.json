@@ -607,7 +607,6 @@
     },
     "picksSheet": {
       "cardAria": "Why we picked {{name}}",
-      "eyebrow": "OUR TOURNAMENT PICKS",
       "title": "Why we picked them",
       "worldNo": "World no. {{rank}}",
       "pickOf": "Pick {{rank}} of {{total}}",

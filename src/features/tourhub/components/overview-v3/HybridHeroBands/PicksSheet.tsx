@@ -62,7 +62,10 @@ export function PicksSheet({ open, onClose, picks, predictions, eventName, venue
         {/* 1 — HEADER */}
         <div style={{ paddingBottom: 14 }}>
           <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: AMBER }}>
-            {t('overview.picksSheet.eyebrow')}
+            {/* Shares overview.hero.ourPicks with the band: same label for the same
+                thing, one key — a second key for the same words is how a label
+                drifts between two surfaces. */}
+            {t('overview.hero.ourPicks')}
           </div>
           <h2 id="overview-picks-sheet-title" style={{ margin: '4px 0 0', fontSize: 19, fontWeight: 800, letterSpacing: '-0.025em', color: INK }}>
             {t('overview.picksSheet.title')}
