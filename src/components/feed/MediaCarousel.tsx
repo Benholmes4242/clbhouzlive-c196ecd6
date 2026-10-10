@@ -436,28 +436,8 @@ export const MediaCarousel: React.FC<Props> = ({
         });
       }
       PrefetchController.request(owner, hlsUrl);
-      /* §1 — CAROUSEL WARM, mirroring CardFeed's: the neighbour is decoded into
-         the physical lane behind its role, so a settled swipe only rotates. */
-      if (mountVideo && postId) {
-        const role: 'next' | 'prev' = j > active ? 'next' : 'prev';
-        try {
-          VideoEngine.preload(feedLaneRoles.laneForRole(role), {
-            hlsUrl,
-            posterUrl: (it as any).thumbnailUrl ?? null,
-            postId: owner,
-            expectedActiveOwnerKey: ownerKeyOf(active),
-          });
-          if (perf) {
-            // eslint-disable-next-line no-console
-            console.info('[CAROUSEL2] warm.attempt', {
-              ownerKey: owner, method: 'preload', role,
-              outcome: 'issued:preload', isAnyLaneLoading,
-            });
-          }
-        } catch { /* engine not booted — safe to ignore */ }
-      }
     }
-  }, [active, isCardActive, items, ownerKeyOf, mountVideo, postId]);
+  }, [active, isCardActive, items, ownerKeyOf]);
 
   /* §2 — PUBLISH WHICH LANES THIS CAROUSEL OWNS, on the SETTLED index (the
      same moment the roles rotate), so CardFeed's card-level warm steps aside
@@ -480,6 +460,31 @@ export const MediaCarousel: React.FC<Props> = ({
       next: hasVideo(settled + 1),
       prev: hasVideo(settled - 1),
     });
+    /* §1 — CAROUSEL WARM, mirroring CardFeed's. Keyed on the SETTLED index,
+       never the halfway flip: until the swipe settles and roles rotate, the
+       'next' lane is still decoding the incoming slide and must not be
+       re-pointed. Non-video neighbours and out-of-range slides: no preload. */
+    const perf = isPerfEnabled();
+    for (const j of [settled - 1, settled + 1]) {
+      if (j < 0 || j >= items.length || !hasVideo(j)) continue;
+      const it = items[j] as any;
+      const role: 'next' | 'prev' = j > settled ? 'next' : 'prev';
+      const owner = `${postId}:${j}`;
+      try {
+        VideoEngine.preload(feedLaneRoles.laneForRole(role), {
+          hlsUrl: it.hlsUrl,
+          posterUrl: it.thumbnailUrl ?? null,
+          postId: owner,
+          expectedActiveOwnerKey: `${postId}:${settled}`,
+        });
+        if (perf) {
+          // eslint-disable-next-line no-console
+          console.info('[CAROUSEL2] warm.attempt', {
+            ownerKey: owner, method: 'preload', role, outcome: 'issued:preload',
+          });
+        }
+      } catch { /* engine not booted — safe to ignore */ }
+    }
   }, [postId, isCardActive, mountVideo, items, settled]);
   useEffect(() => () => { if (postId) carouselNeighbourOverride.clear(postId); }, [postId]);
 
