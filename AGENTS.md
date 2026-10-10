@@ -15,3 +15,4 @@
 - The Explore Scores lead board renders every row through `BoardRowView` under `BoardHeaderRow`; the first-place podium is its `podium` prop gated on `boardColumns(board).ranked`, so figures come only from `boardValue`/`boardSecondary` and the page cannot disagree with the see-all sheet.
 - Board time windows have one vocabulary, `WINDOW_OPTIONS` in `boardFilters.ts`; `WINDOW_SHORT` is only its compact form for middot sample lines, so a window cannot be named two ways on one screen.
 - `BOARD_ROW_FLOOR` (`boardFilters.ts`) is the one "fewer rows is not a board" rule for the landing ladder and the Leaderboards page, so the probe and the sections cannot disagree.
+- Leaderboard board rows and season rows read one geometry, `ROW_METRICS` (`courseled/rowMetrics.ts`); only the podium owns larger values, so two row components cannot drift apart.

@@ -9,6 +9,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMetrics';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
 import { BoardHeaderRow, BoardRowView, boardColumns } from '@/components/explore-tab-new/courseled/BoardRows';
 import { describeFilterParts } from '@/components/explore-tab-new/courseled/describeFilters';
@@ -43,7 +44,7 @@ import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
 import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
 
 /** CompactRow value size (the career, Top 100 and improvement sections). */
-export const ROW_VALUE_SIZE = 14;
+export const ROW_VALUE_SIZE = ROW_METRICS.figureSize;
 
 /**
  * THE LEADERBOARDS PAGE (BRIEF — THE LEADERBOARDS PAGE, structure A).
@@ -390,7 +391,7 @@ function CompactRow({
         display: 'flex',
         alignItems: 'center',
         gap: 10,
-        padding: '8px 0',
+        padding: `${ROW_METRICS.padY}px 0`,
         border: 'none',
         borderBottom: divider ? `1px solid ${A.SOFT}` : 'none',
         background: 'transparent',
@@ -401,19 +402,20 @@ function CompactRow({
     >
       <span
         className="tabular-nums"
-        style={{ width: 20, flexShrink: 0, fontSize: 11.5, fontWeight: 700, color: self ? A.AMBER : FAINT }}
+        style={{ width: ROW_METRICS.posTrack, flexShrink: 0, textAlign: 'center', fontSize: ROW_METRICS.posSize, fontWeight: ROW_METRICS.posWeight, color: self ? A.AMBER : A.MUTE }}
       >
         {tie ? `T${pos}` : pos}
       </span>
       <span style={{ flexShrink: 0 }}>
-        <Avatar id={id} name={name} src={photo} size={26} />
+        <Avatar id={id} name={name} src={photo} size={ROW_METRICS.avatar} />
       </span>
       <span style={{ flex: 1, minWidth: 0 }}>
         <span
           style={{
             display: 'block',
-            fontSize: 13,
-            fontWeight: 600,
+            fontSize: ROW_METRICS.nameSize,
+            fontWeight: ROW_METRICS.nameWeight,
+            lineHeight: ROW_METRICS.nameLine,
             color: ink,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -427,7 +429,9 @@ function CompactRow({
             style={{
               display: 'block',
               marginTop: 1,
-              fontSize: 10.5,
+              fontSize: ROW_METRICS.subSize,
+              fontWeight: 600,
+              lineHeight: ROW_METRICS.subLine,
               color: A.DIM,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
@@ -439,11 +443,11 @@ function CompactRow({
         ) : null}
       </span>
       <span style={{ flexShrink: 0, textAlign: 'right' }}>
-        <span className="tabular-nums" style={{ display: 'block', fontSize: ROW_VALUE_SIZE, fontWeight: 700, color: self ? ink : valueTone ?? ink }}>
+        <span className="tabular-nums" style={{ display: 'block', fontSize: ROW_VALUE_SIZE, fontWeight: ROW_METRICS.figureWeight, letterSpacing: '-0.04em', color: self ? ink : valueTone ?? ink }}>
           {value}
         </span>
         {caption ? (
-          <span className="tabular-nums" style={{ display: 'block', fontSize: 10.5, fontWeight: 700, color: !self && captionTone ? captionTone : A.DIM }}>
+          <span className="tabular-nums" style={{ display: 'block', fontSize: ROW_METRICS.secondarySize, fontWeight: ROW_METRICS.secondaryWeight, color: !self && captionTone ? captionTone : A.DIM }}>
             {caption}
           </span>
         ) : null}
@@ -977,7 +981,7 @@ export function ScoresLeaderboardsPage({
           row count is shown and zero rows reads one quiet line. Only the
           DEFAULT list being empty (or failing) on load hides the section. */}
       {top100Defaulted && top100.isPending ? (
-        pending(170)
+        pending(152)
       ) : top100Defaulted && !(top100.isSuccess && top100Rows.length > 0) ? null : (
         <Section
           contest
@@ -1138,7 +1142,7 @@ export function ScoresLeaderboardsPage({
 
       {/* §4 MOST IMPROVED — cumulative this year, not a single round's cut. */}
       {improved.isPending ? (
-        pending(200)
+        pending(182)
       ) : improved.isSuccess && improvedRows.length >= THIN_FLOOR ? (
         <Section
           contest
