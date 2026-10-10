@@ -10,7 +10,7 @@ import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { MemberAvatar } from '@/components/explore-tab-new/courseled/MemberAvatar';
 import { ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMetrics';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
-import { BoardHeaderRow, BoardRowView, boardColumns, fmtToPar } from '@/components/explore-tab-new/courseled/BoardRows';
+import { BoardDaySeparator, BoardRowView, boardColumns, fmtToPar } from '@/components/explore-tab-new/courseled/BoardRows';
 import { describeFilterParts } from '@/components/explore-tab-new/courseled/describeFilters';
 import { type BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import {
@@ -19,6 +19,7 @@ import {
   OFFERED_RANKING_BOARD_KEYS,
   BOARD_ROW_FLOOR,
   WINDOW_OPTIONS,
+  windowOption,
   boardCountsRounds,
   type BoardFilters,
   type BoardKey,
@@ -34,7 +35,9 @@ import { FiltersPill, ScopeSegments } from './ScoresFilterHead';
 import { handicapPairDisplay } from './circleHandicap';
 import { fmtHcp } from '@/lib/whs/format';
 import { BOARD_FLOOR_COPY } from '@/components/explore-tab-new/courseled/boardFloors';
-import { playDateAtLocalNoon } from '@/components/explore-tab-new/courseled/discoverWhen';
+import { dayLadder, playDateAtLocalNoon, playDateShort } from '@/components/explore-tab-new/courseled/discoverWhen';
+import { SELF_ROW_TINT } from '@/components/explore-tab-new/courseled/tokens';
+import { standingOrdinal } from './ordinal';
 import { useFeatsWindow, type FeatKind, type FeatWindow } from './useFeatsWindow';
 import { RailChips } from '@/components/ui/RailChips';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
@@ -58,8 +61,8 @@ export const ROW_VALUE_SIZE = ROW_METRICS.figureSize;
  */
 
 const GUTTER = 16;
-/* Phase 8 head geometry: the rail, control row, basis and you slab sit 14 in. */
-const HEAD_GUTTER = 14;
+/* Phase 9.5 — the rail, control row, basis and you slab sit 16 in, as the rows do. */
+const HEAD_GUTTER = 16;
 const CHIP_BG = 'rgba(255,255,255,0.04)';
 const CHIP_ACTIVE_BG = 'rgba(247,147,30,0.1)';
 const CHIP_ACTIVE_BORDER = 'rgba(247,147,30,0.55)';
@@ -329,6 +332,37 @@ function Section({
   );
 }
 
+/** 9.14 — the lead board's See all: full width, centred, amber. Lead board only. */
+function LeadSeeAll({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onPress}
+      data-lead-see-all
+      style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 4,
+        padding: '15px 16px 19px',
+        border: 'none',
+        background: 'transparent',
+        fontFamily: SANS,
+        fontSize: 11.5,
+        fontWeight: 700,
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+        color: A.AMBER,
+        cursor: 'pointer',
+      }}
+    >
+      {label}
+      <ChevronRight size={13} />
+    </button>
+  );
+}
+
 function SeeAll({ label, onPress }: { label: string; onPress: () => void }) {
   return (
     <button
@@ -384,7 +418,7 @@ function CompactRow({
   captionTone?: string;
   valueTone?: string;
   self: boolean;
-  /** Phase 5.2 — a broken sequence (the pinned self row) is marked by space, not a line. */
+  /** The pinned self row: a 12px break above it, plus the self tint (9.13). */
   gapAbove?: boolean;
   onPress: () => void;
 }) {
@@ -400,8 +434,10 @@ function CompactRow({
         gap: 10,
         padding: `${ROW_METRICS.padY}px 0`,
         border: 'none',
-        marginTop: gapAbove ? ROW_METRICS.padY * 2 : 0,
-        background: 'transparent',
+        /* 9.13 — a hairline beneath every row, the last included. */
+        borderBottom: `1px solid ${A.SOFT}`,
+        marginTop: gapAbove ? ROW_METRICS.pinnedGap : 0,
+        background: self ? SELF_ROW_TINT : 'transparent',
         textAlign: 'left',
         fontFamily: SANS,
         cursor: 'pointer',
@@ -704,10 +740,7 @@ export function ScoresLeaderboardsPage({
         value={opts.fmt ? opts.fmt(r) : String(r.value)}
         caption={caption}
         self={!!r.is_viewer || r.user_id === userId}
-        /* Three facts, three devices, no overlap: the wash states rank and belongs
-           to 1st place whoever holds it; amber states identity and belongs to the
-           viewing member; this 12px gap states the sequence broke above this row.
-           A tint here would be a second identity device. */
+        /* The pinned self row: 12px gap above, amber self tint (Phase 9.13). */
         gapAbove={!!pin && r.user_id === pin.user_id && i === list.length - 1}
         onPress={() => onPress(r)}
       />
@@ -833,26 +866,30 @@ export function ScoresLeaderboardsPage({
           </div>
           {/* 8.3 THE BASIS SENTENCE — rounds form or ranked form by boardCountsRounds. */}
           {(() => {
-            const windowKey = state.filters.window;
+            /* 9.1 — the window's sentence phrase is the third rendering on its
+               key in WINDOW_OPTIONS. 9.2 — 'all' has no phrase: it takes a
+               whole sentence of its own in each grammar. */
+            const win = windowOption(state.filters.window);
             const scopeKey = state.filters.scope;
-            const windowPhrase = t(`amateur.leaderboards.basisSentence.window.${windowKey}`);
+            const windowPhrase = win.sentence ? t(win.sentence.i18n) : '';
             const strong = (text: string) => (
               <span style={{ color: A.MUTE, fontWeight: 600 }}>{text}</span>
             );
+            const all = !win.sentence;
             const text = boardCountsRounds(state.board)
-              ? t('amateur.leaderboards.basisSentence.rounds', {
+              ? t(all ? 'amateur.leaderboards.basisSentence.roundsAll' : 'amateur.leaderboards.basisSentence.rounds', {
                   scope: t(`amateur.leaderboards.basisSentence.scope.${scopeKey}`),
                   window: MARK_W,
                 })
-              : t('amateur.leaderboards.basisSentence.ranked', {
+              : t(all ? 'amateur.leaderboards.basisSentence.rankedAll' : 'amateur.leaderboards.basisSentence.ranked', {
                   unit: MARK_U,
                   window: MARK_W,
                   scopeLead: t(`amateur.leaderboards.basisSentence.scopeLead.${scopeKey}`),
                 });
-            const unit = t(`amateur.leaderboards.basisSentence.unit.${state.board}`);
+            const unitKey = `amateur.leaderboards.basisSentence.unit.${state.board}`;
             return (
               <p data-scores-basis style={{ margin: 0, padding: `0 ${HEAD_GUTTER}px 11px`, fontSize: 11.5, lineHeight: 1.45, color: A.DIM }}>
-                {splitMarks(text, { [MARK_W]: strong(windowPhrase), [MARK_U]: strong(unit) })}
+                {splitMarks(text, { [MARK_W]: strong(windowPhrase), [MARK_U]: strong(t(unitKey)) })}
               </p>
             );
           })()}
@@ -864,23 +901,43 @@ export function ScoresLeaderboardsPage({
           {userId ? (() => {
             const you = state.facets?.countFor?.('scope', 'you') ?? null;
             let kind: 'on' | 'deeper' | 'none' | 'pending';
-            let figure: string | null = null;
+            let figure: ReactNode = null;
             let sentence: ReactNode = null;
             if (leadMine) {
               kind = 'on';
+              const youWord = <span style={{ color: A.INK, fontWeight: 700 }}>{t('amateur.leaderboards.slab.you')}</span>;
+              const course = leadMine.course_name ?? t('discover.unknownCourse');
+              const date = playDateShort(leadMine.play_date, i18n?.language);
+              let raw: string;
               if (boardColumns(state.board).ranked) {
-                figure = String(leadMine.pos);
+                /* 9.6 — the figure is the position; its suffix at 10/700 DIM. */
+                const ord = standingOrdinal(leadMine.pos, i18n?.language ?? 'en');
+                const suffix = ord.slice(String(leadMine.pos).length);
+                figure = (
+                  <>
+                    {leadMine.pos}
+                    {suffix ? <span style={{ fontSize: 10, fontWeight: 700, color: A.DIM, letterSpacing: 0 }}>{suffix}</span> : null}
+                  </>
+                );
+                raw = t('amateur.leaderboards.slab.onBoardRanked', {
+                  you: MARK_Y,
+                  pool: Number(leadMine.pool_members).toLocaleString(i18n?.language),
+                  scope: t(`amateur.leaderboards.basisSentence.scope.${state.filters.scope}`),
+                  course,
+                  date,
+                });
               } else {
+                /* 9.6 — the figure is the most recent round's to-par. */
                 figure = leadMine.gross_score != null && leadMine.course_par != null
                   ? fmtToPar(leadMine.gross_score - leadMine.course_par)
                   : '\u2014';
+                raw = t('amateur.leaderboards.slab.onBoardRounds', {
+                  you: MARK_Y,
+                  gross: leadMine.gross_score ?? '\u2014',
+                  course,
+                  date,
+                });
               }
-              const d = playDateAtLocalNoon(leadMine.play_date);
-              const date = d ? d.toLocaleDateString(i18n?.language, { day: 'numeric', month: 'short' }) : '';
-              const youWord = <span style={{ color: A.INK, fontWeight: 700 }}>{t('amateur.leaderboards.slab.you')}</span>;
-              const raw = leadMine.course_name
-                ? t('amateur.leaderboards.slab.onBoard', { you: MARK_Y, course: leadMine.course_name, date })
-                : t('amateur.leaderboards.slab.onBoardNoCourse', { you: MARK_Y, date });
               sentence = splitMarks(raw, { [MARK_Y]: youWord });
             } else if (you == null) {
               kind = 'pending';
@@ -921,33 +978,41 @@ export function ScoresLeaderboardsPage({
               </div>
             );
           })() : null}
-          <div style={{ paddingInline: GUTTER }}>
+          <div>
           {leadLoading || !leader ? (
             /* Rows area only — the head above is already final. */
             <div aria-hidden style={{ height: 500 }} />
           ) : (
             <>
           <div>
-            <BoardHeaderRow board={state.board} />
             {(() => {
               const list = leadPinned && leadMine ? [...leadVisible, leadMine] : leadVisible;
-              /* The podium is gated on rank: on 'recent' and the feat boards
-                 (date orders) the first row is an ordinary row. */
+              /* 9.7/9.8 — the feed grammar groups under the day ladder; ranked
+                 boards are one sequence. No column header (9.9), no podium (9.12). */
               const ranked = boardColumns(state.board).ranked;
-              return list.map((r, i) => (
-                <BoardRowView
-                  key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
-                  row={r}
-                  board={state.board}
-                  isSelf={r.user_id === userId}
-                  podium={ranked && i === 0 && r.pos === 1}
-                  onPress={onRowPress}
-                />
-              ));
+              let lastKey: string | null = null;
+              return list.map((r, i) => {
+                const pinned = leadPinned && i === list.length - 1;
+                const day = !ranked && !pinned ? dayLadder(r.play_date, t as never, i18n?.language) : null;
+                const sep = day && day.key !== lastKey ? <BoardDaySeparator label={day.label} /> : null;
+                if (day) lastKey = day.key;
+                return (
+                  <div key={`${r.pos}:${r.whs_score_id ?? r.user_id}${pinned ? ':pin' : ''}`}>
+                    {sep}
+                    <BoardRowView
+                      row={r}
+                      board={state.board}
+                      isSelf={r.user_id === userId}
+                      pinned={pinned}
+                      onPress={onRowPress}
+                    />
+                  </div>
+                );
+              });
             })()}
           </div>
           {state.total > leadVisible.length || (userId && !leadMine && (state.facets?.countFor?.('scope', 'you') ?? 0) > 0) ? (
-            <SeeAll
+            <LeadSeeAll
               label={seeAllForBoard(state.board)}
               onPress={() => {
                 analyticsEvents.track('amateur_board_see_all_opened', { board: state.board, total: state.total });
