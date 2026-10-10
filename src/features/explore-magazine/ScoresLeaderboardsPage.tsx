@@ -876,7 +876,7 @@ export function ScoresLeaderboardsPage({
                   : '\u2014';
               }
               const d = playDateAtLocalNoon(leadMine.play_date);
-              const date = d ? d.toLocaleDateString(i18n.language, { day: 'numeric', month: 'short' }) : '';
+              const date = d ? d.toLocaleDateString(i18n?.language, { day: 'numeric', month: 'short' }) : '';
               const youWord = <span style={{ color: A.INK, fontWeight: 700 }}>{t('amateur.leaderboards.slab.you')}</span>;
               const raw = leadMine.course_name
                 ? t('amateur.leaderboards.slab.onBoard', { you: MARK_Y, course: leadMine.course_name, date })
