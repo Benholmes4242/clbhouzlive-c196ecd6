@@ -112,6 +112,13 @@ export function sheetOnlyDiffCount(f: BoardFilters, d: BoardFilters): number {
   return n;
 }
 
+/** Skip the circle rung ONLY on a resolved zero (cached or fresh). Unresolved
+ *  or failed reads run the 4-row probe — it is cheaper than waiting. A cached
+ *  zero that is now stale costs one landing on club/everyone, never a hidden board. */
+export function circleRungSkippable(c: { isSuccess: boolean; isError?: boolean; data?: number | null }): boolean {
+  return c.isSuccess && c.data === 0;
+}
+
 export function useAmateurBoardState(userId: string | undefined, active = true) {
   const [filters, setFilters] = useState<BoardFilters>(UNRESOLVED_FILTERS);
   /* The resolved default. null until the ladder has resolved, and the board
@@ -155,22 +162,18 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
   const rungBFilters = useMemo(() => entryFiltersFor(probeScopes[1]), [probeScopes]);
   /* A rung whose scope cannot return rows is skipped outright — no query.
      Club with no primary_club_id is the common case. */
-  /* Circle is skipped only on a SETTLED zero (fresh fetch done). Unresolved is
-     not zero; a failed count is unknown, so the rung still runs. */
-  const circleSettled = circle.isError || (circle.isSuccess && !circle.isFetching);
-  const circleEmpty = circle.isSuccess && !circle.isFetching && circle.data === 0;
+  /* OPPORTUNISTIC circle skip: consulted only if the count has already
+     resolved; the ladder never waits for it. */
+  const circleEmpty = circleRungSkippable(circle);
   const rungApplies = (k: ScopeKey) =>
     k === 'club' ? !!homeClub.clubId : k === 'circle' ? !circleEmpty : true;
-  /* A rung's skip is decidable once the fact it depends on is known. */
-  const rungKnown = (k: ScopeKey) => (k === 'club' ? homeClub.ready : k === 'circle' ? circleSettled : true);
-  const ladderOn = !!userId && active && entry === null && homeClub.ready && handicapResolved
-    && (!probeScopes.includes('circle') || circleSettled);
+  const ladderOn = !!userId && active && entry === null && homeClub.ready && handicapResolved;
 
   const rungA = useBoardPage(userId, entryBoard, rungAFilters, {
     limit: PROBE_FETCH,
     enabled: ladderOn && rungApplies(probeScopes[0]),
   });
-  const rungASkipped = rungKnown(probeScopes[0]) && !rungApplies(probeScopes[0]);
+  const rungASkipped = homeClub.ready && !rungApplies(probeScopes[0]);
   const rungASettled = rungASkipped || rungA.isSuccess || rungA.isError;
   const rungAOk = !rungASkipped && rungA.isSuccess && (rungA.data?.rows.length ?? 0) >= CIRCLE_ROW_FLOOR;
 
@@ -178,7 +181,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
     limit: PROBE_FETCH,
     enabled: ladderOn && rungASettled && !rungAOk && rungApplies(probeScopes[1]),
   });
-  const rungBSkipped = rungKnown(probeScopes[1]) && !rungApplies(probeScopes[1]);
+  const rungBSkipped = homeClub.ready && !rungApplies(probeScopes[1]);
   const rungBSettled = rungBSkipped || rungB.isSuccess || rungB.isError;
   const rungBOk = !rungBSkipped && rungB.isSuccess && (rungB.data?.rows.length ?? 0) >= CIRCLE_ROW_FLOOR;
 
