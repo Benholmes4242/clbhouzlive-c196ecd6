@@ -33,7 +33,7 @@ const CTA_LABEL_KEYS: { key: string; labelKey: string }[] = [
 ];
 
 function ctaLabelKey(state: HeroState): string {
-  if (state.kind === 'live') return 'overview.leaderboardBand.ctaLive';
+  if (state.kind === 'live' || state.kind === 'suspended') return 'overview.leaderboardBand.ctaLive';
   if (state.kind === 'results') {
     if (state.variant === 'cancelled') return 'overview.leaderboardBand.ctaCancelled';
     if (state.variant === 'awaiting-playoff') return 'overview.leaderboardBand.ctaAwaitingPlayoff';
@@ -329,7 +329,7 @@ export function LeaderboardBand({
     }
   } else {
     // Upcoming
-    if (state.variant === 'imminent' && teeTimes && teeTimes.length > 0) {
+    if (state.kind === 'upcoming' && state.variant === 'imminent' && teeTimes && teeTimes.length > 0) {
       const fourGroups = teeTimes.slice(0, 4);
       body = (
         <>

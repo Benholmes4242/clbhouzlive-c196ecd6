@@ -66,7 +66,9 @@ export function tournamentHeadline({
   const facts = marginFacts(leaderboard);
   const leader = playerName(facts.leaders[0]);
 
-  if (state.kind === 'live') {
+  // Suspended reads as live until Phase 2 gives it its own sentence: the
+  // scores are live scores, and it must never read as a result.
+  if (state.kind === 'live' || state.kind === 'suspended') {
     if (facts.leaders.length > 1) {
       const first = playerName(facts.leaders[0]);
       const second = playerName(facts.leaders[1]);
