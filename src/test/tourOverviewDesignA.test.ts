@@ -8,7 +8,7 @@ import { BOARD_GEOMETRY, BoardTable, computeBoardColumns, type BoardEntry } from
 import { formatOverviewDateRange, getOverviewCountdown, overviewChampionScoreLabel } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
-import { MiniBoard, heroBoardColumns, shouldShowPrize } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
+import { MiniBoard, heroBoardColumns, heroTieRoles, shouldShowPrize } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
 import { isAlsoThisWeek, shouldShowAlsoThisWeekFigures, statusFor } from '@/features/tourhub/overview/sections/AlsoThisWeek';
@@ -321,16 +321,46 @@ describe('our picks trophy', () => {
 
 describe('heroBoardColumns', () => {
   it('live, one round: THRU only', () => {
-    expect(heroBoardColumns({ roundCount: 1, roundInProgress: true, completed: false })).toEqual({ today: false, thru: true, rounds: false });
+    expect(heroBoardColumns({ roundCount: 1, roundInProgress: true, completed: false })).toEqual({ today: false, thru: true, rounds: false, mov: false });
   });
   it('live, two or more rounds: TODAY and THRU', () => {
-    expect(heroBoardColumns({ roundCount: 2, roundInProgress: true, completed: false })).toEqual({ today: true, thru: true, rounds: false });
+    expect(heroBoardColumns({ roundCount: 2, roundInProgress: true, completed: false })).toEqual({ today: true, thru: true, rounds: false, mov: false });
   });
   it('not live, two or more rounds: round columns', () => {
-    expect(heroBoardColumns({ roundCount: 3, roundInProgress: false, completed: true })).toEqual({ today: false, thru: false, rounds: true });
+    expect(heroBoardColumns({ roundCount: 3, roundInProgress: false, completed: true })).toEqual({ today: false, thru: false, rounds: true, mov: false });
   });
   it('not live, one round or fewer: neither', () => {
-    expect(heroBoardColumns({ roundCount: 1, roundInProgress: false, completed: false })).toEqual({ today: false, thru: false, rounds: false });
+    expect(heroBoardColumns({ roundCount: 1, roundInProgress: false, completed: false })).toEqual({ today: false, thru: false, rounds: false, mov: false });
+  });
+});
+
+describe('hero board MOV rule', () => {
+  it('live from round two with movement: MOV shows', () => {
+    expect(heroBoardColumns({ roundCount: 2, roundInProgress: true, completed: false, hasMovement: true }).mov).toBe(true);
+  });
+  it('round one: no MOV even with data', () => {
+    expect(heroBoardColumns({ roundCount: 1, roundInProgress: true, completed: false, hasMovement: true }).mov).toBe(false);
+  });
+  it('completed: no MOV', () => {
+    expect(heroBoardColumns({ roundCount: 4, roundInProgress: false, completed: true, hasMovement: true }).mov).toBe(false);
+  });
+  it('no movement data: no MOV', () => {
+    expect(heroBoardColumns({ roundCount: 3, roundInProgress: true, completed: false, hasMovement: false }).mov).toBe(false);
+  });
+});
+
+describe('heroTieRoles', () => {
+  it('T1 T1 T1 T4 T4 is two groups', () => {
+    expect(heroTieRoles([1, 1, 1, 4, 4].map((position) => ({ position })))).toEqual(['first', 'middle', 'last', 'first', 'last']);
+  });
+  it('all five tied is one group', () => {
+    expect(heroTieRoles([2, 2, 2, 2, 2].map((position) => ({ position })))).toEqual(['first', 'middle', 'middle', 'middle', 'last']);
+  });
+  it('a tie continuing past the limit ends on the last visible row; a lone visible tied row is solo', () => {
+    expect(heroTieRoles([1, 2, 3, 3, 5].map((position) => ({ position })))).toEqual(['solo', 'solo', 'first', 'last', 'solo']);
+  });
+  it('missed-cut rows never group', () => {
+    expect(heroTieRoles([{ position: 70, status: 'MC' }, { position: 70, status: 'MC' }])).toEqual(['solo', 'solo']);
   });
 });
 
