@@ -1893,6 +1893,7 @@ class VideoEngineImpl {
     this.sameElementReturn.delete(b);
     // The old 'a' content (now under id b) is paused and parked.
     la.wantPlay = false;
+    this.clearPlayWatchdog(a);
     this.clearPlayWatchdog(b);
     if (!la.el.paused) la.el.pause();
     const host = ensureHiddenHost();
