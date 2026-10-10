@@ -8,8 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { FIGS, SANS } from './tokens';
 import { BOARD_LABELS, boardCountsRounds, type BoardFilters, type BoardKey } from './boardFilters';
 import { boardRpcArgs, type BoardRow } from './hooks/useBoardPage';
-import { BoardHeaderRow, BoardRowView, boardColumns } from './BoardRows';
-import { playDateAtLocalNoon, relativeDayFull } from './discoverWhen';
+import { BoardDaySeparator, BoardHeaderRow, BoardRowView, boardColumns } from './BoardRows';
+import { dayLadder } from './discoverWhen';
 
 /**
  * SEE ALL (BRIEF_DISCOVER_FILTER_LED_BOARD S5.1).
@@ -51,7 +51,7 @@ export function BoardSeeAllSheet({
   title,
   onRowPress,
 }: BoardSeeAllSheetProps) {
-  const { t } = useTranslation('courses');
+  const { t, i18n } = useTranslation('courses');
   const args = boardRpcArgs(userId, board, filters);
 
   const query = useInfiniteQuery({
@@ -75,38 +75,23 @@ export function BoardSeeAllSheet({
   const rows = useMemo(() => (query.data?.pages ?? []).flat(), [query.data]);
   const total = rows.length > 0 ? Number(rows[0].total_count) : 0;
 
-  /* GROUPING IS ON FOR EVERY ROUND BOARD — a deliberate reversal of S4.5, chosen
-     with the consequence seen rendered. Any sheet whose rows carry a play_date
-     groups: all six ranking boards and all five event boards. Rows with no
-     play_date (career / per-course lists) stay flat. The ranked POS column and
-     the figure columns are retained so the member still sees where a round sits
-     on the whole board; the cost is that the first group does not open on
-     position 1. Within a group rows keep the board's own order and POS is never
-     renumbered.
-     SHEET GROUPED, PAGE DATED: the group header states when, so the row's second
-     line here is the course alone. The page's flat board leads its second line
-     with the date instead — do not "fix" either to match the other. */
-  const grouped = rows.length > 0 && rows.some((r) => !!r.play_date);
-  /* Event boards rank on the date itself, so their value column stays hidden. */
-  const hideValue = boardColumns(board).valueIsText;
+  /* Phase 9.8 — THE DAY LADDER, FEED GRAMMAR ONLY. The recent board and the
+     four feat boards are date orders and group under the same ladder the lead
+     board uses (Today / Yesterday / This week / Last week / Month). Ranked
+     boards are flat: their order is the rank, and a date header would cut it.
+     This replaces the earlier window-dependent day/month grouping. */
+  const grouped = !boardColumns(board).ranked && rows.length > 0;
   const groups = useMemo(() => {
     if (!grouped) return null;
     const out: { key: string; label: string; rows: BoardRow[] }[] = [];
     for (const r of rows) {
-      const { key, label } = groupFor(filters.window, r.play_date, t as never);
+      const { key, label } = dayLadder(r.play_date, t as never, i18n?.language);
       const last = out[out.length - 1];
       if (last && last.key === key) last.rows.push(r);
       else out.push({ key, label, rows: [r] });
     }
-    /* Newest first; stable sort keeps board order inside each group. */
-    const merged = new Map<string, { key: string; label: string; rows: BoardRow[] }>();
-    for (const g of out) {
-      const m = merged.get(g.key);
-      if (m) m.rows.push(...g.rows);
-      else merged.set(g.key, { ...g, rows: [...g.rows] });
-    }
-    return [...merged.values()].sort((a, b) => (a.key < b.key ? 1 : a.key > b.key ? -1 : 0));
-  }, [grouped, rows, filters.window, t]);
+    return out;
+  }, [grouped, rows, t, i18n?.language]);
 
 
   return (
@@ -155,8 +140,8 @@ export function BoardSeeAllSheet({
           ))}
         </div>
       </div>
-      <div style={{ flexShrink: 0, padding: '8px 16px 0', fontFamily: SANS, ...FIGS }}>
-        <BoardHeaderRow board={board} hideValue={hideValue} />
+      <div style={{ flexShrink: 0, paddingTop: 8, fontFamily: SANS, ...FIGS }}>
+        <BoardHeaderRow board={board} />
       </div>
       <div
         style={{
@@ -166,7 +151,7 @@ export function BoardSeeAllSheet({
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain',
           willChange: 'transform',
-          padding: '0 16px calc(env(safe-area-inset-bottom, 0px) + 24px)',
+          padding: '0 0 calc(env(safe-area-inset-bottom, 0px) + 24px)',
           fontFamily: SANS,
           ...FIGS,
         }}
@@ -174,26 +159,13 @@ export function BoardSeeAllSheet({
         {groups
           ? groups.map((g, gi) => (
               <div key={`${g.key}:${gi}`}>
-                {/* Period and round count, not sticky. POS keeps counting
-                    through the groups: rows carry the RPC's own positions. */}
-                <div
-                  style={{
-                    ...KICKER,
-                    fontSize: 10,
-                    color: A.DIM,
-                    padding: gi === 0 ? '10px 2px 6px' : '18px 2px 6px',
-                  }}
-                >
-                  {g.label} {'\u00B7'}{' '}
-                  {t('discover.filterBoard.nRounds', { count: g.rows.length })}
-                </div>
+                <BoardDaySeparator label={`${g.label} \u00B7 ${t('discover.filterBoard.nRounds', { count: g.rows.length })}`} />
                 {g.rows.map((r) => (
                   <BoardRowView
                     key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
                     row={r}
                     board={board}
                     isSelf={!!userId && r.user_id === userId}
-                    hideValue={hideValue}
                     onPress={onRowPress}
                   />
                 ))}
@@ -236,22 +208,3 @@ export function BoardSeeAllSheet({
 
 export default BoardSeeAllSheet;
 
-/**
- * THE ONE WINDOW -> GROUPING RULE. Short windows ('14', '30') group by day
- * with relativeDayFull; longer windows ('90', 'year', 'all') group by month
- * ("September 2026"), because a header per day over months is noise.
- */
-function groupFor(
-  window: BoardFilters['window'],
-  playDate: string | null | undefined,
-  t: (k: string, o?: any) => string,
-): { key: string; label: string } {
-  const iso = String(playDate ?? '').slice(0, 10);
-  if (window === '14' || window === '30') {
-    return { key: iso, label: relativeDayFull(playDate, t) };
-  }
-  const month = iso.slice(0, 7);
-  const dt = playDateAtLocalNoon(`${month}-01`);
-  const label = !dt ? iso : dt.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-  return { key: month, label };
-}

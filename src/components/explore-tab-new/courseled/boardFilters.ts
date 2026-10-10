@@ -137,23 +137,55 @@ export const SCOPE_OPTIONS: FixedOption<ScopeKey>[] = [
      still resolves in the RPC; we simply stop offering it. */
 ];
 
-/** S3.5 — When. 'year' IS THE CALENDAR YEAR, from 1 January (the RPC's own cutoff). */
-export const WINDOW_OPTIONS: FixedOption<WindowKey>[] = [
-  { key: '14', i18n: 'discover.filterBoard.window.d14', label: 'Last 14 days' },
-  { key: '30', i18n: 'discover.filterBoard.window.d30', label: 'Last 30 days' },
-  { key: '90', i18n: 'discover.filterBoard.window.d90', label: 'Last 90 days' },
-  { key: 'year', i18n: 'discover.filterBoard.window.year', label: 'This year' },
-  { key: 'all', i18n: 'discover.filterBoard.window.all', label: 'All time' },
+/**
+ * S3.5 — When. 'year' IS THE CALENDAR YEAR, from 1 January (the RPC's own cutoff).
+ *
+ * PHASE 9.1 — ONE KEY, THREE RENDERINGS, all on the key here: the control label
+ * (i18n/label), the compact form for middot sample lines (short), and the
+ * sentence phrase for the basis sentence (sentence), which carries its own
+ * preposition. 'all' has no phrase: it takes a whole sentence of its own in each
+ * grammar (9.2). A fourth rendering is a fork.
+ */
+export interface WindowOption extends FixedOption<WindowKey> {
+  short: { i18n: string; label: string };
+  sentence: { i18n: string; label: string } | null;
+}
+
+export const WINDOW_OPTIONS: WindowOption[] = [
+  {
+    key: '14', i18n: 'discover.filterBoard.window.d14', label: 'Last 14 days',
+    short: { i18n: 'discover.filterBoard.windowShort.d14', label: '14 DAYS' },
+    sentence: { i18n: 'discover.filterBoard.windowSentence.d14', label: 'in the last fortnight' },
+  },
+  {
+    key: '30', i18n: 'discover.filterBoard.window.d30', label: 'Last 30 days',
+    short: { i18n: 'discover.filterBoard.windowShort.d30', label: '30 DAYS' },
+    sentence: { i18n: 'discover.filterBoard.windowSentence.d30', label: 'in the last 30 days' },
+  },
+  {
+    key: '90', i18n: 'discover.filterBoard.window.d90', label: 'Last 90 days',
+    short: { i18n: 'discover.filterBoard.windowShort.d90', label: '90 DAYS' },
+    sentence: { i18n: 'discover.filterBoard.windowSentence.d90', label: 'in the last 90 days' },
+  },
+  {
+    key: 'year', i18n: 'discover.filterBoard.window.year', label: 'This year',
+    short: { i18n: 'discover.filterBoard.windowShort.year', label: 'THIS YEAR' },
+    sentence: { i18n: 'discover.filterBoard.windowSentence.year', label: 'this year' },
+  },
+  {
+    key: 'all', i18n: 'discover.filterBoard.window.all', label: 'All time',
+    short: { i18n: 'discover.filterBoard.windowShort.all', label: 'ALL TIME' },
+    sentence: null,
+  },
 ];
 
-/** The window's short form, for the hero rail and the applied line. */
-export const WINDOW_SHORT: Record<WindowKey, { i18n: string; label: string }> = {
-  '14': { i18n: 'discover.filterBoard.windowShort.d14', label: '14 DAYS' },
-  '30': { i18n: 'discover.filterBoard.windowShort.d30', label: '30 DAYS' },
-  '90': { i18n: 'discover.filterBoard.windowShort.d90', label: '90 DAYS' },
-  year: { i18n: 'discover.filterBoard.windowShort.year', label: 'THIS YEAR' },
-  all: { i18n: 'discover.filterBoard.windowShort.all', label: 'ALL TIME' },
-};
+export const windowOption = (key: WindowKey): WindowOption =>
+  WINDOW_OPTIONS.find((o) => o.key === key) ?? WINDOW_OPTIONS[0];
+
+/** The compact form, read by key. A view of WINDOW_OPTIONS, not a second list. */
+export const WINDOW_SHORT: Record<WindowKey, { i18n: string; label: string }> = Object.fromEntries(
+  WINDOW_OPTIONS.map((o) => [o.key, o.short]),
+) as Record<WindowKey, { i18n: string; label: string }>;
 
 /** S3.5 — the three courses SET options. Individual courses are an open list. */
 export const COURSES_SET_OPTIONS: FixedOption<Exclude<CoursesKey, 'one'>>[] = [

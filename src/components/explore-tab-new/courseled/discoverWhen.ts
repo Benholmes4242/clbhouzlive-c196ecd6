@@ -121,3 +121,47 @@ export function relativeDayFull(
   const n = Math.max(1, Math.round(days / 365.25));
   return t('discover.when.fullYearsAgo', { count: n });
 }
+
+/**
+ * THE DAY LADDER (Leaderboards Phase 9.8) — the feed grammar's one grouping,
+ * used by the lead board and the see-all sheet alike:
+ *
+ *   Today / Yesterday / This week / Last week / {Month} / {Month Year}
+ *
+ * "This week" is the current Monday-to-Sunday week, excluding today and
+ * yesterday; "Last week" is the previous Monday-to-Sunday week. Older rows group
+ * by calendar month, with the year only when it is not the current year. Every
+ * date is read through playDateAtLocalNoon, the same base relativeDayCompact uses.
+ * Uppercasing is the caller's.
+ */
+export function dayLadder(
+  iso: string | null | undefined,
+  t: (k: string, o?: any) => string,
+  locale?: string,
+  now: Date = new Date(),
+): { key: string; label: string } {
+  const d = playDateAtLocalNoon(iso);
+  if (!d) return { key: 'none', label: '\u2014' };
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12);
+  const days = Math.round((today.getTime() - d.getTime()) / 86_400_000);
+  if (days <= 0) return { key: 'today', label: t('discover.when.ladder.today') };
+  if (days === 1) return { key: 'yesterday', label: t('discover.when.ladder.yesterday') };
+  /* Monday of the current week, at local noon. getDay(): Sunday = 0. */
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+  if (d.getTime() >= monday.getTime()) return { key: 'thisWeek', label: t('discover.when.ladder.thisWeek') };
+  const lastMonday = new Date(monday);
+  lastMonday.setDate(monday.getDate() - 7);
+  if (d.getTime() >= lastMonday.getTime()) return { key: 'lastWeek', label: t('discover.when.ladder.lastWeek') };
+  const sameYear = d.getFullYear() === today.getFullYear();
+  return {
+    key: `m:${d.getFullYear()}-${d.getMonth()}`,
+    label: d.toLocaleDateString(locale, sameYear ? { month: 'long' } : { month: 'long', year: 'numeric' }),
+  };
+}
+
+/** The row's own date on the sub-line, in the ladder's time base. */
+export function playDateShort(iso: string | null | undefined, locale?: string): string {
+  const d = playDateAtLocalNoon(iso);
+  return d ? d.toLocaleDateString(locale, { day: 'numeric', month: 'short' }) : '';
+}

@@ -136,13 +136,26 @@ describe('Board rail (Phase 1, absorbs the retired BoardPicker tests)', () => {
 });
 
 describe('Scores lead board (Phase 0)', () => {
-  it('a ranked board renders positions and a podium on first', () => {
+  it('a ranked board renders positions, no podium and no column header', () => {
     page('gross', [row(1), row(2), row(3)]);
     const rows = rowsOf();
-    expect(rows[0].hasAttribute('data-board-podium')).toBe(true);
-    expect(rows[1].hasAttribute('data-board-podium')).toBe(false);
+    expect(rows.some((r) => r.hasAttribute('data-board-podium'))).toBe(false);
     expect(rows.map((r) => r.textContent?.match(/^(\d+)/)?.[1])).toEqual(['1', '2', '3']);
-    expect(screen.getByText('POS')).toBeTruthy();
+    expect(screen.queryByText('POS')).toBeNull();
+  });
+
+  it('recent leads with net to par and gross to par behind; no net means gross alone', () => {
+    page('recent', [row(1, { net_score: 70, gross_score: 80 }), row(2, { net_score: null, gross_score: 75 })]);
+    const [a, b] = rowsOf();
+    expect(a.querySelector('[data-board-main]')?.textContent).toBe('\u22122');
+    expect(a.querySelector('[data-board-secondary]')?.textContent).toBe('+8');
+    expect(b.querySelector('[data-board-main]')?.textContent).toBe('+3');
+    expect(b.querySelector('[data-board-secondary]')).toBeNull();
+  });
+
+  it('the viewing member row carries the amber self tint', () => {
+    page('topar', [row(1), row(2, { user_id: 'viewer', display_name: 'Viewer' })]);
+    expect(rowsOf()[1].style.background).toBe('rgba(247, 147, 30, 0.07)');
   });
 
   it("the 'recent' board renders no positions and no podium", () => {
@@ -164,8 +177,8 @@ describe('Scores lead board (Phase 0)', () => {
     const sheetRow = screen.getAllByRole('button').find((b) => b.textContent?.includes('Member 1'))!;
     const sheetCells = Array.from(sheetRow.querySelectorAll('.tabular-nums')).map((n) => n.textContent);
     expect(pageCells).toEqual(sheetCells);
-    expect(pageCells.at(-1)).toBe('\u22123');
-    expect(pageCells.at(-2)).toBe('69');
+    expect(pageCells.at(-2)).toBe('\u22123');
+    expect(pageCells.at(-1)).toBe('69');
   });
 
   it('the viewing member keeps the score colour law; amber on position and name only', () => {
@@ -173,7 +186,7 @@ describe('Scores lead board (Phase 0)', () => {
     const self = rowsOf()[1];
     const cells = self.querySelectorAll<HTMLElement>('.tabular-nums');
     const pos = cells[0];
-    const value = cells[cells.length - 1];
+    const value = self.querySelector<HTMLElement>('[data-board-main]')!;
     expect(value.textContent).toBe('\u22122');
     expect(value.style.color).toBe(toCss(A.RED));
     expect(pos.style.color).toBe(toCss(A.AMBER));
