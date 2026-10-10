@@ -35,7 +35,7 @@ import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListPr
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
 import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
 
-/** Row value size; the leader's value drops to it when the board's value is a time. */
+/** CompactRow value size (the career, Top 100 and improvement sections). */
 export const ROW_VALUE_SIZE = 14;
 
 /**
