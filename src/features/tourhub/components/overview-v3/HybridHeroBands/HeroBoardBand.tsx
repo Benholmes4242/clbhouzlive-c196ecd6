@@ -62,6 +62,7 @@ import { useTournamentVenueRecord } from '../../../overview/data/useTournamentVe
 import { surnameOf } from '../../../_shared/playerName';
 import { r } from '@/lib/radius';
 import { PicksSheet } from './PicksSheet';
+import type { HeroState } from '../HybridHero.utils';
 
 /**
  * SIX rows. It was five while the board occupied the photo band, because the
