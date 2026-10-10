@@ -200,7 +200,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   const overviewGrid = [
     showOverviewPosition ? `${BOARD_GEOMETRY.pos}px` : null,
     'minmax(0, 1fr)',
-    showHeroToday ? `${BOARD_GEOMETRY.cell}px` : null,
+    showHeroToday ? `${BOARD_GEOMETRY.today}px` : null,
     showHeroThru ? `${BOARD_GEOMETRY.thru}px` : null,
     heroRoundTracks || null,
     `${BOARD_GEOMETRY.tot}px`,

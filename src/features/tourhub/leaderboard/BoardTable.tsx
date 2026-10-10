@@ -72,7 +72,12 @@ const CANVAS = TOUR_CANVAS;
  *  A width changed in one place must change in both, so there is one place.
  *  The hero differs ONLY in which columns it draws and in its row padding;
  *  it never redefines a width. */
-export const BOARD_GEOMETRY = Object.freeze({ mov: 24, pos: 24, tot: 40, thru: 26, prize: 52, cell: 26, cellFloor: 22, gap: 4 } as const);
+/* A COLUMN IS AS WIDE AS THE WIDEST THING IN IT, AND THAT INCLUDES ITS OWN
+   HEADER. At 10px/700/0.12em uppercase, "TODAY" measures 39.9px and "THRU"
+   32.6px; both are right-aligned, so a track narrower than its label spills
+   leftwards into the column beside it. `cell` (26) is a ROUND's figure —
+   "R1", "-3" — and TODAY is not a round, so it has its own width here. */
+export const BOARD_GEOMETRY = Object.freeze({ mov: 24, pos: 24, tot: 40, today: 40, thru: 34, prize: 52, cell: 26, cellFloor: 22, gap: 4 } as const);
 
 /** TIGHTENED GEOMETRY (2.4) — local aliases of BOARD_GEOMETRY, never numbers of their own. */
 const MOV_W = BOARD_GEOMETRY.mov;
