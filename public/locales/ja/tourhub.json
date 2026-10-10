@@ -78,339 +78,69 @@
       "fullLeaderboard": "リーダーボード全体"
     },
     "fieldStrength": {
-      "eyebrow": "FIELD",
-      "playersCount": "{{count}} players",
-      "topRankedLine": "{{topRanked}} of world top {{threshold}}",
-      "inFieldLabel": "IN FIELD"
+      "playersCount": "{{count}} players"
     },
     "champion": {
-      "scoreLabelToPar": "TO PAR",
       "eyebrow": "CHAMPION"
     },
     "rankings": {
       "sectionEyebrow": "World rankings",
       "linkLabel": "Full rankings",
-      "worldNo1Label": "World No. 1",
-      "pointsLabel": "POINTS",
       "boards": {
         "owgr": "Official World Golf Ranking",
         "r2d": "Race to Dubai",
         "rolex": "Rolex Rankings"
       },
-      "seasonNo1Label": "Season No. 1",
       "movementBasis": "Positions moved over {{days}} days"
     },
     "leaderRow": {
       "tiedAtTop_one": "{{count}} tied at the top",
       "tiedAtTop_other": "{{count}} tied at the top"
     },
-    "photoBand": {
-      "insightKickerCourse": "COURSE INTELLIGENCE",
-      "insightKickerResult": "HOW IT FINISHED",
-      "wonBy": "Won by {{winnerName}}"
-    },
     "trajectorySparkline": {
       "ariaLabel": "Trajectory: rounds {{rounds}}",
       "ariaLabelRoundOf": "Trajectory: rounds {{rounds}} (round {{current}} of {{total}})"
-    },
-    "statWatch": {
-      "eyebrow": "Stat watch",
-      "allStatsLink": "All stats",
-      "seasonLeaders": "Season leaders · {{tourLabel}}"
-    },
-    "sectionTourLens": {
-      "allTours": "All Tours",
-      "filterAriaLabel": "Filter section by tour"
     },
     "page": {
       "offlineBanner": "You're offline. Some data may be outdated."
     },
     "hero": {
-      "prevAria": "Previous tournament",
-      "nextAria": "Next tournament",
-      "counter": "{{current}} / {{total}}",
       "stateLive": "ライブ",
       "stateFinal": "結果",
-      "stateUpcoming": "予定",
-      "factRound": "ラウンド",
-      "factThru": "経過",
-      "factMargin": "差",
-      "factPlayoff": "プレーオフ"
+      "factRound": "ラウンド"
     },
     "leaderboardBand": {
       "ctaUpcoming": "View tournament",
       "fieldEyebrow": "Field"
     },
     "comingUp": {
-      "eyebrow": "What's coming up",
       "linkLabel": "Full schedule",
-      "chipPlayoffs": "Playoffs",
       "daysLabel": "DAYS",
       "venueDefendsSep": " · {{name}} defends",
-      "subline": "ツアースケジュール",
-      "pageAria": "{{total}} ページ中 {{page}} ページ"
+      "subline": "ツアースケジュール"
     },
     "onTheCourse": {
       "eyebrow": "On the course",
       "rightMeta_one": "{{count}} group",
       "rightMeta_other": "{{count}} groups",
-      "rightMetaWithRound_one": "{{count}} group · R{{round}}",
-      "rightMetaWithRound_other": "{{count}} groups · R{{round}}",
-      "roundOnly": "R{{round}}",
-      "teeLabel": "TEE {{time}}",
       "thruLabel": "THRU {{value}}",
-      "holeLabel": "HOLE {{hole}}",
-      "featuredBadge": "★ FEATURED",
       "allGroups": "All groups",
       "fullField": "full field",
       "moreCount": "{{count}} more",
       "fullFieldDivider": "FULL FIELD",
-      "backLine1": "Back to",
-      "backLine2": "featured",
       "showAllAria": "Show all groups",
-      "backAria": "Back to featured",
-      "rightMetaWithRound": "{{count}} groups · R{{round}}",
-      "roundShort": "R{{round}}",
       "teeTimeLabel": "TEE {{time}}",
       "holeLabelSep": " · HOLE {{hole}}",
       "backToFeaturedAria": "Back to featured",
       "backToLine1": "Back to",
       "backToLine2": "featured",
-      "fieldAverageToday": "平均スコア",
-      "fromNRoundsIn": "{{n}}ラウンドから",
-      "lowRoundLabel": "ベストラウンド",
-      "awaitingPlayers": "{{range}} は集計待ち",
-      "nShare_one": "{{count}} players",
-      "nShare_other": "{{count}} players",
-      "playingHardest": "最も難しい",
-      "playingEasiest": "最も易しい",
-      "parShort": "パー {{par}}",
       "featuredGroupLabel": "注目の組",
-      "underParTodayLabel": "本日アンダーパー",
-      "underParTodayValue": "{{m}}人中{{n}}人",
-      "underParTodaySub": "現在までの選手",
-      "axisEasier": "易しい",
-      "axisHarder": "難しい",
       "finishedLabel": "終了",
       "todaySuffix": "本日 {{value}}",
-      "fieldAverageWaiting": "{{n}}ラウンドが揃い次第、フィールド平均を表示",
-      "courseShapeLabel": "コースの傾向",
-      "ourPicksLabel": "注目選手",
-      "ourPicksAll": "すべての注目選手と根拠",
-      "figuresBasis": "3つの数値はすべてラウンド{{round}}の終了済み{{n}}ラウンドに基づきます。",
-      "figuresBasisLowOnly": "ベストスコアはラウンド{{round}}の終了済みラウンドに基づきます。フィールド平均には数が足りません。",
-      "figuresBasisLow": "ベストスコア: {{names}}。",
       "rightMeta": "{{count}}組"
-    },
-    "tiPicks": {
-      "eyebrow": "Tournament intelligence",
-      "subline": "Our picks for the tournament",
-      "explainer": "AIは競技が始まる前にフィールドを読み解きます。このコースでの過去の成績、現在の調子、故障に関する報道、天候、そしてドライバーの飛距離、正確性、ショートゲームといった選手データを分析し、その週の予想を導き出します。",
-      "linkLabel": "All picks",
-      "confidenceHigh": "High",
-      "confidenceSolid": "Solid",
-      "confidenceLive": "Live",
-      "theCase": "The case ›",
-      "pickLabel": "Pick {{rank}}",
-      "won": "Won",
-      "hit": "Hit",
-      "miss": "Miss",
-      "missWithCut": "Miss · {{cut}}",
-      "wonBadge": "WON · {{score}}",
-      "hitBadge": "HIT · {{pos}} · {{score}}",
-      "missBadge": "MISS · {{pos}} · {{score}}",
-      "missShort": "MISS",
-      "missWithCutBadge": "MISS · {{cut}}",
-      "thruLabel": "thru {{value}}",
-      "caseFor": "The case for",
-      "boardTitle": "The board",
-      "boardMeta_one": "{{count}} PICK · TAP FOR THE CASE",
-      "boardMeta_other": "{{count}} PICKS · TAP FOR THE CASE",
-      "courseFit": "course fit {{score}}",
-      "concernLabel": "Concern",
-      "finalLine": "{{pos}} · {{score}}",
-      "confidence": {
-        "high": "High",
-        "solid": "Solid",
-        "live": "Live"
-      },
-      "verdict": {
-        "won": "WON · {{score}}",
-        "hit": "HIT · {{pos}} · {{score}}",
-        "miss": "MISS · {{pos}} · {{score}}",
-        "missOnly": "MISS",
-        "missCut": "MISS · {{cut}}"
-      },
-      "chip": {
-        "won": "Won",
-        "hit": "Hit",
-        "miss": "Miss",
-        "missCut": "Miss · {{cut}}"
-      },
-      "card": {
-        "theCase": "The case ›",
-        "pickLabel": "Pick {{rank}}",
-        "pickOf": "予想 {{n}}／{{total}}",
-        "courseFitLabel": "Course fit"
-      },
-      "case": {
-        "eyebrow": "The case for",
-        "concernLabel": "Concern",
-        "courseFit": "course fit {{score}}"
-      },
-      "sheet": {
-        "picksHeader": "{{count}} PICKS · TAP FOR THE CASE",
-        "title": "The board"
-      },
-      "thru": {
-        "finished": "F",
-        "thruN": "thru {{n}}"
-      },
-      "thruSep": " · {{value}}",
-      "board": {
-        "methodology": "予想は第1打の前に確定し、その後変更されません。判定は最終リーダーボードで確定します。"
-      },
-      "method": {
-        "heading": "選出の方法",
-        "lede": "AIは競技が始まる前にフィールドを読み解きます。このコースでの過去の成績、現在の調子、故障に関する報道、天候、そしてドライバーの飛距離、正確性、ショートゲームといった選手データを重み付けし、その週の予想を導き出します。",
-        "playerLabel": "選手",
-        "playerItems": [
-          "ドライバー飛距離",
-          "フェアウェイキープ率",
-          "パーオン率",
-          "スクランブリング",
-          "パッティング",
-          "ストロークゲインド: ティーショット",
-          "ストロークゲインド: アプローチショット",
-          "ストロークゲインド: グリーン周り",
-          "ストロークゲインド: パッティング",
-          "ストロークゲインド: 合計",
-          "1ラウンド平均バーディー数",
-          "平均ストローク"
-        ],
-        "courseLabel": "コース",
-        "courseItems": [
-          "この地での過去5年の成績",
-          "この会場で実際に勝ったスコア",
-          "パー、距離、コースタイプ"
-        ],
-        "weekLabel": "今週",
-        "weekItems": [
-          "直近4試合の調子",
-          "確定した棄権と故障",
-          "風と雨の予報",
-          "フィールドの強さ"
-        ],
-        "rules": [
-          "初日のティオフ前に確定",
-          "後から変更しない",
-          "最終リーダーボードで採点"
-        ],
-        "closing": "Tournament Intelligence は分析であり、助言ではありません。"
-      }
-    },
-    "collegeFranchise": {
-      "eyebrow": "COLLEGE FRANCHISE",
-      "linkLabel": "All franchises",
-      "vs": "VS",
-      "tugLabel": "SEASON ALUMNI EARNINGS",
-      "captainLabel": "· CAPTAIN",
-      "onTour_one": "{{count}} on tour",
-      "onTour_other": "{{count}} on tour",
-      "onTourCaptainSuffix": " · {{name}} captains",
-      "headlineFallbackWide": "{{leader}} runs away with it.",
-      "headlineFallbackClose": "{{leader}} leads. {{chaser}} is closing.",
-      "captainSuffix": "· CAPTAIN",
-      "headlineRunaway": "<0>{{leader}} runs away with it.</0>",
-      "headlineClosing": "<0>{{leader}} leads. {{chaser}} is closing.</0>",
-      "rowMetaWithCaptain": "{{count}} on tour · {{captain}} captains",
-      "rowMeta": "{{count}} on tour",
-      "summaryWide": "<0>{{leader}}</0> leads all franchises on {{amount}} in season alumni earnings, <1>{{gap}}</1> clear of {{chaser}}.",
-      "summaryClose": "<0>{{leader}}</0> leads all franchises on {{amount}}, with just <1>{{gap}}</1> between them and {{chaser}}.",
-      "allAction": "ALL FRANCHISES",
-      "earningsBasis": "出身大学ごとのシーズン獲得賞金。"
-    },
-    "cinematic": {
-      "championEyebrow": "★ Champion",
-      "championLabel": "Champion",
-      "defendingChampionEyebrow": "★ Defending champion",
-      "defendingChampionLabel": "Defending Champion",
-      "defendingChampionYearLabel": "{{year}} Defending Champion",
-      "wonYearScore": "Won {{year}} · {{score}}",
-      "wonInPlayoff": "Won in playoff",
-      "wonByMargin": "Won by {{margin}}",
-      "finalResult": "FINAL RESULT",
-      "finalResults": "Final results",
-      "finalLeaderboardCount": "FINAL LEADERBOARD · {{count}}",
-      "fullLeaderboard": "Full leaderboard",
-      "fullLeaderboardWithField_one": "Full leaderboard · {{count}} player",
-      "fullLeaderboardWithField_other": "Full leaderboard · {{count}} players",
-      "viewTournament": "View tournament",
-      "viewTournamentWithField_one": "View tournament · {{count}} in the field",
-      "viewTournamentWithField_other": "View tournament · {{count}} in the field",
-      "openTournamentAria": "Open tournament",
-      "openLeaderboardAria": "Open leaderboard",
-      "openFullLeaderboardAria": "Open full leaderboard",
-      "finalTournamentAria": "Final tournament",
-      "finalLeaderboardAria": "Final leaderboard",
-      "viewTournamentAria": "View tournament",
-      "majorAria": "Major championship",
-      "eyebrowPlayoff": "PLAYOFF",
-      "eyebrowFinal": "🏆 FINAL",
-      "eyebrowUpcoming": "UPCOMING",
-      "eyebrowUpcomingMajor": "UPCOMING · MAJOR CHAMPIONSHIP",
-      "eyebrowSuffix": " · {{tour}}",
-      "countdownHoursLabel": "HRS",
-      "countdownMinutesLabel": "MIN",
-      "teeingOffSoon": "Teeing off soon",
-      "teesOffIn": "TEES OFF IN",
-      "roundAwaitingScores": "Round {{round}} · Awaiting scores",
-      "fieldPreviewPlayers_one": "{{count}} player",
-      "fieldPreviewPlayers_other": "{{count}} players",
-      "topRankedWorld": " · #{{rank}} world",
-      "inTheField_one": "{{count}} in the field",
-      "inTheField_other": "{{count}} in the field",
-      "ctaTournament": "TOURNAMENT",
-      "colToday": "TODAY",
-      "colTotal": "TOTAL",
-      "colTotalShort": "TOT",
-      "colThru": "THRU",
-      "colYardsFull": "YARDS",
-      "tiedForLead_one": "{{count}} tied for the lead",
-      "tiedForLead_other": "{{count}} tied for the lead",
-      "playersTiedCount_one": "{{count}} player",
-      "playersTiedCount_other": "{{count}} players",
-      "inPlayoffCount_one": "{{count}} in playoff",
-      "inPlayoffCount_other": "{{count}} in playoff",
-      "fieldStrengthEyebrow": "Field Strength"
-    },
-    "hybridHero": {
-      "majorChampionship": "MAJOR CHAMPIONSHIP",
-      "teamFallback": "Team"
-    },
-    "status": {
-      "finished": "終了",
-      "thru": "{{n}}ホール"
     },
     "board": {
       "clbhouzPick": "clbhouz の注目選手"
-    },
-    "venueRecord": {
-      "kicker": "Record book",
-      "clubhouseRating": "Clubhouse",
-      "reviews": "Review",
-      "top100": "Top 100",
-      "tooFewRatings": "Kono course wo hyoka shita member ga mada sukunai desu.",
-      "rateAction": "KONO COURSE WO HYOKA",
-      "ratingFrom_one": "{{count}} ken no hyoka",
-      "ratingFrom_other": "{{count}} ken no hyoka",
-      "sectionKicker": "clbhouz: konshu no kaijo",
-      "viewCourse": "Course wo miru",
-      "ratingLabel": "Member hyoka",
-      "basis_one": "Play shita member {{count}} ken no hyoka.",
-      "basis_other": "Play shita member {{count}} ken no hyoka.",
-      "seeAction": "COURSE WO MIRU",
-      "playedLabel": "Play shita member"
     },
     "magazine": {
       "scoreEven": "イーブンパー",

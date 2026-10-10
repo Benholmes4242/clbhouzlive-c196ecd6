@@ -78,64 +78,36 @@
       "fullLeaderboard": "[Full leaderboard]"
     },
     "fieldStrength": {
-      "eyebrow": "[~~ƑÍÉĻĐ~~]",
-      "playersCount": "[~~{{count}} ƥļáýéřš~~]",
-      "topRankedLine": "[~~{{topRanked}} őƒ ŵőřļđ ţőƥ {{threshold}}~~]",
-      "inFieldLabel": "[~~ÍÑ ƑÍÉĻĐ~~]"
+      "playersCount": "[~~{{count}} ƥļáýéřš~~]"
     },
     "champion": {
-      "scoreLabelToPar": "[~~ŢŐ ƤÁŘ~~]",
       "eyebrow": "[~~ĈĤÁṀƤÍŐÑ~~]"
     },
     "rankings": {
       "sectionEyebrow": "[~~Ŵőřļđ řáñǩíñĝš~~]",
       "linkLabel": "[~~Ƒúļļ řáñǩíñĝš~~]",
-      "worldNo1Label": "[~~Ŵőřļđ Ñő. 1~~]",
-      "pointsLabel": "[~~ƤŐÍÑŢŠ~~]",
       "boards": {
         "owgr": "[~~Őƒƒíĉíáļ Ŵőřļđ Ĝőļƒ Řáñǩíñĝ~~]",
         "r2d": "[~~Řáĉé ţő Đúƀáí~~]",
         "rolex": "[~~Řőļéẋ Řáñǩíñĝš~~]"
       },
-      "seasonNo1Label": "[~~Season No. 1~~]",
       "movementBasis": "[~~Ƥőšíţíőñš mővéđ ővéř {{days}} đáýš~~]"
     },
     "leaderRow": {
       "tiedAtTop_one": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]",
       "tiedAtTop_other": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]"
     },
-    "photoBand": {
-      "insightKickerCourse": "COURSE INTELLIGENCE",
-      "insightKickerResult": "HOW IT FINISHED",
-      "wonBy": "[~~Ŵőñ ƀý {{winnerName}}~~]"
-    },
     "trajectorySparkline": {
       "ariaLabel": "[~~Ţřáĵéĉţőřý: řőúñđš {{rounds}}~~]",
       "ariaLabelRoundOf": "[~~Ţřáĵéĉţőřý: řőúñđš {{rounds}} (řőúñđ {{current}} őƒ {{total}})~~]"
-    },
-    "statWatch": {
-      "eyebrow": "[~~Šţáţ ŵáţĉĥ~~]",
-      "allStatsLink": "[~~Áļļ šţáţš~~]",
-      "seasonLeaders": "[~~Šéášőñ ļéáđéřš · {{tourLabel}}~~]"
-    },
-    "sectionTourLens": {
-      "allTours": "[~~Áļļ Ţőúřš~~]",
-      "filterAriaLabel": "[~~Ƒíļţéř šéĉţíőñ ƀý ţőúř~~]"
     },
     "page": {
       "offlineBanner": "[~~Ýőú'řé őƒƒļíñé. Šőɱé đáţá ɱáý ƀé őúţđáţéđ.~~]"
     },
     "hero": {
-      "prevAria": "[~~Ƥřéṽíőúš ţőúřñáɱéñţ~~]",
-      "nextAria": "[~~Ñéẋţ ţőúřñáɱéñţ~~]",
-      "counter": "[~~{{current}} / {{total}}~~]",
       "stateLive": "[LIVE]",
       "stateFinal": "[~~ŘÉŠÚĻŢŠ~~]",
-      "stateUpcoming": "[UPCOMING]",
       "factRound": "[ROUND]",
-      "factThru": "[THRU]",
-      "factMargin": "[MARGIN]",
-      "factPlayoff": "[PLAYOFF]",
       "ourPicks": "[OUR TOURNAMENT PICKS]",
       "leaderLabel": "[Leader]",
       "stateSuspended": "[SUSPENDED]",
@@ -149,257 +121,30 @@
       "fieldEyebrow": "[~~Ƒíéļđ~~]"
     },
     "comingUp": {
-      "eyebrow": "[~~Ŵĥáţ'š ĉőɱíñĝ úƥ~~]",
       "linkLabel": "[~~Ƒúļļ šĉĥéđúļé~~]",
-      "chipPlayoffs": "[~~Ƥļáýőƒƒš~~]",
       "daysLabel": "[~~ĐÁÝŠ~~]",
       "venueDefendsSep": "[~~ · {{name}} đéƒéñđš~~]",
-      "subline": "[~~Ţĥé ţőúŕ šçĥéðúļé~~]",
-      "pageAria": "[Page {{page}} of {{total}}]"
+      "subline": "[~~Ţĥé ţőúŕ šçĥéðúļé~~]"
     },
     "onTheCourse": {
       "eyebrow": "[~~Őñ ţĥé ĉőúřšé~~]",
       "rightMeta_one": "[~~{{count}} ĝřőúƥ~~]",
       "rightMeta_other": "[~~{{count}} ĝřőúƥš~~]",
-      "rightMetaWithRound_one": "[~~{{count}} ĝřőúƥ · Ř{{round}}~~]",
-      "rightMetaWithRound_other": "[~~{{count}} ĝřőúƥš · Ř{{round}}~~]",
-      "roundOnly": "[~~Ř{{round}}~~]",
-      "teeLabel": "[~~ŢÉÉ {{time}}~~]",
       "thruLabel": "[~~ŢĤŘÚ {{value}}~~]",
-      "holeLabel": "[~~ĤŐĻÉ {{hole}}~~]",
-      "featuredBadge": "[~~★ ƑÉÁŢÚŘÉĐ~~]",
       "allGroups": "[~~Áļļ ĝřőúƥš~~]",
       "fullField": "[~~ƒúļļ ƒíéļđ~~]",
       "moreCount": "[~~{{count}} ɱőřé~~]",
       "fullFieldDivider": "[~~ƑÚĻĻ ƑÍÉĻĐ~~]",
-      "backLine1": "[~~Ɓáĉǩ ţő~~]",
-      "backLine2": "[~~ƒéáţúřéđ~~]",
       "showAllAria": "[~~Šĥőŵ áļļ ĝřőúƥš~~]",
-      "backAria": "[~~Ɓáĉǩ ţő ƒéáţúřéđ~~]",
-      "rightMetaWithRound": "[~~{{count}} gróúpš · R{{round}}~~]",
-      "roundShort": "[~~R{{round}}~~]",
       "teeTimeLabel": "[~~TÉÉ {{time}}~~]",
       "holeLabelSep": "[~~ · HÓLÉ {{hole}}~~]",
       "backToFeaturedAria": "[~~Báçk tó féátúréd~~]",
       "backToLine1": "[~~Báçk tó~~]",
       "backToLine2": "[~~féátúréd~~]",
-      "fieldAverageToday": "Field Average",
-      "fromNRoundsIn": "from {{n}} rounds",
-      "lowRoundLabel": "Low round",
-      "awaitingPlayers": "{{range}} awaiting players",
-      "nShare_one": "[{{count}} player]",
-      "nShare_other": "[{{count}} players]",
-      "playingHardest": "[Playing hardest]",
-      "playingEasiest": "[Playing easiest]",
-      "parShort": "[Par {{par}}]",
       "featuredGroupLabel": "[Featured group]",
-      "underParTodayLabel": "UNDER PAR TODAY",
-      "underParTodayValue": "{{n}} of {{m}}",
-      "underParTodaySub": "players in",
-      "axisEasier": "[Easier]",
-      "axisHarder": "[Harder]",
       "finishedLabel": "[Fïnïshéd]",
       "todaySuffix": "[{{value}} tódáý]",
-      "fieldAverageWaiting": "[Field average once {{n}} rounds are in]",
-      "courseShapeLabel": "[Çöûrsé shåpé]",
-      "ourPicksLabel": "[Our picks]",
-      "ourPicksAll": "[All picks and the case for each]",
-      "figuresBasis": "[ALL THREE FROM {{n}} COMPLETED ROUNDS IN ROUND {{round}}.]",
-      "figuresBasisLowOnly": "[LOW ROUND FROM COMPLETED ROUNDS IN ROUND {{round}}; TOO FEW FOR A FIELD AVERAGE.]",
-      "figuresBasisLow": "[LOW ROUND: {{names}}.]",
       "rightMeta": "[~~{{count}} ĝřőúƥš~~]"
-    },
-    "tiPicks": {
-      "eyebrow": "[~~Tóúrñáméñt íñtéllígéñçé~~]",
-      "subline": "[~~Óúr píçkš ƒőŕ ţĥé ţőúřñáméñţ~~]",
-      "explainer": "[~~Őúř ÁÍ řéáđš ţĥé ƒíélđ ƀéƒőřé ƥláý ƀéĝíñš. Íţ ŵéíĝĥš ĥíšţőříĉál ƥéřƒőřmáñĉé áţ ţĥé ĉőúřšé, ĉúřřéñţ ƒőřm, íñĵúřý ñéŵš, ŵéáţĥéř áñđ ƥláýéř šţáţš šúĉĥ áš đříṽíñĝ đíšţáñĉé, áĉĉúřáĉý áñđ šĥőřţ ĝámé, ţő ƥřőĵéĉţ íţš ƥíĉǩš ƒőř ţĥé ŵééǩ.~~]",
-      "linkLabel": "[~~Áll píçkš~~]",
-      "confidenceHigh": "[~~Ĥíĝĥ~~]",
-      "confidenceSolid": "[~~Šőļíđ~~]",
-      "confidenceLive": "[~~Ļíṽé~~]",
-      "theCase": "[~~Ţĥé ĉášé ›~~]",
-      "pickLabel": "[~~Ƥíĉǩ {{rank}}~~]",
-      "won": "[~~Ŵőñ~~]",
-      "hit": "[~~Ĥíţ~~]",
-      "miss": "[~~Ṁíšš~~]",
-      "missWithCut": "[~~Ṁíšš · {{cut}}~~]",
-      "wonBadge": "[~~ŴŐÑ · {{score}}~~]",
-      "hitBadge": "[~~ĤÍŢ · {{pos}} · {{score}}~~]",
-      "missBadge": "[~~ṀÍŠŠ · {{pos}} · {{score}}~~]",
-      "missShort": "[~~ṀÍŠŠ~~]",
-      "missWithCutBadge": "[~~ṀÍŠŠ · {{cut}}~~]",
-      "thruLabel": "[~~ţĥřú {{value}}~~]",
-      "caseFor": "[~~Ţĥé ĉášé ƒőř~~]",
-      "boardTitle": "[~~Ţĥé ƀőářđ~~]",
-      "boardMeta_one": "[~~{{count}} ƤÍĈǨ · ŢÁƤ ƑŐŘ ŢĤÉ ĈÁŠÉ~~]",
-      "boardMeta_other": "[~~{{count}} ƤÍĈǨŠ · ŢÁƤ ƑŐŘ ŢĤÉ ĈÁŠÉ~~]",
-      "courseFit": "[~~ĉőúřšé ƒíţ {{score}}~~]",
-      "concernLabel": "[~~Ĉőñĉéřñ~~]",
-      "finalLine": "[~~{{pos}} · {{score}}~~]",
-      "confidence": {
-        "high": "[~~Hígh~~]",
-        "solid": "[~~Šólíd~~]",
-        "live": "[~~Lívé~~]"
-      },
-      "verdict": {
-        "won": "[~~WÓÑ · {{score}}~~]",
-        "hit": "[~~HÍT · {{pos}} · {{score}}~~]",
-        "miss": "[~~MÍŠŠ · {{pos}} · {{score}}~~]",
-        "missOnly": "[~~MÍŠŠ~~]",
-        "missCut": "[~~MÍŠŠ · {{cut}}~~]"
-      },
-      "chip": {
-        "won": "[~~Wóñ~~]",
-        "hit": "[~~Hít~~]",
-        "miss": "[~~Míšš~~]",
-        "missCut": "[~~Míšš · {{cut}}~~]"
-      },
-      "card": {
-        "theCase": "[~~Thé çášé ›~~]",
-        "pickLabel": "[~~Píçk {{rank}}~~]",
-        "pickOf": "[Pîçk {{n}} öf {{total}}]",
-        "courseFitLabel": "[~~Çóúršé fít~~]"
-      },
-      "case": {
-        "eyebrow": "[~~Thé çášé fór~~]",
-        "concernLabel": "[~~Çóñçérñ~~]",
-        "courseFit": "[~~çóúršé fít {{score}}~~]"
-      },
-      "sheet": {
-        "picksHeader": "[~~{{count}} PÍÇKŠ · TÁP FÓR THÉ ÇÁŠÉ~~]",
-        "title": "[~~Thé bóárd~~]"
-      },
-      "thru": {
-        "finished": "[~~F~~]",
-        "thruN": "[~~thrú {{n}}~~]"
-      },
-      "thruSep": "[~~ · {{value}}~~]",
-      "board": {
-        "titleCount_one": "[~~Óúr píçk~~]",
-        "titleCount_other": "[~~Óúr {{count}} píçkš~~]",
-        "methodology": "[~~Ƥíĉǩš ářé lőĉǩéđ ƀéƒőřé ţĥé ƒířšţ ţéé ţímé áñđ ñéṽéř ĉĥáñĝé. Ṽéřđíĉţš šéţţlé ŵíţĥ ţĥé ƒíñál léáđéřƀőářđ.~~]"
-      },
-      "method": {
-        "heading": "[~~Hów wé píçk~~]",
-        "lede": "[~~Óúr ÁÍ réádš thé fíéld béfóré pláy bégíñš. Ít wéíghš híštóríçál pérfórmáñçé át thé çóúršé, çúrréñt fórm, íñjúry ñéwš, wéáthér áñd pláyér štátš šúçh áš drívíñg díštáñçé, áççúráçy áñd šhórt gámé, tó prójéçt ítš píçkš fór thé wéék.~~]",
-        "playerLabel": "[~~Thé pláyér~~]",
-        "playerItems": [
-          "[~~Drívíñg díštáñçé~~]",
-          "[~~Drívíñg áççúráçy~~]",
-          "[~~Grééñš íñ régúlátíóñ~~]",
-          "[~~Sçrámblíñg~~]",
-          "[~~Púttíñg~~]",
-          "[~~Strókéš gáíñéd: óff thé téé~~]",
-          "[~~Strókéš gáíñéd: áppróáçh~~]",
-          "[~~Strókéš gáíñéd: áróúñd thé grééñ~~]",
-          "[~~Strókéš gáíñéd: púttíñg~~]",
-          "[~~Strókéš gáíñéd: tótál~~]",
-          "[~~Bírdíéš pér róúñd~~]",
-          "[~~Sçóríñg ávérágé~~]"
-        ],
-        "courseLabel": "[~~Thé çóúršé~~]",
-        "courseItems": [
-          "[~~Fívé yéárš óf réšúltš héré~~]",
-          "[~~Whát háš áçtúálly wóñ át thíš véñúé~~]",
-          "[~~Pár, léñgth áñd çóúršé typé~~]"
-        ],
-        "weekLabel": "[~~Thíš wéék~~]",
-        "weekItems": [
-          "[~~Fórm óvér thé lášt fóúr évéñtš~~]",
-          "[~~Cóñfírméd wíthdráwálš áñd íñjúríéš~~]",
-          "[~~Wíñd áñd ráíñ fóréçášt~~]",
-          "[~~Stréñgth óf thé fíéld~~]"
-        ],
-        "rules": [
-          "[~~Lóçkéd béfóré thé fíršt téé~~]",
-          "[~~Névér édítéd~~]",
-          "[~~Grádéd óñ thé fíñál léádérbóárd~~]"
-        ],
-        "closing": "[~~Tóúrñáméñt Íñtéllígéñçé íš áñályšíš, ñót ádvíçé.~~]"
-      }
-    },
-    "collegeFranchise": {
-      "eyebrow": "[~~ÇÓLLÉGÉ FRÁÑÇHÍŠÉ~~]",
-      "linkLabel": "[~~Áll fráñçhíšéš~~]",
-      "vs": "[~~VŠ~~]",
-      "tugLabel": "[~~ŠÉÁŠÓÑ ÁLÚMÑÍ ÉÁRÑÍÑGŠ~~]",
-      "captainLabel": "[~~· ĈÁƤŢÁÍÑ~~]",
-      "onTour_one": "[~~{{count}} őñ ţőúř~~]",
-      "onTour_other": "[~~{{count}} őñ ţőúř~~]",
-      "onTourCaptainSuffix": "[~~ · {{name}} ĉáƥţáíñš~~]",
-      "headlineFallbackWide": "[~~{{leader}} řúñš áŵáý ŵíţĥ íţ.~~]",
-      "headlineFallbackClose": "[~~{{leader}} ļéáđš. {{chaser}} íš ĉļőšíñĝ.~~]",
-      "captainSuffix": "[~~· ÇÁPTÁÍÑ~~]",
-      "headlineRunaway": "[~~<0>{{leader}} rúñš áwáy wíth ít.</0>~~]",
-      "headlineClosing": "[~~<0>{{leader}} léádš. {{chaser}} íš çlóšíñg.</0>~~]",
-      "rowMetaWithCaptain": "[~~{{count}} óñ tóúr · {{captain}} çáptáíñš~~]",
-      "rowMeta": "[~~{{count}} óñ tóúr~~]",
-      "summaryWide": "[~~<0>{{leader}}</0> léádš áll fráñçhíšéš óñ {{amount}} íñ šéášóñ álúmñí éárñíñgš, <1>{{gap}}</1> çléár óf {{chaser}}.~~]",
-      "summaryClose": "[~~<0>{{leader}}</0> léádš áll fráñçhíšéš óñ {{amount}}, wíth júšt <1>{{gap}}</1> bétwééñ thém áñd {{chaser}}.~~]",
-      "allAction": "[~~ÁLL FRÁÑÇHÍŠÉŠ~~]",
-      "earningsBasis": "[Şééáşóń éáŕńíńĝş ƀý ţĥé çółłéĝé ţĥéíŕ áłůmńí çámé ţĥŕóůĝĥ.]"
-    },
-    "cinematic": {
-      "championEyebrow": "[!! ★ Chámpíón !!]",
-      "championLabel": "[!! Chámpíón !!]",
-      "defendingChampionEyebrow": "[!! ★ Déféndíng chámpíón !!]",
-      "defendingChampionLabel": "[!! Déféndíng Chámpíón !!]",
-      "defendingChampionYearLabel": "[!! {{year}} Déféndíng Chámpíón !!]",
-      "wonYearScore": "[!! Wón {{year}} · {{score}} !!]",
-      "wonInPlayoff": "[!! Wón ín pláyóff !!]",
-      "wonByMargin": "[!! Wón by {{margin}} !!]",
-      "finalResult": "[!! FÍNÁL RÉSÚLT !!]",
-      "finalResults": "[!! Fínál résúlts !!]",
-      "finalLeaderboardCount": "[!! FÍNÁL LÉÁDÉRBÓÁRD · {{count}} !!]",
-      "fullLeaderboard": "[!! Fúll léádérbóárd !!]",
-      "fullLeaderboardWithField_one": "[!! Fúll léádérbóárd · {{count}} pláyér !!]",
-      "fullLeaderboardWithField_other": "[!! Fúll léádérbóárd · {{count}} pláyérs !!]",
-      "viewTournament": "[!! Víéw tóúrnámént !!]",
-      "viewTournamentWithField_one": "[!! Víéw tóúrnámént · {{count}} ín thé fíéld !!]",
-      "viewTournamentWithField_other": "[!! Víéw tóúrnámént · {{count}} ín thé fíéld !!]",
-      "openTournamentAria": "[!! Ópén tóúrnámént !!]",
-      "openLeaderboardAria": "[!! Ópén léádérbóárd !!]",
-      "openFullLeaderboardAria": "[!! Ópén fúll léádérbóárd !!]",
-      "finalTournamentAria": "[!! Fínál tóúrnámént !!]",
-      "finalLeaderboardAria": "[!! Fínál léádérbóárd !!]",
-      "viewTournamentAria": "[!! Víéw tóúrnámént !!]",
-      "majorAria": "[!! Májór chámpíónshíp !!]",
-      "eyebrowPlayoff": "[!! PLÁYÓFF !!]",
-      "eyebrowFinal": "[!! 🏆 FÍNÁL !!]",
-      "eyebrowUpcoming": "[!! ÚPCÓMÍNG !!]",
-      "eyebrowUpcomingMajor": "[!! ÚPCÓMÍNG · MÁJÓR CHÁMPÍÓNSHÍP !!]",
-      "eyebrowSuffix": "[!!  · {{tour}} !!]",
-      "countdownHoursLabel": "[!! HRS !!]",
-      "countdownMinutesLabel": "[!! MÍN !!]",
-      "teeingOffSoon": "[!! Tééíng óff sóón !!]",
-      "teesOffIn": "[!! TÉÉS ÓFF ÍN !!]",
-      "roundAwaitingScores": "[!! Róúnd {{round}} · Áwáítíng scórés !!]",
-      "fieldPreviewPlayers_one": "[!! {{count}} pláyér !!]",
-      "fieldPreviewPlayers_other": "[!! {{count}} pláyérs !!]",
-      "topRankedWorld": "[!!  · #{{rank}} wórld !!]",
-      "inTheField_one": "[!! {{count}} ín thé fíéld !!]",
-      "inTheField_other": "[!! {{count}} ín thé fíéld !!]",
-      "ctaTournament": "[!! TÓÚRNÁMÉNT !!]",
-      "colToday": "[!! TÓDÁY !!]",
-      "colTotal": "[!! TÓTÁL !!]",
-      "colTotalShort": "[!! TÓT !!]",
-      "colThru": "[!! THRÚ !!]",
-      "colYardsFull": "[!! YÁRDS !!]",
-      "tiedForLead_one": "[!! {{count}} tíéd fór thé léád !!]",
-      "tiedForLead_other": "[!! {{count}} tíéd fór thé léád !!]",
-      "playersTiedCount_one": "[!! {{count}} pláyér !!]",
-      "playersTiedCount_other": "[!! {{count}} pláyérs !!]",
-      "inPlayoffCount_one": "[!! {{count}} ín pláyóff !!]",
-      "inPlayoffCount_other": "[!! {{count}} ín pláyóff !!]",
-      "fieldStrengthEyebrow": "[!! Fíéld Stréngth !!]"
-    },
-    "hybridHero": {
-      "majorChampionship": "[!! MÁJÓR CHÁMPÍÓNSHÍP !!]",
-      "teamFallback": "[!! Téám !!]"
-    },
-    "status": {
-      "finished": "FINISHED",
-      "thru": "THRU {{n}}"
     },
     "board": {
       "clbhouzPick": "[çlbhöûz pïçk]",
@@ -407,21 +152,6 @@
       "teamName": "[{{team}}: {{members}}]"
     },
     "venueRecord": {
-      "kicker": "[The record book]",
-      "clubhouseRating": "[Clubhouse]",
-      "reviews": "[Reviews]",
-      "top100": "[Top 100]",
-      "tooFewRatings": "[Too few members have rated this course yet.]",
-      "rateAction": "[RATE THIS COURSE]",
-      "ratingFrom_one": "[from {{count}} rating]",
-      "ratingFrom_other": "[from {{count}} ratings]",
-      "sectionKicker": "[This week's venue on clbhouz]",
-      "viewCourse": "[View course]",
-      "ratingLabel": "[Members' rating]",
-      "basis_one": "[From {{count}} rating by members who have played it.]",
-      "basis_other": "[From {{count}} ratings by members who have played it.]",
-      "seeAction": "[SEE THE COURSE]",
-      "playedLabel": "[Played it]",
       "course": "[Course]"
     },
     "magazine": {
@@ -486,14 +216,6 @@
       "courseFit": "[COURSE FIT]",
       "howLabel": "[HOW WE PICK]",
       "howIntro": "[Every pick comes from the clbhouz model. It reads the course, scores every player in the field against it, and ranks them. No odds, no bookmakers, no betting data.]",
-      "step1Lead": "[We profile the course.]",
-      "step1Body": "[Yardage, par and the venue's own history give a weighting for each skill — how much driving distance matters here versus approach play, scrambling or putting.]",
-      "step2Lead": "[We score every player in the field against that profile.]",
-      "step2Body": "[Each player's season stats become a percentile against this field, then get weighted by what the course actually asks for. That is the course-fit figure on each pick.]",
-      "step3Lead": "[We weigh fit against form.]",
-      "step3Body": "[Course fit on its own would pick specialists who are playing badly, so recent results and current form are read alongside it.]",
-      "step4Lead": "[We publish three names and leave them there.]",
-      "step4Body": "[The picks go up before a ball is struck and they are not edited afterwards, so you can see when we were wrong.]",
       "whatWinsLabel": "[WHAT WINS HERE]",
       "figDifficulty": "[DIFFICULTY]",
       "footer": "[Analysis, not advice — and never betting advice.]",
