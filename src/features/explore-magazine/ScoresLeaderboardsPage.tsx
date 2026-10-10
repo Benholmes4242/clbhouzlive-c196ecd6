@@ -598,16 +598,18 @@ export function ScoresLeaderboardsPage({
     analyticsEvents.track('feats_window_changed', { window: next });
   };
 
-  /* W.1 — the window swaps the rpc on all four boards; the rpc is in the
+  /* W.1 — the window swaps the rpc on every board; the rpc is in the
      query key, so each window caches separately. Only the selected window runs.
-     best_stableford / best_score_diff are NOT fetched: both RPCs return zero
-     rows for them (they stay in CareerMetric). */
+     The two bests run on the year view only — see the gate at `career`. */
   const [leadWindow, setLeadWindow] = useState<FeatWindow>('year');
   const leadRpc = leadWindow === 'year' ? 'get_year_leaderboard' : 'get_career_leaderboard';
+  const bestsAvailable = leadWindow === 'year';
   const birdiesC = useCareerBoard(userId, 'birdies', CAREER_RAIL_LIMIT, leadRpc);
   const roundsC = useCareerBoard(userId, 'rounds', CAREER_RAIL_LIMIT, leadRpc);
   const sub80C = useCareerBoard(userId, 'sub_80', CAREER_RAIL_LIMIT, leadRpc);
   const eaglesC = useCareerBoard(userId, 'eagles', CAREER_RAIL_LIMIT, leadRpc);
+  const stablefordC = useCareerBoard(userId, 'best_stableford', CAREER_RAIL_LIMIT, leadRpc, bestsAvailable);
+  const scoreDiffC = useCareerBoard(userId, 'best_score_diff', CAREER_RAIL_LIMIT, leadRpc, bestsAvailable);
   /* The tile reads rows 0-1; the sheet it opens reads the same query object. */
   const [leaderSheet, setLeaderSheet] = useState<CareerMetric | null>(null);
   const [top100List, setTop100List] = useState<RankListSlug>(TOP100_DEFAULT);
@@ -712,6 +714,19 @@ export function ScoresLeaderboardsPage({
     { metric: 'rounds', label: t('amateur.leaderboards.career.rounds'), q: roundsC },
     { metric: 'sub_80', label: t('amateur.leaderboards.career.sub80'), q: sub80C },
     { metric: 'eagles', label: t('amateur.leaderboards.career.eagles'), q: eaglesC, noAvg: true },
+    /* THE BESTS GATE. A tile holds its place and reads zero when its absence
+       is a fact about the world, as Rare air's albatross does. These two are
+       absent all time because get_career_leaderboard reads gam_user_milestones,
+       which stores counts, and cannot compute a maximum — that is our gap, not
+       the member's news, so on All time the tile goes rather than announcing
+       our plumbing on screen. They sit LAST so removing them never moves the
+       four tiles before them. */
+    ...(bestsAvailable
+      ? [
+          { metric: 'best_stableford', label: t('amateur.leaderboards.career.bestStableford'), q: stablefordC },
+          { metric: 'best_score_diff', label: t('amateur.leaderboards.career.bestScoreDiff'), q: scoreDiffC },
+        ]
+      : []),
   ] as { metric: CareerMetric; label: string; q: typeof birdiesC; noAvg?: boolean }[];
   /* NOTHING ELSE JOINS THIS RAIL: holes in one / albatrosses are §5, lowest gross §3, bogey-free §5. */
   const careerSettled = career.every((c) => c.q.isFetched);
