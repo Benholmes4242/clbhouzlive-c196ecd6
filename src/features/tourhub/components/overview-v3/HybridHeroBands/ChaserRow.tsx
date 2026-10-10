@@ -1,3 +1,4 @@
+// SALVAGED — claimed by Tour Overview rebuild Phase 2 (imported by PlayoffPendingPanel; awaiting-playoff decision). Do not sweep as unreachable.
 /**
  * ChaserRow + FinishRow — non-leader leaderboard rows.
  * §6.3.3 + §6.3.5 of HYBRID_HERO_IMPLEMENTATION_BRIEF.

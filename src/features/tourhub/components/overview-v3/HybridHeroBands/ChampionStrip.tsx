@@ -204,54 +204,6 @@ export function ChampionStrip({
   );
 }
 
-export function CancelledStrip({ reason }: { reason: string }) {
-  const { t } = useTranslation('tourhub');
-  return (
-    <div
-      style={{
-        background: SURFACE,
-        padding: '14px 20px',
-        minHeight: STRIP_HEIGHT,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 14,
-        borderTop: `0.5px solid ${WHITE_ALPHA_06}`,
-      }}
-    >
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-        <circle cx="10" cy="10" r="9" stroke={STATUS_NEGATIVE} strokeWidth="1.5" />
-        <path d="M6 6L14 14M14 6L6 14" stroke={STATUS_NEGATIVE} strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            fontSize: 10 /* AXIS 10 — HERO BROADCAST EXCEPTION: tracked marker/coordinate over photography (see file header) */,
-            fontWeight: 700,
-            letterSpacing: '0.18em',
-            color: STATUS_NEGATIVE,
-            textTransform: 'uppercase',
-            marginBottom: 2,
-          }}
-        >
-          {t('overview.cancelledStrip.eyebrow')}
-        </div>
-        <div
-          style={{
-            fontSize: 14,
-            fontWeight: 700,
-            color: 'white',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {reason}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 interface PlayoffStripProps {
   count: number;
   score: string;
