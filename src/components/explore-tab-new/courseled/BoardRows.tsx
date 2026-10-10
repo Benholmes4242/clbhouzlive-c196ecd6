@@ -1,3 +1,4 @@
+import { ROW_METRICS } from './rowMetrics';
 import { useTranslation } from 'react-i18next';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -270,7 +271,7 @@ export function BoardAvatar({ row, size = 28 }: { row: Row; size?: number }) {
   );
 }
 
-const POS_W = 28;
+const POS_W = ROW_METRICS.posTrack;
 const VALUE_W = 58;
 const SECOND_W = 46;
 /** Podium avatar and figure — the first row's emphasis on a ranked board. */
@@ -402,7 +403,7 @@ export function BoardRowView({
   const ink = isSelf ? A.AMBER : A.INK;
   const feat = boardFeatMarker(row, board, t);
   const big = !!podium && ranked;
-  const avatar = big ? PODIUM_AVATAR : 28;
+  const avatar = big ? PODIUM_AVATAR : ROW_METRICS.avatar;
 
   return (
     <button
@@ -414,7 +415,7 @@ export function BoardRowView({
         display: 'flex',
         alignItems: 'center',
         gap: 10,
-        padding: big ? '12px 2px' : '6px 2px',
+        padding: big ? '12px 2px' : `${ROW_METRICS.padY}px 2px`,
         borderRadius: big ? 12 : undefined,
         /* The wash states rank; amber remains the viewing member's identity. */
         background: ranked && row.pos === 1 ? LEADER_WASH : 'transparent',
@@ -431,8 +432,8 @@ export function BoardRowView({
             width: POS_W,
             flexShrink: 0,
             textAlign: 'center',
-            fontSize: 13,
-            fontWeight: 700,
+            fontSize: ROW_METRICS.posSize,
+            fontWeight: ROW_METRICS.posWeight,
             color: isSelf ? A.AMBER : A.MUTE,
           }}
         >
@@ -459,13 +460,13 @@ export function BoardRowView({
           style={{
             display: 'block',
             /* §7 ROW NAME — 14 / 600. */
-            fontSize: big ? 16 : 14,
-            fontWeight: big ? 700 : 600,
+            fontSize: big ? 16 : ROW_METRICS.nameSize,
+            fontWeight: big ? 700 : ROW_METRICS.nameWeight,
             color: ink,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
-            lineHeight: big ? '18px' : '14px',
+            lineHeight: big ? '18px' : ROW_METRICS.nameLine,
           }}
         >
           {row.display_name ?? t('discover.aMember')}
@@ -520,8 +521,8 @@ export function BoardRowView({
             width: SECOND_W,
             flexShrink: 0,
             textAlign: 'center',
-            fontSize: 12.5,
-            fontWeight: 700,
+            fontSize: ROW_METRICS.secondarySize,
+            fontWeight: ROW_METRICS.secondaryWeight,
             letterSpacing: '-0.04em',
             color: second.tone,
           }}
@@ -539,7 +540,7 @@ export function BoardRowView({
             /* B4.2 — WORDS at 12.5, FIGURES at 15. VALUE_W stays 58 either way
                (B4.5) so the right edge aligns across boards. */
             /* §7 ROW FIGURE — 16 tabular, -0.04em. Words stay at 12.5. */
-            fontSize: valueIsText ? 12.5 : big ? PODIUM_FIGURE_SIZE : 16,
+            fontSize: valueIsText ? 12.5 : big ? PODIUM_FIGURE_SIZE : ROW_METRICS.figureSize,
             fontWeight: 700,
             letterSpacing: valueIsText ? undefined : '-0.04em',
             /* S1.3 — THE RANKED FIGURE FOLLOWS THE COLOUR LAW, NEVER AMBER:
