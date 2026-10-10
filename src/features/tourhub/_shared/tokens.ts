@@ -99,7 +99,7 @@ export const WHITE_ALPHA_30 = 'rgba(255,255,255,0.30)';      // separator dots, 
 export const WHITE_ALPHA_32 = 'rgba(255,255,255,0.32)';      // pick-card corner chevron
 export const WHITE_ALPHA_45 = 'rgba(255,255,255,0.45)';      // sheet figure labels / footer on dark bg
 export const READING_INK_84 = 'rgba(248,250,252,0.84)';      // long-form reading text on dark sheets
-export const LIVE_INK_BORDER_35 = 'rgba(52,215,127,0.35)';   // green-tinted pill border (ranked model vote)
+export const READING_INK_86 = 'rgba(248,250,252,0.86)';      // long-form prose on dark sheets
 export const WHITE_ALPHA_55 = 'rgba(255,255,255,0.55)';      // tertiary/disabled text on dark bg
 export const WHITE_ALPHA_65 = 'rgba(255,255,255,0.65)';      // secondary text on dark bg
 

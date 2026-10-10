@@ -3,7 +3,8 @@
  *
  * One document, same order whichever card was tapped: header, one section per
  * pick (rank order), the method, footer. Opens at the top; no segments, no
- * pager. Nothing truncates. Absent figures omit their element — never a zero,
+ * pager. No win probability, model identity/count, agreement or confidence
+ * figure appears anywhere. Nothing truncates. Absent figures omit their element — never a zero,
  * a dash or a placeholder.
  */
 import React from 'react';
@@ -16,9 +17,8 @@ import {
   AMBER,
   FONT,
   INK,
-  LIVE_INK,
-  LIVE_INK_BORDER_35,
   READING_INK_84,
+  READING_INK_86,
   WHITE_ALPHA_06,
   WHITE_ALPHA_08,
   WHITE_ALPHA_45,
@@ -38,35 +38,15 @@ const FIGS: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeat
 const LABEL: React.CSSProperties = { fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: WHITE_ALPHA_45 };
 const HAIRLINE: React.CSSProperties = { height: 1, background: WHITE_ALPHA_08, border: 'none', margin: 0 };
 
-function ordinal(n: number, lang: string): string {
-  if (!lang.startsWith('en')) return String(n);
-  const rule = new Intl.PluralRules('en', { type: 'ordinal' }).select(n);
-  const suffix = { one: 'st', two: 'nd', few: 'rd', other: 'th' }[rule as 'one' | 'two' | 'few' | 'other'] ?? 'th';
-  return `${n}${suffix}`;
-}
-
 const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
 const nonEmpty = (v: unknown): v is string => typeof v === 'string' && v.trim().length > 0;
 
 export function PicksSheet({ open, onClose, picks, predictions, eventName, venueName }: PicksSheetProps) {
-  const { t, i18n } = useTranslation('tourhub');
+  const { t } = useTranslation('tourhub');
   const { viewingTourSlug } = useTourSelection();
   const tourCode = viewingTourSlug ?? 'pga';
   const total = picks.length;
 
-  const consensus = predictions?.consensus ?? null;
-  const modelsCount = consensus ? consensus.models.filter((m) => m.success).length : null;
-  const agreement = consensus && isNum(consensus.agreementScore) ? Math.round(consensus.agreementScore) : null;
-  const generated = predictions?.generatedAt ? new Date(predictions.generatedAt) : null;
-  const updated = generated && !Number.isNaN(generated.getTime())
-    ? new Intl.DateTimeFormat(i18n.language || 'en', { day: 'numeric', month: 'short' }).format(generated)
-    : null;
-  const figures = [
-    modelsCount != null && modelsCount > 0 ? { label: t('overview.picksSheet.figModels'), value: String(modelsCount) } : null,
-    agreement != null ? { label: t('overview.picksSheet.figAgreement'), value: `${agreement}%` } : null,
-    updated ? { label: t('overview.picksSheet.figUpdated'), value: updated } : null,
-  ].filter(Boolean) as Array<{ label: string; value: string }>;
-  const confidence = isNum(predictions?.confidence) ? Math.round((predictions!.confidence) * 100) : null;
 
   const ca = predictions?.courseAnalysis;
   const winnerProfile = nonEmpty(ca?.winnerProfile) ? ca!.winnerProfile : null;
@@ -98,7 +78,6 @@ export function PicksSheet({ open, onClose, picks, predictions, eventName, venue
         {/* 2 — ONE SECTION PER PICK */}
         {picks.map((p, idx) => {
           const reasons = (p.reasons ?? []).filter(nonEmpty);
-          const votes = p.modelVotes ?? [];
           const metaParts = [
             isNum(p.worldRanking) && p.worldRanking > 0 ? t('overview.picksSheet.worldNo', { rank: p.worldRanking }) : null,
             t('overview.picksSheet.pickOf', { rank: p.rank, total }),
@@ -111,14 +90,6 @@ export function PicksSheet({ open, onClose, picks, predictions, eventName, venue
                   <div style={{ fontSize: 15.5, fontWeight: 800, letterSpacing: '-0.018em', color: INK }}>{p.playerName}</div>
                   <div style={{ marginTop: 2, fontSize: 11, fontWeight: 600, color: WHITE_ALPHA_65, ...FIGS }}>{metaParts.join(' · ')}</div>
                 </div>
-                {isNum(p.winProbability) ? (
-                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <div style={LABEL}>{t('overview.picksSheet.winProb')}</div>
-                    <div style={{ marginTop: 2, fontSize: 19, fontWeight: 800, letterSpacing: '-0.02em', color: INK, ...FIGS }}>
-                      {`${Math.round(p.winProbability)}%`}
-                    </div>
-                  </div>
-                ) : null}
               </div>
 
               {reasons.length > 0 ? (
@@ -147,23 +118,6 @@ export function PicksSheet({ open, onClose, picks, predictions, eventName, venue
                 </div>
               ) : null}
 
-              {votes.length > 0 ? (
-                <div style={{ marginTop: 14 }}>
-                  <div style={LABEL}>{t('overview.picksSheet.namedBy')}</div>
-                  <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                    {votes.map((v, vi) => {
-                      const ranked = isNum(v.rank);
-                      return (
-                        <span key={`${v.model}-${vi}`} style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', borderRadius: 999, padding: '4px 9px', border: `1px solid ${ranked ? LIVE_INK_BORDER_35 : WHITE_ALPHA_08}`, color: ranked ? LIVE_INK : WHITE_ALPHA_65, ...FIGS }}>
-                          {ranked
-                            ? `${v.model} · ${ordinal(v.rank as number, i18n.language || 'en')}`
-                            : `${v.model} · ${t('overview.picksSheet.notRanked')}`}
-                        </span>
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : null}
             </section>
           );
         })}
@@ -185,27 +139,12 @@ export function PicksSheet({ open, onClose, picks, predictions, eventName, venue
             ))}
           </ol>
 
-          {figures.length > 0 ? (
-            <div data-overview-picks-sheet-figures style={{ marginTop: 14, display: 'grid', gridTemplateColumns: `repeat(${figures.length}, 1fr)`, border: `1px solid ${WHITE_ALPHA_08}`, borderRadius: 8, overflow: 'hidden' }}>
-              {figures.map((f, fi) => (
-                <div key={f.label} style={{ padding: '10px 12px', borderLeft: fi > 0 ? `1px solid ${WHITE_ALPHA_08}` : 'none' }}>
-                  <div style={LABEL}>{f.label}</div>
-                  <div style={{ marginTop: 3, fontSize: 15, fontWeight: 800, color: INK, ...FIGS }}>{f.value}</div>
-                </div>
-              ))}
-            </div>
-          ) : null}
-
-          <p style={{ margin: '12px 0 0', fontSize: 11.5, lineHeight: 1.45, color: WHITE_ALPHA_65 }}>
-            {t('overview.picksSheet.agreementLead')}
-            {confidence != null ? ` ${t('overview.picksSheet.confidenceClause', { confidence })}` : ''}
-          </p>
 
           {hasCourse ? (
             <div style={{ marginTop: 18 }}>
               <div style={LABEL}>{t('overview.picksSheet.whatWinsLabel')}</div>
-              {winnerProfile ? <p style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.5, color: READING_INK_84 }}>{winnerProfile}</p> : null}
-              {insight ? <p style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.5, color: READING_INK_84 }}>{insight}</p> : null}
+              {winnerProfile ? <p style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.5, color: READING_INK_86 }}>{winnerProfile}</p> : null}
+              {insight ? <p style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.5, color: READING_INK_86 }}>{insight}</p> : null}
               {difficulty ? (
                 <div style={{ marginTop: 10, display: 'inline-block', border: `1px solid ${WHITE_ALPHA_08}`, borderRadius: 8, padding: '8px 12px', background: WHITE_ALPHA_06 }}>
                   <div style={LABEL}>{t('overview.picksSheet.figDifficulty')}</div>
