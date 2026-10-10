@@ -144,13 +144,25 @@ describe('Scores lead board (Phase 0)', () => {
     expect(screen.queryByText('POS')).toBeNull();
   });
 
-  it('recent leads with net to par and gross to par behind; no net means gross alone', () => {
-    page('recent', [row(1, { net_score: 70, gross_score: 80 }), row(2, { net_score: null, gross_score: 75 })]);
-    const [a, b] = rowsOf();
-    expect(a.querySelector('[data-board-main]')?.textContent).toBe('\u22122');
-    expect(a.querySelector('[data-board-secondary]')?.textContent).toBe('+8');
-    expect(b.querySelector('[data-board-main]')?.textContent).toBe('+3');
-    expect(b.querySelector('[data-board-secondary]')).toBeNull();
+  it('Phase 18.1 — recent leads with gross to par, then the gross score', () => {
+    page('recent', [
+      row(1, { gross_score: 69, course_par: 72 }),
+      row(2, { gross_score: 80, course_par: 72 }),
+      row(3, { gross_score: 72, course_par: 72 }),
+      row(4, { gross_score: 75, course_par: null }),
+      row(5, { gross_score: null, course_par: 72 }),
+    ]);
+    const figs = rowsOf().map((r) => [
+      r.querySelector('[data-board-main]')?.textContent,
+      r.querySelector('[data-board-secondary]')?.textContent,
+    ]);
+    expect(figs).toEqual([
+      ['\u22123', '69'],
+      ['+8', '80'],
+      ['E', '72'],
+      ['\u2014', '75'],
+      ['\u2014', '\u2014'],
+    ]);
   });
 
   it('the viewing member row carries the amber self tint', () => {
