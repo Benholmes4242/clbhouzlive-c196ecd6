@@ -78,340 +78,69 @@
       "fullLeaderboard": "Komplette Rangliste"
     },
     "fieldStrength": {
-      "eyebrow": "FIELD",
-      "playersCount": "{{count}} players",
-      "topRankedLine": "{{topRanked}} of world top {{threshold}}",
-      "inFieldLabel": "IN FIELD"
+      "playersCount": "{{count}} players"
     },
     "champion": {
-      "scoreLabelToPar": "TO PAR",
       "eyebrow": "CHAMPION"
     },
     "rankings": {
       "sectionEyebrow": "World rankings",
       "linkLabel": "Full rankings",
-      "worldNo1Label": "World No. 1",
-      "pointsLabel": "POINTS",
       "boards": {
         "owgr": "Official World Golf Ranking",
         "r2d": "Race to Dubai",
         "rolex": "Rolex Rankings"
       },
-      "seasonNo1Label": "Season No. 1",
       "movementBasis": "Positions moved over {{days}} days"
     },
     "leaderRow": {
       "tiedAtTop_one": "{{count}} tied at the top",
       "tiedAtTop_other": "{{count}} tied at the top"
     },
-    "photoBand": {
-      "insightKickerCourse": "COURSE INTELLIGENCE",
-      "insightKickerResult": "HOW IT FINISHED",
-      "wonBy": "Won by {{winnerName}}",
-      "readMore": "Read more"
-    },
     "trajectorySparkline": {
       "ariaLabel": "Trajectory: rounds {{rounds}}",
       "ariaLabelRoundOf": "Trajectory: rounds {{rounds}} (round {{current}} of {{total}})"
-    },
-    "statWatch": {
-      "eyebrow": "Stat watch",
-      "allStatsLink": "All stats",
-      "seasonLeaders": "Season leaders · {{tourLabel}}"
-    },
-    "sectionTourLens": {
-      "allTours": "All Tours",
-      "filterAriaLabel": "Filter section by tour"
     },
     "page": {
       "offlineBanner": "You're offline. Some data may be outdated."
     },
     "hero": {
-      "prevAria": "Previous tournament",
-      "nextAria": "Next tournament",
-      "counter": "{{current}} / {{total}}",
       "stateLive": "LIVE",
       "stateFinal": "ERGEBNISSE",
-      "stateUpcoming": "BEVORSTEHEND",
-      "factRound": "RUNDE",
-      "factThru": "BIS",
-      "factMargin": "VORSPRUNG",
-      "factPlayoff": "PLAYOFF"
+      "factRound": "RUNDE"
     },
     "leaderboardBand": {
       "ctaUpcoming": "View tournament",
       "fieldEyebrow": "Field"
     },
     "comingUp": {
-      "eyebrow": "What's coming up",
       "linkLabel": "Full schedule",
-      "chipPlayoffs": "Playoffs",
       "daysLabel": "DAYS",
       "venueDefendsSep": " · {{name}} defends",
-      "subline": "Der Tour-Kalender",
-      "pageAria": "Seite {{page}} von {{total}}"
+      "subline": "Der Tour-Kalender"
     },
     "onTheCourse": {
       "eyebrow": "On the course",
       "rightMeta_one": "{{count}} group",
       "rightMeta_other": "{{count}} groups",
-      "rightMetaWithRound_one": "{{count}} group · R{{round}}",
-      "rightMetaWithRound_other": "{{count}} groups · R{{round}}",
-      "roundOnly": "R{{round}}",
-      "teeLabel": "TEE {{time}}",
       "thruLabel": "THRU {{value}}",
-      "holeLabel": "HOLE {{hole}}",
-      "featuredBadge": "★ FEATURED",
       "allGroups": "All groups",
       "fullField": "full field",
       "moreCount": "{{count}} more",
       "fullFieldDivider": "FULL FIELD",
-      "backLine1": "Back to",
-      "backLine2": "featured",
       "showAllAria": "Show all groups",
-      "backAria": "Back to featured",
-      "rightMetaWithRound": "{{count}} groups · R{{round}}",
-      "roundShort": "R{{round}}",
       "teeTimeLabel": "TEE {{time}}",
       "holeLabelSep": " · HOLE {{hole}}",
       "backToFeaturedAria": "Back to featured",
       "backToLine1": "Back to",
       "backToLine2": "featured",
-      "fieldAverageToday": "Felddurchschnitt",
-      "fromNRoundsIn": "aus {{n}} Runden",
-      "lowRoundLabel": "Beste Runde",
-      "awaitingPlayers": "{{range}} noch offen",
-      "nShare_one": "{{count}} Spieler",
-      "nShare_other": "{{count}} Spieler",
-      "playingHardest": "Spielt am schwersten",
-      "playingEasiest": "Spielt am leichtesten",
-      "parShort": "Par {{par}}",
       "featuredGroupLabel": "Featured-Gruppe",
-      "underParTodayLabel": "HEUTE UNTER PAR",
-      "underParTodayValue": "{{n}} von {{m}}",
-      "underParTodaySub": "Spieler bisher im Ziel",
-      "axisEasier": "Leichter",
-      "axisHarder": "Schwerer",
       "finishedLabel": "Beendet",
       "todaySuffix": "{{value}} heute",
-      "fieldAverageWaiting": "Feld-Durchschnitt, sobald {{n}} Runden vorliegen",
-      "courseShapeLabel": "Platzprofil",
-      "ourPicksLabel": "Unsere Tipps",
-      "ourPicksAll": "Alle Tipps und die Begründung",
-      "figuresBasis": "Alle drei aus {{n}} abgeschlossenen Runden in Runde {{round}}.",
-      "figuresBasisLowOnly": "Beste Runde aus abgeschlossenen Runden in Runde {{round}}; zu wenige für einen Felddurchschnitt.",
-      "figuresBasisLow": "Beste Runde: {{names}}.",
       "rightMeta": "{{count}} Gruppen"
-    },
-    "tiPicks": {
-      "eyebrow": "Tournament intelligence",
-      "subline": "Our picks for the tournament",
-      "explainer": "Unsere KI liest das Feld, bevor gespielt wird. Sie bewertet die bisherigen Leistungen auf diesem Platz, die aktuelle Form, Meldungen zu Verletzungen, das Wetter und Spielerwerte wie Abschlagslänge, Genauigkeit und kurzes Spiel, um ihre Tipps für die Woche zu ermitteln.",
-      "linkLabel": "All picks",
-      "confidenceHigh": "High",
-      "confidenceSolid": "Solid",
-      "confidenceLive": "Live",
-      "theCase": "The case ›",
-      "pickLabel": "Pick {{rank}}",
-      "won": "Won",
-      "hit": "Hit",
-      "miss": "Miss",
-      "missWithCut": "Miss · {{cut}}",
-      "wonBadge": "WON · {{score}}",
-      "hitBadge": "HIT · {{pos}} · {{score}}",
-      "missBadge": "MISS · {{pos}} · {{score}}",
-      "missShort": "MISS",
-      "missWithCutBadge": "MISS · {{cut}}",
-      "thruLabel": "thru {{value}}",
-      "caseFor": "The case for",
-      "boardTitle": "The board",
-      "boardMeta_one": "{{count}} PICK · TAP FOR THE CASE",
-      "boardMeta_other": "{{count}} PICKS · TAP FOR THE CASE",
-      "courseFit": "course fit {{score}}",
-      "concernLabel": "Concern",
-      "finalLine": "{{pos}} · {{score}}",
-      "confidence": {
-        "high": "High",
-        "solid": "Solid",
-        "live": "Live"
-      },
-      "verdict": {
-        "won": "WON · {{score}}",
-        "hit": "HIT · {{pos}} · {{score}}",
-        "miss": "MISS · {{pos}} · {{score}}",
-        "missOnly": "MISS",
-        "missCut": "MISS · {{cut}}"
-      },
-      "chip": {
-        "won": "Won",
-        "hit": "Hit",
-        "miss": "Miss",
-        "missCut": "Miss · {{cut}}"
-      },
-      "card": {
-        "theCase": "The case ›",
-        "pickLabel": "Pick {{rank}}",
-        "pickOf": "Tipp {{n}} von {{total}}",
-        "courseFitLabel": "Course fit"
-      },
-      "case": {
-        "eyebrow": "The case for",
-        "concernLabel": "Concern",
-        "courseFit": "course fit {{score}}"
-      },
-      "sheet": {
-        "picksHeader": "{{count}} PICKS · TAP FOR THE CASE",
-        "title": "The board"
-      },
-      "thru": {
-        "finished": "F",
-        "thruN": "thru {{n}}"
-      },
-      "thruSep": " · {{value}}",
-      "board": {
-        "methodology": "Die Tipps werden vor dem ersten Abschlag festgelegt und ändern sich nie. Die Bewertung erfolgt mit der Endtabelle."
-      },
-      "method": {
-        "heading": "So wählen wir aus",
-        "lede": "Unsere KI liest das Feld, bevor gespielt wird. Sie bewertet die bisherigen Leistungen auf diesem Platz, die aktuelle Form, Meldungen zu Verletzungen, das Wetter und Spielerwerte wie Abschlagslänge, Genauigkeit und kurzes Spiel, um ihre Tipps für die Woche zu ermitteln.",
-        "playerLabel": "Der Spieler",
-        "playerItems": [
-          "Abschlagslänge",
-          "Abschlaggenauigkeit",
-          "Grüns in Regulation",
-          "Scrambling",
-          "Putten",
-          "Strokes Gained: Abschlag",
-          "Strokes Gained: Annäherung",
-          "Strokes Gained: um das Grün",
-          "Strokes Gained: Putten",
-          "Strokes Gained: gesamt",
-          "Birdies pro Runde",
-          "Schnitt pro Runde"
-        ],
-        "courseLabel": "Der Platz",
-        "courseItems": [
-          "Fünf Jahre Ergebnisse an diesem Ort",
-          "Was hier tatsächlich gewonnen hat",
-          "Par, Länge und Platztyp"
-        ],
-        "weekLabel": "Diese Woche",
-        "weekItems": [
-          "Form der letzten vier Turniere",
-          "Bestätigte Rückzüge und Verletzungen",
-          "Wind- und Regenprognose",
-          "Stärke des Feldes"
-        ],
-        "rules": [
-          "Vor dem ersten Abschlag festgelegt",
-          "Niemals nachträglich geändert",
-          "Bewertet nach der Endtabelle"
-        ],
-        "closing": "Tournament Intelligence ist Analyse, keine Empfehlung."
-      }
-    },
-    "collegeFranchise": {
-      "eyebrow": "COLLEGE FRANCHISE",
-      "linkLabel": "All franchises",
-      "vs": "VS",
-      "tugLabel": "SEASON ALUMNI EARNINGS",
-      "captainLabel": "· CAPTAIN",
-      "onTour_one": "{{count}} on tour",
-      "onTour_other": "{{count}} on tour",
-      "onTourCaptainSuffix": " · {{name}} captains",
-      "headlineFallbackWide": "{{leader}} runs away with it.",
-      "headlineFallbackClose": "{{leader}} leads. {{chaser}} is closing.",
-      "captainSuffix": "· CAPTAIN",
-      "headlineRunaway": "<0>{{leader}} runs away with it.</0>",
-      "headlineClosing": "<0>{{leader}} leads. {{chaser}} is closing.</0>",
-      "rowMetaWithCaptain": "{{count}} on tour · {{captain}} captains",
-      "rowMeta": "{{count}} on tour",
-      "summaryWide": "<0>{{leader}}</0> leads all franchises on {{amount}} in season alumni earnings, <1>{{gap}}</1> clear of {{chaser}}.",
-      "summaryClose": "<0>{{leader}}</0> leads all franchises on {{amount}}, with just <1>{{gap}}</1> between them and {{chaser}}.",
-      "allAction": "ALL FRANCHISES",
-      "earningsBasis": "Saisoneinnahmen nach dem College, das ihre Absolventen durchlaufen haben."
-    },
-    "cinematic": {
-      "championEyebrow": "★ Champion",
-      "championLabel": "Champion",
-      "defendingChampionEyebrow": "★ Defending champion",
-      "defendingChampionLabel": "Defending Champion",
-      "defendingChampionYearLabel": "{{year}} Defending Champion",
-      "wonYearScore": "Won {{year}} · {{score}}",
-      "wonInPlayoff": "Won in playoff",
-      "wonByMargin": "Won by {{margin}}",
-      "finalResult": "FINAL RESULT",
-      "finalResults": "Final results",
-      "finalLeaderboardCount": "FINAL LEADERBOARD · {{count}}",
-      "fullLeaderboard": "Full leaderboard",
-      "fullLeaderboardWithField_one": "Full leaderboard · {{count}} player",
-      "fullLeaderboardWithField_other": "Full leaderboard · {{count}} players",
-      "viewTournament": "View tournament",
-      "viewTournamentWithField_one": "View tournament · {{count}} in the field",
-      "viewTournamentWithField_other": "View tournament · {{count}} in the field",
-      "openTournamentAria": "Open tournament",
-      "openLeaderboardAria": "Open leaderboard",
-      "openFullLeaderboardAria": "Open full leaderboard",
-      "finalTournamentAria": "Final tournament",
-      "finalLeaderboardAria": "Final leaderboard",
-      "viewTournamentAria": "View tournament",
-      "majorAria": "Major championship",
-      "eyebrowPlayoff": "PLAYOFF",
-      "eyebrowFinal": "🏆 FINAL",
-      "eyebrowUpcoming": "UPCOMING",
-      "eyebrowUpcomingMajor": "UPCOMING · MAJOR CHAMPIONSHIP",
-      "eyebrowSuffix": " · {{tour}}",
-      "countdownHoursLabel": "HRS",
-      "countdownMinutesLabel": "MIN",
-      "teeingOffSoon": "Teeing off soon",
-      "teesOffIn": "TEES OFF IN",
-      "roundAwaitingScores": "Round {{round}} · Awaiting scores",
-      "fieldPreviewPlayers_one": "{{count}} player",
-      "fieldPreviewPlayers_other": "{{count}} players",
-      "topRankedWorld": " · #{{rank}} world",
-      "inTheField_one": "{{count}} in the field",
-      "inTheField_other": "{{count}} in the field",
-      "ctaTournament": "TOURNAMENT",
-      "colToday": "TODAY",
-      "colTotal": "TOTAL",
-      "colTotalShort": "TOT",
-      "colThru": "THRU",
-      "colYardsFull": "YARDS",
-      "tiedForLead_one": "{{count}} tied for the lead",
-      "tiedForLead_other": "{{count}} tied for the lead",
-      "playersTiedCount_one": "{{count}} player",
-      "playersTiedCount_other": "{{count}} players",
-      "inPlayoffCount_one": "{{count}} in playoff",
-      "inPlayoffCount_other": "{{count}} in playoff",
-      "fieldStrengthEyebrow": "Field Strength"
-    },
-    "hybridHero": {
-      "majorChampionship": "MAJOR CHAMPIONSHIP",
-      "teamFallback": "Team"
-    },
-    "status": {
-      "finished": "BEENDET",
-      "thru": "BIS {{n}}"
     },
     "board": {
       "clbhouzPick": "clbhouz-Tipp"
-    },
-    "venueRecord": {
-      "kicker": "Das Protokoll",
-      "clubhouseRating": "Clubhaus",
-      "reviews": "Bewertungen",
-      "top100": "Top 100",
-      "tooFewRatings": "Zu wenige Mitglieder haben diesen Platz bisher bewertet.",
-      "rateAction": "DIESEN PLATZ BEWERTEN",
-      "ratingFrom_one": "aus {{count}} Bewertung",
-      "ratingFrom_other": "aus {{count}} Bewertungen",
-      "sectionKicker": "Der Austragungsort dieser Woche auf clbhouz",
-      "viewCourse": "Platz ansehen",
-      "ratingLabel": "Mitglieder-Bewertung",
-      "basis_one": "Aus {{count}} Bewertung von Mitgliedern, die dort gespielt haben.",
-      "basis_other": "Aus {{count}} Bewertungen von Mitgliedern, die dort gespielt haben.",
-      "seeAction": "PLATZ ANSEHEN",
-      "playedLabel": "Gespielt"
     },
     "magazine": {
       "scoreEven": "Par",

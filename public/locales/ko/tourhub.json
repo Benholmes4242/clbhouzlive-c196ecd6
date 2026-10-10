@@ -78,339 +78,69 @@
       "fullLeaderboard": "전체 리더보드"
     },
     "fieldStrength": {
-      "eyebrow": "FIELD",
-      "playersCount": "{{count}} players",
-      "topRankedLine": "{{topRanked}} of world top {{threshold}}",
-      "inFieldLabel": "IN FIELD"
+      "playersCount": "{{count}} players"
     },
     "champion": {
-      "scoreLabelToPar": "TO PAR",
       "eyebrow": "CHAMPION"
     },
     "rankings": {
       "sectionEyebrow": "World rankings",
       "linkLabel": "Full rankings",
-      "worldNo1Label": "World No. 1",
-      "pointsLabel": "POINTS",
       "boards": {
         "owgr": "Official World Golf Ranking",
         "r2d": "Race to Dubai",
         "rolex": "Rolex Rankings"
       },
-      "seasonNo1Label": "Season No. 1",
       "movementBasis": "Positions moved over {{days}} days"
     },
     "leaderRow": {
       "tiedAtTop_one": "{{count}} tied at the top",
       "tiedAtTop_other": "{{count}} tied at the top"
     },
-    "photoBand": {
-      "insightKickerCourse": "COURSE INTELLIGENCE",
-      "insightKickerResult": "HOW IT FINISHED",
-      "wonBy": "Won by {{winnerName}}"
-    },
     "trajectorySparkline": {
       "ariaLabel": "Trajectory: rounds {{rounds}}",
       "ariaLabelRoundOf": "Trajectory: rounds {{rounds}} (round {{current}} of {{total}})"
-    },
-    "statWatch": {
-      "eyebrow": "Stat watch",
-      "allStatsLink": "All stats",
-      "seasonLeaders": "Season leaders · {{tourLabel}}"
-    },
-    "sectionTourLens": {
-      "allTours": "All Tours",
-      "filterAriaLabel": "Filter section by tour"
     },
     "page": {
       "offlineBanner": "You're offline. Some data may be outdated."
     },
     "hero": {
-      "prevAria": "Previous tournament",
-      "nextAria": "Next tournament",
-      "counter": "{{current}} / {{total}}",
       "stateLive": "라이부",
       "stateFinal": "결과",
-      "stateUpcoming": "예정",
-      "factRound": "라운드",
-      "factThru": "진행",
-      "factMargin": "상황",
-      "factPlayoff": "허파우별"
+      "factRound": "라운드"
     },
     "leaderboardBand": {
       "ctaUpcoming": "View tournament",
       "fieldEyebrow": "Field"
     },
     "comingUp": {
-      "eyebrow": "What's coming up",
       "linkLabel": "Full schedule",
-      "chipPlayoffs": "Playoffs",
       "daysLabel": "DAYS",
       "venueDefendsSep": " · {{name}} defends",
-      "subline": "투어 일정",
-      "pageAria": "{{total}}페이지 중 {{page}}페이지"
+      "subline": "투어 일정"
     },
     "onTheCourse": {
       "eyebrow": "On the course",
       "rightMeta_one": "{{count}} group",
       "rightMeta_other": "{{count}} groups",
-      "rightMetaWithRound_one": "{{count}} group · R{{round}}",
-      "rightMetaWithRound_other": "{{count}} groups · R{{round}}",
-      "roundOnly": "R{{round}}",
-      "teeLabel": "TEE {{time}}",
       "thruLabel": "THRU {{value}}",
-      "holeLabel": "HOLE {{hole}}",
-      "featuredBadge": "★ FEATURED",
       "allGroups": "All groups",
       "fullField": "full field",
       "moreCount": "{{count}} more",
       "fullFieldDivider": "FULL FIELD",
-      "backLine1": "Back to",
-      "backLine2": "featured",
       "showAllAria": "Show all groups",
-      "backAria": "Back to featured",
-      "rightMetaWithRound": "{{count}} groups · R{{round}}",
-      "roundShort": "R{{round}}",
       "teeTimeLabel": "TEE {{time}}",
       "holeLabelSep": " · HOLE {{hole}}",
       "backToFeaturedAria": "Back to featured",
       "backToLine1": "Back to",
       "backToLine2": "featured",
-      "fieldAverageToday": "필드 평균",
-      "fromNRoundsIn": "{{n}} 라운드 기준",
-      "lowRoundLabel": "베스트 라운드",
-      "awaitingPlayers": "{{range}} 집계 대기",
-      "nShare_one": "{{count}} players",
-      "nShare_other": "{{count}} players",
-      "playingHardest": "가장 어려운",
-      "playingEasiest": "가장 쉬운",
-      "parShort": "파 {{par}}",
       "featuredGroupLabel": "주목 그룹",
-      "underParTodayLabel": "오늘 언더파",
-      "underParTodayValue": "{{m}}명 중 {{n}}명",
-      "underParTodaySub": "현재까지 선수",
-      "axisEasier": "쉬움",
-      "axisHarder": "어려움",
       "finishedLabel": "종료",
       "todaySuffix": "오늘 {{value}}",
-      "fieldAverageWaiting": "{{n}}라운드가 모이면 필드 평균 표시",
-      "courseShapeLabel": "코스 난이도",
-      "ourPicksLabel": "주목 선수",
-      "ourPicksAll": "모든 주목 선수와 근거",
-      "figuresBasis": "세 수치 모두 {{round}}라운드의 완료된 {{n}}개 라운드 기준입니다.",
-      "figuresBasisLowOnly": "최저 라운드는 {{round}}라운드의 완료된 라운드 기준이며, 필드 평균에는 표본이 부족합니다.",
-      "figuresBasisLow": "최저 라운드: {{names}}.",
       "rightMeta": "{{count}}개 조"
-    },
-    "tiPicks": {
-      "eyebrow": "Tournament intelligence",
-      "subline": "Our picks for the tournament",
-      "explainer": "AI는 경기가 시작되기 전에 출전 선수단을 분석합니다. 이 코스에서의 과거 성적, 현재 폼, 부상 관련 소식, 날씨, 그리고 드라이버 비거리와 정확도, 쇼트 게임 같은 선수 지표를 종합해 그 주의 예상을 도출합니다.",
-      "linkLabel": "All picks",
-      "confidenceHigh": "High",
-      "confidenceSolid": "Solid",
-      "confidenceLive": "Live",
-      "theCase": "The case ›",
-      "pickLabel": "Pick {{rank}}",
-      "won": "Won",
-      "hit": "Hit",
-      "miss": "Miss",
-      "missWithCut": "Miss · {{cut}}",
-      "wonBadge": "WON · {{score}}",
-      "hitBadge": "HIT · {{pos}} · {{score}}",
-      "missBadge": "MISS · {{pos}} · {{score}}",
-      "missShort": "MISS",
-      "missWithCutBadge": "MISS · {{cut}}",
-      "thruLabel": "thru {{value}}",
-      "caseFor": "The case for",
-      "boardTitle": "The board",
-      "boardMeta_one": "{{count}} PICK · TAP FOR THE CASE",
-      "boardMeta_other": "{{count}} PICKS · TAP FOR THE CASE",
-      "courseFit": "course fit {{score}}",
-      "concernLabel": "Concern",
-      "finalLine": "{{pos}} · {{score}}",
-      "confidence": {
-        "high": "High",
-        "solid": "Solid",
-        "live": "Live"
-      },
-      "verdict": {
-        "won": "WON · {{score}}",
-        "hit": "HIT · {{pos}} · {{score}}",
-        "miss": "MISS · {{pos}} · {{score}}",
-        "missOnly": "MISS",
-        "missCut": "MISS · {{cut}}"
-      },
-      "chip": {
-        "won": "Won",
-        "hit": "Hit",
-        "miss": "Miss",
-        "missCut": "Miss · {{cut}}"
-      },
-      "card": {
-        "theCase": "The case ›",
-        "pickLabel": "Pick {{rank}}",
-        "pickOf": "픽 {{n}} / {{total}}",
-        "courseFitLabel": "Course fit"
-      },
-      "case": {
-        "eyebrow": "The case for",
-        "concernLabel": "Concern",
-        "courseFit": "course fit {{score}}"
-      },
-      "sheet": {
-        "picksHeader": "{{count}} PICKS · TAP FOR THE CASE",
-        "title": "The board"
-      },
-      "thru": {
-        "finished": "F",
-        "thruN": "thru {{n}}"
-      },
-      "thruSep": " · {{value}}",
-      "board": {
-        "methodology": "예측은 첫 티오프 전에 확정되며 이후 변경되지 않습니다. 판정은 최종 리더보드로 결정됩니다."
-      },
-      "method": {
-        "heading": "선정 방식",
-        "lede": "AI는 경기가 시작되기 전에 출전 선수들을 분석합니다. 이 코스에서의 과거 성적, 현재 컨디션, 부상 관련 소식, 날씨, 그리고 드라이버 비거리, 정확도, 숏게임 같은 선수 지표를 종합해 그 주의 예측을 내놓습니다.",
-        "playerLabel": "선수",
-        "playerItems": [
-          "드라이버 비거리",
-          "드라이버 정확도",
-          "그린 적중률",
-          "스크램블링",
-          "퍼팅",
-          "스트로크 게인드: 티샷",
-          "스트로크 게인드: 어프로치",
-          "스트로크 게인드: 그린 주변",
-          "스트로크 게인드: 퍼팅",
-          "스트로크 게인드: 합계",
-          "라운드당 버디",
-          "평균 타수"
-        ],
-        "courseLabel": "코스",
-        "courseItems": [
-          "이곳에서의 최근 5년 성적",
-          "이 코스에서 실제로 우승한 스코어",
-          "파, 길이, 코스 유형"
-        ],
-        "weekLabel": "이번 주",
-        "weekItems": [
-          "최근 4개 대회의 컨디션",
-          "확정된 기권과 부상",
-          "바람과 비 예보",
-          "출전 선수층의 수준"
-        ],
-        "rules": [
-          "첫 티오프 전에 확정",
-          "이후 수정 없음",
-          "최종 리더보드로 채점"
-        ],
-        "closing": "Tournament Intelligence는 분석이며 조언이 아닙니다."
-      }
-    },
-    "collegeFranchise": {
-      "eyebrow": "COLLEGE FRANCHISE",
-      "linkLabel": "All franchises",
-      "vs": "VS",
-      "tugLabel": "SEASON ALUMNI EARNINGS",
-      "captainLabel": "· CAPTAIN",
-      "onTour_one": "{{count}} on tour",
-      "onTour_other": "{{count}} on tour",
-      "onTourCaptainSuffix": " · {{name}} captains",
-      "headlineFallbackWide": "{{leader}} runs away with it.",
-      "headlineFallbackClose": "{{leader}} leads. {{chaser}} is closing.",
-      "captainSuffix": "· CAPTAIN",
-      "headlineRunaway": "<0>{{leader}} runs away with it.</0>",
-      "headlineClosing": "<0>{{leader}} leads. {{chaser}} is closing.</0>",
-      "rowMetaWithCaptain": "{{count}} on tour · {{captain}} captains",
-      "rowMeta": "{{count}} on tour",
-      "summaryWide": "<0>{{leader}}</0> leads all franchises on {{amount}} in season alumni earnings, <1>{{gap}}</1> clear of {{chaser}}.",
-      "summaryClose": "<0>{{leader}}</0> leads all franchises on {{amount}}, with just <1>{{gap}}</1> between them and {{chaser}}.",
-      "allAction": "ALL FRANCHISES",
-      "earningsBasis": "선수들이 거쳐 온 대학별 시즌 상금."
-    },
-    "cinematic": {
-      "championEyebrow": "★ Champion",
-      "championLabel": "Champion",
-      "defendingChampionEyebrow": "★ Defending champion",
-      "defendingChampionLabel": "Defending Champion",
-      "defendingChampionYearLabel": "{{year}} Defending Champion",
-      "wonYearScore": "Won {{year}} · {{score}}",
-      "wonInPlayoff": "Won in playoff",
-      "wonByMargin": "Won by {{margin}}",
-      "finalResult": "FINAL RESULT",
-      "finalResults": "Final results",
-      "finalLeaderboardCount": "FINAL LEADERBOARD · {{count}}",
-      "fullLeaderboard": "Full leaderboard",
-      "fullLeaderboardWithField_one": "Full leaderboard · {{count}} player",
-      "fullLeaderboardWithField_other": "Full leaderboard · {{count}} players",
-      "viewTournament": "View tournament",
-      "viewTournamentWithField_one": "View tournament · {{count}} in the field",
-      "viewTournamentWithField_other": "View tournament · {{count}} in the field",
-      "openTournamentAria": "Open tournament",
-      "openLeaderboardAria": "Open leaderboard",
-      "openFullLeaderboardAria": "Open full leaderboard",
-      "finalTournamentAria": "Final tournament",
-      "finalLeaderboardAria": "Final leaderboard",
-      "viewTournamentAria": "View tournament",
-      "majorAria": "Major championship",
-      "eyebrowPlayoff": "PLAYOFF",
-      "eyebrowFinal": "🏆 FINAL",
-      "eyebrowUpcoming": "UPCOMING",
-      "eyebrowUpcomingMajor": "UPCOMING · MAJOR CHAMPIONSHIP",
-      "eyebrowSuffix": " · {{tour}}",
-      "countdownHoursLabel": "HRS",
-      "countdownMinutesLabel": "MIN",
-      "teeingOffSoon": "Teeing off soon",
-      "teesOffIn": "TEES OFF IN",
-      "roundAwaitingScores": "Round {{round}} · Awaiting scores",
-      "fieldPreviewPlayers_one": "{{count}} player",
-      "fieldPreviewPlayers_other": "{{count}} players",
-      "topRankedWorld": " · #{{rank}} world",
-      "inTheField_one": "{{count}} in the field",
-      "inTheField_other": "{{count}} in the field",
-      "ctaTournament": "TOURNAMENT",
-      "colToday": "TODAY",
-      "colTotal": "TOTAL",
-      "colTotalShort": "TOT",
-      "colThru": "THRU",
-      "colYardsFull": "YARDS",
-      "tiedForLead_one": "{{count}} tied for the lead",
-      "tiedForLead_other": "{{count}} tied for the lead",
-      "playersTiedCount_one": "{{count}} player",
-      "playersTiedCount_other": "{{count}} players",
-      "inPlayoffCount_one": "{{count}} in playoff",
-      "inPlayoffCount_other": "{{count}} in playoff",
-      "fieldStrengthEyebrow": "Field Strength"
-    },
-    "hybridHero": {
-      "majorChampionship": "MAJOR CHAMPIONSHIP",
-      "teamFallback": "Team"
-    },
-    "status": {
-      "finished": "종료",
-      "thru": "{{n}}홀"
     },
     "board": {
       "clbhouzPick": "clbhouz 주목 선수"
-    },
-    "venueRecord": {
-      "kicker": "Record book",
-      "clubhouseRating": "Clubhouse",
-      "reviews": "Review",
-      "top100": "Top 100",
-      "tooFewRatings": "Ajik i course reul pyeongga han member ga jeokseumnida.",
-      "rateAction": "I COURSE PYEONGGA HAGI",
-      "ratingFrom_one": "pyeongjeom {{count}}gae",
-      "ratingFrom_other": "pyeongjeom {{count}}gae",
-      "sectionKicker": "clbhouz: ibeon ju gyeongginjang",
-      "viewCourse": "Course bogi",
-      "ratingLabel": "Member pyeongjeom",
-      "basis_one": "Play han member {{count}}gae pyeongjeom.",
-      "basis_other": "Play han member {{count}}gae pyeongjeom.",
-      "seeAction": "COURSE BOGI",
-      "playedLabel": "Play han member"
     },
     "magazine": {
       "scoreEven": "이븐파",
