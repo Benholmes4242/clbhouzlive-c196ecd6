@@ -1144,7 +1144,7 @@ export function ScoresLeaderboardsPage({
           contest
           eyebrow={t('amateur.leaderboards.climb')}
           title={t('amateur.leaderboards.mostImproved')}
-          meta={t('amateur.leaderboards.window.year')}
+          meta={windowLabel('year')}
         >
           {improvedRows.slice(0, SHORT_ROWS).map((r, i, arr) => improvedRow(r, i < arr.length - 1, false))}
           <SeeAll
