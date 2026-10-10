@@ -345,7 +345,8 @@ describe('canonical member surface tokens', () => {
     expect(authCallback).toContain('rgba(247,147,30,0.04)');
 
     const join = readFileSync(resolve(process.cwd(), 'src/pages/public/JoinLandingPage.tsx'), 'utf8');
-    expect(join).toContain('MEMBER_PANEL');
+    // The join redesign has no panel (only a 28px avatar disc, on MEMBER_CELL), so MEMBER_PANEL is not asserted.
+    expect(join).toContain('MEMBER_CELL');
     expect(join).toContain('INK_ON_LIGHT');
 
     const deleted = readFileSync(resolve(process.cwd(), 'src/components/DeletedAccountScreen.tsx'), 'utf8');
