@@ -1,4 +1,22 @@
 /**
+ * THE ONE TIME BASE FOR A PLAY DATE on the Explore Scores screen (and every
+ * Discover surface that imports this file).
+ *
+ * play_date is a DATE: no time, no zone. It names the calendar day the member
+ * played, in their own day. Reading it at UTC midnight would move it a day
+ * back for anyone west of Greenwich; reading it at local midnight puts it on
+ * a DST edge. LOCAL NOON of that calendar day is always the same local date in
+ * every zone, so the absolute form (weekday, month) and the relative form
+ * (today, 3d ago — counted against the member's own clock) can never disagree
+ * about which day it was. Timestamps are truncated to their calendar day first.
+ */
+export function playDateAtLocalNoon(iso: string | null | undefined): Date | null {
+  if (!iso) return null;
+  const d = new Date(`${String(iso).slice(0, 10)}T12:00:00`);
+  return Number.isFinite(d.getTime()) ? d : null;
+}
+
+/**
  * relativeDay — THE ONE relative-day formatter Discover uses for a PLAY DATE.
  *
  * Lifted verbatim (behaviour-identical) out of FriendsPlayedRail so the friends
@@ -19,7 +37,7 @@ export function relativeDay(
    */
   weekday: 'short' | 'long' = 'short',
 ): string {
-  const then = new Date(`${iso.slice(0, 10)}T12:00:00`).getTime();
+  const then = playDateAtLocalNoon(iso)?.getTime() ?? NaN;
   if (!Number.isFinite(then)) return '';
   const days = Math.round((Date.now() - then) / 86_400_000);
   if (days <= 0) return t('discover.when.today', 'Today');
@@ -54,7 +72,7 @@ export function relativeDayCompact(
   t: (k: string, o?: any) => string,
 ): string {
   if (!iso) return '\u2014';
-  const then = new Date(`${iso.slice(0, 10)}T12:00:00`).getTime();
+  const then = playDateAtLocalNoon(iso)?.getTime() ?? NaN;
   if (!Number.isFinite(then)) return '\u2014';
   const days = Math.max(0, Math.round((Date.now() - then) / 86_400_000));
   if (days === 0) return t('discover.when.relToday', { defaultValue: 'today' });
@@ -90,7 +108,7 @@ export function relativeDayFull(
   t: (k: string, o?: any) => string,
 ): string {
   if (!iso) return '\u2014';
-  const then = new Date(`${iso.slice(0, 10)}T12:00:00`).getTime();
+  const then = playDateAtLocalNoon(iso)?.getTime() ?? NaN;
   if (!Number.isFinite(then)) return '\u2014';
   const days = Math.max(0, Math.round((Date.now() - then) / 86_400_000));
   if (days === 0) return t('discover.when.today', { defaultValue: 'Today' });
