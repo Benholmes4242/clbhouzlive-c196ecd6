@@ -570,7 +570,7 @@ export function ScoresLeaderboardsPage({
             : t('amateur.leaderboards.window.all', 'All time');
 
   const membersText = (n: number) =>
-    t('amateur.leaderboards.nMembers', { count: n, defaultValue_one: '{{count}} member', defaultValue_other: '{{count}} members' });
+    t('amateur.leaderboards.nMembers', { count: n });
   // Deliberately uncounted: "See all members" without a figure everywhere.
   const seeAllMembers = () => t('amateur.leaderboards.seeAllMembers');
   /* The lead board's destination row follows the board's UNIT: rounds on
@@ -579,7 +579,7 @@ export function ScoresLeaderboardsPage({
     boardCountsRounds(b) ? t('amateur.leaderboards.seeAllRounds') : seeAllMembers();
   const boardCountText = (b: BoardKey, n: number) =>
     boardCountsRounds(b)
-      ? t('amateur.leaderboards.nRounds', { count: n, defaultValue_one: '{{count}} round', defaultValue_other: '{{count}} rounds' })
+      ? t('amateur.leaderboards.nRounds', { count: n })
       : membersText(n);
 
   /* §4 row. start_index and current_index are FACTS from the RPC, so they are
@@ -962,8 +962,7 @@ export function ScoresLeaderboardsPage({
                 <span className="tabular-nums" style={{ display: 'block', marginTop: 6, fontSize: 10.5, lineHeight: 1.3, color: A.MUTE }}>
                   {t('amateur.leaderboards.featRarity', {
                     n: Math.round(f.denominator / f.events).toLocaleString(),
-                    unit: t(`amateur.leaderboards.unit.${f.denominator_unit}`, f.denominator_unit),
-                    defaultValue: '1 in every {{n}} {{unit}}',
+                    unit: t(`amateur.leaderboards.unit.${f.denominator_unit}`),
                   })}
                 </span>
                 <span style={{ display: 'block', marginTop: 6, fontSize: 10.5, color: A.DIM }}>{membersText(f.members)}</span>

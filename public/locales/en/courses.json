@@ -136,7 +136,11 @@
       "coursesOf100": "Courses of 100",
       "standing": {
         "deeper": "You're on this board, further down than shown here. See all to find your place."
-      }
+      },
+      "nMembers_one": "{{count}} member",
+      "nMembers_other": "{{count}} members",
+      "nRounds_one": "{{count}} round",
+      "nRounds_other": "{{count}} rounds"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
@@ -1286,7 +1290,9 @@
         "albatross": "Albatrosses",
         "eagle": "Eagles",
         "cleanCard": "Bogey-free rounds"
-      }
+      },
+      "nRounds_one": "{{count}} round",
+      "nRounds_other": "{{count}} rounds"
     },
     "findGolfers": {
       "addFriend": "Add friend",

@@ -136,7 +136,11 @@
       "coursesOf100": "[~~Ĉőúřšéš őƒ 100~~]",
       "standing": {
         "deeper": "[~~Ýőú'řé őñ ţĥíš ƀőářđ, ƒúřţĥéř đőŵñ ţĥáñ šĥőŵñ ĥéřé. Šéé áļļ ţő ƒíñđ ýőúř ƥļáĉé.~~]"
-      }
+      },
+      "nMembers_one": "[~~{{count}} ɱéɱƀéř~~]",
+      "nMembers_other": "[~~{{count}} ɱéɱƀéřš~~]",
+      "nRounds_one": "[~~{{count}} řőúñđ~~]",
+      "nRounds_other": "[~~{{count}} řőúñđš~~]"
     },
     "place": {
       "pair": "[~~{{place}}, {{nation}}~~]"
@@ -1286,7 +1290,9 @@
         "albatross": "[~~Áļƀáţřőššéš~~]",
         "eagle": "[~~Éáĝļéš~~]",
         "cleanCard": "[~~Ɓőĝéý-ƒřéé řőúñđš~~]"
-      }
+      },
+      "nRounds_one": "[~~{{count}} řőúñđ~~]",
+      "nRounds_other": "[~~{{count}} řőúñđš~~]"
     },
     "findGolfers": {
       "addFriend": "[~~Áđđ ƒříéñđ~~]",
