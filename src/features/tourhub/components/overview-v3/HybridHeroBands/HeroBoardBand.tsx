@@ -373,7 +373,6 @@ export function HeroBoardSection({
           tourCode={pickTourCode}
           phase={phase}
           boardByPlayer={boardByPlayer}
-          predictions={predictions ?? null}
           championPlayerId={championPlayerId}
           championPlayerIds={championPlayerIds}
           onOpenPick={() => setPicksOpen(true)}
@@ -384,7 +383,6 @@ export function HeroBoardSection({
           open={picksOpen}
           onClose={() => setPicksOpen(false)}
           picks={picks}
-          predictions={predictions ?? null}
           eventName={predictions?.tournament?.name ?? ''}
           venueName={predictions?.tournament?.venueName || null}
         />
@@ -429,7 +427,6 @@ function PicksBlock({
   tourCode,
   phase,
   boardByPlayer,
-  predictions,
   championPlayerId,
   championPlayerIds,
   onOpenPick,
@@ -440,7 +437,6 @@ function PicksBlock({
   tourCode: string;
   phase: 'live' | 'upcoming' | 'completed';
   boardByPlayer: Map<string, { position: number | null; tied: boolean; score: number | null }>;
-  predictions: { editorialFraming?: string | null } | null;
   /** The champion, by player id — settledFigureFor can only see a POSITION,
    *  and a playoff winner's position is T1, so identity comes in separately. */
   championPlayerId: string | null;
@@ -457,12 +453,6 @@ function PicksBlock({
             key, so band and sheet cannot drift apart in translation. */}
         <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
       </div>
-
-      {predictions?.editorialFraming ? (
-        <div style={{ padding: '0 20px 10px', fontSize: 11, fontWeight: 500, lineHeight: 1.35, color: WHITE_ALPHA_65 }}>
-          {predictions.editorialFraming}
-        </div>
-      ) : null}
 
       <div style={{ padding: '0 16px 14px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
         {cards.map((p, i) => {

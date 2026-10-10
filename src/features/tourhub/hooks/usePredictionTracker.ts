@@ -74,23 +74,6 @@ async function fetchTrackerData(
     return buildTrackedPrediction(p, i + 1, lb, false, fieldCompletionPct, tournamentId);
   });
 
-  // Backwards compat: if old data had dark horses but < 5 contenders, merge them in
-  if (trackedPredictions.length < 5 && predictions.darkHorses?.length > 0) {
-    const remaining = 5 - trackedPredictions.length;
-    predictions.darkHorses.slice(0, remaining).forEach((dh, i) => {
-      const lb = leaderboardMap.get(dh.playerId)
-        ?? leaderboardByName.get(dh.playerName?.toLowerCase() ?? '');
-      trackedPredictions.push(buildTrackedPrediction(
-        { ...dh, reasons: [dh.hook], winProbability: 0 },
-        trackedPredictions.length + 1,
-        lb,
-        false,
-        fieldCompletionPct,
-        tournamentId
-      ));
-    });
-  }
-
   // Calculate accuracy metrics
   const accuracy = calculateAccuracy(trackedPredictions);
 
@@ -100,7 +83,6 @@ async function fetchTrackerData(
 
   return {
     predictions: trackedPredictions,
-    darkHorses: [],
     allPicks: trackedPredictions,
     accuracy,
     lastUpdated: new Date().toISOString(),
@@ -175,7 +157,6 @@ function buildTrackedPrediction(
     moveDir,
     moveSpots,
     country: (lb?.sr_players as any)?.country ?? null,
-    pulledQuote: player.pulledQuote ?? null,
   };
 }
 
