@@ -87,10 +87,6 @@
       "scoreLabelToPar": "[~~ŢŐ ƤÁŘ~~]",
       "eyebrow": "[~~ĈĤÁṀƤÍŐÑ~~]"
     },
-    "playoff": {
-      "eyebrow": "[~~ÁŴÁÍŢÍÑĜ ƤĻÁÝŐƑƑ~~]",
-      "tiedAtTop": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]"
-    },
     "rankings": {
       "sectionEyebrow": "[~~Ŵőřļđ řáñǩíñĝš~~]",
       "linkLabel": "[~~Ƒúļļ řáñǩíñĝš~~]",
@@ -105,16 +101,8 @@
       "movementBasis": "[~~Ƥőšíţíőñš mővéđ ővéř {{days}} đáýš~~]"
     },
     "leaderRow": {
-      "tiedAtRank_one": "[~~{{count}} ţíéđ áţ {{rank}}~~]",
-      "tiedAtRank_other": "[~~{{count}} ţíéđ áţ {{rank}}~~]",
-      "tiedAtRankAria_one": "[~~{{count}} ƥļáýéř ţíéđ áţ {{rank}} ŵíţĥ šĉőřé {{score}}, áṽéřáĝé ţřáĵéĉţőřý~~]",
-      "tiedAtRankAria_other": "[~~{{count}} ƥļáýéřš ţíéđ áţ {{rank}} ŵíţĥ šĉőřé {{score}}, áṽéřáĝé ţřáĵéĉţőřý~~]",
       "tiedAtTop_one": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]",
-      "tiedAtTop_other": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]",
-      "tiedAtTopAria_one": "[~~{{count}} ƥļáýéř ţíéđ áţ ţĥé ţőƥ ŵíţĥ šĉőřé {{score}}~~]",
-      "tiedAtTopAria_other": "[~~{{count}} ƥļáýéřš ţíéđ áţ ţĥé ţőƥ ŵíţĥ šĉőřé {{score}}~~]",
-      "playoffMarker": "[~~* ƤĻÁÝŐƑƑ~~]",
-      "championIconLabel": "[~~Ĉĥáɱƥíőñ~~]"
+      "tiedAtTop_other": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]"
     },
     "photoBand": {
       "insightKickerCourse": "COURSE INTELLIGENCE",
@@ -471,7 +459,15 @@
       "pickPre": "[!! Our pick: {{player}}, with a {{probability}}% win chance. !!]",
       "pickPlain": "[!! Our pick: {{player}}. !!]",
       "courseKicker": "[!! Çöürsë öf thë wëëk !!]",
-      "top100Link": "[!! Töp 100 !!]"
+      "top100Link": "[!! Töp 100 !!]",
+      "suspendedTieTwo": "[~~Pláy íš šúšpéñdéd íñ řőúñd {{round}}, wíth {{first}} áñd {{second}} šháříñg thé léád át {{score}}.~~]",
+      "suspendedTieMany": "[~~Pláy íš šúšpéñdéd íñ řőúñd {{round}}, wíth {{count}} pláyéřš šháříñg thé léád át {{score}}.~~]",
+      "suspendedMargin": "[~~Pláy íš šúšpéñdéd íñ řőúñd {{round}}, wíth {{leader}} léádíñg by {{count}} át {{score}}.~~]",
+      "suspendedLeader": "[~~Pláy íš šúšpéñdéd íñ řőúñd {{round}}, wíth {{leader}} léádíñg át {{score}}.~~]",
+      "suspendedPlain": "[~~Pláy íš šúšpéñdéd íñ řőúñd {{round}}.~~]",
+      "playoffTieTwo": "[~~{{first}} áñd {{second}} fíñíšhéd tíéd át {{score}}. Á pláyőff déĉídéš ít.~~]",
+      "playoffTieMany": "[~~{{count}} pláyéřš fíñíšhéd tíéd át {{score}}. Á pláyőff déĉídéš ít.~~]",
+      "playoffPending": "[~~Régúlátíőñ fíñíšhéd lévél. Á pláyőff déĉídéš ít.~~]"
     },
     "picksSheet": {
       "cardAria": "[Why we picked {{name}}]",
