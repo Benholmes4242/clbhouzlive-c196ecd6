@@ -1889,6 +1889,15 @@ class VideoEngineImpl {
     lb.id = a; lb.listeners = la2; lb.el.dataset.laneId = a;
     this.lanes.set(a, lb);
     this.lanes.set(b, la);
+    // Audio policy and loop are declared per lane ID by the bound consumer
+    // (useVideoLane re-applies them only when the id changes, which it does
+    // not), so they stay with the slot: 'fullscreen' keeps 'session', and
+    // 'fullscreen-next' keeps 'always-muted' — never the speaker.
+    const pa = la.audioPolicy; la.audioPolicy = lb.audioPolicy; lb.audioPolicy = pa;
+    const loopA = la.loop; la.loop = lb.loop; lb.loop = loopA;
+    la.el.loop = la.loop; lb.el.loop = lb.loop;
+    this.applyAudioPolicy(lb, 'swap');
+    this.applyAudioPolicy(la, 'swap');
     this.sameElementReturn.delete(a);
     this.sameElementReturn.delete(b);
     // The old 'a' content (now under id b) is paused and parked.
