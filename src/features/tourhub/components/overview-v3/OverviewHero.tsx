@@ -329,6 +329,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
             tournamentId={bandTournamentId}
             entries={boardEntries}
             currentRound={boardRound}
+            totalRounds={heroState && isInPlayState(heroState) ? heroState.totalRounds : null}
             phase={bandPhase}
             /* The SAME champion the strip crowns: only passed once the winner
                gate has resolved a name, so a pending playoff marks nobody. */

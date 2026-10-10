@@ -68,16 +68,17 @@ export function leaderOf(
 export function nextDrawnRound(
   currentRound: number | null | undefined,
   drawnRounds: number[] | null | undefined,
+  totalRounds: number,
 ): number | null {
   if (!isNum(currentRound)) return null;
   const next = currentRound + 1;
-  if (next > 4) return null; // ceiling of the 1–4 draw, not the event's round count
+  if (next > totalRounds) return null;
   return (drawnRounds ?? []).includes(next) ? next : null;
 }
 
 /** Whether a next round can exist at all — gates the draw query itself. */
-export function hasNextRound(currentRound: number | null | undefined): boolean {
-  return isNum(currentRound) && currentRound >= 1 && currentRound < 4;
+export function hasNextRound(currentRound: number | null | undefined, totalRounds: number): boolean {
+  return isNum(currentRound) && currentRound >= 1 && currentRound < totalRounds;
 }
 
 /** The group containing the leader, by player id — never "last off". */

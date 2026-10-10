@@ -213,6 +213,7 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
           avatarUrl={championAvatarUrl}
           narrative={championNarrative}
           rounds={champion.rounds}
+          totalRounds={roundsFromSchedule(tournament.startDate, tournament.endDate)}
           country={champion.country}
         />
       ) : null}
