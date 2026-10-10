@@ -33,6 +33,6 @@ export function makeBoardState(over: Partial<AmateurBoardState> = {}): AmateurBo
     sheetFilterCount: 0,
     changeScope: vi.fn(),
     seeEveryone: vi.fn(),
-  } as AmateurBoardState;
+  };
   return { ...base, ...over };
 }
