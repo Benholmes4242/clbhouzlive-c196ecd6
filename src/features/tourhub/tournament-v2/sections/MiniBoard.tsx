@@ -95,14 +95,51 @@ const HERO_NUM = { fontVariantNumeric: 'tabular-nums lining-nums' as const, text
  *
  *  PER-ROUND COLUMNS NEED AT LEAST TWO ROUNDS for the same reason: a lone
  *  R1 column is the total under another name.
+ *
+ *  MOV (places gained since the round began) IS A LIVE IDEA. It appears
+ *  only while play is in progress (live or suspended mid-round); on a
+ *  finished board the round columns already tell how the week went. It
+ *  NEEDS A PRIOR ROUND: round one has nothing to rank against, so no
+ *  header, no track, no dashes — the width returns to the name. And
+ *  FOUR ROUND COLUMNS WIN: beside four round tracks MOV takes the player
+ *  track below what a full name needs (~124px at 382px), so MOV is the
+ *  column that goes, never the name. `hasMovement` is the data guard:
+ *  movementFromRounds over the FULL field returned at least one delta.
  */
-export function heroBoardColumns(opts: { roundCount: number; roundInProgress: boolean; completed: boolean }): {
-  today: boolean; thru: boolean; rounds: boolean;
+export function heroBoardColumns(opts: { roundCount: number; roundInProgress: boolean; completed: boolean; hasMovement?: boolean }): {
+  today: boolean; thru: boolean; rounds: boolean; mov: boolean;
 } {
   const live = !opts.completed && opts.roundInProgress;
   const multi = opts.roundCount >= 2;
-  if (live) return { today: multi, thru: true, rounds: false };
-  return { today: false, thru: false, rounds: multi };
+  const rounds = !live && multi;
+  const fourRoundTracks = rounds && opts.roundCount >= 4;
+  const mov = live && multi && !!opts.hasMovement && !fourRoundTracks;
+  if (live) return { today: multi, thru: true, rounds: false, mov };
+  return { today: false, thru: false, rounds, mov: false };
+}
+
+export type TieRole = 'solo' | 'first' | 'middle' | 'last';
+
+/** GROUP THE TIE over the VISIBLE rows. A group is two or more consecutive
+ *  rows sharing a position. A group cut by the row limit ends on the last
+ *  visible row, so its bracket never points at nothing; a single visible row
+ *  of a tie that continues below is a solo row and keeps its marker. */
+export function heroTieRoles(rows: Array<{ position?: number | null; status?: string | null }>): TieRole[] {
+  const key = (r: { position?: number | null; status?: string | null }) => {
+    const s = r.status?.toUpperCase();
+    if (s === 'MC' || s === 'CUT' || s === 'WD') return null;
+    return r.position ?? null;
+  };
+  return rows.map((r, i) => {
+    const k = key(r);
+    if (k == null) return 'solo';
+    const prev = i > 0 && key(rows[i - 1]) === k;
+    const next = i < rows.length - 1 && key(rows[i + 1]) === k;
+    if (prev && next) return 'middle';
+    if (prev) return 'last';
+    if (next) return 'first';
+    return 'solo';
+  });
 }
 
 
