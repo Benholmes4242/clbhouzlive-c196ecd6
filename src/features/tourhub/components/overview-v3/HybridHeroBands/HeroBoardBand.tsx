@@ -393,7 +393,7 @@ export function HeroBoardSection({
             data-overview-course-cta
             style={{ flex: '1 1 0', minWidth: 0, minHeight: 48, margin: 0, padding: '0 12px', borderRadius: r.md, background: 'transparent', border: `1px solid ${WHITE_ALPHA_08}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: WHITE_ALPHA_65, fontFamily: FONT, fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.01em', cursor: 'pointer', whiteSpace: 'nowrap' }}
           >
-            {t('overview.venueRecord.course', 'Course')}
+            {t('overview.venueRecord.course')}
             <ChevronRight size={16} aria-hidden />
           </button>
         ) : null}
