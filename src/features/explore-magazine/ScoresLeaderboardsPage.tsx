@@ -500,7 +500,6 @@ const RAIL_CARD = {
 export function ScoresLeaderboardsPage({
   userId,
   state,
-  onOpenBoard,
   onOpenFilters,
   onRowPress,
   onMemberTap,
@@ -508,7 +507,8 @@ export function ScoresLeaderboardsPage({
 }: {
   userId: string | undefined;
   state: AmateurBoardState;
-  onOpenBoard: () => void;
+  /** Unused since Phase 1: the rail changes the board; nothing on this page opens BoardPicker. */
+  onOpenBoard?: () => void;
   onOpenFilters: () => void;
   onRowPress: (row: BoardRow) => void;
   /** Resolves to compare, nudge or invite via useMemberTapResolver. NOT a profile page — the Top 100 sheet's Profile pill navigates to /profile/:id itself. */
