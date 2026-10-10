@@ -859,15 +859,19 @@ export function ScoresLeaderboardsPage({
           </div>
           {/* 2.2 WHERE THE MEMBER STANDS when their row is not in the fetch.
               The facets' `you` scope count tells "deeper than fetched" from
-              "no qualifying round"; unresolved renders nothing. */}
+              "no qualifying round"; unresolved renders nothing.
+              SAFE ON EVERY OFFERED SCOPE: board_pool's circle is the people a
+              member follows UNION the member, club includes the viewer's own
+              primary club, everyone includes all — so the viewer is always in
+              the pool and a qualifying round means a place on the board. This
+              stops being true only if a scope that EXCLUDES the viewer from
+              their own board is offered ('you' is retired); re-gate it then. */}
           {userId && !leadMine ? (() => {
             const you = state.facets?.countFor?.('scope', 'you') ?? null;
             if (you == null) return null;
             const msg = you > 0
               ? t('amateur.leaderboards.standing.deeper', "You're on this board, further down than shown here. See all to find your place.")
-              : t('amateur.leaderboards.standing.none', "You don't have a qualifying round here yet — this board needs {{floor}}.", {
-                  floor: t(BOARD_FLOOR_COPY[state.board].i18n, BOARD_FLOOR_COPY[state.board].label),
-                });
+              : t(BOARD_FLOOR_COPY[state.board].i18n, BOARD_FLOOR_COPY[state.board].label);
             return (
               <div data-scores-standing={you > 0 ? 'deeper' : 'none'} style={{ marginTop: 12, fontSize: 12.5, lineHeight: 1.45, color: A.MUTE }}>
                 {msg}
