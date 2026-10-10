@@ -115,6 +115,7 @@ export function fmtScore(n: number | null | undefined): string {
  * 4-round event: R1/R2 → "Round 1/2", R3 → "Moving Day", R4 → "Final Round".
  * 3-round event: R1 → "Round 1", R2 → "Moving Day", R3 → "Final Round".
  */
+// UNUSED and English-only (hardcoded strings, no translation keys) — candidate for the orphan sweep.
 export function roundLabel(round: number, totalRounds: number): string {
   if (!Number.isFinite(round) || round < 1) return 'Round 1';
   if (!Number.isFinite(totalRounds) || totalRounds < 2) return `Round ${round}`;

@@ -34,6 +34,23 @@ export function neededGross(
   return gross;
 }
 
+/** Stroke-play events on the overview are four rounds. */
+export const TOTAL_ROUNDS = 4;
+
+/**
+ * THE REQUIRED-ROUND WINDOW. A required round score is only a true statement
+ * when exactly one full round remains: a gap spread over two or more rounds
+ * is not a single round score, and a gap measured once the final round is
+ * under way is a part-round figure wearing a full-round label. So the line
+ * lives in the penultimate round only (on a four-round event, Saturday).
+ */
+export function inRequiredRoundWindow(
+  currentRound: number | null | undefined,
+  totalRounds: number = TOTAL_ROUNDS,
+): boolean {
+  return isNum(currentRound) && currentRound === totalRounds - 1;
+}
+
 /** Lowest to-par among the board's leading row; the leader's total. */
 export function leaderOf(
   entries: Array<{ position?: number | null; score?: number | null; player?: { id?: string | null } | null }>,

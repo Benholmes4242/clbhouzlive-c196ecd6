@@ -61,7 +61,7 @@ import { useTeeTimesAll } from '../../../tournament-v2/data/useTeeTimesAll';
 import { useDrawnRounds } from '../../../tournament-v2/data/useDrawnRounds';
 import { formatTimeHm } from '@/i18n/format';
 import { LastYearRow } from './LastYearRow';
-import { hasNextRound, leaderGroup, leaderOf, neededGross, nextDrawnRound } from './whatsNext';
+import { inRequiredRoundWindow, hasNextRound, leaderGroup, leaderOf, neededGross, nextDrawnRound } from './whatsNext';
 import { useTournamentVenueRecord } from '../../../overview/data/useTournamentVenueRecord';
 import { surnameOf } from '../../../_shared/playerName';
 import { r } from '@/lib/radius';
@@ -350,14 +350,14 @@ export function HeroBoardSection({
   const leader = useMemo(() => (inPlay ? leaderOf(entries) : null), [inPlay, entries]);
   const neededByPlayer = useMemo(() => {
     const map = new Map<string, number>();
-    if (!inPlay || !leader) return map;
+    if (!inPlay || !leader || !inRequiredRoundWindow(currentRound)) return map;
     for (const p of picks) {
       if (!p?.playerId) continue;
       const g = neededGross(venuePar, leader.total, boardByPlayer.get(String(p.playerId))?.score ?? null);
       if (g != null) map.set(String(p.playerId), g);
     }
     return map;
-  }, [inPlay, leader, picks, venuePar, boardByPlayer]);
+  }, [inPlay, leader, picks, venuePar, boardByPlayer, currentRound]);
 
   // Gated: no draw request unless in play with a round still to come; no
   // tee-time request unless that next round is actually drawn.
@@ -437,7 +437,6 @@ export function HeroBoardSection({
           eventName={predictions?.tournament?.name ?? ''}
           venueName={predictions?.tournament?.venueName || null}
           neededByPlayer={neededByPlayer}
-          round={inPlay ? currentRound : null}
         />
       ) : null}
 

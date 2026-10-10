@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   MIN_TARGET_ROUND,
+  inRequiredRoundWindow,
   hasNextRound,
   leaderGroup,
   leaderOf,
@@ -48,5 +49,14 @@ describe('next round band (Phase 4.2)', () => {
     expect(leaderGroup(groups, 'zzz')).toBeNull();
     expect(leaderOf([{ position: 2, score: -5, player: { id: 'x' } }, { position: 1, score: -9, player: { id: 'lead' } }]))
       .toEqual({ playerId: 'lead', total: -9 });
+  });
+});
+
+describe('required round window (Phase 4.5)', () => {
+  it('is the penultimate round only', () => {
+    expect(inRequiredRoundWindow(3)).toBe(true);
+    expect(inRequiredRoundWindow(2)).toBe(false);
+    expect(inRequiredRoundWindow(4)).toBe(false);
+    expect(inRequiredRoundWindow(null)).toBe(false);
   });
 });
