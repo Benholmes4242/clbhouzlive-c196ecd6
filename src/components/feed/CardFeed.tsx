@@ -21,7 +21,7 @@
 import type { RoundCourseMeta } from './roundPostItem';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
 import { dropUnresolvedRounds } from './dropUnresolvedRounds';
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { Virtuoso, type VirtuosoHandle, type StateSnapshot } from 'react-virtuoso';
 import type { CommentOpenSource } from '@/types/commentOpenSource';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -35,7 +35,7 @@ import { getPageScrollTop } from '@/lib/getScrollParent';
 
 
 import { VideoEngine } from '@/video/VideoEngine';
-import { feedLaneRoles } from '@/video/feedLaneRoles';
+import { feedLaneRoles, carouselNeighbourOverride } from '@/video/feedLaneRoles';
 import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted } from '@/perf/vperf';
 import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 
@@ -484,10 +484,26 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // 'next' / 'prev' role. Warming is idempotent (alreadyLoaded skip in the
   // engine); a two-lane degraded window (one lane frozen by a borrow) simply
   // warms into the ex-active — safe by construction.
+  /* BRIEF_CAROUSEL_NEIGHBOUR_WARM §2 — the active card's carousel may own the
+     'next' / 'prev' lanes for its horizontal video neighbours. Only an override
+     published by the CURRENT playing post counts; a single-media card never
+     publishes, so `ownedBy` is null and this effect is exactly the old path. */
+  const neighbourOverride = useSyncExternalStore(
+    carouselNeighbourOverride.subscribe,
+    carouselNeighbourOverride.get,
+    carouselNeighbourOverride.get,
+  );
   useEffect(() => {
     const activePost = posts[playingIdx];
-    const expectedActiveOwnerKey = activePost ? `${activePost.id}:0` : undefined;
+    const ownedBy =
+      activePost && neighbourOverride && neighbourOverride.postId === activePost.id
+        ? neighbourOverride
+        : null;
+    const expectedActiveOwnerKey = activePost
+      ? `${activePost.id}:${ownedBy ? ownedBy.activeIndex : 0}`
+      : undefined;
     const warm = (role: 'next' | 'prev', post: FeedPost | undefined) => {
+      if (ownedBy && ownedBy[role]) return; // the carousel's neighbour owns this lane
       const m = post?.mediaItems?.[0];
       if (!post || !m || m.type !== 'video' || !(m as any).hlsUrl) return;
       try {
@@ -508,7 +524,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     };
     warm('next', posts[playingIdx + 1]);
     warm('prev', posts[playingIdx - 1]);
-  }, [playingIdx, posts]);
+  }, [playingIdx, posts, neighbourOverride]);
 
 
 
