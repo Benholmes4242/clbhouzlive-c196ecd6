@@ -55,7 +55,7 @@ export interface AccuracyMetrics {
 
 export interface PredictionTrackerData {
   predictions: TrackedPrediction[];
-  /** Top 5 + dark horses in one list. */
+  /** The tracked picks; same list as `predictions` (dark horses are not tracked). */
   allPicks: TrackedPrediction[];
   accuracy: AccuracyMetrics;
   lastUpdated: string;
