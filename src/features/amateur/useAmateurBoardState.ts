@@ -306,6 +306,9 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
     () => ({
       ready: resolved,
       clubApplies,
+      /** 14.1 — the viewer's CURRENT index as resolved by resolveDisplayHandicap
+       *  (the one resolver). null when absent or withheld; never re-read elsewhere. */
+      viewerIndex: handicap,
       board,
       /** The member's resolved entry board — reset and 'changed' compare against this. */
       entryBoard,
@@ -334,7 +337,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
       changeScope,
       seeEveryone,
     }),
-    [resolved, clubApplies, sheetFilterCount, changeScope, board, entryBoard, filters, courseBoard, facets, page, hasCircle, widened, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters, resetAll, canReset, seeEveryone],
+    [resolved, clubApplies, handicap, sheetFilterCount, changeScope, board, entryBoard, filters, courseBoard, facets, page, hasCircle, widened, panelOpen, changeBoard, changeFilters, changeCourseBoard, resetFilters, resetAll, canReset, seeEveryone],
   );
 }
 

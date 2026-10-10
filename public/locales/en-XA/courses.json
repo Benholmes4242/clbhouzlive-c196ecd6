@@ -168,7 +168,8 @@
       "slab": {
         "you": "[~~Ýőú~~]",
         "onBoardRanked": "[~~{{you}}, őƒ {{pool}} íñ {{scope}}. {{course}}, {{date}}.~~]",
-        "onBoardRounds": "[~~{{you}} ƥőšţéđ {{gross}} áţ {{course}}, {{date}}.~~]"
+        "onBoardRounds": "[~~{{you}} ƥőšţéđ {{gross}} áţ {{course}}, {{date}}.~~]",
+        "indexSince": "[~~Ŷőűŕ íñđéx ĥáš ɱőṽéđ {{figure}} šíñčé.~~]"
       }
     },
     "place": {

@@ -168,7 +168,8 @@
       "slab": {
         "you": "You",
         "onBoardRanked": "{{you}}, of {{pool}} in {{scope}}. {{course}}, {{date}}.",
-        "onBoardRounds": "{{you}} posted {{gross}} at {{course}}, {{date}}."
+        "onBoardRounds": "{{you}} posted {{gross}} at {{course}}, {{date}}.",
+        "indexSince": "Your index has moved {{figure}} since."
       }
     },
     "place": {
