@@ -22,6 +22,13 @@ export type UpcomingVariant = 'far' | 'imminent';
 
 export type HeroState =
   | { kind: 'live'; round: number; totalRounds: number; thruLabel: string; roundStatus?: 'scheduled' | 'live' }
+  /**
+   * Play has STOPPED but the tournament has NOT finished (suspended, delayed,
+   * weather, holdup). The scores on the board are live scores, so this state
+   * renders as live with a suspended marker — never FINAL, never a champion.
+   * `reason` is null until the data carries one; no reason field exists today.
+   */
+  | { kind: 'suspended'; round: number; totalRounds: number; reason: string | null }
   | { kind: 'results'; variant: ResultsVariant; finishDate: string; meta: string }
   | { kind: 'upcoming'; variant: UpcomingVariant; countdown: string; meta: string };
 
@@ -179,6 +186,29 @@ interface DeriveOpts {
  */
 export const UPCOMING_STATUSES = ['scheduled', 'created'];
 
+/** Statuses meaning play has stopped mid-event. Mapped to `suspended`. */
+export const SUSPENDED_STATUSES = ['suspended', 'delayed', 'weather', 'holdup'];
+/** Statuses meaning regulation is over and a playoff is pending. */
+export const PLAYOFF_STATUSES = ['playoff', 'inplayoff', 'in_playoff'];
+
+/** Live or suspended: the board carries live scores (TODAY / THRU). */
+export function isInPlayState(state: HeroState): state is Extract<HeroState, { kind: 'live' | 'suspended' }> {
+  return state.kind === 'live' || state.kind === 'suspended';
+}
+
+/**
+ * THE ONE CHAMPION GATE. A champion may be resolved ONLY when the event is
+ * genuinely finished: `results`, and neither a pending playoff nor a
+ * cancellation. Combined at every call site with an authoritative winner
+ * (winner_id, or a closed team event's untied P1) — never by name or by a
+ * position on a live board. Shared by the ChampionStrip (HybridHero), the
+ * band's champion member ids (OverviewHero) and the pick trophy
+ * (HeroBoardBand), so the three can never disagree.
+ */
+export function isChampionResolvable(state: HeroState): boolean {
+  return state.kind === 'results' && state.variant !== 'awaiting-playoff' && state.variant !== 'cancelled';
+}
+
 export function deriveHeroState(
   tournament: HeroTournament,
   now: Date = new Date(),
@@ -233,19 +263,25 @@ export function deriveHeroState(
     };
   }
 
-  // Unresolved — playoff / suspended / weather / delayed. Play not finished:
-  // stay featured, but render the awaiting-playoff variant rather than crowning.
-  const UNRESOLVED = [
-    'playoff', 'inplayoff', 'in_playoff',
-    'suspended', 'delayed', 'weather', 'holdup',
-  ];
-  if (UNRESOLVED.includes(status)) {
-    const isSuspended = status === 'suspended' || status === 'delayed' || status === 'weather' || status === 'holdup';
+  // Suspended — play has stopped but the event has not finished. These scores
+  // are LIVE scores, so this is its own kind and never reaches `results`.
+  if (SUSPENDED_STATUSES.includes(status)) {
+    return {
+      kind: 'suspended',
+      round: tournament.currentRound ?? 1,
+      totalRounds: tournament.tourSlug === 'lpga' ? 3 : 4,
+      reason: null,
+    };
+  }
+
+  // Awaiting playoff — regulation complete, a playoff pending. ONLY playoff
+  // statuses reach this variant; nothing weather-related may.
+  if (PLAYOFF_STATUSES.includes(status)) {
     return {
       kind: 'results',
       variant: 'awaiting-playoff',
       finishDate: tournament.endDate || '',
-      meta: isSuspended ? 'PLAY SUSPENDED' : 'PLAYOFF',
+      meta: 'PLAYOFF',
     };
   }
 
