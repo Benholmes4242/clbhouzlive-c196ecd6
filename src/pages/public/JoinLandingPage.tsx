@@ -10,8 +10,7 @@ const INK_62 = inkWithAlpha(INK, 0.62);
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const FALLBACK_URL = 'https://apps.apple.com/app/id6752538886';
 const MARK = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
-// Until Ben supplies public/join/screen-feed.png, the frame shows the OG card.
-const SCREEN = '/og-card-v2.png';
+const SCREEN = '/join/screen-feed.png';
 
 async function fetchDownloadUrl(): Promise<string> {
   try {
