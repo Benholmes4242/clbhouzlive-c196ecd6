@@ -1,7 +1,7 @@
 import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Trans, useTranslation } from 'react-i18next';
-import { ChevronRight, Medal } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -23,11 +23,8 @@ import {
   boardCountsRounds,
   type BoardFilters,
   type BoardKey,
-  type FeatBoardKey,
   type WindowKey,
 } from '@/components/explore-tab-new/courseled/boardFilters';
-import { REC } from '@/components/profile/handicap/whs/gam/trophy-room/career/tokens';
-import { MEDAL_BRONZE, MEDAL_GOLD, MEDAL_SILVER } from '@/lib/tokens/medals';
 import { entryFiltersFor, type AmateurBoardState } from '@/features/amateur/useAmateurBoardState';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -38,7 +35,9 @@ import { BOARD_FLOOR_COPY } from '@/components/explore-tab-new/courseled/boardFl
 import { dayLadder, playDateAtLocalNoon, playDateShort } from '@/components/explore-tab-new/courseled/discoverWhen';
 import { SELF_ROW_TINT } from '@/components/explore-tab-new/courseled/tokens';
 import { standingOrdinal } from './ordinal';
-import { useFeatsWindow, type FeatKind, type FeatWindow } from './useFeatsWindow';
+import { useFeatsWindow, type FeatWindow } from './useFeatsWindow';
+import { RARE_AIR, rareAirPlaceholderHeight } from './rareAir';
+import { RareAirLede, RareAirRail, RareAirYou } from './RareAirSection';
 import { RailChips } from '@/components/ui/RailChips';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
@@ -283,6 +282,7 @@ function Section({
   metaAlign,
   first,
   lede,
+  ledeStyle,
   children,
 }: {
   eyebrow: string;
@@ -293,6 +293,7 @@ function Section({
   metaAlign?: 'center';
   first?: boolean;
   lede?: ReactNode;
+  ledeStyle?: CSSProperties;
   children: ReactNode;
 }) {
   return (
@@ -326,7 +327,7 @@ function Section({
         ) : null}
       </div>
       {lede != null ? (
-        <div style={{ marginTop: 8, fontSize: 11.5, lineHeight: 1.45, color: A.MUTE }}>{lede}</div>
+        <div style={{ marginTop: 8, fontSize: 11.5, lineHeight: 1.45, color: A.MUTE, ...ledeStyle }}>{lede}</div>
       ) : null}
       <div style={{ marginTop: 12 }}>{children}</div>
     </section>
@@ -534,8 +535,6 @@ function Rail({ children }: { children: ReactNode }) {
   );
 }
 
-const FEAT_TONE: Record<FeatKind, string> = { ace: MEDAL_GOLD, albatross: MEDAL_SILVER, eagle: MEDAL_BRONZE, clean_card: REC.GOOD };
-
 const RAIL_CARD = {
   flexShrink: 0,
   padding: 12,
@@ -577,6 +576,10 @@ export function ScoresLeaderboardsPage({
 
   const [featWindow, setFeatWindow] = useState<FeatWindow>('year');
   const featsYear = useFeatsWindow(userId, featWindow);
+  /* B.2 — the year view compares against all time, and the rarity bar always
+     reads all time. On the all-time view the primary read IS that read. */
+  const featsAll = useFeatsWindow(userId, 'all', featWindow === 'year');
+  const featAllRows = (featWindow === 'all' ? featsYear.data : featsAll.data) ?? [];
   /** Feat tiles are counted in the section's own window, so their sheets open on the same one. */
   const featFilters: BoardFilters = { ...DEFAULT_FILTERS, window: featWindow };
   const pickFeatWindow = (next: FeatWindow) => {
@@ -684,24 +687,10 @@ export function ScoresLeaderboardsPage({
   /* §5 reads get_feats_window: true event counts (eagles, not rounds with an
      eagle) and the denominator each divides by, from one RPC row per kind. */
   const featRows = featsYear.data ?? [];
-  const featsShown = featsYear.isSuccess
-    ? featRows.filter((f) => f.events > 0).map((f) => ({ ...f, key: f.feat_kind as FeatBoardKey, tone: FEAT_TONE[f.feat_kind] }))
-    : [];
+  // B.8 — nothing vanishes: all four feats, in RPC order, every window.
   const featTotals = featsYear.isSuccess ? featRows[0] ?? null : null;
   // First load only: isFetched drops on key change while placeholderData holds rows; isSuccess does not.
   const featsFirstLoad = !featsYear.isSuccess && featRows.length === 0;
-  const featLabel = (k: FeatBoardKey, n: number) => {
-    switch (k) {
-      case 'ace':
-        return t('amateur.leaderboards.feat.ace', { count: n });
-      case 'albatross':
-        return t('amateur.leaderboards.feat.albatross', { count: n });
-      case 'eagle':
-        return t('amateur.leaderboards.feat.eagle', { count: n });
-      default:
-        return t('amateur.leaderboards.feat.cleanCard', { count: n });
-    }
-  };
 
   /* ------------------------------------------------------------ §6 career */
   const career = [
@@ -1046,9 +1035,10 @@ export function ScoresLeaderboardsPage({
       ) : null}
 
       {/* §5 FEATS THIS YEAR — event counts; footnote is distinct members. */}
+      {/* §5 RARE AIR — all four feats rarest first; hides only on zero rounds. */}
       {featsFirstLoad ? (
-        pending(175)
-      ) : featsShown.length > 0 ? (
+        pending(rareAirPlaceholderHeight(!!userId))
+      ) : featTotals && featTotals.total_rounds > 0 ? (
         <Section
           contest={false}
           eyebrow={t('amateur.leaderboards.rareAir')}
@@ -1059,8 +1049,8 @@ export function ScoresLeaderboardsPage({
               role="radiogroup"
               aria-label={t('amateur.leaderboards.featsWindow')}
               style={{
-                display: 'flex', gap: 3, padding: 3, borderRadius: 999, flex: 'none', alignSelf: 'center',
-                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)',
+                display: 'flex', gap: RARE_AIR.toggle.gap, padding: RARE_AIR.toggle.padding, borderRadius: 999, flex: 'none', alignSelf: 'center',
+                background: RARE_AIR.toggle.background, border: `1px solid ${RARE_AIR.toggle.border}`,
               }}
             >
               {([
@@ -1076,10 +1066,10 @@ export function ScoresLeaderboardsPage({
                     aria-checked={selected}
                     onClick={() => pickFeatWindow(key)}
                     style={{
-                      height: 24, padding: '0 10px', borderRadius: 999, border: 'none',
-                      fontFamily: SANS, fontSize: 11.5, fontWeight: 600, whiteSpace: 'nowrap',
+                      height: RARE_AIR.toggle.height, padding: `0 ${RARE_AIR.toggle.sidePadding}px`, borderRadius: 999, border: 'none',
+                      fontFamily: SANS, fontSize: RARE_AIR.toggle.fontSize, fontWeight: 600, whiteSpace: 'nowrap',
                       letterSpacing: 'normal', textTransform: 'none',
-                      background: selected ? 'rgba(255,255,255,0.12)' : 'transparent',
+                      background: selected ? RARE_AIR.toggle.fill : 'transparent',
                       color: selected ? A.INK : A.MUTE,
                     }}
                   >
@@ -1089,40 +1079,17 @@ export function ScoresLeaderboardsPage({
               })}
             </div>
           )}
-          lede={featTotals && featTotals.total_rounds > 0 ? (
-            <Trans
-              i18nKey="amateur.leaderboards.featsFrom"
-              defaults="From <n>{{rounds}} full rounds</n> and <n>{{holes}} holes</n> tracked on clbhouz."
-              values={{ rounds: featTotals.total_rounds.toLocaleString(), holes: featTotals.total_holes.toLocaleString() }}
-              components={{ n: <span style={{ fontWeight: 700, color: A.INK }} /> }}
-            />
-          ) : undefined}
+          ledeStyle={{ fontSize: RARE_AIR.lede.fontSize, lineHeight: RARE_AIR.lede.lineHeight }}
+          lede={<RareAirLede totals={featTotals} window={featWindow} />}
         >
-          <Rail>
-            {featsShown.map((f) => (
-              <button key={f.key} type="button" onClick={() => setSeeAll({ board: f.key, filters: featFilters })} style={{ ...RAIL_CARD, width: 150, position: 'relative' }}>
-                <span aria-hidden style={{ position: 'absolute', top: 12, right: 11, color: FAINT, display: 'flex' }}>
-                  <ChevronRight size={13} />
-                </span>
-                <span style={{ width: 26, height: 26, borderRadius: 8, display: 'grid', placeItems: 'center', background: f.tone, color: A.CANVAS }}>
-                  <Medal size={15} />
-                </span>
-                <span className="tabular-nums" style={{ display: 'block', marginTop: 10, fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK }}>
-                  {f.events}
-                </span>
-                <span style={{ display: 'block', marginTop: 2, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.MUTE }}>
-                  {featLabel(f.key, f.events)}
-                </span>
-                <span className="tabular-nums" style={{ display: 'block', marginTop: 6, fontSize: 10.5, lineHeight: 1.3, color: A.MUTE }}>
-                  {t('amateur.leaderboards.featRarity', {
-                    n: Math.round(f.denominator / f.events).toLocaleString(),
-                    unit: t(`amateur.leaderboards.unit.${f.denominator_unit}`),
-                  })}
-                </span>
-                <span style={{ display: 'block', marginTop: 6, fontSize: 10.5, color: A.DIM }}>{membersText(f.members)}</span>
-              </button>
-            ))}
-          </Rail>
+          {userId ? <RareAirYou rows={featRows} locale={i18n?.language} /> : null}
+          <RareAirRail
+            rows={featRows}
+            allRows={featAllRows}
+            window={featWindow}
+            locale={i18n?.language}
+            onOpen={(key) => setSeeAll({ board: key, filters: featFilters })}
+          />
         </Section>
       ) : null}
 
