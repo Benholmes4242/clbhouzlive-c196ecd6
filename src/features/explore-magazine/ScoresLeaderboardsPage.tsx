@@ -712,16 +712,18 @@ export function ScoresLeaderboardsPage({
   /* ------------------------------------------------------------ §6 career */
   const career = [
     { metric: 'birdies', label: t('amateur.leaderboards.career.birdies'), q: birdiesC },
-    { metric: 'rounds', label: t('amateur.leaderboards.career.rounds'), q: roundsC },
     { metric: 'sub_80', label: t('amateur.leaderboards.career.sub80'), q: sub80C },
     { metric: 'eagles', label: t('amateur.leaderboards.career.eagles'), q: eaglesC, noAvg: true },
+    { metric: 'rounds', label: t('amateur.leaderboards.career.rounds'), q: roundsC },
     /* THE BESTS GATE. A tile holds its place and reads zero when its absence
        is a fact about the world, as Rare air's albatross does. These two are
        absent all time because get_career_leaderboard reads gam_user_milestones,
        which stores counts, and cannot compute a maximum — that is our gap, not
        the member's news, so on All time the tile goes rather than announcing
        our plumbing on screen. They sit LAST so removing them never moves the
-       four tiles before them. */
+       four tiles before them. Within the four that are always present, scoring
+       comes before activity, so the first tiles a member sees reward playing
+       well rather than playing often. */
     ...(bestsAvailable
       ? [
           { metric: 'best_stableford', label: t('amateur.leaderboards.career.bestStableford'), q: stablefordC },
