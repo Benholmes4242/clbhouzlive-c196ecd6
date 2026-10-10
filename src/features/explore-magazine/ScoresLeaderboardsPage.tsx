@@ -75,6 +75,7 @@ const VISUALLY_HIDDEN: CSSProperties = {
 const MARK_W = '\u0001W\u0001';
 const MARK_U = '\u0001U\u0001';
 const MARK_Y = '\u0001Y\u0001';
+const MARK_F = '\u0001F\u0001';
 function splitMarks(text: string, map: Record<string, ReactNode>): ReactNode[] {
   return text.split(/(\u0001[A-Z]\u0001)/).map((part, i) =>
     part in map ? <span key={i}>{map[part]}</span> : part,
@@ -938,7 +939,25 @@ export function ScoresLeaderboardsPage({
                   date,
                 });
               }
-              sentence = splitMarks(raw, { [MARK_Y]: youWord });
+              const marks: Record<string, ReactNode> = { [MARK_Y]: youWord };
+              /* 14.3 — THE INDEX CLAUSE IS GATED TO THE RECENT BOARD ONLY. The
+                 claim (current index minus that round's hcp_at_time) would be
+                 true anywhere, but on a ranked board the row is the member's
+                 BEST round and on a feat board it is the round that carried the
+                 feat, so "since" has no natural referent there. Do not
+                 generalise this past 'recent'. The figure is NOT delta_index
+                 and the copy must never attribute the movement to the round. */
+              if (state.board === 'recent' && state.viewerIndex != null && leadMine.hcp_at_time != null) {
+                const moved = Math.round((Number(state.viewerIndex) - Number(leadMine.hcp_at_time)) * 10) / 10;
+                if (moved !== 0) {
+                  const text = moved < 0 ? `\u2212${Math.abs(moved).toFixed(1)}` : `+${moved.toFixed(1)}`;
+                  marks[MARK_F] = (
+                    <span className="tabular-nums" style={{ color: moved < 0 ? A.GREEN : A.MUTE, fontWeight: 700 }}>{text}</span>
+                  );
+                  raw = `${raw} ${t('amateur.leaderboards.slab.indexSince', { figure: MARK_F })}`;
+                }
+              }
+              sentence = splitMarks(raw, marks);
             } else if (you == null) {
               kind = 'pending';
             } else if (you > 0) {
