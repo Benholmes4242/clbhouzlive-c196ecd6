@@ -34,7 +34,7 @@ export function FiltersPill({ count, onOpen }: { count: number; onOpen: () => vo
       }}
     >
       <SlidersHorizontal size={14} />
-      {t('discover.filterBoard.filters', 'Filters')}
+      {t('discover.filterBoard.filters')}
       {count > 0 ? (
         <span
           className="tabular-nums"
@@ -75,7 +75,7 @@ export function ScopeSegments({
   return (
     <div
       role="radiogroup"
-      aria-label={t('amateur.stream.scopes', 'Scores scope')}
+      aria-label={t('amateur.stream.scopes')}
       style={{
         display: 'grid',
         gridTemplateColumns: `repeat(${options.length}, minmax(0,1fr))`,
@@ -120,7 +120,7 @@ export function ScopeSegments({
                 51px. Nothing clips today. en-XA pseudo-localisation will NOT
                 catch an overflow here. */}
             <span style={{ display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {t(o.i18n, o.label)}
+              {t(o.i18n)}
             </span>
           </button>
         );

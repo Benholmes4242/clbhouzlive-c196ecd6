@@ -225,7 +225,7 @@ export function gapText(
 ): string | null {
   if (mine.pos <= 1) return null;
   if (boardCountsRounds(board)) {
-    return t('discover.filterBoard.gapRounds', '{{count}} rounds back', {
+    return t('discover.filterBoard.gapRounds', {
       count: mine.pos - leader.pos,
     });
   }
@@ -234,13 +234,13 @@ export function gapText(
   if (!Number.isFinite(d) || d === 0) return null;
   switch (board) {
     case 'stableford':
-      return t('discover.filterBoard.gapPoints', '{{n}} points back', { n: Math.round(d) });
+      return t('discover.filterBoard.gapPoints', { n: Math.round(d) });
     case 'birdies':
-      return t('discover.filterBoard.gapBirdies', '{{n}} birdies back', { n: Math.round(d) });
+      return t('discover.filterBoard.gapBirdies', { n: Math.round(d) });
     case 'improved':
-      return t('discover.filterBoard.gapCut', '{{n}} off the lead', { n: d.toFixed(1) });
+      return t('discover.filterBoard.gapCut', { n: d.toFixed(1) });
     default:
-      return t('discover.filterBoard.gapShots', '{{n}} shots back', { n: Math.round(d) });
+      return t('discover.filterBoard.gapShots', { n: Math.round(d) });
   }
 }
 
@@ -261,7 +261,7 @@ export function BoardAvatar({ row, size = 28 }: { row: Row; size?: number }) {
   return (
     <SquircleAvatar
       src={row.profile_photo_url ?? null}
-      alt={row.display_name ?? t('discover.aMember', 'A member')}
+      alt={row.display_name ?? t('discover.aMember')}
       userId={row.user_id}
       fallback={getInitialsFromName(row.display_name).slice(0, 2)}
       size={size}
@@ -290,7 +290,7 @@ function boardFeatLabel(feat: ExploreRoundFeat, t: BoardT): string {
     case 'birdies':
       return t('discover.filterBoard.featBirdies', { count: feat.count, defaultValue_one: '{{count}} BIRDIE', defaultValue_other: '{{count}} BIRDIES' });
     case 'clean':
-      return t('discover.filterBoard.featClean', 'BOGEY-FREE');
+      return t('discover.filterBoard.featClean');
   }
 }
 
@@ -323,7 +323,7 @@ export function boardFeatMarker(row: Row, board: BoardKey, t: BoardT): string | 
   const labels = feats.map((feat) => boardFeatLabel(feat, t));
   if (labels.length === 0) return null;
   return labels.length > 1
-    ? t('discover.filterBoard.featJoin', '{{first}} + {{second}}', { first: labels[0], second: labels[1] })
+    ? t('discover.filterBoard.featJoin', { first: labels[0], second: labels[1] })
     : labels[0];
 }
 
@@ -349,22 +349,22 @@ export function BoardHeaderRow({ board, hideValue }: { board: BoardKey; hideValu
     >
       {cols.ranked && (
         <span style={{ ...cap, width: POS_W, textAlign: 'center', flexShrink: 0 }}>
-          {t('discover.filterBoard.col.pos', 'POS')}
+          {t('discover.filterBoard.col.pos')}
         </span>
       )}
       <span style={{ ...cap, flex: 1, minWidth: 0 }}>
-        {t('discover.filterBoard.col.member', 'MEMBER')}
+        {t('discover.filterBoard.col.member')}
       </span>
       {cols.secondary && (
         <span style={{ ...cap, width: SECOND_W, textAlign: 'center', flexShrink: 0 }}>
-          {t(cols.secondary.i18n, cols.secondary.label)}
+          {t(cols.secondary.i18n)}
         </span>
       )}
       {/* S4.3 — on a DAY-GROUPED sheet the WHEN value is stated once per group,
           so neither the column nor its header belongs on the row. */}
       {!hideValue && (
         <span style={{ ...cap, width: VALUE_W, textAlign: 'center', flexShrink: 0 }}>
-          {t(cols.value.i18n, cols.value.label)}
+          {t(cols.value.i18n)}
         </span>
       )}
     </div>
@@ -468,7 +468,7 @@ export function BoardRowView({
             lineHeight: big ? '18px' : '14px',
           }}
         >
-          {row.display_name ?? t('discover.aMember', 'A member')}
+          {row.display_name ?? t('discover.aMember')}
         </span>
         {/* S5.5 — THE SECOND LINE IS THE COURSE, on every board and every row. */}
         {!gap && feat && !ranked ? (
@@ -488,7 +488,7 @@ export function BoardRowView({
           >
             <span style={{ flexShrink: 0 }}>{feat} {'\u00B7'}&nbsp;</span>
             <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {row.course_name ?? t('discover.unknownCourse', 'A course')}
+              {row.course_name ?? t('discover.unknownCourse')}
             </span>
           </span>
         ) : (
@@ -508,8 +508,8 @@ export function BoardRowView({
           >
             {gap ??
             (feat
-              ? `${row.course_name ?? t('discover.unknownCourse', 'A course')} \u00B7 ${feat}`
-              : (row.course_name ?? t('discover.unknownCourse', 'A course')))}
+              ? `${row.course_name ?? t('discover.unknownCourse')} \u00B7 ${feat}`
+              : (row.course_name ?? t('discover.unknownCourse')))}
           </span>
         )}
       </span>

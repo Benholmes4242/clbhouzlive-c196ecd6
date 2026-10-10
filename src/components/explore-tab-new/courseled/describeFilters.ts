@@ -18,23 +18,23 @@ export function describeFilterParts(
 ): string[] {
   const parts: string[] = [];
   const scope = SCOPE_OPTIONS.find((o) => o.key === f.scope);
-  if (scope) parts.push(t(scope.i18n, scope.label));
+  if (scope) parts.push(t(scope.i18n));
   const win = WINDOW_OPTIONS.find((o) => o.key === f.window);
-  if (win) parts.push(t(win.i18n, win.label));
+  if (win) parts.push(t(win.i18n));
   if (f.regionValue) parts.push(f.regionValue);
-  if (f.courses === 'one') parts.push(t('discover.filterBoard.courses.oneCourse', 'one course'));
+  if (f.courses === 'one') parts.push(t('discover.filterBoard.courses.oneCourse'));
   else if (f.courses !== 'any') {
     const c = COURSES_SET_OPTIONS.find((o) => o.key === f.courses);
-    if (c) parts.push(t(c.i18n, c.label));
+    if (c) parts.push(t(c.i18n));
   }
   if (f.band !== 'any') {
     const b = BAND_OPTIONS.find((o) => o.key === f.band);
-    if (b) parts.push(t(b.i18n, b.label));
+    if (b) parts.push(t(b.i18n));
   }
   /* B3.4 — COMPETITION JOINS THE APPLIED LINE when set. */
   if (f.competition !== 'any') {
     const c = COMPETITION_OPTIONS.find((o) => o.key === f.competition);
-    if (c) parts.push(t(c.i18n, c.label));
+    if (c) parts.push(t(c.i18n));
   }
   return parts;
 }
