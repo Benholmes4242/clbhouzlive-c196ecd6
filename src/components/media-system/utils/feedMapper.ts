@@ -139,7 +139,7 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
       : (row.creator_username || ''),
     displayName: isBusiness
       ? (row.business_name || row.creator_display_name || '')
-      : (row.creator_display_name || row.creator_username || ''),
+      : (row.creator_display_name?.trim() || ''), // never the username: an auto-generated handle is an id, not a name
     avatarUrl: isBusiness
       ? (row.business_logo_url || '')
       : (row.creator_avatar_url || ''),
