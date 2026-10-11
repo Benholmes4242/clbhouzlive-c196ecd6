@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
-import { MiniBoard, showScorecardFooter } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
+import { MiniBoard } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
 import { RoundMovementBand } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 
