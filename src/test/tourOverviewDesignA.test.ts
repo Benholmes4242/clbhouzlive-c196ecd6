@@ -385,7 +385,7 @@ describe('MiniBoard heroBoard render', () => {
     ] as unknown as BoardEntry[];
     const view = mountBoard(entries, 2, 'live');
     const header = view.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(header?.style.gridTemplateColumns).toBe('26px minmax(0,1fr) 34px 36px 42px');
+    expect(header?.style.gridTemplateColumns).toBe('26px minmax(0,1fr) 40px 44px 42px');
     expect(view.container.querySelectorAll('[data-hero-shape]').length).toBe(2);
   });
   it('renders no THRU cell and no MOV track in any phase', () => {
