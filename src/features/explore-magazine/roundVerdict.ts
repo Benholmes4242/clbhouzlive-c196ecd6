@@ -42,9 +42,13 @@ export interface Verdict {
   emphasis: VerdictClause;
 }
 
-/** A rank is only claimed inside the member's top three rounds here: a lower
- *  rank is true but is not a claim worth making about a member's own round. */
-const RANK_CLAIM_CEILING = 3;
+/**
+ * THE RANK RULE: a rank among the member's rounds here is claimed only when
+ * this round is in their top three at the course. A true sentence that makes a
+ * member feel worse for having posted is not worth printing — "their 9th best
+ * of 14 here" is accurate and unkind, so fourth and below say nothing.
+ */
+export const RANK_CLAIM_CEILING = 3;
 
 /**
  * The round against the member's handicap first, then the strongest TRUE claim:
@@ -82,7 +86,13 @@ export function roundVerdict(input: VerdictInput): Verdict | null {
   return null;
 }
 
-/** B.1 — a stableford round leads with points; any other round with the gross. */
+/**
+ * B.1 — a stableford round leads with points; any other round with the gross.
+ * THE POINTS BRANCH IS UNREACHABLE FROM THE CLUBHOUSE FEED TODAY: the feed's
+ * round data (usePostRounds) carries no points figure, so Clubhouse passes
+ * stableford null and a stableford round leads with its gross. Only the Scores
+ * hero, whose get_featured_round row carries points, reaches it. Not dead code.
+ */
 export function headlineFigure(r: { stableford: number | null; gross: number | null; toPar: number | null }):
   { kind: 'points'; value: number } | { kind: 'gross'; value: number; toPar: number | null } | null {
   if (r.stableford != null) return { kind: 'points', value: r.stableford };
