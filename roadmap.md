@@ -1,5 +1,11 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_TOUR_FOLLOW_AND_TEE_ALERT
+- [ ] Add session-scoped optimistic player follows and hero-board indicators.
+- [ ] Add tee-alert toggle and notification-delivery warning.
+- [ ] Dispatch confirmed leader-group alerts through tournament-live-sync.
+- [ ] Reuse Overview token owners and verify tests without opening preview.
+
 ## Review tile height correction
 - [x] Restore the original standard photo-overlay review layout; full-width frame 210 → 252px, rounds unchanged.
 - [x] Match review loading placeholders; 27 focused tests passed and preview build OK. Authenticated visual checks unavailable on external Supabase.

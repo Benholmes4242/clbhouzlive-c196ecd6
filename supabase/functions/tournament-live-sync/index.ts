@@ -14,6 +14,7 @@ import { corsFor } from '../_shared/cors.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { isWithinPlayingHoursForTimezone, isTournamentDay } from '../_shared/countryTimezoneMap.ts'
 import { getActiveRound } from '../_shared/roundState.ts'
+import { dispatchTeeAlerts } from './teeAlerts.ts'
 
 const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
 const getTourBaseUrl = (tour: string = 'pga') =>
@@ -240,6 +241,7 @@ Deno.serve(async (req) => {
 
     // No inprogress tournaments: return early (zero API calls)
     if (!liveTournaments || liveTournaments.length === 0) {
+      await dispatchTeeAlerts(supabase);
       const msg = 'No live tournaments found';
       console.log(`[LiveSync] ${msg}`);
       if (syncLogId) {
@@ -274,6 +276,9 @@ Deno.serve(async (req) => {
     }
 
     console.log(`[LiveSync] ✓ Complete: ${inHoursCount} synced, ${gatedCount} gated, ${totalRecords} records in ${totalDuration}ms`);
+
+    // Existing minute run, after fresh scores/draws; no new schedule or cron.
+    await dispatchTeeAlerts(supabase);
 
     return new Response(
       JSON.stringify({

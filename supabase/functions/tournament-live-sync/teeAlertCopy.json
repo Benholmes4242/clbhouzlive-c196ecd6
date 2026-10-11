@@ -1,0 +1,18 @@
+{
+  "en": {
+    "unarmed": "Tell me when they tee off",
+    "armed": "You will be told when they tee off",
+    "turnOnNotifications": "— turn on notifications",
+    "writeFailed": "Could not update your tee-off alert. Please try again.",
+    "pushTitle": "{{players}} are teeing off",
+    "pushBody": "{{players}} tee off at {{time}}."
+  },
+  "en-XA": {
+    "unarmed": "[~~Ţéļļ ɱé ŵĥéñ ţĥéý ţéé őƒƒ~~]",
+    "armed": "[~~Ýőú ŵíļļ ƀé ţőļđ ŵĥéñ ţĥéý ţéé őƒƒ~~]",
+    "turnOnNotifications": "[~~— ţúřñ őñ ñőţíƒíĉáţíőñš~~]",
+    "writeFailed": "[~~Ĉőúļđ ñőţ úƥđáţé ýőúř ţéé-őƒƒ áļéřţ. Ƥļéášé ţřý áĝáíñ.~~]",
+    "pushTitle": "[~~{{players}} ářé ţééíñĝ őƒƒ~~]",
+    "pushBody": "[~~{{players}} ţéé őƒƒ áţ {{time}}.~~]"
+  }
+}

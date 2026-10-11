@@ -999,5 +999,18 @@
       "startsIn": "STARTS IN",
       "awaitingScores": "AWAITING SCORES"
     }
+  },
+  "playerFollow": {
+    "following": "Following",
+    "footer": "Tap a player to follow them",
+    "writeFailed": "Could not update your player follow. Please try again."
+  },
+  "teeAlert": {
+    "unarmed": "Tell me when they tee off",
+    "armed": "You will be told when they tee off",
+    "turnOnNotifications": "— turn on notifications",
+    "writeFailed": "Could not update your tee-off alert. Please try again.",
+    "pushTitle": "{{players}} are teeing off",
+    "pushBody": "{{players}} tee off at {{time}}."
   }
 }
