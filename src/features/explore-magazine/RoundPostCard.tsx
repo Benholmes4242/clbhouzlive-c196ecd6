@@ -96,8 +96,8 @@ export interface RoundPostCardProps {
   crownLabel?: string;
   /** Named awards from the feed's batched award read. */
   awards?: RoundAwardRow[] | null;
-  /** The member's history here, from a feed-level batched read. Absent today:
-   *  get_round_course_context takes one score id and cannot be batched. */
+  /** The member's history here, from the feed's one batched read per window
+   *  (useBatchRoundCourseContext). undefined/null = em dash (in flight or no row). */
   context?: { rank_here: number | null; rounds_here: number | null; best_here: number | null } | null;
   /** Rendered beneath the member row (the ordinary card's "Liked by" line). */
   footer?: React.ReactNode;

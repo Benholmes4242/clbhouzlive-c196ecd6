@@ -47,6 +47,7 @@ import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/
 import type { RoundCourseMeta } from '@/components/feed/roundPostItem';
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { useBatchRoundMedals } from '@/features/explore-magazine/useBatchRoundMedals';
+import { useBatchRoundCourseContext } from '@/features/explore-magazine/useBatchRoundCourseContext';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 
 type PostsFilter = 'all' | 'videos' | 'shorts' | 'images' | 'reviews';
@@ -146,6 +147,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
   const roundChainFetching = postScoreIdMap.fetching || postRoundMap.fetching;
   const roundShapeMap = useRoundHoleShapes(feedScoreIds);
   const roundMedals = useBatchRoundMedals(feedScoreIds);
+  const roundCourseContexts = useBatchRoundCourseContext(feedScoreIds);
   const roundCourseIds = useMemo(() => roundCourseIdsFor(filteredPosts, postScoreIdMap), [filteredPosts, postScoreIdMap]);
   /* Course image/region for round cards — the same read Home and Explore use.
      isFetched, never isLoading; an empty id list is ready. */
@@ -392,6 +394,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
           roundShapeMap={roundShapeMap}
           roundCourseMeta={roundCourseMeta}
           roundMedalMap={roundMedals.isSuccess ? roundMedals.medals : undefined}
+          roundCourseContextMap={roundCourseContexts.isSuccess ? roundCourseContexts.contexts : undefined}
           onRoundTap={(post, round) =>
             setRoundSheet({ scoreId: round.whsScoreId, userId: post.userId })
           }

@@ -64,6 +64,7 @@ import type { PostRound } from '@/hooks/feed/usePostRounds';
 import { SLAB } from './feedSurfaces';
 import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import type { RoundCourseContext } from '@/lib/whs/useRoundCourseContext';
 import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRoundMedals';
 import { roundPostItem } from './roundPostItem';
 import { featuredRoundFrom, decideFeatured, type FeaturedTrigger } from './featuredRoundTrigger';
@@ -178,6 +179,8 @@ export interface FeedCardProps {
   roundShape?: HoleShape | null;
   /** Batched medal counts (useBatchRoundMedals, page level). undefined = none. */
   roundMedals?: RoundMedalCounts;
+  /** Batched course history for this round (useBatchRoundCourseContext, window level). */
+  roundCourseContext?: RoundCourseContext | null;
   /** Page-level consequence sources; null until every source has fetched. */
   consequenceSources?: ConsequenceSources | null;
   /** Page-level course meta for round cards (image, region). */
@@ -343,6 +346,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   onRoundTap,
   roundShape,
   roundMedals,
+  roundCourseContext,
   consequenceSources = null,
   roundCourseMeta = null,
   weekPickScoreId,
@@ -606,6 +610,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           square
           trailing={item.who?.is_viewer === true ? <PostOwnerMenu postId={post.id} isOwnPost actorType="personal" variant="inline" /> : null}
           awards={roundMedals?.awards ?? null}
+          context={roundCourseContext ?? null}
           footer={postRound?.whsScoreId && likeCount > 0 ? (
             /* RESTORED exactly as ExploreCard drew it: same component, props and placement under the member row. */
             <div data-round-reactions-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, marginTop: 6 }}>

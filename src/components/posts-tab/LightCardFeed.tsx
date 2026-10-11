@@ -30,6 +30,7 @@ import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import type { RoundCourseMeta } from '@/components/feed/roundPostItem';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import type { RoundCourseContext } from '@/lib/whs/useRoundCourseContext';
 import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRoundMedals';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
@@ -105,6 +106,8 @@ export interface LightCardFeedProps {
   roundShapeMap?: Map<string, HoleShape> | null;
   /** Batched medal counts keyed by whs_score_id (resolved queries only). */
   roundMedalMap?: Map<string, RoundMedalCounts>;
+  /** Batched course history keyed by whs_score_id (one read per window). */
+  roundCourseContextMap?: Map<string, RoundCourseContext>;
   /** Course image/region for round cards (useCourseCardMeta), same as Home. */
   roundCourseMeta?: RoundCourseMeta | null;
 }
@@ -135,6 +138,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   onRoundTap,
   roundShapeMap,
   roundMedalMap,
+  roundCourseContextMap,
   roundCourseMeta = null,
 }) => {
   /* A round post renders the round card or nothing — see dropUnresolvedRounds.
@@ -587,6 +591,10 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
                   const sid = postScoreIdMap?.get(post.id) ?? null;
                   return sid ? roundMedalMap?.get(sid) : undefined;
                 })()}
+                roundCourseContext={(() => {
+                  const sid = postScoreIdMap?.get(post.id) ?? null;
+                  return sid ? roundCourseContextMap?.get(sid) ?? null : null;
+                })()}
                 roundCourseMeta={roundCourseMeta}
                 commentPreviewEnabled
                 commentPreview={commentPreview.map.get(post.id) ?? null}
@@ -622,6 +630,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       onRoundTap,
       roundShapeMap,
       roundMedalMap,
+      roundCourseContextMap,
       roundCourseMeta,
       commentPreview.map,
     ],
