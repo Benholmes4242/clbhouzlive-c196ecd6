@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import CountryFlag from '@/components/ui/country-flag';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { BOARD_GEOMETRY, boardMovementMap, computeBoardColumns, todayFromEntry, type BoardEntry } from '../../leaderboard/BoardTable';
+import { BOARD_GEOMETRY, computeBoardColumns, todayFromEntry, type BoardEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
