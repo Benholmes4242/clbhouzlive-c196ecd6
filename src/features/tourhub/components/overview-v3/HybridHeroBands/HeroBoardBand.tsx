@@ -70,6 +70,7 @@ import { boardMovementMap, todayFromEntry, type BoardEntry } from '../../../lead
 import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
 import { OVERVIEW, pickMovementCards, type MovementCard } from '../overviewTokens';
 import { fmtScore } from '../../../utils/fmtScore';
+import { getScoreColor } from '../../../_shared/scoreColor';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { TeeAlertButton } from './TeeAlertButton';
 
@@ -698,7 +699,7 @@ function PicksBlock({
  * CARRIES THE DIRECTION, NOT THE COLOUR: red is under par on every Tour
  * surface, so a lost place reads muted ink, never red.
  */
-function RoundMovementBand({ round, cards }: { round: number; cards: MovementCard[] }) {
+export function RoundMovementBand({ round, cards }: { round: number; cards: MovementCard[] }) {
   const { t } = useTranslation('tourhub');
   return (
     <div data-overview-movement style={{ padding: '15px 20px', borderTop: `1px solid ${OVERVIEW.hairline}` }}>
@@ -717,8 +718,16 @@ function RoundMovementBand({ round, cards }: { round: number; cards: MovementCar
                 {c.delta > 0 ? '\u25B2' : '\u25BC'}{Math.abs(c.delta)}
               </span>
               {c.toPar != null ? (
-                <span style={{ fontSize: 10, fontWeight: 600, color: OVERVIEW.mute, whiteSpace: 'nowrap', ...FIGS }}>
-                  {c.gross != null ? `${c.gross} (${fmtScore(c.toPar)})` : `(${fmtScore(c.toPar)})`}
+                /* The to-par is a score and takes the colour law; the gross stays
+                   muted. With no gross the to-par stands bare — brackets around
+                   the only figure on the line say nothing. */
+                <span data-movement-score style={{ fontSize: 10, fontWeight: 600, whiteSpace: 'nowrap', ...FIGS }}>
+                  {c.gross != null ? (
+                    <><span data-movement-gross style={{ color: OVERVIEW.mute }}>{c.gross}</span>{' '}
+                      <span data-movement-topar style={{ color: getScoreColor(c.toPar, 'dark') }}>({fmtScore(c.toPar)})</span></>
+                  ) : (
+                    <span data-movement-topar style={{ color: getScoreColor(c.toPar, 'dark') }}>{fmtScore(c.toPar)}</span>
+                  )}
                 </span>
               ) : null}
             </div>

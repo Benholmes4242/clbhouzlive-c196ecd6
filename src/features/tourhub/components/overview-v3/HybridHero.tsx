@@ -1,5 +1,5 @@
 /** Tour Overview's photographic hero. Renders the HeroState it is GIVEN (OverviewHero derives it once). */
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import '@/styles/hybrid-hero.css';
 
@@ -10,7 +10,6 @@ import { PhotoBand, type HeroLeaderTrio, type OverviewCountdownUnit } from './Hy
 import { countInWords } from './overviewTokens';
 import { detectTopTie, fmtScore, isChampionResolvable, isInPlayState, roundsFromSchedule, type HeroState } from './HybridHero.utils';
 import type { BoardEntry } from '../../leaderboard/BoardTable';
-import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { ChampionStrip } from './HybridHeroBands/ChampionStrip';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
@@ -131,11 +130,6 @@ export function buildLeaderTrio(
 export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroProps) {
   const { tournament } = slide;
   const { t } = useTranslation('tourhub');
-
-  useEffect(() => {
-    setHeroFullBleed(true);
-    return () => setHeroFullBleed(false);
-  }, []);
 
   const venueAdapter = useMemo(
     () => tournament.id ? [{ id: tournament.id, venue_name: tournament.venueName }] : [],
