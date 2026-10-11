@@ -9,6 +9,7 @@ import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { PhotoBand, type HeroLeaderTrio, type OverviewCountdownUnit } from './HybridHeroBands/PhotoBand';
 import { countInWords } from './overviewTokens';
 import { detectTopTie, fmtScore, isChampionResolvable, isInPlayState, roundsFromSchedule, type HeroState } from './HybridHero.utils';
+import type { BoardEntry } from '../../leaderboard/BoardTable';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { ChampionStrip } from './HybridHeroBands/ChampionStrip';
@@ -93,6 +94,40 @@ function closingGross(round4: number | null | undefined, par: number | null | un
   return par + round4;
 }
 
+/**
+ * A.2 THE LEADER TRIO: faces (at most three), the score, one caps line.
+ * The caps line states the TRUE count of a tie, however many faces show.
+ * Null unless the board has a sole or shared first with a score.
+ */
+export function buildLeaderTrio(
+  rows: BoardEntry[],
+  needsInitials: boolean,
+  tourSlug: string | null | undefined,
+  t: (key: string, opts?: Record<string, unknown>) => string,
+): HeroLeaderTrio | null {
+  const top = rows[0];
+  if (top?.position !== 1 || top.score == null) return null;
+  const leaders = rows.filter((entry) => entry.position === 1);
+  return {
+    score: top.score,
+    faces: leaders.slice(0, 3).map((entry) => {
+      const name = entry.team
+        ? resolveBoardEntity(entry, needsInitials).prose || ''
+        : entry.player?.full_name?.trim() || '';
+      return {
+        key: entry.id,
+        name,
+        candidates: entry.team ? [] : resolvePlayerAvatarCandidates({ name, photoUrl: entry.player?.photo_url ?? null, tourSlug }),
+      };
+    }),
+    caps: leaders.length > 1
+      ? t('overview.hero.tiedCaps', { words: countInWords(leaders.length, t) })
+      : top.team
+        ? resolveBoardEntity(top, needsInitials).prose || null
+        : top.player?.full_name?.trim().split(/\s+/).slice(-1)[0] ?? null,
+  };
+}
+
 export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroProps) {
   const { tournament } = slide;
   const { t } = useTranslation('tourhub');
@@ -118,31 +153,7 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
   const tied = tiedCount > 1 ? { count: tiedCount } : null;
   const needsInitials = useMemo(() => teamNamesNeedInitials(rows), [rows]);
 
-  /* A.2 THE LEADER TRIO: faces (at most three), the score, one caps line.
-     The caps line states the TRUE count of a tie, however many faces show. */
-  const leader: HeroLeaderTrio | null = isInPlayState(state) && topPosition === 1 && top?.score != null
-    ? {
-        score: top.score,
-        faces: rows
-          .filter((entry) => entry.position === 1)
-          .slice(0, 3)
-          .map((entry) => {
-            const name = entry.team
-              ? resolveBoardEntity(entry, needsInitials).prose || ''
-              : entry.player?.full_name?.trim() || '';
-            return {
-              key: entry.id,
-              name,
-              candidates: entry.team ? [] : resolvePlayerAvatarCandidates({ name, photoUrl: entry.player?.photo_url ?? null, tourSlug: tournament.tourSlug }),
-            };
-          }),
-        caps: tied
-          ? t('overview.hero.tiedCaps', { words: countInWords(tied.count, t) })
-          : top.team
-            ? resolveBoardEntity(top, needsInitials).prose || null
-            : top.player?.full_name?.trim().split(/\s+/).slice(-1)[0] ?? null,
-      }
-    : null;
+  const leader = isInPlayState(state) ? buildLeaderTrio(rows, needsInitials, tournament.tourSlug, t) : null;
 
   const champion = useMemo(() => {
     // Champion gate — the SAME rule as the pick trophy in HeroBoardBand: only a
