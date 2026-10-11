@@ -13,6 +13,16 @@ import { COURSE_GRADIENT, NUMERIC_STYLE, OVERVIEW_PHOTO_BAND_HEIGHT } from '../H
 import { fmtScore, type HeroState } from '../HybridHero.utils';
 import { DARK_CHROME_GLASS_MATERIAL } from '@/features/chrome-v2/ChromeIsland';
 import { MASTHEAD_KICKER, MASTHEAD_NAME, MASTHEAD_PLACE } from '@/components/courses/CourseMasthead';
+import { MOCK, MockFace } from '../overviewMock';
+
+export interface HeroLeaderTrio {
+  score: number;
+  /** At most three faces; a longer tie still states its true count in `caps`. */
+  faces: Array<{ key: string; name: string; candidates: string[] }>;
+  /** "THREE TIED" or the sole leader's surname (caps from CSS). */
+  caps: string | null;
+}
+
 
 export interface OverviewCountdownUnit {
   value: number;
@@ -26,7 +36,7 @@ interface PhotoBandProps {
   venueImageUrl: string | null;
   state: HeroState;
   tourLabel: string | null;
-  leader: { score: number; name: string | null } | null;
+  leader: HeroLeaderTrio | null;
   countdown: OverviewCountdownUnit[];
   startDay: string | null;
   heightPx?: number;
@@ -131,13 +141,20 @@ export function PhotoBand({
             {title}
           </h1>
           {venueLine ? <div style={MASTHEAD_PLACE}>{venueLine}</div> : null}
+          {inPlay ? <RoundSpine round={state.round} totalRounds={state.totalRounds} /> : null}
         </div>
 
         {inPlay && leader ? (
-          <div style={{ flex: 'none', maxWidth: 150, alignSelf: 'flex-end', textAlign: 'right' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.58)', whiteSpace: 'nowrap' }}>{t('overview.hero.leaderLabel')}</div>
-            <div style={{ ...NUMERIC_STYLE, marginTop: 4, fontSize: 26, lineHeight: 1, fontWeight: 800, letterSpacing: '-0.02em', color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
-            {leader.name ? <div data-overview-leader-name style={{ maxWidth: 150, marginTop: 4, marginLeft: 'auto', fontSize: 11, fontWeight: 600, lineHeight: 1.25, color: 'rgba(255,255,255,0.6)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{leader.name}</div> : null}
+          <div data-overview-leader-trio style={{ flex: 'none', maxWidth: 150, alignSelf: 'flex-end', textAlign: 'right' }}>
+            {leader.faces.length > 0 ? (
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}>
+                {leader.faces.map((face, i) => (
+                  <MockFace key={face.key} name={face.name} candidates={face.candidates} size={28} radius={9} border={MOCK.trio.faceBorder} style={i > 0 ? { marginLeft: -9 } : undefined} />
+                ))}
+              </div>
+            ) : null}
+            <div style={{ ...NUMERIC_STYLE, fontSize: 26, lineHeight: 1, fontWeight: 800, letterSpacing: '-0.02em', color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
+            {leader.caps ? <div data-overview-leader-name style={{ maxWidth: 150, marginTop: 5, marginLeft: 'auto', fontSize: 10, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: MOCK.trio.caps, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{leader.caps}</div> : null}
           </div>
         ) : null}
 
@@ -153,6 +170,33 @@ export function PhotoBand({
         ) : null}
       </div>
     </button>
+  );
+}
+
+/**
+ * A.1 THE ROUND SPINE — one node per round, a connector between consecutive
+ * nodes. In-play states only (the caller gates it): never upcoming, never a
+ * finished result. Amber here is the round in progress, as on every Tour surface.
+ */
+function RoundSpine({ round, totalRounds }: { round: number; totalRounds: number }) {
+  const { t } = useTranslation('tourhub');
+  const nodes = Array.from({ length: Math.max(0, totalRounds) }, (_, i) => i + 1);
+  return (
+    <div data-overview-round-spine style={{ display: 'flex', alignItems: 'center', marginTop: 11 }}>
+      {nodes.map((n, i) => {
+        const live = n === round;
+        const done = n < round;
+        return (
+          <div key={n} style={{ display: 'contents' }}>
+            {i > 0 ? <span aria-hidden style={{ flex: 1, height: 1, background: MOCK.spine.connector, margin: '0 7px' }} /> : null}
+            <span data-round-node={live ? 'live' : done ? 'done' : 'todo'} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flex: 'none' }}>
+              <span aria-hidden style={{ width: 7, height: 7, borderRadius: '50%', background: live ? MOCK.amber : done ? MOCK.spine.done : MOCK.spine.todo, boxShadow: live ? MOCK.spine.liveHalo : undefined }} />
+              <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: live ? MOCK.amber : MOCK.spine.label }}>{t('overview.hero.roundNode', { round: n })}</span>
+            </span>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
