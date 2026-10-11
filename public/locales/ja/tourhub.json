@@ -268,7 +268,7 @@
       "marginLabel": "差",
       "fieldLabel": "出場選手",
       "verdict": {
-        "liveContest": "{{leader}}が{{margin}}打差で首位。残り{{holes}}ホールで{{count}}人が4打差以内です。",
+        "liveContest": "{{leader}}が{{margin}}打差で首位。残り{{holes}}ホールで{{chasers}}人が4打差以内です。",
         "liveShared": "残り{{holes}}ホールで{{count}}人が首位タイです。",
         "liveClear": "{{leader}}が{{margin}}打差で首位です。",
         "liveScore": "{{leader}}が{{score}}で首位です。",

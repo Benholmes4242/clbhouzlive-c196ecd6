@@ -6,7 +6,7 @@ import { fmtScore } from '../../utils/fmtScore';
 import { AMBER, CAPS_10, FONT, INK, STATUS_LIVE_ON_DARK, TOUR_HERO_PHOTO_H } from '../../_shared/tokens';
 import { heroCanonBackground } from '../../_shared/heroGradient';
 import { hasStrokeBoard } from '../../_shared/eventFormat';
-import { resolveBoardEntity, resolveChampion, teamNamesNeedInitials } from '../../_shared/boardEntity';
+import { boardEntityPeopleCount, resolveBoardEntity, resolveChampion, teamNamesNeedInitials } from '../../_shared/boardEntity';
 import { useTournamentDefendingChamp } from '../../hooks/useTournamentDefendingChamp';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import type { EventState } from '../../components/overview-v3/useTournamentPulse';
@@ -39,6 +39,8 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
   const purse = meta.purse != null ? formatPurse(meta.purse) : null;
   const needsInitials = teamNamesNeedInitials(contest.pack.map((row) => row.entry));
   const leaderName = contest.leader ? resolveBoardEntity(contest.leader, needsInitials).prose : null;
+  // `count` on leader-subject verdicts is the number of people named, so a team of two reads "lead", not "leads".
+  const leaderCount = contest.leader ? boardEntityPeopleCount(contest.leader) : 1;
   const completedChampion = state === 'completed'
     ? resolveChampion(contest.pack.map((row) => row.entry), meta)
     : null;
@@ -65,10 +67,10 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
   if (!strokeBoard || (state === 'completed' && !completedChampionName)) {
     verdict = null;
   } else if (state === 'live' && leaderName) {
-    if (!contest.sharedLead && contest.margin != null && contest.holesLeft != null && contest.chasersWithinFour >= 2) verdict = t('tournament.hero.verdict.liveContest', { leader: leaderName, margin: contest.margin, count: contest.chasersWithinFour, holes: contest.holesLeft });
+    if (!contest.sharedLead && contest.margin != null && contest.holesLeft != null && contest.chasersWithinFour >= 2) verdict = t('tournament.hero.verdict.liveContest', { leader: leaderName, margin: contest.margin, count: leaderCount, chasers: contest.chasersWithinFour, holes: contest.holesLeft });
     else if (contest.sharedLead && contest.holesLeft != null) verdict = t('tournament.hero.verdict.liveShared', { count: contest.leaders.length, holes: contest.holesLeft });
-    else if (!contest.sharedLead && contest.margin != null && contest.margin >= 5) verdict = t('tournament.hero.verdict.liveClear', { leader: leaderName, margin: contest.margin });
-    else if (score != null) verdict = t('tournament.hero.verdict.liveScore', { leader: leaderName, score });
+    else if (!contest.sharedLead && contest.margin != null && contest.margin >= 5) verdict = t('tournament.hero.verdict.liveClear', { leader: leaderName, margin: contest.margin, count: leaderCount });
+    else if (score != null) verdict = t('tournament.hero.verdict.liveScore', { leader: leaderName, score, count: leaderCount });
   } else if (state === 'completed' && completedChampionName) {
     if (contest.sharedLead) verdict = t('tournament.hero.verdict.completedPlayoff', { winner: completedChampionName });
     else if (contest.margin != null && contest.margin >= 1) verdict = t('tournament.hero.verdict.completedMargin', { winner: completedChampionName, margin: contest.margin });

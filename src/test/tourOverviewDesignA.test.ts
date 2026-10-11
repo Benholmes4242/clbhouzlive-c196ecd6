@@ -417,14 +417,14 @@ describe('MiniBoard hero rows', () => {
     ] as unknown as BoardEntry[];
     const view = mount(entries, 1);
     expect(view.container.querySelectorAll('button').length).toBe(0);
-    expect(view.container.querySelector('[role="group"]')?.getAttribute('aria-label')).toBe('Team Lowry: Shane Lowry, Rory McIlroy, 1, -9');
+    expect(view.container.querySelector('[role="group"]')?.getAttribute('aria-label')).toBe('Team Lowry: Shane Lowry, Rory McIlroy, 1, −9');
   });
   it('a player row is a button labelled name, position, score', () => {
     const entries = [
       { id: 'a', position: 2, position_tied: true, score: -4, thru: 9, round_1: -4, player: { id: 'pa', full_name: 'Player A' } },
     ] as unknown as BoardEntry[];
     const view = mount(entries, 1);
-    expect(view.container.querySelector('button')?.getAttribute('aria-label')).toBe('Player A, T2, -4');
+    expect(view.container.querySelector('button')?.getAttribute('aria-label')).toBe('Player A, T2, −4');
   });
   it('live round two renders no MOV track before POS', () => {
     const entries = [

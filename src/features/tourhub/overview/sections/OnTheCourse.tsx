@@ -34,7 +34,7 @@ import { PlayerAvatar } from '../../components/PlayerAvatar';
 import { SPACE } from '@/lib/spacing';
 import { formatTimeHm } from '@/i18n/format';
 import { A, LABEL, KICKER, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { formatToPar } from '../data/liveRoundStats';
+import { fmtScore } from '../../utils/fmtScore';
 
 
 interface Props {
@@ -201,7 +201,7 @@ function CutWatchLine({ tournamentId }: { tournamentId: string | undefined }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ ...LABEL, color: A.INK }}>{t('tour.projectedCut')}</span>
         <span style={{ fontSize: 14, fontWeight: 700, color: A.INK, ...FIGS }}>
-          {formatToPar(cut.cutline)}
+          {fmtScore(cut.cutline)}
         </span>
       </div>
     </div>

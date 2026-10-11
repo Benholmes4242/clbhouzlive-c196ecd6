@@ -16,10 +16,11 @@ const copy: Record<string, string> = {
   'tour.par': 'PAR',
   'tournament.hero.fieldLabel': 'FIELD',
   'tournament.hero.purseLabel': 'PURSE',
-  'tournament.hero.verdict.liveContest': '{{leader}} leads by {{margin}} — and {{count}} players are inside four shots with {{holes}} to play.',
+  'tournament.hero.verdict.liveContest_one': '{{leader}} leads by {{margin}} — and {{chasers}} players are inside four shots with {{holes}} to play.',
   'tournament.hero.verdict.liveShared': '{{count}} players share the lead with {{holes}} to play.',
-  'tournament.hero.verdict.liveClear': '{{leader}} leads by {{margin}}.',
-  'tournament.hero.verdict.liveScore': '{{leader}} leads on {{score}}.',
+  'tournament.hero.verdict.liveClear_one': '{{leader}} leads by {{margin}}.',
+  'tournament.hero.verdict.liveScore_one': '{{leader}} leads on {{score}}.',
+  'tournament.hero.verdict.liveScore_other': '{{leader}} lead on {{score}}.',
   'tournament.contest.liveEyebrow': 'The contest',
   'tournament.contest.completedEyebrow': 'The margin',
   'tournament.contest.sharedLead': '{{count}} share the lead',
@@ -171,7 +172,7 @@ describe('tournament contest sections', () => {
     render(<HeroSection meta={meta} state="live" imageUrl={null} tourCode="pga" contest={contest} fieldCount={3} />);
 
     expect(contest.chasersWithinFour).toBe(1);
-    expect(screen.getByText('Leader leads on -12.')).toBeInTheDocument();
+    expect(screen.getByText('Leader leads on −12.')).toBeInTheDocument();
     expect(screen.queryByText(/inside four shots/)).not.toBeInTheDocument();
   });
 
@@ -273,7 +274,7 @@ describe('tournament contest sections', () => {
       </>,
     );
 
-    expect(screen.getByText('Gina Kim and Yana Wilson leads on -18.')).toBeInTheDocument();
+    expect(screen.getByText('Gina Kim and Yana Wilson lead on −18.')).toBeInTheDocument();
     expect(screen.getByText('Gina Kim and Yana Wilson from Hyo Joo Kim and Hye Jin Choi.')).toBeInTheDocument();
     expect(screen.getByTestId('move')).toBeEmptyDOMElement();
     expect(container.textContent).not.toContain('undefined');

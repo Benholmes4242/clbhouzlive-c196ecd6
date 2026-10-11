@@ -4,7 +4,7 @@ import type { TournamentContest } from '../data/tournamentContest';
 import { SectionEyebrow } from './SectionEyebrow';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { FONT, INK, INK_FAINT, INK_SOFT, SURFACE, WHITE_ALPHA_10, HAIRLINE_INK_8 } from '../../_shared/tokens';
-import { formatToPar } from '../../overview/data/liveRoundStats';
+import { fmtScore } from '../../utils/fmtScore';
 import { resolveBoardEntity, teamNamesNeedInitials } from '../../_shared/boardEntity';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
@@ -24,7 +24,7 @@ export function ContestSection({ contest, state }: Props) {
   const thirdName = prose(chasers[1]?.entry);
   const gapPhrase = (shots: number) => t('tournament.contest.gapShots', { count: shots });
   const leaderNames = contest.leaders.map((row) => resolveBoardEntity(row, needsInitials).prose).filter(Boolean);
-  const levelScore = contest.leader?.score == null ? null : formatToPar(contest.leader.score);
+  const levelScore = contest.leader?.score == null ? null : fmtScore(contest.leader.score);
 
   let subline: string | null = null;
   if (contest.sharedLead || contest.leadForm === 'word') {

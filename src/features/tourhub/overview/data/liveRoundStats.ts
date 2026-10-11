@@ -145,12 +145,6 @@ export function formatToParAvg(v: number): string {
   return 'E';
 }
 
-/** "-6" / "+2" / "E" — whole round-to-par. */
-export function formatToPar(v: number): string {
-  if (v === 0) return 'E';
-  return v < 0 ? String(v) : `+${v}`;
-}
-
 /** "P. Cantlay" — matches the tour side-menu short-name convention. */
 export function shortPlayerName(full: string): string {
   const parts = full.trim().split(/\s+/);

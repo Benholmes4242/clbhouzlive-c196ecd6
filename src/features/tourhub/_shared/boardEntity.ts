@@ -20,6 +20,12 @@ function teamSegments(entry: BoardEntry): string[] {
     .filter(Boolean);
 }
 
+/** How many people a board entry names — 1 for a player, the member count for a team. Drives verb agreement in prose. */
+export function boardEntityPeopleCount(entry: BoardEntry): number {
+  if (!entry.team) return 1;
+  return Math.max(1, orderedMemberNames(entry).length);
+}
+
 function orderedMemberNames(entry: BoardEntry): string[] {
   return [...(entry.team?.members ?? [])]
     .sort((a, b) => (a.position_in_team ?? Number.MAX_SAFE_INTEGER) - (b.position_in_team ?? Number.MAX_SAFE_INTEGER))
