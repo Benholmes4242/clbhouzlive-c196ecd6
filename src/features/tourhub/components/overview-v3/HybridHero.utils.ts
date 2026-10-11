@@ -101,10 +101,10 @@ export const UPCOMING_WINDOW_DAYS = 14;
 
 // ---------- Score formatting -----------------------------------------------
 
-const UNICODE_MINUS = '\u2212';
 
 /** Re-exported: one Tour score formatter (utils/fmtScore). */
-export { fmtScore } from '../../utils/fmtScore';
+import { fmtScore } from '../../utils/fmtScore';
+export { fmtScore };
 
 /**
  * Broadcast round labels — positional, relative to total round count.

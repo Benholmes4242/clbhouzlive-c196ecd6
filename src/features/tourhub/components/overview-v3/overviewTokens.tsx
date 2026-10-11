@@ -1,7 +1,7 @@
 /**
  * BRIEF_TOUR_OVERVIEW_MOCK_EXACT — the signed-off mock's own values.
  *
- * THE MOCK IS THE SPEC. These figures are carried exactly as the brief states
+ * THE OVERVIEW IS THE SPEC. These figures are carried exactly as the brief states
  * them and are not rounded to the nearest existing tour token. Where a value
  * coincides with an existing token (AMBER, INK) the token is read instead, so
  * no colour is declared twice. Everything here is used only by the Overview
@@ -10,7 +10,7 @@
 import { useState } from 'react';
 import { AMBER, INK } from '../../_shared/tokens';
 
-export const MOCK = {
+export const OVERVIEW = {
   /** Muted caps / secondary figures on the dark band ground. */
   mute: 'rgba(248,250,252,0.42)',
   /** Body copy one step down from INK. */
@@ -89,11 +89,11 @@ export function MockFace({
         border,
         boxSizing: 'border-box',
         overflow: 'hidden',
-        background: MOCK.cardGround,
+        background: OVERVIEW.cardGround,
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: MOCK.mute,
+        color: OVERVIEW.mute,
         fontSize: Math.round(size * 0.36),
         fontWeight: 700,
         ...style,

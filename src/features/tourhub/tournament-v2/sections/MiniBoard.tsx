@@ -22,7 +22,7 @@ import { MovementFigure } from '../../_shared/movement';
 import { formatEarnings } from '../../_shared/formatEarnings';
 import { resolveBoardEntity, teamNamesNeedInitials, type BoardNameTier } from '../../_shared/boardEntity';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
-import { MOCK, MockFace, countInWords } from '../../components/overview-v3/overviewMock';
+import { OVERVIEW, MockFace, countInWords } from '../../components/overview-v3/overviewTokens';
 import { TrajectorySparkline } from '../../components/overview-v3/HybridHeroBands/TrajectorySparkline';
 
 type Row = BoardEntry;
@@ -331,7 +331,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     return (
       <>
         <div style={{ background: T.surface, fontFamily: FONT }}>
-          <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, minHeight: 26, padding: `4px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: MOCK.mute, textTransform: 'uppercase' }}>
+          <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, minHeight: 26, padding: `4px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
             {showHeroMov ? <div style={{ textAlign: 'right' }}>{t('board.columns.mov')}</div> : null}
             {showHeroShape || showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>
@@ -462,16 +462,16 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
           return (
             <>
               <div data-hero-tie-cap style={{ padding: `9px ${HERO_PAD_X}px 3px`, display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', color: MOCK.ink, fontVariantNumeric: 'tabular-nums lining-nums' }}>T1</span>
-                <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: MOCK.mute }}>
+                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', color: OVERVIEW.ink, fontVariantNumeric: 'tabular-nums lining-nums' }}>T1</span>
+                <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.mute }}>
                   {t('overview.hero.tiedCaps', { words: countInWords(topTieCount, t) })}
                 </span>
               </div>
               <div data-hero-tie-group style={{ position: 'relative' }}>
-                <span aria-hidden data-hero-tie-bracket style={{ position: 'absolute', left: 9, top: 2, bottom: 2, width: 1.5, borderRadius: 2, background: MOCK.bracket }} />
+                <span aria-hidden data-hero-tie-bracket style={{ position: 'absolute', left: 9, top: 2, bottom: 2, width: 1.5, borderRadius: 2, background: OVERVIEW.bracket }} />
                 {rows.slice(0, topTieLength).map((r, i) => renderRow(r, i, true))}
               </div>
-              <div aria-hidden data-hero-tie-separator style={{ height: 1, background: MOCK.hairline, marginTop: 9 }} />
+              <div aria-hidden data-hero-tie-separator style={{ height: 1, background: OVERVIEW.hairline, marginTop: 9 }} />
               {rows.slice(topTieLength).map((r, i) => renderRow(r, i + topTieLength, false))}
             </>
           );

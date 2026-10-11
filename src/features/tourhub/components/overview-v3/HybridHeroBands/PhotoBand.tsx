@@ -13,7 +13,7 @@ import { COURSE_GRADIENT, NUMERIC_STYLE, OVERVIEW_PHOTO_BAND_HEIGHT } from '../H
 import { fmtScore, type HeroState } from '../HybridHero.utils';
 import { DARK_CHROME_GLASS_MATERIAL } from '@/features/chrome-v2/ChromeIsland';
 import { MASTHEAD_KICKER, MASTHEAD_NAME, MASTHEAD_PLACE } from '@/components/courses/CourseMasthead';
-import { MOCK, MockFace } from '../overviewMock';
+import { OVERVIEW, MockFace } from '../overviewTokens';
 
 export interface HeroLeaderTrio {
   score: number;
@@ -149,12 +149,12 @@ export function PhotoBand({
             {leader.faces.length > 0 ? (
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}>
                 {leader.faces.map((face, i) => (
-                  <MockFace key={face.key} name={face.name} candidates={face.candidates} size={28} radius={9} border={MOCK.trio.faceBorder} style={i > 0 ? { marginLeft: -9 } : undefined} />
+                  <MockFace key={face.key} name={face.name} candidates={face.candidates} size={28} radius={9} border={OVERVIEW.trio.faceBorder} style={i > 0 ? { marginLeft: -9 } : undefined} />
                 ))}
               </div>
             ) : null}
             <div style={{ ...NUMERIC_STYLE, fontSize: 26, lineHeight: 1, fontWeight: 800, letterSpacing: '-0.02em', color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
-            {leader.caps ? <div data-overview-leader-name style={{ maxWidth: 150, marginTop: 5, marginLeft: 'auto', fontSize: 10, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: MOCK.trio.caps, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{leader.caps}</div> : null}
+            {leader.caps ? <div data-overview-leader-name style={{ maxWidth: 150, marginTop: 5, marginLeft: 'auto', fontSize: 10, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{leader.caps}</div> : null}
           </div>
         ) : null}
 
@@ -188,10 +188,10 @@ function RoundSpine({ round, totalRounds }: { round: number; totalRounds: number
         const done = n < round;
         return (
           <div key={n} style={{ display: 'contents' }}>
-            {i > 0 ? <span aria-hidden style={{ flex: 1, height: 1, background: MOCK.spine.connector, margin: '0 7px' }} /> : null}
+            {i > 0 ? <span aria-hidden style={{ flex: 1, height: 1, background: OVERVIEW.spine.connector, margin: '0 7px' }} /> : null}
             <span data-round-node={live ? 'live' : done ? 'done' : 'todo'} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flex: 'none' }}>
-              <span aria-hidden style={{ width: 7, height: 7, borderRadius: '50%', background: live ? MOCK.amber : done ? MOCK.spine.done : MOCK.spine.todo, boxShadow: live ? MOCK.spine.liveHalo : undefined }} />
-              <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: live ? MOCK.amber : MOCK.spine.label }}>{t('overview.hero.roundNode', { round: n })}</span>
+              <span aria-hidden style={{ width: 7, height: 7, borderRadius: '50%', background: live ? OVERVIEW.amber : done ? OVERVIEW.spine.done : OVERVIEW.spine.todo, boxShadow: live ? OVERVIEW.spine.liveHalo : undefined }} />
+              <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: live ? OVERVIEW.amber : OVERVIEW.spine.label }}>{t('overview.hero.roundNode', { round: n })}</span>
             </span>
           </div>
         );
