@@ -30,6 +30,7 @@ import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import type { RoundCourseMeta } from '@/components/feed/roundPostItem';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import type { RoundCourseContext } from '@/lib/whs/useRoundCourseContext';
 import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRoundMedals';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { openWithOrigin } from '@/lib/openWithOrigin';
