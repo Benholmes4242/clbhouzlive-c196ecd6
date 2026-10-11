@@ -486,6 +486,7 @@ export function HeroBoardSection({
           championPlayerIds={championPlayerIds}
           intro={picksIntro}
           neededByPlayer={toReachWindow ? neededByPlayer : null}
+          leaderTotal={leader?.total ?? null}
           toReachScore={toReachWindow && leader?.total != null ? fmtScore(leader.total) : null}
           onOpenPick={() => setPicksOpen(true)}
         />
@@ -518,14 +519,20 @@ export function HeroBoardSection({
 
       <div
         data-overview-action-row
-        style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+        /* CORRECTIONS I.4: with the course button beside it the ROW carries the
+           top boundary and a 20px right / 12px bottom inset, so the course
+           button keeps its spacing and its 48px hit area. Alone, the CTA's own
+           top line is the row's boundary. */
+        style={venueRecord?.courseId
+          ? { display: 'flex', alignItems: 'center', gap: 8, borderTop: `1px solid ${OVERVIEW.hairline}`, padding: '0 20px 12px 0' }
+          : { display: 'flex', alignItems: 'center', gap: 8 }}
       >
         <button
           type="button"
           onClick={onFullLeaderboard}
           data-overview-board-cta
           /* §F.1 the mock's full-width row, not a filled pill. */
-          style={{ flex: '1 1 0', minWidth: 0, margin: 0, padding: 16, background: 'none', border: 'none', borderTop: `1px solid ${OVERVIEW.hairline}`, borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, color: OVERVIEW.amber, fontFamily: FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', whiteSpace: 'nowrap' }}
+          style={{ flex: '1 1 0', minWidth: 0, margin: 0, padding: 16, background: 'none', border: 'none', borderTop: venueRecord?.courseId ? 'none' : `1px solid ${OVERVIEW.hairline}`, borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, color: OVERVIEW.amber, fontFamily: FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', whiteSpace: 'nowrap' }}
         >
           {t(overviewTournamentDoorKey(phase))}
           <ChevronRight size={16} color={OVERVIEW.amber} aria-hidden />
@@ -560,8 +567,11 @@ function PicksBlock({
   intro,
   neededByPlayer,
   toReachScore,
+  leaderTotal,
   onOpenPick,
 }: {
+  /** The leader's to-par; a pick at or ahead of it has nothing to reach. */
+  leaderTotal: number | null;
   onOpenPick: () => void;
   /** §E.1 where the picks stand; null renders no line. */
   intro: string | null;
@@ -660,7 +670,10 @@ function PicksBlock({
                   {figureLine}
                 </div>
               ) : null}
-              {neededByPlayer && toReachScore ? (
+              {/* CORRECTIONS I.2: a pick leading or level has nothing to reach — no
+                  label, no divider, no dash. The dash is only for a target
+                  genuinely out of reach. */}
+              {neededByPlayer && toReachScore && !(line?.score != null && leaderTotal != null && line.score <= leaderTotal) ? (
                 <div data-overview-pick-to-reach style={{ borderTop: `1px solid ${OVERVIEW.hairline}`, paddingTop: 7, marginTop: 7 }}>
                   <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: OVERVIEW.mute }}>{t('overview.picksToReach', { score: toReachScore })}</div>
                   <div style={{ display: 'block', marginTop: 3, fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em', color: OVERVIEW.ink, ...FIGS }}>
