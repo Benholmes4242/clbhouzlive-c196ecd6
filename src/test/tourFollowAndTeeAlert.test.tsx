@@ -9,10 +9,14 @@ import { TeeAlertControl } from '@/features/tourhub/components/overview-v3/Hybri
 import { confirmedLastGroup, dispatchTeeAlerts, enqueueAndStamp } from '../../supabase/functions/tournament-live-sync/teeAlerts';
 import en from '../../public/locales/en/tourhub.json';
 
-vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key: string) => {
-  const [section, name] = key.split('.');
-  return (en as Record<string, Record<string, string>>)[section]?.[name] ?? key;
-} }) }));
+vi.mock('react-i18next', async (importOriginal) => ({
+  ...await importOriginal<typeof import('react-i18next')>(),
+  useTranslation: () => ({ t: (key: string) => {
+    const value = key.split('.').reduce<unknown>((node, part) =>
+      node && typeof node === 'object' ? (node as Record<string, unknown>)[part] : undefined, en);
+    return typeof value === 'string' ? value : key;
+  } }),
+}));
 afterEach(cleanup);
 
 describe('Tour follow writes', () => {
