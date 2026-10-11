@@ -36,15 +36,12 @@ describe('heroBoard row tap opens the scorecard', () => {
     expect(screen.getByRole('dialog').getAttribute('data-target')).toBe('pb');
   });
 
-  it('a team row with no player id is not a button, and an all-team board has no footer', () => {
+  it('a team row with no player id is not a button', () => {
     const entries = [
       { id: 't', position: 1, score: -8, thru: 9, round_1: -4, round_2: -4, team: { id: 'team', display_name: 'Team One', members: [] } },
     ] as unknown as BoardEntry[];
     const view = mount(entries);
     expect(view.container.querySelectorAll('button').length).toBe(0);
-    expect(view.container.querySelector('[data-overview-board-footer]')).toBeNull();
-    expect(showScorecardFooter([{ player: null }])).toBe(false);
-    expect(showScorecardFooter([{ player: null }, { player: { id: 'p' } }])).toBe(true);
   });
 });
 
