@@ -113,3 +113,31 @@ export function MockFace({
     </span>
   );
 }
+
+/** To-par with a true minus (U+2212), never a hyphen; E at level. */
+export function fmtToParTrueMinus(v: number): string {
+  if (v === 0) return 'E';
+  return v < 0 ? `\u2212${Math.abs(v)}` : `+${v}`;
+}
+
+export interface MovementCard {
+  key: string;
+  name: string;
+  candidates: string[];
+  delta: number;
+  /** Today's to-par for the round in progress; null when the player has none. */
+  toPar: number | null;
+  /** Gross for the round, only once the round is complete and par is known. */
+  gross: number | null;
+}
+
+/**
+ * §C.5 — the three largest movements by absolute size, gained first then
+ * lost. Zero movements are not movements. Never padded to three.
+ */
+export function pickMovementCards<T extends { delta: number }>(cards: T[]): T[] {
+  const top = cards.filter((c) => c.delta !== 0)
+    .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
+    .slice(0, 3);
+  return [...top.filter((c) => c.delta > 0), ...top.filter((c) => c.delta < 0)];
+}
