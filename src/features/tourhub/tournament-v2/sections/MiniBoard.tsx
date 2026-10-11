@@ -18,7 +18,6 @@ import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { ClbhouzPickMark } from '../../_shared/ClbhouzPickMark';
-import { MovementFigure } from '../../_shared/movement';
 import { formatEarnings } from '../../_shared/formatEarnings';
 import { resolveBoardEntity, teamNamesNeedInitials, type BoardNameTier } from '../../_shared/boardEntity';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
@@ -116,8 +115,8 @@ const HERO_NUM = { fontVariantNumeric: 'tabular-nums lining-nums' as const, text
  *  column that goes, never the name. `hasMovement` is the data guard:
  *  movementFromRounds over the FULL field returned at least one delta.
  */
-export function heroBoardColumns(opts: { roundCount: number; roundInProgress: boolean; completed: boolean; hasMovement?: boolean }): {
-  today: boolean; thru: boolean; rounds: boolean; mov: boolean; shape: boolean;
+export function heroBoardColumns(opts: { roundCount: number; roundInProgress: boolean; completed: boolean }): {
+  today: boolean; rounds: boolean; shape: boolean;
 } {
   /* BRIEF_TOUR_OVERVIEW_MOCK_EXACT §D.1 supersedes the THRU and MOV notes
      above: the live grammar is POS | PLAYER | TODAY | SHAPE | TOT. MOV left
@@ -126,8 +125,8 @@ export function heroBoardColumns(opts: { roundCount: number; roundInProgress: bo
      round-one rule (it would equal TOT). */
   const live = !opts.completed && opts.roundInProgress;
   const multi = opts.roundCount >= 2;
-  if (live) return { today: multi, thru: false, rounds: false, mov: false, shape: true };
-  return { today: false, thru: false, rounds: multi, mov: false, shape: false };
+  if (live) return { today: multi, rounds: false, shape: true };
+  return { today: false, rounds: multi, shape: false };
 }
 
 /** The live hero grid, exactly as the mock sets it. */
@@ -252,22 +251,13 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     if (todayFromEntry(row as unknown as Parameters<typeof todayFromEntry>[0], currentRound) == null) return false;
     return row.thru != null && row.thru < 18;
   });
-  /* MOVEMENT RANKS THE WHOLE FIELD on prior-round totals — computed over
-     `entries`, never the five-row slice, or the prior ranks are wrong. */
-  const movementMap = useMemo(
-    () => (theme === 'heroBoard' ? boardMovementMap(entries, currentRound ?? null) : new Map<string, number>()),
-    [theme, entries, currentRound],
-  );
   const heroColumnRule = heroBoardColumns({
     roundCount: heroCols.rounds.length,
     roundInProgress,
     completed: phase === 'completed',
-    hasMovement: movementMap.size > 0,
   });
-  const showHeroMov = theme === 'heroBoard' && heroColumnRule.mov;
   const tieRoles = heroTieRoles(rows);
   const showHeroToday = theme === 'heroBoard' && heroColumnRule.today;
-  const showHeroThru = theme === 'heroBoard' && heroColumnRule.thru;
   const showHeroRounds = theme === 'heroBoard' && heroHasRoundData && heroColumnRule.rounds;
   const heroRounds = showHeroRounds ? heroCols.rounds : [];
   const heroRoundTracks = heroRounds.map(() => `${BOARD_GEOMETRY.cell}px`).join(' ');
@@ -275,11 +265,9 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   const topTieLength = theme === 'heroBoard' && showHeroShape ? heroTopTieLength(rows) : 0;
   const topTieCount = topTieLength > 0 ? entries.filter((e) => e.position === 1).length : 0;
   const legacyGrid = [
-    showHeroMov ? `${BOARD_GEOMETRY.mov}px` : null,
     showOverviewPosition ? `${BOARD_GEOMETRY.pos}px` : null,
     'minmax(0, 1fr)',
     showHeroToday ? `${BOARD_GEOMETRY.today}px` : null,
-    showHeroThru ? `${BOARD_GEOMETRY.thru}px` : null,
     heroRoundTracks || null,
     `${BOARD_GEOMETRY.tot}px`,
   ].filter(Boolean).join(' ');
@@ -334,11 +322,9 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
       <>
         <div style={{ background: T.surface, fontFamily: FONT }}>
           <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, minHeight: 26, padding: `4px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
-            {showHeroMov ? <div style={{ textAlign: 'right' }}>{t('board.columns.mov')}</div> : null}
             {showHeroShape || showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>
             {showHeroToday ? <div style={{ textAlign: 'right' }}>{t('board.columns.today')}</div> : null}
-            {showHeroThru ? <div style={{ textAlign: 'right' }}>{t('board.columns.thru')}</div> : null}
             {showHeroShape ? <div style={{ textAlign: 'right' }}>{t('board.columns.shape')}</div> : null}
             {heroRounds.map((rd) => (
               <div key={rd} style={{ textAlign: 'right', color: heroCols.liveRound === rd ? AMBER : T.faint }}>
@@ -352,7 +338,6 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             const entity = resolveBoardEntity(r, needsInitials, nameTier);
             const tieRole = tieRoles[rowIndex];
             const demotedRow = ['MC', 'CUT', 'WD'].includes(r.status?.toUpperCase() ?? '');
-            const mov = showHeroMov && !demotedRow ? movementMap.get(r.player?.id ?? r.team?.id ?? r.id) : undefined;
             const posText = r.status === 'MC' || r.status === 'CUT' ? 'MC'
               : r.status === 'WD' ? 'WD'
               : r.position == null ? BLANK
@@ -381,11 +366,6 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, width: '100%', minHeight: showHeroShape ? 36 : 34, padding: showHeroShape ? `6px ${HERO_PAD_X}px` : `${entity.kind === 'team' ? 6 : 5}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
                 className={tappable ? `${T.press} transition-colors` : undefined}
               >
-                {showHeroMov ? (
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', minWidth: 0 }}>
-                    {demotedRow ? null : <MovementFigure movement={mov ?? null} variant="compact" tone="ink" />}
-                  </div>
-                ) : null}
                 {(showHeroShape || showOverviewPosition) && inTopTie ? (
                   /* §D.3: the cap above states the position once; the row carries none. */
                   <div data-hero-tie="capped"><span className="sr-only">{posText}</span></div>
@@ -436,10 +416,6 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                       liveIndex={currentRound != null && roundInProgress ? currentRound - 1 : null}
                     />
                   </div>
-                ) : null}
-                {/* THRU IS NOT A SCORE — faint ink, never a score colour. */}
-                {showHeroThru ? (
-                  <div data-hero-thru style={{ ...HERO_NUM, fontSize: 12, fontWeight: 600, color: T.faint }}>{thruLabel(r, today)}</div>
                 ) : null}
                 {heroRounds.map((rd) => {
                   const val = rd === currentRound
