@@ -46,6 +46,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { fmtScore } from '../utils/fmtScore';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { movementFromRounds } from './movementFromRounds';
@@ -186,11 +187,8 @@ function houseColor(score: number | null | undefined, emphasis: 'standard' | 'le
 }
 
 /** Absent figures render NOTHING — the grid holds the column. */
-function fmtScore(score: number | null | undefined): string {
-  if (score == null) return '';
-  if (score === 0) return 'E';
-  return score > 0 ? `+${score}` : String(score);
-}
+/** Board cells: an absent figure is an empty cell, never "E". */
+const fmtBoardScore = (score: number | null | undefined): string => fmtScore(score, { absent: '' });
 
 function fmtThru(thru: number | null | undefined): string {
   if (thru == null) return '';
@@ -652,7 +650,7 @@ export function BoardTable({
       : `${e.position_tied ? 'T' : ''}${e.position}`;
     const isLeader = !demotedRow && e.position === 1;
     const totColor = demotedRow ? SECONDARY : houseColor(e.score);
-    const totalDisplay = fmtScore(e.score);
+    const totalDisplay = fmtBoardScore(e.score);
     const todayVal = todayFromEntry(e, currentRound);
     // THRU must agree with the live round: if the active round has not started
     // for this player, the stale top-level thru (yesterday's "F") is hidden.
@@ -821,7 +819,7 @@ export function BoardTable({
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {val == null || demotedRow ? '' : fmtScore(val)}
+                  {val == null || demotedRow ? '' : fmtBoardScore(val)}
                 </div>
               );
             })}

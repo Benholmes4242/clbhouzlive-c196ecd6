@@ -69,7 +69,10 @@ import { PicksSheet } from './PicksSheet';
 import type { HeroState } from '../HybridHero.utils';
 import { boardMovementMap, todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
 import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
-import { MOCK, MockFace, fmtToParTrueMinus, pickMovementCards, type MovementCard } from '../overviewMock';
+import { OVERVIEW, pickMovementCards, type MovementCard } from '../overviewTokens';
+import { fmtScore } from '../../../utils/fmtScore';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+
 
 /**
  * FIVE rows: the leading positions shown on the hero board. The board sits
@@ -402,7 +405,7 @@ export function HeroBoardSection({
       if (!best || line.position < best.position) best = { name: surnameOf(p.playerName), position: line.position, tied: line.tied, score: line.score };
     }
     if (!best) return null;
-    const score = fmtToParTrueMinus(leader.total);
+    const score = fmtScore(leader.total);
     const pos = `${best.tied ? 'T' : ''}${best.position}`;
     if (best.position === 1 && !best.tied) return t('overview.picksIntro.leads', { name: best.name, score });
     const gap = best.score - leader.total;
@@ -483,7 +486,8 @@ export function HeroBoardSection({
           championPlayerIds={championPlayerIds}
           intro={picksIntro}
           neededByPlayer={toReachWindow ? neededByPlayer : null}
-          toReachScore={toReachWindow && leader?.total != null ? fmtToParTrueMinus(leader.total) : null}
+          leaderTotal={leader?.total ?? null}
+          toReachScore={toReachWindow && leader?.total != null ? fmtScore(leader.total) : null}
           onOpenPick={() => setPicksOpen(true)}
         />
       ) : null}
@@ -515,17 +519,23 @@ export function HeroBoardSection({
 
       <div
         data-overview-action-row
-        style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+        /* CORRECTIONS I.4: with the course button beside it the ROW carries the
+           top boundary and a 20px right / 12px bottom inset, so the course
+           button keeps its spacing and its 48px hit area. Alone, the CTA's own
+           top line is the row's boundary. */
+        style={venueRecord?.courseId
+          ? { display: 'flex', alignItems: 'center', gap: 8, borderTop: `1px solid ${OVERVIEW.hairline}`, padding: '0 20px 12px 0' }
+          : { display: 'flex', alignItems: 'center', gap: 8 }}
       >
         <button
           type="button"
           onClick={onFullLeaderboard}
           data-overview-board-cta
           /* §F.1 the mock's full-width row, not a filled pill. */
-          style={{ flex: '1 1 0', minWidth: 0, margin: 0, padding: 16, background: 'none', border: 'none', borderTop: `1px solid ${MOCK.hairline}`, borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, color: MOCK.amber, fontFamily: FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', whiteSpace: 'nowrap' }}
+          style={{ flex: '1 1 0', minWidth: 0, margin: 0, padding: 16, background: 'none', border: 'none', borderTop: venueRecord?.courseId ? 'none' : `1px solid ${OVERVIEW.hairline}`, borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, color: OVERVIEW.amber, fontFamily: FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', whiteSpace: 'nowrap' }}
         >
           {t(overviewTournamentDoorKey(phase))}
-          <ChevronRight size={16} color={MOCK.amber} aria-hidden />
+          <ChevronRight size={16} color={OVERVIEW.amber} aria-hidden />
         </button>
         {venueRecord?.courseId ? (
           <button
@@ -557,8 +567,11 @@ function PicksBlock({
   intro,
   neededByPlayer,
   toReachScore,
+  leaderTotal,
   onOpenPick,
 }: {
+  /** The leader's to-par; a pick at or ahead of it has nothing to reach. */
+  leaderTotal: number | null;
   onOpenPick: () => void;
   /** §E.1 where the picks stand; null renders no line. */
   intro: string | null;
@@ -587,7 +600,7 @@ function PicksBlock({
         <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
       </div>
       {intro ? (
-        <p data-overview-picks-intro style={{ margin: '0 20px 9px', marginTop: 0, fontSize: 12.5, lineHeight: 1.5, color: MOCK.soft }}>{intro}</p>
+        <p data-overview-picks-intro style={{ margin: '0 20px 9px', marginTop: 0, fontSize: 12.5, lineHeight: 1.5, color: OVERVIEW.soft }}>{intro}</p>
       ) : null}
 
       <div style={{ padding: '0 16px 14px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
@@ -657,10 +670,13 @@ function PicksBlock({
                   {figureLine}
                 </div>
               ) : null}
-              {neededByPlayer && toReachScore ? (
-                <div data-overview-pick-to-reach style={{ borderTop: `1px solid ${MOCK.hairline}`, paddingTop: 7, marginTop: 7 }}>
-                  <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: MOCK.mute }}>{t('overview.picksToReach', { score: toReachScore })}</div>
-                  <div style={{ display: 'block', marginTop: 3, fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em', color: MOCK.ink, ...FIGS }}>
+              {/* CORRECTIONS I.2: a pick leading or level has nothing to reach — no
+                  label, no divider, no dash. The dash is only for a target
+                  genuinely out of reach. */}
+              {neededByPlayer && toReachScore && !(line?.score != null && leaderTotal != null && line.score <= leaderTotal) ? (
+                <div data-overview-pick-to-reach style={{ borderTop: `1px solid ${OVERVIEW.hairline}`, paddingTop: 7, marginTop: 7 }}>
+                  <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: OVERVIEW.mute }}>{t('overview.picksToReach', { score: toReachScore })}</div>
+                  <div style={{ display: 'block', marginTop: 3, fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em', color: OVERVIEW.ink, ...FIGS }}>
                     {neededByPlayer.get(String(p.playerId)) ?? '\u2014'}
                   </div>
                 </div>
@@ -682,24 +698,24 @@ function PicksBlock({
 function RoundMovementBand({ round, cards }: { round: number; cards: MovementCard[] }) {
   const { t } = useTranslation('tourhub');
   return (
-    <div data-overview-movement style={{ padding: '15px 20px', borderTop: `1px solid ${MOCK.hairline}` }}>
-      <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: MOCK.mute }}>
+    <div data-overview-movement style={{ padding: '15px 20px', borderTop: `1px solid ${OVERVIEW.hairline}` }}>
+      <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.mute }}>
         {t('overview.movement.label', { round })}
       </div>
       <div style={{ display: 'flex', gap: 8, marginTop: 11 }}>
         {cards.map((c) => (
-          <div key={c.key} data-overview-movement-card style={{ flex: 1, minWidth: 0, background: MOCK.cardGround, border: `1px solid ${MOCK.hairline}`, borderRadius: 9, padding: '9px 9px 10px' }}>
+          <div key={c.key} data-overview-movement-card style={{ flex: 1, minWidth: 0, background: OVERVIEW.cardGround, border: `1px solid ${OVERVIEW.hairline}`, borderRadius: 9, padding: '9px 9px 10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-              <MockFace name={c.name} candidates={c.candidates} size={22} radius={7} />
-              <span style={{ minWidth: 0, fontSize: 11.5, fontWeight: 700, color: MOCK.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{surnameOf(c.name)}</span>
+              <SquircleAvatar size={22} srcCandidates={c.candidates} alt={c.name} userId={c.key} hideRing />
+              <span style={{ minWidth: 0, fontSize: 11.5, fontWeight: 700, color: OVERVIEW.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{surnameOf(c.name)}</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 7 }}>
-              <span data-movement-dir={c.delta > 0 ? 'up' : 'down'} style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: c.delta > 0 ? MOCK.ink : MOCK.mute, whiteSpace: 'nowrap', ...FIGS }}>
+              <span data-movement-dir={c.delta > 0 ? 'up' : 'down'} style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: c.delta > 0 ? OVERVIEW.ink : OVERVIEW.mute, whiteSpace: 'nowrap', ...FIGS }}>
                 {c.delta > 0 ? '\u25B2' : '\u25BC'}{Math.abs(c.delta)}
               </span>
               {c.toPar != null ? (
-                <span style={{ fontSize: 10, fontWeight: 600, color: MOCK.mute, whiteSpace: 'nowrap', ...FIGS }}>
-                  {c.gross != null ? `${c.gross} (${fmtToParTrueMinus(c.toPar)})` : `(${fmtToParTrueMinus(c.toPar)})`}
+                <span style={{ fontSize: 10, fontWeight: 600, color: OVERVIEW.mute, whiteSpace: 'nowrap', ...FIGS }}>
+                  {c.gross != null ? `${c.gross} (${fmtScore(c.toPar)})` : `(${fmtScore(c.toPar)})`}
                 </span>
               ) : null}
             </div>
