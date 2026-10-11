@@ -21,6 +21,9 @@ import { ClbhouzPickMark } from '../../_shared/ClbhouzPickMark';
 import { MovementFigure } from '../../_shared/movement';
 import { formatEarnings } from '../../_shared/formatEarnings';
 import { resolveBoardEntity, teamNamesNeedInitials, type BoardNameTier } from '../../_shared/boardEntity';
+import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
+import { MOCK, MockFace, countInWords } from '../../components/overview-v3/overviewMock';
+import { TrajectorySparkline } from '../../components/overview-v3/HybridHeroBands/TrajectorySparkline';
 
 type Row = BoardEntry;
 
@@ -60,6 +63,10 @@ interface Props {
    * round's amber header; round-column presence remains data-led.
    */
   phase?: 'live' | 'completed';
+  /** heroBoard only: the event's tour, for the shared headshot resolver. */
+  tourSlug?: string | null;
+  /** heroBoard only: rounds in the schedule, so SHAPE always draws every slot. */
+  totalRounds?: number | null;
 }
 
 /**
@@ -108,15 +115,33 @@ const HERO_NUM = { fontVariantNumeric: 'tabular-nums lining-nums' as const, text
  *  movementFromRounds over the FULL field returned at least one delta.
  */
 export function heroBoardColumns(opts: { roundCount: number; roundInProgress: boolean; completed: boolean; hasMovement?: boolean }): {
-  today: boolean; thru: boolean; rounds: boolean; mov: boolean;
+  today: boolean; thru: boolean; rounds: boolean; mov: boolean; shape: boolean;
 } {
+  /* BRIEF_TOUR_OVERVIEW_MOCK_EXACT §D.1 supersedes the THRU and MOV notes
+     above: the live grammar is POS | PLAYER | TODAY | SHAPE | TOT. MOV left
+     because movement has its own band (RoundMovementBand) and must not be said
+     twice; THRU left because the mock does not carry it. TODAY keeps its
+     round-one rule (it would equal TOT). */
   const live = !opts.completed && opts.roundInProgress;
   const multi = opts.roundCount >= 2;
-  const rounds = !live && multi;
-  const fourRoundTracks = rounds && opts.roundCount >= 4;
-  const mov = live && multi && !!opts.hasMovement && !fourRoundTracks;
-  if (live) return { today: multi, thru: true, rounds: false, mov };
-  return { today: false, thru: false, rounds, mov: false };
+  if (live) return { today: multi, thru: false, rounds: false, mov: false, shape: true };
+  return { today: false, thru: false, rounds: multi, mov: false, shape: false };
+}
+
+/** The live hero grid, exactly as the mock sets it. */
+export function heroLiveGrid(showToday: boolean): string {
+  return ['26px', 'minmax(0,1fr)', showToday ? '34px' : null, '36px', '42px'].filter(Boolean).join(' ');
+}
+
+/** The TOP group when it is a tie over the visible rows: its length, else 0. */
+export function heroTopTieLength(rows: Array<{ position?: number | null; status?: string | null }>): number {
+  let n = 0;
+  for (const r of rows) {
+    const s = r.status?.toUpperCase();
+    if (s === 'MC' || s === 'CUT' || s === 'WD' || r.position !== 1) break;
+    n += 1;
+  }
+  return n >= 2 ? n : 0;
 }
 
 export type TieRole = 'solo' | 'first' | 'middle' | 'last';
@@ -183,7 +208,7 @@ function thruLabel(row: Row, today: number | null): string {
   return row.thru >= 18 ? 'F' : String(row.thru);
 }
 
-export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'panel', pickPlayerIds, onRowTap, phase = 'live' }: Props) {
+export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'panel', pickPlayerIds, onRowTap, phase = 'live', tourSlug = null, totalRounds = null }: Props) {
   const { t } = useTranslation('tourhub');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
@@ -244,7 +269,10 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   const showHeroRounds = theme === 'heroBoard' && heroHasRoundData && heroColumnRule.rounds;
   const heroRounds = showHeroRounds ? heroCols.rounds : [];
   const heroRoundTracks = heroRounds.map(() => `${BOARD_GEOMETRY.cell}px`).join(' ');
-  const overviewGrid = [
+  const showHeroShape = theme === 'heroBoard' && heroColumnRule.shape;
+  const topTieLength = theme === 'heroBoard' && showHeroShape ? heroTopTieLength(rows) : 0;
+  const topTieCount = topTieLength > 0 ? entries.filter((e) => e.position === 1).length : 0;
+  const legacyGrid = [
     showHeroMov ? `${BOARD_GEOMETRY.mov}px` : null,
     showOverviewPosition ? `${BOARD_GEOMETRY.pos}px` : null,
     'minmax(0, 1fr)',
@@ -253,6 +281,9 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     heroRoundTracks || null,
     `${BOARD_GEOMETRY.tot}px`,
   ].filter(Boolean).join(' ');
+  const overviewGrid = showHeroShape ? heroLiveGrid(showHeroToday) : legacyGrid;
+  const heroGap = showHeroShape ? 4 : BOARD_GEOMETRY.gap;
+  const shapeSlots = Math.max(totalRounds ?? 0, heroCols.rounds.length, currentRound ?? 0);
 
   const showPanelThru = theme !== 'heroBoard' && phase !== 'completed' && roundInProgress;
   /* WHEN NOTHING IS IN PROGRESS, "TODAY" IS A LIE — the column is
