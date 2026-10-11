@@ -13,6 +13,7 @@
  */
 import React from 'react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import type { RoundCourseContext } from '@/lib/whs/useRoundCourseContext';
 import type { RoundMedalCounts } from './useBatchRoundMedals';
 import { r as rad } from '@/lib/radius';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
@@ -30,6 +31,8 @@ export const FeaturedRoundCard: React.FC<{
   engagement?: FeaturedRoundEngagement | null;
   /** The feed's batched award read; its `awards` name each chip. */
   medals?: RoundMedalCounts | null;
+  /** The surface's batched course-context row (useBatchRoundCourseContext). */
+  courseContext?: RoundCourseContext | null;
   /** Home only: square corners, edge to edge like its feed neighbours. */
   square?: boolean;
   /** Crown text. Absent = "Round of the week". */
@@ -38,7 +41,7 @@ export const FeaturedRoundCard: React.FC<{
   courseHandicap?: number | null;
   /** Member's public home club, when the caller holds it. */
   club?: string | null;
-}> = ({ round: r, viewerId, shape = null, onOpen, engagement = null, medals, square = false, pillLabel, courseHandicap = null, club = null }) => (
+}> = ({ round: r, viewerId, shape = null, onOpen, engagement = null, medals, square = false, pillLabel, courseHandicap = null, club = null, courseContext = null }) => (
   /* ONE CARD, TWO STATES: the hero is the ordinary round post with the crown. */
   <RoundPostCard
     hero
@@ -59,6 +62,7 @@ export const FeaturedRoundCard: React.FC<{
     club={club}
     engagement={engagement}
     awards={medals?.awards ?? null}
+    context={courseContext}
     onOpen={onOpen}
     square={square}
     crownLabel={pillLabel}
