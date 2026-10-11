@@ -9,6 +9,9 @@
  * VS HANDICAP appears ONCE, on the photograph. The third figure cell is the
  * member's OWN rank among their OWN rounds at this course
  * (get_round_course_context) — never a comparison with other members.
+ *
+ * A CARD MUST NEVER FETCH. Awards and course context arrive as props from the
+ * feed's one batched read per window; nothing in this file issues a request.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,8 +21,7 @@ import { RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { playDateStandalone } from '@/components/explore-tab-new/courseled/discoverWhen';
 import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
-import { useRoundAwards, type RoundAwardRow } from '@/hooks/gam/useRoundAwards';
-import { useRoundCourseContext } from '@/lib/whs/useRoundCourseContext';
+import type { RoundAwardRow } from '@/hooks/gam/useRoundAwards';
 import { awardTitle } from '@/features/courses/_shared/scorecard/RoundResults';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
@@ -92,6 +94,13 @@ export interface RoundPostCardProps {
   onWhoTap?: () => void;
   square?: boolean;
   crownLabel?: string;
+  /** Named awards from the feed's batched award read. */
+  awards?: RoundAwardRow[] | null;
+  /** The member's history here, from a feed-level batched read. Absent today:
+   *  get_round_course_context takes one score id and cannot be batched. */
+  context?: { rank_here: number | null; rounds_here: number | null; best_here: number | null } | null;
+  /** Rendered beneath the member row (the ordinary card's "Liked by" line). */
+  footer?: React.ReactNode;
   /** Owner affordances (post menu) at the end of the member row. */
   trailing?: React.ReactNode;
 }
@@ -100,8 +109,8 @@ export function RoundPostCard(p: RoundPostCardProps) {
   const { t, i18n } = useTranslation('courses');
   const { t: tH } = useTranslation('handicap');
   const k = (key: string, opts?: Record<string, unknown>) => t(`roundPost.${key}`, opts);
-  const context = useRoundCourseContext(p.scoreId).data ?? null;
-  const awards = useRoundAwards(p.scoreId).data?.awards ?? [];
+  const context = p.context ?? null;
+  const awards = p.awards ?? [];
 
   const vsHcp = p.net != null && p.par != null ? p.net - p.par : null;
   const counts = goodHoleCounts(p.shape);
@@ -199,6 +208,7 @@ export function RoundPostCard(p: RoundPostCardProps) {
         {p.engagement ? <Actions engagement={p.engagement} mine={p.who.isViewer} /> : null}
         {p.trailing ? <span style={{ flex: 'none' }} onClick={(e) => e.stopPropagation()}>{p.trailing}</span> : null}
       </div>
+      {p.footer ?? null}
     </div>
   );
 }
