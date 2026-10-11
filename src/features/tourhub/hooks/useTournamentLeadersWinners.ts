@@ -8,6 +8,7 @@
  * Includes player photo_url for avatar rendering.
  */
 
+import { fmtScore } from '../utils/fmtScore';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -48,12 +49,6 @@ export interface TournamentLeaderWinner extends TournamentFinisher {
   tiedCount: number;
 }
 
-function formatScore(score: number | null): string {
-  if (score === null || score === undefined) return '';
-  if (score === 0) return 'E';
-  if (score > 0) return `+${score}`;
-  return `${score}`;
-}
 
 function formatDisplayName(firstName: string | null, lastName: string | null): string {
   if (!firstName && !lastName) return 'Unknown';
@@ -159,7 +154,7 @@ export function useTournamentLeadersWinners(
           pgaTourId: player.pga_tour_id || null,
           tourCode: player.tour_codes?.[0] ?? null,
           displayName: isTeam ? fullName : formatDisplayName(firstName, lastName),
-          displayScore: formatScore(entry.score),
+          displayScore: fmtScore(entry.score, { absent: '' }),
           round1: entry.round_1 ?? null,
           round2: entry.round_2 ?? null,
           round3: entry.round_3 ?? null,
