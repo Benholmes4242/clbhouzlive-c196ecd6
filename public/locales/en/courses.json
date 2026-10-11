@@ -3088,49 +3088,5 @@
   },
   "common": {
     "done": "Done"
-  },
-  "roundPost": {
-    "crown": "Round of the week",
-    "points": "points",
-    "vsHcp": "vs handicap",
-    "gross": "Gross",
-    "net": "Net",
-    "history": "Your rounds here",
-    "par": "par {{par}}",
-    "off": "off {{hcp}}",
-    "of": "of {{count}}",
-    "best": "best {{best}}",
-    "awardsMore": "+{{count}} more",
-    "trace": {
-      "level": "LEVEL",
-      "turn": "TURN",
-      "empty": "The round, hole by hole",
-      "birdies_one": "birdie",
-      "birdies_other": "birdies",
-      "eagles_one": "eagle",
-      "eagles_other": "eagles"
-    },
-    "verdict": {
-      "joiner": ", and ",
-      "stop": ".",
-      "hcpUnder_self": "{{count}} under your handicap",
-      "hcpUnder_other": "{{count}} under handicap",
-      "hcpOver_self": "{{count}} over your handicap",
-      "hcpOver_other": "{{count}} over handicap",
-      "hcpLevel_self": "Level with your handicap",
-      "hcpLevel_other": "Level with handicap",
-      "bestHere_self": "your best round here",
-      "bestHere_other": "their best round here",
-      "rankHere_self": "your {{rank}} best of {{count}} here",
-      "rankHere_other": "their {{rank}} best of {{count}} here",
-      "featHoleInOne": "a hole in one on the card",
-      "featEagle_one": "an eagle on the card",
-      "featEagle_other": "{{count}} eagles on the card",
-      "featCleanCard": "a bogey-free card",
-      "featHoleInOneAlone": "A hole in one on the card",
-      "featEagleAlone_one": "An eagle on the card",
-      "featEagleAlone_other": "{{count}} eagles on the card",
-      "featCleanCardAlone": "A bogey-free card"
-    }
   }
 }

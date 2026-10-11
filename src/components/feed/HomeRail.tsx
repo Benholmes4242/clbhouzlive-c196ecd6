@@ -13,7 +13,6 @@ import { ScoresStandingSlot } from '@/features/explore-magazine/ConnectStandingI
 import { useFeaturedRound } from '@/features/explore-magazine/useFeaturedRound';
 import { useViewerScoreScope } from '@/features/explore-magazine/useViewerScoreScope';
 import { useBatchRoundMedals } from '@/features/explore-magazine/useBatchRoundMedals';
-import { useBatchRoundCourseContext } from '@/features/explore-magazine/useBatchRoundCourseContext';
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
@@ -55,7 +54,6 @@ function FeaturedRoundSlab({ viewerId }: { viewerId: string }) {
   const ids = useMemo(() => [id], [id]);
   const shapes = useRoundHoleShapes(ids);
   const medals = useBatchRoundMedals(ids);
-  const courseContexts = useBatchRoundCourseContext(ids);
   const opener = useScorecardOpener();
   const queryClient = useQueryClient();
   const [commentsOpen, setCommentsOpen] = useState(false);
@@ -103,7 +101,6 @@ function FeaturedRoundSlab({ viewerId }: { viewerId: string }) {
           viewerId={viewerId}
           shape={shapes?.get(r.whs_score_id) ?? null}
           medals={medals.isSuccess ? medals.medals?.get(r.whs_score_id) ?? null : undefined}
-          courseContext={courseContexts.contexts?.get(r.whs_score_id) ?? null}
           engagement={engagement}
           square
           onOpen={() => opener.openByScore(r.whs_score_id, null, r.user_id)}

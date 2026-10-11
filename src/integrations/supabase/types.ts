@@ -21993,18 +21993,6 @@ export type Database = {
           your_avg_to_par: number
         }[]
       }
-      get_round_course_context_batch: {
-        Args: { p_ids: string[] }
-        Returns: {
-          avg_to_par_others: number
-          best_here: number
-          course_id: string
-          rank_here: number
-          rounds_here: number
-          whs_score_id: string
-          your_avg_to_par: number
-        }[]
-      }
       get_round_crowns: {
         Args: { p_score_ids: string[] }
         Returns: {

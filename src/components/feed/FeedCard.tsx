@@ -64,14 +64,10 @@ import type { PostRound } from '@/hooks/feed/usePostRounds';
 import { SLAB } from './feedSurfaces';
 import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
-import type { RoundCourseContext } from '@/lib/whs/useRoundCourseContext';
 import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRoundMedals';
 import { roundPostItem } from './roundPostItem';
 import { featuredRoundFrom, decideFeatured, type FeaturedTrigger } from './featuredRoundTrigger';
 import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard';
-import { RoundPostCard } from '@/features/explore-magazine/RoundPostCard';
-import { CALLOUT_SUBTEXT } from '@/features/explore-magazine/AchievementCallout';
-import { A as A_TOKENS } from '@/components/explore-tab-new/courseled/tokens';
 import type { RoundCourseMeta } from './roundPostItem';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
 
@@ -179,8 +175,6 @@ export interface FeedCardProps {
   roundShape?: HoleShape | null;
   /** Batched medal counts (useBatchRoundMedals, page level). undefined = none. */
   roundMedals?: RoundMedalCounts;
-  /** Batched course history for this round (useBatchRoundCourseContext, window level). */
-  roundCourseContext?: RoundCourseContext | null;
   /** Page-level consequence sources; null until every source has fetched. */
   consequenceSources?: ConsequenceSources | null;
   /** Page-level course meta for round cards (image, region). */
@@ -346,7 +340,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   onRoundTap,
   roundShape,
   roundMedals,
-  roundCourseContext,
   consequenceSources = null,
   roundCourseMeta = null,
   weekPickScoreId,
@@ -537,10 +530,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   const rendersRoundCard = !!postRound || !!postRoundPending;
   if (rendersRoundCard) {
     const item = roundPostItem(post, postRound ?? null, currentUserId, consequenceSources, roundCourseMeta);
-    /* Strokes received = gross of record minus net, both already batched. */
-    const roundCourseHandicap = postRound?.grossScore != null && postRound?.netScore != null
-      ? postRound.grossScore - postRound.netScore
-      : null;
     const roundEngagement = {
       likeCount,
       liked,
@@ -567,8 +556,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             engagement={roundEngagement}
             square
             pillLabel={tCourses('courseDetail.featured.featuredPill')}
-            courseHandicap={roundCourseHandicap}
-            club={post.homeClub ?? null}
             onOpen={() => onRoundTap?.(post, postRound)}
           />
         </article>
@@ -587,47 +574,27 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           borderTop: feedIndex === 0 ? undefined : `1px solid ${LINE}`,
         }}
       >
-        <RoundPostCard
-          hero={false}
-          scoreId={postRound?.whsScoreId ?? null}
-          courseName={item.subject?.course_name ?? null}
-          imageUrl={item.subject?.image_url ?? null}
-          gross={item.facts.gross ?? null}
-          toPar={item.facts.to_par ?? null}
-          par={item.facts.course_par ?? null}
-          net={item.facts.net ?? null}
-          courseHandicap={roundCourseHandicap}
-          stableford={null}
-          playDate={item.facts.play_date ?? null}
-          shape={postRound ? roundShape : undefined}
-          holesInOne={postRound?.holesInOne ?? null}
-          cleanCard={postRound?.cleanCard ?? null}
-          who={{ userId: post.userId ?? null, name: post.displayName ?? null, photoUrl: post.avatarUrl ?? null, isViewer: item.who?.is_viewer === true }}
-          club={post.homeClub ?? null}
-          engagement={roundEngagement}
-          onOpen={() => { if (postRound) onRoundTap?.(post, postRound); }}
+        <ExploreCard
+          item={item}
+          size="std"
+          bleed={ROUND_CARD_INSET}
+          shape={postRound ? (roundShape === undefined ? undefined : roundShape) : undefined}
+          medals={roundMedals}
+          onTap={() => { if (postRound) onRoundTap?.(post, postRound); }}
           onWhoTap={() => onProfile(post)}
-          square
-          trailing={item.who?.is_viewer === true ? <PostOwnerMenu postId={post.id} isOwnPost actorType="personal" variant="inline" /> : null}
-          awards={roundMedals?.awards ?? null}
-          context={roundCourseContext ?? null}
-          footer={postRound?.whsScoreId && likeCount > 0 ? (
-            /* RESTORED exactly as ExploreCard drew it: same component, props and placement under the member row. */
-            <div data-round-reactions-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, marginTop: 6 }}>
-              <LikedByRow
-                postId={postRound.whsScoreId}
-                count={likeCount}
-                source="round"
-                kind="celebrate"
-                surfaceColor={A_TOKENS.CANVAS}
-                isOwnRound={item.who?.is_viewer === true}
-                style={{ marginTop: 0, minWidth: 0 }}
-                fontSize={CALLOUT_SUBTEXT.fontSize}
-                fontWeight={CALLOUT_SUBTEXT.fontWeight}
-                lines={1}
-              />
-            </div>
-          ) : null}
+          engagement={{
+            kind: 'celebrate',
+            likeCount,
+            liked,
+            likeAvailable: true,
+            commentCount,
+            commentAvailable: true,
+            onToggleLike: () => onLike(post, effectiveActor),
+            onOpenComments: () => onComment(post, effectiveActor, 'footer_glyph'),
+            reactionSubjectId: postRound?.whsScoreId ?? null,
+            ownerName: post.displayName ?? null,
+            isOwnRound: item.who?.is_viewer === true,
+          }}
         />
       </article>
     );

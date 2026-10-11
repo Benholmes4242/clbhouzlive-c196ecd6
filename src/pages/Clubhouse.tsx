@@ -67,7 +67,6 @@ import { usePostScoreIds, usePostRounds } from '@/hooks/feed/usePostRounds';
 import { useRoundChainGate } from '@/hooks/feed/useRoundChainGate';
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { useBatchRoundMedals } from '@/features/explore-magazine/useBatchRoundMedals';
-import { useBatchRoundCourseContext } from '@/features/explore-magazine/useBatchRoundCourseContext';
 import { useViewerStanding, type StandingRow } from '@/features/explore-magazine/useViewerStanding';
 import { useViewerCourseBests } from '@/features/explore-magazine/useViewerCourseBests';
 import { useCourseRecordSignal } from '@/features/explore-magazine/useCourseRecordSignal';
@@ -248,7 +247,6 @@ const ClubhouseContent = () => {
   const roundChainFetching = postScoreIdMap.fetching || postRoundMap.fetching;
   const roundShapeMap = useRoundHoleShapes(feedScoreIds);
   const roundMedals = useBatchRoundMedals(feedScoreIds);
-  const roundCourseContexts = useBatchRoundCourseContext(feedScoreIds);
   /* PHASE 2 — THE CONSEQUENCE SOURCES, assembled exactly as
      useExploreStreamClient does, ONE read each per page, never per card.
      Standing is the one-argument get_viewer_standing — the same read the
@@ -633,7 +631,6 @@ const ClubhouseContent = () => {
               postRoundsSettled={roundChainSettled && !roundChainFetching}
               roundShapeMap={roundShapeMap}
               roundMedalMap={roundMedals.isSuccess ? roundMedals.medals : undefined}
-          roundCourseContextMap={roundCourseContexts.isSuccess ? roundCourseContexts.contexts : undefined}
               consequenceSources={consequenceSources}
               roundCourseMeta={roundCourseMeta}
               weekPickScoreId={weekPickScoreId}

@@ -2,11 +2,8 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/integrations/supabase/client';
-import type { RoundAwardRow } from '@/hooks/gam/useRoundAwards';
 
-/** `awards` carries each award by name, from the SAME one batched read, so a
- *  round card can name its awards without a second request. */
-export interface RoundMedalCounts { gold: number; silver: number; bronze: number; awards: RoundAwardRow[] }
+export interface RoundMedalCounts { gold: number; silver: number; bronze: number }
 
 /**
  * ONE READ PER RENDERED PAGE of Explore round cards: medal counts straight from
@@ -31,22 +28,14 @@ export function useBatchRoundMedals(scoreIds: Array<string | null | undefined>) 
     queryFn: async (): Promise<Map<string, RoundMedalCounts>> => {
       const { data, error } = await supabase
         .from('gam_round_awards')
-        .select('whs_score_id, tier, award_kind, unit_kind, unit_key, value, previous_value, delta, rank_here, attempts_at_detection')
+        .select('whs_score_id, tier')
         .in('whs_score_id', ids);
       if (error) throw error;
       const map = new Map<string, RoundMedalCounts>();
-      type Row = { whs_score_id: string | null; tier: string | null; award_kind: string; unit_kind: string; unit_key: number; value: number | null; previous_value: number | null; delta: number | null; rank_here: number | null; attempts_at_detection: number | null };
-      for (const row of (data ?? []) as Row[]) {
+      for (const row of (data ?? []) as Array<{ whs_score_id: string | null; tier: string | null }>) {
         if (!row.whs_score_id) continue;
-        const entry = map.get(row.whs_score_id) ?? { gold: 0, silver: 0, bronze: 0, awards: [] };
-        if (row.tier === 'gold' || row.tier === 'silver' || row.tier === 'bronze') {
-          entry[row.tier] += 1;
-          entry.awards.push({
-            award_kind: row.award_kind, unit_kind: row.unit_kind as RoundAwardRow['unit_kind'], unit_key: row.unit_key,
-            tier: row.tier, value: row.value, previous_value: row.previous_value, delta: row.delta,
-            rank_here: row.rank_here, attempts: row.attempts_at_detection,
-          });
-        }
+        const entry = map.get(row.whs_score_id) ?? { gold: 0, silver: 0, bronze: 0 };
+        if (row.tier === 'gold' || row.tier === 'silver' || row.tier === 'bronze') entry[row.tier] += 1;
         map.set(row.whs_score_id, entry);
       }
       return map;

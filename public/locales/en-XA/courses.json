@@ -3088,49 +3088,5 @@
   },
   "common": {
     "done": "[~~Đőñé~~]"
-  },
-  "roundPost": {
-    "crown": "[~~Řőúñđ őƒ ţĥé ŵééǩ~~]",
-    "points": "[~~ƥőíñţš~~]",
-    "vsHcp": "[~~ṽš ĥáñđíĉáƥ~~]",
-    "gross": "[~~Ĝřőšš~~]",
-    "net": "[~~Ñéţ~~]",
-    "history": "[~~Ýőúř řőúñđš ĥéřé~~]",
-    "par": "[~~ƥář {{par}}~~]",
-    "off": "[~~őƒƒ {{hcp}}~~]",
-    "of": "[~~őƒ {{count}}~~]",
-    "best": "[~~ƀéšţ {{best}}~~]",
-    "awardsMore": "[~~+{{count}} ɱőřé~~]",
-    "trace": {
-      "level": "[~~ĻÉṼÉĻ~~]",
-      "turn": "[~~ŢÚŘÑ~~]",
-      "empty": "[~~Ţĥé řőúñđ, ĥőļé ƀý ĥőļé~~]",
-      "birdies_one": "[~~ƀířđíé~~]",
-      "birdies_other": "[~~ƀířđíéš~~]",
-      "eagles_one": "[~~éáĝļé~~]",
-      "eagles_other": "[~~éáĝļéš~~]"
-    },
-    "verdict": {
-      "joiner": "[~~, áñđ ~~]",
-      "stop": "[~~.~~]",
-      "hcpUnder_self": "[~~{{count}} úñđéř ýőúř ĥáñđíĉáƥ~~]",
-      "hcpUnder_other": "[~~{{count}} úñđéř ĥáñđíĉáƥ~~]",
-      "hcpOver_self": "[~~{{count}} őṽéř ýőúř ĥáñđíĉáƥ~~]",
-      "hcpOver_other": "[~~{{count}} őṽéř ĥáñđíĉáƥ~~]",
-      "hcpLevel_self": "[~~Ļéṽéļ ŵíţĥ ýőúř ĥáñđíĉáƥ~~]",
-      "hcpLevel_other": "[~~Ļéṽéļ ŵíţĥ ĥáñđíĉáƥ~~]",
-      "bestHere_self": "[~~ýőúř ƀéšţ řőúñđ ĥéřé~~]",
-      "bestHere_other": "[~~ţĥéíř ƀéšţ řőúñđ ĥéřé~~]",
-      "rankHere_self": "[~~ýőúř {{rank}} ƀéšţ őƒ {{count}} ĥéřé~~]",
-      "rankHere_other": "[~~ţĥéíř {{rank}} ƀéšţ őƒ {{count}} ĥéřé~~]",
-      "featHoleInOne": "[~~á ĥőļé íñ őñé őñ ţĥé ĉářđ~~]",
-      "featEagle_one": "[~~áñ éáĝļé őñ ţĥé ĉářđ~~]",
-      "featEagle_other": "[~~{{count}} éáĝļéš őñ ţĥé ĉářđ~~]",
-      "featCleanCard": "[~~á ƀőĝéý-ƒřéé ĉářđ~~]",
-      "featHoleInOneAlone": "[~~Á ĥőļé íñ őñé őñ ţĥé ĉářđ~~]",
-      "featEagleAlone_one": "[~~Áñ éáĝļé őñ ţĥé ĉářđ~~]",
-      "featEagleAlone_other": "[~~{{count}} éáĝļéš őñ ţĥé ĉářđ~~]",
-      "featCleanCardAlone": "[~~Á ƀőĝéý-ƒřéé ĉářđ~~]"
-    }
   }
 }
