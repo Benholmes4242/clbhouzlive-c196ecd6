@@ -37,7 +37,6 @@ export const THE_HUNDRED = {
     caption: { inset: 6, bottom: 5, fontSize: 9, letterSpacing: '0.04em', lineHeight: 1.15 },
     /** White mark on amber is ~2.4:1, so it carries extra weight to read. */
     played: { size: 17, inset: 6, ink: A.INK, check: 11, stroke: 4.2 },
-    next: { inset: 7, fontSize: 8, letterSpacing: '0.1em', padding: '1px 5px', ink: A.CANVAS, ground: A.INK },
   },
   row: {
     progress: { marginTop: 5, height: 3, background: 'rgba(255,255,255,0.08)', fill: 'rgba(248,250,252,0.55)' },
