@@ -13058,6 +13058,60 @@ export type Database = {
           },
         ]
       }
+      tour_player_follows: {
+        Row: {
+          created_at: string
+          player_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          player_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          player_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_player_follows_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_player_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "tour_player_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "tour_player_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_player_follows_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tour_push_rotation: {
         Row: {
           enabled: boolean
@@ -13249,6 +13303,73 @@ export type Database = {
             columns: ["tournament_id"]
             isOneToOne: false
             referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tour_tee_alerts: {
+        Row: {
+          created_at: string
+          fired_at: string | null
+          round: number
+          tournament_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          fired_at?: string | null
+          round: number
+          tournament_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          fired_at?: string | null
+          round?: number
+          tournament_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_tee_alerts_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournament_course_resolution"
+            referencedColumns: ["tournament_id"]
+          },
+          {
+            foreignKeyName: "tour_tee_alerts_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_tee_alerts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "tour_tee_alerts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "tour_tee_alerts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_tee_alerts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -24976,6 +25097,15 @@ export type Database = {
           p_post_id: string
         }
         Returns: Json
+      }
+      tour_tee_alerts_due: {
+        Args: { p_grace?: string }
+        Returns: {
+          round: number
+          tee_time: string
+          tournament_id: string
+          user_id: string
+        }[]
       }
       tournament_scoring_totals:
         | {
