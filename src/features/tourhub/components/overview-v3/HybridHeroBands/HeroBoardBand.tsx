@@ -69,7 +69,10 @@ import { PicksSheet } from './PicksSheet';
 import type { HeroState } from '../HybridHero.utils';
 import { boardMovementMap, todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
 import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
-import { OVERVIEW, MockFace, fmtToParTrueMinus, pickMovementCards, type MovementCard } from '../overviewTokens';
+import { OVERVIEW, pickMovementCards, type MovementCard } from '../overviewTokens';
+import { fmtScore } from '../../../utils/fmtScore';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+
 
 /**
  * FIVE rows: the leading positions shown on the hero board. The board sits
@@ -402,7 +405,7 @@ export function HeroBoardSection({
       if (!best || line.position < best.position) best = { name: surnameOf(p.playerName), position: line.position, tied: line.tied, score: line.score };
     }
     if (!best) return null;
-    const score = fmtToParTrueMinus(leader.total);
+    const score = fmtScore(leader.total);
     const pos = `${best.tied ? 'T' : ''}${best.position}`;
     if (best.position === 1 && !best.tied) return t('overview.picksIntro.leads', { name: best.name, score });
     const gap = best.score - leader.total;
@@ -483,7 +486,7 @@ export function HeroBoardSection({
           championPlayerIds={championPlayerIds}
           intro={picksIntro}
           neededByPlayer={toReachWindow ? neededByPlayer : null}
-          toReachScore={toReachWindow && leader?.total != null ? fmtToParTrueMinus(leader.total) : null}
+          toReachScore={toReachWindow && leader?.total != null ? fmtScore(leader.total) : null}
           onOpenPick={() => setPicksOpen(true)}
         />
       ) : null}
@@ -690,7 +693,7 @@ function RoundMovementBand({ round, cards }: { round: number; cards: MovementCar
         {cards.map((c) => (
           <div key={c.key} data-overview-movement-card style={{ flex: 1, minWidth: 0, background: OVERVIEW.cardGround, border: `1px solid ${OVERVIEW.hairline}`, borderRadius: 9, padding: '9px 9px 10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-              <MockFace name={c.name} candidates={c.candidates} size={22} radius={7} />
+              <SquircleAvatar size={22} srcCandidates={c.candidates} alt={c.name} userId={c.key} hideRing />
               <span style={{ minWidth: 0, fontSize: 11.5, fontWeight: 700, color: OVERVIEW.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{surnameOf(c.name)}</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 7 }}>
@@ -699,7 +702,7 @@ function RoundMovementBand({ round, cards }: { round: number; cards: MovementCar
               </span>
               {c.toPar != null ? (
                 <span style={{ fontSize: 10, fontWeight: 600, color: OVERVIEW.mute, whiteSpace: 'nowrap', ...FIGS }}>
-                  {c.gross != null ? `${c.gross} (${fmtToParTrueMinus(c.toPar)})` : `(${fmtToParTrueMinus(c.toPar)})`}
+                  {c.gross != null ? `${c.gross} (${fmtScore(c.toPar)})` : `(${fmtScore(c.toPar)})`}
                 </span>
               ) : null}
             </div>

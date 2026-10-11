@@ -22,7 +22,9 @@ import { MovementFigure } from '../../_shared/movement';
 import { formatEarnings } from '../../_shared/formatEarnings';
 import { resolveBoardEntity, teamNamesNeedInitials, type BoardNameTier } from '../../_shared/boardEntity';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
-import { OVERVIEW, MockFace, countInWords } from '../../components/overview-v3/overviewTokens';
+import { OVERVIEW, countInWords } from '../../components/overview-v3/overviewTokens';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+
 import { TrajectorySparkline } from '../../components/overview-v3/HybridHeroBands/TrajectorySparkline';
 
 type Row = BoardEntry;
@@ -410,12 +412,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: showHeroShape ? 6 : 5 }}>
                   {/* §D.4 a face leads the name. The heroBoard theme never drew a flag. */}
                   {showHeroShape ? (
-                    <MockFace
-                      name={entity.prose || entity.lines[0] || ''}
-                      candidates={r.player ? resolvePlayerAvatarCandidates({ name: r.player.full_name, photoUrl: r.player.photo_url ?? null, tourSlug }) : []}
-                      size={22}
-                      radius={7}
-                    />
+                    <SquircleAvatar size={22} srcCandidates={r.player ? resolvePlayerAvatarCandidates({ name: r.player.full_name, photoUrl: r.player.photo_url ?? null, tourSlug }) : []} alt={entity.prose || entity.lines[0] || ''} userId={r.player?.id ?? r.id} hideRing />
                   ) : null}
                   {entity.kind === 'team' ? renderEntityName(entity, T.ink) : (
                     <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.15, fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em', color: T.ink }}>{overviewName(entity.lines[0])}</span>

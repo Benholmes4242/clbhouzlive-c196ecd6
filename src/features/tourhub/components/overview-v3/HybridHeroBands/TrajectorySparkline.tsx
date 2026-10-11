@@ -11,7 +11,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { classifyTrajectory } from '../HybridHero.utils';
-import { TREND_UP, TREND_DOWN } from '../../../_shared/tokens';
+import { TREND_UP, TREND_DOWN, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { OVERVIEW } from '../overviewTokens';
 
 interface TrajectorySparklineProps {
@@ -130,14 +130,14 @@ export function shapeBarHeight(toPar: number): number {
 }
 
 /**
- * Colour of one SHAPE bar. Under par takes the mock's red; level or over takes
+ * Colour of one SHAPE bar. Under par takes TOPAR_UNDER_DARK, the tour token; level or over takes
  * the soft ink; the round in progress is amber regardless of its score. The
  * mock painted every bar red only because every sample round was under par.
  */
 export function shapeBarColor(toPar: number | null, live: boolean): string {
   if (live) return OVERVIEW.shape.live;
   if (toPar == null) return OVERVIEW.shape.stub;
-  return toPar < 0 ? OVERVIEW.shape.under : OVERVIEW.shape.level;
+  return toPar < 0 ? TOPAR_UNDER_DARK : OVERVIEW.shape.level;
 }
 
 function ShapeBars({ slots, liveIndex }: { slots: Array<number | null>; liveIndex: number | null }) {

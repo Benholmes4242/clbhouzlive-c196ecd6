@@ -13,7 +13,9 @@ import { COURSE_GRADIENT, NUMERIC_STYLE, OVERVIEW_PHOTO_BAND_HEIGHT } from '../H
 import { fmtScore, type HeroState } from '../HybridHero.utils';
 import { DARK_CHROME_GLASS_MATERIAL } from '@/features/chrome-v2/ChromeIsland';
 import { MASTHEAD_KICKER, MASTHEAD_NAME, MASTHEAD_PLACE } from '@/components/courses/CourseMasthead';
-import { OVERVIEW, MockFace } from '../overviewTokens';
+import { OVERVIEW } from '../overviewTokens';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+
 
 export interface HeroLeaderTrio {
   score: number;
@@ -149,7 +151,9 @@ export function PhotoBand({
             {leader.faces.length > 0 ? (
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}>
                 {leader.faces.map((face, i) => (
-                  <MockFace key={face.key} name={face.name} candidates={face.candidates} size={28} radius={9} border={OVERVIEW.trio.faceBorder} style={i > 0 ? { marginLeft: -9 } : undefined} />
+                  <span key={face.key} data-overview-trio-face style={{ display: 'inline-flex', flex: 'none', border: OVERVIEW.trio.faceBorder, borderRadius: '34%', marginLeft: i > 0 ? -9 : 0 }}>
+                    <SquircleAvatar size={28} srcCandidates={face.candidates} alt={face.name} userId={face.key} hideRing />
+                  </span>
                 ))}
               </div>
             ) : null}
