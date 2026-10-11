@@ -1,6 +1,14 @@
 import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/config/streamConstants';
 import type { FeedPost, FeedRpcRow, MediaItem, ReviewData, CreatorRelation, FeedPostTag } from '../types/media';
 import { isPortraitAdmissible } from './mediaOrientation';
+import i18n from '@/i18n';
+
+/** THE BYLINE FALLBACK, owned here so every post type inherits it: a member
+ *  with no display name reads as the localised "A member" — never an id, a
+ *  handle (auto-generated handles are ids) or an empty string. */
+export function memberDisplayName(displayName: string | null | undefined): string {
+  return displayName?.trim() || i18n.t('amateur.stream.aMember', { ns: 'courses', defaultValue: 'A member' });
+}
 
 // LEGACY FALLBACK ONLY. The feed RPCs project post_media.stream_id, which is
 // the primary source of a Cloudflare Stream uid. This pattern exists only for
@@ -139,7 +147,7 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
       : (row.creator_username || ''),
     displayName: isBusiness
       ? (row.business_name || row.creator_display_name || '')
-      : (row.creator_display_name?.trim() || ''), // never the username: an auto-generated handle is an id, not a name
+      : memberDisplayName(row.creator_display_name),
     avatarUrl: isBusiness
       ? (row.business_logo_url || '')
       : (row.creator_avatar_url || ''),

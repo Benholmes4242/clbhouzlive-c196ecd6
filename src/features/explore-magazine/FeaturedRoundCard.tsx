@@ -28,7 +28,7 @@ export const FeaturedRoundCard: React.FC<{
   shape?: HoleShape | null;
   onOpen: () => void;
   engagement?: FeaturedRoundEngagement | null;
-  /** Retained for callers; awards are now named per chip from get_round_awards. */
+  /** The feed's batched award read; its `awards` name each chip. */
   medals?: RoundMedalCounts | null;
   /** Home only: square corners, edge to edge like its feed neighbours. */
   square?: boolean;
@@ -38,7 +38,7 @@ export const FeaturedRoundCard: React.FC<{
   courseHandicap?: number | null;
   /** Member's public home club, when the caller holds it. */
   club?: string | null;
-}> = ({ round: r, viewerId, shape = null, onOpen, engagement = null, square = false, pillLabel, courseHandicap = null, club = null }) => (
+}> = ({ round: r, viewerId, shape = null, onOpen, engagement = null, medals, square = false, pillLabel, courseHandicap = null, club = null }) => (
   /* ONE CARD, TWO STATES: the hero is the ordinary round post with the crown. */
   <RoundPostCard
     hero
@@ -58,6 +58,7 @@ export const FeaturedRoundCard: React.FC<{
     who={{ userId: r.user_id, name: r.display_name, photoUrl: r.photo_url, isViewer: !!viewerId && r.user_id === viewerId }}
     club={club}
     engagement={engagement}
+    awards={medals?.awards ?? null}
     onOpen={onOpen}
     square={square}
     crownLabel={pillLabel}

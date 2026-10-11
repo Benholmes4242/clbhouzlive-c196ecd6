@@ -1,3 +1,4 @@
+import { memberDisplayName } from '@/components/media-system/utils/feedMapper';
 /**
  * Post Helper Functions
  * 
@@ -225,7 +226,7 @@ export function extractUserData(post: any): ExtractedUserData {
   
   return {
     id: user.id || post.created_by || post.user_id || '',
-    name: user.display_name || user.name || user.username || 'Golfer',
+    name: memberDisplayName(user.display_name || user.name),
     username: user.username,
     avatar: user.profile_photo_url || user.avatar_url || user.avatar,
   };
