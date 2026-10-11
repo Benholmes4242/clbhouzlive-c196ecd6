@@ -425,7 +425,7 @@ function CompactRow({
   caption?: string | null;
   /** OPTIONAL 0–1 bar under the name (Top 100 only). Absent = the row as before. */
   progress?: number;
-  /** Ignored on the viewer's own row: amber identity outranks par tone. */
+  /** The caption's semantic colour, on every row including the viewer's. */
   captionTone?: string;
   valueTone?: string;
   self: boolean;
@@ -433,6 +433,12 @@ function CompactRow({
   gapAbove?: boolean;
   onPress: () => void;
 }) {
+  /* THE FIGURE NEVER TAKES AMBER. Amber marks WHICH ROW IS YOURS, through the
+     position, the name and the tint (and the progress fill). A figure's colour
+     means what the figure means — green for a cut, red for under par — and a
+     member's own figure is the one they most want to read correctly. So the
+     figure reads valueTone (else A.INK) and the caption captionTone (else
+     A.DIM), whoever's row it is. BoardRowView carries the same law. */
   const ink = self ? A.AMBER : A.INK;
   return (
     <button
@@ -446,7 +452,7 @@ function CompactRow({
         padding: `${SEASON_ROW_METRICS.padY}px 0`,
         border: 'none',
         /* 9.13 — a hairline beneath every row, the last included. */
-        borderBottom: `1px solid ${A.SOFT}`,
+        borderBottom: `${SEASON_ROW_METRICS.hairline}px solid ${A.SOFT}`,
         marginTop: gapAbove ? SEASON_ROW_METRICS.pinnedGap : 0,
         background: self ? SELF_ROW_TINT : 'transparent',
         textAlign: 'left',
@@ -482,7 +488,7 @@ function CompactRow({
           <span
             style={{
               display: 'block',
-              marginTop: 1,
+              marginTop: SEASON_ROW_METRICS.subGap,
               fontSize: SEASON_ROW_METRICS.subSize,
               fontWeight: SEASON_ROW_METRICS.subWeight,
               lineHeight: SEASON_ROW_METRICS.subLine,
@@ -499,18 +505,18 @@ function CompactRow({
           <span
             aria-hidden
             data-row-progress
-            style={{ display: 'block', marginTop: THE_HUNDRED.row.progress.marginTop, height: THE_HUNDRED.row.progress.height, borderRadius: 999, background: THE_HUNDRED.row.progress.background, overflow: 'hidden' }}
+            style={{ display: 'block', marginTop: THE_HUNDRED.row.progress.marginTop, height: THE_HUNDRED.row.progress.height, borderRadius: SEASON_ROW_METRICS.barRadius, background: THE_HUNDRED.row.progress.background, overflow: 'hidden' }}
           >
             <span style={{ display: 'block', width: `${Math.max(0, Math.min(1, progress)) * 100}%`, height: '100%', background: self ? A.AMBER : THE_HUNDRED.row.progress.fill }} />
           </span>
         ) : null}
       </span>
       <span style={{ flexShrink: 0, textAlign: 'right' }}>
-        <span className="tabular-nums" style={{ display: 'block', fontSize: ROW_VALUE_SIZE, fontWeight: SEASON_ROW_METRICS.figureWeight, letterSpacing: SEASON_ROW_METRICS.figureTracking, color: self ? ink : valueTone ?? ink }}>
+        <span className="tabular-nums" style={{ display: 'block', fontSize: ROW_VALUE_SIZE, fontWeight: SEASON_ROW_METRICS.figureWeight, letterSpacing: SEASON_ROW_METRICS.figureTracking, lineHeight: caption ? SEASON_ROW_METRICS.figureLine : undefined, color: valueTone ?? A.INK }}>
           {value}
         </span>
         {caption ? (
-          <span className="tabular-nums" style={{ display: 'block', fontSize: SEASON_ROW_METRICS.secondarySize, fontWeight: SEASON_ROW_METRICS.secondaryWeight, color: !self && captionTone ? captionTone : A.DIM }}>
+          <span className="tabular-nums" style={{ display: 'block', fontSize: SEASON_ROW_METRICS.secondarySize, fontWeight: SEASON_ROW_METRICS.secondaryWeight, lineHeight: SEASON_ROW_METRICS.secondaryLine, color: captionTone ?? A.DIM }}>
             {caption}
           </span>
         ) : null}
@@ -1304,7 +1310,7 @@ export function ScoresLeaderboardsPage({
                   </span>
                   <span className="tabular-nums" style={{
                     display: 'block', marginTop: W.figure.marginTop, fontSize: W.figure.fontSize, fontWeight: W.figure.fontWeight,
-                    letterSpacing: W.figure.letterSpacing, lineHeight: 1, color: lead ? A.AMBER : A.INK,
+                    letterSpacing: W.figure.letterSpacing, lineHeight: 1, color: A.INK, /* never amber: the name and the you line mark the lead */
                   }}>
                     {fmtCareerValue(c.metric, r.value)}
                   </span>
