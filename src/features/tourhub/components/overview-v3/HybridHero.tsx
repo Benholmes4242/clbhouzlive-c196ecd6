@@ -6,7 +6,8 @@ import '@/styles/hybrid-hero.css';
 import type { HeroSlide } from '../../hooks/useHeroCarouselData';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
-import { PhotoBand, type OverviewCountdownUnit } from './HybridHeroBands/PhotoBand';
+import { PhotoBand, type HeroLeaderTrio, type OverviewCountdownUnit } from './HybridHeroBands/PhotoBand';
+import { countInWords } from './overviewMock';
 import { detectTopTie, fmtScore, isChampionResolvable, isInPlayState, roundsFromSchedule, type HeroState } from './HybridHero.utils';
 import { setHeroFullBleed } from '../../_shared/heroFullBleedSignal';
 import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
@@ -117,11 +118,26 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
   const tied = tiedCount > 1 ? { count: tiedCount } : null;
   const needsInitials = useMemo(() => teamNamesNeedInitials(rows), [rows]);
 
-  const leader = isInPlayState(state) && topPosition === 1 && top?.score != null
+  /* A.2 THE LEADER TRIO: faces (at most three), the score, one caps line.
+     The caps line states the TRUE count of a tie, however many faces show. */
+  const leader: HeroLeaderTrio | null = isInPlayState(state) && topPosition === 1 && top?.score != null
     ? {
         score: top.score,
-        name: tied
-          ? t('overview.leaderRow.tiedAtTop', { count: tied.count })
+        faces: rows
+          .filter((entry) => entry.position === 1)
+          .slice(0, 3)
+          .map((entry) => {
+            const name = entry.team
+              ? resolveBoardEntity(entry, needsInitials).prose || ''
+              : entry.player?.full_name?.trim() || '';
+            return {
+              key: entry.id,
+              name,
+              candidates: entry.team ? [] : resolvePlayerAvatarCandidates({ name, photoUrl: entry.player?.photo_url ?? null, tourSlug: tournament.tourSlug }),
+            };
+          }),
+        caps: tied
+          ? t('overview.hero.tiedCaps', { words: countInWords(tied.count, t) })
           : top.team
             ? resolveBoardEntity(top, needsInitials).prose || null
             : top.player?.full_name?.trim().split(/\s+/).slice(-1)[0] ?? null,

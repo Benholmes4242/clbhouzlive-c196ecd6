@@ -12,6 +12,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { classifyTrajectory } from '../HybridHero.utils';
 import { TREND_UP, TREND_DOWN } from '../../../_shared/tokens';
+import { MOCK } from '../overviewMock';
 
 interface TrajectorySparklineProps {
   /**
@@ -20,8 +21,14 @@ interface TrajectorySparklineProps {
    * 2+ entries required to render.
    */
   rounds: number[];
-  /** Visual variant — affects size + stroke weight. */
-  variant?: 'solo' | 'tied' | 'champion';
+  /** Visual variant — affects size + stroke weight. 'bars' is the hero
+   *  board's SHAPE column (BRIEF_TOUR_OVERVIEW_MOCK_EXACT §D.5): one bar per
+   *  scheduled round, read from `slots` rather than `rounds`. */
+  variant?: 'solo' | 'tied' | 'champion' | 'bars';
+  /** 'bars' only: one to-par figure per scheduled round; null = not yet played. */
+  slots?: Array<number | null>;
+  /** 'bars' only: zero-based index of the round in progress, painted amber whatever its score. */
+  liveIndex?: number | null;
   /** Number of total rounds expected (4 for standard, 3 for shortened). For aria-label only. */
   totalRounds?: number;
   /** Hide from a11y tree (used when parent row has the descriptive label). */
@@ -51,8 +58,11 @@ export function TrajectorySparkline({
   variant = 'solo',
   totalRounds,
   ariaHidden = false,
+  slots,
+  liveIndex = null,
 }: TrajectorySparklineProps) {
   const { t } = useTranslation('tourhub');
+  if (variant === 'bars') return <ShapeBars slots={slots ?? []} liveIndex={liveIndex} />;
   if (rounds.length < 2) return null;
 
   const { width, height, stroke, dotR } = SIZING[variant];
@@ -111,5 +121,38 @@ export function TrajectorySparkline({
         opacity={classification === 'steady' ? 0.65 : 1}
       />
     </svg>
+  );
+}
+
+/** Bar height for a played round: 4px floor, +1.5px per shot from par, 13px cap. */
+export function shapeBarHeight(toPar: number): number {
+  return Math.min(13, Math.max(4, 4 + Math.abs(toPar) * 1.5));
+}
+
+/**
+ * Colour of one SHAPE bar. Under par takes the mock's red; level or over takes
+ * the soft ink; the round in progress is amber regardless of its score. The
+ * mock painted every bar red only because every sample round was under par.
+ */
+export function shapeBarColor(toPar: number | null, live: boolean): string {
+  if (live) return MOCK.shape.live;
+  if (toPar == null) return MOCK.shape.stub;
+  return toPar < 0 ? MOCK.shape.under : MOCK.shape.level;
+}
+
+function ShapeBars({ slots, liveIndex }: { slots: Array<number | null>; liveIndex: number | null }) {
+  return (
+    <span aria-hidden data-shape-bars style={{ display: 'inline-flex', alignItems: 'flex-end', justifyContent: 'flex-end', gap: 2, height: 13 }}>
+      {slots.map((v, i) => {
+        const live = i === liveIndex && v != null;
+        return (
+          <span
+            key={i}
+            data-shape-bar={v == null ? 'stub' : live ? 'live' : v < 0 ? 'under' : 'level'}
+            style={{ width: 4, height: v == null ? 3 : shapeBarHeight(v), borderRadius: 1, background: shapeBarColor(v, live) }}
+          />
+        );
+      })}
+    </span>
   );
 }

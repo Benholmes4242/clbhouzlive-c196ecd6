@@ -67,7 +67,9 @@ import { surnameOf } from '../../../_shared/playerName';
 import { r } from '@/lib/radius';
 import { PicksSheet } from './PicksSheet';
 import type { HeroState } from '../HybridHero.utils';
-import type { BoardEntry } from '../../../leaderboard/BoardTable';
+import { boardMovementMap, todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
+import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
+import { MOCK, MockFace, fmtToParTrueMinus, pickMovementCards, type MovementCard } from '../overviewMock';
 
 /**
  * FIVE rows: the leading positions shown on the hero board. The board sits
@@ -364,6 +366,51 @@ export function HeroBoardSection({
 
   // Gated: no draw request unless in play with a round still to come; no
   // tee-time request unless that next round is actually drawn.
+  /* §C — ROUND N MOVEMENT. The same full-field boardMovementMap the MOV column
+     used, so the guard is identical to the old hasMovement: in play, a prior
+     round to rank against, at least one non-zero delta. */
+  const movementCards = useMemo<MovementCard[]>(() => {
+    if (!inPlay || currentRound == null || currentRound < 2) return [];
+    const map = boardMovementMap(entries, currentRound);
+    const cards: MovementCard[] = [];
+    for (const e of entries) {
+      const delta = map.get(e.player?.id ?? e.team?.id ?? e.id);
+      if (delta == null || delta === 0) continue;
+      const name = e.player?.full_name?.trim() || e.team?.display_name?.trim() || '';
+      const toPar = todayFromEntry(e, currentRound);
+      const complete = e.thru != null && e.thru >= 18;
+      cards.push({
+        key: e.id,
+        name,
+        candidates: e.player ? resolvePlayerAvatarCandidates({ name, photoUrl: e.player.photo_url ?? null, tourSlug: pickTourCode }) : [],
+        delta,
+        toPar,
+        gross: complete && toPar != null && typeof venuePar === 'number' && venuePar > 0 ? venuePar + toPar : null,
+      });
+    }
+    return pickMovementCards(cards);
+  }, [inPlay, currentRound, entries, venuePar, pickTourCode]);
+
+  /* §E.1 — where the picks stand. A fixed sentence from the board: the
+     best-placed pick and its gap to the lead. Absent when no pick is on it. */
+  const picksIntro = useMemo(() => {
+    if (!inPlay || !leader || leader.total == null) return null;
+    let best: { name: string; position: number; tied: boolean; score: number } | null = null;
+    for (const p of picks) {
+      const line = p?.playerId ? boardByPlayer.get(String(p.playerId)) : undefined;
+      if (!line || line.position == null || line.score == null) continue;
+      if (!best || line.position < best.position) best = { name: surnameOf(p.playerName), position: line.position, tied: line.tied, score: line.score };
+    }
+    if (!best) return null;
+    const score = fmtToParTrueMinus(leader.total);
+    const pos = `${best.tied ? 'T' : ''}${best.position}`;
+    if (best.position === 1 && !best.tied) return t('overview.picksIntro.leads', { name: best.name, score });
+    const gap = best.score - leader.total;
+    if (gap <= 0) return t('overview.picksIntro.level', { name: best.name, pos, score });
+    return t('overview.picksIntro.behind', { name: best.name, pos, count: gap, score });
+  }, [inPlay, leader, picks, boardByPlayer, t]);
+  const toReachWindow = inPlay && leader?.total != null && totalRounds != null && inRequiredRoundWindow(currentRound, totalRounds);
+
   const drawGate = inPlay && totalRounds != null && hasNextRound(currentRound, totalRounds);
   const { data: drawnRounds } = useDrawnRounds(tournamentId, { enabled: drawGate });
   const nextRound = drawGate ? nextDrawnRound(currentRound, drawnRounds, totalRounds as number) : null;
@@ -372,8 +419,14 @@ export function HeroBoardSection({
 
   return (
     <div style={{ background: PAGE_CANVAS, fontFamily: FONT }}>
+      {movementCards.length > 0 && currentRound != null ? (
+        <RoundMovementBand round={currentRound} cards={movementCards} />
+      ) : null}
+
       {hasBoard ? (
         <MiniBoard
+          tourSlug={pickTourCode}
+          totalRounds={totalRounds}
           tournamentId={tournamentId}
           entries={entries}
           limit={5}
@@ -428,6 +481,9 @@ export function HeroBoardSection({
           boardByPlayer={boardByPlayer}
           championPlayerId={championPlayerId}
           championPlayerIds={championPlayerIds}
+          intro={picksIntro}
+          neededByPlayer={toReachWindow ? neededByPlayer : null}
+          toReachScore={toReachWindow && leader?.total != null ? fmtToParTrueMinus(leader.total) : null}
           onOpenPick={() => setPicksOpen(true)}
         />
       ) : null}
@@ -459,16 +515,17 @@ export function HeroBoardSection({
 
       <div
         data-overview-action-row
-        style={{ padding: '12px 20px 18px', display: 'flex', alignItems: 'stretch', gap: 8, borderTop: `1px solid ${WHITE_ALPHA_06}` }}
+        style={{ display: 'flex', alignItems: 'center', gap: 8 }}
       >
         <button
           type="button"
           onClick={onFullLeaderboard}
           data-overview-board-cta
-          style={{ flex: '1.8 1 0', minWidth: 0, minHeight: 48, margin: 0, padding: '0 12px', borderRadius: r.md, background: WHITE_ALPHA_08, border: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: INK, fontFamily: FONT, fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.01em', cursor: 'pointer', whiteSpace: 'nowrap' }}
+          /* §F.1 the mock's full-width row, not a filled pill. */
+          style={{ flex: '1 1 0', minWidth: 0, margin: 0, padding: 16, background: 'none', border: 'none', borderTop: `1px solid ${MOCK.hairline}`, borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, color: MOCK.amber, fontFamily: FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', whiteSpace: 'nowrap' }}
         >
           {t(overviewTournamentDoorKey(phase))}
-          <ChevronRight size={16} aria-hidden />
+          <ChevronRight size={16} color={MOCK.amber} aria-hidden />
         </button>
         {venueRecord?.courseId ? (
           <button
@@ -497,9 +554,17 @@ function PicksBlock({
   boardByPlayer,
   championPlayerId,
   championPlayerIds,
+  intro,
+  neededByPlayer,
+  toReachScore,
   onOpenPick,
 }: {
   onOpenPick: () => void;
+  /** §E.1 where the picks stand; null renders no line. */
+  intro: string | null;
+  /** §E.2 the same map PicksSheet reads; null outside the required-round window. */
+  neededByPlayer: Map<string, number> | null;
+  toReachScore: string | null;
   picks: AITopContender[];
   /** The event's tour, for the shared headshot resolver. */
   tourCode: string;
@@ -521,6 +586,9 @@ function PicksBlock({
             key, so band and sheet cannot drift apart in translation. */}
         <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
       </div>
+      {intro ? (
+        <p data-overview-picks-intro style={{ margin: '0 20px 9px', marginTop: 0, fontSize: 12.5, lineHeight: 1.5, color: MOCK.soft }}>{intro}</p>
+      ) : null}
 
       <div style={{ padding: '0 16px 14px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
         {cards.map((p, i) => {
@@ -589,11 +657,55 @@ function PicksBlock({
                   {figureLine}
                 </div>
               ) : null}
+              {neededByPlayer && toReachScore ? (
+                <div data-overview-pick-to-reach style={{ borderTop: `1px solid ${MOCK.hairline}`, paddingTop: 7, marginTop: 7 }}>
+                  <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: MOCK.mute }}>{t('overview.picksToReach', { score: toReachScore })}</div>
+                  <div style={{ display: 'block', marginTop: 3, fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em', color: MOCK.ink, ...FIGS }}>
+                    {neededByPlayer.get(String(p.playerId)) ?? '\u2014'}
+                  </div>
+                </div>
+              ) : null}
             </button>
           );
         })}
       </div>
 
+    </div>
+  );
+}
+
+/**
+ * §C — ROUND N MOVEMENT. Three cards at most, never padded. THE ARROW
+ * CARRIES THE DIRECTION, NOT THE COLOUR: red is under par on every Tour
+ * surface, so a lost place reads muted ink, never red.
+ */
+function RoundMovementBand({ round, cards }: { round: number; cards: MovementCard[] }) {
+  const { t } = useTranslation('tourhub');
+  return (
+    <div data-overview-movement style={{ padding: '15px 20px', borderTop: `1px solid ${MOCK.hairline}` }}>
+      <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: MOCK.mute }}>
+        {t('overview.movement.label', { round })}
+      </div>
+      <div style={{ display: 'flex', gap: 8, marginTop: 11 }}>
+        {cards.map((c) => (
+          <div key={c.key} data-overview-movement-card style={{ flex: 1, minWidth: 0, background: MOCK.cardGround, border: `1px solid ${MOCK.hairline}`, borderRadius: 9, padding: '9px 9px 10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+              <MockFace name={c.name} candidates={c.candidates} size={22} radius={7} />
+              <span style={{ minWidth: 0, fontSize: 11.5, fontWeight: 700, color: MOCK.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{surnameOf(c.name)}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 7 }}>
+              <span data-movement-dir={c.delta > 0 ? 'up' : 'down'} style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: c.delta > 0 ? MOCK.ink : MOCK.mute, whiteSpace: 'nowrap', ...FIGS }}>
+                {c.delta > 0 ? '\u25B2' : '\u25BC'}{Math.abs(c.delta)}
+              </span>
+              {c.toPar != null ? (
+                <span style={{ fontSize: 10, fontWeight: 600, color: MOCK.mute, whiteSpace: 'nowrap', ...FIGS }}>
+                  {c.gross != null ? `${c.gross} (${fmtToParTrueMinus(c.toPar)})` : `(${fmtToParTrueMinus(c.toPar)})`}
+                </span>
+              ) : null}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
