@@ -10,6 +10,10 @@ import { BOARD_GEOMETRY, BoardTable, computeBoardColumns, type BoardEntry } from
 import { formatOverviewDateRange, getOverviewCountdown, overviewChampionScoreLabel } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { detectTopTie, fmtScore, shortenName } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { compactUpcomingFacts, overviewTournamentDoorKey, shouldLoadUpcomingFacts, shouldShowOverviewBoard } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
+import { PhotoBand } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand';
+import { buildLeaderTrio } from '@/features/tourhub/components/overview-v3/HybridHero';
+import { countInWords, pickMovementCards } from '@/features/tourhub/components/overview-v3/overviewTokens';
+import type { HeroState } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
 import { MiniBoard, heroBoardColumns, heroTieRoles, shouldShowPrize } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
 import { OVERVIEW_PHOTO_BAND_HEIGHT, PHOTO_BAND_HEIGHT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
 import { OVERVIEW_HERO_HEIGHT, OVERVIEW_HERO_TOTAL_HEIGHT } from '@/features/tourhub/components/overview-v3/OverviewHero';
@@ -322,32 +326,33 @@ describe('our picks trophy', () => {
 });
 
 describe('heroBoardColumns', () => {
-  it('live, one round: THRU only', () => {
-    expect(heroBoardColumns({ roundCount: 1, roundInProgress: true, completed: false })).toEqual({ today: false, thru: true, rounds: false, mov: false });
+  it('live, one round: SHAPE only — TODAY would equal TOT', () => {
+    expect(heroBoardColumns({ roundCount: 1, roundInProgress: true, completed: false })).toEqual({ today: false, rounds: false, shape: true });
   });
-  it('live, two or more rounds: TODAY and THRU', () => {
-    expect(heroBoardColumns({ roundCount: 2, roundInProgress: true, completed: false })).toEqual({ today: true, thru: true, rounds: false, mov: false });
+  it('live, two or more rounds: TODAY and SHAPE', () => {
+    expect(heroBoardColumns({ roundCount: 2, roundInProgress: true, completed: false })).toEqual({ today: true, rounds: false, shape: true });
   });
-  it('not live, two or more rounds: round columns', () => {
-    expect(heroBoardColumns({ roundCount: 3, roundInProgress: false, completed: true })).toEqual({ today: false, thru: false, rounds: true, mov: false });
+  it('not live, two or more rounds: round columns, no SHAPE', () => {
+    expect(heroBoardColumns({ roundCount: 3, roundInProgress: false, completed: true })).toEqual({ today: false, rounds: true, shape: false });
   });
-  it('not live, one round or fewer: neither', () => {
-    expect(heroBoardColumns({ roundCount: 1, roundInProgress: false, completed: false })).toEqual({ today: false, thru: false, rounds: false, mov: false });
+  it('not live, one round or fewer: neither, no SHAPE', () => {
+    expect(heroBoardColumns({ roundCount: 1, roundInProgress: false, completed: false })).toEqual({ today: false, rounds: false, shape: false });
   });
 });
 
-describe('hero board MOV rule', () => {
-  it('live from round two with movement: MOV shows', () => {
-    expect(heroBoardColumns({ roundCount: 2, roundInProgress: true, completed: false, hasMovement: true }).mov).toBe(true);
+describe('hero board carries no THRU or MOV key', () => {
+  it('the returned object has exactly today, rounds and shape', () => {
+    for (const opts of [
+      { roundCount: 1, roundInProgress: true, completed: false },
+      { roundCount: 4, roundInProgress: true, completed: false },
+      { roundCount: 4, roundInProgress: false, completed: true },
+    ]) {
+      expect(Object.keys(heroBoardColumns(opts)).sort()).toEqual(['rounds', 'shape', 'today']);
+    }
   });
-  it('round one: no MOV even with data', () => {
-    expect(heroBoardColumns({ roundCount: 1, roundInProgress: true, completed: false, hasMovement: true }).mov).toBe(false);
-  });
-  it('completed: no MOV', () => {
-    expect(heroBoardColumns({ roundCount: 4, roundInProgress: false, completed: true, hasMovement: true }).mov).toBe(false);
-  });
-  it('no movement data: no MOV', () => {
-    expect(heroBoardColumns({ roundCount: 3, roundInProgress: true, completed: false, hasMovement: false }).mov).toBe(false);
+  it('SHAPE is present on a live multi-round board and absent on a single-round one that is not live', () => {
+    expect(heroBoardColumns({ roundCount: 3, roundInProgress: true, completed: false }).shape).toBe(true);
+    expect(heroBoardColumns({ roundCount: 1, roundInProgress: false, completed: false }).shape).toBe(false);
   });
 });
 
@@ -367,20 +372,34 @@ describe('heroTieRoles', () => {
 });
 
 describe('MiniBoard heroBoard render', () => {
-  it('live round one in progress renders THRU and no TODAY column', () => {
+  const mountBoard = (entries: BoardEntry[], currentRound: number, phase: 'live' | 'completed') => render(createElement(
+    QueryClientProvider,
+    { client: new QueryClient({ defaultOptions: { queries: { retry: false } } }) },
+    createElement(MemoryRouter, null,
+      createElement(MiniBoard, { tournamentId: 'event', entries, limit: 5, currentRound, phase, theme: 'heroBoard', totalRounds: 4 })),
+  ));
+  it('live round two takes the mock grammar POS | PLAYER | TODAY | SHAPE | TOT', () => {
     const entries = [
-      { id: 'a', position: 1, score: -3, thru: 9, round_1: -3, player: { id: 'pa', full_name: 'Player A' } },
-      { id: 'b', position: 2, score: -2, thru: 8, round_1: -2, player: { id: 'pb', full_name: 'Player B' } },
+      { id: 'a', position: 1, score: -6, thru: 9, round_1: -1, round_2: -5, player: { id: 'pa', full_name: 'Player A' } },
+      { id: 'b', position: 2, score: -4, thru: 8, round_1: -4, round_2: 0, player: { id: 'pb', full_name: 'Player B' } },
     ] as unknown as BoardEntry[];
-    const view = render(createElement(
-      QueryClientProvider,
-      { client: new QueryClient({ defaultOptions: { queries: { retry: false } } }) },
-      createElement(MemoryRouter, null,
-        createElement(MiniBoard, { tournamentId: 'event', entries, limit: 5, currentRound: 1, phase: 'live', theme: 'heroBoard' })),
-    ));
+    const view = mountBoard(entries, 2, 'live');
     const header = view.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(header?.style.gridTemplateColumns).toBe(`24px minmax(0, 1fr) ${BOARD_GEOMETRY.thru}px 40px`);
-    expect(view.container.querySelectorAll('[data-hero-thru]').length).toBe(2);
+    expect(header?.style.gridTemplateColumns).toBe('26px minmax(0,1fr) 34px 36px 42px');
+    expect(view.container.querySelectorAll('[data-hero-shape]').length).toBe(2);
+  });
+  it('renders no THRU cell and no MOV track in any phase', () => {
+    const entries = [
+      { id: 'a', position: 1, score: -6, thru: 9, round_1: -1, round_2: -5, player: { id: 'pa', full_name: 'Player A' } },
+      { id: 'b', position: 2, score: -4, thru: 18, round_1: -4, round_2: 0, player: { id: 'pb', full_name: 'Player B' } },
+    ] as unknown as BoardEntry[];
+    for (const [round, phase] of [[1, 'live'], [2, 'live'], [2, 'completed']] as const) {
+      const view = mountBoard(entries, round, phase);
+      expect(view.container.querySelectorAll('[data-hero-thru]').length).toBe(0);
+      expect(view.container.textContent).not.toContain('\u25B2');
+      expect(view.container.textContent).not.toContain('MOV');
+      view.unmount();
+    }
   });
 });
 
@@ -407,15 +426,15 @@ describe('MiniBoard hero rows', () => {
     const view = mount(entries, 1);
     expect(view.container.querySelector('button')?.getAttribute('aria-label')).toBe('Player A, T2, -4');
   });
-  it('live round two renders a MOV track before POS', () => {
+  it('live round two renders no MOV track before POS', () => {
     const entries = [
       { id: 'a', position: 1, score: -6, thru: 9, round_1: -1, round_2: -5, player: { id: 'pa', full_name: 'Player A' } },
       { id: 'b', position: 2, score: -4, thru: 9, round_1: -4, round_2: 0, player: { id: 'pb', full_name: 'Player B' } },
     ] as unknown as BoardEntry[];
     const view = mount(entries, 2);
     const header = view.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(header?.style.gridTemplateColumns.startsWith(`${BOARD_GEOMETRY.mov}px ${BOARD_GEOMETRY.pos}px`)).toBe(true);
-    expect(view.container.textContent).toContain('\u25B2 1');
+    expect(header?.style.gridTemplateColumns.startsWith('26px minmax(0,1fr)')).toBe(true);
+    expect(view.container.textContent).not.toContain('\u25B2');
   });
 });
 
@@ -453,5 +472,76 @@ describe('one board geometry', () => {
     const header = view.container.querySelector<HTMLElement>('[data-overview-board-header]');
     expect(header?.style.gridTemplateColumns).toContain(`${BOARD_GEOMETRY.cell}px ${BOARD_GEOMETRY.cell}px`);
     expect(header?.style.gridTemplateColumns.endsWith(`${BOARD_GEOMETRY.tot}px`)).toBe(true);
+  });
+});
+
+describe('BRIEF_TOUR_OVERVIEW_MOCK_EXACT coverage', () => {
+  i18n.addResourceBundle(i18n.language || 'en', 'tourhub', enTourhub, true, true);
+  const t = i18n.getFixedT(i18n.language || 'en', 'tourhub') as unknown as (k: string, o?: Record<string, unknown>) => string;
+
+  it('(a) the round spine renders live and suspended, never upcoming or a finished result', () => {
+    const states: Array<[HeroState, boolean]> = [
+      [{ kind: 'live', round: 2, totalRounds: 4 }, true],
+      [{ kind: 'suspended', round: 3, totalRounds: 4, reason: null }, true],
+      [{ kind: 'upcoming', variant: 'later' as never, countdown: '', meta: '' }, false],
+      [{ kind: 'results', variant: 'final' as never, finishDate: '2026-10-10', meta: '' }, false],
+    ];
+    for (const [state, shown] of states) {
+      const view = render(createElement(PhotoBand, { title: 'Event', venueName: null, datesString: null, venueImageUrl: null, state, tourLabel: null, leader: null, countdown: [], startDay: null, onOpen: () => {} }));
+      const spine = view.container.querySelector('[data-overview-round-spine]');
+      expect(Boolean(spine)).toBe(shown);
+      if (spine) {
+        expect(spine.querySelectorAll('[data-round-node]').length).toBe(4);
+        expect(spine.querySelector('[data-round-node="live"]')?.textContent).toBe(`R${(state as { round: number }).round}`);
+      }
+      view.unmount();
+    }
+  });
+
+  it('(b) countInWords is words for 2–10 and a numeral past 10; the trio caps state the TRUE count', () => {
+    expect([2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => countInWords(n, t))).toEqual(['Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten']);
+    expect(countInWords(11, t)).toBe('11');
+    const rows = ['a', 'b', 'c', 'd', 'e'].map((id) => ({ id, position: 1, position_tied: true, score: -12, player: { id: `p${id}`, full_name: `Player ${id.toUpperCase()}` } })) as unknown as BoardEntry[];
+    const trio = buildLeaderTrio(rows, false, 'pga', t);
+    expect(trio?.faces.length).toBe(3);
+    expect(trio?.caps).toBe('Five tied');
+    const sole = buildLeaderTrio([{ ...rows[0], position_tied: false }, { ...rows[1], position: 2 }] as BoardEntry[], false, 'pga', t);
+    expect(sole?.faces.length).toBe(1);
+    expect(sole?.caps).toBe('A');
+  });
+
+  it('(c) the tie cap renders once over a tied top group whose rows carry no position; absent when the top is not tied', () => {
+    const mountLive = (entries: BoardEntry[]) => render(createElement(
+      QueryClientProvider,
+      { client: new QueryClient({ defaultOptions: { queries: { retry: false } } }) },
+      createElement(MemoryRouter, null,
+        createElement(MiniBoard, { tournamentId: 'event', entries, limit: 5, currentRound: 2, phase: 'live', theme: 'heroBoard', totalRounds: 4 })),
+    ));
+    const tied = [
+      { id: 'a', position: 1, position_tied: true, score: -6, thru: 9, round_1: -1, round_2: -5, player: { id: 'pa', full_name: 'Player A' } },
+      { id: 'b', position: 1, position_tied: true, score: -6, thru: 9, round_1: -3, round_2: -3, player: { id: 'pb', full_name: 'Player B' } },
+      { id: 'c', position: 1, position_tied: true, score: -6, thru: 9, round_1: -4, round_2: -2, player: { id: 'pc', full_name: 'Player C' } },
+      { id: 'd', position: 4, score: -4, thru: 9, round_1: -4, round_2: 0, player: { id: 'pd', full_name: 'Player D' } },
+    ] as unknown as BoardEntry[];
+    const view = mountLive(tied);
+    const caps = view.container.querySelectorAll('[data-hero-tie-cap]');
+    expect(caps.length).toBe(1);
+    expect(caps[0].textContent).toBe('T1Three tied');
+    const group = view.container.querySelector('[data-hero-tie-group]')!;
+    expect(group.querySelectorAll('[data-hero-tie="capped"]').length).toBe(3);
+    group.querySelectorAll('[data-hero-tie="capped"]').forEach((cell) => {
+      expect(cell.querySelector(':not(.sr-only)')).toBeNull();
+    });
+    view.unmount();
+    const solo = mountLive([{ ...tied[0], position_tied: false }, { ...tied[3], position: 2 }] as BoardEntry[]);
+    expect(solo.container.querySelector('[data-hero-tie-cap]')).toBeNull();
+    expect(solo.container.querySelector('[data-hero-tie-group]')).toBeNull();
+  });
+
+  it('(d) pickMovementCards drops zeros, keeps the three largest, gained before lost, never pads', () => {
+    const c = (key: string, delta: number) => ({ key, delta });
+    expect(pickMovementCards([c('z', 0), c('a', -5), c('b', 2), c('c', 7), c('d', -1), c('e', 3)]).map((x) => x.key)).toEqual(['c', 'e', 'a']);
+    expect(pickMovementCards([c('a', 0), c('b', -2)]).map((x) => x.key)).toEqual(['b']);
+    expect(pickMovementCards([c('a', 0)])).toEqual([]);
   });
 });
