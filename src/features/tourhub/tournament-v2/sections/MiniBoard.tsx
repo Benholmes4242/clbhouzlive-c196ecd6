@@ -331,12 +331,13 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     return (
       <>
         <div style={{ background: T.surface, fontFamily: FONT }}>
-          <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: BOARD_GEOMETRY.gap, minHeight: 26, padding: `3px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: T.faint, textTransform: 'uppercase' }}>
+          <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, minHeight: 26, padding: `4px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: MOCK.mute, textTransform: 'uppercase' }}>
             {showHeroMov ? <div style={{ textAlign: 'right' }}>{t('board.columns.mov')}</div> : null}
-            {showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
+            {showHeroShape || showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>
             {showHeroToday ? <div style={{ textAlign: 'right' }}>{t('board.columns.today')}</div> : null}
             {showHeroThru ? <div style={{ textAlign: 'right' }}>{t('board.columns.thru')}</div> : null}
+            {showHeroShape ? <div style={{ textAlign: 'right' }}>{t('board.columns.shape')}</div> : null}
             {heroRounds.map((rd) => (
               <div key={rd} style={{ textAlign: 'right', color: heroCols.liveRound === rd ? AMBER : T.faint }}>
                 {`R${rd}`}
@@ -344,7 +345,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             ))}
             <div style={{ textAlign: 'right' }}>{t('board.columns.tot')}</div>
           </div>
-          {rows.map((r, rowIndex) => {
+          {(() => {
+          const renderRow = (r: Row, rowIndex: number, inTopTie: boolean) => {
             const entity = resolveBoardEntity(r, needsInitials, nameTier);
             const tieRole = tieRoles[rowIndex];
             const demotedRow = ['MC', 'CUT', 'WD'].includes(r.status?.toUpperCase() ?? '');
@@ -374,7 +376,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   playerId: pid, playerName: entity.lines[0] ?? '', countryCode: r.player?.country_code ?? r.player?.country ?? null,
                   position: r.position ?? null, positionTied: r.position_tied ?? null, total: r.score ?? null, today, thru: r.thru ?? null, status: r.status ?? null,
                 }); } : undefined}
-                style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: BOARD_GEOMETRY.gap, width: '100%', minHeight: 34, padding: `${entity.kind === 'team' ? 6 : 5}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
+                style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, width: '100%', minHeight: showHeroShape ? 36 : 34, padding: showHeroShape ? `6px ${HERO_PAD_X}px` : `${entity.kind === 'team' ? 6 : 5}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
                 className={tappable ? `${T.press} transition-colors` : undefined}
               >
                 {showHeroMov ? (
@@ -382,7 +384,10 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                     {demotedRow ? null : <MovementFigure movement={mov ?? null} variant="compact" tone="ink" />}
                   </div>
                 ) : null}
-                {showOverviewPosition ? (
+                {(showHeroShape || showOverviewPosition) && inTopTie ? (
+                  /* §D.3: the cap above states the position once; the row carries none. */
+                  <div data-hero-tie="capped"><span className="sr-only">{posText}</span></div>
+                ) : showHeroShape || showOverviewPosition ? (
                   <div data-hero-tie={tieRole} style={{ position: 'relative', alignSelf: 'stretch', display: 'flex', alignItems: 'center', fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                     {/* ONE MARKER PER TIE: later rows carry it for screen readers only. */}
                     {tieRole === 'middle' || tieRole === 'last' ? <span className="sr-only">{posText}</span> : posText}
@@ -402,7 +407,16 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                     ) : null}
                   </div>
                 ) : null}
-                <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: showHeroShape ? 6 : 5 }}>
+                  {/* §D.4 a face leads the name. The heroBoard theme never drew a flag. */}
+                  {showHeroShape ? (
+                    <MockFace
+                      name={entity.prose || entity.lines[0] || ''}
+                      candidates={r.player ? resolvePlayerAvatarCandidates({ name: r.player.full_name, photoUrl: r.player.photo_url ?? null, tourSlug }) : []}
+                      size={22}
+                      radius={7}
+                    />
+                  ) : null}
                   {entity.kind === 'team' ? renderEntityName(entity, T.ink) : (
                     <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.15, fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em', color: T.ink }}>{overviewName(entity.lines[0])}</span>
                   )}
@@ -410,6 +424,21 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 </div>
                 {showHeroToday ? (
                   <div style={{ ...HERO_NUM, fontSize: 13, fontWeight: 700, color: getScoreColor(today, scoreTheme) }}>{today == null ? BLANK : fmtScore(today)}</div>
+                ) : null}
+                {showHeroShape ? (
+                  <div data-hero-shape style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', minWidth: 0 }}>
+                    <TrajectorySparkline
+                      variant="bars"
+                      rounds={[]}
+                      ariaHidden
+                      slots={Array.from({ length: shapeSlots }, (_, i) => {
+                        const rd = i + 1;
+                        if (rd === currentRound) return today;
+                        return ([r.round_1, r.round_2, r.round_3, r.round_4][i] ?? null);
+                      })}
+                      liveIndex={currentRound != null && roundInProgress ? currentRound - 1 : null}
+                    />
+                  </div>
                 ) : null}
                 {/* THRU IS NOT A SCORE — faint ink, never a score colour. */}
                 {showHeroThru ? (
@@ -428,7 +457,25 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 <div style={{ ...HERO_NUM, fontSize: 15, fontWeight: 700, color: getScoreColor(r.score, scoreTheme) }}>{r.score == null ? BLANK : fmtScore(r.score)}</div>
               </RowTag>
             );
-          })}
+          };
+          if (topTieLength === 0) return rows.map((r, i) => renderRow(r, i, false));
+          return (
+            <>
+              <div data-hero-tie-cap style={{ padding: `9px ${HERO_PAD_X}px 3px`, display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', color: MOCK.ink, fontVariantNumeric: 'tabular-nums lining-nums' }}>T1</span>
+                <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: MOCK.mute }}>
+                  {t('overview.hero.tiedCaps', { words: countInWords(topTieCount, t) })}
+                </span>
+              </div>
+              <div data-hero-tie-group style={{ position: 'relative' }}>
+                <span aria-hidden data-hero-tie-bracket style={{ position: 'absolute', left: 9, top: 2, bottom: 2, width: 1.5, borderRadius: 2, background: MOCK.bracket }} />
+                {rows.slice(0, topTieLength).map((r, i) => renderRow(r, i, true))}
+              </div>
+              <div aria-hidden data-hero-tie-separator style={{ height: 1, background: MOCK.hairline, marginTop: 9 }} />
+              {rows.slice(topTieLength).map((r, i) => renderRow(r, i + topTieLength, false))}
+            </>
+          );
+          })()}
         </div>
         <ScorecardSheet open={!!target} onClose={() => setTarget(null)} tournamentId={tournamentId} target={target} />
       </>
