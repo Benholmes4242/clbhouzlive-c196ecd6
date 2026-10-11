@@ -69,6 +69,9 @@ import { roundPostItem } from './roundPostItem';
 import { featuredRoundFrom, decideFeatured, type FeaturedTrigger } from './featuredRoundTrigger';
 import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard';
 import { RoundPostCard } from '@/features/explore-magazine/RoundPostCard';
+import { LikedByRow } from '@/components/likes/LikedByRow';
+import { CALLOUT_SUBTEXT } from '@/features/explore-magazine/AchievementCallout';
+import { A as A_TOKENS } from '@/components/explore-tab-new/courseled/tokens';
 import type { RoundCourseMeta } from './roundPostItem';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
 
@@ -603,6 +606,24 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           onWhoTap={() => onProfile(post)}
           square
           trailing={item.who?.is_viewer === true ? <PostOwnerMenu postId={post.id} isOwnPost actorType="personal" variant="inline" /> : null}
+          awards={roundMedals?.awards ?? null}
+          footer={postRound?.whsScoreId && likeCount > 0 ? (
+            /* RESTORED exactly as ExploreCard drew it: same component, props and placement under the member row. */
+            <div data-round-reactions-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, marginTop: 6 }}>
+              <LikedByRow
+                postId={postRound.whsScoreId}
+                count={likeCount}
+                source="round"
+                kind="celebrate"
+                surfaceColor={A_TOKENS.CANVAS}
+                isOwnRound={item.who?.is_viewer === true}
+                style={{ marginTop: 0, minWidth: 0 }}
+                fontSize={CALLOUT_SUBTEXT.fontSize}
+                fontWeight={CALLOUT_SUBTEXT.fontWeight}
+                lines={1}
+              />
+            </div>
+          ) : null}
         />
       </article>
     );
