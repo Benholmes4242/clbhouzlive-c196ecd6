@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
-import { MiniBoard, showScorecardFooter } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
+import { MiniBoard } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
 import { RoundMovementBand } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 
@@ -36,15 +36,12 @@ describe('heroBoard row tap opens the scorecard', () => {
     expect(screen.getByRole('dialog').getAttribute('data-target')).toBe('pb');
   });
 
-  it('a team row with no player id is not a button, and an all-team board has no footer', () => {
+  it('a team row with no player id is not a button', () => {
     const entries = [
       { id: 't', position: 1, score: -8, thru: 9, round_1: -4, round_2: -4, team: { id: 'team', display_name: 'Team One', members: [] } },
     ] as unknown as BoardEntry[];
     const view = mount(entries);
     expect(view.container.querySelectorAll('button').length).toBe(0);
-    expect(view.container.querySelector('[data-overview-board-footer]')).toBeNull();
-    expect(showScorecardFooter([{ player: null }])).toBe(false);
-    expect(showScorecardFooter([{ player: null }, { player: { id: 'p' } }])).toBe(true);
   });
 });
 

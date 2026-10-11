@@ -704,7 +704,7 @@ export function RoundMovementBand({ round, cards }: { round: number; cards: Move
   return (
     <div data-overview-movement style={{ padding: '15px 20px', borderTop: `1px solid ${OVERVIEW.hairline}` }}>
       <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.mute }}>
-        {t('overview.movement.label', { round })}
+        {t('overview.biggestMovers', { round })}
       </div>
       <div style={{ display: 'flex', gap: 8, marginTop: 11 }}>
         {cards.map((c) => (

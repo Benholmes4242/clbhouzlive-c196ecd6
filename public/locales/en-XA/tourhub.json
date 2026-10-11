@@ -151,8 +151,7 @@
     "board": {
       "clbhouzPick": "[çlbhöûz pïçk]",
       "rowLabel": "[{{name}}, {{position}}, {{score}}]",
-      "teamName": "[{{team}}: {{members}}]",
-      "tapForScorecard": "[~~Ţáƥ á ƥļáýéř ƒőř ţĥéíř šċőřéċářđ~~]"
+      "teamName": "[{{team}}: {{members}}]"
     },
     "venueRecord": {
       "course": "[Course]"
@@ -243,16 +242,14 @@
     "situation": {
       "label": "[~~Ţĥé šíţúáţíőñ~~]"
     },
-    "movement": {
-      "label": "[~~Řőúñđ {{round}} ɱőṽéɱéñţ~~]"
-    },
     "picksIntro": {
       "leads": "[~~{{name}} ļéáđš ƒőř úš. Éáĉĥ ĉářđ šĥőŵš ţĥé řőúñđ őúř ƥíĉǩš ŵőúļđ ñééđ ţő řéáĉĥ {{score}}.~~]",
       "behind_one": "[~~Őúř ƀéšţ-ƥļáĉéđ ƥíĉǩ, {{name}}, íš {{pos}}, {{count}} šĥőţ ƀáĉǩ. Éáĉĥ ĉářđ šĥőŵš ţĥé řőúñđ ţĥéý ŵőúļđ ñééđ ţő řéáĉĥ {{score}}.~~]",
       "behind_other": "[~~Őúř ƀéšţ-ƥļáĉéđ ƥíĉǩ, {{name}}, íš {{pos}}, {{count}} šĥőţš ƀáĉǩ. Éáĉĥ ĉářđ šĥőŵš ţĥé řőúñđ ţĥéý ŵőúļđ ñééđ ţő řéáĉĥ {{score}}.~~]",
       "level": "[~~Őúř ƀéšţ-ƥļáĉéđ ƥíĉǩ, {{name}}, íš {{pos}}, ļéṽéļ ŵíţĥ ţĥé ļéáđ. Éáĉĥ ĉářđ šĥőŵš ţĥé řőúñđ ţĥéý ŵőúļđ ñééđ ţő řéáĉĥ {{score}}.~~]"
     },
-    "picksToReach": "[~~Ţő řéáĉĥ {{score}}~~]"
+    "picksToReach": "[~~Ţő řéáĉĥ {{score}}~~]",
+    "biggestMovers": "[~~Řőúñđ {{round}} ƀíĝĝéšţ ɱőṽéřš~~]"
   },
   "empty": {
     "leaderboard": {
