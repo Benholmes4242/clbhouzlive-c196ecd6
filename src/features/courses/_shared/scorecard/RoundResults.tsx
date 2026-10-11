@@ -70,7 +70,7 @@ function placingText(rank: number | null, topTen: boolean, t: (key: string, opti
 
 type T = (key: string, options?: Record<string, unknown>) => string;
 
-function awardTitle(award: RoundAwardRow, t: T, voice: RoundResultsVoice | null | undefined): string {
+export function awardTitle(award: RoundAwardRow, t: T, voice: RoundResultsVoice | null | undefined): string {
   // Owner and non-owner are separate keys; with no voice the generic keys stand.
   const who = voice ? (voice.self ? 'Self' : 'Other') : '';
   const name = voice?.subjectName;

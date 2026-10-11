@@ -34,7 +34,7 @@ export interface RoundDot {
   tone: string;
 }
 
-function holeDeltas(shape: HoleShape | null | undefined) {
+export function holeDeltas(shape: HoleShape | null | undefined) {
   if (!shape) return [] as { delta: number; strokes: number }[];
   return shape.holes.flatMap((hole) =>
     hole.par != null && hole.strokes != null

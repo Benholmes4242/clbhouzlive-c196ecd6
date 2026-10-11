@@ -42,6 +42,15 @@ const END_LABEL_GUTTER = 8;
 const UNDER_FILL_TOP = 0.12;
 const UNDER_FILL_BOTTOM = 0.5;
 
+/** The round post trace's values (BRIEF_CLUBHOUSE_ROUND_POST_REBUILD §C). */
+const POST_TRACE = {
+  line: '#FFFFFF',
+  level: 'rgba(255,255,255,0.34)',
+  label: 'rgba(248,250,252,0.30)',
+  turn: 'rgba(255,255,255,0.10)',
+  fill: 'rgba(226,75,63,0.30)',
+} as const;
+
 const OVER_TONE = A.INK;
 const UNDER_TONE = TOPAR_RED;
 
@@ -97,6 +106,7 @@ export function RoundShape({
   exploreDots,
   exploreDotCanvas = A.CANVAS,
   underParFill = false,
+  postTrace,
 
 }: {
   row: CircleRoundRow;
@@ -139,7 +149,9 @@ export function RoundShape({
   /** Explore-only fill between the trace and level par while cumulative gross
    *  to-par is below zero. Defaults off for every shared consumer. */
   underParFill?: boolean;
-
+  /** The Clubhouse round post's trace strip: level-par baseline with its label,
+   *  turn rule, 2.4px line, per-hole under-par quads only. Absent everywhere else. */
+  postTrace?: { level: string; turn: string };
 }) {
   const instanceId = useId().replace(/[^a-zA-Z0-9_-]/g, '');
 
@@ -186,6 +198,61 @@ export function RoundShape({
       {showMeta && shape && <ShapeMeta buckets={buckets} />}
     </>
   );
+
+  if (shape && postTrace) {
+    /* THE ROUND POST TRACE (BRIEF_CLUBHOUSE_ROUND_POST_REBUILD §C).
+       NO HANDICAP PACE LINE, NOW OR LATER. Handicap strokes are allocated by
+       stroke index, one shot on each of the hardest holes, so a straight line
+       from zero to a member's handicap is only true at the eighteenth and is a
+       fiction at every hole before it. The baseline is LEVEL PAR, which is
+       measured: the series is already cumulative to-par. Only the good side is
+       filled — an over-par stretch is a clean line. */
+    const T = POST_TRACE;
+    const v = shape.series;
+    const labelBand = 12;
+    const top = 12;
+    const bottom = height - labelBand;
+    const lo = Math.min(0, ...v) - 0.6;
+    const hi = Math.max(0, ...v) + 0.6;
+    const span = Math.max(hi - lo, 2);
+    const x = (i: number) => SHAPE_PAD_X + (i / Math.max(v.length - 1, 1)) * (width - SHAPE_PAD_X * 2);
+    const y = (value: number) => bottom - ((value - lo) / span) * (bottom - top);
+    const base = y(0);
+    const pts = v.map((value, i) => ({ x: x(i), y: y(value) }));
+    const line = pts.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' ');
+    const turnIndex = v.length === 19 ? 9 : null;
+    return (
+      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden style={{ display: 'block', width: '100%', height: 'auto' }}>
+        {pts.slice(1).map((p, k) => {
+          const a = pts[k];
+          if ((v[k] + v[k + 1]) / 2 >= 0) return null;
+          return <path key={`q${k}`} data-round-under-par-fill="true" fill={T.fill}
+            d={`M${a.x},${a.y} L${p.x},${p.y} L${p.x},${base} L${a.x},${base} Z`} />;
+        })}
+        {turnIndex != null ? (
+          <>
+            <line x1={x(turnIndex)} x2={x(turnIndex)} y1={top - 4} y2={bottom} stroke={T.turn} strokeWidth={1} />
+            <text x={x(turnIndex) + 3} y={top - 4} dominantBaseline="text-before-edge" fill={T.label}
+              fontSize={8} fontWeight={700} letterSpacing="0.1em" fontFamily="Geist, sans-serif">{postTrace.turn}</text>
+          </>
+        ) : null}
+        <line x1={SHAPE_PAD_X} x2={width - SHAPE_PAD_X} y1={base} y2={base} stroke={T.level} strokeWidth={1} strokeDasharray="3 3" />
+        <text x={SHAPE_PAD_X} y={base - 3} fill={T.label} fontSize={8} fontWeight={700} letterSpacing="0.08em"
+          fontFamily="Geist, sans-serif">{postTrace.level}</text>
+        <path d={line} fill="none" stroke={T.line} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
+        {(exploreDots ?? []).map((dot) => {
+          const p = pts[dot.i];
+          if (!p) return null;
+          return <circle key={`${dot.i}:${dot.tone}`} data-round-dot={dot.tone} cx={p.x} cy={p.y}
+            r={dot.tone === SC_FILL_GOLD ? 4.4 : 3.2} fill={dot.tone} stroke={exploreDotCanvas} strokeWidth={1.5} />;
+        })}
+        <g fill={T.label} fontSize={8.5} fontWeight={700} fontFamily="Geist, sans-serif">
+          <text x={SHAPE_PAD_X} y={height} dominantBaseline="text-after-edge">1</text>
+          <text x={width - SHAPE_PAD_X} y={height} dominantBaseline="text-after-edge" textAnchor="end">{String(v.length - 1)}</text>
+        </g>
+      </svg>
+    );
+  }
 
   if (shape && exploreLineOnly) {
     const lineValues = shape.series;
