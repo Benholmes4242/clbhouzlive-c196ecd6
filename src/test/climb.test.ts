@@ -30,10 +30,10 @@ describe('the climb — orders', () => {
       ['a', 1, false], ['b', 2, false], ['c', 3, false], ['n', 4, false], ['z', 5, false], ['p', 6, false], ['e', 7, false],
     ]);
   });
-  it('share uses competition ranking with ties, and sorts uncomputable rows last', () => {
+  it('share uses competition ranking with ties; uncomputable rows sort last with a null position', () => {
     expect(climbOrder(field, 'share').map((p) => [p.row.user_id, p.pos, p.tie])).toEqual([
       ['b', 1, true], ['c', 1, true], ['a', 3, false], ['e', 4, false],
-      ['n', 5, true], ['z', 5, true], ['p', 5, true],
+      ['n', null, false], ['z', null, false], ['p', null, false],
     ]);
   });
   it('no tie when unrounded shares differ even if both round to 45%', () => {

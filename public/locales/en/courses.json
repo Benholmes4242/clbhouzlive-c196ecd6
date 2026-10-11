@@ -235,7 +235,7 @@
           "better": "You are {{pos}} on strokes — but you are {{otherPos}} by share."
         },
         "share": {
-          "first": "You are {{pos}} by share — but nobody on clbhouz has cut more strokes from their index this year.",
+          "first": "You are {{pos}} by share — but nobody on clbhouz has cut more strokes this year.",
           "better": "You are {{pos}} by share — but you are {{otherPos}} on strokes."
         }
       }
