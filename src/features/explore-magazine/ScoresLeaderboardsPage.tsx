@@ -44,6 +44,8 @@ import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListPr
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
 import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
 import { THE_HUNDRED, HUNDRED_ROWS_HEIGHT, HUNDRED_SLAB_HEIGHT, hundredPlaceholderHeight, hundredSlab } from './theHundred';
+import { CLIMB, climbCross, climbOrder, climbPlaceholderHeight, type ClimbMode, type ClimbPlaced } from './climb';
+import { formatMonthLong } from '@/i18n/format';
 import { HundredBasis, HundredRail, HundredSubHead, HundredYou } from './TheHundredSection';
 
 /** CompactRow value size (the career, Top 100 and improvement sections). */
@@ -371,6 +373,43 @@ function LeadSeeAll({ label, onPress }: { label: string; onPress: () => void }) 
   );
 }
 
+/** §4 order toggle — Rare air's shape, read from RARE_AIR.toggle. */
+function ClimbToggle({ mode, onChange }: { mode: ClimbMode; onChange: (m: ClimbMode) => void }) {
+  const { t } = useTranslation('courses');
+  return (
+    <div
+      role="radiogroup"
+      aria-label={t('amateur.leaderboards.climbOrder')}
+      style={{
+        display: 'flex', gap: RARE_AIR.toggle.gap, padding: RARE_AIR.toggle.padding, borderRadius: 999, flex: 'none', alignSelf: 'center',
+        background: RARE_AIR.toggle.background, border: `1px solid ${RARE_AIR.toggle.border}`,
+      }}
+    >
+      {(['strokes', 'share'] as const).map((key) => {
+        const selected = mode === key;
+        return (
+          <button
+            key={key}
+            type="button"
+            role="radio"
+            aria-checked={selected}
+            onClick={() => { if (!selected) onChange(key); }}
+            style={{
+              height: RARE_AIR.toggle.height, padding: `0 ${RARE_AIR.toggle.sidePadding}px`, borderRadius: 999, border: 'none',
+              fontFamily: SANS, fontSize: RARE_AIR.toggle.fontSize, fontWeight: 600, whiteSpace: 'nowrap',
+              letterSpacing: 'normal', textTransform: 'none',
+              background: selected ? RARE_AIR.toggle.fill : 'transparent',
+              color: selected ? A.INK : A.MUTE,
+            }}
+          >
+            {t(key === 'strokes' ? 'amateur.leaderboards.climbStrokes' : 'amateur.leaderboards.climbShare')}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function SeeAll({ label, onPress }: { label: string; onPress: () => void }) {
   return (
     <button
@@ -425,7 +464,7 @@ function CompactRow({
   caption?: string | null;
   /** OPTIONAL 0–1 bar under the name (Top 100 only). Absent = the row as before. */
   progress?: number;
-  /** Ignored on the viewer's own row: amber identity outranks par tone. */
+  /** The caption's semantic colour, on every row including the viewer's. */
   captionTone?: string;
   valueTone?: string;
   self: boolean;
@@ -433,6 +472,12 @@ function CompactRow({
   gapAbove?: boolean;
   onPress: () => void;
 }) {
+  /* THE FIGURE NEVER TAKES AMBER. Amber marks WHICH ROW IS YOURS, through the
+     position, the name and the tint (and the progress fill). A figure's colour
+     means what the figure means — green for a cut, red for under par — and a
+     member's own figure is the one they most want to read correctly. So the
+     figure reads valueTone (else A.INK) and the caption captionTone (else
+     A.DIM), whoever's row it is. BoardRowView carries the same law. */
   const ink = self ? A.AMBER : A.INK;
   return (
     <button
@@ -446,7 +491,7 @@ function CompactRow({
         padding: `${SEASON_ROW_METRICS.padY}px 0`,
         border: 'none',
         /* 9.13 — a hairline beneath every row, the last included. */
-        borderBottom: `1px solid ${A.SOFT}`,
+        borderBottom: `${SEASON_ROW_METRICS.hairline}px solid ${A.SOFT}`,
         marginTop: gapAbove ? SEASON_ROW_METRICS.pinnedGap : 0,
         background: self ? SELF_ROW_TINT : 'transparent',
         textAlign: 'left',
@@ -482,7 +527,7 @@ function CompactRow({
           <span
             style={{
               display: 'block',
-              marginTop: 1,
+              marginTop: SEASON_ROW_METRICS.subGap,
               fontSize: SEASON_ROW_METRICS.subSize,
               fontWeight: SEASON_ROW_METRICS.subWeight,
               lineHeight: SEASON_ROW_METRICS.subLine,
@@ -499,18 +544,18 @@ function CompactRow({
           <span
             aria-hidden
             data-row-progress
-            style={{ display: 'block', marginTop: THE_HUNDRED.row.progress.marginTop, height: THE_HUNDRED.row.progress.height, borderRadius: 999, background: THE_HUNDRED.row.progress.background, overflow: 'hidden' }}
+            style={{ display: 'block', marginTop: THE_HUNDRED.row.progress.marginTop, height: THE_HUNDRED.row.progress.height, borderRadius: SEASON_ROW_METRICS.barRadius, background: THE_HUNDRED.row.progress.background, overflow: 'hidden' }}
           >
             <span style={{ display: 'block', width: `${Math.max(0, Math.min(1, progress)) * 100}%`, height: '100%', background: self ? A.AMBER : THE_HUNDRED.row.progress.fill }} />
           </span>
         ) : null}
       </span>
       <span style={{ flexShrink: 0, textAlign: 'right' }}>
-        <span className="tabular-nums" style={{ display: 'block', fontSize: ROW_VALUE_SIZE, fontWeight: SEASON_ROW_METRICS.figureWeight, letterSpacing: SEASON_ROW_METRICS.figureTracking, color: self ? ink : valueTone ?? ink }}>
+        <span className="tabular-nums" style={{ display: 'block', fontSize: ROW_VALUE_SIZE, fontWeight: SEASON_ROW_METRICS.figureWeight, letterSpacing: SEASON_ROW_METRICS.figureTracking, lineHeight: caption ? SEASON_ROW_METRICS.figureLine : undefined, color: valueTone ?? A.INK }}>
           {value}
         </span>
         {caption ? (
-          <span className="tabular-nums" style={{ display: 'block', fontSize: SEASON_ROW_METRICS.secondarySize, fontWeight: SEASON_ROW_METRICS.secondaryWeight, color: !self && captionTone ? captionTone : A.DIM }}>
+          <span className="tabular-nums" style={{ display: 'block', fontSize: SEASON_ROW_METRICS.secondarySize, fontWeight: SEASON_ROW_METRICS.secondaryWeight, lineHeight: SEASON_ROW_METRICS.secondaryLine, color: captionTone ?? A.DIM }}>
             {caption}
           </span>
         ) : null}
@@ -584,6 +629,7 @@ export function ScoresLeaderboardsPage({
   const improved = useYearImprovement(userId);
   const improvedRows = improved.data ?? [];
   const [improvedSheet, setImprovedSheet] = useState(false);
+  const [climbMode, setClimbMode] = useState<ClimbMode>('strokes');
 
   const [featWindow, setFeatWindow] = useState<FeatWindow>('year');
   const featsYear = useFeatsWindow(userId, featWindow);
@@ -651,30 +697,42 @@ export function ScoresLeaderboardsPage({
   /* §4 row. start_index and current_index are FACTS from the RPC, so they are
      formatted directly — handicapJourneyDisplay derives an after-value from a
      round's delta and must not be used to re-derive numbers we already have. */
-  const improvedRow = (r: ImprovementRow, inSheet: boolean) => {
+  const improvedRow = (p: ClimbPlaced<ImprovementRow>, inSheet: boolean) => {
+    const r = p.row;
     const pair = handicapPairDisplay({
       handicapIndex: r.current_index,
       deltaIndex: r.improvement == null ? null : -Number(r.improvement),
     });
     const month = r.started_on
-      ? playDateAtLocalNoon(r.started_on)?.toLocaleDateString(undefined, { month: 'long' }) ?? null
+      ? (() => { const d = playDateAtLocalNoon(r.started_on); return d ? formatMonthLong(d) : null; })()
       : null;
     const journey =
       r.start_index != null && r.current_index != null
         ? `${fmtHcp(Number(r.start_index))} \u2192 ${fmtHcp(Number(r.current_index))}${month ? ` ${t('amateur.leaderboards.since', { month })}` : ''}`
         : null;
+    /* C.3 — both figures on every row; the order decides which is main. */
+    const imp = r.improvement == null ? null : Number(r.improvement);
+    const cut = pair?.delta ? `${pair.delta.arrow}${pair.delta.text}` : '\u2014';
+    const pct = p.share == null ? null : Math.round(Math.abs(p.share) * 100);
+    const shareMain = pct == null ? '\u2014' : `${pair?.delta?.arrow ?? ''}${pct}%`;
+    const strokesSecondary = pct == null ? '\u2014' : t('amateur.leaderboards.climbOfIndex', { n: pct });
+    const shareSecondary = imp == null
+      ? '\u2014'
+      : t('amateur.leaderboards.climbStrokesCut', { n: `${imp > 0 ? '\u2212' : imp < 0 ? '+' : ''}${Math.abs(imp).toFixed(1)}` });
+    const onShare = climbMode === 'share';
     return (
       <CompactRow
         key={r.user_id}
-        pos={r.pos}
-        tie={r.is_tie}
+        pos={p.pos}
+        tie={p.tie}
         id={r.user_id}
         name={nameOf(r.display_name)}
         avatarName={r.display_name}
         photo={r.photo_url}
         secondary={journey}
-        value={pair?.delta ? `${pair.delta.arrow}${pair.delta.text}` : '\u2014'}
-        valueTone={pair?.delta?.tone}
+        value={onShare ? shareMain : cut}
+        valueTone={onShare && pct == null ? undefined : pair?.delta?.tone}
+        caption={onShare ? shareSecondary : strokesSecondary}
         self={!!r.is_viewer || r.user_id === userId}
         onPress={() => {
           if (inSheet) setImprovedSheet(false);
@@ -683,6 +741,16 @@ export function ScoresLeaderboardsPage({
       />
     );
   };
+  const climbPlaced = climbOrder(improvedRows, climbMode);
+  const climbOrd = (pos: number, tie: boolean) => `${tie ? 'T' : ''}${standingOrdinal(pos, i18n?.language ?? 'en')}`;
+  const climbSentence = (() => {
+    const c = climbCross(improvedRows, climbMode, userId);
+    if (c.kind === 'none') return null;
+    const base = climbMode === 'strokes' ? 'amateur.leaderboards.climbCross.strokes' : 'amateur.leaderboards.climbCross.share';
+    return c.kind === 'first'
+      ? t(`${base}.first`, { pos: climbOrd(c.pos, c.tie) })
+      : t(`${base}.better`, { pos: climbOrd(c.pos, c.tie), otherPos: climbOrd(c.otherPos, c.otherTie) });
+  })();
 
   /* ------------------------------------------------------------ §3 lead */
   const leadRows = state.page.data?.rows ?? [];
@@ -1304,7 +1372,7 @@ export function ScoresLeaderboardsPage({
                   </span>
                   <span className="tabular-nums" style={{
                     display: 'block', marginTop: W.figure.marginTop, fontSize: W.figure.fontSize, fontWeight: W.figure.fontWeight,
-                    letterSpacing: W.figure.letterSpacing, lineHeight: 1, color: lead ? A.AMBER : A.INK,
+                    letterSpacing: W.figure.letterSpacing, lineHeight: 1, color: A.INK, /* never amber: the name and the you line mark the lead */
                   }}>
                     {fmtCareerValue(c.metric, r.value)}
                   </span>
@@ -1369,15 +1437,30 @@ export function ScoresLeaderboardsPage({
 
       {/* §4 MOST IMPROVED — cumulative this year, not a single round's cut. */}
       {improved.isPending ? (
-        pending(180)
+        pending(climbPlaceholderHeight(SHORT_ROWS))
+        /* Below THIN_FLOOR the section renders nothing, deliberately: a three-row improvement board is not a board. */
       ) : improved.isSuccess && improvedRows.length >= THIN_FLOOR ? (
         <Section
           contest
           eyebrow={t('amateur.leaderboards.climb')}
           title={t('amateur.leaderboards.mostImproved')}
-          meta={windowLabel('year')}
+          metaAlign="center"
+          meta={<ClimbToggle mode={climbMode} onChange={setClimbMode} />}
         >
-          {improvedRows.slice(0, SHORT_ROWS).map((r) => improvedRow(r, false))}
+          {climbPlaced.slice(0, SHORT_ROWS).map((p) => improvedRow(p, false))}
+          {climbSentence ? (
+            <div
+              data-climb-cross
+              style={{
+                position: 'relative', marginTop: CLIMB.slab.marginTop, padding: CLIMB.slab.padding, paddingLeft: 14.5,
+                borderRadius: CLIMB.slab.radius, overflow: 'hidden', background: SLAB_BG,
+                fontSize: CLIMB.slab.fontSize, lineHeight: CLIMB.slab.lineHeight, color: A.MUTE,
+              }}
+            >
+              <span aria-hidden style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: CLIMB.slab.bar, background: A.AMBER }} />
+              {climbSentence}
+            </div>
+          ) : null}
           <SeeAll
             label={seeAllMembers()}
             onPress={() => setImprovedSheet(true)}
@@ -1406,10 +1489,15 @@ export function ScoresLeaderboardsPage({
         subtitle={improvedRows.length > 0
           ? `${t('amateur.leaderboards.improvedScope')} · ${membersText(Number(improvedRows[0].total_members) || improvedRows.length)}`
           : t('amateur.leaderboards.improvedScope')}
-        valueHeading={t('amateur.leaderboards.indexChange')}
-        footnote={t('amateur.leaderboards.improvedQualifier')}
+        valueHeading={t(climbMode === 'strokes' ? 'amateur.leaderboards.climbStrokes' : 'amateur.leaderboards.climbShare')}
+        footnote={`${t('amateur.leaderboards.improvedQualifier')} ${t('amateur.leaderboards.climbPlusExcluded')}`}
+        above={(
+          <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '10px 16px', borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
+            <ClimbToggle mode={climbMode} onChange={setClimbMode} />
+          </div>
+        )}
       >
-        {improvedRows.map((r) => improvedRow(r, true))}
+        {climbPlaced.map((p) => improvedRow(p, true))}
       </BoardSheet>
 
       {(() => {

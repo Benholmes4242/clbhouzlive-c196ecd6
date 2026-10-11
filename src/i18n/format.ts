@@ -857,3 +857,8 @@ export function formatList(items: string[]): string {
       : `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
   }
 }
+
+/** Long month name in the active locale — en "January", "March". */
+export function formatMonthLong(d: DateInput): string {
+  return new Intl.DateTimeFormat(getActiveLocale(), { month: 'long' }).format(toDate(d));
+}
