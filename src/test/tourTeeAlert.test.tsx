@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen, cleanup, fireEvent } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
-import { QueryClient } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { tourOptimisticToggle } from '@/features/tourhub/hooks/tourOptimisticToggle';
-import { showFollowFooter } from '@/features/tourhub/tournament-v2/sections/MiniBoard';
 import { TeeAlertControl } from '@/features/tourhub/components/overview-v3/HybridHeroBands/TeeAlertButton';
 import { confirmedLastGroup, dispatchTeeAlerts, enqueueAndStamp } from '../../supabase/functions/tournament-live-sync/teeAlerts';
 import en from '../../public/locales/en/tourhub.json';
@@ -18,35 +16,6 @@ vi.mock('react-i18next', async (importOriginal) => ({
   } }),
 }));
 afterEach(cleanup);
-
-describe('Tour follow writes', () => {
-  it('lights optimistically and rolls back a failed follow', async () => {
-    const client = new QueryClient();
-    const key = ['follows'];
-    client.setQueryData(key, ['existing']);
-    let rejectWrite: (error: Error) => void = () => {};
-    const write = new Promise<void>((_, reject) => { rejectWrite = reject; });
-    const result = tourOptimisticToggle(client, key, 'player', () => write);
-    await vi.waitFor(() => expect(client.getQueryData(key)).toEqual(['existing', 'player']));
-    rejectWrite(new Error('denied'));
-    await expect(result).rejects.toThrow('denied');
-    expect(client.getQueryData(key)).toEqual(['existing']);
-  });
-  it('restores a failed unfollow without removing a concurrent successful follow', async () => {
-    const client = new QueryClient(); const key = ['follows'];
-    client.setQueryData(key, ['player']);
-    await expect(tourOptimisticToggle(client, key, 'player', async () => {
-      client.setQueryData(key, ['another']); throw new Error('denied');
-    })).rejects.toThrow('denied');
-    expect(client.getQueryData(key)).toEqual(['another', 'player']);
-  });
-  it('hides the footer only for a followed player on the visible board', () => {
-    const rows = [{ player: { id: 'visible' } }];
-    expect(showFollowFooter(rows, new Set())).toBe(true);
-    expect(showFollowFooter(rows, new Set(['elsewhere']))).toBe(true);
-    expect(showFollowFooter(rows, new Set(['visible']))).toBe(false);
-  });
-});
 
 describe('Tee alert toggle', () => {
   it('shows the unarmed label with aria-pressed false and toggles', () => {

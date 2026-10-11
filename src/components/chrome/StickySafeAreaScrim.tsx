@@ -26,7 +26,11 @@ export function useStickySafeAreaState() {
       const sat = Number.parseFloat(satValue) || 0;
       setStuck(sentinel.getBoundingClientRect().top <= sat);
       observer = new IntersectionObserver(
-        ([entry]) => setStuck(!entry.isIntersecting),
+        /* STUCK MEANS PASSED, NOT MERELY OUT OF VIEW. A sentinel below a hero
+           taller than the viewport is also not intersecting; reading that as
+           stuck painted the opaque strip over the hero at rest. Only a
+           sentinel above the notch line is stuck. */
+        ([entry]) => setStuck(!entry.isIntersecting && entry.boundingClientRect.top <= sat),
         { threshold: 0, rootMargin: `-${sat}px 0px 0px 0px` },
       );
       observer.observe(sentinel);

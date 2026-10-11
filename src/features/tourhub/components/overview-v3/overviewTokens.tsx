@@ -33,18 +33,12 @@ export const OVERVIEW = {
   },
   ink: INK,
   amber: AMBER,
-  follow: {
-    railWidth: 2.5,
-    chipBorder: 'rgba(247,147,30,0.4)',
-    chipSize: 8.5,
-    chipWeight: 800,
-    chipTracking: '0.1em',
-    chipRadius: 999,
-    chipPadding: '1px 5px',
-    footerSize: 11,
-    footerWeight: 700,
-    footerTracking: '0.12em',
-    footerPadding: '12px 20px',
+  /** The board's scorecard hint beneath the last row. */
+  footer: {
+    size: 11,
+    weight: 700,
+    tracking: '0.12em',
+    padding: '12px 20px',
   },
   teeAlert: {
     border: 'rgba(247,147,30,0.45)',
