@@ -103,6 +103,7 @@ function FeaturedRoundSlab({ viewerId }: { viewerId: string }) {
           viewerId={viewerId}
           shape={shapes?.get(r.whs_score_id) ?? null}
           medals={medals.isSuccess ? medals.medals?.get(r.whs_score_id) ?? null : undefined}
+          courseContext={courseContexts.contexts?.get(r.whs_score_id) ?? null}
           engagement={engagement}
           square
           onOpen={() => opener.openByScore(r.whs_score_id, null, r.user_id)}
