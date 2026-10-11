@@ -3,7 +3,7 @@
 Only rules that govern MORE THAN ONE area live here. A rule that governs one section's code lives as a comment at that code ("ARCHITECTURE RULE (moved from AGENTS.md)").
 
 - Profile handicap index surfaces use `HcpTrendChart` as their canonical plot renderer, so chart styling and interaction markers stay consistent.
-- Tour follow and tee-alert toggles use `tourOptimisticToggle` for cache writes and per-id rollback, because invalidation alone does not refresh this app's mounted queries.
+- Tour tee-alert toggles use `tourOptimisticToggle` for cache writes and per-id rollback, because invalidation alone does not refresh this app's mounted queries.
 - Every surface that prints a course aggregate rating reads `COURSE_RATING_FLOOR` (`courseRatingFloor.ts`), so card, rails and ranker agree on one sample floor.
 - Explicitly selected Tour venue photos take precedence in both batch and single-venue image resolution, so Overview and Tournament Detail cannot display different catalogue photos.
 - Leaderboard row sizes live only in `courseled/rowMetrics.ts`, as two named scales: board rows read `BOARD_ROW_METRICS`, season rows read `SEASON_ROW_METRICS`, so the intended hierarchy is stated in one place and no call site defines a row size.
