@@ -35,7 +35,8 @@ export const THE_HUNDRED = {
     scrim: 'linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.76))',
     rank: { inset: 6, top: 5, fontSize: 9 },
     caption: { inset: 6, bottom: 5, fontSize: 9, letterSpacing: '0.04em', lineHeight: 1.15 },
-    played: { size: 17, inset: 6, ink: A.CANVAS, check: 11 },
+    /** White mark on amber is ~2.4:1, so it carries extra weight to read. */
+    played: { size: 17, inset: 6, ink: A.INK, check: 11, stroke: 4.2 },
     next: { inset: 7, fontSize: 8, letterSpacing: '0.1em', padding: '1px 5px', ink: A.CANVAS, ground: A.INK },
   },
   row: {
@@ -114,8 +115,20 @@ export function firstUnplayedIndex(tiles: { is_viewer_played: boolean }[]): numb
   return i <= 0 ? null : i;
 }
 
-/** Rail scroll position for the first unplayed tile: index × (tile + gap) − gutter. */
-export function hundredRailScroll(index: number | null, gutter: number): number {
-  if (index == null) return 0;
-  return Math.max(0, index * (THE_HUNDRED.tile.width + THE_HUNDRED.rail.gap) - gutter);
+/** Whole tiles visible at rest: the rail's measured client width, less its
+ *  leading gutter, divided by the tile pitch (the last tile needs no gap). */
+export function hundredVisibleTiles(clientWidth: number, gutter: number): number {
+  const pitch = THE_HUNDRED.tile.width + THE_HUNDRED.rail.gap;
+  return Math.max(0, Math.floor((clientWidth - gutter + THE_HUNDRED.rail.gap) / pitch));
+}
+
+/**
+ * Rail scroll position for the first unplayed tile. The scroll exists to save a
+ * long swipe, so it must not fire when there is no swipe to save: a target
+ * already visible at rest leaves the rail at the start. Otherwise the tile
+ * BEFORE it lands at the edge, so the last played sits beside the first unplayed.
+ */
+export function hundredRailScroll(index: number | null, gutter: number, clientWidth: number): number {
+  if (index == null || index < hundredVisibleTiles(clientWidth, gutter)) return 0;
+  return Math.max(0, (index - 1) * (THE_HUNDRED.tile.width + THE_HUNDRED.rail.gap) - gutter);
 }
