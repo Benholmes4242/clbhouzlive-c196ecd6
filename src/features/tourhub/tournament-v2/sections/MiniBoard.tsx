@@ -1,7 +1,8 @@
 /**
  * MiniBoard - TD1 top-5 compressed board.
  * Grammar: POS | PLAYER + flag | THRU | TODAY | TOT
- * Row tap opens ScorecardSheet.
+ * Row tap opens ScorecardSheet, on every theme; a row with no player id
+ * (a team row) is not tappable.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,8 +24,6 @@ import { resolveBoardEntity, teamNamesNeedInitials, type BoardNameTier } from '.
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { OVERVIEW, countInWords } from '../../components/overview-v3/overviewTokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useTourPlayerFollows } from '../../hooks/useTourPlayerFollows';
-import { toast } from '@/lib/toast';
 import { Button } from '@/components/ui/button';
 
 import { TrajectorySparkline } from '../../components/overview-v3/HybridHeroBands/TrajectorySparkline';
@@ -134,7 +133,7 @@ export function heroBoardColumns(opts: { roundCount: number; roundInProgress: bo
 
 /** The live hero grid, exactly as the mock sets it. */
 export function heroLiveGrid(showToday: boolean): string {
-  return ['26px', 'minmax(0,1fr)', showToday ? '34px' : null, '36px', '42px'].filter(Boolean).join(' ');
+  return ['26px', 'minmax(0,1fr)', showToday ? '40px' : null, '44px', '42px'].filter(Boolean).join(' ');
 }
 
 /** The TOP group when it is a tie over the visible rows: its length, else 0. */
@@ -150,8 +149,9 @@ export function heroTopTieLength(rows: Array<{ position?: number | null; status?
 
 export type TieRole = 'solo' | 'first' | 'middle' | 'last';
 
-export function showFollowFooter(rows: Array<{ player?: { id?: string } | null }>, followed: Set<string>): boolean {
-  return rows.length > 0 && !rows.some((row) => row.player?.id && followed.has(row.player.id));
+/** The scorecard hint shows whenever at least one visible row opens a card. */
+export function showScorecardFooter(rows: Array<{ player?: { id?: string } | null }>): boolean {
+  return rows.some((row) => !!row.player?.id);
 }
 
 /** GROUP THE TIE over the VISIBLE rows. A group is two or more consecutive
@@ -218,7 +218,6 @@ function thruLabel(row: Row, today: number | null): string {
 
 export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'panel', pickPlayerIds, onRowTap, phase = 'live', tourSlug = null, totalRounds = null }: Props) {
   const { t } = useTranslation('tourhub');
-  const follows = useTourPlayerFollows(theme === 'heroBoard');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
   const needsInitials = useMemo(() => teamNamesNeedInitials(entries), [entries]);
@@ -329,11 +328,11 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     return (
       <>
         <div style={{ background: T.surface, fontFamily: FONT }}>
-          <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, minHeight: 26, padding: `4px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
+          <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, minHeight: 26, padding: `4px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
             {showHeroShape || showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>
             {showHeroToday ? <div style={{ textAlign: 'right' }}>{t('board.columns.today')}</div> : null}
-            {showHeroShape ? <div style={{ textAlign: 'right' }}>{t('board.columns.shape')}</div> : null}
+            {showHeroShape ? <div style={{ textAlign: 'right' }}>{t('board.columns.rounds')}</div> : null}
             {heroRounds.map((rd) => (
               <div key={rd} style={{ textAlign: 'right', color: heroCols.liveRound === rd ? AMBER : T.faint }}>
                 {`R${rd}`}
@@ -361,24 +360,31 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               ? (teamTitle && memberNames ? t('overview.board.teamName', { team: teamTitle, members: memberNames }) : teamTitle || memberNames || entity.prose)
               : entity.lines[0] ?? '';
             const rowLabel = t('overview.board.rowLabel', { name: labelName, position: posText, score: r.score == null ? '' : fmtScore(r.score) });
-            const followed = !!r.player?.id && follows.playerIds.has(r.player.id);
             const RowTag = tappable ? Button : 'div';
             return (
               <RowTag
                 key={r.id}
-                {...(tappable ? { type: 'button' as const, variant: 'ghost' as const, 'aria-pressed': followed } : { role: 'group' })}
+                {...(tappable ? { type: 'button' as const, variant: 'ghost' as const, 'aria-haspopup': 'dialog' as const } : { role: 'group' })}
                 aria-label={rowLabel}
                 onClick={tappable ? () => {
                   const pid = r.player?.id;
                   if (!pid) return;
                   onRowTap?.(pid);
-                  void follows.toggle(pid).catch(() => toast.error(t('playerFollow.writeFailed')));
+                  setTarget({
+                    playerId: pid,
+                    playerName: entity.lines[0] ?? '',
+                    countryCode: r.player?.country_code ?? r.player?.country ?? null,
+                    position: r.position ?? null,
+                    positionTied: r.position_tied ?? null,
+                    total: r.score ?? null,
+                    today,
+                    thru: r.thru ?? null,
+                    status: r.status ?? null,
+                  });
                 } : undefined}
                 style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, width: '100%', height: 'auto', borderRadius: 0, minHeight: showHeroShape ? 36 : 34, padding: showHeroShape ? `6px ${HERO_PAD_X}px` : `${entity.kind === 'team' ? 6 : 5}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
                 className={tappable ? `${T.press} transition-colors` : undefined}
               >
-                {/* Follow identity is rail + chip only. Figures retain their semantic colour. */}
-                {followed ? <span aria-hidden style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: OVERVIEW.follow.railWidth, background: OVERVIEW.amber }} /> : null}
                 {(showHeroShape || showOverviewPosition) && inTopTie ? (
                   /* §D.3: the cap above states the position once; the row carries none. */
                   <div data-hero-tie="capped"><span className="sr-only">{posText}</span></div>
@@ -410,10 +416,6 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   {entity.kind === 'team' ? renderEntityName(entity, T.ink) : (
                     <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.15, fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em', color: T.ink }}>{overviewName(entity.lines[0])}</span>
                   )}
-                  {followed ? <span style={{ flex: 'none', fontSize: OVERVIEW.follow.chipSize, fontWeight: OVERVIEW.follow.chipWeight,
-                    letterSpacing: OVERVIEW.follow.chipTracking, textTransform: 'uppercase', color: OVERVIEW.amber,
-                    border: `1px solid ${OVERVIEW.follow.chipBorder}`, borderRadius: OVERVIEW.follow.chipRadius,
-                    padding: OVERVIEW.follow.chipPadding }}>{t('playerFollow.following')}</span> : null}
                   {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </div>
                 {showHeroToday ? (
@@ -466,9 +468,9 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             </>
           );
           })()}
-          {showFollowFooter(rows, follows.playerIds) ? <div style={{ textAlign: 'center', fontSize: OVERVIEW.follow.footerSize,
-            fontWeight: OVERVIEW.follow.footerWeight, letterSpacing: OVERVIEW.follow.footerTracking, textTransform: 'uppercase',
-            color: OVERVIEW.mute, padding: OVERVIEW.follow.footerPadding }}>{t('playerFollow.footer')}</div> : null}
+          {showScorecardFooter(rows) ? <div data-overview-board-footer style={{ textAlign: 'center', fontSize: OVERVIEW.footer.size,
+            fontWeight: OVERVIEW.footer.weight, letterSpacing: OVERVIEW.footer.tracking, textTransform: 'uppercase',
+            color: OVERVIEW.mute, padding: OVERVIEW.footer.padding }}>{t('overview.board.tapForScorecard')}</div> : null}
         </div>
         <ScorecardSheet open={!!target} onClose={() => setTarget(null)} tournamentId={tournamentId} target={target} />
       </>
