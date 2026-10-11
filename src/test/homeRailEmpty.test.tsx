@@ -12,6 +12,7 @@ vi.mock('@/features/explore-magazine/ConnectStandingInvite', () => ({ ScoresStan
 vi.mock('@/features/explore-magazine/FeaturedRoundCard', () => ({ FeaturedRoundCard: () => null }));
 vi.mock('@/features/explore-magazine/useFeaturedRound', () => ({ useFeaturedRound: () => ({ data: null }) }));
 vi.mock('@/features/explore-magazine/useBatchRoundMedals', () => ({ useBatchRoundMedals: () => ({}) }));
+vi.mock('@/features/explore-magazine/useBatchRoundCourseContext', () => ({ useBatchRoundCourseContext: () => ({}) }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes', () => ({ useRoundHoleShapes: () => null }));
 vi.mock('@/components/explore-tab-new/useScorecardOpener', () => ({ useScorecardOpener: () => ({ target: null }) }));
 vi.mock('@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet', () => ({ RoundDetailSheet: () => null }));
