@@ -43,6 +43,7 @@ import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
 import { FeedCard } from './FeedCard';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import type { RoundCourseContext } from '@/lib/whs/useRoundCourseContext';
 import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRoundMedals';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import { CardSkeleton } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
@@ -217,6 +218,8 @@ export interface CardFeedProps {
   roundShapeMap?: Map<string, HoleShape> | null;
   /** Batched medal counts keyed by whs_score_id (resolved queries only). */
   roundMedalMap?: Map<string, RoundMedalCounts>;
+  /** Batched course history keyed by whs_score_id (one read per window). */
+  roundCourseContextMap?: Map<string, RoundCourseContext>;
   /** Page-level consequence sources (Clubhouse); null until all have fetched. */
   consequenceSources?: ConsequenceSources | null;
   roundCourseMeta?: RoundCourseMeta | null;
@@ -267,6 +270,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   onRoundTap,
   roundShapeMap,
   roundMedalMap,
+  roundCourseContextMap,
   consequenceSources = null,
   roundCourseMeta = null,
   weekPickScoreId,
@@ -945,6 +949,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                   const sid = postScoreIdMap?.get(post.id) ?? null;
                   return sid ? roundMedalMap?.get(sid) : undefined;
                 })()}
+                roundCourseContext={(() => {
+                  const sid = postScoreIdMap?.get(post.id) ?? null;
+                  return sid ? roundCourseContextMap?.get(sid) ?? null : null;
+                })()}
                 consequenceSources={consequenceSources}
                 roundCourseMeta={roundCourseMeta}
                 weekPickScoreId={weekPickScoreId}
@@ -994,6 +1002,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       onRoundTap,
       roundShapeMap,
       roundMedalMap,
+  roundCourseContextMap,
       consequenceSources,
       roundCourseMeta,
       homeRails,
