@@ -140,7 +140,9 @@
       "leaderLabel": "Leader",
       "stateSuspended": "SUSPENDED",
       "lastYear": "Last year",
-      "leadersOut": "Leaders out · R{{round}}"
+      "leadersOut": "Leaders out · R{{round}}",
+      "roundNode": "R{{round}}",
+      "tiedCaps": "{{words}} tied"
     },
     "leaderboardBand": {
       "ctaUpcoming": "View tournament",
@@ -249,7 +251,31 @@
       "eventOnly": "{{event}}",
       "courseFitValue": "{{score}} / 100",
       "needsRound": "Needs {{gross}} in the final round to match the lead as it stands."
-    }
+    },
+    "countWords": {
+      "2": "Two",
+      "3": "Three",
+      "4": "Four",
+      "5": "Five",
+      "6": "Six",
+      "7": "Seven",
+      "8": "Eight",
+      "9": "Nine",
+      "10": "Ten"
+    },
+    "situation": {
+      "label": "The situation"
+    },
+    "movement": {
+      "label": "Round {{round}} movement"
+    },
+    "picksIntro": {
+      "leads": "{{name}} leads for us. Each card shows the round our picks would need to reach {{score}}.",
+      "behind_one": "Our best-placed pick, {{name}}, is {{pos}}, {{count}} shot back. Each card shows the round they would need to reach {{score}}.",
+      "behind_other": "Our best-placed pick, {{name}}, is {{pos}}, {{count}} shots back. Each card shows the round they would need to reach {{score}}.",
+      "level": "Our best-placed pick, {{name}}, is {{pos}}, level with the lead. Each card shows the round they would need to reach {{score}}."
+    },
+    "picksToReach": "To reach {{score}}"
   },
   "empty": {
     "leaderboard": {
@@ -283,7 +309,8 @@
       "thru": "THRU",
       "today": "TODAY",
       "round": "Round",
-      "mov": "MOV"
+      "mov": "MOV",
+      "shape": "Shape"
     },
     "status": {
       "inProgress": "R{{round}} · IN PROGRESS",

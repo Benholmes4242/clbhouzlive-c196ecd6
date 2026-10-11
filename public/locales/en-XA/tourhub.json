@@ -114,7 +114,9 @@
       "lastYear": "[Last year]",
       "leadersOut": "[Leaders out · R{{round}}]",
       "firstTee": "[First tee]",
-      "defending": "[Defending]"
+      "defending": "[Defending]",
+      "roundNode": "[~~Ř{{round}}~~]",
+      "tiedCaps": "[~~{{words}} ţíéđ~~]"
     },
     "leaderboardBand": {
       "ctaUpcoming": "[~~View tournament~~]",
@@ -225,7 +227,31 @@
       "eventOnly": "[{{event}}]",
       "courseFitValue": "[{{score}} / 100]",
       "needsRound": "[Needs {{gross}} in the final round to match the lead as it stands.]"
-    }
+    },
+    "countWords": {
+      "2": "[~~Ţŵő~~]",
+      "3": "[~~Ţĥřéé~~]",
+      "4": "[~~Ƒőúř~~]",
+      "5": "[~~Ƒíṽé~~]",
+      "6": "[~~Šíẋ~~]",
+      "7": "[~~Šéṽéñ~~]",
+      "8": "[~~Éíĝĥţ~~]",
+      "9": "[~~Ñíñé~~]",
+      "10": "[~~Ţéñ~~]"
+    },
+    "situation": {
+      "label": "[~~Ţĥé šíţúáţíőñ~~]"
+    },
+    "movement": {
+      "label": "[~~Řőúñđ {{round}} ɱőṽéɱéñţ~~]"
+    },
+    "picksIntro": {
+      "leads": "[~~{{name}} ļéáđš ƒőř úš. Éáĉĥ ĉářđ šĥőŵš ţĥé řőúñđ őúř ƥíĉǩš ŵőúļđ ñééđ ţő řéáĉĥ {{score}}.~~]",
+      "behind_one": "[~~Őúř ƀéšţ-ƥļáĉéđ ƥíĉǩ, {{name}}, íš {{pos}}, {{count}} šĥőţ ƀáĉǩ. Éáĉĥ ĉářđ šĥőŵš ţĥé řőúñđ ţĥéý ŵőúļđ ñééđ ţő řéáĉĥ {{score}}.~~]",
+      "behind_other": "[~~Őúř ƀéšţ-ƥļáĉéđ ƥíĉǩ, {{name}}, íš {{pos}}, {{count}} šĥőţš ƀáĉǩ. Éáĉĥ ĉářđ šĥőŵš ţĥé řőúñđ ţĥéý ŵőúļđ ñééđ ţő řéáĉĥ {{score}}.~~]",
+      "level": "[~~Őúř ƀéšţ-ƥļáĉéđ ƥíĉǩ, {{name}}, íš {{pos}}, ļéṽéļ ŵíţĥ ţĥé ļéáđ. Éáĉĥ ĉářđ šĥőŵš ţĥé řőúñđ ţĥéý ŵőúļđ ñééđ ţő řéáĉĥ {{score}}.~~]"
+    },
+    "picksToReach": "[~~Ţő řéáĉĥ {{score}}~~]"
   },
   "empty": {
     "leaderboard": {
@@ -254,7 +280,8 @@
       "thru": "[~~ŢĤŘÚ~~]",
       "today": "[~~ŢŐĐÁÝ~~]",
       "round": "[Round]",
-      "mov": "[~~ MŐṼ ~~]"
+      "mov": "[~~ MŐṼ ~~]",
+      "shape": "[~~Šĥáƥé~~]"
     },
     "status": {
       "inProgress": "[~~Ř{{round}} · ÍÑ ƤŘŐĜŘÉŠŠ~~]",
