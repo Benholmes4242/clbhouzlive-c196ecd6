@@ -268,7 +268,7 @@
       "marginLabel": "Vorsprung",
       "fieldLabel": "Feld",
       "verdict": {
-        "liveContest": "{{leader}} führt mit {{margin}} — und {{count}} Spieler liegen bei noch {{holes}} Löchern innerhalb von vier Schlägen.",
+        "liveContest": "{{leader}} führt mit {{margin}} — und {{chasers}} Spieler liegen bei noch {{holes}} Löchern innerhalb von vier Schlägen.",
         "liveShared": "{{count}} Spieler teilen sich bei noch {{holes}} Löchern die Führung.",
         "liveClear": "{{leader}} führt mit {{margin}}.",
         "liveScore": "{{leader}} führt mit {{score}}.",

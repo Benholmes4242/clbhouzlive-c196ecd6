@@ -53,7 +53,6 @@ import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useTourSelection } from '../../../context/TourSelectionContext';
 import { PlayerAvatar } from '../../PlayerAvatar';
 import { useAIPredictions, type AITopContender } from '../../../hooks/useAIPredictions';
-import { formatToPar } from '../../../overview/data/liveRoundStats';
 import { useTournamentTeeTimes } from '../../../hooks/useTournamentTeeTimes';
 import { useTournamentDefendingChamp } from '../../../hooks/useTournamentDefendingChamp';
 import { useTournamentLastYearTop4 } from '../../../hooks/useTournamentLastYearTop4';
@@ -117,7 +116,7 @@ function settledFigureFor(
   return {
     right: won ? WON_LABEL : `${line.tied ? 'T' : ''}${line.position}`,
     rightColor: won ? GOLD : WHITE_ALPHA_65,
-    figure: line.score == null ? null : formatToPar(line.score),
+    figure: line.score == null ? null : fmtScore(line.score),
     figureColor: tourFigColor(line.score),
   };
 }
@@ -623,7 +622,7 @@ function PicksBlock({
             figureLine = (
               <>
                 <span style={{ color: WHITE_ALPHA_65 }}>{`${liveLine.tied ? 'T' : ''}${liveLine.position}`}</span>
-                {liveLine.score != null ? <span style={{ color: tourFigColor(liveLine.score) }}>{formatToPar(liveLine.score)}</span> : null}
+                {liveLine.score != null ? <span style={{ color: tourFigColor(liveLine.score) }}>{fmtScore(liveLine.score)}</span> : null}
               </>
             );
           } else if (settled) {

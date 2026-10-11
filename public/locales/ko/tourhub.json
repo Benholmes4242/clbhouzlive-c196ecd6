@@ -268,7 +268,7 @@
       "marginLabel": "차이",
       "fieldLabel": "출전 선수",
       "verdict": {
-        "liveContest": "{{leader}}가 {{margin}}타 차 선두이며, {{holes}}홀을 남기고 {{count}}명이 4타 차 안에 있습니다.",
+        "liveContest": "{{leader}}가 {{margin}}타 차 선두이며, {{holes}}홀을 남기고 {{chasers}}명이 4타 차 안에 있습니다.",
         "liveShared": "{{holes}}홀을 남기고 {{count}}명이 공동 선두입니다.",
         "liveClear": "{{leader}}가 {{margin}}타 차로 선두입니다.",
         "liveScore": "{{leader}}가 {{score}}로 선두입니다.",

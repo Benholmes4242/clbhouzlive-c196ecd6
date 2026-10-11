@@ -268,7 +268,7 @@
       "marginLabel": "Ventaja",
       "fieldLabel": "Campo",
       "verdict": {
-        "liveContest": "{{leader}} lidera por {{margin}} — y {{count}} jugadores están a cuatro golpes con {{holes}} por jugar.",
+        "liveContest": "{{leader}} lidera por {{margin}} — y {{chasers}} jugadores están a cuatro golpes con {{holes}} por jugar.",
         "liveShared": "{{count}} jugadores comparten el liderato con {{holes}} por jugar.",
         "liveClear": "{{leader}} lidera por {{margin}}.",
         "liveScore": "{{leader}} lidera con {{score}}.",
