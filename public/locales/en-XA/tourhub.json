@@ -151,7 +151,8 @@
     "board": {
       "clbhouzPick": "[çlbhöûz pïçk]",
       "rowLabel": "[{{name}}, {{position}}, {{score}}]",
-      "teamName": "[{{team}}: {{members}}]"
+      "teamName": "[{{team}}: {{members}}]",
+      "tapForScorecard": "[~~Ţáƥ á ƥļáýéř ƒőř ţĥéíř šċőřéċářđ~~]"
     },
     "venueRecord": {
       "course": "[Course]"
@@ -281,7 +282,7 @@
       "today": "[~~ŢŐĐÁÝ~~]",
       "round": "[Round]",
       "mov": "[~~ MŐṼ ~~]",
-      "shape": "[~~Šĥáƥé~~]"
+      "rounds": "[~~Řőúñđš~~]"
     },
     "status": {
       "inProgress": "[~~Ř{{round}} · ÍÑ ƤŘŐĜŘÉŠŠ~~]",
@@ -861,11 +862,6 @@
       "startsIn": "[STARTS IN]",
       "awaitingScores": "[AWAITING SCORES]"
     }
-  },
-  "playerFollow": {
-    "following": "[~~Ƒőļļőŵíñĝ~~]",
-    "footer": "[~~Ţáƥ á ƥļáýéř ţő ƒőļļőŵ ţĥéɱ~~]",
-    "writeFailed": "[~~Ĉőúļđ ñőţ úƥđáţé ýőúř ƥļáýéř ƒőļļőŵ. Ƥļéášé ţřý áĝáíñ.~~]"
   },
   "teeAlert": {
     "unarmed": "[~~Ţéļļ ɱé ŵĥéñ ţĥéý ţéé őƒƒ~~]",

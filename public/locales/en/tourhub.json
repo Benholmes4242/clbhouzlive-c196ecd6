@@ -178,7 +178,8 @@
     "board": {
       "clbhouzPick": "clbhouz pick",
       "rowLabel": "{{name}}, {{position}}, {{score}}",
-      "teamName": "{{team}}: {{members}}"
+      "teamName": "{{team}}: {{members}}",
+      "tapForScorecard": "Tap a player for their scorecard"
     },
     "magazine": {
       "scoreEven": "level par",
@@ -310,7 +311,7 @@
       "today": "TODAY",
       "round": "Round",
       "mov": "MOV",
-      "shape": "Shape"
+      "rounds": "Rounds"
     },
     "status": {
       "inProgress": "R{{round}} · IN PROGRESS",
@@ -999,11 +1000,6 @@
       "startsIn": "STARTS IN",
       "awaitingScores": "AWAITING SCORES"
     }
-  },
-  "playerFollow": {
-    "following": "Following",
-    "footer": "Tap a player to follow them",
-    "writeFailed": "Could not update your player follow. Please try again."
   },
   "teeAlert": {
     "unarmed": "Tell me when they tee off",
