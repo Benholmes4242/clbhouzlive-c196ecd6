@@ -33,14 +33,8 @@ export const OVERVIEW = {
   },
   ink: INK,
   amber: AMBER,
-  /** The board's scorecard hint beneath the last row. */
-  footer: {
-    size: 11,
-    weight: 700,
-    tracking: '0.12em',
-    padding: '12px 20px',
-  },
   teeAlert: {
+
     border: 'rgba(247,147,30,0.45)',
     armedGround: 'rgba(247,147,30,0.14)',
     radius: 10,

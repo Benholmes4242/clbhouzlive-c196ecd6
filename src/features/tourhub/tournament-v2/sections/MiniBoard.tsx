@@ -149,10 +149,6 @@ export function heroTopTieLength(rows: Array<{ position?: number | null; status?
 
 export type TieRole = 'solo' | 'first' | 'middle' | 'last';
 
-/** The scorecard hint shows whenever at least one visible row opens a card. */
-export function showScorecardFooter(rows: Array<{ player?: { id?: string } | null }>): boolean {
-  return rows.some((row) => !!row.player?.id);
-}
 
 /** GROUP THE TIE over the VISIBLE rows. A group is two or more consecutive
  *  rows sharing a position. A group cut by the row limit ends on the last
@@ -468,10 +464,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             </>
           );
           })()}
-          {showScorecardFooter(rows) ? <div data-overview-board-footer style={{ textAlign: 'center', fontSize: OVERVIEW.footer.size,
-            fontWeight: OVERVIEW.footer.weight, letterSpacing: OVERVIEW.footer.tracking, textTransform: 'uppercase',
-            color: OVERVIEW.mute, padding: OVERVIEW.footer.padding }}>{t('overview.board.tapForScorecard')}</div> : null}
         </div>
+
         <ScorecardSheet open={!!target} onClose={() => setTarget(null)} tournamentId={tournamentId} target={target} />
       </>
     );
