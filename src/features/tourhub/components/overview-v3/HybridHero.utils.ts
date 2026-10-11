@@ -103,12 +103,8 @@ export const UPCOMING_WINDOW_DAYS = 14;
 
 const UNICODE_MINUS = '\u2212';
 
-export function fmtScore(n: number | null | undefined): string {
-  if (n == null) return 'E';
-  if (n === 0) return 'E';
-  if (n < 0) return `${UNICODE_MINUS}${Math.abs(n)}`;
-  return `+${n}`;
-}
+/** Re-exported: one Tour score formatter (utils/fmtScore). */
+export { fmtScore } from '../../utils/fmtScore';
 
 /**
  * Broadcast round labels — positional, relative to total round count.
