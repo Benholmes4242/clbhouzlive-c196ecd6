@@ -23,6 +23,9 @@ import { resolveBoardEntity, teamNamesNeedInitials, type BoardNameTier } from '.
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { OVERVIEW, countInWords } from '../../components/overview-v3/overviewTokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useTourPlayerFollows } from '../../hooks/useTourPlayerFollows';
+import { toast } from '@/lib/toast';
+import { Button } from '@/components/ui/button';
 
 import { TrajectorySparkline } from '../../components/overview-v3/HybridHeroBands/TrajectorySparkline';
 
@@ -147,6 +150,10 @@ export function heroTopTieLength(rows: Array<{ position?: number | null; status?
 
 export type TieRole = 'solo' | 'first' | 'middle' | 'last';
 
+export function showFollowFooter(rows: Array<{ player?: { id?: string } | null }>, followed: Set<string>): boolean {
+  return rows.length > 0 && !rows.some((row) => row.player?.id && followed.has(row.player.id));
+}
+
 /** GROUP THE TIE over the VISIBLE rows. A group is two or more consecutive
  *  rows sharing a position. A group cut by the row limit ends on the last
  *  visible row, so its bracket never points at nothing; a single visible row
@@ -211,6 +218,7 @@ function thruLabel(row: Row, today: number | null): string {
 
 export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, theme = 'panel', pickPlayerIds, onRowTap, phase = 'live', tourSlug = null, totalRounds = null }: Props) {
   const { t } = useTranslation('tourhub');
+  const follows = useTourPlayerFollows(theme === 'heroBoard');
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const rows = entries.slice(0, limit);
   const needsInitials = useMemo(() => teamNamesNeedInitials(entries), [entries]);
@@ -353,19 +361,24 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
               ? (teamTitle && memberNames ? t('overview.board.teamName', { team: teamTitle, members: memberNames }) : teamTitle || memberNames || entity.prose)
               : entity.lines[0] ?? '';
             const rowLabel = t('overview.board.rowLabel', { name: labelName, position: posText, score: r.score == null ? '' : fmtScore(r.score) });
-            const RowTag = (tappable ? 'button' : 'div') as 'button' | 'div';
+            const followed = !!r.player?.id && follows.playerIds.has(r.player.id);
+            const RowTag = tappable ? Button : 'div';
             return (
               <RowTag
                 key={r.id}
-                {...(tappable ? { type: 'button' as const } : { role: 'group' })}
+                {...(tappable ? { type: 'button' as const, variant: 'ghost' as const, 'aria-pressed': followed } : { role: 'group' })}
                 aria-label={rowLabel}
-                onClick={tappable ? () => { const pid = r.player!.id as string; onRowTap?.(pid); setTarget({
-                  playerId: pid, playerName: entity.lines[0] ?? '', countryCode: r.player?.country_code ?? r.player?.country ?? null,
-                  position: r.position ?? null, positionTied: r.position_tied ?? null, total: r.score ?? null, today, thru: r.thru ?? null, status: r.status ?? null,
-                }); } : undefined}
-                style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, width: '100%', minHeight: showHeroShape ? 36 : 34, padding: showHeroShape ? `6px ${HERO_PAD_X}px` : `${entity.kind === 'team' ? 6 : 5}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
+                onClick={tappable ? () => {
+                  const pid = r.player?.id;
+                  if (!pid) return;
+                  onRowTap?.(pid);
+                  void follows.toggle(pid).catch(() => toast.error(t('playerFollow.writeFailed')));
+                } : undefined}
+                style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, width: '100%', height: 'auto', borderRadius: 0, minHeight: showHeroShape ? 36 : 34, padding: showHeroShape ? `6px ${HERO_PAD_X}px` : `${entity.kind === 'team' ? 6 : 5}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
                 className={tappable ? `${T.press} transition-colors` : undefined}
               >
+                {/* Follow identity is rail + chip only. Figures retain their semantic colour. */}
+                {followed ? <span aria-hidden style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: OVERVIEW.follow.railWidth, background: OVERVIEW.amber }} /> : null}
                 {(showHeroShape || showOverviewPosition) && inTopTie ? (
                   /* §D.3: the cap above states the position once; the row carries none. */
                   <div data-hero-tie="capped"><span className="sr-only">{posText}</span></div>
@@ -397,6 +410,10 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   {entity.kind === 'team' ? renderEntityName(entity, T.ink) : (
                     <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.15, fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em', color: T.ink }}>{overviewName(entity.lines[0])}</span>
                   )}
+                  {followed ? <span style={{ flex: 'none', fontSize: OVERVIEW.follow.chipSize, fontWeight: OVERVIEW.follow.chipWeight,
+                    letterSpacing: OVERVIEW.follow.chipTracking, textTransform: 'uppercase', color: OVERVIEW.amber,
+                    border: `1px solid ${OVERVIEW.follow.chipBorder}`, borderRadius: OVERVIEW.follow.chipRadius,
+                    padding: OVERVIEW.follow.chipPadding }}>{t('playerFollow.following')}</span> : null}
                   {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </div>
                 {showHeroToday ? (
@@ -449,6 +466,9 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
             </>
           );
           })()}
+          {showFollowFooter(rows, follows.playerIds) ? <div style={{ textAlign: 'center', fontSize: OVERVIEW.follow.footerSize,
+            fontWeight: OVERVIEW.follow.footerWeight, letterSpacing: OVERVIEW.follow.footerTracking, textTransform: 'uppercase',
+            color: OVERVIEW.mute, padding: OVERVIEW.follow.footerPadding }}>{t('playerFollow.footer')}</div> : null}
         </div>
         <ScorecardSheet open={!!target} onClose={() => setTarget(null)} tournamentId={tournamentId} target={target} />
       </>

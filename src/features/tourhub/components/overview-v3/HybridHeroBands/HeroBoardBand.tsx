@@ -71,6 +71,7 @@ import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAva
 import { OVERVIEW, pickMovementCards, type MovementCard } from '../overviewTokens';
 import { fmtScore } from '../../../utils/fmtScore';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { TeeAlertButton } from './TeeAlertButton';
 
 
 /**
@@ -503,7 +504,8 @@ export function HeroBoardSection({
       ) : null}
 
       {nextRound != null && nextGroup ? (
-        <div data-overview-next-round style={{ padding: '14px 20px', display: 'flex', alignItems: 'flex-start', gap: 16, borderTop: `1px solid ${WHITE_ALPHA_06}` }}>
+        <div data-overview-next-round style={{ padding: '14px 20px', borderTop: `1px solid ${WHITE_ALPHA_06}` }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
           <div style={{ flexShrink: 0 }}>
             <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>
               {t('overview.hero.leadersOut', { round: nextRound })}
@@ -513,6 +515,8 @@ export function HeroBoardSection({
           <div style={{ minWidth: 0, paddingTop: 15, fontSize: 13, fontWeight: 600, lineHeight: 1.4, color: INK }}>
             {nextGroup.players.map((p) => p.name).join(', ')}
           </div>
+          </div>
+          <TeeAlertButton tournamentId={tournamentId} round={nextRound} />
         </div>
       ) : null}
 

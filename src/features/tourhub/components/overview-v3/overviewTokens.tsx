@@ -5,21 +5,21 @@
  * no colour is declared twice. Used only by the Overview hero, its bands and
  * the heroBoard theme of MiniBoard.
  */
-import { AMBER, INK } from '../../_shared/tokens';
+import { AMBER, INK, INK_FAINT, INK_MUTE, WHITE_ALPHA_08, INK_TINT_04, WHITE_ALPHA_18, WHITE_ALPHA_30, HAIRLINE_INK_10 } from '../../_shared/tokens';
 
 export const OVERVIEW = {
   /** Muted caps / secondary figures on the dark band ground. */
-  mute: 'rgba(248,250,252,0.42)',
+  mute: INK_FAINT,
   /** Body copy one step down from INK. */
-  soft: 'rgba(248,250,252,0.62)',
-  hairline: 'rgba(255,255,255,0.08)',
-  cardGround: 'rgba(255,255,255,0.05)',
-  bracket: 'rgba(255,255,255,0.18)',
+  soft: INK_MUTE,
+  hairline: WHITE_ALPHA_08,
+  cardGround: INK_TINT_04,
+  bracket: WHITE_ALPHA_18,
   spine: {
     done: 'rgba(255,255,255,0.72)',
-    todo: 'rgba(255,255,255,0.30)',
+    todo: WHITE_ALPHA_30,
     label: 'rgba(255,255,255,0.50)',
-    connector: 'rgba(255,255,255,0.18)',
+    connector: WHITE_ALPHA_18,
     liveHalo: '0 0 0 3px rgba(247,147,30,0.25)',
   },
   trio: {
@@ -27,12 +27,35 @@ export const OVERVIEW = {
     caps: 'rgba(255,255,255,0.72)',
   },
   shape: {
-    level: 'rgba(248,250,252,0.62)',
-    stub: 'rgba(255,255,255,0.14)',
+    level: INK_MUTE,
+    stub: HAIRLINE_INK_10,
     live: AMBER,
   },
   ink: INK,
   amber: AMBER,
+  follow: {
+    railWidth: 2.5,
+    chipBorder: 'rgba(247,147,30,0.4)',
+    chipSize: 8.5,
+    chipWeight: 800,
+    chipTracking: '0.1em',
+    chipRadius: 999,
+    chipPadding: '1px 5px',
+    footerSize: 11,
+    footerWeight: 700,
+    footerTracking: '0.12em',
+    footerPadding: '12px 20px',
+  },
+  teeAlert: {
+    border: 'rgba(247,147,30,0.45)',
+    armedGround: 'rgba(247,147,30,0.14)',
+    radius: 10,
+    padding: 12,
+    marginTop: 12,
+    size: 11.5,
+    weight: 700,
+    tracking: '0.1em',
+  },
 } as const;
 
 /** "Three", "Two"… from the locale; numerals past ten. Caps come from CSS. */
