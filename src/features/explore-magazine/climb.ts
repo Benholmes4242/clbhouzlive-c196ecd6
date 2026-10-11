@@ -34,14 +34,15 @@ export function climbShare(r: Pick<ClimbSource, 'start_index' | 'improvement'>):
   return imp / start;
 }
 
-export interface ClimbPlaced<R> { row: R; pos: number; tie: boolean; share: number | null }
+/** pos is null for a row OUTSIDE the ranking (Share order, share not a number): it renders a dash, never a shared position. */
+export interface ClimbPlaced<R> { row: R; pos: number | null; tie: boolean; share: number | null }
 
 /**
  * Both orders from the same rows. STROKES uses the RPC's own pos/is_tie — the
  * database already decided it. SHARE ranks on the UNROUNDED share with
  * competition ranking (1, 2, 2, 4); a tie only when the unrounded values are
  * equal. Rows whose share is not a number sort last, keep their strokes order,
- * and share one position (tied if more than one).
+ * and take NO position (null): they are outside the ranking, not level.
  */
 export function climbOrder<R extends ClimbSource>(rows: ReadonlyArray<R>, mode: ClimbMode): ClimbPlaced<R>[] {
   if (mode === 'strokes') return rows.map((row) => ({ row, pos: row.pos, tie: row.is_tie, share: climbShare(row) }));
@@ -56,7 +57,7 @@ export function climbOrder<R extends ClimbSource>(rows: ReadonlyArray<R>, mode: 
     return { row: x.row, pos: first + 1, tie, share: x.share };
   });
   const rest = rows.filter((r) => climbShare(r) == null);
-  rest.forEach((row) => out.push({ row, pos: ranked.length + 1, tie: rest.length > 1, share: null }));
+  rest.forEach((row) => out.push({ row, pos: null, tie: false, share: null }));
   return out;
 }
 
@@ -76,7 +77,8 @@ export function climbCross<R extends ClimbSource>(
   const isMe = (r: R) => !!r.is_viewer || r.user_id === viewerId;
   const here = climbOrder(rows, mode).find((p) => isMe(p.row));
   const there = climbOrder(rows, mode === 'strokes' ? 'share' : 'strokes').find((p) => isMe(p.row));
-  if (!here || !there || there.pos >= here.pos) return { kind: 'none' };
+  /* An unranked viewer (null position) has no standing to compare: no sentence. */
+  if (!here || !there || here.pos == null || there.pos == null || there.pos >= here.pos) return { kind: 'none' };
   if (there.pos === 1) return { kind: 'first', pos: here.pos, tie: here.tie };
   return { kind: 'better', pos: here.pos, tie: here.tie, otherPos: there.pos, otherTie: there.tie };
 }

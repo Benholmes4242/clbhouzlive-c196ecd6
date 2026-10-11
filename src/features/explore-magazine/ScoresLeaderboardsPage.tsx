@@ -503,7 +503,7 @@ function CompactRow({
         className="tabular-nums"
         style={{ width: SEASON_ROW_METRICS.posTrack, flexShrink: 0, textAlign: 'center', fontSize: SEASON_ROW_METRICS.posSize, fontWeight: SEASON_ROW_METRICS.posWeight, color: self ? A.AMBER : A.MUTE }}
       >
-        {tie ? `T${pos}` : pos}
+        {pos == null ? '\u2014' : tie ? `T${pos}` : pos}
       </span>
       <span style={{ flexShrink: 0 }}>
         <MemberAvatar userId={id} name={avatarName} photoUrl={photo} size={SEASON_ROW_METRICS.avatar} />
