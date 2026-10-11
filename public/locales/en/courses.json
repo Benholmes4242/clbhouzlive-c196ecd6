@@ -133,7 +133,8 @@
         "on": "You <b>{{pos}}</b> · <b>{{value}}</b>",
         "lead": "You lead this one",
         "absent": "Not on this one yet"
-      },      "climb": "The climb",
+      },
+      "climb": "The climb",
       "mostImproved": "Most improved",
       "improvedScope": "Everyone · this year",
       "indexChange": "Index change",
@@ -221,7 +222,23 @@
       "hundredPlayed": "Played",
       "hundredNext": "Next",
       "coursesOfList": "Courses of {{n}}",
-      "coursesPlayed": "Courses played"
+      "coursesPlayed": "Courses played",
+      "climbOrder": "Climb order",
+      "climbStrokes": "Strokes",
+      "climbShare": "Share",
+      "climbOfIndex": "{{n}}% of index",
+      "climbStrokesCut": "{{n}} strokes",
+      "climbPlusExcluded": "Members who began the year on a plus handicap are not ranked by share, because a share of a plus index has no meaning.",
+      "climbCross": {
+        "strokes": {
+          "first": "You are {{pos}} on strokes — but nobody on clbhouz has cut a bigger share of their index this year.",
+          "better": "You are {{pos}} on strokes — but you are {{otherPos}} by share."
+        },
+        "share": {
+          "first": "You are {{pos}} by share — but nobody on clbhouz has cut more strokes from their index this year.",
+          "better": "You are {{pos}} by share — but you are {{otherPos}} on strokes."
+        }
+      }
     },
     "place": {
       "pair": "{{place}}, {{nation}}"
