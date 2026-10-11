@@ -69,7 +69,6 @@ import { roundPostItem } from './roundPostItem';
 import { featuredRoundFrom, decideFeatured, type FeaturedTrigger } from './featuredRoundTrigger';
 import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard';
 import { RoundPostCard } from '@/features/explore-magazine/RoundPostCard';
-import { LikedByRow } from '@/components/likes/LikedByRow';
 import { CALLOUT_SUBTEXT } from '@/features/explore-magazine/AchievementCallout';
 import { A as A_TOKENS } from '@/components/explore-tab-new/courseled/tokens';
 import type { RoundCourseMeta } from './roundPostItem';

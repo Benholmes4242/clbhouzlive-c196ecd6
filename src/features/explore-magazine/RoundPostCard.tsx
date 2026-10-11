@@ -10,8 +10,8 @@
  * member's OWN rank among their OWN rounds at this course
  * (get_round_course_context) — never a comparison with other members.
  *
- * A CARD MUST NEVER FETCH. Awards and course context arrive as props from the
- * feed's one batched read per window; nothing in this file issues a request.
+ * Awards and course context come from the feed's one batched read per window,
+ * as props. This component NEVER fetches.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
