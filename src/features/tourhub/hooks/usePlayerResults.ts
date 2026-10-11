@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { fmtScore } from '../utils/fmtScore';
 import { supabase } from '@/integrations/supabase/client';
 import { formatCurrencyUsd } from '@/i18n/format';
 import { currentSeasonYear } from '../leaders-v2/data/useLeaderCategories';
@@ -147,13 +148,9 @@ export function formatPositionShort(position: number | null, tied: boolean | nul
   return `${prefix}${position}`;
 }
 
-/**
- * Format score relative to par (e.g., "-12", "E", "+3")
- */
+/** To-par display for result rows — delegates to fmtScore; null renders '—'. */
 export function formatScore(score: number | null): string {
-  if (score === null) return '—';
-  if (score === 0) return 'E';
-  return score > 0 ? `+${score}` : String(score);
+  return fmtScore(score, { absent: '—' });
 }
 
 /**

@@ -191,16 +191,16 @@ describe('tournament contest sections', () => {
 
   it('uses the "and n others" form for a four-way tie', () => {
     const contest = selectTournamentContest([
-      row('A', -12, 1),
-      row('B', -12, 1),
-      row('C', -12, 1),
-      row('D', -12, 1),
-      row('E', -11, 5),
+      row('Alex Archer', -12, 1),
+      row('Ben Brooks', -12, 1),
+      row('Cal Carter', -12, 1),
+      row('Dan Dunne', -12, 1),
+      row('Eli Evans', -11, 5),
     ], meta, 'live');
 
     render(<ContestSection contest={contest} state="live" />);
 
-    expect(screen.getByText('A, B and 2 others, level at -12, with E a shot back.')).toBeInTheDocument();
+    expect(screen.getByText('Alex Archer, Ben Brooks and 2 others, level at −12, with Eli Evans a shot back.')).toBeInTheDocument();
     expect(screen.queryByText(/second/i)).not.toBeInTheDocument();
   });
 
@@ -216,20 +216,20 @@ describe('tournament contest sections', () => {
     render(<ContestSection contest={contest} state="completed" />);
 
     expect(screen.getByText('Won a playoff')).toBeInTheDocument();
-    expect(screen.getByText('Zach Johnson beat Rory Sabbatini after both finished on -12.')).toBeInTheDocument();
+    expect(screen.getByText('Zach Johnson beat Rory Sabbatini after both finished on −12.')).toBeInTheDocument();
     expect(screen.queryByText(/to play/i)).not.toBeInTheDocument();
   });
 
   it('keeps an unresolved completed tie on the finished-level path', () => {
     const contest = selectTournamentContest([
-      row('A', -12, 1, -4, 13, true),
-      row('B', -12, 1, -3, 13, true),
+      row('Alex Archer', -12, 1, -4, 13, true),
+      row('Ben Brooks', -12, 1, -3, 13, true),
     ], meta, 'completed');
 
     render(<ContestSection contest={contest} state="completed" />);
 
     expect(screen.getByText('Finished level')).toBeInTheDocument();
-    expect(screen.getByText('A and B were level at -12.')).toBeInTheDocument();
+    expect(screen.getByText('Alex Archer and Ben Brooks were level at −12.')).toBeInTheDocument();
     expect(screen.queryByText(/to play/i)).not.toBeInTheDocument();
   });
 

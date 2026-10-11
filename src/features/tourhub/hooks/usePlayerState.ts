@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useLeaderboardRealtime } from './useLeaderboardRealtime';
 import { usePlayerResults } from './usePlayerResults';
+import { fmtScore } from '../utils/fmtScore';
 import { formatMonthYearShort } from '@/i18n/format';
 
 export type PlayerState = 'live' | 'recent' | 'inform' | 'inactive';
@@ -74,8 +75,7 @@ interface LiveRow {
 }
 
 function formatScoreText(score: number | null, thru: number | null): string {
-  const scorePart =
-    score === null ? '—' : score === 0 ? 'E' : score > 0 ? `+${score}` : String(score);
+  const scorePart = fmtScore(score, { absent: '—' });
   if (thru === null) return scorePart;
   if (thru >= 18) return `${scorePart} F`;
   return `${scorePart} thru ${thru}`;
