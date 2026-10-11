@@ -132,7 +132,7 @@ export function HundredRail({
   const next = tiles.findIndex((c) => !c.is_viewer_played);
   useLayoutEffect(() => {
     const el = ref.current;
-    if (el) el.scrollLeft = hundredRailScroll(firstUnplayedIndex(tiles), gutter);
+    if (el) el.scrollLeft = hundredRailScroll(firstUnplayedIndex(tiles), gutter, el.clientWidth);
     // Once per mount by design: later updates must never move the rail.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -173,7 +173,7 @@ export function HundredRail({
                 aria-label={t('amateur.leaderboards.hundredPlayed')}
                 style={{ position: 'absolute', top: T.played.inset, right: T.played.inset, width: T.played.size, height: T.played.size, borderRadius: 999, background: A.AMBER, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
-                <Check size={T.played.check} strokeWidth={3} color={T.played.ink} />
+                <Check size={T.played.check} strokeWidth={T.played.stroke} color={T.played.ink} />
               </span>
             ) : i === next ? (
               <span
