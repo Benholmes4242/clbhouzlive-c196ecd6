@@ -132,17 +132,22 @@ function parseRoundNumber(raw: unknown): number | null {
   return null;
 }
 
-function formatScore(v: number | string | null | undefined): string | null {
+/** Group RPC scores can arrive as strings; null for empty, NaN kept so the caller can show the raw text. */
+function toScoreNumber(v: number | string | null | undefined): number | null {
   if (v == null || v === '') return null;
-  const n = typeof v === 'number' ? v : Number(v);
-  if (Number.isNaN(n)) return String(v);
-  if (n === 0) return 'E';
-  return n < 0 ? String(n) : `+${n}`;
+  return typeof v === 'number' ? v : Number(v);
 }
 
-function scoreColor(s: string | null): string {
-  if (!s || s === 'E') return V4.scoreEven;
-  const n = s.startsWith('-') ? -1 : 1;
+/** Display: fmtScore for numbers; a non-numeric string is shown as given. */
+function scoreText(v: number | string | null | undefined): string | null {
+  const n = toScoreNumber(v);
+  if (n == null) return null;
+  return Number.isNaN(n) ? String(v) : fmtScore(n);
+}
+
+/** Colour reads the NUMBER, never the rendered string. Null/level keep the even colour. */
+function scoreColor(n: number | null): string {
+  if (n == null || Number.isNaN(n) || n === 0) return V4.scoreEven;
   return getScoreColor(n, 'light');
 }
 
@@ -389,11 +394,12 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                   const tied = lbRow?.positionTied ?? null;
                   const posText = posNum != null ? `${tied ? 'T' : ''}${posNum}` : '';
 
-                  const total = formatScore(lbRow ? lbRow.score : (p.score as number | string | null));
+                  const totalRaw = lbRow ? lbRow.score : (p.score as number | string | null);
+                  const total = scoreText(totalRaw);
                   // Prefer the round-scoped leaderboard figure; fall back to
                   // the group RPC's own today when the board's is round-gated null.
                   const todayVal = (lbRow?.today ?? (p.today as number | string | null)) ?? null;
-                  const today = formatScore(todayVal);
+                  const today = scoreText(todayVal);
 
                   return (
                     <button
@@ -459,7 +465,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                               fontSize: 15,
                               fontWeight: 700,
                               letterSpacing: '-0.02em',
-                              color: total ? scoreColor(total) : V4.inkFaint,
+                              color: total ? scoreColor(toScoreNumber(totalRaw)) : V4.inkFaint,
                               ...FIGS,
                             }}
                           >
@@ -620,9 +626,8 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                       const status = (lb?.status || '').toUpperCase();
                       const isCut = status === 'CUT' || status === 'WD' || status === 'DQ';
                       // Not started the active round -> TOTAL to par; started -> TODAY.
-                      const display = (lb && lb.today != null
-                        ? formatScore(lb.today)
-                        : formatScore(lb?.score)) ?? '—';
+                      const displayRaw = lb && lb.today != null ? lb.today : lb?.score;
+                      const display = scoreText(displayRaw) ?? '—';
                       return (
                         <button
                           key={pi}
@@ -656,7 +661,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                           {isCut ? (
                             <span style={{ fontSize: 11, fontWeight: 700, color: V4.inkFaint, letterSpacing: '0.1em' }}>{status}</span>
                           ) : (
-                            <span style={{ fontSize: 12.5, fontWeight: 700, color: display === '—' ? V4.inkFaint : scoreColor(display), fontVariantNumeric: 'tabular-nums' }}>{display}</span>
+                            <span style={{ fontSize: 12.5, fontWeight: 700, color: display === '—' ? V4.inkFaint : scoreColor(toScoreNumber(displayRaw)), fontVariantNumeric: 'tabular-nums' }}>{display}</span>
                           )}
                         </button>
                       );
