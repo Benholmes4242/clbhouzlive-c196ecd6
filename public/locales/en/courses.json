@@ -220,7 +220,6 @@
       "hundredBasis": "Ranked on courses played from the <s>{{list}} Hundred</s>. Each member's latest is shown beneath their name.",
       "hundredPlayedCount": "{{played}} of {{total}} played",
       "hundredPlayed": "Played",
-      "hundredNext": "Next",
       "coursesOfList": "Courses of {{n}}",
       "coursesPlayed": "Courses played",
       "climbOrder": "Climb order",

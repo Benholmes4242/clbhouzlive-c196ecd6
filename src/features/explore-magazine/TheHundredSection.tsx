@@ -129,7 +129,6 @@ export function HundredRail({
 }) {
   const { t } = useTranslation('courses');
   const ref = useRef<HTMLDivElement>(null);
-  const next = tiles.findIndex((c) => !c.is_viewer_played);
   useLayoutEffect(() => {
     const el = ref.current;
     if (el) el.scrollLeft = hundredRailScroll(firstUnplayedIndex(tiles), gutter, el.clientWidth);
@@ -174,13 +173,6 @@ export function HundredRail({
                 style={{ position: 'absolute', top: T.played.inset, right: T.played.inset, width: T.played.size, height: T.played.size, borderRadius: 999, background: A.AMBER, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
                 <Check size={T.played.check} strokeWidth={T.played.stroke} color={T.played.ink} />
-              </span>
-            ) : i === next ? (
-              <span
-                data-hundred-next
-                style={{ position: 'absolute', top: T.next.inset, right: T.next.inset, fontSize: T.next.fontSize, fontWeight: 800, letterSpacing: T.next.letterSpacing, textTransform: 'uppercase', lineHeight: 1.2, color: T.next.ink, background: T.next.ground, borderRadius: 999, padding: T.next.padding }}
-              >
-                {t('amateur.leaderboards.hundredNext')}
               </span>
             ) : null}
             <span style={{
