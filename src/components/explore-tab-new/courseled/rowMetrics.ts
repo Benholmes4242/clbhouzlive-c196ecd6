@@ -46,6 +46,15 @@ export const SEASON_ROW_METRICS = {
   figureTracking: '-0.02em',
   secondarySize: 12.5,
   secondaryWeight: 700,
+  /** Two-track figure block (figure over caption) — line heights apply only when a caption is present. */
+  figureLine: '18px',
+  secondaryLine: '14px',
+  /** Gap between name and the line beneath it. */
+  subGap: 1,
+  /** The hairline beneath every row. */
+  hairline: 1,
+  /** Progress bar ends. */
+  barRadius: 999,
   posSize: 13,
   posWeight: 700,
   posTrack: 28,
