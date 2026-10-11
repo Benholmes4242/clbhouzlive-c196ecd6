@@ -69,7 +69,6 @@ import { PicksSheet } from './PicksSheet';
 import type { HeroState } from '../HybridHero.utils';
 import { boardMovementMap, todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
 import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
-import { fmtScore } from '../../../utils/fmtScore';
 import { MOCK, MockFace, fmtToParTrueMinus, pickMovementCards, type MovementCard } from '../overviewMock';
 
 /**
