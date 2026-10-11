@@ -452,7 +452,7 @@ function CompactRow({
   gapAbove,
   onPress,
 }: {
-  pos: number;
+  pos: number | null;
   tie: boolean;
   id: string;
   name: string;
