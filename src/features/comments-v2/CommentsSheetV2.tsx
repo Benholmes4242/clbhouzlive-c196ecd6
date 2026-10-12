@@ -42,6 +42,7 @@ import { ReportCommentSheetV2 } from './components/ReportCommentSheetV2';
 import { FIGS, A } from '@/features/courses/components/holes/analytical/tokens';
 import { MessageCircle, EyeOff } from 'lucide-react';
 import { Trans } from 'react-i18next';
+import { SubjectContextLine } from '@/components/sheets/SubjectContextLine';
 import { useCommentsSubject, useThreadStandings, type CommentsSubject } from './hooks/useCommentsContext';
 import { firstAppearanceStandings, standingUserId } from './lib/standing';
 import { shortCourseName } from '@/features/courses/_shared/courseLabel';
@@ -360,7 +361,7 @@ function CommentsSheetV2Inner({
               <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.4px', color: INK }}>
                 {t('comments.sheetTitle')}
               </div>
-              {subject && <ContextLine subject={subject} />}
+              <SubjectContextLine subject={subject} dataAttr="comments-context" />
               {/* G.1 — the number is the rows rendered below, never posts.comment_count. */}
               {!countReady ? (
                 <div
@@ -595,37 +596,6 @@ function SkeletonRows() {
 
 export const CommentsSheetV2 = memo(CommentsSheetV2Inner);
 export default CommentsSheetV2;
-
-/** G.3 — what you are commenting on. Rounds and reviews only; never invented. */
-function ContextLine({ subject }: { subject: CommentsSubject }) {
-  const { t } = useTranslation('common');
-  if (subject.kind === 'post' || !subject.authorName || !subject.courseName) return null;
-  const strong = { color: A.INK, fontWeight: 700 } as const;
-  let tail: React.ReactNode = null;
-  if (subject.kind === 'round' && subject.gross != null) {
-    const tp = subject.toPar;
-    const tpText = tp == null ? null : tp === 0 ? t('comments.contextLevel') : tp < 0 ? `\u2212${Math.abs(tp)}` : `+${tp}`;
-    tail = (
-      <>
-        {' \u00B7 '}<span style={strong}>{subject.gross}</span>
-        {tpText && <span style={{ color: tp != null && tp < 0 ? TOPAR_UNDER_DARK : A.MUTE, fontWeight: 700 }}>{' '}{tpText}</span>}
-      </>
-    );
-  } else if (subject.kind === 'review' && subject.rating != null) {
-    tail = <>{' \u00B7 '}<span style={strong}>{subject.rating.toFixed(1)}</span></>;
-  }
-  return (
-    <div
-      data-comments-context="true"
-      className="truncate"
-      style={{ ...FIGS, fontSize: 11, color: A.MUTE, marginTop: 4, fontVariantNumeric: 'tabular-nums' }}
-    >
-      <span style={strong}>{subject.authorName}</span>
-      {' \u00B7 '}{shortCourseName(subject.courseName)}
-      {tail}
-    </div>
-  );
-}
 
 /** G.5 genuine empty (132px) and G.2 all-hidden, sharing one shell. */
 function EmptyState({ hiddenCount, name }: { hiddenCount: number; name: string | null }) {
