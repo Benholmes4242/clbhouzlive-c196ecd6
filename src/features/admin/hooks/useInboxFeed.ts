@@ -291,7 +291,7 @@ export function useInboxFeed(): InboxFeedResult {
           type: 'support',
           title: row.subject,
           meta: who ? `Support - from ${who}` : 'Support',
-          createdAt: row.last_message_at ?? row.created_at,
+          createdAt: row.resolved_at ?? row.last_message_at ?? row.created_at,
           openedAt: row.created_at,
           isHighPriority: false,
           payload: row,

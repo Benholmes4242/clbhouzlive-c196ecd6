@@ -241,6 +241,7 @@ function UnmatchedActions({ item, row, onResolved, catalogueTotal }: RowActionPr
             initialQuery={searchMode ?? ''}
             autoFocus={searchMode !== null}
             disabled={busy}
+            whsCountry={row.whs_country_name}
             onPick={(hit) => void link(hit.id)}
           />
           <button type="button" disabled={busy} onClick={() => setCreateOpen(true)} style={btnOutline(busy)}>CREATE</button>
