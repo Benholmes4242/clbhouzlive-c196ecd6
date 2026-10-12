@@ -25,9 +25,9 @@ function makePost(rating: number, breakdown: Record<string, number | null>, text
     ...extra,
   } as never;
 }
-const tree = (post: never, coursesReviewed: number | null = null, extraProps: Record<string, unknown> = {}) => (
+const tree = (post: never, _legacyCount?: number | null, extraProps: Record<string, unknown> = {}) => (
   <MemoryRouter><QueryClientProvider client={new QueryClient()}>
-    <ReviewPostCard post={post} articleRef={() => {}} onProfile={vi.fn()} onReadReview={vi.fn()} onPrefetch={vi.fn()} coursesReviewed={coursesReviewed} footer={null} {...extraProps} />
+    <ReviewPostCard post={post} articleRef={() => {}} onProfile={vi.fn()} onReadReview={vi.fn()} onPrefetch={vi.fn()} footer={null} {...extraProps} />
   </QueryClientProvider></MemoryRouter>
 );
 function card(rating: number, breakdown: Record<string, number | null>, text = 'Words', extra: Record<string, unknown> = {}) {
@@ -91,17 +91,12 @@ describe('review post — R.1 fits between the islands', () => {
   });
 });
 
-describe('review post — A.2 count is latched at first paint', () => {
-  it('shows the count present at first paint', () => {
-    const c = render(tree(makePost(8, all), 47)).container;
-    expect(c.querySelector('[data-review-who-line]')?.textContent).toContain('feed.reviewPost.coursesReviewed:47');
-  });
-  it('never inserts a count that arrives after first paint', () => {
-    const post = makePost(8, all);
-    const { container, rerender } = render(tree(post, null));
-    const before = container.querySelector('[data-review-who-line]')?.textContent;
-    rerender(tree(post, 47));
-    expect(container.querySelector('[data-review-who-line]')?.textContent).toBe(before);
+describe('review post — meta line is the date only', () => {
+  it('states neither the handicap index nor the courses-reviewed count, even when both are present', () => {
+    const c = render(tree(makePost(8, all, 'Words', { handicapIndex: 12.4 }), 47)).container;
+    const line = c.querySelector('[data-review-who-line]') as HTMLElement;
+    expect(line.textContent).not.toContain('feed.reviewPost.hcp');
+    expect(line.textContent).not.toContain('feed.reviewPost.coursesReviewed');
   });
 });
 
@@ -135,12 +130,13 @@ describe('review post v2 — frame and affordances', () => {
     expect(REVIEW_COURSE_CLAMP.WebkitLineClamp).toBe(2);
     expect(REVIEW_COURSE_CLAMP).not.toHaveProperty('whiteSpace');
   });
-  it('the follow pill sits in the right-hand identity slot, not on the meta line', () => {
+  it('the meta line reads like a normal post: owner menu, then the date, then the follow pill', () => {
     const c = render(tree(makePost(8, all), null, { followPill: <span data-pill />, ownerMenu: <span data-menu /> })).container;
-    const right = c.querySelector('[data-review-identity-right]') as HTMLElement;
-    expect(right.children[0].hasAttribute('data-pill')).toBe(true);
-    expect(right.children[1].hasAttribute('data-menu')).toBe(true);
-    expect(c.querySelector('[data-review-who-line] [data-pill]')).toBeNull();
+    const line = c.querySelector('[data-review-who-line]') as HTMLElement;
+    expect(c.querySelector('[data-review-identity-right]')).toBeNull();
+    const kids = Array.from(line.children) as HTMLElement[];
+    expect(kids[0].hasAttribute('data-menu')).toBe(true);
+    expect(kids[kids.length - 1].hasAttribute('data-pill')).toBe(true);
   });
   it('the article carries no border and no radius; hairline only after the first post', () => {
     const first = render(tree(makePost(8, all), null, { feedIndex: 0 })).container.querySelector('[data-review-post-card]') as HTMLElement;

@@ -10,7 +10,7 @@
  * and tier word through reviewLabelColor / ReviewVerdictLabel, every category
  * through courseSubScoreTone. Green at 9.0 and above, mute below.
  */
-import React, { useRef } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -22,14 +22,12 @@ import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import { formatRatingValue } from '@/utils/formatters';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 import { formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
-import { fmtHcp } from '@/lib/whs/format';
 import { CARD, LINE, T100, T60, T40 } from './feedTokens';
-import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, REVIEW_COURSE_CLAMP, joinClauses } from './reviewPostCard';
+import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, REVIEW_COURSE_CLAMP } from './reviewPostCard';
 
 const GUTTER = 14;
 const NAME_SIZE = 15;
 const NAME_LINE = 1.25;
-const NAME_LINE_BOX = NAME_SIZE * NAME_LINE;
 
 type CatKey = 'design' | 'condition' | 'clubhouse' | 'facilities';
 const CATS: CatKey[] = ['design', 'condition', 'clubhouse', 'facilities'];
@@ -47,12 +45,10 @@ export interface ReviewPostCardProps {
   onProfile: () => void;
   onReadReview: (e: React.MouseEvent) => void;
   onPrefetch: () => void;
-  /** The member's courses-rated figure (useReviewerStats, already read by FeedCard). */
-  coursesReviewed?: number | null;
   onOpenCourse?: () => void;
-  /** The same FeedFollowPill a normal post mounts; top right, level with the name. */
+  /** The same FeedFollowPill a normal post mounts; inline on the meta line after the date. */
   followPill?: React.ReactNode;
-  /** The owner menu: the right-hand slot of the identity row. */
+  /** The owner menu: inline on the meta line, before the date, as a normal post does. */
   ownerMenu?: React.ReactNode;
   /** F — the media frame's content (single media or carousel), sized to fill. */
   media?: React.ReactNode;
@@ -61,7 +57,7 @@ export interface ReviewPostCardProps {
 }
 
 export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
-  post, articleRef, feedIndex, onProfile, onReadReview, onPrefetch, coursesReviewed = null, onOpenCourse, followPill, ownerMenu, media, footer,
+  post, articleRef, feedIndex, onProfile, onReadReview, onPrefetch, onOpenCourse, followPill, ownerMenu, media, footer,
 }) => {
   const { t } = useTranslation('common');
   const { t: tCourses } = useTranslation('courses');
@@ -70,18 +66,10 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
   const review = post.review;
   const rating = review?.rating ?? null;
 
-  /* A — one privacy-aware index from the feed row (chosen server-side).
-     The count is LATCHED at first paint so a late figure never shifts the line. */
-  const indexClause = post.handicapIndex != null
-    ? t('feed.reviewPost.hcp', { index: fmtHcp(post.handicapIndex) })
-    : null;
-  const countAtFirstPaint = useRef<number | null | undefined>(undefined);
-  if (countAtFirstPaint.current === undefined) countAtFirstPaint.current = coursesReviewed;
-  const latchedCount = countAtFirstPaint.current;
-  const countClause = latchedCount != null && latchedCount > 0
-    ? t('feed.reviewPost.coursesReviewed', { count: latchedCount })
-    : null;
-  const whoLine = joinClauses([indexClause, countClause, timeAgo(post.createdAt, { absoluteAfterDays: 30 })]);
+  /* A — the meta line is the date only, exactly like a normal post: the
+     handicap-index and courses-reviewed clauses were removed by user decision
+     ("just have the date and then following/follow, like the normal post"). */
+  const whoLine = timeAgo(post.createdAt, { absoluteAfterDays: 30 });
 
   const region = [
     review?.courseRegion || review?.courseSubCountry || post.courseRegion || post.courseSubCountry,
@@ -138,19 +126,15 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
           >
             {post.displayName}
           </button>
-          <div data-review-who-line style={{ marginTop: 1, fontSize: 12, color: T60, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {whoLine}
+          {/* A.1 — the meta line reads exactly like a normal post: the owner
+              menu, then the date, then the follow pill, all inline. The earlier
+              deliberate top-right departure was removed by user decision. */}
+          <div data-review-who-line style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 1 }}>
+            {ownerMenu}
+            <span style={{ fontSize: 12, lineHeight: NAME_LINE, color: T60, whiteSpace: 'nowrap' }}>{whoLine}</span>
+            {followPill}
           </div>
         </div>
-        {/* A.1 — deliberate departure from a normal post: the pill sits top
-            right, level with the name (height = the name's line box), so the
-            meta line keeps the full width. Pill first, then the owner menu. */}
-        {(followPill || ownerMenu) ? (
-          <div data-review-identity-right style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 9, height: NAME_LINE_BOX }}>
-            {followPill}
-            {ownerMenu}
-          </div>
-        ) : null}
       </div>
 
       {/* B — the subject and the verdict */}

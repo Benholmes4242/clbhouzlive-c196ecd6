@@ -779,7 +779,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         onProfile={() => onProfile(post)}
         onReadReview={handleReadReview}
         onPrefetch={prefetchReview}
-        coursesReviewed={reviewerStats?.coursesRated ?? null}
         onOpenCourse={reviewOpenCourse}
         followPill={mountFollowPill ? (
           <FeedFollowPill isFollowed={!!post.isFollowedByMe} onFollow={() => onFollow!(post)} />
