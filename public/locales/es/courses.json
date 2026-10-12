@@ -1899,7 +1899,14 @@
     "scopeHas": "ha",
     "hcpLabel": "HCP",
     "figVsYourAvgNeutralHere": "vs tu promedio aquí",
-    "figVsTheirAvgNeutralHere": "vs el promedio {{possessive}} aquí"
+    "figVsTheirAvgNeutralHere": "vs el promedio {{possessive}} aquí",
+    "playedOff": "Jugó con {{index}}",
+    "key": {
+      "under": "Bajo par",
+      "bogey": "Bogey",
+      "double": "Doble",
+      "triple": "Triple o peor"
+    }
   },
   "searchSheet": {
     "added": "Added",

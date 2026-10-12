@@ -2762,7 +2762,14 @@
     "scopeHas": "[~~ĥáš~~]",
     "hcpLabel": "[~~ĤĈƤ~~]",
     "figVsYourAvgNeutralHere": "[~~vs your average here~~]",
-    "figVsTheirAvgNeutralHere": "[~~vs {{possessive}} average here~~]"
+    "figVsTheirAvgNeutralHere": "[~~vs {{possessive}} average here~~]",
+    "playedOff": "[~~Played off {{index}}~~]",
+    "key": {
+      "under": "[~~Under par~~]",
+      "bogey": "[~~Bogey~~]",
+      "double": "[~~Double~~]",
+      "triple": "[~~Triple or worse~~]"
+    }
   },
   "search": {
     "yourRounds": "[~~Ýőúř řőúñđš~~]"
