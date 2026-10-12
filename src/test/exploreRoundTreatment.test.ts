@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cumulativeSpan, dotsFor, goodHoleDots, treatmentFor } from '@/features/explore-magazine/roundTreatment';
+import { cumulativeSpan, goodHoleDots, treatmentFor } from '@/features/explore-magazine/roundTreatment';
 import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
@@ -41,28 +41,51 @@ describe('treatmentFor', () => {
   });
 });
 
-describe('dotsFor', () => {
+describe('goodHoleDots', () => {
   it('marks only good holes, on the cumulative value after the hole', () => {
-    const dots = dotsFor(item({ eagles: 1 }), shape([-2, -1, 1, 2, 0, 3]));
+    const dots = goodHoleDots(shape([-2, -1, 1, 2, 0, 3]));
     expect(dots).toEqual([
-      { i: 1, tone: SC_FILL_GOLD },
-      { i: 2, tone: TOPAR_UNDER_DARK },
+      { i: 1, tone: SC_FILL_GOLD, r: 4.2, ring: 1.2 },
+      { i: 2, tone: TOPAR_UNDER_DARK, r: 2.8, ring: 0.8 },
     ]);
   });
 
   it('marks an ace in gold whatever its par', () => {
     const ace: HoleShape = { ...shape([0]), holes: [{ holeNo: 1, par: 3, strokes: 1, sheetStrokes: 1 }] };
-    expect(dotsFor(item({ holes_in_one: 1 }), ace)).toEqual([{ i: 1, tone: SC_FILL_GOLD }]);
+    expect(goodHoleDots(ace)).toEqual([{ i: 1, tone: SC_FILL_GOLD, r: 4.2, ring: 1.2, halo: 7.4, label: 'ACE' }]);
   });
 
-  it('never marks a round that earned its line on movement alone', () => {
-    expect(dotsFor(item({ to_par: 4 }), shape([1, -1, 1, 1, 1]))).toEqual([]);
+  it('marks a birdie in a round that is well over par', () => {
+    // BRIEF_ROUND_LINE_MARKS E.0 — the line is drawn for every settled round, so
+    // the marks are too. A round-level verdict must never suppress a hole-level fact.
+    const dots = goodHoleDots(shape([1, -1, 1, 1, 1]));
+    expect(dots).toEqual([{ i: 2, tone: TOPAR_UNDER_DARK, r: 2.8, ring: 0.8 }]);
+  });
+
+  it('grades ace, eagle and birdie into tiers with exactly one ACE label', () => {
+    const s: HoleShape = { ...shape([0, 0, 0]), holes: [
+      { holeNo: 1, par: 3, strokes: 1, sheetStrokes: 1 },
+      { holeNo: 2, par: 5, strokes: 3, sheetStrokes: 3 },
+      { holeNo: 3, par: 4, strokes: 3, sheetStrokes: 3 },
+    ] };
+    const dots = goodHoleDots(s);
+    expect(dots.filter((d) => d.label === 'ACE')).toHaveLength(1);
+    expect(dots[1].halo).toBeUndefined();
+    expect(dots[2].r).toBe(2.8);
+  });
+
+  it('labels only the earlier of two aces', () => {
+    const s: HoleShape = { ...shape([0, 0]), holes: [
+      { holeNo: 1, par: 3, strokes: 1, sheetStrokes: 1 },
+      { holeNo: 2, par: 3, strokes: 1, sheetStrokes: 1 },
+    ] };
+    expect(goodHoleDots(s).map((d) => d.label)).toEqual(['ACE', null]);
   });
 
   it('provides the same good-hole dots when a featured line is already visible', () => {
     expect(goodHoleDots(shape([-2, -1, 0, 1]))).toEqual([
-      { i: 1, tone: SC_FILL_GOLD },
-      { i: 2, tone: TOPAR_UNDER_DARK },
+      { i: 1, tone: SC_FILL_GOLD, r: 4.2, ring: 1.2 },
+      { i: 2, tone: TOPAR_UNDER_DARK, r: 2.8, ring: 0.8 },
     ]);
   });
 });

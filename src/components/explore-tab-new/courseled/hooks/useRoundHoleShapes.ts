@@ -57,8 +57,8 @@ interface ParRow {
 
 /** A bead on the tile curve. Tone and radius come from the SHARED
  *  beadForScore rule (BRIEF_UNIFY_ROUND_CURVE_BEADS) — the tile no longer has
- *  a rule of its own, so an ace draws gold and an eagle draws larger than a
- *  birdie exactly as it does on the scorecard sheet. */
+ *  a rule of its own. beadForScore marks eagle-or-better ONLY (gold); it has
+ *  no birdie bead. */
 export interface ShapeBead {
   /** Index into `series` (1-based hole position). */
   i: number;

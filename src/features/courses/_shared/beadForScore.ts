@@ -3,6 +3,10 @@ import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 /**
  * beadForScore — the ONE trajectory-bead rule.
  *
+ * Deliberately diverges from the Explore trace (goodHoleDots), which marks birdies:
+ * the scorecard sheet grades its stroke per hole, so a red bead on a red segment would
+ * be one fact drawn twice. Do not unify them.
+ *
  *   eagle or better   solid GOLD bead
  *   EVERYTHING ELSE   no bead
  *

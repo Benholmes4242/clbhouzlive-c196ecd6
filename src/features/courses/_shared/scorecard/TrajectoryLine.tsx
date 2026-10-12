@@ -1,3 +1,6 @@
+/* Deliberately diverges from the Explore trace marks (goodHoleDots): this stroke is
+ * graded hole by hole, so birdies need no bead here; the Explore trace is one white
+ * line over a photograph, where a birdie has no other carrier. Do not unify them. */
 import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { A, LABEL, FIGS, NUM, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';

@@ -15,6 +15,7 @@ import { smoothPath } from '@/lib/charts/smoothPath';
 import { PHOTO_FIG_UNDER } from '@/styles/photoScrim';
 
 import { A, CHIP_RADIUS } from './tokens';
+import type { RoundDot } from '@/features/explore-magazine/roundTreatment';
 
 /**
  * RoundShape — THE ONE round-shape renderer for the Discover friends surfaces
@@ -132,7 +133,7 @@ export function RoundShape({
    *  AFTER the hole. `i` indexes `shape.series`. Absent for every shared caller,
    *  so nothing else moves. ONLY good holes are ever passed here — see
    *  roundTreatment.ts for why bad holes are never marked. */
-  exploreDots?: { i: number; tone: string }[];
+  exploreDots?: RoundDot[];
   /** Stroke colour ringing each dot so it reads against the line and the
    *  photograph. Defaults to the canvas token. */
   exploreDotCanvas?: string;
@@ -245,14 +246,38 @@ export function RoundShape({
         ) : null}
         <path d={path} fill="none" stroke={tone} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
         {/* GOOD HOLES ONLY. The tones are chosen by the caller's pure rule and
-            never include a bad hole; the thin canvas ring keeps a 3px dot
-            legible over a bright photograph. */}
+            never include a bad hole; the canvas ring (heavier as the mark
+            gets rarer) keeps each dot legible over a bright photograph. */}
         {(exploreDots ?? []).map((dot) => {
           const point = points[dot.i];
           if (!point) return null;
+          // BRIEF_ROUND_LINE_MARKS E.3: above by default, below when above would
+          // clip; if neither fits, draw the halo and drop the label.
+          let labelY: number | null = null;
+          if (dot.label && dot.halo) {
+            const above = point.y - dot.halo - 5;
+            const below = Math.min(point.y + dot.halo + 11.5, 49);
+            if (above >= 9.5) labelY = above;
+            else if (below - 7.5 > point.y + dot.halo) labelY = below;
+          }
           return (
-            <circle key={`${dot.i}:${dot.tone}`} cx={point.x} cy={point.y} r={3} fill={dot.tone}
-              stroke={exploreDotCanvas} strokeWidth={0.8} vectorEffect="non-scaling-stroke" />
+            <g key={`${dot.i}:${dot.tone}`}>
+              {dot.halo ? (
+                <>
+                  <circle cx={point.x} cy={point.y} r={dot.halo} fill="none" stroke={exploreDotCanvas}
+                    strokeOpacity={0.55} strokeWidth={2.2} vectorEffect="non-scaling-stroke" />
+                  <circle cx={point.x} cy={point.y} r={dot.halo} fill="none" stroke={SC_FILL_GOLD}
+                    strokeOpacity={0.72} strokeWidth={1.1} vectorEffect="non-scaling-stroke" />
+                </>
+              ) : null}
+              <circle cx={point.x} cy={point.y} r={dot.r} fill={dot.tone}
+                stroke={exploreDotCanvas} strokeWidth={dot.ring} vectorEffect="non-scaling-stroke" />
+              {labelY != null ? (
+                <text x={point.x} y={labelY} textAnchor="middle" fontSize={7.5} fontWeight={800}
+                  letterSpacing="0.1em" fill={SC_FILL_GOLD} stroke="rgba(0,0,0,0.75)" strokeWidth={2.5}
+                  paintOrder="stroke" fontFamily="Geist, sans-serif">{dot.label}</text>
+              ) : null}
+            </g>
           );
         })}
         {last ? <circle cx={last.x} cy={last.y} r={2.6} fill={tone} /> : null}
