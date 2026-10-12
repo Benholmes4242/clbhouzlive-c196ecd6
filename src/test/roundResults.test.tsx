@@ -38,7 +38,7 @@ describe('round results', () => {
     expect(container.querySelector('[data-round-effort="finish_six"]')?.textContent).toContain('E');
     expect(container.querySelector('[data-round-effort="finish_six"] [data-round-effort-span]')?.textContent).toBe('roundResults.spans.finish_six');
     expect(container.querySelector('[data-round-effort="front_nine"] [data-round-effort-placing]')?.getAttribute('style')).toContain('color');
-    expect(container.querySelector('[data-round-results-scope]')?.textContent).toContain('roundResults.scope.heading');
+    expect(container.querySelector('[data-round-results-scope]')?.textContent).toContain('roundResults.scope.ownHeading');
     expect(container.querySelector('[data-round-efforts-header]')?.textContent).toContain('roundResults.columns.best');
     expect(container.querySelector('[data-round-efforts-table]')?.getAttribute('style')).toContain('overflow-x: clip');
   });

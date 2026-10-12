@@ -59,7 +59,8 @@ describe('scorecard subject-aware copy', () => {
     expect(scorecard.figVsTheirAvg).toBe('vs their average');
     expect(scorecard.figHcpAtTime).toBe('HCP at the time');
     expect(scorecard.figOfRoundsSelf.replace('{{count}}', '53')).toBe('of your 53 rounds here');
-    expect(scorecard.figVsYourAvgHere).toBe('shots better than your average here');
+    // BRIEF_SCORECARD_SHEET C.2 — the sheet now reads the NEUTRAL label.
+    expect((scorecard as Record<string, string>).figVsYourAvgNeutralHere).toBe('vs your average here');
     expect(handicapFor('en').roundResults.spans.finish_six).toBe('Holes 13–18');
     expect(scorecard.beatFieldOther.replace('{{name}}', 'Richard Lawrence')).toContain(
       'Richard Lawrence beat the field average',
