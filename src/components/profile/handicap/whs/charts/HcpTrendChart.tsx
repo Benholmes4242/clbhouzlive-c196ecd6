@@ -24,6 +24,9 @@ interface Props {
    * HcpStrip passes it; IndexSection renders the zoned chart unchanged.
    */
   simplified?: boolean;
+  /** Simplified-branch tone (stroke, gradient, low mark). The chart never
+   *  decides direction itself — HcpStrip passes it. Omitted = A.IMPROVED. */
+  tone?: string;
 }
 
 // Brief values for the simplified marks (no token owns them yet).
@@ -53,6 +56,7 @@ export const HcpTrendChart: React.FC<Props> = ({
   padX = 11,
   padY = 16,
   simplified = false,
+  tone: toneProp,
 }) => {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
   const n = points.length;
@@ -163,7 +167,7 @@ export const HcpTrendChart: React.FC<Props> = ({
   };
 
   if (simplified) {
-    const tone = A.IMPROVED;
+    const tone = toneProp ?? A.IMPROVED;
     const [cx, cy] = xy[n - 1];
     return (
       <div ref={ref} style={{ width: '100%', height }} data-hcp-chart="simplified">
