@@ -391,8 +391,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const effectiveAggregate = resolvedAggregate !== undefined ? resolvedAggregate : agg;
   const communityAvg = effectiveAggregate?.avg_overall_score ?? null;
   const ratingCount = effectiveAggregate?.review_count ?? 0;
+  const canCompareCourse = ratingCount >= REVIEW_SHEET_COMPARE_MIN;
   const showReference =
-    rating != null && communityAvg != null && ratingCount >= 3;
+    rating != null && communityAvg != null && canCompareCourse;
   const ratingColor = courseSubScoreTone(rating);
 
   // MEDIA (§3c) — prop when a caller has it, otherwise a lazy read.
@@ -450,24 +451,41 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   );
 
 
+  /* §S.2 — all four columns whenever any category was scored; a skipped one
+     keeps an em dash and draws no track. The tick is the course's average for
+     THAT category, gated on the same threshold as the strip. */
   const breakdownEntries = useMemo(() => {
     if (!effectiveBreakdown) return [];
-    return BREAKDOWN_KEYS.flatMap((k) => {
-      const v = effectiveBreakdown[k];
-      return v == null || Number.isNaN(v)
-        ? []
-        : [{ key: k, label: BREAKDOWN_LABELS[k], value: v }];
+    const any = BREAKDOWN_KEYS.some((k) => effectiveBreakdown[k] != null && !Number.isNaN(effectiveBreakdown[k] as number));
+    if (!any) return [];
+    return BREAKDOWN_KEYS.map((k) => {
+      const raw = effectiveBreakdown[k];
+      const value = raw == null || Number.isNaN(raw) ? null : raw;
+      const avgRaw = effectiveAggregate?.[CATEGORY_AVG_FIELD[k]];
+      const courseAvg = value != null && canCompareCourse && avgRaw != null && Number.isFinite(Number(avgRaw))
+        ? Number(avgRaw)
+        : null;
+      return { key: k, label: BREAKDOWN_LABELS[k], value, courseAvg };
     });
-  }, [effectiveBreakdown]);
+  }, [effectiveBreakdown, effectiveAggregate, canCompareCourse]);
+  const anyTick = breakdownEntries.some((e) => e.courseAvg != null);
 
-  const relMonths = relativeMonths(reviewDate ?? effectiveStats?.memberSince ?? null);
-  const handicapSeg =
-    (effectiveStats as any)?.handicap != null
-      ? `handicap ${(effectiveStats as any).handicap}`
-      : effectiveStats?.averageRating != null && (effectiveStats?.coursesRated ?? 0) >= 3
-      ? `avg ${effectiveStats.averageRating.toFixed(1)}`
-      : null;
-  const metaSeg = [relMonths, handicapSeg].filter(Boolean).join(' · ');
+  const metaSeg = playedAgo(reviewDate);
+
+  /* §S.1 — THE CALIBRATION STRIP. Two figures, never coloured. */
+  const reviewerAvg = effectiveStats?.averageRating ?? null;
+  const firstName = user.name.trim().split(/\s+/)[0] || user.name;
+  const ownFigure = rating != null && reviewerAvg != null ? formatDeviation(rating - reviewerAvg) : null;
+  const courseFigure = showReference && communityAvg != null ? formatDeviation(rating - communityAvg) : null;
+  const ownSub = reviewerAvg != null
+    ? `${firstName} rates ${reviewerAvg.toFixed(1)}`
+    : 'Too few reviews to average';
+  const courseSub = courseFigure != null
+    ? `${ratingCount} ratings, ${communityAvg!.toFixed(1)} average`
+    : ratingCount <= 1
+      ? 'First rating here'
+      : `${ratingCount} ratings so far`;
+  const showStrip = ownFigure != null || courseFigure != null;
 
   const paragraphs = useMemo(() => {
     if (!effectiveReviewText) return [];
