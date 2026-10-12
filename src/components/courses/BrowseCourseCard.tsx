@@ -5,6 +5,7 @@ import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImage
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { SubScoreStack } from '@/features/courses/_shared/scoreBands';
 import type { StatBrowseRow } from './useStatBrowse';
+import { courseRankLabels, type RankList } from '@/features/courses/_shared/courseRankLabels';
 import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 const PHOTO_H = 196;
@@ -13,20 +14,12 @@ const PHOTO_DIM = 'rgba(255,255,255,0.55)';
 const RANK_GLASS = 'rgba(15,23,42,0.42)';
 
 function RankBadge({ memberships }: { memberships: StatBrowseRow['memberships'] }) {
-  const labels = memberships
-    .filter((entry) => ['global', 'gb-i', 'usa', 'europe'].includes(entry.list_slug))
-    .sort((a, b) => {
-      const order = ['global', 'gb-i', 'usa', 'europe'];
-      return order.indexOf(a.list_slug) - order.indexOf(b.list_slug);
-    })
-    .map((entry) => {
-      const label = entry.list_slug === 'global'
-        ? 'world'
-        : entry.list_slug === 'gb-i'
-          ? 'GB&I'
-          : entry.list_slug.toUpperCase();
-      return `#${entry.rank} ${label}`;
-    });
+  const SLUG: Record<string, RankList> = { global: 'global', 'gb-i': 'gbi', usa: 'usa', europe: 'europe' };
+  const labels = courseRankLabels(
+    memberships
+      .filter((entry) => entry.list_slug in SLUG && entry.rank != null)
+      .map((entry) => ({ list: SLUG[entry.list_slug], rank: Number(entry.rank) })),
+  );
   if (labels.length === 0) return null;
   return (
     <div
@@ -37,7 +30,7 @@ function RankBadge({ memberships }: { memberships: StatBrowseRow['memberships'] 
         fontVariantNumeric: 'tabular-nums lining-nums', whiteSpace: 'nowrap',
       }}
     >
-      {labels.join(' | ')}
+      {labels.join(' \u00B7 ')}
     </div>
   );
 }
