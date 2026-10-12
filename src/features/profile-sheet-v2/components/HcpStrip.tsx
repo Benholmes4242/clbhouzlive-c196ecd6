@@ -42,7 +42,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
-import { handicapSentence, formatIndex } from '../sheetState';
+import { handicapSentence, formatIndex } , INDEX_DOOR_ROUTE } from '../sheetState';
 import { Door } from './sheetCardParts';
 import { A, KICKER, LABEL, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatDayMonthShortGB } from '@/i18n/format';
@@ -340,7 +340,7 @@ export const TrendCard: React.FC<{
                 : <React.Fragment key={i}>{s.text}</React.Fragment>)}
             </div>
           )}
-          <Door label="View handicap" onClick={() => onNavigate('/handicap')} />
+          <Door label="View handicap" onClick={() => onNavigate(INDEX_DOOR_ROUTE)} />
         </div>
       }
     />

@@ -39,13 +39,30 @@ export interface DeriveSheetStateInput {
   connection: SheetConnectionLike | null;
   egHandicapIndex: number | null | undefined;
   manualHandicapIndex: number | null | undefined;
+  /** The trend's current figure: the synced index's fallback when eg_handicap_index is absent. */
+  trendCurrent?: number | null;
 }
 
-/** A sync is failing when the connection carries an error, or its status says so. */
+/**
+ * EVERY FAILURE VALUE THE SYNC WRITERS SET on whs_connections.last_sync_status,
+ * matched exactly — never a pattern. Writers: sync-whs-due markFailure
+ * (auth_failed | rate_limited | transient_error | unknown_error), its unhandled
+ * catch (timeout | failed), sync-whs-one (auth_failed). Healthy values are ok,
+ * partial and null (connect-whs). A value not in this set is not failing by
+ * status; last_sync_error still marks it.
+ */
+export const FAILING_SYNC_STATUSES: ReadonlySet<string> = new Set([
+  'auth_failed', 'rate_limited', 'transient_error', 'unknown_error', 'timeout', 'failed',
+]);
+
 export function isSyncFailing(c: SheetConnectionLike): boolean {
-  if (c.last_sync_error) return true;
-  return /error|fail/i.test(c.last_sync_status ?? '');
+  if (c.last_sync_error != null) return true;
+  return c.last_sync_status != null && FAILING_SYNC_STATUSES.has(c.last_sync_status);
 }
+
+/** The two doors go to two places: rounds to the profile Rounds tab, index to handicap. */
+export const ROUNDS_DOOR_ROUTE = '/profile?tab=rounds';
+export const INDEX_DOOR_ROUTE = '/handicap';
 
 export function deriveSheetHcpState(i: DeriveSheetStateInput): SheetHcpState {
   if (i.isBusiness) return { kind: 'business' };
@@ -54,7 +71,9 @@ export function deriveSheetHcpState(i: DeriveSheetStateInput): SheetHcpState {
   // S.2(a) — the member switched this off. Nothing replaces it, not even a prompt.
   if (i.hidden) return { kind: 'hidden' };
   const r = resolveDisplayHandicap({
-    egHandicapIndex: i.egHandicapIndex,
+    // eg_handicap_index, else the trend's current figure — both are the
+    // federation's number; the resolver still makes the only choice.
+    egHandicapIndex: i.egHandicapIndex ?? i.trendCurrent ?? null,
     manualHandicapIndex: i.manualHandicapIndex,
     hasWhsConnection: !!i.connection,
   });

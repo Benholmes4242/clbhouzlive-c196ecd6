@@ -162,6 +162,7 @@ export default function ProfileSheetV2({
     connection: conn ?? null,
     egHandicapIndex: profileQ.data?.eg_handicap_index,
     manualHandicapIndex: profileQ.data?.manual_handicap_index,
+    trendCurrent: conn ? (trendQ.data as { current?: number | null } | undefined)?.current ?? null : null,
   });
   const headerLine = identityLine({
     isBusiness: currentActor.type === 'business',
