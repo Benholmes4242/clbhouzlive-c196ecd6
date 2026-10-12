@@ -16,15 +16,6 @@ import { supabase } from '@/integrations/supabase/client';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export interface RecentAuditEntry {
-  id:          string;
-  action:      string;
-  adminUserId: string;
-  targetEmail: string | null;
-  createdAt:   string;
-  details:     Record<string, unknown> | null;
-}
-
 export type EgSyncStatus = 'green' | 'amber' | 'red' | 'idle';
 
 export interface EgSyncHealth {
@@ -95,24 +86,6 @@ async function fetchEgSyncHealth(): Promise<EgSyncHealth> {
   const { data, error } = await supabase.rpc('get_eg_sync_health' as any);
   if (error) throw error;
   return data as EgSyncHealth;
-}
-
-/**
- * Retained but UNREFERENCED: it answers "what did I do", not "how is the
- * platform", so it is no longer part of useDashboard's return.
- */
-async function fetchRecentAudit(): Promise<RecentAuditEntry[]> {
-  const { data, error } = await supabase
-    .from('admin_audit_log')
-    .select('id, action, admin_user_id, target_email, created_at, details')
-    .order('created_at', { ascending: false })
-    .limit(8);
-  if (error) throw error;
-  return (data ?? []).map(e => ({
-    id: e.id, action: e.action, adminUserId: e.admin_user_id,
-    targetEmail: e.target_email, createdAt: e.created_at,
-    details: e.details as Record<string, unknown> | null,
-  }));
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────

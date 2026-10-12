@@ -205,31 +205,6 @@ export function useOverviewMetrics() {
   });
 }
 
-// ─── ACTIVE MEMBERS: daily actives over the last 28 days ───────────────────────
-// Sourced from get_platform_activity, the same aggregation the Engagement card
-// uses. Rolling 7-day / 28-day unique unions are NOT derivable from a per-day
-// trend, so those lines were removed rather than approximated — see the report.
-
-export interface ActivePoint { date: string; d1: number }
-
-async function fetchActiveMembers28d(): Promise<ActivePoint[]> {
-  const { data, error } = await supabase.rpc('get_platform_activity', { p_days: 28 });
-  if (error) throw error;
-  const activity = Array.isArray(data) ? data[0] : undefined;
-  const trend = Array.isArray(activity?.trend) ? (activity!.trend as unknown as TrendPoint[]) : [];
-  return trend.map(p => ({ date: p.date, d1: p.value }));
-}
-
-
-export function useActiveMembers28d() {
-  return useQuery({
-    queryKey: ['admin-v2', 'overview', 'active-members-28d'],
-    queryFn: fetchActiveMembers28d,
-    staleTime: 5 * 60_000,
-    refetchInterval: 10 * 60_000,
-  });
-}
-
 // Delta helper.
 // Returns null when there is no comparable previous period: a previous of 0
 // has no percentage change, and returning 100 made "from nothing" and a
