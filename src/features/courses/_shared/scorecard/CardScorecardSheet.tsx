@@ -40,10 +40,10 @@ import {
  * the values are the ones that were here; nothing about them moved.
  */
 import {
-  CAPTION, EVEN_GRAY, LABEL, LABEL_READ, RAIL_FIG,
+  CAPTION, LABEL, LABEL_READ, RAIL_FIG,
   NohbhMiddle, Nine, NotPlayedLine, RoundSummaryHead, ScorecardSection,
   SkeletonMiddle, SyncingMiddle, UnavailableMiddle,
-  fmtRel, nineSummary, toParColor,
+  fmtRel, nineSummary,
 } from './scorecardParts';
 
 
