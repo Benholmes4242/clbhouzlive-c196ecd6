@@ -27,6 +27,8 @@ export interface UnmatchedCourseRow {
   first_seen_at: string;
   last_attempt_at: string;
   status: UnmatchedCourseStatus;
+  /** When the row left triage (linked / ignored / needs_catalogue decision). */
+  resolved_at: string | null;
 }
 
 export const UNMATCHED_COURSES_KEY = ['admin-unmatched-courses'] as const;
@@ -43,7 +45,7 @@ export async function fetchUnmatchedCourses(
   const { data, error } = await sb
     .from('whs_unmatched_courses')
     .select(
-      'whs_course_id, whs_course_name, round_count, member_count, last_tier_tried, echo_suggestion, first_seen_at, last_attempt_at, status',
+      'whs_course_id, whs_course_name, round_count, member_count, last_tier_tried, echo_suggestion, first_seen_at, last_attempt_at, status, resolved_at',
     )
     .in('status', statuses)
     .order('round_count', { ascending: false })
@@ -73,6 +75,7 @@ export async function fetchUnmatchedCourses(
     first_seen_at: r.first_seen_at,
     last_attempt_at: r.last_attempt_at,
     status: r.status as UnmatchedCourseStatus,
+    resolved_at: r.resolved_at ?? null,
   }));
 }
 
@@ -86,12 +89,14 @@ export function useUnmatchedCourses(
   });
 }
 
-// Link the WHS course to a golf_courses row. The DB trigger clears the queue
-// row and re-enqueues that course's rounds - never invoke a gam-* function
-// from the client.
+// Link the WHS course to a golf_courses row, then close its queue row here.
+// The map's requeue trigger re-enqueues that course's rounds - never invoke a
+// gam-* function from the client. This is the ONE write path for a link: the
+// Inbox and the Course matching workbench both call it.
 export async function linkUnmatchedCourse(
   whsCourseId: string,
   golfCourseId: string,
+  notes?: string | null,
 ): Promise<void> {
   const { data: userRes } = await supabase.auth.getUser();
   const uid = userRes.user?.id ?? null;
@@ -102,6 +107,7 @@ export async function linkUnmatchedCourse(
     match_confidence: 1.0,
     reviewed_at: new Date().toISOString(),
     reviewed_by: uid,
+    ...(notes !== undefined ? { notes: notes?.trim() || null } : {}),
   };
 
   // Most unmatched courses already have a null-mapping row: UPDATE it in place
@@ -113,12 +119,18 @@ export async function linkUnmatchedCourse(
     .eq('whs_course_id', whsCourseId)
     .select('whs_course_id');
   if (updateError) throw updateError;
-  if (updated && updated.length > 0) return;
+  if (!updated || updated.length === 0) {
+    const { error: insertError } = await sb
+      .from('whs_to_golf_course_map')
+      .insert({ whs_course_id: whsCourseId, ...payload });
+    if (insertError) throw insertError;
+  }
 
-  const { error: insertError } = await sb
-    .from('whs_to_golf_course_map')
-    .insert({ whs_course_id: whsCourseId, ...payload });
-  if (insertError) throw insertError;
+  const { error: queueError } = await sb
+    .from('whs_unmatched_courses')
+    .update({ status: 'resolved', resolved_at: new Date().toISOString() })
+    .eq('whs_course_id', whsCourseId);
+  if (queueError) throw queueError;
 }
 
 /**
@@ -129,7 +141,7 @@ export async function linkUnmatchedCourse(
 export async function markUnmatchedNeedsCatalogue(whsCourseId: string): Promise<void> {
   const { error } = await sb
     .from('whs_unmatched_courses')
-    .update({ status: 'needs_catalogue' })
+    .update({ status: 'needs_catalogue', resolved_at: new Date().toISOString() })
     .eq('whs_course_id', whsCourseId);
   if (error) throw error;
 }
@@ -137,7 +149,7 @@ export async function markUnmatchedNeedsCatalogue(whsCourseId: string): Promise<
 export async function ignoreUnmatchedCourse(whsCourseId: string): Promise<void> {
   const { error } = await sb
     .from('whs_unmatched_courses')
-    .update({ status: 'ignored' })
+    .update({ status: 'ignored', resolved_at: new Date().toISOString() })
     .eq('whs_course_id', whsCourseId);
   if (error) throw error;
 }

@@ -271,7 +271,7 @@ function DoNow({ data, loading, failed }: CCProps) {
   const firstQuiet = d?.gone_quiet.names[0]?.user_id;
 
   const rows = d ? [
-    { count: d.stuck_rounds.rounds, color: t.dangerText, label: 'Rounds stuck · unmatched course', sub: plural(d.stuck_rounds.members, 'member'), age: d.stuck_rounds.oldest_days, button: 'MATCH', filled: true, to: '/admin-v2/inbox?queue=unmatched' },
+    { count: d.stuck_rounds.rounds, color: t.dangerText, label: 'Rounds stuck · unmatched course', sub: plural(d.stuck_rounds.members, 'member'), age: d.stuck_rounds.oldest_days, button: 'MATCH', filled: true, to: '/admin-v2/inbox?type=unmatchedCourse' },
     // No bulk-message composer exists in admin; NUDGE opens the not-connected member list.
     { count: d.played_not_connected.members, color: t.warnText, label: 'Played, not connected', sub: 'this week', age: d.played_not_connected.oldest_days, button: 'NUDGE', filled: false, to: '/admin-v2/users?filter=not_connected' },
     // No "quiet" member filter exists; DM opens the longest-silent member.

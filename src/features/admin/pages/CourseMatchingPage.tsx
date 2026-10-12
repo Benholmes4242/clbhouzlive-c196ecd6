@@ -648,20 +648,12 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
     setBusy(true);
     setWriteErr(null);
 
-    const { data: userRes } = await supabase.auth.getUser();
-    const uid = userRes.user?.id ?? null;
-
-    const { error } = await supabase
-      .from('whs_to_golf_course_map')
-      .update({
-        golf_course_id: chosen.id,
-        match_method: 'manual_admin',
-        match_confidence: 1.0,
-        reviewed_at: new Date().toISOString(),
-        reviewed_by: uid,
-        notes: notes.trim() || null,
-      })
-      .eq('whs_course_id', row.whs_course_id);
+    let error: { message?: string } | null = null;
+    try {
+      await linkUnmatchedCourse(row.whs_course_id, chosen.id, notes);
+    } catch (e) {
+      error = e as { message?: string };
+    }
 
     setBusy(false);
     setConfirming(false);

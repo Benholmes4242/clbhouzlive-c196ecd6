@@ -48,10 +48,6 @@ export default function ContentPage() {
   const [params, setParams] = useSearchParams();
   
 
-  // Legacy redirect: ?tab=course-requests -> Inbox
-  if (params.get('tab') === 'course-requests') {
-    return <Navigate to="/admin-v2/inbox?type=courseRequest" replace />;
-  }
 
   const requested = (params.get('tab') as TabId) || 'courses';
   const isAllowed = (id: TabId): boolean => {
