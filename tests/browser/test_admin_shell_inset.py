@@ -21,8 +21,8 @@ import RefreshRuntime from '/@react-refresh';
 RefreshRuntime.injectIntoGlobalHook(window);window.$RefreshReg$=()=>{{}};window.$RefreshSig$=()=>type=>type;
 import React from '{react}';import ReactDOM from '{dom}';const {{createRoot}}=ReactDOM;
 import {{MemoryRouter,Routes,Route,useNavigate,useLocation}} from '{router}';
-import AdminShell from '/src/features/admin/AdminShell.tsx';
-import {{applyRouteChrome}} from '/src/lib/routeChrome.ts';import '/src/index.css';
+const {{default:AdminShell}}=await import('/src/features/admin/AdminShell.tsx');
+const {{applyRouteChrome}}=await import('/src/lib/routeChrome.ts');await import('/src/index.css');
 function App() {{const nav=useNavigate();const loc=useLocation();window.go=nav;
 React.useLayoutEffect(()=>applyRouteChrome(loc.pathname,true),[loc.pathname]);
 return React.createElement('div',{{className:'app-shell'}},React.createElement(Routes,null,
