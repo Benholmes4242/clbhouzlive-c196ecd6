@@ -17,7 +17,18 @@ interface Props {
   padX?: number;
   /** Vertical padding. */
   padY?: number;
+  /**
+   * PROFILE_SHEET_V3 C — the sheet's signed-off treatment: ONE line in
+   * A.IMPROVED (a movement colour, never A.GREEN), gradient beneath, EXACTLY
+   * three marks (high ring, low dot, current white) and NO plot labels. Only
+   * HcpStrip passes it; IndexSection renders the zoned chart unchanged.
+   */
+  simplified?: boolean;
 }
+
+// Brief values for the simplified marks (no token owns them yet).
+const HIGH_RING = 'rgba(248,250,252,0.5)';
+const CURRENT_MARK = '#FFFFFF';
 
 const AMBER = A.AMBER;
 
@@ -41,6 +52,7 @@ export const HcpTrendChart: React.FC<Props> = ({
   width: widthProp,
   padX = 11,
   padY = 16,
+  simplified = false,
 }) => {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
   const n = points.length;
@@ -149,6 +161,35 @@ export const HcpTrendChart: React.FC<Props> = ({
       </g>
     );
   };
+
+  if (simplified) {
+    const tone = A.IMPROVED;
+    const [cx, cy] = xy[n - 1];
+    return (
+      <div ref={ref} style={{ width: '100%', height }} data-hcp-chart="simplified">
+        <svg width={width} height={height} style={{ display: 'block', overflow: 'visible' }}>
+          <defs>
+            <linearGradient id={`hcp-trend-fill-${uid}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={tone} stopOpacity={0.42} />
+              <stop offset="100%" stopColor={tone} stopOpacity={0.03} />
+            </linearGradient>
+          </defs>
+          <path d={area} fill={`url(#hcp-trend-fill-${uid})`} />
+          <path d={line} fill="none" stroke={tone} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
+          {showCrosshair && (
+            <line x1={mx} y1={0} x2={mx} y2={height} stroke={CURRENT_MARK} strokeOpacity={0.85} strokeWidth={2} />
+          )}
+          {worstIdx >= 0 && (
+            <circle data-mark="high" cx={xy[worstIdx][0]} cy={xy[worstIdx][1]} r={3.2} fill={A.PANEL} stroke={HIGH_RING} strokeWidth={1.6} />
+          )}
+          {bestIdx >= 0 && (
+            <circle data-mark="low" cx={xy[bestIdx][0]} cy={xy[bestIdx][1]} r={3.4} fill={tone} stroke={A.PANEL} strokeWidth={1.6} />
+          )}
+          <circle data-mark="current" cx={showCrosshair ? mx : cx} cy={showCrosshair ? my : cy} r={4} fill={CURRENT_MARK} stroke={A.PANEL} strokeWidth={1.8} />
+        </svg>
+      </div>
+    );
+  }
 
   return (
     <div ref={ref} style={{ width: '100%', height }}>
