@@ -22,6 +22,14 @@ export const USE_VIDEO_PROGRESS_SYNC_V1 = true;
  */
 export const WATCH_SURFACE = true;
 
+/**
+ * Tour/Amateur news slides in the Clubhouse feed.
+ * OFF = the Clubhouse feed is social posts only. Tour and Amateur news still
+ * have their own surfaces and are unaffected. Flip to true to restore the
+ * one-slide-every-six-posts injection.
+ */
+export const CLUBHOUSE_WIRE_STORIES = false;
+
 
 
 /**

@@ -41,6 +41,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import type { FeaturedTrigger } from '@/components/feed/featuredRoundTrigger';
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { CLUBHOUSE_WIRE_STORIES } from '@/config/featureFlags';
 import { useTourStories } from '@/features/tourhub/news/useTourStories';
 import { useAmateurStories } from '@/features/amateur/news/useAmateurStories';
 import { injectWireStories } from '@/components/feed/injectWireStories';
@@ -203,10 +204,10 @@ const ClubhouseContent = () => {
   // Ranked posts remain social-only; Wire stories are injected client-side
   // below and never enter the RPC or ranking pipeline.
   const activeFeed = useSuggestedFeed(user?.id);
-  const wireQuery = useTourStories(null);
+  const wireQuery = useTourStories(null, CLUBHOUSE_WIRE_STORIES);
   // Same hook and query key ('amateur-stories','list') the news surfaces use, so
   // the feed shares their cache and costs no extra fetch.
-  const amateurQuery = useAmateurStories(null);
+  const amateurQuery = useAmateurStories(null, CLUBHOUSE_WIRE_STORIES);
 
   /**
    * Batch-idiom scope for this surface (src/lib/queryKeys.ts). What the list
@@ -217,9 +218,11 @@ const ClubhouseContent = () => {
   const posts = activeFeed.posts;
   // Reversible editorial injection: remove this one call and pass `posts`
   // directly to CardFeed to restore a social-only Clubhouse feed.
+  // CLUBHOUSE_WIRE_STORIES off: feedItems is undefined and CardFeed takes its
+  // posts-only path; the injection machinery stays intact for a flip back.
   const feedItems = useMemo(
     () =>
-      injectWireStories(
+      !CLUBHOUSE_WIRE_STORIES ? undefined : injectWireStories(
         posts,
         wireQuery.isError ? [] : wireQuery.stories,
         amateurQuery.isError ? [] : amateurQuery.stories,
@@ -619,7 +622,7 @@ const ClubhouseContent = () => {
             <CardFeed
               key={`${FEED_TAB}:${feedResetKey}`}
               tab={FEED_TAB}
-               initialState={safeInitialState(virtuosoSnapshots.current[FEED_TAB], feedItems.length)}
+               initialState={safeInitialState(virtuosoSnapshots.current[FEED_TAB], feedItems?.length ?? posts.length)}
               onSnapshot={(s) => { virtuosoSnapshots.current[FEED_TAB] = s; }}
               posts={posts}
                feedItems={feedItems}

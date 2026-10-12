@@ -45,9 +45,10 @@ function nowIso() {
  * would make the "all tours" and "null slug" cases two different queries over
  * the same 30 rows.
  */
-export function useTourStories(tourSlug: string | null) {
+export function useTourStories(tourSlug: string | null, enabled = true) {
   const q = useQuery({
     queryKey: ['tour-stories', 'list'],
+    enabled,
     staleTime: 5 * 60_000,
     queryFn: async (): Promise<TourStory[]> => {
       const { data, error } = await supabase
