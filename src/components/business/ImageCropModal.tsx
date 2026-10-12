@@ -53,6 +53,11 @@ async function getCroppedImg(
   const outputHeight = scale < 1 ? Math.round(safeHeight * scale) : safeHeight;
   canvas.width = outputWidth;
   canvas.height = outputHeight;
+  if (scale < 1) {
+    // Browser default is 'low', which aliases at the cap's downscale factors.
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+  }
 
   // Draw the cropped portion of the image onto the canvas
   // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)

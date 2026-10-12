@@ -67,6 +67,9 @@ const getCroppedImg = async (
     outputCanvas.height = Math.round(pixelCrop.height * scale);
     const outputCtx = outputCanvas.getContext('2d');
     if (!outputCtx) throw new Error('No 2d context');
+    // Browser default is 'low', which aliases at the cap's downscale factors.
+    outputCtx.imageSmoothingEnabled = true;
+    outputCtx.imageSmoothingQuality = 'high';
     outputCtx.drawImage(
       canvas,
       pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height,
