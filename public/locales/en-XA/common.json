@@ -909,7 +909,18 @@
     "like": "[~~Ļíǩé~~]",
     "unlike": "[~~Úñļíǩé~~]",
     "more": "[~~Ṁőřé~~]",
-    "sheetTitle": "[~~Ĉőɱɱéñţš~~]"
+    "sheetTitle": "[~~Ĉőɱɱéñţš~~]",
+    "hiddenCount_one": "[~~{{count}} ĉőɱɱéñţ ĥíďďéñ~~]",
+    "hiddenCount_other": "[~~{{count}} ĉőɱɱéñţš ĥíďďéñ~~]",
+    "hiddenLine_one": "[~~Ýőű'vé ĥíďďéñ őř ƀłőĉķéď ŵĥőévéř ŵřőţé íţ.~~]",
+    "hiddenLine_other": "[~~Ýőű'vé ĥíďďéñ őř ƀłőĉķéď ţĥé ƥéőƥłé ŵĥő ŵřőţé ţĥéɱ.~~]",
+    "emptyLineTo": "[~~Ɓé ţĥé ƒířšţ ţő šáý šőɱéţĥíñĝ ţő <b>{{name}}</b>.~~]",
+    "contextLevel": "[~~Łévéł~~]",
+    "standingRecord": "[~~Ĉőűřšé řéĉőřď ĥéřé · {{value}}~~]",
+    "standingTopTen": "[~~Ţőƥ ţéñ ĥéřé~~]",
+    "standingPlayed_one": "[~~Ƥłáýéď ĥéřé {{count}} ţíɱé~~]",
+    "standingPlayed_other": "[~~Ƥłáýéď ĥéřé {{count}} ţíɱéš~~]",
+    "standingFirst": "[~~Ƒířšţ řőűñď ĥéřé~~]"
   },
   "suggestedGolfers": {
     "heading": "[~~Ĝőļƒéřš ţő ƒőļļőŵ~~]",

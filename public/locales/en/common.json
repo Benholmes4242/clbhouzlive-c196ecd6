@@ -933,7 +933,18 @@
     "like": "Like",
     "unlike": "Unlike",
     "more": "More",
-    "sheetTitle": "Comments"
+    "sheetTitle": "Comments",
+    "hiddenCount_one": "{{count}} comment hidden",
+    "hiddenCount_other": "{{count}} comments hidden",
+    "hiddenLine_one": "You've hidden or blocked whoever wrote it.",
+    "hiddenLine_other": "You've hidden or blocked the people who wrote them.",
+    "emptyLineTo": "Be the first to say something to <b>{{name}}</b>.",
+    "contextLevel": "Level",
+    "standingRecord": "Course record here · {{value}}",
+    "standingTopTen": "Top ten here",
+    "standingPlayed_one": "Played here {{count}} time",
+    "standingPlayed_other": "Played here {{count}} times",
+    "standingFirst": "First round here"
   },
   "suggestedGolfers": {
     "heading": "Golfers to follow",
