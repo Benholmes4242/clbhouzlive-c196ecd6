@@ -83,7 +83,7 @@ async function fetchTodayGlance(): Promise<TodayGlance> {
 }
 
 async function fetchEgSyncHealth(): Promise<EgSyncHealth> {
-  const { data, error } = await supabase.rpc('get_eg_sync_health' as any);
+  const { data, error } = await supabase.rpc('get_eg_sync_health' as never);
   if (error) throw error;
   return data as EgSyncHealth;
 }
