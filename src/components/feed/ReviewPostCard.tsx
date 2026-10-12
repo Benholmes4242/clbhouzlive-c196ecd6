@@ -24,7 +24,7 @@ import { formatRatingValue } from '@/utils/formatters';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 import { formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { fmtHcp } from '@/lib/whs/format';
-import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, againstCourse, joinClauses } from './reviewPostCard';
+import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, againstCourse, joinClauses } from './reviewPostCard';
 
 const GUTTER = 14;
 const BODY_SIZE = 13.5;
@@ -244,7 +244,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
             data-review-body
             style={{
               fontSize: BODY_SIZE, lineHeight: BODY_LINE, color: A.INK,
-              display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+              ...REVIEW_BODY_CLAMP,
             }}
           >
             <span aria-hidden style={{ float: 'right', height: `calc(100% - ${BODY_SIZE * BODY_LINE}px)` }} />

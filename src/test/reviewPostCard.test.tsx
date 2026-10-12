@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { REVIEW_CARD_MAX_HEIGHT, againstCourse, joinClauses } from '@/components/feed/reviewPostCard';
+import { REVIEW_BODY_CLAMP, REVIEW_CARD_MAX_HEIGHT, againstCourse, joinClauses } from '@/components/feed/reviewPostCard';
 
 const aggregate = { current: null as Record<string, number> | null };
 vi.mock('@/hooks/useCourseRatingAggregates', () => ({
@@ -83,7 +83,9 @@ describe('review post — body clamp', () => {
     const c = card(8, all, 'A long review. '.repeat(40));
     const body = c.querySelector('[data-review-body]') as HTMLElement;
     const wrap = c.querySelector('[data-review-body-wrap]') as HTMLElement;
-    expect(body.getAttribute('style') ?? '').toMatch(/line-clamp: 2/);
+    expect(REVIEW_BODY_CLAMP.WebkitLineClamp).toBe(2);
+    expect(REVIEW_BODY_CLAMP).not.toHaveProperty('padding');
+    expect(REVIEW_BODY_CLAMP).not.toHaveProperty('paddingBottom');
     expect(body.style.overflow).toBe('hidden');
     expect(body.style.padding).toBe('');
     expect(wrap.style.padding).toBe('0px 14px 12px');

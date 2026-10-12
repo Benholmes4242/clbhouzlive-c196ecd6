@@ -51,3 +51,11 @@ export function againstCourse(
   const direction: AgainstDirection = r < a ? 'below' : r > a ? 'above' : 'inLine';
   return { direction, avg: a / 10, count: Number(reviewCount) };
 }
+
+/** E — the body clamp. No padding of its own: the wrapper owns it (E.2). */
+export const REVIEW_BODY_CLAMP = {
+  display: '-webkit-box',
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: 'vertical',
+  overflow: 'hidden',
+} as const;
