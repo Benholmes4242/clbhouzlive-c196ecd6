@@ -6,6 +6,7 @@ import { HcpTrendChart } from '@/components/profile/handicap/whs/charts/HcpTrend
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 beforeAll(() => {
+  Object.defineProperty(HTMLElement.prototype, 'clientWidth', { configurable: true, get: () => 300 });
   (globalThis as any).ResizeObserver = class {
     cb: any; constructor(cb: any) { this.cb = cb; }
     observe(el: any) { this.cb([{ contentRect: { width: 300 }, target: el }]); }
