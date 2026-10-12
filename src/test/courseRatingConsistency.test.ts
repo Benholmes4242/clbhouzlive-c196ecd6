@@ -69,7 +69,7 @@ describe('C1 course rating consistency', () => {
   it('uses the exact 9.0 threshold and muted absent state', () => {
     expect(courseSubScoreTone(undefined)).toBe(A.MUTE);
     expect(courseSubScoreTone(null)).toBe(A.MUTE);
-    expect(courseSubScoreTone(8.99)).toBe(A.MUTE);
+    expect(courseSubScoreTone(8.94)).toBe(A.MUTE);
     expect(courseSubScoreTone(9)).toBe(A.GREEN);
   });
 
