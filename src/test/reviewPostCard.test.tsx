@@ -27,7 +27,7 @@ function makePost(rating: number, breakdown: Record<string, number | null>, text
 }
 const tree = (post: never, coursesReviewed: number | null = null, extraProps: Record<string, unknown> = {}) => (
   <MemoryRouter><QueryClientProvider client={new QueryClient()}>
-    <ReviewPostCard post={post} articleRef={() => {}} surface={A.PANEL} onProfile={vi.fn()} onReadReview={vi.fn()} onPrefetch={vi.fn()} coursesReviewed={coursesReviewed} footer={null} {...extraProps} />
+    <ReviewPostCard post={post} articleRef={() => {}} onProfile={vi.fn()} onReadReview={vi.fn()} onPrefetch={vi.fn()} coursesReviewed={coursesReviewed} footer={null} {...extraProps} />
   </QueryClientProvider></MemoryRouter>
 );
 function card(rating: number, breakdown: Record<string, number | null>, text = 'Words', extra: Record<string, unknown> = {}) {
