@@ -12,28 +12,47 @@ export type Standing =
   | { kind: 'first' };
 
 /**
- * HELD until Ben confirms that `attempts` on the round_gross row of
- * gam_member_unit_bests is rounds played at that course (brief G.4, "verify
- * before shipping the number"). It could not be checked from here, so tiers 3
- * and 4 render nothing rather than a plausible wrong figure. Flip to true once
- * confirmed; the read and the copy are already wired.
+ * ROUNDS PLAYED COMES FROM get_course_familiarity (gam_round_stats) ONLY.
+ * gam_member_unit_bests.attempts counts rounds that produced a unit and reads
+ * 1-5% short of the true count — never use it for a rounds figure.
  */
-export const ATTEMPTS_VERIFIED = false;
-
 export interface LegendHit { rank: number; value: number }
 
 export function standingFor(
   legend: LegendHit | undefined,
-  attempts: number | undefined,
-  attemptsVerified: boolean = ATTEMPTS_VERIFIED,
+  rounds: number | undefined,
 ): Standing | null {
   if (legend && legend.rank === 1) return { kind: 'record', value: legend.value };
   if (legend && legend.rank >= 1 && legend.rank <= 10) return { kind: 'top_ten' };
-  if (attemptsVerified && attempts != null) {
-    if (attempts > 1) return { kind: 'played', n: attempts };
-    if (attempts === 1) return { kind: 'first' };
+  if (rounds != null) {
+    if (rounds > 1) return { kind: 'played', n: rounds };
+    if (rounds === 1) return { kind: 'first' };
   }
   return null;
+}
+
+/** Familiarity RPC is bounded at 50 ids per call. */
+export const FAMILIARITY_BATCH = 50;
+
+export function chunkIds(ids: string[], size = FAMILIARITY_BATCH): string[][] {
+  const out: string[][] = [];
+  for (let i = 0; i < ids.length; i += size) out.push(ids.slice(i, i + size));
+  return out;
+}
+
+/** A failed or absent familiarity read yields an empty map: the rounds tiers go silent, nothing else. */
+export function familiarityMap(
+  results: Array<{ data: unknown; error: unknown }>,
+): Map<string, number> {
+  const out = new Map<string, number>();
+  for (const res of results) {
+    if (res.error || !Array.isArray(res.data)) continue;
+    for (const r of res.data as Array<{ user_id: string; rounds: number | string | null }>) {
+      const n = r.rounds == null ? NaN : Number(r.rounds);
+      if (r.user_id && Number.isFinite(n)) out.set(r.user_id, n);
+    }
+  }
+  return out;
 }
 
 /** Personal commenters only — a business has no rounds. */

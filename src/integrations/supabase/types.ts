@@ -20172,6 +20172,13 @@ export type Database = {
           last_change_at: string
         }[]
       }
+      get_course_familiarity: {
+        Args: { p_course_id: string; p_user_ids: string[] }
+        Returns: {
+          rounds: number
+          user_id: string
+        }[]
+      }
       get_course_field_sizes: {
         Args: { p_course_ids: string[]; p_exclude_user_id: string }
         Returns: {
