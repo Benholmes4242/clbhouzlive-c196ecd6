@@ -164,7 +164,7 @@ export function NewsTabPage({
 
             {wire.length > 0 && (
               <section aria-labelledby="news-wire" style={{ marginTop: 26, borderRadius: r.md, overflow: 'hidden', background: A.PANEL, border: `1px solid ${A.BORDER}` }}>
-                <div style={{ padding: '13px 13px 0' }}><DiscoverSectionHeading id="news-wire" title="The wire" /></div>
+                <div style={{ padding: '13px 13px 0' }}><DiscoverSectionHeading id="news-wire" title="Tour news" /></div>
                 {visibleWire.map((story) => (
                   <WireItem key={story.id} story={story} onOpen={() => open(story)} />
                 ))}

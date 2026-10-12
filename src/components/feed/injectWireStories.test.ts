@@ -32,15 +32,15 @@ describe('injectWireStories', () => {
       (typeof merged)[number],
       { kind: 'wire' }
     >[];
-    expect(slides.map((s) => s.beat)).toEqual(['tour', 'amateur', 'tour', 'amateur', 'tour']);
-    expect(slides.map((s) => s.story.id)).toEqual(['t0', 'a0', 't1', 'a1', 't2']);
-    expect(slides.map((s) => s.key)).toEqual([
-      'wire:tour:t0', 'wire:amateur:a0', 'wire:tour:t1', 'wire:amateur:a1', 'wire:tour:t2',
-    ]);
+    // Each slide consumes three of its beat (lead + two), so five per beat
+    // yields two slides each.
+    expect(slides.map((s) => s.beat)).toEqual(['tour', 'amateur', 'tour', 'amateur']);
+    expect(slides.map((s) => s.story.id)).toEqual(['t0', 'a0', 't3', 'a3']);
+    expect(slides.map((s) => s.more.map((m) => m.id))).toEqual([['t1', 't2'], ['a1', 'a2'], ['t4'], ['a4']]);
   });
 
   it('falls back to the other beat rather than leaving a gap', () => {
-    const tour = Array.from({ length: 5 }, (_, i) => story(`t${i}`));
+    const tour = Array.from({ length: 15 }, (_, i) => story(`t${i}`));
     const merged = injectWireStories(posts(30), tour, [], NOW);
     const slides = merged.filter((x) => x.kind === 'wire');
     expect(slides).toHaveLength(5);
@@ -51,7 +51,7 @@ describe('injectWireStories', () => {
     const exhausted = injectWireStories(posts(30), [story('a'), story('a'), story('b')], [], NOW);
     expect(
       exhausted.filter((x) => x.kind === 'wire').map((x) => (x.kind === 'wire' ? x.story.id : '')),
-    ).toEqual(['a', 'b']);
+    ).toEqual(['a']);
     expect(exhausted.filter((x) => x.kind === 'post')).toHaveLength(30);
   });
 
@@ -69,12 +69,14 @@ describe('injectWireStories', () => {
   });
 
   it('consumes eligible stories newest first', () => {
-    const result = injectWireStories(posts(12), [
+    const result = injectWireStories(posts(6), [
       story('older', { published_at: new Date(NOW - 3 * 24 * 60 * 60 * 1000).toISOString() }),
       story('newer', { published_at: new Date(NOW - 60 * 60 * 1000).toISOString() }),
     ], [], NOW);
     expect(
       result.filter((x) => x.kind === 'wire').map((x) => (x.kind === 'wire' ? x.story.id : '')),
-    ).toEqual(['newer', 'older']);
+    ).toEqual(['newer']);
+    const slide = result.find((x) => x.kind === 'wire');
+    expect(slide && slide.kind === 'wire' ? slide.more.map((m) => m.id) : []).toEqual(['older']);
   });
 });

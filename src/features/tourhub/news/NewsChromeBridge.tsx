@@ -17,7 +17,7 @@ import { useLogout } from '@/hooks/useLogout';
 import { TourSideMenu } from '../components/TourSideMenu';
 
 interface NewsChromeBridgeProps {
-  label: 'The Wire' | 'Amateur News';
+  label: 'Tour News' | 'Amateur News';
   mode: 'menu' | 'back';
   backFallback: string;
 }
