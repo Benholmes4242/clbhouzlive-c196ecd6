@@ -13,7 +13,6 @@ import {
 } from '../components/CountryMismatchWarning';
 import { adminTheme as t } from '../theme';
 import { useInboxFeed, type InboxItem, type InboxType } from '../hooks/useInboxFeed';
-import { useInboxOpsStats, formatDurationShort as formatDurationMs } from '../hooks/useInboxOpsStats';
 // Seconds in. The Dashboard's System panel uses this exact formatter, so an age
 // reads identically on both surfaces.
 import { formatDurationShort } from '../lib/chartPrimitives';
@@ -30,6 +29,11 @@ import type { HolePhotoQueueRow } from '../hooks/useHolePhotoQueue';
 import CourseMatchingPage from './CourseMatchingPage';
 import VenueMappingPage from './VenueMappingPage';
 import AddCourseSheet from '../components/AddCourseSheet';
+import InboxQueueRow from '../components/InboxQueueRow';
+import { OpenDoneControl, FigureTiles, QueueChips, RowSkeleton, FlowPanel, ToolRow, useCatalogueTotal } from '../components/InboxPanels';
+import { useInboxFlow } from '../hooks/useInboxFlow';
+import { orderOpenItems, summariseQueues } from '../lib/inboxQueue';
+import { LIST_PANEL } from '../lib/panels';
 import CourseSearchField, { useCourseSearch, type CourseSearchHit } from '../components/CourseSearchField';
 import { uploadCoursePhoto } from '../hooks/useCourses';
 import { usePanelRole } from '@/hooks/usePanelRole';
@@ -133,6 +137,16 @@ function InboxListPage() {
   const feed = useInboxFeed();
   const qc = useQueryClient();
   const workbenchCount = useWorkbenchCount(canUsers);
+  const flow14 = useInboxFlow(14);
+  const flow7 = useInboxFlow(7);
+  const catalogueTotal = useCatalogueTotal(canUsers);
+
+  // Rows removed by an inline action leave at once; the refetch confirms.
+  const [removed, setRemoved] = useState<Set<string>>(() => new Set());
+  const onResolved = (id: string) => {
+    setRemoved(prev => new Set(prev).add(id));
+    void refreshAdminQueues(qc);
+  };
 
   // Refresh — manual refresh, plus queue changes made in another admin tab.
   useEffect(() => {
@@ -160,7 +174,7 @@ function InboxListPage() {
   useEffect(() => {
     const ticketId = params.get('ticket');
     if (!ticketId) return;
-    const item = [...feed.items, ...feed.doneItems].find(i => i.type === 'support' && (i.payload as any)?.id === ticketId);
+    const item = [...feed.items, ...feed.doneItems].find(i => i.type === 'support' && (i.payload as SupportTicketRow | undefined)?.id === ticketId);
     if (item) setSupportRow(item.payload as SupportTicketRow);
   }, [params, feed.items, feed.doneItems]);
 
@@ -184,24 +198,16 @@ function InboxListPage() {
     return out;
   }, [canMod, canUsers, canApprove]);
 
-  const openItems = feed.items;
+  const openItems = useMemo(
+    () => orderOpenItems(feed.items.filter(i => !removed.has(i.id))),
+    [feed.items, removed],
+  );
   const doneItems = feed.doneItems;
+  const queues = useMemo(() => summariseQueues(openItems), [openItems]);
   const source = view === 'done' ? doneItems : openItems;
   const filtered = typeFilter === 'all' ? source : source.filter(i => i.type === typeFilter);
-
   const openCount = openItems.length;
-  const oldest = feed.oldestCreatedAt;
-
-  // Oldest OPEN item per queue. The feed sorts high-priority to the top, so the
-  // first row of a type is not necessarily its oldest - take the minimum.
-  const oldestByType = useMemo(() => {
-    const out: Partial<Record<InboxType, string>> = {};
-    for (const item of openItems) {
-      const held = out[item.type];
-      if (!held || new Date(item.createdAt) < new Date(held)) out[item.type] = item.createdAt;
-    }
-    return out;
-  }, [openItems]);
+  const loading = feed.isLoading && feed.items.length === 0;
 
   const openRow = (item: InboxItem) => {
     switch (item.type) {
@@ -235,26 +241,10 @@ function InboxListPage() {
 
   return (
     <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 720, margin: '0 auto' }}>
-      {/* Header — the shell already renders ADMIN / Inbox; only the summary lives here. */}
-      <header style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {openCount > 0 && (
-          <div
-            style={{
-              color: t.inkMuted, fontSize: 13,
-              fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            <span style={{ color: t.ink, fontWeight: 700 }}>{openCount}</span> open
-            {oldest && (
-              <>
-                {' - longest '}
-                <span style={{ color: ageColour(oldest), fontWeight: 700 }}>{ageShort(oldest)}</span>
-              </>
-            )}
-          </div>
-        )}
-        {view === 'open' && <InboxOpsStrip doneItems={feed.doneItems} />}
-      </header>
+      {/* 2.1 - the page's first row is the Open/Done control, nothing else. */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <OpenDoneControl view={view} openCount={openCount} onChange={setView} />
+      </div>
 
       {feed.hadErrors && (
         <div
@@ -263,7 +253,6 @@ function InboxListPage() {
             display: 'flex', alignItems: 'center', gap: 8,
             padding: '8px 12px', borderRadius: t.radius.md,
             background: t.warnSoft, color: t.warnText,
-            border: `1px solid ${t.warnText}22`,
             fontSize: 12, fontWeight: 600,
           }}
         >
@@ -271,157 +260,85 @@ function InboxListPage() {
         </div>
       )}
 
-      {/* Open/Done toggle */}
-      <div
-        style={{
-          display: 'inline-flex', alignSelf: 'flex-start',
-          background: t.canvas, border: `1px solid ${t.line}`, borderRadius: 999, padding: 3,
-        }}
-      >
-        {(['open', 'done'] as const).map(k => {
-          const active = view === k;
-          return (
-            <button
-              key={k}
-              onClick={() => setView(k)}
-              style={{
-                padding: '6px 14px', borderRadius: 999,
-                background: active ? t.ink : 'transparent',
-                color: active ? t.surface : t.inkMuted,
-                fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer',
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-              }}
-            >
-              {k === 'open' ? 'Open' : 'Done'}
-              {k === 'open' && openCount > 0 && (
-                <span style={{
-                  background: active ? t.brand : t.line,
-                  color: active ? t.surface : t.inkMuted,
-                  fontSize: 10, fontWeight: 700, padding: '0 6px', borderRadius: 999,
-                  fontFeatureSettings: '"tnum" 1',
-                }}>{openCount}</span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+      <FigureTiles
+        view={view}
+        loading={loading}
+        openItems={openItems}
+        doneItems={doneItems}
+        queueCount={queues.length}
+        flow7={flow7.data}
+        flow7Loading={flow7.isLoading}
+      />
 
-      {/* Queue board */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${visibleTypes.length <= 4 ? 2 : 3}, minmax(0, 1fr))`,
-          gap: 8,
-        }}
-      >
-        {visibleTypes.map(tp => (
-          <QueueTile
-            key={tp}
-            label={TYPE_LABEL[tp]}
-            count={feed.counts[tp] ?? 0}
-            oldestIso={oldestByType[tp] ?? null}
-            active={typeFilter === tp}
-            onClick={() => setType(typeFilter === tp ? 'all' : tp)}
-          />
-        ))}
-      </div>
+      {view === 'open' && (
+        <QueueChips loading={loading} total={openCount} queues={queues} selected={typeFilter} onSelect={setType} />
+      )}
 
-      {/* Stream card */}
-      <section
-        style={{
-          background: t.surface, border: `1px solid ${t.line}`,
-          borderRadius: 18, boxShadow: t.shadowCard,
-          padding: 12, display: 'flex', flexDirection: 'column',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-            gap: 10, padding: '4px 4px 8px',
-          }}
-        >
-          <span style={{ ...LABEL_T, color: t.inkMuted }}>
-            {typeFilter === 'all' ? 'All queues' : TYPE_LABEL[typeFilter as InboxType]}
+      {/* 2.4 The list */}
+      <section style={{ ...LIST_PANEL, padding: '14px 0 0' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10, padding: '0 16px 10px' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.ink }}>
+            {view === 'done' ? 'Recently closed' : 'Members affected first'}
           </span>
-          <span style={{ ...LABEL_T, color: t.inkFaint }}>
-            {view === 'done' ? 'Recently closed' : 'Longest wait first'}
+          <span style={{ fontSize: 11, color: t.inkFaint }}>
+            {view === 'done' ? 'newest first' : 'then longest wait'}
           </span>
         </div>
 
-        {feed.isLoading && filtered.length === 0 ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '6px 0' }}>
-            {[0, 1, 2, 3].map(i => (
-              <div key={i} style={{
-                height: 60, background: t.canvas, borderRadius: t.radius.md,
-                animation: 'admin-pulse 1.4s ease-in-out infinite',
-              }} />
-            ))}
+        {loading ? (
+          <div aria-busy>
+            {[0, 1, 2].map(i => <RowSkeleton key={i} first={i === 0} />)}
           </div>
-        ) : filtered.length === 0 && view === 'open' && typeFilter === 'all' ? (
-          <EmptyState
-            icon={<CheckCircle2 size={28} />}
-            title="Inbox zero"
-            subtitle="Every queue is clear. New items land here the moment they arrive."
-          />
+        ) : filtered.length === 0 && view === 'open' ? (
+          <div style={{ padding: '48px 16px', textAlign: 'center', borderTop: `1px solid ${t.hairline}` }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: t.ink }}>Nothing waiting</div>
+            <div style={{ fontSize: 11.5, color: t.inkMuted, marginTop: 2 }}>
+              {typeFilter === 'all' ? 'every queue is clear' : 'this queue is clear'}
+            </div>
+          </div>
         ) : filtered.length === 0 ? (
-          <EmptyState title="Nothing here" subtitle="No items match this filter." />
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ padding: '48px 16px', textAlign: 'center', borderTop: `1px solid ${t.hairline}`, fontSize: 11.5, color: t.inkMuted }}>
+            Nothing closed yet
+          </div>
+        ) : view === 'open' ? (
+          <div style={{ borderTop: `1px solid ${t.hairline}` }}>
             {filtered.map((item, idx) => (
-              <StreamRow
+              <InboxQueueRow
                 key={item.id}
                 item={item}
                 first={idx === 0}
-                done={view === 'done'}
-                showQueue={typeFilter === 'all'}
-                onClick={() => openRow(item)}
+                onOpen={() => openRow(item)}
+                onResolved={onResolved}
+                isFullAdmin={role === 'full'}
+                catalogueTotal={catalogueTotal}
               />
             ))}
           </div>
+        ) : (
+          <div style={{ borderTop: `1px solid ${t.hairline}`, padding: '0 12px' }}>
+            {filtered.map((item, idx) => (
+              <StreamRow key={item.id} item={item} first={idx === 0} done showQueue={typeFilter === 'all'} onClick={() => openRow(item)} />
+            ))}
+          </div>
         )}
-
       </section>
 
-      {/* TOOLS */}
-      {canUsers && workbenchCount > 0 && view === 'open' && (
-        <section
-          style={{
-            background: t.surface, border: `1px solid ${t.line}`,
-            borderRadius: 18, boxShadow: t.shadowCard,
-            padding: 12, display: 'flex', flexDirection: 'column',
-          }}
-        >
-          <div style={{ ...LABEL_T, color: t.inkFaint, padding: '2px 4px 8px' }}>Tools</div>
-          <Link
+      {view === 'open' && <FlowPanel flow={flow14.data} loading={flow14.isLoading} />}
+
+      {/* 2.6 TOOLS */}
+      {canUsers && view === 'open' && (
+        <section style={{ ...LIST_PANEL, padding: '14px 0 0' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.ink, padding: '0 16px 10px' }}>Tools</div>
+          <ToolRow
             to="/admin-v2/inbox/matching"
-            style={{
-              display: 'flex', alignItems: 'center', gap: 12,
-              padding: '4px 4px',
-              textDecoration: 'none', color: t.ink,
-            }}
-          >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13.5, fontWeight: 700, color: t.ink }}>Course matching workbench</div>
-              <div style={{ fontSize: 11.5, color: t.inkMuted }}>
-                {workbenchCount} scored course{workbenchCount === 1 ? '' : 's'} unmatched
-              </div>
-            </div>
-            <ChevronRight size={16} color={t.inkFaint} />
-          </Link>
-          <Link
-            to="/admin-v2/inbox/venues"
-            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 4px 4px', textDecoration: 'none', color: t.ink }}
-          >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13.5, fontWeight: 700, color: t.ink }}>Tour venue mapping</div>
-              <div style={{ fontSize: 11.5, color: t.inkMuted }}>Link tournament venues to courses</div>
-            </div>
-            <ChevronRight size={16} color={t.inkFaint} />
-          </Link>
+            title="Course matching workbench"
+            sub={`${workbenchCount} scored course${workbenchCount === 1 ? '' : 's'} unmatched`}
+          />
+          <ToolRow to="/admin-v2/inbox/venues" title="Tour venue mapping" sub="Link tournament venues to courses" />
         </section>
       )}
 
-      <style>{`@keyframes admin-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }`}</style>
+      <style>{`@keyframes admin-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } } .inbox-chips::-webkit-scrollbar { display: none; }`}</style>
 
       {/* Drawers */}
       <ModerationDetailDrawer open={modRow !== null} onClose={() => setModRow(null)} row={modRow} />
