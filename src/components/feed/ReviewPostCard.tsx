@@ -204,9 +204,9 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
           get_course_media_v2) do NOT, per the repo's generated types. On those
           surfaces the line is absent, never wrong. Do not add a per-card read to
           close the gap; it is a projection change on those reads (Ben's call).
-          Row is 22px: 16px of line + 6px under. */}
+          Row is 22.7px: 16.7px of line + 6px under. */}
       {against ? (
-        <div data-review-against style={{ flex: 'none', padding: `0 ${GUTTER}px 6px`, fontSize: 11.5, lineHeight: 1.4, color: A.MUTE }}>
+        <div data-review-against style={{ flex: 'none', padding: `0 ${GUTTER}px 6px`, fontSize: 11.5, lineHeight: 1.45, color: A.MUTE }}>
           {t(`feed.reviewPost.against.${against.direction}`, {
             avg: against.avg.toLocaleString(i18n?.language, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
           })}
