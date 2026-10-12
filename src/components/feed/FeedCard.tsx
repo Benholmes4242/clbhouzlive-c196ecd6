@@ -62,6 +62,7 @@ import { crownCategoryLabel } from '@/lib/crownCategoryLabel';
 import type { PostCourseContext } from '@/hooks/feed/usePostCourseContext';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import { SLAB } from './feedSurfaces';
+import { ReviewPostCard } from './ReviewPostCard';
 import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import type { RoundMedalCounts } from '@/features/explore-magazine/useBatchRoundMedals';
@@ -97,17 +98,15 @@ const RATIO_MIN = 0.8;   // tallest allowed = 4:5 (portrait capped)
 const RATIO_MAX = 1.91;  // widest = ~cinematic landscape
 const FALLBACK_RATIO = 4 / 5;
 
-// Chrome measured on a 390x844 card. Standard: header 54.7 + caption 49.2
-// + unified band incl. actions 100.2 + hairline + 88 nav = 293, reserved at
-// 305 (12px margin). Review posts carry the tier word (absolute ghost
-// numeral + header chip, zero layout) and a THIRD clamped line of review
-// text plus the absolutely-positioned "Read review" affordance, so the only
-// real layout delta is one 14/1.4 line: measured caption block 68.8 (review,
-// 3 lines) vs 49.2 (standard, 2 lines) = 19.6 -> reserve 20.
+// NON-REVIEW POSTS ONLY. Chrome measured on a 390x844 card: header 54.7 +
+// caption 49.2 + unified band incl. actions 100.2 + hairline + 88 nav = 293,
+// reserved at 305 (12px margin). This is still a typed reserve and is a known
+// debt for the non-review path. Review posts do NOT use it: ReviewPostCard
+// sizes itself from the measured clearances (REVIEW_CARD_MAX_HEIGHT in
+// reviewPostCard.ts) and its media frame fills what is left.
 const MEDIA_CHROME_RESERVE = 305;
-const REVIEW_HEADER_EXTRA = 20;
-const mediaMaxHeight = (isReview: boolean) =>
-  `max(280px, calc(100svh - ${MEDIA_CHROME_RESERVE + (isReview ? REVIEW_HEADER_EXTRA : 0)}px - env(safe-area-inset-bottom)))`;
+const mediaMaxHeight = () =>
+  `max(280px, calc(100svh - ${MEDIA_CHROME_RESERVE}px - env(safe-area-inset-bottom)))`;
 
 
 // formatCount / timeAgo moved to @/i18n/format (Wave 1 drift-consolidation).
@@ -600,6 +599,244 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     );
   }
 
+  /* The media frame and the footer are shared by the standard card and the
+     review card, so likes, comments, sharing, the owner menu and the
+     fullscreen viewer keep one path. `fill` = the review card's frame owns
+     the size and the media fills it with cover. */
+  const renderMedia = (fill: boolean) => (
+    <>
+{/* Media. A round post never reaches here: it returns the round card
+          above, whose photograph is the course's, not post_media's. */}
+      <div style={{ position: 'relative', zIndex: 1, ...(fill ? { height: '100%' } : {}) }}>
+        {isMulti ? (
+          <MediaCarousel
+            items={items}
+            isCardActive={isActive}
+            initialIndex={initialMediaIndex}
+            maxHeight={fill ? '100%' : mediaMaxHeight()}
+            mountVideo={mountVideo}
+            postId={post.id}
+            onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
+            onOpen={(idx, mediaId, originEl, ownerKey) => {
+              const slide = items[idx];
+              const posterUrl = slide?.thumbnailUrl ?? (slide as any)?.imageUrl ?? null;
+              onOpenMedia(
+                post,
+                idx,
+                originEl ? { el: originEl, posterUrl } : undefined,
+                mediaId,
+                ownerKey ?? null,
+              );
+            }}
+            onDoubleTap={handleMediaDoubleTap}
+          />
+
+        ) : media ? (
+          <SingleMediaTapButton
+            onSingle={() =>
+              onOpenMedia(post, 0, {
+                el: singleMediaBtnRef.current,
+                posterUrl: media.thumbnailUrl ?? (media as any).imageUrl ?? null,
+              })
+            }
+            onDouble={handleMediaDoubleTap}
+            innerRef={singleMediaBtnRef}
+            postId={post.id}
+          >
+            <div
+              style={{
+                position: 'relative',
+                width: '100%',
+                ...(fill
+                  ? { height: '100%' }
+                  : { aspectRatio: String(ratio), maxHeight: mediaMaxHeight() }),
+                // Non-review: see MEDIA_CHROME_RESERVE above. Review: the
+                // ReviewPostCard frame owns the size; this fills it.
+                overflow: 'hidden',
+                background: CARD,
+              }}
+
+            >
+              {media.type === 'video' ? (
+                <InlineVideo
+                  item={media}
+                  isActive={isActive}
+                  isNear={mountVideo}
+                  earlyMotion={earlyMotion}
+                  feedIndex={feedIndex}
+                  postId={post.id}
+                  ownerKey={`${post.id}:0`}
+                  objectFit="cover"
+                  onFirstFrameReady={isFirstCard ? fireContentReady : undefined}
+                />
+
+              ) : mediaUrl ? (
+                <>
+                  {feedIndex != null && feedIndex >= 1 && (
+                    <LqipUnderlay from={mediaUrl} />
+                  )}
+                  <img
+                    ref={isFirstCard ? primaryImgRef : undefined}
+                    {...postImageProps(mediaUrl)}
+                    alt={post.caption || post.displayName}
+                    loading="lazy"
+                    decoding="async"
+                    {...(isActive ? { fetchpriority: 'high' } : {})}
+
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      objectPosition: 'center',
+                      display: 'block',
+                    }}
+                  />
+                </>
+              ) : null}
+            </div>
+          </SingleMediaTapButton>
+        ) : null}
+        {burstVisible && (
+          <HeartBurst key={burstKey} onDone={() => setBurstVisible(false)} />
+        )}
+      </div>
+    </>
+  );
+  /* THE FOOTER (section A). ONE always-present object, last on every card.
+     `compact` is the review card's tightened rows (action row 40, liked-by 26). */
+  const renderFooter = (gutter: number, compact: boolean) => (() => {
+        /* SHOW WHO LIKED A POST — the liked-by line is the SINGLE entry point on
+           a card. The like count in the actions row stays untappable: two
+           targets six pixels apart is a mis-tap. Zero likes renders no line and
+           no gap. */
+        const showLikedBy = likeCount > 0;
+
+        /* SECTION C — comments live INSIDE the footer, under the liked-by line,
+           and only when there are comments to show. Rendered from the COMMENT,
+           never from the count: comment_count can claim a comment this page's
+           read did not return. */
+        const previewLines = commentPreview?.recent?.length
+          ? commentPreview.recent
+          : commentPreview ? [commentPreview] : [];
+        const showComments =
+          commentPreviewEnabled &&
+          commentCount > 0 &&
+          previewLines.some(l => (l.content ?? '').trim().length > 0);
+
+        /* ONE OWNER PER SEAM. Whatever is last in the footer carries the 12px
+           bottom padding; everything above it carries none, so the gap above
+           the first comment is the comment block's own 10px. */
+        const actionsBottom = showLikedBy || showComments ? 0 : 12;
+        const likedByBottom = showComments ? 0 : 12;
+
+        return (
+          <div
+            style={{
+              /* 1px, matching PostCourseBand's rules and the card's own top
+                 rule. The app gets ONE hairline weight on this surface. */
+              borderTop: `1px solid ${LINE}`,
+            }}
+          >
+            {/* POST ACTIONS LEFT, ACTOR RIGHT (Ben, 14 Sep). Heart+count,
+                comment+count and share form one action group at the 20px
+                reading edge. The avatar/chevron is separated at the far right.
+                Same footer object on a normal post and a review post. */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: FOOTER_ACTION_GAP,
+                padding: compact ? `9px ${gutter}px ${actionsBottom ? 7 : 0}px` : `10px ${gutter}px ${actionsBottom}px`,
+              }}
+            >
+              <FooterButton
+                icon={LikeGlyph}
+                label={likeCount > 0 ? formatCount(likeCount) : undefined}
+                active={liked}
+                onClick={() => onLike(post, effectiveActor)}
+                activeColor={AMBER}
+                glyph={<ReactionGlyph reacted={liked} size={21} />}
+                haptic={!liked ? 'selection' : 'none'}
+              />
+              <FooterButton
+                icon={MessageCircle}
+                label={commentCount > 0 ? formatCount(commentCount) : undefined}
+                onClick={() => onComment(post, effectiveActor, 'footer_glyph')}
+              />
+              <FooterButton icon={Share} onClick={() => onShare(post)} ariaLabel="Send" />
+              <div style={{ marginLeft: 'auto' }} />
+              <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
+            </div>
+
+
+            {showLikedBy && (
+              /* Ben, 14 Sep: this begins at the same card gutter as the heart.
+                  The in-flight count and resolved names occupy this same
+                  one-line box, so neither height nor x-position moves. */
+              <LikedByRow
+                postId={post.id}
+                count={likeCount}
+                surfaceColor={CARD}
+                style={{
+                  padding: compact ? `0 ${gutter}px ${likedByBottom ? 10 : 0}px` : `0 ${gutter}px ${likedByBottom}px`,
+                }}
+              />
+            )}
+
+
+            {showComments && (
+              <FeedCommentPreview
+                preview={commentPreview ?? null}
+                commentCount={commentCount}
+                onOpenComments={() => onComment(post, effectiveActor, 'preview_row')}
+                viewerAvatarUrl={effectiveActor?.avatarUrl ?? null}
+                viewerName={effectiveActor?.name ?? null}
+                viewerId={effectiveActor?.id ?? null}
+                topRule={false}
+                padding={`10px ${gutter}px 12px`}
+              />
+            )}
+          </div>
+        );
+      })();
+
+  if (post.isReview && post.review) {
+    const reviewOpenCourse = reviewCourseId ? () => navigate(`/courses/${reviewCourseId}`) : undefined;
+    return (
+      <ReviewPostCard
+        post={post}
+        articleRef={articleRef}
+        surface={CARD}
+        onProfile={() => onProfile(post)}
+        onReadReview={handleReadReview}
+        onPrefetch={prefetchReview}
+        onOpenCourse={reviewOpenCourse}
+        identityRight={(canManage || mountFollowPill) ? (
+          <>
+            {mountFollowPill && (
+              <FeedFollowPill isFollowed={!!post.isFollowedByMe} onFollow={() => onFollow!(post)} />
+            )}
+            {canManage && (
+              <PostOwnerMenu
+                postId={post.id}
+                isOwnPost
+                actorType={post.actorType === 'business' ? 'business' : 'personal'}
+                actorId={post.actorId}
+                sourceReviewId={post.review?.reviewId ?? null}
+                reviewCourseId={post.review?.courseId ?? null}
+                variant="inline"
+              />
+            )}
+          </>
+        ) : null}
+        media={items.length ? renderMedia(true) : null}
+        footer={renderFooter(14, true)}
+      />
+    );
+  }
+
   return (
     <article
       ref={articleRef}
@@ -722,102 +959,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       />
 
 
-      {/* Media. A round post never reaches here: it returns the round card
-          above, whose photograph is the course's, not post_media's. */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        {isMulti ? (
-          <MediaCarousel
-            items={items}
-            isCardActive={isActive}
-            initialIndex={initialMediaIndex}
-            maxHeight={mediaMaxHeight(!!post.isReview)}
-            mountVideo={mountVideo}
-            postId={post.id}
-            onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
-            onOpen={(idx, mediaId, originEl, ownerKey) => {
-              const slide = items[idx];
-              const posterUrl = slide?.thumbnailUrl ?? (slide as any)?.imageUrl ?? null;
-              onOpenMedia(
-                post,
-                idx,
-                originEl ? { el: originEl, posterUrl } : undefined,
-                mediaId,
-                ownerKey ?? null,
-              );
-            }}
-            onDoubleTap={handleMediaDoubleTap}
-          />
-
-        ) : media ? (
-          <SingleMediaTapButton
-            onSingle={() =>
-              onOpenMedia(post, 0, {
-                el: singleMediaBtnRef.current,
-                posterUrl: media.thumbnailUrl ?? (media as any).imageUrl ?? null,
-              })
-            }
-            onDouble={handleMediaDoubleTap}
-            innerRef={singleMediaBtnRef}
-            postId={post.id}
-          >
-            <div
-              style={{
-                position: 'relative',
-                width: '100%',
-                aspectRatio: String(ratio),
-                // See MEDIA_CHROME_RESERVE / REVIEW_HEADER_EXTRA above.
-                maxHeight: mediaMaxHeight(!!post.isReview),
-                overflow: 'hidden',
-                background: CARD,
-              }}
-
-            >
-              {media.type === 'video' ? (
-                <InlineVideo
-                  item={media}
-                  isActive={isActive}
-                  isNear={mountVideo}
-                  earlyMotion={earlyMotion}
-                  feedIndex={feedIndex}
-                  postId={post.id}
-                  ownerKey={`${post.id}:0`}
-                  objectFit="cover"
-                  onFirstFrameReady={isFirstCard ? fireContentReady : undefined}
-                />
-
-              ) : mediaUrl ? (
-                <>
-                  {feedIndex != null && feedIndex >= 1 && (
-                    <LqipUnderlay from={mediaUrl} />
-                  )}
-                  <img
-                    ref={isFirstCard ? primaryImgRef : undefined}
-                    {...postImageProps(mediaUrl)}
-                    alt={post.caption || post.displayName}
-                    loading="lazy"
-                    decoding="async"
-                    {...(isActive ? { fetchpriority: 'high' } : {})}
-
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      objectPosition: 'center',
-                      display: 'block',
-                    }}
-                  />
-                </>
-              ) : null}
-            </div>
-          </SingleMediaTapButton>
-        ) : null}
-        {burstVisible && (
-          <HeartBurst key={burstKey} onDone={() => setBurstVisible(false)} />
-        )}
-      </div>
-
+      {renderMedia(false)}
 
 
       {/* Course band: identity + figures. The actions row is NO LONGER passed
@@ -883,106 +1025,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         );
       })()}
 
-      {/* THE FOOTER (section A). ONE always-present object, last on every card,
-          whatever the card carries: header, body, media, course band, footer.
-          The hairline runs the full width of the slab; the content is inset to
-          the 20px gutter. Counts are glyph-only at zero — a "0" beside a heart
-          reads as a state, and there is no state to report. */}
-      {(() => {
-        /* SHOW WHO LIKED A POST — the liked-by line is the SINGLE entry point on
-           a card. The like count in the actions row stays untappable: two
-           targets six pixels apart is a mis-tap. Zero likes renders no line and
-           no gap. */
-        const showLikedBy = likeCount > 0;
-
-        /* SECTION C — comments live INSIDE the footer, under the liked-by line,
-           and only when there are comments to show. Rendered from the COMMENT,
-           never from the count: comment_count can claim a comment this page's
-           read did not return. */
-        const previewLines = commentPreview?.recent?.length
-          ? commentPreview.recent
-          : commentPreview ? [commentPreview] : [];
-        const showComments =
-          commentPreviewEnabled &&
-          commentCount > 0 &&
-          previewLines.some(l => (l.content ?? '').trim().length > 0);
-
-        /* ONE OWNER PER SEAM. Whatever is last in the footer carries the 12px
-           bottom padding; everything above it carries none, so the gap above
-           the first comment is the comment block's own 10px. */
-        const actionsBottom = showLikedBy || showComments ? 0 : 12;
-        const likedByBottom = showComments ? 0 : 12;
-
-        return (
-          <div
-            style={{
-              /* 1px, matching PostCourseBand's rules and the card's own top
-                 rule. The app gets ONE hairline weight on this surface. */
-              borderTop: `1px solid ${LINE}`,
-            }}
-          >
-            {/* POST ACTIONS LEFT, ACTOR RIGHT (Ben, 14 Sep). Heart+count,
-                comment+count and share form one action group at the 20px
-                reading edge. The avatar/chevron is separated at the far right.
-                Same footer object on a normal post and a review post. */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: FOOTER_ACTION_GAP,
-                padding: `10px ${FOOTER_GUTTER}px ${actionsBottom}px`,
-              }}
-            >
-              <FooterButton
-                icon={LikeGlyph}
-                label={likeCount > 0 ? formatCount(likeCount) : undefined}
-                active={liked}
-                onClick={() => onLike(post, effectiveActor)}
-                activeColor={AMBER}
-                glyph={<ReactionGlyph reacted={liked} size={21} />}
-                haptic={!liked ? 'selection' : 'none'}
-              />
-              <FooterButton
-                icon={MessageCircle}
-                label={commentCount > 0 ? formatCount(commentCount) : undefined}
-                onClick={() => onComment(post, effectiveActor, 'footer_glyph')}
-              />
-              <FooterButton icon={Share} onClick={() => onShare(post)} ariaLabel="Send" />
-              <div style={{ marginLeft: 'auto' }} />
-              <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
-            </div>
-
-
-            {showLikedBy && (
-              /* Ben, 14 Sep: this begins at the same card gutter as the heart.
-                  The in-flight count and resolved names occupy this same
-                  one-line box, so neither height nor x-position moves. */
-              <LikedByRow
-                postId={post.id}
-                count={likeCount}
-                surfaceColor={CARD}
-                style={{
-                  padding: `0 ${FOOTER_GUTTER}px ${likedByBottom}px`,
-                }}
-              />
-            )}
-
-
-            {showComments && (
-              <FeedCommentPreview
-                preview={commentPreview ?? null}
-                commentCount={commentCount}
-                onOpenComments={() => onComment(post, effectiveActor, 'preview_row')}
-                viewerAvatarUrl={effectiveActor?.avatarUrl ?? null}
-                viewerName={effectiveActor?.name ?? null}
-                viewerId={effectiveActor?.id ?? null}
-                topRule={false}
-                padding={`10px ${FOOTER_GUTTER}px 12px`}
-              />
-            )}
-          </div>
-        );
-      })()}
+      {renderFooter(FOOTER_GUTTER, false)}
 
       </div>
     </article>
