@@ -46,8 +46,8 @@ export function newestUnread(rows: InboxConversation[] | undefined): InboxConver
 export const alertsLabel = (n: number) => `${n} new alert${n === 1 ? '' : 's'}`;
 const ALERTS_LINE = 'Reactions and comments on your rounds';
 
-function Row({ lead, title, when, line, onClick, testId }: {
-  lead: React.ReactNode; title: string; when?: string; line: string; onClick: () => void; testId: string;
+function Row({ lead, title, when, line, onClick, testId, gutter }: {
+  gutter: number; lead: React.ReactNode; title: string; when?: string; line: string; onClick: () => void; testId: string;
 }) {
   return (
     <button
@@ -56,7 +56,7 @@ function Row({ lead, title, when, line, onClick, testId }: {
       onClick={onClick}
       style={{
         display: 'flex', alignItems: 'center', gap: 11, width: '100%', textAlign: 'left',
-        padding: '9px 22px', background: 'transparent', border: 0, borderTop: `1px solid ${A.TRACK}`,
+        padding: `9px ${gutter}px`, background: 'transparent', border: 0, borderTop: `1px solid ${A.TRACK}`,
         cursor: 'pointer', fontFamily: SANS,
       }}
     >
@@ -112,7 +112,7 @@ export default function QuickActionsRow({ gutter, onNavigate }: Props) {
 
   return (
     <div data-wait-block style={{ paddingBottom: 14, fontFamily: SANS }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '2px 22px 6px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `2px ${gutter}px 6px` }}>
         <span style={CARD_LABEL}>Waiting for you</span>
         <button
           type="button"
@@ -129,6 +129,7 @@ export default function QuickActionsRow({ gutter, onNavigate }: Props) {
         {msg && (
           <Row
             testId="message"
+            gutter={gutter}
             lead={<SquircleAvatar size={34} src={msg.avatar_url ?? undefined} alt={msg.title ?? ''} hairlineRing ringColor={DARK_HAIRLINE} />}
             title={msg.title ?? 'Conversation'}
             when={formatStamp(msg.last_message_at)}
@@ -139,6 +140,7 @@ export default function QuickActionsRow({ gutter, onNavigate }: Props) {
         {alerts > 0 && (
           <Row
             testId="alerts"
+            gutter={gutter}
             lead={
               <span aria-hidden style={{ width: 34, height: 34, borderRadius: 11, flex: 'none', background: A.SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Bell size={15} color={A.MUTE} />

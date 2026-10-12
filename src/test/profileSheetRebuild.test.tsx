@@ -89,7 +89,7 @@ describe('profile sheet parts', () => {
       profiles={[{ id: '1', type: 'personal', name: 'Ben' }]} onSwitchProfile={() => {}} />);
     expect(container.innerHTML).toBe('');
   });
-  it('count only on the non-active actor', () => {
+  it('count only for the non-active actor', () => {
     const { getAllByLabelText } = render(<ActorCards currentActor={{ id: '1', type: 'personal' }}
       profiles={[{ id: '1', type: 'personal', name: 'Ben' }, { id: '2', type: 'business', name: 'clbhouz' }]} onSwitchProfile={() => {}} />);
     expect(getAllByLabelText('3 unread')).toHaveLength(1);
