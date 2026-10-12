@@ -1,9 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { formatDistanceToNow, format } from 'date-fns';
 import { Send } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
-import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
@@ -11,8 +9,6 @@ import DetailDrawer from './DetailDrawer';
 import { useSupportTicketActions } from '../hooks/useSupportTicketActions';
 import StatusPill from './StatusPill';
 import {
-  SUPPORT_TICKETS_KEY,
-  SUPPORT_THREAD_KEY,
   useSupportThread,
   type SupportStatus,
   type SupportTicketRow,
@@ -51,7 +47,6 @@ interface Props {
 }
 
 export default function SupportTicketDrawer({ ticket, onClose }: Props) {
-  const qc = useQueryClient();
   const { user } = useSupabaseSession();
   const supportActions = useSupportTicketActions();
   const { data: messages = [], isLoading } = useSupportThread(ticket?.id ?? null);
