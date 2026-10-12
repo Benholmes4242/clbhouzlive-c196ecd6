@@ -6,7 +6,7 @@
  * A post with no round or review yields no context line; the author is still
  * returned so the empty state can name them.
  *
- * useThreadStandings is TWO BATCHED READS FOR THE WHOLE THREAD, keyed on the
+ * useThreadStandings is TWO BATCHED READS FOR THE WHOLE THREAD (legends + get_course_familiarity RPC), keyed on the
  * distinct commenter ids plus the one course id — never one read per comment.
  */
 import { useMemo } from 'react';
@@ -14,7 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { RECORD_CATEGORY } from '@/features/explore-magazine/useCourseRecordSignal';
 import type { TargetType } from './useCommentsV2';
-import { standingFor, type LegendHit, type Standing } from '../lib/standing';
+import { standingFor, chunkIds, familiarityMap, type LegendHit, type Standing } from '../lib/standing';
 
 export interface CommentsSubject {
   authorName: string | null;

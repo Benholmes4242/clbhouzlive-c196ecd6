@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { visibleCommentCount, hiddenCommentCount } from '@/features/comments-v2/lib/threadCounts';
-import { standingFor, firstAppearanceStandings, type Standing } from '@/features/comments-v2/lib/standing';
+import { standingFor, firstAppearanceStandings, chunkIds, familiarityMap, type Standing } from '@/features/comments-v2/lib/standing';
 import type { CommentV2 } from '@/features/comments-v2/hooks/useCommentsV2';
 
 const c = (id: string, user: string, replies: CommentV2[] = []) =>
