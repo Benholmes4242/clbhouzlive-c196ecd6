@@ -29,6 +29,8 @@ export interface InboxItem {
   isHighPriority: boolean;
   payload: unknown;
   closedOutcome?: string;
+  /** Done items only: when the item arrived, so the Done view can time the wait. */
+  openedAt?: string;
 }
 
 export interface InboxFeedResult {
@@ -224,6 +226,7 @@ export function useInboxFeed(): InboxFeedResult {
             title: reportKindTitle(row),
             meta: reportMeta(row),
             createdAt: row.reviewed_at ?? row.created_at,
+            openedAt: row.created_at,
             isHighPriority: false,
             payload: row,
             closedOutcome: row.status === 'actioned' ? 'Actioned' : 'Dismissed - no violation',
@@ -255,6 +258,7 @@ export function useInboxFeed(): InboxFeedResult {
             title: 'Suspension appeal',
             meta: `Appeal - ${row.appellant?.display_name ?? row.appellant?.username ?? 'A member'}`,
             createdAt: row.reviewed_at ?? row.created_at,
+            openedAt: row.created_at,
             isHighPriority: false,
             payload: row,
             closedOutcome: row.status === 'overturned' ? 'Overturned' : 'Upheld',
@@ -288,6 +292,7 @@ export function useInboxFeed(): InboxFeedResult {
           title: row.subject,
           meta: who ? `Support - from ${who}` : 'Support',
           createdAt: row.last_message_at ?? row.created_at,
+          openedAt: row.created_at,
           isHighPriority: false,
           payload: row,
           closedOutcome: row.status === 'closed' ? 'Closed' : 'Resolved',
@@ -330,6 +335,7 @@ export function useInboxFeed(): InboxFeedResult {
             title: label,
             meta,
             createdAt: row.reviewedAt ?? row.createdAt,
+            openedAt: row.createdAt,
             isHighPriority: false,
             payload: row,
             closedOutcome: outcome,
@@ -360,6 +366,7 @@ export function useInboxFeed(): InboxFeedResult {
           title: 'WHS course match request',
           meta: `Matches - ${row.whs_course_name ?? 'unnamed'}`,
           createdAt: row.resolved_at ?? row.created_at,
+          openedAt: row.created_at,
           isHighPriority: false,
           payload: row,
           closedOutcome: row.status === 'matched' ? 'Matched' : 'Rejected',
@@ -396,6 +403,7 @@ export function useInboxFeed(): InboxFeedResult {
           title: row.whs_course_name ?? 'Unnamed WHS course',
           meta: `Unmatched courses - ${row.round_count} round${row.round_count === 1 ? '' : 's'} from ${row.member_count} member${row.member_count === 1 ? '' : 's'}`,
           createdAt: row.resolved_at ?? row.last_attempt_at ?? row.first_seen_at,
+          openedAt: row.first_seen_at,
           isHighPriority: false,
           payload: row,
           closedOutcome: row.status === 'resolved' ? 'Matched' : 'Ignored',
@@ -414,6 +422,7 @@ export function useInboxFeed(): InboxFeedResult {
           title: row.courseName,
           meta: `Course requests - ${row.displayName ?? row.username ?? 'user'}`,
           createdAt: row.resolvedAt ?? row.createdAt,
+          openedAt: row.createdAt,
           isHighPriority: false,
           payload: row,
           closedOutcome: label[row.status],
@@ -478,6 +487,7 @@ export function useInboxFeed(): InboxFeedResult {
           title: holePhotoTitle(row),
           meta: holePhotoMeta(row),
           createdAt: row.reviewed_at ?? row.created_at,
+          openedAt: row.created_at,
           isHighPriority: false,
           payload: row,
           closedOutcome: row.status === 'approved'
@@ -510,6 +520,7 @@ export function useInboxFeed(): InboxFeedResult {
             title: humanAction(row.action_type),
             meta: `Approvals - by ${row.requester?.display_name ?? row.requester?.username ?? 'admin'}`,
             createdAt: row.reviewed_at ?? row.created_at,
+            openedAt: row.created_at,
             isHighPriority: false,
             payload: row,
             closedOutcome: row.status === 'approved' ? 'Approved' : row.status === 'rejected' ? 'Rejected' : 'Cancelled',
