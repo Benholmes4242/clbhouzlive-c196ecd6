@@ -11,6 +11,8 @@ vi.mock('@/hooks/useCourseRatingAggregates', () => ({
 }));
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (k: string) => k, i18n: { language: 'en' } }),
+  initReactI18next: { type: '3rdParty', init: () => {} },
+  Trans: ({ children }: { children?: React.ReactNode }) => children,
 }));
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => <span /> }));
 
