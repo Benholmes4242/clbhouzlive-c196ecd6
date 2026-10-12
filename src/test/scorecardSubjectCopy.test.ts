@@ -34,11 +34,16 @@ describe('scorecard subject-aware copy', () => {
     expect(scorecard.figHcpAtTime).toBeTruthy();
     expect(scorecard.figOfRoundsSelf).toContain('{{count}}');
     expect(scorecard.figOfRoundsOther).toContain('{{count}}');
-    expect(scorecard.figVsYourAvgHere).toBeTruthy();
-    expect(scorecard.figVsTheirAvgHere).toBeTruthy();
-    expect(scorecard.beatFieldSelf.toLowerCase()).toContain('field');
+    // BRIEF_SCORECARD_SHEET C.2 — the sheet reads the NEUTRAL keys; every locale must carry them.
+    expect(scorecard.figVsYourAvgNeutralHere).toBeTruthy();
+    expect(scorecard.figVsTheirAvgNeutralHere).toBeTruthy();
+    // "field" is an ENGLISH copy requirement, asserted against the real English string at the
+    // Richard Lawrence block below. It does not belong in the six-locale loop: en-XA rewrites every
+    // letter ("ƒíéļđ"), so no pseudo-locale value can ever contain the literal substring, and
+    // demanding it of de/es/ja/ko is what put the raw English word "field" mid-sentence in those
+    // four files. A placeholder IS locale-agnostic, so the {{name}} check stays.
+    expect(scorecard.beatFieldSelf).toBeTruthy();
     expect(scorecard.beatFieldOther).toContain('{{name}}');
-    expect(scorecard.beatFieldOther.toLowerCase()).toContain('field');
   });
 
   it.each(locales)('%s provides the scope, column and five span labels', (locale) => {
