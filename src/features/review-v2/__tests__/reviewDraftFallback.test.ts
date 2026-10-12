@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mergeRestoredDraft, sameAsPublished, type DraftShape } from '../hooks/useReviewComposer';
+import { mergeRestoredDraft, sameAsPublished, readDraft, writeDraft, DRAFT_VERSION, type DraftShape } from '../hooks/useReviewComposer';
 import type { ReviewComposerState } from '../types';
 
 const base: ReviewComposerState = {
@@ -38,5 +38,19 @@ it('sameAsPublished: draft with no reviewText is unchanged', () => {
   });
   it('draft carrying shareToFeed false overrides a published true', () => {
     expect(mergeRestoredDraft(base, draft({ shareToFeed: false })).shareToFeed).toBe(false);
+  });
+  it('a present null tee overrides the published tee', () => {
+    expect(mergeRestoredDraft(base, draft({ teeLabel: null })).teeLabel).toBeNull();
+  });
+  it('a cleared tee survives the real sessionStorage round trip', () => {
+    writeDraft('course-rt', {
+      v: DRAFT_VERSION, step: 2, overall: 8.5, scores: base.scores,
+      reviewText: 'Published words', shareToFeed: true, teeLabel: null, savedAt: Date.now(),
+    }, 'rating-rt');
+    const back = readDraft('course-rt', 'rating-rt');
+    expect(back).not.toBeNull();
+    expect('teeLabel' in back!).toBe(true);
+    expect(mergeRestoredDraft(base, back).teeLabel).toBeNull();
+    expect(sameAsPublished(back!, base)).toBe(false);
   });
 });

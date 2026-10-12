@@ -375,7 +375,7 @@ export function useReviewComposer(
   }, []);
 
   const setTeeLabel = useCallback((label: string | null) => {
-    setState((s) => ({ ...s, teeLabel: label }));
+    setState((s) => ({ ...s, teeLabel: label ?? null }));
   }, []);
 
   /* Debounced draft write. Both modes. The FILES are still never persisted —
