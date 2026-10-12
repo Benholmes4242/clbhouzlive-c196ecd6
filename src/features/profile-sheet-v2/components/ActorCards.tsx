@@ -12,7 +12,7 @@
  * rather than switching blind.
  *
  * A COUNT APPEARS ONLY FOR NON-ACTIVE ACTORS. The active actor's count belongs
- * on Alerts and nowhere else.
+ * on Notifications and nowhere else.
  *
  * ON THIS SHEET A NOTIFICATION COUNT IS WHITE (ground A.INK, figure A.CANVAS).
  * It never takes amber.

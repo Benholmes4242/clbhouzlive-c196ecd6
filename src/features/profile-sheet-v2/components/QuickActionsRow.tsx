@@ -3,10 +3,10 @@
  *
  * Sources (unchanged, so nothing can drift from the destination pages):
  *   Messages — useConversations (the inbox RPC); unread = per-conversation unread_count.
- *   Alerts   — useUnreadNotifications (a number and nothing else).
+ *   Notifications — useUnreadNotifications (a number and nothing else).
  *
  * A full row exists only because something is unread, so there are no unread
- * dots. Message row = newest unread conversation, taps to the THREAD. Alerts
+ * dots. Message row = newest unread conversation, taps to the THREAD. Notifications
  * row = count plus a fixed line; no preview (we cannot source one without a
  * new request, which is deliberately not made). With nothing waiting the block
  * is one compact pair of plain doors; with one thing waiting, the other is a
@@ -43,8 +43,8 @@ export function newestUnread(rows: InboxConversation[] | undefined): InboxConver
   return best;
 }
 
-export const alertsLabel = (n: number) => `${n} new alert${n === 1 ? '' : 's'}`;
-const ALERTS_LINE = 'Reactions and comments on your rounds';
+export const notificationsLabel = (n: number) => `${n} new notification${n === 1 ? '' : 's'}`;
+const NOTIFICATIONS_LINE = 'Reactions and comments on your rounds';
 
 function Row({ lead, title, when, line, onClick, testId, gutter }: {
   gutter: number; lead: React.ReactNode; title: string; when?: string; line: string; onClick: () => void; testId: string;
@@ -94,15 +94,15 @@ function PlainDoor({ label, icon, onClick }: { label: string; icon: React.ReactN
 export default function QuickActionsRow({ gutter, onNavigate }: Props) {
   const { conversations } = useConversations();
   const { unreadCount } = useUnreadNotifications();
-  const alerts = unreadCount ?? 0;
+  const notifications = unreadCount ?? 0;
   const msg = newestUnread(conversations);
 
   const toMessages = () => onNavigate('/messages');
-  const toAlerts = () => onNavigate('/notificationmessages');
+  const toNotifications = () => onNavigate('/notificationmessages');
   const mailDoor = <PlainDoor label="Messages" icon={<Mail size={14} color={A.MUTE} />} onClick={toMessages} />;
-  const bellDoor = <PlainDoor label="Alerts" icon={<Bell size={14} color={A.MUTE} />} onClick={toAlerts} />;
+  const bellDoor = <PlainDoor label="Notifications" icon={<Bell size={14} color={A.MUTE} />} onClick={toNotifications} />;
 
-  if (!msg && alerts <= 0) {
+  if (!msg && notifications <= 0) {
     return (
       <div data-wait-quiet style={{ display: 'flex', gap: 8, padding: `0 ${gutter}px 14px` }}>
         {mailDoor}{bellDoor}
@@ -137,22 +137,22 @@ export default function QuickActionsRow({ gutter, onNavigate }: Props) {
             onClick={() => onNavigate(`/messages/${msg.conversation_id}`)}
           />
         )}
-        {alerts > 0 && (
+        {notifications > 0 && (
           <Row
-            testId="alerts"
+            testId="notifications"
             gutter={gutter}
             lead={
               <span aria-hidden style={{ width: 34, height: 34, borderRadius: 11, flex: 'none', background: A.SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Bell size={15} color={A.MUTE} />
               </span>
             }
-            title={alertsLabel(alerts)}
-            line={ALERTS_LINE}
-            onClick={toAlerts}
+            title={notificationsLabel(notifications)}
+            line={NOTIFICATIONS_LINE}
+            onClick={toNotifications}
           />
         )}
       </div>
-      {(!msg || alerts <= 0) && (
+      {(!msg || notifications <= 0) && (
         <div style={{ display: 'flex', padding: `10px ${gutter}px 0` }}>
           {!msg ? mailDoor : bellDoor}
         </div>
