@@ -124,7 +124,7 @@ export interface DraftMediaCounts {
 
 
 
-function readDraft(
+export function readDraft(
   courseId: string | null | undefined,
   reviewId?: string | null,
 ): DraftShape | null {
@@ -142,7 +142,7 @@ function readDraft(
   }
 }
 
-function writeDraft(
+export function writeDraft(
   courseId: string | null | undefined,
   draft: DraftShape,
   reviewId?: string | null,
@@ -228,10 +228,16 @@ function seedFromExisting(existing: ExistingReview | null | undefined): ReviewCo
   };
 }
 
-/* A RESTORED DRAFT OVERRIDES THE PUBLISHED REVIEW ONLY WHERE THE DRAFT
- * ACTUALLY CARRIES A VALUE; EVERY FIELD FALLS BACK TO THE PUBLISHED ONE,
- * NEVER TO A LITERAL. "Carries a value" means not null/undefined — never
- * truthiness, so a stored `false` or `''` still overrides. */
+/* A RESTORED DRAFT OVERRIDES THE PUBLISHED REVIEW FOR EVERY FIELD IT CARRIES
+ * A KEY FOR, AND FALLS BACK TO THE PUBLISHED VALUE ONLY WHERE THE KEY IS
+ * ABSENT. Presence, not truthiness, not null-ness: a present null, '' or false
+ * overrides (a cleared tee stays cleared). writeDraft always writes these keys,
+ * and clearing must write null, never undefined — JSON.stringify drops
+ * undefined keys, which would turn a clear into an absence.
+ *
+ * Two deliberate asymmetries: `scores` merges by object spread, which is
+ * already a per-key presence test; `overall` keeps `??` because it cannot be
+ * cleared — the dial always holds a value. */
 export function mergeRestoredDraft(
   base: ReviewComposerState,
   restored: DraftShape | null | undefined,
@@ -241,9 +247,9 @@ export function mergeRestoredDraft(
     ...base,
     overall: restored.overall ?? base.overall,
     scores: { ...base.scores, ...(restored.scores ?? {}) },
-    reviewText: restored.reviewText ?? base.reviewText,
-    shareToFeed: restored.shareToFeed ?? base.shareToFeed,
-    teeLabel: restored.teeLabel ?? base.teeLabel,
+    reviewText: 'reviewText' in restored ? restored.reviewText : base.reviewText,
+    shareToFeed: 'shareToFeed' in restored ? restored.shareToFeed : base.shareToFeed,
+    teeLabel: 'teeLabel' in restored ? restored.teeLabel : base.teeLabel,
   };
 }
 
@@ -391,7 +397,7 @@ export function useReviewComposer(
           scores: state.scores,
           reviewText: state.reviewText,
           shareToFeed: state.shareToFeed,
-          teeLabel: state.teeLabel,
+          teeLabel: state.teeLabel ?? null,
           photoCount,
           videoCount,
           savedAt: Date.now(),
