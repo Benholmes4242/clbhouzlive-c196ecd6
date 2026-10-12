@@ -123,13 +123,13 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
             onClick={onProfile}
             style={{
               display: 'block', maxWidth: '100%', background: 'transparent', border: 'none', padding: 0, textAlign: 'left',
-              fontSize: 14.5, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK, cursor: 'pointer',
+              fontSize: 14.5, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.2, color: A.INK, cursor: 'pointer',
               whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             }}
           >
             {post.displayName}
           </button>
-          <div data-review-who-line style={{ fontSize: 11.5, color: A.DIM, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div data-review-who-line style={{ fontSize: 11.5, lineHeight: 1.2, color: A.DIM, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {whoLine}
           </div>
         </div>
@@ -139,7 +139,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
       {/* B — the subject and the verdict */}
       <div style={{ flex: 'none', display: 'flex', alignItems: 'flex-end', gap: 14, padding: `0 ${GUTTER}px 12px` }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: A.DIM }}>
+          <div style={{ fontSize: 9, lineHeight: 1.2, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: A.DIM }}>
             {t('feed.reviewPost.kicker')}
           </div>
           {onOpenCourse ? (
@@ -164,7 +164,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
             </div>
           )}
           {region ? (
-            <div style={{ marginTop: 3, fontSize: 12, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{region}</div>
+            <div style={{ marginTop: 3, fontSize: 12, lineHeight: 1.2, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{region}</div>
           ) : null}
         </div>
         <div style={{ flex: 'none', textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
@@ -214,10 +214,10 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
                 aria-label={value != null ? `${label} ${value.toFixed(1)}` : label}
                 style={{ minWidth: 0 }}
               >
-                <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ fontSize: 8.5, lineHeight: 1.2, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {label}
                 </div>
-                <div data-review-category-value className="tabular-nums" style={{ fontSize: 16.5, fontWeight: 800, marginTop: 2, letterSpacing: '-0.03em', color: value != null ? tone : A.DIM }}>
+                <div data-review-category-value className="tabular-nums" style={{ fontSize: 16.5, lineHeight: 1.15, fontWeight: 800, marginTop: 2, letterSpacing: '-0.03em', color: value != null ? tone : A.DIM }}>
                   {value != null ? value.toFixed(1) : '\u2014'}
                 </div>
                 {value != null ? (
