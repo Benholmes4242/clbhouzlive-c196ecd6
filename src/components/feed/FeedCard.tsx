@@ -775,29 +775,25 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       <ReviewPostCard
         post={post}
         articleRef={articleRef}
-        surface={CARD}
+        feedIndex={feedIndex}
         onProfile={() => onProfile(post)}
         onReadReview={handleReadReview}
         onPrefetch={prefetchReview}
         coursesReviewed={reviewerStats?.coursesRated ?? null}
         onOpenCourse={reviewOpenCourse}
-        identityRight={(canManage || mountFollowPill) ? (
-          <>
-            {mountFollowPill && (
-              <FeedFollowPill isFollowed={!!post.isFollowedByMe} onFollow={() => onFollow!(post)} />
-            )}
-            {canManage && (
-              <PostOwnerMenu
-                postId={post.id}
-                isOwnPost
-                actorType={post.actorType === 'business' ? 'business' : 'personal'}
-                actorId={post.actorId}
-                sourceReviewId={post.review?.reviewId ?? null}
-                reviewCourseId={post.review?.courseId ?? null}
-                variant="inline"
-              />
-            )}
-          </>
+        followPill={mountFollowPill ? (
+          <FeedFollowPill isFollowed={!!post.isFollowedByMe} onFollow={() => onFollow!(post)} />
+        ) : null}
+        ownerMenu={canManage ? (
+          <PostOwnerMenu
+            postId={post.id}
+            isOwnPost
+            actorType={post.actorType === 'business' ? 'business' : 'personal'}
+            actorId={post.actorId}
+            sourceReviewId={post.review?.reviewId ?? null}
+            reviewCourseId={post.review?.courseId ?? null}
+            variant="inline"
+          />
         ) : null}
         media={items.length ? renderMedia(true) : null}
         footer={renderFooter(14, true)}
