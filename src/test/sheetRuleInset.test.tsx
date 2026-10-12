@@ -68,7 +68,8 @@ describe('BRIEF_MERGED_CARD_RULE — the merged card rule is inset', () => {
   it('keeps the same 1px hairline, same colour, same vertical spacing', () => {
     const rule = renderRule();
     expect(rule.style.height).toBe('1px');
-    expect(rule.style.background).toBe(A.TRACK);
+    // jsdom re-serialises rgba() with spaces; compare the normalised value.
+    expect(rule.style.background.replace(/\s+/g, '')).toBe(A.TRACK.replace(/\s+/g, ''));
     expect(parseFloat(rule.style.marginTop)).toBe(12);
     expect(parseFloat(rule.style.marginBottom)).toBe(11);
   });
