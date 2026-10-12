@@ -228,7 +228,25 @@ function seedFromExisting(existing: ExistingReview | null | undefined): ReviewCo
   };
 }
 
-function sameAsPublished(draft: DraftShape, base: ReviewComposerState): boolean {
+/* A RESTORED DRAFT OVERRIDES THE PUBLISHED REVIEW ONLY WHERE THE DRAFT
+ * ACTUALLY CARRIES A VALUE; EVERY FIELD FALLS BACK TO THE PUBLISHED ONE,
+ * NEVER TO A LITERAL. (shareToFeed's `!== false` is the stored-boolean form.) */
+export function mergeRestoredDraft(
+  base: ReviewComposerState,
+  restored: DraftShape | null | undefined,
+): ReviewComposerState {
+  if (!restored) return base;
+  return {
+    ...base,
+    overall: restored.overall ?? base.overall,
+    scores: { ...base.scores, ...(restored.scores ?? {}) },
+    reviewText: restored.reviewText ?? base.reviewText,
+    shareToFeed: restored.shareToFeed !== false,
+    teeLabel: restored.teeLabel ?? base.teeLabel,
+  };
+}
+
+export function sameAsPublished(draft: DraftShape, base: ReviewComposerState): boolean {
   const s = draft.scores ?? ({} as DraftShape['scores']);
   return (
     (draft.overall ?? null) === (base.overall ?? null) &&
@@ -291,18 +309,9 @@ export function useReviewComposer(
     [],
   );
 
-  const [state, setState] = useState<ReviewComposerState>(() => {
-    const base = seedFromExisting(existing);
-    if (!restored) return base;
-    return {
-      ...base,
-      overall: restored.overall ?? base.overall,
-      scores: { ...base.scores, ...(restored.scores ?? {}) },
-      reviewText: restored.reviewText ?? '',
-      shareToFeed: restored.shareToFeed !== false,
-      teeLabel: restored.teeLabel ?? null,
-    };
-  });
+  const [state, setState] = useState<ReviewComposerState>(() =>
+    mergeRestoredDraft(seedFromExisting(existing), restored),
+  );
 
   // Edit mode only: true when unsaved changes were brought back from a draft.
   const [restoredFromDraft, setRestoredFromDraft] = useState<boolean>(
