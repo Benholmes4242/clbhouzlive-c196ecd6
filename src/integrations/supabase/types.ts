@@ -20175,6 +20175,7 @@ export type Database = {
       get_course_familiarity: {
         Args: { p_course_id: string; p_user_ids: string[] }
         Returns: {
+          best_gross: number
           rounds: number
           user_id: string
         }[]
