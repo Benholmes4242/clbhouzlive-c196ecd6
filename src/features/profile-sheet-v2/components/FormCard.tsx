@@ -10,7 +10,7 @@
 import React from 'react';
 import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { playDateStandalone } from '@/components/explore-tab-new/courseled/discoverWhen';
-import { fmtSigned, formSummary, type FormBar } , ROUNDS_DOOR_ROUTE } from '../sheetState';
+import { fmtSigned, formSummary, type FormBar, ROUNDS_DOOR_ROUTE } from '../sheetState';
 import { CARD, CardHead, Door } from './sheetCardParts';
 
 const PLOT_H = 78;
