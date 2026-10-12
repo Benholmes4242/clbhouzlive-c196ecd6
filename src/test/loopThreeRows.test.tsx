@@ -70,9 +70,9 @@ describe('The loop — three rows, share of joined', () => {
 
   it('draws each bar against joined, so bar and percentage agree', () => {
     panel(PRODUCTION);
-    expect(row('Joined').bar.style.width).toBe('100%');
-    expect(parseFloat(row('Connected').bar.style.width)).toBeGreaterThan(22);
-    expect(parseFloat(row('Connected').bar.style.width)).toBeLessThan(23);
+    expect(row('Joined').fill.style.width).toBe('100%');
+    expect(parseFloat(row('Connected').fill.style.width)).toBeGreaterThan(22);
+    expect(parseFloat(row('Connected').fill.style.width)).toBeLessThan(23);
   });
 
   it('keeps connected dangerText, round in inkMuted, and no green anywhere', () => {
