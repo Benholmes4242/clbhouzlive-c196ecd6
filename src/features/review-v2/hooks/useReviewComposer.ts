@@ -230,7 +230,8 @@ function seedFromExisting(existing: ExistingReview | null | undefined): ReviewCo
 
 /* A RESTORED DRAFT OVERRIDES THE PUBLISHED REVIEW ONLY WHERE THE DRAFT
  * ACTUALLY CARRIES A VALUE; EVERY FIELD FALLS BACK TO THE PUBLISHED ONE,
- * NEVER TO A LITERAL. (shareToFeed's `!== false` is the stored-boolean form.) */
+ * NEVER TO A LITERAL. "Carries a value" means not null/undefined — never
+ * truthiness, so a stored `false` or `''` still overrides. */
 export function mergeRestoredDraft(
   base: ReviewComposerState,
   restored: DraftShape | null | undefined,
@@ -241,23 +242,24 @@ export function mergeRestoredDraft(
     overall: restored.overall ?? base.overall,
     scores: { ...base.scores, ...(restored.scores ?? {}) },
     reviewText: restored.reviewText ?? base.reviewText,
-    shareToFeed: restored.shareToFeed !== false,
+    shareToFeed: restored.shareToFeed ?? base.shareToFeed,
     teeLabel: restored.teeLabel ?? base.teeLabel,
   };
 }
 
+/* Asks one question: does what the composer WILL SHOW differ from what is
+ * published? It compares the merged state, so it follows mergeRestoredDraft
+ * by construction and cannot drift from it. */
 export function sameAsPublished(draft: DraftShape, base: ReviewComposerState): boolean {
-  const s = draft.scores ?? ({} as DraftShape['scores']);
-  return (
-    (draft.overall ?? null) === (base.overall ?? null) &&
-    (s.design ?? null) === (base.scores.design ?? null) &&
-    (s.condition ?? null) === (base.scores.condition ?? null) &&
-    (s.clubhouse ?? null) === (base.scores.clubhouse ?? null) &&
-    (s.facilities ?? null) === (base.scores.facilities ?? null) &&
-    (draft.reviewText ?? '') === (base.reviewText ?? '') &&
-    (draft.shareToFeed !== false) === (base.shareToFeed !== false) &&
-    (draft.teeLabel ?? null) === (base.teeLabel ?? null)
-  );
+  const merged = mergeRestoredDraft(base, draft);
+  const keys = Object.keys(base) as (keyof ReviewComposerState)[];
+  return keys.every((k) => {
+    if (k === 'scores') {
+      const ks = Object.keys({ ...base.scores, ...merged.scores }) as (keyof ReviewComposerState['scores'])[];
+      return ks.every((c) => (merged.scores[c] ?? null) === (base.scores[c] ?? null));
+    }
+    return merged[k] === base[k];
+  });
 }
 
 export function useReviewComposer(

@@ -22,10 +22,21 @@ describe('restored draft falls back to the published review', () => {
   it('draft with teeLabel overrides the published tee', () => {
     expect(mergeRestoredDraft(base, draft({ teeLabel: 'Blue' })).teeLabel).toBe('Blue');
   });
-  // HELD: currently fails — sameAsPublished compares (draft.reviewText ?? '') to the
-  // published text, so a text-less draft reads as "emptied". Awaiting ruling.
-  it.skip('sameAsPublished: draft with no reviewText is unchanged', () => {
+it('sameAsPublished: draft with no reviewText is unchanged', () => {
     const d = draft({ overall: 8.5, scores: base.scores, shareToFeed: true, teeLabel: 'White' });
     expect(sameAsPublished(d, base)).toBe(true);
+  });
+  it('sameAsPublished: draft with no teeLabel is unchanged', () => {
+    const d = draft({ overall: 8.5, scores: base.scores, shareToFeed: true, reviewText: 'Published words' });
+    expect(sameAsPublished(d, base)).toBe(true);
+  });
+  it('draft with no shareToFeed keeps a published false and is unchanged', () => {
+    const priv = { ...base, shareToFeed: false };
+    const d = draft({ overall: 8.5, scores: base.scores, reviewText: 'Published words', teeLabel: 'White' });
+    expect(mergeRestoredDraft(priv, d).shareToFeed).toBe(false);
+    expect(sameAsPublished(d, priv)).toBe(true);
+  });
+  it('draft carrying shareToFeed false overrides a published true', () => {
+    expect(mergeRestoredDraft(base, draft({ shareToFeed: false })).shareToFeed).toBe(false);
   });
 });
