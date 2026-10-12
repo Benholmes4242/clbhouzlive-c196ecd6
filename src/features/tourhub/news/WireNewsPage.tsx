@@ -8,7 +8,7 @@ import { FONT, TOUR_CANVAS } from '../_shared/tokens';
 export function WireNewsPage() {
   return (
     <div style={{ background: TOUR_CANVAS, minHeight: '100dvh', fontFamily: FONT }}>
-      <NewsChromeBridge label="The Wire" mode="menu" backFallback="/tourhub" />
+      <NewsChromeBridge label="Tour News" mode="menu" backFallback="/tourhub" />
       <div style={{ paddingTop: 'var(--news-header-h)' }}>
         <NewsTab immersiveHero={false} />
       </div>

@@ -215,7 +215,7 @@ export function StoryPage() {
         fontFamily: FONT,
       }}
     >
-      <NewsChromeBridge label="The Wire" mode="back" backFallback="/tour/news" />
+      <NewsChromeBridge label="Tour News" mode="back" backFallback="/tour/news" />
 
 
       <div style={{ paddingTop: 'var(--news-header-h)' }}>
@@ -239,7 +239,7 @@ export function StoryPage() {
           {(more?.length ?? 0) > 0 && (
             <div style={{ marginTop: 28 }}>
               <div style={{ ...MORE_HEADING, color: INK, padding: '0 14px 6px' }}>
-                {t('news.more', 'MORE FROM THE WIRE')}
+                {t('news.more', 'MORE TOUR NEWS')}
               </div>
               {(more ?? []).map((s, i) => (
                 <div key={s.id} style={{ borderTop: `1px solid ${HAIRLINE_INK_10}`, padding: '0 14px' }}>

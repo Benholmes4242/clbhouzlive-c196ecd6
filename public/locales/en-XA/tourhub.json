@@ -837,14 +837,14 @@
     "fieldInline": "[Field {{v}} from {{n}}]"
   },
   "news": {
-    "masthead": "THE WIRE",
+    "masthead": "TOUR NEWS",
     "allStories": "ALL STORIES",
     "amateurNews": "[AMATEUR NEWS]",
     "fromWire": "[FROM THE WIRE]",
     "readStory": "[READ THE STORY]",
     "updated": "Updated {{time}}",
     "empty": "No stories on the wire yet.",
-    "more": "MORE FROM THE WIRE",
+    "more": "MORE TOUR NEWS",
     "notFound": "This story is no longer available.",
     "back": "Back",
     "live": "LIVE",
