@@ -323,21 +323,19 @@ function DoNow({ data, loading, failed }: CCProps) {
 
 // ─── 4 THE LOOP ───────────────────────────────────────────────────────────────
 
-function TheLoop({ data, loading, failed }: CCProps) {
+export function TheLoop({ data, loading, failed }: CCProps) {
   const l = data?.loop;
   const rows = l ? [
     { label: 'Joined', v: l.joined },
     { label: 'Connected', v: l.connected, red: true },
     { label: 'Round in', v: l.round_in },
-    { label: 'Posted', v: l.posted },
-    { label: 'Weekly', v: l.weekly },
   ] : [];
   const pct = (v: number | null) => (v == null ? DASH : `${v}%`);
 
   return (
     <section style={PANEL}>
       <Header title="The loop" meta="share of all members" />
-      <Body height={5 * 14 + 4 * 7 + 70} loading={loading} failed={failed}>{() => (
+      <Body height={3 * 14 + 2 * 7 + 70} loading={loading} failed={failed}>{() => (
         <>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
             {rows.map((r) => {
