@@ -38,7 +38,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Play, Share, User } from 'lucide-react';
+import { ChevronRight, MapPin, Play, Share, User } from 'lucide-react';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 import { useReviewerStats } from '@/hooks/useReviewerStats';
@@ -67,7 +67,7 @@ import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toast } from '@/lib/toast';
-import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
 /* Dark surface tokens (analytical ramp). BODY sits at 72% rather than the 62%
    a caption would take: this sheet's payload is three paragraphs of member
@@ -352,6 +352,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
       : `/courses/${courseId}?tab=reviews`;
     navigate(url);
   }, [courseId, reviewId, navigate, onClose, closeFullscreen]);
+
+  /* §S.5 — every rating of the course: the reviews tab, no single review. */
+  const handleSeeAll = useCallback(() => {
+    if (!courseId) return;
+    onClose();
+    closeFullscreen();
+    navigate(`/courses/${courseId}?tab=reviews`);
+  }, [courseId, navigate, onClose, closeFullscreen]);
 
   const handleShare = useCallback(() => {
     if (!reviewId || !courseId) return;
@@ -894,6 +902,23 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   </div>
                 </div>
               )}
+              {/* §S.4 — the text runs UNDER the boundary rather than stopping
+                  dead at it. Sticky, so it holds the bottom edge while scrolling;
+                  no clamp, no "read more" — this sheet is the full review. */}
+              <div
+                aria-hidden
+                data-review-scroll-fade="true"
+                style={{
+                  position: 'sticky',
+                  bottom: -16,
+                  height: 46,
+                  marginTop: -30,
+                  marginLeft: -18,
+                  marginRight: -18,
+                  pointerEvents: 'none',
+                  background: `linear-gradient(to bottom, transparent, ${PANEL_FILL})`,
+                }}
+              />
             </div>
 
 
@@ -911,23 +936,37 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   component, so the two feet read as one object. Both glyphs are
                   bare at zero, so a review with nothing on it can still take its
                   first like and its first comment. */}
-              {reviewId && onToggleReaction && (
-                <div style={{ marginBottom: 2 }}>
-                  <RoundEngagementActions
-                    comment={{
-                      count: commentCount,
-                      label: t('scorecard.commentReview', 'Comment on this review'),
-                      onOpen: () => setCommentsOpen(true),
-                    }}
-                    like={{
-                      count: reactionCount,
-                      reacted: reactionMine,
-                      onToggle: onToggleReaction,
-                      label: t('scorecard.likeReview', 'Like this review'),
-                      hidden: reactionHidden,
-                    }}
-                    kind="helpful"
-                  />
+              {/* §S.6 — share sits in the engagement row, as everywhere else. */}
+              {reviewId && (onToggleReaction || courseId) && (
+                <div data-review-engagement="true" style={{ marginBottom: 2, display: 'flex', alignItems: 'center', gap: 12 }}>
+                  {onToggleReaction && (
+                    <RoundEngagementActions
+                      comment={{
+                        count: commentCount,
+                        label: t('scorecard.commentReview', 'Comment on this review'),
+                        onOpen: () => setCommentsOpen(true),
+                      }}
+                      like={{
+                        count: reactionCount,
+                        reacted: reactionMine,
+                        onToggle: onToggleReaction,
+                        label: t('scorecard.likeReview', 'Like this review'),
+                        hidden: reactionHidden,
+                      }}
+                      kind="helpful"
+                    />
+                  )}
+                  {courseId && (
+                    <button
+                      type="button"
+                      data-review-share="true"
+                      aria-label="Share this review"
+                      onClick={handleShare}
+                      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 32, minHeight: 32, padding: 0, background: 'none', border: 0, color: MUTE, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+                    >
+                      <Share size={15} strokeWidth={1.75} />
+                    </button>
+                  )}
                 </div>
               )}
               {reviewId && reactionCount > 0 && (
@@ -944,10 +983,10 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   />
                 </div>
               )}
-              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${reviewId && courseId ? 3 : 2}, minmax(0, 1fr))` }}>
-                <GlassCardFootAction label={t('scorecard.viewProfile')} onClick={handleGoToProfile} icon={User} disabled={!user.id} />
+              {/* §S.6 — two doors: the course, and the reviewer by name. */}
+              <div data-review-foot-actions="true" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
                 <GlassCardFootAction label={t('scorecard.viewCourse')} onClick={handleGoToReview} icon={MapPin} disabled={!courseId} />
-                {reviewId && courseId && <GlassCardFootAction label={t('scorecard.shareRound')} onClick={handleShare} icon={Share} />}
+                <GlassCardFootAction label={user.name} onClick={handleGoToProfile} icon={User} disabled={!user.id} />
               </div>
             </div>
           </motion.div>
