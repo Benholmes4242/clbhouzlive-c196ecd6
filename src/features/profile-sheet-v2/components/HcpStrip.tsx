@@ -167,7 +167,7 @@ export const TrendCard: React.FC<{
   onWindow: (d: 30 | 90) => void;
   fallbackIndex: number | null;
   onNavigate: (route: string) => void;
-  /** V6 D — the last five rounds live inside this card, below a full-bleed rule. */
+  /** V6 D — the last five rounds live inside this card, below an INSET rule. */
   bars?: FormBar[];
 }> = ({ points, windowDays, onWindow, fallbackIndex, onNavigate, bars = [] }) => {
   // C.2 — the sentence reads the SAME points the chart draws, so it moves with the toggle.
@@ -356,8 +356,17 @@ export const TrendCard: React.FC<{
           )}
           {bars.length >= 2 && (
             <>
-              {/* Full-bleed: the legend band pads PAD each side, so -PAD reaches the card's inner edges. */}
-              <div data-form-rule style={{ height: 1, background: A.TRACK, margin: `12px -${PAD}px 11px` }} />
+              {/* BRIEF_MERGED_CARD_RULE — this rule MUST stay INSET: it starts and
+                  ends at the card's content width, the same two edges the sentence
+                  above and the "Last five rounds" label below start and end at. A
+                  rule pulled out to the card's own border on both sides is the
+                  visual grammar the feed uses BETWEEN two posts, so it reads as
+                  structure and tells the eye "two cards" — in the one card whose
+                  entire purpose is that the index and its last five rounds are a
+                  single subject at two resolutions. Inset, it divides content,
+                  which is what a divider inside a container is for. Do not
+                  re-bleed it with a negative horizontal margin. */}
+              <div data-form-rule style={{ height: 1, background: A.TRACK, margin: '12px 0 11px' }} />
               <FormSection bars={bars} />
             </>
           )}
