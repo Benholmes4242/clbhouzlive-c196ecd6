@@ -32,7 +32,7 @@ export const ReviewBottomSheetPortal: React.FC = () => {
   const location = useLocation();
   const hasText = !!payload?.reviewText;
   const hasBreakdown = !!payload?.breakdown && Object.values(payload.breakdown).some((value) => value != null);
-  const fallbackQuery = useReviewFallback({ reviewId: payload?.reviewId ?? null, enabled: isOpen, hasText, hasBreakdown });
+  const fallbackQuery = useReviewFallback({ reviewId: payload?.reviewId ?? null, enabled: isOpen, hasText, hasBreakdown, hasReviewDate: !!payload?.reviewDate });
   const mediaQuery = useReviewMedia(payload?.reviewId ?? null, isOpen);
   const aggregateQuery = useCourseRatingAggregates(isOpen ? payload?.courseId : undefined);
   const reactionTargets = React.useMemo(
@@ -136,7 +136,9 @@ export const ReviewBottomSheetPortal: React.FC = () => {
       courseRegion={payload.courseRegion}
       courseSubCountry={payload.courseSubCountry}
       reviewText={payload.reviewText}
-      reviewDate={payload.reviewDate ?? null}
+      // review_date first (payload or fetched by reviewId). Only if the review has
+      // no review_date does the post's date stand in — never the reviewer's join date.
+      reviewDate={payload.reviewDate ?? fallbackQuery.data?.reviewDate ?? payload.postDate ?? null}
       breakdown={payload.breakdown ?? null}
       resolvedReviewText={payload.reviewText ?? fallbackQuery.data?.reviewText ?? null}
       resolvedBreakdown={payload.breakdown ?? fallbackQuery.data?.breakdown ?? null}
