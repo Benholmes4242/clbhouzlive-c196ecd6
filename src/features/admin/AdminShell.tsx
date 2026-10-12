@@ -63,15 +63,16 @@ export default function AdminShell() {
   const segment = location.pathname.split('/')[2] ?? 'dashboard';
   const title = SECTION_TITLES[segment] ?? 'Admin';
 
-  // The shell pulls itself up by --sat and pads main by the header's full height,
-  // so the layout is correct whether or not .app-shell paid the inset on the way in.
+  // The dark app-shell has zero top padding (body.route-clubhouse), including admin.
+  // Main pays the fixed header's full height; never pull this shell up by --sat:
+  // that subtracts an inset the parent did not pay and hides the first content.
   const headerHeight = 'calc(52px + env(safe-area-inset-top, 0px))';
 
   const defaultRoute = role === 'moderator' ? 'inbox?type=report' : 'dashboard';
   const canInbox = can.viewModeration || can.viewUsers || can.approveRequests;
 
   return (
-    <div style={{ minHeight: '100dvh', marginTop: 'calc(-1 * var(--sat, 0px))', background: t.canvas, color: t.ink, colorScheme: 'dark' }}>
+    <div style={{ minHeight: '100dvh', background: t.canvas, color: t.ink, colorScheme: 'dark' }}>
       <AdminDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
