@@ -323,7 +323,7 @@ function DoNow({ data, loading, failed }: CCProps) {
 
 // ─── 4 THE LOOP ───────────────────────────────────────────────────────────────
 
-function TheLoop({ data, loading, failed }: CCProps) {
+export function TheLoop({ data, loading, failed }: CCProps) {
   const l = data?.loop;
   const rows = l ? [
     { label: 'Joined', v: l.joined },
