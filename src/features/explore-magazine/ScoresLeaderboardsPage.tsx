@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Trans, useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
@@ -39,6 +39,7 @@ import { WHO_LEADS, whoLeadsPlaceholderHeight, whoLeadsYou } from './whoLeads';
 import { useFeatsWindow, type FeatWindow } from './useFeatsWindow';
 import { RARE_AIR, rareAirPlaceholderHeight } from './rareAir';
 import { RareAirLede, RareAirRail, RareAirYou } from './RareAirSection';
+import { Skeleton } from '@/components/ui/skeleton';
 import { RailChips } from '@/components/ui/RailChips';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
@@ -355,7 +356,7 @@ function LeadSeeAll({ label, onPress }: { label: string; onPress: () => void }) 
         alignItems: 'center',
         justifyContent: 'center',
         gap: 4,
-        padding: '15px 16px 19px',
+        padding: '15px 16px 0',
         border: 'none',
         background: 'transparent',
         fontFamily: SANS,
@@ -370,6 +371,55 @@ function LeadSeeAll({ label, onPress }: { label: string; onPress: () => void }) 
       {label}
       <ChevronRight size={13} />
     </button>
+  );
+}
+
+/** 1.4 — the five lead rows' minimum, in BoardRowView geometry. */
+function LeadRowsSkeleton() {
+  return (
+    <div aria-hidden data-lead-rows-skeleton>
+      {Array.from({ length: LEAD_POSITIONS }, (_, i) => (
+        <div
+          key={i}
+          style={{ display: 'grid', gridTemplateColumns: '34px minmax(0,1fr) auto', columnGap: 11, alignItems: 'center', padding: '10px 16px', borderBottom: `1px solid ${A.SOFT}` }}
+        >
+          <Skeleton variant="dark" style={{ width: 34, height: 34, borderRadius: 11 }} />
+          <div style={{ minWidth: 0 }}>
+            <Skeleton variant="dark" style={{ width: '46%', height: 14, borderRadius: 4 }} />
+            <Skeleton variant="dark" style={{ width: '72%', height: 11, borderRadius: 4, marginTop: 4 }} />
+          </div>
+          <Skeleton variant="dark" style={{ width: 36, height: 18, borderRadius: 4 }} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** 1.3 — the lead block's cold-open placeholder. Reserves exactly the smallest
+ *  settled block (rail, control row, basis, one-line slab, five rows, no See
+ *  all) so the block can only grow when it swaps in, never contract. */
+function LeadBoardSkeleton({ signedIn }: { signedIn: boolean }) {
+  return (
+    <div aria-hidden data-lead-board-skeleton style={{ marginBottom: 24 }}>
+      <div style={{ display: 'flex', gap: 7, overflow: 'hidden', padding: `2px ${HEAD_GUTTER}px 12px` }}>
+        {[0, 1, 2, 3].map((i) => (
+          <Skeleton key={i} variant="dark" style={{ flex: 'none', width: 92, height: 50, borderRadius: 11 }} />
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 9, padding: `0 ${HEAD_GUTTER}px 12px` }}>
+        <Skeleton variant="dark" style={{ flex: 1, height: 36, borderRadius: 999 }} />
+        <Skeleton variant="dark" style={{ flex: 'none', width: 36, height: 36, borderRadius: 999 }} />
+      </div>
+      <div style={{ padding: `0 ${HEAD_GUTTER}px 11px` }}>
+        <Skeleton variant="dark" style={{ width: '70%', height: 17, borderRadius: 4 }} />
+      </div>
+      {signedIn ? (
+        <div style={{ position: 'relative', margin: `0 ${HEAD_GUTTER}px 12px`, height: 44, borderRadius: 11, overflow: 'hidden', background: SLAB_BG }}>
+          <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2.5, background: A.AMBER }} />
+        </div>
+      ) : null}
+      <LeadRowsSkeleton />
+    </div>
   );
 }
 
@@ -863,11 +913,21 @@ export function ScoresLeaderboardsPage({
   const openTop100Sheet = (r: CareerRow) => setTop100Sheet(r);
 
   const leadLoading = !state.ready || state.page.isPending;
+  /* 1.2 ONE GATE — the lead block (rail, controls, basis, slab, rows) arrives
+     once on the cold open. `ready` already waits on the home-club query, so
+     clubApplies is final whenever it is true. After the first settle, only
+     the rows area swaps (1.4). */
+  const leadSettled = state.ready && state.page.isSuccess && (state.facets?.settled ?? false);
+  const leadSettledOnce = useRef(false);
+  if (leadSettled) leadSettledOnce.current = true;
+  const leadHeadShown = leadSettledOnce.current;
   const pending = (h: number) => <div aria-hidden style={{ height: h, marginInline: GUTTER, marginBottom: 24 }} />;
 
 
   return (
     <div style={{ fontFamily: SANS }}>
+      {!leadHeadShown ? <LeadBoardSkeleton signedIn={!!userId} /> : null}
+      {leadHeadShown ? (<>
       {/* 1.1 THE BOARD RAIL — the six offered ranking boards, each with its
           get_board_facets `board`-axis count under the current filters. Feat
           boards stay in §5. A zero renders greyed and unselectable; an
@@ -995,13 +1055,13 @@ export function ScoresLeaderboardsPage({
             );
           })()}
           {/* 8.4 THE YOU SLAB — always present for a signed-in member; three
-              states from fields already on the page, plus an empty shape while
-              the facets' `you` count is unresolved so the head does not move.
+              states from fields already on the page. It renders only once the
+              facets have settled (1.2), so there is no pending state.
               SAFE ON EVERY OFFERED SCOPE: every offered scope includes the
               viewer, so a qualifying round means a place on the board. */}
           {userId ? (() => {
             const you = state.facets?.countFor?.('scope', 'you') ?? null;
-            let kind: 'on' | 'deeper' | 'none' | 'pending';
+            let kind: 'on' | 'deeper' | 'none';
             let figure: ReactNode = null;
             let sentence: ReactNode = null;
             if (leadMine) {
@@ -1059,9 +1119,7 @@ export function ScoresLeaderboardsPage({
                 }
               }
               sentence = splitMarks(raw, marks);
-            } else if (you == null) {
-              kind = 'pending';
-            } else if (you > 0) {
+            } else if (you != null && you > 0) {
               kind = 'deeper';
               figure = '\u2014';
               sentence = t('amateur.leaderboards.standing.deeper');
@@ -1100,8 +1158,8 @@ export function ScoresLeaderboardsPage({
           })() : null}
           <div>
           {leadLoading || !leader ? (
-            /* Rows area only — the head above is already final. */
-            <div aria-hidden style={{ height: 500 }} />
+            /* 1.4 Rows area only — the head above is already final. */
+            <LeadRowsSkeleton />
           ) : (
             <>
           <div>
@@ -1145,6 +1203,7 @@ export function ScoresLeaderboardsPage({
           </div>
         </section>
       ) : null}
+      </>) : null}
 
       {/* §5 FEATS THIS YEAR — event counts; footnote is distinct members. */}
       {/* §5 RARE AIR — all four feats rarest first; hides only on zero rounds. */}
