@@ -36,7 +36,6 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import type { CommentOpenSource } from '@/types/commentOpenSource';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { InlineVideo } from './InlineVideo';
-import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import LqipUnderlay from '@/components/shared/LqipUnderlay';
 import { postImageProps } from '@/utils/imageSrc';
 import { useNavigate } from 'react-router-dom';
@@ -825,7 +824,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           onClick={() => onProfile(post)}
           style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
         >
-          <SquircleAvatar src={buildImageThumbnailUrl(post.avatarUrl, { width: 72 * (typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1) })} alt={post.displayName} userId={post.actorId ?? post.userId} size={34} hairlineRing />
+          <SquircleAvatar src={post.avatarUrl} alt={post.displayName} userId={post.actorId ?? post.userId} size={34} hairlineRing />
         </button>
         <div style={{ minWidth: 0, flex: 1 }}>
           <button
