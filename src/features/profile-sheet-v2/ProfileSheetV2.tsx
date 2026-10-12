@@ -46,8 +46,7 @@ import YourCourseAnalyticsSheet from './components/YourCourseAnalyticsSheet';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useWhsConnection, useHandicapTrend, useHandicapHistory, useAllScores } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { deriveSheetHcpState, sheetIndex, identityLine, formBars, courseFigures } from './sheetState';
-import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
+import { deriveSheetHcpState, sheetIndex, identityLine, formBars } from './sheetState';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 
@@ -140,7 +139,6 @@ export default function ProfileSheetV2({
   const analyticsUserId = currentActor.type === 'personal' ? currentActor.id : undefined;
   const { data: whsConn } = useWhsConnection(analyticsUserId);
   const whsSynced = !!whsConn && !(whsConn as { deleted_at?: string | null }).deleted_at;
-  const { data: userCourses } = useUserAnalyticsCourses({ enabled: open && whsSynced });
   /* S.4 — analyticsState, EXTENDED into the sheet's one handicap state
      (sheetState.ts). Not a second machine: the old triple's only reader, the
      Course analytics nav row, is gone. Reads are gated on `open` so a closed
@@ -279,9 +277,7 @@ export default function ProfileSheetV2({
                 state={analyticsState}
                 history90={histQ.data as { observed_at: string; handicap_index: number }[] | undefined}
                 bars={formBars(scoresQ.data, sheetIndex(analyticsState))}
-                courses={courseFigures(userCourses, scoresQ.data)}
                 onNavigate={onNavigate}
-                onOpenCourseAnalytics={handleOpenCourseAnalytics}
               />
               <SheetNavGroup
                 gutter={SHEET_GUTTER}
@@ -289,6 +285,7 @@ export default function ProfileSheetV2({
                 isAdmin={isAdmin}
                 onNavigate={onNavigate}
                 onInviteFriends={handleInviteFriends}
+                onOpenCourses={handleOpenCourseAnalytics}
                 businessNames={profiles.filter((p) => p.type === 'business').map((p) => p.name)}
               />
               <SignOutRow onNavigate={onNavigate} />

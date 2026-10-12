@@ -6,14 +6,12 @@
  *   manual   → manual card           (no form, no courses — there is no manual round entry)
  *   syncing  → syncing card          (no form, no courses)
  *   failing  → not-syncing card      (no form, no courses)
- *   ready    → handicap, form, courses
+ *   ready    → one "How you're playing" card (index + last five rounds, V6 D)
  */
 import React, { useMemo, useState } from 'react';
-import type { CourseFigures, FormBar, SeriesPoint, SheetHcpState } from '../sheetState';
+import type { FormBar, SeriesPoint, SheetHcpState } from '../sheetState';
 import { TrendCard } from './HcpStrip';
 import { ConnectCard, ManualCard, SyncingCard, FailingCard } from './PreIndexCards';
-import FormCard from './FormCard';
-import CoursesCard from './CoursesCard';
 
 interface HistoryPoint { observed_at: string; handicap_index: number }
 
@@ -21,14 +19,12 @@ interface Props {
   state: SheetHcpState;
   history90: HistoryPoint[] | null | undefined;
   bars: FormBar[];
-  courses: CourseFigures | null;
   onNavigate: (route: string) => void;
-  onOpenCourseAnalytics: () => void;
   /** Injectable clock for tests. */
   now?: number;
 }
 
-export default function SheetCards({ state, history90, bars, courses, onNavigate, onOpenCourseAnalytics, now }: Props) {
+export default function SheetCards({ state, history90, bars, onNavigate, now }: Props) {
   const [windowDays, setWindowDays] = useState<30 | 90>(90);
   // The 30-day window is a client-side slice of the SAME 90-day query.
   const points = useMemo<SeriesPoint[]>(() => {
@@ -54,17 +50,14 @@ export default function SheetCards({ state, history90, bars, courses, onNavigate
       return <FailingCard body={state.body} lastSyncedAt={state.lastSyncedAt} onNavigate={onNavigate} />;
     case 'ready':
       return (
-        <>
-          <TrendCard
+        <TrendCard
             points={points}
             windowDays={windowDays}
             onWindow={setWindowDays}
             fallbackIndex={state.index}
             onNavigate={onNavigate}
+            bars={bars}
           />
-          <FormCard bars={bars} onNavigate={onNavigate} />
-          <CoursesCard figures={courses} onOpen={onOpenCourseAnalytics} />
-        </>
       );
   }
 }

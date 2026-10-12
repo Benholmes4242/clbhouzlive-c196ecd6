@@ -12,6 +12,9 @@
  * is one compact pair of plain doors; with one thing waiting, the other is a
  * single plain door beneath it. Height follows what is actually waiting.
  *
+ * V6 C: no right-hand "Inbox" link — every row owns its destination. The bell
+ * tile is the block's one colour (A.AMBER glyph on a low-alpha A.AMBER wash).
+ *
  * Not a card: full-width rows with hairlines, so it never reads as a third
  * analytics card.
  */
@@ -112,18 +115,8 @@ export default function QuickActionsRow({ gutter, onNavigate }: Props) {
 
   return (
     <div data-wait-block style={{ paddingBottom: 14, fontFamily: SANS }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `2px ${gutter}px 6px` }}>
+      <div style={{ display: 'flex', alignItems: 'center', padding: `2px ${gutter}px 6px` }}>
         <span style={CARD_LABEL}>Waiting for you</span>
-        <button
-          type="button"
-          onClick={toMessages}
-          style={{
-            background: 'transparent', border: 0, padding: 0, cursor: 'pointer', fontFamily: SANS,
-            fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: A.AMBER,
-          }}
-        >
-          Inbox <span aria-hidden>{'\u203A'}</span>
-        </button>
       </div>
       <div style={{ borderBottom: `1px solid ${A.TRACK}` }}>
         {msg && (
@@ -142,8 +135,8 @@ export default function QuickActionsRow({ gutter, onNavigate }: Props) {
             testId="notifications"
             gutter={gutter}
             lead={
-              <span aria-hidden style={{ width: 34, height: 34, borderRadius: 11, flex: 'none', background: A.SOFT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Bell size={15} color={A.MUTE} />
+              <span aria-hidden style={{ width: 34, height: 34, borderRadius: 11, flex: 'none', background: `${A.AMBER}1F`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Bell size={15} color={A.AMBER} />
               </span>
             }
             title={notificationsLabel(notifications)}

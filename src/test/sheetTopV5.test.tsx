@@ -82,3 +82,35 @@ describe('the word is Notifications', () => {
     expect(out.trim()).toBe('');
   });
 });
+
+describe('V6', () => {
+  beforeEach(() => { convs = []; notifications = 0; });
+  it('waiting head has no Inbox link; bell tile is amber', () => {
+    notifications = 1;
+    const { container, queryByText } = render(<QuickActionsRow gutter={20} actorType="personal" actorId="p" onNavigate={() => {}} />);
+    expect(queryByText(/Inbox/)).toBeNull();
+    expect(container.querySelector('[data-wait-row="notifications"]')!.textContent).toContain('1 new notification');
+  });
+  it('message only: Messages door absent, Notifications door present', () => {
+    convs = [conv('x', 1, '2026-10-11T10:00:00Z')];
+    const { container } = render(<QuickActionsRow gutter={20} actorType="personal" actorId="p" onNavigate={() => {}} />);
+    const doors = container.querySelectorAll('[data-plain-door]');
+    expect(doors).toHaveLength(1);
+    expect(doors[0].getAttribute('data-plain-door')).toBe('Notifications');
+  });
+  it('nav list first row is Your courses and opens course analytics', async () => {
+    const { default: SheetNavGroup } = await import('@/features/profile-sheet-v2/components/SheetNavGroup');
+    const open = vi.fn();
+    const { container } = render(<SheetNavGroup gutter={20} currentActor={{ id: 'p', type: 'personal' }} isAdmin={false}
+      onNavigate={() => {}} onInviteFriends={() => {}} onOpenCourses={open} businessNames={[]} />);
+    const first = container.querySelector('[data-sheet-nav] button')!;
+    expect(first.textContent).toContain('Your courses');
+    fireEvent.click(first);
+    expect(open).toHaveBeenCalled();
+  });
+  it('no component renders "Your rounds" as a door', async () => {
+    const { execSync } = await import('node:child_process');
+    const hits = execSync(`grep -rn "label=\\"Your rounds\\"" src || true`).toString();
+    expect(hits).toBe('');
+  });
+});

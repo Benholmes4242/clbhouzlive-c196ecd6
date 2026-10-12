@@ -1,12 +1,15 @@
 /**
- * ProfileSheetV2 · SheetNavGroup — four rows (BRIEF_PROFILE_SHEET_REBUILD G):
+ * ProfileSheetV2 · SheetNavGroup (BRIEF_PROFILE_SHEET_REBUILD G, V6 E.2):
+ *   Your courses       -> YourCourseAnalyticsSheet (personal only). This row is
+ *                         that sheet's ONLY door since the courses card was
+ *                         deleted; removing it strands the sheet.
  *   Invite friends     -> invite sheet
  *   Manage businesses  -> '/businesses/manage'
  *   Settings           -> '/edit-profile?tab=settings'
  *   Command centre     -> '/admin/command-center' (admin only, ADMIN tag)
  *
  * "View profile" is gone: the identity header is that door (A.4).
- * "Course analytics" is gone: the Your courses card is that door (E.5).
+ * "Course analytics" became "Your courses", the first row (V6 E.2).
  *
  * THE 0.55 LESSON. Rendering a live row at reduced opacity told the member it
  * does nothing, which is the opposite of true and cost them the feature
@@ -25,6 +28,7 @@ interface Props {
   isAdmin: boolean;
   onNavigate: (route: string) => void;
   onInviteFriends?: () => void;
+  onOpenCourses?: () => void;
   /** The member's business names; empty puts "Create a business profile" under the row. */
   businessNames: string[];
 }
@@ -51,9 +55,12 @@ function Row({ label, onClick, trailing, subLabel }: { label: string; onClick: (
   );
 }
 
-export default function SheetNavGroup({ gutter, currentActor, isAdmin, onNavigate, onInviteFriends, businessNames }: Props) {
+export default function SheetNavGroup({ gutter, currentActor, isAdmin, onNavigate, onInviteFriends, onOpenCourses, businessNames }: Props) {
   return (
     <div data-sheet-nav style={{ margin: `4px ${gutter}px 0`, borderTop: `1px solid ${A.TRACK}` }}>
+      {currentActor.type === 'personal' && onOpenCourses && (
+        <Row label="Your courses" subLabel="Every course you have played, and how you play it" onClick={onOpenCourses} />
+      )}
       {currentActor.type === 'personal' && onInviteFriends && (
         <Row label="Invite friends" subLabel="Share clbhouz and build your circle" onClick={onInviteFriends} />
       )}
