@@ -630,6 +630,7 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
         <CourseSearchField
           placeholder="Search courses"
           initialQuery={query}
+          whsCountry={row.whs_country_name}
           onPick={(hit) => setChosen(hit as CourseHit)}
         />
         {err && (

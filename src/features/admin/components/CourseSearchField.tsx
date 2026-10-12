@@ -3,6 +3,7 @@ import { Search } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { adminTheme as t } from '../theme';
 import { RAISED } from '../lib/panels';
+import { CandidateCountryFlag } from './CountryMismatchWarning';
 
 /**
  * The admin's ONE golf_courses name search (BRIEF_INBOX_WORK_THE_QUEUE 2.4).
@@ -56,13 +57,15 @@ export function useCourseSearch(
 }
 
 export default function CourseSearchField({
-  placeholder, initialQuery = '', onPick, autoFocus = false, disabled = false,
+  placeholder, initialQuery = '', onPick, autoFocus = false, disabled = false, whsCountry = null,
 }: {
   placeholder: string;
   initialQuery?: string;
   onPick: (hit: CourseSearchHit) => void;
   autoFocus?: boolean;
   disabled?: boolean;
+  /** The WHS-published country, so each candidate shows its country flag. */
+  whsCountry?: string | null;
 }) {
   const [query, setQuery] = useState(initialQuery);
   const [open, setOpen] = useState(false);
@@ -127,8 +130,9 @@ export default function CourseSearchField({
               }}
             >
               <div style={{ fontSize: 13, fontWeight: 600, color: t.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.name}</div>
-              <div style={{ fontSize: 11, color: t.inkFaint }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', fontSize: 11, color: t.inkFaint }}>
                 {[h.sub_country, h.country].filter(Boolean).join(' \u00b7 ') || '\u2014'}
+                <CandidateCountryFlag whsCountry={whsCountry} subCountry={h.sub_country} />
               </div>
             </button>
           ))}

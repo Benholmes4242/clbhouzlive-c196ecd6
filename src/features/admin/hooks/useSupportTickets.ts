@@ -16,6 +16,8 @@ export interface SupportTicketRow {
   last_sender: 'user' | 'admin';
   last_message_at: string;
   created_at: string;
+  /** Stamped when resolved/closed; null when open or closed before Stage 1. */
+  resolved_at: string | null;
   profile: {
     display_name: string | null;
     username: string | null;
@@ -41,7 +43,7 @@ export interface SupportMessageRow {
 export async function fetchSupportTickets(opts?: { closed?: boolean }): Promise<SupportTicketRow[]> {
   let q: any = supabase
     .from('support_tickets')
-    .select('id, user_id, category, subject, status, last_sender, last_message_at, created_at')
+    .select('id, user_id, category, subject, status, last_sender, last_message_at, created_at, resolved_at')
     .order('last_message_at', { ascending: false })
     .limit(500);
   if (opts?.closed) q = q.in('status', ['resolved', 'closed']);
@@ -83,6 +85,7 @@ export async function fetchSupportTickets(opts?: { closed?: boolean }): Promise<
     ...t,
     status: t.status as SupportStatus,
     last_sender: t.last_sender as 'user' | 'admin',
+    resolved_at: t.resolved_at ?? null,
     profile: pMap.get(t.user_id) ?? null,
     snippet: snippetMap.get(t.id) ?? null,
   }));
