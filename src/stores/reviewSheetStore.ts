@@ -23,6 +23,8 @@ export interface ReviewSheetPayload {
   courseRegion?: string | null;
   courseSubCountry?: string | null;
   reviewText?: string | null;
+  /** When the review was posted — the only honest source for "Played n months ago". */
+  reviewDate?: string | null;
   /** Optional breakdown sub-scores. Each may be null if the user skipped that breakdown. */
   breakdown?: ReviewSheetBreakdown | null;
   /** Optional reviewer aggregate stats — surfaced in the author card. */
