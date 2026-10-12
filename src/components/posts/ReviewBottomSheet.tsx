@@ -1,3 +1,4 @@
+import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 /**
  * ReviewBottomSheet — DARK floating glass review card.
  *
@@ -182,13 +183,17 @@ export function formatDeviation(delta: number): string {
 
 /** §S.3 — the review's age in words. Reads the review date only: a member's
  *  join year is not when they played, so it is never a fallback. */
+const REVIEW_TILE_MAX_W = 115;
+const tileDpr = () => (typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1);
+
 export function playedAgo(iso?: string | null, now: number = Date.now()): string | null {
   if (!iso) return null;
   const then = new Date(iso).getTime();
   if (!Number.isFinite(then)) return null;
   const d = Math.floor((now - then) / (24 * 60 * 60 * 1000));
-  const unit = (n: number, w: string) => `Played ${n} ${w}${n === 1 ? '' : 's'} ago`;
-  if (d < 1) return 'Played today';
+  // review_date is when the review was written — there is no play date.
+  const unit = (n: number, w: string) => `Reviewed ${n} ${w}${n === 1 ? '' : 's'} ago`;
+  if (d < 1) return 'Reviewed today';
   if (d < 7) return unit(d, 'day');
   if (d < 30) return unit(Math.floor(d / 7), 'week');
   if (d < 365) return unit(Math.max(1, Math.floor(d / 30)), 'month');
@@ -847,7 +852,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         className="review-photo-tile"
                       >
                         <img
-                          src={m.mediaType === 'video' ? (m.posterUrl ?? m.mediaUrl) : m.mediaUrl}
+                          // Grid tiles request their drawn size x DPR via Cloudflare
+                          // (tiles are ≤115 x 78px). Originals (24MP+) trip iOS
+                          // subsampling, which drops EXIF orientation. Fullscreen
+                          // still opens the original.
+                          src={m.mediaType === 'video'
+                            ? (m.posterUrl ?? m.mediaUrl)
+                            : buildImageThumbnailUrl(m.mediaUrl, { width: Math.round(REVIEW_TILE_MAX_W * tileDpr()), height: Math.round(78 * tileDpr()), fit: 'cover' })}
                           alt=""
                           loading="lazy"
                           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}

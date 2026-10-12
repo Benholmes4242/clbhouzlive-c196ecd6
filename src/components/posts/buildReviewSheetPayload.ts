@@ -36,7 +36,9 @@ export function buildReviewSheetPayload(
     courseRegion: review.courseRegion,
     courseSubCountry: review.courseSubCountry,
     reviewText: review.reviewText,
-    reviewDate: post.createdAt || null,
+    // The post's date is NOT the review's date — review_date is fetched by
+    // reviewId in the sheet. postDate is only the null-review_date fallback.
+    postDate: post.createdAt || null,
     breakdown: (review as { breakdown?: ReviewSheetPayload['breakdown'] }).breakdown ?? null,
     reviewerStats,
   };

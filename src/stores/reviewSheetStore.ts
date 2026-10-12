@@ -23,8 +23,11 @@ export interface ReviewSheetPayload {
   courseRegion?: string | null;
   courseSubCountry?: string | null;
   reviewText?: string | null;
-  /** When the review was posted — the only honest source for "Played n months ago". */
+  /** The review's own review_date, when the caller already has it. When absent
+   *  the sheet fetches it by reviewId. Never anything about the reviewer. */
   reviewDate?: string | null;
+  /** The feed post's created date. Used ONLY if review_date is null. */
+  postDate?: string | null;
   /** Optional breakdown sub-scores. Each may be null if the user skipped that breakdown. */
   breakdown?: ReviewSheetBreakdown | null;
   /** Optional reviewer aggregate stats — surfaced in the author card. */
