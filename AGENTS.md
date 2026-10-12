@@ -2,6 +2,8 @@
 
 Only rules that govern MORE THAN ONE area live here. A rule that governs one section's code lives as a comment at that code ("ARCHITECTURE RULE (moved from AGENTS.md)").
 
+- Browser canvas regression checks for both crop modals live outside Vitest in `tests/browser`, exercise the real Apply handlers with local callbacks, and write evidence under `/tmp/browser`, because JPEG byte identity needs a real browser without hosted upload writes or changing the agreed Vitest count.
+
 - Profile handicap index surfaces use `HcpTrendChart` as their canonical plot renderer, so chart styling and interaction markers stay consistent.
 - Tour tee-alert toggles use `tourOptimisticToggle` for cache writes and per-id rollback, because invalidation alone does not refresh this app's mounted queries.
 - Every surface that prints a course aggregate rating reads `COURSE_RATING_FLOOR` (`courseRatingFloor.ts`), so card, rails and ranker agree on one sample floor.
