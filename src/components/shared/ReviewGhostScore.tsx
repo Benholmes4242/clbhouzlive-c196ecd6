@@ -1,51 +1,20 @@
 /**
- * ReviewGhostScore — shared ghost numeral + verdict label used by
- * Clubhouse FeedCard AND ReviewBottomSheet. Palettes MUST never fork.
+ * ReviewGhostScore — the shared review verdict label and its colour rules.
+ * The watermark numeral that once lived here was deleted with the feed review
+ * card rebuild (BRIEF_REVIEW_POST_REBUILD B.3); nothing else rendered it.
  *
- * Split of duties:
- *   - The huge low-alpha watermark numeral is GREEN at 9.0 and above, and
- *     neutral below. Its existing 16% dark / 10% light alpha remains fixed so
- *     the 110px wash stays behind the body copy rather than competing with it.
  *   - The tier verdict label (EXCEPTIONAL / EXCELLENT / GOOD / FAIR / POOR)
  *     uses the canonical display rule: GREEN at 9.0 and above, MUTE below.
  *     The three-band scale belongs only to score-composer feedback.
  */
 import React from 'react';
 import { getRatingTierLabel, type RatingTier } from '@/lib/ratingTier';
-import { formatRatingValue } from '@/utils/formatters';
 import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { BAND_GREEN } from '@/features/courses/_shared/scoreBandTokens';
 
 export type ReviewGhostSurface = 'dark' | 'light';
 
-/** One neutral ghost value for every tier — 9.2 and 4.1 render identically.
- *  Dark = paper-white at 16%; light = ink at 10% (a quiet grey watermark). */
-export const REVIEW_GHOST_COLOR_NEUTRAL = 'rgba(248,250,252,0.16)';
-export const REVIEW_GHOST_COLOR_NEUTRAL_LIGHT = 'rgba(14,18,22,0.10)';
 export const REVIEW_LABEL_COLOR_NEUTRAL_LIGHT = 'var(--rating-bar-fill-neutral)';
-
-function hexAtAlpha(hex: string, alpha: number): string {
-  const channels = hex.match(/[a-f\d]{2}/gi)?.map((channel) => Number.parseInt(channel, 16));
-  if (!channels || channels.length !== 3) return hex;
-  return `rgba(${channels[0]},${channels[1]},${channels[2]},${alpha})`;
-}
-
-export const REVIEW_GHOST_COLOR_GREEN = hexAtAlpha(A.GREEN, 0.16);
-export const REVIEW_GHOST_COLOR_GREEN_LIGHT = hexAtAlpha(BAND_GREEN, 0.10);
-
-export function reviewGhostColor(
-  rating: number,
-  surface: ReviewGhostSurface = 'dark',
-): string {
-  if (rating >= 9) {
-    return surface === 'light'
-      ? REVIEW_GHOST_COLOR_GREEN_LIGHT
-      : REVIEW_GHOST_COLOR_GREEN;
-  }
-  return surface === 'light'
-    ? REVIEW_GHOST_COLOR_NEUTRAL_LIGHT
-    : REVIEW_GHOST_COLOR_NEUTRAL;
-}
 
 /** Canonical display colour, not the composer bands. The scoreBands.tsx light
  * values fail on the dark feed and its amber/red meanings do not apply here.
@@ -85,54 +54,6 @@ export function reviewTierColor(
 }
 
 
-
-interface ReviewGhostNumeralProps {
-  rating: number;
-  /** Watermark font size — card uses 110; sheet uses ~86. */
-  fontSize?: number;
-  /** Absolute-position `right` offset. Both card and sheet use -7 by default. */
-  right?: number;
-  /** Absolute-position `top` (before translateY(-50%)). Card uses 28. */
-  top?: number;
-  /** Host surface. Default 'dark' — FeedCard and ReviewBottomSheet unchanged. */
-  surface?: ReviewGhostSurface;
-}
-
-/**
- * Absolutely-positioned watermark numeral. Parent must be `position: relative`
- * with `overflow: hidden` so the numeral clips at the container edge (this is
- * what gives the card/sheet its off-edge overflow).
- */
-export const ReviewGhostNumeral: React.FC<ReviewGhostNumeralProps> = ({
-  rating,
-  fontSize = 110,
-  right = -7,
-  top = 28,
-  surface = 'dark',
-}) => {
-  return (
-    <span
-      aria-hidden
-      style={{
-        position: 'absolute',
-        right,
-        top,
-        transform: 'translateY(-50%)',
-        fontSize,
-        fontWeight: 700,
-        letterSpacing: '-0.05em',
-        lineHeight: 1,
-        pointerEvents: 'none',
-        whiteSpace: 'nowrap',
-        zIndex: 0,
-        fontVariantNumeric: 'tabular-nums',
-        color: reviewGhostColor(rating, surface),
-      }}
-    >
-      {formatRatingValue(rating)}
-    </span>
-  );
-};
 
 interface ReviewVerdictLabelProps {
   rating: number;

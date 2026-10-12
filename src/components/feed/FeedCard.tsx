@@ -32,7 +32,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
 import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
 import { getRatingTierLabel } from '@/lib/ratingTier';
-import { ReviewGhostNumeral, ReviewVerdictLabel } from '@/components/shared/ReviewGhostScore';
+import { ReviewVerdictLabel } from '@/components/shared/ReviewGhostScore';
 import { formatRatingValue } from '@/utils/formatters';
 import { useActiveActor } from '@/context/ActiveActorContext';
 
@@ -853,10 +853,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         borderTop: feedIndex === 0 ? undefined : `1px solid ${LINE}`,
       }}
     >
-      {/* Card-level ghost numeral — overflows the header, clipped by card edges */}
-      {reviewRating != null && (
-        <ReviewGhostNumeral rating={reviewRating} fontSize={110} right={-7} top={28} />
-      )}
 
       <div style={{ position: 'relative', zIndex: 1 }}>
 
