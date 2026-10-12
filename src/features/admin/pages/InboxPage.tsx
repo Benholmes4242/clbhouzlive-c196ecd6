@@ -1127,16 +1127,55 @@ function CourseRequestInboxSheet({ row, onClose }: { row: CourseRequestRow | nul
           <ClubCoursePicker requestId={row.id} clubId={row.forClubId} initialQuery={row.courseName} requestLocation={row.location ?? undefined} onDone={onClose} />
         )}
 
-        <div style={{ marginTop: 8 }}>
-          <Link
-            to="/admin-v2/content"
-            style={{ color: t.brandText, fontWeight: 600, fontSize: 13 }}
-          >
-            Manage in Content
-          </Link>
-        </div>
+        {!isHomeClub && !isClubCourse && row.status === 'pending' && (
+          <PlainRequestResolver row={row} onDone={onClose} />
+        )}
       </div>
     </AdminSheet>
+  );
+}
+
+/**
+ * BRIEF_INBOX_WORK_THE_QUEUE 1.2 - a plain course request resolves in the
+ * Inbox: 'added' when a course is created for it, 'duplicate' when the admin
+ * uses an existing catalogue course instead, 'rejected' on Dismiss.
+ */
+function PlainRequestResolver({ row, onDone }: { row: CourseRequestRow; onDone: () => void }) {
+  const { resolveCourseRequest } = useCourseRequests();
+  const [createOpen, setCreateOpen] = useState(false);
+  const busy = resolveCourseRequest.isPending;
+  const resolve = async (status: 'added' | 'rejected' | 'duplicate') => {
+    await resolveCourseRequest.mutateAsync({ id: row.id, status });
+    onDone();
+  };
+  return (
+    <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+      <button type="button" disabled={busy} onClick={() => setCreateOpen(true)} style={{ ...btnGhost(), flex: 1 }}>
+        Create course
+      </button>
+      <button type="button" disabled={busy} onClick={() => { void resolve('rejected').catch(() => {}); }} style={{ ...btnGhost(), flex: 1, color: t.inkMuted }}>
+        Dismiss
+      </button>
+      <AddCourseSheet
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        prefillName={row.courseName}
+        prefillSubCountry={row.location ?? undefined}
+        uploadPhoto={uploadCoursePhoto}
+        onOpenExisting={() => {
+          setCreateOpen(false);
+          void resolve('duplicate').catch(() => {});
+        }}
+        onCreated={async () => {
+          try {
+            await resolve('added');
+            return true;
+          } catch {
+            return false;
+          }
+        }}
+      />
+    </div>
   );
 }
 

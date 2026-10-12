@@ -98,8 +98,8 @@ const QUEUES: QueueSpec[] = [
   },
   {
     key: 'unmatchedCourses', label: 'Unmatched courses', type: 'unmatchedCourse',
-    countBuilder: () => sb.from('whs_unmatched_courses').select('whs_course_id', { count: 'exact', head: true }).eq('status', 'open'),
-    oldestBuilder: () => sb.from('whs_unmatched_courses').select('first_seen_at').eq('status', 'open').order('first_seen_at', { ascending: true }).limit(1),
+    countBuilder: () => sb.from('whs_unmatched_courses').select('whs_course_id', { count: 'exact', head: true }).in('status', ['open', 'needs_catalogue']),
+    oldestBuilder: () => sb.from('whs_unmatched_courses').select('first_seen_at').in('status', ['open', 'needs_catalogue']).order('first_seen_at', { ascending: true }).limit(1),
   },
   {
     key: 'holePhotos', label: 'Hole photos', type: 'holePhoto',
@@ -108,8 +108,8 @@ const QUEUES: QueueSpec[] = [
   },
   {
     key: 'supportAwaitingReply', label: 'Support tickets', type: 'support',
-    countBuilder: () => sb.from('support_tickets').select('id', { count: 'exact', head: true }).eq('last_sender', 'user').not('status', 'in', '(resolved,closed)'),
-    oldestBuilder: () => sb.from('support_tickets').select('created_at').eq('last_sender', 'user').not('status', 'in', '(resolved,closed)').order('created_at', { ascending: true }).limit(1),
+    countBuilder: () => sb.from('support_tickets').select('id', { count: 'exact', head: true }).not('status', 'in', '(resolved,closed)'),
+    oldestBuilder: () => sb.from('support_tickets').select('created_at').not('status', 'in', '(resolved,closed)').order('created_at', { ascending: true }).limit(1),
   },
   {
     key: 'approvals', label: 'Approvals', type: 'approval',

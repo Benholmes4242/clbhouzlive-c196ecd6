@@ -145,6 +145,7 @@ export function useCourseRequests() {
     },
     onSettled: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'course-requests'] });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'inbox'] });
     },
   });
 

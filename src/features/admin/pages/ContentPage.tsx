@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams, Navigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow, format } from 'date-fns';
 import { toast } from '@/lib/toast';
@@ -48,10 +48,6 @@ export default function ContentPage() {
   const [params, setParams] = useSearchParams();
   
 
-  // Legacy redirect: ?tab=course-requests -> Inbox
-  if (params.get('tab') === 'course-requests') {
-    return <Navigate to="/admin-v2/inbox?type=courseRequest" replace />;
-  }
 
   const requested = (params.get('tab') as TabId) || 'courses';
   const isAllowed = (id: TabId): boolean => {
