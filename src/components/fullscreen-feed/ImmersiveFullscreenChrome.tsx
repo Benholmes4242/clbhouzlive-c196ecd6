@@ -335,6 +335,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   }, []);
 
   const activePost = posts[activeIndex] ?? null;
+  // K.1: the member's position is saved on pause, close and a throttled interval.
+  useVideoProgressWriter(activePost);
+
   // Prefer the FullscreenMediaPager's live index (updates on every scroll
   // settle inside the fullscreen viewer). Fall back to the clubhouseStore
   // position map (which lags horizontal swipes in fullscreen).
@@ -460,9 +463,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     onBeforeNavigate?.();
     navigate(`/courses/${cid}`);
   };
-
-  // K.1: the member's position is saved on pause, close and a throttled interval.
-  useVideoProgressWriter(activePost);
 
   return (
     <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
