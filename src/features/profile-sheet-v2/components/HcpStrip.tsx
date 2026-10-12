@@ -43,23 +43,18 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
-import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
-import { useUserProfile } from '@/hooks/useUserProfile';
+import { handicapSentence, formatIndex } from '../sheetState';
+import { Door } from './sheetCardParts';
 import { A, KICKER, LABEL, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatDayMonthShortGB } from '@/i18n/format';
 import { HcpTrendChart } from '@/components/profile/handicap/whs/charts';
 
-interface Props {
-  actorType: 'personal' | 'business';
-  actorId: string;
-  onNavigate: (route: string) => void;
-}
 
 // ---------------------------------------------------------------------------
 // Fixed geometry. The two states share every band so the card cannot change
 // height when a member connects.
 // ---------------------------------------------------------------------------
-const CARD_RADIUS = 12;
+const CARD_RADIUS = 14;
 const HEADER_H = 26;
 const FIGURE_H = 46;
 const PLOT_H = 96;
@@ -76,9 +71,6 @@ interface Point { t: string; v: number }
    consumers here were the removed sample curve and the removed WORST/MID/BEST
    key. Do not reintroduce either: a curve in this file has no data behind it. */
 
-function formatIndex(v: number): string {
-  return v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
-}
 
 
 
@@ -110,7 +102,7 @@ const Shell: React.FC<{
   }, []);
 
   return (
-    <div style={{ margin: '12px 20px 0', fontFamily: SANS }}>
+    <div data-card="handicap" style={{ margin: '0 20px 9px', fontFamily: SANS }}>
       <div
         ref={outerRef}
         onClick={onClick}
@@ -153,9 +145,6 @@ const Shell: React.FC<{
                card height between connected and unconnected is unaffected. */
             minHeight: LEGEND_H,
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
             padding: `0 ${PAD}px`,
             marginBottom: PAD - 4,
           }}
@@ -170,61 +159,17 @@ const Shell: React.FC<{
 
 
 // ---------------------------------------------------------------------------
-// The unconnected card. Amber throughout, and NO FIGURES ANYWHERE — nothing
-// on it may be mistaken for the member's own data. The kicker is
-// FEDERATION-NEUTRAL: sixteen more governing bodies are pending, so nothing
-// before a member picks a country may name England Golf.
-// ---------------------------------------------------------------------------
-const GhostCard: React.FC<{ onOpen: () => void }> = ({ onOpen }) => (
-  <Shell
-    onClick={onOpen}
-    header={<span style={KICKER}>Official handicap index</span>}
-    figure={
-      <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK, lineHeight: 1.3 }}>
-        Connect your official handicap
-        <br />
-        for stats, analytics and your circle.
-      </div>
-    }
-    /* BRIEF_ACCOUNT_SHEET_REBUILD A — THE PLOT BAND IS DELIBERATELY EMPTY.
-       It previously drew eight hardcoded points under a WORST/MID/BEST key.
-       That is invented data wearing a legend, on the state ~4 in 5 accounts
-       see. Nothing here may resemble a trace, an axis or a key: no svg, no
-       path, no gradient, no swatch. The band is retained ONLY so the card is
-       the same height connected and unconnected. The CTA sits on its
-       baseline, which is the whole of its content. */
-    plot={() => (
-      <div
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 6,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 4,
-          color: AMBER_TEXT,
-        }}
-      >
-        <span style={{ ...LABEL, color: AMBER_TEXT }}>Connect your handicap</span>
-        <ChevronRight size={12} strokeWidth={2.6} />
-      </div>
-    )}
-  />
-);
-
-
-// ---------------------------------------------------------------------------
 // The connected card.
 // ---------------------------------------------------------------------------
-const TrendCard: React.FC<{
+export const TrendCard: React.FC<{
   points: Point[];
   windowDays: 30 | 90;
   onWindow: (d: 30 | 90) => void;
   fallbackIndex: number | null;
   onNavigate: (route: string) => void;
 }> = ({ points, windowDays, onWindow, fallbackIndex, onNavigate }) => {
+  // C.2 — the sentence reads the SAME points the chart draws, so it moves with the toggle.
+  const sentence = useMemo(() => handicapSentence(points, windowDays), [points, windowDays]);
   const [scrub, setScrub] = useState<number | null>(null);
   const plotRef = useRef<HTMLDivElement | null>(null);
   const dragging = useRef(false);
@@ -389,77 +334,18 @@ const TrendCard: React.FC<{
         />
       )}
       legend={
-        <>
-          <button
-            type="button"
-            onClick={() => onNavigate('/handicap')}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              padding: 0,
-              marginLeft: 'auto',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              fontFamily: SANS,
-            }}
-          >
-            <span style={{ ...LABEL, color: A.INK }}>View handicap</span>
-            <ChevronRight size={12} strokeWidth={2.6} color={A.INK} />
-          </button>
-        </>
+        <div style={{ width: '100%' }}>
+          {sentence && (
+            <div data-hcp-sentence style={{ fontSize: 12.5, lineHeight: 1.4, color: A.MUTE, marginTop: 9 }}>
+              {sentence.map((s, i) => s.bold
+                ? <b key={i} style={{ color: A.INK, fontWeight: 700 }}>{s.text}</b>
+                : <React.Fragment key={i}>{s.text}</React.Fragment>)}
+            </div>
+          )}
+          <Door label="View handicap" onClick={() => onNavigate('/handicap')} />
+        </div>
       }
     />
   );
 };
 
-export default function HcpStrip({ actorType, actorId, onNavigate }: Props) {
-  const isBusiness = actorType === 'business';
-  const [windowDays, setWindowDays] = useState<30 | 90>(90);
-
-  const { data: profile, isFetched: profileFetched, isError: profileError } =
-    useUserProfile(isBusiness ? undefined : actorId);
-  const { data: connection, isFetched: connFetched, isError: connError } =
-    useWhsConnection(isBusiness ? undefined : actorId);
-  const { data: trend, isFetched: trendFetched, isError: trendError } =
-    useHandicapTrend(connection?.id);
-  const { data: history90, isFetched: histFetched, isError: histError } =
-    useHandicapHistory(connection?.id, 90);
-
-  // The 30-day window is a client-side slice of the SAME 90-day query — the
-  // segmented control costs no extra round trip.
-  const points = useMemo<Point[]>(() => {
-    if (!history90) return [];
-    const cutoff = windowDays === 90 ? 0 : Date.now() - windowDays * 86_400_000;
-    return history90
-      .filter((p: any) => !cutoff || new Date(p.observed_at).getTime() >= cutoff)
-      .map((p: any) => ({ t: p.observed_at, v: p.handicap_index }));
-  }, [history90, windowDays]);
-
-  const anyError = profileError || connError || trendError || histError;
-  const settled =
-    anyError ||
-    (profileFetched && connFetched && (!connection || (trendFetched && histFetched)));
-
-  if (isBusiness) return null;
-  // UNRESOLVED IS NOT ABSENT: render nothing at all while unsettled.
-  if (!settled) return null;
-  // The hide toggle governs BOTH surfaces — the island chip and this card.
-  if (profile?.hide_handicap_chip) return null;
-
-  if (!connection) return <GhostCard onOpen={() => onNavigate('/manage/handicap')} />;
-
-  const fallbackIndex = typeof trend?.current === 'number' ? trend.current : null;
-  if (points.length < 2 && fallbackIndex == null) return null;
-
-  return (
-    <TrendCard
-      points={points}
-      windowDays={windowDays}
-      onWindow={setWindowDays}
-      fallbackIndex={fallbackIndex}
-      onNavigate={onNavigate}
-    />
-  );
-}
