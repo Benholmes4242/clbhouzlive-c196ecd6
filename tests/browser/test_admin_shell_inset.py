@@ -65,7 +65,7 @@ createRoot(document.getElementById('root')).render(React.createElement(MemoryRou
             for section in ('dashboard', 'inbox', 'users', 'content', 'analytics', 'health'):
                 await page.evaluate('(s)=>window.go("/admin-v2/"+s)', section)
                 await page.get_by_test_id('first-panel').wait_for()
-                await page.wait_for_timeout(250)
+                await page.wait_for_timeout(650)
                 header = await page.locator('header').bounding_box()
                 panel = await page.get_by_test_id('first-panel').bounding_box()
                 gap = panel['y'] - header['y'] - header['height']
