@@ -16,6 +16,7 @@ import { patchEngagement } from '@/lib/engagementCache';
 import { useReactionPostIds } from '@/components/explore-tab-new/courseled/hooks/useReactionPostIds';
 import { commentsKeys, commentsScope, viewerId } from '@/lib/queryKeys';
 import { resolveReactionActor, isReactionByActor } from '@/lib/reactionActor';
+import { visibleCommentCount, hiddenCommentCount } from '../lib/threadCounts';
 
 /**
  * 'tour_story' | 'amateur_story' (BRIEF_STORY_ENGAGEMENT §S5). Both story beats
@@ -371,6 +372,15 @@ export function useCommentsV2({
       return count ?? 0;
     },
   });
+
+  /* G.1 — ONE SOURCE: the count is the threads array the body maps over. */
+  const visibleCount = useMemo(() => visibleCommentCount(threads), [threads]);
+  const threadFetched = pagesFetched && (parentIds.length === 0 || repliesFetched);
+  const hiddenCount = hiddenCommentCount(
+    totalCount,
+    visibleCount,
+    threadFetched && totalCountFetched && !hasNextPage,
+  );
 
   const invalidate = useCallback(() => {
     qc.invalidateQueries({ queryKey: keyRoot as unknown as readonly unknown[] });
