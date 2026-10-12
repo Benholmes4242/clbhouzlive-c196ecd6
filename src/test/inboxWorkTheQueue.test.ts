@@ -68,3 +68,16 @@ describe('Flow panel', () => {
     expect(formatWaitHours(72)).toBe('3d');
   });
 });
+
+describe('Done view LONGEST WAIT', () => {
+  it('is the maximum closed-minus-opened among items cleared in the last 7 days', async () => {
+    const { longestWaitHours } = await import('@/features/admin/lib/inboxQueue');
+    const done = [
+      { ...item('a', 'support', 1), openedAt: daysAgo(4) },        // 3d wait, cleared 1d ago
+      { ...item('b', 'courseRequest', 2), openedAt: daysAgo(95) }, // 93d wait, cleared 2d ago
+      { ...item('c', 'report', 10), openedAt: daysAgo(200) },      // cleared 10d ago: excluded
+    ];
+    expect(longestWaitHours(done, NOW)).toBe(93 * 24);
+    expect(longestWaitHours([], NOW)).toBeNull();
+  });
+});

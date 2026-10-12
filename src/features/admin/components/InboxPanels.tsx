@@ -9,7 +9,7 @@ import { formatDurationShort } from '../lib/chartPrimitives';
 import type { InboxItem, InboxType } from '../hooks/useInboxFeed';
 import { flowColumns, formatWaitHours, type InboxFlow } from '../hooks/useInboxFlow';
 import {
-  QUEUE_SHORT, ageLabel, isLongWait, oldestItem, totalMembers, type QueueSummary,
+  QUEUE_SHORT, ageLabel, isLongWait, longestWaitHours, oldestItem, totalMembers, type QueueSummary,
 } from '../lib/inboxQueue';
 
 /** BRIEF_INBOX_WORK_THE_QUEUE stage 2: the Inbox's tiles, chips, Flow and Tools. */
@@ -103,11 +103,11 @@ export function FigureTiles({ view, loading, openItems, doneItems, queueCount, f
   const medianCaption = `median ${medianH == null ? DASH : formatDurationShort(medianH * 3600)}`;
 
   if (view === 'done') {
-    const oldest = oldestItem(doneItems);
+    const wait = longestWaitHours(doneItems);
     return (
       <div style={grid}>
         <Tile label="Done" figure={String(doneItems.length)} caption="recently closed" loading={loading} />
-        <Tile label="Oldest cleared" figure={oldest ? ageLabel(oldest.createdAt) : DASH} caption={oldest ? QUEUE_SHORT[oldest.type] : DASH} loading={loading} />
+        <Tile label="Longest wait" figure={formatWaitHours(wait)} caption="to clear" loading={loading} />
         <Tile label="Members" figure={String(totalMembers(doneItems))} caption="helped" loading={loading} />
         <Tile label="Median" figure={formatWaitHours(medianH)} caption="wait · 7d" loading={flow7Loading} />
       </div>

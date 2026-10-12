@@ -1,22 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
+import { Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { invalidateAdminQueues, subscribeAdminQueueChanges, refreshAdminQueues } from '@/features/admin/lib/adminQueueRefresh';
-import { ChevronRight, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { LABEL } from '@/lib/tokens/type';
-import { courseMatchLabel } from '../lib/geography';
 import {
-  CandidateCountryFlag,
   CountryMismatchWarning,
   WhsCountryChip,
 } from '../components/CountryMismatchWarning';
 import { adminTheme as t } from '../theme';
 import { useInboxFeed, type InboxItem, type InboxType } from '../hooks/useInboxFeed';
-// Seconds in. The Dashboard's System panel uses this exact formatter, so an age
-// reads identically on both surfaces.
-import { formatDurationShort } from '../lib/chartPrimitives';
-import EmptyState from '../components/EmptyState';
 import AdminAccessDenied from '../components/AdminAccessDenied';
 import ModerationDetailDrawer from '../components/ModerationDetailDrawer';
 import AppealDetailDrawer from '../components/AppealDetailDrawer';
@@ -34,7 +27,7 @@ import { OpenDoneControl, FigureTiles, QueueChips, RowSkeleton, FlowPanel, ToolR
 import { useInboxFlow } from '../hooks/useInboxFlow';
 import { orderOpenItems, summariseQueues } from '../lib/inboxQueue';
 import { LIST_PANEL } from '../lib/panels';
-import CourseSearchField, { useCourseSearch, type CourseSearchHit } from '../components/CourseSearchField';
+import CourseSearchField, { useCourseSearch } from '../components/CourseSearchField';
 import { uploadCoursePhoto } from '../hooks/useCourses';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
@@ -58,39 +51,10 @@ import {
   type UnmatchedCourseRow,
 } from '../hooks/useUnmatchedCourses';
 
-// ---------- type meta ----------
-
-const TYPE_LABEL: Record<InboxType, string> = {
-  report: 'Reports',
-  appeal: 'Appeals',
-  support: 'Support',
-  verification: 'Verifications',
-  approval: 'Approvals',
-  match: 'Matches',
-  courseRequest: 'Course requests',
-  unmatchedCourse: 'Unmatched courses',
-  holePhoto: 'Hole photos',
-};
-
-/** The page's one age format. Absolute, tabular-safe: "44m" / "31h" / "32d". */
-function ageShort(iso: string): string {
-  const secs = (Date.now() - new Date(iso).getTime()) / 1000;
-  return Number.isFinite(secs) ? formatDurationShort(Math.max(0, secs)) : '-';
-}
-
-/** Kept for the Done view only: "closed 2 days ago" beats an absolute age. */
+/** The Unmatched sheet's "Waiting 3 months ago" line. */
 function relTime(iso: string): string {
   try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); } catch { return '-'; }
 }
-
-function ageColour(iso: string): string {
-  const diffH = (Date.now() - new Date(iso).getTime()) / 3_600_000;
-  if (diffH >= 24) return t.dangerText;
-  if (diffH >= 8) return t.warnText;
-  return t.inkFaint;
-}
-
-const LABEL_T = { ...LABEL, fontFeatureSettings: '"kern" 1, "liga" 1' } as const;
 
 // ---------- redirects helper ----------
 
@@ -315,9 +279,18 @@ function InboxListPage() {
             ))}
           </div>
         ) : (
-          <div style={{ borderTop: `1px solid ${t.hairline}`, padding: '0 12px' }}>
+          <div style={{ borderTop: `1px solid ${t.hairline}` }}>
             {filtered.map((item, idx) => (
-              <StreamRow key={item.id} item={item} first={idx === 0} done showQueue={typeFilter === 'all'} onClick={() => openRow(item)} />
+              <InboxQueueRow
+                key={item.id}
+                item={item}
+                first={idx === 0}
+                done
+                onOpen={() => openRow(item)}
+                onResolved={onResolved}
+                isFullAdmin={role === 'full'}
+                catalogueTotal={catalogueTotal}
+              />
             ))}
           </div>
         )}
@@ -351,150 +324,6 @@ function InboxListPage() {
       <CourseRequestInboxSheet row={courseReqRow} onClose={() => setCourseReqRow(null)} />
       <HolePhotoReviewSheet row={holePhotoRow} onClose={() => setHolePhotoRow(null)} />
     </div>
-  );
-}
-
-// ---------- pieces ----------
-
-function QueueTile({
-  label, count, oldestIso, active, onClick,
-}: {
-  label: string;
-  count: number;
-  oldestIso: string | null;
-  active: boolean;
-  onClick: () => void;
-}) {
-  const empty = count === 0;
-  const tone = oldestIso ? ageColour(oldestIso) : t.line;
-  const capOpacity = !oldestIso ? 1 : tone === t.inkFaint ? 0.5 : 1;
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      style={{
-        display: 'flex', flexDirection: 'column', gap: 8,
-        padding: '8px 10px 10px',
-        borderRadius: t.radius.lg,
-        background: active ? t.neutralSoft : t.surface,
-        border: `1px solid ${active ? t.line : t.hairline}`,
-        cursor: 'pointer',
-        textAlign: 'left',
-        opacity: empty ? 0.55 : 1,
-        minWidth: 0,
-      }}
-    >
-      <span
-        aria-hidden
-        style={{
-          height: 2.5, borderRadius: 2, width: '100%',
-          background: tone, opacity: capOpacity,
-        }}
-      />
-      <span
-        style={{
-          ...LABEL_T, color: t.inkMuted,
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          maxWidth: '100%',
-        }}
-      >
-        {label}
-      </span>
-      <span style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
-        <span
-          style={{
-            fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: t.ink,
-            fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {count}
-        </span>
-        {!empty && oldestIso && (
-          <span
-            style={{
-              fontSize: 11, fontWeight: 700, color: tone,
-              fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {ageShort(oldestIso)}
-          </span>
-        )}
-      </span>
-    </button>
-  );
-}
-
-function StreamRow({ item, first, done, showQueue, onClick }: {
-  item: InboxItem; first: boolean; done: boolean; showQueue: boolean; onClick: () => void;
-}) {
-  const meta = item.meta.replace(/^[^-]+-\s*/, '');
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 10,
-        padding: '10px 4px',
-        borderTop: first ? 'none' : `1px solid ${t.line}`,
-        background: 'transparent', border: 'none', cursor: 'pointer',
-        textAlign: 'left', width: '100%',
-        opacity: done ? 0.72 : 1,
-      }}
-    >
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-          {item.isHighPriority && (
-            <span
-              style={{
-                padding: '1px 6px', borderRadius: 4,
-                background: t.dangerSoft, color: t.dangerText,
-                fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.4,
-                flexShrink: 0,
-              }}
-            >
-              High
-            </span>
-          )}
-          <span
-            style={{
-              color: t.ink, fontSize: 13.5, fontWeight: 700,
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            }}
-          >
-            {item.title}
-          </span>
-          {showQueue && (
-            <span style={{ ...LABEL_T, color: t.inkFaint, flexShrink: 0 }}>
-              {TYPE_LABEL[item.type]}
-            </span>
-          )}
-        </div>
-        <div
-          style={{
-            color: t.inkMuted, fontSize: 11.5, marginTop: 2,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}
-        >
-          {done && item.closedOutcome ? item.closedOutcome : meta}
-        </div>
-      </div>
-      <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
-        <span
-          style={{
-            fontSize: 11, fontWeight: 700,
-            color: done ? t.inkFaint : ageColour(item.createdAt),
-            fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {done ? relTime(item.createdAt) : ageShort(item.createdAt)}
-        </span>
-        {!done && (
-          <span style={{ ...LABEL_T, color: t.inkFaint, marginTop: 1 }}>Waiting</span>
-        )}
-      </span>
-      <ChevronRight size={14} color={t.inkFaint} />
-    </button>
   );
 }
 
@@ -695,9 +524,6 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
     setQuery(row.echo_suggestion ?? (row.whs_course_name ?? '').split('-')[0].trim());
   }, [whsId]);
 
-  const { hits: rawHits, searching, error: searchError } = useCourseSearch(query, { enabled: !!row });
-  const hits = rawHits as CourseHit[];
-  useEffect(() => { if (searchError) setErr(searchError); }, [searchError]);
 
   if (!row) return null;
 
@@ -796,51 +622,16 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
         {chosen && (
           <CountryMismatchWarning whsCountry={row.whs_country_name} subCountry={chosen.sub_country} />
         )}
-        <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase', color: t.inkFaint }}>
-          Search courses
-        </label>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Club name..."
-          style={{
-            padding: '10px 12px', borderRadius: t.radius.md,
-            border: `1px solid ${t.line}`, background: t.surface, color: t.ink,
-            fontSize: 13, outline: 'none',
-          }}
-        />
-        {searching ? (
-          <div style={{ color: t.inkMuted, fontSize: 12 }}>Searching...</div>
-        ) : hits.length === 0 ? (
-          <div style={{ color: t.inkMuted, fontSize: 12 }}>
-            {query.trim().length < 2 ? 'Type at least 2 characters.' : 'No matches.'}
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {hits.map((h) => {
-              const active = chosen?.id === h.id;
-              return (
-                <button
-                  key={h.id}
-                  onClick={() => setChosen(h)}
-                  style={{
-                    textAlign: 'left', padding: '10px 12px', borderRadius: t.radius.md,
-                    border: `1px solid ${active ? t.brand : t.line}`,
-                    background: active ? t.brandSoft ?? t.canvas : t.surface,
-                    cursor: 'pointer',
-                  }}
-                >
-                  <div style={{ fontSize: 13, fontWeight: 600, color: t.ink }}>{h.name}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', fontSize: 11, color: t.inkMuted }}>
-                    {courseMatchLabel(h) || '-'}
-                    <CandidateCountryFlag whsCountry={row.whs_country_name} subCountry={h.sub_country} />
-                  </div>
-                </button>
-              );
-            })}
+        {chosen && (
+          <div style={{ fontSize: 13, color: t.ink }}>
+            Link to: <b>{chosen.name}</b>
           </div>
         )}
+        <CourseSearchField
+          placeholder="Search courses"
+          initialQuery={query}
+          onPick={(hit) => setChosen(hit as CourseHit)}
+        />
         {err && (
           <div style={{
             padding: '8px 10px', borderRadius: t.radius.md,

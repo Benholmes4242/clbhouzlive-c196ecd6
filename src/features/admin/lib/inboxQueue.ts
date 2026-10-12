@@ -106,3 +106,21 @@ export function ageLabel(iso: string, now = Date.now()): string {
   if (h < 48) return `${h}h`;
   return `${Math.floor(h / 24)}d`;
 }
+
+/**
+ * Done view LONGEST WAIT: the maximum (closed - opened), in hours, among items
+ * cleared in the last 7 days. Null when none qualifies.
+ */
+export function longestWaitHours(done: InboxItem[], now = Date.now()): number | null {
+  const since = now - 7 * 86_400_000;
+  let max: number | null = null;
+  for (const it of done) {
+    if (!it.openedAt) continue;
+    const closed = new Date(it.createdAt).getTime();
+    const opened = new Date(it.openedAt).getTime();
+    if (!Number.isFinite(closed) || !Number.isFinite(opened) || closed < since || closed < opened) continue;
+    const h = (closed - opened) / 3_600_000;
+    if (max == null || h > max) max = h;
+  }
+  return max;
+}

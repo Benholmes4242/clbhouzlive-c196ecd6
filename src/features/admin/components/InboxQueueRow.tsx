@@ -70,6 +70,8 @@ export interface InboxQueueRowProps {
   onResolved: (id: string) => void;
   isFullAdmin: boolean;
   catalogueTotal: number | null;
+  /** Done view: the outcome replaces the action row; the age is time since closing. */
+  done?: boolean;
 }
 
 /** The row's fact line (2.4). */
@@ -109,8 +111,8 @@ function SubLine({ item, isFullAdmin }: { item: InboxItem; isFullAdmin: boolean 
   }
 }
 
-export default function InboxQueueRow({ item, first, onOpen, onResolved, isFullAdmin, catalogueTotal }: InboxQueueRowProps) {
-  const long = isLongWait(item.createdAt);
+export default function InboxQueueRow({ item, first, onOpen, onResolved, isFullAdmin, catalogueTotal, done = false }: InboxQueueRowProps) {
+  const long = !done && isLongWait(item.createdAt);
   return (
     <div style={{ padding: '12px 16px', borderTop: first ? 'none' : `1px solid ${t.hairline}` }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', gap: 10, alignItems: 'start' }}>
@@ -131,12 +133,16 @@ export default function InboxQueueRow({ item, first, onOpen, onResolved, isFullA
           <span style={{ fontSize: 13, fontWeight: 800, color: long ? t.dangerText : t.inkMuted, fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum" 1' }}>
             {ageLabel(item.createdAt)}
           </span>
-          <span style={TAG}>Waiting</span>
+          <span style={TAG}>{done ? 'Ago' : 'Waiting'}</span>
         </div>
       </div>
-      <div style={{ marginTop: 10, display: 'flex', gap: 8, alignItems: 'center' }}>
-        <ActionRow item={item} onOpen={onOpen} onResolved={onResolved} isFullAdmin={isFullAdmin} catalogueTotal={catalogueTotal} />
-      </div>
+      {done ? (
+        <div style={{ marginTop: 10, fontSize: 12, fontWeight: 700, color: t.inkMuted }}>{item.closedOutcome ?? 'Closed'}</div>
+      ) : (
+        <div style={{ marginTop: 10, display: 'flex', gap: 8, alignItems: 'center' }}>
+          <ActionRow item={item} onOpen={onOpen} onResolved={onResolved} isFullAdmin={isFullAdmin} catalogueTotal={catalogueTotal} />
+        </div>
+      )}
     </div>
   );
 }
