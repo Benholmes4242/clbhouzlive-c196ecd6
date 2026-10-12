@@ -372,6 +372,21 @@ export function WatchFeed({
   const settled = (!vParams || videos.isFetched) && (!cParams || clips.isFetched);
   const loading = !settled && rows.length === 0;
   const nothing = !community && settled && quickRows.length === 0 && longRows.length === 0 && !videos.isError && !clips.isError;
+  /* Q.1: the Quick hits heading has ONE home, rendered by both the loading and rows branches,
+     so the heading seen while loading can never drift from the one seen once loaded. */
+  const quickSection = (
+    <Section
+      title={t('amateur.watch.rail.quick', 'Quick hits')}
+      kicker={t('amateur.watch.rail.quickKicker', 'Under 3 min')}
+      /* M.1: no See all on the Quick hits chip; it would point at a worse version of this page. */
+      seeAll={quickGrid ? undefined : t('amateur.watch.seeAll', 'See all')}
+      onSeeAll={quickGrid ? undefined : () => {
+        analyticsEvents.track('amateur_shelf_see_all', { kind: 'clips', surface: 'watch' });
+        onDepart();
+        navigate('/watch/clips');
+      }}
+    />
+  );
 
   return (
     <div style={{ fontFamily: SANS }}>
@@ -458,17 +473,7 @@ export function WatchFeed({
             />
           ) : quickRows.length > 0 ? (
             <>
-              <Section
-                title={t('amateur.watch.rail.quick', 'Quick hits')}
-                kicker={t('amateur.watch.rail.quickKicker', 'Under 3 min')}
-                /* M.1: no See all on the Quick hits chip; it would point at a worse version of this page. */
-                seeAll={quickGrid ? undefined : t('amateur.watch.seeAll', 'See all')}
-                onSeeAll={quickGrid ? undefined : () => {
-                  analyticsEvents.track('amateur_shelf_see_all', { kind: 'clips', surface: 'watch' });
-                  onDepart();
-                  navigate('/watch/clips');
-                }}
-              />
+              {quickSection}
               <QuickLayout grid={quickGrid}>
                 {quickRows.map((row, index) => {
                   const who = creatorName(row);
@@ -502,16 +507,7 @@ export function WatchFeed({
                will once loaded — the skeleton then holds the tiles' place and nothing shifts.
                A settled chip with no rows renders no heading (falls to null below). */
             <>
-              <Section
-                title={t('amateur.watch.rail.quick', 'Quick hits')}
-                kicker={t('amateur.watch.rail.quickKicker', 'Under 3 min')}
-                seeAll={quickGrid ? undefined : t('amateur.watch.seeAll', 'See all')}
-                onSeeAll={quickGrid ? undefined : () => {
-                  analyticsEvents.track('amateur_shelf_see_all', { kind: 'clips', surface: 'watch' });
-                  onDepart();
-                  navigate('/watch/clips');
-                }}
-              />
+              {quickSection}
               {quickGrid ? <GridShell inset={INSET} radius={12} /> : <ShelfShell tileW={QH_W} tileH={QH_H} heading={false} />}
             </>
           ) : null}
