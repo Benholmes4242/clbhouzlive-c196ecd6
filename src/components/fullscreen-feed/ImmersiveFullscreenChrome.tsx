@@ -47,6 +47,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { FullscreenTopProgress, showsTopProgress } from './FullscreenTopProgress';
+import { useVideoProgressWriter } from '@/video/useVideoProgressWriter';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
 
@@ -334,6 +335,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   }, []);
 
   const activePost = posts[activeIndex] ?? null;
+  // K.1: the member's position is saved on pause, close and a throttled interval.
+  useVideoProgressWriter(activePost);
+
   // Prefer the FullscreenMediaPager's live index (updates on every scroll
   // settle inside the fullscreen viewer). Fall back to the clubhouseStore
   // position map (which lags horizontal swipes in fullscreen).

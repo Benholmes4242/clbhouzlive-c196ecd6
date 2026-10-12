@@ -1,86 +1,64 @@
 /**
- * BRIEF_WATCH_MIXED_FEED §4 — THE CHIPS ARE RELATIONSHIP AND TYPE.
+ * THE WATCH CHIPS (BRIEF_WATCH_PAGE K.8): All / Quick hits / Long form /
+ * Friends / Your courses. "Quick hits" and "Long form" filter on QUICK_HIT_MAX
+ * and nothing else — both reads are fetched and split client-side by duration.
  *
- * No invented topics. The mock's "Course vlogs" and "Tips" do not exist as
- * data and are not built.
- *
- * THE HONEST LIMIT, stated once here so no call site can forget it:
- *   get_watch_shorts_v2 takes p_mode ('for_you' | 'trending' | 'latest') AND
- *   p_filter ('following' | 'played_courses'), so all three relationships are
- *   real for CLIPS.
- *   get_long_form_videos_v2 takes p_mode ('latest' | 'popular' | 'following')
- *   — 'following' IS supported (contrary to the brief's §4 statement) but
- *   there is NO played-courses mode. So:
- *     For you  -> videos 'popular' (viewer-aware: the RPC damps posts this
- *                 member has already been shown, keyed on p_user_id)
- *     Friends  -> videos 'following' (a real server-side follow filter)
- *     Your courses -> CLIPS ONLY. Nothing is shown unfiltered under a filter.
- *   The proposed RPC change that would give videos a played-courses mode is
- *   docs/sql/watch_long_form_played_courses.sql, UNAPPLIED.
+ * THE HONEST LIMITS, stated once here:
+ *   Friends -> videos p_mode 'following' + clips p_filter 'following' (both
+ *              server-side follow filters).
+ *   Your courses -> clips p_filter 'played_courses' (server-side). The long-form
+ *              RPC has NO played-courses mode, so long-form is the 'latest'
+ *              read filtered client-side to the member's own courses; it only
+ *              sees loaded pages. The proposed RPC change is
+ *              docs/sql/watch_long_form_played_courses.sql, UNAPPLIED.
+ *   'community' is not a chip. It is the entry state Explore's community
+ *              see-all and the rail's See all open — the shared mosaic.
  */
 
-export const WATCH_FILTERS = ['all', 'for_you', 'friends', 'your_courses', 'clips', 'videos', 'community'] as const;
+export const WATCH_CHIPS = ['all', 'quick', 'long', 'friends', 'your_courses'] as const;
+export const WATCH_FILTERS = [...WATCH_CHIPS, 'community'] as const;
 
 export type WatchFilter = (typeof WATCH_FILTERS)[number];
 
-/** Long-form params, or null where long-form CANNOT honour the filter. */
+/** Long-form read params, or null where the long-form read stands down. */
 export function videoParams(filter: WatchFilter): { mode: string } | null {
   switch (filter) {
-    case 'clips':
-      return null;
-    /* COMMUNITY PHOTOS ARE NEITHER LONG-FORM NOR CLIPS. The chip reads the
-       community moments query instead, so the video feed stands down. */
     case 'community':
       return null;
-    /* NO PLAYED-COURSES MODE EXISTS. Clips only, rather than a page of videos
-       that ignore the chip the member just tapped. */
-    case 'your_courses':
-      return null;
-    case 'for_you':
-      return { mode: 'popular' };
     case 'friends':
       return { mode: 'following' };
-    case 'videos':
-    case 'all':
     default:
       return { mode: 'latest' };
   }
 }
 
-/** Clip params, or null where the filter is long-form only. */
+/** Clip read params, or null where the clip read stands down. */
 export function clipParams(filter: WatchFilter): { mode: string; filter?: string } | null {
   switch (filter) {
-    case 'videos':
-      return null;
-    /* COMMUNITY PHOTOS ARE NEITHER LONG-FORM NOR CLIPS — the clips feed stands
-       down too, rather than showing clips under a community chip. */
     case 'community':
       return null;
-    case 'for_you':
-      return { mode: 'for_you' };
     case 'friends':
       return { mode: 'latest', filter: 'following' };
     case 'your_courses':
       return { mode: 'latest', filter: 'played_courses' };
-    case 'clips':
-      return { mode: 'for_you' };
-    case 'all':
     default:
       return { mode: 'trending' };
   }
 }
 
-/** THE CLIPS-ONLY SHAPE: a 3-up vertical grid, not the mixed feed. */
-export function isClipsOnly(filter: WatchFilter): boolean {
-  return filter === 'clips' || filter === 'your_courses';
-}
-
-/** THE COMMUNITY SHAPE: the shared MomentsGrid mosaic (mixed-ratio media). */
 export function isCommunityOnly(filter: WatchFilter): boolean {
   return filter === 'community';
 }
 
-/** Community photos have no server search path, so rails stand down on search. */
-export function railsWanted(filter: WatchFilter, searching: boolean): boolean {
-  return !searching && filter !== 'videos' && !isClipsOnly(filter) && !isCommunityOnly(filter);
+export function showsQuickHits(filter: WatchFilter): boolean {
+  return filter !== 'long' && filter !== 'community';
+}
+
+export function showsLongForm(filter: WatchFilter): boolean {
+  return filter !== 'quick' && filter !== 'community';
+}
+
+/** Continue watching and the community rail render on All only, never under search. */
+export function allOnly(filter: WatchFilter, searching: boolean): boolean {
+  return filter === 'all' && !searching;
 }

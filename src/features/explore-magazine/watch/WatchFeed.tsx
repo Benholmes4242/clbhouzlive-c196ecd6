@@ -1,28 +1,28 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
-import { useMomentsOfTheWeek } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
+import { useMomentsOfTheWeek, type Moment } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
 import { MomentsGrid } from '@/components/explore-tab-new/courseled/MomentsGrid';
 import { RailChips } from '@/components/ui/RailChips';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
 
 import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import { openWithOrigin } from '@/lib/openWithOrigin';
-import { useActiveActor } from '@/context/ActiveActorContext';
-import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
-import { ExploreShelf } from '../ExploreShelf';
 import { ShelfRetry, ShelfShell } from '../ExploreShells';
 import {
-  WATCH_FILTERS,
+  WATCH_CHIPS,
+  allOnly,
   clipParams,
-  isClipsOnly,
   isCommunityOnly,
-  railsWanted,
+  showsLongForm,
+  showsQuickHits,
   videoParams,
   type WatchFilter,
 } from './watchFilters';
@@ -30,125 +30,127 @@ import {
   AutoplayLayer,
   PosterFallback,
   VideoCard,
+  WatchProgressBar,
   creatorName,
   hlsFor,
   posterFor,
+  videoTitle,
 } from './videoUnit';
 import { useWatchClips } from './useWatchClips';
 import { useWatchVideos } from './useWatchVideos';
+import { useWatchProgress, useWatchViews } from './useWatchSignals';
+import {
+  RAIL_EVERY,
+  groupByMember,
+  isPartWatched,
+  isQuickHit,
+  photosCaption,
+  progressFraction,
+  reasonLine,
+  remainingLabel,
+  spreadByCreator,
+  viewsLabel,
+} from './watchRules';
 
 /**
- * THE WATCH FEED (BRIEF_WATCH_MIXED_FEED).
+ * THE WATCH PAGE (BRIEF_WATCH_PAGE; the signed-off prototype is the spec).
  *
- * THE SHAPE TELLS YOU WHAT IT IS, and that is the whole layout rule:
- *   LONG-FORM VIDEO is full width and 16:9.
- *   A CLIP is 112px wide and 9:16, in a horizontal rail.
- *   A MOMENT is a 112px square, in a horizontal rail.
- * There are NO type labels and no "CLIP" badges anywhere in this file. A member
- * knows what a vertical thumbnail is; a badge would be the layout apologising
- * for itself.
+ * ORDER (K.8): chips, then Continue watching (All only, only when populated)
+ * -> Quick hits -> the long-form column, with the community rail injected once,
+ * after the third long-form card.
  *
- * SEE-ALL IS A DOORWAY, NOT A SUMMARY (BRIEF_WATCH_RAIL_SEE_ALL, overturning
- * BRIEF_WATCH_MIXED_FEED's blanket no-see-all for the two rails only). The Clips
- * rail opens /watch/clips and the community rail opens /media?kind=community —
- * the full pages for those kinds, the same destinations reachable from the Watch
- * hub's doors and Discover's shelves. The label stays COUNT-FREE: a rail only
- * knows its loaded window, and a count of a window would be a lie. Inside the
- * feed the rails still take the NEXT window of rows, never the first one again,
- * and only the Clips chip turns the whole page into clips. The long-form video
- * rows carry NO see-all: they are the feed itself, not a window onto something.
+ * THE SHAPE IS THE TYPE. A video under QUICK_HIT_MAX is a portrait Quick Hit in
+ * a rail; three minutes or more is full-width 16:9 long-form. Both reads are
+ * fetched and split on duration alone, whichever RPC a row came from. No
+ * "Quick hit" badge: the shape and the rail title already say it.
  *
- * WATCH IS CLIENT-COMPOSED. It is not in the stream ranker's pool and this
- * brief does not change that.
+ * K.7: every rail card is a top-aligned flex column with a fixed-height poster
+ * (flex: none), because a <button> vertically centres its own contents.
  */
 
-const INSET = 16;
-/* BRIEF_EXPLORE_DEVICE_PASS §2b — THE CLIPS RAIL AGREES WITH EXPLORE'S.
-   140 wide gives about 2.4 tiles at 390: clearly bigger than the old 112, and
-   still a rail rather than a carousel of posters. Explore's ClipsShelf carries
-   the same 140 x 249 so the two surfaces cannot drift. */
-const CLIP_W = 140;
+const INSET = 14;
+const CW_W = 184;
+const CW_H = 104;
+const QH_W = 126;
+const QH_H = 224;
+const CT_W = 124;
 
-const MOMENT_W = 112;
-const RAIL_WINDOW = 10;
-/** Rails break the video run: after 2 videos, then every 4, alternating. */
-const FIRST_RAIL_AFTER = 2;
-const RAIL_EVERY = 4;
+const cardButton: React.CSSProperties = {
+  flex: 'none',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'stretch',
+  justifyContent: 'flex-start',
+  padding: 0,
+  border: 0,
+  background: 'transparent',
+  textAlign: 'left',
+  cursor: 'pointer',
+  fontFamily: SANS,
+  color: A.INK,
+};
 
-type RailKind = 'clips' | 'community';
+const clamp2: React.CSSProperties = {
+  display: '-webkit-box',
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: 'vertical',
+  overflow: 'hidden',
+};
 
-function railKindAt(ordinal: number): RailKind {
-  return ordinal % 2 === 0 ? 'clips' : 'community';
+const oneLine: React.CSSProperties = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
+
+function Section({ title, kicker, onSeeAll, seeAll }: { title: string; kicker?: string; onSeeAll?: () => void; seeAll?: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: `18px ${INSET}px 9px` }}>
+      <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, letterSpacing: '-0.3px', color: A.INK }}>
+        {title}
+        {kicker ? (
+          <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>
+            {kicker}
+          </span>
+        ) : null}
+      </h2>
+      {onSeeAll ? (
+        <button
+          type="button"
+          onClick={onSeeAll}
+          style={{ padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 13, fontWeight: 600, color: A.MUTE }}
+        >
+          {seeAll}
+        </button>
+      ) : null}
+    </div>
+  );
 }
 
-
-/** THE CLIP — 112 wide, 9:16, radius 10, duration chip, creator beneath. */
-function ClipTile({ row, width, onPress }: { row: HubRpcRow; width?: number | string; onPress: () => void }) {
-  const who = creatorName(row);
-  const initial = (who || '?').trim().charAt(0).toUpperCase() || '?';
-  const poster = posterFor(row, 480);
-  const [posterFailed, setPosterFailed] = useState(false);
+function Rail({ children, label }: { children: React.ReactNode; label: string }) {
   return (
-    <button
-      type="button"
-      onClick={onPress}
-      style={{
-        width: width ?? CLIP_W,
-        padding: 0,
-        border: 0,
-        background: 'transparent',
-        textAlign: 'left',
-        cursor: 'pointer',
-        fontFamily: SANS,
-      }}
+    <div
+      data-watch-rail={label}
+      style={{ display: 'flex', gap: 10, padding: `0 ${INSET}px 2px`, overflowX: 'auto', maxWidth: '100%', scrollbarWidth: 'none', willChange: 'transform' }}
     >
-      <span
-        style={{
-          display: 'block',
-          position: 'relative',
-          width: '100%',
-          aspectRatio: '9 / 16',
-          overflow: 'hidden',
-          borderRadius: 10,
-          background: A.PANEL,
-        }}
-      >
-        {poster && !posterFailed ? (
-          <img
-            src={poster}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            onError={() => setPosterFailed(true)}
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        ) : (
-          <PosterFallback initial={initial} size={20} />
-        )}
-        <AutoplayLayer hlsUrl={hlsFor(row)} poster={poster} />
-        {/* The duration chip stays ABOVE the playing frame. */}
-        <span style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
-          <GlassDurationBadge seconds={row.duration_seconds ?? null} />
-        </span>
+      {children}
+    </div>
+  );
+}
 
+function Poster({ row, height, posterH, radius, autoplay, progress }: { row: HubRpcRow; height: number; posterH: number; radius: number; autoplay: boolean; progress: number | null }) {
+  const poster = posterFor(row, posterH);
+  const [failed, setFailed] = useState(false);
+  const initial = (creatorName(row) || '?').trim().charAt(0).toUpperCase() || '?';
+  return (
+    <span data-watch-frame style={{ display: 'block', position: 'relative', height, flex: 'none', borderRadius: radius, overflow: 'hidden', background: A.PANEL }}>
+      {poster && !failed ? (
+        <img src={poster} alt="" loading="lazy" decoding="async" onError={() => setFailed(true)} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+      ) : (
+        <PosterFallback initial={initial} size={20} />
+      )}
+      {autoplay ? <AutoplayLayer hlsUrl={hlsFor(row)} poster={poster} /> : null}
+      <span style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
+        <GlassDurationBadge seconds={row.duration_seconds ?? null} />
       </span>
-      {who ? (
-        <span
-          style={{
-            display: 'block',
-            marginTop: 6,
-            fontSize: 11,
-            fontWeight: 600,
-            color: A.MUTE,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {who}
-        </span>
-      ) : null}
-    </button>
+      {progress != null ? <WatchProgressBar fraction={progress} /> : null}
+    </span>
   );
 }
 
@@ -167,94 +169,98 @@ export function WatchFeed({
 }) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
-  /* SESSION-SCOPED SELECTION: the chip resets to All on the next visit, so the
-     page a member returns to is the page the page is meant to be. */
   const [filter, setFilter] = useState<WatchFilter>(initialFilter);
-  const [draft, setDraft] = useState('');
   const [query, setQuery] = useState('');
 
-  /* THE SEARCH IS SERVER-SIDE. Both Watch RPCs already take p_search_query and
-     match post content, creator display name, creator username and course name,
-     so this searches EVERY row that qualifies - never only the page that
-     happens to be loaded. */
+  /* THE SEARCH IS SERVER-SIDE: both RPCs take p_search_query. */
   const search = query.trim().length >= 2 ? query.trim() : null;
   const searching = !!search;
+  useEffect(() => {
+    if (searching && filter === 'community') setFilter('all');
+  }, [searching, filter]);
 
   const vParams = videoParams(filter);
   const cParams = clipParams(filter);
   const videos = useWatchVideos({ userId, mode: vParams?.mode ?? null, search });
   const clips = useWatchClips({ userId, mode: cParams?.mode ?? null, filter: cParams?.filter, search });
-  const rails = railsWanted(filter, searching);
   const community = isCommunityOnly(filter);
-  /* COMMUNITY HAS NO SERVER SEARCH PATH: under a search term the chip is hidden
-     and a selected community chip falls back to All — never an unfiltered wall
-     beneath a filter. */
-  useEffect(() => {
-    if (searching && filter === 'community') setFilter('all');
-  }, [searching, filter]);
-  /* ONE QUERY: the community chip reads the same moments the rail reads. */
-  const moments = useMomentsOfTheWeek(30, { enabled: (rails || community) && !!userId, candidateLimit: 72 });
-
-  const videoRows = useMemo(
-    () => ((videos.data?.pages ?? []).flat() as HubRpcRow[]).filter((row) => !!row?.post_id),
-    [videos.data],
+  const onAll = allOnly(filter, searching);
+  const moments = useMomentsOfTheWeek(30, { enabled: (onAll || community) && !!userId, candidateLimit: 72 });
+  const progress = useWatchProgress(userId);
+  const { data: myCourses } = useUserAnalyticsCourses({ enabled: !!userId });
+  const playedIds = useMemo(
+    () => new Set((myCourses ?? []).filter((c) => c.rounds_count > 0).map((c) => c.course_id)),
+    [myCourses],
   );
-  const clipRows = useMemo(
-    () => ((clips.data?.pages ?? []).flat() as HubRpcRow[]).filter((row) => !!row?.post_id),
-    [clips.data],
-  );
-  const momentRows = useMemo(() => moments.data ?? [], [moments.data]);
+  const onYourCourse = useCallback((row: HubRpcRow) => !!row.course_id && playedIds.has(row.course_id), [playedIds]);
 
-  const videoPosts = useMemo(() => toFeedPosts(videoRows), [videoRows]);
-  const clipPosts = useMemo(() => toFeedPosts(clipRows), [clipRows]);
-  const { activeActor } = useActiveActor();
-  const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
-  const likeAvailable = !!userId && !!activeActor;
+  /* ONE POOL, SPLIT ON DURATION. A row is the same video whichever read it came from. */
+  const rows = useMemo(() => {
+    const seen = new Set<string>();
+    const out: HubRpcRow[] = [];
+    for (const row of [...(videos.data?.pages ?? []).flat(), ...(clips.data?.pages ?? []).flat()] as HubRpcRow[]) {
+      if (!row?.post_id || seen.has(row.post_id)) continue;
+      seen.add(row.post_id);
+      out.push(row);
+    }
+    return filter === 'your_courses' ? out.filter(onYourCourse) : out;
+  }, [videos.data, clips.data, filter, onYourCourse]);
+
+  const saved = progress.data;
+  const quickRows = useMemo(() => (showsQuickHits(filter) ? rows.filter((r) => isQuickHit(r.duration_seconds)) : []), [rows, filter]);
+  const longRows = useMemo(
+    () =>
+      showsLongForm(filter)
+        ? spreadByCreator(
+            rows.filter((r) => !isQuickHit(r.duration_seconds)),
+            (r) => String(r.post_user_id ?? r.actor_id ?? creatorName(r)),
+          )
+        : [],
+    [rows, filter],
+  );
+  const continueRows = useMemo(
+    () => (onAll && saved ? rows.filter((r) => isPartWatched(r, saved.get(r.post_id))) : []),
+    [onAll, rows, saved],
+  );
+
+  const views = useWatchViews(useMemo(() => [...quickRows, ...longRows].map((r) => r.post_id), [quickRows, longRows]));
+  const viewsFor = (row: HubRpcRow) => (views.data ? viewsLabel(views.data.get(row.post_id) ?? 0) : null);
+  const barFor = (row: HubRpcRow) => {
+    const p = saved?.get(row.post_id);
+    return isPartWatched(row, p) ? progressFraction(row, p) : null;
+  };
+
+  const quickPosts = useMemo(() => toFeedPosts(quickRows), [quickRows]);
+  const longPosts = useMemo(() => toFeedPosts(longRows), [longRows]);
+  const continuePosts = useMemo(() => toFeedPosts(continueRows), [continueRows]);
 
   useEffect(() => {
     analyticsEvents.track('amateur_watch_filter_changed', { filter, searching });
   }, [filter, searching]);
 
-  const openVideo = useCallback(
-    (index: number) => {
-      analyticsEvents.track('amateur_watch_tapped', { kind: 'video', filter });
+  const open = useCallback(
+    (kind: 'video' | 'clip' | 'continue', posts: ReturnType<typeof toFeedPosts>, list: HubRpcRow[], index: number) => {
+      analyticsEvents.track('amateur_watch_tapped', { kind, filter });
       onDepart();
+      const row = list[index];
+      const resume = saved?.get(row?.post_id ?? '');
       openWithOrigin({
-        posts: videoPosts,
+        posts,
         index,
         originEl: null,
-        posterUrl: videoRows[index]?.poster_url ?? null,
-        openedFrom: 'amateur-watch',
+        posterUrl: row?.poster_url ?? null,
+        openedFrom: kind === 'clip' ? 'amateur-clips' : 'amateur-watch',
         forceStartAtZero: true,
+        /* K.1: a part-watched video resumes where the member left it. */
+        resumeAtSeconds: row && isPartWatched(row, resume) ? resume?.position ?? null : null,
       });
     },
-    [filter, onDepart, videoPosts, videoRows],
+    [filter, onDepart, saved],
   );
 
-  /* THE RAIL IS THE DECK. Tapping a clip opens the viewer at that clip with the
-     rail's own window as its deck, exactly as it does today. */
-  const openClip = useCallback(
-    (index: number) => {
-      analyticsEvents.track('amateur_watch_tapped', { kind: 'clip', filter });
-      onDepart();
-      openWithOrigin({
-        posts: clipPosts,
-        index,
-        originEl: null,
-        posterUrl: clipRows[index]?.poster_url ?? null,
-        openedFrom: 'amateur-clips',
-        forceStartAtZero: true,
-      });
-    },
-    [clipPosts, clipRows, filter, onDepart],
-  );
-
-  /* PAGINATION. One sentinel for the page: videos drive it on every mixed or
-     video view, clips drive it where the page IS clips. */
+  /* PAGINATION: one sentinel. Quick hits pages the clip read, every other view the long-form read. */
   const sentinelRef = useRef<HTMLDivElement | null>(null);
-  /* Where the page IS clips, clips paginate it; everywhere else the videos do,
-     and the rails top themselves up separately below. */
-  const driver = isClipsOnly(filter) ? clips : vParams ? videos : clips;
+  const driver = filter === 'quick' ? clips : videos;
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el || !driver.hasNextPage || driver.isFetchingNextPage) return;
@@ -268,95 +274,36 @@ export function WatchFeed({
     return () => observer.disconnect();
   }, [driver]);
 
-  /* THE RAILS KEEP THEIR OWN SUPPLY TOPPED UP. A rail that would reach past the
-     loaded clip rows asks for the next page rather than repeating the first. */
-  const railCount = rails ? Math.max(0, Math.ceil((videoRows.length - FIRST_RAIL_AFTER) / RAIL_EVERY)) : 0;
-  const clipsNeeded = useMemo(() => {
-    let n = 0;
-    for (let i = 0; i < railCount; i += 1) if (railKindAt(i) === 'clips') n += 1;
-    return n * RAIL_WINDOW;
-  }, [railCount]);
-  useEffect(() => {
-    if (!rails) return;
-    if (clipRows.length >= clipsNeeded) return;
-    if (clips.hasNextPage && !clips.isFetchingNextPage) void clips.fetchNextPage();
-  }, [rails, clipRows.length, clipsNeeded, clips]);
+  const chipLabel = (key: (typeof WATCH_CHIPS)[number]) =>
+    key === 'all'
+      ? t('amateur.watch.chip.all', 'All')
+      : key === 'quick'
+        ? t('amateur.watch.chip.quick', 'Quick hits')
+        : key === 'long'
+          ? t('amateur.watch.chip.long', 'Long form')
+          : key === 'friends'
+            ? t('amateur.watch.chip.friends', 'Friends')
+            : t('amateur.watch.chip.yourCourses', 'Your courses');
+  const chips = WATCH_CHIPS.map((key) => ({ id: key, label: chipLabel(key) }));
 
-  const chips = useMemo(
-    () =>
-      WATCH_FILTERS.filter((key) => !(searching && key === 'community')).map((key) => ({
-        id: key,
-        label:
-          key === 'all'
-            ? t('amateur.watch.chip.all', 'All')
-            : key === 'for_you'
-              ? /* Label only. The VALUE stays 'for_you' — it is also the clips
-                   RPC's p_mode string and any stored selection. Do not rename it. */
-                t('amateur.watch.chip.forYou', 'Suggested')
-              : key === 'friends'
-                ? t('amateur.watch.chip.friends', 'Friends')
-                : key === 'your_courses'
-                  ? t('amateur.watch.chip.yourCourses', 'Your courses')
-                  : key === 'clips'
-                    ? t('amateur.watch.chip.clips', 'Clips')
-                    : key === 'videos'
-                      ? t('amateur.watch.chip.videos', 'Videos')
-                      : t('amateur.watch.chip.community', 'Community'),
-      })),
-    [t, searching],
-  );
-
-  const clipWindow = (ordinal: number): HubRpcRow[] => {
-    let clipsBefore = 0;
-    for (let i = 0; i < ordinal; i += 1) if (railKindAt(i) === 'clips') clipsBefore += 1;
-    const start = clipsBefore * RAIL_WINDOW;
-    return clipRows.slice(start, start + RAIL_WINDOW);
+  const openMoment = (moment: Moment) => {
+    analyticsEvents.track('amateur_watch_tapped', { kind: 'moment', filter });
+    onDepart();
+    openWithOrigin({
+      posts: [moment.post],
+      index: 0,
+      originEl: null,
+      posterUrl: moment.thumbnail,
+      mediaIndex: moment.mediaIndex ?? 0,
+      mediaId: moment.mediaId ?? null,
+      openedFrom: 'amateur-moments',
+      forceStartAtZero: true,
+    });
   };
 
-  const momentWindow = (ordinal: number) => {
-    let before = 0;
-    for (let i = 0; i < ordinal; i += 1) if (railKindAt(i) === 'community') before += 1;
-    const start = before * RAIL_WINDOW;
-    return momentRows.slice(start, start + RAIL_WINDOW);
-  };
-
-  const clipsRail = (ordinal: number) => {
-    /* ERRORED IS NOT EMPTY. A failed read shows its retry state; a settled empty
-       window renders nothing at all. */
-    if (clips.isError) {
-      return (
-        <ShelfRetry
-          heading={t('amateur.watch.rail.clips', 'Clips')}
-          label={t('amateur.stream.failed', 'This did not load.')}
-          action={t('amateur.stream.retry', 'Try again')}
-          onRetry={() => void clips.refetch()}
-        />
-      );
-    }
-    if (!clips.isFetched) return <ShelfShell tileW={CLIP_W} tileH={Math.round((CLIP_W * 16) / 9)} />;
-    const window = clipWindow(ordinal);
-    if (window.length === 0) return null;
-    const offset = clipRows.indexOf(window[0]);
-    return (
-      <ExploreShelf
-        heading={t('amateur.watch.rail.clips', 'Clips')}
-        seeAllLabel={t('amateur.watch.seeAll', 'See all')}
-        onSeeAll={() => {
-          analyticsEvents.track('amateur_shelf_see_all', { kind: 'clips', surface: 'watch' });
-          onDepart();
-          navigate('/watch/clips');
-        }}
-      >
-        {window.map((row, index) => (
-          <div key={`clip:${row.post_id}:${row.media_id ?? index}`} style={{ flex: `0 0 ${CLIP_W}px` }}>
-            <ClipTile row={row} onPress={() => openClip(offset + index)} />
-          </div>
-        ))}
-      </ExploreShelf>
-    );
-  };
-
-  const communityRail = (ordinal: number) => {
+  /* K.6 — ONE ENTRY PER MEMBER, labelled with who, then where. */
+  const members = useMemo(() => groupByMember(moments.data ?? [], (m) => m.post?.userId ?? null).slice(0, 10), [moments.data]);
+  const communityRail = () => {
     if (moments.isError) {
       return (
         <ShelfRetry
@@ -367,151 +314,55 @@ export function WatchFeed({
         />
       );
     }
-    if (!moments.isFetched) return <ShelfShell tileW={MOMENT_W} tileH={MOMENT_W} />;
-    const window = momentWindow(ordinal);
-    if (window.length === 0) return null;
+    if (!moments.isFetched) return <ShelfShell tileW={CT_W} tileH={CT_W} />;
+    if (members.length === 0) return null;
     return (
-      <ExploreShelf
-        heading={t('amateur.watch.rail.community', 'From the community')}
-        seeAllLabel={t('amateur.watch.seeAll', 'See all')}
-        onSeeAll={() => {
-          analyticsEvents.track('amateur_shelf_see_all', { kind: 'moments', surface: 'watch' });
-          /* SELECTS THE COMMUNITY CHIP IN PLACE — same page, no navigation. */
-          setFilter('community');
-        }}
-      >
-        {window.map((moment) => (
-          <div key={`moment:${moment.key}`} style={{ flex: `0 0 ${MOMENT_W}px` }}>
-            <div style={{ width: MOMENT_W, height: MOMENT_W }}>
-              <MomentTile
-                moment={moment}
-                radius={10}
-                initialsSize={14}
-                labelSize={11}
-                labelInset={8}
-                labelled={false}
-                autoplayGroup="amateur-watch-moments"
-                /* THE TILE MUST CARRY ITS OWN BOX. Everything inside it is
-                   absolutely positioned against the button, so a button with no
-                   width or height collapsed and the picture never painted — the
-                   square read as an empty box with the course name beneath. */
-                style={{ width: '100%', height: '100%', display: 'block' }}
-
-                onPress={() => {
-                  analyticsEvents.track('amateur_watch_tapped', { kind: 'moment', filter });
-                  onDepart();
-                  openWithOrigin({
-                    posts: [moment.post],
-                    index: 0,
-                    originEl: null,
-                    posterUrl: moment.thumbnail,
-                    mediaIndex: moment.mediaIndex ?? 0,
-                    mediaId: moment.mediaId ?? null,
-                    openedFrom: 'amateur-moments',
-                    forceStartAtZero: true,
-                  });
-                }}
-              />
-            </div>
-            {moment.courseName ? (
-              <div
-                style={{
-                  marginTop: 6,
-                  width: MOMENT_W,
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: A.MUTE,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {moment.courseName}
+      <div style={{ paddingBottom: 8 }}>
+        <Section
+          title={t('amateur.watch.rail.community', 'From the community')}
+          seeAll={t('amateur.watch.seeAll', 'See all')}
+          onSeeAll={() => {
+            analyticsEvents.track('amateur_shelf_see_all', { kind: 'moments', surface: 'watch' });
+            setFilter('community');
+          }}
+        />
+        <Rail label="community">
+          {members.map(({ lead, count }) => (
+            <div key={`member:${lead.key}`} data-watch-card="community" style={{ ...cardButton, width: CT_W, cursor: 'default' }}>
+              <div data-watch-frame style={{ width: CT_W, height: CT_W, flex: 'none', borderRadius: 11, overflow: 'hidden', position: 'relative' }}>
+                <MomentTile
+                  moment={lead}
+                  radius={11}
+                  initialsSize={14}
+                  labelSize={11}
+                  labelInset={8}
+                  labelled={false}
+                  autoplayGroup="amateur-watch-moments"
+                  style={{ width: '100%', height: '100%', display: 'block' }}
+                  onPress={() => openMoment(lead)}
+                />
               </div>
-            ) : null}
-          </div>
-        ))}
-      </ExploreShelf>
+              <span style={{ ...oneLine, marginTop: 7, fontSize: 12.5, fontWeight: 600 }}>{lead.post?.displayName || lead.post?.username}</span>
+              <span style={{ ...oneLine, marginTop: 2, fontSize: 11.5, color: A.DIM }}>{photosCaption(lead.courseName, count)}</span>
+            </div>
+          ))}
+        </Rail>
+      </div>
     );
   };
 
-  /** THE CLIPS PAGE — 3-up vertical grid, nothing else. */
-  const clipsGrid = (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-        gap: 8,
-        paddingInline: INSET,
-      }}
-    >
-      {clipRows.map((row, index) => (
-        <ClipTile
-          key={`grid:${row.post_id}:${row.media_id ?? index}`}
-          row={row}
-          width="100%"
-          onPress={() => openClip(index)}
-        />
-      ))}
-    </div>
-  );
-
-  const videoList = videoRows.map((row, index) => {
-    const ordinal = index >= FIRST_RAIL_AFTER && (index - FIRST_RAIL_AFTER) % RAIL_EVERY === 0
-      ? (index - FIRST_RAIL_AFTER) / RAIL_EVERY
-      : null;
-    return (
-      <div key={`video:${row.post_id}`} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 26 }}>
-        <VideoCard
-          row={row}
-          onPress={() => openVideo(index)}
-          engagement={(() => {
-            /* videoPosts[index] is 1:1 with videoRows[index] (load-bearing). */
-            const post = videoPosts[index] ?? null;
-            const like = getActiveLikeState(post);
-            return {
-              likeAvailable,
-              liked: like.isLiked,
-              likeCount: like.count,
-              own: !!userId && (row.post_user_id ?? row.actor_id) === userId,
-              onToggleLike: () => handleLike(post),
-              commentCount: Number(row.comment_count ?? 0),
-              onOpenComments: () => onOpenComments?.(row.post_id),
-            };
-          })()}
-        />
-        {rails && ordinal != null ? (
-          <div style={{ minWidth: 0, overflow: 'hidden' }}>
-            {railKindAt(ordinal) === 'clips' ? clipsRail(ordinal) : communityRail(ordinal)}
-          </div>
-        ) : null}
-      </div>
-    );
-  });
-
-  const videosSettled = !vParams || videos.isFetched;
-  const clipsSettled = !cParams || clips.isFetched;
-  const nothing =
-    !community &&
-    videosSettled &&
-    clipsSettled &&
-    videoRows.length === 0 &&
-    clipRows.length === 0 &&
-    !videos.isError &&
-    !clips.isError;
+  const settled = (!vParams || videos.isFetched) && (!cParams || clips.isFetched);
+  const loading = !settled && rows.length === 0;
+  const nothing = !community && settled && quickRows.length === 0 && longRows.length === 0 && !videos.isError && !clips.isError;
 
   return (
     <div style={{ fontFamily: SANS }}>
-      {/* SEARCH, then chips, then the feed. Results REPLACE the page - no route,
-          no sheet - and the chips stay visible so All is always one tap away. */}
-      <div style={{ paddingInline: INSET, paddingBottom: 12 }}>
+      {/* K.9: the search field is unchanged. */}
+      <div style={{ paddingInline: 16, paddingBottom: 12 }}>
         <input
           type="search"
-          value={draft}
-          onChange={(event) => {
-            setDraft(event.target.value);
-            setQuery(event.target.value);
-          }}
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
           placeholder={t('amateur.watch.searchPlaceholder', 'Search videos, clips and creators')}
           aria-label={t('amateur.watch.searchPlaceholder', 'Search videos, clips and creators')}
           style={{
@@ -530,7 +381,7 @@ export function WatchFeed({
         />
       </div>
 
-      <div style={{ paddingInline: INSET, paddingBottom: 16 }}>
+      <div style={{ paddingInline: 16, paddingBottom: 4 }}>
         <RailChips
           options={chips}
           value={filter}
@@ -539,17 +390,6 @@ export function WatchFeed({
           ground="filled-selection"
         />
       </div>
-
-      {videos.isError && vParams ? (
-        <div style={{ paddingBottom: 26 }}>
-          <ShelfRetry
-            heading={t('amateur.watch.rail.videos', 'Videos')}
-            label={t('amateur.stream.failed', 'This did not load.')}
-            action={t('amateur.stream.retry', 'Try again')}
-            onRetry={() => void videos.refetch()}
-          />
-        </div>
-      ) : null}
 
       {community ? (
         moments.isError ? (
@@ -561,80 +401,134 @@ export function WatchFeed({
           />
         ) : !moments.isFetched ? (
           <ShelfShell tileW={320} tileH={240} />
-        ) : momentRows.length === 0 ? (
-          <div style={{ paddingInline: INSET, paddingTop: 8 }}>
-            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
-              {t('amateur.watch.empty', 'Nothing to watch here yet.')}
-            </p>
-          </div>
+        ) : (moments.data ?? []).length === 0 ? (
+          <p style={{ margin: 0, padding: '8px 16px 0', fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
+            {t('amateur.watch.empty', 'Nothing to watch here yet.')}
+          </p>
         ) : (
-          /* THE EXISTING MOSAIC — the same MomentsGrid Discover and the media
-             library use. Never a third grid, never the 3-up clips grid. */
-          <div style={{ paddingInline: INSET }}>
-            <MomentsGrid
-              moments={momentRows}
-              gap={4}
-              tall={320}
-              radius={10}
-              autoplayGroup="amateur-watch-community"
-              onTilePress={(moment) => {
-                analyticsEvents.track('amateur_watch_tapped', { kind: 'moment', filter });
-                onDepart();
-                openWithOrigin({
-                  posts: [moment.post],
-                  index: 0,
-                  originEl: null,
-                  posterUrl: moment.thumbnail,
-                  mediaIndex: moment.mediaIndex ?? 0,
-                  mediaId: moment.mediaId ?? null,
-                  openedFrom: 'amateur-moments',
-                  forceStartAtZero: true,
-                });
-              }}
-            />
+          <div style={{ paddingInline: 16, paddingTop: 12 }}>
+            <MomentsGrid moments={moments.data ?? []} gap={4} tall={320} radius={10} autoplayGroup="amateur-watch-community" onTilePress={openMoment} />
           </div>
         )
-      ) : isClipsOnly(filter) ? (
+      ) : (
         <>
-          {clips.isError ? (
+          {/* K.2 — CONTINUE WATCHING: All only, only when something is part-watched. */}
+          {continueRows.length > 0 ? (
+            <>
+              <Section title={t('amateur.watch.rail.continue', 'Continue watching')} />
+              <Rail label="continue">
+                {continueRows.map((row, index) => (
+                  <button key={`cw:${row.post_id}`} type="button" data-watch-card="continue" onClick={() => open('continue', continuePosts, continueRows, index)} style={{ ...cardButton, width: CW_W }}>
+                    <Poster row={row} height={CW_H} posterH={360} radius={10} autoplay={false} progress={barFor(row)} />
+                    <span style={{ ...clamp2, marginTop: 7, fontSize: 12.5, fontWeight: 600, lineHeight: 1.32 }}>
+                      {videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}
+                    </span>
+                    <span style={{ marginTop: 4, fontSize: 11.5, fontWeight: 700, color: A.AMBER }}>{remainingLabel(row, saved?.get(row.post_id))}</span>
+                  </button>
+                ))}
+              </Rail>
+            </>
+          ) : null}
+
+          {/* K.3 — QUICK HITS. No badge on the tiles. */}
+          {clips.isError && quickRows.length === 0 && showsQuickHits(filter) ? (
             <ShelfRetry
-              heading={t('amateur.watch.rail.clips', 'Clips')}
+              heading={t('amateur.watch.rail.quick', 'Quick hits')}
               label={t('amateur.stream.failed', 'This did not load.')}
               action={t('amateur.stream.retry', 'Try again')}
               onRetry={() => void clips.refetch()}
             />
-          ) : (
-            clipsGrid
-          )}
+          ) : quickRows.length > 0 ? (
+            <>
+              <Section
+                title={t('amateur.watch.rail.quick', 'Quick hits')}
+                kicker={t('amateur.watch.rail.quickKicker', 'Under 3 min')}
+                seeAll={t('amateur.watch.seeAll', 'See all')}
+                onSeeAll={() => {
+                  analyticsEvents.track('amateur_shelf_see_all', { kind: 'clips', surface: 'watch' });
+                  onDepart();
+                  navigate('/watch/clips');
+                }}
+              />
+              <Rail label="quick">
+                {quickRows.map((row, index) => {
+                  const who = creatorName(row);
+                  const v = viewsFor(row);
+                  return (
+                    <button key={`qh:${row.post_id}`} type="button" data-watch-card="quick" onClick={() => open('clip', quickPosts, quickRows, index)} style={{ ...cardButton, width: QH_W }}>
+                      <Poster row={row} height={QH_H} posterH={480} radius={12} autoplay progress={barFor(row)} />
+                      <span style={{ ...clamp2, marginTop: 7, fontSize: 12, fontWeight: 600, lineHeight: 1.3 }}>
+                        {videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}
+                      </span>
+                      {who || v ? (
+                        <span style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{[who, v].filter(Boolean).join(' \u00B7 ')}</span>
+                      ) : null}
+                      {onYourCourse(row) && row.course_name ? (
+                        <span style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.AMBER }}>{row.course_name}</span>
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </Rail>
+            </>
+          ) : loading && showsQuickHits(filter) ? (
+            <div style={{ paddingTop: 18 }}>
+              <ShelfShell tileW={QH_W} tileH={QH_H} />
+            </div>
+          ) : null}
+
+          {/* K.4 — THE LONG-FORM COLUMN, with the community rail once after the third card. */}
+          {videos.isError && showsLongForm(filter) ? (
+            <div style={{ paddingTop: 18 }}>
+              <ShelfRetry
+                heading={t('amateur.watch.rail.videos', 'Videos')}
+                label={t('amateur.stream.failed', 'This did not load.')}
+                action={t('amateur.stream.retry', 'Try again')}
+                onRetry={() => void videos.refetch()}
+              />
+            </div>
+          ) : null}
+          {longRows.length > 0 ? (
+            <>
+              <Section title={filter === 'your_courses' ? t('amateur.watch.rail.fromYourCourses', 'From your courses') : t('amateur.watch.rail.watch', 'Watch')} />
+              {longRows.map((row, index) => {
+                const p = saved?.get(row.post_id);
+                const part = isPartWatched(row, p);
+                return (
+                  <div key={`lf:${row.post_id}`} style={{ marginBottom: 4 }}>
+                    <VideoCard
+                      row={row}
+                      onPress={() => open('video', longPosts, longRows, index)}
+                      views={viewsFor(row)}
+                      progress={barFor(row)}
+                      reason={reasonLine({
+                        partWatched: part,
+                        remaining: remainingLabel(row, p),
+                        courseName: row.course_name,
+                        onYourCourse: onYourCourse(row),
+                        fromFollowed: row.creator_relation === 'following' || row.creator_relation === 'friend',
+                      })}
+                      engagement={{
+                        commentCount: Number(row.comment_count ?? 0),
+                        onOpenComments: () => onOpenComments?.(row.post_id),
+                      }}
+                    />
+                    {onAll && index + 1 === RAIL_EVERY && index + 1 < longRows.length ? communityRail() : null}
+                  </div>
+                );
+              })}
+            </>
+          ) : null}
+
+          {nothing ? (
+            <p style={{ margin: 0, padding: '30px 24px', textAlign: 'center', fontSize: 13.5, lineHeight: 1.5, color: A.MUTE }}>
+              {t('amateur.watch.emptyFilter', 'Nothing here yet. Try another filter.')}
+            </p>
+          ) : null}
         </>
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 26 }}>
-          {videoList}
-          {/* A SEARCH THAT MATCHES CLIPS SHOWS THEM. The rails stand down while
-              searching, so matching clips arrive as one grid beneath the
-              matching videos rather than as a window into a feed. */}
-          {searching && clipRows.length > 0 ? clipsGrid : null}
-        </div>
       )}
 
-      {nothing ? (
-        <div style={{ paddingInline: INSET, paddingTop: 8 }}>
-          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.BODY }}>
-            {searching
-              ? t('amateur.watch.noResults', 'Nothing matches {{query}}.', { query: search })
-              : t('amateur.watch.empty', 'Nothing to watch here yet.')}
-          </p>
-        </div>
-      ) : null}
-
-      {!videosSettled && videoRows.length === 0 && !isClipsOnly(filter) && !community ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 26 }}>
-          <ShelfShell tileW={320} tileH={180} />
-          <ShelfShell tileW={320} tileH={180} />
-        </div>
-      ) : null}
-
-      {driver.hasNextPage ? <div ref={sentinelRef} style={{ height: 1 }} /> : null}
+      <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
     </div>
   );
 }
