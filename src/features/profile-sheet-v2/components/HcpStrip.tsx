@@ -291,6 +291,7 @@ export const TrendCard: React.FC<{
           {headDate && <span style={{ ...LABEL, paddingBottom: 2 }}>{headDate}</span>}
           {delta != null && (
             <span
+              data-hcp-chip
               style={{
                 marginLeft: 'auto',
                 borderRadius: 999,
