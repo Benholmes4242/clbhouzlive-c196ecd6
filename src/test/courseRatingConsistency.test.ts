@@ -66,11 +66,20 @@ describe('C1 course rating consistency', () => {
     expect(browse).not.toContain('getRatingTier');
   });
 
-  it('uses the exact 9.0 threshold and muted absent state', () => {
+  it('uses the displayed 9.0 threshold and muted absent state', () => {
     expect(courseSubScoreTone(undefined)).toBe(A.MUTE);
     expect(courseSubScoreTone(null)).toBe(A.MUTE);
-    expect(courseSubScoreTone(8.99)).toBe(A.MUTE);
+    // Tone follows the DISPLAYED value: 8.99 prints "9.0", so it is green.
+    expect(courseSubScoreTone(8.99)).toBe(A.GREEN);
     expect(courseSubScoreTone(9)).toBe(A.GREEN);
+  });
+
+  it('renders the course-hero rating white below 9.0 with no muted fallback', () => {
+    const hero = src('src/components/golf-club/GolfClubView.tsx');
+    /* Green only where the helper says green; every other rating drops the
+       tone so the figure inherits the white the other hero figures use. */
+    expect(hero).toContain('tone={courseSubScoreTone(communityRating) === A.GREEN ? A.GREEN : undefined}');
+    expect(hero).not.toContain('tone={courseSubScoreTone(communityRating)}');
   });
 
   it('renders Berkshire category tones green, muted, green, muted', () => {

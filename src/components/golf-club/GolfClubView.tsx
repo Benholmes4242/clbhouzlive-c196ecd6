@@ -505,13 +505,17 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
     }
   }
   // No floor: the REVIEWS cell beside it shows the sample size (V.3).
+  // V.1 HERO TONE: green at 9.0 and above, WHITE below — never the MUTE
+  // fallback. White is what the rounds/reviews/avg figures beside it already
+  // print, so the rating sits with them and colour stays reserved for the
+  // standout nine.
   if (ratingDisplayable(communityRating)) {
     cells.push(
       <HeroStatCell
         key="rating"
         label={t('courseHero.rating')}
         value={formatRatingValue(communityRating)}
-        tone={courseSubScoreTone(communityRating)}
+        tone={courseSubScoreTone(communityRating) === A.GREEN ? A.GREEN : undefined}
       />
     );
   }
