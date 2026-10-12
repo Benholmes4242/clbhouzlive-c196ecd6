@@ -106,13 +106,16 @@ export function GridShell({ inset, radius, cells = 6 }: { inset: number; radius:
   );
 }
 
-export function ShelfShell({ tileW, tileH }: { tileW: number; tileH: number }) {
+/** `heading={false}` only where the caller already renders the real heading (Watch Quick hits). */
+export function ShelfShell({ tileW, tileH, heading = true }: { tileW: number; tileH: number; heading?: boolean }) {
   return (
     <div aria-hidden style={{ fontFamily: SANS }}>
-      <div style={{ padding: '0 16px' }}>
-        <Line width={148} height={14} />
-      </div>
-      <div style={{ marginTop: 10, display: 'flex', gap: 8, padding: '0 16px', overflow: 'hidden' }}>
+      {heading ? (
+        <div style={{ padding: '0 16px' }}>
+          <Line width={148} height={14} />
+        </div>
+      ) : null}
+      <div style={{ marginTop: heading ? 10 : 0, display: 'flex', gap: 8, padding: '0 16px', overflow: 'hidden' }}>
         {[0, 1, 2].map((index) => (
           <div
             key={index}

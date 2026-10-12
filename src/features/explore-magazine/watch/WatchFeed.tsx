@@ -498,9 +498,22 @@ export function WatchFeed({
               </QuickLayout>
             </>
           ) : loading && showsQuickHits(filter) ? (
-            <div style={{ paddingTop: 18 }}>
-              {quickGrid ? <GridShell inset={INSET} radius={12} /> : <ShelfShell tileW={QH_W} tileH={QH_H} />}
-            </div>
+            /* P.1: the heading is static text, so it renders during loading exactly as it
+               will once loaded — the skeleton then holds the tiles' place and nothing shifts.
+               A settled chip with no rows renders no heading (falls to null below). */
+            <>
+              <Section
+                title={t('amateur.watch.rail.quick', 'Quick hits')}
+                kicker={t('amateur.watch.rail.quickKicker', 'Under 3 min')}
+                seeAll={quickGrid ? undefined : t('amateur.watch.seeAll', 'See all')}
+                onSeeAll={quickGrid ? undefined : () => {
+                  analyticsEvents.track('amateur_shelf_see_all', { kind: 'clips', surface: 'watch' });
+                  onDepart();
+                  navigate('/watch/clips');
+                }}
+              />
+              {quickGrid ? <GridShell inset={INSET} radius={12} /> : <ShelfShell tileW={QH_W} tileH={QH_H} heading={false} />}
+            </>
           ) : null}
 
           {/* K.4 — THE LONG-FORM COLUMN, with the community rail once after the third card. */}
