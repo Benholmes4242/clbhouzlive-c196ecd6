@@ -16,6 +16,8 @@ import { ReplyRow } from './ReplyRow';
 import { FIGS, A } from '@/features/courses/components/holes/analytical/tokens';
 import { isEmojiOnly } from '../lib/emojiOnly';
 import type { CommentV2 } from '../hooks/useCommentsV2';
+import type { Standing } from '../lib/standing';
+import { StandingLine } from './StandingLine';
 
 /* Dark baseline (MICRO_BRIEF_COMMENTS_DARK §2). Row separation is hairline
    only, so the border sits one step stronger than its light counterpart. */
@@ -45,6 +47,8 @@ interface Props {
   onLike: (id: string) => void;
   onMore: (c: CommentV2) => void;
   onClose?: () => void;
+  /** G.4 — keyed by comment id; only a commenter's first appearance is present. */
+  standings?: Map<string, Standing>;
 }
 
 export function CommentCard({
@@ -57,6 +61,7 @@ export function CommentCard({
   onLike,
   onMore,
   onClose,
+  standings,
 }: Props) {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
@@ -126,6 +131,7 @@ export function CommentCard({
             </span>
             {comment.is_edited && <span style={{ ...FIGS, fontSize: 11.5, color: DIM, fontVariantNumeric: 'tabular-nums' }}>{'\u00B7'} {t('comments.edited')}</span>}
           </div>
+          <StandingLine standing={standings?.get(comment.id)} />
 
           {comment.content && (
             <MentionText
@@ -214,6 +220,7 @@ export function CommentCard({
               onLike={onLike}
               onMore={onMore}
               onClose={onClose}
+              standing={standings?.get(r.id)}
             />
           ))}
         </div>
