@@ -135,12 +135,12 @@ describe('review post v2 — frame and affordances', () => {
     expect(REVIEW_COURSE_CLAMP.WebkitLineClamp).toBe(2);
     expect(REVIEW_COURSE_CLAMP).not.toHaveProperty('whiteSpace');
   });
-  it('the follow pill sits inline straight after the age', () => {
+  it('the follow pill sits in the right-hand identity slot, not on the meta line', () => {
     const c = render(tree(makePost(8, all), null, { followPill: <span data-pill />, ownerMenu: <span data-menu /> })).container;
-    const meta = c.querySelector('[data-review-meta]') as HTMLElement;
-    expect(meta.children[0].hasAttribute('data-review-who-line')).toBe(true);
-    expect(meta.children[1].querySelector('[data-pill]')).toBeTruthy();
-    expect(meta.querySelector('[data-menu]')).toBeNull();
+    const right = c.querySelector('[data-review-identity-right]') as HTMLElement;
+    expect(right.children[0].hasAttribute('data-pill')).toBe(true);
+    expect(right.children[1].hasAttribute('data-menu')).toBe(true);
+    expect(c.querySelector('[data-review-who-line] [data-pill]')).toBeNull();
   });
   it('the article carries no border and no radius; hairline only after the first post', () => {
     const first = render(tree(makePost(8, all), null, { feedIndex: 0 })).container.querySelector('[data-review-post-card]') as HTMLElement;

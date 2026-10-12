@@ -27,6 +27,9 @@ import { CARD, LINE, T100, T60, T40 } from './feedTokens';
 import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, REVIEW_COURSE_CLAMP, joinClauses } from './reviewPostCard';
 
 const GUTTER = 14;
+const NAME_SIZE = 15;
+const NAME_LINE = 1.25;
+const NAME_LINE_BOX = NAME_SIZE * NAME_LINE;
 
 type CatKey = 'design' | 'condition' | 'clubhouse' | 'facilities';
 const CATS: CatKey[] = ['design', 'condition', 'clubhouse', 'facilities'];
@@ -47,7 +50,7 @@ export interface ReviewPostCardProps {
   /** The member's courses-rated figure (useReviewerStats, already read by FeedCard). */
   coursesReviewed?: number | null;
   onOpenCourse?: () => void;
-  /** The same FeedFollowPill a normal post mounts, inline after the age. */
+  /** The same FeedFollowPill a normal post mounts; top right, level with the name. */
   followPill?: React.ReactNode;
   /** The owner menu: the right-hand slot of the identity row. */
   ownerMenu?: React.ReactNode;
@@ -113,7 +116,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
       }}
     >
       {/* A — the reviewer */}
-      <div data-review-who style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px 2px' }}>
+      <div data-review-who style={{ flex: 'none', display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 12px 2px' }}>
         <button type="button" onClick={onProfile} style={{ display: 'flex', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', flex: 'none' }}>
           <SquircleAvatar
             src={buildImageThumbnailUrl(post.avatarUrl, { width: 72 * (typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1) })}
@@ -129,20 +132,25 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
             onClick={onProfile}
             style={{
               display: 'block', maxWidth: '100%', background: 'transparent', border: 'none', padding: 0, textAlign: 'left',
-              fontSize: 15, fontWeight: 700, lineHeight: 1.25, color: T100, cursor: 'pointer',
+              fontSize: NAME_SIZE, fontWeight: 700, lineHeight: NAME_LINE, color: T100, cursor: 'pointer',
               whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             }}
           >
             {post.displayName}
           </button>
-          <div data-review-meta style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 1, fontSize: 12, color: T60, minWidth: 0 }}>
-            <span data-review-who-line style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {whoLine}
-            </span>
-            {followPill ? <span data-review-follow style={{ flex: 'none', display: 'inline-flex' }}>{followPill}</span> : null}
+          <div data-review-who-line style={{ marginTop: 1, fontSize: 12, color: T60, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {whoLine}
           </div>
         </div>
-        {ownerMenu ? <div style={{ flex: 'none', display: 'flex', alignItems: 'center' }}>{ownerMenu}</div> : null}
+        {/* A.1 — deliberate departure from a normal post: the pill sits top
+            right, level with the name (height = the name's line box), so the
+            meta line keeps the full width. Pill first, then the owner menu. */}
+        {(followPill || ownerMenu) ? (
+          <div data-review-identity-right style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 9, height: NAME_LINE_BOX }}>
+            {followPill}
+            {ownerMenu}
+          </div>
+        ) : null}
       </div>
 
       {/* B — the subject and the verdict */}
