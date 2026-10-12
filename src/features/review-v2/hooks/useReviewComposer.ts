@@ -89,7 +89,7 @@ function draftKey(courseId: string | null | undefined, reviewId?: string | null)
  */
 export const DRAFT_VERSION = 2;
 
-interface DraftShape {
+export interface DraftShape {
   /** DRAFT_VERSION at write time. Absent or stale means discard. */
   v?: number;
   step: WizardStep;
