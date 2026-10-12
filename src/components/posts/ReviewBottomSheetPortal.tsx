@@ -136,6 +136,7 @@ export const ReviewBottomSheetPortal: React.FC = () => {
       courseRegion={payload.courseRegion}
       courseSubCountry={payload.courseSubCountry}
       reviewText={payload.reviewText}
+      reviewDate={payload.reviewDate ?? null}
       breakdown={payload.breakdown ?? null}
       resolvedReviewText={payload.reviewText ?? fallbackQuery.data?.reviewText ?? null}
       resolvedBreakdown={payload.breakdown ?? fallbackQuery.data?.breakdown ?? null}

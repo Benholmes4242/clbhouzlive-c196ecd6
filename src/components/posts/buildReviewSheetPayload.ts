@@ -36,6 +36,7 @@ export function buildReviewSheetPayload(
     courseRegion: review.courseRegion,
     courseSubCountry: review.courseSubCountry,
     reviewText: review.reviewText,
+    reviewDate: post.createdAt || null,
     breakdown: (review as { breakdown?: ReviewSheetPayload['breakdown'] }).breakdown ?? null,
     reviewerStats,
   };

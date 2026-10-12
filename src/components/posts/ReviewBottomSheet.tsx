@@ -38,7 +38,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Play, Share, User } from 'lucide-react';
+import { ChevronRight, MapPin, Play, Share, User } from 'lucide-react';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 import { useReviewerStats } from '@/hooks/useReviewerStats';
@@ -67,7 +67,7 @@ import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toast } from '@/lib/toast';
-import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
 /* Dark surface tokens (analytical ramp). BODY sits at 72% rather than the 62%
    a caption would take: this sheet's payload is three paragraphs of member
@@ -137,7 +137,14 @@ export interface ReviewBottomSheetProps {
   resolvedReviewText?: string | null;
   resolvedBreakdown?: ReviewBottomSheetProps['breakdown'];
   resolvedMedia?: ReviewMediaItem[] | null;
-  resolvedAggregate?: { avg_overall_score?: number | null; review_count?: number | null } | null;
+  resolvedAggregate?: {
+    avg_overall_score?: number | null;
+    review_count?: number | null;
+    avg_design_score?: number | null;
+    avg_condition_score?: number | null;
+    avg_clubhouse_score?: number | null;
+    avg_facilities_score?: number | null;
+  } | null;
   /** G2.5 — false while the prose read is still open; the empty-state line stays silent. */
   proseSettled?: boolean;
   reactionCount?: number;
@@ -158,19 +165,42 @@ const BREAKDOWN_LABELS: Record<typeof BREAKDOWN_KEYS[number], string> = {
   facilities: 'FACILITIES',
 };
 
-function relativeMonths(iso?: string | null): string | null {
+/** BRIEF_REVIEW_SHEET §S.4 — the panel's own fill, shared by the scroll fade so
+ *  the text runs UNDER the boundary into exactly the surface it sits on. */
+const PANEL_FILL = 'rgba(24,27,35,0.88)';
+
+/** §S.1 / §S.2 — one threshold for every comparison against the course. Below
+ *  three ratings the course "average" is substantially this review. */
+export const REVIEW_SHEET_COMPARE_MIN = 3;
+
+/** §S.1 — signed deviation, one decimal, TRUE MINUS (U+2212). Never coloured. */
+export function formatDeviation(delta: number): string {
+  const r = Math.round(delta * 10) / 10;
+  if (r === 0) return '0.0';
+  return r > 0 ? `+${r.toFixed(1)}` : `\u2212${Math.abs(r).toFixed(1)}`;
+}
+
+/** §S.3 — the review's age in words. Reads the review date only: a member's
+ *  join year is not when they played, so it is never a fallback. */
+export function playedAgo(iso?: string | null, now: number = Date.now()): string | null {
   if (!iso) return null;
   const then = new Date(iso).getTime();
   if (!Number.isFinite(then)) return null;
-  const diff = Date.now() - then;
-  const day = 24 * 60 * 60 * 1000;
-  const d = Math.floor(diff / day);
-  if (d < 1) return 'today';
-  if (d < 7) return `${d}d`;
-  if (d < 30) return `${Math.floor(d / 7)}w`;
-  if (d < 365) return `${Math.floor(d / 30)}mo`;
-  return `${Math.floor(d / 365)}y`;
+  const d = Math.floor((now - then) / (24 * 60 * 60 * 1000));
+  const unit = (n: number, w: string) => `Played ${n} ${w}${n === 1 ? '' : 's'} ago`;
+  if (d < 1) return 'Played today';
+  if (d < 7) return unit(d, 'day');
+  if (d < 30) return unit(Math.floor(d / 7), 'week');
+  if (d < 365) return unit(Math.max(1, Math.floor(d / 30)), 'month');
+  return unit(Math.floor(d / 365), 'year');
 }
+
+const CATEGORY_AVG_FIELD = {
+  design: 'avg_design_score',
+  conditions: 'avg_condition_score',
+  clubhouse: 'avg_clubhouse_score',
+  facilities: 'avg_facilities_score',
+} as const;
 
 export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   isOpen,
@@ -323,6 +353,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     navigate(url);
   }, [courseId, reviewId, navigate, onClose, closeFullscreen]);
 
+  /* §S.5 — every rating of the course: the reviews tab, no single review. */
+  const handleSeeAll = useCallback(() => {
+    if (!courseId) return;
+    onClose();
+    closeFullscreen();
+    navigate(`/courses/${courseId}?tab=reviews`);
+  }, [courseId, navigate, onClose, closeFullscreen]);
+
   const handleShare = useCallback(() => {
     if (!reviewId || !courseId) return;
     const shareUrl = `${window.location.origin}/courses/${courseId}?tab=reviews&review=${reviewId}`;
@@ -361,8 +399,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const effectiveAggregate = resolvedAggregate !== undefined ? resolvedAggregate : agg;
   const communityAvg = effectiveAggregate?.avg_overall_score ?? null;
   const ratingCount = effectiveAggregate?.review_count ?? 0;
+  const canCompareCourse = ratingCount >= REVIEW_SHEET_COMPARE_MIN;
   const showReference =
-    rating != null && communityAvg != null && ratingCount >= 3;
+    rating != null && communityAvg != null && canCompareCourse;
   const ratingColor = courseSubScoreTone(rating);
 
   // MEDIA (§3c) — prop when a caller has it, otherwise a lazy read.
@@ -420,24 +459,41 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   );
 
 
+  /* §S.2 — all four columns whenever any category was scored; a skipped one
+     keeps an em dash and draws no track. The tick is the course's average for
+     THAT category, gated on the same threshold as the strip. */
   const breakdownEntries = useMemo(() => {
     if (!effectiveBreakdown) return [];
-    return BREAKDOWN_KEYS.flatMap((k) => {
-      const v = effectiveBreakdown[k];
-      return v == null || Number.isNaN(v)
-        ? []
-        : [{ key: k, label: BREAKDOWN_LABELS[k], value: v }];
+    const any = BREAKDOWN_KEYS.some((k) => effectiveBreakdown[k] != null && !Number.isNaN(effectiveBreakdown[k] as number));
+    if (!any) return [];
+    return BREAKDOWN_KEYS.map((k) => {
+      const raw = effectiveBreakdown[k];
+      const value = raw == null || Number.isNaN(raw) ? null : raw;
+      const avgRaw = effectiveAggregate?.[CATEGORY_AVG_FIELD[k]];
+      const courseAvg = value != null && canCompareCourse && avgRaw != null && Number.isFinite(Number(avgRaw))
+        ? Number(avgRaw)
+        : null;
+      return { key: k, label: BREAKDOWN_LABELS[k], value, courseAvg };
     });
-  }, [effectiveBreakdown]);
+  }, [effectiveBreakdown, effectiveAggregate, canCompareCourse]);
+  const anyTick = breakdownEntries.some((e) => e.courseAvg != null);
 
-  const relMonths = relativeMonths(reviewDate ?? effectiveStats?.memberSince ?? null);
-  const handicapSeg =
-    (effectiveStats as any)?.handicap != null
-      ? `handicap ${(effectiveStats as any).handicap}`
-      : effectiveStats?.averageRating != null && (effectiveStats?.coursesRated ?? 0) >= 3
-      ? `avg ${effectiveStats.averageRating.toFixed(1)}`
-      : null;
-  const metaSeg = [relMonths, handicapSeg].filter(Boolean).join(' · ');
+  const metaSeg = playedAgo(reviewDate);
+
+  /* §S.1 — THE CALIBRATION STRIP. Two figures, never coloured. */
+  const reviewerAvg = effectiveStats?.averageRating ?? null;
+  const firstName = user.name.trim().split(/\s+/)[0] || user.name;
+  const ownFigure = rating != null && reviewerAvg != null ? formatDeviation(rating - reviewerAvg) : null;
+  const courseFigure = showReference && communityAvg != null ? formatDeviation(rating - communityAvg) : null;
+  const ownSub = reviewerAvg != null
+    ? `${firstName} rates ${reviewerAvg.toFixed(1)}`
+    : 'Too few reviews to average';
+  const courseSub = courseFigure != null
+    ? `${ratingCount} ratings, ${communityAvg!.toFixed(1)} average`
+    : ratingCount <= 1
+      ? 'First rating here'
+      : `${ratingCount} ratings so far`;
+  const showStrip = ownFigure != null || courseFigure != null;
 
   const paragraphs = useMemo(() => {
     if (!effectiveReviewText) return [];
@@ -594,68 +650,60 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 </div>
               </div>
 
-              {/* Community reference, without repeating the primary rating. */}
-              {showReference && (
-                <div
-                  data-review-community-reference="true"
-                  style={{
-                    marginTop: 12,
-                    fontSize: 11.5,
-                    lineHeight: 1.35,
-                    color: MUTE,
-                    fontVariantNumeric: 'tabular-nums lining-nums',
-                  }}
-                >
-                  {t('reviewSheet.communityAverage', {
-                    average: communityAvg?.toFixed(1) ?? '',
-                    count: ratingCount,
-                  })}
+              {/* §S.1 — THE CALIBRATION STRIP. Both cells always, or none: two
+                  em dashes side by side say nothing. NEITHER FIGURE IS COLOURED —
+                  a deviation is not a verdict, and green here means 9.0+. */}
+              {showStrip && (
+                <div data-review-calibration="true" style={{ display: 'flex', gap: 9, marginTop: 13 }}>
+                  {[
+                    { key: 'own', label: 'Against their own', figure: ownFigure, sub: ownSub },
+                    { key: 'course', label: 'Against this course', figure: courseFigure, sub: courseSub },
+                  ].map((c) => (
+                    <div
+                      key={c.key}
+                      data-review-calibration-cell={c.key}
+                      style={{ flex: 1, minWidth: 0, background: A.SOFT, border: `1px solid ${BORDER}`, borderRadius: 11, padding: '9px 10px' }}
+                    >
+                      <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.11em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.label}</div>
+                      <div data-review-calibration-figure style={{ marginTop: 3, fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums', color: INK }}>{c.figure ?? '\u2014'}</div>
+                      <div style={{ marginTop: 2, fontSize: 10, fontWeight: 600, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.sub}</div>
+                    </div>
+                  ))}
                 </div>
               )}
 
-              {/* THE SPREAD — one row of four: figure over label.
-                  A null category omits its column and the row rebalances. */}
+              {/* §S.2 — THE SPREAD: label, figure, and a 4px track whose fill is
+                  this score out of ten and whose tick is the course's average
+                  for that category (three ratings or more only). */}
               {breakdownEntries.length > 0 && (
-                <div
-                  style={{
-                    marginTop: 12,
-                    display: 'grid',
-                    gridTemplateColumns: `repeat(${breakdownEntries.length}, 1fr)`,
-                    gap: 10,
-                  }}
-                >
-                  {breakdownEntries.map(({ key, label, value }) => {
-                    return (
-                      <div key={key} data-review-subscore={key} style={{ minWidth: 0, textAlign: 'center' }}>
-                        <div
-                          style={{
-                            fontSize: 15,
-                            fontWeight: 800,
-                            color: courseSubScoreTone(value),
-                            fontVariantNumeric: 'tabular-nums',
-                            lineHeight: 1,
-                          }}
-                        >
-                          {value.toFixed(1)}
-                        </div>
-                        <div
-                          style={{
-                            marginTop: 5,
-                            fontSize: 9,
-                            fontWeight: 800,
-                            letterSpacing: '0.1em',
-                            color: MUTE,
-                            textTransform: 'uppercase',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                          }}
-                        >
-                          {label}
-                        </div>
+                <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 11 }}>
+                  {breakdownEntries.map(({ key, label, value, courseAvg }) => (
+                    <div key={key} data-review-subscore={key} style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', color: A.DIM, textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+                      <div style={{ marginTop: 2, fontSize: 17, fontWeight: 800, letterSpacing: '-0.03em', color: courseSubScoreTone(value), fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>
+                        {value != null ? value.toFixed(1) : '\u2014'}
                       </div>
-                    );
-                  })}
+                      {value != null && (
+                        <div data-review-subscore-track style={{ position: 'relative', height: 4, borderRadius: 999, background: A.TRACK, marginTop: 6 }}>
+                          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(100, value * 10))}%`, borderRadius: 999, background: value >= 9 ? A.GREEN : A.DIM }} />
+                          {courseAvg != null && (
+                            <div data-review-subscore-tick style={{ position: 'absolute', top: -2.5, left: `${Math.max(0, Math.min(100, courseAvg * 10))}%`, width: 1.5, height: 9, borderRadius: 1, background: MUTE }} />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {breakdownEntries.length > 0 && anyTick && (
+                <div data-review-subscore-key style={{ marginTop: 9, fontSize: 10.5, color: A.DIM }}>
+                  <span aria-hidden style={{ display: 'inline-block', width: 1.5, height: 8, background: MUTE, margin: '0 5px -1px 0', borderRadius: 1 }} />
+                  The mark is this course&rsquo;s average in that category.
+                </div>
+              )}
+              {breakdownEntries.length > 0 && !anyTick && ratingCount === 1 && (
+                <div data-review-subscore-first style={{ marginTop: 9, fontSize: 10.5, color: A.DIM }}>
+                  No course average yet &mdash; this is the first rating here.
                 </div>
               )}
 
@@ -705,6 +753,41 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   />
                 ))
               )}
+
+              {/* §S.5 — the next question after one opinion is everyone else's.
+                  At one rating there is nothing else to see. */}
+              {courseId && ratingCount >= 2 && (
+                <button
+                  type="button"
+                  data-review-see-all="true"
+                  onClick={handleSeeAll}
+                  style={{
+                    marginTop: 16,
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 10,
+                    border: `1px solid ${BORDER}`,
+                    borderRadius: 11,
+                    padding: '11px 13px',
+                    background: 'transparent',
+                    color: INK,
+                    fontFamily: FONT_SF,
+                    fontSize: 12.5,
+                    fontWeight: 700,
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
+                >
+                  <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {`See all ${ratingCount} ${ratingCount === 1 ? 'rating' : 'ratings'} of ${courseName}`}
+                  </span>
+                  <ChevronRight size={15} strokeWidth={2} color={MUTE} aria-hidden style={{ flexShrink: 0 }} />
+                </button>
+              )}
+
 
               {/* MEDIA STRIP (§3c) — up to three thumbnails, 78 tall, r12.
                   INTERACTIVE: each tile is a real button that opens the
@@ -819,6 +902,23 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   </div>
                 </div>
               )}
+              {/* §S.4 — the text runs UNDER the boundary rather than stopping
+                  dead at it. Sticky, so it holds the bottom edge while scrolling;
+                  no clamp, no "read more" — this sheet is the full review. */}
+              <div
+                aria-hidden
+                data-review-scroll-fade="true"
+                style={{
+                  position: 'sticky',
+                  bottom: -16,
+                  height: 46,
+                  marginTop: -30,
+                  marginLeft: -18,
+                  marginRight: -18,
+                  pointerEvents: 'none',
+                  background: `linear-gradient(to bottom, transparent, ${PANEL_FILL})`,
+                }}
+              />
             </div>
 
 
@@ -836,23 +936,37 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   component, so the two feet read as one object. Both glyphs are
                   bare at zero, so a review with nothing on it can still take its
                   first like and its first comment. */}
-              {reviewId && onToggleReaction && (
-                <div style={{ marginBottom: 2 }}>
-                  <RoundEngagementActions
-                    comment={{
-                      count: commentCount,
-                      label: t('scorecard.commentReview', 'Comment on this review'),
-                      onOpen: () => setCommentsOpen(true),
-                    }}
-                    like={{
-                      count: reactionCount,
-                      reacted: reactionMine,
-                      onToggle: onToggleReaction,
-                      label: t('scorecard.likeReview', 'Like this review'),
-                      hidden: reactionHidden,
-                    }}
-                    kind="helpful"
-                  />
+              {/* §S.6 — share sits in the engagement row, as everywhere else. */}
+              {reviewId && (onToggleReaction || courseId) && (
+                <div data-review-engagement="true" style={{ marginBottom: 2, display: 'flex', alignItems: 'center', gap: 12 }}>
+                  {onToggleReaction && (
+                    <RoundEngagementActions
+                      comment={{
+                        count: commentCount,
+                        label: t('scorecard.commentReview', 'Comment on this review'),
+                        onOpen: () => setCommentsOpen(true),
+                      }}
+                      like={{
+                        count: reactionCount,
+                        reacted: reactionMine,
+                        onToggle: onToggleReaction,
+                        label: t('scorecard.likeReview', 'Like this review'),
+                        hidden: reactionHidden,
+                      }}
+                      kind="helpful"
+                    />
+                  )}
+                  {courseId && (
+                    <button
+                      type="button"
+                      data-review-share="true"
+                      aria-label="Share this review"
+                      onClick={handleShare}
+                      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 32, minHeight: 32, padding: 0, background: 'none', border: 0, color: MUTE, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+                    >
+                      <Share size={15} strokeWidth={1.75} />
+                    </button>
+                  )}
                 </div>
               )}
               {reviewId && reactionCount > 0 && (
@@ -869,10 +983,10 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   />
                 </div>
               )}
-              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${reviewId && courseId ? 3 : 2}, minmax(0, 1fr))` }}>
-                <GlassCardFootAction label={t('scorecard.viewProfile')} onClick={handleGoToProfile} icon={User} disabled={!user.id} />
+              {/* §S.6 — two doors: the course, and the reviewer by name. */}
+              <div data-review-foot-actions="true" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
                 <GlassCardFootAction label={t('scorecard.viewCourse')} onClick={handleGoToReview} icon={MapPin} disabled={!courseId} />
-                {reviewId && courseId && <GlassCardFootAction label={t('scorecard.shareRound')} onClick={handleShare} icon={Share} />}
+                <GlassCardFootAction label={user.name} onClick={handleGoToProfile} icon={User} disabled={!user.id} />
               </div>
             </div>
           </motion.div>
