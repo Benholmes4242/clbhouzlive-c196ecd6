@@ -866,8 +866,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 isOwnPost
                 actorType={post.actorType === 'business' ? 'business' : 'personal'}
                 actorId={post.actorId}
-                sourceReviewId={post.review?.reviewId ?? null}
-                reviewCourseId={post.review?.courseId ?? null}
                 variant="inline"
               />
             )}
@@ -898,9 +896,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             >
               DEAL
             </span>
-          )}
- ${getRatingTierLabel(reviewRating)}`}
-            />
           )}
         </div>
       </div>
