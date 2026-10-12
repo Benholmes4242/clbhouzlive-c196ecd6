@@ -15,9 +15,8 @@ import { formatRelativeAgo } from '@/i18n/format';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import { getThumbnailUrl } from '@/utils/thumbnail';
 import { MessageCircle } from 'lucide-react';
-import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
-import { reactionKindFor } from '@/lib/reactionKind';
+import type { ReasonLine } from './watchRules';
 
 /**
  * THE LONG-FORM VIDEO UNIT — ONE UNIT, TWO SIZES (BRIEF_EXPLORE_ALL_VIDEO).
@@ -191,6 +190,9 @@ export function VideoCard({
   context = 'watch',
   autoplay = size === 'full',
   engagement,
+  views = null,
+  reason = null,
+  progress = null,
 }: {
   row: HubRpcRow;
   onPress: () => void;
@@ -204,6 +206,12 @@ export function VideoCard({
   /** ROW REACTIONS (BRIEF_WATCH_VIDEO_ROW_REACTIONS). Optional and only passed
    *  by the Watch feed's full-width rows; the All rail never passes it. */
   engagement?: VideoRowEngagement;
+  /** K.4 — "1.2k views", or null when the view read is unavailable. */
+  views?: string | null;
+  /** K.4 line two; null renders no line at all. */
+  reason?: ReasonLine | null;
+  /** K.1 — part-watched fraction; pass only when the bar should draw. */
+  progress?: number | null;
 }) {
   const { t } = useTranslation('courses');
   const rail = size === 'rail';
@@ -211,10 +219,10 @@ export function VideoCard({
   const title = videoTitle(row, t('amateur.watch.untitled', 'Untitled video'));
   const who = creatorName(row);
   const when = formatRelativeAgo(row.post_created_at ?? null);
-  /* THE META LINE CARRIES NO VIEW COUNT. There is no per-post view figure on
-     posts and neither Watch RPC returns one, so the figure is DROPPED rather
-     than invented from likes or impressions. */
-  const meta = [who, when].filter(Boolean).join(' \u00B7 ');
+  /* K.4 LINE ONE: {creator} · {views} · {age}. Views come from post_views
+     (useWatchViews); when that read is unavailable the figure is omitted,
+     never invented from likes. */
+  const meta = [who, rail ? null : views ?? null, when].filter(Boolean).join(' \u00B7 ');
   const initial = (who || '?').trim().charAt(0).toUpperCase() || '?';
   const poster = posterFor(row, rail ? 480 : 720);
   const [posterFailed, setPosterFailed] = useState(false);
@@ -223,8 +231,14 @@ export function VideoCard({
     <button
       type="button"
       onClick={onPress}
+      data-watch-card="long"
       style={{
-        display: 'block',
+        /* K.7: a <button> centres its own contents. Every card is a top-aligned
+           column and the poster cannot shrink. */
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'stretch',
+        justifyContent: 'flex-start',
         width: '100%',
         padding: 0,
         border: 0,
@@ -232,11 +246,14 @@ export function VideoCard({
         textAlign: 'left',
         cursor: 'pointer',
         fontFamily: SANS,
+        color: A.INK,
       }}
     >
       <div
+        data-watch-frame
         style={{
           position: 'relative',
+          flex: 'none',
           width: '100%',
           aspectRatio: '16 / 9',
           overflow: 'hidden',
@@ -261,52 +278,18 @@ export function VideoCard({
         <span style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
           <GlassDurationBadge seconds={row.duration_seconds ?? null} />
         </span>
-
+        {!rail && progress != null ? <WatchProgressBar fraction={progress} /> : null}
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          gap: rail ? 0 : 10,
-          padding: magazine ? '8px 4px 0' : rail ? '7px 0 0' : `9px ${INSET}px 0`,
-          alignItems: 'flex-start',
-        }}
-      >
-        {rail ? null : row.creator_avatar_url ? (
-          <img
-            src={row.creator_avatar_url}
-            alt=""
-            loading="lazy"
-            style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
-          />
-        ) : (
-          <span
-            aria-hidden
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: '50%',
-              background: A.PANEL,
-              color: A.MUTE,
-              fontSize: 12,
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            {initial}
-          </span>
-        )}
-        <span style={{ minWidth: 0, flex: 1 }}>
+      {rail ? (
+        <span style={{ display: 'block', padding: magazine ? '8px 4px 0' : '7px 0 0', minWidth: 0 }}>
           <span
             style={{
               display: '-webkit-box',
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
-              fontSize: rail ? 12.5 : 14,
+              fontSize: 12.5,
               fontWeight: 600,
               lineHeight: 1.3,
               color: A.INK,
@@ -314,79 +297,126 @@ export function VideoCard({
           >
             {title}
           </span>
-          {/* THE RAIL TILE NAMES THE CREATOR AND NOTHING ELSE: a date on a
-              120px line would push the title to one clamped word. */}
-          {rail ? (
-            who ? (
-              <span
-                style={{
-                  display: 'block',
-                  marginTop: 3,
-                  fontSize: 11,
-                  fontWeight: 500,
-                  color: A.MUTE,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {who}
-              </span>
-            ) : null
-          ) : (meta || engagement) ? (
-            <span style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 3 }}>
-              <span
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  fontSize: 11.5,
-                  fontWeight: 500,
-                  color: A.MUTE,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {meta}
-              </span>
-              {engagement ? (
-                <span style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 0, marginRight: -8 }}>
-                  <ReactionAction
-                    kind={reactionKindFor({ isRound: false, isReview: !!(row.source_review_id || row.review_id) })}
-                    count={engagement.likeCount}
-                    reacted={engagement.liked}
-                    onToggle={engagement.onToggleLike}
-                    readOnly={engagement.own}
-                    hidden={!engagement.likeAvailable}
-                    tone="ink"
-                    hitBias="down"
-                    label={
-                      engagement.liked
-                        ? t('amateur.watch.liked', 'Liked')
-                        : t('amateur.watch.likeVideo', 'Like this video')
-                    }
-                  />
-                  <VideoCommentAction
-                    count={engagement.commentCount}
-                    onOpen={engagement.onOpenComments}
-                    label={t('amateur.watch.comments', 'Comments, {{count}}', { count: engagement.commentCount })}
-                  />
-                </span>
-              ) : null}
+          {/* THE RAIL TILE NAMES THE CREATOR AND NOTHING ELSE. */}
+          {who ? (
+            <span
+              style={{
+                display: 'block',
+                marginTop: 3,
+                fontSize: 11,
+                fontWeight: 500,
+                color: A.MUTE,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {who}
             </span>
           ) : null}
         </span>
-      </div>
+      ) : (
+        <span style={{ display: 'flex', gap: 11, padding: magazine ? '8px 4px 0' : '11px 14px 15px', alignItems: 'flex-start' }}>
+          {row.creator_avatar_url ? (
+            <img
+              src={row.creator_avatar_url}
+              alt=""
+              loading="lazy"
+              style={{ width: 36, height: 36, borderRadius: 11, objectFit: 'cover', flex: 'none' }}
+            />
+          ) : (
+            <span
+              aria-hidden
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 11,
+                background: A.PANEL,
+                color: A.MUTE,
+                fontSize: 13,
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flex: 'none',
+              }}
+            >
+              {initial}
+            </span>
+          )}
+          <span style={{ minWidth: 0, flex: 1 }}>
+            <span
+              style={{
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                fontSize: 15.5,
+                fontWeight: 700,
+                lineHeight: 1.3,
+                color: A.INK,
+              }}
+            >
+              {title}
+            </span>
+            {meta ? (
+              <span
+                data-watch-by
+                style={{ display: 'block', marginTop: 4, fontSize: 13, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+              >
+                {meta}
+              </span>
+            ) : null}
+            {/* K.4 LINE TWO: the reason it is in front of you, or nothing. */}
+            {reason ? (
+              <span
+                data-watch-reason={reason.hot ? 'hot' : 'plain'}
+                style={{
+                  display: 'block',
+                  marginTop: 5,
+                  fontSize: 12.5,
+                  fontWeight: reason.hot ? 700 : 400,
+                  color: reason.hot ? A.AMBER : A.DIM,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {reason.text}
+              </span>
+            ) : null}
+          </span>
+          {engagement ? (
+            <span style={{ flex: 'none', paddingTop: 1, marginRight: -8 }}>
+              <VideoCommentAction
+                count={engagement.commentCount}
+                onOpen={engagement.onOpenComments}
+                label={t('amateur.watch.comments', 'Comments, {{count}}', { count: engagement.commentCount })}
+              />
+            </span>
+          ) : null}
+        </span>
+      )}
     </button>
   );
 }
 
+/** K.1 — 3px, full bleed to the poster edges, no radius. Track is the same
+ *  0.26 white the fullscreen progress strip uses; fill is the member's amber. */
+export function WatchProgressBar({ fraction }: { fraction: number }) {
+  return (
+    <span
+      data-watch-progress
+      aria-hidden
+      style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 3, zIndex: 3, background: 'rgba(255,255,255,0.26)', pointerEvents: 'none' }}
+    >
+      <span style={{ display: 'block', height: '100%', width: `${(Math.max(0, Math.min(1, fraction)) * 100).toFixed(1)}%`, background: A.AMBER }} />
+    </span>
+  );
+}
+
+/** K.4: likes stay on the video itself; the card carries the comment door only. */
 export interface VideoRowEngagement {
-  likeAvailable: boolean;
-  liked: boolean;
-  likeCount: number;
-  own: boolean;
-  onToggleLike: () => void;
   commentCount: number;
   onOpenComments: () => void;
 }
