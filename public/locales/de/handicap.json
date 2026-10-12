@@ -181,7 +181,16 @@
       "kicker": "MEASURED AGAINST",
       "heading": "{{name}} own rounds at {{course}}",
       "line": "{{subject}} {{verb}} played here {{count}} times. Every comparison below is to those rounds — not to other members, and not to {{possessive}} golf anywhere else.",
-      "their": "THEIR"
+      "their": "THEIR",
+      "ownHeading": "Against {{possessive}} own rounds here",
+      "ownLine": "{{count}} rounds at this course. Nothing in this section compares {{object}} to anyone else.",
+      "fieldHeading": "Against everyone who plays here",
+      "object": {
+        "you": "you",
+        "he": "him",
+        "she": "her",
+        "they": "them"
+      }
     },
     "spans": {
       "round_gross": "All 18 holes",

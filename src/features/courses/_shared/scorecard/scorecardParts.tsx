@@ -1,3 +1,4 @@
+import { formatHcp } from '@/lib/formatHcp';
 import { handicapPairDisplay } from '@/features/explore-magazine/circleHandicap';
 /**
  * BRIEF_ROUND_SHEET_PEEK §1 — THE SCORECARD'S SHARED PARTS.
@@ -370,6 +371,13 @@ export interface RoundSummaryHeadProps {
   /** Member surface: the index under the player's name (handicapPairDisplay). */
   playerHcp?: number | null;
   playerHcpDelta?: number | null;
+  /**
+   * BRIEF_SCORECARD_SHEET C.4 — THE INDEX THE ROUND WAS PLAYED OFF. When present
+   * the identity line reads "Played off {index}" and the handicap appears
+   * nowhere else on the sheet. Null keeps the existing HCP line; today's index
+   * is never relabelled as the index at the time.
+   */
+  playedOffIndex?: number | null;
   rail?: RailFigure[];
 }
 
@@ -382,7 +390,7 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
   isTour = false, kickerText, memberDateText, courseName, courseLocation,
   showScore, gross, toPar, shownPar = 0, playedHoles = 0, coursePar,
   heroMuted, playerName, playerAvatarUrl, playerUserId,
-  tourAvatarCandidates = [], isOwner = false, playerHcp, playerHcpDelta, rail = [],
+  tourAvatarCandidates = [], isOwner = false, playerHcp, playerHcpDelta, playedOffIndex = null, rail = [],
 }) => {
   const { t } = useTranslation(['courses']);
   const showChip = playerHcpDelta != null && Math.abs(playerHcpDelta) >= 0.05;
@@ -482,7 +490,11 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
             <span style={{ fontSize: 12.5, fontWeight: 700, color: isOwner ? A.AMBER : A.INK, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {playerName}
             </span>
-            {hcpPair && (
+            {!isTour && playedOffIndex != null ? (
+              <span data-scorecard-played-off="true" style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase', color: A.DIM, marginTop: 2, whiteSpace: 'nowrap' }}>
+                {t('courses:scorecard.playedOff', { index: formatHcp(playedOffIndex) })}
+              </span>
+            ) : hcpPair && (
               <span data-scorecard-hcp="true" style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 2, whiteSpace: 'nowrap' }}>
                 <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: A.MUTE }}>{t('courses:scorecard.hcpLabel', { defaultValue: 'HCP' })}</span>
                 <span style={{ ...NUM, fontSize: 11.5, fontWeight: 700, color: A.INK }}>{hcpPair.index}</span>

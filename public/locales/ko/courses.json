@@ -1854,7 +1854,16 @@
     "scopeTheir": "회원의",
     "scopeHave": "플레이했습니다",
     "scopeHas": "플레이했습니다",
-    "hcpLabel": "HCP"
+    "hcpLabel": "HCP",
+    "figVsYourAvgNeutralHere": "이곳에서의 회원님 평균 대비",
+    "figVsTheirAvgNeutralHere": "이곳에서의 {{possessive}} 평균 대비",
+    "playedOff": "플레이 당시 {{index}}",
+    "key": {
+      "under": "언더파",
+      "bogey": "보기",
+      "double": "더블",
+      "triple": "트리플 이상"
+    }
   },
   "searchSheet": {
     "added": "Added",

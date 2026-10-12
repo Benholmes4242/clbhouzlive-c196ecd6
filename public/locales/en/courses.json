@@ -2760,7 +2760,16 @@
     "scopeTheir": "their",
     "scopeHave": "have",
     "scopeHas": "has",
-    "hcpLabel": "HCP"
+    "hcpLabel": "HCP",
+    "figVsYourAvgNeutralHere": "vs your average here",
+    "figVsTheirAvgNeutralHere": "vs {{possessive}} average here",
+    "playedOff": "Played off {{index}}",
+    "key": {
+      "under": "Under par",
+      "bogey": "Bogey",
+      "double": "Double",
+      "triple": "Triple or worse"
+    }
   },
   "search": {
     "yourRounds": "Your rounds"

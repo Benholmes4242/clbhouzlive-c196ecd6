@@ -1851,7 +1851,16 @@
     "scopeTheir": "本人の",
     "scopeHave": "は",
     "scopeHas": "は",
-    "hcpLabel": "HCP"
+    "hcpLabel": "HCP",
+    "figVsYourAvgNeutralHere": "ここでのあなたの平均との比較",
+    "figVsTheirAvgNeutralHere": "ここでの{{possessive}}平均との比較",
+    "playedOff": "プレー時HC {{index}}",
+    "key": {
+      "under": "アンダーパー",
+      "bogey": "ボギー",
+      "double": "ダブル",
+      "triple": "トリプル以上"
+    }
   },
   "searchSheet": {
     "added": "Added",
