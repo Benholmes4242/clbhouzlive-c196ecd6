@@ -1,11 +1,10 @@
 import React from 'react';
 import { describe, it, expect, beforeAll } from 'vitest';
 import { render } from '@testing-library/react';
-import FormCard from '@/features/profile-sheet-v2/components/FormCard';
-import CoursesCard from '@/features/profile-sheet-v2/components/CoursesCard';
+import FormSection from '@/features/profile-sheet-v2/components/FormSection';
 import { HcpTrendChart } from '@/components/profile/handicap/whs/charts/HcpTrendChart';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { identityLine, formBars, courseFigures, lowestRound } from '@/features/profile-sheet-v2/sheetState';
+import { identityLine, formBars } from '@/features/profile-sheet-v2/sheetState';
 
 beforeAll(() => {
   (globalThis as any).ResizeObserver = class { observe() {} disconnect() {} };
@@ -36,7 +35,7 @@ describe('V3 D form colour follows the effect', () => {
     expect(bars[2]).toMatchObject({ id: 'c', value: 0.8, movement: -0.2 });
   });
   it('a POSITIVE bar is green when it lowered the index; a NEGATIVE bar is grey when it did not', () => {
-    const { container } = render(<FormCard bars={bars} onNavigate={() => {}} />);
+    const { container } = render(<FormSection bars={bars} />);
     const els = container.querySelectorAll('[data-form-bar]');
     expect(els[0].getAttribute('data-below')).toBe('true');
     expect(els[0].getAttribute('data-lowered')).toBe('false');
@@ -44,28 +43,10 @@ describe('V3 D form colour follows the effect', () => {
     expect(els[2].getAttribute('data-lowered')).toBe('true');
   });
   it('the head renders no summary text', () => {
-    const { container } = render(<FormCard bars={bars} onNavigate={() => {}} />);
+    const { container } = render(<FormSection bars={bars} />);
     const text = container.textContent ?? '';
     expect(text).not.toMatch(/better|worse|level|vs index/i);
     expect(text).toContain('Green rounds lowered your index.');
-  });
-});
-
-describe('V3 E lowest round', () => {
-  it('ignores nine-hole rounds and null grosses', () => {
-    expect(lowestRound([
-      { adjusted_gross: 38, is_nine_hole: true, course: { name: 'Nine' } },
-      { adjusted_gross: null, is_nine_hole: false, course: { name: 'Null' } },
-      { adjusted_gross: 74, is_nine_hole: false, course: { name: 'Knebworth' } },
-      { adjusted_gross: 79, is_nine_hole: false, course: { name: 'Other' } },
-    ])).toEqual({ gross: 74, name: 'Knebworth' });
-  });
-  it('shows an em dash when nothing qualifies', () => {
-    const f = courseFigures([{ course_name: 'K', rounds_count: 1, last_played: null, avg_to_par: 1 }],
-      [{ adjusted_gross: 38, is_nine_hole: true }]);
-    const { container } = render(<CoursesCard figures={f} onOpen={() => {}} />);
-    expect(container.textContent).toContain('Lowest round');
-    expect(container.textContent).toContain('\u2014');
   });
 });
 

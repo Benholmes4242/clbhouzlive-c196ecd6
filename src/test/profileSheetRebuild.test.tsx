@@ -8,10 +8,9 @@ vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => <span /
 
 import SheetCards from '@/features/profile-sheet-v2/components/SheetCards';
 import ActorCards from '@/features/profile-sheet-v2/components/ActorCards';
-import FormCard from '@/features/profile-sheet-v2/components/FormCard';
-import CoursesCard from '@/features/profile-sheet-v2/components/CoursesCard';
+import FormSection from '@/features/profile-sheet-v2/components/FormSection';
 import {
-  deriveSheetHcpState, isSyncFailing, handicapSentence, formBars, courseFigures, type SheetHcpState,
+  deriveSheetHcpState, isSyncFailing, handicapSentence, formBars, type SheetHcpState,
 } from '@/features/profile-sheet-v2/sheetState';
 
 beforeAll(() => {
@@ -23,7 +22,6 @@ const bars = [
   { id: 'b', date: '2026-09-14', value: 2.1, movement: 0.1 },
   { id: 'c', date: '2026-09-21', value: -1.9, movement: -0.3 },
 ];
-const courses = courseFigures([{ course_name: 'Knebworth', rounds_count: 4, last_played: '2026-05-01', avg_to_par: 2.1 }]);
 const history = [
   { observed_at: '2026-08-01', handicap_index: 2.2 },
   { observed_at: '2026-09-01', handicap_index: 1.6 },
@@ -31,10 +29,10 @@ const history = [
 
 function cards(state: SheetHcpState) {
   const { container } = render(
-    <SheetCards state={state} history90={history} bars={bars} courses={courses}
-      onNavigate={() => {}} onOpenCourseAnalytics={() => {}} now={Date.parse('2026-10-12')} />,
+    <SheetCards state={state} history90={history} bars={bars}
+      onNavigate={() => {}} now={Date.parse('2026-10-12')} />,
   );
-  return (name: string) => !!container.querySelector(`[data-card="${name}"]`);
+  return (name: string) => !!container.querySelector(name === 'form' ? '[data-form-section]' : `[data-card="${name}"]`);
 }
 
 const base = { isBusiness: false, settled: true, hidden: false, connection: null, egHandicapIndex: null, manualHandicapIndex: null };
@@ -72,9 +70,10 @@ describe('profile sheet states (S.2)', () => {
     expect(has('failing')).toBe(true);
     expect(has('connect') || has('syncing') || has('form')).toBe(false);
   });
-  it('(e) whs with index: handicap, form and courses', () => {
+  it('(e) whs with index: one merged card holding the form; no courses card (V6 E)', () => {
     const has = cards(deriveSheetHcpState({ ...base, connection: { provider: 'england_golf' }, egHandicapIndex: 1.6 }));
-    expect(has('handicap') && has('form') && has('courses')).toBe(true);
+    expect(has('handicap') && has('form')).toBe(true);
+    expect(has('courses')).toBe(false);
     expect(has('connect')).toBe(false);
   });
   it('unsettled renders nothing', () => {
@@ -95,14 +94,14 @@ describe('profile sheet parts', () => {
     expect(getAllByLabelText('3 unread')).toHaveLength(1);
   });
   it('negative form bar hangs below the line, positive rises above, true minus', () => {
-    const { container } = render(<FormCard bars={bars} onNavigate={() => {}} />);
+    const { container } = render(<FormSection bars={bars} />);
     const els = container.querySelectorAll('[data-form-bar]');
     expect(els[0].getAttribute('data-below')).toBe('true');
     expect(els[1].getAttribute('data-below')).toBe('false');
     expect(els[0].textContent).toBe('\u22120.9');
   });
   it('form card absent below two rounds', () => {
-    const { container } = render(<FormCard bars={[bars[0]]} onNavigate={() => {}} />);
+    const { container } = render(<FormSection bars={[bars[0]]} />);
     expect(container.innerHTML).toBe('');
   });
   it('form uses differential minus index played off, excludes nine-hole, oldest first', () => {
@@ -120,11 +119,6 @@ describe('profile sheet parts', () => {
     expect(text).not.toContain('high');
     expect(handicapSentence([{ t: '2026-08-01', v: 1 }], 90)).toBeNull();
   });
-  it('courses card absent with no courses', () => {
-    expect(courseFigures([])).toBeNull();
-    const { container } = render(<CoursesCard figures={null} onOpen={() => {}} />);
-    expect(container.innerHTML).toBe('');
-  });
 });
 
 describe('profile sheet corrections (V)', () => {
@@ -132,24 +126,24 @@ describe('profile sheet corrections (V)', () => {
     const s = deriveSheetHcpState({ ...base, connection: { provider: 'england_golf' }, trendCurrent: 3.4 });
     expect(s).toEqual({ kind: 'ready', index: 3.4 });
     const { container } = render(
-      <SheetCards state={s} history90={[]} bars={bars} courses={courses}
-        onNavigate={() => {}} onOpenCourseAnalytics={() => {}} now={Date.parse('2026-10-12')} />,
+      <SheetCards state={s} history90={[]} bars={bars}
+        onNavigate={() => {}} now={Date.parse('2026-10-12')} />,
     );
     expect(container.querySelector('[data-card="handicap"]')).not.toBeNull();
     expect(container.querySelector('[data-card="syncing"]')).toBeNull();
   });
 
-  it('V.1 the form door and the index door resolve to different routes', () => {
+  it('V6 D the merged card has one door, View handicap; no Your rounds door', () => {
     const go = vi.fn();
-    const { getByText } = render(
-      <SheetCards state={{ kind: 'ready', index: 1.6 }} history90={history} bars={bars} courses={courses}
-        onNavigate={go} onOpenCourseAnalytics={() => {}} now={Date.parse('2026-10-12')} />,
+    const { getByText, queryByText, container } = render(
+      <SheetCards state={{ kind: 'ready', index: 1.6 }} history90={history} bars={bars}
+        onNavigate={go} now={Date.parse('2026-10-12')} />,
     );
-    getByText('Your rounds').click();
+    expect(container.querySelectorAll('button').length - 2).toBe(1); // minus the 30d/90d pair
+    expect(queryByText('Your rounds')).toBeNull();
+    expect(getByText("How you\u2019re playing")).toBeTruthy();
     getByText('View handicap').click();
-    expect(go.mock.calls[0][0]).toBe('/profile?tab=rounds');
-    expect(go.mock.calls[1][0]).toBe('/handicap');
-    expect(go.mock.calls[0][0]).not.toBe(go.mock.calls[1][0]);
+    expect(go).toHaveBeenCalledWith('/handicap');
   });
 
   it('V.3 sync failure matches the written statuses exactly', () => {
