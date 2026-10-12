@@ -35,7 +35,7 @@ createRoot(document.getElementById('root')).render(React.createElement(MemoryRou
         context = await browser.new_context(viewport={'width':1280,'height':1800})
         page = await context.new_page()
         errors = []
-        page.on('pageerror', lambda error: errors.append(str(error)))
+        page.on('pageerror', lambda error: (errors.append(str(error)), print('PAGE ERROR', str(error), flush=True)))
 
         async def fixture(route):
             path = route.request.url.split('?')[0]
