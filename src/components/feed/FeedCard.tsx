@@ -941,9 +941,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               courseName={post.courseName}
               /**
                * THE COURSE NAME IS A DOOR. Routes to /courses/:courseId for the
-               * id the card ALREADY carries — review posts resolve through
-               * reviewCourseId (review.courseId, else courseId), every other
-               * kind through post.courseId. No id -> no prop -> plain text, and
+               * id the card ALREADY carries (post.courseId). Review posts never
+               * reach here; ReviewPostCard owns their course door. No id -> no
+               * prop -> plain text, and
                * never a lookup by name.
                */
               onOpenCourse={
@@ -963,12 +963,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               courseLocation={courseLocation || null}
               courseRating={post.courseRating ?? null}
               ctx={courseContext ?? null}
-              /**
-               * REVIEW POSTS HAVE ONE DESTINATION. The band on a review card
-               * carries the course name and its place only, and does not open
-               * the course stats sheet — the card's single destination is the
-               * review sheet. Every other post kind is unchanged.
-               */
               onOpenStats={post.courseId ? () => setStatsOpen(true) : undefined}
               surface="solid"
             />
