@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { REVIEW_BODY_CLAMP, REVIEW_CARD_MAX_HEIGHT, againstCourse, joinClauses } from '@/components/feed/reviewPostCard';
+import { REVIEW_BODY_CLAMP, REVIEW_CARD_MAX_HEIGHT, REVIEW_COURSE_CLAMP, joinClauses } from '@/components/feed/reviewPostCard';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (k: string, o?: { count?: number }) => (o?.count != null ? `${k}:${o.count}` : k), i18n: { language: 'en' } }),
@@ -25,9 +25,9 @@ function makePost(rating: number, breakdown: Record<string, number | null>, text
     ...extra,
   } as never;
 }
-const tree = (post: never, coursesReviewed: number | null = null) => (
+const tree = (post: never, coursesReviewed: number | null = null, extraProps: Record<string, unknown> = {}) => (
   <MemoryRouter><QueryClientProvider client={new QueryClient()}>
-    <ReviewPostCard post={post} articleRef={() => {}} surface={A.PANEL} onProfile={vi.fn()} onReadReview={vi.fn()} onPrefetch={vi.fn()} coursesReviewed={coursesReviewed} footer={null} />
+    <ReviewPostCard post={post} articleRef={() => {}} onProfile={vi.fn()} onReadReview={vi.fn()} onPrefetch={vi.fn()} coursesReviewed={coursesReviewed} footer={null} {...extraProps} />
   </QueryClientProvider></MemoryRouter>
 );
 function card(rating: number, breakdown: Record<string, number | null>, text = 'Words', extra: Record<string, unknown> = {}) {
@@ -64,23 +64,6 @@ describe('review post — categories', () => {
   });
 });
 
-describe('review post — context line', () => {
-  it('reads the batched course average and is absent without one', () => {
-    expect(card(6.8, all).querySelector('[data-review-against]')).toBeNull();
-    const c = card(6.8, all, 'Words', { courseRating: 7.1 });
-    expect(c.querySelector('[data-review-against]')?.textContent).toBe('feed.reviewPost.against.below');
-  });
-  it('does not render when courseRating is null', () => {
-    expect(card(6.8, all, 'Words', { courseRating: null }).querySelector('[data-review-against]')).toBeNull();
-  });
-  it('reads below / above / in line at one decimal', () => {
-    expect(againstCourse(6.8, 7.1)?.direction).toBe('below');
-    expect(againstCourse(7.4, 7.1)?.direction).toBe('above');
-    expect(againstCourse(7.1, 7.06)?.direction).toBe('inLine');
-    expect(againstCourse(7.1, null)).toBeNull();
-  });
-});
-
 describe('review post — body clamp', () => {
   it('clamps to two lines with the padding on the wrapper, not the clamped box', () => {
     const c = card(8, all, 'A long review. '.repeat(40));
@@ -91,7 +74,7 @@ describe('review post — body clamp', () => {
     expect(REVIEW_BODY_CLAMP).not.toHaveProperty('paddingBottom');
     expect(body.style.overflow).toBe('hidden');
     expect(body.style.padding).toBe('');
-    expect(wrap.style.padding).toBe('0px 14px 12px');
+    expect(wrap.style.padding).toBe('0px 14px 6px');
   });
 });
 
@@ -128,7 +111,50 @@ describe('review post — one home', () => {
     expect(c.querySelector('[data-review-post-card]')).toBeTruthy();
     expect(c.querySelector('[data-review-course]')).toBeNull();
     expect(c.querySelector('[data-review-score]')).toBeNull();
-    expect(c.querySelector('[data-review-against]')).toBeNull();
     expect(c.querySelector('[data-review-body]')?.textContent).toContain('Body text');
+  });
+});
+
+describe('review post v2 — frame and affordances', () => {
+  it('the CTA renders with and without review text and calls onReadReview', async () => {
+    const { fireEvent } = await import('@testing-library/react');
+    for (const text of ['Words', '']) {
+      const onRead = vi.fn();
+      const c = render(tree(makePost(8, all, text, { caption: '' }), null, { onReadReview: onRead })).container;
+      const cta = c.querySelector('[data-review-cta]') as HTMLElement;
+      expect(cta.textContent).toContain('feed.reviewPost.readFullReview');
+      fireEvent.click(cta);
+      expect(onRead).toHaveBeenCalledTimes(1);
+      expect(!!c.querySelector('[data-review-body]')).toBe(text !== '');
+    }
+  });
+  it('the course name clamps to two lines rather than nowrap', () => {
+    const name = card(8, all).querySelector('[data-review-course]') as HTMLElement;
+    expect(name.style.whiteSpace).toBe('');
+    expect(name.style.overflow).toBe('hidden');
+    expect(REVIEW_COURSE_CLAMP.WebkitLineClamp).toBe(2);
+    expect(REVIEW_COURSE_CLAMP).not.toHaveProperty('whiteSpace');
+  });
+  it('the follow pill sits inline straight after the age', () => {
+    const c = render(tree(makePost(8, all), null, { followPill: <span data-pill />, ownerMenu: <span data-menu /> })).container;
+    const meta = c.querySelector('[data-review-meta]') as HTMLElement;
+    expect(meta.children[0].hasAttribute('data-review-who-line')).toBe(true);
+    expect(meta.children[1].querySelector('[data-pill]')).toBeTruthy();
+    expect(meta.querySelector('[data-menu]')).toBeNull();
+  });
+  it('the article carries no border and no radius; hairline only after the first post', () => {
+    const first = render(tree(makePost(8, all), null, { feedIndex: 0 })).container.querySelector('[data-review-post-card]') as HTMLElement;
+    expect(first.style.borderRadius).toBe('');
+    expect(first.style.border).toBe('');
+    expect(first.style.borderTop).toBe('');
+    const later = render(tree(makePost(8, all), null, { feedIndex: 2 })).container.querySelector('[data-review-post-card]') as HTMLElement;
+    expect(later.style.borderTop).toContain('1px solid');
+    expect(later.style.borderRadius).toBe('');
+  });
+  it('the media carries no margin and no radius', () => {
+    const c = render(tree(makePost(8, all), null, { media: <img alt="" /> })).container;
+    const m = c.querySelector('[data-review-media]') as HTMLElement;
+    expect(m.style.margin).toBe('');
+    expect(m.style.borderRadius).toBe('');
   });
 });

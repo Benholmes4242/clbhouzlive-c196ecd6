@@ -1,14 +1,14 @@
 /**
- * ReviewPostCard — the Clubhouse feed's review post (BRIEF_REVIEW_POST_REBUILD,
- * spec reviewcard-spec.html). FeedCard routes review posts here and hands in
- * the media frame and the shared footer as slots, so likes, comments, sharing,
- * the owner menu and the fullscreen viewer keep exactly their existing paths.
+ * ReviewPostCard — the Clubhouse feed's review post (BRIEF_REVIEW_POST_V2,
+ * spec reviewpost-v2.html). A REVIEW POST IS NOT A CARD: the article takes
+ * FeedCard's own frame — edge to edge, no border, no radius, a 1px hairline
+ * above unless it is the first post. FeedCard hands in the media and the
+ * shared footer as slots, so likes, comments, sharing, the owner menu and
+ * the fullscreen viewer keep exactly their existing paths.
  *
- * Every score colour resolves through the app's helpers (R.2): the overall
- * figure and tier word through reviewLabelColor / ReviewVerdictLabel, every
- * category through courseSubScoreTone. Green at 9.0 and above, mute below.
- * A category is never coloured for beating the course average — the tick
- * carries that comparison alone.
+ * Every score colour resolves through the app's helpers: the overall figure
+ * and tier word through reviewLabelColor / ReviewVerdictLabel, every category
+ * through courseSubScoreTone. Green at 9.0 and above, mute below.
  */
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,27 +23,34 @@ import { formatRatingValue } from '@/utils/formatters';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 import { formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { fmtHcp } from '@/lib/whs/format';
-import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, againstCourse, joinClauses } from './reviewPostCard';
+import { CARD, LINE, T100, T60, T40 } from './feedTokens';
+import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, REVIEW_COURSE_CLAMP, joinClauses } from './reviewPostCard';
 
 const GUTTER = 14;
-const BODY_SIZE = 13.5;
-const BODY_LINE = 1.5;
 
 type CatKey = 'design' | 'condition' | 'clubhouse' | 'facilities';
 const CATS: CatKey[] = ['design', 'condition', 'clubhouse', 'facilities'];
 
+const COURSE_NAME_STYLE: React.CSSProperties = {
+  fontSize: 19, fontWeight: 800, letterSpacing: '-0.028em', lineHeight: 1.16, color: A.INK,
+  ...REVIEW_COURSE_CLAMP,
+};
+
 export interface ReviewPostCardProps {
   post: FeedPost;
   articleRef: React.Ref<HTMLElement>;
-  surface: string;
+  /** FeedCard's feedIndex: no hairline on the first post, same rule as a round. */
+  feedIndex?: number;
   onProfile: () => void;
   onReadReview: (e: React.MouseEvent) => void;
   onPrefetch: () => void;
   /** The member's courses-rated figure (useReviewerStats, already read by FeedCard). */
   coursesReviewed?: number | null;
   onOpenCourse?: () => void;
-  /** Right-hand group of the identity row: the Following pill and the owner menu. */
-  identityRight?: React.ReactNode;
+  /** The same FeedFollowPill a normal post mounts, inline after the age. */
+  followPill?: React.ReactNode;
+  /** The owner menu: the right-hand slot of the identity row. */
+  ownerMenu?: React.ReactNode;
   /** F — the media frame's content (single media or carousel), sized to fill. */
   media?: React.ReactNode;
   /** G — the shared footer, unchanged. */
@@ -51,24 +58,19 @@ export interface ReviewPostCardProps {
 }
 
 export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
-  post, articleRef, surface, onProfile, onReadReview, onPrefetch, coursesReviewed = null, onOpenCourse, identityRight, media, footer,
+  post, articleRef, feedIndex, onProfile, onReadReview, onPrefetch, coursesReviewed = null, onOpenCourse, followPill, ownerMenu, media, footer,
 }) => {
-  const { t, i18n } = useTranslation('common');
+  const { t } = useTranslation('common');
   const { t: tCourses } = useTranslation('courses');
   /* ONE HOME: a review whose course did not resolve has no `review` object;
-     every part below drops independently, like a missing region. */
+     every part below drops independently. */
   const review = post.review;
   const rating = review?.rating ?? null;
 
-  /* A.1 — the feed row carries ONE privacy-aware index (creator_handicap_index,
-     chosen server-side), so there is no eg/manual pair here to hand to
-     resolveDisplayHandicap. The clause is dropped when there is no index.
-     A.2 — the count comes from useReviewerStats, which FeedCard already reads
-     for every review card. It is LATCHED: the line composes once with what had
-     arrived by first paint, so a late count never shifts the date along under
-     the reader's eye (same pattern as leadSettledOnce). */
+  /* A — one privacy-aware index from the feed row (chosen server-side).
+     The count is LATCHED at first paint so a late figure never shifts the line. */
   const indexClause = post.handicapIndex != null
-    ? t('feed.reviewPost.playsOff', { index: fmtHcp(post.handicapIndex) })
+    ? t('feed.reviewPost.hcp', { index: fmtHcp(post.handicapIndex) })
     : null;
   const countAtFirstPaint = useRef<number | null | undefined>(undefined);
   if (countAtFirstPaint.current === undefined) countAtFirstPaint.current = coursesReviewed;
@@ -83,9 +85,6 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
     review?.courseCountry || post.courseCountry,
   ].filter(Boolean).join(', ');
 
-  /* C — the batched course average (feed row course_avg_overall_score). No
-     batched review count exists, so the line states the average alone. */
-  const against = againstCourse(rating, post.courseRating ?? null);
   const courseName = review?.courseName || post.courseName || null;
   const scores: Record<CatKey, number | null> = {
     design: review?.breakdown?.design ?? null,
@@ -106,16 +105,15 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         flexDirection: 'column',
         containerType: 'inline-size',
         maxHeight: REVIEW_CARD_MAX_HEIGHT,
-        margin: '8px 0',
-        background: surface,
-        border: `1px solid ${A.BORDER}`,
-        borderRadius: 16,
+        marginInline: 0,
+        background: CARD,
+        borderTop: feedIndex === 0 ? undefined : `1px solid ${LINE}`,
         overflow: 'hidden',
         position: 'relative',
       }}
     >
       {/* A — the reviewer */}
-      <div data-review-who style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 10, padding: `12px ${GUTTER}px 10px` }}>
+      <div data-review-who style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px 2px' }}>
         <button type="button" onClick={onProfile} style={{ display: 'flex', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', flex: 'none' }}>
           <SquircleAvatar
             src={buildImageThumbnailUrl(post.avatarUrl, { width: 72 * (typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1) })}
@@ -131,45 +129,36 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
             onClick={onProfile}
             style={{
               display: 'block', maxWidth: '100%', background: 'transparent', border: 'none', padding: 0, textAlign: 'left',
-              fontSize: 14.5, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.2, color: A.INK, cursor: 'pointer',
+              fontSize: 15, fontWeight: 700, lineHeight: 1.25, color: T100, cursor: 'pointer',
               whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             }}
           >
             {post.displayName}
           </button>
-          <div data-review-who-line style={{ fontSize: 11.5, lineHeight: 1.2, color: A.DIM, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {whoLine}
+          <div data-review-meta style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 1, fontSize: 12, color: T60, minWidth: 0 }}>
+            <span data-review-who-line style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {whoLine}
+            </span>
+            {followPill ? <span data-review-follow style={{ flex: 'none', display: 'inline-flex' }}>{followPill}</span> : null}
           </div>
         </div>
-        {identityRight ? <div style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>{identityRight}</div> : null}
+        {ownerMenu ? <div style={{ flex: 'none', display: 'flex', alignItems: 'center' }}>{ownerMenu}</div> : null}
       </div>
 
       {/* B — the subject and the verdict */}
-      <div style={{ flex: 'none', display: 'flex', alignItems: 'flex-end', gap: 14, padding: `0 ${GUTTER}px 12px` }}>
+      <div style={{ flex: 'none', display: 'flex', alignItems: 'flex-start', gap: 12, padding: `8px ${GUTTER}px 12px` }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 9, lineHeight: 1.2, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: A.DIM }}>
-            {t('feed.reviewPost.kicker')}
-          </div>
           {!courseName ? null : onOpenCourse ? (
             <button
               type="button"
               data-review-course
               onClick={(e) => { e.stopPropagation(); onOpenCourse(); }}
-              style={{
-                display: 'block', maxWidth: '100%', marginTop: 4, padding: 0, background: 'transparent', border: 'none', textAlign: 'left',
-                fontSize: 19, fontWeight: 800, letterSpacing: '-0.028em', lineHeight: 1.16, color: A.INK, cursor: 'pointer',
-                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-              }}
+              style={{ ...COURSE_NAME_STYLE, maxWidth: '100%', padding: 0, background: 'transparent', border: 'none', textAlign: 'left', cursor: 'pointer' }}
             >
               {courseName}
             </button>
           ) : (
-            <div
-              data-review-course
-              style={{ marginTop: 4, fontSize: 19, fontWeight: 800, letterSpacing: '-0.028em', lineHeight: 1.16, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-            >
-              {courseName}
-            </div>
+            <div data-review-course style={COURSE_NAME_STYLE}>{courseName}</div>
           )}
           {region ? (
             <div style={{ marginTop: 3, fontSize: 12, lineHeight: 1.2, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{region}</div>
@@ -184,7 +173,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
           >
             {formatRatingValue(rating)}
           </div>
-          <div data-review-tier style={{ marginTop: 4, lineHeight: 1 }}>
+          <div data-review-tier style={{ marginTop: 5, lineHeight: 1 }}>
             <ReviewVerdictLabel
               rating={rating}
               fontSize={9.5}
@@ -196,26 +185,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         ) : null}
       </div>
 
-      {/* C — the context line; absent without an aggregate or on the only review.
-          Reads post.courseRating, mapped by feedMapper from course_avg_overall_score.
-          Four callers map rows into this card: useSuggestedFeed (Clubhouse,
-          get_suggested_feed_v3) PROJECTS the field; useProfilePosts (posts tab,
-          get_profile_posts), useCourseMedia and useGalleryCourseMedia (both
-          get_course_media_v2) do NOT, per the repo's generated types. On those
-          surfaces the line is absent, never wrong. Do not add a per-card read to
-          close the gap; it is a projection change on those reads (Ben's call).
-          Row is 22.7px: 16.7px of line + 6px under. */}
-      {against ? (
-        <div data-review-against style={{ flex: 'none', padding: `0 ${GUTTER}px 6px`, fontSize: 11.5, lineHeight: 1.45, color: A.MUTE }}>
-          {t(`feed.reviewPost.against.${against.direction}`, {
-            avg: against.avg.toLocaleString(i18n?.language, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
-          })}
-        </div>
-      ) : null}
-
-      {/* D — what they scored. Four columns always. No course-average tick:
-          the category averages are not in the batched feed read, and a
-          per-card read is not allowed. It returns once they are batched. */}
+      {/* D — what they scored. Four columns always; em dash, no track, when unscored. */}
       {anyScore ? (
         <ul
           data-review-categories
@@ -249,38 +219,33 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         </ul>
       ) : null}
 
-      {/* E — the words: two lines, ellipsis, inline Read more. The padding lives
-          on this wrapper, never on the clamped box: a -webkit-box with its own
-          bottom padding clips below the padding edge and a third line bleeds
-          through. The two floats put "Read more" on the last visible line. */}
+      {/* E — the words at the caption's size. Padding lives on the wrapper,
+          never on the clamped box (a padded -webkit-box bleeds a third line). */}
       {body ? (
-        <div data-review-body-wrap style={{ flex: 'none', display: 'flex', padding: `0 ${GUTTER}px 12px` }}>
-          <div
-            data-review-body
-            style={{
-              fontSize: BODY_SIZE, lineHeight: BODY_LINE, color: A.INK,
-              ...REVIEW_BODY_CLAMP,
-            }}
-          >
-            <span aria-hidden style={{ float: 'right', height: `calc(100% - ${BODY_SIZE * BODY_LINE}px)` }} />
-            <button
-              type="button"
-              data-review-read-more
-              onClick={(e) => { e.stopPropagation(); onReadReview(e); }}
-              style={{
-                float: 'right', clear: 'right', marginLeft: 6, padding: 0, background: 'transparent', border: 'none',
-                fontSize: BODY_SIZE, lineHeight: BODY_LINE, fontWeight: 800, color: A.INK, cursor: 'pointer',
-              }}
-            >
-              {t('feed.reviewPost.readMore')}
-            </button>
+        <div data-review-body-wrap style={{ flex: 'none', display: 'flex', padding: `0 ${GUTTER}px 6px` }}>
+          <div data-review-body style={{ fontSize: 15, lineHeight: 1.4, color: A.INK, ...REVIEW_BODY_CLAMP }}>
             <MentionText text={body} />
           </div>
         </div>
       ) : null}
 
-      {/* F — the media: the ONLY flexible child. Natural size is 1:1, capped at
-          the card's width, shrunk to the remaining height, floored at 120. */}
+      {/* E.2 — the one way into the full review, present in both states. */}
+      <button
+        type="button"
+        data-review-cta
+        onClick={(e) => { e.stopPropagation(); onReadReview(e); }}
+        style={{
+          flex: 'none', display: 'flex', alignItems: 'center', gap: 4, padding: `0 ${GUTTER}px 12px`,
+          background: 'transparent', border: 'none', textAlign: 'left', cursor: 'pointer',
+          fontSize: 13, fontWeight: 700, lineHeight: 1.3, color: A.INK,
+        }}
+      >
+        {t('feed.reviewPost.readFullReview')}
+        <span aria-hidden style={{ color: T40 }}>{'\u203A'}</span>
+      </button>
+
+      {/* F — the media, edge to edge: the ONLY flexible child. 1:1, capped at
+          the post's width, shrunk to the remaining height, floored at 120. */}
       {media ? (
         <div
           data-review-media
@@ -290,8 +255,6 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
             maxHeight: '100cqw',
             aspectRatio: '1 / 1',
             position: 'relative',
-            margin: `0 ${GUTTER}px 8px`,
-            borderRadius: 12,
             overflow: 'hidden',
           }}
         >

@@ -80,11 +80,8 @@ const LikeGlyph = reactionGlyph('like');
 // Full-bleed slab chrome — the post slab is #10151C and the feed canvas behind
 // it (#05070A) is darker, so the gap between posts does the separating.
 // Text constants flip to light-on-dark; LINE becomes a white hairline.
-const CARD = SLAB;
-const T100 = '#F8FAFC';
-const T60 = 'rgba(248,250,252,0.65)';
-const T40 = 'rgba(248,250,252,0.45)';
-export const LINE = 'rgba(255,255,255,0.08)';
+import { CARD, T100, T60, T40, LINE } from './feedTokens';
+export { LINE };
 const GREEN = '#22C55E';
 
 /** Shared inset and spacing for the unified footer. */
@@ -778,29 +775,25 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       <ReviewPostCard
         post={post}
         articleRef={articleRef}
-        surface={CARD}
+        feedIndex={feedIndex}
         onProfile={() => onProfile(post)}
         onReadReview={handleReadReview}
         onPrefetch={prefetchReview}
         coursesReviewed={reviewerStats?.coursesRated ?? null}
         onOpenCourse={reviewOpenCourse}
-        identityRight={(canManage || mountFollowPill) ? (
-          <>
-            {mountFollowPill && (
-              <FeedFollowPill isFollowed={!!post.isFollowedByMe} onFollow={() => onFollow!(post)} />
-            )}
-            {canManage && (
-              <PostOwnerMenu
-                postId={post.id}
-                isOwnPost
-                actorType={post.actorType === 'business' ? 'business' : 'personal'}
-                actorId={post.actorId}
-                sourceReviewId={post.review?.reviewId ?? null}
-                reviewCourseId={post.review?.courseId ?? null}
-                variant="inline"
-              />
-            )}
-          </>
+        followPill={mountFollowPill ? (
+          <FeedFollowPill isFollowed={!!post.isFollowedByMe} onFollow={() => onFollow!(post)} />
+        ) : null}
+        ownerMenu={canManage ? (
+          <PostOwnerMenu
+            postId={post.id}
+            isOwnPost
+            actorType={post.actorType === 'business' ? 'business' : 'personal'}
+            actorId={post.actorId}
+            sourceReviewId={post.review?.reviewId ?? null}
+            reviewCourseId={post.review?.courseId ?? null}
+            variant="inline"
+          />
         ) : null}
         media={items.length ? renderMedia(true) : null}
         footer={renderFooter(14, true)}
