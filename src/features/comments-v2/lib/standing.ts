@@ -113,6 +113,21 @@ export type LikerStanding =
   | { kind: 'best'; value: number }
   | { kind: 'played'; n: number };
 
+/**
+ * WHY THIS IS NOT standingFor, AND WHY THE TWO ARE NEVER TO BE UNIFIED INTO ONE
+ * RULE. They answer different questions about the same person.
+ *
+ * A COMMENT is a statement, qualified by FAMILIARITY: how much of this course
+ * you have actually seen. So standingFor's third tier is a ROUNDS COUNT.
+ * A LIKE is an acknowledgement of a score, qualified by ACHIEVEMENT: what you
+ * have managed here. So likerStandingFor's second tier is the BEST GROSS.
+ *
+ * Both share the record tier, and both fall silent when nothing is known.
+ *
+ * The top-ten tier is deliberately absent here: "Best here 71" already carries
+ * the number that top-ten would only hint at, so keeping both would say the
+ * same thing twice.
+ */
 export function likerStandingFor(
   legend: LegendHit | undefined,
   fam: Familiarity | undefined,
