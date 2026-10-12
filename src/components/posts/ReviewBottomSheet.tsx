@@ -137,7 +137,14 @@ export interface ReviewBottomSheetProps {
   resolvedReviewText?: string | null;
   resolvedBreakdown?: ReviewBottomSheetProps['breakdown'];
   resolvedMedia?: ReviewMediaItem[] | null;
-  resolvedAggregate?: { avg_overall_score?: number | null; review_count?: number | null } | null;
+  resolvedAggregate?: {
+    avg_overall_score?: number | null;
+    review_count?: number | null;
+    avg_design_score?: number | null;
+    avg_condition_score?: number | null;
+    avg_clubhouse_score?: number | null;
+    avg_facilities_score?: number | null;
+  } | null;
   /** G2.5 — false while the prose read is still open; the empty-state line stays silent. */
   proseSettled?: boolean;
   reactionCount?: number;
@@ -158,19 +165,42 @@ const BREAKDOWN_LABELS: Record<typeof BREAKDOWN_KEYS[number], string> = {
   facilities: 'FACILITIES',
 };
 
-function relativeMonths(iso?: string | null): string | null {
+/** BRIEF_REVIEW_SHEET §S.4 — the panel's own fill, shared by the scroll fade so
+ *  the text runs UNDER the boundary into exactly the surface it sits on. */
+const PANEL_FILL = 'rgba(24,27,35,0.88)';
+
+/** §S.1 / §S.2 — one threshold for every comparison against the course. Below
+ *  three ratings the course "average" is substantially this review. */
+export const REVIEW_SHEET_COMPARE_MIN = 3;
+
+/** §S.1 — signed deviation, one decimal, TRUE MINUS (U+2212). Never coloured. */
+export function formatDeviation(delta: number): string {
+  const r = Math.round(delta * 10) / 10;
+  if (r === 0) return '0.0';
+  return r > 0 ? `+${r.toFixed(1)}` : `\u2212${Math.abs(r).toFixed(1)}`;
+}
+
+/** §S.3 — the review's age in words. Reads the review date only: a member's
+ *  join year is not when they played, so it is never a fallback. */
+export function playedAgo(iso?: string | null, now: number = Date.now()): string | null {
   if (!iso) return null;
   const then = new Date(iso).getTime();
   if (!Number.isFinite(then)) return null;
-  const diff = Date.now() - then;
-  const day = 24 * 60 * 60 * 1000;
-  const d = Math.floor(diff / day);
-  if (d < 1) return 'today';
-  if (d < 7) return `${d}d`;
-  if (d < 30) return `${Math.floor(d / 7)}w`;
-  if (d < 365) return `${Math.floor(d / 30)}mo`;
-  return `${Math.floor(d / 365)}y`;
+  const d = Math.floor((now - then) / (24 * 60 * 60 * 1000));
+  const unit = (n: number, w: string) => `Played ${n} ${w}${n === 1 ? '' : 's'} ago`;
+  if (d < 1) return 'Played today';
+  if (d < 7) return unit(d, 'day');
+  if (d < 30) return unit(Math.floor(d / 7), 'week');
+  if (d < 365) return unit(Math.max(1, Math.floor(d / 30)), 'month');
+  return unit(Math.floor(d / 365), 'year');
 }
+
+const CATEGORY_AVG_FIELD = {
+  design: 'avg_design_score',
+  conditions: 'avg_condition_score',
+  clubhouse: 'avg_clubhouse_score',
+  facilities: 'avg_facilities_score',
+} as const;
 
 export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   isOpen,
