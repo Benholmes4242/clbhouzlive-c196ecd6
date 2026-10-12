@@ -7,7 +7,7 @@
  * columns. No courses → no card (E.4).
  */
 import React from 'react';
-import { A, FIGS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import type { CourseFigures } from '../sheetState';
 import { CARD, CardHead, Door } from './sheetCardParts';
 
@@ -23,14 +23,13 @@ const Cell: React.FC<{ label: string; value: string | null; sub: string | null }
 
 const CoursesCard: React.FC<{ figures: CourseFigures | null; onOpen: () => void }> = ({ figures, onOpen }) => {
   if (!figures) return null;
-  const best = figures.best ? toParParts(figures.best.value)?.text ?? null : null;
   return (
     <div data-card="courses" style={CARD}>
       <CardHead label="Your courses" />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10, marginTop: 11 }}>
         <Cell label="Played" value={String(figures.played)} sub={`${figures.playedThisYear} this year`} />
         <Cell label="Rounds" value={String(figures.rounds)} sub={`across ${figures.played} ${figures.played === 1 ? 'course' : 'courses'}`} />
-        <Cell label="Best avg" value={best} sub={figures.best?.name ?? null} />
+        <Cell label="Lowest round" value={figures.lowest ? String(figures.lowest.gross) : null} sub={figures.lowest?.name ?? null} />
       </div>
       <Door label="Course analytics" onClick={onOpen} style={{ marginTop: 12 }} />
     </div>

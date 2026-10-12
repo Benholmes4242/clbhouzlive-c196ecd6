@@ -272,8 +272,8 @@ export default function ProfileSheetV2({
               <SheetCards
                 state={analyticsState}
                 history90={histQ.data as { observed_at: string; handicap_index: number }[] | undefined}
-                bars={formBars(scoresQ.data)}
-                courses={courseFigures(userCourses)}
+                bars={formBars(scoresQ.data, sheetIndex(analyticsState))}
+                courses={courseFigures(userCourses, scoresQ.data)}
                 onNavigate={onNavigate}
                 onOpenCourseAnalytics={handleOpenCourseAnalytics}
               />

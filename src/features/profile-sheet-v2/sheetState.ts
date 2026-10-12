@@ -111,9 +111,9 @@ export function identityLine(a: { isBusiness: boolean; club: string | null | und
   if (a.isBusiness) return 'Business profile';
   const club = a.club?.trim() || null;
   const idx = a.index != null ? formatIndex(a.index) : null;
-  if (club && idx) return `${club} \u00B7 playing off ${idx}`;
-  if (idx) return `Playing off ${idx}`;
+  // V3 A.2: with a club, the club alone — card C states the index directly below.
   if (club) return club;
+  if (idx) return `Playing off ${idx}`;
   return null;
 }
 
@@ -173,28 +173,57 @@ export interface FormScoreLike {
   handicap_index_at_time: number | null;
   is_nine_hole: boolean;
 }
-export interface FormBar { id: string; date: string; value: number }
+export interface FormBar {
+  id: string;
+  date: string;
+  /** Differential minus the index played off — the bar's SIDE and height. */
+  value: number;
+  /** The index movement attributed to this round — the bar's TONE. Null when unknown. */
+  movement: number | null;
+}
 
 /**
  * D.1 — differential minus the index played off, both from the SAME row.
  * Input may be in any order; output is the last five, oldest first. Nine-hole
  * rounds are excluded (D.6).
+ *
+ * V3 D.4/D.5 — MOVEMENT IS AN ATTRIBUTION, NOT A CERTIFICATE. A round's movement
+ * is the index the NEXT round (by play_date) was played off minus the index this
+ * round was played off; for the most recent round, the member's CURRENT index
+ * minus that. A WHS revision or a course re-rating also moves an index, so a rare
+ * round is coloured by a movement it did not cause. Accepted; never read the
+ * figure as exact.
  */
-export function formBars(scores: FormScoreLike[] | null | undefined): FormBar[] {
+export function formBars(scores: FormScoreLike[] | null | undefined, currentIndex: number | null = null): FormBar[] {
   if (!scores) return [];
+  const chain = scores
+    .filter((s) => s.handicap_index_at_time != null)
+    .slice()
+    .sort((a, b) => (a.play_date < b.play_date ? -1 : a.play_date > b.play_date ? 1 : 0));
+  const movementOf = (id: string): number | null => {
+    const i = chain.findIndex((s) => s.id === id);
+    if (i < 0) return null;
+    const from = Number(chain[i].handicap_index_at_time);
+    const to = i + 1 < chain.length ? Number(chain[i + 1].handicap_index_at_time) : currentIndex;
+    return to == null ? null : r1(to - from);
+  };
   return scores
     .filter((s) => !s.is_nine_hole && s.handicap_differential != null && s.handicap_index_at_time != null)
     .slice()
     .sort((a, b) => (a.play_date < b.play_date ? 1 : a.play_date > b.play_date ? -1 : 0))
     .slice(0, 5)
     .reverse()
-    .map((s) => ({ id: s.id, date: s.play_date, value: r1(Number(s.handicap_differential) - Number(s.handicap_index_at_time)) }));
+    .map((s) => ({
+      id: s.id,
+      date: s.play_date,
+      value: r1(Number(s.handicap_differential) - Number(s.handicap_index_at_time)),
+      movement: movementOf(s.id),
+    }));
 }
 
-export function formSummary(bars: FormBar[]): { n: string; better: boolean | null } {
-  const avg = bars.reduce((a, b) => a + b.value, 0) / Math.max(1, bars.length);
-  const v = r1(avg);
-  return { n: Math.abs(v).toFixed(1), better: v < 0 ? true : v > 0 ? false : null };
+/** V3 D.3 — green when the round lowered the index, whichever side the bar sits. */
+export function formBarLowered(b: FormBar): boolean {
+  return b.movement != null && b.movement < 0;
 }
 
 // ─── E. your courses ────────────────────────────────────────────────────────
@@ -203,20 +232,37 @@ export interface CourseFigures {
   played: number;
   playedThisYear: number;
   rounds: number;
-  best: { value: number; name: string } | null;
+  /** V3 E.1 — the single lowest adjusted gross across every full round, with its course. */
+  lowest: { gross: number; name: string | null } | null;
 }
-export function courseFigures(courses: CourseLike[] | null | undefined, now: Date = new Date()): CourseFigures | null {
+
+export interface LowestRoundLike {
+  adjusted_gross: number | null;
+  is_nine_hole: boolean;
+  course?: { name?: string | null } | null;
+}
+
+/** V3 E.3 — nine-hole rounds and null grosses never qualify. */
+export function lowestRound(scores: LowestRoundLike[] | null | undefined): CourseFigures['lowest'] {
+  let best: CourseFigures['lowest'] = null;
+  for (const s of scores ?? []) {
+    if (s.is_nine_hole || s.adjusted_gross == null) continue;
+    if (!best || s.adjusted_gross < best.gross) best = { gross: s.adjusted_gross, name: s.course?.name ?? null };
+  }
+  return best;
+}
+
+export function courseFigures(
+  courses: CourseLike[] | null | undefined,
+  scores: LowestRoundLike[] | null | undefined = null,
+  now: Date = new Date(),
+): CourseFigures | null {
   if (!courses || courses.length === 0) return null;
   const y = String(now.getFullYear());
-  let best: CourseFigures['best'] = null;
-  for (const c of courses) {
-    if (c.avg_to_par == null) continue;
-    if (!best || c.avg_to_par < best.value) best = { value: c.avg_to_par, name: c.course_name };
-  }
   return {
     played: courses.length,
     playedThisYear: courses.filter((c) => c.last_played?.slice(0, 4) === y).length,
     rounds: courses.reduce((a, c) => a + (c.rounds_count ?? 0), 0),
-    best,
+    lowest: lowestRound(scores),
   };
 }

@@ -329,6 +329,7 @@ export const TrendCard: React.FC<{
           showCrosshair={scrub != null}
           width={w}
           height={PLOT_H}
+          simplified
         />
       )}
       legend={

@@ -7,6 +7,9 @@ import React from 'react';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
+// Brief value; the amber has no token owner yet (see AGENTS.md).
+const AMBER_PILL_BORDER = 'rgba(247,147,30,0.34)';
+
 const IdentityHeader: React.FC<{
   id: string;
   name: string;
@@ -30,7 +33,12 @@ const IdentityHeader: React.FC<{
         <div style={{ fontSize: 12.5, color: A.DIM, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{line}</div>
       )}
     </div>
-    <span aria-hidden style={{ flex: '0 0 auto', color: A.DIM, fontSize: 17, lineHeight: 1 }}>{'\u203A'}</span>
+    {/* V3 A.1 — the NAMED door. Decoration only: the whole header is the tap target. */}
+    <span data-view-profile-pill style={{
+      flex: 'none', whiteSpace: 'nowrap', pointerEvents: 'none',
+      fontSize: 11.5, fontWeight: 800, letterSpacing: '0.04em', color: A.AMBER,
+      border: `1px solid ${AMBER_PILL_BORDER}`, borderRadius: 999, padding: '5px 10px 5px 11px',
+    }}>View profile {'\u203A'}</span>
   </button>
 );
 
