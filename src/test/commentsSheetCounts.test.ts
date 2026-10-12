@@ -29,14 +29,27 @@ describe('comments sheet count is what it renders (G.1/G.2)', () => {
 
 describe('commenter standing (G.4)', () => {
   it('record beats top ten beats rounds', () => {
-    expect(standingFor({ rank: 1, value: 64 }, 9, true)).toEqual({ kind: 'record', value: 64 });
-    expect(standingFor({ rank: 4, value: 70 }, 9, true)).toEqual({ kind: 'top_ten' });
-    expect(standingFor(undefined, 112, true)).toEqual({ kind: 'played', n: 112 });
-    expect(standingFor(undefined, 1, true)).toEqual({ kind: 'first' });
-    expect(standingFor(undefined, undefined, true)).toBeNull();
+    expect(standingFor({ rank: 1, value: 64 }, 9)).toEqual({ kind: 'record', value: 64 });
+    expect(standingFor({ rank: 4, value: 70 }, 9)).toEqual({ kind: 'top_ten' });
+    expect(standingFor(undefined, 113)).toEqual({ kind: 'played', n: 113 });
+    expect(standingFor(undefined, 1)).toEqual({ kind: 'first' });
+    expect(standingFor(undefined, undefined)).toBeNull();
   });
-  it('rounds tiers stay silent until attempts is verified', () => {
-    expect(standingFor(undefined, 112, false)).toBeNull();
+  it('familiarity: rounds read from the RPC rows', () => {
+    const m = familiarityMap([{ data: [{ user_id: 'ben', rounds: 113 }, { user_id: 'tom', rounds: '1' }], error: null }]);
+    expect(m.get('ben')).toBe(113);
+    expect(m.get('tom')).toBe(1);
+  });
+  it('familiarity: a failed read silences rounds tiers but keeps record and top ten', () => {
+    const m = familiarityMap([{ data: null, error: { message: 'function does not exist' } }]);
+    expect(m.size).toBe(0);
+    expect(standingFor({ rank: 1, value: 64 }, m.get('ben'))).toEqual({ kind: 'record', value: 64 });
+    expect(standingFor({ rank: 3, value: 70 }, m.get('ben'))).toEqual({ kind: 'top_ten' });
+    expect(standingFor(undefined, m.get('ben'))).toBeNull();
+  });
+  it('familiarity: one call per page, split only past the 50-id bound', () => {
+    expect(chunkIds(Array.from({ length: 12 }, (_, i) => `u${i}`))).toHaveLength(1);
+    expect(chunkIds(Array.from({ length: 51 }, (_, i) => `u${i}`)).map((c) => c.length)).toEqual([50, 1]);
   });
   it('a reply repeats nothing: only the first appearance carries the line', () => {
     const threads = [c('a', 'ben'), c('b', 'julian', [c('r', 'ben')])];

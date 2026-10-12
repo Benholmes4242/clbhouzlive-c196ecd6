@@ -147,13 +147,16 @@ export function useThreadStandings(courseId: string | null, userIds: string[], e
     enabled: enabled && !!courseId && ids.length > 0,
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const [unitRes, legendRes] = await Promise.all([
-        supabase
-          .from('gam_member_unit_bests' as never)
-          .select('user_id, attempts')
-          .eq('golf_course_id', courseId as string)
-          .eq('unit_kind', 'round_gross')
-          .in('user_id', ids),
+      const famCall = Promise.all(
+        chunkIds(ids).map((chunk) =>
+          (supabase.rpc as unknown as (fn: string, args: object) => Promise<{ data: unknown; error: unknown }>)(
+            'get_course_familiarity',
+            { p_user_ids: chunk, p_course_id: courseId },
+          ).then((r) => r, (error) => ({ data: null, error })),
+        ),
+      );
+      const [famRes, legendRes] = await Promise.all([
+        famCall,
         /* THE APP'S COURSE RECORD (consequences.ts, useCourseRecordSignal):
            current rows of category RECORD_CATEGORY ('lowest_gross_all_time');
            rank 1 is the record, rank <= 10 is the top ten. */
@@ -166,10 +169,7 @@ export function useThreadStandings(courseId: string | null, userIds: string[], e
           .lte('rank', 10)
           .in('user_id', ids),
       ]);
-      const attempts = new Map<string, number>();
-      for (const r of ((unitRes.data ?? []) as Array<{ user_id: string; attempts: number | null }>)) {
-        if (r.attempts != null) attempts.set(r.user_id, Math.max(attempts.get(r.user_id) ?? 0, r.attempts));
-      }
+      const rounds = familiarityMap(famRes);
       const legends = new Map<string, LegendHit>();
       for (const r of ((legendRes.data ?? []) as Array<{ user_id: string; rank: number; value: number }>)) {
         const prev = legends.get(r.user_id);
@@ -177,7 +177,7 @@ export function useThreadStandings(courseId: string | null, userIds: string[], e
       }
       const out = new Map<string, Standing>();
       for (const id of ids) {
-        const s = standingFor(legends.get(id), attempts.get(id));
+        const s = standingFor(legends.get(id), rounds.get(id));
         if (s) out.set(id, s);
       }
       return out;
