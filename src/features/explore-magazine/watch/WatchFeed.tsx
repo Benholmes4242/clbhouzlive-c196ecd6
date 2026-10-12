@@ -136,12 +136,22 @@ function Rail({ children, label }: { children: React.ReactNode; label: string })
   );
 }
 
-function Poster({ row, height, posterH, radius, autoplay, progress }: { row: HubRpcRow; height: number; posterH: number; radius: number; autoplay: boolean; progress: number | null }) {
+/** M.1 — Quick hits chip lays the same tile out as a 3-column grid; All keeps the rail. */
+function QuickLayout({ grid, children }: { grid: boolean; children: React.ReactNode }) {
+  if (!grid) return <Rail label="quick">{children}</Rail>;
+  return (
+    <div data-watch-grid="quick" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, alignItems: 'start', padding: `0 ${INSET}px 2px` }}>
+      {children}
+    </div>
+  );
+}
+
+function Poster({ row, height, posterH, radius, autoplay, progress }: { row: HubRpcRow; height: number | null; posterH: number; radius: number; autoplay: boolean; progress: number | null }) {
   const poster = posterFor(row, posterH);
   const [failed, setFailed] = useState(false);
   const initial = (creatorName(row) || '?').trim().charAt(0).toUpperCase() || '?';
   return (
-    <span data-watch-frame style={{ display: 'block', position: 'relative', height, flex: 'none', borderRadius: radius, overflow: 'hidden', background: A.PANEL }}>
+    <span data-watch-frame style={{ display: 'block', position: 'relative', ...(height == null ? { aspectRatio: '9 / 16' } : { height }), flex: 'none', borderRadius: radius, overflow: 'hidden', background: A.PANEL }}>
       {poster && !failed ? (
         <img src={poster} alt="" loading="lazy" decoding="async" onError={() => setFailed(true)} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
       ) : (
@@ -209,6 +219,8 @@ export function WatchFeed({
   }, [videos.data, clips.data, filter, onYourCourse]);
 
   const saved = progress.data;
+  /* M.1 — one tile, two layouts: grid on the Quick hits chip, rail everywhere else. */
+  const quickGrid = filter === 'quick';
   const quickRows = useMemo(() => (showsQuickHits(filter) ? rows.filter((r) => isQuickHit(r.duration_seconds)) : []), [rows, filter]);
   const longRows = useMemo(
     () =>
@@ -449,20 +461,21 @@ export function WatchFeed({
               <Section
                 title={t('amateur.watch.rail.quick', 'Quick hits')}
                 kicker={t('amateur.watch.rail.quickKicker', 'Under 3 min')}
-                seeAll={t('amateur.watch.seeAll', 'See all')}
-                onSeeAll={() => {
+                /* M.1: no See all on the Quick hits chip; it would point at a worse version of this page. */
+                seeAll={quickGrid ? undefined : t('amateur.watch.seeAll', 'See all')}
+                onSeeAll={quickGrid ? undefined : () => {
                   analyticsEvents.track('amateur_shelf_see_all', { kind: 'clips', surface: 'watch' });
                   onDepart();
                   navigate('/watch/clips');
                 }}
               />
-              <Rail label="quick">
+              <QuickLayout grid={quickGrid}>
                 {quickRows.map((row, index) => {
                   const who = creatorName(row);
                   const v = viewsFor(row);
                   return (
-                    <button key={`qh:${row.post_id}`} type="button" data-watch-card="quick" onClick={() => open('clip', quickPosts, quickRows, index)} style={{ ...cardButton, width: QH_W }}>
-                      <Poster row={row} height={QH_H} posterH={480} radius={12} autoplay progress={barFor(row)} />
+                    <button key={`qh:${row.post_id}`} type="button" data-watch-card="quick" onClick={() => open('clip', quickPosts, quickRows, index)} style={{ ...cardButton, width: quickGrid ? '100%' : QH_W, minWidth: 0 }}>
+                      <Poster row={row} height={quickGrid ? null : QH_H} posterH={480} radius={12} autoplay progress={barFor(row)} />
                       <span style={{ ...clamp2, marginTop: 7, fontSize: 12, fontWeight: 600, lineHeight: 1.3 }}>
                         {videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}
                       </span>
@@ -475,7 +488,7 @@ export function WatchFeed({
                     </button>
                   );
                 })}
-              </Rail>
+              </QuickLayout>
             </>
           ) : loading && showsQuickHits(filter) ? (
             <div style={{ paddingTop: 18 }}>
