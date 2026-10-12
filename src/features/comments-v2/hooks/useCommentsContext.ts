@@ -14,7 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { RECORD_CATEGORY } from '@/features/explore-magazine/useCourseRecordSignal';
 import type { TargetType } from './useCommentsV2';
-import { standingFor, chunkIds, familiarityMap, type LegendHit, type Standing } from '../lib/standing';
+import { standingFor, likerStandingFor, chunkIds, familiarityMap, familiarityDetailMap, type LegendHit, type Standing, type LikerStanding } from '../lib/standing';
 
 export interface CommentsSubject {
   authorName: string | null;
@@ -140,6 +140,41 @@ export function useCommentsSubject(targetType: TargetType, targetId: string, ena
   });
 }
 
+/**
+ * THE TWO BATCHED READS behind both sheets' standings: get_course_familiarity
+ * (blocks of 50) and gam_course_legends (current lowest_gross_all_time, rank
+ * <= 10). Each failure is contained: its map comes back empty.
+ */
+export async function fetchCourseStandingInputs(courseId: string, ids: string[]) {
+  const famCall = Promise.all(
+    chunkIds(ids).map((chunk) =>
+      (supabase.rpc as unknown as (fn: string, args: object) => Promise<{ data: unknown; error: unknown }>)(
+        'get_course_familiarity',
+        { p_user_ids: chunk, p_course_id: courseId },
+      ).then((r) => r, (error) => ({ data: null, error })),
+    ),
+  );
+  const legendCall = Promise.resolve(
+    supabase
+      .from('gam_course_legends' as never)
+      .select('user_id, rank, value')
+      .eq('course_id', courseId)
+      .eq('is_current', true)
+      .eq('category', RECORD_CATEGORY)
+      .lte('rank', 10)
+      .in('user_id', ids),
+  ).then((r) => r as { data: unknown; error: unknown }, (error) => ({ data: null, error }));
+  const [famRes, legendRes] = await Promise.all([famCall, legendCall]);
+  const legends = new Map<string, LegendHit>();
+  if (!legendRes.error && Array.isArray(legendRes.data)) {
+    for (const r of legendRes.data as Array<{ user_id: string; rank: number; value: number }>) {
+      const prev = legends.get(r.user_id);
+      if (!prev || r.rank < prev.rank) legends.set(r.user_id, { rank: r.rank, value: r.value });
+    }
+  }
+  return { famRes, legends };
+}
+
 export function useThreadStandings(courseId: string | null, userIds: string[], enabled: boolean) {
   const ids = useMemo(() => Array.from(new Set(userIds.filter(Boolean))).sort(), [userIds]);
   return useQuery<Map<string, Standing>>({
@@ -147,37 +182,31 @@ export function useThreadStandings(courseId: string | null, userIds: string[], e
     enabled: enabled && !!courseId && ids.length > 0,
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const famCall = Promise.all(
-        chunkIds(ids).map((chunk) =>
-          (supabase.rpc as unknown as (fn: string, args: object) => Promise<{ data: unknown; error: unknown }>)(
-            'get_course_familiarity',
-            { p_user_ids: chunk, p_course_id: courseId },
-          ).then((r) => r, (error) => ({ data: null, error })),
-        ),
-      );
-      const [famRes, legendRes] = await Promise.all([
-        famCall,
-        /* THE APP'S COURSE RECORD (consequences.ts, useCourseRecordSignal):
-           current rows of category RECORD_CATEGORY ('lowest_gross_all_time');
-           rank 1 is the record, rank <= 10 is the top ten. */
-        supabase
-          .from('gam_course_legends' as never)
-          .select('user_id, rank, value')
-          .eq('course_id', courseId as string)
-          .eq('is_current', true)
-          .eq('category', RECORD_CATEGORY)
-          .lte('rank', 10)
-          .in('user_id', ids),
-      ]);
+      const { famRes, legends } = await fetchCourseStandingInputs(courseId as string, ids);
       const rounds = familiarityMap(famRes);
-      const legends = new Map<string, LegendHit>();
-      for (const r of ((legendRes.data ?? []) as Array<{ user_id: string; rank: number; value: number }>)) {
-        const prev = legends.get(r.user_id);
-        if (!prev || r.rank < prev.rank) legends.set(r.user_id, { rank: r.rank, value: r.value });
-      }
       const out = new Map<string, Standing>();
       for (const id of ids) {
         const s = standingFor(legends.get(id), rounds.get(id));
+        if (s) out.set(id, s);
+      }
+      return out;
+    },
+  });
+}
+
+/** BRIEF_LIKES_SHEET H.4 — the same two reads, for the likes sheet's tiers. */
+export function useLikerStandings(courseId: string | null, userIds: string[], enabled: boolean) {
+  const ids = useMemo(() => Array.from(new Set(userIds.filter(Boolean))).sort(), [userIds]);
+  return useQuery<Map<string, LikerStanding>>({
+    queryKey: ['likes-sheet', 'standings', courseId, ids.join('|')],
+    enabled: enabled && !!courseId && ids.length > 0,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { famRes, legends } = await fetchCourseStandingInputs(courseId as string, ids);
+      const fam = familiarityDetailMap(famRes);
+      const out = new Map<string, LikerStanding>();
+      for (const id of ids) {
+        const s = likerStandingFor(legends.get(id), fam.get(id));
         if (s) out.set(id, s);
       }
       return out;

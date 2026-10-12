@@ -84,3 +84,41 @@ export function firstAppearanceStandings(
   }
   return out;
 }
+
+/** Familiarity with best gross (get_course_familiarity now returns rounds, best_gross). */
+export interface Familiarity { rounds: number; bestGross: number | null }
+
+export function familiarityDetailMap(
+  results: Array<{ data: unknown; error: unknown }>,
+): Map<string, Familiarity> {
+  const out = new Map<string, Familiarity>();
+  for (const res of results) {
+    if (res.error || !Array.isArray(res.data)) continue;
+    for (const r of res.data as Array<{ user_id: string; rounds: number | string | null; best_gross?: number | string | null }>) {
+      const n = r.rounds == null ? NaN : Number(r.rounds);
+      if (!r.user_id || !Number.isFinite(n)) continue;
+      const b = r.best_gross == null ? NaN : Number(r.best_gross);
+      out.set(r.user_id, { rounds: n, bestGross: Number.isFinite(b) ? b : null });
+    }
+  }
+  return out;
+}
+
+/**
+ * BRIEF_LIKES_SHEET H.4 — the likes sheet's tiers, highest only:
+ * record > best gross here > played here (once / n times) > nothing.
+ */
+export type LikerStanding =
+  | { kind: 'record'; value: number }
+  | { kind: 'best'; value: number }
+  | { kind: 'played'; n: number };
+
+export function likerStandingFor(
+  legend: LegendHit | undefined,
+  fam: Familiarity | undefined,
+): LikerStanding | null {
+  if (legend && legend.rank === 1) return { kind: 'record', value: legend.value };
+  if (fam?.bestGross != null) return { kind: 'best', value: fam.bestGross };
+  if (fam && fam.rounds >= 1) return { kind: 'played', n: fam.rounds };
+  return null;
+}

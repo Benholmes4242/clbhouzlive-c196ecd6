@@ -26,6 +26,10 @@ import { LIKES_SHEET_Z } from '@/lib/zLayers';
 import { formatHcp } from '@/lib/formatHcp';
 import { usePostLikers } from '@/hooks/usePostLikers';
 import type { LikeSource } from '@/hooks/usePostLikes';
+import { SubjectContextLine, type SubjectContext } from '@/components/sheets/SubjectContextLine';
+import { useLikerStandings } from '@/features/comments-v2/hooks/useCommentsContext';
+import type { LikerStanding } from '@/features/comments-v2/lib/standing';
+import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
 
 const PAGE = 30;
 
@@ -42,9 +46,22 @@ export interface LikesSheetProps {
   count: number;
   source?: LikeSource;
   kind?: ReactionKind;
+  /**
+   * H.5 — OPTIONAL course context: what the sheet is about. Absent -> no
+   * context line and no course segment; the sheet behaves exactly as before.
+   */
+  subject?: SubjectContext | null;
 }
 
-export function LikesSheet({ open, onClose, postId, count, source = 'post', kind = 'like' }: LikesSheetProps) {
+/** H.4 — one segment after the handicap; null renders nothing at all. */
+function standingSegment(s: LikerStanding | undefined): { text: string; record: boolean } | null {
+  if (!s) return null;
+  if (s.kind === 'record') return { text: `Course record \u00B7 ${s.value}`, record: true };
+  if (s.kind === 'best') return { text: `Best here ${s.value}`, record: false };
+  return { text: s.n === 1 ? 'Played here once' : `Played here ${s.n} times`, record: false };
+}
+
+export function LikesSheet({ open, onClose, postId, count, source = 'post', kind = 'like', subject = null }: LikesSheetProps) {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const { likers, isLoading } = usePostLikers(postId, open, source);
@@ -67,12 +84,24 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
 
   const { user } = useSupabaseSession();
 
-  /* TWO GROUPS over usePostLikers' existing followed-first order — never
-     re-sorted here. An empty group renders nothing (no eyebrow). */
-  const followed = rows.filter((l) => l.isFollowing);
-  const others = rows.filter((l) => !l.isFollowing);
+  /* THREE TIERS, in usePostLikers' own order: the hook returns the viewer
+     first (isViewer), then people the viewer follows (!isViewer &&
+     isFollowing), then everyone else. The sheet renders all three: the
+     viewer's row with NO eyebrow (the amber "· You" names it), then
+     "People you follow", then "Everyone else". Nothing is re-sorted within a
+     group, and an empty group renders nothing, eyebrow included. */
+  const viewerRows = rows.filter((l) => l.isViewer);
+  const followed = rows.filter((l) => !l.isViewer && l.isFollowing);
+  const others = rows.filter((l) => !l.isViewer && !l.isFollowing);
 
-  const renderRow = (l: (typeof rows)[number], i: number) => {
+  /* H.4 — ONE batched pair of reads for the whole sheet, personal likers only. */
+  const standingIds = useMemo(
+    () => likers.filter((l) => l.actorType !== 'business').map((l) => l.actorId ?? l.userId).filter(Boolean) as string[],
+    [likers],
+  );
+  const { data: standingByUser } = useLikerStandings(subject?.courseId ?? null, standingIds, open);
+
+  const renderRow = (l: (typeof rows)[number], i: number, firstPad = false) => {
     const isBusiness = l.actorType === 'business';
     const actorId = l.actorId ?? l.userId;
     // Actor-matched in usePostLikers — a member acting as a business is not
@@ -96,7 +125,7 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
           alignItems: 'center',
           gap: 12,
           width: '100%',
-          padding: '10px 16px',
+          padding: firstPad ? '14px 16px 10px' : '10px 16px',
           background: 'transparent',
           border: 'none',
           textAlign: 'left',
@@ -140,6 +169,18 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
               <span style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: '-0.1px', color: A.MUTE, fontVariantNumeric: 'tabular-nums' }}>
                 {formatHcp(l.handicapIndex)}
               </span>
+              {(() => {
+                const seg = standingSegment(standingByUser?.get(actorId));
+                if (!seg) return null;
+                return (
+                  <span data-liker-standing={seg.record ? 'record' : 'other'} style={{ display: 'contents' }}>
+                    <span aria-hidden style={{ fontSize: 12.5, color: A.DIM }}>{'\u00B7'}</span>
+                    <span style={{ fontSize: 12, fontWeight: seg.record ? 700 : 600, color: seg.record ? SC_FILL_GOLD : A.DIM, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
+                      {seg.text}
+                    </span>
+                  </span>
+                );
+              })()}
             </div>
           ) : null}
         </div>
@@ -165,6 +206,7 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
         <div style={{ fontSize: 19, fontWeight: 700, color: A.INK, letterSpacing: '-0.4px' }}>
           {kind === 'celebrate' ? t('reactions.sheetTitleCelebrated') : 'Likes'}
         </div>
+        <SubjectContextLine subject={subject} dataAttr="likes-context" />
         {/* The surface's own count — never likers.length. */}
         <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, marginTop: 4 }}>
           {count === 1 ? '1 person' : `${count.toLocaleString()} people`}
@@ -180,16 +222,21 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
           <div style={{ padding: '20px 16px', fontSize: 12.5, color: A.MUTE }}>Loading…</div>
         ) : (
           <>
+            {viewerRows.length > 0 && (
+              <div data-likes-group="viewer">
+                {viewerRows.map((l, i) => renderRow(l, i, i === 0))}
+              </div>
+            )}
             {followed.length > 0 && (
               <div data-likes-group="following">
                 {eyebrow('People you follow')}
-                {followed.map(renderRow)}
+                {followed.map((l, i) => renderRow(l, i))}
               </div>
             )}
             {others.length > 0 && (
               <div data-likes-group="others">
                 {eyebrow('Everyone else')}
-                {others.map(renderRow)}
+                {others.map((l, i) => renderRow(l, i))}
               </div>
             )}
           </>

@@ -743,6 +743,13 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               <LikedByRow
                 postId={post.id}
                 count={likeCount}
+                subject={post.review ? {
+                  authorName: post.displayName ?? null,
+                  courseId: post.review.courseId ?? null,
+                  courseName: post.review.courseName ?? null,
+                  kind: 'review', gross: null, toPar: null,
+                  rating: post.review.rating ?? null,
+                } : null}
                 surfaceColor={CARD}
                 style={{
                   padding: compact ? `0 ${gutter}px ${likedByBottom ? 10 : 0}px` : `0 ${gutter}px ${likedByBottom}px`,

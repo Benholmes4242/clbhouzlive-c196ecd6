@@ -39,6 +39,7 @@ import { useState } from 'react';
 import { usePostLikers, likerFirstNames } from '@/hooks/usePostLikers';
 import type { LikeSource } from '@/hooks/usePostLikes';
 import { LikesSheet } from './LikesSheet';
+import type { SubjectContext } from '@/components/sheets/SubjectContextLine';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 
 export interface LikedByRowProps {
@@ -63,6 +64,8 @@ export interface LikedByRowProps {
   /** The viewer owns the round (celebrate only). */
   isOwnRound?: boolean;
   style?: React.CSSProperties;
+  /** H.5 — optional course context, passed straight to the sheet. */
+  subject?: SubjectContext | null;
   /** Line type size; default 13 (Clubhouse FeedCard, ReviewBottomSheet, scorecard). */
   fontSize?: number;
   /** Line colour; default the dark-canvas 0.65 slate. Pass an on-photo value over photography. */
@@ -86,6 +89,7 @@ export function LikedByRow({
   fontSize = 13,
   fontWeight = 500,
   lines = 1,
+  subject = null,
   color = 'rgba(248,250,252,0.65)',
 }: LikedByRowProps) {
   const { t } = useTranslation('common');
@@ -267,6 +271,7 @@ export function LikedByRow({
         count={count}
         source={source}
         kind={kind}
+        subject={subject}
       />
     </>
   );
