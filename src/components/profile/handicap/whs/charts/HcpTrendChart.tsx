@@ -169,6 +169,12 @@ export const HcpTrendChart: React.FC<Props> = ({
   if (simplified) {
     const tone = toneProp ?? A.IMPROVED;
     const [cx, cy] = xy[n - 1];
+    // Level series: when high and low agree at one decimal (the sentence's
+    // rounding) there are no extremes to mark — draw ONLY the current mark,
+    // otherwise high, low and current stack on one spot.
+    const level = stats.worst.toFixed(1) === stats.best.toFixed(1);
+    const showHigh = !level && worstIdx >= 0;
+    const showLow = !level && bestIdx >= 0;
     return (
       <div ref={ref} style={{ width: '100%', height }} data-hcp-chart="simplified">
         <svg width={width} height={height} style={{ display: 'block', overflow: 'visible' }}>
@@ -183,10 +189,10 @@ export const HcpTrendChart: React.FC<Props> = ({
           {showCrosshair && (
             <line x1={mx} y1={0} x2={mx} y2={height} stroke={CURRENT_MARK} strokeOpacity={0.85} strokeWidth={2} />
           )}
-          {worstIdx >= 0 && (
+          {showHigh && (
             <circle data-mark="high" cx={xy[worstIdx][0]} cy={xy[worstIdx][1]} r={3.2} fill={A.PANEL} stroke={HIGH_RING} strokeWidth={1.6} />
           )}
-          {bestIdx >= 0 && (
+          {showLow && (
             <circle data-mark="low" cx={xy[bestIdx][0]} cy={xy[bestIdx][1]} r={3.4} fill={tone} stroke={A.PANEL} strokeWidth={1.6} />
           )}
           <circle data-mark="current" cx={showCrosshair ? mx : cx} cy={showCrosshair ? my : cy} r={4} fill={CURRENT_MARK} stroke={A.PANEL} strokeWidth={1.8} />
