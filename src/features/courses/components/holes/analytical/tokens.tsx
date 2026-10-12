@@ -81,8 +81,7 @@ export const A = {
  * earns its keep here, so nothing else on a course card may use it.
  */
 export function courseSubScoreTone(score: number | null | undefined): string {
-  // Tone follows the DISPLAYED one-decimal value, so 8.96 (prints "9.0") is green.
-  return score != null && Math.round(score * 10) / 10 >= 9 ? A.GREEN : A.MUTE;
+  return score != null && score >= 9 ? A.GREEN : A.MUTE;
 }
 
 /** Every analytical bar, track and segment. A measurement, not a pill. */

@@ -84,7 +84,7 @@ export function CourseShelf({
             /* No review count on this tile, so the floor applies (V.3). */
             figure={row.rank != null ? null : ratingRankable(row.rating, row.ratingCount) ? row.rating.toFixed(1) : null}
             /* Neutral keeps the component's white default over photography. */
-            figureTone={row.rank == null && ratingRankable(row.rating, row.ratingCount) && Math.round(row.rating * 10) / 10 >= 9 ? courseSubScoreTone(row.rating) : undefined}
+            figureTone={row.rank == null && ratingRankable(row.rating, row.ratingCount) && row.rating >= 9 ? courseSubScoreTone(row.rating) : undefined}
             whenLabel=""
             who=""
             isOwn={false}
