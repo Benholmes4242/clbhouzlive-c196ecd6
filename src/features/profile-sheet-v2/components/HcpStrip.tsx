@@ -44,6 +44,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
 import { handicapSentence, formatIndex, INDEX_DOOR_ROUTE } from '../sheetState';
 import { Door } from './sheetCardParts';
+import FormSection from './FormSection';
+import type { FormBar } from '../sheetState';
 import { A, KICKER, LABEL, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatDayMonthShortGB } from '@/i18n/format';
 import { HcpTrendChart } from '@/components/profile/handicap/whs/charts';
@@ -165,7 +167,9 @@ export const TrendCard: React.FC<{
   onWindow: (d: 30 | 90) => void;
   fallbackIndex: number | null;
   onNavigate: (route: string) => void;
-}> = ({ points, windowDays, onWindow, fallbackIndex, onNavigate }) => {
+  /** V6 D — the last five rounds live inside this card, below a full-bleed rule. */
+  bars?: FormBar[];
+}> = ({ points, windowDays, onWindow, fallbackIndex, onNavigate, bars = [] }) => {
   // C.2 — the sentence reads the SAME points the chart draws, so it moves with the toggle.
   const sentence = useMemo(() => handicapSentence(points, windowDays), [points, windowDays]);
   const [scrub, setScrub] = useState<number | null>(null);
@@ -233,7 +237,7 @@ export const TrendCard: React.FC<{
       }}
       header={
         <>
-          <span style={KICKER}>Handicap index</span>
+          <span style={KICKER}>How you&rsquo;re playing</span>
           <span style={{ display: 'inline-flex', gap: 2, background: A.TRACK, borderRadius: 7, padding: 2 }}>
             {([30, 90] as const).map((d) => {
               const on = windowDays === d;
@@ -340,6 +344,13 @@ export const TrendCard: React.FC<{
                 ? <b key={i} style={{ color: A.INK, fontWeight: 700 }}>{s.text}</b>
                 : <React.Fragment key={i}>{s.text}</React.Fragment>)}
             </div>
+          )}
+          {bars.length >= 2 && (
+            <>
+              {/* Full-bleed: the legend band pads PAD each side, so -PAD reaches the card's inner edges. */}
+              <div data-form-rule style={{ height: 1, background: A.TRACK, margin: `12px -${PAD}px 11px` }} />
+              <FormSection bars={bars} />
+            </>
           )}
           <Door label="View handicap" onClick={() => onNavigate(INDEX_DOOR_ROUTE)} />
         </div>

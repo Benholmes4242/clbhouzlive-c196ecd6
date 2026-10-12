@@ -61,7 +61,6 @@ export function isSyncFailing(c: SheetConnectionLike): boolean {
 }
 
 /** The two doors go to two places: rounds to the profile Rounds tab, index to handicap. */
-export const ROUNDS_DOOR_ROUTE = '/profile?tab=rounds';
 export const INDEX_DOOR_ROUTE = '/handicap';
 
 export function deriveSheetHcpState(i: DeriveSheetStateInput): SheetHcpState {
@@ -224,45 +223,4 @@ export function formBars(scores: FormScoreLike[] | null | undefined, currentInde
 /** V3 D.3 — green when the round lowered the index, whichever side the bar sits. */
 export function formBarLowered(b: FormBar): boolean {
   return b.movement != null && b.movement < 0;
-}
-
-// ─── E. your courses ────────────────────────────────────────────────────────
-export interface CourseLike { course_name: string; rounds_count: number; last_played: string | null; avg_to_par: number | null }
-export interface CourseFigures {
-  played: number;
-  playedThisYear: number;
-  rounds: number;
-  /** V3 E.1 — the single lowest adjusted gross across every full round, with its course. */
-  lowest: { gross: number; name: string | null } | null;
-}
-
-export interface LowestRoundLike {
-  adjusted_gross: number | null;
-  is_nine_hole: boolean;
-  course?: { name?: string | null } | null;
-}
-
-/** V3 E.3 — nine-hole rounds and null grosses never qualify. */
-export function lowestRound(scores: LowestRoundLike[] | null | undefined): CourseFigures['lowest'] {
-  let best: CourseFigures['lowest'] = null;
-  for (const s of scores ?? []) {
-    if (s.is_nine_hole || s.adjusted_gross == null) continue;
-    if (!best || s.adjusted_gross < best.gross) best = { gross: s.adjusted_gross, name: s.course?.name ?? null };
-  }
-  return best;
-}
-
-export function courseFigures(
-  courses: CourseLike[] | null | undefined,
-  scores: LowestRoundLike[] | null | undefined = null,
-  now: Date = new Date(),
-): CourseFigures | null {
-  if (!courses || courses.length === 0) return null;
-  const y = String(now.getFullYear());
-  return {
-    played: courses.length,
-    playedThisYear: courses.filter((c) => c.last_played?.slice(0, 4) === y).length,
-    rounds: courses.reduce((a, c) => a + (c.rounds_count ?? 0), 0),
-    lowest: lowestRound(scores),
-  };
 }
