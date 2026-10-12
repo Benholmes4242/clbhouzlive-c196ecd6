@@ -23,3 +23,19 @@ export function storyTime(iso: string | null | undefined, now = new Date()): str
   if (ageMs < WEEK_MS) return `${Math.floor(elapsedHours / 24)} DAYS AGO`;
   return storyDate(new Date(t));
 }
+
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+const MONTHS_TITLE = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
+
+/** The short dateline a news card prints: "Fri 10 Oct". Empty when absent. */
+export function storyDateline(iso: string | null | undefined): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (!Number.isFinite(d.getTime())) return '';
+  return `${WEEKDAYS[d.getDay()]} ${d.getDate()} ${MONTHS_TITLE[d.getMonth()]}`;
+}
+
+/** Join clauses with a middot, dropping empty ones so no separator strays. */
+export function joinDateline(parts: Array<string | null | undefined>): string {
+  return parts.map((p) => (p ?? '').trim()).filter(Boolean).join(' · ');
+}
