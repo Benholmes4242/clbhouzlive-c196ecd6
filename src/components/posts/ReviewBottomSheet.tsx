@@ -858,7 +858,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                           // still opens the original.
                           src={m.mediaType === 'video'
                             ? (m.posterUrl ?? m.mediaUrl)
-                            : buildImageThumbnailUrl(m.mediaUrl, { width: Math.round(REVIEW_TILE_MAX_W * tileDpr()), height: Math.round(78 * tileDpr()), fit: 'cover' })}
+                            : buildImageThumbnailUrl(m.mediaUrl, { width: Math.round(REVIEW_TILE_MAX_W * tileDpr()) })}
                           alt=""
                           loading="lazy"
                           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}

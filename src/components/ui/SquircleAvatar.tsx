@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getDirectImageUrl } from '@/utils/r2ImageUtils';
+import { imageSrc as sizeImageSrc } from '@/utils/imageSrc';
 import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
 import { 
   getRingColorForTotalPlayed,
@@ -131,6 +132,12 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
 
   // Convert size variant to pixel value
   const pixelSize = typeof size === 'string' ? SIZE_MAP[size] : size;
+  // Device pixel ratio, read once per mount, capped at 3, SSR/test safe.
+  const dprRef = React.useRef<number | null>(null);
+  if (dprRef.current === null) {
+    dprRef.current = typeof window !== 'undefined' ? Math.min(3, window.devicePixelRatio || 1) : 1;
+  }
+  const fetchWidth = Math.max(1, Math.round(pixelSize * dprRef.current));
 
   // Determine effective ring color:
   // 1. Explicit ringColor prop takes precedence
@@ -176,10 +183,13 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
       }
       return;
     }
-    setImageSrc(directUrl);
+    // The component sizes its own source: request the avatar at its rendered
+    // size x DPR. imageSrc leaves non-media URLs unchanged and never
+    // re-transforms a /cdn-cgi/ URL, so pre-sized callers are unaffected.
+    setImageSrc(sizeImageSrc(directUrl, fetchWidth));
     setShowFallback(false);
     setImageLoaded(false);
-  }, [candidates, candidateIdx]);
+  }, [candidates, candidateIdx, fetchWidth]);
 
   const fireLoadedOnce = () => {
     if (notifiedRef.current) return;

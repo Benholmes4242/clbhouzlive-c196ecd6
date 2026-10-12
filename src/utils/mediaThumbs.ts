@@ -43,11 +43,7 @@ export function buildLqipUrl(url: string | null | undefined): string | null {
  */
 export function buildImageThumbnailUrl(
   url: string | null | undefined,
-  {
-    width = 600,
-    height = 600,
-    fit = 'cover',
-  }: { width?: number; height?: number; fit?: 'cover' | 'contain' } = {}
+  { width = 600 }: { width?: number } = {}
 ): string {
   if (!url) return '/placeholder.svg';
 
@@ -62,7 +58,7 @@ export function buildImageThumbnailUrl(
 
   if (isStreamThumb) return url;
 
-  void height; void fit;
+  // Width only: the visual crop is the caller's CSS object-fit.
   return imageSrc(url, width);
 }
 

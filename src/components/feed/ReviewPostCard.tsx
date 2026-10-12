@@ -18,7 +18,6 @@ import { MentionText } from '@/components/mentions/MentionText';
 import { ReviewVerdictLabel, reviewLabelColor } from '@/components/shared/ReviewGhostScore';
 import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { categoryFillPercent } from '@/components/courses/course-detail/CategoryScores';
-import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import { formatRatingValue } from '@/utils/formatters';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 import { formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
@@ -107,7 +106,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
       <div data-review-who style={{ flex: 'none', display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 12px 2px' }}>
         <button type="button" onClick={onProfile} style={{ display: 'flex', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', flex: 'none' }}>
           <SquircleAvatar
-            src={buildImageThumbnailUrl(post.avatarUrl, { width: 72 * (typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1) })}
+            src={post.avatarUrl}
             alt={post.displayName}
             userId={post.actorId ?? post.userId}
             size={34}
