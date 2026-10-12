@@ -32,24 +32,6 @@ export function joinClauses(parts: Array<string | null | undefined | false>): st
   return parts.filter((p): p is string => typeof p === 'string' && p.trim().length > 0).join(' \u00b7 ');
 }
 
-export type AgainstDirection = 'below' | 'above' | 'inLine';
-
-/**
- * C — where this review sits against the course average. Compared at the one
- * decimal both figures are printed at, so "In line with 7.1" never sits beside
- * 7.1. Null (no line) when there is no rating or no batched average.
- */
-export function againstCourse(
-  rating: number | null | undefined,
-  avg: number | null | undefined,
-): { direction: AgainstDirection; avg: number } | null {
-  if (rating == null || avg == null || !Number.isFinite(Number(avg))) return null;
-  const r = Math.round(Number(rating) * 10);
-  const a = Math.round(Number(avg) * 10);
-  const direction: AgainstDirection = r < a ? 'below' : r > a ? 'above' : 'inLine';
-  return { direction, avg: a / 10 };
-}
-
 /** E — the body clamp. No padding of its own: the wrapper owns it (E.2). */
 export const REVIEW_BODY_CLAMP = {
   display: '-webkit-box',
