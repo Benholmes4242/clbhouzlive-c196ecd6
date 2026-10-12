@@ -28,7 +28,7 @@ import type { StreamItem } from './streamItem';
 import { calloutFor, rendersOnPhoto } from './cardTreatment';
 import { REVIEW_CARD_HEIGHT } from './reviewTileHeight';
 import { FigureCell, RoundStatStrip, vsHandicapLabel } from './AchievementCallout';
-import { dotsFor, SCORE_TRACE_PLOT_HEIGHT, treatmentFor } from './roundTreatment';
+import { goodHoleDots, SCORE_TRACE_PLOT_HEIGHT, treatmentFor } from './roundTreatment';
 import { coursePlaceLine } from './placeLine';
 import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTop100RankIndex';
 import { RankFlagBadge } from './RankFlagBadge';
@@ -860,7 +860,7 @@ export function ExploreCard({
      ticks row and the distribution bar are retired — see roundTreatment.ts. */
   const treatment = item.kind === 'round' && size !== 'pair' ? treatmentFor(item, shape) : 'none';
   const hasVisual = treatment === 'line' && shape != null && item.payload.round != null;
-  const dots = hasVisual ? dotsFor(item, shape) : [];
+  const dots = hasVisual ? goodHoleDots(shape) : [];
   const band = hasVisual ? SHAPE_BAND[size] + EXPLORE_END_LABEL_BAND : 0;
 
 
