@@ -108,7 +108,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
     >
       {/* A — the reviewer */}
       <div data-review-who style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 10, padding: `12px ${GUTTER}px 10px` }}>
-        <button type="button" onClick={onProfile} style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', flex: 'none' }}>
+        <button type="button" onClick={onProfile} style={{ display: 'flex', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', flex: 'none' }}>
           <SquircleAvatar
             src={buildImageThumbnailUrl(post.avatarUrl, { width: 72 * (typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1) })}
             alt={post.displayName}
