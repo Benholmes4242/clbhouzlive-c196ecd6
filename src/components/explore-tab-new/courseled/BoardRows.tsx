@@ -79,14 +79,11 @@ export function boardColumns(board: BoardKey): BoardColumns {
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
         ranked: true,
       };
-    /* A3.1 — MOST RECENT CARRIES TO PAR, NOT GROSS. The board spans many
-       courses, so a bare 71 beside an 85 is two unrelated numbers; to-par is
-       the figure that travels between courses. */
-    /* Phase 9.10 — NET against par leads, GROSS against par behind. */
+    /* A3.2 - gross leads, to-par behind, on Most recent. */
     case 'recent':
       return {
-        value: { i18n: 'discover.filterBoard.col.net', label: 'NET' },
-        secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
+        value: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
+        secondary: { i18n: 'discover.filterBoard.col.toPar', label: 'TO PAR' },
         ranked: false,
       };
     /* B1.3 / A3.5 — THE FEAT BOARDS KEEP GROSS: they are event lists where the
@@ -119,8 +116,8 @@ function netToParOf(r: Row): number | null {
 }
 
 /** 18.5 — figure tracks: min-widths, right-aligned. */
-const MAIN_FIG_MIN_W = 36;
-const SECOND_FIG_MIN_W = 26;
+const MAIN_FIG_MIN_W = 24;
+const SECOND_FIG_MIN_W = 22;
 
 interface Cell {
   text: string;
@@ -160,12 +157,9 @@ export function boardValue(
         : { text: fmtIndexMove(Number(r.delta_index)), tone: A.GREEN };
     case 'birdies':
       return { text: r.birdies != null ? String(r.birdies) : '\u2014', tone: A.INK };
-    /* 18.1 — GROSS against par, red under par; the gross score sits behind it.
-       Net is not shown here: Lowest net is its own ranked chip. */
-    case 'recent': {
-      const p = toParOf(r);
-      return { text: fmtToPar(p), tone: p != null && p < 0 ? A.RED : A.INK };
-    }
+    /* A3.2 - the gross leads on Most recent; to-par is the sub-figure beside it. */
+    case 'recent':
+      return { text: r.gross_score != null ? String(r.gross_score) : '\u2014', tone: A.INK };
     /* Feat boards: gross, plain, no tone. The date lives on the sub-line and in
        the day ladder, so it is no longer a figure. */
     default:
@@ -181,9 +175,10 @@ export function boardSecondary(r: Row, board: BoardKey): Cell | null {
     }
     case 'improved':
       return null;
-    /* 18.1 — the gross score, plain and unsigned. */
-    case 'recent':
-      return { text: r.gross_score != null ? String(r.gross_score) : '\u2014', tone: A.DIM };
+    case 'recent': {
+      const p = toParOf(r);
+      return { text: fmtToPar(p), tone: p == null ? A.DIM : p < 0 ? A.RED : p === 0 ? A.DIM : A.MUTE };
+    }
     case 'topar':
     case 'net':
     case 'stableford':
@@ -533,13 +528,13 @@ export function BoardRowView({
           ) : null}
         </span>
       </span>
-      <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 8 }}>
+      <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', columnGap: 3 }}>
         {/* S1.3 — THE FIGURE FOLLOWS THE COLOUR LAW, NEVER AMBER.
             18.5 — fixed min-width tracks so right edges align. */}
         <span
           data-board-main
           className="tabular-nums"
-          style={{ minWidth: MAIN_FIG_MIN_W, textAlign: 'right', fontSize: M.figureSize, fontWeight: M.figureWeight, letterSpacing: M.figureTracking, color: value.tone }}
+          style={{ minWidth: MAIN_FIG_MIN_W, textAlign: 'right', fontSize: M.figureSize, fontWeight: M.figureWeight, letterSpacing: M.figureTracking, lineHeight: 1, color: value.tone }}
         >
           {value.text}
         </span>
@@ -547,7 +542,7 @@ export function BoardRowView({
           <span
             data-board-secondary
             className="tabular-nums"
-            style={{ minWidth: SECOND_FIG_MIN_W, textAlign: 'right', fontSize: M.secondarySize, fontWeight: M.secondaryWeight, color: second.tone }}
+            style={{ minWidth: SECOND_FIG_MIN_W, textAlign: 'left', fontSize: M.secondarySize, fontWeight: M.secondaryWeight, lineHeight: 1, color: second.tone }}
           >
             {second.text}
           </span>

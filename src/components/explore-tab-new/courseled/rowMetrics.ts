@@ -20,8 +20,8 @@ export const BOARD_ROW_METRICS = {
   figureWeight: 800,
   /** Same tracking on both scales: no reason for the figures to differ. */
   figureTracking: '-0.02em',
-  secondarySize: 12,
-  secondaryWeight: 600,
+  secondarySize: 10.5,
+  secondaryWeight: 700,
   posSize: 13,
   posWeight: 800,
   posTrack: 20,
