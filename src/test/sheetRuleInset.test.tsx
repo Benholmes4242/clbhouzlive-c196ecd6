@@ -19,8 +19,14 @@ import { TrendCard } from '@/features/profile-sheet-v2/components/HcpStrip';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { formBars } from '@/features/profile-sheet-v2/sheetState';
 
+class StubResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
 beforeAll(() => {
-  (globalThis as any).ResizeObserver = class { observe() {} disconnect() {} };
+  globalThis.ResizeObserver = StubResizeObserver as unknown as typeof ResizeObserver;
 });
 
 const row = (id: string, play_date: string, diff: number, at: number) => ({
