@@ -144,7 +144,7 @@ describe('Scores lead board (Phase 0)', () => {
     expect(screen.queryByText('POS')).toBeNull();
   });
 
-  it('Phase 18.1 — recent leads with gross to par, then the gross score', () => {
+  it('A3.2 — recent leads with the gross score, then gross to par', () => {
     page('recent', [
       row(1, { gross_score: 69, course_par: 72 }),
       row(2, { gross_score: 80, course_par: 72 }),
@@ -157,10 +157,10 @@ describe('Scores lead board (Phase 0)', () => {
       r.querySelector('[data-board-secondary]')?.textContent,
     ]);
     expect(figs).toEqual([
-      ['\u22123', '69'],
-      ['+8', '80'],
-      ['E', '72'],
-      ['\u2014', '75'],
+      ['69', '\u22123'],
+      ['80', '+8'],
+      ['72', 'E'],
+      ['75', '\u2014'],
       ['\u2014', '\u2014'],
     ]);
   });
