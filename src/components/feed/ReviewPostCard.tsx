@@ -196,9 +196,17 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         ) : null}
       </div>
 
-      {/* C — the context line; absent without an aggregate or on the only review */}
+      {/* C — the context line; absent without an aggregate or on the only review.
+          Reads post.courseRating, mapped by feedMapper from course_avg_overall_score.
+          Four callers map rows into this card: useSuggestedFeed (Clubhouse,
+          get_suggested_feed_v3) PROJECTS the field; useProfilePosts (posts tab,
+          get_profile_posts), useCourseMedia and useGalleryCourseMedia (both
+          get_course_media_v2) do NOT, per the repo's generated types. On those
+          surfaces the line is absent, never wrong. Do not add a per-card read to
+          close the gap; it is a projection change on those reads (Ben's call).
+          Row is 22px: 16px of line + 6px under. */}
       {against ? (
-        <div data-review-against style={{ flex: 'none', padding: `0 ${GUTTER}px 12px`, fontSize: 11.5, lineHeight: 1.4, color: A.MUTE }}>
+        <div data-review-against style={{ flex: 'none', padding: `0 ${GUTTER}px 6px`, fontSize: 11.5, lineHeight: 1.4, color: A.MUTE }}>
           {t(`feed.reviewPost.against.${against.direction}`, {
             avg: against.avg.toLocaleString(i18n?.language, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
           })}
@@ -282,7 +290,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
             maxHeight: '100cqw',
             aspectRatio: '1 / 1',
             position: 'relative',
-            margin: `0 ${GUTTER}px 12px`,
+            margin: `0 ${GUTTER}px 8px`,
             borderRadius: 12,
             overflow: 'hidden',
           }}

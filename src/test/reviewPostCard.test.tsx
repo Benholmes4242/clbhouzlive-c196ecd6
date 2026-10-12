@@ -70,6 +70,9 @@ describe('review post — context line', () => {
     const c = card(6.8, all, 'Words', { courseRating: 7.1 });
     expect(c.querySelector('[data-review-against]')?.textContent).toBe('feed.reviewPost.against.below');
   });
+  it('does not render when courseRating is null', () => {
+    expect(card(6.8, all, 'Words', { courseRating: null }).querySelector('[data-review-against]')).toBeNull();
+  });
   it('reads below / above / in line at one decimal', () => {
     expect(againstCourse(6.8, 7.1)?.direction).toBe('below');
     expect(againstCourse(7.4, 7.1)?.direction).toBe('above');
