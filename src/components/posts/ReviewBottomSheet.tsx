@@ -642,68 +642,60 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 </div>
               </div>
 
-              {/* Community reference, without repeating the primary rating. */}
-              {showReference && (
-                <div
-                  data-review-community-reference="true"
-                  style={{
-                    marginTop: 12,
-                    fontSize: 11.5,
-                    lineHeight: 1.35,
-                    color: MUTE,
-                    fontVariantNumeric: 'tabular-nums lining-nums',
-                  }}
-                >
-                  {t('reviewSheet.communityAverage', {
-                    average: communityAvg?.toFixed(1) ?? '',
-                    count: ratingCount,
-                  })}
+              {/* §S.1 — THE CALIBRATION STRIP. Both cells always, or none: two
+                  em dashes side by side say nothing. NEITHER FIGURE IS COLOURED —
+                  a deviation is not a verdict, and green here means 9.0+. */}
+              {showStrip && (
+                <div data-review-calibration="true" style={{ display: 'flex', gap: 9, marginTop: 13 }}>
+                  {[
+                    { key: 'own', label: 'Against their own', figure: ownFigure, sub: ownSub },
+                    { key: 'course', label: 'Against this course', figure: courseFigure, sub: courseSub },
+                  ].map((c) => (
+                    <div
+                      key={c.key}
+                      data-review-calibration-cell={c.key}
+                      style={{ flex: 1, minWidth: 0, background: A.SOFT, border: `1px solid ${BORDER}`, borderRadius: 11, padding: '9px 10px' }}
+                    >
+                      <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.11em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.label}</div>
+                      <div data-review-calibration-figure style={{ marginTop: 3, fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums', color: INK }}>{c.figure ?? '\u2014'}</div>
+                      <div style={{ marginTop: 2, fontSize: 10, fontWeight: 600, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.sub}</div>
+                    </div>
+                  ))}
                 </div>
               )}
 
-              {/* THE SPREAD — one row of four: figure over label.
-                  A null category omits its column and the row rebalances. */}
+              {/* §S.2 — THE SPREAD: label, figure, and a 4px track whose fill is
+                  this score out of ten and whose tick is the course's average
+                  for that category (three ratings or more only). */}
               {breakdownEntries.length > 0 && (
-                <div
-                  style={{
-                    marginTop: 12,
-                    display: 'grid',
-                    gridTemplateColumns: `repeat(${breakdownEntries.length}, 1fr)`,
-                    gap: 10,
-                  }}
-                >
-                  {breakdownEntries.map(({ key, label, value }) => {
-                    return (
-                      <div key={key} data-review-subscore={key} style={{ minWidth: 0, textAlign: 'center' }}>
-                        <div
-                          style={{
-                            fontSize: 15,
-                            fontWeight: 800,
-                            color: courseSubScoreTone(value),
-                            fontVariantNumeric: 'tabular-nums',
-                            lineHeight: 1,
-                          }}
-                        >
-                          {value.toFixed(1)}
-                        </div>
-                        <div
-                          style={{
-                            marginTop: 5,
-                            fontSize: 9,
-                            fontWeight: 800,
-                            letterSpacing: '0.1em',
-                            color: MUTE,
-                            textTransform: 'uppercase',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                          }}
-                        >
-                          {label}
-                        </div>
+                <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 11 }}>
+                  {breakdownEntries.map(({ key, label, value, courseAvg }) => (
+                    <div key={key} data-review-subscore={key} style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', color: A.DIM, textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+                      <div style={{ marginTop: 2, fontSize: 17, fontWeight: 800, letterSpacing: '-0.03em', color: courseSubScoreTone(value), fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>
+                        {value != null ? value.toFixed(1) : '\u2014'}
                       </div>
-                    );
-                  })}
+                      {value != null && (
+                        <div data-review-subscore-track style={{ position: 'relative', height: 4, borderRadius: 999, background: A.TRACK, marginTop: 6 }}>
+                          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(100, value * 10))}%`, borderRadius: 999, background: value >= 9 ? A.GREEN : A.DIM }} />
+                          {courseAvg != null && (
+                            <div data-review-subscore-tick style={{ position: 'absolute', top: -2.5, left: `${Math.max(0, Math.min(100, courseAvg * 10))}%`, width: 1.5, height: 9, borderRadius: 1, background: MUTE }} />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {breakdownEntries.length > 0 && anyTick && (
+                <div data-review-subscore-key style={{ marginTop: 9, fontSize: 10.5, color: A.DIM }}>
+                  <span aria-hidden style={{ display: 'inline-block', width: 1.5, height: 8, background: MUTE, margin: '0 5px -1px 0', borderRadius: 1 }} />
+                  The mark is this course&rsquo;s average in that category.
+                </div>
+              )}
+              {breakdownEntries.length > 0 && !anyTick && ratingCount === 1 && (
+                <div data-review-subscore-first style={{ marginTop: 9, fontSize: 10.5, color: A.DIM }}>
+                  No course average yet &mdash; this is the first rating here.
                 </div>
               )}
 
@@ -753,6 +745,41 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   />
                 ))
               )}
+
+              {/* §S.5 — the next question after one opinion is everyone else's.
+                  At one rating there is nothing else to see. */}
+              {courseId && ratingCount >= 2 && (
+                <button
+                  type="button"
+                  data-review-see-all="true"
+                  onClick={handleSeeAll}
+                  style={{
+                    marginTop: 16,
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 10,
+                    border: `1px solid ${BORDER}`,
+                    borderRadius: 11,
+                    padding: '11px 13px',
+                    background: 'transparent',
+                    color: INK,
+                    fontFamily: FONT_SF,
+                    fontSize: 12.5,
+                    fontWeight: 700,
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
+                >
+                  <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {`See all ${ratingCount} ${ratingCount === 1 ? 'rating' : 'ratings'} of ${courseName}`}
+                  </span>
+                  <ChevronRight size={15} strokeWidth={2} color={MUTE} aria-hidden style={{ flexShrink: 0 }} />
+                </button>
+              )}
+
 
               {/* MEDIA STRIP (§3c) — up to three thumbnails, 78 tall, r12.
                   INTERACTIVE: each tile is a real button that opens the
