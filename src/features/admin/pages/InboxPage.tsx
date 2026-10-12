@@ -326,7 +326,7 @@ function InboxListPage() {
       {view === 'open' && <FlowPanel flow={flow14.data} loading={flow14.isLoading} />}
 
       {/* 2.6 TOOLS */}
-      {canUsers && view === 'open' && (
+      {canUsers && workbenchCount > 0 && view === 'open' && (
         <section style={{ ...LIST_PANEL, padding: '14px 0 0' }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.ink, padding: '0 16px 10px' }}>Tools</div>
           <ToolRow
