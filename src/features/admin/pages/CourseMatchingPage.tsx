@@ -26,6 +26,7 @@ import {
   UNMATCHED_COURSES_KEY,
   type UnmatchedCourseStatus,
 } from '../hooks/useUnmatchedCourses';
+import { useCourseSearch } from '../components/CourseSearchField';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 
@@ -586,9 +587,6 @@ interface SheetProps {
 
 function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
   const [query, setQuery] = useState('');
-  const [hits, setHits] = useState<CourseHit[]>([]);
-  const [searching, setSearching] = useState(false);
-  const [searchErr, setSearchErr] = useState<string | null>(null);
   const [suggestion, setSuggestion] = useState<CourseHit | null>(null);
   const [chosen, setChosen] = useState<CourseHit | null>(null);
   const [notes, setNotes] = useState('');
@@ -621,26 +619,12 @@ function ResolveSheet({ row, onClose, onLinked }: SheetProps) {
     return () => { cancel = true; };
   }, [row?.whs_course_id]);
 
-  // Debounced search
-  useEffect(() => {
-    if (!row) return;
-    const q = query.trim();
-    if (q.length < 2) { setHits([]); return; }
-    setSearching(true);
-    setSearchErr(null);
-    const handle = setTimeout(async () => {
-      const { data, error } = await supabase
-        .from('golf_courses')
-        .select('id, name, region, sub_country, country, thumbnail_image')
-        .ilike('name', `%${q}%`)
-        .order('name')
-        .limit(25);
-      setSearching(false);
-      if (error) { setSearchErr(error.message); setHits([]); return; }
-      setHits((data ?? []) as CourseHit[]);
-    }, 220);
-    return () => clearTimeout(handle);
-  }, [query, row?.whs_course_id]);
+  // Debounced search - the admin's one course search (CourseSearchField.tsx).
+  const { hits: rawHits, searching, error: searchErr } = useCourseSearch(query, {
+    enabled: !!row,
+    columns: 'id, name, region, sub_country, country, thumbnail_image',
+  });
+  const hits = rawHits as CourseHit[];
 
   if (!row) return null;
 

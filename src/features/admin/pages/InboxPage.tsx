@@ -30,6 +30,7 @@ import type { HolePhotoQueueRow } from '../hooks/useHolePhotoQueue';
 import CourseMatchingPage from './CourseMatchingPage';
 import VenueMappingPage from './VenueMappingPage';
 import AddCourseSheet from '../components/AddCourseSheet';
+import CourseSearchField, { useCourseSearch, type CourseSearchHit } from '../components/CourseSearchField';
 import { uploadCoursePhoto } from '../hooks/useCourses';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
@@ -762,8 +763,6 @@ interface CourseHit { id: string; name: string; region: string | null; sub_count
 
 function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null; onClose: () => void }) {
   const [query, setQuery] = useState('');
-  const [hits, setHits] = useState<CourseHit[]>([]);
-  const [searching, setSearching] = useState(false);
   const [chosen, setChosen] = useState<CourseHit | null>(null);
   const [busy, setBusy] = useState(false);
   const [confirmIgnore, setConfirmIgnore] = useState(false);
@@ -776,28 +775,12 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
     if (!row) return;
     setChosen(null);
     setErr(null);
-    setHits([]);
     setQuery(row.echo_suggestion ?? (row.whs_course_name ?? '').split('-')[0].trim());
   }, [whsId]);
 
-  useEffect(() => {
-    if (!row) return;
-    const q = query.trim();
-    if (q.length < 2) { setHits([]); return; }
-    setSearching(true);
-    const handle = setTimeout(async () => {
-      const { data, error } = await supabase
-        .from('golf_courses')
-        .select('id, name, region, sub_country, country')
-        .ilike('name', `%${q}%`)
-        .order('name')
-        .limit(25);
-      setSearching(false);
-      if (error) { setErr(error.message); setHits([]); return; }
-      setHits((data ?? []) as CourseHit[]);
-    }, 220);
-    return () => clearTimeout(handle);
-  }, [query, whsId]);
+  const { hits: rawHits, searching, error: searchError } = useCourseSearch(query, { enabled: !!row });
+  const hits = rawHits as CourseHit[];
+  useEffect(() => { if (searchError) setErr(searchError); }, [searchError]);
 
   if (!row) return null;
 
@@ -1211,27 +1194,8 @@ function ClubCoursePicker({
   const { resolveClubCourseRequest } = useCourseRequests();
   const [createOpen, setCreateOpen] = useState(false);
   const [q, setQ] = useState(initialQuery);
-  const [hits, setHits] = useState<Array<{ id: string; name: string; club_id: string | null }>>([]);
-  const [loading, setLoading] = useState(false);
   const [picked, setPicked] = useState<{ id: string; name: string } | null>(null);
-
-  useEffect(() => {
-    const term = q.trim();
-    if (term.length < 2) { setHits([]); return; }
-    let cancelled = false;
-    setLoading(true);
-    const h = setTimeout(async () => {
-      const { data } = await supabase
-        .from('golf_courses')
-        .select('id, name, club_id')
-        .ilike('name', `%${term}%`)
-        .limit(10);
-      if (cancelled) return;
-      setHits((data ?? []) as any);
-      setLoading(false);
-    }, 250);
-    return () => { cancelled = true; clearTimeout(h); };
-  }, [q]);
+  const { hits, searching: loading } = useCourseSearch(q, { limit: 10, columns: 'id, name, club_id', debounceMs: 250 });
 
   const busy = resolveClubCourseRequest.isPending;
 
