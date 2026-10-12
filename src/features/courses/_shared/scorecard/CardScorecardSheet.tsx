@@ -1109,6 +1109,17 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   count={engagement.likeCount}
                   source={engagement.likeSource ?? 'post'}
                   kind="celebrate"
+                  /* No course id is held here: the context line shows, the
+                     per-liker course segment stays silent (H.5). */
+                  subject={{
+                    authorName: (ownerDisplayName ?? playerName) || null,
+                    courseId: null,
+                    courseName: courseName ?? null,
+                    kind: 'round',
+                    gross: totals.played ? totals.gross : null,
+                    toPar: totals.played ? totals.toPar : null,
+                    rating: null,
+                  }}
                   isOwnRound={isOwner}
                   ownerName={isTour ? null : (playerName.trim().split(/\s+/)[0] || null)}
                   surfaceColor={SHEET_SURFACE}

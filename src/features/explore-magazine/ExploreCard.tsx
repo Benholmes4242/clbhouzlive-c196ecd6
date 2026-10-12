@@ -1,4 +1,5 @@
 import React from 'react';
+import type { SubjectContext } from '@/components/sheets/SubjectContextLine';
 import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
@@ -366,6 +367,20 @@ function StackedLayersGlyph() {
   );
 }
 
+/** H.5 — the likes sheet's course context, from what the card already holds. */
+function likesSubjectOf(item: StreamItem): SubjectContext | null {
+  if (item.kind !== 'round' && item.kind !== 'review') return null;
+  return {
+    authorName: item.who?.display_name?.trim() || null,
+    courseId: item.subject?.course_id ?? null,
+    courseName: item.subject?.course_name ?? null,
+    kind: item.kind,
+    gross: item.kind === 'round' ? item.facts.gross ?? null : null,
+    toPar: item.kind === 'round' ? item.facts.to_par ?? null : null,
+    rating: item.kind === 'review' ? item.facts.rating ?? null : null,
+  };
+}
+
 function WhoLine({
   item,
   size,
@@ -587,6 +602,7 @@ function WhoLine({
                 kind={helpful ? 'helpful' : 'celebrate'}
                 surfaceColor={A.CANVAS}
                 isOwnRound={engagement!.isOwnRound ?? false}
+                subject={likesSubjectOf(item)}
                 style={{ marginTop: 0, minWidth: 0 }}
                 fontSize={CALLOUT_SUBTEXT.fontSize}
                 fontWeight={CALLOUT_SUBTEXT.fontWeight}
@@ -1295,6 +1311,7 @@ export function ExploreCard({
                 count={engagement.likeCount}
                 source="review"
                 kind="helpful"
+                subject={likesSubjectOf(item)}
                 lines={1}
                 fontSize={11}
                 fontWeight={600}
