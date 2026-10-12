@@ -43,10 +43,8 @@ import { FIGS, A } from '@/features/courses/components/holes/analytical/tokens';
 import { MessageCircle, EyeOff } from 'lucide-react';
 import { Trans } from 'react-i18next';
 import { SubjectContextLine } from '@/components/sheets/SubjectContextLine';
-import { useCommentsSubject, useThreadStandings, type CommentsSubject } from './hooks/useCommentsContext';
+import { useCommentsSubject, useThreadStandings } from './hooks/useCommentsContext';
 import { firstAppearanceStandings, standingUserId } from './lib/standing';
-import { shortCourseName } from '@/features/courses/_shared/courseLabel';
-import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { useMemo } from 'react';
 import { TITLE as TITLE_SCALE, BODY } from '@/lib/tokens/type';
 
