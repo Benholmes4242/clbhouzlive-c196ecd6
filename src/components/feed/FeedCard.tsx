@@ -1010,7 +1010,7 @@ const SingleMediaTapButton: React.FC<{
   );
 };
 
-const FooterButton: React.FC<{
+export const FooterButton: React.FC<{
   icon: React.ComponentType<any>;
   label?: string;
   onClick: () => void;

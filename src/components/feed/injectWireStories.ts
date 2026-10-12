@@ -9,7 +9,10 @@ export type StoryBeat = 'tour' | 'amateur';
 
 export type ClubhouseFeedItem =
   | { kind: 'post'; key: string; post: FeedPost; postIndex: number }
-  | { kind: 'wire'; key: string; story: TourStory; beat: StoryBeat };
+  | { kind: 'wire'; key: string; story: TourStory; beat: StoryBeat; more: TourStory[] };
+
+/** A wire slide shows its lead plus up to this many more from the SAME beat. */
+export const WIRE_BRIEFING_EXTRA = 2;
 
 function eligible(stories: TourStory[], nowMs: number): TourStory[] {
   const oldestAllowedMs = nowMs - WIRE_STORY_MAX_AGE_DAYS * 24 * 60 * 60 * 1000;
@@ -48,13 +51,18 @@ export function injectWireStories(
 
   // Each beat keeps its OWN cursor; an exhausted beat falls back to the other
   // rather than leaving a gap the reader cannot explain.
-  const take = (preferred: StoryBeat): { story: TourStory; beat: StoryBeat } | null => {
+  // A slide takes its lead AND the next two of that beat, advancing the
+  // cursor by three, so the next slide of the beat repeats none of them. The
+  // briefing never pads across beats.
+  const take = (preferred: StoryBeat): { story: TourStory; beat: StoryBeat; more: TourStory[] } | null => {
     const order: StoryBeat[] = preferred === 'tour' ? ['tour', 'amateur'] : ['amateur', 'tour'];
     for (const beat of order) {
-      const story = queues[beat][cursors[beat]];
+      const start = cursors[beat];
+      const story = queues[beat][start];
       if (story) {
-        cursors[beat] += 1;
-        return { story, beat };
+        const more = queues[beat].slice(start + 1, start + 1 + WIRE_BRIEFING_EXTRA);
+        cursors[beat] = start + 1 + more.length;
+        return { story, beat, more };
       }
     }
     return null;
@@ -76,6 +84,7 @@ export function injectWireStories(
       key: `wire:${picked.beat}:${picked.story.id}`,
       story: picked.story,
       beat: picked.beat,
+      more: picked.more,
     });
     slot += 1;
   }
