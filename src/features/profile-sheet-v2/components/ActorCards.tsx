@@ -1,20 +1,21 @@
 /**
- * ProfileSheetV2 · ActorCards — the actor pills (BRIEF_PROFILE_SHEET_REBUILD B).
+ * ProfileSheetV2 · ActorCards — the actor SWITCH LINE (BRIEF_SHEET_TOP_V5 G.2).
  *
  * RENDERS ONLY WHEN profiles.length > 1. One actor means this block does not
- * exist — not an empty container, not a single pill, no residual spacing.
+ * exist — not an empty container, no residual spacing.
  *
- * THIS RAIL CONTAINS IDENTITIES ONLY (BRIEF_ACCOUNT_SHEET_REBUILD D). No
- * creation door here; that rides the "Manage businesses" row.
+ * THE ACTIVE ACTOR IS NOT RENDERED. Its name and face are already in the
+ * identity header directly above. What remains is the switch: the other
+ * actor's 19px avatar, "Switch to {name}", and that actor's unread count.
+ * With three or more actors it reads "Switch actor", the count is the SUM
+ * across every non-active actor, and pressing it opens the list of actors
+ * rather than switching blind.
  *
- * A COUNT APPEARS ONLY ON A NON-ACTIVE ACTOR. The active actor's count belongs
+ * A COUNT APPEARS ONLY FOR NON-ACTIVE ACTORS. The active actor's count belongs
  * on Alerts and nowhere else.
  *
- * ON THIS SHEET A NOTIFICATION COUNT IS WHITE (ground A.INK, figure A.CANVAS),
- * matching QuickActionsRow, which this brief leaves unchanged.
- *
- * The active pill takes the canonical 1px active field border (28% white), not
- * amber: both actors are the viewing member, so amber cannot tell them apart.
+ * ON THIS SHEET A NOTIFICATION COUNT IS WHITE (ground A.INK, figure A.CANVAS).
+ * It never takes amber.
  */
 
 import React from 'react';
@@ -44,65 +45,85 @@ interface Props {
   onNavigate?: (route: string) => void;
 }
 
-const ACTIVE_BORDER = 'rgba(255,255,255,0.28)';
+function Count({ n }: { n: number }) {
+  if (n <= 0) return null;
+  return (
+    <span
+      data-switch-count
+      aria-label={`${n} unread`}
+      style={{
+        minWidth: 15, height: 15, borderRadius: 999, background: A.INK, color: A.CANVAS,
+        fontSize: 9.5, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '0 4px', fontVariantNumeric: 'tabular-nums', flex: 'none',
+      }}
+    >
+      {n > 99 ? '99+' : n}
+    </span>
+  );
+}
+
+function SwitchPill({ avatar, label, count, onClick, expanded }: {
+  avatar?: ActorCardsProfile; label: string; count: number; onClick: () => void; expanded?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-expanded={expanded}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: 6, maxWidth: '100%',
+        border: `1px solid ${A.TRACK}`, borderRadius: 999, padding: '3px 10px 3px 3px',
+        background: A.SOFT, fontFamily: SANS, cursor: 'pointer',
+      }}
+    >
+      {avatar ? (
+        <SquircleAvatar size={19} src={avatar.avatarUrl} alt={avatar.name} userId={avatar.id} hairlineRing ringColor={DARK_HAIRLINE} />
+      ) : (
+        <span aria-hidden style={{ width: 19, height: 19, borderRadius: 6, background: A.TRACK, flex: 'none' }} />
+      )}
+      <span style={{ fontSize: 11.5, fontWeight: 700, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        {label}
+      </span>
+      <Count n={count} />
+    </button>
+  );
+}
 
 export default function ActorCards({ currentActor, profiles, onSwitchProfile }: Props) {
   const { countFor } = useActorUnreadCounts();
-  const [switchingId, setSwitchingId] = React.useState<string | null>(null);
-
-  const ordered = React.useMemo(() => {
-    const indexed = profiles.map((p, i) => ({ p, i }));
-    indexed.sort((a, b) => {
-      const aa = a.p.id === currentActor.id ? 0 : 1;
-      const bb = b.p.id === currentActor.id ? 0 : 1;
-      return aa !== bb ? aa - bb : a.i - b.i;
-    });
-    return indexed.map((x) => x.p);
-  }, [profiles, currentActor.id]);
+  const [switching, setSwitching] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
 
   if (profiles.length <= 1) return null;
 
+  const others = profiles.filter((p) => p.id !== currentActor.id);
+  const switchTo = (id: string) => {
+    if (switching) return;
+    setSwitching(true);
+    Promise.resolve(onSwitchProfile(id)).finally(() => setSwitching(false));
+  };
+
+  const wrap: React.CSSProperties = {
+    display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', padding: '0 22px 12px', fontFamily: SANS,
+  };
+
+  if (others.length === 1) {
+    const o = others[0];
+    return (
+      <div data-actor-switch style={wrap}>
+        <SwitchPill avatar={o} label={`Switch to ${o.name}`} count={countFor(o.type, o.id)} onClick={() => switchTo(o.id)} />
+      </div>
+    );
+  }
+
+  // Three or more actors: one control, summed count, opens the list.
+  const total = others.reduce((s, p) => s + countFor(p.type, p.id), 0);
   return (
-    <div data-actor-pills style={{ display: 'flex', gap: 7, padding: '0 22px 14px', flexWrap: 'wrap', fontFamily: SANS }}>
-      {ordered.map((p) => {
-        const active = p.id === currentActor.id;
-        const unread = active ? 0 : countFor(p.type, p.id);
-        const tap = () => {
-          if (active || switchingId) return;
-          setSwitchingId(p.id);
-          Promise.resolve(onSwitchProfile(p.id)).finally(() => setSwitchingId(null));
-        };
-        return (
-          <button
-            key={`${p.type}-${p.id}`}
-            type="button"
-            onClick={tap}
-            aria-pressed={active}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 7, maxWidth: '100%',
-              border: `1px solid ${active ? ACTIVE_BORDER : A.BORDER}`, borderRadius: 999,
-              padding: '5px 11px 5px 5px', background: A.SOFT, fontFamily: SANS,
-              fontSize: 12, fontWeight: 700, color: active ? A.INK : A.MUTE,
-              cursor: active ? 'default' : 'pointer',
-            }}
-          >
-            <SquircleAvatar size={22} src={p.avatarUrl} alt={p.name} userId={p.id} hairlineRing ringColor={DARK_HAIRLINE} />
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
-            {unread > 0 && (
-              <span
-                aria-label={`${unread} unread`}
-                style={{
-                  minWidth: 17, height: 17, borderRadius: 999, background: A.INK, color: A.CANVAS,
-                  fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  padding: '0 5px', fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {unread > 99 ? '99+' : unread}
-              </span>
-            )}
-          </button>
-        );
-      })}
+    <div data-actor-switch style={wrap}>
+      <SwitchPill label="Switch actor" count={total} expanded={open} onClick={() => setOpen((v) => !v)} />
+      {open && others.map((p) => (
+        <SwitchPill key={`${p.type}-${p.id}`} avatar={p} label={p.name} count={countFor(p.type, p.id)} onClick={() => switchTo(p.id)} />
+      ))}
     </div>
   );
 }
