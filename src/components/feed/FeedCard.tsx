@@ -32,7 +32,6 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
 import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
 import { getRatingTierLabel } from '@/lib/ratingTier';
-import { ReviewVerdictLabel } from '@/components/shared/ReviewGhostScore';
 import { formatRatingValue } from '@/utils/formatters';
 import { useActiveActor } from '@/context/ActiveActorContext';
 
@@ -203,11 +202,9 @@ interface CaptionBlockProps {
   isClamped: boolean;
   setIsClamped: (v: boolean) => void;
   textRef: React.MutableRefObject<HTMLDivElement | null>;
-  /** When set, renders an inline "Read review ›" affordance (review posts) instead of more/less. */
-  onReadReview?: (e: React.MouseEvent) => void;
 }
 
-const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded, isClamped, setIsClamped, textRef, onReadReview }) => {
+const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded, isClamped, setIsClamped, textRef }) => {
   useLayoutEffect(() => {
     const el = textRef.current;
     if (!el) return;
@@ -219,13 +216,9 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
     }
   }, [body, expanded, setIsClamped, textRef]);
 
-  // Review posts: always clamp to 3 lines and show "Read review ›" affordance
-  // that navigates straight to the course review page (no inline expand).
-  const isReviewMode = !!onReadReview;
-  const showMore = !isReviewMode && !expanded && isClamped;
-  const showReadReview = isReviewMode && !!body;
+  const showMore = !expanded && isClamped;
 
-  if (!body && !showReadReview) return null;
+  if (!body) return null;
 
   return (
     <div style={{ padding: '0px 14px 10px', position: 'relative', zIndex: 2, marginTop: -1 }}>
@@ -236,7 +229,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
             fontSize: 15,
             lineHeight: 1.4,
             color: T100,
-            ...((isReviewMode || !expanded)
+            ...(!expanded
               ? {
                   display: '-webkit-box',
                   WebkitLineClamp: 3,
@@ -247,7 +240,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
           }}
         >
           <MentionText text={body} />
-          {!isReviewMode && expanded && isClamped && (
+          {expanded && isClamped && (
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
@@ -279,28 +272,6 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
             }}
           >
             more
-          </button>
-        )}
-        {showReadReview && (
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); onReadReview!(e); }}
-            style={{
-              position: 'absolute',
-              right: 0,
-              bottom: 0,
-              paddingLeft: 64,
-               background: `linear-gradient(90deg, ${surfaceWithAlpha(FEED_CARD_SURFACE, 0)} 0%, ${FEED_CARD_SURFACE} 38%)`,
-              border: 'none',
-              color: T60,
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: 'pointer',
-              lineHeight: 1.4,
-              whiteSpace: 'nowrap',
-            }}
-          >
-            Read review ›
           </button>
         )}
       </div>
@@ -429,7 +400,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     return Math.min(RATIO_MAX, Math.max(RATIO_MIN, r));
   }, [media]);
 
-  const reviewRating = post.review?.rating ?? null;
   const isDeal = false;
 
   const subLine = useMemo(() => {
@@ -803,7 +773,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         );
       })();
 
-  if (post.isReview && post.review) {
+  /* ONE HOME: every review post, resolved course or not, is ReviewPostCard. */
+  if (post.isReview) {
     const reviewOpenCourse = reviewCourseId ? () => navigate(`/courses/${reviewCourseId}`) : undefined;
     return (
       <ReviewPostCard
@@ -813,6 +784,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         onProfile={() => onProfile(post)}
         onReadReview={handleReadReview}
         onPrefetch={prefetchReview}
+        coursesReviewed={reviewerStats?.coursesRated ?? null}
         onOpenCourse={reviewOpenCourse}
         identityRight={(canManage || mountFollowPill) ? (
           <>
@@ -841,7 +813,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   return (
     <article
       ref={articleRef}
-      onPointerDown={post.isReview ? prefetchReview : undefined}
       style={{
         background: CARD,
         overflow: 'hidden',
@@ -928,31 +899,25 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               DEAL
             </span>
           )}
-          {reviewRating != null && (
-            <ReviewVerdictLabel
-              rating={reviewRating}
-              onClick={handleReadReview}
-              onPointerDown={prefetchReview}
-              ariaLabel={`Your review: ${formatRatingValue(reviewRating)} ${getRatingTierLabel(reviewRating)}`}
+ ${getRatingTierLabel(reviewRating)}`}
             />
           )}
         </div>
       </div>
 
       {/* Empty-caption spacer: give the header breathing room when no caption block renders */}
-      {!(post.caption || (post.isReview && post.review?.reviewText)) && (
+      {!post.caption && (
         <div aria-hidden style={{ height: 8 }} />
       )}
 
-      {/* Caption — review text above media, overlapping the ghost numeral's lower edge */}
+      {/* Caption */}
       <CaptionBlock
-        body={post.caption || (post.isReview ? post.review?.reviewText ?? '' : '')}
+        body={post.caption || ''}
         expanded={captionExpanded}
         setExpanded={setCaptionExpanded}
         isClamped={isCaptionClamped}
         setIsClamped={setIsCaptionClamped}
         textRef={captionTextRef}
-        onReadReview={post.isReview && reviewCourseId ? handleReadReview : undefined}
       />
 
 
@@ -982,8 +947,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                * never a lookup by name.
                */
               onOpenCourse={
-                (post.isReview ? reviewCourseId : post.courseId)
-                  ? () => navigate(`/courses/${post.isReview ? reviewCourseId : post.courseId}`)
+                post.courseId
+                  ? () => navigate(`/courses/${post.courseId}`)
                   : undefined
               }
               /**
@@ -1004,11 +969,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                * the course stats sheet — the card's single destination is the
                * review sheet. Every other post kind is unchanged.
                */
-              identityOnly={!!post.isReview}
-              onOpenStats={post.courseId && !post.isReview ? () => setStatsOpen(true) : undefined}
+              onOpenStats={post.courseId ? () => setStatsOpen(true) : undefined}
               surface="solid"
             />
-            {post.courseId && !post.isReview && statsOpen && (
+            {post.courseId && statsOpen && (
               <CourseStatsSheet
                 open={statsOpen}
                 onClose={() => setStatsOpen(false)}
