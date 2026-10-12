@@ -642,6 +642,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             onDouble={handleMediaDoubleTap}
             innerRef={singleMediaBtnRef}
             postId={post.id}
+            fill={fill}
           >
             <div
               style={{
@@ -1037,8 +1038,10 @@ const SingleMediaTapButton: React.FC<{
   onDouble: () => void;
   innerRef: React.RefObject<HTMLButtonElement>;
   postId: string;
+  /** Review card: fill the frame's height instead of taking the media's ratio. */
+  fill?: boolean;
   children: React.ReactNode;
-}> = ({ onSingle, onDouble, innerRef, postId, children }) => {
+}> = ({ onSingle, onDouble, innerRef, postId, fill = false, children }) => {
   const handleTap = React.useMemo(
     () => createTapHandler({
       onSingle: () => onSingle(),
@@ -1055,6 +1058,7 @@ const SingleMediaTapButton: React.FC<{
       style={{
         display: 'block',
         width: '100%',
+        ...(fill ? { height: '100%' } : {}),
         background: 'transparent',
         border: 'none',
         padding: 0,

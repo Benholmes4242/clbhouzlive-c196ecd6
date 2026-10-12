@@ -238,6 +238,16 @@
       "most_albatrosses_all_time": "Most albatrosses",
       "most_eagles_all_time": "Most eagles",
       "most_birdies_all_time": "Most birdies"
+    },
+    "reviewPost": {
+      "kicker": "Reviewed",
+      "playsOff": "Plays off {{index}}",
+      "readMore": "Read more",
+      "against": {
+        "below": "Below the course average of {{avg}}, across {{count}} reviews.",
+        "above": "Above the course average of {{avg}}, across {{count}} reviews.",
+        "inLine": "In line with the course average of {{avg}}, across {{count}} reviews."
+      }
     }
   },
   "settings": {
