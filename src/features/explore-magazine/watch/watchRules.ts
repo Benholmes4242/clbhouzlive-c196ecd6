@@ -25,6 +25,16 @@ export function isQuickHit(durationSeconds: number | null | undefined): boolean 
   return typeof durationSeconds === 'number' && durationSeconds > 0 && durationSeconds < QUICK_HIT_MAX;
 }
 
+/**
+ * L.3 — duration decides the rail; the SOURCE decides the frame. True only when
+ * both dimensions are known and height > width. Unknown shape is not guessed.
+ */
+export function isPortraitSource(row: { width?: number | null; height?: number | null }): boolean {
+  const w = Number(row.width ?? 0);
+  const h = Number(row.height ?? 0);
+  return w > 0 && h > 0 && h > w;
+}
+
 function durationOf(row: Pick<HubRpcRow, 'duration_seconds'>, saved: SavedProgress | undefined): number {
   const d = Number(row.duration_seconds ?? 0) || Number(saved?.duration ?? 0);
   return d > 0 ? d : 0;

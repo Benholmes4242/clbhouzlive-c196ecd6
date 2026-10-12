@@ -14,6 +14,8 @@ import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
 import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 
 import { ShelfRetry, ShelfShell } from '../ExploreShells';
 import {
@@ -232,6 +234,10 @@ export function WatchFeed({
 
   const quickPosts = useMemo(() => toFeedPosts(quickRows), [quickRows]);
   const longPosts = useMemo(() => toFeedPosts(longRows), [longRows]);
+  /* L.2 — the like control lives on the long-form card (BRIEF_WATCH_VIDEO_ROW_REACTIONS). */
+  const { activeActor } = useActiveActor();
+  const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
+  const likeAvailable = !!userId && !!activeActor;
   const continuePosts = useMemo(() => toFeedPosts(continueRows), [continueRows]);
 
   useEffect(() => {
@@ -508,10 +514,20 @@ export function WatchFeed({
                         onYourCourse: onYourCourse(row),
                         fromFollowed: row.creator_relation === 'following' || row.creator_relation === 'friend',
                       })}
-                      engagement={{
-                        commentCount: Number(row.comment_count ?? 0),
-                        onOpenComments: () => onOpenComments?.(row.post_id),
-                      }}
+                      engagement={(() => {
+                        /* longPosts[index] is 1:1 with longRows[index] (load-bearing). */
+                        const post = longPosts[index] ?? null;
+                        const like = getActiveLikeState(post);
+                        return {
+                          likeAvailable,
+                          liked: like.isLiked,
+                          likeCount: like.count,
+                          own: !!userId && (row.post_user_id ?? row.actor_id) === userId,
+                          onToggleLike: () => handleLike(post),
+                          commentCount: Number(row.comment_count ?? 0),
+                          onOpenComments: () => onOpenComments?.(row.post_id),
+                        };
+                      })()}
                     />
                     {onAll && index + 1 === RAIL_EVERY && index + 1 < longRows.length ? communityRail() : null}
                   </div>
