@@ -269,6 +269,12 @@ export default function ProfileSheetV2({
                 onSwitchProfile={onSwitchProfile}
                 onNavigate={onNavigate}
               />
+              <QuickActionsRow
+                gutter={SHEET_GUTTER}
+                actorType={currentActor.type}
+                actorId={currentActor.id}
+                onNavigate={onNavigate}
+              />
               <SheetCards
                 state={analyticsState}
                 history90={histQ.data as { observed_at: string; handicap_index: number }[] | undefined}
@@ -276,12 +282,6 @@ export default function ProfileSheetV2({
                 courses={courseFigures(userCourses, scoresQ.data)}
                 onNavigate={onNavigate}
                 onOpenCourseAnalytics={handleOpenCourseAnalytics}
-              />
-              <QuickActionsRow
-                gutter={SHEET_GUTTER}
-                actorType={currentActor.type}
-                actorId={currentActor.id}
-                onNavigate={onNavigate}
               />
               <SheetNavGroup
                 gutter={SHEET_GUTTER}

@@ -81,7 +81,7 @@ function resolveIdentity(
   };
 }
 
-function formatStamp(iso: string | null): string {
+export function formatStamp(iso: string | null): string {
   if (!iso) return '';
   const d = new Date(iso);
   if (isNaN(d.getTime())) return '';
