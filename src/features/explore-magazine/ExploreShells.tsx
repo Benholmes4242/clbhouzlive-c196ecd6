@@ -87,6 +87,11 @@ export function PairShell() {
  * N.3 — the Quick hits GRID shell. A skeleton may only expand into the layout
  * it stands in for, so on the grid chip the shell is the grid itself: same
  * columns, gap, inset, 9:16 cells and radius, with caption lines under each.
+ *
+ * P.1: no heading here — WatchFeed renders the real Section above it.
+ * P.2: TWO caption lines per cell, deliberately, not three. The skeleton cannot
+ * know which tiles carry a course line; shorter than content expands outwards
+ * (allowed), taller would collapse inwards (forbidden). Do not "tidy" to three.
  */
 export function GridShell({ inset, radius, cells = 6 }: { inset: number; radius: number; cells?: number }) {
   return (
