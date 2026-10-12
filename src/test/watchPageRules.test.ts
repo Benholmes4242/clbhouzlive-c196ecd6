@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  QUICK_HIT_MAX, isQuickHit, isPartWatched, remainingLabel, reasonLine, spreadByCreator, groupByMember, photosCaption, viewsLabel,
+  QUICK_HIT_MAX, isQuickHit, isPortraitSource, isPartWatched, remainingLabel, reasonLine, spreadByCreator, groupByMember, photosCaption, viewsLabel,
 } from '@/features/explore-magazine/watch/watchRules';
 
 describe('BRIEF_WATCH_PAGE rules', () => {
@@ -37,5 +37,11 @@ describe('BRIEF_WATCH_PAGE rules', () => {
     expect(photosCaption('Rosapenna', 4)).toBe('Rosapenna \u00B7 4 photos');
     expect(photosCaption('Rosapenna', 1)).toBe('Rosapenna');
     expect(viewsLabel(1240)).toBe('1.2k views');
+  });
+  it('portrait frame only when the source is known taller than wide', () => {
+    expect(isPortraitSource({ width: 1080, height: 1920 })).toBe(true);
+    expect(isPortraitSource({ width: 1920, height: 1080 })).toBe(false);
+    expect(isPortraitSource({ width: null, height: null })).toBe(false);
+    expect(isPortraitSource({ width: 1080, height: null })).toBe(false);
   });
 });

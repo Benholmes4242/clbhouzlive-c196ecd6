@@ -15,8 +15,10 @@ import { formatRelativeAgo } from '@/i18n/format';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import { getThumbnailUrl } from '@/utils/thumbnail';
 import { MessageCircle } from 'lucide-react';
+import { ReactionAction } from '@/components/explore-tab-new/courseled/ReactionAction';
 import { FIGS } from '@/components/explore-tab-new/courseled/tokens';
-import type { ReasonLine } from './watchRules';
+import { reactionKindFor } from '@/lib/reactionKind';
+import { isPortraitSource, type ReasonLine } from './watchRules';
 
 /**
  * THE LONG-FORM VIDEO UNIT — ONE UNIT, TWO SIZES (BRIEF_EXPLORE_ALL_VIDEO).
@@ -254,8 +256,11 @@ export function VideoCard({
         style={{
           position: 'relative',
           flex: 'none',
-          width: '100%',
-          aspectRatio: '16 / 9',
+          /* L.3 — duration decides the rail, the SOURCE decides the frame. A
+             portrait source never sits in 16:9: centred, capped at 420px tall. */
+          ...(!rail && isPortraitSource(row)
+            ? { alignSelf: 'center', width: 'min(100%, calc(420px * 9 / 16))', aspectRatio: '9 / 16' }
+            : { width: '100%', aspectRatio: '16 / 9' }),
           overflow: 'hidden',
           borderRadius: magazine ? r.md : rail ? r.sm : undefined,
           background: A.PANEL,
@@ -387,7 +392,18 @@ export function VideoCard({
             ) : null}
           </span>
           {engagement ? (
-            <span style={{ flex: 'none', paddingTop: 1, marginRight: -8 }}>
+            <span style={{ flex: 'none', paddingTop: 1, marginRight: -8, display: 'inline-flex', alignItems: 'center' }}>
+              <ReactionAction
+                kind={reactionKindFor({ isRound: false, isReview: !!(row.source_review_id || row.review_id) })}
+                count={engagement.likeCount}
+                reacted={engagement.liked}
+                onToggle={engagement.onToggleLike}
+                readOnly={engagement.own}
+                hidden={!engagement.likeAvailable}
+                tone="ink"
+                hitBias="down"
+                label={engagement.liked ? t('amateur.watch.liked', 'Liked') : t('amateur.watch.likeVideo', 'Like this video')}
+              />
               <VideoCommentAction
                 count={engagement.commentCount}
                 onOpen={engagement.onOpenComments}
@@ -415,8 +431,13 @@ export function WatchProgressBar({ fraction }: { fraction: number }) {
   );
 }
 
-/** K.4: likes stay on the video itself; the card carries the comment door only. */
+/** K.4 moved the FIGURE on line one to views; the like control and its count stay on the card (L.2). */
 export interface VideoRowEngagement {
+  likeAvailable: boolean;
+  liked: boolean;
+  likeCount: number;
+  own: boolean;
+  onToggleLike: () => void;
   commentCount: number;
   onOpenComments: () => void;
 }
