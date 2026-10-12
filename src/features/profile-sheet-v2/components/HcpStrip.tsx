@@ -41,7 +41,6 @@
 
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight } from 'lucide-react';
 import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
 import { handicapSentence, formatIndex } from '../sheetState';
 import { Door } from './sheetCardParts';
@@ -61,7 +60,6 @@ const PLOT_H = 96;
 const LEGEND_H = 18;
 const PAD = 14;
 
-const AMBER_TEXT = A.AMBER_DEEP;
 
 interface Point { t: string; v: number }
 
