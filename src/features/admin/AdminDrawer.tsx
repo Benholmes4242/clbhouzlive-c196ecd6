@@ -21,7 +21,7 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
-  { to: '/admin-v2/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/admin-v2/dashboard', label: 'Command centre', icon: LayoutDashboard },
   { to: '/admin-v2/inbox',     label: 'Inbox',     icon: Inbox, moderatorAllowed: true, showBadge: true },
   { to: '/admin-v2/users',     label: 'Members',   icon: Users },
   { to: '/admin-v2/content',   label: 'Content',   icon: MapPin },

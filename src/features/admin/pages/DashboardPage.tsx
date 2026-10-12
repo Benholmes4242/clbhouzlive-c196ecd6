@@ -1,795 +1,609 @@
-import React, { useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChevronRight, ChevronDown } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { CARD, KICKER, LABEL, FIG, Skeleton } from '../lib/chartPrimitives';
-
+/**
+ * COMMAND CENTRE (BRIEF_COMMAND_CENTRE, Stages 1-2). Nine panels, fixed order:
+ * Status strip, Right now, Do now, The loop, The moat, Growth | Rounds,
+ * Clubhouse, Retention. Figures, not prose. Every panel shell renders from the
+ * first paint at its settled height and swaps in when its own query lands; on
+ * an RPC error the shell stays empty — never a fabricated zero.
+ */
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import { FIG, Skeleton, monotonePath, formatDurationShort } from '../lib/chartPrimitives';
 import { adminTheme as t } from '../theme';
-import EmptyState from '../components/EmptyState';
-import AdminErrorState from '../components/AdminErrorState';
-import MetricCard from '../components/MetricCard';
 import PostInsightSheet from '../components/PostInsightSheet';
-import CourseInsightSheet from '../components/CourseInsightSheet';
-import { useTriageCounts } from '../hooks/useTriageCounts';
 import { useEchoEngineHealth } from '../hooks/useEchoEngineHealth';
 import { usePushHealth } from '../hooks/usePushHealth';
 import { useDashboard } from '../hooks/useDashboard';
+import { useLiveInApp, useRightNowHourly, pctDelta } from '../hooks/useOverviewMetrics';
 import {
-  useOverviewMetrics, useLiveInApp, useRightNowHourly, pctDelta,
-} from '../hooks/useOverviewMetrics';
-import {
-  computeEchoChip, computePushChip, computeEgChip, computeCronChip,
-  computeErrorsChip,
+  computeEchoChip, computePushChip, computeEgChip, computeCronChip, computeErrorsChip,
+  toneColor, type ChipTone,
 } from '../lib/healthChips';
 import { useErrorCount24h } from '../hooks/useStability';
 import { useOpsHealth } from '../hooks/useOpsHealth';
-import { useActiveWindows, type ActiveWindows } from '../hooks/useActiveWindows';
+import { useActiveWindows } from '../hooks/useActiveWindows';
 import { useRetention } from '../hooks/useRetention';
-import { SystemPanel, ActivationPanel, PipelinePanel } from '../components/SystemPanels';
-import { RightNowPanel, RetentionPanel, ActiveMembersPanel } from '../components/ChartPanels';
-import { OpsErrorsPanel } from '../components/OpsPanels';
-import type { OpsHealth } from '../hooks/useOpsHealth';
-import { stripMentionMarkup } from '@/lib/mentions/format';
+import { pipelineTone } from '../components/SystemPanels';
+import { useCommandCentre, type CommandCentre } from '../hooks/useCommandCentre';
 
+// Brief-specified panel values with no theme token (BRIEF_COMMAND_CENTRE).
+const RAISED = 'rgba(255,255,255,0.03)';
+const TRACK = 'rgba(255,255,255,0.08)';
+const AREA = 'rgba(255,255,255,0.06)';
+const AVATAR_GROUND = '#1E2430';
+const MINUS = '\u2212';
+const DASH = '\u2014';
 
-const num = (n: number) => n.toLocaleString();
-function relTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return 'just now';
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.floor(h / 24)}d ago`;
+const fmt = (n: number) => n.toLocaleString();
+
+// ─── Shell ────────────────────────────────────────────────────────────────────
+
+const PANEL: React.CSSProperties = { background: t.surface, borderRadius: 16, padding: '14px 16px' };
+const LIST_PANEL: React.CSSProperties = { background: t.surface, borderRadius: 16, padding: '14px 0 4px' };
+const TITLE: React.CSSProperties = { fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.ink };
+const META: React.CSSProperties = { ...FIG, fontSize: 11, color: t.inkFaint };
+const MINI_LABEL: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: t.inkFaint };
+
+function Header({ title, meta, list }: { title: React.ReactNode; meta?: React.ReactNode; list?: boolean }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginBottom: 12, padding: list ? '0 16px' : undefined }}>
+      <span style={TITLE}>{title}</span>
+      {meta != null ? <span style={META}>{meta}</span> : null}
+    </div>
+  );
 }
 
-// ─── Clubhouse feed ───────────────────────────────────────────────────────────
-
-type FeedKind = 'member' | 'post' | 'review';
-
-interface FeedRound {
-  gross: number;
-  par: number;
-  courseName: string | null;
+/** Loading → skeleton; error → empty body at the same height; else content. */
+function Body({ height, loading, failed, children }: { height: number; loading: boolean; failed: boolean; children: () => React.ReactNode }) {
+  if (loading) return <div style={{ padding: 0 }}><Skeleton height={height} radius={10} /></div>;
+  if (failed) return <div style={{ height }} aria-label="Unavailable" />;
+  return <>{children()}</>;
 }
 
-interface FeedItem {
-  id: string;
-  kind: FeedKind;
-  created_at: string;
-  /** Line 1 subject: member name, post author, or - for reviews - the COURSE. */
-  subject: string;
-  /** Line 2 content: caption, "{author} - {review}", or nothing for a join. */
-  body: string | null;
-  avatarUrl: string | null;
-  href: string;
-  /**
-   * 4a GROUPING IDENTITY. The member who caused the item - for a review that
-   * is the AUTHOR, not the course the row is titled with. Carried explicitly
-   * rather than inferred from `href` so grouping never depends on a route
-   * string, and `memberName` exists because a review row's `subject` is the
-   * course name and a collapsed group must name the person.
-   */
-  memberId: string;
-  memberName: string;
-  postId?: string;
-  courseId?: string;
-  /**
-   * Line 3 metadata. Every entry carries its own noun - never a bare figure.
-   * A zero is only present where the zero is itself a finding (likes,
-   * comments); absent values are omitted rather than rendered as 0.
-   */
-  meta: string[];
-  /** Present only when a post resolves to a processed round. */
-  round?: FeedRound;
-  /**
-   * Moderation markers. Hidden and mock rows are MARKED, never filtered:
-   * an admin needs to see that something was hidden.
-   */
-  warnings: string[];
+// ─── Small figures ────────────────────────────────────────────────────────────
+
+function Delta({ current, previous }: { current: number; previous: number }) {
+  if (current === previous) return <span style={{ color: t.inkMuted }}>level</span>;
+  const d = pctDelta(current, previous);
+  if (d === null) return <span style={{ color: t.inkMuted }}>new</span>;
+  if (d === 0) return <span style={{ color: t.inkMuted }}>level</span>;
+  return d > 0
+    ? <span style={{ color: t.okText }}>↗ {d}%</span>
+    : <span style={{ color: t.dangerText }}>↘ {Math.abs(d)}%</span>;
 }
 
-async function fetchClubhouseFeed(): Promise<FeedItem[]> {
-  // 4.1d: 8/8/8 merged and sliced to 8, deliberately. A 4/4/4 split would
-  // spend four slots on reviews in a week with no reviews while live posts
-  // fell off the panel.
-  const [members, posts, reviews] = await Promise.all([
-    supabase
-      .from('user_profiles')
-      .select('id, display_name, username, profile_photo_url, created_at')
-      .is('deleted_at', null)
-      .order('created_at', { ascending: false })
-      .limit(8),
-    supabase
-      .from('posts')
-      .select('id, content, created_at, user_id, moderation_hidden, auto_hidden, like_count, comment_count, course_id, whs_score_id, visibility, status')
-      .order('created_at', { ascending: false })
-      .limit(8),
-    supabase
-      .from('course_ratings')
-      .select('id, created_at, user_id, course_id, review, is_mock, rating, tee_label, helpful_count')
-      .order('created_at', { ascending: false })
-      .limit(8),
-  ]);
-
-  type PostRow = {
-    id: string; content: string | null; created_at: string; user_id: string;
-    moderation_hidden: boolean | null; auto_hidden: boolean | null;
-    like_count: number | null; comment_count: number | null;
-    course_id: string | null; whs_score_id: string | null;
-    visibility: string | null; status: string | null;
-  };
-  type ReviewRow = {
-    id: string; created_at: string; user_id: string; course_id: string;
-    review: string | null; is_mock: boolean | null; rating: number | null;
-    tee_label: string | null; helpful_count: number | null;
-  };
-  const postRows = (posts.data ?? []) as PostRow[];
-  const reviewRows = (reviews.data ?? []) as ReviewRow[];
-  const memberRows = (members.data ?? []) as { id: string; display_name: string | null; username: string | null; profile_photo_url: string | null; created_at: string }[];
-
-  const profileIds = Array.from(new Set([
-    ...postRows.map(r => r.user_id),
-    ...reviewRows.map(r => r.user_id),
-  ].filter(Boolean)));
-  // 4.1a ONE course map serves both branches - review course_ids and post
-  // course_ids in the same query.
-  const courseIds = Array.from(new Set([
-    ...reviewRows.map(r => r.course_id),
-    ...postRows.map(r => r.course_id ?? ''),
-  ].filter(Boolean))) as string[];
-  // 4.1c Deliberately narrow: only posts with no caption need a media
-  // fallback subtitle, so media type is NOT reliable metadata here.
-  const emptyContentPostIds = postRows
-    .filter(p => !((p.content ?? '').trim()))
-    .map(p => p.id);
-  const roundScoreIds = Array.from(new Set(
-    postRows.map(p => p.whs_score_id).filter(Boolean),
-  )) as string[];
-
-  const [profRes, courseRes, mediaRes, roundRes] = await Promise.all([
-    profileIds.length
-      ? supabase.from('user_profiles').select('id, display_name, username, profile_photo_url').in('id', profileIds)
-      : Promise.resolve({ data: [] } as { data: unknown[] }),
-    courseIds.length
-      ? supabase.from('golf_courses').select('id, name').in('id', courseIds)
-      : Promise.resolve({ data: [] } as { data: unknown[] }),
-    emptyContentPostIds.length
-      ? supabase.from('post_media').select('post_id, media_type').in('post_id', emptyContentPostIds).limit(50)
-      : Promise.resolve({ data: [] } as { data: unknown[] }),
-    roundScoreIds.length
-      ? supabase.from('gam_round_stats').select('whs_score_id, gross_score, course_par, course_name').in('whs_score_id', roundScoreIds)
-      : Promise.resolve({ data: [] } as { data: unknown[] }),
-  ]);
-  type Prof = { id: string; display_name: string | null; username: string | null; profile_photo_url: string | null };
-  const profMap = new Map<string, Prof>(((profRes.data ?? []) as Prof[]).map(p => [p.id, p]));
-  const courseMap = new Map<string, { id: string; name: string }>(((courseRes.data ?? []) as { id: string; name: string }[]).map(c => [c.id, c]));
-  const mediaMap = new Map<string, string>();
-  for (const m of ((mediaRes.data ?? []) as { post_id: string; media_type: string }[])) {
-    if (!mediaMap.has(m.post_id)) mediaMap.set(m.post_id, m.media_type);
-  }
-  // A missing row means the evaluator has not processed the round yet. The
-  // post then renders as an ordinary post: no partial score, no "pending".
-  const roundMap = new Map<string, FeedRound>();
-  for (const r of ((roundRes.data ?? []) as { whs_score_id: string | null; gross_score: number | null; course_par: number | null; course_name: string | null }[])) {
-    if (!r.whs_score_id) continue;
-    if (r.gross_score == null || r.course_par == null) continue;
-    if (!roundMap.has(r.whs_score_id)) {
-      roundMap.set(r.whs_score_id, { gross: r.gross_score, par: r.course_par, courseName: r.course_name });
-    }
-  }
-
-  const displayName = (p: Prof | undefined | null) => p?.display_name ?? p?.username ?? 'A member';
-  const items: FeedItem[] = [];
-
-  for (const m of memberRows) {
-    items.push({
-      id: `member:${m.id}`,
-      kind: 'member',
-      created_at: m.created_at,
-      subject: m.display_name ?? m.username ?? 'A member',
-      body: null,
-      avatarUrl: m.profile_photo_url,
-      href: `/admin-v2/users?member=${m.id}`,
-      memberId: m.id,
-      memberName: m.display_name ?? m.username ?? 'A member',
-      meta: [],
-      warnings: [],
-    });
-  }
-  for (const p of postRows) {
-    const prof = profMap.get(p.user_id);
-    const name = displayName(prof);
-    const content = stripMentionMarkup((p.content ?? '').trim()).trim();
-    let body: string | null = null;
-    if (content) body = content;
-    else {
-      const mt = mediaMap.get(p.id);
-      if (mt === 'video') body = 'Video post';
-      else if (mt === 'image' || mt === 'photo') body = 'Photo post';
-    }
-    const likes = p.like_count ?? 0;
-    const comments = p.comment_count ?? 0;
-    const meta: string[] = [
-      `${likes} like${likes === 1 ? '' : 's'}`,
-      `${comments} comment${comments === 1 ? '' : 's'}`,
-    ];
-    const courseName = p.course_id ? courseMap.get(p.course_id)?.name : undefined;
-    if (courseName) meta.push(courseName);
-    // post_visibility is ('anyone' | 'followers' | 'private') - 'anyone' IS
-    // public. 'private' is named as itself rather than mislabelled "friends".
-    // NOT "Friends only": 'followers' is not friendship, and nothing enforces a
-    // restriction on the file. See the audience-copy rule in useUpdatePost.ts.
-    if (p.visibility === 'followers') meta.push('Followers');
-    else if (p.visibility === 'private') meta.push('Private');
-
-    items.push({
-      id: `post:${p.id}`,
-      kind: 'post',
-      created_at: p.created_at,
-      subject: name,
-      body,
-      avatarUrl: prof?.profile_photo_url ?? null,
-      href: `/admin-v2/users?member=${p.user_id}`,
-      memberId: p.user_id,
-      memberName: name,
-      postId: p.id,
-      meta,
-      round: p.whs_score_id ? roundMap.get(p.whs_score_id) : undefined,
-      warnings: [
-        ...(p.auto_hidden ? ['Auto-hidden'] : []),
-        ...(p.moderation_hidden ? ['Hidden'] : []),
-      ],
-    });
-  }
-  for (const r of reviewRows) {
-    const course = courseMap.get(r.course_id);
-    const prof = profMap.get(r.user_id);
-    const author = displayName(prof);
-    const text = stripMentionMarkup((r.review ?? '').trim()).trim();
-    const meta: string[] = [];
-    if (r.rating != null) meta.push(`${r.rating.toFixed(1)} rated`);
-    if (r.tee_label) meta.push(`${r.tee_label} tees`);
-    if ((r.helpful_count ?? 0) > 0) meta.push(`${r.helpful_count} helpful`);
-    items.push({
-      id: `review:${r.id}`,
-      kind: 'review',
-      created_at: r.created_at,
-      subject: course?.name ?? 'a course',
-      body: text ? `${author} - ${text}` : author,
-      avatarUrl: prof?.profile_photo_url ?? null,
-      href: `/admin-v2/users?member=${r.user_id}`,
-      memberId: r.user_id,
-      memberName: author,
-      courseId: r.course_id,
-      meta,
-      warnings: r.is_mock ? ['Mock'] : [],
-    });
-  }
-
-  items.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
-  return items.slice(0, 8);
+function Spark({ values, height, color, width = 1.2 }: { values: number[]; height: number; color: string; width?: number }) {
+  const W = 100;
+  if (values.length < 2) return <div style={{ height }} />;
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const span = max - min || 1;
+  const pts = values.map((v, i) => ({ x: (i / (values.length - 1)) * W, y: height - 1 - ((v - min) / span) * (height - 2) }));
+  return (
+    <svg width="100%" height={height} viewBox={`0 0 ${W} ${height}`} preserveAspectRatio="none" style={{ display: 'block' }} aria-hidden>
+      <path d={monotonePath(pts)} fill="none" stroke={color} strokeWidth={width} vectorEffect="non-scaling-stroke" />
+    </svg>
+  );
 }
 
+const cumulative = (xs: { n: number }[]) => {
+  let s = 0;
+  return xs.map(x => (s += x.n));
+};
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
   const qc = useQueryClient();
-  const triage = useTriageCounts();
-  const echo = useEchoEngineHealth();
-  const push = usePushHealth();
-  const dashboard = useDashboard();
-  const eg = dashboard.egSyncHealth;
-
-  const overview = useOverviewMetrics();
-  const live = useLiveInApp();
-  const intraday = useRightNowHourly();
-  const activeWindows = useActiveWindows(28);
-
-  const feed = useQuery({
-    queryKey: ['admin-v2', 'dashboard', 'clubhouse-feed'],
-    queryFn: fetchClubhouseFeed,
-    staleTime: 60_000,
-    refetchInterval: 120_000,
-  });
-
   useEffect(() => {
     const handler = () => qc.invalidateQueries({ queryKey: ['admin-v2'] });
     window.addEventListener('admin-v2:refetch', handler);
     return () => window.removeEventListener('admin-v2:refetch', handler);
   }, [qc]);
 
-  const echoChip = useMemo(() => computeEchoChip(echo), [echo.isLoading, echo.isError, echo.data]);
-  const pushChip = useMemo(() => computePushChip(push), [push.isLoading, push.isError, push.data]);
-  const egChip = useMemo(() => computeEgChip(eg), [eg.isLoading, eg.isError, eg.data]);
-  const cronChip = useMemo(() => computeCronChip(eg), [eg.isLoading, eg.isError, eg.data]);
-  const errors = useErrorCount24h();
-  const ops = useOpsHealth(7);
-  const retention = useRetention(56);
-
-  const errorsChip = useMemo(
-    () => computeErrorsChip(errors.data ?? null, errors.isLoading, errors.isError),
-    [errors.data, errors.isLoading, errors.isError],
-  );
-  const nonOkChips = [echoChip, pushChip, egChip, cronChip, errorsChip].filter(c => c.tone !== 'ok' && c.tone !== 'idle').length;
-
-  const m = overview.data;
-  const loading = overview.isLoading;
+  const cc = useCommandCentre();
+  const ccLoading = cc.isLoading;
+  const ccFailed = cc.isError || (cc.isFetched && !cc.data);
 
   return (
-    <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 720, margin: '0 auto' }}>
-      {/* Status first: an admin opens this to find out whether anything is
-          broken, so system state leads and vanity metrics follow. */}
-      <SystemPanel
-        chips={{ eg: egChip, cron: cronChip, echo: echoChip, push: pushChip, errors: errorsChip }}
-        nonOkChips={nonOkChips}
-        triage={triage}
-        ops={ops.data}
-        opsLoading={ops.isLoading}
-        eg={eg.data}
-      />
-
-      <ActivationPanel ops={ops.data} loading={ops.isLoading} />
-
-      <PipelinePanel ops={ops.data} loading={ops.isLoading} />
-
-      <RightNowPanel
-        live={live.data?.count ?? null}
-        liveLoading={live.isLoading}
-        intraday={intraday.data ?? []}
-        intradayLoading={intraday.isLoading}
-        topUsers={dashboard.glance.data?.topActiveUsers}
-        topUsersLoading={dashboard.glance.isLoading}
-      />
-
-      <MetricGrid
-        loading={loading}
-        data={m}
-        ops={ops.data}
-        opsLoading={ops.isLoading}
-        aw={activeWindows.data ?? null}
-        awLoading={activeWindows.isLoading}
-      />
-
-      <RetentionPanel data={retention.data} loading={retention.isLoading} />
-
-      {/* WAU, not daily actives: the DAU tile now carries the daily series
-          and two charts of one series on one page is a duplication. */}
-      <ActiveMembersPanel
-        data={activeWindows.data?.daily ?? []}
-        stickiness={activeWindows.data?.stickiness ?? null}
-        loading={activeWindows.isLoading || !activeWindows.data}
-        isError={activeWindows.isError}
-        onRetry={() => activeWindows.refetch()}
-      />
-
-      <OpsErrorsPanel data={ops.data} loading={ops.isLoading} />
-
-      <LatestInClubhouse
-        items={feed.data ?? []}
-        loading={feed.isLoading}
-        isError={feed.isError}
-        onRetry={() => feed.refetch()}
-      />
-
-      <style>{`@keyframes admin-pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.55 } } @keyframes admin-pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }`}</style>
+    <div style={{ padding: '8px 12px 24px', display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 720, margin: '0 auto' }}>
+      <StatusStrip />
+      <RightNow />
+      <DoNow data={cc.data} loading={ccLoading} failed={ccFailed} />
+      <TheLoop data={cc.data} loading={ccLoading} failed={ccFailed} />
+      <TheMoat data={cc.data} loading={ccLoading} failed={ccFailed} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
+        <Growth data={cc.data} loading={ccLoading} failed={ccFailed} />
+        <RoundsByDay data={cc.data} loading={ccLoading} failed={ccFailed} />
+      </div>
+      <Clubhouse data={cc.data} loading={ccLoading} failed={ccFailed} />
+      <RetentionCard />
+      <style>{`@keyframes admin-pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.55 } }`}</style>
     </div>
   );
 }
 
+type CCProps = { data?: CommandCentre; loading: boolean; failed: boolean };
 
+// ─── 1 STATUS STRIP ───────────────────────────────────────────────────────────
 
-// ─── Metric grid ──────────────────────────────────────────────────────────────
+function StatusStrip() {
+  const navigate = useNavigate();
+  const echo = useEchoEngineHealth();
+  const push = usePushHealth();
+  const eg = useDashboard().egSyncHealth;
+  const errors = useErrorCount24h();
+  const ops = useOpsHealth(7);
 
-function MetricGrid({ loading, data, ops, opsLoading, aw, awLoading }: {
-  loading: boolean;
-  data: ReturnType<typeof useOverviewMetrics>['data'];
-  ops?: OpsHealth;
-  opsLoading: boolean;
-  /** null while unresolved OR when a cached payload predates the RPC. */
-  aw: ActiveWindows | null;
-  awLoading: boolean;
-}) {
-  const act = ops?.activity;
-  // UNRESOLVED IS NOT ABSENT: a missing block keeps the four window tiles in
-  // their loading state rather than rendering a zero.
-  const wLoading = awLoading || !aw;
+  const echoChip = useMemo(() => computeEchoChip(echo), [echo.isLoading, echo.isError, echo.data]); // eslint-disable-line react-hooks/exhaustive-deps
+  const pushChip = useMemo(() => computePushChip(push), [push.isLoading, push.isError, push.data]); // eslint-disable-line react-hooks/exhaustive-deps
+  const egChip = useMemo(() => computeEgChip(eg), [eg.isLoading, eg.isError, eg.data]); // eslint-disable-line react-hooks/exhaustive-deps
+  const cronChip = useMemo(() => computeCronChip(eg), [eg.isLoading, eg.isError, eg.data]); // eslint-disable-line react-hooks/exhaustive-deps
+  const errorsChip = computeErrorsChip(errors.data ?? null, errors.isLoading, errors.isError);
 
-  /**
-   * 27 weekly actives means one thing against 84 members and another against
-   * 8,400, so every ACTIVE-WINDOW figure carries its share of the membership.
-   *
-   * The denominator is the SAME totalUsers the Members tile shows - NOT
-   * ops.activation.members_total, which applies its own deleted_at filter and
-   * would put two different member totals on one screen. Returns null while
-   * the total is unresolved: a share of an unknown denominator is not a figure.
-   */
-  const totalMembers = loading ? null : (data?.totalUsers ?? null);
-  const share = (v: number | null | undefined): number | null =>
-    v == null || totalMembers == null || totalMembers <= 0 ? null : (v / totalMembers) * 100;
+  const egD = eg.data;
+  const p = ops.data?.pipeline;
+  const pTone = pipelineTone(p);
+  const errs = ops.data?.errors;
 
-  return (
-    <section
-      className="admin-v2-metric-grid"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-        gap: 10,
-      }}
-    >
-      {/*
-        WAU leads: golfers play once or twice a week, so the weekly window is
-        the headline and DAU is a live pulse beside it. WAU and MAU are
-        distinct rolling counts from the database - never summed from a daily
-        series, which would count a member once per day they appeared.
-      */}
-      <MetricCard
-        label="WAU"
-        value={wLoading ? null : aw!.wau.current}
-        delta={wLoading ? undefined : pctDelta(aw!.wau.current, aw!.wau.previous)}
-        deltaLabel="vs prev 7d"
-        sparkline={aw?.daily.map(d => d.wau)}
-        sharePct={wLoading ? null : share(aw!.wau.current)}
-        to="/admin-v2/analytics?tab=engagement"
-        loading={wLoading}
-      />
-      {/*
-        MIDNIGHT-ANCHORED, and the label says so. Audiences carries a ROLLING
-        24-hour count, which is legitimately a different (larger) number: two
-        cards must never appear to claim the same thing and disagree.
-      */}
-      <MetricCard
-        label="DAU (since midnight)"
-        value={wLoading ? null : aw!.dau.current}
-
-        delta={wLoading ? undefined : pctDelta(aw!.dau.current, aw!.dau.previous)}
-        deltaLabel="vs same day last week"
-        sparkline={aw?.daily.map(d => d.dau)}
-        sharePct={wLoading ? null : share(aw!.dau.current)}
-        to="/admin-v2/analytics?tab=engagement"
-        loading={wLoading}
-      />
-      <MetricCard
-        label="MAU"
-        value={wLoading ? null : aw!.mau.current}
-        delta={wLoading ? undefined : pctDelta(aw!.mau.current, aw!.mau.previous)}
-        deltaLabel="vs prev 30d"
-        sparkline={aw?.daily.map(d => d.mau)}
-        sharePct={wLoading ? null : share(aw!.mau.current)}
-        to="/admin-v2/analytics?tab=engagement"
-        loading={wLoading}
-      />
-      {/*
-        NO SHARE FIGURE HERE. Signups is a FLOW, not a stock: "4 signups, 5% of
-        members" invites a comparison between a week's arrivals and the whole
-        membership that means nothing.
-      */}
-      <MetricCard
-        label="Signups 7d"
-        value={loading ? null : (data?.signups.current ?? 0)}
-        delta={loading ? undefined : pctDelta(data?.signups.current ?? 0, data?.signups.previous ?? 0)}
-        deltaLabel="vs prev 7d"
-        sparkline={data?.signups.sparkline}
-        to="/admin-v2/analytics?tab=growth"
-        loading={loading}
-      />
-      {/*
-        Rounds, not sessions: logging a round is the product's actual action.
-        play_date, never created_at - a handicap connection backfills history.
-        The member count is the reference point: 16 rounds could be one keen
-        golfer or nine.
-      */}
-      <MetricCard
-        label="Rounds 7d"
-        value={opsLoading ? null : (act?.rounds_in_window ?? 0)}
-        delta={opsLoading ? undefined : pctDelta(act?.rounds_in_window ?? 0, act?.rounds_prev_window ?? 0)}
-        deltaLabel={act ? `by ${act.rounds_members} member${act.rounds_members === 1 ? '' : 's'}` : 'vs prev 7d'}
-        sparkline={act?.daily.map((d) => d.n)}
-        to="/admin-v2/analytics?tab=engagement"
-        loading={opsLoading}
-      />
-      <MetricCard
-        label="Posts 7d"
-        value={loading ? null : (data?.posts.current ?? 0)}
-        delta={loading ? undefined : pctDelta(data?.posts.current ?? 0, data?.posts.previous ?? 0)}
-        deltaLabel="vs prev 7d"
-        sparkline={data?.posts.sparkline}
-        to="/admin-v2/analytics?tab=engagement"
-        loading={loading}
-      />
-      <MetricCard
-        label="Reviews 7d"
-        value={loading ? null : (data?.reviews.current ?? 0)}
-        delta={loading ? undefined : pctDelta(data?.reviews.current ?? 0, data?.reviews.previous ?? 0)}
-        deltaLabel="vs prev 7d"
-        sparkline={data?.reviews.sparkline}
-        to="/admin-v2/analytics?tab=engagement"
-        loading={loading}
-      />
-      <MetricCard
-        label="Members"
-        value={loading ? null : (data?.totalUsers ?? 0)}
-        deltaLabel="total"
-        to="/admin-v2/users"
-        loading={loading}
-      />
-    </section>
-  );
-}
-
-
-// ─── Clubhouse feed ───────────────────────────────────────────────────────────
-
-/**
- * Local to-par. NOT imported from the member tokens: that module carries
- * member-surface colours, and pulling it in would couple two palettes.
- * ROUND FIRST, THEN BRANCH - taking the sign before rounding renders "-0.0"
- * on a value fractionally under par.
- */
-function toParParts(gross: number, par: number): { text: string; color: string } {
-  const rounded = Math.round(gross - par);
-  if (rounded === 0) return { text: 'E', color: t.inkMuted };
-  if (rounded < 0) return { text: `\u2212${Math.abs(rounded)}`, color: t.danger };
-  return { text: `+${rounded}`, color: t.ink };
-}
-
-const KIND_LABEL: Record<FeedKind, { text: string; color: string }> = {
-  member: { text: 'JOINED', color: t.ok },
-  post:   { text: 'POST',   color: t.inkFaint },
-  review: { text: 'REVIEW', color: t.ink },
-};
-
-/**
- * 4a CONSECUTIVE, NOT GLOBAL. Runs of the same member in the ALREADY SORTED
- * order collapse; if another member posts between two of Matt's, that is three
- * groups, not two, and the feed stays strictly chronological.
- *
- * 4e Grouping is PRESENTATION and runs AFTER the 8-item slice. The panel does
- * not fetch more to fill the space grouping frees - that would change what
- * "latest 8" means.
- */
-function groupConsecutive(items: FeedItem[]): FeedItem[][] {
-  const groups: FeedItem[][] = [];
-  for (const it of items) {
-    const last = groups[groups.length - 1];
-    if (last && last[0].memberId && last[0].memberId === it.memberId) last.push(it);
-    else groups.push([it]);
-  }
-  return groups;
-}
-
-/**
- * 4d ONE NOUN. Mixed kinds read "{n} items" - never "2 posts and a review",
- * which does not fit the row and reads as a sentence rather than a figure.
- */
-function groupLabel(group: FeedItem[]): string {
-  const kinds = new Set(group.map(g => g.kind));
-  if (kinds.size > 1) return `${group.length} items`;
-  const kind = group[0].kind;
-  if (kind === 'post') return `${group.length} posts`;
-  if (kind === 'review') return `${group.length} reviews`;
-  return `${group.length} items`;
-}
-
-/** 4c/4f One collapsed row per run. Collapsed ALWAYS on mount - the newest
- *  group does not auto-expand, or the panel reverts to its dominated state. */
-function FeedGroup({
-  group, first, onOpenPost, onOpenCourse,
-}: {
-  group: FeedItem[]; first: boolean;
-  onOpenPost: (id: string) => void;
-  onOpenCourse: (id: string) => void;
-}) {
-  const [open, setOpen] = React.useState(false);
-  const head = group[0];
+  const cells: { label: string; tone: ChipTone; value: string | null }[] = [
+    { label: 'EG sync', tone: egChip.tone, value: egD ? `${egD.status_ok_count}/${egD.total_connected}` : null },
+    { label: 'Cron', tone: cronChip.tone, value: egD ? (egD.cron_hours_ago == null ? DASH : formatDurationShort(Math.round(egD.cron_hours_ago) * 3600)) : null },
+    { label: 'Echo', tone: echoChip.tone, value: echo.data ? String(echo.data.latest?.length ?? 0) : null },
+    { label: 'Push', tone: pushChip.tone, value: push.isLoading ? null : pushChip.tone === 'ok' ? 'OK' : pushChip.detail },
+    { label: 'Waiting', tone: ops.isLoading ? 'idle' : pTone, value: p ? fmt(p.unprocessed) : null },
+    {
+      label: 'Errors', tone: errorsChip.tone,
+      value: errs ? (errs.sessions_24h > 0 ? `${((errs.errors_24h / errs.sessions_24h) * 100).toFixed(1)}%` : DASH) : null,
+    },
+  ];
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(v => !v)}
-        aria-expanded={open}
-        style={{
-          display: 'flex', alignItems: 'center', gap: 10, width: '100%',
-          padding: '10px 0', textAlign: 'left', cursor: 'pointer',
-          background: 'transparent', border: 'none',
-          borderTop: first ? 'none' : `1px solid ${t.hairline}`,
-          borderTopStyle: first ? 'none' : 'solid',
-          borderTopWidth: first ? 0 : 1, borderTopColor: t.hairline,
-          color: 'inherit',
-        }}
-      >
-        <SquircleAvatar src={head.avatarUrl} alt={head.memberName} userId={head.memberId} size={28} hairlineRing ringColor={t.line} />
-        <span style={{
-          color: t.ink, fontSize: 13, fontWeight: 700, minWidth: 0,
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        }}>
-          {head.memberName}
-        </span>
-        <span style={{ ...LABEL, flexShrink: 0 }}>{groupLabel(group)}</span>
-        <span style={{ flex: 1 }} />
-        {/* The age of the MOST RECENT item: the group sits where its newest
-            member sits, so any other age would misplace it. */}
-        <span style={{ ...LABEL, ...FIG, flexShrink: 0 }}>{relTime(head.created_at)}</span>
-        <ChevronDown
-          size={14} color={t.inkFaint} aria-hidden
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 4 }}>
+      {cells.map(c => (
+        <button
+          key={c.label}
+          type="button"
+          onClick={() => navigate('/admin-v2/health')}
           style={{
-            flexShrink: 0,
-            transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-            transition: 'transform 160ms ease',
+            background: t.surface, borderRadius: 10, padding: '8px 6px', border: 'none', cursor: 'pointer',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 0,
           }}
-        />
-      </button>
-
-      {open ? (
-        <div style={{ paddingLeft: 38 }}>
-          {group.map((it, i) => (
-            <FeedRow
-              key={it.id} item={it} first={i === 0}
-              onOpenPost={onOpenPost}
-              onOpenCourse={onOpenCourse}
-            />
-          ))}
-        </div>
-      ) : null}
-    </>
+        >
+          <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: toneColor(c.tone) }} />
+          <span style={{ ...FIG, marginTop: 5, fontSize: 12, fontWeight: 800, color: t.ink, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {c.value ?? DASH}
+          </span>
+          <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: t.inkFaint, whiteSpace: 'nowrap' }}>
+            {c.label}
+          </span>
+        </button>
+      ))}
+    </div>
   );
 }
 
-function LatestInClubhouse({
-  items, loading, isError, onRetry,
-}: {
-  items: FeedItem[];
-  loading: boolean; isError: boolean; onRetry: () => void;
-}) {
-  const [openPost, setOpenPost] = React.useState<string | null>(null);
-  const [openCourse, setOpenCourse] = React.useState<string | null>(null);
-  const groups = React.useMemo(() => groupConsecutive(items), [items]);
+// ─── 2 RIGHT NOW ──────────────────────────────────────────────────────────────
 
+function RightNow() {
+  const live = useLiveInApp();
+  const intraday = useRightNowHourly();
+  const aw = useActiveWindows(28);
+
+  const hours = intraday.data ?? [];
+  const peak = hours.reduce((m, h) => (h.today != null && h.today > m ? h.today : m), 0);
+
+  const W = 200, H = 48;
+  const maxY = Math.max(1, ...hours.map(h => Math.max(h.today ?? 0, h.last ?? 0)));
+  const x = (hr: number) => (hr / 23) * W;
+  const y = (v: number) => H - 2 - (v / maxY) * (H - 4);
+  const todayPts = hours.filter(h => h.today != null).map(h => ({ x: x(h.hour), y: y(h.today as number) }));
+  const lastPts = hours.filter(h => h.last != null).map(h => ({ x: x(h.hour), y: y(h.last as number) }));
+  const end = todayPts[todayPts.length - 1];
+
+  const a = aw.data;
+  const awLoading = aw.isLoading;
+  const tiles = a ? [
+    { label: 'DAU', value: fmt(a.dau.current), delta: <Delta current={a.dau.current} previous={a.dau.previous} />, spark: a.daily.slice(-7).map(d => d.dau) },
+    { label: 'WAU', value: fmt(a.wau.current), delta: <Delta current={a.wau.current} previous={a.wau.previous} />, spark: a.daily.map(d => d.wau) },
+    { label: 'MAU', value: fmt(a.mau.current), delta: <Delta current={a.mau.current} previous={a.mau.previous} />, spark: a.daily.map(d => d.mau) },
+    {
+      label: 'Sticky', value: a.stickiness == null ? DASH : `${a.stickiness}%`,
+      delta: <span style={{ color: t.inkMuted }}>WAU/MAU</span>,
+      spark: a.daily.map(d => (d.mau > 0 ? d.wau / d.mau : 0)),
+    },
+  ] : null;
 
   return (
-    <section style={CARD}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
-        <span style={KICKER}>Latest in the clubhouse</span>
-        <Link to="/admin-v2/content" style={{ ...LABEL, color: t.inkMuted, textDecoration: 'none' }}>ALL</Link>
+    <section style={PANEL}>
+      <Header
+        title={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><span aria-hidden style={{ width: 8, height: 8, borderRadius: 999, background: t.ok }} />Right now</span>}
+        meta={<>peak today <span style={{ color: t.ink, fontWeight: 700 }}>{intraday.data ? fmt(peak) : DASH}</span></>}
+      />
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, marginBottom: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+          <span style={{ ...FIG, fontSize: 44, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1, color: t.ink }}>
+            {live.data ? fmt(live.data.count) : DASH}
+          </span>
+          <span style={{ fontSize: 12, color: t.inkMuted }}>live</span>
+        </div>
+        {intraday.isLoading ? <div style={{ width: W }}><Skeleton height={H} radius={8} /></div> : (
+          <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} aria-hidden style={{ display: 'block', flexShrink: 0 }}>
+            {lastPts.length > 1 && <path d={monotonePath(lastPts)} fill="none" stroke={t.inkFaint} strokeWidth={1} strokeDasharray="3 3" />}
+            {todayPts.length > 1 && (
+              <>
+                <path d={`${monotonePath(todayPts)} L${end.x.toFixed(2)},${H} L${todayPts[0].x.toFixed(2)},${H} Z`} fill={AREA} />
+                <path d={monotonePath(todayPts)} fill="none" stroke={t.ink} strokeWidth={1.5} />
+              </>
+            )}
+            {end && <circle cx={end.x} cy={end.y} r={2.5} fill={t.ink} />}
+          </svg>
+        )}
       </div>
-
-      {loading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {[0, 1, 2].map(i => <Skeleton key={i} height={52} />)}
-        </div>
-      ) : isError ? (
-        <AdminErrorState message="Couldn't load recent activity." onRetry={onRetry} />
-      ) : items.length === 0 ? (
-        <EmptyState title="No activity yet" />
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {/* 4b A GROUP OF ONE IS UNCHANGED: no wrapper, no chevron, no
-              expansion - it renders exactly the row it rendered before. */}
-          {groups.map((g, idx) => (
-            g.length === 1 ? (
-              <FeedRow
-                key={g[0].id} item={g[0]} first={idx === 0}
-                onOpenPost={setOpenPost}
-                onOpenCourse={setOpenCourse}
-              />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 6 }}>
+        {(tiles ?? ['DAU', 'WAU', 'MAU', 'Sticky'].map(label => ({ label, value: null, delta: null, spark: [] as number[] }))).map(tile => (
+          <div key={tile.label} style={{ background: RAISED, borderRadius: 10, padding: '10px 10px 8px', minWidth: 0 }}>
+            <div style={MINI_LABEL}>{tile.label}</div>
+            {awLoading || !tiles ? (
+              <div style={{ marginTop: 4 }}><Skeleton height={44} radius={6} /></div>
             ) : (
-              <FeedGroup
-                key={`group:${g[0].id}`} group={g} first={idx === 0}
-                onOpenPost={setOpenPost}
-                onOpenCourse={setOpenCourse}
-              />
-            )
-          ))}
-        </div>
-      )}
-
-      <PostInsightSheet postId={openPost} open={!!openPost} onClose={() => setOpenPost(null)} />
-      <CourseInsightSheet courseId={openCourse} open={!!openCourse} onClose={() => setOpenCourse(null)} />
+              <>
+                <div style={{ ...FIG, fontSize: 18, fontWeight: 800, letterSpacing: '-0.02em', color: t.ink, marginTop: 2 }}>{tile.value}</div>
+                <div style={{ ...FIG, fontSize: 10, fontWeight: 700, whiteSpace: 'nowrap' }}>{tile.delta}</div>
+                <div style={{ marginTop: 6 }}><Spark values={tile.spark} height={16} color={t.inkMuted} /></div>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
 
-function FeedRow({
-  item, first, onOpenPost, onOpenCourse,
-}: {
-  item: FeedItem; first: boolean;
-  onOpenPost: (id: string) => void;
-  onOpenCourse: (id: string) => void;
-}) {
-  // Post rows -> post insight sheet; review rows -> course insight sheet.
-  const opensSheet =
-    (item.kind === 'post' && !!item.postId) ||
-    (item.kind === 'review' && !!item.courseId);
+// ─── 3 DO NOW ─────────────────────────────────────────────────────────────────
 
-  const rowStyle: React.CSSProperties = {
-    display: 'flex', alignItems: 'flex-start', gap: 10,
-    padding: '10px 0',
-    borderTop: first ? 'none' : `1px solid ${t.hairline}`,
-    textDecoration: 'none', color: 'inherit',
-    background: 'transparent', border: 'none', width: '100%', textAlign: 'left',
-    cursor: 'pointer',
-  };
+const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
-  const kind = KIND_LABEL[item.kind];
-  const round = item.round;
+function DoNow({ data, loading, failed }: CCProps) {
+  const d = data?.do_now;
+  const inboxCount = d ? d.inbox.claims + d.inbox.course_requests + d.inbox.tickets : 0;
+  const total = d ? d.stuck_rounds.members + d.played_not_connected.members + d.gone_quiet.members + inboxCount : null;
+  const firstQuiet = d?.gone_quiet.names[0]?.user_id;
 
-  const inner = (
-    <>
-      {/* The avatar belongs to the MEMBER, always: `subject` is the COURSE on a
-          review row, so alt is memberName. SquircleAvatar always occupies the
-          28px slot, so rows align with and without a photo. */}
-      <SquircleAvatar src={item.avatarUrl} alt={item.memberName} userId={item.memberId} size={28} hairlineRing ringColor={t.line} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, minWidth: 0 }}>
-          <span style={{ color: t.ink, fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {item.subject}
-          </span>
-          <span style={{ ...LABEL, color: kind.color, flexShrink: 0 }}>{kind.text}</span>
-        </div>
-        {item.body && (
-          <div
-            style={{
-              color: t.inkMuted, fontSize: 13, marginTop: 2,
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            }}
-          >
-            {item.body}
-          </div>
-        )}
-        {(item.warnings.length > 0 || item.meta.length > 0 || round) && (
-          <div
-            style={{
-              ...LABEL, ...FIG, marginTop: 3,
-              display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 8,
-            }}
-          >
-            {item.warnings.map(w => (
-              <span key={w} style={{ color: t.dangerText, fontWeight: 700 }}>{w}</span>
-            ))}
-            {item.meta.map(mt => <span key={mt}>{mt}</span>)}
-            {round && (() => {
-              const p = toParParts(round.gross, round.par);
-              return (
-                <span style={{ color: t.inkMuted }}>
-                  <span style={{ color: t.ink, fontWeight: 700 }}>{round.gross}</span>{' '}
-                  <span style={{ color: p.color, fontWeight: 700 }}>{p.text}</span>
-                  {round.courseName ? ` - ${round.courseName}` : ''}
-                </span>
-              );
-            })()}
-          </div>
-        )}
-      </div>
-      {/* 4.2a Right rail: age only. Nothing else may sit in this column. */}
-      <span style={{ ...LABEL, ...FIG, flexShrink: 0, marginTop: 1 }}>{relTime(item.created_at)}</span>
-      <ChevronRight size={14} color={t.inkFaint} style={{ marginTop: 1, flexShrink: 0 }} />
-    </>
-  );
-
-  if (opensSheet) {
-    return (
-      <button
-        type="button"
-        onClick={() => {
-          if (item.kind === 'post' && item.postId) onOpenPost(item.postId);
-          else if (item.kind === 'review' && item.courseId) onOpenCourse(item.courseId);
-        }}
-        style={{ ...rowStyle, borderTopStyle: first ? 'none' : 'solid', borderTopWidth: first ? 0 : 1, borderTopColor: t.hairline }}
-      >
-        {inner}
-      </button>
-    );
-  }
+  const rows = d ? [
+    { count: d.stuck_rounds.rounds, color: t.dangerText, label: 'Rounds stuck · unmatched course', sub: plural(d.stuck_rounds.members, 'member'), age: d.stuck_rounds.oldest_days, button: 'MATCH', filled: true, to: '/admin-v2/inbox?queue=unmatched' },
+    // No bulk-message composer exists in admin; NUDGE opens the not-connected member list.
+    { count: d.played_not_connected.members, color: t.warnText, label: 'Played, not connected', sub: 'this week', age: d.played_not_connected.oldest_days, button: 'NUDGE', filled: false, to: '/admin-v2/users?filter=not_connected' },
+    // No "quiet" member filter exists; DM opens the longest-silent member.
+    { count: d.gone_quiet.members, color: t.warnText, label: 'Regulars gone quiet', sub: 'weekly → 10d+ silent', age: d.gone_quiet.oldest_days, button: 'DM', filled: false, to: firstQuiet ? `/admin-v2/users?member=${firstQuiet}` : '/admin-v2/users' },
+    {
+      count: inboxCount, color: t.inkMuted, label: 'Inbox',
+      sub: `${plural(d.inbox.claims, 'claim')} · ${plural(d.inbox.course_requests, 'request')} · ${plural(d.inbox.tickets, 'ticket')}`,
+      age: d.inbox.oldest_days, button: 'OPEN', filled: false, to: '/admin-v2/inbox',
+    },
+  ] : [];
 
   return (
-    <Link to={item.href} style={rowStyle}>
-      {inner}
-    </Link>
+    <section style={LIST_PANEL}>
+      <Header list title="Do now" meta={total == null ? null : <><span style={{ color: t.ink, fontWeight: 700 }}>{fmt(total)}</span> members</>} />
+      {loading || failed ? (
+        <div style={{ padding: '0 16px 10px' }}><Body height={4 * 50 - 10} loading={loading} failed={failed}>{() => null}</Body></div>
+      ) : rows.map(r => {
+        const zero = r.count === 0;
+        return (
+          <div key={r.label} style={{ display: 'grid', gridTemplateColumns: '34px minmax(0,1fr) 54px auto', columnGap: 10, alignItems: 'center', padding: '10px 16px', borderTop: `1px solid ${t.hairline}` }}>
+            <span style={{ ...FIG, fontSize: 20, fontWeight: 800, letterSpacing: '-0.02em', color: zero ? t.inkFaint : r.color }}>{fmt(r.count)}</span>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: t.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.label}</div>
+              <div style={{ ...FIG, fontSize: 10.5, color: t.inkFaint, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.sub}</div>
+            </div>
+            <span style={{ ...FIG, fontSize: 11, fontWeight: 700, textAlign: 'right', color: r.age >= 14 ? t.dangerText : t.inkMuted }}>{r.age}d</span>
+            <Link
+              to={r.to}
+              aria-disabled={zero}
+              onClick={zero ? (e) => e.preventDefault() : undefined}
+              style={{
+                width: 64, height: 30, borderRadius: 999, fontSize: 11.5, fontWeight: 700, textDecoration: 'none',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box',
+                background: r.filled ? t.brand : 'transparent',
+                color: r.filled ? t.canvas : t.ink,
+                border: r.filled ? 'none' : `1px solid ${t.line}`,
+                opacity: zero ? 0.5 : 1,
+                pointerEvents: zero ? 'none' : undefined,
+              }}
+            >
+              {r.button}
+            </Link>
+          </div>
+        );
+      })}
+    </section>
   );
 }
 
+// ─── 4 THE LOOP ───────────────────────────────────────────────────────────────
 
+function TheLoop({ data, loading, failed }: CCProps) {
+  const l = data?.loop;
+  const rows = l ? [
+    { label: 'Joined', v: l.joined },
+    { label: 'Connected', v: l.connected, red: true },
+    { label: 'Round in', v: l.round_in },
+    { label: 'Posted', v: l.posted },
+    { label: 'Weekly', v: l.weekly },
+  ] : [];
+  const pct = (v: number | null) => (v == null ? DASH : `${v}%`);
+
+  return (
+    <section style={PANEL}>
+      <Header title="The loop" meta="all members" />
+      <Body height={5 * 14 + 4 * 7 + 70} loading={loading} failed={failed}>{() => (
+        <>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+            {rows.map((r, i) => {
+              const prev = i > 0 ? rows[i - 1].v : null;
+              const step = prev == null ? '' : prev > 0 ? `${Math.round((r.v / prev) * 100)}%` : DASH;
+              const w = l!.joined > 0 ? Math.min(100, (r.v / l!.joined) * 100) : 0;
+              return (
+                <div key={r.label} style={{ display: 'grid', gridTemplateColumns: '64px minmax(0,1fr) 36px 40px', columnGap: 8, alignItems: 'center' }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: t.inkFaint, whiteSpace: 'nowrap' }}>{r.label}</span>
+                  <div style={{ height: 14, borderRadius: 4, background: TRACK, overflow: 'hidden' }}>
+                    <div style={{ width: `${w}%`, height: '100%', borderRadius: 4, background: r.red ? t.danger : t.ink }} />
+                  </div>
+                  <span style={{ ...FIG, fontSize: 13, fontWeight: 800, textAlign: 'right', color: r.red ? t.dangerText : t.ink }}>{fmt(r.v)}</span>
+                  <span style={{ ...FIG, fontSize: 10, fontWeight: 700, textAlign: 'right', color: r.red ? t.dangerText : t.okText }}>{step}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ borderTop: `1px solid ${t.hairline}`, marginTop: 12, paddingTop: 12, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 8 }}>
+            {[
+              { label: 'Never connected', v: fmt(l!.never_connected), c: t.dangerText },
+              { label: 'D30 · connected', v: pct(l!.d30_connected_pct), c: t.ink },
+              { label: 'D30 · not', v: pct(l!.d30_not_connected_pct), c: t.ink },
+            ].map(c => (
+              <div key={c.label} style={{ minWidth: 0 }}>
+                <div style={MINI_LABEL}>{c.label}</div>
+                <div style={{ ...FIG, fontSize: 18, fontWeight: 800, color: c.c, marginTop: 2 }}>{c.v}</div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}</Body>
+    </section>
+  );
+}
+
+// ─── 5 THE MOAT ───────────────────────────────────────────────────────────────
+
+function TheMoat({ data, loading, failed }: CCProps) {
+  const m = data?.moat;
+  const roundsCum = m ? cumulative(m.rounds_daily_28) : [];
+  const cells = m ? [
+    { label: 'Rounds', v: m.rounds_total, right: <span style={{ color: t.okText }}>+{fmt(m.rounds_7d)}</span>, spark: roundsCum },
+    // No daily holes series exists; the rounds cumulative carries the shape.
+    { label: 'Holes', v: m.holes_total, right: <span style={{ color: t.okText }}>+{fmt(m.holes_7d)}</span>, spark: roundsCum },
+    { label: 'Courses played', v: m.courses_played, right: <span style={{ color: t.inkFaint }}>of {fmt(m.catalogue_total)}</span>, spark: m.courses_played_daily_28.map(d => d.cumulative) },
+    { label: 'Reviews', v: m.reviews_total, right: <span style={{ color: t.okText }}>+{fmt(m.reviews_7d)}</span>, spark: cumulative(m.reviews_daily_28) },
+  ] : [];
+
+  return (
+    <section style={PANEL}>
+      <Header title="The moat" meta="all time · 28d" />
+      <Body height={2 * 78 + 8} loading={loading} failed={failed}>{() => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0,1fr))', gap: 8 }}>
+          {cells.map(c => (
+            <div key={c.label} style={{ background: RAISED, borderRadius: 12, padding: '10px 12px 8px', minWidth: 0 }}>
+              <div style={MINI_LABEL}>{c.label}</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 6, marginTop: 2 }}>
+                <span style={{ ...FIG, fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', color: t.ink }}>{fmt(c.v)}</span>
+                <span style={{ ...FIG, fontSize: 10.5, fontWeight: 700, whiteSpace: 'nowrap' }}>{c.right}</span>
+              </div>
+              <div style={{ marginTop: 6 }}><Spark values={c.spark} height={22} color={t.ink} width={1.3} /></div>
+            </div>
+          ))}
+        </div>
+      )}</Body>
+    </section>
+  );
+}
+
+// ─── 6 GROWTH  |  7 ROUNDS ────────────────────────────────────────────────────
+
+const HALF: React.CSSProperties = { background: t.surface, borderRadius: 16, padding: '14px 14px 12px', minWidth: 0 };
+
+function HalfHeader({ title, sub }: { title: string; sub: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 10 }}>
+      <span style={TITLE}>{title}</span>
+      <span style={{ fontSize: 10, color: t.inkFaint, whiteSpace: 'nowrap' }}>{sub}</span>
+    </div>
+  );
+}
+
+function Growth({ data, loading, failed }: CCProps) {
+  const g = data?.growth;
+  return (
+    <section style={HALF}>
+      <HalfHeader title="Growth" sub="7d" />
+      <Body height={80} loading={loading} failed={failed}>{() => (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0,1fr))', gap: 8 }}>
+            <div>
+              <div style={MINI_LABEL}>Signups</div>
+              <div style={{ ...FIG, fontSize: 20, fontWeight: 800, color: t.ink }}>{fmt(g!.signups_7d)}</div>
+              <div style={{ ...FIG, fontSize: 10, fontWeight: 700 }}><Delta current={g!.signups_7d} previous={g!.signups_prev_7d} /></div>
+            </div>
+            <div>
+              <div style={MINI_LABEL}>Invited</div>
+              <div style={{ ...FIG, fontSize: 20, fontWeight: 800, color: t.ink }}>{fmt(g!.invites_sent_7d)}</div>
+              <div style={{ ...FIG, fontSize: 10, fontWeight: 700, color: t.inkMuted }}>{fmt(g!.invites_joined_7d)} joined</div>
+            </div>
+          </div>
+          <div style={{ marginTop: 8 }}><Spark values={g!.signups_daily_14.map(d => d.n)} height={28} color={t.ink} width={1.3} /></div>
+        </>
+      )}</Body>
+    </section>
+  );
+}
+
+const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+function RoundsByDay({ data, loading, failed }: CCProps) {
+  const byDow = Array(7).fill(0) as number[];
+  for (const r of data?.rounds_by_day ?? []) if (r.dow >= 0 && r.dow < 7) byDow[r.dow] += r.n;
+  const max = Math.max(1, ...byDow);
+  const barColor = (i: number) => (i === 6 ? t.brand : i === 5 ? t.ink : t.inkMuted);
+
+  return (
+    <section style={HALF}>
+      <HalfHeader title="Rounds" sub="by day · 7d" />
+      <Body height={80} loading={loading} failed={failed}>{() => (
+        <>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexWrap: 'nowrap', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+            <span style={{ ...FIG, fontSize: 20, fontWeight: 800, color: t.ink }}>{fmt(data!.moat.rounds_7d)}</span>
+            <span style={{ ...FIG, fontSize: 10, fontWeight: 700 }}><Delta current={data!.moat.rounds_7d} previous={data!.rounds_prev_7d} /></span>
+            <span style={{ ...FIG, fontSize: 10, color: t.inkFaint }}>· {fmt(data!.rounds_7d_members)} members</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 34, marginTop: 8 }}>
+            {byDow.map((n, i) => (
+              <div key={i} style={{ flex: 1, height: `${(n / max) * 100}%`, minHeight: n > 0 ? 2 : 0, background: barColor(i), borderRadius: '3px 3px 0 0' }} />
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 3, marginTop: 4 }}>
+            {DAY_LETTERS.map((l, i) => (
+              <span key={i} style={{ flex: 1, textAlign: 'center', fontSize: 8.5, fontWeight: 700, color: i === 6 ? t.brandText : t.inkFaint }}>{l}</span>
+            ))}
+          </div>
+        </>
+      )}</Body>
+    </section>
+  );
+}
+
+// ─── 8 CLUBHOUSE ──────────────────────────────────────────────────────────────
+
+function toParText(n: number): string {
+  if (n === 0) return 'E';
+  return n > 0 ? `+${n}` : `${MINUS}${Math.abs(n)}`;
+}
+
+function initials(name: string | null): string {
+  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
+  return (parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '') || '·';
+}
+
+function Clubhouse({ data, loading, failed }: CCProps) {
+  const [openPost, setOpenPost] = useState<string | null>(null);
+  const c = data?.clubhouse;
+  const figs = c ? [
+    { label: 'Posts', v: fmt(c.posts_7d), sub: <Delta current={c.posts_7d} previous={c.posts_prev_7d} />, color: t.ink },
+    { label: 'Reactions', v: fmt(c.reactions_7d), sub: <span style={{ color: t.inkMuted }}>per post {c.reactions_per_post.toFixed(1)}</span>, color: t.ink },
+    { label: 'Reviews', v: fmt(c.reviews_7d), sub: <Delta current={c.reviews_7d} previous={c.reviews_prev_7d} />, color: t.ink },
+    { label: 'Unseen', v: fmt(c.unseen_7d), sub: <span style={{ color: t.inkMuted }}>0 reactions</span>, color: t.dangerText },
+  ] : [];
+
+  return (
+    <section style={LIST_PANEL}>
+      <Header list title="Clubhouse" meta="7d" />
+      {loading || failed ? (
+        <div style={{ padding: '0 16px 10px' }}><Body height={56 + 5 * 46} loading={loading} failed={failed}>{() => null}</Body></div>
+      ) : (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 8, padding: '0 16px 12px' }}>
+            {figs.map(f => (
+              <div key={f.label} style={{ minWidth: 0 }}>
+                <div style={MINI_LABEL}>{f.label}</div>
+                <div style={{ ...FIG, fontSize: 18, fontWeight: 800, color: f.color }}>{f.v}</div>
+                <div style={{ ...FIG, fontSize: 10, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{f.sub}</div>
+              </div>
+            ))}
+          </div>
+          {c!.top.map(r => {
+            const nameColor = r.unseen ? t.dangerText : t.ink;
+            return (
+              <button
+                key={r.post_id}
+                type="button"
+                onClick={() => setOpenPost(r.post_id)}
+                style={{
+                  display: 'grid', gridTemplateColumns: '28px minmax(0,1fr) 58px auto', columnGap: 10, alignItems: 'center',
+                  width: '100%', padding: '9px 16px', borderTop: `1px solid ${t.hairline}`, borderLeft: 'none', borderRight: 'none', borderBottom: 'none',
+                  background: 'transparent', cursor: 'pointer', textAlign: 'left',
+                }}
+              >
+                {r.avatar_url ? (
+                  <img src={r.avatar_url} alt="" style={{ width: 28, height: 28, borderRadius: 8, objectFit: 'cover', display: 'block' }} />
+                ) : (
+                  <span aria-hidden style={{ width: 28, height: 28, borderRadius: 8, background: AVATAR_GROUND, color: t.inkMuted, fontSize: 11, fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textTransform: 'uppercase' }}>
+                    {initials(r.display_name)}
+                  </span>
+                )}
+                <span style={{ fontSize: 13, fontWeight: 600, color: nameColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {r.display_name ?? DASH}
+                </span>
+                <span style={{ ...FIG, fontSize: 11, color: r.unseen ? t.dangerText : t.inkFaint, textAlign: 'right' }}>
+                  {r.like_count} · {r.comment_count}
+                </span>
+                <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 3 }}>
+                  <span style={{ ...FIG, width: 24, textAlign: 'right', fontSize: 17, fontWeight: 800, color: t.ink }}>{r.gross ?? DASH}</span>
+                  <span style={{ ...FIG, width: 22, textAlign: 'left', fontSize: 10.5, fontWeight: 700, color: r.to_par != null && r.to_par < 0 ? t.dangerText : t.inkMuted }}>
+                    {r.gross != null && r.to_par != null ? toParText(r.to_par) : ''}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
+        </>
+      )}
+      <PostInsightSheet postId={openPost} open={!!openPost} onClose={() => setOpenPost(null)} />
+    </section>
+  );
+}
+
+// ─── 9 RETENTION ──────────────────────────────────────────────────────────────
+
+function RetentionCard() {
+  const r = useRetention(56);
+  const c = r.data?.cohort;
+  const daily = r.data?.daily ?? [];
+  const max = Math.max(1, ...daily.map(d => d.returning ?? 0));
+  const cols = c ? [
+    { label: 'D1', ret: c.d1_returned, el: c.d1_eligible },
+    { label: 'D7', ret: c.d7_returned, el: c.d7_eligible },
+    { label: 'D30', ret: c.d30_returned, el: c.d30_eligible },
+  ] : [];
+  const day = (iso?: string) => (iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '');
+
+  return (
+    <section style={PANEL}>
+      <Header title="Retention" meta="28d cohorts" />
+      <Body height={44 + 44 + 30} loading={r.isLoading} failed={r.isError || (r.isFetched && !c)}>{() => (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 8 }}>
+            {cols.map(col => (
+              <div key={col.label}>
+                <div style={MINI_LABEL}>{col.label}</div>
+                <div style={{ ...FIG, fontSize: 20, fontWeight: 800, color: t.ink }}>{col.el > 0 ? `${Math.round((col.ret / col.el) * 100)}%` : DASH}</div>
+                <div style={{ ...FIG, fontSize: 10, color: t.inkFaint }}>{fmt(col.ret)} of {fmt(col.el)}</div>
+              </div>
+            ))}
+          </div>
+          {daily.length > 0 && (
+            <>
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 44, marginTop: 12 }}>
+                {daily.map(d => (
+                  <div key={d.date} style={{ flex: 1, minWidth: 0, height: `${((d.returning ?? 0) / max) * 100}%`, background: t.ink, borderRadius: '2px 2px 0 0' }} />
+                ))}
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+                <span style={{ ...FIG, fontSize: 9.5, fontWeight: 700, color: t.inkFaint }}>{day(daily[0]?.date)}</span>
+                <span style={{ ...FIG, fontSize: 9.5, fontWeight: 700, color: t.inkFaint }}>{day(daily[daily.length - 1]?.date)}</span>
+              </div>
+            </>
+          )}
+        </>
+      )}</Body>
+    </section>
+  );
+}

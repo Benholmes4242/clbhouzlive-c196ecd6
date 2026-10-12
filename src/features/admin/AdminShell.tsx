@@ -19,7 +19,7 @@ const HealthPage = lazy(() => import('./pages/HealthPage'));
 const InboxPage = lazy(() => import('./pages/InboxPage'));
 
 const SECTION_TITLES: Record<string, string> = {
-  dashboard:  'Dashboard',
+  dashboard:  'Command centre',
   inbox:      'Inbox',
   users:      'Members',
   content:    'Content',
