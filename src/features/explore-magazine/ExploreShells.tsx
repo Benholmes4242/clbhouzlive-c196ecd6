@@ -87,6 +87,11 @@ export function PairShell() {
  * N.3 — the Quick hits GRID shell. A skeleton may only expand into the layout
  * it stands in for, so on the grid chip the shell is the grid itself: same
  * columns, gap, inset, 9:16 cells and radius, with caption lines under each.
+ *
+ * P.1: no heading here — WatchFeed renders the real Section above it.
+ * P.2: TWO caption lines per cell, deliberately, not three. The skeleton cannot
+ * know which tiles carry a course line; shorter than content expands outwards
+ * (allowed), taller would collapse inwards (forbidden). Do not "tidy" to three.
  */
 export function GridShell({ inset, radius, cells = 6 }: { inset: number; radius: number; cells?: number }) {
   return (
@@ -106,13 +111,16 @@ export function GridShell({ inset, radius, cells = 6 }: { inset: number; radius:
   );
 }
 
-export function ShelfShell({ tileW, tileH }: { tileW: number; tileH: number }) {
+/** `heading={false}` only where the caller already renders the real heading (Watch Quick hits). */
+export function ShelfShell({ tileW, tileH, heading = true }: { tileW: number; tileH: number; heading?: boolean }) {
   return (
     <div aria-hidden style={{ fontFamily: SANS }}>
-      <div style={{ padding: '0 16px' }}>
-        <Line width={148} height={14} />
-      </div>
-      <div style={{ marginTop: 10, display: 'flex', gap: 8, padding: '0 16px', overflow: 'hidden' }}>
+      {heading ? (
+        <div style={{ padding: '0 16px' }}>
+          <Line width={148} height={14} />
+        </div>
+      ) : null}
+      <div style={{ marginTop: heading ? 10 : 0, display: 'flex', gap: 8, padding: '0 16px', overflow: 'hidden' }}>
         {[0, 1, 2].map((index) => (
           <div
             key={index}
