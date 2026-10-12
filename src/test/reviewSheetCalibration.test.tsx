@@ -114,9 +114,9 @@ describe('category ticks', () => {
 });
 
 describe('reviewer line', () => {
-  it('reads Played n months ago and no avg', () => {
+  it('reads Reviewed n months ago and no avg', () => {
     sheet({ count: 3, reviewerAvg: 7.6 });
-    expect(screen.getByText('Played 9 months ago')).toBeTruthy();
+    expect(screen.getByText('Reviewed 9 months ago')).toBeTruthy();
     expect(document.body.textContent).not.toMatch(/avg \d/);
   });
   it('never falls back to a join year', () => {
@@ -141,5 +141,14 @@ describe('see-all row and footer', () => {
     expect(foot.querySelectorAll('button').length).toBe(2);
     expect(foot.querySelector('[data-review-share]')).toBeNull();
     expect(foot.textContent).toContain('mikem84');
+  });
+});
+
+import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayload';
+describe('review sheet followup', () => {
+  it('payload never treats the post date as the review date', () => {
+    const p = buildReviewSheetPayload({ id: 'p', isReview: true, createdAt: '2026-01-01T00:00:00Z', review: { reviewId: 'r', courseId: 'c', courseName: 'X', courseImageUrl: null, rating: 8 } } as never);
+    expect(p?.reviewDate).toBeUndefined();
+    expect(p?.postDate).toBe('2026-01-01T00:00:00Z');
   });
 });
