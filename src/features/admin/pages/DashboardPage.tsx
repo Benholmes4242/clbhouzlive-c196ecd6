@@ -336,13 +336,14 @@ function TheLoop({ data, loading, failed }: CCProps) {
 
   return (
     <section style={PANEL}>
-      <Header title="The loop" meta="all members" />
+      <Header title="The loop" meta="share of all members" />
       <Body height={5 * 14 + 4 * 7 + 70} loading={loading} failed={failed}>{() => (
         <>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-            {rows.map((r, i) => {
-              const prev = i > 0 ? rows[i - 1].v : null;
-              const step = prev == null ? '' : prev > 0 ? `${Math.round((r.v / prev) * 100)}%` : DASH;
+            {rows.map((r) => {
+              // Percentage is the row's figure as a share of JOINED, never of the row
+              // above — the bar fill is drawn against joined, so number and bar agree.
+              const share = r.label === 'Joined' ? '' : l!.joined > 0 ? `${Math.round((r.v / l!.joined) * 100)}%` : DASH;
               const w = l!.joined > 0 ? Math.min(100, (r.v / l!.joined) * 100) : 0;
               return (
                 <div key={r.label} style={{ display: 'grid', gridTemplateColumns: '64px minmax(0,1fr) 36px 40px', columnGap: 8, alignItems: 'center' }}>
@@ -351,7 +352,7 @@ function TheLoop({ data, loading, failed }: CCProps) {
                     <div style={{ width: `${w}%`, height: '100%', borderRadius: 4, background: r.red ? t.danger : t.ink }} />
                   </div>
                   <span style={{ ...FIG, fontSize: 13, fontWeight: 800, textAlign: 'right', color: r.red ? t.dangerText : t.ink }}>{fmt(r.v)}</span>
-                  <span style={{ ...FIG, fontSize: 10, fontWeight: 700, textAlign: 'right', color: r.red ? t.dangerText : t.okText }}>{step}</span>
+                  <span style={{ ...FIG, fontSize: 10, fontWeight: 700, textAlign: 'right', color: r.red ? t.dangerText : t.inkMuted }}>{share}</span>
                 </div>
               );
             })}
