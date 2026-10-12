@@ -2,12 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { invalidateAdminQueues, subscribeAdminQueueChanges, refreshAdminQueues } from '@/features/admin/lib/adminQueueRefresh';
-import { ChevronRight, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { LABEL } from '@/lib/tokens/type';
-import { courseMatchLabel } from '../lib/geography';
 import {
-  CandidateCountryFlag,
   CountryMismatchWarning,
   WhsCountryChip,
 } from '../components/CountryMismatchWarning';
@@ -16,7 +13,6 @@ import { useInboxFeed, type InboxItem, type InboxType } from '../hooks/useInboxF
 // Seconds in. The Dashboard's System panel uses this exact formatter, so an age
 // reads identically on both surfaces.
 import { formatDurationShort } from '../lib/chartPrimitives';
-import EmptyState from '../components/EmptyState';
 import AdminAccessDenied from '../components/AdminAccessDenied';
 import ModerationDetailDrawer from '../components/ModerationDetailDrawer';
 import AppealDetailDrawer from '../components/AppealDetailDrawer';
@@ -34,7 +30,7 @@ import { OpenDoneControl, FigureTiles, QueueChips, RowSkeleton, FlowPanel, ToolR
 import { useInboxFlow } from '../hooks/useInboxFlow';
 import { orderOpenItems, summariseQueues } from '../lib/inboxQueue';
 import { LIST_PANEL } from '../lib/panels';
-import CourseSearchField, { useCourseSearch, type CourseSearchHit } from '../components/CourseSearchField';
+import CourseSearchField, { useCourseSearch } from '../components/CourseSearchField';
 import { uploadCoursePhoto } from '../hooks/useCourses';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
@@ -560,9 +556,6 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
     setQuery(row.echo_suggestion ?? (row.whs_course_name ?? '').split('-')[0].trim());
   }, [whsId]);
 
-  const { hits: rawHits, searching, error: searchError } = useCourseSearch(query, { enabled: !!row });
-  const hits = rawHits as CourseHit[];
-  useEffect(() => { if (searchError) setErr(searchError); }, [searchError]);
 
   if (!row) return null;
 
@@ -661,51 +654,16 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
         {chosen && (
           <CountryMismatchWarning whsCountry={row.whs_country_name} subCountry={chosen.sub_country} />
         )}
-        <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase', color: t.inkFaint }}>
-          Search courses
-        </label>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Club name..."
-          style={{
-            padding: '10px 12px', borderRadius: t.radius.md,
-            border: `1px solid ${t.line}`, background: t.surface, color: t.ink,
-            fontSize: 13, outline: 'none',
-          }}
-        />
-        {searching ? (
-          <div style={{ color: t.inkMuted, fontSize: 12 }}>Searching...</div>
-        ) : hits.length === 0 ? (
-          <div style={{ color: t.inkMuted, fontSize: 12 }}>
-            {query.trim().length < 2 ? 'Type at least 2 characters.' : 'No matches.'}
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {hits.map((h) => {
-              const active = chosen?.id === h.id;
-              return (
-                <button
-                  key={h.id}
-                  onClick={() => setChosen(h)}
-                  style={{
-                    textAlign: 'left', padding: '10px 12px', borderRadius: t.radius.md,
-                    border: `1px solid ${active ? t.brand : t.line}`,
-                    background: active ? t.brandSoft ?? t.canvas : t.surface,
-                    cursor: 'pointer',
-                  }}
-                >
-                  <div style={{ fontSize: 13, fontWeight: 600, color: t.ink }}>{h.name}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', fontSize: 11, color: t.inkMuted }}>
-                    {courseMatchLabel(h) || '-'}
-                    <CandidateCountryFlag whsCountry={row.whs_country_name} subCountry={h.sub_country} />
-                  </div>
-                </button>
-              );
-            })}
+        {chosen && (
+          <div style={{ fontSize: 13, color: t.ink }}>
+            Link to: <b>{chosen.name}</b>
           </div>
         )}
+        <CourseSearchField
+          placeholder="Search courses"
+          initialQuery={query}
+          onPick={(hit) => setChosen(hit as CourseHit)}
+        />
         {err && (
           <div style={{
             padding: '8px 10px', borderRadius: t.radius.md,
