@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MemoryRouter } from 'react-router-dom';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { REVIEW_CARD_MAX_HEIGHT, againstCourse, joinClauses } from '@/components/feed/reviewPostCard';
 
@@ -27,9 +28,9 @@ function card(rating: number, breakdown: Record<string, number | null>, text = '
     review: { reviewId: 'r', courseId: 'c', courseName: 'Course', courseImageUrl: null, rating, reviewText: text, breakdown },
   } as never;
   return render(
-    <QueryClientProvider client={new QueryClient()}>
+    <MemoryRouter><QueryClientProvider client={new QueryClient()}>
       <ReviewPostCard post={post} articleRef={() => {}} surface={A.PANEL} onProfile={vi.fn()} onReadReview={vi.fn()} onPrefetch={vi.fn()} footer={null} />
-    </QueryClientProvider>,
+    </QueryClientProvider></MemoryRouter>,
   ).container;
 }
 const all = { design: 9, conditions: 8.9, clubhouse: 7, facilities: 6 };
