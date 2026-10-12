@@ -11,7 +11,7 @@ import ActorCards from '@/features/profile-sheet-v2/components/ActorCards';
 import FormCard from '@/features/profile-sheet-v2/components/FormCard';
 import CoursesCard from '@/features/profile-sheet-v2/components/CoursesCard';
 import {
-  deriveSheetHcpState, handicapSentence, formBars, courseFigures, type SheetHcpState,
+  deriveSheetHcpState, isSyncFailing, handicapSentence, formBars, courseFigures, type SheetHcpState,
 } from '@/features/profile-sheet-v2/sheetState';
 
 beforeAll(() => {
@@ -124,5 +124,37 @@ describe('profile sheet parts', () => {
     expect(courseFigures([])).toBeNull();
     const { container } = render(<CoursesCard figures={null} onOpen={() => {}} />);
     expect(container.innerHTML).toBe('');
+  });
+});
+
+describe('profile sheet corrections (V)', () => {
+  it('V.2 no eg index but a trend current figure renders the index card, not syncing', () => {
+    const s = deriveSheetHcpState({ ...base, connection: { provider: 'england_golf' }, trendCurrent: 3.4 });
+    expect(s).toEqual({ kind: 'ready', index: 3.4 });
+    const { container } = render(
+      <SheetCards state={s} history90={[]} bars={bars} courses={courses}
+        onNavigate={() => {}} onOpenCourseAnalytics={() => {}} now={Date.parse('2026-10-12')} />,
+    );
+    expect(container.querySelector('[data-card="handicap"]')).not.toBeNull();
+    expect(container.querySelector('[data-card="syncing"]')).toBeNull();
+  });
+
+  it('V.1 the form door and the index door resolve to different routes', () => {
+    const go = vi.fn();
+    const { getByText } = render(
+      <SheetCards state={{ kind: 'ready', index: 1.6 }} history90={history} bars={bars} courses={courses}
+        onNavigate={go} onOpenCourseAnalytics={() => {}} now={Date.parse('2026-10-12')} />,
+    );
+    getByText('Your rounds').click();
+    getByText('View handicap').click();
+    expect(go.mock.calls[0][0]).toBe('/profile?tab=rounds');
+    expect(go.mock.calls[1][0]).toBe('/handicap');
+    expect(go.mock.calls[0][0]).not.toBe(go.mock.calls[1][0]);
+  });
+
+  it('V.3 sync failure matches the written statuses exactly', () => {
+    expect(isSyncFailing({ provider: 'england_golf', last_sync_status: 'timeout' })).toBe(true);
+    expect(isSyncFailing({ provider: 'england_golf', last_sync_status: 'partial' })).toBe(false);
+    expect(isSyncFailing({ provider: 'england_golf', last_sync_status: 'ok' })).toBe(false);
   });
 });
