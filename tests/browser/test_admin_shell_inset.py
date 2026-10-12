@@ -19,7 +19,7 @@ async def main():
     html = f'''<html><body><div id="root"></div><script type="module">
 import RefreshRuntime from '/@react-refresh';
 RefreshRuntime.injectIntoGlobalHook(window);window.$RefreshReg$=()=>{{}};window.$RefreshSig$=()=>type=>type;
-import React from '{react}';import {{createRoot}} from '{dom}';
+import React from '{react}';import ReactDOM from '{dom}';const {{createRoot}}=ReactDOM;
 import {{MemoryRouter,Routes,Route,useNavigate,useLocation}} from '{router}';
 import AdminShell from '/src/features/admin/AdminShell.tsx';
 import {{applyRouteChrome}} from '/src/lib/routeChrome.ts';import '/src/index.css';
