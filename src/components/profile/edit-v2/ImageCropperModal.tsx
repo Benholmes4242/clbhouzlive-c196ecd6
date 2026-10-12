@@ -58,24 +58,32 @@ const getCroppedImg = async (
   // Draw rotated image
   ctx.drawImage(image, 0, 0);
 
-  // Create output canvas for the cropped area
-  const data = ctx.getImageData(
-    pixelCrop.x,
-    pixelCrop.y,
-    pixelCrop.width,
-    pixelCrop.height
-  );
-
-  // Set canvas width to final desired crop size
-  canvas.width = pixelCrop.width;
-  canvas.height = pixelCrop.height;
-
-  // Clear and paste cropped imagedata
-  ctx.putImageData(data, 0, 0);
+  // Cap future uploads without upscaling; retain the exact old path for small crops.
+  const scale = Math.min(1, 1440 / Math.max(pixelCrop.width, pixelCrop.height));
+  let outputCanvas = canvas;
+  if (scale < 1) {
+    outputCanvas = document.createElement('canvas');
+    outputCanvas.width = Math.round(pixelCrop.width * scale);
+    outputCanvas.height = Math.round(pixelCrop.height * scale);
+    const outputCtx = outputCanvas.getContext('2d');
+    if (!outputCtx) throw new Error('No 2d context');
+    outputCtx.drawImage(
+      canvas,
+      pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height,
+      0, 0, outputCanvas.width, outputCanvas.height
+    );
+  } else {
+    const data = ctx.getImageData(
+      pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height
+    );
+    canvas.width = pixelCrop.width;
+    canvas.height = pixelCrop.height;
+    ctx.putImageData(data, 0, 0);
+  }
 
   // Return as blob
   return new Promise((resolve, reject) => {
-    canvas.toBlob(
+    outputCanvas.toBlob(
       (blob) => {
         if (blob) {
           resolve(blob);

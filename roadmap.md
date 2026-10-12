@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## Avatar crop cap F.3
+- [x] Cap both future crop outputs at 1440px without upscaling or changing JPEG quality.
+- [x] Measure both real modal outputs and prove under-cap JPEG bytes unchanged (both modals, 571×600).
+- [x] Confirm the full suite remains at 1,138 passing and fifteen known failures; preview build OK, no lint errors. Hosted authenticated upload checks unavailable on external Supabase; no R2 writes made.
+
 ## BRIEF_TOUR_FOLLOW_AND_TEE_ALERT
 - [x] Player follows withdrawn; hero-board rows open the scorecard instead.
 - [ ] Add tee-alert toggle and notification-delivery warning.

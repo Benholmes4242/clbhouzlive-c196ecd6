@@ -47,9 +47,12 @@ async function getCroppedImg(
   
   
 
-  // Set canvas size to the cropped area dimensions
-  canvas.width = safeWidth;
-  canvas.height = safeHeight;
+  // Cap future uploads without upscaling; preserve uncapped destination dimensions.
+  const scale = Math.min(1, 1440 / Math.max(safeWidth, safeHeight));
+  const outputWidth = scale < 1 ? Math.round(safeWidth * scale) : safeWidth;
+  const outputHeight = scale < 1 ? Math.round(safeHeight * scale) : safeHeight;
+  canvas.width = outputWidth;
+  canvas.height = outputHeight;
 
   // Draw the cropped portion of the image onto the canvas
   // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
@@ -61,8 +64,8 @@ async function getCroppedImg(
     safeHeight,   // Source height
     0,            // Destination X - where to place on canvas
     0,            // Destination Y
-    safeWidth,    // Destination width
-    safeHeight    // Destination height
+    outputWidth,  // Destination width
+    outputHeight  // Destination height
   );
 
   // Convert canvas to blob
