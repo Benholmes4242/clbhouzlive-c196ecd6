@@ -118,5 +118,5 @@ export function useBoardFacets(
         );
       },
     };
-  }, [query.data]);
+  }, [query.data, query.isPending]);
 }
