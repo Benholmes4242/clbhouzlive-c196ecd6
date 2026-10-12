@@ -32,10 +32,10 @@ function cc(loop: CommandCentre['loop']): CommandCentre {
 // Production figures, 12 Oct 2026: 111 joined, 25 connected, 25 with a round in.
 const PRODUCTION = cc({ joined: 111, connected: 25, round_in: 25, posted: 25, weekly: 8, never_connected: 86, d30_connected_pct: 40, d30_not_connected_pct: 60 });
 
-/** The row grid carrying `label`: [label, bar, figure, percentage]. */
+/** The row grid carrying `label`: [label, bar track (fill inside), figure, percentage]. */
 function row(label: string) {
   const el = screen.getByText(label).parentElement as HTMLElement;
-  return { bar: el.children[1] as HTMLElement, figure: el.children[2] as HTMLElement, pct: el.children[3] as HTMLElement };
+  return { fill: (el.children[1] as HTMLElement).firstElementChild as HTMLElement, figure: el.children[2] as HTMLElement, pct: el.children[3] as HTMLElement };
 }
 
 /** jsdom serialises colours as rgb(); accept either spelling of a token. */
