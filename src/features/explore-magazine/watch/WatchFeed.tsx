@@ -17,7 +17,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 
-import { ShelfRetry, ShelfShell } from '../ExploreShells';
+import { GridShell, ShelfRetry, ShelfShell } from '../ExploreShells';
 import {
   WATCH_CHIPS,
   allOnly,
@@ -475,11 +475,18 @@ export function WatchFeed({
                   const v = viewsFor(row);
                   return (
                     <button key={`qh:${row.post_id}`} type="button" data-watch-card="quick" onClick={() => open('clip', quickPosts, quickRows, index)} style={{ ...cardButton, width: quickGrid ? '100%' : QH_W, minWidth: 0 }}>
-                      <Poster row={row} height={quickGrid ? null : QH_H} posterH={480} radius={12} autoplay progress={barFor(row)} />
+                      {/* N.2: no autoplay in a 3-across grid — three equally central tiles, one playing, reads as failure. */}
+                      <Poster row={row} height={quickGrid ? null : QH_H} posterH={480} radius={12} autoplay={!quickGrid} progress={barFor(row)} />
                       <span style={{ ...clamp2, marginTop: 7, fontSize: 12, fontWeight: 600, lineHeight: 1.3 }}>
                         {videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}
                       </span>
-                      {who || v ? (
+                      {quickGrid ? (
+                        /* N.1: at grid width the joined line truncated the views away; split it, grid only. */
+                        <>
+                          {who ? <span data-watch-sub="creator" style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{who}</span> : null}
+                          {v ? <span data-watch-sub="views" style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{v}</span> : null}
+                        </>
+                      ) : who || v ? (
                         <span style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{[who, v].filter(Boolean).join(' \u00B7 ')}</span>
                       ) : null}
                       {onYourCourse(row) && row.course_name ? (
@@ -492,7 +499,7 @@ export function WatchFeed({
             </>
           ) : loading && showsQuickHits(filter) ? (
             <div style={{ paddingTop: 18 }}>
-              <ShelfShell tileW={QH_W} tileH={QH_H} />
+              {quickGrid ? <GridShell inset={INSET} radius={12} /> : <ShelfShell tileW={QH_W} tileH={QH_H} />}
             </div>
           ) : null}
 
