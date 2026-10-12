@@ -184,6 +184,13 @@ export const TrendCard: React.FC<{
   const deltaTone = delta == null || Math.abs(delta) < 0.05
     ? A.DIM
     : delta < 0 ? A.IMPROVED : A.DRIFTED;
+  // Chart tone: the SAME direction test, read from deltaTone so the rule has
+  // one home. The ONE deliberate difference: flat/unknown is A.DIM for the
+  // chip (right for text) but A.MUTE for the chart, because a 2.2px stroke
+  // and a gradient in A.DIM are near-invisible on this canvas. Intentional.
+  // This makes the chart change colour between 30D and 90D when the index
+  // moved in opposite directions over those windows — both are true.
+  const chartTone = deltaTone === A.DIM ? A.MUTE : deltaTone;
 
   const headIndex = n > 0 ? points[active].v : fallbackIndex;
   const headDate = n > 0 ? formatDayMonthShortGB(points[active].t) : null;
@@ -334,6 +341,7 @@ export const TrendCard: React.FC<{
           width={w}
           height={PLOT_H}
           simplified
+          tone={chartTone}
         />
       )}
       legend={
