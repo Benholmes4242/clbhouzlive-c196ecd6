@@ -103,7 +103,7 @@ export default function DashboardPage() {
 
   const cc = useCommandCentre();
   const ccLoading = cc.isLoading;
-  const ccFailed = cc.isError || (!cc.isLoading && !cc.data);
+  const ccFailed = cc.isError || (cc.isFetched && !cc.data);
 
   return (
     <div style={{ padding: '8px 12px 24px', display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 720, margin: '0 auto' }}>
@@ -578,7 +578,7 @@ function RetentionCard() {
   return (
     <section style={PANEL}>
       <Header title="Retention" meta="28d cohorts" />
-      <Body height={44 + 44 + 30} loading={r.isLoading} failed={r.isError || (!r.isLoading && !c)}>{() => (
+      <Body height={44 + 44 + 30} loading={r.isLoading} failed={r.isError || (r.isFetched && !c)}>{() => (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 8 }}>
             {cols.map(col => (
