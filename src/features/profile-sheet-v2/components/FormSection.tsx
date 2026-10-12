@@ -16,13 +16,40 @@ import { playDateStandalone } from '@/components/explore-tab-new/courseled/disco
 import { fmtSigned, formBarLowered, type FormBar } from '../sheetState';
 import { CARD_LABEL } from './sheetCardParts';
 
-// V6 D — the plot gives up a little height to suit the merged card.
-const PLOT_H = 66;
-const MID = 33;
 const GAP = 8;
+const BAR_INSET = 0.14;
+// BRIEF_FORM_PLOT F.2 — floors so the line never sits flush (spec file absent;
+// below floor 4 is implied by the brief's 40px all-above case).
+export const FLOOR_ABOVE = 4;
+export const FLOOR_BELOW = 4;
+
+/** F.2 — plot height and line position measured from the bars in hand. */
+export function plotMetrics(values: number[]): { plotH: number; mid: number } {
+  const maxAbs = Math.max(...values.map(Math.abs));
+  let above = FLOOR_ABOVE;
+  let below = FLOOR_BELOW;
+  for (const v of values) {
+    const h = barGeometry(v, maxAbs, 0).height;
+    if (v < 0) below = Math.max(below, h + 15);
+    else above = Math.max(above, h + 14);
+  }
+  return { plotH: above + below, mid: above };
+}
+
+/**
+ * F.1 — baseline insets, so the line starts where the first bar starts and ends
+ * where the last bar ends. Slots stay one fifth wide (fewer bars left-align), so
+ * the right inset also absorbs the empty slots.
+ */
+export function baselineInsets(n: number): { left: string; right: string } {
+  const inset = `(${SLOT_EXPR}) * ${BAR_INSET}`;
+  const used = `(${SLOT_EXPR}) * ${n} + ${GAP * (n - 1)}px`;
+  return { left: `calc(${inset})`, right: `calc(100% - (${used}) + ${inset})` };
+}
+const SLOT_EXPR = `(100% - ${GAP * 4}px) / 5`;
 const SLOT = `calc((100% - ${GAP * 4}px) / 5)`;
 
-export function barGeometry(value: number, maxAbs: number): { top: number; height: number; labelTop: number; below: boolean } {
+export function barGeometry(value: number, maxAbs: number, MID: number): { top: number; height: number; labelTop: number; below: boolean } {
   const perStroke = Math.min(8, 22 / Math.max(maxAbs, 0.1));
   const height = Math.max(2, Math.abs(value) * perStroke);
   const below = value < 0;
@@ -34,13 +61,15 @@ export function barGeometry(value: number, maxAbs: number): { top: number; heigh
 const FormSection: React.FC<{ bars: FormBar[] }> = ({ bars }) => {
   if (bars.length < 2) return null;
   const maxAbs = Math.max(...bars.map((b) => Math.abs(b.value)));
+  const { plotH, mid } = plotMetrics(bars.map((b) => b.value));
+  const line = baselineInsets(bars.length);
   return (
     <div data-form-section>
       <div style={CARD_LABEL}>Last five rounds</div>
-      <div style={{ display: 'flex', gap: GAP, height: PLOT_H, marginTop: 9, position: 'relative' }}>
-        <div style={{ position: 'absolute', left: 0, right: 0, top: MID, height: 1, background: A.HAIRLINE }} />
+      <div style={{ display: 'flex', gap: GAP, height: plotH, marginTop: 9, position: 'relative' }}>
+        <div style={{ position: 'absolute', left: line.left, right: line.right, top: mid, height: 1, background: A.HAIRLINE }} />
         {bars.map((b) => {
-          const g = barGeometry(b.value, maxAbs);
+          const g = barGeometry(b.value, maxAbs, mid);
           const lowered = formBarLowered(b);
           const tone = lowered ? A.IMPROVED : A.DIM;
           return (
@@ -53,7 +82,7 @@ const FormSection: React.FC<{ bars: FormBar[] }> = ({ bars }) => {
           );
         })}
       </div>
-      <div style={{ display: 'flex', gap: GAP, marginTop: 6 }}>
+      <div style={{ display: 'flex', gap: GAP, marginTop: 4 }}>
         {bars.map((b) => (
           <span key={b.id} style={{
             flex: `0 0 ${SLOT}`, minWidth: 0, textAlign: 'center', fontSize: 9, fontWeight: 700,
