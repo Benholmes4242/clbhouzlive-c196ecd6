@@ -11,7 +11,8 @@ import { injectWireStories } from '@/components/feed/injectWireStories';
 import { readingTimeLabel } from '@/features/tourhub/news/readingTime';
 import { joinDateline } from '@/features/tourhub/news/storyTime';
 
-vi.mock('react-i18next', () => ({
+vi.mock('react-i18next', async (orig) => ({
+  ...(await orig<typeof import('react-i18next')>()),
   useTranslation: () => ({
     t: (k: string, o?: unknown) => {
       const map: Record<string, string> = { 'news.fromWire': 'TOUR NEWS', 'news.amateurNews': 'AMATEUR NEWS', 'news.readStory': 'READ THE STORY' };
