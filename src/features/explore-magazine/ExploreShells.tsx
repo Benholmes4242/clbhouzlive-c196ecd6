@@ -83,6 +83,29 @@ export function PairShell() {
   );
 }
 
+/**
+ * N.3 — the Quick hits GRID shell. A skeleton may only expand into the layout
+ * it stands in for, so on the grid chip the shell is the grid itself: same
+ * columns, gap, inset, 9:16 cells and radius, with caption lines under each.
+ */
+export function GridShell({ inset, radius, cells = 6 }: { inset: number; radius: number; cells?: number }) {
+  return (
+    <div
+      aria-hidden
+      data-watch-grid-shell="quick"
+      style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, alignItems: 'start', padding: `0 ${inset}px 2px` }}
+    >
+      {Array.from({ length: cells }, (_, index) => (
+        <div key={index} style={{ minWidth: 0 }}>
+          <div className="clb-shimmer-dark" style={{ width: '100%', aspectRatio: '9 / 16', borderRadius: radius, backgroundColor: MEMBER_CELL }} />
+          <Line width="85%" height={12} />
+          <Line width="60%" height={11} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function ShelfShell({ tileW, tileH }: { tileW: number; tileH: number }) {
   return (
     <div aria-hidden style={{ fontFamily: SANS }}>
