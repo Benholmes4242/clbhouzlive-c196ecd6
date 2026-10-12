@@ -3,8 +3,9 @@
  *
  * Sections, in order (RECENT is rendered separately by the caller):
  *   1) IN ACTION rail    — horizontal player cards
- *   2) PEOPLE TO FOLLOW  — reason lines + inline Follow button
- *   3) POPULAR ON CLBHOUZ — CourseRow reuse
+ *   2) YOUR COURSES      — member with rounds only (J.5), gam_user_courses order
+ *   3) PEOPLE TO FOLLOW  — reason lines + inline Follow button
+ *   3) HIGHEST RATED ON CLBHOUZ — CourseRow reuse (ordered by rating, J.1)
  *
  * Data: one RPC (search_empty_state_v2) via useSearchEmptyStateV2,
  * cached for the session.
@@ -22,7 +23,10 @@ import { useFollowState } from '@/hooks/useFollowState';
 import { useToggleFollow } from '@/hooks/useToggleFollow';
 import { isAnyMajor } from '@/features/tourhub/utils/majorScope';
 import CountryFlag from '@/components/ui/country-flag';
+import { useState } from 'react';
 import { CourseRow } from './CourseRow';
+import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
+import YourCourseAnalyticsSheet from '@/features/profile-sheet-v2/components/YourCourseAnalyticsSheet';
 import {
   useSearchEmptyStateV2,
   type EmptyStatePlayer,
@@ -32,6 +36,9 @@ import { navCourse } from '../lib/searchNavigation';
 import { KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { A, ROW_BASE, S } from '../lib/tokens';
 
+
+/** How many of the member's courses the zero state lists before See all. */
+const YOUR_COURSES_SHOWN = 3;
 
 interface Props {
   onSelect: () => void; // called before navigation (parent uses to close)
@@ -45,6 +52,14 @@ export function SearchEmptyState({ onSelect }: Props) {
   const players = data?.players ?? [];
   const people = data?.suggested_people ?? [];
   const courses = data?.popular_courses ?? [];
+
+  // J.5 - one surface, one source: gam_user_courses, already ordered
+  // rounds_count DESC, last_played DESC, and the same cached query the
+  // "Your rounds" marker reads. Rendered only for a member with rounds.
+  const { user } = useSupabaseSession();
+  const { data: myCourses } = useUserAnalyticsCourses({ enabled: !!user?.id });
+  const yourCourses = (myCourses ?? []).filter((c) => c.rounds_count > 0).slice(0, YOUR_COURSES_SHOWN);
+  const [allCoursesOpen, setAllCoursesOpen] = useState(false);
 
   const liveEvent = event?.is_live ? event : null;
   const eyebrowLabel = liveEvent
@@ -128,6 +143,48 @@ export function SearchEmptyState({ onSelect }: Props) {
         </>
       )}
 
+      {/* ============ YOUR COURSES ============ */}
+      {yourCourses.length > 0 && (
+        <>
+          <SectionEyebrow
+            label="Your courses"
+            rightChip={
+              <button
+                type="button"
+                onClick={() => setAllCoursesOpen(true)}
+                style={{ ...KICKER, background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', flexShrink: 0 }}
+              >
+                See all
+              </button>
+            }
+          />
+          <div>
+            {yourCourses.map((c) => (
+              <CourseRow
+                key={c.course_id}
+                course={{ id: c.course_id, name: c.course_name }}
+                query=""
+                ownRoundsTone={A.AMBER}
+                onSelect={() => {
+                  onSelect();
+                  navCourse(navigate, { id: c.course_id, name: c.course_name });
+                }}
+              />
+            ))}
+          </div>
+          <YourCourseAnalyticsSheet
+            open={allCoursesOpen}
+            onClose={() => setAllCoursesOpen(false)}
+            onNavigate={(route) => {
+              setAllCoursesOpen(false);
+              onSelect();
+              navigate(route);
+            }}
+            synced
+          />
+        </>
+      )}
+
       {/* ============ PEOPLE TO FOLLOW ============ */}
       {(isLoading || people.length > 0) && (
         <>
@@ -154,7 +211,7 @@ export function SearchEmptyState({ onSelect }: Props) {
       {/* ============ POPULAR ON CLBHOUZ ============ */}
       {(isLoading || courses.length > 0) && (
         <>
-          <SectionEyebrow label="Popular on clbhouz" />
+          <SectionEyebrow label="Highest rated on clbhouz" />
           {isLoading && courses.length === 0 ? (
             <CoursesSkeleton />
           ) : (

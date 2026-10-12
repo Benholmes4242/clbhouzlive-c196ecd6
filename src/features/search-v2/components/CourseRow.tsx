@@ -9,9 +9,16 @@ import { A, KICKER, NUM } from '@/features/courses/components/holes/analytical/t
 import { ResultTile } from './ResultTile';
 import { ROW_BASE, S } from '../lib/tokens';
 
-interface Props { course: CourseHit; query: string; onSelect: () => void }
+interface Props {
+  course: CourseHit;
+  query: string;
+  onSelect: () => void;
+  /** Colour of the "Your rounds" marker. Omitted = today's KICKER tone; the
+   *  zero state's "Your courses" passes A.AMBER, the viewing member's colour. */
+  ownRoundsTone?: string;
+}
 
-export function CourseRow({ course, query, onSelect }: Props) {
+export function CourseRow({ course, query, onSelect, ownRoundsTone }: Props) {
   const { t } = useTranslation('courses');
   const sub = [course.sub_country, course.country].filter(Boolean).join(', ');
   const yourStatsRounds = useUserStatsRoundsForCourse(course.id);
@@ -36,10 +43,10 @@ export function CourseRow({ course, query, onSelect }: Props) {
         </div>
 
         {yourStatsRounds != null && (
-          <div className="flex items-center gap-1.5" style={{ color: KICKER.color }}>
+          <div className="flex items-center gap-1.5" style={{ color: ownRoundsTone ?? KICKER.color }}>
             <BarChartGlyph size={10} />
-            <span style={KICKER}>{t('search.yourRounds', 'Your rounds')}</span>
-            <span style={{ ...KICKER, ...NUM, color: KICKER.color }}>
+            <span style={{ ...KICKER, color: ownRoundsTone ?? KICKER.color }}>{t('search.yourRounds', 'Your rounds')}</span>
+            <span style={{ ...KICKER, ...NUM, color: ownRoundsTone ?? KICKER.color }}>
               {yourStatsRounds}
             </span>
           </div>
