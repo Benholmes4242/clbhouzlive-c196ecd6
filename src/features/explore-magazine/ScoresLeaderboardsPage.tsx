@@ -311,9 +311,9 @@ function Section({
         fontFamily: SANS,
         paddingInline: GUTTER,
         marginTop: 0, // first section: the tab strip's own gap is the seam (matches All / Watch)
-        paddingTop: first ? 0 : 24,
-        borderTop: first ? 'none' : `1px solid ${A.SOFT}`,
-        marginBottom: 24,
+        // No rule between sections: the eyebrow separates them, so the seam is 18 + 18 = 36.
+        paddingTop: first ? 0 : 18,
+        marginBottom: 18,
       }}
     >
       <div style={{ ...EYEBROW, color: contest ? A.AMBER : A.DIM }}>{eyebrow}</div>
