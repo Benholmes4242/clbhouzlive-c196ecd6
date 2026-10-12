@@ -47,6 +47,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { FullscreenTopProgress, showsTopProgress } from './FullscreenTopProgress';
+import { useVideoProgressWriter } from '@/video/useVideoProgressWriter';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
 
@@ -459,6 +460,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     onBeforeNavigate?.();
     navigate(`/courses/${cid}`);
   };
+
+  // K.1: the member's position is saved on pause, close and a throttled interval.
+  useVideoProgressWriter(activePost);
 
   return (
     <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>

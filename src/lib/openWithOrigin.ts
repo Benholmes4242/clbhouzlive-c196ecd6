@@ -111,6 +111,9 @@ interface OpenWithOriginArgs {
   openedFrom: string;
   /** Deliberate gallery opens start at frame zero instead of inheriting a prior session playhead. */
   forceStartAtZero?: boolean;
+  /** A saved video_progress position (Watch Continue watching). Wins over every
+   *  other rung, including forceStartAtZero. */
+  resumeAtSeconds?: number | null;
   /** Gallery mode shorthand (same as options.readOnly). */
   readOnly?: boolean;
   /** Per-open stacking value; omitted → FS_OVERLAY_Z. Sheets pass
@@ -138,6 +141,7 @@ export function openWithOrigin({
   mediaId,
   openedFrom,
   forceStartAtZero = false,
+  resumeAtSeconds = null,
   readOnly,
   zIndex,
   options,
@@ -431,7 +435,10 @@ export function openWithOrigin({
   let railLaneCT = -1;
   let feedSnapCT = -1;
   let lastPosCT = -1;
-  if (forceStartAtZero) {
+  if (resumeAtSeconds != null && resumeAtSeconds > 0) {
+    startPosition = resumeAtSeconds;
+    startSource = 'lastPos';
+  } else if (forceStartAtZero) {
     startSource = 'zero';
   } else if (borrow) {
     startSource = 'borrow';
