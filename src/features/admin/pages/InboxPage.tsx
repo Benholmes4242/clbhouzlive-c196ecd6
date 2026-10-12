@@ -10,9 +10,6 @@ import {
 } from '../components/CountryMismatchWarning';
 import { adminTheme as t } from '../theme';
 import { useInboxFeed, type InboxItem, type InboxType } from '../hooks/useInboxFeed';
-// Seconds in. The Dashboard's System panel uses this exact formatter, so an age
-// reads identically on both surfaces.
-import { formatDurationShort } from '../lib/chartPrimitives';
 import AdminAccessDenied from '../components/AdminAccessDenied';
 import ModerationDetailDrawer from '../components/ModerationDetailDrawer';
 import AppealDetailDrawer from '../components/AppealDetailDrawer';
@@ -54,39 +51,10 @@ import {
   type UnmatchedCourseRow,
 } from '../hooks/useUnmatchedCourses';
 
-// ---------- type meta ----------
-
-const TYPE_LABEL: Record<InboxType, string> = {
-  report: 'Reports',
-  appeal: 'Appeals',
-  support: 'Support',
-  verification: 'Verifications',
-  approval: 'Approvals',
-  match: 'Matches',
-  courseRequest: 'Course requests',
-  unmatchedCourse: 'Unmatched courses',
-  holePhoto: 'Hole photos',
-};
-
-/** The page's one age format. Absolute, tabular-safe: "44m" / "31h" / "32d". */
-function ageShort(iso: string): string {
-  const secs = (Date.now() - new Date(iso).getTime()) / 1000;
-  return Number.isFinite(secs) ? formatDurationShort(Math.max(0, secs)) : '-';
-}
-
-/** Kept for the Done view only: "closed 2 days ago" beats an absolute age. */
+/** The Unmatched sheet's "Waiting 3 months ago" line. */
 function relTime(iso: string): string {
   try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); } catch { return '-'; }
 }
-
-function ageColour(iso: string): string {
-  const diffH = (Date.now() - new Date(iso).getTime()) / 3_600_000;
-  if (diffH >= 24) return t.dangerText;
-  if (diffH >= 8) return t.warnText;
-  return t.inkFaint;
-}
-
-const LABEL_T = { ...LABEL, fontFeatureSettings: '"kern" 1, "liga" 1' } as const;
 
 // ---------- redirects helper ----------
 
