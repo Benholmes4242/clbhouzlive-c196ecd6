@@ -23,11 +23,11 @@ import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 import { useCourseStatsDetail, type CourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import CourseStatsSheet from '@/components/feed/CourseStatsSheet';
 import { CourseMasthead, HeroFigureCell } from '@/components/courses/CourseMasthead';
-import { ratingPrintable } from '@/features/explore-magazine/courseRatingFloor';
+import { ratingDisplayable } from '@/features/explore-magazine/courseRatingFloor';
 import { formatRatingValue } from '@/utils/formatters';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseTop100Standing } from '@/hooks/useCourseTop100Standing';
 import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 import { Z } from '@/config/zIndex';
@@ -504,14 +504,14 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
       );
     }
   }
-  // Same floor as every printed course aggregate (COURSE_RATING_FLOOR).
-  if (ratingPrintable(communityRating, reviewCount)) {
+  // No floor: the REVIEWS cell beside it shows the sample size (V.3).
+  if (ratingDisplayable(communityRating)) {
     cells.push(
       <HeroStatCell
         key="rating"
         label={t('courseHero.rating')}
         value={formatRatingValue(communityRating)}
-        tone={A.GREEN}
+        tone={courseSubScoreTone(communityRating)}
       />
     );
   }
@@ -534,7 +534,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
             className="active:scale-[0.98] transition-transform"
             style={{
               display: 'grid',
-              gridTemplateColumns: `repeat(${cells.length}, minmax(0, 1fr))`,
+              gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
               gap: 10,
               width: '100%',
               padding: 0,
