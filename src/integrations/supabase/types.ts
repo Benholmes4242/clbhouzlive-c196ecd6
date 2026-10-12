@@ -19681,6 +19681,7 @@ export type Database = {
         Returns: Json
       }
       get_admin_audiences: { Args: never; Returns: Json }
+      get_admin_command_centre: { Args: { p_tz?: string }; Returns: Json }
       get_admin_dashboard_glance: { Args: { p_tz?: string }; Returns: Json }
       get_admin_event_aggregates: {
         Args: {
