@@ -24,7 +24,7 @@ import { getRatingTierLabel } from '@/lib/ratingTier';
 import { formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { fmtHcp } from '@/lib/whs/format';
 import { CARD, LINE, T100, T60, T40 } from './feedTokens';
-import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, joinClauses } from './reviewPostCard';
+import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, REVIEW_COURSE_CLAMP, joinClauses } from './reviewPostCard';
 
 const GUTTER = 14;
 
@@ -33,7 +33,7 @@ const CATS: CatKey[] = ['design', 'condition', 'clubhouse', 'facilities'];
 
 const COURSE_NAME_STYLE: React.CSSProperties = {
   fontSize: 19, fontWeight: 800, letterSpacing: '-0.028em', lineHeight: 1.16, color: A.INK,
-  display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+  ...REVIEW_COURSE_CLAMP,
 };
 
 export interface ReviewPostCardProps {

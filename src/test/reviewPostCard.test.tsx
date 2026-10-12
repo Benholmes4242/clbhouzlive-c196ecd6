@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { REVIEW_BODY_CLAMP, REVIEW_CARD_MAX_HEIGHT, joinClauses } from '@/components/feed/reviewPostCard';
+import { REVIEW_BODY_CLAMP, REVIEW_CARD_MAX_HEIGHT, REVIEW_COURSE_CLAMP, joinClauses } from '@/components/feed/reviewPostCard';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (k: string, o?: { count?: number }) => (o?.count != null ? `${k}:${o.count}` : k), i18n: { language: 'en' } }),
@@ -132,7 +132,8 @@ describe('review post v2 — frame and affordances', () => {
     const name = card(8, all).querySelector('[data-review-course]') as HTMLElement;
     expect(name.style.whiteSpace).toBe('');
     expect(name.style.overflow).toBe('hidden');
-    expect((name.style as unknown as Record<string, string>).webkitLineClamp ?? name.getAttribute('style')).toMatch(/2/);
+    expect(REVIEW_COURSE_CLAMP.WebkitLineClamp).toBe(2);
+    expect(REVIEW_COURSE_CLAMP).not.toHaveProperty('whiteSpace');
   });
   it('the follow pill sits inline straight after the age', () => {
     const c = render(tree(makePost(8, all), null, { followPill: <span data-pill />, ownerMenu: <span data-menu /> })).container;

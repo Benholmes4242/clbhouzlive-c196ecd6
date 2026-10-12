@@ -39,3 +39,11 @@ export const REVIEW_BODY_CLAMP = {
   WebkitBoxOrient: 'vertical',
   overflow: 'hidden',
 } as const;
+
+/** B — the course name wraps to two lines and clamps, never nowrap. */
+export const REVIEW_COURSE_CLAMP = {
+  display: '-webkit-box',
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: 'vertical',
+  overflow: 'hidden',
+} as const;
