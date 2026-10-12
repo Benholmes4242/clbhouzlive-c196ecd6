@@ -6,12 +6,8 @@ import { MemoryRouter } from 'react-router-dom';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { REVIEW_BODY_CLAMP, REVIEW_CARD_MAX_HEIGHT, againstCourse, joinClauses } from '@/components/feed/reviewPostCard';
 
-const aggregate = { current: null as Record<string, number> | null };
-vi.mock('@/hooks/useCourseRatingAggregates', () => ({
-  useCourseRatingAggregates: () => ({ data: aggregate.current }),
-}));
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (k: string) => k, i18n: { language: 'en' } }),
+  useTranslation: () => ({ t: (k: string, o?: { count?: number }) => (o?.count != null ? `${k}:${o.count}` : k), i18n: { language: 'en' } }),
   initReactI18next: { type: '3rdParty', init: () => {} },
   Trans: ({ children }: { children?: React.ReactNode }) => children,
 }));
@@ -21,17 +17,21 @@ import { ReviewPostCard } from '@/components/feed/ReviewPostCard';
 
 const toRgb = (c: string) => { const d = document.createElement('div'); d.style.color = c; return d.style.color; };
 
-function card(rating: number, breakdown: Record<string, number | null>, text = 'Words') {
-  const post = {
+function makePost(rating: number, breakdown: Record<string, number | null>, text = 'Words', extra: Record<string, unknown> = {}) {
+  return {
     id: 'p', userId: 'u', actorId: 'u', displayName: 'Member', avatarUrl: '', createdAt: new Date().toISOString(),
-    caption: '', handicapIndex: null,
+    caption: '', handicapIndex: null, courseRating: null,
     review: { reviewId: 'r', courseId: 'c', courseName: 'Course', courseImageUrl: null, rating, reviewText: text, breakdown },
+    ...extra,
   } as never;
-  return render(
-    <MemoryRouter><QueryClientProvider client={new QueryClient()}>
-      <ReviewPostCard post={post} articleRef={() => {}} surface={A.PANEL} onProfile={vi.fn()} onReadReview={vi.fn()} onPrefetch={vi.fn()} footer={null} />
-    </QueryClientProvider></MemoryRouter>,
-  ).container;
+}
+const tree = (post: never, coursesReviewed: number | null = null) => (
+  <MemoryRouter><QueryClientProvider client={new QueryClient()}>
+    <ReviewPostCard post={post} articleRef={() => {}} surface={A.PANEL} onProfile={vi.fn()} onReadReview={vi.fn()} onPrefetch={vi.fn()} coursesReviewed={coursesReviewed} footer={null} />
+  </QueryClientProvider></MemoryRouter>
+);
+function card(rating: number, breakdown: Record<string, number | null>, text = 'Words', extra: Record<string, unknown> = {}) {
+  return render(tree(makePost(rating, breakdown, text, extra))).container;
 }
 const all = { design: 9, conditions: 8.9, clubhouse: 7, facilities: 6 };
 
@@ -65,16 +65,16 @@ describe('review post — categories', () => {
 });
 
 describe('review post — context line', () => {
-  it('is absent when the review is the only one', () => {
-    aggregate.current = { avg_overall_score: 7.1, review_count: 1 };
+  it('reads the batched course average and is absent without one', () => {
     expect(card(6.8, all).querySelector('[data-review-against]')).toBeNull();
-    expect(againstCourse(6.8, 7.1, 1)).toBeNull();
-    aggregate.current = null;
+    const c = card(6.8, all, 'Words', { courseRating: 7.1 });
+    expect(c.querySelector('[data-review-against]')?.textContent).toBe('feed.reviewPost.against.below');
   });
   it('reads below / above / in line at one decimal', () => {
-    expect(againstCourse(6.8, 7.1, 24)?.direction).toBe('below');
-    expect(againstCourse(7.4, 7.1, 24)?.direction).toBe('above');
-    expect(againstCourse(7.1, 7.06, 24)?.direction).toBe('inLine');
+    expect(againstCourse(6.8, 7.1)?.direction).toBe('below');
+    expect(againstCourse(7.4, 7.1)?.direction).toBe('above');
+    expect(againstCourse(7.1, 7.06)?.direction).toBe('inLine');
+    expect(againstCourse(7.1, null)).toBeNull();
   });
 });
 
@@ -102,5 +102,30 @@ describe('review post — R.1 fits between the islands', () => {
   it('joins only the true clauses with no stray separator', () => {
     expect(joinClauses([null, '1d'])).toBe('1d');
     expect(joinClauses(['Plays off 12', null, '1d'])).toBe('Plays off 12 \u00b7 1d');
+  });
+});
+
+describe('review post — A.2 count is latched at first paint', () => {
+  it('shows the count present at first paint', () => {
+    const c = render(tree(makePost(8, all), 47)).container;
+    expect(c.querySelector('[data-review-who-line]')?.textContent).toContain('feed.reviewPost.coursesReviewed:47');
+  });
+  it('never inserts a count that arrives after first paint', () => {
+    const post = makePost(8, all);
+    const { container, rerender } = render(tree(post, null));
+    const before = container.querySelector('[data-review-who-line]')?.textContent;
+    rerender(tree(post, 47));
+    expect(container.querySelector('[data-review-who-line]')?.textContent).toBe(before);
+  });
+});
+
+describe('review post — one home', () => {
+  it('draws a review whose course did not resolve, without course, score or context line', () => {
+    const c = card(8, all, 'Words', { review: null, caption: 'Body text', courseRating: 7 });
+    expect(c.querySelector('[data-review-post-card]')).toBeTruthy();
+    expect(c.querySelector('[data-review-course]')).toBeNull();
+    expect(c.querySelector('[data-review-score]')).toBeNull();
+    expect(c.querySelector('[data-review-against]')).toBeNull();
+    expect(c.querySelector('[data-review-body]')?.textContent).toContain('Body text');
   });
 });

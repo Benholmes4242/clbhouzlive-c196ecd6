@@ -10,7 +10,7 @@
  * A category is never coloured for beating the course average — the tick
  * carries that comparison alone.
  */
-import React from 'react';
+import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -18,7 +18,6 @@ import { MentionText } from '@/components/mentions/MentionText';
 import { ReviewVerdictLabel, reviewLabelColor } from '@/components/shared/ReviewGhostScore';
 import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { categoryFillPercent } from '@/components/courses/course-detail/CategoryScores';
-import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import { formatRatingValue } from '@/utils/formatters';
 import { getRatingTierLabel } from '@/lib/ratingTier';
@@ -31,12 +30,7 @@ const BODY_SIZE = 13.5;
 const BODY_LINE = 1.5;
 
 type CatKey = 'design' | 'condition' | 'clubhouse' | 'facilities';
-const CATS: { key: CatKey; avgKey: 'avg_design_score' | 'avg_condition_score' | 'avg_clubhouse_score' | 'avg_facilities_score' }[] = [
-  { key: 'design', avgKey: 'avg_design_score' },
-  { key: 'condition', avgKey: 'avg_condition_score' },
-  { key: 'clubhouse', avgKey: 'avg_clubhouse_score' },
-  { key: 'facilities', avgKey: 'avg_facilities_score' },
-];
+const CATS: CatKey[] = ['design', 'condition', 'clubhouse', 'facilities'];
 
 export interface ReviewPostCardProps {
   post: FeedPost;
@@ -45,6 +39,8 @@ export interface ReviewPostCardProps {
   onProfile: () => void;
   onReadReview: (e: React.MouseEvent) => void;
   onPrefetch: () => void;
+  /** The member's courses-rated figure (useReviewerStats, already read by FeedCard). */
+  coursesReviewed?: number | null;
   onOpenCourse?: () => void;
   /** Right-hand group of the identity row: the Following pill and the owner menu. */
   identityRight?: React.ReactNode;
@@ -55,38 +51,50 @@ export interface ReviewPostCardProps {
 }
 
 export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
-  post, articleRef, surface, onProfile, onReadReview, onPrefetch, onOpenCourse, identityRight, media, footer,
+  post, articleRef, surface, onProfile, onReadReview, onPrefetch, coursesReviewed = null, onOpenCourse, identityRight, media, footer,
 }) => {
   const { t, i18n } = useTranslation('common');
   const { t: tCourses } = useTranslation('courses');
-  const review = post.review!;
-  const rating = review.rating;
-  const { data: agg } = useCourseRatingAggregates(review.courseId || undefined);
+  /* ONE HOME: a review whose course did not resolve has no `review` object;
+     every part below drops independently, like a missing region. */
+  const review = post.review;
+  const rating = review?.rating ?? null;
 
   /* A.1 — the feed row carries ONE privacy-aware index (creator_handicap_index,
      chosen server-side), so there is no eg/manual pair here to hand to
      resolveDisplayHandicap. The clause is dropped when there is no index.
-     A.2 — no batched review count exists; the clause is omitted, and
-     joinClauses takes it the day a source arrives. */
+     A.2 — the count comes from useReviewerStats, which FeedCard already reads
+     for every review card. It is LATCHED: the line composes once with what had
+     arrived by first paint, so a late count never shifts the date along under
+     the reader's eye (same pattern as leadSettledOnce). */
   const indexClause = post.handicapIndex != null
     ? t('feed.reviewPost.playsOff', { index: fmtHcp(post.handicapIndex) })
     : null;
-  const whoLine = joinClauses([indexClause, timeAgo(post.createdAt, { absoluteAfterDays: 30 })]);
+  const countAtFirstPaint = useRef<number | null | undefined>(undefined);
+  if (countAtFirstPaint.current === undefined) countAtFirstPaint.current = coursesReviewed;
+  const latchedCount = countAtFirstPaint.current;
+  const countClause = latchedCount != null && latchedCount > 0
+    ? t('feed.reviewPost.coursesReviewed', { count: latchedCount })
+    : null;
+  const whoLine = joinClauses([indexClause, countClause, timeAgo(post.createdAt, { absoluteAfterDays: 30 })]);
 
   const region = [
-    review.courseRegion || review.courseSubCountry || post.courseRegion || post.courseSubCountry,
-    review.courseCountry || post.courseCountry,
+    review?.courseRegion || review?.courseSubCountry || post.courseRegion || post.courseSubCountry,
+    review?.courseCountry || post.courseCountry,
   ].filter(Boolean).join(', ');
 
-  const against = againstCourse(rating, agg?.avg_overall_score, agg?.review_count);
+  /* C — the batched course average (feed row course_avg_overall_score). No
+     batched review count exists, so the line states the average alone. */
+  const against = againstCourse(rating, post.courseRating ?? null);
+  const courseName = review?.courseName || post.courseName || null;
   const scores: Record<CatKey, number | null> = {
-    design: review.breakdown?.design ?? null,
-    condition: review.breakdown?.conditions ?? null,
-    clubhouse: review.breakdown?.clubhouse ?? null,
-    facilities: review.breakdown?.facilities ?? null,
+    design: review?.breakdown?.design ?? null,
+    condition: review?.breakdown?.conditions ?? null,
+    clubhouse: review?.breakdown?.clubhouse ?? null,
+    facilities: review?.breakdown?.facilities ?? null,
   };
-  const anyScore = CATS.some(({ key }) => scores[key] != null);
-  const body = review.reviewText || post.caption || '';
+  const anyScore = CATS.some((key) => scores[key] != null);
+  const body = review?.reviewText || post.caption || '';
 
   return (
     <article
@@ -142,7 +150,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
           <div style={{ fontSize: 9, lineHeight: 1.2, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: A.DIM }}>
             {t('feed.reviewPost.kicker')}
           </div>
-          {onOpenCourse ? (
+          {!courseName ? null : onOpenCourse ? (
             <button
               type="button"
               data-review-course
@@ -153,20 +161,21 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               }}
             >
-              {review.courseName}
+              {courseName}
             </button>
           ) : (
             <div
               data-review-course
               style={{ marginTop: 4, fontSize: 19, fontWeight: 800, letterSpacing: '-0.028em', lineHeight: 1.16, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
             >
-              {review.courseName}
+              {courseName}
             </div>
           )}
           {region ? (
             <div style={{ marginTop: 3, fontSize: 12, lineHeight: 1.2, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{region}</div>
           ) : null}
         </div>
+        {rating != null ? (
         <div style={{ flex: 'none', textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
           <div
             data-review-score
@@ -184,6 +193,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
             />
           </div>
         </div>
+        ) : null}
       </div>
 
       {/* C — the context line; absent without an aggregate or on the only review */}
@@ -191,21 +201,21 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         <div data-review-against style={{ flex: 'none', padding: `0 ${GUTTER}px 12px`, fontSize: 11.5, lineHeight: 1.4, color: A.MUTE }}>
           {t(`feed.reviewPost.against.${against.direction}`, {
             avg: against.avg.toLocaleString(i18n?.language, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
-            count: against.count,
           })}
         </div>
       ) : null}
 
-      {/* D — what they scored. Four columns always; the tick is the course average. */}
+      {/* D — what they scored. Four columns always. No course-average tick:
+          the category averages are not in the batched feed read, and a
+          per-card read is not allowed. It returns once they are batched. */}
       {anyScore ? (
         <ul
           data-review-categories
           style={{ flex: 'none', listStyle: 'none', margin: 0, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 9, padding: `0 ${GUTTER}px 12px` }}
         >
-          {CATS.map(({ key, avgKey }) => {
+          {CATS.map((key) => {
             const value = scores[key];
             const label = tCourses(`review.subscore.${key}`);
-            const avg = agg?.[avgKey] ?? null;
             const tone = courseSubScoreTone(value);
             return (
               <li
@@ -221,11 +231,8 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
                   {value != null ? value.toFixed(1) : '\u2014'}
                 </div>
                 {value != null ? (
-                  <div data-review-track style={{ position: 'relative', height: 4, borderRadius: 999, background: A.TRACK, marginTop: 5 }}>
+                  <div data-review-track style={{ position: 'relative', height: 4, borderRadius: 999, background: A.BORDER, marginTop: 5 }}>
                     <div data-review-fill style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${categoryFillPercent(value)}%`, borderRadius: 999, background: tone }} />
-                    {avg != null ? (
-                      <div data-review-tick style={{ position: 'absolute', top: -2, left: `${categoryFillPercent(Number(avg))}%`, width: 1.5, height: 8, borderRadius: 1, background: A.MUTE }} />
-                    ) : null}
                   </div>
                 ) : null}
               </li>

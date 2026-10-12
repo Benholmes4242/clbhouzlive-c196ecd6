@@ -35,21 +35,19 @@ export function joinClauses(parts: Array<string | null | undefined | false>): st
 export type AgainstDirection = 'below' | 'above' | 'inLine';
 
 /**
- * C — where this review sits against the course. Compared at the one decimal
- * both figures are printed at, so "In line with 7.1" never sits beside 7.1.
- * Null (no line) when the aggregate is missing or this is the only review.
+ * C — where this review sits against the course average. Compared at the one
+ * decimal both figures are printed at, so "In line with 7.1" never sits beside
+ * 7.1. Null (no line) when there is no rating or no batched average.
  */
 export function againstCourse(
   rating: number | null | undefined,
   avg: number | null | undefined,
-  reviewCount: number | null | undefined,
-): { direction: AgainstDirection; avg: number; count: number } | null {
-  if (rating == null || avg == null || reviewCount == null) return null;
-  if (!Number.isFinite(Number(avg)) || Number(reviewCount) <= 1) return null;
+): { direction: AgainstDirection; avg: number } | null {
+  if (rating == null || avg == null || !Number.isFinite(Number(avg))) return null;
   const r = Math.round(Number(rating) * 10);
   const a = Math.round(Number(avg) * 10);
   const direction: AgainstDirection = r < a ? 'below' : r > a ? 'above' : 'inLine';
-  return { direction, avg: a / 10, count: Number(reviewCount) };
+  return { direction, avg: a / 10 };
 }
 
 /** E — the body clamp. No padding of its own: the wrapper owns it (E.2). */
