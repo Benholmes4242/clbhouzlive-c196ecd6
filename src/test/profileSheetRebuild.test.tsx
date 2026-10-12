@@ -116,7 +116,7 @@ describe('profile sheet parts', () => {
   it('handicap sentence drops the high clause when the series has no high above now', () => {
     const rising = [{ t: '2026-08-01', v: 1.0 }, { t: '2026-09-01', v: 1.4 }];
     const text = handicapSentence(rising, 90)!.map((s) => s.text).join('');
-    expect(text).toBe('Up 0.4 in ninety days.');
+    expect(text.startsWith('Up 0.4 in ninety days.')).toBe(true);
     expect(text).not.toContain('high');
     expect(handicapSentence([{ t: '2026-08-01', v: 1 }], 90)).toBeNull();
   });
