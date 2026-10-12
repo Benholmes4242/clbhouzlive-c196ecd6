@@ -40,7 +40,13 @@ import {
 
 import { ReportCommentSheetV2 } from './components/ReportCommentSheetV2';
 import { FIGS, A } from '@/features/courses/components/holes/analytical/tokens';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, EyeOff } from 'lucide-react';
+import { Trans } from 'react-i18next';
+import { useCommentsSubject, useThreadStandings, type CommentsSubject } from './hooks/useCommentsContext';
+import { firstAppearanceStandings, standingUserId } from './lib/standing';
+import { shortCourseName } from '@/features/courses/_shared/courseLabel';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
+import { useMemo } from 'react';
 import { TITLE as TITLE_SCALE, BODY } from '@/lib/tokens/type';
 
 import {
@@ -97,12 +103,27 @@ function CommentsSheetV2Inner({
   const kb = useKeyboardHeight();
 
   const {
-    threads, totalCount, totalCountFetched, isFetched, isLoading,
+    threads, visibleCount, hiddenCount, threadFetched, totalCountFetched, isFetched, isLoading,
     fetchNextPage, hasNextPage, isFetchingNextPage,
     addComment, editComment, deleteComment, toggleLike, hideComment, reportComment,
   } = useCommentsV2({ targetType, targetId, targetSecondaryId, enabled: isOpen });
 
   useCommentsRealtimeV2(targetType, targetId, isOpen);
+
+  /* G.3 / G.4 — the subject the sheet covers, and each commenter's standing
+     at its course: two batched reads for the whole thread. */
+  const { data: subject } = useCommentsSubject(targetType, targetId, isOpen);
+  const commenterIds = useMemo(
+    () => threads.flatMap((c) => [c, ...c.replies]).map(standingUserId).filter((x): x is string => !!x),
+    [threads],
+  );
+  const { data: standingByUser } = useThreadStandings(subject?.courseId ?? null, commenterIds, isOpen);
+  const standings = useMemo(
+    () => firstAppearanceStandings(threads, standingByUser ?? new Map()),
+    [threads, standingByUser],
+  );
+  /* Every page + the global total must be in before the count is printed. */
+  const countReady = threadFetched && totalCountFetched;
 
   const [replyingTo, setReplyingTo] = useState<{ id: string; displayName: string } | null>(null);
   const [editing, setEditing] = useState<CommentV2 | null>(null);
@@ -339,15 +360,17 @@ function CommentsSheetV2Inner({
               <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.4px', color: INK }}>
                 {t('comments.sheetTitle')}
               </div>
-              {!totalCountFetched ? (
+              {subject && <ContextLine subject={subject} />}
+              {/* G.1 — the number is the rows rendered below, never posts.comment_count. */}
+              {!countReady ? (
                 <div
                   className="rounded-sm"
                   style={{ width: 72, height: 11, marginTop: 6, background: SHIMMER }}
                 />
-              ) : totalCount === 0 ? null /* No count line at zero — the title and rule are the header. */ : (
+              ) : visibleCount === 0 ? null /* No count line at zero (incl. all-hidden) — the body states it. */ : (
                 /* Uppercase by textTransform — the locale strings stay sentence case. */
                 <div style={{ ...FIGS, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, marginTop: 6 }}>
-                  {t('comments.count', { count: totalCount })}
+                  {t('comments.count', { count: visibleCount })}
                 </div>
               )}
             </div>
@@ -372,22 +395,8 @@ function CommentsSheetV2Inner({
               {!isFetched ? (
                 <SkeletonRows />
               ) : threads.length === 0 ? (
-                /* Empty state lives in the body; minHeight 220 stops the sheet collapsing. */
-                <div
-                  style={{
-                    flex: 1, display: 'flex', flexDirection: 'column',
-                    alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                    padding: '34px 30px 30px', gap: 7, minHeight: 220,
-                  }}
-                >
-                  <MessageCircle size={34} strokeWidth={1.5} color={A.DIM} style={{ marginBottom: 3 }} aria-hidden />
-                  <div style={{ fontSize: 15, fontWeight: 600, color: A.INK, letterSpacing: '-0.1px' }}>
-                    {t('comments.countNone')}
-                  </div>
-                  <div style={{ fontSize: 13, lineHeight: 1.45, color: A.MUTE, maxWidth: 230 }}>
-                    {t('comments.emptyLine')}
-                  </div>
-                </div>
+                /* G.2 / G.5 — two different situations, never one block of copy. */
+                <EmptyState hiddenCount={hiddenCount} name={subject?.authorFirstName ?? null} />
               ) : (
                 <div>
                   {threads.map((c, i) => (
@@ -402,6 +411,7 @@ function CommentsSheetV2Inner({
                       onLike={onLike}
                       onMore={onMore}
                       onClose={onClose}
+                      standings={standings}
                     />
                   ))}
                   {hasNextPage && (
@@ -415,6 +425,15 @@ function CommentsSheetV2Inner({
                     >
                       {isFetchingNextPage ? t('comments.loading') : t('comments.viewEarlier')}
                     </button>
+                  )}
+                  {/* G.2 — some shown, some hidden: stated once at the foot. */}
+                  {hiddenCount > 0 && (
+                    <div
+                      data-comments-hidden-foot="true"
+                      style={{ ...FIGS, borderTop: `1px solid ${BORDER}`, paddingTop: 12, marginTop: 4, textAlign: 'center', fontSize: 11, color: A.DIM }}
+                    >
+                      {t('comments.hiddenCount', { count: hiddenCount })}
+                    </div>
                   )}
                 </div>
               )}
@@ -576,3 +595,64 @@ function SkeletonRows() {
 
 export const CommentsSheetV2 = memo(CommentsSheetV2Inner);
 export default CommentsSheetV2;
+
+/** G.3 — what you are commenting on. Rounds and reviews only; never invented. */
+function ContextLine({ subject }: { subject: CommentsSubject }) {
+  const { t } = useTranslation('common');
+  if (subject.kind === 'post' || !subject.authorName || !subject.courseName) return null;
+  const strong = { color: A.INK, fontWeight: 700 } as const;
+  let tail: React.ReactNode = null;
+  if (subject.kind === 'round' && subject.gross != null) {
+    const tp = subject.toPar;
+    const tpText = tp == null ? null : tp === 0 ? t('comments.contextLevel') : tp < 0 ? `\u2212${Math.abs(tp)}` : `+${tp}`;
+    tail = (
+      <>
+        {' \u00B7 '}<span style={strong}>{subject.gross}</span>
+        {tpText && <span style={{ color: tp != null && tp < 0 ? TOPAR_UNDER_DARK : A.MUTE, fontWeight: 700 }}>{' '}{tpText}</span>}
+      </>
+    );
+  } else if (subject.kind === 'review' && subject.rating != null) {
+    tail = <>{' \u00B7 '}<span style={strong}>{subject.rating.toFixed(1)}</span></>;
+  }
+  return (
+    <div
+      data-comments-context="true"
+      className="truncate"
+      style={{ ...FIGS, fontSize: 11, color: A.MUTE, marginTop: 4, fontVariantNumeric: 'tabular-nums' }}
+    >
+      <span style={strong}>{subject.authorName}</span>
+      {' \u00B7 '}{shortCourseName(subject.courseName)}
+      {tail}
+    </div>
+  );
+}
+
+/** G.5 genuine empty (132px) and G.2 all-hidden, sharing one shell. */
+function EmptyState({ hiddenCount, name }: { hiddenCount: number; name: string | null }) {
+  const { t } = useTranslation('common');
+  const hidden = hiddenCount > 0;
+  return (
+    <div
+      data-comments-empty={hidden ? 'hidden' : 'none'}
+      style={{
+        flex: 1, display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+        padding: '22px 28px 20px', gap: 6, minHeight: 132,
+      }}
+    >
+      {hidden
+        ? <EyeOff size={24} strokeWidth={1.5} color={A.DIM} aria-hidden />
+        : <MessageCircle size={24} strokeWidth={1.5} color={A.DIM} aria-hidden />}
+      <div style={{ fontSize: 15, fontWeight: 600, color: A.INK, letterSpacing: '-0.1px' }}>
+        {hidden ? t('comments.hiddenCount', { count: hiddenCount }) : t('comments.countNone')}
+      </div>
+      <div style={{ fontSize: 13, lineHeight: 1.45, color: A.MUTE, maxWidth: 260 }}>
+        {hidden
+          ? t('comments.hiddenLine', { count: hiddenCount })
+          : name
+            ? <Trans t={t} i18nKey="comments.emptyLineTo" values={{ name }} components={{ b: <strong style={{ color: A.INK, fontWeight: 700 }} /> }} />
+            : t('comments.emptyLine')}
+      </div>
+    </div>
+  );
+}

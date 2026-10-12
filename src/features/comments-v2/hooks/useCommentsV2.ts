@@ -16,6 +16,7 @@ import { patchEngagement } from '@/lib/engagementCache';
 import { useReactionPostIds } from '@/components/explore-tab-new/courseled/hooks/useReactionPostIds';
 import { commentsKeys, commentsScope, viewerId } from '@/lib/queryKeys';
 import { resolveReactionActor, isReactionByActor } from '@/lib/reactionActor';
+import { visibleCommentCount, hiddenCommentCount } from '../lib/threadCounts';
 
 /**
  * 'tour_story' | 'amateur_story' (BRIEF_STORY_ENGAGEMENT §S5). Both story beats
@@ -172,7 +173,7 @@ export function useCommentsV2({
 
   // Fetch all replies for the visible parents in one query.
   const parentIds = useMemo(() => parents.map(p => p.id), [parents]);
-  const { data: replies = [] } = useQuery({
+  const { data: replies = [], isFetched: repliesFetched } = useQuery({
     // Batch idiom: how many parents are loaded, never which ones.
     queryKey: commentsKeys.replies(scope, viewerId(user?.id), parentIds.length),
     placeholderData: keepPreviousData,
@@ -334,7 +335,12 @@ export function useCommentsV2({
       });
   }, [parents, replies, hiddenIds, blockedIds, shape]);
 
-  // Header total (top-level count for the current target).
+  /* GLOBAL TOTAL for the target — EVERYONE's rows, replies included, which is
+     what the visible count also counts. For a post it is posts.comment_count;
+     otherwise (rounds, reviews, every non-post target) it counts every
+     comments_v2 row for the target, top-level AND replies. The sheet no longer
+     DISPLAYS this number (BRIEF_COMMENTS_SHEET G.1): it is compared with the
+     rendered count to state how many are hidden (G.2). */
   const {
     data: totalCount = 0,
     isLoading: totalCountLoading,
@@ -366,6 +372,15 @@ export function useCommentsV2({
       return count ?? 0;
     },
   });
+
+  /* G.1 — ONE SOURCE: the count is the threads array the body maps over. */
+  const visibleCount = useMemo(() => visibleCommentCount(threads), [threads]);
+  const threadFetched = pagesFetched && (parentIds.length === 0 || repliesFetched);
+  const hiddenCount = hiddenCommentCount(
+    totalCount,
+    visibleCount,
+    threadFetched && totalCountFetched && !hasNextPage,
+  );
 
   const invalidate = useCallback(() => {
     qc.invalidateQueries({ queryKey: keyRoot as unknown as readonly unknown[] });
@@ -564,8 +579,15 @@ export function useCommentsV2({
 
   return {
     threads,
+    /** What the sheet prints: rows on screen, replies included (G.1). */
+    visibleCount,
+    /** Global total minus visible, once every page is in (G.2). */
+    hiddenCount,
+    /** Everyone's total. Not for display in the sheet. */
     totalCount,
     totalCountLoading,
+    /** Pages AND their replies have landed — the visible count is final. */
+    threadFetched,
     isLoading,
     /**
      * THE ONLY HONEST GATES (RULING A). isLoading / totalCountLoading are

@@ -13,6 +13,8 @@ import { CommentImageV2 } from './CommentImageV2';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { isEmojiOnly } from '../lib/emojiOnly';
 import type { CommentV2 } from '../hooks/useCommentsV2';
+import type { Standing } from '../lib/standing';
+import { StandingLine } from './StandingLine';
 
 /* Dark baseline (MICRO_BRIEF_COMMENTS_DARK §2). */
 const INK = A.INK;
@@ -30,9 +32,10 @@ interface Props {
   onLike: (id: string) => void;
   onMore: (c: CommentV2) => void;
   onClose?: () => void;
+  standing?: Standing | null;
 }
 
-export function ReplyRow({ comment, currentUserId, registerRef, highlighted, onLike, onMore, onClose }: Props) {
+export function ReplyRow({ comment, currentUserId, registerRef, highlighted, onLike, onMore, onClose, standing }: Props) {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
   /* Amber = the viewer, and nothing else on this surface. */
@@ -90,6 +93,7 @@ export function ReplyRow({ comment, currentUserId, registerRef, highlighted, onL
           </span>
           {comment.is_edited && <span style={{ fontSize: 11.5, color: DIM, fontVariantNumeric: 'tabular-nums' }}>{'\u00B7'} {t('comments.edited')}</span>}
         </div>
+        <StandingLine standing={standing} />
 
         {comment.content && (
           <MentionText
