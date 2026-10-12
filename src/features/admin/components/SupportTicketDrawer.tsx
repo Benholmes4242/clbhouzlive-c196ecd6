@@ -8,6 +8,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
 import DetailDrawer from './DetailDrawer';
+import { useSupportTicketActions } from '../hooks/useSupportTicketActions';
 import StatusPill from './StatusPill';
 import {
   SUPPORT_TICKETS_KEY,
@@ -52,6 +53,7 @@ interface Props {
 export default function SupportTicketDrawer({ ticket, onClose }: Props) {
   const qc = useQueryClient();
   const { user } = useSupabaseSession();
+  const supportActions = useSupportTicketActions();
   const { data: messages = [], isLoading } = useSupportThread(ticket?.id ?? null);
   const [body, setBody] = useState('');
   const [sending, setSending] = useState(false);
@@ -80,21 +82,10 @@ export default function SupportTicketDrawer({ ticket, onClose }: Props) {
     const prev = status;
     setLocalStatus(next);
     try {
-      const { error } = await supabase
-        .from('support_tickets')
-        .update({
-          status: next,
-          // Stamped on close so the Inbox's Flow and Done view can time it;
-          // cleared when the ticket is reopened.
-          resolved_at: next === 'resolved' || next === 'closed' ? new Date().toISOString() : null,
-        } as never)
-        .eq('id', ticket.id);
-      if (error) throw error;
-      qc.invalidateQueries({ queryKey: SUPPORT_TICKETS_KEY });
-      qc.invalidateQueries({ queryKey: ['admin-v2', 'inbox'] });
-    } catch (e: any) {
+      await supportActions.setStatus(ticket.id, next);
+    } catch (e: unknown) {
       setLocalStatus(prev);
-      toast.error(e?.message ?? 'Failed to update status');
+      toast.error((e as { message?: string })?.message ?? 'Failed to update status');
     } finally {
       setStatusBusy(false);
     }
@@ -105,43 +96,11 @@ export default function SupportTicketDrawer({ ticket, onClose }: Props) {
     if (!ticket || !user?.id || !trimmed) return;
     setSending(true);
     try {
-      const { error } = await supabase.from('support_messages').insert({
-        ticket_id: ticket.id,
-        sender_id: user.id,
-        sender_role: 'admin',
-        body: trimmed,
-      });
-      if (error) throw error;
-
-      // Notify user in-app
-      const snippet = trimmed.length > 140 ? trimmed.slice(0, 140) + '…' : trimmed;
-      await supabase.from('notifications').insert({
-        user_id: ticket.user_id,
-        recipient_actor_id: ticket.user_id,
-        recipient_actor_type: 'personal',
-        actor_id: user.id,
-        type: 'support_reply',
-        title: 'replied to your request',
-        message: snippet,
-        entity_type: 'support_ticket',
-        entity_id: ticket.id,
-        data: { ticket_id: ticket.id },
-      });
-
-      // Email (fail soft)
-      supabase.functions
-        .invoke('support-reply-notify', {
-          body: { ticketId: ticket.id, messageBody: trimmed },
-        })
-        .catch((e) => console.warn('support-reply-notify failed', e));
-
+      await supportActions.sendReply(ticket, user.id, trimmed);
       setBody('');
-      qc.invalidateQueries({ queryKey: SUPPORT_THREAD_KEY(ticket.id) });
-      qc.invalidateQueries({ queryKey: SUPPORT_TICKETS_KEY });
-      qc.invalidateQueries({ queryKey: ['admin-v2', 'inbox'] });
       toast.success('Reply sent');
-    } catch (e: any) {
-      toast.error(e?.message ?? 'Failed to send reply');
+    } catch (e: unknown) {
+      toast.error((e as { message?: string })?.message ?? 'Failed to send reply');
     } finally {
       setSending(false);
     }
