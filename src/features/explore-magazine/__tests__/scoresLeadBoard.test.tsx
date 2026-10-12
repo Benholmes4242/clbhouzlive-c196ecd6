@@ -69,7 +69,7 @@ function withYou(you: number | null, board: BoardKey = 'stableford') {
   const rows = [row(1), row(2)];
   const state = makeBoardState({
     board, total: 2,
-    facets: { settled: you != null, countFor: (axis: string, key: string) => (axis === 'scope' && key === 'you' ? you : null), openList: () => [] },
+    facets: { settled: true, resolved: true, countFor: (axis: string, key: string) => (axis === 'scope' && key === 'you' ? you : null), openList: () => [] },
     page: { data: { rows, total: 2, pool: { rounds: 23, courses: 3, members: 19 } }, isSuccess: true, isPending: false } as never,
   });
   return render(<ScoresLeaderboardsPage userId="viewer" state={state} onOpenFilters={vi.fn()}
@@ -78,14 +78,46 @@ function withYou(you: number | null, board: BoardKey = 'stableford') {
 
 describe('Standing and basis (Phase 2)', () => {
   it('renders the basis line beneath the controls', () => {
-    withYou(null);
+    withYou(0);
     expect(document.querySelector('[data-scores-basis]')).toBeTruthy();
   });
-  it('keeps the you slab shape, empty, before the you-count resolves', () => {
+  it('holds the whole lead block behind the placeholder while the counts read is pending', () => {
+    const state = makeBoardState({
+      total: 2,
+      facets: { settled: false, resolved: false, countFor: () => null, openList: () => [] },
+      page: { data: { rows: [row(1), row(2)], total: 2, pool: { rounds: 2, courses: 1, members: 2 } }, isSuccess: true, isPending: false } as never,
+    });
+    render(<ScoresLeaderboardsPage userId="viewer" state={state} onOpenFilters={vi.fn()}
+      onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />);
+    expect(document.querySelector('[data-scores-board-rail]')).toBeNull();
+    expect(document.querySelector('[data-scores-basis]')).toBeNull();
+    expect(document.querySelector('[data-scores-standing]')).toBeNull();
+    expect(screen.queryByText('Member 1')).toBeNull();
+    expect(document.querySelector('[data-lead-board-skeleton]')).toBeTruthy();
+  });
+  it('a failed counts read opens the board with names, no figures and nothing greyed', () => {
+    const state = makeBoardState({
+      total: 2,
+      facets: { settled: false, resolved: true, countFor: () => null, openList: () => [] },
+      page: { data: { rows: [row(1), row(2)], total: 2, pool: { rounds: 2, courses: 1, members: 2 } }, isSuccess: true, isPending: false } as never,
+    });
+    render(<ScoresLeaderboardsPage userId="viewer" state={state} onOpenFilters={vi.fn()}
+      onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />);
+    expect(document.querySelector('[data-lead-board-skeleton]')).toBeNull();
+    expect(document.querySelectorAll('[data-board-chip]').length).toBe(6);
+    document.querySelectorAll('[data-board-chip]').forEach((c) => expect((c as HTMLButtonElement).disabled).toBe(false));
+    expect(document.querySelector('[data-scores-board-rail]')?.textContent).not.toMatch(/\d/);
+    expect(rowsOf().length).toBe(2);
+  });
+  it('an unknown you-count with no own row renders no slab at all', () => {
     withYou(null);
+    expect(document.querySelector('[data-scores-standing]')).toBeNull();
+  });
+  it('a you-count of zero is told the floor', () => {
+    withYou(0);
     const slab = document.querySelector('[data-scores-standing]');
-    expect(slab?.getAttribute('data-scores-standing')).toBe('pending');
-    expect(slab?.textContent).toBe('');
+    expect(slab?.getAttribute('data-scores-standing')).toBe('none');
+    expect(slab?.textContent).not.toBe('');
   });
   it('a qualifying member beyond the fetch is told they are deeper and given see-all', () => {
     withYou(3);

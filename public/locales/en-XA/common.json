@@ -238,6 +238,16 @@
       "most_albatrosses_all_time": "[~~Ṁőšţ áļƀáţřőššéš~~]",
       "most_eagles_all_time": "[~~Ṁőšţ éáĝļéš~~]",
       "most_birdies_all_time": "[~~Ṁőšţ ƀířđíéš~~]"
+    },
+    "reviewPost": {
+      "kicker": "[Řéṽîéŵéð]",
+      "playsOff": "[Þļåýš öƒƒ {{index}}]",
+      "readMore": "[Ŕéåð ɱöŕé]",
+      "against": {
+        "below": "[Ɓéļöŵ ţĥé çöûŕšé åṽéŕåĝé öƒ {{avg}}, åçŕöšš {{count}} ŕéṽîéŵš.]",
+        "above": "[Åƀöṽé ţĥé çöûŕšé åṽéŕåĝé öƒ {{avg}}, åçŕöšš {{count}} ŕéṽîéŵš.]",
+        "inLine": "[Îñ ļîñé ŵîţĥ ţĥé çöûŕšé åṽéŕåĝé öƒ {{avg}}, åçŕöšš {{count}} ŕéṽîéŵš.]"
+      }
     }
   },
   "settings": {

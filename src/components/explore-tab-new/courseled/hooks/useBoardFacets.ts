@@ -50,6 +50,13 @@ export interface BoardFacets {
   /** true once at least one facet answer has arrived for this session. */
   settled: boolean;
   /**
+   * true once the read has FINISHED, successfully or not. `settled` answers
+   * "have I got counts?"; `resolved` answers "may the board open?". A failed
+   * read is resolved but never settled, so it can open the board without
+   * fabricating zeros through countFor.
+   */
+  resolved: boolean;
+  /**
    * A FIXED-LIST count. `null` means UNRESOLVED (render no count, grey nothing);
    * 0 means the RPC answered and the option genuinely holds nothing.
    */
@@ -98,6 +105,7 @@ export function useBoardFacets(
 
     return {
       settled,
+      resolved: !query.isPending,
       countFor: (axis, key) => {
         if (!settled) return null;
         return byAxis.get(axis)?.get(key)?.n ?? 0;
@@ -110,5 +118,5 @@ export function useBoardFacets(
         );
       },
     };
-  }, [query.data]);
+  }, [query.data, query.isPending]);
 }

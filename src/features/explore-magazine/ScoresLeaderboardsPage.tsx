@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Trans, useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
@@ -916,8 +916,23 @@ export function ScoresLeaderboardsPage({
   /* 1.2 ONE GATE — the lead block (rail, controls, basis, slab, rows) arrives
      once on the cold open. `ready` already waits on the home-club query, so
      clubApplies is final whenever it is true. After the first settle, only
-     the rows area swaps (1.4). */
-  const leadSettled = state.ready && state.page.isSuccess && (state.facets?.settled ?? false);
+     the rows area swaps (1.4).
+     THE RULE: NO PRIMARY SURFACE IN THIS APP MAY BE HELD SHUT, OR MADE TO
+     STATE SOMETHING IT DOES NOT KNOW, BY A FIGURE THAT IS DECORATION. The
+     counts are decoration here; the rows are the screen. So the gate waits on
+     the counts read having FINISHED (`resolved`, success or failure), never on
+     it having succeeded, and a 2500ms backstop opens the block without
+     figures if the read never answers. The chips reserve their figure slot,
+     so counts that land late fill in without moving the rail. */
+  const rowsReady = state.ready && state.page.isSuccess;
+  const [countsBackstop, setCountsBackstop] = useState(false);
+  const countsResolved = state.facets ? state.facets.resolved : true;
+  useEffect(() => {
+    if (!rowsReady || countsResolved || countsBackstop) return;
+    const id = window.setTimeout(() => setCountsBackstop(true), 2500);
+    return () => window.clearTimeout(id);
+  }, [rowsReady, countsResolved, countsBackstop]);
+  const leadSettled = rowsReady && (countsResolved || countsBackstop);
   const leadSettledOnce = useRef(false);
   if (leadSettled) leadSettledOnce.current = true;
   const leadHeadShown = leadSettledOnce.current;
@@ -1055,12 +1070,16 @@ export function ScoresLeaderboardsPage({
             );
           })()}
           {/* 8.4 THE YOU SLAB — always present for a signed-in member; three
-              states from fields already on the page. It renders only once the
-              facets have settled (1.2), so there is no pending state.
+              states from fields already on the page, and no pending state. With
+              no own row and an unknown `you` count it renders nothing.
               SAFE ON EVERY OFFERED SCOPE: every offered scope includes the
               viewer, so a qualifying round means a place on the board. */}
           {userId ? (() => {
             const you = state.facets?.countFor?.('scope', 'you') ?? null;
+            /* An unknown `you` count is not a fact: with no row of the member's
+               own to show, render no slab rather than tell them they have no
+               qualifying round. */
+            if (!leadMine && you == null) return null;
             let kind: 'on' | 'deeper' | 'none';
             let figure: ReactNode = null;
             let sentence: ReactNode = null;
