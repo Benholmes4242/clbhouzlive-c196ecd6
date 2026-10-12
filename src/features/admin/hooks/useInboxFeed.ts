@@ -146,6 +146,14 @@ export function useInboxFeed(): InboxFeedResult {
     enabled: canUsers,
     staleTime: 30_000,
   });
+  // Done view: rows that left triage, timed by resolved_at. needs_catalogue is
+  // NOT done - it stays open via TRIAGE_VISIBLE_STATUSES.
+  const unmatchedDone = useQuery({
+    queryKey: ['admin-v2', 'inbox', 'unmatched-courses-done'],
+    queryFn: () => fetchUnmatchedCourses(['resolved', 'ignored']),
+    enabled: canUsers,
+    staleTime: 30_000,
+  });
   const courseReqAll = useQuery({
     queryKey: ['admin-v2', 'inbox', 'course-requests'],
     queryFn: fetchCourseRequests,
@@ -179,7 +187,7 @@ export function useInboxFeed(): InboxFeedResult {
 
   const allQueries = [
     mod, modDone, appealsOpen, appealsDone, supportOpen, supportDone,
-    verifOpen, matchOpen, matchDoneMatched, matchDoneRejected, unmatchedOpen,
+    verifOpen, matchOpen, matchDoneMatched, matchDoneRejected, unmatchedOpen, unmatchedDone,
     courseReqAll, approvalsOpen, approvalsDone, holePhotosOpen, holePhotosDone,
   ];
 
@@ -380,6 +388,39 @@ export function useInboxFeed(): InboxFeedResult {
       }
     }
 
+    if (canUsers && unmatchedDone.data) {
+      for (const row of unmatchedDone.data) {
+        done.push({
+          id: `done-unmatched-${row.whs_course_id}`,
+          type: 'unmatchedCourse',
+          title: row.whs_course_name ?? 'Unnamed WHS course',
+          meta: `Unmatched courses - ${row.round_count} round${row.round_count === 1 ? '' : 's'} from ${row.member_count} member${row.member_count === 1 ? '' : 's'}`,
+          createdAt: row.resolved_at ?? row.last_attempt_at ?? row.first_seen_at,
+          isHighPriority: false,
+          payload: row,
+          closedOutcome: row.status === 'resolved' ? 'Matched' : 'Ignored',
+        });
+      }
+    }
+
+    // Course requests (done)
+    if (canUsers && courseReqAll.data) {
+      const label: Record<string, string> = { added: 'Added', rejected: 'Dismissed', duplicate: 'Duplicate' };
+      for (const row of courseReqAll.data) {
+        if (!label[row.status]) continue;
+        done.push({
+          id: `done-req-${row.id}`,
+          type: 'courseRequest',
+          title: row.courseName,
+          meta: `Course requests - ${row.displayName ?? row.username ?? 'user'}`,
+          createdAt: row.resolvedAt ?? row.createdAt,
+          isHighPriority: false,
+          payload: row,
+          closedOutcome: label[row.status],
+        });
+      }
+    }
+
     // Course requests
     if (canUsers && courseReqAll.data) {
       for (const row of courseReqAll.data) {
@@ -501,7 +542,7 @@ export function useInboxFeed(): InboxFeedResult {
     mod.data, modDone.data, appealsOpen.data, appealsDone.data,
     supportOpen.data, supportDone.data, verifOpen.data,
     matchOpen.data, matchDoneMatched.data, matchDoneRejected.data, unmatchedOpen.data,
-    courseReqAll.data, approvalsOpen.data, approvalsDone.data,
+    unmatchedDone.data, courseReqAll.data, approvalsOpen.data, approvalsDone.data,
     holePhotosOpen.data, holePhotosDone.data,
   ]);
 

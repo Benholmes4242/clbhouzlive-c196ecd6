@@ -20,6 +20,7 @@ import ProHoleDataQueue, { useProHoleDataQueue, proHoleQueueCount } from '../com
 
 import {
   ignoreUnmatchedCourse,
+  linkUnmatchedCourse,
   markUnmatchedNeedsCatalogue,
   TRIAGE_VISIBLE_STATUSES,
   UNMATCHED_COURSES_KEY,

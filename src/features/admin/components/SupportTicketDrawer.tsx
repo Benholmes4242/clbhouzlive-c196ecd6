@@ -82,10 +82,16 @@ export default function SupportTicketDrawer({ ticket, onClose }: Props) {
     try {
       const { error } = await supabase
         .from('support_tickets')
-        .update({ status: next })
+        .update({
+          status: next,
+          // Stamped on close so the Inbox's Flow and Done view can time it;
+          // cleared when the ticket is reopened.
+          resolved_at: next === 'resolved' || next === 'closed' ? new Date().toISOString() : null,
+        } as never)
         .eq('id', ticket.id);
       if (error) throw error;
       qc.invalidateQueries({ queryKey: SUPPORT_TICKETS_KEY });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'inbox'] });
     } catch (e: any) {
       setLocalStatus(prev);
       toast.error(e?.message ?? 'Failed to update status');
@@ -132,6 +138,7 @@ export default function SupportTicketDrawer({ ticket, onClose }: Props) {
       setBody('');
       qc.invalidateQueries({ queryKey: SUPPORT_THREAD_KEY(ticket.id) });
       qc.invalidateQueries({ queryKey: SUPPORT_TICKETS_KEY });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'inbox'] });
       toast.success('Reply sent');
     } catch (e: any) {
       toast.error(e?.message ?? 'Failed to send reply');
