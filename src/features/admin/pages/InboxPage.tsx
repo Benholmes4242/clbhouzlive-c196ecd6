@@ -315,9 +315,18 @@ function InboxListPage() {
             ))}
           </div>
         ) : (
-          <div style={{ borderTop: `1px solid ${t.hairline}`, padding: '0 12px' }}>
+          <div style={{ borderTop: `1px solid ${t.hairline}` }}>
             {filtered.map((item, idx) => (
-              <StreamRow key={item.id} item={item} first={idx === 0} done showQueue={typeFilter === 'all'} onClick={() => openRow(item)} />
+              <InboxQueueRow
+                key={item.id}
+                item={item}
+                first={idx === 0}
+                done
+                onOpen={() => openRow(item)}
+                onResolved={onResolved}
+                isFullAdmin={role === 'full'}
+                catalogueTotal={catalogueTotal}
+              />
             ))}
           </div>
         )}
