@@ -24,6 +24,9 @@ export interface ReviewFallbackFields {
     clubhouse: number | null;
     facilities: number | null;
   } | null;
+  /** The review's own timestamp (course_ratings.review_date) — the one source
+   *  every surface reads for a review's age, so two surfaces cannot disagree. */
+  reviewDate: string | null;
 }
 
 export const reviewFallbackKey = (reviewId: string) => ['review-fallback', reviewId] as const;
@@ -31,7 +34,7 @@ export const reviewFallbackKey = (reviewId: string) => ['review-fallback', revie
 export async function fetchReviewFallback(reviewId: string): Promise<ReviewFallbackFields | null> {
   const { data, error } = await supabase
     .from('course_ratings')
-    .select('review, design_score, condition_score, clubhouse_score, facilities_score')
+    .select('review, design_score, condition_score, clubhouse_score, facilities_score, review_date')
     .eq('id', reviewId)
     .maybeSingle();
   if (error) throw error;
@@ -44,6 +47,7 @@ export async function fetchReviewFallback(reviewId: string): Promise<ReviewFallb
       clubhouse: data.clubhouse_score != null ? Number(data.clubhouse_score) : null,
       facilities: data.facilities_score != null ? Number(data.facilities_score) : null,
     },
+    reviewDate: (data.review_date as string | null) ?? null,
   };
 }
 
@@ -56,10 +60,12 @@ interface Params {
   enabled: boolean;
   hasText: boolean;
   hasBreakdown: boolean;
+  /** True when the payload already carries the review's own review_date. */
+  hasReviewDate?: boolean;
 }
 
-export function useReviewFallback({ reviewId, enabled, hasText, hasBreakdown }: Params) {
-  const needsFetch = enabled && !!reviewId && (!hasText || !hasBreakdown);
+export function useReviewFallback({ reviewId, enabled, hasText, hasBreakdown, hasReviewDate = false }: Params) {
+  const needsFetch = enabled && !!reviewId && (!hasText || !hasBreakdown || !hasReviewDate);
 
   return useQuery<ReviewFallbackFields | null>({
     queryKey: reviewFallbackKey(reviewId ?? ''),
