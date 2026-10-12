@@ -205,11 +205,6 @@ export function useOverviewMetrics() {
   });
 }
 
-// ─── ACTIVE MEMBERS: daily actives over the last 28 days ───────────────────────
-// Sourced from get_platform_activity, the same aggregation the Engagement card
-// uses. Rolling 7-day / 28-day unique unions are NOT derivable from a per-day
-// trend, so those lines were removed rather than approximated — see the report.
-
 // Delta helper.
 // Returns null when there is no comparable previous period: a previous of 0
 // has no percentage change, and returning 100 made "from nothing" and a

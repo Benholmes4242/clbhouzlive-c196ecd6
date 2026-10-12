@@ -16,7 +16,6 @@ import { supabase } from '@/integrations/supabase/client';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-
 export type EgSyncStatus = 'green' | 'amber' | 'red' | 'idle';
 
 export interface EgSyncHealth {
