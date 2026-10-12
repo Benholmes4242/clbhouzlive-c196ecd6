@@ -66,11 +66,10 @@ describe('C1 course rating consistency', () => {
     expect(browse).not.toContain('getRatingTier');
   });
 
-  it('uses the displayed 9.0 threshold and muted absent state', () => {
+  it('uses the exact 9.0 threshold and muted absent state', () => {
     expect(courseSubScoreTone(undefined)).toBe(A.MUTE);
     expect(courseSubScoreTone(null)).toBe(A.MUTE);
-    // Tone follows the DISPLAYED value: 8.99 prints "9.0", so it is green.
-    expect(courseSubScoreTone(8.99)).toBe(A.GREEN);
+    expect(courseSubScoreTone(8.99)).toBe(A.MUTE);
     expect(courseSubScoreTone(9)).toBe(A.GREEN);
   });
 
