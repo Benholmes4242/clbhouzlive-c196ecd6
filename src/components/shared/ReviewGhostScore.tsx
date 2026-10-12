@@ -86,7 +86,7 @@ export const ReviewVerdictLabel: React.FC<ReviewVerdictLabelProps> = ({
     <span
       style={{
         fontSize,
-        fontWeight: 700,
+        fontWeight: 800,
         letterSpacing: '0.14em',
         textTransform: 'uppercase',
         whiteSpace: 'nowrap',

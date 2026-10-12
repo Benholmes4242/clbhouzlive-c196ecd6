@@ -31,8 +31,6 @@ import { canManagePost } from '@/lib/canManagePost';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
 import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
-import { getRatingTierLabel } from '@/lib/ratingTier';
-import { formatRatingValue } from '@/utils/formatters';
 import { useActiveActor } from '@/context/ActiveActorContext';
 
 import type { CommentOpenSource } from '@/types/commentOpenSource';
