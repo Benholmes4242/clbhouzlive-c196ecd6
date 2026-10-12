@@ -9,7 +9,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
 import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';
-import CourseRankBadges from '@/components/courses/CourseRankBadges';
+import { courseRankLabels, type RankList } from '@/features/courses/_shared/courseRankLabels';
 import { CourseTabs, type CourseTabId } from '@/components/courses/course-detail/CourseTabs';
 import CourseDetailShellTabs from '@/features/courses/components/CourseDetailShellTabs';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
@@ -464,7 +464,14 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
    * US course regional_rank actually holds the USA rank.
    */
   const { data: standing } = useCourseTop100Standing(courseId);
-  const hasRank = Boolean(standing?.globalRank || standing?.regionalRank || standing?.usaRank);
+  // Same country rule CourseRankBadges used to decide what "regional" means.
+  const rankEntries: Array<{ list: RankList; rank: number }> = [];
+  if (standing?.globalRank) rankEntries.push({ list: 'global', rank: standing.globalRank });
+  const c = course.country ?? '';
+  const isGBI = ['United Kingdom', 'Ireland', 'England', 'Scotland', 'Wales', 'Northern Ireland', 'Isle of Man', 'Britain & Ireland'].includes(c);
+  if (isGBI && standing?.regionalRank) rankEntries.push({ list: 'gbi', rank: standing.regionalRank });
+  else if (['United States', 'USA'].includes(c) && standing?.usaRank) rankEntries.push({ list: 'usa', rank: standing.usaRank });
+  else if (c === 'Continental Europe' && standing?.regionalRank) rankEntries.push({ list: 'europe', rank: standing.regionalRank });
 
   const shownRef = useRef<string | null>(null);
   useEffect(() => {
@@ -513,7 +520,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
     <div className="absolute inset-x-0 bottom-4 px-4 z-[1] flex flex-col gap-2">
       <CourseMasthead
         as="h1"
-        kicker={(course.sub_country || course.region || null) as string | null}
+        kicker={[course.sub_country || course.region, ...courseRankLabels(rankEntries)].filter(Boolean).join(' \u00B7 ') || null}
         name={course.name}
         place={course.country || null}
       >
@@ -546,22 +553,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
           figures legitimately differ. The tee card, 300px below, owns and
           labels tee data. */}
 
-      {hasRank && (
-        <div
-          className="inline-flex items-center self-end shrink-0"
-          style={{
-            gap: 8,
-          }}
-        >
-          <CourseRankBadges
-            globalRank={standing?.globalRank ?? null}
-            regionalRank={standing?.regionalRank ?? null}
-            usaRank={standing?.usaRank ?? null}
-            country={course.country}
-            positioning="inline"
-          />
-        </div>
-      )}
+      {/* Ranks live in the kicker (BRIEF_COURSE_RANK_ONE_FORM): a pill row here pushed the masthead up only on ranked courses. */}
     </div>
   );
 };
