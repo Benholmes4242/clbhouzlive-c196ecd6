@@ -141,7 +141,7 @@ export async function linkUnmatchedCourse(
 export async function markUnmatchedNeedsCatalogue(whsCourseId: string): Promise<void> {
   const { error } = await sb
     .from('whs_unmatched_courses')
-    .update({ status: 'needs_catalogue', resolved_at: new Date().toISOString() })
+    .update({ status: 'needs_catalogue' })
     .eq('whs_course_id', whsCourseId);
   if (error) throw error;
 }

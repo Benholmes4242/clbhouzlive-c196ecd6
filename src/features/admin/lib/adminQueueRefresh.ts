@@ -19,6 +19,10 @@ export async function invalidateAdminQueues(qc: QueryClient, extraKeys: readonly
     ['admin-v2', 'verifications'],
     ['admin-v2', 'dashboard', 'triage-counts'],
     ['admin-v2', 'dashboard', 'queue'],
+    // BRIEF_INBOX_WORK_THE_QUEUE 2.4: every inline action also refreshes the
+    // Command centre and the Inbox's Flow figures.
+    ['admin', 'command-centre'],
+    ['admin', 'inbox-flow'],
     ...extraKeys.map(k => [...k]),
   ];
   await Promise.all(

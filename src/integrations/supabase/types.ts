@@ -12450,6 +12450,7 @@ export type Database = {
           id: string
           last_message_at: string
           last_sender: string
+          resolved_at: string | null
           status: string
           subject: string
           user_hidden_at: string | null
@@ -12461,6 +12462,7 @@ export type Database = {
           id?: string
           last_message_at?: string
           last_sender?: string
+          resolved_at?: string | null
           status?: string
           subject: string
           user_hidden_at?: string | null
@@ -12472,6 +12474,7 @@ export type Database = {
           id?: string
           last_message_at?: string
           last_sender?: string
+          resolved_at?: string | null
           status?: string
           subject?: string
           user_hidden_at?: string | null
@@ -17485,6 +17488,7 @@ export type Database = {
           last_attempt_at: string
           last_tier_tried: string | null
           member_count: number
+          resolved_at: string | null
           round_count: number
           status: string
           whs_course_id: string
@@ -17496,6 +17500,7 @@ export type Database = {
           last_attempt_at?: string
           last_tier_tried?: string | null
           member_count?: number
+          resolved_at?: string | null
           round_count?: number
           status?: string
           whs_course_id: string
@@ -17507,6 +17512,7 @@ export type Database = {
           last_attempt_at?: string
           last_tier_tried?: string | null
           member_count?: number
+          resolved_at?: string | null
           round_count?: number
           status?: string
           whs_course_id?: string
@@ -19711,6 +19717,7 @@ export type Database = {
         Returns: Json
       }
       get_admin_funnel_cohorts: { Args: { p_weeks?: number }; Returns: Json }
+      get_admin_inbox_flow: { Args: { p_days?: number }; Returns: Json }
       get_admin_intraday: { Args: { p_tz?: string }; Returns: Json }
       get_admin_member_actions: { Args: { p_days?: number }; Returns: Json }
       get_admin_member_activity: {

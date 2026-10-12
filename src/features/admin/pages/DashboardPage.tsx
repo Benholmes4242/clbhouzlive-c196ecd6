@@ -25,9 +25,9 @@ import { useActiveWindows } from '../hooks/useActiveWindows';
 import { useRetention } from '../hooks/useRetention';
 import { pipelineTone } from '../components/SystemPanels';
 import { useCommandCentre, type CommandCentre } from '../hooks/useCommandCentre';
+import { RAISED, PANEL, LIST_PANEL } from '../lib/panels';
 
 // Brief-specified panel values with no theme token (BRIEF_COMMAND_CENTRE).
-const RAISED = 'rgba(255,255,255,0.03)';
 const TRACK = 'rgba(255,255,255,0.08)';
 const AREA = 'rgba(255,255,255,0.06)';
 const AVATAR_GROUND = '#1E2430';
@@ -38,8 +38,6 @@ const fmt = (n: number) => n.toLocaleString();
 
 // ─── Shell ────────────────────────────────────────────────────────────────────
 
-const PANEL: React.CSSProperties = { background: t.surface, borderRadius: 16, padding: '14px 16px' };
-const LIST_PANEL: React.CSSProperties = { background: t.surface, borderRadius: 16, padding: '14px 0 4px' };
 const TITLE: React.CSSProperties = { fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.ink };
 const META: React.CSSProperties = { ...FIG, fontSize: 11, color: t.inkFaint };
 const MINI_LABEL: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: t.inkFaint };
