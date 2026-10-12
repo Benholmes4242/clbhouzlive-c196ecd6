@@ -83,7 +83,7 @@ describe('review post — body clamp', () => {
     const c = card(8, all, 'A long review. '.repeat(40));
     const body = c.querySelector('[data-review-body]') as HTMLElement;
     const wrap = c.querySelector('[data-review-body-wrap]') as HTMLElement;
-    expect(body.style.webkitLineClamp).toBe('2');
+    expect(body.getAttribute('style') ?? '').toMatch(/line-clamp: 2/);
     expect(body.style.overflow).toBe('hidden');
     expect(body.style.padding).toBe('');
     expect(wrap.style.padding).toBe('0px 14px 12px');
