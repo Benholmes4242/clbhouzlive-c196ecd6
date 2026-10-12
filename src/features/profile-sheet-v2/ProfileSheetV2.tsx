@@ -34,7 +34,8 @@ import { overlayOpen, overlayMark } from '@/perf/overlayTiming';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import ActorCards from './components/ActorCards';
-import HcpStrip from './components/HcpStrip';
+import SheetCards from './components/SheetCards';
+import IdentityHeader from './components/IdentityHeader';
 import QuickActionsRow from './components/QuickActionsRow';
 import SheetNavGroup from './components/SheetNavGroup';
 import SignOutRow from './components/SignOutRow';
@@ -43,7 +44,9 @@ import SignOutRow from './components/SignOutRow';
 const SHEET_GUTTER = 20;
 import YourCourseAnalyticsSheet from './components/YourCourseAnalyticsSheet';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
-import { useWhsConnection } from '@/lib/whs/hooks';
+import { useWhsConnection, useHandicapTrend, useHandicapHistory, useAllScores } from '@/lib/whs/hooks';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { deriveSheetHcpState, sheetIndex, identityLine, formBars, courseFigures } from './sheetState';
 import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -138,11 +141,34 @@ export default function ProfileSheetV2({
   const { data: whsConn } = useWhsConnection(analyticsUserId);
   const whsSynced = !!whsConn && !(whsConn as { deleted_at?: string | null }).deleted_at;
   const { data: userCourses } = useUserAnalyticsCourses({ enabled: open && whsSynced });
-  const analyticsState: 'ready' | 'building' | 'disconnected' = !whsSynced
-    ? 'disconnected'
-    : (userCourses?.length ?? 0) > 0
-      ? 'ready'
-      : 'building';
+  /* S.4 — analyticsState, EXTENDED into the sheet's one handicap state
+     (sheetState.ts). Not a second machine: the old triple's only reader, the
+     Course analytics nav row, is gone. Reads are gated on `open` so a closed
+     sheet costs nothing, as when HcpStrip owned them. */
+  const sheetUserId = open ? analyticsUserId : undefined;
+  const conn = whsSynced ? whsConn : null;
+  const profileQ = useUserProfile(sheetUserId);
+  const trendQ = useHandicapTrend(open ? conn?.id : undefined);
+  const histQ = useHandicapHistory(open ? conn?.id : undefined, 90);
+  const scoresQ = useAllScores(open ? conn?.id : undefined);
+  const { isFetched: connFetched, isError: connError } = useWhsConnection(analyticsUserId);
+  const anyError = profileQ.isError || connError || trendQ.isError || histQ.isError;
+  const settled = anyError ||
+    (!!sheetUserId && profileQ.isFetched && connFetched && (!conn || (trendQ.isFetched && histQ.isFetched)));
+  const analyticsState = deriveSheetHcpState({
+    isBusiness: currentActor.type === 'business',
+    settled,
+    hidden: !!profileQ.data?.hide_handicap_chip,
+    connection: conn ?? null,
+    egHandicapIndex: profileQ.data?.eg_handicap_index,
+    manualHandicapIndex: profileQ.data?.manual_handicap_index,
+  });
+  const headerLine = identityLine({
+    isBusiness: currentActor.type === 'business',
+    club: profileQ.data?.home_club,
+    // A hidden index is not printed in the header either.
+    index: analyticsState.kind === 'hidden' ? null : sheetIndex(analyticsState),
+  });
   const handleOpenCourseAnalytics = () => setAnalyticsSheetOpen(true);
   /* Two sheets are open here (this one and the analytics sheet), so TWO
      sheet-stack markers unwind with a history.back() each. The navigate has to
@@ -228,17 +254,27 @@ export default function ProfileSheetV2({
           {isLoading ? (
             <SheetSkeleton />
           ) : (
-            <div style={{ paddingTop: 16, paddingBottom: 32 }}>
+            <div style={{ paddingTop: 8, paddingBottom: 32 }}>
+              <IdentityHeader
+                id={currentActor.id}
+                name={currentActor.name}
+                avatarUrl={currentActor.avatarUrl}
+                line={headerLine}
+                onOpen={() => onNavigate(`/profile/${currentActor.id}`)}
+              />
               <ActorCards
                 currentActor={currentActor}
                 profiles={profiles}
                 onSwitchProfile={onSwitchProfile}
                 onNavigate={onNavigate}
               />
-              <HcpStrip
-                actorType={currentActor.type}
-                actorId={currentActor.id}
+              <SheetCards
+                state={analyticsState}
+                history90={histQ.data as { observed_at: string; handicap_index: number }[] | undefined}
+                bars={formBars(scoresQ.data)}
+                courses={courseFigures(userCourses)}
                 onNavigate={onNavigate}
+                onOpenCourseAnalytics={handleOpenCourseAnalytics}
               />
               <QuickActionsRow
                 gutter={SHEET_GUTTER}
@@ -252,13 +288,7 @@ export default function ProfileSheetV2({
                 isAdmin={isAdmin}
                 onNavigate={onNavigate}
                 onInviteFriends={handleInviteFriends}
-                onOpenCourseAnalytics={
-                  currentActor.type === 'personal' ? handleOpenCourseAnalytics : undefined
-                }
-                analyticsState={analyticsState}
-                /* D2: the dashed "+ Business" tile left the actor rail; this is
-                   what decides whether the business row offers creation. */
-                hasBusinessActor={profiles.some((p) => p.type === 'business')}
+                businessNames={profiles.filter((p) => p.type === 'business').map((p) => p.name)}
               />
               <SignOutRow onNavigate={onNavigate} />
             </div>

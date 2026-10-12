@@ -289,7 +289,9 @@ export interface WhsFriendWindowRanking {
 }
 
 export interface WhsScoreWithIndex extends WhsScore {
-  /** Handicap index after this round was applied. Null if not yet computed. */
+  /** The index this round was PLAYED OFF, as the provider recorded it (EG
+   *  score HandicapIndex; see gam-evaluator delta_index). Not the index after
+   *  the round. Null when the provider has not yet calculated it. */
   handicap_index_at_time: number | null;
   /**
    * Resolved thumbnail from `golf_courses.thumbnail_image` (matched via the
