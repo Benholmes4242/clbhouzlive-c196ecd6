@@ -19,9 +19,9 @@ beforeAll(() => {
 });
 
 const bars = [
-  { id: 'a', date: '2026-09-06', value: -0.9 },
-  { id: 'b', date: '2026-09-14', value: 2.1 },
-  { id: 'c', date: '2026-09-21', value: -1.9 },
+  { id: 'a', date: '2026-09-06', value: -0.9, movement: -0.2 },
+  { id: 'b', date: '2026-09-14', value: 2.1, movement: 0.1 },
+  { id: 'c', date: '2026-09-21', value: -1.9, movement: -0.3 },
 ];
 const courses = courseFigures([{ course_name: 'Knebworth', rounds_count: 4, last_played: '2026-05-01', avg_to_par: 2.1 }]);
 const history = [
