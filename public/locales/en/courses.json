@@ -2760,7 +2760,9 @@
     "scopeTheir": "their",
     "scopeHave": "have",
     "scopeHas": "has",
-    "hcpLabel": "HCP"
+    "hcpLabel": "HCP",
+    "figVsYourAvgNeutralHere": "vs your average here",
+    "figVsTheirAvgNeutralHere": "vs {{possessive}} average here"
   },
   "search": {
     "yourRounds": "Your rounds"

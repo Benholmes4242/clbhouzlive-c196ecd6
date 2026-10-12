@@ -1897,7 +1897,9 @@
     "scopeTheir": "suyas",
     "scopeHave": "has",
     "scopeHas": "ha",
-    "hcpLabel": "HCP"
+    "hcpLabel": "HCP",
+    "figVsYourAvgNeutralHere": "vs tu promedio aquí",
+    "figVsTheirAvgNeutralHere": "vs el promedio {{possessive}} aquí"
   },
   "searchSheet": {
     "added": "Added",

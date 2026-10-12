@@ -1851,7 +1851,9 @@
     "scopeTheir": "本人の",
     "scopeHave": "は",
     "scopeHas": "は",
-    "hcpLabel": "HCP"
+    "hcpLabel": "HCP",
+    "figVsYourAvgNeutralHere": "ここでのあなたの平均との比較",
+    "figVsTheirAvgNeutralHere": "ここでの{{possessive}}平均との比較"
   },
   "searchSheet": {
     "added": "Added",

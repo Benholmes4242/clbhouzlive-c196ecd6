@@ -1897,7 +1897,9 @@
     "scopeTheir": "deren",
     "scopeHave": "hast",
     "scopeHas": "hat",
-    "hcpLabel": "HCP"
+    "hcpLabel": "HCP",
+    "figVsYourAvgNeutralHere": "vs. deinen Durchschnitt hier",
+    "figVsTheirAvgNeutralHere": "vs. {{possessive}} Durchschnitt hier"
   },
   "searchSheet": {
     "added": "Added",
