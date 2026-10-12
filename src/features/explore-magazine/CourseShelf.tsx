@@ -10,7 +10,7 @@ import { courseSubScoreTone } from '@/features/courses/components/holes/analytic
 import type { ListEvent } from './listCourseEvents';
 import { ShelfShell } from './ExploreShells';
 import type { CourseShelfRow } from './useCourseShelves';
-import { ratingPrintable } from './courseRatingFloor';
+import { ratingRankable } from './courseRatingFloor';
 import { RankFlagBadge } from './RankFlagBadge';
 
 /**
@@ -81,9 +81,10 @@ export function CourseShelf({
             photo={TILE.h}
               reserveTwoLines
             figureNode={row.rank != null ? <RankFlagBadge rank={row.rank} scope={row.rankScope ?? null} /> : undefined}
-            figure={row.rank != null ? null : ratingPrintable(row.rating, row.ratingCount) ? row.rating.toFixed(1) : null}
+            /* No review count on this tile, so the floor applies (V.3). */
+            figure={row.rank != null ? null : ratingRankable(row.rating, row.ratingCount) ? row.rating.toFixed(1) : null}
             /* Neutral keeps the component's white default over photography. */
-            figureTone={row.rank == null && ratingPrintable(row.rating, row.ratingCount) && row.rating >= 9 ? courseSubScoreTone(row.rating) : undefined}
+            figureTone={row.rank == null && ratingRankable(row.rating, row.ratingCount) && row.rating >= 9 ? courseSubScoreTone(row.rating) : undefined}
             whenLabel=""
             who=""
             isOwn={false}
