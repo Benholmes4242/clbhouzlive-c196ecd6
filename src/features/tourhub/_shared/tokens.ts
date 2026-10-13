@@ -305,6 +305,8 @@ export const TOUR_HERO_BAND_H = '244px';
  * falls back to the same-height neutral gradient when no headshot resolves.
  */
 export const TOUR_HERO_PHOTO_H = '340px';
+/** Player hero band (photo-free). Separate from TOUR_HERO_PHOTO_H, which the tournament hero uses. */
+export const TOUR_PLAYER_HERO_H = '268px';
 
 /**
  * TOUR_EYEBROW — BRIEF_TOUR_FIXED_HEADER S5.

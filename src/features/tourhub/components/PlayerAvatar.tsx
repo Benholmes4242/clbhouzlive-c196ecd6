@@ -33,6 +33,9 @@ interface PlayerAvatarProps {
   /** sr_players.headshot_override — a FILENAME KEY for the folder lookup, not a
    *  URL. Never pass it as photoUrl and never coalesce the two. */
   headshotOverride?: string | null;
+  /** Passed to SquircleAvatar. Defaults change nothing. */
+  surface?: 'tile' | 'canvas';
+  imagePosition?: string;
 }
 
 const SIZE_PX = { xs: 26, sm: 32, md: 44, lg: 64, xl: 96, '2xl': 128 } as const;
@@ -46,6 +49,8 @@ export function PlayerAvatar({
   className,
   ringColor = DARK_HAIRLINE,
   headshotOverride = null,
+  surface = 'tile',
+  imagePosition = '50% 50%',
 }: PlayerAvatarProps) {
   const candidates = resolvePlayerAvatarCandidates({
     name: playerName,
@@ -62,6 +67,8 @@ export function PlayerAvatar({
       hairlineRing
       ringColor={ringColor}
       className={className}
+      surface={surface}
+      imagePosition={imagePosition}
     />
   );
 }

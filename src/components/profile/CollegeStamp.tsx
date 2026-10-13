@@ -115,8 +115,8 @@ export const CollegeStamp: React.FC<CollegeStampProps> = ({
         <img
           src={logoUrl}
           alt={`${displayName} logo`}
-          className="w-5 h-5 rounded-full object-contain bg-background"
-          style={{ opacity: isSupporter ? 0.7 : 1 }}
+          className={isDark ? "w-5 h-5 object-contain" : "w-5 h-5 rounded-full object-contain bg-background"}
+          style={isDark ? { opacity: isSupporter ? 0.7 : 1, filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.9))' } : { opacity: isSupporter ? 0.7 : 1 }}
           onError={(e) => {
             e.currentTarget.style.display = 'none';
           }}

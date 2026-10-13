@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { getDirectImageUrl } from '@/utils/r2ImageUtils';
 import { imageSrc as sizeImageSrc } from '@/utils/imageSrc';
 import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { 
   getRingColorForTotalPlayed,
   THEME_COLORS,
@@ -45,6 +46,12 @@ const SIZE_MAP = {
 export type SquircleAvatarSize = keyof typeof SIZE_MAP | number;
 
 export interface SquircleAvatarProps {
+  /** Base-layer fill. 'tile' (default) = the canonical fallback gradient;
+   *  'canvas' = PAGE_CANVAS, for avatars sitting directly on the page canvas. */
+  surface?: 'tile' | 'canvas';
+  /** objectPosition for the photo. Default '50% 50%' (the CSS default, so no
+   *  style is emitted and existing avatars render unchanged). */
+  imagePosition?: string;
   /** Pixel value or size variant */
   size?: SquircleAvatarSize;
   /** Image source URL */
@@ -110,6 +117,8 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   priority = false,
   children,
   onClick,
+  surface = 'tile',
+  imagePosition = '50% 50%',
 }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [showFallback, setShowFallback] = useState(false);
@@ -244,7 +253,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   /* HUE IS A PERSON. The hue is derived from the user id; `alt` is the last
      resort for a subject with genuinely no id and will not match that member
      elsewhere. Entities that build their own tile keep the slate palette. */
-  const fallbackBg = getAvatarFallbackGradient(userId || alt);
+  const fallbackBg = surface === 'canvas' ? PAGE_CANVAS : getAvatarFallbackGradient(userId || alt);
   const initialsFontSize = Math.max(10, Math.round(pixelSize * 0.38));
 
   // Two render states, never three:
@@ -300,6 +309,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
           style={{
             opacity: imageLoaded ? 1 : 0,
             transition: 'opacity 0.2s ease',
+            ...(imagePosition !== '50% 50%' ? { objectPosition: imagePosition } : null),
           }}
           loading={priority ? 'eager' : 'lazy'}
           onLoad={handleImageLoad}
