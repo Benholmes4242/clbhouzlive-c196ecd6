@@ -1366,9 +1366,6 @@ void periodToDays;
 //   page_view via src/hooks/usePageTracking.ts).
 // - Both polling queries are visibility-gated in their hook definitions.
 
-/** 2.2 — the one admin age formatter. */
-const relTimeShort = (iso: string) => formatAgo(iso, { suffix: true });
-
 function displayNameOf(p?: LiteProfile | null): string {
   if (!p) return 'Member';
   return p.display_name || (p.username ? `@${p.username}` : 'Member');
@@ -1492,7 +1489,7 @@ function WhoIsHere({
                   color: t.inkMuted, fontSize: 12, fontVariantNumeric: 'tabular-nums',
                   textAlign: 'right', minWidth: 68,
                 }}>
-                  active {relTimeShort(u.latestAt)}
+                  active {formatAgo(u.latestAt, { suffix: true })}
                 </span>
               </Link>
             );
@@ -1840,7 +1837,7 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
                       color: t.inkFaint, fontSize: 10.5,
                       fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    }}>{a.name}{a.lastSeenAt ? ` · last ${relTimeShort(a.lastSeenAt)}` : ''}</div>
+                    }}>{a.name}{a.lastSeenAt ? ` · last ${formatAgo(a.lastSeenAt, { suffix: true })}` : ''}</div>
                     {a.probableRenameTo && (
                       <div style={{ color: t.inkMuted, fontSize: 10.5, marginTop: 2 }}>
                         Probable rename → <span style={{
@@ -1932,7 +1929,7 @@ function AppErrorsCard({ period }: { period: AnalyticsPeriod }) {
                 <div style={{
                   color: t.inkFaint, fontSize: 10.5,
                   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-                }}>{g.build} · last {relTimeShort(g.lastSeenAt)}</div>
+                }}>{g.build} · last {formatAgo(g.lastSeenAt, { suffix: true })}</div>
               </div>
               <div style={{ textAlign: 'right', flexShrink: 0 }}>
                 <div style={{
@@ -2011,7 +2008,7 @@ function EventDetailSheet({
             <StatBox label="Prior members" value={fmtInt(aggregate.priorUsers)} />
             <StatBox
               label="Last seen"
-              value={aggregate.lastSeenAt ? relTimeShort(aggregate.lastSeenAt) : '-'}
+              value={aggregate.lastSeenAt ? formatAgo(aggregate.lastSeenAt, { suffix: true }) : '-'}
             />
           </div>
 
@@ -2069,7 +2066,7 @@ function EventDetailSheet({
                         <span style={{
                           color: t.inkFaint, fontSize: 12, fontVariantNumeric: 'tabular-nums',
                           textAlign: 'right', minWidth: 68, flexShrink: 0,
-                        }}>{relTimeShort(o.created_at)}</span>
+                        }}>{formatAgo(o.created_at, { suffix: true })}</span>
                       </>
                     );
                     const style: React.CSSProperties = {
