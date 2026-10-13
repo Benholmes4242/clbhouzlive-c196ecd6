@@ -91,10 +91,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
   const isValid = membershipNumber.trim().length > 0 && password.length > 0;
   const disabled = !isValid || submitting;
 
-  /* A rejected credential is the one error that belongs on the password field.
-     Everything else (federation down, our side, already linked) reads as a
-     neutral message and must NOT tell a member their details are wrong. */
-  const rejected = !!error && /didn't recognise|did not accept/i.test(error);
+  /* MARKER_REJECTED */
 
   return (
     <form
