@@ -1,36 +1,18 @@
 /**
  * THE CONNECT-INTRO CHART. This is NOT HowItPlays' LocalHoleChart and must not
- * be merged with it. It is coloured and animated because the connect intro is a
- * sales surface rather than a data surface. LocalHoleChart in HowItPlays stays
- * neutral and must not be changed to match this one. Geometry is identical.
+ * be merged with it: this one is animated (the connect intro sells the idea).
+ * The bars are neutral for the same reason LocalHoleChart's are - height carries
+ * difficulty, so a colour ramp would encode the same number twice. The amber
+ * example line is the only colour on the chart.
  */
 import React from 'react';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { A, BAR_RADIUS, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
-const CHART_HEIGHT = 82;
+const CHART_HEIGHT = 100;
 const GAP = 3;
 
-/**
- * Four discrete difficulty bands, hardest first. The third band is deliberately
- * '#EC6C2A' and NOT the brand amber '#F7931E': the amber example line is drawn
- * across these bars and over an amber bar it would lose almost all contrast.
- */
-const INTRO_BANDS = {
-  hardest: '#F2422E',
-  hard: '#EC6C2A',
-  middle: '#E8B94A',
-  easy: '#2FBF6B',
-} as const;
-
 const LINE_AMBER = '#F7931E';
-
-function bandFor(t: number): string {
-  if (t > 0.78) return INTRO_BANDS.hardest;
-  if (t > 0.55) return INTRO_BANDS.hard;
-  if (t > 0.32) return INTRO_BANDS.middle;
-  return INTRO_BANDS.easy;
-}
 
 const KEYFRAMES = `
 @keyframes ciWipe { 0% { clip-path: inset(0 100% 0 0) } 24% { clip-path: inset(0 -2% 0 0) } 100% { clip-path: inset(0 -2% 0 0) } }
@@ -58,7 +40,7 @@ export const IntroHoleChart: React.FC<{ holes: CourseHole[] }> = ({ holes }) => 
     const barHeight = Math.max(2, (Math.max(0, h.avg_to_par) / maxField) * CHART_HEIGHT);
     const exampleToPar = Math.max(0, h.avg_to_par) * (0.6 + 0.08 * ((h.hole_no * 7) % 5));
     const markerBottom = Math.max(0, Math.min(barHeight - 2, (exampleToPar / maxField) * CHART_HEIGHT));
-    return { h, barHeight, markerBottom, color: bandFor(h.avg_to_par / maxField) };
+    return { h, barHeight, markerBottom };
   });
 
   const n = holes.length;
@@ -89,7 +71,7 @@ export const IntroHoleChart: React.FC<{ holes: CourseHole[] }> = ({ holes }) => 
                 height: g.barHeight,
                 borderRadius: BAR_RADIUS,
                 overflow: 'hidden',
-                background: `linear-gradient(180deg, ${g.color}, ${g.color}66)`,
+                background: A.DIM,
               }}
             />
           ))}
