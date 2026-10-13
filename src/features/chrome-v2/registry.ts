@@ -273,10 +273,6 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { prefix: '/tourhub/' },               spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub' }, tone: 'dark', bleed: false, note: 'tour backstop — Pattern A' } },
   { match: { prefix: '/tour/' },                  spec: { chrome: 'island', left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/tourhub' }, tone: 'dark', bleed: false, note: 'tour backstop — Pattern A' } },
 
-  // Watch sub-pages: back to /watch's caller.
-  { match: { exact: '/watch/videos' },            spec: { chrome: 'island', left: { kind: 'back', title: 'Videos', backTarget: 'history' }, tone: 'light', bleed: true, scrollAway: true } },
-  { match: { exact: '/watch/clips' },             spec: { chrome: 'island', left: { kind: 'back', title: 'Clips',  backTarget: 'history' }, tone: 'light', bleed: true, scrollAway: true } },
-  { match: { exact: '/watch' },                   spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'light', bleed: true, scrollAway: true } },
 
   // Discover landing (bottom-nav tab). Same editorial geometry as /courses:
   // cinematic hero under a scroll-away glass island.
