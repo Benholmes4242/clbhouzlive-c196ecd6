@@ -14,6 +14,7 @@ import {
 } from '@/lib/whs/hooks';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import ParRings from './ParRings';
+import { stripClubSuffix } from './useConnectIntroCourse';
 import { useRingSize } from './useRingSize';
 
 interface Props {
@@ -65,6 +66,13 @@ const RINGS_MIN_COMPLETE_ROUNDS = 8;
 const RINGS_MIN_HOLES_PER_PAR = 20;
 
 const MINUS = '\u2212';
+
+/** Signed 2dp figure for the damaging-holes block: +x, MINUS x, or bare 0.00. */
+function signed(v: number): string {
+  if (v > 0) return `+${v.toFixed(2)}`;
+  if (v < 0) return `${MINUS}${Math.abs(v).toFixed(2)}`;
+  return v.toFixed(2);
+}
 const DASH = '\u2014';
 
 const fmtIndex = (h: number | null) => {
@@ -171,7 +179,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
     par5.holes_played >= RINGS_MIN_HOLES_PER_PAR;
 
   const holes = (nemesis ?? []).filter((h) => Number.isFinite(h.my_avg_over));
-  const holesReady = ringsReady && holes.length >= 3;
+  const holesReady = holes.length > 0;
 
   /* Still arriving vs genuinely thin. Only the second gets the floor line. */
   const breakdownLanding = !ringsReady && !breakdownCeilingHit;
@@ -271,7 +279,10 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
               <div style={LABEL_LG}>{t('whsConnect.done.damagingLabel')}</div>
               <div style={LABEL_LG}>{t('whsConnect.done.damagingAside')}</div>
             </div>
-            {holes.slice(0, 3).map((h) => (
+            {holes.slice(0, 3).map((h) => {
+              const gap = h.field_avg_over == null ? h.my_avg_over : h.my_avg_over - h.field_avg_over;
+              const plays = t('whsConnect.done.plays', { count: h.times_played });
+              return (
               <div
                 key={`${h.course_id}-${h.hole_no}`}
                 style={{
@@ -322,12 +333,29 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
                       fontWeight: 700,
                       letterSpacing: '-0.015em',
                       color: INK,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
                     }}
                   >
-                    {h.course_name ?? t('whsConnect.done.courseUnknown')}
+                    {h.course_name ? stripClubSuffix(h.course_name) : t('whsConnect.done.courseUnknown')}
                   </div>
-                  <div style={{ ...LABEL_LG, color: DIM, marginTop: 6 }}>
-                    {t('whsConnect.rings.holes', { n: h.times_played })}
+                  <div
+                    style={{
+                      fontSize: 11.5,
+                      fontWeight: 500,
+                      letterSpacing: 0,
+                      color: DIM,
+                      marginTop: 5,
+                      ...NUM,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {h.field_avg_over == null
+                      ? t('whsConnect.done.holeStatNoField', { you: signed(h.my_avg_over), plays })
+                      : t('whsConnect.done.holeStat', { you: signed(h.my_avg_over), field: signed(h.field_avg_over), plays })}
                   </div>
                 </div>
 
@@ -336,15 +364,16 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
                     fontSize: 20,
                     fontWeight: 700,
                     letterSpacing: '-0.03em',
-                    color: BAD,
+                    color: gap > 0 ? BAD : MUTE,
                     flexShrink: 0,
                     ...NUM,
                   }}
                 >
-                  {`+${Math.abs(h.my_avg_over).toFixed(2)}`}
+                  {signed(gap)}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         ) : null}
         <div style={{ height: 28 }} />
