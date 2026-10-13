@@ -50,7 +50,7 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
     const agreed = unsupported.filter((c) => c.comingSoon);
     const rest = unsupported.filter((c) => !c.comingSoon);
     return {
-      live: WHS_COUNTRIES.filter((c) => c.supported),
+      live: filtered.filter((c) => c.supported),
       agreed,
       rest,
       notYet: [...agreed, ...rest],
@@ -182,6 +182,8 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
         </>
       ) : null}
 
+      {notYet.length > 0 ? (
+        <>
       <div style={{ marginTop: 26, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <div style={LABEL_LG}>Everywhere else</div>
         <div style={LABEL_LG}>{`${notYet.length} countries`}</div>
@@ -190,6 +192,8 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
         A federation has to open its API before we can read from it. Tell us where you play — it is how we choose
         which one to push next.
       </div>
+        </>
+      ) : null}
 
       {/* FIELD CANON (lib/tokens/field.ts). */}
       <div
