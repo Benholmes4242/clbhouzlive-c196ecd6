@@ -31,8 +31,7 @@ type SyncState =
   | { kind: 'new'; count: number }
   | { kind: 'none' }
   | { kind: 'refreshing' }
-  | { kind: 'failed' }
-  | { kind: 'cooldown' };
+  | { kind: 'failed' };
 
 /**
  * The detail line under the course name. Segments joined by " - middot - ",
@@ -83,30 +82,28 @@ export const ManageScreen: React.FC<Props> = ({
   const { data: lastRound } = useLastRound(connection.id);
 
   /* ── Sync now state machine ─────────────────────────────────────────────
-     One press, one discriminated union. The cooldown is COMPONENT STATE ONLY:
-     the sweep writes last_attempted_at too, so that field must never gate the
-     button. Cooldown chain: the response's own result state shows first; 60s
-     after the completed press the state holds 'cooldown' for 60s, then
-     returns to 'idle'. refreshing/failed persist instead - the member is
-     mid-decision with an enabled Try again. */
+     Two independent pieces of state. `sync` is the outcome only and persists
+     until the next press or unmount. `coolingDown` is ONE 60-second window:
+     set true at the press, cleared by a single 60s timer started when the
+     response lands. It gates the button for EVERY outcome, refreshing and
+     failed included - it is the only rate limit on this path. Component
+     state only: the sweep writes last_attempted_at too, so that field must
+     never gate the button. */
   const [sync, setSync] = useState<SyncState>({ kind: 'idle' });
-  const cooldownFirst = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const cooldownSecond = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [coolingDown, setCoolingDown] = useState(false);
+  const cooldownTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const clearCooldownTimers = () => {
-    if (cooldownFirst.current) {
-      clearTimeout(cooldownFirst.current);
-      cooldownFirst.current = null;
-    }
-    if (cooldownSecond.current) {
-      clearTimeout(cooldownSecond.current);
-      cooldownSecond.current = null;
+  const clearCooldownTimer = () => {
+    if (cooldownTimer.current) {
+      clearTimeout(cooldownTimer.current);
+      cooldownTimer.current = null;
     }
   };
-  useEffect(() => clearCooldownTimers, []);
+  useEffect(() => clearCooldownTimer, []);
 
   const handleSyncNow = async () => {
-    if (sync.kind === 'running') return;
+    if (sync.kind === 'running' || coolingDown) return;
+    setCoolingDown(true);
     setSync({ kind: 'running' });
     const res = await callSyncWhsOne();
     // Branch on the body's error string, never the HTTP status - the fetch
@@ -120,12 +117,10 @@ export const ManageScreen: React.FC<Props> = ({
     setSync(next);
     if (res.ok) onSynced?.();
 
-    clearCooldownTimers();
-    cooldownFirst.current = setTimeout(() => {
-      setSync((prev) => (prev.kind === 'new' || prev.kind === 'none' ? { kind: 'cooldown' } : prev));
-      cooldownSecond.current = setTimeout(() => {
-        setSync((prev) => (prev.kind === 'cooldown' ? { kind: 'idle' } : prev));
-      }, 60_000);
+    clearCooldownTimer();
+    cooldownTimer.current = setTimeout(() => {
+      cooldownTimer.current = null;
+      setCoolingDown(false);
     }, 60_000);
   };
 
@@ -150,13 +145,12 @@ export const ManageScreen: React.FC<Props> = ({
      (sync-whs-due-every-6h, minute 0 every 6th hour), not the sweep's internal
      defer. */
   const syncLine = !lastSyncedAt
-    ? 'Not checked yet.'
+    ? 'Not checked yet. We check England Golf every 6 hours.'
     : Date.now() - new Date(lastSyncedAt).getTime() < 60_000
       ? 'Checked just now. We check England Golf every 6 hours.'
       : `Checked ${formatRelative(lastSyncedAt)} ago. We check England Golf every 6 hours.`;
 
-  const syncDisabled =
-    sync.kind === 'running' || sync.kind === 'new' || sync.kind === 'none' || sync.kind === 'cooldown';
+  const syncDisabled = sync.kind === 'running' || coolingDown;
 
   const syncButton = (marginTop: number) => (
     <div style={{ marginTop }}>
@@ -204,11 +198,6 @@ export const ManageScreen: React.FC<Props> = ({
       {sync.kind === 'none' && (
         <div style={{ marginTop: 11, fontSize: 12, color: MUTE }}>Nothing new at England Golf.</div>
       )}
-      {sync.kind === 'cooldown' && (
-        <div style={{ marginTop: 11, fontSize: 12, color: DIM }}>
-          Just checked — you can check again in a minute.
-        </div>
-      )}
       {sync.kind === 'refreshing' && (
         <div style={{ marginTop: 11, display: 'flex', alignItems: 'flex-start', gap: 7 }}>
           <Dot color={AMBER} style={{ marginTop: 4 }} />
@@ -221,6 +210,11 @@ export const ManageScreen: React.FC<Props> = ({
       {sync.kind === 'failed' && (
         <div style={{ marginTop: 11, fontSize: 12, lineHeight: 1.5, color: MUTE }}>
           England Golf did not answer. We will keep trying in the background.
+        </div>
+      )}
+      {coolingDown && sync.kind !== 'running' && (
+        <div style={{ marginTop: 6, fontSize: 11.5, lineHeight: 1.52, color: DIM }}>
+          You can check again in a minute.
         </div>
       )}
       {sync.kind === 'failed' ? contactSupport('Sync now is not working') : null}
@@ -248,7 +242,7 @@ export const ManageScreen: React.FC<Props> = ({
         <button
           type="button"
           onClick={() => navigate(`/round/${lastRound.id}`)}
-          aria-label={`${lastRound.course?.name ?? 'Round'}, ${formatDate(lastRound.play_date, 'medium')}`}
+          aria-label={`${lastRound.course?.name ?? 'Your last round'}, ${formatDate(lastRound.play_date, 'medium')}`}
           style={{
             width: '100%',
             background: 'transparent',
@@ -265,7 +259,7 @@ export const ManageScreen: React.FC<Props> = ({
         >
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ ...TITLE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {lastRound.course?.name ?? 'Round'}
+              {lastRound.course?.name ?? 'Your last round'}
             </div>
             <div style={{ fontSize: 12.5, lineHeight: 1.5, color: MUTE, marginTop: 4, ...NUM }}>
               {buildDetailLine(lastRound)}
