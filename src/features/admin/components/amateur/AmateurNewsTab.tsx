@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import { ExternalLink, Plus } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatAgo } from '../../lib/formatAgo';
 import { toast } from '@/lib/toast';
 
 import { categoryLabel } from '@/features/amateur/news/categories';
@@ -28,11 +28,7 @@ const KICKER_STYLE: React.CSSProperties = {
 
 function when(s: AdminAmateurStory): string {
   const at = s.published_at ?? s.created_at;
-  try {
-    return formatDistanceToNow(new Date(at), { addSuffix: true });
-  } catch {
-    return '';
-  }
+  return formatAgo(at, { suffix: true, empty: '' });
 }
 
 export default function AmateurNewsTab() {

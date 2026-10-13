@@ -1,5 +1,6 @@
+import { formatAgo } from '../lib/formatAgo';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { formatDistanceToNow, format } from 'date-fns';
+import { format } from 'date-fns';
 import { Send } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -37,9 +38,6 @@ function statusTone(s: SupportStatus): 'warn' | 'ok' | 'neutral' {
   return 'neutral';
 }
 
-function relTime(iso: string): string {
-  try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); } catch { return ''; }
-}
 
 interface Props {
   ticket: SupportTicketRow | null;
@@ -132,7 +130,7 @@ export default function SupportTicketDrawer({ ticket, onClose }: Props) {
         </span>
         <StatusPill tone={statusTone(status)}>{STATUS_OPTIONS.find(s => s.id === status)?.label ?? status}</StatusPill>
         <span style={{ color: t.inkFaint, fontSize: 11 }}>
-          Opened {relTime(ticket.created_at)}
+          Opened {formatAgo(ticket.created_at, { suffix: true, empty: '' })}
         </span>
       </div>
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>

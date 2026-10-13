@@ -1,20 +1,8 @@
+import { formatAgo } from '../lib/formatAgo';
 import React from 'react';
 import { adminTheme as t } from '../theme';
 import { useMemberActivity } from '../hooks/useMemberActivity';
 
-function relTime(iso: string | null | undefined): string {
-  if (!iso) return 'never';
-  const diff = Date.now() - new Date(iso).getTime();
-  const s = Math.floor(diff / 1000);
-  if (s < 60) return `${s}s ago`;
-  const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  if (d < 30) return `${d}d ago`;
-  return new Date(iso).toLocaleDateString();
-}
 
 interface Props { userId: string | null }
 
@@ -61,7 +49,7 @@ export default function MemberActivityCard({ userId }: Props) {
 
       <div style={{ display: 'flex', gap: 8 }}>
         <Chip label="Sessions" value={isLoading ? '-' : String(data?.sessions ?? 0)} />
-        <Chip label="Last session" value={isLoading ? '-' : relTime(data?.lastSessionAt ?? null)} />
+        <Chip label="Last session" value={isLoading ? '-' : formatAgo(data?.lastSessionAt ?? null, { suffix: true, empty: 'never' })} />
         <Chip label="Avg / active day" value={isLoading ? '-' : String(data?.avgPerActiveDay ?? 0)} />
       </div>
 

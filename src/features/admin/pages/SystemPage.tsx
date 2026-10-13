@@ -1,3 +1,4 @@
+import { formatAgo } from '../lib/formatAgo';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
@@ -26,16 +27,6 @@ import { audioDebugEnabled, setAudioDebugEnabled, subscribeAudioDebugEnabled } f
 
 type TabId = 'audit' | 'tools' | 'settings';
 
-function relTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return 'just now';
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  return `${d}d ago`;
-}
 
 export default function SystemPage() {
   const { role } = usePanelRole();
@@ -165,7 +156,7 @@ export function AuditLogTab() {
         columns={[
           { key: 'action', header: 'Action', render: (r) => <span style={{ fontWeight: 600 }}>{r.action}</span> },
           { key: 'target', header: 'Target', render: (r) => r.targetEmail ?? '—' },
-          { key: 'when', header: 'When', align: 'right', render: (r) => <span style={{ color: t.inkMuted }}>{relTime(r.createdAt)}</span> },
+          { key: 'when', header: 'When', align: 'right', render: (r) => <span style={{ color: t.inkMuted }}>{formatAgo(r.createdAt, { suffix: true, empty: '-' })}</span> },
         ]}
         renderCard={(r) => <AuditCard row={r} />}
         emptyTitle="No audit entries"
@@ -217,7 +208,7 @@ function AuditCard({ row }: { row: AuditEntry }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'flex-start' }}>
         <span style={{ fontWeight: 600, color: t.ink, fontSize: 14 }}>{row.action}</span>
-        <span style={{ color: t.inkMuted, fontSize: 12, whiteSpace: 'nowrap' }}>{relTime(row.createdAt)}</span>
+        <span style={{ color: t.inkMuted, fontSize: 12, whiteSpace: 'nowrap' }}>{formatAgo(row.createdAt, { suffix: true, empty: '-' })}</span>
       </div>
       <span style={{ color: t.inkMuted, fontSize: 12 }}>{row.targetEmail ?? '—'}</span>
       {hasDetails && (
@@ -321,11 +312,11 @@ function EgSyncDetailCard() {
             <StatTile label="Consec. failures" value={data.consecutive_failures_total ?? 0} />
             <StatTile
               label="Last attempt"
-              value={data.last_attempt_at ? relTime(data.last_attempt_at) : '—'}
+              value={data.last_attempt_at ? formatAgo(data.last_attempt_at, { suffix: true, empty: '-' }) : '—'}
             />
             <StatTile
               label="Cron last run"
-              value={data.cron_last_run_at ? relTime(data.cron_last_run_at) : '—'}
+              value={data.cron_last_run_at ? formatAgo(data.cron_last_run_at, { suffix: true, empty: '-' }) : '—'}
             />
             <StatTile label="Cron status" value={data.cron_last_status ?? '—'} />
           </div>

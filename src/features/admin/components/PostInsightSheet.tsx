@@ -1,3 +1,4 @@
+import { formatAgo } from '../lib/formatAgo';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSheet from './AdminSheet';
@@ -5,19 +6,6 @@ import { adminTheme as t } from '../theme';
 import { usePostInsight } from '../hooks/usePostInsight';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
-function relTime(iso: string | null | undefined): string {
-  if (!iso) return '-';
-  const diff = Date.now() - new Date(iso).getTime();
-  const s = Math.floor(diff / 1000);
-  if (s < 60) return `${s}s ago`;
-  const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  if (d < 30) return `${d}d ago`;
-  return new Date(iso).toLocaleDateString();
-}
 
 interface Props {
   postId: string | null;
@@ -50,7 +38,7 @@ export default function PostInsightSheet({ postId, open, onClose }: Props) {
       open={open}
       onClose={onClose}
       title={data?.authorName ?? 'Post insight'}
-      subtitle={data?.createdAt ? relTime(data.createdAt) : undefined}
+      subtitle={data?.createdAt ? formatAgo(data.createdAt, { suffix: true, empty: '-' }) : undefined}
       maxWidth={560}
       footer={
         data?.authorId ? (
