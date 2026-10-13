@@ -64,6 +64,7 @@ export default function HandicapManagePage() {
       queryClient.invalidateQueries({ queryKey: whsKeys.lastRound(c.id) });
       queryClient.invalidateQueries({ queryKey: whsKeys.counters(c.id) });
       queryClient.invalidateQueries({ queryKey: whsKeys.allScores(c.id) });
+      queryClient.invalidateQueries({ queryKey: ['whs-imported-counts', c.id] });
     }
     queryClient.invalidateQueries({ queryKey: ['whs-round-detail'] });
     queryClient.invalidateQueries({ queryKey: ['profile'] });
@@ -150,6 +151,7 @@ export default function HandicapManagePage() {
           onDisconnect={() => setConfirmDisconnect(true)}
           onDelete={() => setConfirmDelete(true)}
           onReconnect={() => setConfirmDisconnect(true)}
+          onSynced={() => invalidateAll(connection)}
         />
       </div>
 

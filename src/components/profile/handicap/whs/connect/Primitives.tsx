@@ -52,15 +52,13 @@ export const Rule: React.FC<{ style?: React.CSSProperties }> = ({ style }) => (
   <div style={{ height: 1, background: BORDER, ...style }} />
 );
 
-/** Figure: label, value, optional sub. Sits in a flex row of equals. */
+/** Figure: the value on top, the label beneath. Sits in a flex row of equals. */
 export const Figure: React.FC<{
   label: string;
   value: React.ReactNode;
-  sub?: string;
   size?: number;
-}> = ({ label, value, sub, size = 20 }) => (
+}> = ({ label, value, size = 22 }) => (
   <div style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
-    <div style={{ ...LABEL, marginBottom: 6 }}>{label}</div>
     <div
       style={{
         fontSize: size,
@@ -73,7 +71,7 @@ export const Figure: React.FC<{
     >
       {value}
     </div>
-    {sub ? <div style={{ ...LABEL, marginTop: 5 }}>{sub}</div> : null}
+    <div style={{ ...LABEL, marginTop: 7 }}>{label}</div>
   </div>
 );
 
@@ -85,7 +83,7 @@ export const RefRow: React.FC<{ label: string; value: React.ReactNode }> = ({ la
       justifyContent: 'space-between',
       alignItems: 'baseline',
       gap: 12,
-      padding: '4px 0',
+      padding: '5px 0',
     }}
   >
     <div style={LABEL}>{label}</div>
@@ -120,6 +118,41 @@ export const PrimaryButton: React.FC<{
       fontFamily: FONT,
       fontSize: 14.5,
       fontWeight: 700,
+      cursor: disabled ? 'default' : 'pointer',
+    }}
+  >
+    {children}
+  </button>
+);
+
+/**
+ * Secondary button: the outlined sibling of PrimaryButton. Used for controls
+ * that live inside a panel (Sync now, Sign in again) rather than ONE footer
+ * CTA - PrimaryButton's rule still applies and is untouched by this.
+ */
+export const SecondaryButton: React.FC<{
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+}> = ({ children, onClick, disabled }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    style={{
+      width: '100%',
+      padding: '13px 16px',
+      borderRadius: 12,
+      background: 'transparent',
+      border: disabled ? `1px solid ${BORDER}` : '1px solid rgba(255,255,255,0.22)',
+      color: disabled ? 'rgba(248,250,252,0.38)' : INK,
+      fontFamily: FONT,
+      fontSize: 13.5,
+      fontWeight: 700,
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
       cursor: disabled ? 'default' : 'pointer',
     }}
   >
