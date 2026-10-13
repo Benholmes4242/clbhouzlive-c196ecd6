@@ -799,7 +799,7 @@ function TeamPanel({ overview, loading }: { overview: MembersOverview | undefine
       {loading
         ? Array.from({ length: 2 }, (_, i) => (
             <div key={i} style={TEAM_ROW}>
-              <Skeleton height={30} radius={9} />
+              <Skeleton height={30} radius={10} />
               <span style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 <Skeleton height={16} radius={3} />
                 <Skeleton height={13} radius={3} />

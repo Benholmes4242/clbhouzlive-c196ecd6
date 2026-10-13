@@ -271,7 +271,7 @@ function RowSkeleton() {
         borderTop: `1px solid ${t.hairline}`,
       }}
     >
-      <Skeleton height={38} radius={11} />
+      <Skeleton height={38} radius={13} />
       <span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         <Skeleton height={17} radius={3} />
         <Skeleton height={14} radius={3} />
