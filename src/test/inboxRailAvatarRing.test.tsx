@@ -48,7 +48,9 @@ const tile = (hairlineRing?: boolean) =>
 describe('messages rail avatar ring', () => {
   it('wears the 1px hairline when asked', () => {
     const { container } = tile(true);
-    expect(squircleBox(container).style.border).toBe('none');
+    /* jsdom reads `border: none` back as an empty string, so the assertion is
+       that the box itself draws no ring — the hairline lives on the overlay. */
+    expect(squircleBox(container).style.border).not.toMatch(/solid/);
     expect(hairlineOverlay(container)?.style.border).toBe(`1px solid ${HAIRLINE}`);
     expect(container.innerHTML).not.toContain(WIDE_RING);
   });
