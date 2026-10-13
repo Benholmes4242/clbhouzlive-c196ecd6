@@ -15,7 +15,7 @@ export const WhatTheyScored: React.FC<{ aggregates: CategoryAggregates }> = ({ a
   if ([aggregates.design, aggregates.condition, aggregates.clubhouse, aggregates.facilities].every((v) => v == null)) return null;
   return (
     <AboutSection kicker="What they scored">
-      <CategoryScores scores={aggregates} />
+      <CategoryScores scores={aggregates} layout="pairs" />
     </AboutSection>
   );
 };
