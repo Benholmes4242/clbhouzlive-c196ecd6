@@ -90,7 +90,7 @@ export function lastSeenColor(m: MembersOverviewMember, now = Date.now()): strin
 export function weekDashColors(m: MembersOverviewMember, now = Date.now()): string[] {
   const joined = new Date(m.created_at).getTime();
   return m.weeks_8.map((active, i) => {
-    const weekEnd = now - (7 - i - 1) * 7 * DAY;
+    const weekEnd = now - (7 - i) * 7 * DAY;
     if (weekEnd <= joined) return WEEK_PREJOIN;
     return active ? t.ink : WEEK_OFF;
   });
