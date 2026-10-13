@@ -154,6 +154,13 @@ export const EVENT_LABELS: Record<string, string> = {
   // ─── Notifications ────────────────────────────────────────────
   notifications_opened: 'Notifications opened',
   notification_clicked: 'Notification clicked',
+  push_opened: 'Opened from push',
+
+  // ─── Video ────────────────────────────────────────────────────
+  video_play: 'Video played',
+  video_progress: 'Video progress',
+  video_complete: 'Video finished',
+  video_watch: 'Video watched',
 
   // ─── Social ───────────────────────────────────────────────────
   social_follow_toggled: 'Follow toggled',

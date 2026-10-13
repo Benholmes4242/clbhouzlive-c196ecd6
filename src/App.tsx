@@ -165,6 +165,13 @@ if (typeof window !== 'undefined') {
         (typeof d?.route === 'string' && d.route) ||
         (typeof d?.targetUrl === 'string' && d.targetUrl) ||
         null;
+      import('@/utils/analyticsEvents').then(({ analyticsEvents }) => {
+        analyticsEvents.track('push_opened', {
+          type: d?.type ?? null,
+          target_type: d?.target_type ?? d?.targetType ?? null,
+          target_id: d?.target_id ?? d?.targetId ?? null,
+        });
+      }).catch(() => {});
       if (!target) return;
       const path = target.startsWith('http')
         ? new URL(target).pathname + new URL(target).search + new URL(target).hash
@@ -992,20 +999,11 @@ const AppInner: React.FC = () => {
     };
   }, []);
 
-  // ── Analytics: session start + page tracking ──
+  // ── Analytics: session_start is fired by getSessionId() when it mints an id
+  // (analyticsSession.onSessionMinted), never on mount. Importing the module
+  // registers that listener.
   useEffect(() => {
-    // The session id is owned by getSessionId(): localStorage plus a 30 minute
-    // inactivity timeout. Boot must NOT mint one, or an app reopen would again
-    // start a new "session" and the metric would keep counting app opens.
-    import('@/utils/analyticsSession').then(({ getSessionId }) => {
-      const sessionId = getSessionId();
-      import('@/utils/analyticsEvents').then(({ analyticsEvents }) => {
-        analyticsEvents.track('session_start', {
-          session_id: sessionId,
-          referrer: document.referrer || 'direct',
-        });
-      });
-    });
+    import('@/utils/analyticsEvents').then(() => import('@/utils/analyticsSession')).then(({ getSessionId }) => { getSessionId(); });
   }, []);
   
   // Enforce R2-only policy globally

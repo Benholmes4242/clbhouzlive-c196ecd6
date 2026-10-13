@@ -376,3 +376,11 @@ export const analyticsEvents = {
       }),
   },
 };
+
+// session_start fires exactly when getSessionId() mints a new id.
+onSessionMinted((id) => {
+  void analyticsEvents.track('session_start', {
+    session_id: id,
+    referrer: (typeof document !== 'undefined' && document.referrer) || 'direct',
+  });
+});
