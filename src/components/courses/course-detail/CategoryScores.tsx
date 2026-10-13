@@ -11,6 +11,7 @@
  * An absent category renders an EMPTY column — never a zero, never a dash.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { A, SANS, FIGS, BAR_RADIUS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 
@@ -118,12 +119,17 @@ export const SETTLED_MIN_RATINGS = 5;
  * slot of the Course tab's score row, where "Your rating" used to sit.
  */
 export const OverallScoreLine: React.FC<{ score: number; ratingCount: number }> = ({ score, ratingCount }) => {
+  const { t } = useTranslation('courses');
   const settled = ratingCount >= SETTLED_MIN_RATINGS;
   const tone = courseSubScoreTone(score);
   return (
     <div data-overall-score style={{ display: 'flex', alignItems: 'baseline', gap: 10, minWidth: 0, fontFamily: SANS }}>
       <span style={{ ...FIGS, flexShrink: 0, fontSize: 38, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: tone }}>
         {score.toFixed(1)}
+      </span>
+      {/* Always shown, at every rating count — a label, not a verdict. */}
+      <span style={{ flexShrink: 0, fontSize: 9, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase', color: A.DIM }}>
+        {t('courseDetail.communityScore.overall')}
       </span>
       {settled ? (
         <span style={{ minWidth: 0, fontSize: 11.5, fontWeight: 600, lineHeight: 1.35, color: tone }}>
