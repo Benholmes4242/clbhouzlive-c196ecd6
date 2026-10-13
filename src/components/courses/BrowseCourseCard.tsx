@@ -1,9 +1,8 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { SubScoreStack } from '@/features/courses/_shared/scoreBands';
+import { CategoryScores } from '@/components/courses/course-detail/CategoryScores';
 import type { StatBrowseRow } from './useStatBrowse';
 import { courseRankLabels, type RankList } from '@/features/courses/_shared/courseRankLabels';
 import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
@@ -63,7 +62,6 @@ export function BrowseCourseCard({
       : row.avg_to_par < 0
         ? `−${Math.abs(row.avg_to_par).toFixed(1)}`
         : null;
-  const { t } = useTranslation('courses');
   const fig: React.CSSProperties = { ...FIGS, color: A.INK, fontSize: 14, fontWeight: 700, letterSpacing: '-0.04em' };
   /* Comparison only at the ends of the field (>=80 harder, <=20 easier).
      "Easier" uses 100 - pct: the complement absorbs ties, immaterial at whole
@@ -76,12 +74,6 @@ export function BrowseCourseCard({
       : pct <= 20
         ? { word: 'easier', value: 100 - pct }
         : null;
-  const bars = [
-    { label: t('top100.stats.design'), score: row.design_score },
-    { label: t('top100.stats.condition'), score: row.condition_score },
-    { label: t('top100.stats.clubhouse'), score: row.clubhouse_score },
-    { label: t('top100.stats.facilities'), score: row.facilities_score },
-  ];
   const location = [row.region, row.sub_country].filter(Boolean).join(', ') || row.country;
   return (
     <button
@@ -172,11 +164,10 @@ export function BrowseCourseCard({
             {ratedWithoutRoundsNote}
           </div>
         ) : null}
-        <div style={{ display: 'flex', gap: 10, marginTop: 13 }}>
-          {bars.map(({ label, score }) =>
-            score != null ? <SubScoreStack key={label} label={label} score={score} /> : null,
-          )}
-        </div>
+        <CategoryScores
+          scores={{ design: row.design_score, condition: row.condition_score, clubhouse: row.clubhouse_score, facilities: row.facilities_score }}
+          marginTop={14}
+        />
       </div>
     </button>
   );

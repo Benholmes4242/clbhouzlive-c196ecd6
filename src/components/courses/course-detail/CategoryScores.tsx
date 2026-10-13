@@ -3,16 +3,16 @@
  * overall line. Mounted on the courses list card, the Course tab and the
  * Reviews tab. Same numbers, one treatment.
  *
- *   bar     3px, BAR_RADIUS, A.TRACK track, fill (value / 10) * 100% clamped
- *   figure  17 / 700 / -0.02em, courseSubScoreTone(value)
- *   label   9 / 700 / 0.09em / uppercase / A.DIM, beneath the figure
+ *   grid4   no bar; centred figure then label (pairs keeps its 8px bars)
+ *   figure  16 / 700 / -0.02em, courseSubScoreTone(value)
+ *   label   9 / 700 / 0.09em / uppercase / A.DIM, 6px beneath the figure
  *   columns four equal, 12px gap
  *
  * An absent category renders an EMPTY column — never a zero, never a dash.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { A, SANS, FIGS, BAR_RADIUS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 
 export interface CategoryScoreValues {
@@ -85,19 +85,17 @@ export const CategoryScores: React.FC<{ scores: CategoryScoreValues; marginTop?:
         if (value == null) return <div key={key} data-category={key} aria-hidden style={{ minWidth: 0 }} />;
         const tone = courseSubScoreTone(value);
         return (
-          <div key={key} data-category={key} style={{ minWidth: 0 }}>
-            <div style={{ height: 3, borderRadius: BAR_RADIUS, background: A.TRACK, overflow: 'hidden' }}>
-              <div
-                data-category-score={value.toFixed(1)}
-                style={{ height: '100%', width: `${categoryFillPercent(value)}%`, borderRadius: BAR_RADIUS, background: tone }}
-              />
-            </div>
-            <div data-category-figure style={{ ...FIGS, marginTop: 6, fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: tone }}>
+          <div key={key} data-category={key} style={{ minWidth: 0, textAlign: 'center' }}>
+            <div
+              data-category-figure
+              data-category-score={value.toFixed(1)}
+              style={{ ...FIGS, fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: tone }}
+            >
               {value.toFixed(1)}
             </div>
             <div
               style={{
-                marginTop: 5, fontSize: 9, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase',
+                marginTop: 6, fontSize: 9, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase',
                 color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               }}
             >
