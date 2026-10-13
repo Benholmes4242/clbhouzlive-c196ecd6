@@ -54,7 +54,6 @@ import { useTourSelection } from '../../../context/TourSelectionContext';
 import { PlayerAvatar } from '../../PlayerAvatar';
 import { useAIPredictions, type AITopContender } from '../../../hooks/useAIPredictions';
 import { useTournamentTeeTimes } from '../../../hooks/useTournamentTeeTimes';
-import { useTournamentDefendingChamp } from '../../../hooks/useTournamentDefendingChamp';
 import { useTournamentLastYearTop4 } from '../../../hooks/useTournamentLastYearTop4';
 import { useTeeTimesAll } from '../../../tournament-v2/data/useTeeTimesAll';
 import { useDrawnRounds } from '../../../tournament-v2/data/useDrawnRounds';
