@@ -513,7 +513,7 @@ export function WatchFeed({
               {t('amateur.watch.rail.community', 'From the community')}
             </h2>
             <div data-watch-count style={{ padding: '2px 16px 12px', fontSize: 11.5, color: COUNT_INK, fontVariantNumeric: 'tabular-nums' }}>
-              {t('amateur.watch.communityCount', '{{count}} photos', { count: (moments.data ?? []).length })}
+              {t('amateur.watch.communityMoments', '{{count}} moments', { count: (moments.data ?? []).length })}
             </div>
             <div style={{ paddingInline: 16 }}>
               <MomentsGrid moments={moments.data ?? []} gap={4} tall={320} radius={10} autoplayGroup="amateur-watch-community" onTilePress={openMoment} />
