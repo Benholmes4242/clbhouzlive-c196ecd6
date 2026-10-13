@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
+import { MEMBERS_KEY } from './useMembersRadar';
 
 /** Invite actions only. Invite rows come from get_admin_members_overview,
  * which already excludes anyone holding an unexpired admin membership. */
@@ -8,7 +9,8 @@ export function useInvites() {
   const qc = useQueryClient();
 
   const invalidate = () => {
-    qc.invalidateQueries({ queryKey: ['admin-v2'] });
+    qc.invalidateQueries({ queryKey: [...MEMBERS_KEY, 'overview'] });
+    qc.invalidateQueries({ queryKey: ['admin-v2', 'dashboard', 'queue'] });
   };
 
   const invoke = async (body: Record<string, unknown>) => {
