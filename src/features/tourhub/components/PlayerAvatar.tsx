@@ -15,7 +15,7 @@
  * (or SquircleAvatar with `srcCandidates`) so the fallback stays unified.
  */
 
-import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
+import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 
 interface PlayerAvatarProps {
@@ -43,9 +43,12 @@ export function PlayerAvatar({
   className,
   ringColor = DARK_HAIRLINE,
 }: PlayerAvatarProps) {
-  const nameCandidates = getPlayerHeadshotCandidates(playerName, tourCode);
-  // DB photo_url wins (matches the hero's resolveAvatar priority); then name-based chain.
-  const candidates = photoUrl ? [photoUrl, ...nameCandidates] : nameCandidates;
+  const candidates = resolvePlayerAvatarCandidates({
+    name: playerName,
+    photoUrl: photoUrl ?? null,
+    tourSlug: tourCode,
+    headshotOverride: null,
+  });
   return (
     <SquircleAvatar
       size={typeof size === 'number' ? size : SIZE_PX[size]}
