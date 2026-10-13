@@ -16,12 +16,13 @@ import { MemberRailTile } from '@/pages/messaging-v2/MemberRailTile';
  */
 
 const HAIRLINE = 'rgba(255,255,255,0.22)';
-const WIDE_RING = '2px solid #B8C6C9';
+const WIDE_RING = '2px solid #b8c6c9';
 
-/** The squircle box is the only element carrying the 34% radius. */
+/** The squircle box carries the 34% radius; so does the hairline overlay, which
+ *  is the aria-hidden one, so the box is the radius holder that is not the overlay. */
 function squircleBox(container: HTMLElement): HTMLElement {
   const boxes = Array.from(container.querySelectorAll<HTMLElement>('div')).filter(
-    (d) => d.style.borderRadius === '34%',
+    (d) => d.style.borderRadius === '34%' && d.getAttribute('aria-hidden') !== 'true',
   );
   expect(boxes.length).toBe(1);
   return boxes[0];
