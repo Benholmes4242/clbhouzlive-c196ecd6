@@ -162,7 +162,6 @@ const LocalHoleChart: React.FC<{
         </svg>
       ) : null}
       </div>
-      </div>
       <div
         style={{
           display: 'flex',
