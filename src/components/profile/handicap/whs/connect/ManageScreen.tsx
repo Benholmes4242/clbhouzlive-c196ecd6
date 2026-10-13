@@ -147,7 +147,8 @@ export const ManageScreen: React.FC<Props> = ({
   const lastSyncedAt = connection.last_synced_at;
   /* formatRelative returns "now" under 60s, which would render "Checked now
      ago" - guard it. The 6-hour cadence is the member-visible pg_cron job
-     (sync-whs-due-every-6h on '0 */6 * * *'), not the sweep's internal defer. */
+     (sync-whs-due-every-6h, minute 0 every 6th hour), not the sweep's internal
+     defer. */
   const syncLine = !lastSyncedAt
     ? 'Not checked yet.'
     : Date.now() - new Date(lastSyncedAt).getTime() < 60_000
