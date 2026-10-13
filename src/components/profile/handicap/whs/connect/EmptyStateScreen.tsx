@@ -47,15 +47,20 @@ const FittedHeadline: React.FC<{ line1: string; line2: string }> = ({ line1, lin
     const el = ref.current;
     if (!el) return;
     const fit = () => {
-      el.style.fontSize = '42px';
+      const MAX = window.innerHeight <= 740 ? 30 : 42;
+      el.style.fontSize = `${MAX}px`;
       const spans = Array.from(el.children) as HTMLElement[];
       const widest = Math.max(1, ...spans.map((s) => s.scrollWidth));
-      el.style.fontSize = `${Math.min(42, (42 * (el.clientWidth - 2)) / widest)}px`;
+      el.style.fontSize = `${Math.min(MAX, (MAX * (el.clientWidth - 2)) / widest)}px`;
     };
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
-    return () => ro.disconnect();
+    window.addEventListener('resize', fit);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', fit);
+    };
   }, [line1, line2]);
   return (
     <h1 ref={ref} style={{ margin: 0, fontSize: 42, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1.03, color: INK }}>
