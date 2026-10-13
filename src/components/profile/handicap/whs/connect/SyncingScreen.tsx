@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
-import { CANVAS, INK, MUTE, DIM, BORDER, GOOD, LABEL_LG, STEP_WAIT_RING, STEP_WAIT_INK } from './designTokens';
+import { CANVAS, INK, MUTE, BORDER, STEP_WAIT_RING, STEP_WAIT_INK } from './designTokens';
 import { Stage, StageHead } from './Primitives';
 
 /**
- * STAGE 4 - SYNCING. NO RING, no spinner, NO FIGURE.
+ * STAGE 4 - SYNCING. NO PROGRESS RING, NO FIGURE.
  *
  * connect-whs is ONE synchronous call that returns only when the import is
  * finished - it streams nothing back, and the connection row (and therefore
@@ -13,31 +13,58 @@ import { Stage, StageHead } from './Primitives';
  * rounds-so-far figure, and a fabricated one on this screen would be the worst
  * possible place for one. There is therefore no figure slot at all.
  *
- * THE STEP TIMER IS COSMETIC. It loops, and the caption says plainly that the
- * steps are what the server is doing in order - we cannot know which one it has
- * reached. THE SCREEN ENDS WHEN callConnectWhs RESOLVES, never on the timer.
+ * THE STEP TIMER IS COSMETIC AND ONE-WAY. It advances through the steps once,
+ * on widening delays, then holds on the last step until the screen unmounts.
+ * It never wraps, resets or decreases. We cannot know which step the server
+ * has reached, so marks are white, never green. THE SCREEN ENDS WHEN
+ * callConnectWhs RESOLVES, never on the timer.
  */
-const STEP_MS = 1400;
 const STEP_KEYS = ['step1', 'step2', 'step3', 'step4'] as const;
+/** Delay before advancing to step 2, 3 and 4. */
+const STEP_DELAYS_MS = [1500, 4000, 9000] as const;
+const LAST = STEP_KEYS.length - 1;
+
+const MARK: React.CSSProperties = {
+  width: 18,
+  height: 18,
+  borderRadius: 999,
+  flexShrink: 0,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  boxSizing: 'border-box',
+};
 
 export const SyncingScreen: React.FC = () => {
   const { t } = useTranslation('handicap');
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    const id = setInterval(() => setCurrent((p) => (p + 1) % STEP_KEYS.length), STEP_MS);
-    return () => clearInterval(id);
+    const ids: ReturnType<typeof setTimeout>[] = [];
+    let elapsed = 0;
+    STEP_DELAYS_MS.forEach((delay, i) => {
+      elapsed += delay;
+      const target = Math.min(i + 1, LAST);
+      ids.push(setTimeout(() => setCurrent((p) => Math.max(p, target)), elapsed));
+    });
+    return () => ids.forEach(clearTimeout);
   }, []);
 
   return (
     <Stage>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) {
+          .whs-sync-spinner { animation: none !important; }
+        }
+      `}</style>
       <StageHead
         kicker={t('whsConnect.steps.sync')}
         headline={t('whsConnect.sync.headline')}
         lead={t('whsConnect.sync.sub')}
       />
 
-      <div style={{ marginTop: 40 }}>
+      <div style={{ marginTop: 40, paddingBottom: 28 }}>
         {STEP_KEYS.map((key, i) => {
           const passed = i < current;
           const isCurrent = i === current;
@@ -52,25 +79,30 @@ export const SyncingScreen: React.FC = () => {
                 borderTop: i === 0 ? undefined : `1px solid ${BORDER}`,
               }}
             >
-              <span
-                style={{
-                  width: 17,
-                  height: 17,
-                  borderRadius: 999,
-                  flexShrink: 0,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: passed ? GOOD : 'transparent',
-                  /* GREEN HAS ONE JOB: a step the server has completed (filled)
-                     or is on (ring). Waiting steps sit at the quiet tier. */
-                  boxSizing: 'border-box',
-                  border: passed ? 'none' : `2px solid ${isCurrent ? GOOD : STEP_WAIT_RING}`,
-                  transition: 'background 200ms ease, border-color 200ms ease',
-                }}
-              >
-                {passed ? <Check size={10} strokeWidth={3.2} color={CANVAS} /> : null}
-              </span>
+              {passed ? (
+                <span style={{ ...MARK, background: INK }}>
+                  <Check size={11} strokeWidth={3.4} color={CANVAS} />
+                </span>
+              ) : isCurrent ? (
+                <span style={MARK}>
+                  <svg width="100%" height="100%" viewBox="0 0 18 18" aria-hidden="true">
+                    <circle
+                      className="whs-sync-spinner"
+                      cx={9}
+                      cy={9}
+                      r={7.6}
+                      fill="none"
+                      stroke={INK}
+                      strokeWidth={1.9}
+                      strokeLinecap="round"
+                      strokeDasharray="15 33"
+                      style={{ animation: 'spin 1.05s linear infinite', transformOrigin: '50% 50%' }}
+                    />
+                  </svg>
+                </span>
+              ) : (
+                <span style={{ ...MARK, border: `1.5px solid ${STEP_WAIT_RING}` }} />
+              )}
               <span
                 style={{
                   fontSize: 15,
@@ -84,10 +116,6 @@ export const SyncingScreen: React.FC = () => {
             </div>
           );
         })}
-      </div>
-
-      <div style={{ ...LABEL_LG, color: DIM, marginTop: 22, paddingBottom: 28 }}>
-        {t('whsConnect.sync.note')}
       </div>
     </Stage>
   );
