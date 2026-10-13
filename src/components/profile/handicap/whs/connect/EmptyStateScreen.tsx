@@ -11,6 +11,7 @@ import { courseBucketShares } from '@/features/courses/components/holes/analytic
 import { A, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { useConnectIntroCourse, stripClubSuffix, type ConnectIntroCourse } from './useConnectIntroCourse';
 import { IntroHoleChart } from './IntroHoleChart';
+import { formatNumber } from '@/i18n/format';
 import { MUTE, DIM, INK, AMBER, NUM } from './designTokens';
 import { PrimaryButton, Action, FooterBar, Stage } from './Primitives';
 
@@ -38,7 +39,8 @@ const PROMISE_RULE = 'rgba(255,255,255,0.11)';
 const TAIL_CSS = `
 .ci-change { margin-top: 16px }
 .ci-source { margin-top: 16px }
-@media (max-height: 740px) { .ci-lead { display: none } .ci-change { margin-top: 0 } .ci-source { margin-top: 4px } }
+.ci-scope { margin-top: 20px }
+@media (max-height: 740px) { .ci-lead { display: none } .ci-change { margin-top: 0 } .ci-source { margin-top: 4px } .ci-scope { margin-top: 14px } }
 `;
 
 /** Two lines at every width: measured, never estimated (brief §2b). */
@@ -89,7 +91,6 @@ const EvidenceBody: React.FC<{ course: ConnectIntroCourse; hasHomeClub: boolean;
   const { holes } = course;
   const fieldAvg = holes.reduce((s, h) => s + h.avg_to_par, 0) / holes.length;
   const hardest = holes.reduce((m, h) => (h.avg_to_par > m.avg_to_par ? h : m), holes[0]);
-  const easiest = holes.reduce((m, h) => (h.avg_to_par < m.avg_to_par ? h : m), holes[0]);
   const field = toParParts(fieldAvg);
   const shares = courseBucketShares(holes);
 
@@ -106,9 +107,11 @@ const EvidenceBody: React.FC<{ course: ConnectIntroCourse; hasHomeClub: boolean;
       <div style={{ flexShrink: 0 }}>
         <IntroHoleChart holes={holes} />
         <div style={{ marginTop: 10, fontSize: 11.5, lineHeight: 1.5, color: A.MUTE }}>{t('whsConnect.intro.chartCaption')}</div>
-        <div style={{ display: 'flex', gap: 30, marginTop: 20 }}>
+        <div className="ci-scope" style={ABOUT_KICKER}>
+          {t('whsConnect.intro.scopeAllHoles', { count: holes.length, holes: formatNumber(holes.length) })}
+        </div>
+        <div style={{ display: 'flex', gap: 30, marginTop: 10 }}>
           <IntroFigure label={tc('courseDetail.plays.fieldAvg')} value={field ? field.text : '\u2014'} tone={field ? field.tone : A.INK} />
-          <IntroFigure label={tc('courseDetail.plays.easiestHole')} value={String(easiest.hole_no)} />
         </div>
         {shares ? <CourseDistributionSummary shares={shares} /> : null}
         <AboutHairline style={{ marginTop: 18 }} />
