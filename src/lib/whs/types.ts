@@ -92,6 +92,9 @@ export interface SyncWhsResponse {
   message?: string;
   handicap_changed?: boolean;
   handicap_index?: number;
+  scores_upserted?: number;
+  friends_upserted?: number;
+  holes_enriched?: number;
 }
 
 // ─── Phase 6b additions ────────────────────────────────────────────────

@@ -13,7 +13,7 @@ export const INK = '#F8FAFC';
 export const MUTE = 'rgba(248,250,252,0.72)';
 export const DIM = 'rgba(248,250,252,0.62)';
 export const AMBER = '#F7931E';
-export const GOOD = '#34D77F';
+export const GOOD = '#34D399';
 /** Bespoke destructive red - NOT the under-par red. */
 export const BAD = '#FF5A5A';
 export const TRACK = 'rgba(255,255,255,0.08)';
