@@ -116,7 +116,9 @@ export function formatNumber(n: number): string {
  * compact helpers used in engagement counters.
  */
 export function formatCompact(n: number): string {
-  return new Intl.NumberFormat(formattingLocale(), {
+  // Pinned 'en-US' on purpose: magnitude suffixes (12K / 1.2M / 3.5B) are app
+  // vocabulary, not a locale correctness question — en-GB gives "3.5bn".
+  return new Intl.NumberFormat('en-US', {
     notation: 'compact',
     maximumFractionDigits: 1,
   }).format(n);
@@ -229,7 +231,7 @@ export function formatWeekdayLong(d: DateInput): string {
 
 /**
  * Month + year, short month — "Jul 2026".
- * Matches `toLocaleDateString('en-US', { month: 'short', year: 'numeric' })`.
+ * Short month + year in the formatting locale — en "Jul 2026".
  */
 export function formatMonthYearShort(d: DateInput): string {
   return new Intl.DateTimeFormat(formattingLocale(), {
@@ -240,7 +242,7 @@ export function formatMonthYearShort(d: DateInput): string {
 
 /**
  * Short month + day + year — "Jul 16, 2026".
- * Matches `toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' })`.
+ * Day, short month, year in the formatting locale — en "16 Jul 2026" (was American "Jul 16, 2026").
  */
 export function formatMonthDayYearShort(d: DateInput): string {
   return new Intl.DateTimeFormat(formattingLocale(), {
@@ -256,6 +258,8 @@ export function formatMonthDayYearShort(d: DateInput): string {
  * money). Currency symbol is fixed English copy for this wave; extraction
  * moves to i18n copy in Wave ≥ 2.
  */
+// The currency is American and so is its symbol convention: a bare "$" built
+// from formatNumber + the en-US-pinned formatCompact, never Intl currency style.
 export function formatCurrencyUsd(n: number): string {
   return `$${formatNumber(n)}`;
 }
@@ -502,24 +506,23 @@ export function formatMonthLongGB(d: DateInput): string {
   return new Intl.DateTimeFormat(formattingLocale(), { month: 'long' }).format(toDate(d));
 }
 
-/** en-US "Thu, Jul 16" — short weekday + short month + day. Matches the
- *  upload-scheduled toast pill (weekday:'short', month:'short', day:'numeric'). */
+/** Short weekday + day + short month — en "Thu 16 Jul" (was American
+ *  "Thu, Jul 16"). Used by the upload-scheduled toast pill. */
 export function formatWeekdayMonthDayShortUS(d: DateInput): string {
   return new Intl.DateTimeFormat(formattingLocale(), {
     weekday: 'short', month: 'short', day: 'numeric',
   }).format(toDate(d));
 }
 
-/** en-US "3:45 PM" — hour + 2-digit minute, 12h clock. Matches
- *  `toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })`. */
+/** Hour + 2-digit minute, British 12h clock — en "3:45 pm" (was "3:45 PM"). */
 export function formatTimeHmUS(d: DateInput): string {
   return new Intl.DateTimeFormat(formattingLocale(), {
     hour: 'numeric', minute: '2-digit',
   }).format(toDate(d));
 }
 
-/** en-US "Jul 16, 2026, 03:45 PM" — full news timestamp. Matches
- *  `toLocaleDateString('en-US', { year, month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })`. */
+/** Full news timestamp — en "16 Jul 2026, 3:45 pm" (was "Jul 16, 2026, 03:45 PM").
+ *  hour is 'numeric' so it matches every other time in the app. */
 export function formatNewsTimestampUS(d: DateInput): string {
   return new Intl.DateTimeFormat(formattingLocale(), {
     year: 'numeric', month: 'short', day: 'numeric',
