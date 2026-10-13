@@ -198,6 +198,11 @@
   },
   "whsConnect": {
     "intro": {
+      "scoresLabel": "What the field scores here",
+      "bucketBirdie": "Birdie+",
+      "bucketPar": "Par",
+      "bucketBogey": "Bogey",
+      "bucketDouble": "Double+",
       "scopeAllHoles_one": "All {{holes}} hole",
       "scopeAllHoles_other": "All {{holes}} holes",
       "headline": "Your game, in numbers you can use.",
