@@ -114,6 +114,6 @@
 - [x] Stage 1 tracking; follow-ups: Explore ?view=, Inbox ?type=, video_watch per-interval confirmed.
 - [x] Stage 2 (2.1–2.5).
 - [x] Stage 3 hooks + rules 4–6 + follow-ups.
-- [ ] Stage 4 Member screen — blocked: Member.dc.html is absent from accessible uploads and project/saved files. Original brief recovered at /mnt/user-uploads/BRIEFMEMBERSRADAR_pasted.txt; only the mock requires reattachment. Do not approximate. Use Stage 3 hooks and memberRadarRules, London times, formatAgo, permission/empty states and shape-matched skeletons.
-- [ ] Stage 5 Behaviour screen — blocked: Behaviour.dc.html is absent from accessible uploads; requires reattachment. Match exactly; use returned seconds/actions/area/screen labels, paged sessions and merged session detail through Stage 3 hooks.
-- [ ] Verify Stages 4–5 and report exact mock parity, authentication limits and full-suite result after the required files are available; no SQL, migrations or edge-function changes. No application code changed and suite not rerun while blocked.
+- [ ] Stage 4 Member screen — Member.html received; check exact mock against recovered brief and Stage 3 data before implementing. Use Stage 3 hooks and memberRadarRules, London times, formatAgo, permission/empty states and shape-matched skeletons.
+- [ ] Stage 5 Behaviour screen — Behaviour.html received; check exact mock coverage, then implement returned seconds/actions/area/screen labels, paged sessions and merged session detail through Stage 3 hooks.
+- [ ] Verify Stages 4–5 and report exact mock parity, authentication limits and full-suite result; no SQL, migrations or edge-function changes.
