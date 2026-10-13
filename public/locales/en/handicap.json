@@ -205,6 +205,14 @@
       "kicker": "Connect your handicap",
       "headlineLine1": "Connect once.",
       "headlineLine2": "All of it opens.",
+      "kickerHomeClub": "Your home club",
+      "kickerTop100": "In the Top 100",
+      "headlineSuffix": "measured.",
+      "chartCaption": "Amber is an example of where your scoring would sit.",
+      "source": "From official rounds tracked here.",
+      "lead": "Connect your handicap and it becomes <1>yours</1> — here, and on every course you play.",
+      "changeCourse": "Not your course? Change",
+      "setHomeClub": "Set your home club",
       "promises": {
         "analyse": {
           "title": "Analyse your golf",
