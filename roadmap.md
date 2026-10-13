@@ -109,3 +109,8 @@
 - `useMemberStandings` (one rpc call, keyed on user id, mirrors useRoundAwards), `career/standings.ts` (rules: tiedWith, discState 4 states, formatValue, standingLine, groupStandings, courseSubline), `career/panels/StandingsPanel.tsx`, mounted in `CareerRecordSheet` after Course Records. `REC.FAINT` added for the placed disc border.
 - The UI derives nothing but `tied_with` and |value − column|. Tenure boards render with no disc.
 - Out of scope, untouched: the course You tab, `get_member_standings`/any SQL, legends/ranks/titles/badges/notifications, the room's other sections.
+
+## BRIEF_MEMBERS_RADAR
+- [x] Stage 1 tracking; follow-ups: Explore ?view=, Inbox ?type=, video_watch per-interval confirmed.
+- [x] Stage 2 (2.1–2.5).
+- [ ] Stages 3–5 — waiting on go-ahead. Carry into Member/Behaviour build: index shown only when connected (else —); index chart ends on today at profile.index; timeline merges consecutive same-label screen steps (seconds summed); use server seconds/actions as returned, no client recompute or refilter; area names are data.

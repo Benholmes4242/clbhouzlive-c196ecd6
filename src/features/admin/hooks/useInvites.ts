@@ -117,10 +117,10 @@ export function useInvites() {
 
   const counts = {
     all: data.length,
-    pending: data.filter(i => i.status === 'pending' && !i.acceptedAt).length,
+    // 2.5 — an expired invite is not pending.
+    pending: data.filter(i => i.status === 'pending' && !i.acceptedAt && new Date(i.expiresAt) >= new Date()).length,
     accepted: data.filter(i => !!i.acceptedAt).length,
     expired: data.filter(i => !i.acceptedAt && new Date(i.expiresAt) < new Date()).length,
-    cancelled: data.filter(i => i.status === 'cancelled').length,
   };
 
   return { data, isLoading, refetch, counts, create, cancel, resend, revokeBulk };

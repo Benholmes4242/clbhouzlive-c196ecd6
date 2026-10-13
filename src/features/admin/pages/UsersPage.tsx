@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -13,7 +12,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useUserActions } from '@/hooks/admin/useUserDetails';
 import { supabase } from '@/integrations/supabase/client';
 import { adminTheme as t } from '../theme';
-import { formatDurationShort } from '../lib/chartPrimitives';
+import { formatAgo } from '../lib/formatAgo';
 import SectionTabs from '../components/SectionTabs';
 import StatusPill from '../components/StatusPill';
 import EmptyState from '../components/EmptyState';
@@ -32,29 +31,11 @@ import MemberActivityCard from '../components/MemberActivityCard';
 
 type TabId = 'members' | 'team' | 'invites';
 
-/** Still used by the WHS sync line, Team grants and Invites copy. */
-function relTime(iso: string | null | undefined): string {
-  if (!iso) return '-';
-  try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); }
-  catch { return '-'; }
-}
-
 const LABEL_T = { ...LABEL, fontFeatureSettings: '"kern" 1, "liga" 1' } as const;
 const FIG_T = { fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums' } as const;
-
-/**
- * The roster's one age format. Absolute and tabular: "now" / "44m" / "31h" /
- * "32d". Shares formatDurationShort with the Dashboard and the Inbox; only the
- * sub-2-minute band differs (that formatter emits seconds, which read as noise
- * on a roster).
- */
-function ageShort(iso: string | null | undefined): string {
-  if (!iso) return '-';
-  const secs = (Date.now() - new Date(iso).getTime()) / 1000;
-  if (!Number.isFinite(secs)) return '-';
-  if (secs < 120) return 'now';
-  return formatDurationShort(Math.max(0, secs));
-}
+/** 2.2 — last-seen is sentence case; LABEL's uppercase must never reach it. */
+const AGE_T = { ...FIG_T, fontSize: 11, fontWeight: 600, letterSpacing: 0, textTransform: 'none' } as const;
+const ago = (iso: string | null | undefined) => formatAgo(iso, { suffix: true, empty: '-' });
 
 function ageTone(iso: string | null | undefined): string {
   if (!iso) return t.inkFaint;
@@ -64,11 +45,12 @@ function ageTone(iso: string | null | undefined): string {
   return t.inkFaint;
 }
 
-/** 'user' is the default role and distinguishes nothing; suppress it by name. */
-const DEFAULT_ROLES = new Set(['user']);
-function badgeRole(role: string | null): string | null {
-  if (!role) return null;
-  return DEFAULT_ROLES.has(role) ? null : role;
+/** Admin membership role -> label. 2.4: a moderator reads "Moderator", never "Limited". */
+function adminRoleLabel(role: string | null | undefined): string | null {
+  if (role === 'full') return 'Full';
+  if (role === 'limited') return 'Limited';
+  if (role === 'moderator') return 'Moderator';
+  return null;
 }
 
 /** Top-level view switch. Not a filter — active state is ink, like every other
@@ -416,7 +398,7 @@ function CohortTile({ label, count, share, active, onClick }: {
 
 function RosterRow({ user, onOpen, divider }: { user: AdminUserRow; onOpen: () => void; divider: boolean }) {
   const isNew = Date.now() - new Date(user.created_at).getTime() < 7 * 86400_000;
-  const role = badgeRole(user.role);
+  const role = adminRoleLabel(user.admin_role);
   const hcp = user.handicap_index;
   return (
     <button
@@ -475,8 +457,8 @@ function RosterRow({ user, onOpen, divider }: { user: AdminUserRow; onOpen: () =
         ) : (
           <span style={{ ...FIG_T, fontSize: 13.5, fontWeight: 700, color: t.ink }}>{hcp.toFixed(1)}</span>
         )}
-        <span style={{ ...LABEL_T, ...FIG_T, color: ageTone(user.last_seen_at) }}>
-          {ageShort(user.last_seen_at)}
+        <span style={{ ...AGE_T, color: ageTone(user.last_seen_at) }}>
+          {formatAgo(user.last_seen_at, { empty: '-' })}
         </span>
       </div>
     </button>
@@ -533,7 +515,7 @@ function egStatusView(conn: { last_sync_status: string | null; last_synced_at: s
     return {
       tone: 'ok' as const,
       label: 'Linked - syncing',
-      when: conn.last_synced_at ? `last synced ${relTime(conn.last_synced_at)}` : null,
+      when: conn.last_synced_at ? `last synced ${ago(conn.last_synced_at)}` : null,
     };
   }
   // A partial run DID sync - it authenticated, refreshed the handicap and
@@ -543,7 +525,7 @@ function egStatusView(conn: { last_sync_status: string | null; last_synced_at: s
     return {
       tone: 'warn' as const,
       label: 'Linked - partial sync',
-      when: conn.last_synced_at ? `last synced ${relTime(conn.last_synced_at)}` : null,
+      when: conn.last_synced_at ? `last synced ${ago(conn.last_synced_at)}` : null,
     };
   }
   return { tone: 'warn' as const, label: 'Needs re-auth', when: null };
@@ -586,7 +568,9 @@ function Member360Sheet({
     setBusy(true);
     try {
       let res: { success: boolean; error?: any } | undefined;
-      if (confirm === 'suspend') res = await actions.suspendUser(detail.id);
+      if (confirm === 'suspend') res = detail.is_suspended
+        ? await actions.unsuspendUser(detail.id)
+        : await actions.suspendUser(detail.id);
       if (confirm === 'delete')  res = await actions.deleteUser(detail.id);
       if (confirm === 'reset')   res = await actions.resetPassword(detail.id, detail.email ?? `${detail.username ?? detail.id}@user`);
       if (confirm === 'verify')  res = await actions.verifyGolfer(detail.id);
@@ -600,7 +584,7 @@ function Member360Sheet({
       } else if (res?.success) {
         toast.success(
           confirm === 'delete' ? 'User deleted' :
-          confirm === 'suspend' ? 'User suspended' :
+          confirm === 'suspend' ? (detail.is_suspended ? 'Suspension lifted' : 'User suspended') :
           confirm === 'verify' ? 'Golfer verified' :
           confirm === 'unverify' ? 'Verification removed' :
           'Password reset email sent'
@@ -1339,7 +1323,7 @@ function TeamCard({
             {member.displayName ?? member.username ?? member.userId.slice(0, 8)}
           </span>
           <StatusPill tone={member.role === 'full' ? 'ok' : 'warn'}>
-            {member.role === 'full' ? 'Full' : 'Limited'}
+            {adminRoleLabel(member.role) ?? member.role}
           </StatusPill>
           {expiry && (
             <StatusPill tone={expiryTone}>
@@ -1348,7 +1332,7 @@ function TeamCard({
           )}
         </div>
         <div style={{ fontSize: 12, color: t.inkMuted, marginTop: 4 }}>
-          Granted {relTime(member.createdAt)}{member.grantedBy ? ` - by ${member.grantedBy.slice(0, 8)}` : ''}
+          Granted {ago(member.createdAt)}{member.grantedByName ? ` - by ${member.grantedByName}` : ''}
         </div>
         {member.notes && (
           <div style={{ fontSize: 12, color: t.inkMuted, marginTop: 4 }}>{member.notes}</div>
@@ -1481,7 +1465,6 @@ function InvitesTab() {
 
 function inviteStatus(inv: InviteRow): { label: string; tone: 'ok' | 'warn' | 'danger' | 'neutral' } {
   if (inv.acceptedAt) return { label: 'Accepted', tone: 'ok' };
-  if (inv.status === 'cancelled') return { label: 'Cancelled', tone: 'neutral' };
   if (new Date(inv.expiresAt) < new Date()) return { label: 'Expired', tone: 'danger' };
   return { label: 'Pending', tone: 'warn' };
 }
@@ -1490,7 +1473,7 @@ function InviteCard({
   invite, onResend, onCancel,
 }: { invite: InviteRow; onResend: () => void; onCancel: () => void }) {
   const s = inviteStatus(invite);
-  const canMutate = !invite.acceptedAt && invite.status !== 'cancelled';
+  const canMutate = !invite.acceptedAt;
   return (
     <div style={{
       background: t.surface, border: `1px solid ${t.line}`,
@@ -1504,7 +1487,7 @@ function InviteCard({
             {invite.displayName ?? invite.username ?? invite.email ?? '-'}
           </div>
           <div style={{ fontSize: 12, color: t.inkMuted }}>
-            {invite.role ?? 'admin'} - sent {relTime(invite.createdAt)}
+            {invite.role ?? 'admin'} - sent {ago(invite.createdAt)}
           </div>
         </div>
         <StatusPill tone={s.tone}>{s.label}</StatusPill>

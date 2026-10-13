@@ -13,9 +13,9 @@
  */
 
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft, PencilLine, Plus, Search, X } from 'lucide-react';
 import { useConversations } from '@/hooks/messaging/useConversations';
 import { ConversationRow } from './ConversationRow';
@@ -60,7 +60,14 @@ const InboxV2Page: React.FC = () => {
   const navigate = useNavigate();
   const [composeOpen, setComposeOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState<InboxFilter>('all');
+  /* The type chip lives in ?type= so page_view paths tell chips apart
+     (usePageTracking treats a change in `type` as a screen change). */
+  const [searchParams, setSearchParams] = useSearchParams();
+  const rawType = searchParams.get('type');
+  const filter: InboxFilter = rawType === 'unread' || rawType === 'played' ? rawType : 'all';
+  const setFilter = useCallback((v: InboxFilter) => {
+    setSearchParams((prev) => { const n = new URLSearchParams(prev); n.set('type', v); return n; }, { replace: true });
+  }, [setSearchParams]);
   const { conversations, isLoading, error, refetch, hasActor } = useConversations();
   const actor = useMessagingActor();
   const { user } = useSupabaseSession();
