@@ -114,4 +114,6 @@
 - [x] Stage 1 tracking; follow-ups: Explore ?view=, Inbox ?type=, video_watch per-interval confirmed.
 - [x] Stage 2 (2.1–2.5).
 - [x] Stage 3 hooks + rules 4–6 + follow-ups.
-- [ ] Stages 4–5 screens — waiting on go-ahead. Carry into Member/Behaviour build: index shown only when connected (else —); index chart ends on today at profile.index; timeline merges consecutive same-label screen steps (seconds summed); use server seconds/actions as returned, no client recompute or refilter; area names are data.
+- [ ] Stage 4 Member screen — go-ahead received; locate authoritative brief and Member.dc.html before implementation. Match exactly; use Stage 3 hooks and memberRadarRules, London times, formatAgo, permission/empty states and shape-matched skeletons.
+- [ ] Stage 5 Behaviour screen — locate Behaviour.dc.html and match exactly; use returned seconds/actions/area/screen labels, paged sessions and merged session detail through Stage 3 hooks.
+- [ ] Verify Stages 4–5 and report exact mock parity, authentication limits and full-suite result; no SQL, migrations or edge-function changes.
