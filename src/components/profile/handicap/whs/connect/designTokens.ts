@@ -149,10 +149,12 @@ export const KICKER_LG: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.18em',
   textTransform: 'uppercase',
-  /* AMBER ON EVERY STAGE (BRIEF_WHS_CONNECT_FLOW_ONE_LANGUAGE). There is no
-     colour override on StageHead: an escape hatch here is how four eyebrow
-     colours happened. A non-amber eyebrow is a design question, not a prop. */
-  color: AMBER,
+  /* INK ON EVERY STAGE (BRIEF_COUNTRY_SCREEN_WAITLIST, replacing the amber
+     rule). Amber on this flow now marks the MEMBER - the intro's chart and the
+     member's own figures - so it can no longer also mark wayfinding chrome.
+     One meaning per colour. Answered once, here in the token, for every stage:
+     there is still no colour override on StageHead and there must not be one. */
+  color: INK,
 };
 
 /** Syncing step not yet reached: ring and label. */
