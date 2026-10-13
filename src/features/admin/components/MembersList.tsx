@@ -91,7 +91,7 @@ export function weekDashColors(m: MembersOverviewMember, now = Date.now()): stri
   const joined = new Date(m.created_at).getTime();
   return m.weeks_8.map((active, i) => {
     const weekEnd = now - (7 - i - 1) * 7 * DAY;
-    if (weekEnd - 7 * DAY < joined && weekEnd <= joined) return WEEK_PREJOIN;
+    if (weekEnd <= joined) return WEEK_PREJOIN;
     return active ? t.ink : WEEK_OFF;
   });
 }
