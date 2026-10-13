@@ -30,6 +30,9 @@ interface PlayerAvatarProps {
    *  canonical hairline. Override only for an achievement or accent ring — the
    *  app is dark-only, so this is never a surface choice. */
   ringColor?: string;
+  /** sr_players.headshot_override — a FILENAME KEY for the folder lookup, not a
+   *  URL. Never pass it as photoUrl and never coalesce the two. */
+  headshotOverride?: string | null;
 }
 
 const SIZE_PX = { xs: 26, sm: 32, md: 44, lg: 64, xl: 96, '2xl': 128 } as const;
@@ -42,12 +45,13 @@ export function PlayerAvatar({
   size = 'md',
   className,
   ringColor = DARK_HAIRLINE,
+  headshotOverride = null,
 }: PlayerAvatarProps) {
   const candidates = resolvePlayerAvatarCandidates({
     name: playerName,
     photoUrl: photoUrl ?? null,
     tourSlug: tourCode,
-    headshotOverride: null,
+    headshotOverride: headshotOverride ?? null,
   });
   return (
     <SquircleAvatar

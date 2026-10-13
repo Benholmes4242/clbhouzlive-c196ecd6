@@ -426,6 +426,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                         playerName={name}
                         tourCode={tourCode}
                         photoUrl={p.photo_url ?? null}
+                        headshotOverride={p.headshot_override ?? null}
                         size="sm"
                       />
                       <span
