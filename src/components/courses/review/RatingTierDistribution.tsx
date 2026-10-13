@@ -1,6 +1,7 @@
 import React from 'react';
 import { reviewTierColor } from '@/components/shared/ReviewGhostScore';
 import type { RatingTier } from '@/lib/ratingTier';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 // The Reviews tab header (TheScore) is its one live importer: restored by
 // BRIEF_REVIEWS_HEADER_PAIR_AND_DISTRIBUTION. Empty bands render as the label,
@@ -57,7 +58,7 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
               {item.label}
             </span>
 
-            <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <div className="flex-1 h-[8px] rounded-full overflow-hidden" style={{ background: A.TRACK }}>
               <div
                 className="h-full rounded-full transition-all duration-300"
                 style={{
