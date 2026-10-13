@@ -13,7 +13,7 @@ import { setWhsConnectImmersive } from '@/components/header/globalHeaderRules';
 import { applyRouteChrome } from '@/lib/routeChrome';
 import EmptyStateScreen from './connect/EmptyStateScreen';
 import CountryScreen from './connect/CountryScreen';
-import EnglandGolfForm from './connect/EnglandGolfForm';
+import EnglandGolfForm, { type FormErrorKind } from './connect/EnglandGolfForm';
 import ComingSoonScreen from './connect/ComingSoonScreen';
 import SyncingScreen from './connect/SyncingScreen';
 import WelcomeAboardScreen from './connect/WelcomeAboardScreen';
@@ -28,6 +28,8 @@ const ERROR_MESSAGES: Record<string, string> = {
   already_connected: 'Your England Golf account is already linked. Pull down to refresh.',
   eg_auth_failed:
     "England Golf didn't recognise that membership number and password. Double-check them in your MyEG app.",
+  eg_connection_refreshing:
+    'Our connection to England Golf is being refreshed. This is on our side, not yours. Try again shortly.',
   eg_unavailable: 'England Golf is temporarily unreachable. Please try again in a few minutes.',
   internal_error: 'Something went wrong on our side. Please try again in a moment.',
 };
@@ -52,11 +54,19 @@ type WhsErrorCategory =
 const ERROR_CODE_CATEGORY: Record<string, WhsErrorCategory> = {
   eg_auth_failed: 'invalid_credentials',
   eg_unavailable: 'provider_unavailable',
+  eg_connection_refreshing: 'provider_unavailable',
   already_connected: 'already_connected',
   invalid_request: 'invalid_request',
   not_authenticated: 'not_authenticated',
   internal_error: 'unknown',
 };
+
+/** error_code -> the form's state. Display copy never drives behaviour. */
+function errorKindFor(code: string): FormErrorKind {
+  if (code === 'eg_auth_failed') return 'rejected';
+  if (code === 'eg_connection_refreshing') return 'refreshing';
+  return 'other';
+}
 
 function categorizeWhsError(code: string | null, err: unknown): WhsErrorCategory {
   if (code && ERROR_CODE_CATEGORY[code]) return ERROR_CODE_CATEGORY[code];
@@ -91,6 +101,8 @@ export const WhsConnectScreen: React.FC<Props> = ({
   const [step, setStep] = useState<'intro' | 'country' | 'chosen' | 'declined'>('intro');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /* The form's state comes from error_code, never from the display copy. */
+  const [errorKind, setErrorKind] = useState<FormErrorKind>(null);
   const [successData, setSuccessData] = useState<ConnectWhsSuccess | null>(null);
 
   const immersive = layout === 'page';
@@ -177,12 +189,14 @@ export const WhsConnectScreen: React.FC<Props> = ({
     setCountryId(c.id);
     setStep('chosen');
     setError(null);
+    setErrorKind(null);
     analyticsEvents.track('whs_connect_country', { country: c.id });
   };
 
   const handleSubmit = async (membershipNumber: string, password: string) => {
     setSubmitting(true);
     setError(null);
+    setErrorKind(null);
 
     // S3.1: credentials are passed to the API call and NOWHERE else. No event
     // prop ever carries membershipNumber, password, or anything derived.
@@ -193,6 +207,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
       if (data.ok === false) {
         const code = data.error_code ?? 'internal_error';
         setError(ERROR_MESSAGES[code] ?? data.message ?? ERROR_MESSAGES.internal_error);
+        setErrorKind(errorKindFor(code));
         // Categorised, never the raw message (S3.2).
         analyticsEvents.track('whs_connect_failed', {
           category: categorizeWhsError(code, null),
@@ -226,6 +241,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
       setSuccessData(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setErrorKind('other');
       // Name/shape only — the message string never leaves this function (S3.2).
       analyticsEvents.track('whs_connect_failed', {
         category: categorizeWhsError(null, err),
@@ -328,6 +344,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
           <EnglandGolfForm
             onSubmit={handleSubmit}
             error={error}
+            errorKind={errorKind}
             submitting={false}
             bodyName={country?.body}
             bodyShort={country?.bodyShort ?? country?.body}
