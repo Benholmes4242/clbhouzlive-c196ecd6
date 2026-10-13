@@ -85,19 +85,17 @@ export const CategoryScores: React.FC<{ scores: CategoryScoreValues; marginTop?:
         if (value == null) return <div key={key} data-category={key} aria-hidden style={{ minWidth: 0 }} />;
         const tone = courseSubScoreTone(value);
         return (
-          <div key={key} data-category={key} style={{ minWidth: 0 }}>
-            <div style={{ height: 3, borderRadius: BAR_RADIUS, background: A.TRACK, overflow: 'hidden' }}>
-              <div
-                data-category-score={value.toFixed(1)}
-                style={{ height: '100%', width: `${categoryFillPercent(value)}%`, borderRadius: BAR_RADIUS, background: tone }}
-              />
-            </div>
-            <div data-category-figure style={{ ...FIGS, marginTop: 6, fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: tone }}>
+          <div key={key} data-category={key} style={{ minWidth: 0, textAlign: 'center' }}>
+            <div
+              data-category-figure
+              data-category-score={value.toFixed(1)}
+              style={{ ...FIGS, fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: tone }}
+            >
               {value.toFixed(1)}
             </div>
             <div
               style={{
-                marginTop: 5, fontSize: 9, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase',
+                marginTop: 6, fontSize: 9, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase',
                 color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               }}
             >

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { SubScoreStack } from '@/features/courses/_shared/scoreBands';
+import { CategoryScores } from '@/components/courses/course-detail/CategoryScores';
 import type { StatBrowseRow } from './useStatBrowse';
 import { courseRankLabels, type RankList } from '@/features/courses/_shared/courseRankLabels';
 import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
@@ -76,12 +76,6 @@ export function BrowseCourseCard({
       : pct <= 20
         ? { word: 'easier', value: 100 - pct }
         : null;
-  const bars = [
-    { label: t('top100.stats.design'), score: row.design_score },
-    { label: t('top100.stats.condition'), score: row.condition_score },
-    { label: t('top100.stats.clubhouse'), score: row.clubhouse_score },
-    { label: t('top100.stats.facilities'), score: row.facilities_score },
-  ];
   const location = [row.region, row.sub_country].filter(Boolean).join(', ') || row.country;
   return (
     <button
@@ -172,11 +166,10 @@ export function BrowseCourseCard({
             {ratedWithoutRoundsNote}
           </div>
         ) : null}
-        <div style={{ display: 'flex', gap: 10, marginTop: 13 }}>
-          {bars.map(({ label, score }) =>
-            score != null ? <SubScoreStack key={label} label={label} score={score} /> : null,
-          )}
-        </div>
+        <CategoryScores
+          scores={{ design: row.design_score, condition: row.condition_score, clubhouse: row.clubhouse_score, facilities: row.facilities_score }}
+          marginTop={14}
+        />
       </div>
     </button>
   );
