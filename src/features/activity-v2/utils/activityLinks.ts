@@ -25,6 +25,7 @@ import { handicapTabRoute } from '@/lib/handicap/handicapTabRoute';
  *  business_verification_*                 -> /business/:id/verification
  *  course_claim_*                          -> /courses/:course_id (claim surface)
  *  business_member_added                   -> /business/:id
+ *  admin_invite (with data.token)          -> /admin-invite/accept?token=...
  *  business_team_invited                   -> /business/invite/accept?token=... (fallback /business/:id)
  *  business_team_joined                    -> /business/:id
  *  business_team_member_joined             -> /business/:id/team
@@ -389,6 +390,9 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
   if (type === 'business_member_added' || type === 'business_access_approved') {
     const id = data.business_slug || data.business_id || entity_id;
     if (id) return `/business/${id}`;
+  }
+  if (type === 'admin_invite' && data.token) {
+    return `/admin-invite/accept?token=${encodeURIComponent(data.token)}`;
   }
   if (type === 'business_team_invited') {
     if (data.token) return `/business/invite/accept?token=${encodeURIComponent(data.token)}`;

@@ -94,7 +94,11 @@ export function useInvites() {
       if (data?.error) throw new Error(data.error);
       return data;
     },
-    onSuccess: () => { toast.success('Invite sent'); invalidate(); },
+    onSuccess: (data) => {
+      if (data?.email_sent === false) toast.warning('Invite saved, but the email could not be sent');
+      else toast.success('Invite sent');
+      invalidate();
+    },
     onError: (e: Error) => toast.error(e.message || 'Failed to send invite'),
   });
 
@@ -117,8 +121,13 @@ export function useInvites() {
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
+      return data;
     },
-    onSuccess: () => { toast.success('Invite extended +7 days'); invalidate(); },
+    onSuccess: (data) => {
+      if (data?.email_sent === false) toast.warning('Invite saved, but the email could not be sent');
+      else toast.success('Invite sent again, expires in 7 days');
+      invalidate();
+    },
     onError: (e: Error) => toast.error(e.message || 'Failed to resend invite'),
   });
 

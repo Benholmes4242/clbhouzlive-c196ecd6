@@ -1350,7 +1350,7 @@ function InviteCard({
       </div>
       {canMutate && (
         <div style={{ display: 'flex', gap: 8 }}>
-          <DrawerBtn icon={<Mail size={14} />} onClick={onResend}>Extend +7d</DrawerBtn>
+          <DrawerBtn icon={<Mail size={14} />} onClick={onResend}>Re-invite</DrawerBtn>
           <DrawerBtn icon={<X size={14} />} tone="danger" onClick={onCancel}>Cancel</DrawerBtn>
         </div>
       )}

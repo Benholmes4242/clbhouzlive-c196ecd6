@@ -317,9 +317,8 @@ const CreateProfileRedirect = lazy(() => import("./components/redirects/CreatePr
 
 
 
-// AdminSetupPage removed: the admin-invitation redemption path never existed
-// (every admin_invitations policy requires is_admin()/is_panel_admin()), so the
-// route could not work. Re-introduce only with a real edge-function redemption.
+// Admin invites are redeemed at /admin-invite/accept via the admin-invite-manage
+// edge function (accept_invite), never by client reads of admin_invitations.
 const AdminShell = lazy(() => import('./features/admin/AdminShell'));
 
 
@@ -430,6 +429,7 @@ const BusinessVerificationPage = lazy(() => import("./pages/BusinessVerification
 const BusinessTeamPage = lazy(() => import("./pages/BusinessTeamPage"));
 const BusinessInvitePage = lazy(() => import("./pages/BusinessInvitePage"));
 const BusinessInviteAcceptPage = lazy(() => import("./pages/BusinessInviteAcceptPage"));
+const AdminInviteAcceptPage = lazy(() => import("./pages/AdminInviteAcceptPage"));
 const BusinessActivityPage = lazy(() => import("./pages/BusinessActivityPage"));
 const BusinessReviewsPage = lazy(() => import("./pages/BusinessReviewsPage"));
 
@@ -714,6 +714,7 @@ function AppRoutes() {
         <Route path="/business/:businessId/team" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessTeamPage /></Suspense>} />
         <Route path="/business/:businessId/team/invite" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInvitePage /></Suspense>} />
         <Route path="/business/invite/accept" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInviteAcceptPage /></Suspense>} />
+        <Route path="/admin-invite/accept" element={<Suspense fallback={<GenericPageSkeleton />}><AdminInviteAcceptPage /></Suspense>} />
         <Route path="/business/:businessId/activity" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessActivityPage /></Suspense>} />
         <Route path="/business/:id/reviews" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessReviewsPage /></Suspense>} />
         <Route path="/business/:idOrSlug/followers" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessSocialListRoute direction="followers" /></Suspense>} />
