@@ -18,6 +18,7 @@ import {
   egListScores,
   egListFriends,
   EgApiError,
+  getPreAuthToken,
   insertHandicapSnapshotIfChanged,
   syncProfileHandicapIndex,
   upsertScores,
@@ -644,6 +645,18 @@ Deno.serve(async (req) => {
         summary.skippedBudget = queue.length - results.length;
         console.warn(`[sync-due ${runId}] budget reached at ${elapsed}ms — ${summary.skippedBudget} connection(s) deferred to the next run`);
         break;
+      }
+
+      // Pre-auth check BEFORE the claim, so a lapsed token leaves even
+      // last_attempted_at untouched on this row.
+      try {
+        getPreAuthToken();
+      } catch (err) {
+        if (err instanceof EgApiError && err.kind === "preauth_expired") {
+          preauthLapsed = true;
+          summary.skippedPreauthExpired++;
+          continue;
+        }
       }
 
       // CLAIM FIRST. If this invocation dies mid-connection, the row still
