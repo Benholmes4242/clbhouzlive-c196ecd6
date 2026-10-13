@@ -11,17 +11,11 @@
  * Counting happens in Postgres. A new metric needs an RPC, not a select and a
  * Set.
  */
-import { useState, useMemo } from 'react';
-import { useMembersOverview } from './useMembersRadar';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
 import type { Database } from '@/integrations/supabase/types';
-import {
-  isNewThisWeek, isDormant14dPlus, isActive24h, hasEgIssue, isSuspended,
-  isConnected, isNotConnected,
-  EG_AUTH_FAILED_STATUSES as EG_AUTH_FAILED_STATUSES_SHARED,
-} from '../lib/memberPredicates';
+import { EG_AUTH_FAILED_STATUSES as EG_AUTH_FAILED_STATUSES_SHARED } from '../lib/memberPredicates';
 
 
 type AppRole = Database['public']['Enums']['app_role'];
@@ -86,85 +80,11 @@ export type UserFilterStatus =
   | 'not_connected';
 
 
-const ANALYTICS_LOOKBACK_DAYS = 14;
-
-async function fetchAllUsers(): Promise<AdminUserRow[]> {
-  const { data: profiles, error } = await supabase
-    .from('user_profiles')
-    .select(`id, display_name, username, profile_photo_url, country, home_club,
-             eg_handicap_index, is_verified_golfer, is_suspended, created_at`)
-    .is('deleted_at', null)
-    // ONE population governs every member figure: live profiles, service
-    // account excluded. Must match get_admin_audiences()'s members CTE.
-    .eq('is_system_account', false)
-    .order('created_at', { ascending: false })
-    .limit(10000);
-  if (error) throw error;
-
-  // One row per member, aggregated in Postgres. 14d so it also serves the
-  // "dormant 14d+" filter, and active_24h comes from the same max(created_at)
-  // as the last-seen column, so the column and the filters cannot disagree.
-  const lastSeenRows = await fetchMemberLastSeen();
-  const lastSeenMap = new Map<string, string>();
-  for (const r of lastSeenRows) {
-    if (r.user_id && r.last_seen_at) lastSeenMap.set(r.user_id, r.last_seen_at);
-  }
-
-  return (profiles ?? []).map(p => ({
-    id: p.id,
-    display_name: p.display_name,
-    username: p.username,
-    avatar_url: p.profile_photo_url,
-    country: p.country,
-    home_club: p.home_club,
-    handicap_index: p.eg_handicap_index,
-    is_verified: p.is_verified_golfer ?? false,
-    is_suspended: p.is_suspended ?? false,
-    created_at: p.created_at,
-    role: null,
-    admin_role: null, // filled from get_admin_members_overview in useUsers
-    last_seen_at: lastSeenMap.get(p.id) ?? null,
-  }));
-}
-
-interface MemberLastSeenRow {
-  user_id: string;
-  last_seen_at: string | null;
-  active_24h: boolean;
-}
-
-async function fetchMemberLastSeen(): Promise<MemberLastSeenRow[]> {
-  const { data, error } = await supabase.rpc(
-    'get_admin_member_last_seen' as never,
-    { p_days: ANALYTICS_LOOKBACK_DAYS } as never,
-  );
-  if (error) throw error;
-  return (data as unknown as MemberLastSeenRow[]) ?? [];
-}
-
-async function fetchActive24h(): Promise<string[]> {
-  const rows = await fetchMemberLastSeen();
-  return rows.filter(r => r.active_24h).map(r => r.user_id);
-}
-
 async function fetchEgIssueUserIds(): Promise<string[]> {
   const { data } = await supabase
     .from('whs_connections')
     .select('user_id')
     .in('last_sync_status', EG_AUTH_FAILED_STATUSES as unknown as string[])
-    .limit(10000);
-  return [...new Set((data ?? []).map(r => r.user_id).filter(Boolean) as string[])];
-}
-
-/**
- * The FULL set of members with a live handicap connection - one query against
- * whs_connections, no pagination and no per-page slicing, so `not_connected`
- * is the true complement rather than "not connected, on this page only".
- */
-async function fetchConnectedUserIds(): Promise<string[]> {
-  const { data } = await supabase
-    .from('whs_connections')
-    .select('user_id')
     .limit(10000);
   return [...new Set((data ?? []).map(r => r.user_id).filter(Boolean) as string[])];
 }
@@ -219,125 +139,18 @@ async function fetchUserDetail(userId: string): Promise<AdminUserDetail> {
   };
 }
 
-export function useUsers() {
+/**
+ * The Members list reads get_admin_members_overview (useMembersOverview). What
+ * remains here serves the Member screen's legacy More actions (detail + role)
+ * and the one legacy ?filter=eg_issues deep link the overview has no flag for.
+ */
+export function useAdminUserDetail(userId: string | null) {
   const qc = useQueryClient();
-  const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<UserFilterStatus>('all');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
-  const [drawerUserId, setDrawerUserId] = useState<string | null>(null);
-
-  const { data: rawUsers = [], isLoading, refetch } = useQuery({
-    queryKey: ['admin-v2', 'users', 'all'],
-    queryFn: fetchAllUsers,
-    staleTime: 5 * 60_000,
+  const detail = useQuery({
+    queryKey: ['admin-v2', 'users', 'detail', userId],
+    queryFn: () => fetchUserDetail(userId!),
+    enabled: !!userId,
   });
-
-  // Follow-up 3 — the admin tag comes from get_admin_members_overview
-  // (SECURITY DEFINER), so limited admins see it whatever admin_memberships RLS allows.
-  const { data: overview } = useMembersOverview();
-  const allUsers = useMemo(() => {
-    const roles = new Map((overview?.members ?? []).map(m => [m.user_id, m.admin_role]));
-    return rawUsers.map(u => ({ ...u, admin_role: roles.get(u.id) ?? null }));
-  }, [rawUsers, overview]);
-
-  const { data: activeIds = [] } = useQuery({
-    queryKey: ['admin-v2', 'users', 'active-24h'],
-    queryFn: fetchActive24h,
-    staleTime: 3 * 60_000,
-  });
-
-  const { data: egIssueIds = [] } = useQuery({
-    queryKey: ['admin-v2', 'users', 'eg-issues'],
-    queryFn: fetchEgIssueUserIds,
-    staleTime: 3 * 60_000,
-  });
-
-  const { data: connectedIds = [] } = useQuery({
-    queryKey: ['admin-v2', 'users', 'connected'],
-    queryFn: fetchConnectedUserIds,
-    staleTime: 3 * 60_000,
-  });
-
-  const { data: userDetail, isLoading: detailLoading, isError: detailError, refetch: refetchDetail } = useQuery({
-    queryKey: ['admin-v2', 'users', 'detail', drawerUserId],
-    queryFn: () => fetchUserDetail(drawerUserId!),
-    enabled: !!drawerUserId,
-    staleTime: 2 * 60_000,
-  });
-
-  const filtered = useMemo(() => {
-    let rows = allUsers;
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      rows = rows.filter(u =>
-        u.display_name?.toLowerCase().includes(q) ||
-        u.username?.toLowerCase().includes(q) ||
-        u.home_club?.toLowerCase().includes(q) ||
-        u.id.toLowerCase().includes(q)
-      );
-    }
-    if (filter === 'admin') rows = rows.filter(u => !!u.admin_role);
-    if (filter === 'new_this_week') rows = rows.filter(u => isNewThisWeek(u));
-    if (filter === 'active_24h') {
-      const s = new Set(activeIds);
-      rows = rows.filter(u => isActive24h(u, s));
-    }
-    if (filter === 'dormant_14d') rows = rows.filter(u => isDormant14dPlus(u));
-    if (filter === 'eg_issues') {
-      const s = new Set(egIssueIds);
-      rows = rows.filter(u => hasEgIssue(u, s));
-    }
-    if (filter === 'connected') {
-      const s = new Set(connectedIds);
-      rows = rows.filter(u => isConnected(u, s));
-    }
-    if (filter === 'not_connected') {
-      const s = new Set(connectedIds);
-      rows = rows.filter(u => isNotConnected(u, s));
-    }
-    if (filter === 'suspended') rows = rows.filter(u => isSuspended(u));
-    if (filter === 'verified') rows = rows.filter(u => u.is_verified);
-    return rows;
-  }, [allUsers, search, filter, activeIds, egIssueIds, connectedIds]);
-
-  // Roster sort: last activity desc; users without activity sink to the bottom
-  // ordered by join date desc.
-  const sorted = useMemo(() => {
-    const clone = filtered.slice();
-    clone.sort((a, b) => {
-      const aT = a.last_seen_at ? new Date(a.last_seen_at).getTime() : 0;
-      const bT = b.last_seen_at ? new Date(b.last_seen_at).getTime() : 0;
-      if (aT !== bT) return bT - aT;
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    });
-    return clone;
-  }, [filtered]);
-
-  const paginated = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return sorted.slice(start, start + pageSize);
-  }, [sorted, page, pageSize]);
-
-  const counts = useMemo(() => {
-    const activeSet = new Set(activeIds);
-    const egSet = new Set(egIssueIds);
-    const connSet = new Set(connectedIds);
-    return {
-      all: allUsers.length,
-      new_this_week: allUsers.filter(u => isNewThisWeek(u)).length,
-      active_24h: allUsers.filter(u => isActive24h(u, activeSet)).length,
-      dormant_14d: allUsers.filter(u => isDormant14dPlus(u)).length,
-      eg_issues: allUsers.filter(u => hasEgIssue(u, egSet)).length,
-      suspended: allUsers.filter(u => isSuspended(u)).length,
-      verified: allUsers.filter(u => u.is_verified).length,
-      admin: allUsers.filter(u => !!u.admin_role).length,
-      connected: allUsers.filter(u => isConnected(u, connSet)).length,
-      not_connected: allUsers.filter(u => isNotConnected(u, connSet)).length,
-    };
-
-  }, [allUsers, activeIds, egIssueIds, connectedIds]);
-
   const roleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string | null }) => {
       await supabase.from('user_roles').delete().eq('user_id', userId);
@@ -355,17 +168,22 @@ export function useUsers() {
     },
     onError: () => toast.error('Failed to update role'),
   });
-
   return {
-    users: paginated, filteredCount: sorted.length, allCount: allUsers.length,
-    allUsers, isLoading, refetch,
-    search, setSearch: (v: string) => { setSearch(v); setPage(1); },
-    filter, setFilter: (v: UserFilterStatus) => { setFilter(v); setPage(1); },
-    counts,
-    page, setPage, pageSize, setPageSize,
-    drawerUserId, setDrawerUserId,
-    userDetail, detailLoading, detailError, refetchDetail,
+    userDetail: detail.data,
+    detailLoading: detail.isLoading,
+    detailError: detail.isError,
+    refetchDetail: detail.refetch,
     updateRole: (userId: string, role: string | null) => roleMutation.mutate({ userId, role }),
     roleUpdating: roleMutation.isPending,
   };
+}
+
+/** Legacy ?filter=eg_issues only: members whose handicap sync auth failed. */
+export function useEgIssueUserIds(enabled: boolean) {
+  return useQuery({
+    queryKey: ['admin-v2', 'users', 'eg-issues'],
+    queryFn: fetchEgIssueUserIds,
+    enabled,
+    staleTime: 5 * 60_000,
+  });
 }
