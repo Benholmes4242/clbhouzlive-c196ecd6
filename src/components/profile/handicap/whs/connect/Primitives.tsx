@@ -245,7 +245,7 @@ export const FooterBar: React.FC<{ children: React.ReactNode }> = ({ children })
  * safe-area inset, owned by the host) stops - together they put the kicker
  * about 54px below the physical top edge on a notched device.
  */
-export const Stage: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+export const Stage: React.FC<{ children: React.ReactNode; fill?: boolean }> = ({ children, fill = false }) => (
   <div
     style={{
       flex: 1,
@@ -253,6 +253,7 @@ export const Stage: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       overflowY: 'auto',
       WebkitOverflowScrolling: 'touch',
       padding: '10px 24px 0',
+      ...(fill ? { display: 'flex', flexDirection: 'column' } : null),
     }}
   >
     {children}
