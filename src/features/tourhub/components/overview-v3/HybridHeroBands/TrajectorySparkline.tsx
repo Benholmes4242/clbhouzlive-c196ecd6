@@ -1,4 +1,4 @@
-// SALVAGED — claimed by Tour Overview rebuild reachable via ChampionStrip; kept for Phase 2/3. Do not sweep as unreachable.
+// SALVAGED — claimed by Tour Overview rebuild no longer drawn by ChampionStrip (BRIEF_TOUR_CHAMPION_TRUTH X.2); kept for Phase 2/3. Do not sweep as unreachable.
 /**
  * TrajectorySparkline — round-by-round cumulative to-par sparkline.
  * Pure SVG, no D3/Recharts. Per HERO_PASS_3_BRIEF §2.
