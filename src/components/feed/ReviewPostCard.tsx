@@ -16,7 +16,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
 import { ReviewVerdictLabel, reviewLabelColor } from '@/components/shared/ReviewGhostScore';
-import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { CategoryScores } from '@/components/courses/course-detail/CategoryScores';
 import { formatRatingValue } from '@/utils/formatters';
 import { getRatingTierLabel } from '@/lib/ratingTier';
