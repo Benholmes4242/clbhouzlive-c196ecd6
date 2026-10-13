@@ -250,6 +250,28 @@ export async function fetchCounters(connectionId: string): Promise<WhsCounterSco
   return (data as unknown as WhsCounterScore[]) ?? [];
 }
 
+/**
+ * The member's most recent differentials, newest first.
+ *
+ * THIS IS A PROJECTION of the same column `useAllScores` already returns,
+ * nothing more. It derives NOTHING - every derivation lives in coursePlay.ts.
+ * It must NOT be used on any surface that already holds `useAllScores`, and if
+ * a surface ever needs a score's date, course or counter flag it must use
+ * `useAllScores` instead of widening this select.
+ */
+export async function fetchRecentDifferentials(connectionId: string, limit = 20): Promise<number[]> {
+  const { data, error } = await supabase
+    .from('whs_scores' as any)
+    .select('handicap_differential')
+    .eq('connection_id', connectionId)
+    .order('play_date', { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return ((data as unknown as { handicap_differential: number | string | null }[]) ?? [])
+    .map((r) => Number(r.handicap_differential))
+    .filter((v) => Number.isFinite(v));
+}
+
 /** All scores (used for achievements + course form + recent rounds). */
 export async function fetchAllScores(connectionId: string): Promise<WhsScoreWithIndex[]> {
   const { data, error } = await supabase
