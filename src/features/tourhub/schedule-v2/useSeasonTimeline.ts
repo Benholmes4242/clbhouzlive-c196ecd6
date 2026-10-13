@@ -2,7 +2,7 @@ import { linkedTournamentPlace, TOURNAMENT_COURSE_PLACE_JOIN, type CoursePlaceJo
 /**
  * useSeasonTimeline — data hook powering the schedule-v2 open-ledger view.
  *
- * SEASON RESOLUTION (PROBE pattern, ported from useStatWatch.resolveSeasonIds):
+ * SEASON RESOLUTION (PROBE pattern, ported from the former useStatWatch.resolveSeasonIds):
  *   1. Pull sr_seasons rows desc by year (limit 50).
  *   2. Filter to rows whose mapTourSlug(tour_full_name) === requested tour.
  *   3. For pga, prefer exact-name matches over fallback-mapped rows.
@@ -78,7 +78,7 @@ async function resolveSeasonCandidates(
     (r: SrSeasonRow) => mapTourSlug(r.tour_full_name) === tour,
   );
 
-  // Same tie-break as useStatWatch: prefer exact 'pga' string matches over
+  // Same tie-break as the former useStatWatch: prefer exact 'pga' string matches over
   // fallback-mapped rows so DP-World / LIV rows can't masquerade as pga.
   const sorted =
     tour === 'pga'
