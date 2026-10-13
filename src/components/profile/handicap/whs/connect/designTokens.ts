@@ -29,9 +29,9 @@ export const SURFACE = PAGE_CANVAS;
 
 /**
  * Amber wash. Runs edge to edge, sits behind the content, never a top bar.
- * RENDERED ON THE INTRO AND THE PAYOFF (done) ONLY: amber light on the
- * promise, flat canvas while the work happens (country, form, syncing, coming
- * soon), amber light again on the payoff. The wash marks a moment; on every
+ * RENDERED ON THE PAYOFF (done) ONLY: flat canvas while the work happens
+ * (intro, country, form, syncing, coming soon), amber light on the payoff.
+ * The intro dropped the wash when it became a chart screen (CE). The wash marks a moment; on every
  * screen it would be wallpaper and stop meaning anything. On a light canvas an amber radial read as a soft
  * consumer gradient and was cut; on near-black the same radial reads as
  * stadium light. It is the brand colour used as LIGHT, not as ink, so it does
