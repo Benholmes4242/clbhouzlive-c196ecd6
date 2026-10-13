@@ -40,17 +40,17 @@ export const CategoryScores: React.FC<{ scores: CategoryScoreValues; marginTop?:
     >
       {ORDER.map(({ key, label }) => {
         const value = scores[key];
-        if (value == null) return <div key={key} aria-hidden style={{ minWidth: 0 }} />;
+        if (value == null) return <div key={key} data-category={key} aria-hidden style={{ minWidth: 0 }} />;
         const tone = courseSubScoreTone(value);
         return (
-          <div key={key} style={{ minWidth: 0 }}>
+          <div key={key} data-category={key} style={{ minWidth: 0 }}>
             <div style={{ height: 3, borderRadius: BAR_RADIUS, background: A.TRACK, overflow: 'hidden' }}>
               <div
                 data-category-score={value.toFixed(1)}
                 style={{ height: '100%', width: `${categoryFillPercent(value)}%`, borderRadius: BAR_RADIUS, background: tone }}
               />
             </div>
-            <div style={{ ...FIGS, marginTop: 6, fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: tone }}>
+            <div data-category-figure style={{ ...FIGS, marginTop: 6, fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: tone }}>
               {value.toFixed(1)}
             </div>
             <div
