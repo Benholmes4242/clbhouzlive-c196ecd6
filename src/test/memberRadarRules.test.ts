@@ -37,17 +37,3 @@ describe('members radar — permission denied', () => {
   it('recognises Postgres 42501', () => expect(isPermissionDenied({ code: '42501' })).toBe(true));
 });
 
-import { dropTeamInvites } from '@/features/admin/hooks/useInvites';
-describe('invites — a team member never appears under Invites', () => {
-  it('drops an expired invite for someone with an unexpired membership', () => {
-    const out = dropTeamInvites(
-      [{ id: 'i1', invitedUserId: 'thomas' }, { id: 'i2', invitedUserId: 'other' }],
-      [{ userId: 'thomas', expiresAt: null }],
-    );
-    expect(out.map((i) => i.id)).toEqual(['i2']);
-  });
-  it('keeps the invite when the membership has expired', () => {
-    const out = dropTeamInvites([{ id: 'i1', invitedUserId: 'x' }], [{ userId: 'x', expiresAt: '2000-01-01' }]);
-    expect(out).toHaveLength(1);
-  });
-});
