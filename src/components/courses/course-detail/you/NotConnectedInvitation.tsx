@@ -40,46 +40,46 @@ export const FieldHoleBars: React.FC<{ holes: CourseHole[] }> = ({ holes }) => {
   return (
     <>
         <div
-          aria-hidden="true"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))`,
-            alignItems: 'end',
-            gap: GAP,
-            height: CHART_HEIGHT,
-          }}
-        >
-          {sorted.map((h) => (
-            <span
-              key={h.hole_no}
-              style={{
-                display: 'block',
-                width: '100%',
-                height: Math.max(2, (Math.max(0, h.avg_to_par) / maxField) * CHART_HEIGHT),
-                borderRadius: BAR_RADIUS,
-                background: barFill(h),
-              }}
-            />
-          ))}
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginTop: 8,
-            color: A.DIM,
-            fontFamily: SANS,
-            fontSize: 10,
-            fontWeight: 700,
-            ...FIGS,
-          }}
-        >
-          <span>1</span>
-          <span>{String(Math.ceil(n / 2))}</span>
-          <span>{String(n)}</span>
-        </div>
-    </>
-  );
+        aria-hidden="true"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))`,
+          alignItems: 'end',
+          gap: GAP,
+          height: CHART_HEIGHT,
+        }}
+      >
+        {sorted.map((h) => (
+          <span
+            key={h.hole_no}
+            style={{
+              display: 'block',
+              width: '100%',
+              height: Math.max(2, (Math.max(0, h.avg_to_par) / maxField) * CHART_HEIGHT),
+              borderRadius: BAR_RADIUS,
+              background: barFill(h),
+            }}
+          />
+        ))}
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginTop: 8,
+          color: A.DIM,
+          fontFamily: SANS,
+          fontSize: 10,
+          fontWeight: 700,
+          ...FIGS,
+        }}
+      >
+        <span>1</span>
+        <span>{String(Math.ceil(n / 2))}</span>
+        <span>{String(n)}</span>
+      </div>
+  </>
+);
 };
 
 export const FieldShotsSection: React.FC<{ holes: CourseHole[]; totalRounds: number; courseName: string }> = ({
