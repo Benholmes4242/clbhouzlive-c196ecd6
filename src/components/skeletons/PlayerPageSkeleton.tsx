@@ -26,20 +26,20 @@ function Bone({ w, h, radius = 6, dark = false }: { w: number | string; h: numbe
 export function PlayerPageSkeleton() {
   return (
     <div style={{ background: SLATE_50, minHeight: '100vh' }}>
-      {/* Hero bone */}
-      <div
-        style={{
-          background: `linear-gradient(180deg, ${MEMBER_PANEL} 0%, ${PAGE_CANVAS} 100%)`,
-          paddingTop: 'calc(var(--chrome-total-h, 0px) + 8px)',
-          paddingBottom: 16,
-        }}
-      >
-        <div style={{ padding: '10px 16px 0', display: 'flex', gap: 16, alignItems: 'flex-end' }}>
-          <Skeleton variant="dark" style={{ width: 74, height: 74, borderRadius: '34%' }} />
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <Bone w={100} h={10} dark />
-            <Bone w={180} h={22} dark />
-            <Bone w={140} h={12} dark />
+      {/* Hero bone — same anatomy as HeroSection: 268px canvas band, 80x84
+          squircle pinned right and centred, bottom-aligned text column. */}
+      <div style={{ position: 'relative', minHeight: 268, overflow: 'hidden', background: PAGE_CANVAS }}>
+        <div style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}>
+          <Skeleton variant="dark" style={{ width: 80, height: 84, borderRadius: '34%' }} />
+        </div>
+        <div style={{ position: 'relative', minHeight: 268, padding: '24px 16px 16px', paddingRight: 114, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', boxSizing: 'border-box' }}>
+          <Bone w={200} h={10} dark />
+          <div style={{ marginTop: 10 }}><Bone w={220} h={30} dark /></div>
+          <div style={{ marginTop: 10 }}><Bone w={260} h={12} dark /></div>
+          <div style={{ marginTop: 6 }}><Bone w={180} h={12} dark /></div>
+          <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.18)', display: 'flex', gap: 32 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}><Bone w={36} h={21} dark /><Bone w={48} h={10} dark /></div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}><Bone w={36} h={21} dark /><Bone w={56} h={10} dark /></div>
           </div>
         </div>
       </div>

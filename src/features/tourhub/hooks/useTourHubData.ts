@@ -99,6 +99,8 @@ export interface TourPlayer {
   pga_tour_id: string | null;
   handedness: string | null;
   tour_codes: string[] | null;
+  /** sr_players.headshot_override — a FILENAME KEY, never a URL. */
+  headshot_override?: string | null;
 }
 
 // Raw data structure from SportsRadar
