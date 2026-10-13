@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { radarDuration, londonTime, weeklySessionCounts, radarQueryUser } from '@/features/admin/lib/memberRadarDisplay';
-import type { MemberSessionSummary } from '@/features/admin/hooks/useMembersRadar';
+import { radarDuration, londonTime, londonSessionDay, radarQueryUser } from '@/features/admin/lib/memberRadarDisplay';
 
 describe('Member radar server presentation', () => {
   it('formats server seconds without deriving elapsed time', () => {
@@ -18,14 +17,10 @@ describe('Member radar server presentation', () => {
     expect(radarQueryUser('member', true, false)).toBeNull();
     expect(radarQueryUser('member', true, true)).toBe('member');
   });
-  it('counts eight London weeks oldest first without duplicate sessions', () => {
-    const row = (id: string, at: string): MemberSessionSummary => ({ session_id: id, started_at: at, ended_at: null, seconds: 552, screens: 3, events: 2, errors: 0, client: 'App' });
-    expect(weeklySessionCounts([
-      row('old', '2026-08-23T12:00:00Z'),
-      row('first', '2026-08-24T12:00:00Z'),
-      row('sunday-london-monday', '2026-10-11T23:30:00Z'),
-      row('today', '2026-10-13T07:48:00Z'),
-      row('today', '2026-10-13T07:48:00Z'),
-    ], '2026-10-13T10:00:00Z')).toEqual([1, 0, 0, 0, 0, 0, 0, 2]);
+  it('labels the last session day in Europe/London', () => {
+    const now = '2026-10-13T07:48:00Z';
+    expect(londonSessionDay('2026-10-12T23:30:00Z', now)).toBe('today');
+    expect(londonSessionDay('2026-10-12T12:00:00Z', now)).toBe('yesterday');
+    expect(londonSessionDay('2026-10-05T12:00:00Z', now)).toBe('Mon 5 Oct');
   });
 });

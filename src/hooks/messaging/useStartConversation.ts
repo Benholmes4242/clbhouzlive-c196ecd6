@@ -18,6 +18,8 @@ export interface StartConversationOptions {
   asActor?: TargetActor;
   focusComposer?: boolean;
   returnTo?: string;
+  /** Route state handed back with returnTo when the thread's Back is used. */
+  returnState?: unknown;
 }
 
 export interface UseStartConversationReturn {
@@ -64,7 +66,7 @@ export function useStartConversation(): UseStartConversationReturn {
         navigate(
           `/messages/${conversationId}`,
           draft || options?.focusComposer || options?.returnTo
-            ? { state: { draft, focusComposer: options?.focusComposer, returnTo: options?.returnTo } }
+            ? { state: { draft, focusComposer: options?.focusComposer, returnTo: options?.returnTo, returnState: options?.returnState } }
             : undefined,
         );
       } catch {

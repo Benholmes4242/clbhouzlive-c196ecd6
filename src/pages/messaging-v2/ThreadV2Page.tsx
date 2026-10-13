@@ -190,7 +190,7 @@ const ThreadV2Page: React.FC = () => {
   const { conversationId = '' } = useParams<{ conversationId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const entryRef = useRef(location.state as { focusComposer?: boolean; returnTo?: string } | null);
+  const entryRef = useRef(location.state as { focusComposer?: boolean; returnTo?: string; returnState?: unknown } | null);
 
   // A draft handed over by useStartConversation (e.g. the handicap sync
   // nudge). Read ONCE into a ref, then clear the history entry's state so a
@@ -201,7 +201,7 @@ const ThreadV2Page: React.FC = () => {
   );
   useEffect(() => {
     if (!(location.state as { draft?: string } | null)?.draft) return;
-    navigate(location.pathname, { replace: true, state: { returnTo: entryRef.current?.returnTo } });
+    navigate(location.pathname, { replace: true, state: { returnTo: entryRef.current?.returnTo, returnState: entryRef.current?.returnState } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const actor = useMessagingActor();
@@ -388,7 +388,7 @@ const ThreadV2Page: React.FC = () => {
               onClick={() => {
                 // Prefer real back so we don't push a duplicate /messages entry
                 // and trap the user in an inbox ↔ thread loop.
-                if (entryRef.current?.returnTo?.startsWith('/admin-v2/users')) navigate(entryRef.current.returnTo, { replace: true });
+                if (entryRef.current?.returnTo?.startsWith('/admin-v2/users')) navigate(entryRef.current.returnTo, { replace: true, state: entryRef.current.returnState });
                 else if (window.history.length > 1) navigate(-1);
                 else navigate('/messages', { replace: true });
               }}
