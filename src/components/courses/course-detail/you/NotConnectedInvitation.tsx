@@ -32,59 +32,68 @@ function barFill(h: CourseHole): string {
   return RAMP_TOPAR[best];
 }
 
+/** The field's 18 bars and their 1 / 9 / 18 axis. ONE home: branch B and branch C both draw this. */
+export const FieldHoleBars: React.FC<{ holes: CourseHole[] }> = ({ holes }) => {
+  const sorted = [...holes].sort((a, b) => a.hole_no - b.hole_no);
+  const maxField = Math.max(0.01, ...sorted.map((h) => Math.max(0, h.avg_to_par)));
+  const n = sorted.length;
+  return (
+    <>
+        <div
+          aria-hidden="true"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))`,
+            alignItems: 'end',
+            gap: GAP,
+            height: CHART_HEIGHT,
+          }}
+        >
+          {sorted.map((h) => (
+            <span
+              key={h.hole_no}
+              style={{
+                display: 'block',
+                width: '100%',
+                height: Math.max(2, (Math.max(0, h.avg_to_par) / maxField) * CHART_HEIGHT),
+                borderRadius: BAR_RADIUS,
+                background: barFill(h),
+              }}
+            />
+          ))}
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginTop: 8,
+            color: A.DIM,
+            fontFamily: SANS,
+            fontSize: 10,
+            fontWeight: 700,
+            ...FIGS,
+          }}
+        >
+          <span>1</span>
+          <span>{String(Math.ceil(n / 2))}</span>
+          <span>{String(n)}</span>
+        </div>
+    </>
+  );
+};
+
 export const FieldShotsSection: React.FC<{ holes: CourseHole[]; totalRounds: number; courseName: string }> = ({
   holes,
   totalRounds,
   courseName,
 }) => {
   const { t } = useTranslation('courses');
-  const sorted = [...holes].sort((a, b) => a.hole_no - b.hole_no);
-  const maxField = Math.max(0.01, ...sorted.map((h) => Math.max(0, h.avg_to_par)));
-  const n = sorted.length;
   return (
     <AboutSection
       heading={t('courseDetail.youTab.sections.shotsGo')}
       meta={t('courseDetail.youTab.connect.roundsMeta', { count: totalRounds, rounds: formatNumber(totalRounds) })}
     >
-      <div
-        aria-hidden="true"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))`,
-          alignItems: 'end',
-          gap: GAP,
-          height: CHART_HEIGHT,
-        }}
-      >
-        {sorted.map((h) => (
-          <span
-            key={h.hole_no}
-            style={{
-              display: 'block',
-              width: '100%',
-              height: Math.max(2, (Math.max(0, h.avg_to_par) / maxField) * CHART_HEIGHT),
-              borderRadius: BAR_RADIUS,
-              background: barFill(h),
-            }}
-          />
-        ))}
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginTop: 8,
-          color: A.DIM,
-          fontFamily: SANS,
-          fontSize: 10,
-          fontWeight: 700,
-          ...FIGS,
-        }}
-      >
-        <span>1</span>
-        <span>{String(Math.ceil(n / 2))}</span>
-        <span>{String(n)}</span>
-      </div>
+      <FieldHoleBars holes={holes} />
       <div style={{ marginTop: 12 }}>
         <YouSentence quiet>{t('courseDetail.youTab.connect.chartCaption', { courseName })}</YouSentence>
       </div>

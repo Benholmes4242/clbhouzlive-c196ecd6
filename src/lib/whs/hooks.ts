@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   fetchWhsConnection,
   fetchHandicapTrend,
+  fetchRecentDifferentials,
   fetchLastRound,
   fetchCounters,
   fetchAllScores,
@@ -33,6 +34,8 @@ import {
 export const whsKeys = {
   connection: (userId: string) => ['whs-connection', userId] as const,
   trend: (connectionId: string) => ['whs-handicap-trend', connectionId] as const,
+  recentDifferentials: (connectionId: string, limit: number) =>
+    ['whs-recent-differentials', connectionId, limit] as const,
   lastRound: (connectionId: string) => ['whs-last-round', connectionId] as const,
   counters: (connectionId: string) => ['whs-counters', connectionId] as const,
   allScores: (connectionId: string) => ['whs-all-scores', connectionId] as const,
@@ -101,6 +104,16 @@ export function useWhsConnection(userId: string | undefined) {
     queryFn: () => fetchWhsConnection(userId as string),
     enabled: !!userId,
     staleTime: 30_000,
+  });
+}
+
+/** The member's last `limit` differentials. See fetchRecentDifferentials for its rule. */
+export function useRecentDifferentials(connectionId: string | undefined, limit = 20) {
+  return useQuery({
+    queryKey: whsKeys.recentDifferentials(connectionId ?? '', limit),
+    queryFn: () => fetchRecentDifferentials(connectionId as string, limit),
+    enabled: !!connectionId,
+    staleTime: 60_000,
   });
 }
 

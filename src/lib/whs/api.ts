@@ -268,6 +268,8 @@ export async function fetchRecentDifferentials(connectionId: string, limit = 20)
     .limit(limit);
   if (error) throw error;
   return ((data as unknown as { handicap_differential: number | string | null }[]) ?? [])
+    // A null must not become Number(null) === 0, which is finite.
+    .filter((r) => r.handicap_differential != null)
     .map((r) => Number(r.handicap_differential))
     .filter((v) => Number.isFinite(v));
 }
