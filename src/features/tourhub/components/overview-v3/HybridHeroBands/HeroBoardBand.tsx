@@ -467,7 +467,7 @@ export function HeroBoardSection({
               score={row.score}
               year={row.year}
               isWinner={row.rank === '1'}
-              avatarCandidates={[row.photoUrl]}
+              avatarCandidates={resolvePlayerAvatarCandidates({ name: row.name, photoUrl: row.photoUrl ?? null, tourSlug: pickTourCode })}
               isLast={i === lastYearRows.length - 1}
             />
           ))}
