@@ -17,12 +17,19 @@ import { getActiveLocale } from './index';
  * (used for copy lookup and the hand-written English branches); this returns
  * the locale handed to every Intl constructor. They are deliberately
  * different: bare "en" is American to Intl (M/D order, Oxford comma), while
- * clbhouz is British, so English formats as en-GB. This rule previously lived
- * inside formatList only; it is now the one place for the whole module.
+ * clbhouz is British, so English formats as en-GB. The -u-hc-h12 extension
+ * keeps the 12-hour clock without zero-padding the hour ("3:45 pm"). This rule
+ * previously lived inside formatList (and a copy in formatRelativeWithSeconds);
+ * it is now the one place for the whole module.
+ *
+ * PRINCIPLE: this exists because American DATE ORDER is a correctness problem
+ * for British members ("10/11/26" reads two ways). It is not a licence to
+ * restyle numbers or currency that were already right — where en-GB changes
+ * something that was correct, pin it back to 'en-US' and say why.
  */
 function formattingLocale(): string {
   const l = getActiveLocale();
-  return l === 'en' || l.startsWith('en-XA') ? 'en-GB' : l;
+  return l === 'en' || l.startsWith('en-XA') ? 'en-GB-u-hc-h12' : l;
 }
 
 
@@ -41,7 +48,7 @@ export function formatDate(d: DateInput, style: DateStyle = 'medium'): string {
 }
 
 export function formatTime(d: DateInput, style: DateStyle = 'short'): string {
-  return new Intl.DateTimeFormat(formattingLocale(), { timeStyle: style, hour12: true }).format(toDate(d));
+  return new Intl.DateTimeFormat(formattingLocale(), { timeStyle: style }).format(toDate(d));
 }
 
 // ─── relative time ────────────────────────────────────────────────────────
@@ -181,7 +188,6 @@ export function formatScheduleDateTime(d: DateInput): string {
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
-    hour12: true,
     minute: '2-digit',
   }).format(toDate(d));
 }
@@ -209,7 +215,6 @@ export function formatDateNumeric(d: DateInput): string {
 export function formatTimeHm(d: DateInput): string {
   return new Intl.DateTimeFormat(formattingLocale(), {
     hour: 'numeric',
-    hour12: true,
     minute: '2-digit',
   }).format(toDate(d));
 }
@@ -509,7 +514,7 @@ export function formatWeekdayMonthDayShortUS(d: DateInput): string {
  *  `toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })`. */
 export function formatTimeHmUS(d: DateInput): string {
   return new Intl.DateTimeFormat(formattingLocale(), {
-    hour: 'numeric', minute: '2-digit', hour12: true,
+    hour: 'numeric', minute: '2-digit',
   }).format(toDate(d));
 }
 
@@ -518,7 +523,7 @@ export function formatTimeHmUS(d: DateInput): string {
 export function formatNewsTimestampUS(d: DateInput): string {
   return new Intl.DateTimeFormat(formattingLocale(), {
     year: 'numeric', month: 'short', day: 'numeric',
-    hour: '2-digit', minute: '2-digit', hour12: true,
+    hour: 'numeric', minute: '2-digit',
   }).format(toDate(d));
 }
 
@@ -526,7 +531,7 @@ export function formatNewsTimestampUS(d: DateInput): string {
  *  Matches `toLocaleString(undefined, { dateStyle:'long', timeStyle:'short' })`. */
 export function formatDateLongTimeShort(d: DateInput): string {
   return new Intl.DateTimeFormat(formattingLocale(), {
-    dateStyle: 'long', timeStyle: 'short', hour12: true,
+    dateStyle: 'long', timeStyle: 'short',
   }).format(toDate(d));
 }
 
@@ -586,7 +591,7 @@ const EN_ORDINAL_SUFFIX: Record<Intl.LDMLPluralRule, string> = {
 export function formatOrdinal(n: number): string {
   const locale = getActiveLocale();
   if (locale.startsWith('en')) {
-    const rule = new Intl.PluralRules('en', { type: 'ordinal' }).select(n);
+    const rule = new Intl.PluralRules(formattingLocale(), { type: 'ordinal' }).select(n);
     return `${n}${EN_ORDINAL_SUFFIX[rule]}`;
   }
   // For non-en locales we fall back to plain digits until we ship per-locale
