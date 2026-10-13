@@ -18951,6 +18951,19 @@ export type Database = {
         Args: { _body_name: string; _country_id: string }
         Returns: number
       }
+      admin_member_screens: {
+        Args: { p_session_id?: string; p_since: string; p_user_id: string }
+        Returns: {
+          area: string
+          event_id: string
+          is_dev: boolean
+          label: string
+          path: string
+          secs: number
+          seen_at: string
+          sid: string
+        }[]
+      }
       admin_overview_metrics: {
         Args: never
         Returns: {
@@ -18962,6 +18975,7 @@ export type Database = {
           total_users: number
         }[]
       }
+      admin_route_for_path: { Args: { p_path: string }; Returns: string }
       admin_set_course_club: {
         Args: { p_club_id: string; p_course_id: string }
         Returns: undefined
