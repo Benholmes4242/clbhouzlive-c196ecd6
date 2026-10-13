@@ -22,6 +22,11 @@ const paints = {
   '--mr-danger-text': t.dangerText, '--mr-danger-soft': t.dangerSoft,
   '--mr-never-edge': RADAR_NEVER_EDGE, '--mr-event-dot': RADAR_EVENT_DOT,
 } as React.CSSProperties;
+function RadarAvatar({ userId, name, photo, loading }: { userId: string; name: string | null | undefined; photo?: string | null; loading: boolean }) {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [photo]);
+  return <span className="mr-avatar" style={{ background: getAvatarFallbackColor(userId) }}>{loading ? <Skeleton height={56} /> : photo && !failed ? <img src={photo} alt={name ?? ''} onError={() => setFailed(true)} /> : getInitialsFromName(name)}</span>;
+}
 function Head({ title, right }: { title: string; right?: React.ReactNode }) {
   return <div className="mr-head"><span className="mr-title">{title}</span>{right && <span className="mr-caption">{right}</span>}</div>;
 }
@@ -70,7 +75,8 @@ export default function MemberRadar({ userId, full, onClose, onMore }: { userId:
   const weeksLoading = sessions.isPending || !!needsWeeks || sessions.isFetchingNextPage;
   const weeks = weeklySessionCounts(allSessions), maxWeek = Math.max(...weeks, 1);
   const connected = !!d?.connection.connected_at;
-  const series = indexSeriesToToday(d?.index_series ?? [], d?.profile.index);
+  const londonToday = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+  const series = indexSeriesToToday(d?.index_series ?? [], d?.profile.index, londonToday);
   const first = series[0];
   const delta = d?.index_start != null && d.profile.index != null ? d.index_start - d.profile.index : null;
   const range = series.length ? Math.max(...series.map(p => p.index)) - Math.min(...series.map(p => p.index)) : 0;
@@ -95,7 +101,7 @@ export default function MemberRadar({ userId, full, onClose, onMore }: { userId:
     {tab === 'overview' && <div className="mr-stack">
       {overview.error ? <Panel title="Member"><Failure error={overview.error} /></Panel> : <>
       <section className="mr-panel mr-identity"><div className="mr-identity-row">
-        <span className="mr-avatar" style={{ background: getAvatarFallbackColor(userId) }}>{loading ? <Skeleton height={56} /> : d?.profile.photo_url ? <img src={d.profile.photo_url} alt={d.profile.display_name ?? ''} onError={e => { e.currentTarget.style.display = 'none'; }} /> : getInitialsFromName(d?.profile.display_name)}</span>
+        <RadarAvatar userId={userId} name={d?.profile.display_name} photo={d?.profile.photo_url} loading={loading} />
         <span className="mr-copy"><span className="mr-sub">{loading ? <Skeleton height={16} /> : [d?.profile.username ? `@${d.profile.username}` : '—', d?.profile.home_club].filter(Boolean).join(' · ')}</span><span className="mr-pills">{loading ? <Skeleton height={18} /> : <>{d?.weeks_active_8 === 8 && <span className="mr-pill mr-ok">Weekly</span>}{d?.connection.failing ? <span className="mr-pill mr-danger">EG failing</span> : d?.connection.synced && <span className="mr-pill">EG synced</span>}{d?.client && <span className="mr-pill">{d.client}</span>}</>}</span></span>
         <span className="mr-index"><span className="mr-index-value">{loading ? <Skeleton height={30} /> : memberIndexText(d?.profile.index, connected)}</span>{connected && first && delta != null && delta !== 0 && <span className={`mr-change${delta > 0 ? ' mr-improved' : ''}`}>{delta > 0 ? '↓' : '↑'} {Math.abs(delta).toFixed(1)} since {londonDate(first.date, { month: 'short' })}</span>}</span>
       </div><div className="mr-chart">{loading ? <Skeleton height={56} /> : !connected || series.length < 2 ? <Empty centre>{!connected ? 'No handicap connected' : 'Not enough rounds for a trend yet'}</Empty> : <svg viewBox="0 0 330 56" preserveAspectRatio="none" aria-label="Handicap index trend"><path d={path} fill="none" stroke={t.ink} strokeWidth={1.5} /><path d={`${path} L330 56 L0 56 Z`} fill={RADAR_CHART_FILL} />{end && <circle cx={328} cy={end.y} r={2.5} fill={t.ink} />}</svg>}</div><div className="mr-axis"><span>{first && connected ? `${londonDate(first.date, { month: 'short' })} · ${memberIndexText(first.index, connected)}` : '—'}</span><span>Now · {memberIndexText(d?.profile.index, connected)}</span></div></section>

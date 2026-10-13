@@ -3,6 +3,8 @@
 Only rules that govern MORE THAN ONE area live here. A rule that governs one section's code lives as a comment at that code ("ARCHITECTURE RULE (moved from AGENTS.md)").
 
 - Browser canvas regression checks for both crop modals live outside Vitest in `tests/browser`, exercise the real Apply handlers with local callbacks, and write evidence under `/tmp/browser`, because JPEG byte identity needs a real browser without hosted upload writes or changing the agreed Vitest count.
+- Member Radar panels read only the Stage 3 member hooks; legacy member details serve existing More actions only, so analytics displays cannot silently fall back to unrelated client reads.
+- Message entrypoints hand optional focus and return navigation through the existing start-conversation hook, so server messaging refusals remain authoritative and no entrypoint sends automatically.
 
 - Profile handicap index surfaces use `HcpTrendChart` as their canonical plot renderer, so chart styling and interaction markers stay consistent.
 - Tour tee-alert toggles use `tourOptimisticToggle` for cache writes and per-id rollback, because invalidation alone does not refresh this app's mounted queries.
