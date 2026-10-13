@@ -86,7 +86,9 @@ export function lastSeenColor(m: MembersOverviewMember, now = Date.now()): strin
   return t.inkFaint;
 }
 
-/** weeks_8[0] is 7 weeks ago. A week that ended before the member joined is pre-join. */
+/** weeks_8[0] is 7 weeks ago. The overview's weeks_8 buckets are 7-day steps
+ * counted back from now, so week ends computed from now line up with them.
+ * A week that ended before the member joined is pre-join. */
 export function weekDashColors(m: MembersOverviewMember, now = Date.now()): string[] {
   const joined = new Date(m.created_at).getTime();
   return m.weeks_8.map((active, i) => {

@@ -1,99 +1,28 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { revokeBulkInvites } from '@/lib/adminBulkApi';
 import { toast } from '@/lib/toast';
-import { useTeam } from './useTeam';
+import { MEMBERS_KEY } from './useMembersRadar';
 
-export interface InviteRow {
-  id: string;
-  email: string | null;
-  role: string | null;
-  status: string;
-  invitedBy: string;
-  createdAt: string;
-  expiresAt: string;
-  acceptedAt: string | null;
-  notes: string | null;
-  invitedUserId: string | null;
-  displayName: string | null;
-  username: string | null;
-  avatarUrl: string | null;
-}
-
-async function fetchInvites(): Promise<InviteRow[]> {
-  const { data, error } = await supabase
-    .from('admin_invitations')
-    .select('id, email, role, status, invited_by, created_at, expires_at, accepted_at, notes, invited_user_id')
-    .order('created_at', { ascending: false });
-  if (error) throw error;
-  if (!data?.length) return [];
-
-  const ids = data.map(r => (r as any).invited_user_id).filter(Boolean) as string[];
-  let map = new Map<string, any>();
-  if (ids.length) {
-    const { data: profiles } = await supabase
-      .from('user_profiles')
-      .select('id, display_name, username, profile_photo_url')
-      .in('id', ids);
-    map = new Map((profiles ?? []).map(p => [p.id, p]));
-  }
-
-  return data.map(r => {
-    const uid = (r as any).invited_user_id;
-    const p = uid ? map.get(uid) : null;
-    return {
-      id: r.id,
-      email: r.email,
-      role: r.role,
-      status: r.status,
-      invitedBy: r.invited_by,
-      createdAt: r.created_at,
-      expiresAt: r.expires_at,
-      acceptedAt: r.accepted_at,
-      notes: r.notes,
-      invitedUserId: uid ?? null,
-      displayName: p?.display_name ?? null,
-      username: p?.username ?? null,
-      avatarUrl: p?.profile_photo_url ?? null,
-    };
-  });
-}
-
-export function dropTeamInvites<T extends { invitedUserId: string | null }>(
-  invites: T[],
-  team: { userId: string; expiresAt: string | null }[],
-  now: number = Date.now(),
-): T[] {
-  const onTeam = new Set(team.filter(m => !m.expiresAt || new Date(m.expiresAt).getTime() > now).map(m => m.userId));
-  return invites.filter(i => !i.invitedUserId || !onTeam.has(i.invitedUserId));
-}
-
+/** Invite actions only. Invite rows come from get_admin_members_overview,
+ * which already excludes anyone holding an unexpired admin membership. */
 export function useInvites() {
   const qc = useQueryClient();
-  const { data: rawInvites = [], isLoading, refetch } = useQuery({
-    queryKey: ['admin-v2', 'invites'],
-    queryFn: fetchInvites,
-    staleTime: 60_000,
-  });
-  // A person on the team never appears under Invites, whatever the invite's
-  // status: drop any invite whose user holds an unexpired admin membership.
-  const team = useTeam();
-  const data = dropTeamInvites(rawInvites, team.data);
 
   const invalidate = () => {
-    qc.invalidateQueries({ queryKey: ['admin-v2', 'invites'] });
+    qc.invalidateQueries({ queryKey: [...MEMBERS_KEY, 'overview'] });
     qc.invalidateQueries({ queryKey: ['admin-v2', 'dashboard', 'queue'] });
   };
 
+  const invoke = async (body: Record<string, unknown>) => {
+    const { data, error } = await supabase.functions.invoke('admin-invite-manage', { body });
+    if (error) throw error;
+    if (data?.error) throw new Error(data.error);
+    return data;
+  };
+
   const create = useMutation({
-    mutationFn: async ({ invitedUserId, role }: { invitedUserId: string; role: string }) => {
-      const { data, error } = await supabase.functions.invoke('admin-invite-manage', {
-        body: { action: 'create_invite', invited_user_id: invitedUserId, role },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      return data;
-    },
+    mutationFn: ({ invitedUserId, role }: { invitedUserId: string; role: string }) =>
+      invoke({ action: 'create_invite', invited_user_id: invitedUserId, role }),
     onSuccess: (data) => {
       if (data?.email_sent === false) toast.warning('Invite saved, but the email could not be sent');
       else toast.success('Invite sent');
@@ -103,26 +32,13 @@ export function useInvites() {
   });
 
   const cancel = useMutation({
-    mutationFn: async (id: string) => {
-      const { data, error } = await supabase.functions.invoke('admin-invite-manage', {
-        body: { action: 'revoke_invite', id },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-    },
+    mutationFn: (id: string) => invoke({ action: 'revoke_invite', id }),
     onSuccess: () => { toast.success('Invite cancelled'); invalidate(); },
     onError: (e: Error) => toast.error(e.message || 'Failed to cancel invite'),
   });
 
   const resend = useMutation({
-    mutationFn: async (id: string) => {
-      const { data, error } = await supabase.functions.invoke('admin-invite-manage', {
-        body: { action: 'resend_invite', id },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      return data;
-    },
+    mutationFn: (id: string) => invoke({ action: 'resend_invite', id }),
     onSuccess: (data) => {
       if (data?.email_sent === false) toast.warning('Invite saved, but the email could not be sent');
       else toast.success('Invite sent again, expires in 7 days');
@@ -131,20 +47,5 @@ export function useInvites() {
     onError: (e: Error) => toast.error(e.message || 'Failed to resend invite'),
   });
 
-
-  const revokeBulk = useMutation({
-    mutationFn: (ids: string[]) => revokeBulkInvites(ids),
-    onSuccess: () => { toast.success('Invites revoked'); invalidate(); },
-    onError: (e: Error) => toast.error(e.message || 'Failed to revoke'),
-  });
-
-  const counts = {
-    all: data.length,
-    // 2.5 — an expired invite is not pending.
-    pending: data.filter(i => i.status === 'pending' && !i.acceptedAt && new Date(i.expiresAt) >= new Date()).length,
-    accepted: data.filter(i => !!i.acceptedAt).length,
-    expired: data.filter(i => !i.acceptedAt && new Date(i.expiresAt) < new Date()).length,
-  };
-
-  return { data, isLoading, refetch, counts, create, cancel, resend, revokeBulk };
+  return { create, cancel, resend };
 }

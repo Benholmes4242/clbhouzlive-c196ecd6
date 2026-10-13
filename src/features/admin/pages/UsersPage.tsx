@@ -26,7 +26,7 @@ import MembersList, { MembersAvatar } from '../components/MembersList';
 import { Skeleton } from '../lib/chartPrimitives';
 import { londonDate } from '../lib/memberRadarDisplay';
 import { useTeam, type TeamMember } from '../hooks/useTeam';
-import { useInvites, type InviteRow } from '../hooks/useInvites';
+import { useInvites } from '../hooks/useInvites';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
@@ -755,23 +755,19 @@ const TEAM_ROW: React.CSSProperties = {
   borderTop: `1px solid ${t.hairline}`,
 };
 
-/** Rows are overview.team then overview.invites. Invites for anyone already on
- * the team are dropped, so a person appears once. */
+/** Rows are overview.team then overview.invites, as returned. */
 function TeamPanel({ overview, loading }: { overview: MembersOverview | undefined; loading: boolean }) {
   const team = useTeam();
   const invites = useInvites();
   const [showCreate, setShowCreate] = useState(false);
   const [confirm, setConfirm] = useState<{ userId: string; name: string } | null>(null);
+  const [confirmCancel, setConfirmCancel] = useState<{ id: string; name: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
   const teamRows = overview?.team ?? [];
-  const teamNames = new Set(teamRows.map(r => r.display_name).filter(Boolean));
-  // useInvites already removes invitees with access; it carries the user id the
-  // overview invite row does not.
-  const liveInviteIds = new Set(invites.data.filter(i => !i.acceptedAt).map(i => i.id));
-  const inviteRows = (overview?.invites ?? []).filter(
-    i => (invites.isLoading || liveInviteIds.has(i.id)) && !(i.display_name && teamNames.has(i.display_name)),
-  );
+  // The overview already excludes invites for anyone with an unexpired admin
+  // membership (by account and email), so its invites render as returned.
+  const inviteRows = overview?.invites ?? [];
   const candidates: InviteCandidate[] = (overview?.members ?? [])
     .filter(m => !m.admin_role)
     .map(m => ({ id: m.user_id, display_name: m.display_name, username: m.username, avatar_url: m.photo_url }));
@@ -859,26 +855,29 @@ function TeamPanel({ overview, loading }: { overview: MembersOverview | undefine
                     <span style={{ display: 'block', fontSize: 13.5, fontWeight: 600 }}>{name}</span>
                     <span style={{ display: 'block', fontSize: 11, color: t.warnText }}>{status}{role}</span>
                   </span>
-                  <button
-                    type="button"
-                    disabled={invites.resend.isPending}
-                    onClick={() => invites.resend.mutate(i.id)}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      height: 30,
-                      padding: '0 12px',
-                      borderRadius: 999,
-                      border: `1px solid ${t.line}`,
-                      background: 'transparent',
-                      color: t.ink,
-                      fontSize: 11.5,
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Re-invite
-                  </button>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <button
+                      type="button"
+                      disabled={invites.resend.isPending}
+                      onClick={() => invites.resend.mutate(i.id)}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        height: 30,
+                        padding: '0 12px',
+                        borderRadius: 999,
+                        border: `1px solid ${t.line}`,
+                        background: 'transparent',
+                        color: t.ink,
+                        fontSize: 11.5,
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Re-invite
+                    </button>
+                    <InviteMenu onCancel={() => setConfirmCancel({ id: i.id, name })} />
+                  </span>
                 </div>
               );
             })}
@@ -906,6 +905,73 @@ function TeamPanel({ overview, loading }: { overview: MembersOverview | undefine
         tone="danger"
         busy={busy}
       />
+      <ConfirmDialog
+        open={!!confirmCancel}
+        onClose={() => setConfirmCancel(null)}
+        onConfirm={async () => {
+          if (!confirmCancel) return;
+          setBusy(true);
+          try {
+            await invites.cancel.mutateAsync(confirmCancel.id);
+            setConfirmCancel(null);
+          } finally { setBusy(false); }
+        }}
+        title="Cancel invite?"
+        description={`This will cancel the invite for ${confirmCancel?.name ?? 'this user'}.`}
+        confirmLabel="Cancel invite"
+        tone="danger"
+        busy={busy}
+      />
+    </div>
+  );
+}
+
+/** Invite rows carry the same more button and menu as team rows. */
+function InviteMenu({ onCancel }: { onCancel: () => void }) {
+  const [menu, setMenu] = useState(false);
+  return (
+    <div style={{ position: 'relative', flexShrink: 0 }}>
+      <button
+        type="button"
+        onClick={() => setMenu(v => !v)}
+        aria-label="Invite actions"
+        style={{
+          width: 30,
+          height: 30,
+          borderRadius: 999,
+          border: `1px solid ${t.line}`,
+          background: 'transparent',
+          color: t.ink,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+        }}
+      >
+        <MoreVertical size={14} />
+      </button>
+      {menu && (
+        <>
+          <div onClick={() => setMenu(false)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
+          <div
+            style={{
+              position: 'absolute',
+              top: '100%',
+              right: 0,
+              marginTop: 6,
+              zIndex: 50,
+              minWidth: 200,
+              background: t.surface,
+              border: `1px solid ${t.line}`,
+              borderRadius: t.radius.md,
+              boxShadow: t.shadowPop,
+              padding: 4,
+            }}
+          >
+            <MenuItem danger onClick={() => { setMenu(false); onCancel(); }}>Cancel invite</MenuItem>
+          </div>
+        </>
+      )}
     </div>
   );
 }
