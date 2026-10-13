@@ -300,9 +300,12 @@ export function WatchFeed({
     [filter, onDepart, saved],
   );
 
-  /* PAGINATION: one sentinel. Quick hits pages the clip read, every other view the long-form read. */
+  /* PAGINATION: one sentinel, one page per trigger, from one read. Every view except Quick hits
+     pages the long-form read. BF.0 — Quick hits pages the clip read until it is exhausted, THEN
+     the videos read, because sub-3-minute videos live throughout that feed, not only on page one.
+     Clips first: they are the dense source; videos yield a handful per page. */
   const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const driver = filter === 'quick' ? clips : videos;
+  const driver = filter === 'quick' ? (clips.hasNextPage ? clips : videos) : videos;
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el || !driver.hasNextPage || driver.isFetchingNextPage) return;
