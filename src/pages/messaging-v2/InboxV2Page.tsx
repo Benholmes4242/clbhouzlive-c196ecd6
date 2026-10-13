@@ -283,6 +283,7 @@ const InboxV2Page: React.FC = () => {
                         userId={m.userId}
                         name={m.name}
                         label={m.name.split(' ')[0]}
+                        hairlineRing
                         bubble={date ? (
                           <span
                             style={{
