@@ -1114,9 +1114,7 @@
       "momentsMeta": "{{moments}}",
       "notPlayed": {
         "addToList": "Add to my list",
-        "adding": "Adding…",
-        "body": "You have not played here yet. The field averages {{field}} — post a round and this fills in on its own.",
-        "bodyNoField": "You have not played here yet. Post a round and this fills in on its own."
+        "adding": "Adding…"
       },
       "rating": {
         "edit": "Edit your rating",
@@ -1161,6 +1159,49 @@
       "stat": {
         "back": "BACK",
         "front": "FRONT"
+      },
+      "projection": {
+        "heading": "How {{courseName}} would play for you",
+        "typically": "typically",
+        "offHandicap": "off your handicap",
+        "courseHandicap": "Your course handicap",
+        "working": "Index {{index}} · CR {{cr}} · Slope {{slope}} · Par {{par}}",
+        "youMark": "You {{gross}}",
+        "recordMark": "Record {{gross}}",
+        "range": "Your range here is {{low}} to {{high}}.",
+        "rangeWithRecord": "Your range here is {{low}} to {{high}}. The record is {{record}} — you have played to that standard {{count}} times in your last {{sample}} rounds.",
+        "rangeWithRecordUnbeaten": "Your range here is {{low}} to {{high}}. The record is {{record}}, {{gap}} under your typical round.",
+        "basis": "Your last {{sample}} differentials, converted at this course's rating and slope.",
+        "fieldLead": "the field",
+        "youEverywhere": "You, everywhere",
+        "compare": "The field gives up {{field}} shots a round here. Across your own {{count}} courses you give up {{yours}}.",
+        "compareBasis": "No course rating is on file here yet, so this is two averages side by side and not a projection. Different fields, different courses.",
+        "handicapOnlyRecord": "The record here is {{record}}. Play to your handicap and you take it.",
+        "handicapOnlyRecordAbove": "The record here is {{record}}, {{gap}} under a round played to your handicap.",
+        "handicapOnlyBasis": "What this course asks of a {{index}} index. A typical-round projection needs eight rounds on record; you have {{sample}}."
+      },
+      "wonAndLost": {
+        "heading": "Where it is won and lost",
+        "holeTitle": "Par {{par}} · Stroke index {{si}}",
+        "holeTitleNoIndex": "Par {{par}}",
+        "holeSub": "{{yards}} yards · the field drops {{shots}} shots",
+        "holeSubNoYards": "The field drops {{shots}} shots",
+        "allHoles": "All 18 holes"
+      },
+      "againstYourGolf": {
+        "heading": "Against the golf you play",
+        "meta_one": "{{courses}} course",
+        "meta_other": "{{courses}} courses",
+        "here": "Here",
+        "you": "You, so far",
+        "basis": "Holes played in par or better."
+      },
+      "circle": {
+        "heading": "Who you know has played it"
+      },
+      "actions": {
+        "playingSoon": "Playing it soon?",
+        "playingSoonBody": "Add it to your bucket list and your round posts itself here the day it syncs."
       }
     },
     "yourHolesSheet": {

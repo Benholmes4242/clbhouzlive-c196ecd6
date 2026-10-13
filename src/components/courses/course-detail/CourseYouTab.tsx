@@ -39,7 +39,10 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useWhsConnection } from '@/lib/whs/hooks';
+import { useWhsConnection, useHandicapTrend, useRecentDifferentials } from '@/lib/whs/hooks';
+import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
+import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
+import { buildCourseProjection } from '@/lib/whs/coursePlay';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useMyHolePerformance } from '@/hooks/gam/useMyHolePerformance';
@@ -56,7 +59,7 @@ import { useCourseRecordSummary } from './useCourseRecordSummary';
 import AboutSection, { AboutHairline } from './about/AboutSection';
 import CenteredStatStrip from './about/CenteredStatStrip';
 import { EmptyBirdiesSection, FieldShotsSection, FIELD_CHART_MIN_ROUNDS } from './you/NotConnectedInvitation';
-import { YouButton, YouSentence } from './you/youBits';
+import { YouAction, YouButton, YouSentence } from './you/youBits';
 import YourRecordHere from './you/YourRecordHere';
 import WhereYouStandHere from './you/WhereYouStandHere';
 import { useMemberStandings } from '@/hooks/gam/useMemberStandings';
@@ -67,6 +70,9 @@ import BirdiesHere from './you/BirdiesHere';
 import YourRatingSection from './you/YourRatingSection';
 import YourMomentsSection from './you/YourMomentsSection';
 import UpForGrabsSection from './you/UpForGrabsSection';
+import ProjectionSection, { type ProjectionState } from './you/ProjectionSection';
+import WonAndLostSection from './you/WonAndLostSection';
+import AgainstYourGolfSection from './you/AgainstYourGolfSection';
 
 interface Props {
   courseId: string;
@@ -75,7 +81,7 @@ interface Props {
 }
 
 export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChange }) => {
-  const { t } = useTranslation('courses');
+  const { t } = useTranslation(['courses', 'common']);
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { data: connection, isLoading: connectionLoading } = useWhsConnection(user?.id);
@@ -150,18 +156,97 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   /* Scoped to this course; only read once the member is known to have played. */
   const { data: standings } = useMemberStandings(user?.id, settled && hasTrackedRounds, courseId);
 
+  /* BRIEF_YOU_TAB_BRANCH_C_SCOUTING_REPORT — branch C's reads. trend and
+     differentials are inert without a connection; analytics courses only fire
+     on branch C's preconditions; course meta is GolfClubView's warm entry. */
+  const branchC = settled && Boolean(connection) && !hasTrackedRounds;
+  const { data: courseMeta, isLoading: metaLoading } = useCourseMeta(courseId);
+  const { data: trend, isLoading: trendLoading } = useHandicapTrend(connection?.id);
+  const { data: recentDiffs, isLoading: diffsLoading } = useRecentDifferentials(connection?.id);
+  const { data: myCourses, isLoading: myCoursesLoading } = useUserAnalyticsCourses({ enabled: branchC });
+
+  /* The field's par-or-better share across this course's holes. */
+  const fieldParOrBetterPct = React.useMemo(() => {
+    let good = 0;
+    let all = 0;
+    for (const h of analysis?.holes ?? []) {
+      const d = h.dist;
+      good += d.ace + d.albatross + d.eagle + d.birdie + d.par;
+      all += d.ace + d.albatross + d.eagle + d.birdie + d.par + d.bogey + d.double;
+    }
+    return all > 0 ? (good / all) * 100 : null;
+  }, [analysis?.holes]);
+
+  /* The member's own, across every course whose counts are present. */
+  const yourGolf = React.useMemo(() => {
+    let good = 0;
+    let all = 0;
+    let courses = 0;
+    let overSum = 0;
+    let overRounds = 0;
+    let overCourses = 0;
+    for (const r of myCourses ?? []) {
+      if (r.eagles_plus_count != null && r.birdies_count != null && r.pars_count != null && r.bogeys_plus_count != null) {
+        const g = r.eagles_plus_count + r.birdies_count + r.pars_count;
+        good += g;
+        all += g + r.bogeys_plus_count;
+        courses += 1;
+      }
+      if (r.avg_to_par != null && Number.isFinite(r.avg_to_par) && r.rounds_count > 0) {
+        overSum += r.avg_to_par * r.rounds_count;
+        overRounds += r.rounds_count;
+        overCourses += 1;
+      }
+    }
+    return {
+      parOrBetterPct: all > 0 ? (good / all) * 100 : null,
+      courses,
+      overPar: overRounds > 0 ? overSum / overRounds : null,
+      overCourses,
+    };
+  }, [myCourses]);
+
+  const projectionState = React.useMemo<ProjectionState>(() => {
+    const index = trend?.current ?? null;
+    const cr = courseMeta?.course_cr ?? null;
+    const slope = courseMeta?.course_slope ?? null;
+    const par = courseMeta?.course_par ?? null;
+    if (index == null || cr == null || slope == null || par == null) {
+      if (fieldOverPar != null && yourGolf.overPar != null) {
+        return { kind: 'compare', fieldOverPar, yourOverPar: yourGolf.overPar, courseCount: yourGolf.overCourses };
+      }
+      return { kind: 'none' };
+    }
+    const inputs = { index: Number(index), cr: Number(cr), slope: Number(slope), par: Number(par) };
+    const diffs = recentDiffs ?? [];
+    const projection = buildCourseProjection(diffs, inputs);
+    if (!projection) return { kind: 'handicap_only', inputs, sample: diffs.length };
+    return { kind: 'full', inputs, projection, differentials: diffs };
+  }, [trend, courseMeta, recentDiffs, fieldOverPar, yourGolf]);
+
+  const projectionSettled = !metaLoading && !trendLoading && !diffsLoading && !myCoursesLoading;
+
   /* §7 — one view event per mount, carrying the round count so we can see which
      state members actually land in. */
   const viewFired = React.useRef(false);
   React.useEffect(() => {
     if (!settled || viewFired.current) return;
+    /* Branch C waits for its projection reads so the state it reports is the one drawn. */
+    if (branchC && !projectionSettled) return;
     viewFired.current = true;
     analyticsEvents.track('course_you_tab_viewed', {
       course_id: courseId,
       rounds: roundTotal,
       connected: Boolean(connection),
+      projection: !branchC
+        ? 'none'
+        : projectionState.kind === 'full'
+          ? 'full'
+          : projectionState.kind === 'handicap_only'
+            ? 'handicap_only'
+            : 'none',
     });
-  }, [settled, courseId, roundTotal, connection]);
+  }, [settled, courseId, roundTotal, connection, branchC, projectionSettled, projectionState.kind]);
 
   const upForGrabs = (
     <UpForGrabsSection
@@ -251,17 +336,59 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     );
   }
 
-  // C — CONNECTED, NEVER PLAYED HERE. The invitation, their rating if they have
-  // left one, and up for grabs.
+  // C — CONNECTED, NEVER PLAYED HERE (BRIEF_YOU_TAB_BRANCH_C_SCOUTING_REPORT).
+  // The order is the argument: a number to beat, where the round is decided,
+  // whether the course flatters or exposes them, what is unclaimed, who they
+  // know, then the button. Do not promote the button back to the top.
   if (!hasTrackedRounds) {
+    const showWonAndLost =
+      (analysis?.holes?.length ?? 0) === 18 && Number(analysis?.total_rounds ?? 0) >= FIELD_CHART_MIN_ROUNDS;
+    const showAgainst =
+      fieldParOrBetterPct != null &&
+      Number.isFinite(fieldParOrBetterPct) &&
+      yourGolf.parOrBetterPct != null &&
+      Number.isFinite(yourGolf.parOrBetterPct) &&
+      yourGolf.courses > 0;
+    const circlePlayed = courseStats?.circle_played ?? 0;
     return wrap(
       <div>
-        <AboutSection first heading={t('courseDetail.youTab.sections.record')}>
-          <YouSentence quiet>
-            {fieldGross
-              ? t('courseDetail.youTab.notPlayed.body', { field: fieldGross })
-              : t('courseDetail.youTab.notPlayed.bodyNoField')}
-          </YouSentence>
+        <ProjectionSection
+          courseName={courseName}
+          state={projectionState}
+          recordGross={courseRecord?.value ?? null}
+        />
+        {showWonAndLost && analysis ? (
+          <WonAndLostSection
+            holes={analysis.holes}
+            totalRounds={Number(analysis.total_rounds)}
+            onAllHoles={() => {
+              analyticsEvents.track('course_you_all_18_holes', { course_id: courseId, holes: 0 });
+              navigate(`/courses/${courseId}?tab=you&sheet=your-holes`);
+            }}
+          />
+        ) : null}
+        {showAgainst ? (
+          <AgainstYourGolfSection
+            fieldParOrBetterPct={fieldParOrBetterPct!}
+            yourParOrBetterPct={yourGolf.parOrBetterPct!}
+            courseCount={yourGolf.courses}
+            harderThanPct={courseStats?.harder_than_pct ?? null}
+          />
+        ) : null}
+        {upForGrabs}
+        {circlePlayed > 0 ? (
+          <AboutSection heading={t('courseDetail.youTab.circle.heading')}>
+            <YouSentence>{t('common:feed.courseSheet.circlePlayed', { count: circlePlayed })}</YouSentence>
+          </AboutSection>
+        ) : null}
+        <AboutSection>
+          <AboutHairline />
+          <div style={{ marginTop: 16 }}>
+            <YouSentence>{t('courseDetail.youTab.actions.playingSoon')}</YouSentence>
+          </div>
+          <div style={{ marginTop: 6 }}>
+            <YouSentence quiet>{t('courseDetail.youTab.actions.playingSoonBody')}</YouSentence>
+          </div>
           {status?.status === 'want_to_play' ? (
             <div style={{ marginTop: 16 }}>
               <CourseStatusToggle courseId={courseId} courseName={courseName} userRating={rating?.rating} />
@@ -269,7 +396,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
           ) : (
             <YouButton
               label={isUpdating ? t('courseDetail.youTab.notPlayed.adding') : t('courseDetail.youTab.notPlayed.addToList')}
-              variant="outline"
+              variant="solid"
               disabled={isUpdating}
               onClick={() => {
                 analyticsEvents.track('course_you_add_to_list', { course_id: courseId });
@@ -277,6 +404,17 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
               }}
             />
           )}
+          {!rating ? (
+            <YouAction
+              label={t('courseDetail.youTab.rating.rateIt')}
+              tone="ink"
+              space={16}
+              onPress={() => {
+                analyticsEvents.track('course_you_rate_it', { course_id: courseId });
+                navigate(`/courses/${courseId}/rate`);
+              }}
+            />
+          ) : null}
         </AboutSection>
         {rating ? (
           <YourRatingSection
@@ -291,7 +429,6 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
             }}
           />
         ) : null}
-        {upForGrabs}
       </div>,
     );
   }
