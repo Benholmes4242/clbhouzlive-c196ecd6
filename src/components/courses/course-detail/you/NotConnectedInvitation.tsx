@@ -11,7 +11,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
-import { courseBucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
+import { courseBucketShares, dominantBucket } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatNumber } from '@/i18n/format';
 import AboutSection from '../about/AboutSection';
@@ -20,16 +20,13 @@ import { YouSentence } from './youBits';
 /** Mock you-tab-final.html draws the chart at 96px. */
 const CHART_HEIGHT = 96;
 const GAP = 3;
-const ORDER = ['birdie', 'par', 'bogey', 'double'] as const;
 /** Visibility floor, not significance: the round count always sits beside the heading. */
 export const FIELD_CHART_MIN_ROUNDS = 5;
 
 function barFill(h: CourseHole): string {
   const seg = courseBucketShares([h]);
   if (!seg) return A.DIM;
-  let best: (typeof ORDER)[number] = ORDER[0];
-  for (const k of ORDER) if (seg[k] > seg[best]) best = k;
-  return RAMP_TOPAR[best];
+  return RAMP_TOPAR[dominantBucket(seg)];
 }
 
 /** The field's 18 bars and their 1 / 9 / 18 axis. ONE home: branch B and branch C both draw this. */

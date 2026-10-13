@@ -9,6 +9,9 @@ export interface MyHolePerformanceRow {
   birdie_count: number;
   eagle_or_better_count: number;
   ace_count: number;
+  par_count: number;
+  bogey_count: number;
+  double_plus_count: number;
 }
 
 /**
