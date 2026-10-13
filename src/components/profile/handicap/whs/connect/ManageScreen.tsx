@@ -314,7 +314,10 @@ export const ManageScreen: React.FC<Props> = ({
       </Panel>
     ) : (
       /* VARIANT B - nothing to FIX, something to RE-TRY. health.actionable is
-         false here; branch on health.kind only, never last_sync_error. */
+         false here; branch on health.kind only, never last_sync_error.
+         DELIBERATELY NO "Checked … every 6 hours." sync line here: the body's
+         "We have not been able to reach England Golf since {date}" already
+         states the last-checked fact with a real date. Do not add it back. */
       <Panel
         kicker="Sync paused"
         aside={
