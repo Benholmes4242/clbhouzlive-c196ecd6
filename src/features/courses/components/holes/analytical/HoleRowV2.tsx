@@ -236,6 +236,48 @@ export function courseBucketShares(holes: CourseHole[]): BucketShares | null {
 }
 
 /**
+ * THE ONE DOMINANT-BUCKET RULE. Every chart that colours a bar by its most
+ * common outcome calls this. Scans birdie, par, bogey, double with birdie as
+ * the incumbent and replaces only on a STRICTLY GREATER share, so a tie goes
+ * to the earlier, better outcome.
+ */
+export function dominantBucket(shares: BucketShares): keyof BucketShares {
+  const order = ['birdie', 'par', 'bogey', 'double'] as const;
+  let best: keyof BucketShares = order[0];
+  for (const k of order) if (shares[k] > shares[best]) best = k;
+  return best;
+}
+
+/**
+ * THE MEMBER-SIDE TWIN of courseBucketShares, from get_my_hole_performance's
+ * counts (structural shape, so no hook type is imported). `birdie` folds
+ * eagle_or_better_count + birdie_count to mean what the field's birdie bucket
+ * means. ace_count is DELIBERATELY ABSENT: it is already inside
+ * eagle_or_better_count, so adding it would double count every hole-in-one.
+ * Total is the sum of the four buckets, not times_played. Shares are 0..1;
+ * null when the total is zero or any input is not finite.
+ */
+export function memberBucketShares(row: {
+  eagle_or_better_count: number;
+  birdie_count: number;
+  par_count: number;
+  bogey_count: number;
+  double_plus_count: number;
+}): BucketShares | null {
+  const inputs = [row.eagle_or_better_count, row.birdie_count, row.par_count, row.bogey_count, row.double_plus_count];
+  if (!inputs.every((v) => typeof v === 'number' && Number.isFinite(v))) return null;
+  const raw = {
+    birdie: row.eagle_or_better_count + row.birdie_count,
+    par: row.par_count,
+    bogey: row.bogey_count,
+    double: row.double_plus_count,
+  };
+  const total = raw.birdie + raw.par + raw.bogey + raw.double;
+  if (!(total > 0)) return null;
+  return { birdie: raw.birdie / total, par: raw.par / total, bogey: raw.bogey / total, double: raw.double / total };
+}
+
+/**
  * THE DISTRIBUTION STRIP - the whole course before the parts. ONE component,
  * rendered by the Course tab's hole-by-hole panel and by the sheet, in the same
  * four tones as every row beneath it, so the strip teaches the rows. Its four
