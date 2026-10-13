@@ -21243,6 +21243,7 @@ export type Database = {
           username: string
         }[]
       }
+      get_handicap_waitlist_counts: { Args: never; Returns: Json }
       get_hero_course_fact: {
         Args: { p_course_id: string }
         Returns: {
