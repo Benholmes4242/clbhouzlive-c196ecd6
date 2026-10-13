@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { adminTheme as t } from '../theme';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 interface Props {
   open: boolean;
@@ -13,6 +14,11 @@ interface Props {
 }
 
 export default function DetailDrawer({ open, onClose, title, subtitle, children, footer, artboard = false }: Props) {
+  useEffect(() => {
+    if (!open || !artboard) return;
+    lockBodyScroll();
+    return unlockBodyScroll;
+  }, [open, artboard]);
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
