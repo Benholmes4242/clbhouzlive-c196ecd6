@@ -26,7 +26,6 @@ const PENDING_CARD_ROUTE_PATTERNS = [
   '/profile',
   '/profile/:username',
   '/business/:idOrSlug',
-  '/watch/videos',
 ];
 
 function routeRendersPendingCards(pathname: string): boolean {

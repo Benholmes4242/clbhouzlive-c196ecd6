@@ -29,16 +29,10 @@ export const IMMERSIVE_EXACT_ROUTES = [
      Content starts BELOW the islands via CHROME_CLEARANCE, exactly as the
      Handicap page does. The '/explore' entry stays: it is the redirect shim
      into /amateur, not a surface of its own. */
-  '/watch',
-  '/watch/clips',
-  '/watch/videos',
   '/tourhub',
 ] as const;
 
 export const LIGHT_IMMERSIVE_EXACT_ROUTES = [
-  '/watch',
-  '/watch/clips',
-  '/watch/videos',
 ] as const;
 
 /**

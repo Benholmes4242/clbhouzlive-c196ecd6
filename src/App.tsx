@@ -93,7 +93,6 @@ import StageLoadingShell from '@/features/post-v2/StageLoadingShell';
 import { PlayerPageSkeleton } from '@/components/skeletons/PlayerPageSkeleton';
 import { TournamentPageSkeleton } from '@/components/skeletons/TournamentPageSkeleton';
 import { TourHubOverviewSkeleton } from '@/components/skeletons/TourHubOverviewSkeleton';
-import { WatchHubSkeleton, WatchClipsSkeleton, WatchVideosSkeleton } from '@/components/skeletons/WatchSkeletons';
 import { AchievementsSkeleton } from '@/components/skeletons/AchievementsSkeleton';
 import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 import { HubSkeleton } from '@/components/skeletons/HubSkeleton';
@@ -253,9 +252,6 @@ const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const HomeLanding = lazy(() => import("./pages/HomeLanding"));
 
 
-const WatchHubV2 = lazy(() => import("./features/watch-v2/WatchHubV2"));
-const VideosPageV2 = lazy(() => import("./features/videos-v2/VideosPageV2"));
-const ClipsPageV2 = lazy(() => import("./features/clips-v2/ClipsPageV2"));
 const MediaLibraryPage = lazy(() => import("./features/media-library/MediaLibraryPage"));
 
 
@@ -605,13 +601,10 @@ function AppRoutes() {
         <Route path="/profile/:username/reviews" element={<UserReviewsRedirect />} />
         
         
-        {/* Watch surface is dormant (WATCH_SURFACE=false): routes stay registered
-            and redirect to /explore so shared links never hard-404. */}
-        <Route path="/watch" element={<WatchGate><Suspense fallback={<WatchHubSkeleton />}><WatchHubV2 /></Suspense></WatchGate>} />
-        <Route path="/videos" element={<WatchGate><Navigate to="/watch" replace /></WatchGate>} />
-        <Route path="/clips" element={<WatchGate><Navigate to="/watch/clips" replace /></WatchGate>} />
-        <Route path="/watch/clips" element={<WatchGate><Suspense fallback={<WatchClipsSkeleton />}><ClipsPageV2 /></Suspense></WatchGate>} />
-        <Route path="/watch/videos" element={<WatchGate><Suspense fallback={<WatchVideosSkeleton />}><VideosPageV2 /></Suspense></WatchGate>} />
+        {/* The /watch pages are retired. Old shared /videos and /clips links
+            land on /amateur, where the live Watch surface lives. */}
+        <Route path="/videos" element={<WatchGate><Navigate to="/amateur" replace /></WatchGate>} />
+        <Route path="/clips" element={<WatchGate><Navigate to="/amateur" replace /></WatchGate>} />
         {/* CUTOVER: /media is the one media destination, and it carries the
             MERGED set the Amateur mosaic summarises — review photographs and
             course-tagged member moments in one wall, one count. */}

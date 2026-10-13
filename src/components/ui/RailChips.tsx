@@ -8,9 +8,8 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
  *
  * One treatment, one place. Geometry and both states come from the Scores
  * board rails (BRIEF_SCORES §S1.3) and are now shared by every surface doing
- * the same job: the two Scores rails, the Discover filter rail, and the four
- * Watch destinations (/watch/clips, /watch/videos, /explore/reviews,
- * /explore/moments).
+ * the same job: the two Scores rails, the Discover filter rail, and the
+ * Explore media destinations.
  *
  * 12 / 700, padding 6 by 11, radius 11. The row scrolls horizontally and
  * never wraps.
