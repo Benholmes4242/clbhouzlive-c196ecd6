@@ -11,6 +11,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
  * tab were both invisible. Keep this list to view-selecting params only; it
  * multiplies the distinct paths in analytics.
  */
+/* TABS ARE SCREENS: a change in any of these params is a screen change -
+   page_exit for the previous trackedPath, page_view for the new one. */
 const VIEW_PARAMS = ['tab', 'view', 'type', 'subtab'] as const;
 
 function trackedPath(pathname: string, search: string): string {
@@ -62,7 +64,8 @@ export function usePageTracking() {
       if (!lastPath.current) return;
       exitedOnHide.current = true;
       const durationSec = Math.round((Date.now() - enterTime.current) / 1000);
-      analyticsEvents.track('page_exit', {
+      // keepalive fetch: survives the app being killed.
+      analyticsEvents.trackOnHide('page_exit', {
         path: lastPath.current,
         duration_sec: durationSec,
       });

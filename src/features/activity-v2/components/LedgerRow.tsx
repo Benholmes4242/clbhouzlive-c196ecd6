@@ -296,6 +296,17 @@ export const LedgerRow: React.FC<Props> = ({ row, onMarkRead, onLongPress }) => 
 
   const handleClick = () => {
     if (heldRef.current) return;
+    {
+      const et = row.entity_type;
+      const targetType = et === 'profile' || et === 'post' || et === 'course' || et === 'message' ? et : undefined;
+      analyticsEvents.notifications.clicked({
+        id: row.notif_id,
+        type: row.notif_type,
+        source: 'notifications_page',
+        targetType,
+        targetId: row.entity_id ?? undefined,
+      });
+    }
     if (isUnread) onMarkRead(row.notif_id);
     const url = getActivityLink(row);
     if (!url) return;

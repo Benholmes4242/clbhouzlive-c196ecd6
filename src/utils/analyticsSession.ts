@@ -30,21 +30,53 @@ function mint(): string {
 }
 
 /**
- * Current session id, minting a new one when the last activity was more than
- * 30 minutes ago. Always returns a string; never throws.
+ * SESSIONS ARE SESSIONS. session_start fires exactly when an id is minted,
+ * never on App mount. The listener is registered by analyticsEvents; a mint
+ * that happens before it registers is held and delivered on registration.
  */
-export function getSessionId(): string {
+type MintListener = (id: string) => void;
+let mintListener: MintListener | null = null;
+let pendingMint: string | null = null;
+
+export function onSessionMinted(fn: MintListener): void {
+  mintListener = fn;
+  if (pendingMint) {
+    const id = pendingMint;
+    pendingMint = null;
+    fn(id);
+  }
+}
+
+/**
+ * Current session id, minting a new one when the last activity was more than
+ * 30 minutes ago. `minted` is true exactly when this call created the id.
+ * Never throws.
+ */
+export function getSessionInfo(): { id: string; minted: boolean } {
   const now = Date.now();
   let id = safeLocalStorage.get(ID_KEY);
   const seenRaw = safeLocalStorage.get(SEEN_KEY);
   const seen = seenRaw ? Number(seenRaw) : 0;
+  let minted = false;
 
   if (!id || !Number.isFinite(seen) || seen <= 0 || now - seen > TIMEOUT_MS) {
     id = mint();
+    minted = true;
     safeLocalStorage.set(ID_KEY, id);
   }
   safeLocalStorage.set(SEEN_KEY, String(now));
-  return id;
+  if (minted) {
+    if (mintListener) {
+      try { mintListener(id); } catch { /* analytics never throws */ }
+    } else {
+      pendingMint = id;
+    }
+  }
+  return { id, minted };
+}
+
+export function getSessionId(): string {
+  return getSessionInfo().id;
 }
 
 /**

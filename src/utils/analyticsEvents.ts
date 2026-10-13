@@ -1,7 +1,11 @@
 // Analytics event tracking utility
 // Rewired to write directly to Supabase analytics_events table
-import { supabase } from '@/integrations/supabase/client';
-import { getSessionId, getUserAgent } from './analyticsSession';
+import { supabase, SUPABASE_URL } from '@/integrations/supabase/client';
+import { getSessionId, getUserAgent, onSessionMinted } from './analyticsSession';
+
+// The publishable (anon) key, read from the client config; safe in code.
+const SUPABASE_PUBLISHABLE_KEY: string =
+  ((supabase as unknown as { supabaseKey?: string }).supabaseKey) ?? '';
 
 /**
  * Bot traffic is dropped at WRITE time. Read-time filtering means every future
@@ -25,41 +29,69 @@ function isBot(): boolean {
 
 type EventParams = Record<string, any>;
 
+/* DWELL SURVIVES CLOSING THE APP. The user id and access token are held in
+   memory from onAuthStateChange, so no event awaits getUser() before
+   inserting. The hide-time page_exit uses sendKeepalive() below. */
+let currentUserId: string | null = null;
+let currentToken: string | null = null;
+try {
+  supabase.auth.onAuthStateChange((_evt, session) => {
+    currentUserId = session?.user?.id ?? null;
+    currentToken = session?.access_token ?? null;
+  });
+} catch { /* analytics never throws */ }
+
+/* Envelope. The CALLER'S `path` wins (page_exit must record the page left,
+   page_view must keep ?tab=). `page` stays location.pathname. session_id,
+   page, build and ua remain reserved: callers must NOT send them — Explore's
+   numeric `page` was silently replaced for the life of that event (renamed
+   to stream_page, Sep 2026). */
+function buildRow(eventName: string, params?: EventParams) {
+  return {
+    name: eventName,
+    user_id: currentUserId,
+    props: {
+      ...params,
+      session_id: getSessionId(),
+      page: window.location.pathname,
+      path: params?.path ?? window.location.pathname,
+      build: __BUILD_ID__,
+      ua: getUserAgent(),
+    },
+  };
+}
+
+/** Survives the page being killed: fetch with keepalive, same row shape. */
+function sendKeepalive(eventName: string, params?: EventParams) {
+  try {
+    if (isBot()) return;
+    const row = buildRow(eventName, params);
+    void fetch(`${SUPABASE_URL}/rest/v1/analytics_events`, {
+      method: 'POST',
+      keepalive: true,
+      headers: {
+        apikey: SUPABASE_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${currentToken ?? SUPABASE_PUBLISHABLE_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify(row),
+    }).catch(() => {});
+  } catch { /* never block */ }
+}
+
 export const analyticsEvents = {
   track: async (eventName: string, params?: EventParams) => {
     try {
       if (isBot()) return;
-      const { data: { user } } = await supabase.auth.getUser();
-      await supabase.from('analytics_events').insert({
-        name: eventName,
-        user_id: user?.id ?? null,
-        props: {
-          ...params,
-          /* RESERVED ENVELOPE KEYS — session_id, page, path, build, ua.
-             These are applied AFTER the caller's spread, so they overwrite a
-             caller prop of the same name silently: the event still writes,
-             nothing errors, and the caller's value is simply gone. Callers
-             must NOT use these names. What it cost when one did: Explore sent
-             `page` as a scroll-depth number and the envelope replaced it with
-             the route, so amateur_stream_page_loaded depth was unrecorded for
-             the life of the event (renamed to stream_page, Sep 2026). The
-             spread must never move after these keys either — letting callers
-             win would hand route analytics a number the moment any caller
-             sends `page`.
-             `page` is the route key read by admin analytics; `path` is the
-             same value under the key newer consumers prefer — both are
-             written until the older readers migrate. */
-          session_id: getSessionId(),
-          page: window.location.pathname,
-          path: window.location.pathname,
-          build: __BUILD_ID__,
-          ua: getUserAgent(),
-        },
-      });
+      await supabase.from('analytics_events').insert(buildRow(eventName, params));
     } catch {
       // Never block UI — analytics is non-critical
     }
   },
+
+  /** Hide-time page_exit only. Every other event uses track(). */
+  trackOnHide: (eventName: string, params?: EventParams) => sendKeepalive(eventName, params),
 
   // Shorts squircle specific events
   shortsSquircle: {
@@ -344,3 +376,11 @@ export const analyticsEvents = {
       }),
   },
 };
+
+// session_start fires exactly when getSessionId() mints a new id.
+onSessionMinted((id) => {
+  void analyticsEvents.track('session_start', {
+    session_id: id,
+    referrer: (typeof document !== 'undefined' && document.referrer) || 'direct',
+  });
+});
