@@ -219,16 +219,6 @@ function pctDelta(current: number, prior: number): number | null {
   return Math.round(((current - prior) / prior) * 100);
 }
 
-function relTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return 'just now';
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  return `${d}d ago`;
-}
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
@@ -1332,7 +1322,7 @@ function AuthTab({ period }: { period: AnalyticsPeriod }) {
                   </div>
                   <span style={{
                     color: t.inkFaint, fontSize: 12, fontVariantNumeric: 'tabular-nums', textAlign: 'right', minWidth: 68,
-                  }}>{relTime(e.createdAt)}</span>
+                  }}>{formatAgo(e.createdAt, { suffix: true, empty: '-' })}</span>
                 </>
               );
               const style: React.CSSProperties = {
@@ -1375,9 +1365,6 @@ void periodToDays;
 //   the event stream, and the top-screens section (verified `path` prop on
 //   page_view via src/hooks/usePageTracking.ts).
 // - Both polling queries are visibility-gated in their hook definitions.
-
-/** 2.2 — the one admin age formatter. */
-const relTimeShort = (iso: string) => formatAgo(iso, { suffix: true });
 
 function displayNameOf(p?: LiteProfile | null): string {
   if (!p) return 'Member';
@@ -1502,7 +1489,7 @@ function WhoIsHere({
                   color: t.inkMuted, fontSize: 12, fontVariantNumeric: 'tabular-nums',
                   textAlign: 'right', minWidth: 68,
                 }}>
-                  active {relTimeShort(u.latestAt)}
+                  active {formatAgo(u.latestAt, { suffix: true })}
                 </span>
               </Link>
             );
@@ -1850,7 +1837,7 @@ function EventsTab({ period }: { period: AnalyticsPeriod }) {
                       color: t.inkFaint, fontSize: 10.5,
                       fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    }}>{a.name}{a.lastSeenAt ? ` · last ${relTimeShort(a.lastSeenAt)}` : ''}</div>
+                    }}>{a.name}{a.lastSeenAt ? ` · last ${formatAgo(a.lastSeenAt, { suffix: true })}` : ''}</div>
                     {a.probableRenameTo && (
                       <div style={{ color: t.inkMuted, fontSize: 10.5, marginTop: 2 }}>
                         Probable rename → <span style={{
@@ -1942,7 +1929,7 @@ function AppErrorsCard({ period }: { period: AnalyticsPeriod }) {
                 <div style={{
                   color: t.inkFaint, fontSize: 10.5,
                   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-                }}>{g.build} · last {relTimeShort(g.lastSeenAt)}</div>
+                }}>{g.build} · last {formatAgo(g.lastSeenAt, { suffix: true })}</div>
               </div>
               <div style={{ textAlign: 'right', flexShrink: 0 }}>
                 <div style={{
@@ -2021,7 +2008,7 @@ function EventDetailSheet({
             <StatBox label="Prior members" value={fmtInt(aggregate.priorUsers)} />
             <StatBox
               label="Last seen"
-              value={aggregate.lastSeenAt ? relTimeShort(aggregate.lastSeenAt) : '-'}
+              value={aggregate.lastSeenAt ? formatAgo(aggregate.lastSeenAt, { suffix: true }) : '-'}
             />
           </div>
 
@@ -2079,7 +2066,7 @@ function EventDetailSheet({
                         <span style={{
                           color: t.inkFaint, fontSize: 12, fontVariantNumeric: 'tabular-nums',
                           textAlign: 'right', minWidth: 68, flexShrink: 0,
-                        }}>{relTimeShort(o.created_at)}</span>
+                        }}>{formatAgo(o.created_at, { suffix: true })}</span>
                       </>
                     );
                     const style: React.CSSProperties = {

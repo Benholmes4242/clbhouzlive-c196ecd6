@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { revokeBulkInvites } from '@/lib/adminBulkApi';
 import { toast } from '@/lib/toast';
+import { useTeam } from './useTeam';
 
 export interface InviteRow {
   id: string;
@@ -58,13 +59,26 @@ async function fetchInvites(): Promise<InviteRow[]> {
   });
 }
 
+export function dropTeamInvites<T extends { invitedUserId: string | null }>(
+  invites: T[],
+  team: { userId: string; expiresAt: string | null }[],
+  now: number = Date.now(),
+): T[] {
+  const onTeam = new Set(team.filter(m => !m.expiresAt || new Date(m.expiresAt).getTime() > now).map(m => m.userId));
+  return invites.filter(i => !i.invitedUserId || !onTeam.has(i.invitedUserId));
+}
+
 export function useInvites() {
   const qc = useQueryClient();
-  const { data = [], isLoading, refetch } = useQuery({
+  const { data: rawInvites = [], isLoading, refetch } = useQuery({
     queryKey: ['admin-v2', 'invites'],
     queryFn: fetchInvites,
     staleTime: 60_000,
   });
+  // A person on the team never appears under Invites, whatever the invite's
+  // status: drop any invite whose user holds an unexpired admin membership.
+  const team = useTeam();
+  const data = dropTeamInvites(rawInvites, team.data);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ['admin-v2', 'invites'] });

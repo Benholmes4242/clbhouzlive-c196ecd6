@@ -113,4 +113,5 @@
 ## BRIEF_MEMBERS_RADAR
 - [x] Stage 1 tracking; follow-ups: Explore ?view=, Inbox ?type=, video_watch per-interval confirmed.
 - [x] Stage 2 (2.1–2.5).
-- [ ] Stages 3–5 — waiting on go-ahead. Carry into Member/Behaviour build: index shown only when connected (else —); index chart ends on today at profile.index; timeline merges consecutive same-label screen steps (seconds summed); use server seconds/actions as returned, no client recompute or refilter; area names are data.
+- [x] Stage 3 hooks + rules 4–6 + follow-ups.
+- [ ] Stages 4–5 screens — waiting on go-ahead. Carry into Member/Behaviour build: index shown only when connected (else —); index chart ends on today at profile.index; timeline merges consecutive same-label screen steps (seconds summed); use server seconds/actions as returned, no client recompute or refilter; area names are data.

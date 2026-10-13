@@ -12,6 +12,7 @@
  * Set.
  */
 import { useState, useMemo } from 'react';
+import { useMembersOverview } from './useMembersRadar';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
@@ -39,7 +40,7 @@ export interface AdminUserRow {
   /** App role from user_roles. Read ONLY by the member sheet's full-admin
    *  "App role" chips (BRIEF_MEMBERS_RADAR 2.3). */
   role: string | null;
-  /** Admin tag: admin_memberships, valid and unexpired. The ONLY source of the
+  /** Admin tag from get_admin_members_overview().members[].admin_role. The ONLY source of the
    *  ADMINS tile, its filter and the role badge. */
   admin_role: string | null;
   last_seen_at: string | null;
@@ -100,18 +101,6 @@ async function fetchAllUsers(): Promise<AdminUserRow[]> {
     .limit(10000);
   if (error) throw error;
 
-  // 2.3 — the admin tag comes only from admin_memberships (unexpired).
-  const { data: memberships } = await supabase
-    .from('admin_memberships')
-    .select('user_id, role, expires_at')
-    .limit(10000);
-  const nowMs = Date.now();
-  const adminMap = new Map(
-    (memberships ?? [])
-      .filter(m => !m.expires_at || new Date(m.expires_at).getTime() > nowMs)
-      .map(m => [m.user_id, m.role]),
-  );
-
   // One row per member, aggregated in Postgres. 14d so it also serves the
   // "dormant 14d+" filter, and active_24h comes from the same max(created_at)
   // as the last-seen column, so the column and the filters cannot disagree.
@@ -133,7 +122,7 @@ async function fetchAllUsers(): Promise<AdminUserRow[]> {
     is_suspended: p.is_suspended ?? false,
     created_at: p.created_at,
     role: null,
-    admin_role: adminMap.get(p.id) ?? null,
+    admin_role: null, // filled from get_admin_members_overview in useUsers
     last_seen_at: lastSeenMap.get(p.id) ?? null,
   }));
 }
@@ -238,11 +227,19 @@ export function useUsers() {
   const [pageSize, setPageSize] = useState(25);
   const [drawerUserId, setDrawerUserId] = useState<string | null>(null);
 
-  const { data: allUsers = [], isLoading, refetch } = useQuery({
+  const { data: rawUsers = [], isLoading, refetch } = useQuery({
     queryKey: ['admin-v2', 'users', 'all'],
     queryFn: fetchAllUsers,
     staleTime: 5 * 60_000,
   });
+
+  // Follow-up 3 — the admin tag comes from get_admin_members_overview
+  // (SECURITY DEFINER), so limited admins see it whatever admin_memberships RLS allows.
+  const { data: overview } = useMembersOverview();
+  const allUsers = useMemo(() => {
+    const roles = new Map((overview?.members ?? []).map(m => [m.user_id, m.admin_role]));
+    return rawUsers.map(u => ({ ...u, admin_role: roles.get(u.id) ?? null }));
+  }, [rawUsers, overview]);
 
   const { data: activeIds = [] } = useQuery({
     queryKey: ['admin-v2', 'users', 'active-24h'],

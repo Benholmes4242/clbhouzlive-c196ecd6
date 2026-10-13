@@ -1,5 +1,5 @@
+import { formatAgo } from '../lib/formatAgo';
 import React, { useMemo, useState } from 'react';
-import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
 import DetailDrawer from './DetailDrawer';
@@ -26,10 +26,6 @@ const DURATION_OPTIONS: Array<{ label: string; value: number | null }> = [
   { label: 'Permanent', value: null },
 ];
 
-function relTime(iso: string | null | undefined) {
-  if (!iso) return '-';
-  try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); } catch { return '-'; }
-}
 
 function statusTone(s: ReportStatus) {
   if (s === 'pending') return 'warn' as const;
@@ -65,7 +61,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
     : '';
 
   const subtitle = row
-    ? `${row.report_count} report${row.report_count === 1 ? '' : 's'} - ${relTime(row.created_at)}`
+    ? `${row.report_count} report${row.report_count === 1 ? '' : 's'} - ${formatAgo(row.created_at, { suffix: true, empty: '-' })}`
     : '';
 
   const resetEnforce = () => {
@@ -312,7 +308,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
                       <span style={{ color: t.ink, fontWeight: 700, fontSize: 13 }}>
                         {row.targetPost.author?.display_name ?? 'Unknown author'}
                       </span>
-                      <span style={{ color: t.inkFaint, fontSize: 11 }}>{relTime(row.targetPost.created_at)}</span>
+                      <span style={{ color: t.inkFaint, fontSize: 11 }}>{formatAgo(row.targetPost.created_at, { suffix: true, empty: '-' })}</span>
                     </div>
                   </div>
                   <div style={{ color: t.ink, fontSize: 14, whiteSpace: 'pre-wrap', lineHeight: 1.45 }}>
@@ -338,7 +334,7 @@ export default function ModerationDetailDrawer({ open, onClose, row }: Props) {
                           <span style={{ color: t.ink, fontSize: 13, fontWeight: 600 }}>
                             {r.reporter?.display_name ?? 'Unknown reporter'}
                           </span>
-                          <span style={{ color: t.inkFaint, fontSize: 11 }}>{relTime(r.raw.created_at)}</span>
+                          <span style={{ color: t.inkFaint, fontSize: 11 }}>{formatAgo(r.raw.created_at, { suffix: true, empty: '-' })}</span>
                         </div>
                         <StatusPill tone={statusTone(r.raw.status)}>{r.raw.status}</StatusPill>
                       </div>

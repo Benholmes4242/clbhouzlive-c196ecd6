@@ -1,9 +1,9 @@
+import { formatAgo } from '../lib/formatAgo';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { invalidateAdminQueues, subscribeAdminQueueChanges, refreshAdminQueues } from '@/features/admin/lib/adminQueueRefresh';
 import { AlertTriangle } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
 import {
   CountryMismatchWarning,
   WhsCountryChip,
@@ -51,10 +51,6 @@ import {
   type UnmatchedCourseRow,
 } from '../hooks/useUnmatchedCourses';
 
-/** The Unmatched sheet's "Waiting 3 months ago" line. */
-function relTime(iso: string): string {
-  try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); } catch { return '-'; }
-}
 
 // ---------- redirects helper ----------
 
@@ -602,7 +598,7 @@ function UnmatchedCourseSheet({ row, onClose }: { row: UnmatchedCourseRow | null
           </div>
         )}
         <div style={{ fontSize: 12, color: t.inkMuted }}>
-          Waiting {relTime(row.first_seen_at)}
+          Waiting {formatAgo(row.first_seen_at, { suffix: true, empty: '-' })}
           {row.last_tier_tried ? ` - last tier: ${row.last_tier_tried}` : ''}
         </div>
         {row.echo_suggestion && (
