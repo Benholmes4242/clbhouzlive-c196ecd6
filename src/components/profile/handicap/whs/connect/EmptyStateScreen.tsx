@@ -4,14 +4,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHomeClubStatus } from '@/features/home-club/useHomeClubStatus';
 import { openHomeClubPicker } from '@/features/home-club/homeClubPickerStore';
-import { CourseDistributionSummary } from '@/components/courses/course-detail/about/HowItPlays';
-import { CompactHoleRow } from '@/components/courses/course-detail/about/AllHolesSheet';
-import { ABOUT_KICKER, AboutHairline, aboutFig } from '@/components/courses/course-detail/about/AboutSection';
+import { ABOUT_KICKER } from '@/components/courses/course-detail/about/AboutSection';
 import { courseBucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
-import { A, toParParts } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useConnectIntroCourse, stripClubSuffix, type ConnectIntroCourse } from './useConnectIntroCourse';
 import { IntroHoleChart } from './IntroHoleChart';
-import { formatNumber } from '@/i18n/format';
+import { ScoringBand } from './ScoringBand';
 import { MUTE, DIM, INK, AMBER, NUM } from './designTokens';
 import { PrimaryButton, Action, FooterBar, Stage } from './Primitives';
 
@@ -38,9 +36,7 @@ const PROMISE_RULE = 'rgba(255,255,255,0.11)';
  */
 const TAIL_CSS = `
 .ci-change { margin-top: 16px }
-.ci-source { margin-top: 16px }
-.ci-scope { margin-top: 20px }
-@media (max-height: 740px) { .ci-lead { display: none } .ci-change { margin-top: 0 } .ci-source { margin-top: 4px } .ci-scope { margin-top: 14px } }
+@media (max-height: 740px) { .ci-lead { display: none } .ci-change { margin-top: 0 } }
 `;
 
 /** Two lines at every width: measured, never estimated (brief §2b). */
@@ -73,13 +69,6 @@ const FittedHeadline: React.FC<{ line1: string; line2: string }> = ({ line1, lin
   );
 };
 
-const IntroFigure: React.FC<{ label: string; value: string; tone?: string }> = ({ label, value, tone = A.INK }) => (
-  <div style={{ flex: '0 0 auto', minWidth: 0 }}>
-    <div style={{ ...aboutFig(21, tone), lineHeight: 1 }}>{value}</div>
-    <div style={{ ...ABOUT_KICKER, marginTop: 5, whiteSpace: 'nowrap' }}>{label}</div>
-  </div>
-);
-
 /** The evidence screen: a real course measured from real rounds. totalRounds is never printed. */
 const EvidenceBody: React.FC<{ course: ConnectIntroCourse; hasHomeClub: boolean; onChange: () => void }> = ({
   course,
@@ -87,11 +76,7 @@ const EvidenceBody: React.FC<{ course: ConnectIntroCourse; hasHomeClub: boolean;
   onChange,
 }) => {
   const { t } = useTranslation('handicap');
-  const { t: tc } = useTranslation('courses');
   const { holes } = course;
-  const fieldAvg = holes.reduce((s, h) => s + h.avg_to_par, 0) / holes.length;
-  const hardest = holes.reduce((m, h) => (h.avg_to_par > m.avg_to_par ? h : m), holes[0]);
-  const field = toParParts(fieldAvg);
   const shares = courseBucketShares(holes);
 
   return (
@@ -107,21 +92,7 @@ const EvidenceBody: React.FC<{ course: ConnectIntroCourse; hasHomeClub: boolean;
       <div style={{ flexShrink: 0 }}>
         <IntroHoleChart holes={holes} />
         <div style={{ marginTop: 10, fontSize: 11.5, lineHeight: 1.5, color: A.MUTE }}>{t('whsConnect.intro.chartCaption')}</div>
-        <div className="ci-scope" style={ABOUT_KICKER}>
-          {t('whsConnect.intro.scopeAllHoles', { count: holes.length, holes: formatNumber(holes.length) })}
-        </div>
-        <div style={{ display: 'flex', gap: 30, marginTop: 10 }}>
-          <IntroFigure label={tc('courseDetail.plays.fieldAvg')} value={field ? field.text : '\u2014'} tone={field ? field.tone : A.INK} />
-        </div>
-        {shares ? <CourseDistributionSummary shares={shares} /> : null}
-        <AboutHairline style={{ marginTop: 18 }} />
-        <div style={{ paddingTop: 14 }}>
-          <span style={ABOUT_KICKER}>{tc('courseDetail.plays.hardestHole')}</span>
-          <div style={{ marginTop: 2 }}>
-            <CompactHoleRow hole={hardest} mine={null} hasYou={false} last />
-          </div>
-        </div>
-        <div className="ci-source" style={{ fontSize: 11, fontWeight: 600, color: A.DIM }}>{t('whsConnect.intro.source')}</div>
+        {shares ? <ScoringBand shares={shares} /> : null}
       </div>
 
       <div style={{ flex: '1 1 0', minHeight: 14 }} />
