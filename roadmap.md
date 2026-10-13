@@ -114,6 +114,6 @@
 - [x] Stage 1 tracking; follow-ups: Explore ?view=, Inbox ?type=, video_watch per-interval confirmed.
 - [x] Stage 2 (2.1–2.5).
 - [x] Stage 3 hooks + rules 4–6 + follow-ups.
-- [ ] Stage 4 Member screen — blocked: Member.dc.html is absent from accessible uploads and project/saved files. Original brief recovered at /mnt/user-uploads/BRIEFMEMBERSRADAR_pasted.txt; only the mock requires reattachment. Do not approximate. Use Stage 3 hooks and memberRadarRules, London times, formatAgo, permission/empty states and shape-matched skeletons.
-- [ ] Stage 5 Behaviour screen — blocked: Behaviour.dc.html is absent from accessible uploads; requires reattachment. Match exactly; use returned seconds/actions/area/screen labels, paged sessions and merged session detail through Stage 3 hooks.
-- [ ] Verify Stages 4–5 and report exact mock parity, authentication limits and full-suite result after the required files are available; no SQL, migrations or edge-function changes. No application code changed and suite not rerun while blocked.
+- [ ] Stage 4 Member screen — blocked pending exact no-data appearance and eight-week session-bar source for limited admins: overview has no weekly counts; Stage 3 sessions are full-admin-only. Member.html received and reviewed. TOP 100 may use the brief-sanctioned em dash; do not add a query.
+- [ ] Stage 5 Behaviour screen — blocked pending exact no-data appearance: Behaviour.html and Member.html contain populated panels only, with no empty-state markup. Preserve returned seconds/actions/area/screen labels, paged sessions and merged detail through Stage 3 hooks when unblocked.
+- [ ] Verify Stages 4–5 and report exact mock parity, authentication limits and full-suite result after clarification; no SQL, migrations or edge-function changes. No application code changed; suite not rerun. External/unmanaged Supabase prevents authenticated end-to-end checks.
