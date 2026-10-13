@@ -414,9 +414,10 @@ export function WatchFeed({
     />
   );
 
-  /* BC.1 — the count is only printed once both reads have reached their end, because
-     only then is the loaded length the total. Until then the line is not shown. */
-  const quickTotalKnown = settled && !clips.hasNextPage && !videos.hasNextPage;
+  /* BE.1 — the count always renders and is always true: while either read can still page,
+     it says how many are on screen; once both are exhausted the loaded length is the total.
+     No order word: clips read `trending`, videos read `latest`, and the rows are merged. */
+  const quickMorePending = clips.hasNextPage || videos.hasNextPage;
   const quickHeading = (
     <>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 9, padding: '16px 16px 2px' }}>
@@ -427,9 +428,11 @@ export function WatchFeed({
           {t('amateur.watch.rail.quickKicker', 'Under 3 min')}
         </span>
       </div>
-      {quickTotalKnown && quickRows.length > 0 ? (
+      {quickRows.length > 0 ? (
         <div data-watch-count style={{ padding: '2px 16px 12px', fontSize: 11.5, color: COUNT_INK, fontVariantNumeric: 'tabular-nums' }}>
-          {t('amateur.watch.quickCount', '{{count}} clips', { count: quickRows.length })}
+          {quickMorePending
+            ? t('amateur.watch.quickShowing', 'Showing {{count}}', { count: quickRows.length })
+            : t('amateur.watch.quickCount', '{{count}} clips', { count: quickRows.length })}
         </div>
       ) : (
         <div style={{ height: 12 }} />
@@ -519,10 +522,7 @@ export function WatchFeed({
             </>
           ) : null}
 
-          {/* K.3 — QUICK HITS. No badge on the RAIL tiles: under a heading reading UNDER 3 MIN
-              the badge repeats the heading. BC.1 overrules this FOR THE GRID ONLY: in the full
-              view the tiles are the whole screen and duration is what separates them, so grid
-              tiles and the lead carry the solid badge. */}
+          {/* K.3 — QUICK HITS. The rail carries the GLASS duration badge, as every Poster always has. The grid and the lead carry the SOLID badge instead: at 3-column width a translucent badge over a bright poster is unreadable, and solid 62% black is legible whatever is behind it. An earlier version of this comment claimed the rail had no badge; it never matched the code. */}
           {clips.isError && quickRows.length === 0 && showsQuickHits(filter) ? (
             <ShelfRetry
               heading={t('amateur.watch.rail.quick', 'Quick hits')}

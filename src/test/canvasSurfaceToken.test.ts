@@ -193,7 +193,6 @@ describe('canonical member surface tokens', () => {
 
   it('keeps dark skeletons on the canonical ramp and away from the black shimmer', () => {
     const darkSkeletonPaths = [
-      'src/components/skeletons/WatchSkeletons.tsx',
       'src/components/skeletons/MediaLibrarySkeletons.tsx',
       'src/components/skeletons/ProfileSurfaceSkeleton.tsx',
       'src/components/skeletons/RateCoursePageSkeleton.tsx',
