@@ -559,6 +559,7 @@ function Member360Sheet({
         else if (msg === 'already_unverified') toast.error('This member is not verified');
         else toast.error(msg);
       } else if (res?.success) {
+        qc.invalidateQueries({ queryKey: ['admin', 'members'] });
         toast.success(
           confirm === 'delete' ? 'User deleted' :
           confirm === 'suspend' ? (detail.is_suspended ? 'Suspension lifted' : 'User suspended') :
@@ -627,32 +628,32 @@ function Member360Sheet({
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {isFullAdmin && (
               <>
-                <DrawerBtn icon={<KeyRound size={14} />} onClick={() => setConfirm('reset')}>Send password reset</DrawerBtn>
-                <DrawerBtn icon={<AtSign size={14} />} onClick={() => setRenameOpen(true)}>Change username</DrawerBtn>
+                <DrawerBtn icon={<KeyRound size={14} />} onClick={() => { setMoreOpen(false); setConfirm('reset'); }}>Send password reset</DrawerBtn>
+                <DrawerBtn icon={<AtSign size={14} />} onClick={() => { setMoreOpen(false); setRenameOpen(true); }}>Change username</DrawerBtn>
                 {detail.is_verified ? (
-                  <DrawerBtn icon={<BadgeCheck size={14} />} tone="danger" onClick={() => setConfirm('unverify')}>
+                  <DrawerBtn icon={<BadgeCheck size={14} />} tone="danger" onClick={() => { setMoreOpen(false); setConfirm('unverify'); }}>
                     Remove verification
                   </DrawerBtn>
                 ) : (
-                  <DrawerBtn icon={<BadgeCheck size={14} />} onClick={() => setConfirm('verify')}>
+                  <DrawerBtn icon={<BadgeCheck size={14} />} onClick={() => { setMoreOpen(false); setConfirm('verify'); }}>
                     Verify golfer
                   </DrawerBtn>
                 )}
                 <DrawerBtn
                   icon={<Ban size={14} />}
                   tone={detail.is_suspended ? undefined : 'warn'}
-                  onClick={() => setConfirm('suspend')}
+                  onClick={() => { setMoreOpen(false); setConfirm('suspend'); }}
                 >
                   {detail.is_suspended ? 'Lift suspension' : 'Suspend member'}
                 </DrawerBtn>
-                <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => setConfirm('delete')}>Delete member</DrawerBtn>
+                <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => { setMoreOpen(false); setConfirm('delete'); }}>Delete member</DrawerBtn>
               </>
             )}
             {isLimited && (
               <>
-                <DrawerBtn icon={<ShieldAlert size={14} />} tone="warn" onClick={() => { setRequestMode('ban'); setReqReason(''); }}>Request permanent ban</DrawerBtn>
-                <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => { setRequestMode('delete'); setReqReason(''); }}>Request delete</DrawerBtn>
-                <DrawerBtn icon={<ShieldCheck size={14} />} onClick={() => { setRequestMode('role'); setReqReason(''); }}>Request role change</DrawerBtn>
+                <DrawerBtn icon={<ShieldAlert size={14} />} tone="warn" onClick={() => { setMoreOpen(false); setRequestMode('ban'); setReqReason(''); }}>Request permanent ban</DrawerBtn>
+                <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => { setMoreOpen(false); setRequestMode('delete'); setReqReason(''); }}>Request delete</DrawerBtn>
+                <DrawerBtn icon={<ShieldCheck size={14} />} onClick={() => { setMoreOpen(false); setRequestMode('role'); setReqReason(''); }}>Request role change</DrawerBtn>
               </>
             )}
           </div>
