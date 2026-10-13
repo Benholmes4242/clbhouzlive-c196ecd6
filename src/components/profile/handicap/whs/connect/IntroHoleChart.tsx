@@ -12,6 +12,8 @@ import { A, BAR_RADIUS, FIGS, SANS } from '@/features/courses/components/holes/a
 const CHART_HEIGHT = 100;
 const GAP = 3;
 
+const LINE_AMBER = '#F7931E';
+
 const KEYFRAMES = `
 @keyframes ciWipe { 0% { clip-path: inset(0 100% 0 0) } 24% { clip-path: inset(0 -2% 0 0) } 100% { clip-path: inset(0 -2% 0 0) } }
 @keyframes ciLine { 0%, 78% { opacity: 1 } 88%, 100% { opacity: 0 } }
