@@ -151,8 +151,8 @@ export const IntroHoleChart: React.FC<{ holes: CourseHole[] }> = ({ holes }) => 
         }}
       >
         <span>1</span>
-        <span>9</span>
-        <span>18</span>
+        <span>{String(Math.ceil(n / 2))}</span>
+        <span>{String(n)}</span>
       </div>
     </div>
   );

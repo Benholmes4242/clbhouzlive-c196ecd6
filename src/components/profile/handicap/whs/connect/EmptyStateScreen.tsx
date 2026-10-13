@@ -36,7 +36,8 @@ const PROMISE_RULE = 'rgba(255,255,255,0.11)';
  */
 const TAIL_CSS = `
 .ci-change { margin-top: 16px }
-@media (max-height: 740px) { .ci-lead { display: none } .ci-change { margin-top: 0 } }
+.ci-source { margin-top: 16px }
+@media (max-height: 740px) { .ci-lead { display: none } .ci-change { margin-top: 0 } .ci-source { margin-top: 4px } }
 `;
 
 /** Two lines at every width: measured, never estimated (brief §2b). */
@@ -111,7 +112,7 @@ const EvidenceBody: React.FC<{ course: ConnectIntroCourse; hasHomeClub: boolean;
             <CompactHoleRow hole={hardest} mine={null} hasYou={false} last />
           </div>
         </div>
-        <div style={{ marginTop: 16, fontSize: 11, fontWeight: 600, color: A.DIM }}>{t('whsConnect.intro.source')}</div>
+        <div className="ci-source" style={{ fontSize: 11, fontWeight: 600, color: A.DIM }}>{t('whsConnect.intro.source')}</div>
       </div>
 
       <div style={{ flex: '1 1 0', minHeight: 14 }} />
