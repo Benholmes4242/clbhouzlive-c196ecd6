@@ -369,8 +369,8 @@ export function WatchFeed({
       <div style={{ paddingBottom: 8 }}>
         <Section
           title={t('amateur.watch.rail.community', 'From the community')}
-          seeAll={t('amateur.watch.seeAll', 'See all')}
-          onSeeAll={() => {
+          seeAll={filter === 'community' ? undefined : t('amateur.watch.seeAll', 'See all')}
+          onSeeAll={filter === 'community' ? undefined : () => {
             analyticsEvents.track('amateur_shelf_see_all', { kind: 'moments', surface: 'watch' });
             setFilter('community');
           }}
@@ -505,9 +505,20 @@ export function WatchFeed({
             {t('amateur.watch.empty', 'Nothing to watch here yet.')}
           </p>
         ) : (
-          <div style={{ paddingInline: 16, paddingTop: 12 }}>
-            <MomentsGrid moments={moments.data ?? []} gap={4} tall={320} radius={10} autoplayGroup="amateur-watch-community" onTilePress={openMoment} />
-          </div>
+          <>
+            {/* BG.3 — the full view keeps its heading, matching Quick hits. No kicker. The moments
+                read is a plain query, not an infinite one: what is loaded IS everything, so the
+                count has one form only and no "Showing" state. */}
+            <h2 style={{ margin: 0, padding: '16px 16px 2px', fontSize: 17, fontWeight: 750, letterSpacing: '-0.01em', color: A.INK }}>
+              {t('amateur.watch.rail.community', 'From the community')}
+            </h2>
+            <div data-watch-count style={{ padding: '2px 16px 12px', fontSize: 11.5, color: COUNT_INK, fontVariantNumeric: 'tabular-nums' }}>
+              {t('amateur.watch.communityCount', '{{count}} photos', { count: (moments.data ?? []).length })}
+            </div>
+            <div style={{ paddingInline: 16, paddingTop: 12 }}>
+              <MomentsGrid moments={moments.data ?? []} gap={4} tall={320} radius={10} autoplayGroup="amateur-watch-community" onTilePress={openMoment} />
+            </div>
+          </>
         )
       ) : (
         <>
