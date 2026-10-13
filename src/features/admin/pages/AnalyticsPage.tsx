@@ -1,3 +1,4 @@
+import { formatAgo } from '../lib/formatAgo';
 import React, { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
@@ -1375,17 +1376,8 @@ void periodToDays;
 //   page_view via src/hooks/usePageTracking.ts).
 // - Both polling queries are visibility-gated in their hook definitions.
 
-function relTimeShort(iso: string): string {
-  const diff = Math.max(0, Date.now() - new Date(iso).getTime());
-  const s = Math.floor(diff / 1000);
-  if (s < 60) return `${s}s ago`;
-  const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  return `${d}d ago`;
-}
+/** 2.2 — the one admin age formatter. */
+const relTimeShort = (iso: string) => formatAgo(iso, { suffix: true });
 
 function displayNameOf(p?: LiteProfile | null): string {
   if (!p) return 'Member';

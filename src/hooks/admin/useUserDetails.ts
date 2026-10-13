@@ -175,6 +175,25 @@ export function useUserActions() {
     }
   }, []);
 
+  /** 2.1 — lifting a suspension is its own action, never suspend_user. */
+  const unsuspendUser = useCallback(async (userId: string) => {
+    setLoading(userId);
+    try {
+      const { data, error } = await supabase.functions.invoke('secure-admin-operations', {
+        body: { action: 'unsuspend', targetUserId: userId, suspended: false },
+      });
+      if (error || (data as any)?.error) {
+        const msg = await parseAdminOpError(error, data, 'Failed to lift suspension');
+        return { success: false, error: new Error(msg) };
+      }
+      return { success: true, data };
+    } catch (error) {
+      return { success: false, error };
+    } finally {
+      setLoading(null);
+    }
+  }, []);
+
   const deleteUser = useCallback(async (userId: string, _userEmail?: string) => {
     setLoading(userId);
     try {
@@ -285,6 +304,7 @@ export function useUserActions() {
     loading,
     changeRole,
     suspendUser,
+    unsuspendUser,
     deleteUser,
     resetPassword,
     changeUsername,

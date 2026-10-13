@@ -36,7 +36,12 @@ export interface AdminUserRow {
   is_verified: boolean;
   is_suspended: boolean;
   created_at: string;
+  /** App role from user_roles. Read ONLY by the member sheet's full-admin
+   *  "App role" chips (BRIEF_MEMBERS_RADAR 2.3). */
   role: string | null;
+  /** Admin tag: admin_memberships, valid and unexpired. The ONLY source of the
+   *  ADMINS tile, its filter and the role badge. */
+  admin_role: string | null;
   last_seen_at: string | null;
 }
 
@@ -95,11 +100,17 @@ async function fetchAllUsers(): Promise<AdminUserRow[]> {
     .limit(10000);
   if (error) throw error;
 
-  const { data: roles } = await supabase
-    .from('user_roles')
-    .select('user_id, role')
+  // 2.3 — the admin tag comes only from admin_memberships (unexpired).
+  const { data: memberships } = await supabase
+    .from('admin_memberships')
+    .select('user_id, role, expires_at')
     .limit(10000);
-  const roleMap = new Map((roles ?? []).map(r => [r.user_id, r.role]));
+  const nowMs = Date.now();
+  const adminMap = new Map(
+    (memberships ?? [])
+      .filter(m => !m.expires_at || new Date(m.expires_at).getTime() > nowMs)
+      .map(m => [m.user_id, m.role]),
+  );
 
   // One row per member, aggregated in Postgres. 14d so it also serves the
   // "dormant 14d+" filter, and active_24h comes from the same max(created_at)
@@ -121,7 +132,8 @@ async function fetchAllUsers(): Promise<AdminUserRow[]> {
     is_verified: p.is_verified_golfer ?? false,
     is_suspended: p.is_suspended ?? false,
     created_at: p.created_at,
-    role: roleMap.get(p.id) ?? null,
+    role: null,
+    admin_role: adminMap.get(p.id) ?? null,
     last_seen_at: lastSeenMap.get(p.id) ?? null,
   }));
 }
@@ -206,6 +218,7 @@ async function fetchUserDetail(userId: string): Promise<AdminUserDetail> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     email_confirmed: (p as any).email_confirmed ?? null,
     role: role.data?.role ?? null,
+    admin_role: null,
     posts_count: posts.count ?? 0,
     reviews_count: reviews.count ?? 0,
     followers: followers.count ?? 0,
@@ -267,7 +280,7 @@ export function useUsers() {
         u.id.toLowerCase().includes(q)
       );
     }
-    if (filter === 'admin') rows = rows.filter(u => !!u.role);
+    if (filter === 'admin') rows = rows.filter(u => !!u.admin_role);
     if (filter === 'new_this_week') rows = rows.filter(u => isNewThisWeek(u));
     if (filter === 'active_24h') {
       const s = new Set(activeIds);
@@ -321,7 +334,7 @@ export function useUsers() {
       eg_issues: allUsers.filter(u => hasEgIssue(u, egSet)).length,
       suspended: allUsers.filter(u => isSuspended(u)).length,
       verified: allUsers.filter(u => u.is_verified).length,
-      admin: allUsers.filter(u => !!u.role).length,
+      admin: allUsers.filter(u => !!u.admin_role).length,
       connected: allUsers.filter(u => isConnected(u, connSet)).length,
       not_connected: allUsers.filter(u => isNotConnected(u, connSet)).length,
     };

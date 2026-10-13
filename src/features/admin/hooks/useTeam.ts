@@ -7,6 +7,8 @@ export interface TeamMember {
   userId: string;
   role: string;
   grantedBy: string | null;
+  /** Display name of the granter (2.4), never a uuid slice. */
+  grantedByName: string | null;
   createdAt: string | null;
   expiresAt: string | null;
   notes: string | null;
@@ -23,7 +25,7 @@ async function fetchTeam(): Promise<TeamMember[]> {
   if (error) throw error;
   if (!data?.length) return [];
 
-  const ids = data.map(m => m.user_id);
+  const ids = [...new Set([...data.map(m => m.user_id), ...data.map(m => m.granted_by).filter(Boolean) as string[]])];
   const { data: profiles } = await supabase
     .from('user_profiles')
     .select('id, display_name, username, profile_photo_url')
@@ -36,6 +38,7 @@ async function fetchTeam(): Promise<TeamMember[]> {
       userId: m.user_id,
       role: m.role,
       grantedBy: m.granted_by,
+      grantedByName: m.granted_by ? (map.get(m.granted_by)?.display_name ?? map.get(m.granted_by)?.username ?? null) : null,
       createdAt: m.created_at,
       expiresAt: m.expires_at,
       notes: m.notes,
