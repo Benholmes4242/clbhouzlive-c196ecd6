@@ -198,6 +198,8 @@
   },
   "whsConnect": {
     "intro": {
+      "scopeAllHoles_one": "All {{holes}} hole",
+      "scopeAllHoles_other": "All {{holes}} holes",
       "headline": "Your game, in numbers you can use.",
       "sub": "Connect your official record once. We read every round you have ever posted and show you where the shots actually go.",
       "cta": "Find your country",
