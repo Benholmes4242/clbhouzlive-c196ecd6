@@ -31,8 +31,49 @@ const ORDER: { key: keyof CategoryScoreValues; label: string }[] = [
 /** The only copy of the fill arithmetic. */
 export const categoryFillPercent = (value: number) => Math.max(0, Math.min(100, (value / 10) * 100));
 
-export const CategoryScores: React.FC<{ scores: CategoryScoreValues; marginTop?: number }> = ({ scores, marginTop = 0 }) => {
+/**
+ * BRIEF_REVIEWS_CATEGORY_PAIRS — the 'pairs' layout, used ONLY by the Reviews
+ * tab (WhatTheyScored). Two columns, readable 13/700 INK labels, an 8px bar and
+ * figure on one row.
+ *
+ * THE 0–10 SCALE IS DELIBERATE. Rescaling the bar to start at 5.0 was built,
+ * measured and declined: at 0–10 the four bars differ only slightly and read as
+ * near-identical — that is accepted. The bar gives weight and familiarity; the
+ * figures carry the comparison. Changing the scale is a product decision, not a
+ * bug fix. The fill arithmetic stays in categoryFillPercent.
+ */
+const CategoryScorePairs: React.FC<{ scores: CategoryScoreValues; marginTop: number }> = ({ scores, marginTop }) => (
+  <div
+    data-category-scores
+    style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px 16px', marginTop, fontFamily: SANS }}
+  >
+    {ORDER.map(({ key, label }) => {
+      const value = scores[key];
+      if (value == null) return <div key={key} data-category={key} aria-hidden style={{ minWidth: 0 }} />;
+      const tone = courseSubScoreTone(value);
+      return (
+        <div key={key} data-category={key} style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: A.INK, marginBottom: 9 }}>{label}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ flex: 1, height: 8, borderRadius: 4, background: A.TRACK, overflow: 'hidden' }}>
+              <div
+                data-category-score={value.toFixed(1)}
+                style={{ height: '100%', width: `${categoryFillPercent(value)}%`, borderRadius: 4, background: tone }}
+              />
+            </div>
+            <div data-category-figure style={{ ...FIGS, flex: '0 0 30px', textAlign: 'right', fontSize: 15, fontWeight: 700, color: tone }}>
+              {value.toFixed(1)}
+            </div>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+);
+
+export const CategoryScores: React.FC<{ scores: CategoryScoreValues; marginTop?: number; layout?: 'grid4' | 'pairs' }> = ({ scores, marginTop = 0, layout = 'grid4' }) => {
   if (ORDER.every(({ key }) => scores[key] == null)) return null;
+  if (layout === 'pairs') return <CategoryScorePairs scores={scores} marginTop={marginTop} />;
   return (
     <div
       data-category-scores
