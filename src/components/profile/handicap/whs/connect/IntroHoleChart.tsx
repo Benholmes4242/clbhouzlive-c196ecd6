@@ -13,7 +13,7 @@ import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { courseBucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
-const CHART_HEIGHT = 150;
+const CHART_HEIGHT = 135;
 const GAP = 3;
 
 const ORDER = ['birdie', 'par', 'bogey', 'double'] as const;

@@ -1074,8 +1074,14 @@
       },
       "clear": "Clear",
       "connect": {
-        "body": "Connect your handicap and every round you play here appears automatically, with your score against the field.",
-        "cta": "Connect handicap"
+        "cta": "Connect handicap",
+        "roundsMeta_one": "{{rounds}} round",
+        "roundsMeta_other": "{{rounds}} rounds",
+        "chartCaption": "This is the field at {{courseName}}, hole by hole. Connect and your own line is drawn straight over it.",
+        "birdiesMeta": "0 of 18",
+        "birdiesCaption": "Every hole you have birdied here lights up — including rounds you played before you connected.",
+        "fillsIn": "Connect once and all of it fills in.",
+        "history": "The rounds you have already played here come with it, not just the ones from today onwards."
       },
       "field": "Field",
       "form": {

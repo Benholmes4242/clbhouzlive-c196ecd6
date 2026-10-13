@@ -189,7 +189,7 @@ async function runInitialSync(
     );
   }
 
-  // 2. First page of scores (most recent 30)
+  // 2. First page of scores (most recent 300 - one page, capped)
   //    Uses the SHARED mapper in _shared/eg-api.ts — the only score mapper.
   //    That brings row-by-row degradation to the initial import too: one
   //    unstorable row can no longer lose the member's entire history.

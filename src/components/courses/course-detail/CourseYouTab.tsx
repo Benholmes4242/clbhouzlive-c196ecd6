@@ -23,6 +23,12 @@
  * par/bogey/double split; "Your battle - hole 18" as its own block; the
  * duplicated Within reach; the community / difference / category block.
  *
+ * DELIBERATE EXCEPTION, BRANCH B ONLY (BRIEF_YOU_TAB_CONNECT_INVITATION): the
+ * not-connected branch DOES draw the field's chart (FieldShotsSection), because
+ * that branch has nothing else on it. This is a reversal for branch B alone,
+ * not a gap - do not "restore" the field chart to branch C or the connected
+ * page, and do not remove it from branch B as a rule violation.
+ *
  * MOVED, NOT DELETED: how each par plays for you, how your round unfolds by
  * thirds, the hole-ranked list with its advice line and the donut split all
  * The All 18 action opens the same analytical sheet as the Course tab.
@@ -47,7 +53,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { A, EmptyState } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
-import AboutSection from './about/AboutSection';
+import AboutSection, { AboutHairline } from './about/AboutSection';
+import CenteredStatStrip from './about/CenteredStatStrip';
+import { EmptyBirdiesSection, FieldShotsSection, FIELD_CHART_MIN_ROUNDS } from './you/NotConnectedInvitation';
 import { YouButton, YouSentence } from './you/youBits';
 import YourRecordHere from './you/YourRecordHere';
 import WhereYouStandHere from './you/WhereYouStandHere';
@@ -197,14 +205,40 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     );
   }
 
-  // B — NO HANDICAP CONNECTED. The majority screen. Section 1 becomes the
-  // invitation, section 8 renders, and NOTHING ELSE: the field's chart and the
-  // par bars are the Course tab's job, one tap away.
+  // B — NO HANDICAP CONNECTED. The majority screen, rebuilt by
+  // BRIEF_YOU_TAB_CONNECT_INVITATION: the member's page with their side blank.
+  // Stat strip (dashes, never zeroes), the field's chart (gated: 18 holes and
+  // at least 5 rounds), empty birdie slots, up for grabs, then the connect block.
   if (!connection) {
+    const showFieldChart =
+      (analysis?.holes?.length ?? 0) === 18 && Number(analysis?.total_rounds ?? 0) >= FIELD_CHART_MIN_ROUNDS;
     return wrap(
       <div>
-        <AboutSection first heading={t('courseDetail.youTab.sections.record')}>
-          <YouSentence quiet>{t('courseDetail.youTab.connect.body')}</YouSentence>
+        <AboutSection first>
+          <CenteredStatStrip
+            items={[
+              { label: t('courseDetail.youTab.rounds'), value: '\u2014' },
+              { label: t('courseDetail.youTab.best'), value: '\u2014' },
+              { label: t('courseDetail.youTab.yourAverage'), value: '\u2014' },
+              { label: t('courseDetail.youTab.field'), value: fieldGross ?? '\u2014' },
+            ]}
+          />
+        </AboutSection>
+        {showFieldChart && analysis ? (
+          <FieldShotsSection
+            holes={analysis.holes}
+            totalRounds={Number(analysis.total_rounds)}
+            courseName={courseName}
+          />
+        ) : null}
+        <EmptyBirdiesSection />
+        {upForGrabs}
+        <AboutSection>
+          <AboutHairline style={{ marginBottom: 20 }} />
+          <p style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700, color: A.INK }}>
+            {t('courseDetail.youTab.connect.fillsIn')}
+          </p>
+          <YouSentence quiet>{t('courseDetail.youTab.connect.history')}</YouSentence>
           <YouButton
             label={t('courseDetail.youTab.connect.cta')}
             onClick={() => {
@@ -213,7 +247,6 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
             }}
           />
         </AboutSection>
-        {upForGrabs}
       </div>,
     );
   }
