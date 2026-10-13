@@ -39,7 +39,7 @@ export function MoveSection({ contest, state, tourCode, currentRound }: Props) {
     <section style={{ fontFamily: FONT }}>
       <SectionEyebrow kicker={t(state === 'live' ? 'tournament.move.liveEyebrow' : 'tournament.move.completedEyebrow')} />
       <div style={{ display: 'grid', gridTemplateColumns: '40px minmax(0,1fr) auto', alignItems: 'center', gap: 12, padding: '14px 16px', background: PAGE_CANVAS, borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
-        <PlayerAvatar playerId={row.player?.id ?? row.id} playerName={name} photoUrl={row.player?.photo_url ?? null} tourCode={tourCode} size={40} />
+        <PlayerAvatar playerId={row.player?.id ?? row.id} playerName={name} photoUrl={row.player?.photo_url ?? null} headshotOverride={row.player?.headshot_override ?? null} tourCode={tourCode} size={40} />
         <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 15.5, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
           <div style={{ marginTop: 2, fontSize: 12, color: INK_FAINT, fontVariantNumeric: 'tabular-nums lining-nums' }}>{t('tournament.move.subline', { thru, position, total })}</div>

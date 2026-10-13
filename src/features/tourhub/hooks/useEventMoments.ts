@@ -17,6 +17,9 @@ export interface EventMoment {
     id: string;
     full_name: string;
     country: string | null;
+    photo_url?: string | null;
+    /** Filename key, never a URL. */
+    headshot_override?: string | null;
   };
 }
 
@@ -33,7 +36,7 @@ export function useEventMoments(tournamentId: string | undefined) {
         .from('event_moments')
         .select(`
           *,
-          player:sr_players(id, full_name, country)
+          player:sr_players(id, full_name, country, photo_url, headshot_override)
         `)
         .eq('tournament_id', tournamentId)
         .order('sort_order', { ascending: true });

@@ -95,7 +95,7 @@ export function PicksSheet({ open, onClose, picks, predictions, eventName, venue
           return (
             <section key={p.playerId || idx} data-overview-picks-sheet-pick style={{ padding: '16px 0' , borderBottom: idx < picks.length - 1 ? `1px solid ${WHITE_ALPHA_08}` : 'none' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <PlayerAvatar playerId={String(p.playerId ?? '')} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl ?? null} size={42} />
+                <PlayerAvatar playerId={String(p.playerId ?? '')} playerName={p.playerName} tourCode={tourCode} photoUrl={p.photoUrl ?? null} headshotOverride={p.headshotOverride ?? null} size={42} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 15.5, fontWeight: 800, letterSpacing: '-0.018em', color: INK }}>{p.playerName}</div>
                   <div style={{ marginTop: 2, fontSize: 11, fontWeight: 600, color: WHITE_ALPHA_65, ...FIGS }}>{meta}</div>

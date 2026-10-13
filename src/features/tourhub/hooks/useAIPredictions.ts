@@ -24,6 +24,8 @@ export interface AITopContender {
   playerId: string;
   playerName: string;
   photoUrl: string | null;
+  /** sr_players.headshot_override — a filename KEY, never a URL. Own field, never photoUrl. */
+  headshotOverride?: string | null;
   pgaTourId: string | null;
   country: string;
   worldRanking: number;
@@ -190,15 +192,17 @@ async function fetchScopedTournamentPredictions(
         .from('sr_players')
         .select('id, photo_url, headshot_override')
         .in('id', missingIds);
-      const photoMap = new Map<string, string | null>();
+      const photoMap = new Map<string, { photoUrl: string | null; headshotOverride: string | null }>();
       (playerRows ?? []).forEach((r: any) => {
-        // headshot_override is a filename key for R2 lookups, not a URL.
-        // Only photo_url is a valid direct image src here.
-        photoMap.set(r.id, r.photo_url || null);
+        // headshot_override is a filename key for R2 lookups, not a URL, so it
+        // travels in its OWN field. Only photo_url is a direct image src.
+        photoMap.set(r.id, { photoUrl: r.photo_url || null, headshotOverride: r.headshot_override || null });
       });
-      predictions.topContenders = predictions.topContenders.map((p) =>
-        p.photoUrl ? p : { ...p, photoUrl: photoMap.get(p.playerId) ?? null },
-      );
+      predictions.topContenders = predictions.topContenders.map((p) => {
+        if (p.photoUrl) return p;
+        const hit = photoMap.get(p.playerId);
+        return { ...p, photoUrl: hit?.photoUrl ?? null, headshotOverride: hit?.headshotOverride ?? null };
+      });
     }
   }
   const status = (tournament as any).status;
@@ -666,6 +670,7 @@ function formatPredictions(
     ...p,
     rank: p.rank || index + 1,
     photoUrl: p.photoUrl || null,
+    headshotOverride: p.headshotOverride || null,
     reasons: cleanReasons(p.reasons),
   }));
 

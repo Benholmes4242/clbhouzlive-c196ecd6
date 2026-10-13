@@ -157,6 +157,7 @@ export function TeeTimesRail({ groups, round: _round, onOpenAll }: Props) {
                       playerId={p.id ?? p.name}
                       playerName={p.name}
                       photoUrl={p.photoUrl ?? null}
+                      headshotOverride={p.headshotOverride ?? null}
                       size="xs"
                     />
                     <div

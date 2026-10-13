@@ -129,6 +129,8 @@ export interface BoardEntry {
     country_code?: string | null;
     country?: string | null;
     photo_url?: string | null;
+    /** Filename key, never a URL. Present at runtime: useTourLeaderboard selects sr_players(*). */
+    headshot_override?: string | null;
   } | null;
   team?: {
     id?: string | null;
