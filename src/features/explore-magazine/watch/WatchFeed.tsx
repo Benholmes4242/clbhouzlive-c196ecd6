@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
 import { useMomentsOfTheWeek, type Moment } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
 import { MomentsGrid } from '@/components/explore-tab-new/courseled/MomentsGrid';
 import { RailChips } from '@/components/ui/RailChips';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
 
@@ -76,6 +77,29 @@ const CW_H = 104;
 const QH_W = 126;
 const QH_H = 224;
 const CT_W = 124;
+
+/* BRIEF_WATCH_SEE_ALL_IN_PLACE values with no shared token yet. */
+const COUNT_INK = 'rgba(248,250,252,0.46)';
+const BADGE_INK = '#FFFFFF';
+const BADGE_FILL = 'rgba(0,0,0,0.62)';
+
+/** BC.1 — the solid duration badge: grid tiles and the lead only, never the rail. */
+function SolidDurationBadge({ seconds }: { seconds: number | null | undefined }) {
+  const label = seconds ? formatDuration(seconds) : '';
+  if (!label) return null;
+  return (
+    <span
+      data-watch-badge="duration"
+      style={{
+        position: 'absolute', right: 6, bottom: 6, zIndex: 2, pointerEvents: 'none',
+        fontSize: 10, fontWeight: 700, color: BADGE_INK, background: BADGE_FILL,
+        borderRadius: 5, padding: '2px 5px', fontVariantNumeric: 'tabular-nums', lineHeight: 1.2,
+      }}
+    >
+      {label}
+    </span>
+  );
+}
 
 const cardButton: React.CSSProperties = {
   flex: 'none',
@@ -146,12 +170,12 @@ function QuickLayout({ grid, children }: { grid: boolean; children: React.ReactN
   );
 }
 
-function Poster({ row, height, posterH, radius, autoplay, progress }: { row: HubRpcRow; height: number | null; posterH: number; radius: number; autoplay: boolean; progress: number | null }) {
+function Poster({ row, height, posterH, radius, autoplay, progress, aspect = '9 / 16', badge = 'glass', children }: { row: HubRpcRow; height: number | null; posterH: number; radius: number; autoplay: boolean; progress: number | null; aspect?: string; badge?: 'glass' | 'solid'; children?: React.ReactNode }) {
   const poster = posterFor(row, posterH);
   const [failed, setFailed] = useState(false);
   const initial = (creatorName(row) || '?').trim().charAt(0).toUpperCase() || '?';
   return (
-    <span data-watch-frame style={{ display: 'block', position: 'relative', ...(height == null ? { aspectRatio: '9 / 16' } : { height }), flex: 'none', borderRadius: radius, overflow: 'hidden', background: A.PANEL }}>
+    <span data-watch-frame style={{ display: 'block', position: 'relative', ...(height == null ? { aspectRatio: aspect } : { height }), flex: 'none', borderRadius: radius, overflow: 'hidden', background: A.PANEL }}>
       {poster && !failed ? (
         <img src={poster} alt="" loading="lazy" decoding="async" onError={() => setFailed(true)} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
       ) : (
@@ -159,8 +183,9 @@ function Poster({ row, height, posterH, radius, autoplay, progress }: { row: Hub
       )}
       {autoplay ? <AutoplayLayer hlsUrl={hlsFor(row)} poster={poster} /> : null}
       <span style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}>
-        <GlassDurationBadge seconds={row.duration_seconds ?? null} />
+        {badge === 'solid' ? <SolidDurationBadge seconds={row.duration_seconds} /> : <GlassDurationBadge seconds={row.duration_seconds ?? null} />}
       </span>
+      {children}
       {progress != null ? <WatchProgressBar fraction={progress} /> : null}
     </span>
   );
@@ -180,7 +205,6 @@ export function WatchFeed({
   onOpenComments?: (postId: string) => void;
 }) {
   const { t } = useTranslation('courses');
-  const navigate = useNavigate();
   const [filter, setFilter] = useState<WatchFilter>(initialFilter);
   const [query, setQuery] = useState('');
 
@@ -378,14 +402,39 @@ export function WatchFeed({
     <Section
       title={t('amateur.watch.rail.quick', 'Quick hits')}
       kicker={t('amateur.watch.rail.quickKicker', 'Under 3 min')}
-      /* M.1: no See all on the Quick hits chip; it would point at a worse version of this page. */
-      seeAll={quickGrid ? undefined : t('amateur.watch.seeAll', 'See all')}
-      onSeeAll={quickGrid ? undefined : () => {
+      /* BC.0: See all selects the Quick hits chip in place. Both reads are infinite
+         queries, so the chip view already shows everything there is; a separate page
+         could only show the same clips under another name. Once the chip is active
+         there is nothing left to expand, so there is no See all. */
+      seeAll={filter === 'quick' ? undefined : t('amateur.watch.seeAll', 'See all')}
+      onSeeAll={filter === 'quick' ? undefined : () => {
         analyticsEvents.track('amateur_shelf_see_all', { kind: 'clips', surface: 'watch' });
-        onDepart();
-        navigate('/watch/clips');
+        setFilter('quick');
       }}
     />
+  );
+
+  /* BC.1 — the count is only printed once both reads have reached their end, because
+     only then is the loaded length the total. Until then the line is not shown. */
+  const quickTotalKnown = settled && !clips.hasNextPage && !videos.hasNextPage;
+  const quickHeading = (
+    <>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 9, padding: '16px 16px 2px' }}>
+        <h2 style={{ margin: 0, fontSize: 17, fontWeight: 750, letterSpacing: '-0.01em', color: A.INK }}>
+          {t('amateur.watch.rail.quick', 'Quick hits')}
+        </h2>
+        <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: A.DIM }}>
+          {t('amateur.watch.rail.quickKicker', 'Under 3 min')}
+        </span>
+      </div>
+      {quickTotalKnown && quickRows.length > 0 ? (
+        <div data-watch-count style={{ padding: '2px 16px 12px', fontSize: 11.5, color: COUNT_INK, fontVariantNumeric: 'tabular-nums' }}>
+          {t('amateur.watch.quickCount', '{{count}} clips', { count: quickRows.length })}
+        </div>
+      ) : (
+        <div style={{ height: 12 }} />
+      )}
+    </>
   );
 
   return (
@@ -414,7 +463,14 @@ export function WatchFeed({
         />
       </div>
 
-      <div style={{ paddingInline: 16, paddingBottom: 4 }}>
+      <div
+        style={
+          quickGrid
+            ? /* BC.1 — sticky, opaque chips in the full view only. */
+              { position: 'sticky', top: 'var(--chrome-total-h, 0px)', zIndex: 3, background: PAGE_CANVAS, paddingInline: 16, paddingBlock: '8px 6px' }
+            : { paddingInline: 16, paddingBottom: 4 }
+        }
+      >
         <RailChips
           options={chips}
           value={filter}
@@ -463,7 +519,10 @@ export function WatchFeed({
             </>
           ) : null}
 
-          {/* K.3 — QUICK HITS. No badge on the tiles. */}
+          {/* K.3 — QUICK HITS. No badge on the RAIL tiles: under a heading reading UNDER 3 MIN
+              the badge repeats the heading. BC.1 overrules this FOR THE GRID ONLY: in the full
+              view the tiles are the whole screen and duration is what separates them, so grid
+              tiles and the lead carry the solid badge. */}
           {clips.isError && quickRows.length === 0 && showsQuickHits(filter) ? (
             <ShelfRetry
               heading={t('amateur.watch.rail.quick', 'Quick hits')}
@@ -471,10 +530,65 @@ export function WatchFeed({
               action={t('amateur.stream.retry', 'Try again')}
               onRetry={() => void clips.refetch()}
             />
+          ) : quickRows.length > 0 && quickGrid ? (
+            <>
+              {quickHeading}
+              {/* BC.1 — the lead is quickRows[0]; the grid renders quickRows.slice(1), never twice. */}
+              {(() => {
+                const lead = quickRows[0];
+                const who = creatorName(lead);
+                const v = viewsFor(lead);
+                return (
+                  <div style={{ padding: '0 14px 16px' }}>
+                    <button type="button" data-watch-card="quick-lead" onClick={() => open('clip', quickPosts, quickRows, 0)} style={{ ...cardButton, width: '100%' }}>
+                      <Poster row={lead} height={null} aspect="16 / 10" posterH={720} radius={14} autoplay progress={barFor(lead)} badge="solid">
+                        <span
+                          style={{
+                            position: 'absolute', left: 10, top: 10, zIndex: 3, pointerEvents: 'none',
+                            fontSize: 9.5, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase',
+                            color: PAGE_CANVAS, background: A.AMBER, borderRadius: 5, padding: '3px 7px',
+                          }}
+                        >
+                          {t('amateur.watch.playing', 'Playing')}
+                        </span>
+                      </Poster>
+                      <span style={{ marginTop: 10, fontSize: 16, fontWeight: 700, lineHeight: 1.26, color: A.INK }}>
+                        {videoTitle(lead, t('amateur.watch.untitled', 'Untitled video'))}
+                      </span>
+                      {who || v ? (
+                        <span style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.DIM }}>{[who, v].filter(Boolean).join(' \u00B7 ')}</span>
+                      ) : null}
+                    </button>
+                  </div>
+                );
+              })()}
+              <div data-watch-grid="quick" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, alignItems: 'start', padding: '0 14px' }}>
+                {quickRows.slice(1).map((row, i) => {
+                  const index = i + 1;
+                  const who = creatorName(row);
+                  const v = viewsFor(row);
+                  return (
+                    <button key={`qh:${row.post_id}`} type="button" data-watch-card="quick" onClick={() => open('clip', quickPosts, quickRows, index)} style={{ ...cardButton, width: '100%', minWidth: 0 }}>
+                      {/* N.2: no autoplay in a 3-across grid; only the lead plays. */}
+                      <Poster row={row} height={null} aspect="126 / 224" posterH={480} radius={12} autoplay={false} progress={barFor(row)} badge="solid" />
+                      <span style={{ ...clamp2, marginTop: 7, fontSize: 12.5, fontWeight: 600, lineHeight: 1.32 }}>
+                        {videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}
+                      </span>
+                      {/* N.1: at grid width the joined line truncated the views away; split it, grid only. */}
+                      {who ? <span data-watch-sub="creator" style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.DIM }}>{who}</span> : null}
+                      {v ? <span data-watch-sub="views" style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.DIM }}>{v}</span> : null}
+                      {onYourCourse(row) && row.course_name ? (
+                        <span style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.AMBER }}>{row.course_name}</span>
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
           ) : quickRows.length > 0 ? (
             <>
               {quickSection}
-              <QuickLayout grid={quickGrid}>
+              <QuickLayout grid={false}>
                 {quickRows.map((row, index) => {
                   const who = creatorName(row);
                   const v = viewsFor(row);
@@ -507,7 +621,7 @@ export function WatchFeed({
                will once loaded — the skeleton then holds the tiles' place and nothing shifts.
                A settled chip with no rows renders no heading (falls to null below). */
             <>
-              {quickSection}
+              {quickGrid ? quickHeading : quickSection}
               {quickGrid ? <GridShell inset={INSET} radius={12} /> : <ShelfShell tileW={QH_W} tileH={QH_H} heading={false} />}
             </>
           ) : null}
