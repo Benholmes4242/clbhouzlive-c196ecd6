@@ -8,7 +8,7 @@ import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useBatchCourseImages } from '../../hooks/useBatchCourseImages';
 import { PhotoBand, type HeroLeaderTrio, type OverviewCountdownUnit } from './HybridHeroBands/PhotoBand';
 import { countInWords } from './overviewTokens';
-import { detectTopTie, fmtScore, isChampionResolvable, isInPlayState, roundsFromSchedule, type HeroState } from './HybridHero.utils';
+import { detectTopTie, fmtScore, isChampionResolvable, isInPlayState, type HeroState } from './HybridHero.utils';
 import type { BoardEntry } from '../../leaderboard/BoardTable';
 import { OVERVIEW_PHOTO_BAND_HEIGHT } from './HybridHero.constants';
 import { ChampionStrip } from './HybridHeroBands/ChampionStrip';
@@ -198,10 +198,11 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
   const situation = showSituation
     ? tournamentHeadlineSegments({ tournament, state, leaderboard: rows, t })
     : null;
-  // Completed: ONE sentence, inside the champion strip — the stored narrative,
-  // else the generator's results sentence. Never both.
-  const championNarrative = champion
-    ? tournament.championNarrative?.trim() || tournamentHeadline({ tournament, state, leaderboard: rows, t, closingRound: champion.closingRound })
+  // Completed: ONE sentence, inside the champion strip, composed from THIS
+  // event's leaderboard only (BRIEF_TOUR_CHAMPION_TRUTH X.1). A sentence that
+  // states a score must be derived from the score, never asked for.
+  const championSentence = champion
+    ? tournamentHeadline({ tournament, state, leaderboard: rows, t, closingRound: champion.closingRound })
     : null;
 
   const startDay = tournament.startDate
@@ -232,9 +233,7 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
           scoreLabel={overviewChampionScoreLabel(champion.playoff, champion.margin, t)}
           eyebrow={t('overview.hero.champion')}
           avatarUrl={championAvatarUrl}
-          narrative={championNarrative}
-          rounds={champion.rounds}
-          totalRounds={roundsFromSchedule(tournament.startDate, tournament.endDate)}
+          narrative={championSentence}
           country={champion.country}
         />
       ) : null}

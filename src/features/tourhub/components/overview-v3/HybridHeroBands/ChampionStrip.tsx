@@ -21,7 +21,6 @@ import type { LucideIcon } from 'lucide-react';
 import { GOLD, NUMERIC_STYLE, STRIP_HEIGHT } from '../HybridHero.constants';
 import { CHAMPION_STRIP_WASH, SURFACE, WHITE_ALPHA_06, WHITE_ALPHA_65 } from '../../../_shared/tokens';
 import { getScoreColor } from '../../../_shared/scoreColor';
-import { TrajectorySparkline } from './TrajectorySparkline';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import CountryFlag from '@/components/ui/country-flag';
 
@@ -36,10 +35,6 @@ interface ChampionStripProps {
   eyebrowIcon?: LucideIcon;
   /** Optional avatar URL — when missing, render a gradient placeholder */
   avatarUrl?: string | null;
-  /** Per-round TO-PAR figures (round_N) for the winner's trajectory sparkline — not strokes. */
-  rounds?: number[];
-  /** Event round count, from roundsFromSchedule — the one derivation. */
-  totalRounds?: number;
   /** Pass 5.5: italic editorial narrative beneath the name. */
   narrative?: string | null;
 }
@@ -65,8 +60,6 @@ export function ChampionStrip({
   eyebrow,
   eyebrowIcon: EyebrowIcon = Trophy,
   avatarUrl,
-  rounds,
-  totalRounds,
   narrative,
 }: ChampionStripProps) {
   const { t } = useTranslation('tourhub');
@@ -131,11 +124,6 @@ export function ChampionStrip({
             {name}
           </div>
         </div>
-        {rounds && rounds.length >= 2 ? (
-          <div style={{ marginRight: 10, display: 'flex', alignItems: 'center' }}>
-            <TrajectorySparkline rounds={rounds} variant="champion" totalRounds={totalRounds} />
-          </div>
-        ) : null}
         <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
           <div
             style={{

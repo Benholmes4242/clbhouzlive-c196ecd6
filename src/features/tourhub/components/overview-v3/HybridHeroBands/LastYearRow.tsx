@@ -24,6 +24,7 @@ import {
   GOLD_DARK,
   NUMERIC_STYLE,
 } from '../HybridHero.constants';
+import { TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 
 interface LastYearRowProps {
   rank: string;
@@ -101,7 +102,9 @@ export function LastYearRow({
           ...NUMERIC_STYLE,
           fontSize: isWinner ? 22 : 16,
           fontWeight: 700,
-          color: isWinner ? GOLD_DARK : INK,
+          // X.4: same rule as the results board — under par red. The champion
+          // row stays amber: it marks who won, not what they shot.
+          color: isWinner ? GOLD_DARK : /^[-−]/.test(score.trim()) ? TOPAR_UNDER_DARK : INK,
           letterSpacing: '-0.02em',
         }}
       >

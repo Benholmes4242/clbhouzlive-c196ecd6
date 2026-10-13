@@ -51,7 +51,6 @@ export interface HeroTournament {
   defendingChampion: string | null;
   defendingChampionPhotoUrl: string | null;
   defendingChampionPgaTourId: string | null;
-  championNarrative: string | null;
   isMajor: boolean;
   isSignature: boolean;
   /** True when this slide is the pseudo-tour major entry (mens or womens). */
@@ -320,7 +319,6 @@ export function useHeroCarouselData() {
           defendingChampion: row.defending_champion || null,
           defendingChampionPhotoUrl: champData?.photo_url ?? null,
           defendingChampionPgaTourId: champData?.pga_tour_id ?? null,
-          championNarrative: row.champion_narrative || null,
           isMajor: contextLabel === 'MAJOR CHAMPIONSHIP' || isAnyMajor(row.name || ''),
           isSignature: contextLabel === 'SIGNATURE EVENT' || contextLabel === 'ROLEX SERIES',
           eventType: row.event_type ?? null,
