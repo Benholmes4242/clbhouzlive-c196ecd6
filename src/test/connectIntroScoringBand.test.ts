@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { wholePercents } from '../ScoringBand';
+import { wholePercents } from '@/components/profile/handicap/whs/connect/ScoringBand';
 
 describe('scoring band percentages', () => {
   it('sums to 100 for a share set that rounds badly', () => {
