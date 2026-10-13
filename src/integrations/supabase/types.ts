@@ -18944,6 +18944,8 @@ export type Database = {
         }[]
       }
       admin_guard: { Args: never; Returns: undefined }
+      admin_is_bot_ua: { Args: { p_ua: string }; Returns: boolean }
+      admin_is_full: { Args: never; Returns: boolean }
       admin_launch_authority: {
         Args: { _body_name: string; _country_id: string }
         Returns: number
@@ -19724,6 +19726,10 @@ export type Database = {
         Args: { p_days?: number; p_user_id: string }
         Returns: Json
       }
+      get_admin_member_behaviour: {
+        Args: { p_days?: number; p_user_id: string }
+        Returns: Json
+      }
       get_admin_member_last_seen: {
         Args: { p_days?: number }
         Returns: {
@@ -19732,6 +19738,16 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_admin_member_overview: { Args: { p_user_id: string }; Returns: Json }
+      get_admin_member_session: {
+        Args: { p_session_id: string; p_user_id: string }
+        Returns: Json
+      }
+      get_admin_member_sessions: {
+        Args: { p_before?: string; p_limit?: number; p_user_id: string }
+        Returns: Json
+      }
+      get_admin_members_overview: { Args: never; Returns: Json }
       get_admin_north_star: { Args: never; Returns: Json }
       get_admin_ops_health: {
         Args: { p_build_id?: string; p_days?: number }
