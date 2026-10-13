@@ -40,7 +40,7 @@ export interface AdminUserRow {
   /** App role from user_roles. Read ONLY by the member sheet's full-admin
    *  "App role" chips (BRIEF_MEMBERS_RADAR 2.3). */
   role: string | null;
-  /** Admin tag: admin_memberships, valid and unexpired. The ONLY source of the
+  /** Admin tag from get_admin_members_overview().members[].admin_role. The ONLY source of the
    *  ADMINS tile, its filter and the role badge. */
   admin_role: string | null;
   last_seen_at: string | null;
