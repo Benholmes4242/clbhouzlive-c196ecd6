@@ -9,6 +9,7 @@ import type { BucketShares } from '@/features/courses/components/holes/analytica
 import { ABOUT_KICKER } from '@/components/courses/course-detail/about/AboutSection';
 import { A, BAR_RADIUS } from '@/features/courses/components/holes/analytical/tokens';
 import { NUM } from './designTokens';
+import { formatNumber } from '@/i18n/format';
 
 const ORDER = ['birdie', 'par', 'bogey', 'double'] as const;
 
@@ -38,12 +39,17 @@ export function wholePercents(shares: number[]): number[] {
   return out;
 }
 
-export const ScoringBand: React.FC<{ shares: BucketShares }> = ({ shares }) => {
+export const ScoringBand: React.FC<{ shares: BucketShares; holesTracked: number }> = ({ shares, holesTracked }) => {
   const { t } = useTranslation('handicap');
   const pcts = wholePercents(ORDER.map((k) => shares[k]));
   return (
     <div style={{ marginTop: 26 }}>
-      <div style={{ ...ABOUT_KICKER, marginBottom: 11 }}>{t('whsConnect.intro.scoresLabel')}</div>
+      {/* Degenerate guard: no "0 holes" label, even though null shares should already prevent it. */}
+      {Number.isFinite(holesTracked) && holesTracked > 0 ? (
+        <div style={{ ...ABOUT_KICKER, marginBottom: 11 }}>
+          {t('whsConnect.intro.scoresVolume', { count: holesTracked, holes: formatNumber(holesTracked) })}
+        </div>
+      ) : null}
       <div aria-hidden="true" style={{ display: 'flex', gap: 2, height: 10 }}>
         {ORDER.map((k) => (
           <span key={k} style={{ flex: shares[k], borderRadius: BAR_RADIUS, background: FILLS[k] }} />
