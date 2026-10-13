@@ -6,6 +6,11 @@ import { adminTheme as t } from '../theme';
  * import one definition. Values with no theme token live here and nowhere else.
  */
 export const RAISED = 'rgba(255,255,255,0.03)';
+export const TRACK = 'rgba(255,255,255,0.08)';
+export const DORMANT_FILL = 'rgba(255,123,114,0.55)';
+export const RADAR_CHART_FILL = 'rgba(255,255,255,0.06)';
+export const RADAR_EVENT_DOT = 'rgba(233,237,243,0.4)';
+export const RADAR_NEVER_EDGE = 'rgba(255,123,114,0.35)';
 /** Echo's suggestion chip in the Inbox: a tint of the brand, never a fill. */
 export const ECHO_GROUND = 'rgba(255,168,58,0.10)';
 export const ECHO_EDGE = 'rgba(255,168,58,0.35)';

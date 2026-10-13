@@ -116,5 +116,5 @@
 - [x] Stage 3 hooks + rules 4–6 + follow-ups.
 - [ ] Stage 4 Member screen — implement Member.html with resolved empty/permission rules; full admins get eight-week counts from paged Sessions, limited admins request no Sessions and keep counters. TOP 100 uses the brief-sanctioned em dash; no new query.
 - [ ] Stage 5 Behaviour screen — implement Behaviour.html and Sessions with resolved empty/permission rules, Stage 3 hooks, server values, London times and merged timelines.
-- Blocker: the brief requires an existing member-targeted admin DM composer, but repository searches find none; consumer profile messaging exists. Await permission to reuse that flow rather than inventing an admin composer. No screens changed; suite not rerun.
+- Message uses normal personal-account 1:1 messaging with blocks respected, composer focus, no automatic send and Back to the same Member screen; no separate composer or database changes.
 - [ ] Verify Stages 4–5 and report exact mock parity, authentication limits and full-suite result; no SQL, migrations or edge-function changes. External/unmanaged Supabase prevents authenticated end-to-end checks.
