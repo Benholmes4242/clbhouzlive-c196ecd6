@@ -19,6 +19,7 @@ import {
   egListFriends,
   EgApiError,
   getPreAuthToken,
+  preAuthExpiry,
   insertHandicapSnapshotIfChanged,
   syncProfileHandicapIndex,
   upsertScores,
@@ -44,22 +45,17 @@ import {
  * expiry check is the real gate. The "not a JWT / no exp → usable" branch is a
  * safety fallback only; nothing relies on it.
  */
+/* SWEEP MARGIN. Deliberately wider than eg-api.ts's PREAUTH_EXPIRY_MARGIN_MS:
+   the opening guard runs before any connection, so it needs room for the
+   token not to die between the guard and the first connection's request.
+   Two margins over ONE decoder (preAuthExpiry) is correct; two decoders is not. */
 const TOKEN_EXPIRY_MARGIN_S = 120;
 function preAuthTokenProblem(): { reason: "missing" | "expired"; expiredAt?: string } | null {
   const tok = Deno.env.get("EG_PREAUTH_TOKEN");
   if (!tok || !tok.trim()) return { reason: "missing" };
-  const raw = tok.trim().replace(/^Bearer\s+/i, "");
-  const parts = raw.split(".");
-  if (parts.length !== 3) return null;
-  try {
-    const b64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-    const payload = JSON.parse(atob(b64 + "=".repeat((4 - (b64.length % 4)) % 4)));
-    const exp = typeof payload?.exp === "number" ? payload.exp : null;
-    if (exp != null && exp - TOKEN_EXPIRY_MARGIN_S <= Date.now() / 1000) {
-      return { reason: "expired", expiredAt: new Date(exp * 1000).toISOString() };
-    }
-  } catch {
-    return null;
+  const expiresAt = preAuthExpiry(tok);
+  if (expiresAt != null && expiresAt - TOKEN_EXPIRY_MARGIN_S * 1000 <= Date.now()) {
+    return { reason: "expired", expiredAt: new Date(expiresAt).toISOString() };
   }
   return null;
 }
@@ -718,13 +714,17 @@ Deno.serve(async (req) => {
     }
 
     if (summary.skippedPreauthExpired > 0) {
-      console.error(`[sync-due ${runId}] PREAUTH LAPSED — EG_PREAUTH_TOKEN expired mid-sweep; ${summary.skippedPreauthExpired} connection(s) skipped untouched. Health board will still read green: refresh the token.`);
+      console.error(`[sync-due ${runId}] PREAUTH LAPSED DURING SWEEP — EG_PREAUTH_TOKEN expired after the opening guard passed; ${summary.skippedPreauthExpired} connection(s) skipped untouched.`);
     }
     logSummary();
     await recordRun(admin, {
       run_id: runId,
       at: new Date().toISOString(),
-      outcome: "ran",
+      // A mid-sweep lapse records the same outcome the opening guard writes,
+      // keeping what did complete alongside it.
+      ...(summary.skippedPreauthExpired > 0
+        ? { outcome: "token_unavailable", reason: "expired", skipped_preauth_expired: summary.skippedPreauthExpired }
+        : { outcome: "ran" }),
       attempted: summary.attempted,
       succeeded: summary.succeeded,
       partial: summary.partial,

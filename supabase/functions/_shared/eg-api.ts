@@ -101,6 +101,10 @@ export function getPreAuthToken(): string {
   return tok;
 }
 
+/* CALL-SITE MARGIN. Deliberately tighter than sync-whs-due's
+   TOKEN_EXPIRY_MARGIN_S: by the time this runs the EG request is imminent, so
+   60s is enough to stop a token dying in flight. The two margins share ONE
+   decoder (preAuthExpiry) and that is intentional. */
 const PREAUTH_EXPIRY_MARGIN_MS = 60_000;
 
 /**
@@ -108,9 +112,11 @@ const PREAUTH_EXPIRY_MARGIN_MS = 60_000;
  *   1. the token is a three-part JWT whose payload carries a numeric `exp`;
  *   2. otherwise EG_PREAUTH_EXPIRES_AT, if set to a parseable RFC3339 timestamp;
  *   3. otherwise null — behave exactly as before.
+ * THE ONE place the token's expiry is established. Takes no view on margin:
+ * callers apply their own.
  * NEVER inferred from a 401: a 401 cannot tell our token from their password.
  */
-function preAuthExpiry(tok: string): number | null {
+export function preAuthExpiry(tok: string): number | null {
   const parts = tok.trim().replace(/^Bearer\s+/i, "").split(".");
   if (parts.length === 3) {
     try {
