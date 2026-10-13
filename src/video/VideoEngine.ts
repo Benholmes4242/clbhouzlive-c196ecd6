@@ -14,6 +14,7 @@
  * elements.
  */
 
+import { LaneVideoTracker } from './videoAnalytics';
 import Hls, { type HlsConfig } from 'hls.js';
 import {
   ABR_MAX_KBPS,
