@@ -3,16 +3,16 @@
  * overall line. Mounted on the courses list card, the Course tab and the
  * Reviews tab. Same numbers, one treatment.
  *
- *   bar     3px, BAR_RADIUS, A.TRACK track, fill (value / 10) * 100% clamped
- *   figure  17 / 700 / -0.02em, courseSubScoreTone(value)
- *   label   9 / 700 / 0.09em / uppercase / A.DIM, beneath the figure
+ *   grid4   no bar; centred figure then label (pairs keeps its 8px bars)
+ *   figure  16 / 700 / -0.02em, courseSubScoreTone(value)
+ *   label   9 / 700 / 0.09em / uppercase / A.DIM, 6px beneath the figure
  *   columns four equal, 12px gap
  *
  * An absent category renders an EMPTY column — never a zero, never a dash.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { A, SANS, FIGS, BAR_RADIUS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 
 export interface CategoryScoreValues {

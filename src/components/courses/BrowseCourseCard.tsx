@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -63,7 +62,6 @@ export function BrowseCourseCard({
       : row.avg_to_par < 0
         ? `−${Math.abs(row.avg_to_par).toFixed(1)}`
         : null;
-  const { t } = useTranslation('courses');
   const fig: React.CSSProperties = { ...FIGS, color: A.INK, fontSize: 14, fontWeight: 700, letterSpacing: '-0.04em' };
   /* Comparison only at the ends of the field (>=80 harder, <=20 easier).
      "Easier" uses 100 - pct: the complement absorbs ties, immaterial at whole
