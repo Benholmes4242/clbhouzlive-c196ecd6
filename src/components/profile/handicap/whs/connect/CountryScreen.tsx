@@ -74,7 +74,6 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
           alignItems: 'center',
           gap: 12,
           padding: '13px 0',
-          borderBottom: isLast ? undefined : `1px solid ${BORDER}`,
           textAlign: 'left',
           background: 'none',
           border: 0,
