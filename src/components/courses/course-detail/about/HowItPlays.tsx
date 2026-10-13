@@ -174,7 +174,7 @@ const Sentence: React.FC<{ children: React.ReactNode; quiet?: boolean }> = ({ ch
 
 
 /** §4 — the pooled-round threshold below which no course picture is drawn. */
-const MIN_ROUNDS = 20;
+export const MIN_ROUNDS = 20;
 
 interface HowItPlaysProps {
   courseId: string;
