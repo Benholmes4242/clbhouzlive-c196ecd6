@@ -20,7 +20,11 @@ import DetailDrawer from '../components/DetailDrawer';
 import ConfirmDialog from '../components/ConfirmDialog';
 import AdminErrorState from '../components/AdminErrorState';
 import AdminSheet from '../components/AdminSheet';
-import { useUsers, type AdminUserRow, type UserFilterStatus, type AdminUserDetail } from '../hooks/useUsers';
+import { useAdminUserDetail, type AdminUserDetail } from '../hooks/useUsers';
+import { useMembersOverview, type MembersOverview } from '../hooks/useMembersRadar';
+import MembersList, { MembersAvatar } from '../components/MembersList';
+import { Skeleton } from '../lib/chartPrimitives';
+import { londonDate } from '../lib/memberRadarDisplay';
 import { useTeam, type TeamMember } from '../hooks/useTeam';
 import { useInvites, type InviteRow } from '../hooks/useInvites';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
@@ -28,8 +32,6 @@ import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import { useCreateAdminActionRequest } from '../hooks/useAdminActionRequests';
 import MemberRadar from '../components/MemberRadar';
-
-type TabId = 'members' | 'team' | 'invites';
 
 const LABEL_T = { ...LABEL, fontFeatureSettings: '"kern" 1, "liga" 1' } as const;
 const FIG_T = { fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums' } as const;
@@ -53,286 +55,51 @@ function adminRoleLabel(role: string | null | undefined): string | null {
   return null;
 }
 
-/** Top-level view switch. Not a filter — active state is ink, like every other
- * active control in the console. SectionTabs stays untouched for its other
- * four consumers. */
-function TopTabs({ tabs, activeId, onChange }: {
-  tabs: Array<{ id: TabId; label: string; count?: number }>;
-  activeId: string;
-  onChange: (id: string) => void;
-}) {
-  return (
-    <div style={{ display: 'flex', gap: 8, padding: '4px 2px', flexWrap: 'wrap' }}>
-      {tabs.map(tab => {
-        const active = tab.id === activeId;
-        return (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => onChange(tab.id)}
-            style={{
-              padding: '8px 14px', borderRadius: 999,
-              border: `1px solid ${active ? t.ink : t.line}`,
-              background: active ? t.ink : t.surface,
-              color: active ? t.canvas : t.inkMuted,
-              fontSize: 13, fontWeight: 600, cursor: 'pointer',
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {tab.label}
-            {typeof tab.count === 'number' && (
-              <span style={{
-                ...FIG_T, background: active ? t.canvas : t.line,
-                color: active ? t.ink : t.inkMuted,
-                fontSize: 11, padding: '0 6px', borderRadius: 999,
-                minWidth: 18, textAlign: 'center',
-              }}>
-                {tab.count}
-              </span>
-            )}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 /**
- * MembersPage (D4). Route stays /admin-v2/users; edge-function emails deep
- * link here. Tabs: Members / Team / Invites. Members = roster + Member 360
- * bottom sheet with a ?member= deep link.
+ * Members list (BRIEF_MEMBERS_LIST_REBUILD, Main.html). Route stays
+ * /admin-v2/users; ?member= opens the Member screen; ?filter= holds the chip.
+ * All list data is get_admin_members_overview. Team and invites sit in one
+ * panel below, full admins only.
  */
 export default function UsersPage() {
   const [params, setParams] = useSearchParams();
   const { role } = usePanelRole();
-  const caps = panelCan(role);
-  const isFullAdmin = caps.manageAdmins;
-
-  // Legacy ?tab=all is mapped to the new "members" tab.
-  const rawTab = (params.get('tab') as string | null) ?? 'members';
-  const tab: TabId = rawTab === 'all' ? 'members'
-    : rawTab === 'team' || rawTab === 'invites' ? rawTab
-    : 'members';
-
-  const setTab = (id: string) => {
-    const next = new URLSearchParams(params);
-    next.set('tab', id);
-    setParams(next, { replace: true });
-  };
-
-  const invites = useInvites();
-
-  const tabs = useMemo(() => {
-    const base: Array<{ id: TabId; label: string; count?: number }> = [
-      { id: 'members', label: 'Members' },
-    ];
-    if (isFullAdmin) {
-      base.push({ id: 'team', label: 'Team & Roles' });
-      base.push({ id: 'invites', label: 'Invites', count: invites.counts.pending || undefined });
-    }
-    return base;
-  }, [invites.counts.pending, isFullAdmin]);
-
-  useEffect(() => {
-    const handler = () => { invites.refetch(); };
-    window.addEventListener('admin-v2:refetch', handler);
-    return () => window.removeEventListener('admin-v2:refetch', handler);
-  }, [invites]);
-
-  const effectiveTab: TabId =
-    !isFullAdmin && (tab === 'team' || tab === 'invites') ? 'members' : tab;
-
-  return (
-    <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 1180, margin: '0 auto' }}>
-      <TopTabs tabs={tabs} activeId={effectiveTab} onChange={setTab} />
-      {effectiveTab === 'members' && <MembersTab />}
-      {effectiveTab === 'team' && isFullAdmin && <TeamTab />}
-      {effectiveTab === 'invites' && isFullAdmin && <InvitesTab />}
-    </div>
-  );
-}
-
-/* ─────────────────────── Members (roster) ─────────────────────── */
-
-const LEGACY_FILTER_VALUES = new Set(['unverified', 'new_today']);
-const VALID_FILTERS: UserFilterStatus[] = [
-  'all', 'new_this_week', 'active_24h', 'dormant_14d', 'eg_issues', 'suspended', 'verified', 'admin',
-  // Handicap connection. Deep-link only: the cohort board is unchanged, these
-  // arrive from the Dashboard's Activation panel.
-  'connected', 'not_connected',
-];
-
-/** Labels for filters that have no cohort tile of their own. */
-const EXTRA_FILTER_LABELS: Partial<Record<UserFilterStatus, string>> = {
-  connected:     'Handicap connected',
-  not_connected: 'No handicap connected',
-};
-
-function MembersTab() {
-  const [params, setParams] = useSearchParams();
-  const {
-    users, filteredCount, allCount, isLoading, refetch,
-    search, setSearch, filter, setFilter, counts,
-    page, setPage, pageSize,
-    drawerUserId, setDrawerUserId, userDetail, detailLoading, detailError, refetchDetail,
-    updateRole, roleUpdating,
-  } = useUsers();
-
-  const [searchInput, setSearchInput] = useState(search);
-  const debounced = useDebouncedValue(searchInput, 220);
-  useEffect(() => { setSearch(debounced); }, [debounced]); // eslint-disable-line
-
-  useEffect(() => {
-    const handler = () => refetch();
-    window.addEventListener('admin-v2:refetch', handler);
-    return () => window.removeEventListener('admin-v2:refetch', handler);
-  }, [refetch]);
-
-  // URL <-> filter binding. Legacy verified/unverified/new_today are silently
-  // remapped to All so old deep links keep working.
-  useEffect(() => {
-    const raw = params.get('filter');
-    if (!raw) {
-      if (filter !== 'all') setFilter('all');
-      return;
-    }
-    if (LEGACY_FILTER_VALUES.has(raw)) {
-      if (filter !== 'all') setFilter('all');
-      return;
-    }
-    const next = VALID_FILTERS.find(v => v === raw) ?? 'all';
-    if (next !== filter) setFilter(next);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
-
-  const updateFilterUrl = (id: UserFilterStatus) => {
-    setFilter(id);
-    const next = new URLSearchParams(params);
-    if (id === 'all') next.delete('filter');
-    else next.set('filter', id);
-    setParams(next, { replace: true });
-  };
-
-  // ?member= deep link (matches the Inbox ?ticket= pattern).
-  useEffect(() => {
-    const member = params.get('member');
-    if (member && member !== drawerUserId) setDrawerUserId(member);
-    if (!member && drawerUserId) setDrawerUserId(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
+  const isFullAdmin = panelCan(role).manageAdmins;
+  const overview = useMembersOverview();
+  const drawerUserId = params.get('member');
+  const { userDetail, detailLoading, detailError, refetchDetail, updateRole, roleUpdating } =
+    useAdminUserDetail(drawerUserId);
 
   const openMember = (id: string) => {
     const next = new URLSearchParams(params);
     next.set('member', id);
     setParams(next, { replace: true });
-    setDrawerUserId(id);
   };
   const closeMember = () => {
     const next = new URLSearchParams(params);
     next.delete('member');
     setParams(next, { replace: true });
-    setDrawerUserId(null);
   };
 
-  // Cohort board. No 'all' tile: the roster defaults to all members and a tile
-  // deselects on a second tap. 'all' stays a valid ?filter= value.
-  const cohorts: { id: Exclude<UserFilterStatus, 'all'>; label: string; count: number }[] = [
-    { id: 'new_this_week', label: 'New this week',  count: counts.new_this_week },
-    { id: 'active_24h',    label: 'Active 24h',     count: counts.active_24h },
-    { id: 'dormant_14d',   label: 'Dormant 14d+',   count: counts.dormant_14d },
-    { id: 'eg_issues',     label: 'EG issues',      count: counts.eg_issues },
-    { id: 'suspended',     label: 'Suspended',      count: counts.suspended },
-    { id: 'verified',      label: 'Verified',       count: counts.verified },
-    { id: 'admin',         label: 'Admins',         count: counts.admin },
-  ];
-  const activeCohortLabel =
-    cohorts.find(c => c.id === filter)?.label ?? EXTRA_FILTER_LABELS[filter] ?? 'All members';
-
-  const totalPages = Math.max(1, Math.ceil(filteredCount / pageSize));
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {/* Search */}
-      <div style={{ position: 'relative' }}>
-        <Search size={16} style={{ position: 'absolute', left: 12, top: 12, color: t.inkFaint }} />
-        <input
-          value={searchInput}
-          onChange={e => setSearchInput(e.target.value)}
-          placeholder="Search name, username, email, club"
-          style={{
-            width: '100%', padding: '10px 12px 10px 36px',
-            borderRadius: t.radius.md,
-            border: `1px solid ${t.line}`,
-            background: t.surface, color: t.ink, fontSize: 14, outline: 'none',
-          }}
-        />
-      </div>
-
-      {/* Cohort board — two columns; labels are too long for three at 390px */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
-        {cohorts.map(c => (
-          <CohortTile
-            key={c.id}
-            label={c.label}
-            count={c.count}
-            share={allCount > 0 ? c.count / allCount : 0}
-            active={filter === c.id}
-            onClick={() => updateFilterUrl(filter === c.id ? 'all' : c.id)}
-          />
-        ))}
-      </div>
-
-      {/* Roster list card with caption */}
-      <div style={{
-        background: t.surface, border: `1px solid ${t.line}`,
-        borderRadius: 18, overflow: 'hidden',
-      }}>
-        <div style={{
-          padding: '10px 14px', borderBottom: `1px solid ${t.line}`,
-          display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10,
-        }}>
-          <span style={{ ...LABEL_T, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {activeCohortLabel}
-          </span>
-          <span style={{ ...LABEL_T, color: t.inkFaint, flexShrink: 0 }}>
-            Index · last seen
-          </span>
-        </div>
-        {isLoading ? (
-          <SkeletonCards />
-        ) : users.length === 0 ? (
-          <EmptyState title="No members match" subtitle={search ? `for "${search}"` : undefined} />
-        ) : (
-          <div>
-            {users.map((u, i) => (
-              <RosterRow
-                key={u.id}
-                user={u}
-                divider={i > 0}
-                onOpen={() => openMember(u.id)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Pagination */}
-      {filteredCount > pageSize && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4, gap: 8, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 12, color: t.inkMuted, fontVariantNumeric: 'tabular-nums' }}>
-            {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, filteredCount)} of {filteredCount.toLocaleString()} ({allCount.toLocaleString()} total)
-          </span>
-          <div style={{ display: 'flex', gap: 6 }}>
-            <PagerBtn disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Prev</PagerBtn>
-            <span style={{ fontSize: 13, color: t.ink, padding: '6px 4px', fontVariantNumeric: 'tabular-nums' }}>
-              {page} / {totalPages}
-            </span>
-            <PagerBtn disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Next</PagerBtn>
-          </div>
-        </div>
+    <div
+      style={{
+        padding: '0 12px 24px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10,
+        maxWidth: 1180,
+        margin: '0 auto',
+        color: t.ink,
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      {overview.error ? (
+        <AdminErrorState onRetry={() => overview.refetch()} />
+      ) : (
+        <MembersList overview={overview.data} loading={overview.isPending} onOpenMember={openMember} />
       )}
-
+      {isFullAdmin && <TeamPanel overview={overview.data} loading={overview.isPending} />}
       <Member360Sheet
         userId={drawerUserId}
         detail={userDetail ?? null}
@@ -344,142 +111,6 @@ function MembersTab() {
         roleUpdating={roleUpdating}
       />
     </div>
-  );
-}
-
-/* ─────────────────────── Cohort tile ─────────────────────── */
-
-/**
- * Proportion bar = the cohort's share of allCount (never of the filtered set or
- * of the page). The bar states the proportion and the figure states the count;
- * a percentage would be a third statement of the same fact.
- */
-function CohortTile({ label, count, share, active, onClick }: {
-  label: string; count: number; share: number; active: boolean; onClick: () => void;
-}) {
-  const empty = count === 0;
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      style={{
-        display: 'flex', flexDirection: 'column', gap: 8,
-        padding: '8px 10px 10px',
-        borderRadius: t.radius.lg,
-        background: active ? t.neutralSoft : t.surface,
-        border: `1px solid ${active ? t.line : t.hairline}`,
-        cursor: 'pointer', textAlign: 'left',
-        opacity: empty ? 0.55 : 1,
-        minWidth: 0,
-      }}
-    >
-      <span aria-hidden style={{ height: 2.5, borderRadius: 2, width: '100%', background: t.line, overflow: 'hidden' }}>
-        <span style={{
-          display: 'block', height: '100%', borderRadius: 2,
-          width: `${Math.min(100, Math.max(0, share * 100))}%`,
-          background: t.brand,
-        }} />
-      </span>
-      <span style={{
-        ...LABEL_T, color: t.inkMuted,
-        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%',
-      }}>
-        {label}
-      </span>
-      <span style={{ ...FIG_T, fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: t.ink }}>
-        {count}
-      </span>
-    </button>
-  );
-}
-
-/* ─────────────────────── Roster row ─────────────────────── */
-
-function RosterRow({ user, onOpen, divider }: { user: AdminUserRow; onOpen: () => void; divider: boolean }) {
-  const isNew = Date.now() - new Date(user.created_at).getTime() < 7 * 86400_000;
-  const role = adminRoleLabel(user.admin_role);
-  const hcp = user.handicap_index;
-  return (
-    <button
-      onClick={onOpen}
-      style={{
-        width: '100%', textAlign: 'left',
-        background: 'transparent',
-        borderTop: divider ? `1px solid ${t.line}` : 'none',
-        borderLeft: 'none', borderRight: 'none', borderBottom: 'none',
-        padding: '12px 14px',
-        display: 'flex', gap: 12, alignItems: 'center',
-        cursor: 'pointer',
-      }}
-    >
-      <SquircleAvatar size={38} src={user.avatar_url} alt={user.display_name ?? ''} userId={user.id} hairlineRing />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-          <span style={{
-            color: t.ink, fontSize: 14, fontWeight: 700,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}>
-            {user.display_name ?? user.username ?? '-'}
-          </span>
-          {user.is_suspended && (
-            <span style={{ ...LABEL_T, color: t.danger, flexShrink: 0 }}>Suspended</span>
-          )}
-          {isNew && !user.is_suspended && (
-            <span style={{ ...LABEL_T, color: t.ok, flexShrink: 0 }}>New</span>
-          )}
-          {role && (
-            <span style={{ ...LABEL_T, color: t.brandText, flexShrink: 0 }}>{role}</span>
-          )}
-        </div>
-        <div style={{
-          color: t.inkMuted, fontSize: 12, marginTop: 2,
-          display: 'flex', alignItems: 'center', gap: 5,
-          overflow: 'hidden', whiteSpace: 'nowrap',
-        }}>
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {user.username ? `@${user.username}` : ''}
-          </span>
-          {user.home_club && (
-            <>
-              {user.username && <span style={{ flexShrink: 0 }}>·</span>}
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.home_club}</span>
-            </>
-          )}
-        </div>
-      </div>
-      <div style={{
-        flexShrink: 0, minWidth: 52, textAlign: 'right',
-        display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2,
-      }}>
-        {hcp === null || hcp === undefined ? (
-          <span style={{ ...FIG_T, fontSize: 13.5, fontWeight: 700, color: t.inkFaint }}>—</span>
-        ) : (
-          <span style={{ ...FIG_T, fontSize: 13.5, fontWeight: 700, color: t.ink }}>{hcp.toFixed(1)}</span>
-        )}
-        <span style={{ ...AGE_T, color: ageTone(user.last_seen_at) }}>
-          {formatAgo(user.last_seen_at, { empty: '-' })}
-        </span>
-      </div>
-    </button>
-  );
-}
-
-function PagerBtn({ children, ...rest }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  return (
-    <button
-      {...rest}
-      style={{
-        padding: '6px 12px', borderRadius: t.radius.md,
-        border: `1px solid ${t.line}`,
-        background: rest.disabled ? t.canvas : t.surface,
-        color: rest.disabled ? t.inkFaint : t.ink,
-        fontSize: 12, fontWeight: 600,
-        cursor: rest.disabled ? 'not-allowed' : 'pointer',
-      }}
-    >
-      {children}
-    </button>
   );
 }
 
@@ -1106,21 +737,44 @@ function DrawerBtn({
 
 /* ─────────────────────── Team & Roles (unchanged) ─────────────────────── */
 
-function TeamTab() {
+/* ─────────────────────── Team (Main.html) ─────────────────────── */
+
+interface InviteCandidate {
+  id: string;
+  display_name: string | null;
+  username: string | null;
+  avatar_url: string | null;
+}
+
+const TEAM_ROW: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '30px minmax(0,1fr) auto',
+  columnGap: 10,
+  alignItems: 'center',
+  padding: '10px 16px',
+  borderTop: `1px solid ${t.hairline}`,
+};
+
+/** Rows are overview.team then overview.invites. Invites for anyone already on
+ * the team are dropped, so a person appears once. */
+function TeamPanel({ overview, loading }: { overview: MembersOverview | undefined; loading: boolean }) {
   const team = useTeam();
-  const [confirm, setConfirm] = useState<TeamMember | null>(null);
+  const invites = useInvites();
+  const [showCreate, setShowCreate] = useState(false);
+  const [confirm, setConfirm] = useState<{ userId: string; name: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    const handler = () => team.refetch();
-    window.addEventListener('admin-v2:refetch', handler);
-    return () => window.removeEventListener('admin-v2:refetch', handler);
-  }, [team]);
-
-  if (team.isLoading) return <SkeletonCards />;
-  if (!team.data.length) {
-    return <EmptyState title="No team members" subtitle="Grant admin access via the Invites tab." />;
-  }
+  const teamRows = overview?.team ?? [];
+  const teamNames = new Set(teamRows.map(r => r.display_name).filter(Boolean));
+  // useInvites already removes invitees with access; it carries the user id the
+  // overview invite row does not.
+  const liveInviteIds = new Set(invites.data.filter(i => !i.acceptedAt).map(i => i.id));
+  const inviteRows = (overview?.invites ?? []).filter(
+    i => (invites.isLoading || liveInviteIds.has(i.id)) && !(i.display_name && teamNames.has(i.display_name)),
+  );
+  const candidates: InviteCandidate[] = (overview?.members ?? [])
+    .filter(m => !m.admin_role)
+    .map(m => ({ id: m.user_id, display_name: m.display_name, username: m.username, avatar_url: m.photo_url }));
 
   const onConfirmRevoke = async () => {
     if (!confirm) return;
@@ -1128,19 +782,126 @@ function TeamTab() {
     try {
       await team.revoke.mutateAsync(confirm.userId);
       setConfirm(null);
-    } finally { setBusy(false); }
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      {team.data.map(m => <TeamCard key={m.userId} member={m} hook={team} onRevoke={() => setConfirm(m)} />)}
+    <div style={{ background: t.surface, borderRadius: 16, padding: '14px 0 4px' }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '0 16px 10px' }}>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Team</span>
+        <button
+          type="button"
+          onClick={() => setShowCreate(true)}
+          style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 12, fontWeight: 700, color: t.brandText, cursor: 'pointer' }}
+        >
+          Invite
+        </button>
+      </div>
+
+      {loading
+        ? Array.from({ length: 2 }, (_, i) => (
+            <div key={i} style={TEAM_ROW}>
+              <Skeleton height={30} radius={9} />
+              <span style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <Skeleton height={16} radius={3} />
+                <Skeleton height={13} radius={3} />
+              </span>
+              <span style={{ width: 44 }}><Skeleton height={22} radius={999} /></span>
+            </div>
+          ))
+        : (
+          <>
+            {teamRows.map(r => {
+              const full = r.role === 'full';
+              const name = r.display_name ?? 'Member';
+              const since = `since ${londonDate(r.granted_at, { month: 'short', year: 'numeric' })}`;
+              const addedBy = r.granted_by_name && r.granted_by_name !== r.display_name ? ` · added by ${r.granted_by_name}` : '';
+              const member = team.data.find(m => m.userId === r.user_id);
+              return (
+                <div key={r.user_id} style={TEAM_ROW}>
+                  <MembersAvatar id={r.user_id} name={name} photo={r.photo_url} size={30} radius={9} font={10.5} />
+                  <span style={{ minWidth: 0 }}>
+                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 600 }}>{name}</span>
+                    <span style={{ display: 'block', fontSize: 11, color: t.inkFaint }}>{since}{addedBy}</span>
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 800,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        padding: '4px 8px',
+                        borderRadius: 999,
+                        background: full ? t.okSoft : t.neutralSoft,
+                        color: full ? t.okText : t.inkMuted,
+                      }}
+                    >
+                      {adminRoleLabel(r.role) ?? r.role}
+                    </span>
+                    {member && <TeamMenu member={member} hook={team} onRevoke={() => setConfirm({ userId: r.user_id, name })} />}
+                  </span>
+                </div>
+              );
+            })}
+            {inviteRows.map(i => {
+              const name = i.display_name ?? i.email ?? 'Invite';
+              const status = i.expired
+                ? `Invite expired ${formatAgo(i.expires_at, { suffix: true })}`
+                : `Invite sent ${formatAgo(i.created_at, { suffix: true })}`;
+              const role = i.role ? ` · ${(adminRoleLabel(i.role) ?? i.role).toLowerCase()}` : '';
+              return (
+                <div key={i.id} style={TEAM_ROW}>
+                  <MembersAvatar id={i.id} name={name} photo={null} size={30} radius={9} font={10.5} />
+                  <span style={{ minWidth: 0 }}>
+                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 600 }}>{name}</span>
+                    <span style={{ display: 'block', fontSize: 11, color: t.warnText }}>{status}{role}</span>
+                  </span>
+                  <button
+                    type="button"
+                    disabled={invites.resend.isPending}
+                    onClick={() => invites.resend.mutate(i.id)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      height: 30,
+                      padding: '0 12px',
+                      borderRadius: 999,
+                      border: `1px solid ${t.line}`,
+                      background: 'transparent',
+                      color: t.ink,
+                      fontSize: 11.5,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Re-invite
+                  </button>
+                </div>
+              );
+            })}
+          </>
+        )}
+
+      <CreateInviteDrawer
+        open={showCreate}
+        onClose={() => setShowCreate(false)}
+        users={candidates}
+        usersLoading={loading}
+        onCreate={(invitedUserId, role) =>
+          invites.create.mutate({ invitedUserId, role }, { onSuccess: () => setShowCreate(false) })
+        }
+        creating={invites.create.isPending}
+      />
       <ConfirmDialog
         open={!!confirm}
         onClose={() => setConfirm(null)}
         onConfirm={onConfirmRevoke}
-        title={`Revoke admin access?`}
-        description={`This will remove admin access for ${confirm?.displayName ?? confirm?.username ?? 'this user'}.`}
-        requireText={confirm?.username || confirm?.displayName || 'REVOKE'}
+        title="Revoke admin access?"
+        description={`This will remove admin access for ${confirm?.name ?? 'this user'}.`}
+        requireText={confirm?.name || 'REVOKE'}
         confirmLabel="Revoke access"
         tone="danger"
         busy={busy}
@@ -1149,88 +910,67 @@ function TeamTab() {
   );
 }
 
-function TeamCard({
-  member, hook, onRevoke,
-}: { member: TeamMember; hook: ReturnType<typeof useTeam>; onRevoke: () => void }) {
+/** The Team tab's existing more menu, unchanged, on each team row. */
+function TeamMenu({ member, hook, onRevoke }: { member: TeamMember; hook: ReturnType<typeof useTeam>; onRevoke: () => void }) {
   const [menu, setMenu] = useState(false);
-  const expiry = member.expiresAt ? new Date(member.expiresAt) : null;
-  const daysLeft = expiry ? Math.floor((expiry.getTime() - Date.now()) / 86400_000) : null;
-  const expiryTone: 'ok' | 'warn' | 'danger' | 'neutral' =
-    daysLeft == null ? 'neutral' :
-    daysLeft < 0 ? 'danger' :
-    daysLeft <= 7 ? 'warn' : 'ok';
-
   const extend = async (days: number) => {
     const next = new Date(Date.now() + days * 86400_000).toISOString();
     await hook.setExpiry.mutateAsync({ userId: member.userId, expiresAt: next });
     setMenu(false);
   };
-
   return (
-    <div style={{
-      background: t.surface, border: `1px solid ${t.line}`,
-      borderRadius: t.radius.md, padding: 12,
-      display: 'flex', gap: 12, alignItems: 'flex-start',
-    }}>
-      <SquircleAvatar size={40} src={member.avatarUrl} alt={member.displayName ?? ''} userId={member.userId} hairlineRing />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 14, fontWeight: 600, color: t.ink }}>
-            {member.displayName ?? member.username ?? member.userId.slice(0, 8)}
-          </span>
-          <StatusPill tone={member.role === 'full' ? 'ok' : 'warn'}>
-            {adminRoleLabel(member.role) ?? member.role}
-          </StatusPill>
-          {expiry && (
-            <StatusPill tone={expiryTone}>
-              {daysLeft! < 0 ? `Expired ${Math.abs(daysLeft!)}d` : `Expires in ${daysLeft}d`}
-            </StatusPill>
-          )}
-        </div>
-        <div style={{ fontSize: 12, color: t.inkMuted, marginTop: 4 }}>
-          Granted {ago(member.createdAt)}{member.grantedByName ? ` - by ${member.grantedByName}` : ''}
-        </div>
-        {member.notes && (
-          <div style={{ fontSize: 12, color: t.inkMuted, marginTop: 4 }}>{member.notes}</div>
-        )}
-      </div>
-      <div style={{ position: 'relative', flexShrink: 0 }}>
-        <button
-          onClick={() => setMenu(v => !v)}
-          aria-label="Member actions"
-          style={{
-            width: 32, height: 32, borderRadius: t.radius.md,
-            border: `1px solid ${t.line}`, background: t.surface,
-            color: t.ink, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer',
-          }}
-        >
-          <MoreVertical size={14} />
-        </button>
-        {menu && (
-          <>
-            <div onClick={() => setMenu(false)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
-            <div style={{
-              position: 'absolute', top: '100%', right: 0, marginTop: 6,
-              zIndex: 50, minWidth: 200,
-              background: t.surface, border: `1px solid ${t.line}`,
-              borderRadius: t.radius.md, boxShadow: t.shadowPop, padding: 4,
-            }}>
-              {member.role === 'full' ? (
-                <MenuItem onClick={() => { hook.downgrade.mutate(member.userId); setMenu(false); }}>Downgrade to Limited</MenuItem>
-              ) : (
-                <MenuItem onClick={() => { hook.grantFull.mutate(member.userId); setMenu(false); }}>Upgrade to Full</MenuItem>
-              )}
-              <MenuItem onClick={() => extend(7)}>Extend expiry +7d</MenuItem>
-              <MenuItem onClick={() => extend(30)}>Extend expiry +30d</MenuItem>
-              <MenuItem onClick={() => { hook.setExpiry.mutate({ userId: member.userId, expiresAt: null }); setMenu(false); }}>
-                Clear expiry
-              </MenuItem>
-              <MenuItem danger onClick={() => { setMenu(false); onRevoke(); }}>Revoke access</MenuItem>
-            </div>
-          </>
-        )}
-      </div>
+    <div style={{ position: 'relative', flexShrink: 0 }}>
+      <button
+        type="button"
+        onClick={() => setMenu(v => !v)}
+        aria-label="Member actions"
+        style={{
+          width: 30,
+          height: 30,
+          borderRadius: 999,
+          border: `1px solid ${t.line}`,
+          background: 'transparent',
+          color: t.ink,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+        }}
+      >
+        <MoreVertical size={14} />
+      </button>
+      {menu && (
+        <>
+          <div onClick={() => setMenu(false)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
+          <div
+            style={{
+              position: 'absolute',
+              top: '100%',
+              right: 0,
+              marginTop: 6,
+              zIndex: 50,
+              minWidth: 200,
+              background: t.surface,
+              border: `1px solid ${t.line}`,
+              borderRadius: t.radius.md,
+              boxShadow: t.shadowPop,
+              padding: 4,
+            }}
+          >
+            {member.role === 'full' ? (
+              <MenuItem onClick={() => { hook.downgrade.mutate(member.userId); setMenu(false); }}>Downgrade to Limited</MenuItem>
+            ) : (
+              <MenuItem onClick={() => { hook.grantFull.mutate(member.userId); setMenu(false); }}>Upgrade to Full</MenuItem>
+            )}
+            <MenuItem onClick={() => extend(7)}>Extend expiry +7d</MenuItem>
+            <MenuItem onClick={() => extend(30)}>Extend expiry +30d</MenuItem>
+            <MenuItem onClick={() => { hook.setExpiry.mutate({ userId: member.userId, expiresAt: null }); setMenu(false); }}>
+              Clear expiry
+            </MenuItem>
+            <MenuItem danger onClick={() => { setMenu(false); onRevoke(); }}>Revoke access</MenuItem>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -1252,122 +992,16 @@ function MenuItem({ children, onClick, danger }: { children: React.ReactNode; on
   );
 }
 
-/* ─────────────────────── Invites (unchanged) ─────────────────────── */
-
-function InvitesTab() {
-  const invites = useInvites();
-  const users = useUsers();
-  const [showCreate, setShowCreate] = useState(false);
-  const [confirmCancel, setConfirmCancel] = useState<InviteRow | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    const handler = () => invites.refetch();
-    window.addEventListener('admin-v2:refetch', handler);
-    return () => window.removeEventListener('admin-v2:refetch', handler);
-  }, [invites]);
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <DrawerBtn icon={<UserPlus size={14} />} onClick={() => setShowCreate(true)}>New invite</DrawerBtn>
-      </div>
-
-      {invites.isLoading ? <SkeletonCards /> :
-        invites.data.length === 0 ? <EmptyState title="No invites yet" /> : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {invites.data.map(inv => (
-              <InviteCard
-                key={inv.id} invite={inv}
-                onResend={() => invites.resend.mutate(inv.id)}
-                onCancel={() => setConfirmCancel(inv)}
-              />
-            ))}
-          </div>
-        )
-      }
-
-      <CreateInviteDrawer
-        open={showCreate}
-        onClose={() => setShowCreate(false)}
-        users={users.allUsers}
-        usersLoading={users.isLoading}
-        onCreate={(invitedUserId, role) =>
-          invites.create.mutate({ invitedUserId, role }, { onSuccess: () => setShowCreate(false) })
-        }
-        creating={invites.create.isPending}
-      />
-
-      <ConfirmDialog
-        open={!!confirmCancel}
-        onClose={() => setConfirmCancel(null)}
-        onConfirm={async () => {
-          if (!confirmCancel) return;
-          setBusy(true);
-          try {
-            await invites.cancel.mutateAsync(confirmCancel.id);
-            setConfirmCancel(null);
-          } finally { setBusy(false); }
-        }}
-        title="Cancel invite?"
-        description={`This will cancel the invite for ${confirmCancel?.displayName ?? confirmCancel?.email ?? 'this user'}.`}
-        confirmLabel="Cancel invite"
-        tone="danger"
-        busy={busy}
-      />
-    </div>
-  );
-}
-
-function inviteStatus(inv: InviteRow): { label: string; tone: 'ok' | 'warn' | 'danger' | 'neutral' } {
-  if (inv.acceptedAt) return { label: 'Accepted', tone: 'ok' };
-  if (new Date(inv.expiresAt) < new Date()) return { label: 'Expired', tone: 'danger' };
-  return { label: 'Pending', tone: 'warn' };
-}
-
-function InviteCard({
-  invite, onResend, onCancel,
-}: { invite: InviteRow; onResend: () => void; onCancel: () => void }) {
-  const s = inviteStatus(invite);
-  const canMutate = !invite.acceptedAt;
-  return (
-    <div style={{
-      background: t.surface, border: `1px solid ${t.line}`,
-      borderRadius: t.radius.md, padding: 12,
-      display: 'flex', flexDirection: 'column', gap: 10,
-    }}>
-      <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-        <SquircleAvatar size={36} src={invite.avatarUrl} alt={invite.displayName ?? invite.email ?? ''} userId={invite.invitedUserId} hairlineRing />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: t.ink }}>
-            {invite.displayName ?? invite.username ?? invite.email ?? '-'}
-          </div>
-          <div style={{ fontSize: 12, color: t.inkMuted }}>
-            {invite.role ?? 'admin'} - sent {ago(invite.createdAt)}
-          </div>
-        </div>
-        <StatusPill tone={s.tone}>{s.label}</StatusPill>
-      </div>
-      {canMutate && (
-        <div style={{ display: 'flex', gap: 8 }}>
-          <DrawerBtn icon={<Mail size={14} />} onClick={onResend}>Re-invite</DrawerBtn>
-          <DrawerBtn icon={<X size={14} />} tone="danger" onClick={onCancel}>Cancel</DrawerBtn>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function CreateInviteDrawer({
   open, onClose, users, usersLoading, onCreate, creating,
 }: {
   open: boolean; onClose: () => void;
-  users: AdminUserRow[]; usersLoading: boolean;
+  users: InviteCandidate[]; usersLoading: boolean;
   onCreate: (invitedUserId: string, role: string) => void;
   creating: boolean;
 }) {
   const [q, setQ] = useState('');
-  const [selected, setSelected] = useState<AdminUserRow | null>(null);
+  const [selected, setSelected] = useState<InviteCandidate | null>(null);
   const [role, setRole] = useState<'full' | 'limited'>('limited');
 
   useEffect(() => { if (!open) { setQ(''); setSelected(null); setRole('limited'); } }, [open]);

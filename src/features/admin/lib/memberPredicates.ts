@@ -1,7 +1,7 @@
 /**
  * Member segment predicates — the SINGLE source of truth for how the admin
  * console partitions users into segments. Consumed by:
- *   - useUsers (Members roster filter chips + counts)
+ *   - (formerly useUsers; the Members list now reads get_admin_members_overview)
  *   - useAudiences (Analytics > Growth > Audiences cards)
  *
  * The Members chip filter and the Audiences card MUST resolve to the same
