@@ -35,6 +35,7 @@ interface Props {
    * later renders, or the member could not delete the text.
    */
   initialText?: string;
+  focusOnOpen?: boolean;
   onHeightChange?: (heightPx: number) => void;
   onAfterSend?: () => void;
 }
@@ -55,6 +56,7 @@ export const Composer: React.FC<Props> = ({
   conversationId,
   disabled,
   initialText,
+  focusOnOpen = false,
   onHeightChange,
   onAfterSend,
 }) => {
@@ -66,6 +68,9 @@ export const Composer: React.FC<Props> = ({
   const [text, setText] = useState(initialText ?? '');
   const [pending, setPending] = useState<PendingAttachment[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  useEffect(() => {
+    if (focusOnOpen && !disabled) textareaRef.current?.focus();
+  }, [focusOnOpen, disabled]);
   const containerRef = useRef<HTMLDivElement | null>(null);
   // Track URLs we've minted so we can revoke on unmount even after state clears.
   const mintedUrlsRef = useRef<Set<string>>(new Set());

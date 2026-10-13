@@ -165,7 +165,7 @@ export interface MemberSessionsPage {
 
 export const MEMBERS_KEY = ['admin', 'members'] as const;
 const STALE = 60_000;
-const SESSIONS_PAGE = 20;
+const SESSIONS_PAGE = 30;
 
 /** Permission denied from a full-admin-only RPC renders "Full admins only". */
 export function isPermissionDenied(error: unknown): boolean {

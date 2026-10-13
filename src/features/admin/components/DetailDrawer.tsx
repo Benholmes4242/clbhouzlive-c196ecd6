@@ -9,9 +9,10 @@ interface Props {
   subtitle?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  artboard?: boolean;
 }
 
-export default function DetailDrawer({ open, onClose, title, subtitle, children, footer }: Props) {
+export default function DetailDrawer({ open, onClose, title, subtitle, children, footer, artboard = false }: Props) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -38,16 +39,16 @@ export default function DetailDrawer({ open, onClose, title, subtitle, children,
         aria-label={title}
         style={{
           position: 'fixed', top: 0, bottom: 0, right: 0, zIndex: 160,
-          width: 'min(440px, 100vw)',
-          background: t.surface,
-          borderLeft: `1px solid ${t.line}`,
+          width: artboard ? 'min(390px, 100vw)' : 'min(440px, 100vw)',
+          background: artboard ? t.canvas : t.surface,
+          borderLeft: artboard ? 'none' : `1px solid ${t.line}`,
           transform: open ? 'translateX(0)' : 'translateX(100%)',
           transition: 'transform .26s cubic-bezier(0.22,1,0.36,1)',
           display: 'flex', flexDirection: 'column',
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)',
+          paddingTop: artboard ? 'env(safe-area-inset-top, 0px)' : 'max(env(safe-area-inset-top, 0px), 12px)',
         }}
       >
-        <div style={{
+        {!artboard && <div style={{
           display: 'flex', alignItems: 'flex-start', gap: 8,
           padding: '12px 16px',
           borderBottom: `1px solid ${t.line}`,
@@ -74,9 +75,9 @@ export default function DetailDrawer({ open, onClose, title, subtitle, children,
           >
             <X size={16} />
           </button>
-        </div>
+        </div>}
 
-        <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: artboard ? 0 : 16 }}>
           {children}
         </div>
 
