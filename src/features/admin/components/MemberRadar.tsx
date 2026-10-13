@@ -30,7 +30,7 @@ import {
   isPermissionDenied,
   type MemberSession,
 } from '../hooks/useMembersRadar';
-import { getAvatarFallbackColor, getInitialsFromName } from '@/lib/avatarFallback';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import './memberRadar.css';
@@ -67,19 +67,14 @@ function RadarAvatar({
   photo?: string | null;
   loading: boolean;
 }) {
-  const [failed, setFailed] = useState(false);
-  useEffect(() => setFailed(false), [photo]);
-  return (
-    <span className="mr-avatar" style={{ background: getAvatarFallbackColor(userId) }}>
-      {loading ? (
-        <Skeleton height={56} />
-      ) : photo && !failed ? (
-        <img src={photo} alt={name ?? ''} onError={() => setFailed(true)} />
-      ) : (
-        getInitialsFromName(name)
-      )}
-    </span>
-  );
+  if (loading) {
+    return (
+      <span className="mr-avatar">
+        <Skeleton height={56} radius={19} />
+      </span>
+    );
+  }
+  return <SquircleAvatar size={56} src={photo} alt={name ?? ''} userId={userId} hairlineRing />;
 }
 function Head({ title, right }: { title: string; right?: React.ReactNode }) {
   return (

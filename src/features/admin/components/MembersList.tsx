@@ -13,7 +13,7 @@ import { Skeleton } from '../lib/chartPrimitives';
 import { formatAgo } from '../lib/formatAgo';
 import { memberIndexText } from '../lib/memberRadarRules';
 import { londonDate } from '../lib/memberRadarDisplay';
-import { getAvatarFallbackColor, getInitialsFromName } from '@/lib/avatarFallback';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { MembersOverview, MembersOverviewMember } from '../hooks/useMembersRadar';
 import { useEgIssueUserIds } from '../hooks/useUsers';
 
@@ -98,32 +98,6 @@ export function weekDashColors(m: MembersOverviewMember, now = Date.now()): stri
   });
 }
 
-function Avatar({ id, name, photo, size, radius, font }: { id: string; name: string | null; photo: string | null; size: number; radius: number; font: number }) {
-  const [failed, setFailed] = useState(false);
-  return (
-    <span
-      style={{
-        width: size,
-        height: size,
-        borderRadius: radius,
-        background: getAvatarFallbackColor(id),
-        display: 'grid',
-        placeItems: 'center',
-        fontSize: font,
-        fontWeight: 700,
-        overflow: 'hidden',
-        color: t.ink,
-      }}
-    >
-      {photo && !failed ? (
-        <img src={photo} alt={name ?? ''} onError={() => setFailed(true)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-      ) : (
-        getInitialsFromName(name)
-      )}
-    </span>
-  );
-}
-export { Avatar as MembersAvatar };
 
 function LastSeenPanel({ o }: { o: MembersOverview | undefined }) {
   const r = o?.recency;
@@ -244,7 +218,7 @@ function MemberRow({ m, onOpen }: { m: MembersOverviewMember; onOpen: () => void
         borderTop: `1px solid ${t.hairline}`,
       }}
     >
-      <Avatar id={m.user_id} name={name} photo={m.photo_url} size={38} radius={11} font={12} />
+      <SquircleAvatar size={38} src={m.photo_url} alt={name} userId={m.user_id} hairlineRing />
       <span style={{ minWidth: 0 }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontSize: 14.5, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -297,7 +271,7 @@ function RowSkeleton() {
         borderTop: `1px solid ${t.hairline}`,
       }}
     >
-      <Skeleton height={38} radius={11} />
+      <Skeleton height={38} radius={13} />
       <span style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         <Skeleton height={17} radius={3} />
         <Skeleton height={14} radius={3} />

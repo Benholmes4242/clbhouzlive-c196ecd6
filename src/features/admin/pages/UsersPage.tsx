@@ -22,7 +22,7 @@ import AdminErrorState from '../components/AdminErrorState';
 import AdminSheet from '../components/AdminSheet';
 import { useAdminUserDetail, type AdminUserDetail } from '../hooks/useUsers';
 import { useMembersOverview, type MembersOverview } from '../hooks/useMembersRadar';
-import MembersList, { MembersAvatar } from '../components/MembersList';
+import MembersList from '../components/MembersList';
 import { Skeleton } from '../lib/chartPrimitives';
 import { londonDate } from '../lib/memberRadarDisplay';
 import { useTeam, type TeamMember } from '../hooks/useTeam';
@@ -799,7 +799,7 @@ function TeamPanel({ overview, loading }: { overview: MembersOverview | undefine
       {loading
         ? Array.from({ length: 2 }, (_, i) => (
             <div key={i} style={TEAM_ROW}>
-              <Skeleton height={30} radius={9} />
+              <Skeleton height={30} radius={10} />
               <span style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 <Skeleton height={16} radius={3} />
                 <Skeleton height={13} radius={3} />
@@ -817,7 +817,7 @@ function TeamPanel({ overview, loading }: { overview: MembersOverview | undefine
               const member = team.data.find(m => m.userId === r.user_id);
               return (
                 <div key={r.user_id} style={TEAM_ROW}>
-                  <MembersAvatar id={r.user_id} name={name} photo={r.photo_url} size={30} radius={9} font={10.5} />
+                  <SquircleAvatar size={30} src={r.photo_url} alt={name} userId={r.user_id} hairlineRing />
                   <span style={{ minWidth: 0 }}>
                     <span style={{ display: 'block', fontSize: 13.5, fontWeight: 600 }}>{name}</span>
                     <span style={{ display: 'block', fontSize: 11, color: t.inkFaint }}>{since}{addedBy}</span>
@@ -850,7 +850,7 @@ function TeamPanel({ overview, loading }: { overview: MembersOverview | undefine
               const role = i.role ? ` · ${(adminRoleLabel(i.role) ?? i.role).toLowerCase()}` : '';
               return (
                 <div key={i.id} style={TEAM_ROW}>
-                  <MembersAvatar id={i.id} name={name} photo={null} size={30} radius={9} font={10.5} />
+                  <SquircleAvatar size={30} alt={name} userId={i.id} hairlineRing />
                   <span style={{ minWidth: 0 }}>
                     <span style={{ display: 'block', fontSize: 13.5, fontWeight: 600 }}>{name}</span>
                     <span style={{ display: 'block', fontSize: 11, color: t.warnText }}>{status}{role}</span>
