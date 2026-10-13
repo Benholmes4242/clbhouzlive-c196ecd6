@@ -328,7 +328,11 @@ export function WatchFeed({
           ? t('amateur.watch.chip.long', 'Long form')
           : key === 'friends'
             ? t('amateur.watch.chip.friends', 'Friends')
-            : t('amateur.watch.chip.yourCourses', 'Your courses');
+            : key === 'your_courses'
+              ? t('amateur.watch.chip.yourCourses', 'Your courses')
+              : key === 'community'
+                ? t('amateur.watch.chip.community', 'Community')
+                : (key satisfies never);
   const chips = WATCH_CHIPS.map((key) => ({ id: key, label: chipLabel(key) }));
 
   const openMoment = (moment: Moment) => {

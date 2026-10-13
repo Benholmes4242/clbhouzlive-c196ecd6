@@ -11,12 +11,14 @@
  *              read filtered client-side to the member's own courses; it only
  *              sees loaded pages. The proposed RPC change is
  *              docs/sql/watch_long_form_played_courses.sql, UNAPPLIED.
- *   'community' is not a chip. It is the entry state Explore's community
- *              see-all and the rail's See all open — the shared mosaic.
+ *   Community IS a chip, the last one. It is the only chip that filters
+ *              photographs rather than video — the shared mosaic — so both
+ *              the long-form and the clip read stand down on it: it has no
+ *              video or clip source.
  */
 
-export const WATCH_CHIPS = ['all', 'quick', 'long', 'friends', 'your_courses'] as const;
-export const WATCH_FILTERS = [...WATCH_CHIPS, 'community'] as const;
+export const WATCH_CHIPS = ['all', 'quick', 'long', 'friends', 'your_courses', 'community'] as const;
+export const WATCH_FILTERS = WATCH_CHIPS;
 
 export type WatchFilter = (typeof WATCH_FILTERS)[number];
 
