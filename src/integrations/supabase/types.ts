@@ -18946,6 +18946,7 @@ export type Database = {
       admin_guard: { Args: never; Returns: undefined }
       admin_is_bot_ua: { Args: { p_ua: string }; Returns: boolean }
       admin_is_full: { Args: never; Returns: boolean }
+      admin_is_passive_event: { Args: { p_name: string }; Returns: boolean }
       admin_launch_authority: {
         Args: { _body_name: string; _country_id: string }
         Returns: number
