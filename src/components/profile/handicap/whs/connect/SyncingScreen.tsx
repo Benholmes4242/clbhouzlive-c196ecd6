@@ -52,12 +52,6 @@ export const SyncingScreen: React.FC = () => {
 
   return (
     <Stage>
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @media (prefers-reduced-motion: reduce) {
-          .whs-sync-spinner { animation: none !important; }
-        }
-      `}</style>
       <StageHead
         kicker={t('whsConnect.steps.sync')}
         headline={t('whsConnect.sync.headline')}
@@ -87,7 +81,7 @@ export const SyncingScreen: React.FC = () => {
                 <span style={MARK}>
                   <svg width="100%" height="100%" viewBox="0 0 18 18" aria-hidden="true">
                     <circle
-                      className="whs-sync-spinner"
+                      className="animate-spin motion-reduce:animate-none"
                       cx={9}
                       cy={9}
                       r={7.6}
@@ -96,7 +90,7 @@ export const SyncingScreen: React.FC = () => {
                       strokeWidth={1.9}
                       strokeLinecap="round"
                       strokeDasharray="15 33"
-                      style={{ animation: 'spin 1.05s linear infinite', transformOrigin: '50% 50%' }}
+                      style={{ animationDuration: '1.05s', transformOrigin: '50% 50%' }}
                     />
                   </svg>
                 </span>
