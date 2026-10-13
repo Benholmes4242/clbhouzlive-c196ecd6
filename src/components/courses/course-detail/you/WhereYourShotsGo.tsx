@@ -5,8 +5,9 @@
  * and over: eighteen bars of the member's OWN average over par, three figures,
  * the member's hardest hole, then the one drill-down.
  *
- * THE CHART IS LOCAL, AMBER, AND NOT ShapeChart. Amber because every bar is the
- * viewing member's own figure.
+ * THE CHART IS LOCAL AND NOT ShapeChart. Each bar takes the RAMP_TOPAR hue of
+ * the member's most common score on that hole (dominantBucket over
+ * memberBucketShares); amber is retained for the member's FIGURES.
  *
  * TAPPABLE (BRIEF — THE CHARTS BECOME TAPPABLE, option A). Each bar is a
  * button whose hit area fills the chart height. Selection never uses the colour
@@ -14,8 +15,9 @@
  * Selecting a hole replaces the three figures in place, inside a shared
  * min-height, so nothing below moves.
  *
- * The scoring distribution is the FIELD'S. It is shown only in the labelled
- * hardest-hole block, never under the member's selected-hole figures.
+ * The scoring distribution is the MEMBER'S OWN, from get_my_hole_performance's
+ * bucket counts. It is still shown only in the labelled hardest-hole block,
+ * never under the member's selected-hole figures.
  */
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,8 +25,8 @@ import { formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
-import { A, BAR_RADIUS, FIGS, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
-import { courseBucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
+import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
+import { dominantBucket, memberBucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import AboutSection, { ABOUT_KICKER, AboutHairline } from '../about/AboutSection';
 import { CompactHoleRow } from '../about/AllHolesSheet';
 import { CourseDistributionSummary } from '../about/HowItPlays';
@@ -69,8 +71,7 @@ const MyHoleChart: React.FC<{
         {sorted.map((row) => {
           const value = Math.max(0, row.avg_to_par);
           const height = Math.max(2, (value / max) * CHART_HEIGHT);
-          const strong = row.avg_to_par > 0.6;
-          const overPar = row.avg_to_par > 0;
+          const seg = memberBucketShares(row);
           const isSelected = selected === row.hole_no;
           const figure = toParParts(row.avg_to_par, 1)?.text ?? '';
           return (
@@ -98,11 +99,7 @@ const MyHoleChart: React.FC<{
                   borderRadius: BAR_RADIUS,
                   opacity: selected != null && !isSelected ? DIMMED_OPACITY : 1,
                   transition: 'opacity 160ms ease',
-                  background: overPar && !strong
-                    ? `color-mix(in srgb, ${A.AMBER} 50%, transparent)`
-                    : overPar
-                      ? A.AMBER
-                      : A.MUTE,
+                  background: seg ? RAMP_TOPAR[dominantBucket(seg)] : A.DIM,
                 }}
               />
             </button>
@@ -228,7 +225,7 @@ const WhereYourShotsGo: React.FC<Props> = ({ courseId, rounds, mine, field, onAl
     </div>
   );
 
-  const shares = worstField ? courseBucketShares([worstField]) : null;
+  const shares = memberBucketShares(worst);
 
   return (
     <AboutSection
