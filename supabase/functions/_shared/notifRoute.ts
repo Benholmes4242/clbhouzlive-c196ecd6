@@ -345,6 +345,7 @@ export function routeForNotif(input: NotifRouteInput): string {
     const id = data.business_slug || data.business_id || entity_id;
     if (id) return `/business/${id}`;
   }
+  if (type === 'admin_invite' && data.token) return `/admin-invite/accept?token=${encodeURIComponent(data.token)}`;
   if (type === 'business_team_invited') {
     if (data.token) return `/business/invite/accept?token=${encodeURIComponent(data.token)}`;
     const id = data.business_slug || data.business_id || entity_id;
