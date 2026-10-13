@@ -25,14 +25,15 @@ const PROMISES = ['analyse', 'leaderboards', 'topTen', 'community'] as const;
 const PROMISE_RULE = 'rgba(255,255,255,0.11)';
 
 /**
- * STAGE 1 - INTRO (BRIEF_WHS_INTRO_CONNECT_ONCE). Federation-neutral: no
- * governing body, no country, no figure anywhere on this screen. It says what
- * connecting opens - four plain promises - and borrows nobody's data. The
- * rings live on stage 5, with the member's real figures.
+ * STAGE 1 - INTRO, THE EVIDENCE SCREEN. Resolves a real course through
+ * useConnectIntroCourse (which reads useHomeClubStatus context and calls
+ * get_course_hole_analysis) and draws it with the app's own How it plays
+ * panel plus the connect-only IntroHoleChart. It never prints a round count.
  *
- * Painted on WASH by the flow container (stage 1 only). The rows are pushed to
- * the bottom with margin-top:auto so they sit on flat canvas below the fall.
- * Reads nothing: no query, no RPC.
+ * The four-promise screen below is the FALLBACK for when no course
+ * qualifies, and is unchanged.
+ *
+ * The flow container paints flat SURFACE here, not WASH (CE).
  */
 const TAIL_CSS = `
 .ci-change { margin-top: 16px }
