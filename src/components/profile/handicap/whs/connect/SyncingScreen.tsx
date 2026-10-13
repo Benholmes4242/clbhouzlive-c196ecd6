@@ -5,7 +5,7 @@ import { CANVAS, INK, MUTE, BORDER, STEP_WAIT_RING, STEP_WAIT_INK } from './desi
 import { Stage, StageHead } from './Primitives';
 
 /**
- * STAGE 4 - SYNCING. NO RING, no spinner, NO FIGURE.
+ * STAGE 4 - SYNCING. NO PROGRESS RING, NO FIGURE.
  *
  * connect-whs is ONE synchronous call that returns only when the import is
  * finished - it streams nothing back, and the connection row (and therefore
