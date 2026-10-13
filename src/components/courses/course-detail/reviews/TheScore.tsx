@@ -15,7 +15,7 @@
  * THE "/10" IS DROPPED. The tier word already fixes the scale.
  */
 import React from 'react';
-import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 import { DELTA_TONE } from '@/lib/tokens/indexDelta';
 import { GUTTER } from '../about/AboutSection';
@@ -94,7 +94,7 @@ export const TheScore: React.FC<TheScoreProps> = ({ score, ratingCount, viewerSc
       <div style={{ display: 'flex', alignItems: 'stretch' }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ ...EYEBROW, color: A.DIM }}>Community</div>
-          <div style={{ ...FIGURE, color: A.INK }}>{loading ? <Bar>0.0</Bar> : score.toFixed(1)}</div>
+          <div style={{ ...FIGURE, color: courseSubScoreTone(score) }}>{loading ? <Bar>0.0</Bar> : score.toFixed(1)}</div>
           <div style={SUPPORT}>
             {loading ? <Bar>0 ratings · Excellent</Bar> : (
               <>
