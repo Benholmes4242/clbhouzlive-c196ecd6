@@ -1,5 +1,3 @@
-import type { MemberSessionSummary } from '../hooks/useMembersRadar';
-
 export function radarDuration(seconds: number | null | undefined): string {
   if (seconds == null || !Number.isFinite(seconds)) return '—';
   if (seconds >= 3600) return `${Math.floor(seconds / 3600)}h ${Math.floor(seconds % 3600 / 60)}m`;
@@ -18,19 +16,14 @@ function londonDay(iso: string): number {
   const n = (type: string) => Number(p.find(x => x.type === type)?.value);
   return Date.UTC(n('year'), n('month') - 1, n('day'));
 }
-export function eightWeekStart(now = new Date().toISOString()): number {
-  const day = londonDay(now);
-  return day - ((new Date(day).getUTCDay() + 6) % 7 + 49) * 86400000;
-}
-export function weeklySessionCounts(sessions: MemberSessionSummary[], now = new Date().toISOString()): number[] {
-  const first = eightWeekStart(now), counts = Array<number>(8).fill(0), seen = new Set<string>();
-  for (const s of sessions) {
-    if (seen.has(s.session_id)) continue;
-    seen.add(s.session_id);
-    const i = Math.floor((londonDay(s.started_at) - first) / 604800000);
-    if (i >= 0 && i < 8) counts[i] += 1;
-  }
-  return counts;
+/** Last session header day: "today" / "yesterday" in Europe/London, else "Mon 12 Oct". */
+export function londonSessionDay(iso: string, now = new Date().toISOString()): string {
+  const diff = (londonDay(now) - londonDay(iso)) / 86400000;
+  if (diff === 0) return 'today';
+  if (diff === 1) return 'yesterday';
+  const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', weekday: 'short', day: 'numeric', month: 'short' }).formatToParts(new Date(iso));
+  const v = (type: string) => p.find(x => x.type === type)?.value ?? '';
+  return `${v('weekday')} ${v('day')} ${v('month')}`;
 }
 export function radarQueryUser(userId: string | null, full: boolean, opened = true) {
   return full && opened ? userId : null;

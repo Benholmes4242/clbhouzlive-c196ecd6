@@ -123,6 +123,8 @@ export interface MemberSession {
   ended_at: string | null;
   seconds: number;
   client: string | null;
+  /** true when the session ended on the passive page_exit (never in steps) */
+  ends_on_exit?: boolean;
   steps: SessionStep[];
 }
 
@@ -161,6 +163,16 @@ export interface MemberSessionsPage {
   total: number;
   /** newest first */
   sessions: MemberSessionSummary[];
+}
+
+export interface MemberExtras {
+  year: number;
+  top100_year: number;
+  /** Monday (Europe/London) of the oldest week */
+  week_start: string;
+  /** 8 session counts, oldest week first; null for limited admins */
+  sessions_8: number[] | null;
+  computed_at: string;
 }
 
 export const MEMBERS_KEY = ['admin', 'members'] as const;
@@ -246,5 +258,15 @@ export function useMemberSession(userId: string | null | undefined, sessionId: s
     enabled: !!userId && !!sessionId,
     staleTime: STALE,
     retry: (n, e) => !isPermissionDenied(e) && n < 2,
+  });
+}
+
+export function useMemberExtras(userId: string | null | undefined) {
+  useRefetchOnAdminEvent();
+  return useQuery({
+    queryKey: [...MEMBERS_KEY, 'extras', userId],
+    queryFn: () => rpc<MemberExtras>('get_admin_member_extras', { p_user_id: userId }),
+    enabled: !!userId,
+    staleTime: STALE,
   });
 }

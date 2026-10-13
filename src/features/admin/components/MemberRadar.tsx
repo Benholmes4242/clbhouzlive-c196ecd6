@@ -5,10 +5,9 @@ import { adminTheme as t } from '../theme';
 import { PANEL, LIST_PANEL, RAISED, TRACK, RADAR_CHART_FILL, RADAR_EVENT_DOT, RADAR_NEVER_EDGE } from '../lib/panels';
 import { Skeleton, monotonePath } from '../lib/chartPrimitives';
 import { memberIndexText, indexSeriesToToday, mergeSessionSteps } from '../lib/memberRadarRules';
-import { radarDuration, londonTime, londonDate, weeklySessionCounts, eightWeekStart, radarQueryUser } from '../lib/memberRadarDisplay';
-import { formatAgo } from '../lib/formatAgo';
+import { radarDuration, londonTime, londonDate, londonSessionDay, radarQueryUser } from '../lib/memberRadarDisplay';
 import { labelForEvent } from '../lib/eventLabels';
-import { useMemberOverview, useMemberBehaviour, useMemberSessions, useMemberSession, isPermissionDenied, type MemberSession } from '../hooks/useMembersRadar';
+import { useMemberOverview, useMemberBehaviour, useMemberSessions, useMemberSession, useMemberExtras, isPermissionDenied, type MemberSession } from '../hooks/useMembersRadar';
 import { getAvatarFallbackColor, getInitialsFromName } from '@/lib/avatarFallback';
 import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -43,13 +42,13 @@ function Failure({ error }: { error: unknown }) { return <Empty centre>{isPermis
 
 export function RadarTimeline({ session }: { session: MemberSession }) {
   const steps = mergeSessionSteps(session.steps);
-  const closed = session.steps.at(-1)?.name === 'page_exit';
+  // page_exit is passive and never in steps; the server flags it instead.
+  const closeAt = session.ends_on_exit ? session.ended_at : null;
   return <>{steps.map((s, i) => {
-    const close = closed && i === steps.length - 1 && s.name === 'page_exit';
-    const kind = close ? 'close' : s.kind;
-    const label = close ? 'Closed the app' : s.kind === 'screen' ? s.label ?? '—' : s.kind === 'push' ? 'Opened from push' : s.kind === 'error' ? `Error · ${s.detail ?? '—'}` : labelForEvent(s.name ?? '');
+    const kind = s.kind;
+    const label = s.kind === 'screen' ? s.label ?? '—' : s.kind === 'push' ? 'Opened from push' : s.kind === 'error' ? `Error · ${s.detail ?? '—'}` : labelForEvent(s.name ?? '');
     return <div className="mr-step" key={`${s.at}-${i}`}><span className="mr-step-time">{londonTime(s.at)}</span><span className={`mr-dot mr-dot-${kind}`} /><span className={`mr-step-label mr-step-${kind}`}>{label}</span><span className="mr-seconds">{s.kind === 'screen' ? radarDuration(s.seconds) : ''}</span></div>;
-  })}</>;
+  })}{closeAt && <div className="mr-step"><span className="mr-step-time">{londonTime(closeAt)}</span><span className="mr-dot mr-dot-close" /><span className="mr-step-label mr-step-close">Closed the app</span><span className="mr-seconds" /></div>}</>;
 }
 function TimelineLoading() { return <>{Array.from({ length: 7 }, (_, i) => <div className="mr-step" key={i}><Skeleton height={16} /><span className="mr-dot" /><Skeleton height={16} /><Skeleton height={16} /></div>)}</>; }
 function SessionDetail({ userId, sessionId }: { userId: string; sessionId: string }) {
@@ -62,18 +61,14 @@ export default function MemberRadar({ userId, full, onClose, onMore }: { userId:
   const [tab, setTab] = useState<'overview' | 'behaviour' | 'sessions'>('overview');
   const [expanded, setExpanded] = useState<string | null>(null);
   const overview = useMemberOverview(userId);
-  const sessions = useMemberSessions(radarQueryUser(userId, full));
+  const sessions = useMemberSessions(radarQueryUser(userId, full, tab === 'sessions'));
+  const extras = useMemberExtras(userId);
   const behaviour = useMemberBehaviour(radarQueryUser(userId, full, tab === 'behaviour'), 30);
   const { start, isStarting } = useStartConversation();
-  const { availableActors, setActiveActor } = useActiveActor();
+  const { activeActor, availableActors, setActiveActor } = useActiveActor();
   const d = overview.data, loading = overview.isPending;
   const allSessions = sessions.data?.pages.flatMap(p => p.sessions) ?? [];
-  const oldest = allSessions.at(-1);
-  // Overview's bars need ALL eight weeks, not just the first page. No timestamp durations.
-  const needsWeeks = full && !sessions.error && sessions.hasNextPage && (!oldest || new Date(oldest.started_at).getTime() >= eightWeekStart());
-  useEffect(() => { if (tab === 'overview' && needsWeeks && !sessions.isFetchingNextPage) void sessions.fetchNextPage(); }, [tab, needsWeeks, sessions.isFetchingNextPage, sessions.fetchNextPage]);
-  const weeksLoading = sessions.isPending || !!needsWeeks || sessions.isFetchingNextPage;
-  const weeks = weeklySessionCounts(allSessions), maxWeek = Math.max(...weeks, 1);
+  const weeks = extras.data?.sessions_8 ?? null, maxWeek = Math.max(...(weeks ?? []), 1);
   const connected = !!d?.connection.connected_at;
   const londonToday = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
   const series = indexSeriesToToday(d?.index_series ?? [], d?.profile.index, londonToday);
@@ -88,12 +83,22 @@ export default function MemberRadar({ userId, full, onClose, onMore }: { userId:
   const bLoading = full && behaviour.isPending;
   const maxHour = Math.max(...(b?.hourly ?? []), 1), maxArea = Math.max(...(b?.areas.map(a => a.seconds) ?? []), 1);
   const never = b ? [...b.never_opened.areas, ...(!b.has.reviewed ? ['Rate a course'] : []), ...(!b.has.posted ? ['Post'] : []), ...(!b.has.invited ? ['Invite'] : [])] : [];
+  const restoreActor = (location.state as { restoreActor?: { type: string; id: string } } | null)?.restoreActor;
+  useEffect(() => {
+    if (!restoreActor) return;
+    const prior = availableActors.find(a => a.type === restoreActor.type && a.id === restoreActor.id);
+    if (prior) setActiveActor(prior);
+    navigate(location.pathname + location.search, { replace: true, state: null });
+  }, [restoreActor, availableActors, setActiveActor, navigate, location.pathname, location.search]);
   const restrictedBody = <Empty centre>Full admins only</Empty>;
   const message = async () => {
     const personal = availableActors.find(a => a.type === 'personal');
     if (!personal) return;
-    setActiveActor(personal);
-    await start({ actorType: 'personal', actorId: userId }, undefined, { asActor: { actorType: 'personal', actorId: personal.id }, focusComposer: true, returnTo: location.pathname + location.search });
+    // The thread, composer and send path read the app-wide active actor, so a
+    // business-acting admin is switched for the conversation and restored on Back.
+    const previous = activeActor && activeActor.type !== 'personal' ? activeActor : null;
+    if (previous) setActiveActor(personal);
+    await start({ actorType: 'personal', actorId: userId }, undefined, { asActor: { actorType: 'personal', actorId: personal.id }, focusComposer: true, returnTo: location.pathname + location.search, returnState: previous ? { restoreActor: { type: previous.type, id: previous.id } } : undefined });
   };
   return <div className="member-radar" style={paints}>
     <header className="mr-header"><button type="button" className="mr-back" aria-label="Back to members" onClick={onClose}><ChevronLeft size={14} strokeWidth={1.6} /></button><span><span className="mr-kicker">Members</span><span className="mr-name">{loading ? <Skeleton height={20} /> : d?.profile.display_name ?? d?.profile.username ?? 'Member'}</span></span></header>
@@ -112,9 +117,9 @@ export default function MemberRadar({ userId, full, onClose, onMore }: { userId:
         { label: 'Weekly', reached: d?.weeks_active_8 === 8, date: `${d?.weeks_active_8 ?? 0} of 8 wks` },
       ].map(s => <div key={s.label}><div className={`mr-loop-bar${s.reached ? s.label === 'Weekly' ? ' mr-weekly' : ' mr-reached' : ''}`} /><div className="mr-loop-label">{s.label}</div><div className="mr-loop-date">{loading ? <Skeleton height={13} /> : s.date}</div></div>)}</div></Panel>
       <Panel title="Golf" right={londonDate(new Date().toISOString(), { year: 'numeric' })}><div className="mr-grid">{[
-        ['Rounds', d?.golf_year.rounds ?? 0], ['Sub-80', d?.golf_year.sub_80 ?? 0], ['Birdies', d?.golf_year.birdies ?? 0], ['Top 100', '—'], ['Courses', d?.golf_year.courses ?? 0],
-      ].map(([label, value]) => <Figure key={label} label={String(label)} value={value} loading={loading} cell />)}<Figure label="Last round" loading={loading} cell value={<>{d?.last_round?.gross ?? '—'}{d?.last_round && <span className={`mr-par${d.last_round.to_par < 0 ? ' mr-under' : ''}`}>{d.last_round.to_par === 0 ? 'E' : d.last_round.to_par > 0 ? `+${d.last_round.to_par}` : d.last_round.to_par}</span>}</>} /></div></Panel>
-      <Panel title="In the app" right="sessions · 8 wks">{!full || isPermissionDenied(sessions.error) ? <div className="mr-week-empty">{restrictedBody}</div> : sessions.error ? <div className="mr-week-empty"><Failure error={sessions.error} /></div> : weeksLoading ? <div className="mr-week-empty"><Skeleton height={44} /></div> : weeks.every(n => n === 0) ? <div className="mr-week-empty"><Empty centre>No app sessions in the last 8 weeks</Empty></div> : <div className="mr-week-bars">{weeks.map((n, i) => <div key={i} style={{ height: `${n / maxWeek * 100}%` }} title={`${n} sessions`} />)}</div>}<div className="mr-counters">{[['Posts', d?.app.posts ?? 0], ['Reviews', d?.app.reviews ?? 0], ['Invited', d?.app.invites_sent ?? 0], ['Brought in', d?.app.brought_in ?? 0]].map(([label, value]) => <Figure key={label} label={String(label)} value={value} loading={loading} />)}</div></Panel>
+        ['Rounds', d?.golf_year.rounds ?? 0], ['Sub-80', d?.golf_year.sub_80 ?? 0], ['Birdies', d?.golf_year.birdies ?? 0], ['Top 100', extras.data?.top100_year ?? 0], ['Courses', d?.golf_year.courses ?? 0],
+      ].map(([label, value]) => <Figure key={label} label={String(label)} value={value} loading={label === 'Top 100' ? extras.isPending : loading} cell />)}<Figure label="Last round" loading={loading} cell value={<>{d?.last_round?.gross ?? '—'}{d?.last_round && <span className={`mr-par${d.last_round.to_par < 0 ? ' mr-under' : ''}`}>{d.last_round.to_par === 0 ? 'E' : d.last_round.to_par > 0 ? `+${d.last_round.to_par}` : d.last_round.to_par}</span>}</>} /></div></Panel>
+      <Panel title="In the app" right="sessions · 8 wks">{extras.error ? <div className="mr-week-empty"><Failure error={extras.error} /></div> : extras.isPending ? <div className="mr-week-empty"><Skeleton height={44} /></div> : weeks == null ? <div className="mr-week-empty">{restrictedBody}</div> : weeks.every(n => n === 0) ? <div className="mr-week-empty"><Empty centre>No app sessions in the last 8 weeks</Empty></div> : <div className="mr-week-bars">{weeks.map((n, i) => <div key={i} style={{ height: `${n / maxWeek * 100}%` }} title={`${n} sessions`} />)}</div>}<div className="mr-counters">{[['Posts', d?.app.posts ?? 0], ['Reviews', d?.app.reviews ?? 0], ['Invited', d?.app.invites_sent ?? 0], ['Brought in', d?.app.brought_in ?? 0]].map(([label, value]) => <Figure key={label} label={String(label)} value={value} loading={loading} />)}</div></Panel>
       <div className="mr-actions"><button type="button" className="mr-action mr-message" onClick={message} disabled={loading || isStarting}>Message</button><button type="button" className="mr-action" onClick={() => d?.profile.username && navigate(`/profile/${d.profile.username}`)} disabled={!d?.profile.username}>Profile</button><button type="button" className="mr-action mr-more" aria-label="More actions" onClick={onMore}><MoreHorizontal size={16} /></button></div>
       </>}
     </div>}
@@ -122,7 +127,7 @@ export default function MemberRadar({ userId, full, onClose, onMore }: { userId:
       <Panel title="Time in app" right="last 30d">{restricted ? restrictedBody : behaviour.error ? <Failure error={behaviour.error} /> : !bLoading && (!b || b.sessions === 0) ? <Empty>No app activity in the last 30 days</Empty> : <><div className="mr-time">{[['Total', radarDuration(b?.total_seconds)], ['Sessions', b?.sessions ?? 0], ['Avg', radarDuration(b?.avg_session_seconds)], ['Peak', b?.peak ? `${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][b.peak.dow - 1]} ${String(b.peak.hour).padStart(2, '0')}:00` : '—']].map(([label, value]) => <Figure key={label} label={String(label)} value={value} loading={bLoading} />)}</div><div className="mr-hours">{Array.from({ length: 24 }, (_, i) => bLoading ? <Skeleton key={i} height={36} radius={2} /> : <div key={i} title={`${String(i).padStart(2,'0')}:00 · ${b?.hourly[i] ?? 0}s`} className={`mr-hour${b?.peak?.hour === i ? ' mr-peak' : b?.peak && Math.min((i - b.peak.hour + 24) % 24, (b.peak.hour - i + 24) % 24) <= 2 ? ' mr-near-peak' : ''}`} style={{ height: `${(b?.hourly[i] ?? 0) / maxHour * 100}%` }} />)}</div><div className="mr-axis mr-hours-axis">{['00','06','12','18','23'].map(s => <span key={s}>{s}</span>)}</div></>}</Panel>
       <Panel title="Where the time goes" right="time · visits">{restricted ? restrictedBody : behaviour.error ? <Failure error={behaviour.error} /> : bLoading ? <div className="mr-areas">{Array.from({ length: 6 }, (_, i) => <Skeleton key={i} height={16} />)}</div> : !b?.areas.length ? <Empty>No screens viewed in the last 30 days</Empty> : <div className="mr-areas">{b.areas.map((a, i) => <div className="mr-area" key={i}><span className="mr-area-name" title={a.area}>{a.area}</span><div className="mr-track"><div style={{ width: `${a.seconds / maxArea * 100}%` }} /></div><span className="mr-area-time">{radarDuration(a.seconds)}</span><span className="mr-visits">{a.visits}</span></div>)}</div>}</Panel>
       <Panel title="What they do" right="30d">{restricted ? restrictedBody : behaviour.error ? <Failure error={behaviour.error} /> : <>{bLoading ? <div className="mr-grid">{Array.from({ length: 6 }, (_, i) => <div className="mr-cell" key={i}><Skeleton height={40} /></div>)}</div> : !b?.actions.length ? <Empty>No actions in the last 30 days</Empty> : <div className="mr-grid">{b.actions.slice(0,6).map((a, i) => <div className="mr-cell mr-action-cell" key={i}><div className="mr-label">{labelForEvent(a.name)}</div><div className="mr-figure">{a.count}</div></div>)}</div>}<div className="mr-never"><div className="mr-label">Never opened</div><div className="mr-never-pills">{bLoading ? <Skeleton height={28} /> : never.map((s, i) => <span className="mr-never-pill" key={i}>{s}</span>)}</div></div></>}</Panel>
-      <Panel title="Last session" list right={b?.last_session && !restricted ? `${formatAgo(b.last_session.started_at)} · ${londonTime(b.last_session.started_at)} · ${radarDuration(b.last_session.seconds)} · ${b.last_session.client ?? '—'}` : undefined}>{restricted ? restrictedBody : behaviour.error ? <Failure error={behaviour.error} /> : bLoading ? <TimelineLoading /> : b?.last_session ? <RadarTimeline session={b.last_session} /> : <Empty>No sessions recorded yet</Empty>}{!restricted && <button type="button" className="mr-footer" onClick={() => setTab('sessions')}>All {bLoading ? '—' : b?.sessions ?? 0} sessions</button>}</Panel>
+      <Panel title="Last session" list right={b?.last_session && !restricted ? `${londonSessionDay(b.last_session.started_at)} ${londonTime(b.last_session.started_at)} · ${radarDuration(b.last_session.seconds)} · ${b.last_session.client ?? '—'}` : undefined}>{restricted ? restrictedBody : behaviour.error ? <Failure error={behaviour.error} /> : bLoading ? <TimelineLoading /> : b?.last_session ? <RadarTimeline session={b.last_session} /> : <Empty>No sessions recorded yet</Empty>}{!restricted && <button type="button" className="mr-footer" onClick={() => setTab('sessions')}>All {bLoading ? '—' : b?.sessions ?? 0} sessions</button>}</Panel>
     </div>}
     {tab === 'sessions' && <Panel title="Sessions" right="last 180d" list>{!full ? restrictedBody : sessions.error ? <Failure error={sessions.error} /> : sessions.isPending ? <>{Array.from({ length: 6 }, (_, i) => <div className="mr-session-row" key={i}><Skeleton height={38} /></div>)}</> : !allSessions.length ? <Empty>No sessions in the last 180 days</Empty> : <>{allSessions.map(s => <React.Fragment key={s.session_id}><button type="button" className="mr-session-row" aria-expanded={expanded === s.session_id} onClick={() => setExpanded(expanded === s.session_id ? null : s.session_id)}><span><span className="mr-session-main">{londonDate(s.started_at, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })} · {londonTime(s.started_at)}</span><div className="mr-session-sub">{s.screens} screens · {s.events} actions · {s.client ?? '—'}</div></span><span className="mr-session-right">{radarDuration(s.seconds)}{s.errors > 0 && <div className="mr-errors">{s.errors} errors</div>}</span></button>{expanded === s.session_id && <SessionDetail userId={userId} sessionId={s.session_id} />}</React.Fragment>)}{sessions.hasNextPage && <button type="button" className="mr-footer" disabled={sessions.isFetchingNextPage} onClick={() => void sessions.fetchNextPage()}>{sessions.isFetchingNextPage ? 'Loading…' : 'Load more'}</button>}</>}</Panel>}
   </div>;
