@@ -65,6 +65,7 @@ const HIDDEN_ROUTE_PREFIXES = [
   '/businesses/manage',
   '/business/create',
   '/business/invite/accept',
+  '/admin-invite/accept',
   '/i/',
   '/rate-course-v2/',
 ];
