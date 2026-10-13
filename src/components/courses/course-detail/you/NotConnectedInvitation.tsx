@@ -2,9 +2,9 @@
  * BRIEF_YOU_TAB_CONNECT_INVITATION §2.2-2.3 — the field's chart and the empty
  * birdie strip, for branch B (not connected) of CourseYouTab ONLY.
  *
- * The chart colours each bar exactly as IntroHoleChart does (dominant bucket
- * via courseBucketShares, first strictly-greater share wins, RAMP_TOPAR), but
- * carries NO amber example line: here a real "you" is coming. The birdie slots
+ * Each bar takes the RAMP_TOPAR hue of the hole's dominant bucket via the
+ * shared `dominantBucket` helper, which the intro screen and the member's own
+ * chart also call. The chart carries NO amber example line: here a real "you" is coming. The birdie slots
  * are dashed WHITE, never amber - amber marks the member's own data, and there
  * is none yet.
  */
