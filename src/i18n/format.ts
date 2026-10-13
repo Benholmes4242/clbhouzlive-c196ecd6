@@ -12,6 +12,19 @@
 import { formatDistanceToNow } from 'date-fns';
 import { getActiveLocale } from './index';
 
+/**
+ * The Intl FORMATTING locale. getActiveLocale() returns the i18n LANGUAGE
+ * (used for copy lookup and the hand-written English branches); this returns
+ * the locale handed to every Intl constructor. They are deliberately
+ * different: bare "en" is American to Intl (M/D order, Oxford comma), while
+ * clbhouz is British, so English formats as en-GB. This rule previously lived
+ * inside formatList only; it is now the one place for the whole module.
+ */
+function formattingLocale(): string {
+  const l = getActiveLocale();
+  return l === 'en' || l.startsWith('en-XA') ? 'en-GB' : l;
+}
+
 
 type DateInput = Date | string | number;
 
@@ -24,11 +37,11 @@ function toDate(d: DateInput): Date {
 export type DateStyle = 'short' | 'medium' | 'long' | 'full';
 
 export function formatDate(d: DateInput, style: DateStyle = 'medium'): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), { dateStyle: style }).format(toDate(d));
+  return new Intl.DateTimeFormat(formattingLocale(), { dateStyle: style }).format(toDate(d));
 }
 
 export function formatTime(d: DateInput, style: DateStyle = 'short'): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), { timeStyle: style }).format(toDate(d));
+  return new Intl.DateTimeFormat(formattingLocale(), { timeStyle: style, hour12: true }).format(toDate(d));
 }
 
 // ─── relative time ────────────────────────────────────────────────────────
@@ -69,7 +82,7 @@ export function formatRelative(d: DateInput): string {
     return `${years}y`;
   }
 
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'short' });
+  const rtf = new Intl.RelativeTimeFormat(formattingLocale(), { numeric: 'auto', style: 'short' });
   if (seconds < 60) return rtf.format(-seconds, 'second');
   if (minutes < 60) return rtf.format(-minutes, 'minute');
   if (hours < 24) return rtf.format(-hours, 'hour');
@@ -88,7 +101,7 @@ export function formatRelative(d: DateInput): string {
  * inserted for the `en` locale (that is a fr-FR quirk).
  */
 export function formatNumber(n: number): string {
-  return new Intl.NumberFormat(getActiveLocale()).format(n);
+  return new Intl.NumberFormat(formattingLocale()).format(n);
 }
 
 /**
@@ -96,7 +109,7 @@ export function formatNumber(n: number): string {
  * compact helpers used in engagement counters.
  */
 export function formatCompact(n: number): string {
-  return new Intl.NumberFormat(getActiveLocale(), {
+  return new Intl.NumberFormat(formattingLocale(), {
     notation: 'compact',
     maximumFractionDigits: 1,
   }).format(n);
@@ -138,7 +151,7 @@ export function formatCountShort(n: number): string {
  * array used by scheduled-post pills).
  */
 export function formatWeekdayShort(d: DateInput): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), { weekday: 'short' }).format(toDate(d));
+  return new Intl.DateTimeFormat(formattingLocale(), { weekday: 'short' }).format(toDate(d));
 }
 
 /**
@@ -146,7 +159,7 @@ export function formatWeekdayShort(d: DateInput): string {
  * byte-matching the legacy MONTH_SHORT array).
  */
 export function formatMonthShort(d: DateInput): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), { month: 'short' }).format(toDate(d));
+  return new Intl.DateTimeFormat(formattingLocale(), { month: 'short' }).format(toDate(d));
 }
 
 /**
@@ -163,11 +176,12 @@ export function formatMonthShort(d: DateInput): string {
  *   - two-digit minutes, one-or-two-digit hour
  */
 export function formatScheduleDateTime(d: DateInput): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
+    hour12: true,
     minute: '2-digit',
   }).format(toDate(d));
 }
@@ -179,7 +193,7 @@ export function formatScheduleDateTime(d: DateInput): string {
  * en output (Intl 'en' resolves to en-US): "7/16/2026" (M/D/YYYY, no padding).
  */
 export function formatDateNumeric(d: DateInput): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     month: 'numeric',
     day: 'numeric',
     year: 'numeric',
@@ -193,8 +207,9 @@ export function formatDateNumeric(d: DateInput): string {
  * Callers that need uppercase apply `.toUpperCase()` themselves (copy layer).
  */
 export function formatTimeHm(d: DateInput): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     hour: 'numeric',
+    hour12: true,
     minute: '2-digit',
   }).format(toDate(d));
 }
@@ -204,7 +219,7 @@ export function formatTimeHm(d: DateInput): string {
  * Matches `toLocaleDateString(undefined, { weekday: 'long' })`.
  */
 export function formatWeekdayLong(d: DateInput): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), { weekday: 'long' }).format(toDate(d));
+  return new Intl.DateTimeFormat(formattingLocale(), { weekday: 'long' }).format(toDate(d));
 }
 
 /**
@@ -212,7 +227,7 @@ export function formatWeekdayLong(d: DateInput): string {
  * Matches `toLocaleDateString('en-US', { month: 'short', year: 'numeric' })`.
  */
 export function formatMonthYearShort(d: DateInput): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     month: 'short',
     year: 'numeric',
   }).format(toDate(d));
@@ -223,7 +238,7 @@ export function formatMonthYearShort(d: DateInput): string {
  * Matches `toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' })`.
  */
 export function formatMonthDayYearShort(d: DateInput): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -261,7 +276,7 @@ export function formatCurrencyUsdCompact(n: number): string {
  * En output byte-matches the legacy call; groups with commas.
  */
 export function formatNumberMaxFrac(n: number, max: number): string {
-  return new Intl.NumberFormat(getActiveLocale(), { maximumFractionDigits: max }).format(n);
+  return new Intl.NumberFormat(formattingLocale(), { maximumFractionDigits: max }).format(n);
 }
 
 /**
@@ -269,7 +284,7 @@ export function formatNumberMaxFrac(n: number, max: number): string {
  * Matches date-fns `format(d, 'MMM d')` for en.
  */
 export function formatMonthDay(d: DateInput): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     month: 'short',
     day: 'numeric',
   }).format(toDate(d));
@@ -317,7 +332,7 @@ export function formatTournamentDateRange(
  * QUIRK: day-before-month ordering; pinned to en-GB.
  */
 export function formatDayMonthShortGB(d: DateInput): string {
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     day: 'numeric',
     month: 'short',
   }).format(toDate(d));
@@ -330,7 +345,7 @@ export function formatDayMonthShortGB(d: DateInput): string {
  * QUIRK: day-before-month ordering; pinned to en-GB.
  */
 export function formatDayMonthYearShortGB(d: DateInput): string {
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -343,7 +358,7 @@ export function formatDayMonthYearShortGB(d: DateInput): string {
  * per-locale numeral overrides.
  */
 export function formatYearNumeric(d: DateInput): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     year: 'numeric',
   }).format(toDate(d));
 }
@@ -352,45 +367,45 @@ export function formatYearNumeric(d: DateInput): string {
 
 /** en-GB "05 Jul 2026" — day 2-digit, short month, numeric year. */
 export function formatDay2MonthYearShortGB(d: DateInput): string {
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     day: '2-digit', month: 'short', year: 'numeric',
   }).format(toDate(d));
 }
 
 /** en-GB "Jul 05" — short month + 2-digit day. */
 export function formatMonthDay2ShortGB(d: DateInput): string {
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     month: 'short', day: '2-digit',
   }).format(toDate(d));
 }
 
 /** en-GB "Jul 2026" — short month + numeric year. */
 export function formatMonthYearShortGB(d: DateInput): string {
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     month: 'short', year: 'numeric',
   }).format(toDate(d));
 }
 
 /** en-GB "July 2026" — long month + numeric year. */
 export function formatMonthYearLongGB(d: DateInput): string {
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     month: 'long', year: 'numeric',
   }).format(toDate(d));
 }
 
 /** en-GB "Jul" — short month only. */
 export function formatMonthShortGB(d: DateInput): string {
-  return new Intl.DateTimeFormat('en-GB', { month: 'short' }).format(toDate(d));
+  return new Intl.DateTimeFormat(formattingLocale(), { month: 'short' }).format(toDate(d));
 }
 
 /** en-GB "Sat" — short weekday only. */
 export function formatWeekdayShortGB(d: DateInput): string {
-  return new Intl.DateTimeFormat('en-GB', { weekday: 'short' }).format(toDate(d));
+  return new Intl.DateTimeFormat(formattingLocale(), { weekday: 'short' }).format(toDate(d));
 }
 
 /** en-GB "Sat 16 Jul" — short weekday + day + short month. */
 export function formatWeekdayDayMonthShortGB(d: DateInput): string {
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     weekday: 'short', day: 'numeric', month: 'short',
   }).format(toDate(d));
 }
@@ -401,7 +416,7 @@ export function formatWeekdayDayMonthShortGB(d: DateInput): string {
  * on English editorial pages (legal docs). Pinned en-GB for day-before-month.
  */
 export function formatDayMonthLongYearGB(d: DateInput): string {
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     day: 'numeric', month: 'long', year: 'numeric',
   }).format(toDate(d));
 }
@@ -446,7 +461,7 @@ export function formatRelativeRounded(iso: string | null | undefined): string {
 
 /** "July 16, 2026" — long month, day, year (en-US ordering). Matches date-fns `MMMM d, yyyy`. */
 export function formatMonthLongDayYear(d: DateInput): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     month: 'long', day: 'numeric', year: 'numeric',
   }).format(toDate(d));
 }
@@ -455,7 +470,7 @@ export function formatMonthLongDayYear(d: DateInput): string {
  *  Matches date-fns `MMM d, HH:mm` — comma from en-US locale ordering. */
 export function formatMonthDayHm24(d: DateInput): string {
   const date = toDate(d);
-  const md = new Intl.DateTimeFormat(getActiveLocale(), { month: 'short', day: 'numeric' }).format(date);
+  const md = new Intl.DateTimeFormat(formattingLocale(), { month: 'short', day: 'numeric' }).format(date);
   const hm = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
   return `${md}, ${hm}`;
 }
@@ -463,14 +478,14 @@ export function formatMonthDayHm24(d: DateInput): string {
 /** "16 July, 2026" — en-GB day + long month + comma + year. Matches date-fns `d MMMM, yyyy`. */
 export function formatDayMonthLongYearCommaGB(d: DateInput): string {
   const date = toDate(d);
-  const dm = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long' }).format(date);
+  const dm = new Intl.DateTimeFormat(formattingLocale(), { day: 'numeric', month: 'long' }).format(date);
   return `${dm}, ${date.getFullYear()}`;
 }
 
 /** "Saturday, 16 July" — en-GB long weekday + comma + day + long month.
  *  Matches date-fns `EEEE, d MMMM`. */
 export function formatWeekdayLongDayMonthLongGB(d: DateInput): string {
-  return new Intl.DateTimeFormat('en-GB', {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     weekday: 'long', day: 'numeric', month: 'long',
   }).format(toDate(d));
 }
@@ -479,13 +494,13 @@ export function formatWeekdayLongDayMonthLongGB(d: DateInput): string {
 
 /** en-GB long month only — "July". Pinned en-GB for editorial forecast copy. */
 export function formatMonthLongGB(d: DateInput): string {
-  return new Intl.DateTimeFormat('en-GB', { month: 'long' }).format(toDate(d));
+  return new Intl.DateTimeFormat(formattingLocale(), { month: 'long' }).format(toDate(d));
 }
 
 /** en-US "Thu, Jul 16" — short weekday + short month + day. Matches the
  *  upload-scheduled toast pill (weekday:'short', month:'short', day:'numeric'). */
 export function formatWeekdayMonthDayShortUS(d: DateInput): string {
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     weekday: 'short', month: 'short', day: 'numeric',
   }).format(toDate(d));
 }
@@ -493,25 +508,25 @@ export function formatWeekdayMonthDayShortUS(d: DateInput): string {
 /** en-US "3:45 PM" — hour + 2-digit minute, 12h clock. Matches
  *  `toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })`. */
 export function formatTimeHmUS(d: DateInput): string {
-  return new Intl.DateTimeFormat('en-US', {
-    hour: 'numeric', minute: '2-digit',
+  return new Intl.DateTimeFormat(formattingLocale(), {
+    hour: 'numeric', minute: '2-digit', hour12: true,
   }).format(toDate(d));
 }
 
 /** en-US "Jul 16, 2026, 03:45 PM" — full news timestamp. Matches
  *  `toLocaleDateString('en-US', { year, month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })`. */
 export function formatNewsTimestampUS(d: DateInput): string {
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     year: 'numeric', month: 'short', day: 'numeric',
-    hour: '2-digit', minute: '2-digit',
+    hour: '2-digit', minute: '2-digit', hour12: true,
   }).format(toDate(d));
 }
 
 /** "July 16, 2026 at 3:45 PM" — dateStyle:'long' + timeStyle:'short'.
  *  Matches `toLocaleString(undefined, { dateStyle:'long', timeStyle:'short' })`. */
 export function formatDateLongTimeShort(d: DateInput): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), {
-    dateStyle: 'long', timeStyle: 'short',
+  return new Intl.DateTimeFormat(formattingLocale(), {
+    dateStyle: 'long', timeStyle: 'short', hour12: true,
   }).format(toDate(d));
 }
 
@@ -519,7 +534,7 @@ export function formatDateLongTimeShort(d: DateInput): string {
  *  `toLocaleString('default', { month:'long', year:'numeric' })` (default →
  *  active locale). */
 export function formatMonthYearLong(d: DateInput): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), {
+  return new Intl.DateTimeFormat(formattingLocale(), {
     month: 'long', year: 'numeric',
   }).format(toDate(d));
 }
@@ -625,14 +640,14 @@ export function formatRelativeAgo(
     // reader do arithmetic. Opt-in, because surfaces that measure elapsed
     // time (a sync, a streak) are worse for it.
     if (options.weekday && days >= 2 && days <= 6) {
-      return date.toLocaleDateString('en-GB', { weekday: 'short' });
+      return date.toLocaleDateString(formattingLocale(), { weekday: 'short' });
     }
     if (days < 30) return `${days}d ago`;
     if (months < 12) return `${months}mo ago`;
     return `${years}y ago`;
   }
 
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'short' });
+  const rtf = new Intl.RelativeTimeFormat(formattingLocale(), { numeric: 'auto', style: 'short' });
   if (seconds < 60) return rtf.format(-seconds, 'second');
   if (minutes < 60) return rtf.format(-minutes, 'minute');
   if (hours < 24) return rtf.format(-hours, 'hour');
@@ -698,8 +713,7 @@ export function formatRelativeWithSeconds(
       return formatRelative(t);
     }
     const sameYear = date.getFullYear() === new Date().getFullYear();
-    const tag = locale === 'en' ? 'en-GB' : locale;
-    return date.toLocaleDateString(tag, sameYear
+    return date.toLocaleDateString(formattingLocale(), sameYear
       ? { day: 'numeric', month: 'long' }
       : { day: 'numeric', month: 'long', year: 'numeric' });
   }
@@ -774,7 +788,7 @@ export function formatRelativeAgoLong(iso: string | null | undefined): string {
     if (raw === 'less than a minute') return 'just now';
     return `${raw} ago`;
   }
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'long' });
+  const rtf = new Intl.RelativeTimeFormat(formattingLocale(), { numeric: 'auto', style: 'long' });
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
@@ -839,18 +853,13 @@ export function fmtDateLong(iso: string | null | undefined): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
   const d = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(iso);
   if (isNaN(d.getTime())) return '';
-  return new Intl.DateTimeFormat(getActiveLocale(), { weekday: 'long', day: 'numeric', month: 'long' }).format(d);
+  return new Intl.DateTimeFormat(formattingLocale(), { weekday: 'long', day: 'numeric', month: 'long' }).format(d);
 }
 
 /** Locale-aware conjunction list — "4th, 9th and 15th". */
 export function formatList(items: string[]): string {
-  // getActiveLocale() returns a bare "en", which Intl reads as American and
-  // punctuates with the Oxford comma. clbhouz is British: English pins to
-  // en-GB, exactly as every formatDayMonth*GB helper in this file does.
-  const locale = getActiveLocale();
-  const tag = locale === 'en' || locale.startsWith('en-XA') ? 'en-GB' : locale;
   try {
-    return new Intl.ListFormat(tag, { style: 'long', type: 'conjunction' }).format(items);
+    return new Intl.ListFormat(formattingLocale(), { style: 'long', type: 'conjunction' }).format(items);
   } catch {
     return items.length < 2
       ? items.join('')
@@ -860,5 +869,5 @@ export function formatList(items: string[]): string {
 
 /** Long month name in the active locale — en "January", "March". */
 export function formatMonthLong(d: DateInput): string {
-  return new Intl.DateTimeFormat(getActiveLocale(), { month: 'long' }).format(toDate(d));
+  return new Intl.DateTimeFormat(formattingLocale(), { month: 'long' }).format(toDate(d));
 }
