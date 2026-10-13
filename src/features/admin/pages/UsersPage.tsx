@@ -27,7 +27,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import { useCreateAdminActionRequest } from '../hooks/useAdminActionRequests';
-import MemberActivityCard from '../components/MemberActivityCard';
+import MemberRadar from '../components/MemberRadar';
 
 type TabId = 'members' | 'team' | 'invites';
 
@@ -508,30 +508,6 @@ const ROLE_OPTIONS = [
   { value: 'limited_admin', label: 'Limited Admin' },
 ];
 
-function egStatusView(conn: { last_sync_status: string | null; last_synced_at: string | null } | null) {
-  if (!conn) return { tone: 'muted' as const, label: 'Not linked', when: null as string | null };
-  const status = conn.last_sync_status ?? '';
-  if (status === 'ok') {
-    return {
-      tone: 'ok' as const,
-      label: 'Linked - syncing',
-      when: conn.last_synced_at ? `last synced ${ago(conn.last_synced_at)}` : null,
-    };
-  }
-  // A partial run DID sync - it authenticated, refreshed the handicap and
-  // advanced last_synced_at; some score rows were rejected. Keep the synced
-  // time, and never label it as needing re-authentication.
-  if (status === 'partial') {
-    return {
-      tone: 'warn' as const,
-      label: 'Linked - partial sync',
-      when: conn.last_synced_at ? `last synced ${ago(conn.last_synced_at)}` : null,
-    };
-  }
-  return { tone: 'warn' as const, label: 'Needs re-auth', when: null };
-}
-
-
 function Member360Sheet({
   userId, detail, loading, error, onRetry, onClose, onUpdateRole, roleUpdating,
 }: {
@@ -558,8 +534,9 @@ function Member360Sheet({
   const [reqRoleAction, setReqRoleAction] =
     useState<'grant_limited' | 'grant_full' | 'downgrade' | 'revoke'>('grant_limited');
   const [renameOpen, setRenameOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
 
-  const close = () => { setConfirm(null); setRequestMode(null); setReqReason(''); onClose(); };
+  const close = () => { setMoreOpen(false); setConfirm(null); setRequestMode(null); setReqReason(''); onClose(); };
   const name = detail?.display_name ?? detail?.username ?? 'member';
 
   const qc = useQueryClient();
@@ -582,6 +559,7 @@ function Member360Sheet({
         else if (msg === 'already_unverified') toast.error('This member is not verified');
         else toast.error(msg);
       } else if (res?.success) {
+        qc.invalidateQueries({ queryKey: ['admin', 'members'] });
         toast.success(
           confirm === 'delete' ? 'User deleted' :
           confirm === 'suspend' ? (detail.is_suspended ? 'Suspension lifted' : 'User suspended') :
@@ -636,166 +614,49 @@ function Member360Sheet({
     }
   };
 
-  const joinedMonth = detail?.created_at
-    ? new Date(detail.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
-    : null;
-
-  const egView = detail ? egStatusView(detail.whs_connection) : null;
-  const isNew = detail
-    ? Date.now() - new Date(detail.created_at).getTime() < 7 * 86400_000
-    : false;
-
   return (
     <DetailDrawer
       open={!!userId}
       onClose={close}
       title={detail?.display_name ?? (loading ? 'Loading...' : 'Member')}
       subtitle={detail?.username ? `@${detail.username}` : undefined}
-      footer={
-        detail ? (
+      artboard
+    >
+      {userId && <MemberRadar userId={userId} full={isFullAdmin} onClose={close} onMore={() => setMoreOpen(true)} />}
+      <AdminSheet open={moreOpen} onClose={() => setMoreOpen(false)} title="More actions">
+        {detail ? <>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <DrawerBtn onClick={() => navigate(`/profile/${detail.id}`)}>Public profile</DrawerBtn>
             {isFullAdmin && (
               <>
-                <DrawerBtn icon={<KeyRound size={14} />} onClick={() => setConfirm('reset')}>Send password reset</DrawerBtn>
-                <DrawerBtn icon={<AtSign size={14} />} onClick={() => setRenameOpen(true)}>Change username</DrawerBtn>
+                <DrawerBtn icon={<KeyRound size={14} />} onClick={() => { setMoreOpen(false); setConfirm('reset'); }}>Send password reset</DrawerBtn>
+                <DrawerBtn icon={<AtSign size={14} />} onClick={() => { setMoreOpen(false); setRenameOpen(true); }}>Change username</DrawerBtn>
                 {detail.is_verified ? (
-                  <DrawerBtn icon={<BadgeCheck size={14} />} tone="danger" onClick={() => setConfirm('unverify')}>
+                  <DrawerBtn icon={<BadgeCheck size={14} />} tone="danger" onClick={() => { setMoreOpen(false); setConfirm('unverify'); }}>
                     Remove verification
                   </DrawerBtn>
                 ) : (
-                  <DrawerBtn icon={<BadgeCheck size={14} />} onClick={() => setConfirm('verify')}>
+                  <DrawerBtn icon={<BadgeCheck size={14} />} onClick={() => { setMoreOpen(false); setConfirm('verify'); }}>
                     Verify golfer
                   </DrawerBtn>
                 )}
                 <DrawerBtn
                   icon={<Ban size={14} />}
                   tone={detail.is_suspended ? undefined : 'warn'}
-                  onClick={() => setConfirm('suspend')}
+                  onClick={() => { setMoreOpen(false); setConfirm('suspend'); }}
                 >
                   {detail.is_suspended ? 'Lift suspension' : 'Suspend member'}
                 </DrawerBtn>
-                <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => setConfirm('delete')}>Delete member</DrawerBtn>
+                <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => { setMoreOpen(false); setConfirm('delete'); }}>Delete member</DrawerBtn>
               </>
             )}
             {isLimited && (
               <>
-                <DrawerBtn icon={<ShieldAlert size={14} />} tone="warn" onClick={() => { setRequestMode('ban'); setReqReason(''); }}>Request permanent ban</DrawerBtn>
-                <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => { setRequestMode('delete'); setReqReason(''); }}>Request delete</DrawerBtn>
-                <DrawerBtn icon={<ShieldCheck size={14} />} onClick={() => { setRequestMode('role'); setReqReason(''); }}>Request role change</DrawerBtn>
+                <DrawerBtn icon={<ShieldAlert size={14} />} tone="warn" onClick={() => { setMoreOpen(false); setRequestMode('ban'); setReqReason(''); }}>Request permanent ban</DrawerBtn>
+                <DrawerBtn icon={<Trash2 size={14} />} tone="danger" onClick={() => { setMoreOpen(false); setRequestMode('delete'); setReqReason(''); }}>Request delete</DrawerBtn>
+                <DrawerBtn icon={<ShieldCheck size={14} />} onClick={() => { setMoreOpen(false); setRequestMode('role'); setReqReason(''); }}>Request role change</DrawerBtn>
               </>
             )}
           </div>
-        ) : undefined
-      }
-    >
-      {loading && !detail ? (
-        <SkeletonCards n={4} />
-      ) : error && !detail ? (
-        <AdminErrorState title="Couldn't load member" message="Try again in a moment." onRetry={onRetry} />
-      ) : !detail ? null : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {/* Identity header (sticky-ish via top position) */}
-          <div style={{
-            display: 'flex', gap: 12, alignItems: 'flex-start',
-            paddingBottom: 12, borderBottom: `1px solid ${t.line}`,
-          }}>
-            <SquircleAvatar size={46} src={detail.avatar_url} alt={detail.display_name ?? ''} userId={detail.id}
-              hairlineRing
-            />
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 17, fontWeight: 700, color: t.ink }}>
-                  {detail.display_name ?? '-'}
-                </span>
-                {detail.is_verified && <CheckCircle2 size={14} color={t.ok} />}
-                {detail.is_suspended && <StatusPill tone="danger">Suspended</StatusPill>}
-                {isNew && <StatusPill tone="brand">New</StatusPill>}
-                {egView?.tone === 'warn' && <StatusPill tone="warn">EG re-auth</StatusPill>}
-              </div>
-              <div style={{ fontSize: 12, color: t.inkMuted, marginTop: 2 }}>
-                {detail.username ? `@${detail.username}` : ''}
-                {joinedMonth ? ` - joined ${joinedMonth}` : ''}
-              </div>
-              {detail.email && (
-                <div style={{
-                  fontSize: 11, color: t.inkFaint, marginTop: 4,
-                  display: 'flex', alignItems: 'center', gap: 4, minWidth: 0,
-                }}>
-                  {detail.email_confirmed && <BadgeCheck size={12} color={t.ok} style={{ flexShrink: 0 }} />}
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {detail.email}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* 1) Engagement rail: one card, four equal stats */}
-          <Section title="Engagement">
-            <div style={{
-              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0,
-              border: `1px solid ${t.line}`, borderRadius: t.radius.md,
-              background: t.surface, overflow: 'hidden',
-            }}>
-              <Stat label="Posts" value={detail.posts_count} />
-              <Stat label="Reviews" value={detail.reviews_count} divider />
-              <Stat label="Followers" value={detail.followers} divider />
-              <Stat label="Top 100" value={detail.top100_played} divider />
-            </div>
-          </Section>
-
-          {/* C4-1: Member activity - 30-day event bars + session chips */}
-          <MemberActivityCard userId={detail.id} />
-
-          {/* 2) Golf identity */}
-          <Section title="Golf identity">
-            <div style={{
-              border: `1px solid ${t.line}`, borderRadius: t.radius.md,
-              background: t.surface,
-            }}>
-              <IdentityRow icon={<MapPin size={14} color={t.inkMuted} />} label="Home club"
-                value={detail.home_club ?? 'Not set'} muted={!detail.home_club} />
-              <IdentityRow
-                icon={<Radio size={14} color={t.inkMuted} />}
-                label="England Golf"
-                divider
-                value={
-                  egView?.tone === 'muted' ? 'Not linked' :
-                  egView?.tone === 'warn' ? undefined :
-                  egView?.when ? `${egView.label} - ${egView.when}` : egView?.label
-                }
-                muted={egView?.tone === 'muted'}
-                pill={
-                  egView?.tone === 'ok'   ? { tone: 'ok', label: 'Linked - syncing' } :
-                  egView?.tone === 'warn' ? { tone: 'warn', label: 'Needs re-auth' } :
-                  null
-                }
-              />
-            </div>
-          </Section>
-
-          {/* 3) Moderation history */}
-          <Section title="Moderation">
-            <div style={{
-              border: `1px solid ${t.line}`, borderRadius: t.radius.md,
-              background: t.surface, padding: '10px 14px',
-              display: 'flex', flexDirection: 'column', gap: 6,
-            }}>
-              <div style={{
-                fontSize: 13, fontWeight: 600,
-                color: detail.is_suspended ? t.dangerText : t.ink,
-              }}>
-                {detail.is_suspended ? 'Suspended - active' : 'No suspensions'}
-              </div>
-              <div style={{ fontSize: 12, color: t.inkMuted, fontVariantNumeric: 'tabular-nums' }}>
-                {detail.reports_received > 0
-                  ? `${detail.reports_received.toLocaleString()} report${detail.reports_received === 1 ? '' : 's'} received`
-                  : 'No reports received'}
-              </div>
-            </div>
-          </Section>
-
           {/* Role (full-admin direct edit) */}
           {isFullAdmin && (
             <Section title="App role">
@@ -829,13 +690,8 @@ function Member360Sheet({
             </Section>
           )}
 
-          {detail.bio && (
-            <Section title="Bio">
-              <div style={{ fontSize: 13, color: t.ink, lineHeight: 1.5 }}>{detail.bio}</div>
-            </Section>
-          )}
-        </div>
-      )}
+        </> : <SkeletonCards n={1} />}
+      </AdminSheet>
 
       <ConfirmDialog
         open={confirm === 'reset'}

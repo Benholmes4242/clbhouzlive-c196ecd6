@@ -16,6 +16,8 @@ export interface StartConversationOptions {
    * happens to be acting as.
    */
   asActor?: TargetActor;
+  focusComposer?: boolean;
+  returnTo?: string;
 }
 
 export interface UseStartConversationReturn {
@@ -61,7 +63,9 @@ export function useStartConversation(): UseStartConversationReturn {
         }
         navigate(
           `/messages/${conversationId}`,
-          draft ? { state: { draft } } : undefined,
+          draft || options?.focusComposer || options?.returnTo
+            ? { state: { draft, focusComposer: options?.focusComposer, returnTo: options?.returnTo } }
+            : undefined,
         );
       } catch {
         toast.error('Could not start conversation');
