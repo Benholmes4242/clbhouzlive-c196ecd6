@@ -1,23 +1,23 @@
 /**
- * The connect intro's single scoring band. White at four opacities, brightest
- * for the best score, so the band reads good-to-bad without a hue. Do NOT use
- * RAMP_TOPAR here: its hues collided with the chart and were removed.
+ * The connect intro's single scoring band: the whole course's actual mix in
+ * RAMP_TOPAR, the same four buckets and colours the chart above uses per hole,
+ * so the band is the chart's key. One palette, used twice.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { BucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import { ABOUT_KICKER } from '@/components/courses/course-detail/about/AboutSection';
-import { A, BAR_RADIUS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, BAR_RADIUS, RAMP_TOPAR } from '@/features/courses/components/holes/analytical/tokens';
 import { NUM } from './designTokens';
 import { formatNumber } from '@/i18n/format';
 
 const ORDER = ['birdie', 'par', 'bogey', 'double'] as const;
 
 const FILLS: Record<(typeof ORDER)[number], string> = {
-  birdie: 'rgba(248,250,252,0.86)',
-  par: 'rgba(248,250,252,0.58)',
-  bogey: 'rgba(248,250,252,0.34)',
-  double: 'rgba(248,250,252,0.18)',
+  birdie: RAMP_TOPAR.birdie,
+  par: RAMP_TOPAR.par,
+  bogey: RAMP_TOPAR.bogey,
+  double: RAMP_TOPAR.double,
 };
 
 const LABEL_KEYS = {

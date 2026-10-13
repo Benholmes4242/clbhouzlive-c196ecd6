@@ -1,16 +1,33 @@
 /**
  * THE CONNECT-INTRO CHART. This is NOT HowItPlays' LocalHoleChart and must not
  * be merged with it: this one is animated (the connect intro sells the idea).
- * The bars are neutral for the same reason LocalHoleChart's are - height carries
- * difficulty, so a colour ramp would encode the same number twice. The amber
- * example line is the only colour on the chart.
+ * Height carries the hole's difficulty (avg_to_par). Colour carries a DIFFERENT
+ * variable: the hole's typical SCORE - the bucket it most often yields - taken
+ * from the app's own hole-by-hole palette, RAMP_TOPAR. So no number is encoded
+ * twice. The ScoringBand below is the course-wide version of the same four
+ * buckets in the same four colours, so the band reads as the chart's key.
+ * The amber example line is the member's colour on the chart.
  */
 import React from 'react';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
-import { A, BAR_RADIUS, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { courseBucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
+import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
-const CHART_HEIGHT = 100;
+const CHART_HEIGHT = 150;
 const GAP = 3;
+
+const ORDER = ['birdie', 'par', 'bogey', 'double'] as const;
+
+/** Fill for one bar: the hole's dominant bucket, or flat A.DIM with no scored plays. */
+function barFill(h: CourseHole): string {
+  const seg = courseBucketShares([h]);
+  if (!seg) return A.DIM;
+  // Scan in BUCKETS order and keep only a STRICTLY greater share, so the first
+  // maximum wins: an exact tie resolves to the better score, deterministically.
+  let best: (typeof ORDER)[number] = ORDER[0];
+  for (const k of ORDER) if (seg[k] > seg[best]) best = k;
+  return RAMP_TOPAR[best];
+}
 
 const LINE_AMBER = '#F7931E';
 
@@ -40,7 +57,7 @@ export const IntroHoleChart: React.FC<{ holes: CourseHole[] }> = ({ holes }) => 
     const barHeight = Math.max(2, (Math.max(0, h.avg_to_par) / maxField) * CHART_HEIGHT);
     const exampleToPar = Math.max(0, h.avg_to_par) * (0.6 + 0.08 * ((h.hole_no * 7) % 5));
     const markerBottom = Math.max(0, Math.min(barHeight - 2, (exampleToPar / maxField) * CHART_HEIGHT));
-    return { h, barHeight, markerBottom };
+    return { h, barHeight, markerBottom, fill: barFill(h) };
   });
 
   const n = holes.length;
@@ -71,7 +88,7 @@ export const IntroHoleChart: React.FC<{ holes: CourseHole[] }> = ({ holes }) => 
                 height: g.barHeight,
                 borderRadius: BAR_RADIUS,
                 overflow: 'hidden',
-                background: A.DIM,
+                background: g.fill,
               }}
             />
           ))}
