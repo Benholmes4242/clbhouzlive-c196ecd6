@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fieldPaint, FIELD_HEIGHT, FIELD_INK } from '@/lib/tokens/field';
-import { MUTE, DIM, BAD, FONT, LABEL_LG } from './designTokens';
+import { MUTE, DIM, BAD, FONT, LABEL_LG, INK, BORDER, PANEL } from './designTokens';
 import { PrimaryButton, FooterBar, Action, Stage, StageHead } from './Primitives';
 
+/** Derived from the server's error_code in WhsConnectScreen. Never from copy. */
+export type FormErrorKind = 'rejected' | 'refreshing' | 'other' | null;
+
 interface Props {
+  errorKind?: FormErrorKind;
   onSubmit: (membershipNumber: string, password: string) => void;
   error: string | null;
   submitting: boolean;
@@ -24,17 +28,21 @@ interface Props {
  */
 const Field: React.FC<{
   label: string;
-  hint: React.ReactNode;
+  labelAside?: React.ReactNode;
+  hint?: React.ReactNode;
   hintColor?: string;
   invalid?: boolean;
   input: (handlers: { onFocus: () => void; onBlur: () => void }) => React.ReactNode;
   first?: boolean;
-}> = ({ label, hint, hintColor, invalid, input, first }) => {
+}> = ({ label, labelAside, hint, hintColor, invalid, input, first }) => {
   const [focused, setFocused] = useState(false);
   const paint = fieldPaint(focused);
   return (
     <div style={{ paddingTop: first ? 0 : 30 }}>
-      <div style={{ ...LABEL_LG, marginBottom: 10 }}>{label}</div>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
+        <div style={LABEL_LG}>{label}</div>
+        {labelAside}
+      </div>
       <div
         style={{
           ...paint,
@@ -48,12 +56,43 @@ const Field: React.FC<{
       >
         {input({ onFocus: () => setFocused(true), onBlur: () => setFocused(false) })}
       </div>
-      <div style={{ fontSize: 12.5, color: hintColor ?? DIM, marginTop: 10, lineHeight: 1.5 }}>
-        {hint}
-      </div>
+      {hint ? (
+        <div style={{ fontSize: 12.5, color: hintColor ?? DIM, marginTop: 10, lineHeight: 1.5 }}>
+          {hint}
+        </div>
+      ) : null}
     </div>
   );
 };
+
+const TRUST_LABEL: React.CSSProperties = {
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: '0.15em',
+  textTransform: 'uppercase',
+  color: INK,
+};
+const TRUST_BODY: React.CSSProperties = { fontSize: 12.5, lineHeight: 1.5, color: MUTE, marginTop: 6 };
+
+/* TRUST COPY. Every sentence is verified against the edge functions
+   (connect-whs vault_create_secret; sync-whs-due / sync-whs-one /
+   backfill-whs-holes decrypt; disconnect-whs / delete-whs-data / delete-account
+   vault_delete_secret; eg-api.ts is read-only and records the single-use JWT).
+   If any of that stops being true, this copy changes in the same commit. */
+const trustRows = (body: string) => [
+  {
+    label: 'Why we need your password',
+    body: `${body} issues a sign-in token that works once, so every sync has to sign in again. Yours is held in an encrypted vault and decrypted only to fetch your scores.`,
+  },
+  {
+    label: 'We only ever read',
+    body: `Your scores and your handicap record. Nothing is written back to ${body}, and a synced round is never posted anywhere.`,
+  },
+  {
+    label: 'Disconnect and it is gone',
+    body: 'One tap destroys the stored password. Deleting your account does the same.',
+  },
+];
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -83,18 +122,21 @@ export const EnglandGolfForm: React.FC<Props> = ({
   error,
   submitting,
   bodyName = 'England Golf',
+  errorKind = null,
 }) => {
   const { t } = useTranslation('handicap');
   const [membershipNumber, setMembershipNumber] = useState('');
   const [password, setPassword] = useState('');
+  const [reveal, setReveal] = useState(false);
 
   const isValid = membershipNumber.trim().length > 0 && password.length > 0;
   const disabled = !isValid || submitting;
 
   /* A rejected credential is the one error that belongs on the password field.
-     Everything else (federation down, our side, already linked) reads as a
-     neutral message and must NOT tell a member their details are wrong. */
-  const rejected = !!error && /didn't recognise|did not accept/i.test(error);
+     'refreshing' is OUR fault and never touches the fields. Driven by the
+     error_code-derived errorKind, never by matching display copy. */
+  const rejected = errorKind === 'rejected';
+  const refreshing = errorKind === 'refreshing';
 
   return (
     <form
@@ -106,7 +148,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
       className="flex flex-col flex-1 min-h-0"
       style={{ fontFamily: FONT }}
     >
-      <Stage>
+      <Stage fill>
         <StageHead
           small
           kicker={t('whsConnect.steps.form', { body: bodyName })}
@@ -114,7 +156,26 @@ export const EnglandGolfForm: React.FC<Props> = ({
           lead={`The same details you use for the ${bodyName} app.`}
         />
 
-        <div style={{ marginTop: 36 }}>
+        {refreshing ? (
+          <div
+            role="status"
+            style={{
+              background: PANEL,
+              border: `1px solid ${BORDER}`,
+              borderRadius: 14,
+              padding: 14,
+              marginTop: 30,
+            }}
+          >
+            <div style={TRUST_LABEL}>This one is ours</div>
+            <div style={TRUST_BODY}>
+              Our connection to {bodyName} is being refreshed — this is on our side, not yours. Leave
+              your details exactly as they are and try again shortly.
+            </div>
+          </div>
+        ) : null}
+
+        <div style={{ marginTop: refreshing ? 30 : 36 }}>
           <Field
             first
             label="Membership number"
@@ -136,15 +197,31 @@ export const EnglandGolfForm: React.FC<Props> = ({
             label="Password"
             invalid={rejected}
             hintColor={rejected ? BAD : DIM}
-            hint={
-              rejected
-                ? `${bodyName} did not accept those details.`
-                : `Kept encrypted in a vault and decrypted only to run a sync. Disconnect and it is deleted.`
+            hint={rejected ? `${bodyName} did not accept those details.` : undefined}
+            labelAside={
+              <button
+                type="button"
+                onClick={() => setReveal((v) => !v)}
+                aria-pressed={reveal}
+                aria-label={reveal ? 'Hide password' : 'Show password'}
+                style={{
+                  ...LABEL_LG,
+                  letterSpacing: '0.13em',
+                  color: INK,
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  fontFamily: FONT,
+                }}
+              >
+                {reveal ? 'Hide' : 'Show'}
+              </button>
             }
             input={(h) => (
               <input
                 {...h}
-                type="password"
+                type={reveal ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
@@ -155,7 +232,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
             )}
           />
 
-          {error && !rejected ? (
+          {error && !rejected && !refreshing ? (
             <div style={{ fontSize: 13.5, color: BAD, marginTop: 24, lineHeight: 1.5 }}>{error}</div>
           ) : null}
 
@@ -172,12 +249,23 @@ export const EnglandGolfForm: React.FC<Props> = ({
             </div>
           ) : null}
         </div>
-        <div style={{ height: 28 }} />
+        <div style={{ marginTop: 'auto', paddingTop: 36 }}>
+          {trustRows(bodyName).map((row, i) => (
+            <div
+              key={row.label}
+              style={{ padding: '14px 0', borderTop: i === 0 ? 'none' : `1px solid ${BORDER}` }}
+            >
+              <div style={TRUST_LABEL}>{row.label}</div>
+              <div style={TRUST_BODY}>{row.body}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ height: 28, flexShrink: 0 }} />
       </Stage>
 
       <FooterBar>
         <PrimaryButton type="submit" disabled={disabled}>
-          {rejected ? 'Try again' : `Connect to ${bodyName}`}
+          {rejected || refreshing ? 'Try again' : `Connect to ${bodyName}`}
         </PrimaryButton>
       </FooterBar>
     </form>

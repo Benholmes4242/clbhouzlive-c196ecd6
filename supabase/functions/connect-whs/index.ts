@@ -94,6 +94,7 @@ interface ConnectError {
     | "invalid_request"           // missing/malformed body
     | "already_connected"         // user already has a whs_connections row
     | "eg_auth_failed"            // EG rejected the credentials
+    | "eg_connection_refreshing"  // our pre-auth token has lapsed — NOT the member's credentials
     | "eg_unavailable"            // EG returned 5xx / network error
     | "internal_error";           // something else broke
   message: string;
@@ -455,7 +456,22 @@ Deno.serve(async (req) => {
         status: c.status,
         kind: c.kind,
         detail: c.detail.slice(0, 300),
+        // What EG returns on an auth 401 is unknown for client-token vs
+        // credential rejection; logged so a second signal can be added later.
+        // Not branched on.
+        ...(c.kind === "auth_failed" && err instanceof EgApiError
+          ? { upstream_body: (err.upstreamBody ?? "").slice(0, 500) }
+          : {}),
       });
+      if (c.kind === "preauth_expired") {
+        return await fail(
+          "eg_connection_refreshing",
+          "Our connection to England Golf is being refreshed. Please try again shortly.",
+          503,
+          `eg preauth expired: ${c.detail}`,
+          c.status,
+        );
+      }
       if (c.kind === "auth_failed") {
         return await fail(
           "eg_auth_failed",

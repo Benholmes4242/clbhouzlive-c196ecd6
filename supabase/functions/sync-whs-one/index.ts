@@ -87,7 +87,13 @@ Deno.serve(async (req) => {
     const auth = await egAuth(conn.membership_number, password);
     token = auth.token;
   } catch (err) {
+    // A lapsed pre-auth token is OURS, not the member's: skip, write nothing.
+    if (err instanceof EgApiError && err.kind === "preauth_expired") {
+      console.error(`[sync-whs-one] SKIP preauth_expired conn=${conn.id} — row left untouched: ${err.message}`);
+      return Response.json({ ok: false, error: "eg_connection_refreshing" }, { status: 503 });
+    }
     if (err instanceof EgApiError && err.kind === "auth_failed") {
+      console.warn(JSON.stringify({ fn: "sync-whs-one", event: "eg_auth", kind: "auth_failed", conn: conn.id, upstream_body: (err.upstreamBody ?? "").slice(0, 500) }));
       await admin
         .from("whs_connections")
         .update({
