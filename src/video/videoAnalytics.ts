@@ -2,7 +2,7 @@
  * VIDEO IS RECORDED (BRIEF_MEMBERS_RADAR 1.6). One tracker per lane, fed by
  * VideoEngine.wireElementEvents. Emits video_play, video_progress (25/50/75),
  * video_complete and video_watch { seconds actually played }.
- * At most one of each milestone per post+media per session.
+ * At most one play / progress step / complete per post+media per session.
  */
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { getSessionId } from '@/utils/analyticsSession';
@@ -83,7 +83,6 @@ export class LaneVideoTracker {
     if (!(isFinite(d) && d > 0)) return;
     const pct = t / d;
     if (pct >= 0.9) this.passed90 = true;
-    if (pct < 0.5 && delta0(this.lastTime)) this.passed90 = this.passed90 && pct >= 0.9;
     const p = this.props(el);
     for (const m of [25, 50, 75] as const) {
       if (pct * 100 >= m && once(`p${m}`, p.post_id, p.media_index)) {
@@ -109,8 +108,7 @@ export class LaneVideoTracker {
     const seconds = Math.round(this.played);
     this.played = 0;
     const p = this.props(el);
-    if (once('watch', p.post_id, p.media_index)) analyticsEvents.track('video_watch', { ...p, seconds });
+    // Not a milestone: every watched stretch is recorded.
+    analyticsEvents.track('video_watch', { ...p, seconds });
   }
 }
-
-function delta0(_t: number | null) { return false; }

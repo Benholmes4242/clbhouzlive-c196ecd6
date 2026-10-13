@@ -1064,6 +1064,8 @@ class VideoEngineImpl {
 
   private wireElementEvents(lane: Lane, _usingHls: boolean) {
     const el = lane.el;
+    // [ANALYTICS] BRIEF_MEMBERS_RADAR 1.6 — play / progress / complete / watch.
+    const vt = new LaneVideoTracker(lane.id);
     // Unified "ready to show" gate for BOTH fullscreen (open) and feed-active
     // (close/resume). Only flip firstFrame once the element has actually
     // seeked to (or past) the requested position — preventing frame-0 flash.
@@ -1136,6 +1138,7 @@ class VideoEngineImpl {
     };
 
     const onTime = () => {
+      try { vt.onTime(lane.postId, lane.el); } catch { /* analytics only */ }
       if (lane.postId) this.lastPos.set(lane.postId, lane.el.currentTime || 0);
       if (!lane.firstFrame) markReadyToShow('timeupdate');
       // Gapless loop for short clips (<15s): native loop leaves a 100-300ms
@@ -1160,6 +1163,7 @@ class VideoEngineImpl {
     };
 
     const onPlay = () => {
+      try { vt.onPlay(lane.postId, lane.el); } catch { /* analytics only */ }
       vperfLaneEvent(lane.id, 'playing');
       // Reveal as soon as the element reports it is actually playing. 'playing'
       // fires after any pending seek has committed and before the first
@@ -1190,6 +1194,7 @@ class VideoEngineImpl {
       if (lane.state !== 'error') this.transition(lane, 'paused');
       // Only emit sessions for real pauses (not the borrow guard's suppressed pauses).
       if (!lane.el.paused) return;
+      try { vt.flush(lane.el); } catch { /* analytics only */ }
       vperfSessionEnd(lane.id, 'pause');
     };
     const onWaiting = () => {
@@ -1210,6 +1215,7 @@ class VideoEngineImpl {
         }
         return;
       }
+      try { vt.onEnded(lane.el); } catch { /* analytics only */ }
       lane.endedCount++;
       this.emit(lane);
     };
@@ -1240,6 +1246,7 @@ class VideoEngineImpl {
     el.addEventListener('error', onError);
     el.addEventListener('ended', onEnded);
     lane.detachFns.push(() => {
+      try { vt.flush(el); } catch { /* analytics only */ }
       el.removeEventListener('loadeddata', onLoadedData);
       el.removeEventListener('canplay', onCanPlay);
       el.removeEventListener('seeked', onSeeked);
