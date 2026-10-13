@@ -116,7 +116,8 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
       </div>
 
       <CategoryScores
-        marginTop={16}
+        layout="pairs"
+        marginTop={22}
         scores={{
           design: aggregates?.avg_design_score,
           condition: aggregates?.avg_condition_score,
