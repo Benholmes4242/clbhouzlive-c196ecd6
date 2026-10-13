@@ -338,16 +338,14 @@ export function HeroBoardSection({
 
   const showUpcomingFacts = shouldLoadUpcomingFacts(phase);
   const { data: teeTimes = [] } = useTournamentTeeTimes(tournamentId, showUpcomingFacts);
-  const { data: defending } = useTournamentDefendingChamp(showUpcomingFacts ? tournamentId : null);
   const { data: lastYear } = useTournamentLastYearTop4(showUpcomingFacts ? tournamentId : null);
   const firstTeeCandidate = teeTimes[0] ?? null;
   const firstTee = firstTeeCandidate?.time && firstTeeCandidate.time !== '\u2014'
     ? firstTeeCandidate
     : null;
-  const priorWinner = lastYear?.find((row) => row.rank === '1' || row.rank === 'T1') ?? null;
-  const priorScore = priorWinner?.score || defending?.score || null;
   const upcomingFacts = compactUpcomingFacts([
-    defending?.name ? { label: t('overview.hero.defending'), value: surnameOf(defending.name), trailing: priorScore, trailingColor: priorScore && /^[-−]/.test(priorScore) ? TOPAR_UNDER_DARK : INK } : null,
+    // DEFENDING removed (BRIEF_TOUR_CHAMPION_TRUTH X.3): THE SITUATION names the
+    // defender and the LAST YEAR board carries the score in context.
     firstTee ? { label: t('overview.hero.firstTee'), value: firstTee.time, trailing: null, trailingColor: INK } : null,
     // FIELD (world top-20 count) is omitted: no entries data exists to derive it (Phase 4 §4.3).
   ]);
