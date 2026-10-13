@@ -571,11 +571,11 @@ function AppRoutes() {
         <Route path="/create-profile" element={<CreateProfileRedirect />} />
         <Route path="/profile" element={<ProfileWrapped />} />
         <Route path="/profile/handicap" element={<Navigate to="/profile?tab=handicap" replace />} />
-        <Route path="/handicap" element={<Suspense fallback={null}><HandicapRedirect /></Suspense>} />
+        <Route path="/handicap" element={<Suspense fallback={<HandicapPageSkeleton />}><HandicapRedirect /></Suspense>} />
         <Route path="/handicap/legends" element={<Navigate to="/profile?tab=handicap" replace />} />
         
         <Route path="/handicap/rivalry/:rivalUserId" element={<Suspense fallback={<HandicapPageSkeleton />}><RivalryCompareRedirect /></Suspense>} />
-        <Route path="/handicap/:userId" element={<Suspense fallback={null}><HandicapRedirect /></Suspense>} />
+        <Route path="/handicap/:userId" element={<Suspense fallback={<HandicapPageSkeleton />}><HandicapRedirect /></Suspense>} />
         <Route path="/handicap/:friendUserId/rivalry/:rivalUserId" element={<Suspense fallback={<HandicapPageSkeleton />}><RivalryCompareRedirect /></Suspense>} />
 
 

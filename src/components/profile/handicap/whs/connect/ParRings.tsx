@@ -7,10 +7,13 @@
  * what was offered.
  *
  * ALL THREE RINGS SHARE ONE CEILING (RING_MAX) so they are comparable with
- * each other. Colours are designTokens AMBER / BAD / GOOD - the dark values.
+ * each other. Every ring takes INK: the arc carries the value. The only colour is the
+ * derived AMBER "Costs you most" kicker under the highest avg_over (ties and
+ * nulls excluded) - a comparison of the on-screen values, never a category.
  */
 import React from 'react';
-import { INK, DIM, TRACK, AMBER, GOOD, BAD, LABEL, NUM } from './designTokens';
+import { useTranslation } from 'react-i18next';
+import { INK, DIM, TRACK, AMBER, LABEL, NUM } from './designTokens';
 
 /** One ceiling for all three rings, so par types read against each other. */
 export const RING_MAX = 0.8;
@@ -29,7 +32,9 @@ const Ring: React.FC<{
   holesLabel: string;
   color: string;
   size: number;
-}> = ({ value, holes, label, holesLabel, color, size }) => {
+  costsMost: boolean;
+  costsMostLabel: string;
+}> = ({ value, holes, label, holesLabel, color, size, costsMost, costsMostLabel }) => {
   const stroke = size >= 100 ? 9 : size >= 84 ? 8 : 7;
   const figure = size >= 100 ? 21 : size >= 84 ? 18 : 16;
 
@@ -72,6 +77,19 @@ const Ring: React.FC<{
       </div>
       <span style={{ ...LABEL, color: DIM }}>{label}</span>
       {holes ? <span style={{ ...LABEL, color: DIM }}>{holesLabel}</span> : null}
+      <span
+        aria-hidden={!costsMost}
+        style={{
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: '0.13em',
+          textTransform: 'uppercase',
+          color: AMBER,
+          visibility: costsMost ? 'visible' : 'hidden',
+        }}
+      >
+        {costsMostLabel}
+      </span>
     </div>
   );
 };
@@ -86,16 +104,36 @@ interface Props {
   holesLabel: (n: number) => string;
 }
 
+/**
+ * Index of the highest avg_over among the values present, compared at the
+ * displayed precision (2dp). A tie at the top marks none; nulls are skipped.
+ */
+export function costsMostIndex(values: Array<number | null | undefined>): number | null {
+  let best: number | null = null;
+  let bestVal = -Infinity;
+  let tied = false;
+  values.forEach((v, i) => {
+    if (v == null || Number.isNaN(v)) return;
+    const r = Math.round(v * 100);
+    if (r > bestVal) { bestVal = r; best = i; tied = false; }
+    else if (r === bestVal) tied = true;
+  });
+  return tied ? null : best;
+}
+
 export const ParRings: React.FC<Props> = ({ par3, par4, par5, size = 86, labels, holesLabel }) => {
+  const { t } = useTranslation('handicap');
   const rows: Array<{ d: RingDatum; label: string; color: string }> = [
-    { d: par3, label: labels.par3, color: AMBER },
-    { d: par4, label: labels.par4, color: BAD },
-    { d: par5, label: labels.par5, color: GOOD },
+    { d: par3, label: labels.par3, color: INK },
+    { d: par4, label: labels.par4, color: INK },
+    { d: par5, label: labels.par5, color: INK },
   ];
+  const worst = costsMostIndex(rows.map((r) => r.d.value));
+  const costsMostLabel = t('whsConnect.done.costsMost', { defaultValue: 'Costs you most' });
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10 }}>
-      {rows.map((row) =>
+      {rows.map((row, i) =>
         row.d.value == null || Number.isNaN(row.d.value) ? (
           <div key={row.label} />
         ) : (
@@ -107,6 +145,8 @@ export const ParRings: React.FC<Props> = ({ par3, par4, par5, size = 86, labels,
             holesLabel={holesLabel(row.d.holes ?? 0)}
             color={row.color}
             size={size}
+            costsMost={i === worst}
+            costsMostLabel={costsMostLabel}
           />
         ),
       )}

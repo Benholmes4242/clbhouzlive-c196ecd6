@@ -17,6 +17,7 @@ import DisconnectConfirmSheet from '@/components/settings/sheets/DisconnectConfi
 import DeleteAllDataConfirmSheet from '@/components/settings/sheets/DeleteAllDataConfirmSheet';
 import { useDeclineHandicapChip } from '@/lib/whs/useDeclineHandicapChip';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { handicapTabRoute } from '@/lib/handicap/handicapTabRoute';
 
 
 export default function HandicapManagePage() {
@@ -130,7 +131,7 @@ export default function HandicapManagePage() {
         onConnected={async () => {
           invalidateAll();
           setFlowFinished(true);
-          navigate('/handicap', { replace: true });
+          navigate(handicapTabRoute(), { replace: true });
         }}
         onDecline={declineHandicapChip}
       />

@@ -274,7 +274,8 @@
       "floor": "Your scoring breakdown builds as you post rounds.",
       "cta": "See your full record",
       "headlineRounds": "{{rounds}} rounds, all here.",
-      "shotsLanding": "Still reading your holes. This finishes on our servers - the breakdown appears here and on your record the moment it lands."
+      "shotsLanding": "Still reading your holes. This finishes on our servers - the breakdown appears here and on your record the moment it lands.",
+      "costsMost": "Costs you most"
     },
     "steps": {
       "country": "Step 1 · Your country",
