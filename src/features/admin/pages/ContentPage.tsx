@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { formatDistanceToNow, format } from 'date-fns';
+import { format } from 'date-fns';
+import { formatAgo } from '../lib/formatAgo';
 import { toast } from '@/lib/toast';
 import {
   Plus, Search, RefreshCw, Image as ImageIcon,
@@ -876,7 +877,7 @@ function TourDataTab() {
 
       {lastUpdated && (
         <div style={{ fontSize: 11, color: t.inkFaint }}>
-          Updated {formatDistanceToNow(new Date(lastUpdated), { addSuffix: true })}
+          Updated {formatAgo(lastUpdated, { suffix: true })}
         </div>
       )}
 
@@ -1253,7 +1254,7 @@ function PlayerRowCard({ player, cacheBust, onPhoto }: { player: PlayerRow; cach
       </div>
       {player.updatedAt && (
         <div style={{ fontSize: 11, color: t.inkFaint, flexShrink: 0 }}>
-          {formatDistanceToNow(new Date(player.updatedAt), { addSuffix: true })}
+          {formatAgo(player.updatedAt, { suffix: true })}
         </div>
       )}
       <ChevronRight size={16} color={t.inkFaint} style={{ flexShrink: 0 }} />

@@ -1,5 +1,5 @@
+import { formatAgo } from '../lib/formatAgo';
 import React, { useEffect, useMemo, useState } from 'react';
-import { formatDistanceToNow } from 'date-fns';
 import { Link2, ChevronDown, ChevronUp, Image as ImageIcon, MapPin, CheckCircle2 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -157,10 +157,6 @@ async function fetchQueue(): Promise<QueueRow[]> {
     .sort((a, b) => b.scored_rounds - a.scored_rounds);
 }
 
-function relTime(iso: string | null): string {
-  if (!iso) return '—';
-  try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); } catch { return '—'; }
-}
 
 function methodTone(m: MatchMethod): 'warn' | 'neutral' {
   if (m === 'echo_no_match' || m === 'echo_review') return 'warn';
@@ -482,7 +478,7 @@ function QueueCard({ row, expanded, onToggle, onResolve, onIgnore, onNeedsCatalo
         <span>·</span>
         <span style={{ fontVariantNumeric: 'tabular-nums' }}>{agree} {agree === 1 ? 'model agrees' : 'models agree'}</span>
         <span>·</span>
-        <span>{relTime(row.matched_at)}</span>
+        <span>{formatAgo(row.matched_at, { suffix: true, empty: '—' })}</span>
         {row.suggested_course_name && (
           <>
             <span>·</span>

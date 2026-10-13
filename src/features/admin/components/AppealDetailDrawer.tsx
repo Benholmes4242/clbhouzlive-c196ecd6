@@ -1,5 +1,5 @@
+import { formatAgo } from '../lib/formatAgo';
 import React, { useMemo, useState } from 'react';
-import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
 import DetailDrawer from './DetailDrawer';
@@ -13,10 +13,6 @@ interface Props {
   row: AppealRow | null;
 }
 
-function relTime(iso: string | null | undefined): string {
-  if (!iso) return '-';
-  try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); } catch { return '-'; }
-}
 
 function fmt(iso: string | null): string {
   if (!iso) return '-';
@@ -61,7 +57,7 @@ export default function AppealDetailDrawer({ open, onClose, row }: Props) {
         open={open}
         onClose={closeAll}
         title="Suspension appeal"
-        subtitle={row ? `Submitted ${relTime(row.created_at)}` : ''}
+        subtitle={row ? `Submitted ${formatAgo(row.created_at, { suffix: true, empty: '-' })}` : ''}
         footer={
           row && isPending ? (
             <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
@@ -128,7 +124,7 @@ export default function AppealDetailDrawer({ open, onClose, row }: Props) {
               <section style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <div style={sectionLabel()}>Reviewed</div>
                 <span style={{ color: t.inkMuted, fontSize: 13 }}>
-                  {relTime(row.reviewed_at)} - {row.review_note ?? 'no note'}
+                  {formatAgo(row.reviewed_at, { suffix: true, empty: '-' })} - {row.review_note ?? 'no note'}
                 </span>
               </section>
             )}

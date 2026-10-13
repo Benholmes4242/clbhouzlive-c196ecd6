@@ -10,7 +10,7 @@
  */
 import React from 'react';
 import { ExternalLink, Plus } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatAgo } from '../../lib/formatAgo';
 import { toast } from '@/lib/toast';
 import { adminTheme as t } from '../../theme';
 import StatusPill from '../StatusPill';
@@ -30,11 +30,7 @@ const KICKER_STYLE: React.CSSProperties = {
 
 function when(s: AdminStory): string {
   const at = s.published_at ?? s.created_at;
-  try {
-    return formatDistanceToNow(new Date(at), { addSuffix: true });
-  } catch {
-    return '';
-  }
+  return formatAgo(at, { suffix: true, empty: '' });
 }
 
 export default function TheWireTab() {

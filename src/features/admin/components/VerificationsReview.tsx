@@ -1,6 +1,6 @@
+import { formatAgo } from '../lib/formatAgo';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
 import { CheckCircle2, Mail, ShieldOff, X } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { adminTheme as t } from '../theme';
@@ -27,11 +27,6 @@ import { BarVerdict, RawMetadataDisclosure, SignalsPanel, resolveSignals } from 
  * using this without regression.
  */
 
-function relTime(iso: string | null | undefined): string {
-  if (!iso) return '-';
-  try { return formatDistanceToNow(new Date(iso), { addSuffix: true }); }
-  catch { return '-'; }
-}
 
 /* PROOF_LABELS retired in Phase 4: the drawer names signals, not proof methods.
    PROOF_NOUNS survives because the duplicate warning still names the evidence. */
@@ -226,8 +221,8 @@ export function VerificationsTab({
         ) : ''}
         subtitle={active ? (
           active.type === 'course_claim'
-            ? `Course claim - requested by ${active.displayName ?? active.username ?? '-'} - ${relTime(active.createdAt)}`
-            : `${active.type === 'business' ? 'Business' : 'Golfer'} - ${relTime(active.createdAt)}`
+            ? `Course claim - requested by ${active.displayName ?? active.username ?? '-'} - ${formatAgo(active.createdAt, { suffix: true, empty: '-' })}`
+            : `${active.type === 'business' ? 'Business' : 'Golfer'} - ${formatAgo(active.createdAt, { suffix: true, empty: '-' })}`
         ) : undefined}
         footer={active && canRevoke ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
@@ -428,7 +423,7 @@ export function VerificationDetailBody({
             <strong style={{ fontWeight: 700 }}>Already verified elsewhere</strong> - this{' '}
             {PROOF_NOUNS[row.proofMethod ?? ''] ?? 'evidence'} is verified for{' '}
             <strong style={{ fontWeight: 700 }}>{proofConflict.businessName}</strong>
-            {proofConflict.approvedAt ? ` (${relTime(proofConflict.approvedAt)})` : ''}.
+            {proofConflict.approvedAt ? ` (${formatAgo(proofConflict.approvedAt, { suffix: true, empty: '-' })})` : ''}.
             Approving verifies a second business on the same evidence.
           </div>
         </div>
@@ -481,7 +476,7 @@ export function VerificationDetailBody({
           </div>
           <div style={{ fontSize: 13, color: t.ink, lineHeight: 1.45 }}>
             {row.status} {row.reviewerName ? `by ${row.reviewerName}` : row.reviewedBy ? `by ${row.reviewedBy.slice(0, 8)}` : ''}
-            {row.reviewedAt ? ` - ${relTime(row.reviewedAt)}` : ''}
+            {row.reviewedAt ? ` - ${formatAgo(row.reviewedAt, { suffix: true, empty: '-' })}` : ''}
           </div>
           {(row.type === 'golfer' ? golferReasonLabel(row.reviewReason) : reviewReasonLabel(row.reviewReason)) && (
             <div style={{ fontSize: 13, color: t.ink }}>
@@ -628,7 +623,7 @@ function VerificationCard({
                 {row.claimCourseName ?? row.claimBusinessName ?? 'Course claim'}
               </div>
               <div style={{ fontSize: 12, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                Course claim - requested by {row.displayName ?? row.username ?? '-'} - {relTime(row.createdAt)}
+                Course claim - requested by {row.displayName ?? row.username ?? '-'} - {formatAgo(row.createdAt, { suffix: true, empty: '-' })}
                 {row.claimBusinessName && row.claimBusinessName !== row.claimCourseName ? ` - ${row.claimBusinessName}` : ''}
               </div>
             </>
@@ -638,7 +633,7 @@ function VerificationCard({
                 {row.displayName ?? row.username ?? row.requestedBy?.slice(0, 8) ?? '-'}
               </div>
               <div style={{ fontSize: 12, color: t.inkMuted }}>
-                {row.type === 'business' ? 'Business' : 'Golfer'} - {relTime(row.createdAt)}
+                {row.type === 'business' ? 'Business' : 'Golfer'} - {formatAgo(row.createdAt, { suffix: true, empty: '-' })}
               </div>
             </>
           )}
