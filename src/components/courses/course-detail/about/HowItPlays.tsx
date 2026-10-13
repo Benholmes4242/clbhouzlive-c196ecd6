@@ -27,11 +27,26 @@ import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
-import { courseBucketShares, type BucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
+import { BUCKETS, courseBucketShares, type BucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import AboutSection, { ABOUT_KICKER, AboutHairline, aboutFig } from './AboutSection';
 import AllHolesSheet, { CompactHoleRow } from './AllHolesSheet';
 
 const CHART_HEIGHT = 82;
+const GAP = 3;
+
+/** Dominant score bucket of one hole: BUCKETS order, strictly-greater scan, so an
+ *  exact tie resolves to the better score. Null shares → flat A.DIM. */
+function dominantColour(hole: CourseHole): string {
+  const seg = courseBucketShares([hole]);
+  if (!seg) return A.DIM;
+  let best: keyof typeof RAMP_TOPAR | null = null;
+  let bestV = -Infinity;
+  for (const b of BUCKETS) {
+    const v = seg[b.key as keyof BucketShares];
+    if (v > bestV) { bestV = v; best = b.key as keyof typeof RAMP_TOPAR; }
+  }
+  return best ? RAMP_TOPAR[best] : A.DIM;
+}
 
 /** Eighteen independent field comparisons. This intentionally does not reuse ShapeChart. */
 const LocalHoleChart: React.FC<{
@@ -39,38 +54,71 @@ const LocalHoleChart: React.FC<{
   myByHole: Map<number, MyHolePerformanceRow>;
   hasYou: boolean;
 }> = ({ holes, myByHole, hasYou }) => {
-  const maxField = Math.max(0.01, ...holes.map((hole) => Math.max(0, hole.avg_to_par)));
+  // One shared scale for field AND member, so a member worse than the field draws
+  // ABOVE the bar instead of being clamped level with it (the old marker's bug).
+  const scaleMax = Math.max(
+    0.01,
+    ...holes.map((h) => Math.max(0, h.avg_to_par)),
+    ...(hasYou ? [...myByHole.values()].map((m) => Math.max(0, m.avg_to_par)) : []),
+  );
+
+  const wrapRef = React.useRef<HTMLDivElement>(null);
+  const [W, setW] = React.useState(0);
+  React.useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const measure = () => setW(el.clientWidth);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Runs of CONSECUTIVE played holes. Gaps break the line — never bridged, since
+  // joining across an unplayed hole would invent rounds that were never played.
+  const runs: Array<Array<[number, number]>> = [];
+  if (hasYou && W > 0 && holes.length > 0) {
+    const bw = (W - (holes.length - 1) * GAP) / holes.length;
+    let cur: Array<[number, number]> = [];
+    holes.forEach((hole, i) => {
+      const mine = myByHole.get(hole.hole_no)?.avg_to_par;
+      if (mine == null || !Number.isFinite(mine)) {
+        if (cur.length) runs.push(cur);
+        cur = [];
+        return;
+      }
+      const x = i * (bw + GAP) + bw / 2;
+      const y = CHART_HEIGHT - (Math.max(0, mine) / scaleMax) * CHART_HEIGHT;
+      cur.push([x, y]);
+    });
+    if (cur.length) runs.push(cur);
+  }
 
   return (
     <div>
+      <div ref={wrapRef} aria-hidden="true" style={{ position: 'relative' }}>
       <div
-        aria-hidden="true"
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${holes.length}, minmax(0, 1fr))`,
           alignItems: 'end',
-          gap: 3,
+          gap: GAP,
           height: CHART_HEIGHT,
         }}
       >
         {holes.map((hole) => {
           const fieldValue = Math.max(0, hole.avg_to_par);
-          const barHeight = Math.max(2, (fieldValue / maxField) * CHART_HEIGHT);
-          const mine = myByHole.get(hole.hole_no)?.avg_to_par;
-          const markerBottom = mine == null
-            ? null
-            : Math.max(0, Math.min(barHeight - 2, (Math.max(0, mine) / maxField) * CHART_HEIGHT));
+          const barHeight = Math.max(2, (fieldValue / scaleMax) * CHART_HEIGHT);
 
           return (
-            /* NEUTRAL ON PURPOSE. The bars carried a two-step red keyed on avg_to_par,
-               which is the number the bar HEIGHT already encodes on the same scale — so
-               the colour was a duplicate, not a signal. Worse, that red was A.RED
-               (#E24B3F), which is TOPAR_UNDER_DARK: the same hex as RAMP_TOPAR.birdie in
-               the distribution strip below, where it means the BEST scores. One value
-               cannot mean "hardest hole" here and "birdie" there.
-               Height carries difficulty. Amber carries the viewer. Nothing else is a
-               colour. Do not reintroduce a difficulty hue here — if one is ever wanted,
-               it is DIFFICULTY_RAMP from the analytical tokens and nothing else. */
+            /* COLOUR = THE HOLE'S MOST COMMON SCORE, from RAMP_TOPAR. This used to be
+               neutral because the earlier two-step red was A.RED (#E24B3F) — the same hex
+               as RAMP_TOPAR.birdie in the distribution strip below — so one value meant
+               "hardest hole" here and "birdie" there. That objection is now SATISFIED, not
+               broken: red means birdie in BOTH places, and the strip below is this chart's
+               key. Height still carries difficulty and remains its ONLY encoding: never add
+               a difficulty hue here. DIFFICULTY_RAMP is still the wrong answer. Amber
+               carries the viewer, as the line drawn over these bars. */
             <span
               key={hole.hole_no}
               style={{
@@ -79,26 +127,41 @@ const LocalHoleChart: React.FC<{
                 width: '100%',
                 height: barHeight,
                 borderRadius: BAR_RADIUS,
-                background: A.DIM,
+                background: dominantColour(hole),
                 overflow: 'hidden',
               }}
-            >
-              {hasYou && markerBottom != null ? (
-                <i
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    right: 0,
-                    bottom: markerBottom,
-                    height: 2,
-                    borderRadius: BAR_RADIUS,
-                    background: A.AMBER,
-                  }}
-                />
-              ) : null}
-            </span>
+            />
           );
         })}
+      </div>
+      {/* SOLID, not dashed: this is the member's real per-hole average. The connect
+          intro's line is dashed because it is an invented example — dashed means
+          illustrative, solid means measured. Static: no animation on a data surface. */}
+      {hasYou && W > 0 ? (
+        <svg
+          viewBox={`0 0 ${W} ${CHART_HEIGHT}`}
+          preserveAspectRatio="none"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' }}
+        >
+          {runs.map((run, k) =>
+            run.length === 1 ? (
+              <circle key={k} cx={run[0][0]} cy={run[0][1]} r={2} fill={A.AMBER} />
+            ) : (
+              <polyline
+                key={k}
+                points={run.map(([x, y]) => `${x},${y}`).join(' ')}
+                fill="none"
+                stroke={A.AMBER}
+                strokeWidth={1.75}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            ),
+          )}
+        </svg>
+      ) : null}
+      </div>
       </div>
       <div
         style={{
