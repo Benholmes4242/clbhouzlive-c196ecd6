@@ -177,7 +177,17 @@ async function syncOneConnection(
     const auth = await egAuth(conn.membership_number, password);
     token = auth.token;
   } catch (err) {
+    // A lapsed pre-auth token is OURS: no markFailure, no consecutive_failures,
+    // no last_sync_status, no last_synced_at. The row stays exactly as it was.
+    if (err instanceof EgApiError && err.kind === "preauth_expired") {
+      result.status = "preauth_expired";
+      result.error = err.message;
+      return result;
+    }
     if (err instanceof EgApiError) {
+      if (err.kind === "auth_failed") {
+        console.warn(JSON.stringify({ fn: "sync-whs-due", event: "eg_auth", kind: "auth_failed", conn: conn.id, upstream_body: (err.upstreamBody ?? "").slice(0, 500) }));
+      }
       result.status = err.kind;
       result.error = err.message;
       await markFailure(admin, conn, err.kind, err.message);
@@ -519,6 +529,7 @@ Deno.serve(async (req) => {
     timedOut: 0,
     skippedPoisoned: 0,
     skippedBudget: 0,
+    skippedPreauthExpired: 0,
     durationMs: 0,
     budgetReached: false,
   };
@@ -618,7 +629,15 @@ Deno.serve(async (req) => {
 
     // Process sequentially to avoid hammering EG with parallel auth calls.
     const results: SyncResult[] = [];
+    let preauthLapsed = false;
     for (const conn of queue) {
+      // SHORT-CIRCUIT: once the pre-auth token is seen lapsed, every remaining
+      // connection would fail identically. Skip them without calling egAuth
+      // and without claiming or writing the row.
+      if (preauthLapsed) {
+        summary.skippedPreauthExpired++;
+        continue;
+      }
       const elapsed = Date.now() - startedAt;
       if (elapsed > OVERALL_BUDGET_MS) {
         summary.budgetReached = true;
@@ -644,6 +663,12 @@ Deno.serve(async (req) => {
       try {
         const r = await syncOneConnection(admin, conn, drain);
         results.push(r);
+        if (r.status === "preauth_expired") {
+          preauthLapsed = true;
+          summary.skippedPreauthExpired++;
+          summary.attempted--;
+          continue;
+        }
         if (r.ok && r.status === "partial") summary.partial++;
         else if (r.ok) summary.succeeded++;
         else summary.failed++;
@@ -679,6 +704,9 @@ Deno.serve(async (req) => {
       }
     }
 
+    if (summary.skippedPreauthExpired > 0) {
+      console.error(`[sync-due ${runId}] PREAUTH LAPSED — EG_PREAUTH_TOKEN expired mid-sweep; ${summary.skippedPreauthExpired} connection(s) skipped untouched. Health board will still read green: refresh the token.`);
+    }
     logSummary();
     await recordRun(admin, {
       run_id: runId,

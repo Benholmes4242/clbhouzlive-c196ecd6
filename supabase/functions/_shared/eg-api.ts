@@ -40,6 +40,7 @@ function egPlayDateToLocal(playDate: string): string {
 
 export type EgErrorKind =
   | "auth_failed"           // user creds wrong, or pre-auth token rejected
+  | "preauth_expired"       // OUR pre-auth token has lapsed (established from its expiry, never from a 401)
   | "rate_limited"          // 429
   | "transient_error"       // 5xx, network failure, timeout
   | "not_found"             // 404
@@ -89,7 +90,43 @@ export function getPreAuthToken(): string {
       "EG_PREAUTH_TOKEN env var not set — call supabase secrets set EG_PREAUTH_TOKEN=<token>",
     );
   }
+  const expiresAt = preAuthExpiry(tok);
+  if (expiresAt != null && expiresAt - PREAUTH_EXPIRY_MARGIN_MS <= Date.now()) {
+    throw new EgApiError(
+      "preauth_expired",
+      0,
+      `EG_PREAUTH_TOKEN lapsed at ${new Date(expiresAt).toISOString()} — refresh it before syncing`,
+    );
+  }
   return tok;
+}
+
+const PREAUTH_EXPIRY_MARGIN_MS = 60_000;
+
+/**
+ * Expiry of the pre-auth token in epoch ms, established WITHOUT guessing:
+ *   1. the token is a three-part JWT whose payload carries a numeric `exp`;
+ *   2. otherwise EG_PREAUTH_EXPIRES_AT, if set to a parseable RFC3339 timestamp;
+ *   3. otherwise null — behave exactly as before.
+ * NEVER inferred from a 401: a 401 cannot tell our token from their password.
+ */
+function preAuthExpiry(tok: string): number | null {
+  const parts = tok.trim().replace(/^Bearer\s+/i, "").split(".");
+  if (parts.length === 3) {
+    try {
+      const b64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+      const payload = JSON.parse(atob(b64 + "=".repeat((4 - (b64.length % 4)) % 4)));
+      if (typeof payload?.exp === "number" && Number.isFinite(payload.exp)) return payload.exp * 1000;
+    } catch {
+      // not a decodable JWT — fall through to the env var
+    }
+  }
+  const envExp = Deno.env.get("EG_PREAUTH_EXPIRES_AT");
+  if (envExp) {
+    const ms = Date.parse(envExp);
+    if (Number.isFinite(ms)) return ms;
+  }
+  return null;
 }
 
 // =============================================================================
