@@ -17,7 +17,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
 import { ReviewVerdictLabel, reviewLabelColor } from '@/components/shared/ReviewGhostScore';
 import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
-import { categoryFillPercent } from '@/components/courses/course-detail/CategoryScores';
+import { CategoryScores } from '@/components/courses/course-detail/CategoryScores';
 import { formatRatingValue } from '@/utils/formatters';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 import { formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
@@ -28,8 +28,6 @@ const GUTTER = 14;
 const NAME_SIZE = 15;
 const NAME_LINE = 1.25;
 
-type CatKey = 'design' | 'condition' | 'clubhouse' | 'facilities';
-const CATS: CatKey[] = ['design', 'condition', 'clubhouse', 'facilities'];
 
 const COURSE_NAME_STYLE: React.CSSProperties = {
   fontSize: 19, fontWeight: 800, letterSpacing: '-0.028em', lineHeight: 1.16, color: A.INK,
@@ -76,13 +74,13 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
   ].filter(Boolean).join(', ');
 
   const courseName = review?.courseName || post.courseName || null;
-  const scores: Record<CatKey, number | null> = {
+  const scores = {
     design: review?.breakdown?.design ?? null,
     condition: review?.breakdown?.conditions ?? null,
     clubhouse: review?.breakdown?.clubhouse ?? null,
     facilities: review?.breakdown?.facilities ?? null,
   };
-  const anyScore = CATS.some((key) => scores[key] != null);
+  const anyScore = Object.values(scores).some((v) => v != null);
   const body = review?.reviewText || post.caption || '';
 
   return (
@@ -176,38 +174,12 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         ) : null}
       </div>
 
-      {/* D — what they scored. Four columns always; em dash, no track, when unscored. */}
+      {/* D — what they scored. The shared course-page block (bar, figure,
+          label); a missing category keeps its empty column. */}
       {anyScore ? (
-        <ul
-          data-review-categories
-          style={{ flex: 'none', listStyle: 'none', margin: 0, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 9, padding: `0 ${GUTTER}px 12px` }}
-        >
-          {CATS.map((key) => {
-            const value = scores[key];
-            const label = tCourses(`review.subscore.${key}`);
-            const tone = courseSubScoreTone(value);
-            return (
-              <li
-                key={key}
-                data-review-category={key}
-                aria-label={value != null ? `${label} ${value.toFixed(1)}` : label}
-                style={{ minWidth: 0 }}
-              >
-                <div style={{ fontSize: 8.5, lineHeight: 1.2, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {label}
-                </div>
-                <div data-review-category-value className="tabular-nums" style={{ fontSize: 16.5, lineHeight: 1.15, fontWeight: 800, marginTop: 2, letterSpacing: '-0.03em', color: value != null ? tone : A.DIM }}>
-                  {value != null ? value.toFixed(1) : '\u2014'}
-                </div>
-                {value != null ? (
-                  <div data-review-track style={{ position: 'relative', height: 4, borderRadius: 999, background: A.BORDER, marginTop: 5 }}>
-                    <div data-review-fill style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${categoryFillPercent(value)}%`, borderRadius: 999, background: tone }} />
-                  </div>
-                ) : null}
-              </li>
-            );
-          })}
-        </ul>
+        <div data-review-categories style={{ flex: 'none', padding: `0 ${GUTTER}px 12px` }}>
+          <CategoryScores scores={scores} />
+        </div>
       ) : null}
 
       {/* E — the words at the caption's size. Padding lives on the wrapper,
