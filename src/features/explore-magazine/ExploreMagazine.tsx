@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { MediaRailTile } from '@/components/explore-tab-new/courseled/MediaRailTile';
@@ -487,7 +487,14 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const circleSize = useCircleSize(userId, !!userId);
   const openReview = useReviewSheetStore((state) => state.open);
 
-  const [view, setView] = useState<ExploreView>(() => readExploreView());
+  /* ?view= is written on every switch so page_view paths tell views apart
+     (usePageTracking treats a change in `view` as a screen change). A ?view=
+     on arrival wins over the session memory. */
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [view, setView] = useState<ExploreView>(() => {
+    const fromUrl = searchParams.get('view') as ExploreView | null;
+    return fromUrl && EXPLORE_VIEWS.includes(fromUrl) ? fromUrl : readExploreView();
+  });
   const [watchEntry, setWatchEntry] = useState<'all' | 'community'>('all');
   const geography = useViewerScoreScope(userId);
   /** SCOPED_VIEWS is the register of views that carry a scope row (Scores only;
@@ -901,6 +908,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
       analyticsEvents.track('amateur_view_changed', { from: view, to: value });
       setView(value);
       writeExploreView(value);
+      setSearchParams((prev) => { const n = new URLSearchParams(prev); n.set('view', value); return n; }, { replace: true });
       setRevealed(STREAM_PAGE_SIZE);
       loggedRef.current = 0;
       /* A view is not a route: no history entry, no scroll animation. */
