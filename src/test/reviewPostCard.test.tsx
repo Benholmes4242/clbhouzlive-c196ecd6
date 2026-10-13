@@ -40,27 +40,30 @@ describe('review post — R.2 score colour', () => {
     const c = card(9, all);
     expect((c.querySelector('[data-review-score]') as HTMLElement).style.color).toBe(toRgb(A.GREEN));
     expect((c.querySelector('[data-review-tier] span') as HTMLElement).style.color).toBe(toRgb(A.GREEN));
-    const design = c.querySelector('[data-review-category="design"] [data-review-category-value]') as HTMLElement;
+    const design = c.querySelector('[data-category="design"] [data-category-figure]') as HTMLElement;
     expect(design.style.color).toBe(toRgb(A.GREEN));
   });
   it('8.9 renders muted for the figure, the tier word and a category', () => {
     const c = card(8.9, all);
     expect((c.querySelector('[data-review-score]') as HTMLElement).style.color).toBe(toRgb(A.MUTE));
     expect((c.querySelector('[data-review-tier] span') as HTMLElement).style.color).toBe(toRgb(A.MUTE));
-    const cond = c.querySelector('[data-review-category="condition"] [data-review-category-value]') as HTMLElement;
+    const cond = c.querySelector('[data-category="condition"] [data-category-figure]') as HTMLElement;
     expect(cond.style.color).toBe(toRgb(A.MUTE));
   });
 });
 
 describe('review post — categories', () => {
-  it('an unscored category shows an em dash with no track, and the grid keeps four columns', () => {
+  // The em dash went on purpose: the review card now shares `CategoryScores` with
+  // the course page and the Reviews tab, and that block's rule — pinned by
+  // courseRatingConsistency — is an EMPTY cell for an unscored category. Do not
+  // put a dash back here alone; that would fork the one block.
+  it('an unscored category renders an empty cell and the grid keeps four columns', () => {
     const c = card(8, { ...all, clubhouse: null });
-    const items = c.querySelectorAll('[data-review-category]');
-    expect(items.length).toBe(4);
-    expect((c.querySelector('[data-review-categories]') as HTMLElement).style.gridTemplateColumns).toBe('repeat(4, minmax(0, 1fr))');
-    const club = c.querySelector('[data-review-category="clubhouse"]')!;
-    expect(club.querySelector('[data-review-category-value]')?.textContent).toBe('\u2014');
-    expect(club.querySelector('[data-review-track]')).toBeNull();
+    expect(c.querySelectorAll('[data-category]').length).toBe(4);
+    expect((c.querySelector('[data-category-scores]') as HTMLElement).style.gridTemplateColumns).toBe('repeat(4, minmax(0, 1fr))');
+    const club = c.querySelector('[data-category="clubhouse"]')!;
+    expect(club.querySelector('[data-category-score]')).toBeNull();
+    expect(club.textContent).toBe('');
   });
 });
 
