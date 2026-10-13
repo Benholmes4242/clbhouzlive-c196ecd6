@@ -19745,6 +19745,7 @@ export type Database = {
         Args: { p_days?: number; p_user_id: string }
         Returns: Json
       }
+      get_admin_member_extras: { Args: { p_user_id: string }; Returns: Json }
       get_admin_member_last_seen: {
         Args: { p_days?: number }
         Returns: {
