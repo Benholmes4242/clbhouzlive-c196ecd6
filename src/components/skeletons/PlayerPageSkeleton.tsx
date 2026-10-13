@@ -25,7 +25,7 @@ function Bone({ w, h, radius = 6, dark = false }: { w: number | string; h: numbe
 
 export function PlayerPageSkeleton() {
   return (
-    <div style={{ background: SLATE_50, minHeight: '100vh' }}>
+    <div style={{ background: SLATE_50, minHeight: '100vh', paddingTop: 'var(--chrome-total-h, 0px)' }}>
       {/* Hero bone — same anatomy as HeroSection: 268px canvas band, 80x84
           squircle pinned right and centred, bottom-aligned text column. */}
       <div style={{ position: 'relative', minHeight: 268, overflow: 'hidden', background: PAGE_CANVAS }}>
