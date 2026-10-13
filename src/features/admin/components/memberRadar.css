@@ -2,7 +2,9 @@
 .member-radar {
   color: var(--mr-ink);
   background: var(--mr-canvas);
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue",
+    sans-serif;
   font-variant-numeric: tabular-nums;
   display: flex;
   flex-direction: column;
@@ -58,7 +60,7 @@
   font-weight: 700;
   padding: 0;
 }
-.mr-tab[aria-selected='true'] {
+.mr-tab[aria-selected="true"] {
   background: var(--mr-ink);
   color: var(--mr-canvas);
 }
