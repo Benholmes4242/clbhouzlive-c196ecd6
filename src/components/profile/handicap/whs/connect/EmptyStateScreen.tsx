@@ -93,7 +93,7 @@ const EvidenceBody: React.FC<{ course: ConnectIntroCourse; hasHomeClub: boolean;
   const shares = courseBucketShares(holes);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: '1 0 auto' }}>
       <style>{TAIL_CSS}</style>
       <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: INK, marginBottom: 14 }}>
         {course.source === 'home' ? t('whsConnect.intro.kickerHomeClub') : t('whsConnect.intro.kickerTop100')}
@@ -178,7 +178,7 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
   if (intro.data) {
     return (
       <>
-        <Stage>
+        <Stage fill>
           <EvidenceBody course={intro.data} hasHomeClub={home.clubId != null} onChange={onChange} />
         </Stage>
         {footer}
@@ -189,8 +189,8 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
   /* Neither home club nor fallback qualifies: the original promises screen, unchanged. */
   return (
     <>
-      <Stage>
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
+      <Stage fill>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: '1 0 auto' }}>
           <div style={{ height: 120, flexShrink: 0 }} />
           <div
             style={{
