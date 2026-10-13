@@ -198,7 +198,8 @@
   },
   "whsConnect": {
     "intro": {
-      "scoresLabel": "What the field scores here",
+      "scoresVolume_one": "{{holes}} hole tracked here so far",
+      "scoresVolume_other": "{{holes}} holes tracked here so far",
       "bucketBirdie": "Birdie+",
       "bucketPar": "Par",
       "bucketBogey": "Bogey",

@@ -78,6 +78,7 @@ const EvidenceBody: React.FC<{ course: ConnectIntroCourse; hasHomeClub: boolean;
   const { t } = useTranslation('handicap');
   const { holes } = course;
   const shares = courseBucketShares(holes);
+  const holesTracked = holes.reduce((sum, h) => sum + (h.rounds ?? 0), 0);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: '1 0 auto' }}>
@@ -92,7 +93,7 @@ const EvidenceBody: React.FC<{ course: ConnectIntroCourse; hasHomeClub: boolean;
       <div style={{ flexShrink: 0 }}>
         <IntroHoleChart holes={holes} />
         <div style={{ marginTop: 10, fontSize: 11.5, lineHeight: 1.5, color: A.MUTE }}>{t('whsConnect.intro.chartCaption')}</div>
-        {shares ? <ScoringBand shares={shares} /> : null}
+        {shares ? <ScoringBand shares={shares} holesTracked={holesTracked} /> : null}
       </div>
 
       <div style={{ flex: '1 1 0', minHeight: 14 }} />
