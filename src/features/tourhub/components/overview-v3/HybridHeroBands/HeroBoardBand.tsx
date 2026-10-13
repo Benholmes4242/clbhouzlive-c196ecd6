@@ -660,6 +660,7 @@ function PicksBlock({
                   playerName={p.playerName}
                   tourCode={tourCode}
                   photoUrl={p.photoUrl ?? null}
+                  headshotOverride={p.headshotOverride ?? null}
                   size="sm"
                 />
               </div>

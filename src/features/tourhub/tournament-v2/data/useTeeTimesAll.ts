@@ -11,6 +11,8 @@ export interface TeeGroupPlayer {
   name: string;
   country?: string | null;
   photoUrl?: string | null;
+  /** Filename key, never a URL. */
+  headshotOverride?: string | null;
 }
 export interface TeeGroup {
   teeTime: string;
@@ -37,7 +39,7 @@ export function useTeeTimesAll(
           back_nine,
           players:sr_tee_time_players(
             player:sr_players!sr_tee_time_players_player_id_fkey(
-              id, full_name, first_name, last_name, country, country_code, photo_url
+              id, full_name, first_name, last_name, country, country_code, photo_url, headshot_override
             )
           )
         `)
@@ -55,6 +57,7 @@ export function useTeeTimesAll(
         country: string | null;
         country_code: string | null;
         photo_url: string | null;
+        headshot_override: string | null;
       };
       type RawRow = {
         tee_time: string;
@@ -76,6 +79,7 @@ export function useTeeTimesAll(
               name,
               country: p.country_code || p.country,
               photoUrl: p.photo_url,
+              headshotOverride: p.headshot_override,
             };
           }),
         }))

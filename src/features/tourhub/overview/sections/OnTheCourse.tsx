@@ -654,6 +654,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                             playerName={p.name}
                             tourCode={tourCode}
                             photoUrl={p.photoUrl ?? null}
+                            headshotOverride={p.headshotOverride ?? null}
                             size="xs"
                           />
                           <div style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 700, color: V4.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
