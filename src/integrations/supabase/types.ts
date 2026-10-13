@@ -21520,9 +21520,12 @@ export type Database = {
           avg_to_par: number
           best_to_par: number
           birdie_count: number
+          bogey_count: number
+          double_plus_count: number
           eagle_or_better_count: number
           hole_no: number
           par: number
+          par_count: number
           times_played: number
         }[]
       }
