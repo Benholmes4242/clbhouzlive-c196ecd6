@@ -114,6 +114,6 @@
 - [x] Stage 1 tracking; follow-ups: Explore ?view=, Inbox ?type=, video_watch per-interval confirmed.
 - [x] Stage 2 (2.1–2.5).
 - [x] Stage 3 hooks + rules 4–6 + follow-ups.
-- [ ] Stage 4 Member screen — blocked pending exact no-data appearance and eight-week session-bar source for limited admins: overview has no weekly counts; Stage 3 sessions are full-admin-only. Member.html received and reviewed. TOP 100 may use the brief-sanctioned em dash; do not add a query.
-- [ ] Stage 5 Behaviour screen — blocked pending exact no-data appearance: Behaviour.html and Member.html contain populated panels only, with no empty-state markup. Preserve returned seconds/actions/area/screen labels, paged sessions and merged detail through Stage 3 hooks when unblocked.
-- [ ] Verify Stages 4–5 and report exact mock parity, authentication limits and full-suite result after clarification; no SQL, migrations or edge-function changes. No application code changed; suite not rerun. External/unmanaged Supabase prevents authenticated end-to-end checks.
+- [ ] Stage 4 Member screen — implement Member.html with resolved empty/permission rules; full admins get eight-week counts from paged Sessions, limited admins request no Sessions and keep counters. TOP 100 uses the brief-sanctioned em dash; no new query.
+- [ ] Stage 5 Behaviour screen — implement Behaviour.html and Sessions with resolved empty/permission rules, Stage 3 hooks, server values, London times and merged timelines.
+- [ ] Verify Stages 4–5 and report exact mock parity, authentication limits and full-suite result; no SQL, migrations or edge-function changes. External/unmanaged Supabase prevents authenticated end-to-end checks.
