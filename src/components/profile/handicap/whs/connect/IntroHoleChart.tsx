@@ -10,23 +10,17 @@
  */
 import React from 'react';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
-import { courseBucketShares } from '@/features/courses/components/holes/analytical/HoleRowV2';
+import { courseBucketShares, dominantBucket } from '@/features/courses/components/holes/analytical/HoleRowV2';
 import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
 const CHART_HEIGHT = 135;
 const GAP = 3;
 
-const ORDER = ['birdie', 'par', 'bogey', 'double'] as const;
-
 /** Fill for one bar: the hole's dominant bucket, or flat A.DIM with no scored plays. */
 function barFill(h: CourseHole): string {
   const seg = courseBucketShares([h]);
   if (!seg) return A.DIM;
-  // Scan in BUCKETS order and keep only a STRICTLY greater share, so the first
-  // maximum wins: an exact tie resolves to the better score, deterministically.
-  let best: (typeof ORDER)[number] = ORDER[0];
-  for (const k of ORDER) if (seg[k] > seg[best]) best = k;
-  return RAMP_TOPAR[best];
+  return RAMP_TOPAR[dominantBucket(seg)];
 }
 
 const LINE_AMBER = '#F7931E';

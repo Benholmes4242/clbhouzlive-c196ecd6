@@ -244,7 +244,9 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
           ? 'full'
           : projectionState.kind === 'handicap_only'
             ? 'handicap_only'
-            : 'none',
+            : projectionState.kind === 'compare'
+              ? 'field_compare'
+              : 'none',
     });
   }, [settled, courseId, roundTotal, connection, branchC, projectionSettled, projectionState.kind]);
 
