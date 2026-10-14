@@ -35,10 +35,6 @@ interface CourseGroup {
   members: CircleRoundRow[]; // one row per distinct member, most recent first
 }
 
-function firstName(name: string): string {
-  const s = (name ?? '').trim();
-  return s ? s.split(/\s+/)[0] : 'Golfer';
-}
 
 export function WhoPlayingSection() {
   const { t } = useTranslation('courses');
