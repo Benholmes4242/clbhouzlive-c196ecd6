@@ -330,7 +330,19 @@ function Section({
           {title}
         </div>
         {meta != null ? (
-          <div className="tabular-nums" style={{ ...EYEBROW, color: A.DIM, flexShrink: 0, whiteSpace: 'nowrap', alignSelf: metaAlign }}>
+          <div
+            className="tabular-nums"
+            style={{
+              ...EYEBROW,
+              color: A.DIM,
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
+              alignSelf: metaAlign,
+              // A centred control is taller than the title; negative block margins stop it
+              // setting the row height so the title governs the 5 / 12 gaps (Courses parity).
+              ...(metaAlign === 'center' ? { marginTop: -5, marginBottom: -5 } : null),
+            }}
+          >
             {meta}
           </div>
         ) : null}
