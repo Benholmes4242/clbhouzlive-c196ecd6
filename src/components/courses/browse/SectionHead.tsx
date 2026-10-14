@@ -1,5 +1,4 @@
 import React from 'react';
-import { KICKER } from '@/lib/tokens/type';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /**
@@ -17,7 +16,10 @@ export interface SectionHeadProps {
 export function SectionHead({ kicker, title, tone = 'amber' }: SectionHeadProps) {
   return (
     <div>
-      <div style={{ ...KICKER, lineHeight: 1, color: tone === 'amber' ? A.AMBER : A.MUTE }}>
+      {/* Matched to ScoresLeaderboardsPage's local EYEBROW const (11 / 700 /
+          0.16em / uppercase) — must not drift from it. A fork until that const
+          is published as a shared token; KICKER is the 9px one neither uses. */}
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', lineHeight: 1, color: tone === 'amber' ? A.AMBER : A.MUTE }}>
         {kicker}
       </div>
       {title ? <h2
@@ -38,7 +40,7 @@ export function SectionHead({ kicker, title, tone = 'amber' }: SectionHeadProps)
 }
 
 /** Gap between a section's head and its content — every section reads this. */
-export const HEAD_GAP = 14;
+export const HEAD_GAP = 12;
 
 /** The wrapper every section's head + content sits in. */
 export const SECTION_WRAP: React.CSSProperties = { padding: '20px 16px 14px' };
