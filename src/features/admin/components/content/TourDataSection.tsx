@@ -12,7 +12,7 @@ import { adminTheme as t } from '../../theme';
 import { formatAgo } from '../../lib/formatAgo';
 import { londonTime } from '../../lib/memberRadarDisplay';
 import { useFeedsHealth, isPermissionError } from '../../hooks/useContentDesk';
-import { normaliseRankingName, rankingTourLabel, formatPoints, byTourEntries, minutesSince } from '../../lib/tourDataDisplay';
+import { normaliseRankingName, rankingTourLabel, formatPoints, byTourEntries, minutesSince, feedsHeadline } from '../../lib/tourDataDisplay';
 import { desk, SECTION, LIST_SECTION, H, H_RIGHT, FIG_LABEL, MORE, DOT } from './deskTokens';
 
 type Tone = 'ok' | 'warn' | 'danger' | 'neutral';
@@ -153,11 +153,12 @@ export default function TourDataSection({
 
   const failures = Number(d?.failures_24h ?? 0);
   const needs = feeds.filter((f) => f.tone === 'warn' || f.tone === 'danger').length;
-  const feedHead = failures > 0
-    ? <span style={{ fontSize: 11, fontWeight: 700, color: t.dangerText }}>{failures} failed in 24 h</span>
-    : needs > 0
-      ? <span style={{ fontSize: 11, fontWeight: 700, color: t.warnText }}>{needs} needs a run</span>
-      : <span style={{ fontSize: 11, fontWeight: 700, color: t.okText }}>All running</span>;
+  const head = feedsHeadline(failures, needs);
+  const feedHead = (
+    <span style={{ fontSize: 11, fontWeight: 700, color: head.tone === 'danger' ? t.dangerText : head.tone === 'warn' ? t.warnText : t.okText }}>
+      {head.text}
+    </span>
+  );
 
   /* ── Field ── */
   const field = d?.field ?? null;
