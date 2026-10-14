@@ -29,11 +29,9 @@ export function SectionHead({ kicker, title, tone = 'amber' }: SectionHeadProps)
           letterSpacing: '-0.02em',
           lineHeight: 1.1,
           color: A.INK,
-          // Title marginTop 12 and HEAD_GAP 24 are MEASURED to match ScoresLeaderboardsPage's RENDERED head, not its source
-          // values: deliberately larger than that page's own marginTop 5 / 12, because its
-          // title row carries a ~44px toggle pill that makes the row taller than the words.
-          // Do not "fix" these back to 5 and 12.
-          marginTop: 12,
+          // These are the Courses page's own head spacing. The Explore page is being
+          // brought to these values, not the other way round.
+          marginTop: 5,
           marginBottom: 0,
         }}
       >
