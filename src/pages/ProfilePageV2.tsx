@@ -41,7 +41,8 @@ import { safeGoBack } from '@/utils/navigation';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useTranslation } from 'react-i18next';
-import { ProfileHero, HeroPill } from '@/components/profile/hero/ProfileHero';
+import { ProfileHero } from '@/components/profile/hero/ProfileHero';
+import { BandPill, BandDots } from '@/components/profile/hero/ProfileCoverBand';
 import { ProfileTopTenRail } from '@/components/profile/hero/ProfileTopTenRail';
 import { VerifiedAccountsNote } from '@/components/profile/VerifiedAccountsNote';
 import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
@@ -897,6 +898,17 @@ const ProfilePageV2Content: React.FC = () => {
             avatarUrl={profile.profile_photo_url}
             coverUrl={profile.header_photo_url ?? null}
             region={profile.location ?? null}
+            ownerFirstName={handicapOwnerFirstName(profile.display_name, profile.username)}
+            ownerGender={(profile as { gender?: string | null }).gender ?? null}
+            bio={isPrivateAndLocked ? null : profile.bio || null}
+            bioRef={bioRef}
+            bioExpanded={bioExpanded}
+            bioOverflows={bioOverflows}
+            onToggleBio={() => setBioExpanded(v => !v)}
+            website={isPrivateAndLocked ? null : websites[0] ? ensureProtocol(websites[0]) : null}
+            websiteDisplay={websites[0] ? formatUrlForDisplay(websites[0]) : null}
+            onEdit={() => navigate(editRoute)}
+            onConnect={() => navigate('/handicap')}
             isSelf={isSelf}
             indexValue={resolvedHcp.value ?? null}
             roundsCount={shellRoundsCount}
@@ -909,30 +921,13 @@ const ProfilePageV2Content: React.FC = () => {
             onAvatarTap={() => (isSelf ? setPhotoSheet('avatar') : setIsAvatarLightboxOpen(true))}
             action={
               isSelfView ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <HeroPill label={t('hero.edit', 'Edit')} onClick={() => navigate(editRoute)} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                  <BandPill label={t('hero.edit', 'Edit')} onClick={() => navigate(editRoute)} />
                   <DropdownMenu onOpenChange={(open) => {
                     if (!open) (document.activeElement as HTMLElement)?.blur();
                   }}>
                     <DropdownMenuTrigger asChild>
-                      <button
-                        type="button"
-                        aria-label="More options"
-                        style={{
-                          width: 28,
-                          height: 28,
-                          flexShrink: 0,
-                          borderRadius: 999,
-                          background: 'rgba(255,255,255,0.12)',
-                          border: 'none',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <MoreHorizontal size={15} strokeWidth={2.25} color="#FFFFFF" />
-                      </button>
+                      <BandDots />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-52">
                       <DropdownMenuItem onClick={() => {
@@ -978,7 +973,8 @@ const ProfilePageV2Content: React.FC = () => {
                   </DropdownMenu>
                 </div>
               ) : friendshipStatus === 'blocked' ? null : (
-                <HeroPill
+                <BandPill
+                  solid
                   label={
                     isFollowing
                       ? t('hero.following', 'Following')
