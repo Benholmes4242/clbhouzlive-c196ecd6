@@ -1,5 +1,7 @@
 /**
- * COVER ASPECTS — the one home for each profile cover's shape. The editor's
+ * PROFILE IMAGE-CROP ASPECTS — the one home for the crop shape of every
+ * profile image surface: the personal and business covers, and the member
+ * avatar. The editor's
  * crop frame and the rendered block read the SAME constant, so a crop is
  * exactly what the member gets. That only holds while the block has NO PIXEL
  * FLOOR: a floor that wins on some device changes the aspect there and makes
@@ -17,3 +19,9 @@ export const PERSONAL_COVER_ASPECT = 1.7;
 export const PERSONAL_COVER_ASPECT_CSS = '1.7 / 1';
 export const BUSINESS_COVER_ASPECT = 1;
 export const BUSINESS_COVER_ASPECT_CSS = '1 / 1';
+
+/** The member avatar is rendered square by SquircleAvatar at every size, so
+ *  its crop is square. Deliberately SEPARATE from BUSINESS_COVER_ASPECT even
+ *  though both are 1 today: they are different facts that share a value, and
+ *  tying them together is how the next silent breakage happens. */
+export const AVATAR_CROP_ASPECT = 1;
