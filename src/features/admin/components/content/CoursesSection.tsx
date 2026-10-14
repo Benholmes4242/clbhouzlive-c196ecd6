@@ -15,7 +15,8 @@ import { desk, SECTION, LIST_SECTION, H, H_RIGHT, FIG_LABEL, MORE, DOT, chip } f
 const COVERAGE_LABEL: Record<string, string> = {
   photo: 'Photo', tee: 'Tee data', scorecards: 'Scorecards', location: 'Location', description: 'Description',
 };
-/** Gap filter chips, in the mock's order. Keys match fix_next[].gaps. */
+/** Gap filter chips, in the mock's order. gap_counts keys are these chips'
+ * keys; fix_next[].gaps hold the display words, so GAP_LABEL bridges the two. */
 export const GAP_CHIPS: { key: string | null; label: string }[] = [
   { key: null, label: 'All gaps' },
   { key: 'location', label: 'Location' },
@@ -66,7 +67,8 @@ export default function CoursesSection({
 
   const fix: FixRow[] = useMemo(() => {
     const all = (d?.fix_next ?? []) as FixRow[];
-    return gap ? all.filter((r) => (r.gaps ?? []).includes(gap)) : all;
+    // gaps carry the display words ("Tee data"), not the gap_counts keys.
+    return gap ? all.filter((r) => (r.gaps ?? []).includes(GAP_LABEL[gap])) : all;
   }, [d, gap]);
   const visible = fix.slice(0, shown);
   const more = fix.length - visible.length;
