@@ -149,6 +149,8 @@ const ClubsSectionWrapper: React.FC<{
         secondaryClubs={secondaryClubs}
         isOwner={isSelf}
         isPrivate={isPrivate}
+        profileId={profileId}
+        viewerId={viewerId}
         onEditClick={() => navigate(editRoute)}
         onSetHomeClub={() => openHomeClubPicker()}
         pendingClubName={
