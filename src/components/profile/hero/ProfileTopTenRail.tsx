@@ -373,8 +373,11 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                 <span style={{ position: 'absolute', top: 8, left: 8, background: GLASS, borderRadius: 999, padding: '3px 9px', fontSize: 11, fontWeight: 700, color: PHOTO_INK, ...FIGS }}>{c.position}</span>
                 {pill(c)}
               </CourseImageFallback>
-              <div style={{ marginTop: 7, fontSize: 12, fontWeight: 700, color: A.INK, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{c.name}</div>
-              {regionLine(c, rankOf(c.course_id)) && <div style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c, rankOf(c.course_id))}</div>}
+              {/* ONE HEIGHT for the text under both two-up photographs: two lines of the 12/1.25 name (2 x 15) plus the 2px gap plus the 10.5/1.35 region line (14.17), rounded up to 47. A one-line name — or a course with no region and no placement, where the region div does not render at all — simply leaves the gap, and the pair never goes ragged. Top-aligned on purpose: floating the region line to the bottom instead opens a hole under the short name. */}
+              <div style={{ marginTop: 7, height: 47, overflow: 'hidden' }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: A.INK, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{c.name}</div>
+                {regionLine(c, rankOf(c.course_id)) && <div style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.BODY, lineHeight: 1.35, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c, rankOf(c.course_id))}</div>}
+              </div>
             </button>
           ))}
         </div>
