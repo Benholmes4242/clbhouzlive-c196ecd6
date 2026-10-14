@@ -382,7 +382,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
     return (
       <>
         <div style={{ marginTop: 16, fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, lineHeight: 1.2, whiteSpace: 'pre-line' }}>
-          {n === 0 ? t('topTen.empty.lede', 'Ten courses.\nIn order. Your call.') : t('topTen.progress.lede', { count: n, word: Word(n), left: word(10 - n), defaultValue: '{{word}} down. {{left}} to go.' }).replace(/\. (\w)/, (_m, c) => `. ${c.toUpperCase()}`)}
+          {n === 0 ? t('topTen.empty.lede', 'Ten courses.\nIn order. Your call.') : t('topTen.progress.lede', { count: n, word: Word(n), left: Word(10 - n), defaultValue: '{{word}} down. {{left}} to go.' })}
         </div>
         <div style={{ marginTop: 7, fontSize: 12.5, fontWeight: 600, color: A.BODY, lineHeight: 1.5 }}>
           {n === 0
@@ -527,7 +527,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   );
 
   return (
-    <section style={{ marginTop: 16, marginBottom: 8, paddingBottom: 4, padding: '0 16px 4px', fontFamily: SANS }}>
+    <section style={{ marginTop: 16, marginBottom: 8, padding: '0 16px 4px', fontFamily: SANS }}>
       {header}
       {n >= 3 ? <>{verdict}{renderList()}{shareRow}</> : isOwnProfile ? renderInvitation() : null}
 

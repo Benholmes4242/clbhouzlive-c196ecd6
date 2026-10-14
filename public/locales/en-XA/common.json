@@ -240,10 +240,10 @@
       "most_birdies_all_time": "[~~Ṁőšţ ƀířđíéš~~]"
     },
     "reviewPost": {
-      "hcp": "[ĤÇÞ {{index}}]",
-      "readFullReview": "[Ŕéåð ţĥé ƒûļļ ŕéṽîéŵ]",
-      "coursesReviewed_one": "[{{count}} ŕéṽîéŵ]",
-      "coursesReviewed_other": "[{{count}} ŕéṽîéŵš]"
+      "hcp": "[~~ĤĈƤ {{index}}~~]",
+      "readFullReview": "[~~Řéáđ ţĥé ƒúļļ řéṽíéŵ~~]",
+      "coursesReviewed_one": "[~~{{count}} řéṽíéŵ~~]",
+      "coursesReviewed_other": "[~~{{count}} řéṽíéŵš~~]"
     }
   },
   "settings": {
@@ -436,7 +436,31 @@
         "insights": "[~~Íñšíĝĥţš~~]",
         "reviews": "[~~Řéṽíéŵš~~]",
         "team": "[~~Ṁáñáĝé ţéáɱ~~]",
-        "viewProfile": "[~~Ṽíéŵ ļíṽé ƥřőƒíļé~~]"
+        "viewProfile": "[~~Ṽíéŵ ļíṽé ƥřőƒíļé~~]",
+        "claimCourse": "[~~Ĉļáíɱ ýőúř ĉőúřšé~~]",
+        "claimCourseCaption": "[~~Ļíñǩ ţĥé ĉļúƀ ýőú ɱáñáĝé. Řéṽíéŵéđ ƀý őúř ţéáɱ.~~]"
+      },
+      "claimSheet": {
+        "title": "[~~Ĉļáíɱ ýőúř ĉőúřšé~~]",
+        "intro": "[~~Ƒíñđ ţĥé ĉļúƀ {{name}} ɱáñáĝéš. Őúř ţéáɱ řéṽíéŵš éṽéřý ĉļáíɱ.~~]",
+        "searchPlaceholder": "[~~Šéářĉĥ ƒőř ýőúř ĝőļƒ ĉļúƀ~~]",
+        "searching": "[~~Šéářĉĥíñĝ…~~]",
+        "noResults": "[~~Ñő ĉļúƀš ƒőúñđ~~]",
+        "managed": "[~~Áļřéáđý ɱáñáĝéđ ƀý áñőţĥéř ƀúšíñéšš~~]",
+        "underReview": "[~~Á ĉļáíɱ íš áļřéáđý úñđéř řéṽíéŵ~~]",
+        "noteLabel": "[~~Ţéļļ úš ýőúř ĉőññéĉţíőñ ţő ţĥíš ĉļúƀ~~]",
+        "optional": "[~~(őƥţíőñáļ)~~]",
+        "notePlaceholder": "[~~é.ĝ. Í'ɱ ţĥé Ĝéñéřáļ Ṁáñáĝéř, ŵőřǩ éɱáíļ őñ ţĥé ĉļúƀ đőɱáíñ, ĥáƥƥý ţő šéñđ á ṽéříƒíĉáţíőñ éɱáíļ.~~]",
+        "noteHint": "[~~Ĥéļƥš áđɱíñš ṽéříƒý ýőúř ĉļáíɱ ƒášţéř. Ýőúř ĉļúƀ ļíñǩ íš ƥéñđíñĝ úñţíļ áƥƥřőṽáļ.~~]",
+        "submit": "[~~Ĉļáíɱ áš {{name}}~~]",
+        "footer": "[~~Ĉļáíɱš ářé řéṽíéŵéđ ƀéƒőřé á ĉőúřšé íš ĥáñđéđ őṽéř.~~]",
+        "success": "[~~Ĉļáíɱ šúƀɱíţţéđ ƒőř řéṽíéŵ.~~]",
+        "errors": {
+          "alreadyClaimed": "[~~Ţĥíš ĉļúƀ ĥáš áļřéáđý ƀééñ ĉļáíɱéđ ƀý áñőţĥéř ƀúšíñéšš.~~]",
+          "underReview": "[~~Á ĉļáíɱ ƒőř ţĥíš ĉļúƀ íš áļřéáđý úñđéř řéṽíéŵ.~~]",
+          "notAuthorized": "[~~Ýőú ñééđ ţő ƀé áñ őŵñéř őř áđɱíñ őƒ ţĥíš ƀúšíñéšš ţő ĉļáíɱ á ĉőúřšé.~~]",
+          "generic": "[~~Ĉőúļđ ñőţ šúƀɱíţ ĉļáíɱ. Ƥļéášé ţřý áĝáíñ.~~]"
+        }
       }
     },
     "insights": {
@@ -451,7 +475,7 @@
       "deltaCaption": "[~~Ĉĥáñĝé ṽš ţĥé ƥřéṽíőúš {{range}}~~]",
       "audience": {
         "locked": "[~~Ļőĉǩéđ~~]",
-        "visitorsLabel": "Unique visitors in this period",
+        "visitorsLabel": "[~~Úñíʠúé ṽíšíţőřš íñ ţĥíš ƥéříőđ~~]",
         "body": "[~~Ĥáñđíĉáƥ řáñĝéš áñđ ţőƥ ļőĉáţíőñš ñééđ á ƀíĝĝéř áúđíéñĉé ƒířšţ. Á ƀřéáǩđőŵñ őƒ ţĥíš ƒéŵ ƥéőƥļé ŵőúļđ íđéñţíƒý ţĥéɱ, šő ŵé ĥőļđ íţ ƀáĉǩ úñţíļ ţĥéñ.~~]"
       },
       "followers": {
@@ -465,23 +489,23 @@
         "posts": "[~~Ñő ƥőšţš ƥúƀļíšĥéđ íñ ţĥíš ƥéříőđ.~~]"
       },
       "rate": {
-        "from_one": "From {{n}} impression",
-        "from_other": "From {{n}} impressions",
+        "from_one": "[~~Ƒřőɱ {{n}} íɱƥřéššíőñ~~]",
+        "from_other": "[~~Ƒřőɱ {{n}} íɱƥřéššíőñš~~]",
         "none": "[~~Ƥúƀļíšĥ ƥőšţš áñđ ĝáţĥéř íɱƥřéššíőñš ţő šéé ýőúř éñĝáĝéɱéñţ řáţé.~~]",
-        "tooFew": "Not enough impressions yet to give a meaningful rate.",
-        "benchmark": "Likes and comments as a share of impressions.",
-        "impressionsLabel": "Impressions"
+        "tooFew": "[~~Ñőţ éñőúĝĥ íɱƥřéššíőñš ýéţ ţő ĝíṽé á ɱéáñíñĝƒúļ řáţé.~~]",
+        "benchmark": "[~~Ļíǩéš áñđ ĉőɱɱéñţš áš á šĥářé őƒ íɱƥřéššíőñš.~~]",
+        "impressionsLabel": "[~~Íɱƥřéššíőñš~~]"
       },
       "topPosts": {
-        "impressions_one": "{{n}} impression",
-        "impressions_other": "{{n}} impressions",
-        "likes_one": "{{n}} like",
-        "likes_other": "{{n}} likes",
-        "comments_one": "{{n}} comment",
-        "comments_other": "{{n}} comments"
+        "impressions_one": "[~~{{n}} íɱƥřéššíőñ~~]",
+        "impressions_other": "[~~{{n}} íɱƥřéššíőñš~~]",
+        "likes_one": "[~~{{n}} ļíǩé~~]",
+        "likes_other": "[~~{{n}} ļíǩéš~~]",
+        "comments_one": "[~~{{n}} ĉőɱɱéñţ~~]",
+        "comments_other": "[~~{{n}} ĉőɱɱéñţš~~]"
       },
-      "reviewsCount_one": "{{n}} review",
-      "reviewsCount_other": "{{n}} reviews"
+      "reviewsCount_one": "[~~{{n}} řéṽíéŵ~~]",
+      "reviewsCount_other": "[~~{{n}} řéṽíéŵš~~]"
     }
   },
   "handicap": {
@@ -856,8 +880,8 @@
       "beatWith": "[~~ƀéáţ ŵíţĥ {{n}}~~]",
       "crowns_one": "[~~{{count}} ĉřőŵñ~~]",
       "crowns_other": "[~~{{count}} ĉřőŵñš~~]",
-      "doorCrowns": "CROWNS",
-      "doorMilestones": "MILESTONES"
+      "doorCrowns": "[~~ĈŘŐŴÑŠ~~]",
+      "doorMilestones": "[~~ṀÍĻÉŠŢŐÑÉŠ~~]"
     },
     "footer": {
       "allRounds": "[~~Áļļ {{n}} řőúñđš~~]",
@@ -910,17 +934,17 @@
     "unlike": "[~~Úñļíǩé~~]",
     "more": "[~~Ṁőřé~~]",
     "sheetTitle": "[~~Ĉőɱɱéñţš~~]",
-    "hiddenCount_one": "[~~{{count}} ĉőɱɱéñţ ĥíďďéñ~~]",
-    "hiddenCount_other": "[~~{{count}} ĉőɱɱéñţš ĥíďďéñ~~]",
-    "hiddenLine_one": "[~~Ýőű'vé ĥíďďéñ őř ƀłőĉķéď ŵĥőévéř ŵřőţé íţ.~~]",
-    "hiddenLine_other": "[~~Ýőű'vé ĥíďďéñ őř ƀłőĉķéď ţĥé ƥéőƥłé ŵĥő ŵřőţé ţĥéɱ.~~]",
+    "hiddenCount_one": "[~~{{count}} ĉőɱɱéñţ ĥíđđéñ~~]",
+    "hiddenCount_other": "[~~{{count}} ĉőɱɱéñţš ĥíđđéñ~~]",
+    "hiddenLine_one": "[~~Ýőú'ṽé ĥíđđéñ őř ƀļőĉǩéđ ŵĥőéṽéř ŵřőţé íţ.~~]",
+    "hiddenLine_other": "[~~Ýőú'ṽé ĥíđđéñ őř ƀļőĉǩéđ ţĥé ƥéőƥļé ŵĥő ŵřőţé ţĥéɱ.~~]",
     "emptyLineTo": "[~~Ɓé ţĥé ƒířšţ ţő šáý šőɱéţĥíñĝ ţő <b>{{name}}</b>.~~]",
-    "contextLevel": "[~~Łévéł~~]",
-    "standingRecord": "[~~Ĉőűřšé řéĉőřď ĥéřé · {{value}}~~]",
+    "contextLevel": "[~~Ļéṽéļ~~]",
+    "standingRecord": "[~~Ĉőúřšé řéĉőřđ ĥéřé · {{value}}~~]",
     "standingTopTen": "[~~Ţőƥ ţéñ ĥéřé~~]",
-    "standingPlayed_one": "[~~Ƥłáýéď ĥéřé {{count}} ţíɱé~~]",
-    "standingPlayed_other": "[~~Ƥłáýéď ĥéřé {{count}} ţíɱéš~~]",
-    "standingFirst": "[~~Ƒířšţ řőűñď ĥéřé~~]"
+    "standingPlayed_one": "[~~Ƥļáýéđ ĥéřé {{count}} ţíɱé~~]",
+    "standingPlayed_other": "[~~Ƥļáýéđ ĥéřé {{count}} ţíɱéš~~]",
+    "standingFirst": "[~~Ƒířšţ řőúñđ ĥéřé~~]"
   },
   "suggestedGolfers": {
     "heading": "[~~Ĝőļƒéřš ţő ƒőļļőŵ~~]",
@@ -1009,20 +1033,29 @@
     "namesOneAndMore": "[~~{{a}} áñđ {{n}} ɱőřé~~]",
     "namesTwoAndMore": "[~~{{a}}, {{b}} áñđ {{n}} ɱőřé~~]",
     "sheetTitleCelebrated": "[~~Ĉéļéƀřáţéđ~~]",
-    "likedByYou": "Liked by you",
-    "likedByYouAndName": "Liked by you and {{b}}",
-    "likedByYouAndOne": "Liked by you and one other",
-    "likedByYouAndMore": "Liked by you and {{n}} others",
-    "likedByYouNameAndOne": "Liked by you, {{b}} and one other",
-    "likedByYouNameAndMore": "Liked by you, {{b}} and {{n}} others",
-    "youOnly": "You",
-    "youAndName": "You and {{b}}",
-    "youAndOne": "You and one other",
-    "youAndMore": "You and {{n}} more",
-    "youNameAndOne": "You, {{b}} and one other",
-    "youNameAndMore": "You, {{b}} and {{n}} more",
-    "youCelebratedThisRound": "{{names}} celebrated this round",
-    "youCelebratedYourRound": "{{names}} celebrated your round",
-    "youCelebratedOwnersRound": "{{names}} celebrated {{owner}}'s round"
+    "likedByYou": "[~~Ļíǩéđ ƀý ýőú~~]",
+    "likedByYouAndName": "[~~Ļíǩéđ ƀý ýőú áñđ {{b}}~~]",
+    "likedByYouAndOne": "[~~Ļíǩéđ ƀý ýőú áñđ őñé őţĥéř~~]",
+    "likedByYouAndMore": "[~~Ļíǩéđ ƀý ýőú áñđ {{n}} őţĥéřš~~]",
+    "likedByYouNameAndOne": "[~~Ļíǩéđ ƀý ýőú, {{b}} áñđ őñé őţĥéř~~]",
+    "likedByYouNameAndMore": "[~~Ļíǩéđ ƀý ýőú, {{b}} áñđ {{n}} őţĥéřš~~]",
+    "youOnly": "[~~Ýőú~~]",
+    "youAndName": "[~~Ýőú áñđ {{b}}~~]",
+    "youAndOne": "[~~Ýőú áñđ őñé őţĥéř~~]",
+    "youAndMore": "[~~Ýőú áñđ {{n}} ɱőřé~~]",
+    "youNameAndOne": "[~~Ýőú, {{b}} áñđ őñé őţĥéř~~]",
+    "youNameAndMore": "[~~Ýőú, {{b}} áñđ {{n}} ɱőřé~~]",
+    "youCelebratedThisRound": "[~~{{names}} ĉéļéƀřáţéđ ţĥíš řőúñđ~~]",
+    "youCelebratedYourRound": "[~~{{names}} ĉéļéƀřáţéđ ýőúř řőúñđ~~]",
+    "youCelebratedOwnersRound": "[~~{{names}} ĉéļéƀřáţéđ {{owner}}'š řőúñđ~~]"
+  },
+  "suggestionReason": {
+    "followedBy": "[~~Ƒőļļőŵéđ ƀý {{detail}}~~]",
+    "plays": "[~~Ƥļáýš {{detail}}~~]",
+    "clubRounds_one": "[~~{{club}} · {{count}} řőúñđ~~]",
+    "clubRounds_other": "[~~{{club}} · {{count}} řőúñđš~~]",
+    "roundsTracked_one": "[~~{{count}} řőúñđ ţřáĉǩéđ~~]",
+    "roundsTracked_other": "[~~{{count}} řőúñđš ţřáĉǩéđ~~]",
+    "popular": "[~~Ƥőƥúļář őñ ĉļƀĥőúž~~]"
   }
 }
