@@ -63,16 +63,8 @@ export function unitWord(cat: string, n: number, t?: TFunction<'courses'>): stri
   return n === 1 ? words[0] : words[1];
 }
 
-const WORDS = [
-  'Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
-  'Eleven', 'Twelve',
-];
-
-/** Sentence-leading number word, so the gap line never opens on a numeral. */
-export function numberWord(n: number, capital = true): string {
-  const w = n >= 0 && n < WORDS.length ? WORDS[n] : String(n);
-  return capital ? w : w.toLowerCase();
-}
+import { numberWord } from '@/lib/text/numbers';
+export { numberWord };
 
 /** "HELD 5Y" / "HELD 7M" / "HELD 3D" — how long the champion has stood. */
 export function tenureLabel(iso: string | null | undefined): string | null {

@@ -32,6 +32,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTopTenVisibility } from '@/components/profile/hooks/useTopTenVisibility';
 import { toast } from '@/lib/toast';
+import { numberWord, ordinal } from '@/lib/text/numbers';
 
 const GLASS = 'rgba(10,14,10,0.55)';
 const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.78), rgba(10,14,10,0) 58%)';
@@ -53,14 +54,8 @@ const CAPTURE_OPTS = { backgroundColor: '#000', scale: 2, logging: false, useCOR
  */
 const scoreTone = (score: number) => (score >= 9 ? A.GREEN : A.INK);
 
-const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
-const word = (n: number) => WORDS[n] ?? String(n);
-const Word = (n: number) => { const w = word(n); return w.charAt(0).toUpperCase() + w.slice(1); };
-const ordinal = (n: number) => {
-  const s = n % 100;
-  if (s >= 11 && s <= 13) return `${n}th`;
-  return `${n}${({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[n % 10] ?? 'th'}`;
-};
+const word = (n: number) => numberWord(n, false);
+const Word = (n: number) => numberWord(n);
 
 const regionOf = (c: { sub_country?: string | null; region?: string | null; country?: string | null }) =>
   c.sub_country || c.region || c.country || null;
