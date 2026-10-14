@@ -6,9 +6,7 @@ const scope = { current: { primaryClubId: null as string | null, primaryClubName
 vi.mock('@/features/explore-magazine/useViewerScoreScope', () => ({
   useViewerScoreScope: () => ({ scope: { ...scope.current, county: null, country: null }, isFetched: true }),
 }));
-// Both shelves confirmed to return null on empty (StandingShelf no rows; WeeklyClubShelf no club / no rounds).
-vi.mock('@/features/explore-magazine/WeeklyClubShelf', () => ({ WeeklyClubShelf: () => null }));
-vi.mock('@/features/explore-magazine/ConnectStandingInvite', () => ({ ScoresStandingSlot: () => null }));
+// Home's only rail is the week's pick; with no featured round it mounts nothing.
 vi.mock('@/features/explore-magazine/FeaturedRoundCard', () => ({ FeaturedRoundCard: () => null }));
 vi.mock('@/features/explore-magazine/useFeaturedRound', () => ({ useFeaturedRound: () => ({ data: null }) }));
 vi.mock('@/features/explore-magazine/useBatchRoundMedals', () => ({ useBatchRoundMedals: () => ({}) }));
@@ -33,24 +31,6 @@ function expectCollapsed(container: HTMLElement) {
 
 describe('Home rail bands render nothing when empty', () => {
   beforeEach(() => { scope.current = { primaryClubId: null, primaryClubName: null }; });
-
-  it('club week with no home club mounts nothing', () => {
-    const { container } = render(<HomeRail kind="clubWeek" viewerId="u1" pos={1} />);
-    expect(container.childNodes.length).toBe(0);
-  });
-
-  it('club week with a club but no rounds collapses its band', () => {
-    scope.current = { primaryClubId: 'c1', primaryClubName: 'Club' };
-    const { container } = render(<HomeRail kind="clubWeek" viewerId="u1" pos={1} />);
-    expectCollapsed(container);
-    expect(container.firstElementChild).not.toBeNull();
-  });
-
-  it('standing with no rows collapses its band', () => {
-    const { container } = render(<HomeRail kind="standing" viewerId="u1" pos={2} />);
-    expectCollapsed(container);
-    expect(container.firstElementChild).not.toBeNull();
-  });
 
   it('round of the week with no featured round mounts nothing', () => {
     const { container } = render(<HomeRail kind="featuredRound" viewerId="u1" pos={0} />);

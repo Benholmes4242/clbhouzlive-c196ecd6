@@ -7,7 +7,7 @@
  */
 export const HOME_RAIL_CADENCE = { first: 6, every: 6 } as const;
 
-export type HomeRailKind = 'featuredRound' | 'clubWeek' | 'standing';
+export type HomeRailKind = 'featuredRound';
 
 /** The rail's ordinal in the feed (0 = first rail) after card `postIndex`, or null.
  *  This is the analytics `pos` — the same kind of number Explore sends. */
@@ -17,9 +17,9 @@ export function homeRailOrdinalAfter(postIndex: number): number | null {
   return n / HOME_RAIL_CADENCE.every;
 }
 
-export function homeRailKindFor(ordinal: number): HomeRailKind {
-  if (ordinal === 0) return 'featuredRound'; // once per feed session
-  return ordinal % 2 === 1 ? 'clubWeek' : 'standing';
+/** The week's pick, once per feed session; every later rail renders nothing. */
+export function homeRailKindFor(ordinal: number): HomeRailKind | null {
+  return ordinal === 0 ? 'featuredRound' : null;
 }
 
 /** Rail rendered AFTER the card at `postIndex` (0-based), or null. */

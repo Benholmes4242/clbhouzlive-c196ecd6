@@ -961,8 +961,9 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
             feedIndex, and keyed on postIndex they stay put across pages. */}
         {homeRails && (() => {
           const ordinal = homeRailOrdinalAfter(index);
-          return ordinal == null ? null : (
-            <HomeRail kind={homeRailKindFor(ordinal)} viewerId={currentUserId} pos={ordinal} />
+          const kind = ordinal == null ? null : homeRailKindFor(ordinal);
+          return kind == null || ordinal == null ? null : (
+            <HomeRail kind={kind} viewerId={currentUserId} pos={ordinal} />
           );
         })()}
         </>
