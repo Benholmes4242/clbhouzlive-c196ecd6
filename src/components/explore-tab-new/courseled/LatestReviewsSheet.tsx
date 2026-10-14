@@ -1,3 +1,9 @@
+/**
+ * DEAD — NO CALLERS. The Courses page (CoursesBrowsePage) was this sheet's last
+ * caller; BRIEF_COURSES_PAGE_DEVICE_REVISION §2 removed it, and the page now
+ * ends at the latest-reviews rail. Kept on disk against that decision being
+ * reversed — putting it back is one mount and one open handler.
+ */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
