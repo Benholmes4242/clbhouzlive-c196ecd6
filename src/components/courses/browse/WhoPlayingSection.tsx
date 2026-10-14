@@ -13,7 +13,7 @@ import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { GLASS_CHIP_CLASS } from '@/styles/glassChip';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { SectionHead, SECTION_WRAP } from './SectionHead';
+import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { RAIL_BLEED } from './format';
 
 /**
@@ -26,6 +26,9 @@ import { RAIL_BLEED } from './format';
  */
 const CAP = 10;
 const CARD_W = 214;
+/** Taken from FriendsPlayedRail's SHAPE_H: 60 is the smallest height where a
+ * two-shot swing is legible. Do NOT reduce it. */
+const SHAPE_H = 60;
 const BODY_PAD_X = 11;
 
 function toParLabel(r: CircleRoundRow): string | null {
@@ -59,7 +62,7 @@ export function WhoPlayingSection() {
         title="Who's been playing"
         subline="Every card is a real round, posted by a member, with what they went round in."
       />
-      <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: 10, marginTop: 14 }}>
+      <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: 10, marginTop: HEAD_GAP }}>
         {rows.map((r) => {
           const m = r.course_id ? meta?.get(r.course_id) : undefined;
           const name = m?.name ?? r.course_name ?? '';
@@ -164,7 +167,7 @@ export function WhoPlayingSection() {
                 {/* No hole data → no shape block; never a fabricated line. */}
                 {shape ? (
                   <div style={{ marginTop: 6 }}>
-                    <RoundShape row={r} shape={shape} width={CARD_W - BODY_PAD_X * 2 - 2} height={44} showMeta={false} />
+                    <RoundShape row={r} shape={shape} width={CARD_W - BODY_PAD_X * 2 - 2} height={SHAPE_H} showMeta={false} />
                   </div>
                 ) : null}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 8, minWidth: 0 }}>

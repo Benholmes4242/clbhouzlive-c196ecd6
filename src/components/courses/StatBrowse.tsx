@@ -51,6 +51,7 @@ import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens'
 import { useBrowseReviews } from './useBrowseReviews';
 import { LatestReviewsSheet } from '@/components/explore-tab-new/courseled/LatestReviewsSheet';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { OPEN_REGION_EVENT } from './browse/ByRegionSection';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
@@ -486,6 +487,16 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   }, [t, facets, country, region, countryEntry, regionEntry]);
 
   const regionDisabled = !country || regionsForCountry.length <= 1;
+  /* "All N regions" tile in section 02 asks to open the region dropdown.
+   * Regions are chosen within an area, so with no area set the area
+   * dropdown opens instead — the region control is disabled there. */
+  const [countryOpen, setCountryOpen] = useState(false);
+  const [regionOpen, setRegionOpen] = useState(false);
+  useEffect(() => {
+    const onOpen = () => (regionDisabled ? setCountryOpen(true) : setRegionOpen(true));
+    window.addEventListener(OPEN_REGION_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_REGION_EVENT, onOpen);
+  }, [regionDisabled]);
   const remaining = Math.max(0, totalCount - rows.length);
   // eslint-disable-next-line settled/no-not-loading-empty-check -- useStatBrowseList owns a manual isLoading initialised to true, so it is never false before the first fetch.
   const showEmpty = !isLoading && rows.length === 0;
@@ -569,7 +580,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   }, [facets]);
 
   const countrySelect = (_compact: boolean) => (
-    <Select value={country ?? 'all'} onValueChange={onCountryChange}>
+    <Select value={country ?? 'all'} onValueChange={onCountryChange} open={countryOpen} onOpenChange={setCountryOpen}>
       <SelectTrigger
         className={WELL_TRIGGER_CLS}
         style={WELL_ENABLED}
@@ -616,7 +627,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
   );
 
   const regionSelect = (_compact: boolean) => (
-    <Select value={region ?? 'all'} onValueChange={onRegionChange} disabled={regionDisabled}>
+    <Select value={region ?? 'all'} onValueChange={onRegionChange} disabled={regionDisabled} open={regionOpen} onOpenChange={setRegionOpen}>
       <SelectTrigger
         className={WELL_TRIGGER_CLS}
         style={regionDisabled ? WELL_DISABLED : WELL_ENABLED}

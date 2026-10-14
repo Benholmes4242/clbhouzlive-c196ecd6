@@ -2,11 +2,14 @@ import type React from "react";
 /** Shared figure formatting for the Courses page sections. */
 export const fmtCount = (n: number) => n.toLocaleString('en-GB');
 
-/** "+12.1", "−0.4", "level" — one decimal, true minus sign. */
+/** "+12.1", "−0.4" — one decimal, true minus sign. Level par returns
+ * LEVEL_PAR; callers render the shared hero.factLevelPar key for it. */
+export const LEVEL_PAR = '__level__';
+
 export function fmtToPar(v: number | null | undefined): string | null {
   if (v == null || !Number.isFinite(v)) return null;
   const r = Math.round(v * 10) / 10;
-  if (r === 0) return 'level';
+  if (r === 0) return LEVEL_PAR;
   return r > 0 ? `+${r.toFixed(1)}` : `\u2212${Math.abs(r).toFixed(1)}`;
 }
 

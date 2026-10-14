@@ -61,5 +61,8 @@ export function SectionHead({ n, kicker, title, subline, tone = 'amber' }: Secti
   );
 }
 
+/** Gap between a section's head and its content — every section reads this. */
+export const HEAD_GAP = 14;
+
 /** The wrapper every section's head + content sits in. */
 export const SECTION_WRAP: React.CSSProperties = { padding: '18px 16px 15px' };
