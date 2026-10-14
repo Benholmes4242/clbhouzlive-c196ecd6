@@ -14,9 +14,9 @@ import { ByRegionSection, ALL_COURSES_ANCHOR } from './browse/ByRegionSection';
 import { MostPlayedSection } from './browse/MostPlayedSection';
 
 /**
- * CoursesBrowsePage — the Courses tab as eight stacked sections
- * (BRIEF_COURSES_PAGE_REBUILD). Holds no layout beyond stacking them.
- * Sections 01–07 are app-wide and never read the country/region URL params;
+ * CoursesBrowsePage — the Courses tab: six sections above the list
+ * (BRIEF_COURSES_PAGE_REBUILD, revised by DEVICE_REVISION). Holds no layout
+ * beyond stacking them. The sections above the list are app-wide and never read the country/region URL params;
  * those belong to section 08 (StatBrowse) alone.
  *
  * Opens no bottom sheet: the page ends at the reviews rail (DEVICE_REVISION §2).
@@ -40,8 +40,9 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
     facets?.directory_total != null && facets?.played_total != null
       ? Math.max(0, facets.directory_total - facets.played_total)
       : null;
-  // Section 07 is app-wide: no country, no region.
+  // The reviews rail is app-wide: no country, no region.
   const { pool: reviewPool } = useBrowseReviews(null, null);
+  const openReviewSheet = useReviewSheetStore((st) => st.open);
   const handleReviewTile = useCallback(
     (r: LatestReview) => {
       openReviewSheet({
