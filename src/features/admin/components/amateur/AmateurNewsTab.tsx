@@ -37,47 +37,7 @@ export default function AmateurNewsTab() {
 
   const current = editing && editing !== 'new' ? stories.find((s) => s.id === editing) ?? null : null;
 
-  if (editing) {
-    return (
-      <AmateurStoryEditor
-        story={current}
-        saving={create.isPending || update.isPending}
-        onBack={() => setEditing(null)}
-        onSave={async (input: AmateurStoryInput) => {
-          try {
-            if (current) {
-              await update.mutateAsync({ id: current.id, patch: input });
-              toast.success('Story saved');
-            } else {
-              const made = await create.mutateAsync(input);
-              setEditing(made.id);
-              toast.success('Draft created');
-            }
-          } catch (e: any) {
-            toast.error(e?.message ?? 'Could not save');
-          }
-        }}
-        onPublish={async (publishedAt) => {
-          if (!current) { toast.error('Create the draft first'); return; }
-          try {
-            await setPublishedAt.mutateAsync({ id: current.id, publishedAt });
-            toast.success(publishedAt ? 'Published' : 'Back to draft');
-          } catch (e: any) {
-            toast.error(e?.message ?? 'Could not publish');
-          }
-        }}
-        onDelete={current ? async () => {
-          try {
-            await remove.mutateAsync(current.id);
-            setEditing(null);
-            toast.success('Story deleted');
-          } catch (e: any) {
-            toast.error(e?.message ?? 'Could not delete');
-          }
-        } : undefined}
-      />
-    );
-  }
+  if (editing) return <AmateurStoryEditorHost id={editing} onBack={() => setEditing(null)} />;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -167,5 +127,56 @@ export default function AmateurNewsTab() {
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * The editor with its save, publish, schedule, unpublish and delete handlers,
+ * exactly as the old list tab held them. BRIEF_CONTENT_DESK: hosted by the
+ * Newsroom and the Story screen; this tab keeps using it too.
+ */
+export function AmateurStoryEditorHost({ id, onBack }: { id: string; onBack: () => void }) {
+  const { stories, create, update, setPublishedAt, remove } = useAmateurStoriesAdmin();
+  const [editing, setEditingRaw] = React.useState<string | null>(id);
+  const setEditing = (v: string | null) => { if (v === null) onBack(); else setEditingRaw(v); };
+  const current = editing && editing !== 'new' ? stories.find((s) => s.id === editing) ?? null : null;
+  return (
+    <AmateurStoryEditor
+      story={current}
+      saving={create.isPending || update.isPending}
+      onBack={onBack}
+      onSave={async (input: AmateurStoryInput) => {
+        try {
+          if (current) {
+            await update.mutateAsync({ id: current.id, patch: input });
+            toast.success('Story saved');
+          } else {
+            const made = await create.mutateAsync(input);
+            setEditing(made.id);
+            toast.success('Draft created');
+          }
+        } catch (e: any) {
+          toast.error(e?.message ?? 'Could not save');
+        }
+      }}
+      onPublish={async (publishedAt) => {
+        if (!current) { toast.error('Create the draft first'); return; }
+        try {
+          await setPublishedAt.mutateAsync({ id: current.id, publishedAt });
+          toast.success(publishedAt ? 'Published' : 'Back to draft');
+        } catch (e: any) {
+          toast.error(e?.message ?? 'Could not publish');
+        }
+      }}
+      onDelete={current ? async () => {
+        try {
+          await remove.mutateAsync(current.id);
+          setEditing(null);
+          toast.success('Story deleted');
+        } catch (e: any) {
+          toast.error(e?.message ?? 'Could not delete');
+        }
+      } : undefined}
+    />
   );
 }

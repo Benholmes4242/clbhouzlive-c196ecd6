@@ -208,7 +208,7 @@ export default function WireStoryEditor({
           away from it, because they are different decisions. */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         <button type="button" onClick={onBack} style={btn()}>
-          <ChevronLeft size={14} /> The Wire
+          <ChevronLeft size={14} /> Tour News
         </button>
         <StatusPill tone={state === 'published' ? 'ok' : state === 'scheduled' ? 'brand' : 'neutral'}>
           {state === 'published' ? 'Published' : state === 'scheduled' ? 'Scheduled' : 'Draft'}
@@ -437,7 +437,7 @@ export default function WireStoryEditor({
 
       <ConfirmDialog
         open={confirm === 'publish'}
-        title={scheduleAt ? 'Schedule for The Wire?' : 'Publish to The Wire?'}
+        title={scheduleAt ? 'Schedule for Tour News?' : 'Publish to Tour News?'}
         description={
           scheduleAt
             ? `This story goes live at ${new Date(scheduleAt).toLocaleString()}. Until then it stays invisible to members.`
@@ -455,7 +455,7 @@ export default function WireStoryEditor({
       <ConfirmDialog
         open={confirm === 'unpublish'}
         title="Return to draft?"
-        description="The story disappears from The Wire and its link stops resolving. Nothing is deleted."
+        description="The story disappears from Tour News and its link stops resolving. Nothing is deleted."
         confirmLabel="Unpublish"
         onConfirm={async () => { await onPublish(null); setConfirm(null); }}
         onClose={() => setConfirm(null)}

@@ -19,7 +19,8 @@ import { panelCan } from '@/lib/panelCan';
 
 import { KICKER, LABEL } from '@/lib/tokens/type';
 import { adminTheme as t } from '../theme';
-import SectionTabs from '../components/SectionTabs';
+import ContentSegments, { type ContentSection } from '../components/content/ContentSegments';
+import NewsroomSection from '../components/content/NewsroomSection';
 import StatTile from '../components/StatTile';
 import StatusPill from '../components/StatusPill';
 import EmptyState from '../components/EmptyState';
@@ -38,58 +39,46 @@ import { useCourses, type AdminCourseRow, type CourseFilter } from '../hooks/use
 import { saveDraft, loadDraft, clearDraft, draftKeys, draftsEqual } from '../lib/sheetDrafts';
 import HelpArticlesTab from '../components/HelpArticlesTab';
 import LegalDocumentsTab from '../components/LegalDocumentsTab';
-import TheWireTab from '../components/wire/TheWireTab';
-import AmateurNewsTab from '../components/amateur/AmateurNewsTab';
 
-type TabId = 'courses' | 'wire' | 'amateur' | 'tour' | 'players' | 'help' | 'legal';
+/**
+ * BRIEF_CONTENT_DESK — four sections held in ?section=. Old ?tab= links map:
+ * wire/amateur→newsroom, courses→courses, tour/players→tour, help/legal→pages.
+ */
+const LEGACY_TAB: Record<string, ContentSection> = {
+  wire: 'newsroom', amateur: 'newsroom', courses: 'courses', tour: 'tour', players: 'tour', help: 'pages', legal: 'pages',
+};
 
 export default function ContentPage() {
   const { role } = usePanelRole();
   const can = panelCan(role);
   const [params, setParams] = useSearchParams();
-  
 
+  const visible = useMemo(() => {
+    const v: ContentSection[] = [];
+    if (can.manageAdmins) v.push('newsroom');
+    v.push('courses');
+    if (can.manageAdmins) v.push('tour');
+    if (can.viewModeration) v.push('pages');
+    return v;
+  }, [can.manageAdmins, can.viewModeration]);
 
-  const requested = (params.get('tab') as TabId) || 'courses';
-  const isAllowed = (id: TabId): boolean => {
-    if (id === 'courses') return true;
-    if (id === 'help' || id === 'legal') return can.viewModeration;
-    if (id === 'tour' || id === 'players' || id === 'wire' || id === 'amateur') return can.manageAdmins;
-    return false;
-  };
-  const tab: TabId = isAllowed(requested) ? requested : 'courses';
+  const raw = params.get('section') ?? LEGACY_TAB[params.get('tab') ?? ''] ?? null;
+  const section: ContentSection = raw && visible.includes(raw as ContentSection) ? (raw as ContentSection) : visible[0];
 
-  const setTab = (id: string) => {
+  const setSection = (id: ContentSection) => {
     const next = new URLSearchParams(params);
-    next.set('tab', id);
+    next.delete('tab');
+    next.set('section', id);
     setParams(next, { replace: true });
   };
 
-  const tabs = useMemo(() => {
-    const base: { id: TabId; label: string }[] = [{ id: 'courses', label: 'Courses' }];
-    if (can.manageAdmins) {
-      base.push({ id: 'wire', label: 'The Wire' });
-      base.push({ id: 'amateur', label: 'Amateur' });
-      base.push({ id: 'tour', label: 'Tour data' });
-      base.push({ id: 'players', label: 'Players' });
-    }
-    if (can.viewModeration) {
-      base.push({ id: 'help', label: 'Help' });
-      base.push({ id: 'legal', label: 'Legal' });
-    }
-    return base;
-  }, [can.manageAdmins, can.viewModeration]);
-
   return (
-    <div style={{ padding: '8px 16px 0', display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 1180, margin: '0 auto' }}>
-      <SectionTabs tabs={tabs} activeId={tab} onChange={setTab} />
-      {tab === 'courses' && <CoursesTab />}
-      {tab === 'help' && (can.viewModeration ? <HelpArticlesTab /> : <AdminAccessDenied />)}
-      {tab === 'legal' && (can.viewModeration ? <LegalDocumentsTab /> : <AdminAccessDenied />)}
-      {tab === 'wire' && (can.manageAdmins ? <TheWireTab /> : <AdminAccessDenied />)}
-      {tab === 'amateur' && (can.manageAdmins ? <AmateurNewsTab /> : <AdminAccessDenied />)}
-      {tab === 'tour' && (can.manageAdmins ? <TourDataTab /> : <AdminAccessDenied />)}
-      {tab === 'players' && (can.manageAdmins ? <TourPlayersTab /> : <AdminAccessDenied />)}
+    <div style={{ padding: '8px 12px 24px', display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 1180, margin: '0 auto', fontVariantNumeric: 'tabular-nums' }}>
+      <ContentSegments sections={visible} active={section} onChange={setSection} />
+      {section === 'newsroom' && <NewsroomSection />}
+      {section === 'courses' && <CoursesTab />}
+      {section === 'tour' && (<><TourDataTab /><TourPlayersTab /></>)}
+      {section === 'pages' && (<><HelpArticlesTab /><LegalDocumentsTab /></>)}
     </div>
   );
 }
