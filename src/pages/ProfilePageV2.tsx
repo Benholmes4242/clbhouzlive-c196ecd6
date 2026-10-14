@@ -973,148 +973,11 @@ const ProfilePageV2Content: React.FC = () => {
                   </DropdownMenu>
                 </div>
               ) : friendshipStatus === 'blocked' ? null : (
-                <BandPill
-                  solid
-                  label={
-                    isFollowing
-                      ? t('hero.following', 'Following')
-                      : t('hero.follow', 'Follow')
-                  }
-                  onClick={toggleFollow}
-                  disabled={followBusy}
-                />
-              )
-            }
-
-            onStatTap={(stat) => {
-              // Addendum B: the index block and the ROUNDS cell share one
-              // destination - the profile's handicap surface. The legacy
-              // ?tab=stats id redirects here anyway, so we go straight to it.
-              if (stat === 'index' || stat === 'rounds') {
-                if (isSelf) navigate('/handicap');
-                else if (profileUserId) void resolveMemberTap({ targetUserId: profileUserId });
-                return;
-              }
-              if (stat === 'rated') {
-                handleTabChange('courses');
-                return;
-              }
-              // Round 3 §3: the deleted "N followers . N friends" line's
-              // destinations now live on the strip.
-              if (stat === 'followers') {
-                setActiveMiniNav('followers');
-                navigate(`/profile/${username}/followers`);
-                return;
-              }
-              if (stat === 'friends') {
-                setActiveMiniNav('friends');
-                navigate(`/profile/${username}/followers?tab=following&filter=friends`);
-              }
-            }}
-          />
-        </div>
-      )}
-
-
-      {/* Action Buttons - other members only. Correction 3: the self "..."
-          menu moved INTO the hero identity row beside the EDIT pill, so this
-          block (and the white gap it created) no longer renders for self. */}
-      {!isSelfView && (
-      <div className="mt-3 px-4 flex items-center gap-1.5 sm:gap-2 relative z-10 pointer-events-auto">
-        {
-          /* ── Other user: Follow + Add Friend + Overflow menu ── */
-          friendshipStatus === 'blocked' ? (
-            <div className="h-11 flex-1 rounded-full text-sm font-medium flex items-center justify-center" style={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, color: A.MUTE }}>
-              Unavailable
-            </div>
-          ) : (
-
-          <div className="flex flex-col gap-2 w-full">
-            {/* Row 1 — Message (primary CTA, full width) */}
-            <button
-              type="button"
-              onClick={() => profileUserId && startConversation({ actorType: 'personal', actorId: profileUserId })}
-              disabled={dmStarting}
-              className="h-11 w-full rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 px-4 whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform"
-              style={{ background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.30)', color: '#F7931E' }}
-              aria-label="Send message"
-            >
-              {dmStarting ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <>
-                  <MessageCircle className="w-3.5 h-3.5" />
-                  Message
-                </>
-              )}
-            </button>
-
-            {/* Row 2 — Follow + Friend action + overflow menu */}
-            <div className="flex items-center gap-2 w-full">
-            {viewerActorType !== 'business' && (
-            <button 
-              className={cn(
-                'h-11 flex-1 min-w-0 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5',
-                'whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform border',
-                friendshipStatus === 'friends'
-                  ? ''
-                  : friendshipStatus === 'request_received'
-                    ? 'bg-primary text-primary-foreground border-primary'
-                    : '',
-              )}
-              style={
-                friendshipStatus === 'friends'
-                  ? { background: 'rgba(247,147,30,0.10)', border: '1px solid rgba(247,147,30,0.30)', color: '#F7931E' }
-                  : friendshipStatus === 'request_received'
-                    ? undefined
-                    : { background: A.PANEL, border: `1px solid ${A.BORDER}`, color: A.INK }
-              }
-              onClick={handleFriendAction}
-              disabled={friendshipUpdating}
-            >
-              {friendshipUpdating ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  {friendshipStatus === 'friends' ? 'Unfriending…'
-                    : friendshipStatus === 'request_sent' ? 'Cancelling…'
-                    : friendshipStatus === 'request_received' ? 'Accepting…'
-                    : 'Sending…'}
-                </>
-              ) : friendshipStatus === 'friends' ? (
-                <>
-                  <UserCheck className="w-3.5 h-3.5" />
-                  Friends
-                </>
-              ) : friendshipStatus === 'request_sent' ? (
-                <>
-                  <UserMinus className="w-3.5 h-3.5" />
-                  Requested
-                </>
-              ) : friendshipStatus === 'request_received' ? (
-                <>
-                  <UserCheck className="w-3.5 h-3.5" />
-                  Accept
-                </>
-              ) : (
-                <>
-                  <UserPlus className="w-3.5 h-3.5" />
-                  Add Friend
-                </>
-              )}
-            </button>
-            )}
-
-            {/* Fix 2: Other user overflow menu */}
             <DropdownMenu onOpenChange={(open) => {
               if (!open) (document.activeElement as HTMLElement)?.blur();
             }}>
               <DropdownMenuTrigger asChild>
-                <button 
-                  className="w-11 h-11 flex-shrink-0 rounded-full flex items-center justify-center focus:outline-none active:scale-[0.97] transition-transform"
-                  style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
-                >
-                  <MoreHorizontal className="w-5 h-5" style={{ color: A.INK }} />
-                </button>
+                <BandDots />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuItem onClick={() => {
@@ -1158,11 +1021,100 @@ const ProfilePageV2Content: React.FC = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            </div>
-          </div>
-          )
-        }
-      </div>
+              )
+            }
+
+            actionsRow={!isSelfView && friendshipStatus !== 'blocked' ? (
+              <>
+                <button type="button" onClick={toggleFollow} disabled={followBusy} className="disabled:opacity-60 active:scale-[0.98] transition-transform" style={ACTION_PRIMARY}>
+                  {isFollowing ? t('hero.following', 'Following') : t('hero.follow', 'Follow')}
+                </button>
+            {viewerActorType !== 'business' && (
+            <button 
+              className="disabled:opacity-60 active:scale-[0.98] transition-transform gap-1.5"
+              style={ACTION_GHOST}
+              onClick={handleFriendAction}
+              disabled={friendshipUpdating}
+            >
+              {friendshipUpdating ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  {friendshipStatus === 'friends' ? 'Unfriending…'
+                    : friendshipStatus === 'request_sent' ? 'Cancelling…'
+                    : friendshipStatus === 'request_received' ? 'Accepting…'
+                    : 'Sending…'}
+                </>
+              ) : friendshipStatus === 'friends' ? (
+                <>
+                  <UserCheck className="w-3.5 h-3.5" />
+                  Friends
+                </>
+              ) : friendshipStatus === 'request_sent' ? (
+                <>
+                  <UserMinus className="w-3.5 h-3.5" />
+                  Requested
+                </>
+              ) : friendshipStatus === 'request_received' ? (
+                <>
+                  <UserCheck className="w-3.5 h-3.5" />
+                  Accept
+                </>
+              ) : (
+                <>
+                  <UserPlus className="w-3.5 h-3.5" />
+                  Add Friend
+                </>
+              )}
+            </button>
+            )}
+
+            <button
+              type="button"
+              onClick={() => profileUserId && startConversation({ actorType: 'personal', actorId: profileUserId })}
+              disabled={dmStarting}
+              className="gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform"
+              style={ACTION_GHOST}
+              aria-label="Send message"
+            >
+              {dmStarting ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <>
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  Message
+                </>
+              )}
+            </button>
+              </>
+            ) : null}
+
+            onStatTap={(stat) => {
+              // Addendum B: the index block and the ROUNDS cell share one
+              // destination - the profile's handicap surface. The legacy
+              // ?tab=stats id redirects here anyway, so we go straight to it.
+              if (stat === 'index' || stat === 'rounds') {
+                if (isSelf) navigate('/handicap');
+                else if (profileUserId) void resolveMemberTap({ targetUserId: profileUserId });
+                return;
+              }
+              if (stat === 'rated') {
+                handleTabChange('courses');
+                return;
+              }
+              // Round 3 §3: the deleted "N followers . N friends" line's
+              // destinations now live on the strip.
+              if (stat === 'followers') {
+                setActiveMiniNav('followers');
+                navigate(`/profile/${username}/followers`);
+                return;
+              }
+              if (stat === 'friends') {
+                setActiveMiniNav('friends');
+                navigate(`/profile/${username}/followers?tab=following&filter=friends`);
+              }
+            }}
+          />
+        </div>
       )}
 
 
@@ -1517,5 +1469,13 @@ const ProfilePageV2: React.FC = () => {
     </ProfileTouchDebugProvider>
   );
 };
+
+const ACTION_BASE: React.CSSProperties = {
+  height: 34, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center',
+  fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
+  whiteSpace: 'nowrap', minWidth: 0, padding: '0 8px',
+};
+const ACTION_PRIMARY: React.CSSProperties = { ...ACTION_BASE, background: A.AMBER, border: `1px solid ${A.AMBER}`, color: '#0A0A0C' };
+const ACTION_GHOST: React.CSSProperties = { ...ACTION_BASE, background: 'transparent', border: `1px solid ${A.BORDER}`, color: A.INK };
 
 export default ProfilePageV2;
