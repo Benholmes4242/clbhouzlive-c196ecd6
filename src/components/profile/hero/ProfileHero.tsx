@@ -573,11 +573,11 @@ export const ProfileHero: React.FC<Props> = ({
                     {countingKnown && (
                       <>
                         {countingN === 0 ? (
-                          <><b style={{ color: A.INK, fontWeight: 700 }}>{t('hero.countingNone', 'None')}</b>{t('hero.countingNoneRest', { n: tilesWord, defaultValue: ` of these ${tilesWord} are counting towards your index.` })}</>
+                          <><b style={{ color: A.INK, fontWeight: 700 }}>{t('hero.countingNone', 'None')}</b>{(isSelf ? t('hero.countingNoneRest', { n: tilesWord, defaultValue: ` of these ${tilesWord} are counting towards your index.` }) : ownerFirstName ? t('hero.countingNoneRestNamed', { n: tilesWord, name: ownerFirstName, defaultValue: ` of these ${tilesWord} are counting towards ${ownerFirstName}'s index.` }) : t('hero.countingNoneRestTheir', { n: tilesWord, defaultValue: ` of these ${tilesWord} are counting towards their index.` }))}</>
                         ) : (
                           <><b style={{ color: A.INK, fontWeight: 700 }}>{numberWord(countingN)}</b>{countingN === 1
-                            ? t('hero.countingOneRest', { n: tilesWord, defaultValue: ` of these ${tilesWord} is counting towards your index.` })
-                            : t('hero.countingManyRest', { n: tilesWord, defaultValue: ` of these ${tilesWord} are counting towards your index.` })}</>
+                            ? (isSelf ? t('hero.countingOneRest', { n: tilesWord, defaultValue: ` of these ${tilesWord} is counting towards your index.` }) : ownerFirstName ? t('hero.countingOneRestNamed', { n: tilesWord, name: ownerFirstName, defaultValue: ` of these ${tilesWord} is counting towards ${ownerFirstName}'s index.` }) : t('hero.countingOneRestTheir', { n: tilesWord, defaultValue: ` of these ${tilesWord} is counting towards their index.` }))
+                            : (isSelf ? t('hero.countingManyRest', { n: tilesWord, defaultValue: ` of these ${tilesWord} are counting towards your index.` }) : ownerFirstName ? t('hero.countingManyRestNamed', { n: tilesWord, name: ownerFirstName, defaultValue: ` of these ${tilesWord} are counting towards ${ownerFirstName}'s index.` }) : t('hero.countingManyRestTheir', { n: tilesWord, defaultValue: ` of these ${tilesWord} are counting towards their index.` }))}</>
                         )}
                       </>
                     )}
