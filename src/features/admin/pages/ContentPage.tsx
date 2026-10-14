@@ -21,6 +21,7 @@ import { KICKER, LABEL } from '@/lib/tokens/type';
 import { adminTheme as t } from '../theme';
 import ContentSegments, { type ContentSection } from '../components/content/ContentSegments';
 import NewsroomSection from '../components/content/NewsroomSection';
+import CoursesSection from '../components/content/CoursesSection';
 import StatTile from '../components/StatTile';
 import StatusPill from '../components/StatusPill';
 import EmptyState from '../components/EmptyState';
@@ -182,118 +183,20 @@ function CoursesTab() {
   const activeIssueChip = c.filter === 'missing_coords' || c.filter === 'missing_photo';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {/* Search + Add */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 0 }}>
-          <Search size={16} style={{ position: 'absolute', left: 12, top: 12, color: t.inkFaint }} />
-          <input
-            value={searchInput}
-            onChange={e => setSearchInput(e.target.value)}
-            placeholder="Search courses"
-            style={{
-              width: '100%', padding: '10px 12px 10px 36px',
-              borderRadius: t.radius.md, border: `1px solid ${t.line}`,
-              background: t.surface, color: t.ink, fontSize: 14, outline: 'none',
-            }}
-          />
-        </div>
-        <button
-          onClick={openAdd}
-          style={{
-            padding: '10px 14px', borderRadius: t.radius.md,
-            border: 'none', background: t.ink, color: t.surface,
-            fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-          }}
-        >
-          <Plus size={16} /> Add course
-        </button>
-      </div>
-
-      {/* Coverage board — states what the directory HAS; tiles filter the gap. */}
-      <div style={{
-        background: t.surface, border: `1px solid ${t.line}`,
-        borderRadius: 18, padding: '10px 12px 12px',
-      }}>
-        <div style={{
-          display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-          gap: 10, marginBottom: 10,
-        }}>
-          <span style={{ ...KICKER, color: t.inkMuted }}>Directory</span>
-          <span style={{ ...LABEL_T, ...FIG_T, color: t.inkFaint }}>
-            {total.toLocaleString()} courses
-          </span>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
-          {coverage.map(tile => (
-            <CoverageTile
-              key={tile.id}
-              label={tile.label}
-              value={tile.value}
-              total={total}
-              active={c.filter === tile.id}
-              onClick={() => c.setFilter(c.filter === tile.id ? 'all' : tile.id)}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* List */}
-      {c.isLoading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} style={{ height: 64, background: t.canvas, borderRadius: 18, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
-          ))}
-        </div>
-      ) : c.courses.length === 0 ? (
-        activeIssueChip
-          ? <EmptyState icon={<CheckCircle2 size={22} color={t.ok} />} title="Nothing to fix here." />
-          : <EmptyState title="No courses" subtitle={searchInput ? `for "${searchInput}"` : undefined} />
-      ) : (
-        <div style={{
-          background: t.surface, border: `1px solid ${t.line}`,
-          borderRadius: 18, overflow: 'hidden',
-        }}>
-          <div style={{
-            padding: '10px 14px', borderBottom: `1px solid ${t.line}`,
-            display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10,
-          }}>
-            <span style={{ ...LABEL_T, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {VIEW_LABEL[c.filter]}
-            </span>
-            <span style={{ ...LABEL_T, ...FIG_T, color: t.inkFaint, flexShrink: 0 }}>
-              {c.total.toLocaleString()}
-            </span>
-          </div>
-          {c.courses.map((course, i) => (
-            <CourseRow
-              key={course.id}
-              course={course}
-              first={i === 0}
-              activeFilter={c.filter}
-              missingCoords={c.stats.missingCoords}
-              missingPhoto={c.stats.missingPhoto}
-              total={total}
-              onOpen={() => openCourse(course.id)}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Pagination */}
-      {c.total > c.pageSize && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 12, color: t.inkMuted, fontVariantNumeric: 'tabular-nums' }}>
-            {(c.page - 1) * c.pageSize + 1}-{Math.min(c.page * c.pageSize, c.total)} of {c.total.toLocaleString()}
-          </span>
-          <div style={{ display: 'flex', gap: 6 }}>
-            <PagerBtn disabled={c.page <= 1} onClick={() => c.setPage(p => p - 1)}>Prev</PagerBtn>
-            <span style={{ fontSize: 13, color: t.ink, padding: '6px 4px', fontVariantNumeric: 'tabular-nums' }}>{c.page} / {totalPages}</span>
-            <PagerBtn disabled={c.page >= totalPages} onClick={() => c.setPage(p => p + 1)}>Next</PagerBtn>
-          </div>
-        </div>
-      )}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <CoursesSection
+        stats={{ total: c.stats.total, geocoded: c.stats.geocoded, missingPhoto: c.stats.missingPhoto, top100: c.stats.top100 }}
+        search={searchInput}
+        onSearch={setSearchInput}
+        results={debounced.trim() ? c.courses : []}
+        resultsTotal={c.total}
+        page={c.page}
+        pageSize={c.pageSize}
+        onPage={(p) => c.setPage(p)}
+        searching={c.isLoading || searchInput !== debounced}
+        onFix={openCourse}
+        onAdd={openAdd}
+      />
 
       <CourseDetail
         courseId={drawerId}
