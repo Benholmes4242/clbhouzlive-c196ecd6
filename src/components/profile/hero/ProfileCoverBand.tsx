@@ -19,7 +19,6 @@ export const BAND_HEIGHT = 'max(calc(var(--sat, env(safe-area-inset-top, 0px)) +
 export const BAND_CONTROL_BORDER = 'rgba(255,255,255,0.22)';
 export const BAND_CONTROL_GROUND = 'rgba(10,14,10,0.40)';
 const BAND_AVATAR_BORDER = 'rgba(255,255,255,0.14)';
-const ON_AMBER = '#0A0A0C';
 
 export const BandPill = React.forwardRef<
   HTMLButtonElement,
