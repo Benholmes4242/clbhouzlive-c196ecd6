@@ -83,6 +83,8 @@ interface Props {
   /** First website only renders in the meta row; the page keeps the rest. */
   website?: string | null;
   websiteDisplay?: string | null;
+  /** Visitor relationship actions (Follow, Add friend, Message). Grid sizes to the controls that render. */
+  actionsRow?: React.ReactNode;
   /** Own profile: edit route for "Add your home club". */
   onEdit?: () => void;
   /** Own profile, not connected: the WHS connect flow. */
@@ -151,6 +153,15 @@ const CounterCell: React.FC<{ label: string; value: number | null; state?: 'ok' 
   </button>
 );
 
+/** Grid columns follow the controls that actually render — never a placeholder. */
+const ActionsRow: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const n = React.Children.toArray(
+    React.isValidElement(children) && children.type === React.Fragment ? (children.props as { children: React.ReactNode }).children : children,
+  ).filter(Boolean).length;
+  if (n === 0) return null;
+  return <div style={{ marginTop: 11, display: 'grid', gridTemplateColumns: `repeat(${n}, 1fr)`, gap: 7 }}>{children}</div>;
+};
+
 export const ProfileHero: React.FC<Props> = ({
   userId,
   viewerUserId,
@@ -182,6 +193,7 @@ export const ProfileHero: React.FC<Props> = ({
   websiteDisplay,
   onEdit,
   onConnect,
+  actionsRow,
 }) => {
   const { t } = useTranslation('profile');
   const navigate = useNavigate();
@@ -399,6 +411,8 @@ export const ProfileHero: React.FC<Props> = ({
             )}
           </div>
         )}
+
+        {actionsRow && <ActionsRow>{actionsRow}</ActionsRow>}
 
         {(showIndexBlocks || showConnectCard) && <div style={{ height: 1, background: A.SOFT, marginTop: 14 }} />}
 
