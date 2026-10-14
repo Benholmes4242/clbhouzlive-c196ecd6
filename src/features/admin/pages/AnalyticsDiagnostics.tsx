@@ -29,7 +29,7 @@ import {
   type EventAggregate,
   type EventSort,
 } from '../hooks/useEventsExplorer';
-import { type AnalyticsPeriod, useAuthAnalytics } from '../hooks/useAnalytics';
+import { type AnalyticsPeriod, periodToDays, useAuthAnalytics } from '../hooks/useAnalytics';
 
 function fmtTick(v: number) { return v >= 1000 ? `${Math.round(v / 100) / 10}k` : `${v}`; }
 function fmtInt(n: number) { return n.toLocaleString(); }
