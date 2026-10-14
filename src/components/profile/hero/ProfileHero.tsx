@@ -19,6 +19,7 @@ import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
 import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
 import { countsTowardIndex } from '@/lib/whs/counting';
+import { numberWord } from '@/lib/text/numbers';
 import { formValue } from '@/lib/whs/formValue';
 import { isFullEighteen, useProfileRounds } from '@/components/profile/rounds/useProfileRounds';
 import { useProfileAchievementFigures } from '@/hooks/gam/useProfileAchievementFigures';
@@ -40,8 +41,6 @@ const AXIS_INK = 'rgba(248,250,252,0.30)';
 const LOW_LINE = 'rgba(255,255,255,0.14)';
 const MARKER_HALO = '0 0 0 3px rgba(10,10,12,0.9)';
 const TILE_GROUND = 'rgba(255,255,255,0.02)';
-const TILE_COUNT_BORDER = 'rgba(247,147,30,0.42)';
-const TILE_COUNT_GROUND = 'rgba(247,147,30,0.07)';
 const ON_AMBER = '#0A0A0C';
 
 /** The event contract — not the layout. Every member stays even where a view omits the cell. */
@@ -328,6 +327,10 @@ export const ProfileHero: React.FC<Props> = ({
   const rows = roundsQ.isSuccess ? roundsQ.data ?? [] : [];
   const lastFive = rows.filter(isFullEighteen).slice(0, 5);
   const countingN = lastFive.filter((r) => countsTowardIndex(r)).length;
+  // Counting state is unknown when no tile carries is_counter at all.
+  const countingKnown = lastFive.some((r) => r.is_counter != null);
+  const loweredN = lastFive.filter((r) => { const v = formValue(r); return v != null && v < 0; }).length;
+  const tilesWord = numberWord(lastFive.length, false);
   // COURSES = distinct courses in POSTED ROUNDS (get_profile_rounds, gated by
   // can_view_handicap). It will NOT necessarily equal the Your Courses
   // analytics list (gam_user_courses: mapped, non-penalty) — do not "fix"
@@ -471,17 +474,11 @@ export const ProfileHero: React.FC<Props> = ({
 
             {lastFive.length > 0 && (
               <>
-                <div style={{ marginTop: 18, display: 'flex', alignItems: 'baseline' }}>
+                <div style={{ marginTop: 18 }}>
                   <span style={KICK}>{t('hero.formLastFive', 'Form \u00B7 last five')}</span>
-                  {countingN > 0 && (
-                    <span style={{ marginLeft: 'auto', fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.AMBER, ...FIGS }}>
-                      {t('hero.countingOfFive', { count: countingN, defaultValue: `${countingN} of 5 counting` })}
-                    </span>
-                  )}
                 </div>
                 <div style={{ marginTop: 8, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
                   {lastFive.map((r, i) => {
-                    const counts = countsTowardIndex(r);
                     const fv = formValue(r);
                     return (
                       <button
@@ -493,10 +490,10 @@ export const ProfileHero: React.FC<Props> = ({
                         }}
                         style={{
                           minWidth: 0,
-                          border: `1px solid ${counts ? TILE_COUNT_BORDER : A.SOFT}`,
-                          background: counts ? TILE_COUNT_GROUND : TILE_GROUND,
+                          border: `1px solid ${A.SOFT}`,
+                          background: TILE_GROUND,
                           borderRadius: 11,
-                          padding: '8px 4px 7px',
+                          padding: '8px 5px 7px',
                           textAlign: 'center',
                           cursor: 'pointer',
                           fontFamily: SANS,
@@ -515,6 +512,34 @@ export const ProfileHero: React.FC<Props> = ({
                     );
                   })}
                 </div>
+                {/*
+                  "Counting" and "lowered your index" are DIFFERENT FACTS and they come
+                  apart: a round can enter the best eight without displacing a worse
+                  score (counting, did not lower), and a round that lowered the index
+                  months ago can since have been pushed out (lowered, not counting). On
+                  a five-round window they correlate strongly, which is exactly why one
+                  mark claiming both looks right until the day it is wrong. The tiles
+                  draw the one fact a colour can carry honestly — green for lowered —
+                  and the sentence states the one it cannot. Do not add a counting
+                  marker to these tiles.
+                */}
+                {(countingKnown || loweredN > 0) && (
+                  <div style={{ marginTop: 10, fontSize: 11.5, fontWeight: 600, lineHeight: 1.45, color: A.MUTE }}>
+                    {countingKnown && (
+                      <>
+                        {countingN === 0 ? (
+                          <><b style={{ color: A.INK, fontWeight: 700 }}>None</b>{` of these ${tilesWord} are counting towards your index.`}</>
+                        ) : (
+                          <><b style={{ color: A.INK, fontWeight: 700 }}>{numberWord(countingN)}</b>{` of these ${tilesWord} ${countingN === 1 ? 'is' : 'are'} counting towards your index.`}</>
+                        )}
+                      </>
+                    )}
+                    {countingKnown && loweredN > 0 && ' '}
+                    {loweredN > 0 && (loweredN === 1
+                      ? <>The <span style={{ color: GREEN }}>green</span> round lowered it.</>
+                      : <><span style={{ color: GREEN }}>Green</span> rounds lowered it.</>)}
+                  </div>
+                )}
               </>
             )}
           </div>
