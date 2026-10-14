@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -503,6 +504,7 @@ function ProfileTabBody({
   const profilePickerRef = useRef<ProfilePhotoCardHandle>(null);
   const hasAvatar = Boolean(form.profilePhotoBlob || form.profilePhotoUrl);
   const hasHeader = Boolean(form.headerPhotoBlob || form.headerPhotoUrl);
+  const { t } = useTranslation('profile');
 
   return (
     <>

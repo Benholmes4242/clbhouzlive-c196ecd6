@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 /**
  * BusinessProfileEditor — unified create + edit surface for business profiles.
  *
@@ -118,6 +119,7 @@ type Mode = 'create' | 'edit';
 /* ─────────────────────── component ─────────────────────── */
 
 export default function BusinessProfileEditor() {
+  const { t } = useTranslation('profile');
   const { id } = useParams<{ id: string }>();
   const mode: Mode = id ? 'edit' : 'create';
   const navigate = useNavigate();
