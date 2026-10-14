@@ -9,7 +9,7 @@ import ConfirmDialog from '../ConfirmDialog';
 import { FooterButton, Head, Muted, Panel, ROW_RULE, Slot, FIG_LABEL } from '../analytics/analyticsUi';
 import { dateLabel, num } from '../analytics/analyticsFormat';
 import { useHealthGolf, useHealthJobs, type HealthGolf } from '../../hooks/useHealthLenses';
-import { ageOf, ageSecs, minsText, plural, secsText, untilOf } from './healthText';
+import { ageOf, ageSecs, minsText, plural, secsText } from './healthText';
 import { Bar, H, META, PillButton } from './healthUi';
 import { nextSyncText } from './cronText';
 
