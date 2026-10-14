@@ -300,7 +300,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
     if (ranked > 0 && overlap > 0) {
       clauses.push(tr('topTen.verdict.overlap', { count: ranked, word: Word(ranked), overlap: word(overlap) }));
     } else if (ranked > 0) {
-      clauses.push(tr('topTen.verdict.rankedOther', { count: ranked, word: Word(ranked) }));
+      clauses.push(tr('topTen.verdict.rankedOther', { count: ranked, word: Word(ranked), total: word(n) }));
     } else if (overlap > 0) {
       clauses.push(tr('topTen.verdict.overlapOnly', { count: overlap, word: Word(overlap) }));
     }

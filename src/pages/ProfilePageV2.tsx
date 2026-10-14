@@ -358,6 +358,7 @@ const ProfilePageV2Content: React.FC = () => {
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [showTopTenModal, setShowTopTenModal] = useState(false);
+  const [topTenTab, setTopTenTab] = useState<'manage' | 'add'>('manage');
 
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
   const avatarTakeInputRef = useRef<HTMLInputElement>(null);
