@@ -19,7 +19,6 @@ export const BAND_HEIGHT = 'max(calc(var(--sat, env(safe-area-inset-top, 0px)) +
 export const BAND_CONTROL_BORDER = 'rgba(255,255,255,0.22)';
 export const BAND_CONTROL_GROUND = 'rgba(10,14,10,0.40)';
 const BAND_AVATAR_BORDER = 'rgba(255,255,255,0.14)';
-const ON_AMBER = '#0A0A0C';
 
 export const BandPill = React.forwardRef<
   HTMLButtonElement,
@@ -35,9 +34,9 @@ export const BandPill = React.forwardRef<
       height: 32,
       padding: '0 14px',
       borderRadius: 999,
-      border: `1px solid ${solid ? A.AMBER : BAND_CONTROL_BORDER}`,
-      background: solid ? A.AMBER : BAND_CONTROL_GROUND,
-      color: solid ? ON_AMBER : '#FFFFFF',
+      border: `1px solid ${solid ? '#FFFFFF' : BAND_CONTROL_BORDER}`,
+      background: solid ? '#FFFFFF' : BAND_CONTROL_GROUND,
+      color: solid ? A.CANVAS : '#FFFFFF',
       display: 'inline-flex',
       alignItems: 'center',
       fontFamily: SANS,
