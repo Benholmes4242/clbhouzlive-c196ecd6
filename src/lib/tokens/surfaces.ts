@@ -114,6 +114,13 @@ export const IMMERSIVE_FEED_STATUS_BAR = 'FF0A0A0C';
 /** Native chrome encoding of the retained light compatibility route canvas. */
 export const LIGHT_ROUTE_STATUS_BAR = 'FFF8FAFC';
 
+/**
+ * INVERTED_CONTROL_SURFACE — the ground of a control that inverts the canvas:
+ * solid white carrying INK_ON_LIGHT text. One owner for the white, so the
+ * follow pill and the solid cover-band pill cannot drift apart.
+ */
+export const INVERTED_CONTROL_SURFACE = '#FFFFFF';
+
 /** Preserve a token's RGB channels while applying an explicit alpha stop. */
 export function surfaceWithAlpha(hex: string, alpha: number): string {
   const channels = hex.match(/^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i);

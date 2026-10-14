@@ -7,6 +7,7 @@
 import React from 'react';
 import { MoreHorizontal } from 'lucide-react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { INVERTED_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
 import { COVER_TOP_GUARD, W_55 } from './HeroShell';
 import { HERO_CANON_WASH } from '@/features/tourhub/_shared/heroGradient';
 
@@ -34,8 +35,8 @@ export const BandPill = React.forwardRef<
       height: 32,
       padding: '0 14px',
       borderRadius: 999,
-      border: `1px solid ${solid ? '#FFFFFF' : BAND_CONTROL_BORDER}`,
-      background: solid ? '#FFFFFF' : BAND_CONTROL_GROUND,
+      border: `1px solid ${solid ? INVERTED_CONTROL_SURFACE : BAND_CONTROL_BORDER}`,
+      background: solid ? INVERTED_CONTROL_SURFACE : BAND_CONTROL_GROUND,
       color: solid ? A.CANVAS : '#FFFFFF',
       display: 'inline-flex',
       alignItems: 'center',
