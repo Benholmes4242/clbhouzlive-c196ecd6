@@ -195,15 +195,23 @@ export function groupBrowseRegions(
  * allPlayedTotal: distinct mapped course ids appearing in gam_round_stats,
  * regardless of score/par/hole completeness.
  * stat_browse_facets.played_total: analytics-ready 18-hole scored courses only.
+ * directoryTotal / playedCount / roundsTotal / holesPlayed: the Courses page
+ * list head reads these four figures from here and relies on the 10-minute
+ * staleTime for freshness; no interval, subscription or refetch loop.
+ * holesPlayed is a real head-only count of played whs_score_holes, null when
+ * the read fails or is refused (never 0, never rounds x 18).
  */
 export function useCourseBrowseTruth() {
   return useQuery({
     queryKey: ['course-browse-truth'],
     staleTime: 10 * 60 * 1000,
     queryFn: async () => {
-      const [facetsResult, difficultyResult] = await Promise.all([
+      const [facetsResult, difficultyResult, holesResult] = await Promise.all([
         supabase.rpc('get_stat_browse_facets' as never),
         supabase.from('stat_browse_base' as never).select('course_id, avg_to_par, region, sub_country, rounds, image_url, name').gt('rounds', 0).range(0, 9999),
+        Promise.resolve(
+          supabase.from('whs_score_holes' as never).select('*', { count: 'exact', head: true }).eq('played' as never, true as never),
+        ).catch(() => null),
       ]);
       if (facetsResult.error) throw facetsResult.error;
       if (difficultyResult.error) throw difficultyResult.error;
@@ -236,7 +244,13 @@ export function useCourseBrowseTruth() {
         difficultyPercentiles.set(row.course_id, Math.round((easier / sorted.length) * 100));
       });
       const regions = groupBrowseRegions(baseRows);
-      return { allPlayedTotal, ratedTotal, difficultyPercentiles, regions };
+      const dirRaw = facetData.directory_total;
+      const directoryTotal = dirRaw == null || !Number.isFinite(Number(dirRaw)) ? null : Number(dirRaw);
+      const playedCount = baseRows.length;
+      const roundsTotal = baseRows.reduce((sum, r) => sum + (Number(r.rounds) || 0), 0);
+      const holesPlayed =
+        holesResult && !holesResult.error && typeof holesResult.count === 'number' ? holesResult.count : null;
+      return { allPlayedTotal, ratedTotal, difficultyPercentiles, regions, directoryTotal, playedCount, roundsTotal, holesPlayed };
     },
   });
 }
