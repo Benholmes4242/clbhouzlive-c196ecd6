@@ -57,9 +57,9 @@ export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
  *
  * EVERY SECTION ANSWERS A DIFFERENT QUESTION. Scope governs the lead board
  * (§3 Lowest gross) and nothing below it. Sections, in order: head, §3 Lowest
- * gross, §5 Feats this year, §7 Top 100, §6 Who leads what, §4 Most improved
+ * gross, §5 Feats this year, §4 Most improved, §6 Who leads what, §7 Top 100
  * — §4 onward are platform facts. The order alternates section SHAPE (rows,
- * tiles, carousel, rail, rows) so no two neighbours read alike; anything added
+ * tiles, rows, rail, carousel) so no two neighbours read alike; anything added
  * here is placed by its shape, not its subject. § numbers name sections, not
  * positions. Each section owns its read, holds its
  * own height while pending, and renders NOTHING when its read fails or is empty.
