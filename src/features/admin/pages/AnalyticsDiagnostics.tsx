@@ -29,7 +29,7 @@ import {
   type EventAggregate,
   type EventSort,
 } from '../hooks/useEventsExplorer';
-import { type AnalyticsPeriod, periodToDays, useAuthAnalytics } from '../hooks/useAnalytics';
+import { type AnalyticsPeriod, useAuthAnalytics } from '../hooks/useAnalytics';
 
 function fmtTick(v: number) { return v >= 1000 ? `${Math.round(v / 100) / 10}k` : `${v}`; }
 function fmtInt(n: number) { return n.toLocaleString(); }
@@ -237,8 +237,6 @@ function AuthStackedBars({ data }: { data: { date: string; success: number; fail
   );
 }
 
-// Keep periodToDays exported symbol used implicitly to avoid TS lint on unused import.
-void periodToDays;
 
 // ═══ LIVE TAB (Firebase realtime) ═════════════════════════════════════════════
 // - useLiveInApp: shared 5-min distinct-users query (also feeds Dashboard).
