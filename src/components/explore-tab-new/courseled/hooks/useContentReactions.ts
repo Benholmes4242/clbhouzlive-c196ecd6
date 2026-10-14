@@ -269,9 +269,9 @@ export function useContentReactions(
       // TWO READINGS OF ONE FACT: ['content-reactions'] and ['post-likes'] both
       // report this like — refresh them together, by prefix (no source).
       // Post-likes keys are named from the READER's identity: the post id,
-      // plus the review id (which has readers). Never a null id.
+      // plus the subject id (review and round both have readers). Never a null id.
       queryClient.invalidateQueries({ queryKey: reactionKeys.root() });
-      if (vars.type === 'review') queryClient.invalidateQueries({ queryKey: ['post-likes', vars.id] });
+      queryClient.invalidateQueries({ queryKey: ['post-likes', vars.id] });
       const postId = postIdFor(vars.id);
       if (postId) queryClient.invalidateQueries({ queryKey: ['post-likes', postId] });
     },
