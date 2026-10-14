@@ -25,7 +25,8 @@ import { useUserTopTenCourses, type TopTenCourse } from '@/hooks/useUserTopTenCo
 import { useTopTenReactions, REACTION_CONFIG, type ReactionType } from '@/hooks/useTopTenReactions';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
-import { useCommentsV2 } from '@/features/comments-v2/hooks/useCommentsV2';
+import { useBlockedUserIds } from '@/hooks/useBlockedUserIds';
+import { commentsKeys, viewerId as commentsViewerKey } from '@/lib/queryKeys';
 import CoursePickerModal from '@/components/profile/CoursePickerModal';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -178,12 +179,44 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   const firstCourseId = topTen[0]?.course_id ?? '';
   const stripOn = topTen.length >= 3;
   const { counts, myReaction, toggleReaction } = useTopTenReactions(stripOn ? userId : '', firstCourseId);
-  const { visibleCount, threadFetched } = useCommentsV2({
-    targetType: 'top_ten',
-    targetId: userId,
-    targetSecondaryId: firstCourseId,
+  /*
+   * NEAR COUNT, ON PURPOSE. One head count against comments_v2 instead of the
+   * full thread loader (which refetches on every mount). Replies are included.
+   * Hidden comments (from the cache the sheet already filled — no new query) and
+   * blocked authors (shared blocked-ids cache) are excluded using the sheet's own
+   * columns: user_id, and actor_id for non-business actors.
+   * DELIBERATELY NOT DONE: a reply whose PARENT is hidden or blocked still counts,
+   * because a flat count cannot see a reply's parent. The strip can read one or
+   * two higher than the sheet for such a viewer, and that is accepted — the
+   * strip is a doorway label, not a promise about the thread. Do not "fix" this.
+   */
+  const blockedIds = useBlockedUserIds(viewerId ?? null);
+  const hiddenIds = qc.getQueryData<Set<string>>(commentsKeys.hidden(commentsViewerKey(viewerId)));
+  const hiddenList = hiddenIds ? [...hiddenIds] : [];
+  const blockedList = [...blockedIds];
+  const { data: visibleCount = 0, isFetched: threadFetched } = useQuery({
+    queryKey: ['top-ten-comment-near-count', userId, firstCourseId, hiddenList.sort().join(','), blockedList.sort().join(',')],
     enabled: stripOn && !!firstCourseId,
-  } as any);
+    staleTime: 60_000,
+    queryFn: async () => {
+      let q = supabase
+        .from('comments_v2')
+        .select('id', { count: 'exact', head: true })
+        .eq('target_type', 'top_ten')
+        .eq('target_id', userId)
+        .eq('target_secondary_id', firstCourseId);
+      if (hiddenList.length) q = q.not('id', 'in', `(${hiddenList.join(',')})`);
+      if (blockedList.length) {
+        const ids = blockedList.join(',');
+        q = q
+          .not('user_id', 'in', `(${ids})`)
+          .or(`actor_type.eq.business,actor_id.is.null,actor_id.not.in.(${ids})`);
+      }
+      const { count, error } = await q;
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
 
   if (isLoading) return null;
   if (visibilityLoading && !isOwnProfile) return null;
@@ -331,7 +364,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
             onClick={() => { setCommentsCourseId(firstCourseId); setCommentsOpen(true); }}
             style={{ marginLeft: 'auto', background: 'transparent', border: 'none', padding: 0, fontFamily: SANS, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.MUTE, cursor: 'pointer', ...FIGS }}
           >
-            {threadFetched ? t('topTen.comments', { count: visibleCount, defaultValue: '{{count}} comments' }) : t('topTen.commentsLabel', 'Comments')} ›
+            {threadFetched && visibleCount > 0 ? t('topTen.comments', { count: visibleCount, defaultValue: '{{count}} comments' }) : t('topTen.commentsLabel', 'Comments')} ›
           </button>
         </div>
 
