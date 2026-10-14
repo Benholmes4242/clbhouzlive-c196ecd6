@@ -1136,8 +1136,9 @@ const BorrowedFullscreenSlot: React.FC<{
     if (!hasPauseIntent) {
       void VideoEngine.play(borrow.laneId, { callerPostId: borrow.ownerKey });
     }
-    // Ensure cover for Phase 1.
-    VideoEngine.setObjectFit(borrow.laneId, 'cover');
+    // Assert the resting fit from resolveRestingRect at mount (contain by
+    // default) so the open never shows a cropped frame awaiting correction.
+    VideoEngine.setObjectFit(borrow.laneId, restingFitRef.current ?? 'contain');
 
     if (isPerfEnabled() || (typeof window !== 'undefined' && (window as any).__VIDEO_ENGINE_DBG__)) {
       // eslint-disable-next-line no-console

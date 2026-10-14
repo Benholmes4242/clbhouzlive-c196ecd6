@@ -10,18 +10,16 @@
  * conventions historically): `mediaAspect = width / height`.
  *   Examples: 9:16 portrait = 0.5625, 1:1 square = 1.0, 16:9 landscape = 1.78.
  *
- * Ratified product rules:
- *   • VIDEO with `mediaAspect <= 1.05` (taller-than-wide or square-ish) rests
- *     COVER — full-bleed under the notch (Reels rule). This is an INTRINSIC
- *     media test, not viewport-relative: a 9:16 clip is portrait on any
- *     device and must cover, regardless of the phone's own aspect.
- *   • VIDEO with `mediaAspect > 1.05` (genuinely landscape) rests CONTAIN,
- *     letterboxed inside the SAFE area — bars clear notch / home indicator.
- *   • IMAGES rest CONTAIN always (photos are never cropped by fullscreen).
+ * Ratified product rule: NOTHING IS EVER CROPPED IN THE FULLSCREEN VIEWER.
+ *   • VIDEO and IMAGES both rest CONTAIN, centred inside the SAFE area so the
+ *     letterbox bars clear the notch / home indicator. `mediaType` no longer
+ *     affects the outcome (kept in the signature for call-site stability).
+ *   • The blurred self-backdrop underlay fills the letterbox bars.
  *
- * When dims are unknown (0), the full viewport is returned — `contain` for an
- * IMAGE (the rule above holds with or without dims) and `cover` for a VIDEO.
- * A caller may re-invoke on `loadedmetadata` and animate a corrective tween.
+ * When dims are unknown (0), the full viewport is returned with `contain`:
+ * object-fit contain letterboxes from the media's own intrinsic aspect, so
+ * the whole frame is visible. A caller may re-invoke on `loadedmetadata` and
+ * animate a corrective tween to the exact rect.
  */
 
 export interface Viewport {
@@ -42,8 +40,6 @@ export interface RestingRect {
   fit: 'cover' | 'contain';
 }
 
-const VIDEO_COVER_TOLERANCE = 1.05;
-
 export function resolveRestingRect(
   mediaW: number,
   mediaH: number,
@@ -56,30 +52,13 @@ export function resolveRestingRect(
       left: 0,
       width: viewport.w,
       height: viewport.h,
-      // An image is NEVER cropped by fullscreen, dims known or not. With no
-      // dims there is no rect to compute, but `contain` inside the full
-      // viewport still lets the browser letterbox it correctly. Video keeps
-      // cover here: a portrait clip is the common case and the Reels rule
-      // already rests it full-bleed.
-      fit: mediaType === 'image' ? 'contain' : 'cover',
+      // Nothing is cropped by fullscreen, dims known or not: contain inside
+      // the full viewport letterboxes from the media's intrinsic aspect.
+      fit: 'contain',
     };
   }
 
   const mediaAspect = mediaW / mediaH;
-
-  // Portrait/square VIDEO → full-bleed cover (Reels rule). Intrinsic test:
-  // any clip whose width/height is <= 1.05 is portrait-or-square. Viewport
-  // aspect is deliberately NOT consulted here — a 9:16 clip must cover on
-  // every portrait phone regardless of the phone's exact aspect ratio.
-  if (mediaType === 'video' && mediaAspect <= VIDEO_COVER_TOLERANCE) {
-    return {
-      top: 0,
-      left: 0,
-      width: viewport.w,
-      height: viewport.h,
-      fit: 'cover',
-    };
-  }
 
   // CONTAIN branch — centered inside the SAFE area so letterbox bars clear
   // the notch and home indicator.

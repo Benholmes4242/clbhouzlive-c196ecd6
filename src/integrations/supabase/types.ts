@@ -5510,28 +5510,28 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "follows_follower_user_fk"
-            columns: ["follower_actor_id"]
+            columns: ["follower_user_id"]
             isOneToOne: false
             referencedRelation: "gam_friend_handicap_leaderboard_view"
             referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "follows_follower_user_fk"
-            columns: ["follower_actor_id"]
+            columns: ["follower_user_id"]
             isOneToOne: false
             referencedRelation: "public_golfer_blurbs"
             referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "follows_follower_user_fk"
-            columns: ["follower_actor_id"]
+            columns: ["follower_user_id"]
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "follows_follower_user_fk"
-            columns: ["follower_actor_id"]
+            columns: ["follower_user_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
