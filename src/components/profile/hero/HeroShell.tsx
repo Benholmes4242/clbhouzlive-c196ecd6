@@ -88,16 +88,10 @@ const HERO_TALLEST_CONTENT = Math.ceil(
     H_PAD_BOTTOM,
 );
 
-/** A FLOOR, not a height. The hero's SHAPE is set by the 1/1 aspectRatio
- *  applied alongside this (see the root style), so the block renders as the
- *  LARGER of viewport width and this floor - square on 390/430, slightly
- *  taller on 320. The floor survives because the aspect alone would let the
- *  block reflow as the index, trend chip and sparkline resolve, and on the
- *  narrowest phones a square box is shorter than the content stack. Tracks the
- *  safe area because HERO_CONTENT_INSET carries `var(--sat)` rather than a
- *  measured number. */
-export const HERO_MIN_HEIGHT =
-  `calc(${HERO_CONTENT_INSET} + ${HERO_TALLEST_CONTENT}px)`;
+/** What the square must clear: HERO_CONTENT_INSET + HERO_TALLEST_CONTENT
+ *  (227 now the sparkline is gone). Kept as documentation; the block carries
+ *  NO floor (see coverAspect.ts), so the crop frame equals the rendered square. */
+void HERO_TALLEST_CONTENT;
 
 /** Short top gradient so white status-bar text stays legible over a bright
  *  cover; fades out by 60px. */
