@@ -1,9 +1,10 @@
 /**
  * useBrowseReviews — the review pool for the Courses browse slots.
  *
- * SCOPE: country and region ONLY. A member filtered to Scotland must never be
- * shown a Portuguese review — they have excluded that place, and showing it
- * undercuts the whole reason reviews are on this page. The LENS (Best rated /
+ * SCOPE: the hook accepts country and region and still scopes when given
+ * them. The Courses page calls it UNSCOPED, because section 07 (Latest
+ * reviews) is app-wide and the country/region filter belongs to section 08
+ * alone; the reviews sheet it feeds is app-wide for the same reason. The LENS (Best rated /
  * Toughest / Records to chase) is an ORDERING and a review is not ordered by
  * toughness, so it is deliberately NOT part of the key.
  *
