@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { countsTowardIndex } from '@/lib/whs/counting';
+import { countsTowardIndex, counterWindow } from '@/lib/whs/counting';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 import { formatMonthYearLongGB } from '@/i18n/format';
@@ -174,13 +174,13 @@ export const RecentRoundsCard: React.FC<Props> = ({ connectionId, userId = null,
 
   const filteredRounds = useMemo(() => {
     if (filter.kind === 'all') return rounds;
-    if (filter.kind === 'counters') return rounds.filter(countsTowardIndex);
+    if (filter.kind === 'counters') return counterWindow(rounds).filter(countsTowardIndex);
     return rounds.filter((r) => r.course_id === filter.id);
   }, [rounds, filter]);
 
   const visibleRounds = filteredRounds.slice(0, displayedCount);
   const hasMore = filteredRounds.length > displayedCount;
-  const counterCount = useMemo(() => rounds.filter(countsTowardIndex).length, [rounds]);
+  const counterCount = useMemo(() => counterWindow(rounds).filter(countsTowardIndex).length, [rounds]);
 
   const grouped = useMemo(() => {
     const groups: { month: string; rounds: RoundWithDelta[] }[] = [];
