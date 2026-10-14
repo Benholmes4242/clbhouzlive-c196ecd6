@@ -48,9 +48,6 @@ import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome
 import { Z } from '@/config/zIndex';
 import { BrowseCourseCard } from './BrowseCourseCard';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
-import { useBrowseReviews } from './useBrowseReviews';
-import { LatestReviewsSheet } from '@/components/explore-tab-new/courseled/LatestReviewsSheet';
-import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
@@ -227,47 +224,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
     return rows.filter((row) => row.name.toLowerCase().includes(q));
   }, [rows, nameQuery]);
 
-  /* ── Review slots (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL) ───── */
-  /**
-   * A review is decision content, so it lives where the decision is made. The
-   * pool follows COUNTRY and REGION only — the lens is an ordering and a review
-   * is not ordered by toughness, so changing the lens must not change which
-   * reviews appear.
-   */
-  const { pool: reviewPool } = useBrowseReviews(country, region);
-  const [reviewsSheet, setReviewsSheet] = useState(false);
-  const openReviewSheet = useReviewSheetStore((s) => s.open);
-  const openReviewsSheet = useCallback(() => {
-    analyticsEvents.track('stat_browse_reviews_sheet_open', {
-      country,
-      region,
-      pool: reviewPool.length,
-    });
-    setReviewsSheet(true);
-  }, [country, region, reviewPool.length]);
-  /** Inside the sheet a tile opens the single review, exactly as on Discover. */
-  const handleReviewTile = useCallback(
-    (r: LatestReview) => {
-      openReviewSheet({
-        user: {
-          id: r.userId ?? '',
-          name: r.reviewerName,
-          username: r.reviewerUsername ?? undefined,
-          avatar: r.reviewerAvatar,
-        },
-        courseId: r.courseId,
-        courseName: r.courseName,
-        rating: r.rating,
-        reviewId: r.reviewId,
-        courseCountry: r.courseCountry,
-        courseRegion: r.courseRegion,
-        courseSubCountry: r.courseSubCountry,
-        reviewText: r.quote,
-        breakdown: r.breakdown,
-      });
-    },
-    [openReviewSheet],
-  );
+  /* Reviews sheet: mounted by CoursesBrowsePage (BRIEF_COURSES_PAGE_PHASE_3). */
 
 
 
@@ -987,17 +944,6 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         </div>
       )}
 
-      {/* The SHIPPED reviews sheet, reused from Discover unchanged. Opened by
-          a slot's see-all and by tapping a review in a slot. It carries the
-          scoped pool, so a filtered browse opens a filtered sheet. */}
-      <LatestReviewsSheet
-        open={reviewsSheet}
-        onClose={() => setReviewsSheet(false)}
-        reviews={reviewPool}
-        totalCount={reviewPool.length}
-        viewerId={user?.id}
-        onTilePress={handleReviewTile}
-      />
     </div>
   );
 };

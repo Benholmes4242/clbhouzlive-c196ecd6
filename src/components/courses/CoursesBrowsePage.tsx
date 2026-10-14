@@ -1,4 +1,14 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
+import { HardestSection } from './browse/HardestSection';
+import { HighestRatedSection } from './browse/HighestRatedSection';
+import { UnclaimedSection } from './browse/UnclaimedSection';
+import { LatestReviewsSection } from './browse/LatestReviewsSection';
+import { useBrowseReviews } from './useBrowseReviews';
+import { LatestReviewsSheet } from '@/components/explore-tab-new/courseled/LatestReviewsSheet';
+import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
+import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import StatBrowse from './StatBrowse';
 import { SectionHead, SECTION_WRAP } from './browse/SectionHead';
 import { useCourseBrowseTruth, useStatBrowseFacets } from './useStatBrowse';
@@ -13,7 +23,7 @@ import { MostPlayedSection } from './browse/MostPlayedSection';
  * Sections 01–07 are app-wide and never read the country/region URL params;
  * those belong to section 08 (StatBrowse) alone.
  *
- * PHASE 2: 01–03 built; 04–07 are still heading shells (Phase 3).
+ * Owns the LatestReviewsSheet so section 07 and section 08 open the same sheet.
  */
 interface Props {
   onOpenDirectory: React.ComponentProps<typeof StatBrowse>['onOpenDirectory'];
@@ -23,12 +33,6 @@ interface Props {
 // own 16px gutter, so they cancel it rather than doubling it.
 const BLEED: React.CSSProperties = { marginLeft: -16, marginRight: -16 };
 
-const SHELLS = [
-  { n: '04', kicker: 'The hardest tests', title: 'Where the field loses most', subline: 'Average strokes over par across every tracked round.' },
-  { n: '05', kicker: 'Highest rated', title: 'What members rate highest', subline: 'Three only. The rest are in the list at the bottom.' },
-  { n: '06', kicker: 'Crowns', title: 'Records still unclaimed', subline: 'The lowest anyone has gone round. Some of these are soft.' },
-  { n: '07', kicker: "In members' words", title: 'Latest reviews', subline: 'What members said after they played.' },
-] as const;
 
 export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
   const { data: facets } = useStatBrowseFacets();
@@ -36,6 +40,32 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
   // The list browses the analytics-ready population (stat_browse_base), so the
   // heading counts that population, not every course with any tracked round.
   const total = facets?.played_total;
+  const { user } = useSupabaseSession();
+  // Section 07 is app-wide: no country, no region.
+  const { pool: reviewPool } = useBrowseReviews(null, null);
+  const [reviewsSheet, setReviewsSheet] = useState(false);
+  const openReviewSheet = useReviewSheetStore((st) => st.open);
+  const openReviewsSheet = useCallback(() => {
+    analyticsEvents.track('stat_browse_reviews_sheet_open', { country: null, region: null, pool: reviewPool.length });
+    setReviewsSheet(true);
+  }, [reviewPool.length]);
+  const handleReviewTile = useCallback(
+    (r: LatestReview) => {
+      openReviewSheet({
+        user: { id: r.userId ?? '', name: r.reviewerName, username: r.reviewerUsername ?? undefined, avatar: r.reviewerAvatar },
+        courseId: r.courseId,
+        courseName: r.courseName,
+        rating: r.rating,
+        reviewId: r.reviewId,
+        courseCountry: r.courseCountry,
+        courseRegion: r.courseRegion,
+        courseSubCountry: r.courseSubCountry,
+        reviewText: r.quote,
+        breakdown: r.breakdown,
+      });
+    },
+    [openReviewSheet],
+  );
 
   return (
     <div>
@@ -44,11 +74,10 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         <WhoPlayingSection />
         <ByRegionSection />
         <MostPlayedSection />
-        {SHELLS.map((s) => (
-          <section key={s.n} style={SECTION_WRAP}>
-            <SectionHead n={s.n} kicker={s.kicker} title={s.title} subline={s.subline} tone="amber" />
-          </section>
-        ))}
+        <HardestSection />
+        <HighestRatedSection />
+        <UnclaimedSection />
+        <LatestReviewsSection reviews={reviewPool} onReviewPress={handleReviewTile} onSeeAll={openReviewsSheet} />
         <section id={ALL_COURSES_ANCHOR} style={SECTION_WRAP}>
           <SectionHead
             n="08"
@@ -64,6 +93,14 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         </section>
       </div>
       <StatBrowse onOpenDirectory={onOpenDirectory} />
+      <LatestReviewsSheet
+        open={reviewsSheet}
+        onClose={() => setReviewsSheet(false)}
+        reviews={reviewPool}
+        totalCount={reviewPool.length}
+        viewerId={user?.id}
+        onTilePress={handleReviewTile}
+      />
     </div>
   );
 }
