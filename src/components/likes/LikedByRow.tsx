@@ -41,6 +41,8 @@ import type { LikeSource } from '@/hooks/usePostLikes';
 import { LikesSheet } from './LikesSheet';
 import type { SubjectContext } from '@/components/sheets/SubjectContextLine';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
 
 export interface LikedByRowProps {
   postId: string | null;
@@ -207,41 +209,52 @@ export function LikedByRow({
             style={{
               position: 'relative',
               flex: 'none',
-              height: 18,
-              width: 18 + (Math.min(count, 3) - 1) * 12,
+              height: 20,
+              width: 19 + (Math.min(count, 3) - 1) * 12,
               ...(avatarRing === 'media' ? { filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.55))' } : null),
             }}
           >
             {Array.from({ length: isLoading ? Math.min(count, 3) : Math.min(likers.length, Math.min(count, 3)) }, (_, i) => {
               const liker = likers[i];
+              /* OUTER ring (surfaceColor) separates disc from disc; the INNER
+                 hairline (SquircleAvatar hairlineRing) gives each disc an edge on
+                 any ground. Not interchangeable — keep both. No overflow clip:
+                 it would cut the hairline overlay. */
               const slot: React.CSSProperties = {
-                width: 18,
-                height: 18,
-                borderRadius: 6,
-                flex: 'none',
                 position: 'absolute',
                 top: 0,
                 left: i * 12,
+                width: 19,
+                height: 20,
+                flex: 'none',
+                borderRadius: '34%',
                 boxShadow: `0 0 0 1.5px ${avatarRing === 'media' ? 'rgba(0,0,0,0.55)' : surfaceColor}`,
-                overflow: 'hidden',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
                 zIndex: 3 - i,
               };
               if (!liker) {
-                return <span key={i} style={{ ...slot, background: 'rgba(255,255,255,0.07)' }} />;
-              }
-              if (liker.avatarUrl) {
                 return (
-                  <span key={i} style={slot}>
-                    <img src={liker.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                  </span>
+                  <span
+                    key={i}
+                    style={{
+                      ...slot,
+                      background: getAvatarFallbackGradient(null),
+                      boxShadow: `${slot.boxShadow}, inset 0 0 0 1px rgba(255,255,255,0.22)`,
+                    }}
+                  />
                 );
               }
+              /* ONE branch: SquircleAvatar paints its fill first and fades the
+                 bitmap in, so a missing or dead URL degrades to the initials disc. */
               return (
-                <span key={i} style={{ ...slot, background: 'rgba(255,255,255,0.10)', color: 'rgba(248,250,252,0.62)', fontSize: 8, fontWeight: 700, lineHeight: 1 }}>
-                  {(liker.displayName ?? '').trim().charAt(0).toUpperCase()}
+                <span key={i} style={slot}>
+                  <SquircleAvatar
+                    size={19}
+                    src={liker.avatarUrl}
+                    alt={liker.displayName ?? ''}
+                    userId={liker.actorId ?? liker.userId}
+                    fallback={getInitialsFromName(liker.displayName ?? '').charAt(0)}
+                    hairlineRing
+                  />
                 </span>
               );
             })}
