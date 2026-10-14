@@ -9,7 +9,8 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
  */
 export interface SectionHeadProps {
   kicker: string;
-  title: string;
+  /** Omitted = no title element at all (section 08's list head). */
+  title?: string;
   subline?: string;
   tone?: 'amber' | 'quiet';
 }
@@ -20,7 +21,7 @@ export function SectionHead({ kicker, title, subline, tone = 'amber' }: SectionH
       <div style={{ ...KICKER, lineHeight: 1, color: tone === 'amber' ? A.AMBER : A.MUTE }}>
         {kicker}
       </div>
-      <h2
+      {title ? <h2
         style={{
           fontSize: 19,
           fontWeight: 700,
@@ -32,7 +33,7 @@ export function SectionHead({ kicker, title, subline, tone = 'amber' }: SectionH
         }}
       >
         {title}
-      </h2>
+      </h2> : null}
       {subline ? (
         <p style={{ fontSize: 12, lineHeight: 1.5, color: A.DIM, marginTop: 8, marginBottom: 0 }}>
           {subline}

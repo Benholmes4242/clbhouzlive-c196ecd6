@@ -6,8 +6,9 @@ import { useBrowseReviews } from './useBrowseReviews';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import StatBrowse from './StatBrowse';
-import { SectionHead, SECTION_WRAP } from './browse/SectionHead';
-import { useStatBrowseFacets } from './useStatBrowse';
+import { SectionHead, SECTION_WRAP, HEAD_GAP } from './browse/SectionHead';
+import { useCourseBrowseTruth } from './useStatBrowse';
+import { HERO_FIGURE_LABEL, HERO_FIGURE_VALUE } from './CourseMasthead';
 import { GLASS_CHIP_CSS } from '@/styles/glassChip';
 import { WhoPlayingSection } from './browse/WhoPlayingSection';
 import { ByRegionSection, ALL_COURSES_ANCHOR } from './browse/ByRegionSection';
@@ -31,15 +32,18 @@ const BLEED: React.CSSProperties = { marginLeft: -16, marginRight: -16 };
 
 
 export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
-  const { data: facets } = useStatBrowseFacets();
-  // The list browses the analytics-ready population (stat_browse_base), so the
-  // heading counts that population, not every course with any tracked round.
-  const total = facets?.played_total;
-  // Same derivation StatBrowse uses for its directory floor.
-  const directoryRemaining =
-    facets?.directory_total != null && facets?.played_total != null
-      ? Math.max(0, facets.directory_total - facets.played_total)
-      : null;
+  // Live head figures (BRIEF_COURSES_LIST_HEAD_STATS). HOLES is dropped, never
+  // zeroed, when its count is unavailable to this viewer.
+  const { data: truth } = useCourseBrowseTruth();
+  const fmt = (n: number) => n.toLocaleString('en-GB');
+  const cells: Array<[string, number]> = truth
+    ? ([
+        ['Courses', truth.directoryTotal],
+        ['Played', truth.playedCount],
+        ['Rounds', truth.roundsTotal],
+        ['Holes', truth.holesPlayed],
+      ].filter((c): c is [string, number] => c[1] != null))
+    : [];
   // The reviews rail is app-wide: no country, no region.
   const { pool: reviewPool } = useBrowseReviews(null, null);
   const openReviewSheet = useReviewSheetStore((st) => st.open);
@@ -72,16 +76,17 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         <HighestRatedSection />
         <LatestReviewsSection reviews={reviewPool} onReviewPress={handleReviewTile} />
         <section id={ALL_COURSES_ANCHOR} style={SECTION_WRAP}>
-          <SectionHead
-            tone="quiet"
-            kicker="Played by members"
-            title={
-              total != null && directoryRemaining != null
-                ? `${total.toLocaleString('en-GB')} courses, ${directoryRemaining.toLocaleString('en-GB')} more`
-                : 'Courses'
-            }
-            subline="These are the courses a member has posted a full round at, so every figure on them is real. The rest of the directory is one tap below."
-          />
+          <SectionHead tone="quiet" kicker="Every course we hold" />
+          {cells.length > 0 ? (
+            <div style={{ display: 'flex', marginTop: HEAD_GAP }}>
+              {cells.map(([label, value]) => (
+                <div key={label} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                  <span style={HERO_FIGURE_LABEL}>{label}</span>
+                  <span style={HERO_FIGURE_VALUE}>{fmt(value)}</span>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </section>
       </div>
       <StatBrowse onOpenDirectory={onOpenDirectory} />
