@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from '@/lib/toast';
-import { Plus, Pencil, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { adminTheme as t } from '../theme';
-import StatusPill from './StatusPill';
-import EmptyState from './EmptyState';
+import { LIST_SECTION, H, H_RIGHT, MORE } from './content/deskTokens';
 import AdminSheet from './AdminSheet';
 import ConfirmDialog from './ConfirmDialog';
 import {
@@ -21,11 +19,16 @@ const EMPTY_INPUT: LegalDocumentInput = {
   is_published: false,
 };
 
+/**
+ * BRIEF_CONTENT_DESK Stage 5 (Pages.html) — Legal. Rows open the existing
+ * editor; publish toggle and delete live inside it. Save logic unchanged.
+ */
 export default function LegalDocumentsTab() {
-  const { isLoading, documents, create, update, remove, togglePublish } = useLegalDocumentsAdmin();
+  const { isLoading, documents, create, update, remove } = useLegalDocumentsAdmin();
   const [editing, setEditing] = useState<AdminLegalDocument | null>(null);
   const [creating, setCreating] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<AdminLegalDocument | null>(null);
+  const [all, setAll] = useState(false);
 
   const handleSave = async (input: LegalDocumentInput, id?: string) => {
     try {
@@ -45,108 +48,48 @@ export default function LegalDocumentsTab() {
     }
   };
 
-  const handleTogglePublish = async (d: AdminLegalDocument) => {
-    try {
-      await togglePublish.mutateAsync({ id: d.id, is_published: !d.is_published });
-      toast.success(d.is_published ? 'Unpublished' : 'Published');
-    } catch (e: any) {
-      toast.error(e?.message || 'Failed');
-    }
-  };
-
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
       await remove.mutateAsync(deleteTarget.id);
       toast.success('Deleted');
       setDeleteTarget(null);
+      setEditing(null);
     } catch (e: any) {
       toast.error(e?.message || 'Delete failed');
     }
   };
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-        <div style={{ fontSize: 13, color: t.inkMuted }}>
-          {documents.length} document{documents.length === 1 ? '' : 's'}. Edits go live immediately.
-        </div>
-        <button
-          onClick={() => setCreating(true)}
-          style={{
-            padding: '10px 14px', borderRadius: t.radius.md,
-            border: 'none', background: t.ink, color: t.surface,
-            fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-          }}
-        >
-          <Plus size={16} /> New document
-        </button>
-      </div>
+  const shown = all ? documents : documents.slice(0, 6);
+  const hidden = documents.length - shown.length;
 
-      {isLoading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} style={{ height: 56, background: t.canvas, borderRadius: t.radius.md, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
-          ))}
+  return (
+    <>
+      <section style={LIST_SECTION}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '0 16px 10px' }}>
+          <span style={H}>Legal</span>
+          <span style={H_RIGHT}>effective</span>
         </div>
-      ) : documents.length === 0 ? (
-        <EmptyState title="No legal documents" subtitle="Create the first document to publish it." />
-      ) : (
-        <div style={{
-          background: t.surface, border: `1px solid ${t.line}`,
-          borderRadius: t.radius.lg, overflow: 'hidden',
-        }}>
-          {documents.map((d, i) => (
-            <div
-              key={d.id}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '12px 14px',
-                borderTop: i === 0 ? 'none' : `1px solid ${t.line}`,
-              }}
-            >
-              <div style={{
-                minWidth: 40, fontSize: 12, fontWeight: 700, color: t.inkFaint,
-                fontVariantNumeric: 'tabular-nums',
-              }}>
-                #{d.sort_order}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: t.ink, lineHeight: 1.3 }}>
-                  {d.title}
-                </div>
-                <div style={{
-                  fontSize: 12, color: t.inkMuted, marginTop: 2,
-                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                }}>
-                  /legal/{d.slug}{d.effective_date ? ` · effective ${d.effective_date}` : ''}
-                </div>
-              </div>
-              <StatusPill tone={d.is_published ? 'ok' : 'neutral'}>
-                {d.is_published ? 'Published' : 'Draft'}
-              </StatusPill>
-              <button
-                onClick={() => handleTogglePublish(d)}
-                title={d.is_published ? 'Unpublish' : 'Publish'}
-                style={iconBtnStyle}
-              >
-                {d.is_published ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-              <button onClick={() => setEditing(d)} title="Edit" style={iconBtnStyle}>
-                <Pencil size={16} />
-              </button>
-              <button
-                onClick={() => setDeleteTarget(d)}
-                title="Delete"
-                style={{ ...iconBtnStyle, color: t.danger }}
-              >
-                <Trash2 size={16} />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+        {isLoading ? (
+          <div style={{ ...ROW, color: t.inkFaint, fontSize: 12 }}>Loading</div>
+        ) : documents.length === 0 ? (
+          <div style={{ ...ROW, color: t.inkFaint, fontSize: 12 }}>No legal documents</div>
+        ) : shown.map((d) => {
+          const eff = effectiveLabel(d);
+          return (
+            <button key={d.id} type="button" onClick={() => setEditing(d)} style={ROW}>
+              <span style={{ fontSize: 13.5, fontWeight: 600, color: t.ink }}>{d.title}</span>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: eff.colour }}>{eff.text}</span>
+            </button>
+          );
+        })}
+        {hidden > 0 && (
+          <button type="button" onClick={() => setAll(true)} style={MORE}>{hidden} more documents</button>
+        )}
+        {(all || documents.length <= 6) && !isLoading && (
+          <button type="button" onClick={() => setCreating(true)} style={{ ...ROW, color: t.brandText, fontSize: 13.5, fontWeight: 700 }}>+ New document</button>
+        )}
+      </section>
 
       <DocumentEditor
         open={creating}
@@ -160,6 +103,7 @@ export default function LegalDocumentsTab() {
         initial={editing}
         onClose={() => setEditing(null)}
         onSave={(input) => editing && handleSave(input, editing.id)}
+        onDelete={editing ? () => setDeleteTarget(editing) : undefined}
         busy={update.isPending}
       />
       <ConfirmDialog
@@ -172,29 +116,37 @@ export default function LegalDocumentsTab() {
         tone="danger"
         busy={remove.isPending}
       />
-
-      <style>{`@keyframes admin-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }`}</style>
-    </div>
+    </>
   );
 }
 
-const iconBtnStyle: React.CSSProperties = {
-  width: 32, height: 32, borderRadius: 8,
-  border: `1px solid ${t.line}`,
-  background: t.surface, color: t.ink,
-  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-  cursor: 'pointer', flexShrink: 0,
+/** "d Mon yyyy"; okText within the last 30 days; "Hidden" when unpublished. */
+export function effectiveLabel(d: { is_published: boolean; effective_date: string | null }, now = new Date()): { text: string; colour: string } {
+  if (!d.is_published) return { text: 'Hidden', colour: t.inkFaint };
+  if (!d.effective_date) return { text: '-', colour: t.inkMuted };
+  const at = new Date(`${d.effective_date.slice(0, 10)}T12:00:00Z`);
+  const text = at.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Europe/London' });
+  const days = (now.getTime() - at.getTime()) / 86_400_000;
+  return { text, colour: days >= -1 && days <= 30 ? t.okText : t.inkMuted };
+}
+
+const ROW: React.CSSProperties = {
+  display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 10, alignItems: 'center',
+  padding: '10px 16px', width: '100%', textAlign: 'left', background: 'transparent',
+  border: 0, borderTop: `1px solid ${t.hairline}`, cursor: 'pointer', font: 'inherit',
 };
 
 /* --------------------------- Editor sheet --------------------------- */
 
 function DocumentEditor({
-  open, initial, onClose, onSave, busy,
+  open, initial, onClose, onSave, onDelete, busy,
 }: {
   open: boolean;
   initial: AdminLegalDocument | null;
   onClose: () => void;
   onSave: (input: LegalDocumentInput) => void;
+  /** Editing only: opens the existing delete confirm. */
+  onDelete?: () => void;
   busy: boolean;
 }) {
   const [form, setForm] = useState<LegalDocumentInput>(EMPTY_INPUT);
@@ -241,6 +193,7 @@ function DocumentEditor({
       subtitle={initial ? `/legal/${initial.slug}` : 'Publish a new legal document'}
       footer={
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+          {onDelete && <button onClick={onDelete} style={{ ...btnSecondary, color: t.dangerText, marginRight: 'auto' }}>Delete</button>}
           <button onClick={onClose} style={btnSecondary}>Cancel</button>
           <button onClick={handleSubmit} disabled={!valid || busy} style={{ ...btnPrimary, opacity: !valid || busy ? 0.55 : 1 }}>
             {busy ? 'Saving...' : initial ? 'Save changes' : 'Create document'}
