@@ -1,13 +1,12 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 /**
  * Cover guidance line. Mounted BESIDE the avatar (flex row, bottom-aligned)
  * so it never sits between the cover edge and the avatar. Shared by the
  * personal and business editors - do not inline a copy.
+ * Each editor passes its own dimensions text (translated) via `text`.
  */
-export const CoverGuidance: React.FC = () => {
-  const { t } = useTranslation('profile');
+export const CoverGuidance: React.FC<{ text: string }> = ({ text }) => {
   return (
     <p
       style={{
@@ -22,7 +21,7 @@ export const CoverGuidance: React.FC = () => {
         color: 'hsl(var(--muted-foreground))',
       }}
     >
-      {t('hero.coverGuidance')}
+      {text}
     </p>
   );
 };

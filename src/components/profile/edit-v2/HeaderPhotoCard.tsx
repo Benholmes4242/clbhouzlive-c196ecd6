@@ -12,24 +12,23 @@ interface HeaderPhotoCardProps {
   previewUrl?: string | null;
   onFileChange: (file: File | null) => void;
   onRemove?: () => void;
+  aspectRatio: number;
+  aspectCss: string;
 }
 
 /**
- * 1:1. The profile hero block is now pinned to one height (HERO_MIN_HEIGHT in
- * HeroShell), whose aspect is ~1.006 on a notched device - so a square crop is
- * what the member actually gets. ONE constant serves personal AND business;
- * both surfaces mount this card. Never fork it.
- *
+ * Shape-agnostic: the cover's shape belongs to the surface mounting this card
+ * (aspect constants live in coverAspect.ts). One card, parameterised — never fork.
  * Stored covers are NOT re-cropped: they keep composing under objectFit cover.
  */
-const HEADER_ASPECT_RATIO = 1 / 1;
-const HEADER_ASPECT_CSS = '1 / 1';
 
 export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   currentUrl,
   previewUrl,
   onFileChange,
   onRemove,
+  aspectRatio,
+  aspectCss,
 }) => {
   
   const inputRef = useRef<HTMLInputElement>(null);
@@ -82,7 +81,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
       open={showCropper}
       onOpenChange={handleCropperClose}
       image={cropperImage}
-      aspectRatio={HEADER_ASPECT_RATIO}
+      aspectRatio={aspectRatio}
       cropShape="rect"
       title="Crop Header Photo"
       onCropComplete={handleCropComplete}
@@ -109,7 +108,7 @@ return (
           position: 'relative',
           display: 'block',
           width: '100%',
-          aspectRatio: HEADER_ASPECT_CSS,
+          aspectRatio: aspectCss,
           /* Stands in for a photo: same decision as the other missing-image
              fallbacks — Cell to Panel, both stops from the ramp. */
           background: displayUrl
