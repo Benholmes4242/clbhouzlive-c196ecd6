@@ -34,7 +34,51 @@
     "subtitleOther": "The very best they have played",
     "manage": "Manage",
     "rated": "Rated",
-    "emptyOwn": "Nothing here yet - add the courses you rate above all others.",
-    "emptyOther": "Their top 10 builds up as they rate the courses they play."
+    "verdict": {
+      "ranked_one": "<b>{{word}}</b> of your {{total}} is ranked by clbhouz.",
+      "ranked_other": "<b>{{word}}</b> of your {{total}} are ranked by clbhouz.",
+      "topsBoth": "<b>{{name}}</b> tops your list and ours.",
+      "boldest": "Your boldest call is <b>{{name}}</b> at <b>{{position}}</b> - everyone else has it <b>{{rank}}</b>.",
+      "rankedOther_one": "<b>{{word}}</b> of their courses is ranked by clbhouz.",
+      "rankedOther_other": "<b>{{word}}</b> of their courses are ranked by clbhouz.",
+      "overlap_one": "<b>{{word}}</b> of their courses is ranked by clbhouz, and <b>{{overlap}}</b> in yours too.",
+      "overlap_other": "<b>{{word}}</b> of their courses are ranked by clbhouz, and <b>{{overlap}}</b> are in yours too.",
+      "overlapOnly_one": "<b>{{word}}</b> of their courses is in yours too.",
+      "overlapOnly_other": "<b>{{word}}</b> of their courses are in yours too.",
+      "filled_one": "<b>{{word}}</b> of ten filled. Rate a course and it takes its place here on its own.",
+      "filled_other": "<b>{{word}}</b> of ten filled. Rate a course and it takes its place here on its own."
+    },
+    "ours": "Ours",
+    "you": "You",
+    "them": "Them",
+    "comments_one": "{{count}} comment",
+    "comments_other": "{{count}} comments",
+    "commentsLabel": "Comments",
+    "share": {
+      "title": "Share your ten",
+      "body": "A card for Instagram, WhatsApp or the group chat.",
+      "cta": "Create",
+      "cardTitle": "My top 10",
+      "cardSub": "{{rounds}} · {{rated}}",
+      "rounds_one": "{{count}} round",
+      "rounds_other": "{{count}} rounds",
+      "rated_one": "{{count}} rated",
+      "rated_other": "{{count}} rated",
+      "hcp": "{{value}} hcp",
+      "tagline": "stay in play."
+    },
+    "empty": {
+      "lede": "Ten courses.\nIn order. Your call.",
+      "body": "It fills itself from the courses you rate, and you don't need a single round on clbhouz to start. Pick the best you have ever played, anywhere, any time.",
+      "cta": "Start with your number one",
+      "suggest": "Played any of these?",
+      "searchAll": "Search all courses"
+    },
+    "progress": {
+      "lede_one": "{{word}} down. {{left}} to go.",
+      "lede_other": "{{word}} down. {{left}} to go.",
+      "body": "{{name}} is your number one. Add another and they sort themselves by what you score them.",
+      "cta": "Add your number {{next}}"
+    }
   }
 }

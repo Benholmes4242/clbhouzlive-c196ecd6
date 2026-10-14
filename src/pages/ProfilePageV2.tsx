@@ -1342,6 +1342,13 @@ const ProfilePageV2Content: React.FC = () => {
               initialCommentId={deepLinkTopTen.current?.commentId ?? null}
               initialParentCommentId={deepLinkTopTen.current?.parentId ?? null}
               topTenVisibility={profile?.top_ten_visibility}
+              shareIdentity={isSelf ? {
+                displayName,
+                avatarUrl: profile.profile_photo_url ?? null,
+                handicapIndex: resolvedHcp.value ?? null,
+                rounds: shellRoundsCount ?? null,
+                rated: reviewsCountFetched && !reviewsCountError ? reviewsCount : null,
+              } : undefined}
             />
             {showTopTenModal && isSelf && (
               <AddCourseModal

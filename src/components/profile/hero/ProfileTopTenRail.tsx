@@ -1,29 +1,84 @@
 /**
- * ProfileTopTenRail - BRIEF_PROFILE_HERO_AND_TOP10 section 4.
+ * ProfileTopTenRail - BRIEF_PROFILE_TOP_TEN_REBUILD (mock: top-ten-final.html).
  *
- * Editorial replacement for FavouritesCarousel on the personal profile: a
- * horizontal rail of 168px cards on canvas, image over a course name and
- * region, with a rank chip and (when rated) a rating chip on the image.
+ * A member's top ten drawn as a RANKING, not a shelf: a verdict line, number
+ * one as a 186px photograph, two and three side by side at 104px, a reaction
+ * strip for the list as a whole (scoped to the position-1 course, because
+ * useTopTenReactions is keyed by course), then positions four to ten as rows
+ * carrying our clbhouz rank beside the member's own score.
  *
- * Same data (useUserTopTenCourses) and the same deep-link contract
- * (?tab=courses&top_ten_comment=...) - the comments sheet is still mounted for
- * the deep-linked course, it is simply no longer what a card tap opens.
+ * The empty, partial and full states are ONE component. Everything that is
+ * an invitation - the ten slots, slot rows under a partial list, the lede,
+ * the add button, suggestion chips and the share card - is owner only; a
+ * visitor sees only the entries that exist, and nothing when there are none.
+ *
+ * Deep-link contract kept: ?tab=courses&course=<id>&top_ten_comment=<id>
+ * auto-opens the comments sheet for the deep-linked course on mount.
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Trans, useTranslation } from 'react-i18next';
+import html2canvas from 'html2canvas';
 import { supabase } from '@/integrations/supabase/client';
-import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
+import { useUserTopTenCourses, type TopTenCourse } from '@/hooks/useUserTopTenCourses';
+import { useTopTenReactions, REACTION_CONFIG, type ReactionType } from '@/hooks/useTopTenReactions';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
+import { useCommentsV2 } from '@/features/comments-v2/hooks/useCommentsV2';
+import CoursePickerModal from '@/components/profile/CoursePickerModal';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTopTenVisibility } from '@/components/profile/hooks/useTopTenVisibility';
+import { toast } from '@/lib/toast';
 
 const GLASS = 'rgba(10,14,10,0.55)';
-const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.62), rgba(10,14,10,0) 55%)';
+const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.78), rgba(10,14,10,0) 58%)';
+const PHOTO_INK = '#FFFFFF';
+const PILL_KICKER = 'rgba(255,255,255,0.7)';
+const CAPTION_SUB = 'rgba(255,255,255,0.74)';
+const SLOT_DASH = 'rgba(248,250,252,0.26)';
+const SLOT_NEXT = 'rgba(248,250,252,0.55)';
+const ROW_SLOT_DASH = 'rgba(248,250,252,0.22)';
+const PRESSED_BORDER = 'rgba(247,147,30,0.55)';
+const SHARE_BG = 'linear-gradient(170deg, #101417, #0A0A0C 60%)';
+const CAPTURE_OPTS = { backgroundColor: '#000', scale: 2, logging: false, useCORS: true };
+
+/**
+ * THE SCORE TONE IS GREEN AT 9.0+, INK OTHERWISE. Deliberately NOT
+ * courseSubScoreTone: that helper returns MUTE below 9, which suits a course
+ * card where the sub-score is secondary. Here the rating IS the row, so the
+ * else-branch is INK. Threshold and green are identical to the helper's.
+ */
+const scoreTone = (score: number) => (score >= 9 ? A.GREEN : A.INK);
+
+const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const word = (n: number) => WORDS[n] ?? String(n);
+const Word = (n: number) => { const w = word(n); return w.charAt(0).toUpperCase() + w.slice(1); };
+const ordinal = (n: number) => {
+  const s = n % 100;
+  if (s >= 11 && s <= 13) return `${n}th`;
+  return `${n}${({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[n % 10] ?? 'th'}`;
+};
+
+const regionOf = (c: { sub_country?: string | null; region?: string | null; country?: string | null }) =>
+  c.sub_country || c.region || c.country || null;
+const regionLine = (c: TopTenCourse | SuggestCourse) =>
+  [regionOf(c), c.global_rank ? `clbhouz #${c.global_rank}` : null].filter(Boolean).join(' · ');
+
+type SuggestCourse = {
+  id: string; name: string; country: string | null; sub_country: string | null;
+  region: string | null; global_rank: number | null; thumbnail_image?: string | null;
+};
+
+export interface TopTenShareIdentity {
+  displayName: string;
+  avatarUrl?: string | null;
+  handicapIndex?: number | null;
+  rounds?: number | null;
+  rated?: number | null;
+}
 
 interface Props {
   userId: string;
@@ -35,7 +90,13 @@ interface Props {
   /** Raw user_profiles.top_ten_visibility from the profile row already in memory
    *  (ProfilePageV2 holds it). Never fetched here — BRIEF_..._ROUNDTRIP §1/§4. */
   topTenVisibility?: string | null;
+  /** Owner-only share card identity, from figures the profile page already holds. */
+  shareIdentity?: TopTenShareIdentity;
 }
+
+const B = (props: React.HTMLAttributes<HTMLElement>) => (
+  <b {...props} style={{ color: A.INK, fontWeight: 700 }} />
+);
 
 export const ProfileTopTenRail: React.FC<Props> = ({
   userId,
@@ -43,36 +104,42 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   onManage,
   initialCourseId = null,
   initialCommentId = null,
-  initialParentCommentId = null,
   topTenVisibility,
+  shareIdentity,
 }) => {
   const { t } = useTranslation('profile');
   const navigate = useNavigate();
-  const { topTen, isLoading } = useUserTopTenCourses(userId);
+  const qc = useQueryClient();
+  const { topTen: rawTopTen, isLoading, addCourse } = useUserTopTenCourses(userId);
   const [commentsOpen, setCommentsOpen] = React.useState(false);
+  const [commentsCourseId, setCommentsCourseId] = React.useState<string | null>(initialCourseId);
+  const [pickerOpen, setPickerOpen] = React.useState(false);
+  const [sharing, setSharing] = React.useState(false);
+  const shareRef = React.useRef<HTMLDivElement>(null);
 
-  // BRIEF_TOP_TEN_VISIBILITY §4/§5 — display gate. The owner always sees the
-  // section; a visitor sees it only when top_ten_visibility admits them.
   const { user } = useSupabaseSession();
   const viewerId = user?.id;
-  const {
-    canView,
-    visibility,
-    isLoading: visibilityLoading,
-  } = useTopTenVisibility(userId, viewerId, topTenVisibility);
+  const { canView, visibility, isLoading: visibilityLoading } =
+    useTopTenVisibility(userId, viewerId, topTenVisibility);
+
+  // The viewer's own list, only on someone else's profile (overlap clause).
+  const { topTen: viewerTopTen } = useUserTopTenCourses(!isOwnProfile ? viewerId : undefined);
+
+  const topTen = React.useMemo(
+    () => [...rawTopTen].sort((a, b) => a.position - b.position),
+    [rawTopTen],
+  );
 
   const didAutoOpen = React.useRef(false);
   React.useEffect(() => {
     if (didAutoOpen.current) return;
     if (!initialCommentId || !initialCourseId) return;
     didAutoOpen.current = true;
+    setCommentsCourseId(initialCourseId);
     setCommentsOpen(true);
   }, [initialCommentId, initialCourseId]);
 
-  const courseIds = React.useMemo(
-    () => topTen.map((c) => c.course_id).sort(),
-    [topTen],
-  );
+  const courseIds = React.useMemo(() => topTen.map((c) => c.course_id).sort(), [topTen]);
 
   const { data: ratingsMap = {} } = useQuery({
     queryKey: ['user-course-ratings-breakdown', userId, courseIds],
@@ -92,270 +159,398 @@ export const ProfileTopTenRail: React.FC<Props> = ({
     staleTime: 60_000,
   });
 
-  if (isLoading) return null;
+  const showSuggestions = isOwnProfile && !isLoading && topTen.length < 3;
+  const { data: suggestions = [] } = useQuery({
+    queryKey: ['top-ten-suggestions', userId, courseIds],
+    enabled: showSuggestions && !!userId,
+    queryFn: async () => {
+      const [{ data: courses, error }, { data: excl }] = await Promise.all([
+        supabase
+          .from('golf_courses')
+          .select('id, name, country, sub_country, region, global_rank, regional_rank, thumbnail_image')
+          .not('global_rank', 'is', null)
+          .order('global_rank', { ascending: true })
+          .limit(20),
+        supabase.from('user_top10_exclusions').select('course_id').eq('user_id', userId),
+      ]);
+      if (error) throw error;
+      const skip = new Set([...courseIds, ...(excl || []).map((e) => e.course_id)]);
+      return ((courses || []) as SuggestCourse[]).filter((c) => !skip.has(c.id)).slice(0, 3);
+    },
+    staleTime: 5 * 60_000,
+  });
 
-  // Gate before anything renders: no header, no subtitle, no wrapper padding.
+  const firstCourseId = topTen[0]?.course_id ?? '';
+  const stripOn = topTen.length >= 3;
+  const { counts, myReaction, toggleReaction } = useTopTenReactions(stripOn ? userId : '', firstCourseId);
+  const { visibleCount, threadFetched } = useCommentsV2({
+    targetType: 'top_ten',
+    targetId: userId,
+    targetSecondaryId: firstCourseId,
+    enabled: stripOn && !!firstCourseId,
+  } as any);
+
+  if (isLoading) return null;
   if (visibilityLoading && !isOwnProfile) return null;
   if (!isOwnProfile && !canView) return null;
+  if (!isOwnProfile && topTen.length === 0) return null;
 
-  /** Uppercase audience marker beside the kicker, owner only, non-public only. */
+  const n = topTen.length;
+  const ratingOf = (c: TopTenCourse) => c.rating ?? ratingsMap[c.course_id] ?? null;
+  const pillKicker = isOwnProfile ? t('topTen.you', 'You') : t('topTen.them', 'Them');
+
+  const open = (c: TopTenCourse) => {
+    analyticsEvents.track('profile_top10_card_tap', { course_id: c.course_id, position: c.position });
+    navigate(`/courses/${c.course_id}`);
+  };
+
   const audienceMarker =
     isOwnProfile && visibility !== 'public'
-      ? visibility === 'private'
-        ? 'Only me'
-        : visibility === 'friends'
-          ? 'Friends only'
-          : 'Followers & friends'
+      ? visibility === 'private' ? 'Only me' : visibility === 'friends' ? 'Friends only' : 'Followers & friends'
       : null;
 
   const header = (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        justifyContent: 'space-between',
-        gap: 12,
-        padding: '0 16px',
-        fontFamily: SANS,
-      }}
-    >
+    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, fontFamily: SANS }}>
       <div style={{ minWidth: 0 }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 8,
-            fontSize: 9.5,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            color: A.INK,
-          }}
-        >
-          <span>
-            {isOwnProfile
-              ? t('topTen.kicker', 'Your top 10')
-              : t('topTen.kickerOther', 'Their top 10')}
-          </span>
-          {audienceMarker && (
-            <span style={{ color: A.MUTE, letterSpacing: '0.16em' }}>{audienceMarker}</span>
-          )}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.INK }}>
+          <span>{isOwnProfile ? t('topTen.kicker', 'Your top 10') : t('topTen.kickerOther', 'Their top 10')}</span>
+          {audienceMarker && <span style={{ color: A.MUTE, letterSpacing: '0.16em' }}>{audienceMarker}</span>}
         </div>
-        <div
-          style={{
-            marginTop: 3,
-            fontSize: 11.5,
-            fontWeight: 600,
-            color: A.BODY,
-            lineHeight: 1.35,
-          }}
-        >
-          {isOwnProfile
-            ? t('topTen.subtitle', "The very best you've played")
-            : t('topTen.subtitleOther', 'The very best they have played')}
+        <div style={{ marginTop: 3, fontSize: 11.5, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
+          {isOwnProfile ? t('topTen.subtitle', "The very best you've played") : t('topTen.subtitleOther', 'The very best they have played')}
         </div>
       </div>
-      {isOwnProfile && onManage && (
-        <button
-          type="button"
-          onClick={onManage}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            flexShrink: 0,
-            fontFamily: SANS,
-            fontSize: 9.5,
-            fontWeight: 700,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: A.INK,
-            cursor: 'pointer',
-          }}
-        >
+      {isOwnProfile && onManage && n > 0 && (
+        <button type="button" onClick={onManage} style={{ background: 'transparent', border: 'none', padding: 0, flexShrink: 0, fontFamily: SANS, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK, cursor: 'pointer' }}>
           {t('topTen.manage', 'Manage')}
         </button>
       )}
     </div>
   );
 
-  if (topTen.length === 0) {
-    return (
-      <section style={{ marginTop: 16, marginBottom: 8, paddingBottom: 4 }}>
-        {header}
-        <div
-          style={{
-            padding: '10px 16px 0',
-            fontFamily: SANS,
-            fontSize: 11.5,
-            fontWeight: 600,
-            color: A.BODY,
-            lineHeight: 1.35,
-          }}
-        >
-          {isOwnProfile
-            ? t('topTen.emptyOwn', 'Nothing here yet - add the courses you rate above all others.')
-            : t('topTen.emptyOther', 'Their top 10 builds up as they rate the courses they play.')}
-        </div>
-      </section>
-    );
+  // ── Verdict ───────────────────────────────────────────────────────────
+  const ranked = topTen.filter((c) => c.global_rank != null).length;
+  const clauses: React.ReactNode[] = [];
+  const tr = (key: string, values: Record<string, unknown>) => (
+    <Trans key={key} t={t} i18nKey={key} values={values} count={values.count as number} components={{ b: <B /> }} />
+  );
+  if (isOwnProfile && n >= 3 && n < 10) {
+    clauses.push(tr('topTen.verdict.filled', { count: n, word: Word(n) }));
+  } else if (isOwnProfile && n === 10) {
+    if (ranked > 0) clauses.push(tr('topTen.verdict.ranked', { count: ranked, word: Word(ranked), total: word(n) }));
+    const top = topTen[0];
+    if (top && top.position === 1 && top.global_rank === 1) clauses.push(tr('topTen.verdict.topsBoth', { name: top.name }));
+    let bold: TopTenCourse | null = null;
+    for (const c of topTen) {
+      if (c.global_rank == null) continue;
+      const gap = c.global_rank - c.position;
+      if (gap > 0 && (!bold || gap > bold.global_rank! - bold.position)) bold = c;
+    }
+    if (bold) clauses.push(tr('topTen.verdict.boldest', { name: bold.name, position: bold.position, rank: ordinal(bold.global_rank!) }));
+  } else if (!isOwnProfile) {
+    const mine = new Set(viewerTopTen.map((c) => c.course_id));
+    const overlap = viewerId ? topTen.filter((c) => mine.has(c.course_id)).length : 0;
+    if (ranked > 0 && overlap > 0) {
+      clauses.push(tr('topTen.verdict.overlap', { count: ranked, word: Word(ranked), overlap: word(overlap) }));
+    } else if (ranked > 0) {
+      clauses.push(tr('topTen.verdict.rankedOther', { count: ranked, word: Word(ranked) }));
+    } else if (overlap > 0) {
+      clauses.push(tr('topTen.verdict.overlapOnly', { count: overlap, word: Word(overlap) }));
+    }
   }
+  const verdict = clauses.length > 0 && (
+    <div style={{ marginTop: 12, fontSize: 12.5, lineHeight: 1.5, fontWeight: 600, color: A.BODY, ...FIGS }}>
+      {clauses.map((c, i) => <React.Fragment key={i}>{i > 0 ? ' ' : ''}{c}</React.Fragment>)}
+    </div>
+  );
+
+  const pill = (c: TopTenCourse) => {
+    const r = ratingOf(c);
+    if (r == null) return null;
+    return (
+      <span style={{ position: 'absolute', bottom: 8, right: 8, display: 'inline-flex', alignItems: 'baseline', gap: 4, background: GLASS, borderRadius: 999, padding: '3px 9px' }}>
+        <span style={{ fontSize: 12, fontWeight: 700, color: r >= 9 ? A.GREEN : PHOTO_INK, ...FIGS }}>{r.toFixed(1)}</span>
+        <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: PILL_KICKER }}>{pillKicker}</span>
+      </span>
+    );
+  };
+
+  const btnReset: React.CSSProperties = { background: 'transparent', border: 'none', padding: 0, textAlign: 'left', fontFamily: SANS, cursor: 'pointer', display: 'block', width: '100%' };
+
+  // ── Full / partial list (3+) ──────────────────────────────────────────
+  const renderList = () => {
+    const [one, two, three, ...rest] = topTen;
+    const missing = isOwnProfile ? Array.from({ length: 10 - n }, (_, i) => n + i + 1) : [];
+    return (
+      <>
+        <button type="button" data-top-ten-course-id={one.course_id} onClick={() => open(one)} style={{ ...btnReset, marginTop: 14 }}>
+          <CourseImageFallback courseId={one.course_id} courseName={one.name} imageUrl={one.thumbnail_image} style={{ height: 186, borderRadius: 14 }}>
+            <div style={{ position: 'absolute', inset: 0, background: SCRIM }} />
+            <span style={{ position: 'absolute', top: 10, left: 12, fontSize: 52, fontWeight: 700, letterSpacing: '-0.05em', lineHeight: 0.85, color: PHOTO_INK, textShadow: '0 2px 20px rgba(0,0,0,0.5)', ...FIGS }}>
+              {one.position}
+            </span>
+            {pill(one)}
+            <div style={{ position: 'absolute', left: 12, right: 104, bottom: 10 }}>
+              <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: PHOTO_INK, lineHeight: 1.2 }}>{one.name}</div>
+              {regionLine(one) && <div style={{ marginTop: 3, fontSize: 11, fontWeight: 600, color: CAPTION_SUB, ...FIGS }}>{regionLine(one)}</div>}
+            </div>
+          </CourseImageFallback>
+        </button>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9, marginTop: 9 }}>
+          {[two, three].map((c) => (
+            <button key={c.id} type="button" data-top-ten-course-id={c.course_id} onClick={() => open(c)} style={btnReset}>
+              <CourseImageFallback courseId={c.course_id} courseName={c.name} imageUrl={c.thumbnail_image} style={{ height: 104, borderRadius: 14 }}>
+                <div style={{ position: 'absolute', inset: 0, background: SCRIM }} />
+                <span style={{ position: 'absolute', top: 8, left: 8, background: GLASS, borderRadius: 999, padding: '3px 9px', fontSize: 11, fontWeight: 700, color: PHOTO_INK, ...FIGS }}>{c.position}</span>
+                {pill(c)}
+              </CourseImageFallback>
+              <div style={{ marginTop: 7, fontSize: 12, fontWeight: 700, color: A.INK, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{c.name}</div>
+              {regionLine(c) && <div style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c)}</div>}
+            </button>
+          ))}
+        </div>
+
+        {/* Reaction strip — one for the list, scoped to the position-1 course. */}
+        <div style={{ marginTop: 12, paddingTop: 11, borderTop: `1px solid ${A.SOFT}`, display: 'flex', alignItems: 'center', gap: 7 }}>
+          {(Object.keys(REACTION_CONFIG) as ReactionType[]).map((k) => {
+            const pressed = myReaction === k;
+            const pressable = !isOwnProfile && !!viewerId;
+            return (
+              <button
+                key={k}
+                type="button"
+                aria-label={REACTION_CONFIG[k].label}
+                aria-pressed={pressable ? pressed : undefined}
+                disabled={!pressable}
+                onClick={pressable ? () => toggleReaction(k) : undefined}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 10px', borderRadius: 999, border: `1px solid ${pressed ? PRESSED_BORDER : A.HAIRLINE}`, background: 'transparent', fontFamily: SANS, cursor: pressable ? 'pointer' : 'default', opacity: 1 }}
+              >
+                <span style={{ fontSize: 12 }}>{REACTION_CONFIG[k].emoji}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: pressed ? A.AMBER : A.MUTE, ...FIGS }}>{counts[k] ?? 0}</span>
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            onClick={() => { setCommentsCourseId(firstCourseId); setCommentsOpen(true); }}
+            style={{ marginLeft: 'auto', background: 'transparent', border: 'none', padding: 0, fontFamily: SANS, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.MUTE, cursor: 'pointer', ...FIGS }}
+          >
+            {threadFetched ? t('topTen.comments', { count: visibleCount, defaultValue: '{{count}} comments' }) : t('topTen.commentsLabel', 'Comments')} ›
+          </button>
+        </div>
+
+        {(rest.length > 0 || missing.length > 0) && (
+          <div style={{ marginTop: 16 }}>
+            {rest.map((c, i) => {
+              const r = ratingOf(c);
+              return (
+                <button key={c.id} type="button" data-top-ten-course-id={c.course_id} onClick={() => open(c)}
+                  style={{ ...btnReset, display: 'flex', alignItems: 'center', gap: 11, padding: '8px 0', borderTop: i > 0 ? `1px solid ${A.SOFT}` : 'none' }}>
+                  <span style={{ width: 18, textAlign: 'right', fontSize: 13, fontWeight: 700, letterSpacing: '-0.02em', color: A.DIM, flexShrink: 0, ...FIGS }}>{c.position}</span>
+                  <CourseImageFallback courseId={c.course_id} courseName={c.name} imageUrl={c.thumbnail_image} style={{ width: 44, height: 34, borderRadius: 8, flexShrink: 0 }} />
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
+                    {regionOf(c) && <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{regionOf(c)}</span>}
+                  </span>
+                  <span style={{ minWidth: 38, textAlign: 'center', border: `1px solid ${A.HAIRLINE}`, borderRadius: 7, padding: '4px 0', flexShrink: 0 }}>
+                    <span style={{ display: 'block', fontSize: 11, fontWeight: 700, color: c.global_rank ? A.MUTE : A.DIM, ...FIGS }}>{c.global_rank ? `#${c.global_rank}` : '–'}</span>
+                    <span style={{ display: 'block', fontSize: 7.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.DIM }}>{t('topTen.ours', 'Ours')}</span>
+                  </span>
+                  <span style={{ minWidth: 34, textAlign: 'right', flexShrink: 0 }}>
+                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: r != null ? scoreTone(r) : A.DIM, ...FIGS }}>{r != null ? r.toFixed(1) : '–'}</span>
+                    <span style={{ display: 'block', fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{pillKicker}</span>
+                  </span>
+                </button>
+              );
+            })}
+            {missing.map((p, i) => (
+              <div key={`slot-${p}`} style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '8px 0', borderTop: rest.length > 0 || i > 0 ? `1px solid ${A.SOFT}` : 'none' }}>
+                <span style={{ width: 18, flexShrink: 0 }} />
+                <span style={{ width: 44, height: 34, borderRadius: 8, border: `1px dashed ${ROW_SLOT_DASH}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600, color: A.DIM, flexShrink: 0, ...FIGS }}>{p}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </>
+    );
+  };
+
+  // ── Owner empty / 1–2 entries ─────────────────────────────────────────
+  const renderInvitation = () => {
+    const next = n + 1;
+    return (
+      <>
+        <div style={{ marginTop: 16, fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, lineHeight: 1.2, whiteSpace: 'pre-line' }}>
+          {n === 0 ? t('topTen.empty.lede', 'Ten courses.\nIn order. Your call.') : t('topTen.progress.lede', { count: n, word: Word(n), left: Word(10 - n), defaultValue: '{{word}} down. {{left}} to go.' })}
+        </div>
+        <div style={{ marginTop: 7, fontSize: 12.5, fontWeight: 600, color: A.BODY, lineHeight: 1.5 }}>
+          {n === 0
+            ? t('topTen.empty.body', "It fills itself from the courses you rate, and you don't need a single round on clbhouz to start. Pick the best you have ever played, anywhere, any time.")
+            : t('topTen.progress.body', { name: topTen[0].name, defaultValue: '{{name}} is your number one. Add another and they sort themselves by what you score them.' })}
+        </div>
+        <div style={{ marginTop: 16, display: 'flex', gap: 5 }}>
+          {Array.from({ length: 10 }, (_, i) => {
+            const c = topTen[i];
+            if (c) {
+              return <CourseImageFallback key={i} courseId={c.course_id} courseName={c.name} imageUrl={c.thumbnail_image} style={{ flex: 1, height: 38, borderRadius: 7 }} />;
+            }
+            const isNext = i === n;
+            return (
+              <div key={i} style={{ flex: 1, height: 38, borderRadius: 7, border: `1px dashed ${isNext ? SLOT_NEXT : SLOT_DASH}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: isNext ? A.INK : A.DIM, ...FIGS }}>
+                {i + 1}
+              </div>
+            );
+          })}
+        </div>
+        <button type="button" onClick={() => setPickerOpen(true)}
+          style={{ marginTop: 16, width: '100%', borderRadius: 14, padding: '13px 0', background: A.INK, color: A.CANVAS, border: 'none', fontFamily: SANS, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+          {n === 0 ? t('topTen.empty.cta', 'Start with your number one') : t('topTen.progress.cta', { next, defaultValue: 'Add your number {{next}}' })}
+        </button>
+        {suggestions.length > 0 && (
+          <>
+            <div style={{ marginTop: 20, fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.DIM }}>
+              {t('topTen.empty.suggest', 'Played any of these?')}
+            </div>
+            <div style={{ marginTop: 9, display: 'flex', flexDirection: 'column', gap: 7 }}>
+              {suggestions.map((s) => (
+                <button key={s.id} type="button"
+                  onClick={() => {
+                    addCourse(s.id);
+                    analyticsEvents.track('profile_top10_suggestion_added', { course_id: s.id, global_rank: s.global_rank });
+                  }}
+                  style={{ ...btnReset, display: 'flex', alignItems: 'center', gap: 10, border: `1px solid ${A.HAIRLINE}`, borderRadius: 12, padding: '9px 11px' }}>
+                  <CourseImageFallback courseId={s.id} courseName={s.name} imageUrl={s.thumbnail_image ?? null} style={{ width: 34, height: 26, borderRadius: 6, flexShrink: 0 }} />
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
+                    <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(s)}</span>
+                  </span>
+                  <span style={{ fontSize: 17, fontWeight: 700, color: A.MUTE }}>+</span>
+                </button>
+              ))}
+            </div>
+            <button type="button" onClick={() => setPickerOpen(true)}
+              style={{ marginTop: 11, background: 'transparent', border: 'none', padding: 0, fontFamily: SANS, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: A.MUTE, cursor: 'pointer' }}>
+              {t('topTen.empty.searchAll', 'Search all courses')} ›
+            </button>
+          </>
+        )}
+      </>
+    );
+  };
+
+  // ── Share card ────────────────────────────────────────────────────────
+  const handleShare = async () => {
+    const el = shareRef.current;
+    if (!el || sharing) return;
+    setSharing(true);
+    try {
+      const canvas = await html2canvas(el, CAPTURE_OPTS);
+      const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/png'));
+      if (!blob) throw new Error('capture failed');
+      const file = new File([blob], 'my-top-10.png', { type: 'image/png' });
+      if (typeof navigator !== 'undefined' && navigator.share && navigator.canShare?.({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: t('topTen.share.cardTitle', 'My top 10') });
+          return;
+        } catch (err) {
+          if ((err as Error).name === 'AbortError') return;
+        }
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'my-top-10.png';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      toast.error("Couldn't create your card");
+    } finally {
+      setSharing(false);
+    }
+  };
+
+  const shareSub = [
+    shareIdentity?.rounds != null ? t('topTen.share.rounds', { count: shareIdentity.rounds, defaultValue: '{{count}} rounds' }) : null,
+    shareIdentity?.rated != null ? t('topTen.share.rated', { count: shareIdentity.rated, defaultValue: '{{count}} rated' }) : null,
+  ].filter(Boolean).join(' · ');
+
+  const shareRow = isOwnProfile && n >= 3 && (
+    <>
+      <div style={{ marginTop: 18, border: `1px solid ${A.HAIRLINE}`, borderRadius: 14, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: A.INK }}>{t('topTen.share.title', 'Share your ten')}</div>
+          <div style={{ marginTop: 3, fontSize: 11, fontWeight: 600, color: A.DIM, lineHeight: 1.4 }}>{t('topTen.share.body', 'A card for Instagram, WhatsApp or the group chat.')}</div>
+        </div>
+        <button type="button" onClick={handleShare} disabled={sharing}
+          style={{ background: A.INK, color: A.CANVAS, border: 'none', borderRadius: 12, padding: '9px 14px', fontFamily: SANS, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', flexShrink: 0, opacity: sharing ? 0.6 : 1 }}>
+          {t('topTen.share.cta', 'Create')}
+        </button>
+      </div>
+      {/* Off-screen, type-only card captured by html2canvas. No course photos. */}
+      <div aria-hidden style={{ position: 'fixed', left: -10000, top: 0, pointerEvents: 'none' }}>
+        <div ref={shareRef} style={{ width: 330, background: SHARE_BG, border: `1px solid ${A.HAIRLINE}`, borderRadius: 18, padding: '22px 20px', fontFamily: SANS, boxSizing: 'border-box' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {shareIdentity?.avatarUrl ? (
+              <img src={shareIdentity.avatarUrl} crossOrigin="anonymous" alt="" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover' }} />
+            ) : (
+              <div style={{ width: 30, height: 30, borderRadius: '50%', background: A.TRACK }} />
+            )}
+            <span style={{ fontSize: 13, fontWeight: 700, color: A.INK }}>{shareIdentity?.displayName ?? ''}</span>
+            {shareIdentity?.handicapIndex != null && (
+              <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.DIM, ...FIGS }}>
+                {t('topTen.share.hcp', { value: shareIdentity.handicapIndex.toFixed(1), defaultValue: '{{value}} hcp' })}
+              </span>
+            )}
+          </div>
+          <div style={{ marginTop: 16, fontSize: 23, fontWeight: 700, letterSpacing: '-0.025em', color: A.INK }}>{t('topTen.share.cardTitle', 'My top 10')}</div>
+          {shareSub && <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, ...FIGS }}>{shareSub}</div>}
+          <div style={{ marginTop: 16 }}>
+            {topTen.map((c, i) => {
+              const r = ratingOf(c);
+              return (
+                <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 0', borderTop: i > 0 ? `1px solid ${A.SOFT}` : 'none', fontSize: 12 }}>
+                  <span style={{ width: 15, fontWeight: 700, color: A.DIM, ...FIGS }}>{c.position}</span>
+                  <span style={{ flex: 1, minWidth: 0, fontWeight: 600, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
+                  <span style={{ fontWeight: 700, color: A.MUTE, ...FIGS }}>{r != null ? r.toFixed(1) : ''}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ marginTop: 18, paddingTop: 12, borderTop: `1px solid ${A.HAIRLINE}`, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>clbhouz</span>
+            <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{t('topTen.share.tagline', 'stay in play.')}</span>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 
   return (
-    <section style={{ marginTop: 16, marginBottom: 8, paddingBottom: 4 }}>
+    <section style={{ marginTop: 16, marginBottom: 8, padding: '0 16px 4px', fontFamily: SANS }}>
       {header}
+      {n >= 3 ? <>{verdict}{renderList()}{shareRow}</> : isOwnProfile ? renderInvitation() : null}
 
-      <div
-        className="scrollbar-hide"
-        style={{
-          marginTop: 12,
-          display: 'flex',
-          gap: 9,
-          overflowX: 'auto',
-          paddingLeft: 16,
-          paddingRight: 16,
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
-      >
-        {topTen.map((course) => {
-          const rating = course.rating ?? ratingsMap[course.course_id] ?? null;
-          const region = course.sub_country || course.region || course.country || null;
-          return (
-            <button
-              key={course.id}
-              type="button"
-              data-top-ten-course-id={course.course_id}
-              onClick={() => {
-                analyticsEvents.track('profile_top10_card_tap', {
-                  course_id: course.course_id,
-                  position: course.position,
-                });
-                navigate(`/courses/${course.course_id}`);
-              }}
-              style={{
-                width: 168,
-                flexShrink: 0,
-                background: 'transparent',
-                border: 'none',
-                padding: 0,
-                textAlign: 'left',
-                fontFamily: SANS,
-                cursor: 'pointer',
-              }}
-            >
-              <CourseImageFallback
-                courseId={course.course_id}
-                courseName={course.name}
-                imageUrl={course.thumbnail_image}
-                style={{ height: 112, borderRadius: 14 }}
-              >
-                <div style={{ position: 'absolute', inset: 0, background: SCRIM }} />
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: 6,
-                    left: 6,
-                    background: GLASS,
-                    borderRadius: 999,
-                    padding: '3px 8px',
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: '#FFFFFF',
-                    ...FIGS,
-                  }}
-                >
-                  #{course.position}
-                </span>
-                {rating != null && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      bottom: 6,
-                      right: 6,
-                      display: 'inline-flex',
-                      alignItems: 'baseline',
-                      gap: 4,
-                      background: GLASS,
-                      borderRadius: 999,
-                      padding: '3px 8px',
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 700,
-                        color: '#FFFFFF',
-                        ...FIGS,
-                      }}
-                    >
-                      {rating === 10 ? '10' : Number(rating).toFixed(1)}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: 7,
-                        fontWeight: 700,
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase',
-                        color: 'rgba(255,255,255,0.7)',
-                      }}
-                    >
-                      {t('topTen.rated', 'Rated')}
-                    </span>
-                  </span>
-                )}
-              </CourseImageFallback>
-
-              {/* Round 3 §4: the text block below the image holds ONE height -
-                  two lines of the 12/800 name (2 x 15) plus the 10.5/600
-                  region line (14.2) and its 2px gap. A one-line name simply
-                  leaves the gap; the rail never goes ragged. */}
-              <div style={{ marginTop: 7, height: 46, overflow: 'hidden' }}>
-                <div
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: A.INK,
-                    lineHeight: 1.25,
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {course.name}
-                </div>
-                {region && (
-                  <div
-                    style={{
-                      marginTop: 2,
-                      fontSize: 10.5,
-                      fontWeight: 600,
-                      color: A.BODY,
-                      lineHeight: 1.35,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {region}
-                  </div>
-                )}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Deep-link contract: ?tab=courses&course=<id>&top_ten_comment=<id> */}
-      {initialCourseId && (
+      {commentsCourseId && (
         <CommentsSheetV2
           isOpen={commentsOpen}
           onClose={() => setCommentsOpen(false)}
           targetType="top_ten"
           targetId={userId}
-          targetSecondaryId={initialCourseId}
-          initialCommentId={initialCommentId}
+          targetSecondaryId={commentsCourseId}
+          initialCommentId={commentsCourseId === initialCourseId ? initialCommentId : null}
+        />
+      )}
+      {isOwnProfile && pickerOpen && (
+        <CoursePickerModal
+          isOpen={pickerOpen}
+          onClose={() => setPickerOpen(false)}
+          userId={userId}
+          region="global"
+          onCoursesAdded={() => {
+            qc.invalidateQueries({ queryKey: ['user-top-ten-courses', userId] });
+            setPickerOpen(false);
+          }}
         />
       )}
     </section>
