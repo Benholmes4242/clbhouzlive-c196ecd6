@@ -8,13 +8,13 @@ import React from 'react';
 import { MoreHorizontal } from 'lucide-react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { COVER_TOP_GUARD, W_55 } from './HeroShell';
+import { HERO_CANON_WASH } from '@/features/tourhub/_shared/heroGradient';
 
-/** Band wash over the photograph (lighter than HeroShell's COVER_WASH). */
-export const BAND_WASH = 'rgba(14,18,22,0.30)';
-/** Band ramp — bottoms out at the exact canvas so the band dissolves into the page. */
-export const BAND_RAMP =
-  'linear-gradient(180deg, rgba(14,18,22,0.45) 0%, rgba(14,18,22,0.00) 46%, rgba(10,10,12,0.86) 92%, #0A0A0C 100%)';
-export const BAND_HEIGHT = 176;
+/**
+ * Band height tracks the safe area: inset + 62 (HERO_CONTENT_INSET) + 104
+ * (34 air + 56 avatar + 14 padding), floored at 200 for no-inset devices.
+ */
+export const BAND_HEIGHT = 'max(calc(var(--sat, env(safe-area-inset-top, 0px)) + 62px + 104px), 200px)';
 /** Control skin over the band (EDIT pill and the overflow dots). */
 export const BAND_CONTROL_BORDER = 'rgba(255,255,255,0.22)';
 export const BAND_CONTROL_GROUND = 'rgba(10,14,10,0.40)';
@@ -132,8 +132,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
             onError={() => setBroken(true)}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
           />
-          <div style={{ position: 'absolute', inset: 0, background: BAND_WASH }} />
-          <div style={{ position: 'absolute', inset: 0, background: BAND_RAMP }} />
+          <div style={{ position: 'absolute', inset: 0, background: HERO_CANON_WASH }} />
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 60, background: COVER_TOP_GUARD }} />
         </div>
       )}
@@ -176,6 +175,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
             style={{
               margin: 0,
               fontSize: 21,
+              textShadow: '0 1px 10px rgba(0,0,0,0.55)',
               fontWeight: 700,
               letterSpacing: '-0.02em',
               lineHeight: 1.15,
@@ -188,14 +188,14 @@ export const ProfileCoverBand: React.FC<Props> = ({
             {displayName}
           </h1>
           {subline ? (
-            <div style={{ marginTop: 3, fontSize: 12.5, fontWeight: 600, color: W_55, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ marginTop: 3, fontSize: 12.5, fontWeight: 600, color: W_55, textShadow: '0 1px 8px rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {subline}
             </div>
           ) : onAddHomeClub ? (
             <button
               type="button"
               onClick={onAddHomeClub}
-              style={{ display: 'block', marginTop: 3, padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 12.5, fontWeight: 600, color: W_55, textAlign: 'left' }}
+              style={{ display: 'block', marginTop: 3, padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 12.5, fontWeight: 600, color: W_55, textShadow: '0 1px 8px rgba(0,0,0,0.5)', textAlign: 'left' }}
             >
               {addHomeClubLabel}
             </button>
