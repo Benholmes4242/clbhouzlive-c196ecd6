@@ -42,8 +42,8 @@ export interface ProfileRound {
   handicap_index_at_time: number | null;
   /** false when the viewer could not read the whs_scores row — treat as unknown, never as 18. */
   whs_joined: boolean;
-  /** whs_scores.is_counter. NOT YET PROJECTED by get_profile_rounds — read only
-   *  through countsTowardIndex(); absent reads as not counting. */
+  /** whs_scores.is_counter, projected by get_profile_rounds. Read only through
+   *  countsTowardIndex(); absent reads as not counting. */
   is_counter?: boolean | null;
 }
 

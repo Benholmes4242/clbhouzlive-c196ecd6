@@ -20,7 +20,7 @@ import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
 import { useHandicapPercentile } from '@/lib/whs/usePercentile';
 import { countsTowardIndex } from '@/lib/whs/counting';
 import { numberWord } from '@/lib/text/numbers';
-import { formValue } from '@/lib/whs/formValue';
+import { formBars, formBarLowered, fmtSigned, type FormScoreLike } from '@/features/profile-sheet-v2/sheetState';
 import { isFullEighteen, useProfileRounds } from '@/components/profile/rounds/useProfileRounds';
 import { useProfileAchievementFigures } from '@/hooks/gam/useProfileAchievementFigures';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
@@ -93,7 +93,6 @@ interface Props {
 function formatIndex(v: number): string {
   return v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
 }
-const signed1 = (n: number) => `${n > 0 ? '+' : n < 0 ? '\u2212' : ''}${Math.abs(n).toFixed(1)}`;
 
 const KICK: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM };
 const MICRO: React.CSSProperties = { fontSize: 7.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase' };
@@ -109,7 +108,8 @@ const ExternalGlyph = () => (
   </svg>
 );
 
-const IndexChart: React.FC<{ points: number[]; axisLeft: string; axisRight: string; lowLabel: string; onTap: () => void }> = ({ points, axisLeft, axisRight, lowLabel, onTap }) => {
+const IndexChart: React.FC<{ points: number[]; color: string; fillTop: number; axisLeft: string; axisRight: string; lowLabel: string; onTap: () => void }> = ({ points, color, fillTop, axisLeft, axisRight, lowLabel, onTap }) => {
+  const gid = React.useId().replace(/:/g, '');
   if (points.length < 2) return null;
   const min = Math.min(...points);
   const max = Math.max(...points);
@@ -123,13 +123,20 @@ const IndexChart: React.FC<{ points: number[]; axisLeft: string; axisRight: stri
     <button type="button" onClick={onTap} style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', cursor: 'pointer', textAlign: 'left', fontFamily: SANS }}>
       <div style={{ marginTop: 12, height: 64, position: 'relative' }}>
         <svg width="100%" height={64} viewBox="0 0 361 64" preserveAspectRatio="none" aria-hidden style={{ display: 'block', overflow: 'visible' }}>
+          <defs>
+            <linearGradient id={`hcpfill-${gid}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor={color} stopOpacity={fillTop} />
+              <stop offset="1" stopColor={color} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <polygon points={`0,64 ${d} 361,64`} fill={`url(#hcpfill-${gid})`} stroke="none" />
           <line x1={0} y1={lowY} x2={361} y2={lowY} stroke={LOW_LINE} strokeWidth={1} strokeDasharray="3 3" vectorEffect="non-scaling-stroke" />
-          <polyline points={d} fill="none" stroke={A.INK} strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+          <polyline points={d} fill="none" stroke={color} strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
         </svg>
         <span style={{ position: 'absolute', left: 0, top: lowY, transform: 'translateY(-50%)', ...MICRO, color: A.DIM, background: A.CANVAS, paddingRight: 6, ...FIGS }}>
           {lowLabel}
         </span>
-        <span aria-hidden style={{ position: 'absolute', right: -3, top: lastY, marginTop: -3.5, width: 7, height: 7, borderRadius: 999, background: '#FFFFFF', boxShadow: MARKER_HALO }} />
+        <span aria-hidden style={{ position: 'absolute', right: -3, top: lastY, marginTop: -3.5, width: 7, height: 7, borderRadius: 999, background: color, boxShadow: MARKER_HALO }} />
       </div>
       <div style={{ marginTop: 5, display: 'flex', justifyContent: 'space-between', ...MICRO, color: AXIS_INK }}>
         <span>{axisLeft}</span><span>{axisRight}</span>
@@ -143,7 +150,7 @@ const CounterCell: React.FC<{ label: string; value: number | null; state?: 'ok' 
     type="button"
     onClick={onTap}
     disabled={state === 'error'}
-    style={{ minWidth: 0, padding: 0, border: 0, background: 'transparent', textAlign: 'left', cursor: state === 'error' ? 'default' : 'pointer', fontFamily: SANS }}
+    style={{ minWidth: 0, padding: 0, border: 0, background: 'transparent', textAlign: 'center', cursor: state === 'error' ? 'default' : 'pointer', fontFamily: SANS }}
   >
     <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1, color: A.INK, ...FIGS }}>
       {state === 'error' ? '\u00A0' : value == null ? '\u2014' : formatNumber(value)}
@@ -215,16 +222,25 @@ export const ProfileHero: React.FC<Props> = ({
   );
   const cover = coverUrl || topCourse?.thumbnail_image || null;
 
-  // EXISTING twelve-month rule: points inside 365 days, else the whole history.
-  const { series, oldestMs } = React.useMemo(() => {
-    if (!history || history.length < 2) return { series: [] as number[], oldestMs: null as number | null };
-    const cutoff = Date.now() - 365 * MS_PER_DAY;
+  // Ninety-day rule: points inside 90 days, else the whole history.
+  const { series, oldestMs, windowHeld } = React.useMemo(() => {
+    if (!history || history.length < 2) return { series: [] as number[], oldestMs: null as number | null, windowHeld: false };
+    const cutoff = Date.now() - 90 * MS_PER_DAY;
     const recent = history.filter((p) => new Date(p.observed_at).getTime() >= cutoff);
-    const use = (recent.length >= 2 ? recent : history).filter((p) => Number.isFinite(Number(p.handicap_index)));
+    const held = recent.length >= 2;
+    const use = (held ? recent : history).filter((p) => Number.isFinite(Number(p.handicap_index)));
     return {
       series: use.map((p) => Number(p.handicap_index)),
       oldestMs: use.length ? new Date(use[0].observed_at).getTime() : null,
+      windowHeld: held,
     };
+  }, [history]);
+
+  // The "lowest index" sentence uses the WHOLE history held, independent of the chart.
+  const allHistory = React.useMemo(() => {
+    const pts = (history ?? []).filter((p) => Number.isFinite(Number(p.handicap_index)));
+    if (pts.length < 2) return null;
+    return { min: Math.min(...pts.map((p) => Number(p.handicap_index))), oldestMs: new Date(pts[0].observed_at).getTime() };
   }, [history]);
 
   const shownIndex = indexValue ?? trend?.current ?? null;
@@ -276,6 +292,12 @@ export const ProfileHero: React.FC<Props> = ({
   const months = oldestMs != null ? Math.min(windowMonths(oldestMs), 12 * 100) : null;
   const windowDays = oldestMs != null ? Math.round((Date.now() - oldestMs) / MS_PER_DAY) : null;
   const windowPhrase = months != null ? t('hero.windowMonths', { count: months, defaultValue: months === 1 ? '1 month' : `${months} months` }) : '';
+  const axisWindow = windowHeld ? t('hero.window90d', '90 days') : windowPhrase;
+  const allMonths = allHistory ? windowMonths(allHistory.oldestMs) : null;
+  const allPhrase = allMonths != null ? t('hero.windowMonths', { count: allMonths, defaultValue: allMonths === 1 ? '1 month' : `${allMonths} months` }) : '';
+  // Chart colour = the 90-day direction (shortDirection), so it never disagrees with the 90 DAYS figure.
+  const chartColor = shortDelta == null || shortDirection === 'flat' ? A.INK : shortDirection === 'down' ? GREEN : RED;
+  const chartFillTop = chartColor === A.INK ? 0.16 : 0.28;
 
   // ── right-hand slot ──
   let slot: { value: string; label: string; color: string } | null = null;
@@ -301,11 +323,11 @@ export const ProfileHero: React.FC<Props> = ({
   // ── verdict ──
   let verdict: React.ReactNode = null;
   if (isSelf) {
-    if (shownIndex != null && series.length >= 2 && Math.round(shownIndex * 10) === Math.round(Math.min(...series) * 10)) {
+    if (shownIndex != null && allHistory && Math.round(shownIndex * 10) === Math.round(allHistory.min * 10)) {
       verdict = (
         <>
           {t('hero.verdictLowestPre', 'Your ')}
-          <b style={{ color: A.INK, fontWeight: 700 }}>{t('hero.verdictLowest', { window: windowPhrase, defaultValue: `lowest index in ${windowPhrase}` })}</b>
+          <b style={{ color: A.INK, fontWeight: 700 }}>{t('hero.verdictLowest', { window: allPhrase, defaultValue: `lowest index in ${allPhrase}` })}</b>
           {t('hero.verdictLowestPost', '.')}
         </>
       );
@@ -325,12 +347,27 @@ export const ProfileHero: React.FC<Props> = ({
 
   // ── form strip ──
   const rows = roundsQ.isSuccess ? roundsQ.data ?? [] : [];
-  const lastFive = rows.filter(isFullEighteen).slice(0, 5);
-  const countingN = lastFive.filter((r) => countsTowardIndex(r)).length;
+  // isFullEighteen FIRST: formBars only tests !is_nine_hole, and a NULL from a
+  // missing whs join would slip through it.
+  const fullRows = rows.filter(isFullEighteen);
+  const byId = new Map(fullRows.map((r) => [r.whs_score_id, r]));
+  const bars = formBars(
+    fullRows.map((r): FormScoreLike => ({
+      id: r.whs_score_id,
+      play_date: r.play_date,
+      handicap_differential: r.handicap_differential,
+      handicap_index_at_time: r.handicap_index_at_time,
+      is_nine_hole: !!r.is_nine_hole,
+    })),
+    shownIndex,
+  ); // oldest first, as the sheet renders them
+  const barRows = bars.map((b) => byId.get(b.id));
+  const countingN = barRows.filter((r) => r && countsTowardIndex(r)).length;
   // Counting state is unknown when no tile carries is_counter at all.
-  const countingKnown = lastFive.some((r) => r.is_counter != null);
-  const loweredN = lastFive.filter((r) => { const v = formValue(r); return v != null && v < 0; }).length;
-  const tilesWord = numberWord(lastFive.length, false);
+  const countingKnown = barRows.some((r) => r?.is_counter != null);
+  const loweredN = bars.filter(formBarLowered).length;
+  const tilesN = bars.length;
+  const tilesWord = numberWord(tilesN, false);
   // COURSES = distinct courses in POSTED ROUNDS (get_profile_rounds, gated by
   // can_view_handicap). It will NOT necessarily equal the Your Courses
   // analytics list (gam_user_courses: mapped, non-penalty) — do not "fix"
@@ -344,7 +381,7 @@ export const ProfileHero: React.FC<Props> = ({
   const counters: Array<{ key: HeroStat; label: string; value: number | null; state?: 'ok' | 'loading' | 'error' }> = [];
   if (isSelf) counters.push({ key: 'rounds', label: t('hero.rounds', 'Rounds'), value: roundsCount, state: roundsCountState });
   if (coursesCount != null) counters.push({ key: 'courses', label: t('hero.courses', 'Courses'), value: coursesCount });
-  counters.push({ key: 'rated', label: t('hero.rated', 'Rated'), value: ratedCount, state: ratedCountState });
+  counters.push({ key: 'rated', label: t('hero.rated', 'Reviewed'), value: ratedCount, state: ratedCountState });
   if (badgesCount != null) counters.push({ key: 'badges', label: t('hero.badges', 'Badges'), value: badgesCount });
 
   const socialFig = (n: number | null | undefined) => (socialCountState === 'ok' && n != null ? formatNumber(n) : null);
@@ -462,8 +499,10 @@ export const ProfileHero: React.FC<Props> = ({
             {series.length >= 2 && (
               <IndexChart
                 points={series}
+                color={chartColor}
+                fillTop={chartFillTop}
                 lowLabel={t('hero.low', { value: formatIndex(Math.min(...series)), defaultValue: `Low ${formatIndex(Math.min(...series))}` })}
-                axisLeft={t('hero.windowAgo', { window: windowPhrase, defaultValue: `${windowPhrase} ago` })}
+                axisLeft={t('hero.windowAgo', { window: axisWindow, defaultValue: `${axisWindow} ago` })}
                 axisRight={t('hero.today', 'Today')}
                 onTap={() => {
                   analyticsEvents.track('profile_index_chart_tap', { window_days: windowDays });
@@ -472,21 +511,23 @@ export const ProfileHero: React.FC<Props> = ({
               />
             )}
 
-            {lastFive.length > 0 && (
+            {bars.length > 0 && (
               <>
                 <div style={{ marginTop: 18 }}>
                   <span style={KICK}>{t('hero.formLastFive', 'Form \u00B7 last five')}</span>
                 </div>
                 <div style={{ marginTop: 8, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
-                  {lastFive.map((r, i) => {
-                    const fv = formValue(r);
+                  {bars.map((bar, i) => {
+                    const r = byId.get(bar.id);
+                    const fig = fmtSigned(bar.value);
+                    const hasSign = fig.startsWith('+') || fig.startsWith('\u2212');
                     return (
                       <button
-                        key={r.whs_score_id}
+                        key={bar.id}
                         type="button"
                         onClick={() => {
-                          analyticsEvents.track('profile_form_tile_tap', { whs_score_id: r.whs_score_id, position: i + 1 });
-                          navigate(`/round/${r.whs_score_id}`);
+                          analyticsEvents.track('profile_form_tile_tap', { whs_score_id: bar.id, position: i + 1 });
+                          navigate(`/round/${bar.id}`);
                         }}
                         style={{
                           minWidth: 0,
@@ -500,13 +541,17 @@ export const ProfileHero: React.FC<Props> = ({
                         }}
                       >
                         <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: A.INK, ...FIGS }}>
-                          {r.gross_score ?? '\u00A0'}
+                          {r?.gross_score ?? '\u00A0'}
                         </div>
-                        <div style={{ marginTop: 4, fontSize: 10, fontWeight: 700, color: fv != null && fv < 0 ? GREEN : A.DIM, ...FIGS }}>
-                          {fv != null ? signed1(Math.round(fv * 10) / 10) : '\u00A0'}
+                        <div style={{ marginTop: 4, fontSize: 10, fontWeight: 700, textAlign: 'center', color: formBarLowered(bar) ? GREEN : A.DIM, ...FIGS }}>
+                          {/* The sign hangs outside the centring so the digits sit under the gross. */}
+                          <span style={{ position: 'relative', display: 'inline-block' }}>
+                            {hasSign && <span style={{ position: 'absolute', right: '100%', marginRight: 0.5 }}>{fig[0]}</span>}
+                            {hasSign ? fig.slice(1) : fig}
+                          </span>
                         </div>
                         <div style={{ marginTop: 5, fontSize: 7, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: AXIS_INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {r.course_name ?? '\u00A0'}
+                          {r?.course_name ?? '\u00A0'}
                         </div>
                       </button>
                     );
@@ -528,16 +573,18 @@ export const ProfileHero: React.FC<Props> = ({
                     {countingKnown && (
                       <>
                         {countingN === 0 ? (
-                          <><b style={{ color: A.INK, fontWeight: 700 }}>None</b>{` of these ${tilesWord} are counting towards your index.`}</>
+                          <><b style={{ color: A.INK, fontWeight: 700 }}>{t('hero.countingNone', 'None')}</b>{t('hero.countingNoneRest', { n: tilesWord, defaultValue: ` of these ${tilesWord} are counting towards your index.` })}</>
                         ) : (
-                          <><b style={{ color: A.INK, fontWeight: 700 }}>{numberWord(countingN)}</b>{` of these ${tilesWord} ${countingN === 1 ? 'is' : 'are'} counting towards your index.`}</>
+                          <><b style={{ color: A.INK, fontWeight: 700 }}>{numberWord(countingN)}</b>{countingN === 1
+                            ? t('hero.countingOneRest', { n: tilesWord, defaultValue: ` of these ${tilesWord} is counting towards your index.` })
+                            : t('hero.countingManyRest', { n: tilesWord, defaultValue: ` of these ${tilesWord} are counting towards your index.` })}</>
                         )}
                       </>
                     )}
                     {countingKnown && loweredN > 0 && ' '}
                     {loweredN > 0 && (loweredN === 1
-                      ? <>The <span style={{ color: GREEN }}>green</span> round lowered it.</>
-                      : <><span style={{ color: GREEN }}>Green</span> rounds lowered it.</>)}
+                      ? <>{t('hero.loweredOnePre', 'The ')}<span style={{ color: GREEN }}>{t('hero.loweredOneGreen', 'green')}</span>{t('hero.loweredOnePost', ' round lowered it.')}</>
+                      : <><span style={{ color: GREEN }}>{t('hero.loweredManyGreen', 'Green')}</span>{t('hero.loweredManyPost', ' rounds lowered it.')}</>)}
                   </div>
                 )}
               </>
