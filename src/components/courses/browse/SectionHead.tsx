@@ -16,7 +16,7 @@ export interface SectionHeadProps {
 
 export function SectionHead({ kicker, title, subline, tone = 'amber' }: SectionHeadProps) {
   return (
-    <div style={{ borderTop: '1px solid rgba(255,255,255,0.14)', paddingTop: 12 }}>
+    <div>
       <div style={{ ...KICKER, lineHeight: 1, color: tone === 'amber' ? A.AMBER : A.MUTE }}>
         {kicker}
       </div>
@@ -46,4 +46,4 @@ export function SectionHead({ kicker, title, subline, tone = 'amber' }: SectionH
 export const HEAD_GAP = 14;
 
 /** The wrapper every section's head + content sits in. */
-export const SECTION_WRAP: React.CSSProperties = { padding: '18px 16px 15px' };
+export const SECTION_WRAP: React.CSSProperties = { padding: '20px 16px 14px' };
