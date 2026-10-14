@@ -364,7 +364,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
             onClick={() => { setCommentsCourseId(firstCourseId); setCommentsOpen(true); }}
             style={{ marginLeft: 'auto', background: 'transparent', border: 'none', padding: 0, fontFamily: SANS, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.MUTE, cursor: 'pointer', ...FIGS }}
           >
-            {threadFetched ? t('topTen.comments', { count: visibleCount, defaultValue: '{{count}} comments' }) : t('topTen.commentsLabel', 'Comments')} ›
+            {threadFetched && visibleCount > 0 ? t('topTen.comments', { count: visibleCount, defaultValue: '{{count}} comments' }) : t('topTen.commentsLabel', 'Comments')} ›
           </button>
         </div>
 
