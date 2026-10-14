@@ -48,7 +48,6 @@ import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome
 import { Z } from '@/config/zIndex';
 import { BrowseCourseCard } from './BrowseCourseCard';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
-import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 import { CoursesSearchField } from '@/features/explore-magazine/CoursesSearchField';
