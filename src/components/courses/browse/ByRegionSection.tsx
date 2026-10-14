@@ -1,0 +1,188 @@
+import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useHomeClubStatus } from '@/features/home-club/useHomeClubStatus';
+import { openHomeClubPicker } from '@/features/home-club/homeClubPickerStore';
+import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
+import { SCRIM_STANDOUT } from '@/styles/photoScrim';
+import { GLASS_CHIP_CLASS } from '@/styles/glassChip';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { useCourseBrowseTruth, type BrowseRegion } from '../useStatBrowse';
+import { SectionHead, SECTION_WRAP } from './SectionHead';
+import { fmtToPar, plural } from './format';
+
+/**
+ * SECTION 02 — BY REGION (BRIEF_COURSES_PAGE_REBUILD §4, amended by
+ * BRIEF_COURSES_PAGE_PHASE_1_CORRECTIONS §4). App-wide: never reads the
+ * country/region params. A tile is the door to section 08 — it writes them
+ * and scrolls there.
+ */
+export const ALL_COURSES_ANCHOR = 'courses-all';
+const MAX_AFTER_LEAD = 9;
+
+/** The member's home region: primary_club_id → golf_courses.club_id → region. */
+function useHomeRegion(clubId: string | null) {
+  return useQuery({
+    queryKey: ['courses-home-region', clubId],
+    enabled: !!clubId,
+    staleTime: 10 * 60 * 1000,
+    queryFn: async (): Promise<string | null> => {
+      const { data, error } = await supabase
+        .from('golf_courses')
+        .select('region')
+        .eq('club_id', clubId as string)
+        .not('region', 'is', null)
+        .limit(1);
+      if (error) throw error;
+      return ((data ?? [])[0] as { region: string | null } | undefined)?.region ?? null;
+    },
+  });
+}
+
+const NAME_SHADOW = '0 1px 6px rgba(0,0,0,0.55)';
+const FACT_SHADOW = '0 1px 4px rgba(0,0,0,0.6)';
+
+export function ByRegionSection() {
+  const { user } = useSupabaseSession();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { data: truth } = useCourseBrowseTruth();
+  const home = useHomeClubStatus(user?.id);
+  const homeRegionQuery = useHomeRegion(home.clubId);
+  const homeRegion = homeRegionQuery.data ?? null;
+
+  const regions = truth?.regions ?? [];
+  if (regions.length === 0) return null;
+
+  const lead = homeRegion ? regions.find((r) => r.region === homeRegion) ?? null : null;
+  const rest = regions.filter((r) => r !== lead).slice(0, MAX_AFTER_LEAD);
+  const tiles: Array<{ r: BrowseRegion; lead: boolean }> = [
+    ...(lead ? [{ r: lead, lead: true }] : []),
+    ...rest.map((r) => ({ r, lead: false })),
+  ];
+
+  const askHomeClub = !!user && !home.isLoading && !home.clubId;
+
+  const open = (r: BrowseRegion) => {
+    const params = new URLSearchParams(searchParams);
+    if (r.subCountry) params.set('country', r.subCountry);
+    else params.delete('country');
+    params.set('region', r.region);
+    setSearchParams(params, { replace: true });
+    requestAnimationFrame(() =>
+      document.getElementById(ALL_COURSES_ANCHOR)?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+    );
+  };
+
+  return (
+    <section style={SECTION_WRAP}>
+      <SectionHead
+        n="02"
+        tone="amber"
+        kicker="Where to go"
+        title="By region"
+        subline={`${regions.length} regions members have played.${lead ? ' Yours first.' : ''}`}
+      />
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 2,
+          marginLeft: -16,
+          marginRight: -16,
+          marginTop: 14,
+        }}
+      >
+        {tiles.map(({ r, lead: isLead }) => {
+          const par = fmtToPar(r.avgToPar);
+          const fact = isLead
+            ? [plural(r.courses, 'course', 'courses'), plural(r.rounds, 'round', 'rounds'), par ? `plays to ${par}` : null]
+            : [plural(r.courses, 'course', 'courses'), par];
+          return (
+            <button
+              key={r.region}
+              type="button"
+              onClick={() => open(r)}
+              style={{
+                gridColumn: isLead ? 'span 2' : undefined,
+                height: isLead ? 168 : 122,
+                padding: 0,
+                border: 'none',
+                borderRadius: 0,
+                textAlign: 'left',
+                cursor: 'pointer',
+                background: 'transparent',
+              }}
+            >
+              <CourseImageFallback
+                courseId={r.imageCourseId}
+                courseName={r.imageCourseName}
+                imageUrl={r.imageUrl}
+                style={{ height: '100%' }}
+              >
+                <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
+                {isLead ? (
+                  <span
+                    className={GLASS_CHIP_CLASS}
+                    style={{
+                      position: 'absolute',
+                      top: 11,
+                      left: 12,
+                      borderRadius: 999,
+                      padding: '3px 8px',
+                      fontSize: 9,
+                      fontWeight: 700,
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                      color: '#FFFFFF',
+                    }}
+                  >
+                    Your patch
+                  </span>
+                ) : null}
+                <div style={{ position: 'absolute', left: 12, right: 12, bottom: 11 }}>
+                  <div
+                    style={{
+                      fontSize: isLead ? 26 : 19,
+                      fontWeight: 700,
+                      letterSpacing: isLead ? '-0.036em' : '-0.03em',
+                      color: '#FFFFFF',
+                      lineHeight: 1,
+                      textShadow: NAME_SHADOW,
+                    }}
+                  >
+                    {r.region}
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 6,
+                      fontSize: 10.5,
+                      fontWeight: 600,
+                      color: 'rgba(255,255,255,0.82)',
+                      fontVariantNumeric: 'tabular-nums',
+                      textShadow: FACT_SHADOW,
+                    }}
+                  >
+                    {fact.filter(Boolean).join(' \u00B7 ')}
+                  </div>
+                </div>
+              </CourseImageFallback>
+            </button>
+          );
+        })}
+      </div>
+      {askHomeClub ? (
+        <p style={{ fontSize: 12, lineHeight: 1.5, color: A.DIM, marginTop: 12, marginBottom: 0 }}>
+          Set your home club and your own region leads this list.{' '}
+          <button
+            type="button"
+            onClick={() => openHomeClubPicker()}
+            style={{ background: 'none', border: 'none', padding: 0, color: A.INK, fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
+          >
+            Set home club
+          </button>
+        </p>
+      ) : null}
+    </section>
+  );
+}
