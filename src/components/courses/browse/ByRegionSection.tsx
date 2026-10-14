@@ -84,7 +84,6 @@ export function ByRegionSection() {
         tone="amber"
         kicker="Where to go"
         title="By region"
-        subline={lead ? 'Your patch, then the four places this community plays most.' : 'The five places this community plays most.'}
       />
       <div
         style={{

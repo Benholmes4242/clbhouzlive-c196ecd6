@@ -17,7 +17,6 @@ import { useTranslation } from 'react-i18next';
 import { HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { A, LABEL, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
-import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 const CARD_W = 244;
@@ -67,11 +66,6 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
 
   return (
     <section>
-      <div style={{ padding: '0 20px 10px' }}>
-        <DiscoverSectionHeading title={t('statBrowse.reviews.heading')} />
-      </div>
-
-
       <div
         style={{
           display: 'flex',
