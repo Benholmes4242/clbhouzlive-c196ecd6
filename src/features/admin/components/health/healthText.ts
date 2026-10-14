@@ -72,3 +72,7 @@ export function londonDayMon(iso: string | null | undefined): string {
   const month = Number(parts.find((p) => p.type === 'month')?.value) - 1;
   return `${day} ${MON[month]}`;
 }
+
+/** Status lens 'Slowest': one decimal, trailing .0 dropped (4.1 -> '4.1h', 4 -> '4h'). */
+export const slowestText = (hrs: number | null | undefined) =>
+  hrs == null ? DASH : `${hrs.toFixed(1).replace(/\.0$/, '')}h`;

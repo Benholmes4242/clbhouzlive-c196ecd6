@@ -9,6 +9,7 @@ import { useEchoEngineHealth } from '../../hooks/useEchoEngineHealth';
 import { usePushHealth } from '../../hooks/usePushHealth';
 import { useDeletionIntegrity } from '../../hooks/useDeletionIntegrity';
 import { useSystemStateHistory, type SystemDayState } from '../../hooks/useSystemStateHistory';
+import { slowestText } from './healthText';
 import { areaTone, jobProblems, useHealthVerdict, type Issue, type IssueArea } from './healthIssues';
 import { lensLabel, type HealthLens } from './healthLens';
 import { hoursMins, londonDayMon } from './healthText';
@@ -117,7 +118,7 @@ function RoundToMember() {
             </div>
             <div style={{ marginTop: 12, paddingTop: 10, borderTop: ROW_RULE, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>
               <Fig label="Rounds" value={num(p.rounds)} sub="this week" />
-              <Fig label="Slowest" value={p.slowest_hrs == null ? '-' : `${Math.round(p.slowest_hrs)}h`} sub="one round" />
+              <Fig label="Slowest" value={slowestText(p.slowest_hrs)} sub="one round" />
               <Fig label="Stuck" value={num(stuck)} sub="over 1h" valueColor={stuck == null ? undefined : stuck > 0 ? H.dangerText : H.okText} />
             </div>
           </Panel>
