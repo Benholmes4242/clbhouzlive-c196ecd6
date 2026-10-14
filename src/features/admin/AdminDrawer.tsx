@@ -2,13 +2,13 @@ import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Inbox, Users, MapPin, BarChart3, Shield, ArrowLeft,
-  Activity,
+  Activity, Settings,
   type LucideIcon,
 } from 'lucide-react';
 import { adminTheme as t } from './theme';
 import type { PanelRole } from '@/hooks/usePanelRole';
 import { useTriageCounts } from './hooks/useTriageCounts';
-import { useHealthChips } from './lib/healthChips';
+import { useHealthVerdict } from './components/health/healthIssues';
 
 interface NavItem {
   to: string;
@@ -18,6 +18,7 @@ interface NavItem {
   moderatorAllowed?: boolean;
   showBadge?: boolean;
   showHealthDot?: boolean;
+  everyRole?: boolean;
 }
 
 const NAV: NavItem[] = [
@@ -27,6 +28,8 @@ const NAV: NavItem[] = [
   { to: '/admin-v2/content',   label: 'Content',   icon: MapPin },
   { to: '/admin-v2/analytics', label: 'Analytics', icon: BarChart3, requireFull: true },
   { to: '/admin-v2/health',    label: 'Health',    icon: Activity, showHealthDot: true },
+  // BRIEF_HEALTH: Settings left the Health tabs; every role reaches it here.
+  { to: '/admin-v2/health?tab=settings', label: 'Settings', icon: Settings, moderatorAllowed: true, everyRole: true },
 ];
 
 interface Props {
@@ -40,8 +43,9 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
   const location = useLocation();
   const triage = useTriageCounts();
   const badge = triage.data?.total ?? 0;
-  const health = useHealthChips();
-  const healthDegraded = health.nonOk > 0;
+  // Same verdict as the Status lens, so the dot and the page cannot disagree.
+  const health = useHealthVerdict();
+  const healthDegraded = health.issues.length > 0;
 
   useEffect(() => {
     if (!open) return;
@@ -51,6 +55,7 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
   }, [open, onClose]);
 
   const items = NAV.filter(n => {
+    if (n.everyRole) return true;
     if (role === 'moderator') return !!n.moderatorAllowed;
     return !n.requireFull || canManageAdmins;
   });
@@ -100,7 +105,9 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
 
         <nav style={{ flex: 1, padding: 10, display: 'flex', flexDirection: 'column', gap: 2, overflowY: 'auto' }}>
           {items.map((item) => {
-            const active = location.pathname.startsWith(item.to);
+            const [path, query] = item.to.split('?');
+            const onSettings = new URLSearchParams(location.search).get('tab') === 'settings';
+            const active = location.pathname.startsWith(path) && (query ? onSettings : !(path === '/admin-v2/health' && onSettings));
             const Icon = item.icon;
             const showBadge = item.showBadge && badge > 0;
             const showDot = item.showHealthDot && healthDegraded;
