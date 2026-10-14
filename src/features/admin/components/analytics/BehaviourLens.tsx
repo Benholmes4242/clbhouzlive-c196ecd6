@@ -121,7 +121,7 @@ function AfterRound({ d }: { d: AnalyticsBehaviour }) {
   );
 }
 
-const SHARE_COLOURS = ['#E9EDF3', '#FFA83A', 'rgba(233,237,243,0.6)', 'rgba(255,168,58,0.55)'];
+const SHARE_COLOURS = [t.ink, t.brand, 'rgba(233,237,243,0.6)', 'rgba(255,168,58,0.55)'];
 const ELSE_COLOUR = 'rgba(233,237,243,0.25)';
 
 function TimeShare({ d }: { d: AnalyticsBehaviour }) {

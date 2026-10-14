@@ -1,7 +1,7 @@
 import React, { lazy, Suspense, useState } from 'react';
 import { Routes, Route, Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, RefreshCw } from 'lucide-react';
+import { ChevronLeft, Menu, RefreshCw } from 'lucide-react';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { panelCan } from '@/lib/panelCan';
@@ -9,6 +9,9 @@ import { adminTheme as t } from './theme';
 import AdminDrawer from './AdminDrawer';
 import AdminLoading from './components/AdminLoading';
 import AdminAccessDenied from './components/AdminAccessDenied';
+import { useAnalyticsLive } from './hooks/useAnalyticsLenses';
+import { backFromLive, lensOf, toLive } from './components/analytics/analyticsLens';
+import { londonHM, num } from './components/analytics/analyticsFormat';
 
 
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
@@ -42,6 +45,7 @@ export default function AdminShell() {
   const { role, loading } = usePanelRole();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const location = useLocation();
+  const [params, setParams] = useSearchParams();
 
   // Admin's notch is the header's surface, not the canvas, because the header touches it.
   // Icons stay light.
@@ -61,7 +65,9 @@ export default function AdminShell() {
 
   const can = panelCan(role);
   const segment = location.pathname.split('/')[2] ?? 'dashboard';
-  const title = SECTION_TITLES[segment] ?? 'Admin';
+  const isAnalytics = segment === 'analytics' && can.manageAdmins;
+  const onLive = isAnalytics && lensOf(params) === 'live' && !params.get('tab')?.match(/^(events|auth)$/);
+  const title = onLive ? 'Live' : (SECTION_TITLES[segment] ?? 'Admin');
 
   // The dark app-shell has zero top padding (body.route-clubhouse), including admin.
   // Main pays the fixed header's full height; never pull this shell up by --sat:
@@ -92,8 +98,8 @@ export default function AdminShell() {
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px', width: '100%' }}>
           <button
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Open navigation"
+            onClick={onLive ? () => setParams(backFromLive(params), { replace: true }) : () => setDrawerOpen(true)}
+            aria-label={onLive ? 'Back to analytics' : 'Open navigation'}
             style={{
               width: 40, height: 40, borderRadius: t.radius.md,
               border: `1px solid ${t.line}`, background: t.surface,
@@ -101,16 +107,18 @@ export default function AdminShell() {
               cursor: 'pointer',
             }}
           >
-            <Menu size={18} />
+            {onLive ? <ChevronLeft size={18} /> : <Menu size={18} />}
           </button>
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1, marginLeft: 4 }}>
             <span style={{ color: t.inkFaint, fontSize: 11, fontWeight: 600, textTransform: 'uppercase' }}>
-              Admin
+              {onLive ? 'Analytics' : 'Admin'}
             </span>
             <span style={{ color: t.ink, fontSize: 15, fontWeight: 700 }}>{title}</span>
           </div>
           <div style={{ flex: 1 }} />
-          <RefreshHeaderButton />
+          {isAnalytics
+            ? <AnalyticsHeaderSlot onLive={onLive} params={params} onOpenLive={() => setParams(toLive(params), { replace: true })} />
+            : <RefreshHeaderButton />}
         </div>
       </header>
 
@@ -182,6 +190,35 @@ function RefreshHeaderButton() {
     >
       <RefreshCw size={16} style={{ animation: spinning ? 'admin-spin .6s linear' : undefined }} />
       <style>{`@keyframes admin-spin { to { transform: rotate(360deg); } }`}</style>
+    </button>
+  );
+}
+
+/**
+ * Analytics-only right slot: the green 'N in app' pill, or 'Updated HH:MM' on
+ * Live. Reads ?staff exactly as LiveLens does so both share one query/poll.
+ */
+function AnalyticsHeaderSlot({ onLive, params, onOpenLive }: {
+  onLive: boolean; params: URLSearchParams; onOpenLive: () => void;
+}) {
+  const staff = onLive && params.get('staff') === '1';
+  const q = useAnalyticsLive(staff, onLive);
+  if (onLive) {
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, color: t.inkFaint }}>
+        <span style={{ width: 7, height: 7, borderRadius: 4, background: t.ok }} />
+        Updated {londonHM(q.data?.computed_at ?? null)}
+      </span>
+    );
+  }
+  return (
+    <button type="button" onClick={onOpenLive} style={{
+      display: 'inline-flex', alignItems: 'center', gap: 7, height: 34, padding: '0 12px', borderRadius: 999, border: 0,
+      background: 'rgba(61,220,145,0.12)', color: t.okText, fontSize: 12, fontWeight: 800, cursor: 'pointer',
+      fontFamily: 'inherit', fontVariantNumeric: 'tabular-nums',
+    }}>
+      <span style={{ width: 7, height: 7, borderRadius: 4, background: t.ok }} />
+      {num(q.data?.now ?? null)} in app
     </button>
   );
 }
