@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { adminTheme as t } from '../../theme';
 import { Fig, Head, Muted, Panel, PanelError, PanelSkeleton, ROW_RULE, Slot, KICKER } from '../analytics/analyticsUi';
-import { DAY_NAMES, dateLabel, londonHM, num } from '../analytics/analyticsFormat';
+import { DAY_NAMES, londonHM, num } from '../analytics/analyticsFormat';
 import { useHealthApp, useHealthGolf, useHealthJobs } from '../../hooks/useHealthLenses';
 import { useEchoEngineHealth } from '../../hooks/useEchoEngineHealth';
 import { usePushHealth } from '../../hooks/usePushHealth';
@@ -11,7 +11,7 @@ import { useDeletionIntegrity } from '../../hooks/useDeletionIntegrity';
 import { useSystemStateHistory, type SystemDayState } from '../../hooks/useSystemStateHistory';
 import { areaTone, jobProblems, useHealthVerdict, type Issue, type IssueArea } from './healthIssues';
 import { lensLabel, type HealthLens } from './healthLens';
-import { hoursMins, plural } from './healthText';
+import { hoursMins, londonDayMon } from './healthText';
 import { H } from './healthUi';
 
 const lensHref = (l: HealthLens) => `/admin-v2/health?lens=${l}`;
@@ -232,7 +232,7 @@ function WhatChanged() {
             {!rows.length && <Muted style={{ padding: '10px 16px', borderTop: ROW_RULE }}>Nothing changed in 14 days.</Muted>}
             {rows.map((c, i) => (
               <div key={i} style={{ display: 'grid', gridTemplateColumns: '52px 12px minmax(0, 1fr)', columnGap: 8, alignItems: 'start', padding: '10px 16px', borderTop: ROW_RULE }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: t.inkFaint }}>{dateLabel(c.at)}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: t.inkFaint }}>{londonDayMon(c.at)}</span>
                 <span style={{ marginTop: 4, width: 8, height: 8, borderRadius: 4, background: cellColor(c.tone) }} />
                 <span>
                   <span style={{ display: 'block', fontSize: 13, fontWeight: 700 }}>
@@ -260,4 +260,3 @@ export default function StatusLens() {
   );
 }
 
-export { plural as _plural };

@@ -58,3 +58,17 @@ export function joinAnd(xs: string[]): string {
   if (xs.length <= 1) return xs[0] ?? '';
   return `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`;
 }
+
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const LONDON_DM = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', day: 'numeric', month: 'numeric' });
+
+/** An INSTANT as '{d Mon}' in Europe/London. Calendar dates use dateLabel instead. */
+export function londonDayMon(iso: string | null | undefined): string {
+  if (!iso) return DASH;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return DASH;
+  const parts = LONDON_DM.formatToParts(d);
+  const day = parts.find((p) => p.type === 'day')?.value;
+  const month = Number(parts.find((p) => p.type === 'month')?.value) - 1;
+  return `${day} ${MON[month]}`;
+}
