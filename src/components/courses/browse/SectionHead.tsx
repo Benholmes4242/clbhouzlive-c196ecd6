@@ -22,12 +22,12 @@ export function SectionHead({ kicker, title, subline, tone = 'amber' }: SectionH
       </div>
       <h2
         style={{
-          fontSize: 24,
+          fontSize: 19,
           fontWeight: 700,
-          letterSpacing: '-0.036em',
+          letterSpacing: '-0.02em',
           lineHeight: 1.1,
           color: A.INK,
-          marginTop: 8,
+          marginTop: 5,
           marginBottom: 0,
         }}
       >
