@@ -338,7 +338,7 @@ export function FullscreenFeedOverlay() {
     | null
     | { from: { top: number; left: number; width: number; height: number };
         to:   { top: number; left: number; width: number; height: number };
-        posterUrl: string; borderRadius: string; }
+        posterUrl: string; borderRadius: string; fit: 'cover' | 'contain'; }
   >(null);
   const [reverseCollapsed, setReverseCollapsed] = useState(false);
   const closeWatchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -428,6 +428,7 @@ export function FullscreenFeedOverlay() {
         to:   { top: o!.rect.top, left: o!.rect.left, width: o!.rect.width, height: o!.rect.height },
         posterUrl: o!.posterUrl ?? '',
         borderRadius: o!.borderRadius,
+        fit: resting.fit,
       });
       setReverseCollapsed(false);
       beginCloseAnim('nonborrow');
@@ -713,7 +714,7 @@ export function FullscreenFeedOverlay() {
   // body/statusbar mutations settle, so the clone target matches the video's
   // final on-screen rect exactly. Prevents zoom-out-then-in re-settle.
   const hostRef = useRef<HTMLDivElement>(null);
-  const [targetRect, setTargetRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
+  const [targetRect, setTargetRect] = useState<{ top: number; left: number; width: number; height: number; fit: 'cover' | 'contain' } | null>(null);
 
   useEffect(() => {
     // Borrow opens skip the poster-clone FLIP entirely — BorrowedFullscreenSlot
@@ -770,6 +771,7 @@ export function FullscreenFeedOverlay() {
             left: resting.left,
             width: resting.width,
             height: resting.height,
+            fit: resting.fit,
           });
           setCloneExpanded(true);
         });
@@ -1103,7 +1105,8 @@ export function FullscreenFeedOverlay() {
                       transform: cloneExpanded && targetRect
                         ? `translate(${targetRect.left}px, ${targetRect.top}px)`
                         : `translate(${origin.rect.left}px, ${origin.rect.top}px)`,
-                      objectFit: 'cover',
+                      // Resting fit from resolveRestingRect (tile cover until resolved).
+                      objectFit: targetRect ? targetRect.fit : 'cover',
                       borderRadius: cloneExpanded ? 0 : origin.borderRadius,
                       willChange: 'transform, width, height, opacity, border-radius',
                       transition:
@@ -1166,7 +1169,7 @@ export function FullscreenFeedOverlay() {
                         transform: reverseCollapsed
                           ? `translate(${reverseClone.to.left}px, ${reverseClone.to.top}px)`
                           : `translate(${reverseClone.from.left}px, ${reverseClone.from.top}px)`,
-                        objectFit: 'cover',
+                        objectFit: reverseClone.fit,
                         borderRadius: reverseCollapsed ? reverseClone.borderRadius : 0,
                         willChange: 'transform, width, height, border-radius',
                         transition:
