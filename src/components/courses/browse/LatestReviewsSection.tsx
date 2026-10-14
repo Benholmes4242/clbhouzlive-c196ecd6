@@ -1,6 +1,6 @@
 import { ReviewRailSlot } from '../ReviewRailSlot';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
+
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 
 /** LATEST REVIEWS — the page ends at this rail; no sheet (BRIEF_COURSES_PAGE_DEVICE_REVISION §2). */
