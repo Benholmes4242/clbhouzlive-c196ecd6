@@ -122,6 +122,73 @@ function normaliseRow(raw: Record<string, unknown>): StatBrowseRow {
   };
 }
 
+/** One region of played courses (BRIEF_COURSES_PAGE_REBUILD §4). */
+export interface BrowseRegion {
+  region: string;
+  subCountry: string | null;
+  courses: number;
+  rounds: number;
+  /** Mean of the non-null course avg_to_par values; null when none. */
+  avgToPar: number | null;
+  /** image_url of the region's most-played course. */
+  imageUrl: string | null;
+  /** That course's id and name, for the deterministic image fallback. */
+  imageCourseId: string;
+  imageCourseName: string | null;
+}
+
+/** Group stat_browse_base rows by region, null regions dropped, courses descending. */
+export function groupBrowseRegions(
+  rows: Array<{
+    course_id: string;
+    avg_to_par: number | string | null;
+    region: string | null;
+    sub_country: string | null;
+    rounds: number | string | null;
+    image_url: string | null;
+    name: string | null;
+  }>,
+): BrowseRegion[] {
+  const groups = new Map<string, { out: BrowseRegion; parSum: number; parN: number; topRounds: number }>();
+  for (const row of rows) {
+    if (!row.region) continue;
+    const rounds = Number(row.rounds ?? 0) || 0;
+    let g = groups.get(row.region);
+    if (!g) {
+      g = {
+        out: {
+          region: row.region,
+          subCountry: row.sub_country,
+          courses: 0,
+          rounds: 0,
+          avgToPar: null,
+          imageUrl: row.image_url,
+          imageCourseId: row.course_id,
+          imageCourseName: row.name,
+        },
+        parSum: 0,
+        parN: 0,
+        topRounds: rounds,
+      };
+      groups.set(row.region, g);
+    } else if (rounds > g.topRounds) {
+      g.topRounds = rounds;
+      g.out.imageUrl = row.image_url;
+      g.out.imageCourseId = row.course_id;
+      g.out.imageCourseName = row.name;
+    }
+    g.out.courses += 1;
+    g.out.rounds += rounds;
+    if (row.avg_to_par != null && Number.isFinite(Number(row.avg_to_par))) {
+      g.parSum += Number(row.avg_to_par);
+      g.parN += 1;
+    }
+  }
+  return Array.from(groups.values())
+    .map((g) => ({ ...g.out, avgToPar: g.parN > 0 ? g.parSum / g.parN : null }))
+    .sort((a, b) => b.courses - a.courses);
+}
+
 /**
  * COUNT CONTRACT — these are deliberately different populations.
  * ratedTotal: courses carrying a non-mock aggregate community rating.
@@ -136,7 +203,7 @@ export function useCourseBrowseTruth() {
     queryFn: async () => {
       const [facetsResult, difficultyResult] = await Promise.all([
         supabase.rpc('get_stat_browse_facets' as never),
-        supabase.from('stat_browse_base' as never).select('course_id, avg_to_par').not('avg_to_par', 'is', null).range(0, 9999),
+        supabase.from('stat_browse_base' as never).select('course_id, avg_to_par, region, sub_country, rounds, image_url, name').range(0, 9999),
       ]);
       if (facetsResult.error) throw facetsResult.error;
       if (difficultyResult.error) throw difficultyResult.error;
@@ -144,10 +211,19 @@ export function useCourseBrowseTruth() {
       const facetData = (facetsResult.data ?? {}) as Record<string, unknown>;
       const allPlayedTotal = Number(facetData.all_played_total ?? 0);
       const ratedTotal = Number(facetData.rated_total ?? 0);
-      const difficultyRows = (difficultyResult.data ?? []) as unknown as Array<{
+      const baseRows = (difficultyResult.data ?? []) as unknown as Array<{
         course_id: string;
-        avg_to_par: number | string;
+        avg_to_par: number | string | null;
+        region: string | null;
+        sub_country: string | null;
+        rounds: number | string | null;
+        image_url: string | null;
+        name: string | null;
       }>;
+      // The read used to filter avg_to_par NOT NULL server-side; it now reads every
+      // row for the region grouping, so the percentile map filters nulls itself
+      // (Number(null) is 0, which would silently rank a course as level par).
+      const difficultyRows = baseRows.filter((row) => row.avg_to_par != null);
       const sorted = difficultyRows
         .map((row) => Number(row.avg_to_par))
         .filter(Number.isFinite)
@@ -159,7 +235,8 @@ export function useCourseBrowseTruth() {
         const easier = sorted.filter((candidate) => candidate < value).length;
         difficultyPercentiles.set(row.course_id, Math.round((easier / sorted.length) * 100));
       });
-      return { allPlayedTotal, ratedTotal, difficultyPercentiles };
+      const regions = groupBrowseRegions(baseRows);
+      return { allPlayedTotal, ratedTotal, difficultyPercentiles, regions };
     },
   });
 }
@@ -222,13 +299,15 @@ interface UseStatBrowseListArgs {
   lens: StatLens;
   country: string | null;
   region: string | null;
+  /** Page size. Defaults to STAT_BROWSE_PAGE_SIZE; the Courses page sections pass a fixed small count. */
+  limit?: number;
 }
 
 /**
  * Paged list for the active lens + filters. Pages append; a filter change
  * resets to offset 0.
  */
-export function useStatBrowseList({ lens, country, region }: UseStatBrowseListArgs) {
+export function useStatBrowseList({ lens, country, region, limit = STAT_BROWSE_PAGE_SIZE }: UseStatBrowseListArgs) {
   const [rows, setRows] = useState<StatBrowseRow[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -245,7 +324,7 @@ export function useStatBrowseList({ lens, country, region }: UseStatBrowseListAr
         p_lens: lens,
         p_country: country,
         p_region: region,
-        p_limit: STAT_BROWSE_PAGE_SIZE,
+        p_limit: limit,
         p_offset: offset,
       } as never);
       if (id !== requestId.current) return;
@@ -309,13 +388,13 @@ export function useStatBrowseList({ lens, country, region }: UseStatBrowseListAr
       setIsLoading(false);
       setIsPaging(false);
     },
-    [lens, country, region, totalCount],
+    [lens, country, region, limit, totalCount],
   );
 
   useEffect(() => {
     void fetchPage(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lens, country, region]);
+  }, [lens, country, region, limit]);
 
   const loadMore = useCallback(() => {
     if (isPaging || rows.length >= totalCount) return;

@@ -26,7 +26,7 @@ import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useRoundHoleShapes } from './hooks/useRoundHoleShapes';
 import { RoundShape } from './RoundShape';
-import { GLASS_CHIP_CSS } from '@/components/courses/browse/glassChip';
+import { GLASS_CHIP_CSS } from '@/styles/glassChip';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { countNewSince, useReportNewCount } from './newSince';

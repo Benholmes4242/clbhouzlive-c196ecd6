@@ -1,4 +1,11 @@
 /**
+ * DEAD — NO CALLERS. The in-list review interleave was removed by
+ * BRIEF_COURSES_PAGE_REBUILD §2: reviews now live in section 07 of the Courses
+ * page (CoursesBrowsePage), and allocateReviewSlots, FIRST_SLOT_AFTER and
+ * SLOT_STRIDE have no caller. Kept on disk against that decision being
+ * reversed — putting the interleave back is one call in StatBrowse.
+ */
+/**
  * REVIEW SLOTS on the Courses browse (BRIEF_REVIEWS_TO_COURSES_AND_TOUR_REMOVAL).
  *
  * A review is DECISION content: it earns its place where someone is choosing
