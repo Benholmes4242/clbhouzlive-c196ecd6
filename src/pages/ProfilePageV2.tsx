@@ -3,7 +3,7 @@
  * Exact match to design mock
  */
 
-import { BUSINESS_COVER_ASPECT } from '@/lib/tokens/coverAspect';
+import { AVATAR_CROP_ASPECT } from '@/lib/tokens/coverAspect';
 import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -1415,7 +1415,7 @@ const ProfilePageV2Content: React.FC = () => {
           open={isCropModalOpen}
           onOpenChange={handleCropCancel}
           imageSrc={cropImageSrc}
-          aspectRatio={BUSINESS_COVER_ASPECT}
+          aspectRatio={AVATAR_CROP_ASPECT}
           onCropComplete={handleCropComplete}
           title="Crop Profile Photo"
         />
