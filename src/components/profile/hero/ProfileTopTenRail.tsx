@@ -160,25 +160,44 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   });
 
   const showSuggestions = isOwnProfile && !isLoading && topTen.length < 3;
+  /*
+   * Zero-state suggestions: the courses at the top of the viewer's most relevant
+   * Top 100 list (gb-i preferred, global fallback), from the membership authority,
+   * skipping anything already in the ten or excluded.
+   */
   const { data: suggestions = [] } = useQuery({
     queryKey: ['top-ten-suggestions', userId, courseIds],
     enabled: showSuggestions && !!userId,
     queryFn: async () => {
-      const [{ data: courses, error }, { data: excl }] = await Promise.all([
+      const { data: lists, error: listErr } = await supabase
+        .from('top100_lists')
+        .select('id, slug')
+        .in('slug', ['gb-i', 'global'])
+        .eq('is_active', true);
+      if (listErr) throw listErr;
+      const list = (lists || []).find((l) => l.slug === 'gb-i') ?? (lists || []).find((l) => l.slug === 'global');
+      if (!list) return [] as SuggestCourse[];
+      const [{ data: rows, error }, { data: excl }] = await Promise.all([
         supabase
-          .from('golf_courses')
-          .select('id, name, country, sub_country, region, global_rank, regional_rank, thumbnail_image')
-          .not('global_rank', 'is', null)
-          .order('global_rank', { ascending: true })
+          .from('course_top100_memberships')
+          .select('rank, golf_courses!inner(id, name, country, sub_country, region, thumbnail_image)')
+          .eq('list_id', list.id)
+          .order('rank', { ascending: true })
           .limit(20),
         supabase.from('user_top10_exclusions').select('course_id').eq('user_id', userId),
       ]);
       if (error) throw error;
       const skip = new Set([...courseIds, ...(excl || []).map((e) => e.course_id)]);
-      return ((courses || []) as SuggestCourse[]).filter((c) => !skip.has(c.id)).slice(0, 3);
+      return ((rows || []) as any[])
+        .map((r) => r.golf_courses as SuggestCourse)
+        .filter((c) => c && !skip.has(c.id))
+        .slice(0, 3);
     },
     staleTime: 5 * 60_000,
   });
+
+  const { data: rankMap } = useCourseListRanks([...courseIds, ...suggestions.map((s) => s.id)]);
+  const rankOf = (id: string): ListRank => rankMap?.get(id) ?? null;
 
   // Community rating per course: course_rating_stats, one read for all ids.
   const { data: communityMap = {} } = useQuery({
