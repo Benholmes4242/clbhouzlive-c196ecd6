@@ -18,7 +18,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import html2canvas from 'html2canvas';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserTopTenCourses, type TopTenCourse } from '@/hooks/useUserTopTenCourses';
@@ -32,8 +32,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTopTenVisibility } from '@/components/profile/hooks/useTopTenVisibility';
 import { toast } from '@/lib/toast';
-import { numberWord, ordinal } from '@/lib/text/numbers';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { MessageCircle } from 'lucide-react';
 import { useCourseListRanks, formatListRank, type ListRank } from '@/lib/courses/listRank';
 
 const GLASS = 'rgba(10,14,10,0.55)';
@@ -56,8 +55,6 @@ const CAPTURE_OPTS = { backgroundColor: '#000', scale: 2, logging: false, useCOR
  */
 const scoreTone = (score: number) => (score >= 9 ? A.GREEN : A.INK);
 
-const word = (n: number) => numberWord(n, false);
-const Word = (n: number) => numberWord(n);
 
 const regionOf = (c: { sub_country?: string | null; region?: string | null; country?: string | null }) =>
   c.sub_country || c.region || c.country || null;
@@ -92,11 +89,10 @@ interface Props {
   topTenVisibility?: string | null;
   /** Owner-only share card identity, from figures the profile page already holds. */
   shareIdentity?: TopTenShareIdentity;
+  /** Profile owner's first name (falling back to display name) for the visitor sentence. */
+  ownerName?: string | null;
 }
 
-const B = (props: React.HTMLAttributes<HTMLElement>) => (
-  <b {...props} style={{ color: A.INK, fontWeight: 700 }} />
-);
 
 export const ProfileTopTenRail: React.FC<Props> = ({
   userId,
@@ -107,6 +103,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   initialCommentId = null,
   topTenVisibility,
   shareIdentity,
+  ownerName,
 }) => {
   const { t } = useTranslation('profile');
   const navigate = useNavigate();
@@ -122,8 +119,6 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   const { canView, visibility, isLoading: visibilityLoading } =
     useTopTenVisibility(userId, viewerId, topTenVisibility);
 
-  // The viewer's own list, only on someone else's profile (overlap clause).
-  const { topTen: viewerTopTen } = useUserTopTenCourses(!isOwnProfile ? viewerId : undefined);
 
   const topTen = React.useMemo(
     () => [...rawTopTen].sort((a, b) => a.position - b.position),
@@ -300,7 +295,6 @@ export const ProfileTopTenRail: React.FC<Props> = ({
       )}
     </div>
   );
-  const verdict = null;
 
   const pill = (c: TopTenCourse) => {
     const r = ratingOf(c);
@@ -569,7 +563,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   return (
     <section style={{ marginTop: 16, marginBottom: 8, padding: '0 16px 4px', fontFamily: SANS }}>
       {header}
-      {n >= 3 ? <>{verdict}{renderList()}{shareRow}</> : isOwnProfile ? renderInvitation() : null}
+      {n >= 3 ? <>{renderList()}{shareRow}</> : isOwnProfile ? renderInvitation() : null}
 
       {commentsCourseId && (
         <CommentsSheetV2
