@@ -54,6 +54,8 @@ interface AddCourseModalProps {
   existingCourseIds: string[];
   /** Optional course ID to highlight at the top of the Add tab */
   preSelectedCourseId?: string;
+  /** Landing tab; preSelectedCourseId still forces 'add'. */
+  initialTab?: 'manage' | 'add';
 }
 
 interface CourseWithRating {
@@ -436,9 +438,10 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({
   onClose,
   existingCourseIds,
   preSelectedCourseId,
+  initialTab,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'manage' | 'add'>(preSelectedCourseId ? 'add' : 'manage');
+  const [activeTab, setActiveTab] = useState<'manage' | 'add'>(preSelectedCourseId ? 'add' : (initialTab ?? 'manage'));
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [sortTileDismissed, setSortTileDismissed] = useState(false);

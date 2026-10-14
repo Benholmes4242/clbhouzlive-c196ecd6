@@ -3,7 +3,7 @@
  *
  * A member's top ten drawn as a RANKING, not a shelf: a verdict line, number
  * one as a 186px photograph, two and three side by side at 104px, a reaction
- * strip for the list as a whole (scoped to the position-1 course, because
+ * strip beneath the number-one card (scoped to the position-1 course, because
  * useTopTenReactions is keyed by course), then positions four to ten as rows
  * carrying our clbhouz rank beside the member's own score.
  *
@@ -27,7 +27,6 @@ import { CourseImageFallback } from '@/components/explore-tab-new/courseled/Cour
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { useBlockedUserIds } from '@/hooks/useBlockedUserIds';
 import { commentsKeys, viewerId as commentsViewerKey } from '@/lib/queryKeys';
-import CoursePickerModal from '@/components/profile/CoursePickerModal';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -80,6 +79,8 @@ interface Props {
   userId: string;
   isOwnProfile: boolean;
   onManage?: () => void;
+  /** Every add affordance opens the same sheet Manage opens, on its Add tab. */
+  onAddCourse?: () => void;
   initialCourseId?: string | null;
   initialCommentId?: string | null;
   initialParentCommentId?: string | null;
@@ -98,6 +99,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   userId,
   isOwnProfile,
   onManage,
+  onAddCourse,
   initialCourseId = null,
   initialCommentId = null,
   topTenVisibility,
@@ -106,10 +108,9 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   const { t } = useTranslation('profile');
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { topTen: rawTopTen, isLoading, addCourse } = useUserTopTenCourses(userId);
+  const { topTen: rawTopTen, isLoading } = useUserTopTenCourses(userId);
   const [commentsOpen, setCommentsOpen] = React.useState(false);
   const [commentsCourseId, setCommentsCourseId] = React.useState<string | null>(initialCourseId);
-  const [pickerOpen, setPickerOpen] = React.useState(false);
   const [sharing, setSharing] = React.useState(false);
   const shareRef = React.useRef<HTMLDivElement>(null);
 
@@ -174,6 +175,24 @@ export const ProfileTopTenRail: React.FC<Props> = ({
       return ((courses || []) as SuggestCourse[]).filter((c) => !skip.has(c.id)).slice(0, 3);
     },
     staleTime: 5 * 60_000,
+  });
+
+  // Community rating per course: course_rating_stats, one read for all ids.
+  const { data: communityMap = {} } = useQuery({
+    queryKey: ['top-ten-community-ratings', courseIds],
+    enabled: courseIds.length > 0,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('course_rating_stats')
+        .select('course_id, average_rating')
+        .in('course_id', courseIds);
+      if (error) throw error;
+      return (data || []).reduce<Record<string, number>>((acc, r: any) => {
+        if (r.course_id && r.average_rating != null) acc[r.course_id] = Number(r.average_rating);
+        return acc;
+      }, {});
+    },
   });
 
   const firstCourseId = topTen[0]?.course_id ?? '';
@@ -325,22 +344,9 @@ export const ProfileTopTenRail: React.FC<Props> = ({
           </CourseImageFallback>
         </button>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9, marginTop: 9 }}>
-          {[two, three].map((c) => (
-            <button key={c.id} type="button" data-top-ten-course-id={c.course_id} onClick={() => open(c)} style={btnReset}>
-              <CourseImageFallback courseId={c.course_id} courseName={c.name} imageUrl={c.thumbnail_image} style={{ height: 104, borderRadius: 14 }}>
-                <div style={{ position: 'absolute', inset: 0, background: SCRIM }} />
-                <span style={{ position: 'absolute', top: 8, left: 8, background: GLASS, borderRadius: 999, padding: '3px 9px', fontSize: 11, fontWeight: 700, color: PHOTO_INK, ...FIGS }}>{c.position}</span>
-                {pill(c)}
-              </CourseImageFallback>
-              <div style={{ marginTop: 7, fontSize: 12, fontWeight: 700, color: A.INK, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{c.name}</div>
-              {regionLine(c) && <div style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c)}</div>}
-            </button>
-          ))}
-        </div>
-
-        {/* Reaction strip — one for the list, scoped to the position-1 course. */}
-        <div style={{ marginTop: 12, paddingTop: 11, borderTop: `1px solid ${A.SOFT}`, display: 'flex', alignItems: 'center', gap: 7 }}>
+        {/* Reaction strip — belongs to the number-one pick, sits directly under it. */}
+        <div style={{ marginTop: 9, padding: '9px 11px', background: 'rgba(255,255,255,0.045)', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 7 }}>
+          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{t('topTen.onThisPick', 'On this pick')}</span>
           {(Object.keys(REACTION_CONFIG) as ReactionType[]).map((k) => {
             const pressed = myReaction === k;
             const pressable = !isOwnProfile && !!viewerId;
@@ -368,10 +374,25 @@ export const ProfileTopTenRail: React.FC<Props> = ({
           </button>
         </div>
 
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9, marginTop: 9 }}>
+          {[two, three].map((c) => (
+            <button key={c.id} type="button" data-top-ten-course-id={c.course_id} onClick={() => open(c)} style={btnReset}>
+              <CourseImageFallback courseId={c.course_id} courseName={c.name} imageUrl={c.thumbnail_image} style={{ height: 104, borderRadius: 14 }}>
+                <div style={{ position: 'absolute', inset: 0, background: SCRIM }} />
+                <span style={{ position: 'absolute', top: 8, left: 8, background: GLASS, borderRadius: 999, padding: '3px 9px', fontSize: 11, fontWeight: 700, color: PHOTO_INK, ...FIGS }}>{c.position}</span>
+                {pill(c)}
+              </CourseImageFallback>
+              <div style={{ marginTop: 7, fontSize: 12, fontWeight: 700, color: A.INK, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{c.name}</div>
+              {regionLine(c) && <div style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c)}</div>}
+            </button>
+          ))}
+        </div>
+
         {(rest.length > 0 || missing.length > 0) && (
           <div style={{ marginTop: 16 }}>
             {rest.map((c, i) => {
               const r = ratingOf(c);
+              const g = communityMap[c.course_id] ?? null;
               return (
                 <button key={c.id} type="button" data-top-ten-course-id={c.course_id} onClick={() => open(c)}
                   style={{ ...btnReset, display: 'flex', alignItems: 'center', gap: 11, padding: '8px 0', borderTop: i > 0 ? `1px solid ${A.SOFT}` : 'none' }}>
@@ -379,11 +400,11 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                   <CourseImageFallback courseId={c.course_id} courseName={c.name} imageUrl={c.thumbnail_image} style={{ width: 44, height: 34, borderRadius: 8, flexShrink: 0 }} />
                   <span style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
-                    {regionOf(c) && <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{regionOf(c)}</span>}
+                    {regionLine(c) && <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c)}</span>}
                   </span>
-                  <span style={{ minWidth: 38, textAlign: 'center', border: `1px solid ${A.HAIRLINE}`, borderRadius: 7, padding: '4px 0', flexShrink: 0 }}>
-                    <span style={{ display: 'block', fontSize: 11, fontWeight: 700, color: c.global_rank ? A.MUTE : A.DIM, ...FIGS }}>{c.global_rank ? `#${c.global_rank}` : '–'}</span>
-                    <span style={{ display: 'block', fontSize: 7.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.DIM }}>{t('topTen.ours', 'Ours')}</span>
+                  <span style={{ minWidth: 40, textAlign: 'right', flexShrink: 0 }}>
+                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: g != null ? A.MUTE : A.DIM, ...FIGS }}>{g != null ? g.toFixed(1) : '–'}</span>
+                    <span style={{ display: 'block', fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{t('topTen.golfers', 'Golfers')}</span>
                   </span>
                   <span style={{ minWidth: 34, textAlign: 'right', flexShrink: 0 }}>
                     <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: r != null ? scoreTone(r) : A.DIM, ...FIGS }}>{r != null ? r.toFixed(1) : '–'}</span>
@@ -431,7 +452,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
             );
           })}
         </div>
-        <button type="button" onClick={() => setPickerOpen(true)}
+        <button type="button" onClick={() => onAddCourse?.()}
           style={{ marginTop: 16, width: '100%', borderRadius: 14, padding: '13px 0', background: A.INK, color: A.CANVAS, border: 'none', fontFamily: SANS, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
           {n === 0 ? t('topTen.empty.cta', 'Start with your number one') : t('topTen.progress.cta', { next, defaultValue: 'Add your number {{next}}' })}
         </button>
@@ -443,10 +464,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
             <div style={{ marginTop: 9, display: 'flex', flexDirection: 'column', gap: 7 }}>
               {suggestions.map((s) => (
                 <button key={s.id} type="button"
-                  onClick={() => {
-                    addCourse(s.id);
-                    analyticsEvents.track('profile_top10_suggestion_added', { course_id: s.id, global_rank: s.global_rank });
-                  }}
+                  onClick={() => onAddCourse?.()}
                   style={{ ...btnReset, display: 'flex', alignItems: 'center', gap: 10, border: `1px solid ${A.HAIRLINE}`, borderRadius: 12, padding: '9px 11px' }}>
                   <CourseImageFallback courseId={s.id} courseName={s.name} imageUrl={s.thumbnail_image ?? null} style={{ width: 34, height: 26, borderRadius: 6, flexShrink: 0 }} />
                   <span style={{ flex: 1, minWidth: 0 }}>
@@ -457,7 +475,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                 </button>
               ))}
             </div>
-            <button type="button" onClick={() => setPickerOpen(true)}
+            <button type="button" onClick={() => onAddCourse?.()}
               style={{ marginTop: 11, background: 'transparent', border: 'none', padding: 0, fontFamily: SANS, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: A.MUTE, cursor: 'pointer' }}>
               {t('topTen.empty.searchAll', 'Search all courses')} ›
             </button>
@@ -567,18 +585,6 @@ export const ProfileTopTenRail: React.FC<Props> = ({
           targetId={userId}
           targetSecondaryId={commentsCourseId}
           initialCommentId={commentsCourseId === initialCourseId ? initialCommentId : null}
-        />
-      )}
-      {isOwnProfile && pickerOpen && (
-        <CoursePickerModal
-          isOpen={pickerOpen}
-          onClose={() => setPickerOpen(false)}
-          userId={userId}
-          region="global"
-          onCoursesAdded={() => {
-            qc.invalidateQueries({ queryKey: ['user-top-ten-courses', userId] });
-            setPickerOpen(false);
-          }}
         />
       )}
     </section>

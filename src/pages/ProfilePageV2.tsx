@@ -1337,7 +1337,8 @@ const ProfilePageV2Content: React.FC = () => {
             <ProfileTopTenRail
               userId={profile.id}
               isOwnProfile={isSelf}
-              onManage={isSelf ? () => setShowTopTenModal(true) : undefined}
+              onManage={isSelf ? () => { setTopTenTab('manage'); setShowTopTenModal(true); } : undefined}
+              onAddCourse={isSelf ? () => { setTopTenTab('add'); setShowTopTenModal(true); } : undefined}
               initialCourseId={deepLinkTopTen.current?.courseId ?? null}
               initialCommentId={deepLinkTopTen.current?.commentId ?? null}
               initialParentCommentId={deepLinkTopTen.current?.parentId ?? null}
@@ -1355,6 +1356,7 @@ const ProfilePageV2Content: React.FC = () => {
                 userId={profile.id}
                 onClose={() => setShowTopTenModal(false)}
                 existingCourseIds={[]}
+                initialTab={topTenTab}
               />
             )}
           </div>
