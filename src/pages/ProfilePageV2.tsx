@@ -1183,11 +1183,12 @@ const ProfilePageV2Content: React.FC = () => {
           />
         ) : (
         <>
-        {/* Bio + website chip — on canvas, no card (§3) */}
+        {/* Extra websites + own 'Add a bio' — bio and first website live in ProfileHero */}
         {(() => {
-          const websiteChips = websites.length > 0 && (
+          const restWebsites = websites.slice(1);
+          const websiteChips = restWebsites.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-3">
-              {websites.map((website, index) => (
+              {restWebsites.map((website, index) => (
                 <a
                   key={index}
                   href={ensureProtocol(website)}
@@ -1212,42 +1213,9 @@ const ProfilePageV2Content: React.FC = () => {
             </div>
           );
 
+          // The bio and the first website now live in ProfileHero (§B).
           if (profile?.bio) {
-            return (
-              <section className="px-4 mb-4">
-                <div
-                  ref={bioRef}
-                  className={cn('whitespace-pre-wrap', !bioExpanded && 'line-clamp-6')}
-                  style={{
-                    fontFamily: SANS,
-                    fontSize: 13.5,
-                    lineHeight: 1.55,
-                    color: A.BODY,
-                    overflowWrap: 'anywhere',
-                  }}
-                >
-                  {profile.bio}
-                </div>
-                {(bioOverflows || bioExpanded) && (
-                  <button
-                    onClick={() => setBioExpanded(v => !v)}
-                    className="mt-1 min-h-[44px] flex items-center gap-1 active:scale-[0.97] transition-transform"
-                    style={{
-                      fontFamily: SANS,
-                      fontSize: 11,
-                      fontWeight: 700,
-                      letterSpacing: '0.10em',
-                      textTransform: 'uppercase',
-                      color: A.INK,
-                    }}
-                  >
-                    {bioExpanded ? t('bio.readLess', 'Read less') : t('bio.readMore', 'Read more')}
-                    <ChevronDown className={cn('w-3.5 h-3.5', bioExpanded && 'rotate-180')} />
-                  </button>
-                )}
-                {websiteChips}
-              </section>
-            );
+            return restWebsites.length > 0 ? <section className="px-4 mb-4">{websiteChips}</section> : null;
           }
 
           if (isSelf) {
@@ -1272,7 +1240,7 @@ const ProfilePageV2Content: React.FC = () => {
             );
           }
 
-          if (websites.length > 0) {
+          if (restWebsites.length > 0) {
             return <section className="px-4 mb-4">{websiteChips}</section>;
           }
           return null;
