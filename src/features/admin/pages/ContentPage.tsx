@@ -130,7 +130,8 @@ function CoursesTab() {
   const debounced = useDebouncedValue(searchInput, 250);
 
   useEffect(() => { c.setSearch(debounced); /* eslint-disable-next-line */ }, [debounced]);
-  useEffect(() => { c.setFilter(initialFilter); /* eslint-disable-next-line */ }, []);
+  // Stage 3: the directory search is A to Z only; no filter is visible, so none applies.
+  useEffect(() => { c.setFilter('all'); /* eslint-disable-next-line */ }, []);
 
   // Reflect state back into URL.
   useEffect(() => {
