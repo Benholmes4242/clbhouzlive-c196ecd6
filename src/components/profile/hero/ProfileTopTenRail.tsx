@@ -33,6 +33,9 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTopTenVisibility } from '@/components/profile/hooks/useTopTenVisibility';
 import { toast } from '@/lib/toast';
 import { MessageCircle } from 'lucide-react';
+import { numberWord } from '@/lib/text/numbers';
+// Used by the owner progress invitation (unchanged), not by any header copy.
+const Word = (n: number) => numberWord(n);
 import { useCourseListRanks, formatListRank, type ListRank } from '@/lib/courses/listRank';
 
 const GLASS = 'rgba(10,14,10,0.55)';
