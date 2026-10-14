@@ -33,6 +33,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTopTenVisibility } from '@/components/profile/hooks/useTopTenVisibility';
 import { toast } from '@/lib/toast';
 import { numberWord, ordinal } from '@/lib/text/numbers';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { useCourseListRanks, formatListRank, type ListRank } from '@/lib/courses/listRank';
 
 const GLASS = 'rgba(10,14,10,0.55)';
 const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.78), rgba(10,14,10,0) 58%)';
@@ -59,12 +61,13 @@ const Word = (n: number) => numberWord(n);
 
 const regionOf = (c: { sub_country?: string | null; region?: string | null; country?: string | null }) =>
   c.sub_country || c.region || c.country || null;
-const regionLine = (c: TopTenCourse | SuggestCourse) =>
-  [regionOf(c), c.global_rank ? `clbhouz #${c.global_rank}` : null].filter(Boolean).join(' · ');
+/** Region plus the course's resolved Top 100 placement (useCourseListRanks). Never the legacy rank columns. */
+const regionLine = (c: { sub_country?: string | null; region?: string | null; country?: string | null }, rank: ListRank | undefined) =>
+  [regionOf(c), formatListRank(rank ?? null)].filter(Boolean).join(' · ');
 
 type SuggestCourse = {
   id: string; name: string; country: string | null; sub_country: string | null;
-  region: string | null; global_rank: number | null; thumbnail_image?: string | null;
+  region: string | null; thumbnail_image?: string | null;
 };
 
 export interface TopTenShareIdentity {
