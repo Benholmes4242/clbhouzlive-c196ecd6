@@ -18990,9 +18990,14 @@ export type Database = {
         }[]
       }
       admin_route_for_path: { Args: { p_path: string }; Returns: string }
+      admin_run_cron_job: { Args: { p_jobid: number }; Returns: Json }
       admin_set_course_club: {
         Args: { p_club_id: string; p_course_id: string }
         Returns: undefined
+      }
+      admin_set_cron_job_active: {
+        Args: { p_active: boolean; p_jobid: number }
+        Returns: Json
       }
       admin_set_test_user_photo: {
         Args: { p_photo_url: string }
@@ -19786,6 +19791,18 @@ export type Database = {
       }
       get_admin_feeds_health: { Args: never; Returns: Json }
       get_admin_funnel_cohorts: { Args: { p_weeks?: number }; Returns: Json }
+      get_admin_health_app: { Args: { p_build_id?: string }; Returns: Json }
+      get_admin_health_golf: { Args: never; Returns: Json }
+      get_admin_health_jobs: { Args: never; Returns: Json }
+      get_admin_health_log: {
+        Args: {
+          p_before?: string
+          p_before_id?: string
+          p_kind?: string
+          p_limit?: number
+        }
+        Returns: Json
+      }
       get_admin_help_insight: { Args: { p_days?: number }; Returns: Json }
       get_admin_inbox_flow: { Args: { p_days?: number }; Returns: Json }
       get_admin_intraday: { Args: { p_tz?: string }; Returns: Json }
