@@ -33,6 +33,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTopTenVisibility } from '@/components/profile/hooks/useTopTenVisibility';
 import { toast } from '@/lib/toast';
 import { numberWord, ordinal } from '@/lib/text/numbers';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { useCourseListRanks, formatListRank, type ListRank } from '@/lib/courses/listRank';
 
 const GLASS = 'rgba(10,14,10,0.55)';
 const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.78), rgba(10,14,10,0) 58%)';
@@ -59,12 +61,13 @@ const Word = (n: number) => numberWord(n);
 
 const regionOf = (c: { sub_country?: string | null; region?: string | null; country?: string | null }) =>
   c.sub_country || c.region || c.country || null;
-const regionLine = (c: TopTenCourse | SuggestCourse) =>
-  [regionOf(c), c.global_rank ? `clbhouz #${c.global_rank}` : null].filter(Boolean).join(' · ');
+/** Region plus the course's resolved Top 100 placement (useCourseListRanks). Never the legacy rank columns. */
+const regionLine = (c: { sub_country?: string | null; region?: string | null; country?: string | null }, rank: ListRank | undefined) =>
+  [regionOf(c), formatListRank(rank ?? null)].filter(Boolean).join(' · ');
 
 type SuggestCourse = {
   id: string; name: string; country: string | null; sub_country: string | null;
-  region: string | null; global_rank: number | null; thumbnail_image?: string | null;
+  region: string | null; thumbnail_image?: string | null;
 };
 
 export interface TopTenShareIdentity {
@@ -157,25 +160,44 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   });
 
   const showSuggestions = isOwnProfile && !isLoading && topTen.length < 3;
+  /*
+   * Zero-state suggestions: the courses at the top of the viewer's most relevant
+   * Top 100 list (gb-i preferred, global fallback), from the membership authority,
+   * skipping anything already in the ten or excluded.
+   */
   const { data: suggestions = [] } = useQuery({
     queryKey: ['top-ten-suggestions', userId, courseIds],
     enabled: showSuggestions && !!userId,
     queryFn: async () => {
-      const [{ data: courses, error }, { data: excl }] = await Promise.all([
+      const { data: lists, error: listErr } = await supabase
+        .from('top100_lists')
+        .select('id, slug')
+        .in('slug', ['gb-i', 'global'])
+        .eq('is_active', true);
+      if (listErr) throw listErr;
+      const list = (lists || []).find((l) => l.slug === 'gb-i') ?? (lists || []).find((l) => l.slug === 'global');
+      if (!list) return [] as SuggestCourse[];
+      const [{ data: rows, error }, { data: excl }] = await Promise.all([
         supabase
-          .from('golf_courses')
-          .select('id, name, country, sub_country, region, global_rank, regional_rank, thumbnail_image')
-          .not('global_rank', 'is', null)
-          .order('global_rank', { ascending: true })
+          .from('course_top100_memberships')
+          .select('rank, golf_courses!inner(id, name, country, sub_country, region, thumbnail_image)')
+          .eq('list_id', list.id)
+          .order('rank', { ascending: true })
           .limit(20),
         supabase.from('user_top10_exclusions').select('course_id').eq('user_id', userId),
       ]);
       if (error) throw error;
       const skip = new Set([...courseIds, ...(excl || []).map((e) => e.course_id)]);
-      return ((courses || []) as SuggestCourse[]).filter((c) => !skip.has(c.id)).slice(0, 3);
+      return ((rows || []) as any[])
+        .map((r) => r.golf_courses as SuggestCourse)
+        .filter((c) => c && !skip.has(c.id))
+        .slice(0, 3);
     },
     staleTime: 5 * 60_000,
   });
+
+  const { data: rankMap } = useCourseListRanks([...courseIds, ...suggestions.map((s) => s.id)]);
+  const rankOf = (id: string): ListRank => rankMap?.get(id) ?? null;
 
   // Community rating per course: course_rating_stats, one read for all ids.
   const { data: communityMap = {} } = useQuery({
@@ -256,16 +278,15 @@ export const ProfileTopTenRail: React.FC<Props> = ({
       ? visibility === 'private' ? 'Only me' : visibility === 'friends' ? 'Friends only' : 'Followers & friends'
       : null;
 
+  // Header: the shared SectionHeader exactly as ClubsCard uses it; Manage and the
+  // audience marker sit beside it without modifying SectionHeader.
   const header = (
-    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, fontFamily: SANS }}>
+    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, fontFamily: SANS }}>
       <div style={{ minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.INK }}>
-          <span>{isOwnProfile ? t('topTen.kicker', 'Your top 10') : t('topTen.kickerOther', 'Their top 10')}</span>
-          {audienceMarker && <span style={{ color: A.MUTE, letterSpacing: '0.16em' }}>{audienceMarker}</span>}
-        </div>
-        <div style={{ marginTop: 3, fontSize: 11.5, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
-          {isOwnProfile ? t('topTen.subtitle', "The very best you've played") : t('topTen.subtitleOther', 'The very best they have played')}
-        </div>
+        <SectionHeader role="section" kicker="COURSES" title={isOwnProfile ? t('topTen.kicker', 'Your top 10') : t('topTen.kickerOther', 'Their top 10')} />
+        {audienceMarker && (
+          <div style={{ marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.MUTE }}>{audienceMarker}</div>
+        )}
       </div>
       {isOwnProfile && onManage && n > 0 && (
         <button type="button" onClick={onManage} style={{ background: 'transparent', border: 'none', padding: 0, flexShrink: 0, fontFamily: SANS, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK, cursor: 'pointer' }}>
@@ -276,7 +297,8 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   );
 
   // ── Verdict ───────────────────────────────────────────────────────────
-  const ranked = topTen.filter((c) => c.global_rank != null).length;
+  // List membership only, read from the resolved list rank — never global_rank.
+  const ranked = topTen.filter((c) => rankOf(c.course_id) != null).length;
   const clauses: React.ReactNode[] = [];
   const tr = (key: string, values: Record<string, unknown>) => (
     <Trans key={key} t={t} i18nKey={key} values={values} count={values.count as number} components={{ b: <B /> }} />
@@ -286,14 +308,17 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   } else if (isOwnProfile && n === 10) {
     if (ranked > 0) clauses.push(tr('topTen.verdict.ranked', { count: ranked, word: Word(ranked), total: word(n) }));
     const top = topTen[0];
-    if (top && top.position === 1 && top.global_rank === 1) clauses.push(tr('topTen.verdict.topsBoth', { name: top.name }));
+    if (top && top.position === 1 && rankOf(top.course_id)?.rank === 1) clauses.push(tr('topTen.verdict.topsBoth', { name: top.name }));
     let bold: TopTenCourse | null = null;
+    let boldGap = 0;
     for (const c of topTen) {
-      if (c.global_rank == null) continue;
-      const gap = c.global_rank - c.position;
-      if (gap > 0 && (!bold || gap > bold.global_rank! - bold.position)) bold = c;
+      const r = rankOf(c.course_id);
+      if (!r) continue;
+      const gap = r.rank - c.position;
+      if (gap > 0 && (!bold || gap > boldGap)) { bold = c; boldGap = gap; }
     }
-    if (bold) clauses.push(tr('topTen.verdict.boldest', { name: bold.name, position: bold.position, rank: ordinal(bold.global_rank!) }));
+    const br = bold ? rankOf(bold.course_id) : null;
+    if (bold && br) clauses.push(tr('topTen.verdict.boldest', { name: bold.name, position: bold.position, rank: ordinal(br.rank), list: br.label.toLowerCase() }));
   } else if (!isOwnProfile) {
     const mine = new Set(viewerTopTen.map((c) => c.course_id));
     const overlap = viewerId ? topTen.filter((c) => mine.has(c.course_id)).length : 0;
@@ -339,14 +364,14 @@ export const ProfileTopTenRail: React.FC<Props> = ({
             {pill(one)}
             <div style={{ position: 'absolute', left: 12, right: 104, bottom: 10 }}>
               <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: PHOTO_INK, lineHeight: 1.2 }}>{one.name}</div>
-              {regionLine(one) && <div style={{ marginTop: 3, fontSize: 11, fontWeight: 600, color: CAPTION_SUB, ...FIGS }}>{regionLine(one)}</div>}
+              {regionLine(one, rankOf(one.course_id)) && <div style={{ marginTop: 3, fontSize: 11, fontWeight: 600, color: CAPTION_SUB, ...FIGS }}>{regionLine(one, rankOf(one.course_id))}</div>}
             </div>
           </CourseImageFallback>
         </button>
 
         {/* Reaction strip — belongs to the number-one pick, sits directly under it. */}
         <div style={{ marginTop: 9, padding: '9px 11px', background: 'rgba(255,255,255,0.045)', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 7 }}>
-          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{t('topTen.onThisPick', 'On this pick')}</span>
+          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{isOwnProfile ? t('topTen.onYourNumberOne', 'On your number 1') : t('topTen.onTheirNumberOne', 'On their number 1')}</span>
           {(Object.keys(REACTION_CONFIG) as ReactionType[]).map((k) => {
             const pressed = myReaction === k;
             const pressable = !isOwnProfile && !!viewerId;
@@ -383,7 +408,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                 {pill(c)}
               </CourseImageFallback>
               <div style={{ marginTop: 7, fontSize: 12, fontWeight: 700, color: A.INK, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{c.name}</div>
-              {regionLine(c) && <div style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c)}</div>}
+              {regionLine(c, rankOf(c.course_id)) && <div style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c, rankOf(c.course_id))}</div>}
             </button>
           ))}
         </div>
@@ -400,15 +425,15 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                   <CourseImageFallback courseId={c.course_id} courseName={c.name} imageUrl={c.thumbnail_image} style={{ width: 44, height: 34, borderRadius: 8, flexShrink: 0 }} />
                   <span style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
-                    {regionLine(c) && <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c)}</span>}
+                    {regionLine(c, rankOf(c.course_id)) && <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c, rankOf(c.course_id))}</span>}
                   </span>
-                  <span style={{ minWidth: 40, textAlign: 'right', flexShrink: 0 }}>
+                  <span style={{ width: 42, textAlign: 'center', flexShrink: 0 }}>
                     <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: g != null ? A.MUTE : A.DIM, ...FIGS }}>{g != null ? g.toFixed(1) : '–'}</span>
-                    <span style={{ display: 'block', fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{t('topTen.golfers', 'Golfers')}</span>
+                    <span style={{ display: 'block', marginTop: 2, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{t('topTen.golfers', 'Golfers')}</span>
                   </span>
-                  <span style={{ minWidth: 34, textAlign: 'right', flexShrink: 0 }}>
+                  <span style={{ width: 42, textAlign: 'center', flexShrink: 0 }}>
                     <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: r != null ? scoreTone(r) : A.DIM, ...FIGS }}>{r != null ? r.toFixed(1) : '–'}</span>
-                    <span style={{ display: 'block', fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{pillKicker}</span>
+                    <span style={{ display: 'block', marginTop: 2, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{pillKicker}</span>
                   </span>
                 </button>
               );
@@ -469,7 +494,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                   <CourseImageFallback courseId={s.id} courseName={s.name} imageUrl={s.thumbnail_image ?? null} style={{ width: 34, height: 26, borderRadius: 6, flexShrink: 0 }} />
                   <span style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
-                    <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(s)}</span>
+                    <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(s, rankOf(s.id))}</span>
                   </span>
                   <span style={{ fontSize: 17, fontWeight: 700, color: A.MUTE }}>+</span>
                 </button>
