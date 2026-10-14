@@ -1344,6 +1344,7 @@ const ProfilePageV2Content: React.FC = () => {
               initialCommentId={deepLinkTopTen.current?.commentId ?? null}
               initialParentCommentId={deepLinkTopTen.current?.parentId ?? null}
               topTenVisibility={profile?.top_ten_visibility}
+              ownerName={handicapOwnerFirstName(profile.display_name, profile.username) ?? profile.display_name ?? null}
               shareIdentity={isSelf ? {
                 displayName,
                 avatarUrl: profile.profile_photo_url ?? null,

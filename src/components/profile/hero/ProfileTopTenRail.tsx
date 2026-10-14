@@ -1,7 +1,7 @@
 /**
  * ProfileTopTenRail - BRIEF_PROFILE_TOP_TEN_REBUILD (mock: top-ten-final.html).
  *
- * A member's top ten drawn as a RANKING, not a shelf: a verdict line, number
+ * A member's top ten drawn as a RANKING, not a shelf: a kicker and one sentence, number
  * one as a 186px photograph, two and three side by side at 104px, a reaction
  * strip beneath the number-one card (scoped to the position-1 course, because
  * useTopTenReactions is keyed by course), then positions four to ten as rows
@@ -18,7 +18,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import html2canvas from 'html2canvas';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserTopTenCourses, type TopTenCourse } from '@/hooks/useUserTopTenCourses';
@@ -32,8 +32,10 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTopTenVisibility } from '@/components/profile/hooks/useTopTenVisibility';
 import { toast } from '@/lib/toast';
-import { numberWord, ordinal } from '@/lib/text/numbers';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { MessageCircle } from 'lucide-react';
+import { numberWord } from '@/lib/text/numbers';
+// Used by the owner progress invitation (unchanged), not by any header copy.
+const Word = (n: number) => numberWord(n);
 import { useCourseListRanks, formatListRank, type ListRank } from '@/lib/courses/listRank';
 
 const GLASS = 'rgba(10,14,10,0.55)';
@@ -56,8 +58,6 @@ const CAPTURE_OPTS = { backgroundColor: '#000', scale: 2, logging: false, useCOR
  */
 const scoreTone = (score: number) => (score >= 9 ? A.GREEN : A.INK);
 
-const word = (n: number) => numberWord(n, false);
-const Word = (n: number) => numberWord(n);
 
 const regionOf = (c: { sub_country?: string | null; region?: string | null; country?: string | null }) =>
   c.sub_country || c.region || c.country || null;
@@ -92,11 +92,10 @@ interface Props {
   topTenVisibility?: string | null;
   /** Owner-only share card identity, from figures the profile page already holds. */
   shareIdentity?: TopTenShareIdentity;
+  /** Profile owner's first name (falling back to display name) for the visitor sentence. */
+  ownerName?: string | null;
 }
 
-const B = (props: React.HTMLAttributes<HTMLElement>) => (
-  <b {...props} style={{ color: A.INK, fontWeight: 700 }} />
-);
 
 export const ProfileTopTenRail: React.FC<Props> = ({
   userId,
@@ -107,6 +106,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   initialCommentId = null,
   topTenVisibility,
   shareIdentity,
+  ownerName,
 }) => {
   const { t } = useTranslation('profile');
   const navigate = useNavigate();
@@ -122,8 +122,6 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   const { canView, visibility, isLoading: visibilityLoading } =
     useTopTenVisibility(userId, viewerId, topTenVisibility);
 
-  // The viewer's own list, only on someone else's profile (overlap clause).
-  const { topTen: viewerTopTen } = useUserTopTenCourses(!isOwnProfile ? viewerId : undefined);
 
   const topTen = React.useMemo(
     () => [...rawTopTen].sort((a, b) => a.position - b.position),
@@ -278,61 +276,26 @@ export const ProfileTopTenRail: React.FC<Props> = ({
       ? visibility === 'private' ? 'Only me' : visibility === 'friends' ? 'Friends only' : 'Followers & friends'
       : null;
 
-  // Header: the shared SectionHeader exactly as ClubsCard uses it; Manage and the
-  // audience marker sit beside it without modifying SectionHeader.
+  // Header: a kicker and ONE plain descriptive sentence. No title, no computed verdict.
+  const line = isOwnProfile
+    ? t('topTen.lineOwn', 'Your top ten rated golf courses.')
+    : ownerName?.trim()
+      ? t('topTen.lineOther', { name: ownerName.trim(), defaultValue: "{{name}}'s top ten rated golf courses." })
+      : t('topTen.lineOtherFallback', 'Their top ten rated golf courses.');
   const header = (
-    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, fontFamily: SANS }}>
-      <div style={{ minWidth: 0 }}>
-        <SectionHeader role="section" kicker="COURSES" title={isOwnProfile ? t('topTen.kicker', 'Your top 10') : t('topTen.kickerOther', 'Their top 10')} />
-        {audienceMarker && (
-          <div style={{ marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.MUTE }}>{audienceMarker}</div>
+    <div style={{ fontFamily: SANS }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.MUTE }}>{t('topTen.kicker', 'Top 10')}</span>
+        {isOwnProfile && onManage && n > 0 && (
+          <button type="button" onClick={onManage} style={{ background: 'transparent', border: 'none', padding: 0, flexShrink: 0, fontFamily: SANS, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK, cursor: 'pointer' }}>
+            {t('topTen.manage', 'Manage')}
+          </button>
         )}
       </div>
-      {isOwnProfile && onManage && n > 0 && (
-        <button type="button" onClick={onManage} style={{ background: 'transparent', border: 'none', padding: 0, flexShrink: 0, fontFamily: SANS, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK, cursor: 'pointer' }}>
-          {t('topTen.manage', 'Manage')}
-        </button>
+      <div style={{ marginTop: 5, fontSize: 12.5, fontWeight: 600, color: A.BODY, lineHeight: 1.45 }}>{line}</div>
+      {audienceMarker && (
+        <div style={{ marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.MUTE }}>{audienceMarker}</div>
       )}
-    </div>
-  );
-
-  // ── Verdict ───────────────────────────────────────────────────────────
-  // List membership only, read from the resolved list rank — never global_rank.
-  const ranked = topTen.filter((c) => rankOf(c.course_id) != null).length;
-  const clauses: React.ReactNode[] = [];
-  const tr = (key: string, values: Record<string, unknown>) => (
-    <Trans key={key} t={t} i18nKey={key} values={values} count={values.count as number} components={{ b: <B /> }} />
-  );
-  if (isOwnProfile && n >= 3 && n < 10) {
-    clauses.push(tr('topTen.verdict.filled', { count: n, word: Word(n) }));
-  } else if (isOwnProfile && n === 10) {
-    if (ranked > 0) clauses.push(tr('topTen.verdict.ranked', { count: ranked, word: Word(ranked), total: word(n) }));
-    const top = topTen[0];
-    if (top && top.position === 1 && rankOf(top.course_id)?.rank === 1) clauses.push(tr('topTen.verdict.topsBoth', { name: top.name }));
-    let bold: TopTenCourse | null = null;
-    let boldGap = 0;
-    for (const c of topTen) {
-      const r = rankOf(c.course_id);
-      if (!r) continue;
-      const gap = r.rank - c.position;
-      if (gap > 0 && (!bold || gap > boldGap)) { bold = c; boldGap = gap; }
-    }
-    const br = bold ? rankOf(bold.course_id) : null;
-    if (bold && br) clauses.push(tr('topTen.verdict.boldest', { name: bold.name, position: bold.position, rank: ordinal(br.rank), list: br.label.toLowerCase() }));
-  } else if (!isOwnProfile) {
-    const mine = new Set(viewerTopTen.map((c) => c.course_id));
-    const overlap = viewerId ? topTen.filter((c) => mine.has(c.course_id)).length : 0;
-    if (ranked > 0 && overlap > 0) {
-      clauses.push(tr('topTen.verdict.overlap', { count: ranked, word: Word(ranked), overlap: word(overlap) }));
-    } else if (ranked > 0) {
-      clauses.push(tr('topTen.verdict.rankedOther', { count: ranked, word: Word(ranked), total: word(n) }));
-    } else if (overlap > 0) {
-      clauses.push(tr('topTen.verdict.overlapOnly', { count: overlap, word: Word(overlap) }));
-    }
-  }
-  const verdict = clauses.length > 0 && (
-    <div style={{ marginTop: 12, fontSize: 12.5, lineHeight: 1.5, fontWeight: 600, color: A.BODY, ...FIGS }}>
-      {clauses.map((c, i) => <React.Fragment key={i}>{i > 0 ? ' ' : ''}{c}</React.Fragment>)}
     </div>
   );
 
@@ -371,7 +334,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
 
         {/* Reaction strip — belongs to the number-one pick, sits directly under it. */}
         <div style={{ marginTop: 9, padding: '9px 11px', background: 'rgba(255,255,255,0.045)', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 7 }}>
-          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{isOwnProfile ? t('topTen.onYourNumberOne', 'On your number 1') : t('topTen.onTheirNumberOne', 'On their number 1')}</span>
+          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap' }}>{isOwnProfile ? t('topTen.onYourNumberOne', 'Your number one') : t('topTen.onTheirNumberOne', 'Their number one')}</span>
           {(Object.keys(REACTION_CONFIG) as ReactionType[]).map((k) => {
             const pressed = myReaction === k;
             const pressable = !isOwnProfile && !!viewerId;
@@ -392,10 +355,13 @@ export const ProfileTopTenRail: React.FC<Props> = ({
           })}
           <button
             type="button"
+            aria-label={t('topTen.commentsLabel', 'Comments')}
             onClick={() => { setCommentsCourseId(firstCourseId); setCommentsOpen(true); }}
-            style={{ marginLeft: 'auto', background: 'transparent', border: 'none', padding: 0, fontFamily: SANS, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.MUTE, cursor: 'pointer', ...FIGS }}
+            style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, background: 'transparent', border: 'none', padding: 0, fontFamily: SANS, color: A.MUTE, cursor: 'pointer' }}
           >
-            {threadFetched && visibleCount > 0 ? t('topTen.comments', { count: visibleCount, defaultValue: '{{count}} comments' }) : t('topTen.commentsLabel', 'Comments')} ›
+            {/* Same icon as FeedCard / FeedActionRail. A zero still renders — it is the way in. */}
+            <MessageCircle size={17} stroke="currentColor" strokeWidth={2} fill="none" />
+            <span style={{ fontSize: 12, fontWeight: 700, color: A.MUTE, ...FIGS }}>{threadFetched ? visibleCount : 0}</span>
           </button>
         </div>
 
@@ -600,7 +566,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   return (
     <section style={{ marginTop: 16, marginBottom: 8, padding: '0 16px 4px', fontFamily: SANS }}>
       {header}
-      {n >= 3 ? <>{verdict}{renderList()}{shareRow}</> : isOwnProfile ? renderInvitation() : null}
+      {n >= 3 ? <>{renderList()}{shareRow}</> : isOwnProfile ? renderInvitation() : null}
 
       {commentsCourseId && (
         <CommentsSheetV2
