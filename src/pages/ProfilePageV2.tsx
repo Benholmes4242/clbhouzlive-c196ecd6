@@ -80,6 +80,7 @@ import {
 import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
 import AchievementsPane from '@/components/profile/AchievementsPane';
 import { A, SANS, Panel, StatRow, Action } from '@/features/courses/components/holes/analytical/tokens';
+import { INVERTED_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
 import { formatNumber } from '@/i18n/format';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
 import { useUserAnalyticsCourses } from '@/hooks/gam/useUserAnalyticsCourses';
@@ -1475,7 +1476,8 @@ const ACTION_BASE: React.CSSProperties = {
   fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
   whiteSpace: 'nowrap', minWidth: 0, padding: '0 8px',
 };
-const ACTION_PRIMARY: React.CSSProperties = { ...ACTION_BASE, background: A.AMBER, border: `1px solid ${A.AMBER}`, color: '#0A0A0C' };
+/** The follow/following pill is an inverted control: white ground, canvas ink. */
+const ACTION_PRIMARY: React.CSSProperties = { ...ACTION_BASE, background: INVERTED_CONTROL_SURFACE, border: `1px solid ${INVERTED_CONTROL_SURFACE}`, color: A.CANVAS };
 const ACTION_GHOST: React.CSSProperties = { ...ACTION_BASE, background: 'transparent', border: `1px solid ${A.BORDER}`, color: A.INK };
 
 export default ProfilePageV2;
