@@ -13,6 +13,7 @@ import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { joinNames, plural, RAIL_BLEED } from './format';
+import { firstName } from '@/lib/whs/share';
 
 /**
  * SECTION 01 — WHAT'S BEEN PLAYED (BRIEF_COURSES_PAGE_DEVICE_REVISION §3).
@@ -34,10 +35,6 @@ interface CourseGroup {
   members: CircleRoundRow[]; // one row per distinct member, most recent first
 }
 
-function firstName(name: string): string {
-  const s = (name ?? '').trim();
-  return s ? s.split(/\s+/)[0] : 'Golfer';
-}
 
 export function WhoPlayingSection() {
   const { t } = useTranslation('courses');
