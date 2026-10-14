@@ -41,3 +41,14 @@ export function byTourEntries(raw: unknown): { code: string; n: number }[] {
 
 export const minutesSince = (iso: string | null | undefined, now = Date.now()) =>
   iso ? (now - new Date(iso).getTime()) / 60_000 : Infinity;
+
+/**
+ * Feeds header copy. A single feed reads "1 needs a run"; two or more read
+ * "3 need a run". Failures outrun the count, and nothing pending reads
+ * "All running".
+ */
+export function feedsHeadline(failures: number, needs: number): { text: string; tone: 'danger' | 'warn' | 'ok' } {
+  if (failures > 0) return { text: `${failures} failed in 24 h`, tone: 'danger' };
+  if (needs > 0) return { text: `${needs} ${needs === 1 ? 'needs' : 'need'} a run`, tone: 'warn' };
+  return { text: 'All running', tone: 'ok' };
+}
