@@ -18,6 +18,7 @@ import { HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/co
 import { A, LABEL, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 const CARD_W = 244;
 
@@ -38,28 +39,7 @@ function Reviewer({ r }: { r: LatestReview }) {
   const name = r.reviewerName || t('discover.reviews.member', 'A member');
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-      {r.reviewerAvatar ? (
-        <img
-          src={r.reviewerAvatar}
-          alt=""
-          width={20}
-          height={20}
-          loading="lazy"
-          style={{ width: 20, height: 20, borderRadius: '34%', objectFit: 'cover', flexShrink: 0 }}
-        />
-      ) : (
-        <div
-          aria-hidden
-          style={{
-            width: 20,
-            height: 20,
-            borderRadius: '34%',
-            background: A.CANVAS,
-            border: `1px solid ${HAIRLINE_INK_8}`,
-            flexShrink: 0,
-          }}
-        />
-      )}
+      <SquircleAvatar src={r.reviewerAvatar} userId={r.userId} alt={name} size={20} hairlineRing />
       <span
         style={{
           fontSize: 11.5,
