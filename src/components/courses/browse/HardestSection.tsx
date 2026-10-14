@@ -12,7 +12,7 @@ export function HardestSection() {
   if (isLoading || rows.length === 0) return null;
   return (
     <section style={SECTION_WRAP}>
-      <SectionHead tone="amber" kicker="Over par on average" title="Toughest tracks" subline="Average strokes over par across every tracked round." />
+      <SectionHead tone="amber" kicker="Over par on average" title="Toughest tracks" />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, marginLeft: -16, marginRight: -16, marginTop: HEAD_GAP }}>
         {rows.slice(0, 4).map((row, i) => (
           <button key={row.course_id} type="button" onClick={() => navigate(`/courses/${row.course_id}`)}

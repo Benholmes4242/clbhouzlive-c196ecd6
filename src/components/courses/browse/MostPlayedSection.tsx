@@ -15,7 +15,7 @@ export function MostPlayedSection() {
 
   return (
     <section style={SECTION_WRAP}>
-      <SectionHead tone="amber" kicker="Most played" title="The regulars" subline="Ranked by rounds tracked, not by reputation." />
+      <SectionHead tone="amber" kicker="Most played" title="The regulars" />
       <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: 2, marginTop: HEAD_GAP }}>
         {rows.slice(0, 3).map((row) => {
           const pill = [row.members > 0 ? plural(row.members, 'member', 'members') : null, playsToPar(row.avg_to_par)]

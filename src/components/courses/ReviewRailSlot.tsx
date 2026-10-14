@@ -67,11 +67,6 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
 
   return (
     <section>
-      <div style={{ padding: '0 20px 10px' }}>
-        <DiscoverSectionHeading title={t('statBrowse.reviews.heading')} />
-      </div>
-
-
       <div
         style={{
           display: 'flex',

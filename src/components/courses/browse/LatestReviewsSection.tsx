@@ -11,7 +11,7 @@ export function LatestReviewsSection({ reviews, onReviewPress }: {
   if (reviews.length === 0) return null;
   return (
     <section style={SECTION_WRAP}>
-      <SectionHead tone="amber" kicker="In members' words" title="Latest reviews" subline="What members said after they played." />
+      <SectionHead tone="amber" kicker="In members' words" title="Latest reviews" />
       <div style={{ marginLeft: -16, marginRight: -16, marginTop: HEAD_GAP }}>
         <ReviewRailSlot reviews={reviews} onReviewPress={onReviewPress} />
       </div>

@@ -11,11 +11,10 @@ export interface SectionHeadProps {
   kicker: string;
   /** Omitted = no title element at all (section 08's list head). */
   title?: string;
-  subline?: string;
   tone?: 'amber' | 'quiet';
 }
 
-export function SectionHead({ kicker, title, subline, tone = 'amber' }: SectionHeadProps) {
+export function SectionHead({ kicker, title, tone = 'amber' }: SectionHeadProps) {
   return (
     <div>
       <div style={{ ...KICKER, lineHeight: 1, color: tone === 'amber' ? A.AMBER : A.MUTE }}>
@@ -34,11 +33,6 @@ export function SectionHead({ kicker, title, subline, tone = 'amber' }: SectionH
       >
         {title}
       </h2> : null}
-      {subline ? (
-        <p style={{ fontSize: 12, lineHeight: 1.5, color: A.DIM, marginTop: 8, marginBottom: 0 }}>
-          {subline}
-        </p>
-      ) : null}
     </div>
   );
 }

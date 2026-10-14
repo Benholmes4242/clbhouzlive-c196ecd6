@@ -18,7 +18,7 @@ export function HighestRatedSection() {
   if (isLoading || rows.length === 0) return null;
   return (
     <section style={SECTION_WRAP}>
-      <SectionHead tone="amber" kicker="Highest rated" title="What members rate highest" subline="Three only. The rest are in the list at the bottom." />
+      <SectionHead tone="amber" kicker="Highest rated" title="What members rate highest" />
       <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: 2, marginTop: HEAD_GAP }}>
         {rows.slice(0, 3).map((row) => (
           <PhotoFigureCard

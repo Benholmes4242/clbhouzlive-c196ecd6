@@ -68,7 +68,6 @@ export function WhoPlayingSection() {
         tone="amber"
         kicker="Recently"
         title="What's been played"
-        subline="The courses members have been playing, and what they went round in."
       />
       <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: 10, marginTop: HEAD_GAP }}>
         {groups.map((g) => {
