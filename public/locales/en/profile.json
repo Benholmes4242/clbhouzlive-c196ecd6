@@ -28,24 +28,9 @@
     "readLess": "Read less"
   },
   "topTen": {
-    "kicker": "Your top 10",
-    "kickerOther": "Their top 10",
+    "kicker": "Top 10",
     "manage": "Manage",
     "rated": "Rated",
-    "verdict": {
-      "ranked_one": "<b>{{word}}</b> of your {{total}} is on a clbhouz Top 100.",
-      "ranked_other": "<b>{{word}}</b> of your {{total}} are on a clbhouz Top 100.",
-      "topsBoth": "<b>{{name}}</b> tops your list and ours.",
-      "boldest": "Your boldest call is <b>{{name}}</b> at <b>{{position}}</b> - it sits <b>{{rank}}</b> {{list}}.",
-      "rankedOther_one": "<b>{{word}}</b> of their {{total}} is on a clbhouz Top 100.",
-      "rankedOther_other": "<b>{{word}}</b> of their {{total}} are on a clbhouz Top 100.",
-      "overlap_one": "<b>{{word}}</b> of their courses is ranked by clbhouz, and <b>{{overlap}}</b> in yours too.",
-      "overlap_other": "<b>{{word}}</b> of their courses are ranked by clbhouz, and <b>{{overlap}}</b> are in yours too.",
-      "overlapOnly_one": "<b>{{word}}</b> of their courses is in yours too.",
-      "overlapOnly_other": "<b>{{word}}</b> of their courses are in yours too.",
-      "filled_one": "<b>{{word}}</b> of ten filled. Rate a course and it takes its place here on its own.",
-      "filled_other": "<b>{{word}}</b> of ten filled. Rate a course and it takes its place here on its own."
-    },
     "ours": "Ours",
     "golfers": "Golfers",
     "you": "You",
@@ -79,8 +64,8 @@
       "body": "{{name}} is your number one. Add another and they sort themselves by what you score them.",
       "cta": "Add your number {{next}}"
     },
-    "onYourNumberOne": "On your number 1",
-    "onTheirNumberOne": "On their number 1",
+    "onYourNumberOne": "Your number one",
+    "onTheirNumberOne": "Their number one",
     "sheet": {
       "kicker": "Courses",
       "title": "Your top 10",
@@ -107,6 +92,9 @@
       "swapOther": "Choose another position",
       "swapConfirm": "Replace",
       "rateIt": "Rate it"
-    }
+    },
+    "lineOwn": "Your top ten rated golf courses.",
+    "lineOther": "{{name}}'s top ten rated golf courses.",
+    "lineOtherFallback": "Their top ten rated golf courses."
   }
 }
