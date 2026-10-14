@@ -209,6 +209,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
           }}
         >
           <CourseCardBackground 
+            courseId={course.id}
             thumbnailImage={course.thumbnail_image}
             courseName={course.name}
             disableLazyLoading={isFromUserCoursesPage}

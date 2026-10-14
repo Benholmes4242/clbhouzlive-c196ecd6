@@ -107,11 +107,11 @@ function buildFactLine(
  * Colour matches the text beside it, never amber: amber is reserved for the
  * viewing member and the record holder is usually somebody else.
  */
-const FACT_ICON_COLOR = 'rgba(255,255,255,0.72)';
+const FACT_ICON_COLOR = 'rgba(255,255,255,0.78)';
 
 function FactIcon({ fact }: { fact: HeroCourseFactRow }) {
   // 13px sits on the 12.5px line by cap height rather than line box.
-  const props = { size: 13, strokeWidth: 2, color: FACT_ICON_COLOR, 'aria-hidden': true } as const;
+  const props = { size: 13, strokeWidth: 2.5, color: FACT_ICON_COLOR, 'aria-hidden': true } as const;
 
   if (fact.fact_kind === 'course_record') return <Crown {...props} />;
   // A single hole playing hardest — the flagstick is that hole.
@@ -297,8 +297,9 @@ function CoursesPageHeroInner() {
                     )}
                     <span
                       style={{
-                        fontSize: 13,
-                        color: 'rgba(255,255,255,0.72)',
+                        fontSize: 12.5,
+                        fontWeight: 600,
+                        color: 'rgba(255,255,255,0.78)',
                         minWidth: 0,
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',

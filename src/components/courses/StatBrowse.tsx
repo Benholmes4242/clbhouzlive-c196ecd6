@@ -48,10 +48,6 @@ import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome
 import { Z } from '@/config/zIndex';
 import { BrowseCourseCard } from './BrowseCourseCard';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
-import { COURSE_BROWSE_DESCRIPTION, COURSE_BROWSE_KICKER } from './courseBrowseTypography';
-import { ReviewRailSlot } from './ReviewRailSlot';
-import { ReviewFeaturedSlot } from './ReviewFeaturedSlot';
-import { allocateReviewSlots } from './reviewSlots';
 import { useBrowseReviews } from './useBrowseReviews';
 import { LatestReviewsSheet } from '@/components/explore-tab-new/courseled/LatestReviewsSheet';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
@@ -60,26 +56,6 @@ import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SURFA
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 import { CoursesSearchField } from '@/features/explore-magazine/CoursesSearchField';
 
-/**
- * Emphasise only the figures inside a sentence: INK 700 with tabular figures
- * against the surrounding INK_MUTE body. Splits on digit runs so initialisms
- * like WHS stay in body weight and are not mistaken for a number.
- */
-const FIGURE_SPLIT = /(\p{Nd}[\p{Nd}.,\u00A0\u202F\u2009]*)/gu;
-const HAS_DIGIT = /\p{Nd}/u;
-const emphasiseFigures = (sentence: string): React.ReactNode[] =>
-  sentence.split(FIGURE_SPLIT).map((part, i) =>
-    HAS_DIGIT.test(part) ? (
-      <span
-        key={i}
-        style={{ color: INK, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}
-      >
-        {part}
-      </span>
-    ) : (
-      part
-    ),
-  );
 
 
 
@@ -261,10 +237,6 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
    * which is what keeps scroll restoration honest.
    */
   const { pool: reviewPool } = useBrowseReviews(country, region);
-  const reviewSlots = useMemo(
-    () => allocateReviewSlots(reviewPool, rows.length),
-    [reviewPool, rows.length],
-  );
   const [reviewsSheet, setReviewsSheet] = useState(false);
   const openReviewSheet = useReviewSheetStore((s) => s.open);
   const openReviewsSheet = useCallback(() => {
@@ -823,22 +795,6 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         </div>
       </div>
 
-      {/* ── Headline ────────────────────────────────────────────── */}
-      <div className="pt-4">
-        <div
-          style={{
-            ...COURSE_BROWSE_KICKER,
-          }}
-        >
-          Courses played
-        </div>
-        <p style={{ ...COURSE_BROWSE_DESCRIPTION, marginTop: 5 }}>
-          {browseTruth
-            ? emphasiseFigures(`${browseTruth.ratedTotal} of the ${browseTruth.allPlayedTotal} courses members have played here carry a rating.`)
-            : null}
-        </p>
-      </div>
-
       {/* ── List ────────────────────────────────────────────────── */}
       {isLoading ? (
         <div className="mt-4 -mx-4 space-y-2 sm:space-y-6">
@@ -989,23 +945,6 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                     navigate(`/courses/${row.course_id}`);
                   }}
                 />
-                {/* Slot placement is computed against the unfiltered list, so
-                    the reviews stand down while a search is narrowing it. */}
-                {!searching && i < visibleRows.length - 1 && reviewSlots.get(i + 1) ? (
-                  <div style={{ marginTop: 32 }}>
-                    {reviewSlots.get(i + 1)!.kind === 'rail' ? (
-                      <ReviewRailSlot
-                        reviews={reviewSlots.get(i + 1)!.reviews}
-                        onReviewPress={handleReviewTile}
-                      />
-                    ) : (
-                      <ReviewFeaturedSlot
-                        review={reviewSlots.get(i + 1)!.reviews[0]}
-                        onReviewPress={handleReviewTile}
-                      />
-                    )}
-                  </div>
-                ) : null}
               </div>
             );
           })}
