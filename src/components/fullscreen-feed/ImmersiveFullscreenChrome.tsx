@@ -7,8 +7,10 @@
  *   TOP (no scrim — the back chevron and course block carry their own
  *   shadow over the blurred media backdrop):
  *     - Back chevron top-LEFT (circular rgba(0,0,0,.32))
- *     - Course block top-RIGHT (name 12/500 ellipsis, location 9/.75 w/ map-pin,
- *       amber ◉ score chip below)
+ *     - Course header LEFT-aligned after the chevron: row one name 15/700
+ *       ellipsis + rating chip at right; location · World #n at 10.5/600;
+ *       row two the VIEWER's own record at the course (status pill, rounds,
+ *       best). No course on the post -> no header.
  *   BOTTOM (no scrim — removed earlier; every element carries its own
  *   drop-shadow over the blurred media backdrop). From the top down:
  *     - LEFT: 40px squircle avatar + column (name · [time · FollowPill] ·
@@ -18,7 +20,7 @@
  *       with avatarRing="media"; it reserves its full size at first paint.
  *     - RIGHT: vertical action rail (mute, heart, comment, send, more)
  *     - BOTTOM-MOST: the comment bar (viewer avatar + "Add a comment…"),
- *       clamped to the physical bottom edge as an opaque bar. When it
+ *       an inset glass pill 44px tall floating above the bottom edge. When it
  *       renders, the author column and rail clear it by COMMENT_BAR_BLOCK;
  *       when it does not, they sit on the safe-area floor. There are no
  *       bottom carousel dots and no bottom scrubber bar.
@@ -33,8 +35,8 @@
  * lockFullscreenViewportScroll exists for) and would be a second composer.
  * Do not "fix" it into a real field.
  *
- * NO fade-on-idle. NO score eyebrow. Course chip in
- * the top-right is the ONLY score surface.
+ * NO fade-on-idle. NO score eyebrow. The header chip and, on reviews, the
+ * figures row under the author line are the only score surfaces.
  */
 import React, { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ChevronLeft, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX } from 'lucide-react';
@@ -52,9 +54,12 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
 
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
-import MapPinIcon from '@/components/icons/MapPinIcon';
 import { Z } from '@/config/zIndex';
 import { formatRatingValue } from '@/utils/formatters';
+import { formatHcp } from '@/lib/formatHcp';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
+import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useFollowState } from '@/hooks/useFollowState';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -67,9 +72,21 @@ const CHEVRON_BG = 'rgba(0,0,0,0.32)';
 const CHIP_BG = 'rgba(0,0,0,0.40)';
 const ICON_SHADOW = 'drop-shadow(0 1px 3px rgba(0,0,0,0.55))';
 const TEXT_SHADOW = '0 1px 3px rgba(0,0,0,0.55)';
-/* The clamped comment bar's real block height: 11px top padding + 38px field
-   + 10px bottom padding = 59, plus the safe area. Change these together. */
-const COMMENT_BAR_BLOCK = 'calc(59px + env(safe-area-inset-bottom, 0px))';
+/* The inset comment pill: 44px tall, floating COMMENT_BAR_BOTTOM above the
+   bottom edge (never inside the home indicator). COMMENT_BAR_BLOCK is the full
+   footprint the author column and rail clear. Change these together. */
+const COMMENT_BAR_H = 44;
+const COMMENT_BAR_BOTTOM = 'max(16px, env(safe-area-inset-bottom, 0px))';
+const COMMENT_BAR_BLOCK = `calc(${COMMENT_BAR_H}px + ${COMMENT_BAR_BOTTOM})`;
+const META = 'rgba(255,255,255,0.62)';
+const META_STRONG = 'rgba(255,255,255,0.78)';
+const MICRO_LABEL = 'rgba(255,255,255,0.50)';
+const FIG: React.CSSProperties = { color: '#FFFFFF', fontWeight: 700 };
+const TABULAR: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums' };
+const BREAKDOWN_CELLS = [
+  ['design', 'DESIGN'], ['conditions', 'CONDITION'],
+  ['clubhouse', 'CLUBHOUSE'], ['facilities', 'FACILITIES'],
+] as const;
 
 function formatCount(n: number | null | undefined): string | null {
   if (n === null || n === undefined || n === 0) return null;
@@ -371,11 +388,15 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     viewerActorType: activeActor?.type ?? 'personal',
     viewerActorId: activeActor?.id ?? undefined,
   });
-  const hookCourseId =
+  // THE ONE resolved course id — the header, chip and record all read it.
+  const resolvedCourseId =
     hookPost?.review?.courseId ?? golfCourse?.id ?? hookPost?.courseId ?? null;
   const { data: ratingAggregate } = useCourseRatingAggregates(
-    hooksLive && hookPost?.courseRating == null ? hookCourseId ?? undefined : undefined,
+    hooksLive && hookPost?.courseRating == null ? resolvedCourseId ?? undefined : undefined,
   );
+  // The VIEWER's own record at this course. Lazy: only while the viewer is live.
+  const personal = useCoursePersonalStatus(hooksLive ? resolvedCourseId ?? undefined : undefined);
+  const recordStats = useCourseStatsDetail(resolvedCourseId, hooksLive);
 
   if (feedEnded) {
     return (
@@ -438,7 +459,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   // Fallback: not every feed-post payload path carries course_avg_overall_score
   // (tag-only posts, older RPCs). Resolve the community rating from
   // course_rating_aggregates when the payload is missing it.
-  const resolvedCourseId = activePost.review?.courseId ?? golfCourse?.id ?? activePost.courseId ?? null;
   const courseRating =
     activePost.viewerRating ??
     activePost.courseRating ??
@@ -456,6 +476,44 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const likeStr = formatCount(likeState.count);
   const commentStr = formatCount(commentCount);
   const timeLabel = timeAgo(activePost.createdAt);
+  const worldRank = activePost.courseGlobalRank ?? null;
+
+  // Record row: never rendered while either read is unsettled (no skeleton).
+  const statusKind = personal.status?.status ?? null;
+  const recordSettled =
+    !!resolvedCourseId && statusKind != null && !personal.isLoading &&
+    (statusKind !== 'played' || !recordStats.isLoading);
+  const yourRounds = recordStats.data?.your_rounds;
+  const yourBest = recordStats.data?.your_best;
+  const hasRounds = yourRounds != null && yourRounds > 0;
+  const hasBest = yourBest != null && yourBest > 0;
+  const showRecord = recordSettled && (statusKind === 'played' || statusKind === 'want_to_play');
+
+  // Author meta: index · club · time. Hidden fields arrive null -> omitted.
+  const authorMeta: React.ReactNode[] = [];
+  if (activePost.handicapIndex != null) {
+    authorMeta.push(<span key="i" style={{ ...FIG, flexShrink: 0 }}>{formatHcp(activePost.handicapIndex)}</span>);
+  }
+  if (activePost.homeClub) {
+    authorMeta.push(
+      <span key="c" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+        {activePost.homeClub}
+      </span>,
+    );
+  }
+  if (timeLabel) authorMeta.push(<span key="t" style={{ flexShrink: 0 }}>{timeLabel}</span>);
+
+  // Review figures: their score, golfers, then each filled-in sub-score.
+  const review = activePost.isReview ? activePost.review : null;
+  const reviewCells: { key: string; value: number; label: string; amber?: boolean }[] = [];
+  if (review) {
+    if (review.rating != null) reviewCells.push({ key: 'r', value: Number(review.rating), label: 'THEIR SCORE', amber: true });
+    if (activePost.courseRating != null) reviewCells.push({ key: 'g', value: Number(activePost.courseRating), label: 'GOLFERS' });
+    for (const [field, label] of BREAKDOWN_CELLS) {
+      const v = review.breakdown?.[field];
+      if (v != null) reviewCells.push({ key: field, value: Number(v), label });
+    }
+  }
 
   const handleCourseTap = () => {
     const cid = activePost.review?.courseId ?? golfCourse?.id ?? activePost.courseId;
@@ -504,90 +562,89 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         </button>
 
 
-        {/* RIGHT — course block */}
+        {/* Course header — left-aligned after the chevron. */}
         {courseName && (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-end',
-              gap: 4,
-              maxWidth: '60%',
-              minWidth: 0,
-              textAlign: 'right',
-            }}
-          >
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
-              aria-label={`Open ${courseName}`}
-              style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
-                gap: 4, maxWidth: '100%', minWidth: 0, textAlign: 'right',
-                background: 'transparent', border: 'none', padding: 0, margin: 0,
-                cursor: 'pointer', pointerEvents: 'auto', fontFamily: 'inherit',
-                color: 'inherit',
-              }}
-            >
-              <span
-                title={courseName}
-                style={{
-                  fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.2,
-                  textShadow: TEXT_SHADOW,
-                  maxWidth: '100%', overflow: 'hidden',
-                  textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                }}
-              >
-                {courseName}
-              </span>
-              {courseLocation && (
-                <span
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 4,
-                    fontSize: 12, color: '#fff', opacity: 0.8, lineHeight: 1.1,
-                    textShadow: TEXT_SHADOW,
-                    maxWidth: '100%', overflow: 'hidden',
-                    textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  }}
-                >
-                  <MapPinIcon width={12} height={12} style={{ flexShrink: 0 }} />
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {courseLocation}
-                  </span>
-                </span>
-              )}
-            </button>
-            {showCourseChip && (
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', paddingTop: 2, textShadow: TEXT_SHADOW }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, minWidth: 0 }}>
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
-                aria-label={`${activePost.viewerRating != null ? 'Review rating' : 'Community rating'} ${courseRatingLabel}`}
+                aria-label={`Open ${courseName}`}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0,
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  padding: '5px 12px 5px 6px', borderRadius: 999,
-                  cursor: 'pointer', marginTop: 3,
-                  backdropFilter: 'blur(8px)',
-                  WebkitBackdropFilter: 'blur(8px)',
-                  pointerEvents: 'auto', fontFamily: 'inherit',
+                  flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+                  textAlign: 'left', background: 'transparent', border: 'none', padding: 0, margin: 0,
+                  cursor: 'pointer', pointerEvents: 'auto', fontFamily: 'inherit', color: 'inherit',
                 }}
               >
-                <img
-                  src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-                  alt=""
-                  aria-hidden="true"
-                  style={{ width: 20, height: 20, flexShrink: 0, objectFit: 'contain' }}
-                />
-                <span style={{ fontSize: 14, fontWeight: 700, color: '#F8FAFC', fontVariantNumeric: 'tabular-nums lining-nums', lineHeight: 1 }}>
-                  {courseRatingLabel}
+                <span
+                  title={courseName}
+                  style={{
+                    fontSize: 15, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.2, color: '#FFFFFF',
+                    maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}
+                >
+                  {courseName}
                 </span>
+                {(courseLocation || worldRank != null) && (
+                  <span
+                    style={{
+                      marginTop: 2, fontSize: 10.5, fontWeight: 600, color: META, lineHeight: 1.3,
+                      maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...TABULAR,
+                    }}
+                  >
+                    {courseLocation}
+                    {courseLocation && worldRank != null && ' · '}
+                    {worldRank != null && (
+                      <span style={{ color: META_STRONG, fontWeight: 700 }}>World #{worldRank}</span>
+                    )}
+                  </span>
+                )}
               </button>
+              {showCourseChip && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
+                  aria-label={`${activePost.viewerRating != null ? 'Review rating' : 'Community rating'} ${courseRatingLabel}`}
+                  style={{
+                    flexShrink: 0, display: 'inline-flex', alignItems: 'baseline', gap: 5,
+                    background: 'rgba(0,0,0,0.42)', border: '1px solid rgba(255,255,255,0.16)',
+                    borderRadius: 999, padding: '4px 10px', cursor: 'pointer',
+                    backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+                    pointerEvents: 'auto', fontFamily: 'inherit', textShadow: 'none',
+                  }}
+                >
+                  <span style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', lineHeight: 1, ...TABULAR }}>
+                    {courseRatingLabel}
+                  </span>
+                  <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: MICRO_LABEL }}>
+                    {activePost.viewerRating != null ? 'Yours' : 'Golfers'}
+                  </span>
+                </button>
+              )}
+            </div>
+            {showRecord && (
+              <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 7, fontSize: 11, fontWeight: 600, color: META, ...TABULAR }}>
+                <span
+                  style={{
+                    border: `1px solid ${statusKind === 'want_to_play' ? 'rgba(247,147,30,0.6)' : 'rgba(255,255,255,0.28)'}`,
+                    color: statusKind === 'want_to_play' ? AMBER : '#FFFFFF',
+                    borderRadius: 999, padding: '3px 9px', fontSize: 8.5, fontWeight: 700,
+                    letterSpacing: '0.12em', textTransform: 'uppercase', lineHeight: 1, textShadow: 'none',
+                  }}
+                >
+                  {statusKind === 'want_to_play' ? 'Want to play' : 'Played'}
+                </span>
+                {statusKind === 'played' && (hasRounds || hasBest) && (
+                  <span>
+                    {hasRounds && (<><span style={FIG}>{yourRounds}</span> {yourRounds === 1 ? 'round' : 'rounds'}</>)}
+                    {hasRounds && hasBest && ' · '}
+                    {hasBest && (<>best <span style={FIG}>{yourBest}</span></>)}
+                  </span>
+                )}
+              </div>
             )}
-
           </div>
         )}
-
       </div>
 
       {/* Bottom scrim removed — author strip + action rail sit on the
@@ -648,29 +705,51 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             >
               {activePost.displayName}
             </span>
+            {activePost.isVerified && <VerifiedBadge size="sm" />}
           </div>
 
-          {/* Sub-row: timeAgo · Follow pill */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minHeight: 20 }}>
-            {timeLabel && (
-              <span
-                style={{
-                  fontSize: 12, color: '#fff', opacity: 0.75, lineHeight: 1,
-                  textShadow: TEXT_SHADOW, flexShrink: 0,
-                }}
-              >
-                {timeLabel}
-              </span>
-            )}
+          {/* Sub-row: index · home club · time · Follow pill */}
+          <div
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6, minHeight: 20, minWidth: 0,
+              fontSize: 11, fontWeight: 600, color: META, lineHeight: 1,
+              textShadow: TEXT_SHADOW, ...TABULAR,
+            }}
+          >
+            {authorMeta.map((node, i) => (
+              <React.Fragment key={i}>
+                {i > 0 && <span aria-hidden style={{ flexShrink: 0 }}>·</span>}
+                {node}
+              </React.Fragment>
+            ))}
             {!readOnly && !isOwnPost && (
-              <div style={{ pointerEvents: 'auto', flexShrink: 0 }}>
-                <FeedFollowPill
-                  isFollowed={isFollowed}
-                  onFollow={() => onFollow(activePost, isFollowed)}
-                />
-              </div>
+              <>
+                {authorMeta.length > 0 && <span aria-hidden style={{ flexShrink: 0 }}>·</span>}
+                <div style={{ pointerEvents: 'auto', flexShrink: 0 }}>
+                  <FeedFollowPill
+                    isFollowed={isFollowed}
+                    onFollow={() => onFollow(activePost, isFollowed)}
+                  />
+                </div>
+              </>
             )}
           </div>
+
+          {/* Review figures — shown, not only linked. Null sub-scores omitted. */}
+          {reviewCells.length > 0 && (
+            <div style={{ marginTop: 11, display: 'flex', gap: 15, textShadow: TEXT_SHADOW }}>
+              {reviewCells.map((c) => (
+                <div key={c.key} style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1, color: c.amber ? AMBER : '#FFFFFF', ...TABULAR }}>
+                    {formatRatingValue(c.value)}
+                  </span>
+                  <span style={{ marginTop: 3, fontSize: 7, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: MICRO_LABEL }}>
+                    {c.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Caption — measured 3-line cut + one inline CTA. Non-review posts
               with an empty caption render nothing; reviews always mount so the
@@ -775,52 +854,40 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           aria-label={t('comments.placeholder')}
           style={{
             position: 'fixed',
-            left: 0, right: 0,
-            bottom: 0,
+            left: 'max(14px, env(safe-area-inset-left, 0px))',
+            right: 'max(14px, env(safe-area-inset-right, 0px))',
+            bottom: COMMENT_BAR_BOTTOM,
+            height: COMMENT_BAR_H, boxSizing: 'border-box',
             zIndex: Z.echo + 1,
-            display: 'flex', alignItems: 'center', gap: 9,
-            background: 'var(--glass-bg)',
-            backdropFilter: 'blur(var(--glass-blur)) saturate(140%)',
-            WebkitBackdropFilter: 'blur(var(--glass-blur)) saturate(140%)',
-            borderTop: '0.5px solid rgba(255,255,255,0.12)',
-            paddingTop: 11,
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 10px)',
-            paddingLeft: 'max(14px, env(safe-area-inset-left, 0px))',
-            paddingRight: 'max(14px, env(safe-area-inset-right, 0px))',
-            borderLeft: 'none', borderRight: 'none', borderBottom: 'none', margin: 0,
+            display: 'flex', alignItems: 'center', gap: 10,
+            borderRadius: 999,
+            background: 'rgba(18,20,22,0.78)',
+            backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            padding: '0 5px', margin: 0,
             cursor: 'pointer', pointerEvents: 'auto', textAlign: 'left',
             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           }}
         >
-          <span
-            style={{
-              width: 26, height: 26, borderRadius: 8, flex: 'none', overflow: 'hidden',
-              boxShadow: '0 0 0 1px rgba(255,255,255,0.22)',
-              background: 'rgba(255,255,255,0.12)',
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.86)',
-            }}
-          >
-            {activeActor!.avatarUrl ? (
-              <img src={activeActor!.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            ) : (
-              (activeActor!.name ?? '').trim().charAt(0).toUpperCase()
-            )}
+          <SquircleAvatar
+            size={30}
+            src={activeActor!.avatarUrl ?? undefined}
+            alt=""
+            fallback={(activeActor!.name ?? '').trim().charAt(0).toUpperCase() || '?'}
+            hairlineRing
+          />
+          <span style={{ flex: 1, minWidth: 0, fontSize: 13, color: META, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {t('comments.placeholder')}
           </span>
           <span
+            aria-hidden
             style={{
-              flex: 1, minWidth: 0, height: 38, borderRadius: 12,
-              background: 'rgba(255,255,255,0.14)',
-              border: '1px solid rgba(255,255,255,0.20)',
-              backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-              padding: '0 13px', boxSizing: 'border-box',
-              display: 'flex', alignItems: 'center',
-              fontSize: 13, color: 'rgba(255,255,255,0.62)',
+              width: 32, height: 32, borderRadius: 999, flexShrink: 0,
+              background: 'rgba(255,255,255,0.08)',
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             }}
           >
-            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
-              {t('comments.placeholder')}
-            </span>
+            <Send size={15} stroke="#fff" strokeWidth={2} />
           </span>
         </button>
       )}
