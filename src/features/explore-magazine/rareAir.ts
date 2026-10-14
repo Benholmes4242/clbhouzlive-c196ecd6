@@ -10,7 +10,7 @@ export const RARE_AIR = {
   toggle: {
     gap: 3,
     padding: 3,
-    height: 24,
+    height: 20, // 20 not 24: keeps the centred toggle clear of the eyebrow now the title row is tight
     sidePadding: 10,
     fontSize: 11.5,
     background: 'rgba(255,255,255,0.05)',

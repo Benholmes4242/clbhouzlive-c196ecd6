@@ -316,7 +316,9 @@ function Section({
         marginBottom: 18,
       }}
     >
-      <div style={{ ...EYEBROW, color: contest ? A.AMBER : A.DIM }}>{eyebrow}</div>
+      {/* lineHeight 1 / 1.1 match Courses' SectionHead: the inherited 1.5 added ~7px of
+          invisible leading between eyebrow and title, so equal margins read as unequal gaps. */}
+      <div style={{ ...EYEBROW, lineHeight: 1, color: contest ? A.AMBER : A.DIM }}>{eyebrow}</div>
       <div
         style={{
           marginTop: 5,
@@ -326,7 +328,7 @@ function Section({
           gap: 12,
         }}
       >
-        <div style={{ minWidth: 0, fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK }}>
+        <div style={{ minWidth: 0, fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1, color: A.INK }}>
           {title}
         </div>
         {meta != null ? (
