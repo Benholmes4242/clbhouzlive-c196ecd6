@@ -1,3 +1,12 @@
+/**
+ * WHY A ROUND SEEDS TWO KEYS. A round post's LikedByRow is mounted with the
+ * whs_score_id: FeedCard.tsx (line ~557) sets
+ * `reactionSubjectId: postRound?.whsScoreId ?? null`, and ExploreCard passes
+ * that into LikedByRow with source 'round' — so the Clubhouse round card reads
+ * ['post-likes', SCORE_ID, 'round']. Any surface that mounts LikedByRow with a
+ * new source creates a reader under that key, which must be seeded AND
+ * invalidated in useContentReactions or it goes stale until the app restarts.
+ */
 import React from 'react';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -37,29 +46,26 @@ const postLikesKeys = (spy: ReturnType<typeof vi.spyOn>) =>
     .map((c) => (c[0] as { queryKey?: unknown[] })?.queryKey)
     .filter((k): k is unknown[] => Array.isArray(k) && k[0] === 'post-likes');
 
-describe('likers cache is keyed on the post id the reader uses', () => {
+describe('likers cache is seeded and invalidated under every key a reader subscribes to (post id and score id for a round post)', () => {
   beforeEach(() => { seed.mockClear(); patch.mockClear(); from.mockReset(); });
 
-  it('a round with a post seeds and invalidates under the post id, source post', async () => {
+  const seeds = () => seed.mock.calls.map((c) => `${c[1]}|${c[2]}`).sort();
+  const keys = (spy: ReturnType<typeof vi.spyOn>) => postLikesKeys(spy).map((k) => k.join('|')).sort();
+
+  it('a round with a post seeds the post id (post) and the score id (round), and invalidates both', async () => {
     const { qc, spy, view } = setup([{ id: 'post-9', whs_score_id: 'score-1' }]);
     await waitFor(() => expect(qc.getQueryData(['round-post-comments', 'score-1'])).toBeTruthy());
     await waitFor(() => expect(view.result.current.unavailable).toBe(false));
     act(() => view.result.current.toggle('round', 'score-1'));
-    await waitFor(() => expect(postLikesKeys(spy).length).toBeGreaterThan(0));
-    expect(seed).toHaveBeenCalledTimes(1);
-    expect(seed.mock.calls[0][1]).toBe('post-9');
-    expect(seed.mock.calls[0][2]).toBe('post');
-    expect(postLikesKeys(spy)).toEqual([['post-likes', 'post-9']]);
+    await waitFor(() => expect(keys(spy)).toEqual(['post-likes|post-9', 'post-likes|score-1']));
+    expect(seeds()).toEqual(['post-9|post', 'score-1|round']);
   });
 
-  it('a round with no post seeds nothing and invalidates nothing post-keyed', async () => {
+  it('a round with no post seeds once under the score id (round) and invalidates it', async () => {
     const { qc, spy, view } = setup([]);
     await waitFor(() => expect(qc.getQueryData(['round-post-comments', 'score-1'])).toBeTruthy());
     act(() => view.result.current.toggle('round', 'score-1'));
-    await waitFor(() =>
-      expect(spy.mock.calls.some((c) => (c[0] as { queryKey?: unknown[] })?.queryKey?.[0] === 'content-reactions')).toBe(true),
-    );
-    expect(seed).not.toHaveBeenCalled();
-    expect(postLikesKeys(spy)).toEqual([]);
+    await waitFor(() => expect(keys(spy)).toEqual(['post-likes|score-1']));
+    expect(seeds()).toEqual(['score-1|round']);
   });
 });

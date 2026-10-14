@@ -20,7 +20,7 @@ vi.mock('@/integrations/supabase/client', () => ({
 }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'viewer' } }) }));
 vi.mock('@/lib/toast', () => ({ toast: { error: toastError } }));
-vi.mock('@/lib/engagementCache', () => ({ patchEngagement: vi.fn() }));
+vi.mock('@/lib/engagementCache', () => ({ patchEngagement: vi.fn(), seedViewerInLikers: vi.fn(() => () => {}) }));
 
 function wrapper(client: QueryClient) {
   return ({ children }: { children: React.ReactNode }) =>
