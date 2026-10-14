@@ -84,7 +84,7 @@ export default function UsersPage() {
   return (
     <div
       style={{
-        padding: '0 12px 24px',
+        padding: '8px 12px 24px',
         display: 'flex',
         flexDirection: 'column',
         gap: 10,
