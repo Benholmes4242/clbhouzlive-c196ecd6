@@ -58,7 +58,7 @@ export function ByRegionSection() {
   if (regions.length === 0) return null;
 
   const lead = homeRegion ? regions.find((r) => r.region === homeRegion) ?? null : null;
-  const rest = regions.filter((r) => r !== lead).slice(0, lead ? REGIONS_WITH_LEAD : REGIONS_NO_LEAD);
+  const rest = [...regions].filter((r) => r !== lead).sort((a, b) => b.rounds - a.rounds).slice(0, lead ? REGIONS_WITH_LEAD : REGIONS_NO_LEAD);
   const tiles: Array<{ r: BrowseRegion; lead: boolean }> = [
     ...(lead ? [{ r: lead, lead: true }] : []),
     ...rest.map((r) => ({ r, lead: false })),
