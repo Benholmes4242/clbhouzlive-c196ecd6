@@ -8,8 +8,6 @@ import type { FeaturedRoundEngagement } from '@/features/explore-magazine/Featur
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard';
-import { WeeklyClubShelf } from '@/features/explore-magazine/WeeklyClubShelf';
-import { ScoresStandingSlot } from '@/features/explore-magazine/ConnectStandingInvite';
 import { useFeaturedRound } from '@/features/explore-magazine/useFeaturedRound';
 import { useViewerScoreScope } from '@/features/explore-magazine/useViewerScoreScope';
 import { useBatchRoundMedals } from '@/features/explore-magazine/useBatchRoundMedals';
@@ -128,30 +126,8 @@ function FeaturedRoundSlab({ viewerId }: { viewerId: string }) {
   );
 }
 
-function ClubWeekBand({ viewerId, pos }: { viewerId: string; pos: number }) {
-  const geo = useViewerScoreScope(viewerId);
-  const { primaryClubId, primaryClubName } = geo.scope;
-  if (!geo.isFetched || !primaryClubId) return null;
-  return (
-      <Band>
-        <WeeklyClubShelf
-          viewerId={viewerId}
-          clubId={primaryClubId}
-          clubName={primaryClubName}
-          enabled
-          pos={pos}
-        />
-      </Band>
-  );
-}
-
-export function HomeRail({ kind, viewerId, pos }: { kind: HomeRailKind; viewerId: string | undefined; pos: number }) {
+export function HomeRail({ kind, viewerId }: { kind: HomeRailKind; viewerId: string | undefined; pos: number }) {
   if (!viewerId) return null;
   if (kind === 'featuredRound') return <FeaturedRoundSlab viewerId={viewerId} />;
-  if (kind === 'clubWeek') return <ClubWeekBand viewerId={viewerId} pos={pos} />;
-  return (
-    <Band>
-      <ScoresStandingSlot viewerId={viewerId} pos={pos} />
-    </Band>
-  );
+  return null;
 }
