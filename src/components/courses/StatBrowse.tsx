@@ -49,9 +49,6 @@ import { Z } from '@/config/zIndex';
 import { BrowseCourseCard } from './BrowseCourseCard';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { COURSE_BROWSE_DESCRIPTION, COURSE_BROWSE_KICKER } from './courseBrowseTypography';
-import { ReviewRailSlot } from './ReviewRailSlot';
-import { ReviewFeaturedSlot } from './ReviewFeaturedSlot';
-import { allocateReviewSlots } from './reviewSlots';
 import { useBrowseReviews } from './useBrowseReviews';
 import { LatestReviewsSheet } from '@/components/explore-tab-new/courseled/LatestReviewsSheet';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
@@ -261,10 +258,6 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
    * which is what keeps scroll restoration honest.
    */
   const { pool: reviewPool } = useBrowseReviews(country, region);
-  const reviewSlots = useMemo(
-    () => allocateReviewSlots(reviewPool, rows.length),
-    [reviewPool, rows.length],
-  );
   const [reviewsSheet, setReviewsSheet] = useState(false);
   const openReviewSheet = useReviewSheetStore((s) => s.open);
   const openReviewsSheet = useCallback(() => {
@@ -823,22 +816,6 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
         </div>
       </div>
 
-      {/* ── Headline ────────────────────────────────────────────── */}
-      <div className="pt-4">
-        <div
-          style={{
-            ...COURSE_BROWSE_KICKER,
-          }}
-        >
-          Courses played
-        </div>
-        <p style={{ ...COURSE_BROWSE_DESCRIPTION, marginTop: 5 }}>
-          {browseTruth
-            ? emphasiseFigures(`${browseTruth.ratedTotal} of the ${browseTruth.allPlayedTotal} courses members have played here carry a rating.`)
-            : null}
-        </p>
-      </div>
-
       {/* ── List ────────────────────────────────────────────────── */}
       {isLoading ? (
         <div className="mt-4 -mx-4 space-y-2 sm:space-y-6">
@@ -989,23 +966,6 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
                     navigate(`/courses/${row.course_id}`);
                   }}
                 />
-                {/* Slot placement is computed against the unfiltered list, so
-                    the reviews stand down while a search is narrowing it. */}
-                {!searching && i < visibleRows.length - 1 && reviewSlots.get(i + 1) ? (
-                  <div style={{ marginTop: 32 }}>
-                    {reviewSlots.get(i + 1)!.kind === 'rail' ? (
-                      <ReviewRailSlot
-                        reviews={reviewSlots.get(i + 1)!.reviews}
-                        onReviewPress={handleReviewTile}
-                      />
-                    ) : (
-                      <ReviewFeaturedSlot
-                        review={reviewSlots.get(i + 1)!.reviews[0]}
-                        onReviewPress={handleReviewTile}
-                      />
-                    )}
-                  </div>
-                ) : null}
               </div>
             );
           })}

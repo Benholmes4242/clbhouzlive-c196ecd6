@@ -26,6 +26,7 @@ import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { useCourseCardMeta } from './hooks/useCourseCardMeta';
 import { useRoundHoleShapes } from './hooks/useRoundHoleShapes';
 import { RoundShape } from './RoundShape';
+import { GLASS_CHIP_CSS } from '@/components/courses/browse/glassChip';
 import { useContentReactions, type ReactionTarget } from './hooks/useContentReactions';
 import { ReactionAction, ReactionSlot } from './ReactionAction';
 import { countNewSince, useReportNewCount } from './newSince';
@@ -78,23 +79,6 @@ const RAIL_SCRIM = SCRIM_STANDOUT;
    The classes are declared once, inline, so the rail carries its own CSS and
    no global stylesheet has to be edited for one section.                    */
 
-const GLASS_CSS = `
-.fpg-chip { background: rgba(24,30,26,0.62); border: 1px solid rgba(255,255,255,0.28); }
-.fpg-score { background: rgba(24,30,26,0.62); border: 1px solid rgba(255,255,255,0.28); }
-@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .fpg-chip {
-    background: rgba(24,30,26,0.40);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    backdrop-filter: blur(16px) saturate(180%);
-  }
-  .fpg-score {
-    background: rgba(24,30,26,0.40);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    backdrop-filter: blur(16px) saturate(180%);
-  }
-}
-
-`;
 
 /* ───────────────────────────── THE SHAPE ─────────────────────────────────
    THREE POINTS, NOT EIGHTEEN. CircleRoundRow carries front_nine_to_par and
@@ -205,7 +189,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
 
   return (
     <section>
-      <style>{GLASS_CSS}</style>
+      <style>{GLASS_CHIP_CSS}</style>
       <Eyebrow
         dot={newCount > 0}
         aside={<InkAction onClick={onSeeAll}>{t('discover.seeAll', 'See all')}</InkAction>}

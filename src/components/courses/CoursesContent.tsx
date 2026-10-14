@@ -10,7 +10,7 @@ import UserCoursesContent from './UserCoursesContent';
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 
 import RateNudge from './RateNudge';
-import StatBrowse from './StatBrowse';
+import CoursesBrowsePage from './CoursesBrowsePage';
 import CourseDirectorySheet from './CourseDirectorySheet';
 
 
@@ -435,7 +435,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
                 <>
                   {shellTabsNode}
                   <div className="px-4 pt-0">
-                    <StatBrowse
+                    <CoursesBrowsePage
                       onOpenDirectory={(c) => {
                         setDirectoryCountry(c);
                         setDirectoryOpen(true);
