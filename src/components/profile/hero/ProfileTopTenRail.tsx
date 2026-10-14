@@ -364,14 +364,14 @@ export const ProfileTopTenRail: React.FC<Props> = ({
             {pill(one)}
             <div style={{ position: 'absolute', left: 12, right: 104, bottom: 10 }}>
               <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: PHOTO_INK, lineHeight: 1.2 }}>{one.name}</div>
-              {regionLine(one) && <div style={{ marginTop: 3, fontSize: 11, fontWeight: 600, color: CAPTION_SUB, ...FIGS }}>{regionLine(one)}</div>}
+              {regionLine(one, rankOf(one.course_id ?? ($1 as any).id)) && <div style={{ marginTop: 3, fontSize: 11, fontWeight: 600, color: CAPTION_SUB, ...FIGS }}>{regionLine(one, rankOf(one.course_id ?? ($1 as any).id))}</div>}
             </div>
           </CourseImageFallback>
         </button>
 
         {/* Reaction strip — belongs to the number-one pick, sits directly under it. */}
         <div style={{ marginTop: 9, padding: '9px 11px', background: 'rgba(255,255,255,0.045)', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 7 }}>
-          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{t('topTen.onThisPick', 'On this pick')}</span>
+          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{isOwnProfile ? t('topTen.onYourNumberOne', 'On your number 1') : t('topTen.onTheirNumberOne', 'On their number 1')}</span>
           {(Object.keys(REACTION_CONFIG) as ReactionType[]).map((k) => {
             const pressed = myReaction === k;
             const pressable = !isOwnProfile && !!viewerId;
@@ -408,7 +408,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                 {pill(c)}
               </CourseImageFallback>
               <div style={{ marginTop: 7, fontSize: 12, fontWeight: 700, color: A.INK, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{c.name}</div>
-              {regionLine(c) && <div style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c)}</div>}
+              {regionLine(c, rankOf(c.course_id ?? ($1 as any).id)) && <div style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c, rankOf(c.course_id ?? ($1 as any).id))}</div>}
             </button>
           ))}
         </div>
@@ -425,7 +425,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                   <CourseImageFallback courseId={c.course_id} courseName={c.name} imageUrl={c.thumbnail_image} style={{ width: 44, height: 34, borderRadius: 8, flexShrink: 0 }} />
                   <span style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
-                    {regionLine(c) && <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c)}</span>}
+                    {regionLine(c, rankOf(c.course_id ?? ($1 as any).id)) && <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c, rankOf(c.course_id ?? ($1 as any).id))}</span>}
                   </span>
                   <span style={{ minWidth: 40, textAlign: 'right', flexShrink: 0 }}>
                     <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: g != null ? A.MUTE : A.DIM, ...FIGS }}>{g != null ? g.toFixed(1) : '–'}</span>
@@ -494,7 +494,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                   <CourseImageFallback courseId={s.id} courseName={s.name} imageUrl={s.thumbnail_image ?? null} style={{ width: 34, height: 26, borderRadius: 6, flexShrink: 0 }} />
                   <span style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
-                    <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(s)}</span>
+                    <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(s, rankOf(s.course_id ?? ($1 as any).id))}</span>
                   </span>
                   <span style={{ fontSize: 17, fontWeight: 700, color: A.MUTE }}>+</span>
                 </button>
