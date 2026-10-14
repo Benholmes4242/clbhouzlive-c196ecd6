@@ -232,9 +232,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
    * A review is decision content, so it lives where the decision is made. The
    * pool follows COUNTRY and REGION only — the lens is an ordering and a review
    * is not ordered by toughness, so changing the lens must not change which
-   * reviews appear. Placement and consumption are pure (reviewSlots.ts): the
-   * same list length yields the same slots in the same places on every load,
-   * which is what keeps scroll restoration honest.
+   * reviews appear.
    */
   const { pool: reviewPool } = useBrowseReviews(country, region);
   const [reviewsSheet, setReviewsSheet] = useState(false);
