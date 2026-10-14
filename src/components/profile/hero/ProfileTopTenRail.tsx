@@ -278,16 +278,15 @@ export const ProfileTopTenRail: React.FC<Props> = ({
       ? visibility === 'private' ? 'Only me' : visibility === 'friends' ? 'Friends only' : 'Followers & friends'
       : null;
 
+  // Header: the shared SectionHeader exactly as ClubsCard uses it; Manage and the
+  // audience marker sit beside it without modifying SectionHeader.
   const header = (
-    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, fontFamily: SANS }}>
+    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, fontFamily: SANS }}>
       <div style={{ minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.INK }}>
-          <span>{isOwnProfile ? t('topTen.kicker', 'Your top 10') : t('topTen.kickerOther', 'Their top 10')}</span>
-          {audienceMarker && <span style={{ color: A.MUTE, letterSpacing: '0.16em' }}>{audienceMarker}</span>}
-        </div>
-        <div style={{ marginTop: 3, fontSize: 11.5, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>
-          {isOwnProfile ? t('topTen.subtitle', "The very best you've played") : t('topTen.subtitleOther', 'The very best they have played')}
-        </div>
+        <SectionHeader role="section" kicker="COURSES" title={isOwnProfile ? t('topTen.kicker', 'Your top 10') : t('topTen.kickerOther', 'Their top 10')} />
+        {audienceMarker && (
+          <div style={{ marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.MUTE }}>{audienceMarker}</div>
+        )}
       </div>
       {isOwnProfile && onManage && n > 0 && (
         <button type="button" onClick={onManage} style={{ background: 'transparent', border: 'none', padding: 0, flexShrink: 0, fontFamily: SANS, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK, cursor: 'pointer' }}>
@@ -298,7 +297,8 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   );
 
   // ── Verdict ───────────────────────────────────────────────────────────
-  const ranked = topTen.filter((c) => c.global_rank != null).length;
+  // List membership only, read from the resolved list rank — never global_rank.
+  const ranked = topTen.filter((c) => rankOf(c.course_id) != null).length;
   const clauses: React.ReactNode[] = [];
   const tr = (key: string, values: Record<string, unknown>) => (
     <Trans key={key} t={t} i18nKey={key} values={values} count={values.count as number} components={{ b: <B /> }} />
@@ -308,14 +308,17 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   } else if (isOwnProfile && n === 10) {
     if (ranked > 0) clauses.push(tr('topTen.verdict.ranked', { count: ranked, word: Word(ranked), total: word(n) }));
     const top = topTen[0];
-    if (top && top.position === 1 && top.global_rank === 1) clauses.push(tr('topTen.verdict.topsBoth', { name: top.name }));
+    if (top && top.position === 1 && rankOf(top.course_id)?.rank === 1) clauses.push(tr('topTen.verdict.topsBoth', { name: top.name }));
     let bold: TopTenCourse | null = null;
+    let boldGap = 0;
     for (const c of topTen) {
-      if (c.global_rank == null) continue;
-      const gap = c.global_rank - c.position;
-      if (gap > 0 && (!bold || gap > bold.global_rank! - bold.position)) bold = c;
+      const r = rankOf(c.course_id);
+      if (!r) continue;
+      const gap = r.rank - c.position;
+      if (gap > 0 && (!bold || gap > boldGap)) { bold = c; boldGap = gap; }
     }
-    if (bold) clauses.push(tr('topTen.verdict.boldest', { name: bold.name, position: bold.position, rank: ordinal(bold.global_rank!) }));
+    const br = bold ? rankOf(bold.course_id) : null;
+    if (bold && br) clauses.push(tr('topTen.verdict.boldest', { name: bold.name, position: bold.position, rank: ordinal(br.rank), list: br.label.toLowerCase() }));
   } else if (!isOwnProfile) {
     const mine = new Set(viewerTopTen.map((c) => c.course_id));
     const overlap = viewerId ? topTen.filter((c) => mine.has(c.course_id)).length : 0;
