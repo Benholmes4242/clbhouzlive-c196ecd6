@@ -15,6 +15,9 @@
  * ONE read, no pagination: the slots consume at most a few dozen reviews on the
  * deepest scroll, so a single capped page covers every position the list can
  * reach. Shape is LatestReview so the shipped review sheet consumes it unchanged.
+ *
+ * NO SURFACE MAY PRINT A REVIEW TOTAL from this pool: it is capped at POOL_CAP
+ * (80) and the sheet it feeds does not page, so any count is a cap, not a truth.
  */
 
 import { useQuery } from '@tanstack/react-query';
