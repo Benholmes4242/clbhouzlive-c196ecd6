@@ -45,6 +45,7 @@ import { AddressValue } from '@/components/business/AddressAutocomplete';
 import { PinDropModal } from '@/components/business/PinDropModal';
 import { PhoneValue } from '@/components/business/PhoneInputWithDialCode';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
+import { BUSINESS_COVER_ASPECT, BUSINESS_COVER_ASPECT_CSS } from '@/lib/tokens/coverAspect';
 import { CoverGuidance } from '@/components/profile/edit-v2/CoverGuidance';
 import { ProfilePhotoCard } from '@/components/profile/edit-v2/ProfilePhotoCard';
 import { RequestAccessModal } from '@/components/business/RequestAccessModal';
@@ -863,6 +864,8 @@ export default function BusinessProfileEditor() {
               }}
             >
               <HeaderPhotoCard
+                aspectRatio={BUSINESS_COVER_ASPECT}
+                aspectCss={BUSINESS_COVER_ASPECT_CSS}
                 currentUrl={effectiveCoverUrl}
                 onFileChange={(file) => { if (file) onCoverFile(file); }}
                 onRemove={onCoverRemove}
@@ -877,7 +880,7 @@ export default function BusinessProfileEditor() {
                       onRemove={onLogoRemove}
                     />
                   </div>
-                  <CoverGuidance />
+                  <CoverGuidance text={t('profile:hero.coverGuidanceBusiness', 'Recommended: 1500x1500px, 1:1 - JPG, PNG or WebP')} />
                 </div>
               </div>
 

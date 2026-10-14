@@ -12,6 +12,7 @@
 import React from 'react';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { formatNumber } from '@/i18n/format';
+import { BUSINESS_COVER_ASPECT_CSS } from '@/lib/tokens/coverAspect';
 
 /* The hero's FALLBACK GROUND, shown only when there is no cover photo.
    Named HERO_INK while the app was light, which hid the fact that it was a
@@ -61,7 +62,8 @@ const H_HEADLINE_GAP = 18;     // headline button marginTop
 const H_HEADLINE_LABEL = 8.5 * LINE;
 const H_FIGURE_GAP = 4;
 const H_FIGURE = 40;           // fontSize 40, lineHeight 1
-const H_SPARKLINE = 10 + 42;   // ProfileHero sparkline: marginTop 10 + H 42
+/* H_SPARKLINE (10 + 42) was personal-only; the personal profile no longer
+   mounts this shell, so it is not part of the sum. */
 const H_STRIP_GAP = 14;        // counter strip marginTop
 const H_STRIP_RULE = 1;        // 1px borderTop
 const H_STRIP_PAD = 13;        // counter strip paddingTop
@@ -77,7 +79,6 @@ const HERO_TALLEST_CONTENT = Math.ceil(
     H_HEADLINE_LABEL +
     H_FIGURE_GAP +
     H_FIGURE +
-    H_SPARKLINE +
     H_STRIP_GAP +
     H_STRIP_RULE +
     H_STRIP_PAD +
@@ -354,10 +355,10 @@ export const HeroShell: React.FC<HeroShellProps> = ({
            `coverBroken` is set by onError after first paint, so gating on it
            would collapse the block post-paint - a worse jump than the one the
            floor removes. A URL that 404s keeps the floor and shows ink. */
-        /* The SHAPE: the cropper takes a 1:1 crop, so the hero holds 1:1 too.
-           Box renders as the larger of width and the floor. */
-        aspectRatio: coverUrl ? '1 / 1' : undefined,
-        minHeight: coverUrl ? HERO_MIN_HEIGHT : undefined,
+        /* The SHAPE, exactly: no floor. Content needs safe-area + 62 + 227; a
+           square gives the viewport width, clearing by +11px at 320pt and +45
+           at 393pt with a 59pt safe area. */
+        aspectRatio: coverUrl ? BUSINESS_COVER_ASPECT_CSS : undefined,
 
 
 

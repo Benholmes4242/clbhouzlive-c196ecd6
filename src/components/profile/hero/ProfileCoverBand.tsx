@@ -9,13 +9,9 @@ import { MoreHorizontal } from 'lucide-react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { INVERTED_CONTROL_SURFACE } from '@/lib/tokens/surfaces';
 import { COVER_TOP_GUARD, W_55 } from './HeroShell';
+import { PERSONAL_COVER_ASPECT_CSS } from '@/lib/tokens/coverAspect';
 import { HERO_CANON_WASH } from '@/features/tourhub/_shared/heroGradient';
 
-/**
- * Band height tracks the safe area: inset + 62 (HERO_CONTENT_INSET) + 104
- * (34 air + 56 avatar + 14 padding), floored at 200 for no-inset devices.
- */
-export const BAND_HEIGHT = 'max(calc(var(--sat, env(safe-area-inset-top, 0px)) + 62px + 104px), 200px)';
 /** Control skin over the band (EDIT pill and the overflow dots). */
 export const BAND_CONTROL_BORDER = 'rgba(255,255,255,0.22)';
 export const BAND_CONTROL_GROUND = 'rgba(10,14,10,0.40)';
@@ -116,7 +112,9 @@ export const ProfileCoverBand: React.FC<Props> = ({
     <section
       style={{
         position: 'relative',
-        height: BAND_HEIGHT,
+        /* Pure aspect, no floor: the cover crop frame reads the same constant.
+           Clearance arithmetic lives in coverAspect.ts. */
+        aspectRatio: PERSONAL_COVER_ASPECT_CSS,
         overflow: 'hidden',
         background: A.CANVAS,
         fontFamily: SANS,

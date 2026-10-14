@@ -40,6 +40,7 @@ import { ManageCard, Label, Nudge, PAGE_BG, CARD_BG, SURFACE_RAISED, HAIR, DANGE
 const DISABLED_BUTTON_FILL = 'rgba(255,255,255,0.06)';
 import { SegToggle } from '@/components/profile/edit-v2/SegToggle';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
+import { PERSONAL_COVER_ASPECT, PERSONAL_COVER_ASPECT_CSS } from '@/lib/tokens/coverAspect';
 import { CoverGuidance } from '@/components/profile/edit-v2/CoverGuidance';
 import { ProfilePhotoCard, type ProfilePhotoCardHandle } from '@/components/profile/edit-v2/ProfilePhotoCard';
 import { HomeClubCard } from '@/components/profile/edit-v2/HomeClubCard';
@@ -510,6 +511,8 @@ function ProfileTabBody({
         <ManageCard padding={0} style={{ overflow: 'visible' }}>
           <div style={{ position: 'relative', borderTopLeftRadius: 14, borderTopRightRadius: 14, overflow: 'hidden' }}>
             <HeaderPhotoCard
+              aspectRatio={PERSONAL_COVER_ASPECT}
+              aspectCss={PERSONAL_COVER_ASPECT_CSS}
               currentUrl={form.headerPhotoUrl}
               onFileChange={(file) => {
                 setField('headerPhotoBlob', file);
@@ -538,7 +541,7 @@ function ProfileTabBody({
                   }}
                 />
               </div>
-              <CoverGuidance />
+              <CoverGuidance text={t('profile:hero.coverGuidancePersonal', 'Recommended: 1700x1000px, 17:10 - JPG, PNG or WebP')} />
             </div>
             <div style={{ paddingTop: 14, paddingBottom: 12 }}>
 

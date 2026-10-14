@@ -15,6 +15,8 @@
     "accept": "Accept",
     "followers": "Followers",
     "coverGuidance": "Recommended: 1500x1500px, 1:1 - JPG, PNG or WebP",
+    "coverGuidancePersonal": "Recommended: 1700x1000px, 17:10 - JPG, PNG or WebP",
+    "coverGuidanceBusiness": "Recommended: 1500x1500px, 1:1 - JPG, PNG or WebP",
     "window12mo": "12 months",
     "trendLevel": "Level",
     "window90d": "90 days"
