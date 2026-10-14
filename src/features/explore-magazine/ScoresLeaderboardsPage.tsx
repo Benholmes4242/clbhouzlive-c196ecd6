@@ -57,9 +57,9 @@ export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
  *
  * EVERY SECTION ANSWERS A DIFFERENT QUESTION. Scope governs the lead board
  * (§3 Lowest gross) and nothing below it. Sections, in order: head, §3 Lowest
- * gross, §5 Feats this year, §7 Top 100, §6 Who leads what, §4 Most improved
+ * gross, §5 Feats this year, §4 Most improved, §6 Who leads what, §7 Top 100
  * — §4 onward are platform facts. The order alternates section SHAPE (rows,
- * tiles, carousel, rail, rows) so no two neighbours read alike; anything added
+ * tiles, rows, rail, carousel) so no two neighbours read alike; anything added
  * here is placed by its shape, not its subject. § numbers name sections, not
  * positions. Each section owns its read, holds its
  * own height while pending, and renders NOTHING when its read fails or is empty.
@@ -1283,84 +1283,38 @@ export function ScoresLeaderboardsPage({
         </Section>
       ) : null}
 
-      {/* §7 TOP 100 — get_career_leaderboard(TOP100_METRIC[list]). This section
-          is get_career_leaderboard's ONLY consumer; its other branches
-          (including 'crowns') stay in SQL, dormant.
-          NO THIN FLOOR ON A LIST THE MEMBER CHOSE: once a chip is tapped, any
-          row count is shown and zero rows reads one quiet line. Only the
-          DEFAULT list being empty (or failing) on load hides the section. */}
-      {top100Defaulted && top100.isPending ? (
-        /* No pinned row: the skeleton cannot know if the viewer is in the top 3,
-           and the shorter shape grows downward (expand-outwards-only). */
-        pending(hundredPlaceholderHeight(!!userId))
-      ) : top100Defaulted && !(top100.isSuccess && top100Rows.length > 0) ? null : (
+      {/* §4 MOST IMPROVED — cumulative this year, not a single round's cut. */}
+      {improved.isPending ? (
+        pending(climbPlaceholderHeight(SHORT_ROWS))
+        /* Below THIN_FLOOR the section renders nothing, deliberately: a three-row improvement board is not a board. */
+      ) : improved.isSuccess && improvedRows.length >= THIN_FLOOR ? (
         <Section
           contest
-          eyebrow={t('amateur.leaderboards.theHundred')}
-          title={t('amateur.leaderboards.top100')}
+          eyebrow={t('amateur.leaderboards.climb')}
+          title={t('amateur.leaderboards.mostImproved')}
+          metaAlign="center"
+          meta={<ClimbToggle mode={climbMode} onChange={setClimbMode} />}
         >
-          {/* §7 head is eyebrow + title only — meta (member count) and lede
-              (field average) were dropped; See all is the only count surface. */}
-          <div style={{ marginBottom: THE_HUNDRED.blockGap }}>
-            <RailChips
-              align="center-when-fit"
-
-              ground="filled-selection"
-              options={TOP100_ORDER.map((slug) => ({ id: slug, label: RANK_SCOPE_LABEL[slug] }))}
-              value={top100List}
-              onChange={pickTop100}
-              ariaLabel={t('amateur.leaderboards.top100List')}
-            />
-          </div>
-          {/* T.1 THE YOU SLAB — signed in only. Needs the board (n, pos, gap)
-              and the list (its length), so it holds its height until both land. */}
-          {userId ? (
-            top100.isPending || listCourses.isPending ? (
-              <div aria-hidden style={{ height: HUNDRED_SLAB_HEIGHT, marginBottom: THE_HUNDRED.blockGap }} />
-            ) : listLength != null ? (
-              <HundredYou
-                slab={hundredSlab(top100Rows, userId)}
-                list={RANK_SCOPE_LABEL[top100List]}
-                listLength={listLength}
-                leaderValue={top100Rows.length > 0 ? Number(top100Rows[0].value) : 0}
-                nameOf={nameOf}
-              />
-            ) : null
-          ) : null}
-          <HundredBasis list={RANK_SCOPE_LABEL[top100List]} />
-          {/* A chip tap starts a fresh slug query. While it loads, reserve the
-              strip (sub-head + tile row) instead of holding the old list:
-              last list's photographs under the new list's caption is worse than
-              a brief empty rail. Deliberately NOT placeholderData. */}
-          {userId && listCourses.isPending ? (
-            <div style={{ marginBottom: THE_HUNDRED.blockGap }}>
-              <HundredSubHead list={RANK_SCOPE_LABEL[top100List]} count={null} />
-              <div aria-hidden style={{ height: THE_HUNDRED.tile.height }} />
-            </div>
-          ) : listCourses.isSuccess && listTiles.length > 0 ? (
-            <div style={{ marginBottom: THE_HUNDRED.blockGap }}>
-              <HundredSubHead
-                list={RANK_SCOPE_LABEL[top100List]}
-                count={{ played: listTiles.filter((c) => c.is_viewer_played).length, total: listTiles.length }}
-              />
-              {/* Keyed by list: a new list remounts the rail, which sets its scroll once. */}
-              <HundredRail key={top100List} tiles={listTiles} gutter={GUTTER} onOpenCourse={onOpenCourse} />
+          {climbPlaced.slice(0, SHORT_ROWS).map((p) => improvedRow(p, false))}
+          {climbSentence ? (
+            <div
+              data-climb-cross
+              style={{
+                position: 'relative', marginTop: CLIMB.slab.marginTop, padding: CLIMB.slab.padding, paddingLeft: 14.5,
+                borderRadius: CLIMB.slab.radius, overflow: 'hidden', background: SLAB_BG,
+                fontSize: CLIMB.slab.fontSize, lineHeight: CLIMB.slab.lineHeight, color: A.MUTE,
+              }}
+            >
+              <span aria-hidden style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: CLIMB.slab.bar, background: A.AMBER }} />
+              {climbSentence}
             </div>
           ) : null}
-          {top100.isPending ? (
-            <div style={{ minHeight: HUNDRED_ROWS_HEIGHT }} />
-          ) : top100Rows.length === 0 ? (
-            <p style={{ margin: 0, padding: THE_HUNDRED.empty.padding, fontFamily: SANS, fontSize: THE_HUNDRED.empty.fontSize, color: A.MUTE }}>
-              {t('amateur.leaderboards.top100Empty')}
-            </p>
-          ) : (
-            shortBoard(top100Rows, top100Secondary, undefined, openTop100Sheet, { progress: top100Progress })
-          )}
-          {top100Rows.length > SHORT_ROWS ? (
-            <SeeAll label={seeAllMembers()} onPress={() => setTop100SeeAllSheet(true)} />
-          ) : null}
+          <SeeAll
+            label={seeAllMembers()}
+            onPress={() => setImprovedSheet(true)}
+          />
         </Section>
-      )}
+      ) : null}
 
       {/* §6 WHO LEADS WHAT — the field's leader of each metric, in the window the
           toggle picks (CAREER_RAIL_LIMIT: every board holds the whole field, so
@@ -1513,38 +1467,84 @@ export function ScoresLeaderboardsPage({
         </Section>
       ) : null}
 
-      {/* §4 MOST IMPROVED — cumulative this year, not a single round's cut. */}
-      {improved.isPending ? (
-        pending(climbPlaceholderHeight(SHORT_ROWS))
-        /* Below THIN_FLOOR the section renders nothing, deliberately: a three-row improvement board is not a board. */
-      ) : improved.isSuccess && improvedRows.length >= THIN_FLOOR ? (
+      {/* §7 TOP 100 — get_career_leaderboard(TOP100_METRIC[list]). This section
+          is get_career_leaderboard's ONLY consumer; its other branches
+          (including 'crowns') stay in SQL, dormant.
+          NO THIN FLOOR ON A LIST THE MEMBER CHOSE: once a chip is tapped, any
+          row count is shown and zero rows reads one quiet line. Only the
+          DEFAULT list being empty (or failing) on load hides the section. */}
+      {top100Defaulted && top100.isPending ? (
+        /* No pinned row: the skeleton cannot know if the viewer is in the top 3,
+           and the shorter shape grows downward (expand-outwards-only). */
+        pending(hundredPlaceholderHeight(!!userId))
+      ) : top100Defaulted && !(top100.isSuccess && top100Rows.length > 0) ? null : (
         <Section
           contest
-          eyebrow={t('amateur.leaderboards.climb')}
-          title={t('amateur.leaderboards.mostImproved')}
-          metaAlign="center"
-          meta={<ClimbToggle mode={climbMode} onChange={setClimbMode} />}
+          eyebrow={t('amateur.leaderboards.theHundred')}
+          title={t('amateur.leaderboards.top100')}
         >
-          {climbPlaced.slice(0, SHORT_ROWS).map((p) => improvedRow(p, false))}
-          {climbSentence ? (
-            <div
-              data-climb-cross
-              style={{
-                position: 'relative', marginTop: CLIMB.slab.marginTop, padding: CLIMB.slab.padding, paddingLeft: 14.5,
-                borderRadius: CLIMB.slab.radius, overflow: 'hidden', background: SLAB_BG,
-                fontSize: CLIMB.slab.fontSize, lineHeight: CLIMB.slab.lineHeight, color: A.MUTE,
-              }}
-            >
-              <span aria-hidden style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: CLIMB.slab.bar, background: A.AMBER }} />
-              {climbSentence}
+          {/* §7 head is eyebrow + title only — meta (member count) and lede
+              (field average) were dropped; See all is the only count surface. */}
+          <div style={{ marginBottom: THE_HUNDRED.blockGap }}>
+            <RailChips
+              align="center-when-fit"
+
+              ground="filled-selection"
+              options={TOP100_ORDER.map((slug) => ({ id: slug, label: RANK_SCOPE_LABEL[slug] }))}
+              value={top100List}
+              onChange={pickTop100}
+              ariaLabel={t('amateur.leaderboards.top100List')}
+            />
+          </div>
+          {/* T.1 THE YOU SLAB — signed in only. Needs the board (n, pos, gap)
+              and the list (its length), so it holds its height until both land. */}
+          {userId ? (
+            top100.isPending || listCourses.isPending ? (
+              <div aria-hidden style={{ height: HUNDRED_SLAB_HEIGHT, marginBottom: THE_HUNDRED.blockGap }} />
+            ) : listLength != null ? (
+              <HundredYou
+                slab={hundredSlab(top100Rows, userId)}
+                list={RANK_SCOPE_LABEL[top100List]}
+                listLength={listLength}
+                leaderValue={top100Rows.length > 0 ? Number(top100Rows[0].value) : 0}
+                nameOf={nameOf}
+              />
+            ) : null
+          ) : null}
+          <HundredBasis list={RANK_SCOPE_LABEL[top100List]} />
+          {/* A chip tap starts a fresh slug query. While it loads, reserve the
+              strip (sub-head + tile row) instead of holding the old list:
+              last list's photographs under the new list's caption is worse than
+              a brief empty rail. Deliberately NOT placeholderData. */}
+          {userId && listCourses.isPending ? (
+            <div style={{ marginBottom: THE_HUNDRED.blockGap }}>
+              <HundredSubHead list={RANK_SCOPE_LABEL[top100List]} count={null} />
+              <div aria-hidden style={{ height: THE_HUNDRED.tile.height }} />
+            </div>
+          ) : listCourses.isSuccess && listTiles.length > 0 ? (
+            <div style={{ marginBottom: THE_HUNDRED.blockGap }}>
+              <HundredSubHead
+                list={RANK_SCOPE_LABEL[top100List]}
+                count={{ played: listTiles.filter((c) => c.is_viewer_played).length, total: listTiles.length }}
+              />
+              {/* Keyed by list: a new list remounts the rail, which sets its scroll once. */}
+              <HundredRail key={top100List} tiles={listTiles} gutter={GUTTER} onOpenCourse={onOpenCourse} />
             </div>
           ) : null}
-          <SeeAll
-            label={seeAllMembers()}
-            onPress={() => setImprovedSheet(true)}
-          />
+          {top100.isPending ? (
+            <div style={{ minHeight: HUNDRED_ROWS_HEIGHT }} />
+          ) : top100Rows.length === 0 ? (
+            <p style={{ margin: 0, padding: THE_HUNDRED.empty.padding, fontFamily: SANS, fontSize: THE_HUNDRED.empty.fontSize, color: A.MUTE }}>
+              {t('amateur.leaderboards.top100Empty')}
+            </p>
+          ) : (
+            shortBoard(top100Rows, top100Secondary, undefined, openTop100Sheet, { progress: top100Progress })
+          )}
+          {top100Rows.length > SHORT_ROWS ? (
+            <SeeAll label={seeAllMembers()} onPress={() => setTop100SeeAllSheet(true)} />
+          ) : null}
         </Section>
-      ) : null}
+      )}
 
       {seeAll ? (
         <BoardSeeAllSheet
