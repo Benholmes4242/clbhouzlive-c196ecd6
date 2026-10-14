@@ -15,11 +15,15 @@ export function fmtToPar(v: number | null | undefined): string | null {
   return r > 0 ? `+${r.toFixed(1)}` : `\u2212${Math.abs(r).toFixed(1)}`;
 }
 
-/** A to-par value as a fact-list item: "plays to +12.1" / "plays level". */
+/** A to-par value as a fact-list item: "Plays to +12.1" / "Plays level".
+ * The capital is there because the value LEADS a middot-separated item — every
+ * item in that list is its own unit, and one beginning with a letter takes a
+ * capital while items beginning with a numeral raise no question. Anyone using
+ * this mid-sentence in future needs fmtToPar instead. */
 export function playsToPar(v: number | null | undefined): string | null {
   const p = fmtToPar(v);
   if (p == null) return null;
-  return p === 'level' ? 'plays level' : `plays to ${p}`;
+  return p === 'level' ? 'Plays level' : `Plays to ${p}`;
 }
 
 export const plural = (n: number, one: string, many: string) =>
