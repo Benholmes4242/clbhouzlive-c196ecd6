@@ -316,6 +316,13 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
           </div>
         </div>
 
+        {/* An empty RPC result is unknown; rounds elsewhere prove readable history,
+            so no qualifying home rounds is a known empty state, not hidden data. */}
+        {rounds.length > 0 && here.length === 0 && (
+          <div style={{ marginTop: 11, fontSize: 12.5, fontWeight: 600, color: A.DIM }}>
+            {t('clubs.noRoundsHere', 'No rounds posted here yet.')}
+          </div>
+        )}
         {figures.length > 0 && (
           <div
             style={{
@@ -425,7 +432,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
                   <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {club.name}
                   </div>
-                  {qualifying.length > 0 && (
+                  {count > 0 && (
                     <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.30)', ...FIGS }}>
                       {t('clubs.roundsCount', '{{n}} ROUNDS', { n: count })}
                     </div>
