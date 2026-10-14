@@ -1,6 +1,6 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -12,7 +12,7 @@ import { GLASS_CHIP_CLASS } from '@/styles/glassChip';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseBrowseTruth, type BrowseRegion } from '../useStatBrowse';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
-import { fmtToPar, LEVEL_PAR, plural } from './format';
+import { fmtToPar, playsToPar, plural } from './format';
 
 /**
  * SECTION 02 — BY REGION (BRIEF_COURSES_PAGE_REBUILD §4, amended by
@@ -24,8 +24,7 @@ export const ALL_COURSES_ANCHOR = 'courses-all';
 /** Single-column tiles must be even: region tiles + the all-regions tile. */
 const REGIONS_WITH_LEAD = 7;
 const REGIONS_NO_LEAD = 9;
-/** Section 08 listens for this to open its region dropdown. */
-export const OPEN_REGION_EVENT = 'courses:open-region';
+
 
 /** The member's home region: primary_club_id → golf_courses.club_id → region. */
 function useHomeRegion(clubId: string | null) {
@@ -52,8 +51,8 @@ const FACT_SHADOW = '0 1px 4px rgba(0,0,0,0.6)';
 export function ByRegionSection() {
   const { user } = useSupabaseSession();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { t } = useTranslation('courses');
   const { data: truth } = useCourseBrowseTruth();
+  const [expanded, setExpanded] = useState(false);
   const home = useHomeClubStatus(user?.id);
   const homeRegionQuery = useHomeRegion(home.clubId);
   const homeRegion = homeRegionQuery.data ?? null;
@@ -62,16 +61,15 @@ export function ByRegionSection() {
   if (regions.length === 0) return null;
 
   const lead = homeRegion ? regions.find((r) => r.region === homeRegion) ?? null : null;
-  const rest = regions.filter((r) => r !== lead).slice(0, lead ? REGIONS_WITH_LEAD : REGIONS_NO_LEAD);
+  const rest = regions.filter((r) => r !== lead).slice(0, expanded ? undefined : lead ? REGIONS_WITH_LEAD : REGIONS_NO_LEAD);
+  // The control tile counts toward the even rule; when singles + control is
+  // odd (only possible expanded), the control spans both columns.
+  const controlSpans = (rest.length + 1) % 2 === 1;
   const tiles: Array<{ r: BrowseRegion; lead: boolean }> = [
     ...(lead ? [{ r: lead, lead: true }] : []),
     ...rest.map((r) => ({ r, lead: false })),
   ];
 
-  const openAll = () => {
-    document.getElementById(ALL_COURSES_ANCHOR)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    window.setTimeout(() => window.dispatchEvent(new Event(OPEN_REGION_EVENT)), 450);
-  };
 
   const askHomeClub = !!user && !home.isLoading && !home.clubId;
 
@@ -108,8 +106,8 @@ export function ByRegionSection() {
         {tiles.map(({ r, lead: isLead }) => {
           const par = fmtToPar(r.avgToPar);
           const fact = isLead
-            ? [plural(r.courses, 'course', 'courses'), plural(r.rounds, 'round', 'rounds'), par === LEVEL_PAR ? t('hero.factLevelPar') : par ? `plays to ${par}` : null]
-            : [plural(r.courses, 'course', 'courses'), par === LEVEL_PAR ? t('hero.factLevelPar') : par];
+            ? [plural(r.courses, 'course', 'courses'), plural(r.rounds, 'round', 'rounds'), playsToPar(r.avgToPar)]
+            : [plural(r.courses, 'course', 'courses'), par];
           return (
             <button
               key={r.region}
@@ -185,11 +183,12 @@ export function ByRegionSection() {
         <button
           key="__all"
           type="button"
-          onClick={openAll}
-          style={{ height: 122, padding: '0 12px', border: 'none', borderRadius: 0, textAlign: 'left', cursor: 'pointer', background: MEMBER_CELL, display: 'flex', alignItems: 'center' }}
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          style={{ gridColumn: controlSpans ? 'span 2' : undefined, height: 122, padding: '0 12px', border: 'none', borderRadius: 0, textAlign: 'left', cursor: 'pointer', background: MEMBER_CELL, display: 'flex', alignItems: 'center' }}
         >
           <span style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.036em', lineHeight: 1.1, color: A.AMBER, fontVariantNumeric: 'tabular-nums' }}>
-            {`All ${regions.length} regions \u203A`}
+            {expanded ? 'Show fewer \u2039' : `All ${regions.length} regions \u203A`}
           </span>
         </button>
       </div>

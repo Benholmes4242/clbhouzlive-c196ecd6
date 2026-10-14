@@ -1,11 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { GLASS_CHIP_CLASS } from '@/styles/glassChip';
 import { useStatBrowseList } from '../useStatBrowse';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
-import { fmtCount, fmtToPar, LEVEL_PAR, plural, RAIL_BLEED } from './format';
+import { fmtCount, fmtToPar, playsToPar, plural, RAIL_BLEED } from './format';
 
 /**
  * SECTION 03 — MOST PLAYED (BRIEF_COURSES_PAGE_REBUILD §5). Replaces the
@@ -14,7 +13,6 @@ import { fmtCount, fmtToPar, LEVEL_PAR, plural, RAIL_BLEED } from './format';
  */
 export function MostPlayedSection() {
   const navigate = useNavigate();
-  const { t } = useTranslation('courses');
   const { rows, isLoading } = useStatBrowseList({ lens: 'played', country: null, region: null, limit: 3 });
   if (isLoading || rows.length === 0) return null;
 
@@ -31,7 +29,7 @@ export function MostPlayedSection() {
         {rows.slice(0, 3).map((row) => {
           const par = fmtToPar(row.avg_to_par);
           const place = [row.region, row.sub_country].filter(Boolean).join(', ');
-          const pill = [row.members > 0 ? plural(row.members, 'member', 'members') : null, par === LEVEL_PAR ? t('hero.factLevelPar') : par ? `plays to ${par}` : null]
+          const pill = [row.members > 0 ? plural(row.members, 'member', 'members') : null, playsToPar(row.avg_to_par)]
             .filter(Boolean)
             .join(' \u00B7 ');
           return (
