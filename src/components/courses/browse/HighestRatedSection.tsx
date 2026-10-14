@@ -1,24 +1,43 @@
-import { useNavigate } from 'react-router-dom';
-import { BrowseCourseCard } from '../BrowseCourseCard';
-import { useStatBrowseList, useCourseBrowseTruth } from '../useStatBrowse';
+import { useStatBrowseList } from '../useStatBrowse';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
+import { RAIL_BLEED } from './format';
+import { PhotoFigureCard } from './PhotoFigureCard';
 
-/** SECTION 05 — HIGHEST RATED (§7). BrowseCourseCard unchanged, three times. */
+const SUBS = [
+  ['design_score', 'Design'],
+  ['condition_score', 'Cond'],
+  ['clubhouse_score', 'House'],
+  ['facilities_score', 'Facil'],
+] as const;
+
+const fmtScore = (v: number | null) => (v == null || !Number.isFinite(v) ? '-' : v.toFixed(1));
+
+/** SECTION 05 — HIGHEST RATED. A rail of PhotoFigureCards (shared with 03). */
 export function HighestRatedSection() {
-  const navigate = useNavigate();
   const { rows, isLoading } = useStatBrowseList({ lens: 'rated', country: null, region: null, limit: 3 });
-  const { data: truth } = useCourseBrowseTruth();
   if (isLoading || rows.length === 0) return null;
-  const top = rows.slice(0, 3);
   return (
     <section style={SECTION_WRAP}>
-      <SectionHead n="05" tone="amber" kicker="Highest rated" title="What members rate highest" subline="Three only. The rest are in the list at the bottom." />
-      <div style={{ marginLeft: -16, marginRight: -16, marginTop: HEAD_GAP }}>
-        {top.map((row, i) => (
-          <div key={row.course_id}>
-            <BrowseCourseCard row={row} difficultyPercentile={truth?.difficultyPercentiles.get(row.course_id)} onClick={() => navigate(`/courses/${row.course_id}`)} />
-            {i < top.length - 1 ? <div aria-hidden="true" style={{ height: 5, background: 'rgba(255,255,255,0.06)' }} /> : null}
-          </div>
+      <SectionHead tone="amber" kicker="Highest rated" title="What members rate highest" subline="Three only. The rest are in the list at the bottom." />
+      <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: 2, marginTop: HEAD_GAP }}>
+        {rows.slice(0, 3).map((row) => (
+          <PhotoFigureCard
+            key={row.course_id}
+            row={row}
+            figure={fmtScore(row.community_rating)}
+            figureLabel={`${row.review_count.toLocaleString('en-GB')} ${row.review_count === 1 ? 'rating' : 'ratings'}`}
+            nameBottom={52}
+            footer={
+              <div style={{ position: 'absolute', left: 14, right: 14, bottom: 13, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
+                {SUBS.map(([key, label]) => (
+                  <div key={key}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF', fontVariantNumeric: 'tabular-nums' }}>{fmtScore(row[key])}</div>
+                    <div style={{ fontSize: 7.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.64)' }}>{label}</div>
+                  </div>
+                ))}
+              </div>
+            }
+          />
         ))}
       </div>
     </section>

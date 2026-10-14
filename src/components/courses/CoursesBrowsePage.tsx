@@ -1,29 +1,25 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { HardestSection } from './browse/HardestSection';
 import { HighestRatedSection } from './browse/HighestRatedSection';
-import { UnclaimedSection } from './browse/UnclaimedSection';
 import { LatestReviewsSection } from './browse/LatestReviewsSection';
 import { useBrowseReviews } from './useBrowseReviews';
-import { LatestReviewsSheet } from '@/components/explore-tab-new/courseled/LatestReviewsSheet';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { analyticsEvents } from '@/utils/analyticsEvents';
 import StatBrowse from './StatBrowse';
 import { SectionHead, SECTION_WRAP } from './browse/SectionHead';
-import { useCourseBrowseTruth, useStatBrowseFacets } from './useStatBrowse';
+import { useStatBrowseFacets } from './useStatBrowse';
 import { GLASS_CHIP_CSS } from '@/styles/glassChip';
 import { WhoPlayingSection } from './browse/WhoPlayingSection';
 import { ByRegionSection, ALL_COURSES_ANCHOR } from './browse/ByRegionSection';
 import { MostPlayedSection } from './browse/MostPlayedSection';
 
 /**
- * CoursesBrowsePage — the Courses tab as eight stacked sections
- * (BRIEF_COURSES_PAGE_REBUILD). Holds no layout beyond stacking them.
- * Sections 01–07 are app-wide and never read the country/region URL params;
+ * CoursesBrowsePage — the Courses tab: six sections above the list
+ * (BRIEF_COURSES_PAGE_REBUILD, revised by DEVICE_REVISION). Holds no layout
+ * beyond stacking them. The sections above the list are app-wide and never read the country/region URL params;
  * those belong to section 08 (StatBrowse) alone.
  *
- * Owns the LatestReviewsSheet so section 07 and section 08 open the same sheet.
+ * Opens no bottom sheet: the page ends at the reviews rail (DEVICE_REVISION §2).
  */
 interface Props {
   onOpenDirectory: React.ComponentProps<typeof StatBrowse>['onOpenDirectory'];
@@ -36,19 +32,17 @@ const BLEED: React.CSSProperties = { marginLeft: -16, marginRight: -16 };
 
 export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
   const { data: facets } = useStatBrowseFacets();
-  const { data: truth } = useCourseBrowseTruth();
   // The list browses the analytics-ready population (stat_browse_base), so the
   // heading counts that population, not every course with any tracked round.
   const total = facets?.played_total;
-  const { user } = useSupabaseSession();
-  // Section 07 is app-wide: no country, no region.
+  // Same derivation StatBrowse uses for its directory floor.
+  const directoryRemaining =
+    facets?.directory_total != null && facets?.played_total != null
+      ? Math.max(0, facets.directory_total - facets.played_total)
+      : null;
+  // The reviews rail is app-wide: no country, no region.
   const { pool: reviewPool } = useBrowseReviews(null, null);
-  const [reviewsSheet, setReviewsSheet] = useState(false);
   const openReviewSheet = useReviewSheetStore((st) => st.open);
-  const openReviewsSheet = useCallback(() => {
-    analyticsEvents.track('stat_browse_reviews_sheet_open', { country: null, region: null, pool: reviewPool.length });
-    setReviewsSheet(true);
-  }, [reviewPool.length]);
   const handleReviewTile = useCallback(
     (r: LatestReview) => {
       openReviewSheet({
@@ -76,30 +70,21 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         <MostPlayedSection />
         <HardestSection />
         <HighestRatedSection />
-        <UnclaimedSection />
-        <LatestReviewsSection reviews={reviewPool} onReviewPress={handleReviewTile} onSeeAll={openReviewsSheet} />
+        <LatestReviewsSection reviews={reviewPool} onReviewPress={handleReviewTile} />
         <section id={ALL_COURSES_ANCHOR} style={SECTION_WRAP}>
           <SectionHead
-            n="08"
             tone="quiet"
-            kicker="Everything we track"
-            title={total ? `All ${total.toLocaleString('en-GB')} courses` : 'All courses'}
-            subline={
-              truth
-                ? `Filter and sort. ${truth.ratedTotal.toLocaleString('en-GB')} carry a community rating.`
-                : 'Filter and sort.'
+            kicker="Played by members"
+            title={
+              total != null && directoryRemaining != null
+                ? `${total.toLocaleString('en-GB')} courses, ${directoryRemaining.toLocaleString('en-GB')} more`
+                : 'Courses'
             }
+            subline="These are the courses a member has posted a full round at, so every figure on them is real. The rest of the directory is one tap below."
           />
         </section>
       </div>
       <StatBrowse onOpenDirectory={onOpenDirectory} />
-      <LatestReviewsSheet
-        open={reviewsSheet}
-        onClose={() => setReviewsSheet(false)}
-        reviews={reviewPool}
-        viewerId={user?.id}
-        onTilePress={handleReviewTile}
-      />
     </div>
   );
 }
