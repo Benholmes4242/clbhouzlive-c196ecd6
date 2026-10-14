@@ -8,9 +8,10 @@ import { adminTheme as t } from '../../theme';
 import ConfirmDialog from '../ConfirmDialog';
 import { FooterButton, Head, Muted, Panel, ROW_RULE, Slot, FIG_LABEL } from '../analytics/analyticsUi';
 import { dateLabel, num } from '../analytics/analyticsFormat';
-import { useHealthGolf, type HealthGolf } from '../../hooks/useHealthLenses';
+import { useHealthGolf, useHealthJobs, type HealthGolf } from '../../hooks/useHealthLenses';
 import { ageOf, ageSecs, minsText, plural, secsText, untilOf } from './healthText';
 import { Bar, H, META, PillButton } from './healthUi';
+import { nextSyncText } from './cronText';
 
 const share = (a: number | null, b: number | null) => (a == null || !b ? 0 : (100 * a) / b);
 
@@ -63,6 +64,7 @@ function Journey({ g }: { g: HealthGolf }) {
 
 function Connections({ g }: { g: HealthGolf }) {
   const c = g.connections;
+  const next = nextSyncText(useHealthJobs().data, new Date());
   const tile = (label: string, v: number | null, sub: string, kind: 'fresh' | 'warn') => {
     const hot = kind === 'warn' && (v ?? 0) > 0;
     return (
@@ -75,7 +77,7 @@ function Connections({ g }: { g: HealthGolf }) {
   };
   return (
     <Panel>
-      <Head title="England Golf connections" side={c.next_sync_at ? `next sync in ${untilOf(c.next_sync_at)}` : 'next sync in -'} />
+      <Head title="England Golf connections" side={next.text} sideStyle={next.tone ? { color: next.tone } : undefined} />
       <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 8 }}>
         <span style={{ fontSize: 32, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>{num(c.connected)}</span>
         <span style={{ fontSize: 13, fontWeight: 600, color: t.inkMuted }}>members connected</span>

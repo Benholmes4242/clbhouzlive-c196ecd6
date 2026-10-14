@@ -1,8 +1,6 @@
 /** Health-only literals and small pieces from health_*.html (no token exists for these). */
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { adminTheme as t } from '../../theme';
-import { ROW_RULE } from '../analytics/analyticsUi';
 
 export const H = {
   okBar: '#3DDC91',
@@ -48,27 +46,4 @@ export function PillButton({ children, onClick, primary, disabled, style }: {
       ...style,
     }}>{children}</button>
   );
-}
-
-/** Two-column list row (title + meta | right), optionally a link. */
-export function ListRow({ to, title, meta, right, inset = false, onClick, titleStyle }: {
-  to?: string; title: React.ReactNode; meta?: React.ReactNode; right?: React.ReactNode; inset?: boolean; onClick?: () => void; titleStyle?: React.CSSProperties;
-}) {
-  const style: React.CSSProperties = {
-    display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 10, alignItems: 'center',
-    padding: inset ? '10px 16px' : '9px 0', borderTop: ROW_RULE, color: t.ink, textDecoration: 'none',
-    background: 'transparent', border: 0, borderTopStyle: 'solid', width: '100%', textAlign: 'left', fontFamily: 'inherit',
-  };
-  const inner = (
-    <>
-      <span style={{ minWidth: 0 }}>
-        <span style={{ display: 'block', fontSize: 13, fontWeight: 700, ...titleStyle }}>{title}</span>
-        {meta != null && <span style={META}>{meta}</span>}
-      </span>
-      {right}
-    </>
-  );
-  if (to) return <Link to={to} style={style}>{inner}</Link>;
-  if (onClick) return <button type="button" onClick={onClick} style={{ ...style, borderTop: ROW_RULE, cursor: 'pointer' }}>{inner}</button>;
-  return <div style={style}>{inner}</div>;
 }

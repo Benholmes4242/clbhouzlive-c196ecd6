@@ -4,7 +4,7 @@
  * so the dot and the page can never disagree.
  */
 import { useMemo } from 'react';
-import { useDashboard, type EgSyncHealth } from '../../hooks/useDashboard';
+import { useEgSyncHealth, type EgSyncHealth } from '../../hooks/useDashboard';
 import { useEchoEngineHealth } from '../../hooks/useEchoEngineHealth';
 import { usePushHealth } from '../../hooks/usePushHealth';
 import { useDeletionIntegrity } from '../../hooks/useDeletionIntegrity';
@@ -154,7 +154,7 @@ export function useHealthVerdict() {
   const golf = useHealthGolf();
   const app = useHealthApp();
   const jobs = useHealthJobs();
-  const eg = useDashboard().egSyncHealth;
+  const eg = useEgSyncHealth();
   const echo = useEchoEngineHealth();
   const push = usePushHealth();
   const deletion = useDeletionIntegrity();

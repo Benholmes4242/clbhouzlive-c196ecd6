@@ -149,3 +149,25 @@ describe('legacy ?tab= map', () => {
     expect(canonicalHealthParams(p, healthViewOf(p, true))?.toString()).toBe('lens=jobs');
   });
 });
+
+describe('BRIEF_HEALTH_FIX1', async () => {
+  const { nextSyncText } = await import('./cronText');
+  const { slowestText } = await import('./healthText');
+  const { adminTheme } = await import('../../theme');
+  const jobs = (active = true) => mapJobs({ jobs: [{ id: 1, name: 'sync-whs-due-every-6h', schedule: '0 8,14,20,2 * * *', active }] });
+  it('counts down to the next sync job run', () => {
+    expect(nextSyncText(jobs(), new Date('2026-10-14T12:53:00Z')).text).toBe('next sync in 1h');
+    expect(nextSyncText(jobs(), new Date('2026-10-14T13:58:00Z')).text).toBe('next sync in 2m');
+  });
+  it('paused job reads sync paused in amber', () => {
+    expect(nextSyncText(jobs(false), new Date())).toEqual({ text: 'sync paused', tone: adminTheme.warnText });
+  });
+  it('no job or no jobs reads dash', () => {
+    expect(nextSyncText(mapJobs({ jobs: [] }), new Date()).text).toBe('next sync in -');
+    expect(nextSyncText(undefined, new Date()).text).toBe('next sync in -');
+  });
+  it('slowest shows one decimal', () => {
+    expect(slowestText(4.1)).toBe('4.1h');
+    expect(slowestText(4)).toBe('4h');
+  });
+});

@@ -32,6 +32,23 @@ const NAV: NavItem[] = [
   { to: '/admin-v2/health?tab=settings', label: 'Settings', icon: Settings, moderatorAllowed: true, everyRole: true },
 ];
 
+/**
+ * Mounted only while the drawer is open for a manageAdmins admin, so a closed
+ * drawer, moderators and limited admins never run the Health queries.
+ * Same verdict as the Status lens, so the dot and the page cannot disagree.
+ */
+function HealthNavDot() {
+  const { issues } = useHealthVerdict();
+  if (issues.length === 0) return null;
+  return (
+    <span style={{
+      position: 'absolute', top: -2, right: -2,
+      width: 8, height: 8, borderRadius: 999,
+      background: t.warn, border: `1.5px solid ${t.surface}`,
+    }} />
+  );
+}
+
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -43,9 +60,6 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
   const location = useLocation();
   const triage = useTriageCounts();
   const badge = triage.data?.total ?? 0;
-  // Same verdict as the Status lens, so the dot and the page cannot disagree.
-  const health = useHealthVerdict();
-  const healthDegraded = health.issues.length > 0;
 
   useEffect(() => {
     if (!open) return;
@@ -110,7 +124,7 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
             const active = location.pathname.startsWith(path) && (query ? onSettings : !(path === '/admin-v2/health' && onSettings));
             const Icon = item.icon;
             const showBadge = item.showBadge && badge > 0;
-            const showDot = item.showHealthDot && healthDegraded;
+            const showDot = item.showHealthDot && open && canManageAdmins;
             return (
               <Link
                 key={item.to}
@@ -128,13 +142,7 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
               >
                 <span style={{ position: 'relative', display: 'inline-flex' }}>
                   <Icon size={18} />
-                  {showDot && (
-                    <span style={{
-                      position: 'absolute', top: -2, right: -2,
-                      width: 8, height: 8, borderRadius: 999,
-                      background: t.warn, border: `1.5px solid ${t.surface}`,
-                    }} />
-                  )}
+                  {showDot && <HealthNavDot />}
                 </span>
                 <span style={{ flex: 1 }}>{item.label}</span>
                 {showBadge && (

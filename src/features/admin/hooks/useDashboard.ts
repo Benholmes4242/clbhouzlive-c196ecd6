@@ -11,7 +11,7 @@
  * Counting happens in Postgres. A new metric needs an RPC, not a select and a
  * Set.
  */
-import { useQueries } from '@tanstack/react-query';
+import { useQueries, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -82,10 +82,15 @@ async function fetchTodayGlance(): Promise<TodayGlance> {
   return { postsByHour, topActiveUsers };
 }
 
-async function fetchEgSyncHealth(): Promise<EgSyncHealth> {
+export async function fetchEgSyncHealth(): Promise<EgSyncHealth> {
   const { data, error } = await supabase.rpc('get_eg_sync_health' as never);
   if (error) throw error;
   return data as EgSyncHealth;
+}
+
+/** EG sync health alone; same key/timings as useDashboard so they share one cache entry. */
+export function useEgSyncHealth() {
+  return useQuery({ queryKey: ['admin-v2', 'dashboard', 'eg'], queryFn: fetchEgSyncHealth, staleTime: 60_000, refetchInterval: 120_000 });
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────

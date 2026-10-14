@@ -5,6 +5,9 @@
  * ONE wording, used by every Health surface.
  */
 import { CronExpressionParser } from 'cron-parser';
+import type { HealthJobs } from '../../hooks/useHealthLenses';
+import { adminTheme } from '../../theme';
+import { untilOf } from './healthText';
 
 export type CronShape = 'hours' | 'hourly' | 'minute' | 'minutes' | 'daily' | 'weekly' | 'monthly' | 'raw';
 
@@ -120,3 +123,17 @@ export function describeSchedule(schedule: string, now: Date = new Date()): Cron
 }
 
 export { DOW as CRON_DOW };
+
+/**
+ * Connections header countdown (BRIEF_HEALTH_FIX1). Reads the England Golf
+ * sync JOB's schedule, never connections.next_sync_at: that per-connection
+ * value is last sync + 4h while the job runs every 6h, so it is in the past
+ * for 2h of every 6 and is never the real next sync.
+ */
+export function nextSyncText(jobs: HealthJobs | undefined, now: Date): { text: string; tone?: string } {
+  const job = jobs?.jobs.find((j) => j.name.startsWith('sync-whs-due'));
+  if (!job) return { text: 'next sync in -' };
+  if (!job.active) return { text: 'sync paused', tone: adminTheme.warnText };
+  const next = nextRun(job.schedule, now);
+  return { text: `next sync in ${untilOf(next ? next.toISOString() : null, now.getTime())}` };
+}
