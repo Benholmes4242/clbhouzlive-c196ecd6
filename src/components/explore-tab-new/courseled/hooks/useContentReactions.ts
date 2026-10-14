@@ -246,11 +246,16 @@ export function useContentReactions(
            a key nothing reads - the same writer/reader mismatch as the August
            useCommentsV2:360 fix. If a post id cannot be resolved, seed NOTHING. */
         if (postId) reverts.push(seedViewerInLikers(queryClient, postId, 'post', viewer, !mine));
-        /* EXCEPTION — the REVIEW-id key HAS readers: ReviewBottomSheet's
-           LikedByRow and ExploreCard's review likers both subscribe under
-           ['post-likes', REVIEW_ID, 'review']. That seed stays. No reader uses
-           ['post-likes', SCORE_ID, 'round'], so rounds no longer seed it. */
+        /* SUBJECT-ID KEYS HAVE READERS TOO. The review id is read under
+           ['post-likes', REVIEW_ID, 'review'] by ReviewBottomSheet's and
+           ExploreCard's review likers; the SCORE id is read under
+           ['post-likes', SCORE_ID, 'round'] by the Clubhouse round card
+           (FeedCard -> ExploreCard LikedByRow source="round"). Any surface that
+           mounts LikedByRow with a given source creates a reader under that
+           exact key, so a new source must be seeded here and invalidated in
+           onSettled, or its roster goes stale against a fresh count. */
         if (type === 'review') reverts.push(seedViewerInLikers(queryClient, id, 'review', viewer, !mine));
+        if (type === 'round') reverts.push(seedViewerInLikers(queryClient, id, 'round', viewer, !mine));
       }
       const revertLikers = reverts.length ? () => reverts.forEach((r) => r()) : undefined;
       return { previous, revertLikers };
