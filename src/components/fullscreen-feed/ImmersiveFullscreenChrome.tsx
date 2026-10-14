@@ -76,6 +76,7 @@ const TEXT_SHADOW = '0 1px 3px rgba(0,0,0,0.55)';
    bottom edge (never inside the home indicator). COMMENT_BAR_BLOCK is the full
    footprint the author column and rail clear. Change these together. */
 const COMMENT_BAR_H = 44;
+// 16 is a FLOOR, not a fixed offset: on home-indicator phones the pill sits above the indicator.
 const COMMENT_BAR_BOTTOM = 'max(16px, env(safe-area-inset-bottom, 0px))';
 const COMMENT_BAR_BLOCK = `calc(${COMMENT_BAR_H}px + ${COMMENT_BAR_BOTTOM})`;
 const META = 'rgba(255,255,255,0.62)';
@@ -460,7 +461,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   // (tag-only posts, older RPCs). Resolve the community rating from
   // course_rating_aggregates when the payload is missing it.
   const courseRating =
-    activePost.viewerRating ??
     activePost.courseRating ??
     (ratingAggregate?.avg_overall_score != null ? Number(ratingAggregate.avg_overall_score) : null);
   const showCourseChip = courseRating != null;
@@ -508,7 +508,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const reviewCells: { key: string; value: number; label: string; amber?: boolean }[] = [];
   if (review) {
     if (review.rating != null) reviewCells.push({ key: 'r', value: Number(review.rating), label: 'THEIR SCORE', amber: true });
-    if (activePost.courseRating != null) reviewCells.push({ key: 'g', value: Number(activePost.courseRating), label: 'GOLFERS' });
     for (const [field, label] of BREAKDOWN_CELLS) {
       const v = review.breakdown?.[field];
       if (v != null) reviewCells.push({ key: field, value: Number(v), label });
@@ -562,7 +561,10 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         </button>
 
 
-        {/* Course header — left-aligned after the chevron. */}
+        {/* Course header — left edge is 70px = chevron left (14) + chevron (44)
+            + row gap (12). The header FOLLOWS the chevron: change the chevron's
+            size or inset and this edge moves with it. The chip shows the
+            course's clbhouz (community) score only — never the author's. */}
         {courseName && (
           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', paddingTop: 2, textShadow: TEXT_SHADOW }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, minWidth: 0 }}>
@@ -604,7 +606,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); handleCourseTap(); }}
-                  aria-label={`${activePost.viewerRating != null ? 'Review rating' : 'Community rating'} ${courseRatingLabel}`}
+                  aria-label={`clbhouz rating ${courseRatingLabel}`}
                   style={{
                     flexShrink: 0, display: 'inline-flex', alignItems: 'baseline', gap: 5,
                     background: 'rgba(0,0,0,0.42)', border: '1px solid rgba(255,255,255,0.16)',
@@ -617,7 +619,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
                     {courseRatingLabel}
                   </span>
                   <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: MICRO_LABEL }}>
-                    {activePost.viewerRating != null ? 'Yours' : 'Golfers'}
+                    CLBHOUZ
                   </span>
                 </button>
               )}
