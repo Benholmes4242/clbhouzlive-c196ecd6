@@ -91,7 +91,6 @@ interface Props {
   open: boolean;
   onClose: () => void;
   reviews: LatestReview[];
-  totalCount?: number | null;
   viewerId?: string;
   onTilePress: (r: LatestReview) => void;
   hasNextPage?: boolean;
@@ -99,11 +98,17 @@ interface Props {
   onLoadMore?: () => void;
 }
 
+/**
+ * THE HEADER PRINTS NO TOTAL. Its pool is capped and unpaged (POOL_CAP in
+ * useBrowseReviews — read that note), so any count here is a cap wearing the
+ * clothes of a truth: the whole-world figure would be the cap itself, and a
+ * region figure is only "how many of the loaded eighty landed here". The header
+ * names the scope and stops there, so it cannot contradict the rail it opens.
+ */
 export function LatestReviewsSheet({
   open,
   onClose,
   reviews,
-  totalCount,
   viewerId,
   onTilePress,
   hasNextPage,
@@ -169,14 +174,11 @@ export function LatestReviewsSheet({
   }, [open, region, hasNextPage, isFetchingNextPage, onLoadMore]);
 
   const complete = !hasNextPage;
-  const total = region === 'all' ? totalCount ?? reviews.length : visible.length;
+  // Scope word alone, in BOTH branches — no count anywhere. See the docblock:
+  // every figure either branch could print is a capped number, not a total.
   const caption =
     region === 'all' || complete
-      ? t('discover.reviews.sheetRegionCaption', {
-          defaultValue: '{{region}} — {{count}} reviews',
-          region: activeLabel,
-          count: total,
-        })
+      ? activeLabel
       : t('discover.reviews.sheetRegionLoading', {
           defaultValue: '{{region}} — loading reviews',
           region: activeLabel,

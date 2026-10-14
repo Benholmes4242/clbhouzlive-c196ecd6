@@ -97,7 +97,6 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         open={reviewsSheet}
         onClose={() => setReviewsSheet(false)}
         reviews={reviewPool}
-        totalCount={reviewPool.length}
         viewerId={user?.id}
         onTilePress={handleReviewTile}
       />
