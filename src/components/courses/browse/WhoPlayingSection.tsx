@@ -12,7 +12,7 @@ import { GLASS_CHIP_CLASS } from '@/styles/glassChip';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
-import { plural, RAIL_BLEED } from './format';
+import { joinNames, plural, RAIL_BLEED } from './format';
 
 /**
  * SECTION 01 — WHAT'S BEEN PLAYED (BRIEF_COURSES_PAGE_DEVICE_REVISION §3).
@@ -22,7 +22,7 @@ import { plural, RAIL_BLEED } from './format';
  */
 const CAP = 10;
 /** Rounds read before grouping — the hook's own cap, unchanged. */
-const ROUND_LIMIT = 10;
+const ROUND_LIMIT = 24;
 
 interface CourseGroup {
   key: string;
@@ -34,17 +34,9 @@ interface CourseGroup {
   members: CircleRoundRow[]; // one row per distinct member, most recent first
 }
 
-/** LikedByRow's grammar: first names; "A", "A and B", "A, B and N others". */
 function firstName(name: string): string {
   const s = (name ?? '').trim();
   return s ? s.split(/\s+/)[0] : 'Golfer';
-}
-function namesLine(members: CircleRoundRow[]): string {
-  const n = members.map((m) => firstName(m.display_name));
-  if (n.length === 1) return n[0];
-  if (n.length === 2) return `${n[0]} and ${n[1]}`;
-  const others = n.length - 2;
-  return `${n[0]}, ${n[1]} and ${others} other${others === 1 ? '' : 's'}`;
 }
 
 export function WhoPlayingSection() {
@@ -77,9 +69,9 @@ export function WhoPlayingSection() {
     <section style={SECTION_WRAP}>
       <SectionHead
         tone="amber"
-        kicker="This week"
+        kicker="Recently"
         title="What's been played"
-        subline="The courses members walked this week, and what they went round in."
+        subline="The courses members have been playing, and what they went round in."
       />
       <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: 10, marginTop: HEAD_GAP }}>
         {groups.map((g) => {
@@ -118,7 +110,7 @@ export function WhoPlayingSection() {
                   ))}
                 </span>
                 <span style={{ fontSize: 11.5, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
-                  <span style={{ color: A.BODY, fontWeight: 600 }}>{namesLine(g.members)}</span>
+                  <span style={{ color: A.BODY, fontWeight: 600 }}>{joinNames(g.members.map((m) => firstName(m.display_name)))}</span>
                   {` \u00B7 ${tail}`}
                 </span>
               </div>
