@@ -1,6 +1,6 @@
 /** Health: Golf data lens (health_golf_data.html). */
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
@@ -9,9 +9,8 @@ import ConfirmDialog from '../ConfirmDialog';
 import { FooterButton, Head, Muted, Panel, ROW_RULE, Slot, FIG_LABEL } from '../analytics/analyticsUi';
 import { dateLabel, num } from '../analytics/analyticsFormat';
 import { useHealthGolf, type HealthGolf } from '../../hooks/useHealthLenses';
-import { ageOf, minsText, plural, secsText, untilOf } from './healthText';
+import { ageOf, ageSecs, minsText, plural, secsText, untilOf } from './healthText';
 import { Bar, H, META, PillButton } from './healthUi';
-import { useNavigate } from 'react-router-dom';
 
 const share = (a: number | null, b: number | null) => (a == null || !b ? 0 : (100 * a) / b);
 
@@ -193,7 +192,7 @@ function Stuck({ g }: { g: HealthGolf }) {
   const body = clear
     ? `Every round posted in the last 7 days has been analysed. Median analysis time ${secsText(s.median_process_secs)}.`
     : isStuck
-      ? `${plural(s.stuck!, 'round')} ${s.stuck === 1 ? 'has' : 'have'} waited over an hour, the oldest ${secsText(s.oldest_wait_secs) === '-' ? '-' : ageOfSecs(s.oldest_wait_secs)}.`
+      ? `${plural(s.stuck!, 'round')} ${s.stuck === 1 ? 'has' : 'have'} waited over an hour, the oldest ${ageSecs(s.oldest_wait_secs)}.`
       : `${plural(pending, 'round')} from the last 7 days ${pending === 1 ? 'has' : 'have'} no analysis yet${(s.failed_7d ?? 0) > 0 ? `, ${s.failed_7d} failed` : ''}`;
   return (
     <Panel>
@@ -210,8 +209,6 @@ function Stuck({ g }: { g: HealthGolf }) {
   );
 }
 
-import { ageSecs } from './healthText';
-const ageOfSecs = (s: number | null) => ageSecs(s);
 
 /** Moved from SystemPage's DevToolsTab: same edge function calls, dialog and toasts. */
 function FixTools() {
