@@ -34,3 +34,17 @@ export const RAIL_BLEED: React.CSSProperties = {
   paddingLeft: 16,
   paddingRight: 16,
 };
+
+/**
+ * joinNames — "Thomas", "Thomas and Amy", "Thomas, Amy and 3 more".
+ * DELIBERATELY NOT LikedByRow's grammar: that sentence lists people who did
+ * something to one object ("Liked by Thomas, Amy and 10 others"); this one is a
+ * list of people beside a count of a different thing ("Thomas and Amy · 2
+ * rounds"). One vocabulary, two grammars — neither is to be unified into the other.
+ */
+export function joinNames(names: string[], max = 2): string {
+  if (names.length === 0) return '';
+  if (names.length === 1) return names[0];
+  if (names.length <= max) return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+  return `${names.slice(0, max).join(', ')} and ${fmtCount(names.length - max)} more`;
+}
