@@ -238,12 +238,6 @@ function AuthStackedBars({ data }: { data: { date: string; success: number; fail
 }
 
 
-// ═══ LIVE TAB (Firebase realtime) ═════════════════════════════════════════════
-// - useLiveInApp: shared 5-min distinct-users query (also feeds Dashboard).
-// - useLiveWindow30m: 30-min event window that powers the minute chart,
-//   the event stream, and the top-screens section (verified `path` prop on
-//   page_view via src/hooks/usePageTracking.ts).
-// - Both polling queries are visibility-gated in their hook definitions.
 
 function displayNameOf(p?: LiteProfile | null): string {
   if (!p) return 'Member';
