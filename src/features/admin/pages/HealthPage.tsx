@@ -46,7 +46,7 @@ export default function HealthPage() {
 
   return (
     <div style={COLUMN}>
-      <AnalyticsLenses<HealthLens> lens={view.lens} onLens={setLens} items={HEALTH_LENSES} label="Health lenses" />
+      <AnalyticsLenses lens={view.lens} onLens={setLens} items={HEALTH_LENSES} label="Health lenses" />
       {view.lens === 'status' && <StatusLens />}
       {view.lens === 'golf' && <GolfDataLens />}
       {view.lens === 'app' && <AppLens />}
