@@ -71,11 +71,9 @@ const ghostBtn: React.CSSProperties = {
   transition: 'background .12s',
 };
 
-};
+// ─── Settings ──────────────────────────────────────────────────────────
 
-// ─── Tab 3: Settings ──────────────────────────────────────────────────────────
-
-export function SettingsTab() {
+export default function SettingsTab() {
   const { user } = useSupabaseSession();
   const { role } = usePanelRole();
   const [pillsVisible, setPillsVisible] = useAdminPillVisibility();
