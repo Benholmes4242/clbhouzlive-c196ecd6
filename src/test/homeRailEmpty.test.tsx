@@ -34,6 +34,7 @@ describe('Home rail bands render nothing when empty', () => {
 
   it('round of the week with no featured round mounts nothing', () => {
     const { container } = render(<HomeRail kind="featuredRound" viewerId="u1" pos={0} />);
+    expectCollapsed(container);
     expect(container.childNodes.length).toBe(0);
   });
 });
