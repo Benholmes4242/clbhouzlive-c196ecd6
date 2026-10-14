@@ -48,7 +48,6 @@ import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome
 import { Z } from '@/config/zIndex';
 import { BrowseCourseCard } from './BrowseCourseCard';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
-import { COURSE_BROWSE_DESCRIPTION, COURSE_BROWSE_KICKER } from './courseBrowseTypography';
 import { useBrowseReviews } from './useBrowseReviews';
 import { LatestReviewsSheet } from '@/components/explore-tab-new/courseled/LatestReviewsSheet';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
@@ -57,26 +56,6 @@ import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SURFA
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 import { CoursesSearchField } from '@/features/explore-magazine/CoursesSearchField';
 
-/**
- * Emphasise only the figures inside a sentence: INK 700 with tabular figures
- * against the surrounding INK_MUTE body. Splits on digit runs so initialisms
- * like WHS stay in body weight and are not mistaken for a number.
- */
-const FIGURE_SPLIT = /(\p{Nd}[\p{Nd}.,\u00A0\u202F\u2009]*)/gu;
-const HAS_DIGIT = /\p{Nd}/u;
-const emphasiseFigures = (sentence: string): React.ReactNode[] =>
-  sentence.split(FIGURE_SPLIT).map((part, i) =>
-    HAS_DIGIT.test(part) ? (
-      <span
-        key={i}
-        style={{ color: INK, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}
-      >
-        {part}
-      </span>
-    ) : (
-      part
-    ),
-  );
 
 
 
