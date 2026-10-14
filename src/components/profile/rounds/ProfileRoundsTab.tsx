@@ -29,6 +29,7 @@ import { useFitOneLine } from '@/features/explore-magazine/useFitOneLine';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 const medalTotal = (r: ProfileRound) => (r.medals_gold ?? 0) + (r.medals_silver ?? 0) + (r.medals_bronze ?? 0);
 import { isFullEighteen, useOwnHandicapVisibility, useProfileRounds, type ProfileRound } from './useProfileRounds';
+import { formValue } from '@/lib/whs/formValue';
 
 interface Props {
   userId: string;
@@ -45,18 +46,7 @@ function parseDate(v: string): Date {
   return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(v);
 }
 
-/**
- * Differential form: played-to (the stored handicap_differential) minus the
- * index the member held at the time. Par and course handicap are not part of
- * it. A round with no index on record has NO form value — the member's
- * current index is never substituted for the one they held.
- */
-function formValue(r: ProfileRound): number | null {
-  if (!isFullEighteen(r) || r.handicap_differential == null || r.handicap_index_at_time == null) {
-    return null;
-  }
-  return Number(r.handicap_differential) - Number(r.handicap_index_at_time);
-}
+// Form is defined once, in src/lib/whs/formValue.ts.
 
 const fmt1 = (n: number) => n.toFixed(1);
 

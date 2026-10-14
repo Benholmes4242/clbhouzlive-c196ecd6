@@ -18984,6 +18984,31 @@ export type Database = {
         Args: { p_photo_url: string }
         Returns: undefined
       }
+      admin_story_checks: {
+        Args: {
+          p_body: Json
+          p_categories: string[]
+          p_headline: string
+          p_image_credit: string
+          p_image_url: string
+          p_kind: string
+          p_standfirst: string
+          p_tournament: string
+        }
+        Returns: Json
+      }
+      admin_story_read_secs: { Args: { p_body: Json }; Returns: number }
+      admin_story_reads: {
+        Args: { p_since: string }
+        Returns: {
+          came_from: string
+          kind: string
+          secs: number
+          seen_at: string
+          slug: string
+          user_id: string
+        }[]
+      }
       admin_waitlist_summary: {
         Args: never
         Returns: {
@@ -19705,6 +19730,7 @@ export type Database = {
       }
       get_admin_audiences: { Args: never; Returns: Json }
       get_admin_command_centre: { Args: { p_tz?: string }; Returns: Json }
+      get_admin_course_coverage: { Args: { p_limit?: number }; Returns: Json }
       get_admin_dashboard_glance: { Args: { p_tz?: string }; Returns: Json }
       get_admin_event_aggregates: {
         Args: {
@@ -19733,7 +19759,9 @@ export type Database = {
         }
         Returns: Json
       }
+      get_admin_feeds_health: { Args: never; Returns: Json }
       get_admin_funnel_cohorts: { Args: { p_weeks?: number }; Returns: Json }
+      get_admin_help_insight: { Args: { p_days?: number }; Returns: Json }
       get_admin_inbox_flow: { Args: { p_days?: number }; Returns: Json }
       get_admin_intraday: { Args: { p_tz?: string }; Returns: Json }
       get_admin_member_actions: { Args: { p_days?: number }; Returns: Json }
@@ -19764,6 +19792,7 @@ export type Database = {
         Returns: Json
       }
       get_admin_members_overview: { Args: never; Returns: Json }
+      get_admin_newsroom: { Args: never; Returns: Json }
       get_admin_north_star: { Args: never; Returns: Json }
       get_admin_ops_health: {
         Args: { p_build_id?: string; p_days?: number }
@@ -19777,6 +19806,10 @@ export type Database = {
       get_admin_role: {
         Args: never
         Returns: Database["public"]["Enums"]["admin_role"]
+      }
+      get_admin_story_insight: {
+        Args: { p_id: string; p_kind: string }
+        Returns: Json
       }
       get_admin_top_content: {
         Args: {
@@ -21904,6 +21937,7 @@ export type Database = {
           handicap_index_at_time: number
           hcp_at_time: number
           holes_in_one: number
+          is_counter: boolean
           is_nine_hole: boolean
           medals_bronze: number
           medals_gold: number
