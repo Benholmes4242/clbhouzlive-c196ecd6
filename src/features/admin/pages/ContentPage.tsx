@@ -21,6 +21,8 @@ import { KICKER, LABEL } from '@/lib/tokens/type';
 import { adminTheme as t } from '../theme';
 import ContentSegments, { type ContentSection } from '../components/content/ContentSegments';
 import NewsroomSection from '../components/content/NewsroomSection';
+import CoursesSection from '../components/content/CoursesSection';
+import TourDataSection from '../components/content/TourDataSection';
 import StatTile from '../components/StatTile';
 import StatusPill from '../components/StatusPill';
 import EmptyState from '../components/EmptyState';
@@ -77,7 +79,7 @@ export default function ContentPage() {
       <ContentSegments sections={visible} active={section} onChange={setSection} />
       {section === 'newsroom' && <NewsroomSection />}
       {section === 'courses' && <CoursesTab />}
-      {section === 'tour' && (<><TourDataTab /><TourPlayersTab /></>)}
+      {section === 'tour' && <TourSection />}
       {section === 'pages' && (<><HelpArticlesTab /><LegalDocumentsTab /></>)}
     </div>
   );
@@ -129,7 +131,8 @@ function CoursesTab() {
   const debounced = useDebouncedValue(searchInput, 250);
 
   useEffect(() => { c.setSearch(debounced); /* eslint-disable-next-line */ }, [debounced]);
-  useEffect(() => { c.setFilter(initialFilter); /* eslint-disable-next-line */ }, []);
+  // Stage 3: the directory search is A to Z only; no filter is visible, so none applies.
+  useEffect(() => { c.setFilter('all'); /* eslint-disable-next-line */ }, []);
 
   // Reflect state back into URL.
   useEffect(() => {
@@ -162,138 +165,22 @@ function CoursesTab() {
   const openAdd = () => setSheetParam(p => { p.set('add', 'course'); p.delete('course'); }, true);
   const closeSheet = () => setSheetParam(p => { p.delete('course'); p.delete('add'); }, false);
 
-  const totalPages = Math.max(1, Math.ceil(c.total / c.pageSize));
-
-  const total = c.stats.total;
-  const withCoords = c.stats.geocoded;
-  const withPhoto = Math.max(0, total - c.stats.missingPhoto);
-
-  /**
-   * Each tile states what the directory HAS and filters to the INVERSE - the
-   * work is the gap, not the coverage. The list heading names the filtered
-   * view, which is what makes the inversion legible.
-   */
-  const coverage: { id: CourseFilter; label: string; value: number }[] = [
-    { id: 'missing_coords', label: 'With coords', value: withCoords },
-    { id: 'missing_photo',  label: 'With photo',  value: withPhoto },
-    { id: 'top100',         label: 'Ranked',      value: c.stats.top100 },
-  ];
-
-  const activeIssueChip = c.filter === 'missing_coords' || c.filter === 'missing_photo';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {/* Search + Add */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 0 }}>
-          <Search size={16} style={{ position: 'absolute', left: 12, top: 12, color: t.inkFaint }} />
-          <input
-            value={searchInput}
-            onChange={e => setSearchInput(e.target.value)}
-            placeholder="Search courses"
-            style={{
-              width: '100%', padding: '10px 12px 10px 36px',
-              borderRadius: t.radius.md, border: `1px solid ${t.line}`,
-              background: t.surface, color: t.ink, fontSize: 14, outline: 'none',
-            }}
-          />
-        </div>
-        <button
-          onClick={openAdd}
-          style={{
-            padding: '10px 14px', borderRadius: t.radius.md,
-            border: 'none', background: t.ink, color: t.surface,
-            fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-          }}
-        >
-          <Plus size={16} /> Add course
-        </button>
-      </div>
-
-      {/* Coverage board — states what the directory HAS; tiles filter the gap. */}
-      <div style={{
-        background: t.surface, border: `1px solid ${t.line}`,
-        borderRadius: 18, padding: '10px 12px 12px',
-      }}>
-        <div style={{
-          display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-          gap: 10, marginBottom: 10,
-        }}>
-          <span style={{ ...KICKER, color: t.inkMuted }}>Directory</span>
-          <span style={{ ...LABEL_T, ...FIG_T, color: t.inkFaint }}>
-            {total.toLocaleString()} courses
-          </span>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
-          {coverage.map(tile => (
-            <CoverageTile
-              key={tile.id}
-              label={tile.label}
-              value={tile.value}
-              total={total}
-              active={c.filter === tile.id}
-              onClick={() => c.setFilter(c.filter === tile.id ? 'all' : tile.id)}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* List */}
-      {c.isLoading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} style={{ height: 64, background: t.canvas, borderRadius: 18, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
-          ))}
-        </div>
-      ) : c.courses.length === 0 ? (
-        activeIssueChip
-          ? <EmptyState icon={<CheckCircle2 size={22} color={t.ok} />} title="Nothing to fix here." />
-          : <EmptyState title="No courses" subtitle={searchInput ? `for "${searchInput}"` : undefined} />
-      ) : (
-        <div style={{
-          background: t.surface, border: `1px solid ${t.line}`,
-          borderRadius: 18, overflow: 'hidden',
-        }}>
-          <div style={{
-            padding: '10px 14px', borderBottom: `1px solid ${t.line}`,
-            display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10,
-          }}>
-            <span style={{ ...LABEL_T, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {VIEW_LABEL[c.filter]}
-            </span>
-            <span style={{ ...LABEL_T, ...FIG_T, color: t.inkFaint, flexShrink: 0 }}>
-              {c.total.toLocaleString()}
-            </span>
-          </div>
-          {c.courses.map((course, i) => (
-            <CourseRow
-              key={course.id}
-              course={course}
-              first={i === 0}
-              activeFilter={c.filter}
-              missingCoords={c.stats.missingCoords}
-              missingPhoto={c.stats.missingPhoto}
-              total={total}
-              onOpen={() => openCourse(course.id)}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Pagination */}
-      {c.total > c.pageSize && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 12, color: t.inkMuted, fontVariantNumeric: 'tabular-nums' }}>
-            {(c.page - 1) * c.pageSize + 1}-{Math.min(c.page * c.pageSize, c.total)} of {c.total.toLocaleString()}
-          </span>
-          <div style={{ display: 'flex', gap: 6 }}>
-            <PagerBtn disabled={c.page <= 1} onClick={() => c.setPage(p => p - 1)}>Prev</PagerBtn>
-            <span style={{ fontSize: 13, color: t.ink, padding: '6px 4px', fontVariantNumeric: 'tabular-nums' }}>{c.page} / {totalPages}</span>
-            <PagerBtn disabled={c.page >= totalPages} onClick={() => c.setPage(p => p + 1)}>Next</PagerBtn>
-          </div>
-        </div>
-      )}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <CoursesSection
+        stats={{ total: c.stats.total, geocoded: c.stats.geocoded, missingPhoto: c.stats.missingPhoto, top100: c.stats.top100 }}
+        search={searchInput}
+        onSearch={setSearchInput}
+        results={debounced.trim() ? c.courses : []}
+        resultsTotal={c.total}
+        page={c.page}
+        pageSize={c.pageSize}
+        onPage={(p) => c.setPage(p)}
+        searching={c.isLoading || searchInput !== debounced}
+        onFix={openCourse}
+        onAdd={openAdd}
+      />
 
       <CourseDetail
         courseId={drawerId}
@@ -776,154 +663,6 @@ function CourseDetail({
 
 
 
-/* ───────────────────────── Tour Data tab ───────────────────────── */
-
-function TourDataTab() {
-  const [activeTour, setActiveTour] = useState('all');
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const PAGE_SIZE = 50;
-
-  const { data = [], isLoading, refetch } = useQuery({
-    queryKey: ['admin-v2', 'tour', 'rankings'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('tour_season_rankings')
-        .select('id, player_id, player_name, position, points, tour_code, season_year, updated_at')
-        .order('position', { ascending: true })
-        .limit(500);
-      if (error) throw error;
-      return data ?? [];
-    },
-    staleTime: 5 * 60_000,
-  });
-
-  useEffect(() => {
-    const h = () => refetch();
-    window.addEventListener('admin-v2:refetch', h);
-    return () => window.removeEventListener('admin-v2:refetch', h);
-  }, [refetch]);
-
-  const tours = useMemo(() => {
-    const codes = Array.from(new Set(data.map(r => r.tour_code))).sort();
-    return ['all', ...codes];
-  }, [data]);
-
-  const filtered = data.filter(r => {
-    const matchT = activeTour === 'all' || r.tour_code === activeTour;
-    const matchS = !search.trim() || (r.player_name ?? '').toLowerCase().includes(search.toLowerCase());
-    return matchT && matchS;
-  });
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const lastUpdated = data[0]?.updated_at;
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 8 }}>
-        <StatTile label="Rankings" value={data.length.toLocaleString()} />
-        <StatTile label="Tours" value={new Set(data.map(r => r.tour_code)).size} />
-        <StatTile label="Seasons" value={new Set(data.map(r => r.season_year)).size} />
-      </div>
-
-      <div style={{
-        display: 'flex', gap: 8, overflowX: 'auto',
-        scrollbarWidth: 'none', padding: '2px',
-      }}>
-        {tours.map(tour => {
-          const active = activeTour === tour;
-          const count = tour === 'all' ? data.length : data.filter(r => r.tour_code === tour).length;
-          return (
-            <button
-              key={tour}
-              onClick={() => { setActiveTour(tour); setPage(1); }}
-              style={{
-                flexShrink: 0, padding: '8px 14px', borderRadius: 999,
-                border: `1px solid ${active ? 'transparent' : t.line}`,
-                background: active ? t.brandSoft : t.surface,
-                color: active ? t.brandText : t.inkMuted,
-                fontSize: 12, fontWeight: 600, textTransform: 'uppercase',
-                cursor: 'pointer', whiteSpace: 'nowrap',
-              }}
-            >{tour === 'all' ? 'All' : tour} · {count}</button>
-          );
-        })}
-      </div>
-
-      <div style={{ position: 'relative' }}>
-        <Search size={16} style={{ position: 'absolute', left: 12, top: 12, color: t.inkFaint }} />
-        <input
-          value={search}
-          onChange={e => { setSearch(e.target.value); setPage(1); }}
-          placeholder="Search player…"
-          style={{
-            width: '100%', padding: '10px 12px 10px 36px',
-            borderRadius: t.radius.md, border: `1px solid ${t.line}`,
-            background: t.surface, color: t.ink, fontSize: 14, outline: 'none',
-          }}
-        />
-      </div>
-
-      {lastUpdated && (
-        <div style={{ fontSize: 11, color: t.inkFaint }}>
-          Updated {formatAgo(lastUpdated, { suffix: true })}
-        </div>
-      )}
-
-      {isLoading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} style={{ height: 52, background: t.canvas, borderRadius: t.radius.md, animation: 'admin-pulse 1.4s ease-in-out infinite' }} />
-          ))}
-        </div>
-      ) : paginated.length === 0 ? (
-        <EmptyState title="No rankings" />
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {paginated.map(r => (
-            <div key={r.id} style={{
-              background: t.surface, border: `1px solid ${t.line}`,
-              borderRadius: t.radius.md, padding: '10px 12px',
-              display: 'flex', alignItems: 'center', gap: 12,
-            }}>
-              <div style={{
-                width: 40, height: 40, borderRadius: t.radius.sm,
-                background: t.canvas, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 13, fontWeight: 700, color: t.ink, fontVariantNumeric: 'tabular-nums',
-                flexShrink: 0,
-              }}>#{r.position}</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: t.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {r.player_name}
-                </div>
-                <div style={{ fontSize: 11, color: t.inkMuted, marginTop: 2 }}>
-                  {String(r.tour_code).toUpperCase()} · {r.season_year}
-                </div>
-              </div>
-              <div style={{ fontSize: 13, color: t.ink, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
-                {r.points?.toLocaleString() ?? '—'}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {filtered.length > PAGE_SIZE && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 12, color: t.inkMuted }}>
-            {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
-          </span>
-          <div style={{ display: 'flex', gap: 6 }}>
-            <PagerBtn disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Prev</PagerBtn>
-            <span style={{ fontSize: 13, color: t.ink, padding: '6px 4px' }}>{page} / {totalPages}</span>
-            <PagerBtn disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Next</PagerBtn>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 /* ───────────────────────── Tour Players tab ───────────────────────── */
 
 const TOURS: Record<string, string> = {
@@ -948,41 +687,23 @@ interface PlayerRow {
   countryCode: string | null;
   tourCodes: string[] | null;
   headshotOverride: string | null;
+  photoUrl: string | null;
   updatedAt: string | null;
 }
 
-function TourPlayersTab() {
-  const queryClient = useQueryClient();
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [tourFilter, setTourFilter] = useState('all');
-  const [syncing, setSyncing] = useState(false);
-  const [syncLabel, setSyncLabel] = useState('');
-  const [playerParams, setPlayerParams] = useSearchParams();
-  const activePlayerId = playerParams.get('player');
-  const openPlayer = (id: string) => {
-    const next = new URLSearchParams(playerParams);
-    const wasOpen = !!next.get('player');
-    next.set('player', id);
-    setPlayerParams(next, { replace: wasOpen });
-  };
-  const closePlayer = () => {
-    const next = new URLSearchParams(playerParams);
-    next.delete('player');
-    setPlayerParams(next, { replace: true });
-  };
-  const [cacheBust, setCacheBust] = useState(0);
-  const PAGE_SIZE = 25;
+const PLAYERS_KEY = ['admin-v2', 'tour', 'players'] as const;
 
-  const { data = [], isLoading, refetch } = useQuery({
-    queryKey: ['admin-v2', 'tour', 'players'],
+/** The full sr_players directory (paged in 1000s). */
+function useAdminPlayers() {
+  return useQuery({
+    queryKey: PLAYERS_KEY,
     queryFn: async (): Promise<PlayerRow[]> => {
       const batch = 1000;
       let offset = 0; let all: any[] = []; let more = true;
       while (more) {
         const { data, error } = await supabase
           .from('sr_players')
-          .select('id, full_name, first_name, last_name, country, country_code, tour_codes, headshot_override, updated_at')
+          .select('id, full_name, first_name, last_name, country, country_code, tour_codes, headshot_override, photo_url, updated_at')
           .order('full_name', { ascending: true })
           .range(offset, offset + batch - 1);
         if (error) throw error;
@@ -994,24 +715,25 @@ function TourPlayersTab() {
         id: p.id, fullName: p.full_name, firstName: p.first_name, lastName: p.last_name,
         country: p.country, countryCode: p.country_code,
         tourCodes: p.tour_codes, headshotOverride: p.headshot_override,
+        photoUrl: p.photo_url ?? null,
         updatedAt: p.updated_at,
       }));
     },
     staleTime: 10 * 60_000,
   });
+}
 
-  useEffect(() => {
-    const h = () => refetch();
-    window.addEventListener('admin-v2:refetch', h);
-    return () => window.removeEventListener('admin-v2:refetch', h);
-  }, [refetch]);
+const ALL_TOURS = ['pga', 'eur', 'lpga', 'pgad', 'liv', 'champions-tour'];
+const TOUR_LABELS: Record<string, string> = {
+  pga: 'PGA Tour', eur: 'DP World', lpga: 'LPGA',
+  pgad: 'Korn Ferry', liv: 'LIV', 'champions-tour': 'Champions',
+};
 
-  const ALL_TOURS = ['pga', 'eur', 'lpga', 'pgad', 'liv', 'champions-tour'];
-  const TOUR_LABELS: Record<string, string> = {
-    pga: 'PGA Tour', eur: 'DP World', lpga: 'LPGA',
-    pgad: 'Korn Ferry', liv: 'LIV', 'champions-tour': 'Champions',
-  };
-
+/** The existing "Sync players" action, unchanged, shared by Run now and the directory. */
+function usePlayerSync() {
+  const queryClient = useQueryClient();
+  const [syncing, setSyncing] = useState(false);
+  const [syncLabel, setSyncLabel] = useState('');
   const handleSync = async () => {
     if (syncing) return;
     setSyncing(true);
@@ -1030,11 +752,91 @@ function TourPlayersTab() {
       }
     }
     setSyncing(false); setSyncLabel('');
-    queryClient.invalidateQueries({ queryKey: ['admin-v2', 'tour', 'players'] });
+    queryClient.invalidateQueries({ queryKey: PLAYERS_KEY });
+    queryClient.invalidateQueries({ queryKey: ['admin', 'content', 'feeds'] });
     const failed = results.filter(r => !r.ok);
     if (failed.length === 0) toast.success('All tours synced');
     else toast.error(`Failed: ${failed.map(r => r.tour).join(', ')}`);
   };
+  return { syncing, syncLabel, handleSync };
+}
+
+/**
+ * BRIEF_CONTENT_DESK Stage 4 — the Tour data section plus its sub-view, the
+ * existing player list, and the existing headshot override sheet (?player=).
+ */
+function TourSection() {
+  const [params, setParams] = useSearchParams();
+  const sub = params.get('sub');
+  const players = useAdminPlayers();
+  const sync = usePlayerSync();
+  const [cacheBust, setCacheBust] = useState(0);
+  const [fallback, setFallback] = useState<PlayerRow | null>(null);
+  const activePlayerId = params.get('player');
+  const setParam = (k: string, v: string | null, push = false) => {
+    const next = new URLSearchParams(params);
+    if (v == null) next.delete(k); else next.set(k, v);
+    setParams(next, { replace: !push });
+  };
+
+  useEffect(() => {
+    const h = () => players.refetch();
+    window.addEventListener('admin-v2:refetch', h);
+    return () => window.removeEventListener('admin-v2:refetch', h);
+  }, [players]);
+
+  const list = players.data ?? [];
+  const noPhotoSet = players.data ? list.filter(p => !p.photoUrl && !p.headshotOverride).length : null;
+  const active = list.find(p => p.id === activePlayerId) ?? (fallback?.id === activePlayerId ? fallback : null);
+
+  const sheet = (
+    <PhotoSheet
+      player={active}
+      onClose={() => { setParam('player', null); setFallback(null); }}
+      cacheBust={cacheBust}
+      onCacheBust={() => { setCacheBust(p => p + 1); }}
+    />
+  );
+
+  if (sub === 'players') {
+    return (
+      <>
+        <button type="button" onClick={() => setParam('sub', null)} style={{ alignSelf: 'flex-start', border: 0, background: 'transparent', padding: '4px 0', color: t.inkMuted, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>&lsaquo; Tour data</button>
+        <TourPlayersTab players={list} isLoading={players.isLoading} refetch={() => players.refetch()} sync={sync} cacheBust={cacheBust} onOpen={(id) => setParam('player', id, !activePlayerId)} />
+        {sheet}
+      </>
+    );
+  }
+  return (
+    <>
+      <TourDataSection
+        syncing={sync.syncing}
+        syncLabel={sync.syncLabel}
+        onRunSync={sync.handleSync}
+        noPhotoSet={noPhotoSet}
+        onOpenDirectory={() => setParam('sub', 'players', true)}
+        onAddPhoto={(fp) => {
+          if (!list.some(p => p.id === fp.player_id)) {
+            setFallback({ id: fp.player_id, fullName: fp.name, firstName: null, lastName: null, country: fp.country, countryCode: null, tourCodes: fp.tour_codes, headshotOverride: fp.headshot_override, photoUrl: fp.photo_url, updatedAt: null });
+          }
+          setParam('player', fp.player_id, true);
+        }}
+      />
+      {sheet}
+    </>
+  );
+}
+
+function TourPlayersTab({ players: data, isLoading, refetch, sync, cacheBust, onOpen }: {
+  players: PlayerRow[]; isLoading: boolean; refetch: () => void;
+  sync: { syncing: boolean; syncLabel: string; handleSync: () => Promise<void> };
+  cacheBust: number; onOpen: (id: string) => void;
+}) {
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [tourFilter, setTourFilter] = useState('all');
+  const { syncing, syncLabel, handleSync } = sync;
+  const PAGE_SIZE = 25;
 
   const stats = useMemo(() => {
     const byTour: Record<string, number> = {};
@@ -1144,7 +946,7 @@ function TourPlayersTab() {
         <EmptyState title="No players" />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {paginated.map(p => <PlayerRowCard key={p.id} player={p} cacheBust={cacheBust} onPhoto={() => openPlayer(p.id)} />)}
+          {paginated.map(p => <PlayerRowCard key={p.id} player={p} cacheBust={cacheBust} onPhoto={() => onOpen(p.id)} />)}
         </div>
       )}
 
@@ -1161,12 +963,6 @@ function TourPlayersTab() {
         </div>
       )}
 
-      <PhotoSheet
-        player={data.find(p => p.id === activePlayerId) ?? null}
-        onClose={closePlayer}
-        cacheBust={cacheBust}
-        onCacheBust={() => setCacheBust(p => p + 1)}
-      />
     </div>
   );
 }
@@ -1178,10 +974,11 @@ function PlayerAvatar({ player, cacheBust, size = 40 }: { player: PlayerRow; cac
   const candidates = useMemo(
     () => resolvePlayerAvatarCandidates({
       name,
+      photoUrl: player.photoUrl ?? null,
       tourSlug: primaryTour,
       headshotOverride: player.headshotOverride ?? null,
     }),
-    [name, primaryTour, player.headshotOverride],
+    [name, primaryTour, player.headshotOverride, player.photoUrl],
   );
 
   const [idx, setIdx] = useState(0);

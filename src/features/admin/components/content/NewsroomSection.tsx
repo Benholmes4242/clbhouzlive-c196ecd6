@@ -30,10 +30,15 @@ export function faultChip(c: { key: string; label?: string; value?: string | num
   switch (c.key) {
     case 'image': return { text: 'No lead image', tone: 'danger' };
     case 'body': return { text: 'No body', tone: 'danger' };
-    case 'players': return { text: `${plural(Number.isFinite(n) ? n : 0, 'player', 'players')} not matched`, tone: 'danger' };
+    case 'players': {
+      // value is "{matched} of {total} matched"
+      const m = /^(\d+)\s+of\s+(\d+)/.exec(String(v ?? ''));
+      const unmatched = m ? Math.max(0, Number(m[2]) - Number(m[1])) : 0;
+      return { text: `${plural(unmatched, 'player', 'players')} not matched`, tone: 'danger' };
+    }
     case 'category': return { text: 'No category', tone: 'danger' };
     case 'headline': return { text: `Headline ${v ?? ''}`.trim(), tone: 'danger' };
-    case 'standfirst': return { text: v == null || v === '' ? 'No standfirst' : `Standfirst ${v}`, tone: 'warn' };
+    case 'standfirst': return { text: v === 'Missing' ? 'No standfirst' : `Standfirst ${v ?? ''}`.trim(), tone: 'warn' };
     case 'credit': return { text: 'No lead credit', tone: 'warn' };
     case 'b2b': return { text: 'Images back to back', tone: 'warn' };
     case 'emdash': return { text: plural(Number.isFinite(n) ? n : 0, 'em dash', 'em dashes'), tone: 'warn' };

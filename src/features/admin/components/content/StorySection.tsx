@@ -15,11 +15,11 @@ import { useAmateurStoriesAdmin } from '../../hooks/useAmateurStoriesAdmin';
 import { BEAT_NAME } from './NewsroomSection';
 import { desk, SECTION, LIST_SECTION, H, H_RIGHT, FIG_LABEL, FIG, FIG_SUB } from './deskTokens';
 
+/** Keys are exactly the stored block types in src/features/tourhub/news/blocks.ts. */
 const BLOCK_WORDS: Record<string, [string, string]> = {
-  paragraph: ['paragraph', 'paragraphs'], subhead: ['subhead', 'subheads'], image: ['image', 'images'],
-  player: ['player card', 'player cards'], player_card: ['player card', 'player cards'],
-  leaderboard: ['leaderboard', 'leaderboards'], stat: ['stat block', 'stat blocks'], stats: ['stat block', 'stat blocks'],
-  round: ['round block', 'round blocks'], quote: ['quote', 'quotes'],
+  paragraph: ['paragraph', 'paragraphs'], heading: ['subhead', 'subheads'], image: ['image', 'images'],
+  quote: ['quote', 'quotes'], leaderboard: ['leaderboard', 'leaderboards'], player: ['player card', 'player cards'],
+  stat: ['stat block', 'stat blocks'], round: ['round block', 'round blocks'],
 };
 const sinceText = (iso: string) => {
   const d = new Date(iso).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'Europe/London' }).replace(',', '');

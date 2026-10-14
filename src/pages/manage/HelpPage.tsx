@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Search, LifeBuoy } from 'lucide-react';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
@@ -77,6 +78,26 @@ export default function HelpPage() {
 
   const categoryOrder = data ? Object.keys(data.grouped) : [];
 
+  // BRIEF_CONTENT_DESK 18 — help_search fires 1200ms after typing stops, for
+  // 3+ characters, once per distinct q per visit.
+  const sentSearches = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const term = q.slice(0, 80);
+    if (term.length < 3 || !data) return;
+    const id = window.setTimeout(() => {
+      if (sentSearches.current.has(term)) return;
+      sentSearches.current.add(term);
+      void analyticsEvents.track('help_search', { q: term, results: matches.length });
+    }, 1200);
+    return () => window.clearTimeout(id);
+  }, [q, data, matches.length]);
+
+  const toggleArticle = (id: string) => {
+    const opening = expanded !== id;
+    setExpanded(opening ? id : null);
+    if (opening) void analyticsEvents.track('help_article_opened', { article_id: id });
+  };
+
   const searchBar = (
     <div className="px-4 pb-3">
       {/* FIELD CANON (lib/tokens/field.ts): was an A.PANEL slab; now a 6%
@@ -148,7 +169,7 @@ export default function HelpPage() {
                 article={a}
                 caption={a.category}
                 expanded={expanded === a.id}
-                onToggle={() => setExpanded(expanded === a.id ? null : a.id)}
+                onToggle={() => toggleArticle(a.id)}
               />
             ))}
           </div>
@@ -174,7 +195,7 @@ export default function HelpPage() {
                       key={a.id}
                       article={a}
                       expanded={expanded === a.id}
-                      onToggle={() => setExpanded(expanded === a.id ? null : a.id)}
+                      onToggle={() => toggleArticle(a.id)}
                           />
                   ))}
                 </div>
