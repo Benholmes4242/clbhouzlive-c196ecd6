@@ -3,7 +3,11 @@ import type React from "react";
 export const fmtCount = (n: number) => n.toLocaleString('en-GB');
 
 /** THE to-par display value for every Courses page section: "+12.1", "−0.4"
- * (true minus), "level" at exactly par. The hero keeps its own sentence. */
+ * (true minus), "level" at exactly par. A FACT LIST takes this value ("plays level").
+ * Exactly two SENTENCE sites legitimately differ, taking the phrase instead:
+ * CoursesPageHero's fact line and BrowseCourseCard's "Plays to … on average"
+ * ("level par"). One spelling of the word, two grammars. Nothing else in the
+ * app may spell level par a third way. */
 export function fmtToPar(v: number | null | undefined): string | null {
   if (v == null || !Number.isFinite(v)) return null;
   const r = Math.round(v * 10) / 10;
