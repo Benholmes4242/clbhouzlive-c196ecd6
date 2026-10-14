@@ -128,7 +128,7 @@ export interface BrowseRegion {
   subCountry: string | null;
   courses: number;
   rounds: number;
-  /** Mean of the non-null course avg_to_par values; null when none. */
+  /** Round-weighted mean of the course averages; null when none. */
   avgToPar: number | null;
   /** image_url of the region's most-played course. */
   imageUrl: string | null;
@@ -180,8 +180,8 @@ export function groupBrowseRegions(
     g.out.courses += 1;
     g.out.rounds += rounds;
     if (row.avg_to_par != null && Number.isFinite(Number(row.avg_to_par))) {
-      g.parSum += Number(row.avg_to_par);
-      g.parN += 1;
+      g.parSum += Number(row.avg_to_par) * rounds;
+      g.parN += rounds;
     }
   }
   return Array.from(groups.values())
@@ -203,7 +203,7 @@ export function useCourseBrowseTruth() {
     queryFn: async () => {
       const [facetsResult, difficultyResult] = await Promise.all([
         supabase.rpc('get_stat_browse_facets' as never),
-        supabase.from('stat_browse_base' as never).select('course_id, avg_to_par, region, sub_country, rounds, image_url, name').range(0, 9999),
+        supabase.from('stat_browse_base' as never).select('course_id, avg_to_par, region, sub_country, rounds, image_url, name').gt('rounds', 0).range(0, 9999),
       ]);
       if (facetsResult.error) throw facetsResult.error;
       if (difficultyResult.error) throw difficultyResult.error;
