@@ -102,7 +102,7 @@ export function WhoPlayingSection() {
                 <span aria-hidden="true" style={{ position: 'relative', flex: 'none', height: 20, width: 19 + (faces.length - 1) * 12 }}>
                   {faces.map((f, i) => (
                     <span key={f.user_id} style={{ position: 'absolute', top: 0, left: i * 12, width: 19, height: 20, borderRadius: '34%', boxShadow: `0 0 0 1.5px ${MEMBER_PANEL}`, zIndex: 3 - i }}>
-                      <SquircleAvatar src={f.profile_photo_url} userId={f.user_id} size={19} alt={f.display_name} />
+                      <SquircleAvatar src={f.profile_photo_url} userId={f.user_id} size={19} alt={f.display_name} hairlineRing />
                     </span>
                   ))}
                 </span>
