@@ -33,7 +33,9 @@ const SHELLS = [
 export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
   const { data: facets } = useStatBrowseFacets();
   const { data: truth } = useCourseBrowseTruth();
-  const total = facets?.all_played_total;
+  // The list browses the analytics-ready population (stat_browse_base), so the
+  // heading counts that population, not every course with any tracked round.
+  const total = facets?.played_total;
 
   return (
     <div>
@@ -55,7 +57,7 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
             title={total ? `All ${total.toLocaleString('en-GB')} courses` : 'All courses'}
             subline={
               truth
-                ? `Filter and sort. ${truth.ratedTotal.toLocaleString('en-GB')} of the ${truth.allPlayedTotal.toLocaleString('en-GB')} carry a rating.`
+                ? `Filter and sort. ${truth.ratedTotal.toLocaleString('en-GB')} carry a community rating.`
                 : 'Filter and sort.'
             }
           />
