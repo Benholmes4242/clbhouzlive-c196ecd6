@@ -14,9 +14,9 @@
  *                        + 7.5 caps label (marginTop 4)
  *   canvas bio           12.5/1.55, READ MORE inside a 44px box, website chip
  *                        minHeight 44 r999
- *   ProfileTopTenRail    kicker 9.5 caps, subtitle 11.5 (marginTop 3), rail
- *                        marginTop 12 / gap 9 / paddingLeft 16, card 168 wide,
- *                        image 112 r14, fixed 46px text block (marginTop 7)
+ *   ProfileTopTenRail    kicker 9.5 caps, subtitle 11.5 (marginTop 3), gutter
+ *                        16; number one 186 r14 full width, two-up 104 r14 in
+ *                        1fr 1fr / gap 9, then four 50px ranked rows
  *   RailChips (md)       6px/11px padding + 1px edge on 12px text (18px line)
  *                        => 32px pills, radius 11, gap 6
  *
@@ -160,26 +160,17 @@ function TopTenSkeleton() {
         </div>
         <L style={{ height: 9, width: 52, marginLeft: 12, flexShrink: 0 }} />
       </div>
-      <div
-        style={{
-          marginTop: 12,
-          display: 'flex',
-          gap: 9,
-          paddingLeft: 16,
-          paddingRight: 16,
-          overflow: 'hidden',
-        }}
-      >
-        {[0, 1, 2].map((i) => (
-          <div key={i} style={{ width: 168, flexShrink: 0 }}>
-            <L style={{ height: 112, width: '100%', borderRadius: 14 }} />
-            <div style={{ marginTop: 7, height: 46, overflow: 'hidden' }}>
-              <L style={{ height: 11, width: '92%' }} />
-              <L style={{ height: 11, width: '58%', marginTop: 5 }} />
-              <L style={{ height: 9, width: '40%', marginTop: 6 }} />
-            </div>
-          </div>
-        ))}
+      <div style={{ padding: '0 16px' }}>
+        <L style={{ marginTop: 14, height: 186, width: '100%', borderRadius: 14 }} />
+        <div style={{ marginTop: 9, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9 }}>
+          <L style={{ height: 104, width: '100%', borderRadius: 14 }} />
+          <L style={{ height: 104, width: '100%', borderRadius: 14 }} />
+        </div>
+        <div style={{ marginTop: 16 }}>
+          {[0, 1, 2, 3].map((i) => (
+            <L key={i} style={{ height: 50, width: '100%', marginTop: i ? 1 : 0 }} />
+          ))}
+        </div>
       </div>
     </section>
   );
