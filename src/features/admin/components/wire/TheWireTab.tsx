@@ -40,48 +40,7 @@ export default function TheWireTab() {
 
   const current = editing && editing !== 'new' ? stories.find((s) => s.id === editing) ?? null : null;
 
-  if (editing) {
-    const saving = create.isPending || update.isPending;
-    return (
-      <WireStoryEditor
-        story={current}
-        saving={saving}
-        onBack={() => setEditing(null)}
-        onSave={async (input: StoryInput) => {
-          try {
-            if (current) {
-              await update.mutateAsync({ id: current.id, patch: input });
-              toast.success('Story saved');
-            } else {
-              const made = await create.mutateAsync(input);
-              setEditing(made.id);
-              toast.success('Draft created');
-            }
-          } catch (e: any) {
-            toast.error(e?.message ?? 'Could not save');
-          }
-        }}
-        onPublish={async (publishedAt) => {
-          if (!current) { toast.error('Create the draft first'); return; }
-          try {
-            await setPublishedAt.mutateAsync({ id: current.id, publishedAt });
-            toast.success(publishedAt ? 'On the wire' : 'Back to draft');
-          } catch (e: any) {
-            toast.error(e?.message ?? 'Could not publish');
-          }
-        }}
-        onDelete={current ? async () => {
-          try {
-            await remove.mutateAsync(current.id);
-            setEditing(null);
-            toast.success('Story deleted');
-          } catch (e: any) {
-            toast.error(e?.message ?? 'Could not delete');
-          }
-        } : undefined}
-      />
-    );
-  }
+  if (editing) return <TourStoryEditorHost id={editing} onBack={() => setEditing(null)} />;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -168,5 +127,57 @@ export default function TheWireTab() {
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * The editor with its save, publish, schedule, unpublish and delete handlers,
+ * exactly as the old list tab held them. BRIEF_CONTENT_DESK: hosted by the
+ * Newsroom and the Story screen; this tab keeps using it too.
+ */
+export function TourStoryEditorHost({ id, onBack }: { id: string; onBack: () => void }) {
+  const { stories, create, update, setPublishedAt, remove } = useTourStoriesAdmin();
+  const [editing, setEditingRaw] = React.useState<string | null>(id);
+  const setEditing = (v: string | null) => { if (v === null) onBack(); else setEditingRaw(v); };
+  const current = editing && editing !== 'new' ? stories.find((s) => s.id === editing) ?? null : null;
+  const saving = create.isPending || update.isPending;
+  return (
+    <WireStoryEditor
+      story={current}
+      saving={saving}
+      onBack={onBack}
+      onSave={async (input: StoryInput) => {
+        try {
+          if (current) {
+            await update.mutateAsync({ id: current.id, patch: input });
+            toast.success('Story saved');
+          } else {
+            const made = await create.mutateAsync(input);
+            setEditing(made.id);
+            toast.success('Draft created');
+          }
+        } catch (e: any) {
+          toast.error(e?.message ?? 'Could not save');
+        }
+      }}
+      onPublish={async (publishedAt) => {
+        if (!current) { toast.error('Create the draft first'); return; }
+        try {
+          await setPublishedAt.mutateAsync({ id: current.id, publishedAt });
+          toast.success(publishedAt ? 'On the wire' : 'Back to draft');
+        } catch (e: any) {
+          toast.error(e?.message ?? 'Could not publish');
+        }
+      }}
+      onDelete={current ? async () => {
+        try {
+          await remove.mutateAsync(current.id);
+          setEditing(null);
+          toast.success('Story deleted');
+        } catch (e: any) {
+          toast.error(e?.message ?? 'Could not delete');
+        }
+      } : undefined}
+    />
   );
 }
