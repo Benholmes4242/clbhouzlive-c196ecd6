@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHomeClubStatus } from '@/features/home-club/useHomeClubStatus';
@@ -21,9 +19,9 @@ import { fmtToPar, playsToPar, plural } from './format';
  * and scrolls there.
  */
 export const ALL_COURSES_ANCHOR = 'courses-all';
-/** Single-column tiles must be even: region tiles + the all-regions tile. */
-const REGIONS_WITH_LEAD = 7;
-const REGIONS_NO_LEAD = 9;
+/** Never more than five tiles (DEVICE_REVISION §4): lead + four, or five. */
+const REGIONS_WITH_LEAD = 4;
+const REGIONS_NO_LEAD = 5;
 
 
 /** The member's home region: primary_club_id → golf_courses.club_id → region. */
@@ -52,7 +50,6 @@ export function ByRegionSection() {
   const { user } = useSupabaseSession();
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: truth } = useCourseBrowseTruth();
-  const [expanded, setExpanded] = useState(false);
   const home = useHomeClubStatus(user?.id);
   const homeRegionQuery = useHomeRegion(home.clubId);
   const homeRegion = homeRegionQuery.data ?? null;
@@ -61,10 +58,7 @@ export function ByRegionSection() {
   if (regions.length === 0) return null;
 
   const lead = homeRegion ? regions.find((r) => r.region === homeRegion) ?? null : null;
-  const rest = regions.filter((r) => r !== lead).slice(0, expanded ? undefined : lead ? REGIONS_WITH_LEAD : REGIONS_NO_LEAD);
-  // The control tile counts toward the even rule; when singles + control is
-  // odd (only possible expanded), the control spans both columns.
-  const controlSpans = (rest.length + 1) % 2 === 1;
+  const rest = regions.filter((r) => r !== lead).slice(0, lead ? REGIONS_WITH_LEAD : REGIONS_NO_LEAD);
   const tiles: Array<{ r: BrowseRegion; lead: boolean }> = [
     ...(lead ? [{ r: lead, lead: true }] : []),
     ...rest.map((r) => ({ r, lead: false })),
@@ -87,11 +81,10 @@ export function ByRegionSection() {
   return (
     <section style={SECTION_WRAP}>
       <SectionHead
-        n="02"
         tone="amber"
         kicker="Where to go"
         title="By region"
-        subline={`${regions.length} regions members have played.${lead ? ' Yours first.' : ''}`}
+        subline={lead ? 'Your patch, then the four places this community plays most.' : 'The five places this community plays most.'}
       />
       <div
         style={{
@@ -103,7 +96,9 @@ export function ByRegionSection() {
           marginTop: HEAD_GAP,
         }}
       >
-        {tiles.map(({ r, lead: isLead }) => {
+        {tiles.map(({ r, lead: isLead }, idx) => {
+          // No lead + five tiles: the fifth spans so the grid closes cleanly.
+          const spans = isLead || (!lead && idx === 4);
           const par = fmtToPar(r.avgToPar);
           const fact = isLead
             ? [plural(r.courses, 'course', 'courses'), plural(r.rounds, 'round', 'rounds'), playsToPar(r.avgToPar)]
@@ -114,7 +109,7 @@ export function ByRegionSection() {
               type="button"
               onClick={() => open(r)}
               style={{
-                gridColumn: isLead ? 'span 2' : undefined,
+                gridColumn: spans ? 'span 2' : undefined,
                 height: isLead ? 168 : 122,
                 padding: 0,
                 border: 'none',
@@ -180,18 +175,10 @@ export function ByRegionSection() {
             </button>
           );
         })}
-        <button
-          key="__all"
-          type="button"
-          onClick={() => setExpanded((v) => !v)}
-          aria-expanded={expanded}
-          style={{ gridColumn: controlSpans ? 'span 2' : undefined, height: 122, padding: '0 12px', border: 'none', borderRadius: 0, textAlign: 'left', cursor: 'pointer', background: MEMBER_CELL, display: 'flex', alignItems: 'center' }}
-        >
-          <span style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.036em', lineHeight: 1.1, color: A.AMBER, fontVariantNumeric: 'tabular-nums' }}>
-            {expanded ? 'Show fewer \u2039' : `All ${regions.length} regions \u203A`}
-          </span>
-        </button>
       </div>
+      <p style={{ fontSize: 12, lineHeight: 1.5, color: A.DIM, marginTop: 8, marginBottom: 0 }}>
+        Everywhere else is in the region filter at the foot of the page.
+      </p>
       {askHomeClub ? (
         <p style={{ fontSize: 12, lineHeight: 1.5, color: A.DIM, marginTop: 12, marginBottom: 0 }}>
           Set your home club and your own region leads this list.{' '}
