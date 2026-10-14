@@ -1838,7 +1838,7 @@
     },
     "reviews": {
       "featured": "Featured",
-      "ratedChip": "Rated",
+      "ratedChip": "Reviewed",
       "sheetCaption": "{{count}} reviews",
       "someone": "A member"
     },
@@ -2990,7 +2990,7 @@
       "segAll": "All",
       "segNotPlayed": "Not played",
       "segPlayed": "Played",
-      "segRated": "Rated",
+      "segRated": "Reviewed",
       "segmentA11y": "Filter list",
       "summary": "{{played}} of {{total}} played · {{rated}} rated"
     },
@@ -3014,7 +3014,7 @@
     },
     "pill": {
       "played": "Played",
-      "rated": "Rated"
+      "rated": "Reviewed"
     },
     "progress": {
       "emptyBody": "Play one and it lands here, with your rating alongside the published rank.",
