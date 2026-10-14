@@ -163,24 +163,6 @@ function CoursesTab() {
   const openAdd = () => setSheetParam(p => { p.set('add', 'course'); p.delete('course'); }, true);
   const closeSheet = () => setSheetParam(p => { p.delete('course'); p.delete('add'); }, false);
 
-  const totalPages = Math.max(1, Math.ceil(c.total / c.pageSize));
-
-  const total = c.stats.total;
-  const withCoords = c.stats.geocoded;
-  const withPhoto = Math.max(0, total - c.stats.missingPhoto);
-
-  /**
-   * Each tile states what the directory HAS and filters to the INVERSE - the
-   * work is the gap, not the coverage. The list heading names the filtered
-   * view, which is what makes the inversion legible.
-   */
-  const coverage: { id: CourseFilter; label: string; value: number }[] = [
-    { id: 'missing_coords', label: 'With coords', value: withCoords },
-    { id: 'missing_photo',  label: 'With photo',  value: withPhoto },
-    { id: 'top100',         label: 'Ranked',      value: c.stats.top100 },
-  ];
-
-  const activeIssueChip = c.filter === 'missing_coords' || c.filter === 'missing_photo';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
