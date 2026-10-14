@@ -69,6 +69,9 @@ export function useAmateurStoriesAdmin() {
    *  is explicit: an app-wide refetchOnMount default can otherwise leave an
    *  invalidated-but-inactive list stale when the page mounts next. */
   const invalidate = () => {
+    // BRIEF_CONTENT_DESK: newsroom + story insight read these rows.
+    qc.invalidateQueries({ queryKey: ['admin', 'content', 'newsroom'], refetchType: 'all' });
+    qc.invalidateQueries({ queryKey: ['admin', 'content', 'story'], refetchType: 'all' });
     qc.invalidateQueries({ queryKey: KEY, refetchType: 'all' });
     qc.invalidateQueries({ queryKey: ['amateur-stories'], refetchType: 'all' });
   };

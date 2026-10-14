@@ -65,6 +65,9 @@ export function useTourStoriesAdmin() {
 
   /** The reader-facing queries must see an edit immediately, not in five minutes. */
   const invalidate = () => {
+    // BRIEF_CONTENT_DESK: newsroom + story insight read these rows.
+    qc.invalidateQueries({ queryKey: ['admin', 'content', 'newsroom'], refetchType: 'all' });
+    qc.invalidateQueries({ queryKey: ['admin', 'content', 'story'], refetchType: 'all' });
     qc.invalidateQueries({ queryKey: KEY });
     qc.invalidateQueries({ queryKey: ['tour-stories'] });
   };
