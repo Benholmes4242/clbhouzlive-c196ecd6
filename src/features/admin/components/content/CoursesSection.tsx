@@ -198,8 +198,7 @@ export default function CoursesSection({
   );
 }
 
-const FIG_18: React.CSSProperties = { marginTop: 2, fontSize: 18, fontWeight: 800, color: '' as string };
-FIG_18.color = t.ink;
+const FIG_18: React.CSSProperties = { marginTop: 2, fontSize: 18, fontWeight: 800, color: t.ink };
 const OUTLINE_30: React.CSSProperties = { height: 30, padding: '0 12px', borderRadius: 999, border: `1px solid ${t.line}`, background: 'transparent', color: t.ink, fontSize: 11.5, fontWeight: 700, cursor: 'pointer' };
 const RESULT_ROW: React.CSSProperties = {
   display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 12, alignItems: 'center', width: '100%',
