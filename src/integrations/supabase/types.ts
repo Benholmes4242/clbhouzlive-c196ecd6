@@ -18934,6 +18934,20 @@ export type Database = {
             }
             Returns: string
           }
+      admin_analytics_spans: {
+        Args: { p_from: string; p_include_staff?: boolean; p_to: string }
+        Returns: {
+          area: string
+          is_dev: boolean
+          label: string
+          path: string
+          route: string
+          secs: number
+          seen_at: string
+          sid: string
+          user_id: string
+        }[]
+      }
       admin_deletion_integrity: {
         Args: never
         Returns: {
@@ -19724,6 +19738,17 @@ export type Database = {
         Args: { p_spark_days?: number }
         Returns: Json
       }
+      get_admin_analytics_behaviour: {
+        Args: { p_days?: number }
+        Returns: Json
+      }
+      get_admin_analytics_health: { Args: { p_days?: number }; Returns: Json }
+      get_admin_analytics_journeys: { Args: { p_days?: number }; Returns: Json }
+      get_admin_analytics_live: {
+        Args: { p_include_staff?: boolean }
+        Returns: Json
+      }
+      get_admin_analytics_screens: { Args: { p_days?: number }; Returns: Json }
       get_admin_app_errors: {
         Args: { p_days?: number; p_limit?: number; p_offset?: number }
         Returns: Json
