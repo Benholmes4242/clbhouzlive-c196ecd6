@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { useStatBrowseList } from '../useStatBrowse';
+import { useSectionReady } from './PageLoadGate';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { fmtToPar } from './format';
 
@@ -9,6 +10,7 @@ import { fmtToPar } from './format';
 export function HardestSection() {
   const navigate = useNavigate();
   const { rows, isLoading } = useStatBrowseList({ lens: 'toughest', country: null, region: null, limit: 4 });
+  useSectionReady('hardest', !isLoading);
   if (isLoading || rows.length === 0) return null;
   return (
     <section style={SECTION_WRAP}>

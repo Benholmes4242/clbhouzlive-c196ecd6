@@ -68,7 +68,7 @@ export function useTop100Enrichment(
   const enabled = courseIds.length > 0;
   const previousRef = useRef<Map<string, Top100Enrichment>>(EMPTY);
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     // BATCH IDIOM: keyed on a DIGEST of the sorted, de-duplicated id set — a
     // count-keyed entry is reused when the membership changes without the size
     // changing, and the new ids are then never requested.
@@ -190,5 +190,5 @@ export function useTop100Enrichment(
 
   if (data && data !== previousRef.current) previousRef.current = data;
 
-  return data ?? EMPTY;
+  return { data: data ?? EMPTY, isLoading };
 }

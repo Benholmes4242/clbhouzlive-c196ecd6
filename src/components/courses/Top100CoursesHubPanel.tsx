@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import BrowseCourseCard from './BrowseCourseCard';
 import type { StatBrowseRow } from './useStatBrowse';
 import { RailChips, railChipStyle } from '@/components/ui/RailChips';
-import { Skeleton } from '@/components/ui/skeleton';
+import { PageLoadGate, usePageRevealed, useSectionReady } from './browse/PageLoadGate';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
 import { useTop100Enrichment, type Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
@@ -109,7 +109,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
     return [...rows].sort((a, b) => (rankFor(a, renderedList) ?? 999) - (rankFor(b, renderedList) ?? 999));
   }, [data, renderedList]);
   const ids = useMemo(() => courses.map((course) => course.id), [courses]);
-  const enrichment = useTop100Enrichment(ids, user?.id, renderedList);
+  const { data: enrichment, isLoading: enrichmentLoading } = useTop100Enrichment(ids, user?.id, renderedList);
   /* Search narrows what is rendered only (client-side, no query). The head's
      reviewed / tracked meta describes the whole list, so it keeps counting
      the unfiltered rows. */
@@ -129,7 +129,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   /* VIEWER counts. Played and the denominator come from the per-list row of
      user_top100_progress_view for the ACTIVE scope — never the global total and
      never a typed 100. Rated is the server's courses_rated_in_list for the active list. */
-  const { data: progress } = useTop100ProgressForUser(user?.id);
+  const { data: progress, isLoading: progressLoading } = useTop100ProgressForUser(user?.id);
   const viewerList = progress?.lists.find((list) => list.listSlug === renderedList);
   const viewerPlayed = viewerList?.played ?? 0;
   const viewerRated = viewerList?.rated ?? 0;
@@ -147,14 +147,15 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
     });
   };
 
+  const revealed = usePageRevealed();
   useEffect(() => {
-    if (restored.current || courses.length === 0) return;
+    if (!revealed || restored.current || courses.length === 0) return;
     const value = sessionStorage.getItem('top100-scroll');
     restored.current = true;
     if (!value) return;
     requestAnimationFrame(() => scrollPageTo(Number(value), 'instant'));
     sessionStorage.removeItem('top100-scroll');
-  }, [courses.length]);
+  }, [courses.length, revealed]);
 
   const openCourse = (courseId: string) => {
     sessionStorage.setItem('top100-scroll', String(getPageScrollTop()));
@@ -209,6 +210,10 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
           </div>
         ) : null}
       </div>
+      <PageLoadGate expect={TOP100_GATE_IDS}>
+      <GateReport id="list" ready={!isLoading} />
+      <GateReport id="progress" ready={!progressLoading} />
+      <GateReport id="enrichment" ready={!enrichmentLoading} />
       {user && viewerList && viewerList.total > 0 && courses.length > 0 ? (
         <YourHundredSection
           viewerPlayed={viewerPlayed}
@@ -230,13 +235,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
       </section>
 
       <div style={{ paddingTop: 24 }}>
-        {isLoading ? (
-          <div style={{ display: 'grid', gap: 32 }}>
-            {[1, 2, 3].map((key) => (
-              <Skeleton key={key} className="w-full aspect-[16/9.5]" style={{ borderRadius: 0 }} />
-            ))}
-          </div>
-        ) : isError ? (
+        {isLoading ? null : isError ? (
           <div style={{ padding: '48px 0', textAlign: 'center', color: A.MUTE }}>
             <Award size={20} aria-hidden />
             <p>Could not load this list.</p>
@@ -271,9 +270,18 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
           </div>
         )}
       </div>
+      </PageLoadGate>
       <div aria-hidden style={{ height: 'calc(var(--bottom-nav-height, 96px) + 16px)' }} />
     </div>
   );
 };
 
 export default Top100CoursesHubPanel;
+
+const TOP100_GATE_IDS = ['list', 'progress', 'enrichment'] as const;
+
+/** Reports panel-owned readiness from inside the gate's context. */
+function GateReport({ id, ready }: { id: string; ready: boolean }) {
+  useSectionReady(id, ready);
+  return null;
+}

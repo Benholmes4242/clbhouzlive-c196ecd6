@@ -1,5 +1,6 @@
 import { GLASS_CHIP_CLASS } from '@/styles/glassChip';
 import { useStatBrowseList } from '../useStatBrowse';
+import { useSectionReady } from './PageLoadGate';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { fmtCount, playsToPar, plural, RAIL_BLEED } from './format';
 import { PhotoFigureCard } from './PhotoFigureCard';
@@ -11,6 +12,7 @@ import { PhotoFigureCard } from './PhotoFigureCard';
  */
 export function MostPlayedSection() {
   const { rows, isLoading } = useStatBrowseList({ lens: 'played', country: null, region: null, limit: 3 });
+  useSectionReady('mostPlayed', !isLoading);
   if (isLoading || rows.length === 0) return null;
 
   return (

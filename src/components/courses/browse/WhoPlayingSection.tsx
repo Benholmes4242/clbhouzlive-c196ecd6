@@ -14,6 +14,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { joinNames, plural, RAIL_BLEED } from './format';
 import { firstName } from '@/lib/whs/share';
+import { useSectionReady } from './PageLoadGate';
 
 /**
  * SECTION 01 — WHAT'S BEEN PLAYED (BRIEF_COURSES_PAGE_DEVICE_REVISION §3).
@@ -58,7 +59,9 @@ export function WhoPlayingSection() {
     return [...map.values()].slice(0, CAP);
   }, [roundsQuery.data]);
   const courseIds = useMemo(() => groups.map((g) => g.courseId).filter((v): v is string => !!v), [groups]);
-  const meta = useCourseCardMeta(courseIds).data;
+  const metaQuery = useCourseCardMeta(courseIds);
+  const meta = metaQuery.data;
+  useSectionReady('whoPlaying', !roundsQuery.isLoading && !metaQuery.isLoading);
 
   if (groups.length === 0) return null;
 

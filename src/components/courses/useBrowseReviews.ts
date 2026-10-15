@@ -154,6 +154,7 @@ export function useBrowseReviews(country: string | null, region: string | null) 
     /** Newest first, already scoped. Empty means NO slots — the correct absence. */
     pool: query.data ?? [],
     isPending: query.isPending,
+    isLoading: query.isLoading,
   };
 }
 
