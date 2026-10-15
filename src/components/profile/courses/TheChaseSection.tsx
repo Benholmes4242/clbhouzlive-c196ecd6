@@ -34,7 +34,7 @@ export const TheChaseSection: React.FC<Props> = ({ userId, viewerId, distinctTop
   const { data: progress } = useTop100ProgressForUser(userId);
   const { data: listCourses } = useTop100ListProgress(listSlug, userId, viewerId ?? userId);
 
-  const lists = progress?.listProgress ?? [];
+  const lists = progress?.lists ?? [];
   if (!lists.some((l) => l.played > 0)) return null;
 
   const listName = lists.find((l) => l.listSlug === listSlug)?.listName ?? '';
