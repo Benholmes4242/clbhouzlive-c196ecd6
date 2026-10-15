@@ -851,7 +851,6 @@ const ProfilePageV2Content: React.FC = () => {
           <ProfileRoundsTab
             userId={profile.id}
             isOwnProfile={isSelf}
-            handicapIndex={resolvedHcp.value ?? null}
           />
         );
       case 'achievements':
