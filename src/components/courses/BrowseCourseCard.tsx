@@ -4,7 +4,7 @@ import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImage
 import { A, FIGS, SANS, SUB_SCORE_GREEN_MIN } from '@/features/courses/components/holes/analytical/tokens';
 import { CategoryScores } from '@/components/courses/course-detail/CategoryScores';
 import type { StatBrowseRow } from './useStatBrowse';
-import { courseRankLabels, type RankList } from '@/features/courses/_shared/courseRankLabels';
+import { courseRankLabels, RANK_LIST_BY_SLUG as SLUG } from '@/features/courses/_shared/courseRankLabels';
 import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
@@ -20,7 +20,6 @@ const GLASS_CHIP: React.CSSProperties = {
 };
 
 function RankBadge({ memberships }: { memberships: StatBrowseRow['memberships'] }) {
-  const SLUG: Record<string, RankList> = { global: 'global', 'gb-i': 'gbi', usa: 'usa', europe: 'europe' };
   const labels = courseRankLabels(
     memberships
       .filter((entry) => entry.list_slug in SLUG && entry.rank != null)

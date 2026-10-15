@@ -31,6 +31,8 @@ export interface Top100Enrichment {
   yourRounds: number;
   yourBest: number | null;
   ratedByYou: boolean;
+  /** The viewer's own overall rating, from the same course_ratings read. */
+  yourRating: number | null;
   harderThanPct: number | null;
   /** Rating sub-scores, straight from course_rating_aggregates. */
   subScores: {
@@ -94,7 +96,7 @@ export function useTop100Enrichment(
         userId
           ? supabase
               .from('course_ratings')
-              .select('course_id')
+              .select('course_id, rating')
               .eq('user_id', userId)
               .in('course_id', ids)
           : Promise.resolve({ data: [], error: null } as any),
@@ -115,6 +117,7 @@ export function useTop100Enrichment(
           yourRounds: 0,
           yourBest: null,
           ratedByYou: false,
+          yourRating: null,
           harderThanPct: null,
           subScores: { design: null, condition: null, facilities: null, clubhouse: null },
           playerCount: 0,
@@ -178,7 +181,10 @@ export function useTop100Enrichment(
 
       for (const row of (mineRes.data ?? []) as any[]) {
         const entry = map.get(row.course_id);
-        if (entry) entry.ratedByYou = true;
+        if (entry) {
+          entry.ratedByYou = true;
+          entry.yourRating = row.rating != null ? Number(row.rating) : null;
+        }
       }
 
       // Merge over what we already had: a row that has a block keeps it.

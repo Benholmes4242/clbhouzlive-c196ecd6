@@ -133,19 +133,20 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   const viewerList = progress?.lists.find((list) => list.listSlug === renderedList);
   const viewerPlayed = viewerList?.played ?? 0;
   const viewerRated = viewerList?.rated ?? 0;
-  const courseNames = useMemo(() => new Map(courses.map((c) => [c.id, c.name ?? ''])), [courses]);
+  const subjects = useMemo(
+    () => new Map(courses.map((c) => [c.id, {
+      name: c.name ?? '',
+      imageUrl: c.thumbnail_image ?? null,
+      memberships: ((c.list_memberships ?? []) as CourseListMembership[]).map((m) => ({ list_slug: m.list_slug, rank: Number(m.rank) })),
+    }])),
+    [courses],
+  );
   const argumentInputs = courses.map((c) => {
     const e = enrichment.get(c.id);
     return { id: c.id, name: c.name ?? '', imageUrl: c.thumbnail_image ?? null, publishedRank: rankFor(c, renderedList), rating: e?.rating ?? null, ratingCount: e?.ratingCount ?? 0 };
   });
   const argument = argumentRows(argumentInputs);
   const argumentQualifying = qualifyingCount(argumentInputs);
-  const jumpToCard = (courseId: string) => {
-    if (nameQuery) setNameQuery('');
-    requestAnimationFrame(() => {
-      document.getElementById(`top100-card-${courseId}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  };
 
   const revealed = usePageRevealed();
   useEffect(() => {
@@ -220,8 +221,8 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
           total={viewerList.total}
           courseIds={ids}
           enrichment={enrichment}
-          courseNames={courseNames}
-          onCellTap={jumpToCard}
+          subjects={subjects}
+          onOpenCourse={openCourse}
         />
       ) : null}
       {argument.length > 0 ? <TheArgumentSection rows={argument} qualifying={argumentQualifying} /> : null}
@@ -252,6 +253,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
               const item = enrichment.get(course.id);
               const row = toBrowseRow(course, item, renderedList);
               return (
+                {/* Anchor with no current consumer, kept for deep links. */}
                 <div key={course.id} id={`top100-card-${course.id}`} style={{ scrollMarginTop: 'max(env(safe-area-inset-top, 0px), 47px)', marginBottom: index < visibleCourses.length - 1 ? 32 : 0 }}>
                   <BrowseCourseCard
                     row={row}
