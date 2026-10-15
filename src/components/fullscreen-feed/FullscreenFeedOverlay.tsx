@@ -1,4 +1,5 @@
-import React, { useEffect, useLayoutEffect, useCallback, useState, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useCallback, useState, useRef, useMemo } from 'react';
+import { usePostScoreIds } from '@/hooks/feed/usePostRounds';
 import { createPortal } from 'react-dom';
 
 import { AnimatePresence, motion } from 'framer-motion';
@@ -529,6 +530,14 @@ export function FullscreenFeedOverlay() {
     setMoreOptionsOpen,
   } = useClubhouseShare(userId);
   const { activePost, golfCourse } = useActivePostDerived(posts, activeIndex);
+  // Comments live at the subject's address: round (score id) beats review beats post.
+  const activePostIdForScore = activePost?.id;
+  const activeScoreIdMap = usePostScoreIds(
+    useMemo(() => (activePostIdForScore ? [activePostIdForScore] : []), [activePostIdForScore]),
+    'fullscreen',
+  );
+  const commentScoreId = activePost?.id ? activeScoreIdMap.get(activePost.id) ?? null : null;
+  const commentReviewId = activePost?.review?.reviewId ?? null;
   const manageableBusinessIds = useManageableBusinessIds(userId);
   const isOwnPost = canManagePost(
     activePost
@@ -1195,12 +1204,14 @@ export function FullscreenFeedOverlay() {
       )}
 
 
-      {!readOnly && (
+      {/* Never mount against the post while the score id is resolving — a comment
+          written then would land on the post and be orphaned. */}
+      {!readOnly && activeScoreIdMap.settled && (
         <CommentsSheetV2
           isOpen={commentsOpen}
           onClose={closeComments}
-          targetType="post"
-          targetId={activePost?.id ?? ""}
+          targetType={commentScoreId ? "round" : commentReviewId ? "review" : "post"}
+          targetId={commentScoreId ?? commentReviewId ?? activePost?.id ?? ""}
           initialCommentId={initialCommentId}
           autoFocusComposer={composeOnOpen}
         />

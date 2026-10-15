@@ -688,19 +688,26 @@ const ClubhouseContent = () => {
       )}
 
       {/* ═══ COMMENTS + MORE OPTIONS ═══ */}
-      {activePost && posts.length > 0 && commentsMounted && (
+      {/* Gated on postScoreIdMap.settled: opening against the post while the score
+          id resolves would write a comment to the post and orphan it. */}
+      {activePost && posts.length > 0 && commentsMounted && postScoreIdMap.settled && (
         <>
           {(() => {
             const isEditorial = activePost.postType === 'course_of_week_card';
             const editorialId = isEditorial
               ? (activePost as { cardData?: { cardId?: string } }).cardData?.cardId ?? null
               : null;
+            // Precedence: editorial, then round (score id), then review, then post.
+            const scoreId = postScoreIdMap.get(activePost.id) ?? null;
+            const reviewId = activePost.review?.reviewId ?? null;
+            const commentTargetType = isEditorial ? 'editorial' : scoreId ? 'round' : reviewId ? 'review' : 'post';
+            const commentTargetId = isEditorial ? (editorialId ?? '') : (scoreId ?? reviewId ?? activePost.id);
             return (
               <CommentsSheetV2
                 isOpen={commentsOpen}
                 onClose={closeComments}
-                targetType={isEditorial ? 'editorial' : 'post'}
-                targetId={isEditorial ? (editorialId ?? '') : activePost.id}
+                targetType={commentTargetType}
+                targetId={commentTargetId}
               />
             );
           })()}
