@@ -26,16 +26,9 @@
   box-shadow: none;
   letter-spacing: 0;
 }
-.courses-archive [aria-label="Course list filter"] > button {
-  padding: 6px 13px !important;
-  font-size: 14px !important;
-}
-.courses-archive [aria-label="Sort courses"] .archive-control {
-  font-size: 13px !important;
-  line-height: 16px;
-}
 .courses-archive .archive-region-row {
   display: flex;
+  justify-content: center;
   gap: 16px;
   flex-wrap: wrap;
 }

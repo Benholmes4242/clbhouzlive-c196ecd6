@@ -4,8 +4,6 @@
 import React from 'react';
 import { CourseRegionPills, type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 import { RailChips } from '@/components/ui/RailChips';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { Button } from '@/components/ui/button';
 
 export type CoursePrimaryTab = 'all' | 'top100';
 export type CourseSortOption = 'recently-played' | 'rating-high-low' | 'rating-low-high';
@@ -48,7 +46,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       {/* Primary tab row — canonical charcoal chips */}
       <RailChips
         ariaLabel="Course list filter"
-        align="start"
+        align="center-when-fit"
         options={TABS.map(({ key, label, count }) => ({ id: key, label, value: count }))}
         value={activeTab}
         onChange={(next) => onTabChange(next as CoursePrimaryTab)}
@@ -63,35 +61,13 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       </div>
 
       {/* Sort chips — only the three sorts that exist. */}
-      <div role="radiogroup" aria-label="Sort courses" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        {SORT_OPTIONS.map((opt) => {
-          const on = activeSort === opt.value;
-          return (
-            <Button
-              variant="ghost"
-              className="archive-control"
-              key={opt.value}
-              type="button"
-              role="radio"
-              aria-checked={on}
-              data-testid="sort-chip"
-              onClick={() => onSortChange(opt.value)}
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                padding: '5px 10px',
-                borderRadius: 9,
-                border: `1px solid ${on ? A.INK : A.BORDER}`,
-                background: on ? A.INK : 'transparent',
-                color: on ? A.CANVAS : A.DIM,
-                cursor: 'pointer',
-              }}
-            >
-              {opt.label}
-            </Button>
-          );
-        })}
-      </div>
+      <RailChips
+        ariaLabel="Sort courses"
+        align="center-when-fit"
+        options={SORT_OPTIONS.map(({ value, label }) => ({ id: value, label }))}
+        value={activeSort}
+        onChange={(next) => onSortChange(next as CourseSortOption)}
+      />
     </div>
   );
 };
