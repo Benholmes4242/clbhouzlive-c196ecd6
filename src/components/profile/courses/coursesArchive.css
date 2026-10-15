@@ -25,6 +25,14 @@
   box-shadow: none;
   letter-spacing: 0;
 }
+.courses-archive [aria-label="Course list filter"] > button {
+  padding: 6px 13px !important;
+  font-size: 14px !important;
+}
+.courses-archive [aria-label="Sort courses"] .archive-control {
+  font-size: 13px !important;
+  line-height: 16px;
+}
 .courses-archive .archive-region-row {
   display: flex;
   gap: 16px;
@@ -35,7 +43,7 @@
   padding: 0;
   border: 0;
   border-radius: 0;
-  font-size: 14px;
+  font-size: 14px !important;
   line-height: 20px;
 }
 .courses-archive .archive-region-choice span {
@@ -52,9 +60,9 @@
   min-width: 0;
 }
 .courses-archive .archive-preview-tile {
-  width: 58px;
-  height: 58px;
-  flex: 0 0 58px;
+  width: 58px !important;
+  height: 58px !important;
+  flex: 0 0 58px !important;
   border-radius: 11px;
   padding: 0;
   background-size: cover;
@@ -62,9 +70,9 @@
 }
 @media (max-width: 389px) {
   .courses-archive .archive-preview-tile {
-    width: 44px;
-    height: 44px;
-    flex-basis: 44px;
+    width: 40px !important;
+    height: 40px !important;
+    flex-basis: 40px !important;
   }
   .courses-archive .archive-preview-row { gap: 8px; }
   .courses-archive .archive-preview-tiles { gap: 6px; }

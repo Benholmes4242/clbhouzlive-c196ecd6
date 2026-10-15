@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type RatedCourseData } from './my-ratings/myRatingsTiers';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { Button } from '@/components/ui/button';
 import { SELECTED_EDGE } from '@/components/ui/RailChips';
 
@@ -86,6 +86,7 @@ const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({ missingCount, cours
           onClick={() => onTap('action')}
           style={{
             marginLeft: 'auto',
+            flexShrink: 0,
             fontSize: 14,
             fontWeight: 700,
             color: A.AMBER,
