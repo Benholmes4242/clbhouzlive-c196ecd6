@@ -87,3 +87,35 @@ export function seasonCompare(rounds: ProfileRound[], year: number) {
   const lastAvg = ys.get(year - 1)?.avg ?? null;
   return { thisAvg, lastAvg, delta: thisAvg != null && lastAvg != null ? lastAvg - thisAvg : null };
 }
+
+/** Distinct courses with ANY round in `year` (same name fallback as courseStats). */
+export function coursesInYear(rounds: ProfileRound[], year: number): number {
+  const keys = new Set<string>();
+  for (const r of rounds) {
+    if (parsePlayDate(r.play_date).getFullYear() !== year) continue;
+    keys.add(r.course_id || `name:${r.course_name ?? 'unknown'}`);
+  }
+  return keys.size;
+}
+
+/** Months of `year` with at least one round. */
+export function monthsPlayed(rounds: ProfileRound[], year: number): number {
+  return monthStats(rounds, year).filter((m) => m.rounds > 0).length;
+}
+
+/**
+ * Busiest month (most rounds) and best month (lowest scoring average), as
+ * 0-based month indexes. null when indeterminate: a tie on either, no rounds,
+ * or fewer than three months with scoring rounds.
+ */
+export function monthHighlights(rounds: ProfileRound[], year: number): { busiest: number; best: number } | null {
+  const ms = monthStats(rounds, year);
+  const scored = ms.map((m, i) => ({ i, avg: m.avg })).filter((m): m is { i: number; avg: number } => m.avg != null);
+  if (scored.length < 3) return null;
+  const maxN = Math.max(...ms.map((m) => m.rounds));
+  const busiest = ms.map((m, i) => (m.rounds === maxN ? i : -1)).filter((i) => i >= 0);
+  const minAvg = Math.min(...scored.map((m) => m.avg));
+  const best = scored.filter((m) => m.avg === minAvg);
+  if (maxN === 0 || busiest.length !== 1 || best.length !== 1) return null;
+  return { busiest: busiest[0], best: best[0].i };
+}
