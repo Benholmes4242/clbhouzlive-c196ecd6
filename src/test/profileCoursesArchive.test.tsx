@@ -120,7 +120,8 @@ describe('profile courses archive — mock design', () => {
     const nameCol = screen.getByText('Alpha Links').parentElement!;
     expect(nameCol.contains(chip)).toBe(true);
     const row = Array.from(rows(container)).find((r) => r.contains(chip))!;
-    const score = Array.from(row.querySelectorAll('div')).find((d) => d.textContent === '9.1')!;
-    expect(score.parentElement!.contains(chip)).toBe(false);
+    const scoreCol = Array.from(row.querySelectorAll<HTMLElement>('div')).find((d) => d.style.flex === '0 0 46px')!;
+    expect(scoreCol.textContent).toBe('9.1');
+    expect(scoreCol.contains(chip)).toBe(false);
   });
 });
