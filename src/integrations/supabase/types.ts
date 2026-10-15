@@ -21892,7 +21892,11 @@ export type Database = {
           community_rating: number
           course_id: string
           harder_than_pct: number
+          player_count: number
+          player_ids: string[]
           rating_count: number
+          record_gross: number
+          record_holder: string
           rounds_tracked: number
           your_best: number
           your_rounds: number

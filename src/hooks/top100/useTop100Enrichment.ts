@@ -10,10 +10,16 @@ import { supabase } from '@/integrations/supabase/client';
  * `usePostCourseContext` does for the Clubhouse feed: one query per source,
  * keyed on the whole id set, results handed to the list as a Map.
  *
- * Sources (all pre-existing, nothing new was added):
+ * Sources:
  *  - course_rating_aggregates      member rating + rating count
- *  - get_post_course_context RPC   rounds tracked, avg over par, your rounds
+ *  - get_post_course_context RPC   rounds tracked, avg over par, your rounds,
+ *                                  member count, course record, player ids
  *  - course_ratings                which of these the viewer has rated
+ *  - user_profiles                 the faces behind those player ids, one
+ *                                  batched read
+ *
+ * The profiles read is sequential on purpose: the ids are not known until the
+ * RPC resolves, and the alternative is a second cache entry for the same fact.
  */
 
 export interface Top100Enrichment {
@@ -33,6 +39,11 @@ export interface Top100Enrichment {
     facilities: number | null;
     clubhouse: number | null;
   };
+  /** DISTINCT members with an 18-hole round here — never players.length. */
+  playerCount: number;
+  recordGross: number | null;
+  recordHolder: string | null;
+  players: Array<{ id: string; name: string | null; photoUrl: string | null }>;
 }
 
 const EMPTY = new Map<string, Top100Enrichment>();
@@ -106,6 +117,10 @@ export function useTop100Enrichment(
           ratedByYou: false,
           harderThanPct: null,
           subScores: { design: null, condition: null, facilities: null, clubhouse: null },
+          playerCount: 0,
+          recordGross: null,
+          recordHolder: null,
+          players: [],
         });
       }
 
@@ -123,7 +138,9 @@ export function useTop100Enrichment(
         };
       }
 
+      const faceIds = new Set<string>();
       for (const row of (ctxRes.data ?? []) as any[]) {
+        for (const pid of (row.player_ids ?? []) as string[]) faceIds.add(pid);
         const entry = map.get(row.course_id);
         if (!entry) continue;
         entry.roundsTracked = Number(row.rounds_tracked ?? 0);
@@ -131,6 +148,32 @@ export function useTop100Enrichment(
         entry.yourRounds = Number(row.your_rounds ?? 0);
         entry.yourBest = row.your_best != null ? Number(row.your_best) : null;
         entry.harderThanPct = row.harder_than_pct != null ? Number(row.harder_than_pct) : null;
+        entry.playerCount = Number(row.player_count ?? 0);
+        entry.recordGross = row.record_gross != null ? Number(row.record_gross) : null;
+        entry.recordHolder = row.record_holder ?? null;
+      }
+
+      // Sequential on purpose: the face ids are unknown until the RPC resolves.
+      if (faceIds.size > 0) {
+        const profRes = await supabase
+          .from('user_profiles')
+          .select('id, display_name, profile_photo_url')
+          .in('id', Array.from(faceIds))
+          .is('deleted_at', null);
+        if (profRes.error) throw profRes.error;
+        const profiles = new Map<string, { display_name: string | null; profile_photo_url: string | null }>();
+        for (const p of (profRes.data ?? []) as any[]) {
+          profiles.set(p.id, { display_name: p.display_name ?? null, profile_photo_url: p.profile_photo_url ?? null });
+        }
+        for (const row of (ctxRes.data ?? []) as any[]) {
+          const entry = map.get(row.course_id);
+          if (!entry) continue;
+          // A member with no profile row (deleted) is dropped — never a blank face.
+          entry.players = ((row.player_ids ?? []) as string[]).flatMap((id) => {
+            const p = profiles.get(id);
+            return p ? [{ id, name: p.display_name ?? null, photoUrl: p.profile_photo_url ?? null }] : [];
+          });
+        }
       }
 
       for (const row of (mineRes.data ?? []) as any[]) {
