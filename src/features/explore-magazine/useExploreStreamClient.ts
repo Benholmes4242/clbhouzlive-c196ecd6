@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { stripMentionMarkup } from '@/lib/mentions/format';
 import { BIRDIE_HAUL_THRESHOLD } from '@/lib/gam/roundFeats';
 
 import { useCircleLatestRounds, type CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
@@ -451,7 +452,7 @@ export function useExploreStreamClient(
           facts: {
             rating: review.rating,
             review_id: review.reviewId,
-            first_sentence: firstSentence(review.quote),
+            first_sentence: firstSentence(stripMentionMarkup(review.quote)),
             arrived_at: review.at,
             play_date: review.at,
           },
@@ -601,7 +602,7 @@ export function useExploreStreamClient(
 }
 
 /** The first sentence of a review, for the quote headline. */
-function firstSentence(text: string): string {
+export function firstSentence(text: string): string {
   const clean = text.trim().replace(/\s+/g, ' ');
   const match = clean.match(/^(.+?[.!?])(\s|$)/);
   return (match ? match[1] : clean).slice(0, 220);

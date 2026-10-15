@@ -13,6 +13,7 @@
  */
 
 import React from 'react';
+import { MentionText } from '@/components/mentions/MentionText';
 import { useTranslation } from 'react-i18next';
 
 import { SubScoreStack } from '@/features/courses/_shared/scoreBands';
@@ -72,7 +73,7 @@ export const ReviewFeaturedSlot: React.FC<Props> = ({ review: r, onReviewPress }
           </span>
         </div>
 
-        <p style={{ marginTop: 10, fontSize: 15, lineHeight: 1.5, color: INK }}>{r.quote}</p>
+        <p style={{ marginTop: 10, fontSize: 15, lineHeight: 1.5, color: INK }}><MentionText text={r.quote} disableNavigation /></p>
 
         <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
           {r.reviewerAvatar ? (

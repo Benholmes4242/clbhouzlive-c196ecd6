@@ -12,6 +12,7 @@
  */
 
 import React from 'react';
+import { MentionText } from '@/components/mentions/MentionText';
 import { useTranslation } from 'react-i18next';
 
 import { HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
@@ -130,7 +131,7 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
                 ...clamp(3),
               }}
             >
-              {r.quote}
+              <MentionText text={r.quote} disableNavigation />
             </p>
 
             <div style={{ marginTop: 12 }}>

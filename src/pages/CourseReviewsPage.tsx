@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { MentionText } from '@/components/mentions/MentionText';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useCourseReviews, ReviewsSortBy, ReviewsRatingFilter } from '@/hooks/useCourseReviews';
@@ -280,7 +281,7 @@ const CourseReviewsPage: React.FC = () => {
                   {/* Review text */}
                   {r.review && (
                     <p className="text-xs leading-relaxed text-foreground/90 mb-2 whitespace-pre-wrap">
-                      {r.review}
+                      <MentionText text={r.review} />
                     </p>
                   )}
 

@@ -1,4 +1,5 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { MentionText } from '@/components/mentions/MentionText';
 import { RailChips, APPLIED_FILL } from '@/components/ui/RailChips';
 import { formatHcp } from '@/lib/formatHcp';
 import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
@@ -160,7 +161,7 @@ function ReplySheet({
             </div>
             {review.review && (
               <p className="text-[13px] leading-relaxed" style={{ color: A.BODY }}>
-                {review.review}
+                <MentionText text={review.review} />
               </p>
             )}
           </div>
@@ -376,7 +377,7 @@ function ReviewCard({
             className={`mt-2 text-[13.5px] leading-relaxed ${expanded ? '' : 'line-clamp-4'}`}
             style={{ color: A.BODY }}
           >
-            {r.review}
+            <MentionText text={r.review} />
           </p>
           {(clamped || expanded) && (
             <button
