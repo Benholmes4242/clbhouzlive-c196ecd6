@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
 import { JourneySummaryCard } from './courses/JourneySummaryCard';
 import { AllCoursesList } from './courses/AllCoursesList';
@@ -70,7 +70,6 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   }, [isOwnProfile, analyticsCourses]);
 
   const { data: top100Progress } = useTop100ProgressForUser(userId);
-  const { user: viewer } = useSupabaseSession();
 
   // ONE course_ratings select for this member, read by both the course list
   // and Your Signature. Do not add a second fetch.
