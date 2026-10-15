@@ -15,6 +15,9 @@ import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { COURSE_BROWSE_DESCRIPTION } from './courseBrowseTypography';
 import { CoursesSearchField } from '@/features/explore-magazine/CoursesSearchField';
+import { SectionHead, SECTION_WRAP } from './browse/SectionHead';
+import { YourHundredSection } from './top100/YourHundredSection';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 
 const LISTS = [
   { id: 'global', label: 'Global' },
@@ -110,15 +113,31 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
   }, [courses, nameQuery]);
   const ids = useMemo(() => courses.map((course) => course.id), [courses]);
   const enrichment = useTop100Enrichment(ids, user?.id, selectedList);
-  const ratedCount = courses.filter((course) => {
+  /* COMMUNITY counts: how many of the list ANYONE has rated / played. Not to be
+     confused with the VIEWER counts below (BRIEF_TOP_100_REBUILD §2). */
+  const communityRatedCount = courses.filter((course) => {
     const item = enrichment.get(course.id);
     return item?.rating != null && item.ratingCount > 0;
   }).length;
-  const playedCount = courses.filter((course) => (enrichment.get(course.id)?.roundsTracked ?? 0) > 0).length;
+  const communityPlayedCount = courses.filter((course) => (enrichment.get(course.id)?.roundsTracked ?? 0) > 0).length;
   const total = summaries.find((summary) => summary.slug === selectedList)?.total_courses ?? courses.length;
   const heading = LIST_NAMES[selectedList] ?? 'Top 100';
-  const ratingSentence = `${ratedCount} of the ${total} ${total === 1 ? 'course' : 'courses'} ${ratedCount === 1 ? 'carries' : 'carry'} a rating.`;
-  const roundSentence = `${playedCount} ${playedCount === 1 ? 'has' : 'have'} a tracked round.`;
+  const ratingSentence = `${communityRatedCount} of the ${total} ${total === 1 ? 'course' : 'courses'} ${communityRatedCount === 1 ? 'carries' : 'carry'} a rating.`;
+  /* VIEWER counts. Played and the denominator come from the per-list row of
+     user_top100_progress_view for the ACTIVE scope — never the global total and
+     never a typed 100. Rated is the viewer's ratings on the loaded list. */
+  const { data: progress } = useTop100ProgressForUser(user?.id);
+  const viewerList = progress?.lists.find((list) => list.listSlug === selectedList);
+  const viewerPlayed = viewerList?.played ?? 0;
+  const viewerRated = courses.filter((course) => enrichment.get(course.id)?.ratedByYou).length;
+  const courseNames = useMemo(() => new Map(courses.map((c) => [c.id, c.name ?? ''])), [courses]);
+  const jumpToCard = (courseId: string) => {
+    if (nameQuery) setNameQuery('');
+    requestAnimationFrame(() => {
+      document.getElementById(`top100-card-${courseId}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+  const roundSentence = `${communityPlayedCount} ${communityPlayedCount === 1 ? 'has' : 'have'} a tracked round.`;
 
   useEffect(() => {
     if (restored.current || courses.length === 0) return;
@@ -137,10 +156,20 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
   return (
     <div>
       {shellTabs}
-      <section style={{ padding: '22px 16px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16 }}>
-          <h2 style={{ margin: 0, color: A.INK, fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em' }}>{heading}</h2>
-          <span style={{ color: A.MUTE, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>{ratedCount} rated</span>
+      {user && viewerList && viewerList.total > 0 && courses.length > 0 ? (
+        <YourHundredSection
+          viewerPlayed={viewerPlayed}
+          total={viewerList.total}
+          courseIds={ids}
+          enrichment={enrichment}
+          courseNames={courseNames}
+          onCellTap={jumpToCard}
+        />
+      ) : null}
+      <section style={{ ...SECTION_WRAP, paddingBottom: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
+          <SectionHead kicker="The list" tone="quiet" title={heading} />
+          <span style={{ color: A.MUTE, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>{communityRatedCount} rated</span>
         </div>
         <p style={{ ...COURSE_BROWSE_DESCRIPTION, margin: '10px 0 16px' }}>
           {ratingSentence} {roundSentence}
@@ -231,7 +260,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
               const item = enrichment.get(course.id);
               const row = toBrowseRow(course, item, selectedList);
               return (
-                <div key={course.id} style={{ marginBottom: index < visibleCourses.length - 1 ? 32 : 0 }}>
+                <div key={course.id} id={`top100-card-${course.id}`} style={{ scrollMarginTop: 'max(env(safe-area-inset-top, 0px), 47px)', marginBottom: index < visibleCourses.length - 1 ? 32 : 0 }}>
                   <BrowseCourseCard
                     row={row}
                     variant="top100"
