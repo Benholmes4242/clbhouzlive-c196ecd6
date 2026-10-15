@@ -5,6 +5,7 @@ export type DivisionSlug =
   | 'rookie'
   | 'fairway'
   | 'founders'
+  | 'thirty'
   | 'heritage'
   | 'century'
   | 'elite'

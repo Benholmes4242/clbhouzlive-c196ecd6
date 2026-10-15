@@ -19,12 +19,10 @@
  */
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// MILESTONE THRESHOLDS - The 8 clubs from Rookie (5) to Hall of Fame (400)
+// MILESTONE THRESHOLDS - The 6 per-list clubs, 5 Club to 100 Club. One list = 100 courses.
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
-export const ACHIEVEMENT_MILESTONES = [
-  5, 10, 20, 50, 100, 200, 300, 400,
-] as const;
+export const ACHIEVEMENT_MILESTONES = [5, 10, 20, 30, 50, 100] as const;
 
 export type AchievementMilestone = (typeof ACHIEVEMENT_MILESTONES)[number];
 
@@ -37,6 +35,7 @@ export type MilestoneTierId =
   | 'rookie'
   | 'fairway'
   | 'founders'
+  | 'thirty'
   | 'heritage'
   | 'century'
   | 'elite'
@@ -51,27 +50,26 @@ export interface MilestoneTierMeta {
 }
 
 /**
- * The tierId values are FROZEN and no longer describe their names — 'fairway'
- * is the id behind "Sophomore Club", 'founders' behind "Veteran Club",
- * 'century' behind "Champion Club", 'grandslam' behind "Hall of Fame". They key
- * the badge image filenames in public/emblems, the ring palette, the
- * DivisionSlug union in src/types/championship.ts and rows already written in
- * the database. Renaming an id to match its new name would take the badges
- * down. Rename the NAME, never the ID.
+ * The tierId values are FROZEN and no longer describe their names — the names
+ * are now numeric ('fairway' is the id behind '10 Club'). They key rows already
+ * written in the database and the DivisionSlug union in
+ * src/types/championship.ts. Rename the NAME, never the ID. 'elite',
+ * 'legendary' and 'grandslam' (200/300/400) are retired from the ladder but
+ * kept in the MilestoneTierId union: a single list holds 100 courses, so those
+ * thresholds cannot be reached per-list. They are reserved for a future
+ * across-all-lists ladder, where the ceiling is 330 distinct courses.
  */
 /**
  * Complete metadata for each milestone tier.
  * Ordered lowest → highest.
  */
 export const MILESTONE_TIER_META: readonly MilestoneTierMeta[] = [
-  { threshold: 5,   tierId: 'rookie',    tierName: 'Rookie Club',     shortLabel: 'Rookie' },
-  { threshold: 10,  tierId: 'fairway',   tierName: 'Sophomore Club',  shortLabel: 'Sophomore' },
-  { threshold: 20,  tierId: 'founders',  tierName: 'Veteran Club',    shortLabel: 'Veteran' },
-  { threshold: 50,  tierId: 'heritage',  tierName: 'All-Star Club',   shortLabel: 'All-Star' },
-  { threshold: 100, tierId: 'century',   tierName: 'Champion Club',   shortLabel: 'Champion' },
-  { threshold: 200, tierId: 'elite',     tierName: 'MVP Club',        shortLabel: 'MVP' },
-  { threshold: 300, tierId: 'legendary', tierName: 'Legend Club',     shortLabel: 'Legend' },
-  { threshold: 400, tierId: 'grandslam', tierName: 'Hall of Fame',    shortLabel: 'Hall of Fame' },
+  { threshold: 5,   tierId: 'rookie',   tierName: '5 Club',   shortLabel: '5' },
+  { threshold: 10,  tierId: 'fairway',  tierName: '10 Club',  shortLabel: '10' },
+  { threshold: 20,  tierId: 'founders', tierName: '20 Club',  shortLabel: '20' },
+  { threshold: 30,  tierId: 'thirty',   tierName: '30 Club',  shortLabel: '30' },
+  { threshold: 50,  tierId: 'heritage', tierName: '50 Club',  shortLabel: '50' },
+  { threshold: 100, tierId: 'century',  tierName: '100 Club', shortLabel: '100' },
 ] as const;
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════

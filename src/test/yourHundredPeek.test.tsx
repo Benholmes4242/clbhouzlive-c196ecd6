@@ -35,7 +35,7 @@ const subjects = new Map([
 ]);
 
 function mount() {
-  render(<YourHundredSection viewerPlayed={3} total={6} courseIds={ids} enrichment={enrichment} subjects={subjects} onOpenCourse={() => {}} />);
+  render(<YourHundredSection listSlug="gb-i" viewerPlayed={3} total={6} courseIds={ids} enrichment={enrichment} subjects={subjects} onOpenCourse={() => {}} />);
 }
 const cell = (name: string) => screen.getByRole('button', { name: new RegExp(name) });
 

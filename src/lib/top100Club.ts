@@ -1,7 +1,7 @@
 /**
  * src/lib/top100Club.ts
  * 
- * Top 100 Club tier system based on total_played_top100 (the ladder is played-based).
+ * Per-list Top 100 club tiers. The count is always ONE list's played count — never a total across lists, and never a sum.
  * 
  * IMPORTANT: Milestone thresholds are sourced from src/config/achievements.ts
  * IMPORTANT: All colors are sourced from globalAchievementMilestoneSystem.ts
@@ -39,11 +39,9 @@ const GLASS_BY_THRESHOLD: Record<number, number> = {
   5: glassIntensity.subtle,
   10: glassIntensity.standard,
   20: glassIntensity.standard,
+  30: glassIntensity.standard,
   50: glassIntensity.vivid,
   100: glassIntensity.standard,
-  200: glassIntensity.vivid,
-  300: glassIntensity.vivid,
-  400: glassIntensity.standard,
 };
 
 /**
@@ -61,16 +59,20 @@ export const CLUB_STEPS: Top100ClubMeta[] = MILESTONE_TIER_META.map(meta => ({
 }));
 
 // Lookup map for quick access by tierId
+const stepById = (id: Top100TierId): Top100ClubMeta | null =>
+  CLUB_STEPS.find((s) => s.tierId === id) ?? null;
+
 export const TIER_BY_ID: Record<Top100TierId, Top100ClubMeta | null> = {
   none: null,
-  rookie: CLUB_STEPS[0],
-  fairway: CLUB_STEPS[1],
-  founders: CLUB_STEPS[2],
-  heritage: CLUB_STEPS[3],
-  century: CLUB_STEPS[4],
-  elite: CLUB_STEPS[5],
-  legendary: CLUB_STEPS[6],
-  grandslam: CLUB_STEPS[7],
+  rookie: stepById('rookie'),
+  fairway: stepById('fairway'),
+  founders: stepById('founders'),
+  thirty: stepById('thirty'),
+  heritage: stepById('heritage'),
+  century: stepById('century'),
+  elite: null,
+  legendary: null,
+  grandslam: null,
 };
 
 export type Top100ClubResult = {

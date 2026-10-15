@@ -188,6 +188,7 @@ export const MILESTONE_PALETTE_MAP: Record<number, ClbhouzAchievementKey> = {
   5:   'FAIR',
   10:  'MILD',
   20:  'STEADY',
+  30:  'STEADY',
   50:  'RESPECTABLE',
   100: 'GOOD',
   200: 'VERY_GOOD',
