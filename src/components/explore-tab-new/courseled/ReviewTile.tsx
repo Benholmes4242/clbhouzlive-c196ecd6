@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { MentionText } from '@/components/mentions/MentionText';
 import { Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -469,7 +470,7 @@ export function ReviewTile({
             ...clamp(3),
           }}
         >
-          {r.quote}
+          <MentionText text={r.quote} disableNavigation />
         </div>
       )}
 
