@@ -2,12 +2,14 @@ import React from 'react';
 import { Globe } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { Button } from '@/components/ui/button';
 
 export type QuickRegion = 'global' | 'gb-i' | 'usa' | 'europe' | 'row';
 
 interface CourseRegionPillsProps {
   value: QuickRegion;
   onChange: (region: QuickRegion) => void;
+  appearance?: 'default' | 'archive';
 }
 
 const REGION_OPTIONS = [
@@ -18,7 +20,21 @@ const REGION_OPTIONS = [
   { id: 'row' as const, label: 'Rest of World', country: null },
 ];
 
-export const CourseRegionPills: React.FC<CourseRegionPillsProps> = ({ value, onChange }) => {
+export const CourseRegionPills: React.FC<CourseRegionPillsProps> = ({ value, onChange, appearance = 'default' }) => {
+  if (appearance === 'archive') {
+    return (
+      <div className="archive-region-row" role="group" aria-label="Course region">
+        {REGION_OPTIONS.map((region) => (
+          <Button key={region.id} type="button" variant="ghost"
+            className="archive-control archive-region-choice" aria-pressed={value === region.id}
+            onClick={() => onChange(region.id)} style={{ color: value === region.id ? A.INK : A.DIM }}>
+            <span aria-hidden="true">{region.id === 'global' ? '🌍' : region.id === 'gb-i' ? '🇬🇧' : region.id === 'usa' ? '🇺🇸' : region.id === 'europe' ? '🇪🇺' : '🌏'}</span>
+            <span>{region.label}</span>
+          </Button>
+        ))}
+      </div>
+    );
+  }
   return (
     <div
       style={{

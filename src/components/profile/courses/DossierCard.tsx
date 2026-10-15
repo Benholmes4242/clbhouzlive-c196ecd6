@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Flag, ChevronDown } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { type RatedCourseData } from './my-ratings/myRatingsTiers';
 import { SubScoreStack } from '@/features/courses/_shared/scoreBands';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
-import { A, SANS, LABEL, NUM, Action, StatRow, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS, LABEL, NUM, Action, StatRow, TOPAR_RED, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 
 /**
@@ -115,59 +115,45 @@ const DossierCard: React.FC<DossierCardProps> = ({
         }
       }}
       style={{
-        background: A.PANEL,
+        background: 'transparent',
         cursor: 'pointer',
-        fontFamily: SANS,
+        fontFamily: 'inherit',
         margin: '0 20px',
-        padding: '9px 0',
-        borderBottom: '1px solid rgba(255,255,255,0.055)',
+        padding: '12px 0',
+        borderBottom: `1px solid ${A.SOFT}`,
         display: 'flex',
         flexDirection: 'column',
         gap: 12,
       }}
     >
       {/* HEADER (always visible) */}
-      <div style={{ display: 'flex', gap: 11, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
         {/* Thumb */}
         <div
           style={{
             position: 'relative',
-            flex: '0 0 44px',
-            width: 44,
-            height: 44,
-            borderRadius: 8,
+            flex: '0 0 52px',
+            width: 52,
+            height: 52,
+            borderRadius: 10,
             overflow: 'hidden',
             background: course.thumbnail_image ? `url(${course.thumbnail_image})` : A.TRACK,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
         >
-          {!course.thumbnail_image && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: A.DIM,
-              }}
-            >
-              <Flag size={16} />
-            </div>
-          )}
         </div>
 
         {/* Identity */}
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
           <div
             style={{
               color: A.INK,
               fontWeight: 700,
-              fontSize: 13,
+              fontSize: 16,
               lineHeight: 1.15,
-              letterSpacing: '-0.01em',
-              whiteSpace: 'nowrap',
+              letterSpacing: 0,
+              overflowWrap: 'anywhere',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
             }}
@@ -175,7 +161,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
             {course.name}
           </div>
           {line1.length > 0 && (
-            <div style={{ ...LABEL, letterSpacing: '0.10em' }}>
+            <div style={{ ...LABEL, fontSize: 12, fontWeight: 400, letterSpacing: 0, lineHeight: 1.3 }}>
               {/* Segments stay unbreakable; the ONLY wrap point is the separator,
                   so a long country drops intact beneath the date (measured: the
                   identity column is ~176px at 390pt; "3 SEPT 2026 · NORTHERN
@@ -186,7 +172,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
             </div>
           )}
           {line2.length > 0 && (
-            <div style={{ ...LABEL, letterSpacing: '0.10em', whiteSpace: 'nowrap' }}>{line2}</div>
+            <div style={{ fontSize: 12, color: A.DIM, lineHeight: 1.3 }}>{line2}</div>
           )}
           {course.is_top100 && course.global_rank != null && (
             <div>
@@ -195,13 +181,13 @@ const DossierCard: React.FC<DossierCardProps> = ({
                 style={{
                   display: 'inline-block',
                   marginTop: 4,
-                  fontSize: 9.5,
+                  fontSize: 11,
                   fontWeight: 700,
-                  letterSpacing: '0.06em',
+                  letterSpacing: 0,
                   color: MEDAL_GOLD,
-                  border: '1px solid rgba(214,168,75,0.45)',
+                  border: `1px solid color-mix(in srgb, ${MEDAL_GOLD} 45%, transparent)`,
                   borderRadius: 7,
-                  padding: '2px 6px',
+                  padding: '1px 6px',
                 }}
               >
                 {`#${course.global_rank} World`}
@@ -217,19 +203,19 @@ const DossierCard: React.FC<DossierCardProps> = ({
               {t('row.notRated', { defaultValue: 'Not rated' })}
             </div>
           ) : (
-            <div style={{ ...NUM, fontSize: 17, color: A.INK, lineHeight: 1 }}>
+            <div style={{ ...NUM, fontFamily: 'inherit', letterSpacing: 0, fontSize: 20, color: courseSubScoreTone(course.rating_value), lineHeight: 1 }}>
               {course.rating_value.toFixed(1)}
             </div>
           )}
         </div>
 
-        <ChevronDown
-          size={18}
+        <ChevronRight
+          size={14}
           color={A.DIM}
           strokeWidth={2}
           style={{
             flexShrink: 0,
-            transform: expanded ? 'rotate(180deg)' : 'none',
+            transform: expanded ? 'rotate(90deg)' : 'none',
             transition: 'transform 0.2s',
           }}
         />

@@ -9,21 +9,22 @@ interface MyRatingsYearDividerProps {
   /** Calendar year of the rows beneath; null groups undated rows. */
   year: number | null;
   count: number;
+  countryCount?: number;
   isFirst: boolean;
 }
 
-const MyRatingsYearDivider: React.FC<MyRatingsYearDividerProps> = ({ year, count, isFirst }) => (
+const MyRatingsYearDivider: React.FC<MyRatingsYearDividerProps> = ({ year, count, countryCount, isFirst }) => (
   <div
     data-year-divider={year ?? 'undated'}
     data-first={isFirst || undefined}
-    style={{ margin: '14px 20px 0', fontFamily: SANS }}
+    style={{ margin: '16px 20px 4px', fontFamily: 'inherit' }}
   >
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', paddingBottom: 7, borderBottom: `1px solid ${A.HAIRLINE}` }}>
       <span
         style={{
-          fontSize: 15,
+          fontSize: 18,
           fontWeight: 800,
-          letterSpacing: '-0.02em',
+          letterSpacing: 0,
           color: A.INK,
           fontVariantNumeric: 'tabular-nums lining-nums',
         }}
@@ -32,15 +33,16 @@ const MyRatingsYearDivider: React.FC<MyRatingsYearDividerProps> = ({ year, count
       </span>
       <span
         style={{
-          fontSize: 10.5,
+          fontSize: 12,
           fontWeight: 700,
-          letterSpacing: '0.08em',
+          letterSpacing: 0,
           textTransform: 'uppercase',
           color: A.DIM,
           fontVariantNumeric: 'tabular-nums lining-nums',
         }}
       >
         {count === 1 ? '1 course' : `${count} courses`}
+        {countryCount != null && countryCount > 0 ? ` · ${countryCount} ${countryCount === 1 ? 'country' : 'countries'}` : ''}
       </span>
     </div>
   </div>

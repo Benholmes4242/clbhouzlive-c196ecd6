@@ -1,0 +1,71 @@
+/* ARCHITECTURE RULE: archive-only treatments stay scoped here; shared rails
+   and headings elsewhere retain their signed-off appearance. */
+.courses-archive {
+  font-family: inherit;
+}
+.courses-archive .archive-heading h2 {
+  font-family: inherit;
+  font-size: 22px;
+  line-height: 26px;
+  letter-spacing: 0;
+}
+.courses-archive .archive-heading > div:first-child > div {
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 16px;
+}
+.courses-archive .archive-heading {
+  margin-bottom: 16px !important;
+}
+.courses-archive .archive-control {
+  height: auto;
+  min-height: 0;
+  font-family: inherit;
+  font-weight: 700;
+  box-shadow: none;
+  letter-spacing: 0;
+}
+.courses-archive .archive-region-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.courses-archive .archive-region-choice {
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  font-size: 14px;
+  line-height: 20px;
+}
+.courses-archive .archive-region-choice span {
+  white-space: nowrap;
+}
+.courses-archive .archive-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.courses-archive .archive-preview-tiles {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+.courses-archive .archive-preview-tile {
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  border-radius: 11px;
+  padding: 0;
+  background-size: cover;
+  background-position: center;
+}
+@media (max-width: 389px) {
+  .courses-archive .archive-preview-tile {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+  }
+  .courses-archive .archive-preview-row { gap: 8px; }
+  .courses-archive .archive-preview-tiles { gap: 6px; }
+}
