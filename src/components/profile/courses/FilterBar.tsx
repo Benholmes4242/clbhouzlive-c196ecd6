@@ -1,5 +1,5 @@
 /**
- * StickyFilterBar - Two primary tabs (All / Top 100) with inline country filter pills and sort dropdown
+ * FilterBar - Two primary tabs (All / Top 100) with inline country filter pills and sort dropdown
  */
 import React from 'react';
 import { cn } from '@/lib/utils';
@@ -17,7 +17,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 export type CoursePrimaryTab = 'all' | 'top100';
 export type CourseSortOption = 'recently-played' | 'rating-high-low' | 'rating-low-high';
 
-interface StickyFilterBarProps {
+interface FilterBarProps {
   activeTab: CoursePrimaryTab;
   onTabChange: (tab: CoursePrimaryTab) => void;
   activeSort: CourseSortOption;
@@ -34,7 +34,7 @@ const SORT_OPTIONS: { value: CourseSortOption; label: string }[] = [
   { value: 'rating-low-high', label: 'Rating: Low to High' },
 ];
 
-export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
+export const FilterBar: React.FC<FilterBarProps> = ({
   activeTab,
   onTabChange,
   activeSort,

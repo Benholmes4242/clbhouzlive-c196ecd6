@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { TieredCourseCard, CourseCardData } from './TieredCourseCard';
-import { StickyFilterBar, CoursePrimaryTab, CourseSortOption } from './StickyFilterBar';
+import { FilterBar, CoursePrimaryTab, CourseSortOption } from './FilterBar';
 import { type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 import { ClipboardList } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,6 +14,7 @@ import BreakdownsPrompt from './BreakdownsPrompt';
 import BreakdownsPickerSheet from './BreakdownsPickerSheet';
 import { usePlayedUnratedCourses } from '@/hooks/usePlayedUnratedCourses';
 import MyRatingsTierDivider from './my-ratings/MyRatingsTierDivider';
+import MyRatingsYearDivider from './my-ratings/MyRatingsYearDivider';
 import {
   getBucket,
   getBucketLabel,
@@ -60,7 +60,38 @@ export interface ProfileRatingRow {
   created_at: string | null;
 }
 
+export interface CourseCardData {
+  id: string;
+  name: string;
+  country: string;
+  sub_country: string | null;
+  thumbnail_image: string | null;
+  is_top100: boolean;
+  last_played_at: string | null;
+  rating_value: number | null;
+  has_rating: boolean;
+  rating_id: string | null;
+  // Optional own-rating breakdown fields used by the canonical sort comparator
+  design_score?: number | null;
+  condition_score?: number | null;
+  clubhouse_score?: number | null;
+  facilities_score?: number | null;
+  review_date?: string | null;
+}
+
 const PAGE_SIZE = 20;
+
+/** The recency sort is the default: a profile is a record of play, not a rival Top 100. */
+export const DEFAULT_COURSE_SORT: CourseSortOption = 'recently-played';
+
+const isRatedRow = (c: CourseCardData) => c.has_rating && c.rating_value != null;
+
+/** Calendar year a row is grouped under on the recency sort; null = undated. */
+export const playedYear = (iso: string | null): number | null => {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? null : d.getFullYear();
+};
 
 /**
  * Maps a hydrated CourseCardData row → the RatedCourseData shape consumed
@@ -81,7 +112,7 @@ const toRatedCourseData = (
   is_top100: course.is_top100,
   global_rank: course.global_rank ?? null,
   last_played_at: course.last_played_at,
-  rating_value: course.rating_value as number,
+  rating_value: (course.rating_value ?? 0) as number,
   rating_id: course.rating_id,
   design_score: course.design_score ?? null,
   condition_score: course.condition_score ?? null,
@@ -104,7 +135,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const navigate = useNavigate();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<CoursePrimaryTab>('all');
-  const [activeSort, setActiveSort] = useState<CourseSortOption>('rating-high-low');
+  const [activeSort, setActiveSort] = useState<CourseSortOption>(DEFAULT_COURSE_SORT);
   const [localCountry, setLocalCountry] = useState<QuickRegion>('global');
   const activeCountry = activeCountryProp ?? localCountry;
   const setActiveCountry = (r: QuickRegion) => {
@@ -196,12 +227,6 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
       } as CourseCardData & { global_rank?: number | null; review_text?: string | null };
     });
   }, [courseRows, ratingRows, userActivity]);
-
-  // Tab counts
-  const tabCounts = useMemo(() => ({
-    all: courses.length,
-    top100: top100Count ?? courses.filter(c => c.is_top100).length,
-  }), [courses, top100Count]);
 
   // Courses missing breakdown ratings (page-level prompt eligibility).
   const missingBreakdownsCourses = useMemo<RatedCourseData[]>(
@@ -301,20 +326,49 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     return result;
   }, [courses, activeTab, activeCountry, activeSort]);
 
-  const tieAnnotated = filteredCourses;
+  const isRatingSort = activeSort === 'rating-high-low' || activeSort === 'rating-low-high';
 
-  const displayedCourses = tieAnnotated.slice(0, displayCount);
-  const hasMore = displayCount < tieAnnotated.length;
-  const totalFiltered = tieAnnotated.length;
+  // ONE SET OF ROWS FEEDS THE CHIPS, THE LIST AND THE FOOTER. Rating sorts draw
+  // rated rows only, so the counts are taken from the rows actually drawn
+  // under the current region filter and sort - never from a wider source.
+  const drawnFor = useCallback(
+    (tab: CoursePrimaryTab) =>
+      courses.filter((c) => {
+        if (tab === 'top100' && !c.is_top100) return false;
+        if (isRatingSort && !isRatedRow(c)) return false;
+        if (activeCountry === 'global') return true;
+        switch (activeCountry) {
+          case 'gb-i': return c.country === 'Britain & Ireland';
+          case 'usa': return c.country === 'USA';
+          case 'europe': return c.country === 'Continental Europe';
+          case 'row': return !['Britain & Ireland', 'USA', 'Continental Europe'].includes(c.country || '');
+          default: return true;
+        }
+      }).length,
+    [courses, isRatingSort, activeCountry],
+  );
+  const tabCounts = useMemo(
+    () => ({ all: drawnFor('all'), top100: drawnFor('top100') }),
+    [drawnFor],
+  );
+
+  const drawnCourses = useMemo(
+    () => (isRatingSort ? filteredCourses.filter(isRatedRow) : filteredCourses),
+    [filteredCourses, isRatingSort],
+  );
+
+  const displayedCourses = drawnCourses.slice(0, displayCount);
+  const hasMore = displayCount < drawnCourses.length;
+  const totalFiltered = drawnCourses.length;
 
   const loadMore = useCallback(() => {
     if (!hasMore || isLoadingMore) return;
     setIsLoadingMore(true);
     setTimeout(() => {
-      setDisplayCount(prev => Math.min(prev + PAGE_SIZE, tieAnnotated.length));
+      setDisplayCount(prev => Math.min(prev + PAGE_SIZE, drawnCourses.length));
       setIsLoadingMore(false);
     }, 300);
-  }, [hasMore, isLoadingMore, tieAnnotated.length]);
+  }, [hasMore, isLoadingMore, drawnCourses.length]);
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -380,7 +434,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
 
       {/* Filter bar */}
-      <StickyFilterBar
+      <FilterBar
         activeTab={activeTab}
         onTabChange={(tab) => {
           setActiveTab(tab);
@@ -437,7 +491,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
       )}
 
       {/* Course list */}
-      {tieAnnotated.length === 0 ? (
+      {drawnCourses.length === 0 ? (
         <div className="bg-card rounded-2xl border border-border/10 p-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)] mt-3">
           <div className="flex flex-col items-center justify-center text-center">
             <div className="w-14 h-14 rounded-full bg-muted border border-border/10 flex items-center justify-center mb-4">
@@ -462,17 +516,13 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
       ) : (
         <div className="mt-3 -mx-2.5">
           {(() => {
-            const isHighLow = activeSort === 'rating-high-low';
-            const isLowHigh = activeSort === 'rating-low-high';
-            const isRatingSort = isHighLow || isLowHigh;
-
             // ── Rating-sorted: single primitive with tier dividers ─────
             if (isRatingSort) {
               const tierCounts: Record<MyRatingsBucket, number> = {
                 top: 0,
                 rest: 0,
               };
-              tieAnnotated.forEach((c) => {
+              drawnCourses.forEach((c) => {
                 if (c.has_rating && c.rating_value != null) {
                   tierCounts[getBucket(c.rating_value)]++;
                 }
@@ -482,10 +532,9 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
               let currentBucket: MyRatingsBucket | null = null;
               let firstDividerRendered = false;
 
-              displayedCourses.forEach((course, index) => {
-                const rank = index + 1;
-                const isRated = course.has_rating && course.rating_value != null;
-                if (!isRated) return;
+              displayedCourses.forEach((course) => {
+                // A row's position in a sorted list is not a rank. The only rank on this row is global_rank, which comes from the published Top 100.
+                if (!isRatedRow(course)) return;
 
                 const rating = course.rating_value as number;
                 const bucket = getBucket(rating);
@@ -507,7 +556,6 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                   <DossierCard
                     key={course.id}
                     course={toRatedCourseData(course)}
-                    rank={rank}
                     onCourseClick={handleCourseClick}
                     onFullReview={handleFullReview}
                     scoring={scoringFor(course.id)}
@@ -519,40 +567,43 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
               return elements;
             }
 
-            // ── Recently-played: flat list, no dividers ────────────
-            return (
-              <>
-                {displayedCourses.map((course, index) => {
-                  const rank = index + 1;
-                  const isRated = course.has_rating && course.rating_value != null;
-                  if (isRated) {
-                    return (
-                      <DossierCard
-                        key={course.id}
-                        course={toRatedCourseData(course)}
-                        rank={rank}
-                        onCourseClick={handleCourseClick}
-                        onFullReview={handleFullReview}
-                        scoring={scoringFor(course.id)}
-                        onExpand={handleRowExpand}
-                      />
-                    );
-                  }
-                  return (
-                    <div
-                      key={course.id}
-                      className="mb-2"
-                      style={{ padding: '0 16px' }}
-                    >
-                      <TieredCourseCard
-                        course={course}
-                        isOwnProfile={isOwnProfile}
-                      />
-                    </div>
-                  );
-                })}
-              </>
-            );
+            // ── Recently-played: one row design, a year divider per calendar year
+            const yearCounts = new Map<number | null, number>();
+            drawnCourses.forEach((c) => {
+              const y = playedYear(c.last_played_at);
+              yearCounts.set(y, (yearCounts.get(y) ?? 0) + 1);
+            });
+            const elements: React.ReactNode[] = [];
+            let currentYear: number | null | undefined = undefined;
+            displayedCourses.forEach((course) => {
+              // A row's position in a sorted list is not a rank. The only rank on this row is global_rank, which comes from the published Top 100.
+              const year = playedYear(course.last_played_at);
+              if (year !== currentYear) {
+                elements.push(
+                  <MyRatingsYearDivider
+                    key={`year-${year ?? 'undated'}`}
+                    year={year}
+                    count={yearCounts.get(year) ?? 0}
+                    isFirst={currentYear === undefined}
+                  />,
+                );
+                currentYear = year;
+              }
+              const rated = isRatedRow(course);
+              elements.push(
+                <DossierCard
+                  key={course.id}
+                  course={toRatedCourseData(course)}
+                  unrated={!rated}
+                  onRate={isOwnProfile && !rated ? (id) => navigate(`/courses/${id}/rate`) : undefined}
+                  onCourseClick={handleCourseClick}
+                  onFullReview={handleFullReview}
+                  scoring={scoringFor(course.id)}
+                  onExpand={handleRowExpand}
+                />,
+              );
+            });
+            return elements;
           })()}
         </div>
       )}
@@ -575,13 +626,13 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         </div>
       )}
 
-      {!hasMore && tieAnnotated.length > PAGE_SIZE && (
+      {!hasMore && drawnCourses.length > PAGE_SIZE && (
         <p className="text-center text-[11px] text-muted-foreground pt-4 pb-6">
           {isOwnProfile ? "You\u2019ve reached the end" : "End of list"} • {formatNumber(totalFiltered)} courses total
         </p>
       )}
 
-      {!hasMore && tieAnnotated.length > 0 && tieAnnotated.length <= PAGE_SIZE && (
+      {!hasMore && drawnCourses.length > 0 && drawnCourses.length <= PAGE_SIZE && (
         <div className="text-center pt-4 pb-2">
           <p className="text-sm text-foreground font-medium italic">
             {isOwnProfile 
