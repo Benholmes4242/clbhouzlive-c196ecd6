@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import BrowseCourseCard from './BrowseCourseCard';
 import type { StatBrowseRow } from './useStatBrowse';
-import { RAIL_CHIP_GAP, RailChips, railChipStyle } from '@/components/ui/RailChips';
+import { RailChips, railChipStyle } from '@/components/ui/RailChips';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
@@ -83,16 +83,14 @@ function toBrowseRow(
 
 interface Props {
   shellTabs?: React.ReactNode;
-  rateNudge?: React.ReactNode;
 }
 
-const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
+const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [selectedList, setSelectedList] = useState(savedList);
   const [searchOpen, setSearchOpen] = useState(false);
   const [nameQuery, setNameQuery] = useState('');
-  const [yoursOnly, setYoursOnly] = useState(false);
   const restored = useRef(false);
   const { data, isLoading, isError, refetch, isPlaceholderData } = useGolfCoursesInfinite({ listSlug: selectedList });
   /* The slug the RENDERED rows belong to. While a region switch is in flight
@@ -112,20 +110,14 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
   }, [data, renderedList]);
   const ids = useMemo(() => courses.map((course) => course.id), [courses]);
   const enrichment = useTop100Enrichment(ids, user?.id, renderedList);
-  /* Search and "Yours" narrow what is rendered only (client-side, no query).
-     The head's rated / tracked meta describes the whole list, so it keeps
-     counting the unfiltered rows. */
+  /* Search narrows what is rendered only (client-side, no query). The head's
+     reviewed / tracked meta describes the whole list, so it keeps counting
+     the unfiltered rows. */
   const visibleCourses = useMemo(() => {
     const q = nameQuery.trim().toLowerCase();
-    return courses.filter((course) => {
-      if (q && !(course.name ?? '').toLowerCase().includes(q)) return false;
-      if (yoursOnly) {
-        const e = enrichment.get(course.id);
-        if (!((e?.yourRounds ?? 0) > 0 || e?.ratedByYou)) return false;
-      }
-      return true;
-    });
-  }, [courses, nameQuery, yoursOnly, enrichment]);
+    if (!q) return courses;
+    return courses.filter((course) => (course.name ?? '').toLowerCase().includes(q));
+  }, [courses, nameQuery]);
   /* COMMUNITY counts: how many of the list ANYONE has rated / played. Not to be
      confused with the VIEWER counts below (BRIEF_TOP_100_REBUILD §2). */
   const communityRatedCount = courses.filter((course) => {
@@ -180,7 +172,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
           ariaLabel="Top 100 region"
           align="center-when-fit"
           size="sm"
-          trailing={(<span style={{ display: 'flex', gap: RAIL_CHIP_GAP }}>
+          trailing={(
             <button
               type="button"
               onClick={() => {
@@ -203,17 +195,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
                 <Search className="h-4 w-4" style={{ color: 'currentColor' }} aria-hidden />
               )}
             </button>
-            {user ? (
-              <button
-                type="button"
-                onClick={() => setYoursOnly((prev) => !prev)}
-                aria-pressed={yoursOnly}
-                style={{ ...railChipStyle(yoursOnly, 'sm'), alignSelf: 'stretch' }}
-              >
-                Yours
-              </button>
-            ) : null}
-          </span>)}
+          )}
         />
         {searchOpen ? (
           <div style={{ marginTop: 10 }}>
@@ -245,7 +227,6 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
             {communityRatedCount} reviewed · {communityPlayedCount} tracked
           </span>
         </div>
-        {rateNudge ? <div style={{ marginTop: 24 }}>{rateNudge}</div> : null}
       </section>
 
       <div style={{ paddingTop: 24 }}>

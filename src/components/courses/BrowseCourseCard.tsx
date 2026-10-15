@@ -131,14 +131,13 @@ export function BrowseCourseCard({
             count, the faces and the course record now arrive in the batched
             enrichment read the page already makes (get_post_course_context +
             one user_profiles read) and render in the strip below.
-            DELIBERATE OMISSION: no per-card "Rate it" control. Rating is
-            prompted once by RateNudge above the list (its 'played' tier), and
-            this card's root is a button, so a control here would nest a
-            button inside a button. */}
+            DELIBERATE OMISSION: no per-card "Rate it" control. This card's
+            root is a button, so a control here would nest a button inside a
+            button. */}
         {top100 && viewerRounds > 0 ? (
           <div style={{ ...GLASS_CHIP, left: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: A.AMBER }} />
-            {viewerBest != null ? <>You played · best <span style={FIGS}>{viewerBest}</span></> : 'You played'}
+            {viewerBest != null ? <>You played · Best <span style={FIGS}>{viewerBest}</span></> : 'You played'}
           </div>
         ) : null}
         <div style={{ position: 'absolute', left: 20, right: 20, bottom: 14, display: 'flex', alignItems: 'flex-end', gap: 16 }}>

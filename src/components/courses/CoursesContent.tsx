@@ -9,7 +9,6 @@ import FriendsCoursesSignedOutEmpty from './FriendsCoursesSignedOutEmpty';
 import UserCoursesContent from './UserCoursesContent';
 import Top100CoursesHubPanel from './Top100CoursesHubPanel';
 
-import RateNudge from './RateNudge';
 import CoursesBrowsePage from './CoursesBrowsePage';
 import CourseDirectorySheet from './CourseDirectorySheet';
 
@@ -203,6 +202,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
+  // RateNudge's empty state was this sheet's only opener; with it unmounted (BRIEF_TOP_100_TRIM) nothing on this page opens it.
   const [rateSheetOpen, setRateSheetOpen] = useState(false);
   // Full directory now lives in a bottom sheet, opened from three doors.
   const [directoryOpen, setDirectoryOpen] = useState(false);
@@ -419,18 +419,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
               {activeTab === 'top100' ? (
 
-                <Top100CoursesHubPanel
-                  shellTabs={shellTabsNode}
-                  rateNudge={
-                    user ? (
-                      <RateNudge
-                        userId={user.id}
-                        onEmptyFallback={() => setRateSheetOpen(true)}
-                        variant="flat"
-                      />
-                    ) : null
-                  }
-                />
+                <Top100CoursesHubPanel shellTabs={shellTabsNode} />
               ) : (
                 <>
                   {shellTabsNode}
