@@ -238,6 +238,14 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
         />
       ) : null}
       {argument.length > 0 ? <TheArgumentSection rows={argument} qualifying={argumentQualifying} /> : null}
+      <section style={{ ...SECTION_WRAP, paddingBottom: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
+          <SectionHead kicker="The list" tone="quiet" title={heading} />
+          <span style={{ color: A.MUTE, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
+            {communityRatedCount} rated · {communityPlayedCount} tracked
+          </span>
+        </div>
+        {rateNudge ? <div style={{ marginTop: 24 }}>{rateNudge}</div> : null}
       </section>
 
       <div style={{ paddingTop: 24 }}>
