@@ -24,12 +24,13 @@ export function TheArgumentSection({ rows, qualifying }: { rows: ArgumentRow[]; 
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</div>
+                {/* Two lines, one fact each: the list's position, then the community's. The member rating value and the rating count are deliberately NOT printed here — this section is about where a course SITS, not what it scored. rating and ratingCount are still required in theArgument.ts (rating orders memberRank, ratingCount gates MIN_RATINGS), so do not remove them from the types because this row stopped showing them. */}
                 <div style={{ fontSize: 11, color: A.DIM, marginTop: 3, fontVariantNumeric: 'tabular-nums' }}>
-                  List says <b style={{ color: A.BODY, fontWeight: 600 }}>#{r.publishedRank}</b> · Rated{' '}
-                  <b style={{ color: A.BODY, fontWeight: 600 }}>{r.rating.toFixed(1)}</b> by{' '}
-                  <b style={{ color: A.BODY, fontWeight: 600 }}>{r.ratingCount}</b> members,{' '}
-                  <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.memberRank)}</b> of the{' '}
-                  <b style={{ color: A.BODY, fontWeight: 600 }}>{qualifying}</b> rated.
+                  Official rank <b style={{ color: A.BODY, fontWeight: 600 }}>#{r.publishedRank}</b>
+                </div>
+                <div style={{ fontSize: 11, color: A.DIM, marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>
+                  Golfers rank it <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.memberRank)}</b> of the{' '}
+                  <b style={{ color: A.BODY, fontWeight: 600 }}>{qualifying}</b> rated
                 </div>
               </div>
               <div style={{ textAlign: 'right', flexShrink: 0 }}>
