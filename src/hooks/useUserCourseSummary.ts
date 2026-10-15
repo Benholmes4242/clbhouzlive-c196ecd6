@@ -48,15 +48,19 @@ export interface CountriesSummary {
   points: CoursePoint[];
   /** Courses that still cannot be plotted after the club fallback. */
   unmapped: number;
+  /** Course name by id, from the same golf_courses read (share card labels). */
+  names: Record<string, string>;
 }
-const EMPTY_COUNTRIES: CountriesSummary = { count: 0, tallies: [], points: [], unmapped: 0 };
+const EMPTY_COUNTRIES: CountriesSummary = { count: 0, tallies: [], points: [], unmapped: 0, names: {} };
 
 /** Null and empty sub_country never become a counted country. */
 export function summariseCountries(rows: CountryRow[]): CountriesSummary {
   const m = new Map<string, number>();
   const points: CoursePoint[] = [];
   let unmapped = 0;
+  const names: Record<string, string> = {};
   for (const r of rows) {
+    if (r.name) names[r.id] = r.name;
     const c = r.sub_country?.trim();
     if (c) m.set(c, (m.get(c) ?? 0) + 1);
     // A course with no coordinates of its own borrows its club's. Whatever still cannot be plotted is stated in the legend — a map that silently drops a quarter of a member's golf while the figure above says 53 is a map that lies.
@@ -73,7 +77,7 @@ export function summariseCountries(rows: CountryRow[]): CountriesSummary {
   const tallies = [...m.entries()]
     .map(([country, courses]) => ({ country, courses }))
     .sort((a, b) => b.courses - a.courses || a.country.localeCompare(b.country));
-  return { count: tallies.length, tallies, points, unmapped };
+  return { count: tallies.length, tallies, points, unmapped, names };
 }
 
 export function useUserCourseSummary(userId: string | undefined) {
@@ -115,7 +119,7 @@ export function useUserCourseSummary(userId: string | undefined) {
       // golf_courses.country is a REGION grouping ('Britain & Ireland', 'Continental Europe', 'Middle East'), NOT a country. The country is sub_country. Reading .country here is what made this panel report 3 countries for a member who has played in 9. The ~20 files under src/components/courses/ that display a location already use sub_country — this hook is following that convention, not inventing one. Do not 'simplify' this back to .country.
       const { data: courses, error: courseError } = await supabase
         .from('golf_courses')
-        .select('id, sub_country, latitude, longitude, golf_clubs(latitude, longitude)')
+        .select('id, name, sub_country, latitude, longitude, golf_clubs(latitude, longitude)')
         .in('id', courseIds);
 
       if (courseError) throw courseError;
