@@ -84,8 +84,10 @@ export const A = {
  * Green is reserved for this standout signal: it is the one place that colour
  * earns its keep here, so nothing else on a course card may use it.
  */
+export const SUB_SCORE_GREEN_MIN = 9;
+
 export function courseSubScoreTone(score: number | null | undefined): string {
-  return score != null && score >= 9 ? A.GREEN : A.MUTE;
+  return score != null && score >= SUB_SCORE_GREEN_MIN ? A.GREEN : A.MUTE;
 }
 
 /** Every analytical bar, track and segment. A measurement, not a pill. */

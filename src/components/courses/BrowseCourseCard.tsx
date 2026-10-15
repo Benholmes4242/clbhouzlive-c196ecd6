@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
-import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS, SANS, SUB_SCORE_GREEN_MIN } from '@/features/courses/components/holes/analytical/tokens';
 import { CategoryScores } from '@/components/courses/course-detail/CategoryScores';
 import type { StatBrowseRow } from './useStatBrowse';
 import { courseRankLabels, type RankList } from '@/features/courses/_shared/courseRankLabels';
@@ -160,11 +160,14 @@ export function BrowseCourseCard({
             ) : null}
           </div>
           {row.community_rating != null ? (
-            <div style={{ flexShrink: 0, textAlign: 'right' }}>
-              <div style={{ ...FIGS, color: A.INK, fontSize: top100 ? 24 : 26, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1 }}>
+            <div style={{ flexShrink: 0, textAlign: 'center' }}>
+              {/* Nine and above takes the shared green so the headline agrees with
+                  the category figures beneath it. Below nine stays INK, not MUTE,
+                  because this figure sits on a photograph. */}
+              <div style={{ ...FIGS, color: row.community_rating >= SUB_SCORE_GREEN_MIN ? A.GREEN : A.INK, fontSize: top100 ? 24 : 26, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1 }}>
                 {row.community_rating.toFixed(1)}
               </div>
-              <div style={{ marginTop: 4, color: PHOTO_DIM, fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+              <div style={{ marginTop: 4, marginRight: '-0.19em', color: PHOTO_DIM, fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
                 {row.review_count} {row.review_count === 1 ? 'rating' : 'ratings'}
               </div>
             </div>
