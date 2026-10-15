@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { CourseSearchFilters, SearchedCourse } from './useGolfCoursesSearch';
 
@@ -59,5 +59,6 @@ export function useGolfCoursesInfinite(filters: Omit<CourseSearchFilters, 'limit
     staleTime: 5 * 60 * 1000,  // 5 minutes
     gcTime: 10 * 60 * 1000,    // 10 minutes
     refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData,
   });
 }
