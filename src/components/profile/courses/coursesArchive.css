@@ -4,15 +4,15 @@
   font-family: inherit;
 }
 .courses-archive .archive-heading h2 {
-  font-family: inherit;
-  font-size: 22px;
-  line-height: 26px;
-  letter-spacing: 0;
+  font-family: inherit !important;
+  font-size: 22px !important;
+  line-height: 26px !important;
+  letter-spacing: 0 !important;
 }
 .courses-archive .archive-heading > div:first-child > div {
-  font-family: inherit;
-  font-size: 13px;
-  line-height: 16px;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  line-height: 16px !important;
 }
 .courses-archive .archive-heading {
   margin-bottom: 16px !important;

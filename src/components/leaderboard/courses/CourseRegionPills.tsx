@@ -28,7 +28,7 @@ export const CourseRegionPills: React.FC<CourseRegionPillsProps> = ({ value, onC
           <Button key={region.id} type="button" variant="ghost"
             className="archive-control archive-region-choice" aria-pressed={value === region.id}
             onClick={() => onChange(region.id)} style={{ color: value === region.id ? A.INK : A.DIM }}>
-            <span aria-hidden="true">{region.id === 'global' ? '🌍' : region.id === 'gb-i' ? '🇬🇧' : region.id === 'usa' ? '🇺🇸' : region.id === 'europe' ? '🇪🇺' : '🌏'}</span>
+            {region.country ? <CountryFlag country={region.country} size="sm" /> : <span aria-hidden="true">{region.id === 'global' ? '🌍' : '🌏'}</span>}
             <span>{region.label}</span>
           </Button>
         ))}

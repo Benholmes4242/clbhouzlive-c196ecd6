@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flag, ChevronRight } from 'lucide-react';
+import { Flag, ChevronRight, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { type RatedCourseData } from './my-ratings/myRatingsTiers';
@@ -66,6 +66,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
   onExpand,
 }) => {
   const archive = appearance === 'archive';
+  const RowChevron = archive ? ChevronRight : ChevronDown;
   const { t } = useTranslation('courses');
   const [expanded, setExpanded] = useState(false);
   const dateIso = course.review_date ?? course.last_played_at ?? null;
@@ -146,6 +147,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
             backgroundPosition: 'center',
           }}
         >
+          {!archive && !course.thumbnail_image && <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: A.DIM }}><Flag size={16} /></div>}
         </div>
 
         {/* Identity */}
@@ -166,7 +168,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
             {course.name}
           </div>
           {line1.length > 0 && (
-            <div style={{ ...LABEL, fontSize: archive ? 12 : LABEL.fontSize, fontWeight: archive ? 400 : LABEL.fontWeight, letterSpacing: 0, lineHeight: 1.3 }}>
+            <div style={{ ...LABEL, fontSize: archive ? 12 : LABEL.fontSize, fontWeight: archive ? 400 : LABEL.fontWeight, letterSpacing: archive ? 0 : '0.10em', lineHeight: archive ? 1.3 : undefined }}>
               {/* Segments stay unbreakable; the ONLY wrap point is the separator,
                   so a long country drops intact beneath the date (measured: the
                   identity column is ~176px at 390pt; "3 SEPT 2026 · NORTHERN
@@ -177,7 +179,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
             </div>
           )}
           {line2.length > 0 && (
-            <div style={{ fontSize: 12, color: A.DIM, lineHeight: 1.3 }}>{line2}</div>
+            <div style={archive ? { fontSize: 12, color: A.DIM, lineHeight: 1.3 } : { ...LABEL, letterSpacing: '0.10em', whiteSpace: 'nowrap' }}>{line2}</div>
           )}
           {course.is_top100 && course.global_rank != null && (
             <div>
@@ -208,19 +210,19 @@ const DossierCard: React.FC<DossierCardProps> = ({
               {t('row.notRated', { defaultValue: 'Not rated' })}
             </div>
           ) : (
-            <div style={{ ...NUM, fontFamily: 'inherit', letterSpacing: 0, fontSize: archive ? 20 : 17, color: archive ? courseSubScoreTone(course.rating_value) : A.INK, lineHeight: 1 }}>
+            <div style={{ ...NUM, fontFamily: archive ? 'inherit' : SANS, letterSpacing: archive ? 0 : NUM.letterSpacing, fontSize: archive ? 20 : 17, color: archive ? courseSubScoreTone(course.rating_value) : A.INK, lineHeight: 1 }}>
               {course.rating_value.toFixed(1)}
             </div>
           )}
         </div>
 
-        <ChevronRight
+        <RowChevron
           size={archive ? 14 : 18}
           color={A.DIM}
           strokeWidth={2}
           style={{
             flexShrink: 0,
-            transform: archive ? (expanded ? 'rotate(90deg)' : 'none') : (expanded ? 'rotate(180deg)' : 'rotate(90deg)'),
+            transform: archive ? (expanded ? 'rotate(90deg)' : 'none') : (expanded ? 'rotate(180deg)' : 'none'),
             transition: 'transform 0.2s',
           }}
         />
