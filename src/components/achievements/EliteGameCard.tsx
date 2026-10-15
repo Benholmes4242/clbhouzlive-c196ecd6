@@ -19,7 +19,7 @@
  * - 400 Club: Radiant amber/gold
  */
 
-/* eslint-disable no-restricted-syntax -- brand: milestone/regional badge product names (alt="Rookie Club" etc) are proper nouns and stay English by product ruling */
+/* eslint-disable no-restricted-syntax -- brand: milestone/regional badge product names (alt={tierNameFor(5)} etc) are proper nouns and stay English by product ruling */
 import React, { useMemo, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -27,6 +27,7 @@ import { Check, Lock } from 'lucide-react';
 import { FaLandmarkDome, FaFlagUsa } from 'react-icons/fa6';
 import { GiEuropeanFlag, GiWorld } from 'react-icons/gi';
 import { cn } from '@/lib/utils';
+import { getMilestoneMetaByThreshold } from '@/config/achievements';
 import { MILESTONE_TAGLINES, REGION_TAGLINES } from '@/config/achievementTaglines';
 import grandslamBadgeImage from '@/assets/badges/grandslam-badge.png';
 import rookieBadgeImage from '@/assets/badges/rookie-badge.png';
@@ -395,10 +396,8 @@ const CLUB_NAMES: Record<string, string> = {
   'GBI': 'GB&I', 'EU': 'Europe', 'USA': 'USA', 'WORLD': 'Global',
 };
 
-const TIER_NAMES: Record<string, string> = {
-  '5': 'Rookie Club', '10': 'Fairway Club', '20': 'Founders Club', '50': 'Heritage Club',
-  '100': 'Century Club', '150': 'Global Elite', '200': 'Elite Club', '300': 'Legendary Club', '400': 'Grand Slam',
-};
+const tierNameFor = (tier: string | number): string =>
+  getMilestoneMetaByThreshold(Number(tier))?.tierName ?? CLUB_NAMES[String(tier)] ?? '';
 
 // Regional icon helper
 function getRegionalIcon(tier: string, size: string = 'w-5 h-5'): React.ReactNode {
@@ -522,7 +521,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
   
   // Get display text
   const displayName = titleOverride || CLUB_NAMES[tier] || `${tier} Club`;
-  const tierName = TIER_NAMES[tier] || '';
+  const tierName = tierNameFor(tier);
   const subtitle = subtitleOverride || (isRegional ? REGION_TAGLINES?.[tier.toLowerCase()] : MILESTONE_TAGLINES?.[threshold]) || tierName;
   
   // Progress calculation
@@ -629,7 +628,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         {/* Grand Slam badge image */}
         <img
           src={grandslamBadgeImage}
-          alt="Grand Slam Club"
+          alt={tierNameFor(400)}
           className="w-full h-full object-contain"
           style={{
             opacity: earned ? 1 : 0.4,
@@ -680,7 +679,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         {/* Rookie badge image */}
         <img
           src={rookieBadgeImage}
-          alt="Rookie Club"
+          alt={tierNameFor(5)}
           className="w-full h-full object-contain p-2"
           style={{
             opacity: earned ? 1 : 0.4,
@@ -731,7 +730,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         {/* Fairway badge image */}
         <img
           src={fairwayBadgeImage}
-          alt="Fairway Club"
+          alt={tierNameFor(10)}
           className="w-full h-full object-contain p-2"
           style={{
             opacity: earned ? 1 : 0.4,
@@ -782,7 +781,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         {/* Founders badge image */}
         <img
           src={foundersBadgeImage}
-          alt="Founders Club"
+          alt={tierNameFor(20)}
           className="w-full h-full object-contain p-2"
           style={{
             opacity: earned ? 1 : 0.4,
@@ -935,7 +934,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         <div className="relative flex-shrink-0 w-14 h-16 z-10">
           <img
             src={grandslamBadgeImage}
-            alt="Grand Slam Club"
+            alt={tierNameFor(400)}
             className="w-full h-full object-contain"
             style={{
               opacity: earned ? 1 : 0.4,
@@ -1035,7 +1034,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         <div className="relative flex-shrink-0 w-14 h-16 z-10">
           <img
             src={rookieBadgeImage}
-            alt="Rookie Club"
+            alt={tierNameFor(5)}
             className="w-full h-full object-contain"
             style={{
               opacity: earned ? 1 : 0.4,
@@ -1136,7 +1135,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         <div className="relative flex-shrink-0 w-14 h-16 z-10">
           <img
             src={fairwayBadgeImage}
-            alt="Fairway Club"
+            alt={tierNameFor(10)}
             className="w-full h-full object-contain"
             style={{
               opacity: earned ? 1 : 0.4,
@@ -1237,7 +1236,7 @@ export const EliteGameCard: React.FC<EliteGameCardProps> = memo(({
         <div className="relative flex-shrink-0 w-14 h-16 z-10">
           <img
             src={foundersBadgeImage}
-            alt="Founders Club"
+            alt={tierNameFor(20)}
             className="w-full h-full object-contain"
             style={{
               opacity: earned ? 1 : 0.4,

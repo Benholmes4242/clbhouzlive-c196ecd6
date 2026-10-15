@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { ChevronRight, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { getMilestoneMetaByThreshold } from '@/config/achievements';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { getNextBadgeNudge, type BadgeNudge } from '@/lib/achievements/nextBadgeNudge';
@@ -48,18 +49,6 @@ const LIST_BADGE_IMAGES: Record<string, string> = {
   'list_worldwide': globalBadgeImage,
 };
 
-// Club names for each threshold (matching Trophy Case)
-const CLUB_NAMES: Record<number, string> = {
-  5: 'Rookie Club',
-  10: 'Fairway Club',
-  20: 'Founders Club',
-  50: 'Heritage Club',
-  100: 'Century Club',
-  200: 'Elite Club',
-  300: 'Legendary Club',
-  400: 'Grand Slam Club',
-};
-
 // Region names for list completions
 const REGION_NAMES: Record<string, string> = {
   'list_gb_ireland': 'GB&I Top 100',
@@ -79,7 +68,7 @@ function getBadgeImage(achievement: { id: string; threshold?: number; type: stri
 // Get display name for achievement
 function getAchievementName(achievement: { id: string; threshold?: number; type: string }): string {
   if (achievement.type === 'milestone' && achievement.threshold) {
-    return CLUB_NAMES[achievement.threshold] || `${achievement.threshold} Club`;
+    return getMilestoneMetaByThreshold(achievement.threshold)?.tierName || `${achievement.threshold} Club`;
   }
   return REGION_NAMES[achievement.id] || achievement.id;
 }
@@ -101,7 +90,7 @@ function getGhostBadgeImage(nudge: BadgeNudge): string | undefined {
 // Get ghost badge name
 function getGhostBadgeName(nudge: BadgeNudge): string {
   if (nudge.type === 'global') {
-    return CLUB_NAMES[nudge.nextThreshold] || `${nudge.nextThreshold} Club`;
+    return getMilestoneMetaByThreshold(nudge.nextThreshold)?.tierName || `${nudge.nextThreshold} Club`;
   }
   const regionMap: Record<string, string> = {
     'GBI': 'list_gb_ireland',

@@ -7,6 +7,7 @@
  * ALL colors must come from globalAchievementMilestoneSystem.ts
  */
 
+import { ACHIEVEMENT_MILESTONES, getMilestoneMetaByThreshold } from '@/config/achievements';
 import {
   MILESTONE_THEMES,
   MilestoneTier,
@@ -26,7 +27,7 @@ export interface GlobalNudge {
   remaining: number;
   totalPlayed: number;
   tierLabel: string;
-  tierName: string; // e.g., "Heritage Club"
+  tierName: string; // e.g., "All-Star Club"
   palette: TierPalette;
 }
 
@@ -55,18 +56,10 @@ export interface UserTop100Progress {
 
 // ============= Constants =============
 
-const MILESTONE_THRESHOLDS: MilestoneTier[] = [5, 10, 20, 50, 100, 200, 300, 400];
+const MILESTONE_THRESHOLDS: readonly MilestoneTier[] = ACHIEVEMENT_MILESTONES;
 
-const TIER_NAMES: Record<MilestoneTier, string> = {
-  5: 'Rookie Club',
-  10: 'Fairway Club',
-  20: 'Founders Club',
-  50: 'Heritage Club',
-  100: 'Century Club',
-  200: 'Elite Club',
-  300: 'Legendary Club',
-  400: 'Grand Slam Club',
-};
+const tierNameFor = (threshold: number): string =>
+  getMilestoneMetaByThreshold(threshold)?.tierName ?? `${threshold} Club`;
 
 const REGION_LABELS: Record<RegionalNudge['regionId'], string> = {
   GBI: 'GB&I Top 100',
@@ -147,7 +140,7 @@ export function getNextBadgeNudge(progress: UserTop100Progress): BadgeNudge | nu
         remaining,
         totalPlayed: totalTop100Played,
         tierLabel: `${nextThreshold} Club`,
-        tierName: TIER_NAMES[nextThreshold],
+        tierName: tierNameFor(nextThreshold),
         palette: getTierPalette(nextThreshold.toString(), true),
       });
     }
@@ -195,7 +188,7 @@ export function getNextMilestoneTierData(totalPlayed: number): {
   
   return {
     threshold: nextTier,
-    tierName: TIER_NAMES[nextTier],
+    tierName: tierNameFor(nextTier),
     remaining: nextTier - totalPlayed,
     palette: getTierPalette(nextTier.toString(), true),
   };
