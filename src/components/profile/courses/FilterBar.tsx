@@ -1,15 +1,7 @@
 /**
- * FilterBar - Two primary tabs (All / Top 100) with inline country filter pills and sort dropdown
+ * FilterBar - Two primary tabs (All / Top 100), country filter pills and a sort chip row
  */
 import React from 'react';
-import { cn } from '@/lib/utils';
-import { ChevronDown } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { CourseRegionPills, type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 import { RailChips } from '@/components/ui/RailChips';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -29,9 +21,9 @@ interface FilterBarProps {
 }
 
 const SORT_OPTIONS: { value: CourseSortOption; label: string }[] = [
-  { value: 'recently-played', label: 'Recently Played' },
-  { value: 'rating-high-low', label: 'Rating: High to Low' },
-  { value: 'rating-low-high', label: 'Rating: Low to High' },
+  { value: 'recently-played', label: 'Recent' },
+  { value: 'rating-high-low', label: 'Highest rated' },
+  { value: 'rating-low-high', label: 'Lowest rated' },
 ];
 
 export const FilterBar: React.FC<FilterBarProps> = ({
@@ -44,7 +36,6 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   allCount,
   top100Count,
 }) => {
-  const currentSortLabel = SORT_OPTIONS.find(s => s.value === activeSort)?.label || 'Sort';
 
   const TABS: { key: CoursePrimaryTab; label: string; count: number }[] = [
     { key: 'all', label: 'All', count: allCount },
@@ -63,36 +54,40 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       />
 
 
-      {/* Controls: region pills + sort on a single row */}
+      {/* Region pills */}
       <div className="flex items-center gap-3 pt-2">
         <div style={{ flex: 1, minWidth: 0 }}>
           <CourseRegionPills value={activeCountry} onChange={onCountryChange} />
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+      </div>
+
+      {/* Sort chips — only the three sorts that exist. */}
+      <div role="radiogroup" aria-label="Sort courses" style={{ marginTop: 12, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        {SORT_OPTIONS.map((opt) => {
+          const on = activeSort === opt.value;
+          return (
             <button
-              className="inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-[12.5px] font-semibold min-h-[34px] whitespace-nowrap shrink-0"
-              style={{ background: A.PANEL, border: `0.5px solid ${A.BORDER}`, color: A.INK }}
+              key={opt.value}
+              type="button"
+              role="radio"
+              aria-checked={on}
+              data-testid="sort-chip"
+              onClick={() => onSortChange(opt.value)}
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                padding: '5px 10px',
+                borderRadius: 9,
+                border: `1px solid ${on ? A.INK : 'rgba(255,255,255,0.09)'}`,
+                background: on ? A.INK : 'transparent',
+                color: on ? A.CANVAS : A.DIM,
+                cursor: 'pointer',
+              }}
             >
-              {currentSortLabel.replace('Rating: ', '')}
-              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+              {opt.label}
             </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-[180px]">
-            {SORT_OPTIONS.map((opt) => (
-              <DropdownMenuItem
-                key={opt.value}
-                onClick={() => onSortChange(opt.value)}
-                className={cn(
-                  "text-sm",
-                  activeSort === opt.value && "font-semibold"
-                )}
-              >
-                {opt.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          );
+        })}
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { compareOwnRatings } from '@/lib/sortCoursesByRating';
 import DossierCard from './DossierCard';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import BreakdownsPrompt from './BreakdownsPrompt';
 import BreakdownsPickerSheet from './BreakdownsPickerSheet';
 import { usePlayedUnratedCourses } from '@/hooks/usePlayedUnratedCourses';
@@ -435,8 +436,9 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
   return (
     <div ref={sectionRef} className="pt-1 pb-4">
-
-
+      <div style={{ padding: '0 20px' }}>
+        <SectionHeader tone="amber" kicker="THE ARCHIVE" title="Every course, newest first" />
+      </div>
 
       {/* Filter bar */}
       <FilterBar
@@ -464,7 +466,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
       {/* Page-level prompt (own profile only): review first, then breakdowns */}
       {isOwnProfile && promptMode && (
-        <div style={{ padding: '12px 16px 0' }}>
+        <div style={{ padding: '24px 20px 0' }}>
           <BreakdownsPrompt
             variant={promptMode}
             missingCount={promptMode === 'review' ? reviewCount : missingBreakdownsCourses.length}
@@ -645,6 +647,20 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         <p style={{ ...LABEL, color: A.DIM, textAlign: 'center', padding: '14px 24px 0' }}>
           SCORING FROM YOUR IMPORTED ROUNDS
         </p>
+      )}
+
+      {/* Overflow affordance: reveals every remaining row at once. */}
+      {hasMore && (
+        <div style={{ padding: '0 20px' }}>
+          <button
+            type="button"
+            data-testid="archive-show-all"
+            onClick={() => setDisplayCount(drawnCourses.length)}
+            style={{ marginTop: 12, fontSize: 12, fontWeight: 700, color: A.AMBER, background: 'transparent', border: 0, padding: 0, cursor: 'pointer' }}
+          >
+            {`Show all ${formatNumber(drawnCourses.length)} \u203A`}
+          </button>
+        </div>
       )}
 
       {/* Load More */}

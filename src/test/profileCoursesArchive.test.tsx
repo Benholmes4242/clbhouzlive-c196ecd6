@@ -97,3 +97,31 @@ describe('profile courses archive', () => {
     }
   });
 });
+
+describe('profile courses archive — mock design', () => {
+  it('the sort control is exactly three chips, recency selected first, no rank or country sort', async () => {
+    const { FilterBar } = await vi.importActual<any>('@/components/profile/courses/FilterBar');
+    render(
+      <FilterBar activeTab="all" onTabChange={() => {}} activeSort={DEFAULT_COURSE_SORT} onSortChange={() => {}}
+        activeCountry="global" onCountryChange={() => {}} allCount={4} top100Count={1} />,
+    );
+    const chips = screen.getAllByTestId('sort-chip');
+    expect(chips.map((c) => c.textContent)).toEqual(['Recent', 'Highest rated', 'Lowest rated']);
+    expect(chips[0].getAttribute('aria-checked')).toBe('true');
+    expect(chips.filter((c) => c.getAttribute('aria-checked') === 'true')).toHaveLength(1);
+    expect(screen.queryByText(/rank/i)).toBeNull();
+    expect(screen.queryByText(/^country$/i)).toBeNull();
+  });
+
+  it('a Top 100 row prints its rank as a chip beneath the course name', async () => {
+    const { container } = mount();
+    const chip = await screen.findByTestId('rank-chip');
+    expect(chip.textContent).toBe('#37 World');
+    const nameCol = screen.getByText('Alpha Links').parentElement!;
+    expect(nameCol.contains(chip)).toBe(true);
+    const row = Array.from(rows(container)).find((r) => r.contains(chip))!;
+    const scoreCol = Array.from(row.querySelectorAll<HTMLElement>('div')).find((d) => d.style.flex === '0 0 46px')!;
+    expect(scoreCol.textContent).toBe('9.1');
+    expect(scoreCol.contains(chip)).toBe(false);
+  });
+});

@@ -35,7 +35,7 @@ export const TheChaseSection: React.FC<Props> = ({ userId }) => {
 
   return (
     <section data-testid="the-chase" style={{ padding: '0 20px' }}>
-      <SectionHeader kicker="TOP 100 GOLF COURSES" title="Four lists, one life" />
+      <SectionHeader tone="amber" kicker="TOP 100 GOLF COURSES" title="Four lists, one life" />
       {lists.map((l) => (
         <div key={l.listSlug} style={{ marginTop: 9, display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ width: 66, flexShrink: 0, fontSize: 11, fontWeight: 700, color: A.BODY, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

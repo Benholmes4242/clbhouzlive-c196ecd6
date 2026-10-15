@@ -85,7 +85,7 @@ export const CourseLegacyCard: React.FC<CourseLegacyCardProps> = ({
 
   return (
     <section style={{ padding: '0 16px', fontFamily: SANS }}>
-      <SectionHeader kicker="SHARE" title="Your card, ready to post" accent={MEDAL_GOLD} />
+      <SectionHeader tone="amber" kicker="SHARE" title="Your card, ready to post" />
       <div
         data-testid="legacy-card"
         style={{
