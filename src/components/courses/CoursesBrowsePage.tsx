@@ -13,6 +13,15 @@ import { GLASS_CHIP_CSS } from '@/styles/glassChip';
 import { WhoPlayingSection } from './browse/WhoPlayingSection';
 import { ByRegionSection, ALL_COURSES_ANCHOR } from './browse/ByRegionSection';
 import { MostPlayedSection } from './browse/MostPlayedSection';
+import { PageLoadGate, useSectionReady } from './browse/PageLoadGate';
+
+const GATE_IDS = ['whoPlaying', 'byRegion', 'mostPlayed', 'hardest', 'highestRated', 'latestReviews', 'figures'] as const;
+
+/** Reports page-owned readiness from inside the gate's context. */
+function GateReport({ id, ready }: { id: string; ready: boolean }) {
+  useSectionReady(id, ready);
+  return null;
+}
 
 /**
  * CoursesBrowsePage — the Courses tab: six sections above the list
@@ -34,7 +43,7 @@ const BLEED: React.CSSProperties = { marginLeft: -16, marginRight: -16 };
 export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
   // Live head figures (BRIEF_COURSES_LIST_HEAD_STATS). HOLES is dropped, never
   // zeroed, when its count is unavailable to this viewer.
-  const { data: truth } = useCourseBrowseTruth();
+  const { data: truth, isLoading: truthLoading } = useCourseBrowseTruth();
   const fmt = (n: number) => n.toLocaleString('en-GB');
   const cells: Array<[string, number]> = truth
     ? ([
@@ -45,7 +54,7 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
       ].filter((c): c is [string, number] => c[1] != null))
     : [];
   // The reviews rail is app-wide: no country, no region.
-  const { pool: reviewPool } = useBrowseReviews(null, null);
+  const { pool: reviewPool, isLoading: reviewsLoading } = useBrowseReviews(null, null);
   const openReviewSheet = useReviewSheetStore((st) => st.open);
   const handleReviewTile = useCallback(
     (r: LatestReview) => {
@@ -69,6 +78,9 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
     <div>
       <style>{GLASS_CHIP_CSS}</style>
       <div style={BLEED}>
+        <PageLoadGate expect={GATE_IDS}>
+        <GateReport id="latestReviews" ready={!reviewsLoading} />
+        <GateReport id="figures" ready={!truthLoading} />
         <WhoPlayingSection />
         <ByRegionSection />
         <MostPlayedSection />
@@ -88,6 +100,7 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
             </div>
           ) : null}
         </section>
+        </PageLoadGate>
       </div>
       <StatBrowse onOpenDirectory={onOpenDirectory} />
     </div>

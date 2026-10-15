@@ -11,6 +11,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseBrowseTruth, type BrowseRegion } from '../useStatBrowse';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { fmtToPar, playsToPar, plural } from './format';
+import { useSectionReady } from './PageLoadGate';
 
 /**
  * SECTION 02 — BY REGION (BRIEF_COURSES_PAGE_REBUILD §4, amended by
@@ -49,10 +50,11 @@ const FACT_SHADOW = '0 1px 4px rgba(0,0,0,0.6)';
 export function ByRegionSection() {
   const { user } = useSupabaseSession();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { data: truth } = useCourseBrowseTruth();
+  const { data: truth, isLoading: truthLoading } = useCourseBrowseTruth();
   const home = useHomeClubStatus(user?.id);
   const homeRegionQuery = useHomeRegion(home.clubId);
   const homeRegion = homeRegionQuery.data ?? null;
+  useSectionReady('byRegion', !homeRegionQuery.isLoading && !truthLoading && !home.isLoading);
 
   const regions = truth?.regions ?? [];
   if (regions.length === 0) return null;

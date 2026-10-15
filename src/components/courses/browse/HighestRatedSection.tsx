@@ -1,4 +1,5 @@
 import { useStatBrowseList } from '../useStatBrowse';
+import { useSectionReady } from './PageLoadGate';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { RAIL_BLEED } from './format';
 import { PhotoFigureCard } from './PhotoFigureCard';
@@ -15,6 +16,7 @@ const fmtScore = (v: number | null) => (v == null || !Number.isFinite(v) ? '-' :
 /** SECTION 05 — HIGHEST RATED. A rail of PhotoFigureCards (shared with 03). */
 export function HighestRatedSection() {
   const { rows, isLoading } = useStatBrowseList({ lens: 'rated', country: null, region: null, limit: 3 });
+  useSectionReady('highestRated', !isLoading);
   if (isLoading || rows.length === 0) return null;
   return (
     <section style={SECTION_WRAP}>
