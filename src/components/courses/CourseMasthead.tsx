@@ -50,6 +50,12 @@ export const MASTHEAD_PLACE: React.CSSProperties = {
  * round card's FigureCell: that one is 9px label / 15px value on card ground,
  * and taking these sizes would change every round card.
  */
+/*
+ * maxWidth / overflow / textOverflow are load-bearing: the cell is flex: 1 with
+ * minWidth: 0, so the BOX shrinks; the label is nowrap, so the TEXT cannot.
+ * Without clipping the text escapes the box (over the neighbour and off screen)
+ * and no width measurement can detect it. Do not remove them to "tidy the style".
+ */
 export const HERO_FIGURE_LABEL: React.CSSProperties = {
   fontSize: 10,
   fontWeight: 700,
@@ -57,6 +63,9 @@ export const HERO_FIGURE_LABEL: React.CSSProperties = {
   textTransform: 'uppercase',
   color: 'rgba(248,250,252,0.58)',
   whiteSpace: 'nowrap',
+  maxWidth: '100%',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
 };
 export const HERO_FIGURE_VALUE: React.CSSProperties = {
   fontSize: 19,

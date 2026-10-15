@@ -1261,7 +1261,7 @@
     }
   },
   "courseHero": {
-    "avgToPar": "avg to par",
+    "avgToPar": "to par",
     "harderThan": "harder than {{pct}}%",
     "reviews": "reviews",
     "rounds": "rounds",
