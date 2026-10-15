@@ -16,7 +16,8 @@ import { MapPin } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { A, SANS, Panel, StatRow, Action } from '@/features/courses/components/holes/analytical/tokens';
+import { formatNumber } from '@/i18n/format';
+import { A, SANS, Panel, Action } from '@/features/courses/components/holes/analytical/tokens';
 
 interface JourneySummaryCardProps {
   /**
@@ -31,12 +32,13 @@ interface JourneySummaryCardProps {
    * How many of their own ratings the RATING figure is the mean of. The label
    * had to shorten to "RATING" to fit its column (see the item comment), so the
    * word AVERAGE lived in the basis line, which was removed on 14 Sep 2026.
-   * THE PROP IS STILL ACCEPTED AND NO LONGER READ: ProfileCoursesTab passes it,
-   * and dropping it from the contract would be a change to a caller this brief
-   * did not ask for. Nothing renders it.
+   * Feeds the COURSES RATED tile.
    */
   ratedCount?: number | null;
+  /** Distinct courses in ANY Top 100 list - the same number as the filter chip. */
   top100Played?: number | null;
+  /** World Top 100 standing sentence; null renders nothing. */
+  standing?: string | null;
   isOwnProfile: boolean;
   displayName?: string;
   className?: string;
@@ -46,7 +48,8 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   coursesPlayed,
   countriesPlayed,
   avgRating,
-  /* ratedCount is accepted and deliberately not destructured - see the prop. */
+  ratedCount,
+  standing,
   top100Played,
   isOwnProfile,
   displayName,
@@ -93,56 +96,17 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
     );
   }
 
-  const items = [
-    // Unknown renders the label with no figure. A dash would read as a value.
-    { label: t('legacy.played', { defaultValue: 'PLAYED' }), value: coursesPlayed == null ? '' : String(coursesPlayed) },
-    ...(countriesPlayed != null && countriesPlayed > 0
-      ? [{ label: t('legacy.countries', { defaultValue: 'COUNTRIES' }), value: String(countriesPlayed) }]
-      : []),
-    ...(top100Played != null && top100Played > 0
-      ? [{
-          // Names the list: the figure is the WORLDWIDE list's played count
-          // (useTop100ProgressForUser), not every Top 100 list combined.
-          //
-          // "WORLD 100", NOT "WORLD TOP 100", AND THE REASON IS MEASURED. Four
-          // items share the panel's inner width: at 390pt that is
-          // (390 - 32 page - 32 panel) / 4 = 81.5px a column. At the label's
-          // canon 11/700/0.13em, "WORLD TOP 100" measures 105.5px, so it CANNOT
-          // fit at any legal type size and used to break after "TOP" - which
-          // read as a separate "100" column. "WORLD 100" measures 75.3px and
-          // holds one line with the list still named.
-          label: t('legacy.top100World', { defaultValue: 'WORLD 100' }),
-          value: String(top100Played),
-        }]
-      : []),
-    ...(avgRating != null && avgRating > 0
-      // "AVG RATING" measures 80.9px against an 81.5px column - it fitted only
-      // by 0.6px, which is a wrap waiting for a wider glyph or a longer locale.
-      // "RATING" is 50.2px and says the same thing beside a one-decimal figure.
-      ? [{ label: t('legacy.avgRating', { defaultValue: 'RATING' }), value: avgRating.toFixed(1) }]
-      : []),
-  ];
-
   /*
-   * THE BASIS LINE IS GONE (Ben's ruling, 14 Sep 2026). It read "Played counts
-   * every course on your record, rated rounds or not. Rating is the average of
-   * your 35 course ratings.", and its `legacy.basisPlayed` / `legacy.basisRating`
-   * keys are retired from all six locale files - not left rendering empty.
-   *
-   * TWO THINGS WENT WITH IT, BOTH ON PURPOSE:
-   *   - THE CHEVRON. Panel renders `footer` as a button with a trailing chevron
-   *     and an `onOpen` handler. This panel never passed `onOpen`, so the whole
-   *     footer was a tappable control that did nothing and a chevron promising a
-   *     screen that does not exist. Passing no footer removes the button
-   *     outright; the panel now has no tap target anywhere.
-   *   - THE ONLY PLACE THAT EXPLAINED WHY PLAYED (49) AND RATING (mean of 35)
-   *     DO NOT AGREE. Those two figures now sit side by side unexplained. Stated
-   *     for the record; the ruling is the ruling.
-   *
-   * Its appearance was also part of the objection: `footer` styles its text with
-   * LABEL (uppercase, 0.13em tracking), not the sentence-case 11px dim caption
-   * the line was specified as - which is why one quiet sentence read as a wall.
+   * THE RECORD BLOCK (BRIEF_PROFILE_COURSES_REBUILD phase 1). Hero figure,
+   * World Top 100 standing line, three tiles. A null figure renders its label
+   * with an empty value - never a substituted zero.
    */
+  const fig = (n: number | null | undefined) => (n == null ? '' : formatNumber(n));
+  const tiles = [
+    { label: 'TOP 100 PLAYED', value: fig(top100Played) },
+    { label: 'YOUR AVERAGE', value: avgRating == null ? '' : avgRating.toFixed(1) },
+    { label: 'COURSES RATED', value: fig(ratedCount) },
+  ];
 
   return (
     <motion.div
@@ -152,11 +116,36 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       className={cn('px-4', className)}
     >
       <Panel kicker={kicker}>
-        {/* labelNoWrap: every label here is measured to fit one 81.5px column at
-            390pt (see the item comments), so a wrap can only mean a locale
-            string longer than the English default - and a truncation reads as
-            one label where a wrap reads as two. */}
-        <StatRow size={22} items={items} labelNoWrap />
+        <div style={{ fontFamily: SANS }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
+            <span data-testid="record-played" style={{ fontSize: 76, fontWeight: 800, letterSpacing: '-0.06em', lineHeight: 0.8, color: A.INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+              {fig(coursesPlayed)}
+            </span>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: A.BODY }}>courses played</div>
+              <div style={{ fontSize: 12.5, color: A.DIM }}>
+                across <b data-testid="record-countries" style={{ color: A.BODY }}>{fig(countriesPlayed)}</b> countries
+              </div>
+            </div>
+          </div>
+          {standing && (
+            <div data-testid="record-standing" style={{ marginTop: 14, fontSize: 12.5, lineHeight: 1.5, color: A.MUTE, borderLeft: `2px solid ${A.AMBER}`, paddingLeft: 10 }}>
+              {standing}
+            </div>
+          )}
+          <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+            {tiles.map((tile) => (
+              <div key={tile.label} style={{ flex: 1, minWidth: 0, background: A.PANEL, borderRadius: 10, padding: '11px 10px' }}>
+                <div data-testid={`tile-${tile.label}`} style={{ fontSize: 21, fontWeight: 800, letterSpacing: '-0.03em', color: A.INK, fontVariantNumeric: 'tabular-nums', minHeight: 21 }}>
+                  {tile.value}
+                </div>
+                <div style={{ marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: A.DIM }}>
+                  {tile.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </Panel>
     </motion.div>
   );

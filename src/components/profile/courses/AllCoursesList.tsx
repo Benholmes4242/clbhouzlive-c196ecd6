@@ -35,6 +35,8 @@ interface AllCoursesListProps {
    * useUserAnalyticsCourses (auth.uid() server-side) - never per row.
    */
   scoringByCourseId?: Map<string, UserAnalyticsCourse>;
+  /** Lifted to ProfileCoursesTab so the record tile and this chip share one count. */
+  top100Count?: number;
 }
 
 const PAGE_SIZE = 20;
@@ -73,6 +75,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   isOwnProfile,
   displayName,
   scoringByCourseId,
+  top100Count,
 }) => {
   const navigate = useNavigate();
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -198,8 +201,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   // Tab counts
   const tabCounts = useMemo(() => ({
     all: courses.length,
-    top100: courses.filter(c => c.is_top100).length,
-  }), [courses]);
+    top100: top100Count ?? courses.filter(c => c.is_top100).length,
+  }), [courses, top100Count]);
 
   // Courses missing breakdown ratings (page-level prompt eligibility).
   const missingBreakdownsCourses = useMemo<RatedCourseData[]>(
