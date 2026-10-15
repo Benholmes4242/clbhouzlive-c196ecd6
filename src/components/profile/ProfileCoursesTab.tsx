@@ -14,6 +14,7 @@ import { top100Standing } from './handicap/whs/gam/trophy-room/career/shareModel
 import { CoursesMapSection, type MapPoint } from './courses/CoursesMapSection';
 import { TheChaseSection } from './courses/TheChaseSection';
 import { YourSignatureSection } from './courses/YourSignatureSection';
+import { CourseLegacyCard } from './courses/CourseLegacyCard';
 import type { ProfileRatingRow } from './courses/AllCoursesList';
 import type { QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -40,7 +41,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   isOwnProfile,
   displayName,
 }) => {
-  const { totalCoursesPlayed, countriesPlayed, countryTallies, coursePoints, unmappedCount, isLoading } = useUserCourseSummary(userId);
+  const { totalCoursesPlayed, countriesPlayed, countryTallies, coursePoints, unmappedCount, courseNames, isLoading } = useUserCourseSummary(userId);
   const { data: userActivity } = useUserCourseActivity(userId);
   const { data: distribution } = useTop100Distribution();
   const { data: recordConfig } = useGamRecordConfig();
@@ -205,6 +206,21 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
           onCountryChange={setActiveCountry}
         />
       </div>
+
+      {isOwnProfile && (
+        <div className="mt-6">
+          <CourseLegacyCard
+            isOwnProfile={isOwnProfile}
+            coursesPlayed={totalCoursesPlayed}
+            countriesPlayed={countriesPlayed}
+            top100Played={top100Count}
+            points={coursePoints ?? []}
+            names={courseNames}
+            ratings={ratingRows ?? []}
+            displayName={displayName}
+          />
+        </div>
+      )}
     </div>
   );
 };

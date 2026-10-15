@@ -33,6 +33,7 @@ import { useTop100ProgressForUser } from './useTop100ProgressForUser';
 
 export interface CountryRow {
   id: string;
+  name?: string | null;
   sub_country: string | null;
   latitude?: number | null;
   longitude?: number | null;
@@ -144,6 +145,7 @@ export function useUserCourseSummary(userId: string | undefined) {
     countryTallies: countriesKnown ? countriesQuery.data?.tallies ?? null : null,
     coursePoints: countriesKnown ? countriesQuery.data?.points ?? null : null,
     unmappedCount: countriesKnown ? countriesQuery.data?.unmapped ?? 0 : 0,
+    courseNames: countriesKnown ? countriesQuery.data?.names ?? {} : {},
     top100Progress,
     /** True only while a read is genuinely in flight; an error ends loading. */
     isLoading:
