@@ -287,6 +287,7 @@ export function CommentComposer({ replyingTo, onClearReply, onSubmit, isSubmitti
           }}
         >
           <MentionsComposerInput
+            panelPlacement="above"
             value={text}
             onChange={setText}
             onSubmit={handleSend}
