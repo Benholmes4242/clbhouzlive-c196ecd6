@@ -115,7 +115,17 @@ export function BrowseCourseCard({
         {!top100 ? <RankBadge memberships={row.memberships} /> : null}
         {/* BRIEF_TOP_100_REBUILD §4 — three states. You played: amber-dot chip
             top-left. Members played, you have not: rounds chip top-right.
-            Nobody: no chip (the meta strip carries the frontier line). */}
+            Nobody: no chip (the meta strip carries the frontier line).
+            The chip counts ROUNDS, not people — a distinct-player count
+            needs a read this page does not make.
+            DELIBERATE OMISSION: no "Best tracked here {n}, {name}" line.
+            Nothing this card loads carries the course's best round (yourBest
+            is the viewer's). Source if wanted later: get_hero_course_fact via
+            useHeroCourseFact — batching it for a hundred courses is its own read.
+            DELIBERATE OMISSION: no per-card "Rate it" control. Rating is
+            prompted once by RateNudge above the list (its 'played' tier), and
+            this card's root is a button, so a control here would nest a
+            button inside a button. */}
         {top100 && viewerRounds > 0 ? (
           <div style={{ ...GLASS_CHIP, left: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: A.AMBER }} />
