@@ -61,9 +61,9 @@
   min-width: 0;
 }
 .courses-archive .archive-preview-tile {
-  width: 58px !important;
-  height: 58px !important;
-  flex: 0 0 58px !important;
+  width: min(58px, calc((100cqw - 156px) / 4)) !important;
+  height: min(58px, calc((100cqw - 156px) / 4)) !important;
+  flex: 0 0 min(58px, calc((100cqw - 156px) / 4)) !important;
   border-radius: 11px;
   padding: 0;
   background-size: cover;
