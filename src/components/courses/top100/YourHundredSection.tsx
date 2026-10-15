@@ -187,7 +187,7 @@ export function YourHundredSection({ viewerPlayed, total, courseIds, enrichment,
         ) : null}
       </div>
 
-      <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4 }}>
+      <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gridTemplateRows: 'repeat(10, 1fr)', gap: 4, height: 320 }}>
         {cells.map((id, i) => (
           <button
             key={id}
@@ -199,11 +199,13 @@ export function YourHundredSection({ viewerPlayed, total, courseIds, enrichment,
              * The cells are deliberately wider than they are tall. The width is set by the
              * ten columns; the height is the only free variable in this grid. At ten columns
              * across a 361px run the cell is 32.5px wide, so a square cell made the grid
-             * 361px tall — the height was the width, not a choice. A fixed 26px height keeps
-             * the full tap width, loses 6px of tap height, and takes the grid to 296px.
+             * 361px tall — the height was the width, not a choice. The grid now carries an
+             * explicit 320px height and ten 1fr rows, so each cell is 28.4px tall — the height
+             * is declared once on the container instead of guessed per cell, and the full tap
+             * width is kept.
              */
             style={{
-              height: 26, borderRadius: 3, padding: 0, border: 0, cursor: 'pointer',
+              borderRadius: 3, padding: 0, border: 0, cursor: 'pointer',
               ...(() => {
                 const base = cellStyle(cellState(enrichment.get(id)));
                 if (selected !== id) return base;
