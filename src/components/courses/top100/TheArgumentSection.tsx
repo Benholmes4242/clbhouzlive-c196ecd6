@@ -4,11 +4,10 @@ import { ArrowDown, ArrowUp } from 'lucide-react';
 import { SectionHead, HEAD_GAP, SECTION_WRAP } from '@/components/courses/browse/SectionHead';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { INK_FAINT } from '@/features/courses/_shared/tokens';
 import type { ArgumentRow } from './theArgument';
 
 /** BRIEF_TOP_100_REBUILD §3. The caller renders nothing when rows is empty. */
-export function TheArgumentSection({ rows }: { rows: ArgumentRow[] }) {
+export function TheArgumentSection({ rows, qualifying }: { rows: ArgumentRow[]; qualifying: number }) {
   return (
     <section style={SECTION_WRAP}>
       <SectionHead kicker="The argument" title="Where we disagree with the list" />
@@ -35,7 +34,7 @@ export function TheArgumentSection({ rows }: { rows: ArgumentRow[] }) {
                   <Arrow size={14} strokeWidth={3} aria-hidden />
                   {Math.abs(r.divergence)}
                 </div>
-                <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: INK_FAINT }}>We rank it</div>
+                <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: A.FAINT, whiteSpace: 'nowrap' }}>Of the {qualifying} rated</div>
               </div>
             </div>
           );

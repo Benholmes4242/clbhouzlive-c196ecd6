@@ -31,6 +31,11 @@ export interface ArgumentRow extends ArgumentInput {
   divergence: number;
 }
 
+/** How many courses on the active list qualify (>= MIN_RATINGS, ranked). */
+export function qualifyingCount(inputs: ArgumentInput[]): number {
+  return inputs.filter((c) => c.publishedRank != null && c.rating != null && c.ratingCount >= MIN_RATINGS).length;
+}
+
 export function argumentRows(inputs: ArgumentInput[]): ArgumentRow[] {
   const set = inputs.filter(
     (c): c is ArgumentInput & { publishedRank: number; rating: number } =>
