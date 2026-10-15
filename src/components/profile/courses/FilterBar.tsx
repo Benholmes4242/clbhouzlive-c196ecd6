@@ -5,6 +5,7 @@ import React from 'react';
 import { CourseRegionPills, type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 import { RailChips } from '@/components/ui/RailChips';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { Button } from '@/components/ui/button';
 
 export type CoursePrimaryTab = 'all' | 'top100';
 export type CourseSortOption = 'recently-played' | 'rating-high-low' | 'rating-low-high';
@@ -43,11 +44,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   ];
 
   return (
-    <div className="space-y-3">
+    <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
       {/* Primary tab row — canonical charcoal chips */}
       <RailChips
         ariaLabel="Course list filter"
-        align="center-when-fit"
+        align="start"
         options={TABS.map(({ key, label, count }) => ({ id: key, label, value: count }))}
         value={activeTab}
         onChange={(next) => onTabChange(next as CoursePrimaryTab)}
@@ -55,18 +56,20 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
 
       {/* Region pills */}
-      <div className="flex items-center gap-3 pt-2">
+      <div className="flex items-center gap-3">
         <div style={{ flex: 1, minWidth: 0 }}>
-          <CourseRegionPills value={activeCountry} onChange={onCountryChange} />
+          <CourseRegionPills value={activeCountry} onChange={onCountryChange} appearance="archive" />
         </div>
       </div>
 
       {/* Sort chips — only the three sorts that exist. */}
-      <div role="radiogroup" aria-label="Sort courses" style={{ marginTop: 12, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+      <div role="radiogroup" aria-label="Sort courses" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         {SORT_OPTIONS.map((opt) => {
           const on = activeSort === opt.value;
           return (
-            <button
+            <Button
+              variant="ghost"
+              className="archive-control"
               key={opt.value}
               type="button"
               role="radio"
@@ -74,18 +77,18 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               data-testid="sort-chip"
               onClick={() => onSortChange(opt.value)}
               style={{
-                fontSize: 11,
+                fontSize: 13,
                 fontWeight: 700,
                 padding: '5px 10px',
                 borderRadius: 9,
-                border: `1px solid ${on ? A.INK : 'rgba(255,255,255,0.09)'}`,
+                border: `1px solid ${on ? A.INK : A.BORDER}`,
                 background: on ? A.INK : 'transparent',
                 color: on ? A.CANVAS : A.DIM,
                 cursor: 'pointer',
               }}
             >
               {opt.label}
-            </button>
+            </Button>
           );
         })}
       </div>

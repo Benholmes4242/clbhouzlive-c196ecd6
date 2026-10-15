@@ -1,0 +1,82 @@
+/* ARCHITECTURE RULE: archive-only treatments stay scoped here; shared rails
+   and headings elsewhere retain their signed-off appearance. */
+.courses-archive {
+  font-family: inherit;
+  container-type: inline-size;
+}
+.courses-archive .archive-heading h2 {
+  font-family: inherit !important;
+  font-size: 22px !important;
+  line-height: 26px !important;
+  letter-spacing: 0 !important;
+}
+.courses-archive .archive-heading > div:first-child > div {
+  font-family: inherit !important;
+  font-size: 13px !important;
+  line-height: 16px !important;
+}
+.courses-archive .archive-heading {
+  margin-bottom: 16px !important;
+}
+.courses-archive .archive-control {
+  height: auto;
+  min-height: 0;
+  font-family: inherit;
+  font-weight: 700;
+  box-shadow: none;
+  letter-spacing: 0;
+}
+.courses-archive [aria-label="Course list filter"] > button {
+  padding: 6px 13px !important;
+  font-size: 14px !important;
+}
+.courses-archive [aria-label="Sort courses"] .archive-control {
+  font-size: 13px !important;
+  line-height: 16px;
+}
+.courses-archive .archive-region-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.courses-archive .archive-region-choice {
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  font-size: 14px !important;
+  line-height: 20px;
+}
+.courses-archive .archive-region-choice span {
+  white-space: nowrap;
+}
+.courses-archive .archive-preview-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.courses-archive .archive-preview-tiles {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+.courses-archive .archive-preview-tile {
+  width: min(58px, calc((100cqw - 156px) / 4)) !important;
+  height: min(58px, calc((100cqw - 156px) / 4)) !important;
+  flex: 0 0 min(58px, calc((100cqw - 156px) / 4)) !important;
+  border-radius: 11px;
+  padding: 0;
+  background-size: cover;
+  background-position: center;
+}
+@container (max-width: 389px) {
+  .courses-archive .archive-preview-tile {
+    width: 40px !important;
+    height: 40px !important;
+    flex-basis: 40px !important;
+  }
+  .courses-archive .archive-preview-row { gap: 8px; }
+  .courses-archive .archive-preview-tiles { gap: 6px; }
+}

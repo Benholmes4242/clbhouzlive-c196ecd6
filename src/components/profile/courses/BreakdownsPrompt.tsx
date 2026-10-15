@@ -2,7 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type RatedCourseData } from './my-ratings/myRatingsTiers';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { Button } from '@/components/ui/button';
+import { SELECTED_EDGE } from '@/components/ui/RailChips';
 
 interface BreakdownsPromptProps {
   missingCount: number;
@@ -10,8 +12,6 @@ interface BreakdownsPromptProps {
   onTap: (from: 'preview' | 'action') => void;
   variant?: 'breakdowns' | 'review';
 }
-
-const TILE = 48;
 
 /**
  * Page-level "still to rate" prompt at the top of AllCoursesList, in the
@@ -27,42 +27,42 @@ const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({ missingCount, cours
   const remainder = missingCount - preview.length;
 
   return (
-    <section data-testid="still-to-rate" style={{ fontFamily: SANS }}>
+    <section data-testid="still-to-rate">
       <SectionHeader
+        className="archive-heading"
         tone="amber"
         kicker={t('toRate.kicker', { defaultValue: 'STILL TO RATE' })}
         title={`${missingCount} ${missingCount === 1 ? 'course is' : 'courses are'} waiting`}
       />
-      <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ display: 'flex', gap: 6 }}>
+      <div className="archive-preview-row">
+        <div className="archive-preview-tiles">
           {preview.map((c) => (
-            <button
+            <Button
+              variant="ghost"
+              className="archive-control archive-preview-tile"
               key={c.id}
               type="button"
               aria-label={c.name}
               onClick={() => onTap('preview')}
               style={{
-                width: TILE,
-                height: TILE,
-                borderRadius: 9,
                 border: 0,
                 padding: 0,
                 cursor: 'pointer',
-                background: c.thumbnail_image ? `url(${c.thumbnail_image})` : A.TRACK,
+                backgroundImage: c.thumbnail_image ? `url(${c.thumbnail_image})` : undefined,
+                backgroundColor: A.TRACK,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
               }}
             />
           ))}
           {remainder > 0 && (
-            <button
+            <Button
+              variant="ghost"
+              className="archive-control archive-preview-tile"
               type="button"
               onClick={() => onTap('preview')}
               style={{
-                width: TILE,
-                height: TILE,
-                borderRadius: 9,
-                border: '1px dashed rgba(255,255,255,0.22)',
+                border: `1px dashed ${SELECTED_EDGE}`,
                 background: 'transparent',
                 padding: 0,
                 cursor: 'pointer',
@@ -76,15 +76,18 @@ const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({ missingCount, cours
               }}
             >
               {`+${remainder}`}
-            </button>
+            </Button>
           )}
         </div>
-        <button
+        <Button
+          variant="ghost"
+          className="archive-control"
           type="button"
           onClick={() => onTap('action')}
           style={{
             marginLeft: 'auto',
-            fontSize: 12,
+            flexShrink: 0,
+            fontSize: 14,
             fontWeight: 700,
             color: A.AMBER,
             background: 'transparent',
@@ -95,7 +98,7 @@ const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({ missingCount, cours
           }}
         >
           {`${t('toRate.action', { defaultValue: 'Rate them' })} \u203A`}
-        </button>
+        </Button>
       </div>
     </section>
   );

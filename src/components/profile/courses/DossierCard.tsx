@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Flag, ChevronDown } from 'lucide-react';
+import { Flag, ChevronRight, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { type RatedCourseData } from './my-ratings/myRatingsTiers';
 import { SubScoreStack } from '@/features/courses/_shared/scoreBands';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
-import { A, SANS, LABEL, NUM, Action, StatRow, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS, LABEL, NUM, Action, StatRow, TOPAR_RED, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 
 /**
@@ -21,6 +21,8 @@ import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 
 export interface DossierCardProps {
   course: RatedCourseData;
+  /** Archive mock treatment is opt-in; Top 100 sheets retain their row styling. */
+  appearance?: 'default' | 'archive';
   /**
    * IGNORED. The sort-index rank was removed: a row's position in a sorted
    * list is not a rank. Kept optional only so the unchanged meta-lines test
@@ -55,6 +57,7 @@ const fmtSigned = (v: number): string => {
 
 const DossierCard: React.FC<DossierCardProps> = ({
   course,
+  appearance = 'default',
   unrated = false,
   onRate,
   onCourseClick,
@@ -62,6 +65,8 @@ const DossierCard: React.FC<DossierCardProps> = ({
   scoring,
   onExpand,
 }) => {
+  const archive = appearance === 'archive';
+  const RowChevron = archive ? ChevronRight : ChevronDown;
   const { t } = useTranslation('courses');
   const [expanded, setExpanded] = useState(false);
   const dateIso = course.review_date ?? course.last_played_at ?? null;
@@ -115,59 +120,47 @@ const DossierCard: React.FC<DossierCardProps> = ({
         }
       }}
       style={{
-        background: A.PANEL,
+        background: archive ? 'transparent' : A.PANEL,
         cursor: 'pointer',
-        fontFamily: SANS,
+        fontFamily: archive ? 'inherit' : SANS,
         margin: '0 20px',
-        padding: '9px 0',
-        borderBottom: '1px solid rgba(255,255,255,0.055)',
+        padding: archive ? '12px 0' : '9px 0',
+        borderBottom: `1px solid ${A.SOFT}`,
         display: 'flex',
         flexDirection: 'column',
         gap: 12,
       }}
     >
       {/* HEADER (always visible) */}
-      <div style={{ display: 'flex', gap: 11, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: archive ? 12 : 11, alignItems: 'center' }}>
         {/* Thumb */}
         <div
           style={{
             position: 'relative',
-            flex: '0 0 44px',
-            width: 44,
-            height: 44,
-            borderRadius: 8,
+            flex: archive ? '0 0 52px' : '0 0 44px',
+            width: archive ? 52 : 44,
+            height: archive ? 52 : 44,
+            borderRadius: archive ? 10 : 8,
             overflow: 'hidden',
             background: course.thumbnail_image ? `url(${course.thumbnail_image})` : A.TRACK,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
         >
-          {!course.thumbnail_image && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: A.DIM,
-              }}
-            >
-              <Flag size={16} />
-            </div>
-          )}
+          {!archive && !course.thumbnail_image && <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: A.DIM }}><Flag size={16} /></div>}
         </div>
 
         {/* Identity */}
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: archive ? 2 : 4 }}>
           <div
             style={{
               color: A.INK,
               fontWeight: 700,
-              fontSize: 13,
+              fontSize: archive ? 16 : 13,
               lineHeight: 1.15,
-              letterSpacing: '-0.01em',
-              whiteSpace: 'nowrap',
+              letterSpacing: 0,
+              overflowWrap: archive ? 'anywhere' : undefined,
+              whiteSpace: archive ? undefined : 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
             }}
@@ -175,7 +168,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
             {course.name}
           </div>
           {line1.length > 0 && (
-            <div style={{ ...LABEL, letterSpacing: '0.10em' }}>
+            <div style={{ ...LABEL, fontSize: archive ? 12 : LABEL.fontSize, fontWeight: archive ? 400 : LABEL.fontWeight, letterSpacing: archive ? 0 : '0.10em', lineHeight: archive ? 1.3 : undefined }}>
               {/* Segments stay unbreakable; the ONLY wrap point is the separator,
                   so a long country drops intact beneath the date (measured: the
                   identity column is ~176px at 390pt; "3 SEPT 2026 · NORTHERN
@@ -186,7 +179,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
             </div>
           )}
           {line2.length > 0 && (
-            <div style={{ ...LABEL, letterSpacing: '0.10em', whiteSpace: 'nowrap' }}>{line2}</div>
+            <div style={archive ? { fontSize: 12, color: A.DIM, lineHeight: 1.3 } : { ...LABEL, letterSpacing: '0.10em', whiteSpace: 'nowrap' }}>{line2}</div>
           )}
           {course.is_top100 && course.global_rank != null && (
             <div>
@@ -195,13 +188,13 @@ const DossierCard: React.FC<DossierCardProps> = ({
                 style={{
                   display: 'inline-block',
                   marginTop: 4,
-                  fontSize: 9.5,
+                  fontSize: archive ? 11 : 9.5,
                   fontWeight: 700,
-                  letterSpacing: '0.06em',
+                  letterSpacing: 0,
                   color: MEDAL_GOLD,
-                  border: '1px solid rgba(214,168,75,0.45)',
+                  border: `1px solid color-mix(in srgb, ${MEDAL_GOLD} 45%, transparent)`,
                   borderRadius: 7,
-                  padding: '2px 6px',
+                  padding: archive ? '1px 6px' : '2px 6px',
                 }}
               >
                 {`#${course.global_rank} World`}
@@ -217,19 +210,19 @@ const DossierCard: React.FC<DossierCardProps> = ({
               {t('row.notRated', { defaultValue: 'Not rated' })}
             </div>
           ) : (
-            <div style={{ ...NUM, fontSize: 17, color: A.INK, lineHeight: 1 }}>
+            <div style={{ ...NUM, fontFamily: archive ? 'inherit' : SANS, letterSpacing: archive ? 0 : NUM.letterSpacing, fontSize: archive ? 20 : 17, color: archive ? courseSubScoreTone(course.rating_value) : A.INK, lineHeight: 1 }}>
               {course.rating_value.toFixed(1)}
             </div>
           )}
         </div>
 
-        <ChevronDown
-          size={18}
+        <RowChevron
+          size={archive ? 14 : 18}
           color={A.DIM}
           strokeWidth={2}
           style={{
             flexShrink: 0,
-            transform: expanded ? 'rotate(180deg)' : 'none',
+            transform: archive ? (expanded ? 'rotate(90deg)' : 'none') : (expanded ? 'rotate(180deg)' : 'none'),
             transition: 'transform 0.2s',
           }}
         />
