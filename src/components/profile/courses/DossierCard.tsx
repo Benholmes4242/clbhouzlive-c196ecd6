@@ -3,9 +3,9 @@ import { Flag, ChevronRight, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { type RatedCourseData } from './my-ratings/myRatingsTiers';
-import { SubScoreStack } from '@/features/courses/_shared/scoreBands';
-import { MEDAL_GOLD } from '@/lib/tokens/medals';
-import { A, SANS, LABEL, NUM, Action, StatRow, TOPAR_RED, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { CategoryScores } from '@/components/courses/course-detail/CategoryScores';
+import { formatListRank, type ListRank } from '@/lib/courses/listRank';
+import { A, SANS, LABEL, NUM, StatRow, TOPAR_RED, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 
 /**
@@ -38,7 +38,29 @@ export interface DossierCardProps {
   /** Own-profile scoring for this course. Absent = render no scoring at all. */
   scoring?: UserAnalyticsCourse | null;
   onExpand?: (course: RatedCourseData, hasScoring: boolean) => void;
+  /** Every Top 100 placement, folded into the first meta line via formatListRank. */
+  listRank?: ListRank | null;
+  /** Own profile only: opens the existing review editor. Absent = no Edit review. */
+  onEditReview?: (courseId: string) => void;
+  /** First row in its group draws no top divider. */
+  isFirst?: boolean;
 }
+
+/** One expanded-row action: no chevron, wraps rather than clips. */
+const RowAction: React.FC<{ label: string; tone: string; onClick: () => void }> = ({ label, tone, onClick }) => (
+  <button
+    type="button"
+    onClick={(e) => { e.stopPropagation(); onClick(); }}
+    style={{
+      minHeight: 32, border: 'none', background: 'transparent', cursor: 'pointer', padding: 0,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', minWidth: 0,
+      fontFamily: 'inherit', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase',
+      lineHeight: 1.3, whiteSpace: 'normal', color: tone,
+    }}
+  >
+    {label}
+  </button>
+);
 
 const formatRowDate = (iso: string | null): string => {
   if (!iso) return '';
@@ -64,6 +86,9 @@ const DossierCard: React.FC<DossierCardProps> = ({
   onFullReview,
   scoring,
   onExpand,
+  listRank = null,
+  onEditReview,
+  isFirst = false,
 }) => {
   const archive = appearance === 'archive';
   const RowChevron = archive ? ChevronRight : ChevronDown;
@@ -84,14 +109,8 @@ const DossierCard: React.FC<DossierCardProps> = ({
     if (next) onExpand?.(course, hasScoring);
   };
 
-  const bars: { label: string; score: number | null }[] = [
-    { label: t('top100.stats.design'), score: course.design_score },
-    { label: t('top100.stats.condition'), score: course.condition_score },
-    { label: t('top100.stats.clubhouse'), score: course.clubhouse_score },
-    { label: t('top100.stats.facilities'), score: course.facilities_score },
-  ];
-
   const where = [course.sub_country, course.country].filter(Boolean)[0] ?? null;
+  const rankText = formatListRank(listRank);
 
   // Two fixed lines, never a wrap: line 1 is date · country, line 2 is
   // rounds · average. Line 2 renders only when scoring exists (Ben, Sep 2026).
@@ -124,23 +143,25 @@ const DossierCard: React.FC<DossierCardProps> = ({
         cursor: 'pointer',
         fontFamily: archive ? 'inherit' : SANS,
         margin: '0 20px',
-        padding: archive ? '12px 0' : '9px 0',
-        borderBottom: `1px solid ${A.SOFT}`,
+        padding: archive ? '8px 0' : '9px 0',
+        borderTop: archive ? (isFirst ? 'none' : `1px solid ${A.SOFT}`) : undefined,
+        borderBottom: archive ? undefined : `1px solid ${A.SOFT}`,
         display: 'flex',
         flexDirection: 'column',
         gap: 12,
       }}
     >
       {/* HEADER (always visible) */}
-      <div style={{ display: 'flex', gap: archive ? 12 : 11, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 11, alignItems: 'center' }}>
         {/* Thumb */}
         <div
           style={{
             position: 'relative',
-            flex: archive ? '0 0 52px' : '0 0 44px',
-            width: archive ? 52 : 44,
-            height: archive ? 52 : 44,
-            borderRadius: archive ? 10 : 8,
+            flex: '0 0 44px',
+            flexShrink: 0,
+            width: 44,
+            height: archive ? 34 : 44,
+            borderRadius: 8,
             overflow: 'hidden',
             background: course.thumbnail_image ? `url(${course.thumbnail_image})` : A.TRACK,
             backgroundSize: 'cover',
@@ -156,18 +177,23 @@ const DossierCard: React.FC<DossierCardProps> = ({
             style={{
               color: A.INK,
               fontWeight: 700,
-              fontSize: archive ? 16 : 13,
+              fontSize: archive ? 12.5 : 13,
               lineHeight: 1.15,
               letterSpacing: 0,
-              overflowWrap: archive ? 'anywhere' : undefined,
-              whiteSpace: archive ? undefined : 'nowrap',
+              whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
             }}
           >
             {course.name}
           </div>
-          {line1.length > 0 && (
+          {archive ? (
+            (line1.length > 0 || rankText) && (
+              <div data-testid="meta-line-1" style={{ fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
+                {[line1 || null, rankText].filter(Boolean).join(' \u00B7 ')}
+              </div>
+            )
+          ) : line1.length > 0 && (
             <div style={{ ...LABEL, fontSize: archive ? 12 : LABEL.fontSize, fontWeight: archive ? 400 : LABEL.fontWeight, letterSpacing: archive ? 0 : '0.10em', lineHeight: archive ? 1.3 : undefined }}>
               {/* Segments stay unbreakable; the ONLY wrap point is the separator,
                   so a long country drops intact beneath the date (measured: the
@@ -179,27 +205,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
             </div>
           )}
           {line2.length > 0 && (
-            <div style={archive ? { fontSize: 12, color: A.DIM, lineHeight: 1.3 } : { ...LABEL, letterSpacing: '0.10em', whiteSpace: 'nowrap' }}>{line2}</div>
-          )}
-          {course.is_top100 && course.global_rank != null && (
-            <div>
-              <span
-                data-testid="rank-chip"
-                style={{
-                  display: 'inline-block',
-                  marginTop: 4,
-                  fontSize: archive ? 11 : 9.5,
-                  fontWeight: 700,
-                  letterSpacing: 0,
-                  color: MEDAL_GOLD,
-                  border: `1px solid color-mix(in srgb, ${MEDAL_GOLD} 45%, transparent)`,
-                  borderRadius: 7,
-                  padding: archive ? '1px 6px' : '2px 6px',
-                }}
-              >
-                {`#${course.global_rank} World`}
-              </span>
-            </div>
+            <div style={archive ? { fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' } : { ...LABEL, letterSpacing: '0.10em', whiteSpace: 'nowrap' }}>{line2}</div>
           )}
         </div>
 
@@ -231,12 +237,12 @@ const DossierCard: React.FC<DossierCardProps> = ({
       {/* EXPANDED */}
       {expanded && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {/* Sub-scores - shared band scale, single row like Courses page */}
-          <div style={{ display: 'flex', gap: 10 }}>
-            {!unrated && bars.map(({ label, score }) =>
-              score != null ? <SubScoreStack key={label} label={label} score={score} /> : null,
-            )}
-          </div>
+          {!unrated && (
+            <CategoryScores
+              marginTop={archive ? 14 : 0}
+              scores={{ design: course.design_score, condition: course.condition_score, clubhouse: course.clubhouse_score, facilities: course.facilities_score }}
+            />
+          )}
 
           {/* Scoring - own profile with rounds only */}
           {hasScoring && (
@@ -265,28 +271,20 @@ const DossierCard: React.FC<DossierCardProps> = ({
             />
           )}
 
-          {/* Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-            <Action
-              align="left"
-              label={t('row.viewCourse', { defaultValue: 'View course' })}
-              onClick={() => onCourseClick(course.id)}
-            />
-            {unrated && onRate && (
-              <Action
-                align="left"
-                label={t('row.review', { defaultValue: 'Review' })}
-                onClick={() => onRate(course.id)}
-              />
-            )}
-            {!unrated && hasReview && (
-              <Action
-                align="left"
-                label={t('row.fullReview', { defaultValue: 'Full review' })}
-                onClick={() => onFullReview(course.id, course.rating_id)}
-              />
-            )}
-          </div>
+          {/* Actions — equal columns echoing the four-column scores above. */}
+          {(() => {
+            const actions: { key: string; label: string; tone: string; onClick: () => void }[] = [
+              { key: 'view', label: t('row.viewCourse', { defaultValue: 'View course' }), tone: A.INK, onClick: () => onCourseClick(course.id) },
+            ];
+            if (unrated && onRate) actions.push({ key: 'rate', label: t('row.review', { defaultValue: 'Review' }), tone: A.INK, onClick: () => onRate(course.id) });
+            if (!unrated && hasReview) actions.push({ key: 'full', label: t('row.fullReview', { defaultValue: 'Full review' }), tone: A.INK, onClick: () => onFullReview(course.id, course.rating_id) });
+            if (!unrated && hasReview && onEditReview) actions.push({ key: 'edit', label: t('row.editReview', { defaultValue: 'Edit review' }), tone: A.AMBER, onClick: () => onEditReview(course.id) });
+            return (
+              <div data-testid="row-actions" style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.max(actions.length, 2)}, minmax(0, 1fr))`, gap: 12, marginTop: archive ? 14 : 0 }}>
+                {actions.map((x) => <RowAction key={x.key} label={x.label} tone={x.tone} onClick={x.onClick} />)}
+              </div>
+            );
+          })()}
         </div>
       )}
     </article>
