@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { type RatedCourseData } from './my-ratings/myRatingsTiers';
-import { A, SANS, LABEL, Panel, Action } from '@/features/courses/components/holes/analytical/tokens';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
 interface BreakdownsPromptProps {
   missingCount: number;
@@ -11,138 +11,93 @@ interface BreakdownsPromptProps {
   variant?: 'breakdowns' | 'review';
 }
 
-const TILE_W = 96;
-const TILE_H = 68;
+const TILE = 48;
 
 /**
- * Page-level "still to rate" prompt at the top of AllCoursesList.
- * Recognition is the prompt: it shows the first three courses rather than a
- * bare count. Analytical panel - no gradient, no glyph tile, no filled pill.
+ * Page-level "still to rate" prompt at the top of AllCoursesList, in the
+ * signed-off mock's compact form: a section head with the count in the title,
+ * then one row of three thumbnails, a "+n" tile and the action. Names and dates
+ * live in the picker sheet, not here.
  */
-const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({
-  missingCount,
-  courses,
-  onTap,
-  variant = 'breakdowns',
-}) => {
+const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({ missingCount, courses, onTap }) => {
   const { t } = useTranslation('courses');
   if (missingCount === 0) return null;
 
   const preview = courses.slice(0, 3);
   const remainder = missingCount - preview.length;
 
-  const kicker = t('toRate.kicker', { defaultValue: 'STILL TO RATE' });
-  const count = t('toRate.count', {
-    count: missingCount,
-    defaultValue: '{{count}} courses',
-  });
-
   return (
-    <Panel kicker={variant === 'review' ? kicker : kicker} aside={count} style={{ fontFamily: SANS }}>
-      {/* THE REMAINDER SITS OUTSIDE THE SCROLLER, AND THAT IS THE FIX.
-          Three 96px tiles plus their gaps are 318px; the panel's inner width at
-          390pt is 390 - 32 page - 32 panel = 326px. A fourth 96px tile inside
-          the same scroller therefore had 8px of visible room and rendered as a
-          sliced "+1" - the text was never clipped, the TILE was. So the count
-          now lives beside the scroller, sized to its own text, and is fully
-          legible at every width while the thumbnails scroll under it. */}
-      <div style={{ display: 'flex', gap: 10, alignItems: 'stretch' }}>
-        <div
-          style={{
-            display: 'flex',
-            gap: 10,
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-            paddingBottom: 2,
-            flex: '1 1 auto',
-            minWidth: 0,
-          }}
-        >
-        {preview.map((c) => {
-          const played = c.last_played_at ? formatDayMonthYearShortGB(new Date(c.last_played_at)) : null;
-          return (
+    <section data-testid="still-to-rate" style={{ fontFamily: SANS }}>
+      <SectionHeader
+        tone="amber"
+        kicker={t('toRate.kicker', { defaultValue: 'STILL TO RATE' })}
+        title={`${missingCount} ${missingCount === 1 ? 'course is' : 'courses are'} waiting`}
+      />
+      <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {preview.map((c) => (
             <button
               key={c.id}
               type="button"
+              aria-label={c.name}
               onClick={() => onTap('preview')}
               style={{
-                flex: `0 0 ${TILE_W}px`,
-                background: 'transparent',
-                border: 'none',
+                width: TILE,
+                height: TILE,
+                borderRadius: 9,
+                border: 0,
                 padding: 0,
-                textAlign: 'left',
                 cursor: 'pointer',
-                fontFamily: SANS,
+                background: c.thumbnail_image ? `url(${c.thumbnail_image})` : A.TRACK,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            />
+          ))}
+          {remainder > 0 && (
+            <button
+              type="button"
+              onClick={() => onTap('preview')}
+              style={{
+                width: TILE,
+                height: TILE,
+                borderRadius: 9,
+                border: '1px dashed rgba(255,255,255,0.22)',
+                background: 'transparent',
+                padding: 0,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 11,
+                fontWeight: 700,
+                color: A.DIM,
+                fontVariantNumeric: 'tabular-nums',
               }}
             >
-              <div
-                style={{
-                  width: TILE_W,
-                  height: TILE_H,
-                  borderRadius: 10,
-                  background: c.thumbnail_image ? `url(${c.thumbnail_image})` : A.TRACK,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              />
-              <div
-                style={{
-                  marginTop: 6,
-                  fontSize: 11.5,
-                  fontWeight: 700,
-                  color: A.INK,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  width: TILE_W,
-                }}
-              >
-                {c.name}
-              </div>
-              {played && (
-                <div style={{ ...LABEL, marginTop: 2, letterSpacing: '0.10em' }}>
-                  {t('toRate.playedAgo', { ago: played, defaultValue: '{{ago}}' })}
-                </div>
-              )}
+              {`+${remainder}`}
             </button>
-          );
-        })}
+          )}
         </div>
-
-        {remainder > 0 && (
-          <button
-            type="button"
-            onClick={() => onTap('preview')}
-            style={{
-              /* Sized to its text, not to a tile: a two- or three-digit
-                 remainder grows the box instead of losing digits. */
-              flex: '0 0 auto',
-              height: TILE_H,
-              padding: '0 10px',
-              borderRadius: 10,
-              border: `1px dashed ${A.DIM}`,
-              background: 'transparent',
-              cursor: 'pointer',
-              fontFamily: SANS,
-              whiteSpace: 'nowrap',
-              ...LABEL,
-              color: A.MUTE,
-            }}
-          >
-            {t('toRate.more', { count: remainder, defaultValue: '+{{count}} more' })}
-          </button>
-        )}
-      </div>
-
-
-      <div style={{ marginTop: 12 }}>
-        <Action
-          align="left"
-          label={t('toRate.action', { defaultValue: 'Rate them' })}
+        <button
+          type="button"
           onClick={() => onTap('action')}
-        />
+          style={{
+            marginLeft: 'auto',
+            fontSize: 12,
+            fontWeight: 700,
+            color: A.AMBER,
+            background: 'transparent',
+            border: 0,
+            padding: 0,
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {`${t('toRate.action', { defaultValue: 'Rate them' })} \u203A`}
+        </button>
       </div>
-    </Panel>
+    </section>
   );
 };
 

@@ -466,7 +466,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
       {/* Page-level prompt (own profile only): review first, then breakdowns */}
       {isOwnProfile && promptMode && (
-        <div style={{ padding: '12px 16px 0' }}>
+        <div style={{ padding: '24px 20px 0' }}>
           <BreakdownsPrompt
             variant={promptMode}
             missingCount={promptMode === 'review' ? reviewCount : missingBreakdownsCourses.length}
