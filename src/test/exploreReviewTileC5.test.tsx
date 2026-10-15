@@ -146,7 +146,8 @@ describe('C5 §1/§6 the card takes that one answer', () => {
     expect(video?.hasAttribute('loop')).toBe(true);
     expect(video?.hasAttribute('muted') || (video as HTMLVideoElement).muted).toBe(true);
     expect(container.querySelector('[data-review-play="true"]')).toBeNull();
-    expect(container.textContent).toContain('1:35');
+    /* BRIEF_REVIEW_TILE_ACTIONS_FIX §1 (29 Sep): no duration chip on the tile. */
+    expect(container.textContent).not.toContain('1:35');
   });
 
   it('§4 ONE badge slot: a video shows the duration and never a photo count', () => {
@@ -155,7 +156,8 @@ describe('C5 §1/§6 the card takes that one answer', () => {
       reviewMedia: { mediaId: 'vid', kind: 'video', url: 'https://example.test/v.m3u8', posterUrl: 'https://example.test/poster.jpg', streamId: 'st', durationS: 95 },
     });
     const { container } = render(<ExploreCard item={item} size="lead" shape={null} onTap={() => undefined} />);
-    expect(container.textContent).toContain('1:35');
+    /* No duration chip since 29 Sep, and still never a photo count. */
+    expect(container.textContent).not.toContain('1:35');
     expect(container.querySelector('[data-review-photo-figure="true"]')).toBeNull();
   });
 
@@ -176,8 +178,10 @@ describe('C5 §1/§6 the card takes that one answer', () => {
     expect(container.querySelector('[data-review-top-line="true"]')).toBeNull();
     expect(container.querySelector('[data-review-stat-strip="true"]')).toBeNull();
     expect(container.querySelector('[data-review-play="true"]')).toBeNull();
-    /* The course photo stays the std review's ground: §1 is a LEAD rule. */
-    expect(container.innerHTML).toContain('example.test/course.jpg');
+    /* The member's own media is the ground at every size (8 Oct): the lead
+       gate never opened, so std reviews had silently dropped it. */
+    expect(container.innerHTML).toContain('example.test/mine.jpg');
+    expect(container.innerHTML).not.toContain('example.test/course.jpg');
   });
 });
 

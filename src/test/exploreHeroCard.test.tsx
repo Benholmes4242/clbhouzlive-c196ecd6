@@ -259,11 +259,12 @@ describe('Explore card shapes', () => {
     const image = container.querySelector<HTMLElement>('button > span > div');
     expect(size).toBe('std');
     expect(hero?.style.minHeight).toBe('340px');
-    expect(image?.style.minHeight).toBe('340px');
+    // A review's photo is a committed 340 height, not a floor (8 Oct).
+    expect(image?.style.height).toBe('340px');
     expect(container.querySelector('[data-lead-review-body="true"]')).toBeNull();
     const headline = container.querySelector<HTMLElement>('[data-explore-headline="true"]');
     expect(headline?.textContent).toContain('A thoughtful review.');
-    expect(headline?.getAttribute('data-explore-line-clamp')).toBe('2');
+    expect(headline?.getAttribute('data-explore-line-clamp')).toBe('3');
     expect(hero && headline && hero.contains(headline)).toBe(true);
     expect(container.querySelector('[data-figure-chip="review-stacked"]')).not.toBeNull();
     expect(image?.style.borderRadius).toBe('14px');
@@ -286,7 +287,8 @@ describe('Explore card shapes', () => {
     const onPhoto = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
     expect(onPhoto?.style.minHeight).toBe('340px');
     expect(onPhoto?.style.height).toBe('');
-    expect(container.querySelector('[data-explore-headline="true"]')?.getAttribute('data-explore-line-clamp')).toBe('2');
+    // A full-width review clamps at three on its committed 340 tile (8 Oct).
+    expect(container.querySelector('[data-explore-headline="true"]')?.getAttribute('data-explore-line-clamp')).toBe('3');
   });
 
   it('uses the ruled on-photo colors and shadows for a review', () => {
