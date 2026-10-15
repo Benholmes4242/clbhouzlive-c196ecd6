@@ -1,7 +1,7 @@
 /**
  * src/lib/top100Club.ts
  * 
- * Top 100 Club tier system based on total_top100_rated.
+ * Top 100 Club tier system based on total_played_top100 (the ladder is played-based).
  * 
  * IMPORTANT: Milestone thresholds are sourced from src/config/achievements.ts
  * IMPORTANT: All colors are sourced from globalAchievementMilestoneSystem.ts

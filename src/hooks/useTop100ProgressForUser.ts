@@ -29,6 +29,8 @@ export type Top100ListProgress = {
   listSlug: string;
   listName: string;
   played: number;
+  /** courses_rated_in_list from user_top100_progress_view. */
+  rated: number;
   total: number;
   course_ids: string[];
 };
@@ -169,6 +171,7 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
       for (const list of lists || []) {
         const row = viewByListId.get(list.id);
         const played = Number(row?.courses_played_in_list ?? 0);
+        const rated = Number(row?.courses_rated_in_list ?? 0);
         const total = Number(row?.total_courses_in_list ?? 0);
 
         // course_ids are still useful for downstream consumers; derive from memberships.
@@ -187,6 +190,7 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
           listSlug: list.slug,
           listName: list.name,
           played,
+          rated,
           total,
           course_ids: courseIdsInList,
         });
@@ -328,7 +332,7 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
 
       return {
         total_played_top100: totalTop100Played,
-        total_top100_rated: totalTop100Played,
+        total_top100_rated: listProgress.reduce((sum, l) => sum + l.rated, 0),
         totalTop100Played,
         regions_count: regionsWithProgress.size,
         lists: listProgress,
