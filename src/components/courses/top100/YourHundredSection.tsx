@@ -31,14 +31,14 @@ const CELL_NOBODY = 'rgba(255,255,255,0.055)';
 
 type CellState = 'reviewed' | 'played' | 'member' | 'nobody';
 
-/* Reviewing is the act the page asks for, so the solid fill marks the
-   finished job (rounds AND a review) and the ring marks rounds awaiting one.
-   DELIBERATE DROP-THROUGH: a review with no rounds earns no state of its own.
-   It cannot be amber, because the headline counts ROUNDS and that course has
-   none — solid + ring must always equal viewerPlayed. The peek row still
-   states the review when tapped, so the fact is kept, just not as a colour. */
+/* A square is YOURS when user_course_activity has it — a tracked round OR a
+   rating — because that is what the figure above the grid counts, and the two
+   must never disagree. Check in plain words: solid plus ring always equals
+   viewerPlayed. Solid = yours and reviewed; ring = yours, not yet reviewed.
+   The community side still reads roundsTracked: grey means a member has a
+   round here. */
 function cellState(e: Top100Enrichment | undefined): CellState {
-  const played = (e?.yourRounds ?? 0) > 0;
+  const played = e?.yourActivity === true;
   if (played && e?.ratedByYou) return 'reviewed';
   if (played) return 'played';
   if ((e?.roundsTracked ?? 0) > 0) return 'member';
@@ -80,11 +80,12 @@ export interface YourHundredSubject {
 const STRONG: React.CSSProperties = { color: A.BODY, fontWeight: 700, fontVariantNumeric: 'tabular-nums' };
 
 function StatusLine({ e }: { e: Top100Enrichment | undefined }) {
-  const played = (e?.yourRounds ?? 0) > 0;
+  const played = e?.yourActivity === true;
   const reviewed = !!e?.ratedByYou;
   const n = e?.playerCount ?? 0;
   const rating = e?.yourRating != null ? e.yourRating.toFixed(1) : null;
-  const best = e?.yourBest != null ? <> · Best <span style={STRONG}>{e.yourBest}</span></> : null;
+  // Best is printed only when there is a round to print.
+  const best = (e?.yourRounds ?? 0) > 0 && e?.yourBest != null ? <> · Best <span style={STRONG}>{e.yourBest}</span></> : null;
   if (played && reviewed) {
     return (
       <>

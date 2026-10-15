@@ -10,30 +10,32 @@ afterEach(cleanup);
 function e(id: string, o: Partial<Top100Enrichment> = {}): Top100Enrichment {
   return {
     courseId: id, rating: null, ratingCount: 0, roundsTracked: 0, avgOverPar: null, yourRounds: 0, yourBest: null,
-    ratedByYou: false, yourRating: null, harderThanPct: null,
+    ratedByYou: false, yourRating: null, yourActivity: false, harderThanPct: null,
     subScores: { design: null, condition: null, facilities: null, clubhouse: null },
     playerCount: 0, recordGross: null, recordHolder: null, players: [], ...o,
   };
 }
 
-const ids = ['a', 'b', 'c', 'd', 'r'];
+const ids = ['a', 'b', 'c', 'd', 'r', 'k'];
 const enrichment = new Map([
-  ['a', e('a', { yourRounds: 2, yourBest: 78, roundsTracked: 2 })],
+  ['a', e('a', { yourActivity: true, yourRounds: 2, yourBest: 78, roundsTracked: 2 })],
   ['b', e('b', { ratedByYou: true, yourRating: 8.4, playerCount: 3 })],
   ['c', e('c', { roundsTracked: 4, playerCount: 4, recordGross: 71, recordHolder: 'Sam' })],
   ['d', e('d')],
-  ['r', e('r', { yourRounds: 1, ratedByYou: true, yourRating: 8.1, yourBest: 80 })],
+  ['k', e('k', { yourActivity: true, ratedByYou: true, yourRating: 7.9 })],
+  ['r', e('r', { yourActivity: true, yourRounds: 1, ratedByYou: true, yourRating: 8.1, yourBest: 80 })],
 ]);
 const subjects = new Map([
   ['a', { name: 'Royal Dornoch', imageUrl: null, memberships: [{ list_slug: 'global', rank: 47 }, { list_slug: 'gb-i', rank: 12 }] }],
   ['b', { name: 'Cruden Bay', imageUrl: null, memberships: [{ list_slug: 'global', rank: 101 }] }],
   ['c', { name: 'Muirfield', imageUrl: null, memberships: [{ list_slug: 'global', rank: 9 }] }],
   ['d', { name: 'Nobody Links', imageUrl: null, memberships: [] }],
+  ['k', { name: 'Kingsbarns', imageUrl: null, memberships: [] }],
   ['r', { name: 'Turnberry', imageUrl: null, memberships: [] }],
 ]);
 
 function mount() {
-  render(<YourHundredSection viewerPlayed={2} total={5} courseIds={ids} enrichment={enrichment} subjects={subjects} onOpenCourse={() => {}} />);
+  render(<YourHundredSection viewerPlayed={3} total={6} courseIds={ids} enrichment={enrichment} subjects={subjects} onOpenCourse={() => {}} />);
 }
 const cell = (name: string) => screen.getByRole('button', { name: new RegExp(name) });
 
@@ -77,7 +79,7 @@ describe('Your hundred peek row', () => {
     const solid = cell('Turnberry').style.background;
     const all = screen.getAllByRole('button').filter((b) => b.hasAttribute('aria-pressed'));
     const amber = all.filter((b) => b.style.background === solid || b.style.boxShadow.includes('inset')).length;
-    expect(amber).toBe(2);
+    expect(amber).toBe(3);
   });
   it('the ring square says Not yet reviewed', () => {
     mount();
@@ -93,5 +95,29 @@ describe('Your hundred peek row', () => {
     mount();
     fireEvent.click(cell('Nobody Links'));
     expect(screen.getByText('No member has logged an official round yet.')).toBeInTheDocument();
+  });
+  it('activity and a rating with no rounds is solid amber, says Reviewed, never Best', () => {
+    mount();
+    expect(cell('Kingsbarns').style.background).toBe(cell('Turnberry').style.background);
+    expect(cell('Kingsbarns').style.background).not.toBe(cell('Nobody Links').style.background);
+    fireEvent.click(cell('Kingsbarns'));
+    const line = screen.getByText('You played').parentElement!.textContent!;
+    expect(line).toContain('Reviewed');
+    expect(line).not.toContain('Best');
+  });
+  it('activity and rounds with no rating is the ring and says Best and Not yet reviewed', () => {
+    mount();
+    expect(cell('Royal Dornoch').style.boxShadow).toContain('inset');
+    fireEvent.click(cell('Royal Dornoch'));
+    const line = screen.getByText('You played').parentElement!.textContent!;
+    expect(line).toContain('Best');
+    expect(line).toContain('Not yet reviewed');
+  });
+  it('solid plus ring equals the played figure passed in', () => {
+    mount();
+    const solid = cell('Turnberry').style.background;
+    const all = screen.getAllByRole('button').filter((b) => b.hasAttribute('aria-pressed'));
+    const n = all.filter((b) => b.style.background === solid || b.style.boxShadow.includes('inset')).length;
+    expect(n).toBe(3);
   });
 });

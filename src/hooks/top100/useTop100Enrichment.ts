@@ -17,6 +17,9 @@ import { supabase } from '@/integrations/supabase/client';
  *  - course_ratings                which of these the viewer has rated
  *  - user_profiles                 the faces behind those player ids, one
  *                                  batched read
+ *  - user_course_activity          whether the viewer has logged this course
+ *                                  at all, which is the definition the Top 100
+ *                                  headline counts
  *
  * The profiles read is sequential on purpose: the ids are not known until the
  * RPC resolves, and the alternative is a second cache entry for the same fact.
@@ -33,6 +36,8 @@ export interface Top100Enrichment {
   ratedByYou: boolean;
   /** The viewer's own overall rating, from the same course_ratings read. */
   yourRating: number | null;
+  /** The viewer has a user_course_activity row here (a round OR a rating). */
+  yourActivity: boolean;
   harderThanPct: number | null;
   /** Rating sub-scores, straight from course_rating_aggregates. */
   subScores: {
@@ -87,7 +92,7 @@ export function useTop100Enrichment(
     queryFn: async (): Promise<Map<string, Top100Enrichment>> => {
       const ids = courseIds;
 
-      const [aggRes, ctxRes, mineRes] = await Promise.all([
+      const [aggRes, ctxRes, mineRes, actRes] = await Promise.all([
         supabase
           .from('course_rating_aggregates' as any)
           .select('course_id, avg_overall_score, review_count, avg_design_score, avg_condition_score, avg_facilities_score, avg_clubhouse_score')
@@ -100,11 +105,19 @@ export function useTop100Enrichment(
               .eq('user_id', userId)
               .in('course_id', ids)
           : Promise.resolve({ data: [], error: null } as any),
+        userId
+          ? supabase
+              .from('user_course_activity' as any)
+              .select('course_id')
+              .eq('user_id', userId)
+              .in('course_id', ids)
+          : Promise.resolve({ data: [], error: null } as any),
       ]);
 
       if (aggRes.error) throw aggRes.error;
       if (ctxRes.error) throw ctxRes.error;
       if (mineRes.error) throw mineRes.error;
+      if (actRes.error) throw actRes.error;
 
       const map = new Map<string, Top100Enrichment>();
       for (const id of ids) {
@@ -118,6 +131,7 @@ export function useTop100Enrichment(
           yourBest: null,
           ratedByYou: false,
           yourRating: null,
+          yourActivity: false,
           harderThanPct: null,
           subScores: { design: null, condition: null, facilities: null, clubhouse: null },
           playerCount: 0,
@@ -185,6 +199,11 @@ export function useTop100Enrichment(
           entry.ratedByYou = true;
           entry.yourRating = row.rating != null ? Number(row.rating) : null;
         }
+      }
+
+      for (const row of (actRes.data ?? []) as any[]) {
+        const entry = map.get(row.course_id);
+        if (entry) entry.yourActivity = true;
       }
 
       // Merge over what we already had: a row that has a block keeps it.
