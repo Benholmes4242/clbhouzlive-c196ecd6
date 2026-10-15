@@ -1,5 +1,6 @@
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { get, set, del } from 'idb-keyval';
+import { isMemberGolfQueryKey } from '@/lib/memberDataFreshness';
 
 
 /** True when `data` is a valid react-query infinite-query payload. */
@@ -149,6 +150,9 @@ export const shouldPersistQuery = (query: {
 }): boolean => {
   const root = query.queryKey?.[0];
   if (typeof root !== 'string') return false;
+  // The member set WINS over the allowlist: a member's own figures are never
+  // written to disk, even when their prefix (e.g. 'top100') is allowlisted.
+  if (isMemberGolfQueryKey(query.queryKey)) return false;
   if (!PERSIST_PREFIXES.some((p) => root.startsWith(p))) return false;
 
   /* ONLY SETTLED SUCCESSES. This predicate REPLACES react-query's default
