@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import BrowseCourseCard from './BrowseCourseCard';
 import type { StatBrowseRow } from './useStatBrowse';
-import { RAIL_CHIP_GEOMETRY, RailChips } from '@/components/ui/RailChips';
+import { RAIL_CHIP_GAP, RailChips, railChipStyle } from '@/components/ui/RailChips';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
@@ -94,7 +94,13 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
   const [nameQuery, setNameQuery] = useState('');
   const [yoursOnly, setYoursOnly] = useState(false);
   const restored = useRef(false);
-  const { data, isLoading, isError, refetch } = useGolfCoursesInfinite({ listSlug: selectedList });
+  const { data, isLoading, isError, refetch, isPlaceholderData } = useGolfCoursesInfinite({ listSlug: selectedList });
+  /* The slug the RENDERED rows belong to. While a region switch is in flight
+     the previous list stays on screen (keepPreviousData), so rows must be read
+     against the list they came from, not the chip just tapped. */
+  const settledList = useRef(selectedList);
+  if (!isPlaceholderData) settledList.current = selectedList;
+  const renderedList = settledList.current;
 
   useEffect(() => {
     sessionStorage.setItem('top100-last-filters', JSON.stringify({ list: selectedList }));
@@ -102,10 +108,10 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
 
   const courses = useMemo(() => {
     const rows = data?.pages.flat() ?? [];
-    return [...rows].sort((a, b) => (rankFor(a, selectedList) ?? 999) - (rankFor(b, selectedList) ?? 999));
-  }, [data, selectedList]);
+    return [...rows].sort((a, b) => (rankFor(a, renderedList) ?? 999) - (rankFor(b, renderedList) ?? 999));
+  }, [data, renderedList]);
   const ids = useMemo(() => courses.map((course) => course.id), [courses]);
-  const enrichment = useTop100Enrichment(ids, user?.id, selectedList);
+  const enrichment = useTop100Enrichment(ids, user?.id, renderedList);
   /* Search and "Yours" narrow what is rendered only (client-side, no query).
      The head's rated / tracked meta describes the whole list, so it keeps
      counting the unfiltered rows. */
@@ -127,18 +133,18 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
     return item?.rating != null && item.ratingCount > 0;
   }).length;
   const communityPlayedCount = courses.filter((course) => (enrichment.get(course.id)?.roundsTracked ?? 0) > 0).length;
-  const heading = LIST_NAMES[selectedList] ?? 'Top 100';
+  const heading = LIST_NAMES[renderedList] ?? 'Top 100';
   /* VIEWER counts. Played and the denominator come from the per-list row of
      user_top100_progress_view for the ACTIVE scope — never the global total and
      never a typed 100. Rated is the server's courses_rated_in_list for the active list. */
   const { data: progress } = useTop100ProgressForUser(user?.id);
-  const viewerList = progress?.lists.find((list) => list.listSlug === selectedList);
+  const viewerList = progress?.lists.find((list) => list.listSlug === renderedList);
   const viewerPlayed = viewerList?.played ?? 0;
   const viewerRated = viewerList?.rated ?? 0;
   const courseNames = useMemo(() => new Map(courses.map((c) => [c.id, c.name ?? ''])), [courses]);
   const argumentInputs = courses.map((c) => {
     const e = enrichment.get(c.id);
-    return { id: c.id, name: c.name ?? '', imageUrl: c.thumbnail_image ?? null, publishedRank: rankFor(c, selectedList), rating: e?.rating ?? null, ratingCount: e?.ratingCount ?? 0 };
+    return { id: c.id, name: c.name ?? '', imageUrl: c.thumbnail_image ?? null, publishedRank: rankFor(c, renderedList), rating: e?.rating ?? null, ratingCount: e?.ratingCount ?? 0 };
   });
   const argument = argumentRows(argumentInputs);
   const argumentQualifying = qualifyingCount(argumentInputs);
@@ -166,38 +172,15 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
   return (
     <div>
       {shellTabs}
-      {user && viewerList && viewerList.total > 0 && courses.length > 0 ? (
-        <YourHundredSection
-          viewerPlayed={viewerPlayed}
-          total={viewerList.total}
-          courseIds={ids}
-          enrichment={enrichment}
-          courseNames={courseNames}
-          onCellTap={jumpToCard}
-        />
-      ) : null}
-      {argument.length > 0 ? <TheArgumentSection rows={argument} qualifying={argumentQualifying} /> : null}
-      <section style={{ ...SECTION_WRAP, paddingBottom: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
-          <SectionHead kicker="The list" tone="quiet" title={heading} />
-          <span style={{ color: A.MUTE, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
-            {communityRatedCount} rated · {communityPlayedCount} tracked
-          </span>
-        </div>
-        <div style={{ height: 16 }} />
-        {/* THE SAME INLINE SEARCH THE COURSES TAB CARRIES, one field component
-            shared by both: a plain case-insensitive contains-match over the
-            list already selected by the region chips. No catalogue query.
-            On Top 100 the search toggle is the last item in the chip row itself,
-            not a separate object pinned to the right edge: same gap, same height,
-            same radius as the scope chips. */}
+      <div style={{ padding: '0 16px' }}>
         <RailChips
           options={LISTS}
           value={selectedList}
           onChange={(next) => { restored.current = true; setSelectedList(next); }}
           ariaLabel="Top 100 region"
           align="center-when-fit"
-          trailing={(<>
+          size="sm"
+          trailing={(<span style={{ display: 'flex', gap: RAIL_CHIP_GAP }}>
             <button
               type="button"
               onClick={() => {
@@ -207,19 +190,8 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
               aria-label="Search this list"
               aria-expanded={searchOpen}
               style={{
-                /* HEIGHT AND RADIUS COME FROM THE CHIPS (BRIEF_SEARCH_CONTROL_HEIGHT).
-                   alignSelf stretch makes it exactly as tall as the Global /
-                   GB&I / Europe / USA chips beside it, and the radius is read
-                   from the chip geometry rather than typed - if the chips ever
-                   change shape this follows them. Horizontal padding is
-                   unchanged, so the width is what it always was. */
+                ...railChipStyle(searchOpen, 'sm'),
                 alignSelf: 'stretch',
-                padding: `0 ${RAIL_CHIP_GEOMETRY.md.padding.split(' ')[1]}`,
-                borderRadius: RAIL_CHIP_GEOMETRY.md.radius,
-                border: `1px solid ${searchOpen ? 'transparent' : A.BORDER}`,
-                background: searchOpen ? A.INK : 'transparent',
-                color: searchOpen ? A.CANVAS : A.MUTE,
-                cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -236,23 +208,12 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
                 type="button"
                 onClick={() => setYoursOnly((prev) => !prev)}
                 aria-pressed={yoursOnly}
-                style={{
-                  alignSelf: 'stretch',
-                  padding: RAIL_CHIP_GEOMETRY.md.padding,
-                  borderRadius: RAIL_CHIP_GEOMETRY.md.radius,
-                  border: `1px solid ${yoursOnly ? 'transparent' : A.BORDER}`,
-                  background: yoursOnly ? A.INK : 'transparent',
-                  color: yoursOnly ? A.CANVAS : A.MUTE,
-                  fontSize: 13,
-                  fontWeight: 600,
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                }}
+                style={{ ...railChipStyle(yoursOnly, 'sm'), alignSelf: 'stretch' }}
               >
                 Yours
               </button>
             ) : null}
-          </>)}
+          </span>)}
         />
         {searchOpen ? (
           <div style={{ marginTop: 10 }}>
@@ -265,7 +226,18 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
             />
           </div>
         ) : null}
-        {rateNudge ? <div style={{ marginTop: 24 }}>{rateNudge}</div> : null}
+      </div>
+      {user && viewerList && viewerList.total > 0 && courses.length > 0 ? (
+        <YourHundredSection
+          viewerPlayed={viewerPlayed}
+          total={viewerList.total}
+          courseIds={ids}
+          enrichment={enrichment}
+          courseNames={courseNames}
+          onCellTap={jumpToCard}
+        />
+      ) : null}
+      {argument.length > 0 ? <TheArgumentSection rows={argument} qualifying={argumentQualifying} /> : null}
       </section>
 
       <div style={{ paddingTop: 24 }}>
@@ -290,13 +262,13 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
             ) : null}
             {visibleCourses.map((course, index) => {
               const item = enrichment.get(course.id);
-              const row = toBrowseRow(course, item, selectedList);
+              const row = toBrowseRow(course, item, renderedList);
               return (
                 <div key={course.id} id={`top100-card-${course.id}`} style={{ scrollMarginTop: 'max(env(safe-area-inset-top, 0px), 47px)', marginBottom: index < visibleCourses.length - 1 ? 32 : 0 }}>
                   <BrowseCourseCard
                     row={row}
                     variant="top100"
-                    rank={rankFor(course, selectedList)}
+                    rank={rankFor(course, renderedList)}
                     viewerRounds={item?.yourRounds ?? 0}
                     viewerBest={item?.yourBest ?? null}
                     recordHolder={item?.recordHolder ?? null}
