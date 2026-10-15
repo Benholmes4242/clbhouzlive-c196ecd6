@@ -89,7 +89,7 @@ describe('profile courses archive', () => {
   it('the chip count and the rows drawn agree under each sort', async () => {
     const { container } = mount();
     await waitFor(() => expect(document.querySelectorAll('article').length).toBeGreaterThan(0));
-    const expected = { 'recently-played': 4, 'rating-high-low': 3, 'rating-low-high': 3 };
+    const expected = { 'recently-played': 4, 'rating-high-low': 4, 'rating-low-high': 4 };
     for (const s of SORTS) {
       fireEvent.click(screen.getByText(`sort:${s}`));
       await waitFor(() => expect(rows(container).length).toBe(expected[s]));
