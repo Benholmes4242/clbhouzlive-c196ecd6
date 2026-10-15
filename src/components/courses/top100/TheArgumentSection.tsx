@@ -11,7 +11,7 @@ import { ordinal } from '@/lib/text/numbers';
 export function TheArgumentSection({ rows, qualifying }: { rows: ArgumentRow[]; qualifying: number }) {
   return (
     <section style={SECTION_WRAP}>
-      <SectionHead kicker="Golfers versus the list" title="Where the ratings and the ranking part company" />
+      <SectionHead kicker="Golfers versus the list" title="Where the ratings and the rankings differ" />
       <div style={{ marginTop: HEAD_GAP, display: 'grid', gap: 12 }}>
         {rows.map((r) => {
           const up = r.divergence > 0;
