@@ -1,3 +1,4 @@
+import { isMemberGolfQueryKey, MEMBER_GOLF_QUERY_KEYS } from '@/lib/memberDataFreshness';
 import React, { createContext, useContext, useEffect, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAppLifecycle, AppLifecycleState } from '../hooks/useAppLifecycle';
@@ -47,6 +48,12 @@ const FEED_QUERY_KEYS = [
   'user-profile',
 ];
 
+/** Every key prefix the light (resume) refresh covers. */
+export const LIGHT_REFRESH_KEYS: readonly (readonly unknown[])[] = [
+  ...FEED_QUERY_KEYS.map((k) => [k]),
+  ...MEMBER_GOLF_QUERY_KEYS,
+];
+
 export function RehydrationProvider({ children }: RehydrationProviderProps) {
   const queryClient = useQueryClient();
   const lifecycle = useAppLifecycle();
@@ -60,11 +67,11 @@ export function RehydrationProvider({ children }: RehydrationProviderProps) {
 
     try {
       if (lifecycle.rehydrationLevel === 'light') {
-        // Light rehydration: Invalidate feed queries only
+        // Light rehydration: feed queries plus the member's own golf figures.
         await queryClient.invalidateQueries({
           predicate: (query) => {
             const key = query.queryKey[0] as string;
-            return FEED_QUERY_KEYS.includes(key);
+            return FEED_QUERY_KEYS.includes(key) || isMemberGolfQueryKey(query.queryKey);
           },
         });
       } 

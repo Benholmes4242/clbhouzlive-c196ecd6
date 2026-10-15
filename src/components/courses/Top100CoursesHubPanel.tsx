@@ -148,7 +148,11 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   /* VIEWER counts. Played and the denominator come from the per-list row of
      user_top100_progress_view for the ACTIVE scope — never the global total and
      never a typed 100. Rated is the server's courses_rated_in_list for the active list. */
-  const { data: progress, isLoading: progressLoading } = useTop100ProgressForUser(user?.id);
+  const {
+    data: progress,
+    isLoading: progressLoading,
+    isFetchedAfterMount: progressFetchedAfterMount,
+  } = useTop100ProgressForUser(user?.id);
   const viewerList = progress?.lists.find((list) => list.listSlug === renderedList);
   const viewerPlayed = viewerList?.played ?? 0;
   const viewerRated = viewerList?.rated ?? 0;
@@ -241,7 +245,8 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
       </div>
       <PageLoadGate expect={TOP100_GATE_IDS}>
       <GateReport id="list" ready={!isLoading} />
-      <GateReport id="progress" ready={!progressLoading} />
+      {/* isLoading false does not mean the server has answered — it means we have something to draw. For a member's own figures those are different things, and the gap between them is how a member gets shown last season's totals with no loading state. */}
+      <GateReport id="progress" ready={user?.id ? progressFetchedAfterMount : !progressLoading} />
       <GateReport id="enrichment" ready={!enrichmentLoading} />
       {user && viewerList && viewerList.total > 0 && courses.length > 0 ? (
         <YourHundredSection
