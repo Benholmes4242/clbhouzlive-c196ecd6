@@ -22,13 +22,21 @@ const REGION_OPTIONS = [
 
 export const CourseRegionPills: React.FC<CourseRegionPillsProps> = ({ value, onChange, appearance = 'default' }) => {
   if (appearance === 'archive') {
+    // NO FLAGS HERE. These five are golf regions, not countries, and the rule is
+    // already written down in src/features/courses/_shared/courseRankLabels.ts:
+    // a Union Flag on GB&I misstates courses in the Republic of Ireland, and an
+    // EU flag on Europe misstates Switzerland, Norway and Turkey. Global and Rest
+    // of World were also showing two different globes in one row. The glyphs
+    // cost 115px — more than the 'Rest of World' label itself — and were the
+    // whole reason the row wrapped onto a second line. Measured at 12.5px/700:
+    // with flags the row is 392px and wraps at 393, 375 and 320; without them it
+    // is 277px and fits at all three.
     return (
       <div className="archive-region-row" role="group" aria-label="Course region">
         {REGION_OPTIONS.map((region) => (
           <Button key={region.id} type="button" variant="ghost"
             className="archive-control archive-region-choice" aria-pressed={value === region.id}
             onClick={() => onChange(region.id)} style={{ color: value === region.id ? A.INK : A.DIM }}>
-            {region.country ? <CountryFlag country={region.country} size="sm" /> : <span aria-hidden="true">{region.id === 'global' ? '🌍' : '🌏'}</span>}
             <span>{region.label}</span>
           </Button>
         ))}

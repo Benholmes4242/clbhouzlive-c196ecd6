@@ -124,4 +124,14 @@ describe('profile courses archive — mock design', () => {
     expect(scoreCol.textContent).toBe('9.1');
     expect(scoreCol.contains(chip)).toBe(false);
   });
+
+  it('the region row is five text-only options with no flag or globe', async () => {
+    const { CourseRegionPills } = await vi.importActual<any>('@/components/leaderboard/courses/CourseRegionPills');
+    render(<CourseRegionPills value="global" onChange={() => {}} appearance="archive" />);
+    const group = screen.getByRole('group', { name: 'Course region' });
+    const options = within(group).getAllByRole('button');
+    expect(options.map((o) => o.textContent)).toEqual(['Global', 'GB&I', 'USA', 'Europe', 'Rest of World']);
+    expect(group.querySelector('img, svg, [aria-hidden="true"]')).toBeNull();
+    expect(group.textContent).not.toMatch(/[🌍🌏🌎]/u);
+  });
 });
