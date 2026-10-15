@@ -64,8 +64,11 @@ export const MentionText: React.FC<Props> = ({
           return <span key={i}>{seg.text}</span>;
         }
         const handleClick = (e: React.MouseEvent | React.TouchEvent) => {
-          e.stopPropagation();
+          // Previews inside a tappable card pass disableNavigation: the tap must
+          // fall through to the card, so propagation is only stopped when the
+          // mention itself navigates.
           if (disableNavigation) return;
+          e.stopPropagation();
           if (onMentionTap) {
             onMentionTap({
               entityType: seg.entityType!,

@@ -23,11 +23,12 @@ describe('review previews render mentions', () => {
       <MemoryRouter><ReviewRailSlot reviews={[review]} onReviewPress={onReviewPress} /></MemoryRouter>,
     );
     const text = container.textContent ?? '';
-    expect(text).toContain('@Danny Holmes');
-    expect(text).toContain('@DPRJK');
+    // MentionText draws the display name in bold without the '@' (app-wide).
+    expect(text).toContain('Danny Holmes');
+    expect(text).toContain('DPRJK');
     expect(text).not.toContain('](u:');
     expect(text).not.toContain('36f22cdf');
-    fireEvent.click(screen.getByText('@Danny Holmes'));
+    fireEvent.click(screen.getByText('Danny Holmes'));
     expect(onReviewPress).toHaveBeenCalledTimes(1);
   });
 
