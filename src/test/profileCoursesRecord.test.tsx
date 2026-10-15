@@ -5,7 +5,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 vi.mock('react-router-dom', () => ({ useNavigate: () => vi.fn() }));
-vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
+vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: {} }));
 vi.mock('react-simple-maps', () => ({
   ComposableMap: ({ children }: { children: React.ReactNode }) => <svg>{children}</svg>,
