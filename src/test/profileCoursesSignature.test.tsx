@@ -24,7 +24,8 @@ describe('profile courses signature', () => {
   it('renders the four in the documented order', () => {
     const rows = Array.from({ length: 5 }, () => row({ design_score: 9, condition_score: 8, clubhouse_score: 7, facilities_score: 6 }));
     render(<YourSignatureSection rows={rows} />);
-    expect(screen.getAllByTestId('signature-row').map((r) => r.textContent?.replace(/[\d.]/g, ''))).toEqual(['Design', 'Condition', 'Clubhouse', 'Facilities']);
+    const cols = [...document.querySelectorAll('[data-category]')].map((c) => c.getAttribute('data-category'));
+    expect(cols).toEqual(['design', 'condition', 'clubhouse', 'facilities']);
   });
 
   it('renders nothing below the 5-review floor', () => {
@@ -72,18 +73,15 @@ describe('profile courses signature', () => {
     }
   });
 
-  it('bars and figures take the canonical sub-score tone', () => {
+  it('figures take the canonical sub-score tone and no bar is drawn', () => {
     const rows = Array.from({ length: 5 }, () => row({ design_score: 9, condition_score: 8.9 }));
-    render(<YourSignatureSection rows={rows} />);
+    const { container } = render(<YourSignatureSection rows={rows} />);
     const norm = (c: string) => { const el = document.createElement('i'); el.style.color = c; return el.style.color; };
-    const [design, condition] = screen.getAllByTestId('signature-row');
-    const fill = (r: HTMLElement) => (r.querySelector('div > div > div') as HTMLElement).style.background;
-    const bg = (c: string) => { const el = document.createElement('i'); el.style.background = c; return el.style.background; };
+    const fig = (k: string) => container.querySelector(`[data-category="${k}"] [data-category-figure]`) as HTMLElement;
     expect(courseSubScoreTone(9)).not.toBe(courseSubScoreTone(8.9));
-    expect(fill(design)).toBe(bg(courseSubScoreTone(9)));
-    expect(fill(condition)).toBe(bg(courseSubScoreTone(8.9)));
-    const [dv, cv] = screen.getAllByTestId('signature-value');
-    expect(dv.style.color).toBe(norm(courseSubScoreTone(9)));
-    expect(cv.style.color).toBe(norm(courseSubScoreTone(8.9)));
+    expect(fig('design').style.color).toBe(norm(courseSubScoreTone(9)));
+    expect(fig('condition').style.color).toBe(norm(courseSubScoreTone(8.9)));
+    expect(container.querySelector('[data-category-score] ')?.hasAttribute('data-category-figure')).toBe(true);
+    expect([...container.querySelectorAll<HTMLElement>('div')].some((d) => d.style.height === '8px')).toBe(false);
   });
 });
