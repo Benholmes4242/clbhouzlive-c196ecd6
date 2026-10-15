@@ -59,7 +59,10 @@ vi.mock('@/hooks/gam/useCourseFieldSizes', () => ({
 vi.mock('@/hooks/gam/useCourseFieldPlayers', () => ({
   useCourseFieldPlayers: () => ({ data: undefined }),
 }));
-vi.mock('@/hooks/gam/useMemberRecordSplit', () => ({
+vi.mock('@/hooks/gam/useMemberRecordSplit', async (importOriginal) => ({
+  // CourseRecordsPanel imports the pure recordsWonFrom sum (since 3 Oct);
+  // the real one runs, only the hook is stubbed.
+  ...(await importOriginal<typeof import('@/hooks/gam/useMemberRecordSplit')>()),
   useMemberRecordSplit: () => ({ data: { available: true, byCourse: new Map() }, isLoading: false }),
 }));
 

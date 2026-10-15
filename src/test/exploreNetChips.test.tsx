@@ -42,7 +42,7 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     expect(strip?.style.backgroundColor).toBe('rgb(22, 22, 26)');
     expect(strip?.style.backgroundImage).toBe('');
     expect(strip?.style.border).toBe('');
-    expect(container.querySelector('[data-round-identity-figures="true"]')).not.toBeNull();
+    expect(container.querySelector('[data-round-figures="true"]')).not.toBeNull();
   });
 
   it('shows no horizontal or vertical rule anywhere in the pill, on any tier', () => {
@@ -83,7 +83,7 @@ describe('BRIEF_FEED_SCORE_PILL round stat strip', () => {
     const container = renderCard({ gross: 82, course_par: 71, net: 76, course_handicap: 6, birdies: 4 });
     const strip = container.querySelector<HTMLElement>('[data-explore-stat-strip="round"]');
     expect(strip).toBeNull();
-    expect(container.querySelector('[data-round-identity-figures="true"]')).not.toBeNull();
+    expect(container.querySelector('[data-round-figures="true"]')).not.toBeNull();
     expect(container.querySelector('[data-explore-stat-value="par"]')).toBeNull();
     expect(container.querySelector('[data-explore-stat-value="net"]')?.textContent).toBe('76');
     expect(container.querySelector('[data-explore-stat-value="vs-hcp"]')?.textContent).toBe('+5');
