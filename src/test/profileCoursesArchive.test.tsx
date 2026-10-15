@@ -19,8 +19,19 @@ const COURSES = [
 
 vi.mock('@/hooks/useUserCourseActivity', () => ({ useUserCourseActivity: () => ({ data: ACTIVITY }) }));
 vi.mock('@/hooks/usePlayedUnratedCourses', () => ({ usePlayedUnratedCourses: () => ({ courses: [], count: 0 }) }));
+const RANKS = [{ course_id: 'a', rank: 37, top100_lists: { slug: 'global', short_label: 'Global', name: 'World', is_active: true, sort_order: 0 } }];
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: { from: () => ({ select: () => ({ in: () => Promise.resolve({ data: COURSES, error: null }) }) }) },
+  supabase: {
+    from: (table: string) => ({
+      select: () => ({
+        in: () => {
+          const p: any = Promise.resolve({ data: table === 'course_top100_memberships' ? RANKS : COURSES, error: null });
+          p.eq = () => Promise.resolve({ data: RANKS, error: null });
+          return p;
+        },
+      }),
+    }),
+  },
 }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 // The sort dropdown is a Radix portal; replace the bar with plain buttons that
@@ -40,11 +51,11 @@ vi.mock('@/components/profile/courses/FilterBar', () => ({
 
 import { AllCoursesList, DEFAULT_COURSE_SORT } from '@/components/profile/courses/AllCoursesList';
 
-const mount = () =>
+const mount = (own = true) =>
   render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
       <MemoryRouter>
-        <AllCoursesList userId="u1" isOwnProfile />
+        <AllCoursesList userId="u1" isOwnProfile={own} />
       </MemoryRouter>
     </QueryClientProvider>,
   );
@@ -72,7 +83,7 @@ describe('profile courses archive', () => {
         expect(leaves.some((n) => /^\d+$/.test((n.textContent ?? '').trim()))).toBe(false);
       });
     }
-    expect(screen.getByText('#37 World')).toBeTruthy();
+    expect(await screen.findByText(/Global #37/)).toBeTruthy();
   });
 
   it('shows one year divider per year on the recency sort and none on the rating sorts', async () => {
@@ -113,18 +124,24 @@ describe('profile courses archive — mock design', () => {
     expect(screen.queryByText(/^country$/i)).toBeNull();
   });
 
-  it('a Top 100 row prints its rank as a chip beneath the course name', async () => {
+  it('a Top 100 row folds its rank into the first meta line', async () => {
     const { container } = mount();
-    const chip = await screen.findByTestId('rank-chip');
-    expect(chip.textContent).toBe('#37 World');
-    const nameCol = screen.getByText('Alpha Links').parentElement!;
-    expect(nameCol.contains(chip)).toBe(true);
-    const row = Array.from(rows(container)).find((r) => r.contains(chip))!;
+    await waitFor(() => expect(container.querySelector('[data-testid="meta-line-1"]')?.textContent).toBeTruthy());
+    const row = Array.from(rows(container)).find((r) => r.textContent?.includes('Alpha Links'))!;
+    await waitFor(() => expect(within(row).getByTestId('meta-line-1').textContent).toContain('Global #37'));
+    expect(screen.queryByTestId('rank-chip')).toBeNull();
     const scoreCol = Array.from(row.querySelectorAll<HTMLElement>('div')).find((d) => d.style.flex === '0 0 46px')!;
     expect(scoreCol.textContent).toBe('9.1');
-    expect(scoreCol.contains(chip)).toBe(false);
   });
 
+  it('no row draws a bar for the four category scores, collapsed or expanded', async () => {
+    const { container } = mount();
+    await waitFor(() => expect(rows(container).length).toBeGreaterThan(0));
+    const noBars = () => expect([...container.querySelectorAll<HTMLElement>('article div')].some((d) => d.style.height === '8px' || d.style.height === '4px')).toBe(false);
+    noBars();
+    rows(container).forEach((r) => fireEvent.click(r));
+    noBars();
+  });
   it('the region row is five text-only options with no flag or globe', async () => {
     const { CourseRegionPills } = await vi.importActual<any>('@/components/leaderboard/courses/CourseRegionPills');
     render(<CourseRegionPills value="global" onChange={() => {}} appearance="archive" />);
@@ -133,5 +150,27 @@ describe('profile courses archive — mock design', () => {
     expect(options.map((o) => o.textContent)).toEqual(['Global', 'GB&I', 'USA', 'Europe', 'Rest of World']);
     expect(group.querySelector('img, svg, [aria-hidden="true"]')).toBeNull();
     expect(group.textContent).not.toMatch(/[🌍🌏🌎]/u);
+  });
+
+  it('an expanded own-profile row with a review has three actions; another member gets two', async () => {
+    const DossierCard = (await import('@/components/profile/courses/DossierCard')).default;
+    const course: any = {
+      id: 'x', name: 'Xray', country: 'England', sub_country: null, thumbnail_image: null, is_top100: false, global_rank: null,
+      last_played_at: '2026-01-01', rating_value: 8, rating_id: 'r1', design_score: 8, condition_score: null,
+      clubhouse_score: null, facilities_score: null, review: 'Lovely', review_date: '2026-01-02',
+    };
+    const actionsFor = (onEditReview?: (id: string) => void) => {
+      const { container, unmount } = render(
+        <DossierCard appearance="archive" course={course} onCourseClick={() => {}} onFullReview={() => {}} onEditReview={onEditReview} />,
+      );
+      fireEvent.click(container.querySelector('article')!);
+      const grid = within(container).getByTestId('row-actions');
+      const n = grid.querySelectorAll('button').length;
+      const cols = grid.style.gridTemplateColumns;
+      unmount();
+      return { n, cols };
+    };
+    expect(actionsFor(() => {})).toEqual({ n: 3, cols: 'repeat(3, minmax(0, 1fr))' });
+    expect(actionsFor(undefined)).toEqual({ n: 2, cols: 'repeat(2, minmax(0, 1fr))' });
   });
 });

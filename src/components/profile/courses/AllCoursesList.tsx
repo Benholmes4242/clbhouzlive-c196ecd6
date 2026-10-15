@@ -27,6 +27,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import './coursesArchive.css';
+import { useCourseListRanks } from '@/lib/courses/listRank';
 
 interface AllCoursesListProps {
   userId: string;
@@ -365,6 +366,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const drawnCourses = filteredCourses;
 
   const displayedCourses = drawnCourses.slice(0, displayCount);
+  // Every Top 100 placement for the drawn rows, folded into each row's first meta line.
+  const { data: listRanks } = useCourseListRanks(displayedCourses.filter((c) => c.is_top100).map((c) => c.id));
   const hasMore = displayCount < drawnCourses.length;
   const totalFiltered = drawnCourses.length;
 
@@ -566,6 +569,9 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                       onRate={isOwnProfile ? (id) => navigate(`/courses/${id}/rate`) : undefined}
                       onCourseClick={handleCourseClick}
                       onFullReview={handleFullReview}
+                  listRank={listRanks?.get(course.id) ?? null}
+                  onEditReview={isOwnProfile ? (id) => navigate(`/courses/${id}/rate`) : undefined}
+                  isFirst={(elements[elements.length - 1] as React.ReactElement | undefined)?.type !== DossierCard}
                       scoring={scoringFor(course.id)}
                       onExpand={handleRowExpand}
                     />,
@@ -596,6 +602,9 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                     course={toRatedCourseData(course)}
                     onCourseClick={handleCourseClick}
                     onFullReview={handleFullReview}
+                  listRank={listRanks?.get(course.id) ?? null}
+                  onEditReview={isOwnProfile ? (id) => navigate(`/courses/${id}/rate`) : undefined}
+                  isFirst={(elements[elements.length - 1] as React.ReactElement | undefined)?.type !== DossierCard}
                     scoring={scoringFor(course.id)}
                     onExpand={handleRowExpand}
                   />,
@@ -647,6 +656,9 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                   onRate={isOwnProfile && !rated ? (id) => navigate(`/courses/${id}/rate`) : undefined}
                   onCourseClick={handleCourseClick}
                   onFullReview={handleFullReview}
+                  listRank={listRanks?.get(course.id) ?? null}
+                  onEditReview={isOwnProfile ? (id) => navigate(`/courses/${id}/rate`) : undefined}
+                  isFirst={(elements[elements.length - 1] as React.ReactElement | undefined)?.type !== DossierCard}
                   scoring={scoringFor(course.id)}
                   onExpand={handleRowExpand}
                 />,
