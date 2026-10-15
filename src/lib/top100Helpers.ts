@@ -88,7 +88,7 @@ function getTierThreshold(tierId: Top100TierId): number {
     rookie: 5,
     fairway: 10,
     founders: 20,
-    founders: 20,
+    heritage: 50,
     thirty: 30,
     century: 100,
     elite: 200,
