@@ -37,6 +37,27 @@ interface AllCoursesListProps {
   scoringByCourseId?: Map<string, UserAnalyticsCourse>;
   /** Lifted to ProfileCoursesTab so the record tile and this chip share one count. */
   top100Count?: number;
+  /**
+   * This member's course_ratings rows, selected ONCE in ProfileCoursesTab so
+   * this list and YourSignatureSection read one result. Never refetched here.
+   */
+  ratingRows?: ProfileRatingRow[];
+  /** Region filter, lifted so The Chase targets the list selected here. */
+  activeCountry?: QuickRegion;
+  onCountryChange?: (region: QuickRegion) => void;
+}
+
+export interface ProfileRatingRow {
+  id: string;
+  course_id: string;
+  rating: number | null;
+  review: string | null;
+  design_score: number | null;
+  condition_score: number | null;
+  clubhouse_score: number | null;
+  facilities_score: number | null;
+  review_date: string | null;
+  created_at: string | null;
 }
 
 const PAGE_SIZE = 20;
@@ -76,12 +97,20 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   displayName,
   scoringByCourseId,
   top100Count,
+  ratingRows,
+  activeCountry: activeCountryProp,
+  onCountryChange,
 }) => {
   const navigate = useNavigate();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<CoursePrimaryTab>('all');
   const [activeSort, setActiveSort] = useState<CourseSortOption>('rating-high-low');
-  const [activeCountry, setActiveCountry] = useState<QuickRegion>('global');
+  const [localCountry, setLocalCountry] = useState<QuickRegion>('global');
+  const activeCountry = activeCountryProp ?? localCountry;
+  const setActiveCountry = (r: QuickRegion) => {
+    setLocalCountry(r);
+    onCountryChange?.(r);
+  };
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [showBreakdownsPicker, setShowBreakdownsPicker] = useState(false);
@@ -128,75 +157,45 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const { data: userActivity = [] } = useUserCourseActivity(userId);
 
   // Fetch course details
-  const { data: courses = [], isLoading, isError, refetch } = useQuery({
-    queryKey: ['user-played-courses-full', userId],
+  const { data: courseRows = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ['user-played-courses-full', userId, userActivity.length],
     enabled: !!userId && userActivity.length > 0,
     queryFn: async () => {
       const courseIds = userActivity.map(a => a.course_id);
-
-      // Extra in-place fetch (per implementation brief): pull breakdown
-      // scores + review_date so the own-rating comparator has full inputs.
-      // Kept local to this component — useUserCourseActivity is intentionally
-      // NOT modified so other consumers are unaffected.
-      const [coursesResult, ratingsResult] = await Promise.all([
-        supabase
-          .from('golf_courses')
-          .select('id, name, country, sub_country, thumbnail_image, global_rank')
-          .in('id', courseIds),
-        supabase
-          .from('course_ratings')
-          .select('id, course_id, rating, review, design_score, condition_score, clubhouse_score, facilities_score, review_date, created_at')
-          .eq('user_id', userId)
-          .eq('is_mock', false)
-          .in('course_id', courseIds),
-      ]);
-
-      if (coursesResult.error) throw coursesResult.error;
-
-      const ratingIdMap = new Map<string, string>();
-      const ratingDetailsMap = new Map<string, {
-        design_score: number | null;
-        condition_score: number | null;
-        clubhouse_score: number | null;
-        facilities_score: number | null;
-        review_date: string | null;
-        review: string | null;
-        rating: number | null;
-      }>();
-      (ratingsResult.data || []).forEach(r => {
-        ratingIdMap.set(r.course_id, r.id);
-        ratingDetailsMap.set(r.course_id, {
-          design_score: r.design_score,
-          condition_score: r.condition_score,
-          clubhouse_score: r.clubhouse_score,
-          facilities_score: r.facilities_score,
-          review_date: r.review_date ?? r.created_at ?? null,
-          review: r.review ?? null,
-          rating: r.rating ?? null,
-        });
-      });
-
-      return (coursesResult.data || []).map(course => {
-        const activity = userActivity.find(a => a.course_id === course.id);
-        const details = ratingDetailsMap.get(course.id);
-        return {
-          ...course,
-          is_top100: activity?.is_top100 || false,
-          last_played_at: activity?.last_played_at || null,
-          rating_value: activity?.rating_value || null,
-          has_rating: activity?.has_rating || false,
-          rating_id: ratingIdMap.get(course.id) || null,
-          design_score: details?.design_score ?? null,
-          condition_score: details?.condition_score ?? null,
-          clubhouse_score: details?.clubhouse_score ?? null,
-          facilities_score: details?.facilities_score ?? null,
-          review_date: details?.review_date ?? null,
-          review_text: details?.review ?? null,
-        } as CourseCardData & { global_rank?: number | null; review_text?: string | null };
-      });
+      const { data, error } = await supabase
+        .from('golf_courses')
+        .select('id, name, country, sub_country, thumbnail_image, global_rank')
+        .in('id', courseIds);
+      if (error) throw error;
+      return data || [];
     },
     staleTime: 60_000,
   });
+
+  // Breakdown scores + review_date come from the lifted ratingRows (one
+  // course_ratings select in ProfileCoursesTab), merged here.
+  const courses = useMemo(() => {
+    const ratingDetailsMap = new Map<string, ProfileRatingRow>();
+    (ratingRows || []).forEach(r => ratingDetailsMap.set(r.course_id, r));
+    return courseRows.map(course => {
+      const activity = userActivity.find(a => a.course_id === course.id);
+      const details = ratingDetailsMap.get(course.id);
+      return {
+        ...course,
+        is_top100: activity?.is_top100 || false,
+        last_played_at: activity?.last_played_at || null,
+        rating_value: activity?.rating_value || null,
+        has_rating: activity?.has_rating || false,
+        rating_id: details?.id || null,
+        design_score: details?.design_score ?? null,
+        condition_score: details?.condition_score ?? null,
+        clubhouse_score: details?.clubhouse_score ?? null,
+        facilities_score: details?.facilities_score ?? null,
+        review_date: details ? (details.review_date ?? details.created_at ?? null) : null,
+        review_text: details?.review ?? null,
+      } as CourseCardData & { global_rank?: number | null; review_text?: string | null };
+    });
+  }, [courseRows, ratingRows, userActivity]);
 
   // Tab counts
   const tabCounts = useMemo(() => ({
