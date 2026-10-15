@@ -31,6 +31,39 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useTop100ProgressForUser } from './useTop100ProgressForUser';
 
+export interface CountryRow {
+  id: string;
+  sub_country: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+}
+export interface CountryTally { country: string; courses: number }
+export interface CoursePoint { id: string; lat: number; lng: number }
+export interface CountriesSummary {
+  count: number;
+  tallies: CountryTally[];
+  /** Courses with both coordinates; the rest still count everywhere else. */
+  points: CoursePoint[];
+}
+const EMPTY_COUNTRIES: CountriesSummary = { count: 0, tallies: [], points: [] };
+
+/** Null and empty sub_country never become a counted country. */
+export function summariseCountries(rows: CountryRow[]): CountriesSummary {
+  const m = new Map<string, number>();
+  const points: CoursePoint[] = [];
+  for (const r of rows) {
+    const c = r.sub_country?.trim();
+    if (c) m.set(c, (m.get(c) ?? 0) + 1);
+    if (r.latitude != null && r.longitude != null) {
+      points.push({ id: r.id, lat: Number(r.latitude), lng: Number(r.longitude) });
+    }
+  }
+  const tallies = [...m.entries()]
+    .map(([country, courses]) => ({ country, courses }))
+    .sort((a, b) => b.courses - a.courses || a.country.localeCompare(b.country));
+  return { count: tallies.length, tallies, points };
+}
+
 export function useUserCourseSummary(userId: string | undefined) {
   const enabled = !!userId;
 
@@ -52,10 +85,10 @@ export function useUserCourseSummary(userId: string | undefined) {
   });
 
   const countriesQuery = useQuery({
-    queryKey: ['user-countries-played-count', userId],
+    queryKey: ['user-countries-played-summary', userId],
     enabled,
     queryFn: async () => {
-      if (!userId) return 0;
+      if (!userId) return EMPTY_COUNTRIES;
 
       const { data: activities, error: actError } = await supabase
         .from('user_course_activity' as any)
@@ -65,17 +98,17 @@ export function useUserCourseSummary(userId: string | undefined) {
       if (actError) throw actError;
 
       const courseIds = (activities || []).map((a: any) => a.course_id);
-      if (courseIds.length === 0) return 0;
+      if (courseIds.length === 0) return EMPTY_COUNTRIES;
 
+      // golf_courses.country is a REGION grouping ('Britain & Ireland', 'Continental Europe', 'Middle East'), NOT a country. The country is sub_country. Reading .country here is what made this panel report 3 countries for a member who has played in 9. The ~20 files under src/components/courses/ that display a location already use sub_country — this hook is following that convention, not inventing one. Do not 'simplify' this back to .country.
       const { data: courses, error: courseError } = await supabase
         .from('golf_courses')
-        .select('id, country')
+        .select('id, sub_country, latitude, longitude')
         .in('id', courseIds);
 
       if (courseError) throw courseError;
 
-      const uniqueCountries = new Set((courses || []).map(c => c.country));
-      return uniqueCountries.size;
+      return summariseCountries((courses || []) as CountryRow[]);
     },
     staleTime: 60_000,
   });
@@ -90,7 +123,10 @@ export function useUserCourseSummary(userId: string | undefined) {
   return {
     /** Null means unknown (unrun or failed read), never "zero courses". */
     totalCoursesPlayed: coursesKnown ? coursesQuery.data ?? null : null,
-    countriesPlayed: countriesKnown ? countriesQuery.data ?? null : null,
+    countriesPlayed: countriesKnown ? countriesQuery.data?.count ?? null : null,
+    /** Per-country tallies (sub_country), descending. Null when unknown. */
+    countryTallies: countriesKnown ? countriesQuery.data?.tallies ?? null : null,
+    coursePoints: countriesKnown ? countriesQuery.data?.points ?? null : null,
     top100Progress,
     /** True only while a read is genuinely in flight; an error ends loading. */
     isLoading:

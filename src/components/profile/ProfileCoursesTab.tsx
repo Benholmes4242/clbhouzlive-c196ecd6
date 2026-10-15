@@ -9,6 +9,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserAnalyticsCourses, type UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
+import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
+import { useTop100Distribution } from '@/hooks/gam/useTop100Distribution';
+import { useGamRecordConfig } from '@/hooks/gam/useGamRecordConfig';
+import { top100Standing } from './handicap/whs/gam/trophy-room/career/shareModel';
+import { CoursesMapSection, type MapPoint } from './courses/CoursesMapSection';
 
 interface ProfileCoursesTabProps {
   userId: string;
@@ -33,7 +38,22 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   isOwnProfile,
   displayName,
 }) => {
-  const { totalCoursesPlayed, countriesPlayed, isLoading } = useUserCourseSummary(userId);
+  const { totalCoursesPlayed, countriesPlayed, countryTallies, coursePoints, isLoading } = useUserCourseSummary(userId);
+  const { data: userActivity } = useUserCourseActivity(userId);
+  const { data: distribution } = useTop100Distribution();
+  const { data: recordConfig } = useGamRecordConfig();
+
+  // One count, two consumers. The record tile and the filter chip must never disagree. This is distinct courses in ANY Top 100 list, which is NOT total_played_top100 (that is the global list alone).
+  const top100Ids = useMemo(
+    () => (userActivity ? new Set(userActivity.filter((a) => a.is_top100).map((a) => a.course_id)) : null),
+    [userActivity],
+  );
+  const top100Count = top100Ids ? top100Ids.size : null;
+
+  const mapPoints = useMemo<MapPoint[]>(
+    () => (coursePoints ?? []).map((p) => ({ ...p, isTop100: !!top100Ids?.has(p.id) })),
+    [coursePoints, top100Ids],
+  );
 
   // PAGE-LEVEL scoring source. The RPC resolves auth.uid() server-side, so it
   // is own-profile only - rows never re-subscribe per card.
@@ -84,6 +104,23 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   });
   const avgRating = ratingSummary?.avg ?? null;
 
+  // World Top 100 standing - the GLOBAL list's count only, matched to the
+  // trophy-room caller's floor/crossover/minDenominator. Never quoted against
+  // the all-lists tile figure.
+  const globalPlayed = top100Progress?.total_played_top100 ?? null;
+  let standingLine: string | null = null;
+  if (isOwnProfile && globalPlayed != null && distribution && recordConfig) {
+    const st = top100Standing(
+      distribution, 'global', globalPlayed,
+      recordConfig.top100ShareFloor, recordConfig.top100RankCrossover, recordConfig.shareMinDenominator,
+    );
+    if (st.kind === 'share') {
+      standingLine = `You have played ${globalPlayed} of the World Top 100 — more than ${st.pct}% of clbhouz members.`;
+    } else if (st.kind === 'ordinal') {
+      standingLine = `You have played ${globalPlayed} of the World Top 100 — among the top ${st.members} of any member.`;
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="pb-2">
@@ -112,12 +149,19 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
       <JourneySummaryCard
         coursesPlayed={totalCoursesPlayed}
         countriesPlayed={countriesPlayed}
-        avgRating={avgRating || null}
+        avgRating={avgRating ?? null}
         ratedCount={ratingSummary?.n ?? null}
-        top100Played={top100Progress?.total_played_top100 ?? null}
+        top100Played={top100Count}
+        standing={standingLine}
         isOwnProfile={isOwnProfile}
         displayName={displayName}
       />
+
+      {countryTallies && (
+        <div className="mt-6">
+          <CoursesMapSection tallies={countryTallies} points={mapPoints} />
+        </div>
+      )}
 
       {/* Section 2: Bucket List (hidden when empty) */}
       <div className="mt-6">
@@ -131,6 +175,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
           isOwnProfile={isOwnProfile}
           displayName={displayName}
           scoringByCourseId={scoringByCourseId}
+          top100Count={top100Count ?? undefined}
         />
       </div>
     </div>
