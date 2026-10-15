@@ -27,7 +27,7 @@ export interface GlobalNudge {
   remaining: number;
   totalPlayed: number;
   tierLabel: string;
-  tierName: string; // e.g., "Heritage Club"
+  tierName: string; // e.g., "All-Star Club"
   palette: TierPalette;
 }
 
