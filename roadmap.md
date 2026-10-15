@@ -1,5 +1,9 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## Profile Courses exact mock — 15 October
+- [ ] Match the Still to rate, Archive controls, year header and flat course rows to the uploaded mock.
+- [ ] Verify populated local rendering and full tests; hosted authenticated checks unavailable on external Supabase.
+
 ## Avatar crop cap F.3
 - [x] Cap both future crop outputs at 1440px without upscaling or changing JPEG quality.
 - [x] Measure both real modal outputs and prove under-cap JPEG bytes unchanged (both modals, 571×600).
