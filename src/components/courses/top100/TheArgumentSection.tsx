@@ -10,7 +10,7 @@ import type { ArgumentRow } from './theArgument';
 export function TheArgumentSection({ rows, qualifying }: { rows: ArgumentRow[]; qualifying: number }) {
   return (
     <section style={SECTION_WRAP}>
-      <SectionHead kicker="The argument" title="Where we disagree with the list" />
+      <SectionHead kicker="The argument" title="Where golfers disagree with the list" />
       <div style={{ marginTop: HEAD_GAP, display: 'grid', gap: 12 }}>
         {rows.map((r) => {
           const up = r.divergence > 0;
