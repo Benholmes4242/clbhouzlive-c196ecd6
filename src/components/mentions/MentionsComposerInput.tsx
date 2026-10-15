@@ -515,7 +515,7 @@ function AnchoredMentionsPanel({ anchorRef, children, placement = 'dock' }: Anch
     } else {
       setDebugLine(null);
     }
-  }, [anchorRef]);
+  }, [anchorRef, placement]);
 
   // Correction pass: put the bottom edge exactly on targetBottom.
   React.useLayoutEffect(() => {
@@ -693,6 +693,7 @@ export function MentionsComposerInput({
   inputRef,
   textStyle,
   currentUserId,
+  panelPlacement = 'dock',
 }: Props) {
   const mentionsStyle = React.useMemo(() => buildMentionsStyle(textStyle), [textStyle]);
   const anchorRef = React.useRef<HTMLDivElement | null>(null);
