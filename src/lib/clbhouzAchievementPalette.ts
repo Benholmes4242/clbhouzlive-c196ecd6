@@ -16,6 +16,12 @@
  * ╚══════════════════════════════════════════════════════════════════════════════════════════╝
  */
 
+import { getMilestoneMetaByThreshold } from '@/config/achievements';
+
+const tierNameFor = (threshold: number): string | null =>
+  getMilestoneMetaByThreshold(threshold)?.tierName ?? null;
+
+
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // TIER CONFIG - SINGLE SOURCE OF TRUTH FOR ALL AVATAR RINGS & PROGRESS BARS
 // ═══════════════════════════════════════════════════════════════════════════════════════════
@@ -29,14 +35,14 @@ export interface TierConfigEntry {
 
 export const TIER_CONFIG = {
   0: { threshold: 0, name: null, color: '#B8C6C9', paletteKey: 'NONE' as const },
-  1: { threshold: 5, name: 'Rookie Club', color: '#B8C6C9', paletteKey: 'FAIR' as const },
-  2: { threshold: 10, name: 'Fairway Club', color: '#9AB0A3', paletteKey: 'MILD' as const },
-  3: { threshold: 20, name: 'Founders Club', color: '#E5D0A1', paletteKey: 'STEADY' as const },
-  4: { threshold: 50, name: 'Heritage Club', color: '#7A9E7A', paletteKey: 'RESPECTABLE' as const },
-  5: { threshold: 100, name: 'Century Club', color: '#5A8A5A', paletteKey: 'GOOD' as const },
-  6: { threshold: 200, name: 'Elite Club', color: '#4A7A4A', paletteKey: 'VERY_GOOD' as const },
-  7: { threshold: 300, name: 'Legendary Club', color: '#334E3D', paletteKey: 'EXCELLENT' as const },
-  8: { threshold: 400, name: 'Grand Slam Club', color: '#C1A84C', paletteKey: 'OUTSTANDING' as const },
+  1: { threshold: 5, name: tierNameFor(5), color: '#B8C6C9', paletteKey: 'FAIR' as const },
+  2: { threshold: 10, name: tierNameFor(10), color: '#9AB0A3', paletteKey: 'MILD' as const },
+  3: { threshold: 20, name: tierNameFor(20), color: '#E5D0A1', paletteKey: 'STEADY' as const },
+  4: { threshold: 50, name: tierNameFor(50), color: '#7A9E7A', paletteKey: 'RESPECTABLE' as const },
+  5: { threshold: 100, name: tierNameFor(100), color: '#5A8A5A', paletteKey: 'GOOD' as const },
+  6: { threshold: 200, name: tierNameFor(200), color: '#4A7A4A', paletteKey: 'VERY_GOOD' as const },
+  7: { threshold: 300, name: tierNameFor(300), color: '#334E3D', paletteKey: 'EXCELLENT' as const },
+  8: { threshold: 400, name: tierNameFor(400), color: '#C1A84C', paletteKey: 'OUTSTANDING' as const },
 } as const;
 
 export type TierLevel = keyof typeof TIER_CONFIG;

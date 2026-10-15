@@ -19,7 +19,7 @@
  */
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// MILESTONE THRESHOLDS - The 8 clubs from Rookie (5) to Grand Slam (400)
+// MILESTONE THRESHOLDS - The 8 clubs from Rookie (5) to Hall of Fame (400)
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 export const ACHIEVEMENT_MILESTONES = [
@@ -51,18 +51,27 @@ export interface MilestoneTierMeta {
 }
 
 /**
+ * The tierId values are FROZEN and no longer describe their names — 'fairway'
+ * is the id behind "Sophomore Club", 'founders' behind "Veteran Club",
+ * 'century' behind "Champion Club", 'grandslam' behind "Hall of Fame". They key
+ * the badge image filenames in public/emblems, the ring palette, the
+ * DivisionSlug union in src/types/championship.ts and rows already written in
+ * the database. Renaming an id to match its new name would take the badges
+ * down. Rename the NAME, never the ID.
+ */
+/**
  * Complete metadata for each milestone tier.
  * Ordered lowest → highest.
  */
 export const MILESTONE_TIER_META: readonly MilestoneTierMeta[] = [
   { threshold: 5,   tierId: 'rookie',    tierName: 'Rookie Club',     shortLabel: 'Rookie' },
-  { threshold: 10,  tierId: 'fairway',   tierName: 'Fairway Club',    shortLabel: 'Fairway' },
-  { threshold: 20,  tierId: 'founders',  tierName: 'Founders Club',   shortLabel: 'Founders' },
-  { threshold: 50,  tierId: 'heritage',  tierName: 'Heritage Club',   shortLabel: 'Heritage' },
-  { threshold: 100, tierId: 'century',   tierName: 'Century Club',    shortLabel: 'Century' },
-  { threshold: 200, tierId: 'elite',     tierName: 'Elite Club',      shortLabel: 'Elite' },
-  { threshold: 300, tierId: 'legendary', tierName: 'Legendary Club',  shortLabel: 'Legendary' },
-  { threshold: 400, tierId: 'grandslam', tierName: 'Grand Slam Club', shortLabel: 'Grand Slam' },
+  { threshold: 10,  tierId: 'fairway',   tierName: 'Sophomore Club',  shortLabel: 'Sophomore' },
+  { threshold: 20,  tierId: 'founders',  tierName: 'Veteran Club',    shortLabel: 'Veteran' },
+  { threshold: 50,  tierId: 'heritage',  tierName: 'All-Star Club',   shortLabel: 'All-Star' },
+  { threshold: 100, tierId: 'century',   tierName: 'Champion Club',   shortLabel: 'Champion' },
+  { threshold: 200, tierId: 'elite',     tierName: 'MVP Club',        shortLabel: 'MVP' },
+  { threshold: 300, tierId: 'legendary', tierName: 'Legend Club',     shortLabel: 'Legend' },
+  { threshold: 400, tierId: 'grandslam', tierName: 'Hall of Fame',    shortLabel: 'Hall of Fame' },
 ] as const;
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
