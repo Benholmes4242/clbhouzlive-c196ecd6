@@ -5,6 +5,7 @@ import { SectionHead, HEAD_GAP, SECTION_WRAP } from '@/components/courses/browse
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import type { ArgumentRow } from './theArgument';
+import { ordinal } from '@/lib/text/numbers';
 
 /** BRIEF_TOP_100_REBUILD §3. The caller renders nothing when rows is empty. */
 export function TheArgumentSection({ rows, qualifying }: { rows: ArgumentRow[]; qualifying: number }) {
@@ -24,9 +25,11 @@ export function TheArgumentSection({ rows, qualifying }: { rows: ArgumentRow[]; 
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</div>
                 <div style={{ fontSize: 11, color: A.DIM, marginTop: 3, fontVariantNumeric: 'tabular-nums' }}>
-                  List says <b style={{ color: A.BODY, fontWeight: 600 }}>#{r.publishedRank}</b> · members rate it{' '}
-                  <b style={{ color: A.BODY, fontWeight: 600 }}>{r.rating.toFixed(1)}</b> from{' '}
-                  <b style={{ color: A.BODY, fontWeight: 600 }}>{r.ratingCount}</b> ratings
+                  List says <b style={{ color: A.BODY, fontWeight: 600 }}>#{r.publishedRank}</b> · Rated{' '}
+                  <b style={{ color: A.BODY, fontWeight: 600 }}>{r.rating.toFixed(1)}</b> by{' '}
+                  <b style={{ color: A.BODY, fontWeight: 600 }}>{r.ratingCount}</b> members,{' '}
+                  <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.memberRank)}</b> of the{' '}
+                  <b style={{ color: A.BODY, fontWeight: 600 }}>{qualifying}</b> rated.
                 </div>
               </div>
               <div style={{ textAlign: 'right', flexShrink: 0 }}>
@@ -34,7 +37,6 @@ export function TheArgumentSection({ rows, qualifying }: { rows: ArgumentRow[]; 
                   <Arrow size={14} strokeWidth={3} aria-hidden />
                   {Math.abs(r.divergence)}
                 </div>
-                <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: A.FAINT, whiteSpace: 'nowrap' }}>Of the {qualifying} rated</div>
               </div>
             </div>
           );

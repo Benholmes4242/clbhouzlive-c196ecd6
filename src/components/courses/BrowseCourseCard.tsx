@@ -199,7 +199,7 @@ export function BrowseCourseCard({
               </span>
               {row.course_record != null && recordHolder ? (
                 <>
-                  {' · best '}
+                  {' · Best '}
                   <span style={fig}>{row.course_record}</span>
                   {' by '}
                   <span style={{ color: A.BODY, fontWeight: 600 }}>{recordHolder}</span>
@@ -219,7 +219,7 @@ export function BrowseCourseCard({
         ) : null}
         {top100 && row.rounds === 0 && viewerRounds === 0 ? (
           <div style={{ marginTop: 11, fontSize: 11, lineHeight: 1.5 }}>
-            <span style={{ color: A.FAINT }}>No member has played here yet.</span>{' '}
+            <span style={{ color: A.FAINT }}>No member has logged an official round yet.</span>{' '}
             <span style={{ color: A.DIM }}>Be the first.</span>
           </div>
         ) : null}

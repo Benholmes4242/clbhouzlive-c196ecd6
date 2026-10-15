@@ -27,6 +27,8 @@ export interface ArgumentInput {
 export interface ArgumentRow extends ArgumentInput {
   publishedRank: number;
   rating: number;
+  memberRank: number;
+  listRank: number;
   /** Positive = our members place it higher than the list does. */
   divergence: number;
 }
@@ -47,7 +49,7 @@ export function argumentRows(inputs: ArgumentInput[]): ArgumentRow[] {
   const listPos = new Map(byList.map((c, i) => [c.id, i + 1]));
   const memberPos = new Map(byMembers.map((c, i) => [c.id, i + 1]));
   return set
-    .map((c) => ({ ...c, divergence: (listPos.get(c.id) as number) - (memberPos.get(c.id) as number) }))
+    .map((c) => ({ ...c, memberRank: memberPos.get(c.id) as number, listRank: listPos.get(c.id) as number, divergence: (listPos.get(c.id) as number) - (memberPos.get(c.id) as number) }))
     .filter((c) => c.divergence !== 0)
     .sort((a, b) => Math.abs(b.divergence) - Math.abs(a.divergence) || a.publishedRank - b.publishedRank)
     .slice(0, ARGUMENT_ROWS);
