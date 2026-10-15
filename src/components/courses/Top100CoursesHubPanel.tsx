@@ -252,8 +252,8 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
             {visibleCourses.map((course, index) => {
               const item = enrichment.get(course.id);
               const row = toBrowseRow(course, item, renderedList);
+              // The id is an anchor with no current consumer, kept for deep links.
               return (
-                {/* Anchor with no current consumer, kept for deep links. */}
                 <div key={course.id} id={`top100-card-${course.id}`} style={{ scrollMarginTop: 'max(env(safe-area-inset-top, 0px), 47px)', marginBottom: index < visibleCourses.length - 1 ? 32 : 0 }}>
                   <BrowseCourseCard
                     row={row}
