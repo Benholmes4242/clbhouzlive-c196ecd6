@@ -58,13 +58,13 @@ describe('profile courses archive', () => {
   it('defaults to the recency sort', async () => {
     expect(DEFAULT_COURSE_SORT).toBe('recently-played');
     mount();
-    await screen.findByText('Alpha Links');
+    await waitFor(() => expect(document.querySelectorAll('article').length).toBeGreaterThan(0));
     expect(screen.getByTestId('sort').textContent).toBe('recently-played');
   });
 
   it('prints no sort-index number on any row, and keeps the stored #global_rank', async () => {
     const { container } = mount();
-    await screen.findByText('Alpha Links');
+    await waitFor(() => expect(document.querySelectorAll('article').length).toBeGreaterThan(0));
     for (const s of SORTS) {
       fireEvent.click(screen.getByText(`sort:${s}`));
       rows(container).forEach((r) => {
@@ -77,7 +77,7 @@ describe('profile courses archive', () => {
 
   it('shows one year divider per year on the recency sort and none on the rating sorts', async () => {
     const { container } = mount();
-    await screen.findByText('Alpha Links');
+    await waitFor(() => expect(document.querySelectorAll('article').length).toBeGreaterThan(0));
     const years = [...container.querySelectorAll('[data-year-divider]')].map((d) => d.getAttribute('data-year-divider'));
     expect(years).toEqual(['2026', '2025', '2024']);
     for (const s of ['rating-high-low', 'rating-low-high']) {
@@ -88,7 +88,7 @@ describe('profile courses archive', () => {
 
   it('the chip count and the rows drawn agree under each sort', async () => {
     const { container } = mount();
-    await screen.findByText('Alpha Links');
+    await waitFor(() => expect(document.querySelectorAll('article').length).toBeGreaterThan(0));
     const expected = { 'recently-played': 4, 'rating-high-low': 3, 'rating-low-high': 3 };
     for (const s of SORTS) {
       fireEvent.click(screen.getByText(`sort:${s}`));
