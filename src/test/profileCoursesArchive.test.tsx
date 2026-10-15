@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -105,10 +105,10 @@ describe('profile courses archive — mock design', () => {
       <FilterBar activeTab="all" onTabChange={() => {}} activeSort={DEFAULT_COURSE_SORT} onSortChange={() => {}}
         activeCountry="global" onCountryChange={() => {}} allCount={4} top100Count={1} />,
     );
-    const chips = screen.getAllByTestId('sort-chip');
+    const chips = within(screen.getByRole('tablist', { name: 'Sort courses' })).getAllByRole('tab');
     expect(chips.map((c) => c.textContent)).toEqual(['Recent', 'Highest rated', 'Lowest rated']);
-    expect(chips[0].getAttribute('aria-checked')).toBe('true');
-    expect(chips.filter((c) => c.getAttribute('aria-checked') === 'true')).toHaveLength(1);
+    expect(chips[0].getAttribute('aria-selected')).toBe('true');
+    expect(chips.filter((c) => c.getAttribute('aria-selected') === 'true')).toHaveLength(1);
     expect(screen.queryByText(/rank/i)).toBeNull();
     expect(screen.queryByText(/^country$/i)).toBeNull();
   });
