@@ -72,7 +72,7 @@ describe('Your hundred peek row', () => {
     expect(cell('Turnberry').style.background).not.toBe('transparent');
     expect(cell('Royal Dornoch').style.background).toBe('transparent');
     expect(cell('Royal Dornoch').style.boxShadow).toContain('inset');
-    expect(cell('Cruden Bay').style.background).toBe(cell('Muirfield').style.background);
+    expect(cell('Cruden Bay').style.background).toBe(cell('Nobody Links').style.background);
     expect(cell('Cruden Bay').style.boxShadow).toBe('');
     const solid = cell('Turnberry').style.background;
     const all = screen.getAllByRole('button').filter((b) => b.hasAttribute('aria-pressed'));
