@@ -559,6 +559,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                   }
                   elements.push(
                     <DossierCard
+                      appearance="archive"
                       key={course.id}
                       course={toRatedCourseData(course)}
                       unrated
@@ -590,6 +591,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
                 elements.push(
                   <DossierCard
+                      appearance="archive"
                     key={course.id}
                     course={toRatedCourseData(course)}
                     onCourseClick={handleCourseClick}
@@ -638,6 +640,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
               const rated = isRatedRow(course);
               elements.push(
                 <DossierCard
+                      appearance="archive"
                   key={course.id}
                   course={toRatedCourseData(course)}
                   unrated={!rated}
