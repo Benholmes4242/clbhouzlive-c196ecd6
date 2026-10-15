@@ -173,6 +173,12 @@ interface Props {
    * call to satisfy this prop (that reintroduces a first-keystroke race).
    */
   currentUserId?: string | null;
+  /**
+   * Where the mention panel sits. 'dock' (default) rests on the keyboard for
+   * composers with room beneath them; 'above' floats over a composer that
+   * itself sits on the keyboard (comments). Chosen by the host, never guessed.
+   */
+  panelPlacement?: MentionsPanelMode;
 }
 
 const DEFAULT_TEXT_STYLE: Required<Pick<MentionsTextStyle, 'fontSize' | 'lineHeight' | 'padding' | 'color' | 'caretColor'>> = {
@@ -400,12 +406,17 @@ export type MentionsPanelMode = 'dock' | 'above';
  *     panel floats above the composer and never covers it.
  */
 export function placeMentionsPanel(p: {
+  placement?: MentionsPanelMode;
   vTop: number; vBottom: number; anchorTop: number; anchorBottom: number; safeTop?: number;
 }): { mode: MentionsPanelMode; targetBottom: number; maxHeight: number } {
   const safeTop = p.safeTop ?? 0;
-  const spaceBelow = p.vBottom - p.anchorBottom - 8;
-  if (spaceBelow >= MIN_PANEL) {
-    return { mode: 'dock', targetBottom: p.vBottom, maxHeight: Math.min(PANEL_MAX_HEIGHT, spaceBelow) };
+  if ((p.placement ?? 'dock') === 'dock') {
+    const spaceBelow = p.vBottom - p.anchorBottom - 8;
+    return {
+      mode: 'dock',
+      targetBottom: p.vBottom,
+      maxHeight: Math.min(PANEL_MAX_HEIGHT, p.vBottom - safeTop - 16, Math.max(MIN_PANEL, spaceBelow)),
+    };
   }
   return {
     mode: 'above',
@@ -467,7 +478,7 @@ interface PanelGeom {
   ready: boolean;
 }
 
-function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
+function AnchoredMentionsPanel({ anchorRef, children, placement = 'dock' }: AnchoredPanelProps & { placement?: MentionsPanelMode }) {
   const panelRef = React.useRef<HTMLDivElement | null>(null);
   const [geom, setGeom] = React.useState<PanelGeom | null>(null);
   // Perf-toggle-only placement readout (admin Settings perf switch).
@@ -481,7 +492,7 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
     const { vTop, vBottom } = readVisibleArea(window);
     const a = anchor.getBoundingClientRect();
     const place = placeMentionsPanel({
-      vTop, vBottom, anchorTop: a.top, anchorBottom: a.bottom, safeTop: readSafeTop(),
+      placement, vTop, vBottom, anchorTop: a.top, anchorBottom: a.bottom, safeTop: readSafeTop(),
     });
     setGeom(prev => {
       if (prev && prev.mode === place.mode && Math.abs(prev.targetBottom - place.targetBottom) < 0.5 &&
@@ -716,9 +727,9 @@ export function MentionsComposerInput({
 
   const customSuggestionsContainer = React.useCallback(
     (children: React.ReactNode) => (
-      <AnchoredMentionsPanel anchorRef={anchorRef}>{children}</AnchoredMentionsPanel>
+      <AnchoredMentionsPanel anchorRef={anchorRef} placement={panelPlacement}>{children}</AnchoredMentionsPanel>
     ),
-    [],
+    [panelPlacement],
   );
 
   return (
