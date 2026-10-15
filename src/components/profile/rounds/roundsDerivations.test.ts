@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { courseStats, monthStats, seasonCompare, yearStats } from './roundsDerivations';
+import { courseStats, monthHighlights, monthStats, seasonCompare, yearStats } from './roundsDerivations';
 import type { ProfileRound } from './useProfileRounds';
 
 let n = 0;
@@ -60,5 +60,22 @@ describe('roundsDerivations', () => {
     const s = seasonCompare([R({ play_date: '2026-04-01' }), R({ play_date: '2025-04-01', gross_score: null })], 2026);
     expect(s.lastAvg).toBeNull();
     expect(s.delta).toBeNull();
+  });
+});
+
+describe('monthHighlights', () => {
+  it('names busiest and best month from three scored months', () => {
+    const rs = [
+      R({ play_date: '2026-03-01', gross_score: 80 }), R({ play_date: '2026-03-08', gross_score: 82 }),
+      R({ play_date: '2026-04-01', gross_score: 75 }), R({ play_date: '2026-05-01', gross_score: 85 }),
+    ];
+    expect(monthHighlights(rs, 2026)).toEqual({ busiest: 2, best: 3 });
+  });
+  it('is null with fewer than three scored months', () => {
+    expect(monthHighlights([R({ play_date: '2026-03-01' }), R({ play_date: '2026-04-01' })], 2026)).toBeNull();
+  });
+  it('is null on a busiest-month tie', () => {
+    const rs = [R({ play_date: '2026-03-01', gross_score: 80 }), R({ play_date: '2026-04-01', gross_score: 75 }), R({ play_date: '2026-05-01', gross_score: 85 })];
+    expect(monthHighlights(rs, 2026)).toBeNull();
   });
 });

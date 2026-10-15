@@ -43,7 +43,9 @@ export interface ProfileRound {
   /** false when the viewer could not read the whs_scores row — treat as unknown, never as 18. */
   whs_joined: boolean;
   /** whs_scores.is_counter, projected by get_profile_rounds. Read only through
-   *  countsTowardIndex(); absent reads as not counting. */
+   *  countsTowardIndex(); absent reads as not counting. Consumers: ProfileHero
+   *  (the counting figure, and `countingKnown`, which decides whether the hero
+   *  claims anything at all) alongside RoundsThatCountSection. Do not remove. */
   is_counter?: boolean | null;
 }
 

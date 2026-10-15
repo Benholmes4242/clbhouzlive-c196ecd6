@@ -851,6 +851,7 @@ const ProfilePageV2Content: React.FC = () => {
           <ProfileRoundsTab
             userId={profile.id}
             isOwnProfile={isSelf}
+            viewerId={user?.id}
           />
         );
       case 'achievements':
