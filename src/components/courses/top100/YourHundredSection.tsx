@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { ChevronRight } from 'lucide-react';
+import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
+import { courseRankLabels, RANK_LIST_BY_SLUG } from '@/features/courses/_shared/courseRankLabels';
 
 import { SectionHead, HEAD_GAP, SECTION_WRAP } from '@/components/courses/browse/SectionHead';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -57,11 +60,84 @@ interface Props {
   /** Rank-ordered ids for the active list (cell one = rank one). */
   courseIds: string[];
   enrichment: Map<string, Top100Enrichment>;
-  courseNames: Map<string, string>;
-  onCellTap: (courseId: string) => void;
+  subjects: Map<string, YourHundredSubject>;
+  onOpenCourse: (courseId: string) => void;
 }
 
-export function YourHundredSection({ viewerPlayed, total, courseIds, enrichment, courseNames, onCellTap }: Props) {
+export interface YourHundredSubject {
+  name: string;
+  imageUrl: string | null;
+  memberships: Array<{ list_slug: string; rank: number }>;
+}
+
+const STRONG: React.CSSProperties = { color: A.BODY, fontWeight: 700, fontVariantNumeric: 'tabular-nums' };
+
+function StatusLine({ e }: { e: Top100Enrichment | undefined }) {
+  const state = cellState(e);
+  if (state === 'played') {
+    return (
+      <>
+        <span style={{ color: A.AMBER, fontWeight: 700 }}>You played</span>
+        {e?.yourBest != null ? <> · Best <span style={STRONG}>{e.yourBest}</span></> : null}
+      </>
+    );
+  }
+  if (state === 'rated') {
+    const n = e?.playerCount ?? 0;
+    return (
+      <>
+        <span style={{ color: A.AMBER, fontWeight: 700 }}>You rated</span>
+        {e?.yourRating != null ? <> <span style={STRONG}>{e.yourRating.toFixed(1)}</span></> : null}
+        {n > 0 ? <> · <span style={STRONG}>{n}</span> members</> : null}
+      </>
+    );
+  }
+  if (state === 'member') {
+    return (
+      <>
+        <span style={STRONG}>{e?.playerCount ?? 0}</span> members
+        {e?.recordGross != null && e?.recordHolder ? <> · Best <span style={STRONG}>{e.recordGross}</span></> : null}
+      </>
+    );
+  }
+  return <span style={{ color: A.FAINT }}>No member has logged an official round yet.</span>;
+}
+
+function PeekRow({ id, subject, e, onOpen }: { id: string; subject: YourHundredSubject | undefined; e: Top100Enrichment | undefined; onOpen: () => void }) {
+  const ranks = courseRankLabels(
+    (subject?.memberships ?? [])
+      .filter((m) => m.list_slug in RANK_LIST_BY_SLUG && m.rank != null)
+      .map((m) => ({ list: RANK_LIST_BY_SLUG[m.list_slug], rank: Number(m.rank) })),
+  ).join(' · ');
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      style={{ display: 'flex', alignItems: 'center', gap: 11, width: '100%', minWidth: 0, background: 'transparent', border: 0, padding: 0, cursor: 'pointer', textAlign: 'left' }}
+    >
+      <div style={{ width: 52, height: 52, borderRadius: 8, overflow: 'hidden', flex: 'none' }}>
+        <CourseImageFallback courseId={id} courseName={subject?.name ?? ''} imageUrl={subject?.imageUrl ?? null} style={{ height: '100%' }} />
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK, lineHeight: 1.15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {subject?.name ?? ''}
+        </div>
+        {ranks ? (
+          <div data-testid="peek-ranks" style={{ marginTop: 3, fontSize: 11, fontWeight: 700, color: A.BODY, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{ranks}</div>
+        ) : null}
+        <div style={{ marginTop: 2, fontSize: 11, color: A.DIM, whiteSpace: 'nowrap' }}>
+          <StatusLine e={e} />
+        </div>
+      </div>
+      <ChevronRight size={16} color={A.DIM} style={{ flex: 'none', paddingLeft: 4 }} />
+    </button>
+  );
+}
+
+export function YourHundredSection({ viewerPlayed, total, courseIds, enrichment, subjects, onOpenCourse }: Props) {
+  const [selected, setSelected] = useState<string | null>(null);
+  // A new region is a different hundred: drop the selection.
+  useEffect(() => { setSelected(null); }, [courseIds]);
   const current = getCurrentMilestoneMeta(viewerPlayed);
   const nextThreshold = getNextMilestone(viewerPlayed);
   const next = nextThreshold != null ? getMilestoneMetaByThreshold(nextThreshold) : undefined;
@@ -96,20 +172,31 @@ export function YourHundredSection({ viewerPlayed, total, courseIds, enrichment,
           <button
             key={id}
             type="button"
-            onClick={() => onCellTap(id)}
-            aria-label={`#${i + 1} ${courseNames.get(id) ?? ''}`.trim()}
-            style={{ aspectRatio: '1', borderRadius: 3, padding: 0, border: 0, cursor: 'pointer', ...cellStyle(cellState(enrichment.get(id))) }}
+            onClick={() => setSelected((cur) => (cur === id ? null : id))}
+            aria-label={`#${i + 1} ${subjects.get(id)?.name ?? ''}`.trim()}
+            aria-pressed={selected === id}
+            style={{
+              aspectRatio: '1', borderRadius: 3, padding: 0, border: 0, cursor: 'pointer',
+              ...cellStyle(cellState(enrichment.get(id))),
+              ...(selected === id ? { boxShadow: `0 0 0 2px ${A.CANVAS}, 0 0 0 4px ${A.INK}` } : null),
+            }}
           />
         ))}
       </div>
 
-      <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: '6px 14px' }}>
+      <div style={{ marginTop: 12, minHeight: 52, display: 'flex', alignItems: 'center' }}>
+        {selected ? (
+          <PeekRow id={selected} subject={subjects.get(selected)} e={enrichment.get(selected)} onOpen={() => onOpenCourse(selected)} />
+        ) : (
+      <div data-testid="hundred-legend" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 14px' }}>
         {LEGEND.map(({ state, label }) => (
           <span key={state} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 10.5, color: A.DIM }}>
             <span aria-hidden style={{ width: 9, height: 9, borderRadius: 2, ...cellStyle(state) }} />
             {label}
           </span>
         ))}
+      </div>
+        )}
       </div>
     </section>
   );
