@@ -1,10 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { type RatedCourseData } from './my-ratings/myRatingsTiers';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { Button } from '@/components/ui/button';
-import { SELECTED_EDGE } from '@/components/ui/RailChips';
+import { playDateStandalone } from '@/components/explore-tab-new/courseled/discoverWhen';
 
 interface BreakdownsPromptProps {
   missingCount: number;
@@ -13,18 +14,22 @@ interface BreakdownsPromptProps {
   variant?: 'breakdowns' | 'review';
 }
 
+export const STILL_TO_RATE_CAP = 12;
+
 /**
- * Page-level "still to rate" prompt at the top of AllCoursesList, in the
- * signed-off mock's compact form: a section head with the count in the title,
- * then one row of three thumbnails, a "+n" tile and the action. Names and dates
- * live in the picker sheet, not here.
+ * Named tiles, scrolled. The photograph alone could not tell a member which
+ * course it was — eleven unrated courses and not one of them identifiable. The
+ * name and the date played are the information here; the picture is
+ * decoration. Every unrated course is in the scroller up to the cap, so there
+ * is no remainder tile to place.
  */
 const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({ missingCount, courses, onTap }) => {
   const { t } = useTranslation('courses');
+  const navigate = useNavigate();
   if (missingCount === 0) return null;
 
-  const preview = courses.slice(0, 3);
-  const remainder = missingCount - preview.length;
+  const tiles = courses.slice(0, STILL_TO_RATE_CAP);
+  const capped = missingCount > STILL_TO_RATE_CAP;
 
   return (
     <section data-testid="still-to-rate">
@@ -34,72 +39,78 @@ const BreakdownsPrompt: React.FC<BreakdownsPromptProps> = ({ missingCount, cours
         kicker={t('toRate.kicker', { defaultValue: 'STILL TO RATE' })}
         title={`${missingCount} ${missingCount === 1 ? 'course is' : 'courses are'} waiting`}
       />
-      <div className="archive-preview-row">
-        <div className="archive-preview-tiles">
-          {preview.map((c) => (
-            <Button
-              variant="ghost"
-              className="archive-control archive-preview-tile"
-              key={c.id}
-              type="button"
-              aria-label={c.name}
-              onClick={() => onTap('preview')}
+      <div
+        className="still-to-rate-scroller"
+        style={{
+          marginTop: 12,
+          display: 'flex',
+          gap: 10,
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        <style>{`.still-to-rate-scroller::-webkit-scrollbar{display:none}`}</style>
+        {tiles.map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            data-testid="still-to-rate-tile"
+            aria-label={c.name}
+            // Same destination as the matching row in BreakdownsPickerSheet.
+            onClick={() => navigate(`/courses/${c.id}/rate`)}
+            style={{ width: 100, flexShrink: 0, padding: 0, border: 0, background: 'transparent', cursor: 'pointer', textAlign: 'left' }}
+          >
+            <div
               style={{
-                border: 0,
-                padding: 0,
-                cursor: 'pointer',
+                width: 100,
+                height: 68,
+                borderRadius: 9,
                 backgroundImage: c.thumbnail_image ? `url(${c.thumbnail_image})` : undefined,
                 backgroundColor: A.TRACK,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
               }}
             />
-          ))}
-          {remainder > 0 && (
-            <Button
-              variant="ghost"
-              className="archive-control archive-preview-tile"
-              type="button"
-              onClick={() => onTap('preview')}
+            <div
               style={{
-                border: `1px dashed ${SELECTED_EDGE}`,
-                background: 'transparent',
-                padding: 0,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                marginTop: 6,
                 fontSize: 11,
                 fontWeight: 700,
-                color: A.DIM,
-                fontVariantNumeric: 'tabular-nums',
+                color: A.INK,
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
               }}
             >
-              {`+${remainder}`}
-            </Button>
-          )}
-        </div>
-        <Button
-          variant="ghost"
-          className="archive-control"
-          type="button"
-          onClick={() => onTap('action')}
-          style={{
-            marginLeft: 'auto',
-            flexShrink: 0,
-            fontSize: 14,
-            fontWeight: 700,
-            color: A.AMBER,
-            background: 'transparent',
-            border: 0,
-            padding: 0,
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {`${t('toRate.action', { defaultValue: 'Rate them' })} \u203A`}
-        </Button>
+              {c.name}
+            </div>
+            <div style={{ marginTop: 2, fontSize: 10, color: A.DIM }}>
+              {playDateStandalone(c.review_date ?? c.last_played_at)}
+            </div>
+          </button>
+        ))}
       </div>
+      <Button
+        variant="ghost"
+        className="archive-control"
+        type="button"
+        onClick={() => onTap('action')}
+        style={{
+          marginTop: 12,
+          fontSize: 12,
+          fontWeight: 700,
+          color: A.AMBER,
+          background: 'transparent',
+          border: 0,
+          padding: 0,
+          cursor: 'pointer',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {capped ? `Rate all ${missingCount} \u203A` : `${t('toRate.action', { defaultValue: 'Rate them' })} \u203A`}
+      </Button>
     </section>
   );
 };
