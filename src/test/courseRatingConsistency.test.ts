@@ -45,7 +45,7 @@ describe('C1 course rating consistency', () => {
     const card = src('src/components/posts/ReviewBottomSheet.tsx');
     const block = src('src/components/courses/course-detail/CategoryScores.tsx');
     expect(course).toContain('<OverallScoreLine');
-    expect(reviews).toContain('<OverallScoreLine');
+    expect(reviews).toContain('courseSubScoreTone(score)');
     expect(block).toContain('const tone = courseSubScoreTone(score)');
     expect(card).toContain('const ratingColor = courseSubScoreTone(rating)');
   });
