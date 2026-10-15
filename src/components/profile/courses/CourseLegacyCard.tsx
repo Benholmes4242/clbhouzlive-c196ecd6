@@ -134,7 +134,7 @@ export const CourseLegacyCard: React.FC<CourseLegacyCardProps> = ({
         onClick={() => {}}
         style={{
           marginTop: 12, width: '100%', borderRadius: 10, padding: 11, border: 0,
-          background: MEDAL_GOLD, color: A.CANVAS ?? A.INK, fontFamily: SANS, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+          background: MEDAL_GOLD, color: A.CANVAS, fontFamily: SANS, fontSize: 13, fontWeight: 700, cursor: 'pointer',
         }}
       >
         Create card
