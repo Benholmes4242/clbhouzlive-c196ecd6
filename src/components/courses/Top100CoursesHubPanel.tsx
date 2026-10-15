@@ -8,12 +8,10 @@ import { RAIL_CHIP_GEOMETRY, RailChips } from '@/components/ui/RailChips';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
-import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useTop100Enrichment, type Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 import type { CourseListMembership } from '@/hooks/useGolfCoursesSearch';
 import { getPageScrollTop, scrollPageTo } from '@/lib/getScrollParent';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { COURSE_BROWSE_DESCRIPTION } from './courseBrowseTypography';
 import { CoursesSearchField } from '@/features/explore-magazine/CoursesSearchField';
 import { SectionHead, SECTION_WRAP } from './browse/SectionHead';
 import { YourHundredSection } from './top100/YourHundredSection';
@@ -94,8 +92,8 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
   const [selectedList, setSelectedList] = useState(savedList);
   const [searchOpen, setSearchOpen] = useState(false);
   const [nameQuery, setNameQuery] = useState('');
+  const [yoursOnly, setYoursOnly] = useState(false);
   const restored = useRef(false);
-  const { data: summaries = [] } = useTop100ListSummaries(user?.id);
   const { data, isLoading, isError, refetch } = useGolfCoursesInfinite({ listSlug: selectedList });
 
   useEffect(() => {
@@ -106,15 +104,22 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
     const rows = data?.pages.flat() ?? [];
     return [...rows].sort((a, b) => (rankFor(a, selectedList) ?? 999) - (rankFor(b, selectedList) ?? 999));
   }, [data, selectedList]);
-  /* Search narrows what is rendered only. The rated / tracked sentences above
-     describe the whole list, so they keep counting the unfiltered rows. */
-  const visibleCourses = useMemo(() => {
-    const q = nameQuery.trim().toLowerCase();
-    if (!q) return courses;
-    return courses.filter((course) => (course.name ?? '').toLowerCase().includes(q));
-  }, [courses, nameQuery]);
   const ids = useMemo(() => courses.map((course) => course.id), [courses]);
   const enrichment = useTop100Enrichment(ids, user?.id, selectedList);
+  /* Search and "Yours" narrow what is rendered only (client-side, no query).
+     The head's rated / tracked meta describes the whole list, so it keeps
+     counting the unfiltered rows. */
+  const visibleCourses = useMemo(() => {
+    const q = nameQuery.trim().toLowerCase();
+    return courses.filter((course) => {
+      if (q && !(course.name ?? '').toLowerCase().includes(q)) return false;
+      if (yoursOnly) {
+        const e = enrichment.get(course.id);
+        if (!((e?.yourRounds ?? 0) > 0 || e?.ratedByYou)) return false;
+      }
+      return true;
+    });
+  }, [courses, nameQuery, yoursOnly, enrichment]);
   /* COMMUNITY counts: how many of the list ANYONE has rated / played. Not to be
      confused with the VIEWER counts below (BRIEF_TOP_100_REBUILD §2). */
   const communityRatedCount = courses.filter((course) => {
@@ -122,9 +127,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
     return item?.rating != null && item.ratingCount > 0;
   }).length;
   const communityPlayedCount = courses.filter((course) => (enrichment.get(course.id)?.roundsTracked ?? 0) > 0).length;
-  const total = summaries.find((summary) => summary.slug === selectedList)?.total_courses ?? courses.length;
   const heading = LIST_NAMES[selectedList] ?? 'Top 100';
-  const ratingSentence = `${communityRatedCount} of the ${total} ${total === 1 ? 'course' : 'courses'} ${communityRatedCount === 1 ? 'carries' : 'carry'} a rating.`;
   /* VIEWER counts. Played and the denominator come from the per-list row of
      user_top100_progress_view for the ACTIVE scope — never the global total and
      never a typed 100. Rated is the server's courses_rated_in_list for the active list. */
@@ -145,7 +148,6 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
       document.getElementById(`top100-card-${courseId}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   };
-  const roundSentence = `${communityPlayedCount} ${communityPlayedCount === 1 ? 'has' : 'have'} a tracked round.`;
 
   useEffect(() => {
     if (restored.current || courses.length === 0) return;
@@ -178,11 +180,11 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
       <section style={{ ...SECTION_WRAP, paddingBottom: 0 }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
           <SectionHead kicker="The list" tone="quiet" title={heading} />
-          <span style={{ color: A.MUTE, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>{communityRatedCount} rated</span>
+          <span style={{ color: A.MUTE, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
+            {communityRatedCount} rated · {communityPlayedCount} tracked
+          </span>
         </div>
-        <p style={{ ...COURSE_BROWSE_DESCRIPTION, margin: '10px 0 16px' }}>
-          {ratingSentence} {roundSentence}
-        </p>
+        <div style={{ height: 16 }} />
         {/* THE SAME INLINE SEARCH THE COURSES TAB CARRIES, one field component
             shared by both: a plain case-insensitive contains-match over the
             list already selected by the region chips. No catalogue query.
@@ -195,7 +197,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
           onChange={(next) => { restored.current = true; setSelectedList(next); }}
           ariaLabel="Top 100 region"
           align="center-when-fit"
-          trailing={(
+          trailing={(<>
             <button
               type="button"
               onClick={() => {
@@ -229,7 +231,28 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
                 <Search className="h-4 w-4" style={{ color: 'currentColor' }} aria-hidden />
               )}
             </button>
-          )}
+            {user ? (
+              <button
+                type="button"
+                onClick={() => setYoursOnly((prev) => !prev)}
+                aria-pressed={yoursOnly}
+                style={{
+                  alignSelf: 'stretch',
+                  padding: RAIL_CHIP_GEOMETRY.md.padding,
+                  borderRadius: RAIL_CHIP_GEOMETRY.md.radius,
+                  border: `1px solid ${yoursOnly ? 'transparent' : A.BORDER}`,
+                  background: yoursOnly ? A.INK : 'transparent',
+                  color: yoursOnly ? A.CANVAS : A.MUTE,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                }}
+              >
+                Yours
+              </button>
+            ) : null}
+          </>)}
         />
         {searchOpen ? (
           <div style={{ marginTop: 10 }}>
@@ -275,8 +298,8 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
                     variant="top100"
                     rank={rankFor(course, selectedList)}
                     viewerRounds={item?.yourRounds ?? 0}
+                    viewerBest={item?.yourBest ?? null}
                     difficultyPercentile={row.rounds > 0 ? row.difficulty_percentile : null}
-                    ratedWithoutRoundsNote="Rated, but nobody has tracked a round here yet."
                     onClick={() => openCourse(course.id)}
                   />
                 </div>

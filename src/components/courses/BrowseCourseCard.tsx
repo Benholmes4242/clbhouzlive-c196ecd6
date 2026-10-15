@@ -11,6 +11,12 @@ const PHOTO_H = 196;
 const PHOTO_MUTE = 'rgba(255,255,255,0.66)';
 const PHOTO_DIM = 'rgba(255,255,255,0.55)';
 const RANK_GLASS = 'rgba(15,23,42,0.42)';
+const GLASS_CHIP: React.CSSProperties = {
+  position: 'absolute', top: 14, padding: '5px 10px', borderRadius: 999,
+  background: RANK_GLASS, backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+  color: A.INK, fontSize: 10.5, fontWeight: 700,
+  fontVariantNumeric: 'tabular-nums lining-nums', whiteSpace: 'nowrap',
+};
 
 function RankBadge({ memberships }: { memberships: StatBrowseRow['memberships'] }) {
   const SLUG: Record<string, RankList> = { global: 'global', 'gb-i': 'gbi', usa: 'usa', europe: 'europe' };
@@ -41,7 +47,8 @@ interface BrowseCourseCardProps {
   variant?: 'browse' | 'top100';
   rank?: number | null;
   viewerRounds?: number;
-  ratedWithoutRoundsNote?: string;
+  /** Top 100 only: the viewer's best gross here, or null when unknown. */
+  viewerBest?: number | null;
 }
 
 export function BrowseCourseCard({
@@ -51,7 +58,7 @@ export function BrowseCourseCard({
   variant = 'browse',
   rank = null,
   viewerRounds = 0,
-  ratedWithoutRoundsNote,
+  viewerBest = null,
 }: BrowseCourseCardProps) {
   const top100 = variant === 'top100';
   const hasRoundFacts = row.rounds > 0 && row.avg_to_par != null;
@@ -106,16 +113,17 @@ export function BrowseCourseCard({
           }}
         />
         {!top100 ? <RankBadge memberships={row.memberships} /> : null}
+        {/* BRIEF_TOP_100_REBUILD §4 — three states. You played: amber-dot chip
+            top-left. Members played, you have not: rounds chip top-right.
+            Nobody: no chip (the meta strip carries the frontier line). */}
         {top100 && viewerRounds > 0 ? (
-          <div
-            style={{
-              position: 'absolute', top: 14, left: 20, padding: '5px 10px', borderRadius: 999,
-              background: RANK_GLASS, backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
-              color: A.AMBER, fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
-              fontVariantNumeric: 'tabular-nums lining-nums', whiteSpace: 'nowrap',
-            }}
-          >
-            PLAYED <span style={{ letterSpacing: 0 }}>{viewerRounds}</span>
+          <div style={{ ...GLASS_CHIP, left: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: A.AMBER }} />
+            {viewerBest != null ? <>You played · best <span style={FIGS}>{viewerBest}</span></> : 'You played'}
+          </div>
+        ) : top100 && row.rounds > 0 ? (
+          <div style={{ ...GLASS_CHIP, right: 20 }}>
+            <span style={FIGS}>{row.rounds}</span> {row.rounds === 1 ? 'round' : 'rounds'} tracked
           </div>
         ) : null}
         <div style={{ position: 'absolute', left: 20, right: 20, bottom: 14, display: 'flex', alignItems: 'flex-end', gap: 16 }}>
@@ -159,9 +167,10 @@ export function BrowseCourseCard({
             ) : '.'}
           </div>
         ) : null}
-        {top100 && row.community_rating != null && row.rounds === 0 && ratedWithoutRoundsNote ? (
-          <div style={{ marginTop: 11, color: A.DIM, fontSize: 11, lineHeight: 1.5 }}>
-            {ratedWithoutRoundsNote}
+        {top100 && row.rounds === 0 && viewerRounds === 0 ? (
+          <div style={{ marginTop: 11, fontSize: 11, lineHeight: 1.5 }}>
+            <span style={{ color: A.FAINT }}>No member has played here yet.</span>{' '}
+            <span style={{ color: A.DIM }}>Be the first.</span>
           </div>
         ) : null}
         <CategoryScores
