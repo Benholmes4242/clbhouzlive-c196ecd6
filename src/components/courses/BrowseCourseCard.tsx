@@ -164,9 +164,10 @@ export function BrowseCourseCard({
               {/* Nine and above takes the shared green so the headline agrees with
                   the category figures beneath it. Below nine stays INK, not MUTE,
                   because this figure sits on a photograph. Do NOT swap this for
-                  courseSubScoreTone: it returns MUTE below 9 (right in a panel,
-                  wrong here — it would dim every card's score), and
-                  courseRatingConsistency asserts this card never imports it. */}
+                  the shared category tone helper in the analytical tokens module:
+                  it returns MUTE below 9 (right in a panel, wrong here — it would
+                  dim every card's score), and courseRatingConsistency asserts
+                  this card never reaches for it. */}
               <div style={{ ...FIGS, color: row.community_rating >= SUB_SCORE_GREEN_MIN ? A.GREEN : A.INK, fontSize: top100 ? 24 : 26, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1 }}>
                 {row.community_rating.toFixed(1)}
               </div>
