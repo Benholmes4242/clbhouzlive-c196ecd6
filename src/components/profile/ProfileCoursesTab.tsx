@@ -16,7 +16,6 @@ import { TheChaseSection } from './courses/TheChaseSection';
 import { YourSignatureSection } from './courses/YourSignatureSection';
 import { CourseLegacyCard } from './courses/CourseLegacyCard';
 import type { ProfileRatingRow } from './courses/AllCoursesList';
-import type { QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface ProfileCoursesTabProps {
@@ -72,9 +71,6 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
 
   const { data: top100Progress } = useTop100ProgressForUser(userId);
   const { user: viewer } = useSupabaseSession();
-  const [activeCountry, setActiveCountry] = useState<QuickRegion>('global');
-  // 'row' has no Top 100 list of its own, so The Chase shows no next-target card there.
-  const chaseListSlug = activeCountry === 'row' ? null : activeCountry;
 
   // ONE course_ratings select for this member, read by both the course list
   // and Your Signature. Do not add a second fetch.
@@ -187,7 +183,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
       )}
 
       <div className="mt-6">
-        <TheChaseSection userId={userId} viewerId={viewer?.id} distinctTop100={top100Count} listSlug={chaseListSlug} />
+        <TheChaseSection userId={userId} />
       </div>
       <div className="mt-6">
         <YourSignatureSection rows={ratingRows ?? []} />
@@ -202,8 +198,6 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
           scoringByCourseId={scoringByCourseId}
           top100Count={top100Count ?? undefined}
           ratingRows={ratingRows}
-          activeCountry={activeCountry}
-          onCountryChange={setActiveCountry}
         />
       </div>
 
