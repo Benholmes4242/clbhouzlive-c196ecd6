@@ -25,7 +25,20 @@ interface Props {
   as?: 'span' | 'div' | 'p';
 }
 
-export const MentionText: React.FC<Props> = ({
+/**
+ * Navigating mentions need the router; previews (disableNavigation) never
+ * navigate, so they render without one and work in any tree.
+ */
+export const MentionText: React.FC<Props> = (props) =>
+  props.disableNavigation ? <MentionBody {...props} navigate={null} /> : <MentionWithRouter {...props} />;
+
+const MentionWithRouter: React.FC<Props> = (props) => {
+  const navigate = useNavigate();
+  return <MentionBody {...props} navigate={navigate} />;
+};
+
+const MentionBody: React.FC<Props & { navigate: ReturnType<typeof useNavigate> | null }> = ({
+  navigate,
   text,
   className,
   style,
@@ -33,7 +46,6 @@ export const MentionText: React.FC<Props> = ({
   disableNavigation,
   as: Tag = 'span',
 }) => {
-  const navigate = useNavigate();
 
   /**
    * Paragraph normalisation (see BRIEF_MENTIONTEXT_PARAGRAPHS):
@@ -78,9 +90,9 @@ export const MentionText: React.FC<Props> = ({
             return;
           }
           if (seg.entityType === 'user') {
-            navigate(`/profile/${seg.entityId}`);
+            navigate?.(`/profile/${seg.entityId}`);
           } else {
-            navigate(`/business/${seg.entityId}`);
+            navigate?.(`/business/${seg.entityId}`);
           }
         };
         return (
