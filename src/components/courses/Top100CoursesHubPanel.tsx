@@ -217,6 +217,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
       <GateReport id="enrichment" ready={!enrichmentLoading} />
       {user && viewerList && viewerList.total > 0 && courses.length > 0 ? (
         <YourHundredSection
+          listSlug={renderedList}
           viewerPlayed={viewerPlayed}
           total={viewerList.total}
           courseIds={ids}

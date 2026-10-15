@@ -423,17 +423,7 @@ export function getTierPalette(
  * Map threshold to tier ID for backwards compatibility with top100Club
  */
 export function getThresholdTierId(threshold: number): string {
-  const tierMap: Record<number, string> = {
-    5: 'rookie',
-    10: 'fairway',
-    20: 'founders',
-    50: 'heritage',
-    100: 'century',
-    200: 'elite',
-    300: 'legendary',
-    400: 'grandslam',
-  };
-  return tierMap[threshold] ?? 'none';
+  return MILESTONE_TIER_META.find((m) => m.threshold === threshold)?.tierId ?? 'none';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════

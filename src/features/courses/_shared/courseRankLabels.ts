@@ -16,7 +16,8 @@ export type RankList = 'global' | 'gbi' | 'usa' | 'europe';
 export const RANK_LIST_BY_SLUG: Record<string, RankList> = { global: 'global', 'gb-i': 'gbi', usa: 'usa', europe: 'europe' };
 
 const ORDER: RankList[] = ['global', 'gbi', 'usa', 'europe'];
-const LABEL: Record<RankList, string> = {
+/** RankList -> on-screen list name. The one home for these four names. */
+export const RANK_LIST_LABEL: Record<RankList, string> = {
   global: 'World',
   gbi: 'GB&I',
   usa: 'USA',
@@ -27,5 +28,5 @@ export function courseRankLabels(entries: Array<{ list: RankList; rank: number }
   return entries
     .filter((e) => Number.isFinite(e.rank) && e.rank >= 1 && e.rank <= 100)
     .sort((a, b) => ORDER.indexOf(a.list) - ORDER.indexOf(b.list))
-    .map((e) => `#${e.rank} ${LABEL[e.list]}`);
+    .map((e) => `#${e.rank} ${RANK_LIST_LABEL[e.list]}`);
 }

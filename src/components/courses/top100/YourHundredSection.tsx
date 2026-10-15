@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
-import { courseRankLabels, RANK_LIST_BY_SLUG } from '@/features/courses/_shared/courseRankLabels';
+import { courseRankLabels, RANK_LIST_BY_SLUG, RANK_LIST_LABEL } from '@/features/courses/_shared/courseRankLabels';
 
 import { SectionHead, HEAD_GAP, SECTION_WRAP } from '@/components/courses/browse/SectionHead';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -10,6 +10,7 @@ import {
   getCurrentMilestoneMeta,
   getMilestoneMetaByThreshold,
   getNextMilestone,
+  MILESTONE_TIER_META,
 } from '@/config/achievements';
 import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 
@@ -62,6 +63,8 @@ const LEGEND: Array<{ state: CellState; label: string }> = [
 ];
 
 interface Props {
+  /** Raw database list slug, e.g. 'gb-i'. */
+  listSlug: string;
   viewerPlayed: number;
   total: number;
   /** Rank-ordered ids for the active list (cell one = rank one). */
@@ -154,7 +157,7 @@ function PeekRow({ id, subject, e, onOpen }: { id: string; subject: YourHundredS
   );
 }
 
-export function YourHundredSection({ viewerPlayed, total, courseIds, enrichment, subjects, onOpenCourse }: Props) {
+export function YourHundredSection({ listSlug, viewerPlayed, total, courseIds, enrichment, subjects, onOpenCourse }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   // A new region is a different hundred: drop the selection.
   useEffect(() => { setSelected(null); }, [courseIds]);
@@ -162,6 +165,7 @@ export function YourHundredSection({ viewerPlayed, total, courseIds, enrichment,
   const nextThreshold = getNextMilestone(viewerPlayed);
   const next = nextThreshold != null ? getMilestoneMetaByThreshold(nextThreshold) : undefined;
   const cells = courseIds.slice(0, total);
+  const listLabel = RANK_LIST_LABEL[RANK_LIST_BY_SLUG[listSlug]] ?? '';
 
   return (
     <section style={SECTION_WRAP}>
@@ -173,14 +177,22 @@ export function YourHundredSection({ viewerPlayed, total, courseIds, enrichment,
           </span>
           <span style={{ fontSize: 15, fontWeight: 700, color: A.DIM, fontVariantNumeric: 'tabular-nums' }}>of {total}</span>
         </div>
-        {current ? (
+        {/* The club is scoped to ONE list and says so. A list holds 100 courses, so the ladder stops at 100 — do not reintroduce 200/300/400 here. The list name is resolved from RANK_LIST_LABEL, which is the one home for these four names. */}
+        {viewerPlayed > 0 ? (
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: MEDAL_GOLD }}>
-              {current.shortLabel}
-            </div>
-            {next && nextThreshold != null ? (
+            {current ? (
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: MEDAL_GOLD }}>
+                {`${listLabel} ${current.tierName}`}
+              </div>
+            ) : null}
+            {current && next && nextThreshold != null ? (
               <div style={{ fontSize: 11.5, color: A.DIM, marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
-                {nextThreshold - viewerPlayed} more to {next.shortLabel}
+                {`${nextThreshold - viewerPlayed} more to the ${next.tierName}`}
+              </div>
+            ) : null}
+            {!current ? (
+              <div style={{ fontSize: 11.5, color: A.DIM, marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
+                {`${MILESTONE_TIER_META[0].threshold - viewerPlayed} more to the ${listLabel} ${MILESTONE_TIER_META[0].tierName}`}
               </div>
             ) : null}
           </div>
