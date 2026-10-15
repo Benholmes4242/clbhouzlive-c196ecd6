@@ -31,15 +31,6 @@ export interface RatedCourseData {
 }
 
 /**
- * Tier name used in the byline metadata row on cards
- * and as section header labels. Aligned to the 5-tier taxonomy.
- */
-export function getTierName(rating: number | null | undefined): string {
-  if (rating == null) return 'UNRATED';
-  return getRatingTier(rating);
-}
-
-/**
  * Coarse tier bucket used to group cards under section dividers.
  * Two buckets reflect the 5-tier taxonomy honestly — one Exceptional
  * section, one Excellent-and-below section.

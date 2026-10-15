@@ -127,7 +127,6 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   isOwnProfile,
   displayName,
   scoringByCourseId,
-  top100Count,
   ratingRows,
   activeCountry: activeCountryProp,
   onCountryChange,

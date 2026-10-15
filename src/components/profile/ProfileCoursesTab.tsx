@@ -1,9 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
 import { JourneySummaryCard } from './courses/JourneySummaryCard';
-import { WantToPlaySection } from './courses/WantToPlaySection';
 import { AllCoursesList } from './courses/AllCoursesList';
-import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -31,7 +29,6 @@ interface ProfileCoursesTabProps {
  *
  * Section order:
  *   1. JourneySummaryCard — Course Legacy summary (serif numeral, dispatch eyebrow)
- *   2. WantToPlaySection — Bucket List (hidden when empty; editorial framing for 1–2)
  *   3. AllCoursesList — Course History with DossierCard primitives
  *
  * Spacing: each section gets `mt-6` after the first.
@@ -169,8 +166,6 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
 
   return (
     <div className="pb-2">
-      <ScrollToTopGlass />
-
       {/* Section 1: Course Legacy summary */}
       <JourneySummaryCard
         coursesPlayed={totalCoursesPlayed}
@@ -194,11 +189,6 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
       </div>
       <div className="mt-6">
         <YourSignatureSection rows={ratingRows ?? []} />
-      </div>
-
-      {/* Section 2: Bucket List (hidden when empty) */}
-      <div className="mt-6">
-        <WantToPlaySection userId={userId} isOwnProfile={isOwnProfile} />
       </div>
 
       {/* Section 3: Course History */}
