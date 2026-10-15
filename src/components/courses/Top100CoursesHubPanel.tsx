@@ -17,6 +17,8 @@ import { COURSE_BROWSE_DESCRIPTION } from './courseBrowseTypography';
 import { CoursesSearchField } from '@/features/explore-magazine/CoursesSearchField';
 import { SectionHead, SECTION_WRAP } from './browse/SectionHead';
 import { YourHundredSection } from './top100/YourHundredSection';
+import { TheArgumentSection } from './top100/TheArgumentSection';
+import { argumentRows } from './top100/theArgument';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 
 const LISTS = [
@@ -125,12 +127,16 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
   const ratingSentence = `${communityRatedCount} of the ${total} ${total === 1 ? 'course' : 'courses'} ${communityRatedCount === 1 ? 'carries' : 'carry'} a rating.`;
   /* VIEWER counts. Played and the denominator come from the per-list row of
      user_top100_progress_view for the ACTIVE scope — never the global total and
-     never a typed 100. Rated is the viewer's ratings on the loaded list. */
+     never a typed 100. Rated is the server's courses_rated_in_list for the active list. */
   const { data: progress } = useTop100ProgressForUser(user?.id);
   const viewerList = progress?.lists.find((list) => list.listSlug === selectedList);
   const viewerPlayed = viewerList?.played ?? 0;
-  const viewerRated = courses.filter((course) => enrichment.get(course.id)?.ratedByYou).length;
+  const viewerRated = viewerList?.rated ?? 0;
   const courseNames = useMemo(() => new Map(courses.map((c) => [c.id, c.name ?? ''])), [courses]);
+  const argument = argumentRows(courses.map((c) => {
+    const e = enrichment.get(c.id);
+    return { id: c.id, name: c.name ?? '', imageUrl: c.thumbnail_image ?? null, publishedRank: rankFor(c, selectedList), rating: e?.rating ?? null, ratingCount: e?.ratingCount ?? 0 };
+  }));
   const jumpToCard = (courseId: string) => {
     if (nameQuery) setNameQuery('');
     requestAnimationFrame(() => {
@@ -166,6 +172,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
           onCellTap={jumpToCard}
         />
       ) : null}
+      {argument.length > 0 ? <TheArgumentSection rows={argument} /> : null}
       <section style={{ ...SECTION_WRAP, paddingBottom: 0 }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
           <SectionHead kicker="The list" tone="quiet" title={heading} />
