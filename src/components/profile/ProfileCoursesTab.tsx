@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
 import { JourneySummaryCard } from './courses/JourneySummaryCard';
 import { WantToPlaySection } from './courses/WantToPlaySection';
@@ -14,6 +14,11 @@ import { useTop100Distribution } from '@/hooks/gam/useTop100Distribution';
 import { useGamRecordConfig } from '@/hooks/gam/useGamRecordConfig';
 import { top100Standing } from './handicap/whs/gam/trophy-room/career/shareModel';
 import { CoursesMapSection, type MapPoint } from './courses/CoursesMapSection';
+import { TheChaseSection } from './courses/TheChaseSection';
+import { YourSignatureSection } from './courses/YourSignatureSection';
+import type { ProfileRatingRow } from './courses/AllCoursesList';
+import type { QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface ProfileCoursesTabProps {
   userId: string;
@@ -68,6 +73,27 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   }, [isOwnProfile, analyticsCourses]);
 
   const { data: top100Progress } = useTop100ProgressForUser(userId);
+  const { user: viewer } = useSupabaseSession();
+  const [activeCountry, setActiveCountry] = useState<QuickRegion>('global');
+  // 'row' has no Top 100 list of its own, so The Chase targets the World list there.
+  const chaseListSlug = activeCountry === 'row' ? 'global' : activeCountry;
+
+  // ONE course_ratings select for this member, read by both the course list
+  // and Your Signature. Do not add a second fetch.
+  const { data: ratingRows } = useQuery({
+    queryKey: ['profile-course-rating-rows', userId],
+    enabled: !!userId,
+    queryFn: async (): Promise<ProfileRatingRow[]> => {
+      const { data, error } = await supabase
+        .from('course_ratings')
+        .select('id, course_id, rating, review, design_score, condition_score, clubhouse_score, facilities_score, review_date, created_at')
+        .eq('user_id', userId)
+        .eq('is_mock', false);
+      if (error) throw error;
+      return (data ?? []) as ProfileRatingRow[];
+    },
+    staleTime: 60_000,
+  });
 
   /**
    * THE RATING FIGURE AND WHAT IT AVERAGES OVER.
@@ -163,6 +189,13 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
         </div>
       )}
 
+      <div className="mt-6">
+        <TheChaseSection userId={userId} viewerId={viewer?.id} distinctTop100={top100Count} listSlug={chaseListSlug} />
+      </div>
+      <div className="mt-6">
+        <YourSignatureSection rows={ratingRows ?? []} />
+      </div>
+
       {/* Section 2: Bucket List (hidden when empty) */}
       <div className="mt-6">
         <WantToPlaySection userId={userId} isOwnProfile={isOwnProfile} />
@@ -176,6 +209,9 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
           displayName={displayName}
           scoringByCourseId={scoringByCourseId}
           top100Count={top100Count ?? undefined}
+          ratingRows={ratingRows}
+          activeCountry={activeCountry}
+          onCountryChange={setActiveCountry}
         />
       </div>
     </div>
