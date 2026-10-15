@@ -19,7 +19,6 @@ import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 import { formatDayMonthShortGB, formatNumber } from '@/i18n/format';
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { ABOUT_KICKER } from '@/components/courses/course-detail/about/AboutSection';
-import { YouFigure } from '@/components/courses/course-detail/you/youBits';
 import RailChips from '@/components/ui/RailChips';
 import { CAPS, FeatPill, FigureCell, Pill, roundFeats, vsHandicapLabel } from '@/features/explore-magazine/AchievementCallout';
 import { handicapPairDisplay } from '@/features/explore-magazine/circleHandicap';
@@ -33,29 +32,14 @@ import { isFullEighteen, useOwnHandicapVisibility, useProfileRounds, type Profil
 interface Props {
   userId: string;
   isOwnProfile: boolean;
-  handicapIndex: number | null;
 }
 
 type Sort = 'recent' | 'lowest';
-const FORM_N = 10;
 const INITIAL_ROWS = 20;
 
 function parseDate(v: string): Date {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(v);
   return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(v);
-}
-
-/**
- * Differential form: played-to (the stored handicap_differential) minus the
- * index the member held at the time. Par and course handicap are not part of
- * it. A round with no index on record has NO form value — the member's
- * current index is never substituted for the one they held.
- */
-function formValue(r: ProfileRound): number | null {
-  if (!isFullEighteen(r) || r.handicap_differential == null || r.handicap_index_at_time == null) {
-    return null;
-  }
-  return Number(r.handicap_differential) - Number(r.handicap_index_at_time);
 }
 
 const fmt1 = (n: number) => n.toFixed(1);
@@ -70,7 +54,7 @@ const RowName: React.FC<{ name: string }> = ({ name }) => {
   );
 };
 
-const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex }) => {
+const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile }) => {
   const { t } = useTranslation('profile');
   const navigate = useNavigate();
   const { data: rounds = [], isLoading } = useProfileRounds(userId);
@@ -80,16 +64,8 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
   const [openId, setOpenId] = React.useState<string | null>(null);
 
   const stats = React.useMemo(() => {
-    const full = rounds.filter(isFullEighteen);
-    const grosses = full.map((r) => r.gross_score).filter((g): g is number => g != null);
-    const best = grosses.length ? Math.min(...grosses) : null;
-    const avg = grosses.length ? grosses.reduce((a, b) => a + b, 0) / grosses.length : null;
-    const last = rounds.slice(0, FORM_N);
-    const form = last
-      .map((r) => ({ r, v: formValue(r) }))
-      .filter((x): x is { r: ProfileRound; v: number } => x.v != null)
-      .reverse(); // oldest left
-    return { best, avg, form, lastCount: last.length };
+    const grosses = rounds.filter(isFullEighteen).map((r) => r.gross_score).filter((g): g is number => g != null);
+    return { best: grosses.length ? Math.min(...grosses) : null };
   }, [rounds]);
 
   if (isLoading) {
@@ -118,8 +94,6 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
   }
 
   const isPrivateOwn = isOwnProfile && ownVisibility === 'private';
-  const maxAbs = Math.max(1, ...stats.form.map((x) => Math.abs(x.v)));
-  const HALF = 36;
 
   // Rows
   const sorted =
@@ -131,7 +105,7 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
   const yearMeta = new Map<number, { n: number; avg: number | null }>();
   if (sort === 'recent') {
     const acc = new Map<number, number[]>();
-    let count = new Map<number, number>();
+    const count = new Map<number, number>();
     for (const r of rounds) {
       const y = parseDate(r.play_date).getFullYear();
       count.set(y, (count.get(y) ?? 0) + 1);
@@ -141,7 +115,6 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
       const g = acc.get(y) ?? [];
       yearMeta.set(y, { n, avg: g.length ? g.reduce((a, b) => a + b, 0) / g.length : null });
     });
-    count = new Map();
   }
 
   let lastYear: number | null = null;
@@ -164,52 +137,6 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, handicapIndex
             {t('rounds.private.cta', 'Privacy settings')} ›
           </button>
         </div>
-      ) : null}
-
-      {/* 1. STAT BAND */}
-      <div style={{ display: 'flex', gap: 12 }}>
-        <YouFigure align="center" label={t('rounds.stat.rounds', 'Rounds')} value={formatNumber(rounds.length)} />
-        <YouFigure align="center" label={t('rounds.stat.best', 'Best')} value={stats.best != null ? String(stats.best) : '\u2014'} tone={A.AMBER} />
-        <YouFigure align="center" label={t('rounds.stat.average', 'Average')} value={stats.avg != null ? fmt1(stats.avg) : '\u2014'} />
-        <YouFigure align="center" label={t('rounds.stat.index', 'Index')} value={handicapIndex != null ? fmt1(handicapIndex) : '\u2014'} />
-      </div>
-
-      {/* 2. RECENT FORM */}
-      {stats.form.length > 0 ? (
-        <section style={{ marginTop: 28 }}>
-          <div style={{ ...ABOUT_KICKER }}>{t('rounds.form.title', 'Recent form against handicap')}</div>
-          <div style={{ position: 'relative', height: HALF * 2, marginTop: 12, display: 'flex', gap: 6 }}>
-            <span aria-hidden style={{ position: 'absolute', left: 0, right: 0, top: HALF, height: 1, background: CHART.FAINT }} />
-            {stats.form.map(({ r, v }) => {
-              const px = Math.max(2, Math.round((Math.abs(v) / maxAbs) * (HALF - 2)));
-              const worse = v > 0;
-              return (
-                <div key={r.whs_score_id} style={{ flex: 1, position: 'relative' }}>
-                  <span
-                    aria-hidden
-                    style={{
-                      position: 'absolute',
-                      left: 0,
-                      right: 0,
-                      top: worse ? HALF - px : HALF + 1,
-                      height: px,
-                      borderRadius: 2,
-                      background: v === 0 ? CHART.FAINT : worse ? CHART.UP : CHART.DOWN,
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </div>
-          {stats.form.length < stats.lastCount ? (
-            <p style={{ margin: '4px 0 0', fontSize: 11, color: CHART.DIM, ...FIGS }}>
-              {t('rounds.form.missing', '{{k}} of the last {{total}} are left out: nine holes, or no handicap index on record.', {
-                k: stats.lastCount - stats.form.length,
-                total: stats.lastCount,
-              })}
-            </p>
-          ) : null}
-        </section>
       ) : null}
 
       {/* 3. SORT */}
