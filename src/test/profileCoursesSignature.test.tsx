@@ -39,4 +39,35 @@ describe('profile courses signature', () => {
     expect(t).not.toContain('member average');
     expect(t).not.toContain('clbhouz average');
   });
+
+  it('compares with the four-category mean, not the overall rating average', () => {
+    // overall 8.4 = design exactly; four-category mean is 8.0, so design sits 0.4 above
+    const rows = Array.from({ length: 5 }, () => row({ rating: 8.4, design_score: 8.4, condition_score: 8, clubhouse_score: 7.8, facilities_score: 7.8 }));
+    render(<YourSignatureSection rows={rows} />);
+    const t = screen.getByTestId('signature-sentence').textContent!;
+    expect(t).toContain('design voter — you mark it 0.4 above your average across the four');
+    expect(t).not.toMatch(/ 0 |0\.0/);
+  });
+
+  it('even categories get the even sentence with no figures', () => {
+    const rows = Array.from({ length: 5 }, () => row({ design_score: 8.1, condition_score: 8, clubhouse_score: 7.9, facilities_score: 8 }));
+    render(<YourSignatureSection rows={rows} />);
+    const t = screen.getByTestId('signature-sentence').textContent!;
+    expect(t).toBe('You rate the four evenly — none sits more than 0.2 from your average across them.');
+    expect(t.replace('0.2', '')).not.toMatch(/\d/);
+  });
+
+  it('no branch ever prints a zero difference', () => {
+    const cases = [
+      [9, 8, 7, 6], [8.3, 8, 8, 7.7], [8.3, 8, 7.95, 7.95], [8, 8, 8, 8], [8.24, 8, 8, 7.96], [10, 7, 7, 7],
+    ];
+    for (const [d, c, h, f] of cases) {
+      const rows = Array.from({ length: 5 }, () => row({ design_score: d, condition_score: c, clubhouse_score: h, facilities_score: f }));
+      const { unmount } = render(<YourSignatureSection rows={rows} />);
+      const t = screen.getByTestId('signature-sentence').textContent!;
+      expect(t).not.toContain(' 0 ');
+      expect(t).not.toContain('0.0');
+      unmount();
+    }
+  });
 });

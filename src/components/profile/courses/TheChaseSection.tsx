@@ -1,9 +1,7 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
-import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
 import { RANK_LIST_BY_SLUG, RANK_LIST_LABEL } from '@/features/courses/_shared/courseRankLabels';
 
 // RANK_LIST_LABEL is the one home for how these four lists are named on screen. top100_lists.name is unbounded database text and will break a fixed-width row. Do not print it directly.
@@ -27,32 +25,17 @@ export const ChaseBar: React.FC<{ ratio: number; fill: string }> = ({ ratio, fil
 
 interface Props {
   userId: string;
-  viewerId: string | undefined;
-  /** The distinct all-lists count published on the tab (Phase 1 §1.3). Never recomputed here. */
-  distinctTop100: number | null;
-  /** List currently selected in the filter bar; null when the region has no list (no card). */
-  listSlug: string | null;
 }
 
-export const TheChaseSection: React.FC<Props> = ({ userId, viewerId, distinctTop100, listSlug }) => {
-  const navigate = useNavigate();
+export const TheChaseSection: React.FC<Props> = ({ userId }) => {
   const { data: progress } = useTop100ProgressForUser(userId);
-  const { data: listCourses } = useTop100ListProgress(listSlug ?? undefined, userId, viewerId ?? userId);
 
   const lists = progress?.lists ?? [];
   if (!lists.some((l) => l.played > 0)) return null;
 
-  const sel = lists.find((l) => l.listSlug === listSlug);
-  const listName = sel ? displayListName(sel.listSlug, sel.listName) : '';
-  const unplayed = (listCourses ?? [])
-    .filter((c) => !c.is_owner_played && c.rank != null)
-    .sort((a, b) => (a.rank as number) - (b.rank as number));
-  const target = unplayed[0];
-  const allPlayed = !!listSlug && !!listCourses && listCourses.length > 0 && unplayed.length === 0;
-
   return (
     <section data-testid="the-chase" style={{ padding: '0 20px' }}>
-      <SectionHeader kicker="THE CHASE" title="Four hundreds, one life" />
+      <SectionHeader kicker="TOP 100 GOLF COURSES" title="Four lists, one life" />
       {lists.map((l) => (
         <div key={l.listSlug} style={{ marginTop: 9, display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ width: 66, flexShrink: 0, fontSize: 11, fontWeight: 700, color: A.BODY, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -64,39 +47,6 @@ export const TheChaseSection: React.FC<Props> = ({ userId, viewerId, distinctTop
           </span>
         </div>
       ))}
-      {distinctTop100 != null && (
-        <p style={{ margin: '10px 0 0', fontSize: 11.5, color: A.DIM }}>
-          <b style={{ color: A.BODY, fontWeight: 700, ...NUMERIC }}>{distinctTop100}</b> distinct courses — the lists overlap, so they do not sum.
-        </p>
-      )}
-      {listSlug && (target || allPlayed) && (
-        <div style={{ marginTop: 12, background: A.PANEL, borderRadius: 12, padding: 11 }}>
-          {allPlayed ? (
-            <span style={{ fontSize: 13, fontWeight: 700, color: A.INK }}>You have played the whole list.</span>
-          ) : (
-            <button
-              type="button"
-              onClick={() => navigate(`/courses/${target!.course_id}`)}
-              style={{ all: 'unset', display: 'block', width: '100%', cursor: 'pointer' }}
-            >
-              <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: A.FAINT }}>
-                NEXT ON THIS LIST
-              </div>
-              <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 42, height: 42, borderRadius: 8, flexShrink: 0, overflow: 'hidden', background: A.SOFT }}>
-                  {target!.thumbnail_image && (
-                    <img src={target!.thumbnail_image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  )}
-                </div>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: A.INK }}>{target!.course_name}</div>
-                  <div style={{ fontSize: 11, color: A.DIM, ...NUMERIC }}>#{target!.rank} {listName}</div>
-                </div>
-              </div>
-            </button>
-          )}
-        </div>
-      )}
     </section>
   );
 };
