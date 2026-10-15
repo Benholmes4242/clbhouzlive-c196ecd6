@@ -29,27 +29,34 @@ import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 const CELL_MEMBER = 'rgba(255,255,255,0.14)';
 const CELL_NOBODY = 'rgba(255,255,255,0.055)';
 
-type CellState = 'played' | 'rated' | 'member' | 'nobody';
+type CellState = 'reviewed' | 'played' | 'member' | 'nobody';
 
+/* Reviewing is the act the page asks for, so the solid fill marks the
+   finished job (rounds AND a review) and the ring marks rounds awaiting one.
+   DELIBERATE DROP-THROUGH: a review with no rounds earns no state of its own.
+   It cannot be amber, because the headline counts ROUNDS and that course has
+   none — solid + ring must always equal viewerPlayed. The peek row still
+   states the review when tapped, so the fact is kept, just not as a colour. */
 function cellState(e: Top100Enrichment | undefined): CellState {
-  if ((e?.yourRounds ?? 0) > 0) return 'played';
-  if (e?.ratedByYou) return 'rated';
+  const played = (e?.yourRounds ?? 0) > 0;
+  if (played && e?.ratedByYou) return 'reviewed';
+  if (played) return 'played';
   if ((e?.roundsTracked ?? 0) > 0) return 'member';
   return 'nobody';
 }
 
 function cellStyle(state: CellState): React.CSSProperties {
   switch (state) {
-    case 'played': return { background: A.AMBER };
-    case 'rated': return { background: 'transparent', boxShadow: `inset 0 0 0 1.5px ${A.AMBER}` };
+    case 'reviewed': return { background: A.AMBER };
+    case 'played': return { background: 'transparent', boxShadow: `inset 0 0 0 1.5px ${A.AMBER}` };
     case 'member': return { background: CELL_MEMBER };
     default: return { background: CELL_NOBODY };
   }
 }
 
 const LEGEND: Array<{ state: CellState; label: string }> = [
-  { state: 'played', label: 'You played' },
-  { state: 'rated', label: 'You rated' },
+  { state: 'reviewed', label: 'Played and reviewed' },
+  { state: 'played', label: 'Played, not reviewed' },
   { state: 'member', label: 'A member played' },
   { state: 'nobody', label: 'Nobody yet' },
 ];
@@ -73,29 +80,41 @@ export interface YourHundredSubject {
 const STRONG: React.CSSProperties = { color: A.BODY, fontWeight: 700, fontVariantNumeric: 'tabular-nums' };
 
 function StatusLine({ e }: { e: Top100Enrichment | undefined }) {
-  const state = cellState(e);
-  if (state === 'played') {
+  const played = (e?.yourRounds ?? 0) > 0;
+  const reviewed = !!e?.ratedByYou;
+  const n = e?.playerCount ?? 0;
+  const rating = e?.yourRating != null ? e.yourRating.toFixed(1) : null;
+  const best = e?.yourBest != null ? <> · Best <span style={STRONG}>{e.yourBest}</span></> : null;
+  if (played && reviewed) {
     return (
       <>
         <span style={{ color: A.AMBER, fontWeight: 700 }}>You played</span>
-        {e?.yourBest != null ? <> · Best <span style={STRONG}>{e.yourBest}</span></> : null}
+        {best}
+        {rating ? <> · Reviewed <span style={STRONG}>{rating}</span></> : null}
       </>
     );
   }
-  if (state === 'rated') {
-    const n = e?.playerCount ?? 0;
+  if (played) {
     return (
       <>
-        <span style={{ color: A.AMBER, fontWeight: 700 }}>You rated</span>
-        {e?.yourRating != null ? <> <span style={STRONG}>{e.yourRating.toFixed(1)}</span></> : null}
+        <span style={{ color: A.AMBER, fontWeight: 700 }}>You played</span>
+        {best}
+        <span style={{ color: A.DIM }}> · Not yet reviewed</span>
+      </>
+    );
+  }
+  if (reviewed) {
+    return (
+      <>
+        <span style={{ color: A.AMBER, fontWeight: 700 }}>You reviewed{rating ? <> <span style={STRONG}>{rating}</span></> : null}</span>
         {n > 0 ? <> · <span style={STRONG}>{n}</span> members</> : null}
       </>
     );
   }
-  if (state === 'member') {
+  if (n > 0) {
     return (
       <>
-        <span style={STRONG}>{e?.playerCount ?? 0}</span> members
+        <span style={STRONG}>{n}</span> members
         {e?.recordGross != null && e?.recordHolder ? <> · Best <span style={STRONG}>{e.recordGross}</span></> : null}
       </>
     );

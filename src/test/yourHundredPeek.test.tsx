@@ -16,22 +16,24 @@ function e(id: string, o: Partial<Top100Enrichment> = {}): Top100Enrichment {
   };
 }
 
-const ids = ['a', 'b', 'c', 'd'];
+const ids = ['a', 'b', 'c', 'd', 'r'];
 const enrichment = new Map([
   ['a', e('a', { yourRounds: 2, yourBest: 78, roundsTracked: 2 })],
   ['b', e('b', { ratedByYou: true, yourRating: 8.4, playerCount: 3 })],
   ['c', e('c', { roundsTracked: 4, playerCount: 4, recordGross: 71, recordHolder: 'Sam' })],
   ['d', e('d')],
+  ['r', e('r', { yourRounds: 1, ratedByYou: true, yourRating: 8.1, yourBest: 80 })],
 ]);
 const subjects = new Map([
   ['a', { name: 'Royal Dornoch', imageUrl: null, memberships: [{ list_slug: 'global', rank: 47 }, { list_slug: 'gb-i', rank: 12 }] }],
   ['b', { name: 'Cruden Bay', imageUrl: null, memberships: [{ list_slug: 'global', rank: 101 }] }],
   ['c', { name: 'Muirfield', imageUrl: null, memberships: [{ list_slug: 'global', rank: 9 }] }],
   ['d', { name: 'Nobody Links', imageUrl: null, memberships: [] }],
+  ['r', { name: 'Turnberry', imageUrl: null, memberships: [] }],
 ]);
 
 function mount() {
-  render(<YourHundredSection viewerPlayed={1} total={4} courseIds={ids} enrichment={enrichment} subjects={subjects} onOpenCourse={() => {}} />);
+  render(<YourHundredSection viewerPlayed={2} total={5} courseIds={ids} enrichment={enrichment} subjects={subjects} onOpenCourse={() => {}} />);
 }
 const cell = (name: string) => screen.getByRole('button', { name: new RegExp(name) });
 
@@ -63,6 +65,29 @@ describe('Your hundred peek row', () => {
     fireEvent.click(cell('Cruden Bay'));
     expect(screen.getByText('Cruden Bay')).toBeInTheDocument();
     expect(screen.queryByTestId('peek-ranks')).toBeNull();
+  });
+  it('solid marks rounds+review, ring marks rounds only, review-only is not amber', () => {
+    mount();
+    expect(cell('Turnberry').style.boxShadow).toBe('');
+    expect(cell('Turnberry').style.background).not.toBe('transparent');
+    expect(cell('Royal Dornoch').style.background).toBe('transparent');
+    expect(cell('Royal Dornoch').style.boxShadow).toContain('inset');
+    expect(cell('Cruden Bay').style.background).toBe(cell('Nobody Links').style.background);
+    expect(cell('Cruden Bay').style.boxShadow).toBe('');
+    const solid = cell('Turnberry').style.background;
+    const all = screen.getAllByRole('button').filter((b) => b.hasAttribute('aria-pressed'));
+    const amber = all.filter((b) => b.style.background === solid || b.style.boxShadow.includes('inset')).length;
+    expect(amber).toBe(2);
+  });
+  it('the ring square says Not yet reviewed', () => {
+    mount();
+    fireEvent.click(cell('Royal Dornoch'));
+    expect(screen.getByText(/Not yet reviewed/)).toBeInTheDocument();
+  });
+  it('the drop-through square says You reviewed', () => {
+    mount();
+    fireEvent.click(cell('Cruden Bay'));
+    expect(screen.getByText(/You reviewed/)).toBeInTheDocument();
   });
   it('the nobody-yet state prints the caption line', () => {
     mount();
