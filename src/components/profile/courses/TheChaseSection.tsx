@@ -4,6 +4,11 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
+import { RANK_LIST_BY_SLUG, RANK_LIST_LABEL } from '@/features/courses/_shared/courseRankLabels';
+
+// RANK_LIST_LABEL is the one home for how these four lists are named on screen. top100_lists.name is unbounded database text and will break a fixed-width row. Do not print it directly.
+const displayListName = (slug: string, fallback: string) =>
+  slug in RANK_LIST_BY_SLUG ? RANK_LIST_LABEL[RANK_LIST_BY_SLUG[slug]] : fallback;
 
 const TRACK = 'rgba(255,255,255,0.07)';
 const ZERO_FILL = 'rgba(255,255,255,0.14)';
@@ -25,31 +30,34 @@ interface Props {
   viewerId: string | undefined;
   /** The distinct all-lists count published on the tab (Phase 1 §1.3). Never recomputed here. */
   distinctTop100: number | null;
-  /** List currently selected in the filter bar. */
-  listSlug: string;
+  /** List currently selected in the filter bar; null when the region has no list (no card). */
+  listSlug: string | null;
 }
 
 export const TheChaseSection: React.FC<Props> = ({ userId, viewerId, distinctTop100, listSlug }) => {
   const navigate = useNavigate();
   const { data: progress } = useTop100ProgressForUser(userId);
-  const { data: listCourses } = useTop100ListProgress(listSlug, userId, viewerId ?? userId);
+  const { data: listCourses } = useTop100ListProgress(listSlug ?? undefined, userId, viewerId ?? userId);
 
   const lists = progress?.lists ?? [];
   if (!lists.some((l) => l.played > 0)) return null;
 
-  const listName = lists.find((l) => l.listSlug === listSlug)?.listName ?? '';
+  const sel = lists.find((l) => l.listSlug === listSlug);
+  const listName = sel ? displayListName(sel.listSlug, sel.listName) : '';
   const unplayed = (listCourses ?? [])
     .filter((c) => !c.is_owner_played && c.rank != null)
     .sort((a, b) => (a.rank as number) - (b.rank as number));
   const target = unplayed[0];
-  const allPlayed = !!listCourses && listCourses.length > 0 && unplayed.length === 0;
+  const allPlayed = !!listSlug && !!listCourses && listCourses.length > 0 && unplayed.length === 0;
 
   return (
     <section data-testid="the-chase" style={{ padding: '0 20px' }}>
       <SectionHeader kicker="THE CHASE" title="Four hundreds, one life" />
       {lists.map((l) => (
         <div key={l.listSlug} style={{ marginTop: 9, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ width: 66, flexShrink: 0, fontSize: 11, fontWeight: 700, color: A.BODY }}>{l.listName}</span>
+          <span style={{ width: 66, flexShrink: 0, fontSize: 11, fontWeight: 700, color: A.BODY, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {displayListName(l.listSlug, l.listName)}
+          </span>
           <ChaseBar ratio={l.total > 0 ? l.played / l.total : 0} fill={A.AMBER} />
           <span style={{ width: 62, flexShrink: 0, textAlign: 'right', fontSize: 11, fontWeight: 700, color: A.BODY, ...NUMERIC }}>
             {l.played} / {l.total}
@@ -61,7 +69,7 @@ export const TheChaseSection: React.FC<Props> = ({ userId, viewerId, distinctTop
           <b style={{ color: A.BODY, fontWeight: 700, ...NUMERIC }}>{distinctTop100}</b> distinct courses — the lists overlap, so they do not sum.
         </p>
       )}
-      {(target || allPlayed) && (
+      {listSlug && (target || allPlayed) && (
         <div style={{ marginTop: 12, background: A.PANEL, borderRadius: 12, padding: 11 }}>
           {allPlayed ? (
             <span style={{ fontSize: 13, fontWeight: 700, color: A.INK }}>You have played the whole list.</span>
