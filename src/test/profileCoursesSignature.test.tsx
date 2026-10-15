@@ -77,7 +77,7 @@ describe('profile courses signature', () => {
     render(<YourSignatureSection rows={rows} />);
     const norm = (c: string) => { const el = document.createElement('i'); el.style.color = c; return el.style.color; };
     const [design, condition] = screen.getAllByTestId('signature-row');
-    const fill = (r: HTMLElement) => (r.querySelector('div > div') as HTMLElement).style.background;
+    const fill = (r: HTMLElement) => (r.querySelector('div > div > div') as HTMLElement).style.background;
     const bg = (c: string) => { const el = document.createElement('i'); el.style.background = c; return el.style.background; };
     expect(courseSubScoreTone(9)).not.toBe(courseSubScoreTone(8.9));
     expect(fill(design)).toBe(bg(courseSubScoreTone(9)));
