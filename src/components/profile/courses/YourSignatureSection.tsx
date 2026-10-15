@@ -1,16 +1,15 @@
 import React, { useMemo } from 'react';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { CategoryScores } from '@/components/courses/course-detail/CategoryScores';
 import { buildSignature, signatureSentence, type SignatureRow } from './yourSignature';
-import { ChaseBar } from './TheChaseSection';
-
-const NUMERIC: React.CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 
 export const YourSignatureSection: React.FC<{ rows: SignatureRow[] }> = ({ rows }) => {
   const model = useMemo(() => buildSignature(rows), [rows]);
   if (!model) return null;
   const { categories } = model;
   const sentence = signatureSentence(model);
+  const mean = (label: string) => categories.find((c) => c.label === label)?.mean ?? null;
 
   return (
     <section data-testid="your-signature" style={{ padding: '0 20px' }}>
@@ -32,16 +31,8 @@ export const YourSignatureSection: React.FC<{ rows: SignatureRow[] }> = ({ rows 
           </>
         )}
       </p>
-      {categories.map((c) => (
-        <div key={c.label} data-testid="signature-row" style={{ marginTop: 9, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ width: 66, flexShrink: 0, fontSize: 11, fontWeight: 700, color: A.BODY }}>{c.label}</span>
-          {/* courseSubScoreTone is the one home for the 9.0 rule — green at 9.0 and above, A.MUTE below. These are course sub-scores and must read exactly as they do on a review. Do not re-implement the threshold here and do not introduce another colour for a score. */}
-          <ChaseBar ratio={c.mean / 10} fill={courseSubScoreTone(c.mean)} />
-          <span data-testid="signature-value" style={{ width: 62, flexShrink: 0, textAlign: 'right', fontSize: 11, fontWeight: 700, color: courseSubScoreTone(c.mean), ...NUMERIC }}>
-            {c.mean.toFixed(1)}
-          </span>
-        </div>
-      ))}
+      {/* The four AVERAGES in the shared category block; it owns the score tone rule. */}
+      <CategoryScores marginTop={14} scores={{ design: mean('Design'), condition: mean('Condition'), clubhouse: mean('Clubhouse'), facilities: mean('Facilities') }} />
     </section>
   );
 };
