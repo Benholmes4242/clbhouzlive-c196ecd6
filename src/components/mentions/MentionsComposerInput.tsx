@@ -383,44 +383,128 @@ interface AnchoredPanelProps {
   children: React.ReactNode;
 }
 
+/** Smallest list worth docking between the text and the keyboard. */
+export const MIN_PANEL = 170;
+export { PANEL_MAX_HEIGHT };
+
+export type MentionsPanelMode = 'dock' | 'above';
+
+/**
+ * Pure placement, in layout-viewport coordinates (the space
+ * getBoundingClientRect uses). vBottom is the top of the keyboard when it
+ * is open and the bottom of the screen when it is not.
+ *   - dock: room below the composer → the panel sits on vBottom, between
+ *     the text and the keyboard, so the text stays visible.
+ *   - above: the composer itself sits on the keyboard (comments) → the
+ *     panel floats above the composer and never covers it.
+ */
+export function placeMentionsPanel(p: {
+  vTop: number; vBottom: number; anchorTop: number; anchorBottom: number; safeTop?: number;
+}): { mode: MentionsPanelMode; targetBottom: number; maxHeight: number } {
+  const safeTop = p.safeTop ?? 0;
+  const spaceBelow = p.vBottom - p.anchorBottom - 8;
+  if (spaceBelow >= MIN_PANEL) {
+    return { mode: 'dock', targetBottom: p.vBottom, maxHeight: Math.min(PANEL_MAX_HEIGHT, spaceBelow) };
+  }
+  return {
+    mode: 'above',
+    targetBottom: p.anchorTop - 8,
+    maxHeight: Math.min(PANEL_MAX_HEIGHT, Math.max(0, p.anchorTop - p.vTop - safeTop - 16)),
+  };
+}
+
+export const MAX_PANEL_CORRECTIONS = 2;
+
+/**
+ * One correction step: the WebView's innerHeight can disagree with the
+ * visual viewport, so after rendering we read where the panel's bottom
+ * edge actually landed and move it by the difference. Capped so it can
+ * never loop.
+ */
+export function correctPanelBottom(s: {
+  bottom: number; measuredBottom: number; targetBottom: number; corrections: number;
+}): { bottom: number; corrections: number; done: boolean } {
+  const delta = s.measuredBottom - s.targetBottom;
+  if (Math.abs(delta) <= 1 || s.corrections >= MAX_PANEL_CORRECTIONS) {
+    return { bottom: s.bottom, corrections: s.corrections, done: true };
+  }
+  return { bottom: s.bottom + delta, corrections: s.corrections + 1, done: false };
+}
+
+let cachedSafeTop: number | null = null;
+function readSafeTop(): number {
+  if (cachedSafeTop !== null) return cachedSafeTop;
+  if (typeof document === 'undefined') return 0;
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;visibility:hidden;pointer-events:none;padding-top:env(safe-area-inset-top, 0px);';
+  document.body.appendChild(probe);
+  cachedSafeTop = parseFloat(getComputedStyle(probe).paddingTop) || 0;
+  probe.remove();
+  return cachedSafeTop;
+}
+
+interface PanelGeom {
+  mode: MentionsPanelMode;
+  targetBottom: number;
+  maxHeight: number;
+  bottom: number;
+  corrections: number;
+  ready: boolean;
+}
+
 function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
   const panelRef = React.useRef<HTMLDivElement | null>(null);
-  const [geom, setGeom] = React.useState<{
-    left: number;
-    width: number;
-    bottom: number;
-    maxHeight: number;
-  } | null>(null);
+  const [geom, setGeom] = React.useState<PanelGeom | null>(null);
 
   const measure = React.useCallback(() => {
     if (typeof window === 'undefined') return;
+    const anchor = anchorRef.current;
+    if (!anchor) return;
     const vv = window.visualViewport;
-    const innerH = window.innerHeight;
-    const vHeight = vv?.height ?? innerH;
-    const vOffsetTop = vv?.offsetTop ?? 0;
-    const keyboardH = Math.max(0, innerH - vHeight - vOffsetTop);
-    const maxHeight = Math.min(PANEL_MAX_HEIGHT, Math.round(vHeight * 0.60));
-    setGeom(prev => {
-      const next = { left: 0, width: window.innerWidth, bottom: keyboardH, maxHeight };
-      if (prev && prev.left === next.left && prev.width === next.width &&
-          prev.bottom === next.bottom && prev.maxHeight === next.maxHeight) return prev;
-      return next;
+    const vTop = vv ? vv.offsetTop : 0;
+    const vBottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
+    const a = anchor.getBoundingClientRect();
+    const place = placeMentionsPanel({
+      vTop, vBottom, anchorTop: a.top, anchorBottom: a.bottom, safeTop: readSafeTop(),
     });
-  }, []);
+    setGeom(prev => {
+      if (prev && prev.mode === place.mode && Math.abs(prev.targetBottom - place.targetBottom) < 0.5 &&
+          prev.maxHeight === place.maxHeight) return prev;
+      return {
+        ...place,
+        bottom: window.innerHeight - place.targetBottom,
+        corrections: 0,
+        ready: false,
+      };
+    });
+  }, [anchorRef]);
 
-  // Mount-time measurement + full listener lifecycle. This effect
-  // runs every time the panel mounts (== every time suggestions
-  // open), so no "measured stale" state can persist across steps.
+  // Correction pass: put the bottom edge exactly on targetBottom.
+  React.useLayoutEffect(() => {
+    if (!geom || geom.ready || !panelRef.current) return;
+    const rect = panelRef.current.getBoundingClientRect();
+    const step = correctPanelBottom({
+      bottom: geom.bottom, measuredBottom: rect.bottom,
+      targetBottom: geom.targetBottom, corrections: geom.corrections,
+    });
+    setGeom({ ...geom, bottom: step.bottom, corrections: step.corrections, ready: step.done });
+  }, [geom]);
+
+  // Mount-time measurement + full listener lifecycle. Runs every time the
+  // panel mounts (== every time suggestions open).
   React.useLayoutEffect(() => {
     measure();
 
     const ro = new ResizeObserver(() => measure());
     if (panelRef.current) ro.observe(panelRef.current);
+    const anchor = anchorRef.current;
+    if (anchor) ro.observe(anchor);
 
     const onWinResize = () => measure();
     const onWinScroll = () => measure();
     window.addEventListener('resize', onWinResize);
     window.addEventListener('scroll', onWinScroll, true);
+    anchor?.addEventListener('focusin', onWinResize);
 
     const vv = window.visualViewport;
     vv?.addEventListener('resize', onWinResize);
@@ -430,17 +514,15 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
       ro.disconnect();
       window.removeEventListener('resize', onWinResize);
       window.removeEventListener('scroll', onWinScroll, true);
+      anchor?.removeEventListener('focusin', onWinResize);
       vv?.removeEventListener('resize', onWinResize);
       vv?.removeEventListener('scroll', onWinScroll);
     };
-  }, [measure]);
+  }, [measure, anchorRef]);
 
-  // Portal the visible chrome DIRECTLY to <body>, as a SIBLING of the
-  // react-mentions shell — nothing about the shell (0x0, pointer-none)
-  // can clip / pierce / occlude it. React tree is unchanged, so the
-  // library's synthetic click handlers on the <li>s still route.
   if (typeof document === 'undefined') return null;
   const hasChildren = React.Children.count(children) > 0;
+  const above = geom?.mode === 'above';
   return ReactDOM.createPortal(
     <div
       ref={panelRef}
@@ -449,19 +531,27 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
       onMouseDown={(e) => e.preventDefault()}
       style={{
         position: 'fixed',
-        left: 0,
-        right: 0,
+        left: above ? 8 : 0,
+        right: above ? 8 : 0,
         bottom: geom?.bottom ?? 0,
-        width: '100%',
         maxHeight: geom?.maxHeight ?? PANEL_MAX_HEIGHT,
         display: 'flex',
         flexDirection: 'column',
         background: PANEL_BG,
-        borderRadius: '18px 18px 0 0',
-        borderTop: `1px solid ${BORDER}`,
-        boxShadow: '0 -10px 30px -6px rgba(0,0,0,0.45)',
+        overflow: 'hidden',
+        ...(above
+          ? {
+              borderRadius: 18,
+              border: `1px solid ${BORDER}`,
+              boxShadow: '0 10px 30px -6px rgba(0,0,0,0.45)',
+            }
+          : {
+              borderRadius: '18px 18px 0 0',
+              borderTop: `1px solid ${BORDER}`,
+              boxShadow: '0 -10px 30px -6px rgba(0,0,0,0.45)',
+            }),
         pointerEvents: 'auto',
-        opacity: geom ? 1 : 0,
+        opacity: geom?.ready ? 1 : 0,
         zIndex: Z.mentionsPanel,
       }}
     >
