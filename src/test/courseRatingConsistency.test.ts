@@ -124,7 +124,7 @@ describe('C1 course rating consistency', () => {
   it('preserves viewing-member amber and moves the composer onto the course rule', () => {
     const about = src('src/components/courses/course-detail/about/WhatPeopleSay.tsx');
     const rows = src('src/components/courses/course-detail/reviews/reviewFlatBits.tsx');
-    expect(about).toContain('aboutFig(22, A.AMBER_DEEP)');
+    expect(about).toContain('<OverallScoreLine score={score} ratingCount={total} />');
     expect(rows).toContain('isMine ? A.AMBER : courseSubScoreTone(score)');
 
     /* THE REVIEW FLOW PRINTS THE COURSE PAGE'S COLOURS. Every score figure in
