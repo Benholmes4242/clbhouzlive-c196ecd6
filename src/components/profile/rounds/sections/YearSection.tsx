@@ -7,7 +7,7 @@ import React from 'react';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import type { ProfileRound } from '../useProfileRounds';
 import { monthHighlights, monthStats } from '../roundsDerivations';
-import { KICKER, RT, SR_ONLY, TITLE, fmt1, note } from './roundsTokens';
+import { KICKER, RT, SR_ONLY, TAB, TITLE, fmt1, note } from './roundsTokens';
 
 interface Props {
   rounds: ProfileRound[];
@@ -35,8 +35,8 @@ const YearSection: React.FC<Props> = ({ rounds, year, today }) => {
   const avgs = ms.map((m) => m.avg).filter((a): a is number => a != null);
   const lo = avgs.length ? Math.min(...avgs) : 0;
   const hi = avgs.length ? Math.max(...avgs) : 0;
-  // Lower score plots HIGHER. A flat year sits mid-band.
-  const y = (a: number) => (hi === lo ? (LINE_TOP + LINE_BOTTOM) / 2 : LINE_TOP + ((a - lo) / (hi - lo)) * (LINE_BOTTOM - LINE_TOP));
+  // Golf convention: a LOWER average plots LOWER (falling line = improving). Flat year sits mid-band.
+  const y = (a: number) => (hi === lo ? (LINE_TOP + LINE_BOTTOM) / 2 : LINE_TOP + ((hi - a) / (hi - lo)) * (LINE_BOTTOM - LINE_TOP));
 
   const segments: string[] = [];
   let cur: string[] = [];
@@ -56,7 +56,7 @@ const YearSection: React.FC<Props> = ({ rounds, year, today }) => {
       <div style={TITLE}>The shape of it</div>
 
       <div style={{ background: MEMBER_PANEL, borderRadius: 12, padding: '10px 10px 2px', marginTop: 14 }}>
-        <svg viewBox="0 0 329 112" width="100%" height={112} style={{ display: 'block' }} aria-hidden>
+        <svg viewBox="0 0 353 112" width="100%" height={112} style={{ display: 'block' }} aria-hidden>
           <line x1={0} x2={329} y1={BASE + 0.5} y2={BASE + 0.5} stroke={RT.BASELINE} strokeWidth={1} />
           {ms.map((m, i) => {
             if (isFuture(i)) {
@@ -70,6 +70,12 @@ const YearSection: React.FC<Props> = ({ rounds, year, today }) => {
             <path key={k} d={d} fill="none" stroke={RT.GREEN} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" opacity={0.9} />
           ))}
           {ms.map((m, i) => (m.avg != null ? <circle key={i} cx={cx(i)} cy={y(m.avg)} r={1.9} fill={RT.GREEN} opacity={0.9} /> : null))}
+          {avgs.length ? (
+            <>
+              <text x={353} y={LINE_TOP + 3} textAnchor="end" fontSize={8.5} fontWeight={700} fill={RT.DIM} style={TAB}>{fmt1(hi)}</text>
+              {hi !== lo ? <text x={353} y={LINE_BOTTOM + 3} textAnchor="end" fontSize={8.5} fontWeight={700} fill={RT.DIM} style={TAB}>{fmt1(lo)}</text> : null}
+            </>
+          ) : null}
           {INITIALS.map((l, i) => (
             <text key={i} x={cx(i)} y={104} textAnchor="middle" fontSize={8.5} fontWeight={700} letterSpacing="0.06em" fill={RT.FAINT}>{l}</text>
           ))}

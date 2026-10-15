@@ -18,6 +18,24 @@ interface Props {
   viewerId: string | undefined;
 }
 
+/** Splits names that share a club prefix with another row: club truncates, course stays visible. */
+export function splitClubCourse(names: (string | null)[]): ({ club: string; course: string } | null)[] {
+  const words = names.map((n) => (n ?? '').split(/\s+/).filter(Boolean));
+  return words.map((w, i) => {
+    let best = 0;
+    words.forEach((o, j) => {
+      if (j === i) return;
+      let k = 0;
+      while (k < w.length && k < o.length && w[k] === o[k]) k++;
+      best = Math.max(best, k);
+    });
+    if (best < 2 || best >= w.length) return null;
+    const club = w.slice(0, best).join(' ').replace(/\s*[-–—,]$/, '');
+    const rest = w.slice(best).join(' ').replace(/^[-–—,(]\s*|\)$/g, '').replace(/\s+Course$/i, '').trim();
+    return rest ? { club, course: `(${rest})` } : null;
+  });
+}
+
 const CoursesPlayedSection: React.FC<Props> = ({ rounds, userId, viewerId }) => {
   const all = courseStats(rounds);
   const top = all.slice(0, 5);
@@ -28,6 +46,7 @@ const CoursesPlayedSection: React.FC<Props> = ({ rounds, userId, viewerId }) => 
 
   if (!top.length) return null;
   const maxN = top[0].rounds;
+  const split = splitClubCourse(top.map((c) => c.name));
   const full18 = all.reduce((a, c) => a + c.rounds, 0);
   const lead = top[0];
   const pct = full18 > 0 ? Math.round((lead.rounds / full18) * 100) : null;
@@ -37,10 +56,15 @@ const CoursesPlayedSection: React.FC<Props> = ({ rounds, userId, viewerId }) => 
       <div style={KICKER}>Where you play</div>
       <div style={TITLE}>Your five most played</div>
       <div style={{ marginTop: 5 }}>
-        {top.map((c) => (
+        {top.map((c, i) => (
           <div key={c.key} style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 9 }}>
             <span style={{ width: 130, flex: 'none', fontSize: 11, fontWeight: 600, color: RT.BODY, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {c.name ?? ''}
+              {split[i] ? (
+                <span style={{ display: 'inline-flex', maxWidth: '100%', verticalAlign: 'bottom' }}>
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{split[i]!.club}</span>
+                  <span style={{ flex: 'none', marginLeft: 3 }}>{split[i]!.course}</span>
+                </span>
+              ) : (c.name ?? '')}
               {c.courseId && homeIds.has(c.courseId) ? (
                 <span style={{ marginLeft: 4, fontSize: 8, fontWeight: 700, letterSpacing: '0.1em', color: RT.AMBER }}>HOME</span>
               ) : null}

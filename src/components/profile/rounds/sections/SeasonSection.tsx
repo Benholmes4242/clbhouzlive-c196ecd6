@@ -62,7 +62,7 @@ const SeasonSection: React.FC<Props> = ({ rounds, year, userId, isOwnProfile }) 
       <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
         {isOwnProfile ? <Tile value={total != null ? formatNumber(total) : ''} label="Rounds all time" /> : null}
         <Tile value={formatNumber(courses)} label="Courses this year" />
-        <Tile value={formatNumber(months)} label="Months played" />
+        <Tile value={formatNumber(months)} label="Months played this year" />
       </div>
     </section>
   );
