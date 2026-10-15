@@ -83,3 +83,17 @@ describe('the preview read honours the target type it is handed', () => {
     expect(src('src/hooks/feed/useFeedCommentPreview.ts')).toContain('parent_id');
   });
 });
+
+describe('feed and fullscreen comment sheets target the real subject', () => {
+  for (const file of ['src/pages/Clubhouse.tsx', 'src/components/fullscreen-feed/FullscreenFeedOverlay.tsx']) {
+    it(`${file} resolves round and review targets before falling back to the post`, () => {
+      const s = src(file);
+      expect(s).toMatch(/['"]round['"]/);
+      expect(s).toMatch(/['"]review['"]/);
+      expect(s).toMatch(/usePostScoreIds/);
+      expect(s).toMatch(/review\?\.reviewId/);
+      expect(s).not.toMatch(/targetType="post"/);
+      expect(s).toMatch(/\.settled/);
+    });
+  }
+});
