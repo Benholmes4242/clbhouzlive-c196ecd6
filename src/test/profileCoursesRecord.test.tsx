@@ -77,7 +77,7 @@ describe('profile courses record', () => {
     for (const s of ['recently-played', 'rating-high-low', 'rating-low-high']) {
       fireEvent.click(screen.getByText(`sort:${s}`));
       await waitFor(() => expect(container.querySelectorAll('article').length).toBe(ACTIVITY.length));
-      for (const c of COURSES) expect(screen.getByText(c.name)).toBeTruthy();
+      for (const c of COURSES) expect(screen.getAllByText(c.name).length).toBeGreaterThan(0);
       expect(Number(screen.getByTestId('chip-all').textContent)).toBe(container.querySelectorAll('article').length);
     }
     fireEvent.click(screen.getByText('tab:top100'));
