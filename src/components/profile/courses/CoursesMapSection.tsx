@@ -46,9 +46,11 @@ export function fitProjection(points: CoursePoint[]) {
 interface Props {
   tallies: CountryTally[];
   points: MapPoint[];
+  /** Courses that cannot be plotted even after the club fallback. */
+  unmapped?: number;
 }
 
-export const CoursesMapSection: React.FC<Props> = ({ tallies, points }) => {
+export const CoursesMapSection: React.FC<Props> = ({ tallies, points, unmapped = 0 }) => {
   const showPlot = points.length >= MIN_POINTS;
   const fit = useMemo(() => (showPlot ? fitProjection(points) : null), [showPlot, points]);
   if (tallies.length === 0 && !showPlot) return null;
@@ -125,6 +127,9 @@ export const CoursesMapSection: React.FC<Props> = ({ tallies, points }) => {
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: OTHER_DOT }} />Everything else
         </span>
+        {unmapped > 0 && (
+          <span data-testid="map-unmapped" style={{ fontSize: 10.5, color: A.FAINT }}>{unmapped} not yet mapped</span>
+        )}
       </div>
     </div>
   );

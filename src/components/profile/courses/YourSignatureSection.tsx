@@ -7,11 +7,7 @@ import { ChaseBar } from './TheChaseSection';
 
 const NUMERIC: React.CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 
-function gap(cat: number, overall: number): string {
-  const d = Math.round((cat - overall) * 10) / 10;
-  if (d === 0) return 'level with';
-  return `${Math.abs(d).toFixed(1)} ${d > 0 ? 'above' : 'below'}`;
-}
+const diff = (cat: number, overall: number) => Math.abs(cat - overall).toFixed(1);
 
 export const YourSignatureSection: React.FC<{ rows: SignatureRow[] }> = ({ rows }) => {
   const model = useMemo(() => buildSignature(rows), [rows]);
@@ -28,13 +24,9 @@ export const YourSignatureSection: React.FC<{ rows: SignatureRow[] }> = ({ rows 
         members — so any comparison with other golfers would be invented.
       */}
       <p data-testid="signature-sentence" style={{ fontSize: 12.5, lineHeight: 1.55, color: A.MUTE, margin: '8px 0 0' }}>
-        <b style={{ color: A.INK, fontWeight: 700 }}>{high.label}</b> sits {gap(high.mean, overall)} your overall average
-        {high.label !== low.label && (
-          <>
-            ; <b style={{ color: A.INK, fontWeight: 700 }}>{low.label}</b> sits {gap(low.mean, overall)} it
-          </>
-        )}
-        .
+        You are a <b style={{ color: A.INK, fontWeight: 700 }}>{high.label.toLowerCase()}</b> voter — you mark it{' '}
+        {diff(high.mean, overall)} above your overall average
+        {categories.length > 1 ? `, and ${low.label.toLowerCase()} ${diff(low.mean, overall)} below.` : '.'}
       </p>
       {categories.map((c) => (
         <div key={c.label} data-testid="signature-row" style={{ marginTop: 9, display: 'flex', alignItems: 'center', gap: 10 }}>

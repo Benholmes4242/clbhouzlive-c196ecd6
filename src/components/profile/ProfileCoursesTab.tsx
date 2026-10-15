@@ -43,7 +43,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   isOwnProfile,
   displayName,
 }) => {
-  const { totalCoursesPlayed, countriesPlayed, countryTallies, coursePoints, isLoading } = useUserCourseSummary(userId);
+  const { totalCoursesPlayed, countriesPlayed, countryTallies, coursePoints, unmappedCount, isLoading } = useUserCourseSummary(userId);
   const { data: userActivity } = useUserCourseActivity(userId);
   const { data: distribution } = useTop100Distribution();
   const { data: recordConfig } = useGamRecordConfig();
@@ -75,8 +75,8 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   const { data: top100Progress } = useTop100ProgressForUser(userId);
   const { user: viewer } = useSupabaseSession();
   const [activeCountry, setActiveCountry] = useState<QuickRegion>('global');
-  // 'row' has no Top 100 list of its own, so The Chase targets the World list there.
-  const chaseListSlug = activeCountry === 'row' ? 'global' : activeCountry;
+  // 'row' has no Top 100 list of its own, so The Chase shows no next-target card there.
+  const chaseListSlug = activeCountry === 'row' ? null : activeCountry;
 
   // ONE course_ratings select for this member, read by both the course list
   // and Your Signature. Do not add a second fetch.
@@ -185,7 +185,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
 
       {countryTallies && (
         <div className="mt-6">
-          <CoursesMapSection tallies={countryTallies} points={mapPoints} />
+          <CoursesMapSection tallies={countryTallies} points={mapPoints} unmapped={unmappedCount} />
         </div>
       )}
 

@@ -36,6 +36,8 @@ export interface CountryRow {
   sub_country: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  /** The course's club, embedded in the same read (golf_courses.club_id). */
+  golf_clubs?: { latitude: number | null; longitude: number | null } | null;
 }
 export interface CountryTally { country: string; courses: number }
 export interface CoursePoint { id: string; lat: number; lng: number }
@@ -44,24 +46,34 @@ export interface CountriesSummary {
   tallies: CountryTally[];
   /** Courses with both coordinates; the rest still count everywhere else. */
   points: CoursePoint[];
+  /** Courses that still cannot be plotted after the club fallback. */
+  unmapped: number;
 }
-const EMPTY_COUNTRIES: CountriesSummary = { count: 0, tallies: [], points: [] };
+const EMPTY_COUNTRIES: CountriesSummary = { count: 0, tallies: [], points: [], unmapped: 0 };
 
 /** Null and empty sub_country never become a counted country. */
 export function summariseCountries(rows: CountryRow[]): CountriesSummary {
   const m = new Map<string, number>();
   const points: CoursePoint[] = [];
+  let unmapped = 0;
   for (const r of rows) {
     const c = r.sub_country?.trim();
     if (c) m.set(c, (m.get(c) ?? 0) + 1);
-    if (r.latitude != null && r.longitude != null) {
-      points.push({ id: r.id, lat: Number(r.latitude), lng: Number(r.longitude) });
+    // A course with no coordinates of its own borrows its club's. Whatever still cannot be plotted is stated in the legend — a map that silently drops a quarter of a member's golf while the figure above says 53 is a map that lies.
+    const own = r.latitude != null && r.longitude != null;
+    const club = r.golf_clubs;
+    const lat = own ? r.latitude : club?.latitude;
+    const lng = own ? r.longitude : club?.longitude;
+    if (lat != null && lng != null) {
+      points.push({ id: r.id, lat: Number(lat), lng: Number(lng) });
+    } else {
+      unmapped += 1;
     }
   }
   const tallies = [...m.entries()]
     .map(([country, courses]) => ({ country, courses }))
     .sort((a, b) => b.courses - a.courses || a.country.localeCompare(b.country));
-  return { count: tallies.length, tallies, points };
+  return { count: tallies.length, tallies, points, unmapped };
 }
 
 export function useUserCourseSummary(userId: string | undefined) {
@@ -103,7 +115,7 @@ export function useUserCourseSummary(userId: string | undefined) {
       // golf_courses.country is a REGION grouping ('Britain & Ireland', 'Continental Europe', 'Middle East'), NOT a country. The country is sub_country. Reading .country here is what made this panel report 3 countries for a member who has played in 9. The ~20 files under src/components/courses/ that display a location already use sub_country — this hook is following that convention, not inventing one. Do not 'simplify' this back to .country.
       const { data: courses, error: courseError } = await supabase
         .from('golf_courses')
-        .select('id, sub_country, latitude, longitude')
+        .select('id, sub_country, latitude, longitude, golf_clubs(latitude, longitude)')
         .in('id', courseIds);
 
       if (courseError) throw courseError;
@@ -127,6 +139,7 @@ export function useUserCourseSummary(userId: string | undefined) {
     /** Per-country tallies (sub_country), descending. Null when unknown. */
     countryTallies: countriesKnown ? countriesQuery.data?.tallies ?? null : null,
     coursePoints: countriesKnown ? countriesQuery.data?.points ?? null : null,
+    unmappedCount: countriesKnown ? countriesQuery.data?.unmapped ?? 0 : 0,
     top100Progress,
     /** True only while a read is genuinely in flight; an error ends loading. */
     isLoading:
