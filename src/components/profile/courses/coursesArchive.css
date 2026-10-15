@@ -52,6 +52,7 @@
 }
 .courses-archive .archive-preview-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
 }
@@ -59,6 +60,7 @@
   display: flex;
   gap: 8px;
   min-width: 0;
+  flex-shrink: 0;
 }
 .courses-archive .archive-preview-tile {
   width: min(58px, calc((100cqw - 156px) / 4)) !important;
