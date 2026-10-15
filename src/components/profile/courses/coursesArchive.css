@@ -2,6 +2,7 @@
    and headings elsewhere retain their signed-off appearance. */
 .courses-archive {
   font-family: inherit;
+  container-type: inline-size;
 }
 .courses-archive .archive-heading h2 {
   font-family: inherit !important;
@@ -68,7 +69,7 @@
   background-size: cover;
   background-position: center;
 }
-@media (max-width: 389px) {
+@container (max-width: 389px) {
   .courses-archive .archive-preview-tile {
     width: 40px !important;
     height: 40px !important;
