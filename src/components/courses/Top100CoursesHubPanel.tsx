@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import BrowseCourseCard from './BrowseCourseCard';
 import type { StatBrowseRow } from './useStatBrowse';
-import { RAIL_CHIP_GAP, RailChips, railChipStyle } from '@/components/ui/RailChips';
+import { RailChips, railChipStyle } from '@/components/ui/RailChips';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
@@ -227,7 +227,6 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
             {communityRatedCount} reviewed · {communityPlayedCount} tracked
           </span>
         </div>
-        {rateNudge ? <div style={{ marginTop: 24 }}>{rateNudge}</div> : null}
       </section>
 
       <div style={{ paddingTop: 24 }}>
