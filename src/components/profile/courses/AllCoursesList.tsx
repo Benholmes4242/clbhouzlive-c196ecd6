@@ -315,11 +315,21 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         });
         break;
       case 'rating-high-low':
-        result.sort((a, b) => compareOwnRatings(buildOwnRow(a), buildOwnRow(b), 'desc'));
+      case 'rating-low-high': {
+        // Every played course is drawn. Rated rows sort by compareOwnRatings;
+        // unrated rows all sit below them, most recently played first.
+        const dir = activeSort === 'rating-high-low' ? 'desc' : 'asc';
+        const playedAt = (c: { last_played_at?: string | null }) =>
+          c.last_played_at ? new Date(c.last_played_at).getTime() : 0;
+        result.sort((a, b) => {
+          const ra = isRatedRow(a);
+          const rb = isRatedRow(b);
+          if (ra && rb) return compareOwnRatings(buildOwnRow(a), buildOwnRow(b), dir);
+          if (ra !== rb) return ra ? -1 : 1;
+          return playedAt(b) - playedAt(a);
+        });
         break;
-      case 'rating-low-high':
-        result.sort((a, b) => compareOwnRatings(buildOwnRow(a), buildOwnRow(b), 'asc'));
-        break;
+      }
     }
 
     return result;
@@ -327,14 +337,13 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
   const isRatingSort = activeSort === 'rating-high-low' || activeSort === 'rating-low-high';
 
-  // ONE SET OF ROWS FEEDS THE CHIPS, THE LIST AND THE FOOTER. Rating sorts draw
-  // rated rows only, so the counts are taken from the rows actually drawn
-  // under the current region filter and sort - never from a wider source.
+  // ONE SET OF ROWS FEEDS THE CHIPS, THE LIST AND THE FOOTER. Every sort draws
+  // every played course, so the counts are the rows drawn under the current
+  // region filter - never from a wider source.
   const drawnFor = useCallback(
     (tab: CoursePrimaryTab) =>
       courses.filter((c) => {
         if (tab === 'top100' && !c.is_top100) return false;
-        if (isRatingSort && !isRatedRow(c)) return false;
         if (activeCountry === 'global') return true;
         switch (activeCountry) {
           case 'gb-i': return c.country === 'Britain & Ireland';
@@ -344,17 +353,14 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           default: return true;
         }
       }).length,
-    [courses, isRatingSort, activeCountry],
+    [courses, activeCountry],
   );
   const tabCounts = useMemo(
     () => ({ all: drawnFor('all'), top100: drawnFor('top100') }),
     [drawnFor],
   );
 
-  const drawnCourses = useMemo(
-    () => (isRatingSort ? filteredCourses.filter(isRatedRow) : filteredCourses),
-    [filteredCourses, isRatingSort],
-  );
+  const drawnCourses = filteredCourses;
 
   const displayedCourses = drawnCourses.slice(0, displayCount);
   const hasMore = displayCount < drawnCourses.length;
@@ -521,11 +527,12 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                 top: 0,
                 rest: 0,
               };
+              let unratedCount = 0;
               drawnCourses.forEach((c) => {
-                if (c.has_rating && c.rating_value != null) {
-                  tierCounts[getBucket(c.rating_value)]++;
-                }
+                if (isRatedRow(c)) tierCounts[getBucket(c.rating_value as number)]++;
+                else unratedCount++;
               });
+              let unratedDividerRendered = false;
 
               const elements: React.ReactNode[] = [];
               let currentBucket: MyRatingsBucket | null = null;
@@ -533,7 +540,33 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
               displayedCourses.forEach((course) => {
                 // A row's position in a sorted list is not a rank. The only rank on this row is global_rank, which comes from the published Top 100.
-                if (!isRatedRow(course)) return;
+                if (!isRatedRow(course)) {
+                  if (!unratedDividerRendered) {
+                    elements.push(
+                      <MyRatingsTierDivider
+                        key="divider-unrated"
+                        tierName="NOT YET RATED"
+                        count={unratedCount}
+                        isFirst={!firstDividerRendered}
+                      />,
+                    );
+                    unratedDividerRendered = true;
+                    firstDividerRendered = true;
+                  }
+                  elements.push(
+                    <DossierCard
+                      key={course.id}
+                      course={toRatedCourseData(course)}
+                      unrated
+                      onRate={isOwnProfile ? (id) => navigate(`/courses/${id}/rate`) : undefined}
+                      onCourseClick={handleCourseClick}
+                      onFullReview={handleFullReview}
+                      scoring={scoringFor(course.id)}
+                      onExpand={handleRowExpand}
+                    />,
+                  );
+                  return;
+                }
 
                 const rating = course.rating_value as number;
                 const bucket = getBucket(rating);
