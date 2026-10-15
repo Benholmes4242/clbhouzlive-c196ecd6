@@ -45,6 +45,10 @@ export const A = {
   /** Detail lines: near-ink body text, heavier than MUTE. */
   BODY: 'rgba(248,250,252,0.72)',
   DIM: 'rgba(248,250,252,0.42)',
+  /** The tier below DIM: labels that must sit under a DIM line. Not a new
+   *  colour — rgba(248,250,252,0.3) is already a literal in 4 files; this is
+   *  the name it never got. Existing literals are NOT retro-fitted. */
+  FAINT: 'rgba(248,250,252,0.30)',
   /** The softer of the two hairlines: rules INSIDE a block (between rows of
    *  one list) as against A.BORDER, which separates blocks. Not a new colour
    *  — rgba(255,255,255,0.06) is already a literal in 83 files; this is the
