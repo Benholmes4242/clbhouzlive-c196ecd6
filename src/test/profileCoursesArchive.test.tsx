@@ -152,5 +152,25 @@ describe('profile courses archive — mock design', () => {
     expect(group.textContent).not.toMatch(/[🌍🌏🌎]/u);
   });
 
-  const DossierCard = (await import('@/components/profile/courses/DossierCard')).default;
+  it('an expanded own-profile row with a review has three actions; another member gets two', async () => {
+    const DossierCard = (await import('@/components/profile/courses/DossierCard')).default;
+    const course: any = {
+      id: 'x', name: 'Xray', country: 'England', sub_country: null, thumbnail_image: null, is_top100: false, global_rank: null,
+      last_played_at: '2026-01-01', rating_value: 8, rating_id: 'r1', design_score: 8, condition_score: null,
+      clubhouse_score: null, facilities_score: null, review: 'Lovely', review_date: '2026-01-02',
+    };
+    const actionsFor = (onEditReview?: (id: string) => void) => {
+      const { container, unmount } = render(
+        <DossierCard appearance="archive" course={course} onCourseClick={() => {}} onFullReview={() => {}} onEditReview={onEditReview} />,
+      );
+      fireEvent.click(container.querySelector('article')!);
+      const grid = within(container).getByTestId('row-actions');
+      const n = grid.querySelectorAll('button').length;
+      const cols = grid.style.gridTemplateColumns;
+      unmount();
+      return { n, cols };
+    };
+    expect(actionsFor(() => {})).toEqual({ n: 3, cols: 'repeat(3, minmax(0, 1fr))' });
+    expect(actionsFor(undefined)).toEqual({ n: 2, cols: 'repeat(2, minmax(0, 1fr))' });
+  });
 });
