@@ -47,6 +47,7 @@ import { Z } from '@/config/zIndex';
 import { extractMentions } from '@/lib/mentions/format';
 import { FIELD_PLACEHOLDER } from '@/lib/tokens/field';
 import { COMPOSER_PANEL_SURFACE } from '@/lib/tokens/surfaces';
+import { isPerfEnabled } from '@/perf/navTiming';
 
 const INK = '#F8FAFC';
 const INK_SUBTLE = 'rgba(248,250,252,0.42)';
@@ -443,6 +444,20 @@ function readSafeTop(): number {
   return cachedSafeTop;
 }
 
+/**
+ * The visible area in SCREEN coordinates. In the app's iOS WebView both
+ * getBoundingClientRect and position:fixed are relative to the screen, so the
+ * keyboard's top edge is visualViewport.height. visualViewport.offsetTop is the
+ * page's keyboard scroll and must never be added — doing so pushed the panel
+ * behind the keyboard by exactly that scroll in the review wizard.
+ */
+export function readVisibleArea(
+  win: { innerHeight: number; visualViewport?: { height: number } | null },
+): { vTop: number; vBottom: number } {
+  const vv = win.visualViewport;
+  return { vTop: 0, vBottom: vv ? vv.height : win.innerHeight };
+}
+
 interface PanelGeom {
   mode: MentionsPanelMode;
   targetBottom: number;
@@ -455,14 +470,15 @@ interface PanelGeom {
 function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
   const panelRef = React.useRef<HTMLDivElement | null>(null);
   const [geom, setGeom] = React.useState<PanelGeom | null>(null);
+  // Perf-toggle-only placement readout (admin Settings perf switch).
+  const [debugLine, setDebugLine] = React.useState<string | null>(null);
 
   const measure = React.useCallback(() => {
     if (typeof window === 'undefined') return;
     const anchor = anchorRef.current;
     if (!anchor) return;
     const vv = window.visualViewport;
-    const vTop = vv ? vv.offsetTop : 0;
-    const vBottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
+    const { vTop, vBottom } = readVisibleArea(window);
     const a = anchor.getBoundingClientRect();
     const place = placeMentionsPanel({
       vTop, vBottom, anchorTop: a.top, anchorBottom: a.bottom, safeTop: readSafeTop(),
@@ -477,6 +493,17 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
         ready: false,
       };
     });
+    if (isPerfEnabled()) {
+      const r = Math.round;
+      const pr = panelRef.current?.getBoundingClientRect();
+      setDebugLine(
+        `ih ${r(window.innerHeight)} vh ${r(vv ? vv.height : window.innerHeight)} vo ${r(vv ? vv.offsetTop : 0)} ` +
+        `sy ${r(window.scrollY)} a ${r(a.top)}-${r(a.bottom)} p ${r(pr?.top ?? 0)}-${r(pr?.bottom ?? 0)} ` +
+        `${place.mode} t ${r(place.targetBottom)}`,
+      );
+    } else {
+      setDebugLine(null);
+    }
   }, [anchorRef]);
 
   // Correction pass: put the bottom edge exactly on targetBottom.
@@ -598,6 +625,22 @@ function AnchoredMentionsPanel({ anchorRef, children }: AnchoredPanelProps) {
             <AtSign size={11} strokeWidth={2.25} style={{ color: INK_SUBTLE }} />
             Mention someone
           </div>
+          {debugLine && (
+            <div
+              aria-hidden
+              style={{
+                padding: '4px 14px 6px',
+                fontSize: 10,
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                color: 'rgba(248,250,252,0.6)',
+                pointerEvents: 'none',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+              }}
+            >
+              {debugLine}
+            </div>
+          )}
         </div>
       )}
       <div
