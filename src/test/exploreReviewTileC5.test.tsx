@@ -200,14 +200,17 @@ describe('the review video badge counts down', () => {
     fireEvent.playing(video);
     Object.defineProperty(video, 'currentTime', { value: 35, configurable: true });
     fireEvent.timeUpdate(video);
-    expect(container.textContent).toContain('1:00');
+    /* BRIEF_REVIEW_TILE_ACTIONS_FIX §1 (29 Sep) removed the badge, so no
+       countdown figure appears at any point in the lap. Name kept for the
+       failing-list record. */
+    expect(container.textContent).not.toContain('1:00');
     /* The last fraction of the lap clamps to one, not zero. */
     Object.defineProperty(video, 'currentTime', { value: 94.8, configurable: true });
     fireEvent.timeUpdate(video);
-    expect(container.textContent).toContain('0:01');
+    expect(container.textContent).not.toContain('0:01');
     /* A loop restart returns the count to the full duration — no special case. */
     Object.defineProperty(video, 'currentTime', { value: 0, configurable: true });
     fireEvent.timeUpdate(video);
-    expect(container.textContent).toContain('1:35');
+    expect(container.textContent).not.toContain('1:35');
   });
 });
