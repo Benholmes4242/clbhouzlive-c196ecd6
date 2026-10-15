@@ -195,8 +195,15 @@ export function YourHundredSection({ viewerPlayed, total, courseIds, enrichment,
             onClick={() => setSelected((cur) => (cur === id ? null : id))}
             aria-label={`#${i + 1} ${subjects.get(id)?.name ?? ''}`.trim()}
             aria-pressed={selected === id}
+            /*
+             * The cells are deliberately wider than they are tall. The width is set by the
+             * ten columns; the height is the only free variable in this grid. At ten columns
+             * across a 361px run the cell is 32.5px wide, so a square cell made the grid
+             * 361px tall — the height was the width, not a choice. A fixed 26px height keeps
+             * the full tap width, loses 6px of tap height, and takes the grid to 296px.
+             */
             style={{
-              aspectRatio: '1', borderRadius: 3, padding: 0, border: 0, cursor: 'pointer',
+              height: 26, borderRadius: 3, padding: 0, border: 0, cursor: 'pointer',
               ...(() => {
                 const base = cellStyle(cellState(enrichment.get(id)));
                 if (selected !== id) return base;
