@@ -42,6 +42,20 @@ function savedList(): string {
   }
 }
 
+/** The list holding the member's most played courses — a single clear
+ *  leader with more than zero, otherwise 'global'. Unknown slugs are ignored. */
+export function mostPlayedList(lists: ReadonlyArray<{ listSlug: string; played: number }> | undefined): string {
+  let best = 0;
+  let leaders: string[] = [];
+  for (const row of lists ?? []) {
+    if (!LISTS.some((list) => list.id === row.listSlug)) continue;
+    const played = Number(row.played ?? 0);
+    if (played > best) { best = played; leaders = [row.listSlug]; }
+    else if (played === best && played > 0) leaders.push(row.listSlug);
+  }
+  return leaders.length === 1 && best > 0 ? leaders[0] : 'global';
+}
+
 function rankFor(course: SearchedCourseWithRating, list: string): number | null {
   const match = (course.list_memberships ?? []).find((membership: CourseListMembership) => membership.list_slug === list);
   return match?.rank ?? null;
@@ -100,9 +114,14 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   if (!isPlaceholderData) settledList.current = selectedList;
   const renderedList = settledList.current;
 
-  useEffect(() => {
-    sessionStorage.setItem('top100-last-filters', JSON.stringify({ list: selectedList }));
-  }, [selectedList]);
+  const chosenThisMount = useRef(false);
+  const defaultApplied = useRef(false);
+  const chooseList = (next: string) => {
+    restored.current = true;
+    chosenThisMount.current = true;
+    sessionStorage.setItem('top100-last-filters', JSON.stringify({ list: next }));
+    setSelectedList(next);
+  };
 
   const courses = useMemo(() => {
     const rows = data?.pages.flat() ?? [];
@@ -133,6 +152,15 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   const viewerList = progress?.lists.find((list) => list.listSlug === renderedList);
   const viewerPlayed = viewerList?.played ?? 0;
   const viewerRated = viewerList?.rated ?? 0;
+
+  /* The tab opens where the member's golf is. This runs ONCE, only when nothing has been chosen — a saved list or a tap in this mount both win over it, because a default that overrides a member's own choice is not a default, it is a bug. A tie for the most played, or none played at all, falls back to Global. It is safe to change the list here because PageLoadGate is already waiting on 'progress', so the page has not painted yet. */
+  useEffect(() => {
+    if (!user?.id || progressLoading || !progress) return;
+    if (sessionStorage.getItem('top100-last-filters') != null) return;
+    if (chosenThisMount.current || defaultApplied.current) return;
+    defaultApplied.current = true;
+    setSelectedList(mostPlayedList(progress.lists));
+  }, [user?.id, progress, progressLoading]);
   const subjects = useMemo(
     () => new Map(courses.map((c) => [c.id, {
       name: c.name ?? '',
@@ -170,7 +198,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
         <RailChips
           options={LISTS}
           value={selectedList}
-          onChange={(next) => { restored.current = true; setSelectedList(next); }}
+          onChange={chooseList}
           ariaLabel="Top 100 region"
           align="center-when-fit"
           size="sm"
