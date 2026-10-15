@@ -167,6 +167,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   return (
     <div className="pb-2">
       {/* Section 1: Course Legacy summary */}
+      {/* This is a fact about the member, not about the list below it. It does not move when a filter, scope or sort changes. The filter chip is a different thing — a control, whose number promises what tapping it will show — and the two agree only because the list hides nothing. */}
       <JourneySummaryCard
         coursesPlayed={totalCoursesPlayed}
         countriesPlayed={countriesPlayed}
