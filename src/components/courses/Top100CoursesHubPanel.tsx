@@ -65,11 +65,11 @@ function toBrowseRow(
     global_rank: course.global_rank ?? null,
     regional_rank: course.regional_rank ?? null,
     rounds: data?.roundsTracked ?? 0,
-    members: 0,
+    members: data?.playerCount ?? 0,
     avg_to_par: hasRounds ? data?.avgOverPar ?? null : null,
     total_yards: null,
     tee_label: null,
-    course_record: null,
+    course_record: data?.recordGross ?? null,
     open_crowns: 0,
     total_count: 0,
     design_score: hasRounds ? data?.subScores.design ?? null : null,
@@ -299,6 +299,8 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs, rateNudge }) => {
                     rank={rankFor(course, selectedList)}
                     viewerRounds={item?.yourRounds ?? 0}
                     viewerBest={item?.yourBest ?? null}
+                    recordHolder={item?.recordHolder ?? null}
+                    players={item?.players ?? []}
                     difficultyPercentile={row.rounds > 0 ? row.difficulty_percentile : null}
                     onClick={() => openCourse(course.id)}
                   />

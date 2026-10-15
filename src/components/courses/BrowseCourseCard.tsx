@@ -6,6 +6,7 @@ import { CategoryScores } from '@/components/courses/course-detail/CategoryScore
 import type { StatBrowseRow } from './useStatBrowse';
 import { courseRankLabels, type RankList } from '@/features/courses/_shared/courseRankLabels';
 import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 const PHOTO_H = 196;
 const PHOTO_MUTE = 'rgba(255,255,255,0.66)';
@@ -49,7 +50,15 @@ interface BrowseCourseCardProps {
   viewerRounds?: number;
   /** Top 100 only: the viewer's best gross here, or null when unknown. */
   viewerBest?: number | null;
+  /** Top 100 only: display name pairing with row.course_record. The record
+      line renders only when BOTH are present (the course hero's rule), which
+      is why no username can reach this card. */
+  recordHolder?: string | null;
+  /** Top 100 only: up to three members, most rounds first. */
+  players?: Array<{ id: string; name: string | null; photoUrl: string | null }>;
 }
+
+const NO_PLAYERS: NonNullable<BrowseCourseCardProps['players']> = [];
 
 export function BrowseCourseCard({
   row,
@@ -59,6 +68,8 @@ export function BrowseCourseCard({
   rank = null,
   viewerRounds = 0,
   viewerBest = null,
+  recordHolder = null,
+  players = NO_PLAYERS,
 }: BrowseCourseCardProps) {
   const top100 = variant === 'top100';
   const hasRoundFacts = row.rounds > 0 && row.avg_to_par != null;
@@ -113,15 +124,13 @@ export function BrowseCourseCard({
           }}
         />
         {!top100 ? <RankBadge memberships={row.memberships} /> : null}
-        {/* BRIEF_TOP_100_REBUILD §4 — three states. You played: amber-dot chip
-            top-left. Members played, you have not: rounds chip top-right.
-            Nobody: no chip (the meta strip carries the frontier line).
-            The chip counts ROUNDS, not people — a distinct-player count
-            needs a read this page does not make.
-            DELIBERATE OMISSION: no "Best tracked here {n}, {name}" line.
-            Nothing this card loads carries the course's best round (yourBest
-            is the viewer's). Source if wanted later: get_hero_course_fact via
-            useHeroCourseFact — batching it for a hundred courses is its own read.
+        {/* THE PHOTOGRAPH IS ABOUT YOU, THE STRIP BELOW IT IS ABOUT EVERYONE ELSE.
+            The amber "You played" chip is the only chip the photograph carries.
+            The old top-right chip counted rounds and lied about crowds (a dozen
+            rounds by one member read as a crowd), so it is gone. The member
+            count, the faces and the course record now arrive in the batched
+            enrichment read the page already makes (get_post_course_context +
+            one user_profiles read) and render in the strip below.
             DELIBERATE OMISSION: no per-card "Rate it" control. Rating is
             prompted once by RateNudge above the list (its 'played' tier), and
             this card's root is a button, so a control here would nest a
@@ -130,10 +139,6 @@ export function BrowseCourseCard({
           <div style={{ ...GLASS_CHIP, left: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <span aria-hidden style={{ width: 6, height: 6, borderRadius: 999, background: A.AMBER }} />
             {viewerBest != null ? <>You played · best <span style={FIGS}>{viewerBest}</span></> : 'You played'}
-          </div>
-        ) : top100 && row.rounds > 0 ? (
-          <div style={{ ...GLASS_CHIP, right: 20 }}>
-            <span style={FIGS}>{row.rounds}</span> {row.rounds === 1 ? 'round' : 'rounds'} tracked
           </div>
         ) : null}
         <div style={{ position: 'absolute', left: 20, right: 20, bottom: 14, display: 'flex', alignItems: 'flex-end', gap: 16 }}>
@@ -168,6 +173,41 @@ export function BrowseCourseCard({
         </div>
       </div>
       <div style={{ padding: '0 20px' }}>
+        {top100 && row.members > 0 ? (
+          <div style={{ marginTop: 11, display: 'flex', alignItems: 'center', gap: 7, minWidth: 0, fontSize: 11, color: A.DIM }}>
+            {players.length > 0 ? (
+              <span
+                aria-hidden="true"
+                style={{ flex: 'none', position: 'relative', height: 20, width: 19 + (players.length - 1) * 12 }}
+              >
+                {players.map((player, index) => (
+                  <span
+                    key={player.id}
+                    style={{
+                      position: 'absolute', left: index * 12, top: 0, width: 19, height: 20,
+                      borderRadius: '34%', zIndex: 3 - index, boxShadow: `0 0 0 1.5px ${A.CANVAS}`,
+                    }}
+                  >
+                    <SquircleAvatar src={player.photoUrl} userId={player.id} size={19} alt={player.name ?? ''} hairlineRing />
+                  </span>
+                ))}
+              </span>
+            ) : null}
+            <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <span style={{ color: A.BODY, fontWeight: 600 }}>
+                <span style={FIGS}>{row.members}</span> {row.members === 1 ? 'member' : 'members'}
+              </span>
+              {row.course_record != null && recordHolder ? (
+                <>
+                  {' · best '}
+                  <span style={fig}>{row.course_record}</span>
+                  {' by '}
+                  <span style={{ color: A.BODY, fontWeight: 600 }}>{recordHolder}</span>
+                </>
+              ) : null}
+            </span>
+          </div>
+        ) : null}
         {hasRoundFacts ? (
           <div style={{ marginTop: 11, whiteSpace: 'nowrap', color: A.DIM, fontSize: 11 }}>
             Plays to{' '}
