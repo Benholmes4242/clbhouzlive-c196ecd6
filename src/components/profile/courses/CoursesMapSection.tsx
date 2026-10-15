@@ -61,7 +61,7 @@ export const CoursesMapSection: React.FC<Props> = ({ tallies, points, unmapped =
 
   return (
     <div className="px-4" style={{ fontFamily: SANS }}>
-      <SectionHeader kicker="WHERE YOU'VE PLAYED" title="Your golf, plotted" />
+      <SectionHeader tone="amber" kicker="WHERE YOU'VE PLAYED" title="Your golf, plotted" />
       <div style={{ display: 'flex', gap: 12, alignItems: 'stretch' }}>
         {showPlot && fit && (
           <div data-testid="courses-map-plot" style={{ flex: 'none', width: 186, background: A.PANEL, borderRadius: 12, padding: 6 }}>

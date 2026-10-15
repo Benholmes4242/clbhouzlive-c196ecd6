@@ -4,12 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { formatDayMonthYearShortGB } from '@/i18n/format';
 import { type RatedCourseData } from './my-ratings/myRatingsTiers';
 import { SubScoreStack } from '@/features/courses/_shared/scoreBands';
+import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { A, SANS, LABEL, NUM, Action, StatRow, TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens';
 import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 
 /**
  * DossierCard - scannable rated-course row.
- * Collapsed: thumb + name + meta line + rating (+ Top 100 rank).
+ * Collapsed: thumb + name + meta lines (+ Top 100 rank chip) + rating.
  * Expanded: single-row sub-score stacks, scoring stat row (own profile only),
  * then the quiet actions. Tap the row to toggle; navigation via the actions.
  *
@@ -117,22 +118,24 @@ const DossierCard: React.FC<DossierCardProps> = ({
         background: A.PANEL,
         cursor: 'pointer',
         fontFamily: SANS,
-        padding: '13px 20px',
+        margin: '0 20px',
+        padding: '9px 0',
+        borderBottom: '1px solid rgba(255,255,255,0.055)',
         display: 'flex',
         flexDirection: 'column',
         gap: 12,
       }}
     >
       {/* HEADER (always visible) */}
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 11, alignItems: 'center' }}>
         {/* Thumb */}
         <div
           style={{
             position: 'relative',
-            flex: '0 0 42px',
-            width: 42,
-            height: 42,
-            borderRadius: 10,
+            flex: '0 0 44px',
+            width: 44,
+            height: 44,
+            borderRadius: 8,
             overflow: 'hidden',
             background: course.thumbnail_image ? `url(${course.thumbnail_image})` : A.TRACK,
             backgroundSize: 'cover',
@@ -161,13 +164,12 @@ const DossierCard: React.FC<DossierCardProps> = ({
             style={{
               color: A.INK,
               fontWeight: 700,
-              fontSize: 14.5,
+              fontSize: 13,
               lineHeight: 1.15,
               letterSpacing: '-0.01em',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
+              whiteSpace: 'nowrap',
               overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
           >
             {course.name}
@@ -186,6 +188,26 @@ const DossierCard: React.FC<DossierCardProps> = ({
           {line2.length > 0 && (
             <div style={{ ...LABEL, letterSpacing: '0.10em', whiteSpace: 'nowrap' }}>{line2}</div>
           )}
+          {course.is_top100 && course.global_rank != null && (
+            <div>
+              <span
+                data-testid="rank-chip"
+                style={{
+                  display: 'inline-block',
+                  marginTop: 4,
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  letterSpacing: '0.06em',
+                  color: MEDAL_GOLD,
+                  border: '1px solid rgba(214,168,75,0.45)',
+                  borderRadius: 7,
+                  padding: '2px 6px',
+                }}
+              >
+                {`#${course.global_rank} World`}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Rating - one figure, published rank beneath */}
@@ -198,9 +220,6 @@ const DossierCard: React.FC<DossierCardProps> = ({
             <div style={{ ...NUM, fontSize: 17, color: A.INK, lineHeight: 1 }}>
               {course.rating_value.toFixed(1)}
             </div>
-          )}
-          {course.is_top100 && course.global_rank != null && (
-            <div style={{ ...LABEL, marginTop: 3 }}>{`#${course.global_rank}`}</div>
           )}
         </div>
 

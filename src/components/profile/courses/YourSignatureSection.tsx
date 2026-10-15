@@ -14,7 +14,7 @@ export const YourSignatureSection: React.FC<{ rows: SignatureRow[] }> = ({ rows 
 
   return (
     <section data-testid="your-signature" style={{ padding: '0 20px' }}>
-      <SectionHeader kicker="HOW YOU RATE" title="What you actually reward" />
+      <SectionHeader tone="amber" kicker="HOW YOU RATE" title="What you actually reward" />
       {/*
         Compared ONLY with the mean of this member's own category averages. There is no
         per-member population average for the four categories anywhere in the

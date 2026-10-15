@@ -2,8 +2,8 @@ import React from 'react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
 /**
- * Year spine for the recency sort. Spacing is MyRatingsTierDivider's, reused
- * rather than reinvented: 6/16/12 for the first divider, 24/16/12 after.
+ * Year spine for the recency sort, to the signed-off mock: 14 above, 7 below,
+ * one hairline beneath.
  */
 interface MyRatingsYearDividerProps {
   /** Calendar year of the rows beneath; null groups undated rows. */
@@ -15,9 +15,10 @@ interface MyRatingsYearDividerProps {
 const MyRatingsYearDivider: React.FC<MyRatingsYearDividerProps> = ({ year, count, isFirst }) => (
   <div
     data-year-divider={year ?? 'undated'}
-    style={{ margin: isFirst ? '6px 16px 12px' : '24px 16px 12px', fontFamily: SANS }}
+    data-first={isFirst || undefined}
+    style={{ margin: '14px 20px 0', fontFamily: SANS }}
   >
-    <div style={{ padding: '0 2px', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', paddingBottom: 7, borderBottom: `1px solid ${A.HAIRLINE}` }}>
       <span
         style={{
           fontSize: 15,
