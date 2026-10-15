@@ -177,8 +177,12 @@ export function YourHundredSection({ viewerPlayed, total, courseIds, enrichment,
             aria-pressed={selected === id}
             style={{
               aspectRatio: '1', borderRadius: 3, padding: 0, border: 0, cursor: 'pointer',
-              ...cellStyle(cellState(enrichment.get(id))),
-              ...(selected === id ? { boxShadow: `0 0 0 2px ${A.CANVAS}, 0 0 0 4px ${A.INK}` } : null),
+              ...(() => {
+                const base = cellStyle(cellState(enrichment.get(id)));
+                if (selected !== id) return base;
+                const ring = `0 0 0 2px ${A.CANVAS}, 0 0 0 4px ${A.INK}`;
+                return { ...base, boxShadow: base.boxShadow ? `${base.boxShadow}, ${ring}` : ring };
+              })(),
             }}
           />
         ))}
