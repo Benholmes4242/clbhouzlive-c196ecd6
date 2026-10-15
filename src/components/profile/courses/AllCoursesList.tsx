@@ -26,6 +26,7 @@ import { formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
+import './coursesArchive.css';
 
 interface AllCoursesListProps {
   userId: string;
@@ -435,38 +436,10 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   }
 
   return (
-    <div ref={sectionRef} className="pt-1 pb-4">
-      <div style={{ padding: '0 20px' }}>
-        <SectionHeader tone="amber" kicker="THE ARCHIVE" title="Every course, newest first" />
-      </div>
-
-      {/* Filter bar */}
-      <FilterBar
-        activeTab={activeTab}
-        onTabChange={(tab) => {
-          setActiveTab(tab);
-          if (tab === 'top100' && activeCountry === 'global') {
-            setActiveCountry('gb-i');
-          }
-          setDisplayCount(PAGE_SIZE);
-        }}
-        activeSort={activeSort}
-        onSortChange={(sort) => {
-          setActiveSort(sort);
-          setDisplayCount(PAGE_SIZE);
-        }}
-        activeCountry={activeCountry}
-        onCountryChange={(country) => {
-          setActiveCountry(country);
-          setDisplayCount(PAGE_SIZE);
-        }}
-        allCount={tabCounts.all}
-        top100Count={tabCounts.top100}
-      />
-
+    <div ref={sectionRef} className="courses-archive pb-4" style={{ borderTop: `1px solid ${A.HAIRLINE}` }}>
       {/* Page-level prompt (own profile only): review first, then breakdowns */}
       {isOwnProfile && promptMode && (
-        <div style={{ padding: '24px 20px 0' }}>
+        <div style={{ padding: '24px 20px 22px', borderBottom: `1px solid ${A.HAIRLINE}`, marginBottom: 24 }}>
           <BreakdownsPrompt
             variant={promptMode}
             missingCount={promptMode === 'review' ? reviewCount : missingBreakdownsCourses.length}
@@ -497,6 +470,35 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         </div>
       )}
 
+
+      <div style={{ padding: promptMode && isOwnProfile ? '0 20px' : '24px 20px 0' }}>
+        <SectionHeader className="archive-heading" tone="amber" kicker="THE ARCHIVE" title="Every course, newest first" />
+      </div>
+
+      {/* Filter bar */}
+      <FilterBar
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          setActiveTab(tab);
+          if (tab === 'top100' && activeCountry === 'global') {
+            setActiveCountry('gb-i');
+          }
+          setDisplayCount(PAGE_SIZE);
+        }}
+        activeSort={activeSort}
+        onSortChange={(sort) => {
+          setActiveSort(sort);
+          setDisplayCount(PAGE_SIZE);
+        }}
+        activeCountry={activeCountry}
+        onCountryChange={(country) => {
+          setActiveCountry(country);
+          setDisplayCount(PAGE_SIZE);
+        }}
+        allCount={tabCounts.all}
+        top100Count={tabCounts.top100}
+      />
+
       {/* Course list */}
       {drawnCourses.length === 0 ? (
         <div className="bg-card rounded-2xl border border-border/10 p-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)] mt-3">
@@ -521,7 +523,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           </div>
         </div>
       ) : (
-        <div className="mt-3 -mx-2.5">
+        <div>
           {(() => {
             // ── Rating-sorted: single primitive with tier dividers ─────
             if (isRatingSort) {
@@ -607,6 +609,15 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
               const y = playedYear(c.last_played_at);
               yearCounts.set(y, (yearCounts.get(y) ?? 0) + 1);
             });
+            const yearCountries = new Map<number | null, Set<string>>();
+            drawnCourses.forEach((c) => {
+              const country = c.sub_country?.trim();
+              if (!country) return;
+              const y = playedYear(c.last_played_at);
+              const countries = yearCountries.get(y) ?? new Set<string>();
+              countries.add(country);
+              yearCountries.set(y, countries);
+            });
             const elements: React.ReactNode[] = [];
             let currentYear: number | null | undefined = undefined;
             displayedCourses.forEach((course) => {
@@ -618,6 +629,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                     key={`year-${year ?? 'undated'}`}
                     year={year}
                     count={yearCounts.get(year) ?? 0}
+                    countryCount={yearCountries.get(year)?.size ?? 0}
                     isFirst={currentYear === undefined}
                   />,
                 );

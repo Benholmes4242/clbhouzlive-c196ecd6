@@ -72,7 +72,7 @@ describe('profile courses archive', () => {
         expect(leaves.some((n) => /^\d+$/.test((n.textContent ?? '').trim()))).toBe(false);
       });
     }
-    expect(screen.getByText('#37')).toBeTruthy();
+    expect(screen.getByText('#37 World')).toBeTruthy();
   });
 
   it('shows one year divider per year on the recency sort and none on the rating sorts', async () => {
