@@ -16,7 +16,6 @@ import { TheChaseSection } from './courses/TheChaseSection';
 import { YourSignatureSection } from './courses/YourSignatureSection';
 import { CourseLegacyCard } from './courses/CourseLegacyCard';
 import type { ProfileRatingRow } from './courses/AllCoursesList';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface ProfileCoursesTabProps {
   userId: string;
