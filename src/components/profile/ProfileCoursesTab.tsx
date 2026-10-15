@@ -109,7 +109,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   // the all-lists tile figure.
   const globalPlayed = top100Progress?.total_played_top100 ?? null;
   let standingLine: string | null = null;
-  if (globalPlayed != null && distribution && recordConfig) {
+  if (isOwnProfile && globalPlayed != null && distribution && recordConfig) {
     const st = top100Standing(
       distribution, 'global', globalPlayed,
       recordConfig.top100ShareFloor, recordConfig.top100RankCrossover, recordConfig.shareMinDenominator,
