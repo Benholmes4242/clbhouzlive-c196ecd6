@@ -9,7 +9,7 @@ import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 
 /**
  * DossierCard - scannable rated-course row.
- * Collapsed: rank + thumb + name + meta line + rating (+ Top 100 rank).
+ * Collapsed: thumb + name + meta line + rating (+ Top 100 rank).
  * Expanded: single-row sub-score stacks, scoring stat row (own profile only),
  * then the quiet actions. Tap the row to toggle; navigation via the actions.
  *
@@ -20,7 +20,16 @@ import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 
 export interface DossierCardProps {
   course: RatedCourseData;
-  rank: number;
+  /**
+   * IGNORED. The sort-index rank was removed: a row's position in a sorted
+   * list is not a rank. Kept optional only so the unchanged meta-lines test
+   * (which still passes it) type-checks. Do not read it.
+   */
+  rank?: number;
+  /** Played but not yet rated: no figure, no sub-scores, a Review action. */
+  unrated?: boolean;
+  /** Own profile only: opens the rating flow for an unrated row. */
+  onRate?: (courseId: string) => void;
   onCourseClick: (courseId: string) => void;
   onFullReview: (courseId: string, ratingId: string | null) => void;
   /** Own-profile scoring for this course. Absent = render no scoring at all. */
@@ -45,7 +54,8 @@ const fmtSigned = (v: number): string => {
 
 const DossierCard: React.FC<DossierCardProps> = ({
   course,
-  rank,
+  unrated = false,
+  onRate,
   onCourseClick,
   onFullReview,
   scoring,
@@ -115,21 +125,6 @@ const DossierCard: React.FC<DossierCardProps> = ({
     >
       {/* HEADER (always visible) */}
       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-        {/* Rank */}
-        <span
-          style={{
-            ...NUM,
-            flex: '0 0 22px',
-            color: A.INK,
-            fontSize: 20,
-            letterSpacing: '-0.04em',
-            lineHeight: 1,
-            textAlign: 'center',
-          }}
-        >
-          {rank}
-        </span>
-
         {/* Thumb */}
         <div
           style={{
@@ -195,9 +190,15 @@ const DossierCard: React.FC<DossierCardProps> = ({
 
         {/* Rating - one figure, published rank beneath */}
         <div style={{ flex: '0 0 46px', textAlign: 'right' }}>
-          <div style={{ ...NUM, fontSize: 17, color: A.INK, lineHeight: 1 }}>
-            {course.rating_value.toFixed(1)}
-          </div>
+          {unrated ? (
+            <div style={{ ...LABEL, color: A.DIM, lineHeight: 1.45 }}>
+              {t('row.notRated', { defaultValue: 'Not rated' })}
+            </div>
+          ) : (
+            <div style={{ ...NUM, fontSize: 17, color: A.INK, lineHeight: 1 }}>
+              {course.rating_value.toFixed(1)}
+            </div>
+          )}
           {course.is_top100 && course.global_rank != null && (
             <div style={{ ...LABEL, marginTop: 3 }}>{`#${course.global_rank}`}</div>
           )}
@@ -220,7 +221,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {/* Sub-scores - shared band scale, single row like Courses page */}
           <div style={{ display: 'flex', gap: 10 }}>
-            {bars.map(({ label, score }) =>
+            {!unrated && bars.map(({ label, score }) =>
               score != null ? <SubScoreStack key={label} label={label} score={score} /> : null,
             )}
           </div>
@@ -259,7 +260,14 @@ const DossierCard: React.FC<DossierCardProps> = ({
               label={t('row.viewCourse', { defaultValue: 'View course' })}
               onClick={() => onCourseClick(course.id)}
             />
-            {hasReview && (
+            {unrated && onRate && (
+              <Action
+                align="left"
+                label={t('row.review', { defaultValue: 'Review' })}
+                onClick={() => onRate(course.id)}
+              />
+            )}
+            {!unrated && hasReview && (
               <Action
                 align="left"
                 label={t('row.fullReview', { defaultValue: 'Full review' })}
