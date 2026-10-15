@@ -12,6 +12,9 @@
  */
 export type RankList = 'global' | 'gbi' | 'usa' | 'europe';
 
+/** Database list slug -> RankList. The one home for this map. */
+export const RANK_LIST_BY_SLUG: Record<string, RankList> = { global: 'global', 'gb-i': 'gbi', usa: 'usa', europe: 'europe' };
+
 const ORDER: RankList[] = ['global', 'gbi', 'usa', 'europe'];
 const LABEL: Record<RankList, string> = {
   global: 'World',
