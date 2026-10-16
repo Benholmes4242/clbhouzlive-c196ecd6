@@ -9,7 +9,7 @@ import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { WHS_COUNTRIES } from '@/lib/whs/whsCountries';
 import { useConnectIntroCourse, type ConnectIntroCourse } from './useConnectIntroCourse';
-import { MUTE, DIM, INK, AMBER, NUM, FONT } from './designTokens';
+import { DIM, INK, AMBER, NUM, FONT } from './designTokens';
 import { FooterBar, Stage } from './Primitives';
 
 interface Props {
@@ -599,7 +599,7 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
     return () => obs.disconnect();
   }, [intro.data, band.data]);
 
-  const pending = !homeSettled || intro.isPending || (userId && profile.isPending) || (intro.data && band.isPending);
+  const pending = !homeSettled || intro.isPending || (!!userId && profile.isPending) || (!!intro.data && band.isPending);
   if (pending) {
     return (
       <>
