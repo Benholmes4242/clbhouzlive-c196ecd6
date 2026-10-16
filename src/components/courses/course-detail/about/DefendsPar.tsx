@@ -43,7 +43,6 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
   const max = Math.max(0.01, ...v.holes.map((h) => Math.max(0, h.avg_to_par)));
   const maxPer = Math.max(0.01, ...v.parTypes.map((p) => Math.max(0, p.perHole)));
   const labelled = new Set([v.holes[0].hole_no, 9, v.easiest.hole_no, v.hardest.hole_no]);
-  const total = signed(v.totalShots);
 
   let nineLine: React.ReactNode = null;
   if (v.front != null && v.back != null) {
@@ -165,7 +164,6 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
               count: p.holes,
               holes: formatNumber(p.holes),
               shots: signed(p.shots).replace('+', ''),
-              total: total.replace('+', ''),
             })}
           </div>
         </div>

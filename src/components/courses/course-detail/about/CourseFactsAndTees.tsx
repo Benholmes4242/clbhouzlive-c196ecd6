@@ -158,6 +158,10 @@ export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
           );
         })}
       </div>
+      {/* BRIEF_COURSE_TAB_1B P1.4 — PERMANENTLY OMITTED: the mock's "worth less
+          than one shot" line. Converting a slope spread into shots needs a
+          handicap index, which is viewer data, and nothing on this tab may be
+          viewer-scoped. Do not add it back. The slope-point spread stays. */}
       {spreadText ? <Said quiet>{spreadText}</Said> : null}
     </AboutSection>
   );

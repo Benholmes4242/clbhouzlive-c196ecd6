@@ -242,7 +242,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       <CourseTitleOverlay
         course={course}
         courseStats={courseStats ?? null}
-        communityRating={communityRating}
         reviewCount={reviewCount}
         onOpenStats={() => setStatsSheetOpen(true)}
       />
@@ -270,7 +269,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       <CourseTitleOverlay
         course={course}
         courseStats={courseStats ?? null}
-        communityRating={communityRating}
         reviewCount={reviewCount}
         onOpenStats={() => setStatsSheetOpen(true)}
       />
@@ -435,7 +433,6 @@ interface CourseMetaShape {
 interface CourseTitleOverlayProps {
   course: CourseOverlayShape;
   courseStats: CourseStatsDetail | null;
-  communityRating: number | null;
   reviewCount: number;
   onOpenStats: () => void;
 }
@@ -444,7 +441,6 @@ interface CourseTitleOverlayProps {
 const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   course,
   courseStats,
-  communityRating,
   reviewCount,
   onOpenStats,
 }) => {
@@ -485,7 +481,6 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   /* BRIEF_COURSE_TAB_1A P1.1 — the generic stat row collapses to ONE reference
      line: par · yards · rating / slope · tracked rounds. Reference, not findings. */
   const referenceLine = useHeroReferenceLine(courseId, rounds);
-  void communityRating;
 
   return (
     <div className="absolute inset-x-0 bottom-4 px-4 z-[1] flex flex-col gap-2">
