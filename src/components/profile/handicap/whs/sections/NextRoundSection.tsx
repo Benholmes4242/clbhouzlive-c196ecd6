@@ -196,7 +196,7 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
   const shownPayload = useMemo(() => {
     if (!projection || !projection.hasData || currentHandicap == null) return null;
     const { cutTarget, settleAtRaw } = projection;
-    if (!Number.isFinite(cutTarget) || !Number.isFinite(settleAtRaw)) return null;
+    if (!Number.isFinite(cutTarget) || settleAtRaw == null || !Number.isFinite(settleAtRaw)) return null;
     return {
       cut: Number(cutTarget.toFixed(1)),
       rise: Number((settleAtRaw - currentHandicap).toFixed(1)),
@@ -229,7 +229,7 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
   }, [withheld, total]);
 
   const tone =
-    projection && currentHandicap != null
+    projection && currentHandicap != null && projection.settleAtRaw != null
       ? indexTone(currentHandicap, projection.settleAtRaw)
       : null;
 
@@ -264,7 +264,7 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
   if (!projection || !projection.hasData) return null;
 
   const { cutTarget, settleAtRaw } = projection;
-  if (!Number.isFinite(cutTarget) || !Number.isFinite(settleAtRaw)) return null;
+  if (!Number.isFinite(cutTarget) || settleAtRaw == null || !Number.isFinite(settleAtRaw)) return null;
 
   const willRise = tone === 'up';
   const rungs = ladder?.rungs ?? [];

@@ -5,13 +5,13 @@ export interface NextRoundProjection {
   /** Differential needed to cut handicap below current. Beat this and you drop. */
   cutTarget: number;
   /** Where handicap settles if next round doesn't make top 8. */
-  settleAt: number;
+  settleAt: number | null;
   /** True if settleAt > currentHandicap (handicap rises unless cut target is beaten). */
   isAtRisk: boolean;
   /** Whether projection is reliable (need at least 8 rounds with diffs). */
   hasData: boolean;
   /** Raw (unrounded) settle value — lets the UI decide visibility on the displayed delta. */
-  settleAtRaw: number;
+  settleAtRaw: number | null;
   /** True if the round rolling off (oldest of last 20) is currently in the counting top 8. */
   counterDropping: boolean;
 }
@@ -62,10 +62,11 @@ export function projectNextRound(
   const sumTop7 = top7Remaining.reduce((s, d) => s + d, 0);
   const cutTarget = 8 * currentHandicap - sumTop7;
 
-  // Fewer than eight remaining (a window of exactly eight) keeps the index.
-  const settleAt = indexFromDifferentials(remaining19Diffs) ?? currentHandicap;
+  // Fewer than eight remaining (a window of exactly eight): no settled index.
+  // No variable denominator — that is new handicap maths, a separate decision.
+  const settleAt = indexFromDifferentials(remaining19Diffs);
 
-  const isAtRisk = settleAt > currentHandicap + 0.05;
+  const isAtRisk = settleAt != null && settleAt > currentHandicap + 0.05;
 
   // Is the oldest round (the one rolling off) currently in the counting top 8?
   const currentTop8Ids = new Set(
@@ -83,7 +84,7 @@ export function projectNextRound(
 
   return {
     cutTarget: Number(cutTarget.toFixed(1)),
-    settleAt: Number(settleAt.toFixed(1)),
+    settleAt: settleAt == null ? null : Number(settleAt.toFixed(1)),
     isAtRisk,
     hasData: true,
     settleAtRaw: settleAt,
