@@ -5,6 +5,9 @@ import {
   buildCourseProjection,
   medianOf,
   axisScale,
+  differentialFromGross,
+  indexFromDifferentials,
+  indexWithCandidate,
 } from './coursePlay';
 
 const inputs = { index: 12.4, cr: 72.1, slope: 131, par: 71 };
@@ -34,5 +37,41 @@ describe('coursePlay', () => {
     const s = axisScale(85, 97, 91);
     expect(s.lo).toBe(82);
     expect(s.hi).toBe(100);
+  });
+
+  it('differentialFromGross round-trips against grossFromDifferential', () => {
+    const g = grossFromDifferential(16.8, 72.1, 131);
+    expect(differentialFromGross(g, 72.1, 131)).toBeCloseTo(16.8, 10);
+    expect(differentialFromGross(92, 72.1, 131)).toBeCloseTo(((92 - 72.1) * 113) / 131, 10);
+  });
+
+  it('indexFromDifferentials is null at 7 values and the mean of the lowest 8 at 8', () => {
+    expect(indexFromDifferentials([1, 2, 3, 4, 5, 6, 7])).toBeNull();
+    expect(indexFromDifferentials([8, 1, 7, 2, 6, 3, 5, 4])).toBe(4.5);
+  });
+
+  it('indexFromDifferentials ignores the 9th-worst entirely', () => {
+    expect(indexFromDifferentials([1, 2, 3, 4, 5, 6, 7, 8, 99])).toBe(4.5);
+    expect(indexFromDifferentials([1, 2, 3, 4, 5, 6, 7, 8, 9])).toBe(4.5);
+  });
+
+  // Oldest first: the 30 drops off; current best eight are 1..8 (index 4.5).
+  const window20 = [30, 1, 2, 3, 4, 5, 6, 7, 8, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20];
+
+  it('indexWithCandidate lowers the index for a candidate better than the 8th-best', () => {
+    expect(indexWithCandidate(window20, 0)).toBe(3.5);
+  });
+
+  it('indexWithCandidate does not lower the index for a candidate worse than the 8th-best', () => {
+    expect(indexWithCandidate(window20, 9)).toBe(4.5);
+  });
+
+  it('a monotonically worse candidate never produces a falling index', () => {
+    let prev = -Infinity;
+    for (let c = -5; c <= 40; c += 0.1) {
+      const idx = indexWithCandidate(window20, c)!;
+      expect(idx).toBeGreaterThanOrEqual(prev - 1e-12);
+      prev = idx;
+    }
   });
 });

@@ -57,7 +57,6 @@ export function projectNextRound(
 
   // Sort remaining diffs ASCENDING to pick the top 8 (lowest = best)
   const remainingSorted = [...remaining19Diffs].sort((a, b) => a - b);
-  const top8Remaining = remainingSorted.slice(0, 8);
   const top7Remaining = remainingSorted.slice(0, 7);
 
   const sumTop7 = top7Remaining.reduce((s, d) => s + d, 0);
