@@ -521,7 +521,8 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
               fontSize: 13,
               fontWeight: 600,
               letterSpacing: '-0.005em',
-              color: SURFACE.dark.mute.replace('0.62', '0.78'),
+              // Spec value (hero-option-a): no surface tier owns 0.78 on this base yet.
+              color: 'rgba(248,250,252,0.78)',
             }}
           >
             {referenceLine.split(' \u00B7 ').map((part, i) => (
@@ -532,7 +533,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
             ))}
           </button>
         ) : null}
-        {referenceLine ? <HeroCourseRecord holders={recordHolders} /> : null}
+        <HeroCourseRecord holders={recordHolders} />
       </CourseMasthead>
 
       {/* CR / SLOPE is deliberately NOT rendered here: get_course_meta resolves
