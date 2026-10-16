@@ -2,6 +2,8 @@
  * useCourseImageResolver - Resolves SR venue names to golf_courses images
  * Uses server-side ILIKE search + client-side scoring for best match.
  *
+ * Selected Tour venue photos take precedence in batch and single-venue resolution, so Overview and Tournament Detail agree.
+ *
  * GEOGRAPHY IS A HARD GATE (BRIEF_TOURNAMENT_VENUE_MAPPING_GATE_AND_REVIEW).
  * Every candidate failing isVenueGeographyCompatible is REMOVED before scoring -
  * not penalised, not demoted to low confidence. Name similarity is not evidence

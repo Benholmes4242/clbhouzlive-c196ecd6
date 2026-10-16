@@ -1,3 +1,6 @@
+/**
+ * The fullscreen multi-media pager keeps its likely next page decoded in the lazy `fullscreen-next` lane and moves it onto the page with `VideoEngine.swapLanes`, while lane ids, subscribers, audio policy and loop stay with the id, because every viewer consumer reads 'fullscreen' by id and 'fullscreen-next' must never be the speaker.
+ */
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { postImageProps } from '@/utils/imageSrc';

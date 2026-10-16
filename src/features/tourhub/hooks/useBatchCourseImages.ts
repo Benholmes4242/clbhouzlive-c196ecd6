@@ -1,6 +1,8 @@
 /**
  * useBatchCourseImages — Resolves course images for many tournaments in 1-2 queries
  * Replaces per-card useSingleCourseImage calls (N→1 reduction)
+ *
+ * Selected Tour venue photos take precedence in batch and single-venue resolution, so Overview and Tournament Detail agree.
  */
 
 import { useQuery } from '@tanstack/react-query';

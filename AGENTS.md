@@ -1,6 +1,13 @@
 # Architecture rules
 
-Cross-area rules; local rules stay in section comments.
+ABSOLUTE RULES — never compress, reword or remove these.
+Never run SQL. Ben runs every statement by hand.
+Never write a migration or a migration file.
+Never touch feed_config.
+round_pool_cap stays at 30.
+Any unexpected test failure: STOP AND REPORT. Never edit a test to make it pass unless a brief explicitly authorises that exact change.
+
+When AGENTS.md approaches its limit, always move an architecture note into a file header, never compress a rule. A fact about how one module behaves belongs next to that module. AGENTS.md holds only what cannot live in a header: cross-cutting process rules.
 
 - Shared standings/Top 100 helpers live in `src/lib/gam`; achievement levels live beside celebrations, preserving active consumers after Trophy Room removal.
 
@@ -10,15 +17,12 @@ Cross-area rules; local rules stay in section comments.
 - Member Radar panels read only the Stage 3 member hooks; legacy member details serve existing More actions only, so analytics displays cannot silently fall back to unrelated client reads.
 - Message entrypoints hand optional focus and return navigation through the existing start-conversation hook, so server messaging refusals remain authoritative and no entrypoint sends automatically.
 
-- Profile handicap plots use `HcpTrendChart`, keeping styling and interaction markers consistent.
 - `whs/pickCourse.ts` is shared by AgeingOut and PersonalBests; section removal must preserve their course selection.
 - Tour tee-alert toggles use `tourOptimisticToggle` for cache writes and per-id rollback, because invalidation alone does not refresh this app's mounted queries.
 - Every surface that prints a course aggregate rating reads `COURSE_RATING_FLOOR` (`courseRatingFloor.ts`), so card, rails and ranker agree on one sample floor.
-- Selected Tour venue photos win batch and single-venue resolution, keeping Overview and Tournament Detail consistent.
 - Leaderboard row sizes live only in `courseled/rowMetrics.ts`, as two named scales: board rows read `BOARD_ROW_METRICS`, season rows read `SEASON_ROW_METRICS`, so the intended hierarchy is stated in one place and no call site defines a row size.
 - A date states its year unless an ancestor already does: rows and slabs with no year-stating header use `playDateStandalone`; rows under a year-stating group use `playDateUnderYearHeader` (`discoverWhen.ts`), so no screen prints an undated date with nothing above it saying the year.
 - A local copy of a design value that has a token is a fork, whether or not it currently matches. Ink, surfaces and canvases have owners: read them from `@/lib/tokens/surface` and `@/lib/tokens/surfaces` and never redeclare the value. THE BRAND AMBER `#F7931E` HAS NO OWNER YET — it is declared raw in around 105 files and partially owned by four modules (`frostPanel.amber`, `gam/visuals.rare`, `reactionKind.AMBER`, `PROFILE_PILL_SURFACES.active`). Until it has a single home, a local amber is the existing state rather than a new fork: do not add more, do not promote any of the four part-owners to canon, and do not fix it one file at a time.
-- The fullscreen multi-media pager keeps its likely next page decoded in the lazy `fullscreen-next` lane and moves it onto the page with `VideoEngine.swapLanes`, while lane ids, subscribers, audio policy and loop stay with the id, because every viewer consumer reads 'fullscreen' by id and 'fullscreen-next' must never be the speaker.
 - DECIDING A MEMBER'S INDEX IS resolveDisplayHandicap's JOB AND NO ONE ELSE'S. Loading eg_handicap_index and manual_handicap_index to display, edit or save them is fine. Choosing between them — coalescing, falling back from one to the other, or treating a present manual figure as the index of a connected member — is not. A connection without a synced index means the index is UNKNOWN, not the manual figure. board_pool's 'near' band coalesces the two columns in SQL and so does not follow this rule; today every member with rounds has a synced index, so the two agree. If that stops being true, the function needs the same rule.
   - NOTE: an app-wide check of which readers CHOOSE between the columns rather than merely loading them has not been done. Start from this list: ProfilePageV2, ManageProfile, useUserProfile, useUserByUsername, useProfileSave, useProfileForm, profile-wizard/types, SettingsTabContent, RoundDetailSheet, usePostLikers, useEchoSuggestions, admin useUsers, review-island/overrides, types/profile, lib/supabase/selects.
 - The admin Analytics page and its header pill read figures only from the five `get_admin_analytics_*` RPCs via `useAnalyticsLenses.ts`, never tables, because browser reads truncate at the row cap and staff filtering belongs to the server.
