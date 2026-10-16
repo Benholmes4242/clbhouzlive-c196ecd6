@@ -47,7 +47,7 @@ describe('deriveAgeingOut', () => {
   });
 });
 
-import { settleAfterRounds, MAX_REPEATS } from './ageingOut';
+import { settleAfterRounds, indexAfterRepeats, MAX_REPEATS } from './ageingOut';
 import { projectNextRound } from './handicapMath';
 
 describe('3A amendment', () => {
@@ -58,11 +58,25 @@ describe('3A amendment', () => {
     expect(settleAfterRounds(oldestFirst, 13)).toBeNull();
   });
 
-  it('C5: 72 holds in one, 73 holds in two; repeat limit five', () => {
+  /* 3D F3: C5 is SPLIT. The "73 holds in two" property is a statement about
+     the calculation, so it moves to the maths layer against indexAfterRepeats;
+     the card layer asserts the repeat line is NOT rendered at N = 1. */
+  it('C5 (maths layer): 72 holds in one, 73 holds in two; repeat limit five', () => {
     const a = deriveAgeingOut(twenty(2), 11.6, course)!;
     expect(a.holdGross).toBe(72);
-    expect(a.repeat).toEqual({ gross: 73, times: 2 });
     expect(MAX_REPEATS).toBe(5);
+    // Oldest-first twenty is 2,10..28; gross 73 at cr 70 / slope 113 is a 3.0.
+    const oldestFirst = [...twenty(2)].reverse().map((r) => r.handicap_differential as number);
+    // One 73: best eight of [3,10..28] = 3,10..16 = 73/8 = 9.125 — holds.
+    expect(indexAfterRepeats(oldestFirst, 3, 1)).toBeCloseTo(9.125, 5);
+    // Two 73s: drops the 2.0 and the 10, best eight = 3,3,10..15 = 71/8 = 8.875 — holds.
+    expect(indexAfterRepeats(oldestFirst, 3, 2)).toBeCloseTo(8.875, 5);
+  });
+
+  it('C5 (card layer, 3D F1/F2): at N = 1 the repeat line is NOT rendered', () => {
+    const a = deriveAgeingOut(twenty(2), 11.6, course)!;
+    expect(a.inRounds).toBe(1);
+    expect(a.repeat).toBeNull();
   });
 
   it('C8: counter three rounds deep moves N, settle and replacement together', () => {
