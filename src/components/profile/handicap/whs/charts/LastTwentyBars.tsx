@@ -144,7 +144,7 @@ const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, cut =
           }}
         >
           <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', minWidth: 0 }}>
-            {eight.map((v, i) => (
+            {(eight ?? []).map((v, i) => (
               <span key={i} style={{ ...FIG, color: A.IMPROVED }}>{v}</span>
             ))}
           </div>
