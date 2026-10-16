@@ -24,7 +24,7 @@ import {
   categoryLabel,
   formatValue,
   type StandingWindow,
-} from '@/components/profile/handicap/whs/gam/trophy-room/career/standings';
+} from '@/lib/gam/standings';
 import type { MemberStandingRow } from '@/hooks/gam/useMemberStandings';
 
 const CELL_W = 86;

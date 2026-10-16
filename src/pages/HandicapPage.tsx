@@ -19,9 +19,8 @@ import React, { useCallback, useState, useEffect, useLayoutEffect, useMemo } fro
 import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { useNavigate, Navigate, useSearchParams, useParams } from 'react-router-dom';
 import { ChevronRight, Trophy, Activity } from 'lucide-react';
-import GamMount from '@/components/profile/handicap/whs/gam/GamMount';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { openGamAchievements, openAllStreaks } from '@/components/profile/handicap/whs/gam/events';
+import { openAllStreaks } from '@/components/profile/handicap/whs/gam/events';
 import { StreaksSheetMount } from '@/components/profile/handicap/gam/streaks/StreaksSheetMount';
 
 
@@ -319,37 +318,8 @@ const HandicapPage: React.FC = () => {
     setSearchParams(next, { replace: true });
   }, [searchParams, setSearchParams]);
 
-  /**
-   * ONE HANDLER, TWO VOCABULARIES.
-   *
-   * ?gam= is the current vocabulary. ?sheet= is the legacy one the push
-   * dispatcher emitted until 10 Sep 2026, and delivered pushes carry their
-   * URL verbatim and cannot be rewritten. 591 notifications to 22 members
-   * were delivered with ?sheet= URLs between 13 Jul and 10 Sep 2026, and
-   * every one of them still arrives as ?sheet=. NOTHING NEW EMITS ?sheet=
-   * ANYMORE, so this branch looks dead — it is not. It is the only thing
-   * keeping those 591 delivered pushes working, and it must stay
-   * permanently. It sits on the same established footing as
-   * /handicap/rivalry/:id and the stale ?subtab= values above.
-   *
-   * BOTH VOCABULARIES RESOLVE THROUGH THIS ONE EFFECT so they cannot drift
-   * apart again: the intent is read first, then handled once.
-   *
-   *   gam=trophies | sheet=achievements -> openGamAchievements()
-   *   gam=streaks  | sheet=streaks      -> openAllStreaks()
-   *
-   * LIMITATION, DELIBERATELY NOT PAPERED OVER: the push payload carries
-   * badge_id as a DATA field, not a query param, so an aliased
-   * ?sheet=achievements opens the trophy room but cannot open the specific
-   * badge that was earned. &section= and &badge= are honoured when present on
-   * either vocabulary; nothing is inferred from the data field.
-   *
-   * Defer the emit until after GamMount / StreaksSheetMount have mounted and
-   * subscribed. The early-return `loading` / `!ownerUserId` branches above
-   * unmount the subscriber, and a synchronous emit here would fire into the
-   * void on first render. Gate on `ownerUserId` (mount precondition) AND use a
-   * macrotask so subscription effects run first in the same commit.
-   */
+  // Retired Trophy Room links are consumed without opening a replacement.
+  // Current and legacy streak links retain their existing sheet behaviour.
   useEffect(() => {
     const gam = searchParams.get('gam');
     const sheet = searchParams.get('sheet');
@@ -361,16 +331,8 @@ const HandicapPage: React.FC = () => {
           : null;
     if (!intent) return;
     if (!ownerUserId) return;
-    const section = searchParams.get('section') === 'crowns' ? 'crowns' : undefined;
-    // ?badge=<id> preserves the retired NotificationsSheet behaviour: a badge
-    // row in the Activity ledger opens the career record ON THAT BADGE.
-    const badgeId = searchParams.get('badge') || undefined;
     const id = setTimeout(() => {
-      if (intent === 'trophies') {
-        openGamAchievements(badgeId || section ? { badgeId, section } : undefined);
-      } else {
-        openAllStreaks();
-      }
+      if (intent === 'streaks') openAllStreaks();
       const next = new URLSearchParams(searchParams);
       next.delete('gam');
       next.delete('sheet');
@@ -527,7 +489,6 @@ const HandicapPage: React.FC = () => {
         onBack={() => safeGoBack(navigate, '/profile')}
       >
         <WhsHandicapTab userId={ownerUserId} ownerFirstName={displayName} />
-        <GamMount ownerUserId={ownerUserId} viewerUserId={user.id} ownerFirstName={displayName} readOnly={false} />
         <CompareMount viewerUserId={user.id} />
       </ManagePageShell>
     );
@@ -562,7 +523,6 @@ const HandicapPage: React.FC = () => {
           <WhsHandicapTab userId={ownerUserId} ownerFirstName={displayName} />
         )}
       </main>
-      <GamMount ownerUserId={ownerUserId} viewerUserId={user.id} ownerFirstName={displayName} readOnly={isFriendView} />
       {!isFriendView && <StreaksSheetMount />}
 
       <CompareMount viewerUserId={user.id} />

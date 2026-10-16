@@ -44,7 +44,7 @@ import { JourneySummaryCard } from '@/components/profile/courses/JourneySummaryC
 import { CoursesMapSection } from '@/components/profile/courses/CoursesMapSection';
 import { summariseCountries } from '@/hooks/useUserCourseSummary';
 import { AllCoursesList } from '@/components/profile/courses/AllCoursesList';
-import { top100Standing } from '@/components/profile/handicap/whs/gam/trophy-room/career/shareModel';
+import { top100Standing } from '@/lib/gam/top100Standing';
 
 const base = { avgRating: 8.2, ratedCount: 35, top100Played: 12, isOwnProfile: true };
 

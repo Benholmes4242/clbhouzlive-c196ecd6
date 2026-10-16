@@ -8,7 +8,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-import { categoryLabel } from '@/components/profile/handicap/whs/gam/trophy-room/career/standings';
+import { categoryLabel } from '@/lib/gam/standings';
 import WhereYouStandHere from '@/components/courses/course-detail/you/WhereYouStandHere';
 import type { MemberStandingRow } from '@/hooks/gam/useMemberStandings';
 
