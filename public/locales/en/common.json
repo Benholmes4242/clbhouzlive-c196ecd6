@@ -332,7 +332,7 @@
       "kickerPlural": "COURSES",
       "fromRounds": "from {{count}} rounds",
       "playsTo": "PLAYS TO",
-      "harderThan": "harder than {{pct}}%",
+      "harderThan": "harder than {{pct}}% of tracked courses",
       "easierThan": "easier than {{pct}}%",
       "middleOfPack": "middle of the pack",
       "hardest": "HARDEST",
