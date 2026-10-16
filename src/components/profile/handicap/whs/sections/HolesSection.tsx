@@ -89,17 +89,23 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
   const d = s!;
 
   /* §5.1: the title names whichever par type carries the largest share of
-     shots dropped. */
-  const dom = d.dominant!;
-  const totalShots = d.rows.reduce((x, r) => x + r.shotsPerRound, 0);
-  const holesShare = Math.round((dom.holesPlayed / d.totalHoles) * 100);
-  const shotsShare = totalShots > 0 ? Math.round((dom.shotsPerRound / totalShots) * 100) : 0;
+     shots dropped. 5A H2: a type below MIN_HOLES_PAR_TYPE cannot win, and if
+     NO type clears the threshold the plain section name renders instead and
+     the derived sentence does not. */
+  const dom = d.dominant;
+  const totalShots = d.rows.reduce((x, r) => x + (r.shotsPerRound ?? 0), 0);
+  const holesShare = dom ? Math.round((dom.holesPlayed / d.totalHoles) * 100) : 0;
+  const shotsShare = dom && totalShots > 0 ? Math.round((dom.shotsPerRound! / totalShots) * 100) : 0;
 
   /* §5.4: tone by severity — worst RED, middle AMBER, best the improved tone.
      Rank by shots a round, never by par type; stable sort keeps the earlier
-     par type on the lower rank when two tie. */
-  const ranked = [...d.rows].sort((a, b) => a.shotsPerRound - b.shotsPerRound);
+     par type on the lower rank when two tie. 5A H1: withheld rows carry no
+     figure, so they are not ranked and take no tone. */
+  const ranked = d.rows
+    .filter((r): r is (typeof d.rows)[number] & { shotsPerRound: number } => r.shotsPerRound !== null)
+    .sort((a, b) => a.shotsPerRound - b.shotsPerRound);
   const toneFor = (row: (typeof d.rows)[number]) => {
+    if (row.shotsPerRound === null) return null;
     if (ranked.length <= 1) return CHART.AMBER;
     if (row === ranked[ranked.length - 1]) return CHART.UP;
     if (row === ranked[0]) return CHART.DOWN;
