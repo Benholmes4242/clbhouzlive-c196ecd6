@@ -32,3 +32,4 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 
 - Record, counting-round and log rows open `RoundDetailSheet` by score id with the known profile owner, keeping one scorecard and member context.
 - Owner copy uses `profileOwnerVoice` to share grammar.
+- The course detail hero's record row reads holders only from `useCourseRecordSummary` (lowest gross), the same read as the record boards, so the hero and boards cannot name different holders.
