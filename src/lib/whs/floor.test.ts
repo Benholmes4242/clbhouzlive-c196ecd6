@@ -2,18 +2,26 @@ import { describe, it, expect } from 'vitest';
 import { FLOOR_LADDER, floorTarget, floorScalePosition, countMeeting } from './floor';
 
 describe('floorTarget (§6.2)', () => {
-  it('the target is the next milestone below the current index', () => {
-    expect(floorTarget(24)!.key).toBe('bogeyGolf');
-    expect(floorTarget(24)!.index).toBe(18.0);
-    expect(floorTarget(15)!.key).toBe('singleFigures');
-    expect(floorTarget(7)!.key).toBe('categoryOne');
-    expect(floorTarget(2)!.key).toBe('scratch');
+  it.each([
+    [1.5, 'scratch', 0.0],
+    [5.0, 'scratch', 0.0],
+    [7.0, 'categoryOne', 5.4],
+    [10.0, 'singleFigures', 9.9],
+    [17.0, 'categoryTwo', 11.4],
+    [24.0, 'categoryThree', 18.4],
+    [28.0, 'categoryFour', 26.4],
+  ])('index %s selects %s at %s', (current, key, index) => {
+    expect(floorTarget(current)).toEqual({ key, index });
   });
 
-  it('a rung must be strictly BELOW the current index', () => {
-    // Exactly on a rung: that rung is not below, so the next one down is the target.
-    expect(floorTarget(9.9)!.key).toBe('categoryOne');
-    expect(floorTarget(18.0)!.key).toBe('singleFigures');
+  it.each([
+    [26.4, 'categoryThree', 18.4],
+    [18.4, 'categoryTwo', 11.4],
+    [11.4, 'singleFigures', 9.9],
+    [9.9, 'categoryOne', 5.4],
+    [5.4, 'scratch', 0.0],
+  ])('index exactly %s selects the strictly lower %s at %s', (current, key, index) => {
+    expect(floorTarget(current)).toEqual({ key, index });
   });
 
   it('at or below scratch there is no rung left and the section does not render', () => {
@@ -21,12 +29,12 @@ describe('floorTarget (§6.2)', () => {
     expect(floorTarget(-0.4)).toBeNull();
   });
 
-  it('above bogey golf the target is bogey golf', () => {
-    expect(floorTarget(36)!.key).toBe('bogeyGolf');
+  it('above category four the target is category four', () => {
+    expect(floorTarget(36)).toEqual({ key: 'categoryFour', index: 26.4 });
   });
 
-  it('the ladder is the four rungs of §6.2', () => {
-    expect(FLOOR_LADDER.map((r) => r.index)).toEqual([18.0, 9.9, 5.4, 0.0]);
+  it('the ladder is the six rungs of amendment 6A', () => {
+    expect(FLOOR_LADDER.map((r) => r.index)).toEqual([26.4, 18.4, 11.4, 9.9, 5.4, 0.0]);
   });
 });
 

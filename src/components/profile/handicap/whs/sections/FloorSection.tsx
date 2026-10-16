@@ -3,7 +3,8 @@
  * BRIEF_HANDICAP_TAB_REBUILD.
  *
  * §6.2: the target is the next rung of FLOOR_LADDER still BELOW the member's
- * current index (24 → bogey golf, 15 → single figures, 7 → category one,
+ * current index (28 → category four, 24 → category three, 17 → category two,
+ * 10 → single figures, 7 → category one,
  * 2 → scratch). At or below scratch there is no rung left and the section
  * does not render — scratch is the wrong target for most members and a
  * section that only speaks to low handicaps is worse than no section.

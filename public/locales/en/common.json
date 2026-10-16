@@ -964,7 +964,9 @@
       "kicker": "The floor",
       "title": "What {{milestone}} actually needs",
       "milestone": {
-        "bogeyGolf": "bogey golf",
+        "categoryFour": "category four",
+        "categoryThree": "category three",
+        "categoryTwo": "category two",
         "singleFigures": "single figures",
         "categoryOne": "category one",
         "scratch": "scratch"

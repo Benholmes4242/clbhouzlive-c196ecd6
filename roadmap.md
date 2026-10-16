@@ -1,5 +1,9 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_HANDICAP_TAB_REBUILD_6A
+- [x] Replace the Floor ladder with six category milestones and English names; preserve section calculations and appearance.
+- [x] Verify 19 focused tests and full suite (1,421 passing, no failures); preview build OK. Live authenticated checks unavailable on external Supabase.
+
 ## BRIEF_HANDICAP_TAB_REBUILD_5C
 - [x] Mute all par-row figures/fills with A.MUTE and use BAR_RADIUS; retain 4px tracks and proportions.
 - [x] Remove observation and its unused calculations/read; preserve distribution, title, meta and thresholds.
