@@ -29,8 +29,8 @@ export const SURFACE = PAGE_CANVAS;
 
 /**
  * Amber wash. Runs edge to edge, sits behind the content, never a top bar.
- * RENDERED ON THE PAYOFF (done) ONLY: flat canvas while the work happens
- * (intro, country, form, syncing, coming soon), amber light on the payoff.
+ * CURRENTLY UNUSED: the done stage dropped it (BRIEF_CONNECT_DONE_CHROME), so
+ * every connect stage paints SURFACE flat. Kept as a token, not deleted.
  * The intro dropped the wash when it became a chart screen (CE). The wash marks a moment; on every
  * screen it would be wallpaper and stop meaning anything. On a light canvas an amber radial read as a soft
  * consumer gradient and was cut; on near-black the same radial reads as
