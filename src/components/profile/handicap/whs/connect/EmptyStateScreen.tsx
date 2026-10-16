@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHomeClubStatus } from '@/features/home-club/useHomeClubStatus';
@@ -15,6 +15,7 @@ import { FooterBar, Stage } from './Primitives';
 interface Props {
   onPickCountry: () => void;
   onDecline?: () => void;
+  layout?: 'page' | 'embedded';
 }
 
 type IntroHole = { hole_no: number; par: number; stroke_index: number | null; avg_to_par: number };
@@ -41,11 +42,7 @@ const AMBER_ROW = 'rgba(247,147,30,0.07)';
 const STEP_BG = 'rgba(255,255,255,0.06)';
 const AVATAR_BG = 'rgba(255,255,255,0.08)';
 
-const TRUST_STEPS = [
-  { title: 'Pick your country, sign in once', line: 'The same login you use for your handicap app. Every round you have posted comes across.' },
-  { title: 'Read only', line: 'We never post, change or delete a score. Your handicap stays exactly where it is.' },
-  { title: 'Yours to take back', line: 'Your password is kept encrypted and only used to sync. Disconnect any time and it is deleted.' },
-] as const;
+const TRUST_STEPS = ['1', '2', '3'] as const;
 
 const EXAMPLE = {
   beat: [
@@ -59,8 +56,8 @@ const EXAMPLE = {
   bars: [64, 46, 57, 36, 72, 43, 54, 32, 61, 50, 39, 68, 46, 36, 57, 43, 75, 50, 39, 54],
   counters: new Set([1, 3, 5, 7, 10, 13, 15, 18]),
   ways: [
-    { title: 'Turn your doubles into bogeys', value: '10.4' },
-    { title: 'Play the back nine like the front', value: '11.0' },
+    { titleKey: 'exampleWayDoubles', value: '10.4' },
+    { titleKey: 'exampleWayBackNine', value: '11.0' },
   ],
 } as const;
 
@@ -127,10 +124,6 @@ function unsignedOne(n: number): string {
   return Math.abs(Math.round(n * 10) / 10).toFixed(1);
 }
 
-export function hcpLabel(n: number): string {
-  return n === 0 ? 'scratch' : String(n);
-}
-
 export function rangeHcp(n: number): string {
   return n < 0 ? `+${Math.abs(n)}` : String(n);
 }
@@ -139,23 +132,44 @@ export function formatIndex(n: number): string {
   return n < 0 ? `+${Math.abs(n).toFixed(1)}` : n.toFixed(1);
 }
 
-export function buildReadout(block: IntroBlock, band: IntroBand | null, h: number) {
+type IntroT = (key: string, options?: Record<string, unknown>) => string;
+
+export function buildReadout(block: IntroBlock, band: IntroBand | null, h: number, t?: IntroT) {
   const holes = costliestThree(block.holes);
   const anyNegative = holes.some((x) => x.avg_to_par < 0);
   const holeList = holes.map((x) => ordinal(x.hole_no));
   const values = holes.map((x) => (anyNegative ? signedOne(x.avg_to_par) : unsignedOne(x.avg_to_par)));
   const median = block.median_gross == null ? '' : String(Math.round(block.median_gross));
   const par = block.par == null ? '' : String(block.par);
+  const label = hcpLabel(h, t);
   return {
     median,
     baseline: band
-      ? `${median} is what golfers off ${hcpLabel(h)} typically shoot here, par ${par}.`
-      : `${median} is what golfers here typically shoot, par ${par}.`,
-    cost: `The ${holeList[0]}, ${holeList[1]} and ${holeList[2]} cost them most: ${values[0]}, ${values[1]} and ${values[2]} ${anyNegative ? 'against par.' : 'over par.'}`,
+      ? t?.('whsConnect.intro.readoutBandBaseline', { median, hcp: label, par }) ?? `${median} is what golfers off ${label} typically shoot here, par ${par}.`
+      : t?.('whsConnect.intro.readoutAllBaseline', { median, par }) ?? `${median} is what golfers here typically shoot, par ${par}.`,
+    cost: t?.('whsConnect.intro.readoutCost', {
+      hole1: holeList[0],
+      hole2: holeList[1],
+      hole3: holeList[2],
+      value1: values[0],
+      value2: values[1],
+      value3: values[2],
+      ending: t(anyNegative ? 'whsConnect.intro.readoutAgainstPar' : 'whsConnect.intro.readoutOverPar'),
+    }) ?? `The ${holeList[0]}, ${holeList[1]} and ${holeList[2]} cost them most: ${values[0]}, ${values[1]} and ${values[2]} ${anyNegative ? 'against par.' : 'over par.'}`,
     source: band
-      ? `From ${band.rounds} ${band.rounds === 1 ? 'round' : 'rounds'} by golfers off ${rangeHcp(band.lo)} to ${rangeHcp(band.hi)} at this course.`
-      : `Not enough rounds yet from golfers off ${hcpLabel(h)}, so this is every golfer here: ${block.rounds} ${block.rounds === 1 ? 'round' : 'rounds'}.`,
+      ? t?.('whsConnect.intro.readoutBandSource', { count: band.rounds, lo: rangeHcp(band.lo), hi: rangeHcp(band.hi) }) ?? `From ${band.rounds} ${band.rounds === 1 ? 'round' : 'rounds'} by golfers off ${rangeHcp(band.lo)} to ${rangeHcp(band.hi)} at this course.`
+      : t?.('whsConnect.intro.readoutAllSource', { count: block.rounds, hcp: label }) ?? `Not enough rounds yet from golfers off ${label}, so this is every golfer here: ${block.rounds} ${block.rounds === 1 ? 'round' : 'rounds'}.`,
   };
+}
+
+export function hcpLabel(n: number, t?: IntroT): string {
+  return n === 0 ? t?.('whsConnect.intro.scratch') ?? 'scratch' : String(n);
+}
+
+export function nextFooterHidden(current: boolean, ratio: number): boolean {
+  if (ratio >= 0.6) return true;
+  if (ratio < 0.3) return false;
+  return current;
 }
 
 export function chooseCirclePeople(people: CirclePerson[], h: number): CirclePerson[] {
@@ -253,8 +267,9 @@ function useFittedThreeLine(deps: React.DependencyList) {
   return ref;
 }
 
-const LegacyFallback: React.FC<Props> = ({ onPickCountry, onDecline }) => {
+const LegacyFallback: React.FC<Props> = ({ onPickCountry, onDecline, layout = 'page' }) => {
   const { t } = useTranslation('handicap');
+  const immersive = layout === 'page';
   return (
     <>
       <Stage fill>
@@ -282,10 +297,12 @@ const LegacyFallback: React.FC<Props> = ({ onPickCountry, onDecline }) => {
           </div>
         </div>
       </Stage>
-      <FooterBar>
-        <button type="button" onClick={onPickCountry} style={primaryCtaStyle}>{t('whsConnect.intro.cta')}</button>
-        {onDecline ? <DeclineButton onClick={onDecline} /> : null}
-      </FooterBar>
+      {immersive ? (
+        <FooterBar>
+          <button type="button" onClick={onPickCountry} style={primaryCtaStyle}>{t('whsConnect.intro.cta')}</button>
+          {onDecline ? <DeclineButton onClick={onDecline} /> : null}
+        </FooterBar>
+      ) : null}
     </>
   );
 };
@@ -308,20 +325,28 @@ const primaryCtaStyle: React.CSSProperties = {
 
 const DeclineButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   <button type="button" onClick={onClick} style={{ height: 36, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', fontFamily: FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: QUIET, cursor: 'pointer' }}>
-    I don&apos;t hold an official handicap
+    <IntroText k="decline" />
   </button>
 );
 
-const Stepper: React.FC<{ value: number; onChange: (next: number) => void }> = ({ value, onChange }) => (
-  <div style={{ paddingTop: 22, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-    <span style={{ fontSize: 15, fontWeight: 600, color: MID }}>If you play off</span>
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-      <button type="button" aria-label="Lower handicap" disabled={value <= 0} onClick={() => onChange(Math.max(0, value - 1))} style={stepperButtonStyle(value <= 0)}>&minus;</button>
-      <span style={{ minWidth: 56, textAlign: 'center', fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', color: SOFT_INK, ...NUM }}>{value}</span>
-      <button type="button" aria-label="Higher handicap" disabled={value >= 36} onClick={() => onChange(Math.min(36, value + 1))} style={stepperButtonStyle(value >= 36)}>+</button>
-    </span>
-  </div>
-);
+const IntroText: React.FC<{ k: string; options?: Record<string, unknown> }> = ({ k, options }) => {
+  const { t } = useTranslation('handicap');
+  return <>{t(`whsConnect.intro.${k}`, options)}</>;
+};
+
+const Stepper: React.FC<{ value: number; onChange: (next: number) => void }> = ({ value, onChange }) => {
+  const { t } = useTranslation('handicap');
+  return (
+    <div style={{ paddingTop: 22, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <span style={{ fontSize: 15, fontWeight: 600, color: MID }}>{t('whsConnect.intro.stepperLabel')}</span>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <button type="button" aria-label={t('whsConnect.intro.lowerHandicapAria')} disabled={value <= 0} onClick={() => onChange(Math.max(0, value - 1))} style={stepperButtonStyle(value <= 0)}>&minus;</button>
+        <span style={{ minWidth: 56, textAlign: 'center', fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', color: SOFT_INK, ...NUM }}>{value}</span>
+        <button type="button" aria-label={t('whsConnect.intro.higherHandicapAria')} disabled={value >= 36} onClick={() => onChange(Math.min(36, value + 1))} style={stepperButtonStyle(value >= 36)}>+</button>
+      </span>
+    </div>
+  );
+};
 
 function stepperButtonStyle(disabled: boolean): React.CSSProperties {
   return {
@@ -368,32 +393,26 @@ const FirstScreen: React.FC<{
   block: IntroBlock;
   band: IntroBand | null;
   h: number;
+  dataHcp: number;
   setH: (h: number) => void;
   hasHomeClub: boolean;
   onChange: () => void;
-  onPickCountry: () => void;
-  onDecline?: () => void;
-  footerHidden: boolean;
   fetching: boolean;
-  circleShown: boolean;
-}> = ({ course, block, band, h, setH, hasHomeClub, onChange, onPickCountry, onDecline, footerHidden, fetching, circleShown }) => {
+}> = ({ course, block, band, h, dataHcp, setH, hasHomeClub, onChange, fetching }) => {
+  const { t } = useTranslation('handicap');
   const headlineRef = useFittedThreeLine([course.courseName]);
   const top = costliestThree(block.holes);
-  const readout = buildReadout(block, band, h);
-  const cta = (place: 'footer' | 'end') => {
-    analyticsEvents.track('connect_intro_cta', { h, place, circle_shown: circleShown });
-    onPickCountry();
-  };
+  const readout = buildReadout(block, band, dataHcp, t);
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
-        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: QUIET }}>{course.source === 'home' ? 'Your home club' : 'In the Top 100'}</span>
-        <button type="button" onClick={onChange} style={{ background: 'none', border: 'none', padding: 0, fontFamily: FONT, fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: QUIET, cursor: 'pointer' }}>{hasHomeClub ? 'Change' : 'Set your home club'}</button>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: QUIET }}>{t(course.source === 'home' ? 'whsConnect.intro.homeClubKicker' : 'whsConnect.intro.top100Kicker')}</span>
+        <button type="button" onClick={onChange} style={{ background: 'none', border: 'none', padding: 0, fontFamily: FONT, fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: QUIET, cursor: 'pointer' }}>{t(hasHomeClub ? 'whsConnect.intro.change' : 'whsConnect.intro.setHomeClub')}</button>
       </div>
       <h1 ref={headlineRef} style={{ margin: '12px 0 0', fontSize: 40, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.02, color: SOFT_INK }}>
-        <span style={{ display: 'block', whiteSpace: 'nowrap' }}>Which holes at</span>
+        <span style={{ display: 'block', whiteSpace: 'nowrap' }}>{t('whsConnect.intro.tryHeadlineLine1')}</span>
         <span style={{ display: 'block', whiteSpace: 'nowrap' }}>{displayCourseName(course.courseName)}</span>
-        <span style={{ display: 'block', whiteSpace: 'nowrap', color: AMBER }}>will cost you?</span>
+        <span style={{ display: 'block', whiteSpace: 'nowrap', color: AMBER }}>{t('whsConnect.intro.tryHeadlineLine3')}</span>
       </h1>
       <Stepper value={h} onChange={setH} />
       <HoleChart block={block} top={top} fetching={fetching} />
@@ -405,28 +424,41 @@ const FirstScreen: React.FC<{
         <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.45, color: MID }}>{readout.cost}</div>
         <div style={{ marginTop: 6, fontSize: 12, color: DIMMER }}>{readout.source}</div>
       </div>
-      <div aria-hidden={footerHidden} style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 20, padding: '18px 24px 30px', paddingBottom: 'calc(30px + env(safe-area-inset-bottom, 0px))', display: 'flex', flexDirection: 'column', gap: 12, background: GROUND, borderTop: `1px solid ${FAINT_HAIR}`, transform: footerHidden ? 'translateY(100%)' : 'translateY(0)', opacity: footerHidden ? 0 : 1, pointerEvents: footerHidden ? 'none' : 'auto', transition: 'transform 200ms ease, opacity 200ms ease' }}>
-        <div style={{ fontSize: 13.5, lineHeight: 1.45, color: QUIET }}>Connect your official handicap and this is built from <span style={{ color: SOFT_INK, fontWeight: 700 }}>your own rounds</span>, on every course you play.</div>
-        <button type="button" onClick={() => cta('footer')} style={primaryCtaStyle}>Connect your handicap</button>
-        {onDecline ? <DeclineButton onClick={onDecline} /> : null}
-      </div>
     </>
   );
 };
 
+const IntroFooter: React.FC<{ hidden: boolean; display: boolean; onTransitionEnd: () => void; onPickCountry: () => void; onDecline?: () => void; h: number; circleShown: boolean }> = ({ hidden, display, onTransitionEnd, onPickCountry, onDecline, h, circleShown }) => {
+  const { t } = useTranslation('handicap');
+  const cta = () => {
+    analyticsEvents.track('connect_intro_cta', { h, place: 'footer', circle_shown: circleShown });
+    onPickCountry();
+  };
+  return (
+    <div aria-hidden={hidden} onTransitionEnd={onTransitionEnd} style={{ padding: '18px 24px 30px', paddingBottom: 'calc(30px + env(safe-area-inset-bottom, 0px))', display: display ? 'flex' : 'none', flexDirection: 'column', gap: 12, background: GROUND, borderTop: `1px solid ${FAINT_HAIR}`, transform: hidden ? 'translateY(100%)' : 'translateY(0)', opacity: hidden ? 0 : 1, pointerEvents: hidden ? 'none' : 'auto', transition: 'transform 200ms ease, opacity 200ms ease' }}>
+      <div style={{ fontSize: 13.5, lineHeight: 1.45, color: QUIET }}>
+        <Trans t={t} i18nKey="whsConnect.intro.footerLine" components={{ 1: <span style={{ color: SOFT_INK, fontWeight: 700 }} /> }} />
+      </div>
+      <button type="button" onClick={cta} style={primaryCtaStyle}>{t('whsConnect.intro.connectCta')}</button>
+      {onDecline ? <DeclineButton onClick={onDecline} /> : null}
+    </div>
+  );
+};
+
 const YouTable: React.FC<{ block: IntroBlock; all: IntroBlock; band: IntroBand | null; h: number }> = ({ block, all, band, h }) => {
+  const { t } = useTranslation('handicap');
   const top = costliestThree(block.holes);
   const hardest = costliestThree(all.holes)[0]?.hole_no;
   return (
     <section style={{ paddingTop: 32 }}>
-      <h2 style={sectionHeadStyle}>Then it stops being<br />golfers like you.<br /><span style={{ color: AMBER }}>It&apos;s you.</span></h2>
-      <p style={sectionSubStyle}>Same holes, your own rounds. The right-hand column fills in the moment you connect.</p>
+      <h2 style={sectionHeadStyle}>{t('whsConnect.intro.youTableHeadingLine1')}<br />{t('whsConnect.intro.youTableHeadingLine2')}<br /><span style={{ color: AMBER }}>{t('whsConnect.intro.youTableHeadingLine3')}</span></h2>
+      <p style={sectionSubStyle}>{t('whsConnect.intro.youTableSub')}</p>
       <div style={{ marginTop: 18, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 84px 84px', columnGap: 8, paddingBottom: 8, borderBottom: `1px solid ${HAIR}`, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: DIMMER }}>
-        <span>Hole</span><span style={{ textAlign: 'right' }}>{band ? (h === 0 ? 'Scratch' : `Off ${h}`) : 'All golfers'}</span><span style={{ textAlign: 'right' }}>You</span>
+        <span>{t('whsConnect.intro.youTableHole')}</span><span style={{ textAlign: 'right' }}>{band ? (h === 0 ? t('whsConnect.intro.youTableScratch') : t('whsConnect.intro.youTableOff', { hcp: h })) : t('whsConnect.intro.youTableAllGolfers')}</span><span style={{ textAlign: 'right' }}>{t('whsConnect.intro.youTableYou')}</span>
       </div>
       {top.map((hole) => (
         <div key={hole.hole_no} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 84px 84px', columnGap: 8, alignItems: 'center', padding: '14px 0', borderBottom: `1px solid ${HAIR}` }}>
-          <span><span style={{ display: 'block', fontSize: 16, fontWeight: 700 }}>{ordinal(hole.hole_no)}</span><span style={{ display: 'block', marginTop: 2, fontSize: 12.5, color: DIMMER }}>par {hole.par}{hardest === hole.hole_no ? ' · the hardest here' : ''}</span></span>
+          <span><span style={{ display: 'block', fontSize: 16, fontWeight: 700 }}>{ordinal(hole.hole_no)}</span><span style={{ display: 'block', marginTop: 2, fontSize: 12.5, color: DIMMER }}>{t('whsConnect.intro.youTablePar', { par: hole.par })}{hardest === hole.hole_no ? ` · ${t('whsConnect.intro.youTableHardest')}` : ''}</span></span>
           <span style={{ textAlign: 'right', fontSize: 18, fontWeight: 800, color: MID }}>{signedOne(hole.avg_to_par)}</span>
           <span style={{ justifySelf: 'end', width: 64, height: 30, borderRadius: 10, border: `1.5px dashed ${AMBER_DASH}` }} />
         </div>
@@ -438,41 +470,45 @@ const YouTable: React.FC<{ block: IntroBlock; all: IntroBlock; band: IntroBand |
 const sectionHeadStyle: React.CSSProperties = { margin: 0, fontSize: 30, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.08, color: SOFT_INK };
 const sectionSubStyle: React.CSSProperties = { margin: '10px 0 0', fontSize: 14, lineHeight: 1.5, color: QUIET };
 
-const ExampleBlock: React.FC = () => (
-  <section style={{ paddingTop: 52 }}>
-    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-      <h2 style={sectionHeadStyle}>After every round</h2>
-      <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: DIMMER }}>Example</span>
-    </div>
-    <p style={sectionSubStyle}>Your rounds arrive on their own, scored hole by hole against the course you played.</p>
-    <div style={{ marginTop: 22, paddingTop: 18, borderTop: `1px solid ${HAIR}` }}>
-      <ExampleTitle n="01" title="The score to beat next time" />
+const ExampleBlock: React.FC = () => {
+  const { t } = useTranslation('handicap');
+  return (
+    <section style={{ paddingTop: 52 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <h2 style={sectionHeadStyle}>{t('whsConnect.intro.exampleHeading')}</h2>
+        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: DIMMER }}>{t('whsConnect.intro.exampleKicker')}</span>
+      </div>
+      <p style={sectionSubStyle}>{t('whsConnect.intro.exampleSub')}</p>
+      <div style={{ marginTop: 22, paddingTop: 18, borderTop: `1px solid ${HAIR}` }}>
+        <ExampleTitle n="01" title={t('whsConnect.intro.exampleBeatTitle')} />
       <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 4 }}>
         {EXAMPLE.beat.map((x) => <span key={x.score} style={{ height: 58, borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, border: x.active ? `1.5px solid ${SOFT_INK}` : `1px solid ${HAIR}`, background: x.active ? AVATAR_BG : undefined }}><span style={{ fontSize: 15, fontWeight: 800 }}>{x.score}</span><span style={{ fontSize: 11.5, fontWeight: 700, color: x.good ? GOOD : DIMMER }}>{x.index}</span></span>)}
       </div>
-      <p style={exampleTextStyle}>Shoot 84 at your home course and your index drops to 11.6. 85 or worse changes nothing.</p>
+      <p style={exampleTextStyle}>{t('whsConnect.intro.exampleBeatText')}</p>
     </div>
     <div style={{ marginTop: 26, paddingTop: 18, borderTop: `1px solid ${HAIR}` }}>
-      <ExampleTitle n="02" title="Your last 20, and what counts" />
+      <ExampleTitle n="02" title={t('whsConnect.intro.exampleCountTitle')} />
       <div style={{ marginTop: 14, height: 80, display: 'grid', gridTemplateColumns: 'repeat(20, minmax(0, 1fr))', gap: 3, alignItems: 'end' }}>
         {EXAMPLE.bars.map((height, i) => <span key={i} style={{ height, borderRadius: 4, background: EXAMPLE.counters.has(i) ? GOOD : BAR }} />)}
       </div>
-      <p style={exampleTextStyle}>Your best 8 make your index. See which drop out next, and where your index is heading.</p>
+      <p style={exampleTextStyle}>{t('whsConnect.intro.exampleCountText')}</p>
     </div>
     <div style={{ marginTop: 26, paddingTop: 18, borderTop: `1px solid ${HAIR}` }}>
-      <ExampleTitle n="03" title="Ways to get it down" />
+      <ExampleTitle n="03" title={t('whsConnect.intro.exampleWaysTitle')} />
       <div style={{ marginTop: 12 }}>
-        {EXAMPLE.ways.map((x) => <div key={x.title} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 12, alignItems: 'baseline', padding: '10px 0', borderBottom: `1px solid ${FAINT_HAIR}` }}><span style={{ fontSize: 14.5, fontWeight: 600, color: MID }}>{x.title}</span><span style={{ fontSize: 18, fontWeight: 800, color: GOOD }}>{x.value}</span></div>)}
+        {EXAMPLE.ways.map((x) => <div key={x.titleKey} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 12, alignItems: 'baseline', padding: '10px 0', borderBottom: `1px solid ${FAINT_HAIR}` }}><span style={{ fontSize: 14.5, fontWeight: 600, color: MID }}>{t(`whsConnect.intro.${x.titleKey}`)}</span><span style={{ fontSize: 18, fontWeight: 800, color: GOOD }}>{x.value}</span></div>)}
       </div>
-      <p style={exampleTextStyle}>Worked out by replaying your own counting rounds with one thing changed.</p>
+      <p style={exampleTextStyle}>{t('whsConnect.intro.exampleWaysText')}</p>
     </div>
   </section>
-);
+  );
+};
 
 const ExampleTitle: React.FC<{ n: string; title: string }> = ({ n, title }) => <div style={{ display: 'flex', gap: 12, alignItems: 'baseline' }}><span style={{ fontSize: 13, fontWeight: 800, color: AMBER }}>{n}</span><span style={{ fontSize: 18, fontWeight: 700 }}>{title}</span></div>;
 const exampleTextStyle: React.CSSProperties = { margin: '10px 0 0', fontSize: 13, lineHeight: 1.45, color: QUIET };
 
 const CircleSection: React.FC<{ preview: CirclePreview; h: number }> = ({ preview, h }) => {
+  const { t } = useTranslation('handicap');
   if (preview.connected <= 0) return null;
   const people = chooseCirclePeople(preview.people, h);
   const rows: Array<CirclePerson | 'you'> = [];
@@ -487,8 +523,8 @@ const CircleSection: React.FC<{ preview: CirclePreview; h: number }> = ({ previe
   if (!placed) rows.push('you');
   return (
     <section style={{ paddingTop: 52 }}>
-      <h2 style={sectionHeadStyle}>Your circle is<br />already here</h2>
-      <p style={sectionSubStyle}>{preview.connected === 1 ? '1 golfer you follow has connected.' : `${preview.connected} golfers you follow have connected. Connect to take your place among them.`}</p>
+      <h2 style={sectionHeadStyle}>{t('whsConnect.intro.circleHeadingLine1')}<br />{t('whsConnect.intro.circleHeadingLine2')}</h2>
+      <p style={sectionSubStyle}>{t('whsConnect.intro.circleSub', { count: preview.connected })}</p>
       <div style={{ margin: '16px -24px 0' }}>
         {rows.map((row) => row === 'you' ? <YouCircleRow key="you" /> : <PersonRow key={row.user_id} person={row} />)}
       </div>
@@ -507,7 +543,7 @@ const PersonRow: React.FC<{ person: CirclePerson }> = ({ person }) => (
 const YouCircleRow: React.FC = () => (
   <div style={circleRowStyle(AMBER_ROW)}>
     <span style={{ width: 36, height: 36, borderRadius: 12, display: 'grid', placeItems: 'center', fontSize: 14, fontWeight: 800, border: `1.5px dashed ${AMBER_DASH_STRONG}`, color: AMBER }}>?</span>
-    <span style={{ minWidth: 0 }}><span style={{ display: 'block', fontSize: 15, fontWeight: 700 }}>You</span><span style={{ display: 'block', marginTop: 2, fontSize: 12.5, color: DIMMER }}>connect to take your place</span></span>
+    <span style={{ minWidth: 0 }}><span style={{ display: 'block', fontSize: 15, fontWeight: 700 }}><IntroText k="circleYou" /></span><span style={{ display: 'block', marginTop: 2, fontSize: 12.5, color: DIMMER }}><IntroText k="circleYouLine" /></span></span>
     <span style={{ width: 44, height: 26, borderRadius: 8, border: `1.5px dashed ${AMBER_DASH}` }} />
   </div>
 );
@@ -516,21 +552,25 @@ function circleRowStyle(background?: string): React.CSSProperties {
   return { display: 'grid', gridTemplateColumns: '36px minmax(0, 1fr) auto', columnGap: 12, alignItems: 'center', padding: '11px 24px', borderBottom: `1px solid ${FAINT_HAIR}`, background };
 }
 
-const TrustSection: React.FC = () => (
-  <section style={{ paddingTop: 52 }}>
-    <h2 style={sectionHeadStyle}>Thirty seconds.<br />Then it looks after itself.</h2>
-    <div style={{ marginTop: 18 }}>
-      {TRUST_STEPS.map((x, i) => (
-        <div key={x.title} style={{ display: 'grid', gridTemplateColumns: '36px minmax(0, 1fr)', columnGap: 14, alignItems: 'start', padding: '14px 0', borderBottom: `1px solid ${HAIR}` }}>
-          <span style={{ width: 36, height: 36, borderRadius: 12, background: STEP_BG, display: 'grid', placeItems: 'center', fontSize: 13, fontWeight: 800, color: SOFT_INK }}>{i + 1}</span>
-          <span><span style={{ display: 'block', fontSize: 16, fontWeight: 700 }}>{x.title}</span><span style={{ display: 'block', marginTop: 3, fontSize: 13.5, lineHeight: 1.45, color: QUIET }}>{x.line}</span></span>
-        </div>
-      ))}
-    </div>
-  </section>
-);
+const TrustSection: React.FC = () => {
+  const { t } = useTranslation('handicap');
+  return (
+    <section style={{ paddingTop: 52 }}>
+      <h2 style={sectionHeadStyle}>{t('whsConnect.intro.trustHeadingLine1')}<br />{t('whsConnect.intro.trustHeadingLine2')}</h2>
+      <div style={{ marginTop: 18 }}>
+        {TRUST_STEPS.map((x, i) => (
+          <div key={x} style={{ display: 'grid', gridTemplateColumns: '36px minmax(0, 1fr)', columnGap: 14, alignItems: 'start', padding: '14px 0', borderBottom: `1px solid ${HAIR}` }}>
+            <span style={{ width: 36, height: 36, borderRadius: 12, background: STEP_BG, display: 'grid', placeItems: 'center', fontSize: 13, fontWeight: 800, color: SOFT_INK }}>{i + 1}</span>
+            <span><span style={{ display: 'block', fontSize: 16, fontWeight: 700 }}>{t(`whsConnect.intro.trustStep${x}Title`)}</span><span style={{ display: 'block', marginTop: 3, fontSize: 13.5, lineHeight: 1.45, color: QUIET }}>{t(`whsConnect.intro.trustStep${x}Line`)}</span></span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
 
 const EndBlock = React.forwardRef<HTMLDivElement, { onPickCountry: () => void; onDecline?: () => void; h: number; circleShown: boolean }>(({ onPickCountry, onDecline, h, circleShown }, ref) => {
+  const { t } = useTranslation('handicap');
   const live = WHS_COUNTRIES.filter((c) => c.supported).map((c) => c.name);
   const notYet = WHS_COUNTRIES.filter((c) => !c.supported).length;
   const liveText = live.length <= 1 ? live[0] ?? '' : `${live.slice(0, -1).join(', ')} and ${live[live.length - 1]}`;
@@ -540,15 +580,15 @@ const EndBlock = React.forwardRef<HTMLDivElement, { onPickCountry: () => void; o
   };
   return (
     <div ref={ref} style={{ marginTop: 36, display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <button type="button" onClick={cta} style={primaryCtaStyle}>Connect your handicap</button>
-      <div style={{ textAlign: 'center', fontSize: 12.5, lineHeight: 1.5, color: DIMMER }}>Works with official handicaps. {liveText} is live now, with {notYet} more countries on the way.</div>
+      <button type="button" onClick={cta} style={primaryCtaStyle}>{t('whsConnect.intro.connectCta')}</button>
+      <div style={{ textAlign: 'center', fontSize: 12.5, lineHeight: 1.5, color: DIMMER }}>{t('whsConnect.intro.endLine', { live: liveText, count: notYet })}</div>
       {onDecline ? <DeclineButton onClick={onDecline} /> : null}
     </div>
   );
 });
 EndBlock.displayName = 'EndBlock';
 
-export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) => {
+export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline, layout = 'page' }) => {
   const qc = useQueryClient();
   const { user, loading: sessionLoading } = useSupabaseSession();
   const userId = user?.id;
@@ -572,8 +612,10 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
   const stageRef = React.useRef<HTMLDivElement>(null);
   const endRef = React.useRef<HTMLDivElement>(null);
   const [footerHidden, setFooterHidden] = React.useState(false);
+  const [footerDisplay, setFooterDisplay] = React.useState(true);
   const triedRef = React.useRef(false);
   const viewedRef = React.useRef(false);
+  const immersive = layout === 'page';
 
   const onChange = () => openHomeClubPicker({
     onSelected: () => {
@@ -591,45 +633,57 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
   };
 
   React.useEffect(() => {
-    const root = stageRef.current;
     const target = endRef.current;
-    if (!root || !target) return;
-    const obs = new IntersectionObserver(([entry]) => setFooterHidden(entry.intersectionRatio >= 0.6), { root, threshold: [0, 0.6, 1] });
+    if (!immersive || !target) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      const ratio = entry?.intersectionRatio ?? 0;
+      setFooterHidden((current) => nextFooterHidden(current, ratio));
+    }, { root: null, threshold: [0, 0.3, 0.6, 1] });
     obs.observe(target);
     return () => obs.disconnect();
-  }, [intro.data, band.data]);
+  }, [immersive, intro.data, band.data]);
+
+  React.useEffect(() => {
+    if (!footerHidden) setFooterDisplay(true);
+  }, [footerHidden]);
 
   const pending = !homeSettled || intro.isPending || (!!userId && profile.isPending) || (!!intro.data && band.isPending);
+
+  React.useEffect(() => {
+    if (pending || !intro.data || !band.data || viewedRef.current) return;
+    viewedRef.current = true;
+    analyticsEvents.track('connect_intro_viewed', { source: intro.data.source, band: !!band.data.band, h0 });
+  }, [band.data, h0, intro.data, pending]);
+
   if (pending) {
     return (
       <>
         <Stage ref={stageRef}>{null}</Stage>
-        <FooterBar>{null}</FooterBar>
+        {immersive ? <FooterBar>{null}</FooterBar> : null}
       </>
     );
   }
 
-  if (!intro.data) return <LegacyFallback onPickCountry={onPickCountry} onDecline={onDecline} />;
-  if (!band.data || band.data.available === false || !band.data.all) return <LegacyFallback onPickCountry={onPickCountry} onDecline={onDecline} />;
+  if (!intro.data) return <LegacyFallback onPickCountry={onPickCountry} onDecline={onDecline} layout={layout} />;
+  if (!band.data || band.data.available === false || !band.data.all) return <LegacyFallback onPickCountry={onPickCountry} onDecline={onDecline} layout={layout} />;
 
   const block = band.data.band ?? band.data.all;
+  const dataHcp = band.data.hcp;
   const circleShown = !!circle.isFetched && (circle.data?.connected ?? 0) > 0;
 
-  if (!viewedRef.current) {
-    viewedRef.current = true;
-    analyticsEvents.track('connect_intro_viewed', { source: intro.data.source, band: !!band.data.band, h0 });
-  }
-
   return (
-    <Stage ref={stageRef}>
-      <FirstScreen course={intro.data} block={block} band={band.data.band} h={h} setH={setH} hasHomeClub={home.clubId != null} onChange={onChange} onPickCountry={onPickCountry} onDecline={onDecline} footerHidden={footerHidden} fetching={band.isFetching} circleShown={circleShown} />
-      <YouTable block={block} all={band.data.all} band={band.data.band} h={h} />
-      <ExampleBlock />
-      {circle.isFetched && circle.data ? <CircleSection preview={circle.data} h={h} /> : null}
-      <TrustSection />
-      <EndBlock ref={endRef} onPickCountry={onPickCountry} onDecline={onDecline} h={h} circleShown={circleShown} />
-      <div style={{ height: 40 }} />
-    </Stage>
+    <>
+      <Stage ref={stageRef}>
+        <FirstScreen course={intro.data} block={block} band={band.data.band} h={h} dataHcp={dataHcp} setH={setH} hasHomeClub={home.clubId != null} onChange={onChange} fetching={band.isFetching} />
+        <YouTable block={block} all={band.data.all} band={band.data.band} h={dataHcp} />
+        <ExampleBlock />
+        {circle.isFetched && circle.data ? <CircleSection preview={circle.data} h={dataHcp} /> : null}
+        <TrustSection />
+        <EndBlock ref={endRef} onPickCountry={onPickCountry} onDecline={onDecline} h={dataHcp} circleShown={circleShown} />
+        <div style={{ height: 40 }} />
+      </Stage>
+      {immersive ? <IntroFooter hidden={footerHidden} display={footerDisplay} onTransitionEnd={() => { if (footerHidden) setFooterDisplay(false); }} onPickCountry={onPickCountry} onDecline={onDecline} h={dataHcp} circleShown={circleShown} /> : null}
+    </>
   );
 };
 
