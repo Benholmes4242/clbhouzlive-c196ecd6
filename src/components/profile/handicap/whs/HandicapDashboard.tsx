@@ -24,6 +24,7 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 // resolveHandicapSubtab) were deleted 10 Sep 2026.
 
 import IndexSection from './sections/IndexSection';
+import LockedCard from './sections/LockedCard';
 import NextRoundSection from './sections/NextRoundSection';
 import RoundsThatCountSection from './sections/RoundsThatCountSection';
 import HolesSection from './sections/HolesSection';
@@ -111,7 +112,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       */}
 
       {/* 1 — HANDICAP INDEX */}
-      <IndexSection connection={connection} />
+      <IndexSection connection={connection} belowHeadline={<LockedCard connectionId={connection.id} />} />
 
       {/* 2 — NEXT ROUND */}
       <NextRoundSection connectionId={connection.id} currentHandicap={currentHandicap} />
