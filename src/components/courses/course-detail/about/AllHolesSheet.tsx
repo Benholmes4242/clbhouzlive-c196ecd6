@@ -362,7 +362,7 @@ const AllHolesSheet: React.FC<AllHolesSheetProps> = ({ open, onClose, courseId, 
             <AboutSection heading={t('courseDetail.allHolesSheet.holes')}>
               {shares ? <DistributionSummary shares={shares} /> : null}
               <div style={{ marginTop: shares ? 16 : 0 }}>
-                {holes.map((hole, index) => (
+                {fieldHoles.map((hole, index) => (
                   <CompactHoleRow key={hole.hole_no} hole={hole} mine={myByHole.get(hole.hole_no) ?? null} hasYou={hasYou} last={index === holes.length - 1} />
                 ))}
               </div>
