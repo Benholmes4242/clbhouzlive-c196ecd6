@@ -11,12 +11,40 @@ const split = (over: number, holes: number, bp: number, bog: number, dbl: number
   pct_double: dbl,
 });
 
+/* 5B L1: a split carrying the four exact outcome counts, which partition
+   holes_played exactly. */
+const splitWithCounts = (
+  over: number,
+  holes: number,
+  counts: { birdie: number; par: number; bogey: number; dbl: number },
+): ParSplitInput => ({
+  par: 4,
+  avg_over: over,
+  holes_played: holes,
+  pct_par_better: 0,
+  pct_bogey: 0,
+  pct_double: 0,
+  birdie_better_count: counts.birdie,
+  par_count: counts.par,
+  bogey_count: counts.bogey,
+  double_count: counts.dbl,
+});
+
 /* A member with many partial cards: 90 / 540 / 270 holes = 900 total.
    complete_rounds would be far fewer than 50 — the basis rule must not use it. */
 const fixture = {
   par3: split(0.4, 90, 30, 40, 10),
   par4: split(0.8, 540, 20, 50, 12),
   par5: split(0.5, 270, 40, 30, 8),
+};
+
+/* 5B: the same hole totals with exact counts.
+   birdie 243 / par 243 / bogey 324 / double 90 over 900 holes
+   = 27 / 27 / 36 / 10 — summing to exactly 100. */
+const countedFixture = {
+  par3: splitWithCounts(0.4, 90, { birdie: 27, par: 27, bogey: 27, dbl: 9 }),
+  par4: splitWithCounts(0.8, 540, { birdie: 108, par: 162, bogey: 216, dbl: 54 }),
+  par5: splitWithCounts(0.5, 270, { birdie: 108, par: 54, bogey: 81, dbl: 27 }),
 };
 
 describe('deriveStrokesGo', () => {
