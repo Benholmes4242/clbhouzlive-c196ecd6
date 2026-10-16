@@ -922,7 +922,8 @@
     },
     "ageingOut": {
       "kicker": "Ageing out",
-      "title": "Your index is about to rise on its own",
+      "title": "A counting round is about to drop out",
+      "titleBest": "Your best round is about to drop out",
       "inRounds_one": "In {{count}} round",
       "inRounds_other": "In {{count}} rounds",
       "body": "Your <b>{{gross}}</b> at {{course}} on {{date}} is a <b>{{diff}}</b> differential, the best in your twenty. It drops off in {{count}} rounds and <b>{{next}}</b> takes its place in your counting eight. If none of your next {{count}} rounds beats {{next}}, your index lands at <b>{{settle}}</b>.",
