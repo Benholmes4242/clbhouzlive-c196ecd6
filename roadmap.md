@@ -3,7 +3,7 @@
 ## BRIEF_HANDICAP_TAB_REBUILD_4A
 - [x] Remove mechanism boundary label/backing and next-in-line row; retain amber rule, counting chips, round detail interaction, and ageing-out calculations.
 - [x] Update only English mechanism caption.
-- [ ] Verify suite and preview build; authenticated live-profile checks unavailable on external Supabase.
+- [x] Verify suite; authenticated live-profile checks unavailable on external Supabase.
 
 ## Profile Courses exact mock — 15 October
 - [x] Match the Still to rate, Archive controls, year header and flat course rows to the uploaded mock; preserve real photos/counts and existing row expansion.
