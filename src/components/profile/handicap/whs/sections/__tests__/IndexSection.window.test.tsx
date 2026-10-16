@@ -32,7 +32,7 @@ describe('Index block — window anchored to today, headline mutated in place', 
     expect(screen.getByText('0.0')).toBeTruthy();
     expect(screen.getByText('common:handicap.walk.window30')).toBeTruthy();
     expect(container.querySelector('linearGradient[id^="hcp-trend-fill-"]')).toBeTruthy();
-    expect(container.querySelector('linearGradient[id^="hcp-trend-stroke-"]')).toBeTruthy();
+    expect(container.querySelector('[data-hcp-chart="simplified"]')).toBeTruthy();
     const chart = screen.getByRole('img');
     chart.getBoundingClientRect = () => ({ left: 0 } as DOMRect);
     fireEvent.pointerDown(chart, { clientX: 0, pointerId: 1 });
@@ -49,7 +49,7 @@ describe('Index block — window anchored to today, headline mutated in place', 
     const { container } = render(<IndexSection connection={conn} />);
     expect(screen.getByText('\u22121.5')).toBeTruthy();
     expect(container.querySelector('linearGradient[id^="hcp-trend-fill-"]')).toBeTruthy();
-    expect(container.querySelector('linearGradient[id^="hcp-trend-stroke-"]')).toBeTruthy();
+    expect(container.querySelector('[data-hcp-chart="simplified"]')).toBeTruthy();
     expect(container.querySelectorAll('svg path').length).toBe(3);
   });
 

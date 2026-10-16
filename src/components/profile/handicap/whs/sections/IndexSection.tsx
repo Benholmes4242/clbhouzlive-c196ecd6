@@ -20,7 +20,8 @@
  *   up = drifted tone, zero = A.DIM and reads "0.0".
  *
  * - THE CHART IS THE SAME SHARED HcpTrendChart USED BY THE PROFILE SHEET:
- *   zone-graded stroke, net-movement fill, best/worst callouts and active halo.
+ *   SIMPLIFIED branch (one toned line, gradient beneath, three marks, no plot
+ *   labels), toned with the dark movement pair. The range sits in a row below.
  *
  * - SCRUB: pointer down snaps to the nearest point; drag follows under pointer
  *   capture; release PARKS it. Any range change resets to landing.
@@ -44,6 +45,8 @@ import { HcpTrendChart } from '../charts/HcpTrendChart';
 
 interface Props {
   connection: WhsConnection;
+  /** Rendered directly under the headline, before the range chips (the lock card). */
+  belowHeadline?: React.ReactNode;
 }
 
 const MS_PER_DAY = 86_400_000;
@@ -103,7 +106,7 @@ interface Pt {
   edge?: 'lead' | 'trail';
 }
 
-const IndexSection: React.FC<Props> = ({ connection }) => {
+const IndexSection: React.FC<Props> = ({ connection, belowHeadline = null }) => {
   const { t } = useTranslation(['common']);
   const { data: history, isLoading } = useHandicapHistory(connection.id, 'all');
 
@@ -141,6 +144,20 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
     if (last && last.ts < end) pts.push({ ts: end, v: last.v, edge: 'trail' });
     return { pts, start, end };
   }, [all, win]);
+
+  /* THE RANGE ROW reads the index in force across the last twelve months,
+     whatever window the chips select: 12M high, 12M low, today. */
+  const range = useMemo(() => {
+    if (all.length === 0) return null;
+    const start = Date.now() - DAYS['12m'] * MS_PER_DAY;
+    const before = all.filter((p) => p.ts <= start);
+    const vals = [
+      ...(before.length ? [before[before.length - 1].v] : []),
+      ...all.filter((p) => p.ts > start).map((p) => p.v),
+    ];
+    if (vals.length === 0) return null;
+    return { high: Math.max(...vals), low: Math.min(...vals), today: vals[vals.length - 1] };
+  }, [all]);
 
   const pts = view?.pts ?? [];
   const chartPoints = useMemo(
@@ -185,6 +202,9 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
   /* THE ONE VALUE (§2.2): window end minus window start. The headline figure
      and the line/fill tone both read it; they cannot disagree. */
   const windowNet = pts.length ? pts[pts.length - 1].v - pts[0].v : 0;
+  /* The caller decides direction (the chart never does): dark improved for a
+     fall, dark drifted for a rise, DIM when held. */
+  const chartTone = Math.abs(windowNet) < DEAD_BAND ? CHART.DIM : windowNet < 0 ? CHART.DOWN : CHART.UP;
   if (isLoading) return null;
 
   const idx = sel == null ? null : Math.min(sel, pts.length - 1);
@@ -286,6 +306,8 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
         </div>
       )}
 
+      {belowHeadline}
+
       {chips}
 
       {!drawable ? (
@@ -334,6 +356,10 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
               /* FULL SECTION WIDTH: padX 0 so the line spans the same left and
                  right edges as the section rows below (BRIEF user ruling). */
               padX={0}
+              /* The sheet's simplified branch, toned with the DARK movement
+                 pair: this tab is near-black, the sheet is white. */
+              simplified
+              tone={chartTone}
             />
           </div>
 
@@ -341,6 +367,23 @@ const IndexSection: React.FC<Props> = ({ connection }) => {
             <span>{view ? format(new Date(view.start), 'MMM yyyy') : ''}</span>
             <span>{t('common:handicap.walk.today')}</span>
           </div>
+
+          {range && (
+            <div data-hcp-range style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
+              {([
+                ['high', range.high, CHART.INK, t('common:handicap.walk.rangeHigh', { defaultValue: '12M high' })],
+                ['low', range.low, chartTone, t('common:handicap.walk.rangeLow', { defaultValue: 'Low' })],
+                ['today', range.today, CHART.INK, t('common:handicap.walk.rangeToday', { defaultValue: 'Today' })],
+              ] as const).map(([k, v, c, l], i) => (
+                <div key={k} style={{ textAlign: i === 0 ? 'left' : i === 1 ? 'center' : 'right' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: c, ...FIG }}>{formatIndex(v)}</div>
+                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: CHART.DIM, marginTop: 2 }}>
+                    {l}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </>
       )}
     </HcpSection>
