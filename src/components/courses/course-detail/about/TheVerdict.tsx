@@ -16,7 +16,7 @@ import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import AboutSection from './AboutSection';
 import { deriveCourseVerdict, shotsInWords, signed } from './courseVerdict';
-import { B, BAR_NEUTRAL, Said, SMALL_LABEL, TILE_FILL } from './verdictBits';
+import { B, Said, SMALL_LABEL, TILE_FILL } from './verdictBits';
 
 const TRACK = A.TRACK;
 
@@ -113,8 +113,6 @@ const TheVerdict: React.FC<{ courseId: string }> = ({ courseId }) => {
           </Said>
         </>
       ) : null}
-      {/* BAR_NEUTRAL is exported for the hole chart; referenced to keep one owner. */}
-      <span hidden data-fill={BAR_NEUTRAL} />
     </AboutSection>
   );
 };
