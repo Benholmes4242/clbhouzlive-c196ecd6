@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_HANDICAP_TAB_REBUILD_8A
+- [ ] Confirm clbhouz; enable record row buttons opening the canonical RoundDetailSheet by existing id, preserving geometry and no-id noninteraction.
+- [ ] Capitalise five English Stood strings only; preserve record calculations and all other copy.
+- [ ] Verify interaction tests/full suite and preview; report no-id feasibility and external/unmanaged live-auth limits. No SQL/migrations; feed_config untouched, round_pool_cap 30.
+
 ## BRIEF_HANDICAP_TAB_REBUILD_6B
 - [x] Confirm clbhouz; remove FloorSection, its derivations and 19 dedicated tests, and English handicap.floor keys; supersedes 6A.
 - [x] Preserve pickCourse and PersonalBestsSection exactly, with the requested remaining section order.
