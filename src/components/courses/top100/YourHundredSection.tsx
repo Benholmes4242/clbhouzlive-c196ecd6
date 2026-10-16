@@ -30,6 +30,17 @@ import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 const CELL_MEMBER = 'rgba(255,255,255,0.14)';
 const CELL_NOBODY = 'rgba(255,255,255,0.055)';
 
+/* Grid geometry, read by the section AND its shell (BRIEF_COURSES_SKELETONS 3.1). */
+export const HUNDRED_GRID_H = 320;
+export const HUNDRED_COLS = 10;
+export const HUNDRED_ROWS = 10;
+export const HUNDRED_GAP = 4;
+export const HUNDRED_CELL_RADIUS = 3;
+export const HUNDRED_GRID_TOP = 16;
+/* Figure and legend slot geometry (3.2). */
+export const HUNDRED_FIGURE = { size: 58, lineHeight: 0.85 } as const;
+export const HUNDRED_LEGEND = { marginTop: 12, minHeight: 52, swatch: 9, swatchRadius: 2, rowGap: 6, colGap: 14, labelGap: 6, labelSize: 10.5 } as const;
+
 type CellState = 'reviewed' | 'played' | 'member' | 'nobody';
 
 /* A square is YOURS when user_course_activity has it — a tracked round OR a
@@ -46,7 +57,7 @@ function cellState(e: Top100Enrichment | undefined): CellState {
   return 'nobody';
 }
 
-function cellStyle(state: CellState): React.CSSProperties {
+export function cellStyle(state: CellState): React.CSSProperties {
   switch (state) {
     case 'reviewed': return { background: A.AMBER };
     case 'played': return { background: 'transparent', boxShadow: `inset 0 0 0 1.5px ${A.AMBER}` };
@@ -172,7 +183,7 @@ export function YourHundredSection({ listSlug, viewerPlayed, total, courseIds, e
       <SectionHead kicker="Your hundred" title="A life in golf, one list" />
       <div style={{ marginTop: HEAD_GAP, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-          <span style={{ fontSize: 58, fontWeight: 800, letterSpacing: '-0.055em', lineHeight: 0.85, color: A.INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+          <span style={{ fontSize: HUNDRED_FIGURE.size, fontWeight: 800, letterSpacing: '-0.055em', lineHeight: HUNDRED_FIGURE.lineHeight, color: A.INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>
             {viewerPlayed}
           </span>
           <span style={{ fontSize: 15, fontWeight: 700, color: A.DIM, fontVariantNumeric: 'tabular-nums' }}>of {total}</span>
@@ -199,7 +210,7 @@ export function YourHundredSection({ listSlug, viewerPlayed, total, courseIds, e
         ) : null}
       </div>
 
-      <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gridTemplateRows: 'repeat(10, 1fr)', gap: 4, height: 320 }}>
+      <div style={{ marginTop: HUNDRED_GRID_TOP, display: 'grid', gridTemplateColumns: `repeat(${HUNDRED_COLS}, 1fr)`, gridTemplateRows: `repeat(${HUNDRED_ROWS}, 1fr)`, gap: HUNDRED_GAP, height: HUNDRED_GRID_H }}>
         {cells.map((id, i) => (
           <button
             key={id}
@@ -217,7 +228,7 @@ export function YourHundredSection({ listSlug, viewerPlayed, total, courseIds, e
              * width is kept.
              */
             style={{
-              borderRadius: 3, padding: 0, border: 0, cursor: 'pointer',
+              borderRadius: HUNDRED_CELL_RADIUS, padding: 0, border: 0, cursor: 'pointer',
               ...(() => {
                 const base = cellStyle(cellState(enrichment.get(id)));
                 if (selected !== id) return base;
@@ -229,14 +240,14 @@ export function YourHundredSection({ listSlug, viewerPlayed, total, courseIds, e
         ))}
       </div>
 
-      <div style={{ marginTop: 12, minHeight: 52, display: 'flex', alignItems: 'center' }}>
+      <div style={{ marginTop: HUNDRED_LEGEND.marginTop, minHeight: HUNDRED_LEGEND.minHeight, display: 'flex', alignItems: 'center' }}>
         {selected ? (
           <PeekRow id={selected} subject={subjects.get(selected)} e={enrichment.get(selected)} onOpen={() => onOpenCourse(selected)} />
         ) : (
-      <div data-testid="hundred-legend" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 14px' }}>
+      <div data-testid="hundred-legend" style={{ display: 'flex', flexWrap: 'wrap', gap: `${HUNDRED_LEGEND.rowGap}px ${HUNDRED_LEGEND.colGap}px` }}>
         {LEGEND.map(({ state, label }) => (
-          <span key={state} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 10.5, color: A.DIM }}>
-            <span aria-hidden style={{ width: 9, height: 9, borderRadius: 2, ...cellStyle(state) }} />
+          <span key={state} style={{ display: 'inline-flex', alignItems: 'center', gap: HUNDRED_LEGEND.labelGap, fontSize: HUNDRED_LEGEND.labelSize, color: A.DIM }}>
+            <span aria-hidden style={{ width: HUNDRED_LEGEND.swatch, height: HUNDRED_LEGEND.swatch, borderRadius: HUNDRED_LEGEND.swatchRadius, ...cellStyle(state) }} />
             {label}
           </span>
         ))}

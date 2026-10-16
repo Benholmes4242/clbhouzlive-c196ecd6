@@ -9,6 +9,8 @@ import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces'
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 const PHOTO_H = 196;
+/** The top100 variant's photo height; read by its shell (BRIEF_COURSES_SKELETONS 3.3). */
+export const TOP100_PHOTO_H = 178;
 const PHOTO_MUTE = 'rgba(255,255,255,0.66)';
 const PHOTO_DIM = 'rgba(255,255,255,0.55)';
 const RANK_GLASS = 'rgba(15,23,42,0.42)';
@@ -99,7 +101,7 @@ export function BrowseCourseCard({
       aria-label={`View ${row.name}`}
       style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', fontFamily: SANS }}
     >
-      <div style={{ position: 'relative', height: top100 ? 178 : PHOTO_H, overflow: 'hidden' }}>
+      <div style={{ position: 'relative', height: top100 ? TOP100_PHOTO_H : PHOTO_H, overflow: 'hidden' }}>
         {row.image_url ? (
           <img
             src={getOptimizedImageUrl(row.image_url, { width: 640 })}

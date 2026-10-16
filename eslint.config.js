@@ -15,7 +15,8 @@ import { join, sep } from "node:path";
  * file and would silently drop the i18n/toLocale syntax bans on overlapping files.
  *
  * SCOPE = what a skeleton is: src/components/skeletons/**, any file importing
- * shellVocabulary, any file whose NAME contains Skeleton or Shell. Resolved by
+ * shellVocabulary, any file whose NAME contains Skeleton (1B dropped "Shell":
+ * page frames are named Shell and their fills are real surfaces). Resolved by
  * scanning src at config load so the list cannot go stale.
  */
 const skeletonTokenSelectors = JSON.parse(
@@ -45,7 +46,7 @@ function skeletonFiles() {
       const rel = full.split(sep).join("/");
       if (
         rel.startsWith("src/components/skeletons/") ||
-        /Skeleton|Shell/.test(e.name) ||
+        /Skeleton/.test(e.name) ||
         /shellVocabulary['"]/.test(readFileSync(full, "utf8"))
       ) out.push(rel);
     }
@@ -336,7 +337,9 @@ export default tseslint.config(
   {
     files: skeletonFiles(),
     plugins: { skeletontokens: skeletonPlugin },
-    rules: { "skeletontokens/no-raw-fill": "error" },
+    // WARN, not error (BRIEF_COURSES_SKELETONS_1B): ~106 existing violations
+    // across 31 files. Raise to "error" only once that backlog is cleared.
+    rules: { "skeletontokens/no-raw-fill": "warn" },
   },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
