@@ -9,6 +9,14 @@ import type { StatBrowseRow } from '../useStatBrowse';
  * (BRIEF_COURSES_PAGE_DEVICE_REVISION §6). One card, different figures.
  * BrowseCourseCard is full-width and shared with Top 100, so it is not this.
  */
+/* Card geometry, read by the card AND its shell (BRIEF_COURSES_SKELETONS 2.3). */
+export const PHOTO_FIGURE_W = 300;
+export const PHOTO_FIGURE_H = 230;
+/** Rail gap of the two PhotoFigureCard rails. */
+export const PHOTO_FIGURE_GAP = 2;
+/** Both rails show exactly this many cards. */
+export const PHOTO_FIGURE_COUNT = 3;
+
 export function PhotoFigureCard({ row, figure, figureLabel, footer, nameBottom = 15 }: {
   row: StatBrowseRow;
   figure: React.ReactNode;
@@ -24,7 +32,7 @@ export function PhotoFigureCard({ row, figure, figureLabel, footer, nameBottom =
     <button
       type="button"
       onClick={() => navigate(`/courses/${row.course_id}`)}
-      style={{ width: 300, height: 230, flex: 'none', padding: 0, border: 'none', textAlign: 'left', cursor: 'pointer', background: 'transparent' }}
+      style={{ width: PHOTO_FIGURE_W, height: PHOTO_FIGURE_H, flex: 'none', padding: 0, border: 'none', textAlign: 'left', cursor: 'pointer', background: 'transparent' }}
     >
       <CourseImageFallback courseId={row.course_id} courseName={row.name} imageUrl={row.image_url} style={{ height: '100%' }}>
         <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />

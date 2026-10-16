@@ -2,7 +2,8 @@ import { useStatBrowseList } from '../useStatBrowse';
 import { useSectionReady } from './PageLoadGate';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { RAIL_BLEED } from './format';
-import { PhotoFigureCard } from './PhotoFigureCard';
+import { PhotoFigureCard, PHOTO_FIGURE_COUNT, PHOTO_FIGURE_GAP } from './PhotoFigureCard';
+import { PhotoRailShell } from './sectionShells';
 
 const SUBS = [
   ['design_score', 'Design'],
@@ -15,14 +16,15 @@ const fmtScore = (v: number | null) => (v == null || !Number.isFinite(v) ? '-' :
 
 /** SECTION 05 — HIGHEST RATED. A rail of PhotoFigureCards (shared with 03). */
 export function HighestRatedSection() {
-  const { rows, isLoading } = useStatBrowseList({ lens: 'rated', country: null, region: null, limit: 3 });
+  const { rows, isLoading } = useStatBrowseList({ lens: 'rated', country: null, region: null, limit: PHOTO_FIGURE_COUNT });
   useSectionReady('highestRated', !isLoading);
-  if (isLoading || rows.length === 0) return null;
+  if (isLoading) return <PhotoRailShell />;
+  if (rows.length === 0) return null;
   return (
     <section style={SECTION_WRAP}>
       <SectionHead tone="amber" kicker="Highest rated" title="What members rate highest" />
-      <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: 2, marginTop: HEAD_GAP }}>
-        {rows.slice(0, 3).map((row) => (
+      <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: PHOTO_FIGURE_GAP, marginTop: HEAD_GAP }}>
+        {rows.slice(0, PHOTO_FIGURE_COUNT).map((row) => (
           <PhotoFigureCard
             key={row.course_id}
             row={row}
