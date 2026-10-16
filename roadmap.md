@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_HANDICAP_TAB_REBUILD_7A
+- [x] Confirm project identity is clbhouz; remove Trophy Room entry and dashboard launch mount while preserving Records to break.
+- [ ] Delete Trophy Room and verified orphan files/assets/tests; remove unused aggregates hook and fetcher after tracing callers.
+- [ ] Verify full suite, preview build, and report removed files and authentication limits; no SQL/data changes or career-counter placeholder.
+
 ## BRIEF_HANDICAP_TAB_REBUILD_6A
 - [x] Replace the Floor ladder with six category milestones and English names; preserve section calculations and appearance.
 - [x] Verify 19 focused tests and full suite (1,421 passing, no failures); preview build OK. Live authenticated checks unavailable on external Supabase.
