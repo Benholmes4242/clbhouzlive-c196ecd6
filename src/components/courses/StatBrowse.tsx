@@ -7,6 +7,7 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from 'react-i18next';
 import {
   ChevronDown,
@@ -753,11 +754,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
       {isLoading ? (
         <div className="mt-4 -mx-4 space-y-2 sm:space-y-6">
           {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="w-full aspect-[16/9.5] animate-pulse"
-              style={{ background: 'rgba(255,255,255,0.06)' }}
-            />
+            /* Square because the real browse photo is full-bleed with no radius. */
+            <Skeleton key={i} className="w-full aspect-[16/9.5]" style={{ borderRadius: 0 }} />
           ))}
         </div>
       ) : showEmpty && areaHasTracked === null ? null : showEmpty &&

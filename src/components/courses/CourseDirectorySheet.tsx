@@ -7,6 +7,7 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
@@ -337,11 +338,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
         ) : isLoading ? (
           <div className="mt-3 space-y-2">
             {[0, 1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="h-14 rounded-xl animate-pulse"
-                style={{ background: 'rgba(255,255,255,0.06)' }}
-              />
+              <Skeleton key={i} className="h-14 rounded-xl" />
             ))}
           </div>
         ) : rows.length === 0 ? (
