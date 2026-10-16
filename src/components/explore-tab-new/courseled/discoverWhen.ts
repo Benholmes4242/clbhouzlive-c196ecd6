@@ -1,3 +1,4 @@
+// A date states its year unless an ancestor already does: rows and slabs with no year-stating header use `playDateStandalone`; rows under a year-stating group use `playDateUnderYearHeader` (`discoverWhen.ts`), so no screen prints an undated date with nothing above it saying the year.
 /**
  * THE ONE TIME BASE FOR A PLAY DATE on the Explore Scores screen (and every
  * Discover surface that imports this file).
