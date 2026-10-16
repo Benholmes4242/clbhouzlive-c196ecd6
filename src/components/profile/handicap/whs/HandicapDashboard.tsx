@@ -11,7 +11,7 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 // blocks mount here directly, in the fixed page order:
 //
 //   1 Next round · 2 Index · 3 Rounds that count · 4 Which holes cost you ·
-//   5 Personal bests · 6 Your circle · 7 Trophy room · Footer provenance
+//   5 Personal bests · Footer provenance
 //
 // SECTION A IS THE SHELL ONLY. Each block below still renders its existing
 // pre-rebuild UI; sections B–K replace them one at a time with the flat
@@ -29,9 +29,8 @@ import AgeingOutSection from './sections/AgeingOutSection';
 import RoundsThatCountSection from './sections/RoundsThatCountSection';
 import HolesSection from './sections/HolesSection';
 import FloorSection from './sections/FloorSection';
-import PersonalBestsSection, { TrophyRoomRow } from './sections/PersonalBestsSection';
+import PersonalBestsSection from './sections/PersonalBestsSection';
 import HandicapFooter from './sections/HandicapFooter';
-import { LaunchSheetMount } from '../gam/launch/LaunchSheetMount';
 
 interface Props {
   connection: WhsConnection;
@@ -136,22 +135,11 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
         ownerFirstName={ownerFirstName}
       />
 
-      {/* StreaksCard (the ON THE LINE - {n} ACTIVE rail) is OFF this page and
-          deleted 10 Sep 2026. It went with the trophies layer: the streak
-          material lives in the trophy room's StreaksPanel, whose door is the
-          terminal TROPHY ROOM row at the foot of Personal bests, and
-          StreaksSheetMount stays at page level so ?gam=streaks still opens. */}
-
-      {/* 6 — TROPHY ROOM — the one door, directly after Personal bests. */}
-      {!readOnly && <TrophyRoomRow userId={userId} />}
-
       {/* FOOTER — provenance only. */}
       <HandicapFooter
         membershipNumber={connection.membership_number}
       />
 
-      {/* Sheet mounts that lived inside the old views must survive them. */}
-      <LaunchSheetMount userId={userId} />
     </div>
   );
 };
