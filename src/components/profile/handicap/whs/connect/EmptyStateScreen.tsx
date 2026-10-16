@@ -75,7 +75,7 @@ const courseNameSuffixes = [
 ];
 
 export function displayCourseName(name: string): string {
-  const bracketExpanded = name.replace(/\(([^)]+)\)/g, ' $1');
+  const bracketExpanded = name.replace(/\(([^)]+)\)/g, (_match, raw: string) => ` ${raw.replace(/\s+Course$/i, '')}`);
   let out = bracketExpanded;
   for (const suffix of courseNameSuffixes) {
     out = out.replace(new RegExp(suffix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), ' ');
@@ -163,7 +163,7 @@ export function chooseCirclePeople(people: CirclePerson[], h: number): CirclePer
   return [...people]
     .sort((a, b) => {
       const dist = Math.abs(a.index - h) - Math.abs(b.index - h);
-      return dist || a.index - b.index;
+      return dist || b.index - a.index;
     })
     .slice(0, 4)
     .sort((a, b) => a.index - b.index);
