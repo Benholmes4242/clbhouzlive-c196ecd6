@@ -1,33 +1,29 @@
 /**
- * HolesSection — SECTION G of the one-page handicap brief.
+ * HolesSection — PHASE 5 "WHERE THE STROKES GO" of BRIEF_HANDICAP_TAB_REBUILD.
  *
- * The subject of this section is THE HOLE, not the round: what a member scores
- * on a hole (the outcome distribution, arriving here from SCORE STATS) and
- * which par types cost them (the three MiniRings, arriving from
- * the deleted GameEverywhereCard).
+ * EVERY FIGURE comes from get_my_scoring_breakdown_all_courses via
+ * deriveStrokesGo — none from get_trophy_aggregates (§5.3: the old caption
+ * took its hole count from the trophy aggregates, which INCLUDE nine-hole
+ * rounds, while the share percentage summed ParSplit holes, which EXCLUDE
+ * them server-side — two populations, arithmetic that did not close).
  *
- * NINE-HOLE ROUNDS ARE INCLUDED AND CARRY NO MARK. The unit here is the hole,
- * so nine holes contribute nine holes and every figure stays on one basis.
- * That is the OPPOSITE of Section F, where the unit was the round and nine-hole
- * rounds are excluded outright. If you are reading this because you found
- * `is_nine_hole` in a filter somewhere: it does not belong in this section.
- * (The par-type rings are the one exception, and not by choice — their RPC
- * excludes nine-hole rounds server-side and deployed RPCs are not edited.)
+ * THE BASIS RULE (§5.2) lives in src/lib/whs/strokesGo.ts: holes a round is
+ * the mix ratio × 18, NEVER holes_played / complete_rounds.
  *
- * COMPLETE CARDS ONLY: both sources count a hole only where `played IS TRUE`
- * and the gross is non-null, so a half-placeholder card contributes only its
- * real holes and never drags an average. Same rule as the round-post scorecard
- * strip.
- *
- * NO RING for the outcome distribution. The four-band ring is the same four
- * figures drawn twice — the reason the stableford ring came off Section F, and
- * moving rooms does not change it.
+ * §5.7: there is deliberately NO "lever" card (holding par 4s to a par-3
+ * standard is an arithmetic identity presented as advice). §5.6's observation
+ * line replaces it. §5.8: OWN-PROFILE ONLY — the RPC resolves auth.uid()
+ * server-side, so on another member's profile nothing renders. §5.9: the RPC
+ * inner-joins the course map, so unmapped rounds are absent; the hole count
+ * is NOT reconciled with any round count elsewhere on the profile.
  */
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { useScoringBreakdownAllCourses, useTrophyAggregates, type ParSplit } from '@/lib/whs/hooks';
+import { useAllScores, useScoringBreakdownAllCourses } from '@/lib/whs/hooks';
+import { counterWindow } from '@/lib/whs/counting';
+import { deriveStrokesGo, shotsToDifferential } from '@/lib/whs/strokesGo';
 import {
   SC_BIRDIE_DARK,
   SC_PAR_DARK,
@@ -37,24 +33,15 @@ import {
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { HcpSection } from './HcpSection';
-import { CHART, sharedMax, type ChartTone } from '../charts';
+import { CHART } from '../charts';
+import { pickCourse } from './NextRoundSection';
 
-/** The distribution row needs this many holes before it says anything. */
-const MIN_HOLES_DISTRIBUTION = 180;
-/** A single ring needs this many holes OF ITS OWN TYPE. */
-const MIN_HOLES_PAR_TYPE = 90;
+/** The section needs this many holes before it says anything. */
+const MIN_HOLES = 180;
 
 const FIG: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums lining-nums',
   letterSpacing: '-0.04em',
-};
-
-const KICKER: React.CSSProperties = {
-  fontSize: 9,
-  fontWeight: 700,
-  letterSpacing: '0.12em',
-  textTransform: 'uppercase',
-  color: CHART.DIM,
 };
 
 interface Props {
@@ -63,206 +50,167 @@ interface Props {
   readOnly?: boolean;
 }
 
-type ParTypeKey = 'par3' | 'par4' | 'par5';
-interface RingRow {
-  key: ParTypeKey;
-  parN: 3 | 4 | 5;
-  data: ParSplit;
-}
-
 export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly = false }) => {
   const { t } = useTranslation(['common']);
 
-  // No dates: the window is all-time, which is what a hole-level figure wants.
-  const { data: agg, isLoading: aggLoading } = useTrophyAggregates(
-    readOnly ? undefined : userId,
-    readOnly ? undefined : connectionId,
-  );
-  const { data: breakdown } = useScoringBreakdownAllCourses(!readOnly);
+  // §5.8: the one read, owner-only by construction.
+  const { data: breakdown, isLoading } = useScoringBreakdownAllCourses(!readOnly);
+  // §5.6: the member's most-played course in the window, for the differential.
+  const { data: scores } = useAllScores(readOnly ? undefined : connectionId);
 
-  const hs = (agg as any)?.hole_stats ?? null;
-  const totalHoles: number = hs?.total_holes_in_window ?? 0;
-  const rounds: number = hs?.rounds_with_holes_in_window ?? 0;
-  const withheld = totalHoles < MIN_HOLES_DISTRIBUTION;
+  const s = breakdown ? deriveStrokesGo({ par3: breakdown.par3, par4: breakdown.par4, par5: breakdown.par5 }) : null;
+  const withheld = !s || s.totalHoles < MIN_HOLES;
 
   const fired = useRef(false);
   useEffect(() => {
-    if (aggLoading || fired.current) return;
+    if (isLoading || fired.current) return;
     fired.current = true;
-    if (withheld) {
-      analyticsEvents.track('handicap_section_withheld', {
-        section: 'holes',
-        holes: totalHoles,
-        required: MIN_HOLES_DISTRIBUTION,
-      });
-    } else {
-      analyticsEvents.track('handicap_section_shown', {
-        section: 'holes',
-        holes: totalHoles,
-        rounds,
-      });
-    }
-  }, [aggLoading, withheld, totalHoles, rounds]);
+    analyticsEvents.track(withheld ? 'handicap_section_withheld' : 'handicap_section_shown', {
+      section: 'holes',
+      holes: s?.totalHoles ?? 0,
+      required: MIN_HOLES,
+    });
+  }, [isLoading, withheld, s]);
 
   if (readOnly) return null;
-  // Nothing renders while the hole payload is in flight — no skeleton, no jump.
-  if (aggLoading) return null;
+  // Nothing renders while the payload is in flight — no skeleton, no jump.
+  if (isLoading) return null;
 
   if (withheld) {
     return (
-      <HcpSection
-        hairline
-        heading={t('common:handicap.holes.mergedHeading')}
-        meta={t('common:handicap.holes.meta', { count: rounds })}
-      >
+      <HcpSection hairline kicker={t('common:handicap.strokes.kicker')} heading={t('common:handicap.strokes.titleFallback')}>
         <p style={{ margin: 0, fontSize: 13, color: CHART.MUTE, lineHeight: 1.55 }}>
-          {rounds > 0
-            ? t('common:handicap.holes.withheldSome', { count: rounds })
-            : t('common:handicap.holes.withheldNone')}
+          {t('common:handicap.strokes.withheld')}
         </p>
       </HcpSection>
     );
   }
 
-  /**
-   * ── The four outcome bands, in the established palette ──────────────────
-   *
-   * DEFINITION, and why it is a subtraction rather than a sum.
-   *
-   * The four bands must partition total_holes_in_window exactly: every hole
-   * with a card falls in one of them and in only one. Summing the RPC's
-   * ace/albatross/eagle/birdie window counts does NOT partition it, because
-   * those four counts overlap — an ace on a par 3 is both `gross = 1` and
-   * `gross = par - 2`, and an ace on a par 4 is both `gross = 1` and
-   * `gross = par - 3`, so every ace is counted twice. That is the whole of the
-   * 4034-vs-4032 gap on the live record: two aces, counted twice each,
-   * against a true 4032 holes. The RPC is correct and is not edited; it simply
-   * answers "how many aces" and "how many eagles" separately, for the trophy
-   * catalogue, and those answers were never meant to be added together.
-   *
-   * BIRDIE OR BETTER is therefore everything that is not a par, a bogey or a
-   * double-plus. total_holes_in_window is the denominator and the arbiter, so
-   * the four figures now always add to the basis line beneath them.
-   */
-  const birdiePlus = Math.max(
-    0,
-    totalHoles - (hs.pars_count ?? 0) - (hs.bogey_count ?? 0) - (hs.double_plus_count ?? 0),
-  );
+  const d = s!;
+
+  /* §5.1: the title names whichever par type carries the largest share of
+     shots dropped. */
+  const dom = d.dominant!;
+  const totalShots = d.rows.reduce((x, r) => x + r.shotsPerRound, 0);
+  const holesShare = Math.round((dom.holesPlayed / d.totalHoles) * 100);
+  const shotsShare = totalShots > 0 ? Math.round((dom.shotsPerRound / totalShots) * 100) : 0;
+
+  /* §5.4: tone by severity — worst RED, middle AMBER, best the improved tone.
+     Rank by shots a round, never by par type; stable sort keeps the earlier
+     par type on the lower rank when two tie. */
+  const ranked = [...d.rows].sort((a, b) => a.shotsPerRound - b.shotsPerRound);
+  const toneFor = (row: (typeof d.rows)[number]) => {
+    if (ranked.length <= 1) return CHART.AMBER;
+    if (row === ranked[ranked.length - 1]) return CHART.UP;
+    if (row === ranked[0]) return CHART.DOWN;
+    return CHART.AMBER;
+  };
+  const worstShots = ranked[ranked.length - 1]?.shotsPerRound ?? 0;
 
   const bands = [
-    { key: 'birdiePlus', count: birdiePlus, label: t('common:handicap.holes.birdiePlus'), color: SC_BIRDIE_DARK },
-    { key: 'par', count: hs.pars_count ?? 0, label: t('common:handicap.holes.par'), color: SC_PAR_DARK },
-    { key: 'bogey', count: hs.bogey_count ?? 0, label: t('common:handicap.holes.bogey'), color: SC_BOGEY_DARK },
-    { key: 'double', count: hs.double_plus_count ?? 0, label: t('common:handicap.holes.doublePlus'), color: SC_DOUBLE_DARK },
+    { key: 'birdiePlus', pct: d.bands.birdiePlus, label: t('common:handicap.holes.birdiePlus'), color: SC_BIRDIE_DARK },
+    { key: 'par', pct: d.bands.par, label: t('common:handicap.holes.par'), color: SC_PAR_DARK },
+    { key: 'bogey', pct: d.bands.bogey, label: t('common:handicap.holes.bogey'), color: SC_BOGEY_DARK },
+    { key: 'double', pct: d.bands.doublePlus, label: t('common:handicap.holes.doublePlus'), color: SC_DOUBLE_DARK },
   ];
 
-  // ── The three par-type rings ────────────────────────────────────────────
-  const allTypes: Array<{ key: ParTypeKey; parN: 3 | 4 | 5; data: ParSplit | null }> = [
-    { key: 'par3', parN: 3, data: breakdown?.par3 ?? null },
-    { key: 'par4', parN: 4, data: breakdown?.par4 ?? null },
-    { key: 'par5', parN: 5, data: breakdown?.par5 ?? null },
-  ];
-  const rings: RingRow[] = allTypes.filter(
-    (r): r is RingRow => !!r.data && r.data.holes_played >= MIN_HOLES_PAR_TYPE,
-  );
-  const missing = allTypes.filter((r) => !rings.some((x) => x.key === r.key));
+  /* §5.6: one fewer double a round is one shot of gross, which is 113/slope
+     of a differential at the member's most-played course. */
+  const course = scores ? pickCourse(counterWindow(scores)) : null;
+  const diffPerShot = course ? shotsToDifferential(1, course.slope) : null;
 
-  /** ONE ceiling. Three rings on independent scales cannot be compared. */
-  const ringMax = sharedMax(rings.map((r) => r.data.avg_over), 0.7);
-
-  /**
-   * Rank by value, never by par type. Worst RED, best GREEN, middle AMBER.
-   * A stable sort keeps the earlier par type on the lower rank when two tie.
-   */
-  const ranked = [...rings].sort((a, b) => a.data.avg_over - b.data.avg_over);
-  const toneFor = (row: RingRow): ChartTone => {
-    if (ranked.length <= 1) return 'amber';
-    if (row === ranked[ranked.length - 1]) return 'up';
-    if (row === ranked[0]) return 'down';
-    return 'amber';
-  };
-
-  const worst = ranked[ranked.length - 1];
-  const best = ranked[0];
-  const ringHoles = rings.reduce((s, r) => s + r.data.holes_played, 0);
-  const share = worst && ringHoles > 0 ? Math.round((worst.data.holes_played / ringHoles) * 100) : 0;
-
-  const missingSentence =
-    missing.length > 0
-      ? t('common:handicap.holes.parMissing', {
-          types: missing.map((m) => m.parN).join(', '),
-          count: missing.length,
-        })
-      : null;
-
-  /* ONE CAPTION states the unit once (BRIEF_HANDICAP_TAB_SIMPLIFY §4.4). The
-     share is the existing worst-par-type share, not a new computation. */
-  const holesFmt = totalHoles.toLocaleString('en-GB');
-  const caption =
-    worst && best && worst !== best
-      ? t('common:handicap.holes.captionShare', { holes: holesFmt, n: worst.parN, share })
-      : t('common:handicap.holes.caption', { holes: holesFmt });
-
-  const toneColorOf = (tone: ChartTone) =>
-    tone === 'up' ? CHART.UP : tone === 'down' ? CHART.DOWN : CHART.AMBER;
-
-  /* ONE SECTION (§4): distribution bar, its key, the cost bars, one caption.
-     Same two reads as before. The four raw counts leave the surface. */
   return (
-    <HcpSection hairline heading={t('common:handicap.holes.mergedHeading')}>
-      <div
-        aria-hidden
-        style={{ display: 'flex', height: 9, borderRadius: 5, overflow: 'hidden', background: CHART.TRACK }}
-      >
-        {bands.map((b) =>
-          b.count > 0 ? (
-            <div key={b.key} style={{ width: `${(b.count / totalHoles) * 100}%`, background: b.color }} />
-          ) : null,
-        )}
-      </div>
-      <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-        {bands.map((b) => {
-          const pct = totalHoles > 0 ? Math.round((b.count / totalHoles) * 100) : 0;
+    <HcpSection
+      hairline
+      kicker={t('common:handicap.strokes.kicker')}
+      heading={t('common:handicap.strokes.title', { n: dom.parN, holesShare, shotsShare })}
+    >
+      {/* §5.1 caption: N is the SUM of holes_played across the three types. */}
+      <p style={{ margin: '0 0 16px', fontSize: 12.5, fontWeight: 400, lineHeight: 1.45, color: CHART.MUTE, ...FIG }}>
+        {t('common:handicap.strokes.caption', { holes: d.totalHoles.toLocaleString('en-GB') })}
+      </p>
+
+      {/* §5.4: the three par rows. */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {d.rows.map((row) => {
+          const tone = toneFor(row);
+          const fill = worstShots > 0 ? Math.max(0, Math.min(1, row.shotsPerRound / worstShots)) : 0;
           return (
-            <div key={b.key} style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1, color: b.count === 0 ? CHART.MUTE : b.color, ...FIG }}>
-                {pct}%
+            <div key={row.parN}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
+                <span style={{ fontSize: 15, fontWeight: 700, color: CHART.INK }}>
+                  {t('common:handicap.holes.parNs', { n: row.parN })}
+                </span>
+                <span style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.03em', color: tone, ...FIG }}>
+                  {row.shotsPerRound.toFixed(1)}
+                </span>
               </div>
-              <div style={{ ...KICKER, fontSize: 8, marginTop: 5 }}>{b.label}</div>
+              <div style={{ marginTop: 6, height: 4, borderRadius: 999, background: CHART.BORDER, overflow: 'hidden' }}>
+                <div style={{ width: `${fill * 100}%`, height: '100%', background: tone, borderRadius: 999 }} />
+              </div>
+              <div style={{ marginTop: 5, fontSize: 11, fontWeight: 400, color: CHART.DIM, ...FIG }}>
+                {t('common:handicap.strokes.rowMeta', {
+                  holes: row.holesPerRound.toFixed(1),
+                  perHole: `+${row.perHole.toFixed(2)}`,
+                  played: row.holesPlayed.toLocaleString('en-GB'),
+                })}
+              </div>
             </div>
           );
         })}
       </div>
 
-      {rings.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 20 }}>
-          {rings.map((ring) => {
-            const tone = toneColorOf(toneFor(ring));
-            const pct = ringMax > 0 ? Math.max(0, Math.min(1, ring.data.avg_over / ringMax)) : 0;
-            return (
-              <div key={ring.key}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: CHART.INK }}>
-                    {t('common:handicap.holes.parNs', { n: ring.parN })}
-                    <span style={{ marginLeft: 8, fontSize: 11, color: CHART.DIM, ...FIG }}>
-                      {t('common:handicap.holes.nHoles', { count: ring.data.holes_played })}
-                    </span>
-                  </span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: tone, ...FIG }}>
-                    +{ring.data.avg_over.toFixed(2)}
-                  </span>
-                </div>
-                <div style={{ marginTop: 6, height: 6, borderRadius: 3, background: CHART.TRACK, overflow: 'hidden' }}>
-                  <div style={{ width: `${pct * 100}%`, height: '100%', background: tone, borderRadius: 3 }} />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {/* §5.5: the outcome distribution, one segmented 7px bar. */}
+      <div
+        aria-hidden
+        style={{ display: 'flex', height: 7, borderRadius: 999, overflow: 'hidden', background: CHART.TRACK, marginTop: 22 }}
+      >
+        {bands.map((b) =>
+          b.pct > 0 ? (
+            <div key={b.key} style={{ width: `${b.pct}%`, background: b.color }} />
+          ) : null,
+        )}
+      </div>
+      <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+        {bands.map((b) => (
+          <div key={b.key} style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1, color: b.pct === 0 ? CHART.MUTE : b.color, ...FIG }}>
+              {Math.round(b.pct)}%
+            </div>
+            <div
+              style={{
+                fontSize: 9, fontWeight: 700, letterSpacing: '0.1em',
+                textTransform: 'uppercase', color: CHART.DIM, marginTop: 5,
+              }}
+            >
+              {b.label}
+            </div>
+          </div>
+        ))}
+      </div>
 
-      <p style={{ margin: '12px 0 0', fontSize: 11.5, color: A.DIM, lineHeight: 1.45, ...FIG }}>
-        {[caption, missingSentence].filter(Boolean).join(' ')}
+      {/* §5.6: the one observation line. */}
+      <p
+        style={{
+          margin: '18px 0 0',
+          borderLeft: `2px solid ${CHART.AMBER}`,
+          paddingLeft: 11,
+          fontSize: 12.5,
+          fontWeight: 400,
+          lineHeight: 1.45,
+          color: A.BODY,
+          ...FIG,
+        }}
+      >
+        {diffPerShot != null
+          ? t('common:handicap.strokes.observation', {
+              doubles: d.doublesPerRound.toFixed(1),
+              diff: diffPerShot.toFixed(1),
+              course: course!.name,
+            })
+          : t('common:handicap.strokes.observationNoCourse', {
+              doubles: d.doublesPerRound.toFixed(1),
+            })}
       </p>
     </HcpSection>
   );

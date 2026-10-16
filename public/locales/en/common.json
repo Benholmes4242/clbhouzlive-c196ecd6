@@ -945,6 +945,16 @@
       "countingEight": "The counting eight",
       "nextInLine": "Next in line",
       "nextInLineValue": "{{diff}} · {{course}} · {{date}}"
+    },
+    "strokes": {
+      "kicker": "Where the strokes go",
+      "title": "Par {{n}}s are {{holesShare}}% of your holes and {{shotsShare}}% of your lost shots",
+      "titleFallback": "Where the strokes go",
+      "caption": "Shots over par per round, across {{holes}} holes",
+      "rowMeta": "{{holes}} holes a round · {{perHole}} a hole · {{played}} played",
+      "observation": "About {{doubles}} holes a round are doubles or worse. One fewer is worth a shot a round — about {{diff}} of differential at {{course}}.",
+      "observationNoCourse": "About {{doubles}} holes a round are doubles or worse. One fewer is worth a shot a round.",
+      "withheld": "Not enough scored holes yet — this appears once you've played 180 holes with hole-by-hole scores."
     }
   },
   "comments": {
