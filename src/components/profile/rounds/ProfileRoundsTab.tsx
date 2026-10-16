@@ -20,8 +20,8 @@ import { formatDayMonthShortGB, formatNumber } from '@/i18n/format';
 import SeasonSection from './sections/SeasonSection';
 import YearSection from './sections/YearSection';
 import CoursesPlayedSection from './sections/CoursesPlayedSection';
-import { courseStats, parsePlayDate, yearStats } from './roundsDerivations';
-import { KICKER, RT, TAB, TITLE, fmt1 } from './sections/roundsTokens';
+import { courseStats, parsePlayDate } from './roundsDerivations';
+import { KICKER, RT, TAB, TITLE } from './sections/roundsTokens';
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import RailChips from '@/components/ui/RailChips';
 import { CAPS, FeatPill, Pill, roundFeats, vsHandicapLabel } from '@/features/explore-magazine/AchievementCallout';
@@ -47,12 +47,11 @@ const byDateDesc = (a: ProfileRound, b: ProfileRound) =>
   parsePlayDate(b.play_date).getTime() - parsePlayDate(a.play_date).getTime();
 
 const DIVIDER: React.CSSProperties = {
-  display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '20px 0 8px',
+  display: 'flex', alignItems: 'baseline', padding: '20px 0 8px',
 };
 const DIVIDER_TITLE: React.CSSProperties = { fontSize: 15, fontWeight: 800, letterSpacing: '-0.02em', color: RT.INK, ...TAB };
-const DIVIDER_META: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: RT.DIM, ...TAB };
 
-type Item = { kind: 'head'; key: string; title: string; meta: string | null } | { kind: 'row'; r: ProfileRound };
+type Item = { kind: 'head'; key: string; title: string } | { kind: 'row'; r: ProfileRound };
 
 const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, ownerFirstName = null }) => {
   const { t } = useTranslation('profile');
@@ -115,24 +114,19 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, own
   }
   const visible = showAll ? ordered : ordered.slice(0, INITIAL_ROWS);
 
-  const ys = yearStats(rounds);
   const items: Item[] = [];
   let lastKey: string | null = null;
   for (const r of visible) {
     if (sort === 'recent') {
       const y = parsePlayDate(r.play_date).getFullYear();
       if (String(y) !== lastKey) {
-        const m = ys.get(y)!;
-        const meta = m.avg != null
-          ? `${formatNumber(m.rounds)} rounds · avg ${fmt1(m.avg)} over ${formatNumber(m.scoringRounds)} full`
-          : `${formatNumber(m.rounds)} rounds`;
-        items.push({ kind: 'head', key: `y${y}`, title: String(y), meta });
+        items.push({ kind: 'head', key: `y${y}`, title: String(y) });
         lastKey = String(y);
       }
     } else if (sort === 'course') {
       const k = r.course_id || `name:${r.course_name ?? 'unknown'}`;
       if (k !== lastKey) {
-        items.push({ kind: 'head', key: `c${k}`, title: r.course_name ?? '', meta: null });
+        items.push({ kind: 'head', key: `c${k}`, title: r.course_name ?? '' });
         lastKey = k;
       }
     }
@@ -197,7 +191,6 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, own
               return (
                 <div key={it.key} style={DIVIDER}>
                   <span style={{ ...DIVIDER_TITLE, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{it.title}</span>
-                  {it.meta ? <span style={DIVIDER_META}>{it.meta}</span> : null}
                 </div>
               );
             }
