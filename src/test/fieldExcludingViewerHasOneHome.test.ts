@@ -52,4 +52,18 @@ describe('field excluding viewer has one implementation and fixed surfaces impor
     expect(imp).not.toBeNull();
     for (const name of names) expect(imp![1]).toMatch(new RegExp(`\\b${name}\\b`));
   });
+
+  it('the small per-hole "Field avg" under hardest/easiest reads the reader-excluded rows, never the inclusive hole', () => {
+    const ext = files.find((f) => f.rel === 'features/courses/components/holes/analytical/Extremes.tsx')?.text ?? '';
+    expect(ext).toMatch(/fieldHoles\.find\(/);
+    expect(ext).toMatch(/toParParts\(fieldAvg\)/);
+    expect(ext).not.toMatch(/toParParts\(hole\.avg_to_par\)/);
+    for (const rel of [
+      'features/courses/components/holes/analytical/CourseAnalyticsPanels.tsx',
+      'components/explore-tab-new/courseled/CourseHolePanel.tsx',
+    ]) {
+      const text = files.find((f) => f.rel === rel)?.text ?? '';
+      expect(text).toMatch(/<Extremes\b[^>]*fieldHoles=\{fieldHoles\}/);
+    }
+  });
 });
