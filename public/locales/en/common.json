@@ -934,6 +934,17 @@
       "hold_other": "To hold {{index}}, shoot {{gross}} or better at {{course}} once in your next {{count}} rounds.",
       "holdRepeat": "Or shoot {{gross}} there {{times}} times in a row.",
       "caption": "This appears only when a counting round is about to expire. The course named is your most played in your last twenty."
+    },
+    "mechanism": {
+      "kicker": "The mechanism",
+      "title": "Eight of your last twenty",
+      "caption": "Every round you've played, by differential. The eight under the cut line are your index. The rest is just history.",
+      "cut": "Cut · {{value}}",
+      "oldest": "Oldest · {{date}}",
+      "newest": "Newest · {{date}}",
+      "countingEight": "The counting eight",
+      "nextInLine": "Next in line",
+      "nextInLineValue": "{{diff}} · {{course}} · {{date}}"
     }
   },
   "comments": {
