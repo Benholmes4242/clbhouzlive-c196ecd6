@@ -37,6 +37,7 @@ import { HcpSection } from './HcpSection';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 import { CHART } from '../charts';
 import LastTwentyBars from '../charts/LastTwentyBars';
+import { grossFromDifferential } from '@/lib/whs/coursePlay';
 
 /** A full rolling window. Below this the section states the sample instead. */
 const MIN_ROUNDS = 20;

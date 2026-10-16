@@ -48,6 +48,7 @@ import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { milestonesReachedFrom } from '../gam/trophy-room/career/milestones';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import { r } from '@/lib/radius';
+import { differentialFromGross } from '@/lib/whs/coursePlay';
 
 const FIG: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums lining-nums',
