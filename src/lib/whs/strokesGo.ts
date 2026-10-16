@@ -67,7 +67,11 @@ export interface ParTypeRow {
 }
 
 export interface OutcomeBands {
-  /** Percentages 0–100, weighted by holes_played across the three types. */
+  /**
+   * Display-rounded integer percentages summing to exactly 100 (5B L2):
+   * derived from the exact counts, rounded, with any 99/101 rounding
+   * difference added to the largest band so the bar fills exactly.
+   */
   birdiePlus: number;
   par: number;
   bogey: number;
