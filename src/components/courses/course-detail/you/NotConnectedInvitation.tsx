@@ -104,7 +104,10 @@ const SLOT_BORDER = '1px dashed rgba(248,250,252,0.30)';
 export const EmptyBirdiesSection: React.FC = () => {
   const { t } = useTranslation('courses');
   return (
-    <AboutSection heading={t('courseDetail.youTab.sections.birdiesHere')} meta={t('courseDetail.youTab.connect.birdiesMeta')}>
+    // YOU_TAB_SPARSE_2 Q1 — no "0 of 18" counter: the one element that stated a
+    // score, and the score is nothing. The grid, heading and caption stand as a
+    // preview of what a connection unlocks.
+    <AboutSection heading={t('courseDetail.youTab.sections.birdiesHere')}>
       <div aria-hidden="true" style={{ display: 'flex', gap: GAP }}>
         {Array.from({ length: 18 }, (_, i) => (
           <span key={i} style={{ flex: 1, height: 14, borderRadius: 2, border: SLOT_BORDER }} />
