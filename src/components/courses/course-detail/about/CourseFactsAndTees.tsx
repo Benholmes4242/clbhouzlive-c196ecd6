@@ -29,6 +29,7 @@ import {
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { AboutSection } from './AboutSection';
 import { Said } from './verdictBits';
+import { TEE_CHANGED_EVENT } from './useHeroReferenceLine';
 import { useTranslation } from 'react-i18next';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
@@ -64,6 +65,7 @@ export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
     } catch {
       /* private mode — the selection is in-memory only */
     }
+    window.dispatchEvent(new Event(TEE_CHANGED_EVENT));
     analyticsEvents.track('course_card_tee_changed', {
       course_id: courseId ?? null,
       tee_label: label,
