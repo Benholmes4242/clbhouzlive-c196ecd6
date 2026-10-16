@@ -59,9 +59,11 @@ interface Props {
   newestLabel?: string;
   selectedIndex: number | null;
   onSelectIndex: (i: number) => void;
+  /** BRIEF_MECHANISM_PAIRING: per-bar accessible names (date, course, differential, counts). */
+  labels?: string[];
 }
 
-const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, cut = null, oldestLabel, newestLabel, selectedIndex, onSelectIndex }) => {
+const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, cut = null, oldestLabel, newestLabel, selectedIndex, onSelectIndex, labels }) => {
   const diffs = rounds.map((r) => r.diff).filter((d): d is number => d != null);
   const lo = diffs.length ? Math.min(...diffs) : 0;
   const hi = diffs.length ? Math.max(...diffs) : 0;
@@ -80,7 +82,7 @@ const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, cut =
             key={i}
             type="button"
             onClick={() => onSelectIndex(i)}
-            aria-label={`Round ${i + 1} of ${rounds.length}`}
+            aria-label={labels?.[i] ?? `Round ${i + 1} of ${rounds.length}`}
             aria-pressed={selectedIndex === i}
             style={{
               display: 'flex', alignItems: 'flex-end',

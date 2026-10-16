@@ -59,7 +59,10 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
   const { t } = useTranslation(['common']);
   const { data: allScores, isLoading } = useAllScores(connectionId);
 
-  const [selIdx, setSelIdx] = useState<number | null>(null);
+  /* BRIEF_MECHANISM_PAIRING: ONE selection, by ROUND ID (never by differential —
+     duplicate differentials are real). Bars and chips both read it; it
+     persists after the sheet closes; re-tapping re-opens rather than clears. */
+  const [selId, setSelId] = useState<string | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const total = allScores?.length ?? 0;
@@ -120,12 +123,21 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
   const cutLine = counters.length ? Math.max(...counters.map((r) => r.diff as number)) : null;
   const countingEight = [...counters].sort((a, b) => (a.diff as number) - (b.diff as number));
 
+  const selIdxRaw = selId != null ? window20.findIndex((r) => r.id === selId) : -1;
+  const selIdx = selIdxRaw >= 0 ? selIdxRaw : null;
   const selected = selIdx != null ? window20[selIdx] : null;
+  const roundLabel = (r: (typeof window20)[number]) =>
+    t(r.is_counter ? 'common:handicap.mechanism.roundLabelCounts' : 'common:handicap.mechanism.roundLabelNotCounting', {
+      date: formatDayMonthShortGB(r.play_date),
+      course: r.course_name ?? '',
+      diff: r.diff != null ? fmtDiff(r.diff) : '',
+    });
 
   const onSelect = (i: number) => {
     const r = window20[i];
     if (!r) return;
-    setSelIdx(i);
+    setSelId(r.id);
+    setSheetOpen(true);
     analyticsEvents.track('handicap_counting_point_tapped', {
       score_id: r.id,
       counts: r.is_counter,
@@ -212,6 +224,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
           newestLabel={t('common:handicap.mechanism.newest', { date: formatDayMonthShortGB(window20[window20.length - 1].play_date) })}
           selectedIndex={selIdx}
           onSelectIndex={onSelect}
+          labels={window20.map(roundLabel)}
         />
 
         {/* §4.6 THE COUNTING EIGHT — chips best first, each with a course tag. */}
@@ -234,12 +247,19 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 9 }}>
               {countingEight.map((r) => (
-                <span
+                <button
                   key={r.id}
+                  type="button"
+                  data-round-id={r.id}
+                  aria-label={roundLabel(r)}
+                  aria-pressed={selId === r.id}
+                  onClick={() => onSelect(window20.findIndex((w) => w.id === r.id))}
                   style={{
                     display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
-                    gap: 2, padding: '6px 8px',
+                    gap: 2, padding: '6px 8px', margin: 0, background: 'transparent',
+                    font: 'inherit', cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
                     border: `1px solid ${CHART.BORDER}`, borderRadius: 8,
+                    opacity: selId != null && selId !== r.id ? 0.55 : 1,
                   }}
                 >
                   <span style={{ fontSize: 11.5, fontWeight: 800, color: CHART.INK, ...FIG }}>
@@ -254,7 +274,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
                   >
                     {r.course_name ?? ''}
                   </span>
-                </span>
+                </button>
               ))}
             </div>
           </div>
