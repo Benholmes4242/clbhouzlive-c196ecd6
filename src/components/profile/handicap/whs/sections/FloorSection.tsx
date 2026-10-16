@@ -138,7 +138,7 @@ export const FloorSection: React.FC<Props> = ({ connection, currentHandicap }) =
             height: 12,
             borderRadius: '50%',
             background: CHART.INK,
-            border: `2px solid ${CHART.BG}`,
+            border: '2px solid var(--hcp-bg-0)',
             transform: 'translate(-50%, -50%)',
           }}
         />
