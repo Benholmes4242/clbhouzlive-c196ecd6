@@ -390,32 +390,26 @@ const FirstScreen: React.FC<{
   block: IntroBlock;
   band: IntroBand | null;
   h: number;
+  dataHcp: number;
   setH: (h: number) => void;
   hasHomeClub: boolean;
   onChange: () => void;
-  onPickCountry: () => void;
-  onDecline?: () => void;
-  footerHidden: boolean;
   fetching: boolean;
-  circleShown: boolean;
-}> = ({ course, block, band, h, setH, hasHomeClub, onChange, onPickCountry, onDecline, footerHidden, fetching, circleShown }) => {
+}> = ({ course, block, band, h, dataHcp, setH, hasHomeClub, onChange, fetching }) => {
+  const { t } = useTranslation('handicap');
   const headlineRef = useFittedThreeLine([course.courseName]);
   const top = costliestThree(block.holes);
-  const readout = buildReadout(block, band, h);
-  const cta = (place: 'footer' | 'end') => {
-    analyticsEvents.track('connect_intro_cta', { h, place, circle_shown: circleShown });
-    onPickCountry();
-  };
+  const readout = buildReadout(block, band, dataHcp, t);
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
-        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: QUIET }}>{course.source === 'home' ? 'Your home club' : 'In the Top 100'}</span>
-        <button type="button" onClick={onChange} style={{ background: 'none', border: 'none', padding: 0, fontFamily: FONT, fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: QUIET, cursor: 'pointer' }}>{hasHomeClub ? 'Change' : 'Set your home club'}</button>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: QUIET }}>{t(course.source === 'home' ? 'whsConnect.intro.homeClubKicker' : 'whsConnect.intro.top100Kicker')}</span>
+        <button type="button" onClick={onChange} style={{ background: 'none', border: 'none', padding: 0, fontFamily: FONT, fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: QUIET, cursor: 'pointer' }}>{t(hasHomeClub ? 'whsConnect.intro.change' : 'whsConnect.intro.setHomeClub')}</button>
       </div>
       <h1 ref={headlineRef} style={{ margin: '12px 0 0', fontSize: 40, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.02, color: SOFT_INK }}>
-        <span style={{ display: 'block', whiteSpace: 'nowrap' }}>Which holes at</span>
+        <span style={{ display: 'block', whiteSpace: 'nowrap' }}>{t('whsConnect.intro.tryHeadlineLine1')}</span>
         <span style={{ display: 'block', whiteSpace: 'nowrap' }}>{displayCourseName(course.courseName)}</span>
-        <span style={{ display: 'block', whiteSpace: 'nowrap', color: AMBER }}>will cost you?</span>
+        <span style={{ display: 'block', whiteSpace: 'nowrap', color: AMBER }}>{t('whsConnect.intro.tryHeadlineLine3')}</span>
       </h1>
       <Stepper value={h} onChange={setH} />
       <HoleChart block={block} top={top} fetching={fetching} />
@@ -426,11 +420,6 @@ const FirstScreen: React.FC<{
         </div>
         <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.45, color: MID }}>{readout.cost}</div>
         <div style={{ marginTop: 6, fontSize: 12, color: DIMMER }}>{readout.source}</div>
-      </div>
-      <div aria-hidden={footerHidden} style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 20, padding: '18px 24px 30px', paddingBottom: 'calc(30px + env(safe-area-inset-bottom, 0px))', display: 'flex', flexDirection: 'column', gap: 12, background: GROUND, borderTop: `1px solid ${FAINT_HAIR}`, transform: footerHidden ? 'translateY(100%)' : 'translateY(0)', opacity: footerHidden ? 0 : 1, pointerEvents: footerHidden ? 'none' : 'auto', transition: 'transform 200ms ease, opacity 200ms ease' }}>
-        <div style={{ fontSize: 13.5, lineHeight: 1.45, color: QUIET }}>Connect your official handicap and this is built from <span style={{ color: SOFT_INK, fontWeight: 700 }}>your own rounds</span>, on every course you play.</div>
-        <button type="button" onClick={() => cta('footer')} style={primaryCtaStyle}>Connect your handicap</button>
-        {onDecline ? <DeclineButton onClick={onDecline} /> : null}
       </div>
     </>
   );
