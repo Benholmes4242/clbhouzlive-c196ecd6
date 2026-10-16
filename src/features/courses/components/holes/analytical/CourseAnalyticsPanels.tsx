@@ -11,6 +11,7 @@
  * chart and the hole rows.
  */
 import { PopulationCaption } from './PopulationCaption';
+import { Extremes } from '@/components/explore-tab-new/courseled/CourseHolePanel';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -420,11 +421,10 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
   );
 
   /* FIELD_EXCLUDES_VIEWER_B (R1). Every "Field" figure set beside "You" -
-     field avg, you beat the field on, the chart bars, hole rows, par types and
-     the extremes the chart labels - is the field EXCLUDING the member whose
+     field avg, you beat the field on, the chart bars, hole rows and par types - is the field EXCLUDING the member whose
      figures are shown. A hole with no field once they are removed is blank
      (NaN), never the inclusive figure. The members' distribution strip stays on
-     the inclusive analysis: it describes the course. The pros pool never
+     the inclusive analysis, as do the hardest/easiest holes (S1): they describe the course. The pros pool never
      contains the member, and with nobody to exclude the inclusive pool is used. */
   const excluding = activeView === 'members' && Boolean(viewerId);
   const { data: holeField } = useCourseHoleField(courseId, viewerId, { enabled: excluding });
@@ -811,6 +811,8 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
       >
         {courseShares && <DistributionStrip shares={courseShares} />}
         {courseShares && activeView === 'members' && <PopulationCaption includesYou={hasYou} style={{ marginBottom: 8 }} />}
+        {/* S2: the hardest and easiest hole live with the course facts, not on the comparison chart. */}
+        <Extremes hardest={stats.hardest} easiest={stats.easiest} />
 
         {fieldHoles.slice(0, previewCount).map((h, i, arr) => (
           <HoleRowV2
