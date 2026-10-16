@@ -229,7 +229,7 @@ const NextRoundSection: React.FC<Props> = ({ connectionId, currentHandicap }) =>
   }, [withheld, total]);
 
   const tone =
-    projection && currentHandicap != null
+    projection && currentHandicap != null && projection.settleAtRaw != null
       ? indexTone(currentHandicap, projection.settleAtRaw)
       : null;
 
