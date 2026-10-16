@@ -647,13 +647,14 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline, la
     if (!footerHidden) setFooterDisplay(true);
   }, [footerHidden]);
 
+  const pending = !homeSettled || intro.isPending || (!!userId && profile.isPending) || (!!intro.data && band.isPending);
+
   React.useEffect(() => {
     if (pending || !intro.data || !band.data || viewedRef.current) return;
     viewedRef.current = true;
     analyticsEvents.track('connect_intro_viewed', { source: intro.data.source, band: !!band.data.band, h0 });
   }, [band.data, h0, intro.data, pending]);
 
-  const pending = !homeSettled || intro.isPending || (!!userId && profile.isPending) || (!!intro.data && band.isPending);
   if (pending) {
     return (
       <>
