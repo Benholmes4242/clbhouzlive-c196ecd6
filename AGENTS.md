@@ -11,7 +11,7 @@ Cross-area rules only; single-section rules stay in local architecture comments.
 - Message entrypoints hand optional focus and return navigation through the existing start-conversation hook, so server messaging refusals remain authoritative and no entrypoint sends automatically.
 
 - Profile handicap index surfaces use `HcpTrendChart` as their canonical plot renderer, so chart styling and interaction markers stay consistent.
-- `whs/pickCourse.ts` is shared by AgeingOut, Holes and PersonalBests; section removal must preserve their course selection.
+- `whs/pickCourse.ts` is shared by AgeingOut and PersonalBests; section removal must preserve their course selection.
 - Tour tee-alert toggles use `tourOptimisticToggle` for cache writes and per-id rollback, because invalidation alone does not refresh this app's mounted queries.
 - Every surface that prints a course aggregate rating reads `COURSE_RATING_FLOOR` (`courseRatingFloor.ts`), so card, rails and ranker agree on one sample floor.
 - Selected Tour venue photos take precedence in batch and single-venue resolution, so Overview and Tournament Detail agree.
