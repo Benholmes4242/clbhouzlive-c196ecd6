@@ -10,7 +10,7 @@ import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useTop100Distribution } from '@/hooks/gam/useTop100Distribution';
 import { useGamRecordConfig } from '@/hooks/gam/useGamRecordConfig';
-import { top100Standing } from './handicap/whs/gam/trophy-room/career/shareModel';
+import { top100Standing } from '@/lib/gam/top100Standing';
 import { CoursesMapSection, type MapPoint } from './courses/CoursesMapSection';
 import { TheChaseSection } from './courses/TheChaseSection';
 import { YourSignatureSection } from './courses/YourSignatureSection';

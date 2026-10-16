@@ -20,25 +20,6 @@ export function roundToFive(pct: number): number {
   return Math.max(0, Math.min(100, Math.round(pct / 5) * 5));
 }
 
-export interface ShareInput {
-  holders: number;
-  denominator: number;
-}
-
-/**
- * The measured share of members holding something, or null when the
- * population is too small to say anything honest.
- */
-export function measuredShare(
-  input: ShareInput | undefined,
-  minDenominator: number,
-): number | null {
-  if (!input) return null;
-  if (input.denominator < minDenominator) return null;
-  if (input.denominator <= 0) return null;
-  return roundToFive((input.holders / input.denominator) * 100);
-}
-
 /** The highest threshold the member has reached, and who else reached it. */
 export function distributionAt(
   rows: Top100DistributionRow[],
@@ -48,18 +29,6 @@ export function distributionAt(
   const forList = rows
     .filter((r) => r.list_slug === listSlug && r.threshold <= count)
     .sort((a, b) => b.threshold - a.threshold);
-  return forList[0] ?? null;
-}
-
-/** The next threshold above the member's count, and who has reached it. */
-export function nextDistribution(
-  rows: Top100DistributionRow[],
-  listSlug: string,
-  count: number,
-): Top100DistributionRow | null {
-  const forList = rows
-    .filter((r) => r.list_slug === listSlug && r.threshold > count)
-    .sort((a, b) => a.threshold - b.threshold);
   return forList[0] ?? null;
 }
 
