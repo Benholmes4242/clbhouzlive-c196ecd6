@@ -72,7 +72,7 @@ vi.mock('react-i18next', () => {
   const t = (key: string, options?: Record<string, unknown>) => {
     const pluralKey = typeof options?.count === 'number' ? `${key}_${options.count === 1 ? 'one' : 'other'}` : key;
     let value = i18n.dict[pluralKey] ?? i18n.dict[key] ?? key;
-    for (const [k, v] of Object.entries(options ?? {})) value = value.replaceAll(`{{${k}}}`, String(v));
+    for (const [k, v] of Object.entries(options ?? {})) value = value.split(`{{${k}}}`).join(String(v));
     return value;
   };
   return {
