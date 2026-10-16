@@ -4,6 +4,55 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 import i18next from "eslint-plugin-i18next";
+import { readFileSync, readdirSync } from "node:fs";
+import { join, sep } from "node:path";
+
+/**
+ * ─── SKELETON TOKENS (BRIEF_COURSES_SKELETONS_1A) ────────────────────────────
+ * .eslintrc.skeleton-tokens.json is the rule's source of truth; it was never
+ * referenced before 1A. Its selectors run as their OWN plugin rule rather than
+ * as `no-restricted-syntax`, because flat config REPLACES a rule's options per
+ * file and would silently drop the i18n/toLocale syntax bans on overlapping files.
+ *
+ * SCOPE = what a skeleton is: src/components/skeletons/**, any file importing
+ * shellVocabulary, any file whose NAME contains Skeleton or Shell. Resolved by
+ * scanning src at config load so the list cannot go stale.
+ */
+const skeletonTokenSelectors = JSON.parse(
+  readFileSync(new URL("./.eslintrc.skeleton-tokens.json", import.meta.url), "utf8"),
+).rules["no-restricted-syntax"].filter((x) => typeof x === "object");
+const skeletonPlugin = {
+  rules: {
+    "no-raw-fill": {
+      meta: { type: "problem", schema: [] },
+      create(context) {
+        const visitors = {};
+        for (const { selector, message } of skeletonTokenSelectors) {
+          visitors[selector] = (node) => context.report({ node, message });
+        }
+        return visitors;
+      },
+    },
+  },
+};
+function skeletonFiles() {
+  const out = [];
+  const walk = (dir) => {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, e.name);
+      if (e.isDirectory()) { walk(full); continue; }
+      if (!/\.tsx?$/.test(e.name) || /\.test\.tsx?$/.test(e.name)) continue;
+      const rel = full.split(sep).join("/");
+      if (
+        rel.startsWith("src/components/skeletons/") ||
+        /Skeleton|Shell/.test(e.name) ||
+        /shellVocabulary['"]/.test(readFileSync(full, "utf8"))
+      ) out.push(rel);
+    }
+  };
+  walk("src");
+  return out;
+}
 
 // Wave 3b.iii — single source of truth for the i18next/no-literal-string
 // options (project-wide WARN + scope-dir ERROR overrides).
@@ -284,6 +333,11 @@ const toLocaleSyntax = [
 
 export default tseslint.config(
   { ignores: ["dist"] },
+  {
+    files: skeletonFiles(),
+    plugins: { skeletontokens: skeletonPlugin },
+    rules: { "skeletontokens/no-raw-fill": "error" },
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
