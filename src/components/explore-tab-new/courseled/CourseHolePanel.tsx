@@ -519,54 +519,5 @@ function HoleChart({
  * of the number a small labelled stack. A bare 1.4 beside a hole number says
  * nothing, so the figure carries FIELD AVG beneath it.
  */
-export function Extremes({ hardest, easiest }: { hardest: CourseHole; easiest: CourseHole }) {
-  const { t } = useTranslation('courses');
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', marginTop: 10 }}>
-      {/* §2.2 - the hardest hole's FIGURE obeys the to-par law like every
-          other figure; the difficulty ramp lives in the BARS, not here. */}
-      <Extreme label={t('discover.coursesPlayed.hardest', 'Hardest')} hole={hardest} />
-      <Extreme label={t('discover.coursesPlayed.easiest', 'Easiest')} hole={easiest} />
-    </div>
-  );
-}
-
-function Extreme({ label, hole, tone }: { label: string; hole: CourseHole; tone?: string }) {
-  const { t } = useTranslation('courses');
-  const fig = toParParts(hole.avg_to_par);
-  return (
-    <div style={{ textAlign: 'center', minWidth: 0 }}>
-      <div style={CAP}>{label}</div>
-      <div
-        style={{
-          marginTop: 3,
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-        }}
-      >
-        <span
-          className="tabular-nums"
-          style={{ fontSize: 21, fontWeight: 800, letterSpacing: '-0.025em', color: A.INK, lineHeight: 1 }}
-        >
-          {hole.hole_no}
-        </span>
-        {fig && (
-          <span style={{ textAlign: 'left' }}>
-            <span
-              className="tabular-nums"
-              style={{ display: 'block', fontSize: 12, fontWeight: 700, color: tone ?? fig.tone, lineHeight: 1.1 }}
-            >
-              {fig.text}
-            </span>
-            <span style={{ ...CAP, display: 'block', fontSize: 8.5 }}>
-              {t('courseDetail.plays.fieldAvg', 'Field avg')}
-            </span>
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
 
 export default CourseHolePanel;
