@@ -38,16 +38,29 @@ export interface BarRound {
 
 interface Props {
   rounds: BarRound[];
-  /** Counting set, already sorted ascending, already formatted. */
-  eight: string[];
+  /** Counting set, already sorted ascending, already formatted. Optional since
+   *  PHASE 4: the counting eight moved to the section's own chip box. */
+  eight?: string[];
   /** Ninth-best; null when there is none (absent, not a dash). */
-  next: string | null;
-  nextLabel: string;
+  next?: string | null;
+  nextLabel?: string;
+  /**
+   * PHASE 4 §4.4: the cut line. `value` is the highest differential among
+   * rounds where is_counter is true (derived by the section, never by a
+   * client-side comparison here); `label` is the formatted "CUT · {value}".
+   * Drawn as a 1px AMBER rule at the value's true height on the same
+   * min-anchored scale as the bars, so the line and the bar colours cannot
+   * disagree.
+   */
+  cut?: { value: number; label: string } | null;
+  /** PHASE 4 §4.5: axis labels carry the dates — "OLDEST · {date}". */
+  oldestLabel?: string;
+  newestLabel?: string;
   selectedIndex: number | null;
   onSelectIndex: (i: number) => void;
 }
 
-const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, selectedIndex, onSelectIndex }) => {
+const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, cut = null, oldestLabel, newestLabel, selectedIndex, onSelectIndex }) => {
   const diffs = rounds.map((r) => r.diff).filter((d): d is number => d != null);
   const lo = diffs.length ? Math.min(...diffs) : 0;
   const hi = diffs.length ? Math.max(...diffs) : 0;
