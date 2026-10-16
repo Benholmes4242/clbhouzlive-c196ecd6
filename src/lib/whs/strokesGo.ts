@@ -88,12 +88,6 @@ export interface StrokesGo {
    * the bar and band labels do not render — absent, not approximated.
    */
   bands: OutcomeBands | null;
-  /**
-   * Double-or-worse holes per round: the exact double_count share × 18
-   * (5B L6 — from the count, never the rounded percentage). NULL when the
-   * counts are absent.
-   */
-  doublesPerRound: number | null;
 }
 
 const TYPES: Array<{ parN: 3 | 4 | 5; key: 'par3' | 'par4' | 'par5' }> = [
@@ -148,7 +142,6 @@ export function deriveStrokesGo(
   );
 
   let bands: OutcomeBands | null = null;
-  let doublesPerRound: number | null = null;
   if (hasCounts) {
     const sum = (pick: (d: ParSplitInput) => number | undefined) =>
       present.reduce((s, t) => s + (pick(t.data) ?? 0), 0);
@@ -176,9 +169,6 @@ export function deriveStrokesGo(
       bogey: entries.find((e) => e.key === 'bogey')!.value,
       doublePlus: entries.find((e) => e.key === 'doublePlus')!.value,
     };
-    /* L6: doubles a round reads the exact count share, not the rounded
-       display percentage. */
-    doublesPerRound = (exact.doublePlus / 100) * 18;
   }
 
   return {
@@ -186,11 +176,6 @@ export function deriveStrokesGo(
     rows,
     dominant,
     bands,
-    doublesPerRound,
   };
 }
 
-/** A shot of gross is 113 / slope of a differential (§5.6). */
-export function shotsToDifferential(shots: number, slope: number): number {
-  return shots * (113 / slope);
-}

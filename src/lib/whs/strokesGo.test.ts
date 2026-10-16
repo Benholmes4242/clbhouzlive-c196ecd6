@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { deriveStrokesGo, shotsToDifferential } from './strokesGo';
+import { deriveStrokesGo } from './strokesGo';
 import type { ParSplitInput } from './strokesGo';
 
 const split = (over: number, holes: number, bp: number, bog: number, dbl: number): ParSplitInput => ({
@@ -102,18 +102,11 @@ describe('deriveStrokesGo', () => {
     expect(s.bands!.birdiePlus + s.bands!.par + s.bands!.bogey + s.bands!.doublePlus).toBe(100);
   });
 
-  it('5B L3: when the counts are absent the bands and doubles figure are null', () => {
+  it('5B L3: when the counts are absent the bands are null', () => {
     const s = deriveStrokesGo(fixture)!; // pct-only splits, no count fields
     expect(s.bands).toBeNull();
-    expect(s.doublesPerRound).toBeNull();
     // The three par rows above the bar are unaffected.
     expect(s.rows).toHaveLength(3);
-  });
-
-  it('5B L6: doubles a round reads the exact count share × 18', () => {
-    const s = deriveStrokesGo(countedFixture)!;
-    // double share = 90 / 900 = 0.10 exactly.
-    expect(s.doublesPerRound).toBeCloseTo(0.1 * 18, 5);
   });
 
   it('null when no type has holes', () => {
@@ -161,9 +154,3 @@ describe('deriveStrokesGo', () => {
   });
 });
 
-describe('shotsToDifferential', () => {
-  it('a shot of gross is 113/slope of a differential', () => {
-    expect(shotsToDifferential(1, 113)).toBeCloseTo(1, 5);
-    expect(shotsToDifferential(1, 125)).toBeCloseTo(0.904, 3);
-  });
-});
