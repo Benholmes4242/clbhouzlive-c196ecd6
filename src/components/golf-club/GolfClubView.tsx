@@ -522,8 +522,8 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
               fontSize: 13,
               fontWeight: 600,
               letterSpacing: '-0.005em',
-              // Spec value (hero-option-a): no surface tier owns 0.78 on this base yet.
-              color: 'rgba(248,250,252,0.78)',
+              // BRIEF_COURSE_HERO_1B K3 — the existing body tier, not a new 78%.
+              color: SURFACE.dark.body,
             }}
           >
             {referenceLine.split(' \u00B7 ').map((part, i) => (
