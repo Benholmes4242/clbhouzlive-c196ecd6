@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_PROFILE_TABS_VOICE
+- [ ] Confirm clbhouz; change only specified Courses/Rounds ownership copy and props, with name-free third-person fallbacks and the archive possessive fix.
+- [ ] Add English keys only; preserve all queries, hooks, derivations, figures and Handicap sections.
+- [ ] Add one third-person render test per tab; run focused/full tests and check preview. Stop and report any unexpected failure; live authenticated checks unavailable on external/unmanaged Supabase.
+
 ## BRIEF_HANDICAP_TAB_REBUILD_8A
 - [x] Confirm clbhouz; record row buttons open the canonical RoundDetailSheet by existing id and pass the profile owner; existing flex/gap/padding/hairlines retained with button reset and no-id fallback.
 - [x] Capitalise five English Stood strings only; record calculations, stoodFor/join and other copy untouched; no lowercase assertions found.
