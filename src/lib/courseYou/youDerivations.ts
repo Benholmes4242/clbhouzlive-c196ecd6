@@ -318,12 +318,7 @@ export type OpenHolesState =
   | { kind: 'none' };
 
 export function openHolesState(edges: HoleEdge[]): OpenHolesState {
-  const played = edges.filter((e) => e.timesPlayed > 0);
-  if (edges.length === 0 || played.length < edges.length) {
-    /* An unplayed hole cannot be "left to birdie" on the evidence we have, and
-       the section's count would be wrong; it does not render. */
-    return { kind: 'none' };
-  }
+  if (edges.length === 0) return { kind: 'none' };
   const open = edges.filter((e) => !e.birdied);
   if (open.length === 0) return { kind: 'complete', total: edges.length };
   if (open.length > HANDFUL) return { kind: 'none' };
