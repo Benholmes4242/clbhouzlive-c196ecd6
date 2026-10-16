@@ -124,10 +124,6 @@ function unsignedOne(n: number): string {
   return Math.abs(Math.round(n * 10) / 10).toFixed(1);
 }
 
-export function hcpLabel(n: number): string {
-  return n === 0 ? 'scratch' : String(n);
-}
-
 export function rangeHcp(n: number): string {
   return n < 0 ? `+${Math.abs(n)}` : String(n);
 }
