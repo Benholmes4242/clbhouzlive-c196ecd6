@@ -14,7 +14,7 @@ import { counterWindow } from '@/lib/whs/counting';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import { playDateStandalone } from '@/components/explore-tab-new/courseled/discoverWhen';
 import { CHART } from '../charts/tokens';
-import { pickCourse } from './NextRoundSection';
+import { pickCourse } from '@/lib/whs/pickCourse';
 
 const fmt = (d: number) => (d < 0 ? `\u2212${Math.abs(d).toFixed(1)}` : d.toFixed(1));
 const FIG: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
