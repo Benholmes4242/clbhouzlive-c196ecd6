@@ -25,6 +25,7 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 
 import IndexSection from './sections/IndexSection';
 import LockedCard from './sections/LockedCard';
+import AgeingOutSection from './sections/AgeingOutSection';
 import NextRoundSection from './sections/NextRoundSection';
 import RoundsThatCountSection from './sections/RoundsThatCountSection';
 import HolesSection from './sections/HolesSection';
@@ -113,6 +114,9 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
 
       {/* 1 — HANDICAP INDEX */}
       <IndexSection connection={connection} belowHeadline={<LockedCard connectionId={connection.id} />} />
+
+      {/* 1b — AGEING OUT (renders only when a counter is about to expire) */}
+      <AgeingOutSection connectionId={connection.id} currentHandicap={currentHandicap} />
 
       {/* 2 — NEXT ROUND */}
       <NextRoundSection connectionId={connection.id} currentHandicap={currentHandicap} />
