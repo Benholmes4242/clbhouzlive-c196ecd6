@@ -425,19 +425,37 @@ const FirstScreen: React.FC<{
   );
 };
 
+const IntroFooter: React.FC<{ hidden: boolean; display: boolean; onTransitionEnd: () => void; onPickCountry: () => void; onDecline?: () => void; h: number; circleShown: boolean }> = ({ hidden, display, onTransitionEnd, onPickCountry, onDecline, h, circleShown }) => {
+  const { t } = useTranslation('handicap');
+  const cta = () => {
+    analyticsEvents.track('connect_intro_cta', { h, place: 'footer', circle_shown: circleShown });
+    onPickCountry();
+  };
+  return (
+    <div aria-hidden={hidden} onTransitionEnd={onTransitionEnd} style={{ padding: '18px 24px 30px', paddingBottom: 'calc(30px + env(safe-area-inset-bottom, 0px))', display: display ? 'flex' : 'none', flexDirection: 'column', gap: 12, background: GROUND, borderTop: `1px solid ${FAINT_HAIR}`, transform: hidden ? 'translateY(100%)' : 'translateY(0)', opacity: hidden ? 0 : 1, pointerEvents: hidden ? 'none' : 'auto', transition: 'transform 200ms ease, opacity 200ms ease' }}>
+      <div style={{ fontSize: 13.5, lineHeight: 1.45, color: QUIET }}>
+        <Trans t={t} i18nKey="whsConnect.intro.footerLine" components={[null, <span style={{ color: SOFT_INK, fontWeight: 700 }} />]} />
+      </div>
+      <button type="button" onClick={cta} style={primaryCtaStyle}>{t('whsConnect.intro.connectCta')}</button>
+      {onDecline ? <DeclineButton onClick={onDecline} /> : null}
+    </div>
+  );
+};
+
 const YouTable: React.FC<{ block: IntroBlock; all: IntroBlock; band: IntroBand | null; h: number }> = ({ block, all, band, h }) => {
+  const { t } = useTranslation('handicap');
   const top = costliestThree(block.holes);
   const hardest = costliestThree(all.holes)[0]?.hole_no;
   return (
     <section style={{ paddingTop: 32 }}>
-      <h2 style={sectionHeadStyle}>Then it stops being<br />golfers like you.<br /><span style={{ color: AMBER }}>It&apos;s you.</span></h2>
-      <p style={sectionSubStyle}>Same holes, your own rounds. The right-hand column fills in the moment you connect.</p>
+      <h2 style={sectionHeadStyle}>{t('whsConnect.intro.youTableHeadingLine1')}<br />{t('whsConnect.intro.youTableHeadingLine2')}<br /><span style={{ color: AMBER }}>{t('whsConnect.intro.youTableHeadingLine3')}</span></h2>
+      <p style={sectionSubStyle}>{t('whsConnect.intro.youTableSub')}</p>
       <div style={{ marginTop: 18, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 84px 84px', columnGap: 8, paddingBottom: 8, borderBottom: `1px solid ${HAIR}`, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: DIMMER }}>
-        <span>Hole</span><span style={{ textAlign: 'right' }}>{band ? (h === 0 ? 'Scratch' : `Off ${h}`) : 'All golfers'}</span><span style={{ textAlign: 'right' }}>You</span>
+        <span>{t('whsConnect.intro.youTableHole')}</span><span style={{ textAlign: 'right' }}>{band ? (h === 0 ? t('whsConnect.intro.youTableScratch') : t('whsConnect.intro.youTableOff', { hcp: h })) : t('whsConnect.intro.youTableAllGolfers')}</span><span style={{ textAlign: 'right' }}>{t('whsConnect.intro.youTableYou')}</span>
       </div>
       {top.map((hole) => (
         <div key={hole.hole_no} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 84px 84px', columnGap: 8, alignItems: 'center', padding: '14px 0', borderBottom: `1px solid ${HAIR}` }}>
-          <span><span style={{ display: 'block', fontSize: 16, fontWeight: 700 }}>{ordinal(hole.hole_no)}</span><span style={{ display: 'block', marginTop: 2, fontSize: 12.5, color: DIMMER }}>par {hole.par}{hardest === hole.hole_no ? ' · the hardest here' : ''}</span></span>
+          <span><span style={{ display: 'block', fontSize: 16, fontWeight: 700 }}>{ordinal(hole.hole_no)}</span><span style={{ display: 'block', marginTop: 2, fontSize: 12.5, color: DIMMER }}>{t('whsConnect.intro.youTablePar', { par: hole.par })}{hardest === hole.hole_no ? ` · ${t('whsConnect.intro.youTableHardest')}` : ''}</span></span>
           <span style={{ textAlign: 'right', fontSize: 18, fontWeight: 800, color: MID }}>{signedOne(hole.avg_to_par)}</span>
           <span style={{ justifySelf: 'end', width: 64, height: 30, borderRadius: 10, border: `1.5px dashed ${AMBER_DASH}` }} />
         </div>
