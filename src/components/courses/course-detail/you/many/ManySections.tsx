@@ -9,7 +9,7 @@ import React from 'react';
 import { A, FIGS, RAMP_TOPAR } from '@/features/courses/components/holes/analytical/tokens';
 import { formatNumber } from '@/i18n/format';
 import {
-  GOOD_ROUND_GROSS, SMALL_SET, round1,
+  GOOD_ROUND_GROSS, SEASON_MIN_ROUNDS, SMALL_SET, round1,
   type EdgeSummary, type GoodRounds, type HoleEdge, type OpenHolesState, type Season,
 } from '@/lib/courseYou/youDerivations';
 import { ordinal } from '../youBits';
@@ -72,7 +72,7 @@ export const VerdictSection: React.FC<VerdictProps> = (p) => {
       />
       {top != null && p.lifetimeOverPar != null ? (
         <Said>
-          The Course tab says this place takes <B>{f1(top)} shots</B> off everyone else who plays it. It took <B>{f1(p.lifetimeOverPar)}</B> off you across {yearsWord} {plural(p.seasonCount, 'year', 'years')}.
+          The Course tab says this place takes <B>{f1(top)} shots</B> off everyone else who plays it. It took <B>{f1(p.lifetimeOverPar)}</B> off you across {yearsWord} {plural(p.seasonCount, 'season', 'seasons')}.
           {p.season?.avgOverPar != null ? <> This season it is taking <B>{f1(p.season.avgOverPar)}</B>.</> : null}
           {p.mostRoundsHere ? ' Nobody has played here more than you, so this is a finding, not a statistic.' : null}
         </Said>
@@ -171,7 +171,7 @@ export const GoodRoundsSection: React.FC<{ g: GoodRounds | null; seasons: number
       kicker={`The ${words(n)} ${plural(n, 'time', 'times')} you broke ${th}`}
       title={g.everyMadeBeforeTurn ? `${n === 1 ? 'It was' : 'Every one of them was'} made before the turn` : null}
     >
-      <Lede>{Words(n)} {plural(n, 'round', 'rounds')} under {th} in {words(seasons)} {plural(seasons, 'year', 'years')}. Here is what separated {plural(n, 'it', 'them')} from the other {formatNumber(others)}.</Lede>
+      <Lede>{Words(n)} {plural(n, 'round', 'rounds')} under {th} in {words(seasons)} {plural(seasons, 'season', 'seasons')}. Here is what separated {plural(n, 'it', 'them')} from the other {formatNumber(others)}.</Lede>
       <div style={{ marginTop: 15 }}>
         <GroupHead left={`Your ${words(n)} ${plural(n, 'round', 'rounds')} under ${th}`} right={g.good.avgGross != null ? `avg ${f1(g.good.avgGross)}` : ''} />
         <NineRow name="Front" v={g.good.front} lo={range.lo} hi={range.hi} overFill={RAMP_TOPAR.bogey} />
