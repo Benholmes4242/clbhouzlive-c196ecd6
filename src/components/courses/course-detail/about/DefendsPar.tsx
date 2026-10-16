@@ -19,7 +19,7 @@ import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import AboutSection from './AboutSection';
 import AllHolesSheet from './AllHolesSheet';
 import { deriveCourseVerdict, sharePct, signed } from './courseVerdict';
-import { B, BAR_NEUTRAL, Said, SMALL_LABEL } from './verdictBits';
+import { B, BAR_NEUTRAL, PAR_FILL, Said, SMALL_LABEL } from './verdictBits';
 
 const CHART_H = 56;
 
@@ -156,7 +156,7 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
                 height: '100%',
                 borderRadius: 2,
                 width: `${(Math.max(0, p.perHole) / maxPer) * 100}%`,
-                background: inkFill,
+                background: PAR_FILL,
               }}
             />
           </div>
@@ -205,7 +205,5 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
     </AboutSection>
   );
 };
-
-const inkFill = 'var(--defends-par-fill)';
 
 export default DefendsPar;

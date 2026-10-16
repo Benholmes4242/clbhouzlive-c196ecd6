@@ -6,6 +6,7 @@ import { SURFACE } from '@/lib/tokens/surface';
 
 export const TILE_FILL = inkWithAlpha(SURFACE.dark.ink, 0.05);
 export const BAR_NEUTRAL = inkWithAlpha(SURFACE.dark.ink, 0.28);
+export const PAR_FILL = inkWithAlpha(SURFACE.dark.ink, 0.4);
 
 export const SMALL_LABEL: React.CSSProperties = {
   fontSize: 9,
