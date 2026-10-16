@@ -4,12 +4,10 @@
  * Shared by the Explore course hole panel and the Explore course panels; it
  * sits with the course-facts block, never on a you-against-the-field chart (S2).
  *
- * FIELD_EXCLUDES_VIEWER_D T1: WHICH hole is hardest/easiest is a course fact
- * (inclusive), but the small "Field avg" FIGURE under it is read from
- * `fieldHoles` - the same reader-excluded rows the panel's hole rows use - so
- * one hole never shows two "Field avg" figures from different populations.
- * A hole with no field once the reader is removed is blank; it never falls
- * back to the inclusive figure.
+ * FIELD_EXCLUDES_VIEWER_E U1/U2: the pair sits in the course-facts block under
+ * "Every round played here", so the hole AND the "Field avg" figure beneath it
+ * both read the inclusive analysis. A figure takes its population from the
+ * block it sits in.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,30 +22,21 @@ const CAP: React.CSSProperties = {
   color: A.DIM,
 };
 
-export function Extremes({
-  hardest,
-  easiest,
-  fieldHoles,
-}: {
-  hardest: CourseHole;
-  easiest: CourseHole;
-  fieldHoles: CourseHole[];
-}) {
+export function Extremes({ hardest, easiest }: { hardest: CourseHole; easiest: CourseHole }) {
   const { t } = useTranslation('courses');
-  const fieldFor = (h: CourseHole) => fieldHoles.find((f) => f.hole_no === h.hole_no)?.avg_to_par;
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', marginTop: 10 }}>
       {/* §2.2 - the hardest hole's FIGURE obeys the to-par law like every
           other figure; the difficulty ramp lives in the BARS, not here. */}
-      <Extreme label={t('discover.coursesPlayed.hardest', 'Hardest')} hole={hardest} fieldAvg={fieldFor(hardest)} />
-      <Extreme label={t('discover.coursesPlayed.easiest', 'Easiest')} hole={easiest} fieldAvg={fieldFor(easiest)} />
+      <Extreme label={t('discover.coursesPlayed.hardest', 'Hardest')} hole={hardest} />
+      <Extreme label={t('discover.coursesPlayed.easiest', 'Easiest')} hole={easiest} />
     </div>
   );
 }
 
-function Extreme({ label, hole, fieldAvg, tone }: { label: string; hole: CourseHole; fieldAvg: number | undefined; tone?: string }) {
+function Extreme({ label, hole, tone }: { label: string; hole: CourseHole; tone?: string }) {
   const { t } = useTranslation('courses');
-  const fig = toParParts(fieldAvg);
+  const fig = toParParts(hole.avg_to_par);
   return (
     <div style={{ textAlign: 'center', minWidth: 0 }}>
       <div style={CAP}>{label}</div>
