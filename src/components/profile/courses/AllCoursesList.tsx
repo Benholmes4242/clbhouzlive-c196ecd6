@@ -28,6 +28,8 @@ import type { UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import './coursesArchive.css';
 import { useCourseListRanks } from '@/lib/courses/listRank';
+import { handicapOwnerFirstName } from '../handicap/ProfileHandicapTab';
+import { profileOwnerPossessive } from '@/lib/profileOwnerVoice';
 
 interface AllCoursesListProps {
   userId: string;
@@ -712,7 +714,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           <p className="text-sm text-foreground font-medium italic">
             {isOwnProfile 
               ? "That\u2019s your journey so far. On to the next tee."
-              : `That\u2019s ${firstName || 'their'}\u2019s journey so far.`}
+              : `That\u2019s ${profileOwnerPossessive(handicapOwnerFirstName(displayName, null)).replace(/^Their$/, 'their')} journey so far.`}
           </p>
         </div>
       )}

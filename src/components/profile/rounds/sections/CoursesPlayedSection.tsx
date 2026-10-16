@@ -5,6 +5,8 @@
  * useClubsCourses (golf_courses.club_id).
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { profileOwnerPossessive } from '@/lib/profileOwnerVoice';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
 import { useClubsCourses } from '@/components/profile/clubs/useClubsCourses';
 import { formatNumber } from '@/i18n/format';
@@ -16,6 +18,8 @@ interface Props {
   rounds: ProfileRound[];
   userId: string;
   viewerId: string | undefined;
+  isOwnProfile: boolean;
+  ownerFirstName?: string | null;
 }
 
 /** Splits names that share a club prefix with another row: club truncates, course stays visible. */
@@ -36,7 +40,9 @@ export function splitClubCourse(names: (string | null)[]): ({ club: string; cour
   });
 }
 
-const CoursesPlayedSection: React.FC<Props> = ({ rounds, userId, viewerId }) => {
+const CoursesPlayedSection: React.FC<Props> = ({ rounds, userId, viewerId, isOwnProfile, ownerFirstName = null }) => {
+  const { t } = useTranslation('common');
+  const voice = isOwnProfile ? 'Own' : ownerFirstName ? 'Friend' : 'Other';
   const all = courseStats(rounds);
   const top = all.slice(0, 5);
   // homeClub is already null when home_club_visibility hides it from this viewer.
@@ -53,8 +59,8 @@ const CoursesPlayedSection: React.FC<Props> = ({ rounds, userId, viewerId }) => 
 
   return (
     <section>
-      <div style={KICKER}>Where you play</div>
-      <div style={TITLE}>Your five most played</div>
+      <div style={KICKER}>{t(`profile.rounds.courses.kicker${voice}`, { name: ownerFirstName })}</div>
+      <div style={TITLE}>{t(isOwnProfile ? 'profile.rounds.courses.titleOwn' : 'profile.rounds.courses.titleFriend', { possessive: profileOwnerPossessive(ownerFirstName) })}</div>
       <div style={{ marginTop: 5 }}>
         {top.map((c, i) => (
           <div key={c.key} style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 9 }}>
@@ -82,8 +88,7 @@ const CoursesPlayedSection: React.FC<Props> = ({ rounds, userId, viewerId }) => 
       </div>
       {lead.name ? (
         <p style={{ ...note(RT.HAIRLINE), margin: '12px 0 0' }}>
-          {`You have played ${lead.name} ${formatNumber(lead.rounds)} ${lead.rounds === 1 ? 'time' : 'times'}`}
-          {pct != null ? `, ${pct}% of your full rounds` : ''}
+          {t(`profile.rounds.courses.played${voice}${pct == null ? 'NoShare' : ''}`, { name: ownerFirstName, course: lead.name, n: formatNumber(lead.rounds), times: lead.rounds === 1 ? 'time' : 'times', pct })}
         </p>
       ) : null}
     </section>

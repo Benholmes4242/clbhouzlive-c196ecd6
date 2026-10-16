@@ -1,0 +1,51 @@
+import React from 'react';
+import { beforeAll, expect, it, vi } from 'vitest';
+import { render } from '@testing-library/react';
+import { createInstance } from 'i18next';
+import { I18nextProvider } from 'react-i18next';
+import common from '../../public/locales/en/common.json';
+import courses from '../../public/locales/en/courses.json';
+import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
+
+let rows = Array.from({ length: 5 }, (_, i) => ({ id: `r${i}`, course_id: 'c', rating: 8, design_score: 9, condition_score: 8, clubhouse_score: 7, facilities_score: 6 }));
+vi.mock('@/hooks/useUserCourseSummary', () => ({ useUserCourseSummary: () => ({ totalCoursesPlayed: 1, countriesPlayed: 1, countryTallies: [{ country: 'England', courses: 1 }], coursePoints: [], unmappedCount: 0, isLoading: false }) }));
+vi.mock('@/hooks/useUserCourseActivity', () => ({ useUserCourseActivity: () => ({ data: [{ course_id: 'c', has_rating: true, rating_value: 8 }] }) }));
+vi.mock('@/hooks/gam/useUserAnalyticsCourses', () => ({ useUserAnalyticsCourses: () => ({ data: [] }) }));
+vi.mock('@/hooks/useTop100ProgressForUser', () => ({ useTop100ProgressForUser: () => ({ data: null }) }));
+vi.mock('@/hooks/gam/useTop100Distribution', () => ({ useTop100Distribution: () => ({ data: null }) }));
+vi.mock('@/hooks/gam/useGamRecordConfig', () => ({ useGamRecordConfig: () => ({ data: null }) }));
+vi.mock('@/hooks/usePlayedUnratedCourses', () => ({ usePlayedUnratedCourses: () => ({ courses: [], count: 0 }) }));
+vi.mock('@/lib/courses/listRank', () => ({ useCourseListRanks: () => ({ data: new Map() }), formatListRank: () => null }));
+vi.mock('@tanstack/react-query', () => ({ useQuery: ({ queryKey }: { queryKey: string[] }) => ({ isLoading: false, data: queryKey[0] === 'profile-course-rating-rows' ? rows : queryKey[0] === 'user-avg-rating' ? { avg: 8, n: 5 } : [{ id: 'c', name: 'Sundridge', country: 'England' }] }) }));
+vi.mock('@/integrations/supabase/client', () => ({ supabase: {} }));
+vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
+vi.mock('react-router-dom', () => ({ useNavigate: () => vi.fn() }));
+vi.mock('@/components/profile/courses/TheChaseSection', () => ({ TheChaseSection: () => null }));
+vi.mock('@/components/profile/courses/CourseLegacyCard', () => ({ CourseLegacyCard: () => null }));
+vi.mock('@/components/profile/courses/DossierCard', () => ({ default: () => <article>Sundridge</article> }));
+vi.mock('@/components/profile/courses/BreakdownsPickerSheet', () => ({ default: () => null }));
+
+const i18n = createInstance();
+beforeAll(async () => { await i18n.init({ lng: 'en', resources: { en: { common, courses } }, defaultNS: 'common', interpolation: { escapeValue: false } }); });
+
+it('Courses names the other member, with third-person fallbacks and no viewer-addressed copy — BRIEF_PROFILE_TABS_VOICE', () => {
+  const { container, rerender } = render(<I18nextProvider i18n={i18n}><ProfileCoursesTab userId="owner" isOwnProfile={false} displayName="Smith, Andrew" /></I18nextProvider>);
+  let text = container.textContent ?? '';
+  expect(text).toContain("Andrew's golf, plotted");
+  expect(text).toContain('HOW Andrew RATES');
+  expect(text).toContain('What Andrew actually rewards');
+  expect(text).toContain('Andrew is a design voter — marking it 1.5 above their average across the four, and facilities 1.5 below.');
+  expect(text).toContain('AVERAGE RATING');
+  expect(text).toContain("That’s Andrew's journey so far.");
+  expect(text).not.toMatch(/\b(?:you|your|you've)\b/i);
+  rerender(<I18nextProvider i18n={i18n}><ProfileCoursesTab userId="owner" isOwnProfile={false} /></I18nextProvider>);
+  text = container.textContent ?? '';
+  expect(text).toContain('Their golf, plotted');
+  expect(text).toContain('HOW THEY RATE');
+  expect(text).toContain('They are a design voter');
+  expect(text).toContain('That’s their journey so far.');
+  expect(text).not.toMatch(/\b(?:you|your|their['’]s)\b/i);
+  rows = rows.map((r) => ({ ...r, design_score: 8, condition_score: 8, clubhouse_score: 8, facilities_score: 8 }));
+  rerender(<I18nextProvider i18n={i18n}><ProfileCoursesTab userId="owner" isOwnProfile={false} displayName="Andrew Smith" /></I18nextProvider>);
+  expect(container.textContent).toContain('Andrew rates the four evenly — none sits more than 0.2 from their average across them.');
+});

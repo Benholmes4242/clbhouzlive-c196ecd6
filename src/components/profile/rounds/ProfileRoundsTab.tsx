@@ -36,6 +36,7 @@ interface Props {
   userId: string;
   isOwnProfile: boolean;
   viewerId?: string;
+  ownerFirstName?: string | null;
 }
 
 type Sort = 'recent' | 'lowest' | 'course';
@@ -53,7 +54,7 @@ const DIVIDER_META: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, let
 
 type Item = { kind: 'head'; key: string; title: string; meta: string | null } | { kind: 'row'; r: ProfileRound };
 
-const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId }) => {
+const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, ownerFirstName = null }) => {
   const { t } = useTranslation('profile');
   const navigate = useNavigate();
   const { data: rounds = [], isLoading } = useProfileRounds(userId);
@@ -161,9 +162,9 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId }) =
         </div>
       ) : null}
 
-      <SeasonSection rounds={rounds} year={year} userId={userId} isOwnProfile={isOwnProfile} />
-      <div style={{ marginTop: 32 }}><YearSection rounds={rounds} year={year} today={today} /></div>
-      <div style={{ marginTop: 32 }}><CoursesPlayedSection rounds={rounds} userId={userId} viewerId={viewerId} /></div>
+      <SeasonSection rounds={rounds} year={year} userId={userId} isOwnProfile={isOwnProfile} ownerFirstName={ownerFirstName} />
+      <div style={{ marginTop: 32 }}><YearSection rounds={rounds} year={year} today={today} isOwnProfile={isOwnProfile} ownerFirstName={ownerFirstName} /></div>
+      <div style={{ marginTop: 32 }}><CoursesPlayedSection rounds={rounds} userId={userId} viewerId={viewerId} isOwnProfile={isOwnProfile} ownerFirstName={ownerFirstName} /></div>
 
       <section style={{ marginTop: 32 }}>
         <div style={KICKER}>Every round</div>

@@ -10,6 +10,8 @@
  * Tallies come from useUserCourseSummary (sub_country) - never fetched again.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { profileOwnerPossessive } from '@/lib/profileOwnerVoice';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -44,13 +46,16 @@ export function fitProjection(points: CoursePoint[]) {
 }
 
 interface Props {
+  isOwnProfile?: boolean;
+  ownerFirstName?: string | null;
   tallies: CountryTally[];
   points: MapPoint[];
   /** Courses that cannot be plotted even after the club fallback. */
   unmapped?: number;
 }
 
-export const CoursesMapSection: React.FC<Props> = ({ tallies, points, unmapped = 0 }) => {
+export const CoursesMapSection: React.FC<Props> = ({ tallies, points, unmapped = 0, isOwnProfile = true, ownerFirstName = null }) => {
+  const { t } = useTranslation('common');
   const showPlot = points.length >= MIN_POINTS;
   const fit = useMemo(() => (showPlot ? fitProjection(points) : null), [showPlot, points]);
   if (tallies.length === 0 && !showPlot) return null;
@@ -61,7 +66,7 @@ export const CoursesMapSection: React.FC<Props> = ({ tallies, points, unmapped =
 
   return (
     <div className="px-4" style={{ fontFamily: SANS }}>
-      <SectionHeader tone="amber" kicker="WHERE YOU'VE PLAYED" title="Your golf, plotted" />
+      <SectionHeader tone="amber" kicker="COURSES PLAYED" title={t(isOwnProfile ? 'profile.courses.map.titleOwn' : 'profile.courses.map.titleFriend', { possessive: profileOwnerPossessive(ownerFirstName), defaultValue: isOwnProfile ? 'Your golf, plotted' : '{{possessive}} golf, plotted' })} />
       <div style={{ display: 'flex', gap: 12, alignItems: 'stretch' }}>
         {showPlot && fit && (
           <div data-testid="courses-map-plot" style={{ flex: 'none', width: 186, background: A.PANEL, borderRadius: 12, padding: 6 }}>

@@ -4,6 +4,7 @@
  * The average line BREAKS across months with no scoring round.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import type { ProfileRound } from '../useProfileRounds';
 import { monthHighlights, monthStats } from '../roundsDerivations';
@@ -14,6 +15,8 @@ interface Props {
   year: number;
   /** "Today", passed in. */
   today: Date;
+  isOwnProfile: boolean;
+  ownerFirstName?: string | null;
 }
 
 const INITIALS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
@@ -27,7 +30,8 @@ const LINE_BOTTOM = 60;
 const x0 = (i: number) => i * (BAR_W + GAP);
 const cx = (i: number) => x0(i) + BAR_W / 2;
 
-const YearSection: React.FC<Props> = ({ rounds, year, today }) => {
+const YearSection: React.FC<Props> = ({ rounds, year, today, isOwnProfile, ownerFirstName = null }) => {
+  const { t } = useTranslation('common');
   const ms = monthStats(rounds, year);
   const isCurrent = today.getFullYear() === year;
   const isFuture = (i: number) => isCurrent && i > today.getMonth();
@@ -101,7 +105,7 @@ const YearSection: React.FC<Props> = ({ rounds, year, today }) => {
 
       {hl ? (
         <p style={{ ...note(RT.HAIRLINE), margin: '12px 0 0' }}>
-          {`You play most in ${MONTHS[hl.busiest]} and score best in ${MONTHS[hl.best]}`}
+          {t(`profile.rounds.yearHighlights${isOwnProfile ? 'Own' : ownerFirstName ? 'Friend' : 'Other'}`, { name: ownerFirstName, busiest: MONTHS[hl.busiest], best: MONTHS[hl.best] })}
         </p>
       ) : null}
     </section>

@@ -29,3 +29,4 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - The admin Health page and the drawer's Health dot read figures only from the `get_admin_health_*` RPCs (`useHealthLenses.ts`) and the existing service hooks, and share one verdict (`useHealthVerdict` in `components/health/healthIssues.ts`), so the dot and the page cannot disagree and no Health panel reads a table.
 
 - Record, counting-round and log rows open `RoundDetailSheet` by score id with the known profile owner, keeping one scorecard and member context.
+- Owner copy uses `profileOwnerVoice` to share grammar.

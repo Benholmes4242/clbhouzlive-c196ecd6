@@ -16,6 +16,7 @@ import { TheChaseSection } from './courses/TheChaseSection';
 import { YourSignatureSection } from './courses/YourSignatureSection';
 import { CourseLegacyCard } from './courses/CourseLegacyCard';
 import type { ProfileRatingRow } from './courses/AllCoursesList';
+import { handicapOwnerFirstName } from './handicap/ProfileHandicapTab';
 
 interface ProfileCoursesTabProps {
   userId: string;
@@ -39,6 +40,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   isOwnProfile,
   displayName,
 }) => {
+  const ownerFirstName = handicapOwnerFirstName(displayName, null);
   const { totalCoursesPlayed, countriesPlayed, countryTallies, coursePoints, unmappedCount, courseNames, isLoading } = useUserCourseSummary(userId);
   const { data: userActivity } = useUserCourseActivity(userId);
   const { data: distribution } = useTop100Distribution();
@@ -176,7 +178,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
 
       {countryTallies && (
         <div className="mt-6">
-          <CoursesMapSection tallies={countryTallies} points={mapPoints} unmapped={unmappedCount} />
+          <CoursesMapSection tallies={countryTallies} points={mapPoints} unmapped={unmappedCount} isOwnProfile={isOwnProfile} ownerFirstName={ownerFirstName} />
         </div>
       )}
 
@@ -184,7 +186,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
         <TheChaseSection userId={userId} />
       </div>
       <div className="mt-6">
-        <YourSignatureSection rows={ratingRows ?? []} />
+        <YourSignatureSection rows={ratingRows ?? []} isOwnProfile={isOwnProfile} ownerFirstName={ownerFirstName} />
       </div>
 
       {/* Section 3: Course History */}
