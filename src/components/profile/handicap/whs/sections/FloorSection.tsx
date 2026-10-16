@@ -28,7 +28,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 import { HcpSection } from './HcpSection';
 import { CHART } from '../charts';
-import { pickCourse } from './NextRoundSection';
+import { pickCourse } from '@/lib/whs/pickCourse';
 
 const MS_PER_DAY = 86_400_000;
 

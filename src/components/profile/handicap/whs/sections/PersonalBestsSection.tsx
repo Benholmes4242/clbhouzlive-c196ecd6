@@ -39,7 +39,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { WhsScore } from '@/lib/whs/types';
 
 import { HcpSection } from './HcpSection';
-import { pickCourse } from './NextRoundSection';
+import { pickCourse } from '@/lib/whs/pickCourse';
 import { CHART } from '../charts';
 import { openGamAchievements } from '../gam/events';
 import { AwardMark, type AwardTier } from '@/components/awards/AwardMark';

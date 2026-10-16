@@ -34,7 +34,7 @@ import {
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { HcpSection } from './HcpSection';
 import { CHART } from '../charts';
-import { pickCourse } from './NextRoundSection';
+import { pickCourse } from '@/lib/whs/pickCourse';
 
 /** The section needs this many holes before it says anything. */
 const MIN_HOLES = 180;
