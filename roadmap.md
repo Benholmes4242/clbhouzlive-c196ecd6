@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_HANDICAP_TAB_REBUILD_8A
+- [x] Confirm clbhouz; record row buttons open the canonical RoundDetailSheet by existing id and pass the profile owner; existing flex/gap/padding/hairlines retained with button reset and no-id fallback.
+- [x] Capitalise five English Stood strings only; record calculations, stoodFor/join and other copy untouched; no lowercase assertions found.
+- [x] Five new interaction tests pass; full suite 1,397 passing, zero failures (1,392 prior + five). Preview build OK; public profile redirects to /auth with zero runtime errors. Normal records all have WhsScore.id; malformed no-id rows remain noninteractive. Live authenticated taps and visual geometry remain unverified on external/unmanaged Supabase. No SQL/migrations; feed_config untouched, round_pool_cap 30.
+
 ## BRIEF_HANDICAP_TAB_REBUILD_6B
 - [x] Confirm clbhouz; remove FloorSection, its derivations and 19 dedicated tests, and English handicap.floor keys; supersedes 6A.
 - [x] Preserve pickCourse and PersonalBestsSection exactly, with the requested remaining section order.

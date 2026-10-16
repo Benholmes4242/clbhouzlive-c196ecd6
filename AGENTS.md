@@ -1,8 +1,8 @@
 # Architecture rules
 
-Cross-area rules only; single-section rules stay in local architecture comments.
+Cross-area rules; local rules stay in section comments.
 
-- Shared course standings and Top 100 comparison helpers live in `src/lib/gam`; achievement level lookup lives beside the achievement celebration, so removing the handicap Trophy Room cannot remove active course/profile/celebration behaviour.
+- Shared standings/Top 100 helpers live in `src/lib/gam`; achievement levels live beside celebrations, preserving active consumers after Trophy Room removal.
 
 - Profile course archive overrides are scoped by `courses-archive`, with an opt-in archive appearance on shared region controls, so matching its mock cannot restyle other course filters or section headings.
 
@@ -10,11 +10,11 @@ Cross-area rules only; single-section rules stay in local architecture comments.
 - Member Radar panels read only the Stage 3 member hooks; legacy member details serve existing More actions only, so analytics displays cannot silently fall back to unrelated client reads.
 - Message entrypoints hand optional focus and return navigation through the existing start-conversation hook, so server messaging refusals remain authoritative and no entrypoint sends automatically.
 
-- Profile handicap index surfaces use `HcpTrendChart` as their canonical plot renderer, so chart styling and interaction markers stay consistent.
+- Profile handicap plots use `HcpTrendChart`, keeping styling and interaction markers consistent.
 - `whs/pickCourse.ts` is shared by AgeingOut and PersonalBests; section removal must preserve their course selection.
 - Tour tee-alert toggles use `tourOptimisticToggle` for cache writes and per-id rollback, because invalidation alone does not refresh this app's mounted queries.
 - Every surface that prints a course aggregate rating reads `COURSE_RATING_FLOOR` (`courseRatingFloor.ts`), so card, rails and ranker agree on one sample floor.
-- Selected Tour venue photos take precedence in batch and single-venue resolution, so Overview and Tournament Detail agree.
+- Selected Tour venue photos win batch and single-venue resolution, keeping Overview and Tournament Detail consistent.
 - Leaderboard row sizes live only in `courseled/rowMetrics.ts`, as two named scales: board rows read `BOARD_ROW_METRICS`, season rows read `SEASON_ROW_METRICS`, so the intended hierarchy is stated in one place and no call site defines a row size.
 - A date states its year unless an ancestor already does: rows and slabs with no year-stating header use `playDateStandalone`; rows under a year-stating group use `playDateUnderYearHeader` (`discoverWhen.ts`), so no screen prints an undated date with nothing above it saying the year.
 - A local copy of a design value that has a token is a fork, whether or not it currently matches. Ink, surfaces and canvases have owners: read them from `@/lib/tokens/surface` and `@/lib/tokens/surfaces` and never redeclare the value. THE BRAND AMBER `#F7931E` HAS NO OWNER YET — it is declared raw in around 105 files and partially owned by four modules (`frostPanel.amber`, `gam/visuals.rare`, `reactionKind.AMBER`, `PROFILE_PILL_SURFACES.active`). Until it has a single home, a local amber is the existing state rather than a new fork: do not add more, do not promote any of the four part-owners to canon, and do not fix it one file at a time.
@@ -23,3 +23,5 @@ Cross-area rules only; single-section rules stay in local architecture comments.
   - NOTE: an app-wide check of which readers CHOOSE between the columns rather than merely loading them has not been done. Start from this list: ProfilePageV2, ManageProfile, useUserProfile, useUserByUsername, useProfileSave, useProfileForm, profile-wizard/types, SettingsTabContent, RoundDetailSheet, usePostLikers, useEchoSuggestions, admin useUsers, review-island/overrides, types/profile, lib/supabase/selects.
 - The admin Analytics page and its header pill read figures only from the five `get_admin_analytics_*` RPCs via `useAnalyticsLenses.ts`, never tables, because browser reads truncate at the row cap and staff filtering belongs to the server.
 - The admin Health page and the drawer's Health dot read figures only from the `get_admin_health_*` RPCs (`useHealthLenses.ts`) and the existing service hooks, and share one verdict (`useHealthVerdict` in `components/health/healthIssues.ts`), so the dot and the page cannot disagree and no Health panel reads a table.
+
+- Record, counting-round and log rows open `RoundDetailSheet` by score id with the known profile owner, keeping one scorecard and member context.
