@@ -1322,6 +1322,10 @@
       "kicker": "What people say",
       "title_one": "{{score}} from one golfer",
       "title_other": "{{score}} from {{golfers}} golfers"
+    },
+    "populations": {
+      "everyRound": "Every round played here",
+      "everyRoundWithYours": "Every round played here, including yours"
     }
   },
   "courseHero": {
