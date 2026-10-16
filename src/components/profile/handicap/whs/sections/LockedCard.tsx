@@ -51,7 +51,7 @@ export function lockFacts(recentFirst: readonly Scored[]): LockFacts | null {
 
 const fmt = (d: number) => (d < 0 ? `\u2212${Math.abs(d).toFixed(1)}` : d.toFixed(1));
 
-const LockedCard: React.FC<{ connectionId: string }> = ({ connectionId }) => {
+const LockedCard: React.FC<{ connectionId: string; ageingOutPresent?: boolean }> = ({ connectionId, ageingOutPresent = false }) => {
   const { t } = useTranslation(['common']);
   const { data: scores } = useAllScores(connectionId);
   const facts = scores ? lockFacts(scores) : null;
@@ -69,6 +69,7 @@ const LockedCard: React.FC<{ connectionId: string }> = ({ connectionId }) => {
       <p style={{ margin: '4px 0 0', fontSize: 12.5, fontWeight: 400, lineHeight: 1.45, color: CHART.MUTE }}>
         {t('common:handicap.lock.body', { worst: fmt(facts.worstCounting),
         })}
+        {ageingOutPresent && <> {' '}{t('common:handicap.lock.ageingBridge')}</>}
       </p>
     </div>
   );

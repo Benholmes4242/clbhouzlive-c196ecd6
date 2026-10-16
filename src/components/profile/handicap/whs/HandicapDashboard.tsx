@@ -25,7 +25,7 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 
 import IndexSection from './sections/IndexSection';
 import LockedCard from './sections/LockedCard';
-import AgeingOutSection from './sections/AgeingOutSection';
+import AgeingOutSection, { useAgeingOutState } from './sections/AgeingOutSection';
 import RoundsThatCountSection from './sections/RoundsThatCountSection';
 import HolesSection from './sections/HolesSection';
 import FloorSection from './sections/FloorSection';
@@ -54,6 +54,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
   // ── Trend (used by hero + passed to sections as currentHandicap) ───────
   const { data: trend } = useHandicapTrend(connection.id);
   const currentHandicap = trend?.current ?? null;
+  const ageingOutState = useAgeingOutState(connection.id, currentHandicap);
 
   const viewMode: 'owner' | 'friend' = readOnly ? 'friend' : 'owner';
 
@@ -113,10 +114,10 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       */}
 
       {/* 1 — HANDICAP INDEX */}
-      <IndexSection connection={connection} belowHeadline={<LockedCard connectionId={connection.id} />} />
+      <IndexSection connection={connection} belowHeadline={<LockedCard connectionId={connection.id} ageingOutPresent={ageingOutState != null} />} />
 
       {/* 1b — AGEING OUT (renders only when a counter is about to expire) */}
-      <AgeingOutSection connectionId={connection.id} currentHandicap={currentHandicap} />
+      <AgeingOutSection state={ageingOutState} />
 
       {/* 2 — ROUNDS THAT COUNT (the "Next round" dial section was cut in
           phase 1.6: no dial, no score stepper, no course picker) */}

@@ -1,5 +1,9 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_HANDICAP_TAB_REBUILD_2B
+- [ ] Clarify lock and ageing-out framing; share the existing ageing-out gate without changing maths or layout.
+- [ ] Verify bridge present/absent regression and full-suite failure baseline; report authenticated-check limits.
+
 ## Profile Courses exact mock — 15 October
 - [x] Match the Still to rate, Archive controls, year header and flat course rows to the uploaded mock; preserve real photos/counts and existing row expansion.
 - [x] Verify populated local rendering and controls at 320/472/628px; full suite passes. Hosted authenticated checks remain unavailable on external Supabase.
