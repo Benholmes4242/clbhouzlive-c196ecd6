@@ -68,7 +68,7 @@ import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import {
-  LAST_N, SEASON_MIN_ROUNDS, aggregate, allSeasons, edgeSummary, fieldExcludingViewer, firstN,
+  LAST_N, NOBODY_CLOSE_SHARE, SEASON_MIN_ROUNDS, aggregate, allSeasons, edgeSummary, fieldExcludingViewer, firstN,
   goodRounds, holeEdges, lastN, openHolesState, scoredRounds,
 } from '@/lib/courseYou/youDerivations';
 import { ordinal } from './you/youBits';
@@ -514,7 +514,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     reach.push({ key: 'diff', name: 'Best differential', sub: `Your ${d}`, value: d, mark: rankMark(diff), near: diff.rank === 1 });
   }
   if (roundsRow?.value != null) {
-    const clear = roundsRow.rank === 1 && roundsRow.next_value != null && roundsRow.next_value <= roundsRow.value / 2;
+    const clear = roundsRow.rank === 1 && roundsRow.next_value != null && roundsRow.next_value <= roundsRow.value * NOBODY_CLOSE_SHARE;
     reach.push({ key: 'rounds', name: 'Rounds played', sub: clear ? 'Nobody is close' : `Your ${roundsRow.value} rounds`, value: String(roundsRow.value), mark: ordinal(roundsRow.rank), near: roundsRow.rank === 1 });
   }
 
@@ -534,7 +534,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         bestThisYear={seasonsAll.find((x) => x.year === thisYear)?.best ?? null}
         mostRoundsHere={roundsRow?.rank === 1}
       />
-      <YearsSection seasons={qualifying} year={thisYear} firstTwenty={first20} lastForty={last40} held={held} />
+      <YearsSection seasons={qualifying} omitted={seasonsAll.filter((x) => x.count < SEASON_MIN_ROUNDS)} year={thisYear} firstTwenty={first20} lastForty={last40} held={held} />
       <GoodRoundsSection g={goodRounds(history)} seasons={seasonsAll.length} />
       <EdgeSection
         edges={edges}

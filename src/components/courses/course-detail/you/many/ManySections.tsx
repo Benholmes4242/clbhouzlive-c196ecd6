@@ -83,7 +83,16 @@ export const VerdictSection: React.FC<VerdictProps> = (p) => {
 
 /* ================= P2.4 years ================= */
 
-export const YearsSection: React.FC<{ seasons: Season[]; year: number; firstTwenty: number | null; lastForty: number | null; held: boolean }> = ({ seasons, year, firstTwenty, lastForty, held }) => {
+/**
+ * BRIEF_YOU_TAB_1B C2 — this chart asks "how did each SEASON THAT MEETS THE
+ * MINIMUM play?" and draws only those; the Verdict's "Seasons here" tile asks
+ * "in how many calendar years did you play here at all?". Different questions,
+ * deliberately different counts; the lede names the minimum and the omissions.
+ */
+const listYears = (ys: number[]) => ys.length <= 1 ? ys.join('') : `${ys.slice(0, -1).join(', ')} and ${ys[ys.length - 1]}`;
+const countsList = (cs: number[]) => { const w = cs.map((c) => words(c)); return w.length <= 1 ? w.join('') : `${w.slice(0, -1).join(', ')} and ${w[w.length - 1]}`; };
+
+export const YearsSection: React.FC<{ seasons: Season[]; omitted?: Season[]; year: number; firstTwenty: number | null; lastForty: number | null; held: boolean }> = ({ seasons, omitted = [], year, firstTwenty, lastForty, held }) => {
   const drawn = seasons.filter((s) => s.avgGross != null);
   if (drawn.length < 2) return null;
   const avgs = drawn.map((s) => s.avgGross as number);
@@ -96,6 +105,12 @@ export const YearsSection: React.FC<{ seasons: Season[]; year: number; firstTwen
   const gain = firstTwenty != null && lastForty != null && lastForty < firstTwenty;
   return (
     <Sec kicker="Your years here" title={gain ? 'Where the gain actually came' : null}>
+      <Lede>
+        Seasons with at least {words(SEASON_MIN_ROUNDS)} rounds.
+        {omitted.length > 0
+          ? ` Your ${listYears(omitted.map((o) => o.year))} ${omitted.length === 1 ? 'was' : 'were'} ${countsList(omitted.map((o) => o.count))} ${plural(omitted[omitted.length - 1].count, 'round', 'rounds')}, so ${omitted.length === 1 ? 'it is' : 'they are'} not drawn.`
+          : null}
+      </Lede>
       <svg viewBox={`0 0 ${W} 92`} width="100%" height={92} style={{ display: 'block', marginTop: 13 }} role="img" aria-label="Your average gross by season">
         {drawn.map((s, i) => {
           const cx = slot * i + slot / 2; const hh = h(s.avgGross as number); const on = s.year === year;

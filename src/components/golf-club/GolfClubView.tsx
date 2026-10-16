@@ -371,7 +371,9 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         onClose={closeRoundsSheet}
         courseId={course.id}
         courseName={course.name}
-        fieldAverage={fieldGross}
+        fieldOverPar={courseStats?.avg_over_par ?? null}
+        fieldRounds={courseStats?.rounds_tracked ?? null}
+        coursePar={courseMeta?.course_par ?? null}
       />
       <YourHolesSheet
         open={yourHolesSheetOpen}
@@ -406,7 +408,9 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         onClose={closeRoundsSheet}
         courseId={course.id}
         courseName={course.name}
-        fieldAverage={fieldGross}
+        fieldOverPar={courseStats?.avg_over_par ?? null}
+        fieldRounds={courseStats?.rounds_tracked ?? null}
+        coursePar={courseMeta?.course_par ?? null}
       />
       <YourHolesSheet
         open={yourHolesSheetOpen}
