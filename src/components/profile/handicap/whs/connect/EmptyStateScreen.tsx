@@ -565,13 +565,9 @@ const TrustSection: React.FC = () => {
     </section>
   );
 };
-        </div>
-      ))}
-    </div>
-  </section>
-);
 
 const EndBlock = React.forwardRef<HTMLDivElement, { onPickCountry: () => void; onDecline?: () => void; h: number; circleShown: boolean }>(({ onPickCountry, onDecline, h, circleShown }, ref) => {
+  const { t } = useTranslation('handicap');
   const live = WHS_COUNTRIES.filter((c) => c.supported).map((c) => c.name);
   const notYet = WHS_COUNTRIES.filter((c) => !c.supported).length;
   const liveText = live.length <= 1 ? live[0] ?? '' : `${live.slice(0, -1).join(', ')} and ${live[live.length - 1]}`;
@@ -581,15 +577,15 @@ const EndBlock = React.forwardRef<HTMLDivElement, { onPickCountry: () => void; o
   };
   return (
     <div ref={ref} style={{ marginTop: 36, display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <button type="button" onClick={cta} style={primaryCtaStyle}>Connect your handicap</button>
-      <div style={{ textAlign: 'center', fontSize: 12.5, lineHeight: 1.5, color: DIMMER }}>Works with official handicaps. {liveText} is live now, with {notYet} more countries on the way.</div>
+      <button type="button" onClick={cta} style={primaryCtaStyle}>{t('whsConnect.intro.connectCta')}</button>
+      <div style={{ textAlign: 'center', fontSize: 12.5, lineHeight: 1.5, color: DIMMER }}>{t('whsConnect.intro.endLine', { live: liveText, count: notYet })}</div>
       {onDecline ? <DeclineButton onClick={onDecline} /> : null}
     </div>
   );
 });
 EndBlock.displayName = 'EndBlock';
 
-export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) => {
+export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline, layout = 'page' }) => {
   const qc = useQueryClient();
   const { user, loading: sessionLoading } = useSupabaseSession();
   const userId = user?.id;
@@ -613,8 +609,10 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
   const stageRef = React.useRef<HTMLDivElement>(null);
   const endRef = React.useRef<HTMLDivElement>(null);
   const [footerHidden, setFooterHidden] = React.useState(false);
+  const [footerDisplay, setFooterDisplay] = React.useState(true);
   const triedRef = React.useRef(false);
   const viewedRef = React.useRef(false);
+  const immersive = layout === 'page';
 
   const onChange = () => openHomeClubPicker({
     onSelected: () => {
@@ -632,20 +630,26 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
   };
 
   React.useEffect(() => {
-    const root = stageRef.current;
     const target = endRef.current;
-    if (!root || !target) return;
-    const obs = new IntersectionObserver(([entry]) => setFooterHidden(entry.intersectionRatio >= 0.6), { root, threshold: [0, 0.6, 1] });
+    if (!immersive || !target) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      const ratio = entry?.intersectionRatio ?? 0;
+      setFooterHidden((current) => nextFooterHidden(current, ratio));
+    }, { root: null, threshold: [0, 0.3, 0.6, 1] });
     obs.observe(target);
     return () => obs.disconnect();
-  }, [intro.data, band.data]);
+  }, [immersive, intro.data, band.data]);
+
+  React.useEffect(() => {
+    if (!footerHidden) setFooterDisplay(true);
+  }, [footerHidden]);
 
   const pending = !homeSettled || intro.isPending || (!!userId && profile.isPending) || (!!intro.data && band.isPending);
   if (pending) {
     return (
       <>
         <Stage ref={stageRef}>{null}</Stage>
-        <FooterBar>{null}</FooterBar>
+        {immersive ? <FooterBar>{null}</FooterBar> : null}
       </>
     );
   }
@@ -654,23 +658,28 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
   if (!band.data || band.data.available === false || !band.data.all) return <LegacyFallback onPickCountry={onPickCountry} onDecline={onDecline} />;
 
   const block = band.data.band ?? band.data.all;
+  const dataHcp = band.data.hcp;
   const circleShown = !!circle.isFetched && (circle.data?.connected ?? 0) > 0;
 
-  if (!viewedRef.current) {
+  React.useEffect(() => {
+    if (viewedRef.current) return;
     viewedRef.current = true;
-    analyticsEvents.track('connect_intro_viewed', { source: intro.data.source, band: !!band.data.band, h0 });
-  }
+    analyticsEvents.track('connect_intro_viewed', { source: intro.data?.source ?? null, band: !!band.data?.band, h0 });
+  }, [band.data?.band, h0, intro.data?.source]);
 
   return (
-    <Stage ref={stageRef}>
-      <FirstScreen course={intro.data} block={block} band={band.data.band} h={h} setH={setH} hasHomeClub={home.clubId != null} onChange={onChange} onPickCountry={onPickCountry} onDecline={onDecline} footerHidden={footerHidden} fetching={band.isFetching} circleShown={circleShown} />
-      <YouTable block={block} all={band.data.all} band={band.data.band} h={h} />
-      <ExampleBlock />
-      {circle.isFetched && circle.data ? <CircleSection preview={circle.data} h={h} /> : null}
-      <TrustSection />
-      <EndBlock ref={endRef} onPickCountry={onPickCountry} onDecline={onDecline} h={h} circleShown={circleShown} />
-      <div style={{ height: 40 }} />
-    </Stage>
+    <>
+      <Stage ref={stageRef}>
+        <FirstScreen course={intro.data} block={block} band={band.data.band} h={h} dataHcp={dataHcp} setH={setH} hasHomeClub={home.clubId != null} onChange={onChange} fetching={band.isFetching} />
+        <YouTable block={block} all={band.data.all} band={band.data.band} h={dataHcp} />
+        <ExampleBlock />
+        {circle.isFetched && circle.data ? <CircleSection preview={circle.data} h={dataHcp} /> : null}
+        <TrustSection />
+        <EndBlock ref={endRef} onPickCountry={onPickCountry} onDecline={onDecline} h={dataHcp} circleShown={circleShown} />
+        <div style={{ height: 40 }} />
+      </Stage>
+      {immersive ? <IntroFooter hidden={footerHidden} display={footerDisplay} onTransitionEnd={() => { if (footerHidden) setFooterDisplay(false); }} onPickCountry={onPickCountry} onDecline={onDecline} h={dataHcp} circleShown={circleShown} /> : null}
+    </>
   );
 };
 
