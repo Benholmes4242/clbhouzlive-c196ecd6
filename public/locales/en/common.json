@@ -1,4 +1,49 @@
 {
+  "profile": {
+    "courses": {
+      "map": {
+        "titleOwn": "Your golf, plotted",
+        "titleFriend": "{{possessive}} golf, plotted"
+      },
+      "signature": {
+        "kickerOwn": "HOW YOU RATE",
+        "titleOwn": "What you actually reward",
+        "evenOwn": "You rate the four evenly — none sits more than 0.2 from your average across them.",
+        "voterOwn": "You are a <bold>{{high}}</bold> voter — you mark it {{highGap}} above your average across the four, and {{low}} {{lowGap}} below.",
+        "voterOwnHighOnly": "You are a <bold>{{high}}</bold> voter — you mark it {{highGap}} above your average across the four.",
+        "kickerFriend": "HOW {{name}} RATES",
+        "titleFriend": "What {{name}} actually rewards",
+        "evenFriend": "{{name}} rates the four evenly — none sits more than 0.2 from their average across them.",
+        "voterFriend": "{{name}} is a <bold>{{high}}</bold> voter — marking it {{highGap}} above their average across the four, and {{low}} {{lowGap}} below.",
+        "voterFriendHighOnly": "{{name}} is a <bold>{{high}}</bold> voter — marking it {{highGap}} above their average across the four.",
+        "kickerOther": "HOW THEY RATE",
+        "titleOther": "What they actually reward",
+        "evenOther": "They rate the four evenly — none sits more than 0.2 from their average across them.",
+        "voterOther": "They are a <bold>{{high}}</bold> voter — marking it {{highGap}} above their average across the four, and {{low}} {{lowGap}} below.",
+        "voterOtherHighOnly": "They are a <bold>{{high}}</bold> voter — marking it {{highGap}} above their average across the four."
+      }
+    },
+    "rounds": {
+      "seasonOwn": "Your season",
+      "seasonFriend": "{{possessive}} season",
+      "yearHighlightsOwn": "You play most in {{busiest}} and score best in {{best}}",
+      "yearHighlightsFriend": "{{name}} plays most in {{busiest}} and scores best in {{best}}",
+      "yearHighlightsOther": "They play most in {{busiest}} and score best in {{best}}",
+      "courses": {
+        "titleOwn": "Your five most played",
+        "titleFriend": "{{possessive}} five most played",
+        "kickerOwn": "Where you play",
+        "playedOwn": "You have played {{course}} {{n}} {{times}}, {{pct}}% of your full rounds",
+        "playedOwnNoShare": "You have played {{course}} {{n}} {{times}}",
+        "kickerFriend": "Where {{name}} plays",
+        "playedFriend": "{{name}} has played {{course}} {{n}} {{times}}, {{pct}}% of their full rounds",
+        "playedFriendNoShare": "{{name}} has played {{course}} {{n}} {{times}}",
+        "kickerOther": "Where they play",
+        "playedOther": "They have played {{course}} {{n}} {{times}}, {{pct}}% of their full rounds",
+        "playedOtherNoShare": "They have played {{course}} {{n}} {{times}}"
+      }
+    }
+  },
   "invite": {
     "kicker": "INVITE FRIENDS",
     "title": "Golf's better with your circle",
