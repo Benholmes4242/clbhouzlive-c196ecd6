@@ -188,58 +188,66 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
         })}
       </div>
 
-      {/* §5.5: the outcome distribution, one segmented 7px bar. */}
-      <div
-        aria-hidden
-        style={{ display: 'flex', height: 7, borderRadius: 999, overflow: 'hidden', background: CHART.TRACK, marginTop: 22 }}
-      >
-        {bands.map((b) =>
-          b.pct > 0 ? (
-            <div key={b.key} style={{ width: `${b.pct}%`, background: b.color }} />
-          ) : null,
-        )}
-      </div>
-      <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-        {bands.map((b) => (
-          <div key={b.key} style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1, color: b.pct === 0 ? CHART.MUTE : b.color, ...FIG }}>
-              {Math.round(b.pct)}%
-            </div>
-            <div
-              style={{
-                fontSize: 9, fontWeight: 700, letterSpacing: '0.1em',
-                textTransform: 'uppercase', color: CHART.DIM, marginTop: 5,
-              }}
-            >
-              {b.label}
-            </div>
+      {/* §5.5: the outcome distribution, one segmented 7px bar. 5B L3:
+          absent entirely when the count fields are not present. */}
+      {bands && (
+        <>
+          <div
+            aria-hidden
+            style={{ display: 'flex', height: 7, borderRadius: 999, overflow: 'hidden', background: CHART.TRACK, marginTop: 22 }}
+          >
+            {bands.map((b) =>
+              b.pct > 0 ? (
+                <div key={b.key} style={{ width: `${b.pct}%`, background: b.color }} />
+              ) : null,
+            )}
           </div>
-        ))}
-      </div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+            {bands.map((b) => (
+              <div key={b.key} style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1, color: b.pct === 0 ? CHART.MUTE : b.color, ...FIG }}>
+                  {b.pct}%
+                </div>
+                <div
+                  style={{
+                    fontSize: 9, fontWeight: 700, letterSpacing: '0.1em',
+                    textTransform: 'uppercase', color: CHART.DIM, marginTop: 5,
+                  }}
+                >
+                  {b.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
-      {/* §5.6: the one observation line. */}
-      <p
-        style={{
-          margin: '18px 0 0',
-          borderLeft: `2px solid ${CHART.AMBER}`,
-          paddingLeft: 11,
-          fontSize: 12.5,
-          fontWeight: 400,
-          lineHeight: 1.45,
-          color: A.BODY,
-          ...FIG,
-        }}
-      >
-        {diffPerShot != null
-          ? t('common:handicap.strokes.observation', {
-              doubles: d.doublesPerRound.toFixed(1),
-              diff: diffPerShot.toFixed(1),
-              course: course!.name,
-            })
-          : t('common:handicap.strokes.observationNoCourse', {
-              doubles: d.doublesPerRound.toFixed(1),
-            })}
-      </p>
+      {/* §5.6: the one observation line. 5B L6: doublesPerRound comes from
+          the exact count, so when the counts are absent the line is too. */}
+      {d.doublesPerRound != null && (
+        <p
+          style={{
+            margin: '18px 0 0',
+            borderLeft: `2px solid ${CHART.AMBER}`,
+            paddingLeft: 11,
+            fontSize: 12.5,
+            fontWeight: 400,
+            lineHeight: 1.45,
+            color: A.BODY,
+            ...FIG,
+          }}
+        >
+          {diffPerShot != null
+            ? t('common:handicap.strokes.observation', {
+                doubles: d.doublesPerRound.toFixed(1),
+                diff: diffPerShot.toFixed(1),
+                course: course!.name,
+              })
+            : t('common:handicap.strokes.observationNoCourse', {
+                doubles: d.doublesPerRound.toFixed(1),
+              })}
+        </p>
+      )}
     </HcpSection>
   );
 };
