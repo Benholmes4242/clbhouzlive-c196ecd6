@@ -1082,7 +1082,6 @@
         "fieldShotsHeading": "How {{courseName}} plays",
         "fieldChartLede_one": "Average over par on each hole, across the {{rounds}} round tracked here by every member who has played it.",
         "fieldChartLede_other": "Average over par on each hole, across the {{rounds}} rounds tracked here by every member who has played it.",
-        "birdiesMeta": "0 of 18",
         "birdiesCaption": "Every hole you have birdied here lights up — including rounds you played before you connected.",
         "fillsIn": "Connect once and all of it fills in.",
         "history": "The rounds you have already played here come with it, not just the ones from today onwards."
