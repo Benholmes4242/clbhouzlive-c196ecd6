@@ -73,13 +73,11 @@ describe('C1 course rating consistency', () => {
     expect(courseSubScoreTone(9)).toBe(A.GREEN);
   });
 
-  it('renders the course-hero rating white below 9.0 with no muted fallback', () => {
-    const hero = src('src/components/golf-club/GolfClubView.tsx');
-    /* Green only where the helper says green; every other rating drops the
-       tone so the figure inherits the white the other hero figures use. */
-    expect(hero).toContain('tone={courseSubScoreTone(communityRating) === A.GREEN ? A.GREEN : undefined}');
-    expect(hero).not.toContain('tone={courseSubScoreTone(communityRating)}');
-  });
+  /* WITHDRAWN (BRIEF_COURSE_TAB_1B T1): the hero stat row carried a community
+     rating and needed an override so a sub-9.0 figure read white rather than
+     muted. BRIEF_COURSE_TAB replaced that row with a reference line that carries
+     no rating, so the rule has no surface left on the hero. This is a documented
+     rule being withdrawn with its surface, not a test edited to make a build pass. */
 
   it('renders Berkshire category tones green, muted, green, muted', () => {
     expect([9.3, 8.3, 9.8, 7.1].map(courseSubScoreTone)).toEqual([

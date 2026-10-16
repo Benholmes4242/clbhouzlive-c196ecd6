@@ -25,11 +25,25 @@ describe('BRIEF_COURSE_TAB_1A course verdict', () => {
   it('a nine with missing holes is absent, not partial', () => {
     expect(deriveCourseVerdict(card.slice(0, 17))!.back).toBeNull();
   });
-  it('outcome bands are summed counts that partition the whole', () => {
-    const o = deriveCourseVerdict(card)!.outcomes!;
-    expect([o.birdie, o.par, o.bogey, o.double]).toEqual([18, 90, 54, 18]);
-    expect(o.total).toBe(180);
-    expect(sharePct(o.par, o.total)).toBe(50);
+  it('outcome bands are rounds-weighted from per-hole percentages, each from its own numerator', () => {
+    // Hole 1: 100 rounds, all par. Hole 2: 10 rounds, all bogey.
+    // Unweighted average would say 50% par / 50% bogey; weighted is 100/110 par.
+    const a = { ...hole(1, 4, 0), rounds: 100, dist: { ace: 0, albatross: 0, eagle: 0, birdie: 0, par: 100, bogey: 0, double: 0 } };
+    const b = { ...hole(2, 4, 1), rounds: 10, dist: { ace: 0, albatross: 0, eagle: 0, birdie: 0, par: 0, bogey: 100, double: 0 } };
+    const o = deriveCourseVerdict([a, b])!.outcomes!;
+    expect(o.par).toBeCloseTo(100);
+    expect(o.bogey).toBeCloseTo(10);
+    expect(o.birdie).toBe(0);
+    expect(o.double).toBe(0);
+    expect(o.total).toBeCloseTo(o.birdie + o.par + o.bogey + o.double);
+    expect(sharePct(o.par, o.total)).toBe(91);
+    expect(sharePct(o.bogey, o.total)).toBe(9);
+  });
+  it('birdie-or-better adds ace, albatross, eagle and birdie', () => {
+    const h = { ...hole(1, 5, 0), rounds: 50, dist: { ace: 2, albatross: 4, eagle: 10, birdie: 20, par: 40, bogey: 20, double: 4 } };
+    const o = deriveCourseVerdict([h])!.outcomes!;
+    expect(o.birdie).toBeCloseTo(18);
+    expect(o.par).toBeCloseTo(20);
   });
   it('no holes means no verdict', () => {
     expect(deriveCourseVerdict([])).toBeNull();

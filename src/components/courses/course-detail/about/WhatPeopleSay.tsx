@@ -29,6 +29,7 @@ import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { CategoryScores, OverallScoreLine } from '../CategoryScores';
 import AboutSection, { AboutHairline } from './AboutSection';
+import { shotsInWords } from './courseVerdict';
 
 export { SETTLED_MIN_RATINGS } from '../CategoryScores';
 
@@ -106,8 +107,18 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
     );
   }
 
+  /* BRIEF_COURSE_TAB_1B P1.2 — "8.2 from three golfers", both figures from the
+     aggregate already read above. P1.3: the "N ratings is not a verdict, clbhouz
+     ranks a course once it has ten" line does NOT render — no constant for a
+     ranking threshold of ten exists, and none is to be created. */
+  const title = t('courseDetail.reviewsHead.title', {
+    count: total,
+    score: score.toFixed(1),
+    golfers: shotsInWords(total),
+  });
+
   return (
-    <AboutSection heading={heading}>
+    <AboutSection kicker={t('courseDetail.reviewsHead.kicker')} title={title}>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <OverallScoreLine score={score} ratingCount={total} />

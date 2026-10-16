@@ -8,9 +8,8 @@
  * D3: each nine is the SUM of its holes' averages. Each hole's average rests on
  * whoever played that hole, so a nine is a statement about those holes, never
  * a round score.
- * P2.3: the outcome bands are summed per-hole dist values (the same bucket keys
- * as BUCKETS in HoleRowV2), so the four partition the whole — no band is ever
- * 100 minus the others.
+ * P2.3 / 1B B1: the outcome bands are rounds-weighted counts rebuilt from the
+ * per-hole percentages — see the comment at the aggregation.
  */
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 
@@ -79,14 +78,21 @@ export function deriveCourseVerdict(raw: CourseHole[] | null | undefined): Cours
     null,
   );
 
+  /* BRIEF_COURSE_TAB_1B B1: every dist value is a PER-HOLE PERCENTAGE with
+     that hole's own rounds as denominator. Reconstruct each band's count as
+     pct * rounds / 100 per hole, sum per band, and take the total from the four
+     band totals (not the sum of rounds — the source pcts are rounded). Each
+     band has its own numerator; none is ever 100 minus the others. Birdie-or-
+     better = ace + albatross + eagle + birdie, disjoint in the function. */
   const n = (v: unknown) => (finite(v) ? v : 0);
   const o = holes.reduce(
     (acc, h) => {
       const d = h.dist ?? ({} as CourseHole['dist']);
-      acc.birdie += n(d.ace) + n(d.albatross) + n(d.eagle) + n(d.birdie);
-      acc.par += n(d.par);
-      acc.bogey += n(d.bogey);
-      acc.double += n(d.double);
+      const w = n(h.rounds) / 100;
+      acc.birdie += (n(d.ace) + n(d.albatross) + n(d.eagle) + n(d.birdie)) * w;
+      acc.par += n(d.par) * w;
+      acc.bogey += n(d.bogey) * w;
+      acc.double += n(d.double) * w;
       return acc;
     },
     { birdie: 0, par: 0, bogey: 0, double: 0 },
