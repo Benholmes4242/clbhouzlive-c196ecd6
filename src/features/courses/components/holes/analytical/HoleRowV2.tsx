@@ -105,7 +105,8 @@ export function rankHolesByDifficulty(
 ): Map<number, number> {
   const rankByHole = new Map<number, number>();
   [...holes]
-    .sort((a, b) => b.avg_to_par - a.avg_to_par)
+    /* An unmeasured field hole (NaN) ranks last rather than corrupting the sort. */
+    .sort((a, b) => (Number.isFinite(b.avg_to_par) ? b.avg_to_par : -Infinity) - (Number.isFinite(a.avg_to_par) ? a.avg_to_par : -Infinity) || 0)
     .forEach((h, i) => rankByHole.set(h.hole_no, i + 1));
   return rankByHole;
 }
