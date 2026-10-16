@@ -467,36 +467,39 @@ const YouTable: React.FC<{ block: IntroBlock; all: IntroBlock; band: IntroBand |
 const sectionHeadStyle: React.CSSProperties = { margin: 0, fontSize: 30, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.08, color: SOFT_INK };
 const sectionSubStyle: React.CSSProperties = { margin: '10px 0 0', fontSize: 14, lineHeight: 1.5, color: QUIET };
 
-const ExampleBlock: React.FC = () => (
-  <section style={{ paddingTop: 52 }}>
-    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-      <h2 style={sectionHeadStyle}>After every round</h2>
-      <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: DIMMER }}>Example</span>
-    </div>
-    <p style={sectionSubStyle}>Your rounds arrive on their own, scored hole by hole against the course you played.</p>
-    <div style={{ marginTop: 22, paddingTop: 18, borderTop: `1px solid ${HAIR}` }}>
-      <ExampleTitle n="01" title="The score to beat next time" />
+const ExampleBlock: React.FC = () => {
+  const { t } = useTranslation('handicap');
+  return (
+    <section style={{ paddingTop: 52 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+        <h2 style={sectionHeadStyle}>{t('whsConnect.intro.exampleHeading')}</h2>
+        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: DIMMER }}>{t('whsConnect.intro.exampleKicker')}</span>
+      </div>
+      <p style={sectionSubStyle}>{t('whsConnect.intro.exampleSub')}</p>
+      <div style={{ marginTop: 22, paddingTop: 18, borderTop: `1px solid ${HAIR}` }}>
+        <ExampleTitle n="01" title={t('whsConnect.intro.exampleBeatTitle')} />
       <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 4 }}>
         {EXAMPLE.beat.map((x) => <span key={x.score} style={{ height: 58, borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, border: x.active ? `1.5px solid ${SOFT_INK}` : `1px solid ${HAIR}`, background: x.active ? AVATAR_BG : undefined }}><span style={{ fontSize: 15, fontWeight: 800 }}>{x.score}</span><span style={{ fontSize: 11.5, fontWeight: 700, color: x.good ? GOOD : DIMMER }}>{x.index}</span></span>)}
       </div>
-      <p style={exampleTextStyle}>Shoot 84 at your home course and your index drops to 11.6. 85 or worse changes nothing.</p>
+      <p style={exampleTextStyle}>{t('whsConnect.intro.exampleBeatText')}</p>
     </div>
     <div style={{ marginTop: 26, paddingTop: 18, borderTop: `1px solid ${HAIR}` }}>
-      <ExampleTitle n="02" title="Your last 20, and what counts" />
+      <ExampleTitle n="02" title={t('whsConnect.intro.exampleCountTitle')} />
       <div style={{ marginTop: 14, height: 80, display: 'grid', gridTemplateColumns: 'repeat(20, minmax(0, 1fr))', gap: 3, alignItems: 'end' }}>
         {EXAMPLE.bars.map((height, i) => <span key={i} style={{ height, borderRadius: 4, background: EXAMPLE.counters.has(i) ? GOOD : BAR }} />)}
       </div>
-      <p style={exampleTextStyle}>Your best 8 make your index. See which drop out next, and where your index is heading.</p>
+      <p style={exampleTextStyle}>{t('whsConnect.intro.exampleCountText')}</p>
     </div>
     <div style={{ marginTop: 26, paddingTop: 18, borderTop: `1px solid ${HAIR}` }}>
-      <ExampleTitle n="03" title="Ways to get it down" />
+      <ExampleTitle n="03" title={t('whsConnect.intro.exampleWaysTitle')} />
       <div style={{ marginTop: 12 }}>
-        {EXAMPLE.ways.map((x) => <div key={x.title} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 12, alignItems: 'baseline', padding: '10px 0', borderBottom: `1px solid ${FAINT_HAIR}` }}><span style={{ fontSize: 14.5, fontWeight: 600, color: MID }}>{x.title}</span><span style={{ fontSize: 18, fontWeight: 800, color: GOOD }}>{x.value}</span></div>)}
+        {EXAMPLE.ways.map((x) => <div key={x.titleKey} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 12, alignItems: 'baseline', padding: '10px 0', borderBottom: `1px solid ${FAINT_HAIR}` }}><span style={{ fontSize: 14.5, fontWeight: 600, color: MID }}>{t(`whsConnect.intro.${x.titleKey}`)}</span><span style={{ fontSize: 18, fontWeight: 800, color: GOOD }}>{x.value}</span></div>)}
       </div>
-      <p style={exampleTextStyle}>Worked out by replaying your own counting rounds with one thing changed.</p>
+      <p style={exampleTextStyle}>{t('whsConnect.intro.exampleWaysText')}</p>
     </div>
   </section>
-);
+  );
+};
 
 const ExampleTitle: React.FC<{ n: string; title: string }> = ({ n, title }) => <div style={{ display: 'flex', gap: 12, alignItems: 'baseline' }}><span style={{ fontSize: 13, fontWeight: 800, color: AMBER }}>{n}</span><span style={{ fontSize: 18, fontWeight: 700 }}>{title}</span></div>;
 const exampleTextStyle: React.CSSProperties = { margin: '10px 0 0', fontSize: 13, lineHeight: 1.45, color: QUIET };
