@@ -31,6 +31,9 @@ import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 import { Z } from '@/config/zIndex';
 import { TAB_LEAD_IN } from '@/components/courses/course-detail/about/AboutSection';
 import { useHeroReferenceLine } from '@/components/courses/course-detail/about/useHeroReferenceLine';
+import { useCourseRecordSummary } from '@/components/courses/course-detail/useCourseRecordSummary';
+import { HeroCourseRecord, heroRecordVisible, HERO_RECORD_ROW_EXTRA } from '@/components/courses/course-detail/about/HeroCourseRecord';
+import { SURFACE } from '@/lib/tokens/surface';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import YourRoundsSheet from '@/components/courses/course-detail/you/YourRoundsSheet';
 import YourHolesSheet from '@/components/courses/course-detail/you/YourHolesSheet';
@@ -130,6 +133,9 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
   const { data: ratingAggregate } = useCourseRatingAggregates(courseId);
   const { data: courseMeta } = useCourseMeta(courseId);
+  // Same read as the record boards (useCourseLegends query, deduped by cache).
+  const { courseRecordHolders } = useCourseRecordSummary(courseId, user?.id ?? null);
+  const heroHeight = EXPLORE_COURSE_HERO_HEIGHT + (heroRecordVisible(courseRecordHolders) ? HERO_RECORD_ROW_EXTRA : 0);
   // One course, one destination page the member deliberately navigated to —
   // see the hook header: the "never prefetch" rule is about N courses in a feed.
   const { data: courseStats } = useCourseStatsDetail(courseId, true);
@@ -224,7 +230,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     <div
       className="relative overflow-hidden"
       style={{
-        height: EXPLORE_COURSE_HERO_HEIGHT,
+        height: heroHeight,
         marginTop: 0,
         background: heroImageBackground,
         backgroundColor: A.CANVAS,
@@ -244,6 +250,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         courseStats={courseStats ?? null}
         reviewCount={reviewCount}
         onOpenStats={() => setStatsSheetOpen(true)}
+        recordHolders={courseRecordHolders}
       />
     </div>
   );
@@ -254,7 +261,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       className="relative overflow-hidden"
       style={{
         width: '100%',
-        height: EXPLORE_COURSE_HERO_HEIGHT,
+        height: heroHeight,
         background: heroImageBackground,
         backgroundColor: A.CANVAS,
         display: 'flex',
@@ -271,6 +278,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         courseStats={courseStats ?? null}
         reviewCount={reviewCount}
         onOpenStats={() => setStatsSheetOpen(true)}
+        recordHolders={courseRecordHolders}
       />
     </div>
   );
@@ -439,6 +447,7 @@ interface CourseTitleOverlayProps {
   courseStats: CourseStatsDetail | null;
   reviewCount: number;
   onOpenStats: () => void;
+  recordHolders: import('@/lib/gam/types').CourseLegendRow[];
 }
 
 
@@ -447,6 +456,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   courseStats,
   reviewCount,
   onOpenStats,
+  recordHolders,
 }) => {
   const { t } = useTranslation('courses');
   const rounds = typeof courseStats?.rounds_tracked === 'number' ? courseStats.rounds_tracked : 0;
@@ -494,6 +504,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
         name={course.name}
         place={course.country || null}
       >
+        {(referenceLine || heroRecordVisible(recordHolders)) ? (<>
         {referenceLine ? (
           <button
             type="button"
@@ -508,13 +519,23 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
               border: 0,
               background: 'transparent',
               textAlign: 'left',
-              fontSize: 11.5,
-              color: A.MUTE,
+              fontSize: 13,
+              fontWeight: 600,
+              letterSpacing: '-0.005em',
+              // Spec value (hero-option-a): no surface tier owns 0.78 on this base yet.
+              color: 'rgba(248,250,252,0.78)',
             }}
           >
-            {referenceLine}
+            {referenceLine.split(' \u00B7 ').map((part, i) => (
+              <React.Fragment key={i}>
+                {i > 0 && <span style={{ fontWeight: 500, color: SURFACE.dark.dim }}>{' \u00B7 '}</span>}
+                {part}
+              </React.Fragment>
+            ))}
           </button>
         ) : null}
+        <HeroCourseRecord holders={recordHolders} />
+        </>) : null}
       </CourseMasthead>
 
       {/* CR / SLOPE is deliberately NOT rendered here: get_course_meta resolves
