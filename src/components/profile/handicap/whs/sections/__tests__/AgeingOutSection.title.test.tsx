@@ -2,7 +2,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
-import common from '../../../../../../../../public/locales/en/common.json';
+import common from '../../../../../../../public/locales/en/common.json';
 import AgeingOutSection from '../AgeingOutSection';
 
 const state = vi.hoisted(() => ({ isBest: true, inRounds: 1 }));
