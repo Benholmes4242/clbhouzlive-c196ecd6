@@ -4,6 +4,8 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
+import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
+import { holeEdges } from '@/lib/courseYou/youDerivations';
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
@@ -274,19 +276,37 @@ const AllHolesSheet: React.FC<AllHolesSheetProps> = ({ open, onClose, courseId, 
   const myByHole = React.useMemo(() => new Map((myPerf ?? []).map((row) => [row.hole_no, row])), [myPerf]);
   const hasYou = myByHole.size > 0 && holes.some((hole) => myByHole.has(hole.hole_no));
   const rounds = Number(data?.total_rounds ?? 0);
+  /*
+   * FIELD_EXCLUDES_VIEWER (F1). Every figure labelled "Field" on this sheet is
+   * the field EXCLUDING the viewer: get_course_hole_field minus that hole's par
+   * from get_course_hole_analysis, via the shared holeEdges derivation — the
+   * same source as the You tab. get_course_hole_analysis's own avg_to_par
+   * includes the viewer and is used only when nobody is signed in (so there is
+   * no viewer to contain). The distribution bars and the SI ladder stay on the
+   * inclusive analysis: they are facts about the course, not comparisons.
+   * An unmeasured field hole is NaN, which every renderer here draws as blank.
+   */
+  const { data: holeField } = useCourseHoleField(courseId, user?.id, { enabled: open });
+  const fieldHoles = React.useMemo<CourseHole[]>(() => {
+    if (!user?.id) return holes;
+    const edges = holeEdges(holes, holeField?.available ? holeField.holes : [], []);
+    const byHole = new Map(edges.map((edge) => [edge.hole_no, edge.field]));
+    return holes.map((hole) => ({ ...hole, avg_to_par: byHole.get(hole.hole_no) ?? Number.NaN }));
+  }, [holes, holeField, user?.id]);
   const stats = React.useMemo(() => {
-    if (holes.length === 0) return null;
-    const fieldAvg = holes.reduce((sum, hole) => sum + hole.avg_to_par, 0) / holes.length;
-    const mine = holes.map((hole) => myByHole.get(hole.hole_no)).filter((row): row is MyHolePerformanceRow => row != null);
+    if (fieldHoles.length === 0) return null;
+    const measured = fieldHoles.filter((hole) => Number.isFinite(hole.avg_to_par));
+    const fieldAvg = measured.length ? measured.reduce((sum, hole) => sum + hole.avg_to_par, 0) / measured.length : Number.NaN;
+    const mine = fieldHoles.map((hole) => myByHole.get(hole.hole_no)).filter((row): row is MyHolePerformanceRow => row != null);
     const yourAvg = mine.length ? mine.reduce((sum, row) => sum + row.avg_to_par, 0) / mine.length : null;
-    const beat = holes.filter((hole) => {
+    const beat = measured.filter((hole) => {
       const yours = myByHole.get(hole.hole_no);
       return yours != null && yours.avg_to_par < hole.avg_to_par;
     }).length;
     return { fieldAvg, yourAvg, beat, compared: mine.length };
-  }, [holes, myByHole]);
+  }, [fieldHoles, myByHole]);
   const shares: BucketShares | null = React.useMemo(() => courseBucketShares(holes), [holes]);
-  const parRows = React.useMemo(() => buildParTypeRows(holes, myByHole), [holes, myByHole]);
+  const parRows = React.useMemo(() => buildParTypeRows(fieldHoles, myByHole), [fieldHoles, myByHole]);
   const ladder = React.useMemo(() => buildSiLadder(holes, rounds), [holes, rounds]);
 
   const trackedOpen = React.useRef(false);
@@ -344,7 +364,7 @@ const AllHolesSheet: React.FC<AllHolesSheetProps> = ({ open, onClose, courseId, 
             <AboutSection heading={t('courseDetail.allHolesSheet.holes')}>
               {shares ? <DistributionSummary shares={shares} /> : null}
               <div style={{ marginTop: shares ? 16 : 0 }}>
-                {holes.map((hole, index) => (
+                {fieldHoles.map((hole, index) => (
                   <CompactHoleRow key={hole.hole_no} hole={hole} mine={myByHole.get(hole.hole_no) ?? null} hasYou={hasYou} last={index === holes.length - 1} />
                 ))}
               </div>
