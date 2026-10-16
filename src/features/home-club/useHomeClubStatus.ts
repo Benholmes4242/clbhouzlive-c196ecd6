@@ -23,7 +23,7 @@ const EMPTY: HomeClubStatus = {
  * answered and is never prompted.
  */
 export function useHomeClubStatus(userId: string | undefined) {
-  const { data = EMPTY, isLoading } = useQuery({
+  const { data = EMPTY, isLoading, isFetched, isSuccess } = useQuery({
     queryKey: ['home-club-status', userId],
     enabled: !!userId,
     staleTime: 60_000,
@@ -63,5 +63,5 @@ export function useHomeClubStatus(userId: string | undefined) {
     },
   });
 
-  return { ...data, isLoading };
+  return { ...data, isLoading, isFetched, isSuccess };
 }
