@@ -149,16 +149,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <CourseFactsAndTees courseId={course.id} />
         <DefendsPar courseId={course.id} courseName={course.name} />
 
-        {/* §3.5 — THE RECORD BOOK, flat. Same read as the Panel version
-            (useCourseRecordSummary over get_course_legends); CourseRecordBook.tsx
-            itself is untouched. It owns its own 20px gutter, so it sits OUTSIDE
-            the padded block below. */}
-        <RecordBook
-          courseId={course.id}
-          courseName={course.name}
-          onSeeAll={() => onTabChange?.('legends')}
-        />
-
         {/* §3.6 — WHAT PEOPLE SAY, flat. The score and the viewer's own score
             only; the five-bar histogram and the four category scores render on
             the Reviews tab instead (nothing deleted). */}
@@ -167,6 +157,16 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           courseName={course.name}
           onRateClick={handleRateClick}
           onSeeAllReviews={() => onTabChange?.('reviews')}
+        />
+
+        {/* §3.5 — THE RECORD BOOK, flat. Same read as the Panel version
+            (useCourseRecordSummary over get_course_legends); CourseRecordBook.tsx
+            itself is untouched. It owns its own 20px gutter, so it sits OUTSIDE
+            the padded block below. */}
+        <RecordBook
+          courseId={course.id}
+          courseName={course.name}
+          onSeeAll={() => onTabChange?.('legends')}
         />
 
         {/* BRIEF_COURSE_TAB_1A P3.2 — Who plays here is OFF this tab: it counted
