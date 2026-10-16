@@ -278,8 +278,9 @@ export const FooterBar: React.FC<{ children: React.ReactNode }> = ({ children })
  * safe-area inset, owned by the host) stops - together they put the kicker
  * about 54px below the physical top edge on a notched device.
  */
-export const Stage: React.FC<{ children: React.ReactNode; fill?: boolean }> = ({ children, fill = false }) => (
+export const Stage = React.forwardRef<HTMLDivElement, { children: React.ReactNode; fill?: boolean }>(({ children, fill = false }, ref) => (
   <div
+    ref={ref}
     style={{
       flex: 1,
       minHeight: 0,
@@ -291,7 +292,8 @@ export const Stage: React.FC<{ children: React.ReactNode; fill?: boolean }> = ({
   >
     {children}
   </div>
-);
+));
+Stage.displayName = 'Stage';
 
 /**
  * The stage headline block: kicker, DISPLAY headline, one lead sentence.

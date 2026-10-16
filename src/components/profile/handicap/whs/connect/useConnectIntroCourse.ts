@@ -26,6 +26,7 @@ export function stripClubSuffix(name: string): string {
 
 export interface ConnectIntroCourse {
   source: 'home' | 'top100';
+  courseId: string;
   courseName: string;
   holes: CourseHole[];
   totalRounds: number;
@@ -46,10 +47,11 @@ async function analyse(courseId: string): Promise<{ holes: CourseHole[]; totalRo
   }
 }
 
-export function useConnectIntroCourse(clubId: string | null) {
+export function useConnectIntroCourse(clubId: string | null, enabled = true) {
   return useQuery({
-    queryKey: ['connect-intro-course', clubId],
+    queryKey: ['connect-intro-course', enabled ? clubId : 'disabled'],
     staleTime: 5 * 60_000,
+    enabled,
     queryFn: async (): Promise<ConnectIntroCourse | null> => {
       if (clubId) {
         const { data: courses } = await supabase
@@ -63,14 +65,14 @@ export function useConnectIntroCourse(clubId: string | null) {
         const best = results
           .filter((x) => x.r != null)
           .sort((a, b) => b.r!.totalRounds - a.r!.totalRounds)[0];
-        if (best) return { source: 'home', courseName: best.c.name, ...best.r! };
+        if (best) return { source: 'home', courseId: best.c.id, courseName: best.c.name, ...best.r! };
       }
       for (const id of CONNECT_INTRO_FALLBACK_COURSE_IDS) {
         const r = await analyse(id);
         if (!r) continue;
         const { data: course } = await supabase.from('golf_courses').select('name').eq('id', id).maybeSingle();
         if (!course?.name) continue;
-        return { source: 'top100', courseName: course.name, ...r };
+        return { source: 'top100', courseId: id, courseName: course.name, ...r };
       }
       return null;
     },
