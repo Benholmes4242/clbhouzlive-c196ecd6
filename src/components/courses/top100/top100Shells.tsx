@@ -18,14 +18,13 @@ import {
   HEAD_GAP, HEAD_KICKER_SIZE, HEAD_TITLE_GAP, HEAD_TITLE_LINE_HEIGHT, HEAD_TITLE_SIZE, SECTION_WRAP,
 } from '@/components/courses/browse/SectionHead';
 import { TOP100_PHOTO_H } from '../BrowseCourseCard';
+import { TOP100_CARD_GAP } from '../Top100CoursesHubPanel';
 import {
   cellStyle, HUNDRED_CELL_RADIUS, HUNDRED_COLS, HUNDRED_FIGURE, HUNDRED_GAP, HUNDRED_GRID_H,
   HUNDRED_GRID_TOP, HUNDRED_LEGEND, HUNDRED_ROWS,
 } from './YourHundredSection';
 import { ARGUMENT_ROW_GAP, ARGUMENT_THUMB } from './TheArgumentSection';
 
-/** Real gap between top100 cards (Top100CoursesHubPanel card wrapper marginBottom). */
-export const TOP100_CARD_GAP = 32;
 
 function Head({ children }: { children: React.ReactNode }) {
   return (

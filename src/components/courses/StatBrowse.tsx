@@ -47,7 +47,10 @@ import {
 import { RailChips } from '@/components/ui/RailChips';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import { Z } from '@/config/zIndex';
-import { BrowseCourseCard } from './BrowseCourseCard';
+import { BrowseCourseCard, PHOTO_H as BROWSE_PHOTO_H } from './BrowseCourseCard';
+
+/** Gap between browse cards; the list and its shell both read it. */
+const STAT_BROWSE_CARD_GAP = 32;
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
@@ -752,10 +755,18 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
 
       {/* ── List ────────────────────────────────────────────────── */}
       {isLoading ? (
-        <div className="mt-4 -mx-4 space-y-2 sm:space-y-6">
-          {[0, 1, 2].map((i) => (
-            /* Square because the real browse photo is full-bleed with no radius. */
-            <Skeleton key={i} className="w-full aspect-[16/9.5]" style={{ borderRadius: 0 }} />
+        /* BRIEF_COURSES_SKELETONS 4.2-4.4: one shell per page row, the real gap,
+           and the photo only — everything under the browse photo is conditional
+           (plays-to line; CategoryScores returns null with no scores), so the
+           photo is the card's smallest settled state. Square: the real photo is
+           full-bleed with no radius. */
+        <div aria-hidden className="mt-4 -mx-4">
+          {Array.from({ length: STAT_BROWSE_PAGE_SIZE }, (_, i) => (
+            <Skeleton
+              key={i}
+              className="w-full"
+              style={{ height: BROWSE_PHOTO_H, borderRadius: 0, marginBottom: i < STAT_BROWSE_PAGE_SIZE - 1 ? STAT_BROWSE_CARD_GAP : 0 }}
+            />
           ))}
         </div>
       ) : showEmpty && areaHasTracked === null ? null : showEmpty &&
@@ -884,7 +895,7 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
           ) : null}
           {visibleRows.map((row, i) => {
             return (
-              <div key={row.course_id} style={{ marginBottom: i < visibleRows.length - 1 ? 32 : 0 }}>
+              <div key={row.course_id} style={{ marginBottom: i < visibleRows.length - 1 ? STAT_BROWSE_CARD_GAP : 0 }}>
                 <BrowseCourseCard
                   row={row}
                   difficultyPercentile={browseTruth?.difficultyPercentiles.get(row.course_id)}
