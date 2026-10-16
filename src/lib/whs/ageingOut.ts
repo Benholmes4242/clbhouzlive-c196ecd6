@@ -11,15 +11,17 @@
  * from is_counter (countsTowardIndex), never restated here.
  */
 import type { WhsScoreWithIndex } from './types';
-import { projectNextRound } from './handicapMath';
 import { countsTowardIndex, counterWindow } from './counting';
-import { differentialFromGross, indexWithCandidate } from './coursePlay';
+import { differentialFromGross, indexFromDifferentials, indexWithCandidate } from './coursePlay';
 
 export const AGEING_MIN_ROUNDS = 20;
 /** Same horizon as RoundsThatCountSection's falling walk. */
 export const AGEING_HORIZON = 5;
-/** Most repetitions of a lesser score we will search. */
-const MAX_REPEATS = AGEING_HORIZON;
+/**
+ * Most repetitions of a lesser score we search. Beyond five in a row it stops
+ * being advice a member can act on.
+ */
+export const MAX_REPEATS = 5;
 
 export interface AgeingCourse {
   id: string;
@@ -54,8 +56,20 @@ function indexAfterRepeats(oldestFirst: number[], candidate: number, k: number):
 }
 
 /**
+ * C1 (3A): index after the oldest `n` rounds leave the window and `n`
+ * non-counting rounds enter — drop the oldest n, mean the best eight of the
+ * remaining 20 − n. Same assumption settleAt makes for one round (C2). Null
+ * when fewer than eight remain; no variable denominator.
+ */
+export function settleAfterRounds(oldestFirstDiffs: readonly number[], n: number): number | null {
+  return indexFromDifferentials(oldestFirstDiffs.slice(n));
+}
+
+/**
  * `recentFirst`: the member's scores, newest first. `course`: pickCourse's
  * result for the twenty. Returns null whenever the section must not render.
+ * Gate (3A C3): full twenty, the falling walk finds a counter within the
+ * horizon, and the settled index for that fallsIn is > 0.05 above today.
  */
 export function deriveAgeingOut(
   recentFirst: readonly WhsScoreWithIndex[],
@@ -64,30 +78,29 @@ export function deriveAgeingOut(
 ): AgeingOut | null {
   if (current == null || recentFirst.length < AGEING_MIN_ROUNDS) return null;
   const window = counterWindow(recentFirst) as WhsScoreWithIndex[];
-  const diffs = window.map((r) => r.handicap_differential);
-  if (diffs.some((d) => typeof d !== 'number' || !Number.isFinite(d))) return null;
-
-  const p = projectNextRound(window, current);
-  if (!p.hasData || !p.counterDropping || p.settleAtRaw == null) return null;
-  if (!(p.settleAtRaw > current + 0.05)) return null;
+  if (window.some((r) => typeof r.handicap_differential !== 'number' || !Number.isFinite(r.handicap_differential))) return null;
 
   const oldestFirstRounds = [...window].sort(
     (a, b) => new Date(a.play_date).getTime() - new Date(b.play_date).getTime(),
   );
-  const expiring = oldestFirstRounds[0];
   const oldestFirst = oldestFirstRounds.map((r) => r.handicap_differential as number);
 
-  // The falling walk, oldest first, over the five-round horizon (is_counter).
-  let inRounds: number | null = null;
+  // The falling walk, oldest first, over the horizon (is_counter) — same as
+  // RoundsThatCountSection's.
+  let fallsIn: number | null = null;
   for (let i = 0; i < Math.min(AGEING_HORIZON, oldestFirstRounds.length); i++) {
-    if (countsTowardIndex(oldestFirstRounds[i])) { inRounds = i + 1; break; }
+    if (countsTowardIndex(oldestFirstRounds[i])) { fallsIn = i + 1; break; }
   }
+  if (fallsIn == null) return null;
 
+  const settleRaw = settleAfterRounds(oldestFirst, fallsIn);
+  if (settleRaw == null || !(settleRaw > current + 0.05)) return null;
+
+  const expiring = oldestFirstRounds[fallsIn - 1];
   const all = [...oldestFirst].sort((a, b) => a - b);
   const isBest = (expiring.handicap_differential as number) <= all[0];
-  // Projected: of the remaining nineteen, the eighth-lowest joins the eight.
-  const remaining = oldestFirst.slice(1).sort((a, b) => a - b);
-  const replacement = remaining[7];
+  // The differential that becomes eighth-lowest once the oldest fallsIn leave.
+  const replacement = oldestFirst.slice(fallsIn).sort((a, b) => a - b)[7];
 
   let holdGross: number | null = null;
   let repeat: AgeingOut['repeat'] = null;
@@ -96,7 +109,6 @@ export function deriveAgeingOut(
       const idx = indexAfterRepeats(oldestFirst, differentialFromGross(g, course.cr, course.slope), k);
       return idx != null && r1(idx) <= r1(current);
     };
-    // Search downward from a gross well above anything plausible.
     const top = Math.ceil(course.cr + 60);
     for (let g = top; g >= Math.floor(course.cr - 40); g--) {
       if (holds(g)) { holdGross = g; break; }
@@ -111,8 +123,8 @@ export function deriveAgeingOut(
 
   return {
     current,
-    settleAt: r1(p.settleAtRaw),
-    inRounds,
+    settleAt: r1(settleRaw),
+    inRounds: fallsIn,
     expiring,
     isBest,
     replacement,
@@ -120,3 +132,4 @@ export function deriveAgeingOut(
     repeat,
   };
 }
+

@@ -7,7 +7,7 @@
  */
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useAllScores } from '@/lib/whs/hooks';
 import { deriveAgeingOut } from '@/lib/whs/ageingOut';
 import { counterWindow } from '@/lib/whs/counting';
@@ -18,7 +18,8 @@ import { pickCourse } from './NextRoundSection';
 
 const fmt = (d: number) => (d < 0 ? `\u2212${Math.abs(d).toFixed(1)}` : d.toFixed(1));
 const FIG: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
-const BODY = CHART.INK;
+/** 3A C6: prose at MUTE; bolded figures inside it at INK. */
+const BODY = CHART.MUTE;
 
 const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number | null }> = ({
   connectionId,
@@ -40,6 +41,7 @@ const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number
     date: playDateStandalone(r.play_date),
     diff: fmt(r.handicap_differential as number),
     next: fmt(a.replacement),
+    settle: a.settleAt.toFixed(1),
     count,
   };
 
@@ -64,7 +66,12 @@ const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number
         </div>
         {a.inRounds != null && (
           <p style={{ margin: '10px 0 0', fontSize: 12.5, fontWeight: 400, lineHeight: 1.45, color: BODY, ...FIG }}>
-            {t(a.isBest ? 'common:handicap.ageingOut.body' : 'common:handicap.ageingOut.bodyNotBest', bodyVars)}
+            <Trans
+              t={t}
+              i18nKey={a.isBest ? 'common:handicap.ageingOut.body' : 'common:handicap.ageingOut.bodyNotBest'}
+              values={bodyVars}
+              components={{ b: <strong style={{ fontWeight: 700, color: CHART.INK }} /> }}
+            />
           </p>
         )}
         {course && a.holdGross != null && (

@@ -46,3 +46,37 @@ describe('deriveAgeingOut', () => {
     expect(deriveAgeingOut(twenty(17), 13.5, course)).toBeNull();
   });
 });
+
+import { settleAfterRounds, MAX_REPEATS } from './ageingOut';
+import { projectNextRound } from './handicapMath';
+
+describe('3A amendment', () => {
+  it('C1: settleAfterRounds(1) equals projectNextRound settleAtRaw', () => {
+    const w = twenty(2);
+    const oldestFirst = [...w].reverse().map((r) => r.handicap_differential as number);
+    expect(settleAfterRounds(oldestFirst, 1)).toBe(projectNextRound(w, 11.6).settleAtRaw);
+    expect(settleAfterRounds(oldestFirst, 13)).toBeNull();
+  });
+
+  it('C5: 72 holds in one, 73 holds in two; repeat limit five', () => {
+    const a = deriveAgeingOut(twenty(2), 11.6, course)!;
+    expect(a.holdGross).toBe(72);
+    expect(a.repeat).toEqual({ gross: 73, times: 2 });
+    expect(MAX_REPEATS).toBe(5);
+  });
+
+  it('C8: counter three rounds deep moves N, settle and replacement together', () => {
+    // Oldest two (i=19,18) are non-counters at 40/41; i=17 is a 2.0 counter.
+    const rounds = twenty(40, false).map((r, i) => {
+      if (i === 18) return { ...r, handicap_differential: 41, is_counter: false };
+      if (i === 17) return { ...r, handicap_differential: 2, is_counter: true };
+      return r;
+    }) as WhsScoreWithIndex[];
+    // Today: 2,10..16 = 93/8 → 11.6. After 3 leave: 10..17 → 13.5.
+    const a = deriveAgeingOut(rounds, 11.6, course)!;
+    expect(a.inRounds).toBe(3);
+    expect(a.expiring.id).toBe('r17');
+    expect(a.settleAt).toBe(13.5);
+    expect(a.replacement).toBe(17);
+  });
+});
