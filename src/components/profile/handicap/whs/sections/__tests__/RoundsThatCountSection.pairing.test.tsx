@@ -1,4 +1,4 @@
-/** BRIEF_MECHANISM_PAIRING — bars and the counting eight share one selection by round id. */
+/** BRIEF_MECHANISM_PAIRING + BRIEF_MECHANISM_PAIRING_2 — bars and the counting eight share one selection by round id. */
 import { afterEach, beforeAll, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { createInstance } from 'i18next';
@@ -15,6 +15,8 @@ const scores = diffs.map((d, i) => ({
   handicap_differential: d,
   is_counter: i < 8,
   course: { name: `Course ${i}` },
+  adjusted_gross: 70 + i,
+  course_par: 72,
 }));
 vi.mock('@/lib/whs/hooks', () => ({ useAllScores: () => ({ data: scores, isLoading: false }) }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
@@ -35,51 +37,61 @@ const mount = () => render(<I18nextProvider i18n={i18n}><RoundsThatCountSection 
 const barFor = (course: string) => screen.getAllByRole('button', { name: new RegExp(`, ${course}, `) })
   .find((b) => !b.hasAttribute('data-round-id'))!;
 const chipFor = (id: string) => document.querySelector(`[data-round-id="${id}"]`) as HTMLElement;
-const lastSheet = () => state.sheet.mock.calls.at(-1)![0];
+const detail = (k: string) => screen.getByTestId(`detail-${k}`).textContent;
 
-it('a chip tap lights the matching bar and opens the sheet with that round id', () => {
+it('newest round is selected on first render, and no sheet is mounted', () => {
   mount();
-  fireEvent.click(chipFor('s3'));
-  expect(lastSheet()).toMatchObject({ scoreId: 's3', open: true });
-  expect(barFor('Course 3').getAttribute('aria-pressed')).toBe('true');
-  expect((barFor('Course 4').firstChild as HTMLElement).style.opacity).toBe('0.55');
+  // Most-recent-first input: s0 is newest.
+  expect(chipFor('s0').getAttribute('aria-pressed')).toBe('true');
+  expect(barFor('Course 0').getAttribute('aria-pressed')).toBe('true');
+  expect(detail('course')).toBe('Course 0');
+  expect(state.sheet).not.toHaveBeenCalled();
 });
 
-it('a bar tap lights the matching chip', () => {
+it('a chip tap updates the detail block and lights the matching bar, opening nothing', () => {
+  mount();
+  fireEvent.click(chipFor('s3'));
+  expect(detail('course')).toBe('Course 3');
+  expect(detail('gross')).toBe('73 (+1)');
+  expect(detail('diff')).toBe('3.0');
+  expect(barFor('Course 3').getAttribute('aria-pressed')).toBe('true');
+  expect((barFor('Course 4').firstChild as HTMLElement).style.opacity).toBe('0.55');
+  expect(screen.queryByRole('dialog')).toBeNull();
+  expect(state.sheet).not.toHaveBeenCalled();
+});
+
+it('a bar tap lights the matching chip and updates the block', () => {
   mount();
   fireEvent.click(barFor('Course 5'));
   expect(chipFor('s5').getAttribute('aria-pressed')).toBe('true');
-  expect(chipFor('s5').style.opacity).toBe('1');
   expect(chipFor('s4').style.opacity).toBe('0.55');
+  expect(detail('course')).toBe('Course 5');
 });
 
 it('two rounds sharing a differential are paired by id, not first match', () => {
   mount();
   fireEvent.click(chipFor('s2'));
-  expect(lastSheet().scoreId).toBe('s2');
+  expect(detail('course')).toBe('Course 2');
   expect(barFor('Course 2').getAttribute('aria-pressed')).toBe('true');
   expect(barFor('Course 1').getAttribute('aria-pressed')).toBe('false');
   expect(chipFor('s1').style.opacity).toBe('0.55');
 });
 
-it('dismissing the sheet leaves the selection in place', () => {
+it('a second tap keeps the selection', () => {
   mount();
   fireEvent.click(chipFor('s6'));
-  fireEvent.click(screen.getByText('Close round'));
-  expect(screen.queryByRole('dialog')).toBeNull();
-  expect(chipFor('s6').getAttribute('aria-pressed')).toBe('true');
-  expect(barFor('Course 6').getAttribute('aria-pressed')).toBe('true');
   fireEvent.click(chipFor('s6'));
-  expect(lastSheet()).toMatchObject({ scoreId: 's6', open: true });
+  expect(chipFor('s6').getAttribute('aria-pressed')).toBe('true');
+  expect(detail('course')).toBe('Course 6');
 });
 
-it('a non-counting bar opens its round and lights no chip', () => {
+it('a non-counting bar selects itself, lights no chip, and a null net renders empty', () => {
   mount();
   fireEvent.click(barFor('Course 10'));
-  expect(lastSheet()).toMatchObject({ scoreId: 's10', open: true });
-  expect(barFor('Course 10').getAttribute('aria-label')).toMatch(/Does not count$/);
+  expect(detail('course')).toBe('Course 10');
+  expect(detail('counts')).toBe("Doesn't count");
+  expect(detail('net')).toBe('');
   document.querySelectorAll('[data-round-id]').forEach((c) => {
     expect(c.getAttribute('aria-pressed')).toBe('false');
-    expect((c as HTMLElement).style.opacity).toBe('0.55');
   });
 });

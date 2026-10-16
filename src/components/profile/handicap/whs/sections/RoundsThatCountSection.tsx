@@ -15,16 +15,17 @@
  *  - Boundary label and NEXT IN LINE row (BRIEF_HANDICAP_TAB_REBUILD_4A).
  *    The amber rule stays; AgeingOutSection owns replacement advice.
  *
- * NO DEFAULT SELECTION. The newest round is Section D in full, three sections
- * above; defaulting the row here would print the same round on the page twice.
- * The slot's height is reserved from mount so the chart never moves.
+ * BRIEF_MECHANISM_PAIRING_2: the selection defaults to the newest round in the
+ * twenty, and a tap only selects — this section never opens RoundDetailSheet.
+ * The two-line detail block always renders, so the section never moves.
+ * NET IS ABSENT, NOT APPROXIMATED: whs_scores carries no net figure, so the
+ * net slot stays empty rather than being derived.
  *
  * NINE HOLES CARRY NO MARK HERE: WHS states every differential on an
  * eighteen-hole basis, so every point is already on one scale.
  */
 import { countsTowardIndex, counterWindow } from '@/lib/whs/counting';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 /* Figures use a TRUE MINUS (U+2212), never a hyphen. */
@@ -34,7 +35,6 @@ import { useAllScores } from '@/lib/whs/hooks';
 import { formatDayMonthShortGB } from '@/i18n/format';
 
 import { HcpSection } from './HcpSection';
-import RoundDetailSheet from './round-detail/RoundDetailSheet';
 import { CHART } from '../charts';
 import LastTwentyBars from '../charts/LastTwentyBars';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -48,12 +48,15 @@ const FIG: React.CSSProperties = {
 };
 
 /** Reserved height of the selection slot: 14/600 name row + 16 figure row. */
-const SLOT_H = 26;
+const SLOT_H = 40;
 
 interface Props {
   connectionId: string;
   userId?: string | null;
 }
+
+/** To-par suffix: E, +n, or a true-minus figure. */
+const fmtToPar = (n: number) => (n === 0 ? 'E' : n > 0 ? `+${n}` : `\u2212${-n}`);
 
 const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }) => {
   const { t } = useTranslation(['common']);
@@ -63,7 +66,6 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
      duplicate differentials are real). Bars and chips both read it; it
      persists after the sheet closes; re-tapping re-opens rather than clears. */
   const [selId, setSelId] = useState<string | null>(null);
-  const [sheetOpen, setSheetOpen] = useState(false);
 
   const total = allScores?.length ?? 0;
 
@@ -82,6 +84,10 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
         diff: r.handicap_differential ?? null,
         is_counter: countsTowardIndex(r),
         course_name: r.course?.name ?? null,
+        gross: r.adjusted_gross ?? null,
+        par: r.course_par ?? null,
+        /* Not carried by whs_scores — absent, never derived (AA3). */
+        net: null as number | null,
       }));
   }, [allScores]);
 
@@ -124,7 +130,9 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
   const countingEight = [...counters].sort((a, b) => (a.diff as number) - (b.diff as number));
 
   const selIdxRaw = selId != null ? window20.findIndex((r) => r.id === selId) : -1;
-  const selIdx = selIdxRaw >= 0 ? selIdxRaw : null;
+  /* AA4: no explicit choice yet → the newest round (rightmost bar). */
+  const selIdx = selIdxRaw >= 0 ? selIdxRaw : window20.length ? window20.length - 1 : null;
+  const activeId = selIdx != null ? window20[selIdx].id : null;
   const selected = selIdx != null ? window20[selIdx] : null;
   const roundLabel = (r: (typeof window20)[number]) =>
     t(r.is_counter ? 'common:handicap.mechanism.roundLabelCounts' : 'common:handicap.mechanism.roundLabelNotCounting', {
@@ -137,7 +145,6 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
     const r = window20[i];
     if (!r) return;
     setSelId(r.id);
-    setSheetOpen(true);
     analyticsEvents.track('handicap_counting_point_tapped', {
       score_id: r.id,
       counts: r.is_counter,
@@ -158,62 +165,49 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
           {t('common:handicap.mechanism.caption')}
         </p>
 
-        {/* Selection slot — height reserved from mount, empty until a tap. */}
-        <div style={{ height: SLOT_H, marginBottom: 6 }}>
+        {/* AA2 detail block — two lines, always rendered (newest by default). */}
+        <div data-testid="mechanism-detail" style={{ height: SLOT_H, marginBottom: 6 }}>
           {selected && (
-            <button
-              type="button"
-              onClick={() => setSheetOpen(true)}
-              aria-label={t('common:handicap.roundsThatCount.openRound', {
-                date: formatDayMonthShortGB(selected.play_date),
-              })}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 12,
-                width: '100%',
-                height: SLOT_H,
-                padding: 0,
-                margin: 0,
-                border: 'none',
-                borderRadius: 0,
-                background: 'transparent',
-                textAlign: 'left',
-                cursor: 'pointer',
-                WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 10, minWidth: 0 }}>
-                <span style={{ fontSize: 14, fontWeight: 600, color: CHART.INK, ...FIG }}>
-                  {formatDayMonthShortGB(selected.play_date)}
-                </span>
+            <>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
                 <span
+                  data-testid="detail-course"
                   style={{
-                    fontSize: 16,
-                    fontWeight: 700,
-                    color: selected.is_counter ? CHART.DOWN : CHART.MUTE,
-                    ...FIG,
+                    fontSize: 12.5, fontWeight: 700, color: CHART.INK, minWidth: 0,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}
                 >
-                  {selected.diff != null ? fmtDiff(selected.diff) : ''}
+                  {selected.course_name ?? ''}
                 </span>
+                <span data-testid="detail-date" style={{ fontSize: 11, fontWeight: 600, color: CHART.DIM, flexShrink: 0, ...FIG }}>
+                  {formatDayMonthShortGB(selected.play_date)}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 4, whiteSpace: 'nowrap' }}>
+                {([
+                  ['gross', selected.gross != null
+                    ? `${selected.gross}${selected.par != null ? ` (${fmtToPar(selected.gross - selected.par)})` : ''}`
+                    : ''],
+                  ['net', selected.net != null ? String(selected.net) : ''],
+                  ['diff', selected.diff != null ? fmtDiff(selected.diff) : ''],
+                ] as const).map(([k, v]) => (
+                  <span key={k} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4 }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: CHART.DIM }}>
+                      {t(`common:handicap.mechanism.detail.${k}`)}
+                    </span>
+                    <span data-testid={`detail-${k}`} style={{ fontSize: 12.5, fontWeight: 700, color: CHART.INK, ...FIG }}>{v}</span>
+                  </span>
+                ))}
                 <span
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    color: selected.is_counter ? CHART.DOWN : CHART.DIM,
-                  }}
+                  data-testid="detail-counts"
+                  style={{ fontSize: 12.5, fontWeight: 700, color: selected.is_counter ? A.IMPROVED : CHART.MUTE }}
                 >
                   {selected.is_counter
                     ? t('common:handicap.roundsThatCount.counts')
                     : t('common:handicap.roundsThatCount.doesNotCount')}
                 </span>
-              </span>
-              <ChevronRight size={16} color={CHART.FAINT} strokeWidth={2.4} style={{ flexShrink: 0 }} />
-            </button>
+              </div>
+            </>
           )}
         </div>
 
@@ -252,14 +246,14 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
                   type="button"
                   data-round-id={r.id}
                   aria-label={roundLabel(r)}
-                  aria-pressed={selId === r.id}
+                  aria-pressed={activeId === r.id}
                   onClick={() => onSelect(window20.findIndex((w) => w.id === r.id))}
                   style={{
                     display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
                     gap: 2, padding: '6px 8px', margin: 0, background: 'transparent',
                     font: 'inherit', cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
                     border: `1px solid ${CHART.BORDER}`, borderRadius: 8,
-                    opacity: selId != null && selId !== r.id ? 0.55 : 1,
+                    opacity: activeId != null && activeId !== r.id ? 0.55 : 1,
                   }}
                 >
                   <span style={{ fontSize: 11.5, fontWeight: 800, color: CHART.INK, ...FIG }}>
@@ -281,16 +275,6 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
         )}
       </HcpSection>
 
-      {selected && (
-        <RoundDetailSheet
-          scoreId={selected.id}
-          connectionId={connectionId}
-          profileUserId={userId ?? null}
-          open={sheetOpen}
-          onClose={() => setSheetOpen(false)}
-          handicapDelta={null}
-        />
-      )}
     </>
   );
 };

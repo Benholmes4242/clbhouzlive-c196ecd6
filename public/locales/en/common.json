@@ -994,7 +994,12 @@
       "nextInLine": "Next in line",
       "nextInLineValue": "{{diff}} · {{course}} · {{date}}",
       "roundLabelCounts": "{{date}}, {{course}}, differential {{diff}}. Counts",
-      "roundLabelNotCounting": "{{date}}, {{course}}, differential {{diff}}. Does not count"
+      "roundLabelNotCounting": "{{date}}, {{course}}, differential {{diff}}. Does not count",
+      "detail": {
+        "gross": "Gross",
+        "net": "Net",
+        "diff": "Diff"
+      }
     },
     "strokes": {
       "kicker": "Where the strokes go",
