@@ -13,25 +13,31 @@ export interface SectionHeadProps {
   tone?: 'amber' | 'quiet';
 }
 
+/* Head geometry, read by SectionHead AND its shell (BRIEF_COURSES_SKELETONS 2.2). */
+export const HEAD_KICKER_SIZE = 11;
+export const HEAD_TITLE_SIZE = 19;
+export const HEAD_TITLE_LINE_HEIGHT = 1.1;
+export const HEAD_TITLE_GAP = 5;
+
 export function SectionHead({ kicker, title, tone = 'amber' }: SectionHeadProps) {
   return (
     <div>
       {/* Matched to ScoresLeaderboardsPage's local EYEBROW const (11 / 700 /
           0.16em / uppercase) — must not drift from it. A fork until that const
           is published as a shared token; KICKER is the 9px one neither uses. */}
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', lineHeight: 1, color: tone === 'amber' ? A.AMBER : A.MUTE }}>
+      <div style={{ fontSize: HEAD_KICKER_SIZE, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', lineHeight: 1, color: tone === 'amber' ? A.AMBER : A.MUTE }}>
         {kicker}
       </div>
       {title ? <h2
         style={{
-          fontSize: 19,
+          fontSize: HEAD_TITLE_SIZE,
           fontWeight: 700,
           letterSpacing: '-0.02em',
-          lineHeight: 1.1,
+          lineHeight: HEAD_TITLE_LINE_HEIGHT,
           color: A.INK,
           // These are the Courses page's own head spacing. The Explore page is being
           // brought to these values, not the other way round.
-          marginTop: 5,
+          marginTop: HEAD_TITLE_GAP,
           marginBottom: 0,
         }}
       >

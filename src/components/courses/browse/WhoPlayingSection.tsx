@@ -15,6 +15,7 @@ import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { joinNames, plural, RAIL_BLEED } from './format';
 import { firstName } from '@/lib/whs/share';
 import { useSectionReady } from './PageLoadGate';
+import { WhoPlayingShell } from './sectionShells';
 
 /**
  * SECTION 01 — WHAT'S BEEN PLAYED (BRIEF_COURSES_PAGE_DEVICE_REVISION §3).
@@ -23,6 +24,13 @@ import { useSectionReady } from './PageLoadGate';
  * No RoundShape — it describes a round, and this card's subject is a course.
  */
 const CAP = 10;
+/* Card geometry, read by the card AND its shell (BRIEF_COURSES_SKELETONS 2.3). */
+export const WHO_CARD_W = 300;
+export const WHO_CARD_RADIUS = 12;
+export const WHO_PHOTO_H = 150;
+export const WHO_RAIL_GAP = 10;
+export const WHO_FOOTER_PAD = { top: 10, x: 12, bottom: 11 } as const;
+export const WHO_FACE_H = 20;
 /** Rounds read before grouping — the hook's own cap, unchanged. */
 const ROUND_LIMIT = 24;
 
@@ -63,7 +71,8 @@ export function WhoPlayingSection() {
   const meta = metaQuery.data;
   useSectionReady('whoPlaying', !roundsQuery.isLoading && !metaQuery.isLoading);
 
-  if (groups.length === 0) return null;
+  const loading = roundsQuery.isLoading || metaQuery.isLoading;
+  if (groups.length === 0) return loading ? <WhoPlayingShell /> : null;
 
   return (
     <section style={SECTION_WRAP}>
@@ -72,7 +81,7 @@ export function WhoPlayingSection() {
         kicker="Recently"
         title="What's been played"
       />
-      <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: 10, marginTop: HEAD_GAP }}>
+      <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: WHO_RAIL_GAP, marginTop: HEAD_GAP }}>
         {groups.map((g) => {
           const m = g.courseId ? meta?.get(g.courseId) : undefined;
           const name = m?.name ?? g.courseName;
@@ -83,9 +92,9 @@ export function WhoPlayingSection() {
               key={g.key}
               type="button"
               onClick={() => (g.courseId ? navigate(`/courses/${g.courseId}`) : undefined)}
-              style={{ width: 300, flex: 'none', background: MEMBER_PANEL, border: `1px solid ${A.BORDER}`, borderRadius: 12, overflow: 'hidden', padding: 0, textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}
+              style={{ width: WHO_CARD_W, flex: 'none', background: MEMBER_PANEL, border: `1px solid ${A.BORDER}`, borderRadius: WHO_CARD_RADIUS, overflow: 'hidden', padding: 0, textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}
             >
-              <CourseImageFallback courseId={g.courseId} courseName={name} imageUrl={m?.imageUrl} style={{ height: 150, flexShrink: 0 }}>
+              <CourseImageFallback courseId={g.courseId} courseName={name} imageUrl={m?.imageUrl} style={{ height: WHO_PHOTO_H, flexShrink: 0 }}>
                 <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
                 {g.best != null ? (
                   <span className={GLASS_CHIP_CLASS} style={{ position: 'absolute', right: 10, top: 10, padding: '5px 10px', borderRadius: 10, textAlign: 'right' }}>
@@ -100,8 +109,8 @@ export function WhoPlayingSection() {
                   <div style={{ position: 'absolute', left: 12, bottom: 11, fontSize: 11.5, fontWeight: 500, color: 'rgba(255,255,255,0.74)' }}>{m.region}</div>
                 ) : null}
               </CourseImageFallback>
-              <div style={{ padding: '10px 12px 11px', display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                <span aria-hidden="true" style={{ position: 'relative', flex: 'none', height: 20, width: 19 + (faces.length - 1) * 12 }}>
+              <div style={{ padding: `${WHO_FOOTER_PAD.top}px ${WHO_FOOTER_PAD.x}px ${WHO_FOOTER_PAD.bottom}px`, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                <span aria-hidden="true" style={{ position: 'relative', flex: 'none', height: WHO_FACE_H, width: 19 + (faces.length - 1) * 12 }}>
                   {faces.map((f, i) => (
                     <span key={f.user_id} style={{ position: 'absolute', top: 0, left: i * 12, width: 19, height: 20, borderRadius: '34%', boxShadow: `0 0 0 1.5px ${MEMBER_PANEL}`, zIndex: 3 - i }}>
                       <SquircleAvatar src={f.profile_photo_url} userId={f.user_id} size={19} alt={f.display_name} hairlineRing />

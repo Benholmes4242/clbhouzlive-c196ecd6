@@ -9,6 +9,7 @@ import StatBrowse from './StatBrowse';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './browse/SectionHead';
 import { useCourseBrowseTruth } from './useStatBrowse';
 import { HERO_FIGURE_LABEL, HERO_FIGURE_VALUE } from './CourseMasthead';
+import { FiguresRowShell } from './browse/sectionShells';
 import { GLASS_CHIP_CSS } from '@/styles/glassChip';
 import { WhoPlayingSection } from './browse/WhoPlayingSection';
 import { ByRegionSection, ALL_COURSES_ANCHOR } from './browse/ByRegionSection';
@@ -86,7 +87,7 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         <MostPlayedSection />
         <HardestSection />
         <HighestRatedSection />
-        <LatestReviewsSection reviews={reviewPool} onReviewPress={handleReviewTile} />
+        <LatestReviewsSection reviews={reviewPool} onReviewPress={handleReviewTile} loading={reviewsLoading} />
         <section id={ALL_COURSES_ANCHOR} style={SECTION_WRAP}>
           <SectionHead tone="quiet" kicker="Every course we hold" />
           {cells.length > 0 ? (
@@ -98,6 +99,8 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
                 </div>
               ))}
             </div>
+          ) : truthLoading ? (
+            <FiguresRowShell />
           ) : null}
         </section>
         </PageLoadGate>

@@ -12,6 +12,7 @@ import { useCourseBrowseTruth, type BrowseRegion } from '../useStatBrowse';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { fmtToPar, playsToPar, plural } from './format';
 import { useSectionReady } from './PageLoadGate';
+import { ByRegionShell } from './sectionShells';
 
 /**
  * SECTION 02 — BY REGION (BRIEF_COURSES_PAGE_REBUILD §4, amended by
@@ -23,6 +24,11 @@ export const ALL_COURSES_ANCHOR = 'courses-all';
 /** Never more than five tiles (DEVICE_REVISION §4): lead + four, or five. */
 const REGIONS_WITH_LEAD = 4;
 const REGIONS_NO_LEAD = 5;
+/* Tile geometry, read by the grid AND its shell (BRIEF_COURSES_SKELETONS 2.3). */
+export const REGION_LEAD_H = 168;
+export const REGION_TILE_H = 122;
+export const REGION_GAP = 2;
+export const REGION_TILES_NO_LEAD = REGIONS_NO_LEAD;
 
 
 /** The member's home region: primary_club_id → golf_courses.club_id → region. */
@@ -57,7 +63,8 @@ export function ByRegionSection() {
   useSectionReady('byRegion', !homeRegionQuery.isLoading && !truthLoading && !home.isLoading);
 
   const regions = truth?.regions ?? [];
-  if (regions.length === 0) return null;
+  const loading = truthLoading || home.isLoading || homeRegionQuery.isLoading;
+  if (regions.length === 0) return loading ? <ByRegionShell /> : null;
 
   const lead = homeRegion ? regions.find((r) => r.region === homeRegion) ?? null : null;
   const rest = [...regions].filter((r) => r !== lead).sort((a, b) => b.rounds - a.rounds).slice(0, lead ? REGIONS_WITH_LEAD : REGIONS_NO_LEAD);
@@ -91,7 +98,7 @@ export function ByRegionSection() {
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
-          gap: 2,
+          gap: REGION_GAP,
           marginLeft: -16,
           marginRight: -16,
           marginTop: HEAD_GAP,
@@ -111,7 +118,7 @@ export function ByRegionSection() {
               onClick={() => open(r)}
               style={{
                 gridColumn: spans ? 'span 2' : undefined,
-                height: isLead ? 168 : 122,
+                height: isLead ? REGION_LEAD_H : REGION_TILE_H,
                 padding: 0,
                 border: 'none',
                 borderRadius: 0,

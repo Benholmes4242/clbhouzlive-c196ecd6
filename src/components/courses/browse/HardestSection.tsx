@@ -5,20 +5,27 @@ import { useStatBrowseList } from '../useStatBrowse';
 import { useSectionReady } from './PageLoadGate';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { fmtToPar } from './format';
+import { HardestShell } from './sectionShells';
+
+/* Tile geometry, read by the grid AND its shell (BRIEF_COURSES_SKELETONS 2.3). */
+export const TOUGH_TILE_H = 150;
+export const TOUGH_GAP = 2;
+export const TOUGH_COUNT = 4;
 
 /** SECTION 04 — THE HARDEST TESTS (BRIEF_COURSES_PAGE_REBUILD §6). */
 export function HardestSection() {
   const navigate = useNavigate();
-  const { rows, isLoading } = useStatBrowseList({ lens: 'toughest', country: null, region: null, limit: 4 });
+  const { rows, isLoading } = useStatBrowseList({ lens: 'toughest', country: null, region: null, limit: TOUGH_COUNT });
   useSectionReady('hardest', !isLoading);
-  if (isLoading || rows.length === 0) return null;
+  if (isLoading) return <HardestShell />;
+  if (rows.length === 0) return null;
   return (
     <section style={SECTION_WRAP}>
       <SectionHead tone="amber" kicker="Over par on average" title="Toughest tracks" />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, marginLeft: -16, marginRight: -16, marginTop: HEAD_GAP }}>
-        {rows.slice(0, 4).map((row, i) => (
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: TOUGH_GAP, marginLeft: -16, marginRight: -16, marginTop: HEAD_GAP }}>
+        {rows.slice(0, TOUGH_COUNT).map((row, i) => (
           <button key={row.course_id} type="button" onClick={() => navigate(`/courses/${row.course_id}`)}
-            style={{ height: 150, padding: 0, border: 'none', textAlign: 'left', cursor: 'pointer', background: 'transparent' }}>
+            style={{ height: TOUGH_TILE_H, padding: 0, border: 'none', textAlign: 'left', cursor: 'pointer', background: 'transparent' }}>
             <CourseImageFallback courseId={row.course_id} courseName={row.name} imageUrl={row.image_url} style={{ height: '100%' }}>
               <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
               <div style={{ position: 'absolute', left: 11, top: 10, fontSize: 23, fontWeight: 700, letterSpacing: '-0.045em', color: '#FFFFFF', lineHeight: 1, fontVariantNumeric: 'tabular-nums', textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>

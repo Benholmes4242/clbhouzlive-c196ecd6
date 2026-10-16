@@ -3,7 +3,8 @@ import { useStatBrowseList } from '../useStatBrowse';
 import { useSectionReady } from './PageLoadGate';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { fmtCount, playsToPar, plural, RAIL_BLEED } from './format';
-import { PhotoFigureCard } from './PhotoFigureCard';
+import { PhotoFigureCard, PHOTO_FIGURE_COUNT, PHOTO_FIGURE_GAP } from './PhotoFigureCard';
+import { PhotoRailShell } from './sectionShells';
 
 /**
  * SECTION 03 — MOST PLAYED (BRIEF_COURSES_PAGE_REBUILD §5). Replaces the
@@ -11,15 +12,16 @@ import { PhotoFigureCard } from './PhotoFigureCard';
  * a per-course, per-index-band cell holds one member or none.
  */
 export function MostPlayedSection() {
-  const { rows, isLoading } = useStatBrowseList({ lens: 'played', country: null, region: null, limit: 3 });
+  const { rows, isLoading } = useStatBrowseList({ lens: 'played', country: null, region: null, limit: PHOTO_FIGURE_COUNT });
   useSectionReady('mostPlayed', !isLoading);
-  if (isLoading || rows.length === 0) return null;
+  if (isLoading) return <PhotoRailShell />;
+  if (rows.length === 0) return null;
 
   return (
     <section style={SECTION_WRAP}>
       <SectionHead tone="amber" kicker="Most played" title="The regulars" />
-      <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: 2, marginTop: HEAD_GAP }}>
-        {rows.slice(0, 3).map((row) => {
+      <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: PHOTO_FIGURE_GAP, marginTop: HEAD_GAP }}>
+        {rows.slice(0, PHOTO_FIGURE_COUNT).map((row) => {
           const pill = [row.members > 0 ? plural(row.members, 'member', 'members') : null, playsToPar(row.avg_to_par)]
             .filter(Boolean)
             .join(' \u00B7 ');

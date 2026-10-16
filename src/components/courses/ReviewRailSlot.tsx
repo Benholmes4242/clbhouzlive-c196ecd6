@@ -20,7 +20,16 @@ import { A, LABEL, courseSubScoreTone } from '@/features/courses/components/hole
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
-const CARD_W = 244;
+/* Panel geometry, read by the panel AND its shell (BRIEF_COURSES_SKELETONS 2.3). */
+export const CARD_W = 244;
+export const REVIEW_RADIUS = 14;
+export const REVIEW_PAD = 12;
+export const REVIEW_GAP = 10;
+export const REVIEW_RAIL_X = 20;
+export const REVIEW_RATING_SIZE = 17;
+export const REVIEW_NAME = { marginTop: 8, size: 13.5, lineHeight: 1.25 } as const;
+export const REVIEW_QUOTE = { marginTop: 6, size: 12.5, lineHeight: 1.45 } as const;
+export const REVIEW_FOOT = { marginTop: 12, avatar: 20 } as const;
 
 const FIGS: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums',
@@ -39,7 +48,7 @@ function Reviewer({ r }: { r: LatestReview }) {
   const name = r.reviewerName || t('discover.reviews.member', 'A member');
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-      <SquircleAvatar src={r.reviewerAvatar} userId={r.userId} alt={name} size={20} hairlineRing />
+      <SquircleAvatar src={r.reviewerAvatar} userId={r.userId} alt={name} size={REVIEW_FOOT.avatar} hairlineRing />
       <span
         style={{
           fontSize: 11.5,
@@ -70,9 +79,9 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
       <div
         style={{
           display: 'flex',
-          gap: 10,
+          gap: REVIEW_GAP,
           overflowX: 'auto',
-          padding: '0 20px',
+          padding: `0 ${REVIEW_RAIL_X}px`,
           scrollbarWidth: 'none',
         }}
       >
@@ -87,15 +96,15 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
               textAlign: 'left',
               background: SURFACE,
               border: `1px solid ${HAIRLINE_INK_8}`,
-              borderRadius: 14,
-              padding: 12,
+              borderRadius: REVIEW_RADIUS,
+              padding: REVIEW_PAD,
             }}
           >
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
               <span
                 style={{
                   ...FIGS,
-                  fontSize: 17,
+                  fontSize: REVIEW_RATING_SIZE,
                   fontWeight: 700,
                   lineHeight: 1,
                   letterSpacing: '-0.02em',
@@ -111,10 +120,10 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
 
             <div
               style={{
-                marginTop: 8,
-                fontSize: 13.5,
+                marginTop: REVIEW_NAME.marginTop,
+                fontSize: REVIEW_NAME.size,
                 fontWeight: 700,
-                lineHeight: 1.25,
+                lineHeight: REVIEW_NAME.lineHeight,
                 color: INK,
                 ...clamp(2),
               }}
@@ -124,9 +133,9 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
 
             <p
               style={{
-                marginTop: 6,
-                fontSize: 12.5,
-                lineHeight: 1.45,
+                marginTop: REVIEW_QUOTE.marginTop,
+                fontSize: REVIEW_QUOTE.size,
+                lineHeight: REVIEW_QUOTE.lineHeight,
                 color: INK_MUTE,
                 ...clamp(3),
               }}
@@ -134,7 +143,7 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
               <MentionText text={r.quote} disableNavigation />
             </p>
 
-            <div style={{ marginTop: 12 }}>
+            <div style={{ marginTop: REVIEW_FOOT.marginTop }}>
               <Reviewer r={r} />
             </div>
           </button>
