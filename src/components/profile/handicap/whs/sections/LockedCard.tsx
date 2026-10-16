@@ -64,13 +64,10 @@ const LockedCard: React.FC<{ connectionId: string }> = ({ connectionId }) => {
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700, color: tone }}>
         <Lock size={13} strokeWidth={2.4} aria-hidden />
-        {t('common:handicap.lock.title', { defaultValue: 'Locked for your next round' })}
+        {t('common:handicap.lock.title')}
       </div>
       <p style={{ margin: '4px 0 0', fontSize: 12.5, fontWeight: 400, lineHeight: 1.45, color: CHART.MUTE }}>
-        {t('common:handicap.lock.body', {
-          defaultValue:
-            'It cannot go up whatever you shoot. Your worst counting differential is {{worst}} and your twentieth round is non-counting.',
-          worst: fmt(facts.worstCounting),
+        {t('common:handicap.lock.body', { worst: fmt(facts.worstCounting),
         })}
       </p>
     </div>

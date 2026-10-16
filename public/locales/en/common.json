@@ -912,7 +912,26 @@
       "window30": "30 days",
       "window90": "90 days",
       "window12": "12 months",
-      "thisStep": "This step"
+      "thisStep": "This step",
+      "rangeHigh": "12M high",
+      "rangeLow": "Low"
+    },
+    "lock": {
+      "title": "Locked for your next round",
+      "body": "It cannot go up whatever you shoot. Your worst counting differential is {{worst}} and your twentieth round is non-counting."
+    },
+    "ageingOut": {
+      "kicker": "Ageing out",
+      "title": "Your index is about to rise on its own",
+      "inRounds_one": "In {{count}} round",
+      "inRounds_other": "In {{count}} rounds",
+      "body": "Your {{gross}} at {{course}} on {{date}} is a {{diff}} differential, the best in your twenty. It drops off in {{count}} rounds and {{next}} takes its place in your counting eight.",
+      "body_one": "Your {{gross}} at {{course}} on {{date}} is a {{diff}} differential, the best in your twenty. It drops off next round and {{next}} takes its place in your counting eight.",
+      "bodyNotBest": "Your {{gross}} at {{course}} on {{date}} is a {{diff}} differential in your counting eight. It drops off in {{count}} rounds and {{next}} takes its place.",
+      "bodyNotBest_one": "Your {{gross}} at {{course}} on {{date}} is a {{diff}} differential in your counting eight. It drops off next round and {{next}} takes its place.",
+      "hold": "To hold {{index}}, shoot {{gross}} or better at {{course}}.",
+      "holdRepeat": "Or shoot {{gross}} there {{times}} times in a row.",
+      "caption": "This appears only when a counting round is about to expire. The course named is your most played in your last twenty."
     }
   },
   "comments": {

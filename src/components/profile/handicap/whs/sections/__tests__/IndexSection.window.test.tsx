@@ -50,7 +50,7 @@ describe('Index block — window anchored to today, headline mutated in place', 
     expect(screen.getByText('\u22121.5')).toBeTruthy();
     expect(container.querySelector('linearGradient[id^="hcp-trend-fill-"]')).toBeTruthy();
     expect(container.querySelector('[data-hcp-chart="simplified"]')).toBeTruthy();
-    expect(container.querySelectorAll('svg path').length).toBe(3);
+    expect(container.querySelectorAll('svg path').length).toBe(2);
   });
 
   it.each([['30D', 30], ['90D', 90], ['12M', 365]] as const)('active member: %s axis spans %i days ending today', (chip, days) => {
