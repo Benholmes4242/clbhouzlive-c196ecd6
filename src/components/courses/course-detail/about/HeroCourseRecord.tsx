@@ -15,16 +15,19 @@ import React from 'react';
 import { SURFACE } from '@/lib/tokens/surface';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import type { CourseLegendRow } from '@/lib/gam/types';
-import { displayName, initials } from '@/lib/whs/utils/initials';
+import { displayName } from '@/lib/whs/utils/initials';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 const INK = SURFACE.dark.ink;
 const DIM = SURFACE.dark.dim;
 const AVATAR = 22;
 const OVERLAP = 7;
 const MAX_AVATARS = 3;
-/** Row height (22px avatars vs two-line text block) + 10px margin-top. Drawn
- *  hero is 252px with the row and 176px without; the hero grows by that delta. */
-export const HERO_RECORD_ROW_EXTRA = 252 - 176;
+/** Measured rendered row height (34.75px at 393px — the two-line text block,
+ *  taller than the 22px avatars) + its 10px margin-top, rounded up. The hero
+ *  grows by exactly this; the mock's hero heights were context, not absolutes
+ *  (BRIEF_COURSE_HERO_1B K1). */
+export const HERO_RECORD_ROW_EXTRA = 45;
 
 export function heroRecordNames(holders: CourseLegendRow[]): string | null {
   const names = holders.map((h) => displayName(h.user_display_name).trim());
@@ -39,23 +42,23 @@ export function heroRecordVisible(holders: CourseLegendRow[]): boolean {
   return heroRecordNames(holders) != null;
 }
 
+/* BRIEF_COURSE_HERO_1B K2 — the app-wide avatar rule wins over the mock's
+ *  circles: standard squircle geometry with the canonical 1px hairline ring. */
 function Avatar({ row, index }: { row: CourseLegendRow; index: number }) {
-  const [failed, setFailed] = React.useState(false);
-  const src = !failed ? row.user_photo_url : null;
   return (
     <span
       style={{
-        width: AVATAR, height: AVATAR, borderRadius: '50%', overflow: 'hidden',
         marginLeft: index === 0 ? 0 : -OVERLAP, flex: '0 0 auto',
-        border: '1.5px solid hsl(var(--background))',
-        background: 'hsl(var(--muted))', color: INK,
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 8, fontWeight: 700, position: 'relative', zIndex: MAX_AVATARS - index,
+        display: 'inline-flex', position: 'relative', zIndex: MAX_AVATARS - index,
       }}
     >
-      {src ? (
-        <img src={src} alt="" onError={() => setFailed(true)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-      ) : initials(row.user_display_name)}
+      <SquircleAvatar
+        src={row.user_photo_url}
+        alt={row.user_display_name ?? ''}
+        userId={row.user_id}
+        size={AVATAR}
+        hairlineRing
+      />
     </span>
   );
 }
