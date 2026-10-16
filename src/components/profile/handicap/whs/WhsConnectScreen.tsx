@@ -33,9 +33,10 @@ export function connectWrapperBackground(_stage: string): string {
  */
 export const ConnectTopChrome: React.FC<{
   stage: string;
+  title: string;
   onBack?: () => void;
   immersive: boolean;
-}> = ({ stage, onBack, immersive }) => {
+}> = ({ stage, title, onBack, immersive }) => {
   if (stage === 'done') {
     return (
       <div
@@ -48,7 +49,7 @@ export const ConnectTopChrome: React.FC<{
       />
     );
   }
-  return <BackRow title={HEADER_TITLE} onBack={onBack} immersive={immersive} />;
+  return <BackRow title={title} onBack={onBack} immersive={immersive} />;
 };
 
 
@@ -400,7 +401,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
           : { flex: '1 1 auto', minHeight: 0 }),
       }}
     >
-      <ConnectTopChrome stage={stage} onBack={BACKS[stage]} immersive={immersive} />
+      <ConnectTopChrome stage={stage} title={HEADER_TITLE} onBack={BACKS[stage]} immersive={immersive} />
       {activeScreen}
     </div>
   );

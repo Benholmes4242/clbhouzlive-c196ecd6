@@ -8,12 +8,12 @@ const STAGES = ['intro', 'country', 'form', 'comingSoon', 'sync', 'declined', 'd
 
 describe('connect done chrome (BRIEF_CONNECT_DONE_CHROME)', () => {
   it('done renders no back control and no HANDICAP label', () => {
-    render(<ConnectTopChrome stage="done" immersive />);
+    render(<ConnectTopChrome stage="done" title="Handicap" immersive />);
     expect(document.querySelector('[aria-label^="Back to"]')).toBeNull();
     expect(screen.queryByText(/handicap/i)).toBeNull();
   });
   it.each(['intro', 'country', 'form', 'comingSoon', 'sync', 'declined'])('%s still renders BackRow', (s) => {
-    render(<ConnectTopChrome stage={s} onBack={() => {}} immersive />);
+    render(<ConnectTopChrome stage={s} title="Handicap" onBack={() => {}} immersive />);
     expect(document.querySelector('[aria-label^="Back to"]')).not.toBeNull();
   });
   it('wrapper background is SURFACE on every stage, done included', () => {
