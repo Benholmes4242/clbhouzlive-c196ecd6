@@ -105,8 +105,11 @@ export function deriveAgeingOut(
   let holdGross: number | null = null;
   let repeat: AgeingOut['repeat'] = null;
   if (course) {
+    // 3B D4: with N chances, the other N - 1 rounds are assumed not to make
+    // the eight, so the oldest N - 1 simply leave before the candidate rolls in.
+    const base = oldestFirst.slice(fallsIn - 1);
     const holds = (g: number, k = 1) => {
-      const idx = indexAfterRepeats(oldestFirst, differentialFromGross(g, course.cr, course.slope), k);
+      const idx = indexAfterRepeats(base, differentialFromGross(g, course.cr, course.slope), k);
       return idx != null && r1(idx) <= r1(current);
     };
     const top = Math.ceil(course.cr + 60);

@@ -925,11 +925,13 @@
       "title": "Your index is about to rise on its own",
       "inRounds_one": "In {{count}} round",
       "inRounds_other": "In {{count}} rounds",
-      "body": "Your <b>{{gross}}</b> at {{course}} on {{date}} is a <b>{{diff}}</b> differential, the best in your twenty. It drops off in {{count}} rounds and <b>{{next}}</b> takes its place in your counting eight. If your next {{count}} rounds don't beat {{diff}}, your index lands at <b>{{settle}}</b>.",
-      "body_one": "Your <b>{{gross}}</b> at {{course}} on {{date}} is a <b>{{diff}}</b> differential, the best in your twenty. It drops off next round and <b>{{next}}</b> takes its place in your counting eight. If your next round doesn't beat {{diff}}, your index lands at <b>{{settle}}</b>.",
-      "bodyNotBest": "Your <b>{{gross}}</b> at {{course}} on {{date}} is a <b>{{diff}}</b> differential in your counting eight. It drops off in {{count}} rounds and <b>{{next}}</b> takes its place. If your next {{count}} rounds don't beat {{diff}}, your index lands at <b>{{settle}}</b>.",
-      "bodyNotBest_one": "Your <b>{{gross}}</b> at {{course}} on {{date}} is a <b>{{diff}}</b> differential in your counting eight. It drops off next round and <b>{{next}}</b> takes its place. If your next round doesn't beat {{diff}}, your index lands at <b>{{settle}}</b>.",
+      "body": "Your <b>{{gross}}</b> at {{course}} on {{date}} is a <b>{{diff}}</b> differential, the best in your twenty. It drops off in {{count}} rounds and <b>{{next}}</b> takes its place in your counting eight. If none of your next {{count}} rounds beats {{next}}, your index lands at <b>{{settle}}</b>.",
+      "body_one": "Your <b>{{gross}}</b> at {{course}} on {{date}} is a <b>{{diff}}</b> differential, the best in your twenty. It drops off next round and <b>{{next}}</b> takes its place in your counting eight. If your next round doesn't beat {{next}}, your index lands at <b>{{settle}}</b>.",
+      "bodyNotBest": "Your <b>{{gross}}</b> at {{course}} on {{date}} is a <b>{{diff}}</b> differential in your counting eight. It drops off in {{count}} rounds and <b>{{next}}</b> takes its place. If none of your next {{count}} rounds beats {{next}}, your index lands at <b>{{settle}}</b>.",
+      "bodyNotBest_one": "Your <b>{{gross}}</b> at {{course}} on {{date}} is a <b>{{diff}}</b> differential in your counting eight. It drops off next round and <b>{{next}}</b> takes its place. If your next round doesn't beat {{next}}, your index lands at <b>{{settle}}</b>.",
       "hold": "To hold {{index}}, shoot {{gross}} or better at {{course}}.",
+      "hold_one": "To hold {{index}}, shoot {{gross}} or better at {{course}}.",
+      "hold_other": "To hold {{index}}, shoot {{gross}} or better at {{course}} once in your next {{count}} rounds.",
       "holdRepeat": "Or shoot {{gross}} there {{times}} times in a row.",
       "caption": "This appears only when a counting round is about to expire. The course named is your most played in your last twenty."
     }
