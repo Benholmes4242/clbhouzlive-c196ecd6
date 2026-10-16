@@ -941,7 +941,7 @@
     "mechanism": {
       "kicker": "The mechanism",
       "title": "Eight of your last twenty",
-      "caption": "Every round you've played, by differential. The eight under the cut line are your index. The rest is just history.",
+      "caption": "Every round you've played, by differential. The best eight are your index. The rest is just history.",
       "cut": "Cut · {{value}}",
       "oldest": "Oldest · {{date}}",
       "newest": "Newest · {{date}}",

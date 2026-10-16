@@ -6,14 +6,14 @@
  * LastTwentyBars (kept: twenty differentials oldest-left, min-anchored scale,
  * counting state from is_counter via countsTowardIndex — never a client-side
  * comparison), the amber cut line at the eighth-best differential, date axis
- * labels, then THE COUNTING EIGHT chip box and the NEXT IN LINE row.
+ * labels, then THE COUNTING EIGHT chip box ending after its chips.
  *
  * WHAT IS GONE, BY CONSTRUCTION:
  *  - The NEXT ROUND / "{target} CUTS" footer strip (Section C owns that).
  *  - The FALLING OFF SOON readout and the generated caption/fall lines:
  *    phase 3's AgeingOutSection owns the expiry warning now.
- *  - Score conversion at the cut: the line is labelled with the differential
- *    itself, so no course pick is needed anywhere in this section.
+ *  - Boundary label and NEXT IN LINE row (BRIEF_HANDICAP_TAB_REBUILD_4A).
+ *    The amber rule stays; AgeingOutSection owns replacement advice.
  *
  * NO DEFAULT SELECTION. The newest round is Section D in full, three sections
  * above; defaulting the row here would print the same round on the page twice.
@@ -120,13 +120,6 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
   const cutLine = counters.length ? Math.max(...counters.map((r) => r.diff as number)) : null;
   const countingEight = [...counters].sort((a, b) => (a.diff as number) - (b.diff as number));
 
-  /* NEXT IN LINE (§4.7): the best non-counting differential — the round that
-     enters the eight when one of the current counters leaves. */
-  const nextRound =
-    window20
-      .filter((r) => !r.is_counter && r.diff != null)
-      .sort((a, b) => (a.diff as number) - (b.diff as number))[0] ?? null;
-
   const selected = selIdx != null ? window20[selIdx] : null;
 
   const onSelect = (i: number) => {
@@ -214,7 +207,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
 
         <LastTwentyBars
           rounds={window20.map((r) => ({ diff: r.diff, counts: r.is_counter }))}
-          cut={cutLine != null ? { value: cutLine, label: t('common:handicap.mechanism.cut', { value: fmtDiff(cutLine) }) } : null}
+          cut={cutLine != null ? { value: cutLine } : null}
           oldestLabel={t('common:handicap.mechanism.oldest', { date: formatDayMonthShortGB(window20[0].play_date) })}
           newestLabel={t('common:handicap.mechanism.newest', { date: formatDayMonthShortGB(window20[window20.length - 1].play_date) })}
           selectedIndex={selIdx}
@@ -264,37 +257,6 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
                 </span>
               ))}
             </div>
-
-            {/* §4.7 NEXT IN LINE. */}
-            {nextRound && (
-              <div
-                style={{
-                  display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10,
-                  marginTop: 11, paddingTop: 10, borderTop: `1px solid ${CHART.BORDER}`,
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 9, fontWeight: 700, letterSpacing: '0.12em',
-                    textTransform: 'uppercase', color: CHART.DIM, flexShrink: 0,
-                  }}
-                >
-                  {t('common:handicap.mechanism.nextInLine')}
-                </span>
-                <span
-                  style={{
-                    fontSize: 11, fontWeight: 700, color: A.BODY, ...FIG,
-                    minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  }}
-                >
-                  {t('common:handicap.mechanism.nextInLineValue', {
-                    diff: fmtDiff(nextRound.diff as number),
-                    course: nextRound.course_name ?? '',
-                    date: formatDayMonthShortGB(nextRound.play_date),
-                  })}
-                </span>
-              </div>
-            )}
           </div>
         )}
       </HcpSection>

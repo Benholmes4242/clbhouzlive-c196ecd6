@@ -47,12 +47,13 @@ interface Props {
   /**
    * PHASE 4 §4.4: the cut line. `value` is the highest differential among
    * rounds where is_counter is true (derived by the section, never by a
-   * client-side comparison here); `label` is the formatted "CUT · {value}".
+   * client-side comparison here). BRIEF_HANDICAP_TAB_REBUILD_4A keeps
+   * the rule without a label or canvas backing.
    * Drawn as a 1px AMBER rule at the value's true height on the same
    * min-anchored scale as the bars, so the line and the bar colours cannot
    * disagree.
    */
-  cut?: { value: number; label: string } | null;
+  cut?: { value: number } | null;
   /** PHASE 4 §4.5: axis labels carry the dates — "OLDEST · {date}". */
   oldestLabel?: string;
   newestLabel?: string;
@@ -101,11 +102,9 @@ const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, cut =
         ))}
       </div>
 
-      {/* PHASE 4 §4.4: the cut line — 1px AMBER at the eighth-best
-          differential's true height, label at the right end on a
-          canvas-coloured backing so it never sits on top of a bar. */}
+      {/* PHASE 4 §4.4: the unlabelled 1px AMBER rule at the eighth-best
+          differential's true height. */}
       {cut != null && (
-        <>
           <div
             aria-hidden
             style={{
@@ -114,20 +113,6 @@ const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, cut =
               background: CHART.AMBER,
             }}
           />
-          <span
-            style={{
-              position: 'absolute', right: 0,
-              bottom: heightOf(cut.value) + 3,
-              padding: '0 4px',
-              background: CHART.CANVAS,
-              fontSize: 8.5, fontWeight: 700, letterSpacing: '0.08em',
-              textTransform: 'uppercase', color: CHART.AMBER,
-              fontVariantNumeric: 'tabular-nums lining-nums',
-            }}
-          >
-            {cut.label}
-          </span>
-        </>
       )}
       </div>
 
