@@ -39,6 +39,7 @@ const twenty = (ageing: boolean): WhsScoreWithIndex[] => Array.from({ length: 20
   is_counter: i < 7 || (ageing ? i === 17 : i === 7),
   course: { name: 'Test Links', country_name: null },
   course_id: 'test-course',
+  course_thumbnail_image: null,
   course_rating: 70,
   slope_rating: 113,
   stableford_points: null,
