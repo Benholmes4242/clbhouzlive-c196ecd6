@@ -22,8 +22,8 @@ interface Props {
   onOpen?: (momentId: string) => void;
 }
 
-const YourMomentsSection: React.FC<Props> = ({ courseId, courseName, onOpen }) => {
-  const { t } = useTranslation('courses');
+/** The viewer's moments here and their read-only fullscreen posts (shared with the played-state record section). */
+export function useMomentPosts(courseId: string, courseName: string) {
   const { data: moments } = useUserCourseMoments(courseId);
   const { user } = useSupabaseSession();
   const { profile } = useProfileData();
@@ -68,7 +68,13 @@ const YourMomentsSection: React.FC<Props> = ({ courseId, courseName, onOpen }) =
     [moments, user?.id, profile, courseName, courseId],
   );
 
-  if (!moments || moments.length === 0) return null;
+  return { moments: moments ?? [], posts };
+}
+
+const YourMomentsSection: React.FC<Props> = ({ courseId, courseName, onOpen }) => {
+  const { t } = useTranslation('courses');
+  const { moments, posts } = useMomentPosts(courseId, courseName);
+  if (moments.length === 0) return null;
 
   return (
     <AboutSection
