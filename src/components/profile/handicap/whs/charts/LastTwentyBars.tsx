@@ -101,12 +101,42 @@ const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, cut =
         ))}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, ...LABEL_STYLE }}>
-        <span>Oldest</span>
-        <span>Newest</span>
+      {/* PHASE 4 §4.4: the cut line — 1px AMBER at the eighth-best
+          differential's true height, label at the right end on a
+          canvas-coloured backing so it never sits on top of a bar. */}
+      {cut != null && (
+        <>
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute', left: 0, right: 0,
+              bottom: heightOf(cut.value), height: 1,
+              background: CHART.AMBER,
+            }}
+          />
+          <span
+            style={{
+              position: 'absolute', right: 0,
+              bottom: heightOf(cut.value) + 3,
+              padding: '0 4px',
+              background: CHART.CANVAS,
+              fontSize: 8.5, fontWeight: 700, letterSpacing: '0.08em',
+              textTransform: 'uppercase', color: CHART.AMBER,
+              fontVariantNumeric: 'tabular-nums lining-nums',
+            }}
+          >
+            {cut.label}
+          </span>
+        </>
+      )}
       </div>
 
-      {eight.length > 0 && (
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, ...LABEL_STYLE }}>
+        <span>{oldestLabel ?? 'Oldest'}</span>
+        <span>{newestLabel ?? 'Newest'}</span>
+      </div>
+
+      {(eight?.length ?? 0) > 0 && (
         <div
           style={{
             display: 'flex', alignItems: 'center', gap: 10,
