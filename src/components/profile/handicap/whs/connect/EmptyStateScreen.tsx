@@ -267,8 +267,9 @@ function useFittedThreeLine(deps: React.DependencyList) {
   return ref;
 }
 
-const LegacyFallback: React.FC<Props> = ({ onPickCountry, onDecline }) => {
+const LegacyFallback: React.FC<Props> = ({ onPickCountry, onDecline, layout = 'page' }) => {
   const { t } = useTranslation('handicap');
+  const immersive = layout === 'page';
   return (
     <>
       <Stage fill>
@@ -296,10 +297,12 @@ const LegacyFallback: React.FC<Props> = ({ onPickCountry, onDecline }) => {
           </div>
         </div>
       </Stage>
-      <FooterBar>
-        <button type="button" onClick={onPickCountry} style={primaryCtaStyle}>{t('whsConnect.intro.cta')}</button>
-        {onDecline ? <DeclineButton onClick={onDecline} /> : null}
-      </FooterBar>
+      {immersive ? (
+        <FooterBar>
+          <button type="button" onClick={onPickCountry} style={primaryCtaStyle}>{t('whsConnect.intro.cta')}</button>
+          {onDecline ? <DeclineButton onClick={onDecline} /> : null}
+        </FooterBar>
+      ) : null}
     </>
   );
 };
@@ -434,7 +437,7 @@ const IntroFooter: React.FC<{ hidden: boolean; display: boolean; onTransitionEnd
   return (
     <div aria-hidden={hidden} onTransitionEnd={onTransitionEnd} style={{ padding: '18px 24px 30px', paddingBottom: 'calc(30px + env(safe-area-inset-bottom, 0px))', display: display ? 'flex' : 'none', flexDirection: 'column', gap: 12, background: GROUND, borderTop: `1px solid ${FAINT_HAIR}`, transform: hidden ? 'translateY(100%)' : 'translateY(0)', opacity: hidden ? 0 : 1, pointerEvents: hidden ? 'none' : 'auto', transition: 'transform 200ms ease, opacity 200ms ease' }}>
       <div style={{ fontSize: 13.5, lineHeight: 1.45, color: QUIET }}>
-        <Trans t={t} i18nKey="whsConnect.intro.footerLine" components={[null, <span style={{ color: SOFT_INK, fontWeight: 700 }} />]} />
+        <Trans t={t} i18nKey="whsConnect.intro.footerLine" components={{ 1: <span style={{ color: SOFT_INK, fontWeight: 700 }} /> }} />
       </div>
       <button type="button" onClick={cta} style={primaryCtaStyle}>{t('whsConnect.intro.connectCta')}</button>
       {onDecline ? <DeclineButton onClick={onDecline} /> : null}
@@ -644,6 +647,12 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline, la
     if (!footerHidden) setFooterDisplay(true);
   }, [footerHidden]);
 
+  React.useEffect(() => {
+    if (pending || !intro.data || !band.data || viewedRef.current) return;
+    viewedRef.current = true;
+    analyticsEvents.track('connect_intro_viewed', { source: intro.data.source, band: !!band.data.band, h0 });
+  }, [band.data, h0, intro.data, pending]);
+
   const pending = !homeSettled || intro.isPending || (!!userId && profile.isPending) || (!!intro.data && band.isPending);
   if (pending) {
     return (
@@ -654,18 +663,12 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline, la
     );
   }
 
-  if (!intro.data) return <LegacyFallback onPickCountry={onPickCountry} onDecline={onDecline} />;
-  if (!band.data || band.data.available === false || !band.data.all) return <LegacyFallback onPickCountry={onPickCountry} onDecline={onDecline} />;
+  if (!intro.data) return <LegacyFallback onPickCountry={onPickCountry} onDecline={onDecline} layout={layout} />;
+  if (!band.data || band.data.available === false || !band.data.all) return <LegacyFallback onPickCountry={onPickCountry} onDecline={onDecline} layout={layout} />;
 
   const block = band.data.band ?? band.data.all;
   const dataHcp = band.data.hcp;
   const circleShown = !!circle.isFetched && (circle.data?.connected ?? 0) > 0;
-
-  React.useEffect(() => {
-    if (viewedRef.current) return;
-    viewedRef.current = true;
-    analyticsEvents.track('connect_intro_viewed', { source: intro.data?.source ?? null, band: !!band.data?.band, h0 });
-  }, [band.data?.band, h0, intro.data?.source]);
 
   return (
     <>
