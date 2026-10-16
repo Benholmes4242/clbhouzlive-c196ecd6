@@ -90,7 +90,10 @@ export const VerdictSection: React.FC<VerdictProps> = (p) => {
  * deliberately different counts; the lede names the minimum and the omissions.
  */
 const listYears = (ys: number[]) => ys.length <= 1 ? ys.join('') : `${ys.slice(0, -1).join(', ')} and ${ys[ys.length - 1]}`;
-const countsList = (cs: number[]) => { const w = cs.map((c) => words(c)); return w.length <= 1 ? w.join('') : `${w.slice(0, -1).join(', ')} and ${w[w.length - 1]}`; };
+const countsList = (cs: number[]) => {
+  const w = cs.map((c, i) => (i === 0 ? `${words(c)} ${plural(c, 'round', 'rounds')}` : words(c)));
+  return w.length <= 1 ? w.join('') : `${w.slice(0, -1).join(', ')} and ${w[w.length - 1]}`;
+};
 
 export const YearsSection: React.FC<{ seasons: Season[]; omitted?: Season[]; year: number; firstTwenty: number | null; lastForty: number | null; held: boolean }> = ({ seasons, omitted = [], year, firstTwenty, lastForty, held }) => {
   const drawn = seasons.filter((s) => s.avgGross != null);
@@ -108,7 +111,7 @@ export const YearsSection: React.FC<{ seasons: Season[]; omitted?: Season[]; yea
       <Lede>
         Seasons with at least {words(SEASON_MIN_ROUNDS)} rounds.
         {omitted.length > 0
-          ? ` Your ${listYears(omitted.map((o) => o.year))} ${omitted.length === 1 ? 'was' : 'were'} ${countsList(omitted.map((o) => o.count))} ${plural(omitted[omitted.length - 1].count, 'round', 'rounds')}, so ${omitted.length === 1 ? 'it is' : 'they are'} not drawn.`
+          ? ` Your ${listYears(omitted.map((o) => o.year))} ${omitted.length === 1 ? 'was' : 'were'} ${countsList(omitted.map((o) => o.count))}, so ${omitted.length === 1 ? 'it is' : 'they are'} not drawn.`
           : null}
       </Lede>
       <svg viewBox={`0 0 ${W} 92`} width="100%" height={92} style={{ display: 'block', marginTop: 13 }} role="img" aria-label="Your average gross by season">
