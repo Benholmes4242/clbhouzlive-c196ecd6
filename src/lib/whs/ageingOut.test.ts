@@ -80,3 +80,39 @@ describe('3A amendment', () => {
     expect(a.replacement).toBe(17);
   });
 });
+
+import { indexFromDifferentials } from './coursePlay';
+
+describe('3B amendment', () => {
+  const c8 = () =>
+    twenty(40, false).map((r, i) => {
+      if (i === 18) return { ...r, handicap_differential: 41, is_counter: false };
+      if (i === 17) return { ...r, handicap_differential: 2, is_counter: true };
+      return r;
+    }) as WhsScoreWithIndex[];
+  const after = (newDiffs: number[]) => {
+    const oldestFirst = [...c8()].reverse().map((r) => r.handicap_differential as number);
+    const idx = indexFromDifferentials([...oldestFirst.slice(newDiffs.length), ...newDiffs]);
+    return Math.round(idx! * 10) / 10;
+  };
+
+  it('D3: rounds that fail to beat the expiring 2.0 but make the eight do NOT land at settle', () => {
+    const a = deriveAgeingOut(c8(), 11.6, course)!;
+    expect(after([12, 13, 14])).toBe(12.4);
+    expect(after([12, 13, 14])).not.toBe(a.settleAt);
+  });
+
+  it('D3: rounds worse than the replacement differential land at settle', () => {
+    const a = deriveAgeingOut(c8(), 11.6, course)!;
+    expect(after([a.replacement + 1, a.replacement + 2, a.replacement + 3])).toBe(a.settleAt);
+  });
+
+  it('D4/D5: C8 figures with the hold line', () => {
+    const a = deriveAgeingOut(c8(), 11.6, course)!;
+    expect(a.inRounds).toBe(3);
+    expect(a.expiring.handicap_differential).toBe(2);
+    expect(a.replacement).toBe(17);
+    expect(a.settleAt).toBe(13.5);
+    expect(a.holdGross).toBe(72);
+  });
+});

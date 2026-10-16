@@ -76,7 +76,7 @@ const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number
         )}
         {course && a.holdGross != null && (
           <p style={{ margin: '12px 0 0', paddingTop: 12, borderTop: `1px solid ${CHART.BORDER}`, fontSize: 12.5, fontWeight: 400, lineHeight: 1.45, color: CHART.MUTE, ...FIG }}>
-            {t('common:handicap.ageingOut.hold', { index: a.current.toFixed(1), gross: a.holdGross, course: course.name })}
+            {t('common:handicap.ageingOut.hold', { index: a.current.toFixed(1), gross: a.holdGross, course: course.name, count })}
             {a.repeat && <> {t('common:handicap.ageingOut.holdRepeat', { gross: a.repeat.gross, times: a.repeat.times })}</>}
           </p>
         )}
