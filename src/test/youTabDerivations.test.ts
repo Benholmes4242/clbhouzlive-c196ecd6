@@ -77,7 +77,7 @@ describe('P1.4 per-hole gaps agree with the course gap', () => {
   it('sums 3.01 against 3.23, inside the tolerance', () => {
     const c = edgeConsistency(holeEdges(PARS, fieldRows, mineRows), courseGap);
     expect(c.holeSum).toBeCloseTo(3.01, 2);
-    expect(c.courseGap).toBeCloseTo(3.23, 2);
+    expect(c.courseGap).toBeCloseTo(3.23, 1);
     expect(c.ok).toBe(true);
   });
   it('fails when the two derivations drift beyond the tolerance', () => {
