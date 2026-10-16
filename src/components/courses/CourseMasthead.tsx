@@ -1,4 +1,5 @@
 import React from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /**
@@ -11,7 +12,6 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 const HERO_HAIRLINE = 'rgba(255,255,255,0.18)';
 const PLACE_INK = 'rgba(255,255,255,0.78)';
-const SKELETON_FILL = 'rgba(255,255,255,0.28)';
 
 export const MASTHEAD_KICKER: React.CSSProperties = {
   fontSize: 11,
@@ -133,15 +133,15 @@ export const CourseMasthead: React.FC<CourseMastheadProps> = ({
 /** Loading shape of the masthead: kicker bar, tall name block, place bar, then the row beneath. */
 export function CourseMastheadSkeleton({ rowHeight }: { rowHeight: number }) {
   const bar = (h: number, w: string | number, mb = 0): React.CSSProperties => ({
-    height: h, width: w, background: SKELETON_FILL, borderRadius: 4, marginBottom: mb,
+    height: h, width: w, borderRadius: 4, marginBottom: mb,
   });
   return (
-    <div style={{ opacity: 0.35 }} aria-hidden>
-      <div className="animate-pulse" style={bar(11, 140, 8)} />
-      <div className="animate-pulse" style={bar(30, '70%', 6)} />
-      <div className="animate-pulse" style={bar(12.5, 120)} />
+    <div aria-hidden>
+      <Skeleton style={bar(11, 140, 8)} />
+      <Skeleton style={bar(30, '70%', 6)} />
+      <Skeleton style={bar(12.5, 120)} />
       <MastheadRule>
-        <div className="animate-pulse" style={bar(rowHeight, '80%')} />
+        <Skeleton style={bar(rowHeight, '80%')} />
       </MastheadRule>
     </div>
   );
