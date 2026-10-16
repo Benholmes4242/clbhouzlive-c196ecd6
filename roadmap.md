@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_HANDICAP_TAB_REBUILD_6B
+- [x] Confirm clbhouz; remove FloorSection, its derivations and 19 dedicated tests, and English handicap.floor keys; supersedes 6A.
+- [x] Preserve pickCourse and PersonalBestsSection exactly, with the requested remaining section order.
+- [ ] Verify full suite against 1,411 passing baseline (expected 1,392), preview build and untouched-file checks; authenticated live-profile checks unavailable on external/unmanaged Supabase. No SQL/migrations/data edits.
+
 ## BRIEF_HANDICAP_TAB_REBUILD_7A
 - [x] Confirm project identity is clbhouz; remove Trophy Room entry and dashboard launch mount while preserving Records to break.
 - [x] Delete Trophy Room and verified orphan files/assets/tests; remove unused aggregates hook. User approved keeping fetchTrophyAggregates/TrophyAggregates for Compare (useCompareStats calls it twice).
