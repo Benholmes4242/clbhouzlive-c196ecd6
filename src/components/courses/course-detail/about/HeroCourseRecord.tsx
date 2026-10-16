@@ -23,10 +23,11 @@ const DIM = SURFACE.dark.dim;
 const AVATAR = 22;
 const OVERLAP = 7;
 const MAX_AVATARS = 3;
-/** Measured rendered row height (two-line text block, ~28px, taller than the
- *  22px avatars) + its 10px margin-top. The hero grows by exactly this; the
- *  mock's hero heights were context, not absolutes (BRIEF_COURSE_HERO_1B K1). */
-export const HERO_RECORD_ROW_EXTRA = 38;
+/** Measured rendered row height (34.75px at 393px — the two-line text block,
+ *  taller than the 22px avatars) + its 10px margin-top, rounded up. The hero
+ *  grows by exactly this; the mock's hero heights were context, not absolutes
+ *  (BRIEF_COURSE_HERO_1B K1). */
+export const HERO_RECORD_ROW_EXTRA = 45;
 
 export function heroRecordNames(holders: CourseLegendRow[]): string | null {
   const names = holders.map((h) => displayName(h.user_display_name).trim());
