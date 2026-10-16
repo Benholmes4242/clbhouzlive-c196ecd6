@@ -322,20 +322,28 @@ const primaryCtaStyle: React.CSSProperties = {
 
 const DeclineButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   <button type="button" onClick={onClick} style={{ height: 36, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', fontFamily: FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: QUIET, cursor: 'pointer' }}>
-    I don&apos;t hold an official handicap
+    <IntroText k="decline" />
   </button>
 );
 
-const Stepper: React.FC<{ value: number; onChange: (next: number) => void }> = ({ value, onChange }) => (
-  <div style={{ paddingTop: 22, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-    <span style={{ fontSize: 15, fontWeight: 600, color: MID }}>If you play off</span>
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-      <button type="button" aria-label="Lower handicap" disabled={value <= 0} onClick={() => onChange(Math.max(0, value - 1))} style={stepperButtonStyle(value <= 0)}>&minus;</button>
-      <span style={{ minWidth: 56, textAlign: 'center', fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', color: SOFT_INK, ...NUM }}>{value}</span>
-      <button type="button" aria-label="Higher handicap" disabled={value >= 36} onClick={() => onChange(Math.min(36, value + 1))} style={stepperButtonStyle(value >= 36)}>+</button>
-    </span>
-  </div>
-);
+const IntroText: React.FC<{ k: string; options?: Record<string, unknown> }> = ({ k, options }) => {
+  const { t } = useTranslation('handicap');
+  return <>{t(`whsConnect.intro.${k}`, options)}</>;
+};
+
+const Stepper: React.FC<{ value: number; onChange: (next: number) => void }> = ({ value, onChange }) => {
+  const { t } = useTranslation('handicap');
+  return (
+    <div style={{ paddingTop: 22, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <span style={{ fontSize: 15, fontWeight: 600, color: MID }}>{t('whsConnect.intro.stepperLabel')}</span>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <button type="button" aria-label={t('whsConnect.intro.lowerHandicapAria')} disabled={value <= 0} onClick={() => onChange(Math.max(0, value - 1))} style={stepperButtonStyle(value <= 0)}>&minus;</button>
+        <span style={{ minWidth: 56, textAlign: 'center', fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', color: SOFT_INK, ...NUM }}>{value}</span>
+        <button type="button" aria-label={t('whsConnect.intro.higherHandicapAria')} disabled={value >= 36} onClick={() => onChange(Math.min(36, value + 1))} style={stepperButtonStyle(value >= 36)}>+</button>
+      </span>
+    </div>
+  );
+};
 
 function stepperButtonStyle(disabled: boolean): React.CSSProperties {
   return {
