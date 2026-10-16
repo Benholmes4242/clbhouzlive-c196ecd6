@@ -83,9 +83,17 @@ export interface StrokesGo {
   rows: ParTypeRow[];
   /** The row carrying the largest share of dropped shots (drives the title). */
   dominant: ParTypeRow | null;
-  bands: OutcomeBands;
-  /** Double-or-worse holes per round (bands.doublePlus% × 18). */
-  doublesPerRound: number;
+  /**
+   * NULL when any present par type lacks the four count fields (5B L3):
+   * the bar and band labels do not render — absent, not approximated.
+   */
+  bands: OutcomeBands | null;
+  /**
+   * Double-or-worse holes per round: the exact double_count share × 18
+   * (5B L6 — from the count, never the rounded percentage). NULL when the
+   * counts are absent.
+   */
+  doublesPerRound: number | null;
 }
 
 const TYPES: Array<{ parN: 3 | 4 | 5; key: 'par3' | 'par4' | 'par5' }> = [
