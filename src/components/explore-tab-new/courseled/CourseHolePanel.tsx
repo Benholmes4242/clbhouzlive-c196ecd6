@@ -1,8 +1,11 @@
+import { PopulationCaption } from '@/features/courses/components/holes/analytical/PopulationCaption';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
+import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
+import { fieldHolesExcludingViewer } from '@/lib/courseYou/youDerivations';
 import {
   A,
   FIGS,
@@ -64,6 +67,16 @@ export function CourseHolePanel({
   const mine = useMyHolePerformance(userId, courseId, { enabled: Boolean(userId) });
 
   const holes: CourseHole[] = analysis.data?.holes ?? [];
+  /* FIELD_EXCLUDES_VIEWER_B (R1). Field avg, "you beat the field on", the
+     chart bars, par types and the extremes are the field EXCLUDING the member
+     whose figures are shown; a hole with no field once they are removed is
+     blank (NaN), never the inclusive figure. The distribution strip stays on
+     the inclusive analysis and carries a label naming that population (R4). */
+  const holeField = useCourseHoleField(courseId, userId, { enabled: Boolean(userId) });
+  const fieldHoles: CourseHole[] = useMemo(
+    () => (userId ? fieldHolesExcludingViewer(holes, holeField.data?.available ? holeField.data.holes : []) : holes),
+    [userId, holes, holeField.data],
+  );
   const totalRounds = analysis.data?.total_rounds ?? 0;
 
   const myByHole = useMemo(() => {
@@ -73,7 +86,7 @@ export function CourseHolePanel({
   }, [mine.data]);
 
   /* Acceptance 12 — nothing renders then swaps. Both reads settle first. */
-  const settling = analysis.isPending || (Boolean(userId) && mine.isPending);
+  const settling = analysis.isPending || (Boolean(userId) && (mine.isPending || holeField.isPending));
   if (settling) {
     return <div aria-hidden style={{ minHeight: 330 }} />;
   }
@@ -101,16 +114,18 @@ export function CourseHolePanel({
      be their own average renamed and the beat count 0/18 by arithmetic. */
   const fieldIsOnlyYou = hasYou && totalRounds > 0 && myRounds >= totalRounds;
 
-  const fieldAvg = holes.reduce((s, h) => s + h.avg_to_par, 0) / holes.length;
+  const measured = fieldHoles.filter((h) => Number.isFinite(h.avg_to_par));
+  const fieldAvg = measured.length > 0 ? measured.reduce((s, h) => s + h.avg_to_par, 0) / measured.length : Number.NaN;
   const yourAvg = hasYou ? mineRows.reduce((s, r) => s + r.avg_to_par, 0) / mineRows.length : null;
-  const beat = holes.filter((h) => {
+  const beat = measured.filter((h) => {
     const m = myByHole.get(h.hole_no);
     return m != null && m.avg_to_par < h.avg_to_par;
   }).length;
-  const hardest = holes.reduce((m, h) => (h.avg_to_par > m.avg_to_par ? h : m), holes[0]);
-  const easiest = holes.reduce((m, h) => (h.avg_to_par < m.avg_to_par ? h : m), holes[0]);
+  const pool = measured.length > 0 ? measured : fieldHoles;
+  const hardest = pool.reduce((m, h) => (h.avg_to_par > m.avg_to_par ? h : m), pool[0]);
+  const easiest = pool.reduce((m, h) => (h.avg_to_par < m.avg_to_par ? h : m), pool[0]);
 
-  const parRows = buildParTypeRows(holes, myByHole);
+  const parRows = buildParTypeRows(fieldHoles, myByHole);
   const shares = courseBucketShares(holes);
 
   const field = toParParts(fieldAvg);
@@ -126,7 +141,7 @@ export function CourseHolePanel({
       {/* BLOCK 1 — the chart, directly beneath the basis heading (P1.3). */}
       <Block first>
         <HoleChart
-          holes={holes}
+          holes={fieldHoles}
           myByHole={myByHole}
           hasYou={hasYou}
           fieldIsOnlyYou={fieldIsOnlyYou}
@@ -175,6 +190,7 @@ export function CourseHolePanel({
       {/* M1 / Q2.5 — no disclosure: the final analytical block is always visible. */}
       <Block title={t('holes.preview.eyebrow', 'Hole by hole')}>
         {shares && <DistributionStrip shares={shares} />}
+        {shares && <PopulationCaption includesYou={hasYou} style={{ marginTop: 6 }} />}
         <Extremes hardest={hardest} easiest={easiest} />
       </Block>
       <ListTerminalRow
@@ -306,7 +322,7 @@ function HoleChart({
   const values = holes.flatMap((h) => {
     const m = myByHole.get(h.hole_no)?.avg_to_par;
     return hasYou && m != null ? [h.avg_to_par, m] : [h.avg_to_par];
-  });
+  }).filter((v) => Number.isFinite(v));
   const domainMax = Math.max(0.1, ...values);
   const domainMin = Math.min(0, ...values);
   const span = Math.max(0.1, domainMax - domainMin);
@@ -317,9 +333,9 @@ function HoleChart({
   const cx = (i: number) => i * slot + slot / 2;
 
   /* S5.6 — THE TINT IS THE COURSE'S OWN SPREAD, never an absolute scale. */
-  const fieldVals = holes.map((h) => h.avg_to_par);
-  const fMin = Math.min(...fieldVals);
-  const fMax = Math.max(...fieldVals);
+  const fieldVals = holes.map((h) => h.avg_to_par).filter((v) => Number.isFinite(v));
+  const fMin = fieldVals.length ? Math.min(...fieldVals) : 0;
+  const fMax = fieldVals.length ? Math.max(...fieldVals) : 0;
   const fSpan = Math.max(0.01, fMax - fMin);
 
   const linePts = hasYou
@@ -337,7 +353,7 @@ function HoleChart({
   const selField = toParParts(selHole.avg_to_par);
   const selYou = toParParts(selMine);
   const dotY = selMine == null ? null : y(selMine);
-  const selectedBarTop = Math.min(y(selHole.avg_to_par), yBase);
+  const selectedBarTop = Number.isFinite(selHole.avg_to_par) ? Math.min(y(selHole.avg_to_par), yBase) : yBase;
   /* Amendment I: clear whichever sits higher, the field bar or the member
      trace. The fixed TOP lane keeps this baseline inside the plot. */
   const selectedLabelY = Math.min(selectedBarTop, dotY ?? selectedBarTop) - 6;
@@ -409,6 +425,7 @@ function HoleChart({
           </text>
           {!fieldIsOnlyYou &&
             holes.map((h, i) => {
+              if (!Number.isFinite(h.avg_to_par)) return null;
               const yv = y(h.avg_to_par);
               const top = Math.min(yv, yBase);
               const height = Math.max(2, Math.abs(yBase - yv));

@@ -212,6 +212,23 @@ export function holeEdges(
     });
 }
 
+/**
+ * FIELD_EXCLUDES_VIEWER — per-hole "Field" figures for any surface that sets
+ * them beside the viewer's own. Returns the input holes in their own order with
+ * avg_to_par replaced by the field EXCLUDING the viewer (get_course_hole_field
+ * avg_gross minus par, through holeEdges). A hole the excluding field has not
+ * measured gets NaN: it renders blank and NEVER falls back to the inclusive
+ * get_course_hole_analysis figure. Every other property (dist, rounds, SI) is
+ * left as given, because those describe the course, not a comparison.
+ */
+export function fieldHolesExcludingViewer<H extends HoleParInput & { avg_to_par: number }>(
+  holes: H[],
+  field: HoleFieldInput[],
+): H[] {
+  const byHole = new Map(holeEdges(holes, field, []).map((e) => [e.hole_no, e.field]));
+  return holes.map((h) => ({ ...h, avg_to_par: byHole.get(h.hole_no) ?? Number.NaN }));
+}
+
 export interface EdgeSummary {
   measured: HoleEdge[];
   unmeasured: number;

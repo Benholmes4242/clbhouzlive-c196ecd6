@@ -3,7 +3,7 @@
  *
  * "The field excluding the viewer" has exactly ONE implementation, in
  * src/lib/courseYou/youDerivations.ts: fieldExcludingViewer (course level) and
- * holeEdges (per hole: get_course_hole_field minus par). A new comparison
+ * holeEdges / fieldHolesExcludingViewer (per hole: get_course_hole_field minus par). A new comparison
  * surface must import these, never recompute them. Surfaces already fixed are
  * listed below and must keep importing them.
  */
@@ -16,7 +16,9 @@ const HOME = 'lib/courseYou/youDerivations.ts';
 const FIXED_SURFACES: Record<string, string[]> = {
   'components/courses/course-detail/CourseYouTab.tsx': ['fieldExcludingViewer', 'holeEdges'],
   'components/courses/course-detail/you/YourRoundsSheet.tsx': ['fieldExcludingViewer'],
-  'components/courses/course-detail/about/AllHolesSheet.tsx': ['holeEdges'],
+  'components/courses/course-detail/about/AllHolesSheet.tsx': ['fieldHolesExcludingViewer'],
+  'features/courses/components/holes/analytical/CourseAnalyticsPanels.tsx': ['fieldHolesExcludingViewer'],
+  'components/explore-tab-new/courseled/CourseHolePanel.tsx': ['fieldHolesExcludingViewer'],
 };
 
 function sourceFiles(dir: string): string[] {
@@ -30,7 +32,7 @@ function sourceFiles(dir: string): string[] {
 const files = sourceFiles(ROOT).map((path) => ({ rel: relative(ROOT, path).replace(/\\/g, '/'), text: readFileSync(path, 'utf8') }));
 
 describe('field excluding viewer has one implementation and fixed surfaces import it', () => {
-  it.each(['fieldExcludingViewer', 'holeEdges'])('%s is defined only in youDerivations', (name) => {
+  it.each(['fieldExcludingViewer', 'holeEdges', 'fieldHolesExcludingViewer'])('%s is defined only in youDerivations', (name) => {
     const definers = files
       .filter((f) => new RegExp(`(function|const|let)\\s+${name}\\b`).test(f.text))
       .map((f) => f.rel);

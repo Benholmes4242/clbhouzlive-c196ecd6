@@ -1,3 +1,4 @@
+import { PopulationCaption } from '@/features/courses/components/holes/analytical/PopulationCaption';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -5,7 +6,7 @@ import { formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
-import { holeEdges } from '@/lib/courseYou/youDerivations';
+import { fieldHolesExcludingViewer } from '@/lib/courseYou/youDerivations';
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
@@ -289,9 +290,7 @@ const AllHolesSheet: React.FC<AllHolesSheetProps> = ({ open, onClose, courseId, 
   const { data: holeField } = useCourseHoleField(courseId, user?.id, { enabled: open });
   const fieldHoles = React.useMemo<CourseHole[]>(() => {
     if (!user?.id) return holes;
-    const edges = holeEdges(holes, holeField?.available ? holeField.holes : [], []);
-    const byHole = new Map(edges.map((edge) => [edge.hole_no, edge.field]));
-    return holes.map((hole) => ({ ...hole, avg_to_par: byHole.get(hole.hole_no) ?? Number.NaN }));
+    return fieldHolesExcludingViewer(holes, holeField?.available ? holeField.holes : []);
   }, [holes, holeField, user?.id]);
   const stats = React.useMemo(() => {
     if (fieldHoles.length === 0) return null;
@@ -363,6 +362,7 @@ const AllHolesSheet: React.FC<AllHolesSheetProps> = ({ open, onClose, courseId, 
           <>
             <AboutSection heading={t('courseDetail.allHolesSheet.holes')}>
               {shares ? <DistributionSummary shares={shares} /> : null}
+              {shares ? <PopulationCaption includesYou={hasYou} style={{ marginTop: 10 }} /> : null}
               <div style={{ marginTop: shares ? 16 : 0 }}>
                 {fieldHoles.map((hole, index) => (
                   <CompactHoleRow key={hole.hole_no} hole={hole} mine={myByHole.get(hole.hole_no) ?? null} hasYou={hasYou} last={index === holes.length - 1} />
@@ -379,6 +379,7 @@ const AllHolesSheet: React.FC<AllHolesSheetProps> = ({ open, onClose, courseId, 
                 heading={t('courseDetail.allHolesSheet.ladder')}
                 meta={t('courseDetail.allHolesSheet.outOfStep', { count: ladder.flagged.length })}
               >
+                <PopulationCaption includesYou={hasYou} style={{ marginBottom: 10 }} />
                 <FlatSiLadder ladder={ladder} />
               </AboutSection>
             ) : null}
