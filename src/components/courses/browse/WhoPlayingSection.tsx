@@ -94,7 +94,7 @@ export function WhoPlayingSection() {
               onClick={() => (g.courseId ? navigate(`/courses/${g.courseId}`) : undefined)}
               style={{ width: WHO_CARD_W, flex: 'none', background: MEMBER_PANEL, border: `1px solid ${A.BORDER}`, borderRadius: WHO_CARD_RADIUS, overflow: 'hidden', padding: 0, textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}
             >
-              <CourseImageFallback courseId={g.courseId} courseName={name} imageUrl={m?.imageUrl} style={{ height: WHO_PHOTO_H, flexShrink: 0 }}>
+              <CourseImageFallback courseId={g.courseId} courseName={name} imageUrl={m?.imageUrl} pending={metaQuery.isLoading} style={{ height: WHO_PHOTO_H, flexShrink: 0 }}>
                 <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
                 {g.best != null ? (
                   <span className={GLASS_CHIP_CLASS} style={{ position: 'absolute', right: 10, top: 10, padding: '5px 10px', borderRadius: 10, textAlign: 'right' }}>
