@@ -70,7 +70,8 @@ export function CourseHolePanel({
   /* FIELD_EXCLUDES_VIEWER_B (R1). Field avg, "you beat the field on", the
      chart bars, par types and the extremes are the field EXCLUDING the member
      whose figures are shown; a hole with no field once they are removed is
-     blank (NaN), never the inclusive figure. The distribution strip stays on
+     blank (NaN), never the inclusive figure. The distribution strip and the
+     hardest/easiest holes stay on
      the inclusive analysis and carries a label naming that population (R4). */
   const holeField = useCourseHoleField(courseId, userId, { enabled: Boolean(userId) });
   const fieldHoles: CourseHole[] = useMemo(
@@ -121,9 +122,10 @@ export function CourseHolePanel({
     const m = myByHole.get(h.hole_no);
     return m != null && m.avg_to_par < h.avg_to_par;
   }).length;
-  const pool = measured.length > 0 ? measured : fieldHoles;
-  const hardest = pool.reduce((m, h) => (h.avg_to_par > m.avg_to_par ? h : m), pool[0]);
-  const easiest = pool.reduce((m, h) => (h.avg_to_par < m.avg_to_par ? h : m), pool[0]);
+  /* FIELD_EXCLUDES_VIEWER_C (S1): the hardest and easiest hole are facts about
+     the course, the same for every reader - get_course_hole_analysis, everyone. */
+  const hardest = holes.reduce((m, h) => (h.avg_to_par > m.avg_to_par ? h : m), holes[0]);
+  const easiest = holes.reduce((m, h) => (h.avg_to_par < m.avg_to_par ? h : m), holes[0]);
 
   const parRows = buildParTypeRows(fieldHoles, myByHole);
   const shares = courseBucketShares(holes);
@@ -516,7 +518,7 @@ function HoleChart({
  * of the number a small labelled stack. A bare 1.4 beside a hole number says
  * nothing, so the figure carries FIELD AVG beneath it.
  */
-function Extremes({ hardest, easiest }: { hardest: CourseHole; easiest: CourseHole }) {
+export function Extremes({ hardest, easiest }: { hardest: CourseHole; easiest: CourseHole }) {
   const { t } = useTranslation('courses');
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', marginTop: 10 }}>

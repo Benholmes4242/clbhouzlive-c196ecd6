@@ -467,9 +467,10 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
       const mine = myByHole.get(h.hole_no);
       return mine != null && mine.avg_to_par < h.avg_to_par;
     }).length;
-    const pool = measured.length > 0 ? measured : fieldHoles;
-    const hardest = pool.reduce((m, h) => (h.avg_to_par > m.avg_to_par ? h : m), pool[0]);
-    const easiest = pool.reduce((m, h) => (h.avg_to_par < m.avg_to_par ? h : m), pool[0]);
+    /* FIELD_EXCLUDES_VIEWER_C (S1): hardest/easiest are course facts, the same
+       for every reader - the inclusive analysis (holes), never fieldHoles. */
+    const hardest = holes.reduce((m, h) => (h.avg_to_par > m.avg_to_par ? h : m), holes[0]);
+    const easiest = holes.reduce((m, h) => (h.avg_to_par < m.avg_to_par ? h : m), holes[0]);
     /* NO FIELD (BRIEF_HOW_IT_PLAYS_NO_FIELD): the pool is only a field when it
        contains rounds beyond the viewer's own. times_played is the viewer's
        OWN round count per hole; total_rounds is every round in the pool. When
@@ -480,7 +481,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
     const fieldIsOnlyYou =
       activeView === 'members' && hasYou && totalRounds > 0 && myRounds >= totalRounds;
     return { fieldAvg, yourAvg, beat, withYou: mineRows.length, hardest, easiest, fieldIsOnlyYou };
-  }, [fieldHoles, myByHole, hasYou, totalRounds, activeView]);
+  }, [holes, fieldHoles, myByHole, hasYou, totalRounds, activeView]);
 
   const toggle = (holeNo: number, surface: 'preview' | 'sheet') => {
     setOpenHoles((prev) => {
@@ -691,10 +692,12 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
           holes={fieldHoles}
           myByHole={myByHole}
           hardestHole={stats.hardest.hole_no}
-          hardestText={beastFig ? beastFig.text : ''}
+          /* S2: no hardest/easiest callout on the comparison chart - its bars
+             exclude the member; the course facts carry them below. */
+          hardestText={''}
           hardestTone={beastFig ? beastFig.tone : A.INK}
           easiestHole={stats.easiest.hole_no}
-          easiestText={bestFig ? bestFig.text : ''}
+          easiestText={''}
           easiestTone={bestFig ? bestFig.tone : A.INK}
           flat={flatShape}
           hasYou={hasYou}
