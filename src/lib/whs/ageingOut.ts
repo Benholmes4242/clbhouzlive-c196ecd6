@@ -48,8 +48,9 @@ export interface AgeingOut {
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
 
-/** Roll k identical candidates into an oldest-first twenty. */
-function indexAfterRepeats(oldestFirst: number[], candidate: number, k: number): number | null {
+/** Roll k identical candidates into an oldest-first twenty. Exported for the
+ *  maths-layer tests (3D F3): the "73 holds in two" property lives here. */
+export function indexAfterRepeats(oldestFirst: number[], candidate: number, k: number): number | null {
   let arr = oldestFirst;
   for (let i = 0; i < k - 1; i++) arr = [...arr.slice(1), candidate];
   return indexWithCandidate(arr, candidate);
@@ -118,7 +119,14 @@ export function deriveAgeingOut(
     }
     if (holdGross != null) {
       const lesser = holdGross + 1;
-      for (let k = 2; k <= MAX_REPEATS; k++) {
+      /* 3D F1/F2: the repeat line is bounded by N — the effective cap is
+         min(N, MAX_REPEATS) — because the card is about PREVENTION. Past N
+         the rise has already happened and the member is recovering, not
+         avoiding; this card does not make that claim. At N = 1 the loop
+         never runs and the line is omitted: with one round of runway the
+         single-score hold line already says everything there is to say. */
+      const cap = Math.min(MAX_REPEATS, fallsIn);
+      for (let k = 2; k <= cap; k++) {
         if (holds(lesser, k)) { repeat = { gross: lesser, times: k }; break; }
       }
     }

@@ -38,16 +38,29 @@ export interface BarRound {
 
 interface Props {
   rounds: BarRound[];
-  /** Counting set, already sorted ascending, already formatted. */
-  eight: string[];
+  /** Counting set, already sorted ascending, already formatted. Optional since
+   *  PHASE 4: the counting eight moved to the section's own chip box. */
+  eight?: string[];
   /** Ninth-best; null when there is none (absent, not a dash). */
-  next: string | null;
-  nextLabel: string;
+  next?: string | null;
+  nextLabel?: string;
+  /**
+   * PHASE 4 §4.4: the cut line. `value` is the highest differential among
+   * rounds where is_counter is true (derived by the section, never by a
+   * client-side comparison here); `label` is the formatted "CUT · {value}".
+   * Drawn as a 1px AMBER rule at the value's true height on the same
+   * min-anchored scale as the bars, so the line and the bar colours cannot
+   * disagree.
+   */
+  cut?: { value: number; label: string } | null;
+  /** PHASE 4 §4.5: axis labels carry the dates — "OLDEST · {date}". */
+  oldestLabel?: string;
+  newestLabel?: string;
   selectedIndex: number | null;
   onSelectIndex: (i: number) => void;
 }
 
-const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, selectedIndex, onSelectIndex }) => {
+const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, cut = null, oldestLabel, newestLabel, selectedIndex, onSelectIndex }) => {
   const diffs = rounds.map((r) => r.diff).filter((d): d is number => d != null);
   const lo = diffs.length ? Math.min(...diffs) : 0;
   const hi = diffs.length ? Math.max(...diffs) : 0;
@@ -59,6 +72,7 @@ const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, selec
 
   return (
     <div>
+      <div style={{ position: 'relative' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', columnGap: `${(GAP_U / VIEW_W) * 100}%`, alignItems: 'flex-end', height: BAR_AREA }}>
         {rounds.map((r, i) => (
           <button
@@ -87,12 +101,42 @@ const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, selec
         ))}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, ...LABEL_STYLE }}>
-        <span>Oldest</span>
-        <span>Newest</span>
+      {/* PHASE 4 §4.4: the cut line — 1px AMBER at the eighth-best
+          differential's true height, label at the right end on a
+          canvas-coloured backing so it never sits on top of a bar. */}
+      {cut != null && (
+        <>
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute', left: 0, right: 0,
+              bottom: heightOf(cut.value), height: 1,
+              background: CHART.AMBER,
+            }}
+          />
+          <span
+            style={{
+              position: 'absolute', right: 0,
+              bottom: heightOf(cut.value) + 3,
+              padding: '0 4px',
+              background: CHART.CANVAS,
+              fontSize: 8.5, fontWeight: 700, letterSpacing: '0.08em',
+              textTransform: 'uppercase', color: CHART.AMBER,
+              fontVariantNumeric: 'tabular-nums lining-nums',
+            }}
+          >
+            {cut.label}
+          </span>
+        </>
+      )}
       </div>
 
-      {eight.length > 0 && (
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, ...LABEL_STYLE }}>
+        <span>{oldestLabel ?? 'Oldest'}</span>
+        <span>{newestLabel ?? 'Newest'}</span>
+      </div>
+
+      {(eight?.length ?? 0) > 0 && (
         <div
           style={{
             display: 'flex', alignItems: 'center', gap: 10,
@@ -100,7 +144,7 @@ const LastTwentyBars: React.FC<Props> = ({ rounds, eight, next, nextLabel, selec
           }}
         >
           <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', minWidth: 0 }}>
-            {eight.map((v, i) => (
+            {(eight ?? []).map((v, i) => (
               <span key={i} style={{ ...FIG, color: A.IMPROVED }}>{v}</span>
             ))}
           </div>

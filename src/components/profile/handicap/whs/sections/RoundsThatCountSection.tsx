@@ -1,19 +1,19 @@
 /**
- * RoundsThatCountSection — SECTION E of the one-page handicap brief.
+ * RoundsThatCountSection — PHASE 4 "THE MECHANISM" of
+ * BRIEF_HANDICAP_TAB_REBUILD (replaces the Section E grammar).
  *
- * Flat replacement for RoundsThatCountCard: no panel, no border, no radius, no
- * background tint. Kicker, heading, "{n} count" meta, a reserved selection
- * slot, LastTwentyBars (bars above, the eight below), and ONE generated sentence.
+ * Kicker THE MECHANISM, title "Eight of your last twenty", the §4.1 caption,
+ * LastTwentyBars (kept: twenty differentials oldest-left, min-anchored scale,
+ * counting state from is_counter via countsTowardIndex — never a client-side
+ * comparison), the amber cut line at the eighth-best differential, date axis
+ * labels, then THE COUNTING EIGHT chip box and the NEXT IN LINE row.
  *
- * WHAT IS GONE FROM THIS SECTION, BY CONSTRUCTION:
- *  - The NEXT ROUND / "{target} CUTS" / CAN'T RISE footer strip. Section C is
- *    the only next-round statement on this page. With the strip gone this
- *    section makes NO call to projectNextRound at all, so the below-20
- *    fixed-divisor fault it carried is removed rather than gated.
- *  - The separate FALLING OFF SOON progress bar and its -{x} / IN {n} readout:
- *    folded into the sentence.
- *  - The COUNTS / FALLING OFF legend rows: the green/neutral distinction plus
- *    the sentence carry it (showLegend={false} on the chart).
+ * WHAT IS GONE, BY CONSTRUCTION:
+ *  - The NEXT ROUND / "{target} CUTS" footer strip (Section C owns that).
+ *  - The FALLING OFF SOON readout and the generated caption/fall lines:
+ *    phase 3's AgeingOutSection owns the expiry warning now.
+ *  - Score conversion at the cut: the line is labelled with the differential
+ *    itself, so no course pick is needed anywhere in this section.
  *
  * NO DEFAULT SELECTION. The newest round is Section D in full, three sections
  * above; defaulting the row here would print the same round on the page twice.
@@ -37,12 +37,10 @@ import { HcpSection } from './HcpSection';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 import { CHART } from '../charts';
 import LastTwentyBars from '../charts/LastTwentyBars';
-import { grossFromDifferential } from '@/lib/whs/coursePlay';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /** A full rolling window. Below this the section states the sample instead. */
 const MIN_ROUNDS = 20;
-/** Counters among the five oldest of a full window are the ones about to go. */
-const FALLING_HORIZON = 5;
 
 const FIG: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums lining-nums',
@@ -69,10 +67,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
   /**
    * Last 20, OLDEST FIRST. ONE SOURCE FOR THE COUNTER SET: is_counter as it
    * arrives on useAllScores (whs_scores), the same read the posted-history
-   * sheet uses. The previous useCounters set was a second query filtered
-   * is_counter = true with .limit(8) — eight is what WHS uses at twenty or
-   * more rounds and not what it uses below that, so the limit asserted a rule
-   * the schema does not enforce.
+   * sheet uses.
    */
   const window20 = useMemo(() => {
     if (!allScores || allScores.length === 0) return [];
@@ -83,35 +78,9 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
         play_date: r.play_date,
         diff: r.handicap_differential ?? null,
         is_counter: countsTowardIndex(r),
-        course_id: r.course_id ?? null,
         course_name: r.course?.name ?? null,
-        course_rating: r.course_rating ?? null,
-        slope_rating: r.slope_rating ?? null,
       }));
   }, [allScores]);
-
-  /* THE COURSE THE LINE IS READ AT: most frequent course_id in the window,
-     ties broken by the most recent round; that round's name and ratings.
-     A course lacking either rating is skipped. Null = no score conversion
-     anywhere in this section; a differential is never printed as a score. */
-  const course = useMemo(() => {
-    const stats = new Map<string, { n: number; lastIdx: number }>();
-    window20.forEach((r, i) => {
-      if (!r.course_id) return;
-      const e = stats.get(r.course_id) ?? { n: 0, lastIdx: -1 };
-      e.n += 1;
-      e.lastIdx = i; // oldest-first, so the last seen is the most recent
-      stats.set(r.course_id, e);
-    });
-    const ranked = [...stats.entries()].sort((a, b) => b[1].n - a[1].n || b[1].lastIdx - a[1].lastIdx);
-    for (const [, e] of ranked) {
-      const r = window20[e.lastIdx];
-      if (r.course_rating != null && r.slope_rating != null && r.course_name) {
-        return { name: r.course_name, rating: r.course_rating, slope: r.slope_rating };
-      }
-    }
-    return null;
-  }, [window20]);
 
   const withheld = !isLoading && total > 0 && total < MIN_ROUNDS;
   const withheldFired = useRef(false);
@@ -126,8 +95,6 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
   }, [withheld, total]);
 
   if (isLoading || total === 0) return null;
-
-  const counterCount = window20.filter(countsTowardIndex).length;
 
   // ── Withheld: fewer than a full window ────────────────────────────────
   if (withheld) {
@@ -145,52 +112,20 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
     );
   }
 
-  // Falls-off-in: chronological position i drops out after i+1 more rounds.
-  // Only counters inside the horizon matter — a non-counter leaving changes
-  // nothing the member can feel. Returns the index too, for the round's date.
-  const falling = (() => {
-    for (let i = 0; i < Math.min(FALLING_HORIZON, window20.length); i++) {
-      if (countsTowardIndex(window20[i])) return { idx: i, fallsIn: i + 1 };
-    }
-    return null;
-  })();
+  /* THE CUT (§4.4): the highest differential among rounds where is_counter
+     is true — the eighth-best. Every counter sits on or under it, every
+     non-counter above, so the line and the bar colours cannot disagree.
+     Null when the counter set is empty — nothing to rule. */
+  const counters = window20.filter((r) => r.is_counter && r.diff != null);
+  const cutLine = counters.length ? Math.max(...counters.map((r) => r.diff as number)) : null;
+  const countingEight = [...counters].sort((a, b) => (a.diff as number) - (b.diff as number));
 
-  /* THE COUNTS-BELOW LINE. It rules across at the WORST differential that
-     still counts, so every counter sits on or below it and every non-counter
-     above. Null when the counter set is empty — nothing to rule. */
-  const counterDiffs = window20.filter((r) => countsTowardIndex(r) && r.diff != null).map((r) => r.diff as number);
-  const cutLine = counterDiffs.length ? Math.max(...counterDiffs) : null;
-  const nonCounterDiffs = window20.filter((r) => !countsTowardIndex(r) && r.diff != null).map((r) => r.diff as number);
-  const nextDiff = nonCounterDiffs.length ? Math.min(...nonCounterDiffs) : null;
-
-  /* PLAIN ROUNDING, deliberately NOT the next-round ceil-minus-one: that is a
-     score to BEAT; this only describes where the line already sits. */
-  const scoreAt = (diff: number) =>
-    course ? Math.round(grossFromDifferential(diff, course.rating, course.slope)) : null;
-
-  /* Strip figures: the score at the line's course, else the differential. */
-  const fmtFigure = (d: number) => {
-    const sc = scoreAt(d);
-    return sc != null ? String(sc) : fmtDiff(d);
-  };
-
-  const cutScore = cutLine != null ? scoreAt(cutLine) : null;
-
-  /* ONE CAPTION (BRIEF_HANDICAP_TAB_SIMPLIFY §3.2). The headroom meta is gone:
-     "cannot go up" in Next round states that fact once. */
-  const bodyLine =
-    nextDiff == null
-      ? t('common:handicap.roundsThatCount.bodyLineNoNext')
-      : cutScore != null
-        ? t('common:handicap.roundsThatCount.caption', { cut: cutScore })
-        : null;
-
-  const fallLine = falling
-    ? t('common:handicap.roundsThatCount.fallLine', {
-        date: formatDayMonthShortGB(window20[falling.idx].play_date),
-        falls: t('common:handicap.roundsThatCount.fallsIn', { count: falling.fallsIn }),
-      })
-    : null;
+  /* NEXT IN LINE (§4.7): the best non-counting differential — the round that
+     enters the eight when one of the current counters leaves. */
+  const nextRound =
+    window20
+      .filter((r) => !r.is_counter && r.diff != null)
+      .sort((a, b) => (a.diff as number) - (b.diff as number))[0] ?? null;
 
   const selected = selIdx != null ? window20[selIdx] : null;
 
@@ -200,7 +135,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
     setSelIdx(i);
     analyticsEvents.track('handicap_counting_point_tapped', {
       score_id: r.id,
-      counts: countsTowardIndex(r),
+      counts: r.is_counter,
       position: i + 1,
       of: window20.length,
     });
@@ -210,8 +145,14 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
     <>
       <HcpSection
         hairline
-        heading={t('common:handicap.roundsThatCount.headingCount', { count: counterCount })}
+        kicker={t('common:handicap.mechanism.kicker')}
+        heading={t('common:handicap.mechanism.title')}
       >
+        {/* §4.1 caption. */}
+        <p style={{ margin: '0 0 14px', fontSize: 12.5, fontWeight: 400, lineHeight: 1.45, color: CHART.MUTE }}>
+          {t('common:handicap.mechanism.caption')}
+        </p>
+
         {/* Selection slot — height reserved from mount, empty until a tap. */}
         <div style={{ height: SLOT_H, marginBottom: 6 }}>
           {selected && (
@@ -246,7 +187,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
                   style={{
                     fontSize: 16,
                     fontWeight: 700,
-                    color: countsTowardIndex(selected) ? CHART.DOWN : CHART.MUTE,
+                    color: selected.is_counter ? CHART.DOWN : CHART.MUTE,
                     ...FIG,
                   }}
                 >
@@ -258,10 +199,10 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
                     fontWeight: 700,
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
-                    color: countsTowardIndex(selected) ? CHART.DOWN : CHART.DIM,
+                    color: selected.is_counter ? CHART.DOWN : CHART.DIM,
                   }}
                 >
-                  {countsTowardIndex(selected)
+                  {selected.is_counter
                     ? t('common:handicap.roundsThatCount.counts')
                     : t('common:handicap.roundsThatCount.doesNotCount')}
                 </span>
@@ -272,23 +213,89 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
         </div>
 
         <LastTwentyBars
-          rounds={window20.map((r) => ({ diff: r.diff, counts: countsTowardIndex(r) }))}
-          eight={[...counterDiffs].sort((x, y) => x - y).map(fmtFigure)}
-          next={nextDiff != null ? fmtFigure(nextDiff) : null}
-          nextLabel={t('common:handicap.roundsThatCount.nextInLine')}
+          rounds={window20.map((r) => ({ diff: r.diff, counts: r.is_counter }))}
+          cut={cutLine != null ? { value: cutLine, label: t('common:handicap.mechanism.cut', { value: fmtDiff(cutLine) }) } : null}
+          oldestLabel={t('common:handicap.mechanism.oldest', { date: formatDayMonthShortGB(window20[0].play_date) })}
+          newestLabel={t('common:handicap.mechanism.newest', { date: formatDayMonthShortGB(window20[window20.length - 1].play_date) })}
           selectedIndex={selIdx}
           onSelectIndex={onSelect}
         />
 
-        {bodyLine && (
-          <p style={{ margin: '14px 0 0', fontSize: 13, color: CHART.MUTE, lineHeight: 1.55 }}>
-            {bodyLine}
-          </p>
-        )}
-        {fallLine && (
-          <p style={{ margin: '6px 0 0', fontSize: 13, color: CHART.MUTE, lineHeight: 1.55 }}>
-            {fallLine}
-          </p>
+        {/* §4.6 THE COUNTING EIGHT — chips best first, each with a course tag. */}
+        {countingEight.length > 0 && (
+          <div
+            style={{
+              marginTop: 14,
+              border: `1px solid ${A.IMPROVED}`,
+              borderRadius: 12,
+              padding: 11,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 9, fontWeight: 700, letterSpacing: '0.14em',
+                textTransform: 'uppercase', color: A.IMPROVED,
+              }}
+            >
+              {t('common:handicap.mechanism.countingEight')}
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 9 }}>
+              {countingEight.map((r) => (
+                <span
+                  key={r.id}
+                  style={{
+                    display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
+                    gap: 2, padding: '6px 8px',
+                    border: `1px solid ${CHART.BORDER}`, borderRadius: 8,
+                  }}
+                >
+                  <span style={{ fontSize: 11.5, fontWeight: 800, color: CHART.INK, ...FIG }}>
+                    {fmtDiff(r.diff as number)}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 8.5, fontWeight: 700, letterSpacing: '0.09em',
+                      textTransform: 'uppercase', color: CHART.DIM,
+                      maxWidth: 72, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {r.course_name ?? ''}
+                  </span>
+                </span>
+              ))}
+            </div>
+
+            {/* §4.7 NEXT IN LINE. */}
+            {nextRound && (
+              <div
+                style={{
+                  display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10,
+                  marginTop: 11, paddingTop: 10, borderTop: `1px solid ${CHART.BORDER}`,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 9, fontWeight: 700, letterSpacing: '0.12em',
+                    textTransform: 'uppercase', color: CHART.DIM, flexShrink: 0,
+                  }}
+                >
+                  {t('common:handicap.mechanism.nextInLine')}
+                </span>
+                <span
+                  style={{
+                    fontSize: 11, fontWeight: 700, color: A.BODY, ...FIG,
+                    minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}
+                >
+                  {t('common:handicap.mechanism.nextInLineValue', {
+                    diff: fmtDiff(nextRound.diff as number),
+                    course: nextRound.course_name ?? '',
+                    date: formatDayMonthShortGB(nextRound.play_date),
+                  })}
+                </span>
+              </div>
+            )}
+          </div>
         )}
       </HcpSection>
 

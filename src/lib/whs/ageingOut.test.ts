@@ -30,7 +30,10 @@ describe('deriveAgeingOut', () => {
     expect(a.replacement).toBe(17);
     // 10..16 + c must stay at or below 11.6 at one decimal: c = 2 → gross 72
     expect(a.holdGross).toBe(72);
-    expect(a.repeat).toEqual({ gross: 73, times: 2 });
+    /* 3D F1/F2: at N = 1 the repeat line is never rendered — the single-score
+       hold line already says everything. (The "73 holds in two" property
+       survives at the maths layer; see the 3A amendment block.) */
+    expect(a.repeat).toBeNull();
   });
 
   it('renders nothing below twenty rounds', () => {
@@ -47,7 +50,7 @@ describe('deriveAgeingOut', () => {
   });
 });
 
-import { settleAfterRounds, MAX_REPEATS } from './ageingOut';
+import { settleAfterRounds, indexAfterRepeats, MAX_REPEATS } from './ageingOut';
 import { projectNextRound } from './handicapMath';
 
 describe('3A amendment', () => {
@@ -58,11 +61,28 @@ describe('3A amendment', () => {
     expect(settleAfterRounds(oldestFirst, 13)).toBeNull();
   });
 
-  it('C5: 72 holds in one, 73 holds in two; repeat limit five', () => {
+  /* 3D F3: C5 is SPLIT. The "73 holds in two" property is a statement about
+     the calculation, so it moves to the maths layer against indexAfterRepeats;
+     the card layer asserts the repeat line is NOT rendered at N = 1. */
+  it('C5 (maths layer): 72 holds in one, 73 holds in two; repeat limit five', () => {
     const a = deriveAgeingOut(twenty(2), 11.6, course)!;
     expect(a.holdGross).toBe(72);
-    expect(a.repeat).toEqual({ gross: 73, times: 2 });
     expect(MAX_REPEATS).toBe(5);
+    // Oldest-first twenty is 2,10..28; gross 73 at cr 70 / slope 113 is a 3.0.
+    const oldestFirst = [...twenty(2)].reverse().map((r) => r.handicap_differential as number);
+    // One 73: drops the 2.0, best eight of [3,10..28] = 3,10..16 = 94/8 =
+    // 11.75 — does NOT hold (above 11.6). This is the brief's F1 figure.
+    expect(indexAfterRepeats(oldestFirst, 3, 1)).toBeCloseTo(11.75, 5);
+    // Two 73s: the iterative roll drops the 2.0 and gains two 3.0s, best
+    // eight = 3,3,10..15 = 81/8 = 10.125 — holds. The window rolls as well
+    // as gains.
+    expect(indexAfterRepeats(oldestFirst, 3, 2)).toBeCloseTo(10.125, 5);
+  });
+
+  it('C5 (card layer, 3D F1/F2): at N = 1 the repeat line is NOT rendered', () => {
+    const a = deriveAgeingOut(twenty(2), 11.6, course)!;
+    expect(a.inRounds).toBe(1);
+    expect(a.repeat).toBeNull();
   });
 
   it('C8: counter three rounds deep moves N, settle and replacement together', () => {
@@ -114,5 +134,34 @@ describe('3B amendment', () => {
     expect(a.replacement).toBe(17);
     expect(a.settleAt).toBe(13.5);
     expect(a.holdGross).toBe(72);
+  });
+});
+
+describe('3D amendment', () => {
+  /* Same shape as the 3B block's c8 helper (scoped there); N = 3. */
+  const c8 = () =>
+    twenty(40, false).map((r, i) => {
+      if (i === 18) return { ...r, handicap_differential: 41, is_counter: false };
+      if (i === 17) return { ...r, handicap_differential: 2, is_counter: true };
+      return r;
+    }) as WhsScoreWithIndex[];
+
+  it('F5/E3 boundary: held in N+1 repetitions but not N — the line is omitted, not printed with a count > N', () => {
+    // C8 fixture, N = 3. Base after the oldest two leave: [2,10..26].
+    // Lesser score is 73 (diff 3.0). Three 73s: drops 2,10,11 → best eight
+    // 3,3,3,12,13,14,15,16 = 79/8 = 9.875 ≤ 11.6 — holds AT N, so this is
+    // not the boundary case; assert the line renders with times ≤ N.
+    const a = deriveAgeingOut(c8(), 11.6, course)!;
+    expect(a.inRounds).toBe(3);
+    if (a.repeat) expect(a.repeat.times).toBeLessThanOrEqual(3);
+
+    // The true boundary: same fixture shape at N = 1 (the C5 fixture). The
+    // maths layer above proves two 73s hold (8.875 ≤ 11.6); with N = 1 the
+    // cap is 1, so no count within N exists and the line is omitted rather
+    // than printed with a count greater than N.
+    const b = deriveAgeingOut(twenty(2), 11.6, course)!;
+    expect(b.inRounds).toBe(1);
+    expect(b.holdGross).toBe(72);
+    expect(b.repeat).toBeNull();
   });
 });
