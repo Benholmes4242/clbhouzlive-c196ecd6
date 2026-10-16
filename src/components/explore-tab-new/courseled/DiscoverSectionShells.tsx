@@ -1,7 +1,7 @@
 import React from 'react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { CARD_SHELL, CHIP_RADIUS } from './tokens';
-import { MEMBER_CELL } from '@/lib/tokens/surfaces';
+import { CARD_SHELL } from './tokens';
+import { Bar, EyebrowBar, TextBar } from '@/components/skeletons/shellVocabulary';
 
 /**
  * SECTION SHELLS THAT ARE NOT DISCOVER'S.
@@ -16,47 +16,9 @@ import { MEMBER_CELL } from '@/lib/tokens/surfaces';
  * fraction of its old size, modelling only the page that exists.
  */
 
-/**
- * Shimmer block. The base fill is INLINE because `.clb-shimmer-dark` sets the
- * `background` shorthand, which would otherwise wipe out a `bg-*` utility class
- * and leave the bars invisible on the canvas.
- */
-export function Bar({
-  className,
-  style,
-}: {
-  className?: string;
-  style?: React.CSSProperties;
-}) {
-  return (
-    <div
-      className={`clb-shimmer-dark ${className ?? ''}`}
-      style={{ backgroundColor: MEMBER_CELL, borderRadius: CHIP_RADIUS, ...style }}
-    />
-  );
-}
-
-/**
- * BRIEF_DISCOVER_EYEBROWS §5 — a 10px uppercase eyebrow at lineHeight 1 with no
- * icon, plus the subline that follows it: a fixed 20 + 19.
- */
-function EyebrowBar({ w = 150, aside = false }: { w?: number; aside?: boolean }) {
-  return (
-    <>
-      <div style={{ display: 'flex', alignItems: 'center', padding: '0 2px', height: 20 }}>
-        <Bar style={{ height: 9, width: w }} />
-        {aside ? <Bar style={{ height: 9, width: 44, marginLeft: 'auto' }} /> : null}
-      </div>
-      <div style={{ height: 19, display: 'flex', alignItems: 'center', padding: '0 2px' }}>
-        <Bar style={{ height: 10, width: 196 }} />
-      </div>
-    </>
-  );
-}
-
-function TextBar({ w, h = 11 }: { w: number | string; h?: number }) {
-  return <Bar style={{ height: h, width: w }} />;
-}
+/* Bar, EyebrowBar and TextBar live in the shared shell vocabulary
+   (BRIEF_COURSES_SKELETONS 1.1); re-exported so existing imports hold. */
+export { Bar };
 
 /**
  * Friends rail. MEASURED off FriendsPlayedRail: 224 wide, a 90px photograph

@@ -1,5 +1,4 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
 
 /**
  * PageLoadGate — one reveal per tab (BRIEF_COURSES_LOAD_GATE).
@@ -7,8 +6,8 @@ import { Skeleton } from '@/components/ui/skeleton';
  * Children stay MOUNTED behind display:none so their queries fire exactly as
  * before; the gate reveals in one paint (no fade, no height tween) once every
  * expected section has reported ready. One-shot: never hides again.
- * The skeleton is a single 180px block — smaller than either page's smallest
- * settled state, so the surface only ever expands outwards.
+ * BRIEF_COURSES_SKELETONS 1.4: the gate DRAWS NOTHING. Its old single 180px
+ * bar stood for the whole page; each section now owns its own shell.
  */
 interface GateCtx {
   report: (id: string, ready: boolean) => void;
@@ -55,11 +54,6 @@ export function PageLoadGate({ expect, children }: { expect: readonly string[]; 
 
   return (
     <Ctx.Provider value={value}>
-      {revealed ? null : (
-        <div style={{ padding: '0 16px' }}>
-          <Skeleton className="w-full" style={{ height: 180, borderRadius: 0 }} />
-        </div>
-      )}
       <div style={revealed ? undefined : { display: 'none' }}>{children}</div>
     </Ctx.Provider>
   );
