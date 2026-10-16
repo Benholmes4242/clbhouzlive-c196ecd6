@@ -1,9 +1,9 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
 ## BRIEF_PROFILE_TABS_VOICE
-- [ ] Confirm clbhouz; change only specified Courses/Rounds ownership copy and props, with name-free third-person fallbacks and the archive possessive fix.
-- [ ] Add English keys only; preserve all queries, hooks, derivations, figures and Handicap sections.
-- [ ] Add one third-person render test per tab; run focused/full tests and check preview. Stop and report any unexpected failure; live authenticated checks unavailable on external/unmanaged Supabase.
+- [x] Confirm clbhouz; change only specified Courses/Rounds ownership copy and props, with name-free third-person fallbacks and the archive possessive fix.
+- [x] Add English keys only; preserve all queries, hooks, derivations, figures and Handicap sections. Excluded archive empty state still says "They hasn't" without a name; reported, not changed.
+- [x] One third-person render test per tab checks named/fallback forms; 16 focused and all 1,399 tests pass (1,397 + two), zero failures, preview build OK. Public profile redirects to /auth with zero runtime errors; signed-in visual/live verification unavailable on external/unmanaged Supabase. No SQL/migrations; feed_config untouched, round_pool_cap 30; exact safety block intact.
 
 ## BRIEF_HANDICAP_TAB_REBUILD_8A
 - [x] Confirm clbhouz; record row buttons open the canonical RoundDetailSheet by existing id and pass the profile owner; existing flex/gap/padding/hairlines retained with button reset and no-id fallback.
