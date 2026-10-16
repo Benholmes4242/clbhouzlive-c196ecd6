@@ -1309,7 +1309,8 @@
     },
     "place": {
       "kicker": "The place",
-      "title": "About this course"
+      "title": "About this course",
+      "editRating": "Edit rating"
     },
     "heroLine": {
       "par": "Par {{par}}",
