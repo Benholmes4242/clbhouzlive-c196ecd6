@@ -60,6 +60,43 @@ describe('deriveStrokesGo', () => {
       deriveStrokesGo({ par3: split(0.5, 0, 0, 0, 0), par4: null, par5: null }),
     ).toBeNull();
   });
+
+  /* 5A H4: par 5s below MIN_HOLES_PAR_TYPE — the row keeps its holes-a-round
+     and holes-played but states no shots-a-round figure, the other rows are
+     unaffected, the mix ratios still sum to 18, and the title names a type
+     that cleared the threshold. */
+  it('5A H1/H4: a below-threshold type keeps its row and mix ratio but states no figure', () => {
+    const s = deriveStrokesGo({
+      par3: split(0.4, 120, 30, 40, 10),
+      par4: split(0.8, 540, 20, 50, 12),
+      par5: split(0.5, 60, 40, 30, 8), // 60 < MIN_HOLES_PAR_TYPE
+    })!;
+    const p5 = s.rows.find((r) => r.parN === 5)!;
+    // The row renders: holes-a-round and holes-played are present.
+    expect(p5.holesPlayed).toBe(60);
+    expect(p5.holesPerRound).toBeCloseTo((60 / 720) * 18, 5); // 1.5
+    // …but there is NO shots-a-round figure.
+    expect(p5.shotsPerRound).toBeNull();
+    // The other two rows are unaffected.
+    expect(s.rows.find((r) => r.parN === 3)!.shotsPerRound).toBeCloseTo(0.4 * ((120 / 720) * 18), 5);
+    expect(s.rows.find((r) => r.parN === 4)!.shotsPerRound).toBeCloseTo(0.8 * ((540 / 720) * 18), 5);
+    // H3: the three holes-a-round values still sum to 18.
+    expect(s.rows.reduce((x, r) => x + r.holesPerRound, 0)).toBeCloseTo(18, 5);
+    // H2: the derived title names a type that cleared the threshold.
+    expect(s.dominant!.parN).toBe(4);
+  });
+
+  it('5A H2: when no type clears the threshold, dominant is null and the title falls back', () => {
+    const s = deriveStrokesGo({
+      par3: split(0.4, 40, 30, 40, 10),
+      par4: split(0.8, 80, 20, 50, 12),
+      par5: split(0.5, 60, 40, 30, 8),
+    })!;
+    expect(s.dominant).toBeNull();
+    expect(s.rows.every((r) => r.shotsPerRound === null)).toBe(true);
+    // The mix ratios are unaffected even when every figure is withheld.
+    expect(s.rows.reduce((x, r) => x + r.holesPerRound, 0)).toBeCloseTo(18, 5);
+  });
 });
 
 describe('shotsToDifferential', () => {

@@ -952,9 +952,25 @@
       "titleFallback": "Where the strokes go",
       "caption": "Shots over par per round, across {{holes}} holes",
       "rowMeta": "{{holes}} holes a round · {{perHole}} a hole · {{played}} played",
+      "rowMetaWithheld": "{{holes}} holes a round · {{played}} played",
       "observation": "About {{doubles}} holes a round are doubles or worse. One fewer is worth a shot a round — about {{diff}} of differential at {{course}}.",
       "observationNoCourse": "About {{doubles}} holes a round are doubles or worse. One fewer is worth a shot a round.",
       "withheld": "Not enough scored holes yet — this appears once you've played 180 holes with hole-by-hole scores."
+    },
+    "floor": {
+      "kicker": "The floor",
+      "title": "What {{milestone}} actually needs",
+      "milestone": {
+        "bogeyGolf": "bogey golf",
+        "singleFigures": "single figures",
+        "categoryOne": "category one",
+        "scratch": "scratch"
+      },
+      "scaleHigh": "12M high",
+      "scaleToday": "Today",
+      "body": "An index of {{target}} means eight differentials averaging {{target}} — about {{gross}} gross at {{course}}. {{met}} of your last twenty already meet it.",
+      "bodyNoCourse": "An index of {{target}} means eight differentials averaging {{target}}. {{met}} of your last twenty already meet it.",
+      "distance": "You are {{n}} away."
     }
   },
   "comments": {

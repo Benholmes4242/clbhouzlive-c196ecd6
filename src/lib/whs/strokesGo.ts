@@ -25,15 +25,32 @@ export interface ParSplitInput {
   pct_double: number;
 }
 
+/**
+ * MIN_HOLES_PAR_TYPE (BRIEF_HANDICAP_TAB_REBUILD_5A H1) — a par type needs
+ * this many holes before its shots-a-round figure renders. At 90 holes the
+ * standard error on a per-hole average is about 0.12 shots, against a spread
+ * between par types of roughly 0.1, so below that the figure cannot support
+ * the comparison it is drawn to make. This is a FIGURE-LEVEL withhold, not a
+ * row-level one: the row still renders its label, holes-a-round and
+ * holes-played meta; only the shots-a-round figure and the bar fill are
+ * withheld, and a withheld type cannot win the derived title (H2). The mix
+ * ratio is NOT gated (H3): it is a proportion of holes, not an average of
+ * scores, so it does not carry the same uncertainty.
+ */
+export const MIN_HOLES_PAR_TYPE = 90;
+
 export interface ParTypeRow {
   parN: 3 | 4 | 5;
   holesPlayed: number;
-  /** Holes of this type per 18 (§5.2 mix ratio). */
+  /** Holes of this type per 18 (§5.2 mix ratio). Never withheld (H3). */
   holesPerRound: number;
   /** avg_over, i.e. shots dropped per hole of this type. */
   perHole: number;
-  /** Shots dropped per round on this type: perHole × holesPerRound. */
-  shotsPerRound: number;
+  /**
+   * Shots dropped per round on this type: perHole × holesPerRound.
+   * NULL when holesPlayed < MIN_HOLES_PAR_TYPE (H1 figure-level withhold).
+   */
+  shotsPerRound: number | null;
 }
 
 export interface OutcomeBands {
@@ -78,11 +95,18 @@ export function deriveStrokesGo(
       holesPlayed: t.data.holes_played,
       holesPerRound,
       perHole: t.data.avg_over,
-      shotsPerRound: t.data.avg_over * holesPerRound,
+      shotsPerRound:
+        t.data.holes_played >= MIN_HOLES_PAR_TYPE
+          ? t.data.avg_over * holesPerRound
+          : null,
     };
   });
 
-  const dominant = [...rows].sort((a, b) => b.shotsPerRound - a.shotsPerRound)[0] ?? null;
+  /* H2: a type that cannot state its own figure is not eligible to win the
+     title. If no type clears the threshold the title falls back to the plain
+     section name and the derived sentence does not render. */
+  const eligible = rows.filter((r): r is ParTypeRow & { shotsPerRound: number } => r.shotsPerRound !== null);
+  const dominant = eligible.sort((a, b) => b.shotsPerRound - a.shotsPerRound)[0] ?? null;
 
   /* Outcome bands, weighted by holes_played. Par share is the remainder so
      the four bands partition the holes exactly. */
