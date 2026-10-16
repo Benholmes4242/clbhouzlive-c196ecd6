@@ -114,7 +114,6 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, own
   }
   const visible = showAll ? ordered : ordered.slice(0, INITIAL_ROWS);
 
-  const ys = yearStats(rounds);
   const items: Item[] = [];
   let lastKey: string | null = null;
   for (const r of visible) {
@@ -192,7 +191,6 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, own
               return (
                 <div key={it.key} style={DIVIDER}>
                   <span style={{ ...DIVIDER_TITLE, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{it.title}</span>
-                  {it.meta ? <span style={DIVIDER_META}>{it.meta}</span> : null}
                 </div>
               );
             }
