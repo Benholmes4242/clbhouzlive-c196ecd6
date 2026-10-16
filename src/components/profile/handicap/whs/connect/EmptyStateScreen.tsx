@@ -604,7 +604,7 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline }) 
     return (
       <>
         <Stage ref={stageRef}>{null}</Stage>
-        <FooterBar />
+        <FooterBar>{null}</FooterBar>
       </>
     );
   }
