@@ -102,11 +102,10 @@ import { ReportSheet } from '@/components/moderation/ReportSheet';
 import { PhotoActionSheet } from '@/components/profile/edit-v2/PhotoActionSheet';
 import ProfileRoundsTab from '@/components/profile/rounds/ProfileRoundsTab';
 import ProfileHandicapTab, { handicapOwnerFirstName } from '@/components/profile/handicap/ProfileHandicapTab';
-import GamMount from '@/components/profile/handicap/whs/gam/GamMount';
 import { StreaksSheetMount } from '@/components/profile/handicap/gam/streaks/StreaksSheetMount';
 import CompareMount from '@/components/profile/handicap/whs/sections/compare/CompareMount';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
-import { openGamAchievements, openAllStreaks } from '@/components/profile/handicap/whs/gam/events';
+import { openAllStreaks } from '@/components/profile/handicap/whs/gam/events';
 import { useDeepLinkTabScroll } from '@/hooks/useDeepLinkTabScroll';
 import { useProfileRoundsCount } from '@/components/profile/rounds/useProfileRounds';
 
@@ -440,13 +439,8 @@ const ProfilePageV2Content: React.FC = () => {
     setSearchParams(next, { replace: true });
   }, [isSelf, searchParams, setSearchParams]);
 
-  /* ONE HANDLER, TWO VOCABULARIES. ?gam= is current; ?sheet= is what the push
-     dispatcher emitted until 10 Sep 2026 and 591 delivered pushes still carry
-     it - this branch looks dead and is not, it stays permanently.
-       gam=trophies | sheet=achievements -> openGamAchievements()
-       gam=streaks  | sheet=streaks      -> openAllStreaks()
-     &section= / &badge= are honoured when present. The emit is deferred a
-     macrotask so GamMount / StreaksSheetMount have subscribed first. */
+  // Retired Trophy Room links are consumed without opening a replacement.
+  // Current and legacy streak links retain their existing sheet behaviour.
   useEffect(() => {
     if (!isSelf) return;
     const gam = searchParams.get('gam');
@@ -458,14 +452,8 @@ const ProfilePageV2Content: React.FC = () => {
           ? 'streaks'
           : null;
     if (!intent) return;
-    const section = searchParams.get('section') === 'crowns' ? 'crowns' : undefined;
-    const badgeId = searchParams.get('badge') || undefined;
     const id = setTimeout(() => {
-      if (intent === 'trophies') {
-        openGamAchievements(badgeId || section ? { badgeId, section } : undefined);
-      } else {
-        openAllStreaks();
-      }
+      if (intent === 'streaks') openAllStreaks();
       const next = new URLSearchParams(searchParams);
       next.delete('gam');
       next.delete('sheet');
@@ -1427,12 +1415,6 @@ const ProfilePageV2Content: React.FC = () => {
           profile only; each portals to body with its own dark treatment. */}
       {showHandicapTab && profile?.id && user?.id && (
         <>
-          <GamMount
-            ownerUserId={profile.id}
-            viewerUserId={user.id}
-            ownerFirstName={handicapOwnerFirstName(profile.display_name, profile.username)}
-            readOnly={false}
-          />
           <StreaksSheetMount />
           <CompareMount viewerUserId={user.id} />
           <RoundDetailSheet

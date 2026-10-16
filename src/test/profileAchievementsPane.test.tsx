@@ -5,7 +5,7 @@
  * and a failed read renders an em dash rather than a confident zero.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -64,7 +64,6 @@ describe('AchievementsPane', () => {
       expect(document.querySelector('[data-achievements-empty]')).not.toBeNull(),
     );
     expect(document.querySelector('[data-figure-value="badges"]')).toBeNull();
-    expect(screen.getByLabelText('Open the Trophy Room')).toBeTruthy();
   });
 
   it('prints an em dash when the read fails or has not run', async () => {

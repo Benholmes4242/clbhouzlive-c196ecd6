@@ -23,11 +23,4 @@ export const allStreaksBus = bus<void>();
 // notificationsBus retired with NotificationsSheet: game events now live in
 // the Activity ledger (/notificationmessages?filter=crowns), which reads the
 // notifications table rather than querying gam_* source tables in parallel.
-export const gamAchievementsBus = bus<{ badgeId?: string; section?: 'crowns' } | undefined>();
-
 export const openAllStreaks = () => allStreaksBus.emit();
-
-export const openGamAchievements = (
-  opts?: { badgeId?: string; section?: 'crowns' },
-) => gamAchievementsBus.emit(opts && (opts.badgeId || opts.section) ? opts : undefined);
-

@@ -2,17 +2,15 @@
  * LevelUpSheet -- full-screen dark scoreboard celebration.
  *
  * Presented at most once per event: seen_at is stamped on mount (not on
- * dismiss). CTA routes to /handicap and opens the Trophy Room sheet.
+ * dismiss). The celebration stays; the retired Trophy Room CTA is removed.
  */
 
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { TierGlyph, TIER_COLOR_DARK } from '@/components/shared/TierGlyph';
-import { levelForMedals } from '@/components/profile/handicap/whs/gam/trophy-room/_shared/levels';
-import { openGamAchievements } from '@/components/profile/handicap/whs/gam/events';
+import { levelForMedals } from './levels';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -27,7 +25,6 @@ interface Props {
 
 export function LevelUpSheet({ eventId, label, medals, onClose }: Props) {
   const { t } = useTranslation('achievements');
-  const navigate = useNavigate();
 
   useEffect(() => {
     lockBodyScroll();
@@ -47,12 +44,6 @@ export function LevelUpSheet({ eventId, label, medals, onClose }: Props) {
       }
     })();
   }, [eventId]);
-
-  const onOpenRoom = () => {
-    onClose();
-    navigate('/handicap');
-    setTimeout(() => openGamAchievements(), 0);
-  };
 
   return createPortal(
     <div
@@ -118,24 +109,7 @@ export function LevelUpSheet({ eventId, label, medals, onClose }: Props) {
         {t('levelUp.medals', { count: medals })}
       </div>
 
-      <button
-        type="button"
-        onClick={onOpenRoom}
-        style={{
-          marginTop: 40,
-          height: 48,
-          padding: '0 22px',
-          borderRadius: 999,
-          background: GOLD,
-          color: '#0F172A',
-          fontSize: 15,
-          fontWeight: 700,
-          border: 'none',
-          cursor: 'pointer',
-        }}
-      >
-        {t('levelUp.viewTrophyRoom')}
-      </button>
+
       <button
         type="button"
         onClick={onClose}
