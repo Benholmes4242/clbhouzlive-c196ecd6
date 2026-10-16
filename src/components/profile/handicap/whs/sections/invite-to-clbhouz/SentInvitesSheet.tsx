@@ -16,8 +16,7 @@ import { useSentInvites } from '@/lib/whs/hooks';
 import { firstName } from '@/lib/whs/utils/initials';
 import { shareInvite } from '@/lib/whs/share';
 import type { WhsInviteStatus } from '@/lib/whs/types';
-import { REC, KICKER, LABEL, CAPTION } from '../../gam/trophy-room/career/tokens';
-import { Collapsible } from '../../gam/trophy-room/career/Primitives';
+import { REC, KICKER, LABEL, CAPTION, Collapsible } from './invitePresentation';
 
 interface Props {
   open: boolean;

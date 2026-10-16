@@ -2,6 +2,8 @@
 
 Only rules that govern MORE THAN ONE area live here. A rule that governs one section's code lives as a comment at that code ("ARCHITECTURE RULE (moved from AGENTS.md)").
 
+- Shared course standings and Top 100 comparison helpers live in `src/lib/gam`; achievement level lookup lives beside the achievement celebration, so removing the handicap Trophy Room cannot remove active course/profile/celebration behaviour.
+
 - Profile course archive overrides are scoped by `courses-archive`, with an opt-in archive appearance on shared region controls, so matching its mock cannot restyle other course filters or section headings.
 
 - Browser canvas regression checks for both crop modals live outside Vitest in `tests/browser`, exercise the real Apply handlers with local callbacks, and write evidence under `/tmp/browser`, because JPEG byte identity needs a real browser without hosted upload writes or changing the agreed Vitest count.
