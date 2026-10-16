@@ -992,7 +992,9 @@
       "newest": "Newest · {{date}}",
       "countingEight": "The counting eight",
       "nextInLine": "Next in line",
-      "nextInLineValue": "{{diff}} · {{course}} · {{date}}"
+      "nextInLineValue": "{{diff}} · {{course}} · {{date}}",
+      "roundLabelCounts": "{{date}}, {{course}}, differential {{diff}}. Counts",
+      "roundLabelNotCounting": "{{date}}, {{course}}, differential {{diff}}. Does not count"
     },
     "strokes": {
       "kicker": "Where the strokes go",
@@ -1004,7 +1006,6 @@
       "observation": "About {{doubles}} holes a round are doubles or worse. One fewer is worth a shot a round — about {{diff}} of differential at {{course}}.",
       "observationNoCourse": "About {{doubles}} holes a round are doubles or worse. One fewer is worth a shot a round.",
       "withheld": "Not enough scored holes yet — this appears once you've played 180 holes with hole-by-hole scores."
-
     }
   },
   "comments": {
