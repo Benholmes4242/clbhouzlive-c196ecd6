@@ -3106,7 +3106,7 @@
       "courseStatsLabel": "Course stats",
       "design": "Design",
       "easierThan": "Easier than <1>{{pct}}%</1> of courses",
-      "easierThanLabel": "Easier than",
+      "easierThanLabel": "Of courses it's easier than",
       "facilities": "Facilities",
       "fromRatings_one": "from {{count}} rating",
       "fromRatings_other": "from {{count}} ratings",

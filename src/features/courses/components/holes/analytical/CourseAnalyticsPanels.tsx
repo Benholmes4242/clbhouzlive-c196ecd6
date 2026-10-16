@@ -812,7 +812,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
         {courseShares && <DistributionStrip shares={courseShares} />}
         {courseShares && activeView === 'members' && <PopulationCaption includesYou={hasYou} style={{ marginBottom: 8 }} />}
         {/* S2: the hardest and easiest hole live with the course facts, not on the comparison chart. */}
-        <Extremes hardest={stats.hardest} easiest={stats.easiest} />
+        <Extremes hardest={stats.hardest} easiest={stats.easiest} fieldHoles={fieldHoles} />
 
         {fieldHoles.slice(0, previewCount).map((h, i, arr) => (
           <HoleRowV2
