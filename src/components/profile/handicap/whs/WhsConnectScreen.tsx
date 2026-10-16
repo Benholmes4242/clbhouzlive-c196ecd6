@@ -19,7 +19,37 @@ import SyncingScreen from './connect/SyncingScreen';
 import WelcomeAboardScreen from './connect/WelcomeAboardScreen';
 import DeclinedScreen from './connect/DeclinedScreen';
 import { BackRow } from './connect/Primitives';
-import { SURFACE, WASH, FONT } from './connect/designTokens';
+import { SURFACE, FONT } from './connect/designTokens';
+
+/** Wrapper ground: SURFACE on every stage, done included. */
+export function connectWrapperBackground(_stage: string): string {
+  return SURFACE;
+}
+
+/**
+ * Top chrome. Every stage wears BackRow except 'done': the member has
+ * connected and cannot go back, so done gets a bare spacer that keeps
+ * BackRow's notch clearance (top + 4px bottom) but not its 44px control.
+ */
+export const ConnectTopChrome: React.FC<{
+  stage: string;
+  onBack?: () => void;
+  immersive: boolean;
+}> = ({ stage, onBack, immersive }) => {
+  if (stage === 'done') {
+    return (
+      <div
+        aria-hidden
+        data-testid="connect-done-spacer"
+        style={{
+          paddingTop: immersive ? 'calc(max(env(safe-area-inset-top, 0px), 12px) + 6px)' : 6,
+          paddingBottom: 4,
+        }}
+      />
+    );
+  }
+  return <BackRow title={HEADER_TITLE} onBack={onBack} immersive={immersive} />;
+};
 
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -361,18 +391,16 @@ export const WhsConnectScreen: React.FC<Props> = ({
       className={wrapperClass}
       style={{
         fontFamily: FONT,
-        /* FULL BLEED. WASH paints on the PAYOFF (done) ONLY. The intro earns its
-           warmth from the course chart it renders; an amber light behind it would
-           tint the chart's own ground and compete with the amber line that marks
-           the member. Every other stage, the intro included, paints SURFACE flat,
-           matching the host page and notch shield. */
-        background: stage === 'done' ? WASH : SURFACE,
+        /* FULL BLEED. The amber wash is no longer rendered anywhere in the
+           flow: every stage, done included, paints SURFACE flat, matching the
+           host page and notch shield. */
+        background: connectWrapperBackground(stage),
         ...(immersive
           ? { minHeight: '100dvh', flex: '1 1 auto' }
           : { flex: '1 1 auto', minHeight: 0 }),
       }}
     >
-      <BackRow title={HEADER_TITLE} onBack={BACKS[stage]} immersive={immersive} />
+      <ConnectTopChrome stage={stage} onBack={BACKS[stage]} immersive={immersive} />
       {activeScreen}
     </div>
   );
