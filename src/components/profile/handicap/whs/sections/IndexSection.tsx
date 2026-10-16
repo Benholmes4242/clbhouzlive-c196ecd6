@@ -166,6 +166,14 @@ const IndexSection: React.FC<Props> = ({ connection, belowHeadline = null }) => 
   );
   // NO CHART only when there is no index history at all at or before today.
   const drawable = pts.length >= 1;
+  /* THE LEVEL RULE, read exactly as HcpTrendChart's simplified branch does:
+     worst and best of the plotted series compared at one decimal. Level means
+     no spread, so the range row renders nothing. */
+  const chartLevel = useMemo(() => {
+    if (pts.length === 0) return true;
+    const vs = pts.map((p) => p.v);
+    return Math.max(...vs).toFixed(1) === Math.min(...vs).toFixed(1);
+  }, [pts]);
 
   /* null = LANDING (window movement). A number = parked on that point. */
   const [sel, setSel] = useState<number | null>(null);
@@ -368,14 +376,13 @@ const IndexSection: React.FC<Props> = ({ connection, belowHeadline = null }) => 
             <span>{t('common:handicap.walk.today')}</span>
           </div>
 
-          {range && (
+          {range && !chartLevel && (
             <div data-hcp-range style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
               {([
-                ['high', range.high, CHART.INK, t('common:handicap.walk.rangeHigh', { defaultValue: '12M high' })],
-                ['low', range.low, chartTone, t('common:handicap.walk.rangeLow', { defaultValue: 'Low' })],
-                ['today', range.today, CHART.INK, t('common:handicap.walk.rangeToday', { defaultValue: 'Today' })],
+                ['high', range.high, CHART.INK, t('common:handicap.walk.rangeHigh')],
+                ['low', range.low, chartTone, t('common:handicap.walk.rangeLow')],
               ] as const).map(([k, v, c, l], i) => (
-                <div key={k} style={{ textAlign: i === 0 ? 'left' : i === 1 ? 'center' : 'right' }}>
+                <div key={k} style={{ textAlign: i === 0 ? 'left' : 'right' }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: c, ...FIG }}>{formatIndex(v)}</div>
                   <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: CHART.DIM, marginTop: 2 }}>
                     {l}
