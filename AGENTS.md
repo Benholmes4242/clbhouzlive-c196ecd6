@@ -1,6 +1,6 @@
 # Architecture rules
 
-Only rules that govern MORE THAN ONE area live here. A rule that governs one section's code lives as a comment at that code ("ARCHITECTURE RULE (moved from AGENTS.md)").
+Cross-area rules only; single-section rules stay in local architecture comments.
 
 - Shared course standings and Top 100 comparison helpers live in `src/lib/gam`; achievement level lookup lives beside the achievement celebration, so removing the handicap Trophy Room cannot remove active course/profile/celebration behaviour.
 
@@ -11,9 +11,10 @@ Only rules that govern MORE THAN ONE area live here. A rule that governs one sec
 - Message entrypoints hand optional focus and return navigation through the existing start-conversation hook, so server messaging refusals remain authoritative and no entrypoint sends automatically.
 
 - Profile handicap index surfaces use `HcpTrendChart` as their canonical plot renderer, so chart styling and interaction markers stay consistent.
+- `whs/pickCourse.ts` is shared by AgeingOut, Holes and PersonalBests; section removal must preserve their course selection.
 - Tour tee-alert toggles use `tourOptimisticToggle` for cache writes and per-id rollback, because invalidation alone does not refresh this app's mounted queries.
 - Every surface that prints a course aggregate rating reads `COURSE_RATING_FLOOR` (`courseRatingFloor.ts`), so card, rails and ranker agree on one sample floor.
-- Explicitly selected Tour venue photos take precedence in both batch and single-venue image resolution, so Overview and Tournament Detail cannot display different catalogue photos.
+- Selected Tour venue photos take precedence in batch and single-venue resolution, so Overview and Tournament Detail agree.
 - Leaderboard row sizes live only in `courseled/rowMetrics.ts`, as two named scales: board rows read `BOARD_ROW_METRICS`, season rows read `SEASON_ROW_METRICS`, so the intended hierarchy is stated in one place and no call site defines a row size.
 - A date states its year unless an ancestor already does: rows and slabs with no year-stating header use `playDateStandalone`; rows under a year-stating group use `playDateUnderYearHeader` (`discoverWhen.ts`), so no screen prints an undated date with nothing above it saying the year.
 - A local copy of a design value that has a token is a fork, whether or not it currently matches. Ink, surfaces and canvases have owners: read them from `@/lib/tokens/surface` and `@/lib/tokens/surfaces` and never redeclare the value. THE BRAND AMBER `#F7931E` HAS NO OWNER YET — it is declared raw in around 105 files and partially owned by four modules (`frostPanel.amber`, `gam/visuals.rare`, `reactionKind.AMBER`, `PROFILE_PILL_SURFACES.active`). Until it has a single home, a local amber is the existing state rather than a new fork: do not add more, do not promote any of the four part-owners to canon, and do not fix it one file at a time.
