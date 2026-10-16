@@ -14,6 +14,73 @@ import {
 import { EmptyStateScreen } from '@/components/profile/handicap/whs/connect/EmptyStateScreen';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
+const i18n = vi.hoisted(() => ({
+  dict: {
+    'whsConnect.intro.homeClubKicker': 'Your home club',
+    'whsConnect.intro.change': 'Change',
+    'whsConnect.intro.tryHeadlineLine1': 'Which holes at',
+    'whsConnect.intro.tryHeadlineLine3': 'will cost you?',
+    'whsConnect.intro.stepperLabel': 'If you play off',
+    'whsConnect.intro.lowerHandicapAria': 'Lower handicap',
+    'whsConnect.intro.higherHandicapAria': 'Higher handicap',
+    'whsConnect.intro.footerLine': 'Connect your official handicap and this is built from your own rounds, on every course you play.',
+    'whsConnect.intro.connectCta': 'Connect your handicap',
+    'whsConnect.intro.decline': "I don't hold an official handicap",
+    'whsConnect.intro.readoutBandBaseline': '{{median}} is what golfers off {{hcp}} typically shoot here, par {{par}}.',
+    'whsConnect.intro.readoutCost': 'The {{hole1}}, {{hole2}} and {{hole3}} cost them most: {{value1}}, {{value2}} and {{value3}} {{ending}}',
+    'whsConnect.intro.readoutOverPar': 'over par.',
+    'whsConnect.intro.readoutBandSource_other': 'From {{count}} rounds by golfers off {{lo}} to {{hi}} at this course.',
+    'whsConnect.intro.youTableHeadingLine1': 'Then it stops being',
+    'whsConnect.intro.youTableHeadingLine2': 'golfers like you.',
+    'whsConnect.intro.youTableHeadingLine3': "It's you.",
+    'whsConnect.intro.youTableSub': 'Same holes, your own rounds. The right-hand column fills in the moment you connect.',
+    'whsConnect.intro.youTableHole': 'Hole',
+    'whsConnect.intro.youTableOff': 'Off {{hcp}}',
+    'whsConnect.intro.youTableYou': 'You',
+    'whsConnect.intro.youTablePar': 'par {{par}}',
+    'whsConnect.intro.youTableHardest': 'the hardest here',
+    'whsConnect.intro.exampleHeading': 'After every round',
+    'whsConnect.intro.exampleKicker': 'Example',
+    'whsConnect.intro.exampleSub': 'Your rounds arrive on their own, scored hole by hole against the course you played.',
+    'whsConnect.intro.exampleBeatTitle': 'The score to beat next time',
+    'whsConnect.intro.exampleBeatText': 'Shoot 84 at your home course and your index drops to 11.6. 85 or worse changes nothing.',
+    'whsConnect.intro.exampleCountTitle': 'Your last 20, and what counts',
+    'whsConnect.intro.exampleCountText': 'Your best 8 make your index. See which drop out next, and where your index is heading.',
+    'whsConnect.intro.exampleWaysTitle': 'Ways to get it down',
+    'whsConnect.intro.exampleWayDoubles': 'Turn your doubles into bogeys',
+    'whsConnect.intro.exampleWayBackNine': 'Play the back nine like the front',
+    'whsConnect.intro.exampleWaysText': 'Worked out by replaying your own counting rounds with one thing changed.',
+    'whsConnect.intro.circleHeadingLine1': 'Your circle is',
+    'whsConnect.intro.circleHeadingLine2': 'already here',
+    'whsConnect.intro.circleSub_one': '1 golfer you follow has connected. Connect to take your place among them.',
+    'whsConnect.intro.circleSub_other': '{{count}} golfers you follow have connected. Connect to take your place among them.',
+    'whsConnect.intro.circleYou': 'You',
+    'whsConnect.intro.circleYouLine': 'connect to take your place',
+    'whsConnect.intro.trustHeadingLine1': 'Thirty seconds.',
+    'whsConnect.intro.trustHeadingLine2': 'Then it looks after itself.',
+    'whsConnect.intro.trustStep1Title': 'Pick your country, sign in once',
+    'whsConnect.intro.trustStep1Line': 'The same login you use for your handicap app. Every round you have posted comes across.',
+    'whsConnect.intro.trustStep2Title': 'Read only',
+    'whsConnect.intro.trustStep2Line': 'We never post, change or delete a score. Your handicap stays exactly where it is.',
+    'whsConnect.intro.trustStep3Title': 'Yours to take back',
+    'whsConnect.intro.trustStep3Line': 'Your password is kept encrypted and only used to sync. Disconnect any time and it is deleted.',
+    'whsConnect.intro.endLine': 'Works with official handicaps. {{live}} is live now, with {{count}} more countries on the way.',
+  } as Record<string, string>,
+}));
+
+vi.mock('react-i18next', () => {
+  const t = (key: string, options?: Record<string, unknown>) => {
+    const pluralKey = typeof options?.count === 'number' ? `${key}_${options.count === 1 ? 'one' : 'other'}` : key;
+    let value = i18n.dict[pluralKey] ?? i18n.dict[key] ?? key;
+    for (const [k, v] of Object.entries(options ?? {})) value = value.replaceAll(`{{${k}}}`, String(v));
+    return value;
+  };
+  return {
+    useTranslation: () => ({ t }),
+    Trans: ({ i18nKey }: { i18nKey: string }) => <>{t(i18nKey)}</>,
+  };
+});
+
 const state = vi.hoisted(() => ({
   session: { user: undefined as { id: string } | undefined, loading: true },
   home: { clubId: null as string | null, isFetched: false, isLoading: false },
