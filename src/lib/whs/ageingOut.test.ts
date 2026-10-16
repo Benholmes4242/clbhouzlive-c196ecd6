@@ -2,7 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { deriveAgeingOut } from './ageingOut';
 import type { WhsScoreWithIndex } from './types';
 
-/** Newest first. Oldest round (i=19) is the best, 2.0; others 10..28. */
+/** Newest first. Oldest round (i=19) is the best, 2.0; others 10..28.
+ *  Read OLDEST FIRST the fixture runs 2, 28, 27 … 11, 10 — an improving
+ *  member whose oldest round is their best. The second-oldest round is the
+ *  28, not the 10. */
 function twenty(oldestDiff: number, oldestCounts = true): WhsScoreWithIndex[] {
   return Array.from({ length: 20 }, (_, i) => {
     const diff = i === 19 ? oldestDiff : 10 + i;
@@ -73,9 +76,9 @@ describe('3A amendment', () => {
     // One 73: drops the 2.0, best eight of [3,10..28] = 3,10..16 = 94/8 =
     // 11.75 — does NOT hold (above 11.6). This is the brief's F1 figure.
     expect(indexAfterRepeats(oldestFirst, 3, 1)).toBeCloseTo(11.75, 5);
-    // Two 73s: the iterative roll drops the 2.0 and gains two 3.0s, best
-    // eight = 3,3,10..15 = 81/8 = 10.125 — holds. The window rolls as well
-    // as gains.
+    // Two 73s: the roll drops the two oldest — the 2.0 and the 28 — and gains
+    // two 3.0s, leaving best eight of 3,3,10,11,12,13,14,15 = 81/8 = 10.125 —
+    // holds. The window rolls as well as gains.
     expect(indexAfterRepeats(oldestFirst, 3, 2)).toBeCloseTo(10.125, 5);
   });
 
