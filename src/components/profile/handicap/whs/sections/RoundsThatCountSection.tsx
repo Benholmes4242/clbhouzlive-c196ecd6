@@ -37,6 +37,7 @@ import { HcpSection } from './HcpSection';
 import RoundDetailSheet from './round-detail/RoundDetailSheet';
 import { CHART } from '../charts';
 import LastTwentyBars from '../charts/LastTwentyBars';
+import { grossFromDifferential } from '@/lib/whs/coursePlay';
 
 /** A full rolling window. Below this the section states the sample instead. */
 const MIN_ROUNDS = 20;
@@ -165,7 +166,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
   /* PLAIN ROUNDING, deliberately NOT the next-round ceil-minus-one: that is a
      score to BEAT; this only describes where the line already sits. */
   const scoreAt = (diff: number) =>
-    course ? Math.round((diff * course.slope) / 113 + course.rating) : null;
+    course ? Math.round(grossFromDifferential(diff, course.rating, course.slope)) : null;
 
   /* Strip figures: the score at the line's course, else the differential. */
   const fmtFigure = (d: number) => {

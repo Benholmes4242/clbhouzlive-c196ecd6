@@ -48,6 +48,7 @@ import { useUserAchievements } from '@/hooks/gam/useUserAchievements';
 import { milestonesReachedFrom } from '../gam/trophy-room/career/milestones';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import { r } from '@/lib/radius';
+import { differentialFromGross } from '@/lib/whs/coursePlay';
 
 const FIG: React.CSSProperties = {
   fontVariantNumeric: 'tabular-nums lining-nums',
@@ -174,7 +175,7 @@ export const PersonalBestsSection: React.FC<Props> = ({
       let beatN: number | null = null;
       if (isOwner && ref) {
         const record = best.handicap_differential as number;
-        const diffOf = (g: number) => ((g - ref.cr) * 113) / ref.slope;
+        const diffOf = (g: number) => differentialFromGross(g, ref.cr, ref.slope);
         // CEIL MINUS ONE, never round: a rounded score can merely TIE the record.
         let score = Math.ceil((record * ref.slope) / 113 + ref.cr) - 1;
         while (diffOf(score) >= record) score -= 1;

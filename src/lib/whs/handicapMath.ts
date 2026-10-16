@@ -1,4 +1,5 @@
 import type { WhsScoreWithIndex } from './types';
+import { indexFromDifferentials } from './coursePlay';
 
 export interface NextRoundProjection {
   /** Differential needed to cut handicap below current. Beat this and you drop. */
@@ -56,13 +57,13 @@ export function projectNextRound(
 
   // Sort remaining diffs ASCENDING to pick the top 8 (lowest = best)
   const remainingSorted = [...remaining19Diffs].sort((a, b) => a - b);
-  const top8Remaining = remainingSorted.slice(0, 8);
   const top7Remaining = remainingSorted.slice(0, 7);
 
   const sumTop7 = top7Remaining.reduce((s, d) => s + d, 0);
   const cutTarget = 8 * currentHandicap - sumTop7;
 
-  const settleAt = top8Remaining.reduce((s, d) => s + d, 0) / 8;
+  // Fewer than eight remaining (a window of exactly eight) keeps the index.
+  const settleAt = indexFromDifferentials(remaining19Diffs) ?? currentHandicap;
 
   const isAtRisk = settleAt > currentHandicap + 0.05;
 

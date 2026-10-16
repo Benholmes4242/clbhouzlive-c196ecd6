@@ -31,6 +31,7 @@ import type { WhsScore } from '@/lib/whs/types';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { HcpSection } from './HcpSection';
 import { CHART, DEAD_BAND, indexTone } from '../charts';
+import { differentialFromGross } from '@/lib/whs/coursePlay';
 
 /** A full rolling window. projectNextRound is only correct at this size. */
 const MIN_ROUNDS = 20;
@@ -103,7 +104,7 @@ function buildLadder(
   if (!course) return null;
   const { cr, slope } = course;
   // PCC is ignored here (it is almost always 0); not modelled.
-  const diffOf = (gross: number) => ((gross - cr) * 113) / slope;
+  const diffOf = (gross: number) => differentialFromGross(gross, cr, slope);
   // Largest whole score that strictly BEATS a differential. Never Math.round:
   // a rounded score can TIE the target and move nothing.
   const beats = (d: number) => {
