@@ -194,7 +194,7 @@ export function CourseHolePanel({
       <Block title={t('holes.preview.eyebrow', 'Hole by hole')}>
         {shares && <DistributionStrip shares={shares} />}
         {shares && <PopulationCaption includesYou={hasYou} style={{ marginTop: 6 }} />}
-        <Extremes hardest={hardest} easiest={easiest} fieldHoles={fieldHoles} />
+        <Extremes hardest={hardest} easiest={easiest} />
       </Block>
       <ListTerminalRow
         label={t('discover.coursesPlayed.viewCourse', 'View course')}
