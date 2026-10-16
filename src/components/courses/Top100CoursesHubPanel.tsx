@@ -16,6 +16,7 @@ import { CoursesSearchField } from '@/features/explore-magazine/CoursesSearchFie
 import { SectionHead, SECTION_WRAP } from './browse/SectionHead';
 import { YourHundredSection } from './top100/YourHundredSection';
 import { TheArgumentSection } from './top100/TheArgumentSection';
+import { ArgumentShell, Top100CardListShell, TOP100_CARD_GAP, YourHundredShell } from './top100/top100Shells';
 import { argumentRows, qualifyingCount } from './top100/theArgument';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 
@@ -258,8 +259,14 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
           subjects={subjects}
           onOpenCourse={openCourse}
         />
+      ) : user && (isLoading || (user?.id ? !progressFetchedAfterMount : progressLoading)) ? (
+        <YourHundredShell />
       ) : null}
-      {argument.length > 0 ? <TheArgumentSection rows={argument} qualifying={argumentQualifying} /> : null}
+      {argument.length > 0 ? (
+        <TheArgumentSection rows={argument} qualifying={argumentQualifying} />
+      ) : isLoading || enrichmentLoading ? (
+        <ArgumentShell />
+      ) : null}
       <section style={{ ...SECTION_WRAP, paddingBottom: 0 }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
           <SectionHead kicker="The list" tone="quiet" title={heading} />
@@ -270,7 +277,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
       </section>
 
       <div style={{ paddingTop: 24 }}>
-        {isLoading ? null : isError ? (
+        {isLoading ? <Top100CardListShell /> : isError ? (
           <div style={{ padding: '48px 0', textAlign: 'center', color: A.MUTE }}>
             <Award size={20} aria-hidden />
             <p>Could not load this list.</p>
@@ -288,7 +295,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
               const row = toBrowseRow(course, item, renderedList);
               // The id is an anchor with no current consumer, kept for deep links.
               return (
-                <div key={course.id} id={`top100-card-${course.id}`} style={{ scrollMarginTop: 'max(env(safe-area-inset-top, 0px), 47px)', marginBottom: index < visibleCourses.length - 1 ? 32 : 0 }}>
+                <div key={course.id} id={`top100-card-${course.id}`} style={{ scrollMarginTop: 'max(env(safe-area-inset-top, 0px), 47px)', marginBottom: index < visibleCourses.length - 1 ? TOP100_CARD_GAP : 0 }}>
                   <BrowseCourseCard
                     row={row}
                     variant="top100"

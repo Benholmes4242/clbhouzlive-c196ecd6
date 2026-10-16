@@ -7,19 +7,23 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import type { ArgumentRow } from './theArgument';
 import { ordinal } from '@/lib/text/numbers';
 
+/* Row geometry, read by the rows AND their shell (BRIEF_COURSES_SKELETONS 3.4). */
+export const ARGUMENT_THUMB = { size: 52, radius: 8 } as const;
+export const ARGUMENT_ROW_GAP = 12;
+
 /** BRIEF_TOP_100_REBUILD §3. The caller renders nothing when rows is empty. */
 export function TheArgumentSection({ rows, qualifying }: { rows: ArgumentRow[]; qualifying: number }) {
   return (
     <section style={SECTION_WRAP}>
       <SectionHead kicker="Golfers versus the list" title="Where the ratings and the rankings differ" />
-      <div style={{ marginTop: HEAD_GAP, display: 'grid', gap: 12 }}>
+      <div style={{ marginTop: HEAD_GAP, display: 'grid', gap: ARGUMENT_ROW_GAP }}>
         {rows.map((r) => {
           const up = r.divergence > 0;
           const tone = up ? A.GREEN : A.RED;
           const Arrow = up ? ArrowUp : ArrowDown;
           return (
             <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 52, height: 52, borderRadius: 8, overflow: 'hidden', flexShrink: 0 }}>
+              <div style={{ width: ARGUMENT_THUMB.size, height: ARGUMENT_THUMB.size, borderRadius: ARGUMENT_THUMB.radius, overflow: 'hidden', flexShrink: 0 }}>
                 <CourseImageFallback courseId={r.id} courseName={r.name} imageUrl={r.imageUrl} style={{ height: '100%' }} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
