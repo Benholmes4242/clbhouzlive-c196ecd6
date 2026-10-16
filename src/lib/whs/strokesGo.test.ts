@@ -64,22 +64,56 @@ describe('deriveStrokesGo', () => {
     expect(s.dominant!.parN).toBe(4);
   });
 
-  it('outcome bands are weighted by holes_played and partition the holes', () => {
-    const s = deriveStrokesGo(fixture)!;
-    // birdie+ = (30×90 + 20×540 + 40×270) / 900 = 24300/900 = 27
-    expect(s.bands.birdiePlus).toBeCloseTo(27, 5);
-    // bogey = (40×90 + 50×540 + 30×270) / 900 = 38700/900 = 43
-    expect(s.bands.bogey).toBeCloseTo(43, 5);
-    // double+ = (10×90 + 12×540 + 8×270) / 900 = 9540/900 = 10.6
-    expect(s.bands.doublePlus).toBeCloseTo(10.6, 5);
-    // par is the remainder: 100 − 27 − 43 − 10.6 = 19.4
-    expect(s.bands.par).toBeCloseTo(19.4, 5);
-    expect(s.bands.birdiePlus + s.bands.par + s.bands.bogey + s.bands.doublePlus).toBeCloseTo(100, 5);
+  /* 5B L5: the bands are derived from the exact counts, not percentages. */
+  it('5B L1/L2: bands come from the counts and sum to exactly 100 after rounding', () => {
+    const s = deriveStrokesGo(countedFixture)!;
+    expect(s.bands).not.toBeNull();
+    expect(s.bands!.birdiePlus).toBe(27);
+    expect(s.bands!.par).toBe(27);
+    expect(s.bands!.bogey).toBe(36);
+    expect(s.bands!.doublePlus).toBe(10);
+    expect(s.bands!.birdiePlus + s.bands!.par + s.bands!.bogey + s.bands!.doublePlus).toBe(100);
   });
 
-  it('doubles a round is the double+ share × 18', () => {
-    const s = deriveStrokesGo(fixture)!;
-    expect(s.doublesPerRound).toBeCloseTo(0.106 * 18, 5);
+  it('5B L5: par is NOT zero when par_count is positive — the old remainder bug', () => {
+    const s = deriveStrokesGo(countedFixture)!;
+    // The bug read pct_par_better (par OR better) as the birdie band, which
+    // drove the remainder-computed par band to a clamped zero.
+    expect(s.bands!.par).toBeGreaterThan(0);
+  });
+
+  it('5B L5: birdie-or-better is strictly less than par-or-better would be', () => {
+    const s = deriveStrokesGo(countedFixture)!;
+    // birdie+ (27) must not stand in for par-or-better (27 + 27 = 54).
+    expect(s.bands!.birdiePlus).toBeLessThan(s.bands!.birdiePlus + s.bands!.par);
+    expect(s.bands!.birdiePlus).toBe(27);
+  });
+
+  it('5B L2: a 99/101 rounding remainder is added to the largest band', () => {
+    // Counts chosen so the exact percentages round to a sum of 99:
+    // 100 holes: 33.5/33.5/33.0/… — use 100 holes with thirds.
+    const s = deriveStrokesGo({
+      par3: null,
+      par4: splitWithCounts(0.5, 300, { birdie: 100, par: 100, bogey: 100, dbl: 0 }),
+      par5: null,
+    })!;
+    // Exact 33.333… ×3 → rounds to 33 ×3 = 99; the difference lands on a
+    // largest band and the four still sum to exactly 100.
+    expect(s.bands!.birdiePlus + s.bands!.par + s.bands!.bogey + s.bands!.doublePlus).toBe(100);
+  });
+
+  it('5B L3: when the counts are absent the bands and doubles figure are null', () => {
+    const s = deriveStrokesGo(fixture)!; // pct-only splits, no count fields
+    expect(s.bands).toBeNull();
+    expect(s.doublesPerRound).toBeNull();
+    // The three par rows above the bar are unaffected.
+    expect(s.rows).toHaveLength(3);
+  });
+
+  it('5B L6: doubles a round reads the exact count share × 18', () => {
+    const s = deriveStrokesGo(countedFixture)!;
+    // double share = 90 / 900 = 0.10 exactly.
+    expect(s.doublesPerRound).toBeCloseTo(0.1 * 18, 5);
   });
 
   it('null when no type has holes', () => {
