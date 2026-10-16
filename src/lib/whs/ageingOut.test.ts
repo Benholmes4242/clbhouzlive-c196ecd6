@@ -73,9 +73,10 @@ describe('3A amendment', () => {
     // One 73: drops the 2.0, best eight of [3,10..28] = 3,10..16 = 94/8 =
     // 11.75 — does NOT hold (above 11.6). This is the brief's F1 figure.
     expect(indexAfterRepeats(oldestFirst, 3, 1)).toBeCloseTo(11.75, 5);
-    // Two 73s: drops the 2.0 and the 10, best eight = 3,3,11..16 = 77/8 =
-    // 9.625 — holds. The window rolls as well as gains.
-    expect(indexAfterRepeats(oldestFirst, 3, 2)).toBeCloseTo(9.625, 5);
+    // Two 73s: the iterative roll drops the 2.0 and gains two 3.0s, best
+    // eight = 3,3,10..15 = 81/8 = 10.125 — holds. The window rolls as well
+    // as gains.
+    expect(indexAfterRepeats(oldestFirst, 3, 2)).toBeCloseTo(10.125, 5);
   });
 
   it('C5 (card layer, 3D F1/F2): at N = 1 the repeat line is NOT rendered', () => {
