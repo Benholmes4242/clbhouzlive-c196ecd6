@@ -124,32 +124,11 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
         })
       : null;
 
-  /** Where the viewing member stands on a board they do not hold. */
-  const viewerLine = (category: LegendCategory, isYou: boolean, shared = false) => {
-    if (isYou) {
-      return (
-        <div style={{ ...ABOUT_KICKER, color: A.AMBER_DEEP, marginTop: 4 }}>
-          {shared ? t('courseDetail.records.youShare') : t('courseDetail.records.youHold')}
-        </div>
-      );
-    }
-    const standing = viewerByCategory.get(category);
-    if (!standing) return null;
-    return (
-      <div style={{ marginTop: 3, fontSize: 10.5, fontWeight: 600, color: A.BODY, ...FIGS }}>
-        <span>
-          {t('courseDetail.records.youValue', {
-            value: formatLegendValueCompact(category, standing.row.value),
-          })}
-        </span>
-        <span style={{ marginLeft: 9, color: A.MUTE }}>
-          {standing.behind
-            ? t('courseDetail.records.youBehind', { gap: standing.gap })
-            : t('courseDetail.records.youAhead')}
-        </span>
-      </div>
-    );
-  };
+  /* BRIEF_COURSE_TAB_1A V1 — nothing on the Course tab is about the viewer.
+     The viewer's standing on each board lives on the You and Boards tabs. */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const viewerLine = (_category: LegendCategory, _isYou: boolean, _shared = false): React.ReactNode => null;
+  void viewerByCategory;
 
   const drillDown = (
     <>
@@ -276,7 +255,7 @@ const RecordBook: React.FC<RecordBookProps> = ({ courseId, courseName, onSeeAll 
   const isViewer = (r: { user_id: string; is_self: boolean }) =>
     r.is_self || (!!user?.id && r.user_id === user.id);
   const nameOf = (r: { user_id: string; is_self: boolean; user_display_name: string | null }) =>
-    isViewer(r) ? t('courseDetail.records.you') : r.user_display_name ?? 'Golfer';
+    r.user_display_name ?? 'Golfer';
   return (
     <AboutSection heading={heading} meta={meta}>
       {/* BRIEF_RECORD_BOOK_NO_ROW_RULES: no row rules. The old 11px padding only

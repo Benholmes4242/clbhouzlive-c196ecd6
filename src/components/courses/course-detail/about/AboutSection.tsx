@@ -58,9 +58,33 @@ export const aboutFig = (size: number, color: string = A.INK): React.CSSProperti
   ...FIGS,
 });
 
+/** BRIEF_COURSE_TAB_1A — the canonical amber section kicker (11/700/0.16em). */
+export const VERDICT_KICKER: React.CSSProperties = {
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  lineHeight: 1,
+  color: A.AMBER,
+  fontFamily: SANS,
+};
+
+/** BRIEF_COURSE_TAB_1A — the section title under that kicker (19/700/-0.02em). */
+export const TAB_TITLE: React.CSSProperties = {
+  margin: '5px 0 0',
+  fontSize: 19,
+  fontWeight: 700,
+  letterSpacing: '-0.02em',
+  lineHeight: 1.15,
+  color: A.INK,
+  fontFamily: SANS,
+};
+
 interface AboutSectionProps {
   /** 16/700/-0.01em INK. Omit for a kicker-only section (§3.2). */
   heading?: string;
+  /** BRIEF_COURSE_TAB_1A: with `kicker`, renders the amber kicker + 19px title. */
+  title?: string;
   /** 11/700 MUTE sentence case, right-aligned on the heading baseline. */
   meta?: string | null;
   /** Makes the meta slot a button ("See all 18"). */
@@ -79,6 +103,7 @@ interface AboutSectionProps {
 
 export const AboutSection: React.FC<AboutSectionProps> = ({
   heading,
+  title,
   meta,
   onMetaPress,
   kicker,
@@ -94,7 +119,29 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
       fontFamily: SANS,
     }}
   >
-    {heading ? (
+    {title ? (
+      <div style={{ padding: `0 ${GUTTER}px`, marginBottom: 12 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
+          {kicker ? <span style={VERDICT_KICKER}>{kicker}</span> : <span aria-hidden="true" />}
+          {meta ? (
+            <span
+              className="tabular-nums lining-nums"
+              style={{ flexShrink: 0, fontSize: 11, fontWeight: 700, color: A.MUTE, whiteSpace: 'nowrap' }}
+            >
+              {meta}
+            </span>
+          ) : null}
+        </div>
+        <h2 id={id} style={TAB_TITLE}>{title}</h2>
+      </div>
+    ) : heading ? (
       <div style={{ padding: `0 ${GUTTER}px` }}>
         <DiscoverSectionHeading id={id} title={heading} right={meta ?? null} onRightPress={onMetaPress} />
       </div>

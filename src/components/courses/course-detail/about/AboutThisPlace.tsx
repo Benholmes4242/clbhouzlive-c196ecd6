@@ -50,7 +50,7 @@ const AboutThisPlace: React.FC<AboutThisPlaceProps> = ({ courseId, description, 
   };
 
   return (
-    <AboutSection heading={t('courseDetail.sections.aboutThisPlace')}>
+    <AboutSection kicker={t('courseDetail.place.kicker')} title={t('courseDetail.place.title')}>
       {text ? (
         <div
           style={{

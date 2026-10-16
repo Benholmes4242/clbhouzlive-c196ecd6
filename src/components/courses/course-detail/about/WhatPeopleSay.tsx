@@ -87,7 +87,7 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
         textAlign: 'left',
       }}
     >
-      {yours != null ? t('courseDetail.about.editRating') : t('courseDetail.communityScore.rateThis')}
+      {yours != null ? t('courseDetail.place.editRating') : t('courseDetail.communityScore.rateThis')}
     </button>
   );
 

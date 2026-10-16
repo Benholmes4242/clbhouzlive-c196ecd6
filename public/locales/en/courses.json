@@ -1258,6 +1258,65 @@
       "featuredPill": "Featured",
       "birdieRun": "{{count}} birdies in a row",
       "courseRecordJoint": "Joint course record"
+    },
+    "verdict": {
+      "kicker": "The verdict",
+      "titleOver_one": "It takes one shot off the field",
+      "titleOver_other": "It takes {{words}} shots off the field",
+      "titleUnder": "The field beats par here",
+      "titleLevel": "It plays close to par",
+      "overPar": "over par, on average",
+      "across_one": "across {{rounds}} round, every handicap",
+      "across_other": "across {{rounds}} rounds, every handicap",
+      "gentlest": "Gentlest we track",
+      "harderThan": "Harder than {{pct}}% of them",
+      "hardestHole": "Hardest hole",
+      "letOff": "Only let-off",
+      "defends": "What defends it",
+      "parType": "Par {{par}}s",
+      "saidHardest": "{{hole}} is the hardest hole on the course",
+      "saidJoin": ", and ",
+      "saidDefender": "the par {{par}}s cost the field the most a hole",
+      "saidEnd": ".",
+      "saidEndOnly": "."
+    },
+    "defends": {
+      "kicker": "How it defends par",
+      "title": "Hole by hole",
+      "lede_one": "What the field averages over par on each hole, across the {{rounds}} round here logged with hole-by-hole detail. The scorecard says how long it is; this says how hard it is.",
+      "lede_other": "What the field averages over par on each hole, across the {{rounds}} rounds here logged with hole-by-hole detail. The scorecard says how long it is; this says how hard it is.",
+      "front": "Front nine",
+      "back": "Back nine",
+      "worst": "Worst hole",
+      "ninesLevel": "The two nines play the same, and ",
+      "backCosts": "The back nine costs ",
+      "frontCosts": "The front nine costs ",
+      "shotsMore": "{{shots}} shots more",
+      "thanFront": " than the front, and ",
+      "thanBack": " than the back, and ",
+      "hardest": "{{hole}} is the hardest hole on the course",
+      "lastHardest": "it saves the worst for last: {{hole}} is the hardest hole on the course",
+      "parMeta_one": "{{holes}} hole · {{shots}} shots of the {{total}}",
+      "parMeta_other": "{{holes}} holes · {{shots}} shots of the {{total}}"
+    },
+    "tees": {
+      "kicker": "The tees",
+      "title": "What each set plays to",
+      "slope": "{{slope}} slope",
+      "spread": "{{points}} slope points separate the {{sets}} sets.",
+      "spreadOne": "One slope point separates the {{sets}} sets.",
+      "spreadNone": "Every set plays to the same slope."
+    },
+    "place": {
+      "kicker": "The place",
+      "title": "About this course",
+      "editRating": "Edit rating"
+    },
+    "heroLine": {
+      "par": "Par {{par}}",
+      "yards": "{{yards}} yds",
+      "rounds_one": "{{rounds}} round",
+      "rounds_other": "{{rounds}} rounds"
     }
   },
   "courseHero": {

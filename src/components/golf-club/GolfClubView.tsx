@@ -22,16 +22,15 @@ import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sectio
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 import { useCourseStatsDetail, type CourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import CourseStatsSheet from '@/components/feed/CourseStatsSheet';
-import { CourseMasthead, HeroFigureCell } from '@/components/courses/CourseMasthead';
-import { ratingDisplayable } from '@/features/explore-magazine/courseRatingFloor';
-import { formatRatingValue } from '@/utils/formatters';
+import { CourseMasthead } from '@/components/courses/CourseMasthead';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseTop100Standing } from '@/hooks/useCourseTop100Standing';
 import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 import { Z } from '@/config/zIndex';
 import { TAB_LEAD_IN } from '@/components/courses/course-detail/about/AboutSection';
+import { useHeroReferenceLine } from '@/components/courses/course-detail/about/useHeroReferenceLine';
 import StickySafeAreaScrim, { useStickySafeAreaState } from '@/components/chrome/StickySafeAreaScrim';
 import YourRoundsSheet from '@/components/courses/course-detail/you/YourRoundsSheet';
 import YourHolesSheet from '@/components/courses/course-detail/you/YourHolesSheet';
@@ -441,8 +440,6 @@ interface CourseTitleOverlayProps {
   onOpenStats: () => void;
 }
 
-/* Hero FIGURE ROW cell: the shared HeroFigureCell from CourseMasthead. */
-const HeroStatCell: React.FC<{ label: string; value: string; tone?: string }> = (p) => <HeroFigureCell {...p} />;
 
 const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   course,
@@ -485,40 +482,10 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
     });
   }, [showBand, courseId, rounds, reviewCount]);
 
-  const avgToPar = courseStats?.avg_over_par;
-  const cells: React.ReactNode[] = [];
-  if (showBand) {
-    if (rounds > 0) {
-      cells.push(<HeroStatCell key="rounds" label={t('courseHero.rounds')} value={String(rounds)} />);
-    }
-    if (reviewCount > 0) {
-      cells.push(<HeroStatCell key="reviews" label={t('courseHero.reviews')} value={String(reviewCount)} />);
-    }
-    if (avgToPar != null) {
-      cells.push(
-        <HeroStatCell
-          key="avgToPar"
-          label={t('courseHero.avgToPar')}
-          value={`${avgToPar > 0 ? '+' : ''}${avgToPar.toFixed(1)}`}
-        />
-      );
-    }
-  }
-  // No floor: the REVIEWS cell beside it shows the sample size (V.3).
-  // V.1 HERO TONE: green at 9.0 and above, WHITE below — never the MUTE
-  // fallback. White is what the rounds/reviews/avg figures beside it already
-  // print, so the rating sits with them and colour stays reserved for the
-  // standout nine.
-  if (ratingDisplayable(communityRating)) {
-    cells.push(
-      <HeroStatCell
-        key="rating"
-        label={t('courseHero.rating')}
-        value={formatRatingValue(communityRating)}
-        tone={courseSubScoreTone(communityRating) === A.GREEN ? A.GREEN : undefined}
-      />
-    );
-  }
+  /* BRIEF_COURSE_TAB_1A P1.1 — the generic stat row collapses to ONE reference
+     line: par · yards · rating / slope · tracked rounds. Reference, not findings. */
+  const referenceLine = useHeroReferenceLine(courseId, rounds);
+  void communityRating;
 
   return (
     <div className="absolute inset-x-0 bottom-4 px-4 z-[1] flex flex-col gap-2">
@@ -528,26 +495,25 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
         name={course.name}
         place={course.country || null}
       >
-        {cells.length > 0 ? (
+        {referenceLine ? (
           <button
             type="button"
             onClick={() => {
               analyticsEvents.track('course_hero_stats_tapped', { course_id: courseId, rounds_tracked: rounds });
               onOpenStats();
             }}
-            className="active:scale-[0.98] transition-transform"
+            className="tabular-nums lining-nums"
             style={{
-              display: 'grid',
-              gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-              gap: 10,
-              width: '100%',
+              display: 'block',
               padding: 0,
               border: 0,
               background: 'transparent',
               textAlign: 'left',
+              fontSize: 11.5,
+              color: A.MUTE,
             }}
           >
-            {cells}
+            {referenceLine}
           </button>
         ) : null}
       </CourseMasthead>

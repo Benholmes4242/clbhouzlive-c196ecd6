@@ -27,19 +27,20 @@ import {
   storageKey,
 } from '@/features/courses/components/holes/teePreference';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { AboutSection, GUTTER, ABOUT_KICKER, aboutFig } from './AboutSection';
-import CenteredStatStrip from './CenteredStatStrip';
+import { AboutSection } from './AboutSection';
+import { Said } from './verdictBits';
+import { TEE_CHANGED_EVENT } from './useHeroReferenceLine';
+import { useTranslation } from 'react-i18next';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
 
-/** WHS standard slope. A course of exactly 113 plays to average difficulty. */
-const STANDARD_SLOPE = 113;
 
 interface Props {
   courseId: string | undefined;
 }
 
 export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
+  const { t } = useTranslation('courses');
   const { profile } = useProfileData();
   const { data } = useCourseTeeSets(courseId);
   const tees = useMemo<TeeSet[]>(() => data ?? [], [data]);
@@ -64,6 +65,7 @@ export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
     } catch {
       /* private mode — the selection is in-memory only */
     }
+    window.dispatchEvent(new Event(TEE_CHANGED_EVENT));
     analyticsEvents.track('course_card_tee_changed', {
       course_id: courseId ?? null,
       tee_label: label,
@@ -100,92 +102,64 @@ export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
         (b.slope ?? -1) - (a.slope ?? -1) || (b.tee.total_yards ?? 0) - (a.tee.total_yards ?? 0),
     );
 
-  const delta = slope != null ? slope - STANDARD_SLOPE : null;
-  const deltaText =
-    delta == null || delta === 0
+  /* BRIEF_COURSE_TAB_1A — the tees became a finding. Par, yards, rating and
+     slope are reference and sit on the hero line, never as tiles here. The
+     spread note is DERIVED from the sets' own slopes, nothing illustrative. */
+  const slopes = teeRows.map((r) => r.slope).filter((v): v is number => v != null);
+  const spread = slopes.length >= 2 ? Math.max(...slopes) - Math.min(...slopes) : null;
+  const sets = formatNumber(teeRows.length);
+  const spreadText =
+    spread == null
       ? null
-      : `${delta > 0 ? '+' : '\u2212'}${Math.abs(delta)} against a standard slope of ${STANDARD_SLOPE}.`;
+      : spread === 0
+        ? t('courseDetail.tees.spreadNone')
+        : spread === 1
+          ? t('courseDetail.tees.spreadOne', { sets })
+          : t('courseDetail.tees.spread', { points: formatNumber(spread), sets });
+  void facts;
 
   return (
-    <>
-      {/* §3.1 — no heading, no card. A flat row of four figures. */}
-      {facts.length > 0 && (
-        <div
-          style={{
-            padding: `0 ${GUTTER}px`,
-            fontFamily: SANS,
-          }}
-        >
-          <CenteredStatStrip items={facts.map((f) => ({ label: f.kicker, value: f.value }))} />
-        </div>
-      )}
-
-      {/* §3.2 — kicker only, no section heading. The tee list is a CONTROL. */}
-      <AboutSection kicker="Tees" space={16}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {teeRows.map(({ tee, slope: teeSlope }) => {
-            const on = tee.tee_label === active.tee_label;
-            return (
-              <button
-                key={tee.tee_label}
-                type="button"
-                onClick={() => pickTee(tee.tee_label)}
-                aria-pressed={on}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  width: '100%',
-                  minHeight: 44,
-                  padding: '8px 12px',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  borderRadius: 10,
-                  background: on ? inkWithAlpha(SURFACE.dark.ink, 0.07) : 'transparent',
-                  border: on ? '1px solid rgba(248,250,252,0.18)' : '1px solid transparent',
-                  fontFamily: SANS,
-                }}
-              >
-                <span
-                  style={{
-                    flex: 1,
-                    minWidth: 0,
-                    fontSize: 13,
-                    fontWeight: on ? 600 : 500,
-                    color: on ? A.INK : A.MUTE,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {tee.tee_label}
+    <AboutSection kicker={t('courseDetail.tees.kicker')} title={t('courseDetail.tees.title')}>
+      <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+        {teeRows.map(({ tee, slope: teeSlope }) => {
+          const on = tee.tee_label === active.tee_label;
+          return (
+            <button
+              key={tee.tee_label}
+              type="button"
+              onClick={() => pickTee(tee.tee_label)}
+              aria-pressed={on}
+              style={{
+                flex: '1 1 0',
+                minWidth: 72,
+                padding: '9px 6px',
+                textAlign: 'center',
+                cursor: 'pointer',
+                borderRadius: 10,
+                background: on ? inkWithAlpha(SURFACE.dark.ink, 0.05) : 'transparent',
+                border: `1px solid ${on ? inkWithAlpha(SURFACE.dark.ink, 0.22) : A.HAIRLINE}`,
+                fontFamily: SANS,
+              }}
+            >
+              <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: on ? A.INK : A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {tee.tee_label}
+              </span>
+              {tee.total_yards != null ? (
+                <span className="tabular-nums lining-nums" style={{ display: 'block', fontSize: 9.5, fontWeight: 700, color: A.DIM, marginTop: 4 }}>
+                  {formatNumber(Math.round(tee.total_yards))}
                 </span>
-
-                {teeSlope != null && (
-                  <span style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-                    <span className="tabular-nums lining-nums" style={aboutFig(13)}>
-                      {teeSlope}
-                    </span>
-                    <span style={ABOUT_KICKER}>Slope</span>
-                  </span>
-                )}
-
-                <span
-                  className="tabular-nums lining-nums"
-                  style={{ ...aboutFig(13, A.MUTE), minWidth: 46, textAlign: 'right' }}
-                >
-                  {tee.total_yards == null ? '' : formatNumber(Math.round(tee.total_yards))}
+              ) : null}
+              {teeSlope != null ? (
+                <span className="tabular-nums lining-nums" style={{ display: 'block', fontSize: 9.5, fontWeight: 700, color: A.MUTE, marginTop: 4 }}>
+                  {t('courseDetail.tees.slope', { slope: teeSlope })}
                 </span>
-              </button>
-            );
-          })}
-        </div>
-
-        <p style={{ margin: '12px 0 0', fontSize: 11, color: A.DIM, lineHeight: 1.5 }}>
-          {`Tap a tee to set yours.${deltaText ? ` ${deltaText}` : ''}`}
-        </p>
-      </AboutSection>
-    </>
+              ) : null}
+            </button>
+          );
+        })}
+      </div>
+      {spreadText ? <Said quiet>{spreadText}</Said> : null}
+    </AboutSection>
   );
 };
 
