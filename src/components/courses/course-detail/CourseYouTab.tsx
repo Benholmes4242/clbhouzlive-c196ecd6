@@ -310,23 +310,20 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
 
   // B — NO HANDICAP CONNECTED. The majority screen, rebuilt by
   // BRIEF_YOU_TAB_CONNECT_INVITATION: the member's page with their side blank.
-  // Stat strip (dashes, never zeroes), the field's chart (gated: 18 holes and
+  // Field-only strip (YOU_TAB_SPARSE_1 N1), the field's chart (gated: 18 holes and
   // at least 5 rounds), empty birdie slots, up for grabs, then the connect block.
   if (!connection) {
     const showFieldChart =
       (analysis?.holes?.length ?? 0) === 18 && Number(analysis?.total_rounds ?? 0) >= FIELD_CHART_MIN_ROUNDS;
     return wrap(
       <div>
-        <AboutSection first>
-          <CenteredStatStrip
-            items={[
-              { label: t('courseDetail.youTab.rounds'), value: '\u2014' },
-              { label: t('courseDetail.youTab.best'), value: '\u2014' },
-              { label: t('courseDetail.youTab.yourAverage'), value: '\u2014' },
-              { label: t('courseDetail.youTab.field'), value: fieldGross ?? '\u2014' },
-            ]}
-          />
-        </AboutSection>
+        {/* YOU_TAB_SPARSE_1 N1: no dash columns for the reader's absent figures.
+            The field figure stands alone, labelled as the field; absent, no strip. */}
+        {fieldGross ? (
+          <AboutSection first>
+            <CenteredStatStrip items={[{ label: t('courseDetail.youTab.fieldAverageHere'), value: fieldGross }]} />
+          </AboutSection>
+        ) : null}
         {showFieldChart && analysis ? (
           <FieldShotsSection
             holes={analysis.holes}

@@ -79,6 +79,7 @@ export const FieldHoleBars: React.FC<{ holes: CourseHole[] }> = ({ holes }) => {
 );
 };
 
+/** YOU_TAB_SPARSE_1 N2: the field's chart names the course, never the reader. */
 export const FieldShotsSection: React.FC<{ holes: CourseHole[]; totalRounds: number; courseName: string }> = ({
   holes,
   totalRounds,
@@ -87,12 +88,12 @@ export const FieldShotsSection: React.FC<{ holes: CourseHole[]; totalRounds: num
   const { t } = useTranslation('courses');
   return (
     <AboutSection
-      heading={t('courseDetail.youTab.sections.shotsGo')}
+      heading={t('courseDetail.youTab.connect.fieldShotsHeading', { courseName })}
       meta={t('courseDetail.youTab.connect.roundsMeta', { count: totalRounds, rounds: formatNumber(totalRounds) })}
     >
       <FieldHoleBars holes={holes} />
       <div style={{ marginTop: 12 }}>
-        <YouSentence quiet>{t('courseDetail.youTab.connect.chartCaption', { courseName })}</YouSentence>
+        <YouSentence quiet>{t('courseDetail.youTab.connect.fieldChartLede', { courseName, count: totalRounds, rounds: formatNumber(totalRounds) })}</YouSentence>
       </div>
     </AboutSection>
   );

@@ -1079,12 +1079,16 @@
         "roundsMeta_one": "{{rounds}} round",
         "roundsMeta_other": "{{rounds}} rounds",
         "chartCaption": "This is the field at {{courseName}}, hole by hole. Connect and your own line is drawn straight over it.",
+        "fieldShotsHeading": "How {{courseName}} plays",
+        "fieldChartLede_one": "Average over par on each hole, across the {{rounds}} round tracked here by every member who has played it.",
+        "fieldChartLede_other": "Average over par on each hole, across the {{rounds}} rounds tracked here by every member who has played it.",
         "birdiesMeta": "0 of 18",
         "birdiesCaption": "Every hole you have birdied here lights up — including rounds you played before you connected.",
         "fillsIn": "Connect once and all of it fills in.",
         "history": "The rounds you have already played here come with it, not just the ones from today onwards."
       },
       "field": "Field",
+      "fieldAverageHere": "Field average here",
       "form": {
         "best": "Best {{score}}",
         "better": "{{delta}} better than your ten before",
