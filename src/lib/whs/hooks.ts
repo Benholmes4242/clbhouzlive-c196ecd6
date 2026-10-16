@@ -27,7 +27,6 @@ import {
   type RivalIdentity,
   fetchSharedRounds,
   fetchSharedRoundCounts,
-  fetchTrophyAggregates,
   lookupWhsCourseId,
 } from './api';
 
@@ -378,23 +377,6 @@ export function useSharedRoundCounts(
     staleTime: 5 * 60 * 1000,
   });
 }
-
-
-// ─── Trophy aggregates (Sprint 3) ───────────────────────────────────────
-export function useTrophyAggregates(
-  userId: string | undefined,
-  connectionId: string | undefined,
-  fromDate?: string | null,
-  toDate?: string | null,
-) {
-  return useQuery({
-    queryKey: ['trophy-aggregates', userId, connectionId, fromDate ?? null, toDate ?? null],
-    enabled: !!userId && !!connectionId,
-    queryFn: () => fetchTrophyAggregates(userId!, connectionId!, fromDate, toDate),
-    staleTime: 5 * 60 * 1000,
-  });
-}
-
 
 
 // ─── Round reactions: retired ───────────────────────────────────────────
