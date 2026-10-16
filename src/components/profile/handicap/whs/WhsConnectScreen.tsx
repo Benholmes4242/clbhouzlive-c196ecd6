@@ -319,6 +319,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
       case 'intro':
         return (
           <EmptyStateScreen
+            layout={layout}
             onPickCountry={() => setStep('country')}
             onDecline={
               onDecline
