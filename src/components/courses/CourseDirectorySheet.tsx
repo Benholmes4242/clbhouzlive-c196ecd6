@@ -336,9 +336,22 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
           </div>
 
         ) : isLoading ? (
-          <div className="mt-3 space-y-2">
+          <div className="mt-3">
             {[0, 1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-14 rounded-xl" />
+              /* BRIEF_COURSES_SKELETONS 4.5: the real row — py-3, gap-3, hairline
+                 foot, no radius — with the radius on its 44px squircle thumb. */
+              <div
+                key={i}
+                aria-hidden
+                className="w-full py-3 flex items-center gap-3"
+                style={{ borderBottom: `1px solid ${HAIRLINE_INK_8}` }}
+              >
+                <Skeleton className="h-11 w-11 shrink-0" style={{ borderRadius: '34%' }} />
+                <span className="flex-1 min-w-0 flex flex-col" style={{ gap: 6 }}>
+                  <Skeleton className="h-3 w-3/5" />
+                  <Skeleton className="h-2.5 w-2/5" />
+                </span>
+              </div>
             ))}
           </div>
         ) : rows.length === 0 ? (

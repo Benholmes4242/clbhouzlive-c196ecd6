@@ -8,7 +8,8 @@ import { courseRankLabels, RANK_LIST_BY_SLUG as SLUG } from '@/features/courses/
 import { DISCOVER_SHELL_SURFACE, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
-const PHOTO_H = 196;
+/** The browse variant's photo height; read by StatBrowse's shell (BRIEF_COURSES_SKELETONS 4.4). */
+export const PHOTO_H = 196;
 /** The top100 variant's photo height; read by its shell (BRIEF_COURSES_SKELETONS 3.3). */
 export const TOP100_PHOTO_H = 178;
 const PHOTO_MUTE = 'rgba(255,255,255,0.66)';
