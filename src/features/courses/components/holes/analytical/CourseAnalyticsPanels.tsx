@@ -21,6 +21,8 @@ import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 
 
 import { useMyHolePerformance, type MyHolePerformanceRow } from '@/hooks/gam/useMyHolePerformance';
+import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
+import { fieldHolesExcludingViewer } from '@/lib/courseYou/youDerivations';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { A, FIGS, Hairline, KICKER, LABEL, Panel, difficultyRampColor, toParParts } from './tokens';
@@ -145,7 +147,7 @@ export const ShapeChart: React.FC<{
   const values = holes.flatMap((h) => {
     const mine = myByHole.get(h.hole_no)?.avg_to_par;
     return hasYou && mine != null ? [h.avg_to_par, mine] : [h.avg_to_par];
-  });
+  }).filter((v) => Number.isFinite(v));
   const domainMax = Math.max(0.1, ...values);
   const domainMin = Math.min(0, ...values);
   const span = Math.max(0.1, domainMax - domainMin);
@@ -157,9 +159,9 @@ export const ShapeChart: React.FC<{
   const cx = (i: number) => i * slot + slot / 2;
 
   // Bar tint spread: the course's own easiest -> hardest, not an absolute scale.
-  const fieldVals = holes.map((h) => h.avg_to_par);
-  const fMin = Math.min(...fieldVals);
-  const fMax = Math.max(...fieldVals);
+  const fieldVals = holes.map((h) => h.avg_to_par).filter((v) => Number.isFinite(v));
+  const fMin = fieldVals.length ? Math.min(...fieldVals) : 0;
+  const fMax = fieldVals.length ? Math.max(...fieldVals) : 0;
   const fSpan = Math.max(0.01, fMax - fMin);
   const tint = (v: number) => 0.06 + 0.94 * ((v - fMin) / fSpan);
 
@@ -175,9 +177,9 @@ export const ShapeChart: React.FC<{
   const endPt = linePts.length > 1 ? linePts[linePts.length - 1] : null;
 
   const hardestIdx = holes.findIndex((h) => h.hole_no === hardestHole);
-  const hardestTopY = hardestIdx >= 0 ? Math.min(y(holes[hardestIdx].avg_to_par), yBase) : null;
+  const hardestTopY = hardestIdx >= 0 && Number.isFinite(holes[hardestIdx].avg_to_par) ? Math.min(y(holes[hardestIdx].avg_to_par), yBase) : null;
   const easiestIdx = holes.findIndex((h) => h.hole_no === easiestHole);
-  const easiestTopY = easiestIdx >= 0 ? Math.min(y(holes[easiestIdx].avg_to_par), yBase) : null;
+  const easiestTopY = easiestIdx >= 0 && Number.isFinite(holes[easiestIdx].avg_to_par) ? Math.min(y(holes[easiestIdx].avg_to_par), yBase) : null;
 
 
   /* §4.1 - 1, 9, 18. THREE COORDINATES, NOT FOUR AND NOT EIGHTEEN: the ends are
@@ -223,6 +225,7 @@ export const ShapeChart: React.FC<{
             PAR
           </text>
           {!fieldIsOnlyYou && holes.map((h, i) => {
+            if (!Number.isFinite(h.avg_to_par)) return null;
             const yv = y(h.avg_to_par);
             const top = Math.min(yv, yBase);
             const height = Math.max(2, Math.abs(yBase - yv));
@@ -415,6 +418,20 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
     [data?.holes, proHoles, activeView],
   );
 
+  /* FIELD_EXCLUDES_VIEWER_B (R1). Every "Field" figure set beside "You" -
+     field avg, you beat the field on, the chart bars, hole rows, par types and
+     the extremes the chart labels - is the field EXCLUDING the member whose
+     figures are shown. A hole with no field once they are removed is blank
+     (NaN), never the inclusive figure. The members' distribution strip stays on
+     the inclusive analysis: it describes the course. The pros pool never
+     contains the member, and with nobody to exclude the inclusive pool is used. */
+  const excluding = activeView === 'members' && Boolean(viewerId);
+  const { data: holeField } = useCourseHoleField(courseId, viewerId, { enabled: excluding });
+  const fieldHoles = useMemo(
+    () => (excluding ? fieldHolesExcludingViewer(holes, holeField?.available ? holeField.holes : []) : holes),
+    [excluding, holes, holeField],
+  );
+
   const myByHole = useMemo(() => {
     const m = new Map<number, MyHolePerformanceRow>();
     (myPerf ?? []).forEach((r) => m.set(r.hole_no, r));
@@ -436,20 +453,22 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
     activeView === 'members' && canLoadMine && myPerf == null;
 
   const stats = useMemo(() => {
-    if (holes.length === 0) return null;
-    const fieldAvg = holes.reduce((s, h) => s + h.avg_to_par, 0) / holes.length;
+    if (fieldHoles.length === 0) return null;
+    const measured = fieldHoles.filter((h) => Number.isFinite(h.avg_to_par));
+    const fieldAvg = measured.length > 0 ? measured.reduce((s, h) => s + h.avg_to_par, 0) / measured.length : Number.NaN;
     const mineRows = holes
       .map((h) => myByHole.get(h.hole_no))
       .filter((r): r is MyHolePerformanceRow => r != null);
     const yourAvg = mineRows.length > 0
       ? mineRows.reduce((s, r) => s + r.avg_to_par, 0) / mineRows.length
       : null;
-    const beat = holes.filter((h) => {
+    const beat = measured.filter((h) => {
       const mine = myByHole.get(h.hole_no);
       return mine != null && mine.avg_to_par < h.avg_to_par;
     }).length;
-    const hardest = holes.reduce((m, h) => (h.avg_to_par > m.avg_to_par ? h : m), holes[0]);
-    const easiest = holes.reduce((m, h) => (h.avg_to_par < m.avg_to_par ? h : m), holes[0]);
+    const pool = measured.length > 0 ? measured : fieldHoles;
+    const hardest = pool.reduce((m, h) => (h.avg_to_par > m.avg_to_par ? h : m), pool[0]);
+    const easiest = pool.reduce((m, h) => (h.avg_to_par < m.avg_to_par ? h : m), pool[0]);
     /* NO FIELD (BRIEF_HOW_IT_PLAYS_NO_FIELD): the pool is only a field when it
        contains rounds beyond the viewer's own. times_played is the viewer's
        OWN round count per hole; total_rounds is every round in the pool. When
@@ -460,7 +479,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
     const fieldIsOnlyYou =
       activeView === 'members' && hasYou && totalRounds > 0 && myRounds >= totalRounds;
     return { fieldAvg, yourAvg, beat, withYou: mineRows.length, hardest, easiest, fieldIsOnlyYou };
-  }, [holes, myByHole, hasYou, totalRounds, activeView]);
+  }, [fieldHoles, myByHole, hasYou, totalRounds, activeView]);
 
   const toggle = (holeNo: number, surface: 'preview' | 'sheet') => {
     setOpenHoles((prev) => {
@@ -584,13 +603,13 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
   const beastFig = toParParts(stats.hardest.avg_to_par);
   const bestFig = toParParts(stats.easiest.avg_to_par);
 
-  const scale = buildHoleScale(holes, myByHole, totalRounds);
+  const scale = buildHoleScale(fieldHoles, myByHole, totalRounds);
 
   /* A FLAT CHART LABELS NEITHER EXTREME (§A2). */
   const flatShape = stats.hardest.avg_to_par === stats.easiest.avg_to_par;
 
   /** §A4 and §A5 - both derived from the per-hole data already loaded. */
-  const parRows = buildParTypeRows(holes, myByHole);
+  const parRows = buildParTypeRows(fieldHoles, myByHole);
   const courseShares = courseBucketShares(holes);
 
   /* RECONCILIATION (§A4): each par type weighted by its hole count must return
@@ -599,8 +618,8 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
     const wHoles = parRows.reduce((s, r) => s + r.holes, 0);
     const weighted = parRows.reduce((s, r) => s + r.field * r.holes, 0) / (wHoles || 1);
     const stated =
-      holes.filter((h) => h.par != null && Number.isFinite(h.avg_to_par)).reduce((s, h) => s + h.avg_to_par, 0) /
-      Math.max(1, holes.filter((h) => h.par != null && Number.isFinite(h.avg_to_par)).length);
+      fieldHoles.filter((h) => h.par != null && Number.isFinite(h.avg_to_par)).reduce((s, h) => s + h.avg_to_par, 0) /
+      Math.max(1, fieldHoles.filter((h) => h.par != null && Number.isFinite(h.avg_to_par)).length);
     if (Math.abs(weighted - stated) > 0.005) {
       // eslint-disable-next-line no-console
       console.warn('[par-type reconciliation]', { weighted, stated, fieldAvg: stats.fieldAvg });
@@ -668,7 +687,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
       >
 
         <ShapeChart
-          holes={holes}
+          holes={fieldHoles}
           myByHole={myByHole}
           hardestHole={stats.hardest.hole_no}
           hardestText={beastFig ? beastFig.text : ''}
@@ -788,7 +807,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
       >
         {courseShares && <DistributionStrip shares={courseShares} />}
 
-        {holes.slice(0, previewCount).map((h, i, arr) => (
+        {fieldHoles.slice(0, previewCount).map((h, i, arr) => (
           <HoleRowV2
             key={h.hole_no}
             row={h}
@@ -848,7 +867,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
         </div>
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 28px' }}>
           {courseShares && <DistributionStrip shares={courseShares} />}
-          {holes.map((h, i, arr) => (
+          {fieldHoles.map((h, i, arr) => (
             <HoleRowV2
               key={h.hole_no}
               row={h}
