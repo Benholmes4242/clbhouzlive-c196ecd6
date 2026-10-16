@@ -3,7 +3,7 @@
 ## BRIEF_HANDICAP_TAB_REBUILD_5C
 - [x] Mute all par-row figures/fills with A.MUTE and use BAR_RADIUS; retain 4px tracks and proportions.
 - [x] Remove observation and its unused calculations/read; preserve distribution, title, meta and thresholds.
-- [ ] Verify full suite and preview; hosted live-profile checks unavailable on external Supabase.
+- [x] Verify full suite; hosted live-profile checks unavailable on external Supabase.
 
 ## BRIEF_HANDICAP_TAB_REBUILD_4A
 - [x] Remove mechanism boundary label/backing and next-in-line row; retain amber rule, counting chips, round detail interaction, and ageing-out calculations.
