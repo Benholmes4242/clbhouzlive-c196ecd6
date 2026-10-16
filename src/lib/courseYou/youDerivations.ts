@@ -44,6 +44,11 @@ export const HANDFUL = 3;
 export const LEVEL_EDGE = 0.05;
 /** P1.4 — the per-hole gaps must sum to the course gap within this many shots. */
 export const EDGE_TOLERANCE = 0.3;
+/**
+ * BRIEF_YOU_TAB_1B C5 — "Nobody is close": the viewer leads Rounds played and
+ * the next member has played at most this share of the viewer's rounds.
+ */
+export const NOBODY_CLOSE_SHARE = 0.5;
 /** P1.6 — the one "last N". */
 export const LAST_N = 20;
 
@@ -249,6 +254,8 @@ export function edgeSummary(edges: HoleEdge[]): EdgeSummary {
     leastEdge,
     otherLevel: level.filter((e) => e !== leastEdge),
     fieldEasiest: withField.reduce<HoleEdge | null>((m, e) => (m == null || (e.field as number) < (m.field as number) ? e : m), null),
+    // BRIEF_YOU_TAB_1B C4 — "the hardest on the course" is the hole where the
+    // FIELD's average over par is highest, never the viewer's; matches the Course tab.
     fieldHardest: withField.reduce<HoleEdge | null>((m, e) => (m == null || (e.field as number) > (m.field as number) ? e : m), null),
   };
 }

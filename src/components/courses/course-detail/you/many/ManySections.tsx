@@ -9,7 +9,7 @@ import React from 'react';
 import { A, FIGS, RAMP_TOPAR } from '@/features/courses/components/holes/analytical/tokens';
 import { formatNumber } from '@/i18n/format';
 import {
-  GOOD_ROUND_GROSS, SMALL_SET, round1,
+  GOOD_ROUND_GROSS, SEASON_MIN_ROUNDS, SMALL_SET, round1,
   type EdgeSummary, type GoodRounds, type HoleEdge, type OpenHolesState, type Season,
 } from '@/lib/courseYou/youDerivations';
 import { ordinal } from '../youBits';
@@ -72,7 +72,7 @@ export const VerdictSection: React.FC<VerdictProps> = (p) => {
       />
       {top != null && p.lifetimeOverPar != null ? (
         <Said>
-          The Course tab says this place takes <B>{f1(top)} shots</B> off everyone else who plays it. It took <B>{f1(p.lifetimeOverPar)}</B> off you across {yearsWord} {plural(p.seasonCount, 'year', 'years')}.
+          The Course tab says this place takes <B>{f1(top)} shots</B> off everyone else who plays it. It took <B>{f1(p.lifetimeOverPar)}</B> off you across {yearsWord} {plural(p.seasonCount, 'season', 'seasons')}.
           {p.season?.avgOverPar != null ? <> This season it is taking <B>{f1(p.season.avgOverPar)}</B>.</> : null}
           {p.mostRoundsHere ? ' Nobody has played here more than you, so this is a finding, not a statistic.' : null}
         </Said>
@@ -83,7 +83,19 @@ export const VerdictSection: React.FC<VerdictProps> = (p) => {
 
 /* ================= P2.4 years ================= */
 
-export const YearsSection: React.FC<{ seasons: Season[]; year: number; firstTwenty: number | null; lastForty: number | null; held: boolean }> = ({ seasons, year, firstTwenty, lastForty, held }) => {
+/**
+ * BRIEF_YOU_TAB_1B C2 — this chart asks "how did each SEASON THAT MEETS THE
+ * MINIMUM play?" and draws only those; the Verdict's "Seasons here" tile asks
+ * "in how many calendar years did you play here at all?". Different questions,
+ * deliberately different counts; the lede names the minimum and the omissions.
+ */
+const listYears = (ys: number[]) => ys.length <= 1 ? ys.join('') : `${ys.slice(0, -1).join(', ')} and ${ys[ys.length - 1]}`;
+const countsList = (cs: number[]) => {
+  const w = cs.map((c, i) => (i === 0 ? `${words(c)} ${plural(c, 'round', 'rounds')}` : words(c)));
+  return w.length <= 1 ? w.join('') : `${w.slice(0, -1).join(', ')} and ${w[w.length - 1]}`;
+};
+
+export const YearsSection: React.FC<{ seasons: Season[]; omitted?: Season[]; year: number; firstTwenty: number | null; lastForty: number | null; held: boolean }> = ({ seasons, omitted = [], year, firstTwenty, lastForty, held }) => {
   const drawn = seasons.filter((s) => s.avgGross != null);
   if (drawn.length < 2) return null;
   const avgs = drawn.map((s) => s.avgGross as number);
@@ -96,6 +108,12 @@ export const YearsSection: React.FC<{ seasons: Season[]; year: number; firstTwen
   const gain = firstTwenty != null && lastForty != null && lastForty < firstTwenty;
   return (
     <Sec kicker="Your years here" title={gain ? 'Where the gain actually came' : null}>
+      <Lede>
+        Seasons with at least {words(SEASON_MIN_ROUNDS)} rounds.
+        {omitted.length > 0
+          ? ` Your ${listYears(omitted.map((o) => o.year))} ${omitted.length === 1 ? 'was' : 'were'} ${countsList(omitted.map((o) => o.count))}, so ${omitted.length === 1 ? 'it is' : 'they are'} not drawn.`
+          : null}
+      </Lede>
       <svg viewBox={`0 0 ${W} 92`} width="100%" height={92} style={{ display: 'block', marginTop: 13 }} role="img" aria-label="Your average gross by season">
         {drawn.map((s, i) => {
           const cx = slot * i + slot / 2; const hh = h(s.avgGross as number); const on = s.year === year;
@@ -153,7 +171,7 @@ export const GoodRoundsSection: React.FC<{ g: GoodRounds | null; seasons: number
       kicker={`The ${words(n)} ${plural(n, 'time', 'times')} you broke ${th}`}
       title={g.everyMadeBeforeTurn ? `${n === 1 ? 'It was' : 'Every one of them was'} made before the turn` : null}
     >
-      <Lede>{Words(n)} {plural(n, 'round', 'rounds')} under {th} in {words(seasons)} {plural(seasons, 'year', 'years')}. Here is what separated {plural(n, 'it', 'them')} from the other {formatNumber(others)}.</Lede>
+      <Lede>{Words(n)} {plural(n, 'round', 'rounds')} under {th} in {words(seasons)} {plural(seasons, 'season', 'seasons')}. Here is what separated {plural(n, 'it', 'them')} from the other {formatNumber(others)}.</Lede>
       <div style={{ marginTop: 15 }}>
         <GroupHead left={`Your ${words(n)} ${plural(n, 'round', 'rounds')} under ${th}`} right={g.good.avgGross != null ? `avg ${f1(g.good.avgGross)}` : ''} />
         <NineRow name="Front" v={g.good.front} lo={range.lo} hi={range.hi} overFill={RAMP_TOPAR.bogey} />

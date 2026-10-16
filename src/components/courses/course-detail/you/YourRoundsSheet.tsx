@@ -11,6 +11,7 @@ import { formatDayMonthShortGB, formatNumber } from '@/i18n/format';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { A, FIGS, SANS, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { ABOUT_KICKER } from '../about/AboutSection';
+import { aggregate, fieldExcludingViewer, scoredRounds } from '@/lib/courseYou/youDerivations';
 
 type SortMode = 'recent' | 'lowest';
 
@@ -19,7 +20,15 @@ interface Props {
   onClose: () => void;
   courseId: string;
   courseName: string;
-  fieldAverage: number | null;
+  /**
+   * BRIEF_YOU_TAB_1B C3 — the sheet asks "how do your rounds here compare with
+   * everyone else's?", so its FIELD figure must exclude the viewer. It takes the
+   * inclusive course figures and runs them through fieldExcludingViewer (the one
+   * home of that rule) against the viewer's own rounds loaded here.
+   */
+  fieldOverPar: number | null;
+  fieldRounds: number | null;
+  coursePar: number | null;
 }
 
 const FIGURE: React.CSSProperties = {
@@ -46,7 +55,7 @@ const HeadFigure: React.FC<{ label: string; value: string; amber?: boolean }> = 
   </div>
 );
 
-const YourRoundsSheet: React.FC<Props> = ({ open, onClose, courseId, courseName, fieldAverage }) => {
+const YourRoundsSheet: React.FC<Props> = ({ open, onClose, courseId, courseName, fieldOverPar, fieldRounds, coursePar }) => {
   const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
   const { data, isLoading, isError } = useAllMyRoundsAtCourse(courseId, open);
@@ -65,6 +74,14 @@ const YourRoundsSheet: React.FC<Props> = ({ open, onClose, courseId, courseName,
   );
   const best = grosses.length > 0 ? Math.min(...grosses) : null;
   const average = grosses.length > 0 ? grosses.reduce((sum, gross) => sum + gross, 0) / grosses.length : null;
+  const viewer = aggregate(scoredRounds(rounds));
+  const fieldExcl = fieldExcludingViewer({
+    fieldAvgOverPar: fieldOverPar,
+    fieldRounds,
+    viewerAvgOverPar: viewer.avgOverPar,
+    viewerRounds: viewer.overParCount,
+  });
+  const fieldAverage = coursePar != null && fieldExcl != null ? coursePar + fieldExcl : null;
   const sorted = React.useMemo(() => {
     const copy = [...rounds];
     if (sort === 'lowest') {
