@@ -113,12 +113,17 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
   };
   const worstShots = ranked[ranked.length - 1]?.shotsPerRound ?? 0;
 
-  const bands = [
-    { key: 'birdiePlus', pct: d.bands.birdiePlus, label: t('common:handicap.holes.birdiePlus'), color: SC_BIRDIE_DARK },
-    { key: 'par', pct: d.bands.par, label: t('common:handicap.holes.par'), color: SC_PAR_DARK },
-    { key: 'bogey', pct: d.bands.bogey, label: t('common:handicap.holes.bogey'), color: SC_BOGEY_DARK },
-    { key: 'double', pct: d.bands.doublePlus, label: t('common:handicap.holes.doublePlus'), color: SC_DOUBLE_DARK },
-  ];
+  /* 5B L3: when the RPC predates the four count fields, bands is null and
+     neither the bar nor the band labels render — absent, not approximated.
+     L4: labels and tones unchanged. */
+  const bands = d.bands
+    ? [
+        { key: 'birdiePlus', pct: d.bands.birdiePlus, label: t('common:handicap.holes.birdiePlus'), color: SC_BIRDIE_DARK },
+        { key: 'par', pct: d.bands.par, label: t('common:handicap.holes.par'), color: SC_PAR_DARK },
+        { key: 'bogey', pct: d.bands.bogey, label: t('common:handicap.holes.bogey'), color: SC_BOGEY_DARK },
+        { key: 'double', pct: d.bands.doublePlus, label: t('common:handicap.holes.doublePlus'), color: SC_DOUBLE_DARK },
+      ]
+    : null;
 
   /* §5.6: one fewer double a round is one shot of gross, which is 113/slope
      of a differential at the member's most-played course. */
