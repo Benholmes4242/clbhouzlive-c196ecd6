@@ -126,6 +126,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       {/* 4 — RECORDS TO BREAK */}
       <PersonalBestsSection
         connectionId={connection.id}
+        userId={userId}
         currentHandicap={currentHandicap}
         viewMode={viewMode}
         ownerFirstName={ownerFirstName}

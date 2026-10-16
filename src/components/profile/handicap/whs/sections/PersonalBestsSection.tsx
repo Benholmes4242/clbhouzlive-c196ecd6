@@ -21,10 +21,12 @@
  * alone.
  *
  */
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { Button } from '@/components/ui/button';
+import RoundDetailSheet from './round-detail/RoundDetailSheet';
 
 import { useAllScores } from '@/lib/whs/hooks';
 import { isReasonableGross, isReasonableDiff } from '@/lib/whs/handicapMath';
@@ -67,6 +69,7 @@ interface Row {
 
 interface Props {
   connectionId: string;
+  userId?: string | null;
   /** The member's index now — used ONLY for the beat line of the
    *  against-handicap record (what it takes today). The record itself is
    *  scored off handicap_index_at_time. */
@@ -105,6 +108,7 @@ function stoodFor(playDate: string | null | undefined, t: TFunction): string | n
 
 export const PersonalBestsSection: React.FC<Props> = ({
   connectionId,
+  userId = null,
   currentHandicap,
   viewMode = 'owner',
   ownerFirstName = null,
@@ -112,6 +116,7 @@ export const PersonalBestsSection: React.FC<Props> = ({
   const { t } = useTranslation(['common']);
   const { data: scores, isFetched } = useAllScores(connectionId);
   const isOwner = viewMode === 'owner';
+  const [selectedScoreId, setSelectedScoreId] = useState<string | null>(null);
 
   const rows = useMemo<Row[]>(() => {
     const list = scores ?? [];
@@ -299,17 +304,15 @@ export const PersonalBestsSection: React.FC<Props> = ({
         const repeat = rows.slice(0, i).some((p) => p.id === r.id);
         const lead = repeat ? t('common:handicap.bests.sameRound') : r.metaLead ?? r.course;
         const sub = [lead, r.stood].filter(Boolean).join(' \u00b7 ');
-        return (
-          <div
-            key={r.key}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              padding: '12px 0',
-              borderTop: i === 0 ? 'none' : `1px solid ${CHART.BORDER}`,
-            }}
-          >
+        const rowStyle: React.CSSProperties = {
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          padding: '12px 0',
+          borderTop: i === 0 ? 'none' : `1px solid ${CHART.BORDER}`,
+        };
+        const content = (
+          <>
             <div style={{ minWidth: 0, flex: 1 }}>
               <div style={{ fontSize: 13.5, fontWeight: 700, color: CHART.INK, letterSpacing: '-0.01em' }}>
                 {r.name}
@@ -338,7 +341,24 @@ export const PersonalBestsSection: React.FC<Props> = ({
                 </div>
               )}
             </div>
-          </div>
+          </>
+        );
+        // All records originate from score ids; guard malformed data.
+        // Round opening always uses the canonical sheet, never a second card.
+        return r.id ? (
+          <Button
+            key={r.key}
+            type="button"
+            variant="ghost"
+            className="h-auto w-full justify-start rounded-none border-0 bg-transparent text-left font-normal transition-none active:scale-100"
+            aria-label={[r.name, r.course, r.date, r.figure].filter(Boolean).join(' · ')}
+            onClick={() => setSelectedScoreId(r.id)}
+            style={{ ...rowStyle, margin: 0, background: 'transparent', font: 'inherit', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+          >
+            {content}
+          </Button>
+        ) : (
+          <div key={r.key} style={rowStyle}>{content}</div>
         );
       })}
 
@@ -356,6 +376,16 @@ export const PersonalBestsSection: React.FC<Props> = ({
         </div>
       )}
 
+      {selectedScoreId && (
+        <RoundDetailSheet
+          scoreId={selectedScoreId}
+          connectionId={connectionId}
+          profileUserId={userId}
+          open
+          onClose={() => setSelectedScoreId(null)}
+          handicapDelta={null}
+        />
+      )}
     </HcpSection>
   );
 };

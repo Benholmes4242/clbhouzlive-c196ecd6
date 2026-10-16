@@ -1,8 +1,8 @@
 # Architecture rules
 
-Cross-area rules only; single-section rules stay in local architecture comments.
+Cross-area rules; local rules stay in section comments.
 
-- Shared course standings and Top 100 comparison helpers live in `src/lib/gam`; achievement level lookup lives beside the achievement celebration, so removing the handicap Trophy Room cannot remove active course/profile/celebration behaviour.
+- Shared standings/Top 100 helpers live in `src/lib/gam`; achievement levels live beside celebrations, preserving active consumers after Trophy Room removal.
 
 - Profile course archive overrides are scoped by `courses-archive`, with an opt-in archive appearance on shared region controls, so matching its mock cannot restyle other course filters or section headings.
 
@@ -23,3 +23,5 @@ Cross-area rules only; single-section rules stay in local architecture comments.
   - NOTE: an app-wide check of which readers CHOOSE between the columns rather than merely loading them has not been done. Start from this list: ProfilePageV2, ManageProfile, useUserProfile, useUserByUsername, useProfileSave, useProfileForm, profile-wizard/types, SettingsTabContent, RoundDetailSheet, usePostLikers, useEchoSuggestions, admin useUsers, review-island/overrides, types/profile, lib/supabase/selects.
 - The admin Analytics page and its header pill read figures only from the five `get_admin_analytics_*` RPCs via `useAnalyticsLenses.ts`, never tables, because browser reads truncate at the row cap and staff filtering belongs to the server.
 - The admin Health page and the drawer's Health dot read figures only from the `get_admin_health_*` RPCs (`useHealthLenses.ts`) and the existing service hooks, and share one verdict (`useHealthVerdict` in `components/health/healthIssues.ts`), so the dot and the page cannot disagree and no Health panel reads a table.
+
+- Record, counting-round and log rows open `RoundDetailSheet` by score id with the known profile owner, keeping one scorecard and member context.
