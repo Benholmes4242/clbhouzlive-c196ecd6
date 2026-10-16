@@ -1,3 +1,4 @@
+import { Extremes } from '@/features/courses/components/holes/analytical/Extremes';
 import { PopulationCaption } from '@/features/courses/components/holes/analytical/PopulationCaption';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

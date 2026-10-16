@@ -11,7 +11,7 @@
  * chart and the hole rows.
  */
 import { PopulationCaption } from './PopulationCaption';
-import { Extremes } from '@/components/explore-tab-new/courseled/CourseHolePanel';
+import { Extremes } from './Extremes';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
