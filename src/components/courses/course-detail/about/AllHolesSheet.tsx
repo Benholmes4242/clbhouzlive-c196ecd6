@@ -1,3 +1,4 @@
+import { PopulationCaption } from '@/features/courses/components/holes/analytical/PopulationCaption';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -361,6 +362,7 @@ const AllHolesSheet: React.FC<AllHolesSheetProps> = ({ open, onClose, courseId, 
           <>
             <AboutSection heading={t('courseDetail.allHolesSheet.holes')}>
               {shares ? <DistributionSummary shares={shares} /> : null}
+              {shares ? <PopulationCaption includesYou={hasYou} style={{ marginTop: 10 }} /> : null}
               <div style={{ marginTop: shares ? 16 : 0 }}>
                 {fieldHoles.map((hole, index) => (
                   <CompactHoleRow key={hole.hole_no} hole={hole} mine={myByHole.get(hole.hole_no) ?? null} hasYou={hasYou} last={index === holes.length - 1} />
@@ -377,6 +379,7 @@ const AllHolesSheet: React.FC<AllHolesSheetProps> = ({ open, onClose, courseId, 
                 heading={t('courseDetail.allHolesSheet.ladder')}
                 meta={t('courseDetail.allHolesSheet.outOfStep', { count: ladder.flagged.length })}
               >
+                <PopulationCaption includesYou={hasYou} style={{ marginBottom: 10 }} />
                 <FlatSiLadder ladder={ladder} />
               </AboutSection>
             ) : null}

@@ -10,6 +10,7 @@
  * Client-only: every value comes from the queries that already fed the skyline
  * chart and the hole rows.
  */
+import { PopulationCaption } from './PopulationCaption';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -806,6 +807,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
         style={{ padding: '18px 16px 12px' }}
       >
         {courseShares && <DistributionStrip shares={courseShares} />}
+        {courseShares && activeView === 'members' && <PopulationCaption includesYou={hasYou} style={{ marginBottom: 8 }} />}
 
         {fieldHoles.slice(0, previewCount).map((h, i, arr) => (
           <HoleRowV2
@@ -867,6 +869,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
         </div>
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 28px' }}>
           {courseShares && <DistributionStrip shares={courseShares} />}
+        {courseShares && activeView === 'members' && <PopulationCaption includesYou={hasYou} style={{ marginBottom: 8 }} />}
           {fieldHoles.map((h, i, arr) => (
             <HoleRowV2
               key={h.hole_no}

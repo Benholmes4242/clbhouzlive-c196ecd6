@@ -1,3 +1,4 @@
+import { PopulationCaption } from '@/features/courses/components/holes/analytical/PopulationCaption';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -189,6 +190,7 @@ export function CourseHolePanel({
       {/* M1 / Q2.5 — no disclosure: the final analytical block is always visible. */}
       <Block title={t('holes.preview.eyebrow', 'Hole by hole')}>
         {shares && <DistributionStrip shares={shares} />}
+        {shares && <PopulationCaption includesYou={hasYou} style={{ marginTop: 6 }} />}
         <Extremes hardest={hardest} easiest={easiest} />
       </Block>
       <ListTerminalRow
