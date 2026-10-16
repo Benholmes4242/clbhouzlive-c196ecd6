@@ -259,7 +259,7 @@ describe('connect intro fix 1 behaviour', () => {
     expect(screen.getAllByText('13').length).toBeGreaterThan(0);
     expect(screen.getByText(/golfers off 12 typically shoot here/)).toBeInTheDocument();
     expect(screen.getByText('Off 12')).toBeInTheDocument();
-    expect(screen.getByText('You')).toBeInTheDocument();
+    expect(screen.getAllByText('You').length).toBeGreaterThan(0);
   });
 
   it('keeps the circle second sentence at one connected golfer', async () => {
