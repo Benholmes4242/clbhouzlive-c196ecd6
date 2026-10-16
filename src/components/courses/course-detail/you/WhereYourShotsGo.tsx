@@ -1,4 +1,13 @@
 /**
+ * DEAD AND FAULTY - FIELD_EXCLUDES_VIEWER_D T2. DO NOT REUSE AS IS.
+ * 1. This component is rendered nowhere in the app.
+ * 2. The live course page renders FieldShotsSection under the same heading.
+ * 3. Its "Field" and "field loses" figures INCLUDE the reader and must be
+ *    fixed (use the field-excluding-viewer helpers in
+ *    @/lib/courseYou/youDerivations) before it is reused.
+ * Kept deliberately pending a decision to harvest or remove it.
+ */
+/**
  * BRIEF_YOU_TAB_REBUILD §3.3 — WHERE YOUR SHOTS GO.
  *
  * Under five rounds there is no chart, only a sentence that says why. At five
