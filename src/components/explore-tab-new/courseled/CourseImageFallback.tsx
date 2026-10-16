@@ -56,7 +56,8 @@ interface Props {
    * TRUE while the enrichment query feeding `imageUrl` / `courseName` is still
    * in flight (BRIEF_DISCOVER_LOADING_STATES, layer 2c). A neutral shimmer at
    * the given dimensions — never the gradient, never the initials, never an
-   * <img>. A fallback may only render once its source has settled.
+   * <img>. A fallback may only render once its source has settled. Children
+   * (the caller's overlay) still render over the shimmer.
    */
   pending?: boolean;
   /**
@@ -89,7 +90,12 @@ export function CourseImageFallback({
         className="clb-shimmer-dark"
         aria-hidden="true"
         style={{ position: 'relative', backgroundColor: MEMBER_CELL, overflow: 'hidden', ...style }}
-      />
+      >
+        {/* BRIEF_COURSES_SKELETONS_4A: the shimmer stands in for the photo only.
+            The caller's overlay (scrim, name, chips) is data that has already
+            arrived, so it keeps rendering over the shimmer. */}
+        {children}
+      </div>
     );
   }
 
