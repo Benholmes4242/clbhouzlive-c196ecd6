@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHomeClubStatus } from '@/features/home-club/useHomeClubStatus';
@@ -15,6 +15,7 @@ import { FooterBar, Stage } from './Primitives';
 interface Props {
   onPickCountry: () => void;
   onDecline?: () => void;
+  layout?: 'page' | 'embedded';
 }
 
 type IntroHole = { hole_no: number; par: number; stroke_index: number | null; avg_to_par: number };
@@ -41,11 +42,7 @@ const AMBER_ROW = 'rgba(247,147,30,0.07)';
 const STEP_BG = 'rgba(255,255,255,0.06)';
 const AVATAR_BG = 'rgba(255,255,255,0.08)';
 
-const TRUST_STEPS = [
-  { title: 'Pick your country, sign in once', line: 'The same login you use for your handicap app. Every round you have posted comes across.' },
-  { title: 'Read only', line: 'We never post, change or delete a score. Your handicap stays exactly where it is.' },
-  { title: 'Yours to take back', line: 'Your password is kept encrypted and only used to sync. Disconnect any time and it is deleted.' },
-] as const;
+const TRUST_STEPS = ['1', '2', '3'] as const;
 
 const EXAMPLE = {
   beat: [
@@ -59,8 +56,8 @@ const EXAMPLE = {
   bars: [64, 46, 57, 36, 72, 43, 54, 32, 61, 50, 39, 68, 46, 36, 57, 43, 75, 50, 39, 54],
   counters: new Set([1, 3, 5, 7, 10, 13, 15, 18]),
   ways: [
-    { title: 'Turn your doubles into bogeys', value: '10.4' },
-    { title: 'Play the back nine like the front', value: '11.0' },
+    { titleKey: 'exampleWayDoubles', value: '10.4' },
+    { titleKey: 'exampleWayBackNine', value: '11.0' },
   ],
 } as const;
 
@@ -139,23 +136,44 @@ export function formatIndex(n: number): string {
   return n < 0 ? `+${Math.abs(n).toFixed(1)}` : n.toFixed(1);
 }
 
-export function buildReadout(block: IntroBlock, band: IntroBand | null, h: number) {
+type IntroT = (key: string, options?: Record<string, unknown>) => string;
+
+export function buildReadout(block: IntroBlock, band: IntroBand | null, h: number, t?: IntroT) {
   const holes = costliestThree(block.holes);
   const anyNegative = holes.some((x) => x.avg_to_par < 0);
   const holeList = holes.map((x) => ordinal(x.hole_no));
   const values = holes.map((x) => (anyNegative ? signedOne(x.avg_to_par) : unsignedOne(x.avg_to_par)));
   const median = block.median_gross == null ? '' : String(Math.round(block.median_gross));
   const par = block.par == null ? '' : String(block.par);
+  const label = hcpLabel(h, t);
   return {
     median,
     baseline: band
-      ? `${median} is what golfers off ${hcpLabel(h)} typically shoot here, par ${par}.`
-      : `${median} is what golfers here typically shoot, par ${par}.`,
-    cost: `The ${holeList[0]}, ${holeList[1]} and ${holeList[2]} cost them most: ${values[0]}, ${values[1]} and ${values[2]} ${anyNegative ? 'against par.' : 'over par.'}`,
+      ? t?.('whsConnect.intro.readoutBandBaseline', { median, hcp: label, par }) ?? `${median} is what golfers off ${label} typically shoot here, par ${par}.`
+      : t?.('whsConnect.intro.readoutAllBaseline', { median, par }) ?? `${median} is what golfers here typically shoot, par ${par}.`,
+    cost: t?.('whsConnect.intro.readoutCost', {
+      hole1: holeList[0],
+      hole2: holeList[1],
+      hole3: holeList[2],
+      value1: values[0],
+      value2: values[1],
+      value3: values[2],
+      ending: t(anyNegative ? 'whsConnect.intro.readoutAgainstPar' : 'whsConnect.intro.readoutOverPar'),
+    }) ?? `The ${holeList[0]}, ${holeList[1]} and ${holeList[2]} cost them most: ${values[0]}, ${values[1]} and ${values[2]} ${anyNegative ? 'against par.' : 'over par.'}`,
     source: band
-      ? `From ${band.rounds} ${band.rounds === 1 ? 'round' : 'rounds'} by golfers off ${rangeHcp(band.lo)} to ${rangeHcp(band.hi)} at this course.`
-      : `Not enough rounds yet from golfers off ${hcpLabel(h)}, so this is every golfer here: ${block.rounds} ${block.rounds === 1 ? 'round' : 'rounds'}.`,
+      ? t?.('whsConnect.intro.readoutBandSource', { count: band.rounds, lo: rangeHcp(band.lo), hi: rangeHcp(band.hi) }) ?? `From ${band.rounds} ${band.rounds === 1 ? 'round' : 'rounds'} by golfers off ${rangeHcp(band.lo)} to ${rangeHcp(band.hi)} at this course.`
+      : t?.('whsConnect.intro.readoutAllSource', { count: block.rounds, hcp: label }) ?? `Not enough rounds yet from golfers off ${label}, so this is every golfer here: ${block.rounds} ${block.rounds === 1 ? 'round' : 'rounds'}.`,
   };
+}
+
+export function hcpLabel(n: number, t?: IntroT): string {
+  return n === 0 ? t?.('whsConnect.intro.scratch') ?? 'scratch' : String(n);
+}
+
+export function nextFooterHidden(current: boolean, ratio: number): boolean {
+  if (ratio >= 0.6) return true;
+  if (ratio < 0.3) return false;
+  return current;
 }
 
 export function chooseCirclePeople(people: CirclePerson[], h: number): CirclePerson[] {
