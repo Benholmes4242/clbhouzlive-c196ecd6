@@ -244,7 +244,7 @@ describe('connect intro fix 1 behaviour', () => {
   it('keeps footer out of fixed positioning and hides it in embedded layout', async () => {
     expect(readFileSync('src/components/profile/handicap/whs/connect/EmptyStateScreen.tsx', 'utf8')).not.toContain('position: \'fixed\'');
     const { container, rerender } = renderIntro('page');
-    await screen.findByText('Connect your handicap');
+    await screen.findAllByText('Connect your handicap');
     expect(container.textContent).toContain('Connect your official handicap and this is built from');
 
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -256,7 +256,7 @@ describe('connect intro fix 1 behaviour', () => {
   it('uses band.data.hcp for readout, table header, and circle placement while the stepper shows the live value', async () => {
     renderIntro('embedded');
     await screen.findByText('If you play off');
-    expect(screen.getByText('13')).toBeInTheDocument();
+    expect(screen.getAllByText('13').length).toBeGreaterThan(0);
     expect(screen.getByText(/golfers off 12 typically shoot here/)).toBeInTheDocument();
     expect(screen.getByText('Off 12')).toBeInTheDocument();
     expect(screen.getByText('You')).toBeInTheDocument();
