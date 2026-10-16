@@ -27,7 +27,8 @@ export const Y = {
 export const words = (n: number): string => {
   const w = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve',
     'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
-  return n >= 0 && n < w.length ? w[n] : String(n);
+  const tens: Record<number, string> = { 30: 'thirty', 40: 'forty', 50: 'fifty', 60: 'sixty' };
+  return n >= 0 && n < w.length ? w[n] : tens[n] ?? String(n);
 };
 export const Words = (n: number) => { const s = words(n); return s.charAt(0).toUpperCase() + s.slice(1); };
 export const signed1 = (v: number) => { const r = Math.round(v * 10) / 10; return r > 0 ? `+${r.toFixed(1)}` : r < 0 ? `\u2212${Math.abs(r).toFixed(1)}` : '0.0'; };

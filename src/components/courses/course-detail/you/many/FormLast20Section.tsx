@@ -27,7 +27,6 @@ const halves = (v: number) => {
 };
 
 const FormLast20Section: React.FC<Props> = ({ last, previous, firstTwenty, onOpenRound }) => {
-  const [sel, setSel] = React.useState<number | null>(null);
   if (!last) return null;
   const drawn = [...last.rounds].reverse();
   const values = drawn.map((r) => r.grossScore as number);
@@ -41,8 +40,8 @@ const FormLast20Section: React.FC<Props> = ({ last, previous, firstTwenty, onOpe
         line2={previous != null ? `the ${words(LAST_N)} before averaged ${f1(previous)}` : undefined} />
       <TrendLine
         values={values}
-        selected={sel}
-        onSelect={(i) => { if (sel === i) { onOpenRound(drawn[i].whsScoreId); } setSel(i); }}
+        selected={null}
+        onSelect={(i) => onOpenRound(drawn[i].whsScoreId)}
         label={(i) => `${formatDate(drawn[i].playDate)}, ${drawn[i].grossScore}`}
       />
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 7 }}>
