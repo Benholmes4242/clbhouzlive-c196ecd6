@@ -29,6 +29,7 @@ import AgeingOutSection from './sections/AgeingOutSection';
 import NextRoundSection from './sections/NextRoundSection';
 import RoundsThatCountSection from './sections/RoundsThatCountSection';
 import HolesSection from './sections/HolesSection';
+import FloorSection from './sections/FloorSection';
 import PersonalBestsSection, { TrophyRoomRow } from './sections/PersonalBestsSection';
 import HandicapFooter from './sections/HandicapFooter';
 import { LaunchSheetMount } from '../gam/launch/LaunchSheetMount';
@@ -127,7 +128,10 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       {/* 4 — HOW YOU SCORE A HOLE */}
       <HolesSection userId={userId} connectionId={connection.id} readOnly={readOnly} />
 
-      {/* 5 — RECORDS TO BREAK */}
+      {/* 5 — THE FLOOR (phase 6: renders only when a rung remains below) */}
+      <FloorSection connection={connection} currentHandicap={currentHandicap} />
+
+      {/* 6 — RECORDS TO BREAK */}
       <PersonalBestsSection
         connectionId={connection.id}
         currentHandicap={currentHandicap}
