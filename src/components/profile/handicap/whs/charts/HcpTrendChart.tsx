@@ -1,3 +1,6 @@
+/**
+ * Profile handicap index surfaces use `HcpTrendChart` as their canonical plot renderer, so chart styling and interaction markers stay consistent.
+ */
 import React, { useId, useMemo } from 'react';
 import { smoothPathXY } from '@/lib/charts/smoothPath';
 import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
