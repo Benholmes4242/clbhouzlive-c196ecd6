@@ -15,16 +15,18 @@ import React from 'react';
 import { SURFACE } from '@/lib/tokens/surface';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import type { CourseLegendRow } from '@/lib/gam/types';
-import { displayName, initials } from '@/lib/whs/utils/initials';
+import { displayName } from '@/lib/whs/utils/initials';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 const INK = SURFACE.dark.ink;
 const DIM = SURFACE.dark.dim;
 const AVATAR = 22;
 const OVERLAP = 7;
 const MAX_AVATARS = 3;
-/** Row height (22px avatars vs two-line text block) + 10px margin-top. Drawn
- *  hero is 252px with the row and 176px without; the hero grows by that delta. */
-export const HERO_RECORD_ROW_EXTRA = 252 - 176;
+/** Measured rendered row height (two-line text block, ~28px, taller than the
+ *  22px avatars) + its 10px margin-top. The hero grows by exactly this; the
+ *  mock's hero heights were context, not absolutes (BRIEF_COURSE_HERO_1B K1). */
+export const HERO_RECORD_ROW_EXTRA = 38;
 
 export function heroRecordNames(holders: CourseLegendRow[]): string | null {
   const names = holders.map((h) => displayName(h.user_display_name).trim());
