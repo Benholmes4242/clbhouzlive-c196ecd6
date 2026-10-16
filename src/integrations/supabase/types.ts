@@ -20211,6 +20211,11 @@ export type Database = {
           years: Json
         }[]
       }
+      get_connect_circle_preview: { Args: never; Returns: Json }
+      get_connect_intro_band: {
+        Args: { p_course_id: string; p_hcp: number }
+        Returns: Json
+      }
       get_continue_watching: {
         Args: { p_format?: string; p_limit?: number; p_user_id: string }
         Returns: {
