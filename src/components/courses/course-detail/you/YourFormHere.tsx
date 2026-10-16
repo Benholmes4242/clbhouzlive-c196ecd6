@@ -32,7 +32,7 @@ const DOT = 8;
  * svg — a circle inside the stretched viewBox would be squashed into an ellipse.
  * `values` is OLDEST FIRST; the index handed back is that drawing index.
  */
-const TrendLine: React.FC<{
+export const TrendLine: React.FC<{
   values: number[];
   selected: number | null;
   onSelect: (drawIndex: number) => void;

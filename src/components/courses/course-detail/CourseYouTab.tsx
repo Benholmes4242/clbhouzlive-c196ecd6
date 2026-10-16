@@ -60,15 +60,24 @@ import AboutSection, { AboutHairline } from './about/AboutSection';
 import CenteredStatStrip from './about/CenteredStatStrip';
 import { EmptyBirdiesSection, FieldShotsSection, FIELD_CHART_MIN_ROUNDS } from './you/NotConnectedInvitation';
 import { YouAction, YouButton, YouSentence } from './you/youBits';
-import YourRecordHere from './you/YourRecordHere';
-import WhereYouStandHere from './you/WhereYouStandHere';
 import { useMemberStandings } from '@/hooks/gam/useMemberStandings';
-import YourRoundsHere, { type YouRound } from './you/YourRoundsHere';
-import WhereYourShotsGo from './you/WhereYourShotsGo';
-import YourFormHere from './you/YourFormHere';
-import BirdiesHere from './you/BirdiesHere';
+import type { YouRound } from './you/YourRoundsHere';
+import { useMomentPosts } from './you/YourMomentsSection';
+import { useAllMyRoundsAtCourse } from '@/hooks/feed/useMyRoundsAtCourse';
+import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
+import {
+  LAST_N, SEASON_MIN_ROUNDS, aggregate, allSeasons, edgeSummary, fieldExcludingViewer, firstN,
+  goodRounds, holeEdges, lastN, openHolesState, scoredRounds,
+} from '@/lib/courseYou/youDerivations';
+import { ordinal } from './you/youBits';
+import {
+  EdgeSection, GoodRoundsSection, OneHoleLeftSection, RecordSection, VerdictSection, WithinReachSection, YearsSection,
+  type ReachRow,
+} from './you/many/ManySections';
+import FormLast20Section from './you/many/FormLast20Section';
 import YourRatingSection from './you/YourRatingSection';
-import YourMomentsSection from './you/YourMomentsSection';
 import UpForGrabsSection from './you/UpForGrabsSection';
 import ProjectionSection, { type ProjectionState } from './you/ProjectionSection';
 import WonAndLostSection from './you/WonAndLostSection';
@@ -155,6 +164,13 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
 
   /* Scoped to this course; only read once the member is known to have played. */
   const { data: standings } = useMemberStandings(user?.id, settled && hasTrackedRounds, courseId);
+
+  /* BRIEF_YOU_TAB_1 P1.1 / P1.3 — the played state's reads: the COMPLETE
+     18-hole history (paging read) and the per-hole field EXCLUDING the viewer. */
+  const playedReady = settled && hasTrackedRounds && Boolean(connection);
+  const { data: allRounds, isLoading: allRoundsLoading } = useAllMyRoundsAtCourse(courseId, playedReady);
+  const { data: holeField } = useCourseHoleField(courseId, user?.id, { enabled: playedReady });
+  const { moments, posts: momentPosts } = useMomentPosts(courseId, courseName);
 
   /* BRIEF_YOU_TAB_BRANCH_C_SCOUTING_REPORT — branch C's reads. trend and
      differentials are inert without a connection; analytics courses only fire
@@ -435,86 +451,139 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     );
   }
 
-  // D / E — PLAYED. Every section renders; 3.3 and 3.4 carry their sentences
-  // under their thresholds. There is no separate screen for a rich history.
-  const openRound = (round: YouRound) => {
-    analyticsEvents.track('course_you_round_opened', {
-      course_id: courseId,
-      whs_score_id: round.whsScoreId,
+  // D / E — PLAYED (BRIEF_YOU_TAB_1, drawn to you-tab-many-rounds.html per 1A).
+  // Every aggregate reads the COMPLETE history; a section without its
+  // population is absent, never replaced (1A A3).
+  if (allRoundsLoading || !allRounds) {
+    return wrap(
+      <div style={{ padding: '20px 20px 0' }}>
+        <Skeleton className="h-[110px] w-full rounded-[12px]" />
+      </div>,
+    );
+  }
+  const history = allRounds.rounds;
+  const lifetime = aggregate(scoredRounds(history));
+  const seasonsAll = allSeasons(history);
+  const qualifying = seasonsAll.filter((x) => x.count >= SEASON_MIN_ROUNDS);
+  const thisYear = new Date().getFullYear();
+  const season = qualifying.find((x) => x.year === thisYear) ?? null;
+  const bestSeason =
+    season != null && season.avgOverPar != null && qualifying.length >= 2 &&
+    qualifying.every((x) => x.avgOverPar == null || season.avgOverPar! <= x.avgOverPar);
+  const fieldExcl = fieldExcludingViewer({
+    fieldAvgOverPar: courseStats?.avg_over_par,
+    fieldRounds: courseStats?.rounds_tracked,
+    viewerAvgOverPar: lifetime.avgOverPar,
+    viewerRounds: lifetime.overParCount,
+  });
+  const last20 = lastN(history);
+  const prev20 = lastN(history, LAST_N, LAST_N)?.avg ?? null;
+  const first20 = firstN(history, LAST_N);
+  const last40 = lastN(history, LAST_N * 2)?.avg ?? null;
+  const held = first20 != null && last20 != null && prev20 != null && last20.avg < first20 && prev20 < first20;
+  const allTime = (category: string) => (standings ?? []).find((x) => x.category === category) ?? null;
+  const roundsRow = allTime('most_rounds_all_time');
+
+  const edges = holeEdges(
+    fieldHoles.map((h) => ({ hole_no: h.hole_no, par: h.par })),
+    holeField?.available ? holeField.holes : [],
+    mine,
+  );
+  const edgeSum = edgeSummary(edges);
+
+  const reach: ReachRow[] = [];
+  if (courseRecord && lifetime.best != null) {
+    const names = courseRecordHolders.map((h) => (h.is_self ? 'You' : h.user_display_name ?? 'A member'));
+    const mineHeld = courseRecordHolders.some((h) => h.is_self);
+    const off = lifetime.best - courseRecord.value;
+    reach.push({
+      key: 'gross',
+      name: 'Gross record',
+      sub: `${names.join(' & ')} ${names.length === 1 && !mineHeld ? 'holds' : 'hold'} ${courseRecord.value}`,
+      value: String(lifetime.best),
+      mark: mineHeld || off <= 0 ? 'Yours' : `${off} off it`,
+      near: true,
     });
-    setOpenRoundId(round.whsScoreId);
-  };
+  }
+  const rankMark = (r: { rank: number; field_size: number }) => `${ordinal(r.rank)} of ${r.field_size}`;
+  const stab = allTime('best_stableford_all_time');
+  if (stab?.value != null) reach.push({ key: 'stab', name: 'Best stableford', sub: `Your ${stab.value} points`, value: String(stab.value), mark: rankMark(stab), near: stab.rank === 1 });
+  const diff = allTime('best_score_diff_all_time');
+  if (diff?.value != null) {
+    const d = diff.value < 0 ? `\u2212${Math.abs(diff.value).toFixed(1)}` : diff.value.toFixed(1);
+    reach.push({ key: 'diff', name: 'Best differential', sub: `Your ${d}`, value: d, mark: rankMark(diff), near: diff.rank === 1 });
+  }
+  if (roundsRow?.value != null) {
+    const clear = roundsRow.rank === 1 && roundsRow.next_value != null && roundsRow.next_value <= roundsRow.value / 2;
+    reach.push({ key: 'rounds', name: 'Rounds played', sub: clear ? 'Nobody is close' : `Your ${roundsRow.value} rounds`, value: String(roundsRow.value), mark: ordinal(roundsRow.rank), near: roundsRow.rank === 1 });
+  }
+
+  const sumOf = (k: 'birdie_count' | 'eagle_or_better_count') =>
+    mine.length > 0 ? mine.reduce((acc, h) => acc + (h[k] ?? 0), 0) : null;
 
   return wrap(
     <div>
-      <YourRecordHere
-        rounds={roundTotal}
-        best={bestGross}
-        average={averageGross}
-        field={fieldGross}
+      <VerdictSection
+        year={thisYear}
+        season={season}
+        bestSeason={bestSeason}
+        seasonCount={seasonsAll.length}
+        lifetimeOverPar={lifetime.avgOverPar}
+        lifetimeRounds={allRounds.total}
+        fieldOverPar={fieldExcl}
+        bestThisYear={seasonsAll.find((x) => x.year === thisYear)?.best ?? null}
+        mostRoundsHere={roundsRow?.rank === 1}
       />
-
-      <YourRoundsHere
-        rounds={rounds}
-        total={roundTotal}
-        bestGross={bestGross}
-        onOpenRound={openRound}
-        onSeeAll={() => {
-          analyticsEvents.track('course_you_all_rounds', { course_id: courseId, rounds: roundTotal });
-          navigate(`/courses/${courseId}?tab=you&sheet=rounds`);
-        }}
-      />
-
-      <WhereYourShotsGo
-        courseId={courseId}
-        rounds={roundTotal}
-        mine={mine}
-        field={fieldHoles}
+      <YearsSection seasons={qualifying} year={thisYear} firstTwenty={first20} lastForty={last40} held={held} />
+      <GoodRoundsSection g={goodRounds(history)} seasons={seasonsAll.length} />
+      <EdgeSection
+        edges={edges}
+        s={edgeSum}
+        fieldRounds={holeField?.available ? holeField.course_rounds : null}
         onAllHoles={() => {
           analyticsEvents.track('course_you_all_18_holes', { course_id: courseId, holes: mine.length });
           navigate(`/courses/${courseId}?tab=you&sheet=your-holes`);
         }}
       />
-      <YourFormHere rounds={rounds} total={roundTotal} courseId={courseId} onOpenRound={openRound} />
-
-      {/* §3.5 — ONCE. It used to render inside the shots block and again as its
-          own card. */}
-      <BirdiesHere mine={mine} />
-
-      {/* BRIEF_YOU_TAB_STANDINGS — compact standings, same RPC and rules as the
-          Trophy Room. Renders only when the course-scoped read returns rows. */}
-      <WhereYouStandHere
-        rows={standings ?? []}
+      <OneHoleLeftSection state={openHolesState(edges)} hardest={edgeSum.fieldHardest} />
+      <FormLast20Section
+        last={last20}
+        previous={prev20}
+        firstTwenty={first20}
+        onOpenRound={(id) => {
+          analyticsEvents.track('course_you_round_opened', { course_id: courseId, whs_score_id: id });
+          setOpenRoundId(id);
+        }}
+      />
+      <WithinReachSection
+        rows={reach}
+        unclaimed={unclaimedCount}
+        boards={CHAMPIONS_ORDER_ALL_TIME.length}
         onAllBoards={() => {
-          analyticsEvents.track('course_you_standings_all_boards', {
-            course_id: courseId,
-            boards: (standings ?? []).length,
-          });
+          analyticsEvents.track('course_you_all_boards', { course_id: courseId });
           onTabChange?.('legends');
         }}
       />
-
-      <YourRatingSection
-        rating={rating ?? null}
-        onEdit={() => {
+      <RecordSection
+        rating={rating?.rating ?? null}
+        moments={moments.length}
+        birdies={sumOf('birdie_count')}
+        eagles={sumOf('eagle_or_better_count')}
+        thumbs={moments.map((m) => ({ id: m.id, url: m.posterUrl ?? (m.mediaType === 'image' ? m.mediaUrl : null) }))}
+        onRounds={() => {
+          analyticsEvents.track('course_you_all_rounds', { course_id: courseId, rounds: allRounds.total });
+          navigate(`/courses/${courseId}?tab=you&sheet=rounds`);
+        }}
+        onRating={() => {
           analyticsEvents.track('course_you_edit_rating', { course_id: courseId });
           navigate(`/courses/${courseId}/rate`);
         }}
-        onRate={() => {
-          analyticsEvents.track('course_you_rate_it', { course_id: courseId });
-          navigate(`/courses/${courseId}/rate`);
+        onMoments={(index) => {
+          const m = moments[index];
+          if (m) analyticsEvents.track('course_you_moment_opened', { course_id: courseId, moment_id: m.id });
+          if (momentPosts.length > 0) useFullscreenFeedStore.getState().open(momentPosts, index, { readOnly: true });
         }}
       />
-
-      <YourMomentsSection
-        courseId={courseId}
-        courseName={courseName}
-        onOpen={(momentId) =>
-          analyticsEvents.track('course_you_moment_opened', { course_id: courseId, moment_id: momentId })
-        }
-      />
-
-      {upForGrabs}
 
       <RoundDetailSheet
         open={openRoundId != null}
