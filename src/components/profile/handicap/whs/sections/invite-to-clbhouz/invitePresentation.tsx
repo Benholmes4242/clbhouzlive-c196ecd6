@@ -1,6 +1,7 @@
 // ARCHITECTURE RULE: Invites own their surviving presentation; colours read
 // canonical chart tokens, not a retired Trophy Room's private module.
 import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { CHART, CHART_FONT } from '../../charts/tokens';
 
 export const REC = {
@@ -33,9 +34,9 @@ export const Collapsible: React.FC<{
   return <>
     {open ? rows : rows.slice(0, collapsedCount)}
     <div style={{ padding: '11px 14px', borderTop: `1px solid ${REC.BORDER}` }}>
-      <button type="button" onClick={() => setOpen((prev) => !prev)} style={{ background: 'transparent', border: 'none', padding: 0, fontFamily: REC.FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.02em', color: REC.INK, cursor: 'pointer' }}>
+      <Button variant="ghost" className="h-auto rounded-none transition-none active:scale-100" type="button" onClick={() => setOpen((prev) => !prev)} style={{ background: 'transparent', border: 'none', padding: 0, fontFamily: REC.FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.02em', color: REC.INK, cursor: 'pointer' }}>
         {open ? showFewerLabel : showAllLabel}
-      </button>
+      </Button>
     </div>
   </>;
 };

@@ -1,8 +1,7 @@
 /**
  * Lightweight event bus for gam_* surfaces opened from the page header.
  *
- * The HandicapPage header buttons fire these events; mount components
- * (see GamMount.tsx) subscribe and own sheet state.
+ * Streak links fire this event; StreaksSheetMount subscribes and owns state.
  */
 type Listener<T = void> = (payload: T) => void;
 
