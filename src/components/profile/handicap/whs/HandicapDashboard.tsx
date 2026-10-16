@@ -10,8 +10,8 @@ import { getSyncHealth } from '@/lib/whs/syncHealth';
 // (TodayView / TrendsView / CircleView) were deleted 10 Sep 2026 — their inner
 // blocks mount here directly, in the fixed page order:
 //
-//   1 Next round · 2 Index · 3 Rounds that count · 4 Which holes cost you ·
-//   5 Personal bests · Footer provenance
+//   Index (with lock card) · Ageing out · Rounds that count · Holes ·
+//   Records to break · Footer provenance
 //
 // SECTION A IS THE SHELL ONLY. Each block below still renders its existing
 // pre-rebuild UI; sections B–K replace them one at a time with the flat
@@ -28,7 +28,6 @@ import LockedCard from './sections/LockedCard';
 import AgeingOutSection from './sections/AgeingOutSection';
 import RoundsThatCountSection from './sections/RoundsThatCountSection';
 import HolesSection from './sections/HolesSection';
-import FloorSection from './sections/FloorSection';
 import PersonalBestsSection from './sections/PersonalBestsSection';
 import HandicapFooter from './sections/HandicapFooter';
 
@@ -121,13 +120,10 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
           phase 1.6: no dial, no score stepper, no course picker) */}
       <RoundsThatCountSection connectionId={connection.id} userId={userId} />
 
-      {/* 4 — HOW YOU SCORE A HOLE */}
+      {/* 3 — HOW YOU SCORE A HOLE */}
       <HolesSection userId={userId} connectionId={connection.id} readOnly={readOnly} />
 
-      {/* 5 — THE FLOOR (phase 6: renders only when a rung remains below) */}
-      <FloorSection connection={connection} currentHandicap={currentHandicap} />
-
-      {/* 6 — RECORDS TO BREAK */}
+      {/* 4 — RECORDS TO BREAK */}
       <PersonalBestsSection
         connectionId={connection.id}
         currentHandicap={currentHandicap}
