@@ -512,6 +512,13 @@ export interface ParSplit {
   pct_par_better: number;
   pct_bogey: number;
   pct_double: number;
+  /* 5B L1: exact outcome counts (over ≤ −1 / = 0 / = 1 / ≥ 2), present only
+     once the updated RPC is deployed; absent ⇒ the distribution bar and
+     band labels do not render (5B L3). */
+  birdie_better_count?: number;
+  par_count?: number;
+  bogey_count?: number;
+  double_count?: number;
 }
 
 export interface ScoringBreakdownAllCourses {

@@ -113,12 +113,17 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
   };
   const worstShots = ranked[ranked.length - 1]?.shotsPerRound ?? 0;
 
-  const bands = [
-    { key: 'birdiePlus', pct: d.bands.birdiePlus, label: t('common:handicap.holes.birdiePlus'), color: SC_BIRDIE_DARK },
-    { key: 'par', pct: d.bands.par, label: t('common:handicap.holes.par'), color: SC_PAR_DARK },
-    { key: 'bogey', pct: d.bands.bogey, label: t('common:handicap.holes.bogey'), color: SC_BOGEY_DARK },
-    { key: 'double', pct: d.bands.doublePlus, label: t('common:handicap.holes.doublePlus'), color: SC_DOUBLE_DARK },
-  ];
+  /* 5B L3: when the RPC predates the four count fields, bands is null and
+     neither the bar nor the band labels render — absent, not approximated.
+     L4: labels and tones unchanged. */
+  const bands = d.bands
+    ? [
+        { key: 'birdiePlus', pct: d.bands.birdiePlus, label: t('common:handicap.holes.birdiePlus'), color: SC_BIRDIE_DARK },
+        { key: 'par', pct: d.bands.par, label: t('common:handicap.holes.par'), color: SC_PAR_DARK },
+        { key: 'bogey', pct: d.bands.bogey, label: t('common:handicap.holes.bogey'), color: SC_BOGEY_DARK },
+        { key: 'double', pct: d.bands.doublePlus, label: t('common:handicap.holes.doublePlus'), color: SC_DOUBLE_DARK },
+      ]
+    : null;
 
   /* §5.6: one fewer double a round is one shot of gross, which is 113/slope
      of a differential at the member's most-played course. */
@@ -183,58 +188,66 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
         })}
       </div>
 
-      {/* §5.5: the outcome distribution, one segmented 7px bar. */}
-      <div
-        aria-hidden
-        style={{ display: 'flex', height: 7, borderRadius: 999, overflow: 'hidden', background: CHART.TRACK, marginTop: 22 }}
-      >
-        {bands.map((b) =>
-          b.pct > 0 ? (
-            <div key={b.key} style={{ width: `${b.pct}%`, background: b.color }} />
-          ) : null,
-        )}
-      </div>
-      <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-        {bands.map((b) => (
-          <div key={b.key} style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1, color: b.pct === 0 ? CHART.MUTE : b.color, ...FIG }}>
-              {Math.round(b.pct)}%
-            </div>
-            <div
-              style={{
-                fontSize: 9, fontWeight: 700, letterSpacing: '0.1em',
-                textTransform: 'uppercase', color: CHART.DIM, marginTop: 5,
-              }}
-            >
-              {b.label}
-            </div>
+      {/* §5.5: the outcome distribution, one segmented 7px bar. 5B L3:
+          absent entirely when the count fields are not present. */}
+      {bands && (
+        <>
+          <div
+            aria-hidden
+            style={{ display: 'flex', height: 7, borderRadius: 999, overflow: 'hidden', background: CHART.TRACK, marginTop: 22 }}
+          >
+            {bands.map((b) =>
+              b.pct > 0 ? (
+                <div key={b.key} style={{ width: `${b.pct}%`, background: b.color }} />
+              ) : null,
+            )}
           </div>
-        ))}
-      </div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+            {bands.map((b) => (
+              <div key={b.key} style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1, color: b.pct === 0 ? CHART.MUTE : b.color, ...FIG }}>
+                  {b.pct}%
+                </div>
+                <div
+                  style={{
+                    fontSize: 9, fontWeight: 700, letterSpacing: '0.1em',
+                    textTransform: 'uppercase', color: CHART.DIM, marginTop: 5,
+                  }}
+                >
+                  {b.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
-      {/* §5.6: the one observation line. */}
-      <p
-        style={{
-          margin: '18px 0 0',
-          borderLeft: `2px solid ${CHART.AMBER}`,
-          paddingLeft: 11,
-          fontSize: 12.5,
-          fontWeight: 400,
-          lineHeight: 1.45,
-          color: A.BODY,
-          ...FIG,
-        }}
-      >
-        {diffPerShot != null
-          ? t('common:handicap.strokes.observation', {
-              doubles: d.doublesPerRound.toFixed(1),
-              diff: diffPerShot.toFixed(1),
-              course: course!.name,
-            })
-          : t('common:handicap.strokes.observationNoCourse', {
-              doubles: d.doublesPerRound.toFixed(1),
-            })}
-      </p>
+      {/* §5.6: the one observation line. 5B L6: doublesPerRound comes from
+          the exact count, so when the counts are absent the line is too. */}
+      {d.doublesPerRound != null && (
+        <p
+          style={{
+            margin: '18px 0 0',
+            borderLeft: `2px solid ${CHART.AMBER}`,
+            paddingLeft: 11,
+            fontSize: 12.5,
+            fontWeight: 400,
+            lineHeight: 1.45,
+            color: A.BODY,
+            ...FIG,
+          }}
+        >
+          {diffPerShot != null
+            ? t('common:handicap.strokes.observation', {
+                doubles: d.doublesPerRound.toFixed(1),
+                diff: diffPerShot.toFixed(1),
+                course: course!.name,
+              })
+            : t('common:handicap.strokes.observationNoCourse', {
+                doubles: d.doublesPerRound.toFixed(1),
+              })}
+        </p>
+      )}
     </HcpSection>
   );
 };

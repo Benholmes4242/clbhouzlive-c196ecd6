@@ -23,6 +23,19 @@ export interface ParSplitInput {
   pct_par_better: number;
   pct_bogey: number;
   pct_double: number;
+  /**
+   * Exact hole counts per outcome band (5B L1), added to the RPC by hand.
+   * over ≤ −1 / = 0 / = 1 / ≥ 2; the four partition holes_played exactly.
+   * OPTIONAL: a client running against a database without the updated
+   * function will not have them, and in that case the distribution bar
+   * does not render at all (5B L3) — never approximated from the pct_*
+   * fields, because pct_par_better is par-OR-better and that conflation
+   * is the bug 5B fixes.
+   */
+  birdie_better_count?: number;
+  par_count?: number;
+  bogey_count?: number;
+  double_count?: number;
 }
 
 /**
@@ -54,7 +67,11 @@ export interface ParTypeRow {
 }
 
 export interface OutcomeBands {
-  /** Percentages 0–100, weighted by holes_played across the three types. */
+  /**
+   * Display-rounded integer percentages summing to exactly 100 (5B L2):
+   * derived from the exact counts, rounded, with any 99/101 rounding
+   * difference added to the largest band so the bar fills exactly.
+   */
   birdiePlus: number;
   par: number;
   bogey: number;
@@ -66,9 +83,17 @@ export interface StrokesGo {
   rows: ParTypeRow[];
   /** The row carrying the largest share of dropped shots (drives the title). */
   dominant: ParTypeRow | null;
-  bands: OutcomeBands;
-  /** Double-or-worse holes per round (bands.doublePlus% × 18). */
-  doublesPerRound: number;
+  /**
+   * NULL when any present par type lacks the four count fields (5B L3):
+   * the bar and band labels do not render — absent, not approximated.
+   */
+  bands: OutcomeBands | null;
+  /**
+   * Double-or-worse holes per round: the exact double_count share × 18
+   * (5B L6 — from the count, never the rounded percentage). NULL when the
+   * counts are absent.
+   */
+  doublesPerRound: number | null;
 }
 
 const TYPES: Array<{ parN: 3 | 4 | 5; key: 'par3' | 'par4' | 'par5' }> = [
@@ -108,21 +133,60 @@ export function deriveStrokesGo(
   const eligible = rows.filter((r): r is ParTypeRow & { shotsPerRound: number } => r.shotsPerRound !== null);
   const dominant = eligible.sort((a, b) => b.shotsPerRound - a.shotsPerRound)[0] ?? null;
 
-  /* Outcome bands, weighted by holes_played. Par share is the remainder so
-     the four bands partition the holes exactly. */
-  const w = (pick: (d: ParSplitInput) => number) =>
-    present.reduce((s, t) => s + pick(t.data) * t.data.holes_played, 0) / totalHoles;
-  const birdiePlus = w((d) => d.pct_par_better);
-  const bogey = w((d) => d.pct_bogey);
-  const doublePlus = w((d) => d.pct_double);
-  const par = Math.max(0, 100 - birdiePlus - bogey - doublePlus);
+  /* 5B L1: the four bands come from the exact counts, not the pct_* fields.
+     pct_par_better is par OR BETTER (over ≤ 0) — it includes every par — so
+     deriving birdie-or-better from it overstated the band and drove the
+     remainder-computed par band negative. The remainder and the clamp are
+     gone (L2): the counts partition holes_played, so no band is computed as
+     100 minus the others and a negative band is impossible by construction. */
+  const hasCounts = present.every(
+    (t) =>
+      t.data.birdie_better_count != null &&
+      t.data.par_count != null &&
+      t.data.bogey_count != null &&
+      t.data.double_count != null,
+  );
+
+  let bands: OutcomeBands | null = null;
+  let doublesPerRound: number | null = null;
+  if (hasCounts) {
+    const sum = (pick: (d: ParSplitInput) => number | undefined) =>
+      present.reduce((s, t) => s + (pick(t.data) ?? 0), 0);
+    const exact = {
+      birdiePlus: (sum((d) => d.birdie_better_count) / totalHoles) * 100,
+      par: (sum((d) => d.par_count) / totalHoles) * 100,
+      bogey: (sum((d) => d.bogey_count) / totalHoles) * 100,
+      doublePlus: (sum((d) => d.double_count) / totalHoles) * 100,
+    };
+    /* L2: round for display only, then if rounding leaves the four summing
+       to 99 or 101, add the difference to the largest band so the bar
+       fills exactly. */
+    const entries = (Object.keys(exact) as Array<keyof OutcomeBands>).map((k) => ({
+      key: k,
+      value: Math.round(exact[k]),
+    }));
+    const drift = 100 - entries.reduce((s, e) => s + e.value, 0);
+    if (drift !== 0) {
+      const largest = entries.reduce((a, b) => (b.value > a.value ? b : a));
+      largest.value += drift;
+    }
+    bands = {
+      birdiePlus: entries.find((e) => e.key === 'birdiePlus')!.value,
+      par: entries.find((e) => e.key === 'par')!.value,
+      bogey: entries.find((e) => e.key === 'bogey')!.value,
+      doublePlus: entries.find((e) => e.key === 'doublePlus')!.value,
+    };
+    /* L6: doubles a round reads the exact count share, not the rounded
+       display percentage. */
+    doublesPerRound = (exact.doublePlus / 100) * 18;
+  }
 
   return {
     totalHoles,
     rows,
     dominant,
-    bands: { birdiePlus, par, bogey, doublePlus },
-    doublesPerRound: (doublePlus / 100) * 18,
+    bands,
+    doublesPerRound,
   };
 }
 
