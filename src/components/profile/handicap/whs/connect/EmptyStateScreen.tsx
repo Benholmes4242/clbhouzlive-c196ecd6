@@ -505,6 +505,7 @@ const ExampleTitle: React.FC<{ n: string; title: string }> = ({ n, title }) => <
 const exampleTextStyle: React.CSSProperties = { margin: '10px 0 0', fontSize: 13, lineHeight: 1.45, color: QUIET };
 
 const CircleSection: React.FC<{ preview: CirclePreview; h: number }> = ({ preview, h }) => {
+  const { t } = useTranslation('handicap');
   if (preview.connected <= 0) return null;
   const people = chooseCirclePeople(preview.people, h);
   const rows: Array<CirclePerson | 'you'> = [];
@@ -519,8 +520,8 @@ const CircleSection: React.FC<{ preview: CirclePreview; h: number }> = ({ previe
   if (!placed) rows.push('you');
   return (
     <section style={{ paddingTop: 52 }}>
-      <h2 style={sectionHeadStyle}>Your circle is<br />already here</h2>
-      <p style={sectionSubStyle}>{preview.connected === 1 ? '1 golfer you follow has connected.' : `${preview.connected} golfers you follow have connected. Connect to take your place among them.`}</p>
+      <h2 style={sectionHeadStyle}>{t('whsConnect.intro.circleHeadingLine1')}<br />{t('whsConnect.intro.circleHeadingLine2')}</h2>
+      <p style={sectionSubStyle}>{t('whsConnect.intro.circleSub', { count: preview.connected })}</p>
       <div style={{ margin: '16px -24px 0' }}>
         {rows.map((row) => row === 'you' ? <YouCircleRow key="you" /> : <PersonRow key={row.user_id} person={row} />)}
       </div>
@@ -539,7 +540,7 @@ const PersonRow: React.FC<{ person: CirclePerson }> = ({ person }) => (
 const YouCircleRow: React.FC = () => (
   <div style={circleRowStyle(AMBER_ROW)}>
     <span style={{ width: 36, height: 36, borderRadius: 12, display: 'grid', placeItems: 'center', fontSize: 14, fontWeight: 800, border: `1.5px dashed ${AMBER_DASH_STRONG}`, color: AMBER }}>?</span>
-    <span style={{ minWidth: 0 }}><span style={{ display: 'block', fontSize: 15, fontWeight: 700 }}>You</span><span style={{ display: 'block', marginTop: 2, fontSize: 12.5, color: DIMMER }}>connect to take your place</span></span>
+    <span style={{ minWidth: 0 }}><span style={{ display: 'block', fontSize: 15, fontWeight: 700 }}><IntroText k="circleYou" /></span><span style={{ display: 'block', marginTop: 2, fontSize: 12.5, color: DIMMER }}><IntroText k="circleYouLine" /></span></span>
     <span style={{ width: 44, height: 26, borderRadius: 8, border: `1.5px dashed ${AMBER_DASH}` }} />
   </div>
 );
@@ -548,14 +549,22 @@ function circleRowStyle(background?: string): React.CSSProperties {
   return { display: 'grid', gridTemplateColumns: '36px minmax(0, 1fr) auto', columnGap: 12, alignItems: 'center', padding: '11px 24px', borderBottom: `1px solid ${FAINT_HAIR}`, background };
 }
 
-const TrustSection: React.FC = () => (
-  <section style={{ paddingTop: 52 }}>
-    <h2 style={sectionHeadStyle}>Thirty seconds.<br />Then it looks after itself.</h2>
-    <div style={{ marginTop: 18 }}>
-      {TRUST_STEPS.map((x, i) => (
-        <div key={x.title} style={{ display: 'grid', gridTemplateColumns: '36px minmax(0, 1fr)', columnGap: 14, alignItems: 'start', padding: '14px 0', borderBottom: `1px solid ${HAIR}` }}>
-          <span style={{ width: 36, height: 36, borderRadius: 12, background: STEP_BG, display: 'grid', placeItems: 'center', fontSize: 13, fontWeight: 800, color: SOFT_INK }}>{i + 1}</span>
-          <span><span style={{ display: 'block', fontSize: 16, fontWeight: 700 }}>{x.title}</span><span style={{ display: 'block', marginTop: 3, fontSize: 13.5, lineHeight: 1.45, color: QUIET }}>{x.line}</span></span>
+const TrustSection: React.FC = () => {
+  const { t } = useTranslation('handicap');
+  return (
+    <section style={{ paddingTop: 52 }}>
+      <h2 style={sectionHeadStyle}>{t('whsConnect.intro.trustHeadingLine1')}<br />{t('whsConnect.intro.trustHeadingLine2')}</h2>
+      <div style={{ marginTop: 18 }}>
+        {TRUST_STEPS.map((x, i) => (
+          <div key={x} style={{ display: 'grid', gridTemplateColumns: '36px minmax(0, 1fr)', columnGap: 14, alignItems: 'start', padding: '14px 0', borderBottom: `1px solid ${HAIR}` }}>
+            <span style={{ width: 36, height: 36, borderRadius: 12, background: STEP_BG, display: 'grid', placeItems: 'center', fontSize: 13, fontWeight: 800, color: SOFT_INK }}>{i + 1}</span>
+            <span><span style={{ display: 'block', fontSize: 16, fontWeight: 700 }}>{t(`whsConnect.intro.trustStep${x}Title`)}</span><span style={{ display: 'block', marginTop: 3, fontSize: 13.5, lineHeight: 1.45, color: QUIET }}>{t(`whsConnect.intro.trustStep${x}Line`)}</span></span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
         </div>
       ))}
     </div>
