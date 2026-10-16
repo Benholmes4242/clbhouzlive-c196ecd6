@@ -104,7 +104,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
   const fig = (n: number | null | undefined) => (n == null ? '' : formatNumber(n));
   const tiles = [
     { label: 'TOP 100 PLAYED', value: fig(top100Played) },
-    { label: 'YOUR AVERAGE', value: avgRating == null ? '' : avgRating.toFixed(1) },
+    { label: 'AVERAGE RATING', value: avgRating == null ? '' : avgRating.toFixed(1) },
     { label: 'COURSES RATED', value: fig(ratedCount) },
   ];
 

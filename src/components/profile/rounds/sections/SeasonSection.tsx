@@ -5,6 +5,8 @@
  * absent rather than falling back to rounds.length.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { profileOwnerPossessive } from '@/lib/profileOwnerVoice';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import { formatNumber } from '@/i18n/format';
 import { useMemberRoundTotal } from '@/hooks/profile/useMemberRoundTotal';
@@ -17,6 +19,7 @@ interface Props {
   year: number;
   userId: string;
   isOwnProfile: boolean;
+  ownerFirstName?: string | null;
 }
 
 const Tile: React.FC<{ value: string; label: string }> = ({ value, label }) => (
@@ -26,7 +29,8 @@ const Tile: React.FC<{ value: string; label: string }> = ({ value, label }) => (
   </div>
 );
 
-const SeasonSection: React.FC<Props> = ({ rounds, year, userId, isOwnProfile }) => {
+const SeasonSection: React.FC<Props> = ({ rounds, year, userId, isOwnProfile, ownerFirstName = null }) => {
+  const { t } = useTranslation('common');
   const { total } = useMemberRoundTotal(isOwnProfile ? userId : undefined);
   const ys = yearStats(rounds).get(year);
   const cmp = seasonCompare(rounds, year);
@@ -35,7 +39,7 @@ const SeasonSection: React.FC<Props> = ({ rounds, year, userId, isOwnProfile }) 
 
   return (
     <section>
-      <div style={KICKER}>Your season</div>
+      <div style={KICKER}>{t(isOwnProfile ? 'profile.rounds.seasonOwn' : 'profile.rounds.seasonFriend', { possessive: profileOwnerPossessive(ownerFirstName), defaultValue: isOwnProfile ? 'Your season' : '{{possessive}} season' })}</div>
       <div style={TITLE}>{`${year}, so far`}</div>
 
       {ys?.avg != null ? (
