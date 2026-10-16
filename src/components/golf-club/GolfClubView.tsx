@@ -504,6 +504,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
         name={course.name}
         place={course.country || null}
       >
+        {(referenceLine || heroRecordVisible(recordHolders)) ? (<>
         {referenceLine ? (
           <button
             type="button"
@@ -534,6 +535,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
           </button>
         ) : null}
         <HeroCourseRecord holders={recordHolders} />
+        </>) : null}
       </CourseMasthead>
 
       {/* CR / SLOPE is deliberately NOT rendered here: get_course_meta resolves
