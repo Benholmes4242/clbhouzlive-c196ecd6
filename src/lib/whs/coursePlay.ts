@@ -83,3 +83,27 @@ export function axisScale(
   const hi = Math.ceil(Math.max(highGross, recordGross ?? highGross)) + 3;
   return { lo, hi, pos: (x: number) => ((x - lo) / (hi - lo)) * 100 };
 }
+
+/** Forward WHS differential formula (PCC not modelled). Unrounded. */
+export function differentialFromGross(gross: number, cr: number, slope: number): number {
+  return ((gross - cr) * 113) / slope;
+}
+
+export const COUNTING_DIFFERENTIALS = 8;
+
+/** Mean of the lowest eight differentials; null below eight values. */
+export function indexFromDifferentials(diffs: number[]): number | null {
+  const sorted = diffs.filter((d) => Number.isFinite(d)).sort((a, b) => a - b);
+  if (sorted.length < COUNTING_DIFFERENTIALS) return null;
+  const best = sorted.slice(0, COUNTING_DIFFERENTIALS);
+  return best.reduce((s, d) => s + d, 0) / COUNTING_DIFFERENTIALS;
+}
+
+/**
+ * Hypothetical index after one more round: drop the OLDEST of the window and
+ * add the candidate. `last20Diffs` is ordered OLDEST FIRST. A projection only —
+ * never a statement of which real rounds count (that is is_counter's job).
+ */
+export function indexWithCandidate(last20Diffs: number[], candidate: number): number | null {
+  return indexFromDifferentials([...last20Diffs.slice(1), candidate]);
+}

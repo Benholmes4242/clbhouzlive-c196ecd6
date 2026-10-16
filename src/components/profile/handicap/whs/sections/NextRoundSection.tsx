@@ -103,7 +103,7 @@ function buildLadder(
   if (!course) return null;
   const { cr, slope } = course;
   // PCC is ignored here (it is almost always 0); not modelled.
-  const diffOf = (gross: number) => ((gross - cr) * 113) / slope;
+  const diffOf = (gross: number) => differentialFromGross(gross, cr, slope);
   // Largest whole score that strictly BEATS a differential. Never Math.round:
   // a rounded score can TIE the target and move nothing.
   const beats = (d: number) => {

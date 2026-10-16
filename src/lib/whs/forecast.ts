@@ -1,5 +1,6 @@
 import type { WhsScore } from './types';
 import { projectNextRound } from './handicapMath';
+import { indexFromDifferentials } from './coursePlay';
 import { formatMonthLongGB } from '@/i18n/format';
 
 
@@ -176,9 +177,7 @@ export function buildForecast(
     simDiffs.pop();
     simDiffs.unshift(projDiff);
   }
-  const projectedSorted = [...simDiffs].sort((a, b) => a - b);
-  const projectedTop8 = projectedSorted.slice(0, COUNTER_COUNT);
-  const projectedHandicap = projectedTop8.reduce((s, d) => s + d, 0) / COUNTER_COUNT;
+  const projectedHandicap = indexFromDifferentials(simDiffs) ?? currentHandicap;
   const delta = projectedHandicap - currentHandicap;
 
   // ── State classification ────────────────────────────────────────────

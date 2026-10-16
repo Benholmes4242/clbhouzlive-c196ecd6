@@ -181,7 +181,6 @@ describe('canonical member surface tokens', () => {
       'src/pages/messaging-v2/Composer.tsx',
       'src/pages/messaging-v2/MessageBubble.tsx',
       'src/pages/EchoHistoryPage.tsx',
-      'src/components/profile/handicap/whs/sections/CircleSection.tsx',
       'src/pages/PostDeepLinkPage.tsx',
       'src/components/post/scheduled/ScheduledPostsList.tsx',
       'src/features/tourhub/components/TourSwitcherAffordance.tsx',
