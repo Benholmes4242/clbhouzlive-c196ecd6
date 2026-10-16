@@ -95,11 +95,18 @@ export function deriveStrokesGo(
       holesPlayed: t.data.holes_played,
       holesPerRound,
       perHole: t.data.avg_over,
-      shotsPerRound: t.data.avg_over * holesPerRound,
+      shotsPerRound:
+        t.data.holes_played >= MIN_HOLES_PAR_TYPE
+          ? t.data.avg_over * holesPerRound
+          : null,
     };
   });
 
-  const dominant = [...rows].sort((a, b) => b.shotsPerRound - a.shotsPerRound)[0] ?? null;
+  /* H2: a type that cannot state its own figure is not eligible to win the
+     title. If no type clears the threshold the title falls back to the plain
+     section name and the derived sentence does not render. */
+  const eligible = rows.filter((r): r is ParTypeRow & { shotsPerRound: number } => r.shotsPerRound !== null);
+  const dominant = eligible.sort((a, b) => b.shotsPerRound - a.shotsPerRound)[0] ?? null;
 
   /* Outcome bands, weighted by holes_played. Par share is the remainder so
      the four bands partition the holes exactly. */
