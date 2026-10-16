@@ -16,10 +16,10 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import CourseFactsAndTees from './about/CourseFactsAndTees';
 import AboutThisPlace from './about/AboutThisPlace';
-import HowItPlays from './about/HowItPlays';
+import TheVerdict from './about/TheVerdict';
+import DefendsPar from './about/DefendsPar';
 import RecordBook from './about/RecordBook';
 import WhatPeopleSay from './about/WhatPeopleSay';
-import WhoPlaysHere from './about/WhoPlaysHere';
 import Photos from './about/Photos';
 import WhereItIs from './about/WhereItIs';
 import KeepExploring from './about/KeepExploring';
@@ -142,20 +142,12 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* ONE OWNER FOR THE SEAMS: AboutSection's own 34px lead-in. The grid
           gap that used to sit here added to it, so every seam measured 58. */}
       <div style={{ display: 'grid', gap: 0 }}>
-        {/* BRIEF_COURSE_TAB_REBUILD §3.1/§3.2 — flat facts row + tee control. */}
-        <CourseFactsAndTees courseId={course.id} />
-
-        {/* §3.3 — About moves UP: it is the one section that works with no data.
-            The Top 100 standing is NOT repeated here: the hero badge already
-            carries this course's rank, and the extra lists belong on the Top 100
-            destination rather than as a footnote to the prose. */}
+        {/* BRIEF_COURSE_TAB_1A — the verdict is the first thing under the tabs,
+            then the place, the tees as a finding, and how it defends par. */}
+        <TheVerdict courseId={course.id} />
         <AboutThisPlace courseId={course.id} description={course.description} />
-
-        {/* §3.4 — HOW IT PLAYS, flat. The chart, four figures and the course-wide
-            distribution stay here; hole by hole, how each par plays and the SI
-            ladder move behind the one All 18 holes sheet (§3.10).
-            Nothing is deleted — those components render on that page instead. */}
-        <HowItPlays courseId={course.id} courseName={course.name} />
+        <CourseFactsAndTees courseId={course.id} />
+        <DefendsPar courseId={course.id} courseName={course.name} />
 
         {/* §3.5 — THE RECORD BOOK, flat. Same read as the Panel version
             (useCourseRecordSummary over get_course_legends); CourseRecordBook.tsx
@@ -177,9 +169,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           onSeeAllReviews={() => onTabChange?.('reviews')}
         />
 
-        {/* §3.7 — WHO PLAYS HERE, flat. The same facepile read, no Panel; the
-            circle average stays withheld (reversible, not retired). */}
-        <WhoPlaysHere courseId={course.id} />
+        {/* BRIEF_COURSE_TAB_1A P3.2 — Who plays here is OFF this tab: it counted
+            reviewers (course_ratings), never players. WhoPlaysHere.tsx stays on disk. */}
 
         {/* §3.8 — PHOTOS. The mosaic is unchanged; only its heading is now the
             shared section heading with localised counts. */}

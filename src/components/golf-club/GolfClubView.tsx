@@ -22,12 +22,10 @@ import { CourseLegendsDrilldown } from '@/components/profile/handicap/whs/sectio
 import { useCourseMeta } from '@/hooks/gam/useCourseMeta';
 import { useCourseStatsDetail, type CourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import CourseStatsSheet from '@/components/feed/CourseStatsSheet';
-import { CourseMasthead, HeroFigureCell } from '@/components/courses/CourseMasthead';
-import { ratingDisplayable } from '@/features/explore-magazine/courseRatingFloor';
-import { formatRatingValue } from '@/utils/formatters';
+import { CourseMasthead } from '@/components/courses/CourseMasthead';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseTop100Standing } from '@/hooks/useCourseTop100Standing';
 import { EXPLORE_COURSE_HERO_HEIGHT } from '@/lib/heroHeights';
 import { Z } from '@/config/zIndex';
@@ -442,8 +440,6 @@ interface CourseTitleOverlayProps {
   onOpenStats: () => void;
 }
 
-/* Hero FIGURE ROW cell: the shared HeroFigureCell from CourseMasthead. */
-const HeroStatCell: React.FC<{ label: string; value: string; tone?: string }> = (p) => <HeroFigureCell {...p} />;
 
 const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
   course,
