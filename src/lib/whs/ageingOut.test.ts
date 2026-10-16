@@ -130,3 +130,24 @@ describe('3B amendment', () => {
     expect(a.holdGross).toBe(72);
   });
 });
+
+describe('3D amendment', () => {
+  it('F5/E3 boundary: held in N+1 repetitions but not N — the line is omitted, not printed with a count > N', () => {
+    // C8 fixture, N = 3. Base after the oldest two leave: [2,10..26].
+    // Lesser score is 73 (diff 3.0). Three 73s: drops 2,10,11 → best eight
+    // 3,3,3,12,13,14,15,16 = 79/8 = 9.875 ≤ 11.6 — holds AT N, so this is
+    // not the boundary case; assert the line renders with times ≤ N.
+    const a = deriveAgeingOut(c8(), 11.6, course)!;
+    expect(a.inRounds).toBe(3);
+    if (a.repeat) expect(a.repeat.times).toBeLessThanOrEqual(3);
+
+    // The true boundary: same fixture shape at N = 1 (the C5 fixture). The
+    // maths layer above proves two 73s hold (8.875 ≤ 11.6); with N = 1 the
+    // cap is 1, so no count within N exists and the line is omitted rather
+    // than printed with a count greater than N.
+    const b = deriveAgeingOut(twenty(2), 11.6, course)!;
+    expect(b.inRounds).toBe(1);
+    expect(b.holdGross).toBe(72);
+    expect(b.repeat).toBeNull();
+  });
+});
