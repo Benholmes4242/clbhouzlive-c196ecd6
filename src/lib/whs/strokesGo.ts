@@ -23,6 +23,19 @@ export interface ParSplitInput {
   pct_par_better: number;
   pct_bogey: number;
   pct_double: number;
+  /**
+   * Exact hole counts per outcome band (5B L1), added to the RPC by hand.
+   * over ≤ −1 / = 0 / = 1 / ≥ 2; the four partition holes_played exactly.
+   * OPTIONAL: a client running against a database without the updated
+   * function will not have them, and in that case the distribution bar
+   * does not render at all (5B L3) — never approximated from the pct_*
+   * fields, because pct_par_better is par-OR-better and that conflation
+   * is the bug 5B fixes.
+   */
+  birdie_better_count?: number;
+  par_count?: number;
+  bogey_count?: number;
+  double_count?: number;
 }
 
 /**
