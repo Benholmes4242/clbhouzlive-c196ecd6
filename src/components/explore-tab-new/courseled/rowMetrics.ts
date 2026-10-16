@@ -1,3 +1,4 @@
+// Leaderboard row sizes live only in `courseled/rowMetrics.ts`, as two named scales: board rows read `BOARD_ROW_METRICS`, season rows read `SEASON_ROW_METRICS`, so the intended hierarchy is stated in one place and no call site defines a row size.
 /**
  * TWO NAMED ROW SCALES, ONE FILE (Leaderboards Phase 10.1).
  *
