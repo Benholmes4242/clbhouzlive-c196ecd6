@@ -1,5 +1,9 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_HANDICAP_TAB_REBUILD_2B
+- [x] Clarify lock and ageing-out framing; both read the same derived ageing-out state. Maths, figures, titles, forecast/hold/repeat wording and layout unchanged; only English common keys changed.
+- [x] Both bridge present/absent integration tests pass; full suite 1,411 passing, zero failures (180 files); latest preview build OK. Authenticated real-profile check unavailable on external/unmanaged Supabase. No SQL/migrations, feed_config or round_pool_cap changes.
+
 ## Profile Courses exact mock — 15 October
 - [x] Match the Still to rate, Archive controls, year header and flat course rows to the uploaded mock; preserve real photos/counts and existing row expansion.
 - [x] Verify populated local rendering and controls at 320/472/628px; full suite passes. Hosted authenticated checks remain unavailable on external Supabase.

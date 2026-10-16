@@ -9,7 +9,7 @@ import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useAllScores } from '@/lib/whs/hooks';
-import { deriveAgeingOut } from '@/lib/whs/ageingOut';
+import { deriveAgeingOut, type AgeingOut, type AgeingCourse } from '@/lib/whs/ageingOut';
 import { counterWindow } from '@/lib/whs/counting';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import { playDateStandalone } from '@/components/explore-tab-new/courseled/discoverWhen';
@@ -21,17 +21,23 @@ const FIG: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeatu
 /** 3A C6: prose at MUTE; bolded figures inside it at INK. */
 const BODY = CHART.MUTE;
 
-const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number | null }> = ({
-  connectionId,
-  currentHandicap,
-}) => {
-  const { t } = useTranslation(['common']);
+type AgeingOutState = { a: AgeingOut; course: AgeingCourse | null } | null;
+
+// ARCHITECTURE RULE: Derive this state once in the dashboard; both the section
+// and the lock's bridge read it, so their rendering gates cannot diverge.
+export function useAgeingOutState(connectionId: string, currentHandicap: number | null): AgeingOutState {
   const { data: scores } = useAllScores(connectionId);
   if (!scores) return null;
   const window = counterWindow(scores);
   const course = pickCourse(window);
   const a = deriveAgeingOut(scores, currentHandicap, course);
-  if (!a) return null;
+  return a ? { a, course } : null;
+}
+
+const AgeingOutSection: React.FC<{ state: AgeingOutState }> = ({ state }) => {
+  const { t } = useTranslation(['common']);
+  if (!state) return null;
+  const { a, course } = state;
 
   const r = a.expiring;
   const count = a.inRounds ?? 0;
@@ -66,6 +72,7 @@ const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number
         </div>
         {a.inRounds != null && (
           <p style={{ margin: '10px 0 0', fontSize: 12.5, fontWeight: 400, lineHeight: 1.45, color: BODY, ...FIG }}>
+            {t('common:handicap.ageingOut.framing')}{' '}
             <Trans
               t={t}
               i18nKey={a.isBest ? 'common:handicap.ageingOut.body' : 'common:handicap.ageingOut.bodyNotBest'}
