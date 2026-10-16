@@ -51,7 +51,7 @@ const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number
         {t('common:handicap.ageingOut.kicker')}
       </div>
       <h3 style={{ margin: '6px 0 10px', fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: CHART.INK }}>
-        {t(a.isBest ? 'common:handicap.ageingOut.titleBest' : 'common:handicap.ageingOut.title')}
+        {t(a.isBest ? 'common:handicap.ageingOut.titleBest' : 'common:handicap.ageingOut.title', { count, n: count })}
       </h3>
       <div data-hcp-ageing style={{ background: MEMBER_PANEL, border: `1px solid ${CHART.AMBER}`, borderRadius: 14, padding: 14 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
