@@ -7,7 +7,7 @@ import common from '../../public/locales/en/common.json';
 import courses from '../../public/locales/en/courses.json';
 import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
 
-const rows = Array.from({ length: 5 }, (_, i) => ({ id: `r${i}`, course_id: 'c', rating: 8, design_score: 9, condition_score: 8, clubhouse_score: 7, facilities_score: 6 }));
+let rows = Array.from({ length: 5 }, (_, i) => ({ id: `r${i}`, course_id: 'c', rating: 8, design_score: 9, condition_score: 8, clubhouse_score: 7, facilities_score: 6 }));
 vi.mock('@/hooks/useUserCourseSummary', () => ({ useUserCourseSummary: () => ({ totalCoursesPlayed: 1, countriesPlayed: 1, countryTallies: [{ country: 'England', courses: 1 }], coursePoints: [], unmappedCount: 0, isLoading: false }) }));
 vi.mock('@/hooks/useUserCourseActivity', () => ({ useUserCourseActivity: () => ({ data: [{ course_id: 'c', has_rating: true, rating_value: 8 }] }) }));
 vi.mock('@/hooks/gam/useUserAnalyticsCourses', () => ({ useUserAnalyticsCourses: () => ({ data: [] }) }));
@@ -36,7 +36,7 @@ it('Courses names the other member, with third-person fallbacks and no viewer-ad
   expect(text).toContain('What Andrew actually rewards');
   expect(text).toContain('Andrew is a design voter — marking it 1.5 above their average across the four, and facilities 1.5 below.');
   expect(text).toContain('AVERAGE RATING');
-  expect(text).toContain("That's Andrew's journey so far.");
+  expect(text).toContain("That’s Andrew's journey so far.");
   expect(text).not.toMatch(/\b(?:you|your|you've)\b/i);
   rerender(<I18nextProvider i18n={i18n}><ProfileCoursesTab userId="owner" isOwnProfile={false} /></I18nextProvider>);
   text = container.textContent ?? '';
@@ -45,7 +45,7 @@ it('Courses names the other member, with third-person fallbacks and no viewer-ad
   expect(text).toContain('They are a design voter');
   expect(text).toContain('That’s their journey so far.');
   expect(text).not.toMatch(/\b(?:you|your|their['’]s)\b/i);
-  rows.forEach((r) => { r.design_score = 8; r.condition_score = 8; r.clubhouse_score = 8; r.facilities_score = 8; });
+  rows = rows.map((r) => ({ ...r, design_score: 8, condition_score: 8, clubhouse_score: 8, facilities_score: 8 }));
   rerender(<I18nextProvider i18n={i18n}><ProfileCoursesTab userId="owner" isOwnProfile={false} displayName="Andrew Smith" /></I18nextProvider>);
   expect(container.textContent).toContain('Andrew rates the four evenly — none sits more than 0.2 from their average across them.');
 });
