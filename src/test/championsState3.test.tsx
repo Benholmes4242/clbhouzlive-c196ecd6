@@ -4,14 +4,15 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }), Trans: ({ i18nKey }: { i18nKey: string }) => <span>{i18nKey}</span> }));
 
-// CHAMPIONS_STATE_3_G3: authorised actual-avatar substitution, scoped here.
-const avatarCalls = vi.hoisted(() => ({ current: [] as Array<{ photoUrl: string | null; name: string; ghost?: boolean }> }));
+// CHAMPIONS_STATE_3_G4: scoped avatar output and capture keys depend only on props.
+const avatarCalls = vi.hoisted(() => ({ current: new Map<string, { photoUrl: string | null; name: string; ghost?: boolean }>() }));
 vi.mock('@/components/profile/handicap/whs/sections/course-legends/drilldown/_shared/boardParts', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/components/profile/handicap/whs/sections/course-legends/drilldown/_shared/boardParts')>();
   return {
     ...actual,
     CourseLegendsAvatar: (p: { photoUrl: string | null; name: string; ghost?: boolean }) => {
-      const id = avatarCalls.current.push(p) - 1;
+      const id = JSON.stringify([p.name, p.ghost ?? false, p.photoUrl]);
+      avatarCalls.current.set(id, p);
       const initials = p.name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
       return <span aria-hidden data-avatar-call={id}>{initials}</span>;
     },
@@ -111,14 +112,14 @@ describe('CHAMPIONS_STATE_3 / CHAMPIONS_STATE_3_R / CHAMPIONS_STATE_3_T', () => 
   it('CHAMPIONS_STATE_3_G: ghost loads no image even when viewer and holder both have photos', () => {
     const p = props();
     p.grouped.set(p.activeKey, { rows: [{ ...row(76, 'Alice Stone'), photoUrl: 'https://example.test/holder.jpg' }], total: 1 });
-    avatarCalls.current = [];
+    avatarCalls.current.clear();
     const { container } = render(<ProjectedChampions {...p} />);
     const ghostAvatar = container.querySelector('[data-projection-ghost] [data-avatar-call]');
     const callId = ghostAvatar?.getAttribute('data-avatar-call');
-    const ghostProps = callId == null ? undefined : avatarCalls.current[Number(callId)];
+    const ghostProps = callId == null ? undefined : avatarCalls.current.get(callId);
     // This avatar's no-photo contract is ghost=true, not a src prop.
     expect(ghostProps?.ghost).toBe(true);
-    expect(avatarCalls.current.filter(call => !call.ghost).map(call => call.photoUrl)).toContain('https://example.test/holder.jpg');
+    expect(Array.from(avatarCalls.current.values()).filter(call => !call.ghost).map(call => call.photoUrl)).toContain('https://example.test/holder.jpg');
     expect({ name: ghostProps?.name, initials: ghostAvatar?.textContent }).toEqual({ name: 'Ben Hill', initials: 'BH' });
   });
   it('CHAMPIONS_STATE_3_G: ghost initials belong to the signed-in viewer, never the holder', () => {
