@@ -58,8 +58,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { A, EmptyState } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
 import AboutSection, { AboutHairline } from './about/AboutSection';
-import CenteredStatStrip from './about/CenteredStatStrip';
-import { EmptyBirdiesSection, FieldShotsSection } from './you/NotConnectedInvitation';
+import { EmptyBirdiesSection, FieldShotsSection, FieldVerdictSection } from './you/NotConnectedInvitation';
 import { UnclaimedCourseSection } from './you/UnclaimedCourseSection';
 import { YouAction, YouButton, YouSentence } from './you/youBits';
 import { useMemberStandings } from '@/hooks/gam/useMemberStandings';
@@ -344,7 +343,6 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
        wording via fieldSample. A member without a handicap must not see less
        of a course than a member with one. */
     const fieldRoundsTotal = analysis?.total_rounds != null ? Number(analysis.total_rounds) : null;
-    const sample = fieldSample(fieldRoundsTotal);
     const zeroRounds = fieldRoundsTotal === 0;
     const showFieldChart = (analysis?.holes?.length ?? 0) === 18 && (fieldRoundsTotal ?? 0) >= 1;
     return wrap(
@@ -363,30 +361,27 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
             }}
           />
         ) : null}
-        {/* YOU_TAB_SPARSE_1 N1: no dash columns for the reader's absent figures.
-            The field figure stands alone, labelled as the field; absent, no strip. */}
-        {fieldGross ? (
-          <AboutSection first={!zeroRounds}>
-            <CenteredStatStrip
-              items={[{
-                label: sample === 'one'
-                  ? t('courseDetail.youTab.fieldAverageHereOne')
-                  : sample === 'few'
-                    ? t('courseDetail.youTab.fieldAverageHereFew', { count: fieldRoundsTotal ?? 0, rounds: formatNumber(fieldRoundsTotal ?? 0) })
-                    : t('courseDetail.youTab.fieldAverageHere'),
-                value: fieldGross,
-              }]}
-            />
-          </AboutSection>
+        {/* YOU_TAB_STATE_2 Z1-Z3 — with tracked rounds the verdict replaces the
+            retired "Field average here" strip (same fact twice). Inclusive
+            over-par figure; unavailable or not over par -> no section, no
+            gross fallback. Zero rounds: neither renders. */}
+        {!zeroRounds && fieldOverPar != null && fieldOverPar > 0 && Number(courseStats?.rounds_tracked ?? 0) > 0 ? (
+          <FieldVerdictSection
+            overPar={fieldOverPar}
+            rounds={Number(courseStats?.rounds_tracked)}
+            courseName={courseName}
+          />
         ) : null}
         {showFieldChart && analysis ? (
           <FieldShotsSection
             holes={analysis.holes}
             totalRounds={Number(analysis.total_rounds)}
             courseName={courseName}
+            withFacts
           />
         ) : null}
-        <EmptyBirdiesSection waiting={zeroRounds} />
+        {/* YOU_TAB_STATE_2 Z6 — both branch-B states share the kicker/title form. */}
+        <EmptyBirdiesSection waiting />
         {zeroRounds ? null : upForGrabs}
         <AboutSection>
           <AboutHairline style={{ marginBottom: 20 }} />
