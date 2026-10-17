@@ -577,7 +577,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
           rounds={totalCourseRounds}
           projection={courseProjection}
           inputs={projectionInputs}
-          initials={(profile?.display_name ?? '').split(/\s+/).filter(Boolean).slice(0, 2).map(name => name[0]).join('') || 'You'}
+          viewer={{ name: profile?.display_name ?? 'You', photoUrl: profile?.profile_photo_url ?? null }}
         /> : fieldOnly ? <FieldChampions
           categories={fieldCategories.map(key => ({ key, label: legendCategoryLabel[key], short: SHORT_LABELS[key] }))}
           grouped={grouped}

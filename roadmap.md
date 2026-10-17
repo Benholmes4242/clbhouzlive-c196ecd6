@@ -1,10 +1,12 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
-## BRIEF_CHAMPIONS_STATE_3 — CHAMPIONS_STATE_3
-- [x] Confirm clbhouz; read signed-off brief, HTML and image, and inspect coursePlay exports without SQL.
-- [ ] GA1 blocker: coursePlay exports the gross projection, course handicap and gross/differential conversions, but no projected net or stableford range. Required score-board figures must be supplied by that owner before implementation; no local arithmetic or partial screen added.
-- [ ] Build shared cabinet extension, classification, ghost row and shared record sentence lift once GA1 is unblocked; preserve states 1/2/4 and omit Elsewhere. GB5's no-gold screen clause contradicts GD5's explicit gold record mark; report alongside work.
-- [ ] GE1–GE6 and full-suite verification pending implementation; last verified count is 1,510, no tests changed or rerun in this investigation.
+## BRIEF_CHAMPIONS_STATE_3 / R / T
+- [x] Confirm clbhouz; read all three standing briefs and amended HTML.
+- [x] Extend coursePlay net/differential ranges and shared sentence selector; preserve You wording.
+- [x] Use A.FAINT and extend FlatBoardRow with the authorised ghost variant; remove duplicate ghost rendering.
+- [x] Add 18 State 3 tests and three coursePlay tests; no existing assertions deleted, renamed or rewritten.
+- [ ] STOP: focused run collected 32, passed 31, failed one: ghost profile-photo style did not contain 'viewer.jpg'. No test adjusted. Full suite not run under the stop rule; baseline remains 1,510 and candidate inventory is 1,531 (+18 State 3, +3 coursePlay).
+- [x] Latest preview build OK (2026-10-17 12:04:38 UTC); authenticated/visual acceptance unavailable on external/unmanaged Supabase. State 3 remains unfinished pending authorisation to diagnose the new failure.
 
 ## BRIEF_CHAMPIONS_STATE_2 — CHAMPIONS_STATE_2
 - [x] Confirm clbhouz and record Ben's snapshot verification dated 2026-10-17; values unchanged.

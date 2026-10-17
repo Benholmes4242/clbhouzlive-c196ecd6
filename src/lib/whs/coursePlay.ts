@@ -66,10 +66,13 @@ export function buildCourseProjection(
   differentials: number[],
   i: CoursePlayInputs,
 ): CourseProjection | null {
+  if (![i.index, i.cr, i.slope, i.par].every(Number.isFinite) || i.slope <= 0) return null;
   const sorted = differentials.filter((d) => Number.isFinite(d)).sort((a, b) => a - b);
   if (sorted.length < MIN_PROJECTION_DIFFERENTIALS) return null;
+  const median = medianOf(sorted);
+  if (median == null) return null;
   return {
-    typicalGross: Math.round(grossFromDifferential(medianOf(sorted)!, i.cr, i.slope)),
+    typicalGross: Math.round(grossFromDifferential(median, i.cr, i.slope)),
     lowGross: Math.round(grossFromDifferential(nearestRankPercentile(sorted, 0.1), i.cr, i.slope)),
     highGross: Math.round(grossFromDifferential(nearestRankPercentile(sorted, 0.9), i.cr, i.slope)),
     courseHcp: courseHandicap(i),

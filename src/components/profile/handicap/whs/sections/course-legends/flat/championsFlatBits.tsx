@@ -226,8 +226,10 @@ export const FlatBoardRow: React.FC<{
   deficit?: string | null;
   onPress?: () => void;
   recordTone?: string;
-}> = ({ row, pos, category, coursePar = null, rule = true, deficit = null, onPress, recordTone }) => {
-  const tone = row.isSelf ? A.AMBER : recordTone && row.rank === 1 ? recordTone : A.INK;
+  /** CHAMPIONS_STATE_3_T: same row, grid and defaults; never a second home. */
+  ghost?: boolean;
+}> = ({ row, pos, category, coursePar = null, rule = true, deficit = null, onPress, recordTone, ghost = false }) => {
+  const tone = ghost || row.isSelf ? A.AMBER : recordTone && row.rank === 1 ? recordTone : A.INK;
   const showToPar = hasToPar(category) && coursePar != null;
   return (
     <button
@@ -237,6 +239,7 @@ export const FlatBoardRow: React.FC<{
          this is how it is found. Marker only; the amber tone above is what a
          member sees. */
       data-self={row.isSelf ? '1' : undefined}
+      data-projection-ghost={ghost ? '' : undefined}
       style={{
         display: 'grid',
         width: '100%',
@@ -244,21 +247,22 @@ export const FlatBoardRow: React.FC<{
         gap: 10,
         alignItems: 'center',
         padding: '11px 0',
-        background: 'transparent',
+        background: ghost ? `color-mix(in srgb, ${A.AMBER} 10%, transparent)` : 'transparent',
         border: 'none',
+        borderBottom: ghost ? `1px dashed color-mix(in srgb, ${A.AMBER} 34%, transparent)` : undefined,
         borderTop: rule ? `1px solid ${A.HAIRLINE}` : undefined,
         textAlign: 'left',
         fontFamily: SANS,
         cursor: onPress ? 'pointer' : 'default',
       }}
     >
-      <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-        {pos === '1' && (
+      <span data-ghost-rank={ghost ? '' : undefined} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+        {!ghost && pos === '1' && (
           <Crown size={11} strokeWidth={2.5} fill={recordTone ?? A.AMBER} style={{ color: recordTone ?? A.AMBER, flexShrink: 0 }} />
         )}
-        <span style={{ ...NUM, fontSize: 12, color: row.isSelf ? A.AMBER : A.DIM }}>{pos}</span>
+        {!ghost && <span style={{ ...NUM, fontSize: 12, color: row.isSelf ? A.AMBER : A.DIM }}>{pos}</span>}
       </span>
-      <CourseLegendsAvatar photoUrl={row.photoUrl} name={row.name} size={34} />
+      <CourseLegendsAvatar photoUrl={row.photoUrl} name={row.name} size={34} ghost={ghost} />
       <span style={{ minWidth: 0 }}>
         <span
           style={{
@@ -272,12 +276,12 @@ export const FlatBoardRow: React.FC<{
             whiteSpace: 'nowrap',
           }}
         >
-          {row.isSelf ? 'You' : row.name}
+          {ghost ? 'You would sit here' : row.isSelf ? 'You' : row.name}
         </span>
-        <span style={{ display: 'block', marginTop: 3, fontSize: 11, fontWeight: 500, color: A.DIM }}>
-          {formatChampionsWhen(row.attained_at)}
+        <span style={{ display: 'block', marginTop: 3, fontSize: 11, fontWeight: 500, color: ghost ? A.FAINT : A.DIM }}>
+          {ghost ? 'Projected, not played' : formatChampionsWhen(row.attained_at)}
         </span>
-        {deficit ? (
+        {!ghost && deficit ? (
           <span style={{ ...NUM, display: 'block', marginTop: 3, fontSize: 11, fontWeight: 600, color: A.DIM }}>
             {deficit}
           </span>
@@ -287,7 +291,7 @@ export const FlatBoardRow: React.FC<{
         <span style={{ ...NUM, fontSize: 16, fontWeight: 700, color: tone, display: 'block', lineHeight: 1 }}>
           {row.valueDisplay}
         </span>
-        {showToPar && coursePar != null ? (
+        {ghost && deficit ? <span style={{ ...NUM, display: 'block', marginTop: 3, fontSize: 11, fontWeight: 600, color: A.AMBER }}>{deficit}</span> : showToPar && coursePar != null ? (
           <span
             style={{
               ...NUM,
