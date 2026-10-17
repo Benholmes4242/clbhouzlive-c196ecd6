@@ -9,7 +9,7 @@ import type { LegendCategory } from '@/lib/gam/types';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { numberWord } from '@/lib/text/numbers';
 import { useTitlesInReach, type TitleInReach } from '@/hooks/gam/useTitlesInReach';
-import { CHAMPIONS_BOARD_DATA } from '../_shared/championsOrder';
+import { CHAMPIONS_BOARD_DATA, championsBoardName } from '../_shared/championsOrder';
 import './championsEmpty.css';
 
 export interface ElsewhereCard { row: TitleInReach; category: LegendCategory; proportion: number }
@@ -26,18 +26,16 @@ export function reachProportion(category: LegendCategory, user: number, leader: 
  * already held (nothing to beat) are not cards. */
 export function elsewhereCards(rows: readonly TitleInReach[]): ElsewhereCard[] {
   return rows
-    .filter(row => row.category in CHAMPIONS_BOARD_DATA && Number(row.gap) > 0)
+    .filter(row => {
+      // XA4: an unrecognised category is dropped, but never silently.
+      if (!(row.category in CHAMPIONS_BOARD_DATA)) { console.warn('[champions] elsewhere: unrecognised category', row.category); return false; }
+      return Number(row.gap) > 0;
+    })
     .map(row => {
       const category = row.category as LegendCategory;
       return { row, category, proportion: reachProportion(category, Number(row.user_value), Number(row.leader_value)) };
     })
     .sort((a, b) => b.proportion - a.proportion);
-}
-
-function boardLabel(category: LegendCategory): string {
-  const data = CHAMPIONS_BOARD_DATA[category];
-  if (data.kind === 'cumulative') return `Most ${data.name}`;
-  return data.name.charAt(0).toUpperCase() + data.name.slice(1);
 }
 
 export function ElsewhereSection({ rows }: { rows: readonly TitleInReach[] }) {
@@ -50,7 +48,7 @@ export function ElsewhereSection({ rows }: { rows: readonly TitleInReach[] }) {
     {cards.map(({ row, category, proportion }) => <div key={`${row.course_id}-${row.category}`} data-elsewhere-card="" data-proportion={proportion} style={{ background: A.PANEL, borderRadius: 13, padding: 13, marginTop: 13 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: A.INK }}>{row.course_name}</div>
-        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.09em', textTransform: 'uppercase', color: A.AMBER }}>{boardLabel(category)}</div>
+        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.09em', textTransform: 'uppercase', color: A.AMBER }}>{championsBoardName(category)}</div>
       </div>
       <div style={{ fontSize: 11, color: A.DIM, fontVariantNumeric: 'tabular-nums', marginTop: 3 }}>You {row.user_value} · {row.leader_value} to beat</div>
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 54px', alignItems: 'center', gap: 8, marginTop: 9 }}>

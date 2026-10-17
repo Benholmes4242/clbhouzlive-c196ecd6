@@ -27,6 +27,19 @@ export const CHAMPIONS_BOARD_DATA: Record<LegendCategory, BoardData> = {
   most_rounds_90d: { kind: 'cumulative', name: 'rounds' },
 };
 
+/** CHAMPIONS_ELSEWHERE_N: the ONE display name per board, short enough for the
+ * 114px cabinet tile. Every Champions surface reads it; none spells its own.
+ * Display only - database category names are unchanged. */
+const BOARD_DISPLAY_BY_BASE: Record<string, string> = {
+  lowest_gross: 'Gross', lowest_gross_women: "Women's gross", lowest_net: 'Net',
+  best_stableford: 'Stableford', best_score_diff: 'Differential',
+  most_eagles: 'Eagles', most_birdies: 'Birdies', most_rounds: 'Rounds',
+  most_aces: 'Aces', most_albatrosses: 'Albatrosses',
+};
+export function championsBoardName(category: LegendCategory): string {
+  return BOARD_DISPLAY_BY_BASE[category.replace(/_(all_time|90d)$/, '')] ?? category;
+}
+
 /**
  * Canonical category order shared between Course Champions drilldown and
  * the compact Course Champions grid cell on the Compete tab.
