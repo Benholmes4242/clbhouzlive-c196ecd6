@@ -91,9 +91,18 @@ interface Props {
   courseName: string;
   state: ProjectionState;
   recordGross: number | null;
+  /** Tracked rounds at the course, when known. */
+  fieldRounds?: number | null;
+  /**
+   * YOU_TAB_THIN_COURSE_1 P2 — true below COURSE_FIELD_MIN_ROUNDS: the
+   * "played to that standard N times" sentence comes off, replaced with the
+   * honest version (only N rounds logged, so the best of them is what there
+   * is to beat). The range, projection and course handicap are untouched.
+   */
+  thinField?: boolean;
 }
 
-const ProjectionSection: React.FC<Props> = ({ courseName, state, recordGross }) => {
+const ProjectionSection: React.FC<Props> = ({ courseName, state, recordGross, fieldRounds = null, thinField = false }) => {
   const { t } = useTranslation('courses');
   if (state.kind === 'none') return null;
   const heading = t('courseDetail.youTab.projection.heading', { courseName });
@@ -176,7 +185,14 @@ const ProjectionSection: React.FC<Props> = ({ courseName, state, recordGross }) 
   const payoff =
     recordGross == null
       ? t('courseDetail.youTab.projection.range', { low: p.lowGross, high: p.highGross })
-      : times >= 1
+      : thinField
+        ? t('courseDetail.youTab.projection.rangeWithRecordThin', {
+            low: p.lowGross,
+            high: p.highGross,
+            record: recordGross,
+            count: fieldRounds ?? 0,
+          })
+        : times >= 1
         ? t('courseDetail.youTab.projection.rangeWithRecord', {
             low: p.lowGross,
             high: p.highGross,
