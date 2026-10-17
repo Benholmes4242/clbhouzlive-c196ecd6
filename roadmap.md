@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_CHAMPIONS_STATE_1 — CHAMPIONS_STATE_1
+- [x] Confirm clbhouz; investigate CC2 without querying data. Exact catalogue count exists in admin Inbox; Health has admin-only played_courses/played_on_map fields, not a verified member-accessible catalogue-matched tracked-course total.
+- [ ] BLOCKED by CC2: Ben supplies an existing member-accessible authoritative live count source for catalogue courses with any tracked WHS round. No app/test edits made; no figures hardcoded.
+- [ ] After the count source is supplied, implement the signed-off zero-round cabinet/count/connect screen and CE1–CE4 tests; exclude Elsewhere and preserve all other screens except the explicitly requested count corrections.
+
 ## BRIEF_PROFILE_TABS_VOICE
 - [x] Confirm clbhouz; change only specified Courses/Rounds ownership copy and props, with name-free third-person fallbacks and the archive possessive fix.
 - [x] Add English keys only; preserve all queries, hooks, derivations, figures and Handicap sections. Excluded archive empty state still says "They hasn't" without a name; reported, not changed.
