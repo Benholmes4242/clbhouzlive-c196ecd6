@@ -15,7 +15,7 @@ import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
-import { A, LABEL, SANS, Panel } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS, Panel } from '@/features/courses/components/holes/analytical/tokens';
 
 interface CourseStatusToggleProps {
   courseId: string;
