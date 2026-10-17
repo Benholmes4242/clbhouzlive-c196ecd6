@@ -23,27 +23,24 @@ describe('YOU_TAB_STATE_1 X1 scoping', () => {
   });
 
   it('branch B with zero tracked rounds: Up for grabs does not separately render', () => {
-    expect(tab).toContain('{zeroRounds ? null : upForGrabs}');
+    expect(tab).toContain('{zeroRounds ? null : upForGrabsList}');
   });
 
-  it('branch B with one or more tracked rounds: Up for grabs renders exactly as before', () => {
-    /* The ternary's else branch IS the pre-state-1 render: the same
-       upForGrabs element, built once, reached whenever zeroRounds is false. */
-    const upForGrabsBuild = tab.indexOf('const upForGrabs');
-    const gate = tab.indexOf('{zeroRounds ? null : upForGrabs}');
-    expect(upForGrabsBuild).toBeGreaterThan(-1);
-    expect(gate).toBeGreaterThan(upForGrabsBuild);
-    expect(tab).toContain('const upForGrabs = (');
+  it('branch B with one or more tracked rounds: Up for grabs renders, with the shared board list', () => {
+    /* YOU_TAB_BOARD_LIST_1 AC3 — state 2 now carries the board list. */
+    const listBuild = tab.indexOf('const upForGrabsList');
+    const gate = tab.indexOf('{zeroRounds ? null : upForGrabsList}');
+    expect(listBuild).toBeGreaterThan(-1);
+    expect(gate).toBeGreaterThan(listBuild);
+    expect(tab).toContain('boardHolders={boardHolders}');
   });
 });
 
 describe('YOU_TAB_STATE_1 X2 board list reads real boards', () => {
-  it('the four rows map to existing all-time board categories, not new strings', () => {
-    const expected = ['lowest_gross_all_time', 'lowest_net_all_time', 'best_stableford_all_time', 'best_score_diff_all_time'];
-    for (const category of expected) {
-      expect(CHAMPIONS_ORDER_ALL_TIME).toContain(category);
-    }
-    expect(section).toContain("const SINGLE_ROUND_BOARDS = ['lowestGross', 'lowestNet', 'bestStableford', 'bestDifferential'] as const;");
+  it('the rows are every open all-time board, from the shared BoardList', () => {
+    /* YOU_TAB_BOARD_LIST_1 AC2 — all nine on a zero-round course. */
+    expect(section).toContain('<BoardList holders={holders}');
+    expect(section).not.toContain('SINGLE_ROUND_BOARDS');
   });
 
   it('the "All N boards" count comes from CHAMPIONS_ORDER_ALL_TIME, never a literal', () => {

@@ -28,7 +28,6 @@ describe('YOU_TAB_STATE_3', () => {
     expect(proj).not.toContain('timesPlayedToStandard');
   });
   it('AB3: the board list renders only on branch C with tracked rounds', () => {
-    expect(tab).toContain('{zeroRounds ? upForGrabs : (');
-    expect(tab).toContain('boardHolders={boardHolders}');
+    expect(tab).toContain('{zeroRounds ? upForGrabs : upForGrabsList}');
   });
 });

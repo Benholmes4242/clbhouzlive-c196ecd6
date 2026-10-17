@@ -22,19 +22,22 @@ import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { formatNumber } from '@/i18n/format';
 import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import { Sec, Lede } from './many/manyBits';
+import { BoardList } from './BoardList';
+import type { CourseLegendRow, LegendCategory } from '@/lib/gam/types';
 
-/* X2 — the four boards a single round claims outright, in the boards' own
-   vocabulary. All four exist: lowest_gross, lowest_net, best_stableford and
-   best_score_diff are all-time legend categories. */
-const SINGLE_ROUND_BOARDS = ['lowestGross', 'lowestNet', 'bestStableford', 'bestDifferential'] as const;
+/* YOU_TAB_BOARD_LIST_1 AC2 — every open board renders (all nine on a
+   zero-round course), from the shared BoardList. */
 
 interface Props {
   /** Null when the count is unavailable — the tile stands down (X6). */
   openBoards: number | null;
   onAllBoards: () => void;
+  /** The same holder map the open count is taken from. */
+  holders: Map<LegendCategory, CourseLegendRow>;
+  recordValue?: number | null;
 }
 
-export const UnclaimedCourseSection: React.FC<Props> = ({ openBoards, onAllBoards }) => {
+export const UnclaimedCourseSection: React.FC<Props> = ({ openBoards, onAllBoards, holders, recordValue = null }) => {
   const { t } = useTranslation('courses');
   const boardTotal = CHAMPIONS_ORDER_ALL_TIME.length;
   return (
@@ -61,28 +64,7 @@ export const UnclaimedCourseSection: React.FC<Props> = ({ openBoards, onAllBoard
           </div>
         </div>
       ) : null}
-      <div style={{ marginTop: 16 }}>
-        {SINGLE_ROUND_BOARDS.map((key, i) => (
-          <div
-            key={key}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 11,
-              padding: '11px 0',
-              borderBottom: i < SINGLE_ROUND_BOARDS.length - 1 ? `1px solid ${A.SOFT}` : undefined,
-              fontFamily: SANS,
-            }}
-          >
-            <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: A.BODY }}>
-              {t(`courseDetail.youTab.unclaimed.boards.${key}`)}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: MEDAL_GOLD }}>
-              {t('courseDetail.youTab.unclaimed.open')}
-            </div>
-          </div>
-        ))}
-      </div>
+      <BoardList holders={holders} recordValue={recordValue} marginTop={16} />
       <button
         type="button"
         onClick={onAllBoards}

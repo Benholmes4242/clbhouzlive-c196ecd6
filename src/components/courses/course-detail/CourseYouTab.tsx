@@ -290,6 +290,22 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
      count that governs the wording. */
   const upForGrabsThin =
     analysis?.total_rounds != null && Number(analysis.total_rounds) < COURSE_FIELD_MIN_ROUNDS;
+  /* YOU_TAB_BOARD_LIST_1 AC3/AC4 — states 2 and 3 (tracked rounds, not
+     played by the member) carry the shared board list. */
+  const upForGrabsList = (
+    <UpForGrabsSection
+      recordValue={courseRecord?.value ?? null}
+      holders={courseRecordHolders}
+      unclaimedCount={unclaimedCount}
+      yourBest={bestGross}
+      thinField={upForGrabsThin}
+      boardHolders={boardHolders}
+      onAllBoards={() => {
+        analyticsEvents.track('course_you_all_boards', { course_id: courseId });
+        onTabChange?.('legends');
+      }}
+    />
+  );
   const upForGrabs = (
     <UpForGrabsSection
       recordValue={courseRecord?.value ?? null}
@@ -355,6 +371,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         {zeroRounds ? (
           <UnclaimedCourseSection
             openBoards={unclaimedCount}
+            holders={boardHolders}
             onAllBoards={() => {
               analyticsEvents.track('course_you_all_boards', { course_id: courseId });
               onTabChange?.('legends');
@@ -383,7 +400,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         ) : null}
         {/* YOU_TAB_STATE_2 Z6 — both branch-B states share the kicker/title form. */}
         <EmptyBirdiesSection waiting />
-        {zeroRounds ? null : upForGrabs}
+        {zeroRounds ? null : upForGrabsList}
         <AboutSection>
           <AboutHairline style={{ marginBottom: 20 }} />
           <p style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700, color: A.INK }}>
@@ -443,6 +460,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         {zeroRounds ? (
           <UnclaimedCourseSection
             openBoards={unclaimedCount}
+            holders={boardHolders}
             onAllBoards={() => {
               analyticsEvents.track('course_you_all_boards', { course_id: courseId });
               onTabChange?.('legends');
@@ -477,20 +495,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         ) : null}
         {/* YOU_TAB_STATE_3 AB3 — with tracked rounds Up for grabs names the
             open boards; the zero-round screen keeps the plain section. */}
-        {zeroRounds ? upForGrabs : (
-          <UpForGrabsSection
-            recordValue={courseRecord?.value ?? null}
-            holders={courseRecordHolders}
-            unclaimedCount={unclaimedCount}
-            yourBest={bestGross}
-            thinField={upForGrabsThin}
-            boardHolders={boardHolders}
-            onAllBoards={() => {
-              analyticsEvents.track('course_you_all_boards', { course_id: courseId });
-              onTabChange?.('legends');
-            }}
-          />
-        )}
+        {zeroRounds ? upForGrabs : upForGrabsList}
         {circleCount > 0 ? (
           <AboutSection heading={t('courseDetail.youTab.circle.heading')}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
