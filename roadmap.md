@@ -4,8 +4,9 @@
 - [x] Confirm clbhouz; read all three standing briefs and amended HTML.
 - [x] Extend coursePlay net/differential ranges and shared sentence selector; preserve You wording.
 - [x] Use A.FAINT and extend FlatBoardRow with the authorised ghost variant; remove duplicate ghost rendering.
-- [ ] Add focused tests and run full suite; last verified baseline 1,510. Stop on any new failure.
-- [ ] Report counts, deviations and external/unmanaged authentication limitation.
+- [x] Add 18 State 3 tests and three coursePlay tests; no existing assertions deleted, renamed or rewritten.
+- [ ] STOP: focused run collected 32, passed 31, failed one: ghost profile-photo style did not contain 'viewer.jpg'. No test adjusted. Full suite not run under the stop rule; baseline remains 1,510 and candidate inventory is 1,531 (+18 State 3, +3 coursePlay).
+- [x] Latest preview build OK (2026-10-17 12:04:38 UTC); authenticated/visual acceptance unavailable on external/unmanaged Supabase. State 3 remains unfinished pending authorisation to diagnose the new failure.
 
 ## BRIEF_CHAMPIONS_STATE_2 — CHAMPIONS_STATE_2
 - [x] Confirm clbhouz and record Ben's snapshot verification dated 2026-10-17; values unchanged.
