@@ -2,8 +2,9 @@
 
 ## BRIEF_CHAMPIONS_STATE_1 — CHAMPIONS_STATE_1
 - [x] Confirm clbhouz; investigate CC2 without querying data. Exact catalogue count exists in admin Inbox; Health has admin-only played_courses/played_on_map fields, not a verified member-accessible catalogue-matched tracked-course total.
-- [ ] BLOCKED by CC2: Ben supplies an existing member-accessible authoritative live count source for catalogue courses with any tracked WHS round. No app/test edits made; no figures hardcoded.
-- [ ] After the count source is supplied, implement the signed-off zero-round cabinet/count/connect screen and CE1–CE4 tests; exclude Elsewhere and preserve all other screens except the explicitly requested count corrections.
+- [x] CHAMPIONS_STATE_1_R unblocks CA/CB/CD/CE and reverses CC2: use Ben's last verified catalogue snapshot, pending replacement.
+- [ ] Implement the signed-off zero-round cabinet/count/connect screen and derived catalogue sentence; exclude Elsewhere and preserve populated courses and You tab.
+- [ ] Run CE1–CE4 regression checks and reconcile suite counts; stop on any new failure or broken build.
 
 ## BRIEF_PROFILE_TABS_VOICE
 - [x] Confirm clbhouz; change only specified Courses/Rounds ownership copy and props, with name-free third-person fallbacks and the archive possessive fix.
