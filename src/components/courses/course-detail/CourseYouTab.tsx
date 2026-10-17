@@ -65,6 +65,9 @@ import type { YouRound } from './you/YourRoundsHere';
 import { useMomentPosts } from './you/YourMomentsSection';
 import { useAllMyRoundsAtCourse } from '@/hooks/feed/useMyRoundsAtCourse';
 import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
+import { useBoardCoursePlayers } from '@/components/explore-tab-new/courseled/hooks/useBoardCoursePlayers';
+import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFilters';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import {
@@ -111,6 +114,19 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   const { data: myRounds } = useMyRoundsAtCourse(courseId);
   const { data: rating } = useUserCourseRating(courseId, user?.id);
   const { courseRecord, courseRecordHolders, unclaimedCount } = useCourseRecordSummary(courseId, user?.id ?? null);
+  /* YOU_TAB_CIRCLE_NAMES_1 — ONE rounds-based source for the "who you know"
+     line: get_board_course_players, scope 'circle', window 'all'
+     (board_window_from maps 'all' to 1900-01-01, i.e. all time). The count
+     AND the names come from this call; circle_played from
+     get_course_stats_detail is no longer read on this tab. Only the
+     connected-never-played branch renders the line, so the read waits for
+     the status to settle. */
+  const circlePlayers = useBoardCoursePlayers(
+    user?.id,
+    courseId,
+    { ...DEFAULT_FILTERS, scope: 'circle', window: 'all' },
+    { limit: 50, enabled: !statusLoading && !hasTrackedRounds },
+  );
 
   const [openRoundId, setOpenRoundId] = React.useState<string | null>(null);
 
@@ -373,10 +389,20 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
       Number.isFinite(yourGolf.parOrBetterPct) &&
       yourGolf.courses > 0 &&
       (fieldKnown ? fieldParOrBetterPct != null && Number.isFinite(fieldParOrBetterPct) : true);
-    /* YOU_TAB_THIN_COURSE_2 R2 — the count stays rounds-based (courseStats).
-       Naming from the ratings read redefined "played" as "left a rating";
-       reverted. No rounds-based source with identities exists yet. */
-    const circlePlayed = courseStats?.circle_played ?? 0;
+    /* YOU_TAB_CIRCLE_NAMES_1 S2 — a member whose profile is not readable
+       (null display_name) is excluded from the count as well as the names,
+       so the number and the names always agree. "Played" means a logged
+       round, always: if the rounds-based source returns nothing, the line
+       does not render (S4). */
+    const readableCircle = (circlePlayers.data ?? []).filter(
+      (p) => p.display_name != null && p.display_name !== '',
+    );
+    const circleCount = readableCircle.length;
+    const circleShown = readableCircle.slice(0, 3);
+    const circleNames = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' }).format(
+      circleShown.map((p) => p.display_name!),
+    );
+    const circleOthers = circleCount - circleShown.length;
     return wrap(
       <div>
         <ProjectionSection
@@ -405,9 +431,30 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
           />
         ) : null}
         {upForGrabs}
-        {circlePlayed > 0 ? (
+        {circleCount > 0 ? (
           <AboutSection heading={t('courseDetail.youTab.circle.heading')}>
-            <YouSentence>{t('common:feed.courseSheet.circlePlayed', { count: circlePlayed })}</YouSentence>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>
+                {circleShown.map((p, i) => (
+                  <span key={p.user_id} style={{ marginLeft: i === 0 ? 0 : -7, display: 'inline-flex' }}>
+                    <SquircleAvatar
+                      size={22}
+                      src={p.profile_photo_url}
+                      alt={p.display_name ?? ''}
+                      userId={p.user_id}
+                      /* The canonical hairline ring, identical to the board's
+                         avatars. NO amber: an avatar is never amber. */
+                      hairlineRing
+                    />
+                  </span>
+                ))}
+              </span>
+              <YouSentence>
+                {circleOthers > 0
+                  ? t('courseDetail.youTab.circle.namedWithOthers', { names: circleNames, others: circleOthers })
+                  : t('courseDetail.youTab.circle.named', { names: circleNames, count: circleCount })}
+              </YouSentence>
+            </div>
           </AboutSection>
         ) : null}
         <AboutSection>
