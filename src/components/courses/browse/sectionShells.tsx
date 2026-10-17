@@ -30,7 +30,7 @@ import {
   WHO_CARD_RADIUS, WHO_CARD_W, WHO_FACE_H, WHO_FOOTER_PAD, WHO_PHOTO_H, WHO_RAIL_GAP,
 } from './WhoPlayingSection';
 import { REGION_GAP, REGION_TILE_H, REGION_TILES_NO_LEAD } from './ByRegionSection';
-import { PHOTO_FIGURE_COUNT, PHOTO_FIGURE_GAP, PHOTO_FIGURE_H, PHOTO_FIGURE_W } from './PhotoFigureCard';
+import { PHOTO_FIGURE_GAP, PHOTO_FIGURE_H, PHOTO_FIGURE_W } from './PhotoFigureCard';
 import { TOUGH_COUNT, TOUGH_GAP, TOUGH_TILE_H } from './HardestSection';
 
 const RAIL_CLIPPED: React.CSSProperties = { ...RAIL_BLEED, overflow: 'hidden' };
@@ -117,7 +117,7 @@ export function ByRegionShell() {
 }
 
 /** Most played and Highest rated: PhotoFigureCards, the real count per rail. */
-export function PhotoRailShell({ count = PHOTO_FIGURE_COUNT }: { count?: number } = {}) {
+export function PhotoRailShell({ count }: { count: number }) {
   return (
     <HeadShell>
       <div style={{ ...RAIL_CLIPPED, gap: PHOTO_FIGURE_GAP }}>

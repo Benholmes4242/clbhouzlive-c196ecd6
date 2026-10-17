@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_COURSES_HIGHEST_RATED_TEN
+- [x] Set Highest rated to ten; require per-rail loading counts; preserve Regulars and card geometry.
+- [x] Update the authorised limit assertion and add four focused cases.
+- [ ] Run the full suite and check the preview; report test inventory and authentication limits.
+
 ## BRIEF_CHAMPIONS_ELSEWHERE — CHAMPIONS_ELSEWHERE_1
 - [x] VA3: useTitlesInReach staleTime 0 -> 60_000 (hook had no callers; no reason to be live).
 - [x] CHAMPIONS_ELSEWHERE_R: built narrower (You {v} · {leader} to beat), link omitted, hook caller comment. Suite 1,542 -> 1,546.
