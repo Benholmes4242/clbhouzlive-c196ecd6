@@ -1,6 +1,7 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
 ## BRIEF_CHAMPIONS_STATE_3 / R / T
+- [ ] CHAMPIONS_STATE_3_G: initials-only transparent ghost avatar; replace the never-passed photo assertion with no-image and viewer-initials cases; run full suite (candidate inventory 1,531 → 1,532).
 - [x] Confirm clbhouz; read all three standing briefs and amended HTML.
 - [x] Extend coursePlay net/differential ranges and shared sentence selector; preserve You wording.
 - [x] Use A.FAINT and extend FlatBoardRow with the authorised ghost variant; remove duplicate ghost rendering.
