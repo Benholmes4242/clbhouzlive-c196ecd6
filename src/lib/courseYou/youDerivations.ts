@@ -34,6 +34,18 @@ export interface YouRoundInput {
 
 /** A season below this many rounds is omitted (P2.4) and has no ladder row (P2.2). */
 export const SEASON_MIN_ROUNDS = 5;
+/**
+ * BRIEF_YOU_TAB_THIN_COURSE_1 P1 — below this many tracked rounds the
+ * course-side figures do not claim to describe the course: no "Here" rate, no
+ * harder-than line, and the record is the best card logged here, not "the
+ * course record". Viewer-side figures (projection, course handicap, range)
+ * rest on the member's own differentials and are unaffected. Aligned with
+ * FIELD_CHART_MIN_ROUNDS, the field chart's visibility floor.
+ */
+export const COURSE_FIELD_MIN_ROUNDS = 5;
+/** P1 — the one gate. Null or unknown rounds means the claim cannot be made. */
+export const courseFieldKnown = (rounds: number | null | undefined): boolean =>
+  rounds != null && Number.isFinite(rounds) && rounds >= COURSE_FIELD_MIN_ROUNDS;
 /** "Broke 75": a gross strictly below this. */
 export const GOOD_ROUND_GROSS = 75;
 /** Below this many good rounds the "small set, whole set" line renders (P3.1). */
