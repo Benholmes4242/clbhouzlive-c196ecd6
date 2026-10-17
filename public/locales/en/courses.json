@@ -1105,6 +1105,23 @@
         "open": "Open",
         "allBoards": "All {{count}} boards ›"
       },
+      "fieldVerdict": {
+        "kicker": "What it does to people",
+        "title": "It takes {{shots}} shots off the field",
+        "over": "over par, on average",
+        "across_one": "across {{rounds}} round, every handicap",
+        "across_other": "across {{rounds}} rounds, every handicap",
+        "saidPre": "This is ",
+        "saidField": "the field at {{courseName}}",
+        "saidMid": ", not you. Connect your handicap and ",
+        "saidLine": "your own line is drawn straight over it",
+        "saidPost": " \u2014 including every round you played here before you connected."
+      },
+      "holeFacts": {
+        "hardest": "Hardest hole",
+        "letOff": "The let-off",
+        "costs": "The {{ordinal}} costs"
+      },
       "birdiesWaiting": {
         "title": "Eighteen holes waiting"
       },
