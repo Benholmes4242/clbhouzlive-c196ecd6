@@ -3,7 +3,7 @@ import { useStatBrowseList } from '../useStatBrowse';
 import { useSectionReady } from './PageLoadGate';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { fmtCount, playsToPar, plural, RAIL_BLEED } from './format';
-import { PhotoFigureCard, PHOTO_FIGURE_COUNT, PHOTO_FIGURE_GAP } from './PhotoFigureCard';
+import { PhotoFigureCard, MOST_PLAYED_COUNT, PHOTO_FIGURE_GAP } from './PhotoFigureCard';
 import { PhotoRailShell } from './sectionShells';
 
 /**
@@ -12,16 +12,16 @@ import { PhotoRailShell } from './sectionShells';
  * a per-course, per-index-band cell holds one member or none.
  */
 export function MostPlayedSection() {
-  const { rows, isLoading } = useStatBrowseList({ lens: 'played', country: null, region: null, limit: PHOTO_FIGURE_COUNT });
+  const { rows, isLoading } = useStatBrowseList({ lens: 'played', country: null, region: null, limit: MOST_PLAYED_COUNT });
   useSectionReady('mostPlayed', !isLoading);
-  if (isLoading) return <PhotoRailShell />;
+  if (isLoading) return <PhotoRailShell count={MOST_PLAYED_COUNT} />;
   if (rows.length === 0) return null;
 
   return (
     <section style={SECTION_WRAP}>
       <SectionHead tone="amber" kicker="Most played" title="The regulars" />
       <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: PHOTO_FIGURE_GAP, marginTop: HEAD_GAP }}>
-        {rows.slice(0, PHOTO_FIGURE_COUNT).map((row) => {
+        {rows.slice(0, MOST_PLAYED_COUNT).map((row) => {
           const pill = [row.members > 0 ? plural(row.members, 'member', 'members') : null, playsToPar(row.avg_to_par)]
             .filter(Boolean)
             .join(' \u00B7 ');
