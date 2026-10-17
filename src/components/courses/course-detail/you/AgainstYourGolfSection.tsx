@@ -12,9 +12,9 @@ import { YouSentence } from './youBits';
 
 interface Props {
   /**
-   * The field's par-or-better rate here. YOU_TAB_THIN_COURSE_1 P1 — null below
-   * COURSE_FIELD_MIN_ROUNDS: the "Here" row does not render, and the member's
-   * own rate stands alone rather than against two rounds.
+   * The field's par-or-better rate here. YOU_TAB_NO_GATE_1 U1 — no sample
+   * gate: the "Here" row renders from one tracked round; null only when the
+   * course has no hole analysis at all.
    */
   fieldParOrBetterPct: number | null;
   yourParOrBetterPct: number;
