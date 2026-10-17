@@ -20,8 +20,11 @@ import { YouSentence } from './youBits';
 /** Mock you-tab-final.html draws the chart at 96px. */
 const CHART_HEIGHT = 96;
 const GAP = 3;
-/** Visibility floor, not significance: the round count always sits beside the heading. */
-export const FIELD_CHART_MIN_ROUNDS = 5;
+/* YOU_TAB_STATE_AUDIT_1 W1 — FIELD_CHART_MIN_ROUNDS is deleted. There is no
+   visibility floor: the chart renders from ONE tracked round, and the round
+   count drives only the wording (fieldSample), never whether the section
+   appears. One threshold, one home: COURSE_FIELD_MIN_ROUNDS in
+   lib/courseYou/youDerivations.ts. */
 
 function barFill(h: CourseHole): string {
   const seg = courseBucketShares([h]);
