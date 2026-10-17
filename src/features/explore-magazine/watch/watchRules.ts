@@ -59,12 +59,6 @@ export function remainingLabel(row: Pick<HubRpcRow, 'duration_seconds'>, saved: 
   return left >= 60 ? `${Math.round(left / 60)} min left` : `${Math.max(1, Math.round(left))}s left`;
 }
 
-export function viewsLabel(n: number | null | undefined): string | null {
-  if (n == null) return null;
-  if (n >= 1000) return `${(n / 1000).toFixed(1).replace('.0', '')}k views`;
-  return `${n} ${n === 1 ? 'view' : 'views'}`;
-}
-
 export interface ReasonLine {
   text: string;
   hot: boolean;

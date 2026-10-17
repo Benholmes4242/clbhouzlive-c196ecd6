@@ -41,7 +41,7 @@ import {
 } from './videoUnit';
 import { useWatchClips } from './useWatchClips';
 import { useWatchVideos } from './useWatchVideos';
-import { useWatchProgress, useWatchViews } from './useWatchSignals';
+import { useWatchProgress } from './useWatchSignals';
 import {
   RAIL_EVERY,
   groupByMember,
@@ -52,7 +52,6 @@ import {
   reasonLine,
   remainingLabel,
   spreadByCreator,
-  viewsLabel,
 } from './watchRules';
 
 /**
@@ -261,8 +260,6 @@ export function WatchFeed({
     [onAll, rows, saved],
   );
 
-  const views = useWatchViews(useMemo(() => [...quickRows, ...longRows].map((r) => r.post_id), [quickRows, longRows]));
-  const viewsFor = (row: HubRpcRow) => (views.data ? viewsLabel(views.data.get(row.post_id) ?? 0) : null);
   const barFor = (row: HubRpcRow) => {
     const p = saved?.get(row.post_id);
     return isPartWatched(row, p) ? progressFraction(row, p) : null;
@@ -556,7 +553,6 @@ export function WatchFeed({
               {(() => {
                 const lead = quickRows[0];
                 const who = creatorName(lead);
-                const v = viewsFor(lead);
                 return (
                   <div style={{ padding: '0 14px 16px' }}>
                     <button type="button" data-watch-card="quick-lead" onClick={() => open('clip', quickPosts, quickRows, 0)} style={{ ...cardButton, width: '100%' }}>
@@ -574,9 +570,7 @@ export function WatchFeed({
                       <span style={{ marginTop: 10, fontSize: 16, fontWeight: 700, lineHeight: 1.26, color: A.INK }}>
                         {videoTitle(lead, t('amateur.watch.untitled', 'Untitled video'))}
                       </span>
-                      {who || v ? (
-                        <span style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.DIM }}>{[who, v].filter(Boolean).join(' \u00B7 ')}</span>
-                      ) : null}
+                      {who ? <span style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.DIM }}>{who}</span> : null}
                     </button>
                   </div>
                 );
@@ -585,7 +579,6 @@ export function WatchFeed({
                 {quickRows.slice(1).map((row, i) => {
                   const index = i + 1;
                   const who = creatorName(row);
-                  const v = viewsFor(row);
                   return (
                     <button key={`qh:${row.post_id}`} type="button" data-watch-card="quick" onClick={() => open('clip', quickPosts, quickRows, index)} style={{ ...cardButton, width: '100%', minWidth: 0 }}>
                       {/* N.2: no autoplay in a 3-across grid; only the lead plays. */}
@@ -593,9 +586,7 @@ export function WatchFeed({
                       <span style={{ ...clamp2, marginTop: 7, fontSize: 12.5, fontWeight: 600, lineHeight: 1.32 }}>
                         {videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}
                       </span>
-                      {/* N.1: at grid width the joined line truncated the views away; split it, grid only. */}
                       {who ? <span data-watch-sub="creator" style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.DIM }}>{who}</span> : null}
-                      {v ? <span data-watch-sub="views" style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.DIM }}>{v}</span> : null}
                       {onYourCourse(row) && row.course_name ? (
                         <span style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.AMBER }}>{row.course_name}</span>
                       ) : null}
@@ -610,7 +601,6 @@ export function WatchFeed({
               <QuickLayout grid={false}>
                 {quickRows.map((row, index) => {
                   const who = creatorName(row);
-                  const v = viewsFor(row);
                   return (
                     <button key={`qh:${row.post_id}`} type="button" data-watch-card="quick" onClick={() => open('clip', quickPosts, quickRows, index)} style={{ ...cardButton, width: quickGrid ? '100%' : QH_W, minWidth: 0 }}>
                       {/* N.2: no autoplay in a 3-across grid — three equally central tiles, one playing, reads as failure. */}
@@ -618,15 +608,7 @@ export function WatchFeed({
                       <span style={{ ...clamp2, marginTop: 7, fontSize: 12, fontWeight: 600, lineHeight: 1.3 }}>
                         {videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}
                       </span>
-                      {quickGrid ? (
-                        /* N.1: at grid width the joined line truncated the views away; split it, grid only. */
-                        <>
-                          {who ? <span data-watch-sub="creator" style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{who}</span> : null}
-                          {v ? <span data-watch-sub="views" style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{v}</span> : null}
-                        </>
-                      ) : who || v ? (
-                        <span style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{[who, v].filter(Boolean).join(' \u00B7 ')}</span>
-                      ) : null}
+                      {who ? <span data-watch-sub="creator" style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{who}</span> : null}
                       {onYourCourse(row) && row.course_name ? (
                         <span style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.AMBER }}>{row.course_name}</span>
                       ) : null}
@@ -667,7 +649,6 @@ export function WatchFeed({
                     <VideoCard
                       row={row}
                       onPress={() => open('video', longPosts, longRows, index)}
-                      views={viewsFor(row)}
                       progress={barFor(row)}
                       reason={reasonLine({
                         partWatched: part,
