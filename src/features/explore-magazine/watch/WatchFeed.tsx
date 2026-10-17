@@ -328,11 +328,9 @@ export function WatchFeed({
           ? t('amateur.watch.chip.long', 'Long form')
           : key === 'friends'
             ? t('amateur.watch.chip.friends', 'Friends')
-            : key === 'your_courses'
-              ? t('amateur.watch.chip.yourCourses', 'Your courses')
-              : key === 'community'
-                ? t('amateur.watch.chip.community', 'Community')
-                : (key satisfies never);
+            : key === 'community'
+              ? t('amateur.watch.chip.community', 'Community')
+              : (key satisfies never);
   const chips = WATCH_CHIPS.map((key) => ({ id: key, label: chipLabel(key) }));
 
   const openMoment = (moment: Moment) => {
@@ -476,8 +474,11 @@ export function WatchFeed({
       <div
         style={
           quickGrid
-            ? /* BC.1 — sticky, opaque chips in the full view only. */
-              { position: 'sticky', top: 'var(--chrome-total-h, 0px)', zIndex: 3, background: PAGE_CANVAS, paddingInline: 16, paddingBlock: '8px 6px' }
+            ? /* BC.1 — sticky, opaque chips in the full view only. The upward
+                 box-shadow bridges the gap to the tab bar with the same canvas,
+                 so the band never reads as divider lines above and below the
+                 pills when content scrolls behind it. */
+              { position: 'sticky', top: 'var(--chrome-total-h, 0px)', zIndex: 3, background: PAGE_CANVAS, boxShadow: `0 -16px 0 0 ${PAGE_CANVAS}`, paddingInline: 16, paddingBlock: '8px 6px' }
             : { paddingInline: 16, paddingBottom: 4 }
         }
       >
@@ -657,7 +658,7 @@ export function WatchFeed({
           ) : null}
           {longRows.length > 0 ? (
             <>
-              <Section title={filter === 'your_courses' ? t('amateur.watch.rail.fromYourCourses', 'From your courses') : t('amateur.watch.rail.watch', 'Watch')} />
+              <Section title={t('amateur.watch.rail.watch', 'Watch')} />
               {longRows.map((row, index) => {
                 const p = saved?.get(row.post_id);
                 const part = isPartWatched(row, p);
