@@ -52,8 +52,40 @@ export function selectedDefence(category: LegendCategory, grouped: FieldChampion
 
 const LEGEND: Array<[string, string | null]> = [['Yours', MEDAL_GOLD], ['In reach', A.AMBER], ['Held', A.DIM], ['Never claimed', null]];
 
+const SINGULAR: Record<string, string> = { birdies: 'birdie', eagles: 'eagle', aces: 'ace', albatrosses: 'albatross', rounds: 'round' };
+const article = (noun: string) => (/^[aeiou]/.test(noun) ? 'an ' : 'a ') + noun;
+/** Unit for headline figures. Score boards count shots; Stableford counts points. */
+function boardUnit(category: LegendCategory): string {
+  const data = CHAMPIONS_BOARD_DATA[category];
+  if (data.kind === 'cumulative') return data.name;
+  return data.kind === 'not-projectable' ? 'points' : 'shots';
+}
+const monthName = (date: Date) => date.toLocaleDateString('en-GB', { month: 'long', timeZone: 'Europe/London' });
+function heldFor(since: string | null | undefined, now = new Date()): string | null {
+  if (!since) return null;
+  const days = Math.max(0, Math.floor((now.getTime() - new Date(since).getTime()) / 86400000));
+  if (days < 14) return `${numberWord(days, false)} ${days === 1 ? 'day' : 'days'}`;
+  if (days < 60) { const w = Math.floor(days / 7); return `${numberWord(w, false)} weeks`; }
+  const months = Math.floor(days / 30.44);
+  if (months < 24) return `${numberWord(months, false)} months`;
+  const years = Math.floor(months / 12);
+  return `${numberWord(years, false)} years`;
+}
+
+/** CHAMPIONS_STATE_4_COPY TB3: in-reach clause, then never-claimed clause. */
+export function cabinetLede(categories: readonly LegendCategory[], states: Map<LegendCategory, { state: CabinetState; gap?: number }>): string | null {
+  const reach = categories.filter(key => states.get(key)?.state === 'in-reach');
+  const open = categories.filter(key => states.get(key)?.state === 'never-claimed');
+  const clauses: string[] = [];
+  if (reach.length === 1 && CHAMPIONS_BOARD_DATA[reach[0]].kind === 'cumulative' && states.get(reach[0])?.gap === 1) {
+    clauses.push(`One more is a single ${SINGULAR[CHAMPIONS_BOARD_DATA[reach[0]].name]} away`);
+  } else if (reach.length) clauses.push(`${numberWord(reach.length)} more ${reach.length === 1 ? 'is' : 'are'} within reach`);
+  if (open.length) clauses.push(`${clauses.length ? numberWord(open.length, false) : numberWord(open.length)} ${open.length === 1 ? 'has' : 'have'} never been claimed by anybody`);
+  return clauses.length ? `${clauses.join(', and ')}.` : null;
+}
+
 export function PostedChampions(props: PostedChampionsProps) {
-  const { categories, grouped, activeKey, legendWindow } = props;
+  const { categories, grouped, activeKey, legendWindow, rounds } = props;
   const keys = categories.map(category => category.key);
   const holders = new Map(keys.flatMap(key => {
     const rows = grouped.get(key)?.rows.filter(row => row.rank === 1) ?? [];
@@ -61,51 +93,65 @@ export function PostedChampions(props: PostedChampionsProps) {
   }));
   const states = postedStates(keys, grouped);
   const yours = keys.filter(key => states.get(key)?.state === 'yours');
-  const reach = keys.filter(key => states.get(key)?.state === 'in-reach');
-  const reachNames = new Intl.ListFormat('en-GB', { style: 'long', type: 'conjunction' }).format(reach.map(key => CHAMPIONS_BOARD_DATA[key].name));
+  const lede = cabinetLede(keys, states);
+  const openFeats = keys.filter(key => states.get(key)?.state === 'never-claimed' && CHAMPIONS_BOARD_DATA[key].kind === 'cumulative');
+  const openNames = new Intl.ListFormat('en-GB', { style: 'long', type: 'disjunction' }).format(openFeats.map(key => article(SINGULAR[CHAMPIONS_BOARD_DATA[key].name])));
   const owned = selectedDefence(activeKey, grouped);
   return <div className="champions-empty champions-posted" style={{ color: A.INK }}>
     <section className="champions-empty-section">
-      <div className="champions-empty-kicker" style={{ color: A.AMBER }}>Your cards here</div>
-      <h2 data-yours-count={yours.length} data-board-count={keys.length}>You hold {numberWord(yours.length, false)} of {numberWord(keys.length, false)}</h2>
-      <div className="champions-empty-lede" style={{ color: A.MUTE }} data-reach-count={reach.length}>{reach.length ? `What you have posted here already reaches the ${reachNames} ${reach.length === 1 ? 'board' : 'boards'}.` : 'Nothing you have posted here reaches another board yet.'}</div>
+      <div className="champions-empty-kicker" style={{ color: A.AMBER }}>Your cabinet here</div>
+      <h2 data-yours-count={yours.length} data-board-count={keys.length}>{numberWord(yours.length)} of the {numberWord(keys.length, false)} are yours</h2>
+      {lede && <div className="champions-empty-lede" style={{ color: A.MUTE }}>{lede}</div>}
       <ChampionsCabinet categories={keys} holders={holders} states={states} activeKey={activeKey} onSelect={props.onSelect} />
       <div className="champions-cabinet-legend" aria-label="Board states" style={{ color: A.DIM }}>
         {LEGEND.map(([label, tone]) => <div className="champions-cabinet-legend-entry" key={label}><span className="champions-cabinet-swatch" style={tone ? { background: tone, border: 0 } : undefined} />{label}</div>)}
       </div>
+      {openFeats.length > 0 && rounds != null && <div className="champions-empty-said" style={{ color: A.BODY }}>Nobody has made {openNames} here in {rounds.toLocaleString('en-GB')} recorded rounds. {openFeats.length === 1 ? 'That one has been open since the course was added and the first player to do it takes it outright.' : `Those ${numberWord(openFeats.length, false)} have been open since the course was added and the first player to do it takes them outright.`}</div>}
     </section>
     <BoardSection categories={categories} grouped={grouped} activeKey={activeKey} onSelectCategory={props.onSelect} legendWindow={legendWindow} canSwitchWindow onWindowChange={props.onWindowChange} coursePar={props.par} onOpenFull={props.onOpenFull} onRowPress={props.onRowPress} hasTrackedRounds postedScreen />
-    {owned ? <DefencePanel category={activeKey} {...owned} /> : <WhatItTakes category={activeKey} grouped={grouped} />}
+    {owned ? <DefencePanel category={activeKey} attainedAt={grouped.get(activeKey)?.rows.find(row => row.isSelf)?.attained_at ?? null} {...owned} /> : <WhatItTakes category={activeKey} grouped={grouped} />}
   </div>;
 }
 
+/* CHAMPIONS_STATE_4_COPY TC2/TC3: "Your last 20", "Course handicap" and the
+ * monument sentence need per-card history this screen does not read; the
+ * counting-board stat set and the near-miss sentence are not drawn. None is
+ * invented here — they are reported gaps awaiting the mock. */
 function WhatItTakes({ category, grouped }: { category: LegendCategory; grouped: FieldChampionsProps['grouped'] }) {
   const rows = grouped.get(category)?.rows ?? [];
   const record = rows.find(row => row.rank === 1);
   const self = rows.find(row => row.isSelf);
-  const name = CHAMPIONS_BOARD_DATA[category].name;
+  const cumulative = CHAMPIONS_BOARD_DATA[category].kind === 'cumulative';
+  const gap = record && self ? Math.round(Math.abs(record.value - self.value)) : null;
   return <section className="champions-empty-section" data-section="what-it-takes">
     <div className="champions-empty-kicker" style={{ color: A.AMBER }}>What it takes</div>
-    <h2>{record ? `The ${name} record is ${record.valueDisplay}` : `Nobody holds the ${name} board`}</h2>
+    {gap != null && gap > 0 && <h2>{numberWord(gap)} {cumulative ? 'more than you have ever made here' : 'shots better than you have ever played here'}</h2>}
     <div className="champions-field-panel" style={{ background: A.PANEL }}>
-      <div className="champions-field-stats">{[[record?.valueDisplay ?? '—', 'The record'], [self?.valueDisplay ?? '—', 'Your best here'], [record && self ? String(Number(Math.abs(record.value - self.value).toFixed(1))) : '—', 'The gap']].map(([value, label]) => <div key={label}><strong style={label === 'The record' ? { color: MEDAL_GOLD } : undefined}>{value}</strong><span style={{ color: A.DIM }}>{label}</span></div>)}</div>
+      {record && <div className="champions-field-record"><strong style={{ color: MEDAL_GOLD, fontSize: 32 }}>{record.valueDisplay}</strong><span style={{ color: A.MUTE }}>takes it<br />outright</span></div>}
+      {!cumulative && <div className="champions-field-stats">{[[record?.valueDisplay ?? '—', 'The record'], [self?.valueDisplay ?? '—', 'Your best here']].map(([value, label]) => <div key={label}><strong>{value}</strong><span style={{ color: A.DIM }}>{label}</span></div>)}</div>}
     </div>
   </section>;
 }
 
-function DefencePanel({ category, rival, defence, own90, rival90 }: { category: LegendCategory; rival: FlatRow | null; defence: Defence | null; own90: number | null; rival90: number | null }) {
-  const name = CHAMPIONS_BOARD_DATA[category].name;
+function DefencePanel({ category, rival, defence, own90, rival90, attainedAt }: { category: LegendCategory; rival: FlatRow | null; defence: Defence | null; own90: number | null; rival90: number | null; attainedAt: string | null }) {
+  const unit = boardUnit(category);
   const closing = defence?.trend === 'closing';
   const max = Math.max(own90 ?? 0, rival90 ?? 0, 1);
+  const since = new Date(Date.now() - 90 * 86400000);
+  const held = heldFor(attainedAt);
+  const title = !rival ? 'Nobody else is on this board' : closing ? `${rival.name} is closing` : 'Nobody is closing on you';
   return <section className="champions-empty-section" data-section="your-defence" data-trend={defence?.trend ?? 'no-rival'}>
     <div className="champions-empty-kicker" style={{ color: MEDAL_GOLD }}>Your defence</div>
-    <h2>{rival ? `${defence?.margin} clear of ${rival.name}` : `Nobody else is on the ${name} board`}</h2>
+    <h2>{title}</h2>
     {rival && <div className="champions-field-panel" style={{ background: A.PANEL }}>
-      <div className="champions-field-stats">{([[String(defence?.margin ?? '—'), 'Your margin'], ...(closing ? [[`+${defence?.gain90}`, 'Their 90-day gain'], [defence?.date ? defence.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Europe/London' }) : 'Beyond a year', 'At this rate']] : [])] as string[][]).map(([value, label]) => <div key={label}><strong>{value}</strong><span style={{ color: A.DIM }}>{label}</span></div>)}</div>
+      <div className="champions-field-record"><strong style={{ color: MEDAL_GOLD, fontSize: 32 }}>{defence?.margin}</strong><span style={{ color: A.MUTE }}>{unit}<br />clear</span></div>
+      <div className="champions-field-stats">{([[own90 != null ? `+${own90}` : '—', 'You'], [rival90 != null ? `+${rival90}` : '—', rival.name], ...(closing ? [[`+${defence?.gain90}`, `${rival.name} gains a quarter`], [defence?.date ? monthName(defence.date) : 'Beyond a year', `${rival.name} passes you`]] : [])] as string[][]).map(([value, label]) => <div key={label}><strong>{value}</strong><span style={{ color: A.DIM }}>{label}</span></div>)}</div>
       {CHAMPIONS_BOARD_DATA[category].kind === 'cumulative' && own90 != null && rival90 != null && <div className="champions-defence-bars" aria-label="Last 90 days">
-        {[['You', own90, MEDAL_GOLD], [rival.name, rival90, A.DIM]].map(([who, value, tone]) => <div className="champions-defence-track" key={String(who)}><div className="champions-defence-bar" style={{ width: `${Number(value) / max * 100}%`, background: String(tone) }} /><span style={{ color: A.MUTE }}>{who} · {value}</span></div>)}
+        <div className="champions-empty-kicker" style={{ color: A.DIM }}>LAST 90 DAYS</div>
+        {[[`You +${own90}`, own90, MEDAL_GOLD], [`${rival.name} +${rival90}`, rival90, A.DIM]].map(([caption, value, tone]) => <div className="champions-defence-track" key={String(caption)}><div className="champions-defence-bar" style={{ width: `${Number(value) / max * 100}%`, background: String(tone) }} /><span style={{ color: A.MUTE }}>{caption}</span></div>)}
       </div>}
     </div>}
-    <div className="champions-empty-said" style={{ color: A.MUTE }}>{closing ? 'The date assumes both of you keep posting at your last 90 days\u2019 rate. It is a pace, not a prediction.' : defence?.trend === 'unknown' ? 'There is no honest pace for this board, so no date is given.' : rival ? 'Over the last 90 days nobody is closing on you.' : 'The first card from anyone else starts the chase.'}</div>
+    {closing && rival && rival90 != null && own90 != null && defence?.date && <div className="champions-empty-said" style={{ borderColor: MEDAL_GOLD, color: A.BODY }}>{rival.name} has added {rival90} {unit} here since {monthName(since)} to your {own90}. At that rate {rival.name} takes this board in {monthName(defence.date)}.{held ? ` You have held it for ${held}.` : ''}</div>}
+    <div className="champions-empty-said" style={{ color: A.MUTE }}>{closing ? 'A rate is not a promise \u2014 it is the last ninety days carried forward, and ninety days of anybody\u2019s golf can turn. It is here because a board you cannot lose is not worth holding.' : defence?.trend === 'unknown' ? 'There is no honest pace for this board, so no date is given.' : rival ? 'Over the last 90 days nobody is closing on you.' : 'The first card from anyone else starts the chase.'}</div>
   </section>;
 }

@@ -282,7 +282,7 @@ export const FlatBoardRow: React.FC<{
           {ghost ? 'You would sit here' : row.isSelf ? 'You' : row.name}
         </span>
         <span style={{ display: 'block', marginTop: 3, fontSize: 11, fontWeight: 500, color: ghost ? A.FAINT : A.DIM }}>
-          {ghost ? 'Projected, not played' : `${formatChampionsWhen(row.attained_at)}${pinned ? ' · Your best here' : ''}`}
+          {ghost ? 'Projected, not played' : `${formatChampionsWhen(row.attained_at)}${pinned ? ' · your best here' : ''}`}
         </span>
         {!ghost && deficit ? (
           <span style={{ ...NUM, display: 'block', marginTop: 3, fontSize: 11, fontWeight: 600, color: A.DIM }}>
