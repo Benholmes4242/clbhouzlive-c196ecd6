@@ -47,24 +47,28 @@ const UpForGrabsSection: React.FC<Props> = ({
   const nm = (h: CourseLegendRow | undefined) => h?.user_display_name ?? fallbackName;
   const others = holders.filter((h) => !h.is_self);
   const value = recordValue != null ? formatLegendValueCompact('lowest_gross_all_time', recordValue) : '';
+  /* P1 — on a thin field the same figures are labelled the best card logged
+     here; the "course record" noun is reserved for a field that clears the
+     minimum. */
+  const k = (key: string) => `courseDetail.youTab.grabs.${thinField ? `${key}Thin` : key}`;
   const joint = holders.length >= 2
     ? holderIsYou
       ? holders.length === 2
-        ? t('courseDetail.youTab.grabs.yoursJointTwo', { other: nm(others[0]), value })
-        : t('courseDetail.youTab.grabs.yoursJointMany', { count: holders.length - 1, value })
+        ? t(k('yoursJointTwo'), { other: nm(others[0]), value })
+        : t(k('yoursJointMany'), { count: holders.length - 1, value })
       : holders.length === 2
-        ? t('courseDetail.youTab.grabs.heldJointTwo', { first: nm(holders[0]), second: nm(holders[1]), value })
-        : t('courseDetail.youTab.grabs.heldJointMany', { first: nm(holders[0]), count: holders.length - 1, value })
+        ? t(k('heldJointTwo'), { first: nm(holders[0]), second: nm(holders[1]), value })
+        : t(k('heldJointMany'), { first: nm(holders[0]), count: holders.length - 1, value })
     : null;
 
   const body = recordValue != null && joint
     ? joint
     : recordValue != null
     ? holderIsYou
-      ? t('courseDetail.youTab.grabs.yours', {
+      ? t(k('yours'), {
           value: formatLegendValueCompact('lowest_gross_all_time', recordValue),
         })
-      : t('courseDetail.youTab.grabs.held', {
+      : t(k('held'), {
           name: nm(holders[0]),
           value: formatLegendValueCompact('lowest_gross_all_time', recordValue),
         })
