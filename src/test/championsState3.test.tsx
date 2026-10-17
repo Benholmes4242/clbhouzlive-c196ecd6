@@ -94,11 +94,25 @@ describe('CHAMPIONS_STATE_3 / CHAMPIONS_STATE_3_R / CHAMPIONS_STATE_3_T', () => 
     expect(container.querySelector('[data-ghost-rank]')?.textContent).toBe('');
     expect(container.querySelector('[data-projection-ghost] svg')).toBeNull();
   });
-  it('ghost identity is supplied by the signed-in profile, never the holder', () => {
-    const { container } = render(<ProjectedChampions {...props()} />);
-    expect(container.querySelector('[data-projection-ghost]')?.textContent).toContain('Projected, not played');
-    expect(container.querySelector('[data-projection-ghost]')?.textContent).not.toContain('Member 76');
-    expect(container.querySelector('[data-projection-ghost] [aria-hidden] div')?.getAttribute('style')).toContain('viewer.jpg');
+  it('CHAMPIONS_STATE_3_G: ghost loads no image even when viewer and holder both have photos', () => {
+    const p = props();
+    p.grouped.set(p.activeKey, { rows: [{ ...row(76, 'Alice Stone'), photoUrl: 'https://example.test/holder.jpg' }], total: 1 });
+    const { container } = render(<ProjectedChampions {...p} />);
+    const ghost = container.querySelector('[data-projection-ghost]');
+    expect(ghost).not.toBeNull();
+    expect(ghost?.querySelector('img, image, picture, source, [src], [srcset]')).toBeNull();
+    expect(ghost?.outerHTML).not.toMatch(/url\(|viewer\.jpg|holder\.jpg/);
+    // The opt-in ghost must not suppress the real holder's photo.
+    expect(Array.from(container.querySelectorAll('button:not([data-projection-ghost])')).some(el => el.outerHTML.includes('holder.jpg'))).toBe(true);
+  });
+  it('CHAMPIONS_STATE_3_G: ghost initials belong to the signed-in viewer, never the holder', () => {
+    const p = props();
+    p.grouped.set(p.activeKey, { rows: [{ ...row(76, 'Alice Stone'), photoUrl: 'https://example.test/holder.jpg' }], total: 1 });
+    const { container } = render(<ProjectedChampions {...p} />);
+    const ghost = container.querySelector('[data-projection-ghost]');
+    expect(ghost?.textContent).toContain('Projected, not played');
+    expect(ghost?.querySelector('[aria-hidden]')?.textContent).toBe('BH');
+    expect(ghost?.querySelector('[aria-hidden]')?.textContent).not.toBe('AS');
   });
   it('the All count and full-list action include posted rows only', () => {
     const p = props();

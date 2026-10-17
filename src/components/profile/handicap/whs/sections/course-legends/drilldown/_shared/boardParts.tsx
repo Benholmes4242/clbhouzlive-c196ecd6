@@ -47,7 +47,8 @@ export function hasAnyMovement(
 const SQUIRCLE_MASK_URL =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E\")";
 
-/** 26px squircle with the canonical 1px traced hairline ring. */
+/** Real rows retain their photo and hairline. CHAMPIONS_STATE_3_G ghosts
+ * use viewer initials only, on transparent ground with the dashed ring. */
 export const CourseLegendsAvatar: React.FC<{ photoUrl: string | null; name: string; size?: number; ghost?: boolean }>  = ({
   photoUrl,
   name,
@@ -68,7 +69,7 @@ export const CourseLegendsAvatar: React.FC<{ photoUrl: string | null; name: stri
         style={{
           position: 'absolute',
           inset: 0,
-          background: ghost && !photoUrl ? A.PANEL : photoUrl
+          background: ghost ? 'transparent' : photoUrl
             ? `url(${photoUrl}) center/cover`
             : 'linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%)',
           borderRadius: '34%',
@@ -87,7 +88,7 @@ export const CourseLegendsAvatar: React.FC<{ photoUrl: string | null; name: stri
           fontWeight: 700,
         }}
       >
-        {!photoUrl && initials}
+        {(ghost || !photoUrl) && initials}
       </div>
       <div
         style={{
