@@ -587,6 +587,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
           inputs={projectionInputs}
           viewer={{ name: profile?.display_name ?? 'You', photoUrl: profile?.profile_photo_url ?? null }}
         /> : hasPlayed ? <PostedChampions
+          inputs={projectionInputs}
           categories={fieldCategories.map(key => ({ key, label: legendCategoryLabel[key], short: SHORT_LABELS[key] }))}
           grouped={grouped}
           courseName={ctx.courseName}
