@@ -444,7 +444,15 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     const circleOthers = circle.others;
     return wrap(
       <div>
-        {zeroRounds ? <UnclaimedCourseSection openBoards={unclaimedCount} /> : null}
+        {zeroRounds ? (
+          <UnclaimedCourseSection
+            openBoards={unclaimedCount}
+            onAllBoards={() => {
+              analyticsEvents.track('course_you_all_boards', { course_id: courseId });
+              onTabChange?.('legends');
+            }}
+          />
+        ) : null}
         <ProjectionSection
           courseName={courseName}
           state={projectionState}
