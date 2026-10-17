@@ -570,9 +570,7 @@ export function WatchFeed({
                       <span style={{ marginTop: 10, fontSize: 16, fontWeight: 700, lineHeight: 1.26, color: A.INK }}>
                         {videoTitle(lead, t('amateur.watch.untitled', 'Untitled video'))}
                       </span>
-                      {who || v ? (
-                        <span style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.DIM }}>{[who, v].filter(Boolean).join(' \u00B7 ')}</span>
-                      ) : null}
+                      {who ? <span style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.DIM }}>{who}</span> : null}
                     </button>
                   </div>
                 );
@@ -610,15 +608,7 @@ export function WatchFeed({
                       <span style={{ ...clamp2, marginTop: 7, fontSize: 12, fontWeight: 600, lineHeight: 1.3 }}>
                         {videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}
                       </span>
-                      {quickGrid ? (
-                        /* N.1: at grid width the joined line truncated the views away; split it, grid only. */
-                        <>
-                          {who ? <span data-watch-sub="creator" style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{who}</span> : null}
-                          {v ? <span data-watch-sub="views" style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{v}</span> : null}
-                        </>
-                      ) : who || v ? (
-                        <span style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{[who, v].filter(Boolean).join(' \u00B7 ')}</span>
-                      ) : null}
+                      {who ? <span data-watch-sub="creator" style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.DIM }}>{who}</span> : null}
                       {onYourCourse(row) && row.course_name ? (
                         <span style={{ ...oneLine, marginTop: 3, fontSize: 11, color: A.AMBER }}>{row.course_name}</span>
                       ) : null}
