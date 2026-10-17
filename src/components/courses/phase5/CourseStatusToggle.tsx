@@ -82,7 +82,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
 
   return (
     <Panel style={{ fontFamily: SANS }}>
-      <div style={{ ...LABEL, marginBottom: 10 }}>{t('courseDetail.you.wantToPlay')}</div>
+      {/* YOU_TAB_THIN_COURSE_1 P5 — no kicker: it repeated the pill's own words. */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <button
           type="button"

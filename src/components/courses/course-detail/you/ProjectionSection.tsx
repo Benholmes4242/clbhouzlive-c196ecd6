@@ -155,7 +155,7 @@ const ProjectionSection: React.FC<Props> = ({ courseName, state, recordGross, fi
               gap: toHandicap - recordGross,
             });
     return (
-      <AboutSection first heading={heading}>
+      <AboutSection first heading={heading} wrapHeading>
         <Hero
           figure={String(toHandicap)}
           unit={t('courseDetail.youTab.projection.offHandicap')}
@@ -208,7 +208,7 @@ const ProjectionSection: React.FC<Props> = ({ courseName, state, recordGross, fi
           });
 
   return (
-    <AboutSection first heading={heading}>
+    <AboutSection first heading={heading} wrapHeading>
       <Hero
         figure={String(p.typicalGross)}
         unit={t('courseDetail.youTab.projection.typically')}
