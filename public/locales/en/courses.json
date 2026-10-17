@@ -1112,7 +1112,13 @@
         "heldJointTwo": "{{first}} and {{second}} jointly hold the course record here with {{value}}.",
         "heldJointMany": "{{first}} and {{count}} others jointly hold the course record here with {{value}}.",
         "yoursJointTwo": "You and {{other}} jointly hold the course record here with {{value}}.",
-        "yoursJointMany": "You and {{count}} others jointly hold the course record here with {{value}}."
+        "yoursJointMany": "You and {{count}} others jointly hold the course record here with {{value}}.",
+        "heldThin": "{{name}} has the best card logged here with {{value}}.",
+        "yoursThin": "You have the best card logged here with {{value}}.",
+        "heldJointTwoThin": "{{first}} and {{second}} jointly have the best card logged here with {{value}}.",
+        "heldJointManyThin": "{{first}} and {{count}} others jointly have the best card logged here with {{value}}.",
+        "yoursJointTwoThin": "You and {{other}} jointly have the best card logged here with {{value}}.",
+        "yoursJointManyThin": "You and {{count}} others jointly have the best card logged here with {{value}}."
       },
       "momentsMeta": "{{moments}}",
       "notPlayed": {
@@ -1173,6 +1179,8 @@
         "recordMark": "Record {{gross}}",
         "range": "Your range here is {{low}} to {{high}}.",
         "rangeWithRecord": "Your range here is {{low}} to {{high}}. The record is {{record}} — you have played to that standard {{count}} times in your last {{sample}} rounds.",
+        "rangeWithRecordThin_one": "Your range here is {{low}} to {{high}}. Only {{count}} round has been logged here, so the best of them — {{record}} — is what there is to beat.",
+        "rangeWithRecordThin_other": "Your range here is {{low}} to {{high}}. Only {{count}} rounds have been logged here, so the best of them — {{record}} — is what there is to beat.",
         "rangeWithRecordUnbeaten": "Your range here is {{low}} to {{high}}. The record is {{record}}, {{gap}} under your typical round.",
         "basis": "Your last {{sample}} differentials, converted at this course's rating and slope.",
         "fieldLead": "the field",
@@ -1197,10 +1205,14 @@
         "meta_other": "{{courses}} courses",
         "here": "Here",
         "you": "You, so far",
-        "basis": "Holes played in par or better."
+        "basis": "Holes played in par or better.",
+        "harderThan": "On average over par, this course plays harder than {{pct}}% of the courses we track."
       },
       "circle": {
-        "heading": "Who you know has played it"
+        "heading": "Who you know has played it",
+        "namedOne": "{{name}} in your circle has played it.",
+        "namedAll": "{{names}} in your circle have played it.",
+        "namedMore": "{{names}} and {{count}} others in your circle have played it."
       },
       "actions": {
         "playingSoon": "Playing it soon?",
