@@ -33,7 +33,7 @@ export function postedStates(categories: readonly LegendCategory[], grouped: Fie
     const self = rows.find(row => row.isSelf);
     const posted: PostedBoard = self ? { value: self.value, low: self.value, high: self.value } : { value: null, low: null, high: null };
     const result = championsReach('posted', category, standing, { posted, owns: self?.rank === 1 });
-    return [category, result.state === 'in-reach' ? { state: result.state } : result];
+    return [category, result];
   }));
 }
 
