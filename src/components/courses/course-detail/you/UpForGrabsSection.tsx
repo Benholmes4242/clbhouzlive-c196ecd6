@@ -23,6 +23,12 @@ interface Props {
   unclaimedCount: number;
   /** The member's own best gross here, when they have played. */
   yourBest: number | null;
+  /**
+   * YOU_TAB_THIN_COURSE_1 P1 — true below COURSE_FIELD_MIN_ROUNDS tracked
+   * rounds: the record still renders but is labelled the best card logged
+   * here, never "the course record".
+   */
+  thinField?: boolean;
   onAllBoards: () => void;
 }
 
@@ -31,6 +37,7 @@ const UpForGrabsSection: React.FC<Props> = ({
   holders,
   unclaimedCount,
   yourBest,
+  thinField = false,
   onAllBoards,
 }) => {
   const { t } = useTranslation('courses');
