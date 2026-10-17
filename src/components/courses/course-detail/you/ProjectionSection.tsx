@@ -109,7 +109,7 @@ const ProjectionSection: React.FC<Props> = ({ courseName, state, recordGross, fi
 
   if (state.kind === 'compare') {
     return (
-      <AboutSection first heading={heading}>
+      <AboutSection first heading={heading} wrapHeading>
         <Hero
           figure={signed1(state.fieldOverPar)}
           unit={t('courseDetail.youTab.projection.fieldLead')}
