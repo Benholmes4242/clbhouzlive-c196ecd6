@@ -15,7 +15,6 @@ import { A, BAR_RADIUS, FIGS, SANS } from '@/features/courses/components/holes/a
 import {
   axisScale,
   courseHandicap,
-  timesPlayedToStandard,
   type CoursePlayInputs,
   type CourseProjection,
 } from '@/lib/whs/coursePlay';
@@ -102,6 +101,13 @@ interface Props {
   thinField?: boolean;
 }
 
+/** AB1 — which of the three record sentences applies. Gross: lower is better. */
+export function recordAgainstRange(record: number, low: number, high: number): 'rangeRecordAbove' | 'rangeRecordInside' | 'rangeRecordBelow' {
+  if (record > high) return 'rangeRecordAbove';
+  if (record < low) return 'rangeRecordBelow';
+  return 'rangeRecordInside';
+}
+
 const ProjectionSection: React.FC<Props> = ({ courseName, state, recordGross, fieldRounds = null, thinField = false }) => {
   const { t } = useTranslation('courses');
   if (state.kind === 'none') return null;
@@ -180,8 +186,9 @@ const ProjectionSection: React.FC<Props> = ({ courseName, state, recordGross, fi
 
   const { projection: p, differentials } = state;
   const { pos } = axisScale(p.lowGross, p.highGross, recordGross);
-  const times =
-    recordGross != null ? timesPlayedToStandard(differentials, recordGross, inputs.cr, inputs.slope) : 0;
+  /* YOU_TAB_STATE_3 AB1 — at or above the field minimum the record sentence
+     compares the record with the range already drawn: above the top, inside,
+     or below the bottom. AB2 — the thin-course wording still wins below it. */
   const payoff =
     recordGross == null
       ? t('courseDetail.youTab.projection.range', { low: p.lowGross, high: p.highGross })
@@ -192,19 +199,10 @@ const ProjectionSection: React.FC<Props> = ({ courseName, state, recordGross, fi
             record: recordGross,
             count: fieldRounds ?? 0,
           })
-        : times >= 1
-        ? t('courseDetail.youTab.projection.rangeWithRecord', {
+        : t(`courseDetail.youTab.projection.${recordAgainstRange(recordGross, p.lowGross, p.highGross)}`, {
             low: p.lowGross,
             high: p.highGross,
             record: recordGross,
-            count: times,
-            sample: p.sampleSize,
-          })
-        : t('courseDetail.youTab.projection.rangeWithRecordUnbeaten', {
-            low: p.lowGross,
-            high: p.highGross,
-            record: recordGross,
-            gap: p.typicalGross - recordGross,
           });
 
   return (

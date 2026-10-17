@@ -115,7 +115,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   });
   const { data: myRounds } = useMyRoundsAtCourse(courseId);
   const { data: rating } = useUserCourseRating(courseId, user?.id);
-  const { courseRecord, courseRecordHolders, unclaimedCount } = useCourseRecordSummary(courseId, user?.id ?? null);
+  const { courseRecord, courseRecordHolders, unclaimedCount, holders: boardHolders } = useCourseRecordSummary(courseId, user?.id ?? null);
   /* YOU_TAB_CIRCLE_NAMES_1 — ONE rounds-based source for the "who you know"
      line: get_board_course_players, scope 'circle', window 'all'
      (board_window_from maps 'all' to 1900-01-01, i.e. all time). The count
@@ -475,7 +475,22 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
             harderThanPct={courseStats?.harder_than_pct ?? null}
           />
         ) : null}
-        {upForGrabs}
+        {/* YOU_TAB_STATE_3 AB3 — with tracked rounds Up for grabs names the
+            open boards; the zero-round screen keeps the plain section. */}
+        {zeroRounds ? upForGrabs : (
+          <UpForGrabsSection
+            recordValue={courseRecord?.value ?? null}
+            holders={courseRecordHolders}
+            unclaimedCount={unclaimedCount}
+            yourBest={bestGross}
+            thinField={upForGrabsThin}
+            boardHolders={boardHolders}
+            onAllBoards={() => {
+              analyticsEvents.track('course_you_all_boards', { course_id: courseId });
+              onTabChange?.('legends');
+            }}
+          />
+        )}
         {circleCount > 0 ? (
           <AboutSection heading={t('courseDetail.youTab.circle.heading')}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
