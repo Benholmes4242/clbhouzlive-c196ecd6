@@ -1209,10 +1209,7 @@
         "harderThan": "On average over par, this course plays harder than {{pct}}% of the courses we track."
       },
       "circle": {
-        "heading": "Who you know has played it",
-        "namedOne": "{{name}} in your circle has played it.",
-        "namedAll": "{{names}} in your circle have played it.",
-        "namedMore": "{{names}} and {{count}} others in your circle have played it."
+        "heading": "Who you know has played it"
       },
       "actions": {
         "playingSoon": "Playing it soon?",
