@@ -19,9 +19,11 @@ export const MOST_PLAYED_COUNT = 5;
 /** Highest rated shows exactly this many cards (BRIEF_COURSES_HIGHEST_RATED_TEN). */
 export const HIGHEST_RATED_COUNT = 10;
 
-export function PhotoFigureCard({ row, figure, figureLabel, footer, nameBottom = 15 }: {
+export function PhotoFigureCard({ row, figure, figureColor = '#FFFFFF', figureLabel, footer, nameBottom = 15 }: {
   row: StatBrowseRow;
   figure: React.ReactNode;
+  /** Colour of the headline figure only. Default white; Most played passes nothing. */
+  figureColor?: string;
   figureLabel: string;
   /** Rendered inside the photo; absolute-positioned footers place themselves. */
   footer?: React.ReactNode;
@@ -39,7 +41,7 @@ export function PhotoFigureCard({ row, figure, figureLabel, footer, nameBottom =
       <CourseImageFallback courseId={row.course_id} courseName={row.name} imageUrl={row.image_url} style={{ height: '100%' }}>
         <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
         <div style={{ position: 'absolute', top: 16, right: 16, textAlign: 'right' }}>
-          <div style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-0.05em', color: '#FFFFFF', lineHeight: 1, fontVariantNumeric: 'tabular-nums', textShadow: '0 2px 10px rgba(0,0,0,0.6)' }}>
+          <div style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-0.05em', color: figureColor, lineHeight: 1, fontVariantNumeric: 'tabular-nums', textShadow: '0 2px 10px rgba(0,0,0,0.6)' }}>
             {figure}
           </div>
           <div style={{ marginTop: 5, fontSize: 8, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.82)' }}>
