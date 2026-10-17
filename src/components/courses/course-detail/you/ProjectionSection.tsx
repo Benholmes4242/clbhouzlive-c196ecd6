@@ -10,7 +10,7 @@
  * Amber marks the member only: the band, the typical tick and its label.
  */
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { A, BAR_RADIUS, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import {
   axisScale,
