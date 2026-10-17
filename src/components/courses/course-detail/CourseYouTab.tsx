@@ -349,8 +349,20 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     const showFieldChart = (analysis?.holes?.length ?? 0) === 18 && (fieldRoundsTotal ?? 0) >= 1;
     return wrap(
       <div>
-        {/* W3 — zero tracked rounds: the shared unclaimed framing leads. */}
-        {zeroRounds ? <UnclaimedCourseSection openBoards={unclaimedCount} /> : null}
+        {/* W3 — zero tracked rounds: the shared unclaimed framing leads.
+            YOU_TAB_STATE_1 X1 — on this state it ABSORBS Up for grabs: the
+            count and the ALL BOARDS link live here, and Up for grabs does
+            not separately render. On courses with rounds Up for grabs is
+            unchanged. */}
+        {zeroRounds ? (
+          <UnclaimedCourseSection
+            openBoards={unclaimedCount}
+            onAllBoards={() => {
+              analyticsEvents.track('course_you_all_boards', { course_id: courseId });
+              onTabChange?.('legends');
+            }}
+          />
+        ) : null}
         {/* YOU_TAB_SPARSE_1 N1: no dash columns for the reader's absent figures.
             The field figure stands alone, labelled as the field; absent, no strip. */}
         {fieldGross ? (
@@ -374,8 +386,8 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
             courseName={courseName}
           />
         ) : null}
-        <EmptyBirdiesSection />
-        {upForGrabs}
+        <EmptyBirdiesSection waiting={zeroRounds} />
+        {zeroRounds ? null : upForGrabs}
         <AboutSection>
           <AboutHairline style={{ marginBottom: 20 }} />
           <p style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700, color: A.INK }}>
@@ -432,7 +444,15 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     const circleOthers = circle.others;
     return wrap(
       <div>
-        {zeroRounds ? <UnclaimedCourseSection openBoards={unclaimedCount} /> : null}
+        {zeroRounds ? (
+          <UnclaimedCourseSection
+            openBoards={unclaimedCount}
+            onAllBoards={() => {
+              analyticsEvents.track('course_you_all_boards', { course_id: courseId });
+              onTabChange?.('legends');
+            }}
+          />
+        ) : null}
         <ProjectionSection
           courseName={courseName}
           state={projectionState}

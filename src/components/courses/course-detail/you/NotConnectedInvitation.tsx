@@ -16,6 +16,7 @@ import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS } from '@/features/courses/compon
 import { formatNumber } from '@/i18n/format';
 import AboutSection from '../about/AboutSection';
 import { YouSentence } from './youBits';
+import { Sec } from './many/manyBits';
 
 /** Mock you-tab-final.html draws the chart at 96px. */
 const CHART_HEIGHT = 96;
@@ -106,21 +107,48 @@ export const FieldShotsSection: React.FC<{ holes: CourseHole[]; totalRounds: num
 
 const SLOT_BORDER = '1px dashed rgba(248,250,252,0.30)';
 
-export const EmptyBirdiesSection: React.FC = () => {
+/**
+ * YOU_TAB_STATE_1 X3 — on a course with ZERO tracked rounds (`waiting`) the
+ * birdie section keeps its grid and caption but gains the canonical
+ * kicker + title pair, and the slots take the mock's size so they read as
+ * eighteen holes. On courses WITH rounds (`waiting` false) nothing changes.
+ */
+export const EmptyBirdiesSection: React.FC<{ waiting?: boolean }> = ({ waiting = false }) => {
   const { t } = useTranslation('courses');
+  const grid = (
+    <div aria-hidden="true" style={{ display: 'flex', gap: GAP, marginTop: waiting ? 15 : 0 }}>
+      {Array.from({ length: 18 }, (_, i) => (
+        <span
+          key={i}
+          style={
+            waiting
+              ? { flex: 1, height: 15, borderRadius: 3, border: '1px dashed rgba(255,255,255,0.26)', background: 'rgba(255,255,255,0.03)' }
+              : { flex: 1, height: 14, borderRadius: 2, border: SLOT_BORDER }
+          }
+        />
+      ))}
+    </div>
+  );
+  const caption = (
+    <div style={{ marginTop: 11 }}>
+      <YouSentence quiet>{t('courseDetail.youTab.connect.birdiesCaption')}</YouSentence>
+    </div>
+  );
+  if (waiting) {
+    return (
+      <Sec kicker={t('courseDetail.youTab.sections.birdiesHere')} title={t('courseDetail.youTab.birdiesWaiting.title')}>
+        {grid}
+        {caption}
+      </Sec>
+    );
+  }
   return (
     // YOU_TAB_SPARSE_2 Q1 — no "0 of 18" counter: the one element that stated a
     // score, and the score is nothing. The grid, heading and caption stand as a
     // preview of what a connection unlocks.
     <AboutSection heading={t('courseDetail.youTab.sections.birdiesHere')}>
-      <div aria-hidden="true" style={{ display: 'flex', gap: GAP }}>
-        {Array.from({ length: 18 }, (_, i) => (
-          <span key={i} style={{ flex: 1, height: 14, borderRadius: 2, border: SLOT_BORDER }} />
-        ))}
-      </div>
-      <div style={{ marginTop: 11 }}>
-        <YouSentence quiet>{t('courseDetail.youTab.connect.birdiesCaption')}</YouSentence>
-      </div>
+      {grid}
+      {caption}
     </AboutSection>
   );
 };

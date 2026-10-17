@@ -1095,7 +1095,18 @@
         "title": "Every board here is unclaimed",
         "lede": "No member has logged a round here, so the first card posted takes all nine at once.",
         "tile_one": "board open",
-        "tile_other": "boards open"
+        "tile_other": "boards open",
+        "boards": {
+          "lowestGross": "Lowest gross",
+          "lowestNet": "Lowest net",
+          "bestStableford": "Best stableford",
+          "bestDifferential": "Best differential"
+        },
+        "open": "Open",
+        "allBoards": "All {{count}} boards ›"
+      },
+      "birdiesWaiting": {
+        "title": "Eighteen holes waiting"
       },
       "form": {
         "best": "Best {{score}}",
