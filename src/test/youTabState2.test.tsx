@@ -29,8 +29,8 @@ describe('YOU_TAB_STATE_2', () => {
     expect(tab).toContain('overPar={fieldOverPar}');
   });
 
-  it('Z7: Up for grabs still renders on courses with rounds', () => {
-    expect(tab).toContain('{zeroRounds ? null : upForGrabs}');
+  it('Z7/AC3: Up for grabs renders on courses with rounds, with the board list', () => {
+    expect(tab).toContain('{zeroRounds ? null : upForGrabsList}');
   });
 
   it('Z4: hardest is the highest avg over par, the let-off the lowest, the cost is the hardest figure', () => {
