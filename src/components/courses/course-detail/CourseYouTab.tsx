@@ -52,6 +52,7 @@ import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { CourseStatusToggle } from '@/components/courses/phase5';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { formatNumber } from '@/i18n/format';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { A, EmptyState } from '@/features/courses/components/holes/analytical/tokens';
@@ -407,6 +408,9 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
        same count: "the best card logged here" below, "the course record" at
        or above. */
     const thinField = fieldRoundsTotal != null && fieldRoundsTotal < COURSE_FIELD_MIN_ROUNDS;
+    /* W3 — zero tracked rounds: the same unclaimed framing as the
+       no-handicap branch leads; the bucket-list prompt stays beneath. */
+    const zeroRounds = fieldRoundsTotal === 0;
     const showWonAndLost = (analysis?.holes?.length ?? 0) === 18 && (fieldRoundsTotal ?? 0) >= 1;
     const showAgainst =
       yourGolf.parOrBetterPct != null &&
