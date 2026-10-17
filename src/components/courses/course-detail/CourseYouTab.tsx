@@ -285,7 +285,10 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
 
   /* YOU_TAB_THIN_COURSE_1 P1 — below the field minimum the record is labelled
      the best card logged here, never "the course record". */
-  const upForGrabsThin = !courseFieldKnown(analysis?.total_rounds != null ? Number(analysis.total_rounds) : null);
+  /* U4 — the record labelling keeps the five-round line, driven by the same
+     count that governs the wording. */
+  const upForGrabsThin =
+    analysis?.total_rounds != null && Number(analysis.total_rounds) < COURSE_FIELD_MIN_ROUNDS;
   const upForGrabs = (
     <UpForGrabsSection
       recordValue={courseRecord?.value ?? null}
@@ -412,12 +415,13 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
           state={projectionState}
           recordGross={courseRecord?.value ?? null}
           fieldRounds={fieldRoundsTotal}
-          thinField={!fieldKnown}
+          thinField={thinField}
         />
         {showWonAndLost && analysis ? (
           <WonAndLostSection
             holes={analysis.holes}
             totalRounds={Number(analysis.total_rounds)}
+            sample={sample}
             onAllHoles={() => {
               analyticsEvents.track('course_you_all_18_holes', { course_id: courseId, holes: 0 });
               navigate(`/courses/${courseId}?tab=you&sheet=your-holes`);
@@ -426,10 +430,10 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         ) : null}
         {showAgainst ? (
           <AgainstYourGolfSection
-            fieldParOrBetterPct={fieldKnown ? fieldParOrBetterPct! : null}
+            fieldParOrBetterPct={fieldParOrBetterPct!}
             yourParOrBetterPct={yourGolf.parOrBetterPct!}
             courseCount={yourGolf.courses}
-            harderThanPct={fieldKnown ? courseStats?.harder_than_pct ?? null : null}
+            harderThanPct={courseStats?.harder_than_pct ?? null}
           />
         ) : null}
         {upForGrabs}
