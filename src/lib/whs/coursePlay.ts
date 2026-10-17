@@ -45,6 +45,21 @@ export interface CourseProjection {
   sampleSize: number;
 }
 
+/** CHAMPIONS_STATE_3_R: derived scoring ranges, never a Stableford estimate. */
+export interface ProjectedScoreRange { typical: number; low: number; high: number }
+
+export function projectedNet(p: CourseProjection): ProjectedScoreRange {
+  return { typical: p.typicalGross - p.courseHcp, low: p.lowGross - p.courseHcp, high: p.highGross - p.courseHcp };
+}
+
+export function projectedDifferential(p: CourseProjection, inputs: CoursePlayInputs): ProjectedScoreRange {
+  return {
+    typical: differentialFromGross(p.typicalGross, inputs.cr, inputs.slope),
+    low: differentialFromGross(p.lowGross, inputs.cr, inputs.slope),
+    high: differentialFromGross(p.highGross, inputs.cr, inputs.slope),
+  };
+}
+
 export const MIN_PROJECTION_DIFFERENTIALS = 8;
 
 export function buildCourseProjection(

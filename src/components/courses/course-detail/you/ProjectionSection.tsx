@@ -20,6 +20,7 @@ import {
 } from '@/lib/whs/coursePlay';
 import AboutSection, { ABOUT_KICKER } from '../about/AboutSection';
 import { YouSentence } from './youBits';
+import { recordProjectionForm } from '@/lib/whs/recordProjectionForm';
 
 export type ProjectionState =
   | { kind: 'full'; inputs: CoursePlayInputs; projection: CourseProjection; differentials: number[] }
@@ -103,9 +104,8 @@ interface Props {
 
 /** AB1 — which of the three record sentences applies. Gross: lower is better. */
 export function recordAgainstRange(record: number, low: number, high: number): 'rangeRecordAbove' | 'rangeRecordInside' | 'rangeRecordBelow' {
-  if (record > high) return 'rangeRecordAbove';
-  if (record < low) return 'rangeRecordBelow';
-  return 'rangeRecordInside';
+  const form = recordProjectionForm(record, { lowGross: low, highGross: high }, false);
+  return form === 'range' || form === 'rangeWithRecordThin' ? 'rangeRecordInside' : form;
 }
 
 const ProjectionSection: React.FC<Props> = ({ courseName, state, recordGross, fieldRounds = null, thinField = false }) => {
@@ -192,7 +192,7 @@ const ProjectionSection: React.FC<Props> = ({ courseName, state, recordGross, fi
   const payoff =
     recordGross == null
       ? t('courseDetail.youTab.projection.range', { low: p.lowGross, high: p.highGross })
-      : thinField
+      : recordProjectionForm(recordGross, p, thinField) === 'rangeWithRecordThin'
         ? t('courseDetail.youTab.projection.rangeWithRecordThin', {
             low: p.lowGross,
             high: p.highGross,

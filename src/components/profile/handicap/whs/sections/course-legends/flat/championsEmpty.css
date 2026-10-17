@@ -40,3 +40,18 @@
 .champions-field-stats strong { display: block; font-size: 14px; font-weight: 800; }
 .champions-field-stats span { display: block; font-size: 9.5px; text-transform: uppercase; overflow-wrap: anywhere; }
 .champions-field-scale { width: 100%; height: 64px; display: block; margin-top: 14px; }
+
+/* State 3 only: shared cabinet geometry, new semantic states and unranked row. */
+.champions-cabinet-tile[data-state="in-reach"], .champions-cabinet-tile[data-state="not-started"] { border-style: solid; }
+.champions-cabinet-tile[data-state="not-started"] { border-color: var(--hcp-line); }
+.champions-cabinet-projected .champions-cabinet-value { font-size: 19px; }
+.champions-cabinet-projected .champions-cabinet-state { font-weight: 800; }
+.champions-projected .champions-cabinet-legend { flex-wrap: wrap; gap: 8px 12px; }
+.champions-ghost { display: grid; grid-template-columns: 26px 34px minmax(0,1fr) auto; align-items: center; gap: 10px; padding: 11px 20px; margin: 0 -20px; }
+.champions-ghost-avatar { position: relative; width: 34px; height: 34px; display: grid; place-items: center; font-size: 10px; }
+.champions-ghost-ring { position: absolute; inset: 0; border-radius: 34%; pointer-events: none; }
+.champions-ghost-name b { display: block; font-size: 14px; font-weight: 700; }
+.champions-ghost-name span { display: block; margin-top: 3px; font-size: 10px; text-transform: uppercase; }
+.champions-ghost-value { text-align: right; font-variant-numeric: tabular-nums; }
+.champions-ghost-value b { display: block; font-size: 17px; }
+.champions-ghost-value span { display: block; font-size: 11px; margin-top: 3px; }
