@@ -1,10 +1,16 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_CHAMPIONS_STATE_3 — CHAMPIONS_STATE_3
+- [x] Confirm clbhouz; read signed-off brief, HTML and image, and inspect coursePlay exports without SQL.
+- [ ] GA1 blocker: coursePlay exports the gross projection, course handicap and gross/differential conversions, but no projected net or stableford range. Required score-board figures must be supplied by that owner before implementation; no local arithmetic or partial screen added.
+- [ ] Build shared cabinet extension, classification, ghost row and shared record sentence lift once GA1 is unblocked; preserve states 1/2/4 and omit Elsewhere. GB5's no-gold screen clause contradicts GD5's explicit gold record mark; report alongside work.
+- [ ] GE1–GE6 and full-suite verification pending implementation; last verified count is 1,510, no tests changed or rerun in this investigation.
+
 ## BRIEF_CHAMPIONS_STATE_2 — CHAMPIONS_STATE_2
 - [x] Confirm clbhouz and record Ben's snapshot verification dated 2026-10-17; values unchanged.
 - [x] Extended the existing cabinet with held tiles and course-side counts; scoped to unconnected populated courses, state-1 never-claimed styling preserved.
 - [x] Existing BoardSection rows retained with state-2 self treatment suppressed; selected tile, two windows, field comparison and invitation wired from existing GolfClubView stats; no Elsewhere or new read.
-- [ ] STOP: championsState2.test.tsx failed during collection because its new react-i18next mock omits initReactI18next. Seven new cases were added but none ran; all existing 1,503 tests passed. No existing test deleted, renamed or rewritten. Latest build OK. No browser/authenticated acceptance attempted.
+- [x] CHAMPIONS_STATE_2_T authorised per-file mock fix: all 1,503 existing plus seven State 2 cases pass, 1,510 total. No assertions or existing tests changed; global setup/components untouched. State 1 has no translation mock because its rendered components currently do not call useTranslation. No browser/authenticated acceptance claimed.
 - [ ] Reported deviations: no record-history source, so no invented history; open-feat copy says no visible holder (privacy-safe) rather than claiming no feat occurred; MEDAL_GOLD used only for the expressly specified record scale despite blanket no-gold prose. Connected-member screens keep existing behavior; window controls now use shared Button without changing their appearance.
 
 ## BRIEF_CHAMPIONS_STATE_1 — CHAMPIONS_STATE_1
