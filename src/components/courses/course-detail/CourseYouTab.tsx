@@ -65,6 +65,8 @@ import type { YouRound } from './you/YourRoundsHere';
 import { useMomentPosts } from './you/YourMomentsSection';
 import { useAllMyRoundsAtCourse } from '@/hooks/feed/useMyRoundsAtCourse';
 import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
+import { useMembersWhoPlayedCourse } from '@/hooks/useMembersWhoPlayedCourse';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import {
@@ -105,6 +107,8 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   } = useCoursePersonalStatus(courseId);
   const { data: analysis } = useCourseHoleAnalysis(courseId);
   const { data: courseStats } = useCourseStatsDetail(courseId, true);
+  /* P4 (YOU_TAB_THIN_COURSE_1) — names the circle members who have played here. */
+  const { data: membersData } = useMembersWhoPlayedCourse(courseId, user?.id);
   const { data: myPerf } = useMyHolePerformance(user?.id, courseId, {
     enabled: Boolean(user?.id && courseId && connection),
   });
@@ -266,12 +270,16 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     });
   }, [settled, courseId, roundTotal, connection, branchC, projectionSettled, projectionState.kind]);
 
+  /* YOU_TAB_THIN_COURSE_1 P1 — below the field minimum the record is labelled
+     the best card logged here, never "the course record". */
+  const upForGrabsThin = !courseFieldKnown(analysis?.total_rounds != null ? Number(analysis.total_rounds) : null);
   const upForGrabs = (
     <UpForGrabsSection
       recordValue={courseRecord?.value ?? null}
       holders={courseRecordHolders}
       unclaimedCount={unclaimedCount}
       yourBest={bestGross}
+      thinField={upForGrabsThin}
       onAllBoards={() => {
         analyticsEvents.track('course_you_all_boards', { course_id: courseId });
         onTabChange?.('legends');
