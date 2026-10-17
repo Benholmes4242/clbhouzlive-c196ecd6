@@ -1,5 +1,12 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_CHAMPIONS_STATE_2 — CHAMPIONS_STATE_2
+- [x] Confirm clbhouz and record Ben's snapshot verification dated 2026-10-17; values unchanged.
+- [x] Extended the existing cabinet with held tiles and course-side counts; scoped to unconnected populated courses, state-1 never-claimed styling preserved.
+- [x] Existing BoardSection rows retained with state-2 self treatment suppressed; selected tile, two windows, field comparison and invitation wired from existing GolfClubView stats; no Elsewhere or new read.
+- [ ] STOP: championsState2.test.tsx failed during collection because its new react-i18next mock omits initReactI18next. Seven new cases were added but none ran; all existing 1,503 tests passed. No existing test deleted, renamed or rewritten. Latest build OK. No browser/authenticated acceptance attempted.
+- [ ] Reported deviations: no record-history source, so no invented history; open-feat copy says no visible holder (privacy-safe) rather than claiming no feat occurred; MEDAL_GOLD used only for the expressly specified record scale despite blanket no-gold prose. Connected-member screens keep existing behavior; window controls now use shared Button without changing their appearance.
+
 ## BRIEF_CHAMPIONS_STATE_1 — CHAMPIONS_STATE_1
 - [x] Confirm clbhouz; investigate CC2 without querying data. Exact catalogue count exists in admin Inbox; Health has admin-only played_courses/played_on_map fields, not a verified member-accessible catalogue-matched tracked-course total.
 - [x] CHAMPIONS_STATE_1_R unblocks CA/CB/CD/CE and reverses CC2: use Ben's last verified catalogue snapshot, pending replacement.

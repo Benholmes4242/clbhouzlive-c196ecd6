@@ -7,11 +7,12 @@ import React from 'react';
 import type { LegendCategory } from '@/lib/gam/types';
 import { numberWord } from '@/lib/text/numbers';
 import { SURFACE } from '@/lib/tokens/surface';
-import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
+import { INK_ON_LIGHT, MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { Button } from '@/components/ui/button';
 import { CHAMPIONS_CATALOGUE_TOTAL, championsCatalogueWithoutRounds } from '@/lib/gam/championsCatalogueSnapshot';
 import './championsEmpty.css';
+import { cabinetHolderName } from './championsField';
 
 export type CabinetState = 'never-claimed' | 'held' | 'in-reach' | 'yours';
 
@@ -25,17 +26,39 @@ function boardName(category: LegendCategory): string {
   return labels[base] ?? category;
 }
 
-export function ChampionsCabinetTile({ category, state }: { category: LegendCategory; state: CabinetState }) {
-  if (state !== 'never-claimed') return null;
-  return (
-    <div className="champions-cabinet-tile" data-category={category} data-state={state} role="listitem">
-      <div className="champions-cabinet-name" style={{ color: SURFACE.dark.dim }}>{boardName(category)}</div>
-      <div>
-        <div className="champions-cabinet-value" style={{ color: A.FAINT }}>—</div>
-        <div className="champions-cabinet-state" style={{ color: SURFACE.dark.dim }}>Open</div>
-      </div>
+export function ChampionsCabinetTile({ category, state, value, holders = [], selected = false, onSelect }: {
+  category: LegendCategory; state: CabinetState; value?: string; holders?: readonly string[]; selected?: boolean; onSelect?: () => void;
+}) {
+  if (state !== 'never-claimed' && state !== 'held') return null;
+  const held = state === 'held';
+  const contents = <>
+    <div className="champions-cabinet-name" style={{ color: SURFACE.dark.dim }}>{boardName(category)}</div>
+    <div>
+      <div className="champions-cabinet-value" style={{ color: held ? SURFACE.dark.ink : A.FAINT }}>{held ? value : '—'}</div>
+      <div className="champions-cabinet-state" style={{ color: SURFACE.dark.dim }}>{held ? cabinetHolderName(holders) : 'Open'}</div>
     </div>
+  </>;
+  const tileStyle = held ? { background: MEMBER_PANEL, color: SURFACE.dark.ink, boxShadow: selected ? `inset 0 0 0 1.5px ${SURFACE.dark.ink}` : undefined } : undefined;
+  if (onSelect) return <div role="listitem" data-category={category} data-state={state}>
+    <Button variant="secondary" className="champions-cabinet-tile champions-cabinet-select" data-state={state} aria-pressed={selected} onClick={onSelect} style={tileStyle}>{contents}</Button>
+  </div>;
+  return (
+    <div className="champions-cabinet-tile" data-category={category} data-state={state} role="listitem" style={tileStyle}>{contents}</div>
   );
+}
+
+export function ChampionsCabinet({ categories, holders, activeKey, onSelect }: {
+  categories: readonly LegendCategory[];
+  holders?: Map<LegendCategory, { names: string[]; value: string }>;
+  activeKey?: LegendCategory;
+  onSelect?: (category: LegendCategory) => void;
+}) {
+  return <div className="champions-cabinet" role="list" aria-label="Open boards">
+    {categories.map(category => {
+      const holder = holders?.get(category);
+      return <ChampionsCabinetTile key={category} category={category} state={holder ? 'held' : 'never-claimed'} value={holder?.value} holders={holder?.names} selected={activeKey === category} onSelect={onSelect ? () => onSelect(category) : undefined} />;
+    })}
+  </div>;
 }
 
 export function NobodyHasPlayed({ categories, courseName, showConnect, onConnect }: {
@@ -53,9 +76,7 @@ export function NobodyHasPlayed({ categories, courseName, showConnect, onConnect
         <div className="champions-empty-lede" style={{ color: SURFACE.dark.mute }}>
           No member has posted a round at {courseName}. The first card takes every board at once.
         </div>
-        <div className="champions-cabinet" role="list" aria-label="Open boards">
-          {categories.map(category => <ChampionsCabinetTile key={category} category={category} state="never-claimed" />)}
-        </div>
+        <ChampionsCabinet categories={categories} />
         <div className="champions-cabinet-legend" aria-label="Board states">
           <div className="champions-cabinet-legend-entry" style={{ color: SURFACE.dark.dim }}>
             <span className="champions-cabinet-swatch" aria-hidden="true" />Never claimed

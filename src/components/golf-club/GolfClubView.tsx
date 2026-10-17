@@ -324,6 +324,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
                 courseType: (course as { course_type?: string | null }).course_type ?? null,
               }}
               hideHeader
+              fieldAvgOverPar={courseStats?.avg_over_par ?? null}
+              totalCourseRounds={courseStats?.rounds_tracked ?? null}
             />
 
           </TabsContent>
