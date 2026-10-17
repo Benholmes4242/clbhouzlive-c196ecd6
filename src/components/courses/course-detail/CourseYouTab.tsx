@@ -432,6 +432,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     const circleOthers = circle.others;
     return wrap(
       <div>
+        {zeroRounds ? <UnclaimedCourseSection openBoards={unclaimedCount} /> : null}
         <ProjectionSection
           courseName={courseName}
           state={projectionState}
