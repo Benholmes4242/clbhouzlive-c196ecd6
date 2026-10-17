@@ -1,10 +1,11 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
 ## BRIEF_CHAMPIONS_STATE_4 — CHAMPIONS_STATE_4
-- [ ] Confirm clbhouz, signed-off mock and legitimate posted/spread/rival sources.
+- [x] Confirm clbhouz, signed-off mock; baseline full suite 1,532 passing. Found posted gam_round_stats fields and existing gam_round_net view; leaderboard/window absence remains unknown, not zero.
 - [ ] Extend shared cabinet, explicit reach basis, real pinned row and selected-board defence; preserve States 1–3.
 - [ ] Add rule coverage, run full suite against 1,532 baseline; stop/report any new failure.
 - [ ] Verify preview and report source/auth limits, test inventory and deviations.
+- [ ] STOP: preview typecheck failed in championsProjection.ts(16,57), TS2322: ReachResult can contain 'yours' but projectedTile return excludes 'yours'; narrowing the state does not narrow the object. No correction after failure, as brief requires. Partial reach/posting/defence derivations, posted-card hook and shared cabinet/pinned-row extensions exist, but State 4 page integration and defence UI/tests are not built. Baseline 1,532 → current unchanged inventory 1,532; zero tests added/deleted/renamed/rewritten; post-edit suite not run after broken-build stop. External/unmanaged authenticated checks unavailable. No SQL, migrations, RPC edits/additions, feed_config or round_pool_cap changes.
 
 ## BRIEF_CHAMPIONS_STATE_3 / R / T
 - [x] CHAMPIONS_STATE_3_G4: deterministic props-keyed avatar mock/capture only; exact fallback-tree comparisons and ghost assertions preserved. Full suite 1,532 → 1,532, all passing (198 files); resolves the historical State 3 G/G2/G3 stops below. No tests added/deleted/renamed; holder assertion uses Map values with unchanged expected URL. No application or outside-State-3 test changes; preview build OK; authenticated checks unavailable on external/unmanaged Supabase.
