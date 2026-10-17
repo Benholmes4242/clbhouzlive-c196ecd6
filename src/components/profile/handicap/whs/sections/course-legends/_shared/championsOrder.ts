@@ -61,6 +61,15 @@ export const CHAMPIONS_ORDER_ALL_TIME: LegendCategory[] = [
  *  which already receives a window-filtered holder map. */
 export const CHAMPIONS_ORDER: LegendCategory[] = CHAMPIONS_ORDER_90D;
 
+/** CHAMPIONS_NET_SOURCE_1 RA3–RA5: a board whose SOURCE is unavailable (fetch
+ * failed or source absent) is dropped before anything is counted. A source
+ * that answered with zero rows is a real, never-claimed board and stays.
+ * Decided by query outcome, never by row count.
+ */
+export function withAvailableSources(order: readonly LegendCategory[], unavailable: ReadonlySet<LegendCategory>): LegendCategory[] {
+  return order.filter(category => !unavailable.has(category));
+}
+
 /**
  * L4: Splice the women's-division gross record into the canonical order
  * IMMEDIATELY after its lowest_gross sibling, but ONLY when the holder map
