@@ -21,11 +21,14 @@ import { FlatBoardSheet } from './flat/FlatBoardSheet';
 import { UnclaimedSection, WhatCounts } from './flat/UnclaimedSection';
 import { NobodyHasPlayed } from './flat/NobodyHasPlayed';
 import { FieldChampions } from './flat/FieldChampions';
+import { ProjectedChampions } from './flat/ProjectedChampions';
+import { buildCourseProjection } from '@/lib/whs/coursePlay';
+import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { useBoardMemberUsernames } from '@/hooks/gam/useBoardMemberUsernames';
 
 import { YourCrowns } from './flat/YourCrowns';
 import { BoardSection } from './flat/BoardSection';
-import { useWhsConnection } from '@/lib/whs/hooks';
+import { useWhsConnection, useRecentDifferentials } from '@/lib/whs/hooks';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 
@@ -139,7 +142,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const isLoading = !isFetched || fetching;
   const { data: meta } = useCourseMeta(ctx.courseId);
   const { data: prosRaw } = useProBenchmarks();
-  const { profile } = useProfileData();
+  const { profile, user } = useProfileData();
   const viewerGender = (profile as any)?.gender as 'male' | 'female' | 'prefer_not_to_say' | null | undefined;
   const pros = useMemo(() => filterProsForViewer(prosRaw ?? [], viewerGender), [prosRaw, viewerGender]);
   const [window, setWindow] = useState<LegendWindow>(
@@ -378,6 +381,17 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const navigate = useNavigate();
   const { data: whsConnection, isFetched: whsFetched } = useWhsConnection(activeActor?.id);
 
+  /* State 3 uses the signed-in member's course meta, never a business actor.
+   * Missing personal-round count is unknown, not zero. No card => projection;
+   * any card => existing State 4 subtree, irrespective of visible holder rows.
+   */
+  const neverPlayed = Boolean(whsConnection) && user?.id === activeActor?.id && meta?.your_rounds === 0;
+  const { data: projectionDiffs } = useRecentDifferentials(neverPlayed ? whsConnection?.id : undefined);
+  const projectedIndex = resolveDisplayHandicap({ egHandicapIndex: profile?.eg_handicap_index, manualHandicapIndex: profile?.manual_handicap_index, hasWhsConnection: Boolean(whsConnection) }).value;
+  const projectionInputs = projectedIndex != null && meta?.course_cr != null && meta.course_slope != null && meta.course_par != null
+    ? { index: projectedIndex, cr: meta.course_cr, slope: meta.course_slope, par: meta.course_par } : null;
+  const courseProjection = neverPlayed && projectionInputs ? buildCourseProjection(projectionDiffs ?? [], projectionInputs) : null;
+
   const fieldOnly = !activeActor?.id || (whsFetched && !whsConnection);
   const fieldCategories = orderWithWomensRecord(window === '90d' ? CHAMPIONS_ORDER_90D : CHAMPIONS_ORDER_ALL_TIME, new Set(data.map(row => row.category)));
   const fieldActiveKey = selectedCategory && fieldCategories.includes(selectedCategory) ? selectedCategory : fieldCategories[0];
@@ -547,7 +561,24 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
       {/* BRIEF_CHAMPIONS_TAB_REBUILD §3.1 + §3.2 — a statement, then the board. */}
       {!isLoading && !isError && (data ?? []).length > 0 && (
-        fieldOnly ? <FieldChampions
+        neverPlayed ? <ProjectedChampions
+          categories={fieldCategories.map(key => ({ key, label: legendCategoryLabel[key], short: SHORT_LABELS[key] }))}
+          grouped={grouped}
+          courseName={ctx.courseName}
+          activeKey={fieldActiveKey}
+          onSelect={setSelectedCategory}
+          legendWindow={window}
+          onWindowChange={w => { handleWindowChange(w); setSelectedCategory(null); }}
+          onConnect={() => { analyticsEvents.track('champions_connect_handicap', { course_id: ctx.courseId }); navigate('/handicap'); }}
+          onOpenFull={setFullLeaderboardCategory}
+          onRowPress={row => { if (row.username) navigate(`/profile/${row.username}`); }}
+          par={meta?.course_par ?? null}
+          fieldOverPar={fieldAvgOverPar}
+          rounds={totalCourseRounds}
+          projection={courseProjection}
+          inputs={projectionInputs}
+          initials={(profile?.display_name ?? '').split(/\s+/).filter(Boolean).slice(0, 2).map(name => name[0]).join('') || 'You'}
+        /> : fieldOnly ? <FieldChampions
           categories={fieldCategories.map(key => ({ key, label: legendCategoryLabel[key], short: SHORT_LABELS[key] }))}
           grouped={grouped}
           courseName={ctx.courseName}

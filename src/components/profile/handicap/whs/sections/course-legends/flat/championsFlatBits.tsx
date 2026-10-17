@@ -225,8 +225,9 @@ export const FlatBoardRow: React.FC<{
   /** SHEET ONLY - "5 from champion" in the board's unit. */
   deficit?: string | null;
   onPress?: () => void;
-}> = ({ row, pos, category, coursePar = null, rule = true, deficit = null, onPress }) => {
-  const tone = row.isSelf ? A.AMBER : A.INK;
+  recordTone?: string;
+}> = ({ row, pos, category, coursePar = null, rule = true, deficit = null, onPress, recordTone }) => {
+  const tone = row.isSelf ? A.AMBER : recordTone && row.rank === 1 ? recordTone : A.INK;
   const showToPar = hasToPar(category) && coursePar != null;
   return (
     <button
@@ -253,7 +254,7 @@ export const FlatBoardRow: React.FC<{
     >
       <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
         {pos === '1' && (
-          <Crown size={11} strokeWidth={2.5} fill={A.AMBER} style={{ color: A.AMBER, flexShrink: 0 }} />
+          <Crown size={11} strokeWidth={2.5} fill={recordTone ?? A.AMBER} style={{ color: recordTone ?? A.AMBER, flexShrink: 0 }} />
         )}
         <span style={{ ...NUM, fontSize: 12, color: row.isSelf ? A.AMBER : A.DIM }}>{pos}</span>
       </span>

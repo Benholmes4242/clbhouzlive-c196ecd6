@@ -29,6 +29,8 @@ import {
 } from './championsFlatBits';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import { Button } from '@/components/ui/button';
+import { ProjectionGhostRow, ghostInsertionIndex } from './ProjectionGhostRow';
+import { MEDAL_GOLD } from '@/lib/tokens/medals';
 
 const MAX_ROWS = 6;
 
@@ -52,6 +54,8 @@ interface Props {
   onRowPress?: (row: FlatRow) => void;
   /** State 2: cabinet owns selection; no viewer rank or duplicated champion statement. */
   fieldOnly?: boolean;
+  ghost?: { value: number; initials: string };
+  projectedScreen?: boolean;
 }
 
 export const BoardSection: React.FC<Props> = ({
@@ -66,6 +70,8 @@ export const BoardSection: React.FC<Props> = ({
   onOpenFull,
   onRowPress,
   fieldOnly = false,
+  ghost,
+  projectedScreen = false,
 }) => {
   const { t } = useTranslation('courses');
   const chips: FlatChip[] = useMemo(
@@ -90,6 +96,7 @@ export const BoardSection: React.FC<Props> = ({
   const shown = rows.slice(0, MAX_ROWS);
   const total = entry?.total ?? rows.length;
   const viewerValue = rows.find((r) => r.isSelf)?.value ?? null;
+  const ghostIndex = ghost ? ghostInsertionIndex(rows, ghost.value) : -1;
 
   return (
     <AboutSection heading={active.label} meta={windowMeta(total, legendWindow, t)} space={30}>
@@ -135,21 +142,24 @@ export const BoardSection: React.FC<Props> = ({
       {rows.length > 0 && <AboutHairline style={{ marginTop: 12 }} />}
       {fieldOnly && rows.length === 0 && <div style={{ color: A.DIM }}>Never claimed</div>}
 
-      {shown.map((row, i) => (
+      {shown.map((row, i) => <React.Fragment key={`${row.userId ?? row.name}-${positions[i]}`}>
+        {ghost && ghostIndex === i && <ProjectionGhostRow {...ghost} leader={rows[0]?.value ?? null} />}
         <FlatBoardRow
-          key={`${row.userId ?? row.name}-${positions[i]}`}
           row={row}
           pos={positions[i]}
+          recordTone={projectedScreen ? MEDAL_GOLD : undefined}
           category={active.key}
           coursePar={coursePar}
           rule={i > 0}
           onPress={onRowPress && row.username ? () => onRowPress(row) : undefined}
         />
-      ))}
+      </React.Fragment>)}
+      {ghost && ghostIndex >= shown.length && <ProjectionGhostRow {...ghost} leader={rows[0]?.value ?? null} />}
 
       {rows.length > 0 && (fieldOnly || total > MAX_ROWS || rows.length > MAX_ROWS) ? (
         <FlatAction label={`All ${total}`} onPress={() => onOpenFull(active.key)} />
       ) : null}
+      {ghost && <div className="champions-empty-said" style={{ color: A.MUTE }}>The dashed row is <b>a projection, not a score</b>, so it carries no rank and nobody below it is renumbered. It moves with your handicap and disappears the moment you post a card here.</div>}
     </AboutSection>
   );
 };
