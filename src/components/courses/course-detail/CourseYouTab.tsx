@@ -58,7 +58,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { A, EmptyState } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
 import AboutSection, { AboutHairline } from './about/AboutSection';
-import CenteredStatStrip from './about/CenteredStatStrip';
 import { EmptyBirdiesSection, FieldShotsSection, FieldVerdictSection } from './you/NotConnectedInvitation';
 import { UnclaimedCourseSection } from './you/UnclaimedCourseSection';
 import { YouAction, YouButton, YouSentence } from './you/youBits';
@@ -344,7 +343,6 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
        wording via fieldSample. A member without a handicap must not see less
        of a course than a member with one. */
     const fieldRoundsTotal = analysis?.total_rounds != null ? Number(analysis.total_rounds) : null;
-    const sample = fieldSample(fieldRoundsTotal);
     const zeroRounds = fieldRoundsTotal === 0;
     const showFieldChart = (analysis?.holes?.length ?? 0) === 18 && (fieldRoundsTotal ?? 0) >= 1;
     return wrap(
