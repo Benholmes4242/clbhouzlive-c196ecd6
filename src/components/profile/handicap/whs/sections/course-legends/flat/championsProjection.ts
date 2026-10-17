@@ -13,5 +13,5 @@ export function projectedBoardRange(category: LegendCategory, p: CourseProjectio
 export function projectedTile(category: LegendCategory, standing: number | null, p: CourseProjection, inputs: CoursePlayInputs): { state: 'never-claimed' | 'held' | 'in-reach' | 'not-started'; gap?: number } {
   const result = championsReach('projected', category, standing, { projection: p, inputs });
   // This compatibility entrypoint cannot produce ownership on a projection.
-  return result.state === 'yours' ? { state: 'held' } : result;
+  return { state: result.state === 'yours' ? 'held' : result.state, ...(result.gap != null ? { gap: result.gap } : {}) };
 }
