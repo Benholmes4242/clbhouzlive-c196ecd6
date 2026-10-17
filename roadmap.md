@@ -3,8 +3,10 @@
 ## BRIEF_CHAMPIONS_STATE_1 — CHAMPIONS_STATE_1
 - [x] Confirm clbhouz; investigate CC2 without querying data. Exact catalogue count exists in admin Inbox; Health has admin-only played_courses/played_on_map fields, not a verified member-accessible catalogue-matched tracked-course total.
 - [x] CHAMPIONS_STATE_1_R unblocks CA/CB/CD/CE and reverses CC2: use Ben's last verified catalogue snapshot, pending replacement.
-- [ ] Implement the signed-off zero-round cabinet/count/connect screen and derived catalogue sentence; exclude Elsewhere and preserve populated courses and You tab.
-- [ ] Run CE1–CE4 regression checks and reconcile suite counts; stop on any new failure or broken build.
+- [x] Implement zero-row cabinet/count/connect screen and derived catalogue sentence; Elsewhere excluded, populated courses and You tab untouched. Catalogue snapshot pending Ben's fresh pair.
+- [x] CE1–CE4 plus snapshot rule: 1,498 → 1,503 passing, five new tests in championsState1.test.tsx; no existing tests changed; preview build OK.
+- [ ] STOP: local browser check timed out before the headline appeared; no visual or authenticated acceptance claimed. External/unmanaged authentication remains unavailable. Do not investigate further without a follow-up.
+- [ ] Architecture entry deferred: AGENTS.md addition rejected at its size budget; local component/snapshot headers document ownership, but cross-area note needs approved relocation before adding.
 
 ## BRIEF_PROFILE_TABS_VOICE
 - [x] Confirm clbhouz; change only specified Courses/Rounds ownership copy and props, with name-free third-person fallbacks and the archive possessive fix.
