@@ -379,6 +379,8 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
           courseName={courseName}
           state={projectionState}
           recordGross={courseRecord?.value ?? null}
+          fieldRounds={fieldRoundsTotal}
+          thinField={!fieldKnown}
         />
         {showWonAndLost && analysis ? (
           <WonAndLostSection
@@ -392,16 +394,49 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         ) : null}
         {showAgainst ? (
           <AgainstYourGolfSection
-            fieldParOrBetterPct={fieldParOrBetterPct!}
+            fieldParOrBetterPct={fieldKnown ? fieldParOrBetterPct! : null}
             yourParOrBetterPct={yourGolf.parOrBetterPct!}
             courseCount={yourGolf.courses}
-            harderThanPct={courseStats?.harder_than_pct ?? null}
+            harderThanPct={fieldKnown ? courseStats?.harder_than_pct ?? null : null}
           />
         ) : null}
         {upForGrabs}
-        {circlePlayed > 0 ? (
+        {circleMembers.length > 0 ? (
           <AboutSection heading={t('courseDetail.youTab.circle.heading')}>
-            <YouSentence>{t('common:feed.courseSheet.circlePlayed', { count: circlePlayed })}</YouSentence>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ display: 'flex', flexShrink: 0 }}>
+                {circleMembers.slice(0, 3).map((m, i) => (
+                  <SquircleAvatar
+                    key={m.user_id}
+                    src={m.profile?.profile_photo_url ?? undefined}
+                    alt={m.profile?.display_name || m.profile?.username || '?'}
+                    userId={m.user_id}
+                    size={22}
+                    hairlineRing
+                    className={i > 0 ? '-ml-1.5' : ''}
+                  />
+                ))}
+              </div>
+              <YouSentence>
+                {circleMembers.length === 1
+                  ? t('courseDetail.youTab.circle.namedOne', {
+                      name: circleMembers[0].profile?.display_name || circleMembers[0].profile?.username || '',
+                    })
+                  : circleMembers.length <= 3
+                    ? t('courseDetail.youTab.circle.namedAll', {
+                        names: circleMembers
+                          .map((m) => m.profile?.display_name || m.profile?.username || '')
+                          .join(', '),
+                      })
+                    : t('courseDetail.youTab.circle.namedMore', {
+                        names: circleMembers
+                          .slice(0, 3)
+                          .map((m) => m.profile?.display_name || m.profile?.username || '')
+                          .join(', '),
+                        count: circleMembers.length - 3,
+                      })}
+              </YouSentence>
+            </div>
           </AboutSection>
         ) : null}
         <AboutSection>
