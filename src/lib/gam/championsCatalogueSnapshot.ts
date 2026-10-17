@@ -1,6 +1,6 @@
 /**
- * CHAMPIONS_STATE_1_R: last verified pair supplied by Ben, recorded 2026-10-17.
- * Original measurement date was not supplied; fresh values are pending replacement.
+ * CHAMPIONS_STATE_2 EA0: measured and confirmed by Ben on 2026-10-17.
+ * The catalogue, tracked-course total and orphan check are confirmed clean.
  * SQL to refresh the snapshot lives with Ben. No per-view query belongs here.
  * This module alone stores the pair; the empty count is always derived.
  */

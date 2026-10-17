@@ -1,5 +1,11 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_CHAMPIONS_STATE_2 — CHAMPIONS_STATE_2
+- [x] Confirm clbhouz and record Ben's snapshot verification dated 2026-10-17; values unchanged.
+- [ ] Extend the existing cabinet with held tiles and course-side counts; scope to unconnected populated courses.
+- [ ] Keep existing leaderboard rows, add selected-tile wiring and two window controls, field comparison and invitation; no Elsewhere.
+- [ ] Add EG1–EG5 and derivation tests, reconcile counts, verify build and report authentication/visual limits.
+
 ## BRIEF_CHAMPIONS_STATE_1 — CHAMPIONS_STATE_1
 - [x] Confirm clbhouz; investigate CC2 without querying data. Exact catalogue count exists in admin Inbox; Health has admin-only played_courses/played_on_map fields, not a verified member-accessible catalogue-matched tracked-course total.
 - [x] CHAMPIONS_STATE_1_R unblocks CA/CB/CD/CE and reverses CC2: use Ben's last verified catalogue snapshot, pending replacement.
