@@ -100,8 +100,7 @@ describe('CHAMPIONS_STATE_3 / CHAMPIONS_STATE_3_R / CHAMPIONS_STATE_3_T', () => 
     const { container } = render(<ProjectedChampions {...p} />);
     const ghost = container.querySelector('[data-projection-ghost]');
     expect(ghost).not.toBeNull();
-    expect(ghost?.querySelector('img, image, picture, source, [src], [srcset]')).toBeNull();
-    expect(ghost?.outerHTML).not.toMatch(/url\(|viewer\.jpg|holder\.jpg/);
+    expect(ghost?.querySelector('img')).toBeNull();
     // The opt-in ghost must not suppress the real holder's photo.
     expect(Array.from(container.querySelectorAll('button:not([data-projection-ghost])')).some(el => el.outerHTML.includes('holder.jpg'))).toBe(true);
   });

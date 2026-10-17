@@ -1,6 +1,7 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
 ## BRIEF_CHAMPIONS_STATE_3 / R / T
+- [ ] CHAMPIONS_STATE_3_G2: replace only the authorised ghost no-image check with querySelector('img') === null; preserve distinct-photo fixtures and viewer-initials case; run full suite against 1,532.
 - [x] CHAMPIONS_STATE_3_G: ghost variant now renders viewer initials on transparent ground regardless of photo; real-row defaults unchanged. Authorised never-passed photo test replaced by two cases (inventory 1,531 → 1,532).
 - [ ] CHAMPIONS_STATE_3_G STOP: full suite collected 1,532; 1,531 passed, one new no-image case failed because its broad /url\(/ assertion also matches the existing inline SVG squircle mask. Viewer-initials case passed; all tests outside State 3 passed. No assertion adjusted after failure. Build OK; authenticated visual checks unavailable (external_unmanaged). Await follow-up authorisation.
 - [x] Confirm clbhouz; read all three standing briefs and amended HTML.
