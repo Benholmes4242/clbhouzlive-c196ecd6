@@ -33,7 +33,7 @@ describe('YOU_TAB_STATE_1 X1 scoping', () => {
     const gate = tab.indexOf('{zeroRounds ? null : upForGrabs}');
     expect(upForGrabsBuild).toBeGreaterThan(-1);
     expect(gate).toBeGreaterThan(upForGrabsBuild);
-    expect(tab).toContain('upForGrabs = courseStats ? (');
+    expect(tab).toContain('const upForGrabs = (');
   });
 });
 
