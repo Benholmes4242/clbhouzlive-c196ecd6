@@ -389,10 +389,20 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
       Number.isFinite(yourGolf.parOrBetterPct) &&
       yourGolf.courses > 0 &&
       (fieldKnown ? fieldParOrBetterPct != null && Number.isFinite(fieldParOrBetterPct) : true);
-    /* YOU_TAB_THIN_COURSE_2 R2 — the count stays rounds-based (courseStats).
-       Naming from the ratings read redefined "played" as "left a rating";
-       reverted. No rounds-based source with identities exists yet. */
-    const circlePlayed = courseStats?.circle_played ?? 0;
+    /* YOU_TAB_CIRCLE_NAMES_1 S2 — a member whose profile is not readable
+       (null display_name) is excluded from the count as well as the names,
+       so the number and the names always agree. "Played" means a logged
+       round, always: if the rounds-based source returns nothing, the line
+       does not render (S4). */
+    const readableCircle = (circlePlayers.data ?? []).filter(
+      (p) => p.display_name != null && p.display_name !== '',
+    );
+    const circleCount = readableCircle.length;
+    const circleShown = readableCircle.slice(0, 3);
+    const circleNames = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' }).format(
+      circleShown.map((p) => p.display_name!),
+    );
+    const circleOthers = circleCount - circleShown.length;
     return wrap(
       <div>
         <ProjectionSection
