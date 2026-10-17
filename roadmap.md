@@ -2,8 +2,8 @@
 
 ## BRIEF_CHAMPIONS_ELSEWHERE — CHAMPIONS_ELSEWHERE_1
 - [x] VA3: useTitlesInReach staleTime 0 -> 60_000 (hook had no callers; no reason to be live).
-- [ ] STOP (QA2, source absent): get_player_titles_in_reach returns no field size and no leader name, so the VC3 second line cannot be formed. Awaiting ruling.
-- [ ] VC7: no surface lists titles in reach; link to be omitted pending decision.
+- [x] CHAMPIONS_ELSEWHERE_R: built narrower (You {v} · {leader} to beat), link omitted, hook caller comment. Suite 1,542 -> 1,546.
+- [ ] PARKED (Ben): widen get_player_titles_in_reach (field size, leader name); link destination.
 
 ## BRIEF_CHAMPIONS_STATE_4 — CHAMPIONS_STATE_4
 - [x] CHAMPIONS_STATE_4_COPY_R: rulings applied; State 4 done, all four states in.
