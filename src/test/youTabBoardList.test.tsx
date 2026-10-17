@@ -36,7 +36,7 @@ describe('YOU_TAB_BOARD_LIST_1 AC6', () => {
   });
 
   it('zero-round course: all nine boards render open', () => {
-    const { container } = render(<BoardList holders={new Map()} recordValue={null} />);
+    const { container } = render(<BoardList holders={new Map()} />);
     expect(container.querySelectorAll('[data-board-row="open"]').length).toBe(9);
   });
 
