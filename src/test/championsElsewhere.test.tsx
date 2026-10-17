@@ -41,3 +41,22 @@ describe('CHAMPIONS_ELSEWHERE_R', () => {
     expect(cards.map(card => card.row.course_id)).toEqual(['gross', 'eagles']);
   });
 });
+
+import { vi } from 'vitest';
+import { championsBoardName } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
+describe('CHAMPIONS_ELSEWHERE_N', () => {
+  it('XA2: one short name per board; Elsewhere card and cabinet share it', () => {
+    expect(championsBoardName('most_eagles_all_time')).toBe('Eagles');
+    expect(championsBoardName('most_albatrosses_90d')).toBe('Albatrosses');
+    const { container } = render(<ElsewhereSection rows={[row({ category: 'most_eagles_all_time', user_value: 2, leader_value: 3 })]} />);
+    expect(container.textContent).toContain('Eagles');
+    expect(container.textContent).not.toContain('Most');
+  });
+  it('XA4: an unrecognised category is dropped with one warning naming it', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    expect(elsewhereCards([row({ category: 'fastest_round_all_time' })])).toHaveLength(0);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0]).toContain('fastest_round_all_time');
+    warn.mockRestore();
+  });
+});

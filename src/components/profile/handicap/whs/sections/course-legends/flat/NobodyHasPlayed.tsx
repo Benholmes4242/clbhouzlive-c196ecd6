@@ -13,20 +13,13 @@ import { Button } from '@/components/ui/button';
 import { CHAMPIONS_CATALOGUE_TOTAL, championsCatalogueWithoutRounds } from '@/lib/gam/championsCatalogueSnapshot';
 import './championsEmpty.css';
 import { cabinetHolderName } from './championsField';
+import { championsBoardName } from '../_shared/championsOrder';
 import { Crown } from 'lucide-react';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
 
 export type CabinetState = 'never-claimed' | 'held' | 'in-reach' | 'not-started' | 'yours';
 
-function boardName(category: LegendCategory): string {
-  const base = category.replace(/_(all_time|90d)$/, '');
-  const labels: Record<string, string> = {
-    lowest_gross: 'Gross', lowest_net: 'Net', lowest_gross_women: "Women's gross",
-    best_stableford: 'Stableford', most_aces: 'Aces', most_albatrosses: 'Albatross',
-    most_eagles: 'Eagles', most_birdies: 'Birdies', most_rounds: 'Rounds', best_score_diff: 'Differential',
-  };
-  return labels[base] ?? category;
-}
+const boardName = championsBoardName;
 
 export function ChampionsCabinetTile({ category, state, value, holders = [], selected = false, onSelect, gap }: {
   category: LegendCategory; state: CabinetState; value?: string; holders?: readonly string[]; selected?: boolean; onSelect?: () => void; gap?: number;
