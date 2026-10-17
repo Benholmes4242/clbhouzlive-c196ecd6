@@ -37,7 +37,7 @@ interface Props {
    * YOU_TAB_STATE_3 AB3 — branch C with tracked rounds only: name what is
    * open. The held course record row, then every open all-time board. The
    * set is the holder map useCourseRecordSummary already builds; the count
-   * is the same unclaimedCount the heading uses.
+   * is the length of that same open list (YOU_TAB_BOARD_LIST_2 AD2).
    */
   boardHolders?: Map<LegendCategory, CourseLegendRow>;
 }
@@ -54,10 +54,12 @@ const UpForGrabsSection: React.FC<Props> = ({
   const { t } = useTranslation('courses');
 
   if (boardHolders) {
+    const openCount = openBoardCategories(boardHolders).length;
     return (
       <Sec
         kicker={t('courseDetail.youTab.sections.upForGrabs')}
-        title={unclaimedCount > 0 ? t('courseDetail.youTab.grabs.boardsTitle', { count: unclaimedCount, unclaimed: formatNumber(unclaimedCount) }) : null}
+        /* AD2 — the heading counts the very rows drawn below it. */
+        title={openCount > 0 ? t('courseDetail.youTab.grabs.boardsTitle', { count: openCount, unclaimed: formatNumber(openCount) }) : null}
       >
         <BoardList holders={boardHolders} />
         <More

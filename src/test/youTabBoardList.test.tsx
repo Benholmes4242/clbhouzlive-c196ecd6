@@ -10,28 +10,29 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('react-i18next', () => ({
   initReactI18next: { type: '3rdParty', init: () => {} },
-  useTranslation: () => ({ t: (k: string) => k }),
+  useTranslation: () => ({ t: (k: string, o?: Record<string, unknown>) => (o?.unclaimed != null ? `${k}:${o.unclaimed}` : k) }),
 }));
 
 import { BoardList } from '@/components/courses/course-detail/you/BoardList';
-import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
+import UpForGrabsSection from '@/components/courses/course-detail/you/UpForGrabsSection';
 import type { CourseLegendRow, LegendCategory } from '@/lib/gam/types';
 
 const tab = fs.readFileSync(path.resolve(process.cwd(), 'src/components/courses/course-detail/CourseYouTab.tsx'), 'utf8');
 
-/* Mirrors useCourseRecordSummary's unclaimedCount predicate. */
-const unclaimed = (h: Map<LegendCategory, CourseLegendRow>) => CHAMPIONS_ORDER_ALL_TIME.filter((c) => !h.has(c)).length;
 
 describe('YOU_TAB_BOARD_LIST_1 AC6', () => {
-  it('held record plus several open boards: one held row, open rows equal the unclaimed count', () => {
+  it('record and two other boards held: no held row, six open rows, heading reads 6', () => {
     const holders = new Map<LegendCategory, CourseLegendRow>();
     (['lowest_gross_all_time', 'most_rounds_all_time', 'most_eagles_all_time'] as LegendCategory[]).forEach((c) =>
       holders.set(c, { category: c, rank: 1 } as unknown as CourseLegendRow),
     );
-    const { container } = render(<BoardList holders={holders} recordValue={76} />);
-    expect(container.querySelectorAll('[data-board-row="held"]').length).toBe(1);
-    expect(container.querySelectorAll('[data-board-row="open"]').length).toBe(unclaimed(holders));
-    expect(unclaimed(holders)).toBe(6);
+    const list = render(<BoardList holders={holders} />);
+    expect(list.container.querySelectorAll('[data-board-row="held"]').length).toBe(0);
+    expect(list.container.querySelectorAll('[data-board-row="open"]').length).toBe(6);
+    const section = render(
+      <UpForGrabsSection recordValue={76} holders={[]} unclaimedCount={6} yourBest={null} boardHolders={holders} onAllBoards={() => {}} />,
+    );
+    expect(section.container.textContent).toContain('courseDetail.youTab.grabs.boardsTitle:6');
   });
 
   it('zero-round course: all nine boards render open', () => {
