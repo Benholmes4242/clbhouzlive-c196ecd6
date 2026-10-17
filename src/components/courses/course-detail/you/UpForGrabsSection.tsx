@@ -16,7 +16,7 @@ import { YouAction } from './youBits';
 import type { CourseLegendRow, LegendCategory } from '@/lib/gam/types';
 import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import { More, Sec } from './many/manyBits';
-import { BoardList } from './BoardList';
+import { BoardList, openBoardCategories } from './BoardList';
 
 interface Props {
   /** The course record gross, when someone holds it. */
@@ -59,7 +59,7 @@ const UpForGrabsSection: React.FC<Props> = ({
         kicker={t('courseDetail.youTab.sections.upForGrabs')}
         title={unclaimedCount > 0 ? t('courseDetail.youTab.grabs.boardsTitle', { count: unclaimedCount, unclaimed: formatNumber(unclaimedCount) }) : null}
       >
-        <BoardList holders={boardHolders} recordValue={recordValue} thinField={thinField} />
+        <BoardList holders={boardHolders} />
         <More
           label={t('courseDetail.youTab.unclaimed.allBoards', { count: CHAMPIONS_ORDER_ALL_TIME.length }).replace(/\s*\u203a$/, '')}
           onPress={onAllBoards}

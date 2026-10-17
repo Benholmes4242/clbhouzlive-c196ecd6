@@ -34,10 +34,9 @@ interface Props {
   onAllBoards: () => void;
   /** The same holder map the open count is taken from. */
   holders: Map<LegendCategory, CourseLegendRow>;
-  recordValue?: number | null;
 }
 
-export const UnclaimedCourseSection: React.FC<Props> = ({ openBoards, onAllBoards, holders, recordValue = null }) => {
+export const UnclaimedCourseSection: React.FC<Props> = ({ openBoards, onAllBoards, holders }) => {
   const { t } = useTranslation('courses');
   const boardTotal = CHAMPIONS_ORDER_ALL_TIME.length;
   return (
@@ -64,7 +63,7 @@ export const UnclaimedCourseSection: React.FC<Props> = ({ openBoards, onAllBoard
           </div>
         </div>
       ) : null}
-      <BoardList holders={holders} recordValue={recordValue} marginTop={16} />
+      <BoardList holders={holders} marginTop={16} />
       <button
         type="button"
         onClick={onAllBoards}
