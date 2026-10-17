@@ -8,11 +8,23 @@ import {
   differentialFromGross,
   indexFromDifferentials,
   indexWithCandidate,
+  projectedNet,
+  projectedDifferential,
 } from './coursePlay';
 
 const inputs = { index: 12.4, cr: 72.1, slope: 131, par: 71 };
 
 describe('coursePlay', () => {
+  it('CHAMPIONS_STATE_3_R: net range subtracts the exported course handicap from each gross value', () => {
+    expect(projectedNet({ typicalGross: 73, lowGross: 71, highGross: 76, courseHcp: 2, sampleSize: 8 })).toEqual({ typical: 71, low: 69, high: 74 });
+  });
+  it('CHAMPIONS_STATE_3_R: differential range is produced by the approved forward conversion', () => {
+    expect(projectedDifferential({ typicalGross: 73, lowGross: 71, highGross: 76, courseHcp: 2, sampleSize: 8 }, { index: 2, cr: 71, slope: 113, par: 71 })).toEqual({ typical: 2, low: 0, high: 5 });
+  });
+  it('CHAMPIONS_STATE_3: projection rejects nonfinite index, CR, slope or par and nonpositive slope', () => {
+    for (const key of ['index', 'cr', 'slope', 'par']) expect(buildCourseProjection([1,2,3,4,5,6,7,8], { ...inputs, [key]: NaN })).toBeNull();
+    expect(buildCourseProjection([1,2,3,4,5,6,7,8], { ...inputs, slope: 0 })).toBeNull();
+  });
   it('courseHandicap for index 12.4, CR 72.1, slope 131, par 71 is 15', () => {
     expect(courseHandicap(inputs)).toBe(15);
   });
