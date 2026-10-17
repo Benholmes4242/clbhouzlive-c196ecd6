@@ -1,6 +1,7 @@
 /** CHAMPIONS_STATE_4: exact-course, viewer-only cards, paged to completion.
  * Gross/points/differential are posted gam_round_stats fields. Net is read
- * from the existing visibility-enforcing gam_round_net view, never derived.
+ * from gam_round_net, never derived. Its visibility contract is not established
+ * in this repository: keep this hook unwired until that source is confirmed.
  * This read is enabled only for the signed-in personal actor's played state.
  * Existing leaderboard rows remain the authority for cumulative board values.
  */

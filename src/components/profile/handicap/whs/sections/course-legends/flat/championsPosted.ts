@@ -14,7 +14,9 @@ export interface PostedCard {
 }
 export function postedBoards(cards: PostedCard[], categories: readonly LegendCategory[], window: LegendWindow, now = new Date()): Map<LegendCategory, PostedBoard> {
   const cutoff = now.getTime() - 90 * 86400000;
-  const inWindow = cards.filter(card => window !== '90d' || new Date(card.date).getTime() >= cutoff);
+  // gam-evaluator/index.ts:2703 applies this eligibility to every legend,
+  // including cumulative boards; a nine-hole tracked card still ends State 3.
+  const inWindow = cards.filter(card => card.holes === 18 && (window !== '90d' || new Date(card.date).getTime() >= cutoff));
   return new Map(categories.map(category => {
     const data = CHAMPIONS_BOARD_DATA[category];
     if (data.kind === 'cumulative') {
@@ -39,7 +41,8 @@ export function pinnedBoardRows(rows: readonly FlatRow[], visibleLeaders = 4) {
   const leaders = ordered.slice(0, visibleLeaders);
   const viewerIndex = ordered.findIndex(row => row.isSelf);
   const pinned = viewerIndex >= visibleLeaders ? ordered[viewerIndex] : null;
-  const between = pinned ? ordered.slice(visibleLeaders, viewerIndex).length : 0;
+  const lastLeader = leaders[leaders.length - 1];
+  const between = pinned && lastLeader ? ordered.filter(row => row.rank > lastLeader.rank && row.rank < pinned.rank).length : 0;
   return { ordered, leaders, pinned, between };
 }
 export function postedRankLabel(row: FlatRow, rows: readonly FlatRow[]): string {
