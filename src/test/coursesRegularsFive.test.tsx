@@ -18,7 +18,7 @@ import { MostPlayedSection } from '@/components/courses/browse/MostPlayedSection
 import { HighestRatedSection } from '@/components/courses/browse/HighestRatedSection';
 import { PHOTO_FIGURE_W } from '@/components/courses/browse/PhotoFigureCard';
 
-const rows = Array.from({ length: 7 }, (_, i) => ({ course_id: `c${i}`, course_name: `Course ${i}`, rounds: 10 - i, members: 2, avg_to_par: 5 }));
+const rows = Array.from({ length: 7 }, (_, i) => ({ course_id: `c${i}`, course_name: `Course ${i}`, rounds: 10 - i, members: 2, avg_to_par: 5, community_rating: 8.1, review_count: 4 }));
 const wrap = (ui: React.ReactElement) => render(<MemoryRouter>{ui}</MemoryRouter>);
 
 beforeEach(() => listMock.mockReset());
