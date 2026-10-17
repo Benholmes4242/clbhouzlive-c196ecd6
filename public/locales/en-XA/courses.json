@@ -1133,8 +1133,8 @@
         "boards": {
           "lowestGross": "[~~Ļőŵéšţ ĝřőšš~~]",
           "lowestNet": "[~~Ļőŵéšţ ñéţ~~]",
-          "bestStableford": "[~~Ĺéšţ šţáƀļéƒőřđ~~]",
-          "bestDifferential": "[~~Ĺéšţ đíƒƒéřéñţíáļ~~]"
+          "bestStableford": "[~~Ĥéšţ šţáƀļéƒőřđ~~]",
+          "bestDifferential": "[~~Ĥéšţ đíƒƒéřéñţíáļ~~]"
         },
         "open": "[~~Őƥéñ~~]",
         "allBoards": "[~~Áļļ {{count}} ƀőářđš ›~~]"
