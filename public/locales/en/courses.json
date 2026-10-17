@@ -1088,6 +1088,15 @@
       },
       "field": "Field",
       "fieldAverageHere": "Field average here",
+      "fieldAverageHereOne": "The one round logged here",
+      "fieldAverageHereFew": "The {{rounds}} rounds logged here",
+      "unclaimed": {
+        "kicker": "NOBODY HAS PLAYED IT YET",
+        "title": "Every board here is unclaimed",
+        "lede": "No member has logged a round here, so the first card posted takes all nine at once.",
+        "tile_one": "board open",
+        "tile_other": "boards open"
+      },
       "form": {
         "best": "Best {{score}}",
         "better": "{{delta}} better than your ten before",

@@ -47,3 +47,27 @@ describe('the gate is gone (U1)', () => {
     expect(youTab).not.toMatch(/total_rounds\s*\?\?\s*0\)\s*>=\s*FIELD_CHART_MIN_ROUNDS[\s\S]{0,400}showAgainst/);
   });
 });
+
+describe('one threshold, one home (YOU_TAB_STATE_AUDIT_1 W1)', () => {
+  const invitation = readFileSync(
+    path.resolve(__dirname, '../components/courses/course-detail/you/NotConnectedInvitation.tsx'),
+    'utf8',
+  );
+  const youTab = readFileSync(
+    path.resolve(__dirname, '../components/courses/course-detail/CourseYouTab.tsx'),
+    'utf8',
+  );
+
+  it('FIELD_CHART_MIN_ROUNDS is deleted everywhere', () => {
+    expect(invitation).not.toContain('FIELD_CHART_MIN_ROUNDS =');
+    expect(youTab).not.toContain('FIELD_CHART_MIN_ROUNDS');
+  });
+
+  it('the no-handicap branch draws the field chart from ONE tracked round', () => {
+    expect(youTab).toContain('(fieldRoundsTotal ?? 0) >= 1');
+  });
+
+  it('zero tracked rounds leads with the shared unclaimed framing in both branches', () => {
+    expect(youTab.match(/<UnclaimedCourseSection/g)?.length).toBe(2);
+  });
+});

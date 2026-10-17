@@ -52,13 +52,15 @@ import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { CourseStatusToggle } from '@/components/courses/phase5';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { formatNumber } from '@/i18n/format';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { A, EmptyState } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseRecordSummary } from './useCourseRecordSummary';
 import AboutSection, { AboutHairline } from './about/AboutSection';
 import CenteredStatStrip from './about/CenteredStatStrip';
-import { EmptyBirdiesSection, FieldShotsSection, FIELD_CHART_MIN_ROUNDS } from './you/NotConnectedInvitation';
+import { EmptyBirdiesSection, FieldShotsSection } from './you/NotConnectedInvitation';
+import { UnclaimedCourseSection } from './you/UnclaimedCourseSection';
 import { YouAction, YouButton, YouSentence } from './you/youBits';
 import { useMemberStandings } from '@/hooks/gam/useMemberStandings';
 import type { YouRound } from './you/YourRoundsHere';
@@ -337,15 +339,32 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   // Field-only strip (YOU_TAB_SPARSE_1 N1), the field's chart (gated: 18 holes and
   // at least 5 rounds), empty birdie slots, up for grabs, then the connect block.
   if (!connection) {
-    const showFieldChart =
-      (analysis?.holes?.length ?? 0) === 18 && Number(analysis?.total_rounds ?? 0) >= FIELD_CHART_MIN_ROUNDS;
+    /* YOU_TAB_STATE_AUDIT_1 W1 — no visibility floor here either: the field
+       chart renders from ONE tracked round, and the count drives only the
+       wording via fieldSample. A member without a handicap must not see less
+       of a course than a member with one. */
+    const fieldRoundsTotal = analysis?.total_rounds != null ? Number(analysis.total_rounds) : null;
+    const sample = fieldSample(fieldRoundsTotal);
+    const zeroRounds = fieldRoundsTotal === 0;
+    const showFieldChart = (analysis?.holes?.length ?? 0) === 18 && (fieldRoundsTotal ?? 0) >= 1;
     return wrap(
       <div>
+        {/* W3 — zero tracked rounds: the shared unclaimed framing leads. */}
+        {zeroRounds ? <UnclaimedCourseSection openBoards={unclaimedCount} /> : null}
         {/* YOU_TAB_SPARSE_1 N1: no dash columns for the reader's absent figures.
             The field figure stands alone, labelled as the field; absent, no strip. */}
         {fieldGross ? (
-          <AboutSection first>
-            <CenteredStatStrip items={[{ label: t('courseDetail.youTab.fieldAverageHere'), value: fieldGross }]} />
+          <AboutSection first={!zeroRounds}>
+            <CenteredStatStrip
+              items={[{
+                label: sample === 'one'
+                  ? t('courseDetail.youTab.fieldAverageHereOne')
+                  : sample === 'few'
+                    ? t('courseDetail.youTab.fieldAverageHereFew', { count: fieldRoundsTotal ?? 0, rounds: formatNumber(fieldRoundsTotal ?? 0) })
+                    : t('courseDetail.youTab.fieldAverageHere'),
+                value: fieldGross,
+              }]}
+            />
           </AboutSection>
         ) : null}
         {showFieldChart && analysis ? (
@@ -389,6 +408,9 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
        same count: "the best card logged here" below, "the course record" at
        or above. */
     const thinField = fieldRoundsTotal != null && fieldRoundsTotal < COURSE_FIELD_MIN_ROUNDS;
+    /* W3 — zero tracked rounds: the same unclaimed framing as the
+       no-handicap branch leads; the bucket-list prompt stays beneath. */
+    const zeroRounds = fieldRoundsTotal === 0;
     const showWonAndLost = (analysis?.holes?.length ?? 0) === 18 && (fieldRoundsTotal ?? 0) >= 1;
     const showAgainst =
       yourGolf.parOrBetterPct != null &&
@@ -410,6 +432,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     const circleOthers = circle.others;
     return wrap(
       <div>
+        {zeroRounds ? <UnclaimedCourseSection openBoards={unclaimedCount} /> : null}
         <ProjectionSection
           courseName={courseName}
           state={projectionState}
