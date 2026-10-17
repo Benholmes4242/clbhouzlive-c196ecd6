@@ -1212,7 +1212,8 @@
         "heading": "Who you know has played it",
         "named_one": "{{names}} has played it.",
         "named_other": "{{names}} have played it.",
-        "namedWithOthers": "{{names}} & {{others}} others have played it."
+        "namedWithOthers": "{{names}} & {{others}} others have played it.",
+        "capped": "{{count}}+ in your circle have played it."
       },
       "actions": {
         "playingSoon": "Playing it soon?",

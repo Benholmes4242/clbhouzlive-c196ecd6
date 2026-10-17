@@ -68,6 +68,7 @@ import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
 import { useBoardCoursePlayers } from '@/components/explore-tab-new/courseled/hooks/useBoardCoursePlayers';
 import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFilters';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { CIRCLE_PLAYERS_LIMIT, circleNamesLine } from './you/circleNamesLine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import {
@@ -448,9 +449,11 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
                 ))}
               </span>
               <YouSentence>
-                {circleOthers > 0
-                  ? t('courseDetail.youTab.circle.namedWithOthers', { names: circleNames, others: circleOthers })
-                  : t('courseDetail.youTab.circle.named', { names: circleNames, count: circleCount })}
+                {circle.capped
+                  ? t('courseDetail.youTab.circle.capped', { count: CIRCLE_PLAYERS_LIMIT })
+                  : circleOthers > 0
+                    ? t('courseDetail.youTab.circle.namedWithOthers', { names: circleNames, others: circleOthers })
+                    : t('courseDetail.youTab.circle.named', { names: circleNames, count: circleCount })}
               </YouSentence>
             </div>
           </AboutSection>
