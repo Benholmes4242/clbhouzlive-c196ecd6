@@ -353,7 +353,7 @@ export const WithinReachSection: React.FC<{ rows: ReachRow[]; unclaimed: number;
       ))}
       {unclaimed > 0 ? (
         <Said quiet>
-          <B>{formatNumber(unclaimed)} of the {formatNumber(boards)} boards here {unclaimed === 1 ? 'has' : 'have'} no visible holder.</B> Some may be held by members who keep their records private.
+          <B>{Words(unclaimed)} of the {words(boards)} boards here {unclaimed === 1 ? 'has' : 'have'} no visible holder.</B> Some may be held by members who keep their records private.
         </Said>
       ) : null}
       <More label="All boards" onPress={onAllBoards} />
