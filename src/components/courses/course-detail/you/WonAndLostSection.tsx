@@ -58,7 +58,13 @@ const WonAndLostSection: React.FC<Props> = ({ holes, totalRounds, sample, onAllH
       {rows.length > 0 ? (
         <div style={{ marginTop: 16 }}>
           {rows.map((h, i) => {
-            const shots = Math.max(0, h.avg_to_par).toFixed(2);
+            const shots = Math.max(0, h.avg_to_par).toFixed(dp);
+            const subKey =
+              sample === 'one'
+                ? h.yards != null ? 'holeSubOne' : 'holeSubOneNoYards'
+                : sample === 'few'
+                  ? h.yards != null ? 'holeSubFew' : 'holeSubFewNoYards'
+                  : h.yards != null ? 'holeSub' : 'holeSubNoYards';
             return (
               <div
                 key={h.hole_no}
@@ -97,15 +103,18 @@ const WonAndLostSection: React.FC<Props> = ({ holes, totalRounds, sample, onAllH
                       : t('courseDetail.youTab.wonAndLost.holeTitleNoIndex', { par: h.par })}
                   </div>
                   <div style={{ marginTop: 4, fontSize: 11, fontWeight: 500, color: A.DIM, ...FIGS }}>
-                    {h.yards != null
-                      ? t('courseDetail.youTab.wonAndLost.holeSub', { yards: formatNumber(h.yards), shots })
-                      : t('courseDetail.youTab.wonAndLost.holeSubNoYards', { shots })}
+                    {t(`courseDetail.youTab.wonAndLost.${subKey}`, {
+                      yards: h.yards != null ? formatNumber(h.yards) : undefined,
+                      shots,
+                      count: totalRounds,
+                      rounds: formatNumber(totalRounds),
+                    })}
                   </div>
                 </div>
                 <span
                   style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.035em', color: A.INK, flexShrink: 0, ...FIGS }}
                 >
-                  {signed2(h.avg_to_par)}
+                  {signed(h.avg_to_par)}
                 </span>
               </div>
             );
