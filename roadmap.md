@@ -1,6 +1,7 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
 ## BRIEF_CHAMPIONS_STATE_4 — CHAMPIONS_STATE_4
+- [ ] CHAMPIONS_STATE_4_C: finish the interrupted edit, verify source availability, then compile/full suite; report exact surviving errors and reconcile tests against 1,532.
 - [x] Confirm clbhouz, signed-off mock; baseline full suite 1,532 passing. Found posted gam_round_stats fields and existing gam_round_net view; leaderboard/window absence remains unknown, not zero.
 - [ ] Extend shared cabinet, explicit reach basis, real pinned row and selected-board defence; preserve States 1–3.
 - [ ] Add rule coverage, run full suite against 1,532 baseline; stop/report any new failure.
