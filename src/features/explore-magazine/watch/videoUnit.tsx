@@ -192,7 +192,6 @@ export function VideoCard({
   context = 'watch',
   autoplay = size === 'full',
   engagement,
-  views = null,
   reason = null,
   progress = null,
 }: {
@@ -208,8 +207,6 @@ export function VideoCard({
   /** ROW REACTIONS (BRIEF_WATCH_VIDEO_ROW_REACTIONS). Optional and only passed
    *  by the Watch feed's full-width rows; the All rail never passes it. */
   engagement?: VideoRowEngagement;
-  /** K.4 — "1.2k views", or null when the view read is unavailable. */
-  views?: string | null;
   /** K.4 line two; null renders no line at all. */
   reason?: ReasonLine | null;
   /** K.1 — part-watched fraction; pass only when the bar should draw. */
@@ -431,7 +428,7 @@ export function WatchProgressBar({ fraction }: { fraction: number }) {
   );
 }
 
-/** K.4 moved the FIGURE on line one to views; the like control and its count stay on the card (L.2). */
+/** The like control and its count stay on the card (L.2). */
 export interface VideoRowEngagement {
   likeAvailable: boolean;
   liked: boolean;
