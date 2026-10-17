@@ -9,6 +9,7 @@ import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({ t: (k: string, o?: Record<string, unknown>) => (o?.ordinal ? `${k}:${o.ordinal}` : k) }),
 }));
 
