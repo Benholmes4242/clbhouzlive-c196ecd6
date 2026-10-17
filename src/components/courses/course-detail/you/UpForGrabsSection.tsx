@@ -14,23 +14,9 @@ import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/to
 import AboutSection from '../about/AboutSection';
 import { YouAction } from './youBits';
 import type { CourseLegendRow, LegendCategory } from '@/lib/gam/types';
-import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import { More, Sec } from './many/manyBits';
-
-/* YOU_TAB_STATE_3 AB3 — board names come from the state-1 vocabulary
-   (courseDetail.youTab.unclaimed.boards), one key per all-time board. */
-const BOARD_KEY: Partial<Record<LegendCategory, string>> = {
-  lowest_gross_all_time: 'lowestGross',
-  lowest_net_all_time: 'lowestNet',
-  best_stableford_all_time: 'bestStableford',
-  most_aces_all_time: 'mostAces',
-  most_albatrosses_all_time: 'mostAlbatrosses',
-  most_eagles_all_time: 'mostEagles',
-  most_birdies_all_time: 'mostBirdies',
-  most_rounds_all_time: 'mostRounds',
-  best_score_diff_all_time: 'bestDifferential',
-};
+import { BoardList } from './BoardList';
 
 interface Props {
   /** The course record gross, when someone holds it. */
@@ -68,39 +54,12 @@ const UpForGrabsSection: React.FC<Props> = ({
   const { t } = useTranslation('courses');
 
   if (boardHolders) {
-    const open = CHAMPIONS_ORDER_ALL_TIME.filter((c) => !boardHolders.has(c) && BOARD_KEY[c]);
-    const rows: { key: string; label: string; held: boolean }[] = [];
-    if (recordValue != null) {
-      rows.push({
-        key: 'record',
-        label: t(`courseDetail.youTab.grabs.${thinField ? 'grossHeldThin' : 'grossHeld'}`, {
-          value: formatLegendValueCompact('lowest_gross_all_time', recordValue),
-        }),
-        held: true,
-      });
-    }
-    open.forEach((c) => rows.push({ key: c, label: t(`courseDetail.youTab.unclaimed.boards.${BOARD_KEY[c]}`), held: false }));
     return (
       <Sec
         kicker={t('courseDetail.youTab.sections.upForGrabs')}
         title={unclaimedCount > 0 ? t('courseDetail.youTab.grabs.boardsTitle', { count: unclaimedCount, unclaimed: formatNumber(unclaimedCount) }) : null}
       >
-        <div style={{ marginTop: 14 }}>
-          {rows.map((r, i) => (
-            <div
-              key={r.key}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 11, padding: '11px 0',
-                borderBottom: i < rows.length - 1 ? `1px solid ${A.SOFT}` : undefined, fontFamily: SANS,
-              }}
-            >
-              <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: A.BODY, ...FIGS }}>{r.label}</div>
-              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: r.held ? A.DIM : MEDAL_GOLD }}>
-                {r.held ? t('courseDetail.youTab.grabs.heldTag') : t('courseDetail.youTab.unclaimed.open')}
-              </div>
-            </div>
-          ))}
-        </div>
+        <BoardList holders={boardHolders} recordValue={recordValue} thinField={thinField} />
         <More
           label={t('courseDetail.youTab.unclaimed.allBoards', { count: CHAMPIONS_ORDER_ALL_TIME.length }).replace(/\s*\u203a$/, '')}
           onPress={onAllBoards}
