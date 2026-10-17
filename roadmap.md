@@ -1,5 +1,11 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_CHAMPIONS_STATE_4 — CHAMPIONS_STATE_4
+- [ ] Confirm clbhouz, signed-off mock and legitimate posted/spread/rival sources.
+- [ ] Extend shared cabinet, explicit reach basis, real pinned row and selected-board defence; preserve States 1–3.
+- [ ] Add rule coverage, run full suite against 1,532 baseline; stop/report any new failure.
+- [ ] Verify preview and report source/auth limits, test inventory and deviations.
+
 ## BRIEF_CHAMPIONS_STATE_3 / R / T
 - [x] CHAMPIONS_STATE_3_G4: deterministic props-keyed avatar mock/capture only; exact fallback-tree comparisons and ghost assertions preserved. Full suite 1,532 → 1,532, all passing (198 files); resolves the historical State 3 G/G2/G3 stops below. No tests added/deleted/renamed; holder assertion uses Map values with unchanged expected URL. No application or outside-State-3 test changes; preview build OK; authenticated checks unavailable on external/unmanaged Supabase.
 - [x] CHAMPIONS_STATE_3_G3: user approved mocking actual CourseLegendsAvatar instead of unused SquircleAvatar; failing test now has exactly three input-contract assertions; second initials test and 1,532 count preserved. No application changes.
