@@ -20,6 +20,7 @@ import { DrilldownHeader } from './drilldown/DrilldownHeader';
 import { FlatBoardSheet } from './flat/FlatBoardSheet';
 import { UnclaimedSection, WhatCounts } from './flat/UnclaimedSection';
 import { NobodyHasPlayed } from './flat/NobodyHasPlayed';
+import { FieldChampions } from './flat/FieldChampions';
 import { useBoardMemberUsernames } from '@/hooks/gam/useBoardMemberUsernames';
 
 import { YourCrowns } from './flat/YourCrowns';
@@ -103,9 +104,12 @@ interface Props {
   hideHeader?: boolean;
   /** Backdrop theme threaded to embedded rows/avatars and the full-leaderboard sheet. Default 'dark' preserves handicap rendering. */
   theme?: 'light' | 'dark';
+  /** Already-mounted GolfClubView read; no additional stats query. */
+  fieldAvgOverPar?: number | null;
+  totalCourseRounds?: number | null;
 }
 
-export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader = false, theme = 'dark' }) => {
+export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader = false, theme = 'dark', fieldAvgOverPar = null, totalCourseRounds = null }) => {
   const { t } = useTranslation('courses');
   const ctx = selection;
 
@@ -374,6 +378,10 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const navigate = useNavigate();
   const { data: whsConnection, isFetched: whsFetched } = useWhsConnection(activeActor?.id);
 
+  const fieldOnly = !activeActor?.id || (whsFetched && !whsConnection);
+  const fieldCategories = orderWithWomensRecord(window === '90d' ? CHAMPIONS_ORDER_90D : CHAMPIONS_ORDER_ALL_TIME, new Set(data.map(row => row.category)));
+  const fieldActiveKey = selectedCategory && fieldCategories.includes(selectedCategory) ? selectedCategory : fieldCategories[0];
+
   const containerRef = useRef<HTMLDivElement>(null);
 
 
@@ -539,7 +547,21 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
       {/* BRIEF_CHAMPIONS_TAB_REBUILD §3.1 + §3.2 — a statement, then the board. */}
       {!isLoading && !isError && (data ?? []).length > 0 && (
-        <div>
+        fieldOnly ? <FieldChampions
+          categories={fieldCategories.map(key => ({ key, label: legendCategoryLabel[key], short: SHORT_LABELS[key] }))}
+          grouped={grouped}
+          courseName={ctx.courseName}
+          activeKey={fieldActiveKey}
+          onSelect={setSelectedCategory}
+          legendWindow={window}
+          onWindowChange={w => { handleWindowChange(w); setSelectedCategory(null); }}
+          onConnect={() => { analyticsEvents.track('champions_connect_handicap', { course_id: ctx.courseId }); navigate('/handicap'); }}
+          onOpenFull={setFullLeaderboardCategory}
+          onRowPress={row => { if (row.username) navigate(`/profile/${row.username}`); }}
+          par={meta?.course_par ?? null}
+          fieldOverPar={fieldAvgOverPar}
+          rounds={totalCourseRounds}
+        /> : <div>
           <YourCrowns
             signedOut={!activeActor?.id}
             noHandicap={Boolean(activeActor?.id) && whsFetched && !whsConnection}

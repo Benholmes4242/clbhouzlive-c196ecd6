@@ -28,6 +28,7 @@ import {
   type FlatRow,
 } from './championsFlatBits';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
+import { Button } from '@/components/ui/button';
 
 const MAX_ROWS = 6;
 
@@ -49,6 +50,8 @@ interface Props {
   coursePar: number | null;
   onOpenFull: (cat: LegendCategory) => void;
   onRowPress?: (row: FlatRow) => void;
+  /** State 2: cabinet owns selection; no viewer rank or duplicated champion statement. */
+  fieldOnly?: boolean;
 }
 
 export const BoardSection: React.FC<Props> = ({
@@ -62,6 +65,7 @@ export const BoardSection: React.FC<Props> = ({
   coursePar,
   onOpenFull,
   onRowPress,
+  fieldOnly = false,
 }) => {
   const { t } = useTranslation('courses');
   const chips: FlatChip[] = useMemo(
@@ -79,8 +83,8 @@ export const BoardSection: React.FC<Props> = ({
   if (!active) return null;
 
   const entry = grouped.get(active.key);
-  const rows = entry?.rows ?? [];
-  if (rows.length === 0) return null;
+  const rows = fieldOnly ? (entry?.rows ?? []).map(row => ({ ...row, isSelf: false })) : entry?.rows ?? [];
+  if (rows.length === 0 && !fieldOnly) return null;
 
   const positions = positionsFor(rows);
   const shown = rows.slice(0, MAX_ROWS);
@@ -89,12 +93,12 @@ export const BoardSection: React.FC<Props> = ({
 
   return (
     <AboutSection heading={active.label} meta={windowMeta(total, legendWindow, t)} space={30}>
-      {canSwitchWindow ? (
+      {canSwitchWindow || fieldOnly ? (
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 14, marginBottom: 12, fontFamily: SANS }}>
           {(['all_time', '90d'] as LegendWindow[]).map((w) => {
             const on = w === legendWindow;
             return (
-              <button
+              <Button variant="ghost"
                 key={w}
                 type="button"
                 onClick={() => onWindowChange(w)}
@@ -104,6 +108,7 @@ export const BoardSection: React.FC<Props> = ({
                   // choose what you look at, this only narrows when. Smaller,
                   // lighter, muted — never a second row of equals.
                   padding: 0,
+                  height: 'auto',
                   border: 0,
                   background: 'transparent',
                   fontFamily: SANS,
@@ -114,20 +119,21 @@ export const BoardSection: React.FC<Props> = ({
                 }}
               >
                 {w === 'all_time' ? 'All time' : '90 days'}
-              </button>
+              </Button>
             );
           })}
         </div>
       ) : null}
 
-      {chips.length > 1 ? (
+      {!fieldOnly && chips.length > 1 ? (
         <div style={{ marginBottom: 14 }}>
           <BoardChips chips={chips} activeKey={active.key} onSelect={onSelectCategory} />
         </div>
       ) : null}
 
-      <ChampionLine category={active.key} rows={rows} viewerValue={viewerValue} />
-      <AboutHairline style={{ marginTop: 12 }} />
+      {!fieldOnly && <ChampionLine category={active.key} rows={rows} viewerValue={viewerValue} />}
+      {rows.length > 0 && <AboutHairline style={{ marginTop: 12 }} />}
+      {fieldOnly && rows.length === 0 && <div style={{ color: A.DIM }}>Never claimed</div>}
 
       {shown.map((row, i) => (
         <FlatBoardRow
@@ -141,7 +147,7 @@ export const BoardSection: React.FC<Props> = ({
         />
       ))}
 
-      {total > MAX_ROWS || rows.length > MAX_ROWS ? (
+      {rows.length > 0 && (fieldOnly || total > MAX_ROWS || rows.length > MAX_ROWS) ? (
         <FlatAction label={`All ${total}`} onPress={() => onOpenFull(active.key)} />
       ) : null}
     </AboutSection>

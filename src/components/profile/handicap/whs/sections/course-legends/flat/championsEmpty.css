@@ -22,3 +22,21 @@
 .champions-empty-connect p { font-size: 12.5px; line-height: 1.5; margin-top: 7px; }
 .champions-empty-connect .champions-empty-button { margin-top: 16px; border: 0; border-radius: 999px; padding: 11px 22px; font-size: 14px; font-weight: 700; }
 .champions-empty-connect .champions-empty-said { margin-top: 18px; }
+
+/* CHAMPIONS_STATE_2 held branch only; never-claimed/state-1 rules above unchanged. */
+.champions-cabinet-tile[data-state="held"] { border: 1px solid var(--hcp-line); }
+.champions-cabinet-tile[data-state="held"] .champions-cabinet-value { font-size: 19px; }
+.champions-cabinet-tile[data-state="held"] .champions-cabinet-state { text-transform: none; font-weight: 700; }
+.champions-cabinet-select { width: 100%; height: 100%; align-items: stretch; text-align: left; gap: 0; white-space: normal; }
+.champions-cabinet-select > div { min-width: 0; }
+.champions-field-bullets { margin-top: 13px; padding: 0; list-style: none; }
+.champions-field-bullets li { display: flex; gap: 9px; padding: 7px 0; font-size: 12.5px; line-height: 1.45; }
+.champions-field-bullets li::before { content: '•'; flex-shrink: 0; }
+.champions-field-panel { margin-top: 14px; border: 1px solid var(--hcp-line); border-radius: 8px; padding: 14px; }
+.champions-field-record { display: flex; align-items: baseline; gap: 10px; }
+.champions-field-record strong { font-size: 32px; font-weight: 800; line-height: 1; }
+.champions-field-record span { font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.champions-field-stats { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 8px; margin-top: 12px; }
+.champions-field-stats strong { display: block; font-size: 14px; font-weight: 800; }
+.champions-field-stats span { display: block; font-size: 9.5px; text-transform: uppercase; overflow-wrap: anywhere; }
+.champions-field-scale { width: 100%; height: 64px; display: block; margin-top: 14px; }
