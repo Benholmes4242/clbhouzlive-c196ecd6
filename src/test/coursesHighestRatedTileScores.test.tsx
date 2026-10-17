@@ -36,10 +36,10 @@ afterEach(cleanup);
 describe('BRIEF_COURSES_HIGHEST_RATED_TILE_SCORES', () => {
   it('a) breakdown scores at 9.0+ are green, below 9 white, missing is a white dash', () => {
     renderRated(baseRow);
-    expect(colorOf('10.0')).toBe(A.GREEN);
-    expect(colorOf('9.0')).toBe(A.GREEN);
-    expect(colorOf('8.9')).toBe('#FFFFFF');
-    expect(colorOf('-')).toBe('#FFFFFF');
+    expect(colorOf('10.0')).toBe(GREEN);
+    expect(colorOf('9.0')).toBe(GREEN);
+    expect(colorOf('8.9')).toBe(WHITE);
+    expect(colorOf('-')).toBe(WHITE);
   });
 
   it('b) each of the four breakdown cells is centred', () => {
@@ -52,17 +52,17 @@ describe('BRIEF_COURSES_HIGHEST_RATED_TILE_SCORES', () => {
 
   it('c) the headline rating is green at 9.0 or more', () => {
     renderRated(baseRow);
-    expect(colorOf('9.4')).toBe(A.GREEN);
+    expect(colorOf('9.4')).toBe(GREEN);
   });
 
   it('d) the headline rating is white below 9.0', () => {
     renderRated({ ...baseRow, community_rating: 8.7 });
-    expect(colorOf('8.7')).toBe('#FFFFFF');
+    expect(colorOf('8.7')).toBe(WHITE);
   });
 
   it('e) the regulars rail headline figure stays white', () => {
     listMock.mockReturnValue({ rows: [{ ...baseRow, community_rating: 9.4 }], isLoading: false });
     render(<MemoryRouter><MostPlayedSection /></MemoryRouter>);
-    expect(colorOf('42')).toBe('#FFFFFF');
+    expect(colorOf('42')).toBe(WHITE);
   });
 });
