@@ -1,5 +1,9 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_CHAMPIONS_STATE_1 — CHAMPIONS_STATE_1
+- [ ] Verify existing client catalogue and courses-with-tracked-round counts first; CC2 requires stopping if the latter is unavailable.
+- [ ] Once CC2 is satisfied, implement the signed-off zero-round cabinet/count/connect screen and CE1–CE4 tests; exclude Elsewhere and preserve all other screens except the explicitly requested count corrections.
+
 ## BRIEF_PROFILE_TABS_VOICE
 - [x] Confirm clbhouz; change only specified Courses/Rounds ownership copy and props, with name-free third-person fallbacks and the archive possessive fix.
 - [x] Add English keys only; preserve all queries, hooks, derivations, figures and Handicap sections. Excluded archive empty state still says "They hasn't" without a name; reported, not changed.
