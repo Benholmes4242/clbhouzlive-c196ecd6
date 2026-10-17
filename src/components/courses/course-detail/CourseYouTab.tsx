@@ -431,9 +431,30 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
           />
         ) : null}
         {upForGrabs}
-        {circlePlayed > 0 ? (
+        {circleCount > 0 ? (
           <AboutSection heading={t('courseDetail.youTab.circle.heading')}>
-            <YouSentence>{t('common:feed.courseSheet.circlePlayed', { count: circlePlayed })}</YouSentence>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>
+                {circleShown.map((p, i) => (
+                  <span key={p.user_id} style={{ marginLeft: i === 0 ? 0 : -7, display: 'inline-flex' }}>
+                    <SquircleAvatar
+                      size={22}
+                      src={p.profile_photo_url}
+                      alt={p.display_name ?? ''}
+                      userId={p.user_id}
+                      /* The canonical hairline ring, identical to the board's
+                         avatars. NO amber: an avatar is never amber. */
+                      hairlineRing
+                    />
+                  </span>
+                ))}
+              </span>
+              <YouSentence>
+                {circleOthers > 0
+                  ? t('courseDetail.youTab.circle.namedWithOthers', { names: circleNames, others: circleOthers })
+                  : t('courseDetail.youTab.circle.named', { names: circleNames, count: circleCount })}
+              </YouSentence>
+            </div>
           </AboutSection>
         ) : null}
         <AboutSection>
