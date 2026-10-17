@@ -68,6 +68,7 @@ import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
 import { useBoardCoursePlayers } from '@/components/explore-tab-new/courseled/hooks/useBoardCoursePlayers';
 import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFilters';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { CIRCLE_PLAYERS_LIMIT, circleNamesLine } from './you/circleNamesLine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import {
@@ -125,7 +126,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     user?.id,
     courseId,
     { ...DEFAULT_FILTERS, scope: 'circle', window: 'all' },
-    { limit: 50, enabled: !statusLoading && !hasTrackedRounds },
+    { limit: CIRCLE_PLAYERS_LIMIT, enabled: !statusLoading && !hasTrackedRounds },
   );
 
   const [openRoundId, setOpenRoundId] = React.useState<string | null>(null);
@@ -394,15 +395,13 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
        so the number and the names always agree. "Played" means a logged
        round, always: if the rounds-based source returns nothing, the line
        does not render (S4). */
-    const readableCircle = (circlePlayers.data ?? []).filter(
-      (p) => p.display_name != null && p.display_name !== '',
-    );
-    const circleCount = readableCircle.length;
-    const circleShown = readableCircle.slice(0, 3);
+    const circle = circleNamesLine(circlePlayers.data);
+    const circleCount = circle.count;
+    const circleShown = circle.shown;
     const circleNames = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' }).format(
       circleShown.map((p) => p.display_name!),
     );
-    const circleOthers = circleCount - circleShown.length;
+    const circleOthers = circle.others;
     return wrap(
       <div>
         <ProjectionSection
@@ -450,9 +449,11 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
                 ))}
               </span>
               <YouSentence>
-                {circleOthers > 0
-                  ? t('courseDetail.youTab.circle.namedWithOthers', { names: circleNames, others: circleOthers })
-                  : t('courseDetail.youTab.circle.named', { names: circleNames, count: circleCount })}
+                {circle.capped
+                  ? t('courseDetail.youTab.circle.capped', { count: CIRCLE_PLAYERS_LIMIT })
+                  : circleOthers > 0
+                    ? t('courseDetail.youTab.circle.namedWithOthers', { names: circleNames, others: circleOthers })
+                    : t('courseDetail.youTab.circle.named', { names: circleNames, count: circleCount })}
               </YouSentence>
             </div>
           </AboutSection>

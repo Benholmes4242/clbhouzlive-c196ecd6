@@ -1199,7 +1199,8 @@
         "heading": "[~~Ŵĥő ýőú ǩñőŵ ĥáš ƥļáýéđ íţ~~]",
         "named_one": "[~~{{names}} ĥáš ƥļáýéđ íţ.~~]",
         "named_other": "[~~{{names}} ĥáṽé ƥļáýéđ íţ.~~]",
-        "namedWithOthers": "[~~{{names}} & {{others}} őţĥéřš ĥáṽé ƥļáýéđ íţ.~~]"
+        "namedWithOthers": "[~~{{names}} & {{others}} őţĥéřš ĥáṽé ƥļáýéđ íţ.~~]",
+        "capped": "[~~{{count}}+ íñ ýőúř ĉířĉļé ĥáṽé ƥļáýéđ íţ.~~]"
       },
       "actions": {
         "playingSoon": "[~~Ƥļáýíñĝ íţ šőőñ?~~]",
