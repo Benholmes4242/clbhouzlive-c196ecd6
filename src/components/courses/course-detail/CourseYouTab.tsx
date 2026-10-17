@@ -68,7 +68,7 @@ import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import {
-  LAST_N, NOBODY_CLOSE_SHARE, SEASON_MIN_ROUNDS, aggregate, allSeasons, edgeSummary, fieldExcludingViewer, firstN,
+  LAST_N, NOBODY_CLOSE_SHARE, SEASON_MIN_ROUNDS, aggregate, allSeasons, courseFieldKnown, edgeSummary, fieldExcludingViewer, firstN,
   goodRounds, holeEdges, lastN, openHolesState, scoredRounds,
 } from '@/lib/courseYou/youDerivations';
 import { ordinal } from './you/youBits';
@@ -358,13 +358,21 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   if (!hasTrackedRounds) {
     const showWonAndLost =
       (analysis?.holes?.length ?? 0) === 18 && Number(analysis?.total_rounds ?? 0) >= FIELD_CHART_MIN_ROUNDS;
+    /* YOU_TAB_THIN_COURSE_1 P1 — two rounds is not a field. Below
+       COURSE_FIELD_MIN_ROUNDS the course-side claims come off: no "Here"
+       rate, no harder-than line, and the record is the best card logged
+       here. The viewer's own figures are unaffected. */
+    const fieldRoundsTotal = analysis?.total_rounds != null ? Number(analysis.total_rounds) : null;
+    const fieldKnown = courseFieldKnown(fieldRoundsTotal);
     const showAgainst =
-      fieldParOrBetterPct != null &&
-      Number.isFinite(fieldParOrBetterPct) &&
       yourGolf.parOrBetterPct != null &&
       Number.isFinite(yourGolf.parOrBetterPct) &&
-      yourGolf.courses > 0;
-    const circlePlayed = courseStats?.circle_played ?? 0;
+      yourGolf.courses > 0 &&
+      (fieldKnown ? fieldParOrBetterPct != null && Number.isFinite(fieldParOrBetterPct) : true);
+    /* P4 — the circle is NAMED from the members read (ratings-based, the one
+       client source with profiles); a member whose profile is not readable is
+       excluded from the count as well as the names. */
+    const circleMembers = (membersData?.members ?? []).filter((m) => m.in_circle && m.profile);
     return wrap(
       <div>
         <ProjectionSection
