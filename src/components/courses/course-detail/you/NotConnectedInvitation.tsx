@@ -16,7 +16,8 @@ import { A, BAR_RADIUS, FIGS, RAMP_TOPAR, SANS } from '@/features/courses/compon
 import { formatNumber } from '@/i18n/format';
 import AboutSection from '../about/AboutSection';
 import { YouSentence } from './youBits';
-import { B, Facts, Said, Sec, Verd, signed1 } from './many/manyBits';
+import { B, Facts, More, Said, Sec, Verd, signed1 } from './many/manyBits';
+import AllHolesSheet from '../about/AllHolesSheet';
 import { ordinal } from './youBits';
 
 /** Mock you-tab-final.html draws the chart at 96px. */
@@ -85,13 +86,15 @@ export const FieldHoleBars: React.FC<{ holes: CourseHole[] }> = ({ holes }) => {
 };
 
 /** YOU_TAB_SPARSE_1 N2: the field's chart names the course, never the reader. */
-export const FieldShotsSection: React.FC<{ holes: CourseHole[]; totalRounds: number; courseName: string; withFacts?: boolean }> = ({
+export const FieldShotsSection: React.FC<{ holes: CourseHole[]; totalRounds: number; courseName: string; withFacts?: boolean; courseId?: string }> = ({
   holes,
   totalRounds,
   courseName,
   withFacts = false,
+  courseId,
 }) => {
   const { t } = useTranslation('courses');
+  const [allOpen, setAllOpen] = React.useState(false);
   return (
     <AboutSection
       heading={t('courseDetail.youTab.connect.fieldShotsHeading', { courseName })}
@@ -99,11 +102,22 @@ export const FieldShotsSection: React.FC<{ holes: CourseHole[]; totalRounds: num
       /* YOU_TAB_THIN_COURSE_1 P5 — a long course name wraps, never truncates. */
       wrapHeading
     >
-      <FieldHoleBars holes={holes} />
-      {withFacts ? <FieldHoleFacts holes={holes} /> : null}
-      <div style={{ marginTop: 12 }}>
+      {/* YOU_TAB_STATE_2_R AA1 — the lede sits ABOVE the chart, as the mock draws it. */}
+      <div style={{ marginBottom: 13 }}>
         <YouSentence quiet>{t('courseDetail.youTab.connect.fieldChartLede', { courseName, count: totalRounds, rounds: formatNumber(totalRounds) })}</YouSentence>
       </div>
+      <FieldHoleBars holes={holes} />
+      {withFacts ? <FieldHoleFacts holes={holes} /> : null}
+      {/* AA1 — "All 18 holes" opens the Course tab's own analytical sheet. */}
+      {courseId ? (
+        <>
+          <More
+            label={t('courseDetail.plays.allHoles', { count: holes.length, holes: formatNumber(holes.length) })}
+            onPress={() => setAllOpen(true)}
+          />
+          <AllHolesSheet open={allOpen} onClose={() => setAllOpen(false)} courseId={courseId} courseName={courseName} />
+        </>
+      ) : null}
     </AboutSection>
   );
 };
