@@ -69,3 +69,8 @@ export function ChampionsElsewhere({ userId }: { userId: string }) {
   const { data } = useTitlesInReach(userId);
   return <ElsewhereSection rows={data ?? []} />;
 }
+
+/** VB1/VB2: the signed-in personal member with a synced handicap; never otherwise. */
+export function showElsewhere(connected: boolean, userId: string | null | undefined, actorId: string | null | undefined): boolean {
+  return connected && Boolean(userId) && userId === actorId;
+}
