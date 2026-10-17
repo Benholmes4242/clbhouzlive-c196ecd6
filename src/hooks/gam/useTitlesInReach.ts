@@ -22,6 +22,6 @@ export function useTitlesInReach(
   return useGamRpc<TitleInReach[]>(
     'get_player_titles_in_reach',
     { p_user_id: userId, p_window: window, p_limit: poolSize },
-    { enabled: Boolean(userId), staleTime: 0 },
+    { enabled: Boolean(userId), staleTime: 60_000 },
   );
 }
