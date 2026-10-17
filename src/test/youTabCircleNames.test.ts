@@ -83,6 +83,7 @@ describe('CourseYouTab circle line (source rules)', () => {
 
   it('has no ratings-based fallback for any part of the line', () => {
     expect(src).not.toContain('useMembersWhoPlayedCourse');
-    expect(src).not.toContain('circle_played');
+    /* No read of the old stats count (the file header mentions it in prose). */
+    expect(src).not.toMatch(/courseStats\?\.\s*circle_played/);
   });
 });
