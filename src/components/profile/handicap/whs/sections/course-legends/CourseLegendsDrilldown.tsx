@@ -32,7 +32,8 @@ import { useWhsConnection, useRecentDifferentials } from '@/lib/whs/hooks';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 
-import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME, orderWithWomensRecord } from './_shared/championsOrder';
+import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME, orderWithWomensRecord, withAvailableSources } from './_shared/championsOrder';
+import { PostedChampions } from './flat/PostedChampions';
 import { useProBenchmarks } from '@/hooks/gam/useProBenchmarks';
 import { pickProBenchmark, filterProsForViewer, PRO_BAND_BASES, type ProBandBase } from './drilldown/_shared/proBenchmark';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -133,10 +134,18 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
    * is empty, not fatal: until the SQL draft is applied the other boards are
    * unaffected and the net board simply does not appear.
    */
-  const { data: netRows } = useCourseNetBoard(ctx.courseId, activeActor?.id);
+  const { data: netBoard } = useCourseNetBoard(ctx.courseId, activeActor?.id);
+  const netRows = netBoard?.rows;
   const data = useMemo(
     () => [...(legendRows ?? []), ...(netRows ?? [])],
     [legendRows, netRows],
+  );
+  /* CHAMPIONS_NET_SOURCE_1: sources that did not answer drop out of every
+     candidate order before any tile is drawn or counted. Pending counts as
+     unavailable; the ninth tile arrives when the function answers. */
+  const unavailableSources = useMemo(
+    () => new Set<LegendCategory>(netBoard?.available ? [] : ['lowest_net_all_time']),
+    [netBoard?.available],
   );
   // Settled is not "not loading": useCourseLegends is gated on courseId.
   const isLoading = !isFetched || fetching;
@@ -211,12 +220,12 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const { visibleCategories90d, visibleCategoriesAllTime } = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const present = new Set<LegendCategory>((data ?? []).map((r: any) => r.category as LegendCategory));
-    const list90: LegendCategory[] = orderWithWomensRecord(CHAMPIONS_ORDER_90D, present)
+    const list90: LegendCategory[] = withAvailableSources(orderWithWomensRecord(CHAMPIONS_ORDER_90D, present), unavailableSources)
       .filter((c): c is LegendCategory => c !== 'best_score_diff_90d');
-    const listAll: LegendCategory[] = orderWithWomensRecord(CHAMPIONS_ORDER_ALL_TIME, present)
+    const listAll: LegendCategory[] = withAvailableSources(orderWithWomensRecord(CHAMPIONS_ORDER_ALL_TIME, present), unavailableSources)
       .filter((c): c is LegendCategory => c !== 'best_score_diff_all_time');
     return { visibleCategories90d: list90, visibleCategoriesAllTime: listAll };
-  }, [data]);
+  }, [data, unavailableSources]);
 
   const visibleCategories = window === '90d' ? visibleCategories90d : visibleCategoriesAllTime;
 
@@ -393,7 +402,9 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   const courseProjection = neverPlayed && projectionInputs ? buildCourseProjection(projectionDiffs ?? [], projectionInputs) : null;
 
   const fieldOnly = !activeActor?.id || (whsFetched && !whsConnection);
-  const fieldCategories = orderWithWomensRecord(window === '90d' ? CHAMPIONS_ORDER_90D : CHAMPIONS_ORDER_ALL_TIME, new Set(data.map(row => row.category)));
+  const fieldCategories = withAvailableSources(orderWithWomensRecord(window === '90d' ? CHAMPIONS_ORDER_90D : CHAMPIONS_ORDER_ALL_TIME, new Set(data.map(row => row.category))), unavailableSources);
+  /* CHAMPIONS_STATE_4: basis switches only on tracked rounds at this course. */
+  const hasPlayed = Boolean(whsConnection) && user?.id === activeActor?.id && (meta?.your_rounds ?? 0) > 0;
   const fieldActiveKey = selectedCategory && fieldCategories.includes(selectedCategory) ? selectedCategory : fieldCategories[0];
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -546,10 +557,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
       {!isLoading && !isError && (data ?? []).length === 0 && (
         <NobodyHasPlayed
-          categories={orderWithWomensRecord(
-            window === '90d' ? CHAMPIONS_ORDER_90D : CHAMPIONS_ORDER_ALL_TIME,
-            new Set<LegendCategory>(data.map(row => row.category)),
-          )}
+          categories={fieldCategories}
           courseName={ctx.courseName}
           showConnect={!activeActor?.id || (whsFetched && !whsConnection)}
           onConnect={() => {
@@ -578,6 +586,19 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
           projection={courseProjection}
           inputs={projectionInputs}
           viewer={{ name: profile?.display_name ?? 'You', photoUrl: profile?.profile_photo_url ?? null }}
+        /> : hasPlayed ? <PostedChampions
+          categories={fieldCategories.map(key => ({ key, label: legendCategoryLabel[key], short: SHORT_LABELS[key] }))}
+          grouped={grouped}
+          courseName={ctx.courseName}
+          activeKey={fieldActiveKey}
+          onSelect={setSelectedCategory}
+          legendWindow={window}
+          onWindowChange={w => { handleWindowChange(w); setSelectedCategory(null); }}
+          onOpenFull={setFullLeaderboardCategory}
+          onRowPress={row => { if (row.username) navigate(`/profile/${row.username}`); }}
+          par={meta?.course_par ?? null}
+          fieldOverPar={fieldAvgOverPar}
+          rounds={totalCourseRounds}
         /> : fieldOnly ? <FieldChampions
           categories={fieldCategories.map(key => ({ key, label: legendCategoryLabel[key], short: SHORT_LABELS[key] }))}
           grouped={grouped}

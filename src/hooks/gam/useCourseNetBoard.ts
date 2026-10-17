@@ -5,24 +5,21 @@ import type { CourseLegendRow } from '@/lib/gam/types';
 /**
  * BRIEF_STANDING_TAP 2b — CHAMPIONS' NET BOARD.
  *
- * gam_course_legends has no net category, so the standing shelf's DEFAULT board
- * had no destination on Champions. This reads get_course_net_board
- * (docs/sql/champions_net_board.sql), which is built on the SAME
- * board_pool/board_qualifies primitives, the same sort value, the same collapse
- * and the same rank() as get_viewer_standing — the two surfaces cannot state
- * different ranks because they do not contain two implementations.
+ * gam_course_legends has no net category. This reads get_course_net_board
+ * (docs/sql/champions_net_board.sql), built on the SAME board_pool/
+ * board_qualifies primitives as get_viewer_standing. Rows come back in
+ * get_course_legends' exact shape with category 'lowest_net_all_time'.
  *
- * Rows come back in get_course_legends' exact shape with category
- * 'lowest_net_all_time', so the drilldown merges them into the board machinery
- * it already has; no second row type, no second board renderer.
- *
- * FAILURE IS SILENT AND EMPTY, DELIBERATELY: the function is a draft for Ben to
- * run, so until it exists the rpc 404s. An error here must not take the eight
- * boards that do work down with it, and a category with no rows is simply not
- * rendered — the same treatment as a board nobody holds.
+ * CHAMPIONS_NET_SOURCE_1: a failed fetch is NOT an empty board. The result
+ * carries `available` from the query outcome; an unavailable source is
+ * omitted from the cabinet and every count, while a successful zero-row
+ * answer is a real never-claimed board. Failure stays silent for the reader
+ * (no other board is taken down) but is warned once for us.
  */
+export interface CourseNetBoardResult { available: boolean; rows: CourseLegendRow[] }
+
 export function useCourseNetBoard(courseId: string | undefined, viewerId?: string | null) {
-  return useQuery<CourseLegendRow[]>({
+  return useQuery<CourseNetBoardResult>({
     queryKey: ['gam', 'course-net-board', courseId ?? null, viewerId ?? null],
     enabled: Boolean(courseId),
     staleTime: 60_000,
@@ -32,8 +29,11 @@ export function useCourseNetBoard(courseId: string | undefined, viewerId?: strin
         p_course_id: courseId,
         p_viewer_id: viewerId ?? null,
       } as never);
-      if (error) return [];
-      return (data ?? []) as unknown as CourseLegendRow[];
+      if (error) {
+        console.warn('[champions] lowest_net_all_time unavailable', error.message);
+        return { available: false, rows: [] };
+      }
+      return { available: true, rows: (data ?? []) as unknown as CourseLegendRow[] };
     },
   });
 }
