@@ -125,7 +125,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     user?.id,
     courseId,
     { ...DEFAULT_FILTERS, scope: 'circle', window: 'all' },
-    { limit: 50, enabled: !statusLoading && !hasTrackedRounds },
+    { limit: CIRCLE_PLAYERS_LIMIT, enabled: !statusLoading && !hasTrackedRounds },
   );
 
   const [openRoundId, setOpenRoundId] = React.useState<string | null>(null);
@@ -394,15 +394,13 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
        so the number and the names always agree. "Played" means a logged
        round, always: if the rounds-based source returns nothing, the line
        does not render (S4). */
-    const readableCircle = (circlePlayers.data ?? []).filter(
-      (p) => p.display_name != null && p.display_name !== '',
-    );
-    const circleCount = readableCircle.length;
-    const circleShown = readableCircle.slice(0, 3);
+    const circle = circleNamesLine(circlePlayers.data);
+    const circleCount = circle.count;
+    const circleShown = circle.shown;
     const circleNames = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' }).format(
       circleShown.map((p) => p.display_name!),
     );
-    const circleOthers = circleCount - circleShown.length;
+    const circleOthers = circle.others;
     return wrap(
       <div>
         <ProjectionSection
