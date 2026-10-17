@@ -34,7 +34,7 @@ describe('YOU_TAB_STATE_2', () => {
   });
 
   it('Z4: hardest is the highest avg over par, the let-off the lowest, the cost is the hardest figure', () => {
-    const h = (hole_no: number, avg_to_par: number) => ({ hole_no, avg_to_par } as unknown as CourseHole);
+    const h = (hole_no: number, avg_to_par: number) => ({ hole_no, avg_to_par, par: 4, rounds: 10, dist: { ace: 0, albatross: 0, eagle: 0, birdie: 1, par: 5, bogey: 3, double: 1 } } as unknown as CourseHole);
     const { container } = render(<FieldHoleFacts holes={[h(1, 0.4), h(11, 0.1), h(7, 0.9), h(18, 1.12)]} />);
     const text = container.textContent ?? '';
     expect(text).toContain('18courseDetail.youTab.holeFacts.hardest');
