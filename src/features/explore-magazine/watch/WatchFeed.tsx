@@ -239,8 +239,8 @@ export function WatchFeed({
       seen.add(row.post_id);
       out.push(row);
     }
-    return filter === 'your_courses' ? out.filter(onYourCourse) : out;
-  }, [videos.data, clips.data, filter, onYourCourse]);
+    return out;
+  }, [videos.data, clips.data]);
 
   const saved = progress.data;
   /* M.1 — one tile, two layouts: grid on the Quick hits chip, rail everywhere else. */

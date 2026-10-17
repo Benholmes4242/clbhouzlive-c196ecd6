@@ -17,7 +17,9 @@
  *              video or clip source.
  */
 
-export const WATCH_CHIPS = ['all', 'quick', 'long', 'friends', 'your_courses', 'community'] as const;
+/* "Your courses" was removed from the chips (user request, Oct 2026); the
+   played-courses clip read and its header note remain for the badge logic. */
+export const WATCH_CHIPS = ['all', 'quick', 'long', 'friends', 'community'] as const;
 export const WATCH_FILTERS = WATCH_CHIPS;
 
 export type WatchFilter = (typeof WATCH_FILTERS)[number];
@@ -41,8 +43,6 @@ export function clipParams(filter: WatchFilter): { mode: string; filter?: string
       return null;
     case 'friends':
       return { mode: 'latest', filter: 'following' };
-    case 'your_courses':
-      return { mode: 'latest', filter: 'played_courses' };
     default:
       return { mode: 'trending' };
   }
