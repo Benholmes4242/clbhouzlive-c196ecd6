@@ -378,6 +378,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
             totalRounds={Number(analysis.total_rounds)}
             courseName={courseName}
             withFacts
+            courseId={courseId}
           />
         ) : null}
         {/* YOU_TAB_STATE_2 Z6 — both branch-B states share the kicker/title form. */}
