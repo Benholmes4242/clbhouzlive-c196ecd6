@@ -228,7 +228,9 @@ export const FlatBoardRow: React.FC<{
   recordTone?: string;
   /** CHAMPIONS_STATE_3_T: same row, grid and defaults; never a second home. */
   ghost?: boolean;
-}> = ({ row, pos, category, coursePar = null, rule = true, deficit = null, onPress, recordTone, ghost = false }) => {
+  /** State 4 pins the actual member in the same row, never another renderer. */
+  pinned?: boolean;
+}> = ({ row, pos, category, coursePar = null, rule = true, deficit = null, onPress, recordTone, ghost = false, pinned = false }) => {
   const tone = ghost || row.isSelf ? A.AMBER : recordTone && row.rank === 1 ? recordTone : A.INK;
   const showToPar = hasToPar(category) && coursePar != null;
   return (
@@ -240,6 +242,7 @@ export const FlatBoardRow: React.FC<{
          member sees. */
       data-self={row.isSelf ? '1' : undefined}
       data-projection-ghost={ghost ? '' : undefined}
+      data-pinned-row={pinned ? '' : undefined}
       style={{
         display: 'grid',
         width: '100%',
@@ -247,7 +250,7 @@ export const FlatBoardRow: React.FC<{
         gap: 10,
         alignItems: 'center',
         padding: '11px 0',
-        background: ghost ? `color-mix(in srgb, ${A.AMBER} 10%, transparent)` : 'transparent',
+        background: ghost || pinned ? `color-mix(in srgb, ${A.AMBER} 10%, transparent)` : 'transparent',
         border: 'none',
         borderBottom: ghost ? `1px dashed color-mix(in srgb, ${A.AMBER} 34%, transparent)` : undefined,
         borderTop: rule ? `1px solid ${A.HAIRLINE}` : undefined,
@@ -279,7 +282,7 @@ export const FlatBoardRow: React.FC<{
           {ghost ? 'You would sit here' : row.isSelf ? 'You' : row.name}
         </span>
         <span style={{ display: 'block', marginTop: 3, fontSize: 11, fontWeight: 500, color: ghost ? A.FAINT : A.DIM }}>
-          {ghost ? 'Projected, not played' : formatChampionsWhen(row.attained_at)}
+          {ghost ? 'Projected, not played' : `${formatChampionsWhen(row.attained_at)}${pinned ? ' · Your best here' : ''}`}
         </span>
         {!ghost && deficit ? (
           <span style={{ ...NUM, display: 'block', marginTop: 3, fontSize: 11, fontWeight: 600, color: A.DIM }}>
