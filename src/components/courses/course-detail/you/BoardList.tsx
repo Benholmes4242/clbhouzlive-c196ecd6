@@ -1,14 +1,15 @@
 /**
  * YOU_TAB_BOARD_LIST_1 AC4 — THE one board list for the You tab's states 1, 2
- * and 3. The held course record (when anyone holds it) is its own row with
- * the score and "Held" in muted ink; then EVERY open all-time board in
- * "Open" medal gold. The open set is the SAME holder map, over the SAME
+ * and 3. YOU_TAB_BOARD_LIST_2 AD1 — OPEN BOARDS ONLY: no held row, not even
+ * the course record (the hero already carries it; held boards live behind
+ * ALL BOARDS and on Champions). Every open all-time board in "Open" medal
+ * gold. AD2 — callers take their count from openBoardCategories, so the
+ * heading and the rows cannot drift. The open set is the SAME holder map, over the SAME
  * order, that useCourseRecordSummary.unclaimedCount counts, so the open rows
  * always equal the count (AC1). Do not fork this per branch.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatLegendValueCompact } from '@/lib/gam/visuals';
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import type { CourseLegendRow, LegendCategory } from '@/lib/gam/types';
@@ -34,23 +35,12 @@ export function openBoardCategories(holders: Map<LegendCategory, CourseLegendRow
 
 interface Props {
   holders: Map<LegendCategory, CourseLegendRow>;
-  recordValue: number | null;
-  thinField?: boolean;
   marginTop?: number;
 }
 
-export const BoardList: React.FC<Props> = ({ holders, recordValue, thinField = false, marginTop = 14 }) => {
+export const BoardList: React.FC<Props> = ({ holders, marginTop = 14 }) => {
   const { t } = useTranslation('courses');
   const rows: { key: string; label: string; held: boolean }[] = [];
-  if (recordValue != null) {
-    rows.push({
-      key: 'record',
-      label: t(`courseDetail.youTab.grabs.${thinField ? 'grossHeldThin' : 'grossHeld'}`, {
-        value: formatLegendValueCompact('lowest_gross_all_time', recordValue),
-      }),
-      held: true,
-    });
-  }
   openBoardCategories(holders).forEach((c) =>
     rows.push({ key: c, label: t(`courseDetail.youTab.unclaimed.boards.${BOARD_KEY[c] ?? c}`), held: false }),
   );
