@@ -24,6 +24,12 @@ const renderRated = (row: Record<string, unknown>) => {
 
 const colorOf = (text: string) => screen.getByText(text).style.color;
 
+/* jsdom normalizes hex to rgb(); probe once so assertions compare like with like. */
+const probe = document.createElement('div');
+const norm = (c: string) => { probe.style.color = c; return probe.style.color; };
+const WHITE = norm('#FFFFFF');
+const GREEN = norm(A.GREEN);
+
 beforeEach(() => listMock.mockReset());
 afterEach(cleanup);
 
