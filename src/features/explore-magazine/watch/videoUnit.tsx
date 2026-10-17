@@ -218,10 +218,8 @@ export function VideoCard({
   const title = videoTitle(row, t('amateur.watch.untitled', 'Untitled video'));
   const who = creatorName(row);
   const when = formatRelativeAgo(row.post_created_at ?? null);
-  /* K.4 LINE ONE: {creator} · {views} · {age}. Views come from post_views
-     (useWatchViews); when that read is unavailable the figure is omitted,
-     never invented from likes. */
-  const meta = [who, rail ? null : views ?? null, when].filter(Boolean).join(' \u00B7 ');
+  /* K.4 LINE ONE: {creator} · {age}. View counts are not shown on Watch (BRIEF_WATCH_NO_VIEWS). */
+  const meta = [who, when].filter(Boolean).join(' \u00B7 ');
   const initial = (who || '?').trim().charAt(0).toUpperCase() || '?';
   const poster = posterFor(row, rail ? 480 : 720);
   const [posterFailed, setPosterFailed] = useState(false);
