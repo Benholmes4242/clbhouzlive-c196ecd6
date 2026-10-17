@@ -97,6 +97,8 @@ interface AboutSectionProps {
   space?: number;
   /** Content bleeds past the gutter (map, mosaic). Heading keeps its gutter. */
   bleed?: boolean;
+  /** YOU_TAB_THIN_COURSE_1 P5 — the heading wraps to two lines (long course names). */
+  wrapHeading?: boolean;
   id?: string;
   children: React.ReactNode;
 }
@@ -110,6 +112,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
   first = false,
   space,
   bleed = false,
+  wrapHeading = false,
   id,
   children,
 }) => (
@@ -143,7 +146,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
       </div>
     ) : heading ? (
       <div style={{ padding: `0 ${GUTTER}px` }}>
-        <DiscoverSectionHeading id={id} title={heading} right={meta ?? null} onRightPress={onMetaPress} />
+        <DiscoverSectionHeading id={id} title={heading} right={meta ?? null} onRightPress={onMetaPress} wrap={wrapHeading} />
       </div>
     ) : kicker || meta ? (
       <div
