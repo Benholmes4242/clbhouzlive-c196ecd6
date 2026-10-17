@@ -1,6 +1,9 @@
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+
+vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
+
 import { FieldChampions, type FieldChampionsProps } from '@/components/profile/handicap/whs/sections/course-legends/flat/FieldChampions';
 import { CHAMPIONS_ORDER_ALL_TIME, CHAMPIONS_ORDER_90D } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import { cabinetHolderName, fieldRecordComparison } from '@/components/profile/handicap/whs/sections/course-legends/flat/championsField';
@@ -8,7 +11,6 @@ import type { LegendCategory } from '@/lib/gam/types';
 import type { FlatRow } from '@/components/profile/handicap/whs/sections/course-legends/flat/championsFlatBits';
 import { SURFACE } from '@/lib/tokens/surface';
 
-vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key: string, options?: { count?: number }) => options?.count != null ? `${options.count} golfers` : key }) }));
 afterEach(cleanup);
 
 function props(order = CHAMPIONS_ORDER_ALL_TIME): FieldChampionsProps {
