@@ -65,6 +65,9 @@ import type { YouRound } from './you/YourRoundsHere';
 import { useMomentPosts } from './you/YourMomentsSection';
 import { useAllMyRoundsAtCourse } from '@/hooks/feed/useMyRoundsAtCourse';
 import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
+import { useBoardCoursePlayers } from '@/components/explore-tab-new/courseled/hooks/useBoardCoursePlayers';
+import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFilters';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import {
@@ -111,6 +114,19 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   const { data: myRounds } = useMyRoundsAtCourse(courseId);
   const { data: rating } = useUserCourseRating(courseId, user?.id);
   const { courseRecord, courseRecordHolders, unclaimedCount } = useCourseRecordSummary(courseId, user?.id ?? null);
+  /* YOU_TAB_CIRCLE_NAMES_1 — ONE rounds-based source for the "who you know"
+     line: get_board_course_players, scope 'circle', window 'all'
+     (board_window_from maps 'all' to 1900-01-01, i.e. all time). The count
+     AND the names come from this call; circle_played from
+     get_course_stats_detail is no longer read on this tab. Only the
+     connected-never-played branch renders the line, so the read waits for
+     the status to settle. */
+  const circlePlayers = useBoardCoursePlayers(
+    user?.id,
+    courseId,
+    { ...DEFAULT_FILTERS, scope: 'circle', window: 'all' },
+    { limit: 50, enabled: !statusLoading && !hasTrackedRounds },
+  );
 
   const [openRoundId, setOpenRoundId] = React.useState<string | null>(null);
 
