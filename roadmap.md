@@ -1,6 +1,7 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
 ## BRIEF_CHAMPIONS_STATE_3 / R / T
+- [ ] CHAMPIONS_STATE_3_G4: authorised deterministic props-keyed avatar mock/capture only; preserve exact fallback-tree comparisons and ghost assertions; run full suite against 1,532 tests and stop/report any failure.
 - [x] CHAMPIONS_STATE_3_G3: user approved mocking actual CourseLegendsAvatar instead of unused SquircleAvatar; failing test now has exactly three input-contract assertions; second initials test and 1,532 count preserved. No application changes.
 - [ ] CHAMPIONS_STATE_3_G3 STOP: full suite collected 1,532; 1,530 passed, two State 3 fallback-equality cases failed: 'GE3: seven finite differentials delegates to the exact State 2 subtree' and 'missing tee inputs delegates to State 2 even if a stale projection exists', both assert container.innerHTML === fallback. The scoped mock's incrementing data-avatar-call marker changes across rerenders. All ghost assertions and tests outside State 3 pass. No post-failure fix; build OK; awaiting authorisation to stabilise mock output without editing fallback assertions.
 - [x] CHAMPIONS_STATE_3_G2: replaced only the authorised ghost no-image check with querySelector('img') === null; distinct-photo fixtures and viewer-initials case unchanged; no application changes.
