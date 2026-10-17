@@ -1,6 +1,7 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
 ## BRIEF_CHAMPIONS_STATE_4 — CHAMPIONS_STATE_4
+- [x] CHAMPIONS_STATE_4_COPY_R: rulings applied; State 4 done, all four states in.
 - [x] CHAMPIONS_STATE_4_V: comments corrected (nine is normal; eight is source-unavailable fallback). State 4 copy quoted for Ben's mock diff.
 - [ ] LATER (do not act; Ben decides): get_viewer_standing has two definitions in the database — real fork or harmless overload?
 - [x] CHAMPIONS_NET_SOURCE_1: unavailable sources are dropped from the cabinet and every count, decided by query outcome; console warning names the category. State 4 screen (PostedChampions) wired for members with tracked rounds here: posted values come from their own board rows, Yours tiles, pinned real row, Your defence / What it takes. Suite 1,532 → 1,538 (+6 in championsNetSource.test.tsx), none changed.
