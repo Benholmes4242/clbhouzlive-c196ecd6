@@ -3,7 +3,7 @@
 ## BRIEF_COURSES_HIGHEST_RATED_TEN
 - [x] Set Highest rated to ten; require per-rail loading counts; preserve Regulars and card geometry.
 - [x] Update the authorised limit assertion and add four focused cases.
-- [ ] Run the full suite and check the preview; report test inventory and authentication limits.
+- [x] Full suite 1,548 -> 1,552 passing (202 files); four new coursesHighestRatedTen cases, authorised limit test 3 -> 10 only. Preview build OK. Public phone check: ten 300 x 230 cards, 2px gap, scroll reaches the tenth, its tap opens the course, Regulars five, no runtime errors. Signed-in checks unavailable on external/unmanaged Supabase.
 
 ## BRIEF_CHAMPIONS_ELSEWHERE — CHAMPIONS_ELSEWHERE_1
 - [x] VA3: useTitlesInReach staleTime 0 -> 60_000 (hook had no callers; no reason to be live).
