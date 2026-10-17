@@ -65,8 +65,6 @@ import type { YouRound } from './you/YourRoundsHere';
 import { useMomentPosts } from './you/YourMomentsSection';
 import { useAllMyRoundsAtCourse } from '@/hooks/feed/useMyRoundsAtCourse';
 import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
-import { useMembersWhoPlayedCourse } from '@/hooks/useMembersWhoPlayedCourse';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import {
@@ -107,8 +105,6 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   } = useCoursePersonalStatus(courseId);
   const { data: analysis } = useCourseHoleAnalysis(courseId);
   const { data: courseStats } = useCourseStatsDetail(courseId, true);
-  /* P4 (YOU_TAB_THIN_COURSE_1) — names the circle members who have played here. */
-  const { data: membersData } = useMembersWhoPlayedCourse(courseId, user?.id);
   const { data: myPerf } = useMyHolePerformance(user?.id, courseId, {
     enabled: Boolean(user?.id && courseId && connection),
   });
@@ -377,10 +373,10 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
       Number.isFinite(yourGolf.parOrBetterPct) &&
       yourGolf.courses > 0 &&
       (fieldKnown ? fieldParOrBetterPct != null && Number.isFinite(fieldParOrBetterPct) : true);
-    /* P4 — the circle is NAMED from the members read (ratings-based, the one
-       client source with profiles); a member whose profile is not readable is
-       excluded from the count as well as the names. */
-    const circleMembers = (membersData?.members ?? []).filter((m) => m.in_circle && m.profile);
+    /* YOU_TAB_THIN_COURSE_2 R2 — the count stays rounds-based (courseStats).
+       Naming from the ratings read redefined "played" as "left a rating";
+       reverted. No rounds-based source with identities exists yet. */
+    const circlePlayed = courseStats?.circle_played ?? 0;
     return wrap(
       <div>
         <ProjectionSection
@@ -409,42 +405,9 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
           />
         ) : null}
         {upForGrabs}
-        {circleMembers.length > 0 ? (
+        {circlePlayed > 0 ? (
           <AboutSection heading={t('courseDetail.youTab.circle.heading')}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ display: 'flex', flexShrink: 0 }}>
-                {circleMembers.slice(0, 3).map((m, i) => (
-                  <SquircleAvatar
-                    key={m.user_id}
-                    src={m.profile?.profile_photo_url ?? undefined}
-                    alt={m.profile?.display_name || m.profile?.username || '?'}
-                    userId={m.user_id}
-                    size={22}
-                    hairlineRing
-                    className={i > 0 ? '-ml-1.5' : ''}
-                  />
-                ))}
-              </div>
-              <YouSentence>
-                {circleMembers.length === 1
-                  ? t('courseDetail.youTab.circle.namedOne', {
-                      name: circleMembers[0].profile?.display_name || circleMembers[0].profile?.username || '',
-                    })
-                  : circleMembers.length <= 3
-                    ? t('courseDetail.youTab.circle.namedAll', {
-                        names: circleMembers
-                          .map((m) => m.profile?.display_name || m.profile?.username || '')
-                          .join(', '),
-                      })
-                    : t('courseDetail.youTab.circle.namedMore', {
-                        names: circleMembers
-                          .slice(0, 3)
-                          .map((m) => m.profile?.display_name || m.profile?.username || '')
-                          .join(', '),
-                        count: circleMembers.length - 3,
-                      })}
-              </YouSentence>
-            </div>
+            <YouSentence>{t('common:feed.courseSheet.circlePlayed', { count: circlePlayed })}</YouSentence>
           </AboutSection>
         ) : null}
         <AboutSection>
