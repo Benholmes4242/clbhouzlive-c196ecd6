@@ -29,7 +29,7 @@ import {
 } from './championsFlatBits';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import { Button } from '@/components/ui/button';
-import { ProjectionGhostRow, ghostInsertionIndex } from './ProjectionGhostRow';
+import { ghostInsertionIndex } from './ProjectionGhostRow';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
 
 const MAX_ROWS = 6;
@@ -54,7 +54,7 @@ interface Props {
   onRowPress?: (row: FlatRow) => void;
   /** State 2: cabinet owns selection; no viewer rank or duplicated champion statement. */
   fieldOnly?: boolean;
-  ghost?: { value: number; initials: string };
+  ghost?: { value: number; name: string; photoUrl: string | null };
   projectedScreen?: boolean;
 }
 
@@ -90,13 +90,17 @@ export const BoardSection: React.FC<Props> = ({
 
   const entry = grouped.get(active.key);
   const rows = fieldOnly ? (entry?.rows ?? []).map(row => ({ ...row, isSelf: false })) : entry?.rows ?? [];
-  if (rows.length === 0 && !fieldOnly) return null;
+  const activeGhost = active.key === 'lowest_gross_all_time' || active.key === 'lowest_gross_90d' ? ghost : undefined;
+  if (rows.length === 0 && !fieldOnly && !activeGhost) return null;
 
   const positions = positionsFor(rows);
   const shown = rows.slice(0, MAX_ROWS);
   const total = entry?.total ?? rows.length;
   const viewerValue = rows.find((r) => r.isSelf)?.value ?? null;
-  const ghostIndex = ghost ? ghostInsertionIndex(rows, ghost.value) : -1;
+  const ghostIndex = activeGhost ? ghostInsertionIndex(rows, activeGhost.value) : -1;
+  // Only an empty real list places a ghost at its end. A projection below
+  // every posted score is not appended beneath a truncated six-row preview.
+  const ghostRow = activeGhost ? <FlatBoardRow ghost row={{ rank: 0, name: activeGhost.name, photoUrl: activeGhost.photoUrl, value: activeGhost.value, valueDisplay: String(activeGhost.value), attained_at: '', isSelf: false }} pos="" category={active.key} rule={ghostIndex > 0} deficit={rows[0] ? `${Math.abs(rows[0].value - activeGhost.value)} ${activeGhost.value < rows[0].value ? 'better' : activeGhost.value > rows[0].value ? 'off' : 'level'}` : null} /> : null;
 
   return (
     <AboutSection heading={active.label} meta={windowMeta(total, legendWindow, t)} space={30}>
@@ -143,7 +147,7 @@ export const BoardSection: React.FC<Props> = ({
       {fieldOnly && rows.length === 0 && <div style={{ color: A.DIM }}>Never claimed</div>}
 
       {shown.map((row, i) => <React.Fragment key={`${row.userId ?? row.name}-${positions[i]}`}>
-        {ghost && ghostIndex === i && <ProjectionGhostRow {...ghost} leader={rows[0]?.value ?? null} />}
+        {activeGhost && ghostIndex === i && ghostRow}
         <FlatBoardRow
           row={row}
           pos={positions[i]}
@@ -154,12 +158,12 @@ export const BoardSection: React.FC<Props> = ({
           onPress={onRowPress && row.username ? () => onRowPress(row) : undefined}
         />
       </React.Fragment>)}
-      {ghost && ghostIndex >= shown.length && <ProjectionGhostRow {...ghost} leader={rows[0]?.value ?? null} />}
+      {activeGhost && rows.length === 0 && ghostRow}
 
       {rows.length > 0 && (fieldOnly || total > MAX_ROWS || rows.length > MAX_ROWS) ? (
         <FlatAction label={`All ${total}`} onPress={() => onOpenFull(active.key)} />
       ) : null}
-      {ghost && <div className="champions-empty-said" style={{ color: A.MUTE }}>The dashed row is <b>a projection, not a score</b>, so it carries no rank and nobody below it is renumbered. It moves with your handicap and disappears the moment you post a card here.</div>}
+      {activeGhost && <div className="champions-empty-said" style={{ color: A.MUTE }}>The dashed row is <b>a projection, not a score</b>, so it carries no rank and nobody below it is renumbered. It moves with your handicap and disappears the moment you post a card here.</div>}
     </AboutSection>
   );
 };

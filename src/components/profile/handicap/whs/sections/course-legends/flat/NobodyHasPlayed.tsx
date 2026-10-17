@@ -36,7 +36,7 @@ export function ChampionsCabinetTile({ category, state, value, holders = [], sel
     <div className="champions-cabinet-name" style={{ color: SURFACE.dark.dim }}>{boardName(category)}</div>
     <div>
       <div className="champions-cabinet-value" style={{ color: held ? SURFACE.dark.ink : A.FAINT }}>{held ? value : '—'}</div>
-      <div className="champions-cabinet-state" style={{ color: state === 'in-reach' ? A.AMBER : state === 'not-started' ? inkWithAlpha(SURFACE.dark.ink, 0.3) : SURFACE.dark.dim }}>{state === 'in-reach' ? 'In reach' : state === 'not-started' ? 'Not started' : gap != null ? `${gap} off` : held ? cabinetHolderName(holders) : 'Open'}</div>
+      <div className="champions-cabinet-state" style={{ color: state === 'in-reach' ? A.AMBER : state === 'not-started' ? A.FAINT : SURFACE.dark.dim }}>{state === 'in-reach' ? 'In reach' : state === 'not-started' ? 'Not started' : gap != null ? `${gap} off` : held ? cabinetHolderName(holders) : 'Open'}</div>
     </div>
   </>;
   const tileStyle = held ? { background: MEMBER_PANEL, color: SURFACE.dark.ink, borderColor: state === 'in-reach' ? `color-mix(in srgb, ${A.AMBER} 42%, transparent)` : undefined, boxShadow: selected ? `inset 0 0 0 1.5px ${SURFACE.dark.ink}` : undefined } : undefined;
