@@ -1197,6 +1197,12 @@
         "holeTitleNoIndex": "Par {{par}}",
         "holeSub": "{{yards}} yards · the field drops {{shots}} shots",
         "holeSubNoYards": "The field drops {{shots}} shots",
+        "holeSubOne": "{{yards}} yards · the one round logged here went {{shots}} on this hole",
+        "holeSubOneNoYards": "The one round logged here went {{shots}} on this hole",
+        "holeSubFew": "{{yards}} yards · the {{rounds}} rounds logged here drop {{shots}} shots",
+        "holeSubFewNoYards": "The {{rounds}} rounds logged here drop {{shots}} shots",
+        "ledeOne": "From the one round logged here.",
+        "ledeFew": "From the {{rounds}} rounds logged here.",
         "allHoles": "All 18 holes"
       },
       "againstYourGolf": {

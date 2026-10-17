@@ -72,7 +72,7 @@ import { CIRCLE_PLAYERS_LIMIT, circleNamesLine } from './you/circleNamesLine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import {
-  LAST_N, NOBODY_CLOSE_SHARE, SEASON_MIN_ROUNDS, aggregate, allSeasons, courseFieldKnown, edgeSummary, fieldExcludingViewer, firstN,
+  COURSE_FIELD_MIN_ROUNDS, LAST_N, NOBODY_CLOSE_SHARE, SEASON_MIN_ROUNDS, aggregate, allSeasons, edgeSummary, fieldExcludingViewer, fieldSample, firstN,
   goodRounds, holeEdges, lastN, openHolesState, scoredRounds,
 } from '@/lib/courseYou/youDerivations';
 import { ordinal } from './you/youBits';
@@ -285,7 +285,10 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
 
   /* YOU_TAB_THIN_COURSE_1 P1 — below the field minimum the record is labelled
      the best card logged here, never "the course record". */
-  const upForGrabsThin = !courseFieldKnown(analysis?.total_rounds != null ? Number(analysis.total_rounds) : null);
+  /* U4 — the record labelling keeps the five-round line, driven by the same
+     count that governs the wording. */
+  const upForGrabsThin =
+    analysis?.total_rounds != null && Number(analysis.total_rounds) < COURSE_FIELD_MIN_ROUNDS;
   const upForGrabs = (
     <UpForGrabsSection
       recordValue={courseRecord?.value ?? null}
@@ -377,19 +380,22 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   // whether the course flatters or exposes them, what is unclaimed, who they
   // know, then the button. Do not promote the button back to the top.
   if (!hasTrackedRounds) {
-    const showWonAndLost =
-      (analysis?.holes?.length ?? 0) === 18 && Number(analysis?.total_rounds ?? 0) >= FIELD_CHART_MIN_ROUNDS;
-    /* YOU_TAB_THIN_COURSE_1 P1 — two rounds is not a field. Below
-       COURSE_FIELD_MIN_ROUNDS the course-side claims come off: no "Here"
-       rate, no harder-than line, and the record is the best card logged
-       here. The viewer's own figures are unaffected. */
+    /* YOU_TAB_NO_GATE_1 U1 — no sample-size gate: every course-side section
+       renders from ONE tracked round. The round count now drives only the
+       WORDING (U2, via fieldSample) and the record labelling (U4). */
     const fieldRoundsTotal = analysis?.total_rounds != null ? Number(analysis.total_rounds) : null;
-    const fieldKnown = courseFieldKnown(fieldRoundsTotal);
+    const sample = fieldSample(fieldRoundsTotal);
+    /* U4 — the record labelling keeps the five-round line, driven by the
+       same count: "the best card logged here" below, "the course record" at
+       or above. */
+    const thinField = fieldRoundsTotal != null && fieldRoundsTotal < COURSE_FIELD_MIN_ROUNDS;
+    const showWonAndLost = (analysis?.holes?.length ?? 0) === 18 && (fieldRoundsTotal ?? 0) >= 1;
     const showAgainst =
       yourGolf.parOrBetterPct != null &&
       Number.isFinite(yourGolf.parOrBetterPct) &&
       yourGolf.courses > 0 &&
-      (fieldKnown ? fieldParOrBetterPct != null && Number.isFinite(fieldParOrBetterPct) : true);
+      fieldParOrBetterPct != null &&
+      Number.isFinite(fieldParOrBetterPct);
     /* YOU_TAB_CIRCLE_NAMES_1 S2 — a member whose profile is not readable
        (null display_name) is excluded from the count as well as the names,
        so the number and the names always agree. "Played" means a logged
@@ -409,12 +415,13 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
           state={projectionState}
           recordGross={courseRecord?.value ?? null}
           fieldRounds={fieldRoundsTotal}
-          thinField={!fieldKnown}
+          thinField={thinField}
         />
         {showWonAndLost && analysis ? (
           <WonAndLostSection
             holes={analysis.holes}
             totalRounds={Number(analysis.total_rounds)}
+            sample={sample}
             onAllHoles={() => {
               analyticsEvents.track('course_you_all_18_holes', { course_id: courseId, holes: 0 });
               navigate(`/courses/${courseId}?tab=you&sheet=your-holes`);
@@ -423,10 +430,10 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         ) : null}
         {showAgainst ? (
           <AgainstYourGolfSection
-            fieldParOrBetterPct={fieldKnown ? fieldParOrBetterPct! : null}
+            fieldParOrBetterPct={fieldParOrBetterPct!}
             yourParOrBetterPct={yourGolf.parOrBetterPct!}
             courseCount={yourGolf.courses}
-            harderThanPct={fieldKnown ? courseStats?.harder_than_pct ?? null : null}
+            harderThanPct={courseStats?.harder_than_pct ?? null}
           />
         ) : null}
         {upForGrabs}

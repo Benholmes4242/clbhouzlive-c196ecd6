@@ -1185,6 +1185,12 @@
         "holeTitleNoIndex": "[~~Ƥář {{par}}~~]",
         "holeSub": "[~~{{yards}} ýářđš · ţĥé ƒíéļđ đřőƥš {{shots}} šĥőţš~~]",
         "holeSubNoYards": "[~~Ţĥé ƒíéļđ đřőƥš {{shots}} šĥőţš~~]",
+        "holeSubOne": "[~~{{yards}} ýářđš · ţĥé őñé řőúñđ ļőĝĝéđ ĥéřé ŵéñţ {{shots}} őñ ţĥíš ĥőļé~~]",
+        "holeSubOneNoYards": "[~~Ţĥé őñé řőúñđ ļőĝĝéđ ĥéřé ŵéñţ {{shots}} őñ ţĥíš ĥőļé~~]",
+        "holeSubFew": "[~~{{yards}} ýářđš · ţĥé {{rounds}} řőúñđš ļőĝĝéđ ĥéřé đřőƥ {{shots}} šĥőţš~~]",
+        "holeSubFewNoYards": "[~~Ţĥé {{rounds}} řőúñđš ļőĝĝéđ ĥéřé đřőƥ {{shots}} šĥőţš~~]",
+        "ledeOne": "[~~Ƒřőɱ ţĥé őñé řőúñđ ļőĝĝéđ ĥéřé.~~]",
+        "ledeFew": "[~~Ƒřőɱ ţĥé {{rounds}} řőúñđš ļőĝĝéđ ĥéřé.~~]",
         "allHoles": "[~~Áļļ 18 ĥőļéš~~]"
       },
       "againstYourGolf": {
