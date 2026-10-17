@@ -18,7 +18,8 @@ import type { CourseSelection } from './types';
 import { DrilldownHeader } from './drilldown/DrilldownHeader';
 
 import { FlatBoardSheet } from './flat/FlatBoardSheet';
-import { UnclaimedSection, WhatCounts, NobodyHasPlayed } from './flat/UnclaimedSection';
+import { UnclaimedSection, WhatCounts } from './flat/UnclaimedSection';
+import { NobodyHasPlayed } from './flat/NobodyHasPlayed';
 import { useBoardMemberUsernames } from '@/hooks/gam/useBoardMemberUsernames';
 
 import { YourCrowns } from './flat/YourCrowns';
@@ -522,7 +523,18 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       )}
 
       {!isLoading && !isError && (data ?? []).length === 0 && (
-        <NobodyHasPlayed totalBoards={CANONICAL_BOARDS.length} />
+        <NobodyHasPlayed
+          categories={orderWithWomensRecord(
+            window === '90d' ? CHAMPIONS_ORDER_90D : CHAMPIONS_ORDER_ALL_TIME,
+            new Set<LegendCategory>(data.map(row => row.category)),
+          )}
+          courseName={ctx.courseName}
+          showConnect={!activeActor?.id || (whsFetched && !whsConnection)}
+          onConnect={() => {
+            analyticsEvents.track('champions_connect_handicap', { course_id: ctx.courseId });
+            navigate('/handicap');
+          }}
+        />
       )}
 
       {/* BRIEF_CHAMPIONS_TAB_REBUILD §3.1 + §3.2 — a statement, then the board. */}

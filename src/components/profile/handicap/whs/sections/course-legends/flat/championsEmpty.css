@@ -1,0 +1,24 @@
+.champions-empty {
+  /* Neutral-only cabinet roles, scoped to the zero-row screen. */
+  --champions-open-border: rgba(255,255,255,0.24);
+  --champions-legend-border: rgba(255,255,255,0.34);
+  font-family: var(--font-sans);
+}
+.champions-empty-section { padding: 20px; }
+.champions-empty-kicker { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
+.champions-empty h2 { font-size: 19px; font-weight: 700; line-height: 1.2; }
+.champions-empty-lede { font-size: 12.5px; line-height: 1.5; margin-top: 8px; }
+.champions-cabinet { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; margin-top: 15px; }
+.champions-cabinet-tile { border: 1px dashed var(--champions-open-border); background: transparent; border-radius: 11px; padding: 9px 9px 8px; min-height: 72px; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
+.champions-cabinet-name { font-size: 9px; font-weight: 800; text-transform: uppercase; line-height: 1.2; overflow-wrap: anywhere; }
+.champions-cabinet-value { font-size: 15px; font-weight: 800; margin-top: 5px; line-height: 1; font-variant-numeric: tabular-nums; }
+.champions-cabinet-state { font-size: 9px; font-weight: 800; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
+.champions-cabinet-legend { display: flex; gap: 14px; margin-top: 11px; }
+.champions-cabinet-legend-entry { display: flex; align-items: center; gap: 5px; font-size: 9.5px; font-weight: 700; text-transform: uppercase; }
+.champions-cabinet-swatch { width: 9px; height: 9px; border-radius: 3px; border: 1px dashed var(--champions-legend-border); }
+.champions-empty-said { margin-top: 14px; padding-left: 11px; border-left: 2px solid var(--champions-open-border); font-size: 13px; line-height: 1.5; }
+.champions-empty-connect { border-top: 1px solid var(--hcp-line-2); padding-top: 18px; }
+.champions-empty-connect h3 { font-size: 15px; font-weight: 700; }
+.champions-empty-connect p { font-size: 12.5px; line-height: 1.5; margin-top: 7px; }
+.champions-empty-connect .champions-empty-button { margin-top: 16px; border: 0; border-radius: 999px; padding: 11px 22px; font-size: 14px; font-weight: 700; }
+.champions-empty-connect .champions-empty-said { margin-top: 18px; }

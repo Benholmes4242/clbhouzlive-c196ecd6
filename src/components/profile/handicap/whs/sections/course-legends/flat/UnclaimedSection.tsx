@@ -9,7 +9,6 @@
 import React from 'react';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { AboutSection } from '@/components/courses/course-detail/about/AboutSection';
-import { numberWord } from './championsFlatBits';
 
 function list(names: string[]): string {
   if (names.length <= 1) return names[0] ?? '';
@@ -19,15 +18,10 @@ function list(names: string[]): string {
 export const UnclaimedSection: React.FC<{
   /** Lower-case board names with no holder, e.g. ['ace', 'albatross', 'eagle']. */
   names: string[];
-  /** State A copy — nothing has been posted here at all. */
-  allUnclaimed?: boolean;
-  totalBoards?: number;
-}> = ({ names, allUnclaimed = false, totalBoards = 7 }) => {
+}> = ({ names }) => {
   if (names.length === 0) return null;
   const n = names.length;
-  const sentence = allUnclaimed
-    ? `All ${numberWord(totalBoards, false)} boards are there for the taking.`
-    : `${n} ${n === 1 ? 'board' : 'boards'} here ${n === 1 ? 'has' : 'have'} never been claimed, ${list(names)}.`;
+  const sentence = `${n} ${n === 1 ? 'board' : 'boards'} here ${n === 1 ? 'has' : 'have'} never been claimed, ${list(names)}.`;
 
   return (
     <AboutSection heading="Unclaimed">
@@ -53,20 +47,6 @@ export const WhatCounts: React.FC = () => (
     >
       Boards rank official WHS scores only. A round has to be on your handicap record to count.
     </div>
-  </div>
-);
-
-/** §5 state A — nobody has posted a round here. Two sections and the footnote. */
-export const NobodyHasPlayed: React.FC<{ totalBoards?: number }> = ({ totalBoards = 7 }) => (
-  <div>
-    <AboutSection heading="Champions" first>
-      <div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 500, color: A.MUTE, lineHeight: 1.5 }}>
-        Nobody has posted a round here yet. Post the first and you top every board — gross,
-        stableford, birdies — until someone beats you.
-      </div>
-    </AboutSection>
-    <UnclaimedSection names={['all']} allUnclaimed totalBoards={totalBoards} />
-    <WhatCounts />
   </div>
 );
 
