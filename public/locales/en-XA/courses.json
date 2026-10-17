@@ -1100,6 +1100,11 @@
         "openScorecard": "[~~Őƥéñ šĉőřéĉářđ~~]"
       },
       "grabs": {
+        "boardsTitle_one": "[~~{{unclaimed}} board unclaimed~~]",
+        "boardsTitle_other": "[~~{{unclaimed}} boards unclaimed~~]",
+        "grossHeld": "[~~Gross record \u2014 {{value}}~~]",
+        "grossHeldThin": "[~~Best card here \u2014 {{value}}~~]",
+        "heldTag": "[~~Held~~]",
         "allBoards": "[~~Áļļ ƀőářđš~~]",
         "held": "[~~{{name}} ĥőļđš ţĥé ĉőúřšé řéĉőřđ ĥéřé ŵíţĥ {{value}}.~~]",
         "notPlayed": "[~~Ñő ĉőúřšé řéĉőřđ ĥéřé ýéţ. Íţ íš ţĥéřé ƒőř ţĥé ţáǩíñĝ.~~]",
@@ -1134,7 +1139,12 @@
           "lowestGross": "[~~Ļőŵéšţ ĝřőšš~~]",
           "lowestNet": "[~~Ļőŵéšţ ñéţ~~]",
           "bestStableford": "[~~Ĥéšţ šţáƀļéƒőřđ~~]",
-          "bestDifferential": "[~~Ĥéšţ đíƒƒéřéñţíáļ~~]"
+          "bestDifferential": "[~~Ĥéšţ đíƒƒéřéñţíáļ~~]",
+          "mostAces": "[~~Holes in one~~]",
+          "mostAlbatrosses": "[~~Most albatrosses~~]",
+          "mostEagles": "[~~Most eagles~~]",
+          "mostBirdies": "[~~Most birdies~~]",
+          "mostRounds": "[~~Most rounds~~]"
         },
         "open": "[~~Őƥéñ~~]",
         "allBoards": "[~~Áļļ {{count}} ƀőářđš ›~~]"
@@ -1205,6 +1215,9 @@
         "youMark": "[~~Ýőú {{gross}}~~]",
         "recordMark": "[~~Řéĉőřđ {{gross}}~~]",
         "range": "[~~Ýőúř řáñĝé ĥéřé íš {{low}} ţő {{high}}.~~]",
+        "rangeRecordAbove": "[~~Your range here is {{low}} to {{high}}. The record is {{record}}, so on your ordinary golf you would hold it.~~]",
+        "rangeRecordInside": "[~~Your range here is {{low}} to {{high}}. The record is {{record}}, so it is yours on a good day.~~]",
+        "rangeRecordBelow": "[~~Your range here is {{low}} to {{high}}. The record is {{record}}, so it would take better than your best here.~~]",
         "rangeWithRecord": "[~~Ýőúř řáñĝé ĥéřé íš {{low}} ţő {{high}}. Ţĥé řéĉőřđ íš {{record}} — ýőú ĥáṽé ƥļáýéđ ţő ţĥáţ šţáñđářđ {{count}} ţíɱéš íñ ýőúř ļášţ {{sample}} řőúñđš.~~]",
         "rangeWithRecordUnbeaten": "[~~Ýőúř řáñĝé ĥéřé íš {{low}} ţő {{high}}. Ţĥé řéĉőřđ íš {{record}}, {{gap}} úñđéř ýőúř ţýƥíĉáļ řőúñđ.~~]",
         "basis": "[~~Ýőúř ļášţ {{sample}} đíƒƒéřéñţíáļš, ĉőñṽéřţéđ áţ ţĥíš ĉőúřšé'š řáţíñĝ áñđ šļőƥé.~~]",

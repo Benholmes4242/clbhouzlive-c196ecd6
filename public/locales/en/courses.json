@@ -1100,7 +1100,12 @@
           "lowestGross": "Lowest gross",
           "lowestNet": "Lowest net",
           "bestStableford": "Best stableford",
-          "bestDifferential": "Best differential"
+          "bestDifferential": "Best differential",
+          "mostAces": "Holes in one",
+          "mostAlbatrosses": "Most albatrosses",
+          "mostEagles": "Most eagles",
+          "mostBirdies": "Most birdies",
+          "mostRounds": "Most rounds"
         },
         "open": "Open",
         "allBoards": "All {{count}} boards ›"
@@ -1141,6 +1146,11 @@
         "openScorecard": "Open scorecard"
       },
       "grabs": {
+        "boardsTitle_one": "{{unclaimed}} board unclaimed",
+        "boardsTitle_other": "{{unclaimed}} boards unclaimed",
+        "grossHeld": "Gross record \u2014 {{value}}",
+        "grossHeldThin": "Best card here \u2014 {{value}}",
+        "heldTag": "Held",
         "allBoards": "All boards",
         "held": "{{name}} holds the course record here with {{value}}.",
         "notPlayed": "No course record here yet. It is there for the taking.",
@@ -1215,6 +1225,9 @@
         "youMark": "You {{gross}}",
         "recordMark": "Record {{gross}}",
         "range": "Your range here is {{low}} to {{high}}.",
+        "rangeRecordAbove": "Your range here is {{low}} to {{high}}. The record is {{record}}, so on your ordinary golf you would hold it.",
+        "rangeRecordInside": "Your range here is {{low}} to {{high}}. The record is {{record}}, so it is yours on a good day.",
+        "rangeRecordBelow": "Your range here is {{low}} to {{high}}. The record is {{record}}, so it would take better than your best here.",
         "rangeWithRecord": "Your range here is {{low}} to {{high}}. The record is {{record}} — you have played to that standard {{count}} times in your last {{sample}} rounds.",
         "rangeWithRecordThin_one": "Your range here is {{low}} to {{high}}. Only {{count}} round has been logged here, so the best of them — {{record}} — is what there is to beat.",
         "rangeWithRecordThin_other": "Your range here is {{low}} to {{high}}. Only {{count}} rounds have been logged here, so the best of them — {{record}} — is what there is to beat.",
