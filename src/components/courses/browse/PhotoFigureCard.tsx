@@ -14,10 +14,10 @@ export const PHOTO_FIGURE_W = 300;
 export const PHOTO_FIGURE_H = 230;
 /** Rail gap of the two PhotoFigureCard rails. */
 export const PHOTO_FIGURE_GAP = 2;
-/** Highest rated shows exactly this many cards. */
-export const PHOTO_FIGURE_COUNT = 3;
 /** The regulars (Most played) shows exactly this many cards (BRIEF_COURSES_REGULARS_FIVE). */
 export const MOST_PLAYED_COUNT = 5;
+/** Highest rated shows exactly this many cards (BRIEF_COURSES_HIGHEST_RATED_TEN). */
+export const HIGHEST_RATED_COUNT = 10;
 
 export function PhotoFigureCard({ row, figure, figureLabel, footer, nameBottom = 15 }: {
   row: StatBrowseRow;

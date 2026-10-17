@@ -43,9 +43,9 @@ describe('BRIEF_COURSES_REGULARS_FIVE', () => {
     expect(container.querySelectorAll(`[data-bar][data-w="${PHOTO_FIGURE_W}"]`)).toHaveLength(5);
   });
 
-  it('Highest rated still asks for limit 3', () => {
+  it('Highest rated asks for limit 10', () => {
     listMock.mockReturnValue({ rows, isLoading: false });
     wrap(<HighestRatedSection />);
-    expect(listMock).toHaveBeenCalledWith(expect.objectContaining({ lens: 'rated', limit: 3 }));
+    expect(listMock).toHaveBeenCalledWith(expect.objectContaining({ lens: 'rated', limit: 10 }));
   });
 });
