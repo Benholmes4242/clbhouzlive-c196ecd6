@@ -10,7 +10,9 @@ import type { CourseLegendRow } from '@/lib/gam/types';
  * board_qualifies primitives as get_viewer_standing. Rows come back in
  * get_course_legends' exact shape with category 'lowest_net_all_time'.
  *
- * CHAMPIONS_NET_SOURCE_1: a failed fetch is NOT an empty board. The result
+ * CHAMPIONS_NET_SOURCE_1: a failed fetch is NOT an empty board. The function
+ * is deployed (CHAMPIONS_STATE_4_V), so the normal all-time cabinet is nine;
+ * eight is the source-unavailable fallback only. The result
  * carries `available` from the query outcome; an unavailable source is
  * omitted from the cabinet and every count, while a successful zero-row
  * answer is a real never-claimed board. Failure stays silent for the reader

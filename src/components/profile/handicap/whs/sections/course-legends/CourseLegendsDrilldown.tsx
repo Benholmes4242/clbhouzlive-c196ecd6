@@ -70,9 +70,8 @@ const SHORT_LABELS: Record<LegendCategory, string> = {
  */
 const CANONICAL_BOARDS: LegendCategory[] = CHAMPIONS_ORDER_ALL_TIME.filter(
   // BRIEF_STANDING_TAP 2b - lowest_net_all_time is excluded from the Unclaimed
-  // roll-call: it comes from a SEPARATE rpc, so an empty net board may mean
-  // "not yet deployed" rather than "nobody holds it", and Unclaimed must only
-  // name boards it genuinely knows to be open.
+  // roll-call: it comes from a SEPARATE rpc whose fetch can fail independently,
+  // and Unclaimed must only name boards it genuinely knows to be open.
   (c) => c !== 'best_score_diff_all_time' && c !== 'lowest_net_all_time',
 );
 
@@ -130,9 +129,10 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
   /*
    * BRIEF_STANDING_TAP 2b - the net board is a SEPARATE rpc because
    * gam_course_legends has no net category, and it is merged into the same row
-   * list so every board below renders through the same machinery. Its failure
-   * is empty, not fatal: until the SQL draft is applied the other boards are
-   * unaffected and the net board simply does not appear.
+   * list so every board below renders through the same machinery.
+   * CHAMPIONS_STATE_4_V: get_course_net_board is deployed, so in production
+   * the all-time cabinet is NINE boards and says nine. A failed fetch is not
+   * fatal: the other boards are unaffected and only the net board drops out.
    */
   const { data: netBoard } = useCourseNetBoard(ctx.courseId, activeActor?.id);
   const netRows = netBoard?.rows;
@@ -141,8 +141,8 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
     [legendRows, netRows],
   );
   /* CHAMPIONS_NET_SOURCE_1: sources that did not answer drop out of every
-     candidate order before any tile is drawn or counted. Pending counts as
-     unavailable; the ninth tile arrives when the function answers. */
+     candidate order before any tile is drawn or counted. The normal all-time
+     case is nine; eight is only the source-unavailable fallback (or pending). */
   const unavailableSources = useMemo(
     () => new Set<LegendCategory>(netBoard?.available ? [] : ['lowest_net_all_time']),
     [netBoard?.available],
