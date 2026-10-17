@@ -65,10 +65,12 @@ import type { YouRound } from './you/YourRoundsHere';
 import { useMomentPosts } from './you/YourMomentsSection';
 import { useAllMyRoundsAtCourse } from '@/hooks/feed/useMyRoundsAtCourse';
 import { useCourseHoleField } from '@/hooks/gam/useCourseHoleField';
+import { useMembersWhoPlayedCourse } from '@/hooks/useMembersWhoPlayedCourse';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { CHAMPIONS_ORDER_ALL_TIME } from '@/components/profile/handicap/whs/sections/course-legends/_shared/championsOrder';
 import {
-  LAST_N, NOBODY_CLOSE_SHARE, SEASON_MIN_ROUNDS, aggregate, allSeasons, edgeSummary, fieldExcludingViewer, firstN,
+  LAST_N, NOBODY_CLOSE_SHARE, SEASON_MIN_ROUNDS, aggregate, allSeasons, courseFieldKnown, edgeSummary, fieldExcludingViewer, firstN,
   goodRounds, holeEdges, lastN, openHolesState, scoredRounds,
 } from '@/lib/courseYou/youDerivations';
 import { ordinal } from './you/youBits';
@@ -105,6 +107,8 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   } = useCoursePersonalStatus(courseId);
   const { data: analysis } = useCourseHoleAnalysis(courseId);
   const { data: courseStats } = useCourseStatsDetail(courseId, true);
+  /* P4 (YOU_TAB_THIN_COURSE_1) — names the circle members who have played here. */
+  const { data: membersData } = useMembersWhoPlayedCourse(courseId, user?.id);
   const { data: myPerf } = useMyHolePerformance(user?.id, courseId, {
     enabled: Boolean(user?.id && courseId && connection),
   });
@@ -266,12 +270,16 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     });
   }, [settled, courseId, roundTotal, connection, branchC, projectionSettled, projectionState.kind]);
 
+  /* YOU_TAB_THIN_COURSE_1 P1 — below the field minimum the record is labelled
+     the best card logged here, never "the course record". */
+  const upForGrabsThin = !courseFieldKnown(analysis?.total_rounds != null ? Number(analysis.total_rounds) : null);
   const upForGrabs = (
     <UpForGrabsSection
       recordValue={courseRecord?.value ?? null}
       holders={courseRecordHolders}
       unclaimedCount={unclaimedCount}
       yourBest={bestGross}
+      thinField={upForGrabsThin}
       onAllBoards={() => {
         analyticsEvents.track('course_you_all_boards', { course_id: courseId });
         onTabChange?.('legends');
@@ -358,19 +366,29 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   if (!hasTrackedRounds) {
     const showWonAndLost =
       (analysis?.holes?.length ?? 0) === 18 && Number(analysis?.total_rounds ?? 0) >= FIELD_CHART_MIN_ROUNDS;
+    /* YOU_TAB_THIN_COURSE_1 P1 — two rounds is not a field. Below
+       COURSE_FIELD_MIN_ROUNDS the course-side claims come off: no "Here"
+       rate, no harder-than line, and the record is the best card logged
+       here. The viewer's own figures are unaffected. */
+    const fieldRoundsTotal = analysis?.total_rounds != null ? Number(analysis.total_rounds) : null;
+    const fieldKnown = courseFieldKnown(fieldRoundsTotal);
     const showAgainst =
-      fieldParOrBetterPct != null &&
-      Number.isFinite(fieldParOrBetterPct) &&
       yourGolf.parOrBetterPct != null &&
       Number.isFinite(yourGolf.parOrBetterPct) &&
-      yourGolf.courses > 0;
-    const circlePlayed = courseStats?.circle_played ?? 0;
+      yourGolf.courses > 0 &&
+      (fieldKnown ? fieldParOrBetterPct != null && Number.isFinite(fieldParOrBetterPct) : true);
+    /* P4 — the circle is NAMED from the members read (ratings-based, the one
+       client source with profiles); a member whose profile is not readable is
+       excluded from the count as well as the names. */
+    const circleMembers = (membersData?.members ?? []).filter((m) => m.in_circle && m.profile);
     return wrap(
       <div>
         <ProjectionSection
           courseName={courseName}
           state={projectionState}
           recordGross={courseRecord?.value ?? null}
+          fieldRounds={fieldRoundsTotal}
+          thinField={!fieldKnown}
         />
         {showWonAndLost && analysis ? (
           <WonAndLostSection
@@ -384,16 +402,49 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         ) : null}
         {showAgainst ? (
           <AgainstYourGolfSection
-            fieldParOrBetterPct={fieldParOrBetterPct!}
+            fieldParOrBetterPct={fieldKnown ? fieldParOrBetterPct! : null}
             yourParOrBetterPct={yourGolf.parOrBetterPct!}
             courseCount={yourGolf.courses}
-            harderThanPct={courseStats?.harder_than_pct ?? null}
+            harderThanPct={fieldKnown ? courseStats?.harder_than_pct ?? null : null}
           />
         ) : null}
         {upForGrabs}
-        {circlePlayed > 0 ? (
+        {circleMembers.length > 0 ? (
           <AboutSection heading={t('courseDetail.youTab.circle.heading')}>
-            <YouSentence>{t('common:feed.courseSheet.circlePlayed', { count: circlePlayed })}</YouSentence>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ display: 'flex', flexShrink: 0 }}>
+                {circleMembers.slice(0, 3).map((m, i) => (
+                  <SquircleAvatar
+                    key={m.user_id}
+                    src={m.profile?.profile_photo_url ?? undefined}
+                    alt={m.profile?.display_name || m.profile?.username || '?'}
+                    userId={m.user_id}
+                    size={22}
+                    hairlineRing
+                    className={i > 0 ? '-ml-1.5' : ''}
+                  />
+                ))}
+              </div>
+              <YouSentence>
+                {circleMembers.length === 1
+                  ? t('courseDetail.youTab.circle.namedOne', {
+                      name: circleMembers[0].profile?.display_name || circleMembers[0].profile?.username || '',
+                    })
+                  : circleMembers.length <= 3
+                    ? t('courseDetail.youTab.circle.namedAll', {
+                        names: circleMembers
+                          .map((m) => m.profile?.display_name || m.profile?.username || '')
+                          .join(', '),
+                      })
+                    : t('courseDetail.youTab.circle.namedMore', {
+                        names: circleMembers
+                          .slice(0, 3)
+                          .map((m) => m.profile?.display_name || m.profile?.username || '')
+                          .join(', '),
+                        count: circleMembers.length - 3,
+                      })}
+              </YouSentence>
+            </div>
           </AboutSection>
         ) : null}
         <AboutSection>

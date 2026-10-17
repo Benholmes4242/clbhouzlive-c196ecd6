@@ -11,7 +11,12 @@ import AboutSection, { AboutHairline } from '../about/AboutSection';
 import { YouSentence } from './youBits';
 
 interface Props {
-  fieldParOrBetterPct: number;
+  /**
+   * The field's par-or-better rate here. YOU_TAB_THIN_COURSE_1 P1 — null below
+   * COURSE_FIELD_MIN_ROUNDS: the "Here" row does not render, and the member's
+   * own rate stands alone rather than against two rounds.
+   */
+  fieldParOrBetterPct: number | null;
   yourParOrBetterPct: number;
   courseCount: number;
   harderThanPct: number | null;
@@ -61,7 +66,9 @@ const AgainstYourGolfSection: React.FC<Props> = ({
       meta={t('courseDetail.youTab.againstYourGolf.meta', { count: courseCount, courses: formatNumber(courseCount) })}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontFamily: SANS }}>
-        <Row name={t('courseDetail.youTab.againstYourGolf.here')} pct={fieldParOrBetterPct} fill={A.MUTE} />
+        {fieldParOrBetterPct != null ? (
+          <Row name={t('courseDetail.youTab.againstYourGolf.here')} pct={fieldParOrBetterPct} fill={A.MUTE} />
+        ) : null}
         <Row name={t('courseDetail.youTab.againstYourGolf.you')} pct={yourParOrBetterPct} fill={A.AMBER} />
       </div>
       <p
@@ -81,7 +88,10 @@ const AgainstYourGolfSection: React.FC<Props> = ({
         <>
           <AboutHairline style={{ marginTop: 18 }} />
           <div style={{ marginTop: 14 }}>
-            <YouSentence>{t('common:feed.courseSheet.playsOnAvgBody', { pct: Math.round(harderThanPct) })}</YouSentence>
+            {/* YOU_TAB_THIN_COURSE_1 P3 — no "That": the figure is its own fact
+                (average over par), not a conclusion from the par-or-better bars.
+                The shared common: string stays for CourseStatsSheet. */}
+            <YouSentence>{t('courseDetail.youTab.againstYourGolf.harderThan', { pct: Math.round(harderThanPct) })}</YouSentence>
           </div>
         </>
       ) : null}

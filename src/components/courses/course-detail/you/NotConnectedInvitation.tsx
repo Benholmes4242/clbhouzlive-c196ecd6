@@ -90,6 +90,8 @@ export const FieldShotsSection: React.FC<{ holes: CourseHole[]; totalRounds: num
     <AboutSection
       heading={t('courseDetail.youTab.connect.fieldShotsHeading', { courseName })}
       meta={t('courseDetail.youTab.connect.roundsMeta', { count: totalRounds, rounds: formatNumber(totalRounds) })}
+      /* YOU_TAB_THIN_COURSE_1 P5 — a long course name wraps, never truncates. */
+      wrapHeading
     >
       <FieldHoleBars holes={holes} />
       <div style={{ marginTop: 12 }}>

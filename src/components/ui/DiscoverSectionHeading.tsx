@@ -27,10 +27,16 @@ interface DiscoverSectionHeadingProps {
   right?: string | null;
   /** When present the right slot is a button. */
   onRightPress?: () => void;
+  /**
+   * YOU_TAB_THIN_COURSE_1 P5 — opt-in: the title wraps to two lines instead of
+   * truncating, for headings that carry a long course name. Default is
+   * unchanged (single line, ellipsis) everywhere else.
+   */
+  wrap?: boolean;
   id?: string;
 }
 
-export function DiscoverSectionHeading({ title, right, onRightPress, id }: DiscoverSectionHeadingProps) {
+export function DiscoverSectionHeading({ title, right, onRightPress, wrap = false, id }: DiscoverSectionHeadingProps) {
   const rightText = right ? withSeparators(right) : null;
 
   return (
@@ -54,9 +60,9 @@ export function DiscoverSectionHeading({ title, right, onRightPress, id }: Disco
           letterSpacing: '-0.01em',
           lineHeight: 1.2,
           color: A.INK,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
+          ...(wrap
+            ? null
+            : { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }),
         }}
       >
         {title}
