@@ -1,3 +1,4 @@
+// Caller: Champions Elsewhere (course-legends/flat/ChampionsElsewhere.tsx).
 import { useGamRpc } from './_useGamRpc';
 
 export interface TitleInReach {

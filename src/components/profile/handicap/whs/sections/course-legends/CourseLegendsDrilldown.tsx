@@ -34,6 +34,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { CHAMPIONS_ORDER_90D, CHAMPIONS_ORDER_ALL_TIME, orderWithWomensRecord, withAvailableSources } from './_shared/championsOrder';
 import { PostedChampions } from './flat/PostedChampions';
+import { ChampionsElsewhere } from './flat/ChampionsElsewhere';
 import { useProBenchmarks } from '@/hooks/gam/useProBenchmarks';
 import { pickProBenchmark, filterProsForViewer, PRO_BAND_BASES, type ProBandBase } from './drilldown/_shared/proBenchmark';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -680,6 +681,11 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
         </div>
       )}
 
+
+      {/* CHAMPIONS_ELSEWHERE_R VB1: connected members only, played here or not. */}
+      {!isLoading && !isError && Boolean(whsConnection) && user?.id && user.id === activeActor?.id && (
+        <ChampionsElsewhere userId={user.id} />
+      )}
 
       <FlatBoardSheet
         open={fullLeaderboardCategory !== null}
