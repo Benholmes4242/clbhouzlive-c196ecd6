@@ -7,7 +7,7 @@ import React from 'react';
 import type { LegendCategory } from '@/lib/gam/types';
 import { numberWord } from '@/lib/text/numbers';
 import { SURFACE } from '@/lib/tokens/surface';
-import { INK_ON_LIGHT, MEMBER_PANEL, inkWithAlpha } from '@/lib/tokens/surfaces';
+import { INK_ON_LIGHT, MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { Button } from '@/components/ui/button';
 import { CHAMPIONS_CATALOGUE_TOTAL, championsCatalogueWithoutRounds } from '@/lib/gam/championsCatalogueSnapshot';

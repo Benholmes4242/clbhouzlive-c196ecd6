@@ -48,10 +48,11 @@ const SQUIRCLE_MASK_URL =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M40 0h20c22.091 0 40 17.909 40 40v20c0 22.091-17.909 40-40 40H40C17.909 100 0 82.091 0 60V40C0 17.909 17.909 0 40 0z'/%3E%3C/svg%3E\")";
 
 /** 26px squircle with the canonical 1px traced hairline ring. */
-export const CourseLegendsAvatar: React.FC<{ photoUrl: string | null; name: string; size?: number }> = ({
+export const CourseLegendsAvatar: React.FC<{ photoUrl: string | null; name: string; size?: number; ghost?: boolean }>  = ({
   photoUrl,
   name,
   size = 26,
+  ghost = false,
 }) => {
   const initials =
     (name || '')
@@ -67,7 +68,7 @@ export const CourseLegendsAvatar: React.FC<{ photoUrl: string | null; name: stri
         style={{
           position: 'absolute',
           inset: 0,
-          background: photoUrl
+          background: ghost && !photoUrl ? A.PANEL : photoUrl
             ? `url(${photoUrl}) center/cover`
             : 'linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%)',
           borderRadius: '34%',
@@ -80,7 +81,7 @@ export const CourseLegendsAvatar: React.FC<{ photoUrl: string | null; name: stri
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#FFFFFF',
+          color: ghost ? A.AMBER : '#FFFFFF',
           fontFamily: SANS,
           fontSize: size <= 26 ? 9.5 : 11,
           fontWeight: 700,
@@ -93,7 +94,7 @@ export const CourseLegendsAvatar: React.FC<{ photoUrl: string | null; name: stri
           position: 'absolute',
           inset: 0,
           borderRadius: '34%',
-          border: `1px solid rgba(255,255,255,0.14)`,
+          border: ghost ? `1px dashed color-mix(in srgb, ${A.AMBER} 50%, transparent)` : `1px solid rgba(255,255,255,0.14)`,
           pointerEvents: 'none',
         }}
       />
