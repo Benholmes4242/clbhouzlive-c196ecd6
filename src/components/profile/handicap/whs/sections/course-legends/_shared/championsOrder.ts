@@ -1,5 +1,32 @@
 import type { LegendCategory } from '@/lib/gam/types';
 
+/** State 3: category semantics live with the order, not in cabinet consumers.
+ * Stableford is a single-round score but cannot be inferred from a gross range.
+ */
+export type ChampionsBoardKind = 'projectable' | 'not-projectable' | 'cumulative';
+type BoardData = { kind: ChampionsBoardKind; projection?: 'gross' | 'net' | 'differential'; name: string };
+export const CHAMPIONS_BOARD_DATA: Record<LegendCategory, BoardData> = {
+  lowest_gross_all_time: { kind: 'projectable', projection: 'gross', name: 'gross' },
+  lowest_gross_90d: { kind: 'projectable', projection: 'gross', name: 'gross' },
+  lowest_gross_women_all_time: { kind: 'projectable', projection: 'gross', name: "women's gross" },
+  lowest_gross_women_90d: { kind: 'projectable', projection: 'gross', name: "women's gross" },
+  lowest_net_all_time: { kind: 'projectable', projection: 'net', name: 'net' },
+  best_score_diff_all_time: { kind: 'projectable', projection: 'differential', name: 'differential' },
+  best_score_diff_90d: { kind: 'projectable', projection: 'differential', name: 'differential' },
+  best_stableford_all_time: { kind: 'not-projectable', name: 'stableford' },
+  best_stableford_90d: { kind: 'not-projectable', name: 'stableford' },
+  most_birdies_all_time: { kind: 'cumulative', name: 'birdies' },
+  most_birdies_90d: { kind: 'cumulative', name: 'birdies' },
+  most_eagles_all_time: { kind: 'cumulative', name: 'eagles' },
+  most_eagles_90d: { kind: 'cumulative', name: 'eagles' },
+  most_aces_all_time: { kind: 'cumulative', name: 'aces' },
+  most_aces_90d: { kind: 'cumulative', name: 'aces' },
+  most_albatrosses_all_time: { kind: 'cumulative', name: 'albatrosses' },
+  most_albatrosses_90d: { kind: 'cumulative', name: 'albatrosses' },
+  most_rounds_all_time: { kind: 'cumulative', name: 'rounds' },
+  most_rounds_90d: { kind: 'cumulative', name: 'rounds' },
+};
+
 /**
  * Canonical category order shared between Course Champions drilldown and
  * the compact Course Champions grid cell on the Compete tab.
