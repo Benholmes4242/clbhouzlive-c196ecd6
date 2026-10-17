@@ -47,3 +47,15 @@
 .champions-cabinet-projected .champions-cabinet-value { font-size: 19px; }
 .champions-cabinet-projected .champions-cabinet-state { font-weight: 800; }
 .champions-projected .champions-cabinet-legend { flex-wrap: wrap; gap: 8px 12px; }
+
+/* CHAMPIONS_STATE_4: opt-in geometry only, colour roles come from A/medals. */
+.champions-cabinet-tile[data-state="yours"] { border-style: solid; }
+.champions-cabinet-tile[data-state="yours"] .champions-cabinet-value { font-size: 19px; }
+.champions-cabinet-tile[data-state="yours"] .champions-cabinet-state { font-weight: 800; letter-spacing: 0.08em; }
+.champions-posted .champions-cabinet-legend { flex-wrap: wrap; gap: 8px 12px; }
+.champions-posted .champions-field-stats { grid-template-columns: repeat(auto-fit,minmax(60px,1fr)); }
+.champions-pinned-divider { display: flex; align-items: center; gap: 8px; margin: 8px 0; font-size: 9.5px; text-transform: uppercase; font-weight: 800; }
+.champions-pinned-divider::before, .champions-pinned-divider::after { content: ''; height: 1px; flex: 1; background: var(--hcp-line); }
+.champions-defence-bars { margin-top: 16px; display: grid; gap: 8px; }
+.champions-defence-track { display: grid; grid-template-columns: minmax(0,1fr) minmax(72px,auto); gap: 8px; align-items: center; font-size: 11px; }
+.champions-defence-bar { height: 11px; border-radius: 3px; max-width: 100%; }

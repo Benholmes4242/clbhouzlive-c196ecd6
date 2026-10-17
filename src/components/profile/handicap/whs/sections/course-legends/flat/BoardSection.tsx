@@ -31,6 +31,7 @@ import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import { Button } from '@/components/ui/button';
 import { ghostInsertionIndex } from './ProjectionGhostRow';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
+import { pinnedBoardRows, postedRankLabel } from './championsPosted';
 
 const MAX_ROWS = 6;
 
@@ -56,6 +57,8 @@ interface Props {
   fieldOnly?: boolean;
   ghost?: { value: number; name: string; photoUrl: string | null };
   projectedScreen?: boolean;
+  hasTrackedRounds?: boolean;
+  postedScreen?: boolean;
 }
 
 export const BoardSection: React.FC<Props> = ({
@@ -72,6 +75,8 @@ export const BoardSection: React.FC<Props> = ({
   fieldOnly = false,
   ghost,
   projectedScreen = false,
+  hasTrackedRounds = false,
+  postedScreen = false,
 }) => {
   const { t } = useTranslation('courses');
   const chips: FlatChip[] = useMemo(
@@ -90,11 +95,12 @@ export const BoardSection: React.FC<Props> = ({
 
   const entry = grouped.get(active.key);
   const rows = fieldOnly ? (entry?.rows ?? []).map(row => ({ ...row, isSelf: false })) : entry?.rows ?? [];
-  const activeGhost = active.key === 'lowest_gross_all_time' || active.key === 'lowest_gross_90d' ? ghost : undefined;
+  const activeGhost = !hasTrackedRounds && (active.key === 'lowest_gross_all_time' || active.key === 'lowest_gross_90d') ? ghost : undefined;
   if (rows.length === 0 && !fieldOnly && !activeGhost) return null;
 
   const positions = positionsFor(rows);
-  const shown = rows.slice(0, MAX_ROWS);
+  const pinned = postedScreen ? pinnedBoardRows(rows) : null;
+  const shown = pinned?.leaders ?? rows.slice(0, MAX_ROWS);
   const total = entry?.total ?? rows.length;
   const viewerValue = rows.find((r) => r.isSelf)?.value ?? null;
   const ghostIndex = activeGhost ? ghostInsertionIndex(rows, activeGhost.value) : -1;
@@ -136,13 +142,13 @@ export const BoardSection: React.FC<Props> = ({
         </div>
       ) : null}
 
-      {!fieldOnly && chips.length > 1 ? (
+      {!fieldOnly && !postedScreen && chips.length > 1 ? (
         <div style={{ marginBottom: 14 }}>
           <BoardChips chips={chips} activeKey={active.key} onSelect={onSelectCategory} />
         </div>
       ) : null}
 
-      {!fieldOnly && <ChampionLine category={active.key} rows={rows} viewerValue={viewerValue} />}
+      {!fieldOnly && !postedScreen && <ChampionLine category={active.key} rows={rows} viewerValue={viewerValue} />}
       {rows.length > 0 && <AboutHairline style={{ marginTop: 12 }} />}
       {fieldOnly && rows.length === 0 && <div style={{ color: A.DIM }}>Never claimed</div>}
 
@@ -150,17 +156,22 @@ export const BoardSection: React.FC<Props> = ({
         {activeGhost && ghostIndex === i && ghostRow}
         <FlatBoardRow
           row={row}
-          pos={positions[i]}
-          recordTone={projectedScreen ? MEDAL_GOLD : undefined}
+          pos={postedScreen ? postedRankLabel(row, rows) : positions[i]}
+          recordTone={projectedScreen || postedScreen ? MEDAL_GOLD : undefined}
+          pinned={postedScreen && row.isSelf}
           category={active.key}
           coursePar={coursePar}
           rule={i > 0}
           onPress={onRowPress && row.username ? () => onRowPress(row) : undefined}
         />
       </React.Fragment>)}
+      {pinned?.pinned && <>
+        <div className="champions-pinned-divider" data-golfers-between={pinned.between} style={{ color: A.FAINT }}>{pinned.between} golfers between</div>
+        <FlatBoardRow row={pinned.pinned} pos={postedRankLabel(pinned.pinned, rows)} category={active.key} coursePar={coursePar} pinned recordTone={MEDAL_GOLD} rule={false} onPress={onRowPress && pinned.pinned.username ? () => onRowPress(pinned.pinned as FlatRow) : undefined} />
+      </>}
       {activeGhost && rows.length === 0 && ghostRow}
 
-      {rows.length > 0 && (fieldOnly || total > MAX_ROWS || rows.length > MAX_ROWS) ? (
+      {rows.length > 0 && (postedScreen || fieldOnly || total > MAX_ROWS || rows.length > MAX_ROWS) ? (
         <FlatAction label={`All ${total}`} onPress={() => onOpenFull(active.key)} />
       ) : null}
       {activeGhost && <div className="champions-empty-said" style={{ color: A.MUTE }}>The dashed row is <b>a projection, not a score</b>, so it carries no rank and nobody below it is renumbered. It moves with your handicap and disappears the moment you post a card here.</div>}

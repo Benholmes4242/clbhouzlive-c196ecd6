@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { CHAMPIONS_CATALOGUE_TOTAL, championsCatalogueWithoutRounds } from '@/lib/gam/championsCatalogueSnapshot';
 import './championsEmpty.css';
 import { cabinetHolderName } from './championsField';
+import { Crown } from 'lucide-react';
+import { MEDAL_GOLD } from '@/lib/tokens/medals';
 
 export type CabinetState = 'never-claimed' | 'held' | 'in-reach' | 'not-started' | 'yours';
 
@@ -29,17 +31,17 @@ function boardName(category: LegendCategory): string {
 export function ChampionsCabinetTile({ category, state, value, holders = [], selected = false, onSelect, gap }: {
   category: LegendCategory; state: CabinetState; value?: string; holders?: readonly string[]; selected?: boolean; onSelect?: () => void; gap?: number;
 }) {
-  if (state === 'yours') return null;
+  const yours = state === 'yours';
   const held = state !== 'never-claimed';
   const projected = state === 'in-reach' || state === 'not-started';
   const contents = <>
-    <div className="champions-cabinet-name" style={{ color: SURFACE.dark.dim }}>{boardName(category)}</div>
+    <div className="champions-cabinet-name" style={{ color: SURFACE.dark.dim }}>{boardName(category)}{yours && <Crown size={10} aria-hidden style={{ display: 'inline', marginLeft: 4, color: MEDAL_GOLD }} />}</div>
     <div>
-      <div className="champions-cabinet-value" style={{ color: held ? SURFACE.dark.ink : A.FAINT }}>{held ? value : '—'}</div>
-      <div className="champions-cabinet-state" style={{ color: state === 'in-reach' ? A.AMBER : state === 'not-started' ? A.FAINT : SURFACE.dark.dim }}>{state === 'in-reach' ? 'In reach' : state === 'not-started' ? 'Not started' : gap != null ? `${gap} off` : held ? cabinetHolderName(holders) : 'Open'}</div>
+      <div className="champions-cabinet-value" style={{ color: yours ? MEDAL_GOLD : held ? SURFACE.dark.ink : A.FAINT }}>{held ? value : '—'}</div>
+      <div className="champions-cabinet-state" style={{ color: yours ? MEDAL_GOLD : state === 'in-reach' ? A.AMBER : state === 'not-started' ? A.FAINT : SURFACE.dark.dim }}>{yours ? 'Yours' : state === 'in-reach' ? 'In reach' : state === 'not-started' ? 'Not started' : gap != null ? `${gap} off` : held ? cabinetHolderName(holders) : 'Open'}</div>
     </div>
   </>;
-  const tileStyle = held ? { background: MEMBER_PANEL, color: SURFACE.dark.ink, borderColor: state === 'in-reach' ? `color-mix(in srgb, ${A.AMBER} 42%, transparent)` : undefined, boxShadow: selected ? `inset 0 0 0 1.5px ${SURFACE.dark.ink}` : undefined } : undefined;
+  const tileStyle = held ? { background: yours ? `linear-gradient(160deg, color-mix(in srgb, ${MEDAL_GOLD} 10%, transparent), ${MEMBER_PANEL} 62%)` : MEMBER_PANEL, color: SURFACE.dark.ink, borderColor: yours ? `color-mix(in srgb, ${MEDAL_GOLD} 45%, transparent)` : state === 'in-reach' ? `color-mix(in srgb, ${A.AMBER} 42%, transparent)` : undefined, boxShadow: selected ? `inset 0 0 0 1.5px ${SURFACE.dark.ink}` : undefined } : undefined;
   if (onSelect) return <div role="listitem" data-category={category} data-state={state}>
     <Button variant="secondary" className={`champions-cabinet-tile champions-cabinet-select${projected ? ' champions-cabinet-projected' : ''}`} data-state={state} aria-pressed={selected} onClick={onSelect} style={tileStyle}>{contents}</Button>
   </div>;
