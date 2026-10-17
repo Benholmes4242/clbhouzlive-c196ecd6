@@ -116,12 +116,12 @@ export function ByRegionShell() {
   );
 }
 
-/** Most played and Highest rated: three PhotoFigureCards, the real count. */
-export function PhotoRailShell() {
+/** Most played and Highest rated: PhotoFigureCards, the real count per rail. */
+export function PhotoRailShell({ count = PHOTO_FIGURE_COUNT }: { count?: number } = {}) {
   return (
     <HeadShell>
       <div style={{ ...RAIL_CLIPPED, gap: PHOTO_FIGURE_GAP }}>
-        {Array.from({ length: PHOTO_FIGURE_COUNT }, (_, i) => (
+        {Array.from({ length: count }, (_, i) => (
           <Bar key={i} style={{ width: PHOTO_FIGURE_W, height: PHOTO_FIGURE_H, flex: 'none', borderRadius: 0 }} />
         ))}
       </div>
