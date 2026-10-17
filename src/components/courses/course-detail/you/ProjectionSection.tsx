@@ -199,11 +199,15 @@ const ProjectionSection: React.FC<Props> = ({ courseName, state, recordGross, fi
             record: recordGross,
             count: fieldRounds ?? 0,
           })
-        : t(`courseDetail.youTab.projection.${recordAgainstRange(recordGross, p.lowGross, p.highGross)}`, {
-            low: p.lowGross,
-            high: p.highGross,
-            record: recordGross,
-          });
+        : (
+          /* YOU_TAB_BOARD_LIST_1 AC5 — range, record and verdict in bold, as the mock. */
+          <Trans
+            t={t}
+            i18nKey={`courseDetail.youTab.projection.${recordAgainstRange(recordGross, p.lowGross, p.highGross)}`}
+            values={{ low: p.lowGross, high: p.highGross, record: recordGross }}
+            components={{ b: <b style={{ color: A.INK, fontWeight: 700 }} /> }}
+          />
+        );
 
   return (
     <AboutSection first heading={heading} wrapHeading>
