@@ -19,12 +19,6 @@ export function privateHolePhotos(rows: readonly HolePhoto[], memberId: string, 
   return rows.filter(row => row.user_id === memberId && row.course_id === courseId && (row.status === 'pending' || row.status === 'rejected'));
 }
 
-export function rejectedPhotoReason(reason: string | null): string {
-  return reason?.trim() === 'The picture is of people, not the hole.'
-    ? 'The picture is of people, not the hole.'
-    : 'It did not pass review.';
-}
-
 /** Date-only display without local-time conversion; upload time is never used. */
 export function photoDayLabel(value: string | null): string | null {
   const day = value?.slice(0, 10);
