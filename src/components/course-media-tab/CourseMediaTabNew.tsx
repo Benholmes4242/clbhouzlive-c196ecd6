@@ -153,9 +153,30 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       {tagging.ready && untaggedCount != null && untaggedCount > 0 && activeFilter !== 'videos' && (
         <section className="px-5 pt-5">
           <p className="text-[11px] font-bold uppercase tracking-[0.16em]" style={{ color: A.INK }}>Everything else</p>
-          <h2 className="mt-1 text-[19px] font-bold">{capitalPhotoCount(untaggedCount)} of yours {untaggedCount === 1 ? 'is' : 'are'} untagged</h2>
+          {/* MEDIA_CTA_1: heading left, white pill right on one row. The pill
+              sizes to its label and never shrinks; the heading wraps instead.
+              The pill centres against the whole heading block, and its hit
+              area is padded to 44px while the visible pill stays 13px/700. */}
+          <div className="mt-1 flex items-center gap-3">
+            <h2 className="text-[19px] font-bold" style={{ flex: '1 1 auto', minWidth: 0 }}>{capitalPhotoCount(untaggedCount)} of yours {untaggedCount === 1 ? 'is' : 'are'} untagged</h2>
+            <button
+              type="button"
+              disabled={fastPending || !tagging.sources.isSuccess}
+              onClick={beginBatch}
+              style={{
+                flexShrink: 0, minHeight: 44, padding: '0 4px',
+                background: 'none', border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center',
+              }}
+            >
+              <span style={{
+                background: A.INK, color: INK_ON_LIGHT, borderRadius: 999,
+                fontSize: 13, fontWeight: 700, padding: '8px 16px',
+                whiteSpace: 'nowrap',
+              }}>Tag them</span>
+            </button>
+          </div>
           <p className="mt-2 text-[12.5px] leading-normal" style={{ color: A.MUTE }}>Tagging them to a hole takes one tap each.</p>
-          <Button variant="ghost" className="mt-3" disabled={fastPending || !tagging.sources.isSuccess} onClick={beginBatch}>Tag photos</Button>
           {fastError && addHole == null && <p role="alert" className="text-sm">{fastError}</p>}
         </section>
       )}
