@@ -1,7 +1,8 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
 ## REVIEWS_STATE_2
-- [ ] Confirm data sources and resolve brief/mock contradictions before implementing the exact one-total-rating screen; preserve State 1/composer and other states.
+- [ ] STOP under QA2: no review-linked played-month source exists in the reviewed contract. course_ratings Row (src/integrations/supabase/types.ts:3831–3853) has review_date but no play date/score link; useUserCourseActivity.ts:8 explicitly derives played_at from COALESCE(review_date, created_at), which ABC5 forbids. gam_round_stats provides actual play dates but no specified rule identifies which round this review describes. Await Ben's played-month source/selection rule or explicit omission permission. No app/test changes made.
+- [ ] Rater context must use canonical handicap resolver plus visible tracked-round/rating sources; get_reviewer_stats (types.ts:22072) supplies courses_rated/avg_rating/member_since but not tens, connection or played context. Confirm arbitrary-rater visibility before claiming complete counts; do not invent illustrative values. ABD2 'nowhere else' also conflicts with ABC4/signed-off calibration repeating 10.0; ask whether the calibration is the intended exception.
 - [ ] Add rule coverage with full canonical i18n mocks; no middle-80%/splits components; full suite baseline 1,580 and exact inventory report.
 - [ ] Verify populated local rendering/photo and Add yours flows; report hosted authentication limits and source gaps.
 
