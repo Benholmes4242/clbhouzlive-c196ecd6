@@ -3,7 +3,7 @@ import { reviewTierColor } from '@/components/shared/ReviewGhostScore';
 import type { RatingTier } from '@/lib/ratingTier';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-// The Reviews tab header (TheScore) is its one live importer: restored by
+// Shared by TheScore and the State 3/4 screen: restored by
 // BRIEF_REVIEWS_HEADER_PAIR_AND_DISTRIBUTION. Empty bands render as the label,
 // an empty track and a 0 — never hidden.
 // Bar fill comes from the app-wide score bands via `reviewTierColor` — a flat
@@ -24,6 +24,8 @@ interface RatingTierDistributionProps {
   distribution: RatingTierDistributionData;
   /** The active/highlighted tier (based on community average) */
   activeTier?: RatingTierKey;
+  /** Signed-off small-sample chart: widths are shares, average tier is highlighted. */
+  appearance?: 'default' | 'sample';
 }
 
 const TIER_CONFIG: Array<{ key: RatingTierKey; dataKey: keyof RatingTierDistributionData; label: string }> = [
@@ -36,6 +38,8 @@ const TIER_CONFIG: Array<{ key: RatingTierKey; dataKey: keyof RatingTierDistribu
 
 export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
   distribution,
+  activeTier,
+  appearance = 'default',
 }) => {
   const distributionItems = TIER_CONFIG.map(({ key, dataKey, label }) => ({
     key,
@@ -44,13 +48,14 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
   }));
 
   const maxCount = Math.max(...distributionItems.map(d => d.count), 1);
+  const sample = appearance === 'sample';
+  const denominator = sample ? Math.max(distributionItems.reduce((sum, item) => sum + item.count, 0), 1) : maxCount;
 
   return (
-    <div className="grid items-center gap-x-2 gap-y-2" style={{ gridTemplateColumns: 'max-content 1fr 24px' }}>
+    <div data-distribution className="grid items-center gap-x-2 gap-y-2" style={{ gridTemplateColumns: 'max-content 1fr 24px' }}>
       {distributionItems.map((item) => {
-        const percentage = (item.count / maxCount) * 100;
-        const hasCount = item.count > 0;
-        const bandFill = reviewTierColor(item.key as RatingTier, 'dark');
+        const percentage = (item.count / denominator) * 100;
+        const bandFill = sample ? (item.key === activeTier ? A.IMPROVED : A.MUTE) : reviewTierColor(item.key as RatingTier, 'dark');
 
         return (
           <React.Fragment key={item.key}>
@@ -58,19 +63,19 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
               {item.label}
             </span>
 
-            <div className="flex-1 h-[8px] rounded-full overflow-hidden" style={{ background: A.TRACK }}>
+            <div data-tier-track={item.key} className="flex-1 rounded-full overflow-hidden" style={{ background: A.TRACK, height: sample ? 10 : 8 }}>
               <div
                 className="h-full rounded-full transition-all duration-300"
                 style={{
                   width: `${percentage}%`,
-                  background: hasCount ? bandFill : 'rgba(255,255,255,0.10)',
+                  background: bandFill,
 
                 }}
               />
             </div>
 
 
-            <span className="text-right text-xs text-muted-foreground tabular-nums">
+            <span data-tier-count={item.key} className="text-right text-xs text-muted-foreground tabular-nums">
               {item.count}
             </span>
           </React.Fragment>

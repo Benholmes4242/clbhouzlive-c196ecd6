@@ -34,3 +34,4 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Record, counting-round and log rows open `RoundDetailSheet` by score id with the known profile owner, keeping one scorecard and member context.
 - Owner copy uses `profileOwnerVoice` to share grammar.
 - Small-sample Reviews reuse SingleReview's RaterReviewRow, so context and media cannot drift.
+- Reviews States 3/4 share FewReviews and RatingTierDistribution to prevent population drift.
