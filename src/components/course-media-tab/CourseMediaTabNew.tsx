@@ -16,7 +16,6 @@ import { HolePhotoTagDialog } from './HolePhotoTagDialog';
 import { capitalPhotoCount, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { HoleWalk } from './HoleWalk';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { Button } from '@/components/ui/button';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMediaUpload } from '@/uploads/hooks/useMediaUpload';
 import { HoleKnownPhotoPath, HolePhotoBatchPath } from './HolePhotoFastPaths';
