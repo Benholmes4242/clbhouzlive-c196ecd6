@@ -1,6 +1,9 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
 ## BRIEF_MEDIA_3 — MEDIA_FAST_1
+### MEDIA_FAST_1_R
+- [x] Confirm clbhouz; restore EXIF-only display dates and the original missing-EXIF assertion; expose closed/open/used chip states and replace the authorized appearance assertions; retain row-based shot counts without the seasons clause below two capture months.
+- [ ] Run the full suite (pre-edit inventory 1,673 tests / 215 files), check preview and report every authorized test rewrite; authenticated checks remain unavailable on external unmanaged Supabase. No brief 4 or prohibited changes.
 - [ ] Build separate hole-known and oldest-first batch paths from the two uploaded mocks; use existing date verdict, never show hole chips on Path A; conditional real-round row; batch last-tag floor, closed precedence, floor-minus-one and split verdict; skips retain untagged photos.
 - [ ] Apply AMA1 permanent copy cuts (no TODO); AMA2 display-month created_at fallback and derived shots/seasons. Verify rules, reconcile tests from 1,659/214, check preview; no brief 4 or prohibited data changes.
 - [ ] QA2 STOP: targeted run /tmp/media-fast-targeted.log: src/test/holePhotoFastPaths.test.tsx:50:65, AssertionError: expected '' to be 'dashed' // Object.is equality. 46 passed, 1 failed across 5 files. No test or app edits after failure; browser acceptance and full-suite run not performed. Baseline full suite 1,659/214; inventory now 1,673/215 (+14 new cases in holePhotoFastPaths.test.tsx); final passing total unverified. Preview build OK 2026-10-18T12:46:01Z.

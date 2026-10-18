@@ -3,7 +3,6 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { advanceBatch, batchVerdicts, closedHoleCount, orderedBatch, startBatch, type BatchPhoto } from '@/lib/courseMedia/holePhotoBatch';
 import { HoleKnownPhotoPath, HolePhotoBatchPath } from '@/components/course-media-tab/HolePhotoFastPaths';
 import { HolePhotoPicker } from '@/components/course-media-tab/HolePhotoPicker';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 const round = { id: 'score', userId: 'member', golfCourseId: 'course', playDate: '2026-05-14', grossScore: 82 };
 const photo = (url: string, day: string | null = '2026-05-14'): BatchPhoto => ({ url, createdAt: '2026-10-01T12:00:00Z', exif: { captureDay: day, capturedAt: day ? `${day}T12:00:00` : null, latitude: null, longitude: null } });
@@ -44,12 +43,12 @@ describe('MEDIA_FAST_1', () => {
     expect(advanceBatch(state, 'b', 7).tags).toEqual({ a: 7, b: 7 });
     expect(() => advanceBatch(state, 'b', 4)).toThrow('This hole is closed.');
   });
-  it('closed always beats used, seventh remains green and selectable', () => {
+  it('closed always beats used, seventh remains used and selectable', () => {
     render(<HolePhotoPicker holeCount={9} floor={7} selectedHole={null} usedHoles={[4, 7]} onSelect={() => {}} />);
     const four = screen.getByRole('button', { name: 'Hole 4' }); const seven = screen.getByRole('button', { name: 'Hole 7' });
-    expect(four).toBeDisabled(); expect(four.style.borderStyle).toBe('dashed');
-    expect(four.style.color).not.toBe(seven.style.color); expect(seven).toBeEnabled();
-    const probe = document.createElement('div'); probe.style.color = A.IMPROVED; expect(seven.style.color).toBe(probe.style.color);
+    expect(four).toBeDisabled(); expect(four).toHaveAttribute('data-state', 'closed');
+    expect(seven).toBeEnabled(); expect(seven).toHaveAttribute('data-state', 'used');
+    expect(screen.getByRole('button', { name: 'Hole 8' })).toHaveAttribute('data-state', 'open');
   });
   it('five matching EXIF photos all publish', () => {
     expect(batchVerdicts(Array.from({ length: 5 }, (_, i) => photo(String(i))), 'member', 'course', [round])).toEqual({ published: 5, waiting: 0, all: true });
