@@ -8,7 +8,8 @@ import { Loader2, MoreVertical, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { MEDIA_CATALOGUE_TOTAL, MEDIA_EMPTY_SNAPSHOT, privateHolePhotos, rejectedPhotoReason, photoDayLabel } from '@/lib/courseMedia/emptyStates';
+import { MEDIA_CATALOGUE_TOTAL, MEDIA_EMPTY_SNAPSHOT, privateHolePhotos, photoDayLabel } from '@/lib/courseMedia/emptyStates';
+import { memberReasonSentence } from '@/lib/courseMedia/memberReasonSentence';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { capitalPhotoCount, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { HolePhotoPicker } from './HolePhotoPicker';
@@ -31,6 +32,7 @@ export function CourseMediaNoHoleList({ courseName, photoCount, children }: {
 
 /** State D Retag uses the deployed owner RPC, never a direct table update.
  * Unavailable hole analysis omits the picker/action; Remove stays absent.
+ * Rejection sentences share the notification helper; no local reason map.
  */
 export function CourseMediaNotLive({ rows, memberId, courseId, onRetag }: {
   rows: readonly HolePhoto[]; memberId: string; courseId: string; onRetag?: (row: HolePhoto) => void;
@@ -47,7 +49,7 @@ export function CourseMediaNotLive({ rows, memberId, courseId, onRetag }: {
       return <div key={row.id} role="status" className="media-empty-status" data-status={row.status}>
         {rejected ? <X className="h-4 w-4 shrink-0" /> : <MoreVertical className="h-4 w-4 shrink-0" />}
         <p><strong>{rejected ? 'Not published' : 'Waiting'} · The {row.hole_no}{ordinalSuffix(row.hole_no)}.</strong>{' '}
-          {rejected ? <>{reviewed && <>Reviewed on {reviewed}. </>}<strong>{rejectedPhotoReason(row.reject_reason)}</strong></> : <>The scorecard cannot vouch for this date, so a person will look. <strong>You can see it; nobody else can yet.</strong></>}
+          {rejected ? <>{reviewed && <>Reviewed on {reviewed}. </>}<strong>{memberReasonSentence(row.reject_reason)}</strong></> : <>The scorecard cannot vouch for this date, so a person will look. <strong>You can see it; nobody else can yet.</strong></>}
         </p>
       </div>;
     })}</div>

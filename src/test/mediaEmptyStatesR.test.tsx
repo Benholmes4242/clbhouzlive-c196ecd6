@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { CourseMediaNoHoleList, CourseMediaNotLive } from '@/components/course-media-tab/CourseMediaEmptyStates';
-import { privateHolePhotos, rejectedPhotoReason, photoDayLabel } from '@/lib/courseMedia/emptyStates';
+import { privateHolePhotos, photoDayLabel } from '@/lib/courseMedia/emptyStates';
+import { memberReasonSentence } from '@/lib/courseMedia/memberReasonSentence';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 
 const row = (id: string, status: string, user_id = 'me', course_id = 'here') => ({ id, status, user_id, course_id, hole_no: 12, media_url: '/photo.jpg', reject_reason: null, reviewed_at: null }) as HolePhoto;
@@ -16,11 +17,14 @@ describe('MEDIA_EMPTY_1_R owner population and date rules', () => {
     expect(privateHolePhotos([row('p', 'pending', 'me', 'elsewhere')], 'me', 'here')).toEqual([]);
   });
   it('unmapped reviewer text maps to neutral fixed reason', () => {
-    expect(rejectedPhotoReason('internal reviewer note')).toBe('It did not pass review.');
-    expect(rejectedPhotoReason(null)).toBe('It did not pass review.');
+    expect(memberReasonSentence('internal reviewer note')).toBe(memberReasonSentence('other'));
+    expect(memberReasonSentence(null)).toBe(memberReasonSentence('other'));
+    expect(memberReasonSentence('internal reviewer note')).not.toContain('internal reviewer note');
   });
   it('only the mock supplied exact reason maps to its fixed sentence', () => {
-    expect(rejectedPhotoReason('The picture is of people, not the hole.')).toBe('The picture is of people, not the hole.');
+    expect(memberReasonSentence('The picture is of people, not the hole.')).toBe(memberReasonSentence('other'));
+    expect(memberReasonSentence('The picture is of people, not the hole.')).not.toBe('The picture is of people, not the hole.');
+    expect(memberReasonSentence('not_a_golf_hole')).not.toBe(memberReasonSentence('other'));
   });
   it('missing capture date stays absent; malformed dates stay absent', () => {
     expect(photoDayLabel(null)).toBeNull(); expect(photoDayLabel('2026-02-30')).toBeNull();

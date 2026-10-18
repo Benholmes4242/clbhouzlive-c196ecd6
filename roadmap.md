@@ -1,5 +1,9 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_MEDIA_4_R3 — MEDIA_RETAG_1_R
+- [ ] Delete State D's separate reason map; import shared memberReasonSentence directly. Rewrite only the two authorised rejection-reason tests; preserve test count and report before/after assertions.
+- [ ] Run full suite and check preview; no admin, RPC, SQL, policy or other test changes. Hosted authenticated persistence/privacy remain unavailable on external unmanaged Supabase.
+
 ## BRIEF_MEDIA_4_R2 — MEDIA_RETAG_1
 - [x] Owner rejected-photo Retag uses Ben's deployed retag_hole_photo RPC only; success invalidates owner rows to show Waiting. Actual analysis holes, different-hole guard, refusal/retry verified. No direct member UPDATE/delete, Remove, SQL or deployment changes.
 - [x] Contributor helper moved to src/lib/courseMedia/memberReasonSentence.ts with one-argument signature and neutral-only default; only authorised useHolePhotoQueue.ts changed under admin. Audit: rejection notification is note's only consumer; review sheet supplies note, admin/Inbox display codes. Existing optional rejectHolePhoto input and caller untouched.
