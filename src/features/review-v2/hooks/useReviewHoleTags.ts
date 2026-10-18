@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import { pickPreselectedRound, useMyRoundsAtCourse } from '@/hooks/feed/useMyRoundsAtCourse';
-import { composerPhotoMetadata, composerPhotoVerdict, type ComposerHoleJob } from '@/lib/courseMedia/composerHolePhotos';
+import { composerPhotoMetadata, type ComposerHoleJob } from '@/lib/courseMedia/composerHolePhotos';
 import type { MediaItem } from '../types';
 
 export function useReviewHoleTags(courseId: string, userId: string | null, items: readonly MediaItem[]) {
@@ -27,8 +27,7 @@ export function useReviewHoleTags(courseId: string, userId: string | null, items
     enabled: !!userId && holes.length > 0 && photos.length > 0,
     queryFn: async () => Object.fromEntries(await Promise.all(photos.map(async photo => {
       const exif = await composerPhotoMetadata(photo.file, photo.uploadedUrl);
-      const verdict = userId ? await composerPhotoVerdict(exif, userId, courseId, null).catch(() => null) : null;
-      return [photo.id, { exif, approved: verdict?.status === 'approved' }];
+      return [photo.id, { exif }];
     }))),
     staleTime: Infinity,
   });

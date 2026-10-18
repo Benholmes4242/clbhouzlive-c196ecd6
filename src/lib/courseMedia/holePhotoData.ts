@@ -1,7 +1,7 @@
 /** MEDIA_ENGINE_1_R2: read/write only the hole contribution; never mutate the
  * source photo. Analysis hook owns the hole list; this module has no resolver.
  * All complete-list reads paginate explicitly. Backend policies remain the
- * authority for publishing and owner-only pending visibility.
+ * authority for moderation and owner-only rejected visibility.
  * MEDIA_TAGFIX_1: URL-only sources have no original File and no EXIF. Never
  * download media to manufacture a File; only library uploads parse originals.
  */
@@ -91,9 +91,9 @@ export async function submitLibraryHolePhoto(file: File, url: string, courseId: 
   const { data: auth, error: authError } = await supabase.auth.getUser();
   if (authError) throw authError;
   if (auth.user?.id !== memberId) throw new Error('Please sign in again before tagging.');
-  const exif = await readHolePhotoExif(file);
-  const rounds = exif.captureDay ? await matchedPhotoRounds(courseId, memberId, exif.captureDay) : [];
-  const { data, error } = await supabase.from('course_hole_media').insert({ course_id: courseId, user_id: memberId, hole_no: hole, media_url: url, file_name: file.name, ...holePhotoVerdict(exif, memberId, courseId, rounds) }).select('*').single();
+  // Metadata failure never blocks publication; URL-only inputs never parse.
+  const exif = await readHolePhotoExif(file).catch(() => ({ capturedAt: null, captureDay: null, latitude: null, longitude: null }));
+  const { data, error } = await supabase.from('course_hole_media').insert({ course_id: courseId, user_id: memberId, hole_no: hole, media_url: url, file_name: file.name, ...holePhotoVerdict(exif, memberId, courseId, []) }).select('*').single();
   if (error) throw error;
   return data;
 }
