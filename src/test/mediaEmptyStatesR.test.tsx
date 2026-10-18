@@ -47,4 +47,8 @@ describe('MEDIA_EMPTY_1_R owner population and date rules', () => {
     expect(container.querySelector('input[type=file]')).toBeNull();
     expect(container.querySelector('[data-state]')).toBeNull();
   });
+  it('MEDIA_COPY_1 literal anchors: neutral default and not_a_golf_hole sentence', () => {
+    expect(memberReasonSentence('some other code')).toBe('The photo was not a fit for this hole.');
+    expect(memberReasonSentence('not_a_golf_hole')).toBe('The photo did not show a golf hole.');
+  });
 });
