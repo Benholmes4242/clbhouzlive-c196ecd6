@@ -185,7 +185,17 @@ export function startReviewUpload(
   holeJob?: ComposerHoleJob,
 ): Promise<ReviewUploadResult[]> {
   const existing = jobs.get(key);
-  if (existing && existing.snapshot.running) return existing.promise;
+  if (existing && existing.snapshot.running) {
+    // A foreground tile retry may already own the bytes. Capture optional
+    // submit choices on join too, without restarting uploads or waiting on tags.
+    if (holeJob) void existing.promise.then(results => {
+      for (const result of results) {
+        const item = items.find(input => input.id === result.id);
+        if (item && result.ok && result.uploadedUrl) void writeComposerHolePhoto(holeJob, userId, item, result.uploadedUrl);
+      }
+    });
+    return existing.promise;
+  }
 
   const job: Job = {
     snapshot: {
