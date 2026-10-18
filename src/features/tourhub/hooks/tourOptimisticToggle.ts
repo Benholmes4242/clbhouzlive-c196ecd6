@@ -1,3 +1,8 @@
+/**
+ * ARCHITECTURE RULE (moved from AGENTS.md)
+ * - Tour tee-alert toggles use `tourOptimisticToggle` for cache writes and per-id rollback, because invalidation alone does not refresh this app's mounted queries.
+ */
+
 import type { QueryClient, QueryKey } from '@tanstack/react-query';
 
 /** Roll back only this id, never another player's concurrent successful write. */
