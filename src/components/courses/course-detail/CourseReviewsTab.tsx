@@ -42,6 +42,7 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
 import { useCourseReviewSample } from '@/hooks/useCourseReviewSample';
 import { reviewsCommunitySample } from '@/lib/reviews/communitySample';
+import { reviewsCourseState } from '@/lib/reviews/sampleRules';
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { useCourseReviews, type ReviewsSortBy, type CourseReview } from '@/hooks/useCourseReviews';
 import { useReviewResponses, useSubmitReviewResponse } from '@/hooks/useReviewResponses';
@@ -52,6 +53,7 @@ import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 import { AboutSection, AboutHairline, GUTTER } from './about/AboutSection';
 import { TheScore } from './reviews/TheScore';
 import { WhatTheyScored } from './reviews/WhatTheyScored';
+import { NobodyHasRated } from './reviews/NobodyHasRated';
 import { FlatReviewRow, FlatAction } from './reviews/reviewFlatBits';
 import { ResponseDisplay, ReplyForm, VerifyToRespondPrompt } from '../review/ReviewResponseBlock';
 import { ReportSheet } from '@/components/moderation/ReportSheet';
@@ -399,7 +401,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const communityScore = community.score;
   const ratingCount = community.ratingCount;
   const distribution = community.distribution;
-  const hasRatings = community.totalRatingCount > 0;
   const headerResolved = reviewsResolved && sampleResolved;
   const viewerScore = community.viewerScore;
 
@@ -471,16 +472,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
       <div style={{ background: A.CANVAS, minHeight: '100%', paddingBottom: 8, fontFamily: SANS }}>
-        {/* §6A — no reviews: no figure, no tier, no zero. One section. */}
-        {headerResolved && !hasRatings ? (
-          <AboutSection heading="Reviews" first space={0}>
-            <div>
-              <p style={{ fontSize: 13, color: A.MUTE, lineHeight: 1.6, margin: 0 }}>
-                Nobody has reviewed this course yet.
-              </p>
-              <FlatAction label="Write the first" onClick={() => handleWriteReview('first')} />
-            </div>
-          </AboutSection>
+        {/* REVIEWS_STATE_1: total sample, not viewer-excluding count. */}
+        {headerResolved && reviewsCourseState(community.totalRatingCount) === 'none' ? (
+          <NobodyHasRated totalRatings={community.totalRatingCount} courseName={courseName} onWriteFirst={() => handleWriteReview('first')} />
         ) : (
           <>
             {/* §3.1 */}
