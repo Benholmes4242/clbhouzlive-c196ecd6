@@ -1,6 +1,8 @@
 /** COMPOSER_HOLES_1_R2/R3: optional enrichment belongs to the upload job, not
  * review attachment/retry. A failed contribution loses only its tag. Original
  * File EXIF is retained; chosen proof and EXIF proof are distinct mechanisms.
+ * This module owns review-composer contribution writes because neither the
+ * review-media attachment nor its retry registry may own optional enrichment.
  */
 import { supabase } from '@/integrations/supabase/client';
 import { readHolePhotoExif, type HolePhotoExif } from './holePhotoExif';
