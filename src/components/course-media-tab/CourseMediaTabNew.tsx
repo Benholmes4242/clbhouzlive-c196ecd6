@@ -15,6 +15,12 @@ import { HolePhotoTagDialog, HolePhotoOutcome } from './HolePhotoTagDialog';
 import { capitalPhotoCount, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { HoleWalk } from './HoleWalk';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { Button } from '@/components/ui/button';
+import { useQueryClient } from '@tanstack/react-query';
+import { useMediaUpload } from '@/uploads/hooks/useMediaUpload';
+import { HoleKnownPhotoPath, HolePhotoBatchPath } from './HolePhotoFastPaths';
+import { prepareHolePhoto, submitLibraryHolePhoto } from '@/lib/courseMedia/holePhotoData';
+import { orderedBatch, type BatchPhoto } from '@/lib/courseMedia/holePhotoBatch';
 
 interface CourseMediaTabNewProps {
   courseId: string;
@@ -33,6 +39,11 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const [tagPost, setTagPost] = useState<FeedPost | null>(null);
   const [tagResult, setTagResult] = useState<HolePhoto | null>(null);
   const [addHole, setAddHole] = useState<number | null>(null);
+  const [batch, setBatch] = useState<BatchPhoto[] | null>(null);
+  const [fastPending, setFastPending] = useState(false);
+  const [fastError, setFastError] = useState<string | null>(null);
+  const cache = useQueryClient();
+  const uploader = useMediaUpload();
 
   const {
     posts,
@@ -63,7 +74,34 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
     id: url, userId: user?.id ?? '', actorType: 'personal', actorId: user?.id ?? '', username: '', displayName: '', avatarUrl: '', isVerified: false, creatorRelation: 'none', caption: '', mediaItems: [{ id: url, type: 'image', imageUrl: url, width: 0, height: 0 }], createdAt: '', likeCount: 0, commentCount: 0, shareCount: 0, review: null, isReview: false, isLikedByMe: false, isFollowedByMe: false,
   };
   const startTag = (post: FeedPost) => { setAddHole(null); tagging.submit.reset(); setTagResult(null); setTagPost(post); };
-  const addFirst = (hole: number) => { tagging.submit.reset(); setTagResult(null); setAddHole(hole); setTagPost(sourcePost(ownOptions[0] ?? '')); };
+  const addFirst = (hole: number) => { tagging.submit.reset(); setTagResult(null); setFastError(null); setAddHole(hole); setTagPost(null); };
+  const tagKnown = async (url: string) => {
+    if (addHole == null) return;
+    setFastPending(true); setFastError(null);
+    try { setTagResult(await tagging.submit.mutateAsync({ post: sourcePost(url), hole: addHole })); }
+    catch { setFastError('The photograph could not be tagged. Please try again.'); }
+    finally { setFastPending(false); }
+  };
+  const tagLibrary = async (file: File) => {
+    if (addHole == null || !knownHoles || !user) return;
+    setFastPending(true); setFastError(null);
+    try {
+      const uploaded = await uploader.upload(file, { bucketType: 'clbhouz-course-images', destination: 'r2' });
+      if (!uploaded.success || !uploaded.mediaUrl) throw new Error('Upload failed');
+      setTagResult(await submitLibraryHolePhoto(file, uploaded.mediaUrl, courseId, user.id, addHole, knownHoles));
+      await cache.invalidateQueries({ queryKey: ['hole-photo-tags', courseId, user.id] });
+    } catch { setFastError('The photograph could not be tagged. Please try again.'); }
+    finally { setFastPending(false); }
+  };
+  const beginBatch = async () => {
+    if (!tagging.sources.isSuccess || !tagging.rounds.isSuccess) return;
+    setFastPending(true); setFastError(null);
+    try {
+      const photos = await Promise.all(tagging.sources.data.filter(photo => !tagging.taggedUrls.has(photo.url)).map(async photo => ({ ...photo, exif: (await prepareHolePhoto(photo.url)).exif })));
+      if (photos.length) setBatch(orderedBatch(photos));
+    } catch { setFastError('The photographs could not be read. Please try again.'); }
+    finally { setFastPending(false); }
+  };
   const authors = new Map(posts.filter(post => post.actorType === 'personal' && post.displayName).map(post => [post.userId, post.displayName]));
 
   if (!user) {
@@ -104,6 +142,8 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
           <p className="text-[11px] font-bold uppercase tracking-[0.16em]" style={{ color: A.INK }}>Everything else</p>
           <h2 className="mt-1 text-[19px] font-bold">{capitalPhotoCount(untaggedCount)} of yours {untaggedCount === 1 ? 'is' : 'are'} untagged</h2>
           <p className="mt-2 text-[12.5px] leading-normal" style={{ color: A.MUTE }}>Tagging them to a hole takes one tap each.</p>
+          <Button variant="ghost" className="mt-3" disabled={fastPending || !tagging.sources.isSuccess || !tagging.rounds.isSuccess} onClick={beginBatch}>Tag photos</Button>
+          {fastError && addHole == null && <p role="alert" className="text-sm">{fastError}</p>}
         </section>
       )}
       <CourseMediaCanonGrid
@@ -121,7 +161,9 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         tagging={tagging.ready && user && knownHoles ? { memberId: user.id, holeCount: knownHoles.length, taggedUrls: tagging.taggedUrls, onTag: startTag } : undefined}
       />
       {(tagging.tags.data ?? []).filter(row => row.user_id === user.id && row.status === 'pending').map(row => <div key={row.id} className="mx-5 my-3"><img src={row.media_url} alt="Your waiting photograph" className="w-full max-h-40 object-contain rounded-lg" /><HolePhotoOutcome row={row} /></div>)}
-      {tagResult && !tagPost && <div className="mx-5 mb-4"><HolePhotoOutcome row={tagResult} /></div>}
+      {tagResult && !tagPost && addHole == null && <div className="mx-5 mb-4"><HolePhotoOutcome row={tagResult} /></div>}
+      {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} round={tagging.rounds.data?.[0]} pending={fastPending} result={tagResult} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); setTagResult(null); }} />}
+      {batch && knownHoles && <HolePhotoBatchPath photos={batch} rounds={tagging.rounds.data ?? []} memberId={user.id} courseId={courseId} knownHoles={knownHoles} onClose={() => setBatch(null)} onTag={(url, hole) => tagging.submit.mutateAsync({ post: sourcePost(url), hole })} />}
       {tagPost && knownHoles && (
         <HolePhotoTagDialog key={addHole == null ? tagPost.mediaItems[0]?.id : `add-${addHole}`} imageUrl={tagPost.mediaItems[0]?.imageUrl ?? ''}
           initialHole={addHole} imageOptions={addHole == null ? undefined : ownOptions} onImageChange={url => setTagPost(sourcePost(url))}

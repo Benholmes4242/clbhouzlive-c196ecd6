@@ -3,7 +3,7 @@
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { fetchHolePhotos, fetchOwnPhotoUrls, submitHolePhoto } from '@/lib/courseMedia/holePhotoData';
+import { fetchHolePhotos, fetchOwnPhotoSources, fetchOwnPhotoUrls, coursePhotoRounds, submitHolePhoto } from '@/lib/courseMedia/holePhotoData';
 
 export function useHolePhotoTagging(courseId: string, memberId: string | undefined, knownHoles: readonly number[] | null) {
   const cache = useQueryClient();
@@ -12,6 +12,10 @@ export function useHolePhotoTagging(courseId: string, memberId: string | undefin
     queryFn: () => memberId ? fetchHolePhotos(courseId, memberId) : Promise.resolve([]) });
   const own = useQuery({ queryKey: ['own-course-photo-urls', courseId, memberId], enabled,
     queryFn: () => memberId ? fetchOwnPhotoUrls(courseId, memberId) : Promise.resolve([]) });
+  const sources = useQuery({ queryKey: ['own-course-photo-sources', courseId, memberId], enabled,
+    queryFn: () => memberId ? fetchOwnPhotoSources(courseId, memberId) : Promise.resolve([]) });
+  const rounds = useQuery({ queryKey: ['hole-photo-rounds', courseId, memberId], enabled,
+    queryFn: () => memberId ? coursePhotoRounds(courseId, memberId) : Promise.resolve([]) });
   const submit = useMutation({
     mutationFn: ({ post, hole }: { post: FeedPost; hole: number }) => {
       if (!memberId || !knownHoles) throw new Error('This photograph cannot be tagged.');
@@ -22,5 +26,5 @@ export function useHolePhotoTagging(courseId: string, memberId: string | undefin
     },
   });
   const taggedUrls = new Set((tags.data ?? []).filter(row => row.user_id === memberId).map(row => row.media_url));
-  return { tags, own, taggedUrls, submit, ready: enabled && tags.isSuccess && own.isSuccess };
+  return { tags, own, sources, rounds, taggedUrls, submit, ready: enabled && tags.isSuccess && own.isSuccess };
 }
