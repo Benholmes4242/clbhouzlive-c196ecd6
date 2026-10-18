@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## REVIEWS_STATE_2
+- [ ] Confirm data sources and resolve brief/mock contradictions before implementing the exact one-total-rating screen; preserve State 1/composer and other states.
+- [ ] Add rule coverage with full canonical i18n mocks; no middle-80%/splits components; full suite baseline 1,580 and exact inventory report.
+- [ ] Verify populated local rendering/photo and Add yours flows; report hosted authentication limits and source gaps.
+
 ## REVIEWS_STATE_1
 - [x] Match the signed-off zero-rating invitation only; shared state rule; catalogue figures derived from total/rated.
 - [x] Add zero/one-rating and absence/derived-figure coverage; full suite and preview pass in REVIEWS_STATE_1_T; figures confirmed.
