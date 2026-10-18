@@ -133,6 +133,7 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
     posts: allPosts,
     postsForFullscreen,
     mediaCounts,
+    countsReady: countsQuery.isSuccess,
     isLoading: query.isLoading,
     isError: query.isError,
     hasNextPage: query.hasNextPage,
