@@ -2,7 +2,7 @@
 
 ## BRIEF_MEDIA_2 — MEDIA_WALK_1
 - [x] Confirm clbhouz; read both identical uploaded briefs and the separate State A/State B HTML mocks.
-- [ ] Hold copy decision for Ben: ALA3 permits “Twelve of the eighteen have been photographed” at ten or more (both mocks agree) but bans “NO HOLE TOTAL IN PROSE ANYWHERE ON THIS TAB at any hole count.” Standing R2 additionally requires “{Spelled} of the {spelled} holes we have data for here have never been photographed.” Await explicit scope/exception ruling before implementing conflicting copy. No app or test changes; prior passing inventory remains 1,646 tests / 213 files, not rerun for document-only changes.
+- [x] MEDIA_WALK_1_R resolves copy: total only in walk headline at >=10; <=9 headline has no total. Withdraw AKA1/AKB4 coverage sentences; tag pile adds only member-action sentence. Observation keeps guarded open-hole count. Report hole_alias evidence without altering guard. Baseline 1,646 passing tests / 213 files.
 - [ ] After ruling, build authorised walk and selected-hole states with published-only counts, ordered analysis holes, complete absence when unavailable, guarded observations/month chips/strip, persistent grid and preselected existing picker; verify and reconcile test inventory. Briefs 3–4 remain unauthorised; reach still awaits Ben's SQL.
 
 ## BRIEF_MEDIA_1 — MEDIA_ENGINE_1
