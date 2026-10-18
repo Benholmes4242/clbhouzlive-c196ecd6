@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_MEDIA_2 — MEDIA_WALK_1
+- [x] Confirm clbhouz; read both identical uploaded briefs and the separate State A/State B HTML mocks.
+- [ ] Hold copy decision for Ben: ALA3 permits “Twelve of the eighteen have been photographed” at ten or more (both mocks agree) but bans “NO HOLE TOTAL IN PROSE ANYWHERE ON THIS TAB at any hole count.” Standing R2 additionally requires “{Spelled} of the {spelled} holes we have data for here have never been photographed.” Await explicit scope/exception ruling before implementing conflicting copy. No app or test changes; prior passing inventory remains 1,646 tests / 213 files, not rerun for document-only changes.
+- [ ] After ruling, build authorised walk and selected-hole states with published-only counts, ordered analysis holes, complete absence when unavailable, guarded observations/month chips/strip, persistent grid and preselected existing picker; verify and reconcile test inventory. Briefs 3–4 remain unauthorised; reach still awaits Ben's SQL.
+
 ## BRIEF_MEDIA_1 — MEDIA_ENGINE_1
 - [x] MEDIA_ENGINE_1_R2: mounted shared useCourseHoleAnalysis gating, required holes.length picker plus sparse actual hole numbers/order, own untagged Tag pills, complete paginated source/tag counts, exact known-hole denominator copy, metadata/date-match insert path and published/queued outcome displays. Original photo/review rows untouched. Reach unknown pending Ben's SQL; no SR reads or resolver. Backend publication/owner-only pending policy enforcement unverified; client inserts do not establish security guarantees.
 - [x] Full suite 1,636/212 -> 1,646 passing/213; ten new holePhotoTagging.test.tsx cases: own-only pill, others absent, already-tagged absent, unknown silent, no business/video, sparse order, published-only coverage denominator, zero-photo coverage, pagination beyond 500, unchanged admin. No existing tests deleted/renamed/rewritten. Preview build OK 2026-10-18T12:10:06Z.
