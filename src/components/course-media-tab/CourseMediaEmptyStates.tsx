@@ -1,7 +1,7 @@
 /** MEDIA_EMPTY_1: B and C have distinct layouts and write entrypoints.
  * Only B's untapped Add first chooses a hole. Tile taps use the existing
  * known-hole path; C can only navigate to the existing review composer.
- * A awaits its own missing signed-off mock, never substituted with B or C.
+ * A owns its photograph mosaic and closing invitation, with no tagging controls.
  */
 import { useRef, useState, type CSSProperties } from 'react';
 import { Loader2 } from 'lucide-react';
@@ -26,7 +26,7 @@ export function CourseMediaNoPhotographs({ courseName, holes, onHole, onAddFirst
     <p className="media-empty-lede">Nobody has shot {courseName || 'this course'}. Every hole is open.</p>
     <div className="media-empty-grid">{[...holes].sort((a, b) => a.hole_no - b.hole_no).map(hole => <Button key={hole.hole_no} variant="ghost" aria-label={`Hole ${hole.hole_no}`} data-state="open" className="media-empty-hole" onClick={() => onHole(hole.hole_no)}><span className="media-empty-hole-number">{hole.hole_no}</span><span className="media-empty-hole-open">Open</span></Button>)}</div>
     <p className="media-empty-said"><strong>{MEDIA_EMPTY_SNAPSHOT.withoutPhotos.toLocaleString('en-GB')} of the {MEDIA_CATALOGUE_TOTAL.toLocaleString('en-GB')} courses</strong> we track have no photograph at all. <strong>No publisher will ever shoot them.</strong> Members are the only way this gets filled, one hole at a time.</p>
-    <Button variant="ghost" className="media-empty-action" onClick={onAddFirst}>Add the first</Button>
+    <Button variant="ghost" className="media-empty-action" onClick={() => onAddFirst()}>Add the first</Button>
   </section>;
 }
 

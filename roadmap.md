@@ -1,5 +1,11 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_MEDIA_4_R — MEDIA_EMPTY_1_R
+- [ ] Apply ANB2 callback wrapper in the application; preserve every existing test unchanged. Baseline 1,685 collected / 216 files, 1,684 passed / one known callback failure.
+- [ ] Build State A from the newly supplied four-item mosaic mock; preserve B/C and populated walk/fast paths.
+- [ ] Audit State D owner privacy and retag contract; Remove is cut permanently. Build only supported scope; stop/report missing owner-update permission evidence without inventing writes or a failing control.
+- [ ] Run full suite, check preview, verify available local interactions and report external-unmanaged authenticated limits.
+
 ## BRIEF_MEDIA_4 — MEDIA_EMPTY_1
 - [ ] State B/C implementation written; acceptance STOP below. B actual sparse analysis holes, dated 22,800 snapshot with existing catalogue total, untapped first-photo picker/open/no floor, tile taps use known-hole path. C existing /courses/:courseId/rate entrypoint, no camera/guessed tiles. Loaded-count guard avoids interpreting initial zero as empty; populated walk/fast paths retained. Local headers document new module ownership.
 - [ ] State A BLOCKED: required media-brief4a-no-hole-list.html was not supplied; supplied media-brief3b-batch-2.html is the batch mock, not State A. Do not substitute.
