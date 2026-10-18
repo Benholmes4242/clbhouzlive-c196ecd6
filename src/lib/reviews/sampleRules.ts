@@ -9,6 +9,8 @@ export function reviewsCourseState(totalRatings: number): 'none' | 'rated' {
 }
 
 export const hasCommunityAverage = (count: number): boolean => count >= REVIEWS_SAMPLE.average;
+/** REVIEWS_STATE_3 is selected by total ratings; its average still gates AFTER exclusion. */
+export const isFewReviews = (totalRatings: number): boolean => totalRatings >= 2 && totalRatings < REVIEWS_SAMPLE.distribution;
 export const hasRatingDistribution = (count: number): boolean => count >= REVIEWS_SAMPLE.distribution;
 export const subScoreBandStatistic = (count: number): 'min-max' | 'middle-80' =>
   count >= REVIEWS_SAMPLE.middle80 ? 'middle-80' : 'min-max';

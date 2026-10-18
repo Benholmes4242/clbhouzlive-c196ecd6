@@ -42,7 +42,7 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
 import { useCourseReviewSample } from '@/hooks/useCourseReviewSample';
 import { reviewsCommunitySample } from '@/lib/reviews/communitySample';
-import { reviewsCourseState } from '@/lib/reviews/sampleRules';
+import { reviewsCourseState, isFewReviews } from '@/lib/reviews/sampleRules';
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { useCourseReviews, type ReviewsSortBy, type CourseReview } from '@/hooks/useCourseReviews';
 import { useReviewResponses, useSubmitReviewResponse } from '@/hooks/useReviewResponses';
@@ -55,6 +55,7 @@ import { TheScore } from './reviews/TheScore';
 import { WhatTheyScored } from './reviews/WhatTheyScored';
 import { NobodyHasRated } from './reviews/NobodyHasRated';
 import { SingleReview } from './reviews/SingleReview';
+import { FewReviews } from './reviews/FewReviews';
 import { isSingleReview } from '@/lib/reviews/singleReview';
 import { FlatReviewRow, FlatAction } from './reviews/reviewFlatBits';
 import { ResponseDisplay, ReplyForm, VerifyToRespondPrompt } from '../review/ReviewResponseBlock';
@@ -487,6 +488,16 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             }}
             onAddYours={() => handleWriteReview(myReview ? 'edit' : 'write')}
           />
+        ) : headerResolved && isFewReviews(community.totalRatingCount) ? (
+          <FewReviews community={community} reviews={reviews} viewerId={user?.id} courseId={courseId}
+            onMediaClick={(review, index, el) => mediaClickHandler(review)(index, el)}
+            onWrite={() => handleWriteReview('write')}
+            ownReview={myReview && <AboutSection heading="Your review">{renderRow(myReview, true)}{(() => { const response = reviewResponses?.find(r => r.review_id === myReview.id); return response ? <ResponseDisplay response={response} courseId={courseId} viewerClaim={businessClaim} /> : null; })()}<FlatAction label="Edit your review" onClick={() => handleWriteReview('edit')} /></AboutSection>}
+            afterReview={(review) => {
+              const response = reviewResponses?.find(r => r.review_id === review.id);
+              const admin = !!businessClaim && (businessClaim.role === 'owner' || businessClaim.role === 'admin');
+              return <>{response && <ResponseDisplay response={response} courseId={courseId} viewerClaim={businessClaim} />}{admin && businessClaim?.isVerified && !response && <ReplyForm businessClaim={businessClaim} reviewId={review.id} onSubmit={(reviewId, businessId, text) => submitResponseMutation.mutate({ reviewId, businessId, responseText: text })} isSubmitting={submitResponseMutation.isPending} />}{admin && businessClaim && !businessClaim.isVerified && !response && <VerifyToRespondPrompt businessClaim={businessClaim} />}</>;
+            }} />
         ) : (
           <>
             {/* §3.1 */}
