@@ -3,7 +3,8 @@
  * No aggregates, bars, distribution, categories, count strip or extra actions.
  * playedMonth is a review-owned input only: current stored reviews omit it.
  * This component owns its gutter; the existing tab owns the top seam.
- * Rater-context reads are isolated to this state, never used as community data. */
+ * Rater-context reads are isolated to person rows, never used as community data.
+ * Reviews state-local rater context stays isolated from communitySample; module headers own each state contract to prevent context from becoming aggregate data. */
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
