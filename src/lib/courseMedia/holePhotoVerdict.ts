@@ -10,6 +10,8 @@ export interface HolePhotoRound {
   userId: string;
   golfCourseId: string;
   playDate: string;
+  /** Display-only existing gam_round_stats gross; never influences verdict. */
+  grossScore?: number | null;
 }
 
 export function holePhotoVerdict(

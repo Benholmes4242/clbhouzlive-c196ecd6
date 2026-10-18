@@ -47,6 +47,7 @@ export function HolePhotoBatchPath({ photos, rounds, memberId, courseId, knownHo
   const [error, setError] = useState<string | null>(null);
   const photo = photos[state.index];
   const verdict = batchVerdicts(photos, memberId, courseId, rounds);
+  const match = rounds.find(round => round.userId === memberId && round.golfCourseId === courseId && photo?.exif.captureDay === round.playDate.slice(0, 10));
   const advance = async () => {
     if (!photo || selected == null || selected < state.floor) return;
     setPending(true); setError(null);
@@ -67,7 +68,7 @@ export function HolePhotoBatchPath({ photos, rounds, memberId, courseId, knownHo
     <div className="hole-photo-fast-thumbs">{photos.map((item, index) => <div key={item.url} className={`hole-photo-fast-photo ${index === state.index ? 'is-current' : ''}`}><img src={item.url} alt={index === state.index ? 'Current photograph' : 'Batch photograph'} />{state.tags[item.url] != null && <span className="hole-photo-fast-tag">{state.tags[item.url]}</span>}</div>)}</div>
     <HolePhotoPicker holeCount={knownHoles.length} knownHoleNumbers={knownHoles} floor={state.floor} selectedHole={selected} usedHoles={Object.values(state.tags)} onSelect={hole => { if (!pending) setSelected(hole); }} />
     {state.floor > 1 && <p className="hole-photo-fast-floor">The first <strong>{spellPhotoCount(closedHoleCount(state.floor))}</strong> are closed because your last photo was the <strong>{holeOrdinal(state.floor)}</strong>. You cannot walk backwards. <strong>Three photos on one hole is fine</strong> — the {holeOrdinal(state.floor)} stays open until you move past it.</p>}
-    <div className="hole-photo-fast-verdict"><Check /><p>{verdict.all ? <>All {spellPhotoCount(photos.length)} publish straight away.</> : <><strong>{capitalPhotoCount(verdict.published)}</strong> publish straight away. <strong>{capitalPhotoCount(verdict.waiting)}</strong> {verdict.waiting === 1 ? 'waits' : 'wait'}.</>}</p></div>
+    <div className="hole-photo-fast-verdict"><Check /><p>{match && <>Taken <strong>{playedDate(match.playDate)}</strong>{match.grossScore != null ? <>, the day you posted <strong>{match.grossScore}</strong> here. </> : ', the day you played here. '}</>}{verdict.all ? <>All {spellPhotoCount(photos.length)} publish straight away.</> : <><strong>{capitalPhotoCount(verdict.published)}</strong> publish straight away. <strong>{capitalPhotoCount(verdict.waiting)}</strong> {verdict.waiting === 1 ? 'waits' : 'wait'}.</>}</p></div>
     {error && <p role="alert" className="hole-photo-fast-lede">{error}</p>}
     <Button variant="ghost" className="hole-photo-fast-action" disabled={pending || selected == null} onClick={advance}>{pending && <Loader2 className="animate-spin" />}{state.index === photos.length - 1 ? 'Tag photo' : 'Next photo'}</Button>
     <Button variant="ghost" className="hole-photo-fast-action hole-photo-fast-skip" disabled={pending} onClick={skip}>Skip this one</Button>

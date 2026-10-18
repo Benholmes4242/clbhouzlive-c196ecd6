@@ -68,7 +68,13 @@ export async function coursePhotoRounds(courseId: string, memberId: string): Pro
   const courseIds = mappings.map(row => row.whs_course_id);
   if (!ids.length || !courseIds.length) return [];
   const scores = await readAllPages((from, to) => supabase.from('whs_scores').select('id,play_date').in('connection_id', ids).in('course_id', courseIds).order('play_date', { ascending: false }).order('id').range(from, to));
-  return scores.map(row => ({ id: row.id, playDate: row.play_date, userId: memberId, golfCourseId: courseId }));
+  const gross = new Map<string, number | null>();
+  for (let start = 0; start < scores.length; start += PAGE) {
+    const group = scores.slice(start, start + PAGE).map(row => row.id);
+    const stats = await readAllPages((from, to) => supabase.from('gam_round_stats').select('whs_score_id,gross_score').in('whs_score_id', group).order('whs_score_id').range(from, to));
+    for (const row of stats) gross.set(row.whs_score_id, row.gross_score);
+  }
+  return scores.map(row => ({ id: row.id, playDate: row.play_date, userId: memberId, golfCourseId: courseId, grossScore: gross.get(row.id) ?? null }));
 }
 
 export async function prepareHolePhoto(url: string) {

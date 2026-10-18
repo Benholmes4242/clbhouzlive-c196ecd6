@@ -1,4 +1,5 @@
 /** MEDIA_WALK_1_R: public walk derives only from approved rows and analysis holes.
+ * - Hole-walk public counts share `courseMedia/holeWalk.ts`: no pending.
  * MEDIA_FAST_1 display months use EXIF with created_at fallback. The separate
  * publication verdict remains EXIF-day-only; no alias inference.
  */
