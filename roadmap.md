@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_MEDIA_1 — MEDIA_ENGINE_1
+- [ ] Propose the browser EXIF dependency (name, measured size, licence, local File date/GPS support); await Ben's ruling before installation or implementation.
+- [ ] After approval: scorecard-day verdict and unchanged-source tagging path, reusable course-count/floor picker, own-untagged Tag controls, derived counts and both outcome states; preserve admin and all prohibited surfaces.
+- [ ] After implementation: concrete verdict/metadata/ownership/nine-hole tests, unchanged admin check, reconciled full-suite counts and available end-to-end verification.
+
 ## REVIEWS_STATE_4
 - [x] Ben confirmed ADA2: distribution at five excluding. Correct ADE2 cases: six total with viewer shows; five total with viewer hides; five total without viewer shows. No other brief changes.
 - [x] Reuse FewReviews for States 3/4 and existing RatingTierDistribution with opt-in sample appearance; excluding counts and generated quiet sentence, five zero-preserving rows and shares of excluding total. Min-to-max category bands and findings use the existing helpers; Condition-only exact months clause. State 3 rendering/test assertions preserved; no composer, social source, SQL/migration/RPC/feed_config/cap/artwork changes or raw hex/rgba additions.
