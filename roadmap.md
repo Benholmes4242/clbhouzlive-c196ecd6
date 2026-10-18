@@ -2,7 +2,8 @@
 
 ## BRIEF_MEDIA_TRUST_1 — MEDIA_TRUST_1
 - [x] MEDIA_TRUST_1_R resolves contract: Ben deployed approved-returning retag_hole_photo with same call, and not_your_photo refusal. Preserve RPC; hide that reason's action and show plain refusal. Baseline rerun 1,729 passing / 220 files (/tmp/media-trust-before.log).
-- [ ] Protected non-pending test clarification: holePhotoFastPaths.test.tsx “known-hole proof row is absent without a round and present with one” asserts `.hole-photo-fast-verdict` count 1; holeWalk.test.tsx “existing picker preselects and submits selected hole” clicks the separate `Tag` button. ARA3/4 remove those behaviours, but neither test is within the stated pending-verdict/old-Retag authorization. Named and stopped before rewriting; awaiting explicit permission. No application/test edits yet.
+- [x] MEDIA_TRUST_1_R2 authorises both named tests: proof-row absence with/without a round; picker submission via chip, preserving preselection assertion byte-identical. No application/test edits yet.
+- [ ] Remaining non-pending stale tests: composerHoleTags “unchosen proof uses the existing EXIF match” asserts automatic round query/proof; holePhotoVerdict “matching capture day publishes and identifies the real round” asserts automatic proof/confidence/notes; “retains latitude and longitude when present” asserts GPS persistence despite capture-date-only requirement. These are not pending-verdict/old-Retag tests or the two R2-named tests. Stop before rewriting; clarify authorization and R2's “two already authorised” limit versus R's category-wide permission.
 - [ ] After clarification, implement immediate approved inserts, association-only round choice/capture dates, tap-to-close tagging, rejected-only State D and removal audit; name authorised pending-test changes and reconcile counts.
 
 ## BRIEF_MEDIA_TAG_FIX_1 — MEDIA_TAGFIX_1
