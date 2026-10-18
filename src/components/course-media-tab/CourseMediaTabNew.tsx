@@ -12,7 +12,8 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useHolePhotoTagging } from './hooks/useHolePhotoTagging';
 import { HolePhotoTagDialog, HolePhotoOutcome } from './HolePhotoTagDialog';
-import { capitalPhotoCount, spellPhotoCount, photoCoverage, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
+import { capitalPhotoCount, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
+import { HoleWalk } from './HoleWalk';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 interface CourseMediaTabNewProps {
@@ -27,10 +28,11 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const [activeFilter, setActiveFilter] = useState<CourseMediaFilter>('all');
   // MEDIA_ENGINE_1_R2: same source as About/You; no resolver or fallback.
   const analysis = useCourseHoleAnalysis(user ? courseId : undefined);
-  const knownHoles = analysis.data?.available ? analysis.data.holes.map(hole => hole.hole_no) : null;
+  const knownHoles = analysis.data?.available ? [...analysis.data.holes].sort((a, b) => a.hole_no - b.hole_no).map(hole => hole.hole_no) : null;
   const tagging = useHolePhotoTagging(courseId, user?.id, knownHoles);
   const [tagPost, setTagPost] = useState<FeedPost | null>(null);
   const [tagResult, setTagResult] = useState<HolePhoto | null>(null);
+  const [addHole, setAddHole] = useState<number | null>(null);
 
   const {
     posts,
@@ -56,8 +58,13 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
 
   const gridRef = React.useRef<HTMLDivElement>(null);
   const untaggedCount = tagging.ready ? (tagging.own.data ?? []).filter(url => !tagging.taggedUrls.has(url)).length : null;
-  const coverage = knownHoles && tagging.tags.isSuccess ? photoCoverage(knownHoles, tagging.tags.data ?? []) : null;
-  const startTag = (post: FeedPost) => { tagging.submit.reset(); setTagResult(null); setTagPost(post); };
+  const ownOptions = (tagging.own.data ?? []).filter(url => !tagging.taggedUrls.has(url));
+  const sourcePost = (url: string): FeedPost => posts.find(post => post.userId === user?.id && post.mediaItems[0]?.imageUrl === url) ?? {
+    id: url, userId: user?.id ?? '', actorType: 'personal', actorId: user?.id ?? '', username: '', displayName: '', avatarUrl: '', isVerified: false, creatorRelation: 'none', caption: '', mediaItems: [{ id: url, type: 'image', imageUrl: url, width: 0, height: 0 }], createdAt: '', likeCount: 0, commentCount: 0, shareCount: 0, review: null, isReview: false, isLikedByMe: false, isFollowedByMe: false,
+  };
+  const startTag = (post: FeedPost) => { setAddHole(null); tagging.submit.reset(); setTagResult(null); setTagPost(post); };
+  const addFirst = (hole: number) => { tagging.submit.reset(); setTagResult(null); setAddHole(hole); setTagPost(sourcePost(ownOptions[0] ?? '')); };
+  const authors = new Map(posts.filter(post => post.actorType === 'personal' && post.displayName).map(post => [post.userId, post.displayName]));
 
   if (!user) {
     return (
@@ -91,10 +98,12 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         onFilterChange={handleFilterChange}
         courseId={courseId}
       />
+      {analysis.data?.available && tagging.tags.isSuccess && <HoleWalk available={analysis.data.available} holes={analysis.data.holes} rows={tagging.tags.data ?? []} totalMedia={mediaCounts.total} courseName={courseName} authors={authors} onAddFirst={addFirst} />}
       {tagging.ready && untaggedCount != null && untaggedCount > 0 && activeFilter !== 'videos' && (
         <section className="px-5 pt-5">
           <p className="text-[11px] font-bold uppercase tracking-[0.16em]" style={{ color: A.INK }}>Everything else</p>
           <h2 className="mt-1 text-[19px] font-bold">{capitalPhotoCount(untaggedCount)} of yours {untaggedCount === 1 ? 'is' : 'are'} untagged</h2>
+          <p className="mt-2 text-[12.5px] leading-normal" style={{ color: A.MUTE }}>Tagging them to a hole takes one tap each.</p>
         </section>
       )}
       <CourseMediaCanonGrid
@@ -111,14 +120,11 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         courseId={courseId}
         tagging={tagging.ready && user && knownHoles ? { memberId: user.id, holeCount: knownHoles.length, taggedUrls: tagging.taggedUrls, onTag: startTag } : undefined}
       />
-      {coverage && tagging.ready && activeFilter !== 'videos' && (
-        <p className="mx-5 my-4 border-l-2 pl-3 text-[13px] leading-normal" style={{ borderColor: A.BORDER, color: A.BODY }}>
-          {capitalPhotoCount(coverage.unphotographed)} of the {spellPhotoCount(coverage.known)} holes we have data for here have never been photographed.
-        </p>
-      )}
+      {(tagging.tags.data ?? []).filter(row => row.user_id === user.id && row.status === 'pending').map(row => <div key={row.id} className="mx-5 my-3"><img src={row.media_url} alt="Your waiting photograph" className="w-full max-h-40 object-contain rounded-lg" /><HolePhotoOutcome row={row} /></div>)}
       {tagResult && !tagPost && <div className="mx-5 mb-4"><HolePhotoOutcome row={tagResult} /></div>}
-      {tagPost && knownHoles && tagPost.mediaItems[0]?.imageUrl && (
-        <HolePhotoTagDialog key={tagPost.mediaItems[0].id} imageUrl={tagPost.mediaItems[0].imageUrl}
+      {tagPost && knownHoles && (
+        <HolePhotoTagDialog key={addHole == null ? tagPost.mediaItems[0]?.id : `add-${addHole}`} imageUrl={tagPost.mediaItems[0]?.imageUrl ?? ''}
+          initialHole={addHole} imageOptions={addHole == null ? undefined : ownOptions} onImageChange={url => setTagPost(sourcePost(url))}
           holeCount={knownHoles.length} knownHoleNumbers={knownHoles} usedHoles={(tagging.tags.data ?? []).filter(row => row.user_id === user.id).map(row => row.hole_no)}
           pending={tagging.submit.isPending} result={tagResult}
           error={tagging.submit.error ? 'The photograph could not be tagged. Please try again.' : null}

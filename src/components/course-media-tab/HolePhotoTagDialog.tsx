@@ -18,19 +18,21 @@ export function HolePhotoOutcome({ row }: { row: HolePhoto }) {
   </div>;
 }
 
-export function HolePhotoTagDialog({ imageUrl, holeCount, knownHoleNumbers, usedHoles, pending, result, error, onClose, onSubmit }: {
-  imageUrl: string; holeCount: number; knownHoleNumbers: readonly number[]; usedHoles: readonly number[]; pending: boolean;
+export function HolePhotoTagDialog({ imageUrl, imageOptions, onImageChange, initialHole = null, holeCount, knownHoleNumbers, usedHoles, pending, result, error, onClose, onSubmit }: {
+  imageUrl: string; imageOptions?: readonly string[]; onImageChange?: (url: string) => void; initialHole?: number | null;
+  holeCount: number; knownHoleNumbers: readonly number[]; usedHoles: readonly number[]; pending: boolean;
   result: HolePhoto | null; error: string | null; onClose: () => void; onSubmit: (hole: number) => void;
 }) {
-  const [hole, setHole] = useState<number | null>(null);
+  const [hole, setHole] = useState<number | null>(initialHole);
   return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}>
     <DialogContent className="w-[calc(100%-32px)] max-w-sm rounded-lg p-4 gap-3" style={{ background: A.PANEL, color: A.INK }}>
       <DialogTitle className="tracking-normal">{result ? 'Photograph tagged' : 'Tag photograph'}</DialogTitle>
       <DialogDescription className="sr-only">Choose a hole for your photograph.</DialogDescription>
-      <img src={imageUrl} alt="Your photograph" className="w-full max-h-40 object-contain rounded-lg" />
+      {imageUrl && <img src={imageUrl} alt="Your photograph" className="w-full max-h-40 object-contain rounded-lg" />}
+      {!result && imageOptions && imageOptions.length > 1 && <div className="grid grid-cols-4 gap-1">{imageOptions.map(url => <Button key={url} variant="ghost" aria-label="Choose photograph" aria-pressed={url === imageUrl} disabled={pending} className="aspect-square h-auto p-0 overflow-hidden rounded-lg" onClick={() => onImageChange?.(url)}><img src={url} alt="Your photograph" className="w-full h-full object-cover" /></Button>)}</div>}
       {result ? <HolePhotoOutcome row={result} /> : <HolePhotoPicker holeCount={holeCount} knownHoleNumbers={knownHoleNumbers} selectedHole={hole} usedHoles={usedHoles} onSelect={setHole} />}
       {error && <p role="alert" className="text-sm" style={{ color: A.MUTE }}>{error}</p>}
-      <Button variant="ghost" disabled={pending || (!result && hole == null)} className="w-full" style={{ background: A.INK, color: A.CANVAS }}
+      <Button variant="ghost" disabled={pending || (!result && (hole == null || !imageUrl))} className="w-full" style={{ background: A.INK, color: A.CANVAS }}
         onClick={() => { if (result) onClose(); else if (hole != null) onSubmit(hole); }}>
         {pending && <Loader2 className="animate-spin" />}{result ? 'Done' : pending ? 'Tagging' : 'Tag'}
       </Button>
