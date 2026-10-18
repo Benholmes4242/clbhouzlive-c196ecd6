@@ -178,9 +178,9 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       />}
       <CourseMediaNotLive rows={tagging.tags.data ?? []} memberId={user.id} courseId={courseId} onRetag={knownHoles && knownHoles.length > 0 ? row => { tagging.retag.reset(); setRetagPhoto(row); } : undefined} />
       {retagPhoto && knownHoles && <CoursePhotoRetagPicker key={retagPhoto.id} row={retagPhoto} knownHoles={knownHoles} pending={tagging.retag.isPending} error={tagging.retag.error ? 'The photograph could not be retagged. The new tag was not saved.' : null} onClose={() => setRetagPhoto(null)} onSubmit={hole => tagging.retag.mutate({ row: retagPhoto, hole }, { onSuccess: () => setRetagPhoto(null) })} />}
-      {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} round={tagging.rounds.data?.[0]} pending={fastPending} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); }} />}
+      {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} pending={fastPending} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); }} />}
       {firstPhoto && knownHoles && <CourseFirstPhotoPicker knownHoles={knownHoles} pending={fastPending} error={fastError} onSubmit={tagLibrary} onClose={() => { setFirstPhoto(false); }} />}
-      {batch && knownHoles && <HolePhotoBatchPath photos={batch} rounds={tagging.rounds.data ?? []} memberId={user.id} courseId={courseId} knownHoles={knownHoles} onClose={() => setBatch(null)} onTag={(url, hole) => tagging.submit.mutateAsync({ post: sourcePost(url), hole })} />}
+      {batch && knownHoles && <HolePhotoBatchPath photos={batch} knownHoles={knownHoles} onClose={() => setBatch(null)} onTag={(url, hole) => tagging.submit.mutateAsync({ post: sourcePost(url), hole })} />}
       {tagPost && knownHoles && (
         <HolePhotoTagDialog key={addHole == null ? tagPost.mediaItems[0]?.id : `add-${addHole}`} imageUrl={tagPost.mediaItems[0]?.imageUrl ?? ''}
           initialHole={addHole} imageOptions={addHole == null ? undefined : ownOptions} onImageChange={url => setTagPost(sourcePost(url))}

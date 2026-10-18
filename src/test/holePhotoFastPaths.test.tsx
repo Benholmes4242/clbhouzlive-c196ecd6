@@ -71,7 +71,7 @@ describe('MEDIA_FAST_1', () => {
   it('successful next tags exact URL and hole then advances', async () => {
     const tag = vi.fn().mockResolvedValue({ status: 'approved' } as HolePhoto);
     render(<HolePhotoBatchPath photos={[photo('/a.jpg'), photo('/b.jpg')]} rounds={[round]} memberId="member" courseId="course" knownHoles={[4, 7]} onTag={tag} onClose={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); fireEvent.click(screen.getByRole('button', { name: 'Next photo' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/b.jpg'));
     expect(tag).toHaveBeenCalledWith('/a.jpg', 7); expect(screen.getByRole('button', { name: 'Hole 4' })).toBeDisabled();
   });
