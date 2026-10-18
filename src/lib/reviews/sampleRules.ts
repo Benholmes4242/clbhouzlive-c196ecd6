@@ -1,7 +1,12 @@
 /** REVIEWS_SAMPLE_1: fixed sample policy for every Reviews state. No settings
  * or fallback defaults. Counts are community counts AFTER viewer exclusion.
- * Screen forms are introduced by the subsequent state briefs, not here. */
+ * REVIEWS_STATE_1: absence uses TOTAL course ratings, never the excluding count
+ * (a viewer-only rating is still a rated course). Other forms remain deferred. */
 export const REVIEWS_SAMPLE = Object.freeze({ average: 2, distribution: 5, middle80: 10, splitBand: 10 });
+
+export function reviewsCourseState(totalRatings: number): 'none' | 'rated' {
+  return totalRatings === 0 ? 'none' : 'rated';
+}
 
 export const hasCommunityAverage = (count: number): boolean => count >= REVIEWS_SAMPLE.average;
 export const hasRatingDistribution = (count: number): boolean => count >= REVIEWS_SAMPLE.distribution;
