@@ -12,7 +12,7 @@ export function coursePhotoState(hasPhotographs: boolean, available: boolean) {
 }
 
 /** MEDIA_EMPTY_1_R: the same exact owner population drives heading and rows.
- * Retag is blocked until Ben confirms owner UPDATE permission and semantics.
+ * Retag uses Ben's RPC; members never receive direct UPDATE permission.
  * Never expose reviewer text/identity/notes; unknown reasons use fixed fallback.
  */
 export function privateHolePhotos(rows: readonly HolePhoto[], memberId: string, courseId: string) {
