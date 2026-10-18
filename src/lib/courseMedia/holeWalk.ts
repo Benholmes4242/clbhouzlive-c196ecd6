@@ -19,6 +19,7 @@ export function deriveHoleWalk(holes: readonly CourseHole[], rows: readonly Hole
   const hardest = [...holes].filter(hole => Number.isFinite(hole.avg_to_par)).sort((a, b) => b.avg_to_par - a.avg_to_par || a.hole_no - b.hole_no)[0];
   const hardestOpen = hardest && open.some(tile => tile.hole.hole_no === hardest.hole_no) ? hardest.hole_no : null;
   return { tiles, openCount: open.length, photographed, most, hardestOpen,
+    headlineTotal: holes.length >= 10 ? holes.length : null,
     photoCount: tiles.reduce((sum, tile) => sum + tile.photos.length, 0),
     headline: holes.length >= 10
       ? `${capitalPhotoCount(photographed)} of the ${spellPhotoCount(holes.length)} have been photographed`

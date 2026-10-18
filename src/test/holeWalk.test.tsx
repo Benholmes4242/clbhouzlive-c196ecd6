@@ -8,6 +8,10 @@ import { HolePhotoTagDialog } from '@/components/course-media-tab/HolePhotoTagDi
 const hole = (n: number, avg = n): CourseHole => ({ hole_no: n, par: 4, yards: 475, stroke_index: 3, avg_to_par: avg, avg_gross: 5.9, rounds: 10, dist: { ace: 0, albatross: 0, eagle: 0, birdie: 0, par: 5, bogey: 5, double: 0 } });
 const photo = (id: string, n: number, status = 'approved', month = '2026-05'): HolePhoto => ({ id, hole_no: n, status, user_id: 'member', media_url: `/photo-${id}.jpg`, exif_captured_at: `${month}-12T12:00:00Z` }) as HolePhoto;
 describe('MEDIA_WALK_1_R', () => {
+  it('only the ten-or-more headline owns a total', () => {
+    expect(deriveHoleWalk(Array.from({ length: 9 }, (_, i) => hole(i + 1)), []).headlineTotal).toBeNull();
+    expect(deriveHoleWalk(Array.from({ length: 10 }, (_, i) => hole(i + 1)), []).headlineTotal).toBe(10);
+  });
   it('orders sparse analysis holes without inventing holes', () => { expect(deriveHoleWalk([hole(11), hole(2), hole(7)], []).tiles.map(t => t.hole.hole_no)).toEqual([2, 7, 11]); });
   it('excludes pending from all public populations', () => {
     const r = deriveHoleWalk([hole(1), hole(2)], [photo('a', 1), photo('b', 2, 'pending')]);
