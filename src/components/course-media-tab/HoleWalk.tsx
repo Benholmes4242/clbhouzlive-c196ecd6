@@ -59,7 +59,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       </div>
       {tile.photos.length >= 2 && <div className="hole-walk-strip">{tile.photos.filter(photo => photo.id !== active?.id).map(photo => <Button variant="ghost" key={photo.id} aria-label="View photograph" className="hole-walk-thumbnail" onClick={() => setPhotoId(photo.id)}><img src={photo.media_url} alt={`Hole ${tile.hole.hole_no}`} loading="lazy" /></Button>)}</div>}
       {months.length > 0 && <div className="hole-walk-months">{months.map(item => <span key={item.month}>{capitalPhotoCount(item.count)} in {captureMonthLabel(item.month)}</span>)}</div>}
-      {months.length > 0 && <p className="hole-walk-observation">{capitalPhotoCount(tile.photos.length)} shots of one hole across {months.length === 2 ? 'two' : capitalPhotoCount(months.length).toLowerCase()} seasons.</p>}
+      {tile.photos.length > 0 && <p className="hole-walk-observation">{capitalPhotoCount(tile.photos.length)} shots of one hole{months.length > 0 && <> across {months.length === 2 ? 'two' : capitalPhotoCount(months.length).toLowerCase()} seasons</>}.</p>}
       {!active && <><p className="hole-walk-observation">{walk.hardestOpen === tile.hole.hole_no && <>The field loses more shots here than on any hole{courseName ? ` at ${courseName}` : ' on the course'}. </>}<strong>Nobody has photographed it.</strong></p>
         <Button variant="ghost" className="hole-walk-add" onClick={() => onAddFirst(tile.hole.hole_no)}>Add the first</Button></>}
     </section>}
