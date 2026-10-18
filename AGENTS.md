@@ -32,6 +32,7 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Owner copy uses `profileOwnerVoice` to share grammar.
 - Small-sample Reviews reuse SingleReview's RaterReviewRow, so context and media cannot drift.
 - Reviews States 3/4 share FewReviews and RatingTierDistribution to prevent population drift.
+- Course photo metadata and date-only verdicts live in `src/lib/courseMedia`; its headers preserve bundle and WHS identity rules.
 
 ## Briefs
 
