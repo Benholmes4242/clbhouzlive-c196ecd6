@@ -41,6 +41,12 @@ describe('MEDIA_EMPTY_1_R owner population and date rules', () => {
     const { container } = render(<CourseMediaNotLive rows={[row('r', 'rejected')]} memberId="other" courseId="here" />);
     expect(container.childElementCount).toBe(0);
   });
+  it('State A has no hole choices, Tag action, or file chooser', () => {
+    const { container } = render(<CourseMediaNoHoleList courseName="Hankley Common" photoCount={14}><img src="/photo.jpg" alt="Course" /></CourseMediaNoHoleList>);
+    expect(screen.queryAllByRole('button')).toHaveLength(0);
+    expect(container.querySelector('input[type=file]')).toBeNull();
+    expect(container.querySelector('[data-state]')).toBeNull();
+  });
   it('MEDIA_COPY_1 literal anchors: neutral default and not_a_golf_hole sentence', () => {
     expect(memberReasonSentence('some other code')).toBe('The photo was not a fit for this hole.');
     expect(memberReasonSentence('not_a_golf_hole')).toBe('The photo did not show a golf hole.');
