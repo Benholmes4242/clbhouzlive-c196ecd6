@@ -2,9 +2,9 @@
 
 ## REVIEWS_STATE_2
 - [x] Clarified source gap: unknown review-owned played month means no pill and never an inferred round/review date. Calibration prose may repeat overall score; every-category clause requires four exact tens, mixed/missing categories omit it.
-- [ ] Build single-total-rating selection, person-led panel and complete visible non-mock rater-history context; unknown/inaccessible facts remain absent, handicap uses canonical resolver. Preserve State 1 and existing composer/media entrypoints.
-- [ ] Add rule coverage with full canonical i18n mocks; no middle-80%/splits components; full suite baseline 1,580 and exact inventory report.
-- [ ] Verify populated local rendering/photo and Add yours flows; report hosted authentication limits and source gaps.
+- [x] Build single-total-rating selection, person-led panel and complete visible non-mock rater-history context; unknown/inaccessible facts remain absent, handicap uses canonical resolver. State 1/composer/media entrypoints unchanged; existing six State 1 tests pass. Month supplied only as explicit review-owned input, absent on all current rows. Context counts are RLS-visible, not verified hosted global totals.
+- [ ] QA2 STOP: full suite 1,580 / 206 files -> 1,602 / 208 files (+19 reviewsState2.test.tsx, +3 useSingleReviewContext.test.ts); 1,592 pass, 10 fail, 207 files pass/1 fails. All ten failures are standalone SingleReview renders without a Router: src/components/mentions/MentionText.tsx:36, exact error “useNavigate() may be used only in the context of a <Router> component.” No test assertion edited/deleted/renamed/rewritten. Await explicit authorisation to wrap standalone test fixtures in MemoryRouter; do not change application MentionText or global setup. New history/resolver cases and in-tab State 2 cases pass; no test fix attempted after failure.
+- [ ] Populated visual/photo/Add yours verification not run after QA2 stop; signed-in hosted verification additionally blocked by external/unmanaged authentication. Preview build OK at 2026-10-18T08:04:38Z; no SQL/migrations/RPC/feed_config/cap changes, no raw hex/rgba additions. Middle-80% and splits components not built. Architecture state contract in local headers; previous community-sample note relocated verbatim into its module header.
 
 ## REVIEWS_STATE_1
 - [x] Match the signed-off zero-rating invitation only; shared state rule; catalogue figures derived from total/rated.
