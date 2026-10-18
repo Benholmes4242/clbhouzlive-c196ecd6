@@ -7,17 +7,20 @@ import { holeNumbers, selectableHole } from '@/lib/courseMedia/holePickerRules';
 
 interface HolePhotoPickerProps {
   holeCount: number;
+  /** Preserve sparse known-hole numbers and order from the analysis RPC. */
+  knownHoleNumbers?: readonly number[];
   floor?: number;
   selectedHole: number | null;
   usedHoles?: readonly number[];
   onSelect: (hole: number) => void;
 }
 
-export function HolePhotoPicker({ holeCount, floor = 0, selectedHole, usedHoles = [], onSelect }: HolePhotoPickerProps) {
+export function HolePhotoPicker({ holeCount, knownHoleNumbers, floor = 0, selectedHole, usedHoles = [], onSelect }: HolePhotoPickerProps) {
+  const numbers = knownHoleNumbers?.length === holeCount ? knownHoleNumbers : holeNumbers(holeCount);
   return (
     <div role="group" aria-label="Hole" className="grid grid-cols-6 gap-[6px]">
-      {holeNumbers(holeCount).map(hole => {
-        const available = selectableHole(hole, holeCount, floor);
+      {numbers.map(hole => {
+        const available = knownHoleNumbers ? hole >= floor : selectableHole(hole, holeCount, floor);
         const selected = hole === selectedHole;
         const used = usedHoles.includes(hole);
         return (
