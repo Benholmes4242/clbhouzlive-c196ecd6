@@ -265,3 +265,7 @@
 - The meta string was inline English in the component, not a common.json key — no key existed to remove; other locales untouched.
 - The local `yearStats` read in ProfileRoundsTab had no remaining consumer after the meta went, so the local was removed; the derivation itself stays and SeasonSection still computes its own yearStats for the hero figure. `fmt1` import dropped from ProfileRoundsTab only.
 - No test pinned the meta string; year-divider year assertion unaffected. Full suite 1,399 passed (181 files), tsgo clean.
+
+## AGENTS_BUDGET_R2
+- [x] Confirm clbhouz and corrected token/handicap destinations; copy exactly four named rules into owning headers, with two root pointers only, and replace Briefs verbatim. No medals/src-AGENTS/SQL/migrations/RPC/feed_config/cap changes.
+- [ ] Check final root bytes, verbatim preservation and untouched source bodies; run full suite against 1,626 / 210 files and report actual totals.

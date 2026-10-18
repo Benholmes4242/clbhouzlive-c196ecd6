@@ -1,4 +1,9 @@
 /**
+ * ARCHITECTURE RULE (moved from AGENTS.md)
+ * - Record, counting-round and log rows open `RoundDetailSheet` by score id with the known profile owner, keeping one scorecard and member context.
+ */
+
+/**
  * RoundDetailSheet — handicap round drill-in.
  *
  * Thin wrapper around the canonical CardScorecardSheet ("The Card").

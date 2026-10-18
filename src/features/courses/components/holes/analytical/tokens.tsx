@@ -1,4 +1,9 @@
 /**
+ * ARCHITECTURE RULE (moved from AGENTS.md)
+ * - A local copy of a design value that has a token is a fork, whether or not it currently matches. Ink, surfaces and canvases have owners: read them from `@/lib/tokens/surface` and `@/lib/tokens/surfaces` and never redeclare the value. THE BRAND AMBER `#F7931E` HAS NO OWNER YET — it is declared raw in around 105 files and partially owned by four modules (`frostPanel.amber`, `gam/visuals.rare`, `reactionKind.AMBER`, `PROFILE_PILL_SURFACES.active`). Until it has a single home, a local amber is the existing state rather than a new fork: do not add more, do not promote any of the four part-owners to canon, and do not fix it one file at a time.
+ */
+
+/**
  * Analytical treatment tokens + primitives for the Course tab
  * (BRIEF_COURSE_TAB_ANALYTICAL_TREATMENT).
  *

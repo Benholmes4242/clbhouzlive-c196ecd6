@@ -23,51 +23,40 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Message entrypoints hand optional focus and return navigation through the existing start-conversation hook, so server messaging refusals remain authoritative and no entrypoint sends automatically.
 
 - `whs/pickCourse.ts` is shared by AgeingOut and PersonalBests; section removal must preserve their course selection.
-- Tour tee-alert toggles use `tourOptimisticToggle` for cache writes and per-id rollback, because invalidation alone does not refresh this app's mounted queries.
 - Every surface that prints a course aggregate rating reads `COURSE_RATING_FLOOR` (`courseRatingFloor.ts`), so card, rails and ranker agree on one sample floor.
-- A local copy of a design value that has a token is a fork, whether or not it currently matches. Ink, surfaces and canvases have owners: read them from `@/lib/tokens/surface` and `@/lib/tokens/surfaces` and never redeclare the value. THE BRAND AMBER `#F7931E` HAS NO OWNER YET — it is declared raw in around 105 files and partially owned by four modules (`frostPanel.amber`, `gam/visuals.rare`, `reactionKind.AMBER`, `PROFILE_PILL_SURFACES.active`). Until it has a single home, a local amber is the existing state rather than a new fork: do not add more, do not promote any of the four part-owners to canon, and do not fix it one file at a time.
-- DECIDING A MEMBER'S INDEX IS resolveDisplayHandicap's JOB AND NO ONE ELSE'S. Loading eg_handicap_index and manual_handicap_index to display, edit or save them is fine. Choosing between them — coalescing, falling back from one to the other, or treating a present manual figure as the index of a connected member — is not. A connection without a synced index means the index is UNKNOWN, not the manual figure. board_pool's 'near' band coalesces the two columns in SQL and so does not follow this rule; today every member with rounds has a synced index, so the two agree. If that stops being true, the function needs the same rule.
-  - NOTE: an app-wide check of which readers CHOOSE between the columns rather than merely loading them has not been done. Start from this list: ProfilePageV2, ManageProfile, useUserProfile, useUserByUsername, useProfileSave, useProfileForm, profile-wizard/types, SettingsTabContent, RoundDetailSheet, usePostLikers, useEchoSuggestions, admin useUsers, review-island/overrides, types/profile, lib/supabase/selects.
+- Token ownership and amber restrictions: see `src/features/courses/components/holes/analytical/tokens.tsx`.
+- Handicap-index authority and reader audit: see `src/lib/handicap/resolveHandicap.ts`.
 - The admin Analytics page and its header pill read figures only from the five `get_admin_analytics_*` RPCs via `useAnalyticsLenses.ts`, never tables, because browser reads truncate at the row cap and staff filtering belongs to the server.
 - The admin Health page and the drawer's Health dot read figures only from the `get_admin_health_*` RPCs (`useHealthLenses.ts`) and the existing service hooks, and share one verdict (`useHealthVerdict` in `components/health/healthIssues.ts`), so the dot and the page cannot disagree and no Health panel reads a table.
 
-- Record, counting-round and log rows open `RoundDetailSheet` by score id with the known profile owner, keeping one scorecard and member context.
 - Owner copy uses `profileOwnerVoice` to share grammar.
 - Small-sample Reviews reuse SingleReview's RaterReviewRow, so context and media cannot drift.
 - Reviews States 3/4 share FewReviews and RatingTierDistribution to prevent population drift.
 
 ## Briefs
 
-Three rules learned the hard way, each from a repeated failure.
+### Stops
 
-### 1. What "ANY NEW FAILURE IS STOP AND REPORT" means
+STOP for: a test failing once the work is complete; a type or build error surviving the finished edit; a clause contradicting another clause or the attached mock; data the brief assumes and the codebase lacks.
 
-STOP for: a test that fails once the work is complete; a type or build error that SURVIVES the finished edit; a clause that contradicts another clause or the attached mock; data the brief assumes and the codebase does not have.
+DO NOT STOP for: an intermediate compile state inside your own edit — finish, compile, then report; a clause you disagree with — report it with the finished work; a check your environment cannot run — name it and continue.
 
-DO NOT STOP for: an intermediate compile state inside your own multi-file edit — finish it, then compile, then report; a clause you disagree with — report it alongside the finished work; a check your environment cannot run — name it and carry on past it.
+A stop carries the error itself: file, line, and the tool's own words. A stop blocking sections the error does not touch is badly scoped; build the rest.
 
-When you do stop, the report carries the error itself: the file, the line, and the compiler's or runner's own words. "A preview type error" is not something that can be ruled on, and asking for it costs a round trip.
+### Mocks
 
-A stop that halts four unrelated sections because of one sentence of copy is a badly scoped stop. Build what the stop does not block.
+Prefer a real provider to a hand-written mock — MemoryRouter over a useNavigate mock. A provider cannot be partially wrong.
 
-### 2. A mock must provide everything the module under test imports
-
-PREFER A REAL PROVIDER TO A HAND-WRITTEN MOCK. MemoryRouter over a useNavigate mock, a real provider over a stubbed hook. A provider cannot be partially wrong.
-
-If you must mock, copy the whole thing. A mock missing one export is not a smaller mock, it is a broken one: the module still imports what the mock left out, and the failure surfaces in an unrelated file. react-i18next must always include initReactI18next:
+If you mock, copy the whole thing. A mock missing one export is broken, not smaller, and fails in an unrelated file. react-i18next must include initReactI18next:
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 
-That t returns the defaultValue or an empty string, never a translation. Assert on structure, not on translated words, and never add a defaultValue to a component to make a test pass.
+That t returns defaultValue or ''. Assert on structure, never on translated words, and never add a defaultValue to pass a test. Do not convert passing tests to another pattern.
 
-Do not convert existing passing tests to a different pattern for consistency. Churning green tests is not worth the risk.
+### Conflicts
 
-### 3. When a brief's rule and its drawing disagree, stop and ask
+When a brief's stated rule and its signed-off mock disagree, do not pick one. Both come from the same author and one is a mistake. Quote both and wait.
 
-A signed-off mock is the spec, and so is a stated rule. When the two conflict — a rule saying "exclude the viewer from every figure" beside a drawn sentence that counts the viewer — DO NOT PICK ONE. Both come from the same author and one of them is a mistake. Report the conflict with both quoted, and wait.
+### Counts
 
-This has happened four times and been caught every time by the builder, never by the author. It is expected behaviour, not pedantry.
-
-### Reporting counts
-
-Report the suite total before and after, and name where any delta came from. A count that moves while the report says "unchanged" hides a real change, and a baseline taken from a number that moved underneath you is how two reports in a row can both be wrong.
+Report the suite total before and after, and name the source of any delta. A count that moves under an "unchanged" report hides a real change.
