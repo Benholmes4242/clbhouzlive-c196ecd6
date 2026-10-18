@@ -32,7 +32,7 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Owner copy uses `profileOwnerVoice` to share grammar.
 - Small-sample Reviews reuse SingleReview's RaterReviewRow, so context and media cannot drift.
 - Reviews States 3/4 share FewReviews and RatingTierDistribution to prevent population drift.
-- Course-photo and composer enrichment ownership: see `src/lib/courseMedia` headers; preserve EXIF/WHS identity and independent job writes.
+- Course photo metadata and date-only verdicts live in `src/lib/courseMedia`; its headers preserve bundle and WHS identity rules.
 - Media state/RPC ownership: see CourseMediaEmptyStates.tsx header.
 
 ## Briefs

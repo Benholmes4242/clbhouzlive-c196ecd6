@@ -18,7 +18,7 @@ vi.mock('@/uploads/resilientVideoUpload', () => ({ uploadVideoResilient: vi.fn()
 import { ReviewHoleTags } from '@/features/review-v2/components/ReviewHoleTags';
 import { useReviewHoleTags } from '@/features/review-v2/hooks/useReviewHoleTags';
 import { writeComposerHolePhoto, composerPhotoVerdict, composerVerdictSentence, type ComposerHoleJob } from '@/lib/courseMedia/composerHolePhotos';
-import { uploadAndPublishReview } from '@/features/review-v2/lib/reviewUploadController';
+import { uploadAndPublishReview, startReviewUpload } from '@/features/review-v2/lib/reviewUploadController';
 import type { MediaItem } from '@/features/review-v2/types';
 
 const exif = { captureDay: '2026-06-02', capturedAt: '2026-06-02T12:00:00', latitude: null, longitude: null };
@@ -120,5 +120,16 @@ describe('COMPOSER_HOLES_1_R2 independent job writes', () => {
     f.rpc.mockResolvedValue({ data: 'rating', error: null }); f.insert.mockRejectedValue(new Error('refused'));
     const outcome = await uploadAndPublishReview('test-tag-failed', 'member', 'pending', [{ id: 'p', type: 'image', file: photo.file as File }], undefined, job);
     expect(outcome).toEqual({ ok: true, ratingId: 'rating' });
+  });
+  it('joining a running tile upload retains newly captured hole assignments', async () => {
+    let finish: (value: unknown) => void = () => {};
+    f.invoke.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+    const inputs = [{ id: 'p', type: 'image' as const, file: photo.file as File }];
+    const first = startReviewUpload('join-tags', 'member', inputs);
+    const joined = startReviewUpload('join-tags', 'member', inputs, job);
+    expect(joined).toBe(first);
+    finish({ data: { success: true, publicUrl: 'https://example.test/p.jpg' }, error: null });
+    await joined; await waitFor(() => expect(f.insert).toHaveBeenCalled());
+    expect(f.invoke).toHaveBeenCalledTimes(1);
   });
 });
