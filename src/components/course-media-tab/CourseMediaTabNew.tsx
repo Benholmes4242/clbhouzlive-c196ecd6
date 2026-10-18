@@ -9,6 +9,7 @@ import { CourseMediaCanonGrid } from './CourseMediaCanonGrid';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useHolePhotoTagging } from './hooks/useHolePhotoTagging';
 import { HolePhotoTagDialog } from './HolePhotoTagDialog';
