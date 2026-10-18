@@ -1,4 +1,4 @@
-/** MEDIA_ENGINE_1: isolated verdict only; no database writes or UI callers yet.
+/** MEDIA_ENGINE_1: date-only verdict shared by the contribution write path.
  * Round inputs must already have a real WHS-to-golf mapping and member identity.
  * Never confuse whs_scores.course_id (WHS) with the golf course UUID.
  * GPS is retained verbatim and never participates in verification.

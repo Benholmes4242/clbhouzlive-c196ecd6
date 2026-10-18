@@ -32,6 +32,7 @@ import { useWatchAutoplay } from '@/video/useWatchAutoplay';
 import { AMBER } from '@/features/courses/_shared/tokens';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { MEMBER_CELL } from '@/lib/tokens/surfaces';
+import { HolePhotoTagButton } from './HolePhotoTagButton';
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -47,6 +48,7 @@ interface CourseMediaCanonGridProps {
   refetch: () => void;
   courseName?: string;
   courseId?: string;
+  tagging?: { memberId: string; holeCount: number; taggedUrls: ReadonlySet<string>; onTag: (post: FeedPost) => void };
 }
 
 // Same FeedPost → FeedCardRow projection ExploreGrid uses (Brief U3R).
@@ -108,6 +110,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
   refetch,
   courseName,
   courseId,
+  tagging,
 }, ref) => {
   const { t } = useTranslation(['courses', 'common']);
   const navigate = useNavigate();
@@ -256,8 +259,8 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
             // ("photo tile with a 0:10 badge" symptom).
             const tileKey = posts[i]?.mediaItems[0]?.id ?? `${item.post_id}-${i}`;
             return (
+              <div key={tileKey} className="relative">
               <FeedCard
-                key={tileKey}
                 row={item}
                 feedPost={posts[i]}
                 posts={posts}
@@ -270,7 +273,8 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
                 readOnlyFullscreen
                 hideLikeCount
               />
-
+              {tagging && <HolePhotoTagButton post={posts[i]} {...tagging} />}
+              </div>
             );
           })}
         </div>
@@ -278,8 +282,8 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
           {packed.right.map(({ item, flatIndex: i }) => {
             const tileKey = posts[i]?.mediaItems[0]?.id ?? `${item.post_id}-${i}`;
             return (
+              <div key={tileKey} className="relative">
               <FeedCard
-                key={tileKey}
                 row={item}
                 feedPost={posts[i]}
                 posts={posts}
@@ -292,7 +296,8 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
                 readOnlyFullscreen
                 hideLikeCount
               />
-
+              {tagging && <HolePhotoTagButton post={posts[i]} {...tagging} />}
+              </div>
             );
           })}
         </div>
