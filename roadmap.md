@@ -1,5 +1,11 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## REVIEWS_STATE_3
+- [ ] QA2 clarification: ACA3 excludes viewer from every figure; ACC2 and signed-off mock count all three in the spread (0.3). Excluded sample is two scores of 8.1, spread 0.0. Await Ben's population ruling before app/test edits.
+- [ ] Implement only two-to-four-total state, shared two-excluding average threshold, State 2 community-half fallback, excluded min-to-max categories, shared person/context rows and known-people-first order; preserve States 1/2 and composer; no State 4/middle-80%/splits.
+- [ ] Add exact Sundridge, threshold/fallback and excluded-range rule tests; baseline 1,602 passing / 208 files; stop/report any unexpected failure without adjusting assertions.
+- [ ] Verify and report inventory, visual/source/auth limits; no SQL/migrations/RPC/feed_config/cap changes.
+
 ## REVIEWS_STATE_2
 - [x] Clarified source gap: unknown review-owned played month means no pill and never an inferred round/review date. Calibration prose may repeat overall score; every-category clause requires four exact tens, mixed/missing categories omit it.
 - [x] Build single-total-rating selection, person-led panel and complete visible non-mock rater-history context; unknown/inaccessible facts remain absent, handicap uses canonical resolver. State 1/composer/media entrypoints unchanged; existing six State 1 tests pass. Month supplied only as explicit review-owned input, absent on all current rows. Context counts are RLS-visible, not verified hosted global totals.
