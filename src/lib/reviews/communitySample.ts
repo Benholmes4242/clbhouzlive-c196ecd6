@@ -2,7 +2,8 @@
  * figures. Per-category counts include only finite values, not overall count.
  * Exclusion arithmetic stays in youDerivations; its legacy names accept any
  * mean/count pair without changing its signature or You-tab consumers.
- * Future ranges/splits must use communityRows, never the inclusive rows. */
+ * Future ranges/splits must use communityRows, never the inclusive rows.
+ * Reviews figures share a complete sample via `communitySample`; exclusion stays in `youDerivations` to prevent inconsistent comparisons. */
 import { fieldExcludingViewer } from '@/lib/courseYou/youDerivations';
 import { getRatingTier } from '@/lib/ratingTier';
 import type { RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';

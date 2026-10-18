@@ -54,6 +54,8 @@ import { AboutSection, AboutHairline, GUTTER } from './about/AboutSection';
 import { TheScore } from './reviews/TheScore';
 import { WhatTheyScored } from './reviews/WhatTheyScored';
 import { NobodyHasRated } from './reviews/NobodyHasRated';
+import { SingleReview } from './reviews/SingleReview';
+import { isSingleReview } from '@/lib/reviews/singleReview';
 import { FlatReviewRow, FlatAction } from './reviews/reviewFlatBits';
 import { ResponseDisplay, ReplyForm, VerifyToRespondPrompt } from '../review/ReviewResponseBlock';
 import { ReportSheet } from '@/components/moderation/ReportSheet';
@@ -403,6 +405,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const distribution = community.distribution;
   const headerResolved = reviewsResolved && sampleResolved;
   const viewerScore = community.viewerScore;
+  const singleReview = reviews.find(review => review.id === sampleRows?.[0]?.id);
 
   const showSort = reviews.length >= SORT_GATE;
   const categoryAggregates = community.categories;
@@ -475,6 +478,15 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {/* REVIEWS_STATE_1: total sample, not viewer-excluding count. */}
         {headerResolved && reviewsCourseState(community.totalRatingCount) === 'none' ? (
           <NobodyHasRated totalRatings={community.totalRatingCount} courseName={courseName} onWriteFirst={() => handleWriteReview('first')} />
+        ) : headerResolved && isSingleReview(community.totalRatingCount) ? (
+          <SingleReview
+            totalRatings={community.totalRatingCount}
+            review={singleReview}
+            onMediaClick={(index, el) => {
+              if (singleReview) mediaClickHandler(singleReview)(index, el);
+            }}
+            onAddYours={() => handleWriteReview(myReview ? 'edit' : 'write')}
+          />
         ) : (
           <>
             {/* §3.1 */}
