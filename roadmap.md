@@ -326,3 +326,6 @@
 ## AGENTS_BUDGET_R2
 - [x] Confirm clbhouz and corrected token/handicap destinations; copy exactly four named rules into owning headers, with two root pointers only, and replace Briefs verbatim. No medals/src-AGENTS/SQL/migrations/RPC/feed_config/cap changes.
 - [x] Root 7,866 -> 4,909 bytes (211 under 5,120); exact four rule texts including handicap audit/caveat and unchanged source bodies verified; root changes limited to four moves, two pointers and exact Briefs replacement. Full suite 1,626 passing / 210 files before and after; no tests added, deleted, renamed, rewritten or assertions changed. Log /tmp/agents-budget-r2/suite.log. Preview build OK at 2026-10-18T09:09:04Z; no app behavior changed.
+
+## MEDIA_COPY_1
+- [x] Added one test in src/test/mediaEmptyStatesR.test.tsx pinning two literal sentences against memberReasonSentence: default branch "The photo was not a fit for this hole." and not_a_golf_hole "The photo did not show a golf hole.". No existing tests changed; suite 1,704/218 -> 1,705 passing/218 (+1, mediaEmptyStatesR only). No SQL, migrations, RPC, RLS, feed_config, cap or src/features/admin changes.
