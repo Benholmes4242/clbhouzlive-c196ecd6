@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_REVIEWS_1 — REVIEWS_SAMPLE_1
+- [ ] Correct all existing Reviews community figures via shared viewer exclusion; preserve You-tab output and review screen structure.
+- [ ] Centralise fixed average/distribution/band/split sample rules; add boundary and Sundridge regression coverage without changing existing assertions.
+- [ ] Run full suite against last confirmed 1,557, check preview, and report sources, test inventory and authentication limits.
+
 ## BRIEF_COURSES_HIGHEST_RATED_TEN
 - [x] Set Highest rated to ten; require per-rail loading counts; preserve Regulars and card geometry.
 - [x] Update the authorised limit assertion and add four focused cases.
