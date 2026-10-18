@@ -1,7 +1,7 @@
 /** State A and State B keep one mounted grid; no scroll, gallery cap or alias
  * correction. Real stored photos supply imagery, never illustrative mock art.
  */
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';
 import { A, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
@@ -25,7 +25,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
   const field = tile ? toParParts(tile.hole.avg_to_par) : null;
   const author = active ? authors?.get(active.user_id) : undefined;
   const month = active ? captureMonth(active) : null;
-  return <div className="hole-walk" style={{ color: A.INK }}>
+  return <div className="hole-walk" style={{ color: A.INK, '--hole-walk-ink': A.INK, '--hole-walk-canvas': A.CANVAS, '--hole-walk-muted': A.MUTE, '--hole-walk-body': A.BODY, '--hole-walk-dim': A.DIM, '--hole-walk-faint': A.FAINT, '--hole-walk-soft': A.SOFT, '--hole-walk-rule': A.SOFT, '--hole-walk-track': A.TRACK } as CSSProperties}>
     <section className="hole-walk-section">
       <p className="hole-walk-kicker">Walk the course</p>
       <h2 className="hole-walk-title">{walk.headline}</h2>

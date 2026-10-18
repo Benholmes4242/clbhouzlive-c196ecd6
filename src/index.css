@@ -20,6 +20,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* MEDIA_WALK_1: overlay effects refer to the walk's inherited semantic ink/canvas. */
+.hole-walk {
+  --hole-walk-shadow: 0 1px 4px var(--hole-walk-canvas);
+  --hole-walk-caption-ground: linear-gradient(to top, var(--hole-walk-canvas), transparent);
+}
+
 /* Discover course tiles: preserve the tap affordance when the 320pt data line is tight. */
 @media (max-width: 339px) {
   .course-mosaic-tile__avg {
