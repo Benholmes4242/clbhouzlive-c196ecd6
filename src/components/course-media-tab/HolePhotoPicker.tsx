@@ -1,4 +1,4 @@
-/** One picker for single photographs and the future monotonic-floor flow.
+/** One picker for single photographs and batches (never the known-hole path).
  * The parent owns course count and used holes. Never fetch or assume a count.
  */
 import { Button } from '@/components/ui/button';
@@ -21,8 +21,8 @@ export function HolePhotoPicker({ holeCount, knownHoleNumbers, floor = 0, select
     <div role="group" aria-label="Hole" className="grid grid-cols-6 gap-[6px]">
       {numbers.map(hole => {
         const available = knownHoleNumbers ? hole >= floor : selectableHole(hole, holeCount, floor);
-        const selected = hole === selectedHole;
-        const used = usedHoles.includes(hole);
+        const selected = available && hole === selectedHole;
+        const used = available && usedHoles.includes(hole);
         return (
           <Button
             key={hole}
