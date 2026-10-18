@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_MEDIA_TAG_FIX_1 — MEDIA_TAGFIX_1
+- [x] Confirm clbhouz and report actual fetched-body synthetic File passed at holePhotoData.ts:136 to holePhotoExif.ts:19 before edits. Baseline 1,722 passing / 219 files.
+- [ ] Skip every URL-only EXIF read; preserve original File/composer proof and Waiting rules. Correct pill/title and genuine-write failure copy.
+- [ ] Add regression coverage without changing existing tests; verify full suite and preview; report authenticated acceptance limits.
+
 ## BRIEF_MEDIA_4_R3 — MEDIA_RETAG_1_R
 - [x] Deleted State D's separate rejectedPhotoReason map; State D directly imports shared memberReasonSentence. Exactly two tests in mediaEmptyStatesR.test.tsx rewritten under AND3; names retained, no tests added/deleted/renamed or other test changes.
 - [x] “unmapped reviewer text maps to neutral fixed reason”: BEFORE `expect(rejectedPhotoReason('internal reviewer note')).toBe('It did not pass review.')` and `expect(rejectedPhotoReason(null)).toBe('It did not pass review.')`; AFTER `expect(memberReasonSentence('internal reviewer note')).toBe(memberReasonSentence('other'))`, `expect(memberReasonSentence(null)).toBe(memberReasonSentence('other'))`, and `.not.toContain('internal reviewer note')`. Why: neutral sentence is owned by shared helper; internal notes never reach members.

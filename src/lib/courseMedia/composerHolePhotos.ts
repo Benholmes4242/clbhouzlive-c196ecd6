@@ -3,10 +3,12 @@
  * File EXIF is retained; chosen proof and EXIF proof are distinct mechanisms.
  * This module owns review-composer contribution writes because neither the
  * review-media attachment nor its retry registry may own optional enrichment.
+ * MEDIA_TAGFIX_1: only original Files supply EXIF; an uploaded URL is never
+ * fetched for metadata. Chosen round proof is independent of EXIF availability.
  */
 import { supabase } from '@/integrations/supabase/client';
 import { readHolePhotoExif, type HolePhotoExif } from './holePhotoExif';
-import { matchedPhotoRounds, prepareHolePhoto } from './holePhotoData';
+import { matchedPhotoRounds } from './holePhotoData';
 import { holePhotoVerdict } from './holePhotoVerdict';
 
 export interface ComposerHoleJob {
@@ -18,10 +20,9 @@ export interface ComposerHoleJob {
 
 export const EMPTY_PHOTO_EXIF: HolePhotoExif = { capturedAt: null, captureDay: null, latitude: null, longitude: null };
 
-export async function composerPhotoMetadata(file?: File, url?: string): Promise<HolePhotoExif> {
+export async function composerPhotoMetadata(file?: File, _url?: string): Promise<HolePhotoExif> {
   try {
     if (file) return await readHolePhotoExif(file);
-    if (url) return (await prepareHolePhoto(url)).exif;
   } catch { /* Missing/unreadable EXIF is ordinary and never blocks the review. */ }
   return { ...EMPTY_PHOTO_EXIF };
 }
