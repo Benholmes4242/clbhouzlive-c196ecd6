@@ -30,7 +30,7 @@ export function HolePhotoPicker({ holeCount, floor = 0, selectedHole, usedHoles 
             onClick={() => onSelect(hole)}
             className="aspect-square h-auto min-w-0 p-0 rounded-[9px] text-sm font-extrabold tabular-nums"
             style={{
-              border: `1px ${available ? 'solid' : 'dashed'} ${selected ? A.INK : used ? A.IMPROVED : A.BORDER}`,
+              border: `1px ${available ? 'solid' : 'dashed'} ${selected ? A.INK : used ? A.IMPROVED : `color-mix(in srgb, ${A.INK} 12%, transparent)`}`,
               background: selected ? A.INK : 'transparent',
               color: selected ? A.CANVAS : used ? A.IMPROVED : A.BODY,
               opacity: available ? 1 : 0.18,
