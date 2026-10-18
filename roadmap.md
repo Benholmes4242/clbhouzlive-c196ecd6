@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## REVIEWS_STATE_4
+- [ ] Resolve actual brief contradiction before implementation: ADA2 requires chart at five excluding ratings; ADE2 says six total minus one viewer is four and forbids chart (actual count five). Uploaded HTML also says six-or-more in introductory prose but five in its notes.
+- [ ] Reuse State 3 screen and existing distribution component for five-to-nine total; excluding chart counts and generated quiet sentence; five zero-preserving tier rows; shared min-to-max findings and Condition-only exact months clause; no middle-80%/splits or composer changes.
+- [ ] Add excluding sum and four/five boundary regressions, preserve existing test assertions; baseline 1,616 tests / 209 files. Full-suite/build and populated visual verification; report authenticated limits.
+
 ## REVIEWS_STATE_3
 - [x] Ben resolved ACA3/ACC2: count/spread/ending average all exclude viewer. Zero spread starts “Two people agreeing…”; positive spread starts “They sit inside…”; one other person has no sentence. Mock's old line is superseded, everything else stands.
 - [x] Implement only two-to-four-total state, shared two-excluding average threshold, State 2 community-half fallback, excluded min-to-max categories, shared person/context rows and known-people-first order; preserve States 1/2 and composer; no State 4/middle-80%/splits. Course circle reuses useMembersWhoPlayedCourse (outgoing follows), scoped to visible blocked-filtered rows. Category meaningful contrast uses one displayed tenth; real values replace illustrative mock figures.
