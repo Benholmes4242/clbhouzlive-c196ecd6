@@ -329,3 +329,6 @@
 
 ## MEDIA_COPY_1
 - [x] Added one test in src/test/mediaEmptyStatesR.test.tsx pinning two literal sentences against memberReasonSentence: default branch "The photo was not a fit for this hole." and not_a_golf_hole "The photo did not show a golf hole.". No existing tests changed; suite 1,704/218 -> 1,705 passing/218 (+1, mediaEmptyStatesR only). No SQL, migrations, RPC, RLS, feed_config, cap or src/features/admin changes.
+
+## COMPOSER_HOLES_1
+- [ ] Implement optional review step-two photograph hole tagging after author resolves APA4 versus variant C and supplies composer-hole-picker.html (three variants). Preserve MediaTray/header, eighteen-hole round filter, submit-only independent photo writes and existing tests. Current blockers: APA4 says no tagging sentence when analysis is unavailable; variant C renders one. Referenced picker mock is absent from this upload.
