@@ -1,6 +1,5 @@
 /** One picker for single photographs and batches (never the known-hole path).
  * The parent owns course count and used holes. Never fetch or assume a count.
- * data-state names closed/open/used independently of selection and appearance.
  */
 import { Button } from '@/components/ui/button';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -30,7 +29,6 @@ export function HolePhotoPicker({ holeCount, knownHoleNumbers, floor = 0, select
             variant="ghost"
             aria-label={`Hole ${hole}`}
             aria-pressed={selected}
-            data-state={!available ? 'closed' : used ? 'used' : 'open'}
             disabled={!available}
             onClick={() => onSelect(hole)}
             className="aspect-square h-auto min-w-0 p-0 rounded-[9px] text-sm font-extrabold tabular-nums"
