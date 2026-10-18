@@ -119,7 +119,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       {tagResult && !tagPost && <div className="mx-5 mb-4"><HolePhotoOutcome row={tagResult} /></div>}
       {tagPost && knownHoles && tagPost.mediaItems[0]?.imageUrl && (
         <HolePhotoTagDialog key={tagPost.mediaItems[0].id} imageUrl={tagPost.mediaItems[0].imageUrl}
-          holeCount={knownHoles.length} usedHoles={(tagging.tags.data ?? []).filter(row => row.user_id === user.id).map(row => row.hole_no)}
+          holeCount={knownHoles.length} knownHoleNumbers={knownHoles} usedHoles={(tagging.tags.data ?? []).filter(row => row.user_id === user.id).map(row => row.hole_no)}
           pending={tagging.submit.isPending} result={tagResult}
           error={tagging.submit.error ? 'The photograph could not be tagged. Please try again.' : null}
           onClose={() => setTagPost(null)}

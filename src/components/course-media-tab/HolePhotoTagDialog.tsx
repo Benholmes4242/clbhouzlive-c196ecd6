@@ -18,8 +18,8 @@ export function HolePhotoOutcome({ row }: { row: HolePhoto }) {
   </div>;
 }
 
-export function HolePhotoTagDialog({ imageUrl, holeCount, usedHoles, pending, result, error, onClose, onSubmit }: {
-  imageUrl: string; holeCount: number; usedHoles: readonly number[]; pending: boolean;
+export function HolePhotoTagDialog({ imageUrl, holeCount, knownHoleNumbers, usedHoles, pending, result, error, onClose, onSubmit }: {
+  imageUrl: string; holeCount: number; knownHoleNumbers: readonly number[]; usedHoles: readonly number[]; pending: boolean;
   result: HolePhoto | null; error: string | null; onClose: () => void; onSubmit: (hole: number) => void;
 }) {
   const [hole, setHole] = useState<number | null>(null);
@@ -28,7 +28,7 @@ export function HolePhotoTagDialog({ imageUrl, holeCount, usedHoles, pending, re
       <DialogTitle className="tracking-normal">{result ? 'Photograph tagged' : 'Tag photograph'}</DialogTitle>
       <DialogDescription className="sr-only">Choose a hole for your photograph.</DialogDescription>
       <img src={imageUrl} alt="Your photograph" className="w-full max-h-40 object-contain rounded-lg" />
-      {result ? <HolePhotoOutcome row={result} /> : <HolePhotoPicker holeCount={holeCount} selectedHole={hole} usedHoles={usedHoles} onSelect={setHole} />}
+      {result ? <HolePhotoOutcome row={result} /> : <HolePhotoPicker holeCount={holeCount} knownHoleNumbers={knownHoleNumbers} selectedHole={hole} usedHoles={usedHoles} onSelect={setHole} />}
       {error && <p role="alert" className="text-sm" style={{ color: A.MUTE }}>{error}</p>}
       <Button variant="ghost" disabled={pending || (!result && hole == null)} className="w-full" style={{ background: A.INK, color: A.CANVAS }}
         onClick={() => { if (result) onClose(); else if (hole != null) onSubmit(hole); }}>
