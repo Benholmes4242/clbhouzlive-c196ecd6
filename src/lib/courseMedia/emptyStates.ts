@@ -16,7 +16,7 @@ export function coursePhotoState(hasPhotographs: boolean, available: boolean) {
  * Never expose reviewer text/identity/notes; unknown reasons use fixed fallback.
  */
 export function privateHolePhotos(rows: readonly HolePhoto[], memberId: string, courseId: string) {
-  return rows.filter(row => row.user_id === memberId && row.course_id === courseId && (row.status === 'pending' || row.status === 'rejected'));
+  return rows.filter(row => row.user_id === memberId && row.course_id === courseId && row.status === 'rejected');
 }
 
 /** Date-only display without local-time conversion; upload time is never used. */

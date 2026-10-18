@@ -4,23 +4,21 @@
  * The known-hole path never renders HolePhotoPicker. Skip has no write callback.
  */
 import { useRef, useState, type CSSProperties } from 'react';
-import { Check, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { HolePhotoPicker } from './HolePhotoPicker';
-import { HolePhotoOutcome } from './HolePhotoTagDialog';
 import { holeOrdinal } from '@/lib/courseMedia/holeWalk';
 import { capitalPhotoCount, spellPhotoCount, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
-import { advanceBatch, batchVerdicts, closedHoleCount, startBatch, type BatchPhoto } from '@/lib/courseMedia/holePhotoBatch';
+import { advanceBatch, closedHoleCount, startBatch, type BatchPhoto } from '@/lib/courseMedia/holePhotoBatch';
 import type { HolePhotoRound } from '@/lib/courseMedia/holePhotoVerdict';
 import './hole-photo-fast.css';
 
 const theme = { '--hole-walk-ink': A.INK, '--hole-walk-canvas': A.CANVAS, '--hole-walk-muted': A.MUTE, '--hole-walk-rule': A.BORDER, '--hole-walk-track': A.TRACK, '--hole-photo-panel': A.PANEL, '--hole-photo-success': A.IMPROVED } as CSSProperties;
-const playedDate = (date: string) => new Date(`${date.slice(0, 10)}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
-export function HoleKnownPhotoPath({ hole, photos, round, pending, result, error, onChoose, onLibrary, onClose }: {
-  hole: number; photos: readonly string[]; round?: HolePhotoRound; pending: boolean; result: HolePhoto | null; error: string | null;
+export function HoleKnownPhotoPath({ hole, photos, pending, error, onChoose, onLibrary, onClose }: {
+  hole: number; photos: readonly string[]; round?: HolePhotoRound; pending: boolean; result?: HolePhoto | null; error: string | null;
   onChoose: (url: string) => void; onLibrary: (file: File) => void; onClose: () => void;
 }) {
   const input = useRef<HTMLInputElement>(null);
@@ -28,18 +26,15 @@ export function HoleKnownPhotoPath({ hole, photos, round, pending, result, error
     <div className="hole-photo-fast-grab" />
     <DialogTitle className="hole-photo-fast-title">Add a photo of the {holeOrdinal(hole)}</DialogTitle>
     <DialogDescription className="hole-photo-fast-lede">The hole is already set. Pick a picture and it is done.</DialogDescription>
-    {result ? <><HolePhotoOutcome row={result} /><Button variant="ghost" className="hole-photo-fast-action" onClick={onClose}>Done</Button></> : <>
       <div className="hole-photo-fast-pile">{photos.map(url => <Button key={url} variant="ghost" className="hole-photo-fast-photo" aria-label="Choose photograph" disabled={pending} onClick={() => onChoose(url)}><img src={url} alt="Your photograph" /></Button>)}</div>
-      {round && <div className="hole-photo-fast-verdict"><Check /><p>You played here on <strong>{playedDate(round.playDate)}</strong>. A photo from that day publishes straight away.</p></div>}
       <input ref={input} type="file" accept="image/*" hidden disabled={pending} onChange={event => { const file = event.target.files?.[0]; if (file) onLibrary(file); event.target.value = ''; }} />
       <Button variant="ghost" className="hole-photo-fast-action" disabled={pending} onClick={() => input.current?.click()}>{pending ? <><Loader2 className="animate-spin" />Tagging</> : 'Choose from your library'}</Button>
-    </>}
     {error && <p role="alert" className="hole-photo-fast-lede">{error}</p>}
   </DialogContent></Dialog>;
 }
 
-export function HolePhotoBatchPath({ photos, rounds, memberId, courseId, knownHoles, onTag, onClose }: {
-  photos: readonly BatchPhoto[]; rounds: readonly HolePhotoRound[]; memberId: string; courseId: string; knownHoles: readonly number[];
+export function HolePhotoBatchPath({ photos, knownHoles, onTag, onClose }: {
+  photos: readonly BatchPhoto[]; rounds?: readonly HolePhotoRound[]; memberId?: string; courseId?: string; knownHoles: readonly number[];
   onTag: (url: string, hole: number) => Promise<HolePhoto>; onClose: () => void;
 }) {
   const [state, setState] = useState(startBatch);
@@ -47,14 +42,13 @@ export function HolePhotoBatchPath({ photos, rounds, memberId, courseId, knownHo
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const photo = photos[state.index];
-  const verdict = batchVerdicts(photos, memberId, courseId, rounds);
-  const match = rounds.find(round => round.userId === memberId && round.golfCourseId === courseId && photo?.exif.captureDay === round.playDate.slice(0, 10));
-  const advance = async () => {
-    if (!photo || selected == null || selected < state.floor) return;
+  const advance = async (hole: number) => {
+    if (!photo || pending || hole < state.floor) return;
+    setSelected(hole);
     setPending(true); setError(null);
     try {
-      await onTag(photo.url, selected);
-      const next = advanceBatch(state, photo.url, selected);
+      await onTag(photo.url, hole);
+      const next = advanceBatch(state, photo.url, hole);
       setState(next); setSelected(null);
       if (next.index >= photos.length) onClose();
     } catch { setError('The photograph could not be tagged. The tag was not saved.'); }
@@ -67,11 +61,9 @@ export function HolePhotoBatchPath({ photos, rounds, memberId, courseId, knownHo
     <DialogTitle className="hole-photo-fast-title">Which hole is this?</DialogTitle>
     <DialogDescription className="hole-photo-fast-lede">{capitalPhotoCount(photos.length)} photos, oldest first. <strong>{capitalPhotoCount(state.index + 1)} of {spellPhotoCount(photos.length)}.</strong></DialogDescription>
     <div className="hole-photo-fast-thumbs">{photos.map((item, index) => <div key={item.url} className={`hole-photo-fast-photo ${index === state.index ? 'is-current' : ''}`}><img src={item.url} alt={index === state.index ? 'Current photograph' : 'Batch photograph'} />{state.tags[item.url] != null && <span className="hole-photo-fast-tag">{state.tags[item.url]}</span>}</div>)}</div>
-    <HolePhotoPicker holeCount={knownHoles.length} knownHoleNumbers={knownHoles} floor={state.floor} selectedHole={selected} usedHoles={Object.values(state.tags)} onSelect={hole => { if (!pending) setSelected(hole); }} />
+    <HolePhotoPicker holeCount={knownHoles.length} knownHoleNumbers={knownHoles} floor={state.floor} selectedHole={selected} usedHoles={Object.values(state.tags)} onSelect={hole => { void advance(hole); }} />
     {state.floor > 1 && <p className="hole-photo-fast-floor">The first <strong>{spellPhotoCount(closedHoleCount(state.floor))}</strong> are closed because your last photo was the <strong>{holeOrdinal(state.floor)}</strong>. You cannot walk backwards. <strong>Three photos on one hole is fine</strong> — the {holeOrdinal(state.floor)} stays open until you move past it.</p>}
-    <div className="hole-photo-fast-verdict"><Check /><p>{match && <>Taken <strong>{playedDate(match.playDate)}</strong>{match.grossScore != null ? <>, the day you posted <strong>{match.grossScore}</strong> here. </> : ', the day you played here. '}</>}{verdict.all ? <>All {spellPhotoCount(photos.length)} publish straight away.</> : <><strong>{capitalPhotoCount(verdict.published)}</strong> publish straight away. <strong>{capitalPhotoCount(verdict.waiting)}</strong> {verdict.waiting === 1 ? 'waits' : 'wait'}.</>}</p></div>
     {error && <p role="alert" className="hole-photo-fast-lede">{error}</p>}
-    <Button variant="ghost" className="hole-photo-fast-action" disabled={pending || selected == null} onClick={advance}>{pending && <Loader2 className="animate-spin" />}{state.index === photos.length - 1 ? 'Tag photo' : 'Next photo'}</Button>
     <Button variant="ghost" className="hole-photo-fast-action hole-photo-fast-skip" disabled={pending} onClick={skip}>Skip this one</Button>
   </DialogContent></Dialog>;
 }

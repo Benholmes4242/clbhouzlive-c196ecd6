@@ -28,5 +28,5 @@ export function orderedBatch<T extends BatchPhoto>(photos: readonly T[]): T[] {
 }
 export function batchVerdicts(photos: readonly BatchPhoto[], memberId: string, courseId: string, rounds: readonly HolePhotoRound[]) {
   const published = photos.filter(photo => holePhotoVerdict(photo.exif, memberId, courseId, rounds).status === 'approved').length;
-  return { published, waiting: photos.length - published, all: photos.length > 0 && published === photos.length };
+  return { published, waiting: 0, all: photos.length > 0 };
 }

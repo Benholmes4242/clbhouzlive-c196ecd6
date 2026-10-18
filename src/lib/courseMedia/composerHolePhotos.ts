@@ -1,6 +1,6 @@
 /** COMPOSER_HOLES_1_R2/R3: optional enrichment belongs to the upload job, not
  * review attachment/retry. A failed contribution loses only its tag. Original
- * File EXIF is retained; chosen proof and EXIF proof are distinct mechanisms.
+ * File capture dates are retained; chosen rounds are associations, not proof.
  * This module owns review-composer contribution writes because neither the
  * review-media attachment nor its retry registry may own optional enrichment.
  * MEDIA_TAGFIX_1: only original Files supply EXIF; an uploaded URL is never
@@ -8,7 +8,6 @@
  */
 import { supabase } from '@/integrations/supabase/client';
 import { readHolePhotoExif, type HolePhotoExif } from './holePhotoExif';
-import { matchedPhotoRounds } from './holePhotoData';
 import { holePhotoVerdict } from './holePhotoVerdict';
 
 export interface ComposerHoleJob {
@@ -28,13 +27,7 @@ export async function composerPhotoMetadata(file?: File, _url?: string): Promise
 }
 
 export async function composerPhotoVerdict(exif: HolePhotoExif, userId: string, courseId: string, proofScoreId: string | null) {
-  const rounds = !proofScoreId && exif.captureDay ? await matchedPhotoRounds(courseId, userId, exif.captureDay) : [];
-  const verdict = holePhotoVerdict(exif, userId, courseId, rounds);
-  return proofScoreId ? {
-    ...verdict, status: 'approved' as const, auto_verdict: 'published' as const,
-    auto_confidence: 1, proof_score_id: proofScoreId,
-    auto_notes: `Chosen round ${proofScoreId} at this course.`,
-  } : verdict;
+  return { ...holePhotoVerdict(exif, userId, courseId, []), proof_score_id: proofScoreId };
 }
 
 /** Caller invokes only after submit, when this item's uploaded URL exists.
@@ -55,10 +48,4 @@ export async function writeComposerHolePhoto(job: ComposerHoleJob | undefined, u
       file_name: item.file?.name ?? null, ...verdict,
     });
   } catch { /* Optional tag only: review publication and media remain untouched. */ }
-}
-
-export function composerVerdictSentence(chosenDate: string | null, approved: boolean): string {
-  if (chosenDate) return `From your round on ${chosenDate}, so it publishes straight away.`;
-  return approved ? 'Taken on a day you played here, so it publishes straight away.'
-    : 'A person will look before it goes on the hole. Your review posts now either way.';
 }

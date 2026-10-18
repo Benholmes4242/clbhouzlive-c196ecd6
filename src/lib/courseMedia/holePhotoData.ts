@@ -1,7 +1,7 @@
 /** MEDIA_ENGINE_1_R2: read/write only the hole contribution; never mutate the
  * source photo. Analysis hook owns the hole list; this module has no resolver.
  * All complete-list reads paginate explicitly. Backend policies remain the
- * authority for publishing and owner-only pending visibility.
+ * authority for moderation and owner-only rejected visibility.
  * MEDIA_TAGFIX_1: URL-only sources have no original File and no EXIF. Never
  * download media to manufacture a File; only library uploads parse originals.
  */
@@ -57,28 +57,6 @@ export async function fetchOwnPhotoSources(courseId: string, memberId: string): 
   return [...new Map([...reviews, ...posts].map(row => [row.media_url, { url: row.media_url, createdAt: row.created_at ?? '' }])).values()];
 }
 
-/** Same member/connection/mapping identity as the engine; no SR identity guesses.
- * Batch and conditional copy need the complete list, not a same-day limit.
- */
-export async function coursePhotoRounds(courseId: string, memberId: string): Promise<HolePhotoRound[]> {
-  const [connections, mappings] = await Promise.all([
-    supabase.from('whs_connections').select('id').eq('user_id', memberId).is('deleted_at', null),
-    readAllPages((from, to) => supabase.from('whs_to_golf_course_map').select('whs_course_id').eq('golf_course_id', courseId).order('whs_course_id').range(from, to)),
-  ]);
-  if (connections.error) throw connections.error;
-  const ids = (connections.data ?? []).map(row => row.id);
-  const courseIds = mappings.map(row => row.whs_course_id);
-  if (!ids.length || !courseIds.length) return [];
-  const scores = await readAllPages((from, to) => supabase.from('whs_scores').select('id,play_date').in('connection_id', ids).in('course_id', courseIds).order('play_date', { ascending: false }).order('id').range(from, to));
-  const gross = new Map<string, number | null>();
-  for (let start = 0; start < scores.length; start += PAGE) {
-    const group = scores.slice(start, start + PAGE).map(row => row.id);
-    const stats = await readAllPages((from, to) => supabase.from('gam_round_stats').select('whs_score_id,gross_score').in('whs_score_id', group).order('whs_score_id').range(from, to));
-    for (const row of stats) gross.set(row.whs_score_id, row.gross_score);
-  }
-  return scores.map(row => ({ id: row.id, playDate: row.play_date, userId: memberId, golfCourseId: courseId, grossScore: gross.get(row.id) ?? null }));
-}
-
 export async function prepareHolePhoto(_url: string) {
   return { exif: { capturedAt: null, captureDay: null, latitude: null, longitude: null } };
 }
@@ -91,27 +69,11 @@ export async function submitLibraryHolePhoto(file: File, url: string, courseId: 
   const { data: auth, error: authError } = await supabase.auth.getUser();
   if (authError) throw authError;
   if (auth.user?.id !== memberId) throw new Error('Please sign in again before tagging.');
-  const exif = await readHolePhotoExif(file);
-  const rounds = exif.captureDay ? await matchedPhotoRounds(courseId, memberId, exif.captureDay) : [];
-  const { data, error } = await supabase.from('course_hole_media').insert({ course_id: courseId, user_id: memberId, hole_no: hole, media_url: url, file_name: file.name, ...holePhotoVerdict(exif, memberId, courseId, rounds) }).select('*').single();
+  // Metadata failure never blocks publication; URL-only inputs never parse.
+  const exif = await readHolePhotoExif(file).catch(() => ({ capturedAt: null, captureDay: null, latitude: null, longitude: null }));
+  const { data, error } = await supabase.from('course_hole_media').insert({ course_id: courseId, user_id: memberId, hole_no: hole, media_url: url, file_name: file.name, ...holePhotoVerdict(exif, memberId, courseId, []) }).select('*').single();
   if (error) throw error;
   return data;
-}
-
-export async function matchedPhotoRounds(courseId: string, memberId: string, day: string): Promise<HolePhotoRound[]> {
-  const [connections, mappings] = await Promise.all([
-    supabase.from('whs_connections').select('id').eq('user_id', memberId).is('deleted_at', null),
-    readAllPages((from, to) => supabase.from('whs_to_golf_course_map').select('whs_course_id')
-      .eq('golf_course_id', courseId).order('whs_course_id').range(from, to)),
-  ]);
-  if (connections.error) throw connections.error;
-  const connectionIds = (connections.data ?? []).map(row => row.id);
-  const whsIds = mappings.map(row => row.whs_course_id);
-  if (!connectionIds.length || !whsIds.length) return [];
-  const { data, error } = await supabase.from('whs_scores').select('id,play_date')
-    .in('connection_id', connectionIds).in('course_id', whsIds).eq('play_date', day).order('id').limit(1);
-  if (error) throw error;
-  return (data ?? []).map(row => ({ id: row.id, playDate: row.play_date, userId: memberId, golfCourseId: courseId }));
 }
 
 export async function submitHolePhoto(post: FeedPost, courseId: string, memberId: string, hole: number, knownHoles: readonly number[]): Promise<HolePhoto> {

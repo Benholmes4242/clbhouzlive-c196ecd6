@@ -8,7 +8,7 @@ import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 const row = (id: string, status: string, user_id = 'me', course_id = 'here') => ({ id, status, user_id, course_id, hole_no: 12, media_url: '/photo.jpg', reject_reason: null, reviewed_at: null }) as HolePhoto;
 describe('MEDIA_EMPTY_1_R owner population and date rules', () => {
   it('waiting and rejected count together; approved rows do not', () => {
-    expect(privateHolePhotos([row('p', 'pending'), row('r', 'rejected'), row('a', 'approved')], 'me', 'here').map(r => r.id)).toEqual(['p', 'r']);
+    expect(privateHolePhotos([row('p', 'pending'), row('r', 'rejected'), row('a', 'approved')], 'me', 'here').map(r => r.id)).toEqual(['r']);
   });
   it('other members never enter the private population', () => {
     expect(privateHolePhotos([row('p', 'pending', 'other'), row('r', 'rejected', 'other')], 'me', 'here')).toEqual([]);
@@ -33,8 +33,8 @@ describe('MEDIA_EMPTY_1_R owner population and date rules', () => {
   it('private display shows exactly the filtered rows and no other-member image', () => {
     const other = { ...row('other', 'pending', 'other'), media_url: '/other.jpg' };
     const { container } = render(<CourseMediaNotLive rows={[row('p', 'pending'), row('r', 'rejected'), other, row('a', 'approved')]} memberId="me" courseId="here" />);
-    expect(screen.getAllByRole('status')).toHaveLength(2);
-    expect(screen.getAllByRole('img')).toHaveLength(2);
+    expect(screen.getAllByRole('status')).toHaveLength(1);
+    expect(screen.getAllByRole('img')).toHaveLength(1);
     expect(container.querySelector('img[src="/other.jpg"]')).toBeNull();
   });
   it('private display is absent for another viewer', () => {

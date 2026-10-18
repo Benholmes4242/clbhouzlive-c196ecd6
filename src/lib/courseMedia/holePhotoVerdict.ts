@@ -1,7 +1,6 @@
-/** MEDIA_ENGINE_1: date-only verdict shared by the contribution write path.
- * Round inputs must already have a real WHS-to-golf mapping and member identity.
- * Never confuse whs_scores.course_id (WHS) with the golf course UUID.
- * GPS is retained verbatim and never participates in verification.
+/** MEDIA_TRUST_1_R3: publication payload, never a verification gate.
+ * Original File capture dates serve season chips only. GPS is not persisted.
+ * Legacy arguments are inert; only an explicit composer association sets proof.
  */
 import type { HolePhotoExif } from './holePhotoExif';
 
@@ -16,26 +15,13 @@ export interface HolePhotoRound {
 
 export function holePhotoVerdict(
   exif: HolePhotoExif,
-  memberId: string,
-  courseId: string,
-  rounds: readonly HolePhotoRound[],
+  _memberId: string,
+  _courseId: string,
+  _rounds: readonly HolePhotoRound[],
 ) {
-  const match = exif.captureDay == null ? undefined : rounds.find(round =>
-    round.userId === memberId && round.golfCourseId === courseId &&
-    round.playDate.slice(0, 10) === exif.captureDay,
-  );
   return {
-    status: match ? 'approved' as const : 'pending' as const,
-    auto_verdict: match ? 'published' as const : 'queued' as const,
-    auto_confidence: match ? 1 : 0,
-    auto_notes: match
-      ? `Capture day ${exif.captureDay} matches your round ${match.id} at this course.`
-      : exif.captureDay == null
-        ? 'No EXIF capture date is present. Waiting for a human review.'
-        : `No round of yours at this course matches capture day ${exif.captureDay}. Waiting for a human review.`,
-    proof_score_id: match?.id ?? null,
+    status: 'approved' as const,
+    proof_score_id: null,
     exif_captured_at: exif.capturedAt,
-    exif_lat: exif.latitude,
-    exif_lng: exif.longitude,
   };
 }
