@@ -53,7 +53,7 @@ interface CourseMediaCanonGridProps {
   courseId?: string;
   /** State A alone previews four square tiles, retaining canonical viewer taps. */
   noHolePreviewCount?: number;
-  tagging?: { memberId: string; holeCount: number; taggedUrls: ReadonlySet<string>; onTag: (post: FeedPost) => void };
+  tagging?: { memberId: string; holeCount: number; taggedUrls: ReadonlySet<string>; taggedHoles?: ReadonlyMap<string, number>; onTag: (post: FeedPost) => void };
 }
 
 // Same FeedPost → FeedCardRow projection ExploreGrid uses (Brief U3R).
