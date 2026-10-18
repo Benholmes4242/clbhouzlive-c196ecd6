@@ -1,7 +1,8 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
 ## BRIEF_MEDIA_TRUST_1 — MEDIA_TRUST_1
-- [ ] Contract clarification: ARA7 “Nothing produces pending any more” and “Retag action, exactly as built” conflict with the established retag_hole_photo contract forcing pending (src/lib/courseMedia/retagHolePhoto.ts:1–3, call :12; existing mediaRetag.test.tsx:62–71 proves pending readback). Deployed RPC edits are prohibited. No application/test changes before author clarification; last verified inventory remains 1,729 / 220, not rerun for this read-only stop.
+- [x] MEDIA_TRUST_1_R resolves contract: Ben deployed approved-returning retag_hole_photo with same call, and not_your_photo refusal. Preserve RPC; hide that reason's action and show plain refusal. Baseline rerun 1,729 passing / 220 files (/tmp/media-trust-before.log).
+- [ ] Protected non-pending test clarification: holePhotoFastPaths.test.tsx “known-hole proof row is absent without a round and present with one” asserts `.hole-photo-fast-verdict` count 1; holeWalk.test.tsx “existing picker preselects and submits selected hole” clicks the separate `Tag` button. ARA3/4 remove those behaviours, but neither test is within the stated pending-verdict/old-Retag authorization. Named and stopped before rewriting; awaiting explicit permission. No application/test edits yet.
 - [ ] After clarification, implement immediate approved inserts, association-only round choice/capture dates, tap-to-close tagging, rejected-only State D and removal audit; name authorised pending-test changes and reconcile counts.
 
 ## BRIEF_MEDIA_TAG_FIX_1 — MEDIA_TAGFIX_1
