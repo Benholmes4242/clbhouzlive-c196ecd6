@@ -1,5 +1,7 @@
 """Exercise both real crop modals without authentication, R2 writes or Vitest count changes.
 Run: python3 tests/browser/test_avatar_crop_cap.py
+
+Browser canvas regression checks for both crop modals live outside Vitest in `tests/browser`, exercise the real Apply handlers with local callbacks, and write evidence under `/tmp/browser`, because JPEG byte identity needs a real browser without hosted upload writes or changing the agreed Vitest count.
 """
 import asyncio
 import json

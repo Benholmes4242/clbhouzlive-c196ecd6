@@ -1,8 +1,13 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
 ## REVIEWS_STATE_1
-- [ ] Match the signed-off zero-rating invitation only; shared state rule; dated pending catalogue figures derived from total/rated.
+- [x] Match the signed-off zero-rating invitation only; shared state rule; catalogue figures derived from total/rated.
 - [ ] Add zero/one-rating and absence/derived-figure coverage; full suite, preview and visual checks; report pending figures/auth limits.
+
+## REVIEWS_STATE_1_T
+- [ ] Wire Ben's confirmed 2026-10-18 snapshot (23,292 total, 115 rated; derive 23,177) and remove pending status.
+- [ ] Copy the complete canonical i18n mock into reviewsState1; audit all Reviews/Champions additions and report latent mocks without silently changing them.
+- [ ] Run full suite; report baseline 1,574 and resulting inventory (six State 1 tests), authorised assertion changes, preview status and limits.
 
 ## BRIEF_REVIEWS_1 — REVIEWS_SAMPLE_1
 - [x] Correct overall/four category means and distribution via shared fieldExcludingViewer and complete paginated non-mock rating sample; preserve You-tab implementation/signature and review screen structure. Viewer-only sample has no invented community zero or delta.
