@@ -11,13 +11,14 @@ Any unexpected test failure: STOP AND REPORT. Never edit a test to make it pass 
 ## Tests
 Every test deleted, renamed or rewritten is named in the build report, with its assertion quoted and one line on why. A brief that changes a documented rule implicitly authorises updating the test encoding it; it never authorises doing so silently. State the test count before and after; every difference must reconcile by name.
 
+Copy every react-i18next mock in full from src/test/profileCoursesRecord.test.tsx:33: initReactI18next is required at module load; t returns defaultValue or ''. Assert structure, not translated words; never change components for mocks.
+
 When AGENTS.md approaches its limit, always move an architecture note into a file header, never compress a rule. A fact about how one module behaves belongs next to that module. AGENTS.md holds only what cannot live in a header: cross-cutting process rules.
 
 - Shared standings/Top 100 helpers live in `src/lib/gam`; achievement levels live beside celebrations, preserving active consumers after Trophy Room removal.
 
 - Profile course archive overrides are scoped by `courses-archive`, with an opt-in archive appearance on shared region controls, so matching its mock cannot restyle other course filters or section headings.
 
-- Browser canvas regression checks for both crop modals live outside Vitest in `tests/browser`, exercise the real Apply handlers with local callbacks, and write evidence under `/tmp/browser`, because JPEG byte identity needs a real browser without hosted upload writes or changing the agreed Vitest count.
 - Member Radar panels read only the Stage 3 member hooks; legacy member details serve existing More actions only, so analytics displays cannot silently fall back to unrelated client reads.
 - Message entrypoints hand optional focus and return navigation through the existing start-conversation hook, so server messaging refusals remain authoritative and no entrypoint sends automatically.
 

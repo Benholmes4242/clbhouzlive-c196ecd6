@@ -10,7 +10,7 @@ import { REVIEWS_CATALOGUE_SNAPSHOT, reviewsCatalogueWithoutReview } from '@/lib
 
 const fixture = vi.hoisted(() => ({ rows: [] as any[], user: undefined as { id: string } | undefined }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: fixture.user }) }));
-vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key: string) => key }) }));
+vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useCourseReviewSample', () => ({ useCourseReviewSample: () => ({ data: fixture.rows, isSuccess: true, isError: false }) }));
 vi.mock('@/hooks/useCourseReviews', () => ({ useCourseReviews: () => ({ data: fixture.rows, isSuccess: true, isLoading: false, isError: false, refetch: vi.fn() }) }));
 vi.mock('@/hooks/useBusinessClaimForCourse', () => ({ useBusinessClaimForCourse: () => ({ data: null }) }));
@@ -57,11 +57,12 @@ describe('REVIEWS_STATE_1', () => {
     expect(screen.getByTestId('review-row')).toBeInTheDocument();
   });
   it('stores two catalogue figures and derives without-review from their difference', () => {
-    expect(REVIEWS_CATALOGUE_SNAPSHOT).toEqual({ total: 23292, rated: 0, asOf: '2026-10-18', pending: true });
-    expect(Object.values(REVIEWS_CATALOGUE_SNAPSHOT).filter((value) => typeof value === 'number')).toEqual([23292, 0]);
+    expect(REVIEWS_CATALOGUE_SNAPSHOT).toEqual({ total: 23292, rated: 115, asOf: '2026-10-18' });
+    expect(Object.values(REVIEWS_CATALOGUE_SNAPSHOT).filter((value) => typeof value === 'number')).toEqual([23292, 115]);
     expect(reviewsCatalogueWithoutReview()).toBe(REVIEWS_CATALOGUE_SNAPSHOT.total - REVIEWS_CATALOGUE_SNAPSHOT.rated);
+    expect(reviewsCatalogueWithoutReview()).toBe(23177);
     render(<NobodyHasRated totalRatings={0} courseName="Augusta Country Club" onWriteFirst={vi.fn()} />);
-    expect(screen.getByText(/23,292 of the 23,292 courses/)).toBeInTheDocument();
+    expect(screen.getByText(/23,177 of the 23,292 courses/)).toBeInTheDocument();
   });
   it('first-review CTA calls existing handler once', () => {
     const write = vi.fn();
