@@ -268,4 +268,4 @@
 
 ## AGENTS_BUDGET_R2
 - [x] Confirm clbhouz and corrected token/handicap destinations; copy exactly four named rules into owning headers, with two root pointers only, and replace Briefs verbatim. No medals/src-AGENTS/SQL/migrations/RPC/feed_config/cap changes.
-- [x] Root 7,866 -> 4,909 bytes (211 under 5,120); exact four rule texts including handicap audit/caveat and unchanged source bodies verified; root changes limited to four moves, two pointers and exact Briefs replacement. Full suite 1,626 passing / 210 files before and after; no tests added, deleted, renamed, rewritten or assertions changed. Log /tmp/agents-budget-r2/suite.log. Preview build log unavailable in this sandbox; no app behavior changed.
+- [x] Root 7,866 -> 4,909 bytes (211 under 5,120); exact four rule texts including handicap audit/caveat and unchanged source bodies verified; root changes limited to four moves, two pointers and exact Briefs replacement. Full suite 1,626 passing / 210 files before and after; no tests added, deleted, renamed, rewritten or assertions changed. Log /tmp/agents-budget-r2/suite.log. Preview build OK at 2026-10-18T09:09:04Z; no app behavior changed.
