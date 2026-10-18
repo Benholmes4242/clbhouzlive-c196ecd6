@@ -22,7 +22,7 @@ import { HoleKnownPhotoPath, HolePhotoBatchPath } from './HolePhotoFastPaths';
 import { prepareHolePhoto, submitLibraryHolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { orderedBatch, type BatchPhoto } from '@/lib/courseMedia/holePhotoBatch';
 import { coursePhotoState } from '@/lib/courseMedia/emptyStates';
-import { CourseFirstPhotoPicker, CourseMediaNoPhotographs, CourseMediaNothing } from './CourseMediaEmptyStates';
+import { CourseFirstPhotoPicker, CourseMediaNoPhotographs, CourseMediaNothing, CourseMediaNoHoleList, CourseMediaNotLive } from './CourseMediaEmptyStates';
 
 interface CourseMediaTabNewProps {
   courseId: string;
@@ -140,7 +140,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
 
   return (
     <div className="animate-in fade-in duration-200 flex flex-col" style={{ background: A.CANVAS, minHeight: '100%' }}>
-      {photoState !== 'B' && photoState !== 'C' && <CourseMediaHeader
+      {photoState !== 'A' && photoState !== 'B' && photoState !== 'C' && <CourseMediaHeader
         mediaCounts={mediaCounts}
         activeFilter={activeFilter}
         onFilterChange={handleFilterChange}
@@ -158,7 +158,10 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
           {fastError && addHole == null && <p role="alert" className="text-sm">{fastError}</p>}
         </section>
       )}
-      {photoState !== 'B' && photoState !== 'C' && <CourseMediaCanonGrid
+      {photoState === 'A' && <CourseMediaNoHoleList courseName={courseName} photoCount={mediaCounts.photos}>
+        <CourseMediaCanonGrid posts={posts} postsForFullscreen={postsForFullscreen} isLoading={isLoading} isError={isError} hasNextPage={hasNextPage ?? false} isFetchingNextPage={isFetchingNextPage} fetchNextPage={fetchNextPage} refetch={refetch} courseName={courseName} courseId={courseId} noHolePreviewCount={mediaCounts.total} />
+      </CourseMediaNoHoleList>}
+      {photoState !== 'A' && photoState !== 'B' && photoState !== 'C' && <CourseMediaCanonGrid
         ref={gridRef}
         posts={posts}
         postsForFullscreen={postsForFullscreen}
@@ -172,7 +175,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         courseId={courseId}
         tagging={tagging.ready && user && knownHoles ? { memberId: user.id, holeCount: knownHoles.length, taggedUrls: tagging.taggedUrls, onTag: startTag } : undefined}
       />}
-      {(tagging.tags.data ?? []).filter(row => row.user_id === user.id && row.status === 'pending').map(row => <div key={row.id} className="mx-5 my-3"><img src={row.media_url} alt="Your waiting photograph" className="w-full max-h-40 object-contain rounded-lg" /><HolePhotoOutcome row={row} /></div>)}
+      <CourseMediaNotLive rows={tagging.tags.data ?? []} memberId={user.id} courseId={courseId} />
       {tagResult && !tagPost && addHole == null && <div className="mx-5 mb-4"><HolePhotoOutcome row={tagResult} /></div>}
       {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} round={tagging.rounds.data?.[0]} pending={fastPending} result={tagResult} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); setTagResult(null); }} />}
       {firstPhoto && knownHoles && <CourseFirstPhotoPicker knownHoles={knownHoles} pending={fastPending} result={tagResult} error={fastError} onSubmit={tagLibrary} onClose={() => { setFirstPhoto(false); setTagResult(null); }} />}

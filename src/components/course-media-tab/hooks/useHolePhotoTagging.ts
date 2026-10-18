@@ -8,7 +8,8 @@ import { fetchHolePhotos, fetchOwnPhotoSources, fetchOwnPhotoUrls, coursePhotoRo
 export function useHolePhotoTagging(courseId: string, memberId: string | undefined, knownHoles: readonly number[] | null) {
   const cache = useQueryClient();
   const enabled = !!memberId && knownHoles != null && knownHoles.length > 0;
-  const tags = useQuery({ queryKey: ['hole-photo-tags', courseId, memberId], enabled,
+  // State D owner reads do not depend on analysis availability; writes still do.
+  const tags = useQuery({ queryKey: ['hole-photo-tags', courseId, memberId], enabled: !!memberId && !!courseId,
     queryFn: () => memberId ? fetchHolePhotos(courseId, memberId) : Promise.resolve([]) });
   const own = useQuery({ queryKey: ['own-course-photo-urls', courseId, memberId], enabled,
     queryFn: () => memberId ? fetchOwnPhotoUrls(courseId, memberId) : Promise.resolve([]) });
