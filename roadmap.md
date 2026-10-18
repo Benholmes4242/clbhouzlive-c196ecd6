@@ -1,5 +1,11 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_MEDIA_4 — MEDIA_EMPTY_1
+- [ ] Build State B and C from their separate supplied mocks; B actual analysis holes, constant catalogue snapshot and unchosen first-photo picker; C existing review entrypoint, no camera or guessed tiles. Preserve populated signed-off walk/fast paths.
+- [ ] State A BLOCKED: required media-brief4a-no-hole-list.html was not supplied; supplied media-brief3b-batch-2.html is the batch mock, not State A. Do not substitute.
+- [ ] State D BLOCKED: course_hole_media Row/Update (types.ts:3467–3533) has no soft-remove field; existing client supports inserts only, no owner non-deleting removal contract. No invented status/write contract or hard delete. Owner metadata display/retag/remove must match mock when contract supplied.
+- [ ] Add new rule tests only, full suite baseline 1,674/215; report all deltas and surviving errors. Preview/browser checks where possible; authenticated upload/privacy remains unavailable (external unmanaged). No prohibited changes.
+
 ## BRIEF_MEDIA_3_R — MEDIA_FAST_1_R
 - [x] Confirm clbhouz. Restore EXIF-only months and original “missing EXIF never substitutes upload month” assertion `toEqual([])` under AMB4; no date fallback for captions or chips. Preserve shot row counts and omit only the seasons clause without chips.
 - [x] AMB6 authorised rewrite of “closed always beats used, seventh remains green and selectable”: replace `four.style.borderStyle === 'dashed'`, colour inequality and improved-colour equality with `data-state` closed/used/open assertions; disabled/enabled assertions retained. No other existing tests rewritten, renamed or deleted.
