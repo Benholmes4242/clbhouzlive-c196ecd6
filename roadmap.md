@@ -1,7 +1,7 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
 ## REVIEWS_STATE_3
-- [ ] QA2 clarification: ACA3 excludes viewer from every figure; ACC2 and signed-off mock count all three in the spread (0.3). Excluded sample is two scores of 8.1, spread 0.0. Await Ben's population ruling before app/test edits.
+- [x] Ben resolved ACA3/ACC2: count/spread/ending average all exclude viewer. Zero spread starts “Two people agreeing…”; positive spread starts “They sit inside…”; one other person has no sentence. Mock's old line is superseded, everything else stands.
 - [ ] Implement only two-to-four-total state, shared two-excluding average threshold, State 2 community-half fallback, excluded min-to-max categories, shared person/context rows and known-people-first order; preserve States 1/2 and composer; no State 4/middle-80%/splits.
 - [ ] Add exact Sundridge, threshold/fallback and excluded-range rule tests; baseline 1,602 passing / 208 files; stop/report any unexpected failure without adjusting assertions.
 - [ ] Verify and report inventory, visual/source/auth limits; no SQL/migrations/RPC/feed_config/cap changes.
