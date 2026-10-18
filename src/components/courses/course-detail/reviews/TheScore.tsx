@@ -4,7 +4,9 @@
  *
  * COMMUNITY AND YOU, RULED. Left: the community score. Right (only when the
  * viewer has rated): the viewer's score in amber and its signed difference
- * from the community, in DELTA_TONE. Inside |delta| < 0.05 it reads "Level"
+ * from the community EXCLUDING the viewer (REVIEWS_SAMPLE_1), in DELTA_TONE.
+ * No other raters means no community figure or comparison, never a fake zero.
+ * Inside |delta| < 0.05 it reads "Level"
  * with a muted dash (same dead zone as HcpTrendChart). With no viewer rating
  * the right column and rule do not render and the left column does not move.
  *
@@ -25,7 +27,7 @@ import {
 } from '@/components/courses/review/RatingTierDistribution';
 
 interface TheScoreProps {
-  score: number;
+  score: number | null;
   ratingCount: number;
   /** The viewer's own overall rating, or null when they have not rated. */
   viewerScore?: number | null;
@@ -92,9 +94,9 @@ export const TheScore: React.FC<TheScoreProps> = ({ score, ratingCount, viewerSc
   return (
     <section style={{ padding: `0 ${GUTTER}px`, fontFamily: SANS }} aria-busy={loading || undefined}>
       <div style={{ display: 'flex', alignItems: 'stretch' }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
+        {(loading || score != null) && <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ ...EYEBROW, color: A.DIM }}>Community</div>
-          <div style={{ ...FIGURE, color: courseSubScoreTone(score) }}>{loading ? <Bar>0.0</Bar> : score.toFixed(1)}</div>
+          <div style={{ ...FIGURE, color: courseSubScoreTone(score) }}>{loading ? <Bar>0.0</Bar> : score?.toFixed(1)}</div>
           <div style={SUPPORT}>
             {loading ? <Bar>0 ratings · Excellent</Bar> : (
               <>
@@ -103,19 +105,19 @@ export const TheScore: React.FC<TheScoreProps> = ({ score, ratingCount, viewerSc
               </>
             )}
           </div>
-        </div>
+        </div>}
         {hasYou && (
           <>
-            <div aria-hidden style={{ width: 1, background: A.HAIRLINE, margin: '0 20px' }} />
+            {score != null && <div aria-hidden style={{ width: 1, background: A.HAIRLINE, margin: '0 20px' }} />}
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ ...EYEBROW, color: A.AMBER }}>You</div>
-              <div style={{ ...FIGURE, color: A.AMBER }}>{viewerScore!.toFixed(1)}</div>
-              <DeltaLine delta={Math.round((viewerScore! - score) * 10) / 10} />
+              <div style={{ ...FIGURE, color: A.AMBER }}>{viewerScore?.toFixed(1)}</div>
+              {score != null && viewerScore != null && <DeltaLine delta={Math.round((viewerScore - score) * 10) / 10} />}
             </div>
           </>
         )}
       </div>
-      {dist && (
+      {dist && (loading || ratingCount > 0) && (
         <div style={{ marginTop: 20 }}>
           <RatingTierDistribution distribution={dist} />
         </div>
