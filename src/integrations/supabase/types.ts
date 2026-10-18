@@ -18991,6 +18991,10 @@ export type Database = {
       }
       admin_route_for_path: { Args: { p_path: string }; Returns: string }
       admin_run_cron_job: { Args: { p_jobid: number }; Returns: Json }
+      admin_set_app_config: {
+        Args: { p_key: string; p_value: string }
+        Returns: Json
+      }
       admin_set_course_club: {
         Args: { p_club_id: string; p_course_id: string }
         Returns: undefined
