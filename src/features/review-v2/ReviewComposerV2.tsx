@@ -54,6 +54,8 @@ import { VoiceDictateButton } from './components/VoiceDictateButton';
 import { OverallScrubber } from './components/OverallScrubber';
 import { CategoryGrid, type CategoryCopy } from './components/CategoryGrid';
 import { MediaTray } from './components/MediaTray';
+import { ReviewHoleTags } from './components/ReviewHoleTags';
+import { useReviewHoleTags } from './hooks/useReviewHoleTags';
 import { ShareToggle } from './components/ShareToggle';
 import { SubmitBar } from './components/SubmitBar';
 import { ReviewReceipt, ordinal } from './components/ReviewReceipt';
@@ -441,6 +443,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
 
   const submit = useReviewSubmit();
+  const holeTags = useReviewHoleTags(course.id, userId, media.items);
 
   // ONE fetch of the member's own overall ratings (this course excluded, so an
   // edit never ranks the member against themselves). The ordinal below is
@@ -623,6 +626,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     overallTouchedAtSubmitRef.current = null;
     try {
       const mediaExpected = media.pendingMediaCount();
+      const holeJob = holeTags.capture();
 
       if (mediaExpected === 0) {
         // ---- NO NEW FILES: today's path, unchanged, and still instant. ----
@@ -634,6 +638,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         notifyComposerCompleted();
         composer.clearDraft();
 
+        media.writeUploadedHolePhotos(holeJob);
         const attached = await media.attachToReview(ratingId, {
           queryClient: qc,
           caption: composer.state.reviewText,
@@ -662,7 +667,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
         // NOT AWAITED, and NO cache sweep here: nothing the app reads has
         // changed yet; a refetch now would show the old review as current.
-        media.startBackgroundPublish(pendingId, { queryClient: qc });
+        media.writeUploadedHolePhotos(holeJob);
+        media.startBackgroundPublish(pendingId, { queryClient: qc, holeJob });
 
         onSuccess({
           ratingId: null,
@@ -706,7 +712,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
       toast.error(e instanceof Error ? e.message : "Couldn't save your review");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [submit, media, composer, course.id, course.name, qc, isEditMode, mode]);
+  }, [submit, media, composer, course.id, course.name, qc, isEditMode, mode, holeTags]);
 
   const handlePrimary = useCallback(() => {
     if (step === FIRST_STEP) {
@@ -1224,6 +1230,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
             />
           </section>
 
+          <ReviewHoleTags {...holeTags} />
           <section style={{ padding: '0 16px 16px' }}>
             <div
               style={{
