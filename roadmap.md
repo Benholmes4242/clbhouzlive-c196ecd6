@@ -2,12 +2,13 @@
 
 ## REVIEWS_STATE_1
 - [x] Match the signed-off zero-rating invitation only; shared state rule; catalogue figures derived from total/rated.
-- [ ] Add zero/one-rating and absence/derived-figure coverage; full suite, preview and visual checks; report pending figures/auth limits.
+- [x] Add zero/one-rating and absence/derived-figure coverage; full suite and preview pass in REVIEWS_STATE_1_T; figures confirmed.
+- [ ] Hosted visual/first-review acceptance: external/unmanaged authentication prevents signed-in verification; local handler test passes.
 
 ## REVIEWS_STATE_1_T
-- [ ] Wire Ben's confirmed 2026-10-18 snapshot (23,292 total, 115 rated; derive 23,177) and remove pending status.
-- [ ] Copy the complete canonical i18n mock into reviewsState1; audit all Reviews/Champions additions and report latent mocks without silently changing them.
-- [ ] Run full suite; report baseline 1,574 and resulting inventory (six State 1 tests), authorised assertion changes, preview status and limits.
+- [x] Wire Ben's confirmed 2026-10-18 snapshot (23,292 total, 115 rated; derive 23,177) and remove pending status.
+- [x] Copy the complete canonical i18n mock into reviewsState1; audit Reviews/Champions additions: reviewsState1, reviewsSample1, useCourseReviewSample, championsState1/2/3, championsNetSource, championsElsewhere, championsOrder and coursePlay. No other partial mocks found; State 3 adds Trans while retaining canonical init/t behavior. No other tests changed.
+- [x] Full suite: 1,574 passing / 205 files before State 1 collection fix -> 1,580 passing / 206 files, zero failures; existing six reviewsState1 cases now collect, no added/deleted/renamed cases. Only rewritten case: 'stores two catalogue figures and derives without-review from their difference': rated 0 -> 115, pending removed, numeric figures [23292, 0] -> [23292, 115], sentence 23,292 -> 23,177; add concrete derived assertion 23177, authorised by AAA1. All other assertions unchanged. Preview build OK at 2026-10-18T07:53:16Z. No components/setup/i18n/RPC/SQL/migrations/feed_config edits; cap 30. Crop architecture note moved verbatim to its existing browser-test header to fit the cross-area mock rule; no crop code changes.
 
 ## BRIEF_REVIEWS_1 — REVIEWS_SAMPLE_1
 - [x] Correct overall/four category means and distribution via shared fieldExcludingViewer and complete paginated non-mock rating sample; preserve You-tab implementation/signature and review screen structure. Viewer-only sample has no invented community zero or delta.
