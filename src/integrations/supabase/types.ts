@@ -24300,6 +24300,10 @@ export type Database = {
         }
         Returns: Json
       }
+      retag_hole_photo: {
+        Args: { p_hole_no: number; p_id: string }
+        Returns: undefined
+      }
       revoke_business_verification: {
         Args: {
           p_admin_id: string

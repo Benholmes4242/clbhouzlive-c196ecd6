@@ -22,7 +22,7 @@ import { HoleKnownPhotoPath, HolePhotoBatchPath } from './HolePhotoFastPaths';
 import { prepareHolePhoto, submitLibraryHolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { orderedBatch, type BatchPhoto } from '@/lib/courseMedia/holePhotoBatch';
 import { coursePhotoState } from '@/lib/courseMedia/emptyStates';
-import { CourseFirstPhotoPicker, CourseMediaNoPhotographs, CourseMediaNothing, CourseMediaNoHoleList, CourseMediaNotLive } from './CourseMediaEmptyStates';
+import { CourseFirstPhotoPicker, CoursePhotoRetagPicker, CourseMediaNoPhotographs, CourseMediaNothing, CourseMediaNoHoleList, CourseMediaNotLive } from './CourseMediaEmptyStates';
 
 interface CourseMediaTabNewProps {
   courseId: string;
@@ -43,6 +43,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const [addHole, setAddHole] = useState<number | null>(null);
   const [batch, setBatch] = useState<BatchPhoto[] | null>(null);
   const [firstPhoto, setFirstPhoto] = useState(false);
+  const [retagPhoto, setRetagPhoto] = useState<HolePhoto | null>(null);
   const [fastPending, setFastPending] = useState(false);
   const [fastError, setFastError] = useState<string | null>(null);
   const cache = useQueryClient();
@@ -175,7 +176,8 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         courseId={courseId}
         tagging={tagging.ready && user && knownHoles ? { memberId: user.id, holeCount: knownHoles.length, taggedUrls: tagging.taggedUrls, onTag: startTag } : undefined}
       />}
-      <CourseMediaNotLive rows={tagging.tags.data ?? []} memberId={user.id} courseId={courseId} />
+      <CourseMediaNotLive rows={tagging.tags.data ?? []} memberId={user.id} courseId={courseId} onRetag={knownHoles && knownHoles.length > 0 ? row => { tagging.retag.reset(); setRetagPhoto(row); } : undefined} />
+      {retagPhoto && knownHoles && <CoursePhotoRetagPicker key={retagPhoto.id} row={retagPhoto} knownHoles={knownHoles} pending={tagging.retag.isPending} error={tagging.retag.error ? 'The photograph could not be retagged. Please try again.' : null} onClose={() => setRetagPhoto(null)} onSubmit={hole => tagging.retag.mutate({ row: retagPhoto, hole }, { onSuccess: () => setRetagPhoto(null) })} />}
       {tagResult && !tagPost && addHole == null && <div className="mx-5 mb-4"><HolePhotoOutcome row={tagResult} /></div>}
       {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} round={tagging.rounds.data?.[0]} pending={fastPending} result={tagResult} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); setTagResult(null); }} />}
       {firstPhoto && knownHoles && <CourseFirstPhotoPicker knownHoles={knownHoles} pending={fastPending} result={tagResult} error={fastError} onSubmit={tagLibrary} onClose={() => { setFirstPhoto(false); setTagResult(null); }} />}

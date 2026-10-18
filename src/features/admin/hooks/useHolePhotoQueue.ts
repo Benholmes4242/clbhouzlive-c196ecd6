@@ -6,6 +6,7 @@
  * chm_admin_update already permits status changes for is_admin().
  */
 import { supabase } from '@/integrations/supabase/client';
+import { memberReasonSentence } from '@/lib/courseMedia/memberReasonSentence';
 
 export type HolePhotoStatus = 'pending' | 'approved' | 'rejected';
 
@@ -28,24 +29,6 @@ export const holePhotoReasonLabel = (code: string | null): string => {
     case 'replaced': return 'Replaced by another photo';
     case 'other': return 'Other';
     default: return 'No reason recorded';
-  }
-};
-
-/** Plain-language line sent to the contributor. Never the raw code. */
-const memberReasonSentence = (code: string | null, note: string | null): string => {
-  switch (code) {
-    case 'not_a_golf_hole':
-      return 'The photo did not show a golf hole.';
-    case 'wrong_hole':
-      return 'The photo did not appear to be the hole it was submitted for.';
-    case 'poor_quality':
-      return 'The photo was not clear enough to use.';
-    case 'not_your_photo':
-      return 'We could not confirm the photo was taken by you.';
-    case 'replaced':
-      return 'Another photo is now live on this hole.';
-    default:
-      return note?.trim() || 'The photo was not a fit for this hole.';
   }
 };
 
@@ -263,7 +246,7 @@ export async function rejectHolePhoto(
   await notifyContributor(
     row.user_id,
     reason === 'replaced' ? 'Your hole photo was replaced' : 'Your hole photo was not used',
-    `${memberReasonSentence(reason, note ?? null)} (${where})`,
+    `${memberReasonSentence(reason)} (${where})`,
     row,
   );
 }
