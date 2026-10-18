@@ -1,6 +1,6 @@
 /** MEDIA_WALK_1_R: public walk derives only from approved rows and analysis holes.
  * - Hole-walk public counts share `courseMedia/holeWalk.ts`: no pending.
- * MEDIA_FAST_1 display months use EXIF with created_at fallback. The separate
+ * MEDIA_FAST_1_R display months use EXIF only, never upload dates. The separate
  * publication verdict remains EXIF-day-only; no alias inference.
  */
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
@@ -30,7 +30,7 @@ export function deriveHoleWalk(holes: readonly CourseHole[], rows: readonly Hole
 }
 
 export function captureMonth(row: HolePhoto): string | null {
-  const value = row.exif_captured_at ?? row.created_at;
+  const value = row.exif_captured_at;
   if (!value || !/^\d{4}-(0[1-9]|1[0-2])-\d{2}/.test(value)) return null;
   return value.slice(0, 7);
 }
