@@ -2,6 +2,8 @@
  * source photo. Analysis hook owns the hole list; this module has no resolver.
  * All complete-list reads paginate explicitly. Backend policies remain the
  * authority for publishing and owner-only pending visibility.
+ * MEDIA_TAGFIX_1: URL-only sources have no original File and no EXIF. Never
+ * download media to manufacture a File; only library uploads parse originals.
  */
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
@@ -77,13 +79,8 @@ export async function coursePhotoRounds(courseId: string, memberId: string): Pro
   return scores.map(row => ({ id: row.id, playDate: row.play_date, userId: memberId, golfCourseId: courseId, grossScore: gross.get(row.id) ?? null }));
 }
 
-export async function prepareHolePhoto(url: string) {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('The photograph could not be read. Please try again.');
-  const blob = await response.blob();
-  const name = new URL(url, window.location.origin).pathname.split('/').pop() || 'photograph';
-  const file = new File([blob], name, { type: blob.type });
-  return { file, exif: await readHolePhotoExif(file) };
+export async function prepareHolePhoto(_url: string) {
+  return { exif: { capturedAt: null, captureDay: null, latitude: null, longitude: null } };
 }
 
 /** Chosen local File is uploaded by the existing authenticated media uploader;
@@ -128,13 +125,9 @@ export async function submitHolePhoto(post: FeedPost, courseId: string, memberId
   const [sourceUrls, existing] = await Promise.all([fetchOwnPhotoUrls(courseId, memberId), fetchHolePhotos(courseId, memberId)]);
   if (!sourceUrls.includes(media.imageUrl)) throw new Error('This photograph is not yours at this course.');
   if (existing.some(row => row.media_url === media.imageUrl && row.user_id === memberId)) throw new Error('This photograph is already tagged.');
-  const response = await fetch(media.imageUrl);
-  if (!response.ok) throw new Error('The photograph could not be read. Please try again.');
-  const blob = await response.blob();
   const name = new URL(media.imageUrl).pathname.split('/').pop() || 'photograph';
-  const exif = await readHolePhotoExif(new File([blob], name, { type: blob.type }));
-  const rounds = exif.captureDay ? await matchedPhotoRounds(courseId, memberId, exif.captureDay) : [];
-  const verdict = holePhotoVerdict(exif, memberId, courseId, rounds);
+  const { exif } = await prepareHolePhoto(media.imageUrl);
+  const verdict = holePhotoVerdict(exif, memberId, courseId, []);
   const { data, error } = await supabase.from('course_hole_media').insert({
     course_id: courseId, user_id: memberId, hole_no: hole, media_url: media.imageUrl,
     file_name: name, width: media.width || null, height: media.height || null, ...verdict,

@@ -1,5 +1,6 @@
 /** MEDIA_FAST_1 keeps the hole-known and batch surfaces separate. Parents own
- * real course rounds, complete sources, EXIF preparation and authoritative writes.
+ * real course rounds, complete sources and authoritative writes. URL-only sources
+ * carry empty EXIF without downloading media (MEDIA_TAGFIX_1).
  * The known-hole path never renders HolePhotoPicker. Skip has no write callback.
  */
 import { useRef, useState, type CSSProperties } from 'react';
@@ -56,7 +57,7 @@ export function HolePhotoBatchPath({ photos, rounds, memberId, courseId, knownHo
       const next = advanceBatch(state, photo.url, selected);
       setState(next); setSelected(null);
       if (next.index >= photos.length) onClose();
-    } catch { setError('The photograph could not be tagged. Please try again.'); }
+    } catch { setError('The photograph could not be tagged. The tag was not saved.'); }
     finally { setPending(false); }
   };
   const skip = () => { if (!photo) return; const next = advanceBatch(state, photo.url, null); setState(next); setSelected(null); setError(null); if (next.index >= photos.length) onClose(); };
