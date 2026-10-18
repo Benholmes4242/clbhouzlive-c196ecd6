@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_MEDIA_4_R2 — MEDIA_RETAG_1
+- [ ] Add owner rejected-photo Retag via Ben's deployed retag_hole_photo RPC only; refetch rows to show Waiting. No direct member UPDATE/delete, Remove, SQL or deployment changes.
+- [ ] Move the contributor reason helper to shared ownership and remove its internal-note fallback; only the rejection notification consumes note. State D map replacement is STOPPED pending explicit existing-test rewrite authorisation: mediaEmptyStatesR.test.tsx asserts the withdrawn fallback and free-text mapping.
+- [ ] Verify suite counts, Retag picker/action and preview; hosted authenticated persistence/privacy unavailable on external unmanaged Supabase.
+
 ## BRIEF_MEDIA_4_R — MEDIA_EMPTY_1_R
 - [x] ANB2 app wrapper calls onAddFirst() with no click event. Existing mediaEmptyStates.test.tsx unchanged, including `expect(choose).toHaveBeenCalledWith()`; all eleven cases pass.
 - [x] A four-item mosaic/See all/closing sentence supplied and implemented; no walk, filters/chips or Tag controls. Canonical FeedCard viewer taps/expanded pagination retained; hero/tabs and populated walk/fast paths untouched. B/C preserved. D read-only owner pending/rejected list counts exact member/course rows, fixed reason fallback, real review date, no internal identity/notes or upload-date fallback. Owner tag reads independent of available analysis; write controls still require holes.
