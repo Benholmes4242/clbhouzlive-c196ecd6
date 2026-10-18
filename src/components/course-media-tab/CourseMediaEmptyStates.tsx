@@ -29,11 +29,11 @@ export function CourseMediaNoHoleList({ courseName, photoCount, children }: {
   </section>;
 }
 
-/** State D read-only scope: no Remove and no unsupported Retag affordance.
- * The member UPDATE/RLS contract is absent; no alternative insert or delete.
+/** State D Retag uses the deployed owner RPC, never a direct table update.
+ * Unavailable hole analysis omits the picker/action; Remove stays absent.
  */
-export function CourseMediaNotLive({ rows, memberId, courseId }: {
-  rows: readonly HolePhoto[]; memberId: string; courseId: string;
+export function CourseMediaNotLive({ rows, memberId, courseId, onRetag }: {
+  rows: readonly HolePhoto[]; memberId: string; courseId: string; onRetag?: (row: HolePhoto) => void;
 }) {
   const own = privateHolePhotos(rows, memberId, courseId);
   if (!own.length) return null;
@@ -53,7 +53,24 @@ export function CourseMediaNotLive({ rows, memberId, courseId }: {
     })}</div>
     <div className="media-empty-thumbnails">{own.map(row => <div key={row.id} className="media-empty-thumbnail"><img src={row.media_url} alt={`Your ${row.status === 'rejected' ? 'rejected' : 'waiting'} photograph of hole ${row.hole_no}`} /><span>{row.hole_no}</span></div>)}</div>
     {own.some(row => row.status === 'rejected') && <p className="media-empty-said">A rejected photograph stays yours and stays private.</p>}
+    {onRetag && own.filter(row => row.status === 'rejected').map(row => <Button key={row.id} variant="ghost" className="media-empty-action media-empty-retag-action" onClick={() => onRetag(row)}>Retag the {row.hole_no}{ordinalSuffix(row.hole_no)}</Button>)}
   </section>;
+}
+
+export function CoursePhotoRetagPicker({ row, knownHoles, pending, error, onSubmit, onClose }: {
+  row: HolePhoto; knownHoles: readonly number[]; pending: boolean; error: string | null;
+  onSubmit: (hole: number) => void; onClose: () => void;
+}) {
+  const [hole, setHole] = useState<number | null>(null);
+  return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent className="media-empty" style={{ ...theme, background: A.PANEL }} onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
+    <DialogTitle>Retag the {row.hole_no}{ordinalSuffix(row.hole_no)}</DialogTitle>
+    <DialogDescription className="media-empty-lede">Retag it to a different hole and it goes back through review — nobody else sees it either way.</DialogDescription>
+    <img src={row.media_url} alt="Your rejected photograph" className="media-empty-retag-photo" />
+    <HolePhotoPicker holeCount={knownHoles.length} knownHoleNumbers={knownHoles} selectedHole={hole} onSelect={value => { if (!pending) setHole(value); }} />
+    {error && <p role="alert" className="media-empty-lede">{error}</p>}
+    <Button variant="ghost" className="media-empty-action" disabled={pending || hole == null || hole === row.hole_no} onClick={() => { if (hole != null) onSubmit(hole); }}>{pending ? <><Loader2 className="animate-spin" />Retagging</> : 'Retag'}</Button>
+    <Button variant="ghost" disabled={pending} onClick={onClose}>Cancel</Button>
+  </DialogContent></Dialog>;
 }
 
 function ordinalSuffix(n: number) {

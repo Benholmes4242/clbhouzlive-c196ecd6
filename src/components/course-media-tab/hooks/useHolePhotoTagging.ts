@@ -4,6 +4,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { fetchHolePhotos, fetchOwnPhotoSources, fetchOwnPhotoUrls, coursePhotoRounds, submitHolePhoto } from '@/lib/courseMedia/holePhotoData';
+import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
+import { retagHolePhoto } from '@/lib/courseMedia/retagHolePhoto';
 
 export function useHolePhotoTagging(courseId: string, memberId: string | undefined, knownHoles: readonly number[] | null) {
   const cache = useQueryClient();
@@ -27,5 +29,14 @@ export function useHolePhotoTagging(courseId: string, memberId: string | undefin
     },
   });
   const taggedUrls = new Set((tags.data ?? []).filter(row => row.user_id === memberId).map(row => row.media_url));
-  return { tags, own, sources, rounds, taggedUrls, submit, ready: enabled && tags.isSuccess && own.isSuccess };
+  const retag = useMutation({
+    mutationFn: ({ row, hole }: { row: HolePhoto; hole: number }) => {
+      if (!memberId || !knownHoles) throw new Error('This photograph cannot be retagged.');
+      return retagHolePhoto(row, hole, courseId, memberId, knownHoles);
+    },
+    onSuccess: async () => {
+      await cache.invalidateQueries({ queryKey: ['hole-photo-tags', courseId, memberId] });
+    },
+  });
+  return { tags, own, sources, rounds, taggedUrls, submit, retag, ready: enabled && tags.isSuccess && own.isSuccess };
 }
