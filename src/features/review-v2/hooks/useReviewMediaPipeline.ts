@@ -26,6 +26,7 @@ import { reviewRetryRegistry } from '@/uploads/reviewRetryRegistry';
 import { startReviewUpload, uploadAndPublishReview } from '../lib/reviewUploadController';
 import { REVIEW_V2_LIMITS } from '../tokens';
 import type { ExistingMedia, MediaItem } from '../types';
+import { writeComposerHolePhoto, type ComposerHoleJob } from '@/lib/courseMedia/composerHolePhotos';
 
 /*
  * R1 §1.4a — there is no bucket constant here any more. The client used to
@@ -763,7 +764,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
 
   /** Fire-and-forget: the controller uploads then publishes, surviving unmount. */
   const startBackgroundPublish = useCallback(
-    (pendingId: string, opts?: { queryClient?: QueryClient }) => {
+    (pendingId: string, opts?: { queryClient?: QueryClient; holeJob?: ComposerHoleJob }) => {
       const pending = itemsRef.current.filter(
         (i) => (i.status === 'pending' || i.status === 'failed') && !!i.file,
       );
@@ -789,12 +790,22 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
           durationSeconds: i.durationSeconds ?? null,
         })),
         () => { if (qc) invalidateCourseRatingCaches(qc); },
+        opts?.holeJob,
       );
     },
     [userId, updateItem],
   );
 
   const hasNewMedia = useCallback(() => items.some((i) => !i.isExisting), [items]);
+
+  // Called only after a successful review submit. Uploaded/existing media
+  // need no attach row; pending files are enriched by the background job.
+  const writeUploadedHolePhotos = useCallback((holeJob?: ComposerHoleJob) => {
+    if (!userId || !holeJob) return;
+    for (const item of itemsRef.current) {
+      if (item.type === 'image' && item.uploadedUrl) void writeComposerHolePhoto(holeJob, userId, item, item.uploadedUrl);
+    }
+  }, [userId]);
 
   return {
     items,
@@ -810,6 +821,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
     hasNewMedia,
     pendingMediaCount,
     startBackgroundPublish,
+    writeUploadedHolePhotos,
     uploadKey: uploadKeyRef.current,
   };
 }

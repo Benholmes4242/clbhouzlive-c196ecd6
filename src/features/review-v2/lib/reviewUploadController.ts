@@ -39,6 +39,7 @@ import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
 import { toast } from '@/lib/toast';
 import i18n from '@/i18n';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { writeComposerHolePhoto, type ComposerHoleJob } from '@/lib/courseMedia/composerHolePhotos';
 
 export interface ReviewUploadInput {
   /** Client item id — echoed back on the result so the caller can match. */
@@ -136,6 +137,7 @@ async function runJob(
   job: Job,
   userId: string,
   items: ReviewUploadInput[],
+  holeJob?: ComposerHoleJob,
 ): Promise<ReviewUploadResult[]> {
   const results: ReviewUploadResult[] = [];
 
@@ -154,6 +156,9 @@ async function runJob(
       results.push(res);
       job.snapshot.completed += 1;
       setProgress(100);
+      // COMPOSER_HOLES_1_R2: independent per-item enrichment. Not awaited by
+      // the upload/review path; original File and detached choices outlive UI.
+      if (res.uploadedUrl) void writeComposerHolePhoto(holeJob, userId, item, res.uploadedUrl);
     } catch (e) {
       results.push({
         id: item.id,
@@ -177,9 +182,20 @@ export function startReviewUpload(
   key: string,
   userId: string,
   items: ReviewUploadInput[],
+  holeJob?: ComposerHoleJob,
 ): Promise<ReviewUploadResult[]> {
   const existing = jobs.get(key);
-  if (existing && existing.snapshot.running) return existing.promise;
+  if (existing && existing.snapshot.running) {
+    // A foreground tile retry may already own the bytes. Capture optional
+    // submit choices on join too, without restarting uploads or waiting on tags.
+    if (holeJob) void existing.promise.then(results => {
+      for (const result of results) {
+        const item = items.find(input => input.id === result.id);
+        if (item && result.ok && result.uploadedUrl) void writeComposerHolePhoto(holeJob, userId, item, result.uploadedUrl);
+      }
+    });
+    return existing.promise;
+  }
 
   const job: Job = {
     snapshot: {
@@ -195,7 +211,7 @@ export function startReviewUpload(
   };
   jobs.set(key, job);
 
-  job.promise = runJob(job, userId, items).then((results) => {
+  job.promise = runJob(job, userId, items, holeJob).then((results) => {
     job.snapshot.running = false;
     emit(job);
     // Retain briefly so a composer that remounts late still reads the outcome.
@@ -339,13 +355,14 @@ export async function uploadAndPublishReview(
   pendingId: string,
   items: ReviewUploadInput[],
   onPublished?: () => void,
+  holeJob?: ComposerHoleJob,
 ): Promise<PublishOutcome> {
   const byId = new Map(items.map((i) => [i.id, i]));
   setPublishState(key, {
     phase: 'uploading', uploaded: 0, total: items.length, percent: 0,
   });
   let results: ReviewUploadResult[];
-  const promise = startReviewUpload(key, userId, items); // registers the job
+  const promise = startReviewUpload(key, userId, items, holeJob); // registers the job
   const unsub = subscribeToReviewUpload(key, (s) => {
     const vals = Object.values(s.progress);
     const pct = s.total > 0
