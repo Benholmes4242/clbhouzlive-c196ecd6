@@ -33,6 +33,9 @@ import { AMBER } from '@/features/courses/_shared/tokens';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 import { HolePhotoTagButton } from './HolePhotoTagButton';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { spellPhotoCount } from '@/lib/courseMedia/holePhotoData';
 
 const FONT_FAMILY =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -48,6 +51,8 @@ interface CourseMediaCanonGridProps {
   refetch: () => void;
   courseName?: string;
   courseId?: string;
+  /** State A alone previews four square tiles, retaining canonical viewer taps. */
+  noHolePreviewCount?: number;
   tagging?: { memberId: string; holeCount: number; taggedUrls: ReadonlySet<string>; onTag: (post: FeedPost) => void };
 }
 
@@ -111,10 +116,12 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
   courseName,
   courseId,
   tagging,
+  noHolePreviewCount,
 }, ref) => {
   const { t } = useTranslation(['courses', 'common']);
   const navigate = useNavigate();
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const [showAll, setShowAll] = useState(false);
 
   const { activeIndices, railRef: autoplayRef } = useWatchAutoplay({
     railId: 'course-media',
@@ -131,7 +138,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
   // consumers use.
   useEffect(() => {
     const sentinel = sentinelRef.current;
-    if (!sentinel || !hasNextPage) return;
+    if (!sentinel || !hasNextPage || (noHolePreviewCount != null && !showAll)) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
@@ -142,7 +149,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, noHolePreviewCount, showAll]);
 
   // Mirror pagination + append grouped posts into the fullscreen store when
   // this surface owns it (preserves infinite scroll inside the viewer).
@@ -238,6 +245,15 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
         </button>
       </div>
     );
+  }
+
+  if (noHolePreviewCount != null && !showAll) {
+    return <div ref={setGridRef}>
+      <div className="media-empty-mosaic">{cardRows.slice(0, 4).map((item, i) => <div key={posts[i]?.mediaItems[0]?.id ?? `${item.post_id}-${i}`} className="media-empty-mosaic-tile">
+        <FeedCard row={item} feedPost={posts[i]} posts={posts} flatIndex={i} isAutoplayActive={activeIndices.has(i)} openedFrom="course-media" hideCourseAttribution hideFormatBadge bareTile readOnlyFullscreen hideLikeCount />
+      </div>)}</div>
+      <Button variant="ghost" className="media-empty-see-all" onClick={() => { setShowAll(true); if (hasNextPage && !isFetchingNextPage) fetchNextPage(); }}>See all {spellPhotoCount(noHolePreviewCount)}</Button>
+    </div>;
   }
 
   const packed = packColumns(cardRows, (r) => {

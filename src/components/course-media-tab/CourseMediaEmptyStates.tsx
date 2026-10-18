@@ -3,19 +3,63 @@
  * known-hole path; C can only navigate to the existing review composer.
  * A owns its photograph mosaic and closing invitation, with no tagging controls.
  */
-import { useRef, useState, type CSSProperties } from 'react';
-import { Loader2 } from 'lucide-react';
+import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { Loader2, MoreVertical, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { MEDIA_CATALOGUE_TOTAL, MEDIA_EMPTY_SNAPSHOT } from '@/lib/courseMedia/emptyStates';
+import { MEDIA_CATALOGUE_TOTAL, MEDIA_EMPTY_SNAPSHOT, privateHolePhotos, rejectedPhotoReason, photoDayLabel } from '@/lib/courseMedia/emptyStates';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
-import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
+import { capitalPhotoCount, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { HolePhotoPicker } from './HolePhotoPicker';
 import { HolePhotoOutcome } from './HolePhotoTagDialog';
 import './media-empty.css';
 
 const theme = { '--media-empty-ink': A.INK, '--media-empty-muted': A.MUTE, '--media-empty-body': A.BODY, '--media-empty-rule': A.SOFT, '--media-empty-dim': A.DIM, '--media-empty-faint': A.FAINT, '--media-empty-canvas': A.CANVAS } as CSSProperties;
+
+export function CourseMediaNoHoleList({ courseName, photoCount, children }: {
+  courseName?: string; photoCount: number; children: ReactNode;
+}) {
+  return <section className="media-empty media-empty-section" style={theme}>
+    <p className="media-empty-kicker">From the members</p>
+    <h2 className="media-empty-title">{capitalPhotoCount(photoCount)} {photoCount === 1 ? 'photograph' : 'photographs'}</h2>
+    <p className="media-empty-lede">Posted with reviews of this course.</p>
+    {children}
+    <p className="media-empty-said">Nobody has posted a round at {courseName || 'this course'}, so clbhouz does not yet know which holes it has. <strong>The first tracked round here opens the hole walk</strong> and these photographs become taggable.</p>
+  </section>;
+}
+
+/** State D read-only scope: no Remove and no unsupported Retag affordance.
+ * The member UPDATE/RLS contract is absent; no alternative insert or delete.
+ */
+export function CourseMediaNotLive({ rows, memberId, courseId }: {
+  rows: readonly HolePhoto[]; memberId: string; courseId: string;
+}) {
+  const own = privateHolePhotos(rows, memberId, courseId);
+  if (!own.length) return null;
+  return <section className="media-empty media-empty-section" style={theme}>
+    <p className="media-empty-kicker">Only you can see this</p>
+    <h2 className="media-empty-title">{capitalPhotoCount(own.length)} of yours {own.length === 1 ? 'is' : 'are'} not live</h2>
+    {rows.some(row => row.user_id === memberId && row.course_id === courseId && row.status === 'approved') && <p className="media-empty-lede">Everything else you have tagged here is published.</p>}
+    <div className="media-empty-status-list">{own.map(row => {
+      const rejected = row.status === 'rejected';
+      const reviewed = photoDayLabel(row.reviewed_at);
+      return <div key={row.id} role="status" className="media-empty-status" data-status={row.status}>
+        {rejected ? <X className="h-4 w-4 shrink-0" /> : <MoreVertical className="h-4 w-4 shrink-0" />}
+        <p><strong>{rejected ? 'Not published' : 'Waiting'} · The {row.hole_no}{ordinalSuffix(row.hole_no)}.</strong>{' '}
+          {rejected ? <>{reviewed && <>Reviewed on {reviewed}. </>}<strong>{rejectedPhotoReason(row.reject_reason)}</strong></> : <>The scorecard cannot vouch for this date, so a person will look. <strong>You can see it; nobody else can yet.</strong></>}
+        </p>
+      </div>;
+    })}</div>
+    <div className="media-empty-thumbnails">{own.map(row => <div key={row.id} className="media-empty-thumbnail"><img src={row.media_url} alt={`Your ${row.status === 'rejected' ? 'rejected' : 'waiting'} photograph of hole ${row.hole_no}`} /><span>{row.hole_no}</span></div>)}</div>
+    {own.some(row => row.status === 'rejected') && <p className="media-empty-said">A rejected photograph stays yours and stays private.</p>}
+  </section>;
+}
+
+function ordinalSuffix(n: number) {
+  if (n % 100 >= 11 && n % 100 <= 13) return 'th';
+  return n % 10 === 1 ? 'st' : n % 10 === 2 ? 'nd' : n % 10 === 3 ? 'rd' : 'th';
+}
 
 export function CourseMediaNoPhotographs({ courseName, holes, onHole, onAddFirst }: {
   courseName?: string; holes: readonly CourseHole[]; onHole: (hole: number) => void; onAddFirst: () => void;

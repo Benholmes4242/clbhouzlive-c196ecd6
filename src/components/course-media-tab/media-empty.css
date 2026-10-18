@@ -11,3 +11,15 @@
 .media-empty-hole { position: relative; aspect-ratio: 4/3; height: auto; min-width: 0; padding: 0; border-radius: 9px; border: 1px dashed var(--media-empty-faint); background: transparent; }
 .media-empty-hole-number { position: absolute; left: 6px; top: 5px; font-size: 15px; font-weight: 700; color: var(--media-empty-dim); font-variant-numeric: tabular-nums; }
 .media-empty-hole-open { position: absolute; right: 6px; bottom: 5px; font-size: 9.5px; font-weight: 700; color: var(--media-empty-faint); text-transform: uppercase; letter-spacing: .06em; }
+.media-empty-status-list { display: grid; gap: 12px; margin-top: 16px; }
+.media-empty-status { display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--media-empty-faint); border-radius: 8px; color: var(--media-empty-muted); }
+.media-empty-status p { font-size: 11.5px; line-height: 1.45; }
+.media-empty-status strong { color: var(--media-empty-ink); }
+.media-empty-thumbnails { display: grid; grid-template-columns: repeat(auto-fill,minmax(96px,1fr)); gap: 8px; margin-top: 16px; }
+.media-empty-thumbnail { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: 8px; }
+.media-empty-thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+.media-empty-thumbnail span { position: absolute; top: 4px; left: 4px; padding: 2px 6px; background: var(--media-empty-canvas); color: var(--media-empty-ink); border-radius: 4px; font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.media-empty-mosaic { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5px; margin-top: 12px; }
+.media-empty-mosaic .media-empty-mosaic-tile { aspect-ratio: 1; overflow: hidden; border-radius: 8px; }
+.media-empty-mosaic .media-empty-mosaic-tile > * { height: 100%; }
+.media-empty-see-all { margin-top: 12px; padding: 0; height: auto; min-height: 32px; font-size: 12.5px; font-weight: 700; color: var(--media-empty-ink); }
