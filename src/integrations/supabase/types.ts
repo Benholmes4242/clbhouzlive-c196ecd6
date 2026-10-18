@@ -18999,10 +18999,15 @@ export type Database = {
         Args: { p_active: boolean; p_jobid: number }
         Returns: Json
       }
+      admin_set_staff_account: {
+        Args: { p_staff: boolean; p_user_id: string }
+        Returns: Json
+      }
       admin_set_test_user_photo: {
         Args: { p_photo_url: string }
         Returns: undefined
       }
+      admin_settings_is_full: { Args: never; Returns: boolean }
       admin_story_checks: {
         Args: {
           p_body: Json
@@ -19849,6 +19854,7 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["admin_role"]
       }
+      get_admin_settings: { Args: never; Returns: Json }
       get_admin_story_insight: {
         Args: { p_id: string; p_kind: string }
         Returns: Json
