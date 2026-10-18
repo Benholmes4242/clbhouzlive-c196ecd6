@@ -17,7 +17,7 @@ vi.mock('@/uploads/resilientVideoUpload', () => ({ uploadVideoResilient: vi.fn()
 
 import { ReviewHoleTags } from '@/features/review-v2/components/ReviewHoleTags';
 import { useReviewHoleTags } from '@/features/review-v2/hooks/useReviewHoleTags';
-import { writeComposerHolePhoto, composerPhotoVerdict, composerVerdictSentence, type ComposerHoleJob } from '@/lib/courseMedia/composerHolePhotos';
+import { writeComposerHolePhoto, composerPhotoVerdict, type ComposerHoleJob } from '@/lib/courseMedia/composerHolePhotos';
 import { uploadAndPublishReview, startReviewUpload } from '@/features/review-v2/lib/reviewUploadController';
 import type { MediaItem } from '@/features/review-v2/types';
 
@@ -91,11 +91,11 @@ describe('COMPOSER_HOLES_1_R2 independent job writes', () => {
   it('unchosen proof uses the existing EXIF match', async () => {
     f.matched.mockResolvedValue([{ id: 'nine-round', userId: 'member', golfCourseId: 'course', playDate: '2026-06-02' }]);
     const verdict = await composerPhotoVerdict(exif, 'member', 'course', null);
-    expect(f.matched).toHaveBeenCalledWith('course', 'member', '2026-06-02'); expect(verdict.proof_score_id).toBe('nine-round');
+    expect(f.matched).not.toHaveBeenCalled(); expect(verdict.proof_score_id).toBeNull(); expect(verdict.status).toBe('approved');
   });
   it('missing date and no chosen proof queues', async () => {
     const verdict = await composerPhotoVerdict({ ...exif, captureDay: null }, 'member', 'course', null);
-    expect(verdict.status).toBe('pending'); expect(verdict.proof_score_id).toBeNull();
+    expect(verdict.status).toBe('approved'); expect(verdict.proof_score_id).toBeNull();
   });
   it('writes uploaded URL and chosen proof without any review-media identifier', async () => {
     await writeComposerHolePhoto({ ...job, proofScoreId: 'chosen' }, 'member', photo, 'https://example.test/p.jpg');

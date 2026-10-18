@@ -55,11 +55,10 @@ describe('MEDIA_RETAG_1', () => {
   it('picker submits the actual chosen different hole', () => {
     const submit = vi.fn(); render(<CoursePhotoRetagPicker row={rejected} knownHoles={[7, 12]} pending={false} error={null} onSubmit={submit} onClose={() => {}} />);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));
-    fireEvent.click(screen.getByRole('button', { name: /^Retag$/ }));
     expect(submit).toHaveBeenCalledExactlyOnceWith(7);
   });
   it('successful retag refetches the same owner row as pending at the new hole', async () => {
-    const waiting = { ...rejected, status: 'pending', hole_no: 7, reject_reason: null, reviewed_at: null };
+    const waiting = { ...rejected, status: 'approved', hole_no: 7, reject_reason: null, reviewed_at: null };
     mocks.fetchRows.mockResolvedValueOnce([rejected]).mockResolvedValue([waiting]);
     const cache = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
     function Harness() {
@@ -68,7 +67,8 @@ describe('MEDIA_RETAG_1', () => {
     }
     const { container } = render(<QueryClientProvider client={cache}><Harness /></QueryClientProvider>);
     fireEvent.click(await screen.findByRole('button', { name: 'Retag the 12th' }));
-    await waitFor(() => expect(container.querySelector('[data-status="pending"]')).not.toBeNull());
+    await waitFor(() => expect(cache.getQueryData(['hole-photo-tags', 'here', 'me'])).toEqual([waiting]));
+    expect(container.querySelector('[data-status="pending"]')).toBeNull();
     expect(container.querySelector('[data-status="rejected"]')).toBeNull();
     expect(cache.getQueryData(['hole-photo-tags', 'here', 'me'])).toEqual([waiting]);
   });

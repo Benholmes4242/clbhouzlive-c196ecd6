@@ -59,7 +59,7 @@ describe('MEDIA_WALK_1_R', () => {
   });
   it('existing picker preselects and submits selected hole', () => {
     const submitted: number[] = [];
-    render(<HolePhotoTagDialog imageUrl="/photo.jpg" initialHole={3} holeCount={2} knownHoleNumbers={[1, 3]} usedHoles={[]} pending={false} result={null} error={null} onClose={() => {}} onSubmit={n => submitted.push(n)} />);
-    expect(screen.getByRole('button', { name: 'Hole 3' })).toHaveAttribute('aria-pressed', 'true'); fireEvent.click(screen.getByRole('button', { name: 'Tag' })); expect(submitted).toEqual([3]);
+    render(<HolePhotoTagDialog imageUrl="/photo.jpg" initialHole={3} holeCount={2} knownHoleNumbers={[1, 3]} usedHoles={[]} pending={false} error={null} onClose={() => {}} onSubmit={n => submitted.push(n)} />);
+    expect(screen.getByRole('button', { name: 'Hole 3' })).toHaveAttribute('aria-pressed', 'true'); fireEvent.click(screen.getByRole('button', { name: 'Hole 3' })); expect(submitted).toEqual([3]);
   });
 });
