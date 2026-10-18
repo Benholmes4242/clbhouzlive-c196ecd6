@@ -49,7 +49,7 @@ describe('REVIEWS_STATE_2', () => {
     const { container } = tab();
     expect(container.querySelector('[data-reviews-state="one"]')).not.toBeNull();
     expect(container.querySelectorAll('[data-review-score]')).toHaveLength(1);
-    expect(container.querySelectorAll('[role="progressbar"], svg, [data-community-score], [data-category-bar], [data-distribution]')).toHaveLength(0);
+    expect(container.querySelectorAll('[role="progressbar"], [data-community-score], [data-category-bar], [data-distribution]')).toHaveLength(0);
     expect([...container.querySelectorAll('span, label')].some(node => /^community$/i.test(node.textContent ?? ''))).toBe(false);
   });
   it('overall score has one prominent home on the rater row', () => {

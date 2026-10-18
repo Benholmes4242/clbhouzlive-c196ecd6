@@ -405,6 +405,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const distribution = community.distribution;
   const headerResolved = reviewsResolved && sampleResolved;
   const viewerScore = community.viewerScore;
+  const singleReview = reviews.find(review => review.id === sampleRows?.[0]?.id);
 
   const showSort = reviews.length >= SORT_GATE;
   const categoryAggregates = community.categories;
@@ -480,8 +481,10 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         ) : headerResolved && isSingleReview(community.totalRatingCount) ? (
           <SingleReview
             totalRatings={community.totalRatingCount}
-            review={reviews.find(review => review.id === sampleRows?.[0]?.id)}
-            onMediaClick={mediaClickHandler(reviews.find(review => review.id === sampleRows?.[0]?.id) ?? reviews[0] ?? { media: [] } as unknown as CourseReview)}
+            review={singleReview}
+            onMediaClick={(index, el) => {
+              if (singleReview) mediaClickHandler(singleReview)(index, el);
+            }}
             onAddYours={() => handleWriteReview(myReview ? 'edit' : 'write')}
           />
         ) : (
