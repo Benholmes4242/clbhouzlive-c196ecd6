@@ -1,5 +1,9 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## REVIEWS_STATE_1
+- [ ] Match the signed-off zero-rating invitation only; shared state rule; dated pending catalogue figures derived from total/rated.
+- [ ] Add zero/one-rating and absence/derived-figure coverage; full suite, preview and visual checks; report pending figures/auth limits.
+
 ## BRIEF_REVIEWS_1 — REVIEWS_SAMPLE_1
 - [x] Correct overall/four category means and distribution via shared fieldExcludingViewer and complete paginated non-mock rating sample; preserve You-tab implementation/signature and review screen structure. Viewer-only sample has no invented community zero or delta.
 - [x] Centralise fixed 2/5/10 rules and split eligibility; future state screens consume these helpers, not implemented here under the no-screen-change instruction. No ranges or split screens exist today; excluded communityRows is their future input.
