@@ -31,7 +31,7 @@ const review: CourseReview = {
 };
 const context: RaterContext = { handicap: 2, roundsHere: 2, coursesRated: 48, perfectTens: 4, gender: 'male' };
 function single(row = review, facts: RaterContext | null = context, month?: number | null) {
-  return render(<SingleReview totalRatings={1} review={row} context={facts} playedMonth={month} onMediaClick={vi.fn()} onAddYours={vi.fn()} />);
+  return render(<MemoryRouter><SingleReview totalRatings={1} review={row} context={facts} playedMonth={month} onMediaClick={vi.fn()} onAddYours={vi.fn()} /></MemoryRouter>);
 }
 function tab() {
   return render(<MemoryRouter><QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><CourseReviewsTab courseId="course" courseName="Course" /></QueryClientProvider></MemoryRouter>);
@@ -123,7 +123,7 @@ describe('REVIEWS_STATE_2', () => {
   });
   it('Add yours calls supplied existing handler once', () => {
     const add = vi.fn();
-    render(<SingleReview totalRatings={1} review={review} context={null} onMediaClick={vi.fn()} onAddYours={add} />);
+    render(<MemoryRouter><SingleReview totalRatings={1} review={review} context={null} onMediaClick={vi.fn()} onAddYours={add} /></MemoryRouter>);
     fireEvent.click(screen.getByRole('button', { name: 'Add yours' }));
     expect(add).toHaveBeenCalledTimes(1);
   });
