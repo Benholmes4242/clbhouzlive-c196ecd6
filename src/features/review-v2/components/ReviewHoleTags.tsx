@@ -3,15 +3,12 @@
  * one scroll owner; original file dates alone label photographs.
  */
 import { useState } from 'react';
-import { Check, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet';
 import { RV2 } from '../tokens';
 import { ordinal } from './ReviewReceipt';
 import { capitalPhotoCount, spellPhotoCount } from '@/lib/courseMedia/holePhotoData';
-import { composerVerdictSentence } from '@/lib/courseMedia/composerHolePhotos';
 import type { useReviewHoleTags } from '../hooks/useReviewHoleTags';
-import { daysSinceRound } from '@/hooks/feed/useMyRoundsAtCourse';
 
 type Props = ReturnType<typeof useReviewHoleTags>;
 const dateLabel = (day: string, year = false) => new Date(`${day.slice(0, 10)}T12:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', ...(year ? { year: 'numeric' as const } : {}) });
@@ -30,7 +27,6 @@ export function ReviewHoleTags(props: Props) {
   const tagged = props.photos.filter(photo => props.assignments[photo.id] != null);
   const used = [...new Set(tagged.map(photo => props.assignments[photo.id]))];
   const info = active ? props.metadata[active.id] : undefined;
-  const approved = !!props.chosenRound || !!info?.approved;
   const summary = props.photos.length === tagged.length
     ? `${capitalPhotoCount(tagged.length)} on a hole. All still post with your review.`
     : `${capitalPhotoCount(tagged.length)} of ${spellPhotoCount(props.photos.length)} on a hole. ${capitalPhotoCount(props.photos.length - tagged.length)} still ${props.photos.length - tagged.length === 1 ? 'posts' : 'post'} with your review — ${props.photos.length - tagged.length === 1 ? 'it' : 'they'} just will not appear on a hole.`;
@@ -54,7 +50,6 @@ export function ReviewHoleTags(props: Props) {
       </Button>;
     })}</div>
     <p className="mt-3" style={note}>{summary}</p>
-    {!props.chosenRound && props.rounds.length > 0 && <p className="mt-3" style={note}>Nothing is preselected because your last round here was {daysSinceRound(props.rounds[0].playDate)} days ago. Pick one and these publish straight away; leave it and {props.photos.some(photo => props.metadata[photo.id]?.approved) ? 'the dates on the files decide which need a person to check them first.' : 'a person checks them first.'}</p>}
     <Sheet open={!!active} onOpenChange={open => { if (!open) setActiveId(null); }}>
       <SheetContent side="bottom" hideCloseButton className="p-0 rounded-t-lg gap-0 sm:max-w-[480px] sm:mx-auto" style={{ background: RV2.canvas, color: RV2.ink, borderColor: RV2.hairline }}>
         <div className="overflow-y-auto p-[18px]" style={{ willChange: 'transform' }}>
@@ -66,11 +61,6 @@ export function ReviewHoleTags(props: Props) {
             {props.holes.map(hole => <Button key={hole} variant="ghost" aria-label={`Hole ${hole}`} aria-pressed={!!active && props.assignments[active.id] === hole} data-state={used.includes(hole) ? 'used' : 'open'} className="aspect-square h-auto min-w-0 p-0 rounded-lg text-sm font-bold tabular-nums" style={{ border: `1px solid ${used.includes(hole) ? RV2.success : RV2.hairlineStrong}`, color: used.includes(hole) ? RV2.success : RV2.secondary, background: active && props.assignments[active.id] === hole ? RV2.trackStrong : 'transparent' }} onClick={() => { if (active) props.assign(active.id, hole); setActiveId(null); }}>{hole}</Button>)}
           </div>
           {used.length > 0 && <p className="mt-3" style={note}>The {used.map(ordinal).join(' and ')} {used.length === 1 ? 'is' : 'are'} green because you have already used {used.length === 1 ? 'it' : 'them'} in this review. You can use one twice — two photographs of the same hole is a normal thing to post.</p>}
-          {!props.chosenRound && !info?.approved && props.rounds.length === 0 && !info?.exif.captureDay && <p className="mt-3" style={note}>No round posted here and no date on the file, so there is nothing to check it against.</p>}
-          <div role="status" className="mt-3 flex items-center gap-2 rounded-lg p-3" style={{ border: `1px solid ${approved ? RV2.success : RV2.amber}`, background: approved ? RV2.track : RV2.amberSoft }}>
-            {approved ? <Check className="w-4 h-4 shrink-0" style={{ color: RV2.success }} /> : <MoreVertical className="w-4 h-4 shrink-0" style={{ color: RV2.amber }} />}
-            <p className="text-[11.5px] leading-[1.45]" style={{ color: RV2.secondary }}>{composerVerdictSentence(props.chosenRound ? dateLabel(props.chosenRound.playDate) : null, approved)}</p>
-          </div>
         </div>
       </SheetContent>
     </Sheet>
