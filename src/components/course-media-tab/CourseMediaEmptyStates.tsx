@@ -15,7 +15,7 @@ import { capitalPhotoCount, type HolePhoto } from '@/lib/courseMedia/holePhotoDa
 import { HolePhotoPicker } from './HolePhotoPicker';
 import './media-empty.css';
 
-const theme = { '--media-empty-ink': A.INK, '--media-empty-muted': A.MUTE, '--media-empty-body': A.BODY, '--media-empty-rule': A.SOFT, '--media-empty-dim': A.DIM, '--media-empty-faint': A.FAINT, '--media-empty-canvas': A.CANVAS, '--media-empty-waiting': A.AMBER, '--media-empty-rejected': A.RED } as CSSProperties;
+const theme = { '--media-empty-ink': A.INK, '--media-empty-muted': A.MUTE, '--media-empty-body': A.BODY, '--media-empty-rule': A.SOFT, '--media-empty-dim': A.DIM, '--media-empty-faint': A.FAINT, '--media-empty-canvas': A.CANVAS, '--media-empty-rejected': A.RED } as CSSProperties;
 
 export function CourseMediaNoHoleList({ courseName, photoCount, children }: {
   courseName?: string; photoCount: number; children: ReactNode;
