@@ -36,21 +36,21 @@ describe('MEDIA_WALK_1_R', () => {
   });
   it('selection keeps every tile mounted', () => {
     render(<HoleWalk available holes={[hole(1), hole(3)]} rows={[]} totalMedia={0} onAddFirst={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 3', exact: true }));
-    expect(screen.getByRole('button', { name: 'Hole 1', exact: true })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Hole 3', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 3' }));
+    expect(screen.getByRole('button', { name: 'Hole 1' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Hole 3' })).toHaveAttribute('aria-pressed', 'true');
   });
   it('Add first passes selected hole', () => {
     const selected: number[] = []; render(<HoleWalk available holes={[hole(3)]} rows={[]} totalMedia={0} onAddFirst={n => selected.push(n)} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 3', exact: true })); fireEvent.click(screen.getByRole('button', { name: 'Add the first' })); expect(selected).toEqual([3]);
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 3' })); fireEvent.click(screen.getByRole('button', { name: 'Add the first' })); expect(selected).toEqual([3]);
   });
   it('eight photos reconcile as active plus seven selectable thumbnails', () => {
     render(<HoleWalk available holes={[hole(9)]} rows={Array.from({ length: 8 }, (_, i) => photo(String(i), 9))} totalMedia={8} onAddFirst={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 9', exact: true })); expect(screen.getAllByRole('button', { name: 'View photograph' })).toHaveLength(7);
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 9' })); expect(screen.getAllByRole('button', { name: 'View photograph' })).toHaveLength(7);
   });
   it('existing picker preselects and submits selected hole', () => {
     const submitted: number[] = [];
     render(<HolePhotoTagDialog imageUrl="/photo.jpg" initialHole={3} holeCount={2} knownHoleNumbers={[1, 3]} usedHoles={[]} pending={false} result={null} error={null} onClose={() => {}} onSubmit={n => submitted.push(n)} />);
-    expect(screen.getByRole('button', { name: 'Hole 3', exact: true })).toHaveAttribute('aria-pressed', 'true'); fireEvent.click(screen.getByRole('button', { name: 'Tag', exact: true })); expect(submitted).toEqual([3]);
+    expect(screen.getByRole('button', { name: 'Hole 3' })).toHaveAttribute('aria-pressed', 'true'); fireEvent.click(screen.getByRole('button', { name: 'Tag' })); expect(submitted).toEqual([3]);
   });
 });
