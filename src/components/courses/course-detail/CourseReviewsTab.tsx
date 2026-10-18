@@ -42,7 +42,7 @@ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
 import { useCourseReviewSample } from '@/hooks/useCourseReviewSample';
 import { reviewsCommunitySample } from '@/lib/reviews/communitySample';
-import { reviewsCourseState, isFewReviews } from '@/lib/reviews/sampleRules';
+import { reviewsCourseState, isFewReviews, isFiveToNineReviews } from '@/lib/reviews/sampleRules';
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { useCourseReviews, type ReviewsSortBy, type CourseReview } from '@/hooks/useCourseReviews';
 import { useReviewResponses, useSubmitReviewResponse } from '@/hooks/useReviewResponses';
@@ -488,7 +488,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             }}
             onAddYours={() => handleWriteReview(myReview ? 'edit' : 'write')}
           />
-        ) : headerResolved && isFewReviews(community.totalRatingCount) ? (
+        ) : headerResolved && (isFewReviews(community.totalRatingCount) || isFiveToNineReviews(community.totalRatingCount)) ? (
           <FewReviews community={community} reviews={reviews} viewerId={user?.id} courseId={courseId}
             onMediaClick={(review, index, el) => mediaClickHandler(review)(index, el)}
             onWrite={() => handleWriteReview('write')}

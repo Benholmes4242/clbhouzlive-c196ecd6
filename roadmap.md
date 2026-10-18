@@ -1,7 +1,7 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
 ## REVIEWS_STATE_4
-- [ ] Resolve actual brief contradiction before implementation: ADA2 requires chart at five excluding ratings; ADE2 says six total minus one viewer is four and forbids chart (actual count five). Uploaded HTML also says six-or-more in introductory prose but five in its notes.
+- [x] Ben confirmed ADA2: distribution at five excluding. Correct ADE2 cases: six total with viewer shows; five total with viewer hides; five total without viewer shows. No other brief changes.
 - [ ] Reuse State 3 screen and existing distribution component for five-to-nine total; excluding chart counts and generated quiet sentence; five zero-preserving tier rows; shared min-to-max findings and Condition-only exact months clause; no middle-80%/splits or composer changes.
 - [ ] Add excluding sum and four/five boundary regressions, preserve existing test assertions; baseline 1,616 tests / 209 files. Full-suite/build and populated visual verification; report authenticated limits.
 

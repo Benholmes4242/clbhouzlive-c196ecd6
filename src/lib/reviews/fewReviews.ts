@@ -6,7 +6,7 @@ import type { reviewsCommunitySample } from './communitySample';
 import { hasCommunityAverage } from './sampleRules';
 
 export type ReviewsCommunity = ReturnType<typeof reviewsCommunitySample>;
-export const spelledRatings = (count: number) => ['zero', 'one', 'two', 'three', 'four'][count] ?? String(count);
+export const spelledRatings = (count: number) => ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'][count] ?? String(count);
 export const capitalizedRatings = (count: number) => { const word = spelledRatings(count); return word.charAt(0).toUpperCase() + word.slice(1); };
 
 export function fewReviewFacts(community: ReviewsCommunity) {

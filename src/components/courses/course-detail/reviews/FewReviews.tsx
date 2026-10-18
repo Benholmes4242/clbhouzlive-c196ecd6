@@ -1,12 +1,16 @@
-/** REVIEWS_STATE_3: total selects this screen; complete excluding community
+/** REVIEWS_STATE_3/4: total selects this shared screen; complete excluding community
  * owns every aggregate and caution figure. The existing course circle means
  * outgoing follows; it marks only already-visible, blocked-filtered prose rows.
  * State 2's row/context and panel are reused, never a second review row.
- * All sections are unframed and page-scrolled; missing identities stay unnamed. */
+ * All sections are unframed and page-scrolled; missing identities stay unnamed.
+ * State 4 adds the existing distribution at the shared excluding threshold.
+ * Its month explanation is conditional on widest Condition, never a stored month. */
 import React from 'react';
 import type { CourseReview } from '@/hooks/useCourseReviews';
 import { useMembersWhoPlayedCourse } from '@/hooks/useMembersWhoPlayedCourse';
-import { hasCommunityAverage, isFewReviews } from '@/lib/reviews/sampleRules';
+import { hasCommunityAverage, hasRatingDistribution, isFewReviews, isFiveToNineReviews } from '@/lib/reviews/sampleRules';
+import { RatingTierDistribution } from '@/components/courses/review/RatingTierDistribution';
+import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
 import { capitalizedRatings, fewReviewFacts, partitionKnownReviews, spelledRatings, type ReviewsCommunity } from '@/lib/reviews/fewReviews';
 import { SURFACE } from '@/lib/tokens/surface';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
@@ -33,7 +37,9 @@ const prose: React.CSSProperties = { color: SURFACE.dark.body, fontSize: 12.5, l
 
 export function FewReviews({ community, reviews, viewerId, courseId, onMediaClick, ownReview, afterReview, onWrite }: FewReviewsProps) {
   const { data: members } = useMembersWhoPlayedCourse(viewerId ? courseId : undefined, viewerId);
-  if (!isFewReviews(community.totalRatingCount)) return null;
+  const stateFour = isFiveToNineReviews(community.totalRatingCount);
+  if (!isFewReviews(community.totalRatingCount) && !stateFour) return null;
+  const showDistribution = stateFour && hasRatingDistribution(community.ratingCount);
   const ids = new Set(community.communityRows.map(row => row.id));
   const visible = reviews.filter(review => ids.has(review.id));
   const { known, others } = partitionKnownReviews(visible, new Set(members?.members.filter(member => member.in_circle).map(member => member.user_id) ?? []));
@@ -45,7 +51,7 @@ export function FewReviews({ community, reviews, viewerId, courseId, onMediaClic
     const fullName = profile?.display_name?.trim() || profile?.username?.trim();
     return { name: fullName?.split(/\s+/)[0], rating: row.rating };
   });
-  return <div data-reviews-state="few">
+  return <div data-reviews-state={stateFour ? 'five-to-nine' : 'few'}>
     <section style={{ ...section, paddingTop: 0 }}>
       <div style={kicker}>{capitalizedRatings(community.totalRatingCount)} golfers have rated it</div>
       {facts ? <>
@@ -53,12 +59,22 @@ export function FewReviews({ community, reviews, viewerId, courseId, onMediaClic
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 13, marginTop: 15 }}>
           <strong data-community-score style={{ color: SURFACE.dark.ink, fontSize: 48, lineHeight: 0.9, fontWeight: 800, ...FIGS }}>{community.score?.toFixed(1)}</strong>
           <div style={{ minWidth: 0 }}>
-            {identities.every(person => person.name) && <div style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 700, overflowWrap: 'anywhere' }}>{new Intl.ListFormat('en-GB').format(identities.map(person => person.name ?? ''))}</div>}
-            <div data-individual-scores style={{ color: SURFACE.dark.dim, fontSize: 11.5, lineHeight: 1.45, marginTop: 2, ...FIGS }}>{new Intl.ListFormat('en-GB').format(identities.map(person => person.rating?.toFixed(1) ?? ''))}</div>
+            {stateFour ? <>
+              <div data-community-rater-count={facts.count} style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 700 }}>{spelledRatings(facts.count)} ratings</div>
+              <div style={{ color: SURFACE.dark.dim, fontSize: 11.5, lineHeight: 1.45, marginTop: 2 }}>{getRatingTierLabel(community.score)}</div>
+            </> : <>
+              {identities.every(person => person.name) && <div style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 700, overflowWrap: 'anywhere' }}>{new Intl.ListFormat('en-GB').format(identities.map(person => person.name ?? ''))}</div>}
+              <div data-individual-scores style={{ color: SURFACE.dark.dim, fontSize: 11.5, lineHeight: 1.45, marginTop: 2, ...FIGS }}>{new Intl.ListFormat('en-GB').format(identities.map(person => person.rating?.toFixed(1) ?? ''))}</div>
+            </>}
           </div>
         </div>
         {ratedViewer && community.delta != null && <div data-viewer-delta style={{ display: 'inline-flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 7, marginTop: 13, padding: '7px 12px', borderRadius: 999, border: `1px solid ${inkWithAlpha(A.AMBER, 0.35)}`, background: inkWithAlpha(A.AMBER, 0.07) }}><span style={{ color: SURFACE.dark.mute, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>You</span><b style={{ color: A.AMBER, fontSize: 15, ...FIGS }}>{community.viewerScore?.toFixed(1)}</b><span style={{ color: A.IMPROVED, fontSize: 11, fontWeight: 800, ...FIGS }}>{community.delta > 0 ? '▲' : community.delta < 0 ? '▼' : ''} {Math.abs(community.delta).toFixed(1)} {community.delta > 0 ? 'above' : community.delta < 0 ? 'below' : 'the same'}</span></div>}
-        <p data-community-caution data-community-count={facts.count} data-community-spread={facts.spread} style={prose}>{facts.caution}</p>
+        {showDistribution ? <div style={{ marginTop: 15 }}>
+          <RatingTierDistribution distribution={community.distribution} activeTier={getRatingTier(community.score)} appearance="sample" />
+          <p data-distribution-population={facts.count} style={{ ...prose, color: SURFACE.dark.mute, borderLeft: `2px solid ${SURFACE.dark.hairline}`, paddingLeft: 11 }}>
+            {capitalizedRatings(facts.count)} bars, {spelledRatings(facts.count)} raters. {ratedViewer ? <><b style={{ color: SURFACE.dark.ink }}>Your own rating is not in the chart</b>, for the same reason it is not in the average above it — </> : null}{ratedViewer ? 'the' : 'The'} counts and the figure have to describe the same people.
+          </p>
+        </div> : <p data-community-caution data-community-count={facts.count} data-community-spread={facts.spread} style={prose}>{facts.caution}</p>}
       </> : <>
         <h2 style={heading}>There is no community score yet</h2>
         <p style={prose}>One opinion is not an average. Here it is as what it is — a person, and what they said.</p>
@@ -67,7 +83,7 @@ export function FewReviews({ community, reviews, viewerId, courseId, onMediaClic
     </section>
     {hasCommunityAverage(community.ratingCount) && facts && facts.bands.length > 0 && <section style={section}>
       <div style={kicker}>What they scored</div>
-      {facts.highest && <h2 style={heading}>{facts.highest.key === 'facilities' ? 'The facilities carry it' : `The ${facts.highest.label.toLowerCase()} carries it`}</h2>}
+      {stateFour && facts.finding ? <h2 style={heading}>{facts.finding.widest.label} is the one they argue about</h2> : facts.highest && <h2 style={heading}>{facts.highest.key === 'facilities' ? 'The facilities carry it' : `The ${facts.highest.label.toLowerCase()} carries it`}</h2>}
       <p style={{ ...prose, color: SURFACE.dark.mute, marginTop: 8 }}>The bar is the range between the lowest and highest score; the mark is the average.{ratedViewer ? ' You are not counted in either.' : ''}</p>
       <div style={{ marginTop: 16 }}>
         {facts.bands.map(band => <div key={band.key} data-category-band={band.key} data-low={band.low} data-high={band.high} data-mean={band.mean} style={{ display: 'grid', gridTemplateColumns: '82px minmax(0, 1fr) 72px', alignItems: 'center', gap: 10, padding: '8px 0' }}>
@@ -79,7 +95,9 @@ export function FewReviews({ community, reviews, viewerId, courseId, onMediaClic
           <span style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 800, textAlign: 'right', ...FIGS }}>{band.mean.toFixed(1)}<span style={{ display: 'block', color: SURFACE.dark.dim, fontSize: 9.5, marginTop: 1 }}>{band.low.toFixed(1)}–{band.high.toFixed(1)}</span></span>
         </div>)}
       </div>
-      {facts.finding && <p style={{ ...prose, borderLeft: `2px solid ${A.AMBER}`, paddingLeft: 11 }}>They agree on <b style={{ color: SURFACE.dark.ink }}>{facts.finding.tightest.label.toLowerCase()}</b> and split on the <b style={{ color: SURFACE.dark.ink }}>{facts.finding.widest.label.toLowerCase()}</b>, where the gap is <b style={{ color: SURFACE.dark.ink, ...FIGS }}>{facts.finding.widest.gap.toFixed(1)}</b>. A mean alone would have hidden that.</p>}
+      {facts.finding && <p data-category-finding data-widest={facts.finding.widest.key} data-widest-spread={facts.finding.widest.gap} data-tightest={facts.finding.tightest.key} data-tightest-spread={facts.finding.tightest.gap} style={{ ...prose, borderLeft: `2px solid ${A.AMBER}`, paddingLeft: 11 }}>
+        {stateFour ? <>{facts.finding.widest.label} runs <b style={{ color: SURFACE.dark.ink, ...FIGS }}>{facts.finding.widest.gap.toFixed(1)}</b> wide against {facts.finding.tightest.label.toLowerCase()}’s <b style={{ color: SURFACE.dark.ink, ...FIGS }}>{facts.finding.tightest.gap.toFixed(1)}</b>. {capitalizedRatings(facts.count)} people broadly agree what the course is and disagree sharply about {facts.finding.widest.key === 'condition' ? <>what shape it was in — <span data-condition-month-explanation>which usually means <b style={{ color: SURFACE.dark.ink }}>they played it in different months</b></span></> : `its ${facts.finding.widest.label.toLowerCase()}`}.</> : <>They agree on <b style={{ color: SURFACE.dark.ink }}>{facts.finding.tightest.label.toLowerCase()}</b> and split on the <b style={{ color: SURFACE.dark.ink }}>{facts.finding.widest.label.toLowerCase()}</b>, where the gap is <b style={{ color: SURFACE.dark.ink, ...FIGS }}>{facts.finding.widest.gap.toFixed(1)}</b>. A mean alone would have hidden that.</>}
+      </p>}
     </section>}
     {facts && known.length > 0 && <section style={section}><span style={{ display: 'inline-block', color: MEDAL_GOLD, background: inkWithAlpha(MEDAL_GOLD, 0.10), border: `1px solid ${inkWithAlpha(MEDAL_GOLD, 0.28)}`, borderRadius: 999, padding: '3px 9px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', marginBottom: 11 }}>People you know</span>{known.map(review => renderPerson(review, true))}</section>}
     {facts && others.length > 0 && <section style={section}><div style={kicker}>Everyone else</div>{others.map(review => renderPerson(review, true))}</section>}
