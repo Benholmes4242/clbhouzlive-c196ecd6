@@ -11,6 +11,7 @@ import { ordinal } from './ReviewReceipt';
 import { capitalPhotoCount, spellPhotoCount } from '@/lib/courseMedia/holePhotoData';
 import { composerVerdictSentence } from '@/lib/courseMedia/composerHolePhotos';
 import type { useReviewHoleTags } from '../hooks/useReviewHoleTags';
+import { daysSinceRound } from '@/hooks/feed/useMyRoundsAtCourse';
 
 type Props = ReturnType<typeof useReviewHoleTags>;
 const dateLabel = (day: string, year = false) => new Date(`${day.slice(0, 10)}T12:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', ...(year ? { year: 'numeric' as const } : {}) });
@@ -53,8 +54,9 @@ export function ReviewHoleTags(props: Props) {
       </Button>;
     })}</div>
     <p className="mt-3" style={note}>{summary}</p>
+    {!props.chosenRound && props.rounds.length > 0 && <p className="mt-3" style={note}>Nothing is preselected because your last round here was {daysSinceRound(props.rounds[0].playDate)} days ago. Pick one and these publish straight away; leave it and {props.photos.some(photo => props.metadata[photo.id]?.approved) ? 'the dates on the files decide which need a person to check them first.' : 'a person checks them first.'}</p>}
     <Sheet open={!!active} onOpenChange={open => { if (!open) setActiveId(null); }}>
-      <SheetContent side="bottom" hideCloseButton className="p-0 rounded-t-lg gap-0" style={{ background: RV2.canvas, color: RV2.ink, borderColor: RV2.hairline }}>
+      <SheetContent side="bottom" hideCloseButton className="p-0 rounded-t-lg gap-0 sm:max-w-[480px] sm:mx-auto" style={{ background: RV2.canvas, color: RV2.ink, borderColor: RV2.hairline }}>
         <div className="overflow-y-auto p-[18px]" style={{ willChange: 'transform' }}>
           <div className="w-9 h-1 rounded-full mx-auto mb-4" style={{ background: RV2.trackStrong }} />
           <SheetTitle className="text-base font-bold tracking-normal" style={{ color: RV2.ink }}>Which hole is this?</SheetTitle>
@@ -73,7 +75,7 @@ export function ReviewHoleTags(props: Props) {
       </SheetContent>
     </Sheet>
     <Sheet open={roundOpen} onOpenChange={setRoundOpen}>
-      <SheetContent side="bottom" className="rounded-t-lg" style={{ background: RV2.canvas, color: RV2.ink }}>
+      <SheetContent side="bottom" className="rounded-t-lg sm:max-w-[480px] sm:mx-auto" style={{ background: RV2.canvas, color: RV2.ink }}>
         <SheetTitle style={{ color: RV2.ink }}>Which round were these from?</SheetTitle>
         <SheetDescription style={{ color: RV2.secondary }}>Optional</SheetDescription>
         <div className="overflow-y-auto flex flex-col gap-2" style={{ willChange: 'transform' }}>

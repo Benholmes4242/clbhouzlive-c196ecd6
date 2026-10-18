@@ -27,7 +27,7 @@ export function useReviewHoleTags(courseId: string, userId: string | null, items
     enabled: !!userId && holes.length > 0 && photos.length > 0,
     queryFn: async () => Object.fromEntries(await Promise.all(photos.map(async photo => {
       const exif = await composerPhotoMetadata(photo.file, photo.uploadedUrl);
-      const verdict = userId ? await composerPhotoVerdict(exif, userId, courseId, null) : null;
+      const verdict = userId ? await composerPhotoVerdict(exif, userId, courseId, null).catch(() => null) : null;
       return [photo.id, { exif, approved: verdict?.status === 'approved' }];
     }))),
     staleTime: Infinity,
