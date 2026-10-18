@@ -120,6 +120,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         courseId={courseId}
         tagging={tagging.ready && user && knownHoles ? { memberId: user.id, holeCount: knownHoles.length, taggedUrls: tagging.taggedUrls, onTag: startTag } : undefined}
       />
+      {(tagging.tags.data ?? []).filter(row => row.user_id === user.id && row.status === 'pending').map(row => <div key={row.id} className="mx-5 my-3"><img src={row.media_url} alt="Your waiting photograph" className="w-full max-h-40 object-contain rounded-lg" /><HolePhotoOutcome row={row} /></div>)}
       {tagResult && !tagPost && <div className="mx-5 mb-4"><HolePhotoOutcome row={tagResult} /></div>}
       {tagPost && knownHoles && (
         <HolePhotoTagDialog key={addHole == null ? tagPost.mediaItems[0]?.id : `add-${addHole}`} imageUrl={tagPost.mediaItems[0]?.imageUrl ?? ''}
