@@ -1,5 +1,9 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_MEDIA_TRUST_1 — MEDIA_TRUST_1
+- [ ] Contract clarification: ARA7 “Nothing produces pending any more” and “Retag action, exactly as built” conflict with the established retag_hole_photo contract forcing pending (src/lib/courseMedia/retagHolePhoto.ts:1–3, call :12; existing mediaRetag.test.tsx:62–71 proves pending readback). Deployed RPC edits are prohibited. No application/test changes before author clarification; last verified inventory remains 1,729 / 220, not rerun for this read-only stop.
+- [ ] After clarification, implement immediate approved inserts, association-only round choice/capture dates, tap-to-close tagging, rejected-only State D and removal audit; name authorised pending-test changes and reconcile counts.
+
 ## BRIEF_MEDIA_TAG_FIX_1 — MEDIA_TAGFIX_1
 - [x] Confirm clbhouz and report actual fetched-body synthetic File passed at holePhotoData.ts:136 to holePhotoExif.ts:19 before edits. Baseline 1,722 passing / 219 files.
 - [x] Skip every URL-only EXIF read; preserve original File/composer proof and Waiting rules. Correct pill/title and genuine-write failure copy. prepareHolePhoto returns empty metadata without fetching or parsing; pile/known-hole insertion uses Waiting without a round query; batch receives empty EXIF. Composer original File branch was not the failing pile call; its no-File URL fallback shared prepareHolePhoto and is now removed. Local library original File parser unchanged; chosen-round composer proof unchanged. No SQL/migrations/RPC/RLS/admin/feed_config/cap changes.
