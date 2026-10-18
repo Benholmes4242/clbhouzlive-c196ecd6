@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_REVIEWS_1 — REVIEWS_SAMPLE_1
+- [x] Correct overall/four category means and distribution via shared fieldExcludingViewer and complete paginated non-mock rating sample; preserve You-tab implementation/signature and review screen structure. Viewer-only sample has no invented community zero or delta.
+- [x] Centralise fixed 2/5/10 rules and split eligibility; future state screens consume these helpers, not implemented here under the no-screen-change instruction. No ranges or split screens exist today; excluded communityRows is their future input.
+- [x] Baseline 1,557 -> 1,574 passed (203 -> 205 files): reviewsSample1.test.tsx +15; useCourseReviewSample.test.ts +2. No tests deleted, renamed or rewritten; existing You-tab tests unchanged and passing. Preview build OK. External/unmanaged Supabase prevents authenticated live Sundridge verification; referenced HTML was not provided in this upload or available in the project, so no mock conformity claimed. No SQL/migrations/RPC/feed_config changes; cap 30; no raw hex/rgba additions.
+
 ## BRIEF_COURSES_HIGHEST_RATED_TEN
 - [x] Set Highest rated to ten; require per-rail loading counts; preserve Regulars and card geometry.
 - [x] Update the authorised limit assertion and add four focused cases.

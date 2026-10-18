@@ -13,11 +13,10 @@
  *   99 helpful votes, ALL of them 'helpful', not one unhelpful ever — so the
  *   thumbs-down goes and the like is a single affirmative.
  *
- * RESTORED (BRIEF_REVIEWS_HEADER_PAIR_AND_DISTRIBUTION): RatingTierDistribution,
- *   under the Community/You pair. Its bands are sparse at these numbers and
- *   empty bands are accepted as the honest picture. Counts are computed here
- *   from the same non-mock rated set the header counts; if the two disagree
- *   the bars are withheld rather than contradict the header.
+ * REVIEWS_SAMPLE_1: all community figures use the complete non-mock rating
+ *   sample, excluding the viewer through the shared youDerivations arithmetic.
+ *   The prose list remains independently sorted and blocked. New sample-led
+ *   screen forms are deferred to the subsequent signed-off state briefs.
  *
  * RETIRED FROM THIS TAB (files untouched, other importers unaffected):
  *   RatingFilterChips      — nothing left to filter from.
@@ -41,7 +40,8 @@ import { getProfilePathById } from '@/lib/profileRoutes';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 
 
-import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
+import { useCourseReviewSample } from '@/hooks/useCourseReviewSample';
+import { reviewsCommunitySample } from '@/lib/reviews/communitySample';
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { useCourseReviews, type ReviewsSortBy, type CourseReview } from '@/hooks/useCourseReviews';
 import { useReviewResponses, useSubmitReviewResponse } from '@/hooks/useReviewResponses';
@@ -51,7 +51,6 @@ import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 
 import { AboutSection, AboutHairline, GUTTER } from './about/AboutSection';
 import { TheScore } from './reviews/TheScore';
-import { getRatingTier } from '@/lib/ratingTier';
 import { WhatTheyScored } from './reviews/WhatTheyScored';
 import { FlatReviewRow, FlatAction } from './reviews/reviewFlatBits';
 import { ResponseDisplay, ReplyForm, VerifyToRespondPrompt } from '../review/ReviewResponseBlock';
@@ -97,7 +96,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const { data: businessClaim } = useBusinessClaimForCourse(courseId);
   const { data: reviewResponses } = useReviewResponses(courseId);
   const submitResponseMutation = useSubmitReviewResponse(courseId);
-  const { data: ratingAggregates, isSuccess: aggregatesResolved } = useCourseRatingAggregates(courseId);
+  const { data: sampleRows, isSuccess: sampleResolved, isError: sampleError } = useCourseReviewSample(courseId, user?.id);
 
   const [sortBy, setSortBy] = useState<ReviewsSortBy>('recent');
   const [sortOpen, setSortOpen] = useState(false);
@@ -396,33 +395,16 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     await queryClient.invalidateQueries({ queryKey: ['course-reviews-full', courseId] });
   };
 
-  const communityScore = ratingAggregates?.avg_overall_score || 0;
-
-  /* ONE SOURCE FOR THE COUNT AND THE BARS. Both derive from the same filtered
-     array, so they cannot disagree. The average still comes from the
-     aggregates view: the list is fetched with is_mock=false, the same set the
-     view aggregates.
-     VALID ONLY WHILE THE LIST IS COMPLETE: useCourseReviews caps at 100 rows
-     and the busiest course has 9 today. If any course approaches that cap this
-     silently under-counts — revisit the limit BEFORE that happens. */
-  const ratedReviews = useMemo(() => reviews.filter((r) => !r.is_mock && r.rating != null), [reviews]);
-  const ratingCount = ratedReviews.length;
-  const distribution = useMemo(() => {
-    const d = { exceptional: 0, excellent: 0, good: 0, fair: 0, poor: 0 };
-    for (const r of ratedReviews) d[getRatingTier(r.rating).toLowerCase() as keyof typeof d] += 1;
-    return d;
-  }, [ratedReviews]);
-  const hasRatings = ratingCount > 0;
-  const headerResolved = reviewsResolved && aggregatesResolved;
-  const viewerScore = myReview?.rating ?? null;
+  const community = useMemo(() => reviewsCommunitySample(sampleRows ?? [], user?.id), [sampleRows, user?.id]);
+  const communityScore = community.score;
+  const ratingCount = community.ratingCount;
+  const distribution = community.distribution;
+  const hasRatings = community.totalRatingCount > 0;
+  const headerResolved = reviewsResolved && sampleResolved;
+  const viewerScore = community.viewerScore;
 
   const showSort = reviews.length >= SORT_GATE;
-  const categoryAggregates = useMemo(() => ({
-    design: ratingAggregates?.avg_design_score,
-    condition: ratingAggregates?.avg_condition_score,
-    facilities: ratingAggregates?.avg_facilities_score,
-    clubhouse: ratingAggregates?.avg_clubhouse_score,
-  }), [ratingAggregates]);
+  const categoryAggregates = community.categories;
 
   const voteFor = (reviewId: string) => reactions.stateFor('review', reviewId).mine;
 
@@ -473,7 +455,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     );
   }
 
-  if (isError) {
+  if (isError || sampleError) {
     return (
       <div style={{ background: A.CANVAS, minHeight: '100%', padding: `32px ${GUTTER}px`, fontFamily: SANS }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
