@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Menu, RefreshCw } from 'lucide-react';
@@ -9,6 +9,9 @@ import { adminTheme as t } from './theme';
 import AdminDrawer from './AdminDrawer';
 import AdminLoading from './components/AdminLoading';
 import AdminAccessDenied from './components/AdminAccessDenied';
+import { useAdminSettings } from './hooks/useAdminSettings';
+import { useMaintenanceMode } from '@/hooks/useMaintenanceMode';
+import { toast } from '@/lib/toast';
 import { useAnalyticsLive } from './hooks/useAnalyticsLenses';
 import { backFromLive, lensOf, toLive } from './components/analytics/analyticsLens';
 import { londonHM, num } from './components/analytics/analyticsFormat';
@@ -71,10 +74,19 @@ export default function AdminShell() {
   const onLive = isAnalytics && lensOf(params) === 'live' && !params.get('tab')?.match(/^(events|auth)$/);
   const title = onLive ? 'Live' : (SECTION_TITLES[segment] ?? 'Admin');
 
+  /* BRIEF_ADMIN_SETTINGS S.6: while maintenance is on, a red bar sits under the
+     header on every admin page. Full admins read the authoritative settings
+     query and get the elapsed time and the Turn off button; other roles read
+     the member-facing poll and get the bare bar. */
+  const settings = useAdminSettings(role);
+  const maintenancePoll = useMaintenanceMode();
+  const maintenanceOn = can.manageAdmins ? (settings.data?.maintenance.on ?? false) : maintenancePoll.on;
+
   // The dark app-shell has zero top padding (body.route-clubhouse), including admin.
   // Main pays the fixed header's full height; never pull this shell up by --sat:
   // that subtracts an inset the parent did not pay and hides the first content.
-  const headerHeight = 'calc(52px + env(safe-area-inset-top, 0px))';
+  // The maintenance bar's 48px is added while it is shown so content never slides under it.
+  const headerHeight = `calc(${maintenanceOn ? 100 : 52}px + env(safe-area-inset-top, 0px))`;
 
   const defaultRoute = role === 'moderator' ? 'inbox?type=report' : 'dashboard';
   const canInbox = can.viewModeration || can.viewUsers || can.approveRequests;
