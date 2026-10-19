@@ -15,7 +15,7 @@ const f = vi.hoisted(() => ({
 
 vi.mock('@/hooks/usePanelRole', () => ({ usePanelRole: f.role }));
 vi.mock('@/hooks/useMedianStatusBar', () => ({ useMedianStatusBar: () => {} }));
-vi.mock('../hooks/useAdminSettings', () => ({ useAdminSettings: f.settings }));
+vi.mock('./hooks/useAdminSettings', () => ({ useAdminSettings: f.settings }));
 vi.mock('@/hooks/useMaintenanceMode', () => ({ useMaintenanceMode: f.maintenance }));
 vi.mock('./hooks/useAnalyticsLenses', () => ({ useAnalyticsLive: f.live }));
 vi.mock('./AdminDrawer', () => ({ default: () => null }));
