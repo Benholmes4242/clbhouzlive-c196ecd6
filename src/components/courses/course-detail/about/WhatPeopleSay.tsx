@@ -59,7 +59,7 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
 }) => {
   const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
-  const { data: sampleRows, isLoading } = useCourseReviewSample(courseId, user?.id);
+  const { data: sampleRows, isLoading, isError } = useCourseReviewSample(courseId, user?.id);
   const community = useMemo(() => reviewsCommunitySample(sampleRows ?? [], user?.id), [sampleRows, user?.id]);
 
   const heading = t('courseDetail.sections.whatPeopleSay');
@@ -121,6 +121,11 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
   // The sample is in flight: 0 would state something untrue.
   if (isLoading) return null;
 
+  // CRM2.2 — an error is not an absence: a failed fetch renders nothing, so
+  // the "No one's scored yet" invitation below can only mean a genuinely
+  // empty, successfully fetched sample.
+  if (isError) return null;
+
   // NOBODY HAS SCORED IT — a sentence and an invitation, not a card. (CRM1.8: untouched.)
   if (total === 0) {
     return (
@@ -173,7 +178,8 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 13, minWidth: 0 }}>
           <strong data-community-score style={{ color: SURFACE.dark.ink, fontSize: 48, lineHeight: 0.9, fontWeight: 800, ...FIGS }}>{score?.toFixed(1)}</strong>
           <div style={{ minWidth: 0 }}>
-            <div style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 700, lineHeight: 1.2 }}>{getRatingTierLabel(score)}</div>
+            {/* CRM2.1 — the tier word needs two community ratings; below that its slot collapses. */}
+            {hasCommunityAverage(count) && <div style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 700, lineHeight: 1.2 }}>{getRatingTierLabel(score)}</div>}
             <div data-community-rater-count={count} style={{ color: SURFACE.dark.dim, fontSize: 11.5, lineHeight: 1.45, marginTop: 2, overflowWrap: 'anywhere', ...FIGS }}>{count} {count === 1 ? 'rating' : 'ratings'}</div>
           </div>
         </div>
