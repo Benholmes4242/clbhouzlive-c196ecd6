@@ -81,7 +81,7 @@ function useSeasonRankings(season: number | null) {
       for (let from = 0; ; from += 1000) {
         const { data, error } = await supabase
           .from('tour_season_rankings')
-          .select('id, player_name, position, points, tour_code')
+          .select('id, player_name, position, points, tour_code, player_id, manual_player_id')
           .eq('season_year', season as number)
           .order('position', { ascending: true })
           .range(from, from + 999);
@@ -89,19 +89,21 @@ function useSeasonRankings(season: number | null) {
         all.push(...(data ?? []));
         if ((data?.length ?? 0) < 1000) break;
       }
-      return all as { id: string; player_name: string | null; position: number | null; points: number | null; tour_code: string }[];
+      return all as { id: string; player_name: string | null; position: number | null; points: number | null; tour_code: string; player_id: string | null; manual_player_id: string | null }[];
     },
   });
 }
 
 export default function TourDataSection({
-  syncing, syncLabel, onRunSync, onAddPhoto, onOpenDirectory, noPhotoSet,
+  syncing, syncLabel, onRunSync, onAddPhoto, onOpenDirectory, onOpenPlayer, noPhotoSet,
 }: {
   syncing: boolean;
   syncLabel: string;
   onRunSync: () => Promise<void>;
   onAddPhoto: (p: FieldPlayer) => void;
   onOpenDirectory: () => void;
+  /** BRIEF_TOUR_RANKINGS_OPEN_PLAYER — tap a linked ranking row to open the headshot sheet. */
+  onOpenPlayer: (id: string, name: string) => void;
   /** Players with neither photo_url nor headshot_override; null while loading. */
   noPhotoSet: number | null;
 }) {
