@@ -1479,7 +1479,7 @@ export function ExploreCard({
             </span>
           </span>
         </span>
-      ) : hasVisual ? (
+      ) : hasVisual && !feedPlot ? (
         <span
           aria-hidden
           style={{
@@ -1555,6 +1555,13 @@ export function ExploreCard({
               : undefined}
           />
         </span>
+      ) : null}
+      {/* BRIEF_ROUND_TILE_1 — HOME ONLY. The plot sits on the canvas, full
+          tile width, under the course name and poster line above it. No
+          scoring key; the one named mark (ace / albatross / eagle) is drawn
+          by the plot itself. */}
+      {feedPlot && item.kind === 'round' && size !== 'pair' && shape ? (
+        <RoundTilePlot shape={shape} />
       ) : null}
     </button>
   );
