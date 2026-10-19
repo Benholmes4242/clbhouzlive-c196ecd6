@@ -14,6 +14,7 @@ vi.mock('@/hooks/useSingleReviewContext', () => ({ useSingleReviewContext: () =>
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: fixture.user }) }));
 vi.mock('@/hooks/useCourseReviewSample', () => ({ useCourseReviewSample: () => ({ data: fixture.rows, isSuccess: true, isError: false }) }));
 vi.mock('@/hooks/useCourseReviews', () => ({ useCourseReviews: () => ({ data: fixture.rows, isSuccess: true, isLoading: false, isError: false, refetch: vi.fn() }) }));
+vi.mock('@/hooks/useCourseRatingAggregates', () => ({ useCourseRatingAggregates: () => ({ data: { course_id: 'course', avg_overall_score: 10, review_count: 1, text_review_count: 1 } }) }));
 vi.mock('@/hooks/useBusinessClaimForCourse', () => ({ useBusinessClaimForCourse: () => ({ data: null }) }));
 vi.mock('@/hooks/useReviewResponses', () => ({ useReviewResponses: () => ({ data: [] }), useSubmitReviewResponse: () => ({ mutate: vi.fn() }) }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useContentReactions', () => ({ useContentReactions: () => ({ stateFor: () => ({ mine: false }), toggle: vi.fn() }) }));
@@ -44,13 +45,13 @@ describe('REVIEWS_STATE_2', () => {
     expect(isSingleReview(1)).toBe(true);
     expect(isSingleReview(2)).toBe(false);
   });
-  it('one-rating tab omits aggregate score, category bars, distribution and community labels', () => {
+  it('one-rating tab shows one community score beside its count, with no category bars or distribution', () => {
     fixture.rows = [review];
     const { container } = tab();
     expect(container.querySelector('[data-reviews-state="one"]')).not.toBeNull();
     expect(container.querySelectorAll('[data-review-score]')).toHaveLength(1);
-    expect(container.querySelectorAll('[role="progressbar"], [data-community-score], [data-category-bar], [data-distribution]')).toHaveLength(0);
-    expect([...container.querySelectorAll('span, label')].some(node => /^community$/i.test(node.textContent ?? ''))).toBe(false);
+    expect(container.querySelectorAll('[role="progressbar"], [data-category-bar], [data-distribution]')).toHaveLength(0);
+    expect(container.querySelectorAll('[data-community-score]')).toHaveLength(1);
   });
   it('overall score has one prominent home on the rater row', () => {
     const { container } = single();
