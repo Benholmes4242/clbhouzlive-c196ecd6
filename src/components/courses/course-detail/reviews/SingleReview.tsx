@@ -1,6 +1,7 @@
 /** REVIEWS_STATE_2 signed-off person-led exception to the flat multi-review row.
  * A review owns its overall score; calibration refers to that same source.
- * No aggregates, bars, distribution, categories, count strip or extra actions.
+ * REVIEWS_FIRST_RATING_1: shows the Course tab aggregate with its count beside it
+ * (courseRatingFloor display rule); still no bars, distribution or categories.
  * playedMonth is a review-owned input only: current stored reviews omit it.
  * This component owns its gutter; the existing tab owns the top seam.
  * Rater-context reads are isolated to person rows, never used as community data.
@@ -33,9 +34,10 @@ interface SingleReviewProps {
   communityCount?: number | null;
   /** RF5: the single rating is the viewer's own. */
   isViewerOwn?: boolean;
+  courseName?: string;
 }
 
-export function SingleReview({ totalRatings, review, playedMonth, context, onMediaClick, onAddYours, communityScore = null, communityCount = null, isViewerOwn = false }: SingleReviewProps) {
+export function SingleReview({ totalRatings, review, playedMonth, context, onMediaClick, onAddYours, communityScore = null, communityCount = null, isViewerOwn = false, courseName = '' }: SingleReviewProps) {
   const { data: fetchedContext } = useSingleReviewContext(context === undefined ? review?.user_id : undefined, review?.course_id ?? '');
   if (!isSingleReview(totalRatings)) return null;
   const facts = context === undefined ? fetchedContext : context;

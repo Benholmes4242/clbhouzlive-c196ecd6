@@ -77,8 +77,8 @@ export function FewReviews({ community, reviews, viewerId, courseId, onMediaClic
           </p>
         </div> : <p data-community-caution data-community-count={facts.count} data-community-spread={facts.spread} style={prose}>{facts.caution}</p>}
       </> : <>
-        <h2 style={heading}>There is no community score yet</h2>
-        <p style={prose}>One opinion is not an average. Here it is as what it is — a person, and what they said.</p>
+        <h2 style={heading}>The score builds from here</h2>
+        <p style={prose}>Here they are — the golfers, and what they said.</p>
         {visible.map(review => renderPerson(review, false))}
       </>}
     </section>

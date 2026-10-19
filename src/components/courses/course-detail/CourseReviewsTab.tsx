@@ -489,6 +489,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             communityScore={courseAggregate?.avg_overall_score ?? null}
             communityCount={courseAggregate?.review_count ?? null}
             isViewerOwn={!!myReview}
+            courseName={courseName}
             onMediaClick={(index, el) => {
               if (singleReview) mediaClickHandler(singleReview)(index, el);
             }}
