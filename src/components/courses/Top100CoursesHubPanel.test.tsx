@@ -117,7 +117,7 @@ describe('HUNDRED_FIT_1_R — the under-five gate', () => {
     f.progress.mockReturnValue({ data: progressData(9, 3), isLoading: false, isFetchedAfterMount: true });
     mount();
     expect(screen.getByText('Your hundred')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'GB&I' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
     sectionAbsent();
     // The page itself never remounted: the list head for the new scope is on screen.
     expect(screen.getByText('GB&I Top 100')).toBeInTheDocument();
