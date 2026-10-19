@@ -1,5 +1,8 @@
 # Roadmap
 
+## BRIEF_TOUR_CHAMPION_AVATAR_CANDIDATES
+- [ ] Carry winner override/key through the existing hero reads, pass the full candidate list to ChampionStrip, add three regression cases and run the full suite. Baseline npx vitest run: 1,812 passing / 234 files. Resolver, SquircleAvatar, other bands and strip appearance frozen.
+
 ## BRIEF_AVATAR_CACHED_PHOTO_STUCK
 - [x] Changed only SquircleAvatar's decoded-image layout-effect guard/dependencies; added two regression cases in SquircleAvatar.cachedPhoto.test.tsx. Full npx vitest run: 1,810 passing / 233 files baseline to 1,812 passing / 234 files, zero failures; +2 from the named new file, no existing tests changed. Browser actual-avatar mount verified cached A remains visible after [A,B,C] to [A,C,B], and new D remains hidden until load. Build OK. Hosted Tour switching remains unverified; Tour code, candidate walk, fallback and styling unchanged.
 
