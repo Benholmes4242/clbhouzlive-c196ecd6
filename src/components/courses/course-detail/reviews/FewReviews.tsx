@@ -18,9 +18,10 @@ import { capitalizedRatings, fewReviewFacts, partitionKnownReviews, type Reviews
 import { SURFACE } from '@/lib/tokens/surface';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
-import { A, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { Button } from '@/components/ui/button';
 import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
+import { CategoryBands } from '../CategoryBands';
 import { RaterReviewRow } from './SingleReview';
 
 interface FewReviewsProps {
@@ -87,16 +88,7 @@ export function FewReviews({ community, reviews, viewerId, courseId, courseName,
       <div style={kicker}>What they scored</div>
       <h2 style={heading}>Where the score comes from</h2>
       <p style={{ ...prose, color: SURFACE.dark.mute, marginTop: 8 }}>The bar is the range between the lowest and highest score; the mark is the average.</p>
-      <div style={{ marginTop: 16 }}>
-        {facts.bands.map(band => <div key={band.key} data-category-band={band.key} data-low={band.low} data-high={band.high} data-mean={band.mean} style={{ display: 'grid', gridTemplateColumns: '82px minmax(0, 1fr) 72px', alignItems: 'center', gap: 10, padding: '8px 0' }}>
-          <span style={{ color: SURFACE.dark.body, fontSize: 11.5, fontWeight: 700, lineHeight: 1.45 }}>{band.label}</span>
-          <div style={{ height: 9, borderRadius: 5, background: inkWithAlpha(SURFACE.dark.ink, 0.05), position: 'relative' }}>
-            <div data-range style={{ position: 'absolute', top: 0, bottom: 0, left: `${band.low * 10}%`, width: `${(band.high - band.low) * 10}%`, background: inkWithAlpha(SURFACE.dark.ink, 0.22), borderRadius: 5 }} />
-            <div data-mean-mark style={{ position: 'absolute', top: -2, bottom: -2, width: 3, borderRadius: 2, left: `calc(${band.mean * 10}% - 1.5px)`, background: courseSubScoreTone(band.mean) }} />
-          </div>
-          <span style={{ color: courseSubScoreTone(band.mean), fontSize: 13, fontWeight: 800, textAlign: 'right', ...FIGS }}>{band.mean.toFixed(1)}<span style={{ display: 'block', color: SURFACE.dark.dim, fontSize: 9.5, marginTop: 1 }}>{band.low.toFixed(1)}–{band.high.toFixed(1)}</span></span>
-        </div>)}
-      </div>
+      <CategoryBands bands={facts.bands} />
     </section>}
     {facts && known.length > 0 && <section style={section}><span style={{ display: 'inline-block', color: MEDAL_GOLD, background: inkWithAlpha(MEDAL_GOLD, 0.10), border: `1px solid ${inkWithAlpha(MEDAL_GOLD, 0.28)}`, borderRadius: 999, padding: '3px 9px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', marginBottom: 11 }}>People you know</span>{known.map(review => renderPerson(review, true))}</section>}
     {facts && others.length > 0 && <section style={section}><div style={kicker}>Everyone else</div>{others.map(review => renderPerson(review, true))}</section>}

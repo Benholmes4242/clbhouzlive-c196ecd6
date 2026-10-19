@@ -1,5 +1,8 @@
 # Roadmap
 
+## BRIEF_COURSE_REVIEWS_MATCH_1 (CRM1)
+- [x] WhatPeopleSay moved onto the Reviews tab's source (useCourseReviewSample + reviewsCommunitySample, wired as CourseReviewsTab wires it); aggregates/user-rating hooks removed. Headline key unchanged, fed the viewer-excluding pair; Reviews-style figure row (ink 48px score, tier over numeral count, amber YOU pill); CategoryBands extracted byte-identical from FewReviews to course-detail/CategoryBands.tsx and shared by both tabs; only-rater state added (en keys youFirst/youFirstBody); CountSlot removed, basedOn key left with no readers. Three authorised assertions changed in place in courseRatingConsistency.test.ts; no tests added/deleted. Full npx vitest run: 1,811/235 before and after, zero failures. Build OK. Live course page verified signed-out: 4 band rows, community score, no pill. CRM1.11a: PAGE_SIZE 500, no page cap, no truncation — loop fetches until a short page; mid-pagination error throws rather than presenting a partial sample. Report: /mnt/documents/CRM1_report.md.
+
 ## BRIEF_TOUR_CHAMPION_AVATAR_CANDIDATES
 - [x] Carried winner override/key through existing reads and full candidate list into ChampionStrip; added three cases in tourChampionAvatarCandidates.test.tsx. Full npx vitest run: 1,812/234 to 1,815 passing/235 files, zero failures; no existing tests changed. Build OK; actual strip browser mount verified fallback walk and EL initials. Hosted Tour flow unverified. Shared fallback helper ignores identity key, so distinct hue not claimed; frozen helper unchanged. Report: /mnt/documents/BRIEF_TOUR_CHAMPION_AVATAR_CANDIDATES_report.md.
 
