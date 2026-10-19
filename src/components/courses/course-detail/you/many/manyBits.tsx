@@ -7,6 +7,7 @@
 import React from 'react';
 import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
+import { VERDICT_KICKER, TAB_TITLE } from '../../about/AboutSection';
 import { INVERTED_CONTROL_SURFACE, inkWithAlpha, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 const W = (a: number) => surfaceWithAlpha(INVERTED_CONTROL_SURFACE, a);
@@ -37,8 +38,8 @@ export const plural = (n: number, one: string, many: string) => (n === 1 ? one :
 
 export const Sec: React.FC<{ kicker: string; title?: string | null; children: React.ReactNode }> = ({ kicker, title, children }) => (
   <section style={{ padding: '20px 18px', borderBottom: `1px solid ${A.SOFT}`, fontFamily: SANS }}>
-    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.AMBER, marginBottom: 5 }}>{kicker}</div>
-    {title ? <h2 style={{ margin: 0, fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.2, color: A.INK }}>{title}</h2> : null}
+    <div style={title ? VERDICT_KICKER : { ...VERDICT_KICKER, marginBottom: 5 }}>{kicker}</div>
+    {title ? <h2 style={TAB_TITLE}>{title}</h2> : null}
     {children}
   </section>
 );

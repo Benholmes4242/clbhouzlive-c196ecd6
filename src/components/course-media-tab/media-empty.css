@@ -1,7 +1,6 @@
 .media-empty { color: var(--media-empty-ink); }
 .media-empty-section { padding: 20px; border-bottom: 1px solid var(--media-empty-rule); }
-.media-empty-kicker { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .16em; margin-bottom: 5px; }
-.media-empty-title { font-size: 19px; font-weight: 700; line-height: 1.2; }
+/* TAB_CANON_1: typography is read from AboutSection in the JSX, not forked here. */
 .media-empty-lede { margin-top: 8px; font-size: 12.5px; line-height: 1.5; color: var(--media-empty-muted); }
 .media-empty-said { margin-top: 14px; padding-left: 11px; border-left: 2px solid var(--media-empty-rule); font-size: 13px; line-height: 1.5; color: var(--media-empty-body); }
 .media-empty-said strong { color: var(--media-empty-ink); }

@@ -17,7 +17,7 @@ import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { Button } from '@/components/ui/button';
-import { GUTTER } from '../about/AboutSection';
+import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
 import { RaterReviewRow } from './SingleReview';
 
 interface FewReviewsProps {
@@ -31,8 +31,8 @@ interface FewReviewsProps {
   onWrite: () => void;
 }
 const section: React.CSSProperties = { padding: `20px ${GUTTER}px`, borderBottom: `1px solid ${inkWithAlpha(SURFACE.dark.ink, 0.06)}` };
-const kicker: React.CSSProperties = { color: A.AMBER, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', lineHeight: 1.2, marginBottom: 5 };
-const heading: React.CSSProperties = { color: SURFACE.dark.ink, fontSize: 19, fontWeight: 700, lineHeight: 1.2, margin: 0 };
+const kicker = VERDICT_KICKER;
+const heading = TAB_TITLE;
 const prose: React.CSSProperties = { color: SURFACE.dark.body, fontSize: 12.5, lineHeight: 1.55, margin: '14px 0 0' };
 
 export function FewReviews({ community, reviews, viewerId, courseId, onMediaClick, ownReview, afterReview, onWrite }: FewReviewsProps) {
