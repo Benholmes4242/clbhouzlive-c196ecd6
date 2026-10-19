@@ -59,7 +59,7 @@ export function ElsewhereSection({ rows }: { rows: readonly TitleInReach[] }) {
         <div style={{ textAlign: 'right', fontSize: 13, fontWeight: 800, color: A.AMBER, fontVariantNumeric: 'tabular-nums' }}>{Number(Number(row.gap).toFixed(1))} off</div>
       </div>
     </div>)}
-    <div className="champions-empty-said" style={{ color: A.MUTE, borderColor: A.BASELINE }}>Only courses you have already played appear here, because a rank is the thing that makes a gap real. <b>Courses you have never played cannot be ranked</b> and are not guessed at.</div>
+    <div className="champions-empty-said" style={{ color: A.MUTE, borderColor: A.BORDER }}>Only courses you have already played appear here, because a rank is the thing that makes a gap real. <b>Courses you have never played cannot be ranked</b> and are not guessed at.</div>
   </section>;
 }
 
