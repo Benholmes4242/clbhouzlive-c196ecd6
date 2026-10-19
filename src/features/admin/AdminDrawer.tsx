@@ -112,8 +112,8 @@ function MemberResults({ query, onClose }: { query: string; onClose: () => void 
     <span aria-hidden="true" style={{ display: 'inline-flex' }}>
       <SquircleAvatar size={32} src={m.photo_url} userId={m.user_id} alt="" hairlineRing />
     </span>
-
     <span style={{ minWidth: 0 }}><span style={{ display: 'block', fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.display_name || m.username || 'Member'}</span>{m.username && <span style={{ display: 'block', fontSize: 12, color: t.inkFaint, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>@{m.username}</span>}</span>
+
   </Link>)}</>;
 }
 function DrawerFooter({ role, onClose }: { role: PanelRole; onClose: () => void }) {
