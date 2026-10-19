@@ -270,16 +270,34 @@ export default function TourDataSection({
               style={{ flex: 1, minWidth: 0, border: 0, background: 'transparent', color: t.ink, fontSize: 14, outline: 'none', fontFamily: 'inherit' }} />
           </label>
         </div>
-        {rkVisible.map((r) => (
-          <div key={r.id} style={{ display: 'grid', gridTemplateColumns: '30px minmax(0, 1fr) auto', columnGap: 10, alignItems: 'center', padding: '10px 16px', borderTop: `1px solid ${t.hairline}` }}>
-            <span style={{ fontSize: 15, fontWeight: 800, color: t.inkMuted }}>{r.position ?? '-'}</span>
-            <span style={{ minWidth: 0 }}>
-              <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, color: t.ink }}>{normaliseRankingName(r.player_name)}</span>
-              <span style={{ display: 'block', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: t.inkFaint }}>{rankingTourLabel(r.tour_code)}</span>
-            </span>
-            <span style={{ fontSize: 14, fontWeight: 800, color: t.ink }}>{formatPoints(r.points)}</span>
-          </div>
-        ))}
+        {rkVisible.map((r) => {
+          // Linked id prefers the manual override; unlinked rows stay plain divs.
+          const linkedId = r.manual_player_id ?? r.player_id;
+          const inner = (
+            <>
+              <span style={{ fontSize: 15, fontWeight: 800, color: t.inkMuted }}>{r.position ?? '-'}</span>
+              <span style={{ minWidth: 0 }}>
+                <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, color: t.ink }}>{normaliseRankingName(r.player_name)}</span>
+                <span style={{ display: 'block', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: t.inkFaint }}>{rankingTourLabel(r.tour_code)}</span>
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: t.ink }}>{formatPoints(r.points)}</span>
+              {linkedId ? (
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke={t.inkFaint} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 3l4 4-4 4" /></svg>
+              ) : null}
+            </>
+          );
+          const grid: React.CSSProperties = {
+            display: 'grid', gridTemplateColumns: linkedId ? '30px minmax(0, 1fr) auto 14px' : '30px minmax(0, 1fr) auto',
+            columnGap: 10, alignItems: 'center', padding: '10px 16px', borderTop: `1px solid ${t.hairline}`,
+          };
+          if (!linkedId) return <div key={r.id} style={grid}>{inner}</div>;
+          return (
+            <button key={r.id} type="button" onClick={() => onOpenPlayer(linkedId, normaliseRankingName(r.player_name))}
+              style={{ ...grid, width: '100%', textAlign: 'left', background: 'transparent', borderLeft: 0, borderRight: 0, borderBottom: 0, cursor: 'pointer', font: 'inherit' }}>
+              {inner}
+            </button>
+          );
+        })}
         {!rk.isLoading && rows.length === 0 && (
           <div style={{ padding: '10px 16px 12px', borderTop: `1px solid ${t.hairline}`, fontSize: 12, color: t.inkFaint }}>No rankings</div>
         )}
