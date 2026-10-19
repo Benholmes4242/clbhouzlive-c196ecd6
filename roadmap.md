@@ -1,7 +1,8 @@
 # Roadmap
 
 ## BRIEF_TAB_LEAD_IN_1 - TAB_LEAD_IN_1
-- [ ] STOP before application/test edits: TLA3 calls ChampionsElsewhere one of five opening states, but CourseLegendsDrilldown.tsx:559-683 renders a primary state first and :685-688 appends ChampionsElsewhere afterwards; its ElsewhereSection starts at ChampionsElsewhere.tsx:44. Removing that top padding would change a later-section seam forbidden by TLA4. Await Ben's ruling; shared 22, Course override 22, Sec 20, Champions CSS 20, Reviews/Media zero-top readings confirmed. No tests run; last reported npx vitest run total remains 1,810 passing / 233 files, zero failures, not a fresh result. No measurements or app/test changes.
+- [x] Ben resolved TLA3: Elsewhere remains unchanged; only four primary Champions states receive first-section treatment.
+- [ ] Baseline stop remains for You: VerdictSection is first only in settled played branch (CourseYouTab.tsx:649-661). Connected never-played ProjectionSection already uses AboutSection first (ProjectionSection.tsx:118,164,213), while other eligible opening sections use default 34px AboutSection margins (NotConnectedInvitation.tsx:99-104; WonAndLostSection.tsx:44). Await scope ruling before working around the stated uniform 20px baseline. No app/test edits, measurements or test runs; last reported npx vitest run remains 1,810 passing / 233 files, zero failures (historical).
 
 ## BRIEF_ROUND_PLOT_SCALE_1 - ROUND_PLOT_1
 - [x] ROUND_PLOT_1_R authorises only third expected tone in the ramp test. Derived TOPAR_EVEN_DARK rgba(242,244,247,0.42) over actual Home CARD/FEED_CARD_SURFACE #16161A to #727377; withdrew earlier #6E6F71. Local documented dot token, shared tokens unchanged. Plot SVG 59 -> 102px, unchanged 10px seam gives 69 -> 112px footprint. Per-round range includes zero with symmetric six-stroke floor; panel/mark/series/shared callers unchanged.
