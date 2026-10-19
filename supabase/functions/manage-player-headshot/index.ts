@@ -16,10 +16,13 @@ const TOUR_FOLDER: Record<string, string> = {
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-// AWS Sig V4 helper
+// AWS Sig V4 helper. canonicalPath is the already-encoded object path and goes
+// into the canonical request as-is; deriving it from new URL(url).pathname can
+// re-normalise characters and break the signature.
 async function signRequest(
   method: string,
   url: string,
+  canonicalPath: string,
   body: ArrayBuffer | null,
   accessKeyId: string,
   secretAccessKey: string,
