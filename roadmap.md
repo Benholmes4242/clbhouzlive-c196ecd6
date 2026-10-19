@@ -1,5 +1,8 @@
 # Roadmap
 
+## BRIEF_EYEBROW_CANON_1 - EYEBROW_CANON_1
+- [ ] Blocked before application/test edits: the under-ten Reviews baseline excludes existing zero/one states (CourseReviewsTab.tsx:480-491). Canon A.AMBER for Champions conflicts with ECA7's no-colour-change-beyond-Media restriction (NobodyHasPlayed.tsx:72; FieldChampions.tsx:52,78; PostedChampions.tsx:154). Await revised baseline and colour ruling; preserve completed TAB_LEAD_IN_1.
+
 ## BRIEF_TAB_LEAD_IN_1 - TAB_LEAD_IN_1
 - [x] Ben resolved TLA3: Elsewhere remains unchanged; only four primary Champions states receive first-section treatment.
 - [x] TLA2R resolves the You baseline stop: all six branches and conditional first-rendered alternatives are in scope, including both skeletons; later Sec/AboutSection seams stay unchanged.
