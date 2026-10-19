@@ -30,15 +30,22 @@ import type { Top100Enrichment } from '@/hooks/top100/useTop100Enrichment';
 const CELL_MEMBER = 'rgba(255,255,255,0.14)';
 const CELL_NOBODY = 'rgba(255,255,255,0.055)';
 
-/* Grid geometry, read by the section AND its shell (BRIEF_COURSES_SKELETONS 3.1). */
-export const HUNDRED_GRID_H = 320;
-export const HUNDRED_COLS = 10;
-export const HUNDRED_ROWS = 10;
-export const HUNDRED_GAP = 4;
+/* Grid geometry, read by the section AND its shell (BRIEF_COURSES_SKELETONS 3.1,
+   BRIEF_YOUR_HUNDRED_1 / HUNDRED_FIT_1). Twelve columns at a 3px gap; the row
+   count and the reserved height are functions of the list total, so the section
+   and its skeleton can never disagree. */
+export const HUNDRED_COLS = 12;
+export const HUNDRED_GAP = 3;
+export const HUNDRED_CELL_H = 24;
 export const HUNDRED_CELL_RADIUS = 3;
 export const HUNDRED_GRID_TOP = 16;
+export const hundredRows = (total: number) => Math.ceil(total / HUNDRED_COLS);
+export const hundredGridHeight = (total: number) => {
+  const rows = hundredRows(total);
+  return rows * HUNDRED_CELL_H + (rows - 1) * HUNDRED_GAP;
+};
 /* Figure and legend slot geometry (3.2). */
-export const HUNDRED_FIGURE = { size: 58, lineHeight: 0.85 } as const;
+export const HUNDRED_FIGURE = { size: 34, lineHeight: 0.85 } as const;
 export const HUNDRED_LEGEND = { marginTop: 12, minHeight: 52, swatch: 9, swatchRadius: 2, rowGap: 6, colGap: 14, labelGap: 6, labelSize: 10.5 } as const;
 
 type CellState = 'reviewed' | 'played' | 'member' | 'nobody';
@@ -210,7 +217,7 @@ export function YourHundredSection({ listSlug, viewerPlayed, total, courseIds, e
         ) : null}
       </div>
 
-      <div style={{ marginTop: HUNDRED_GRID_TOP, display: 'grid', gridTemplateColumns: `repeat(${HUNDRED_COLS}, 1fr)`, gridTemplateRows: `repeat(${HUNDRED_ROWS}, 1fr)`, gap: HUNDRED_GAP, height: HUNDRED_GRID_H }}>
+      <div style={{ marginTop: HUNDRED_GRID_TOP, display: 'grid', gridTemplateColumns: `repeat(${HUNDRED_COLS}, 1fr)`, gridTemplateRows: `repeat(${hundredRows(total)}, ${HUNDRED_CELL_H}px)`, gap: HUNDRED_GAP }}>
         {cells.map((id, i) => (
           <button
             key={id}
@@ -219,13 +226,10 @@ export function YourHundredSection({ listSlug, viewerPlayed, total, courseIds, e
             aria-label={`#${i + 1} ${subjects.get(id)?.name ?? ''}`.trim()}
             aria-pressed={selected === id}
             /*
-             * The cells are deliberately wider than they are tall. The width is set by the
-             * ten columns; the height is the only free variable in this grid. At ten columns
-             * across a 361px run the cell is 32.5px wide, so a square cell made the grid
-             * 361px tall — the height was the width, not a choice. The grid now carries an
-             * explicit 320px height and ten 1fr rows, so each cell is 28.4px tall — the height
-             * is declared once on the container instead of guessed per cell, and the full tap
-             * width is kept.
+             * The cells are deliberately wider than they are tall. The width falls out of
+             * the twelve columns (27px across a 357px run); the height is declared once on
+             * the container as an explicit 24px row track, so the full tap width is kept
+             * and the grid clears the fold (HUNDRED_FIT_1).
              */
             style={{
               borderRadius: HUNDRED_CELL_RADIUS, padding: 0, border: 0, cursor: 'pointer',

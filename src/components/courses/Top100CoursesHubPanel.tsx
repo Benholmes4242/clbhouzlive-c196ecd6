@@ -252,7 +252,11 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
       {/* isLoading false does not mean the server has answered — it means we have something to draw. For a member's own figures those are different things, and the gap between them is how a member gets shown last season's totals with no loading state. */}
       <GateReport id="progress" ready={user?.id ? progressFetchedAfterMount : !progressLoading} />
       <GateReport id="enrichment" ready={!enrichmentLoading} />
-      {user && viewerList && viewerList.total > 0 && courses.length > 0 ? (
+      {/* HUNDRED_FIT_1 AXA9/10: below five played on the ACTIVE list the section
+          is absent entirely — no heading, figure, grid, legend or placeholder —
+          and the skeleton must not reserve the space either. viewerPlayed already
+          arrives per-list for the active scope, so this re-evaluates with the chips. */}
+      {user && viewerList && viewerList.total > 0 && courses.length > 0 && viewerPlayed >= 5 ? (
         <YourHundredSection
           listSlug={renderedList}
           viewerPlayed={viewerPlayed}
@@ -262,7 +266,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
           subjects={subjects}
           onOpenCourse={openCourse}
         />
-      ) : user && (isLoading || (user?.id ? !progressFetchedAfterMount : progressLoading)) ? (
+      ) : user && (isLoading || (user?.id ? !progressFetchedAfterMount : progressLoading)) && (!progressFetchedAfterMount || viewerPlayed >= 5) ? (
         <YourHundredShell />
       ) : null}
       {argument.length > 0 ? (

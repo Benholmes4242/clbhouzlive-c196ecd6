@@ -20,8 +20,8 @@ import {
 import { TOP100_PHOTO_H } from '../BrowseCourseCard';
 import { TOP100_CARD_GAP } from '../Top100CoursesHubPanel';
 import {
-  cellStyle, HUNDRED_CELL_RADIUS, HUNDRED_COLS, HUNDRED_FIGURE, HUNDRED_GAP, HUNDRED_GRID_H,
-  HUNDRED_GRID_TOP, HUNDRED_LEGEND, HUNDRED_ROWS,
+  cellStyle, HUNDRED_CELL_H, HUNDRED_CELL_RADIUS, HUNDRED_COLS, HUNDRED_FIGURE, HUNDRED_GAP,
+  HUNDRED_GRID_TOP, HUNDRED_LEGEND, hundredGridHeight, hundredRows,
 } from './YourHundredSection';
 import { ARGUMENT_ROW_GAP, ARGUMENT_THUMB } from './TheArgumentSection';
 
@@ -40,6 +40,10 @@ function Head({ children }: { children: React.ReactNode }) {
   );
 }
 
+/* The shell reserves the height of a full hundred-course list, computed by the
+   same helper the real grid uses, so the skeleton never jumps on arrival. */
+const SHELL_TOTAL = 100;
+
 export function YourHundredShell() {
   const nobody = cellStyle('nobody');
   return (
@@ -49,11 +53,11 @@ export function YourHundredShell() {
       </div>
       <div
         style={{
-          marginTop: HUNDRED_GRID_TOP, display: 'grid', height: HUNDRED_GRID_H, gap: HUNDRED_GAP,
-          gridTemplateColumns: `repeat(${HUNDRED_COLS}, 1fr)`, gridTemplateRows: `repeat(${HUNDRED_ROWS}, 1fr)`,
+          marginTop: HUNDRED_GRID_TOP, display: 'grid', height: hundredGridHeight(SHELL_TOTAL), gap: HUNDRED_GAP,
+          gridTemplateColumns: `repeat(${HUNDRED_COLS}, 1fr)`, gridTemplateRows: `repeat(${hundredRows(SHELL_TOTAL)}, ${HUNDRED_CELL_H}px)`,
         }}
       >
-        {Array.from({ length: HUNDRED_COLS * HUNDRED_ROWS }, (_, i) => (
+        {Array.from({ length: SHELL_TOTAL }, (_, i) => (
           <div key={i} style={{ borderRadius: HUNDRED_CELL_RADIUS, ...nobody }} />
         ))}
       </div>
