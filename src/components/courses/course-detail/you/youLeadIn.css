@@ -1,0 +1,10 @@
+/* TAB_LEAD_IN_1 / TLA2R: wrap() owns first-rendered-element treatment.
+   Null sections leave no DOM child. Only the first section loses its outer
+   top seam; later Sec/AboutSection seams and nested card interiors stay intact. */
+.course-you-lead-in > div {
+  padding-top: 0 !important;
+}
+.course-you-lead-in > .course-you-sections > section:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}

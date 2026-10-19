@@ -68,7 +68,7 @@ export function NobodyHasPlayed({ categories, courseName, showConnect, onConnect
   const spelled = numberWord(categories.length, false);
   return (
     <div className="champions-empty" style={{ color: SURFACE.dark.ink }}>
-      <section className="champions-empty-section">
+      <section className="champions-empty-section champions-empty-section--first">
         <div className="champions-empty-kicker" style={{ color: SURFACE.dark.dim }}>Nothing has been taken here</div>
         <h2>All {spelled} boards are open</h2>
         <div className="champions-empty-lede" style={{ color: SURFACE.dark.mute }}>

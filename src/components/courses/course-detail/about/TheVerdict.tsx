@@ -53,7 +53,7 @@ const TheVerdict: React.FC<{ courseId: string }> = ({ courseId }) => {
   const parLabel = (p: number) => t('courseDetail.verdict.parType', { par: p });
 
   return (
-    <AboutSection first space={22} kicker={t('courseDetail.verdict.kicker')} title={title}>
+    <AboutSection first kicker={t('courseDetail.verdict.kicker')} title={title}>
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 13, fontFamily: SANS }}>
         <div style={{ fontSize: 62, fontWeight: 800, letterSpacing: '-0.055em', lineHeight: 0.82, color: A.INK, ...FIGS }}>
           {signed(avg)}
