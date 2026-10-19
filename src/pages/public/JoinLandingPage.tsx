@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { INK_ON_LIGHT, MEMBER_CELL, PAGE_CANVAS, inkWithAlpha } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
 import wordmark from '@/assets/clbhouz-wordmark.png.asset.json';
