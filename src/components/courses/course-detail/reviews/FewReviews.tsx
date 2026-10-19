@@ -18,7 +18,7 @@ import { capitalizedRatings, fewReviewFacts, partitionKnownReviews, type Reviews
 import { SURFACE } from '@/lib/tokens/surface';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
-import { A, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { Button } from '@/components/ui/button';
 import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
 import { CategoryBands } from '../CategoryBands';

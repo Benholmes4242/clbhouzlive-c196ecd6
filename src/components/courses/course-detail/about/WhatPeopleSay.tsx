@@ -1,57 +1,49 @@
 /**
- * BRIEF_C1.2 (18 Sep 2026) — WHAT PEOPLE SAY, flat.
+ * CRM1 — WHAT PEOPLE SAY reads the Reviews tab's source.
  *
- * The four aggregate category scores live on BOTH the Course and Reviews tabs.
- * They render from the first rating onward because an aggregate from one rating
- * is still factual; the rating count does the honest qualification. Only
- * the tier word stays gated below five ratings because it makes a verdict.
+ * Every figure comes from the SAME community sample the Reviews tab uses:
+ * useCourseReviewSample + reviewsCommunitySample, wired exactly as
+ * CourseReviewsTab wires it. The sample EXCLUDES the viewer, whose own score
+ * appears separately as the amber YOU pill — so both tabs print the same
+ * numbers for the same course. useCourseRatingAggregates and
+ * useUserCourseRating are no longer read here.
  *
- *   NOT HERE AT ALL — the friends average. It was a third headline figure on a
- *   section that is meant to carry two; the friends strip below already names
- *   the people.
+ * FIGURE BLOCK (CRM1.3/1.4): the Reviews tab's arrangement — 48px ink score,
+ * tier word over the numeral rating count beside it, both ink at every count
+ * (no sample gate, no courseSubScoreTone), and the amber YOU pill at the
+ * right-hand end when the viewer has rated and a delta exists.
  *
- * THIN STATE, BUILT WITH THE FULL ONE: under five ratings the score and its
- * rating count show exactly as they do when settled, and only the tier word is
- * withheld. A tier label on two ratings claims a verdict the sample cannot
- * support; the rating count beside the score lets the reader judge the weight
- * for themselves.
+ * CATEGORY BANDS (CRM1.5/1.6): the extracted CategoryBands rows render
+ * directly beneath the figure block whenever there are at least two community
+ * ratings, at every count above; below two, nothing takes their place. The
+ * CategoryScores "pairs" block is removed from this component only.
  *
- * COLOUR: the community figure takes its score band. The rating count is
- * right-aligned in the slot where the viewer's amber "Your rating" figure sat;
- * the viewer's own score is not shown here.
+ * ONLY-RATER STATE (CRM1.7b): when the single rating is the viewer's own,
+ * there is no community figure — the section says so and shows the viewer's
+ * score in amber instead.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
-import { useUserCourseRating } from '@/hooks/useUserCourseRating';
-import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
-import { CategoryScores, OverallScoreLine } from '../CategoryScores';
+import { useCourseReviewSample } from '@/hooks/useCourseReviewSample';
+import { reviewsCommunitySample } from '@/lib/reviews/communitySample';
+import { fewReviewFacts } from '@/lib/reviews/fewReviews';
+import { getRatingTierLabel } from '@/lib/ratingTier';
+import { SURFACE } from '@/lib/tokens/surface';
+import { inkWithAlpha } from '@/lib/tokens/surfaces';
+import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { CategoryBands } from '../CategoryBands';
 import AboutSection, { AboutHairline } from './AboutSection';
 import { shotsInWords } from './courseVerdict';
-
-export { SETTLED_MIN_RATINGS } from '../CategoryScores';
 
 interface WhatPeopleSayProps {
   courseId: string;
   courseName: string;
   onRateClick: () => void;
-  /** Opens the Reviews tab, where the category scores also live beside reviews. */
+  /** Opens the Reviews tab, where the same community figures live beside reviews. */
   onSeeAllReviews?: () => void;
 }
-
-/** The rating count, right-aligned in the slot where "Your rating" used to sit. */
-const CountSlot: React.FC<{ count: number }> = ({ count }) => {
-  const { t } = useTranslation('courses');
-  return (
-    <div style={{ minWidth: 0, flexShrink: 0, textAlign: 'right', paddingBottom: 2 }}>
-      <span style={{ fontFamily: SANS, fontSize: 11.5, fontWeight: 600, lineHeight: 1.35, color: A.MUTE }}>
-        {t('courseDetail.communityScore.basedOn', { count })}
-      </span>
-    </div>
-  );
-};
 
 const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
   courseId,
@@ -61,13 +53,14 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
 }) => {
   const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
-  const { data: aggregates, isLoading } = useCourseRatingAggregates(courseId);
-  const { data: userRating } = useUserCourseRating(courseId, user?.id);
+  const { data: sampleRows, isLoading } = useCourseReviewSample(courseId, user?.id);
+  const community = useMemo(() => reviewsCommunitySample(sampleRows ?? [], user?.id), [sampleRows, user?.id]);
 
   const heading = t('courseDetail.sections.whatPeopleSay');
-  const total = aggregates?.review_count ?? 0;
-  const score = aggregates?.avg_overall_score ?? 0;
-  const yours = userRating?.rating ?? null;
+  const total = community.totalRatingCount;
+  const count = community.ratingCount;
+  const score = community.score;
+  const yours = community.viewerScore;
 
   const rateAction = (
     <button
@@ -92,10 +85,37 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
     </button>
   );
 
-  // The aggregates are in flight: 0 would state something untrue.
+  const seeAll = onSeeAllReviews ? (
+    <>
+      <AboutHairline style={{ marginTop: 18 }} />
+      <button
+        type="button"
+        onClick={onSeeAllReviews}
+        style={{
+          display: 'block',
+          width: '100%',
+          textAlign: 'left',
+          background: 'transparent',
+          border: 0,
+          padding: '14px 0 0',
+          cursor: 'pointer',
+          fontFamily: SANS,
+        }}
+      >
+        <span style={{ display: 'block', fontSize: 13, fontWeight: 600, color: A.INK }}>
+          {t('courseDetail.communityScore.seeAllReviews')} ›
+        </span>
+        <span style={{ display: 'block', marginTop: 5, fontSize: 11, lineHeight: 1.5, color: A.DIM }}>
+          {t('courseDetail.rating.allReviewsSub')}
+        </span>
+      </button>
+    </>
+  ) : null;
+
+  // The sample is in flight: 0 would state something untrue.
   if (isLoading) return null;
 
-  // NOBODY HAS SCORED IT — a sentence and an invitation, not a card.
+  // NOBODY HAS SCORED IT — a sentence and an invitation, not a card. (CRM1.8: untouched.)
   if (total === 0) {
     return (
       <AboutSection heading={heading}>
@@ -107,64 +127,59 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
     );
   }
 
-  /* BRIEF_COURSE_TAB_1B P1.2 — "8.2 from three golfers", both figures from the
-     aggregate already read above. P1.3: the "N ratings is not a verdict, clbhouz
-     ranks a course once it has ten" line does NOT render — no constant for a
-     ranking threshold of ten exists, and none is to be created. */
+  /* CRM1.7b — THE ONLY RATING IS THE VIEWER'S. The community count is zero and
+     there is no community score, so nothing community-flavoured prints: no
+     figure, no tier word, no bands, no YOU pill. */
+  if (total === 1 && yours != null) {
+    return (
+      <AboutSection kicker={t('courseDetail.reviewsHead.kicker')} title={t('courseDetail.reviewsHead.youFirst')}>
+        <p style={{ margin: '14px 0 0', fontSize: 12.5, lineHeight: 1.55, color: SURFACE.dark.body, fontFamily: SANS }}>
+          {t('courseDetail.reviewsHead.youFirstBody', { score: yours.toFixed(1) })}
+        </p>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 13, marginTop: 15 }}>
+          <strong style={{ color: A.AMBER, fontSize: 48, lineHeight: 0.9, fontWeight: 800, ...FIGS }}>{yours.toFixed(1)}</strong>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 700, lineHeight: 1.2 }}>Yours</div>
+            <div style={{ color: SURFACE.dark.dim, fontSize: 11.5, lineHeight: 1.45, marginTop: 2, ...FIGS }}>1 rating</div>
+          </div>
+        </div>
+        {rateAction}
+        {seeAll}
+      </AboutSection>
+    );
+  }
+
+  /* CRM1.2 — the unchanged headline key, now fed the viewer-excluding pair:
+     nine ratings of which one is the viewer's reads "9.3 from eight golfers". */
   const title = t('courseDetail.reviewsHead.title', {
-    count: total,
-    score: score.toFixed(1),
-    golfers: shotsInWords(total),
+    count,
+    score: (score ?? 0).toFixed(1),
+    golfers: shotsInWords(count),
   });
+
+  const facts = fewReviewFacts(community);
+  const ratedViewer = yours != null;
 
   return (
     <AboutSection kicker={t('courseDetail.reviewsHead.kicker')} title={title}>
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <OverallScoreLine score={score} ratingCount={total} />
+      {/* CRM1.3/1.4 — the Reviews tab's figure row: ink score, tier over count, YOU pill at the end. */}
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, marginTop: 15 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 13, minWidth: 0 }}>
+          <strong data-community-score style={{ color: SURFACE.dark.ink, fontSize: 48, lineHeight: 0.9, fontWeight: 800, ...FIGS }}>{score?.toFixed(1)}</strong>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 700, lineHeight: 1.2 }}>{getRatingTierLabel(score)}</div>
+            <div data-community-rater-count={count} style={{ color: SURFACE.dark.dim, fontSize: 11.5, lineHeight: 1.45, marginTop: 2, overflowWrap: 'anywhere', ...FIGS }}>{count} {count === 1 ? 'rating' : 'ratings'}</div>
+          </div>
         </div>
-        <CountSlot count={total} />
+        {ratedViewer && community.delta != null && <div data-viewer-delta style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, padding: '5px 10px', whiteSpace: 'nowrap', flex: '0 0 auto', borderRadius: 999, border: `1px solid ${inkWithAlpha(A.AMBER, 0.35)}`, background: inkWithAlpha(A.AMBER, 0.07) }}><span style={{ color: SURFACE.dark.mute, fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>You</span><b style={{ color: A.AMBER, fontSize: 14, ...FIGS }}>{yours?.toFixed(1)}</b><span style={{ color: A.IMPROVED, fontSize: 10, fontWeight: 800, ...FIGS }}>{community.delta > 0 ? '▲' : community.delta < 0 ? '▼' : ''} {Math.abs(community.delta).toFixed(1)}</span></div>}
       </div>
 
-      <CategoryScores
-        layout="pairs"
-        marginTop={22}
-        scores={{
-          design: aggregates?.avg_design_score,
-          condition: aggregates?.avg_condition_score,
-          clubhouse: aggregates?.avg_clubhouse_score,
-          facilities: aggregates?.avg_facilities_score,
-        }}
-      />
+      {/* CRM1.6 — the shared band rows, no kicker, heading or prose; two community ratings and up. */}
+      {facts && facts.bands.length > 0 && <CategoryBands bands={facts.bands} />}
 
       {rateAction}
 
-      {onSeeAllReviews ? (
-        <>
-          <AboutHairline style={{ marginTop: 18 }} />
-          <button
-            type="button"
-            onClick={onSeeAllReviews}
-            style={{
-              display: 'block',
-              width: '100%',
-              textAlign: 'left',
-              background: 'transparent',
-              border: 0,
-              padding: '14px 0 0',
-              cursor: 'pointer',
-              fontFamily: SANS,
-            }}
-          >
-            <span style={{ display: 'block', fontSize: 13, fontWeight: 600, color: A.INK }}>
-              {t('courseDetail.communityScore.seeAllReviews')} ›
-            </span>
-            <span style={{ display: 'block', marginTop: 5, fontSize: 11, lineHeight: 1.5, color: A.DIM }}>
-              {t('courseDetail.rating.allReviewsSub')}
-            </span>
-          </button>
-        </>
-      ) : null}
+      {seeAll}
     </AboutSection>
   );
 };
