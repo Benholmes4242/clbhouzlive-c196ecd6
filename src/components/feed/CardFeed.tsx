@@ -224,6 +224,9 @@ export interface CardFeedProps {
   featuredDecisions?: Map<string, import('./featuredRoundTrigger').FeaturedTrigger | null>;
   /** Home only: interleave the Phase 3 rails (homeRailCadence). */
   homeRails?: boolean;
+  /** Home only (BRIEF_ROUND_TILE_1): round traces draw on the card canvas
+   *  under the text block, never over the photograph. */
+  homeRoundPlot?: boolean;
 }
 
 export interface CardFeedHandle {
@@ -272,6 +275,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   weekPickScoreId,
   featuredDecisions,
   homeRails = false,
+  homeRoundPlot = false,
 }, ref) {
 
   /* A round post renders the round card or nothing — see dropUnresolvedRounds.
@@ -951,6 +955,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                 featuredDecisions={featuredDecisions}
                 commentPreviewEnabled
                 commentPreview={commentPreview.map.get(post.id) ?? null}
+                homeRoundPlot={homeRoundPlot}
               />
             )}
           </FeedItemGate>
@@ -998,6 +1003,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       consequenceSources,
       roundCourseMeta,
       homeRails,
+      homeRoundPlot,
       commentPreview.map,
       dividerIndex,
 
