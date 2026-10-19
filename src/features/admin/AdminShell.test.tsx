@@ -96,7 +96,8 @@ describe('BRIEF_ADMIN_SETTINGS shell', () => {
   ] as const)('renders without throwing when the role resolves to %s after a loading render', async (role) => {
     f.role.mockReturnValue({ role: 'none', loading: true });
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-    const tree = (
+    // Fresh element each render: React bails out on a referentially identical tree.
+    const tree = () => (
       <QueryClientProvider client={client}>
         <MemoryRouter initialEntries={['/admin-v2/dashboard']}>
           <Routes>
@@ -105,9 +106,9 @@ describe('BRIEF_ADMIN_SETTINGS shell', () => {
         </MemoryRouter>
       </QueryClientProvider>
     );
-    const { rerender } = render(tree);
+    const { rerender } = render(tree());
     f.role.mockReturnValue({ role, loading: false });
-    rerender(tree);
+    rerender(tree());
     expect(await screen.findByText('Dashboard page')).toBeInTheDocument();
   });
 });
