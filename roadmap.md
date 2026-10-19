@@ -1,5 +1,10 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_ADMIN_SIDE_MENU
+- [x] Ben authorizes Settings remaining at /admin-v2/health?tab=settings; Settings page untouched. Baseline 1,734 passing / 221 files, /tmp/admin-menu/before.log.
+- [x] Rebuilt 304px status-board drawer, open-only shared live and Health queries, threshold-mounted Stage 3 search, maintenance pill and identity/build footer. Existing RPCs and hooks untouched.
+- [ ] STOP: src/features/admin/AdminDrawer.test.tsx:123:19, test "search prioritizes starting names and caps case-insensitive name, username and email matches at eight": TestingLibraryElementError: Unable to find an accessible element with the role "link" and name "Other". Targeted 10 pass / 1 fail; no assertion changed after failure. Eleven new tests in that file; no existing test rewritten, renamed or deleted. Expected inventory 1,745 / 222 files; full after suite not run because of stop. Preview build OK 2026-10-19T04:29:05Z. Browser measurements/device and authenticated acceptance not run. Await authorization to diagnose this failure; hosted authenticated acceptance unavailable on external/unmanaged Supabase.
+
 ## BRIEF_MEDIA_TRUST_1 — MEDIA_TRUST_1
 - [x] MEDIA_TRUST_1_R resolves contract: Ben deployed approved-returning retag_hole_photo with same call, and not_your_photo refusal. Preserve RPC; hide that reason's action and show plain refusal. Baseline rerun 1,729 passing / 220 files (/tmp/media-trust-before.log).
 - [x] MEDIA_TRUST_1_R2 authorises both named tests: proof-row absence with/without a round; picker submission via chip, preserving preselection assertion byte-identical.

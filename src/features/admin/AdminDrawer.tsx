@@ -1,197 +1,138 @@
-import React, { useEffect } from 'react';
+/**
+ * Status-board drawer: open-only live/Health children share approved hooks.
+ * Search mounts the Stage 3 overview only at two trimmed characters.
+ * Settings keeps its Health-tab URL until BRIEF_ADMIN_SETTINGS ships.
+ */
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import {
-  LayoutDashboard, Inbox, Users, MapPin, BarChart3, Shield, ArrowLeft,
-  Activity, Settings,
-  type LucideIcon,
-} from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { LayoutDashboard, Inbox, Users, MapPin, BarChart3, ArrowLeft, Activity, Settings, Search, X, type LucideIcon } from 'lucide-react';
 import { adminTheme as t } from './theme';
 import type { PanelRole } from '@/hooks/usePanelRole';
+import { panelCan } from '@/lib/panelCan';
 import { useTriageCounts } from './hooks/useTriageCounts';
-import { useHealthVerdict } from './components/health/healthIssues';
+import { useMembersOverview } from './hooks/useMembersRadar';
+import { useMaintenanceMode } from '@/hooks/useMaintenanceMode';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { supabase } from '@/integrations/supabase/client';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { Button } from '@/components/ui/button';
+import { formatAgo } from './lib/formatAgo';
+import { LiveBoard, LiveCard, HealthNavStatus, StatusDot, type DrawerLive } from './AdminDrawerStatus';
 
-interface NavItem {
-  to: string;
-  label: string;
-  icon: LucideIcon;
-  requireFull?: boolean;
-  moderatorAllowed?: boolean;
-  showBadge?: boolean;
-  showHealthDot?: boolean;
-  everyRole?: boolean;
-}
-
-const NAV: NavItem[] = [
-  { to: '/admin-v2/dashboard', label: 'Command centre', icon: LayoutDashboard },
-  { to: '/admin-v2/inbox',     label: 'Inbox',     icon: Inbox, moderatorAllowed: true, showBadge: true },
-  { to: '/admin-v2/users',     label: 'Members',   icon: Users },
-  { to: '/admin-v2/content',   label: 'Content',   icon: MapPin },
-  { to: '/admin-v2/analytics', label: 'Analytics', icon: BarChart3, requireFull: true },
-  { to: '/admin-v2/health',    label: 'Health',    icon: Activity, showHealthDot: true },
-  // BRIEF_HEALTH: Settings left the Health tabs; every role reaches it here.
-  { to: '/admin-v2/health?tab=settings', label: 'Settings', icon: Settings, moderatorAllowed: true, everyRole: true },
+interface NavItem { to: string; label: string; icon: LucideIcon; requireFull?: boolean; moderatorAllowed?: boolean; everyRole?: boolean; }
+const GROUPS: { label: string; rows: NavItem[] }[] = [
+  { label: 'Today', rows: [
+    { to: '/admin-v2/dashboard', label: 'Command centre', icon: LayoutDashboard },
+    { to: '/admin-v2/inbox', label: 'Inbox', icon: Inbox, moderatorAllowed: true },
+  ] },
+  { label: 'Members and golf', rows: [
+    { to: '/admin-v2/users', label: 'Members', icon: Users },
+    { to: '/admin-v2/content', label: 'Content', icon: MapPin },
+    { to: '/admin-v2/analytics', label: 'Analytics', icon: BarChart3, requireFull: true },
+  ] },
+  { label: 'System', rows: [
+    { to: '/admin-v2/health', label: 'Health', icon: Activity },
+    { to: '/admin-v2/health?tab=settings', label: 'Settings', icon: Settings, everyRole: true },
+  ] },
 ];
-
-/**
- * Mounted only while the drawer is open for a manageAdmins admin, so a closed
- * drawer, moderators and limited admins never run the Health queries.
- * Same verdict as the Status lens, so the dot and the page cannot disagree.
- */
-function HealthNavDot() {
-  const { issues } = useHealthVerdict();
-  if (issues.length === 0) return null;
-  return (
-    <span style={{
-      position: 'absolute', top: -2, right: -2,
-      width: 8, height: 8, borderRadius: 999,
-      background: t.warn, border: `1.5px solid ${t.surface}`,
-    }} />
-  );
-}
-
-interface Props {
-  open: boolean;
-  onClose: () => void;
-  role: PanelRole;
-  canManageAdmins: boolean;
-}
-
+const pill: React.CSSProperties = { height: 22, padding: '0 8px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap' };
+interface Props { open: boolean; onClose: () => void; role: PanelRole; canManageAdmins: boolean; }
 export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Props) {
   const location = useLocation();
   const triage = useTriageCounts();
-  const badge = triage.data?.total ?? 0;
-
+  const maintenance = useMaintenanceMode();
+  const [query, setQuery] = useState('');
   useEffect(() => {
-    if (!open) return;
+    if (!open) { setQuery(''); return; }
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [open, onClose]);
-
-  const items = NAV.filter(n => {
-    if (n.everyRole) return true;
-    if (role === 'moderator') return !!n.moderatorAllowed;
-    return !n.requireFull || canManageAdmins;
-  });
-
-  return (
-    <>
-      <div
-        onClick={onClose}
-        aria-hidden={!open}
-        style={{
-          position: 'fixed', inset: 0, zIndex: 90,
-          background: 'rgba(0,0,0,0.6)',
-          opacity: open ? 1 : 0,
-          pointerEvents: open ? 'auto' : 'none',
-          transition: 'opacity .22s ease',
-        }}
-      />
-      <aside
-        role="dialog"
-        aria-label="Admin navigation"
-        style={{
-          position: 'fixed', top: 0, left: 0, bottom: 0, width: 280, zIndex: 100,
-          background: t.surface,
-          borderRight: `1px solid ${t.line}`,
-          transform: open ? 'translateX(0)' : 'translateX(-100%)',
-          transition: 'transform .26s cubic-bezier(0.22,1,0.36,1)',
-          display: 'flex', flexDirection: 'column',
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 18px', borderBottom: `1px solid ${t.line}` }}>
-          <div
-            style={{
-              width: 34, height: 34, borderRadius: 12,
-              background: `linear-gradient(135deg,${t.brand},${t.brandText})`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: t.surface,
-            }}
-          >
-            <Shield size={18} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontWeight: 700, color: t.ink, fontSize: 15, lineHeight: 1.1 }}>clbhouz</span>
-            <span style={{ color: t.inkFaint, fontSize: 11 }}>Command Center</span>
-          </div>
-        </div>
-
-        <nav style={{ flex: 1, padding: 10, display: 'flex', flexDirection: 'column', gap: 2, overflowY: 'auto' }}>
-          {items.map((item) => {
-            const [path, query] = item.to.split('?');
+  const trimmed = query.trim();
+  const canSearch = panelCan(role).viewUsers;
+  const total = triage.data?.total ?? 0;
+  const oldest = triage.data?.oldestCreatedAt;
+  const hours = oldest ? Math.max(1, Math.floor((Date.now() - new Date(oldest).getTime()) / 3_600_000)) : null;
+  const age = hours !== null && Number.isFinite(hours) ? (hours < 24 ? `${hours}h` : `${Math.floor(hours / 24)}d`) : null;
+  const contents = (live?: DrawerLive) => <>
+    {live && <LiveCard live={live} onClose={onClose} />}
+    {canSearch && <label style={{ flexShrink: 0, margin: '12px 14px 0', height: 44, padding: '0 12px', borderRadius: 12, background: t.canvas, border: `1px solid ${t.line}`, display: 'flex', alignItems: 'center', gap: 10 }}>
+      <Search size={16} color={t.inkFaint} style={{ flexShrink: 0 }} />
+      <input type="search" aria-label="Find a member" placeholder="Find a member" value={query} onChange={e => setQuery(e.target.value)} style={{ flex: 1, minWidth: 0, border: 0, outline: 'none', background: 'transparent', color: t.ink, fontSize: 15, fontFamily: 'inherit' }} />
+    </label>}
+    <nav aria-label="Admin sections" style={{ flex: 1, minHeight: 0, padding: '6px 10px 10px', overflowY: 'auto', willChange: 'transform' }}>
+      {canSearch && trimmed.length >= 2 ? <MemberResults query={trimmed} onClose={onClose} /> : GROUPS.map(group => {
+        const rows = group.rows.filter(n => n.everyRole || (role === 'moderator' ? n.moderatorAllowed : !n.requireFull || canManageAdmins));
+        if (!rows.length) return null;
+        return <div key={group.label}>
+          <div style={{ padding: '16px 12px 6px', fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: t.inkFaint }}>{group.label}</div>
+          {rows.map(item => {
+            const [path, qs] = item.to.split('?');
             const onSettings = new URLSearchParams(location.search).get('tab') === 'settings';
-            const active = location.pathname.startsWith(path) && (query ? onSettings : !(path === '/admin-v2/health' && onSettings));
+            const active = location.pathname.startsWith(path) && (qs ? onSettings : !(path === '/admin-v2/health' && onSettings));
             const Icon = item.icon;
-            const showBadge = item.showBadge && badge > 0;
-            const showDot = item.showHealthDot && open && canManageAdmins;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={onClose}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '10px 12px',
-                  borderRadius: t.radius.md,
-                  background: active ? t.brandSoft : 'transparent',
-                  color: active ? t.brandText : t.ink,
-                  fontSize: 14, fontWeight: active ? 600 : 500,
-                  textDecoration: 'none',
-                }}
-              >
-                <span style={{ position: 'relative', display: 'inline-flex' }}>
-                  <Icon size={18} />
-                  {showDot && <HealthNavDot />}
-                </span>
-                <span style={{ flex: 1 }}>{item.label}</span>
-                {showBadge && (
-                  <span
-                    style={{
-                      background: t.brand, color: t.surface,
-                      fontSize: 11, fontWeight: 700, padding: '1px 8px', borderRadius: 999,
-                      minWidth: 20, textAlign: 'center',
-                      fontFeatureSettings: '"tnum" 1', fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    {badge}
-                  </span>
-                )}
-              </Link>
-            );
+            return <Link key={item.to} to={item.to} onClick={onClose} aria-current={active ? 'page' : undefined} style={{ height: 46, padding: '0 12px', borderRadius: 12, display: 'grid', gridTemplateColumns: '18px minmax(0, 1fr) auto', columnGap: 14, alignItems: 'center', background: active ? t.brandSoft : 'transparent', color: active ? t.brandText : t.ink, textDecoration: 'none' }}>
+              <Icon size={18} strokeWidth={1.9} color={active ? t.brandText : t.inkMuted} />
+              <span style={{ fontSize: 15, fontWeight: active ? 600 : 500 }}>{item.label}</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, whiteSpace: 'nowrap' }}>
+                {item.label === 'Inbox' && !triage.isLoading && (total > 0 ? <>{age && <span style={{ color: t.warnText }}>oldest {age}</span>}<span style={{ ...pill, minWidth: 22, background: t.brand, color: t.surface }}>{total}</span></> : <span style={{ color: t.inkFaint }}>Clear</span>)}
+                {item.label === 'Analytics' && live && !live.isError && live.data?.now != null && <><StatusDot /><span style={{ color: t.okText }}>{live.data.now} live</span></>}
+                {item.label === 'Health' && canManageAdmins && <HealthNavStatus />}
+                {item.label === 'Settings' && maintenance.on && <span style={{ ...pill, background: t.dangerSoft, color: t.dangerText }}>Maintenance on</span>}
+              </span>
+            </Link>;
           })}
-        </nav>
-
-        <div style={{ padding: 14, borderTop: `1px solid ${t.line}`, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span
-              style={{
-                width: 8, height: 8, borderRadius: '50%',
-                background: t.brand, boxShadow: `0 0 0 3px ${t.brandSoft}`,
-              }}
-            />
-            <span style={{ fontSize: 12, color: t.inkMuted }}>
-              {role === 'full' ? 'Full Admin' : role === 'limited' ? 'Limited Admin' : role === 'moderator' ? 'Moderator' : '-'}
-            </span>
-          </div>
-          <Link
-            to="/clubhouse"
-            onClick={onClose}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '8px 12px',
-              borderRadius: t.radius.md,
-              background: t.canvas,
-              color: t.ink,
-              fontSize: 13, fontWeight: 600,
-              textDecoration: 'none',
-              border: `1px solid ${t.line}`,
-            }}
-          >
-            <ArrowLeft size={14} /> Back to App
-          </Link>
+        </div>;
+      })}
+    </nav>
+  </>;
+  return <>
+    <div onClick={onClose} aria-hidden={!open} style={{ position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(0,0,0,0.6)', opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none', transition: 'opacity .22s ease' }} />
+    <aside role="dialog" aria-label="Admin navigation" aria-modal={open || undefined} aria-hidden={!open} style={{ position: 'fixed', top: 0, left: 0, bottom: 0, width: 304, maxWidth: '100vw', zIndex: 100, background: t.surface, borderRight: `1px solid ${t.line}`, transform: open ? 'translateX(0)' : 'translateX(-100%)', transition: 'transform .26s cubic-bezier(0.22,1,0.36,1)', display: 'flex', flexDirection: 'column', paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', color: t.ink, fontVariantNumeric: 'tabular-nums', boxSizing: 'border-box' }}>
+      {open && <>
+        <div style={{ padding: '10px 10px 0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <div><div style={{ fontSize: 19, fontWeight: 700 }}>clbhouz</div><div style={{ marginTop: 1, fontSize: 12, color: t.inkFaint }}>Command centre</div></div>
+          <Button variant="ghost" size="icon" aria-label="Close menu" onClick={onClose} style={{ width: 44, height: 44, borderRadius: 12, color: t.inkMuted, background: 'transparent' }}><X className="!size-[18px]" /></Button>
         </div>
-      </aside>
-    </>
-  );
+        {canManageAdmins ? <LiveBoard>{contents}</LiveBoard> : contents()}
+        <DrawerFooter role={role} onClose={onClose} />
+      </>}
+    </aside>
+  </>;
+}
+function MemberResults({ query, onClose }: { query: string; onClose: () => void }) {
+  const q = useMembersOverview();
+  const needle = query.toLowerCase();
+  const members = (q.data?.members ?? []).filter(m => [m.display_name, m.username, m.email].some(v => v?.toLowerCase().includes(needle)))
+    .sort((a, b) => Number(b.display_name?.toLowerCase().startsWith(needle) ?? false) - Number(a.display_name?.toLowerCase().startsWith(needle) ?? false)).slice(0, 8);
+  if (q.isLoading || q.isError) return <div role="status" style={{ padding: '16px 12px', color: t.inkFaint, fontSize: 13 }}>{q.isError ? 'Member search unavailable' : 'Finding members…'}</div>;
+  if (!members.length) return <div style={{ padding: '16px 12px', color: t.inkFaint, fontSize: 13 }}>No member matches "{query}"</div>;
+  return <>{members.map(m => <Link key={m.user_id} to={`/admin-v2/users?member=${encodeURIComponent(m.user_id)}`} onClick={onClose} style={{ height: 52, padding: '0 12px', display: 'grid', gridTemplateColumns: '32px minmax(0, 1fr)', gap: 12, alignItems: 'center', color: t.ink, textDecoration: 'none' }}>
+    <SquircleAvatar size={32} src={m.photo_url} userId={m.user_id} alt={m.display_name ?? m.username ?? ''} hairlineRing />
+    <span style={{ minWidth: 0 }}><span style={{ display: 'block', fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.display_name || m.username || 'Member'}</span>{m.username && <span style={{ display: 'block', fontSize: 12, color: t.inkFaint, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>@{m.username}</span>}</span>
+  </Link>)}</>;
+}
+function DrawerFooter({ role, onClose }: { role: PanelRole; onClose: () => void }) {
+  const { user } = useSupabaseSession();
+  const me = useQuery({ queryKey: ['admin-v2', 'me'], staleTime: 600_000, enabled: !!user?.id, queryFn: async () => {
+    if (!user) return null;
+    const { data, error } = await supabase.from('user_profiles').select('display_name, username').eq('id', user.id).maybeSingle();
+    if (error) throw error;
+    return data;
+  } });
+  const name = me.data?.display_name || user?.email?.split('@')[0] || 'Admin';
+  const initials = name.trim().split(/\s+/).map(word => word[0]).slice(0, 2).join('').toUpperCase();
+  const label = role === 'full' ? 'Full admin' : role === 'limited' ? 'Limited admin' : 'Moderator';
+  const background = role === 'full' ? t.okSoft : role === 'limited' ? t.warnSoft : t.neutralSoft;
+  const color = role === 'full' ? t.okText : role === 'limited' ? t.warnText : t.inkMuted;
+  return <footer style={{ flexShrink: 0, padding: '14px 14px max(30px, env(safe-area-inset-bottom, 0px))', borderTop: `1px solid ${t.line}` }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '36px minmax(0, 1fr) auto', columnGap: 10, alignItems: 'center' }}>
+      <span style={{ width: 36, height: 36, borderRadius: 10, background: t.neutralSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: t.brand }}>{initials}</span>
+      <span style={{ minWidth: 0, fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+      <span style={{ ...pill, fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', background, color }}>{label}</span>
+    </div>
+    <Button asChild variant="ghost" className="w-full" style={{ marginTop: 12, height: 44, borderRadius: 12, border: `1px solid ${t.line}`, background: t.canvas, color: t.ink, fontSize: 14, fontWeight: 600 }}><Link to="/clubhouse" onClick={onClose}><ArrowLeft className="!size-[14px]" />Back to app</Link></Button>
+    <div style={{ marginTop: 10, textAlign: 'center', fontSize: 11, color: t.inkFaint }}>Build <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }}>{__BUILD_ID__}</span> · deployed {formatAgo(typeof __BUILD_STAMP__ === 'string' ? __BUILD_STAMP__ : null, { suffix: true })}</div>
+  </footer>;
 }

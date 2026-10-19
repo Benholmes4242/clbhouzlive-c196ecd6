@@ -27,7 +27,7 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Token ownership and amber restrictions: see `src/features/courses/components/holes/analytical/tokens.tsx`.
 - Handicap-index authority and reader audit: see `src/lib/handicap/resolveHandicap.ts`.
 - The admin Analytics page and its header pill read figures only from the five `get_admin_analytics_*` RPCs via `useAnalyticsLenses.ts`, never tables, because browser reads truncate at the row cap and staff filtering belongs to the server.
-- The admin Health page and the drawer's Health dot read figures only from the `get_admin_health_*` RPCs (`useHealthLenses.ts`) and the existing service hooks, and share one verdict (`useHealthVerdict` in `components/health/healthIssues.ts`), so the dot and the page cannot disagree and no Health panel reads a table.
+- Admin Health and drawer query ownership: see src/features/admin/AdminDrawerStatus.tsx header.
 
 - Owner copy uses `profileOwnerVoice` to share grammar.
 - Small-sample Reviews reuse SingleReview's RaterReviewRow, so context and media cannot drift.
