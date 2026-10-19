@@ -116,14 +116,14 @@ export interface FeedDot {
 }
 
 /** BEA5 — one dot per played hole, graded in the scorecard ramp. */
-/** FN1.2 — graded on the NET change when `received` is given (Home always
- *  passes it); without it the allowance is zero. */
+/** FGD1 — grade GROSS minus par; received remains accepted for existing callers
+ *  but only the trace and fill use the allowance, never the dots. */
 export function feedHoleDots(shape: HoleShape | null | undefined, received?: readonly number[] | null): FeedDot[] {
   if (!shape) return [];
   const out: FeedDot[] = [];
   shape.holes.forEach((hole, index) => {
     if (hole.par == null || hole.strokes == null || hole.strokes <= 0) return;
-    const d = hole.strokes - hole.par - (received?.[index] ?? 0);
+    const d = hole.strokes - hole.par;
     const i = index + 1;
     if (d <= -2) out.push({ i, tone: SC_FILL_GOLD, r: 2.8 });
     else if (d === -1) out.push({ i, tone: TOPAR_UNDER_DARK, r: 2.8 });

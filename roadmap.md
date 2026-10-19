@@ -1,5 +1,8 @@
 # Roadmap
 
+## FGD1 — Gross dots, net line
+- [x] Gross-only Home dot grading restored; only two authorised FN1 assertions updated, original case names retained under assertion-only scope. Added three cases solely feedGrossDots.test.tsx. Full npx vitest run: 1,856 passing / 240 files before -> 1,859 passing / 241 files after, zero failures; build OK. Browser actual plots with synthetic rounds verified red stroke-hole birdie, sixteen bogey dots/net -4 and five red/no gold, zero page errors. Actual nickleconte204 Old Fold Manor hole data and hosted authenticated acceptance unavailable; five red is implied by five gross birdies, no handicap-created gold remains, genuine gross eagle-or-better would remain gold. Report: /mnt/documents/FGD1_report.md. Net trace/fill/figures, allocation, FED1 condition, tones/radii/thresholds, feats and Explore frozen; no SQL/migrations/RPC/feed_config/cap changes.
+
 ## FED1 — Finish marker
 - [x] Home and Explore line-only terminal circles now yield to a dot at the final series index; only one terminal-circle condition changed in each permitted component. Unmarked endpoints retain the unchanged ink terminus. TrajectoryLine and existing tests untouched. Full `npx vitest run`: 1,850 passing / 239 files before -> 1,856 passing / 240 files after, zero failures; +6 solely src/test/feedEndDot.test.tsx (Home birdie/par/double/unscored, Explore supplied birdie/unmarked). Build OK. Browser actual plots verified all eight Home/Explore finish cases, zero page errors; synthetic fixture only, not hosted authenticated acceptance. Explore still supplies achievement dots only, so par/double finish with ink there. Real partial feed rounds end at the last retained played/scored hole, not a fabricated unplayed endpoint.
 
