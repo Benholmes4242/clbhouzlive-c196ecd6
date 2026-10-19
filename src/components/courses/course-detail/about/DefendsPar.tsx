@@ -186,33 +186,91 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
       </div>
       {nineLine ? <Said>{nineLine}</Said> : null}
 
-      {v.parTypes.map((p) => (
-        <div key={p.par} style={{ marginTop: 13, fontFamily: SANS }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 14, fontWeight: 700, color: A.INK }}>{t('courseDetail.verdict.parType', { par: p.par })}</span>
-            <span style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.03em', color: A.BODY, ...FIGS }}>
-              {signed(p.perHole, 2)}
-            </span>
-          </div>
-          <div style={{ height: 4, borderRadius: 2, background: A.TRACK, marginTop: 6, overflow: 'hidden' }}>
+      <div style={{ ...SMALL_LABEL, marginTop: 18 }}>{t('courseDetail.defends.parScaleLabel')}</div>
+      <div style={{ marginTop: 10 }}>
+        {parRows.map((p) => {
+          const amber = p.par === hardestPar;
+          return (
             <div
+              key={p.par}
+              data-testid={`par-type-row-${p.par}`}
               style={{
-                height: '100%',
-                borderRadius: 2,
-                width: `${(Math.max(0, p.perHole) / maxPer) * 100}%`,
-                background: PAR_FILL,
+                display: 'grid',
+                gridTemplateColumns: '74px minmax(0, 1fr) 58px',
+                alignItems: 'center',
+                gap: 11,
+                padding: '7px 0',
+                fontFamily: SANS,
               }}
-            />
-          </div>
-          <div style={{ fontSize: 11, color: A.DIM, marginTop: 5, ...FIGS }}>
-            {t('courseDetail.defends.parMeta', {
-              count: p.holes,
-              holes: formatNumber(p.holes),
-              shots: signed(p.shots).replace('+', ''),
-            })}
-          </div>
-        </div>
-      ))}
+            >
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: A.INK, lineHeight: 1.2 }}>
+                  {t('courseDetail.verdict.parType', { par: p.par })}
+                </div>
+                <div style={{ fontSize: 9.5, fontWeight: 400, color: A.DIM, marginTop: 2, ...FIGS }}>
+                  {t('courseDetail.defends.parHoles', { count: p.holes, holes: formatNumber(p.holes) })}
+                </div>
+              </div>
+              <div style={{ position: 'relative', height: 3, borderRadius: 2, background: A.TRACK }}>
+                <span
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    left: `${LEVEL_TICK_PCT}%`,
+                    top: -4,
+                    width: 1,
+                    height: 11,
+                    background: 'rgba(255,255,255,0.22)',
+                  }}
+                />
+                <span
+                  data-testid={`par-type-dot-${p.par}`}
+                  style={{
+                    position: 'absolute',
+                    left: `${parTypeTrackPct(p.perHole)}%`,
+                    top: '50%',
+                    width: 9,
+                    height: 9,
+                    borderRadius: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    background: amber ? A.AMBER : 'rgba(248,250,252,0.62)',
+                  }}
+                />
+              </div>
+              <div
+                data-testid={`par-type-figure-${p.par}`}
+                style={{
+                  textAlign: 'right',
+                  fontSize: 15,
+                  fontWeight: 800,
+                  letterSpacing: '-0.03em',
+                  color: amber ? A.AMBER : A.INK,
+                  ...FIGS,
+                }}
+              >
+                {signed(p.perHole, 2)}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginTop: 3,
+          paddingLeft: 85,
+          paddingRight: 69,
+          fontSize: 9.5,
+          color: A.FAINT,
+          fontFamily: SANS,
+          ...FIGS,
+        }}
+      >
+        <span>{signed(PAR_SCALE_MIN, 2)}</span>
+        <span>{t('courseDetail.defends.parScaleLevel')}</span>
+        <span>{signed(PAR_SCALE_MAX, 2)}</span>
+      </div>
 
       {o ? (
         <>
