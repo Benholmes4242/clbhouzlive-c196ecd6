@@ -79,6 +79,15 @@ export function feedFeat(shape: HoleShape | null | undefined): FeedFeat | null {
   return null;
 }
 
+/** BRIEF_ROUND_TILE_1_R2 BGA3/BGA4 -- one fact, one place. The panel shows a
+ *  round feat; when the plot's gold mark already names a rare hole and the
+ *  panel's headline is a rare-hole kind too, the panel is suppressed. */
+export function panelShowsCallout(kind: string | null, shape: HoleShape | null | undefined): boolean {
+  if (!kind) return false;
+  const holeKind = kind === 'ace' || kind === 'albatross' || kind === 'eagle';
+  return !(holeKind && feedFeat(shape) != null);
+}
+
 export function RoundTilePlot({
   shape,
   width = 340,

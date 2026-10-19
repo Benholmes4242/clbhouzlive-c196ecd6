@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
-import { RoundTilePlot } from '@/components/feed/roundTilePlot';
+import { RoundTilePlot, panelShowsCallout } from '@/components/feed/roundTilePlot';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -1514,6 +1514,7 @@ export function ExploreCard({
       ? t('amateur.stream.you', 'You')
       : item.who?.display_name?.trim() || t('amateur.stream.aMember', 'A member');
     const playDate = railCaptionDate(item.facts.play_date ?? null);
+    const homeCallout = panelShowsCallout(callout?.kind ?? null, shape) ? callout : null;
     return (
       <button
         type="button"
@@ -1530,6 +1531,19 @@ export function ExploreCard({
           </span>
         </span>
         {shape ? <RoundTilePlot shape={shape} /> : null}
+        {/* BRIEF_ROUND_TILE_1_R2 -- the round-feat panel, beneath the plot and
+            above the figures. When the plot's gold mark already names a rare
+            hole (ace / albatross / eagle) and the panel's headline is that
+            same kind of hole feat, the panel is suppressed: one fact, one place. */}
+        {homeCallout ? (
+          <RoundStatStrip
+            callout={homeCallout}
+            scoreId={item.facts.score_id ?? null}
+            featCounts={{ aces: item.facts.holes_in_one ?? null, albatrosses: item.facts.albatrosses ?? null, eagles: item.facts.eagles ?? null }}
+            locale={locale}
+            ownerDisplayName={item.who?.display_name ?? null}
+          />
+        ) : null}
         <span style={{ display: 'block', paddingInline: 4, marginTop: 8 }}>
           <WhoLine
             item={item}
