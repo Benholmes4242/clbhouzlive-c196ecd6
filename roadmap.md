@@ -1,7 +1,7 @@
 # Roadmap
 
 ## BRIEF_TOUR_CHAMPION_AVATAR_CANDIDATES
-- [ ] Carry winner override/key through the existing hero reads, pass the full candidate list to ChampionStrip, add three regression cases and run the full suite. Baseline npx vitest run: 1,812 passing / 234 files. Resolver, SquircleAvatar, other bands and strip appearance frozen.
+- [x] Carried winner override/key through existing reads and full candidate list into ChampionStrip; added three cases in tourChampionAvatarCandidates.test.tsx. Full npx vitest run: 1,812/234 to 1,815 passing/235 files, zero failures; no existing tests changed. Build OK; actual strip browser mount verified fallback walk and EL initials. Hosted Tour flow unverified. Shared fallback helper ignores identity key, so distinct hue not claimed; frozen helper unchanged. Report: /mnt/documents/BRIEF_TOUR_CHAMPION_AVATAR_CANDIDATES_report.md.
 
 ## BRIEF_AVATAR_CACHED_PHOTO_STUCK
 - [x] Changed only SquircleAvatar's decoded-image layout-effect guard/dependencies; added two regression cases in SquircleAvatar.cachedPhoto.test.tsx. Full npx vitest run: 1,810 passing / 233 files baseline to 1,812 passing / 234 files, zero failures; +2 from the named new file, no existing tests changed. Browser actual-avatar mount verified cached A remains visible after [A,B,C] to [A,C,B], and new D remains hidden until load. Build OK. Hosted Tour switching remains unverified; Tour code, candidate walk, fallback and styling unchanged.
