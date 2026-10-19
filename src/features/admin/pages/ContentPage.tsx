@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { formatAgo } from '../lib/formatAgo';
-import { matchKey } from '../lib/tourDataDisplay';
+import { matchKey, nameTokens, isDupName, wordsMatch } from '../lib/tourDataDisplay';
 import { toast } from '@/lib/toast';
 import {
   Plus, Search, RefreshCw, Image as ImageIcon,
@@ -825,9 +825,13 @@ export function TourSection() {
           // Exact-name fallback never chooses between same-name players.
           if (id == null) {
             const key = matchKey(name);
-            const matches = key ? list.filter(p => matchKey(p.fullName || `${p.firstName ?? ''} ${p.lastName ?? ''}`) === key) : [];
-            if (matches.length === 1) {
-              setParam('player', matches[0].id, true);
+            const nameOf = (p: PlayerRow) => p.fullName || `${p.firstName ?? ''} ${p.lastName ?? ''}`;
+            const exact = key ? list.filter(p => matchKey(nameOf(p)) === key) : [];
+            // No exact match: a unique word match among non-DUP rows.
+            const words = exact.length === 0 ? list.filter(p => !isDupName(nameOf(p)) && wordsMatch(name, nameOf(p))) : [];
+            const pick = exact.length === 1 ? exact[0] : exact.length === 0 && words.length === 1 ? words[0] : null;
+            if (pick) {
+              setParam('player', pick.id, true);
             } else {
               setParam('sub', 'players', true, { q: name });
             }
@@ -890,11 +894,14 @@ function TourPlayersTab({ players: data, isLoading, refetch, sync, cacheBust, on
   const filtered = useMemo(() => {
     let r = data;
     if (tourFilter !== 'all') r = r.filter(p => p.tourCodes?.some(tc => normalizeTourCode(tc) === tourFilter));
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      r = r.filter(p =>
-        (p.fullName ?? '').toLowerCase().includes(q) ||
-        (p.country ?? '').toLowerCase().includes(q));
+    const tokens = nameTokens(search);
+    if (tokens.length) {
+      // Every query word must appear in the name or in the country.
+      r = r.filter(p => {
+        const n = matchKey(p.fullName || `${p.firstName ?? ''} ${p.lastName ?? ''}`);
+        const c = matchKey(p.country);
+        return tokens.every(tk => n.includes(tk)) || tokens.every(tk => c.includes(tk));
+      });
     }
     return r;
   }, [data, tourFilter, search]);
