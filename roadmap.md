@@ -1,7 +1,8 @@
 # Roadmap
 
 ## BRIEF_ROUND_PLOT_SCALE_1 - ROUND_PLOT_1
-- [ ] STOP before app/test edits: src/test/roundTilePlot.test.tsx, case "dots every played hole and grades each in the ramp", asserts the par entry equals TOPAR_EVEN_DARK (translucent). BLA2 requires opaque local par ink; DO NOT requires naming and stopping before rewriting an existing test. Await authorisation for this exact assertion only. BLA7 requires height and scale together, so neither implemented pending ruling.
+- [x] ROUND_PLOT_1_R authorises only third expected tone in the ramp test. Derived TOPAR_EVEN_DARK rgba(242,244,247,0.42) over actual Home CARD/FEED_CARD_SURFACE #16161A to #727377; withdrew earlier #6E6F71. Local documented dot token, shared tokens unchanged. Plot SVG 59 -> 102px, unchanged 10px seam gives 69 -> 112px footprint. Per-round range includes zero with symmetric six-stroke floor; panel/mark/series/shared callers unchanged.
+- [x] npx vitest run: last reported 1,805 passing / 232 files -> 1,810 passing / 233 files, zero failures; five new range cases solely roundPlotScale.test.ts. Only existing assertion changed: ramp test third tone TOPAR_EVEN_DARK -> '#727377'. No deleted/renamed tests. Preview build OK 2026-10-19T11:00:10Z. Actual populated ExploreCard Home fixture at 430px: tile 223.921875 -> 266.921875px (+43), reconstructed before by restoring SVG height only; chart footprint 112px, opaque dots, no overflow, tap handoff and zero page errors. Screenshot reviewed. Live route /auth; hosted signed-in Home acceptance unavailable on external/unmanaged Supabase. Trace stroke actually 1.8px, not brief's 2.3px; left unchanged under nothing-else-moves rule.
 - [x] Confirm clbhouz from project AGENTS.md and existing roadmap. No app/test changes or test commands in this brief; last reported full suite command npx vitest run: 1,805 passing / 232 files, zero failures. This is a historical result, not a fresh run.
 
 ## BRIEF_ROUND_TILE_1 - ROUND_TILE_1

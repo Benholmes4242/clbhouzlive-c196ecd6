@@ -59,7 +59,7 @@ describe('feedHoleDots — every played hole, scorecard ramp', () => {
     expect(dots.map((d) => d.tone)).toEqual([
       SC_FILL_GOLD,
       TOPAR_UNDER_DARK,
-      TOPAR_EVEN_DARK,
+      '#727377',
       SC_BOGEY_DARK,
       SC_DOUBLE_DARK,
     ]);
