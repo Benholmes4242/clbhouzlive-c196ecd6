@@ -4,7 +4,8 @@
  * State 2's row/context and panel are reused, never a second review row.
  * All sections are unframed and page-scrolled; missing identities stay unnamed.
  * State 4 adds the existing distribution at the shared excluding threshold.
- * Its month explanation is conditional on widest Condition, never a stored month. */
+ * Its month explanation is conditional on widest Condition, never a stored month.
+ * Reviews States 3/4 share FewReviews and RatingTierDistribution to prevent population drift. */
 import React from 'react';
 import type { CourseReview } from '@/hooks/useCourseReviews';
 import { useMembersWhoPlayedCourse } from '@/hooks/useMembersWhoPlayedCourse';

@@ -33,7 +33,7 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Owner copy uses `profileOwnerVoice` to share grammar.
 - Sheet handicap ownership: see HcpStrip.tsx header; prevents connect-card flashes.
 - Small-sample Reviews reuse SingleReview's RaterReviewRow, so context and media cannot drift.
-- Reviews States 3/4 share FewReviews and RatingTierDistribution to prevent population drift.
+- Course tab gaps and canon: see tabCanon.css and AboutSection.tsx; null chains stay aligned.
 - Course photo publication and metadata live in `src/lib/courseMedia`; shared payloads prevent entrypoint drift.
 - Media state/RPC ownership: see CourseMediaEmptyStates.tsx header.
 
