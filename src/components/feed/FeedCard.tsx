@@ -314,6 +314,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   featuredDecisions,
   commentPreview,
   commentPreviewEnabled = false,
+  homeRoundPlot = false,
 }) => {
   const storedSlide = useClubhouseStore((s) => {
     if (carouselRestoreTab == null || feedIndex == null) return 0;
@@ -546,6 +547,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           size="std"
           bleed={ROUND_CARD_INSET}
           shape={postRound ? (roundShape === undefined ? undefined : roundShape) : undefined}
+          feedPlot={homeRoundPlot}
           medals={roundMedals}
           onTap={() => { if (postRound) onRoundTap?.(post, postRound); }}
           onWhoTap={() => onProfile(post)}
