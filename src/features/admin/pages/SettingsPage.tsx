@@ -638,10 +638,11 @@ function ThisDeviceSection({ role, userId }: { role: string; userId: string | un
   useEffect(() => subscribePerfLive(() => setPerfEnabled(isPerfEnabled())), []);
   useEffect(() => subscribeAudioDebugEnabled(() => setAudioEnabled(audioDebugEnabled())), []);
 
+  const buildStamp = typeof __BUILD_STAMP__ === 'string' ? __BUILD_STAMP__ : null;
   const diagnostics = () => [
     'clbhouz diagnostics',
-    `build: ${__BUILD_ID__}`,
-    `built: ${__BUILD_STAMP__}`,
+    `build: ${typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'unknown'}`,
+    `built: ${buildStamp ?? 'unknown'}`,
     `shell: ${shellLabel()}`,
     `user: ${userId ?? ''}`,
     `role: ${role}`,
@@ -702,9 +703,9 @@ function ThisDeviceSection({ role, userId }: { role: string; userId: string | un
       </div>
       <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', paddingTop: 12, borderTop: `1px solid ${t.hairline}` }}>
         {[
-          { label: 'Build', value: <span style={{ fontFamily: MONO }}>{__BUILD_ID__}</span> },
+          { label: 'Build', value: <span style={{ fontFamily: MONO }}>{typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'dev'}</span> },
           { label: 'Shell', value: shellLabel() },
-          { label: 'Deployed', value: formatAgo(typeof __BUILD_STAMP__ === 'string' ? __BUILD_STAMP__ : null, { suffix: true }) },
+          { label: 'Deployed', value: formatAgo(buildStamp, { suffix: true }) },
         ].map((f) => (
           <div key={f.label}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: t.inkFaint }}>{f.label}</div>
