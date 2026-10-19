@@ -73,7 +73,7 @@ describe('Tap fallback word match', () => {
     f.directory = [player('a', 'Eugenio Lopez-Chacarra'), player('b', 'Eugenio Chacarra Ruiz')];
     mount();
     fireEvent.click(await screen.findByRole('button', { name: /Eugenio Chacarra/ }));
-    expect(await screen.findByPlaceholderText('Search by name or country…')).toHaveValue('EUGENIO CHACARRA');
+    expect(await screen.findByPlaceholderText('Search by name or country…')).toHaveValue('Eugenio Chacarra');
     expect(new URLSearchParams(screen.getByTestId('location').textContent ?? '').has('player')).toBe(false);
   });
 });
