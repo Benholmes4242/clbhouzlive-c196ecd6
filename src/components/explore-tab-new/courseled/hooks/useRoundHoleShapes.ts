@@ -47,6 +47,9 @@ interface Row {
    */
   adjusted_gross: number | null;
   played: boolean;
+  /** FN1 — read in the SAME batch so the Home plot can be netted. */
+  stroke_index: number | null;
+  strokes_allowed: number | null;
 }
 
 /** §1(a) — the stored round par, already NULL on an incomplete card. */
@@ -98,6 +101,10 @@ export interface HoleShape {
     strokes: number | null;
     /** §1.3 — the sheet's rule: adjusted_gross ?? actual_gross. */
     sheetStrokes: number | null;
+    /** FN1 — the course's stroke index for this hole, null when absent. */
+    strokeIndex?: number | null;
+    /** FN1 — the provider's strokes received on this hole, null when absent. */
+    strokesAllowed?: number | null;
   }[];
 }
 
@@ -133,6 +140,8 @@ function buildShape(rows: Row[]): Omit<HoleShape, 'coursePar'> | null {
       par: h.par,
       strokes: h.actual_gross,
       sheetStrokes: h.adjusted_gross ?? h.actual_gross ?? null,
+      strokeIndex: h.stroke_index ?? null,
+      strokesAllowed: h.strokes_allowed ?? null,
     })),
   };
 }
@@ -156,7 +165,7 @@ export function useRoundHoleShapes(scoreIds: readonly (string | null | undefined
       const [holesRes, parsRes] = await Promise.all([
         supabase
           .from('whs_score_holes' as never)
-          .select('score_id, hole_no, par, actual_gross, adjusted_gross, played')
+          .select('score_id, hole_no, par, actual_gross, adjusted_gross, played, stroke_index, strokes_allowed')
           .in('score_id', ids as string[]),
         supabase
           .from('gam_round_stats' as never)

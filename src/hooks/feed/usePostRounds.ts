@@ -83,6 +83,9 @@ export interface PostRound {
    * security_invoker, so RLS is enforced through it exactly as on gam_round_stats.
    */
   netScore: number | null;
+  /** FN1 — gam_round_net.course_handicap, read beside net_score in the same
+   *  call. General play has no allowance, so this is the HANDICAP the card prints. */
+  courseHandicap: number | null;
   coursePar: number | null;
   deltaIndex: number | null;
   playDate: string | null;
@@ -259,7 +262,7 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
         // id list. Net is the view's number: there is deliberately no course
         // handicap arithmetic here, because a second copy of the WHS formula in
         // the client is how the two drift.
-        supabase.from('gam_round_net' as never).select('whs_score_id, net_score').in('whs_score_id', ids),
+        supabase.from('gam_round_net' as never).select('whs_score_id, net_score, course_handicap').in('whs_score_id', ids),
       ]);
 
       if (statsRes.error) throw statsRes.error;
@@ -271,9 +274,13 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
       if (netRes.error) console.warn('[feed] gam_round_net unavailable', netRes.error.message);
 
       const nets = new Map<string, number>();
-      for (const n of ((netRes.data ?? []) as unknown) as { whs_score_id: string; net_score: number | null }[]) {
+      const courseHandicaps = new Map<string, number>();
+      for (const n of ((netRes.data ?? []) as unknown) as { whs_score_id: string; net_score: number | null; course_handicap: number | null }[]) {
         if (n.whs_score_id && n.net_score != null && Number.isFinite(Number(n.net_score))) {
           nets.set(n.whs_score_id, Number(n.net_score));
+        }
+        if (n.whs_score_id && n.course_handicap != null && Number.isFinite(Number(n.course_handicap))) {
+          courseHandicaps.set(n.whs_score_id, Number(n.course_handicap));
         }
       }
 
@@ -335,6 +342,7 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
           totalHoles: declaredLengths.get(id) ?? null,
           grossScore: (r.gross_score as number | null) ?? null,
           netScore: nets.get(id) ?? null,
+          courseHandicap: courseHandicaps.get(id) ?? null,
           coursePar: (r.course_par as number | null) ?? null,
           deltaIndex: (r.delta_index as number | null) ?? null,
           playDate: (r.play_date as string | null) ?? null,

@@ -58,6 +58,56 @@ export function roundPlotRange(values: readonly number[]) {
   return { lo: lowest - padding, hi: highest + padding };
 }
 
+/**
+ * FN1 — STROKES RECEIVED PER PLAYED HOLE, aligned with shape.holes.
+ *
+ * Authority: the provider's whs_score_holes.strokes_allowed when every played
+ * hole carries it and it is not uniformly zero (a scratch round computes to
+ * all zeros anyway). Otherwise computed from gam_round_net.course_handicap
+ * (general play: 100%, no allowance) and the stroke index:
+ * floor(H/18) on every hole, one more on SI 1..H mod 18; a plus handicap
+ * gives strokes back in reverse stroke-index order (SI 18 first).
+ *
+ * null = the round cannot be netted: no handicap, or a played hole without a
+ * usable stroke index. NINE-HOLE CARDS are computed by NO convention until
+ * ruled (FN1 Ruling 4) — they use the provider's allocation or return null.
+ */
+export function feedStrokesReceived(
+  shape: HoleShape | null | undefined,
+  courseHandicap: number | null | undefined,
+): number[] | null {
+  if (!shape || courseHandicap == null || !Number.isFinite(courseHandicap)) return null;
+  const holes = shape.holes;
+  if (holes.length === 0) return null;
+  const provided = holes.map((h) => h.strokesAllowed);
+  if (provided.every((v) => v != null && Number.isFinite(v)) && provided.some((v) => v !== 0)) {
+    return provided as number[];
+  }
+  if (holes.length <= 9) return null;
+  const sis = holes.map((h) => h.strokeIndex);
+  if (!sis.every((si) => si != null && Number.isInteger(si) && si >= 1 && si <= 18)) return null;
+  const H = Math.round(courseHandicap);
+  const magnitude = Math.abs(H);
+  const base = Math.floor(magnitude / 18);
+  const extra = magnitude % 18;
+  return (sis as number[]).map((si) => {
+    const gets = base + (H >= 0 ? (si <= extra ? 1 : 0) : (si > 18 - extra ? 1 : 0));
+    return H >= 0 ? gets : -gets;
+  });
+}
+
+/** FN1.1 — cumulative NET to par, leading 0, from actual gross minus received. */
+export function feedNetSeries(shape: HoleShape, received: readonly number[]): number[] {
+  const out = [0];
+  let cum = 0;
+  shape.holes.forEach((h, i) => {
+    if (h.par == null || h.strokes == null) { out.push(cum); return; }
+    cum += h.strokes - h.par - (received[i] ?? 0);
+    out.push(cum);
+  });
+  return out;
+}
+
 export interface FeedDot {
   /** Index into HoleShape.series (cumulative value AFTER the hole). */
   i: number;
@@ -66,12 +116,14 @@ export interface FeedDot {
 }
 
 /** BEA5 — one dot per played hole, graded in the scorecard ramp. */
-export function feedHoleDots(shape: HoleShape | null | undefined): FeedDot[] {
+/** FN1.2 — graded on the NET change when `received` is given (Home always
+ *  passes it); without it the allowance is zero. */
+export function feedHoleDots(shape: HoleShape | null | undefined, received?: readonly number[] | null): FeedDot[] {
   if (!shape) return [];
   const out: FeedDot[] = [];
   shape.holes.forEach((hole, index) => {
     if (hole.par == null || hole.strokes == null || hole.strokes <= 0) return;
-    const d = hole.strokes - hole.par;
+    const d = hole.strokes - hole.par - (received?.[index] ?? 0);
     const i = index + 1;
     if (d <= -2) out.push({ i, tone: SC_FILL_GOLD, r: 4 });
     else if (d === -1) out.push({ i, tone: TOPAR_UNDER_DARK, r: 2.8 });
@@ -145,13 +197,16 @@ export function RoundTilePlot({
   shape,
   width = 340,
   height = 102, // 112px total plot footprint including the unchanged 10px seam.
+  received,
 }: {
   shape: HoleShape;
   width?: number;
   height?: number;
+  /** FN1 — strokes received per played hole (feedStrokesReceived). */
+  received?: readonly number[] | null;
 }) {
   const instanceId = useId().replace(/[^a-zA-Z0-9_-]/g, '');
-  const values = shape.series;
+  const values = received ? feedNetSeries(shape, received) : shape.series;
   if (!values || values.length < 2) return null;
 
   const { lo, hi } = roundPlotRange(values);
@@ -164,7 +219,7 @@ export function RoundTilePlot({
   const path = smoothPath(points);
   const baselineY = yFor(0);
   const wentUnder = Math.min(...values) < 0;
-  const dots = feedHoleDots(shape);
+  const dots = feedHoleDots(shape, received);
   const feat = feedFeat(shape);
   const last = points.at(-1);
 

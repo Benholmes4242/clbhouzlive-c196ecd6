@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
 import { collectRoundFeats } from './roundFeatCollection';
-import { RoundTilePlot, homePanelCallout } from '@/components/feed/roundTilePlot';
+import { RoundTilePlot, homePanelCallout, feedStrokesReceived } from '@/components/feed/roundTilePlot';
+import { formatDisplayedHcp } from '@/lib/whs/format';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -398,7 +399,7 @@ function WhoLine({
   onWhoTap?: () => void;
   engagement?: RoundCardEngagement | null;
   reviewIdentity?: { course: string | null; scope: string | null; date: string | null };
-  roundIdentity?: { course: string | null; date: string | null; gross?: number | null; toPar?: number | null; net: number | null; par: number | null; handicapIndex?: number | null; deltaIndex?: number | null; medalsGold?: number | null; medalsSilver?: number | null; medalsBronze?: number | null };
+  roundIdentity?: { course: string | null; date: string | null; gross?: number | null; toPar?: number | null; net: number | null; par: number | null; handicapIndex?: number | null; deltaIndex?: number | null; medalsGold?: number | null; medalsSilver?: number | null; medalsBronze?: number | null; feedNet?: { courseHandicap: number | null } | null };
   // handicapIndex/deltaIndex are unread here today: the index returns to the name row in a later change — keep them on the prop.
 }) {
   const { t } = useTranslation('courses');
@@ -561,6 +562,37 @@ function WhoLine({
       <div data-round-under-tile="true" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         {/* FOUR COLUMNS, ALWAYS: a missing figure is an empty cell so NET sits at the same x on every card. */}
         <div data-round-figures="true" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', marginTop: 4 }}>
+          {roundIdentity.feedNet ? (() => {
+            /* FN1.5 — HOME ONLY: NET (to-par suffix), GROSS, HANDICAP, AWARDS-or-empty.
+               feedNet.courseHandicap null = cannot be netted: NET and HANDICAP empty. */
+            const ch = roundIdentity.feedNet.courseHandicap;
+            const netShown = ch != null && roundIdentity.net != null;
+            const netToPar = netShown && roundIdentity.par != null ? roundIdentity.net! - roundIdentity.par : null;
+            const netToParText = toParLabel(netToPar);
+            const netSuffix = netToParText
+              ? <span style={{ ...NUMF, color: (netToPar ?? 0) < 0 ? TOPAR_UNDER_DARK : A.MUTE }}>{netToParText}</span>
+              : null;
+            return (
+              <>
+                <span data-round-figure="net" style={{ display: 'contents' }}>
+                  <FigureCell minHeight={34} label={t('amateur.stream.stat.net', 'NET')}
+                    value={netShown ? String(roundIdentity.net) : ''} suffix={netShown ? netSuffix : null} />
+                </span>
+                <span data-round-figure="gross" style={{ display: 'contents' }}>
+                  <FigureCell minHeight={34} label={t('amateur.stream.stat.gross', 'GROSS')}
+                    value={roundIdentity.gross != null ? String(roundIdentity.gross) : ''} suffix={grossToParNode} />
+                </span>
+                <span data-round-figure="handicap" style={{ display: 'contents' }}>
+                  <FigureCell minHeight={34} label={t('amateur.stream.stat.handicap', 'HANDICAP')}
+                    value={netShown ? formatDisplayedHcp(Math.round(ch!)) : ''} />
+                </span>
+                {hasMedals ? (
+                  <FigureCell minHeight={34} label={t('amateur.stream.stat.awards', 'AWARDS')}
+                    value={<AwardCluster gold={mGold} silver={mSilver} bronze={mBronze} surfaceColor={A.CANVAS} />} />
+                ) : <span />}
+              </>
+            );
+          })() : (<>
           <FigureCell minHeight={34} label={t('amateur.stream.stat.gross', 'GROSS')}
             value={roundIdentity.gross != null ? String(roundIdentity.gross) : ''} suffix={grossToParNode} />
           <FigureCell minHeight={34} label={t('amateur.stream.stat.net', 'NET')}
@@ -571,6 +603,7 @@ function WhoLine({
             <FigureCell minHeight={34} label={t('amateur.stream.stat.awards', 'AWARDS')}
               value={<AwardCluster gold={mGold} silver={mSilver} bronze={mBronze} surfaceColor={A.CANVAS} />} />
           ) : <span />}
+          </>)}
         </div>
         <div data-round-identity-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, gap: 8, marginTop: 12 }}>
           {avatar}
@@ -1516,6 +1549,11 @@ export function ExploreCard({
       : item.who?.display_name?.trim() || t('amateur.stream.aMember', 'A member');
     const playDate = railCaptionDate(item.facts.play_date ?? null);
     const homeCallout = homePanelCallout(callout, shape, collectRoundFeats(item.facts));
+    /* FN1 — the plot is NET or absent. A settled shape that cannot be netted
+       draws no plot and blanks NET/HANDICAP; no gross substitution. */
+    const courseHcp = item.facts.course_handicap ?? null;
+    const received = shape ? feedStrokesReceived(shape, courseHcp) : null;
+    const nettable = courseHcp != null && (shape ? received != null : true);
     return (
       <button
         type="button"
@@ -1531,7 +1569,7 @@ export function ExploreCard({
             {playDate ? `${posterName} · ${playDate}` : posterName}
           </span>
         </span>
-        {shape ? <RoundTilePlot shape={shape} /> : null}
+        {shape && received ? <RoundTilePlot shape={shape} received={received} /> : null}
         {/* BRIEF_ROUND_TILE_1_R2 -- the round-feat panel, beneath the plot and
             above the figures. When the plot's gold mark already names a rare
             hole (ace / albatross / eagle) and the panel's headline is that
@@ -1552,7 +1590,7 @@ export function ExploreCard({
             onPhoto={false}
             onWhoTap={onWhoTap}
             engagement={engagement}
-            roundIdentity={{ course: kickerPartsValue.course, date: playDate, gross: item.facts.gross ?? null, toPar: item.facts.to_par ?? null, net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null, medalsGold: medals?.gold ?? null, medalsSilver: medals?.silver ?? null, medalsBronze: medals?.bronze ?? null }}
+            roundIdentity={{ course: kickerPartsValue.course, date: playDate, gross: item.facts.gross ?? null, toPar: item.facts.to_par ?? null, net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null, medalsGold: medals?.gold ?? null, medalsSilver: medals?.silver ?? null, medalsBronze: medals?.bronze ?? null, feedNet: { courseHandicap: nettable ? courseHcp : null } }}
           />
         </span>
       </button>

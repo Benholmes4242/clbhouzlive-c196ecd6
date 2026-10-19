@@ -422,3 +422,6 @@
 ## PTR1 — done
 - Par-type bars replaced by dots on one fixed −0.20…+1.20 scale (PAR_SCALE_MIN/MAX); clamped dots, true figures, level tick at zero on every row; hardest-first order; amber only when the lead clears HARDEST_MIN_GAP = 0.05 (separate from LEVEL_EDGE per correction); ties order by holes then par. End row padded 85px left / 69px right so both ends sit on the track (mock's missing right padding not adopted). Bar, track, maxPer normalisation and the shots meta figure deleted; shots stays computed with no consumer; parMeta keys left in place.
 - New src/test/defendsParTypes.test.ts: 7 pure-function tests (scale mapping, both clamps, zero==tick, clear winner, near-tie none, tie order). No existing test touched. Suite 1,811/235 -> 1,818/236 (+7/+1), zero failures; build OK. Live check signed out with stubbed hole-analysis RPC (Sundridge Park returns available:false, section correctly absent). Report /mnt/documents/PTR1_report.md.
+
+- [x] FN1 Home feed plot net + NET/GROSS/HANDICAP row (1,835/238 -> 1,850/239)
+- [ ] FN1 nine-hole stroke allocation convention — awaiting Ben ruling
