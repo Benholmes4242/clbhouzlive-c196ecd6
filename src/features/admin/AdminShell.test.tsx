@@ -87,4 +87,27 @@ describe('BRIEF_ADMIN_SETTINGS shell', () => {
     mount('/admin-v2/health?tab=settings');
     expect(await screen.findByText('Settings page')).toBeInTheDocument();
   });
+
+  /* BRIEF_ADMIN_SETTINGS_FIX1: hooks run before the early returns, so a role
+     that resolves after the loading render cannot grow the hook count. */
+  it.each([
+    ['full', 'Dashboard page'],
+    ['moderator', 'Inbox page'],
+  ] as const)('renders without throwing when the role resolves to %s after a loading render', async (role, expected) => {
+    f.role.mockReturnValue({ role: 'none', loading: true });
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const tree = (
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={['/admin-v2/dashboard']}>
+          <Routes>
+            <Route path="/admin-v2/*" element={<AdminShell />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+    const { rerender } = render(tree);
+    f.role.mockReturnValue({ role, loading: false });
+    rerender(tree);
+    expect(await screen.findByText(expected)).toBeInTheDocument();
+  });
 });
