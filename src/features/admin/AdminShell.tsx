@@ -197,6 +197,49 @@ export default function AdminShell() {
   );
 }
 
+/** S.6: the red maintenance bar. Elapsed ticks each minute from changed_at. */
+function MaintenanceBar({ changedAt, canManage, onTurnOff }: {
+  changedAt: string | null; canManage: boolean; onTurnOff: () => void;
+}) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+  let elapsed = '';
+  if (canManage && changedAt) {
+    const mins = Math.max(0, Math.floor((now - new Date(changedAt).getTime()) / 60_000));
+    elapsed = mins < 60 ? `${mins} min` : `${Math.floor(mins / 60)} h ${mins % 60} min`;
+  }
+  return (
+    <div
+      role="status"
+      style={{
+        position: 'fixed', top: 'calc(52px + env(safe-area-inset-top, 0px))', left: 0, right: 0, zIndex: 49,
+        height: 48, padding: '0 8px 0 16px', background: t.dangerSoft, borderBottom: `1px solid ${t.dangerSoft}`,
+        display: 'grid', gridTemplateColumns: '8px minmax(0, 1fr) auto', columnGap: 10, alignItems: 'center',
+      }}
+    >
+      <span style={{ width: 8, height: 8, borderRadius: '50%', background: t.danger }} />
+      <span style={{ fontSize: 13.5, fontWeight: 600, color: t.dangerText, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        Maintenance on{elapsed ? ` · ${elapsed}` : ''} · members locked out
+      </span>
+      {canManage ? (
+        <button
+          type="button"
+          onClick={onTurnOff}
+          style={{
+            height: 34, padding: '0 12px', borderRadius: 10, border: 0, background: t.danger, color: t.canvas,
+            fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+          }}
+        >
+          Turn off
+        </button>
+      ) : <span />}
+    </div>
+  );
+}
+
 function RefreshHeaderButton() {
   const [spinning, setSpinning] = useState(false);
   const onClick = () => {
