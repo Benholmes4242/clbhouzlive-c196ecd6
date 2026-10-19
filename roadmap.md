@@ -1,5 +1,8 @@
 # Roadmap
 
+## BRIEF_VERDICT_COPY_1 — VERDICT_COPY_1
+- [x] Ben's ruling recorded: the build wins on all three disputed frozen values (Said 12.5/1.55/A.BODY, TILE_FILL 0.05, 12px title-to-figure gap); VC2 extension retained as built; everything else accepted as built. Mock-authority rule saved to memory: a mock is spec only for what a brief changes; on frozen elements the build wins and the difference is reported, never silently adopted. No code or test changes this turn; last full suite npx vitest run: 1,810 passing / 233 files, zero failures.
+
 ## BRIEF_TAB_CANON_1 - TAB_CANON_1
 - [x] TC5 FINAL authorises populated-grid-first and every additional first-element path on all tabs; path names are a floor and counts are agent-enumerated. Existing source readings confirmed with TC10's explicit WhatTheyScored exception. No changed-value protecting tests found. Baseline 1,810 passing / 233 files.
 - [x] Applied shared first-element rules to Course/Champions/Reviews/Media; You gap rules and later seams untouched. All genuine section pairs read AboutSection canon; protected labels retained; Elsewhere rule restored.
