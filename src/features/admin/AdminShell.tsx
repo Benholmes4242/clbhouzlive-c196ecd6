@@ -65,6 +65,13 @@ export default function AdminShell() {
     (p) => p.startsWith('/admin-v2'),
   );
 
+  /* BRIEF_ADMIN_SETTINGS_FIX1: hooks must run before the early returns, or the
+     hook count grows when the role resolves and React throws. useAdminSettings
+     already disables its query unless panelCan(role).manageAdmins, so calling
+     it while role is 'none' or loading fetches nothing. */
+  const settings = useAdminSettings(role);
+  const maintenancePoll = useMaintenanceMode();
+
   if (loading) return <AdminLoading />;
   if (role === 'none' || role === 'unknown') return <AdminAccessDenied />;
 
