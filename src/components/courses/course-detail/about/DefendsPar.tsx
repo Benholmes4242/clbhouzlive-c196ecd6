@@ -19,9 +19,53 @@ import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import AboutSection from './AboutSection';
 import AllHolesSheet from './AllHolesSheet';
 import { deriveCourseVerdict, sharePct, signed } from './courseVerdict';
-import { B, BAR_NEUTRAL, PAR_FILL, Said, SMALL_LABEL } from './verdictBits';
+import { B, BAR_NEUTRAL, Said, SMALL_LABEL } from './verdictBits';
 
 const CHART_H = 56;
+
+/* PTR1.1 — the par-type rows share ONE FIXED scale, −0.20 to +1.20 shots over
+   par. It is a constant, never derived from the data: a dot in the same place
+   means the same thing on every course, which the old normalise-to-maximum
+   bars could never claim. Out-of-range values clamp the DOT to the track end;
+   the printed figure always shows the true value. */
+export const PAR_SCALE_MIN = -0.2;
+export const PAR_SCALE_MAX = 1.2;
+
+/* PTR1.5 (corrected) — the minimum lead before the block may call one par
+   type the hardest and paint it amber. It governs TWO FIELD AVERAGES being
+   close to each other. It deliberately does NOT share LEVEL_EDGE from
+   youDerivations (a player's edge against the field on one hole) even though
+   both are 0.05 today: tuning the You tab's edge chart must never change when
+   the Course tab claims a hardest par type. */
+export const HARDEST_MIN_GAP = 0.05;
+
+export interface ParTypeRowInput {
+  par: number;
+  holes: number;
+  perHole: number;
+}
+
+/** PTR1.1/PTR1.3 — clamped 0–100 position of a value on the fixed scale. */
+export const parTypeTrackPct = (value: number): number =>
+  Math.min(100, Math.max(0, ((value - PAR_SCALE_MIN) / (PAR_SCALE_MAX - PAR_SCALE_MIN)) * 100));
+
+/** The level tick's position: where zero sits on the fixed scale. */
+export const LEVEL_TICK_PCT = parTypeTrackPct(0);
+
+/** PTR1.4 — hardest first; an exact tie goes to the type with more holes,
+ *  then to the lower par number. */
+export function orderParTypes(rows: ParTypeRowInput[]): ParTypeRowInput[] {
+  return [...rows].sort((a, b) => b.perHole - a.perHole || b.holes - a.holes || a.par - b.par);
+}
+
+/** PTR1.5 — the par type that may take amber, or null when the leader's gap
+ *  over the second is under HARDEST_MIN_GAP (a near-tie claims no hardest). */
+export function hardestParType(ordered: ParTypeRowInput[]): ParTypeRowInput | null {
+  const [top, second] = ordered;
+  if (!top) return null;
+  if (second && top.perHole - second.perHole < HARDEST_MIN_GAP) return null;
+  return top;
+}
 
 const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = ({ courseId, courseName }) => {
   const { t } = useTranslation('courses');
@@ -41,7 +85,8 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
   if (!v) return null;
 
   const max = Math.max(0.01, ...v.holes.map((h) => Math.max(0, h.avg_to_par)));
-  const maxPer = Math.max(0.01, ...v.parTypes.map((p) => Math.max(0, p.perHole)));
+  const parRows = orderParTypes(v.parTypes);
+  const hardestPar = hardestParType(parRows)?.par ?? null;
   const labelled = new Set([v.holes[0].hole_no, 9, v.easiest.hole_no, v.hardest.hole_no]);
 
   let nineLine: React.ReactNode = null;
@@ -141,33 +186,91 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
       </div>
       {nineLine ? <Said>{nineLine}</Said> : null}
 
-      {v.parTypes.map((p) => (
-        <div key={p.par} style={{ marginTop: 13, fontFamily: SANS }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 14, fontWeight: 700, color: A.INK }}>{t('courseDetail.verdict.parType', { par: p.par })}</span>
-            <span style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.03em', color: A.BODY, ...FIGS }}>
-              {signed(p.perHole, 2)}
-            </span>
-          </div>
-          <div style={{ height: 4, borderRadius: 2, background: A.TRACK, marginTop: 6, overflow: 'hidden' }}>
+      <div style={{ ...SMALL_LABEL, marginTop: 18 }}>{t('courseDetail.defends.parScaleLabel')}</div>
+      <div style={{ marginTop: 10 }}>
+        {parRows.map((p) => {
+          const amber = p.par === hardestPar;
+          return (
             <div
+              key={p.par}
+              data-testid={`par-type-row-${p.par}`}
               style={{
-                height: '100%',
-                borderRadius: 2,
-                width: `${(Math.max(0, p.perHole) / maxPer) * 100}%`,
-                background: PAR_FILL,
+                display: 'grid',
+                gridTemplateColumns: '74px minmax(0, 1fr) 58px',
+                alignItems: 'center',
+                gap: 11,
+                padding: '7px 0',
+                fontFamily: SANS,
               }}
-            />
-          </div>
-          <div style={{ fontSize: 11, color: A.DIM, marginTop: 5, ...FIGS }}>
-            {t('courseDetail.defends.parMeta', {
-              count: p.holes,
-              holes: formatNumber(p.holes),
-              shots: signed(p.shots).replace('+', ''),
-            })}
-          </div>
-        </div>
-      ))}
+            >
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: A.INK, lineHeight: 1.2 }}>
+                  {t('courseDetail.verdict.parType', { par: p.par })}
+                </div>
+                <div style={{ fontSize: 9.5, fontWeight: 400, color: A.DIM, marginTop: 2, ...FIGS }}>
+                  {t('courseDetail.defends.parHoles', { count: p.holes, holes: formatNumber(p.holes) })}
+                </div>
+              </div>
+              <div style={{ position: 'relative', height: 3, borderRadius: 2, background: A.TRACK }}>
+                <span
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    left: `${LEVEL_TICK_PCT}%`,
+                    top: -4,
+                    width: 1,
+                    height: 11,
+                    background: 'rgba(255,255,255,0.22)',
+                  }}
+                />
+                <span
+                  data-testid={`par-type-dot-${p.par}`}
+                  style={{
+                    position: 'absolute',
+                    left: `${parTypeTrackPct(p.perHole)}%`,
+                    top: '50%',
+                    width: 9,
+                    height: 9,
+                    borderRadius: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    background: amber ? A.AMBER : 'rgba(248,250,252,0.62)',
+                  }}
+                />
+              </div>
+              <div
+                data-testid={`par-type-figure-${p.par}`}
+                style={{
+                  textAlign: 'right',
+                  fontSize: 15,
+                  fontWeight: 800,
+                  letterSpacing: '-0.03em',
+                  color: amber ? A.AMBER : A.INK,
+                  ...FIGS,
+                }}
+              >
+                {signed(p.perHole, 2)}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginTop: 3,
+          paddingLeft: 85,
+          paddingRight: 69,
+          fontSize: 9.5,
+          color: A.FAINT,
+          fontFamily: SANS,
+          ...FIGS,
+        }}
+      >
+        <span>{signed(PAR_SCALE_MIN, 2)}</span>
+        <span>{t('courseDetail.defends.parScaleLevel')}</span>
+        <span>{signed(PAR_SCALE_MAX, 2)}</span>
+      </div>
 
       {o ? (
         <>
