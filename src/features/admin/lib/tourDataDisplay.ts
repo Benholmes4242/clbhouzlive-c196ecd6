@@ -3,9 +3,33 @@
  * Pure, so the rules the brief states are unit-tested.
  */
 
-/** Shared exact-name matching for Rankings and the loaded player directory. */
+/**
+ * Shared name key for Rankings and the player directory: strips diacritics,
+ * curly to straight apostrophes, hyphens as spaces, collapsed, lowercased.
+ */
 export function matchKey(name: string | null | undefined): string {
-  return (name ?? '').replace(/\u2019/g, "'").replace(/\s+/g, ' ').trim().toLowerCase();
+  return (name ?? '')
+    .normalize('NFD').replace(/\p{M}/gu, '')
+    .replace(/\u2019/g, "'").replace(/-/g, ' ')
+    .replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+export function nameTokens(name: string | null | undefined): string[] {
+  return matchKey(name).split(' ').filter(Boolean);
+}
+
+/** Hand-marked duplicate rows, e.g. "Eugenio-DUP Chacarra-DUP". */
+export function isDupName(name: string | null | undefined): boolean {
+  return /-dup\b/i.test(name ?? '');
+}
+
+/** Both have 2+ tokens and every token of the shorter list is in the other. */
+export function wordsMatch(a: string | null | undefined, b: string | null | undefined): boolean {
+  const ta = nameTokens(a);
+  const tb = nameTokens(b);
+  if (ta.length < 2 || tb.length < 2) return false;
+  const [short, long] = ta.length <= tb.length ? [ta, tb] : [tb, ta];
+  return short.every((tk) => long.includes(tk));
 }
 
 /** Any all-caps word of 2+ letters becomes title case; mixed case stays. */
