@@ -4,7 +4,8 @@
  * State 2's row/context and panel are reused, never a second review row.
  * All sections are unframed and page-scrolled; missing identities stay unnamed.
  * State 4 adds the existing distribution at the shared excluding threshold.
- * Its month explanation is conditional on widest Condition, never a stored month.
+ * REVIEWS_HEADER_1 owns the shared figure row and fixed category heading.
+ * Two-to-four tier/count addition remains deferred pending its protecting-test ruling.
  * Reviews States 3/4 share FewReviews and RatingTierDistribution to prevent population drift. */
 import React from 'react';
 import type { CourseReview } from '@/hooks/useCourseReviews';
@@ -12,11 +13,11 @@ import { useMembersWhoPlayedCourse } from '@/hooks/useMembersWhoPlayedCourse';
 import { hasCommunityAverage, hasRatingDistribution, isFewReviews, isFiveToNineReviews } from '@/lib/reviews/sampleRules';
 import { RatingTierDistribution } from '@/components/courses/review/RatingTierDistribution';
 import { getRatingTier, getRatingTierLabel } from '@/lib/ratingTier';
-import { capitalizedRatings, fewReviewFacts, partitionKnownReviews, spelledRatings, type ReviewsCommunity } from '@/lib/reviews/fewReviews';
+import { capitalizedRatings, fewReviewFacts, partitionKnownReviews, type ReviewsCommunity } from '@/lib/reviews/fewReviews';
 import { SURFACE } from '@/lib/tokens/surface';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
-import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { Button } from '@/components/ui/button';
 import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
 import { RaterReviewRow } from './SingleReview';
@@ -58,24 +59,22 @@ export function FewReviews({ community, reviews, viewerId, courseId, courseName,
       <div style={kicker}>{capitalizedRatings(community.totalRatingCount)} golfers have rated it</div>
       {facts ? <>
         <h2 data-community-headline style={heading}>{courseName} sits at {community.score?.toFixed(1)}</h2>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 13, marginTop: 15 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, marginTop: 15 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 13, minWidth: 0 }}>
           <strong data-community-score style={{ color: SURFACE.dark.ink, fontSize: 48, lineHeight: 0.9, fontWeight: 800, ...FIGS }}>{community.score?.toFixed(1)}</strong>
-          <div style={{ minWidth: 0 }}>
-            {stateFour ? <>
-              <div data-community-rater-count={facts.count} style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 700 }}>{spelledRatings(facts.count)} ratings</div>
-              <div style={{ color: SURFACE.dark.dim, fontSize: 11.5, lineHeight: 1.45, marginTop: 2 }}>{getRatingTierLabel(community.score)}</div>
-            </> : <>
-              {identities.every(person => person.name) && <div style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 700, overflowWrap: 'anywhere' }}>{new Intl.ListFormat('en-GB').format(identities.map(person => person.name ?? ''))}</div>}
-              <div data-individual-scores style={{ color: SURFACE.dark.dim, fontSize: 11.5, lineHeight: 1.45, marginTop: 2, ...FIGS }}>{new Intl.ListFormat('en-GB').format(identities.map(person => person.rating?.toFixed(1) ?? ''))}</div>
-            </>}
+          {stateFour && <div style={{ minWidth: 0 }}>
+              <div style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 700, lineHeight: 1.2 }}>{getRatingTierLabel(community.score)}</div>
+              <div data-community-rater-count={facts.count} style={{ color: SURFACE.dark.dim, fontSize: 11.5, lineHeight: 1.45, marginTop: 2, overflowWrap: 'anywhere', ...FIGS }}>{facts.count} {facts.count === 1 ? 'rating' : 'ratings'}</div>
+          </div>}
           </div>
+          {ratedViewer && community.delta != null && <div data-viewer-delta style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, padding: '5px 10px', whiteSpace: 'nowrap', flex: '0 0 auto', borderRadius: 999, border: `1px solid ${inkWithAlpha(A.AMBER, 0.35)}`, background: inkWithAlpha(A.AMBER, 0.07) }}><span style={{ color: SURFACE.dark.mute, fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>You</span><b style={{ color: A.AMBER, fontSize: 14, ...FIGS }}>{community.viewerScore?.toFixed(1)}</b><span style={{ color: A.IMPROVED, fontSize: 10, fontWeight: 800, ...FIGS }}>{community.delta > 0 ? '▲' : community.delta < 0 ? '▼' : ''} {Math.abs(community.delta).toFixed(1)}</span></div>}
         </div>
-        {ratedViewer && community.delta != null && <div data-viewer-delta style={{ display: 'inline-flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 7, marginTop: 13, padding: '7px 12px', borderRadius: 999, border: `1px solid ${inkWithAlpha(A.AMBER, 0.35)}`, background: inkWithAlpha(A.AMBER, 0.07) }}><span style={{ color: SURFACE.dark.mute, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>You</span><b style={{ color: A.AMBER, fontSize: 15, ...FIGS }}>{community.viewerScore?.toFixed(1)}</b><span style={{ color: A.IMPROVED, fontSize: 11, fontWeight: 800, ...FIGS }}>{community.delta > 0 ? '▲' : community.delta < 0 ? '▼' : ''} {Math.abs(community.delta).toFixed(1)} {community.delta > 0 ? 'above' : community.delta < 0 ? 'below' : 'the same'}</span></div>}
+        {!stateFour && <div style={{ color: SURFACE.dark.dim, fontSize: 11.5, lineHeight: 1.45, marginTop: 11, overflowWrap: 'anywhere', ...FIGS }}>
+          {identities.every(person => person.name) && <>{new Intl.ListFormat('en-GB').format(identities.map(person => person.name ?? ''))} · </>}
+          <span data-individual-scores>{new Intl.ListFormat('en-GB').format(identities.map(person => person.rating?.toFixed(1) ?? ''))}</span>
+        </div>}
         {showDistribution ? <div style={{ marginTop: 15 }}>
           <RatingTierDistribution distribution={community.distribution} activeTier={getRatingTier(community.score)} appearance="sample" />
-          <p data-distribution-population={facts.count} style={{ ...prose, color: SURFACE.dark.mute, borderLeft: `2px solid ${SURFACE.dark.hairline}`, paddingLeft: 11 }}>
-            {capitalizedRatings(facts.count)} bars, {spelledRatings(facts.count)} raters. {ratedViewer ? <><b style={{ color: SURFACE.dark.ink }}>Your own rating is not in the chart</b>, for the same reason it is not in the average above it — </> : null}{ratedViewer ? 'the' : 'The'} counts and the figure have to describe the same people.
-          </p>
         </div> : null}
       </> : <>
         <h2 style={heading}>The score builds from here</h2>
@@ -85,21 +84,18 @@ export function FewReviews({ community, reviews, viewerId, courseId, courseName,
     </section>
     {hasCommunityAverage(community.ratingCount) && facts && facts.bands.length > 0 && <section style={section}>
       <div style={kicker}>What they scored</div>
-      {stateFour && facts.finding ? <h2 style={heading}>{facts.finding.widest.label} is the one they argue about</h2> : facts.highest && <h2 style={heading}>{facts.highest.key === 'facilities' ? 'The facilities carry it' : `The ${facts.highest.label.toLowerCase()} carries it`}</h2>}
+      <h2 style={heading}>Where the score comes from</h2>
       <p style={{ ...prose, color: SURFACE.dark.mute, marginTop: 8 }}>The bar is the range between the lowest and highest score; the mark is the average.</p>
       <div style={{ marginTop: 16 }}>
         {facts.bands.map(band => <div key={band.key} data-category-band={band.key} data-low={band.low} data-high={band.high} data-mean={band.mean} style={{ display: 'grid', gridTemplateColumns: '82px minmax(0, 1fr) 72px', alignItems: 'center', gap: 10, padding: '8px 0' }}>
           <span style={{ color: SURFACE.dark.body, fontSize: 11.5, fontWeight: 700, lineHeight: 1.45 }}>{band.label}</span>
           <div style={{ height: 9, borderRadius: 5, background: inkWithAlpha(SURFACE.dark.ink, 0.05), position: 'relative' }}>
             <div data-range style={{ position: 'absolute', top: 0, bottom: 0, left: `${band.low * 10}%`, width: `${(band.high - band.low) * 10}%`, background: inkWithAlpha(SURFACE.dark.ink, 0.22), borderRadius: 5 }} />
-            <div data-mean-mark style={{ position: 'absolute', top: -2, bottom: -2, width: 3, borderRadius: 2, left: `calc(${band.mean * 10}% - 1.5px)`, background: SURFACE.dark.ink }} />
+            <div data-mean-mark style={{ position: 'absolute', top: -2, bottom: -2, width: 3, borderRadius: 2, left: `calc(${band.mean * 10}% - 1.5px)`, background: courseSubScoreTone(band.mean) }} />
           </div>
-          <span style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 800, textAlign: 'right', ...FIGS }}>{band.mean.toFixed(1)}<span style={{ display: 'block', color: SURFACE.dark.dim, fontSize: 9.5, marginTop: 1 }}>{band.low.toFixed(1)}–{band.high.toFixed(1)}</span></span>
+          <span style={{ color: courseSubScoreTone(band.mean), fontSize: 13, fontWeight: 800, textAlign: 'right', ...FIGS }}>{band.mean.toFixed(1)}<span style={{ display: 'block', color: SURFACE.dark.dim, fontSize: 9.5, marginTop: 1 }}>{band.low.toFixed(1)}–{band.high.toFixed(1)}</span></span>
         </div>)}
       </div>
-      {stateFour && facts.finding && <p data-category-finding data-widest={facts.finding.widest.key} data-widest-spread={facts.finding.widest.gap} data-tightest={facts.finding.tightest.key} data-tightest-spread={facts.finding.tightest.gap} style={{ ...prose, borderLeft: `2px solid ${A.AMBER}`, paddingLeft: 11 }}>
-        <>{facts.finding.widest.label} runs <b style={{ color: SURFACE.dark.ink, ...FIGS }}>{facts.finding.widest.gap.toFixed(1)}</b> wide against {facts.finding.tightest.label.toLowerCase()}’s <b style={{ color: SURFACE.dark.ink, ...FIGS }}>{facts.finding.tightest.gap.toFixed(1)}</b>. {capitalizedRatings(facts.count)} people broadly agree what the course is and disagree sharply about {facts.finding.widest.key === 'condition' ? <>what shape it was in — <span data-condition-month-explanation>which usually means <b style={{ color: SURFACE.dark.ink }}>they played it in different months</b></span></> : `its ${facts.finding.widest.label.toLowerCase()}`}.</>
-      </p>}
     </section>}
     {facts && known.length > 0 && <section style={section}><span style={{ display: 'inline-block', color: MEDAL_GOLD, background: inkWithAlpha(MEDAL_GOLD, 0.10), border: `1px solid ${inkWithAlpha(MEDAL_GOLD, 0.28)}`, borderRadius: 999, padding: '3px 9px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', marginBottom: 11 }}>People you know</span>{known.map(review => renderPerson(review, true))}</section>}
     {facts && others.length > 0 && <section style={section}><div style={kicker}>Everyone else</div>{others.map(review => renderPerson(review, true))}</section>}

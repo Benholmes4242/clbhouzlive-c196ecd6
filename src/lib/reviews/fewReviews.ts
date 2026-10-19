@@ -1,6 +1,6 @@
 /** REVIEWS_STATE_3: consume only communitySample's excluding rows and means.
- * A meaningful category contrast is at least one displayed tenth wider; ties
- * preserve Design/Condition/Clubhouse/Facilities order. No deferred statistics. */
+ * REVIEWS_HEADER_1 retains count, overall spread and ordered min/max/mean bands;
+ * fixed category headings leave no consumer for finding, highest or gap ranking. */
 import type { reviewsCommunitySample } from './communitySample';
 import { hasCommunityAverage } from './sampleRules';
 
@@ -21,15 +21,9 @@ export function fewReviewFacts(community: ReviewsCommunity) {
     const mean = community.categories[key];
     if (!values.length || mean == null) return [];
     const low = Math.min(...values), high = Math.max(...values);
-    return [{ key, label, mean, low, high, gap: Math.round((high - low) * 10) / 10 }];
+    return [{ key, label, mean, low, high }];
   });
-  const byGap = [...bands].sort((a, b) => a.gap - b.gap);
-  const tightest = byGap[0];
-  const widest = byGap.find(band => band.gap === byGap.at(-1)?.gap);
-  const finding = tightest && widest && widest.gap - tightest.gap >= 0.099
-    ? { tightest, widest } : null;
-  const highest = [...bands].sort((a, b) => b.mean - a.mean)[0];
-  return { count: community.ratingCount, spread, bands, finding, highest };
+  return { count: community.ratingCount, spread, bands };
 }
 
 export function partitionKnownReviews<T extends { user_id: string }>(rows: readonly T[], knownIds: ReadonlySet<string>) {

@@ -45,7 +45,6 @@ describe('REVIEWS_STATE_4', () => {
     const { container } = tab();
     expect(counts(container)).toEqual([2, 3, 1, 0, 0]);
     expect(counts(container).reduce((sum, n) => sum + n, 0)).toBe(6);
-    expect(container.querySelector('[data-distribution-population]')?.getAttribute('data-distribution-population')).toBe('6');
     expect(container.querySelector('[data-community-rater-count]')?.getAttribute('data-community-rater-count')).toBe('6');
     expect(container.querySelector('[data-community-score]')?.textContent).toBe('8.6');
     expect(reviewsCommunitySample(fixture.rows, 'viewer').ratingCount).toBe(6);
@@ -88,23 +87,6 @@ describe('REVIEWS_STATE_4', () => {
       expect(Number(band.getAttribute('data-high'))).toBe(9.5);
     }
     expect(container.querySelectorAll('[data-played-season], [data-middle80], [data-split]')).toHaveLength(0);
-  });
-  it('Condition widest permits month explanation and exposes both actual spreads', () => {
-    fixture.rows = population(6).map((r, i) => ({ ...r, design_score: [8, 8.9, 8.3, 8.4, 8.5, 8.6][i], condition_score: [6.2, 9.2, 7.5, 8, 8, 7.9][i], clubhouse_score: [8.4, 9.5, 8.8, 8.9, 9, 8.8][i], facilities_score: [7.9, 9.1, 8.5, 8.6, 8.4, 8.5][i] }));
-    const { container } = tab();
-    const finding = container.querySelector('[data-category-finding]');
-    expect(finding?.getAttribute('data-widest')).toBe('condition');
-    expect(finding?.getAttribute('data-widest-spread')).toBe('3');
-    expect(finding?.getAttribute('data-tightest')).toBe('design');
-    expect(finding?.getAttribute('data-tightest-spread')).toBe('0.9');
-    expect(container.querySelector('[data-condition-month-explanation]')).not.toBeNull();
-    expect(container.querySelector('[data-played-season]')).toBeNull();
-  });
-  it('widest Clubhouse cannot get the Condition month explanation', () => {
-    fixture.rows = population(6).map((r, i) => ({ ...r, design_score: 8, condition_score: 8, facilities_score: 8, clubhouse_score: i === 0 ? 6 : 9 }));
-    const { container } = tab();
-    expect(container.querySelector('[data-category-finding]')?.getAttribute('data-widest')).toBe('clubhouse');
-    expect(container.querySelector('[data-condition-month-explanation]')).toBeNull();
   });
   it('State 4 boundary never reclassifies State 3 or ten total', () => {
     expect([4, 5, 9, 10].map(isFiveToNineReviews)).toEqual([false, true, true, false]);

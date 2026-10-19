@@ -42,7 +42,7 @@ describe('REVIEWS_STATE_3', () => {
   it('Sundridge headline reads excluding 8.1 and delta +0.3 end to end', () => {
     const { container } = tab();
     expect(container.querySelector('[data-community-score]')?.textContent).toBe('8.1');
-    expect(container.querySelector('[data-viewer-delta]')?.textContent).toContain('0.3 above');
+    expect(container.querySelector('[data-viewer-delta]')?.textContent).toContain('0.3');
     expect(container.querySelector('[data-community-headline]')?.textContent).toContain('sits at 8.1');
     expect(container.querySelector('[data-individual-scores]')?.textContent).toBe('8.1 and 8.1');
     expect(container.querySelector('[data-community-headline]')?.textContent).not.toContain('8.2');
@@ -107,14 +107,5 @@ describe('REVIEWS_STATE_3', () => {
   it('unknown played month stays absent on all other rows despite review dates', () => {
     const { container } = tab();
     expect(container.querySelectorAll('[data-played-season]')).toHaveLength(0);
-  });
-  it('meaningful category contrast identifies Design and Clubhouse and 0.8 gap', () => {
-    const facts = fewReviewFacts(reviewsCommunitySample(sundridge, 'viewer'));
-    expect(facts?.finding?.tightest.key).toBe('design');
-    expect(facts?.finding?.widest.key).toBe('clubhouse');
-    expect(facts?.finding?.widest.gap).toBe(0.8);
-  });
-  it('equal category spreads omit the finding', () => {
-    expect(fewReviewFacts(reviewsCommunitySample([row('a', 8), row('b', 8)], undefined))?.finding).toBeNull();
   });
 });
