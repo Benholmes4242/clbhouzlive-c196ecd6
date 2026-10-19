@@ -121,15 +121,18 @@ serve(async (req) => {
 
       const normalizedTourCode = typeof tourCode === 'string' ? tourCode.toLowerCase() : '';
       const folder = TOUR_FOLDER[normalizedTourCode] || 'Misc';
-      const objectKey = `${folder}/${playerName}.webp`;
-      const deleteUrl = `https://${accountId}.r2.cloudflarestorage.com/${bucket}/${encodeURIComponent(folder)}/${encodeURIComponent(playerName)}.webp`;
+      const objectKey = `${folder}/${objectName(folder, playerName)}.webp`;
+      const deletePath = objectPath(bucket, folder, playerName);
+      const deleteUrl = `https://${accountId}.r2.cloudflarestorage.com${deletePath}`;
 
-      const headers = await signRequest('DELETE', deleteUrl, null, accessKeyId, secretAccessKey, accountId, '');
+      const headers = await signRequest('DELETE', deleteUrl, deletePath, null, accessKeyId, secretAccessKey, accountId, '');
       const resp = await fetch(deleteUrl, { method: 'DELETE', headers });
 
       if (!resp.ok && resp.status !== 404) {
-        const errText = await resp.text();
-        throw new Error(`R2 delete failed: ${resp.status} - ${errText}`);
+        // R2's XML body carries the canonical request and signature: log it
+        // server-side only, never return it to the admin toast.
+        console.error('R2 delete failed body:', await resp.text());
+        throw new Error(`R2 delete failed: ${resp.status}`);
       }
 
       return new Response(JSON.stringify({ success: true, deleted: objectKey }), {
