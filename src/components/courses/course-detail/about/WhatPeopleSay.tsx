@@ -8,10 +8,15 @@
  * numbers for the same course. useCourseRatingAggregates and
  * useUserCourseRating are no longer read here.
  *
- * FIGURE BLOCK (CRM1.3/1.4): the Reviews tab's arrangement — 48px ink score,
- * tier word over the numeral rating count beside it, both ink at every count
- * (no sample gate, no courseSubScoreTone), and the amber YOU pill at the
- * right-hand end when the viewer has rated and a delta exists.
+ * FIGURE BLOCK (CRM1.3/1.4, gated by CRM2.1): the Reviews tab's arrangement —
+ * 48px ink score, tier word over the numeral rating count beside it, both ink
+ * (no courseSubScoreTone), and the amber YOU pill at the right-hand end when
+ * the viewer has rated and a delta exists. The tier word renders only at two
+ * or more community ratings (hasCommunityAverage, the same gate the Reviews
+ * tab enforces); at one community rating its slot collapses entirely.
+ *
+ * ERROR (CRM2.2): a failed fetch renders NOTHING, exactly like loading — the
+ * "No one's scored yet" invitation may only run on a successful empty fetch.
  *
  * CATEGORY BANDS (CRM1.5/1.6): the extracted CategoryBands rows render
  * directly beneath the figure block whenever there are at least two community
@@ -29,6 +34,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCourseReviewSample } from '@/hooks/useCourseReviewSample';
 import { reviewsCommunitySample } from '@/lib/reviews/communitySample';
 import { fewReviewFacts } from '@/lib/reviews/fewReviews';
+import { hasCommunityAverage } from '@/lib/reviews/sampleRules';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 import { SURFACE } from '@/lib/tokens/surface';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
@@ -53,7 +59,7 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
 }) => {
   const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
-  const { data: sampleRows, isLoading } = useCourseReviewSample(courseId, user?.id);
+  const { data: sampleRows, isLoading, isError } = useCourseReviewSample(courseId, user?.id);
   const community = useMemo(() => reviewsCommunitySample(sampleRows ?? [], user?.id), [sampleRows, user?.id]);
 
   const heading = t('courseDetail.sections.whatPeopleSay');
@@ -115,6 +121,11 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
   // The sample is in flight: 0 would state something untrue.
   if (isLoading) return null;
 
+  // CRM2.2 — an error is not an absence: a failed fetch renders nothing, so
+  // the "No one's scored yet" invitation below can only mean a genuinely
+  // empty, successfully fetched sample.
+  if (isError) return null;
+
   // NOBODY HAS SCORED IT — a sentence and an invitation, not a card. (CRM1.8: untouched.)
   if (total === 0) {
     return (
@@ -167,7 +178,8 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 13, minWidth: 0 }}>
           <strong data-community-score style={{ color: SURFACE.dark.ink, fontSize: 48, lineHeight: 0.9, fontWeight: 800, ...FIGS }}>{score?.toFixed(1)}</strong>
           <div style={{ minWidth: 0 }}>
-            <div style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 700, lineHeight: 1.2 }}>{getRatingTierLabel(score)}</div>
+            {/* CRM2.1 — the tier word needs two community ratings; below that its slot collapses. */}
+            {hasCommunityAverage(count) && <div style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 700, lineHeight: 1.2 }}>{getRatingTierLabel(score)}</div>}
             <div data-community-rater-count={count} style={{ color: SURFACE.dark.dim, fontSize: 11.5, lineHeight: 1.45, marginTop: 2, overflowWrap: 'anywhere', ...FIGS }}>{count} {count === 1 ? 'rating' : 'ratings'}</div>
           </div>
         </div>
