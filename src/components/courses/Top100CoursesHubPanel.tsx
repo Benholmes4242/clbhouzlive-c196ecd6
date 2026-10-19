@@ -266,7 +266,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
           subjects={subjects}
           onOpenCourse={openCourse}
         />
-      ) : user && (isLoading || (user?.id ? !progressFetchedAfterMount : progressLoading)) ? (
+      ) : user && (isLoading || (user?.id ? !progressFetchedAfterMount : progressLoading)) && (!progressFetchedAfterMount || viewerPlayed >= 5) ? (
         <YourHundredShell />
       ) : null}
       {argument.length > 0 ? (
