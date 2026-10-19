@@ -33,3 +33,14 @@ describe('Tour data display rules', () => {
     expect(feedsHeadline(0, 0)).toEqual({ text: 'All running', tone: 'ok' });
   });
 });
+
+import { nameTokens, isDupName, wordsMatch } from './tourDataDisplay';
+describe('BRIEF_TOUR_RANKINGS_NAME_MATCH helpers', () => {
+  it('strips diacritics', () => { expect(matchKey('Ludvig \u00c5berg')).toBe('ludvig aberg'); });
+  it('treats hyphens as spaces', () => { expect(matchKey('Lopez-Chacarra')).toBe('lopez chacarra'); });
+  it('word match ignores extra surname words', () => { expect(wordsMatch('Eugenio Chacarra', 'Eugenio Lopez-Chacarra')).toBe(true); });
+  it('a single word never word-matches', () => { expect(wordsMatch('Kim', 'Tom Kim')).toBe(false); });
+  it('different given names do not word-match', () => { expect(wordsMatch('Tom Kim', 'Si Woo Kim')).toBe(false); });
+  it('detects hand-marked DUP rows', () => { expect(isDupName('Eugenio-DUP Chacarra-DUP')).toBe(true); });
+  it('tokens split the key', () => { expect(nameTokens(' Eugenio  Lopez-Chacarra ')).toEqual(['eugenio', 'lopez', 'chacarra']); });
+});
