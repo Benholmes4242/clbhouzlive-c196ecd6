@@ -1,9 +1,9 @@
 # Roadmap
 
 ## BRIEF_TAB_CANON_1 - TAB_CANON_1
-- [ ] Baseline gate STOP before application/test edits: TC5 says six incorrect Media paths but names eight (signed-out, grid-error, grid-empty, three empty states, hole walk, grid-loading). TC3/4/5/6 enumerate 7 Champions + 8 Reviews + 9 Media + 13 You = 37 states before Course, conflicting with REPORT's thirty. Ten-plus WhatTheyScored uses protected ABOUT_KICKER 0.19em/inherited line-height, not TC7's blanket Reviews no-tracking/1.2 baseline; explicit TC10 exception recorded. Await corrected baseline/count. No tests run; last npx vitest run remains 1,810 passing / 233 files.
+- [ ] Corrected TC5 baseline STOP: an additional populated-grid-first path has padding-top 12px (CourseMediaCanonGrid.tsx:266), when feed resolves before counts/analysis, header returns null, and earlier photo/walk sections do not render (CourseMediaTabNew.tsx:113-115,144-153,186; useCourseMedia.ts:35,96,126). This is distinct from grid loading and omitted from the eleven-state inventory. Await correction/acknowledgment before application/test edits. No tests run; last npx vitest run remains 1,810 passing / 233 files.
 - [ ] Apply shared first-element rules to Course/Champions/Reviews/Media, preserving You and later seams; share canonical eyebrow/title declarations and protected label exceptions.
-- [ ] Report NearbySection scope for Ben's ruling without editing it; measure per-state gaps and report exact full-suite command/count and declarations.
+- [ ] Nearby IN scope via canon opt-in; preserve/report its 16px gutter and count other SectionHeader callers. Measure per-state gaps and report exact full-suite command/count and declarations.
 
 ## BRIEF_TAB_LEAD_IN_1 - TAB_LEAD_IN_1
 - [x] Ben resolved TLA3: Elsewhere remains unchanged; only four primary Champions states receive first-section treatment.
