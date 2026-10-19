@@ -186,9 +186,7 @@ export const GoodRoundsSection: React.FC<{ g: GoodRounds | null; seasons: number
           {frontSwing > backSwing && g.everyTurnUnderPar ? <> &mdash; and on those {words(n)} days you made the turn <B>under par</B>.</> : '.'}
         </Said>
       ) : null}
-      {n < SMALL_SET ? (
-        thinNines ? <Said quiet>The nines rest on the {formatNumber(g.good.nineCount + g.other.nineCount)} rounds that recorded both.</Said> : null
-      ) : thinNines ? (
+      {thinNines ? (
         <Said quiet>The nines rest on the {formatNumber(g.good.nineCount + g.other.nineCount)} of your {formatNumber(g.total)} rounds that recorded both.</Said>
       ) : null}
     </Sec>
