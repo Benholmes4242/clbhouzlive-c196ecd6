@@ -7,7 +7,7 @@
 - [x] Changed only SquircleAvatar's decoded-image layout-effect guard/dependencies; added two regression cases in SquircleAvatar.cachedPhoto.test.tsx. Full npx vitest run: 1,810 passing / 233 files baseline to 1,812 passing / 234 files, zero failures; +2 from the named new file, no existing tests changed. Browser actual-avatar mount verified cached A remains visible after [A,B,C] to [A,C,B], and new D remains hidden until load. Build OK. Hosted Tour switching remains unverified; Tour code, candidate walk, fallback and styling unchanged.
 
 ## BRIEF_REVIEWS_HEADER_1 - REVIEWS_HEADER_1
-- [x] FOUR AUTHORISATIONS recorded and applied: five-to-nine tier/count swap; shared pill, names line, fixed heading, category tones and paragraph removal; orphaned finding/highest derivations removed. Four authorised cases deleted and only RH9f/g assertions changed. Verification and report in progress.
+- [x] FOUR AUTHORISATIONS applied: five-to-nine tier/count swap; shared pill, names line, fixed heading, category tones and paragraph removal; orphaned finding/highest derivations removed. Four authorised cases deleted and only RH9f/g assertions changed. Full npx vitest run before 1,815/235 and after 1,811/235, zero failures; accepted 1,812/234 plus three previously reported Tour-avatar cases minus four deletions. Build OK. Real FewReviews fixture checked at 320/390/628/1280 widths, positive/negative/zero delta, no overlap/overflow; hosted authenticated flow unavailable. Report and both screenshots in Files: REVIEWS_HEADER_1_authorisations_report.md.
 - [ ] RH1 two-to-four tier/count addition waits on Ben's ruling for the protected tier-absence assertion; no tier or count added to this state.
 
 ## BRIEF_REVIEWS_FEW_COPY_1 - REVIEWS_FEW_COPY_1
