@@ -1,5 +1,8 @@
 # Roadmap
 
+## BRIEF_AVATAR_CACHED_PHOTO_STUCK
+- [ ] Change only SquircleAvatar's decoded-image layout-effect guard/dependencies; add the specified same-first reorder and new-first loading regression tests; run and report the full suite. Last reported baseline: npx vitest run, 1,810 passing / 233 files. Tour code, candidate walk, fallback and styling frozen.
+
 ## BRIEF_REVIEWS_HEADER_1 - REVIEWS_HEADER_1
 - [ ] Baseline/test audit only: RH9 requires authorization before changing protected tests; current RH1/RH3/RH7 readings differ from the brief. No application/test edits or test runs. Await rulings documented in REVIEWS_HEADER_1_stop_report.md; last reported full suite npx vitest run: 1,810 passing / 233 files.
 

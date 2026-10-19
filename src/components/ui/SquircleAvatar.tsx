@@ -231,14 +231,14 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   // fully cached photo would paint one frame at opacity 0 with the initials
   // showing through. Do not "simplify" this back to useEffect.
   useLayoutEffect(() => {
-    if (!imageSrc || showFallback) return;
+    if (!imageSrc || showFallback || imageLoaded) return;
     const img = imgRef.current;
     if (img && img.complete && img.naturalWidth > 0) {
       setImageLoaded(true);
       fireLoadedOnce();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [imageSrc, showFallback]);
+  }, [imageSrc, showFallback, imageLoaded]);
 
   // Fallback rendered without an image at all (no candidates): fire once.
   useEffect(() => {
