@@ -95,6 +95,7 @@ export function roundPostItem(
       course_par: round?.coursePar ?? null,
       to_par: score?.toPar ?? null,
       net: round?.netScore ?? null,
+      course_handicap: round?.courseHandicap ?? null,
       delta_index: round?.deltaIndex ?? null,
       score_id: round?.whsScoreId ?? null,
       play_date: playDate,
