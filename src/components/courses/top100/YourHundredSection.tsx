@@ -226,13 +226,10 @@ export function YourHundredSection({ listSlug, viewerPlayed, total, courseIds, e
             aria-label={`#${i + 1} ${subjects.get(id)?.name ?? ''}`.trim()}
             aria-pressed={selected === id}
             /*
-             * The cells are deliberately wider than they are tall. The width is set by the
-             * ten columns; the height is the only free variable in this grid. At ten columns
-             * across a 361px run the cell is 32.5px wide, so a square cell made the grid
-             * 361px tall — the height was the width, not a choice. The grid now carries an
-             * explicit 320px height and ten 1fr rows, so each cell is 28.4px tall — the height
-             * is declared once on the container instead of guessed per cell, and the full tap
-             * width is kept.
+             * The cells are deliberately wider than they are tall. The width falls out of
+             * the twelve columns (27px across a 357px run); the height is declared once on
+             * the container as an explicit 24px row track, so the full tap width is kept
+             * and the grid clears the fold (HUNDRED_FIT_1).
              */
             style={{
               borderRadius: HUNDRED_CELL_RADIUS, padding: 0, border: 0, cursor: 'pointer',

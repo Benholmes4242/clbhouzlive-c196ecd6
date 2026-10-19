@@ -20,8 +20,8 @@ import {
 import { TOP100_PHOTO_H } from '../BrowseCourseCard';
 import { TOP100_CARD_GAP } from '../Top100CoursesHubPanel';
 import {
-  cellStyle, HUNDRED_CELL_RADIUS, HUNDRED_COLS, HUNDRED_FIGURE, HUNDRED_GAP, HUNDRED_GRID_H,
-  HUNDRED_GRID_TOP, HUNDRED_LEGEND, HUNDRED_ROWS,
+  cellStyle, HUNDRED_CELL_H, HUNDRED_CELL_RADIUS, HUNDRED_COLS, HUNDRED_FIGURE, HUNDRED_GAP,
+  HUNDRED_GRID_TOP, HUNDRED_LEGEND, hundredGridHeight, hundredRows,
 } from './YourHundredSection';
 import { ARGUMENT_ROW_GAP, ARGUMENT_THUMB } from './TheArgumentSection';
 
