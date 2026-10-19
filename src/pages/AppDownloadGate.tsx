@@ -35,7 +35,6 @@ import { useTranslation } from 'react-i18next';
 import { resolveGateState } from './gate/gateRoutes';
 import { useGateContext } from './gate/useGateContext';
 import { usePlatformReach } from '@/hooks/usePlatformReach';
-import { supabase } from '@/integrations/supabase/client';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import { GREEN } from '@/components/manage/ui';
 import wordmark from '@/assets/clbhouz-wordmark.png.asset.json';

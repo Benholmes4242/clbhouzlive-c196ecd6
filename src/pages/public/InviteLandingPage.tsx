@@ -1,20 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { PublicLanding } from './JoinLandingPage';
-import { supabase } from '@/integrations/supabase/client';
+import { FALLBACK_STORE_URL, fetchStoreLinks, pickStoreUrl } from '@/lib/storeLinks';
 
-const FALLBACK_URL = 'https://apps.apple.com/app/id6752538886';
+const FALLBACK_URL = FALLBACK_STORE_URL;
 
+/* Shared storeLinks helpers (BRIEF_ADMIN_SETTINGS S.11). Android without a
+   Play link keeps today's App Store target, so nothing breaks before the
+   link is added. */
 async function fetchDownloadUrl(): Promise<string> {
   try {
-    const { data } = await supabase
-      .from('app_config' as any)
-      .select('value')
-      .eq('key', 'app_download_url')
-      .maybeSingle();
-    const val = (data as any)?.value;
-    if (typeof val === 'string' && val.startsWith('http')) return val;
-    if (val && typeof val === 'object' && typeof val.url === 'string') return val.url;
+    const links = await fetchStoreLinks();
+    return pickStoreUrl(links, navigator.userAgent) ?? links.appStore ?? FALLBACK_URL;
   } catch {
     // fall through
   }
