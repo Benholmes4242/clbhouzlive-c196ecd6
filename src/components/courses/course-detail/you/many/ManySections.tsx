@@ -219,7 +219,7 @@ export const EdgeSection: React.FC<{ edges: HoleEdge[]; s: EdgeSummary; fieldRou
     { kind: 'drifted', label: 'Field gains', color: A.DRIFTED },
     { kind: 'level', label: 'Level', color: A.DIM },
     { kind: 'least', label: 'Worth a look', color: A.AMBER },
-  ].filter((k) => drawn.has(k.kind));
+  ].filter((k) => drawn.has(k.kind as ReturnType<typeof kindOf>));
   return (
     <Sec kicker="You against the field" title={allAhead ? `You beat the field on all ${words(n)}` : null}>
       <Lede>
