@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
 
-import { feedHoleDots, feedFeat, RoundTilePlot, panelShowsCallout } from '@/components/feed/roundTilePlot';
+import { feedHoleDots, feedFeat, RoundTilePlot, panelShowsCallout, homePanelCallout } from '@/components/feed/roundTilePlot';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import {
   SC_FILL_GOLD,
@@ -145,5 +145,30 @@ describe('panelShowsCallout -- waits for the hole batch (ROUND_TILE_1_R3)', () =
     for (const k of ['birdies', 'clean', 'record', 'net_record', 'rank_up']) {
       expect(panelShowsCallout(k, undefined)).toBe(true);
     }
+  });
+});
+
+describe('homePanelCallout -- headline falls through once (ROUND_TILE_1_R4)', () => {
+  const eagleRound = () => shapeOf([hole(1, 5, 3), ...Array.from({ length: 17 }, (_, i) => hole(i + 2, 4, 4))]);
+  const eagle = { kind: 'eagle' as const, count: 1, hole: 1, tier: 'ink' as const };
+  const birdies = { kind: 'birdies' as const, count: 5 };
+  it('marked eagle plus birdie run: the panel shows the birdie run alone', () => {
+    const out = homePanelCallout({ ...eagle, feats: [{ kind: 'eagle', count: 1 }, birdies] }, eagleRound());
+    expect(out?.kind).toBe('birdies');
+    expect(out && 'feats' in out ? out.feats : null).toEqual([birdies]);
+  });
+  it('marked eagle as the only feat: no panel', () => {
+    expect(homePanelCallout({ ...eagle, feats: [{ kind: 'eagle', count: 1 }] }, eagleRound())).toBeNull();
+  });
+  it('a record headline stays the panel beside the eagle mark', () => {
+    expect(homePanelCallout({ kind: 'record', margin: 1 }, eagleRound())?.kind).toBe('record');
+  });
+  it('unmarked eagle carries one feat only, never a list', () => {
+    const out = homePanelCallout({ ...eagle, feats: [{ kind: 'eagle', count: 1 }, birdies] }, null);
+    expect(out?.kind).toBe('eagle');
+    expect(out && 'feats' in out ? out.feats : null).toHaveLength(1);
+  });
+  it('waits for the hole batch before deciding a hole headline', () => {
+    expect(homePanelCallout({ ...eagle, feats: [{ kind: 'eagle', count: 1 }, birdies] }, undefined)).toBeNull();
   });
 });
