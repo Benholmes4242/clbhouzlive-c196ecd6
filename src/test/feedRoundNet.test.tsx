@@ -12,7 +12,7 @@ import {
 } from '@/components/feed/roundTilePlot';
 import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
 import type { StreamItem } from '@/features/explore-magazine/streamItem';
-import { SC_FILL_GOLD } from '@/features/courses/components/holes/_constants';
+import { SC_BOGEY_DARK } from '@/features/courses/components/holes/_constants';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 
 afterEach(cleanup);
@@ -92,14 +92,14 @@ describe('FN1.2 / FN1.4 dots and fill follow net', () => {
   it('a gross birdie on a stroke hole grades as a net eagle', () => {
     const shape = shapeOf([{ par: 4, strokes: 3, si: 1 }, ...Array.from({ length: 17 }, (_, i) => ({ par: 4, strokes: 4, si: i + 2 }))]);
     const received = feedStrokesReceived(shape, 1)!;
-    expect(feedHoleDots(shape, received)[0].tone).toBe(SC_FILL_GOLD);
+    expect(feedHoleDots(shape, received)[0].tone).toBe(TOPAR_UNDER_DARK);
   });
 
   it('a gross bogey on a stroke hole grades as a net par, not a bogey', () => {
     const received = feedStrokesReceived(flat(5), 18)!;
     const dots = feedHoleDots(flat(5), received);
     expect(new Set(dots.map((d) => d.tone)).size).toBe(1);
-    expect(dots[0].tone).not.toBe(TOPAR_UNDER_DARK);
+    expect(dots[0].tone).toBe(SC_BOGEY_DARK);
   });
 
   it('a round under its handicap renders the fill; one that never is renders none', () => {

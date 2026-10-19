@@ -1,5 +1,8 @@
 # Roadmap
 
+## FGD1 — Gross dots, net line
+- [ ] Restore gross-only Home dot grading, update only authorised FN1 assertions, add gross-birdie regression coverage, verify the full suite and report round consequences; frozen net/Explore/finish behavior stays unchanged.
+
 ## FED1 — Finish marker
 - [x] Home and Explore line-only terminal circles now yield to a dot at the final series index; only one terminal-circle condition changed in each permitted component. Unmarked endpoints retain the unchanged ink terminus. TrajectoryLine and existing tests untouched. Full `npx vitest run`: 1,850 passing / 239 files before -> 1,856 passing / 240 files after, zero failures; +6 solely src/test/feedEndDot.test.tsx (Home birdie/par/double/unscored, Explore supplied birdie/unmarked). Build OK. Browser actual plots verified all eight Home/Explore finish cases, zero page errors; synthetic fixture only, not hosted authenticated acceptance. Explore still supplies achievement dots only, so par/double finish with ink there. Real partial feed rounds end at the last retained played/scored hole, not a fabricated unplayed endpoint.
 
