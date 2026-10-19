@@ -7,7 +7,8 @@ import { corsFor } from '../_shared/cors.ts';
  * ALL of them in parallel. Gated tournaments get their last_live_sync
  * stamped so the round-robin debt is cleared.
  *
- * With N live tournaments, every in-hours one is synced every minute.
+ * Every in-hours tournament is processed each minute; provider fetches use
+ * ../_shared/sportradarCadence.ts. Local writes and close-out stay ungated.
  * Supabase Realtime broadcasts DB changes instantly to all connected clients.
  */
 
@@ -15,6 +16,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { isWithinPlayingHoursForTimezone, isTournamentDay } from '../_shared/countryTimezoneMap.ts'
 import { getActiveRound } from '../_shared/roundState.ts'
 import { dispatchTeeAlerts } from './teeAlerts.ts'
+import { shouldFetchLeaderboard, shouldFetchScorecards, shouldFetchHoleStats, shouldFetchInPlayTeeTimes, shouldResolveStatus, shouldFetchPreEventTeeTimes, nextTeeTimesRound } from '../_shared/sportradarCadence.ts'
+import { logSportradarCall } from '../_shared/sportradarCallLog.ts'
 
 const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
 const getTourBaseUrl = (tour: string = 'pga') =>
@@ -83,7 +86,8 @@ Deno.serve(async (req) => {
     const syncLogId = syncLog?.id;
 
     // ── Housekeeping (lightweight, every invocation — no API calls) ───
-    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
 
     // 0. Manual close-out for an event that was closed before the
     //    reconciliation existed: POST { reconcileTournamentId }.
@@ -130,7 +134,9 @@ Deno.serve(async (req) => {
     }
 
     // 2. Status resolver — uses 1 API call per pending tournament
-    const statusResolverResults = await resolveToLiveStatus(supabase, sportradarApiKey, today);
+    const statusResolverResults = shouldResolveStatus(now)
+      ? await resolveToLiveStatus(supabase, sportradarApiKey, today)
+      : [];
     const resolved = statusResolverResults.filter(r => r.resolved).length;
     if (resolved > 0) {
       console.log(`[LiveSync] Status resolver: ${resolved} tournament(s) transitioned to inprogress`);
@@ -150,6 +156,7 @@ Deno.serve(async (req) => {
       .gte('start_date', todayStr);
 
     if (upcomingTournaments?.length) {
+      if (shouldFetchPreEventTeeTimes(now)) {
       console.log(`[LiveSync] ${upcomingTournaments.length} upcoming tournament(s) within 3 days — syncing tee times`);
       for (const upcoming of upcomingTournaments) {
         const { data: uSeason } = await supabase.from('sr_seasons').select('year, tour_name').eq('id', upcoming.season_id).maybeSingle();
@@ -159,6 +166,7 @@ Deno.serve(async (req) => {
         
         try {
           const syncUrl = `${supabaseUrl}/functions/v1/sportradar-sync`;
+          for (const roundNumber of [1, 2]) {
           await fetch(syncUrl, {
             method: 'POST',
             headers: {
@@ -170,12 +178,15 @@ Deno.serve(async (req) => {
               tournamentId: upcoming.sr_id,
               tourId: uTourSlug,
               year: uYear,
+              roundNumber,
             }),
           });
+          }
           console.log(`[LiveSync] Pre-tournament tee times synced for ${upcoming.name}`);
         } catch (e) {
           console.warn(`[LiveSync] Pre-tournament tee times failed for ${upcoming.name}: ${e.message}`);
         }
+      }
       }
 
       // ── Auto-regeneration: refresh stale predictions for imminent tournaments ──
@@ -261,7 +272,7 @@ Deno.serve(async (req) => {
 
     // ── Sync all tournaments (gated ones get stamped, not skipped) ────
     const syncResults = await Promise.all(
-      liveTournaments.map(tournament => syncTournament(supabase, sportradarApiKey, tournament))
+      liveTournaments.map(tournament => syncTournament(supabase, sportradarApiKey, tournament, now))
     );
 
     const totalRecords = syncResults.reduce((sum, r) => sum + r.records, 0);
@@ -320,7 +331,8 @@ Deno.serve(async (req) => {
 async function syncTournament(
   supabase: any,
   sportradarApiKey: string,
-  tournament: any
+  tournament: any,
+  now: Date
 ): Promise<TournamentSyncResult> {
   const tStart = Date.now();
   const tournamentTz = tournament.timezone || 'America/New_York';
@@ -374,7 +386,7 @@ async function syncTournament(
   let sportradarStatus: string | undefined;
   let syncError: string | undefined;
 
-  try {
+  if (shouldFetchLeaderboard(now)) try {
     const result = await syncLeaderboard(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id, tournament);
     leaderboardRecords = result.records;
     sportradarStatus = result.sportradarStatus;
@@ -404,10 +416,9 @@ async function syncTournament(
     }
   }
 
-  // ── Periodic hole stats safety net (every 10th minute) ───────────
+  // ── Periodic hole stats safety net (shared quota cadence) ────────
   const tourSlug = getTourSlug(seasonData?.tour_name || 'pga');
-  const currentMinute = new Date().getMinutes();
-  const shouldSyncHoleStats = (currentMinute % 10 === 0);
+  const shouldSyncHoleStats = shouldFetchHoleStats(now);
 
   if (shouldSyncHoleStats && tourSlug) {
     try {
@@ -434,11 +445,12 @@ async function syncTournament(
     console.log(`[LiveSync] Skipping hole stats for ${tournament.name} — unsupported tour`);
   }
 
-  // ── Periodic tee times sync (every 10th minute, offset by 5) ─────
+  // ── Periodic next-round tee times (shared quota cadence) ───────
   const teeTimesTourSlug = getTourSlugForTeeTimes(seasonData?.tour_name || 'pga');
-  const shouldSyncTeeTimes = (currentMinute % 10 === 5);
+  const shouldSyncTeeTimes = shouldFetchInPlayTeeTimes(now);
+  const teeTimesRound = nextTeeTimesRound(active.round);
 
-  if (shouldSyncTeeTimes && teeTimesTourSlug) {
+  if (shouldSyncTeeTimes && teeTimesTourSlug && teeTimesRound !== null) {
     try {
       console.log(`[LiveSync] Syncing tee times for ${tournament.name}`);
       const syncUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/sportradar-sync`;
@@ -453,6 +465,7 @@ async function syncTournament(
           tournamentId: tournament.sr_id,
           tourId: teeTimesTourSlug,
           year: year,
+          roundNumber: teeTimesRound,
         }),
       });
       console.log(`[LiveSync] Tee times refreshed for ${tournament.name}`);
@@ -461,10 +474,10 @@ async function syncTournament(
     }
   }
 
-  // ── Periodic scorecards sync (every 5th minute, offset by 1) ──────
+  // ── Periodic active-round scorecards (shared quota cadence) ─────
   // PGA, DP World, Champions, LPGA, and Korn Ferry tours get hole-by-hole scorecards
   const scorecardTours = ['pga', 'euro', 'champ', 'lpga', 'pgad', 'liv'];
-  const shouldSyncScorecards = (currentMinute % 5 === 1) && scorecardTours.includes(tour.toLowerCase());
+  const shouldSyncScorecards = shouldFetchScorecards(now) && scorecardTours.includes(tour.toLowerCase());
 
   if (shouldSyncScorecards) {
     try {
@@ -491,7 +504,7 @@ async function syncTournament(
     } catch (e) {
       console.warn(`[LiveSync] Scorecards sync failed for ${tournament.name}: ${e.message}`);
     }
-  } else if (currentMinute % 5 === 1 && !scorecardTours.includes(tour)) {
+  } else if (shouldFetchScorecards(now) && !scorecardTours.includes(tour)) {
     console.log(`[LiveSync] Skipping scorecards for ${tournament.name} — ${tour} tour not prioritised`);
   }
 
@@ -832,6 +845,7 @@ async function checkForLiveLeaderboard(
   const label = tournamentName || tournamentSrId.slice(0, 8);
 
   try {
+    logSportradarCall(url, 'StatusLeaderboard');
     const response = await fetch(url, {
       headers: { 'x-api-key': apiKey, 'Accept': 'application/json' }
     });
@@ -860,6 +874,7 @@ async function checkForLiveLeaderboard(
 // ── Sportradar fetch helper ──────────────────────────────────────────
 
 async function fetchSportradar(url: string, apiKey: string, description: string) {
+  logSportradarCall(url, description);
   const response = await fetch(url, {
     headers: { 'x-api-key': apiKey, 'Accept': 'application/json' }
   });

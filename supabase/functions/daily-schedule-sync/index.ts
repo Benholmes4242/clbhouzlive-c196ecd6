@@ -1,6 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 import { corsFor } from '../_shared/cors.ts';
+import { logSportradarCall } from '../_shared/sportradarCallLog.ts';
 /**
  * Daily Schedule Sync - Syncs tournament schedules and final leaderboards for ALL major tours
  * Runs at 6 AM UTC daily via pg_cron
@@ -336,6 +337,7 @@ async function syncFinalLeaderboard(
   
   console.log(`[FinalLeaderboard] Calling: ${url}`);
   
+  logSportradarCall(url, 'FinalLeaderboard');
   const response = await fetch(url, {
     headers: {
       'x-api-key': apiKey,

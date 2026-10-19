@@ -1,4 +1,5 @@
 import { corsFor } from '../_shared/cors.ts';
+import { logSportradarCall } from '../_shared/sportradarCallLog.ts';
 /**
  * tournament-round-complete - Fetches scorecards + hole statistics
  * 
@@ -33,6 +34,7 @@ function tourSupportsHoleStats(tourSlug: string): boolean {
 }
 
 async function fetchSportradar(url: string, apiKey: string): Promise<any> {
+  logSportradarCall(url, 'Hole Statistics');
   const response = await fetch(url, {
     headers: { 'x-api-key': apiKey, 'Accept': 'application/json' }
   });

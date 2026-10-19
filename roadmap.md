@@ -1,5 +1,8 @@
 # Roadmap
 
+## BRIEF_SPORTRADAR_QUOTA_FIT
+- [ ] Centralize cadence, gate routine provider fetches, preserve every-minute local work and finalization, log actual calls, run full suite and report remaining schedule inventory. Baseline: `npx vitest run`, 1,823 passing / 237 files.
+
 ## FUP1 — Home under-par fill
 - [x] Shared fill-only mechanism; Home uses dark-surface red, Explore retains photo red; ink stroke/scale/dots/baseline/other branches and existing tests unchanged. `npx vitest run`: 1,818/236 before -> 1,823/237 after, zero failures; +5 solely feedRoundUnderParFill.test.tsx. Preview build OK. Actual-chart fixture at 1280/524/390 widths verified states and IDs without overflow/errors. [0,-1,-3,0]: y1=29.5/y2=94; supplied minimum y=72.5 (21.5 gap), actual smooth minimum≈72.5912 (21.4088 gap). Hosted Home authentication unavailable. Shared ownership documented in new module header; root note rejected by size budget, root unchanged. Report /mnt/documents/FUP1_report.md.
 

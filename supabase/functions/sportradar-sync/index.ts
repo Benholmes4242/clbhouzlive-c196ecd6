@@ -216,6 +216,7 @@ Deno.serve(async (req) => {
 async function fetchSportradar(url: string, apiKey: string, description: string) {
   console.log(`[${description}] Calling: ${url}`);
   
+  logSportradarCall(url, description);
   const response = await fetch(url, {
     headers: {
       'x-api-key': apiKey,
