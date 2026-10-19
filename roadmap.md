@@ -1,5 +1,9 @@
 # Roadmap
 
+## BRIEF_ROUND_PLOT_SCALE_1 - ROUND_PLOT_1
+- [ ] STOP before app/test edits: src/test/roundTilePlot.test.tsx, case "dots every played hole and grades each in the ramp", asserts the par entry equals TOPAR_EVEN_DARK (translucent). BLA2 requires opaque local par ink; DO NOT requires naming and stopping before rewriting an existing test. Await authorisation for this exact assertion only. BLA7 requires height and scale together, so neither implemented pending ruling.
+- [x] Confirm clbhouz from project AGENTS.md and existing roadmap. No app/test changes or test commands in this brief; last reported full suite command npx vitest run: 1,805 passing / 232 files, zero failures. This is a historical result, not a fresh run.
+
 ## BRIEF_ROUND_TILE_1 - ROUND_TILE_1
 - [x] BEA1 finding: RoundShape with null nines and no shape returns null — the tile drew NOTHING, never a degenerate curve. BEA2 premise stale: Clubhouse.tsx already batches useRoundHoleShapes at page level (line 251) into CardFeed.roundShapeMap; no new read added.
 - [x] Home-only feedPlot path: new src/components/feed/roundTilePlot.tsx (feedHoleDots every-hole scorecard ramp, feedFeat ace/albatross/eagle via scorecardFeatFor, RoundTilePlot on-canvas trace); ExploreCard feedPlot prop suppresses the photo-foot overlay and draws the plot under the text block; threaded CardFeed.homeRoundPlot -> FeedCard -> ExploreCard; Clubhouse opts in. Explore/Profile never pass it — byte-identical. RoundShape/TrajectoryLine untouched, so no other caller affected (BEA9).
