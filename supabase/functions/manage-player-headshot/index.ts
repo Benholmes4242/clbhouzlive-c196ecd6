@@ -2,14 +2,15 @@ import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 
 import { corsFor } from '../_shared/cors.ts';
-// Tour code → R2 folder name mapping (matches playerHeadshot.ts)
+import { objectPath, s3Encode, objectName } from './s3Encode.ts';
+// Tour code -> R2 folder name mapping (matches playerHeadshot.ts)
 const TOUR_FOLDER: Record<string, string> = {
   pga: 'PGA Tour',
   euro: 'DP World Tour',
   lpga: 'LPGA',
   pgad: 'Korn Ferry',
   liv: 'LIV',
-  champ: 'Champions Tour',
+  champ: 'PGA Champions',
 };
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
