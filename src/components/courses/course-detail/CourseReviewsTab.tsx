@@ -63,6 +63,7 @@ import { ReportSheet } from '@/components/moderation/ReportSheet';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { AlertCircle } from 'lucide-react';
 import type { FeedPost, MediaItem as MediaItemType } from '@/components/media-system/types/media';
 
@@ -119,6 +120,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   const reviews = reviewsData || [];
   const myReview = reviews.find((r) => r.user_id === user?.id);
+  // REVIEWS_FIRST_RATING_1 RF3R: the Course tab's aggregate, never the viewer-excluding sample.
+  const { data: courseAggregate } = useCourseRatingAggregates(courseId);
   const otherReviews = reviews.filter((r) => r.user_id !== user?.id);
 
   /* ── deep link (?review=<id>): highlight the row and open the sheet ─────── */
@@ -483,6 +486,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           <SingleReview
             totalRatings={community.totalRatingCount}
             review={singleReview}
+            communityScore={courseAggregate?.avg_overall_score ?? null}
+            communityCount={courseAggregate?.review_count ?? null}
+            isViewerOwn={!!myReview}
             onMediaClick={(index, el) => {
               if (singleReview) mediaClickHandler(singleReview)(index, el);
             }}

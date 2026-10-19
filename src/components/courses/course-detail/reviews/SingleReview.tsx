@@ -28,9 +28,14 @@ interface SingleReviewProps {
   context?: RaterContext | null;
   onMediaClick: (index: number, el: HTMLElement | null) => void;
   onAddYours: () => void;
+  /** RF3R: Course tab aggregate (course_rating_aggregates); shown with its count beside it. */
+  communityScore?: number | null;
+  communityCount?: number | null;
+  /** RF5: the single rating is the viewer's own. */
+  isViewerOwn?: boolean;
 }
 
-export function SingleReview({ totalRatings, review, playedMonth, context, onMediaClick, onAddYours }: SingleReviewProps) {
+export function SingleReview({ totalRatings, review, playedMonth, context, onMediaClick, onAddYours, communityScore = null, communityCount = null, isViewerOwn = false }: SingleReviewProps) {
   const { data: fetchedContext } = useSingleReviewContext(context === undefined ? review?.user_id : undefined, review?.course_id ?? '');
   if (!isSingleReview(totalRatings)) return null;
   const facts = context === undefined ? fetchedContext : context;
@@ -39,17 +44,35 @@ export function SingleReview({ totalRatings, review, playedMonth, context, onMed
   const subject = gender === 'male' ? 'He' : gender === 'female' ? 'She' : 'They';
   const verb = subject === 'They' ? 'have' : 'has';
   const person = subject === 'He' ? 'a man' : subject === 'She' ? 'a woman' : 'someone';
+  // RF6: first word of the same resolved name the rater row shows; pronoun from the calibration source.
+  const object = subject === 'He' ? 'him' : subject === 'She' ? 'her' : 'them';
+  const resolvedName = review?.user_profiles?.display_name || review?.user_profiles?.username || null;
+  const firstName = resolvedName?.trim().split(/\s+/)[0] || null;
+  const lede = isViewerOwn
+    ? 'You got here first. Every golfer who rates it from now moves the number with you.'
+    : firstName
+      ? `${firstName} got here first. Every golfer who rates it from now moves the number with ${object}.`
+      : `A golfer got here first. Every golfer who rates it from now moves the number with ${object}.`;
   return <section data-reviews-state="one" aria-labelledby="reviews-one-title" style={{ padding: `0 ${GUTTER}px 20px`, fontFamily: SANS }}>
-    <div style={VERDICT_KICKER}>One golfer has rated it</div>
-    <h2 id="reviews-one-title" style={TAB_TITLE}>There is no community score yet</h2>
-    <p style={{ color: SURFACE.dark.mute, fontSize: 12.5, lineHeight: 1.5, margin: '8px 0 0' }}>One opinion is not an average. Here it is as what it is — a person, and what they said.</p>
+    <div style={VERDICT_KICKER}>The first rating</div>
+    <h2 id="reviews-one-title" style={TAB_TITLE}>{courseName} is on the board</h2>
+    {communityScore != null && communityCount != null && <div style={{ display: 'flex', alignItems: 'flex-end', gap: 11, marginTop: 15 }}>
+      <div data-community-score style={{ fontSize: 48, fontWeight: 800, letterSpacing: '-0.035em', lineHeight: 0.9, color: A.INK, ...FIGS }}>{Number(communityScore).toFixed(1)}</div>
+      <div style={{ paddingBottom: 5 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: A.INK, lineHeight: 1.2 }}>The community score</div>
+        <div style={{ fontSize: 11.5, color: A.DIM, lineHeight: 1.45, marginTop: 2, ...FIGS }}>{communityCount} {communityCount === 1 ? 'rating' : 'ratings'}</div>
+      </div>
+    </div>}
+    <p style={{ color: SURFACE.dark.mute, fontSize: 12.5, lineHeight: 1.5, margin: '8px 0 0' }}>{lede}</p>
     {review && <RaterReviewRow review={review} context={facts} playedMonth={playedMonth} onMediaClick={onMediaClick} />}
     {calibration && <p data-review-calibration style={{ borderLeft: `2px solid ${A.AMBER}`, paddingLeft: 11, color: SURFACE.dark.body, fontSize: 13, lineHeight: 1.5, margin: '14px 0 0' }}>
       {calibration.everyCategory && <>{subject} gave it <b style={{ color: SURFACE.dark.ink, ...FIGS }}>{review?.rating?.toFixed(1)}</b> on every category. </>}
       <b style={{ color: SURFACE.dark.ink, fontWeight: 700, ...FIGS }}>{subject} {verb} rated {calibration.coursesRated} courses and given {calibration.perfectTens} of them a ten</b> — so this is not {person} who hands them out.
     </p>}
-    <p style={{ borderLeft: `2px solid ${SURFACE.dark.hairline}`, paddingLeft: 11, color: SURFACE.dark.mute, fontSize: 13, lineHeight: 1.5, margin: '14px 0 0' }}>A community score appears <b style={{ color: SURFACE.dark.ink, fontWeight: 700 }}>as soon as a second golfer rates it</b>. One opinion is not an average — it is a person — so until then this page shows the person.</p>
-    <Button variant="ghost" onClick={onAddYours} style={{ background: SURFACE.dark.ink, color: INK_ON_LIGHT, borderRadius: 999, marginTop: 15, height: 'auto', minHeight: 42, padding: '11px 22px', fontSize: 14, fontWeight: 700, lineHeight: 1.4 }}>Add yours</Button>
+    <p data-first-rating-close style={{ borderLeft: `2px solid ${A.AMBER}`, paddingLeft: 11, color: SURFACE.dark.mute, fontSize: 13, lineHeight: 1.5, margin: '14px 0 0' }}>{isViewerOwn
+      ? <>The next golfer to rate it makes <b style={{ color: A.INK, fontWeight: 700 }}>the score an average of two</b>.</>
+      : <>Add yours and <b style={{ color: A.INK, fontWeight: 700 }}>the score becomes an average of two</b>.</>}</p>
+    <Button variant="ghost" onClick={onAddYours} style={{ background: SURFACE.dark.ink, color: INK_ON_LIGHT, borderRadius: 999, marginTop: 15, height: 'auto', minHeight: 42, padding: '11px 22px', fontSize: 14, fontWeight: 700, lineHeight: 1.4 }}>{isViewerOwn ? 'Edit yours' : 'Add yours'}</Button>
   </section>;
 }
 /** Existing State 2 person row shared with State 3; context never feeds aggregates. */
