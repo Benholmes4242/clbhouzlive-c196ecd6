@@ -1,7 +1,9 @@
 # Roadmap
 
-## BRIEF_TAB_CANON_1 - awaiting replacement brief
-- [ ] Await Ben's replacement brief before implementation. EYEBROW_CANON_1 withdrawn in full; its pending implementation task removed and memory superseded. No application/test edits to revert; no tests run. Corrected Reviews states and Champions section-amber/internal-LAST-90-DAYS distinction recorded, not implemented.
+## BRIEF_TAB_CANON_1 - TAB_CANON_1
+- [ ] Confirm every baseline and inspect protecting tests before application/test edits; stop/report any mismatch or changed-value assertion.
+- [ ] Apply shared first-element rules to Course/Champions/Reviews/Media, preserving You and later seams; share canonical eyebrow/title declarations and protected label exceptions.
+- [ ] Report NearbySection scope for Ben's ruling without editing it; measure per-state gaps and report exact full-suite command/count and declarations.
 
 ## BRIEF_TAB_LEAD_IN_1 - TAB_LEAD_IN_1
 - [x] Ben resolved TLA3: Elsewhere remains unchanged; only four primary Champions states receive first-section treatment.
