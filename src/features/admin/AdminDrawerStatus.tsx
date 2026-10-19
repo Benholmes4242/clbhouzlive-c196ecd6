@@ -1,4 +1,9 @@
-/** Open full-admin children own the existing live/Health queries; no table fallback. */
+/**
+ * The admin Health page and the drawer's Health dot read figures only from the `get_admin_health_*` RPCs (`useHealthLenses.ts`) and the existing service hooks, and share one verdict (`useHealthVerdict` in `components/health/healthIssues.ts`), so the dot and the page cannot disagree and no Health panel reads a table.
+ * Open full-admin children own the existing live/Health queries; no table fallback.
+ * The drawer live card and Analytics row share one query observer. Search uses
+ * the Stage 3 overview in a threshold-mounted child to avoid idle requests.
+ */
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
