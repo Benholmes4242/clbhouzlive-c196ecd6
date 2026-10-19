@@ -1395,7 +1395,9 @@
     "reviewsHead": {
       "kicker": "What people say",
       "title_one": "{{score}} from one golfer",
-      "title_other": "{{score}} from {{golfers}} golfers"
+      "title_other": "{{score}} from {{golfers}} golfers",
+      "youFirst": "You got here first",
+      "youFirstBody": "Your {{score}} is the course's score until someone else rates it."
     },
     "populations": {
       "everyRound": "Every round played here",

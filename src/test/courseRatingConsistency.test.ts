@@ -31,7 +31,15 @@ describe('C1 course rating consistency', () => {
     const course = src('src/components/courses/course-detail/about/WhatPeopleSay.tsx');
     const reviews = src('src/components/courses/course-detail/reviews/WhatTheyScored.tsx');
     const browse = src('src/components/courses/BrowseCourseCard.tsx');
-    for (const file of [course, reviews, browse]) expect(file).toContain('<CategoryScores');
+    for (const file of [reviews, browse]) expect(file).toContain('<CategoryScores');
+    /* CRM1.9: the rule was not withdrawn, the surface changed — the Course tab
+       now renders the extracted band rows, whose order is fewReviewFacts' fixed
+       key order. */
+    expect(course).toContain('<CategoryBands');
+    const facts = src('src/lib/reviews/fewReviews.ts');
+    expect(facts.indexOf("['design'")).toBeLessThan(facts.indexOf("['condition'"));
+    expect(facts.indexOf("['condition'")).toBeLessThan(facts.indexOf("['clubhouse'"));
+    expect(facts.indexOf("['clubhouse'")).toBeLessThan(facts.indexOf("['facilities'"));
     for (const file of [block]) {
       expect(file.indexOf("label: 'Design'")).toBeLessThan(file.indexOf("label: 'Condition'"));
       expect(file.indexOf("label: 'Condition'")).toBeLessThan(file.indexOf("label: 'Clubhouse'"));
@@ -44,7 +52,9 @@ describe('C1 course rating consistency', () => {
     const reviews = src('src/components/courses/course-detail/reviews/TheScore.tsx');
     const card = src('src/components/posts/ReviewBottomSheet.tsx');
     const block = src('src/components/courses/course-detail/CategoryScores.tsx');
-    expect(course).toContain('<OverallScoreLine');
+    /* CRM1.9: the rule was not withdrawn, the surface changed — the Course tab
+       headline now shares the Reviews tab's figure row, ink at every count. */
+    expect(course).toContain('data-community-score');
     expect(reviews).toContain('courseSubScoreTone(score)');
     expect(block).toContain('const tone = courseSubScoreTone(score)');
     expect(card).toContain('const ratingColor = courseSubScoreTone(rating)');
@@ -122,7 +132,9 @@ describe('C1 course rating consistency', () => {
   it('preserves viewing-member amber and moves the composer onto the course rule', () => {
     const about = src('src/components/courses/course-detail/about/WhatPeopleSay.tsx');
     const rows = src('src/components/courses/course-detail/reviews/reviewFlatBits.tsx');
-    expect(about).toContain('<OverallScoreLine score={score} ratingCount={total} />');
+    /* CRM1.9: the rule was not withdrawn, the surface changed — viewing-member
+       amber now lives in the YOU pill beside the community figure. */
+    expect(about).toContain('data-viewer-delta');
     expect(rows).toContain('isMine ? A.AMBER : courseSubScoreTone(score)');
 
     /* THE REVIEW FLOW PRINTS THE COURSE PAGE'S COLOURS. Every score figure in
