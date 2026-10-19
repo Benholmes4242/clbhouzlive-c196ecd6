@@ -5,6 +5,7 @@
  * below follows what is drawn. No ghost row: a tracked card ends State 3.
  */
 import React from 'react';
+import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
 import type { LegendCategory } from '@/lib/gam/types';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -101,8 +102,8 @@ export function PostedChampions(props: PostedChampionsProps) {
   const owned = selectedDefence(activeKey, grouped);
   return <div className="champions-empty champions-posted" style={{ color: A.INK }}>
     <section className="champions-empty-section champions-empty-section--first">
-      <div className="champions-empty-kicker" style={{ color: A.AMBER }}>Your cabinet here</div>
-      <h2 data-yours-count={yours.length} data-board-count={keys.length}>{numberWord(yours.length)} of the {numberWord(keys.length, false)} are yours</h2>
+      <div className="champions-empty-kicker" style={VERDICT_KICKER}>Your cabinet here</div>
+      <h2 data-yours-count={yours.length} data-board-count={keys.length} style={TAB_TITLE}>{numberWord(yours.length)} of the {numberWord(keys.length, false)} are yours</h2>
       {lede && <div className="champions-empty-lede" style={{ color: A.MUTE }}>{lede}</div>}
       <ChampionsCabinet categories={keys} holders={holders} states={states} activeKey={activeKey} onSelect={props.onSelect} />
       <div className="champions-cabinet-legend" aria-label="Board states" style={{ color: A.DIM }}>
@@ -131,8 +132,8 @@ function WhatItTakes({ category, grouped, inputs }: { category: LegendCategory; 
     ? [[record?.valueDisplay ?? '\u2014', 'The record'], [self?.valueDisplay ?? '\u2014', 'Your total here']]
     : [[record?.valueDisplay ?? '\u2014', 'The record'], [self?.valueDisplay ?? '\u2014', 'Your best here'], [inputs ? String(courseHandicap(inputs)) : '\u2014', 'Course handicap']];
   return <section className="champions-empty-section" data-section="what-it-takes">
-    <div className="champions-empty-kicker" style={{ color: A.AMBER }}>What it takes</div>
-    {gap != null && gap > 0 && <h2>{numberWord(gap)} {title}</h2>}
+    <div className="champions-empty-kicker" style={VERDICT_KICKER}>What it takes</div>
+    {gap != null && gap > 0 && <h2 style={TAB_TITLE}>{numberWord(gap)} {title}</h2>}
     <div className="champions-field-panel" style={{ background: A.PANEL }}>
       {record && <div className="champions-field-record"><strong style={{ color: MEDAL_GOLD, fontSize: 32 }}>{record.valueDisplay}</strong><span style={{ color: A.MUTE }}>takes it<br />outright</span></div>}
       {<div className="champions-field-stats">{stats.map(([value, label]) => <div key={label}><strong>{value}</strong><span style={{ color: A.DIM }}>{label}</span></div>)}</div>}
@@ -151,13 +152,13 @@ function DefencePanel({ category, rival, defence, own90, rival90, attainedAt, vi
   const held = heldFor(attainedAt);
   const title = !rival ? 'Nobody else is on this board' : closing ? `${rival.name} is closing` : 'Nobody is closing on you';
   return <section className="champions-empty-section" data-section="your-defence" data-trend={defence?.trend ?? 'no-rival'}>
-    <div className="champions-empty-kicker" style={{ color: MEDAL_GOLD }}>Your defence</div>
-    <h2>{title}</h2>
+    <div className="champions-empty-kicker" style={VERDICT_KICKER}>Your defence</div>
+    <h2 style={TAB_TITLE}>{title}</h2>
     {rival && <div className="champions-field-panel" style={{ background: A.PANEL }}>
       <div className="champions-field-record"><strong style={{ color: MEDAL_GOLD, fontSize: 32 }}>{defence?.margin}</strong><span style={{ color: A.MUTE }}>{unit ? <>{unit}<br /></> : null}clear</span></div>
       <div className="champions-field-stats">{([[String(viewerTotal ?? '\u2014'), 'You'], [rival.valueDisplay, rival.name], ...(closing ? [[`+${defence?.gain90}`, `${rival.name} gains a quarter`], [defence?.date ? monthName(defence.date) : 'Beyond a year', `${rival.name} passes you`]] : [])] as string[][]).map(([value, label]) => <div key={label}><strong>{value}</strong><span style={{ color: A.DIM }}>{label}</span></div>)}</div>
       {CHAMPIONS_BOARD_DATA[category].kind === 'cumulative' && own90 != null && rival90 != null && <div className="champions-defence-bars" aria-label="Last 90 days">
-        <div className="champions-empty-kicker" style={{ color: A.DIM }}>LAST 90 DAYS</div>
+        <div className="champions-bar-group-label" style={{ color: A.DIM }}>LAST 90 DAYS</div>
         {[[`You +${own90}`, own90, MEDAL_GOLD], [`${rival.name} +${rival90}`, rival90, A.DIM]].map(([caption, value, tone]) => <div className="champions-defence-track" key={String(caption)}><div className="champions-defence-bar" style={{ width: `${Number(value) / max * 100}%`, background: String(tone) }} /><span style={{ color: A.MUTE }}>{caption}</span></div>)}
       </div>}
     </div>}

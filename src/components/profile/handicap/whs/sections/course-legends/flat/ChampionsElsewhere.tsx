@@ -5,6 +5,7 @@
  * The heading count is the rendered card count by construction.
  */
 import React from 'react';
+import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
 import type { LegendCategory } from '@/lib/gam/types';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { numberWord } from '@/lib/text/numbers';
@@ -42,8 +43,8 @@ export function ElsewhereSection({ rows }: { rows: readonly TitleInReach[] }) {
   const cards = elsewhereCards(rows);
   if (!cards.length) return null;
   return <section className="champions-empty-section" data-section="elsewhere" style={{ color: A.INK }}>
-    <div className="champions-empty-kicker" style={{ color: A.AMBER }}>Elsewhere</div>
-    <h2 data-card-count={cards.length}>{numberWord(cards.length)} {cards.length === 1 ? 'board you are' : 'boards you are'} closest to</h2>
+    <div className="champions-empty-kicker" style={VERDICT_KICKER}>Elsewhere</div>
+    <h2 data-card-count={cards.length} style={TAB_TITLE}>{numberWord(cards.length)} {cards.length === 1 ? 'board you are' : 'boards you are'} closest to</h2>
     <div className="champions-empty-lede" style={{ color: A.MUTE }}>Across every course you have played. Ordered by how little stands between you and the top.</div>
     {cards.map(({ row, category, proportion }) => <div key={`${row.course_id}-${row.category}`} data-elsewhere-card="" data-proportion={proportion} style={{ background: A.PANEL, borderRadius: 13, padding: 13, marginTop: 13 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
@@ -58,7 +59,7 @@ export function ElsewhereSection({ rows }: { rows: readonly TitleInReach[] }) {
         <div style={{ textAlign: 'right', fontSize: 13, fontWeight: 800, color: A.AMBER, fontVariantNumeric: 'tabular-nums' }}>{Number(Number(row.gap).toFixed(1))} off</div>
       </div>
     </div>)}
-    <div className="champions-empty-said" style={{ color: A.MUTE }}>Only courses you have already played appear here, because a rank is the thing that makes a gap real. <b>Courses you have never played cannot be ranked</b> and are not guessed at.</div>
+    <div className="champions-empty-said" style={{ color: A.MUTE, borderColor: A.BASELINE }}>Only courses you have already played appear here, because a rank is the thing that makes a gap real. <b>Courses you have never played cannot be ranked</b> and are not guessed at.</div>
   </section>;
 }
 

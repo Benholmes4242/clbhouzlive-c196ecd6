@@ -1,3 +1,4 @@
+import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
 /** MEDIA_EMPTY_1: B and C have distinct layouts and write entrypoints.
  * Only B's untapped Add first chooses a hole. Tile taps use the existing
  * known-hole path; C can only navigate to the existing review composer.
@@ -21,8 +22,8 @@ export function CourseMediaNoHoleList({ courseName, photoCount, children }: {
   courseName?: string; photoCount: number; children: ReactNode;
 }) {
   return <section className="media-empty media-empty-section" style={theme}>
-    <p className="media-empty-kicker">From the members</p>
-    <h2 className="media-empty-title">{capitalPhotoCount(photoCount)} {photoCount === 1 ? 'photograph' : 'photographs'}</h2>
+    <p className="media-empty-kicker" style={VERDICT_KICKER}>From the members</p>
+    <h2 className="media-empty-title" style={TAB_TITLE}>{capitalPhotoCount(photoCount)} {photoCount === 1 ? 'photograph' : 'photographs'}</h2>
     <p className="media-empty-lede">Posted with reviews of this course.</p>
     {children}
     <p className="media-empty-said">Nobody has posted a round at {courseName || 'this course'}, so clbhouz does not yet know which holes it has. <strong>The first tracked round here opens the hole walk</strong> and these photographs become taggable.</p>
@@ -39,8 +40,8 @@ export function CourseMediaNotLive({ rows, memberId, courseId, onRetag }: {
   const own = privateHolePhotos(rows, memberId, courseId);
   if (!own.length) return null;
   return <section className="media-empty media-empty-section" style={theme}>
-    <p className="media-empty-kicker">Only you can see this</p>
-    <h2 className="media-empty-title">{capitalPhotoCount(own.length)} of yours {own.length === 1 ? 'is' : 'are'} not live</h2>
+    <p className="media-empty-kicker" style={VERDICT_KICKER}>Only you can see this</p>
+    <h2 className="media-empty-title" style={TAB_TITLE}>{capitalPhotoCount(own.length)} of yours {own.length === 1 ? 'is' : 'are'} not live</h2>
     {rows.some(row => row.user_id === memberId && row.course_id === courseId && row.status === 'approved') && <p className="media-empty-lede">Everything else you have tagged here is published.</p>}
     <div className="media-empty-status-list">{own.map(row => {
       const reviewed = photoDayLabel(row.reviewed_at);
@@ -80,8 +81,8 @@ export function CourseMediaNoPhotographs({ courseName, holes, onHole, onAddFirst
   courseName?: string; holes: readonly CourseHole[]; onHole: (hole: number) => void; onAddFirst: () => void;
 }) {
   return <section className="media-empty media-empty-section" style={theme}>
-    <p className="media-empty-kicker">Walk the course</p>
-    <h2 className="media-empty-title">You would be the first</h2>
+    <p className="media-empty-kicker" style={VERDICT_KICKER}>Walk the course</p>
+    <h2 className="media-empty-title" style={TAB_TITLE}>You would be the first</h2>
     <p className="media-empty-lede">Nobody has shot {courseName || 'this course'}. Every hole is open.</p>
     <div className="media-empty-grid">{[...holes].sort((a, b) => a.hole_no - b.hole_no).map(hole => <Button key={hole.hole_no} variant="ghost" aria-label={`Hole ${hole.hole_no}`} data-state="open" className="media-empty-hole" onClick={() => onHole(hole.hole_no)}><span className="media-empty-hole-number">{hole.hole_no}</span><span className="media-empty-hole-open">Open</span></Button>)}</div>
     <p className="media-empty-said"><strong>{MEDIA_EMPTY_SNAPSHOT.withoutPhotos.toLocaleString('en-GB')} of the {MEDIA_CATALOGUE_TOTAL.toLocaleString('en-GB')} courses</strong> we track have no photograph at all. <strong>No publisher will ever shoot them.</strong> Members are the only way this gets filled, one hole at a time.</p>
@@ -91,8 +92,8 @@ export function CourseMediaNoPhotographs({ courseName, holes, onHole, onAddFirst
 
 export function CourseMediaNothing({ courseName, onReview }: { courseName?: string; onReview: () => void }) {
   return <section className="media-empty media-empty-section" style={theme}>
-    <p className="media-empty-kicker">Nobody has been here yet</p>
-    <h2 className="media-empty-title">No photographs of {courseName || 'this course'}</h2>
+    <p className="media-empty-kicker" style={VERDICT_KICKER}>Nobody has been here yet</p>
+    <h2 className="media-empty-title" style={TAB_TITLE}>No photographs of {courseName || 'this course'}</h2>
     <p className="media-empty-lede">And no rounds, so clbhouz does not yet know its holes.</p>
     <p className="media-empty-said">Photographs reach a course through a review. <strong>Write one and your pictures land here</strong> — and the first round posted opens the hole walk for everybody after you.</p>
     <Button variant="ghost" className="media-empty-action" onClick={onReview}>Review this course</Button>

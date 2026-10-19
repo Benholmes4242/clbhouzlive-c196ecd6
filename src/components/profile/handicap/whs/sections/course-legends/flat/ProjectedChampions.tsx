@@ -4,6 +4,7 @@
  * selector, with the existing youTab namespace deliberately retained.
  */
 import React from 'react';
+import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
 import { Trans, useTranslation } from 'react-i18next';
 import type { CourseProjection, CoursePlayInputs } from '@/lib/whs/coursePlay';
 import { recordProjectionForm } from '@/lib/whs/recordProjectionForm';
@@ -43,8 +44,8 @@ export function ProjectedChampions(props: ProjectedChampionsProps) {
   const heading = form === 'rangeRecordAbove' ? 'On your ordinary golf you would hold it' : form === 'rangeRecordInside' ? 'It is yours on a good day' : form === 'rangeRecordBelow' ? 'It would take better than your best here' : 'Your scoring carried onto this course';
   return <div className="champions-empty champions-projected" style={{ color: A.INK }}>
     <section className="champions-empty-section champions-empty-section--first">
-      <div className="champions-empty-kicker" style={{ color: A.AMBER }}>You have never played here</div>
-      <h2 data-reached-count={reached.length}>Your golf reaches {numberWord(reached.length, false)} of these</h2>
+      <div className="champions-empty-kicker" style={VERDICT_KICKER}>You have never played here</div>
+      <h2 data-reached-count={reached.length} style={TAB_TITLE}>Your golf reaches {numberWord(reached.length, false)} of these</h2>
       <div className="champions-empty-lede" style={{ color: A.MUTE }}>Off a course handicap of {p.courseHcp} you project {p.typicalGross}. {names.length ? `That is enough for the ${named} ${names.length === 1 ? 'board' : 'boards'} here.` : 'No standing projectable board is within your range here yet.'}</div>
       <ChampionsCabinet categories={categories.map(category => category.key)} holders={holders} states={states} activeKey={activeKey} onSelect={props.onSelect} />
       <div className="champions-cabinet-legend" aria-label="Board states" style={{ color: A.DIM }}>
@@ -55,8 +56,8 @@ export function ProjectedChampions(props: ProjectedChampionsProps) {
     </section>
     <BoardSection categories={categories} grouped={grouped} activeKey={activeKey} onSelectCategory={props.onSelect} legendWindow={legendWindow} canSwitchWindow onWindowChange={props.onWindowChange} coursePar={props.par} onOpenFull={props.onOpenFull} onRowPress={props.onRowPress} fieldOnly projectedScreen ghost={range && (activeKey === 'lowest_gross_all_time' || activeKey === 'lowest_gross_90d') ? { value: p.typicalGross, name: props.viewer?.name ?? 'You', photoUrl: props.viewer?.photoUrl ?? null } : undefined} />
     <section className="champions-empty-section">
-      <div className="champions-empty-kicker" style={{ color: A.AMBER }}>What it takes</div>
-      <h2>{heading}</h2>
+      <div className="champions-empty-kicker" style={VERDICT_KICKER}>What it takes</div>
+      <h2 style={TAB_TITLE}>{heading}</h2>
       <div className="champions-field-panel" style={{ background: A.PANEL }}>
         {record != null && <div className="champions-field-record"><strong style={{ color: MEDAL_GOLD }}>{record}</strong><span style={{ color: A.MUTE }}>The record</span></div>}
         <ProjectionScale p={p} record={record} field={props.fieldOverPar != null ? inputs.par + props.fieldOverPar : null} />

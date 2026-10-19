@@ -1,3 +1,4 @@
+import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
 /** State A and State B keep one mounted grid; no scroll, gallery cap or alias
  * correction. Real stored photos supply imagery, never illustrative mock art.
  */
@@ -27,8 +28,8 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
   const month = active ? captureMonth(active) : null;
   return <div className="hole-walk" style={{ color: A.INK, '--hole-walk-ink': A.INK, '--hole-walk-canvas': A.CANVAS, '--hole-walk-muted': A.MUTE, '--hole-walk-body': A.BODY, '--hole-walk-dim': A.DIM, '--hole-walk-faint': A.FAINT, '--hole-walk-soft': A.SOFT, '--hole-walk-rule': A.SOFT, '--hole-walk-track': A.TRACK } as CSSProperties}>
     <section className="hole-walk-section">
-      <p className="hole-walk-kicker">Walk the course</p>
-      <h2 className="hole-walk-title">{walk.headline}</h2>
+      <p className="hole-walk-kicker" style={VERDICT_KICKER}>Walk the course</p>
+      <h2 className="hole-walk-title" style={TAB_TITLE}>{walk.headline}</h2>
       <p className="hole-walk-lede">{capitalPhotoCount(walk.photoCount)} of the {totalMedia.toLocaleString()} are tied to a hole. Tap one to walk it.</p>
       <div className="hole-walk-grid">
         {walk.tiles.map(item => <Button key={item.hole.hole_no} variant="ghost" aria-label={`Hole ${item.hole.hole_no}`} aria-pressed={selected === item.hole.hole_no}
@@ -46,8 +47,8 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       </p>}
     </section>
     {tile && <section className="hole-walk-section">
-      <p className="hole-walk-kicker">The {holeOrdinal(tile.hole.hole_no)}</p>
-      <h2 className="hole-walk-title">Par {tile.hole.par}{tile.hole.yards != null && <> · {tile.hole.yards.toLocaleString()} yards</>}</h2>
+      <p className="hole-walk-kicker" style={VERDICT_KICKER}>The {holeOrdinal(tile.hole.hole_no)}</p>
+      <h2 className="hole-walk-title" style={TAB_TITLE}>Par {tile.hole.par}{tile.hole.yards != null && <> · {tile.hole.yards.toLocaleString()} yards</>}</h2>
       <div className={`hole-walk-photo ${active ? '' : 'hole-walk-photo-open'}`}>
         {active ? <><img src={active.media_url} alt={`Hole ${tile.hole.hole_no}`} />{(author || month) && <div className="hole-walk-caption">{author && <strong>{author}</strong>}{month && <span>{captureMonthLabel(month)}</span>}</div>}</> : <span>No photograph yet</span>}
       </div>
