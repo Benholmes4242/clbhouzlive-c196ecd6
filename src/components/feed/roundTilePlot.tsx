@@ -28,6 +28,7 @@
 import { useId } from 'react';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { smoothPath } from '@/lib/charts/smoothPath';
+import { UnderParGradientFill } from '@/lib/charts/UnderParGradientFill';
 import { A } from '@/components/explore-tab-new/courseled/tokens';
 import {
   SC_FILL_GOLD,
@@ -162,6 +163,7 @@ export function RoundTilePlot({
   const points = values.map((v, i) => ({ x: xFor(i), y: yFor(v) }));
   const path = smoothPath(points);
   const baselineY = yFor(0);
+  const wentUnder = Math.min(...values) < 0;
   const dots = feedHoleDots(shape);
   const feat = feedFeat(shape);
   const last = points.at(-1);
@@ -198,6 +200,14 @@ export function RoundTilePlot({
         aria-hidden
         style={{ display: 'block' }}
       >
+        {wentUnder ? (
+          <UnderParGradientFill
+            path={path} points={points} baselineY={baselineY} bottom={bottom} width={width}
+            clipId={`feed-round-under-clip-${instanceId}`}
+            gradientId={`feed-round-under-gradient-${instanceId}`}
+            color={TOPAR_UNDER_DARK}
+          />
+        ) : null}
         <line
           x1={PAD_X}
           x2={width - PAD_X}
