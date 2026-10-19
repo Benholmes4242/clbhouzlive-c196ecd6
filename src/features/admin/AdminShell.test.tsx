@@ -1,7 +1,7 @@
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const f = vi.hoisted(() => ({
@@ -41,7 +41,9 @@ function mount(path: string) {
   return render(
     <QueryClientProvider client={client}>
       <MemoryRouter initialEntries={[path]}>
-        <AdminShell />
+        <Routes>
+          <Route path="/admin-v2/*" element={<AdminShell />} />
+        </Routes>
       </MemoryRouter>
     </QueryClientProvider>,
   );

@@ -73,10 +73,10 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('BRIEF_ADMIN_SETTINGS page', () => {
-  it('a full admin sees all six sections', () => {
+  it('a full admin sees all six sections', async () => {
     f.role.mockReturnValue({ role: 'full', loading: false });
     mount();
-    expect(screen.getByText('Benjamin Holmes')).toBeInTheDocument();
+    expect(await screen.findByText('Benjamin Holmes')).toBeInTheDocument();
     expect(screen.getByText('Platform')).toBeInTheDocument();
     expect(screen.getByText('Get the app')).toBeInTheDocument();
     expect(screen.getByText('Staff accounts')).toBeInTheDocument();
@@ -84,10 +84,10 @@ describe('BRIEF_ADMIN_SETTINGS page', () => {
     expect(screen.getByText('This device')).toBeInTheDocument();
   });
 
-  it('a limited admin sees only identity and This device', () => {
+  it('a limited admin sees only identity and This device', async () => {
     f.role.mockReturnValue({ role: 'limited', loading: false });
     mount('limited');
-    expect(screen.getByText('Benjamin Holmes')).toBeInTheDocument();
+    expect(await screen.findByText('Benjamin Holmes')).toBeInTheDocument();
     expect(screen.getByText('This device')).toBeInTheDocument();
     expect(screen.queryByText('Platform')).not.toBeInTheDocument();
     expect(screen.queryByText('Get the app')).not.toBeInTheDocument();
@@ -103,12 +103,13 @@ describe('BRIEF_ADMIN_SETTINGS page', () => {
     expect(f.setConfig).not.toHaveBeenCalled();
   });
 
-  it("Turn maintenance on saves a changed message first, then turns maintenance on", () => {
+  it("Turn maintenance on saves a changed message first, then turns maintenance on", async () => {
     f.role.mockReturnValue({ role: 'full', loading: false });
     mount();
     fireEvent.click(screen.getByRole('switch', { name: 'Maintenance mode' }));
     fireEvent.change(screen.getByLabelText('What members see'), { target: { value: 'Back at six.' } });
     fireEvent.click(screen.getByRole('button', { name: 'Turn maintenance on' }));
+    await vi.waitFor(() => expect(f.setConfig).toHaveBeenCalledTimes(2));
     expect(f.setConfig).toHaveBeenCalledWith('maintenance_message', 'Back at six.');
     expect(f.setConfig).toHaveBeenCalledWith('maintenance_mode', 'on');
     expect(f.setConfig.mock.invocationCallOrder[0]).toBeLessThan(f.setConfig.mock.invocationCallOrder[1]);
