@@ -2,7 +2,8 @@
 
 ## BRIEF_TAB_LEAD_IN_1 - TAB_LEAD_IN_1
 - [x] Ben resolved TLA3: Elsewhere remains unchanged; only four primary Champions states receive first-section treatment.
-- [ ] Baseline stop remains for You: VerdictSection is first only in settled played branch (CourseYouTab.tsx:649-661). Connected never-played ProjectionSection already uses AboutSection first (ProjectionSection.tsx:118,164,213), while other eligible opening sections use default 34px AboutSection margins (NotConnectedInvitation.tsx:99-104; WonAndLostSection.tsx:44). Await scope ruling before working around the stated uniform 20px baseline. No app/test edits, measurements or test runs; last reported npx vitest run remains 1,810 passing / 233 files, zero failures (historical).
+- [x] TLA2R resolves the You baseline stop: all six branches and conditional first-rendered alternatives are in scope, including both skeletons; later Sec/AboutSection seams stay unchanged.
+- [ ] Implement shared-only lead-in and zero first-state contributions; verify every You/Champions state individually and all five tabs against Reviews; report full suite against 1,810 passing / 233 files.
 
 ## BRIEF_ROUND_PLOT_SCALE_1 - ROUND_PLOT_1
 - [x] ROUND_PLOT_1_R authorises only third expected tone in the ramp test. Derived TOPAR_EVEN_DARK rgba(242,244,247,0.42) over actual Home CARD/FEED_CARD_SURFACE #16161A to #727377; withdrew earlier #6E6F71. Local documented dot token, shared tokens unchanged. Plot SVG 59 -> 102px, unchanged 10px seam gives 69 -> 112px footprint. Per-round range includes zero with symmetric six-stroke floor; panel/mark/series/shared callers unchanged.
