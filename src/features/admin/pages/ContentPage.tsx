@@ -765,7 +765,7 @@ function usePlayerSync() {
  * BRIEF_CONTENT_DESK Stage 4 — the Tour data section plus its sub-view, the
  * existing player list, and the existing headshot override sheet (?player=).
  */
-function TourSection() {
+export function TourSection() {
   const [params, setParams] = useSearchParams();
   const sub = params.get('sub');
   const players = useAdminPlayers();
