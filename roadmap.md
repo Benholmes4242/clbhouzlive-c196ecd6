@@ -1,4 +1,7 @@
-# BRIEF_EXPLORE_REVIEW_TILE_A1
+# Roadmap
+
+## BRIEF_REMOVE_STALE_ADMIN_GUARD_TEST
+- [x] Deleted only the "no admin file changed in this brief" it block in src/test/holePhotoTagging.test.tsx and its now-unused execFileSync import. Nothing else changed. Full suite 1,796 passing / 232 files, 0 failing; preview build OK 2026-10-19T08:10:01Z.
 
 ## BRIEF_TOUR_RANKINGS_OPEN_PLAYER_FIX1
 - [x] Every row button and chevron; linked precedence preserved; unique matchKey directory match opens PhotoSheet; ambiguous/missing names open the prefilled directory; leaving clears q.
