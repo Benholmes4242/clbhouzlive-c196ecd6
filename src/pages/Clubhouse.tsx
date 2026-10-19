@@ -627,6 +627,7 @@ const ClubhouseContent = () => {
               posts={posts}
                feedItems={feedItems}
               homeRails
+              homeRoundPlot
               courseContextMap={courseContextMap}
               resolveCourseId={resolvePostCourseId}
               postScoreIdMap={postScoreIdMap}
