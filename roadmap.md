@@ -1,7 +1,7 @@
 # Roadmap
 
 ## BRIEF_TAB_CANON_1 - TAB_CANON_1
-- [ ] Ben corrected TC5 to eleven Media first-element states (nine wrong, two header-first correct); withdrew fixed report total in favour of enumerated actual states. Verify corrected source baselines before application/test edits. No tests run; last npx vitest run remains 1,810 passing / 233 files.
+- [ ] Corrected TC5 baseline STOP: an additional populated-grid-first path has padding-top 12px (CourseMediaCanonGrid.tsx:267), when feed resolves before counts/analysis, header returns null, and earlier photo/walk sections do not render (CourseMediaTabNew.tsx:113-115,144-153,186; useCourseMedia.ts:35,96,126). This is distinct from grid loading and omitted from the eleven-state inventory. Await correction/acknowledgment before application/test edits. No tests run; last npx vitest run remains 1,810 passing / 233 files.
 - [ ] Apply shared first-element rules to Course/Champions/Reviews/Media, preserving You and later seams; share canonical eyebrow/title declarations and protected label exceptions.
 - [ ] Nearby IN scope via canon opt-in; preserve/report its 16px gutter and count other SectionHeader callers. Measure per-state gaps and report exact full-suite command/count and declarations.
 
