@@ -390,17 +390,6 @@ function GetTheAppSection({ settings, setConfig }: {
     setValue(which === 'app' ? links?.app_store_url ?? '' : links?.play_store_url ?? '');
     setError(null);
   };
-  const save = async () => {
-    if (!editing) return;
-    const key = editing === 'app' ? 'app_download_url' : 'play_store_url';
-    // The hook toasts server errors; here the message also stays under the input.
-    try {
-      await setConfig(key, value.trim());
-      setEditing(null);
-    } catch {
-      /* setConfig already reported */
-    }
-  };
   const remove = async () => {
     await setConfig('play_store_url', '');
     setEditing(null);

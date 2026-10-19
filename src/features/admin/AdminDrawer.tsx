@@ -1,7 +1,7 @@
 /**
  * Status-board drawer: open-only live/Health children share approved hooks.
  * Search mounts the Stage 3 overview only at two trimmed characters.
- * Settings keeps its Health-tab URL until BRIEF_ADMIN_SETTINGS ships.
+ * Settings is its own route since BRIEF_ADMIN_SETTINGS.
  */
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -33,7 +33,7 @@ const GROUPS: { label: string; rows: NavItem[] }[] = [
   ] },
   { label: 'System', rows: [
     { to: '/admin-v2/health', label: 'Health', icon: Activity },
-    { to: '/admin-v2/health?tab=settings', label: 'Settings', icon: Settings, everyRole: true },
+    { to: '/admin-v2/settings', label: 'Settings', icon: Settings, everyRole: true },
   ] },
 ];
 const pill: React.CSSProperties = { height: 22, padding: '0 8px', borderRadius: 999, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap' };
@@ -68,9 +68,8 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
         return <div key={group.label}>
           <div style={{ padding: '16px 12px 6px', fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: t.inkFaint }}>{group.label}</div>
           {rows.map(item => {
-            const [path, qs] = item.to.split('?');
-            const onSettings = new URLSearchParams(location.search).get('tab') === 'settings';
-            const active = location.pathname.startsWith(path) && (qs ? onSettings : !(path === '/admin-v2/health' && onSettings));
+            const [path] = item.to.split('?');
+            const active = location.pathname.startsWith(path);
             const Icon = item.icon;
             return <Link key={item.to} to={item.to} onClick={onClose} aria-current={active ? 'page' : undefined} style={{ height: 46, padding: '0 12px', borderRadius: 12, display: 'grid', gridTemplateColumns: '18px minmax(0, 1fr) auto', columnGap: 14, alignItems: 'center', background: active ? t.brandSoft : 'transparent', color: active ? t.brandText : t.ink, textDecoration: 'none' }}>
               <Icon size={18} strokeWidth={1.9} color={active ? t.brandText : t.inkMuted} />
