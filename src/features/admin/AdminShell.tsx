@@ -132,9 +132,21 @@ export default function AdminShell() {
           <div style={{ flex: 1 }} />
           {isAnalytics
             ? <AnalyticsHeaderSlot onLive={onLive} params={params} onOpenLive={() => setParams(toLive(params), { replace: true })} />
-            : <RefreshHeaderButton />}
+            : segment === 'settings'
+              ? null
+              : <RefreshHeaderButton />}
         </div>
       </header>
+
+      {maintenanceOn ? (
+        <MaintenanceBar
+          changedAt={can.manageAdmins ? settings.data?.maintenance.changed_at ?? null : null}
+          canManage={can.manageAdmins}
+          onTurnOff={async () => {
+            if (await settings.setConfig('maintenance_mode', 'off')) toast.success('Maintenance off');
+          }}
+        />
+      ) : null}
 
       <main style={{
         paddingTop: headerHeight,
@@ -158,6 +170,7 @@ export default function AdminShell() {
                 <Route path="content/*"   element={<ContentPage />} />
                 <Route path="analytics/*" element={can.manageAdmins ? <AnalyticsPage /> : <AdminAccessDenied />} />
                 <Route path="health/*" element={<HealthPage />} />
+                <Route path="settings/*" element={<SettingsPage />} />
 
                 {/* Redirects: legacy health-family routes -> unified Health page */}
                 <Route path="system/*"      element={<RedirectPreserving to="/admin-v2/health" />} />
