@@ -12,6 +12,7 @@ import type { HoleShape, ShapeBead } from './hooks/useRoundHoleShapes';
 import { TOPAR_RED, RAMP_TOPAR, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { TOPAR_EVEN_LIGHT } from '@/features/tourhub/_shared/tokens';
 import { smoothPath } from '@/lib/charts/smoothPath';
+import { UnderParGradientFill } from '@/lib/charts/UnderParGradientFill';
 import { PHOTO_FIG_UNDER } from '@/styles/photoScrim';
 
 import { A, CHIP_RADIUS } from './tokens';
@@ -38,10 +39,6 @@ const END_LABEL_LINE_HEIGHT = Math.ceil(END_LABEL_FONT_SIZE * 1.3); // 10
 const END_LABEL_CLEARANCE = Math.ceil(END_LABEL_FONT_SIZE * 0.4); // 3
 export const EXPLORE_END_LABEL_BAND = END_LABEL_LINE_HEIGHT + END_LABEL_CLEARANCE; // 13
 const END_LABEL_GUTTER = 8;
-
-/** Explore photo-trace fill strength. Kept together for on-device tuning. */
-const UNDER_FILL_TOP = 0.12;
-const UNDER_FILL_BOTTOM = 0.5;
 
 const OVER_TONE = A.INK;
 const UNDER_TONE = TOPAR_RED;
@@ -206,9 +203,6 @@ export function RoundShape({
     const showUnderFill = underParFill && wentUnder;
     const underClipId = `round-under-clip-${instanceId}`;
     const underGradientId = `round-under-gradient-${instanceId}`;
-    const underFillPath = last
-      ? `${path} L${last.x.toFixed(2)},${baselineY.toFixed(2)} L${points[0].x.toFixed(2)},${baselineY.toFixed(2)} Z`
-      : null;
     /* ONE WHITE TRACE, ABOVE AND BELOW LEVEL PAR. The red segment existed when
        the shape carried a FILL and the colour marked the under-par AREA. With
        the fill gone and the good holes marked by DOTS, red was a second and
@@ -220,22 +214,9 @@ export function RoundShape({
     return (
       <svg width="100%" height={renderedHeight} viewBox={`0 0 ${width} ${renderedHeight}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
         {showUnderFill ? (
-          <defs>
-            <clipPath id={underClipId}>
-              <rect x={0} y={baselineY} width={width} height={Math.max(bottom - baselineY, 0)} />
-            </clipPath>
-            <linearGradient id={underGradientId} gradientUnits="userSpaceOnUse" x1={0} y1={baselineY} x2={0} y2={bottom}>
-              <stop offset="0%" stopColor={PHOTO_FIG_UNDER} stopOpacity={UNDER_FILL_TOP} />
-              <stop offset="100%" stopColor={PHOTO_FIG_UNDER} stopOpacity={UNDER_FILL_BOTTOM} />
-            </linearGradient>
-          </defs>
-        ) : null}
-        {showUnderFill && underFillPath ? (
-          <path
-            data-round-under-par-fill="true"
-            d={underFillPath}
-            fill={`url(#${underGradientId})`}
-            clipPath={`url(#${underClipId})`}
+          <UnderParGradientFill
+            path={path} points={points} baselineY={baselineY} bottom={bottom} width={width}
+            clipId={underClipId} gradientId={underGradientId} color={PHOTO_FIG_UNDER}
           />
         ) : null}
         <line x1={SHAPE_PAD_X} x2={width - SHAPE_PAD_X} y1={baselineY} y2={baselineY}
