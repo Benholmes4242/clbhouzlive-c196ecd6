@@ -1,5 +1,12 @@
 # Roadmap
 
+## FGT1 — Two FGD1 leftovers
+- [x] FGT1.1: two case names in src/test/feedRoundNet.test.tsx renamed to match their unchanged assertions ("a gross birdie on a stroke hole grades in the birdie tone", "a gross bogey on a stroke hole grades in the bogey tone"). No assertion, fixture, import or other case touched.
+- [x] FGT1.2: dead `received` parameter removed from feedHoleDots (src/components/feed/roundTilePlot.tsx:121) and dropped from all four call sites — roundTilePlot.tsx:222, feedRoundNet.test.tsx:95 and :100, feedGrossDots.test.tsx:45. RoundTilePlot's own `received` prop is untouched and still feeds the net trace and fill; roundTilePlot.test.tsx already called the function without the argument.
+- [ ] FGT1.2 leftover awaiting a ruling: feedRoundNet.test.tsx:94 and :99 now compute a `const received = feedStrokesReceived(...)` that nothing in those cases reads. Deleting those two lines was not inside the granted scope, and nothing breaks (noUnusedLocals false, @typescript-eslint/no-unused-vars off).
+- Full `npx vitest run`: 1,859 passing / 241 files before and after, zero failures; build OK. No test added, removed, renamed or reasserted in this step. No SQL/migrations/RPC/feed_config/cap changes.
+
+
 ## FGD1 — Gross dots, net line
 - [x] Gross-only Home dot grading restored; only two authorised FN1 assertions updated, original case names retained under assertion-only scope. Added three cases solely feedGrossDots.test.tsx. Full npx vitest run: 1,856 passing / 240 files before -> 1,859 passing / 241 files after, zero failures; build OK. Browser actual plots with synthetic rounds verified red stroke-hole birdie, sixteen bogey dots/net -4 and five red/no gold, zero page errors. Actual nickleconte204 Old Fold Manor hole data and hosted authenticated acceptance unavailable; five red is implied by five gross birdies, no handicap-created gold remains, genuine gross eagle-or-better would remain gold. Report: /mnt/documents/FGD1_report.md. Net trace/fill/figures, allocation, FED1 condition, tones/radii/thresholds, feats and Explore frozen; no SQL/migrations/RPC/feed_config/cap changes.
 
