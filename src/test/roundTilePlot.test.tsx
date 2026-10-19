@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
 
-import { feedHoleDots, feedFeat, RoundTilePlot } from '@/components/feed/roundTilePlot';
+import { feedHoleDots, feedFeat, RoundTilePlot, panelShowsCallout } from '@/components/feed/roundTilePlot';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import {
   SC_FILL_GOLD,
@@ -113,5 +113,24 @@ describe('RoundTilePlot', () => {
     const mark = container.querySelector('[data-feed-round-feat="true"]');
     expect(mark).not.toBeNull();
     expect(mark?.textContent).toBe('Eagle');
+  });
+});
+
+describe('panelShowsCallout -- one fact, one place (ROUND_TILE_1_R2)', () => {
+  const eagleRound = () => shapeOf([hole(1, 5, 3), ...Array.from({ length: 17 }, (_, i) => hole(i + 2, 4, 4))]);
+  const plain = () => shapeOf(Array.from({ length: 18 }, (_, i) => hole(i + 1, 4, 4)));
+  it('suppresses an eagle panel when the plot already marks the eagle', () => {
+    expect(panelShowsCallout('eagle', eagleRound())).toBe(false);
+  });
+  it('keeps a round feat panel beside the eagle mark', () => {
+    expect(panelShowsCallout('birdies', eagleRound())).toBe(true);
+    expect(panelShowsCallout('clean', eagleRound())).toBe(true);
+  });
+  it('keeps the hole-feat panel when no plot mark can show it', () => {
+    expect(panelShowsCallout('ace', null)).toBe(true);
+    expect(panelShowsCallout('eagle', plain())).toBe(true);
+  });
+  it('shows nothing when the round has no feat', () => {
+    expect(panelShowsCallout(null, eagleRound())).toBe(false);
   });
 });
