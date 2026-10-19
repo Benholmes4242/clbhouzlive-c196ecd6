@@ -435,6 +435,7 @@ const BusinessReviewsPage = lazy(() => import("./pages/BusinessReviewsPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const JoinLandingPage = lazy(() => import("./pages/public/JoinLandingPage"));
 const InviteLandingPage = lazy(() => import("./pages/public/InviteLandingPage"));
+const GetAppPage = lazy(() => import("./pages/public/GetAppPage"));
 const PrivacyPolicyPage = lazy(() => import("./pages/legal/PrivacyPolicyPage"));
 const HandoffPage = lazy(() => import("./pages/gate/HandoffPage"));
 const TermsPage = lazy(() => import("./pages/legal/TermsPage"));
@@ -787,6 +788,7 @@ function AppRoutes() {
         <Route path="/legal/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><LegalDocumentPage /></Suspense>} />
 
         {/* Public invite landings — logged-out, no header/nav chrome */}
+        <Route path="/get" element={<Suspense fallback={<BootHold />}><GetAppPage /></Suspense>} />
         <Route path="/join" element={<Suspense fallback={<GenericPageSkeleton />}><JoinLandingPage /></Suspense>} />
         <Route path="/i/:inviteCode" element={<Suspense fallback={<GenericPageSkeleton />}><InviteLandingPage /></Suspense>} />
 

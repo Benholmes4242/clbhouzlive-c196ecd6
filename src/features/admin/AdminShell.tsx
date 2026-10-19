@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Menu, RefreshCw } from 'lucide-react';
@@ -9,6 +9,9 @@ import { adminTheme as t } from './theme';
 import AdminDrawer from './AdminDrawer';
 import AdminLoading from './components/AdminLoading';
 import AdminAccessDenied from './components/AdminAccessDenied';
+import { useAdminSettings } from './hooks/useAdminSettings';
+import { useMaintenanceMode } from '@/hooks/useMaintenanceMode';
+import { toast } from '@/lib/toast';
 import { useAnalyticsLive } from './hooks/useAnalyticsLenses';
 import { backFromLive, lensOf, toLive } from './components/analytics/analyticsLens';
 import { londonHM, num } from './components/analytics/analyticsFormat';
@@ -20,6 +23,7 @@ const ContentPage = lazy(() => import('./pages/ContentPage'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
 const HealthPage = lazy(() => import('./pages/HealthPage'));
 const InboxPage = lazy(() => import('./pages/InboxPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
 const SECTION_TITLES: Record<string, string> = {
   dashboard:  'Command centre',
@@ -28,6 +32,7 @@ const SECTION_TITLES: Record<string, string> = {
   content:    'Content',
   analytics:  'Analytics',
   health:     'Health',
+  settings:   'Settings',
 };
 
 
@@ -69,10 +74,19 @@ export default function AdminShell() {
   const onLive = isAnalytics && lensOf(params) === 'live' && !params.get('tab')?.match(/^(events|auth)$/);
   const title = onLive ? 'Live' : (SECTION_TITLES[segment] ?? 'Admin');
 
+  /* BRIEF_ADMIN_SETTINGS S.6: while maintenance is on, a red bar sits under the
+     header on every admin page. Full admins read the authoritative settings
+     query and get the elapsed time and the Turn off button; other roles read
+     the member-facing poll and get the bare bar. */
+  const settings = useAdminSettings(role);
+  const maintenancePoll = useMaintenanceMode();
+  const maintenanceOn = can.manageAdmins ? (settings.data?.maintenance.on ?? false) : maintenancePoll.on;
+
   // The dark app-shell has zero top padding (body.route-clubhouse), including admin.
   // Main pays the fixed header's full height; never pull this shell up by --sat:
   // that subtracts an inset the parent did not pay and hides the first content.
-  const headerHeight = 'calc(52px + env(safe-area-inset-top, 0px))';
+  // The maintenance bar's 48px is added while it is shown so content never slides under it.
+  const headerHeight = `calc(${maintenanceOn ? 100 : 52}px + env(safe-area-inset-top, 0px))`;
 
   const defaultRoute = role === 'moderator' ? 'inbox?type=report' : 'dashboard';
   const canInbox = can.viewModeration || can.viewUsers || can.approveRequests;
@@ -118,9 +132,21 @@ export default function AdminShell() {
           <div style={{ flex: 1 }} />
           {isAnalytics
             ? <AnalyticsHeaderSlot onLive={onLive} params={params} onOpenLive={() => setParams(toLive(params), { replace: true })} />
-            : <RefreshHeaderButton />}
+            : segment === 'settings'
+              ? null
+              : <RefreshHeaderButton />}
         </div>
       </header>
+
+      {maintenanceOn ? (
+        <MaintenanceBar
+          changedAt={can.manageAdmins ? settings.data?.maintenance.changed_at ?? null : null}
+          canManage={can.manageAdmins}
+          onTurnOff={async () => {
+            if (await settings.setConfig('maintenance_mode', 'off')) toast.success('Maintenance off');
+          }}
+        />
+      ) : null}
 
       <main style={{
         paddingTop: headerHeight,
@@ -144,6 +170,7 @@ export default function AdminShell() {
                 <Route path="content/*"   element={<ContentPage />} />
                 <Route path="analytics/*" element={can.manageAdmins ? <AnalyticsPage /> : <AdminAccessDenied />} />
                 <Route path="health/*" element={<HealthPage />} />
+                <Route path="settings/*" element={<SettingsPage />} />
 
                 {/* Redirects: legacy health-family routes -> unified Health page */}
                 <Route path="system/*"      element={<RedirectPreserving to="/admin-v2/health" />} />
@@ -166,6 +193,49 @@ export default function AdminShell() {
           </motion.div>
         </AnimatePresence>
       </main>
+    </div>
+  );
+}
+
+/** S.6: the red maintenance bar. Elapsed ticks each minute from changed_at. */
+function MaintenanceBar({ changedAt, canManage, onTurnOff }: {
+  changedAt: string | null; canManage: boolean; onTurnOff: () => void;
+}) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+  let elapsed = '';
+  if (canManage && changedAt) {
+    const mins = Math.max(0, Math.floor((now - new Date(changedAt).getTime()) / 60_000));
+    elapsed = mins < 60 ? `${mins} min` : `${Math.floor(mins / 60)} h ${mins % 60} min`;
+  }
+  return (
+    <div
+      role="status"
+      style={{
+        position: 'fixed', top: 'calc(52px + env(safe-area-inset-top, 0px))', left: 0, right: 0, zIndex: 49,
+        height: 48, padding: '0 8px 0 16px', background: t.dangerSoft, borderBottom: `1px solid ${t.dangerSoft}`,
+        display: 'grid', gridTemplateColumns: '8px minmax(0, 1fr) auto', columnGap: 10, alignItems: 'center',
+      }}
+    >
+      <span style={{ width: 8, height: 8, borderRadius: '50%', background: t.danger }} />
+      <span style={{ fontSize: 13.5, fontWeight: 600, color: t.dangerText, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        Maintenance on{elapsed ? ` · ${elapsed}` : ''} · members locked out
+      </span>
+      {canManage ? (
+        <button
+          type="button"
+          onClick={onTurnOff}
+          style={{
+            height: 34, padding: '0 12px', borderRadius: 10, border: 0, background: t.danger, color: t.canvas,
+            fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+          }}
+        >
+          Turn off
+        </button>
+      ) : <span />}
     </div>
   );
 }

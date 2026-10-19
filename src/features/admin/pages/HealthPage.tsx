@@ -6,7 +6,7 @@
  * Settings here.
  */
 import React, { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import AnalyticsLenses from '../components/analytics/AnalyticsLenses';
@@ -15,7 +15,6 @@ import GolfDataLens from '../components/health/GolfDataLens';
 import AppLens from '../components/health/AppLens';
 import JobsLens from '../components/health/JobsLens';
 import { HEALTH_LENSES, canonicalHealthParams, healthViewOf, type HealthLens } from '../components/health/healthLens';
-import SettingsTab from './SettingsTab';
 import VideoPerfPage from './VideoPerfPage';
 
 const COLUMN: React.CSSProperties = {
@@ -34,7 +33,8 @@ export default function HealthPage() {
     if (next) setParams(next, { replace: true });
   }, [params, view, setParams]);
 
-  if (view.kind === 'settings') return <SettingsTab />;
+  // Settings is its own route since BRIEF_ADMIN_SETTINGS; the old tab redirects.
+  if (view.kind === 'settings') return <Navigate to="/admin-v2/settings" replace />;
   if (view.kind === 'video') return <VideoPerfPage />;
 
   const setLens = (l: HealthLens) => {

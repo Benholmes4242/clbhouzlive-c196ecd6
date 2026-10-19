@@ -62,7 +62,7 @@ describe('BRIEF_ADMIN_SIDE_MENU', () => {
   });
   it('moderator sees only Inbox and Settings without live, search or member group', () => {
     draw({ role: 'moderator' });
-    expect(within(screen.getByRole('navigation')).getAllByRole('link').map(a => a.getAttribute('href'))).toEqual(['/admin-v2/inbox', '/admin-v2/health?tab=settings']);
+    expect(within(screen.getByRole('navigation')).getAllByRole('link').map(a => a.getAttribute('href'))).toEqual(['/admin-v2/inbox', '/admin-v2/settings']);
     expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
     expect(screen.queryByText('In the app now')).not.toBeInTheDocument();
     expect(screen.queryByText('Members and golf')).not.toBeInTheDocument();
@@ -94,8 +94,8 @@ describe('BRIEF_ADMIN_SIDE_MENU', () => {
     expect(f.live).not.toHaveBeenCalled(); expect(f.health).not.toHaveBeenCalled();
     expect(screen.getByText('Limited admin')).toBeInTheDocument();
   });
-  it('Settings query destination alone is active on the existing URL', () => {
-    draw({ path: '/admin-v2/health?tab=settings' });
+  it('Settings destination alone is active on its own route', () => {
+    draw({ path: '/admin-v2/settings' });
     expect(screen.getByRole('link', { name: 'Settings' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('link', { name: /Health/ })).not.toHaveAttribute('aria-current');
   });

@@ -30,7 +30,7 @@ export type GateState =
  * written WITHOUT a trailing slash. '/post/' and '/legal/' keep theirs
  * deliberately — bare '/post' and '/legal' are not pages.
  */
-const EXEMPT_PREFIXES = ['/post/', '/tour/news', '/discover/news', '/privacy', '/terms', '/legal/', '/go/'];
+const EXEMPT_PREFIXES = ['/post/', '/tour/news', '/discover/news', '/privacy', '/terms', '/legal/', '/go/', '/get'];
 
 export function isGateExemptPath(pathname: string): boolean {
   return EXEMPT_PREFIXES.some((p) => pathname === p || pathname.startsWith(p));

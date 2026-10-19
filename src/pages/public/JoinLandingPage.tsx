@@ -4,25 +4,23 @@ import { supabase } from '@/integrations/supabase/client';
 import { INK_ON_LIGHT, MEMBER_CELL, PAGE_CANVAS, inkWithAlpha } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
 import wordmark from '@/assets/clbhouz-wordmark.png.asset.json';
+import { FALLBACK_STORE_URL, fetchStoreLinks, pickStoreUrl } from '@/lib/storeLinks';
 
 const AMBER = '#F7931E';
 const INK = SURFACE.dark.ink;
 const INK_62 = SURFACE.dark.mute;
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const FALLBACK_URL = 'https://apps.apple.com/app/id6752538886';
+const FALLBACK_URL = FALLBACK_STORE_URL;
 const MARK = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
 const SCREEN = '/join/screen-feed.png';
 
+/* Shared storeLinks helpers (BRIEF_ADMIN_SETTINGS S.11). Android without a
+   Play link keeps today's App Store target, so nothing breaks before the
+   link is added. */
 async function fetchDownloadUrl(): Promise<string> {
   try {
-    const { data } = await supabase
-      .from('app_config' as any)
-      .select('value')
-      .eq('key', 'app_download_url')
-      .maybeSingle();
-    const val = (data as any)?.value;
-    if (typeof val === 'string' && val.startsWith('http')) return val;
-    if (val && typeof val === 'object' && typeof val.url === 'string') return val.url;
+    const links = await fetchStoreLinks();
+    return pickStoreUrl(links, navigator.userAgent) ?? links.appStore ?? FALLBACK_URL;
   } catch {
     // fall through
   }
