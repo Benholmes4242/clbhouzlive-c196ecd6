@@ -17,7 +17,7 @@ vi.mock('@/hooks/useBusinessClaimForCourse', () => ({ useBusinessClaimForCourse:
 vi.mock('@/hooks/useReviewResponses', () => ({ useReviewResponses: () => ({ data: [] }), useSubmitReviewResponse: () => ({ mutate: vi.fn() }) }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useContentReactions', () => ({ useContentReactions: () => ({ stateFor: () => ({ mine: false }), toggle: vi.fn() }) }));
 vi.mock('@/stores/reviewSheetStore', () => ({ useReviewSheetStore: (select: any) => select({ open: vi.fn(), isOpen: false }) }));
-vi.mock('@/components/courses/course-detail/reviews/reviewFlatBits', () => ({ FlatReviewRow: () => <article data-testid="review-row" />, FlatAction: ({ label }: any) => <span>{label}</span> }));
+vi.mock('@/components/courses/course-detail/reviews/reviewFlatBits', () => ({ FlatReviewRow: () => <article data-testid="review-row" />, FlatAction: ({ label }: any) => <span>{label}</span>, CategoryLine: () => null }));
 vi.mock('@/components/moderation/ReportSheet', () => ({ ReportSheet: () => null }));
 vi.mock('@/components/common/ScrollToTopGlass', () => ({ default: () => null }));
 vi.mock('@/components/ui/pull-to-refresh', () => ({ PullToRefreshContainer: ({ children }: any) => <>{children}</> }));
