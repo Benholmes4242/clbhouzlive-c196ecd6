@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { SURFACE } from '@/lib/tokens/surface';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
-import { GUTTER } from '../about/AboutSection';
+import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
 import { reviewsCourseState } from '@/lib/reviews/sampleRules';
 import { REVIEWS_CATALOGUE_SNAPSHOT, reviewsCatalogueWithoutReview } from '@/lib/reviews/catalogueSnapshot';
 
@@ -22,10 +22,10 @@ export function NobodyHasRated({ totalRatings, courseName, onWriteFirst }: Nobod
   const format = (value: number) => value.toLocaleString('en-GB');
   return (
     <section aria-labelledby="reviews-first-title" style={{ padding: `0 ${GUTTER}px 20px`, fontFamily: SANS }}>
-      <div style={{ color: A.AMBER, fontSize: 11, fontWeight: 700, lineHeight: 1.2, marginBottom: 5 }}>
+      <div style={VERDICT_KICKER}>
         NOBODY HAS RATED IT
       </div>
-      <h2 id="reviews-first-title" style={{ color: SURFACE.dark.ink, fontSize: 19, fontWeight: 700, lineHeight: 1.2, margin: 0 }}>
+      <h2 id="reviews-first-title" style={TAB_TITLE}>
         You would be the first
       </h2>
       <p style={{ fontSize: 12.5, lineHeight: 1.5, color: SURFACE.dark.mute, margin: '8px 0 0' }}>

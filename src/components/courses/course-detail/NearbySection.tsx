@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useNearbyBusinesses } from '@/hooks/useNearbyBusinesses';
 import { getActorRouteByType } from '@/types/actor';
 import { getBusinessCategoryIcon } from '@/constants/businessCategories';
-import { SectionHeader } from '@/components/ui/SectionHeader';
+import { VERDICT_KICKER, TAB_TITLE } from './about/AboutSection';
 import { formatDistanceKm } from '@/utils/formatDistance';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -23,12 +23,11 @@ const NearbySection: React.FC<NearbySectionProps> = ({ lat, lng }) => {
 
   return (
     <section>
-      <SectionHeader
-        role="section"
-        kicker={t('courseDetail.nearby.kicker')}
-        title={t('courseDetail.nearby.title')}
-        paddingX={16}
-      />
+      {/* TAB_CANON_1: local opt-in; shared SectionHeader and this 16px gutter stay unchanged. */}
+      <div style={{ padding: '0 16px', marginBottom: 14 }}>
+        <div style={VERDICT_KICKER}>{t('courseDetail.nearby.kicker')}</div>
+        <h2 style={TAB_TITLE}>{t('courseDetail.nearby.title')}</h2>
+      </div>
       <div
         style={{
           display: 'flex',

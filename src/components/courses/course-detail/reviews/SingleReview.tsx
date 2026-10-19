@@ -18,7 +18,7 @@ import { MEMBER_PANEL, INK_ON_LIGHT, inkWithAlpha } from '@/lib/tokens/surfaces'
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { SC_BOGEY_DARK } from '@/features/courses/components/holes/_constants';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { GUTTER } from '../about/AboutSection';
+import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
 
 interface SingleReviewProps {
   totalRatings: number;
@@ -40,8 +40,8 @@ export function SingleReview({ totalRatings, review, playedMonth, context, onMed
   const verb = subject === 'They' ? 'have' : 'has';
   const person = subject === 'He' ? 'a man' : subject === 'She' ? 'a woman' : 'someone';
   return <section data-reviews-state="one" aria-labelledby="reviews-one-title" style={{ padding: `0 ${GUTTER}px 20px`, fontFamily: SANS }}>
-    <div style={{ color: A.AMBER, fontSize: 11, fontWeight: 700, lineHeight: 1.2, marginBottom: 5, textTransform: 'uppercase' }}>One golfer has rated it</div>
-    <h2 id="reviews-one-title" style={{ color: SURFACE.dark.ink, fontSize: 19, fontWeight: 700, lineHeight: 1.2, margin: 0 }}>There is no community score yet</h2>
+    <div style={VERDICT_KICKER}>One golfer has rated it</div>
+    <h2 id="reviews-one-title" style={TAB_TITLE}>There is no community score yet</h2>
     <p style={{ color: SURFACE.dark.mute, fontSize: 12.5, lineHeight: 1.5, margin: '8px 0 0' }}>One opinion is not an average. Here it is as what it is — a person, and what they said.</p>
     {review && <RaterReviewRow review={review} context={facts} playedMonth={playedMonth} onMediaClick={onMediaClick} />}
     {calibration && <p data-review-calibration style={{ borderLeft: `2px solid ${A.AMBER}`, paddingLeft: 11, color: SURFACE.dark.body, fontSize: 13, lineHeight: 1.5, margin: '14px 0 0' }}>

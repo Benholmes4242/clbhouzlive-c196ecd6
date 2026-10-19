@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
+import '@/components/courses/course-detail/tabCanon.css';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
 import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';
 import { courseRankLabels, type RankList } from '@/features/courses/_shared/courseRankLabels';
@@ -288,7 +289,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsContent
           value="course"
-          className={`mt-0 transition-opacity duration-200 ${activeTab === 'course' ? 'opacity-100' : 'hidden'}`}
+          className={`course-tab-course mt-0 transition-opacity duration-200 ${activeTab === 'course' ? 'opacity-100' : 'hidden'}`}
         >
           <CourseAboutTab
             course={course}
@@ -308,7 +309,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {visitedTabs.has('legends') && (
           <TabsContent
             value="legends"
-            className={`mt-0 transition-opacity duration-200 ${activeTab === 'legends' ? 'opacity-100' : 'hidden'}`}
+            className={`course-tab-legends mt-0 transition-opacity duration-200 ${activeTab === 'legends' ? 'opacity-100' : 'hidden'}`}
           >
             {/* DARK, like every other tab. The page was light when this tab
                 opted out with a .hcp-light wrapper and theme="light"; both are
@@ -334,7 +335,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {visitedTabs.has('reviews') && (
           <TabsContent
             value="reviews"
-            className={`mt-0 transition-opacity duration-200 ${activeTab === 'reviews' ? 'opacity-100' : 'hidden'}`}
+            className={`course-tab-reviews mt-0 transition-opacity duration-200 ${activeTab === 'reviews' ? 'opacity-100' : 'hidden'}`}
           >
             <CourseReviewsTab
               courseId={course.id}
@@ -347,7 +348,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {visitedTabs.has('media') && (
           <TabsContent
             value="media"
-            className={`mt-0 transition-opacity duration-200 ${activeTab === 'media' ? 'opacity-100' : 'hidden'}`}
+            className={`course-tab-media mt-0 transition-opacity duration-200 ${activeTab === 'media' ? 'opacity-100' : 'hidden'}`}
           >
             <CourseMediaTabNew courseId={course.id} courseName={course.name} />
           </TabsContent>

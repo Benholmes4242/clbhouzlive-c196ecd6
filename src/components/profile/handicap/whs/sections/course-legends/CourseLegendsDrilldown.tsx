@@ -543,7 +543,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
 
 
       {isLoading && (
-        <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[0, 1, 2].map((i) => (
             <Skeleton key={i} height={120} radius={12} />
           ))}
@@ -551,7 +551,7 @@ export const CourseLegendsDrilldown: React.FC<Props> = ({ selection, hideHeader 
       )}
 
       {isError && (
-        <div style={{ padding: '16px' }}>
+        <div style={{ padding: '16px 20px' }}>
           <RetryStub message={t('courseDetail.legends.errorLoading')} onRetry={() => refetch()} />
         </div>
       )}

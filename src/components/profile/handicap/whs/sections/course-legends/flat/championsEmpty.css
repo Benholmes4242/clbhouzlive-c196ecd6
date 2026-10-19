@@ -7,8 +7,9 @@
 .champions-empty-section { padding: 20px; }
 /* TAB_LEAD_IN_1: explicit first-state marker; Elsewhere and later seams stay. */
 .champions-empty-section--first { padding-top: 0; }
-.champions-empty-kicker { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
-.champions-empty h2 { font-size: 19px; font-weight: 700; line-height: 1.2; }
+/* TAB_CANON_1: section typography reads AboutSection in JSX. This nested
+   bar-group label retains its former non-section treatment and dim ink. */
+.champions-bar-group-label { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
 .champions-empty-lede { font-size: 12.5px; line-height: 1.5; margin-top: 8px; }
 .champions-cabinet { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; margin-top: 15px; }
 .champions-cabinet-tile { border: 1px dashed var(--champions-open-border); background: transparent; border-radius: 11px; padding: 9px 9px 8px; min-height: 72px; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }

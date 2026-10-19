@@ -1,0 +1,20 @@
+/* TAB_CANON_1: each tab owns only its first rendered outer seam. Null
+   components leave no child; later sections and card interiors stay intact.
+   You already owns its equivalent rule and is deliberately excluded. */
+.course-tab-course > div > div:first-child > :first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+.course-tab-legends > div > div:first-child {
+  padding-top: 0 !important;
+}
+.course-tab-reviews > div:first-child {
+  padding-top: 0 !important;
+}
+.course-tab-media > div:first-child,
+.course-tab-media > div:first-child > :first-child {
+  padding-top: 0 !important;
+}
+.course-tab-media > div:first-child > .hole-walk:first-child > section:first-child {
+  padding-top: 0 !important;
+}

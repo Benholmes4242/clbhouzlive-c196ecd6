@@ -5,6 +5,7 @@
  * Record history is not returned by these reads, so no movement story is claimed.
  */
 import React from 'react';
+import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
 import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
 import { numberWord } from '@/lib/text/numbers';
 import { SURFACE } from '@/lib/tokens/surface';
@@ -49,8 +50,8 @@ export function FieldChampions(props: FieldChampionsProps) {
   const emptyFeats = categories.filter(category => !holders.has(category.key) && /most_(aces|albatrosses)_/.test(category.key));
   return <div className="champions-empty" style={{ color: SURFACE.dark.ink }}>
     <section className="champions-empty-section champions-empty-section--first">
-      <div className="champions-empty-kicker" style={{ color: SURFACE.dark.dim }}>The cabinet</div>
-      <h2>{numberWord(taken)} taken, {numberWord(untouched, false)} never touched</h2>
+      <div className="champions-empty-kicker" style={VERDICT_KICKER}>The cabinet</div>
+      <h2 style={TAB_TITLE}>{numberWord(taken)} taken, {numberWord(untouched, false)} never touched</h2>
       <div className="champions-empty-lede" style={{ color: SURFACE.dark.mute }}>Every course carries the same {spelled} boards. These are the standing figures at {courseName}.</div>
       <ChampionsCabinet categories={categories.map(category => category.key)} holders={holders} activeKey={activeKey} onSelect={onSelect} />
       <div className="champions-cabinet-legend" aria-label="Board states" style={{ color: SURFACE.dark.dim }}>
@@ -75,8 +76,8 @@ export function FieldChampions(props: FieldChampionsProps) {
     </section>
     <BoardSection categories={categories} grouped={grouped} activeKey={activeKey} onSelectCategory={onSelect} legendWindow={legendWindow} canSwitchWindow onWindowChange={onWindowChange} coursePar={par} onOpenFull={onOpenFull} onRowPress={onRowPress} fieldOnly />
     {comparison && <section className="champions-empty-section">
-      <div className="champions-empty-kicker" style={{ color: SURFACE.dark.dim }}>What it takes</div>
-      <h2>{numberWord(Math.round(Math.abs(comparison.recordToPar)))} {comparison.recordToPar < 0 ? 'under' : 'over'} par, on a course that plays {numberWord(Math.round(Math.abs(comparison.fieldOverPar)), false)} {comparison.fieldOverPar < 0 ? 'under' : 'over'}</h2>
+      <div className="champions-empty-kicker" style={VERDICT_KICKER}>What it takes</div>
+      <h2 style={TAB_TITLE}>{numberWord(Math.round(Math.abs(comparison.recordToPar)))} {comparison.recordToPar < 0 ? 'under' : 'over'} par, on a course that plays {numberWord(Math.round(Math.abs(comparison.fieldOverPar)), false)} {comparison.fieldOverPar < 0 ? 'under' : 'over'}</h2>
       <div className="champions-field-panel" style={{ background: MEMBER_PANEL }}>
         <div className="champions-field-record"><strong>{comparison.record}</strong><span style={{ color: SURFACE.dark.mute }}>The record</span></div>
         <FieldRecordScale record={comparison.record} par={comparison.par} average={comparison.fieldGross} />

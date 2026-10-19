@@ -91,6 +91,8 @@ interface AboutSectionProps {
   onMetaPress?: () => void;
   /** Renders instead of a heading, at the kicker treatment. */
   kicker?: string;
+  /** TAB_CANON_1: genuine section eyebrow without a title; small labels stay default. */
+  sectionEyebrow?: boolean;
   /** First section on the tab takes no 34px lead-in. */
   first?: boolean;
   /** Overrides the 34px lead-in (the tee control sits 16px under the facts). */
@@ -109,6 +111,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
   meta,
   onMetaPress,
   kicker,
+  sectionEyebrow = false,
   first = false,
   space,
   bleed = false,
@@ -159,7 +162,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
           marginBottom: HEADING_GAP,
         }}
       >
-        {kicker ? <span style={ABOUT_KICKER}>{kicker}</span> : <span aria-hidden="true" />}
+        {kicker ? <span style={sectionEyebrow ? VERDICT_KICKER : ABOUT_KICKER}>{kicker}</span> : <span aria-hidden="true" />}
         {meta ? (
           <span
             className="tabular-nums lining-nums"

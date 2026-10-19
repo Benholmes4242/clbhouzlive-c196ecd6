@@ -1,6 +1,5 @@
 .hole-walk-section { padding: 20px; border-bottom: 1px solid var(--hole-walk-rule); }
-.hole-walk-kicker { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .16em; margin-bottom: 5px; }
-.hole-walk-title { font-size: 19px; font-weight: 700; line-height: 1.2; }
+/* TAB_CANON_1: typography is read from AboutSection in the JSX, not forked here. */
 .hole-walk-lede { font-size: 12.5px; line-height: 1.5; margin-top: 8px; color: var(--hole-walk-muted); }
 .hole-walk-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 5px; margin-top: 15px; }
 .hole-walk-tile { position: relative; aspect-ratio: 4/3; height: auto; min-width: 0; padding: 0; border-radius: 9px; overflow: hidden; border: 1px solid var(--hole-walk-soft); display: block; }

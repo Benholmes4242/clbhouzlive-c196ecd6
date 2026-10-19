@@ -1,3 +1,4 @@
+import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -152,13 +153,13 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       {photoState !== 'B' && photoState !== 'C' && analysis.data?.available && tagging.tags.isSuccess && <HoleWalk available={analysis.data.available} holes={analysis.data.holes} rows={tagging.tags.data ?? []} totalMedia={mediaCounts.total} courseName={courseName} authors={authors} onAddFirst={addFirst} />}
       {tagging.ready && untaggedCount != null && untaggedCount > 0 && activeFilter !== 'videos' && (
         <section className="px-5 pt-5">
-          <p className="text-[11px] font-bold uppercase tracking-[0.16em]" style={{ color: A.INK }}>Everything else</p>
+          <p style={VERDICT_KICKER}>Everything else</p>
           {/* MEDIA_CTA_1: heading left, white pill right on one row. The pill
               sizes to its label and never shrinks; the heading wraps instead.
               The pill centres against the whole heading block, and its hit
               area is padded to 44px while the visible pill stays 13px/700. */}
-          <div className="mt-1 flex items-center gap-3">
-            <h2 className="text-[19px] font-bold" style={{ flex: '1 1 auto', minWidth: 0 }}>{capitalPhotoCount(untaggedCount)} of yours {untaggedCount === 1 ? 'is' : 'are'} untagged</h2>
+          <div className="flex items-center gap-3">
+            <h2 style={{ ...TAB_TITLE, flex: '1 1 auto', minWidth: 0 }}>{capitalPhotoCount(untaggedCount)} of yours {untaggedCount === 1 ? 'is' : 'are'} untagged</h2>
             <button
               type="button"
               disabled={fastPending || !tagging.sources.isSuccess}

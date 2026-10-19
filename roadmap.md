@@ -1,9 +1,9 @@
 # Roadmap
 
 ## BRIEF_TAB_CANON_1 - TAB_CANON_1
-- [ ] Corrected TC5 baseline STOP: an additional populated-grid-first path has padding-top 12px (CourseMediaCanonGrid.tsx:266), when feed resolves before counts/analysis, header returns null, and earlier photo/walk sections do not render (CourseMediaTabNew.tsx:113-115,144-153,186; useCourseMedia.ts:35,96,126). This is distinct from grid loading and omitted from the eleven-state inventory. Await correction/acknowledgment before application/test edits. No tests run; last npx vitest run remains 1,810 passing / 233 files.
-- [ ] Apply shared first-element rules to Course/Champions/Reviews/Media, preserving You and later seams; share canonical eyebrow/title declarations and protected label exceptions.
-- [ ] Nearby IN scope via canon opt-in; preserve/report its 16px gutter and count other SectionHeader callers. Measure per-state gaps and report exact full-suite command/count and declarations.
+- [x] TC5 FINAL authorises populated-grid-first and every additional first-element path on all tabs; path names are a floor and counts are agent-enumerated. Existing source readings confirmed with TC10's explicit WhatTheyScored exception. No changed-value protecting tests found. Baseline 1,810 passing / 233 files.
+- [x] Applied shared first-element rules to Course/Champions/Reviews/Media; You gap rules and later seams untouched. All genuine section pairs read AboutSection canon; protected labels retained; Elsewhere rule restored.
+- [x] Nearby local canon opt-in preserves 16px gutter; 17 other SectionHeader usages unchanged. 61 acceptance samples measured 22px at 1280/628 widths (reconstructed before values and fixture limits reported). npx vitest run: 1,810 passing / 233 files, zero test changes; build OK. Report /mnt/documents/TAB_CANON_1_report.md. Hosted authenticated acceptance unavailable (external_unmanaged); populated grid root geometry verified, real account content unverified.
 
 ## BRIEF_TAB_LEAD_IN_1 - TAB_LEAD_IN_1
 - [x] Ben resolved TLA3: Elsewhere remains unchanged; only four primary Champions states receive first-section treatment.

@@ -4,6 +4,7 @@
  * Other cabinet states are reserved for later briefs, not rendered speculatively.
  */
 import React from 'react';
+import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
 import type { LegendCategory } from '@/lib/gam/types';
 import { numberWord } from '@/lib/text/numbers';
 import { SURFACE } from '@/lib/tokens/surface';
@@ -69,8 +70,8 @@ export function NobodyHasPlayed({ categories, courseName, showConnect, onConnect
   return (
     <div className="champions-empty" style={{ color: SURFACE.dark.ink }}>
       <section className="champions-empty-section champions-empty-section--first">
-        <div className="champions-empty-kicker" style={{ color: SURFACE.dark.dim }}>Nothing has been taken here</div>
-        <h2>All {spelled} boards are open</h2>
+        <div className="champions-empty-kicker" style={VERDICT_KICKER}>Nothing has been taken here</div>
+        <h2 style={TAB_TITLE}>All {spelled} boards are open</h2>
         <div className="champions-empty-lede" style={{ color: SURFACE.dark.mute }}>
           No member has posted a round at {courseName}. The first card takes every board at once.
         </div>

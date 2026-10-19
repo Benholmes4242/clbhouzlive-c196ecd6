@@ -14,7 +14,7 @@ export type CategoryAggregates = CategoryScoreValues;
 export const WhatTheyScored: React.FC<{ aggregates: CategoryAggregates }> = ({ aggregates }) => {
   if ([aggregates.design, aggregates.condition, aggregates.clubhouse, aggregates.facilities].every((v) => v == null)) return null;
   return (
-    <AboutSection kicker="What they scored">
+    <AboutSection kicker="What they scored" sectionEyebrow>
       <CategoryScores scores={aggregates} layout="pairs" />
     </AboutSection>
   );
