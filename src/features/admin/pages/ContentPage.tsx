@@ -774,11 +774,12 @@ export function TourSection() {
   const [cacheBust, setCacheBust] = useState(0);
   const [fallback, setFallback] = useState<PlayerRow | null>(null);
   const activePlayerId = params.get('player');
-  const setParam = (k: string, v: string | null, push = false) => {
-    // Merge queued edits so opening the directory also retains its search.
+  const setParam = (k: string, v: string | null, push = false, extra?: Record<string, string>) => {
+    // One navigation owns both directory and search; router edits do not queue.
     setParams(current => {
       const next = new URLSearchParams(current);
       if (v == null) next.delete(k); else next.set(k, v);
+      for (const [key, value] of Object.entries(extra ?? {})) next.set(key, value);
       if (k === 'sub' && v !== 'players') next.delete('q');
       return next;
     }, { replace: !push });
@@ -828,8 +829,7 @@ export function TourSection() {
             if (matches.length === 1) {
               setParam('player', matches[0].id, true);
             } else {
-              setParam('sub', 'players', true);
-              setParam('q', name);
+              setParam('sub', 'players', true, { q: name });
             }
             return;
           }
