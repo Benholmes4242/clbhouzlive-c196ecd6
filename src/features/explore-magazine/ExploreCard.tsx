@@ -812,6 +812,7 @@ export function ExploreCard({
   engagement,
   medals,
   bleed,
+  feedPlot,
 }: {
   /** HOME ONLY. The px inset of the host column. When set, the photograph
    *  runs full bleed to the slab edges (negative margin of this amount, no
@@ -834,6 +835,11 @@ export function ExploreCard({
   onTap: () => void;
   onWhoTap?: () => void;
   engagement?: RoundCardEngagement | null;
+  /** HOME ONLY (BRIEF_ROUND_TILE_1). The trace leaves the photograph and is
+   *  drawn on the card canvas under the text block, every played hole dotted
+   *  in the scorecard ramp. Explore and Profile never pass it, so their tiles
+   *  are byte-identical. */
+  feedPlot?: boolean;
 }) {
   const { t, i18n } = useTranslation('courses');
   const locale = i18n.language || 'en';
