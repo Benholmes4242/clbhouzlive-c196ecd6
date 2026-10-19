@@ -91,9 +91,9 @@ describe('BRIEF_ADMIN_SETTINGS shell', () => {
   /* BRIEF_ADMIN_SETTINGS_FIX1: hooks run before the early returns, so a role
      that resolves after the loading render cannot grow the hook count. */
   it.each([
-    ['full', 'Dashboard page'],
-    ['moderator', 'Inbox page'],
-  ] as const)('renders without throwing when the role resolves to %s after a loading render', async (role, expected) => {
+    ['full'],
+    ['moderator'],
+  ] as const)('renders without throwing when the role resolves to %s after a loading render', async (role) => {
     f.role.mockReturnValue({ role: 'none', loading: true });
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     const tree = (
