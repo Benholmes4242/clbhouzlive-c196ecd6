@@ -1,5 +1,8 @@
 # Roadmap
 
+## EDGE_KEY_1 — EK6 PARTIALLY LIFTED (one value)
+- [x] Removed the `marginTop={6}` override on the Facts call in `EdgeSection` (`ManySections.tsx:256`), so the strip falls back to the component's owned default of 15; no literal typed. Reading confirmed first: `EdgeSection` returns null when `s.measured.length === 0` and the key's `drawn` set uses the identical `edge != null` predicate, so the tiles can never sit under a bare chart. Measured in a temporary fixture (deleted): 11px above the key, 15px below. `npx vitest run`: 1,810 passing / 233 files, zero failures, no test changes; build OK. Report: `EDGE_KEY_1_EK6_report.md`.
+
 ## BRIEF_YOU_TAB_COPY_1 — YC3 FOLLOW-UP
 - [x] Collapsed the two `thinNines` branches in `GoodRoundsSection` to one: the `n < SMALL_SET` conditional is gone, so both cases print "The nines rest on the {X} of your {total} rounds that recorded both." `thinNines` gate unchanged.
 - [x] SMALL_SET had no other consumer in `ManySections.tsx` (only the removed branch), so its import was dropped; the export stays in `youDerivations.ts` and no other file imports it. npx vitest run: 1,810 passing / 233 files, zero failures, no test changes; build OK.
