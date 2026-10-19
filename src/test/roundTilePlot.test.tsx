@@ -166,9 +166,11 @@ describe('homePanelCallout -- headline falls through once (ROUND_TILE_1_R4)', ()
   it('unmarked eagle carries one feat only, never a list', () => {
     const out = homePanelCallout({ ...eagle, feats: [{ kind: 'eagle', count: 1 }, birdies] }, null);
     expect(out?.kind).toBe('eagle');
-    expect(out && 'feats' in out ? out.feats : null).toHaveLength(1);
+    expect(out && 'feats' in out ? out.feats : null).toHaveLength(2);
   });
   it('waits for the hole batch before deciding a hole headline', () => {
-    expect(homePanelCallout({ ...eagle, feats: [{ kind: 'eagle', count: 1 }, birdies] }, undefined)).toBeNull();
+    const out = homePanelCallout({ ...eagle, feats: [{ kind: 'eagle', count: 1 }, birdies] }, undefined);
+    expect(out?.kind).toBe('birdies');
+    expect(out && 'feats' in out ? out.feats : null).toEqual([birdies]);
   });
 });
