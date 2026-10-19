@@ -9,21 +9,21 @@
  *   ready    -> no card; SheetNavGroup owns the connected Handicap door.
  */
 import React from 'react';
-import type { FormBar, SeriesPoint, SheetHcpState } from '../sheetState';
+import type { FormBar, SheetHcpState } from '../sheetState';
 import { ConnectCard, ManualCard, SyncingCard, FailingCard } from './PreIndexCards';
 
 interface HistoryPoint { observed_at: string; handicap_index: number }
 
 interface Props {
   state: SheetHcpState;
-  history90: HistoryPoint[] | null | undefined;
-  bars: FormBar[];
+  history90?: HistoryPoint[] | null;
+  bars?: FormBar[];
   onNavigate: (route: string) => void;
   /** Injectable clock for tests. */
   now?: number;
 }
 
-export default function SheetCards({ state, history90, bars, onNavigate, now }: Props) {
+export default function SheetCards({ state, onNavigate }: Props) {
 
   switch (state.kind) {
     case 'unsettled':
