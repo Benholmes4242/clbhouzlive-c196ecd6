@@ -1371,7 +1371,11 @@
       "hardest": "{{hole}} is the hardest hole on the course",
       "lastHardest": "it saves the worst for last: {{hole}} is the hardest hole on the course",
       "parMeta_one": "{{holes}} hole · {{shots}} shots",
-      "parMeta_other": "{{holes}} holes · {{shots}} shots"
+      "parMeta_other": "{{holes}} holes · {{shots}} shots",
+      "parScaleLabel": "Average over par, by par",
+      "parScaleLevel": "level",
+      "parHoles_one": "{{holes}} hole",
+      "parHoles_other": "{{holes}} holes"
     },
     "tees": {
       "kicker": "The tees",
