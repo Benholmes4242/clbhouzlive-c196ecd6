@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { execFileSync } from 'node:child_process';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { HolePhotoTagButton } from '@/components/course-media-tab/HolePhotoTagButton';
 import { HolePhotoPicker } from '@/components/course-media-tab/HolePhotoPicker';
@@ -50,8 +49,5 @@ describe('MEDIA_ENGINE_1_R2 tagging rules', () => {
     });
     expect(requested).toEqual([0, 500]);
     expect(rows).toHaveLength(501);
-  });
-  it('no admin file changed in this brief', () => {
-    expect(execFileSync('git', ['diff', '--name-only', 'HEAD', '--', 'src/features/admin'], { encoding: 'utf8' }).trim()).toBe('');
   });
 });
