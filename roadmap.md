@@ -1,5 +1,8 @@
 # Roadmap
 
+## BRIEF_REVIEWS_HEADER_1 - REVIEWS_HEADER_1
+- [ ] Baseline/test audit only: RH9 requires authorization before changing protected tests; current RH1/RH3/RH7 readings differ from the brief. No application/test edits or test runs. Await rulings documented in REVIEWS_HEADER_1_stop_report.md; last reported full suite npx vitest run: 1,810 passing / 233 files.
+
 ## BRIEF_REVIEWS_FEW_COPY_1 - REVIEWS_FEW_COPY_1
 - [ ] Blocked before implementation by FC8: reviewsState3.test.tsx:46,99 protects the old headlines; reviewsState4.test.tsx:96-100,106 protects the finding paragraph. Await explicit test authorization. Also resolve FC7's retained count/spread assertions after removal of their element, and FC5's shared one-rating-row effect versus the scope freeze. No application or test edits; no tests run. Last reported full suite: npx vitest run, 1,810 passing / 233 files.
 
