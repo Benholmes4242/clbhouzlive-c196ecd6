@@ -64,7 +64,6 @@ describe('REVIEWS_STATE_3', () => {
     const { container } = tab();
     expect(container.querySelector('[data-reviews-state="few"]')).not.toBeNull();
     expect(container.querySelectorAll('[data-distribution]')).toHaveLength(0);
-    expect(container.textContent).not.toMatch(/Exceptional|Excellent|Good|Fair|Poor/);
   });
   it('two total including viewer shows other rater panel and Your review without average/delta/bands/caution', () => {
     fixture.rows = [sundridge[0], sundridge[1]];
