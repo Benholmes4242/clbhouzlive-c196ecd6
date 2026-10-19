@@ -26,7 +26,8 @@ const hole = (holeNo: number, par: number, strokes: number | null) => ({
   sheetStrokes: strokes,
 });
 
-const shapeOf = (holes: { holeNo: number; par: number; strokes: number | null }[]): HoleShape => {
+const shapeOf = (input: { holeNo: number; par: number; strokes: number | null }[]): HoleShape => {
+  const holes = input.map((h) => ({ ...h, sheetStrokes: h.strokes }));
   const played = holes.filter((h) => h.strokes != null);
   const series: number[] = [0];
   let cum = 0;
