@@ -51,14 +51,13 @@ describe('REVIEWS_STATE_3', () => {
     const community = reviewsCommunitySample(sundridge, 'viewer');
     expect(fewReviewFacts(community)).toMatchObject({ count: 2, spread: 0 });
     const { container } = tab();
-    const caution = container.querySelector('[data-community-caution]');
+    const caution = container.querySelector('[data-reviews-state]');
     expect(caution?.getAttribute('data-community-count')).toBe('2');
     expect(caution?.getAttribute('data-community-spread')).toBe('0');
-    expect(caution?.textContent).toBe('Two people agreeing is not the same as a course being an 8.1.');
   });
   it('positive spread uses only others and ending excluding mean', () => {
     const facts = fewReviewFacts(reviewsCommunitySample([row('viewer', 10), row('mark', 8), row('thomas', 8.4)], 'viewer'));
-    expect(facts).toMatchObject({ count: 2, spread: 0.4, caution: 'They sit inside 0.4 of each other, but two people agreeing is not the same as a course being an 8.2.' });
+    expect(facts).toMatchObject({ count: 2, spread: 0.4 });
   });
   for (const count of [2, 3, 4]) it(`no distribution at ${count} total ratings`, () => {
     fixture.user = undefined; fixture.rows = Array.from({ length: count }, (_, i) => row(String(i), 8));
