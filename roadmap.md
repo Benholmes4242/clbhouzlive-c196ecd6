@@ -1,5 +1,8 @@
 # Roadmap
 
+## FUP1 — Home under-par fill
+- [x] Shared fill-only mechanism; Home uses dark-surface red, Explore retains photo red; ink stroke/scale/dots/baseline/other branches and existing tests unchanged. `npx vitest run`: 1,818/236 before -> 1,823/237 after, zero failures; +5 solely feedRoundUnderParFill.test.tsx. Preview build OK. Actual-chart fixture at 1280/524/390 widths verified states and IDs without overflow/errors. [0,-1,-3,0]: y1=29.5/y2=94; supplied minimum y=72.5 (21.5 gap), actual smooth minimum≈72.5912 (21.4088 gap). Hosted Home authentication unavailable. Shared ownership documented in new module header; root note rejected by size budget, root unchanged. Report /mnt/documents/FUP1_report.md.
+
 ## BRIEF_COURSE_REVIEWS_MATCH_1 (CRM1)
 - [x] WhatPeopleSay moved onto the Reviews tab's source (useCourseReviewSample + reviewsCommunitySample, wired as CourseReviewsTab wires it); aggregates/user-rating hooks removed. Headline key unchanged, fed the viewer-excluding pair; Reviews-style figure row (ink 48px score, tier over numeral count, amber YOU pill); CategoryBands extracted byte-identical from FewReviews to course-detail/CategoryBands.tsx and shared by both tabs; only-rater state added (en keys youFirst/youFirstBody); CountSlot removed, basedOn key left with no readers. Three authorised assertions changed in place in courseRatingConsistency.test.ts; no tests added/deleted. Full npx vitest run: 1,811/235 before and after, zero failures. Build OK. Live course page verified signed-out: 4 band rows, community score, no pill. CRM1.11a: PAGE_SIZE 500, no page cap, no truncation — loop fetches until a short page; mid-pagination error throws rather than presenting a partial sample. Report: /mnt/documents/CRM1_report.md.
 
