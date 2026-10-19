@@ -182,6 +182,10 @@ export interface FeedCardProps {
    * preview row, whatever the counter says.
    */
   commentPreview?: FeedCommentPreviewData | null;
+  /** HOME ONLY (BRIEF_ROUND_TILE_1): the round trace leaves the photograph
+   *  and draws on the canvas under the text block. Profile/grid hosts never
+   *  pass it. */
+  homeRoundPlot?: boolean;
   /**
    * Host opts the card into the comment block (preview + add-a-comment prompt).
    * Grid hosts that do not batch comment data leave it off.
@@ -310,6 +314,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   featuredDecisions,
   commentPreview,
   commentPreviewEnabled = false,
+  homeRoundPlot = false,
 }) => {
   const storedSlide = useClubhouseStore((s) => {
     if (carouselRestoreTab == null || feedIndex == null) return 0;
@@ -542,6 +547,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           size="std"
           bleed={ROUND_CARD_INSET}
           shape={postRound ? (roundShape === undefined ? undefined : roundShape) : undefined}
+          feedPlot={homeRoundPlot}
           medals={roundMedals}
           onTap={() => { if (postRound) onRoundTap?.(post, postRound); }}
           onWhoTap={() => onProfile(post)}

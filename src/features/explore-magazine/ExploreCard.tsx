@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
+import { RoundTilePlot } from '@/components/feed/roundTilePlot';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -812,6 +813,7 @@ export function ExploreCard({
   engagement,
   medals,
   bleed,
+  feedPlot,
 }: {
   /** HOME ONLY. The px inset of the host column. When set, the photograph
    *  runs full bleed to the slab edges (negative margin of this amount, no
@@ -834,6 +836,11 @@ export function ExploreCard({
   onTap: () => void;
   onWhoTap?: () => void;
   engagement?: RoundCardEngagement | null;
+  /** HOME ONLY (BRIEF_ROUND_TILE_1). The trace leaves the photograph and is
+   *  drawn on the card canvas under the text block, every played hole dotted
+   *  in the scorecard ramp. Explore and Profile never pass it, so their tiles
+   *  are byte-identical. */
+  feedPlot?: boolean;
 }) {
   const { t, i18n } = useTranslation('courses');
   const locale = i18n.language || 'en';
@@ -1473,7 +1480,7 @@ export function ExploreCard({
             </span>
           </span>
         </span>
-      ) : hasVisual ? (
+      ) : hasVisual && !feedPlot ? (
         <span
           aria-hidden
           style={{
@@ -1549,6 +1556,13 @@ export function ExploreCard({
               : undefined}
           />
         </span>
+      ) : null}
+      {/* BRIEF_ROUND_TILE_1 — HOME ONLY. The plot sits on the canvas, full
+          tile width, under the course name and poster line above it. No
+          scoring key; the one named mark (ace / albatross / eagle) is drawn
+          by the plot itself. */}
+      {feedPlot && item.kind === 'round' && size !== 'pair' && shape ? (
+        <RoundTilePlot shape={shape} />
       ) : null}
     </button>
   );
