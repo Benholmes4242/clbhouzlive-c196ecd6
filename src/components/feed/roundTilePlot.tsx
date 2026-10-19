@@ -125,7 +125,7 @@ export function feedHoleDots(shape: HoleShape | null | undefined, received?: rea
     if (hole.par == null || hole.strokes == null || hole.strokes <= 0) return;
     const d = hole.strokes - hole.par - (received?.[index] ?? 0);
     const i = index + 1;
-    if (d <= -2) out.push({ i, tone: SC_FILL_GOLD, r: 4 });
+    if (d <= -2) out.push({ i, tone: SC_FILL_GOLD, r: 2.8 });
     else if (d === -1) out.push({ i, tone: TOPAR_UNDER_DARK, r: 2.8 });
     else if (d === 0) out.push({ i, tone: PAR_DOT_INK, r: 2.4 });
     else if (d === 1) out.push({ i, tone: SC_BOGEY_DARK, r: 2.8 });
