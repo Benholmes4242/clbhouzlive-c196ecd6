@@ -261,7 +261,7 @@ export function RoundShape({
             </g>
           );
         })}
-        {last ? <circle cx={last.x} cy={last.y} r={2.6} fill={tone} /> : null}
+        {last && !(exploreDots ?? []).some((dot) => dot.i === points.length - 1) ? <circle cx={last.x} cy={last.y} r={2.6} fill={tone} /> : null}
 
         {endLabels ? (
           <g fill={A.MUTE} fontSize={END_LABEL_FONT_SIZE} fontFamily="Geist, sans-serif">
