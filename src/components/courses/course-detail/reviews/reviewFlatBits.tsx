@@ -63,7 +63,7 @@ const CATEGORY_KEYS: { key: keyof CourseReview; label: string }[] = [
   { key: 'facilities_score', label: 'Facilities' },
 ];
 
-const CategoryLine: React.FC<{ review: CourseReview }> = ({ review }) => {
+export const CategoryLine: React.FC<{ review: CourseReview }> = ({ review }) => {
   const items = CATEGORY_KEYS
     .map((c) => ({ label: c.label, value: review[c.key] as number | null | undefined }))
     .filter((c) => c.value !== null && c.value !== undefined);

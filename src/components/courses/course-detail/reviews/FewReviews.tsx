@@ -1,5 +1,5 @@
 /** REVIEWS_STATE_3/4: total selects this shared screen; complete excluding community
- * owns every aggregate and caution figure. The existing course circle means
+ * owns every aggregate figure. The existing course circle means
  * outgoing follows; it marks only already-visible, blocked-filtered prose rows.
  * State 2's row/context and panel are reused, never a second review row.
  * All sections are unframed and page-scrolled; missing identities stay unnamed.
@@ -53,7 +53,7 @@ export function FewReviews({ community, reviews, viewerId, courseId, courseName,
     const fullName = profile?.display_name?.trim() || profile?.username?.trim();
     return { name: fullName?.split(/\s+/)[0], rating: row.rating };
   });
-  return <div data-reviews-state={stateFour ? 'five-to-nine' : 'few'}>
+  return <div data-reviews-state={stateFour ? 'five-to-nine' : 'few'} data-community-count={facts?.count} data-community-spread={facts?.spread}>
     <section style={{ ...section, paddingTop: 0 }}>
       <div style={kicker}>{capitalizedRatings(community.totalRatingCount)} golfers have rated it</div>
       {facts ? <>
@@ -76,7 +76,7 @@ export function FewReviews({ community, reviews, viewerId, courseId, courseName,
           <p data-distribution-population={facts.count} style={{ ...prose, color: SURFACE.dark.mute, borderLeft: `2px solid ${SURFACE.dark.hairline}`, paddingLeft: 11 }}>
             {capitalizedRatings(facts.count)} bars, {spelledRatings(facts.count)} raters. {ratedViewer ? <><b style={{ color: SURFACE.dark.ink }}>Your own rating is not in the chart</b>, for the same reason it is not in the average above it — </> : null}{ratedViewer ? 'the' : 'The'} counts and the figure have to describe the same people.
           </p>
-        </div> : <p data-community-caution data-community-count={facts.count} data-community-spread={facts.spread} style={prose}>{facts.caution}</p>}
+        </div> : null}
       </> : <>
         <h2 style={heading}>The score builds from here</h2>
         <p style={prose}>Here they are — the golfers, and what they said.</p>
@@ -97,8 +97,8 @@ export function FewReviews({ community, reviews, viewerId, courseId, courseName,
           <span style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 800, textAlign: 'right', ...FIGS }}>{band.mean.toFixed(1)}<span style={{ display: 'block', color: SURFACE.dark.dim, fontSize: 9.5, marginTop: 1 }}>{band.low.toFixed(1)}–{band.high.toFixed(1)}</span></span>
         </div>)}
       </div>
-      {facts.finding && <p data-category-finding data-widest={facts.finding.widest.key} data-widest-spread={facts.finding.widest.gap} data-tightest={facts.finding.tightest.key} data-tightest-spread={facts.finding.tightest.gap} style={{ ...prose, borderLeft: `2px solid ${A.AMBER}`, paddingLeft: 11 }}>
-        {stateFour ? <>{facts.finding.widest.label} runs <b style={{ color: SURFACE.dark.ink, ...FIGS }}>{facts.finding.widest.gap.toFixed(1)}</b> wide against {facts.finding.tightest.label.toLowerCase()}’s <b style={{ color: SURFACE.dark.ink, ...FIGS }}>{facts.finding.tightest.gap.toFixed(1)}</b>. {capitalizedRatings(facts.count)} people broadly agree what the course is and disagree sharply about {facts.finding.widest.key === 'condition' ? <>what shape it was in — <span data-condition-month-explanation>which usually means <b style={{ color: SURFACE.dark.ink }}>they played it in different months</b></span></> : `its ${facts.finding.widest.label.toLowerCase()}`}.</> : <>They agree on <b style={{ color: SURFACE.dark.ink }}>{facts.finding.tightest.label.toLowerCase()}</b> and split on the <b style={{ color: SURFACE.dark.ink }}>{facts.finding.widest.label.toLowerCase()}</b>, where the gap is <b style={{ color: SURFACE.dark.ink, ...FIGS }}>{facts.finding.widest.gap.toFixed(1)}</b>. A mean alone would have hidden that.</>}
+      {stateFour && facts.finding && <p data-category-finding data-widest={facts.finding.widest.key} data-widest-spread={facts.finding.widest.gap} data-tightest={facts.finding.tightest.key} data-tightest-spread={facts.finding.tightest.gap} style={{ ...prose, borderLeft: `2px solid ${A.AMBER}`, paddingLeft: 11 }}>
+        <>{facts.finding.widest.label} runs <b style={{ color: SURFACE.dark.ink, ...FIGS }}>{facts.finding.widest.gap.toFixed(1)}</b> wide against {facts.finding.tightest.label.toLowerCase()}’s <b style={{ color: SURFACE.dark.ink, ...FIGS }}>{facts.finding.tightest.gap.toFixed(1)}</b>. {capitalizedRatings(facts.count)} people broadly agree what the course is and disagree sharply about {facts.finding.widest.key === 'condition' ? <>what shape it was in — <span data-condition-month-explanation>which usually means <b style={{ color: SURFACE.dark.ink }}>they played it in different months</b></span></> : `its ${facts.finding.widest.label.toLowerCase()}`}.</>
       </p>}
     </section>}
     {facts && known.length > 0 && <section style={section}><span style={{ display: 'inline-block', color: MEDAL_GOLD, background: inkWithAlpha(MEDAL_GOLD, 0.10), border: `1px solid ${inkWithAlpha(MEDAL_GOLD, 0.28)}`, borderRadius: 999, padding: '3px 9px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', marginBottom: 11 }}>People you know</span>{known.map(review => renderPerson(review, true))}</section>}

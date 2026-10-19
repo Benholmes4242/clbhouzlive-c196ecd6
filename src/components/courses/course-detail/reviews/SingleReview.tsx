@@ -20,6 +20,7 @@ import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { SC_BOGEY_DARK } from '@/features/courses/components/holes/_constants';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
+import { CategoryLine } from './reviewFlatBits';
 
 interface SingleReviewProps {
   totalRatings: number;
@@ -102,8 +103,8 @@ export function RaterReviewRow({ review, context, playedMonth, onMediaClick, fla
         </div>
         <strong data-review-score style={{ flexShrink: 0, color: flat ? SURFACE.dark.ink : MEDAL_GOLD, fontSize: 19, fontWeight: 800, lineHeight: 1.2, ...FIGS }}>{review.rating?.toFixed(1)}</strong>
       </div>
+      <CategoryLine review={review} />
       {review.review?.trim() && <MentionText as="p" text={review.review} style={{ color: SURFACE.dark.body, fontSize: 13, lineHeight: 1.5, margin: '10px 0 0', overflowWrap: 'anywhere' }} />}
-      {flat && !review.review?.trim() && <p style={{ color: SURFACE.dark.body, fontSize: 13, lineHeight: 1.5, margin: '10px 0 0' }}>{[['Design', review.design_score], ['Condition', review.condition_score], ['Clubhouse', review.clubhouse_score], ['Facilities', review.facilities_score]].filter(([, value]) => value != null).map(([label, value]) => `${label} ${Number(value).toFixed(1)}`).join(' · ')}</p>}
       {month && <span data-played-season style={{ display: 'inline-block', marginTop: 9, padding: '3px 9px', borderRadius: 999, color: SC_BOGEY_DARK, background: inkWithAlpha(SC_BOGEY_DARK, 0.10), border: `1px solid ${inkWithAlpha(SC_BOGEY_DARK, 0.22)}`, fontSize: 10, fontWeight: 800, letterSpacing: '0.09em', textTransform: 'uppercase' }}>Played {month}</span>}
       {!!review.media?.length && <div style={{ marginTop: 11 }}><ReviewMediaStrip media={review.media} onMediaClick={onMediaClick} tileMode="equal" tileHeight={72} tileRadius={9} tileGap={4} maxItems={4} /></div>}
     </article>
