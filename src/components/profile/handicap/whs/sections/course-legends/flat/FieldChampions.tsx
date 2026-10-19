@@ -48,7 +48,7 @@ export function FieldChampions(props: FieldChampionsProps) {
   const comparison = fieldRecordComparison(record, par, fieldOverPar, rounds);
   const emptyFeats = categories.filter(category => !holders.has(category.key) && /most_(aces|albatrosses)_/.test(category.key));
   return <div className="champions-empty" style={{ color: SURFACE.dark.ink }}>
-    <section className="champions-empty-section">
+    <section className="champions-empty-section champions-empty-section--first">
       <div className="champions-empty-kicker" style={{ color: SURFACE.dark.dim }}>The cabinet</div>
       <h2>{numberWord(taken)} taken, {numberWord(untouched, false)} never touched</h2>
       <div className="champions-empty-lede" style={{ color: SURFACE.dark.mute }}>Every course carries the same {spelled} boards. These are the standing figures at {courseName}.</div>

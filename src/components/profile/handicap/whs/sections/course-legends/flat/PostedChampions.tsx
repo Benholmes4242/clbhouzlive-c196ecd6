@@ -100,7 +100,7 @@ export function PostedChampions(props: PostedChampionsProps) {
   const openNames = new Intl.ListFormat('en-GB', { style: 'long', type: 'disjunction' }).format(openFeats.map(key => article(SINGULAR[CHAMPIONS_BOARD_DATA[key].name])));
   const owned = selectedDefence(activeKey, grouped);
   return <div className="champions-empty champions-posted" style={{ color: A.INK }}>
-    <section className="champions-empty-section">
+    <section className="champions-empty-section champions-empty-section--first">
       <div className="champions-empty-kicker" style={{ color: A.AMBER }}>Your cabinet here</div>
       <h2 data-yours-count={yours.length} data-board-count={keys.length}>{numberWord(yours.length)} of the {numberWord(keys.length, false)} are yours</h2>
       {lede && <div className="champions-empty-lede" style={{ color: A.MUTE }}>{lede}</div>}

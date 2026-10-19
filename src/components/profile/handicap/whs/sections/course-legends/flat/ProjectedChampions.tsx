@@ -42,7 +42,7 @@ export function ProjectedChampions(props: ProjectedChampionsProps) {
   const form = recordProjectionForm(record, p, thin);
   const heading = form === 'rangeRecordAbove' ? 'On your ordinary golf you would hold it' : form === 'rangeRecordInside' ? 'It is yours on a good day' : form === 'rangeRecordBelow' ? 'It would take better than your best here' : 'Your scoring carried onto this course';
   return <div className="champions-empty champions-projected" style={{ color: A.INK }}>
-    <section className="champions-empty-section">
+    <section className="champions-empty-section champions-empty-section--first">
       <div className="champions-empty-kicker" style={{ color: A.AMBER }}>You have never played here</div>
       <h2 data-reached-count={reached.length}>Your golf reaches {numberWord(reached.length, false)} of these</h2>
       <div className="champions-empty-lede" style={{ color: A.MUTE }}>Off a course handicap of {p.courseHcp} you project {p.typicalGross}. {names.length ? `That is enough for the ${named} ${names.length === 1 ? 'board' : 'boards'} here.` : 'No standing projectable board is within your range here yet.'}</div>

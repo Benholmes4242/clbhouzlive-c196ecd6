@@ -87,6 +87,7 @@ import UpForGrabsSection from './you/UpForGrabsSection';
 import ProjectionSection, { type ProjectionState } from './you/ProjectionSection';
 import WonAndLostSection from './you/WonAndLostSection';
 import AgainstYourGolfSection from './you/AgainstYourGolfSection';
+import './you/youLeadIn.css';
 
 interface Props {
   courseId: string;
@@ -321,7 +322,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   );
 
   const wrap = (children: React.ReactNode) => (
-    <div className="animate-in fade-in duration-200" style={{ background: A.CANVAS, paddingBottom: 8 }}>
+    <div className="course-you-lead-in animate-in fade-in duration-200" style={{ background: A.CANVAS, paddingBottom: 8 }}>
       {children}
     </div>
   );
@@ -329,7 +330,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
   // A — SIGNED OUT. Unchanged: the sign-in notice only.
   if (!user) {
     return wrap(
-      <div style={{ paddingTop: 20, padding: '20px 16px 0' }}>
+      <div style={{ padding: '20px 16px 0' }}>
         <EmptyState
           title={t('courseDetail.youTab.signedOut.title')}
           body={t('courseDetail.youTab.signedOut.body', { courseName })}
