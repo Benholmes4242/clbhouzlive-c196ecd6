@@ -765,7 +765,7 @@ function usePlayerSync() {
  * BRIEF_CONTENT_DESK Stage 4 — the Tour data section plus its sub-view, the
  * existing player list, and the existing headshot override sheet (?player=).
  */
-function TourSection() {
+export function TourSection() {
   const [params, setParams] = useSearchParams();
   const sub = params.get('sub');
   const players = useAdminPlayers();
@@ -815,6 +815,24 @@ function TourSection() {
         onRunSync={sync.handleSync}
         noPhotoSet={noPhotoSet}
         onOpenDirectory={() => setParam('sub', 'players', true)}
+        onOpenPlayer={async (id, name) => {
+          // BRIEF_TOUR_RANKINGS_OPEN_PLAYER — a linked ranking row opens the
+          // same headshot sheet. When the id is outside the loaded directory,
+          // fetch that one sr_players row and use it as the fallback.
+          if (list.some(p => p.id === id)) { setParam('player', id, true); return; }
+          const { data, error } = await supabase
+            .from('sr_players')
+            .select('id, full_name, first_name, last_name, country, country_code, tour_codes, headshot_override, photo_url, updated_at')
+            .eq('id', id)
+            .maybeSingle();
+          if (error || !data) { toast.error('Could not open this player'); return; }
+          setFallback({
+            id: data.id, fullName: data.full_name ?? name, firstName: data.first_name, lastName: data.last_name,
+            country: data.country, countryCode: data.country_code, tourCodes: data.tour_codes,
+            headshotOverride: data.headshot_override, photoUrl: data.photo_url ?? null, updatedAt: data.updated_at,
+          });
+          setParam('player', id, true);
+        }}
         onAddPhoto={(fp) => {
           if (!list.some(p => p.id === fp.player_id)) {
             setFallback({ id: fp.player_id, fullName: fp.name, firstName: null, lastName: null, country: fp.country, countryCode: null, tourCodes: fp.tour_codes, headshotOverride: fp.headshot_override, photoUrl: fp.photo_url, updatedAt: null });
