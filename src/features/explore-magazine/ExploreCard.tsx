@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
+import { RoundTilePlot } from '@/components/feed/roundTilePlot';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';

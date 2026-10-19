@@ -182,6 +182,10 @@ export interface FeedCardProps {
    * preview row, whatever the counter says.
    */
   commentPreview?: FeedCommentPreviewData | null;
+  /** HOME ONLY (BRIEF_ROUND_TILE_1): the round trace leaves the photograph
+   *  and draws on the canvas under the text block. Profile/grid hosts never
+   *  pass it. */
+  homeRoundPlot?: boolean;
   /**
    * Host opts the card into the comment block (preview + add-a-comment prompt).
    * Grid hosts that do not batch comment data leave it off.
