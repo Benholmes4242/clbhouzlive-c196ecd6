@@ -92,7 +92,7 @@ export default function AdminDrawer({ open, onClose, role, canManageAdmins }: Pr
     <aside role="dialog" aria-label="Admin navigation" aria-modal={open || undefined} aria-hidden={!open} style={{ position: 'fixed', top: 0, left: 0, bottom: 0, width: 304, maxWidth: '100vw', zIndex: 100, background: t.surface, borderRight: `1px solid ${t.line}`, transform: open ? 'translateX(0)' : 'translateX(-100%)', transition: 'transform .26s cubic-bezier(0.22,1,0.36,1)', display: 'flex', flexDirection: 'column', paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', color: t.ink, fontVariantNumeric: 'tabular-nums', boxSizing: 'border-box' }}>
       {open && <>
         <div style={{ padding: '10px 10px 0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-          <div><div style={{ fontSize: 19, fontWeight: 700 }}>clbhouz</div><div style={{ marginTop: 1, fontSize: 12, color: t.inkFaint }}>Command centre</div></div>
+          <div><div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.035em' }}>clbhouz</div><div style={{ marginTop: 1, fontSize: 12, color: t.inkFaint }}>Command centre</div></div>
           <Button variant="ghost" size="icon" aria-label="Close menu" onClick={onClose} style={{ width: 44, height: 44, borderRadius: 12, color: t.inkMuted, background: 'transparent' }}><X className="!size-[18px]" /></Button>
         </div>
         {canManageAdmins ? <LiveBoard>{contents}</LiveBoard> : contents()}
