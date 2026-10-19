@@ -258,7 +258,7 @@ export const EdgeSection: React.FC<{ edges: HoleEdge[]; s: EdgeSummary; fieldRou
         items={[
           ...(s.front != null ? [{ value: s.front.toFixed(2), label: 'Your edge, front', tone: s.back != null && s.front > s.back ? A.IMPROVED : undefined }] : []),
           ...(s.back != null ? [{ value: s.back.toFixed(2), label: 'Your edge, back', tone: s.front != null && s.back > s.front ? A.IMPROVED : undefined }] : []),
-          ...(least ? [{ value: ordinal(least.hole_no), label: 'Least edge that matters', tone: A.AMBER }] : []),
+          ...(least ? [{ value: ordinal(least.hole_no), label: 'Level with the field', tone: A.AMBER }] : []),
         ]}
       />
       <Said>
