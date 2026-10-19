@@ -16,7 +16,7 @@ import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import AboutSection from './AboutSection';
 import { deriveCourseVerdict, shotsInWords, signed } from './courseVerdict';
-import { B, FactTile, Said } from './verdictBits';
+import { B, FactTile, Said, SMALL_LABEL } from './verdictBits';
 
 const TRACK = A.TRACK;
 
