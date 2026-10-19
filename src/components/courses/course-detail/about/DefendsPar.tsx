@@ -85,7 +85,8 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
   if (!v) return null;
 
   const max = Math.max(0.01, ...v.holes.map((h) => Math.max(0, h.avg_to_par)));
-  const maxPer = Math.max(0.01, ...v.parTypes.map((p) => Math.max(0, p.perHole)));
+  const parRows = orderParTypes(v.parTypes);
+  const hardestPar = hardestParType(parRows)?.par ?? null;
   const labelled = new Set([v.holes[0].hole_no, 9, v.easiest.hole_no, v.hardest.hole_no]);
 
   let nineLine: React.ReactNode = null;
