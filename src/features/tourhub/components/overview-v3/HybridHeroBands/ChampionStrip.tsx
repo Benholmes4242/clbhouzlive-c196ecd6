@@ -33,17 +33,20 @@ interface ChampionStripProps {
   scoreLabel?: string;
   eyebrow?: string;
   eyebrowIcon?: LucideIcon;
-  /** Optional avatar URL — when missing, render a gradient placeholder */
-  avatarUrl?: string | null;
+  /** Full shared resolver walk; preserve the player's identity on every miss. */
+  avatarCandidates?: string[];
+  playerKey?: string | null;
   /** Pass 5.5: italic editorial narrative beneath the name. */
   narrative?: string | null;
 }
 
 
-function PlayerHead({ size = 42, src }: { size?: number; src?: string | null }) {
+function PlayerHead({ size = 42, avatarCandidates, name, playerKey }: { size?: number; avatarCandidates?: string[]; name: string; playerKey?: string | null }) {
   return (
     <SquircleAvatar
-      src={src ?? undefined}
+      srcCandidates={avatarCandidates}
+      alt={name}
+      userId={playerKey ?? name}
       size={size}
       hairlineRing
       ringColor={GOLD}
@@ -59,7 +62,8 @@ export function ChampionStrip({
   scoreLabel,
   eyebrow,
   eyebrowIcon: EyebrowIcon = Trophy,
-  avatarUrl,
+  avatarCandidates,
+  playerKey,
   narrative,
 }: ChampionStripProps) {
   const { t } = useTranslation('tourhub');
@@ -90,7 +94,7 @@ export function ChampionStrip({
         }}
       />
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative' }}>
-        <PlayerHead size={42} src={avatarUrl} />
+        <PlayerHead size={42} avatarCandidates={avatarCandidates} name={name} playerKey={playerKey} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
             <span

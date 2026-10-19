@@ -182,13 +182,14 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
     };
   }, [needsInitials, rows, state, top?.player, top?.score, top?.team, tournament.eventType, tournament.winnerId, tournament.winnerName, tournament.venuePar]);
 
-  const championAvatarUrl = champion
+  const championAvatarCandidates = champion
     ? resolvePlayerAvatarCandidates({
         name: champion.name,
         photoUrl: tournament.winnerPhotoUrl,
         tourSlug: tournament.tourSlug,
-      })[0] ?? null
-    : null;
+        headshotOverride: tournament.winnerHeadshotOverride,
+      })
+    : [];
 
   const dates = tournament.startDate ? formatOverviewDateRange(tournament.startDate, tournament.endDate) : null;
 
@@ -232,7 +233,8 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
           scoreValue={champion.score}
           scoreLabel={overviewChampionScoreLabel(champion.playoff, champion.margin, t)}
           eyebrow={t('overview.hero.champion')}
-          avatarUrl={championAvatarUrl}
+          avatarCandidates={championAvatarCandidates}
+          playerKey={tournament.winnerKey}
           narrative={championSentence}
           country={champion.country}
         />

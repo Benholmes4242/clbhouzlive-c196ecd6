@@ -64,6 +64,8 @@ export interface HeroTournament {
   winnerId: string | null;
   winnerName: string | null;
   winnerPhotoUrl: string | null;
+  winnerHeadshotOverride: string | null;
+  winnerKey: string | null;
   winnerPgaTourId: string | null;
   winnerScore: string | null;
   leaderScore: number | null;
@@ -122,7 +124,7 @@ export function useHeroCarouselData() {
         winnerSrIds.length > 0
           ? supabase
               .from('sr_players')
-              .select('sr_id, first_name, last_name, photo_url, pga_tour_id')
+              .select('sr_id, first_name, last_name, photo_url, pga_tour_id, headshot_override')
               .in('sr_id', winnerSrIds)
           : Promise.resolve({ data: [] }),
         allTournamentIds.length > 0
@@ -130,7 +132,7 @@ export function useHeroCarouselData() {
               .from('sr_leaderboards')
               .select(`
                 tournament_id, position, position_tied, score,
-                player:sr_players!sr_leaderboards_player_id_fkey(sr_id, first_name, last_name, photo_url, pga_tour_id),
+                player:sr_players!sr_leaderboards_player_id_fkey(sr_id, first_name, last_name, photo_url, pga_tour_id, headshot_override),
                 team:sr_teams!sr_leaderboards_team_id_fkey(
                   sr_id, display_name, abbr_name,
                   members:sr_team_players(position_in_team, player:sr_players!sr_team_players_player_id_fkey(sr_id, first_name, last_name, photo_url))
@@ -144,7 +146,7 @@ export function useHeroCarouselData() {
         defendingChampionNames.length > 0
           ? supabase
               .from('sr_players')
-              .select('sr_id, first_name, last_name, photo_url, pga_tour_id')
+              .select('sr_id, first_name, last_name, photo_url, pga_tour_id, headshot_override')
               .or(
                 defendingChampionNames.map(name => {
                   const parts = name.trim().split(' ');
@@ -175,14 +177,18 @@ export function useHeroCarouselData() {
       ]);
 
       // Build winner map
-      const winnerMap: Record<string, { first_name: string; last_name: string; photo_url: string | null; pga_tour_id: string | null }> = {};
+      // Keep winner identity and upload override with its photo so the champion
+      // uses the shared candidate walk rather than a single tour-folder guess.
+      const winnerMap: Record<string, { sr_id: string; first_name: string; last_name: string; photo_url: string | null; pga_tour_id: string | null; headshot_override: string | null }> = {};
       (winnersResult.data || []).forEach((w: any) => {
         if (w.sr_id) {
           winnerMap[w.sr_id] = {
+            sr_id: w.sr_id,
             first_name: w.first_name || '',
             last_name: w.last_name || '',
             photo_url: w.photo_url,
             pga_tour_id: w.pga_tour_id || null,
+            headshot_override: w.headshot_override || null,
           };
         }
       });
@@ -255,6 +261,8 @@ export function useHeroCarouselData() {
 
         let winnerName: string | null = null;
         let winnerPhotoUrl: string | null = null;
+        let winnerHeadshotOverride: string | null = null;
+        let winnerKey: string | null = null;
         let winnerPgaTourId: string | null = null;
         let winnerScore: string | null = null;
 
@@ -283,6 +291,8 @@ export function useHeroCarouselData() {
                 : null;
 
             winnerPhotoUrl = winnerFromId?.photo_url || leaderboardEntry?.player?.photo_url || null;
+            winnerHeadshotOverride = winnerFromId?.headshot_override || leaderboardEntry?.player?.headshot_override || null;
+            winnerKey = winnerFromId?.sr_id || leaderboardEntry?.player?.sr_id || leaderboardEntry?.player?.id || null;
             winnerPgaTourId = winnerFromId?.pga_tour_id || leaderboardEntry?.player?.pga_tour_id || null;
 
             winnerScore = leaderboardEntry?.score != null
@@ -325,6 +335,8 @@ export function useHeroCarouselData() {
           winnerId: row.winner_id,
           winnerName,
           winnerPhotoUrl,
+          winnerHeadshotOverride,
+          winnerKey,
           winnerPgaTourId,
           winnerScore,
           leaderScore: leaderboardMap[row.id]?.score ?? null,
