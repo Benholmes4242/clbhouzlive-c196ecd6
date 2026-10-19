@@ -3,6 +3,7 @@
 ## BRIEF_PROFILE_SHEET_HCP_1 - SHEET_HCP_1
 - [ ] Replace connected card with Handicap navigation row; preserve unconnected card and fetched gating. User authorised written brief without missing profile-sheet-c-corrected.html.
 - [ ] AZA8 STOP before edits: FormSection has additional imports at src/test/formPlot.test.ts:2 and src/test/profileSheetV3.test.tsx:4, beyond profileSheetRebuild.test.tsx:11 and HcpStrip.tsx:47. Need authorisation for obsolete FormSection test removal/updates before deleting the module. No application/test changes or tests run; last verified full suite remains 1,796 passing / 232 files.
+- [ ] SHEET_HCP_1_R2 STOP: resolves AZA8 test-importer authority, but requires attached profile-sheet-c-corrected.html and says to stop if not present. File missing from both upload mounts. Production FormSection reach: only src/features/profile-sheet-v2/components/HcpStrip.tsx:47/:370; plotMetrics, baselineInsets, barGeometry, FLOOR_ABOVE and FLOOR_BELOW appear only in profile-sheet FormSection.tsx outside tests. No app or test edits, deletions or suite run.
 
 ## BRIEF_REMOVE_STALE_ADMIN_GUARD_TEST
 - [x] Deleted only the "no admin file changed in this brief" it block in src/test/holePhotoTagging.test.tsx and its now-unused execFileSync import. Nothing else changed. Full suite 1,796 passing / 232 files, 0 failing; preview build OK 2026-10-19T08:10:01Z.
