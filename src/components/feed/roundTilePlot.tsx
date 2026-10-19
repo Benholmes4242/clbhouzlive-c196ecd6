@@ -34,12 +34,28 @@ import {
   SC_BOGEY_DARK,
   SC_DOUBLE_DARK,
 } from '@/features/courses/components/holes/_constants';
-import { TOPAR_UNDER_DARK, TOPAR_EVEN_DARK } from '@/features/tourhub/_shared/tokens';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import type { AchievementCallout } from '@/features/explore-magazine/cardTreatment';
 import type { ExploreRoundFeat } from '@/features/explore-magazine/roundFeatCollection';
 import { scorecardFeatFor, type ScorecardFeatKind } from '@/features/courses/_shared/scorecard/scorecardFeat';
 
 const PAD_X = 6;
+
+// TOPAR_EVEN_DARK rgba(242,244,247,0.42) composited on Home's CARD
+// (FEED_CARD_SURFACE #16161A), rounded per channel: #727377. Alpha cannot
+// travel to a dot sitting on the trace: the line would show through the mark.
+const PAR_DOT_INK = '#727377';
+
+// ROUND_PLOT_1_R: a six-stroke floor keeps a flat round flat rather than
+// magnifying two strokes into the same full-box amplitude as sixteen.
+export const MIN_ROUND_PLOT_SPAN = 6;
+
+export function roundPlotRange(values: readonly number[]) {
+  const lowest = Math.min(0, ...values);
+  const highest = Math.max(0, ...values);
+  const padding = Math.max(0, MIN_ROUND_PLOT_SPAN - (highest - lowest)) / 2;
+  return { lo: lowest - padding, hi: highest + padding };
+}
 
 export interface FeedDot {
   /** Index into HoleShape.series (cumulative value AFTER the hole). */
@@ -58,7 +74,7 @@ export function feedHoleDots(shape: HoleShape | null | undefined): FeedDot[] {
     const i = index + 1;
     if (d <= -2) out.push({ i, tone: SC_FILL_GOLD, r: 4 });
     else if (d === -1) out.push({ i, tone: TOPAR_UNDER_DARK, r: 2.8 });
-    else if (d === 0) out.push({ i, tone: TOPAR_EVEN_DARK, r: 2.4 });
+    else if (d === 0) out.push({ i, tone: PAR_DOT_INK, r: 2.4 });
     else if (d === 1) out.push({ i, tone: SC_BOGEY_DARK, r: 2.8 });
     else out.push({ i, tone: SC_DOUBLE_DARK, r: 2.8 });
   });
@@ -127,7 +143,7 @@ export function homePanelCallout(
 export function RoundTilePlot({
   shape,
   width = 340,
-  height = 59,
+  height = 102, // 112px total plot footprint including the unchanged 10px seam.
 }: {
   shape: HoleShape;
   width?: number;
@@ -137,9 +153,8 @@ export function RoundTilePlot({
   const values = shape.series;
   if (!values || values.length < 2) return null;
 
-  const lo = Math.min(0, ...values) - 0.7;
-  const hi = Math.max(0, ...values) + 0.7;
-  const span = Math.max(hi - lo, 2);
+  const { lo, hi } = roundPlotRange(values);
+  const span = hi - lo;
   const top = 8;
   const bottom = height - 8;
   const xFor = (i: number) => PAD_X + (i / Math.max(values.length - 1, 1)) * (width - PAD_X * 2);
