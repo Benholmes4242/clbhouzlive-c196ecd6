@@ -5,7 +5,8 @@
  * All sections are unframed and page-scrolled; missing identities stay unnamed.
  * State 4 adds the existing distribution at the shared excluding threshold.
  * REVIEWS_HEADER_1 owns the shared figure row and fixed category heading.
- * Two-to-four tier/count addition remains deferred pending its protecting-test ruling.
+ * Tier/count share one stack wherever this screen already shows an average;
+ * the below-five tier prohibition was deliberately reversed by RH11.
  * Reviews States 3/4 share FewReviews and RatingTierDistribution to prevent population drift. */
 import React from 'react';
 import type { CourseReview } from '@/hooks/useCourseReviews';
@@ -62,10 +63,10 @@ export function FewReviews({ community, reviews, viewerId, courseId, courseName,
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, marginTop: 15 }}>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 13, minWidth: 0 }}>
           <strong data-community-score style={{ color: SURFACE.dark.ink, fontSize: 48, lineHeight: 0.9, fontWeight: 800, ...FIGS }}>{community.score?.toFixed(1)}</strong>
-          {stateFour && <div style={{ minWidth: 0 }}>
+          <div style={{ minWidth: 0 }}>
               <div style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 700, lineHeight: 1.2 }}>{getRatingTierLabel(community.score)}</div>
               <div data-community-rater-count={facts.count} style={{ color: SURFACE.dark.dim, fontSize: 11.5, lineHeight: 1.45, marginTop: 2, overflowWrap: 'anywhere', ...FIGS }}>{facts.count} {facts.count === 1 ? 'rating' : 'ratings'}</div>
-          </div>}
+          </div>
           </div>
           {ratedViewer && community.delta != null && <div data-viewer-delta style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, padding: '5px 10px', whiteSpace: 'nowrap', flex: '0 0 auto', borderRadius: 999, border: `1px solid ${inkWithAlpha(A.AMBER, 0.35)}`, background: inkWithAlpha(A.AMBER, 0.07) }}><span style={{ color: SURFACE.dark.mute, fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>You</span><b style={{ color: A.AMBER, fontSize: 14, ...FIGS }}>{community.viewerScore?.toFixed(1)}</b><span style={{ color: A.IMPROVED, fontSize: 10, fontWeight: 800, ...FIGS }}>{community.delta > 0 ? '▲' : community.delta < 0 ? '▼' : ''} {Math.abs(community.delta).toFixed(1)}</span></div>}
         </div>
