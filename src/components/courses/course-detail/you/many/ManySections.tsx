@@ -28,7 +28,6 @@ export interface VerdictProps {
   lifetimeRounds: number;
   fieldOverPar: number | null;
   bestThisYear: number | null;
-  mostRoundsHere: boolean;
 }
 
 const LadderRow: React.FC<{ name: React.ReactNode; pct: number; fill: string; value: string }> = ({ name, pct, fill, value }) => (
@@ -51,7 +50,7 @@ export const VerdictSection: React.FC<VerdictProps> = (p) => {
         <Verd
           value={signed1(p.season.avgOverPar)}
           line1="over par this year"
-          line2={`${formatNumber(p.season.count)} rounds${p.bestSeason ? ` \u00b7 your best of ${yearsWord} seasons here` : ''}`}
+          line2={`${formatNumber(p.season.count)} rounds${p.bestSeason ? ` \u00b7 Your best of ${yearsWord} seasons here` : ''}`}
         />
       ) : null}
       <div style={{ marginTop: 16 }}>
@@ -74,7 +73,6 @@ export const VerdictSection: React.FC<VerdictProps> = (p) => {
         <Said>
           The Course tab says this place takes <B>{f1(top)} shots</B> off everyone else who plays it. It took <B>{f1(p.lifetimeOverPar)}</B> off you across {yearsWord} {plural(p.seasonCount, 'season', 'seasons')}.
           {p.season?.avgOverPar != null ? <> This season it is taking <B>{f1(p.season.avgOverPar)}</B>.</> : null}
-          {p.mostRoundsHere ? ' Nobody has played here more than you, so this is a finding, not a statistic.' : null}
         </Said>
       ) : null}
     </Sec>
@@ -189,10 +187,7 @@ export const GoodRoundsSection: React.FC<{ g: GoodRounds | null; seasons: number
         </Said>
       ) : null}
       {n < SMALL_SET ? (
-        <Said quiet>
-          {Words(n)} {plural(n, 'round is', 'rounds is')} a small set, and it is the whole set: you have played here {formatNumber(g.total)} times and broken {th} {words(n)} of them.
-          {thinNines ? ` The nines rest on the ${formatNumber(g.good.nineCount + g.other.nineCount)} rounds that recorded both.` : ''}
-        </Said>
+        thinNines ? <Said quiet>The nines rest on the {formatNumber(g.good.nineCount + g.other.nineCount)} rounds that recorded both.</Said> : null
       ) : thinNines ? (
         <Said quiet>The nines rest on the {formatNumber(g.good.nineCount + g.other.nineCount)} of your {formatNumber(g.total)} rounds that recorded both.</Said>
       ) : null}

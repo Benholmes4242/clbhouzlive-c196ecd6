@@ -658,7 +658,6 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
         lifetimeRounds={allRounds.total}
         fieldOverPar={fieldExcl}
         bestThisYear={seasonsAll.find((x) => x.year === thisYear)?.best ?? null}
-        mostRoundsHere={roundsRow?.rank === 1}
       />
       <YearsSection seasons={qualifying} omitted={seasonsAll.filter((x) => x.count < SEASON_MIN_ROUNDS)} year={thisYear} firstTwenty={first20} lastForty={last40} held={held} />
       <GoodRoundsSection g={goodRounds(history)} seasons={seasonsAll.length} />
