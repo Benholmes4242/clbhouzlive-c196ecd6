@@ -19,9 +19,53 @@ import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import AboutSection from './AboutSection';
 import AllHolesSheet from './AllHolesSheet';
 import { deriveCourseVerdict, sharePct, signed } from './courseVerdict';
-import { B, BAR_NEUTRAL, PAR_FILL, Said, SMALL_LABEL } from './verdictBits';
+import { B, BAR_NEUTRAL, Said, SMALL_LABEL } from './verdictBits';
 
 const CHART_H = 56;
+
+/* PTR1.1 — the par-type rows share ONE FIXED scale, −0.20 to +1.20 shots over
+   par. It is a constant, never derived from the data: a dot in the same place
+   means the same thing on every course, which the old normalise-to-maximum
+   bars could never claim. Out-of-range values clamp the DOT to the track end;
+   the printed figure always shows the true value. */
+export const PAR_SCALE_MIN = -0.2;
+export const PAR_SCALE_MAX = 1.2;
+
+/* PTR1.5 (corrected) — the minimum lead before the block may call one par
+   type the hardest and paint it amber. It governs TWO FIELD AVERAGES being
+   close to each other. It deliberately does NOT share LEVEL_EDGE from
+   youDerivations (a player's edge against the field on one hole) even though
+   both are 0.05 today: tuning the You tab's edge chart must never change when
+   the Course tab claims a hardest par type. */
+export const HARDEST_MIN_GAP = 0.05;
+
+export interface ParTypeRowInput {
+  par: number;
+  holes: number;
+  perHole: number;
+}
+
+/** PTR1.1/PTR1.3 — clamped 0–100 position of a value on the fixed scale. */
+export const parTypeTrackPct = (value: number): number =>
+  Math.min(100, Math.max(0, ((value - PAR_SCALE_MIN) / (PAR_SCALE_MAX - PAR_SCALE_MIN)) * 100));
+
+/** The level tick's position: where zero sits on the fixed scale. */
+export const LEVEL_TICK_PCT = parTypeTrackPct(0);
+
+/** PTR1.4 — hardest first; an exact tie goes to the type with more holes,
+ *  then to the lower par number. */
+export function orderParTypes(rows: ParTypeRowInput[]): ParTypeRowInput[] {
+  return [...rows].sort((a, b) => b.perHole - a.perHole || b.holes - a.holes || a.par - b.par);
+}
+
+/** PTR1.5 — the par type that may take amber, or null when the leader's gap
+ *  over the second is under HARDEST_MIN_GAP (a near-tie claims no hardest). */
+export function hardestParType(ordered: ParTypeRowInput[]): ParTypeRowInput | null {
+  const [top, second] = ordered;
+  if (!top) return null;
+  if (second && top.perHole - second.perHole < HARDEST_MIN_GAP) return null;
+  return top;
+}
 
 const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = ({ courseId, courseName }) => {
   const { t } = useTranslation('courses');
