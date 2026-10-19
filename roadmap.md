@@ -1,5 +1,8 @@
 # Roadmap
 
+## BRIEF_REVIEWS_FEW_COPY_1 - REVIEWS_FEW_COPY_1
+- [ ] Blocked before implementation by FC8: reviewsState3.test.tsx:46,99 protects the old headlines; reviewsState4.test.tsx:96-100,106 protects the finding paragraph. Await explicit test authorization. Also resolve FC7's retained count/spread assertions after removal of their element, and FC5's shared one-rating-row effect versus the scope freeze. No application or test edits; no tests run. Last reported full suite: npx vitest run, 1,810 passing / 233 files.
+
 ## EDGE_KEY_1 — EK6 PARTIALLY LIFTED (one value)
 - [x] Removed the `marginTop={6}` override on the Facts call in `EdgeSection` (`ManySections.tsx:256`), so the strip falls back to the component's owned default of 15; no literal typed. Reading confirmed first: `EdgeSection` returns null when `s.measured.length === 0` and the key's `drawn` set uses the identical `edge != null` predicate, so the tiles can never sit under a bare chart. Measured in a temporary fixture (deleted): 11px above the key, 15px below. `npx vitest run`: 1,810 passing / 233 files, zero failures, no test changes; build OK. Report: `EDGE_KEY_1_EK6_report.md`.
 
