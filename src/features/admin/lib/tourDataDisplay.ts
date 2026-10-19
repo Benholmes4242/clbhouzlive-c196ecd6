@@ -3,6 +3,11 @@
  * Pure, so the rules the brief states are unit-tested.
  */
 
+/** Shared exact-name matching for Rankings and the loaded player directory. */
+export function matchKey(name: string | null | undefined): string {
+  return (name ?? '').replace(/\u2019/g, "'").replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
 /** Any all-caps word of 2+ letters becomes title case; mixed case stays. */
 export function normaliseRankingName(name: string | null | undefined): string {
   if (!name) return '';

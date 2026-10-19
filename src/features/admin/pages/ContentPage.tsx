@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { formatAgo } from '../lib/formatAgo';
+import { matchKey } from '../lib/tourDataDisplay';
 import { toast } from '@/lib/toast';
 import {
   Plus, Search, RefreshCw, Image as ImageIcon,
@@ -774,9 +775,13 @@ export function TourSection() {
   const [fallback, setFallback] = useState<PlayerRow | null>(null);
   const activePlayerId = params.get('player');
   const setParam = (k: string, v: string | null, push = false) => {
-    const next = new URLSearchParams(params);
-    if (v == null) next.delete(k); else next.set(k, v);
-    setParams(next, { replace: !push });
+    // Merge queued edits so opening the directory also retains its search.
+    setParams(current => {
+      const next = new URLSearchParams(current);
+      if (v == null) next.delete(k); else next.set(k, v);
+      if (k === 'sub' && v !== 'players') next.delete('q');
+      return next;
+    }, { replace: !push });
   };
 
   useEffect(() => {
@@ -816,9 +821,19 @@ export function TourSection() {
         noPhotoSet={noPhotoSet}
         onOpenDirectory={() => setParam('sub', 'players', true)}
         onOpenPlayer={async (id, name) => {
-          // BRIEF_TOUR_RANKINGS_OPEN_PLAYER — a linked ranking row opens the
-          // same headshot sheet. When the id is outside the loaded directory,
-          // fetch that one sr_players row and use it as the fallback.
+          // Exact-name fallback never chooses between same-name players.
+          if (id == null) {
+            const key = matchKey(name);
+            const matches = key ? list.filter(p => matchKey(p.fullName || `${p.firstName ?? ''} ${p.lastName ?? ''}`) === key) : [];
+            if (matches.length === 1) {
+              setParam('player', matches[0].id, true);
+            } else {
+              setParam('sub', 'players', true);
+              setParam('q', name);
+            }
+            return;
+          }
+          // Linked rows outside the loaded directory retain the single fetch.
           if (list.some(p => p.id === id)) { setParam('player', id, true); return; }
           const { data, error } = await supabase
             .from('sr_players')
@@ -850,7 +865,8 @@ function TourPlayersTab({ players: data, isLoading, refetch, sync, cacheBust, on
   sync: { syncing: boolean; syncLabel: string; handleSync: () => Promise<void> };
   cacheBust: number; onOpen: (id: string) => void;
 }) {
-  const [search, setSearch] = useState('');
+  const [params] = useSearchParams();
+  const [search, setSearch] = useState(() => params.get('q') ?? '');
   const [page, setPage] = useState(1);
   const [tourFilter, setTourFilter] = useState('all');
   const { syncing, syncLabel, handleSync } = sync;
