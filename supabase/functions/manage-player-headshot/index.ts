@@ -2,23 +2,27 @@ import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 
 import { corsFor } from '../_shared/cors.ts';
-// Tour code → R2 folder name mapping (matches playerHeadshot.ts)
+import { objectPath, s3Encode, objectName } from './s3Encode.ts';
+// Tour code -> R2 folder name mapping (matches playerHeadshot.ts)
 const TOUR_FOLDER: Record<string, string> = {
   pga: 'PGA Tour',
   euro: 'DP World Tour',
   lpga: 'LPGA',
   pgad: 'Korn Ferry',
   liv: 'LIV',
-  champ: 'Champions Tour',
+  champ: 'PGA Champions',
 };
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-// AWS Sig V4 helper
+// AWS Sig V4 helper. canonicalPath is the already-encoded object path and goes
+// into the canonical request as-is; deriving it from new URL(url).pathname can
+// re-normalise characters and break the signature.
 async function signRequest(
   method: string,
   url: string,
+  canonicalPath: string,
   body: ArrayBuffer | null,
   accessKeyId: string,
   secretAccessKey: string,
@@ -39,7 +43,7 @@ async function signRequest(
 
   const canonicalHeaders = `host:${parsedUrl.host}\nx-amz-content-sha256:${contentHash}\nx-amz-date:${amzDateTime}\n`;
   const signedHeaders = 'host;x-amz-content-sha256;x-amz-date';
-  const canonicalRequest = `${method}\n${parsedUrl.pathname}\n\n${canonicalHeaders}\n${signedHeaders}\n${contentHash}`;
+  const canonicalRequest = `${method}\n${canonicalPath}\n\n${canonicalHeaders}\n${signedHeaders}\n${contentHash}`;
 
   const crHash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(canonicalRequest)))).map(b => b.toString(16).padStart(2, '0')).join('');
   const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
@@ -117,15 +121,18 @@ serve(async (req) => {
 
       const normalizedTourCode = typeof tourCode === 'string' ? tourCode.toLowerCase() : '';
       const folder = TOUR_FOLDER[normalizedTourCode] || 'Misc';
-      const objectKey = `${folder}/${playerName}.webp`;
-      const deleteUrl = `https://${accountId}.r2.cloudflarestorage.com/${bucket}/${encodeURIComponent(folder)}/${encodeURIComponent(playerName)}.webp`;
+      const objectKey = `${folder}/${objectName(folder, playerName)}.webp`;
+      const deletePath = objectPath(bucket, folder, playerName);
+      const deleteUrl = `https://${accountId}.r2.cloudflarestorage.com${deletePath}`;
 
-      const headers = await signRequest('DELETE', deleteUrl, null, accessKeyId, secretAccessKey, accountId, '');
+      const headers = await signRequest('DELETE', deleteUrl, deletePath, null, accessKeyId, secretAccessKey, accountId, '');
       const resp = await fetch(deleteUrl, { method: 'DELETE', headers });
 
       if (!resp.ok && resp.status !== 404) {
-        const errText = await resp.text();
-        throw new Error(`R2 delete failed: ${resp.status} - ${errText}`);
+        // R2's XML body carries the canonical request and signature: log it
+        // server-side only, never return it to the admin toast.
+        console.error('R2 delete failed body:', await resp.text());
+        throw new Error(`R2 delete failed: ${resp.status}`);
       }
 
       return new Response(JSON.stringify({ success: true, deleted: objectKey }), {
@@ -150,24 +157,28 @@ serve(async (req) => {
       // If there was an old photo to remove (could be in a different tour folder)
       const oldFolder = normalizedOldTourCode ? (TOUR_FOLDER[normalizedOldTourCode] || 'Misc') : folder;
       if (oldFolder) {
-        const oldDeleteUrl = `https://${accountId}.r2.cloudflarestorage.com/${bucket}/${encodeURIComponent(oldFolder)}/${encodeURIComponent(playerName)}.webp`;
-        const delHeaders = await signRequest('DELETE', oldDeleteUrl, null, accessKeyId, secretAccessKey, accountId, '');
+        const oldDeletePath = objectPath(bucket, oldFolder, playerName);
+        const oldDeleteUrl = `https://${accountId}.r2.cloudflarestorage.com${oldDeletePath}`;
+        const delHeaders = await signRequest('DELETE', oldDeleteUrl, oldDeletePath, null, accessKeyId, secretAccessKey, accountId, '');
         await fetch(oldDeleteUrl, { method: 'DELETE', headers: delHeaders }).catch(() => {});
       }
 
       // Convert to webp by just uploading as-is (the file should ideally be webp, but we accept any image)
       const fileContent = await file.arrayBuffer();
 
-      const uploadUrl = `https://${accountId}.r2.cloudflarestorage.com/${bucket}/${encodeURIComponent(folder)}/${encodeURIComponent(playerName)}.webp`;
-      const upHeaders = await signRequest('PUT', uploadUrl, fileContent, accessKeyId, secretAccessKey, accountId, 'image/webp');
+      const uploadPath = objectPath(bucket, folder, playerName);
+      const uploadUrl = `https://${accountId}.r2.cloudflarestorage.com${uploadPath}`;
+      const upHeaders = await signRequest('PUT', uploadUrl, uploadPath, fileContent, accessKeyId, secretAccessKey, accountId, 'image/webp');
       const upResp = await fetch(uploadUrl, { method: 'PUT', headers: upHeaders, body: fileContent });
 
       if (!upResp.ok) {
-        const errText = await upResp.text();
-        throw new Error(`R2 upload failed: ${upResp.status} - ${errText}`);
+        // R2's XML body carries the canonical request and signature: log it
+        // server-side only, never return it to the admin toast.
+        console.error('R2 upload failed body:', await upResp.text());
+        throw new Error(`R2 upload failed: ${upResp.status}`);
       }
 
-      const publicUrl = `${publicBaseUrl}/${encodeURIComponent(folder)}/${encodeURIComponent(playerName)}.webp`;
+      const publicUrl = `${publicBaseUrl}/${s3Encode(folder)}/${s3Encode(objectName(folder, playerName))}.webp`;
 
       return new Response(JSON.stringify({ success: true, publicUrl, folder, playerName }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
