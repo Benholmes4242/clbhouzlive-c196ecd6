@@ -19,6 +19,9 @@
 
 import React from 'react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
+import { formatIndex, INDEX_DOOR_ROUTE } from '../sheetState';
+import type { HandicapNavValue } from './HcpStrip';
 
 const CHEVRON = '\u203A';
 
@@ -31,6 +34,7 @@ interface Props {
   onOpenCourses?: () => void;
   /** The member's business names; empty puts "Create a business profile" under the row. */
   businessNames: string[];
+  handicap?: HandicapNavValue | null;
 }
 
 function Row({ label, onClick, trailing, subLabel }: { label: string; onClick: () => void; trailing?: React.ReactNode; subLabel?: string }) {
@@ -49,15 +53,27 @@ function Row({ label, onClick, trailing, subLabel }: { label: string; onClick: (
         <div style={{ fontWeight: 700, fontSize: 15, letterSpacing: '-0.01em', color: A.INK }}>{label}</div>
         {subLabel && <div style={{ fontSize: 12, color: A.DIM, marginTop: 2 }}>{subLabel}</div>}
       </div>
-      {/* A tag OR a chevron — never both. */}
+      {/* A tag labels a row and replaces the chevron (Admin). A value is what
+          the row is about and may accompany a chevron. Never dim live rows. */}
       {trailing ?? <span style={{ color: A.DIM, fontSize: 17, lineHeight: 1 }}>{CHEVRON}</span>}
     </button>
   );
 }
 
-export default function SheetNavGroup({ gutter, currentActor, isAdmin, onNavigate, onInviteFriends, onOpenCourses, businessNames }: Props) {
+export default function SheetNavGroup({ gutter, currentActor, isAdmin, onNavigate, onInviteFriends, onOpenCourses, businessNames, handicap }: Props) {
   return (
     <div data-sheet-nav style={{ margin: `4px ${gutter}px 0`, borderTop: `1px solid ${A.TRACK}` }}>
+      {currentActor.type === 'personal' && handicap && (
+        <Row label="Handicap" subLabel={handicap.subLabel}
+          onClick={() => onNavigate(INDEX_DOOR_ROUTE)}
+          trailing={
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+              <span className="tabular-nums" style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em', color: A.INK, fontFeatureSettings: '"kern" 1, "liga" 1' }}>{formatIndex(handicap.index)}</span>
+              {handicap.direction && <IndexMovementTriangle direction={handicap.direction} color={handicap.direction === 'down' ? A.IMPROVED : A.DRIFTED} size={11} />}
+              <span style={{ color: A.DIM, fontSize: 17, lineHeight: 1 }}>{CHEVRON}</span>
+            </span>
+          } />
+      )}
       {currentActor.type === 'personal' && onOpenCourses && (
         <Row label="Your courses" subLabel="Every course you have played, and how you play it" onClick={onOpenCourses} />
       )}

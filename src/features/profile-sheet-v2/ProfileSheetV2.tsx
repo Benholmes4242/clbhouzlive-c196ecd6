@@ -38,6 +38,7 @@ import SheetCards from './components/SheetCards';
 import IdentityHeader from './components/IdentityHeader';
 import QuickActionsRow from './components/QuickActionsRow';
 import SheetNavGroup from './components/SheetNavGroup';
+import { handicapNavValue } from './components/HcpStrip';
 import SignOutRow from './components/SignOutRow';
 
 /** One side gutter for the sheet's unboxed content (quick actions + nav rows). */
@@ -287,6 +288,7 @@ export default function ProfileSheetV2({
                 onInviteFriends={handleInviteFriends}
                 onOpenCourses={handleOpenCourseAnalytics}
                 businessNames={profiles.filter((p) => p.type === 'business').map((p) => p.name)}
+                handicap={handicapNavValue(analyticsState, histQ.data as { observed_at: string; handicap_index: number }[] | undefined)}
               />
               <SignOutRow onNavigate={onNavigate} />
             </div>
