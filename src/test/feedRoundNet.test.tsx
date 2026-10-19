@@ -92,12 +92,12 @@ describe('FN1.2 / FN1.4 dots and fill follow net', () => {
   it('a gross birdie on a stroke hole grades in the birdie tone', () => {
     const shape = shapeOf([{ par: 4, strokes: 3, si: 1 }, ...Array.from({ length: 17 }, (_, i) => ({ par: 4, strokes: 4, si: i + 2 }))]);
     const received = feedStrokesReceived(shape, 1)!;
-    expect(feedHoleDots(shape, received)[0].tone).toBe(TOPAR_UNDER_DARK);
+    expect(feedHoleDots(shape)[0].tone).toBe(TOPAR_UNDER_DARK);
   });
 
   it('a gross bogey on a stroke hole grades in the bogey tone', () => {
     const received = feedStrokesReceived(flat(5), 18)!;
-    const dots = feedHoleDots(flat(5), received);
+    const dots = feedHoleDots(flat(5));
     expect(new Set(dots.map((d) => d.tone)).size).toBe(1);
     expect(dots[0].tone).toBe(SC_BOGEY_DARK);
   });

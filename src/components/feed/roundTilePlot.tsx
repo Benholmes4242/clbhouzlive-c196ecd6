@@ -116,9 +116,9 @@ export interface FeedDot {
 }
 
 /** BEA5 — one dot per played hole, graded in the scorecard ramp. */
-/** FGD1 — grade GROSS minus par; received remains accepted for existing callers
- *  but only the trace and fill use the allowance, never the dots. */
-export function feedHoleDots(shape: HoleShape | null | undefined, received?: readonly number[] | null): FeedDot[] {
+/** FGD1 — grade GROSS minus par. The allowance feeds the trace and the fill
+ *  only; the dots never take it, so this takes no parameter for it. */
+export function feedHoleDots(shape: HoleShape | null | undefined): FeedDot[] {
   if (!shape) return [];
   const out: FeedDot[] = [];
   shape.holes.forEach((hole, index) => {
@@ -219,7 +219,7 @@ export function RoundTilePlot({
   const path = smoothPath(points);
   const baselineY = yFor(0);
   const wentUnder = Math.min(...values) < 0;
-  const dots = feedHoleDots(shape, received);
+  const dots = feedHoleDots(shape);
   const feat = feedFeat(shape);
   const last = points.at(-1);
 

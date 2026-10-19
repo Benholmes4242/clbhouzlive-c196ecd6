@@ -42,7 +42,7 @@ describe('FGD1 gross dots on the net trace', () => {
     if (!received) throw new Error('Expected eighteen-hole allowance');
     expect(shape.series.at(-1)).toBe(16);
     expect(feedNetSeries(shape, received).at(-1)).toBe(-4);
-    expect(feedHoleDots(shape, received).filter((dot) => dot.tone === SC_BOGEY_DARK)).toHaveLength(16);
+    expect(feedHoleDots(shape).filter((dot) => dot.tone === SC_BOGEY_DARK)).toHaveLength(16);
   });
 
   it('five gross birdies off three retain five red dots and no allowance-created gold dots', () => {
