@@ -1,7 +1,6 @@
 import React from 'react';
 import { describe, it, expect, beforeAll } from 'vitest';
 import { render } from '@testing-library/react';
-import FormSection from '@/features/profile-sheet-v2/components/FormSection';
 import { HcpTrendChart } from '@/components/profile/handicap/whs/charts/HcpTrendChart';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { identityLine, formBars } from '@/features/profile-sheet-v2/sheetState';
@@ -34,20 +33,8 @@ describe('V3 D form colour follows the effect', () => {
   it('most recent movement is current index minus index played off', () => {
     expect(bars[2]).toMatchObject({ id: 'c', value: 0.8, movement: -0.2 });
   });
-  it('a POSITIVE bar is green when it lowered the index; a NEGATIVE bar is grey when it did not', () => {
-    const { container } = render(<FormSection bars={bars} />);
-    const els = container.querySelectorAll('[data-form-bar]');
-    expect(els[0].getAttribute('data-below')).toBe('true');
-    expect(els[0].getAttribute('data-lowered')).toBe('false');
-    expect(els[2].getAttribute('data-below')).toBe('false');
-    expect(els[2].getAttribute('data-lowered')).toBe('true');
-  });
-  it('the head renders no summary text', () => {
-    const { container } = render(<FormSection bars={bars} />);
-    const text = container.textContent ?? '';
-    expect(text).not.toMatch(/better|worse|level|vs index/i);
-    expect(text).toContain('Green rounds lowered your index.');
-  });
+
+
 });
 
 describe('V3 C HcpTrendChart simplified prop', () => {

@@ -8,7 +8,8 @@ vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => <span /
 
 import SheetCards from '@/features/profile-sheet-v2/components/SheetCards';
 import ActorCards from '@/features/profile-sheet-v2/components/ActorCards';
-import FormSection from '@/features/profile-sheet-v2/components/FormSection';
+import SheetNavGroup from '@/features/profile-sheet-v2/components/SheetNavGroup';
+import { handicapNavValue } from '@/features/profile-sheet-v2/components/HcpStrip';
 import {
   deriveSheetHcpState, isSyncFailing, handicapSentence, formBars, type SheetHcpState,
 } from '@/features/profile-sheet-v2/sheetState';
@@ -70,9 +71,9 @@ describe('profile sheet states (S.2)', () => {
     expect(has('failing')).toBe(true);
     expect(has('connect') || has('syncing') || has('form')).toBe(false);
   });
-  it('(e) whs with index: one merged card holding the form; no courses card (V6 E)', () => {
+  it('(e) whs with index: no connected card or form', () => {
     const has = cards(deriveSheetHcpState({ ...base, connection: { provider: 'england_golf' }, egHandicapIndex: 1.6 }));
-    expect(has('handicap') && has('form')).toBe(true);
+    expect(has('handicap') || has('form')).toBe(false);
     expect(has('courses')).toBe(false);
     expect(has('connect')).toBe(false);
   });
@@ -93,17 +94,8 @@ describe('profile sheet parts', () => {
       profiles={[{ id: '1', type: 'personal', name: 'Ben' }, { id: '2', type: 'business', name: 'clbhouz' }]} onSwitchProfile={() => {}} />);
     expect(getAllByLabelText('3 unread')).toHaveLength(1);
   });
-  it('negative form bar hangs below the line, positive rises above, true minus', () => {
-    const { container } = render(<FormSection bars={bars} />);
-    const els = container.querySelectorAll('[data-form-bar]');
-    expect(els[0].getAttribute('data-below')).toBe('true');
-    expect(els[1].getAttribute('data-below')).toBe('false');
-    expect(els[0].textContent).toBe('\u22120.9');
-  });
-  it('form card absent below two rounds', () => {
-    const { container } = render(<FormSection bars={[bars[0]]} />);
-    expect(container.innerHTML).toBe('');
-  });
+
+
   it('form uses differential minus index played off, excludes nine-hole, oldest first', () => {
     const out = formBars([
       { id: 'n', play_date: '2026-10-01', handicap_differential: 1, handicap_index_at_time: 2, is_nine_hole: true },
@@ -122,27 +114,26 @@ describe('profile sheet parts', () => {
 });
 
 describe('profile sheet corrections (V)', () => {
-  it('V.2 no eg index but a trend current figure renders the index card, not syncing', () => {
+  it('V.2 trend current resolves ready without a connected card', () => {
     const s = deriveSheetHcpState({ ...base, connection: { provider: 'england_golf' }, trendCurrent: 3.4 });
     expect(s).toEqual({ kind: 'ready', index: 3.4 });
     const { container } = render(
       <SheetCards state={s} history90={[]} bars={bars}
         onNavigate={() => {}} now={Date.parse('2026-10-12')} />,
     );
-    expect(container.querySelector('[data-card="handicap"]')).not.toBeNull();
+    expect(container.querySelector('[data-card="handicap"]')).toBeNull();
     expect(container.querySelector('[data-card="syncing"]')).toBeNull();
   });
 
-  it('V6 D the merged card has one door, View handicap; no Your rounds door', () => {
+  it('connected Handicap row opens the same handicap destination', () => {
     const go = vi.fn();
-    const { getByText, queryByText, container } = render(
-      <SheetCards state={{ kind: 'ready', index: 1.6 }} history90={history} bars={bars}
-        onNavigate={go} now={Date.parse('2026-10-12')} />,
+    const { container } = render(
+      <SheetNavGroup gutter={20} currentActor={{ id: 'p', type: 'personal' }} isAdmin={false}
+        businessNames={[]} onNavigate={go} handicap={handicapNavValue({ kind: 'ready', index: 1.6 }, history)} />,
     );
-    expect(container.querySelectorAll('button').length - 2).toBe(1); // minus the 30d/90d pair
-    expect(queryByText('Your rounds')).toBeNull();
-    expect(getByText("How you\u2019re playing")).toBeTruthy();
-    getByText('View handicap').click();
+    const first = container.querySelector('button');
+    expect(first).not.toBeNull();
+    first?.click();
     expect(go).toHaveBeenCalledWith('/handicap');
   });
 

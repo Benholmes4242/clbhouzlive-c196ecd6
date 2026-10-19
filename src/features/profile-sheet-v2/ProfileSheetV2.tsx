@@ -38,15 +38,16 @@ import SheetCards from './components/SheetCards';
 import IdentityHeader from './components/IdentityHeader';
 import QuickActionsRow from './components/QuickActionsRow';
 import SheetNavGroup from './components/SheetNavGroup';
+import { handicapNavValue } from './components/HcpStrip';
 import SignOutRow from './components/SignOutRow';
 
 /** One side gutter for the sheet's unboxed content (quick actions + nav rows). */
 const SHEET_GUTTER = 20;
 import YourCourseAnalyticsSheet from './components/YourCourseAnalyticsSheet';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
-import { useWhsConnection, useHandicapTrend, useHandicapHistory, useAllScores } from '@/lib/whs/hooks';
+import { useWhsConnection, useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { deriveSheetHcpState, sheetIndex, identityLine, formBars } from './sheetState';
+import { deriveSheetHcpState, sheetIndex, identityLine } from './sheetState';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 
@@ -148,7 +149,6 @@ export default function ProfileSheetV2({
   const profileQ = useUserProfile(sheetUserId);
   const trendQ = useHandicapTrend(open ? conn?.id : undefined);
   const histQ = useHandicapHistory(open ? conn?.id : undefined, 90);
-  const scoresQ = useAllScores(open ? conn?.id : undefined);
   const { isFetched: connFetched, isError: connError } = useWhsConnection(analyticsUserId);
   const anyError = profileQ.isError || connError || trendQ.isError || histQ.isError;
   const settled = anyError ||
@@ -275,8 +275,6 @@ export default function ProfileSheetV2({
               />
               <SheetCards
                 state={analyticsState}
-                history90={histQ.data as { observed_at: string; handicap_index: number }[] | undefined}
-                bars={formBars(scoresQ.data, sheetIndex(analyticsState))}
                 onNavigate={onNavigate}
               />
               <SheetNavGroup
@@ -287,6 +285,7 @@ export default function ProfileSheetV2({
                 onInviteFriends={handleInviteFriends}
                 onOpenCourses={handleOpenCourseAnalytics}
                 businessNames={profiles.filter((p) => p.type === 'business').map((p) => p.name)}
+                handicap={handicapNavValue(analyticsState, histQ.data as { observed_at: string; handicap_index: number }[] | undefined)}
               />
               <SignOutRow onNavigate={onNavigate} />
             </div>

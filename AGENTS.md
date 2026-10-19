@@ -31,6 +31,7 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Rankings hand all row taps to TourSection, which alone resolves directory names and sheet navigation, so linked and unlinked entrypoints cannot drift.
 
 - Owner copy uses `profileOwnerVoice` to share grammar.
+- Sheet handicap ownership: see HcpStrip.tsx header; prevents connect-card flashes.
 - Small-sample Reviews reuse SingleReview's RaterReviewRow, so context and media cannot drift.
 - Reviews States 3/4 share FewReviews and RatingTierDistribution to prevent population drift.
 - Course photo publication and metadata live in `src/lib/courseMedia`; shared payloads prevent entrypoint drift.
