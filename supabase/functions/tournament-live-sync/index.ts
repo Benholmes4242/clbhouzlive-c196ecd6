@@ -157,36 +157,36 @@ Deno.serve(async (req) => {
 
     if (upcomingTournaments?.length) {
       if (shouldFetchPreEventTeeTimes(now)) {
-      console.log(`[LiveSync] ${upcomingTournaments.length} upcoming tournament(s) within 3 days — syncing tee times`);
-      for (const upcoming of upcomingTournaments) {
-        const { data: uSeason } = await supabase.from('sr_seasons').select('year, tour_name').eq('id', upcoming.season_id).maybeSingle();
-        const uYear = uSeason?.year || new Date().getFullYear();
-        const uTourSlug = getTourSlugForTeeTimes(uSeason?.tour_name || 'pga');
-        if (!uTourSlug) continue;
-        
-        try {
-          const syncUrl = `${supabaseUrl}/functions/v1/sportradar-sync`;
-          for (const roundNumber of [1, 2]) {
-          await fetch(syncUrl, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${supabaseServiceKey}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              action: 'tee_times',
-              tournamentId: upcoming.sr_id,
-              tourId: uTourSlug,
-              year: uYear,
-              roundNumber,
-            }),
-          });
+        console.log(`[LiveSync] ${upcomingTournaments.length} upcoming tournament(s) within 3 days — syncing tee times`);
+        for (const upcoming of upcomingTournaments) {
+          const { data: uSeason } = await supabase.from('sr_seasons').select('year, tour_name').eq('id', upcoming.season_id).maybeSingle();
+          const uYear = uSeason?.year || new Date().getFullYear();
+          const uTourSlug = getTourSlugForTeeTimes(uSeason?.tour_name || 'pga');
+          if (!uTourSlug) continue;
+
+          try {
+            const syncUrl = `${supabaseUrl}/functions/v1/sportradar-sync`;
+            for (const roundNumber of [1, 2]) {
+              await fetch(syncUrl, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${supabaseServiceKey}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  action: 'tee_times',
+                  tournamentId: upcoming.sr_id,
+                  tourId: uTourSlug,
+                  year: uYear,
+                  roundNumber,
+                }),
+              });
+            }
+            console.log(`[LiveSync] Pre-tournament tee times synced for ${upcoming.name}`);
+          } catch (e) {
+            console.warn(`[LiveSync] Pre-tournament tee times failed for ${upcoming.name}: ${e.message}`);
           }
-          console.log(`[LiveSync] Pre-tournament tee times synced for ${upcoming.name}`);
-        } catch (e) {
-          console.warn(`[LiveSync] Pre-tournament tee times failed for ${upcoming.name}: ${e.message}`);
         }
-      }
       }
 
       // ── Auto-regeneration: refresh stale predictions for imminent tournaments ──
@@ -386,13 +386,15 @@ async function syncTournament(
   let sportradarStatus: string | undefined;
   let syncError: string | undefined;
 
-  if (shouldFetchLeaderboard(now)) try {
-    const result = await syncLeaderboard(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id, tournament);
-    leaderboardRecords = result.records;
-    sportradarStatus = result.sportradarStatus;
-  } catch (error) {
-    syncError = error.message;
-    console.error(`[LiveSync] Leaderboard error for ${tournament.name}:`, error.message);
+  if (shouldFetchLeaderboard(now)) {
+    try {
+      const result = await syncLeaderboard(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id, tournament);
+      leaderboardRecords = result.records;
+      sportradarStatus = result.sportradarStatus;
+    } catch (error) {
+      syncError = error.message;
+      console.error(`[LiveSync] Leaderboard error for ${tournament.name}:`, error.message);
+    }
   }
 
   // Single source of truth for the active round. Leaderboard-derived when we
