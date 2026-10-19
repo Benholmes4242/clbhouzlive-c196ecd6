@@ -2,8 +2,8 @@
 
 ## BRIEF_TAB_CANON_1 - TAB_CANON_1
 - [x] TC5 FINAL authorises populated-grid-first and every additional first-element path on all tabs; path names are a floor and counts are agent-enumerated. Existing source readings confirmed with TC10's explicit WhatTheyScored exception. No changed-value protecting tests found. Baseline 1,810 passing / 233 files.
-- [ ] Apply shared first-element rules to Course/Champions/Reviews/Media, preserving You and later seams; share canonical eyebrow/title declarations and protected label exceptions.
-- [ ] Nearby IN scope via canon opt-in; preserve/report its 16px gutter and count other SectionHeader callers. Measure per-state gaps and report exact full-suite command/count and declarations.
+- [x] Applied shared first-element rules to Course/Champions/Reviews/Media; You gap rules and later seams untouched. All genuine section pairs read AboutSection canon; protected labels retained; Elsewhere rule restored.
+- [x] Nearby local canon opt-in preserves 16px gutter; 17 other SectionHeader usages unchanged. 61 acceptance samples measured 22px at 1280/628 widths (reconstructed before values and fixture limits reported). npx vitest run: 1,810 passing / 233 files, zero test changes; build OK. Report /mnt/documents/TAB_CANON_1_report.md. Hosted authenticated acceptance unavailable (external_unmanaged); populated grid root geometry verified, real account content unverified.
 
 ## BRIEF_TAB_LEAD_IN_1 - TAB_LEAD_IN_1
 - [x] Ben resolved TLA3: Elsewhere remains unchanged; only four primary Champions states receive first-section treatment.
