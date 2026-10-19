@@ -157,24 +157,28 @@ serve(async (req) => {
       // If there was an old photo to remove (could be in a different tour folder)
       const oldFolder = normalizedOldTourCode ? (TOUR_FOLDER[normalizedOldTourCode] || 'Misc') : folder;
       if (oldFolder) {
-        const oldDeleteUrl = `https://${accountId}.r2.cloudflarestorage.com/${bucket}/${encodeURIComponent(oldFolder)}/${encodeURIComponent(playerName)}.webp`;
-        const delHeaders = await signRequest('DELETE', oldDeleteUrl, null, accessKeyId, secretAccessKey, accountId, '');
+        const oldDeletePath = objectPath(bucket, oldFolder, playerName);
+        const oldDeleteUrl = `https://${accountId}.r2.cloudflarestorage.com${oldDeletePath}`;
+        const delHeaders = await signRequest('DELETE', oldDeleteUrl, oldDeletePath, null, accessKeyId, secretAccessKey, accountId, '');
         await fetch(oldDeleteUrl, { method: 'DELETE', headers: delHeaders }).catch(() => {});
       }
 
       // Convert to webp by just uploading as-is (the file should ideally be webp, but we accept any image)
       const fileContent = await file.arrayBuffer();
 
-      const uploadUrl = `https://${accountId}.r2.cloudflarestorage.com/${bucket}/${encodeURIComponent(folder)}/${encodeURIComponent(playerName)}.webp`;
-      const upHeaders = await signRequest('PUT', uploadUrl, fileContent, accessKeyId, secretAccessKey, accountId, 'image/webp');
+      const uploadPath = objectPath(bucket, folder, playerName);
+      const uploadUrl = `https://${accountId}.r2.cloudflarestorage.com${uploadPath}`;
+      const upHeaders = await signRequest('PUT', uploadUrl, uploadPath, fileContent, accessKeyId, secretAccessKey, accountId, 'image/webp');
       const upResp = await fetch(uploadUrl, { method: 'PUT', headers: upHeaders, body: fileContent });
 
       if (!upResp.ok) {
-        const errText = await upResp.text();
-        throw new Error(`R2 upload failed: ${upResp.status} - ${errText}`);
+        // R2's XML body carries the canonical request and signature: log it
+        // server-side only, never return it to the admin toast.
+        console.error('R2 upload failed body:', await upResp.text());
+        throw new Error(`R2 upload failed: ${upResp.status}`);
       }
 
-      const publicUrl = `${publicBaseUrl}/${encodeURIComponent(folder)}/${encodeURIComponent(playerName)}.webp`;
+      const publicUrl = `${publicBaseUrl}/${s3Encode(folder)}/${s3Encode(objectName(folder, playerName))}.webp`;
 
       return new Response(JSON.stringify({ success: true, publicUrl, folder, playerName }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
