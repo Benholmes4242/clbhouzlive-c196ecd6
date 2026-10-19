@@ -296,7 +296,7 @@ export function RoundTilePlot({
             />
           );
         })}
-        {last ? <circle cx={last.x} cy={last.y} r={2.6} fill={A.INK} /> : null}
+        {last && !dots.some((dot) => dot.i === points.length - 1) ? <circle cx={last.x} cy={last.y} r={2.6} fill={A.INK} /> : null}
       </svg>
     </div>
   );
