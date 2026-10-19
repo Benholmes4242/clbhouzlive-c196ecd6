@@ -1505,6 +1505,45 @@ export function ExploreCard({
     </CourseImageFallback>
   );
 
+  /* BRIEF_ROUND_TILE_1_R -- HOME ONLY. feedPlot replaces the photograph: no
+     course image, scrim or backdrop is rendered. Order: course name; poster
+     and play date; the plot on the canvas; the figures row; the poster row
+     with actions; the celebrated-by line (the last three come from WhoLine). */
+  if (feedPlot && item.kind === 'round' && size !== 'pair') {
+    const posterName = item.who?.is_viewer
+      ? t('amateur.stream.you', 'You')
+      : item.who?.display_name?.trim() || t('amateur.stream.aMember', 'A member');
+    const playDate = railCaptionDate(item.facts.play_date ?? null);
+    return (
+      <button
+        type="button"
+        onClick={onTap}
+        data-feed-round-tile="true"
+        style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', cursor: 'pointer', color: A.INK, fontFamily: SANS, ...FIGS }}
+      >
+        <span data-feed-round-head="true" style={{ display: 'block', paddingInline: 4, paddingTop: 12 }}>
+          <span data-feed-round-course="true" style={{ display: 'block', fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {kickerPartsValue.course ?? item.subject?.course_name ?? ''}
+          </span>
+          <span data-feed-round-byline="true" style={{ display: 'block', marginTop: 2, fontSize: 11.5, lineHeight: 1.45, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {playDate ? `${posterName} · ${playDate}` : posterName}
+          </span>
+        </span>
+        {shape ? <RoundTilePlot shape={shape} /> : null}
+        <span style={{ display: 'block', paddingInline: 4, marginTop: 8 }}>
+          <WhoLine
+            item={item}
+            size={size}
+            onPhoto={false}
+            onWhoTap={onWhoTap}
+            engagement={engagement}
+            roundIdentity={{ course: kickerPartsValue.course, date: playDate, gross: item.facts.gross ?? null, toPar: item.facts.to_par ?? null, net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null, medalsGold: medals?.gold ?? null, medalsSilver: medals?.silver ?? null, medalsBronze: medals?.bronze ?? null }}
+          />
+        </span>
+      </button>
+    );
+  }
+
   return (
     <button
       type="button"
@@ -1556,13 +1595,6 @@ export function ExploreCard({
               : undefined}
           />
         </span>
-      ) : null}
-      {/* BRIEF_ROUND_TILE_1 — HOME ONLY. The plot sits on the canvas, full
-          tile width, under the course name and poster line above it. No
-          scoring key; the one named mark (ace / albatross / eagle) is drawn
-          by the plot itself. */}
-      {feedPlot && item.kind === 'round' && size !== 'pair' && shape ? (
-        <RoundTilePlot shape={shape} />
       ) : null}
     </button>
   );
