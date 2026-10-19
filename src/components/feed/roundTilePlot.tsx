@@ -35,6 +35,7 @@ import {
   SC_DOUBLE_DARK,
 } from '@/features/courses/components/holes/_constants';
 import { TOPAR_UNDER_DARK, TOPAR_EVEN_DARK } from '@/features/tourhub/_shared/tokens';
+import type { AchievementCallout } from '@/features/explore-magazine/cardTreatment';
 import { scorecardFeatFor, type ScorecardFeatKind } from '@/features/courses/_shared/scorecard/scorecardFeat';
 
 const PAD_X = 6;
@@ -90,6 +91,33 @@ export function panelShowsCallout(kind: string | null, shape: HoleShape | null |
      Hole feats wait (no placeholder, no reserved height); decide once settled. */
   if (shape === undefined) return false;
   return feedFeat(shape) == null;
+}
+
+/** BRIEF_ROUND_TILE_1_R4 -- the Home panel's one feat. When the plot's mark
+ *  covers the headline, the HEADLINE is suppressed and the panel falls through
+ *  ONCE to the next-ranked feat; it disappears only when there is none. The
+ *  panel always carries exactly one feat (never a two-item list). */
+export function homePanelCallout(
+  callout: AchievementCallout | null,
+  shape: HoleShape | null | undefined,
+): AchievementCallout | null {
+  if (!callout) return null;
+  if (callout.kind !== 'ace' && callout.kind !== 'albatross' && callout.kind !== 'eagle'
+    && callout.kind !== 'birdies' && callout.kind !== 'clean') {
+    return callout; // board feats: record, net_record, rank_up
+  }
+  if (callout.kind === 'birdies' || callout.kind === 'clean') {
+    return { ...callout, feats: callout.feats.slice(0, 1) };
+  }
+  if (shape === undefined) return null; // R3: hole batch unsettled
+  if (panelShowsCallout(callout.kind, shape)) {
+    return { ...callout, feats: callout.feats.slice(0, 1) };
+  }
+  const next = callout.feats[1];
+  if (!next) return null;
+  if (next.kind === 'birdies') return { kind: 'birdies', count: next.count, feats: [next], tier: 'ink' };
+  if (next.kind === 'clean') return { kind: 'clean', feats: [next], tier: 'ink' };
+  return { kind: next.kind, count: next.count, hole: null, feats: [next], tier: callout.tier };
 }
 
 export function RoundTilePlot({
