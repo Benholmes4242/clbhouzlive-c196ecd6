@@ -3,6 +3,7 @@ import { resolveTimezone } from '../_shared/countryTimezoneMap.ts'
 import { roundStarted } from '../_shared/roundState.ts'
 
 import { corsFor } from '../_shared/cors.ts';
+import { logSportradarCall } from '../_shared/sportradarCallLog.ts';
 // URL Builders - Match Sportradar docs exactly
 // Uses SPORTRADAR_ACCESS_LEVEL env var (trial or production) instead of hardcoding
 const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
