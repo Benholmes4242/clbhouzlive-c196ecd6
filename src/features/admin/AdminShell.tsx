@@ -65,6 +65,13 @@ export default function AdminShell() {
     (p) => p.startsWith('/admin-v2'),
   );
 
+  /* BRIEF_ADMIN_SETTINGS_FIX1: hooks must run before the early returns, or the
+     hook count grows when the role resolves and React throws. useAdminSettings
+     already disables its query unless panelCan(role).manageAdmins, so calling
+     it while role is 'none' or loading fetches nothing. */
+  const settings = useAdminSettings(role);
+  const maintenancePoll = useMaintenanceMode();
+
   if (loading) return <AdminLoading />;
   if (role === 'none' || role === 'unknown') return <AdminAccessDenied />;
 
@@ -78,8 +85,6 @@ export default function AdminShell() {
      header on every admin page. Full admins read the authoritative settings
      query and get the elapsed time and the Turn off button; other roles read
      the member-facing poll and get the bare bar. */
-  const settings = useAdminSettings(role);
-  const maintenancePoll = useMaintenanceMode();
   const maintenanceOn = can.manageAdmins ? (settings.data?.maintenance.on ?? false) : maintenancePoll.on;
 
   // The dark app-shell has zero top padding (body.route-clubhouse), including admin.
