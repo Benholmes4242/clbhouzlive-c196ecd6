@@ -43,7 +43,7 @@ async function signRequest(
 
   const canonicalHeaders = `host:${parsedUrl.host}\nx-amz-content-sha256:${contentHash}\nx-amz-date:${amzDateTime}\n`;
   const signedHeaders = 'host;x-amz-content-sha256;x-amz-date';
-  const canonicalRequest = `${method}\n${parsedUrl.pathname}\n\n${canonicalHeaders}\n${signedHeaders}\n${contentHash}`;
+  const canonicalRequest = `${method}\n${canonicalPath}\n\n${canonicalHeaders}\n${signedHeaders}\n${contentHash}`;
 
   const crHash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(canonicalRequest)))).map(b => b.toString(16).padStart(2, '0')).join('');
   const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
