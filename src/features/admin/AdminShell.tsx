@@ -20,6 +20,7 @@ const ContentPage = lazy(() => import('./pages/ContentPage'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
 const HealthPage = lazy(() => import('./pages/HealthPage'));
 const InboxPage = lazy(() => import('./pages/InboxPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
 const SECTION_TITLES: Record<string, string> = {
   dashboard:  'Command centre',
@@ -28,6 +29,7 @@ const SECTION_TITLES: Record<string, string> = {
   content:    'Content',
   analytics:  'Analytics',
   health:     'Health',
+  settings:   'Settings',
 };
 
 
