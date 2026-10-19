@@ -43,7 +43,7 @@ describe('REVIEWS_STATE_3', () => {
     const { container } = tab();
     expect(container.querySelector('[data-community-score]')?.textContent).toBe('8.1');
     expect(container.querySelector('[data-viewer-delta]')?.textContent).toContain('0.3 above');
-    expect(container.querySelector('[data-community-headline]')?.textContent).toBe('8.1 from the other two');
+    expect(container.querySelector('[data-community-headline]')?.textContent).toContain('sits at 8.1');
     expect(container.querySelector('[data-individual-scores]')?.textContent).toBe('8.1 and 8.1');
     expect(container.querySelector('[data-community-headline]')?.textContent).not.toContain('8.2');
   });
@@ -96,7 +96,7 @@ describe('REVIEWS_STATE_3', () => {
   it('unrated viewer keeps entire sample and no delta', () => {
     fixture.user = { id: 'unrated' }; fixture.rows = [row('mark', 8.1), row('thomas', 8.1)];
     const { container } = tab();
-    expect(container.querySelector('[data-community-headline]')?.textContent).toBe('8.1 from two golfers');
+    expect(container.querySelector('[data-community-headline]')?.textContent).toContain('sits at 8.1');
     expect(container.querySelector('[data-viewer-delta]')).toBeNull();
   });
   it('known visible people are first, stable inside groups, no unseen person added', () => {

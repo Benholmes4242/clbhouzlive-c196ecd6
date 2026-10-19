@@ -496,7 +496,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             onAddYours={() => handleWriteReview(myReview ? 'edit' : 'write')}
           />
         ) : headerResolved && (isFewReviews(community.totalRatingCount) || isFiveToNineReviews(community.totalRatingCount)) ? (
-          <FewReviews community={community} reviews={reviews} viewerId={user?.id} courseId={courseId}
+          <FewReviews community={community} reviews={reviews} viewerId={user?.id} courseId={courseId} courseName={courseName}
             onMediaClick={(review, index, el) => mediaClickHandler(review)(index, el)}
             onWrite={() => handleWriteReview('write')}
             ownReview={myReview && <AboutSection heading="Your review">{renderRow(myReview, true)}{(() => { const response = reviewResponses?.find(r => r.review_id === myReview.id); return response ? <ResponseDisplay response={response} courseId={courseId} viewerClaim={businessClaim} /> : null; })()}<FlatAction label="Edit your review" onClick={() => handleWriteReview('edit')} /></AboutSection>}

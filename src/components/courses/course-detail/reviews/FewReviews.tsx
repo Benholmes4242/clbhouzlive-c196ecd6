@@ -26,6 +26,7 @@ interface FewReviewsProps {
   reviews: CourseReview[];
   viewerId?: string;
   courseId: string;
+  courseName: string;
   onMediaClick: (review: CourseReview, index: number, el: HTMLElement | null) => void;
   ownReview: React.ReactNode;
   afterReview?: (review: CourseReview) => React.ReactNode;
@@ -36,7 +37,7 @@ const kicker = VERDICT_KICKER;
 const heading = TAB_TITLE;
 const prose: React.CSSProperties = { color: SURFACE.dark.body, fontSize: 12.5, lineHeight: 1.55, margin: '14px 0 0' };
 
-export function FewReviews({ community, reviews, viewerId, courseId, onMediaClick, ownReview, afterReview, onWrite }: FewReviewsProps) {
+export function FewReviews({ community, reviews, viewerId, courseId, courseName, onMediaClick, ownReview, afterReview, onWrite }: FewReviewsProps) {
   const { data: members } = useMembersWhoPlayedCourse(viewerId ? courseId : undefined, viewerId);
   const stateFour = isFiveToNineReviews(community.totalRatingCount);
   if (!isFewReviews(community.totalRatingCount) && !stateFour) return null;
@@ -56,7 +57,7 @@ export function FewReviews({ community, reviews, viewerId, courseId, onMediaClic
     <section style={{ ...section, paddingTop: 0 }}>
       <div style={kicker}>{capitalizedRatings(community.totalRatingCount)} golfers have rated it</div>
       {facts ? <>
-        <h2 data-community-headline style={heading}>{community.score?.toFixed(1)} {ratedViewer ? `from the other ${spelledRatings(facts.count)}` : `from ${spelledRatings(facts.count)} golfers`}</h2>
+        <h2 data-community-headline style={heading}>{courseName} sits at {community.score?.toFixed(1)}</h2>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 13, marginTop: 15 }}>
           <strong data-community-score style={{ color: SURFACE.dark.ink, fontSize: 48, lineHeight: 0.9, fontWeight: 800, ...FIGS }}>{community.score?.toFixed(1)}</strong>
           <div style={{ minWidth: 0 }}>
@@ -85,7 +86,7 @@ export function FewReviews({ community, reviews, viewerId, courseId, onMediaClic
     {hasCommunityAverage(community.ratingCount) && facts && facts.bands.length > 0 && <section style={section}>
       <div style={kicker}>What they scored</div>
       {stateFour && facts.finding ? <h2 style={heading}>{facts.finding.widest.label} is the one they argue about</h2> : facts.highest && <h2 style={heading}>{facts.highest.key === 'facilities' ? 'The facilities carry it' : `The ${facts.highest.label.toLowerCase()} carries it`}</h2>}
-      <p style={{ ...prose, color: SURFACE.dark.mute, marginTop: 8 }}>The bar is the range between the lowest and highest score; the mark is the average.{ratedViewer ? ' You are not counted in either.' : ''}</p>
+      <p style={{ ...prose, color: SURFACE.dark.mute, marginTop: 8 }}>The bar is the range between the lowest and highest score; the mark is the average.</p>
       <div style={{ marginTop: 16 }}>
         {facts.bands.map(band => <div key={band.key} data-category-band={band.key} data-low={band.low} data-high={band.high} data-mean={band.mean} style={{ display: 'grid', gridTemplateColumns: '82px minmax(0, 1fr) 72px', alignItems: 'center', gap: 10, padding: '8px 0' }}>
           <span style={{ color: SURFACE.dark.body, fontSize: 11.5, fontWeight: 700, lineHeight: 1.45 }}>{band.label}</span>
