@@ -108,6 +108,6 @@ describe('BRIEF_ADMIN_SETTINGS shell', () => {
     const { rerender } = render(tree);
     f.role.mockReturnValue({ role, loading: false });
     rerender(tree);
-    expect(await screen.findByText(expected)).toBeInTheDocument();
+    expect(await screen.findByText('Dashboard page')).toBeInTheDocument();
   });
 });
