@@ -40,6 +40,7 @@ import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import { GREEN } from '@/components/manage/ui';
 import wordmark from '@/assets/clbhouz-wordmark.png.asset.json';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { FALLBACK_STORE_URL, fetchStoreLinks, pickStoreUrl } from '@/lib/storeLinks';
 
 const CANVAS = PAGE_CANVAS;
 const INK = '#FFFFFF';
@@ -57,33 +58,26 @@ const LABEL: React.CSSProperties = {
   textTransform: 'uppercase',
 };
 
-const FALLBACK_STORE_URL = 'https://apps.apple.com/app/id6752538886';
 const MARK = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
 
-/** app_config.app_download_url, https-guarded. Never a hardcoded store link. */
+/**
+ * The store link for THIS device via the shared storeLinks helpers
+ * (BRIEF_ADMIN_SETTINGS S.11). Android without a Play link keeps today's App
+ * Store target, so nothing breaks before the link is added.
+ */
 function useStoreUrl(): string {
   const [href, setHref] = React.useState(FALLBACK_STORE_URL);
   React.useEffect(() => {
     let alive = true;
-    (async () => {
-      try {
-        const { data } = await supabase
-          .from('app_config' as any)
-          .select('value')
-          .eq('key', 'app_download_url')
-          .maybeSingle();
-        const val = (data as any)?.value;
-        const url =
-          typeof val === 'string'
-            ? val
-            : val && typeof val === 'object' && typeof val.url === 'string'
-              ? val.url
-              : null;
-        if (alive && url && url.startsWith('https://')) setHref(url);
-      } catch {
+    fetchStoreLinks()
+      .then((links) => {
+        if (!alive) return;
+        const url = pickStoreUrl(links, navigator.userAgent) ?? links.appStore;
+        if (url) setHref(url);
+      })
+      .catch(() => {
         // fallback stands
-      }
-    })();
+      });
     return () => {
       alive = false;
     };
