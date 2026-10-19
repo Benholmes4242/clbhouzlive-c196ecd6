@@ -74,9 +74,9 @@ describe('BRIEF_TOUR_RANKINGS_OPEN_PLAYER rows', () => {
 
   it('falls back to player_id when there is no manual override', async () => {
     const onOpenPlayer = mount();
-    const btn = await screen.findByRole('button', { name: /Rory McIlroy/ });
+    const btn = await screen.findByRole('button', { name: /Rory Mcilroy/ });
     fireEvent.click(btn);
-    expect(onOpenPlayer).toHaveBeenCalledWith('p2', 'Rory McIlroy');
+    expect(onOpenPlayer).toHaveBeenCalledWith('p2', 'Rory Mcilroy');
   });
 
   it('an unlinked row is not a button', async () => {
