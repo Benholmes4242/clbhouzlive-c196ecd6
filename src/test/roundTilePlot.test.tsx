@@ -134,3 +134,16 @@ describe('panelShowsCallout -- one fact, one place (ROUND_TILE_1_R2)', () => {
     expect(panelShowsCallout(null, eagleRound())).toBe(false);
   });
 });
+
+describe('panelShowsCallout -- waits for the hole batch (ROUND_TILE_1_R3)', () => {
+  it('draws no hole-feat panel while the batch is unsettled', () => {
+    expect(panelShowsCallout('ace', undefined)).toBe(false);
+    expect(panelShowsCallout('albatross', undefined)).toBe(false);
+    expect(panelShowsCallout('eagle', undefined)).toBe(false);
+  });
+  it('never makes round or board feats wait on the batch', () => {
+    for (const k of ['birdies', 'clean', 'record', 'net_record', 'rank_up']) {
+      expect(panelShowsCallout(k, undefined)).toBe(true);
+    }
+  });
+});

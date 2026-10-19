@@ -85,7 +85,11 @@ export function feedFeat(shape: HoleShape | null | undefined): FeedFeat | null {
 export function panelShowsCallout(kind: string | null, shape: HoleShape | null | undefined): boolean {
   if (!kind) return false;
   const holeKind = kind === 'ace' || kind === 'albatross' || kind === 'eagle';
-  return !(holeKind && feedFeat(shape) != null);
+  if (!holeKind) return true;
+  /* BRIEF_ROUND_TILE_1_R3 -- `undefined` means the hole batch has not settled.
+     Hole feats wait (no placeholder, no reserved height); decide once settled. */
+  if (shape === undefined) return false;
+  return feedFeat(shape) == null;
 }
 
 export function RoundTilePlot({
