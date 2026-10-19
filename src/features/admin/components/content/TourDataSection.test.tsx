@@ -79,9 +79,12 @@ describe('BRIEF_TOUR_RANKINGS_OPEN_PLAYER rows', () => {
     expect(onOpenPlayer).toHaveBeenCalledWith('p2', 'Rory Mcilroy');
   });
 
-  it('an unlinked row is not a button', async () => {
-    mount();
-    const name = await screen.findByText('Ghost Player');
-    expect(name.closest('button')).toBeNull();
+  it('every row is a button, including unlinked rows', async () => {
+    const onOpenPlayer = mount();
+    for (const name of [/Eugenio Chacarra/, /Rory Mcilroy/, /Ghost Player/]) {
+      expect(await screen.findByRole('button', { name })).toBeInTheDocument();
+    }
+    fireEvent.click(screen.getByRole('button', { name: /Ghost Player/ }));
+    expect(onOpenPlayer).toHaveBeenCalledWith(null, 'Ghost Player');
   });
 });

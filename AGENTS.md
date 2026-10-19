@@ -28,6 +28,7 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Handicap-index authority and reader audit: see `src/lib/handicap/resolveHandicap.ts`.
 - The admin Analytics page and its header pill read figures only from the five `get_admin_analytics_*` RPCs via `useAnalyticsLenses.ts`, never tables, because browser reads truncate at the row cap and staff filtering belongs to the server.
 - Admin Health and drawer query ownership: see src/features/admin/AdminDrawerStatus.tsx header.
+- Rankings hand all row taps to TourSection, which alone resolves directory names and sheet navigation, so linked and unlinked entrypoints cannot drift.
 
 - Owner copy uses `profileOwnerVoice` to share grammar.
 - Small-sample Reviews reuse SingleReview's RaterReviewRow, so context and media cannot drift.

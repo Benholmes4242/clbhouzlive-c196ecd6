@@ -1,5 +1,9 @@
 # BRIEF_EXPLORE_REVIEW_TILE_A1
 
+## BRIEF_TOUR_RANKINGS_OPEN_PLAYER_FIX1
+- [x] Every row button and chevron; linked precedence preserved; unique matchKey directory match opens PhotoSheet; ambiguous/missing names open the prefilled directory; leaving clears q.
+- [x] Focused 17/17; full suite 1,780/230 -> 1,786/231 (+2 matchKey tests, +4 TourSection.nameFallback tests); one authorised unlinked-row test rewritten, no deletions. Latest preview build OK. Hosted authenticated acceptance unavailable on external_unmanaged Supabase.
+
 ## BRIEF_ADMIN_SIDE_MENU
 - [x] Ben authorizes Settings remaining at /admin-v2/health?tab=settings; Settings page untouched. Baseline 1,734 passing / 221 files, /tmp/admin-menu/before.log.
 - [x] Rebuilt 304px status-board drawer, open-only shared live and Health queries, threshold-mounted Stage 3 search, maintenance pill and identity/build footer. Existing RPCs and hooks untouched.

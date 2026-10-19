@@ -1,7 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { normaliseRankingName, rankingTourLabel, formatPoints, feedsHeadline } from './tourDataDisplay';
+import { matchKey, normaliseRankingName, rankingTourLabel, formatPoints, feedsHeadline } from './tourDataDisplay';
 
 describe('Tour data display rules', () => {
+  it('matches case and collapsed whitespace', () => {
+    expect(matchKey('Eugenio  CHACARRA')).toBe(matchKey('Eugenio Chacarra'));
+    expect(matchKey('  Eugenio  CHACARRA ')).toBe('eugenio chacarra');
+  });
+  it('matches curly and straight apostrophes', () => {
+    expect(matchKey("Timothy O\u2019Neal")).toBe(matchKey("Timothy O'Neal"));
+  });
   it('title-cases all-caps surnames', () => {
     expect(normaliseRankingName('Patrick REED')).toBe('Patrick Reed');
   });
