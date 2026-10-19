@@ -1,5 +1,8 @@
 # Roadmap
 
+## FED1 — Finish marker
+- [x] Home and Explore line-only terminal circles now yield to a dot at the final series index; only one terminal-circle condition changed in each permitted component. Unmarked endpoints retain the unchanged ink terminus. TrajectoryLine and existing tests untouched. Full `npx vitest run`: 1,850 passing / 239 files before -> 1,856 passing / 240 files after, zero failures; +6 solely src/test/feedEndDot.test.tsx (Home birdie/par/double/unscored, Explore supplied birdie/unmarked). Build OK. Browser actual plots verified all eight Home/Explore finish cases, zero page errors; synthetic fixture only, not hosted authenticated acceptance. Explore still supplies achievement dots only, so par/double finish with ink there. Real partial feed rounds end at the last retained played/scored hole, not a fabricated unplayed endpoint.
+
 ## BRIEF_SPORTRADAR_QUOTA_FIT
 - [x] Centralized UTC cadence, explicit pre-event rounds 1/2 and in-play next round, gated routine requests, preserved minute local work/finalization, and logged all actual provider fetch sites. `npx vitest run`: 1,823/237 before -> 1,835/238 after, zero failures; +12 solely sportradarCadence.test.ts, existing tests untouched. Actual syncTournament isolated hour verified rounds 2/4 and 60 local writes. Preview build OK; hosted cron/execution/quota unverified without external access. Report /mnt/documents/SPORTRADAR_QUOTA_FIT_report.md includes full source-evidenced schedule inventory, absent live-round scores in live-sync's own writer, and 6,000/week versus rolling-plan arithmetic.
 
