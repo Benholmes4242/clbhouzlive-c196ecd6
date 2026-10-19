@@ -4,7 +4,7 @@
 .course-you-lead-in > div {
   padding-top: 0 !important;
 }
-.course-you-lead-in > div > section:first-child {
+.course-you-lead-in > .course-you-sections > section:first-child {
   margin-top: 0 !important;
   padding-top: 0 !important;
 }

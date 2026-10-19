@@ -363,7 +363,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     const zeroRounds = fieldRoundsTotal === 0;
     const showFieldChart = (analysis?.holes?.length ?? 0) === 18 && (fieldRoundsTotal ?? 0) >= 1;
     return wrap(
-      <div>
+      <div className="course-you-sections">
         {/* W3 — zero tracked rounds: the shared unclaimed framing leads.
             YOU_TAB_STATE_1 X1 — on this state it ABSORBS Up for grabs: the
             count and the ALL BOARDS link live here, and Up for grabs does
@@ -457,7 +457,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     );
     const circleOthers = circle.others;
     return wrap(
-      <div>
+      <div className="course-you-sections">
         {zeroRounds ? (
           <UnclaimedCourseSection
             openBoards={unclaimedCount}
@@ -648,7 +648,7 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
     mine.length > 0 ? mine.reduce((acc, h) => acc + (h[k] ?? 0), 0) : null;
 
   return wrap(
-    <div>
+    <div className="course-you-sections">
       <VerdictSection
         year={thisYear}
         season={season}
