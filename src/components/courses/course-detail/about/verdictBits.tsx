@@ -18,6 +18,15 @@ export const SMALL_LABEL: React.CSSProperties = {
   lineHeight: 1.3,
 };
 
+/** A figure tile: value over SMALL_LABEL on TILE_FILL. Shared by TheVerdict and
+ * the Tees selected-set strip (TEE_SELECTED_STRIP_1) so the two cannot drift. */
+export const FactTile: React.FC<{ value: string; label: string }> = ({ value, label }) => (
+  <div style={{ flex: 1, minWidth: 0, background: TILE_FILL, borderRadius: 10, padding: '10px 9px' }}>
+    <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.03em', color: A.INK, ...FIGS }}>{value}</div>
+    <div style={{ ...SMALL_LABEL, marginTop: 4 }}>{label}</div>
+  </div>
+);
+
 /** The derived observation line: rule on the left, bold for the findings. */
 export const Said: React.FC<{ quiet?: boolean; children: React.ReactNode }> = ({ quiet, children }) => (
   <p

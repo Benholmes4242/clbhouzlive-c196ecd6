@@ -16,7 +16,7 @@ import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import AboutSection from './AboutSection';
 import { deriveCourseVerdict, shotsInWords, signed } from './courseVerdict';
-import { B, Said, SMALL_LABEL, TILE_FILL } from './verdictBits';
+import { B, FactTile, Said } from './verdictBits';
 
 const TRACK = A.TRACK;
 
@@ -25,12 +25,7 @@ export const VERDICT_HARDER_CLAIM_MIN = 80;
 /** VERDICT_COPY_1 VC4: at or below this percentile the left end claims "Easier than". */
 export const VERDICT_EASIER_CLAIM_MAX = 20;
 
-const Fact: React.FC<{ value: string; label: string }> = ({ value, label }) => (
-  <div style={{ flex: 1, minWidth: 0, background: TILE_FILL, borderRadius: 10, padding: '10px 9px' }}>
-    <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.03em', color: A.INK, ...FIGS }}>{value}</div>
-    <div style={{ ...SMALL_LABEL, marginTop: 4 }}>{label}</div>
-  </div>
-);
+const Fact = FactTile;
 
 const TheVerdict: React.FC<{ courseId: string; courseName: string }> = ({ courseId, courseName }) => {
   const { t } = useTranslation('courses');

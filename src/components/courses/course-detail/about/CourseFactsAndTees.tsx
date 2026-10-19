@@ -28,7 +28,7 @@ import {
 } from '@/features/courses/components/holes/teePreference';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { AboutSection } from './AboutSection';
-import { Said } from './verdictBits';
+import { FactTile, Said } from './verdictBits';
 import { TEE_CHANGED_EVENT } from './useHeroReferenceLine';
 import { useTranslation } from 'react-i18next';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
@@ -103,7 +103,8 @@ export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
     );
 
   /* BRIEF_COURSE_TAB_1A — the tees became a finding. Par, yards, rating and
-     slope are reference and sit on the hero line, never as tiles here. The
+     slope sit on the hero line; TEE_SELECTED_STRIP_1 also renders them for the
+     selected set as a strip under the cards so a tap visibly lands. The
      spread note is DERIVED from the sets' own slopes, nothing illustrative. */
   const slopes = teeRows.map((r) => r.slope).filter((v): v is number => v != null);
   const spread = slopes.length >= 2 ? Math.max(...slopes) - Math.min(...slopes) : null;
@@ -116,7 +117,6 @@ export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
         : spread === 1
           ? t('courseDetail.tees.spreadOne', { sets })
           : t('courseDetail.tees.spread', { points: formatNumber(spread), sets });
-  void facts;
 
   return (
     <AboutSection kicker={t('courseDetail.tees.kicker')} title={t('courseDetail.tees.title')}>
@@ -158,6 +158,13 @@ export const CourseFactsAndTees: React.FC<Props> = ({ courseId }) => {
           );
         })}
       </div>
+      {facts.length > 0 ? (
+        <div data-testid="tee-selected-strip" style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+          {facts.map((f) => (
+            <FactTile key={f.kicker} value={f.value} label={f.kicker} />
+          ))}
+        </div>
+      ) : null}
       {/* BRIEF_COURSE_TAB_1B P1.4 — PERMANENTLY OMITTED: the mock's "worth less
           than one shot" line. Converting a slope spread into shots needs a
           handicap index, which is viewer data, and nothing on this tab may be
