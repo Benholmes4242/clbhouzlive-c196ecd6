@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { EXPLORE_END_LABEL_BAND, RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
+import { collectRoundFeats } from './roundFeatCollection';
 import { RoundTilePlot, homePanelCallout } from '@/components/feed/roundTilePlot';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { GlassBadge } from '@/components/media/GlassDurationBadge';
@@ -1514,7 +1515,7 @@ export function ExploreCard({
       ? t('amateur.stream.you', 'You')
       : item.who?.display_name?.trim() || t('amateur.stream.aMember', 'A member');
     const playDate = railCaptionDate(item.facts.play_date ?? null);
-    const homeCallout = homePanelCallout(callout, shape);
+    const homeCallout = homePanelCallout(callout, shape, collectRoundFeats(item.facts));
     return (
       <button
         type="button"
