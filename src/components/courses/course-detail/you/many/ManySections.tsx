@@ -211,10 +211,19 @@ export const EdgeSection: React.FC<{ edges: HoleEdge[]; s: EdgeSummary; fieldRou
   const least = s.leastEdge; const level = new Set(s.otherLevel.map((e) => e.hole_no));
   const labelHoles = new Set([1, Math.ceil(n / 2), n, ...(least ? [least.hole_no] : []), ...level]);
   const ratio = s.front != null && s.back != null && s.front > 0 ? s.back / s.front : null;
+  /* EDGE_KEY_1: the key names only fills actually drawn (same branch order as the bars). */
+  const kindOf = (e: HoleEdge) => (e.edge as number) < 0 ? 'drifted' : least?.hole_no === e.hole_no ? 'least' : level.has(e.hole_no) ? 'level' : 'improved';
+  const drawn = new Set(edges.filter((e) => e.edge != null).map(kindOf));
+  const keyEntries = [
+    { kind: 'improved', label: 'You gain', color: A.IMPROVED },
+    { kind: 'drifted', label: 'Field gains', color: A.DRIFTED },
+    { kind: 'level', label: 'Level', color: A.DIM },
+    { kind: 'least', label: 'Worth a look', color: A.AMBER },
+  ].filter((k) => drawn.has(k.kind as ReturnType<typeof kindOf>));
   return (
-    <Sec kicker="Where your edge goes" title={allAhead ? `You beat the field on all ${words(n)}` : null}>
+    <Sec kicker="You against the field" title={allAhead ? `You beat the field on all ${words(n)}` : null}>
       <Lede>
-        Every hole, your average against the {fieldRounds != null ? `${formatNumber(fieldRounds)} ` : ''}rounds here that are not yours. Deeper bars are holes you take more out of.
+        Shots you gain on each hole, against {fieldRounds != null ? `the ${formatNumber(fieldRounds)} rounds here` : 'the rounds here'} that are not yours. The deeper the bar, the more you gain.
         {s.unmeasured > 0 ? ` ${Words(s.unmeasured)} ${plural(s.unmeasured, 'hole', 'holes')} could not be measured.` : ''}
       </Lede>
       <svg viewBox={`0 0 ${W} 62`} width="100%" height={62} style={{ display: 'block', marginTop: 13 }} role="img" aria-label="Your edge on the field, hole by hole">
@@ -233,6 +242,17 @@ export const EdgeSection: React.FC<{ edges: HoleEdge[]; s: EdgeSummary; fieldRou
             fill={least?.hole_no === e.hole_no ? A.AMBER : level.has(e.hole_no) ? A.DIM : A.FAINT}>{e.hole_no}</text>
         ) : null)}
       </svg>
+      {keyEntries.length > 0 ? (
+        /* Geometry mirrors .champions-cabinet-legend / -entry / -swatch (championsEmpty.css), plus wrap. */
+        <div aria-label="Chart key" style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 11 }}>
+          {keyEntries.map((k) => (
+            <span key={k.kind} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', color: A.DIM }}>
+              <span aria-hidden style={{ width: 9, height: 9, borderRadius: 3, flex: '0 0 9px', background: k.color }} />
+              {k.label}
+            </span>
+          ))}
+        </div>
+      ) : null}
       <Facts
         marginTop={6}
         items={[
