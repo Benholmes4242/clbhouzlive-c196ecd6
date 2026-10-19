@@ -9,7 +9,7 @@ import React from 'react';
 import { A, FIGS, RAMP_TOPAR } from '@/features/courses/components/holes/analytical/tokens';
 import { formatNumber } from '@/i18n/format';
 import {
-  GOOD_ROUND_GROSS, SEASON_MIN_ROUNDS, SMALL_SET, round1,
+  GOOD_ROUND_GROSS, SEASON_MIN_ROUNDS, round1,
   type EdgeSummary, type GoodRounds, type HoleEdge, type OpenHolesState, type Season,
 } from '@/lib/courseYou/youDerivations';
 import { ordinal } from '../youBits';
@@ -186,9 +186,7 @@ export const GoodRoundsSection: React.FC<{ g: GoodRounds | null; seasons: number
           {frontSwing > backSwing && g.everyTurnUnderPar ? <> &mdash; and on those {words(n)} days you made the turn <B>under par</B>.</> : '.'}
         </Said>
       ) : null}
-      {n < SMALL_SET ? (
-        thinNines ? <Said quiet>The nines rest on the {formatNumber(g.good.nineCount + g.other.nineCount)} rounds that recorded both.</Said> : null
-      ) : thinNines ? (
+      {thinNines ? (
         <Said quiet>The nines rest on the {formatNumber(g.good.nineCount + g.other.nineCount)} of your {formatNumber(g.total)} rounds that recorded both.</Said>
       ) : null}
     </Sec>

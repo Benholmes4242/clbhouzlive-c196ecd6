@@ -1,5 +1,9 @@
 # Roadmap
 
+## BRIEF_YOU_TAB_COPY_1 — YC3 FOLLOW-UP
+- [x] Collapsed the two `thinNines` branches in `GoodRoundsSection` to one: the `n < SMALL_SET` conditional is gone, so both cases print "The nines rest on the {X} of your {total} rounds that recorded both." `thinNines` gate unchanged.
+- [x] SMALL_SET had no other consumer in `ManySections.tsx` (only the removed branch), so its import was dropped; the export stays in `youDerivations.ts` and no other file imports it. npx vitest run: 1,810 passing / 233 files, zero failures, no test changes; build OK.
+
 ## BRIEF_VERDICT_COPY_1 — VERDICT_COPY_1
 - [x] Ben's ruling recorded: the build wins on all three disputed frozen values (Said 12.5/1.55/A.BODY, TILE_FILL 0.05, 12px title-to-figure gap); VC2 extension retained as built; everything else accepted as built. Mock-authority rule saved to memory: a mock is spec only for what a brief changes; on frozen elements the build wins and the difference is reported, never silently adopted. No code or test changes this turn; last full suite npx vitest run: 1,810 passing / 233 files, zero failures.
 
