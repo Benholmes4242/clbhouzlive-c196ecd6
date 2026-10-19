@@ -1,7 +1,7 @@
 # Roadmap
 
 ## BRIEF_TAB_CANON_1 - TAB_CANON_1
-- [ ] Baseline gate STOP before application/test edits: TC5 says six incorrect Media paths but names eight (signed-out, grid-error, grid-empty, three empty states, hole walk, grid-loading). TC3/4/5/6 enumerate 7 Champions + 8 Reviews + 9 Media + 13 You = 37 states before Course, conflicting with REPORT's thirty. Ten-plus WhatTheyScored uses protected ABOUT_KICKER 0.19em/line-height 1, not TC7's blanket Reviews no-tracking/1.2 baseline; explicit TC10 exception needs acknowledgment. Await corrected baseline/count. No tests run; last npx vitest run remains 1,810 passing / 233 files.
+- [ ] Baseline gate STOP before application/test edits: TC5 says six incorrect Media paths but names eight (signed-out, grid-error, grid-empty, three empty states, hole walk, grid-loading). TC3/4/5/6 enumerate 7 Champions + 8 Reviews + 9 Media + 13 You = 37 states before Course, conflicting with REPORT's thirty. Ten-plus WhatTheyScored uses protected ABOUT_KICKER 0.19em/inherited line-height, not TC7's blanket Reviews no-tracking/1.2 baseline; explicit TC10 exception recorded. Await corrected baseline/count. No tests run; last npx vitest run remains 1,810 passing / 233 files.
 - [ ] Apply shared first-element rules to Course/Champions/Reviews/Media, preserving You and later seams; share canonical eyebrow/title declarations and protected label exceptions.
 - [ ] Report NearbySection scope for Ben's ruling without editing it; measure per-state gaps and report exact full-suite command/count and declarations.
 
