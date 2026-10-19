@@ -144,7 +144,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <div style={{ display: 'grid', gap: 0 }}>
         {/* BRIEF_COURSE_TAB_1A — the verdict is the first thing under the tabs,
             then the place, the tees as a finding, and how it defends par. */}
-        <TheVerdict courseId={course.id} />
+        <TheVerdict courseId={course.id} courseName={course.name} />
         <AboutThisPlace courseId={course.id} description={course.description} />
         <CourseFactsAndTees courseId={course.id} />
         <DefendsPar courseId={course.id} courseName={course.name} />

@@ -20,6 +20,11 @@ import { B, Said, SMALL_LABEL, TILE_FILL } from './verdictBits';
 
 const TRACK = A.TRACK;
 
+/** VERDICT_COPY_1 VC4: at or above this percentile the right end claims "Harder than". */
+export const VERDICT_HARDER_CLAIM_MIN = 80;
+/** VERDICT_COPY_1 VC4: at or below this percentile the left end claims "Easier than". */
+export const VERDICT_EASIER_CLAIM_MAX = 20;
+
 const Fact: React.FC<{ value: string; label: string }> = ({ value, label }) => (
   <div style={{ flex: 1, minWidth: 0, background: TILE_FILL, borderRadius: 10, padding: '10px 9px' }}>
     <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.03em', color: A.INK, ...FIGS }}>{value}</div>
@@ -27,7 +32,7 @@ const Fact: React.FC<{ value: string; label: string }> = ({ value, label }) => (
   </div>
 );
 
-const TheVerdict: React.FC<{ courseId: string }> = ({ courseId }) => {
+const TheVerdict: React.FC<{ courseId: string; courseName: string }> = ({ courseId, courseName }) => {
   const { t } = useTranslation('courses');
   const { data: stats } = useCourseStatsDetail(courseId, true);
   const { data: analysis } = useCourseHoleAnalysis(courseId);
@@ -43,10 +48,10 @@ const TheVerdict: React.FC<{ courseId: string }> = ({ courseId }) => {
   const r = Math.round(avg);
   const title =
     r >= 1
-      ? t('courseDetail.verdict.titleOver', { count: r, words: shotsInWords(r) })
+      ? t('courseDetail.verdict.titleOver', { count: r, words: shotsInWords(r), courseName })
       : r <= -1
-        ? t('courseDetail.verdict.titleUnder')
-        : t('courseDetail.verdict.titleLevel');
+        ? t('courseDetail.verdict.titleUnder', { courseName })
+        : t('courseDetail.verdict.titleLevel', { courseName });
 
   const harder = stats?.harder_than_pct;
   const pct = harder != null && Number.isFinite(harder) ? Math.max(0, Math.min(100, harder)) : null;
@@ -83,9 +88,17 @@ const TheVerdict: React.FC<{ courseId: string }> = ({ courseId }) => {
               }}
             />
           </div>
-          <div style={{ ...SMALL_LABEL, lineHeight: 1, display: 'flex', justifyContent: 'space-between', marginTop: 7 }}>
-            <span>{t('courseDetail.verdict.gentlest')}</span>
-            <span>{t('courseDetail.verdict.harderThan', { pct: Math.round(pct) })}</span>
+          <div style={{ ...SMALL_LABEL, lineHeight: 1, display: 'flex', justifyContent: 'space-between', gap: 12, marginTop: 7 }}>
+            {Math.round(pct) <= VERDICT_EASIER_CLAIM_MAX ? (
+              <span style={{ color: A.MUTE }}>{t('courseDetail.verdict.easierThan', { pct: 100 - Math.round(pct) })}</span>
+            ) : (
+              <span>{t('courseDetail.verdict.easiest')}</span>
+            )}
+            {Math.round(pct) >= VERDICT_HARDER_CLAIM_MIN ? (
+              <span style={{ color: A.MUTE }}>{t('courseDetail.verdict.harderThan', { pct: Math.round(pct) })}</span>
+            ) : (
+              <span>{t('courseDetail.verdict.hardest')}</span>
+            )}
           </div>
         </div>
       ) : null}
