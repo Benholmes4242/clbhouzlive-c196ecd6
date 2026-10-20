@@ -251,7 +251,7 @@ export function SettingsTabContent() {
           <SettingsToggleRow
             icon={<Eye size={15} />}
             title="Handicap button"
-            subtitle="Removes the connect prompt from your profile sheet and the handicap chip from the top-right island. You can still connect any time from here."
+            subtitle="Hides the connect-handicap prompts on your profile and the handicap button at the top of the screen, and you can still connect any time from here."
 
             checked={!hideHandicapChip}
             disabled={chipUpdating}

@@ -57,6 +57,9 @@ interface Props {
   avatarUrl?: string | null;
   region?: string | null;
   isSelf: boolean;
+  /** Member asked not to be prompted to connect a handicap (the page passes
+   *  user_profiles.hide_handicap_chip). Hides only the connect card. */
+  hideConnectPrompt?: boolean;
   /** Resolved index (resolveDisplayHandicap) as the page already resolves it. */
   indexValue: number | null;
   /** PLAIN ROUND TOTAL — see useMemberRoundTotal. Owner-only by construction. */
@@ -183,6 +186,7 @@ export const ProfileHero: React.FC<Props> = ({
   avatarUrl,
   region,
   isSelf,
+  hideConnectPrompt = false,
   indexValue,
   roundsCount,
   ratedCount,
@@ -382,7 +386,7 @@ export const ProfileHero: React.FC<Props> = ({
   const badgesCount = figures.isFetched && figures.data ? figures.data.badges : null;
 
   const showIndexBlocks = chip.settled && chip.connected;
-  const showConnectCard = chip.settled && !chip.connected && isSelf;
+  const showConnectCard = chip.settled && !chip.connected && isSelf && !hideConnectPrompt;
 
   const counters: Array<{ key: HeroStat; label: string; value: number | null; state?: 'ok' | 'loading' | 'error' }> = [];
   if (isSelf) counters.push({ key: 'rounds', label: t('hero.rounds', 'Rounds'), value: roundsCount, state: roundsCountState });
