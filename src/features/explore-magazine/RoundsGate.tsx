@@ -1,0 +1,231 @@
+/**
+ * CB13 — THE HANDICAP GATE ON THE ROUNDS TAB.
+ *
+ * A signed-in member with no synced handicap cannot appear on any board on
+ * this page, so the page states that fact: the REAL page (live sections, live
+ * queries, live rounds) renders behind the profile hero's crop-and-fade
+ * (EXAMPLE_DISPLAY_STYLE pattern: one opacity + one mask gradient, stops from
+ * the signed-off mock), inert like HeroConnectExample, with a non-dismissible
+ * card over it. Four states, decided by roundsGateState:
+ *   signedOut — no userId: the page renders exactly as today, no gate.
+ *   loading   — connection read unsettled OR errored: the page's own loading
+ *               treatment holds; a failed read never accuses a connected member.
+ *   gated     — settled, no connection: frost + card.
+ *   connected — settled, connection row present: the page, byte-identical.
+ *
+ * THE PREDICATE: useWhsConnection(userId).isSuccess && data != null.
+ * fetchWhsConnection returns the member's UNDELETED (deleted_at IS NULL)
+ * whs_connections row for provider 'england_golf' — the rule circleHandicap.ts
+ * states: an undeleted row proves the federation connection exists.
+ *
+ * The card is not dismissible: no close, no swipe-away, no remembered
+ * dismissal. The white CTA and the sheet's foot both route to
+ * /manage/handicap, the same destination as every other connect CTA (ERT1).
+ */
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { ChevronRight } from 'lucide-react';
+
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import { EYEBROW } from './Section';
+
+export type RoundsGateState = 'signedOut' | 'loading' | 'gated' | 'connected';
+
+/** The four CB13 states. `isSuccess`, never `!isLoading`: a disabled query is
+ *  pending-idle, so isLoading is false before the read has ever run (see the
+ *  warning on useWhsConnection). */
+export function roundsGateState(
+  userId: string | undefined,
+  connection: { isSuccess: boolean; data: unknown },
+): RoundsGateState {
+  if (!userId) return 'signedOut';
+  if (!connection.isSuccess) return 'loading';
+  return connection.data ? 'connected' : 'gated';
+}
+
+/** The hero's frost: one compositing opacity plus the mask gradient. Stops are
+ *  the mock's — solid to 42%, gone by 86%. */
+const FROST: CSSProperties = {
+  opacity: 0.5,
+  WebkitMaskImage: 'linear-gradient(to bottom, #000 0, #000 42%, transparent 86%)',
+  maskImage: 'linear-gradient(to bottom, #000 0, #000 42%, transparent 86%)',
+};
+
+/** Frosted page visible above the card. An empty pool has nothing to frost,
+ *  so the band collapses rather than leaving the card floating on black. */
+const REVEAL = 300;
+const REVEAL_EMPTY = 96;
+
+/** The sheet's outbound links — each row routes to the body's own official
+ *  page. "Any country" has none: the only club finder we could verify is
+ *  England-only, so that row is copy, not a link. */
+const GATE_LINKS = {
+  england: 'https://www.englandgolf.org/igolf',
+  scotland: 'https://www.scottishgolf.org/world-handicap-system',
+  wales: 'https://www.walesgolf.org/',
+  ireland: 'https://www.golfireland.ie/whs-for-golfers',
+} as const;
+
+function GateCard({ onConnect, onNoHandicap }: { onConnect: () => void; onNoHandicap: () => void }) {
+  const { t } = useTranslation('courses');
+  const bullets = [
+    t('amateur.gate.bulletBoards'),
+    t('amateur.gate.bulletComps'),
+    t('amateur.gate.bulletIndex'),
+  ];
+  return (
+    <div
+      data-rounds-gate-card=""
+      style={{
+        background: A.PANEL,
+        borderTop: `1px solid ${A.BORDER}`,
+        borderRadius: '20px 20px 0 0',
+        padding: '22px 20px',
+        boxShadow: '0 -24px 60px rgba(0,0,0,0.72)',
+      }}
+    >
+      <div style={{ ...EYEBROW, lineHeight: 1, color: A.AMBER }}>{t('amateur.gate.eyebrow')}</div>
+      <div style={{ marginTop: 8, fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.18, color: A.INK }}>
+        {t('amateur.gate.title')}
+      </div>
+      <div style={{ marginTop: 9, fontSize: 13, fontWeight: 600, color: A.BODY, lineHeight: 1.5 }}>
+        {t('amateur.gate.body')}
+      </div>
+      <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 9 }}>
+        {bullets.map((line) => (
+          <div key={line} style={{ display: 'flex', gap: 9, alignItems: 'flex-start', fontSize: 12.5, fontWeight: 600, color: A.BODY, lineHeight: 1.4 }}>
+            <span aria-hidden style={{ flex: 'none', width: 5, height: 5, borderRadius: 999, background: A.AMBER, marginTop: 6 }} />
+            <span>{line}</span>
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={onConnect}
+        style={{
+          marginTop: 17, display: 'block', width: '100%', border: 0, cursor: 'pointer',
+          background: A.INK, color: A.CANVAS, borderRadius: 12, padding: 14,
+          fontFamily: SANS, fontSize: 13.5, fontWeight: 800, letterSpacing: '0.02em', textAlign: 'center',
+        }}
+      >
+        {t('amateur.gate.cta')}
+      </button>
+      {/* The quiet second path: the SeeAll treatment (EYEBROW, A.MUTE, 13px
+          chevron), centred as the mock has it. */}
+      <button
+        type="button"
+        onClick={onNoHandicap}
+        style={{
+          marginTop: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, width: '100%',
+          border: 0, background: 'transparent', padding: 0, cursor: 'pointer',
+          fontFamily: SANS, ...EYEBROW, color: A.MUTE,
+        }}
+      >
+        {t('amateur.gate.noHandicap')}
+        <ChevronRight size={13} />
+      </button>
+    </div>
+  );
+}
+
+function GateSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation('courses');
+  const navigate = useNavigate();
+  const rows: { key: keyof typeof GATE_LINKS | 'anywhere'; href: string | null }[] = [
+    { key: 'england', href: GATE_LINKS.england },
+    { key: 'scotland', href: GATE_LINKS.scotland },
+    { key: 'wales', href: GATE_LINKS.wales },
+    { key: 'ireland', href: GATE_LINKS.ireland },
+    { key: 'anywhere', href: null },
+  ];
+  return (
+    <BottomSheet open={open} onClose={onClose} ariaLabelledBy="rounds-gate-sheet-title">
+      <div style={{ padding: '12px 20px 32px', fontFamily: SANS }}>
+        <div style={{ ...EYEBROW, lineHeight: 1, color: A.AMBER }}>{t('amateur.gate.sheetEyebrow')}</div>
+        <h2 id="rounds-gate-sheet-title" style={{ margin: '5px 0 0', fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1, color: A.INK }}>
+          {t('amateur.gate.sheetTitle')}
+        </h2>
+        <div style={{ marginTop: 9, fontSize: 13, fontWeight: 600, color: A.BODY, lineHeight: 1.5 }}>
+          {t('amateur.gate.sheetBody')}
+        </div>
+        <div style={{ marginTop: 16 }}>
+          {rows.map((r) => {
+            const body = (
+              <>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, color: A.INK }}>{t(`amateur.gate.${r.key}`)}</span>
+                  <span style={{ display: 'block', marginTop: 3, fontSize: 11.5, fontWeight: 600, lineHeight: 1.45, color: A.MUTE }}>{t(`amateur.gate.${r.key}Sub`)}</span>
+                </span>
+                {r.href ? <ChevronRight size={13} style={{ flex: 'none', color: A.MUTE }} /> : null}
+              </>
+            );
+            const rowStyle: CSSProperties = {
+              display: 'flex', alignItems: 'center', gap: 11, width: '100%',
+              padding: '11px 0', border: 0, borderBottom: `1px solid ${A.SOFT}`,
+              background: 'transparent', textAlign: 'left', fontFamily: SANS,
+            };
+            return r.href ? (
+              <button key={r.key} type="button" onClick={() => window.open(r.href as string, '_blank', 'noopener,noreferrer')} style={{ ...rowStyle, cursor: 'pointer' }}>
+                {body}
+              </button>
+            ) : (
+              <div key={r.key} style={rowStyle}>{body}</div>
+            );
+          })}
+        </div>
+        <button
+          type="button"
+          onClick={() => { onClose(); navigate('/manage/handicap'); }}
+          style={{
+            marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, width: '100%',
+            border: 0, background: 'transparent', padding: 0, cursor: 'pointer',
+            fontFamily: SANS, ...EYEBROW, color: A.MUTE,
+          }}
+        >
+          {t('amateur.gate.sheetConnect')}
+          <ChevronRight size={13} />
+        </button>
+      </div>
+    </BottomSheet>
+  );
+}
+
+/** The gated render: the real page cropped and faded behind the card. The
+ *  frost is absolute over the whole block and inert — no tap, focus or
+ *  keyboard reaches a row — while the card sits in flow at the bottom, so the
+ *  block ends with the card and nothing below it. */
+export function RoundsGate({ children }: { children: ReactNode }) {
+  const navigate = useNavigate();
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [poolEmpty, setPoolEmpty] = useState(false);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    const measure = () => setPoolEmpty(el.scrollHeight < 40);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <div
+        aria-hidden
+        ref={(el) => el?.setAttribute('inert', '')}
+        style={{ position: 'absolute', inset: 0, overflow: 'hidden', ...FROST }}
+      >
+        <div ref={contentRef}>{children}</div>
+      </div>
+      <div style={{ position: 'relative', paddingTop: poolEmpty ? REVEAL_EMPTY : REVEAL }}>
+        <GateCard onConnect={() => navigate('/manage/handicap')} onNoHandicap={() => setSheetOpen(true)} />
+      </div>
+      <GateSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />
+    </div>
+  );
+}
