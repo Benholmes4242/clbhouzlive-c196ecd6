@@ -13,16 +13,13 @@ import { JustPlayed } from '@/components/explore-tab-new/courseled/JustPlayed';
 import { MemberAvatar } from '@/components/explore-tab-new/courseled/MemberAvatar';
 import { SEASON_ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMetrics';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
-import { BoardDaySeparator, BoardRowView, boardColumns, fmtIndexMove, fmtToPar } from '@/components/explore-tab-new/courseled/BoardRows';
 import { describeFilterParts } from '@/components/explore-tab-new/courseled/describeFilters';
 import { type BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import {
   BOARD_LABELS,
   DEFAULT_FILTERS,
-  OFFERED_RANKING_BOARD_KEYS,
   BOARD_ROW_FLOOR,
   WINDOW_OPTIONS,
-  windowOption,
   boardCountsRounds,
   type BoardFilters,
   type BoardKey,
@@ -34,8 +31,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { ScopeSegments } from './ScoresFilterHead';
 import { handicapPairDisplay } from './circleHandicap';
 import { fmtHcp } from '@/lib/whs/format';
-import { BOARD_FLOOR_COPY } from '@/components/explore-tab-new/courseled/boardFloors';
-import { dayLadder, playDateAtLocalNoon, playDateStandalone } from '@/components/explore-tab-new/courseled/discoverWhen';
+import { playDateAtLocalNoon } from '@/components/explore-tab-new/courseled/discoverWhen';
 import { SELF_ROW_TINT } from '@/components/explore-tab-new/courseled/tokens';
 import { standingOrdinal } from './ordinal';
 import { WHO_LEADS, whoLeadsPlaceholderHeight, whoLeadsYou } from './whoLeads';
@@ -71,24 +67,7 @@ export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
 const GUTTER = 16;
 /* Phase 9.5 — the rail, control row, basis and you slab sit 16 in, as the rows do. */
 const HEAD_GUTTER = 16;
-const CHIP_BG = 'rgba(255,255,255,0.04)';
-const CHIP_ACTIVE_BG = 'rgba(247,147,30,0.1)';
-const CHIP_ACTIVE_BORDER = 'rgba(247,147,30,0.55)';
 const SLAB_BG = 'rgba(255,255,255,0.05)';
-const VISUALLY_HIDDEN: CSSProperties = {
-  position: 'absolute', width: 1, height: 1, padding: 0, margin: -1,
-  overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0,
-};
-/* Interpolation markers: a styled phrase is spliced in after translation. */
-const MARK_W = '\u0001W\u0001';
-const MARK_U = '\u0001U\u0001';
-const MARK_Y = '\u0001Y\u0001';
-const MARK_F = '\u0001F\u0001';
-function splitMarks(text: string, map: Record<string, ReactNode>): ReactNode[] {
-  return text.split(/(\u0001[A-Z]\u0001)/).map((part, i) =>
-    part in map ? <span key={i}>{map[part]}</span> : part,
-  );
-}
 const LEAD_POSITIONS = 5;
 const SHORT_ROWS = 3;
 /** Faint ink: no separate token exists; DIM is the faintest analytical ink. */
@@ -360,86 +339,6 @@ function Section({
   );
 }
 
-/** 9.14 — the lead board's See all: full width, centred, amber. Lead board only. */
-function LeadSeeAll({ label, onPress }: { label: string; onPress: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onPress}
-      data-lead-see-all
-      style={{
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 4,
-        padding: '15px 16px 0',
-        border: 'none',
-        background: 'transparent',
-        fontFamily: SANS,
-        fontSize: 11.5,
-        fontWeight: 700,
-        letterSpacing: '0.12em',
-        textTransform: 'uppercase',
-        color: A.AMBER,
-        cursor: 'pointer',
-      }}
-    >
-      {label}
-      <ChevronRight size={13} />
-    </button>
-  );
-}
-
-/** 1.4 — the five lead rows' minimum, in BoardRowView geometry. */
-function LeadRowsSkeleton() {
-  return (
-    <div aria-hidden data-lead-rows-skeleton>
-      {Array.from({ length: LEAD_POSITIONS }, (_, i) => (
-        <div
-          key={i}
-          style={{ display: 'grid', gridTemplateColumns: '34px minmax(0,1fr) auto', columnGap: 11, alignItems: 'center', padding: '10px 16px', borderBottom: `1px solid ${A.SOFT}` }}
-        >
-          <Skeleton variant="dark" style={{ width: 34, height: 34, borderRadius: 11 }} />
-          <div style={{ minWidth: 0 }}>
-            <Skeleton variant="dark" style={{ width: '46%', height: 14, borderRadius: 4 }} />
-            <Skeleton variant="dark" style={{ width: '72%', height: 11, borderRadius: 4, marginTop: 4 }} />
-          </div>
-          <Skeleton variant="dark" style={{ width: 36, height: 18, borderRadius: 4 }} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/** 1.3 — the lead block's cold-open placeholder. Reserves exactly the smallest
- *  settled block (rail, control row, basis, one-line slab, five rows, no See
- *  all) so the block can only grow when it swaps in, never contract. */
-function LeadBoardSkeleton({ signedIn }: { signedIn: boolean }) {
-  return (
-    <div aria-hidden data-lead-board-skeleton style={{ marginBottom: 24 }}>
-      <div style={{ display: 'flex', gap: 7, overflow: 'hidden', padding: `2px ${HEAD_GUTTER}px 12px` }}>
-        {[0, 1, 2, 3].map((i) => (
-          <Skeleton key={i} variant="dark" style={{ flex: 'none', width: 92, height: 50, borderRadius: 11 }} />
-        ))}
-      </div>
-      <div style={{ display: 'flex', gap: 9, padding: `0 ${HEAD_GUTTER}px 12px` }}>
-        <Skeleton variant="dark" style={{ flex: 1, height: 36, borderRadius: 999 }} />
-        <Skeleton variant="dark" style={{ flex: 'none', width: 36, height: 36, borderRadius: 999 }} />
-      </div>
-      <div style={{ padding: `0 ${HEAD_GUTTER}px 11px` }}>
-        <Skeleton variant="dark" style={{ width: '70%', height: 17, borderRadius: 4 }} />
-      </div>
-      {signedIn ? (
-        <div style={{ position: 'relative', margin: `0 ${HEAD_GUTTER}px 12px`, height: 44, borderRadius: 11, overflow: 'hidden', background: SLAB_BG }}>
-          <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2.5, background: A.AMBER }} />
-        </div>
-      ) : null}
-      <LeadRowsSkeleton />
-    </div>
-  );
-}
-
 /** §4 order toggle — Rare air's shape, read from RARE_AIR.toggle. */
 function ClimbToggle({ mode, onChange }: { mode: ClimbMode; onChange: (m: ClimbMode) => void }) {
   const { t } = useTranslation('courses');
@@ -674,14 +573,12 @@ function Rail({ children }: { children: ReactNode }) {
 export function ScoresLeaderboardsPage({
   userId,
   state,
-  onOpenFilters,
   onRowPress,
   onMemberTap,
   onOpenCourse,
 }: {
   userId: string | undefined;
   state: AmateurBoardState;
-  onOpenFilters: () => void;
   onRowPress: (row: RoundPressTarget) => void;
   /** Resolves to compare, nudge or invite via useMemberTapResolver. NOT a profile page — the Top 100 sheet's Profile pill navigates to /profile/:id itself. */
   onMemberTap: (userId: string) => void;
@@ -752,14 +649,6 @@ export function ScoresLeaderboardsPage({
     t('amateur.leaderboards.nMembers', { count: n });
   // Deliberately uncounted: "See all members" without a figure everywhere.
   const seeAllMembers = () => t('amateur.leaderboards.seeAllMembers');
-  /* The lead board's destination row follows the board's UNIT: rounds on
-     Most recent (and any feat board), members on a ranked board. */
-  const seeAllForBoard = (b: BoardKey) =>
-    boardCountsRounds(b) ? t('amateur.leaderboards.seeAllRounds') : seeAllMembers();
-  const boardCountText = (b: BoardKey, n: number) =>
-    boardCountsRounds(b)
-      ? t('amateur.leaderboards.nRounds', { count: n })
-      : membersText(n);
 
   /* §4 row. start_index and current_index are FACTS from the RPC, so they are
      formatted directly — handicapJourneyDisplay derives an after-value from a
@@ -819,21 +708,6 @@ export function ScoresLeaderboardsPage({
       : t(`${base}.better`, { pos: climbOrd(c.pos, c.tie), otherPos: climbOrd(c.otherPos, c.otherTie) });
   })();
 
-  /* ------------------------------------------------------------ §3 lead */
-  const leadRows = state.page.data?.rows ?? [];
-  const leadVisible = leadRows.filter((r) => r.pos <= LEAD_POSITIONS);
-  const leader = leadVisible[0] ?? null;
-  const leadMine = userId ? leadRows.find((r) => r.user_id === userId) ?? null : null;
-  const leadPinned = !!leadMine && !leadVisible.some((r) => r.user_id === leadMine.user_id);
-
-  /* leaderFigures IS GONE. It mapped 'topar' onto the gross cells, so this
-     page led with strokes where the see-all sheet led with to-par — two maps
-     for one board. get_board_page records the same fault in SQL: floors once
-     duplicated inline drifted, "so the facet counts and the rendered board
-     answered different questions". boardValue()/boardSecondary(), read inside
-     BoardRowView, are now the only figure map on this screen. */
-
-  const boardTitle = t(BOARD_LABELS[state.board].i18n);
 
   /* ------------------------------------------------------------ §5 feats */
   /* §5 reads get_feats_window: true event counts (eagles, not rounds with an
@@ -929,30 +803,6 @@ export function ScoresLeaderboardsPage({
   const [top100Sheet, setTop100Sheet] = useState<CareerRow | null>(null);
   const openTop100Sheet = (r: CareerRow) => setTop100Sheet(r);
 
-  const leadLoading = !state.ready || state.page.isPending;
-  /* 1.2 ONE GATE — the lead block (rail, controls, basis, slab, rows) arrives
-     once on the cold open. `ready` already waits on the home-club query, so
-     clubApplies is final whenever it is true. After the first settle, only
-     the rows area swaps (1.4).
-     THE RULE: NO PRIMARY SURFACE IN THIS APP MAY BE HELD SHUT, OR MADE TO
-     STATE SOMETHING IT DOES NOT KNOW, BY A FIGURE THAT IS DECORATION. The
-     counts are decoration here; the rows are the screen. So the gate waits on
-     the counts read having FINISHED (`resolved`, success or failure), never on
-     it having succeeded, and a 2500ms backstop opens the block without
-     figures if the read never answers. The chips reserve their figure slot,
-     so counts that land late fill in without moving the rail. */
-  const rowsReady = state.ready && state.page.isSuccess;
-  const [countsBackstop, setCountsBackstop] = useState(false);
-  const countsResolved = state.facets ? state.facets.resolved : true;
-  useEffect(() => {
-    if (!rowsReady || countsResolved || countsBackstop) return;
-    const id = window.setTimeout(() => setCountsBackstop(true), 2500);
-    return () => window.clearTimeout(id);
-  }, [rowsReady, countsResolved, countsBackstop]);
-  const leadSettled = rowsReady && (countsResolved || countsBackstop);
-  const leadSettledOnce = useRef(false);
-  if (leadSettled) leadSettledOnce.current = true;
-  const leadHeadShown = leadSettledOnce.current;
   const pending = (h: number) => <div aria-hidden style={{ height: h, marginInline: GUTTER, marginBottom: 24 }} />;
 
 

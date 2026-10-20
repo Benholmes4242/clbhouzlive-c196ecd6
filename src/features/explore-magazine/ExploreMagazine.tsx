@@ -1575,10 +1575,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             onRowPress={boardRowPress}
             onMemberTap={(id) => opener.openProfile(id)}
             onOpenCourse={(id) => { depart(); navigate(`/courses/${id}`); }}
-            onOpenFilters={() => {
-              analyticsEvents.track('amateur_filter_opened', { board: boardState.board });
-              setBoardPanelOpen(true);
-            }}
           />
         </div>
       ) : null}
