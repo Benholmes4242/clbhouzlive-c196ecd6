@@ -2,6 +2,8 @@
  * ReviewReceipt - the confirmation screen shown after a review posts.
  * Hero and breakdown render from client state immediately; everything below
  * waits on get_review_receipt and renders nothing until it arrives.
+ * Row a compares the client's overall with the displayed post-review community
+ * average, never avg_before; first-rating receipts omit the comparison line.
  */
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -129,13 +131,13 @@ export function ReviewReceipt({
   }, [receipt]);
 
   const delta =
-    receipt && receipt.avg_before != null && overall != null
-      ? Math.round(Math.abs(overall - Number(receipt.avg_before)) * 10) / 10
+    receipt && receipt.community_avg != null && overall != null
+      ? Math.round(Math.abs(overall - Number(receipt.community_avg)) * 10) / 10
       : null;
-  const showDelta = delta != null && delta >= 0.1;
+  const firstRating = !!receipt && ((receipt.rating_count ?? 0) <= 1 || receipt.community_avg == null);
   const deltaAbove =
-    receipt && receipt.avg_before != null && overall != null
-      ? overall > Number(receipt.avg_before)
+    receipt && receipt.community_avg != null && overall != null
+      ? overall > Number(receipt.community_avg)
       : false;
 
   const rowStyle = (i: number): React.CSSProperties => ({
@@ -375,7 +377,9 @@ export function ReviewReceipt({
                     return (
                       <div key="a" style={rowStyle(i)}>
                         <div style={{ fontSize: 14, color: RV2.ink, lineHeight: 1.45 }}>
-                          <Trans
+                          {firstRating ? t('review.wizard.receipt.rowAFirst', {
+                            course: shortCourseName(receipt.course_name || course.name),
+                          }) : <Trans
                             i18nKey="review.wizard.receipt.rowA"
                             ns="courses"
                             values={{
@@ -387,13 +391,17 @@ export function ReviewReceipt({
                               avg: <span style={figure(courseSubScoreTone(Number(receipt.community_avg)))} />,
                               cnt: <span style={figure(RV2.ink)} />,
                             }}
-                          />
+                          />}
                         </div>
-                        {showDelta && (
+                        {!firstRating && delta != null && overall != null && (
                           <div style={{ fontSize: 12, color: RV2.secondary, marginTop: 4 }}>
-                            {deltaAbove
-                              ? t('review.wizard.receipt.rowADeltaAbove', { delta: delta!.toFixed(1) })
-                              : t('review.wizard.receipt.rowADeltaBelow', { delta: delta!.toFixed(1) })}
+                            {t(delta < 0.1
+                              ? 'review.wizard.receipt.rowADeltaEqual'
+                              : deltaAbove
+                                ? 'review.wizard.receipt.rowADeltaAbove'
+                                : 'review.wizard.receipt.rowADeltaBelow', {
+                              score: overall.toFixed(1), delta: delta.toFixed(1),
+                            })}
                           </div>
                         )}
                       </div>
