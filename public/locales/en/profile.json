@@ -113,5 +113,12 @@
     "lineOwn": "Your top ten rated golf courses.",
     "lineOther": "{{name}}'s top ten rated golf courses.",
     "lineOtherFallback": "Their top ten rated golf courses."
+  },
+  "rounds": {
+    "empty": {
+      "title": "No rounds yet",
+      "body": "Connect your handicap and every round you play lands here, hole by hole.",
+      "cta": "Connect your handicap"
+    }
   }
 }
