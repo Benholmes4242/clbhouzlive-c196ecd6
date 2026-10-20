@@ -76,7 +76,7 @@ function FieldSheet({ card, viewerId, onClose }: { card: CompetitionCard | null;
 function FieldBody({ card, viewerId, t }: { card: CompetitionCard; viewerId: string | undefined; t: (k: string, o?: Record<string, unknown>) => string }) {
   const subtitle = useSubtitle(card);
   return (
-    <div data-competition-field style={{ fontFamily: SANS, ...FIGS }}>
+    <div data-competition-field style={{ fontFamily: SANS, ...FIGS, lineHeight: 'normal' }}>
       <div style={{ padding: '14px 18px 0' }}>
         <h2 id="competition-field-title" style={{ margin: 0, fontSize: 16, fontWeight: 700, color: A.INK, lineHeight: 1.25 }}>{card.course_name}</h2>
         <div style={{ marginTop: 4, fontSize: 11.5, fontWeight: 600, color: A.DIM }}>{subtitle}</div>
@@ -107,7 +107,7 @@ export function CompetitionBoards({ viewerId, scope, enabled }: { viewerId: stri
   const cards = groupCompetitionCards(query.data);
   const open = cards.find((c) => c.key === openKey) ?? null;
   return (
-    <section data-competitions-section style={{ fontFamily: SANS, ...FIGS, paddingInline: 16, marginBottom: 20 }}>
+    <section data-competitions-section style={{ fontFamily: SANS, ...FIGS, lineHeight: 'normal', paddingInline: 16, marginBottom: 20 }}>
       <div style={{ display: 'flex', alignItems: 'baseline', fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.DIM, lineHeight: 'normal' }}>
         <span>{t('amateur.competitions.title', { defaultValue: 'Competitions' })}</span>
         <span style={{ marginLeft: 'auto', color: A.FAINT }}>{t('amateur.competitions.window', { defaultValue: 'Last 30 days' })}</span>
