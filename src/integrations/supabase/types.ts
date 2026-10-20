@@ -25479,6 +25479,7 @@ export type Database = {
         | "mountain"
         | "coastal"
         | "mixed"
+        | "resort"
       creator_event_type:
         | "impression"
         | "profile_visit"
@@ -25687,6 +25688,7 @@ export const Constants = {
         "mountain",
         "coastal",
         "mixed",
+        "resort",
       ],
       creator_event_type: [
         "impression",
