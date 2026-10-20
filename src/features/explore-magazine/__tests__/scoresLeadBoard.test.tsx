@@ -47,7 +47,7 @@ function row(pos: number, over: Partial<BoardRow> = {}): BoardRow {
     whs_score_id: `s${pos}`, play_date: '2026-09-20', course_id: 'c', course_name: 'Course',
     gross_score: 70 + pos, course_par: 72, net_score: null, stableford_points: null, delta_index: null,
     birdies: null, holes_in_one: null, albatrosses: null, eagles: null, clean_card: null, beat_par: null,
-    sub_80: null, hcp_at_time: null, sort_value: null, total_count: 5, pool_rounds: 5, pool_courses: 1, pool_members: 5,
+    sub_80: null, is_competition: null, hcp_at_time: null, sort_value: null, total_count: 5, pool_rounds: 5, pool_courses: 1, pool_members: 5,
     ...over,
   };
 }
