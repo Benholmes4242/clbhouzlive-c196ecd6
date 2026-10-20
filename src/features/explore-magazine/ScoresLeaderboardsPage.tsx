@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Trans, useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
@@ -20,7 +20,6 @@ import {
   DEFAULT_FILTERS,
   BOARD_ROW_FLOOR,
   WINDOW_OPTIONS,
-  boardCountsRounds,
   type BoardFilters,
   type BoardKey,
   type WindowKey,
@@ -38,7 +37,6 @@ import { WHO_LEADS, whoLeadsPlaceholderHeight, whoLeadsYou } from './whoLeads';
 import { useFeatsWindow, type FeatWindow } from './useFeatsWindow';
 import { RARE_AIR, rareAirPlaceholderHeight } from './rareAir';
 import { RareAirLede, RareAirRail, RareAirYou } from './RareAirSection';
-import { Skeleton } from '@/components/ui/skeleton';
 import { RailChips } from '@/components/ui/RailChips';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
@@ -68,7 +66,6 @@ const GUTTER = 16;
 /* Phase 9.5 — the rail, control row, basis and you slab sit 16 in, as the rows do. */
 const HEAD_GUTTER = 16;
 const SLAB_BG = 'rgba(255,255,255,0.05)';
-const LEAD_POSITIONS = 5;
 const SHORT_ROWS = 3;
 /** Faint ink: no separate token exists; DIM is the faintest analytical ink. */
 const FAINT = A.DIM;
@@ -579,6 +576,8 @@ export function ScoresLeaderboardsPage({
 }: {
   userId: string | undefined;
   state: AmateurBoardState;
+  /** EX1: unused since the Filters pill was unmounted; kept optional so the pill can be re-mounted without re-plumbing. */
+  onOpenFilters?: () => void;
   onRowPress: (row: RoundPressTarget) => void;
   /** Resolves to compare, nudge or invite via useMemberTapResolver. NOT a profile page — the Top 100 sheet's Profile pill navigates to /profile/:id itself. */
   onMemberTap: (userId: string) => void;
