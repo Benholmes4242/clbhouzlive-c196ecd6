@@ -9,6 +9,7 @@ import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { StandoutRounds, type RoundPressTarget } from '@/components/explore-tab-new/courseled/StandoutRounds';
 import { CompetitionBoards } from '@/components/explore-tab-new/courseled/CompetitionBoards';
+import { JustPlayed } from '@/components/explore-tab-new/courseled/JustPlayed';
 import { MemberAvatar } from '@/components/explore-tab-new/courseled/MemberAvatar';
 import { SEASON_ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMetrics';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
@@ -30,7 +31,7 @@ import {
 import { entryFiltersFor, type AmateurBoardState } from '@/features/amateur/useAmateurBoardState';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
-import { FiltersPill, ScopeSegments } from './ScoresFilterHead';
+import { ScopeSegments } from './ScoresFilterHead';
 import { handicapPairDisplay } from './circleHandicap';
 import { fmtHcp } from '@/lib/whs/format';
 import { BOARD_FLOOR_COPY } from '@/components/explore-tab-new/courseled/boardFloors';
@@ -957,290 +958,22 @@ export function ScoresLeaderboardsPage({
 
   return (
     <div style={{ fontFamily: SANS }}>
-      {!leadHeadShown ? <LeadBoardSkeleton signedIn={!!userId} /> : null}
-      {leadHeadShown ? (<>
-      {/* 1.1 THE BOARD RAIL — the six offered ranking boards, each with its
-          get_board_facets `board`-axis count under the current filters. Feat
-          boards stay in §5. A zero renders greyed and unselectable; an
-          unresolved count (null) renders no figure and greys nothing. */}
-      <div
-        role="radiogroup"
-        aria-label={t('amateur.board.rail')}
-        data-scores-board-rail
-        className="no-scrollbar"
-        style={{
-          display: 'flex',
-          gap: 7,
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          overscrollBehaviorX: 'contain',
-          touchAction: 'pan-x pan-y',
-          willChange: 'transform',
-          padding: `2px ${HEAD_GUTTER}px 12px`,
-        }}
-      >
-        {OFFERED_RANKING_BOARD_KEYS.map((key) => {
-          /* ONE GUARD, here where the rail reads: an absent counter is treated
-             exactly like an unarrived count (null) — names, no figures, nothing
-             greyed, because grey claims we counted and found zero. */
-          const n = state.facets?.countFor?.('board', key) ?? null;
-          const selected = state.board === key;
-          const empty = n === 0 && !selected;
-          /* 8.5 — figure and trailing word split so the word sits at 10.5/600 MUTE. */
-          const valueText = n == null ? null : boardCountText(key, n);
-          const m = valueText ? /^([^\s]+)\s+(.*)$/.exec(valueText) : null;
-          return (
-            <button
-              key={key}
-              type="button"
-              role="radio"
-              aria-checked={selected}
-              aria-disabled={empty || undefined}
-              disabled={empty}
-              data-board-chip={key}
-              onClick={() => {
-                if (empty || selected) return;
-                state.changeBoard(key);
-              }}
-              style={{
-                flex: 'none',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                gap: 3,
-                minWidth: 92,
-                padding: '8px 11px 9px',
-                borderRadius: 11,
-                background: selected ? CHIP_ACTIVE_BG : CHIP_BG,
-                border: `1px solid ${selected ? CHIP_ACTIVE_BORDER : A.BORDER}`,
-                opacity: empty ? 0.5 : 1,
-                cursor: empty ? 'default' : 'pointer',
-                fontFamily: SANS,
-                whiteSpace: 'nowrap',
-                textAlign: 'left',
-              }}
-            >
-              <span
-                data-chip-label
-                style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.11em', textTransform: 'uppercase', color: selected ? A.AMBER : A.DIM }}
-              >
-                {t(BOARD_LABELS[key].i18n)}
-              </span>
-              <span
-                data-chip-value
-                className="tabular-nums"
-                style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.02em', color: A.INK, minHeight: 19, lineHeight: '19px' }}
-              >
-                {valueText == null ? '\u00a0' : m ? (
-                  <>
-                    {m[1]}
-                    <span style={{ fontSize: 10.5, fontWeight: 600, letterSpacing: 0, color: A.MUTE, marginLeft: 4 }}>{m[2]}</span>
-                  </>
-                ) : valueText}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-      {/* §3 THE LEAD BOARD (Phase 8) — no visible eyebrow or title: the active
-          chip names the board and the basis sentence names the window. The
-          section keeps its labelled landmark through a visually-hidden h2. */}
-      {leadLoading || (state.page.isSuccess && leader) ? (
-        <section aria-labelledby="scores-lead-board-title" style={{ fontFamily: SANS, marginBottom: 24 }}>
-          <h2 id="scores-lead-board-title" data-scores-board-title style={VISUALLY_HIDDEN}>
-            {boardTitle}
-          </h2>
-          {/* 8.2 ONE CONTROL ROW: scope takes the remaining width, Filters at its
-              natural width. Outside the pending branch so the head never moves. */}
+      {/* EX1 — THE BOARDS ARE UNMOUNTED, NOT DELETED: the board chip rail, its
+          rows, the basis sentence, the you slab and the Filters pill no longer
+          render here. BoardRows, BoardFilterPanel, BoardSeeAllSheet,
+          boardFilters, useBoardPage and useBoardFacets stay on disk; restoring
+          a board is re-adding a mount. The scope chips stay and drive
+          Standout rounds, Competitions and Just played. */}
+      {state.ready ? (
+        <>
           <div data-scores-control-row style={{ display: 'flex', alignItems: 'center', gap: 9, padding: `0 ${HEAD_GUTTER}px 12px` }}>
             <ScopeSegments scope={scope} clubApplies={state.clubApplies} onScopeChange={state.changeScope} style={{ flex: 1, minWidth: 0 }} />
-            <FiltersPill count={state.sheetFilterCount} onOpen={onOpenFilters} />
           </div>
           <StandoutRounds viewerId={userId} filters={state.filters} enabled={state.ready} onRowPress={onRowPress} />
           <CompetitionBoards viewerId={userId} scope={state.filters.scope} enabled={state.ready} />
-          {/* 8.3 THE BASIS SENTENCE — rounds form or ranked form by boardCountsRounds. */}
-          {(() => {
-            /* 9.1 — the window's sentence phrase is the third rendering on its
-               key in WINDOW_OPTIONS. 9.2 — 'all' has no phrase: it takes a
-               whole sentence of its own in each grammar. */
-            const win = windowOption(state.filters.window);
-            const scopeKey = state.filters.scope;
-            const windowPhrase = win.sentence ? t(win.sentence.i18n) : '';
-            const strong = (text: string) => (
-              <span style={{ color: A.MUTE, fontWeight: 600 }}>{text}</span>
-            );
-            const all = !win.sentence;
-            const text = boardCountsRounds(state.board)
-              ? t(all ? 'amateur.leaderboards.basisSentence.roundsAll' : 'amateur.leaderboards.basisSentence.rounds', {
-                  scope: t(`amateur.leaderboards.basisSentence.scope.${scopeKey}`),
-                  window: MARK_W,
-                })
-              : t(all ? 'amateur.leaderboards.basisSentence.rankedAll' : 'amateur.leaderboards.basisSentence.ranked', {
-                  unit: MARK_U,
-                  window: MARK_W,
-                  scopeLead: t(`amateur.leaderboards.basisSentence.scopeLead.${scopeKey}`),
-                });
-            const unitKey = `amateur.leaderboards.basisSentence.unit.${state.board}`;
-            return (
-              <p data-scores-basis style={{ margin: 0, padding: `0 ${HEAD_GUTTER}px 11px`, fontSize: 11.5, lineHeight: 1.45, color: A.DIM }}>
-                {splitMarks(text, { [MARK_W]: strong(windowPhrase), [MARK_U]: strong(t(unitKey)) })}
-              </p>
-            );
-          })()}
-          {/* 8.4 THE YOU SLAB — always present for a signed-in member; three
-              states from fields already on the page, and no pending state. With
-              no own row and an unknown `you` count it renders nothing.
-              SAFE ON EVERY OFFERED SCOPE: every offered scope includes the
-              viewer, so a qualifying round means a place on the board. */}
-          {userId ? (() => {
-            const you = state.facets?.countFor?.('scope', 'you') ?? null;
-            /* An unknown `you` count is not a fact: with no row of the member's
-               own to show, render no slab rather than tell them they have no
-               qualifying round. */
-            if (!leadMine && you == null) return null;
-            let kind: 'on' | 'deeper' | 'none';
-            let figure: ReactNode = null;
-            let sentence: ReactNode = null;
-            if (leadMine) {
-              kind = 'on';
-              const youWord = <span style={{ color: A.INK, fontWeight: 700 }}>{t('amateur.leaderboards.slab.you')}</span>;
-              const course = leadMine.course_name ?? t('discover.unknownCourse');
-              /* E.2 — the slab sits above the ladder, so nothing above it states the year. */
-              const date = playDateStandalone(leadMine.play_date, i18n?.language);
-              let raw: string;
-              if (boardColumns(state.board).ranked) {
-                /* 9.6 — the figure is the position; its suffix at 10/700 DIM. */
-                const ord = standingOrdinal(leadMine.pos, i18n?.language ?? 'en');
-                const suffix = ord.slice(String(leadMine.pos).length);
-                figure = (
-                  <>
-                    {leadMine.pos}
-                    {suffix ? <span style={{ fontSize: 10, fontWeight: 700, color: A.DIM, letterSpacing: 0 }}>{suffix}</span> : null}
-                  </>
-                );
-                raw = t('amateur.leaderboards.slab.onBoardRanked', {
-                  you: MARK_Y,
-                  pool: Number(leadMine.pool_members).toLocaleString(i18n?.language),
-                  scope: t(`amateur.leaderboards.basisSentence.scope.${state.filters.scope}`),
-                  course,
-                  date,
-                });
-              } else {
-                /* 9.6 — the figure is the most recent round's to-par. */
-                figure = leadMine.gross_score != null && leadMine.course_par != null
-                  ? fmtToPar(leadMine.gross_score - leadMine.course_par)
-                  : '\u2014';
-                raw = t('amateur.leaderboards.slab.onBoardRounds', {
-                  you: MARK_Y,
-                  gross: leadMine.gross_score ?? '\u2014',
-                  course,
-                  date,
-                });
-              }
-              const marks: Record<string, ReactNode> = { [MARK_Y]: youWord };
-              /* 14.3 — THE INDEX CLAUSE IS GATED TO THE RECENT BOARD ONLY. The
-                 claim (current index minus that round's hcp_at_time) would be
-                 true anywhere, but on a ranked board the row is the member's
-                 BEST round and on a feat board it is the round that carried the
-                 feat, so "since" has no natural referent there. Do not
-                 generalise this past 'recent'. The figure is NOT delta_index
-                 and the copy must never attribute the movement to the round. */
-              if (state.board === 'recent' && state.viewerIndex != null && leadMine.hcp_at_time != null) {
-                const moved = Math.round((Number(state.viewerIndex) - Number(leadMine.hcp_at_time)) * 10) / 10;
-                if (moved !== 0) {
-                  const text = fmtIndexMove(moved);
-                  marks[MARK_F] = (
-                    <span className="tabular-nums" style={{ color: moved < 0 ? A.GREEN : A.MUTE, fontWeight: 700 }}>{text}</span>
-                  );
-                  raw = `${raw} ${t('amateur.leaderboards.slab.indexSince', { figure: MARK_F })}`;
-                }
-              }
-              sentence = splitMarks(raw, marks);
-            } else if (you != null && you > 0) {
-              kind = 'deeper';
-              figure = '\u2014';
-              sentence = t('amateur.leaderboards.standing.deeper');
-            } else {
-              kind = 'none';
-              figure = '\u2014';
-              sentence = t(BOARD_FLOOR_COPY[state.board].i18n);
-            }
-            return (
-              <div
-                data-scores-standing={kind}
-                style={{
-                  position: 'relative',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  margin: `0 ${HEAD_GUTTER}px 12px`,
-                  minHeight: 44,
-                  padding: '11px 12px 11px 14.5px',
-                  borderRadius: 11,
-                  overflow: 'hidden',
-                  background: SLAB_BG,
-                }}
-              >
-                <span aria-hidden style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 2.5, background: A.AMBER }} />
-                {figure != null ? (
-                  <span className="tabular-nums" style={{ flex: 'none', fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em', color: A.INK }}>
-                    {figure}
-                  </span>
-                ) : null}
-                {sentence != null ? (
-                  <span style={{ minWidth: 0, fontSize: 12, lineHeight: 1.4, color: A.MUTE }}>{sentence}</span>
-                ) : null}
-              </div>
-            );
-          })() : null}
-          <div>
-          {leadLoading || !leader ? (
-            /* 1.4 Rows area only — the head above is already final. */
-            <LeadRowsSkeleton />
-          ) : (
-            <>
-          <div>
-            {(() => {
-              const list = leadPinned && leadMine ? [...leadVisible, leadMine] : leadVisible;
-              /* 9.7/9.8 — the feed grammar groups under the day ladder; ranked
-                 boards are one sequence. No column header (9.9), no podium (9.12). */
-              const ranked = boardColumns(state.board).ranked;
-              let lastKey: string | null = null;
-              return list.map((r, i) => {
-                const pinned = leadPinned && i === list.length - 1;
-                const day = !ranked && !pinned ? dayLadder(r.play_date, t as never, i18n?.language) : null;
-                const sep = day && day.key !== lastKey ? <BoardDaySeparator label={day.label} /> : null;
-                if (day) lastKey = day.key;
-                return (
-                  <div key={`${r.pos}:${r.whs_score_id ?? r.user_id}${pinned ? ':pin' : ''}`}>
-                    {sep}
-                    <BoardRowView
-                      row={r}
-                      board={state.board}
-                      isSelf={r.user_id === userId}
-                      pinned={pinned}
-                      onPress={onRowPress}
-                    />
-                  </div>
-                );
-              });
-            })()}
-          </div>
-          {state.total > leadVisible.length || (userId && !leadMine && (state.facets?.countFor?.('scope', 'you') ?? 0) > 0) ? (
-            <LeadSeeAll
-              label={seeAllForBoard(state.board)}
-              onPress={() => {
-                analyticsEvents.track('amateur_board_see_all_opened', { board: state.board, total: state.total });
-                setSeeAll({ board: state.board, filters: state.filters });
-              }}
-            />
-          ) : null}
-            </>
-          )}
-          </div>
-        </section>
+          <JustPlayed viewerId={userId} filters={state.filters} enabled={state.ready} onRowPress={onRowPress} />
+        </>
       ) : null}
-      </>) : null}
 
       {/* §5 FEATS THIS YEAR — event counts; footnote is distinct members. */}
       {/* §5 RARE AIR — all four feats rarest first; hides only on zero rounds. */}

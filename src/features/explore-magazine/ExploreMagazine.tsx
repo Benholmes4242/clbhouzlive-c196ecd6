@@ -1341,7 +1341,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           key === 'all'
             ? t('amateur.stream.view.all', 'All')
             : key === 'scores'
-              ? t('amateur.stream.view.scores', 'Standings')
+              ? t('amateur.stream.view.scores', 'Rounds')
               : t('amateur.stream.view.watch', 'Watch'),
       })),
     [t],
