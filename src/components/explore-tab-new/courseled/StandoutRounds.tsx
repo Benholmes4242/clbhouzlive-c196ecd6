@@ -48,7 +48,7 @@ export function StandoutRounds({ viewerId, filters, enabled, onRowPress }: {
     <div data-standout-section style={{ ...FIGS }}>
     <Section
       contest={false}
-      eyebrow={t('amateur.standout.eyebrow', { defaultValue: 'The form' })}
+      eyebrow={t('amateur.standout.eyebrow', { defaultValue: 'In form' })}
       title={t('amateur.standout.title', { defaultValue: 'Standout rounds' })}
       meta={t(win.i18n, { defaultValue: win.label })}
     >
