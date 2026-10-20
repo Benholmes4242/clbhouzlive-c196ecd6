@@ -33,6 +33,8 @@ import { playDateAtLocalNoon } from '@/components/explore-tab-new/courseled/disc
 import { SELF_ROW_TINT } from '@/components/explore-tab-new/courseled/tokens';
 import { standingOrdinal } from './ordinal';
 import { useFeatsWindow, type FeatWindow } from './useFeatsWindow';
+import { useWhsConnection } from '@/lib/whs/hooks';
+import { RoundsGate, roundsGateState } from './RoundsGate';
 import { RARE_AIR, rareAirPlaceholderHeight } from './rareAir';
 import { RareAirLede, RareAirRail, RareAirYou } from './RareAirSection';
 import { GUTTER, Section, SeeAll } from './Section';
@@ -458,6 +460,14 @@ export function ScoresLeaderboardsPage({
 
   const [seeAll, setSeeAll] = useState<{ board: BoardKey; filters: BoardFilters } | null>(null);
   const [top100SeeAllSheet, setTop100SeeAllSheet] = useState(false);
+
+  /* CB13 — THE HANDICAP GATE. The one added read: the member's own connection
+     (the same useWhsConnection every other surface shares, so it is usually
+     already cached). The four states and the predicate live in RoundsGate.tsx.
+     The page's own queries are untouched: gated, they run live behind the
+     frost; connected, nothing changes. */
+  const connection = useWhsConnection(userId);
+  const gate = roundsGateState(userId, connection);
 
   /* 3.3 ONE WINDOW VOCABULARY: WINDOW_OPTIONS (the filter list's own words)
      is the eyebrow too; WINDOW_SHORT survives only as its compact form for the
