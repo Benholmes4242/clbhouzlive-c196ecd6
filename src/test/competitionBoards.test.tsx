@@ -43,7 +43,7 @@ describe('CB1 competition boards', () => {
     const pending = mount('circle');
     expect(pending.container.innerHTML).toBe('');
   });
-  it('renders cards, rows, tie markers and the field line only above three members', async () => {
+  it('renders cards, rows, tie markers and the uncounted CTA on every card', async () => {
     f.rpc.mockResolvedValue({ data: [
       row({ pos: 1 }), row({ pos: 2, is_tie: true, user_id: 'u2', whs_score_id: 's2' }), row({ pos: 2, is_tie: true, user_id: 'u3', whs_score_id: 's3' }),
       row({ course_id: 'east', comp_date: '2026-09-26', members: 3, pos: 1 }),
@@ -54,8 +54,10 @@ describe('CB1 competition boards', () => {
     expect(q('[data-competition-row]').length).toBe(4);
     const first = q('[data-competition-row]')[1].firstElementChild!.textContent;
     expect(first).toBe('T2');
-    expect(q('[data-competition-card]')[0].querySelector('[data-competition-rest]')).not.toBeNull();
-    expect(q('[data-competition-card]')[1].querySelector('[data-competition-rest]')).toBeNull();
+    /* CB3: the "{n} more played" line is gone; every card carries the same
+     * uncounted "See all players" CTA whatever the field size. */
+    expect(screen.getAllByRole('button', { name: 'See all players' }).length).toBe(2);
+    expect(document.querySelector('[data-competition-rest]')).toBeNull();
   });
   it('card shows three of the field; sheet shows every row from the same single call, tinting only the viewer', async () => {
     const field = [1, 2, 2, 4, 5].map((pos, i) => row({ pos, is_tie: pos === 2, user_id: i === 1 ? 'v' : `u${i}`, whs_score_id: `s${i}`, members: 5 }));
@@ -63,18 +65,18 @@ describe('CB1 competition boards', () => {
     mount();
     await waitFor(() => expect(q('[data-competition-card]').length).toBe(1));
     expect(q('[data-competition-row]').length).toBe(3);
-    fireEvent.click(document.querySelector('[data-competition-rest]')!);
+    fireEvent.click(screen.getByRole('button', { name: 'See all players' }));
     await waitFor(() => expect(q('[data-competition-field]').length).toBe(1));
     expect(q('[data-competition-field-row]').length).toBe(5);
     expect([...q('[data-competition-field-row]')].map((r) => r.firstElementChild!.textContent)).toEqual(['1', 'T2', 'T2', '4', '5']);
     expect(q('[data-competition-field-row][data-self]').length).toBe(1);
     expect(f.rpc).toHaveBeenCalledTimes(1);
   });
-  it('a card of three members has no field line but still opens the sheet', async () => {
+  it('a card of three members carries the same CTA and still opens the sheet', async () => {
     f.rpc.mockResolvedValue({ data: [row({ members: 3 })], error: null });
     mount();
     await waitFor(() => expect(q('[data-competition-card]').length).toBe(1));
-    expect(document.querySelector('[data-competition-rest]')).toBeNull();
+    expect(screen.getByRole('button', { name: 'See all players' })).toBeTruthy();
     fireEvent.click(q('[data-competition-card]')[0]);
     await waitFor(() => expect(q('[data-competition-field]').length).toBe(1));
   });
