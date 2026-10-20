@@ -45,8 +45,8 @@ function LocationProbe() {
 }
 function tab(url: string) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const tree = <MemoryRouter initialEntries={[url]}><QueryClientProvider client={client}><CourseReviewsTab courseId="course" courseName="Course" /><LocationProbe /></QueryClientProvider></MemoryRouter>;
-  return { ...render(tree), tree };
+  const tree = () => <MemoryRouter initialEntries={[url]}><QueryClientProvider client={client}><CourseReviewsTab courseId="course" courseName="Course" /><LocationProbe /></QueryClientProvider></MemoryRouter>;
+  return { ...render(tree()), tree };
 }
 function target() { return document.querySelector('[data-review-id="r0"]'); }
 function highlighted() { return target()?.classList.contains('animate-soft-pulse') ?? false; }
@@ -58,7 +58,7 @@ beforeEach(() => {
   fixture.closeFullscreen.mockClear();
   openSheet.mockClear();
   scroll.mockClear();
-  vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(scroll);
+  Object.defineProperty(Element.prototype, 'scrollIntoView', { configurable: true, value: scroll });
   useReviewSheetStore.setState({ open: openSheet, isOpen: false, payload: null });
 });
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks(); });
@@ -100,7 +100,7 @@ describe('highlight-only review links', () => {
     act(() => vi.advanceTimersByTime(5000));
     expect(scroll).not.toHaveBeenCalled();
     fixture.loading = false;
-    view.rerender(view.tree);
+    view.rerender(view.tree());
     expect(highlighted()).toBe(true);
     expect(scroll).toHaveBeenCalledOnce();
     act(() => vi.advanceTimersByTime(3000));
