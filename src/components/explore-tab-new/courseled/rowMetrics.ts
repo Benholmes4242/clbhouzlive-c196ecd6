@@ -22,7 +22,8 @@ export const BOARD_ROW_METRICS = {
   /** Same tracking on both scales: no reason for the figures to differ. */
   figureTracking: '-0.02em',
   secondarySize: 10.5,
-  /** The latest gross figures match In form, not the ranked-board secondary scale. */
+  /** The latest NET and GROSS figures match In form, not the ranked-board scale. */
+  recentNetSize: 15,
   recentGrossSize: 15,
   secondaryWeight: 700,
   posSize: 13,
