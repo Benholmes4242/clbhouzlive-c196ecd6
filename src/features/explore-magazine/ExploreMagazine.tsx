@@ -1341,7 +1341,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           key === 'all'
             ? t('amateur.stream.view.all', 'All')
             : key === 'scores'
-              ? t('amateur.stream.view.scores', 'Standings')
+              ? t('amateur.stream.view.scores', 'Rounds')
               : t('amateur.stream.view.watch', 'Watch'),
       })),
     [t],
@@ -1575,10 +1575,6 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
             onRowPress={boardRowPress}
             onMemberTap={(id) => opener.openProfile(id)}
             onOpenCourse={(id) => { depart(); navigate(`/courses/${id}`); }}
-            onOpenFilters={() => {
-              analyticsEvents.track('amateur_filter_opened', { board: boardState.board });
-              setBoardPanelOpen(true);
-            }}
           />
         </div>
       ) : null}
