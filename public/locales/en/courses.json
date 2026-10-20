@@ -12,7 +12,7 @@
       "title": "Just played"
     },
     "competitions": {
-      "eyebrow": "The contest",
+      "eyebrow": "Tournament golf",
       "title": "Competitions",
       "window": "Last 30 days",
       "subtitleRest_one": "{{date}} · {{count}} player",

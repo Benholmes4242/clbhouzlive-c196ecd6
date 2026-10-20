@@ -9,11 +9,20 @@ import { COMPETITION } from './tokens';
  * Only call-site spacing and data handles pass through — never restyle the mark. */
 type MarkProps = { style?: Pick<CSSProperties, 'marginLeft'> } & { [k: `data-${string}`]: boolean | string | undefined };
 
+/** CB10 — the trophy glyph, extracted so the field-sheet subtitle can carry it
+ * at a second size without copying the path data. One home for the glyph; only
+ * width/height pass in. Every paint stays currentColor. */
+export function CompetitionTrophy({ width, height }: { width: number; height: number }) {
+  return (
+    <svg width={width} height={height} viewBox="0 0 10 11" aria-hidden="true" focusable="false" style={{ display: 'block', flex: 'none' }}><path d="M3 2H1.4v1.1a2 2 0 0 0 2 2M7 2h1.6v1.1a2 2 0 0 1-2 2" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" /><path d="M3 1h4v2.6a2 2 0 0 1-4 0V1Z" fill="currentColor" /><rect x="4.35" y="5.4" width="1.3" height="2" fill="currentColor" /><rect x="2.7" y="7.4" width="4.6" height="1.3" rx="0.5" fill="currentColor" /></svg>
+  );
+}
+
 export function CompetitionMark({ style, ...data }: MarkProps) {
   const { t } = useTranslation('courses');
   return (
     <span {...data} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0, whiteSpace: 'nowrap', color: COMPETITION, ...style }}>
-      <svg width="9" height="10" viewBox="0 0 10 11" aria-hidden="true" focusable="false" style={{ display: 'block', flex: 'none' }}><path d="M3 2H1.4v1.1a2 2 0 0 0 2 2M7 2h1.6v1.1a2 2 0 0 1-2 2" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" /><path d="M3 1h4v2.6a2 2 0 0 1-4 0V1Z" fill="currentColor" /><rect x="4.35" y="5.4" width="1.3" height="2" fill="currentColor" /><rect x="2.7" y="7.4" width="4.6" height="1.3" rx="0.5" fill="currentColor" /></svg>
+      <CompetitionTrophy width={9} height={10} />
       <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1 }}>{t('discover.filterBoard.competitionShort', { defaultValue: 'Comp' })}</span>
     </span>
   );
