@@ -15,8 +15,14 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
  */
 export function useClubhouseComments(_activeActor?: { type: string; id: string } | null) {
   const [commentsOpen, setCommentsOpen] = useState(false);
+  /* THE TAPPED POST, NOT THE SCROLL-ACTIVE ONE. The sheet targets the post
+     whose comment control was tapped. Closing never clears it, so the sheet
+     cannot swap content mid exit animation; the page clears it once the
+     sheet has unmounted (clearCommentsPost). */
+  const [commentsPost, setCommentsPost] = useState<FeedPost | null>(null);
 
   const openComments = useCallback((post?: FeedPost | null, source: CommentOpenSource = 'sheet') => {
+    setCommentsPost(post ?? null);
     setCommentsOpen(true);
     analyticsEvents.track('post_comment_open', {
       post_id: post?.id ?? null,
@@ -38,7 +44,11 @@ export function useClubhouseComments(_activeActor?: { type: string; id: string }
     setCommentsOpen(false);
   }, []);
 
+  const clearCommentsPost = useCallback(() => {
+    setCommentsPost(null);
+  }, []);
+
   const overlayVisible = !commentsOpen;
 
-  return { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount, resetComments };
+  return { commentsOpen, commentsPost, overlayVisible, openComments, closeComments, getCommentCount, resetComments, clearCommentsPost };
 }
