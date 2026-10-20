@@ -8,15 +8,15 @@
  * ever offers it.
  *
  * Mocks are copied whole (react-i18next with initReactI18next, required at
- * module load). Assertions are on the bio element's own inline style and on
- * button presence — never on a translated word.
+ * module load; its t honours both default forms, because the hero calls
+ * t('hero.more', 'More')). Assertions are on inline style and button presence.
  */
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
-vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
+vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string } | string) => (typeof o === 'string' ? o : o?.defaultValue ?? '') }) }));
 
 vi.mock('@/lib/whs/hooks', () => ({
   useWhsConnection: () => ({ data: null, isFetched: true, isError: false }),
@@ -74,11 +74,11 @@ function renderHero({
 }
 
 describe('profile hero bio shows whole', () => {
-  it('a bio at the editor limit is thirty hundred characters of fixture', () => {
+  it('the bio fixture is exactly the 300-character editor limit', () => {
     expect(BIO_300).toHaveLength(BIO_MAX);
   });
 
-  it('a thirty-character-limit bio collapses to eight lines, not two', () => {
+  it('a bio at the editor limit collapses to eight lines, not two', () => {
     expect(BIO_COLLAPSED_LINES).toBe(8);
     const bioRef = renderHero();
     const style = bioRef.current?.style;
@@ -91,7 +91,7 @@ describe('profile hero bio shows whole', () => {
 
   it('the expanded bio lifts the clamp', () => {
     const bioRef = renderHero({ bioExpanded: true });
-    expect(bioRef.current?.style.WebkitLineClamp).toBe('');
+    expect(bioRef.current?.style.WebkitLineClamp).toBeUndefined();
     expect(bioRef.current?.style.display).not.toBe('-webkit-box');
   });
 
