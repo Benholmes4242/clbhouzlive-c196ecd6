@@ -50,12 +50,14 @@ import { HundredBasis, HundredRail, HundredSubHead, HundredYou } from './TheHund
 export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
 
 /**
- * THE LEADERBOARDS PAGE (BRIEF — THE LEADERBOARDS PAGE, structure A).
+ * THE ROUNDS PAGE (BRIEF — THE LEADERBOARDS PAGE, structure A; EX1).
  *
- * EVERY SECTION ANSWERS A DIFFERENT QUESTION. Scope governs the lead board
- * (§3 Lowest gross) and nothing below it. Sections, in order: head, §3 Lowest
- * gross, §5 Feats this year, §4 Most improved, §6 Who leads what, §7 Top 100
- * — §4 onward are platform facts. The order alternates section SHAPE (rows,
+ * EVERY SECTION ANSWERS A DIFFERENT QUESTION. Scope governs the three scoped
+ * sections (Standout rounds, Competitions, Just played — EX1 replaced §3, the
+ * lead board, with them) and nothing below them. Sections, in order: head
+ * (scope chips), Standout rounds, Competitions, Just played, §5 Feats this
+ * year, §4 Most improved, §6 Who leads what, §7 Top 100 — §5 onward are
+ * platform facts. The order alternates section SHAPE (rows,
  * tiles, rows, rail, carousel) so no two neighbours read alike; anything added
  * here is placed by its shape, not its subject. § numbers name sections, not
  * positions. Each section owns its read, holds its
