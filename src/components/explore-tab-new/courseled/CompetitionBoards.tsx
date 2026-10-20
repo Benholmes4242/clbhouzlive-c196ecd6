@@ -73,7 +73,7 @@ function Card({ card, onOpen, onRowPress }: { card: CompetitionCard; onOpen: () 
   const subtitle = useSubtitleRest(card);
   return (
     <div data-competition-card
-      style={{ width: 244, flex: 'none', boxSizing: 'border-box', scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', border: `1px solid ${A.HAIRLINE}`, borderRadius: 14, padding: '12px 13px', textAlign: 'left' }}>
+      style={{ width: 276, flex: 'none', boxSizing: 'border-box', scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', border: `1px solid ${A.HAIRLINE}`, borderRadius: 14, padding: '12px 13px', textAlign: 'left' }}>
       {/* CB4.7 — the sheet opens from the title/subtitle and the CTA only;
           a podium row opens that player's scorecard instead. */}
       <button type="button" data-competition-open onClick={onOpen}
@@ -84,13 +84,13 @@ function Card({ card, onOpen, onRowPress }: { card: CompetitionCard; onOpen: () 
           <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subtitle}</span>
         </div>
       </button>
-      <Heads netW={46} grossW={44} style={{ marginTop: 10 }} />
+      <Heads netW={44} grossW={44} style={{ marginTop: 10 }} />
       {card.rows.slice(0, PODIUM).map((r) => (
         <button key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} type="button" data-competition-row onClick={() => onRowPress(r)}
           style={{ display: 'flex', alignItems: 'center', marginTop: 7, width: '100%', padding: 0, border: 'none', background: 'transparent', fontFamily: SANS, textAlign: 'left', cursor: 'pointer' }}>
-          <span style={{ lineHeight: 1.25, width: 26, flex: 'none', fontSize: 10, fontWeight: 800, color: A.FAINT }}>{posText(r)}</span>
+          <span style={{ lineHeight: 1.25, width: 22, flex: 'none', fontSize: 10, fontWeight: 800, color: A.FAINT }}>{posText(r)}</span>
           <span style={{ lineHeight: 1.25, flex: 1, minWidth: 0, fontSize: 12.5, fontWeight: 600, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.display_name ?? t('discover.aMember')}</span>
-          <span style={{ width: 46, flex: 'none', textAlign: 'center', fontSize: 13 }}><ScoreWithToPar score={r.net_score} par={r.course_par} kind="net" fontSize={13} /></span>
+          <span style={{ width: 44, flex: 'none', textAlign: 'center', fontSize: 13 }}><ScoreWithToPar score={r.net_score} par={r.course_par} kind="net" fontSize={13} /></span>
           <span style={{ width: 44, flex: 'none', textAlign: 'center' }}><ScoreWithToPar score={r.gross_score} par={r.course_par} kind="gross" fontSize={11.5} /></span>
         </button>
       ))}
