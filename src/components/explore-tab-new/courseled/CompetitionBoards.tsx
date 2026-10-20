@@ -79,7 +79,7 @@ function FieldBody({ card, viewerId, t }: { card: CompetitionCard; viewerId: str
     <div data-competition-field style={{ fontFamily: SANS, ...FIGS }}>
       <div style={{ padding: '14px 18px 0' }}>
         <h2 id="competition-field-title" style={{ margin: 0, fontSize: 16, fontWeight: 700, color: A.INK, lineHeight: 1.25 }}>{card.course_name}</h2>
-        <div style={{ marginTop: 4, fontSize: 11.5, fontWeight: 600, color: A.DIM }}>{subtitle}</div>
+        <div style={{ marginTop: 4, fontSize: 11.5, fontWeight: 600, color: A.DIM, lineHeight: 1.25 }}>{subtitle}</div>
       </div>
       <Heads netW={48} grossW={46} style={{ margin: '14px 18px 0', paddingBottom: 7, borderBottom: `1px solid ${A.SOFT}` }} />
       {card.rows.map((r) => {
@@ -108,7 +108,7 @@ export function CompetitionBoards({ viewerId, scope, enabled }: { viewerId: stri
   const open = cards.find((c) => c.key === openKey) ?? null;
   return (
     <section data-competitions-section style={{ fontFamily: SANS, ...FIGS, paddingInline: 16, marginBottom: 20 }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.DIM, lineHeight: 'normal' }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.DIM, lineHeight: 1.25 }}>
         <span>{t('amateur.competitions.title', { defaultValue: 'Competitions' })}</span>
         <span style={{ marginLeft: 'auto', color: A.FAINT }}>{t('amateur.competitions.window', { defaultValue: 'Last 30 days' })}</span>
       </div>
