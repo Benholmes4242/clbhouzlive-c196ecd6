@@ -9,7 +9,6 @@ import { StandoutRounds } from '@/components/explore-tab-new/courseled/StandoutR
 import { standoutRpcArgs, type StandoutRound } from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';
 import { standoutSentenceParts } from '@/components/explore-tab-new/courseled/standoutSentence';
 import { fmtToPar } from '@/components/explore-tab-new/courseled/BoardRows';
-const standoutToPar = (s: number | null, p: number | null) => (s == null || p == null ? '' : fmtToPar(s - p));
 
 const f = vi.hoisted(() => ({ rpc: vi.fn() }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: f.rpc } }));
@@ -100,9 +99,20 @@ describe('SR1 standout rules', () => {
     expect(standoutSentenceParts(row({ last_better: '2026-10-01', delta: 3.4 }))).toMatchObject({ n: 3 });
   });
   it('prints score minus par with explicit signs and a true minus', () => {
-    expect(standoutToPar(69, 71)).toBe('−2');
-    expect(standoutToPar(73, 72)).toBe('+1');
-    expect(standoutToPar(72, 72)).toBe('E');
-    expect(standoutToPar(null, 72)).toBe('');
+    expect(fmtToPar(69 - 71)).toBe('−2');
+    expect(fmtToPar(73 - 72)).toBe('+1');
+    expect(fmtToPar(72 - 72)).toBe('E');
+  });
+  it('prints no to-par when par is missing', async () => {
+    f.rpc.mockResolvedValue({ data: [row({ course_par: null, net_score: 72, gross_score: 78 })], error: null });
+    mount();
+    await waitFor(() => expect(rows()).toHaveLength(1));
+    expect(rows()[0].textContent).toContain('NET72GROSS78');
+  });
+  it('renders a level net to-par as E', async () => {
+    f.rpc.mockResolvedValue({ data: [row({ net_score: 72, gross_score: 78, course_par: 72 })], error: null });
+    mount();
+    await waitFor(() => expect(rows()).toHaveLength(1));
+    expect(rows()[0].textContent).toContain('NET72EGROSS78+6');
   });
 });
