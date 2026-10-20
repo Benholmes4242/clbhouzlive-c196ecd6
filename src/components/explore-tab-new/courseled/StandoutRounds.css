@@ -1,9 +1,0 @@
-/* SR1's explicit round-avatar exception is local; shared avatar consumers and
-   their canonical ring are untouched. The outer row still owns its 36px slot. */
-[data-standout-avatar] > div > .overflow-hidden {
-  aspect-ratio: 1 !important;
-  border-radius: 999px !important;
-}
-[data-standout-avatar] > div > .pointer-events-none {
-  border-radius: 999px !important;
-}
