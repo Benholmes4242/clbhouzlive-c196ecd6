@@ -32,7 +32,7 @@ const UNLOCKS: { main: string; tail?: string }[] = [
 
 export const ConnectCard: React.FC<{ onNavigate: (r: string) => void }> = ({ onNavigate }) => (
   <div data-card="connect" style={{ ...CARD, padding: '15px 14px 14px' }}>
-    <span style={{ ...CARD_LABEL, color: A.AMBER }}>Your handicap</span>
+    <span style={CARD_LABEL}>Your handicap</span>
     <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.022em', marginTop: 8, lineHeight: 1.22, color: A.INK }}>
       clbhouz is quiet until it knows your game.
     </div>
@@ -43,7 +43,7 @@ export const ConnectCard: React.FC<{ onNavigate: (r: string) => void }> = ({ onN
       {UNLOCKS.map((u) => (
         <div key={u.main} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
           <span aria-hidden style={{
-            width: 19, height: 19, borderRadius: 6, flex: '0 0 19px', background: A.TRACK, color: A.AMBER,
+            width: 19, height: 19, borderRadius: 6, flex: '0 0 19px', background: A.TRACK, color: A.INK,
             display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1,
             fontSize: 11, fontWeight: 900, lineHeight: 1,
           }}>{'\u2713'}</span>
