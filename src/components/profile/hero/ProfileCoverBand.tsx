@@ -186,7 +186,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
             {displayName}
           </h1>
           {subline ? (
-            <div style={{ marginTop: 3, fontSize: 12.5, fontWeight: 600, color: W_55, textShadow: '0 1px 8px rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ marginTop: 3, fontSize: 12.5, fontWeight: 600, color: '#FFFFFF', textShadow: '0 1px 8px rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {subline}
             </div>
           ) : onAddHomeClub ? (
