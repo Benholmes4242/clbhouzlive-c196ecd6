@@ -1,5 +1,10 @@
 # Roadmap
 
+## CTA1 — White solid account-sheet buttons
+- [x] Cta background A.AMBER -> A.INK, foreground A.CANVAS unchanged; removed amber from its doc comment. All three PreIndexCards callers deliberately share this change; Door and other amber details untouched. No test edits or added colour assertions.
+- [x] Read-only hide-gate audit: ProfileSheetV2.tsx:149 reads profileQ, :159 passes hide_handicap_chip, :277-280 passes derived state to SheetCards. sheetState.ts:67/69/71 returns business/unsettled/hidden before any none/manual/connected state; SheetCards.tsx:29-32 returns null for those kinds. No connect path when the supplied flag is true.
+- [ ] Run unchanged full suite against last verified 1,913 passing / 249 files; verify preview and button presentation.
+
 ## CEX1 — Crop the connect example
 - [x] Applied wrapper opacity 0.5/maxHeight 205/overflow hidden/both masks; example-only axis removed; counting props false/0/0, unused fixture fields removed; English rest and fallback matched. Connected counting gate, handlers, controls and ProfileHero gates untouched. Crop derivation documented in local header; no structural changes.
 - [x] Exact command `npx vitest run`: before 1,910 passing / 249 files -> after 1,913 passing / 249 files, zero failures. Brief's 1,908 / 248 predates the +2 profileHeroClubWhite tests already reported. Three added cases solely heroConnectExample.test.tsx: wrapper style; example axis/counting absence; connected axis/counting presence. Sole authorised rewrite: `supplies both movements, five approved round figures and two counting rounds` renamed `supplies both movements and five approved round figures`, dropping only `expect(CONNECT_EXAMPLE.countingN).toBe(2)` because fixture counting data no longer displays. All 12 other existing blocks byte-identical; heroConnectPanel.test.tsx untouched.
