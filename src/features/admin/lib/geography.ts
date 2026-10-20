@@ -61,7 +61,7 @@ export const ROW_CONTINENT_COUNTRY: Record<RowContinent, string> = {
    neighbours file as 'Caribbean'. Verified against golf_courses: change
    both or neither. The test in §5 enforces it. */
 export const CARIBBEAN_NATIONS = new Set<string>([
-  'Anguilla', 'Antigua and Barbuda', 'Aruba', 'Bahamas', 'Barbados',
+  'Anguilla', 'Antigua and Barbuda', 'Aruba', 'Bahamas', 'Barbados', 'Bermuda',
   'Cayman Islands', 'Cuba', 'Curaçao', 'Dominica', 'Dominican Republic',
   'Grenada', 'Guadeloupe', 'Haiti', 'Jamaica', 'Martinique', 'Montserrat',
   'Puerto Rico', 'St Kitts and Nevis', 'St Lucia', 'St Martin',
