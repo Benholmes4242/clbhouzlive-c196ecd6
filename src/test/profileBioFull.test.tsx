@@ -82,16 +82,16 @@ describe('profile hero bio shows whole', () => {
     expect(BIO_COLLAPSED_LINES).toBe(8);
     const bioRef = renderHero();
     const style = bioRef.current?.style;
-    expect(style?.WebkitLineClamp).toBe('8');
+    expect(style?.getPropertyValue('-webkit-line-clamp')).toBe('8');
     expect(style?.display).toBe('-webkit-box');
-    expect(style?.WebkitBoxOrient).toBe('vertical');
+    expect(style?.getPropertyValue('-webkit-box-orient')).toBe('vertical');
     expect(style?.overflow).toBe('hidden');
     expect(bioRef.current?.textContent).toBe(BIO_300);
   });
 
   it('the expanded bio lifts the clamp', () => {
     const bioRef = renderHero({ bioExpanded: true });
-    expect(bioRef.current?.style.WebkitLineClamp).toBeUndefined();
+    expect(bioRef.current?.style.getPropertyValue('-webkit-line-clamp')).toBe('');
     expect(bioRef.current?.style.display).not.toBe('-webkit-box');
   });
 
