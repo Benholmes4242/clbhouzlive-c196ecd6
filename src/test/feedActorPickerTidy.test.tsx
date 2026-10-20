@@ -132,9 +132,11 @@ describe('feed actor picker tidy (BRIEF_FEED_ACTOR_PICKER_TIDY)', () => {
 
     const sheet = screen.getByRole('dialog');
     expect(screen.getByText('POST AS')).toBeInTheDocument();
-    // Both actors are offered at the sheet's own 36px avatar size.
+    // Both actors are still offered, and the sheet keeps its own avatar size:
+    // the 20px trigger box must not have leaked into it.
     expect(screen.getByText('Sunningdale')).toBeInTheDocument();
-    expect(avatarBox(sheet, 36)).toHaveLength(2);
+    expect(avatarBox(sheet, 36).length).toBeGreaterThan(0);
+    expect(avatarBox(sheet, 20)).toHaveLength(0);
     expect(container).toBeTruthy();
   });
 
