@@ -14,7 +14,7 @@ await i18n.init({ lng: 'en', fallbackLng: 'en', ns: ['courses'], defaultNS: 'cou
 
 function row(over: Partial<CompetitionBoardRow> = {}): CompetitionBoardRow {
   return { comp_date: '2026-10-11', course_id: 'west', course_name: 'West', rounds: 8, members: 8, pos: 1, is_tie: false,
-    user_id: 'u1', display_name: 'One', whs_score_id: 's1', net_score: 68, gross_score: 77, course_par: 72, ...over };
+    user_id: 'u1', display_name: 'One', whs_score_id: 's1', profile_photo_url: null, net_score: 68, gross_score: 77, course_par: 72, ...over };
 }
 function mount(scope: 'everyone' | 'circle' = 'everyone', enabled = true) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
