@@ -3,7 +3,6 @@ import { ChevronRight } from 'lucide-react';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { WHO_LEADS } from './whoLeads';
 
 /**
  * EX2 — the Rounds tab's one section head, moved unchanged out of
@@ -16,6 +15,9 @@ import { WHO_LEADS } from './whoLeads';
  */
 
 export const GUTTER = 16;
+
+/** CB11 — shared rail spacing belongs here, not to a removable section. */
+const RAIL = { gap: 10, top: 12, bottom: 18 } as const;
 
 export const EYEBROW = {
   fontSize: 11,
@@ -137,13 +139,13 @@ export function Rail({ children }: { children: ReactNode }) {
       <div
         style={{
           display: 'flex',
-          gap: WHO_LEADS.rail.gap,
+          gap: RAIL.gap,
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
           paddingInline: GUTTER,
           scrollPaddingInline: GUTTER,
-          paddingTop: WHO_LEADS.rail.top,
-          paddingBottom: WHO_LEADS.rail.bottom,
+          paddingTop: RAIL.top,
+          paddingBottom: RAIL.bottom,
           scrollbarWidth: 'none',
           willChange: 'transform',
         }}
