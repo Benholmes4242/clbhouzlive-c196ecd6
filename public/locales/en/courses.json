@@ -9,7 +9,8 @@
     },
     "justPlayed": {
       "eyebrow": "The latest",
-      "title": "Just played"
+      "title": "Just played",
+      "sheetTitle": "The latest"
     },
     "competitions": {
       "eyebrow": "Tournament golf",

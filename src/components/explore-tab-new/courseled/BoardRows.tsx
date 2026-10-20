@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next';
 
 import { A, SANS, SELF_ROW_TINT, INDEX_CUT_BORDER } from './tokens';
 import { CompetitionMark } from './CompetitionMark';
+import { ScoreWithToPar } from './ScoreWithToPar';
+import { fmtToPar } from './scoreToPar';
+export { fmtToPar } from './scoreToPar';
 import { playDateStandalone, playDateUnderYearHeader } from './discoverWhen';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { boardCountsRounds, isFeatBoard, type BoardKey, type FeatBoardKey } from './boardFilters';
@@ -101,13 +104,6 @@ export function boardColumns(board: BoardKey): BoardColumns {
   }
 }
 
-/** True minus, never a hyphen; E at level. */
-export function fmtToPar(n: number | null): string {
-  if (n == null) return '\u2014';
-  const r = Math.round(n);
-  return r === 0 ? 'E' : r < 0 ? `\u2212${Math.abs(r)}` : `+${r}`;
-}
-
 function toParOf(r: Row): number | null {
   if (r.gross_score == null || r.course_par == null) return null;
   return r.gross_score - r.course_par;
@@ -122,6 +118,8 @@ function netToParOf(r: Row): number | null {
 /** 18.5 — figure tracks: min-widths, right-aligned. */
 const MAIN_FIG_MIN_W = 24;
 const SECOND_FIG_MIN_W = 22;
+/** CB12 — recent pairs use stable tracks for score plus suffix on both surfaces. */
+const RECENT_SCORE_WIDTH = 48;
 
 interface Cell {
   text: string;
@@ -328,10 +326,13 @@ export function BoardHeaderRow({ board }: { board: BoardKey }) {
     >
       {cols.ranked && <span style={{ ...cap, textAlign: 'center' }}>{t('discover.filterBoard.col.pos')}</span>}
       <span style={{ ...cap, gridColumn: 'span 2' }}>{t('discover.filterBoard.col.member')}</span>
-      <span style={{ ...cap, textAlign: 'right' }}>
+      {board === 'recent' ? <span style={{ display: 'flex', gap: 12 }}>
+        <span style={{ ...cap, width: RECENT_SCORE_WIDTH, textAlign: 'center' }}>{t(cols.value.i18n)}</span>
+        <span style={{ ...cap, width: RECENT_SCORE_WIDTH, textAlign: 'center' }}>{cols.secondary ? t(cols.secondary.i18n) : null}</span>
+      </span> : <span style={{ ...cap, textAlign: 'right' }}>
         {t(cols.value.i18n)}
         {cols.secondary ? <> {'\u00B7'} {t(cols.secondary.i18n)}</> : null}
-      </span>
+      </span>}
     </div>
   );
 }
@@ -386,7 +387,8 @@ export function BoardRowView({
   const value = boardValue(row, board, t as never);
   const second = boardSecondary(row, board);
   const { ranked } = boardColumns(board);
-  const feat = boardFeatMarker(row, board, t);
+  // CB12: recent is a feed, not a feat sheet; preserve all other marker rules.
+  const feat = board === 'recent' ? null : boardFeatMarker(row, board, t);
   const course = row.course_name ?? t('discover.unknownCourse');
   /* Feed rows sit under day-ladder groups that state the year; a ranked board has no groups. */
   const date = ranked
@@ -536,7 +538,10 @@ export function BoardRowView({
           ) : null}
         </span>
       </span>
-      <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', columnGap: 3 }}>
+      {board === 'recent' ? <span style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+        <span style={{ width: RECENT_SCORE_WIDTH, textAlign: 'center' }}><ScoreWithToPar score={row.net_score} par={row.course_par} kind="net" fontSize={M.figureSize} fontWeight={M.figureWeight} scoreHandle="main" /></span>
+        <span style={{ width: RECENT_SCORE_WIDTH, textAlign: 'center' }}><ScoreWithToPar score={row.gross_score} par={row.course_par} kind="gross" fontSize={M.secondarySize} fontWeight={M.secondaryWeight} scoreHandle="secondary" /></span>
+      </span> : <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', columnGap: 3 }}>
         {/* S1.3 — THE FIGURE FOLLOWS THE COLOUR LAW, NEVER AMBER.
             18.5 — fixed min-width tracks so right edges align. */}
         <span
@@ -555,7 +560,7 @@ export function BoardRowView({
             {second.text}
           </span>
         ) : null}
-      </span>
+      </span>}
     </button>
   );
 }
