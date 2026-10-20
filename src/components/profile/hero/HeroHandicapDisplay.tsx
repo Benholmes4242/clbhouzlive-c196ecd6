@@ -3,6 +3,7 @@
  * the illustrative example supplies fixed props to this same markup, never a
  * parallel drawing. Connected output/geometry and counting fallbacks are frozen.
  * Example taps are suppressed at source; inert is only a secondary safeguard.
+ * CEX1 omits only the example's duplicate axis; counting remains prop-gated.
  */
 import React from 'react';
 import type { TFunction } from 'i18next';
@@ -58,9 +59,9 @@ const IndexChart: React.FC<{ points: number[]; color: string; fillTop: number; a
         </span>
         <span aria-hidden style={{ position: 'absolute', right: -3, top: lastY, marginTop: -3.5, width: 7, height: 7, borderRadius: 999, background: color, boxShadow: MARKER_HALO }} />
       </div>
-      <div style={{ marginTop: 5, display: 'flex', justifyContent: 'space-between', ...MICRO, color: AXIS_INK }}>
+      {!example && <div style={{ marginTop: 5, display: 'flex', justifyContent: 'space-between', ...MICRO, color: AXIS_INK }}>
         <span>{axisLeft}</span><span>{axisRight}</span>
-      </div>
+      </div>}
     </button>
   );
 };
