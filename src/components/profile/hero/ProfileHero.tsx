@@ -44,6 +44,11 @@ const TILE_GROUND = 'rgba(255,255,255,0.02)';
 /** Connect panel ghost figures. Deliberately DIMMER than their own label
  *  (A.FAINT): the label carries the meaning, the figure is the absent thing. */
 const GHOST_FIGURE = 'rgba(248,250,252,0.18)';
+/** Rendered height of a connected form tile (1px borders + 8/7 padding + gross
+ *  16 + 4 + differential 15 + 5 + course 10.5), measured in Chromium. Every
+ *  tile renders all three lines (nbsp fallbacks, one-line ellipsis), so it is
+ *  constant. Re-measure if the tile's type or padding changes. */
+const GHOST_TILE_HEIGHT = 67.5;
 
 /** The event contract — not the layout. Every member stays even where a view omits the cell. */
 export type HeroStat = 'index' | 'rounds' | 'courses' | 'rated' | 'badges' | 'friends' | 'followers';
@@ -616,11 +621,11 @@ export const ProfileHero: React.FC<Props> = ({
         {showConnectCard && (
           <div data-testid="hero-connect-panel" style={{ marginTop: 14 }}>
             <div data-ghost-label="" style={{ ...KICK, color: A.FAINT }}>{t('hero.handicapIndex', 'Handicap index')}</div>
-            <div aria-hidden style={{ marginTop: 6, fontSize: 46, fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 1, color: GHOST_FIGURE }}>{'\u2014'}</div>
-            <div data-ghost-label="" style={{ ...KICK, color: A.FAINT, marginTop: 20 }}>{t('hero.formLastFive', 'Form \u00B7 last five')}</div>
-            <div aria-hidden style={{ marginTop: 9, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 7 }}>
+            <div aria-hidden style={{ marginTop: 5, fontSize: 46, fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 1, color: GHOST_FIGURE }}>{'\u2014'}</div>
+            <div data-ghost-label="" style={{ ...KICK, color: A.FAINT, marginTop: 18 }}>{t('hero.formLastFive', 'Form \u00B7 last five')}</div>
+            <div aria-hidden style={{ marginTop: 9, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
               {[0, 1, 2, 3, 4].map((i) => (
-                <div key={i} data-ghost-tile="" style={{ minWidth: 0, height: 46, border: `1px solid ${A.BORDER}`, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: GHOST_FIGURE }}>{'\u2014'}</div>
+                <div key={i} data-ghost-tile="" style={{ minWidth: 0, height: GHOST_TILE_HEIGHT, border: `1px solid ${A.BORDER}`, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: GHOST_FIGURE }}>{'\u2014'}</div>
               ))}
             </div>
             <div style={{ marginTop: 14, fontSize: 12.5, lineHeight: 1.5, color: A.BODY }}>
