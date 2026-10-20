@@ -482,7 +482,11 @@ export function BoardRowView({
               {feat}
             </span>
           ) : null}
-          {/* CHIP1 — only an explicit true; null is not evidence of a social round. Follows the feat. */}
+          {/* CHIP1 — only an explicit true; null is not evidence of a social round. Follows the feat.
+              CB6.1 — THE RULE: a pill is for a rare achievement (the feat chips keep theirs);
+              a plain coloured word is for a category, which is what a competition is. A bare
+              word next to a feat pill is correct, not an oversight — do not re-add the border
+              for consistency with the chip beside it. */}
           {row.is_competition === true ? (
             <span
               data-board-competition
@@ -490,13 +494,9 @@ export function BoardRowView({
                 flexShrink: 0,
                 fontSize: 8.5,
                 fontWeight: 800,
-                letterSpacing: '0.1em',
+                letterSpacing: '0.14em',
                 textTransform: 'uppercase',
                 color: COMPETITION,
-                border: `1px solid color-mix(in srgb, ${COMPETITION} 38%, transparent)`,
-                background: `color-mix(in srgb, ${COMPETITION} 13%, transparent)`,
-                borderRadius: 999,
-                padding: '1px 5px',
                 lineHeight: 1.2,
                 whiteSpace: 'nowrap',
               }}
