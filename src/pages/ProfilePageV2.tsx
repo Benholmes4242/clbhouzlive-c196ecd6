@@ -903,6 +903,7 @@ const ProfilePageV2Content: React.FC = () => {
             onEdit={() => navigate(editRoute)}
             onConnect={() => navigate('/handicap')}
             isSelf={isSelf}
+            hideConnectPrompt={!!profile.hide_handicap_chip}
             indexValue={resolvedHcp.value ?? null}
             roundsCount={shellRoundsCount}
             roundsCountState={isSelf ? shellRoundsState : 'ok'}
