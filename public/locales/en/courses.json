@@ -1536,6 +1536,7 @@
       "featBirdies_other": "{{count}} BIRDIES",
       "featClean": "BOGEY-FREE",
       "competitionChip": "Competition",
+      "competitionShort": "Comp",
       "featEagle_one": "EAGLE",
       "featEagle_other": "{{count}} EAGLES",
       "featJoin": "{{first}} + {{second}}",
