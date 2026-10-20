@@ -1,12 +1,18 @@
 {
   "amateur": {
     "standout": {
+      "eyebrow": "The form",
       "title": "Standout rounds",
       "bestEver": "Best ever at {{course}}",
       "bestSince": "Best at {{course}} since {{month}}",
       "betterAverage": "{{n}} shots better than average at {{course}}"
     },
+    "justPlayed": {
+      "eyebrow": "The latest",
+      "title": "Just played"
+    },
     "competitions": {
+      "eyebrow": "The contest",
       "title": "Competitions",
       "window": "Last 30 days",
       "subtitle_one": "Competition · {{date}} · {{count}} player",
