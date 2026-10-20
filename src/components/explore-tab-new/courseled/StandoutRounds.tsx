@@ -25,7 +25,7 @@ function Figures({ row }: { row: StandoutRound }) {
         return <span key={kind} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minWidth: 45 }}>
           <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: A.MUTE, lineHeight: '11px' }}>{t(`discover.filterBoard.col.${kind}`, { defaultValue: kind === 'net' ? 'NET' : 'GROSS' })}</span>
           <span className="tabular-nums" style={{ fontSize: 15, fontWeight: 700, lineHeight: '18px', color: under ? TOPAR_UNDER_DARK : kind === 'net' ? A.INK : A.MUTE }}>
-            {score ?? '\u2014'}<span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.01em', marginLeft: 3, color: A.DIM }}>{standoutToPar(score, row.course_par)}</span>
+            {score ?? '\u2014'}<span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.01em', marginLeft: 3, color: A.DIM, lineHeight: 1 }}>{standoutToPar(score, row.course_par)}</span>
           </span>
         </span>;
       })}
@@ -45,7 +45,7 @@ export function StandoutRounds({ viewerId, filters, enabled, onRowPress }: {
   const win = windowOption(filters.window);
   return (
     <section data-standout-section style={{ fontFamily: SANS, ...FIGS, paddingInline: 16, marginTop: 20, marginBottom: 20 }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.DIM, lineHeight: 1.5 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.DIM, lineHeight: 'normal' }}>
         <span>{t('amateur.standout.title', { defaultValue: 'Standout rounds' })}</span>
         <span style={{ marginLeft: 'auto', color: A.FAINT }}>{t(win.i18n, { defaultValue: win.label })}</span>
       </div>
@@ -64,7 +64,7 @@ export function StandoutRounds({ viewerId, filters, enabled, onRowPress }: {
                 {row.is_competition === true ? <span data-standout-competition style={{ fontSize: 7.5, lineHeight: 1, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', borderRadius: 999, padding: '3px 6px', marginLeft: 8, flexShrink: 0, whiteSpace: 'nowrap', color: COMPETITION, border: `1px solid color-mix(in srgb, ${COMPETITION} 38%, transparent)`, background: `color-mix(in srgb, ${COMPETITION} 13%, transparent)` }}>{t('discover.filterBoard.competitionChip', { defaultValue: 'Competition' })}</span> : null}
               </span>
               <span style={{ display: 'block', marginTop: 4, fontSize: 12, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>{t(key, options)}</span>
-              <span style={{ display: 'block', marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: A.FAINT, lineHeight: 1.5 }}>{dateText}</span>
+              <span style={{ display: 'block', marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: A.FAINT, lineHeight: 'normal' }}>{dateText}</span>
             </span>
             <Figures row={row} />
           </Button>;
