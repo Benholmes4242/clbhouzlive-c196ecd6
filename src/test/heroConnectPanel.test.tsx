@@ -99,7 +99,7 @@ describe('CP1 connect panel', () => {
 
     chip.state = { ...chip.state, connected: true, trend: { current: 12.3 } };
     rounds.data = Array.from({ length: 5 }, (_, i) => ({
-      id: `r${i}`, play_date: `2026-10-0${i + 1}`, gross_score: 80 + i, differential: 12 + i,
+      whs_score_id: `r${i}`, play_date: `2026-10-0${i + 1}`, gross_score: 80 + i, handicap_differential: 12 + i, handicap_index_at_time: 12.3,
       course_id: 'c', course_name: 'Course', is_nine_hole: false, is_counter: null,
     }));
     renderHero({ indexValue: 12.3 });
