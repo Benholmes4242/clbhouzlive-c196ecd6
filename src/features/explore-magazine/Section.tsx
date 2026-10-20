@@ -99,8 +99,10 @@ export function Section({
 }
 
 /** CB3 — moved unchanged out of ScoresLeaderboardsPage. The page's one
- * see-all action: EYEBROW at A.MUTE, 13px chevron, no count. */
-export function SeeAll({ label, onPress }: { label: string; onPress: () => void }) {
+ * see-all action: EYEBROW at A.MUTE, 13px chevron, no count.
+ * CB4.2 — `size` shrinks the label only where a caller passes it (the 244px
+ * competition card); omitted, it renders at the shared 11px. */
+export function SeeAll({ label, onPress, size }: { label: string; onPress: () => void; size?: number }) {
   return (
     <button
       type="button"
@@ -115,6 +117,7 @@ export function SeeAll({ label, onPress }: { label: string; onPress: () => void 
         background: 'transparent',
         fontFamily: SANS,
         ...EYEBROW,
+        fontSize: size ?? EYEBROW.fontSize,
         color: A.MUTE,
         cursor: 'pointer',
       }}

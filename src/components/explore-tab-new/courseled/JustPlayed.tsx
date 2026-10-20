@@ -44,7 +44,7 @@ export function JustPlayed({
   return (
     <div data-just-played-section style={{ ...FIGS }}>
     <Section
-      contest={false}
+      contest
       eyebrow={t('amateur.justPlayed.eyebrow', { defaultValue: 'The latest' })}
       title={t('amateur.justPlayed.title', { defaultValue: 'Just played' })}
       meta={t(win.i18n, win.label)}

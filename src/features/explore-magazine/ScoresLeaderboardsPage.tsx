@@ -678,7 +678,7 @@ export function ScoresLeaderboardsPage({
             <ScopeSegments scope={scope} clubApplies={state.clubApplies} onScopeChange={state.changeScope} style={{ flex: 1, minWidth: 0 }} />
           </div>
           <StandoutRounds viewerId={userId} filters={state.filters} enabled={state.ready} onRowPress={onRowPress} />
-          <CompetitionBoards viewerId={userId} scope={state.filters.scope} enabled={state.ready} />
+          <CompetitionBoards viewerId={userId} scope={state.filters.scope} enabled={state.ready} onRowPress={onRowPress} />
           <JustPlayed viewerId={userId} filters={state.filters} enabled={state.ready} onRowPress={onRowPress} />
         </>
       ) : null}

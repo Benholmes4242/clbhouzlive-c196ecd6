@@ -20241,6 +20241,7 @@ export type Database = {
           members: number
           net_score: number
           pos: number
+          profile_photo_url: string
           rounds: number
           user_id: string
           whs_score_id: string

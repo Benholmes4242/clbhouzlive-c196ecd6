@@ -14,11 +14,11 @@ await i18n.init({ lng: 'en', fallbackLng: 'en', ns: ['courses'], defaultNS: 'cou
 
 function row(over: Partial<CompetitionBoardRow> = {}): CompetitionBoardRow {
   return { comp_date: '2026-10-11', course_id: 'west', course_name: 'West', rounds: 8, members: 8, pos: 1, is_tie: false,
-    user_id: 'u1', display_name: 'One', whs_score_id: 's1', net_score: 68, gross_score: 77, course_par: 72, ...over };
+    user_id: 'u1', display_name: 'One', whs_score_id: 's1', profile_photo_url: null, net_score: 68, gross_score: 77, course_par: 72, ...over };
 }
 function mount(scope: 'everyone' | 'circle' = 'everyone', enabled = true) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return render(<QueryClientProvider client={client}><I18nextProvider i18n={i18n}><CompetitionBoards viewerId="v" scope={scope as never} enabled={enabled} /></I18nextProvider></QueryClientProvider>);
+  return render(<QueryClientProvider client={client}><I18nextProvider i18n={i18n}><CompetitionBoards viewerId="v" scope={scope as never} enabled={enabled} onRowPress={() => {}} /></I18nextProvider></QueryClientProvider>);
 }
 const q = (s: string) => document.querySelectorAll(s);
 beforeEach(() => { f.rpc.mockReset(); });
@@ -77,7 +77,9 @@ describe('CB1 competition boards', () => {
     mount();
     await waitFor(() => expect(q('[data-competition-card]').length).toBe(1));
     expect(screen.getByRole('button', { name: 'See all players' })).toBeTruthy();
-    fireEvent.click(q('[data-competition-card]')[0]);
+    /* CB4.7: the card root is no longer the button — the sheet opens from the
+     * title/subtitle area (and the CTA); a podium row opens the scorecard. */
+    fireEvent.click(q('[data-competition-open]')[0]);
     await waitFor(() => expect(q('[data-competition-field]').length).toBe(1));
   });
 });
