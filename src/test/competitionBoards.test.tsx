@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, waitFor } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { I18nextProvider } from 'react-i18next';
 import { createInstance } from 'i18next';
@@ -24,8 +24,8 @@ const q = (s: string) => document.querySelectorAll(s);
 beforeEach(() => { f.rpc.mockReset(); });
 
 describe('CB1 competition boards', () => {
-  it('follows scope but always asks for the 30-day window with no other overrides', () => {
-    expect(competitionRpcArgs('v', 'circle' as never)).toEqual({ p_viewer: 'v', p_scope: 'circle', p_window: '30' });
+  it('follows scope, fixed 30-day window, whole field in one call', () => {
+    expect(competitionRpcArgs('v', 'circle' as never)).toEqual({ p_viewer: 'v', p_scope: 'circle', p_window: '30', p_min_members: 3, p_podium: 100, p_limit: 3 });
   });
   it('groups by course and date together, in returned order', () => {
     const cards = groupCompetitionCards([
@@ -56,6 +56,26 @@ describe('CB1 competition boards', () => {
     expect(first).toBe('T2');
     expect(q('[data-competition-card]')[0].querySelector('[data-competition-rest]')).not.toBeNull();
     expect(q('[data-competition-card]')[1].querySelector('[data-competition-rest]')).toBeNull();
-    expect(document.querySelector('[data-competitions-section] a, [data-competitions-section] button')).toBeNull();
+  });
+  it('card shows three of the field; sheet shows every row from the same single call, tinting only the viewer', async () => {
+    const field = [1, 2, 2, 4, 5].map((pos, i) => row({ pos, is_tie: pos === 2, user_id: i === 1 ? 'v' : `u${i}`, whs_score_id: `s${i}`, members: 5 }));
+    f.rpc.mockResolvedValue({ data: field, error: null });
+    mount();
+    await waitFor(() => expect(q('[data-competition-card]').length).toBe(1));
+    expect(q('[data-competition-row]').length).toBe(3);
+    fireEvent.click(document.querySelector('[data-competition-rest]')!);
+    await waitFor(() => expect(q('[data-competition-field]').length).toBe(1));
+    expect(q('[data-competition-field-row]').length).toBe(5);
+    expect([...q('[data-competition-field-row]')].map((r) => r.firstElementChild!.textContent)).toEqual(['1', 'T2', 'T2', '4', '5']);
+    expect(q('[data-competition-field-row][data-self]').length).toBe(1);
+    expect(f.rpc).toHaveBeenCalledTimes(1);
+  });
+  it('a card of three members has no field line but still opens the sheet', async () => {
+    f.rpc.mockResolvedValue({ data: [row({ members: 3 })], error: null });
+    mount();
+    await waitFor(() => expect(q('[data-competition-card]').length).toBe(1));
+    expect(document.querySelector('[data-competition-rest]')).toBeNull();
+    fireEvent.click(q('[data-competition-card]')[0]);
+    await waitFor(() => expect(q('[data-competition-field]').length).toBe(1));
   });
 });

@@ -2,9 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { BoardFilters } from '../boardFilters';
 
-/** CB1: the deployed `get_competition_boards` owns selection and order. Scope
- * follows the page; the window is fixed at '30' (a competition stays worth
- * seeing for a month); every other tuning argument keeps its deployed default. */
+/** CB2: ONE call to the deployed `get_competition_boards`, which owns selection
+ * and order. Scope follows the page; window fixed at '30'. p_podium 100 brings
+ * the whole field with the cards: the card shows the first three, the field
+ * sheet shows every row of the same result, so the two cannot disagree. */
 export interface CompetitionBoardRow {
   comp_date: string;
   course_id: string;
@@ -33,7 +34,7 @@ export interface CompetitionCard {
 export const COMPETITION_WINDOW = '30';
 
 export function competitionRpcArgs(viewerId: string | undefined, scope: BoardFilters['scope']) {
-  return { p_viewer: viewerId ?? null, p_scope: scope, p_window: COMPETITION_WINDOW };
+  return { p_viewer: viewerId ?? null, p_scope: scope, p_window: COMPETITION_WINDOW, p_min_members: 3, p_podium: 100, p_limit: 3 };
 }
 
 /** Groups by course_id AND comp_date, in returned order — never re-sorted. */
