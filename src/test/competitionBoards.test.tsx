@@ -82,4 +82,16 @@ describe('CB1 competition boards', () => {
     fireEvent.click(q('[data-competition-open]')[0]);
     await waitFor(() => expect(q('[data-competition-field]').length).toBe(1));
   });
+  /* CB10: the field sheet's subtitle is a sentence — it keeps the FULL word
+   * "Competition" (never the row mark's "Comp") beside exactly one trophy. */
+  it('field sheet subtitle carries the full word "Competition" and one trophy', async () => {
+    f.rpc.mockResolvedValue({ data: [row({ members: 3 })], error: null });
+    mount();
+    await waitFor(() => expect(q('[data-competition-card]').length).toBe(1));
+    fireEvent.click(screen.getByRole('button', { name: 'See all players' }));
+    await waitFor(() => expect(q('[data-competition-field]').length).toBe(1));
+    const subtitle = q('[data-competition-field]')[0].querySelector('h2 + div')!;
+    expect(subtitle.textContent).toContain('Competition');
+    expect(subtitle.querySelectorAll('svg').length).toBe(1);
+  });
 });

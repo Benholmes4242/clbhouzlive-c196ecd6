@@ -7,6 +7,7 @@ import type { BoardFilters } from './boardFilters';
 import { playDateAtLocalNoon } from './discoverWhen';
 import { MemberAvatar } from './MemberAvatar';
 import { fmtToPar } from './BoardRows';
+import { CompetitionTrophy } from './CompetitionMark';
 import type { RoundPressTarget } from './StandoutRounds';
 import { groupCompetitionCards, useCompetitionBoards, type CompetitionBoardRow, type CompetitionCard } from './hooks/useCompetitionBoards';
 
@@ -109,7 +110,14 @@ function FieldBody({ card, viewerId, onRowPress, t }: { card: CompetitionCard; v
       <div style={{ padding: '14px 18px 0' }}>
         <h2 id="competition-field-title" style={{ margin: 0, fontSize: 16, fontWeight: 700, color: A.INK, lineHeight: 1.25 }}>{card.course_name}</h2>
         <div style={{ marginTop: 4, fontSize: 11.5, fontWeight: 600, color: A.DIM, lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          <span style={{ color: COMPETITION }}>{t('discover.filterBoard.competitionChip', { defaultValue: 'Competition' })}</span>
+          {/* CB10 — the sentence keeps the FULL word at the subtitle's own size;
+              the trophy rides before it. inline-flex (never flex) so the line
+              still ellipsises; verticalAlign middle lifts the glyph off the
+              bottom-margin-edge baseline an inline-flex box would otherwise take. */}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, verticalAlign: 'middle', color: COMPETITION }}>
+            <CompetitionTrophy width={11} height={12} />
+            {t('discover.filterBoard.competitionChip', { defaultValue: 'Competition' })}
+          </span>
           {' · '}{subtitle}
         </div>
       </div>
@@ -142,7 +150,7 @@ export function CompetitionBoards({ viewerId, scope, enabled, onRowPress }: { vi
     <div data-competitions-section style={{ ...FIGS }}>
     <Section
       contest
-      eyebrow={t('amateur.competitions.eyebrow', { defaultValue: 'The contest' })}
+      eyebrow={t('amateur.competitions.eyebrow', { defaultValue: 'Tournament golf' })}
       title={t('amateur.competitions.title', { defaultValue: 'Competitions' })}
       meta={t('amateur.competitions.window', { defaultValue: 'Last 30 days' })}
     >
