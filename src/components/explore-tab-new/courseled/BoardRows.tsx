@@ -540,7 +540,7 @@ export function BoardRowView({
       </span>
       {board === 'recent' ? <span style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
         <span style={{ width: RECENT_SCORE_WIDTH, textAlign: 'center' }}><ScoreWithToPar score={row.net_score} par={row.course_par} kind="net" fontSize={M.figureSize} fontWeight={M.figureWeight} scoreHandle="main" /></span>
-        <span style={{ width: RECENT_SCORE_WIDTH, textAlign: 'center' }}><ScoreWithToPar score={row.gross_score} par={row.course_par} kind="gross" fontSize={M.secondarySize} fontWeight={M.secondaryWeight} scoreHandle="secondary" /></span>
+        <span style={{ width: RECENT_SCORE_WIDTH, textAlign: 'center' }}><ScoreWithToPar score={row.gross_score} par={row.course_par} kind="gross" fontSize={M.recentGrossSize} fontWeight={M.secondaryWeight} scoreHandle="secondary" /></span>
       </span> : <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', columnGap: 3 }}>
         {/* S1.3 — THE FIGURE FOLLOWS THE COLOUR LAW, NEVER AMBER.
             18.5 — fixed min-width tracks so right edges align. */}
