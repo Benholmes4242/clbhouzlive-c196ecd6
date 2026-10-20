@@ -1,7 +1,6 @@
-import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Trans, useTranslation } from 'react-i18next';
-import { ChevronRight } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -37,7 +36,7 @@ import { WHO_LEADS, whoLeadsPlaceholderHeight, whoLeadsYou } from './whoLeads';
 import { useFeatsWindow, type FeatWindow } from './useFeatsWindow';
 import { RARE_AIR, rareAirPlaceholderHeight } from './rareAir';
 import { RareAirLede, RareAirRail, RareAirYou } from './RareAirSection';
-import { EYEBROW, GUTTER, Section } from './Section';
+import { GUTTER, Rail, Section, SeeAll } from './Section';
 import { RailChips } from '@/components/ui/RailChips';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
@@ -295,31 +294,6 @@ function ClimbToggle({ mode, onChange }: { mode: ClimbMode; onChange: (m: ClimbM
   );
 }
 
-function SeeAll({ label, onPress }: { label: string; onPress: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onPress}
-      style={{
-        marginTop: 12,
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        padding: 0,
-        border: 'none',
-        background: 'transparent',
-        fontFamily: SANS,
-        ...EYEBROW,
-        color: A.MUTE,
-        cursor: 'pointer',
-      }}
-    >
-      {label}
-      <ChevronRight size={13} />
-    </button>
-  );
-}
-
 function CompactRow({
   pos,
   tie,
@@ -446,43 +420,6 @@ function CompactRow({
         ) : null}
       </span>
     </button>
-  );
-}
-
-
-function Rail({ children }: { children: ReactNode }) {
-  return (
-    <div style={{ position: 'relative', marginInline: -GUTTER }}>
-      <div
-        style={{
-          display: 'flex',
-          gap: WHO_LEADS.rail.gap,
-          overflowX: 'auto',
-          scrollSnapType: 'x mandatory',
-          paddingInline: GUTTER,
-          scrollPaddingInline: GUTTER,
-          paddingTop: WHO_LEADS.rail.top,
-          paddingBottom: WHO_LEADS.rail.bottom,
-          scrollbarWidth: 'none',
-          willChange: 'transform',
-        }}
-      >
-        {children}
-        <span style={{ flex: '0 0 14px' }} aria-hidden />
-      </div>
-      <span
-        aria-hidden
-        style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          bottom: 0,
-          width: 30,
-          pointerEvents: 'none',
-          background: `linear-gradient(to right, transparent, ${A.CANVAS})`,
-        }}
-      />
-    </div>
   );
 }
 

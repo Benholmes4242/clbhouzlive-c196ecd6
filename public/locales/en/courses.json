@@ -17,7 +17,9 @@
       "window": "Last 30 days",
       "subtitle_one": "Competition · {{date}} · {{count}} player",
       "subtitle_other": "Competition · {{date}} · {{count}} players",
-      "morePlayed": "{{n}} more played"
+      "subtitleRest_one": "{{date}} · {{count}} player",
+      "subtitleRest_other": "{{date}} · {{count}} players",
+      "seeAllPlayers": "See all players"
     },
     "board": {
       "backToStream": "Back to the stream",
