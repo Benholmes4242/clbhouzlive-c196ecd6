@@ -42,7 +42,7 @@ function hero(p: { hideConnectPrompt?: boolean; isSelf?: boolean; indexValue?: n
 }
 const panel = () => screen.queryByTestId('hero-connect-panel');
 const english = createInstance();
-void english.init({ lng: 'en', defaultNS: 'profile', resources: { en: { profile: profileEnglish } }, initImmediate: false });
+void english.init({ lng: 'en', defaultNS: 'profile', resources: { en: { profile: profileEnglish } } });
 const t = english.getFixedT('en', 'profile');
 beforeEach(() => {
   f.state = { connected: false, settled: true, connection: null, trend: null, anyError: false };
@@ -60,7 +60,7 @@ describe('CE1 fixed connected example', () => {
     expect(display?.style.maxHeight).toBe('205px');
     expect(display?.style.overflow).toBe('hidden');
     expect(display?.style.maskImage).toContain('58%');
-    expect(display?.style.WebkitMaskImage).toContain('58%');
+    expect(display?.style.getPropertyValue('-webkit-mask-image')).toContain('58%');
   });
   it('renders no example axis strings or counting sentence', () => {
     render(<MemoryRouter><HeroConnectExample t={t} /></MemoryRouter>);
