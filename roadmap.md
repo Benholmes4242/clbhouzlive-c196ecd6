@@ -501,4 +501,4 @@
 
 ## CB11 — Remove Who leads what
 - [x] Verified line references and caller audit; user extended scope to the section sheet, state and private formatters. Shared Rail owns unchanged 10/12/18 spacing; §7 and protected helpers untouched.
-- [ ] Run final full suite and report inventory, dormant RPC, retained unused items and page order.
+- [x] Full `npx vitest run`: 1,954/260 before -> 1,947/259 after, zero failures; -7 solely authorized whoLeads.test.ts deletion, no surviving test edits. Preview build OK. Remaining order: scope chips, Standout rounds, Competitions, Just played, §5 Feats, §4 Most improved, §7 Top 100 courses. get_year_leaderboard has no active caller; RPC/type/optional hook signature stay untouched. Unused tiedTop/clearOf keys and non-Top100 CareerMetric variants retained outside explicit deletion scope. Hosted authenticated rendering unverified on external_unmanaged Supabase.
