@@ -14,26 +14,20 @@ import { groupCompetitionCards, useCompetitionBoards, type CompetitionBoardRow, 
  * scope (never a copy), fixed 30-day window. Card and field sheet render the
  * SAME rows from one RPC result — no second query. Absent while unsettled and
  * when empty: an empty month is normal, not a failure.
- * CB3: the cards ride the page's shared Rail; the subtitle's first word is the
- * teal COMPETITION pill the standout rows carry; the field line is gone — the
+ * CB3: the cards ride the page's shared Rail; the field line is gone — the
  * page's uncounted SeeAll (flush to the card's foot via marginTop auto) opens
  * the same full-field sheet the whole card opens.
+ * CB6: the competition mark is a bare coloured word, never a pill (the rule is
+ * recorded in BoardRows.tsx). The rail cards carry no mark at all — every card
+ * under a "Competitions" heading is one, so the label would distinguish
+ * nothing; only the sheet's subtitle keeps the word, in the token colour.
  * CB4: a row tap — podium or field — opens that player's scorecard for the
  * round through the page's one opener; the sheet now opens only from the CTA
  * and the card's title/subtitle. Net and gross carry their to-par exactly as
  * the standout rows render it, and the sheet's subtitle takes the same pill. */
 const PODIUM = 3;
 
-/** The one teal pill, shared by the card subtitle and the sheet subtitle so
- * the two can never drift (CB4.4). */
-function CompetitionPill() {
-  const { t } = useTranslation('courses');
-  return (
-    <span data-competition-pill style={{ fontSize: 7.5, lineHeight: 1, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', borderRadius: 999, padding: '3px 6px', flexShrink: 0, whiteSpace: 'nowrap', color: COMPETITION, border: `1px solid color-mix(in srgb, ${COMPETITION} 38%, transparent)`, background: `color-mix(in srgb, ${COMPETITION} 13%, transparent)` }}>{t('discover.filterBoard.competitionChip', { defaultValue: 'Competition' })}</span>
-  );
-}
-
-/** The words after the pill, on card and sheet alike: the date and the field
+/** The subtitle's metadata, on card and sheet alike: the date and the field
  * size, on one nowrap line. */
 function useSubtitleRest(card: CompetitionCard) {
   const { t, i18n } = useTranslation('courses');
