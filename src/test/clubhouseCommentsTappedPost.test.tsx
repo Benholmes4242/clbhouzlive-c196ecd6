@@ -5,7 +5,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 
 import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseComments';
-import { commentTargetFor } from '@/components/clubhouse/hooks/commentTarget';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 afterEach(cleanup);
@@ -29,7 +28,14 @@ describe('useClubhouseComments keeps the tapped post', () => {
   });
 });
 
-/* Mirrors Clubhouse.tsx's wiring: the real hook, the real target helper, an
+/* Same precedence as the inline derivation in Clubhouse.tsx's comments block. */
+function commentTargetFor(p: FeedPost, scores: Map<string, string>) {
+  const scoreId = scores.get(p.id) ?? null;
+  const reviewId = (p as { review?: { reviewId?: string } }).review?.reviewId ?? null;
+  return { targetType: scoreId ? 'round' : reviewId ? 'review' : 'post', targetId: scoreId ?? reviewId ?? p.id };
+}
+
+/* Mirrors Clubhouse.tsx's wiring: the real hook, the same target precedence, an
    activeIndex pointing elsewhere, and a stand-in sheet that prints its target. */
 function Harness({ posts, scores, initialActive }: { posts: FeedPost[]; scores: Map<string, string>; initialActive: number }) {
   const [activeIndex, setActiveIndex] = useState(initialActive);

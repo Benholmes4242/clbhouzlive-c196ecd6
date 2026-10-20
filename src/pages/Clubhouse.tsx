@@ -88,7 +88,6 @@ import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePost
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
 import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseComments';
-import { commentTargetFor } from '@/components/clubhouse/hooks/commentTarget';
 import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShare';
 import { useClubhouseFeedNav } from '@/components/clubhouse/hooks/useClubhouseFeedNav';
 
@@ -700,13 +699,21 @@ const ClubhouseContent = () => {
           scroll-derived activePost: scrolling behind an open sheet must not
           change its target. */}
       {commentsPost && commentsMounted && postScoreIdMap.settled && (() => {
-        const { targetType, targetId } = commentTargetFor(commentsPost, postScoreIdMap);
+        const isEditorial = commentsPost.postType === 'course_of_week_card';
+        const editorialId = isEditorial
+          ? (commentsPost as { cardData?: { cardId?: string } }).cardData?.cardId ?? null
+          : null;
+        // Precedence: editorial, then round (score id), then review, then post.
+        const scoreId = postScoreIdMap.get(commentsPost.id) ?? null;
+        const reviewId = commentsPost.review?.reviewId ?? null;
+        const commentTargetType = isEditorial ? 'editorial' : scoreId ? 'round' : reviewId ? 'review' : 'post';
+        const commentTargetId = isEditorial ? (editorialId ?? '') : (scoreId ?? reviewId ?? commentsPost.id);
         return (
           <CommentsSheetV2
             isOpen={commentsOpen}
             onClose={closeComments}
-            targetType={targetType}
-            targetId={targetId}
+            targetType={commentTargetType}
+            targetId={commentTargetId}
           />
         );
       })()}
