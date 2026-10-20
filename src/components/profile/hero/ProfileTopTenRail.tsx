@@ -9,8 +9,15 @@
  *
  * The empty, partial and full states are ONE component. Everything that is
  * an invitation - the ten slots, slot rows under a partial list, the lede,
- * the add button, suggestion chips and the share card - is owner only; a
- * visitor sees only the entries that exist, and nothing when there are none.
+ * the add button, the progress footer under a partial list and the share
+ * card - is owner only; a visitor sees only the entries that exist, and
+ * nothing when there are none.
+ *
+ * NO SUGGESTION CHIPS (TT1). "Played any of these?" chips were removed with
+ * their query: every chip, its "+" and "Search all courses" called the same
+ * onAddCourse as the add button, which opens the manage sheet - none added
+ * the named course. They promised a one-tap add they never performed. The
+ * manage sheet is the only way in; do not rebuild chips that route to it.
  *
  * Deep-link contract kept: ?tab=courses&course=<id>&top_ten_comment=<id>
  * auto-opens the comments sheet for the deep-linked course on mount.
@@ -45,7 +52,6 @@ const PILL_KICKER = 'rgba(255,255,255,0.7)';
 const CAPTION_SUB = 'rgba(255,255,255,0.74)';
 const SLOT_DASH = 'rgba(248,250,252,0.26)';
 const SLOT_NEXT = 'rgba(248,250,252,0.55)';
-const ROW_SLOT_DASH = 'rgba(248,250,252,0.22)';
 const PRESSED_BORDER = 'rgba(247,147,30,0.55)';
 const SHARE_BG = 'linear-gradient(170deg, #101417, #0A0A0C 60%)';
 const CAPTURE_OPTS = { backgroundColor: '#000', scale: 2, logging: false, useCORS: true };
@@ -89,11 +95,6 @@ export const RegionRankLine: React.FC<{
       )}
     </span>
   );
-};
-
-type SuggestCourse = {
-  id: string; name: string; country: string | null; sub_country: string | null;
-  region: string | null; thumbnail_image?: string | null;
 };
 
 export interface TopTenShareIdentity {
@@ -183,44 +184,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
     staleTime: 60_000,
   });
 
-  const showSuggestions = isOwnProfile && !isLoading && topTen.length < 3;
-  /*
-   * Zero-state suggestions: the courses at the top of the viewer's most relevant
-   * Top 100 list (gb-i preferred, global fallback), from the membership authority,
-   * skipping anything already in the ten or excluded.
-   */
-  const { data: suggestions = [] } = useQuery({
-    queryKey: ['top-ten-suggestions', userId, courseIds],
-    enabled: showSuggestions && !!userId,
-    queryFn: async () => {
-      const { data: lists, error: listErr } = await supabase
-        .from('top100_lists')
-        .select('id, slug')
-        .in('slug', ['gb-i', 'global'])
-        .eq('is_active', true);
-      if (listErr) throw listErr;
-      const list = (lists || []).find((l) => l.slug === 'gb-i') ?? (lists || []).find((l) => l.slug === 'global');
-      if (!list) return [] as SuggestCourse[];
-      const [{ data: rows, error }, { data: excl }] = await Promise.all([
-        supabase
-          .from('course_top100_memberships')
-          .select('rank, golf_courses!inner(id, name, country, sub_country, region, thumbnail_image)')
-          .eq('list_id', list.id)
-          .order('rank', { ascending: true })
-          .limit(20),
-        supabase.from('user_top10_exclusions').select('course_id').eq('user_id', userId),
-      ]);
-      if (error) throw error;
-      const skip = new Set([...courseIds, ...(excl || []).map((e) => e.course_id)]);
-      return ((rows || []) as any[])
-        .map((r) => r.golf_courses as SuggestCourse)
-        .filter((c) => c && !skip.has(c.id))
-        .slice(0, 3);
-    },
-    staleTime: 5 * 60_000,
-  });
-
-  const { data: rankMap } = useCourseListRanks([...courseIds, ...suggestions.map((s) => s.id)]);
+  const { data: rankMap } = useCourseListRanks(courseIds);
   const rankOf = (id: string): ListRank => rankMap?.get(id) ?? null;
 
   // Community rating per course: course_rating_stats, one read for all ids.
@@ -341,7 +305,6 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   // ── Full / partial list (3+) ──────────────────────────────────────────
   const renderList = () => {
     const [one, two, three, ...rest] = topTen;
-    const missing = isOwnProfile ? Array.from({ length: 10 - n }, (_, i) => n + i + 1) : [];
     return (
       <>
         <button type="button" data-top-ten-course-id={one.course_id} onClick={() => open(one)} style={{ ...btnReset, marginTop: 14 }}>
@@ -411,7 +374,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
           ))}
         </div>
 
-        {(rest.length > 0 || missing.length > 0) && (
+        {rest.length > 0 && (
           <div style={{ marginTop: 16 }}>
             {rest.map((c, i) => {
               const r = ratingOf(c);
@@ -436,12 +399,20 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                 </button>
               );
             })}
-            {missing.map((p, i) => (
-              <div key={`slot-${p}`} style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '8px 0', borderTop: rest.length > 0 || i > 0 ? `1px solid ${A.SOFT}` : 'none' }}>
-                <span style={{ width: 18, flexShrink: 0 }} />
-                <span style={{ width: 44, height: 34, borderRadius: 8, border: `1px dashed ${ROW_SLOT_DASH}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600, color: A.DIM, flexShrink: 0, ...FIGS }}>{p}</span>
-              </div>
-            ))}
+          </div>
+        )}
+
+        {/* Owner only, and only while there is something to add: at ten the
+            sentence would read "Ten down. Zero to go.", so nothing renders. */}
+        {isOwnProfile && n < 10 && (
+          <div data-top-ten-progress-footer style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${A.SOFT}` }}>
+            <div style={{ fontSize: 12.5, fontWeight: 600, color: A.MUTE }}>
+              {t('topTen.progress.lede', { count: n, word: Word(n), left: Word(10 - n), defaultValue: '{{word}} down. {{left}} to go.' })}
+            </div>
+            <button type="button" onClick={() => onAddCourse?.()}
+              style={{ marginTop: 11, width: '100%', borderRadius: 14, padding: '13px 0', background: A.INK, color: A.CANVAS, border: 'none', fontFamily: SANS, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+              {t('topTen.progress.cta', { next: n + 1, defaultValue: 'Add your number {{next}}' })}
+            </button>
           </div>
         )}
       </>
@@ -479,31 +450,6 @@ export const ProfileTopTenRail: React.FC<Props> = ({
           style={{ marginTop: 16, width: '100%', borderRadius: 14, padding: '13px 0', background: A.INK, color: A.CANVAS, border: 'none', fontFamily: SANS, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
           {n === 0 ? t('topTen.empty.cta', 'Start with your number one') : t('topTen.progress.cta', { next, defaultValue: 'Add your number {{next}}' })}
         </button>
-        {suggestions.length > 0 && (
-          <>
-            <div style={{ marginTop: 20, fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.DIM }}>
-              {t('topTen.empty.suggest', 'Played any of these?')}
-            </div>
-            <div style={{ marginTop: 9, display: 'flex', flexDirection: 'column', gap: 7 }}>
-              {suggestions.map((s) => (
-                <button key={s.id} type="button"
-                  onClick={() => onAddCourse?.()}
-                  style={{ ...btnReset, display: 'flex', alignItems: 'center', gap: 10, border: `1px solid ${A.HAIRLINE}`, borderRadius: 12, padding: '9px 11px' }}>
-                  <CourseImageFallback courseId={s.id} courseName={s.name} imageUrl={s.thumbnail_image ?? null} style={{ width: 34, height: 26, borderRadius: 6, flexShrink: 0 }} />
-                  <span style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
-                    <RegionRankLine course={s} rank={rankOf(s.id)} style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, ...FIGS }} />
-                  </span>
-                  <span style={{ fontSize: 17, fontWeight: 700, color: A.MUTE }}>+</span>
-                </button>
-              ))}
-            </div>
-            <button type="button" onClick={() => onAddCourse?.()}
-              style={{ marginTop: 11, background: 'transparent', border: 'none', padding: 0, fontFamily: SANS, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: A.MUTE, cursor: 'pointer' }}>
-              {t('topTen.empty.searchAll', 'Search all courses')} ›
-            </button>
-          </>
-        )}
       </>
     );
   };

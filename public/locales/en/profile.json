@@ -71,9 +71,7 @@
     "empty": {
       "lede": "Ten courses.\nIn order. Your call.",
       "body": "It fills itself from the courses you rate, and you don't need a single round on clbhouz to start. Pick the best you have ever played, anywhere, any time.",
-      "cta": "Start with your number one",
-      "suggest": "Played any of these?",
-      "searchAll": "Search all courses"
+      "cta": "Start with your number one"
     },
     "progress": {
       "lede_one": "{{word}} down. {{left}} to go.",
