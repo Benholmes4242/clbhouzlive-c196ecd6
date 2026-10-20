@@ -7,6 +7,7 @@ vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: ()
 const f = vi.hoisted(() => ({
   decline: vi.fn(),
   navigate: vi.fn(),
+  history: [] as Array<{ observed_at: string; handicap_index: number }>,
   state: { connected: false, settled: true, connection: null, trend: null, anyError: false },
 }));
 vi.mock('react-router-dom', async (importOriginal) => ({
@@ -18,7 +19,7 @@ vi.mock('@/lib/whs/useHandicapChipState', () => ({ useHandicapChipState: () => f
 vi.mock('@/lib/whs/hooks', () => ({
   useWhsConnection: () => ({ data: null, isFetched: true, isError: false }),
   useHandicapTrend: () => ({ data: { current: 28.7 }, isFetched: true, isError: false }),
-  useHandicapHistory: () => ({ data: [], isFetched: true, isError: false }),
+  useHandicapHistory: () => ({ data: f.history, isFetched: true, isError: false }),
 }));
 vi.mock('@/hooks/useHandicapTrend12mo', () => ({ useHandicapTrend12mo: () => ({ delta: null, direction: 'flat' }) }));
 vi.mock('@/lib/whs/usePercentile', () => ({ useHandicapPercentile: () => ({ data: null }) }));
@@ -41,6 +42,7 @@ beforeEach(() => {
   f.state = { connected: false, settled: true, connection: null, trend: null, anyError: false };
   f.decline.mockReset().mockResolvedValue(undefined);
   f.navigate.mockReset();
+  f.history = [];
   vi.mocked(analyticsEvents.track).mockClear();
 });
 
@@ -49,13 +51,16 @@ describe('CE1 fixed connected example', () => {
     render(hero());
     const tiles = screen.getByTestId('hero-connect-panel').querySelectorAll('[data-example-form-tile]');
     expect(tiles).toHaveLength(5);
-    tiles.forEach((tile) => fireEvent.click(tile));
+    tiles.forEach((tile) => {
+      expect(tile).toBeInstanceOf(HTMLButtonElement);
+      fireEvent.click(tile);
+    });
     expect(analyticsEvents.track).not.toHaveBeenCalled();
     expect(f.navigate).not.toHaveBeenCalled();
   });
   it('clicking the example chart fires no analytics or navigation', () => {
     render(hero());
-    const chart = screen.getByTestId('hero-connect-panel').querySelector('[data-example-display] svg')?.closest('button');
+    const chart = screen.getByTestId('hero-connect-panel').querySelector('[data-example-chart]');
     expect(chart).toBeInstanceOf(HTMLButtonElement);
     if (!chart) throw new Error('Example chart button missing');
     fireEvent.click(chart);
@@ -64,7 +69,9 @@ describe('CE1 fixed connected example', () => {
   });
   it('clicking the example index figure fires no analytics or navigation', () => {
     render(hero());
-    const figure = within(screen.getByTestId('hero-connect-panel')).getByRole('button', { name: '12.4' });
+    const figure = screen.getByTestId('hero-connect-panel').querySelector('[data-example-index]');
+    expect(figure).toBeInstanceOf(HTMLButtonElement);
+    if (!figure) throw new Error('Example index button missing');
     fireEvent.click(figure);
     expect(analyticsEvents.track).not.toHaveBeenCalled();
     expect(f.navigate).not.toHaveBeenCalled();
@@ -72,6 +79,24 @@ describe('CE1 fixed connected example', () => {
   it('appears for an unconnected member on their own profile', () => {
     render(hero());
     expect(panel()).not.toBeNull();
+  });
+  it('connected chart and index omit example handles and retain their analytics calls', () => {
+    f.state.connected = true;
+    f.history = [
+      { observed_at: '2026-01-01', handicap_index: 42.7 },
+      { observed_at: '2026-10-01', handicap_index: 41.9 },
+    ];
+    const view = render(hero());
+    expect(view.container.querySelector('[data-example-chart]')).toBeNull();
+    expect(view.container.querySelector('[data-example-index]')).toBeNull();
+    const chart = view.container.querySelector('svg[viewBox="0 0 361 64"]')?.closest('button');
+    expect(chart).toBeInstanceOf(HTMLButtonElement);
+    if (!chart) throw new Error('Connected chart button missing');
+    fireEvent.click(chart);
+    expect(analyticsEvents.track).toHaveBeenCalledWith('profile_index_chart_tap', { window_days: expect.any(Number) });
+    fireEvent.click(screen.getByRole('button', { name: '41.9' }));
+    expect(analyticsEvents.track).toHaveBeenCalledWith('profile_hero_stat_tap', { stat: 'index' });
+    expect(analyticsEvents.track).toHaveBeenCalledTimes(2);
   });
   it('is absent when the hide setting is set', () => {
     render(hero({ hideConnectPrompt: true }));
