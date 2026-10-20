@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { A, COMPETITION_SELF_TINT, FIGS, SANS } from './tokens';
+import { A, SELF_ROW_TINT, FIGS, SANS } from './tokens';
 import type { BoardFilters } from './boardFilters';
 import { playDateAtLocalNoon } from './discoverWhen';
 import { MemberAvatar } from './MemberAvatar';
@@ -86,7 +86,7 @@ function FieldBody({ card, viewerId, t }: { card: CompetitionCard; viewerId: str
         const self = !!viewerId && r.user_id === viewerId;
         return (
           <div key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} data-competition-field-row data-self={self || undefined}
-            style={{ display: 'flex', alignItems: 'center', padding: '9px 18px', borderBottom: `1px solid ${A.SOFT}`, background: self ? COMPETITION_SELF_TINT : 'transparent' }}>
+            style={{ display: 'flex', alignItems: 'center', padding: '9px 18px', borderBottom: `1px solid ${A.SOFT}`, background: self ? SELF_ROW_TINT : 'transparent' }}>
             <span style={{ width: 30, fontSize: 10.5, fontWeight: 800, color: A.FAINT }}>{posText(r)}</span>
             <span style={{ display: 'flex', flex: 'none', height: 28, alignItems: 'center', marginRight: 10 }}><MemberAvatar userId={r.user_id} name={r.display_name} photoUrl={null} size={28} /></span>
             <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: self ? 700 : 600, color: self ? A.INK : A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.display_name ?? t('discover.aMember')}</span>
