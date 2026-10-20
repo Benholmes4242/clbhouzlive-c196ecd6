@@ -62,8 +62,8 @@ describe('BRIEF_TOP_TEN_TILE_WIDTH', () => {
     const grid = tile2.parentElement!;
     expect(grid.style.gridTemplateColumns).toBe('repeat(2, minmax(0, 1fr))');
     expect(grid).toContainElement(tile3);
-    expect(tile2.style.minWidth).toBe('0px');
-    expect(tile3.style.minWidth).toBe('0px');
+    expect(tile2.style.minWidth).toBe('0');
+    expect(tile3.style.minWidth).toBe('0');
   });
 
   it('RegionRankLine renders two spans: the region truncates, the ranks never shrink', () => {
@@ -73,7 +73,7 @@ describe('BRIEF_TOP_TEN_TILE_WIDTH', () => {
     const [region, ranks] = [...wrapper.children] as HTMLElement[];
     expect(region.textContent).toBe('Northern Ireland');
     expect(region.style.textOverflow).toBe('ellipsis');
-    expect(region.style.minWidth).toBe('0px');
+    expect(region.style.minWidth).toBe('0');
     expect(ranks.textContent).toBe(' · Global #10 · GB&I #5');
     expect(ranks.style.flexShrink).toBe('0');
   });
