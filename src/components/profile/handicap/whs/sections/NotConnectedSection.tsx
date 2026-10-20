@@ -27,7 +27,7 @@ export const NotConnectedSection: React.FC = () => {
   }, []);
 
   return (
-    <section style={{ fontFamily: CHART_FONT, padding: '32px 20px 0' }}>
+    <section style={{ fontFamily: CHART_FONT, padding: '24px 20px 32px' }}>
       <h1 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: CHART.INK }}>
         {t('handicap.notConnected.heading')}
       </h1>
@@ -42,17 +42,24 @@ export const NotConnectedSection: React.FC = () => {
             navigate('/manage/handicap');
           }}
           style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            width: '100%',
+            background: CHART.INK,
+            color: CHART.CANVAS,
             border: 0,
-            borderRadius: 999,
-            padding: '11px 18px',
-            background: CHART.AMBER,
-            color: '#0F172A',
+            borderRadius: 12,
+            padding: 14,
             fontFamily: CHART_FONT,
-            fontSize: 13,
-            fontWeight: 700,
+            fontSize: 13.5,
+            fontWeight: 800,
+            letterSpacing: '0.02em',
+            cursor: 'pointer',
           }}
         >
-          {t('handicap.notConnected.connect')}
+          {t('handicap.notConnected.connect')} <span aria-hidden>{'\u203A'}</span>
         </button>
       </div>
     </section>

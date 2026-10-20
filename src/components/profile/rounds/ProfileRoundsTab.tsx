@@ -82,16 +82,18 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, own
         <div style={{ fontSize: 16, fontWeight: 700, color: CHART.INK }}>
           {t('rounds.empty.title', 'No rounds yet')}
         </div>
-        <p style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.55, color: CHART.MUTE }}>
-          {t('rounds.empty.body', 'Connect your handicap record and every round you play will appear here.')}
+        <p style={{ margin: '10px 0 0', fontSize: 13, lineHeight: 1.55, color: CHART.MUTE }}>
+          {t('rounds.empty.body', 'Connect your handicap and every round you play lands here, hole by hole.')}
         </p>
-        <button
-          type="button"
-          onClick={() => navigate('/handicap')}
-          style={{ marginTop: 14, padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 12, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: CHART.INK }}
-        >
-          {t('rounds.empty.cta', 'Connect handicap record')} ›
-        </button>
+        <div style={{ marginTop: 20 }}>
+          <button
+            type="button"
+            onClick={() => navigate('/manage/handicap')}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', background: CHART.INK, color: CHART.CANVAS, border: 0, borderRadius: 12, padding: 14, fontFamily: SANS, fontSize: 13.5, fontWeight: 800, letterSpacing: '0.02em', cursor: 'pointer' }}
+          >
+            {t('rounds.empty.cta', 'Connect your handicap')} <span aria-hidden>{'\u203A'}</span>
+          </button>
+        </div>
       </div>
     );
   }
