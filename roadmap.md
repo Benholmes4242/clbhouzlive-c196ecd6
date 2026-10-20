@@ -1,5 +1,10 @@
 # Roadmap
 
+## CEX1 — Crop the connect example
+- [ ] Apply example-only crop, opacity, axis removal, counting props and matching English copy; preserve connected output and all frozen controls/gates.
+- [ ] Add three prescribed tests; only rename fixture case and remove its countingN assertion. Run full-suite before/after and reconcile prior 1,910 / 249 baseline.
+- [ ] Measure panel/display at 390px, compare connected output before/after, report mock differences and hosted authentication limits in reply text.
+
 ## BRIEF_PROFILE_HERO_CLUB_WHITE — Home club line reads the name's colour
 - [x] ProfileCoverBand subline div colour W_55 -> '#FFFFFF' (the h1 name's value); fontSize 12.5, fontWeight 600, marginTop 3, textShadow '0 1px 8px rgba(0,0,0,0.5)' and single-line ellipsis untouched. "Add your home club" button keeps W_55 (prompt, not information); W_55 import retained — still used by that button, HeroShell and BusinessProfileHero.
 - [x] New src/test/profileHeroClubWhite.test.tsx (2 cases): subline "Kristianstad Golf Club" colour equals #FFFFFF, equals the h1's colour and is not W_55, with the frozen line properties asserted; add-home-club button colour still W_55. No existing test deleted, renamed or rewritten.
