@@ -22313,6 +22313,43 @@ export type Database = {
           viewer_follows: boolean
         }[]
       }
+      get_standout_rounds: {
+        Args: {
+          p_band?: string
+          p_competition?: string
+          p_course_id?: string
+          p_courses?: string
+          p_limit?: number
+          p_min_delta?: number
+          p_min_prior?: number
+          p_per_course?: number
+          p_region_kind?: string
+          p_region_value?: string
+          p_scope?: string
+          p_viewer: string
+          p_window?: string
+        }
+        Returns: {
+          avg_topar: number
+          best_topar: number
+          course_handicap: number
+          course_id: string
+          course_name: string
+          course_par: number
+          delta: number
+          display_name: string
+          gross_score: number
+          is_competition: boolean
+          last_better: string
+          net_score: number
+          play_date: string
+          pos: number
+          prior_n: number
+          profile_photo_url: string
+          user_id: string
+          whs_score_id: string
+        }[]
+      }
       get_stat_browse_courses: {
         Args: {
           p_country?: string
