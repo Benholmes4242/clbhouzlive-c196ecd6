@@ -38,6 +38,6 @@ describe('SR1a temp verification', () => {
     expect(box.style.getPropertyValue('border-top-style')).toBe('none');
     const ring = rowEl.querySelector('.pointer-events-none') as HTMLElement;
     expect(ring.style.borderRadius).toBe('34%');
-    expect(ring.style.borderWidth).toBe('1px');
+    expect(ring.style.getPropertyValue('border-top-width')).toBe('1px');
   });
 });
