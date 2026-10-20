@@ -413,7 +413,7 @@ const ClubhouseContent = () => {
   const { handleFollow, getFollowState, resetFollows } = useClubhouseFollows({ userId: user?.id });
 
   // ── Comments state ──
-  const { commentsOpen, openComments, closeComments, getCommentCount, resetComments } = useClubhouseComments(activeActor);
+  const { commentsOpen, commentsPost, openComments, closeComments, getCommentCount, resetComments, clearCommentsPost } = useClubhouseComments(activeActor);
 
   // Conditionally mount CommentsSheet so its hooks/subtrees don't exist while closed.
   // Keep it mounted through the exit animation (~500ms spring) so close still animates.
@@ -423,9 +423,13 @@ const ClubhouseContent = () => {
       setCommentsMounted(true);
       return;
     }
-    const t = setTimeout(() => setCommentsMounted(false), 500);
+    const t = setTimeout(() => {
+      setCommentsMounted(false);
+      // Only after the exit animation: the closing sheet keeps its content.
+      clearCommentsPost();
+    }, 500);
     return () => clearTimeout(t);
-  }, [commentsOpen]);
+  }, [commentsOpen, clearCommentsPost]);
   const activeCommentCount = getCommentCount(activePost);
   
   // ── Share / Report / Not Interested ──
@@ -691,28 +695,31 @@ const ClubhouseContent = () => {
       {/* ═══ COMMENTS + MORE OPTIONS ═══ */}
       {/* Gated on postScoreIdMap.settled: opening against the post while the score
           id resolves would write a comment to the post and orphan it. */}
+      {/* The sheet targets the TAPPED post (commentsPost), never the
+          scroll-derived activePost: scrolling behind an open sheet must not
+          change its target. */}
+      {commentsPost && commentsMounted && postScoreIdMap.settled && (() => {
+        const isEditorial = commentsPost.postType === 'course_of_week_card';
+        const editorialId = isEditorial
+          ? (commentsPost as { cardData?: { cardId?: string } }).cardData?.cardId ?? null
+          : null;
+        // Precedence: editorial, then round (score id), then review, then post.
+        const scoreId = postScoreIdMap.get(commentsPost.id) ?? null;
+        const reviewId = commentsPost.review?.reviewId ?? null;
+        const commentTargetType = isEditorial ? 'editorial' : scoreId ? 'round' : reviewId ? 'review' : 'post';
+        const commentTargetId = isEditorial ? (editorialId ?? '') : (scoreId ?? reviewId ?? commentsPost.id);
+        return (
+          <CommentsSheetV2
+            isOpen={commentsOpen}
+            onClose={closeComments}
+            targetType={commentTargetType}
+            targetId={commentTargetId}
+          />
+        );
+      })()}
+
       {activePost && posts.length > 0 && commentsMounted && postScoreIdMap.settled && (
         <>
-          {(() => {
-            const isEditorial = activePost.postType === 'course_of_week_card';
-            const editorialId = isEditorial
-              ? (activePost as { cardData?: { cardId?: string } }).cardData?.cardId ?? null
-              : null;
-            // Precedence: editorial, then round (score id), then review, then post.
-            const scoreId = postScoreIdMap.get(activePost.id) ?? null;
-            const reviewId = activePost.review?.reviewId ?? null;
-            const commentTargetType = isEditorial ? 'editorial' : scoreId ? 'round' : reviewId ? 'review' : 'post';
-            const commentTargetId = isEditorial ? (editorialId ?? '') : (scoreId ?? reviewId ?? activePost.id);
-            return (
-              <CommentsSheetV2
-                isOpen={commentsOpen}
-                onClose={closeComments}
-                targetType={commentTargetType}
-                targetId={commentTargetId}
-              />
-            );
-          })()}
-
           <MoreOptionsDrawer
             open={moreOptionsOpen}
             onOpenChange={setMoreOptionsOpen}
