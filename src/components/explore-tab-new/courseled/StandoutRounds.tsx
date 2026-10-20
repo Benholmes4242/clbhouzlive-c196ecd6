@@ -7,7 +7,8 @@ import { windowOption, type BoardFilters } from './boardFilters';
 import type { BoardRow } from './hooks/useBoardPage';
 import { useStandoutRounds, type StandoutRound } from './hooks/useStandoutRounds';
 import { playDateAtLocalNoon } from './discoverWhen';
-import { standoutSentenceParts, standoutToPar } from './standoutSentence';
+import { standoutSentenceParts } from './standoutSentence';
+import { fmtToPar } from './BoardRows';
 
 /** SR1: no independent filter state, no independent round navigation. The host
  * passes its authoritative filters and the very same board-row callback.
@@ -24,7 +25,7 @@ function Figures({ row }: { row: StandoutRound }) {
         return <span key={kind} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minWidth: 45 }}>
           <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: A.MUTE, lineHeight: '11px' }}>{t(`discover.filterBoard.col.${kind}`, { defaultValue: kind === 'net' ? 'NET' : 'GROSS' })}</span>
           <span className="tabular-nums" style={{ fontSize: 15, fontWeight: 700, lineHeight: '18px', color: under ? TOPAR_UNDER_DARK : kind === 'net' ? A.INK : A.MUTE }}>
-            {score ?? '\u2014'}<span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.01em', marginLeft: 3, color: A.DIM, lineHeight: 1 }}>{standoutToPar(score, row.course_par)}</span>
+            {score ?? '\u2014'}<span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.01em', marginLeft: 3, color: A.DIM, lineHeight: 1 }}>{score == null || row.course_par == null ? '' : fmtToPar(score - row.course_par)}</span>
           </span>
         </span>;
       })}

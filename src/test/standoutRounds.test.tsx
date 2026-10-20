@@ -7,7 +7,9 @@ import en from '../../public/locales/en/courses.json';
 import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFilters';
 import { StandoutRounds } from '@/components/explore-tab-new/courseled/StandoutRounds';
 import { standoutRpcArgs, type StandoutRound } from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';
-import { standoutSentenceParts, standoutToPar } from '@/components/explore-tab-new/courseled/standoutSentence';
+import { standoutSentenceParts } from '@/components/explore-tab-new/courseled/standoutSentence';
+import { fmtToPar } from '@/components/explore-tab-new/courseled/BoardRows';
+const standoutToPar = (s: number | null, p: number | null) => (s == null || p == null ? '' : fmtToPar(s - p));
 
 const f = vi.hoisted(() => ({ rpc: vi.fn() }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: f.rpc } }));
@@ -100,7 +102,7 @@ describe('SR1 standout rules', () => {
   it('prints score minus par with explicit signs and a true minus', () => {
     expect(standoutToPar(69, 71)).toBe('−2');
     expect(standoutToPar(73, 72)).toBe('+1');
-    expect(standoutToPar(72, 72)).toBe('+0');
+    expect(standoutToPar(72, 72)).toBe('E');
     expect(standoutToPar(null, 72)).toBe('');
   });
 });

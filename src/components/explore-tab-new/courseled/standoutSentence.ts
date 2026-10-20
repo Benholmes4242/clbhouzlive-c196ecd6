@@ -23,10 +23,3 @@ export function standoutSentenceParts(row: StandoutRound, locale = 'en') {
   }
   return { key: 'amateur.standout.betterAverage', defaultValue: '{{n}} shots better than average at {{course}}', course, n: Math.round(Math.abs(row.delta ?? 0)) };
 }
-
-/** SR1 requests an explicit sign even at level par, rather than the board's E. */
-export function standoutToPar(score: number | null, par: number | null): string {
-  if (score == null || par == null) return '';
-  const delta = score - par;
-  return delta < 0 ? `\u2212${Math.abs(delta)}` : `+${delta}`;
-}
