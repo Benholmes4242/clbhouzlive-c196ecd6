@@ -5,7 +5,7 @@
  *
  *   grid4   no bar; centred figure then label (pairs keeps its 8px bars)
  *   figure  16 / 700 / -0.02em, courseSubScoreTone(value)
- *   label   9 / 700 / 0.09em / uppercase / A.DIM, 6px beneath the figure
+ *   label   9 / 700 / 0.09em / uppercase / A.DIM, lineHeight 1, 4px beneath the figure
  *   columns four equal, 12px gap
  *
  * An absent category renders an EMPTY column — never a zero, never a dash.

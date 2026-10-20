@@ -111,6 +111,9 @@ export const ReviewVerdictLabel: React.FC<ReviewVerdictLabelProps> = ({
         padding: 0,
         cursor: 'pointer',
         flexShrink: 0,
+        display: 'block',
+        fontSize,
+        lineHeight: 1,
       }}
       aria-label={ariaLabel}
     >
