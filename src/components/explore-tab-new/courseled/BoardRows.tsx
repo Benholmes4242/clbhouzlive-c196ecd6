@@ -2,7 +2,8 @@ import { BOARD_ROW_METRICS } from './rowMetrics';
 import { MemberAvatar } from './MemberAvatar';
 import { useTranslation } from 'react-i18next';
 
-import { A, SANS, SELF_ROW_TINT, INDEX_CUT_BORDER, COMPETITION } from './tokens';
+import { A, SANS, SELF_ROW_TINT, INDEX_CUT_BORDER } from './tokens';
+import { CompetitionMark } from './CompetitionMark';
 import { playDateStandalone, playDateUnderYearHeader } from './discoverWhen';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { boardCountsRounds, isFeatBoard, type BoardKey, type FeatBoardKey } from './boardFilters';

@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { Section } from '@/features/explore-magazine/Section';
 import { Button } from '@/components/ui/button';
-import { A, COMPETITION, FIGS, SANS } from './tokens';
+import { A, FIGS, SANS } from './tokens';
+import { CompetitionMark } from './CompetitionMark';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { MemberAvatar } from './MemberAvatar';
 import { windowOption, type BoardFilters } from './boardFilters';
