@@ -8,7 +8,6 @@ import type { BoardRow } from './hooks/useBoardPage';
 import { useStandoutRounds, type StandoutRound } from './hooks/useStandoutRounds';
 import { playDateAtLocalNoon } from './discoverWhen';
 import { standoutSentenceParts, standoutToPar } from './standoutSentence';
-import './StandoutRounds.css';
 
 /** SR1: no independent filter state, no independent round navigation. The host
  * passes its authoritative filters and the very same board-row callback.
@@ -57,7 +56,7 @@ export function StandoutRounds({ viewerId, filters, enabled, onRowPress }: {
           return <Button key={`${row.pos}:${row.whs_score_id ?? row.user_id}`} variant="ghost" data-standout-row onClick={() => onRowPress(row)}
             className="h-auto w-full rounded-none whitespace-normal text-left"
             style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 11, padding: '11px 0', border: 'none', borderBottom: `1px solid ${A.SOFT}`, background: 'transparent', fontFamily: SANS }}>
-            <span data-standout-avatar style={{ width: 36, height: 36, flex: 'none' }}><MemberAvatar userId={row.user_id} name={row.display_name} photoUrl={row.profile_photo_url} size={36} /></span>
+            <span style={{ display: 'flex', flex: 'none' }}><MemberAvatar userId={row.user_id} name={row.display_name} photoUrl={row.profile_photo_url} size={36} /></span>
             <span style={{ flex: 1, minWidth: 0 }}>
               <span style={{ display: 'flex', alignItems: 'center', lineHeight: '16px', minWidth: 0 }}>
                 <span style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{row.display_name ?? t('discover.aMember')}</span>
