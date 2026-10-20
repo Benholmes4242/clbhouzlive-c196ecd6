@@ -1,5 +1,9 @@
 # Roadmap
 
+## Review tile COURSE without reopening
+- [ ] COURSE closes the existing overlays in order and navigates with highlight only; shared/notification review links retain sheet opening.
+- [ ] Highlight-only targets wait for loaded reviews, scroll and expire after three seconds without changing sheet phase; unknown ids clear. Verify full suite against 1,862 passing / 242 files.
+
 ## Launch notch colour
 - [x] First native status-bar request uses STATUS_BAR_CANVAS and white-icon intent; central route chrome starts before React and retains immersive Home behaviour. Ownership documented at the boot call and bridge initialization.
 - `npx vitest run`: before 1,859 passed / 241 files; after 1,862 passed / 242 files; zero failures. +3 solely src/test/launchStatusBar.test.ts (first request, delayed readiness, immersive handoff); no existing tests changed. Preview build OK. Real app Chromium at 430x786 with early/delayed simulated Median bridge sends the correct first payload, renders html/body/root rgb(10,10,12), and reaches /auth signed out without page errors. Physical iOS splash handoff and Median's pre-JavaScript wrapper settings remain unverified; hosted authenticated Clubhouse acceptance unavailable on external/unmanaged Supabase.

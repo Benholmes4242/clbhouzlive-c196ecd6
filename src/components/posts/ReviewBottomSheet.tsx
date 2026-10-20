@@ -353,7 +353,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     onClose();
     closeFullscreen();
     const url = reviewId
-      ? `/courses/${courseId}?tab=reviews&review=${reviewId}`
+      ? `/courses/${courseId}?tab=reviews&highlight=${reviewId}`
       : `/courses/${courseId}?tab=reviews`;
     navigate(url);
   }, [courseId, reviewId, navigate, onClose, closeFullscreen]);

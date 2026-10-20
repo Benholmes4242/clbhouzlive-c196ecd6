@@ -30,6 +30,7 @@ interface FewReviewsProps {
   viewerId?: string;
   courseId: string;
   courseName: string;
+  highlightedReviewId?: string | null;
   onMediaClick: (review: CourseReview, index: number, el: HTMLElement | null) => void;
   ownReview: React.ReactNode;
   afterReview?: (review: CourseReview) => React.ReactNode;
@@ -40,7 +41,7 @@ const kicker = VERDICT_KICKER;
 const heading = TAB_TITLE;
 const prose: React.CSSProperties = { color: SURFACE.dark.body, fontSize: 12.5, lineHeight: 1.55, margin: '14px 0 0' };
 
-export function FewReviews({ community, reviews, viewerId, courseId, courseName, onMediaClick, ownReview, afterReview, onWrite }: FewReviewsProps) {
+export function FewReviews({ community, reviews, viewerId, courseId, courseName, highlightedReviewId, onMediaClick, ownReview, afterReview, onWrite }: FewReviewsProps) {
   const { data: members } = useMembersWhoPlayedCourse(viewerId ? courseId : undefined, viewerId);
   const stateFour = isFiveToNineReviews(community.totalRatingCount);
   if (!isFewReviews(community.totalRatingCount) && !stateFour) return null;
@@ -50,7 +51,7 @@ export function FewReviews({ community, reviews, viewerId, courseId, courseName,
   const { known, others } = partitionKnownReviews(visible, new Set(members?.members.filter(member => member.in_circle).map(member => member.user_id) ?? []));
   const facts = fewReviewFacts(community);
   const ratedViewer = community.viewerScore != null;
-  const renderPerson = (review: CourseReview, flat: boolean) => <React.Fragment key={review.id}><RaterReviewRow review={review} flat={flat} onMediaClick={(index, el) => onMediaClick(review, index, el)} />{afterReview?.(review)}</React.Fragment>;
+  const renderPerson = (review: CourseReview, flat: boolean) => <React.Fragment key={review.id}><RaterReviewRow review={review} flat={flat} isHighlighted={review.id === highlightedReviewId} onMediaClick={(index, el) => onMediaClick(review, index, el)} />{afterReview?.(review)}</React.Fragment>;
   const identities = community.communityRows.map(row => {
     const profile = visible.find(review => review.id === row.id)?.user_profiles;
     const fullName = profile?.display_name?.trim() || profile?.username?.trim();

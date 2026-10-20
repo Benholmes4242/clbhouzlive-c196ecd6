@@ -25,6 +25,7 @@ import { CategoryLine } from './reviewFlatBits';
 interface SingleReviewProps {
   totalRatings: number;
   review?: CourseReview;
+  isHighlighted?: boolean;
   /** Only the review's own known played month; no derived date is accepted. */
   playedMonth?: number | null;
   context?: RaterContext | null;
@@ -38,7 +39,7 @@ interface SingleReviewProps {
   courseName?: string;
 }
 
-export function SingleReview({ totalRatings, review, playedMonth, context, onMediaClick, onAddYours, communityScore = null, communityCount = null, isViewerOwn = false, courseName = '' }: SingleReviewProps) {
+export function SingleReview({ totalRatings, review, isHighlighted, playedMonth, context, onMediaClick, onAddYours, communityScore = null, communityCount = null, isViewerOwn = false, courseName = '' }: SingleReviewProps) {
   const { data: fetchedContext } = useSingleReviewContext(context === undefined ? review?.user_id : undefined, review?.course_id ?? '');
   if (!isSingleReview(totalRatings)) return null;
   const facts = context === undefined ? fetchedContext : context;
@@ -67,7 +68,7 @@ export function SingleReview({ totalRatings, review, playedMonth, context, onMed
       </div>
     </div>}
     <p style={{ color: SURFACE.dark.mute, fontSize: 12.5, lineHeight: 1.5, margin: '8px 0 0' }}>{lede}</p>
-    {review && <RaterReviewRow review={review} context={facts} playedMonth={playedMonth} onMediaClick={onMediaClick} />}
+    {review && <RaterReviewRow review={review} isHighlighted={isHighlighted} context={facts} playedMonth={playedMonth} onMediaClick={onMediaClick} />}
     {calibration && <p data-review-calibration style={{ borderLeft: `2px solid ${A.AMBER}`, paddingLeft: 11, color: SURFACE.dark.body, fontSize: 13, lineHeight: 1.5, margin: '14px 0 0' }}>
       {calibration.everyCategory && <>{subject} gave it <b style={{ color: SURFACE.dark.ink, ...FIGS }}>{review?.rating?.toFixed(1)}</b> on every category. </>}
       <b style={{ color: SURFACE.dark.ink, fontWeight: 700, ...FIGS }}>{subject} {verb} rated {calibration.coursesRated} courses and given {calibration.perfectTens} of them a ten</b> — so this is not {person} who hands them out.
@@ -79,8 +80,9 @@ export function SingleReview({ totalRatings, review, playedMonth, context, onMed
   </section>;
 }
 /** Existing State 2 person row shared with State 3; context never feeds aggregates. */
-export function RaterReviewRow({ review, context, playedMonth, onMediaClick, flat = false }: {
+export function RaterReviewRow({ review, context, playedMonth, onMediaClick, flat = false, isHighlighted = false }: {
   review: CourseReview; context?: RaterContext | null; playedMonth?: number | null;
+  isHighlighted?: boolean;
   onMediaClick: (index: number, el: HTMLElement | null) => void; flat?: boolean;
 }) {
   const { data: fetchedContext } = useSingleReviewContext(context === undefined ? review.user_id : undefined, review.course_id);
@@ -92,7 +94,7 @@ export function RaterReviewRow({ review, context, playedMonth, onMediaClick, fla
   if (facts?.roundsHere != null && facts.roundsHere > 0) contextItems.push(<em key="played" data-tracked-play style={{ color: A.IMPROVED, fontStyle: 'normal', fontWeight: 700 }}>Played here {facts.roundsHere === 1 ? 'once' : facts.roundsHere === 2 ? 'twice' : `${facts.roundsHere} times`}</em>);
   if (facts?.coursesRated != null) contextItems.push(`${facts.coursesRated} courses rated`);
   return (
-    <article data-testid="review-row" data-review-id={review.id} style={flat ? { padding: '14px 0', borderBottom: `1px solid ${inkWithAlpha(SURFACE.dark.ink, 0.06)}` } : { marginTop: 15, background: MEMBER_PANEL, border: `1px solid ${inkWithAlpha(SURFACE.dark.ink, 0.07)}`, borderRadius: 13, padding: 15 }}>
+    <article data-testid="review-row" data-review-id={review.id} className={isHighlighted ? 'animate-soft-pulse' : undefined} style={flat ? { padding: '14px 0', borderBottom: `1px solid ${inkWithAlpha(SURFACE.dark.ink, 0.06)}` } : { marginTop: 15, background: MEMBER_PANEL, border: `1px solid ${inkWithAlpha(SURFACE.dark.ink, 0.07)}`, borderRadius: 13, padding: 15 }}>
       <div data-rater-row style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
         <SquircleAvatar src={review.user_profiles?.profile_photo_url} alt={name} userId={review.user_id} size={34} hairlineRing />
         <div style={{ flex: 1, minWidth: 0 }}>
