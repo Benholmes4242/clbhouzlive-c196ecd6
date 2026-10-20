@@ -40,13 +40,14 @@ function useSubtitleRest(card: CompetitionCard) {
 const posText = (r: CompetitionBoardRow) => (r.is_tie ? `T${r.pos}` : String(r.pos));
 
 /** CB4.3 — a score with its to-par, exactly as the standout rows render it:
- * the figure, then the to-par small and dim. A NET under par takes the one
- * under-par tone (A.RED is TOPAR_UNDER_DARK — BoardRows.tsx); gross never does. */
+ * the figure, then the to-par small. CB9: the figure never takes the under-par
+ * tone; the to-par beside it takes it (A.RED is TOPAR_UNDER_DARK — BoardRows.tsx)
+ * on either column when that column's score is under that column's par. */
 function ScoreWithToPar({ score, par, kind, fontSize }: { score: number | null; par: number | null; kind: 'net' | 'gross'; fontSize: number }) {
-  const under = kind === 'net' && score != null && par != null && score < par;
+  const under = score != null && par != null && score < par;
   return (
-    <span className="tabular-nums" style={{ lineHeight: 1.25, fontSize, fontWeight: 700, color: under ? A.RED : kind === 'net' ? A.INK : A.FAINT }}>
-      {score ?? '—'}<span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.01em', marginLeft: 3, color: A.DIM, lineHeight: 1 }}>{score == null || par == null ? '' : fmtToPar(score - par)}</span>
+    <span className="tabular-nums" style={{ lineHeight: 1.25, fontSize, fontWeight: 700, color: kind === 'net' ? A.INK : A.FAINT }}>
+      {score ?? '—'}<span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.01em', marginLeft: 3, color: under ? A.RED : A.DIM, lineHeight: 1 }}>{score == null || par == null ? '' : fmtToPar(score - par)}</span>
     </span>
   );
 }

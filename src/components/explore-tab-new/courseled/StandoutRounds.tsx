@@ -17,17 +17,19 @@ import { fmtToPar } from './BoardRows';
  * Below-scope placement is Ben's ruling; cold/failed/empty reads reserve no space. */
 export type RoundPressTarget = Pick<BoardRow, 'whs_score_id' | 'user_id'>;
 
+/** CB9: the figure never takes the under-par tone; the to-par beside it takes
+ * TOPAR_UNDER_DARK on either column when that column's score is under par. */
 function Figures({ row }: { row: StandoutRound }) {
   const { t } = useTranslation('courses');
   return (
     <span style={{ display: 'flex', flex: 'none', marginTop: 3, gap: 10 }}>
       {(['net', 'gross'] as const).map((kind) => {
         const score = kind === 'net' ? row.net_score : row.gross_score;
-        const under = kind === 'net' && score != null && row.course_par != null && score < row.course_par;
+        const under = score != null && row.course_par != null && score < row.course_par;
         return <span key={kind} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minWidth: 45 }}>
           <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: A.MUTE, lineHeight: '11px' }}>{t(`discover.filterBoard.col.${kind}`, { defaultValue: kind === 'net' ? 'NET' : 'GROSS' })}</span>
-          <span className="tabular-nums" style={{ fontSize: 15, fontWeight: 700, lineHeight: '18px', color: under ? TOPAR_UNDER_DARK : kind === 'net' ? A.INK : A.MUTE }}>
-            {score ?? '\u2014'}<span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.01em', marginLeft: 3, color: A.DIM, lineHeight: 1 }}>{score == null || row.course_par == null ? '' : fmtToPar(score - row.course_par)}</span>
+          <span className="tabular-nums" style={{ fontSize: 15, fontWeight: 700, lineHeight: '18px', color: kind === 'net' ? A.INK : A.MUTE }}>
+            {score ?? '\u2014'}<span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.01em', marginLeft: 3, color: under ? TOPAR_UNDER_DARK : A.DIM, lineHeight: 1 }}>{score == null || row.course_par == null ? '' : fmtToPar(score - row.course_par)}</span>
           </span>
         </span>;
       })}
