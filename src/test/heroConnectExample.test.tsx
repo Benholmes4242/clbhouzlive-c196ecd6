@@ -6,7 +6,12 @@ import { MemoryRouter } from 'react-router-dom';
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 const f = vi.hoisted(() => ({
   decline: vi.fn(),
+  navigate: vi.fn(),
   state: { connected: false, settled: true, connection: null, trend: null, anyError: false },
+}));
+vi.mock('react-router-dom', async (importOriginal) => ({
+  ...await importOriginal<typeof import('react-router-dom')>(),
+  useNavigate: () => f.navigate,
 }));
 vi.mock('@/lib/whs/useDeclineHandicapChip', () => ({ useDeclineHandicapChip: () => f.decline }));
 vi.mock('@/lib/whs/useHandicapChipState', () => ({ useHandicapChipState: () => f.state }));
@@ -26,6 +31,7 @@ vi.mock('@/utils/median/openExternalUrl', () => ({ openExternalUrl: vi.fn() }));
 
 import { ProfileHero } from '@/components/profile/hero/ProfileHero';
 import { CONNECT_EXAMPLE } from '@/components/profile/hero/HeroConnectExample';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 function hero(p: { hideConnectPrompt?: boolean; isSelf?: boolean; indexValue?: number } = {}) {
   return <MemoryRouter><ProfileHero userId="u1" viewerUserId="u1" displayName="Alex Doe" isSelf={p.isSelf ?? true} hideConnectPrompt={p.hideConnectPrompt} indexValue={p.indexValue ?? 41.9} roundsCount={null} ratedCount={null} onStatTap={() => {}} /></MemoryRouter>;
@@ -34,9 +40,35 @@ const panel = () => screen.queryByTestId('hero-connect-panel');
 beforeEach(() => {
   f.state = { connected: false, settled: true, connection: null, trend: null, anyError: false };
   f.decline.mockReset().mockResolvedValue(undefined);
+  f.navigate.mockReset();
+  vi.mocked(analyticsEvents.track).mockClear();
 });
 
 describe('CE1 fixed connected example', () => {
+  it('clicking every example form tile fires no analytics or navigation', () => {
+    render(hero());
+    const tiles = screen.getByTestId('hero-connect-panel').querySelectorAll('[data-example-form-tile]');
+    expect(tiles).toHaveLength(5);
+    tiles.forEach((tile) => fireEvent.click(tile));
+    expect(analyticsEvents.track).not.toHaveBeenCalled();
+    expect(f.navigate).not.toHaveBeenCalled();
+  });
+  it('clicking the example chart fires no analytics or navigation', () => {
+    render(hero());
+    const chart = screen.getByTestId('hero-connect-panel').querySelector('[data-example-display] svg')?.closest('button');
+    expect(chart).toBeInstanceOf(HTMLButtonElement);
+    if (!chart) throw new Error('Example chart button missing');
+    fireEvent.click(chart);
+    expect(analyticsEvents.track).not.toHaveBeenCalled();
+    expect(f.navigate).not.toHaveBeenCalled();
+  });
+  it('clicking the example index figure fires no analytics or navigation', () => {
+    render(hero());
+    const figure = within(screen.getByTestId('hero-connect-panel')).getByRole('button', { name: '12.4' });
+    fireEvent.click(figure);
+    expect(analyticsEvents.track).not.toHaveBeenCalled();
+    expect(f.navigate).not.toHaveBeenCalled();
+  });
   it('appears for an unconnected member on their own profile', () => {
     render(hero());
     expect(panel()).not.toBeNull();
