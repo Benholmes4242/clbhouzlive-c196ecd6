@@ -33,6 +33,7 @@ export const CONNECT_EXAMPLE = {
 
 /** One compositing operation for the entire real display; pill/actions stay full strength. */
 const EXAMPLE_OPACITY = 0.5;
+export const EXAMPLE_DISPLAY_STYLE: React.CSSProperties = { opacity: EXAMPLE_OPACITY, maxHeight: 205, overflow: 'hidden', WebkitMaskImage: 'linear-gradient(to bottom, #000 0, #000 58%, transparent 100%)', maskImage: 'linear-gradient(to bottom, #000 0, #000 58%, transparent 100%)' };
 const NO_TAP = () => {};
 
 export const HeroConnectExample: React.FC<{ t: TFunction<'profile'>; onConnect?: () => void }> = ({ t, onConnect }) => {
@@ -43,7 +44,7 @@ export const HeroConnectExample: React.FC<{ t: TFunction<'profile'>; onConnect?:
       <div data-example-pill="" style={{ display: 'inline-block', fontSize: 8.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.FAINT, border: `1px solid ${A.BORDER}`, borderRadius: 999, padding: '3px 8px', marginBottom: 12 }}>
         {t('hero.connectExamplePill', { defaultValue: 'Example' })}
       </div>
-      <div data-example-display="" ref={(element) => element?.setAttribute('inert', '')} style={{ opacity: EXAMPLE_OPACITY, maxHeight: 205, overflow: 'hidden', WebkitMaskImage: 'linear-gradient(to bottom, #000 0, #000 58%, transparent 100%)', maskImage: 'linear-gradient(to bottom, #000 0, #000 58%, transparent 100%)' }}>
+      <div data-example-display="" ref={(element) => element?.setAttribute('inert', '')} style={EXAMPLE_DISPLAY_STYLE}>
         <HeroHandicapDisplay
           t={t} shownIndex={CONNECT_EXAMPLE.index}
           deltaLines={CONNECT_EXAMPLE.movements.map((line) => ({ ...line }))}

@@ -33,7 +33,7 @@ vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } 
 vi.mock('@/utils/median/openExternalUrl', () => ({ openExternalUrl: vi.fn() }));
 
 import { ProfileHero } from '@/components/profile/hero/ProfileHero';
-import { CONNECT_EXAMPLE, HeroConnectExample } from '@/components/profile/hero/HeroConnectExample';
+import { CONNECT_EXAMPLE, EXAMPLE_DISPLAY_STYLE, HeroConnectExample } from '@/components/profile/hero/HeroConnectExample';
 import { HeroHandicapDisplay } from '@/components/profile/hero/HeroHandicapDisplay';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -60,7 +60,8 @@ describe('CE1 fixed connected example', () => {
     expect(display?.style.maxHeight).toBe('205px');
     expect(display?.style.overflow).toBe('hidden');
     expect(display?.style.maskImage).toContain('58%');
-    expect(display?.style.getPropertyValue('-webkit-mask-image')).toContain('58%');
+    // jsdom drops vendor-prefixed mask properties, so this one is asserted at the source rather than on the element.
+    expect(EXAMPLE_DISPLAY_STYLE.WebkitMaskImage).toContain('58%');
   });
   it('renders no example axis strings or counting sentence', () => {
     render(<MemoryRouter><HeroConnectExample t={t} /></MemoryRouter>);
