@@ -19,7 +19,10 @@
     "coverGuidanceBusiness": "Recommended: 1500x1500px, 1:1 - JPG, PNG or WebP",
     "window12mo": "12 months",
     "trendLevel": "Level",
-    "window90d": "90 days"
+    "window90d": "90 days",
+    "connectPanelLead": "Connect your official handicap",
+    "connectPanelRest": " and this fills in — your index, and the last five rounds behind it.",
+    "connectPanelAction": "Connect ›"
   },
   "social": {
     "followers": "{{count}} followers",

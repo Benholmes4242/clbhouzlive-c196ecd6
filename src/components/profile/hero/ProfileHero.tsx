@@ -41,7 +41,9 @@ const AXIS_INK = 'rgba(248,250,252,0.30)';
 const LOW_LINE = 'rgba(255,255,255,0.14)';
 const MARKER_HALO = '0 0 0 3px rgba(10,10,12,0.9)';
 const TILE_GROUND = 'rgba(255,255,255,0.02)';
-const ON_AMBER = '#0A0A0C';
+/** Connect panel ghost figures. Deliberately DIMMER than their own label
+ *  (A.FAINT): the label carries the meaning, the figure is the absent thing. */
+const GHOST_FIGURE = 'rgba(248,250,252,0.18)';
 
 /** The event contract — not the layout. Every member stays even where a view omits the cell. */
 export type HeroStat = 'index' | 'rounds' | 'courses' | 'rated' | 'badges' | 'friends' | 'followers';
@@ -602,20 +604,34 @@ export const ProfileHero: React.FC<Props> = ({
           </div>
         )}
 
+        {/*
+          CONNECT PANEL (CP1): the EMPTY SHAPE of the connected hero's
+          unconditional blocks — the "Handicap index" label over its figure, and
+          "Form · last five" over five tiles. The movement lines and percentile
+          are conditional once connected, so they are never ghosted: a ghost may
+          only promise what always appears. Labels reuse the connected hero's own
+          keys. Top edge = the shared divider above; bottom edge = the counters
+          row's own border, so no hairline is drawn twice.
+        */}
         {showConnectCard && (
-          <div style={{ marginTop: 14, border: `1px solid ${A.BORDER}`, borderRadius: 16, padding: 16 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>
-              {t('hero.connectTitle', 'Connect your handicap')}
+          <div data-testid="hero-connect-panel" style={{ marginTop: 14 }}>
+            <div data-ghost-label="" style={{ ...KICK, color: A.FAINT }}>{t('hero.handicapIndex', 'Handicap index')}</div>
+            <div aria-hidden style={{ marginTop: 6, fontSize: 46, fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 1, color: GHOST_FIGURE }}>{'\u2014'}</div>
+            <div data-ghost-label="" style={{ ...KICK, color: A.FAINT, marginTop: 20 }}>{t('hero.formLastFive', 'Form \u00B7 last five')}</div>
+            <div aria-hidden style={{ marginTop: 9, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 7 }}>
+              {[0, 1, 2, 3, 4].map((i) => (
+                <div key={i} data-ghost-tile="" style={{ minWidth: 0, height: 46, border: `1px solid ${A.BORDER}`, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: GHOST_FIGURE }}>{'\u2014'}</div>
+              ))}
             </div>
-            <div style={{ marginTop: 5, fontSize: 12.5, fontWeight: 600, lineHeight: 1.45, color: A.BODY }}>
-              {t('hero.connectBody', 'Your index, your trend, and every round you have posted \u2014 pulled straight from England Golf. It takes about a minute.')}
+            <div style={{ marginTop: 14, fontSize: 12.5, lineHeight: 1.5, color: A.BODY }}>
+              <b style={{ color: A.INK, fontWeight: 700 }}>{t('hero.connectPanelLead')}</b>{t('hero.connectPanelRest')}
             </div>
             <button
               type="button"
               onClick={onConnect}
-              style={{ marginTop: 12, width: '100%', height: 40, borderRadius: 999, border: 0, background: A.AMBER, color: ON_AMBER, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', cursor: 'pointer' }}
+              style={{ marginTop: 11, padding: 0, border: 0, background: 'transparent', fontFamily: SANS, fontSize: 13, fontWeight: 700, color: A.AMBER, cursor: 'pointer' }}
             >
-              {t('hero.connectCta', 'Connect')}
+              {t('hero.connectPanelAction')}
             </button>
           </div>
         )}
@@ -623,7 +639,9 @@ export const ProfileHero: React.FC<Props> = ({
         {counters.length > 0 && (
           <div
             style={{
-              marginTop: showConnectCard ? 22 : 16,
+              // 16 in both states: the panel ends on its action, and this row's
+              // own border is the panel's bottom rule (16 below, per CP1 spec).
+              marginTop: 16,
               paddingTop: 13,
               borderTop: `1px solid ${A.SOFT}`,
               display: 'grid',
