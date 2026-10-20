@@ -45,7 +45,7 @@ describe('CB1 competition boards', () => {
   });
   it('renders cards, rows, tie markers and the field line only above three members', async () => {
     f.rpc.mockResolvedValue({ data: [
-      row({ pos: 1 }), row({ pos: 2, is_tie: true, user_id: 'u2' }), row({ pos: 2, is_tie: true, user_id: 'u3' }),
+      row({ pos: 1 }), row({ pos: 2, is_tie: true, user_id: 'u2', whs_score_id: 's2' }), row({ pos: 2, is_tie: true, user_id: 'u3', whs_score_id: 's3' }),
       row({ course_id: 'east', comp_date: '2026-09-26', members: 3, pos: 1 }),
     ], error: null });
     mount();
