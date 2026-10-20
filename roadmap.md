@@ -1,5 +1,10 @@
 # Roadmap
 
+## Review tile COURSE without reopening
+- [x] COURSE closes the existing overlays in order and navigates with highlight only; share URL, See all and profile actions unchanged, shared/notification review links retain sheet opening.
+- [x] Highlight-only targets wait for loaded reviews, scroll and expire after three seconds without changing sheet phase; unknown ids clear. SingleReview/FewReviews pass through the existing pulse so all populated sample states honour highlighting without new styling. Local ownership documented in CourseReviewsTab's header.
+- Exact command `npx vitest run`: before 1,862 passed / 242 files, zero failed; after 1,872 passed / 243 files, zero failed. +10 solely src/test/reviewCourseNoReopen.test.tsx: two COURSE exits (with/without id), four populated sample states (1/3/6/10), delayed loading, unknown target, and two sheet-opening aliases (review/reviewId) including dismissal timing. No existing tests changed, deleted, renamed or rewritten. Build OK. Chromium public entry reached /auth with zero page errors; hosted authenticated COURSE flow remains unverified because Supabase is external_unmanaged. No SQL/migrations/RPC/feed_config/cap changes.
+
 ## Launch notch colour
 - [x] First native status-bar request uses STATUS_BAR_CANVAS and white-icon intent; central route chrome starts before React and retains immersive Home behaviour. Ownership documented at the boot call and bridge initialization.
 - `npx vitest run`: before 1,859 passed / 241 files; after 1,862 passed / 242 files; zero failures. +3 solely src/test/launchStatusBar.test.ts (first request, delayed readiness, immersive handoff); no existing tests changed. Preview build OK. Real app Chromium at 430x786 with early/delayed simulated Median bridge sends the correct first payload, renders html/body/root rgb(10,10,12), and reaches /auth signed out without page errors. Physical iOS splash handoff and Median's pre-JavaScript wrapper settings remain unverified; hosted authenticated Clubhouse acceptance unavailable on external/unmanaged Supabase.

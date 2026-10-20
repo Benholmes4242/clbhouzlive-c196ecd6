@@ -25,6 +25,8 @@
  *   the "Your tees" chip — it lived in that same control row, which is gone.
  *
  * Panel, tokens.tsx and DiscoverSectionHeading are NOT modified.
+ * COURSE exits use highlight-only links; shared/notification review links still
+ * open the sheet. Highlight-only timing is independent of the sheet lifecycle.
  */
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -109,6 +111,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const [reportingReview, setReportingReview] = useState<CourseReview | null>(null);
   const [highlightedReviewId, setHighlightedReviewId] = useState<string | null>(externalHighlightReviewId || null);
   const [pendingSheetReviewId, setPendingSheetReviewId] = useState<string | null>(null);
+  const [pendingHighlightReviewId, setPendingHighlightReviewId] = useState<string | null>(null);
+  const highlightOnlyTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: reviewsData, isLoading, isError, refetch, isSuccess: reviewsResolved } = useCourseReviews(
     courseId,
@@ -124,15 +128,18 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const { data: courseAggregate } = useCourseRatingAggregates(courseId);
   const otherReviews = reviews.filter((r) => r.user_id !== user?.id);
 
-  /* ── deep link (?review=<id>): highlight the row and open the sheet ─────── */
+  /* Review links open the sheet; highlight links only land on the row. */
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const reviewIdFromUrl = searchParams.get('review') || searchParams.get('reviewId');
-    const reviewIdToHighlight = reviewIdFromUrl || externalHighlightReviewId;
+    const highlightIdFromUrl = searchParams.get('highlight');
+    const reviewIdToHighlight = reviewIdFromUrl || highlightIdFromUrl || externalHighlightReviewId;
     if (!reviewIdToHighlight) return;
 
+    if (highlightOnlyTimeout.current) clearTimeout(highlightOnlyTimeout.current);
     setHighlightedReviewId(reviewIdToHighlight);
     if (reviewIdFromUrl) {
+      setPendingHighlightReviewId(null);
       setPendingSheetReviewId(reviewIdFromUrl);
       // Reset the phase so a second deep link into the same mounted page works.
       deepLinkPhase.current = 'idle';
@@ -146,6 +153,15 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       // now — under the sheet nobody can see it expire.
       return;
     }
+    if (highlightIdFromUrl) {
+      setPendingHighlightReviewId(highlightIdFromUrl);
+      setSearchParams((prev) => {
+        const p = new URLSearchParams(prev);
+        p.delete('highlight');
+        return p;
+      }, { replace: true });
+      return;
+    }
     const timeout = setTimeout(() => setHighlightedReviewId(null), 3000);
     return () => clearTimeout(timeout);
   }, [location.search, location.pathname]);
@@ -157,6 +173,25 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
      destroyed the re-assert frame and the highlight timer. */
   const deepLinkPhase  = useRef<'idle' | 'opening' | 'open' | 'settled'>('idle');
   const landedReviewId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!pendingHighlightReviewId || isLoading || !reviewsResolved) return;
+    const target = reviews.find((r) => r.id === pendingHighlightReviewId);
+    setPendingHighlightReviewId(null);
+    if (!target) {
+      setHighlightedReviewId(null);
+      return;
+    }
+    document
+      .querySelector(`[data-review-id="${target.id}"]`)
+      ?.scrollIntoView({ behavior: 'auto', block: 'center' });
+    // Clearing pending state must not cancel this visible three-second clock.
+    highlightOnlyTimeout.current = setTimeout(() => setHighlightedReviewId(null), 3000);
+  }, [pendingHighlightReviewId, isLoading, reviewsResolved, reviews]);
+
+  useEffect(() => () => {
+    if (highlightOnlyTimeout.current) clearTimeout(highlightOnlyTimeout.current);
+  }, [courseId]);
 
   useEffect(() => {
     if (!pendingSheetReviewId || isLoading) return;
@@ -486,6 +521,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           <SingleReview
             totalRatings={community.totalRatingCount}
             review={singleReview}
+            isHighlighted={singleReview?.id === highlightedReviewId}
             communityScore={courseAggregate?.avg_overall_score ?? null}
             communityCount={courseAggregate?.review_count ?? null}
             isViewerOwn={!!myReview}
@@ -497,6 +533,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           />
         ) : headerResolved && (isFewReviews(community.totalRatingCount) || isFiveToNineReviews(community.totalRatingCount)) ? (
           <FewReviews community={community} reviews={reviews} viewerId={user?.id} courseId={courseId} courseName={courseName}
+            highlightedReviewId={highlightedReviewId}
             onMediaClick={(review, index, el) => mediaClickHandler(review)(index, el)}
             onWrite={() => handleWriteReview('write')}
             ownReview={myReview && <AboutSection heading="Your review">{renderRow(myReview, true)}{(() => { const response = reviewResponses?.find(r => r.review_id === myReview.id); return response ? <ResponseDisplay response={response} courseId={courseId} viewerClaim={businessClaim} /> : null; })()}<FlatAction label="Edit your review" onClick={() => handleWriteReview('edit')} /></AboutSection>}
