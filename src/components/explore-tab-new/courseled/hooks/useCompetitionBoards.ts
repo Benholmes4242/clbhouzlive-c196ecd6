@@ -17,6 +17,9 @@ export interface CompetitionBoardRow {
   user_id: string;
   display_name: string | null;
   whs_score_id: string | null;
+  /** CB4.5 — new GET_COMPETITION_BOARDS_2 column; null until Ben runs that SQL,
+   * and null for a member with no photo (MemberAvatar falls back to initials). */
+  profile_photo_url: string | null;
   net_score: number | null;
   gross_score: number | null;
   course_par: number | null;
