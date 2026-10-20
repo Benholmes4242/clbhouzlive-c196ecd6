@@ -414,7 +414,7 @@ export const ProfileHero: React.FC<Props> = ({
               lineHeight: 1.5,
               color: A.BODY,
               overflowWrap: 'anywhere',
-              ...(bioExpanded ? {} : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }),
+              ...(bioExpanded ? {} : { display: '-webkit-box', WebkitLineClamp: BIO_COLLAPSED_LINES, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }),
             }}
           >
             {bio}
