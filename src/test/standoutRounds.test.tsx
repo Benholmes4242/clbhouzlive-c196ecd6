@@ -9,6 +9,8 @@ import { StandoutRounds } from '@/components/explore-tab-new/courseled/StandoutR
 import { standoutRpcArgs, type StandoutRound } from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';
 import { standoutSentenceParts } from '@/components/explore-tab-new/courseled/standoutSentence';
 import { fmtToPar } from '@/components/explore-tab-new/courseled/BoardRows';
+import { A } from '@/components/explore-tab-new/courseled/tokens';
+import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 
 const f = vi.hoisted(() => ({ rpc: vi.fn() }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: f.rpc } }));
@@ -114,5 +116,34 @@ describe('SR1 standout rules', () => {
     mount();
     await waitFor(() => expect(rows()).toHaveLength(1));
     expect(rows()[0].textContent).toContain('NET72EGROSS78+6');
+  });
+});
+
+describe('CB9 under-par tone sits on the to-par, never the figure', () => {
+  const tone = (c: string) => { const el = document.createElement('span'); el.style.color = c; return el.style.color; };
+  const columns = () => Array.from(rows()[0].querySelectorAll('span.tabular-nums')).map((fig) => {
+    const fg = fig as HTMLElement; const suffix = fg.querySelector('span') as HTMLElement;
+    return { figure: fg.style.color, suffix: suffix.style.color };
+  });
+  it('net under par: figure is A.INK and the to-par carries TOPAR_UNDER_DARK', async () => {
+    mount();
+    await waitFor(() => expect(rows()).toHaveLength(1));
+    const [net, gross] = columns();
+    expect(net).toEqual({ figure: tone(A.INK), suffix: tone(TOPAR_UNDER_DARK) });
+    expect(gross).toEqual({ figure: tone(A.MUTE), suffix: tone(A.DIM) });
+  });
+  it('gross under par paints its own to-par red, figure stays A.MUTE', async () => {
+    f.rpc.mockResolvedValue({ data: [row({ gross_score: 70, net_score: 64 })], error: null });
+    mount();
+    await waitFor(() => expect(rows()).toHaveLength(1));
+    const [net, gross] = columns();
+    expect(net.suffix).toBe(tone(TOPAR_UNDER_DARK));
+    expect(gross).toEqual({ figure: tone(A.MUTE), suffix: tone(TOPAR_UNDER_DARK) });
+  });
+  it('level par (E) stays dim', async () => {
+    f.rpc.mockResolvedValue({ data: [row({ gross_score: 80, net_score: 72 })], error: null });
+    mount();
+    await waitFor(() => expect(rows()).toHaveLength(1));
+    expect(columns()[0]).toEqual({ figure: tone(A.INK), suffix: tone(A.DIM) });
   });
 });
