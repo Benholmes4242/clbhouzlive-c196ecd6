@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Section } from '@/features/explore-magazine/Section';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { A, SELF_ROW_TINT, FIGS, SANS } from './tokens';
 import type { BoardFilters } from './boardFilters';
@@ -107,15 +108,18 @@ export function CompetitionBoards({ viewerId, scope, enabled }: { viewerId: stri
   const cards = groupCompetitionCards(query.data);
   const open = cards.find((c) => c.key === openKey) ?? null;
   return (
-    <section data-competitions-section style={{ fontFamily: SANS, ...FIGS, paddingInline: 16, marginBottom: 20 }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.DIM, lineHeight: 1.25 }}>
-        <span>{t('amateur.competitions.title', { defaultValue: 'Competitions' })}</span>
-        <span style={{ marginLeft: 'auto', color: A.FAINT }}>{t('amateur.competitions.window', { defaultValue: 'Last 30 days' })}</span>
-      </div>
-      <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 9 }}>
+    <div data-competitions-section style={{ ...FIGS }}>
+    <Section
+      contest
+      eyebrow={t('amateur.competitions.eyebrow', { defaultValue: 'The contest' })}
+      title={t('amateur.competitions.title', { defaultValue: 'Competitions' })}
+      meta={t('amateur.competitions.window', { defaultValue: 'Last 30 days' })}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
         {cards.map((c) => <Card key={c.key} card={c} onOpen={() => setOpenKey(c.key)} />)}
       </div>
       <FieldSheet card={open} viewerId={viewerId} onClose={() => setOpenKey(null)} />
-    </section>
+    </Section>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Section } from '@/features/explore-magazine/Section';
 
 import { A, FIGS, SANS } from './tokens';
 import { BOARD_LABELS, windowOption, type BoardFilters } from './boardFilters';
@@ -39,14 +40,15 @@ export function JustPlayed({
     const d = playDateAtLocalNoon(s);
     return d ? `${d.getDate()} ${d.toLocaleDateString(i18n?.language, { month: 'short' })}` : '';
   };
-  const kicker: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', lineHeight: 1.25 };
 
   return (
-    <section data-just-played-section style={{ fontFamily: SANS, padding: '0 16px', marginBottom: 24, ...FIGS }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-        <span style={{ ...kicker, color: A.DIM }}>{t('amateur.justPlayed.kicker', 'Just played')}</span>
-        <span style={{ ...kicker, color: A.FAINT }}>{t(win.i18n, win.label)}</span>
-      </div>
+    <div data-just-played-section style={{ ...FIGS }}>
+    <Section
+      contest={false}
+      eyebrow={t('amateur.justPlayed.eyebrow', { defaultValue: 'The latest' })}
+      title={t('amateur.justPlayed.title', { defaultValue: 'Just played' })}
+      meta={t(win.i18n, win.label)}
+    >
       {rows.map((r) => (
         <button
           key={`${r.pos}:${r.whs_score_id ?? r.user_id}`}
@@ -99,6 +101,7 @@ export function JustPlayed({
           onRowPress={onRowPress}
         />
       ) : null}
-    </section>
+    </Section>
+    </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Section } from '@/features/explore-magazine/Section';
 import { Button } from '@/components/ui/button';
 import { A, COMPETITION, FIGS, SANS } from './tokens';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
@@ -44,12 +45,14 @@ export function StandoutRounds({ viewerId, filters, enabled, onRowPress }: {
   if (!enabled || !query.isSuccess || !query.data?.length) return null;
   const win = windowOption(filters.window);
   return (
-    <section data-standout-section style={{ fontFamily: SANS, ...FIGS, paddingInline: 16, marginTop: 20, marginBottom: 20 }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.DIM, lineHeight: 1.25 }}>
-        <span>{t('amateur.standout.title', { defaultValue: 'Standout rounds' })}</span>
-        <span style={{ marginLeft: 'auto', color: A.FAINT }}>{t(win.i18n, { defaultValue: win.label })}</span>
-      </div>
-      <div style={{ marginTop: 10 }}>
+    <div data-standout-section style={{ ...FIGS }}>
+    <Section
+      contest={false}
+      eyebrow={t('amateur.standout.eyebrow', { defaultValue: 'The form' })}
+      title={t('amateur.standout.title', { defaultValue: 'Standout rounds' })}
+      meta={t(win.i18n, { defaultValue: win.label })}
+    >
+      <div>
         {query.data.map((row) => {
           const { key, ...options } = standoutSentenceParts(row, i18n?.language);
           const date = playDateAtLocalNoon(row.play_date);
@@ -70,6 +73,7 @@ export function StandoutRounds({ viewerId, filters, enabled, onRowPress }: {
           </Button>;
         })}
       </div>
-    </section>
+    </Section>
+    </div>
   );
 }
