@@ -8,6 +8,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { StandoutRounds, type RoundPressTarget } from '@/components/explore-tab-new/courseled/StandoutRounds';
+import { CompetitionBoards } from '@/components/explore-tab-new/courseled/CompetitionBoards';
 import { MemberAvatar } from '@/components/explore-tab-new/courseled/MemberAvatar';
 import { SEASON_ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMetrics';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
@@ -1056,6 +1057,7 @@ export function ScoresLeaderboardsPage({
             <FiltersPill count={state.sheetFilterCount} onOpen={onOpenFilters} />
           </div>
           <StandoutRounds viewerId={userId} filters={state.filters} enabled={state.ready} onRowPress={onRowPress} />
+          <CompetitionBoards viewerId={userId} scope={state.filters.scope} enabled={state.ready} />
           {/* 8.3 THE BASIS SENTENCE — rounds form or ranked form by boardCountsRounds. */}
           {(() => {
             /* 9.1 — the window's sentence phrase is the third rendering on its
