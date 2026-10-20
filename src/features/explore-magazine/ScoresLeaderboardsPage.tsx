@@ -603,8 +603,26 @@ export function ScoresLeaderboardsPage({
 
   const pending = (h: number) => <div aria-hidden style={{ height: h, marginInline: GUTTER, marginBottom: 24 }} />;
 
+  /* CB13 state 2 — the connection read has not settled (or failed): hold the
+     page's own loading treatment. The scoped sections render nothing while
+     pending today, so the shell is the control row plus the three section
+     placeholders, exactly what a first paint already shows. */
+  if (gate === 'loading') {
+    return (
+      <div style={{ fontFamily: SANS }}>
+        {state.ready ? (
+          <div data-scores-control-row style={{ display: 'flex', alignItems: 'center', gap: 9, padding: `0 ${HEAD_GUTTER}px 12px` }}>
+            <ScopeSegments scope={scope} clubApplies={state.clubApplies} onScopeChange={state.changeScope} style={{ flex: 1, minWidth: 0 }} />
+          </div>
+        ) : null}
+        {pending(rareAirPlaceholderHeight(!!userId))}
+        {pending(climbPlaceholderHeight(SHORT_ROWS))}
+        {pending(hundredPlaceholderHeight(!!userId))}
+      </div>
+    );
+  }
 
-  return (
+  const pageBody = (
     <div style={{ fontFamily: SANS }}>
       {/* EX1 — THE BOARDS ARE UNMOUNTED, NOT DELETED: the board chip rail, its
           rows, the basis sentence, the you slab and the Filters pill no longer
