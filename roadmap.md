@@ -452,3 +452,7 @@
 
 - [x] FN1 Home feed plot net + NET/GROSS/HANDICAP row (1,835/238 -> 1,850/239)
 - [ ] FN1 nine-hole stroke allocation convention — awaiting Ben ruling
+
+## BRIEF_TOP_TEN_TILE_WIDTH — done
+- ProfileTopTenRail: tiles 2/3 grid now `repeat(2, minmax(0, 1fr))` with `minWidth: 0` on each tile; new exported `RegionRankLine` (region truncates, ranks never shrink, null when neither) replaces `regionLine` at all four call sites (hero, tiles 2/3, rows 4-10, suggestions); helper removed. No other visual change.
+- New src/test/topTenTileWidth.test.tsx: 5 tests (grid template + tile minWidth, two-span structure, region-only, ranks-only, neither). No existing tests touched. Suite 1,878 passed + 1 failed / 244 files -> 1,883 passed + 1 failed / 245 files (+5/+1, topTenTileWidth only); the 1 failure is the pre-existing reviewReceiptAverageLine selector issue already reported and awaiting authorization. Build OK 2026-10-20T07:01:58Z. No SQL/migration/RPC/feed_config/cap changes.
