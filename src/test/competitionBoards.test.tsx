@@ -18,7 +18,7 @@ function row(over: Partial<CompetitionBoardRow> = {}): CompetitionBoardRow {
 }
 function mount(scope: 'everyone' | 'circle' = 'everyone', enabled = true) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return render(<QueryClientProvider client={client}><I18nextProvider i18n={i18n}><CompetitionBoards viewerId="v" scope={scope as never} enabled={enabled} /></I18nextProvider></QueryClientProvider>);
+  return render(<QueryClientProvider client={client}><I18nextProvider i18n={i18n}><CompetitionBoards viewerId="v" scope={scope as never} enabled={enabled} onRowPress={() => {}} /></I18nextProvider></QueryClientProvider>);
 }
 const q = (s: string) => document.querySelectorAll(s);
 beforeEach(() => { f.rpc.mockReset(); });
@@ -77,7 +77,9 @@ describe('CB1 competition boards', () => {
     mount();
     await waitFor(() => expect(q('[data-competition-card]').length).toBe(1));
     expect(screen.getByRole('button', { name: 'See all players' })).toBeTruthy();
-    fireEvent.click(q('[data-competition-card]')[0]);
+    /* CB4.7: the card root is no longer the button — the sheet opens from the
+     * title/subtitle area (and the CTA); a podium row opens the scorecard. */
+    fireEvent.click(q('[data-competition-open]')[0]);
     await waitFor(() => expect(q('[data-competition-field]').length).toBe(1));
   });
 });
