@@ -79,11 +79,14 @@ export function boardColumns(board: BoardKey): BoardColumns {
         secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
         ranked: true,
       };
-    /* A3.2 - gross leads, to-par behind, on Most recent. */
+    /* A3.2, superseded by EX1c - Most recent now leads with NET, gross behind,
+       the net board's pair. The lead board is gone; the recent board is reached
+       through Just played, which leads with net, and the sheet pages the same
+       call, so the two surfaces must print the same figure. */
     case 'recent':
       return {
-        value: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
-        secondary: { i18n: 'discover.filterBoard.col.toPar', label: 'TO PAR' },
+        value: { i18n: 'discover.filterBoard.col.net', label: 'NET' },
+        secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
         ranked: false,
       };
     /* B1.3 / A3.5 — THE FEAT BOARDS KEEP GROSS: they are event lists where the
@@ -157,9 +160,10 @@ export function boardValue(
         : { text: fmtIndexMove(Number(r.delta_index)), tone: A.GREEN };
     case 'birdies':
       return { text: r.birdies != null ? String(r.birdies) : '\u2014', tone: A.INK };
-    /* A3.2 - the gross leads on Most recent; to-par is the sub-figure beside it. */
+    /* A3.2 superseded by EX1c - the raw net leads on Most recent, as in Just
+       played. A null net is an em dash, never gross substituted, never hidden. */
     case 'recent':
-      return { text: r.gross_score != null ? String(r.gross_score) : '\u2014', tone: A.INK };
+      return { text: r.net_score != null ? String(r.net_score) : '\u2014', tone: A.INK };
     /* Feat boards: gross, plain, no tone. The date lives on the sub-line and in
        the day ladder, so it is no longer a figure. */
     default:
@@ -175,10 +179,7 @@ export function boardSecondary(r: Row, board: BoardKey): Cell | null {
     }
     case 'improved':
       return null;
-    case 'recent': {
-      const p = toParOf(r);
-      return { text: fmtToPar(p), tone: p == null ? A.DIM : p < 0 ? A.RED : p === 0 ? A.DIM : A.MUTE };
-    }
+    case 'recent':
     case 'topar':
     case 'net':
     case 'stableford':
