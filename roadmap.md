@@ -3,7 +3,7 @@
 ## CTA1 — White solid account-sheet buttons
 - [x] Cta background A.AMBER -> A.INK, foreground A.CANVAS unchanged; removed amber from its doc comment. All three PreIndexCards callers deliberately share this change; Door and other amber details untouched. No test edits or added colour assertions.
 - [x] Read-only hide-gate audit: ProfileSheetV2.tsx:149 reads profileQ, :159 passes hide_handicap_chip, :277-280 passes derived state to SheetCards. sheetState.ts:67/69/71 returns business/unsettled/hidden before any none/manual/connected state; SheetCards.tsx:29-32 returns null for those kinds. No connect path when the supplied flag is true.
-- [ ] Run unchanged full suite against last verified 1,913 passing / 249 files; verify preview and button presentation.
+- [x] Exact command `npx vitest run`: before and after 1,913 passing / 249 files, zero failures and no inventory delta; profileSheetRebuild.test.tsx fingerprint unchanged. Preview build OK. Chromium component fixture: all three buttons background rgb(248,250,252), text rgb(10,10,12), marginTop/padding 14px, all navigate /manage/handicap; Door rgb(247,147,30). Screenshot reviewed. Hosted authenticated account-sheet flow not verified on external/unmanaged Supabase. Only application edit is token swap/doc comment; no SQL/migrations/RPC/feed_config/cap changes.
 
 ## CEX1 — Crop the connect example
 - [x] Applied wrapper opacity 0.5/maxHeight 205/overflow hidden/both masks; example-only axis removed; counting props false/0/0, unused fixture fields removed; English rest and fallback matched. Connected counting gate, handlers, controls and ProfileHero gates untouched. Crop derivation documented in local header; no structural changes.
