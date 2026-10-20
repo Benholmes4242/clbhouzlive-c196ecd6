@@ -1,5 +1,9 @@
 # Roadmap
 
+## Launch notch colour
+- [x] First native status-bar request uses STATUS_BAR_CANVAS and white-icon intent; central route chrome starts before React and retains immersive Home behaviour. Ownership documented at the boot call and bridge initialization.
+- `npx vitest run`: before 1,859 passed / 241 files; after 1,862 passed / 242 files; zero failures. +3 solely src/test/launchStatusBar.test.ts (first request, delayed readiness, immersive handoff); no existing tests changed. Preview build OK. Real app Chromium at 430x786 with early/delayed simulated Median bridge sends the correct first payload, renders html/body/root rgb(10,10,12), and reaches /auth signed out without page errors. Physical iOS splash handoff and Median's pre-JavaScript wrapper settings remain unverified; hosted authenticated Clubhouse acceptance unavailable on external/unmanaged Supabase.
+
 ## FGT1 — Two FGD1 leftovers
 - [x] FGT1.1: two case names in src/test/feedRoundNet.test.tsx renamed to match their unchanged assertions ("a gross birdie on a stroke hole grades in the birdie tone", "a gross bogey on a stroke hole grades in the bogey tone"). No assertion, fixture, import or other case touched.
 - [x] FGT1.2: dead `received` parameter removed from feedHoleDots (src/components/feed/roundTilePlot.tsx:121) and dropped from all four call sites — roundTilePlot.tsx:222, feedRoundNet.test.tsx:95 and :100, feedGrossDots.test.tsx:45. RoundTilePlot's own `received` prop is untouched and still feeds the net trace and fill; roundTilePlot.test.tsx already called the function without the argument.

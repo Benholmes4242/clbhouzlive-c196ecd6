@@ -47,8 +47,12 @@ import './i18n'
 // with that logic.
 // ============================================================================
 import { isImmersiveRoute } from '@/components/header/globalHeaderRules';
+import { applyRouteChrome } from '@/lib/routeChrome';
 
 const initialPath = window.location.pathname;
+// Central chrome owner runs before auth/providers render, not only once
+// AppRoutes mounts; its bridge-ready retries also cover the launch hold.
+applyRouteChrome(initialPath);
 if (isImmersiveRoute(initialPath)) {
   document.documentElement.setAttribute('data-immersive-route', 'true');
 }
