@@ -64,7 +64,8 @@ export function StandoutRounds({ viewerId, filters, enabled, onRowPress }: {
             <span style={{ flex: 1, minWidth: 0 }}>
               <span style={{ display: 'flex', alignItems: 'center', lineHeight: '16px', minWidth: 0 }}>
                 <span style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{row.display_name ?? t('discover.aMember')}</span>
-                {row.is_competition === true ? <span data-standout-competition style={{ fontSize: 7.5, lineHeight: 1, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', borderRadius: 999, padding: '3px 6px', marginLeft: 8, flexShrink: 0, whiteSpace: 'nowrap', color: COMPETITION, border: `1px solid color-mix(in srgb, ${COMPETITION} 38%, transparent)`, background: `color-mix(in srgb, ${COMPETITION} 13%, transparent)` }}>{t('discover.filterBoard.competitionChip', { defaultValue: 'Competition' })}</span> : null}
+                {/* CB6.1 — a category, not a rare achievement, so a bare coloured word, never a pill (rule recorded in BoardRows.tsx). */}
+                {row.is_competition === true ? <span data-standout-competition style={{ fontSize: 8.5, lineHeight: 1, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', marginLeft: 9, flexShrink: 0, whiteSpace: 'nowrap', color: COMPETITION }}>{t('discover.filterBoard.competitionChip', { defaultValue: 'Competition' })}</span> : null}
               </span>
               <span style={{ display: 'block', marginTop: 4, fontSize: 12, fontWeight: 600, color: A.BODY, lineHeight: 1.35 }}>{t(key, options)}</span>
               <span style={{ display: 'block', marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: A.FAINT, lineHeight: 1.25 }}>{dateText}</span>
