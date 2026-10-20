@@ -95,7 +95,7 @@ export const CategoryScores: React.FC<{ scores: CategoryScoreValues; marginTop?:
             </div>
             <div
               style={{
-                marginTop: 6, fontSize: 9, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase',
+                marginTop: 4, lineHeight: 1, fontSize: 9, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase',
                 color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               }}
             >
