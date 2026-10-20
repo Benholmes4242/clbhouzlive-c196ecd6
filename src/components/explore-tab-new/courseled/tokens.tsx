@@ -332,5 +332,8 @@ export function ImageChip({
 /* Leaderboards Phase 9 — the board row's three named tints. */
 /** The viewing member's own row, in both grammars and on the pinned copy. */
 export const SELF_ROW_TINT = 'rgba(247,147,30,0.07)';
+/** CB2: the viewer's own row in the competition field sheet — a neutral lift,
+ * deliberately not SELF_ROW_TINT (the signed-off mock is neutral, not amber). */
+export const COMPETITION_SELF_TINT = 'rgba(255,255,255,0.035)';
 /** A cut on the index chip: A.GREEN's own hue at 35%. */
 export const INDEX_CUT_BORDER = 'rgba(52,211,153,0.35)';
