@@ -710,9 +710,11 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               borderTop: `1px solid ${LINE}`,
             }}
           >
-            {/* POST ACTIONS LEFT, ACTOR RIGHT (Ben, 14 Sep). Heart+count,
-                comment+count and share form one action group at the 20px
-                reading edge. The avatar/chevron is separated at the far right.
+            {/* POST ACTIONS RIGHT, ACTOR LEFT (Ben, 20 Oct): matches the
+                round post footer. The avatar/chevron sits at the 20px reading
+                edge; heart+count, comment+count and share form one action
+                group pushed to the right edge by the auto-margin spacer, so
+                the buttons stay right even when the picker renders nothing.
                 Same footer object on a normal post and a review post. */}
             <div
               style={{
@@ -722,6 +724,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 padding: compact ? `9px ${gutter}px ${actionsBottom ? 7 : 0}px` : `10px ${gutter}px ${actionsBottom}px`,
               }}
             >
+              <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
+              <div style={{ marginLeft: 'auto' }} />
               <FooterButton
                 icon={LikeGlyph}
                 label={likeCount > 0 ? formatCount(likeCount) : undefined}
@@ -737,8 +741,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 onClick={() => onComment(post, effectiveActor, 'footer_glyph')}
               />
               <FooterButton icon={Share} onClick={() => onShare(post)} ariaLabel="Send" />
-              <div style={{ marginLeft: 'auto' }} />
-              <FeedActorPicker value={activeActor} onChange={(a) => setActiveActor(a)} />
             </div>
 
 
