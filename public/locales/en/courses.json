@@ -1,5 +1,11 @@
 {
   "amateur": {
+    "standout": {
+      "title": "Standout rounds",
+      "bestEver": "Best ever at {{course}}",
+      "bestSince": "Best at {{course}} since {{month}}",
+      "betterAverage": "{{n}} shots better than average at {{course}}"
+    },
     "board": {
       "backToStream": "Back to the stream",
       "findGolfers": "Find golfers",

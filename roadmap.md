@@ -1,5 +1,9 @@
 # Roadmap
 
+## SR1 — Standout rounds
+- [ ] Add the four-row read and section below the scope chips, using the existing board filters and round handler; preserve frozen surfaces and tests.
+- [ ] Verify sentence thresholds, exact-true chip, absence, taps, full-suite inventory and 390px four-row height; report authentication limits.
+
 ## CTA1 — White solid account-sheet buttons
 - [x] Cta background A.AMBER -> A.INK, foreground A.CANVAS unchanged; removed amber from its doc comment. All three PreIndexCards callers deliberately share this change; Door and other amber details untouched. No test edits or added colour assertions.
 - [x] Read-only hide-gate audit: ProfileSheetV2.tsx:149 reads profileQ, :159 passes hide_handicap_chip, :277-280 passes derived state to SheetCards. sheetState.ts:67/69/71 returns business/unsettled/hidden before any none/manual/connected state; SheetCards.tsx:29-32 returns null for those kinds. No connect path when the supplied flag is true.

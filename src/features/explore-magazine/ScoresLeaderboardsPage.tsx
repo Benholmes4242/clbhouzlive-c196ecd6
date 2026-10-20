@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { StandoutRounds, type RoundPressTarget } from '@/components/explore-tab-new/courseled/StandoutRounds';
 import { MemberAvatar } from '@/components/explore-tab-new/courseled/MemberAvatar';
 import { SEASON_ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMetrics';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
@@ -679,7 +680,7 @@ export function ScoresLeaderboardsPage({
   userId: string | undefined;
   state: AmateurBoardState;
   onOpenFilters: () => void;
-  onRowPress: (row: BoardRow) => void;
+  onRowPress: (row: RoundPressTarget) => void;
   /** Resolves to compare, nudge or invite via useMemberTapResolver. NOT a profile page — the Top 100 sheet's Profile pill navigates to /profile/:id itself. */
   onMemberTap: (userId: string) => void;
   onOpenCourse: (courseId: string) => void;
@@ -1054,6 +1055,7 @@ export function ScoresLeaderboardsPage({
             <ScopeSegments scope={scope} clubApplies={state.clubApplies} onScopeChange={state.changeScope} style={{ flex: 1, minWidth: 0 }} />
             <FiltersPill count={state.sheetFilterCount} onOpen={onOpenFilters} />
           </div>
+          <StandoutRounds viewerId={userId} filters={state.filters} enabled={state.ready} onRowPress={onRowPress} />
           {/* 8.3 THE BASIS SENTENCE — rounds form or ranked form by boardCountsRounds. */}
           {(() => {
             /* 9.1 — the window's sentence phrase is the third rendering on its
