@@ -18,6 +18,8 @@ vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: ()
 const chip = vi.hoisted(() => ({ state: { connected: false, settled: true, connection: null as unknown, trend: null as unknown, anyError: false } }));
 const rounds = vi.hoisted(() => ({ data: [] as unknown[] }));
 
+vi.mock('@/lib/whs/useDeclineHandicapChip', () => ({ useDeclineHandicapChip: () => vi.fn() }));
+
 vi.mock('@/lib/whs/hooks', () => ({
   useWhsConnection: () => ({ data: null, isFetched: true, isError: false }),
   useHandicapTrend: () => ({ data: null, isFetched: true, isError: false }),
@@ -70,9 +72,9 @@ describe('CP1 connect panel', () => {
   it('renders for a member with no connection on their own profile', () => {
     renderHero();
     expect(panel()).not.toBeNull();
-    expect(panel()!.querySelectorAll('[data-ghost-tile]')).toHaveLength(5);
-    expect(panel()!.querySelectorAll('[data-ghost-label]')).toHaveLength(2);
-    expect(panel()!.querySelectorAll('button')).toHaveLength(1);
+    expect(panel()!.querySelectorAll('[data-example-form-tile]')).toHaveLength(5);
+    expect(Array.from(panel()!.querySelectorAll('[data-ghost-label]')).filter((label) => label.textContent)).toHaveLength(2);
+    expect(panel()!.querySelectorAll('[data-example-actions] button')).toHaveLength(2);
   });
 
   it('does not render when hideConnectPrompt is true', () => {

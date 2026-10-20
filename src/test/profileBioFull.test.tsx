@@ -40,6 +40,8 @@ vi.mock('@/hooks/useUserTopTenCourses', () => ({ useUserTopTenCourses: () => ({ 
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 vi.mock('@/utils/median/openExternalUrl', () => ({ openExternalUrl: vi.fn() }));
 
+vi.mock('@/lib/whs/useDeclineHandicapChip', () => ({ useDeclineHandicapChip: () => vi.fn() }));
+
 import { ProfileHero, BIO_COLLAPSED_LINES } from '@/components/profile/hero/ProfileHero';
 import { BIO_MAX } from '@/components/profile/profile-wizard/types';
 
