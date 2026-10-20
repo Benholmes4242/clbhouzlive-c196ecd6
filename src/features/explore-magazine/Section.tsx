@@ -12,6 +12,8 @@ import { SANS } from '@/components/explore-tab-new/courseled/tokens';
  * CB3 — `Rail` and `SeeAll` joined it, moved unchanged out of the same page
  * for the Competitions section. Same rule: the page imports this module, so
  * the page must not re-export them.
+ *
+ * Shared Rounds rail ownership: removable sections must not own shared rail spacing.
  */
 
 export const GUTTER = 16;
