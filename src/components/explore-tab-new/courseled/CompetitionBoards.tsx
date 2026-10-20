@@ -88,7 +88,7 @@ function FieldBody({ card, viewerId, t }: { card: CompetitionCard; viewerId: str
           <div key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} data-competition-field-row data-self={self || undefined}
             style={{ display: 'flex', alignItems: 'center', padding: '9px 18px', borderBottom: `1px solid ${A.SOFT}`, background: self ? COMPETITION_SELF_TINT : 'transparent' }}>
             <span style={{ width: 30, fontSize: 10.5, fontWeight: 800, color: A.FAINT }}>{posText(r)}</span>
-            <span style={{ display: 'flex', flex: 'none', marginRight: 10 }}><MemberAvatar userId={r.user_id} name={r.display_name} photoUrl={null} size={28} /></span>
+            <span style={{ display: 'flex', flex: 'none', height: 28, alignItems: 'center', marginRight: 10 }}><MemberAvatar userId={r.user_id} name={r.display_name} photoUrl={null} size={28} /></span>
             <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: self ? 700 : 600, color: self ? A.INK : A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.display_name ?? t('discover.aMember')}</span>
             <span className="tabular-nums" style={{ width: 48, textAlign: 'center', fontSize: 14, fontWeight: 700, color: A.INK }}>{r.net_score ?? '\u2014'}</span>
             <span className="tabular-nums" style={{ width: 46, textAlign: 'center', fontSize: 12, fontWeight: 700, color: A.FAINT }}>{r.gross_score ?? '\u2014'}</span>
