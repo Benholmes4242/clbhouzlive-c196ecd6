@@ -182,7 +182,8 @@ export function LikedByRow({
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={(e) => { e.stopPropagation(); setOpen(true); }}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.stopPropagation(); }}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -277,6 +278,9 @@ export function LikedByRow({
         </span>
       </button>
 
+      {/* Taps inside the sheet bubble through the React tree even though it
+          portals; this span keeps them from reaching a parent card. */}
+      <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} style={{ display: 'contents' }}>
       <LikesSheet
         open={open}
         onClose={() => setOpen(false)}
@@ -286,6 +290,7 @@ export function LikedByRow({
         kind={kind}
         subject={subject}
       />
+      </span>
     </>
   );
 }
