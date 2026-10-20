@@ -83,7 +83,7 @@ export const CONTINENT_COUNTRIES: Record<string, string[]> = {
     // Legacy labels
     'Caribbean', 'Central and South America', 'Rest of World',
     // Countries
-    'Antigua and Barbuda', 'Bahamas', 'Barbados', 'Belize',
+    'Antigua and Barbuda', 'Bahamas', 'Barbados', 'Belize', 'Bermuda',
     'Canada', 'Costa Rica', 'Cuba', 'Curaçao', 'Dominica',
     'Dominican Republic', 'El Salvador', 'Grenada', 'Guatemala',
     'Haiti', 'Honduras', 'Jamaica', 'Mexico', 'Nicaragua', 'Panama',
