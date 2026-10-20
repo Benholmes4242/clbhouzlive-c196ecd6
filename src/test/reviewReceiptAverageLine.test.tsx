@@ -28,7 +28,11 @@ afterEach(cleanup);
 function receipt(overall: number | null = 7.3) {
   return render(<I18nextProvider i18n={i18n}><ReviewReceipt ratingId="rating" course={{ id: 'course', name: 'Quinta do Lago Laranjal', region: 'Algarve', country: 'Portugal' }} overall={overall} scores={{ design: 7.4, condition: 8, clubhouse: 1.4, facilities: 1.2 }} shareToFeed={false} onClubhouse={() => {}} onBack={() => {}} onNextCourse={() => {}} /></I18nextProvider>);
 }
-const firstLine = () => screen.getByText((_text, element) => element?.textContent === '3 members rate Quinta do Lago Laranjal 7.8 on average' && element?.tagName === 'DIV');
+const firstLine = () => screen.getByText((_text, element) => {
+  const sentence = '3 members rate Quinta do Lago Laranjal 7.8 on average';
+  return element?.tagName === 'DIV' && element.textContent === sentence
+    && !Array.from(element.querySelectorAll('*')).some(child => child.textContent === sentence);
+});
 
 describe('receipt displayed-average comparison', () => {
   it('names the displayed average and measures 7.3 against 7.8, not avg_before 8.1', () => {
