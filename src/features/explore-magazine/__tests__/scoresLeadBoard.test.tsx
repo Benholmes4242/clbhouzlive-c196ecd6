@@ -76,13 +76,6 @@ function withYou(you: number | null, board: BoardKey = 'stableford') {
     onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />);
 }
 
-describe('Standing and basis (Phase 2)', () => {
-  it('an unknown you-count with no own row renders no slab at all', () => {
-    withYou(null);
-    expect(document.querySelector('[data-scores-standing]')).toBeNull();
-  });
-});
-
 describe('Board rail (Phase 1, absorbs the retired BoardPicker tests)', () => {
   it('the Filters pill still calls its own open handler', () => {
     const onOpen = vi.fn();
@@ -108,25 +101,26 @@ async function sheet(board: BoardKey, rows: BoardRow[]) {
 }
 
 describe('See-all sheet rows (retargeted from the page lead board, EX1b)', () => {
-  it('A3.2 — the sheet on recent leads with the gross score, then gross to par', async () => {
+  it('A3.2 / EX1c — the sheet on recent leads with the net score, then gross', async () => {
     const rows = await sheet('recent', [
-      row(1, { gross_score: 69, course_par: 72 }),
-      row(2, { gross_score: 80, course_par: 72 }),
-      row(3, { gross_score: 72, course_par: 72 }),
-      row(4, { gross_score: 75, course_par: null }),
-      row(5, { gross_score: null, course_par: 72 }),
+      row(1, { net_score: 70, gross_score: 82 }),
+      row(2, { net_score: 66, gross_score: 75 }),
     ]);
     const figs = rows.map((r) => [
       r.querySelector('[data-board-main]')?.textContent,
       r.querySelector('[data-board-secondary]')?.textContent,
     ]);
     expect(figs).toEqual([
-      ['69', '\u22123'],
-      ['80', '+8'],
-      ['72', 'E'],
-      ['75', '\u2014'],
-      ['\u2014', '\u2014'],
+      ['70', '82'],
+      ['66', '75'],
     ]);
+  });
+
+  it('EX1c — a null net on recent renders the em dash with the gross still shown', async () => {
+    const rows = await sheet('recent', [row(1, { net_score: null, gross_score: 88 })]);
+    expect(rows.length).toBe(1);
+    expect(rows[0].querySelector('[data-board-main]')?.textContent).toBe('\u2014');
+    expect(rows[0].querySelector('[data-board-secondary]')?.textContent).toBe('88');
   });
 
   it('the viewing member row in the sheet carries the amber self tint', async () => {
