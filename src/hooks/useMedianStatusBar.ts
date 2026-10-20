@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { STATUS_BAR_CANVAS } from '@/lib/tokens/surfaces';
 
 declare global {
   interface Window {
@@ -107,7 +108,9 @@ function sendStatusBar(payload: StatusBarPayload): boolean {
     return false;
   }
   try {
-    window.median!.statusbar!.set!(payload);
+    const statusbar = window.median?.statusbar;
+    if (!statusbar?.set) return false;
+    statusbar.set(payload);
     console.info('[chrome] statusbar.set sent', payload);
     return true;
   } catch {
@@ -119,11 +122,12 @@ function sendStatusBar(payload: StatusBarPayload): boolean {
 export function ensureStatusBarOverlayBooted(): void {
   if (statusBarOverlayBooted) return;
   if (typeof window === 'undefined') return;
-  // style/color here are throwaway — they get overwritten immediately by
-  // the first route/overlay setStyleColor call. What matters is overlay:true.
+  // Before route chrome mounts, the native bar must match the launch canvas
+  // with white icons. Transparent/light defaults expose the wrapper's light
+  // ground during the splash handoff. Route chrome owns subsequent states.
   // No early latch: before median_library_ready, every call re-sends (the
   // full payload never transitions, so the fs.open jolt cannot occur).
-  const sent = sendStatusBar({ style: 'light', color: '00000000', overlay: true, blur: false });
+  const sent = sendStatusBar({ style: toMedianStyle('light'), color: STATUS_BAR_CANVAS, overlay: true, blur: false });
   if (sent && medianLibraryReady) statusBarOverlayBooted = true;
 }
 

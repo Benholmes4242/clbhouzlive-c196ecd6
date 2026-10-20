@@ -1,5 +1,9 @@
 # Roadmap
 
+## Launch notch colour
+- [ ] Match the first native status-bar request to the launch canvas and start central route chrome before React; verify bridge timing and preserve immersive Home behaviour.
+- Baseline `npx vitest run`: 1,859 passed / 241 files, zero failures. Physical iOS splash handoff and Median's pre-JavaScript wrapper settings cannot be verified in Chromium.
+
 ## FGT1 — Two FGD1 leftovers
 - [x] FGT1.1: two case names in src/test/feedRoundNet.test.tsx renamed to match their unchanged assertions ("a gross birdie on a stroke hole grades in the birdie tone", "a gross bogey on a stroke hole grades in the bogey tone"). No assertion, fixture, import or other case touched.
 - [x] FGT1.2: dead `received` parameter removed from feedHoleDots (src/components/feed/roundTilePlot.tsx:121) and dropped from all four call sites — roundTilePlot.tsx:222, feedRoundNet.test.tsx:95 and :100, feedGrossDots.test.tsx:45. RoundTilePlot's own `received` prop is untouched and still feeds the net trace and fill; roundTilePlot.test.tsx already called the function without the argument.
