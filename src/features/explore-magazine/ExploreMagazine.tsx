@@ -46,6 +46,7 @@ import { useAmateurBoardState } from '@/features/amateur/useAmateurBoardState';
 import { BoardFilterPanel } from '@/components/explore-tab-new/courseled/BoardFilterPanel';
 import { BOARD_LABELS, type BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
+import type { RoundPressTarget } from '@/components/explore-tab-new/courseled/StandoutRounds';
 
 import { CircleShelf } from './CircleShelf';
 import { ScoresLeaderboardsPage } from './ScoresLeaderboardsPage';
@@ -1325,7 +1326,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
      cards use; a row with no round id (a member-only ranking row) opens the
      member. */
   const boardRowPress = useCallback(
-    (row: BoardRow) => {
+    (row: RoundPressTarget) => {
       if (row.whs_score_id) opener.openByScore(row.whs_score_id, null, row.user_id);
       else opener.openProfile(row.user_id);
     },
