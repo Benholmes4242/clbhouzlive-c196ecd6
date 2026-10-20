@@ -161,15 +161,3 @@ function toCss(c: string) {
   return el.style.color;
 }
 
-describe('Phase 14 — slab index clause', () => {
-  function slab(board: BoardKey, viewerIndex: number | null, hcp: number | null) {
-    const rows = [row(1), row(2, { user_id: 'viewer', display_name: 'Viewer', hcp_at_time: hcp })];
-    const state = makeBoardState({
-      board, total: 2, viewerIndex,
-      page: { data: { rows, total: 2, pool: { rounds: 2, courses: 1, members: 2 } }, isSuccess: true, isPending: false } as never,
-    });
-    const r = render(<ScoresLeaderboardsPage userId="viewer" state={state} onOpenFilters={vi.fn()}
-      onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />);
-    return r.container.querySelector('[data-scores-standing="on"]')?.textContent ?? '';
-  }
-});
