@@ -639,7 +639,9 @@ export const ProfileHero: React.FC<Props> = ({
         {counters.length > 0 && (
           <div
             style={{
-              marginTop: showConnectCard ? 22 : 16,
+              // 16 in both states: the panel ends on its action, and this row's
+              // own border is the panel's bottom rule (16 below, per CP1 spec).
+              marginTop: 16,
               paddingTop: 13,
               borderTop: `1px solid ${A.SOFT}`,
               display: 'grid',
