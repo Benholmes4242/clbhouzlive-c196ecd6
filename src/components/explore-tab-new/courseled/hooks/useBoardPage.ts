@@ -46,6 +46,8 @@ export interface BoardRow {
   clean_card: boolean | null;
   beat_par: boolean | null;
   sub_80: boolean | null;
+  /** Straight from get_board_page's RETURNS TABLE (board_pool); null = provider never said. */
+  is_competition?: boolean | null;
   hcp_at_time: number | null;
   sort_value: number | null;
   total_count: number;
