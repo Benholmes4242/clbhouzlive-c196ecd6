@@ -1,5 +1,9 @@
 # Roadmap
 
+## Review receipt average line
+- [ ] Row a uses the displayed community average for its comparison, handles equal and first-rating states, and keeps all existing layout and tone tokens.
+- [ ] Update only the five receipt strings in all six locales; add receipt regression coverage and run the full suite against 1,872 passing / 243 files.
+
 ## Review tile COURSE without reopening
 - [x] COURSE closes the existing overlays in order and navigates with highlight only; share URL, See all and profile actions unchanged, shared/notification review links retain sheet opening.
 - [x] Highlight-only targets wait for loaded reviews, scroll and expire after three seconds without changing sheet phase; unknown ids clear. SingleReview/FewReviews pass through the existing pulse so all populated sample states honour highlighting without new styling. Local ownership documented in CourseReviewsTab's header.
