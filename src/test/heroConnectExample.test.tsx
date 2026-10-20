@@ -1,0 +1,103 @@
+import React from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+
+vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
+const f = vi.hoisted(() => ({
+  decline: vi.fn(),
+  state: { connected: false, settled: true, connection: null, trend: null, anyError: false },
+}));
+vi.mock('@/lib/whs/useDeclineHandicapChip', () => ({ useDeclineHandicapChip: () => f.decline }));
+vi.mock('@/lib/whs/useHandicapChipState', () => ({ useHandicapChipState: () => f.state }));
+vi.mock('@/lib/whs/hooks', () => ({
+  useWhsConnection: () => ({ data: null, isFetched: true, isError: false }),
+  useHandicapTrend: () => ({ data: { current: 28.7 }, isFetched: true, isError: false }),
+  useHandicapHistory: () => ({ data: [], isFetched: true, isError: false }),
+}));
+vi.mock('@/hooks/useHandicapTrend12mo', () => ({ useHandicapTrend12mo: () => ({ delta: null, direction: 'flat' }) }));
+vi.mock('@/lib/whs/usePercentile', () => ({ useHandicapPercentile: () => ({ data: null }) }));
+vi.mock('@/components/profile/rounds/useProfileRounds', () => ({ useProfileRounds: () => ({ isSuccess: true, data: [] }), isFullEighteen: () => false }));
+vi.mock('@/hooks/gam/useProfileAchievementFigures', () => ({ useProfileAchievementFigures: () => ({ isFetched: true, data: null }) }));
+vi.mock('@/components/profile/hooks/useProfileClubs', () => ({ useProfileClubs: () => ({ homeClub: null, secondaryClubs: [], isPrivate: false, isLoading: false }) }));
+vi.mock('@/hooks/useUserTopTenCourses', () => ({ useUserTopTenCourses: () => ({ topTen: [], isLoading: false }) }));
+vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
+vi.mock('@/utils/median/openExternalUrl', () => ({ openExternalUrl: vi.fn() }));
+
+import { ProfileHero } from '@/components/profile/hero/ProfileHero';
+import { CONNECT_EXAMPLE } from '@/components/profile/hero/HeroConnectExample';
+
+function hero(p: { hideConnectPrompt?: boolean; isSelf?: boolean; indexValue?: number } = {}) {
+  return <MemoryRouter><ProfileHero userId="u1" viewerUserId="u1" displayName="Alex Doe" isSelf={p.isSelf ?? true} hideConnectPrompt={p.hideConnectPrompt} indexValue={p.indexValue ?? 41.9} roundsCount={null} ratedCount={null} onStatTap={() => {}} /></MemoryRouter>;
+}
+const panel = () => screen.queryByTestId('hero-connect-panel');
+beforeEach(() => {
+  f.state = { connected: false, settled: true, connection: null, trend: null, anyError: false };
+  f.decline.mockReset().mockResolvedValue(undefined);
+});
+
+describe('CE1 fixed connected example', () => {
+  it('appears for an unconnected member on their own profile', () => {
+    render(hero());
+    expect(panel()).not.toBeNull();
+  });
+  it('is absent when the hide setting is set', () => {
+    render(hero({ hideConnectPrompt: true }));
+    expect(panel()).toBeNull();
+  });
+  it('is absent on another member’s profile', () => {
+    render(hero({ isSelf: false }));
+    expect(panel()).toBeNull();
+  });
+  it('is absent for a connected member', () => {
+    f.state.connected = true;
+    render(hero());
+    expect(panel()).toBeNull();
+  });
+  it('does not appear while connection reads remain unsettled', () => {
+    f.state.settled = false;
+    render(hero());
+    expect(panel()).toBeNull();
+  });
+  it('prints fixed index 12.4, never the supplied member index or trend', () => {
+    const view = render(hero());
+    const example = screen.getByTestId('hero-connect-panel');
+    expect(within(example).getByText('12.4')).toBeTruthy();
+    expect(within(example).queryByText('41.9')).toBeNull();
+    expect(within(example).queryByText('28.7')).toBeNull();
+    view.rerender(hero({ indexValue: 7.1 }));
+    expect(within(example).getByText('12.4')).toBeTruthy();
+    expect(within(example).queryByText('7.1')).toBeNull();
+  });
+  it('keeps the pill present alongside every displayed example', () => {
+    const view = render(hero());
+    expect(panel()?.querySelectorAll('[data-example-pill]')).toHaveLength(1);
+    view.rerender(hero({ hideConnectPrompt: true }));
+    expect(view.container.querySelector('[data-example-pill]')).toBeNull();
+    view.rerender(hero());
+    expect(panel()?.querySelectorAll('[data-example-pill]')).toHaveLength(1);
+  });
+  it('supplies both movements, five approved round figures and two counting rounds', () => {
+    expect(CONNECT_EXAMPLE.index).toBe(12.4);
+    expect(CONNECT_EXAMPLE.movements.map(({ delta, window }) => [delta, window])).toEqual([[-0.8, '90 days'], [-2.1, '12 months']]);
+    expect(CONNECT_EXAMPLE.rounds.map(({ gross_score }) => gross_score)).toEqual([86, 91, 84, 88, 90]);
+    expect(CONNECT_EXAMPLE.rounds.map(({ value }) => value)).toEqual([3.5, 5.4, -0.2, 0.8, 1.2]);
+    expect(CONNECT_EXAMPLE.countingN).toBe(2);
+    render(hero());
+    const tiles = panel()?.querySelectorAll('[data-example-form-tile]');
+    expect(tiles).toHaveLength(5);
+    expect(Array.from(tiles ?? []).map((tile) => tile.firstElementChild?.textContent)).toEqual(['86', '91', '84', '88', '90']);
+  });
+  it('Hide calls the decline hook once and waits for the loaded flag, even after its promise resolves', async () => {
+    const view = render(hero());
+    fireEvent.click(screen.getByRole('button', { name: 'Hide this' }));
+    expect(f.decline).toHaveBeenCalledTimes(1);
+    await f.decline.mock.results[0]?.value;
+    expect(panel()).not.toBeNull();
+    view.rerender(hero({ hideConnectPrompt: true }));
+    expect(panel()).toBeNull();
+    view.unmount();
+    render(hero({ hideConnectPrompt: true }));
+    expect(panel()).toBeNull();
+  });
+});

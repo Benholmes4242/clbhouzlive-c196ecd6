@@ -22,7 +22,12 @@
     "window90d": "90 days",
     "connectPanelLead": "Connect your official handicap",
     "connectPanelRest": " and this fills in — your index, and the last five rounds behind it.",
-    "connectPanelAction": "Connect ›"
+    "connectPanelAction": "Connect ›",
+    "connectExampleLead": "Connect your official handicap",
+    "connectExampleRest": " and this is yours — your index, how it is moving, and the rounds behind it.",
+    "connectExampleAction": "Connect ›",
+    "connectExampleHide": "Hide this",
+    "connectExamplePill": "Example"
   },
   "social": {
     "followers": "{{count}} followers",
