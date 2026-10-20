@@ -77,73 +77,13 @@ function withYou(you: number | null, board: BoardKey = 'stableford') {
 }
 
 describe('Standing and basis (Phase 2)', () => {
-  it('renders the basis line beneath the controls', () => {
-    withYou(0);
-    expect(document.querySelector('[data-scores-basis]')).toBeTruthy();
-  });
-  it('holds the whole lead block behind the placeholder while the counts read is pending', () => {
-    const state = makeBoardState({
-      total: 2,
-      facets: { settled: false, resolved: false, countFor: () => null, openList: () => [] },
-      page: { data: { rows: [row(1), row(2)], total: 2, pool: { rounds: 2, courses: 1, members: 2 } }, isSuccess: true, isPending: false } as never,
-    });
-    render(<ScoresLeaderboardsPage userId="viewer" state={state} onOpenFilters={vi.fn()}
-      onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />);
-    expect(document.querySelector('[data-scores-board-rail]')).toBeNull();
-    expect(document.querySelector('[data-scores-basis]')).toBeNull();
-    expect(document.querySelector('[data-scores-standing]')).toBeNull();
-    expect(screen.queryByText('Member 1')).toBeNull();
-    expect(document.querySelector('[data-lead-board-skeleton]')).toBeTruthy();
-  });
-  it('a failed counts read opens the board with names, no figures and nothing greyed', () => {
-    const state = makeBoardState({
-      total: 2,
-      facets: { settled: false, resolved: true, countFor: () => null, openList: () => [] },
-      page: { data: { rows: [row(1), row(2)], total: 2, pool: { rounds: 2, courses: 1, members: 2 } }, isSuccess: true, isPending: false } as never,
-    });
-    render(<ScoresLeaderboardsPage userId="viewer" state={state} onOpenFilters={vi.fn()}
-      onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />);
-    expect(document.querySelector('[data-lead-board-skeleton]')).toBeNull();
-    expect(document.querySelectorAll('[data-board-chip]').length).toBe(6);
-    document.querySelectorAll('[data-board-chip]').forEach((c) => expect((c as HTMLButtonElement).disabled).toBe(false));
-    expect(document.querySelector('[data-scores-board-rail]')?.textContent).not.toMatch(/\d/);
-    expect(rowsOf().length).toBe(2);
-  });
   it('an unknown you-count with no own row renders no slab at all', () => {
     withYou(null);
     expect(document.querySelector('[data-scores-standing]')).toBeNull();
   });
-  it('a you-count of zero is told the floor', () => {
-    withYou(0);
-    const slab = document.querySelector('[data-scores-standing]');
-    expect(slab?.getAttribute('data-scores-standing')).toBe('none');
-    expect(slab?.textContent).not.toBe('');
-  });
-  it('a qualifying member beyond the fetch is told they are deeper and given see-all', () => {
-    withYou(3);
-    expect(document.querySelector('[data-scores-standing]')?.getAttribute('data-scores-standing')).toBe('deeper');
-    expect(screen.getByText('See all members')).toBeTruthy();
-  });
-  it('a member with no qualifying round is told the floor', () => {
-    withYou(0);
-    expect(document.querySelector('[data-scores-standing]')?.getAttribute('data-scores-standing')).toBe('none');
-  });
 });
 
 describe('Board rail (Phase 1, absorbs the retired BoardPicker tests)', () => {
-  it('offers exactly the six ranking boards in order, no feats, no retired gross', () => {
-    expect(OFFERED_RANKING_BOARD_KEYS).toEqual(['recent', 'topar', 'net', 'stableford', 'improved', 'birdies']);
-    render(<ScoresLeaderboardsPage userId="v" state={makeBoardState()} onOpenFilters={vi.fn()}
-      onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />);
-    expect([...document.querySelectorAll('[data-board-chip]')].map((c) => c.getAttribute('data-board-chip'))).toEqual(OFFERED_RANKING_BOARD_KEYS);
-  });
-  it('tapping a chip changes the board through changeBoard', () => {
-    const state = makeBoardState();
-    render(<ScoresLeaderboardsPage userId="v" state={state} onOpenFilters={vi.fn()}
-      onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />);
-    fireEvent.click(document.querySelector('[data-board-chip="net"]')!);
-    expect(state.changeBoard).toHaveBeenCalledWith('net');
-  });
   it('the Filters pill still calls its own open handler', () => {
     const onOpen = vi.fn();
     render(<FiltersPill count={0} onOpen={onOpen} />);
@@ -156,35 +96,27 @@ describe('Board rail (Phase 1, absorbs the retired BoardPicker tests)', () => {
     expect(boardValueIsFigure('recent')).toBe(false);
   });
 
-  it('renders six named chips with no figures and nothing greyed when there is no counts object', () => {
-    const state = makeBoardState({ facets: undefined as never });
-    render(<ScoresLeaderboardsPage userId="v" state={state} onOpenFilters={vi.fn()}
-      onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />);
-    const chips = document.querySelectorAll('[data-board-chip]');
-    expect(chips.length).toBe(6);
-    chips.forEach((c) => expect((c as HTMLButtonElement).disabled).toBe(false));
-    expect(document.querySelector('[data-scores-board-rail]')?.textContent).not.toMatch(/\d/);
-  });
 });
 
-describe('Scores lead board (Phase 0)', () => {
-  it('a ranked board renders positions, no podium and no column header', () => {
-    page('gross', [row(1), row(2), row(3)]);
-    const rows = rowsOf();
-    expect(rows.some((r) => r.hasAttribute('data-board-podium'))).toBe(false);
-    expect(rows.map((r) => r.textContent?.match(/^(\d+)/)?.[1])).toEqual(['1', '2', '3']);
-    expect(screen.queryByText('POS')).toBeNull();
-  });
+/* EX1b — the lead board left the page; these guard the same behaviour where it
+   still ships: BoardSeeAllSheet, the sheet Just played opens. */
+async function sheet(board: BoardKey, rows: BoardRow[]) {
+  rpcRows.current = rows;
+  render(<BoardSeeAllSheet open onClose={vi.fn()} userId="viewer" board={board} filters={DEFAULT_FILTERS} appliedParts={[]} />);
+  await waitFor(() => expect(rowsOf().length).toBe(rows.length));
+  return rowsOf();
+}
 
-  it('A3.2 — recent leads with the gross score, then gross to par', () => {
-    page('recent', [
+describe('See-all sheet rows (retargeted from the page lead board, EX1b)', () => {
+  it('A3.2 — the sheet on recent leads with the gross score, then gross to par', async () => {
+    const rows = await sheet('recent', [
       row(1, { gross_score: 69, course_par: 72 }),
       row(2, { gross_score: 80, course_par: 72 }),
       row(3, { gross_score: 72, course_par: 72 }),
       row(4, { gross_score: 75, course_par: null }),
       row(5, { gross_score: null, course_par: 72 }),
     ]);
-    const figs = rowsOf().map((r) => [
+    const figs = rows.map((r) => [
       r.querySelector('[data-board-main]')?.textContent,
       r.querySelector('[data-board-secondary]')?.textContent,
     ]);
@@ -197,37 +129,21 @@ describe('Scores lead board (Phase 0)', () => {
     ]);
   });
 
-  it('the viewing member row carries the amber self tint', () => {
-    page('topar', [row(1), row(2, { user_id: 'viewer', display_name: 'Viewer' })]);
-    expect(rowsOf()[1].style.background).toBe('rgba(247, 147, 30, 0.07)');
+  it('the viewing member row in the sheet carries the amber self tint', async () => {
+    const rows = await sheet('topar', [row(1), row(2, { user_id: 'viewer', display_name: 'Viewer' })]);
+    expect(rows[1].style.background).toBe('rgba(247, 147, 30, 0.07)');
   });
 
-  it("the 'recent' board renders no positions and no podium", () => {
-    page('recent', [row(1), row(2), row(3)]);
-    const rows = rowsOf();
-    expect(rows.some((r) => r.hasAttribute('data-board-podium'))).toBe(false);
-    expect(rows.every((r) => !/^\d/.test(r.textContent ?? ''))).toBe(true);
-    expect(screen.queryByText('POS')).toBeNull();
+  it("the sheet on 'topar' leads with the to-par figure, then gross (sheet only)", async () => {
+    const rows = await sheet('topar', [row(1, { gross_score: 69, course_par: 72 })]);
+    const cells = Array.from(rows[0].querySelectorAll('.tabular-nums')).map((n) => n.textContent);
+    expect(cells.at(-2)).toBe('\u22123');
+    expect(cells.at(-1)).toBe('69');
   });
 
-  it("on 'topar' the page and the see-all sheet lead with the same figure", async () => {
-    const r = row(1, { gross_score: 69, course_par: 72 });
-    const { unmount } = page('topar', [r]);
-    const pageCells = Array.from(rowsOf()[0].querySelectorAll('.tabular-nums')).map((n) => n.textContent);
-    unmount();
-    rpcRows.current = [r];
-    render(<BoardSeeAllSheet open onClose={vi.fn()} userId="viewer" board="topar" filters={DEFAULT_FILTERS} appliedParts={[]} />);
-    await waitFor(() => expect(screen.getAllByText('Member 1').length).toBeGreaterThan(0));
-    const sheetRow = screen.getAllByRole('button').find((b) => b.textContent?.includes('Member 1'))!;
-    const sheetCells = Array.from(sheetRow.querySelectorAll('.tabular-nums')).map((n) => n.textContent);
-    expect(pageCells).toEqual(sheetCells);
-    expect(pageCells.at(-2)).toBe('\u22123');
-    expect(pageCells.at(-1)).toBe('69');
-  });
-
-  it('the viewing member keeps the score colour law; amber on position and name only', () => {
-    page('topar', [row(1), row(2, { user_id: 'viewer', display_name: 'Viewer', gross_score: 70 })]);
-    const self = rowsOf()[1];
+  it('in the sheet the viewing member keeps the score colour law; amber on position and name only', async () => {
+    const rows = await sheet('topar', [row(1), row(2, { user_id: 'viewer', display_name: 'Viewer', gross_score: 70 })]);
+    const self = rows[1];
     const cells = self.querySelectorAll<HTMLElement>('.tabular-nums');
     const pos = cells[0];
     const value = self.querySelector<HTMLElement>('[data-board-main]')!;
@@ -256,9 +172,4 @@ describe('Phase 14 — slab index clause', () => {
       onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />);
     return r.container.querySelector('[data-scores-standing="on"]')?.textContent ?? '';
   }
-  it('a cut reads with a true minus', () => expect(slab('recent', 12.1, 12.5)).toContain('Your index has moved \u22120.4 since.'));
-  it('a rise reads with a plus', () => expect(slab('recent', 12.8, 12.5)).toContain('Your index has moved +0.3 since.'));
-  it('zero movement omits the clause', () => expect(slab('recent', 12.5, 12.5)).not.toContain('Your index'));
-  it('a null index omits the clause', () => expect(slab('recent', null, 12.5)).not.toContain('Your index'));
-  it('a ranked board never carries it', () => expect(slab('stableford', 12.1, 12.5)).not.toContain('Your index'));
 });
