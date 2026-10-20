@@ -27,7 +27,7 @@ const posText = (r: CompetitionBoardRow) => (r.is_tie ? `T${r.pos}` : String(r.p
 function Heads({ netW, grossW, style }: { netW: number; grossW: number; style: React.CSSProperties }) {
   const { t } = useTranslation('courses');
   return (
-    <div style={{ display: 'flex', alignItems: 'center', fontSize: 8, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.FAINT, ...style }}>
+    <div style={{ display: 'flex', alignItems: 'center', lineHeight: 1.25, fontSize: 8, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.FAINT, ...style }}>
       <span style={{ flex: 1 }} />
       <span style={{ width: netW, textAlign: 'center' }}>{t('discover.filterBoard.col.net', { defaultValue: 'Net' })}</span>
       <span style={{ width: grossW, textAlign: 'center' }}>{t('discover.filterBoard.col.gross', { defaultValue: 'Gross' })}</span>
@@ -44,19 +44,19 @@ function Card({ card, onOpen }: { card: CompetitionCard; onOpen: () => void }) {
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(); } }}
       style={{ border: `1px solid ${A.HAIRLINE}`, borderRadius: 14, padding: '12px 13px', cursor: 'pointer', textAlign: 'left' }}>
       <div style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, lineHeight: 1.25 }}>{card.course_name}</div>
-      <div style={{ marginTop: 3, fontSize: 10.5, fontWeight: 600, color: A.DIM }}>{subtitle}</div>
+      <div style={{ lineHeight: 1.25, marginTop: 3, fontSize: 10.5, fontWeight: 600, color: A.DIM }}>{subtitle}</div>
       <Heads netW={46} grossW={44} style={{ marginTop: 10 }} />
       {card.rows.slice(0, PODIUM).map((r) => (
         <div key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} data-competition-row style={{ display: 'flex', alignItems: 'center', marginTop: 7 }}>
-          <span style={{ width: 26, fontSize: 10, fontWeight: 800, color: A.FAINT }}>{posText(r)}</span>
-          <span style={{ flex: 1, minWidth: 0, fontSize: 12.5, fontWeight: 600, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.display_name ?? t('discover.aMember')}</span>
-          <span className="tabular-nums" style={{ width: 46, textAlign: 'center', fontSize: 13, fontWeight: 700, color: A.INK }}>{r.net_score ?? '\u2014'}</span>
-          <span className="tabular-nums" style={{ width: 44, textAlign: 'center', fontSize: 11.5, fontWeight: 700, color: A.FAINT }}>{r.gross_score ?? '\u2014'}</span>
+          <span style={{ lineHeight: 1.25, width: 26, fontSize: 10, fontWeight: 800, color: A.FAINT }}>{posText(r)}</span>
+          <span style={{ lineHeight: 1.25, flex: 1, minWidth: 0, fontSize: 12.5, fontWeight: 600, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.display_name ?? t('discover.aMember')}</span>
+          <span className="tabular-nums" style={{ lineHeight: 1.25, width: 46, textAlign: 'center', fontSize: 13, fontWeight: 700, color: A.INK }}>{r.net_score ?? '\u2014'}</span>
+          <span className="tabular-nums" style={{ lineHeight: 1.25, width: 44, textAlign: 'center', fontSize: 11.5, fontWeight: 700, color: A.FAINT }}>{r.gross_score ?? '\u2014'}</span>
         </div>
       ))}
       {rest > 0 ? (
         <button type="button" data-competition-rest onClick={(e) => { e.stopPropagation(); onOpen(); }}
-          style={{ display: 'block', marginTop: 10, padding: 0, background: 'transparent', border: 'none', fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: A.FAINT, cursor: 'pointer', lineHeight: 'normal', textAlign: 'left' }}>
+          style={{ display: 'block', marginTop: 10, padding: 0, background: 'transparent', border: 'none', fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: A.FAINT, cursor: 'pointer', lineHeight: 1.25, textAlign: 'left' }}>
           {t('amateur.competitions.morePlayed', { n: numberWord(rest), defaultValue: '{{n}} more played' })}
         </button>
       ) : null}
@@ -76,7 +76,7 @@ function FieldSheet({ card, viewerId, onClose }: { card: CompetitionCard | null;
 function FieldBody({ card, viewerId, t }: { card: CompetitionCard; viewerId: string | undefined; t: (k: string, o?: Record<string, unknown>) => string }) {
   const subtitle = useSubtitle(card);
   return (
-    <div data-competition-field style={{ fontFamily: SANS, ...FIGS, lineHeight: 'normal' }}>
+    <div data-competition-field style={{ fontFamily: SANS, ...FIGS }}>
       <div style={{ padding: '14px 18px 0' }}>
         <h2 id="competition-field-title" style={{ margin: 0, fontSize: 16, fontWeight: 700, color: A.INK, lineHeight: 1.25 }}>{card.course_name}</h2>
         <div style={{ marginTop: 4, fontSize: 11.5, fontWeight: 600, color: A.DIM }}>{subtitle}</div>
@@ -87,11 +87,11 @@ function FieldBody({ card, viewerId, t }: { card: CompetitionCard; viewerId: str
         return (
           <div key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} data-competition-field-row data-self={self || undefined}
             style={{ display: 'flex', alignItems: 'center', padding: '9px 18px', borderBottom: `1px solid ${A.SOFT}`, background: self ? SELF_ROW_TINT : 'transparent' }}>
-            <span style={{ width: 30, fontSize: 10.5, fontWeight: 800, color: A.FAINT }}>{posText(r)}</span>
+            <span style={{ lineHeight: 1.25, width: 30, fontSize: 10.5, fontWeight: 800, color: A.FAINT }}>{posText(r)}</span>
             <span style={{ display: 'flex', flex: 'none', height: 28, alignItems: 'center', marginRight: 10 }}><MemberAvatar userId={r.user_id} name={r.display_name} photoUrl={null} size={28} /></span>
-            <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: self ? 700 : 600, color: self ? A.INK : A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.display_name ?? t('discover.aMember')}</span>
-            <span className="tabular-nums" style={{ width: 48, textAlign: 'center', fontSize: 14, fontWeight: 700, color: A.INK }}>{r.net_score ?? '\u2014'}</span>
-            <span className="tabular-nums" style={{ width: 46, textAlign: 'center', fontSize: 12, fontWeight: 700, color: A.FAINT }}>{r.gross_score ?? '\u2014'}</span>
+            <span style={{ lineHeight: 1.25, flex: 1, minWidth: 0, fontSize: 13, fontWeight: self ? 700 : 600, color: self ? A.INK : A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.display_name ?? t('discover.aMember')}</span>
+            <span className="tabular-nums" style={{ lineHeight: 1.25, width: 48, textAlign: 'center', fontSize: 14, fontWeight: 700, color: A.INK }}>{r.net_score ?? '\u2014'}</span>
+            <span className="tabular-nums" style={{ lineHeight: 1.25, width: 46, textAlign: 'center', fontSize: 12, fontWeight: 700, color: A.FAINT }}>{r.gross_score ?? '\u2014'}</span>
           </div>
         );
       })}
@@ -107,7 +107,7 @@ export function CompetitionBoards({ viewerId, scope, enabled }: { viewerId: stri
   const cards = groupCompetitionCards(query.data);
   const open = cards.find((c) => c.key === openKey) ?? null;
   return (
-    <section data-competitions-section style={{ fontFamily: SANS, ...FIGS, lineHeight: 'normal', paddingInline: 16, marginBottom: 20 }}>
+    <section data-competitions-section style={{ fontFamily: SANS, ...FIGS, paddingInline: 16, marginBottom: 20 }}>
       <div style={{ display: 'flex', alignItems: 'baseline', fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.DIM, lineHeight: 'normal' }}>
         <span>{t('amateur.competitions.title', { defaultValue: 'Competitions' })}</span>
         <span style={{ marginLeft: 'auto', color: A.FAINT }}>{t('amateur.competitions.window', { defaultValue: 'Last 30 days' })}</span>
