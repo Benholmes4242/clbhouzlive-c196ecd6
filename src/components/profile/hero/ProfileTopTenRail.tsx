@@ -61,9 +61,35 @@ const scoreTone = (score: number) => (score >= 9 ? A.GREEN : A.INK);
 
 const regionOf = (c: { sub_country?: string | null; region?: string | null; country?: string | null }) =>
   c.sub_country || c.region || c.country || null;
-/** Region plus the course's resolved Top 100 placement (useCourseListRanks). Never the legacy rank columns. */
-const regionLine = (c: { sub_country?: string | null; region?: string | null; country?: string | null }, rank: ListRank | undefined) =>
-  [regionOf(c), formatListRank(rank ?? null)].filter(Boolean).join(' · ');
+
+/**
+ * Region + ranks as ONE line where only the region truncates (BRIEF_TOP_TEN_TILE_WIDTH).
+ * The region shrinks and ellipsises; the ranks never cut while there is a region left
+ * to shorten ("Northern Irel... · Global #10 · GB&I #5"), and only as a last resort
+ * ellipsis themselves. Ranks come from useCourseListRanks — never the legacy rank
+ * columns. Renders null when neither part exists, so callers keep their
+ * "no line, no gap" behaviour. The call site owns the typography (size, weight,
+ * colour, marginTop, FIGS) through style.
+ */
+export const RegionRankLine: React.FC<{
+  course: { sub_country?: string | null; region?: string | null; country?: string | null };
+  rank: ListRank | undefined;
+  style?: React.CSSProperties;
+}> = ({ course, rank, style }) => {
+  const region = regionOf(course);
+  const ranks = formatListRank(rank ?? null);
+  if (!region && !ranks) return null;
+  return (
+    <span style={{ display: 'flex', alignItems: 'baseline', minWidth: 0, whiteSpace: 'nowrap', ...style }}>
+      {region && (
+        <span style={{ flex: '0 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{region}</span>
+      )}
+      {ranks && (
+        <span style={{ flexShrink: 0, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }}>{region ? ` · ${ranks}` : ranks}</span>
+      )}
+    </span>
+  );
+};
 
 type SuggestCourse = {
   id: string; name: string; country: string | null; sub_country: string | null;
@@ -327,7 +353,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
             {pill(one)}
             <div style={{ position: 'absolute', left: 12, right: 104, bottom: 10 }}>
               <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: PHOTO_INK, lineHeight: 1.2 }}>{one.name}</div>
-              {regionLine(one, rankOf(one.course_id)) && <div style={{ marginTop: 3, fontSize: 11, fontWeight: 600, color: CAPTION_SUB, ...FIGS }}>{regionLine(one, rankOf(one.course_id))}</div>}
+              <RegionRankLine course={one} rank={rankOf(one.course_id)} style={{ marginTop: 3, fontSize: 11, fontWeight: 600, color: CAPTION_SUB, ...FIGS }} />
             </div>
           </CourseImageFallback>
         </button>
@@ -365,9 +391,12 @@ export const ProfileTopTenRail: React.FC<Props> = ({
           </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9, marginTop: 9 }}>
+        {/* minmax(0, 1fr) + minWidth 0 on each tile: a 1fr track will not shrink below
+            min-content, and the nowrap region line used to widen column 2 and push
+            tile 3 off the right edge. The pair is now always exactly equal halves. */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 9, marginTop: 9 }}>
           {[two, three].map((c) => (
-            <button key={c.id} type="button" data-top-ten-course-id={c.course_id} onClick={() => open(c)} style={btnReset}>
+            <button key={c.id} type="button" data-top-ten-course-id={c.course_id} onClick={() => open(c)} style={{ ...btnReset, minWidth: 0 }}>
               <CourseImageFallback courseId={c.course_id} courseName={c.name} imageUrl={c.thumbnail_image} style={{ height: 104, borderRadius: 14 }}>
                 <div style={{ position: 'absolute', inset: 0, background: SCRIM }} />
                 <span style={{ position: 'absolute', top: 8, left: 8, background: GLASS, borderRadius: 999, padding: '3px 9px', fontSize: 11, fontWeight: 700, color: PHOTO_INK, ...FIGS }}>{c.position}</span>
@@ -376,7 +405,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
               {/* ONE HEIGHT for the text under both two-up photographs: two lines of the 12/1.25 name (2 x 15) plus the 2px gap plus the 10.5/1.35 region line (14.17), rounded up to 47. A one-line name — or a course with no region and no placement, where the region div does not render at all — simply leaves the gap, and the pair never goes ragged. Top-aligned on purpose: floating the region line to the bottom instead opens a hole under the short name. */}
               <div style={{ marginTop: 7, height: 47, overflow: 'hidden' }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: A.INK, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{c.name}</div>
-                {regionLine(c, rankOf(c.course_id)) && <div style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.BODY, lineHeight: 1.35, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c, rankOf(c.course_id))}</div>}
+                <RegionRankLine course={c} rank={rankOf(c.course_id)} style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.BODY, lineHeight: 1.35, ...FIGS }} />
               </div>
             </button>
           ))}
@@ -394,7 +423,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                   <CourseImageFallback courseId={c.course_id} courseName={c.name} imageUrl={c.thumbnail_image} style={{ width: 44, height: 34, borderRadius: 8, flexShrink: 0 }} />
                   <span style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
-                    {regionLine(c, rankOf(c.course_id)) && <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(c, rankOf(c.course_id))}</span>}
+                    <RegionRankLine course={c} rank={rankOf(c.course_id)} style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, ...FIGS }} />
                   </span>
                   <span style={{ width: 42, textAlign: 'center', flexShrink: 0 }}>
                     <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: g != null ? A.MUTE : A.DIM, ...FIGS }}>{g != null ? g.toFixed(1) : '–'}</span>
@@ -463,7 +492,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                   <CourseImageFallback courseId={s.id} courseName={s.name} imageUrl={s.thumbnail_image ?? null} style={{ width: 34, height: 26, borderRadius: 6, flexShrink: 0 }} />
                   <span style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
-                    <span style={{ display: 'block', marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...FIGS }}>{regionLine(s, rankOf(s.id))}</span>
+                    <RegionRankLine course={s} rank={rankOf(s.id)} style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, ...FIGS }} />
                   </span>
                   <span style={{ fontSize: 17, fontWeight: 700, color: A.MUTE }}>+</span>
                 </button>
