@@ -3,6 +3,30 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      // BSB1: assert native launch chrome before the bundle runs. Median's
+      // 'dark' style means white icons on iOS (already inverted from intent).
+      (function () {
+        try {
+          function assertLaunchStatusBar() {
+            try {
+              var statusbar = window.median && window.median.statusbar;
+              if (statusbar && typeof statusbar.set === 'function') {
+                statusbar.set({ style: 'dark', color: 'FF0A0A0C', overlay: true, blur: false });
+              }
+            } catch (e) {}
+          }
+          var prev = window.median_library_ready;
+          window.median_library_ready = function () {
+            try {
+              if (typeof prev === 'function') prev();
+            } catch (e) {}
+            assertLaunchStatusBar();
+          };
+          assertLaunchStatusBar();
+        } catch (e) {}
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     
     
@@ -64,8 +88,9 @@
     <!-- Shield seeded TRANSPARENT so full-bleed/immersive heroes (tour/course/profile/business)
          can bleed into the notch from frame 0. The body and root behind it are PAGE_CANVAS
          (#0A0A0C), the same ground every route paints, so the cold-launch chain shows no colour
-         step. These three values are the pre-React mirror of PAGE_CANVAS in
-         src/lib/tokens/surfaces.ts — if that token moves, move them in the same commit. -->
+         step. These three values and the inline status-bar colour FF0A0A0C above
+         are the pre-React mirrors of PAGE_CANVAS and STATUS_BAR_CANVAS in
+         src/lib/tokens/surfaces.ts — if those tokens move, move their mirrors in the same commit. -->
     <div id="safe-area-shield" aria-hidden="true" style="background-color:transparent;"></div>
     <div id="root"><div style="background:#0A0A0C;min-height:100vh;width:100%;"></div></div>
     <div id="portal-root"></div>
