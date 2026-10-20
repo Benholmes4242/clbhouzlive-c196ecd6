@@ -2,7 +2,8 @@ import { BOARD_ROW_METRICS } from './rowMetrics';
 import { MemberAvatar } from './MemberAvatar';
 import { useTranslation } from 'react-i18next';
 
-import { A, SANS, SELF_ROW_TINT, INDEX_CUT_BORDER, COMPETITION } from './tokens';
+import { A, SANS, SELF_ROW_TINT, INDEX_CUT_BORDER } from './tokens';
+import { CompetitionMark } from './CompetitionMark';
 import { playDateStandalone, playDateUnderYearHeader } from './discoverWhen';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { boardCountsRounds, isFeatBoard, type BoardKey, type FeatBoardKey } from './boardFilters';
@@ -487,23 +488,7 @@ export function BoardRowView({
               a plain coloured word is for a category, which is what a competition is. A bare
               word next to a feat pill is correct, not an oversight — do not re-add the border
               for consistency with the chip beside it. */}
-          {row.is_competition === true ? (
-            <span
-              data-board-competition
-              style={{
-                flexShrink: 0,
-                fontSize: 8.5,
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color: COMPETITION,
-                lineHeight: 1.2,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {t('discover.filterBoard.competitionChip', { defaultValue: 'Competition' })}
-            </span>
-          ) : null}
+          {row.is_competition === true ? <CompetitionMark data-board-competition /> : null}
           {/* 18.3 — the chip is a fact about the member's handicap, not the
               figure, so it sits in the name row: name, feat badge, chip. Only
               the name shrinks. */}
