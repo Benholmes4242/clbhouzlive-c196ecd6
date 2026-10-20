@@ -1,5 +1,9 @@
 # Roadmap
 
+## CEF1 — Example tap suppression and English copy
+- [ ] Suppress example index/chart/form handlers at source with example-only tabIndex; retain inert and all geometry, connected output and existing assertions.
+- [ ] Verify orphan keys, add ten exact English counting keys, add three tap regressions and report full-suite baseline/delta and connected-output comparison.
+
 ## CE1 — Shared handicap example
 - [x] Shared real handicap rendering extracted; fixed example uses it with one 0.32 opacity wrapper, undimmed pill, ink Connect and existing decline-hook toast. No transient line or optimistic removal; gate, page, counters and divider frozen. Counting fallbacks carried unchanged. Decline-hook mocks added in both existing hero test files under explicit ruling; no real decline hook in unit tests.
 - [x] Verified full connected DOM equality for owner, visitor and fallback index (generated SVG ids normalised); example, pill, five tiles, Connect, Hide once, query-driven removal and later mount checked at 394/1280px, zero page errors/overflow. Single opacity 0.32; screenshots reviewed. Counting keys deliberately remain absent with unchanged fallbacks; separately briefable, not changed here. Local shared-render ownership lives in HeroHandicapDisplay.tsx header under AGENTS size-budget rule; root remains unchanged.
