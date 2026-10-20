@@ -73,10 +73,7 @@ function Card({ card, onOpen, onRowPress }: { card: CompetitionCard; onOpen: () 
       <button type="button" data-competition-open onClick={onOpen}
         style={{ display: 'block', width: '100%', padding: 0, border: 'none', background: 'transparent', fontFamily: SANS, textAlign: 'left', cursor: 'pointer' }}>
         <div style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{card.course_name}</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, lineHeight: 1.25, marginTop: 3, fontSize: 10.5, fontWeight: 600, color: A.DIM }}>
-          <CompetitionPill />
-          <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subtitle}</span>
-        </div>
+        <div style={{ lineHeight: 1.25, marginTop: 3, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subtitle}</div>
       </button>
       <Heads netW={44} grossW={44} style={{ marginTop: 10 }} />
       {card.rows.slice(0, PODIUM).map((r) => (
@@ -110,9 +107,9 @@ function FieldBody({ card, viewerId, onRowPress, t }: { card: CompetitionCard; v
     <div data-competition-field style={{ fontFamily: SANS, ...FIGS }}>
       <div style={{ padding: '14px 18px 0' }}>
         <h2 id="competition-field-title" style={{ margin: 0, fontSize: 16, fontWeight: 700, color: A.INK, lineHeight: 1.25 }}>{card.course_name}</h2>
-        <div style={{ marginTop: 4, display: 'flex', alignItems: 'center', gap: 8, fontSize: 11.5, fontWeight: 600, color: A.DIM, lineHeight: 1.25 }}>
-          <CompetitionPill />
-          <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subtitle}</span>
+        <div style={{ marginTop: 4, fontSize: 11.5, fontWeight: 600, color: A.DIM, lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <span style={{ color: COMPETITION }}>{t('discover.filterBoard.competitionChip', { defaultValue: 'Competition' })}</span>
+          {' · '}{subtitle}
         </div>
       </div>
       <Heads netW={48} grossW={46} style={{ margin: '14px 18px 0', paddingBottom: 7, borderBottom: `1px solid ${A.SOFT}` }} />
