@@ -11,6 +11,7 @@ void i18n.use(initReactI18next).init({ lng: 'en', ns: ['courses'], resources: { 
 
 import { BoardRowView } from '@/components/explore-tab-new/courseled/BoardRows';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
+import type { BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 
 function row(over: Partial<BoardRow> = {}): BoardRow {
   return {
@@ -24,7 +25,7 @@ function row(over: Partial<BoardRow> = {}): BoardRow {
   };
 }
 
-const view = (r: BoardRow) => render(<I18nextProvider i18n={i18n}><BoardRowView row={r} board="recent" isSelf={false} /></I18nextProvider>).container;
+const view = (r: BoardRow, board: BoardKey = 'recent') => render(<I18nextProvider i18n={i18n}><BoardRowView row={r} board={board} isSelf={false} /></I18nextProvider>).container;
 
 describe('CHIP1 competition chip', () => {
   it('true renders exactly one chip', () => {
@@ -37,8 +38,13 @@ describe('CHIP1 competition chip', () => {
     expect(view(row({ is_competition: null })).querySelectorAll('[data-board-competition]')).toHaveLength(0);
   });
   it('feat chip comes before the competition chip', () => {
-    const c = view(row({ is_competition: true, holes_in_one: 1 }));
+    const c = view(row({ is_competition: true, holes_in_one: 1 }), 'eagle');
     const chips = Array.from(c.querySelectorAll('[data-board-feat], [data-board-competition]'));
     expect(chips.map((el) => (el.hasAttribute('data-board-feat') ? 'feat' : 'competition'))).toEqual(['feat', 'competition']);
+  });
+  it('CB12 recent suppresses feats while an eagle feat board retains a rarer feat', () => {
+    const r = row({ holes_in_one: 1 });
+    expect(view(r).querySelectorAll('[data-board-feat]')).toHaveLength(0);
+    expect(view(r, 'eagle').querySelectorAll('[data-board-feat]')).toHaveLength(1);
   });
 });

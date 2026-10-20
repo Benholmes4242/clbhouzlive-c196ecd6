@@ -3,14 +3,13 @@ import { Section } from '@/features/explore-magazine/Section';
 import { Button } from '@/components/ui/button';
 import { A, FIGS, SANS } from './tokens';
 import { CompetitionMark } from './CompetitionMark';
-import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { MemberAvatar } from './MemberAvatar';
 import { windowOption, type BoardFilters } from './boardFilters';
 import type { BoardRow } from './hooks/useBoardPage';
 import { useStandoutRounds, type StandoutRound } from './hooks/useStandoutRounds';
 import { playDateAtLocalNoon } from './discoverWhen';
 import { standoutSentenceParts } from './standoutSentence';
-import { fmtToPar } from './BoardRows';
+import { ScoreWithToPar } from './ScoreWithToPar';
 
 /** SR1: no independent filter state, no independent round navigation. The host
  * passes its authoritative filters and the very same board-row callback.
@@ -25,12 +24,9 @@ function Figures({ row }: { row: StandoutRound }) {
     <span style={{ display: 'flex', flex: 'none', marginTop: 3, gap: 10 }}>
       {(['net', 'gross'] as const).map((kind) => {
         const score = kind === 'net' ? row.net_score : row.gross_score;
-        const under = score != null && row.course_par != null && score < row.course_par;
         return <span key={kind} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minWidth: 45 }}>
           <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: A.MUTE, lineHeight: '11px' }}>{t(`discover.filterBoard.col.${kind}`, { defaultValue: kind === 'net' ? 'NET' : 'GROSS' })}</span>
-          <span className="tabular-nums" style={{ fontSize: 15, fontWeight: 700, lineHeight: '18px', color: kind === 'net' ? A.INK : A.MUTE }}>
-            {score ?? '\u2014'}<span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.01em', marginLeft: 3, color: under ? TOPAR_UNDER_DARK : A.DIM, lineHeight: 1 }}>{score == null || row.course_par == null ? '' : fmtToPar(score - row.course_par)}</span>
-          </span>
+          <ScoreWithToPar score={score} par={row.course_par} kind={kind} fontSize={15} lineHeight="18px" tone={kind === 'net' ? A.INK : A.MUTE} />
         </span>;
       })}
     </span>
