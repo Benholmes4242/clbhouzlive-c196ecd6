@@ -56,7 +56,7 @@ export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
  * sections (Standout rounds, Competitions, Just played — EX1 replaced §3, the
  * lead board, with them) and nothing below them. Sections, in order: head
  * (scope chips), Standout rounds, Competitions, Just played, §5 Feats this
- * year, §4 Most improved, §6 Who leads what, §7 Top 100 — §5 onward are
+ * year, §4 Most improved, §6 Who leads what, §7 Top 100 — the four below are
  * platform facts. The order alternates section SHAPE (rows,
  * tiles, rows, rail, carousel) so no two neighbours read alike; anything added
  * here is placed by its shape, not its subject. § numbers name sections, not
