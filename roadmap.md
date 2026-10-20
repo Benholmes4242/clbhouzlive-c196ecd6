@@ -502,3 +502,7 @@
 ## CB11 — Remove Who leads what
 - [x] Verified line references and caller audit; user extended scope to the section sheet, state and private formatters. Shared Rail owns unchanged 10/12/18 spacing; §7 and protected helpers untouched.
 - [x] Full `npx vitest run`: 1,954/260 before -> 1,947/259 after, zero failures; -7 solely authorized whoLeads.test.ts deletion, no surviving test edits. Preview build OK. Remaining order: scope chips, Standout rounds, Competitions, Just played, §5 Feats, §4 Most improved, §7 Top 100 courses. get_year_leaderboard has no active caller; RPC/type/optional hook signature stay untouched. Unused tiedTop/clearOf keys and non-Top100 CareerMetric variants retained outside explicit deletion scope. Hosted authenticated rendering unverified on external_unmanaged Supabase.
+
+## CB12 — Just played shared rows
+- [ ] Rebuild section using BoardHeaderRow/BoardRowView, extract shared ScoreWithToPar, scope feat suppression to recent, use shared SeeAll and English sheetTitle; preserve reads and limit 5. Blocked: brief names signed-off justplayed.html panels 1/2, absent from available upload listing; request mock before judging changed geometry against it.
+- [ ] Add scoped feat regression test without editing protected tests; full-suite accounting from 1,947/259; capture section/sheet/feat sheet and before/after row height, reporting external authentication limitations.
