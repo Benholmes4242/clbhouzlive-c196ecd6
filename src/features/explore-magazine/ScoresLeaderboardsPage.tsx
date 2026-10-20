@@ -36,7 +36,7 @@ import { WHO_LEADS, whoLeadsPlaceholderHeight, whoLeadsYou } from './whoLeads';
 import { useFeatsWindow, type FeatWindow } from './useFeatsWindow';
 import { RARE_AIR, rareAirPlaceholderHeight } from './rareAir';
 import { RareAirLede, RareAirRail, RareAirYou } from './RareAirSection';
-import { EYEBROW, GUTTER, Rail, Section, SeeAll } from './Section';
+import { GUTTER, Rail, Section, SeeAll } from './Section';
 import { RailChips } from '@/components/ui/RailChips';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
