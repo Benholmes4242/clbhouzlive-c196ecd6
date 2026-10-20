@@ -162,7 +162,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
           >
             {formatRatingValue(rating)}
           </div>
-          <div data-review-tier style={{ marginTop: 6, lineHeight: 1 }}>
+          <div data-review-tier style={{ marginTop: 4, lineHeight: 1 }}>
             <ReviewVerdictLabel
               rating={rating}
               fontSize={9.5}

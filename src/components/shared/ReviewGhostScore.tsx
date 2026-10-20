@@ -86,6 +86,7 @@ export const ReviewVerdictLabel: React.FC<ReviewVerdictLabelProps> = ({
     <span
       style={{
         fontSize,
+        lineHeight: 1,
         fontWeight: 800,
         letterSpacing: '0.14em',
         textTransform: 'uppercase',
@@ -110,6 +111,9 @@ export const ReviewVerdictLabel: React.FC<ReviewVerdictLabelProps> = ({
         padding: 0,
         cursor: 'pointer',
         flexShrink: 0,
+        display: 'block',
+        fontSize,
+        lineHeight: 1,
       }}
       aria-label={ariaLabel}
     >

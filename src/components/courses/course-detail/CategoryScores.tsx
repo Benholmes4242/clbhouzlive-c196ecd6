@@ -5,7 +5,7 @@
  *
  *   grid4   no bar; centred figure then label (pairs keeps its 8px bars)
  *   figure  16 / 700 / -0.02em, courseSubScoreTone(value)
- *   label   9 / 700 / 0.09em / uppercase / A.DIM, 6px beneath the figure
+ *   label   9 / 700 / 0.09em / uppercase / A.DIM, lineHeight 1, 4px beneath the figure
  *   columns four equal, 12px gap
  *
  * An absent category renders an EMPTY column — never a zero, never a dash.
@@ -95,7 +95,7 @@ export const CategoryScores: React.FC<{ scores: CategoryScoreValues; marginTop?:
             </div>
             <div
               style={{
-                marginTop: 6, fontSize: 9, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase',
+                marginTop: 4, lineHeight: 1, fontSize: 9, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase',
                 color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
               }}
             >
