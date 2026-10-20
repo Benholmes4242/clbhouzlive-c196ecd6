@@ -7,10 +7,15 @@ import type { ActiveActor } from '@/types/actor';
 import { KICKER } from '@/lib/tokens/type';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
+/*
+ * BRIEF_FEED_ACTOR_PICKER_TIDY (Ben, 20 Oct): 20/12, not 24/14. The picker sits
+ * at the left gutter of the Clubhouse footer, directly above the 19px Liked by
+ * avatars; at 24px the two rows collided.
+ */
 const FEED_ACTOR_PICKER_GEOMETRY = {
-  avatar: 24,
+  avatar: 20,
   gap: 4,
-  chevron: 14,
+  chevron: 12,
 } as const;
 
 // Only the trigger chevron is theme-dependent; the sheet follows the dark canvas.
@@ -61,16 +66,14 @@ export const FeedActorPicker: React.FC<FeedActorPickerProps> = ({ value, onChang
     />
   );
 
-  if (!hasMultiple) {
-    return (
-      <div
-        aria-label={`Acting as ${current.name}`}
-        style={{ display: 'inline-flex', alignItems: 'center' }}
-      >
-        {avatar}
-      </div>
-    );
-  }
+  /*
+   * BRIEF_FEED_ACTOR_PICKER_TIDY (Ben, 20 Oct) §1 — a single actor renders
+   * NOTHING. The static avatar was a control that looked like a choice and did
+   * nothing (see the Chips rule): with one actor there is nothing to switch to.
+   * The footer's auto-margin spacer, not this component, holds like/comment/
+   * share at the right edge, so returning null moves nothing else.
+   */
+  if (!hasMultiple) return null;
 
   return (
     <>
