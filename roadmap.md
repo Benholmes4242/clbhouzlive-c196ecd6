@@ -1,7 +1,8 @@
 # Roadmap
 
 ## CE1 — Shared handicap example
-- [ ] Shared extraction and fixed example, ink Connect and query-driven Hide using existing toast; no transient line. Blocked by frozen test context: both heroConnectPanel.test.tsx and profileBioFull.test.tsx render ProfileHero under MemoryRouter only, while the required decline hook calls useQueryClient at useDeclineHandicapChip.ts:15. Request narrowly permitted real QueryClientProvider wrappers (or complete decline-hook mocks) before integrating, without changing any other assertion or the label-parity regression. Baseline `npx vitest run`: 1,895 passed / 247 files, zero failures, /tmp/ce1-baseline.log. No application/test edits made and no failing run introduced.
+- [x] Shared real handicap rendering extracted; fixed example uses it with one 0.32 opacity wrapper, undimmed pill, ink Connect and existing decline-hook toast. No transient line or optimistic removal; gate, page, counters and divider frozen. Counting fallbacks carried unchanged. Decline-hook mocks added in both existing hero test files under explicit ruling; no real decline hook in unit tests.
+- [ ] Verify connected output equality, new example checks and full suite. Baseline `npx vitest run`: 1,895 passed / 247 files, zero failures, /tmp/ce1-baseline.log. Only three existing assertions changed in heroConnectPanel.test.tsx as authorised; label-parity regression untouched. Nine new cases in heroConnectExample.test.tsx.
 
 ## Review receipt average line
 - [x] Row a uses the displayed community average for its comparison, handles equal and first-rating states, and keeps all existing layout and tone tokens. Module header documents average ownership; avg_before remains in the receipt data contract but is no longer read by this row. Frozen mock differences retained: hero top spacing, breakdown geometry and footer differ from the mock; no changes outside row a adopted.
