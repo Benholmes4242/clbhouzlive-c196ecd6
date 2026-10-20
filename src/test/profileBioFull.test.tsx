@@ -82,16 +82,16 @@ describe('profile hero bio shows whole', () => {
     expect(BIO_COLLAPSED_LINES).toBe(8);
     const bioRef = renderHero();
     const style = bioRef.current?.style;
-    expect(style?.getPropertyValue('-webkit-line-clamp')).toBe('8');
+    expect(vendorClamp(bioRef.current)).toBe('8');
     expect(style?.display).toBe('-webkit-box');
-    expect(style?.getPropertyValue('-webkit-box-orient')).toBe('vertical');
+    expect(vendorBoxOrient(bioRef.current)).toBe('vertical');
     expect(style?.overflow).toBe('hidden');
     expect(bioRef.current?.textContent).toBe(BIO_300);
   });
 
   it('the expanded bio lifts the clamp', () => {
     const bioRef = renderHero({ bioExpanded: true });
-    expect(bioRef.current?.style.getPropertyValue('-webkit-line-clamp')).toBe('');
+    expect(vendorClamp(bioRef.current)).toBe('');
     expect(bioRef.current?.style.display).not.toBe('-webkit-box');
   });
 
@@ -113,3 +113,13 @@ describe('profile hero bio shows whole', () => {
     expect(screen.queryByRole('button', { name: 'More' })).toBeNull();
   });
 });
+
+/**
+ * jsdom's CSSStyleDeclaration types no -webkit- member, and its
+ * getPropertyValue('-webkit-line-clamp') answer proved order-dependent across
+ * the full suite, so read the value React wrote onto the element by name.
+ */
+const vendorStyle = (el: HTMLElement | null) =>
+  ((el?.style ?? {}) as unknown as Record<string, string | undefined>);
+const vendorClamp = (el: HTMLElement | null) => vendorStyle(el).WebkitLineClamp ?? '';
+const vendorBoxOrient = (el: HTMLElement | null) => vendorStyle(el).WebkitBoxOrient ?? '';
