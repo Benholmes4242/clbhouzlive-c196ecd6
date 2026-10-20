@@ -1,7 +1,13 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
+import i18next from 'i18next';
+import { I18nextProvider, initReactI18next } from 'react-i18next';
+import courses from '../../public/locales/en/courses.json';
 
-vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
+/* A real i18n provider (not a mock): the feat label must be non-empty for the
+   feat chip to render, which the '' -returning mock cannot provide. */
+const i18n = i18next.createInstance();
+void i18n.use(initReactI18next).init({ lng: 'en', ns: ['courses'], resources: { en: { courses } } });
 
 import { BoardRowView } from '@/components/explore-tab-new/courseled/BoardRows';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
@@ -18,7 +24,7 @@ function row(over: Partial<BoardRow> = {}): BoardRow {
   };
 }
 
-const view = (r: BoardRow) => render(<BoardRowView row={r} board="recent" isSelf={false} />).container;
+const view = (r: BoardRow) => render(<I18nextProvider i18n={i18n}><BoardRowView row={r} board="recent" isSelf={false} /></I18nextProvider>).container;
 
 describe('CHIP1 competition chip', () => {
   it('true renders exactly one chip', () => {
