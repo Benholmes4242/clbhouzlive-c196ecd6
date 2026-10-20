@@ -20287,6 +20287,32 @@ export type Database = {
           username: string
         }[]
       }
+      get_course_boards: {
+        Args: {
+          p_limit?: number
+          p_min_members?: number
+          p_min_rounds?: number
+          p_podium?: number
+          p_scope?: string
+          p_viewer: string
+          p_window?: string
+        }
+        Returns: {
+          course_id: string
+          course_name: string
+          course_par: number
+          display_name: string
+          gross_score: number
+          is_competition: boolean
+          members: number
+          net_score: number
+          pos: number
+          rankable: boolean
+          rounds: number
+          user_id: string
+          whs_score_id: string
+        }[]
+      }
       get_course_countries: {
         Args: never
         Returns: {
