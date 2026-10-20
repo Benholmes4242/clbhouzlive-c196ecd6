@@ -33,6 +33,8 @@ import { playDateAtLocalNoon } from '@/components/explore-tab-new/courseled/disc
 import { SELF_ROW_TINT } from '@/components/explore-tab-new/courseled/tokens';
 import { standingOrdinal } from './ordinal';
 import { useFeatsWindow, type FeatWindow } from './useFeatsWindow';
+import { useWhsConnection } from '@/lib/whs/hooks';
+import { RoundsGate, roundsGateState } from './RoundsGate';
 import { RARE_AIR, rareAirPlaceholderHeight } from './rareAir';
 import { RareAirLede, RareAirRail, RareAirYou } from './RareAirSection';
 import { GUTTER, Section, SeeAll } from './Section';
@@ -459,6 +461,14 @@ export function ScoresLeaderboardsPage({
   const [seeAll, setSeeAll] = useState<{ board: BoardKey; filters: BoardFilters } | null>(null);
   const [top100SeeAllSheet, setTop100SeeAllSheet] = useState(false);
 
+  /* CB13 — THE HANDICAP GATE. The one added read: the member's own connection
+     (the same useWhsConnection every other surface shares, so it is usually
+     already cached). The four states and the predicate live in RoundsGate.tsx.
+     The page's own queries are untouched: gated, they run live behind the
+     frost; connected, nothing changes. */
+  const connection = useWhsConnection(userId);
+  const gate = roundsGateState(userId, connection);
+
   /* 3.3 ONE WINDOW VOCABULARY: WINDOW_OPTIONS (the filter list's own words)
      is the eyebrow too; WINDOW_SHORT survives only as its compact form for the
      middot sample line, where the phrase follows a count ("19 members · 14 days"). */
@@ -593,8 +603,26 @@ export function ScoresLeaderboardsPage({
 
   const pending = (h: number) => <div aria-hidden style={{ height: h, marginInline: GUTTER, marginBottom: 24 }} />;
 
+  /* CB13 state 2 — the connection read has not settled (or failed): hold the
+     page's own loading treatment. The scoped sections render nothing while
+     pending today, so the shell is the control row plus the three section
+     placeholders, exactly what a first paint already shows. */
+  if (gate === 'loading') {
+    return (
+      <div style={{ fontFamily: SANS }}>
+        {state.ready ? (
+          <div data-scores-control-row style={{ display: 'flex', alignItems: 'center', gap: 9, padding: `0 ${HEAD_GUTTER}px 12px` }}>
+            <ScopeSegments scope={scope} clubApplies={state.clubApplies} onScopeChange={state.changeScope} style={{ flex: 1, minWidth: 0 }} />
+          </div>
+        ) : null}
+        {pending(rareAirPlaceholderHeight(!!userId))}
+        {pending(climbPlaceholderHeight(SHORT_ROWS))}
+        {pending(hundredPlaceholderHeight(!!userId))}
+      </div>
+    );
+  }
 
-  return (
+  const pageBody = (
     <div style={{ fontFamily: SANS }}>
       {/* EX1 — THE BOARDS ARE UNMOUNTED, NOT DELETED: the board chip rail, its
           rows, the basis sentence, the you slab and the Filters pill no longer
@@ -877,4 +905,8 @@ export function ScoresLeaderboardsPage({
       ) : null}
     </div>
   );
+
+  /* CB13 states 1 and 4 return the page untouched; state 3 frosts it. */
+  if (gate === 'gated') return <RoundsGate>{pageBody}</RoundsGate>;
+  return pageBody;
 }
