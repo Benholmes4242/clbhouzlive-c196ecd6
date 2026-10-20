@@ -6,6 +6,8 @@ import { A, COMPETITION, SELF_ROW_TINT, FIGS, SANS } from './tokens';
 import type { BoardFilters } from './boardFilters';
 import { playDateAtLocalNoon } from './discoverWhen';
 import { MemberAvatar } from './MemberAvatar';
+import { fmtToPar } from './BoardRows';
+import type { RoundPressTarget } from './StandoutRounds';
 import { groupCompetitionCards, useCompetitionBoards, type CompetitionBoardRow, type CompetitionCard } from './hooks/useCompetitionBoards';
 
 /** CB3 (supersedes CB2): sits directly below Standout rounds. Reads the page's
@@ -15,20 +17,25 @@ import { groupCompetitionCards, useCompetitionBoards, type CompetitionBoardRow, 
  * CB3: the cards ride the page's shared Rail; the subtitle's first word is the
  * teal COMPETITION pill the standout rows carry; the field line is gone — the
  * page's uncounted SeeAll (flush to the card's foot via marginTop auto) opens
- * the same full-field sheet the whole card opens. */
+ * the same full-field sheet the whole card opens.
+ * CB4: a row tap — podium or field — opens that player's scorecard for the
+ * round through the page's one opener; the sheet now opens only from the CTA
+ * and the card's title/subtitle. Net and gross carry their to-par exactly as
+ * the standout rows render it, and the sheet's subtitle takes the same pill. */
 const PODIUM = 3;
 
-/** The sheet's subtitle — unchanged by CB3, which re-worded the card only. */
-function useSubtitle(card: CompetitionCard) {
-  const { t, i18n } = useTranslation('courses');
-  const d = playDateAtLocalNoon(card.comp_date);
-  const date = d ? `${d.getDate()} ${d.toLocaleDateString(i18n?.language, { month: 'short' })}` : '';
-  return t('amateur.competitions.subtitle', { count: card.members, date, defaultValue: 'Competition · {{date}} · {{count}} players' });
+/** The one teal pill, shared by the card subtitle and the sheet subtitle so
+ * the two can never drift (CB4.4). */
+function CompetitionPill() {
+  const { t } = useTranslation('courses');
+  return (
+    <span data-competition-pill style={{ fontSize: 7.5, lineHeight: 1, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', borderRadius: 999, padding: '3px 6px', flexShrink: 0, whiteSpace: 'nowrap', color: COMPETITION, border: `1px solid color-mix(in srgb, ${COMPETITION} 38%, transparent)`, background: `color-mix(in srgb, ${COMPETITION} 13%, transparent)` }}>{t('discover.filterBoard.competitionChip', { defaultValue: 'Competition' })}</span>
+  );
 }
 
-/** The card's subtitle: the pill says "Competition", so the words after it
- * carry only the date and the field size, on one nowrap line. */
-function useCardSubtitle(card: CompetitionCard) {
+/** The words after the pill, on card and sheet alike: the date and the field
+ * size, on one nowrap line. */
+function useSubtitleRest(card: CompetitionCard) {
   const { t, i18n } = useTranslation('courses');
   const d = playDateAtLocalNoon(card.comp_date);
   const date = d ? `${d.getDate()} ${d.toLocaleDateString(i18n?.language, { month: 'short' })}` : '';
@@ -37,6 +44,18 @@ function useCardSubtitle(card: CompetitionCard) {
 
 /** A TIE STATES ITSELF: T4, never a silent second 4 (BoardRows.tsx). */
 const posText = (r: CompetitionBoardRow) => (r.is_tie ? `T${r.pos}` : String(r.pos));
+
+/** CB4.3 — a score with its to-par, exactly as the standout rows render it:
+ * the figure, then the to-par small and dim. A NET under par takes the one
+ * under-par tone (A.RED is TOPAR_UNDER_DARK — BoardRows.tsx); gross never does. */
+function ScoreWithToPar({ score, par, kind, fontSize }: { score: number | null; par: number | null; kind: 'net' | 'gross'; fontSize: number }) {
+  const under = kind === 'net' && score != null && par != null && score < par;
+  return (
+    <span className="tabular-nums" style={{ lineHeight: 1.25, fontSize, fontWeight: 700, color: under ? A.RED : kind === 'net' ? A.INK : A.FAINT }}>
+      {score ?? '—'}<span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.01em', marginLeft: 3, color: A.DIM, lineHeight: 1 }}>{score == null || par == null ? '' : fmtToPar(score - par)}</span>
+    </span>
+  );
+}
 
 function Heads({ netW, grossW, style }: { netW: number; grossW: number; style: React.CSSProperties }) {
   const { t } = useTranslation('courses');
@@ -49,70 +68,78 @@ function Heads({ netW, grossW, style }: { netW: number; grossW: number; style: R
   );
 }
 
-function Card({ card, onOpen }: { card: CompetitionCard; onOpen: () => void }) {
+function Card({ card, onOpen, onRowPress }: { card: CompetitionCard; onOpen: () => void; onRowPress: (row: RoundPressTarget) => void }) {
   const { t } = useTranslation('courses');
-  const subtitle = useCardSubtitle(card);
+  const subtitle = useSubtitleRest(card);
   return (
-    <div data-competition-card role="button" tabIndex={0} onClick={onOpen}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(); } }}
-      style={{ width: 244, flex: 'none', boxSizing: 'border-box', scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', border: `1px solid ${A.HAIRLINE}`, borderRadius: 14, padding: '12px 13px', cursor: 'pointer', textAlign: 'left' }}>
-      <div style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{card.course_name}</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, lineHeight: 1.25, marginTop: 3, fontSize: 10.5, fontWeight: 600, color: A.DIM }}>
-        <span data-competition-pill style={{ fontSize: 7.5, lineHeight: 1, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', borderRadius: 999, padding: '3px 6px', flexShrink: 0, whiteSpace: 'nowrap', color: COMPETITION, border: `1px solid color-mix(in srgb, ${COMPETITION} 38%, transparent)`, background: `color-mix(in srgb, ${COMPETITION} 13%, transparent)` }}>{t('discover.filterBoard.competitionChip', { defaultValue: 'Competition' })}</span>
-        <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subtitle}</span>
-      </div>
+    <div data-competition-card
+      style={{ width: 244, flex: 'none', boxSizing: 'border-box', scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', border: `1px solid ${A.HAIRLINE}`, borderRadius: 14, padding: '12px 13px', textAlign: 'left' }}>
+      {/* CB4.7 — the sheet opens from the title/subtitle and the CTA only;
+          a podium row opens that player's scorecard instead. */}
+      <button type="button" data-competition-open onClick={onOpen}
+        style={{ display: 'block', width: '100%', padding: 0, border: 'none', background: 'transparent', fontFamily: SANS, textAlign: 'left', cursor: 'pointer' }}>
+        <div style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{card.course_name}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, lineHeight: 1.25, marginTop: 3, fontSize: 10.5, fontWeight: 600, color: A.DIM }}>
+          <CompetitionPill />
+          <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subtitle}</span>
+        </div>
+      </button>
       <Heads netW={46} grossW={44} style={{ marginTop: 10 }} />
       {card.rows.slice(0, PODIUM).map((r) => (
-        <div key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} data-competition-row style={{ display: 'flex', alignItems: 'center', marginTop: 7 }}>
-          <span style={{ lineHeight: 1.25, width: 26, fontSize: 10, fontWeight: 800, color: A.FAINT }}>{posText(r)}</span>
+        <button key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} type="button" data-competition-row onClick={() => onRowPress(r)}
+          style={{ display: 'flex', alignItems: 'center', marginTop: 7, width: '100%', padding: 0, border: 'none', background: 'transparent', fontFamily: SANS, textAlign: 'left', cursor: 'pointer' }}>
+          <span style={{ lineHeight: 1.25, width: 26, flex: 'none', fontSize: 10, fontWeight: 800, color: A.FAINT }}>{posText(r)}</span>
           <span style={{ lineHeight: 1.25, flex: 1, minWidth: 0, fontSize: 12.5, fontWeight: 600, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.display_name ?? t('discover.aMember')}</span>
-          <span className="tabular-nums" style={{ lineHeight: 1.25, width: 46, textAlign: 'center', fontSize: 13, fontWeight: 700, color: A.INK }}>{r.net_score ?? '—'}</span>
-          <span className="tabular-nums" style={{ lineHeight: 1.25, width: 44, textAlign: 'center', fontSize: 11.5, fontWeight: 700, color: A.FAINT }}>{r.gross_score ?? '—'}</span>
-        </div>
+          <span style={{ width: 46, flex: 'none', textAlign: 'center', fontSize: 13 }}><ScoreWithToPar score={r.net_score} par={r.course_par} kind="net" fontSize={13} /></span>
+          <span style={{ width: 44, flex: 'none', textAlign: 'center' }}><ScoreWithToPar score={r.gross_score} par={r.course_par} kind="gross" fontSize={11.5} /></span>
+        </button>
       ))}
       <div style={{ marginTop: 'auto' }}>
-        <SeeAll label={t('amateur.competitions.seeAllPlayers', { defaultValue: 'See all players' })} onPress={onOpen} />
+        <SeeAll label={t('amateur.competitions.seeAllPlayers', { defaultValue: 'See all players' })} onPress={onOpen} size={9.5} />
       </div>
     </div>
   );
 }
 
-function FieldSheet({ card, viewerId, onClose }: { card: CompetitionCard | null; viewerId: string | undefined; onClose: () => void }) {
+function FieldSheet({ card, viewerId, onClose, onRowPress }: { card: CompetitionCard | null; viewerId: string | undefined; onClose: () => void; onRowPress: (row: RoundPressTarget) => void }) {
   const { t } = useTranslation('courses');
   return (
     <BottomSheet open={!!card} onClose={onClose} maxHeight="85dvh" ariaLabelledBy="competition-field-title">
-      {card ? <FieldBody card={card} viewerId={viewerId} t={t} /> : null}
+      {card ? <FieldBody card={card} viewerId={viewerId} onRowPress={onRowPress} t={t} /> : null}
     </BottomSheet>
   );
 }
 
-function FieldBody({ card, viewerId, t }: { card: CompetitionCard; viewerId: string | undefined; t: (k: string, o?: Record<string, unknown>) => string }) {
-  const subtitle = useSubtitle(card);
+function FieldBody({ card, viewerId, onRowPress, t }: { card: CompetitionCard; viewerId: string | undefined; onRowPress: (row: RoundPressTarget) => void; t: (k: string, o?: Record<string, unknown>) => string }) {
+  const subtitle = useSubtitleRest(card);
   return (
     <div data-competition-field style={{ fontFamily: SANS, ...FIGS }}>
       <div style={{ padding: '14px 18px 0' }}>
         <h2 id="competition-field-title" style={{ margin: 0, fontSize: 16, fontWeight: 700, color: A.INK, lineHeight: 1.25 }}>{card.course_name}</h2>
-        <div style={{ marginTop: 4, fontSize: 11.5, fontWeight: 600, color: A.DIM, lineHeight: 1.25 }}>{subtitle}</div>
+        <div style={{ marginTop: 4, display: 'flex', alignItems: 'center', gap: 8, fontSize: 11.5, fontWeight: 600, color: A.DIM, lineHeight: 1.25 }}>
+          <CompetitionPill />
+          <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subtitle}</span>
+        </div>
       </div>
       <Heads netW={48} grossW={46} style={{ margin: '14px 18px 0', paddingBottom: 7, borderBottom: `1px solid ${A.SOFT}` }} />
       {card.rows.map((r) => {
         const self = !!viewerId && r.user_id === viewerId;
         return (
-          <div key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} data-competition-field-row data-self={self || undefined}
-            style={{ display: 'flex', alignItems: 'center', padding: '9px 18px', borderBottom: `1px solid ${A.SOFT}`, background: self ? SELF_ROW_TINT : 'transparent' }}>
-            <span style={{ lineHeight: 1.25, width: 30, fontSize: 10.5, fontWeight: 800, color: A.FAINT }}>{posText(r)}</span>
-            <span style={{ display: 'flex', flex: 'none', height: 28, alignItems: 'center', marginRight: 10 }}><MemberAvatar userId={r.user_id} name={r.display_name} photoUrl={null} size={28} /></span>
+          <button key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} type="button" data-competition-field-row data-self={self || undefined} onClick={() => onRowPress(r)}
+            style={{ display: 'flex', alignItems: 'center', width: '100%', padding: '9px 18px', border: 'none', borderBottom: `1px solid ${A.SOFT}`, background: self ? SELF_ROW_TINT : 'transparent', fontFamily: SANS, textAlign: 'left', cursor: 'pointer' }}>
+            <span style={{ lineHeight: 1.25, width: 30, flex: 'none', fontSize: 10.5, fontWeight: 800, color: A.FAINT }}>{posText(r)}</span>
+            <span style={{ display: 'flex', flex: 'none', height: 28, alignItems: 'center', marginRight: 10 }}><MemberAvatar userId={r.user_id} name={r.display_name} photoUrl={r.profile_photo_url} size={28} /></span>
             <span style={{ lineHeight: 1.25, flex: 1, minWidth: 0, fontSize: 13, fontWeight: self ? 700 : 600, color: self ? A.INK : A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.display_name ?? t('discover.aMember')}</span>
-            <span className="tabular-nums" style={{ lineHeight: 1.25, width: 48, textAlign: 'center', fontSize: 14, fontWeight: 700, color: A.INK }}>{r.net_score ?? '—'}</span>
-            <span className="tabular-nums" style={{ lineHeight: 1.25, width: 46, textAlign: 'center', fontSize: 12, fontWeight: 700, color: A.FAINT }}>{r.gross_score ?? '—'}</span>
-          </div>
+            <span style={{ width: 48, flex: 'none', textAlign: 'center' }}><ScoreWithToPar score={r.net_score} par={r.course_par} kind="net" fontSize={14} /></span>
+            <span style={{ width: 46, flex: 'none', textAlign: 'center' }}><ScoreWithToPar score={r.gross_score} par={r.course_par} kind="gross" fontSize={12} /></span>
+          </button>
         );
       })}
     </div>
   );
 }
 
-export function CompetitionBoards({ viewerId, scope, enabled }: { viewerId: string | undefined; scope: BoardFilters['scope']; enabled: boolean }) {
+export function CompetitionBoards({ viewerId, scope, enabled, onRowPress }: { viewerId: string | undefined; scope: BoardFilters['scope']; enabled: boolean; onRowPress: (row: RoundPressTarget) => void }) {
   const { t } = useTranslation('courses');
   const query = useCompetitionBoards(viewerId, scope, enabled);
   const [openKey, setOpenKey] = useState<string | null>(null);
@@ -128,9 +155,9 @@ export function CompetitionBoards({ viewerId, scope, enabled }: { viewerId: stri
       meta={t('amateur.competitions.window', { defaultValue: 'Last 30 days' })}
     >
       <Rail>
-        {cards.map((c) => <Card key={c.key} card={c} onOpen={() => setOpenKey(c.key)} />)}
+        {cards.map((c) => <Card key={c.key} card={c} onOpen={() => setOpenKey(c.key)} onRowPress={onRowPress} />)}
       </Rail>
-      <FieldSheet card={open} viewerId={viewerId} onClose={() => setOpenKey(null)} />
+      <FieldSheet card={open} viewerId={viewerId} onClose={() => setOpenKey(null)} onRowPress={onRowPress} />
     </Section>
     </div>
   );
