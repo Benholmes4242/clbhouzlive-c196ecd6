@@ -2,6 +2,8 @@ import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { createInstance } from 'i18next';
+import profileEnglish from '../../public/locales/en/profile.json';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 const f = vi.hoisted(() => ({
@@ -31,13 +33,17 @@ vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } 
 vi.mock('@/utils/median/openExternalUrl', () => ({ openExternalUrl: vi.fn() }));
 
 import { ProfileHero } from '@/components/profile/hero/ProfileHero';
-import { CONNECT_EXAMPLE } from '@/components/profile/hero/HeroConnectExample';
+import { CONNECT_EXAMPLE, HeroConnectExample } from '@/components/profile/hero/HeroConnectExample';
+import { HeroHandicapDisplay } from '@/components/profile/hero/HeroHandicapDisplay';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 function hero(p: { hideConnectPrompt?: boolean; isSelf?: boolean; indexValue?: number } = {}) {
   return <MemoryRouter><ProfileHero userId="u1" viewerUserId="u1" displayName="Alex Doe" isSelf={p.isSelf ?? true} hideConnectPrompt={p.hideConnectPrompt} indexValue={p.indexValue ?? 41.9} roundsCount={null} ratedCount={null} onStatTap={() => {}} /></MemoryRouter>;
 }
 const panel = () => screen.queryByTestId('hero-connect-panel');
+const english = createInstance();
+void english.init({ lng: 'en', defaultNS: 'profile', resources: { en: { profile: profileEnglish } }, initImmediate: false });
+const t = english.getFixedT('en', 'profile');
 beforeEach(() => {
   f.state = { connected: false, settled: true, connection: null, trend: null, anyError: false };
   f.decline.mockReset().mockResolvedValue(undefined);
@@ -47,6 +53,36 @@ beforeEach(() => {
 });
 
 describe('CE1 fixed connected example', () => {
+  it('crops the example wrapper with both masks and the approved opacity', () => {
+    render(hero());
+    const display = panel()?.querySelector<HTMLElement>('[data-example-display]');
+    expect(display?.style.opacity).toBe('0.5');
+    expect(display?.style.maxHeight).toBe('205px');
+    expect(display?.style.overflow).toBe('hidden');
+    expect(display?.style.maskImage).toContain('58%');
+    expect(display?.style.WebkitMaskImage).toContain('58%');
+  });
+  it('renders no example axis strings or counting sentence', () => {
+    render(<MemoryRouter><HeroConnectExample t={t} /></MemoryRouter>);
+    const text = screen.getByTestId('hero-connect-panel').textContent ?? '';
+    expect(text).not.toContain('90 days ago');
+    expect(text).not.toContain('Today');
+    expect(text).not.toContain('Two of these five are counting towards your index.');
+    expect(text).not.toContain('Green rounds lowered it.');
+  });
+  it('retains the connected axis and known counting sentence', () => {
+    const view = render(<HeroHandicapDisplay
+      t={t} shownIndex={CONNECT_EXAMPLE.index} deltaLines={CONNECT_EXAMPLE.movements.map((line) => ({ ...line }))}
+      slot={null} verdict={null} series={[...CONNECT_EXAMPLE.series]} chartColor="currentColor" chartFillTop={0.28}
+      axisWindow="90 days" windowDays={90} bars={CONNECT_EXAMPLE.rounds.map((round) => ({ ...round }))}
+      byId={new Map(CONNECT_EXAMPLE.rounds.map((round) => [round.id, round]))}
+      countingKnown countingN={2} loweredN={2} tilesWord="five" isSelf
+      onStatTap={() => {}} tap={() => () => {}} navigate={f.navigate}
+    />);
+    expect(view.container.textContent).toContain('90 days ago');
+    expect(view.container.textContent).toContain('Today');
+    expect(view.container.textContent).toContain('Two of these five are counting towards your index.');
+  });
   it('clicking every example form tile fires no analytics or navigation', () => {
     render(hero());
     const tiles = screen.getByTestId('hero-connect-panel').querySelectorAll('[data-example-form-tile]');
@@ -134,12 +170,11 @@ describe('CE1 fixed connected example', () => {
     view.rerender(hero());
     expect(panel()?.querySelectorAll('[data-example-pill]')).toHaveLength(1);
   });
-  it('supplies both movements, five approved round figures and two counting rounds', () => {
+  it('supplies both movements and five approved round figures', () => {
     expect(CONNECT_EXAMPLE.index).toBe(12.4);
     expect(CONNECT_EXAMPLE.movements.map(({ delta, window }) => [delta, window])).toEqual([[-0.8, '90 days'], [-2.1, '12 months']]);
     expect(CONNECT_EXAMPLE.rounds.map(({ gross_score }) => gross_score)).toEqual([86, 91, 84, 88, 90]);
     expect(CONNECT_EXAMPLE.rounds.map(({ value }) => value)).toEqual([3.5, 5.4, -0.2, 0.8, 1.2]);
-    expect(CONNECT_EXAMPLE.countingN).toBe(2);
     render(hero());
     const tiles = panel()?.querySelectorAll('[data-example-form-tile]');
     expect(tiles).toHaveLength(5);
