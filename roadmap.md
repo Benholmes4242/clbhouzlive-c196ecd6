@@ -1,5 +1,10 @@
 # Roadmap
 
+## BRIEF_PROFILE_HERO_CLUB_WHITE — Home club line reads the name's colour
+- [x] ProfileCoverBand subline div colour W_55 -> '#FFFFFF' (the h1 name's value); fontSize 12.5, fontWeight 600, marginTop 3, textShadow '0 1px 8px rgba(0,0,0,0.5)' and single-line ellipsis untouched. "Add your home club" button keeps W_55 (prompt, not information); W_55 import retained — still used by that button, HeroShell and BusinessProfileHero.
+- [x] New src/test/profileHeroClubWhite.test.tsx (2 cases): subline "Kristianstad Golf Club" colour equals #FFFFFF, equals the h1's colour and is not W_55, with the frozen line properties asserted; add-home-club button colour still W_55. No existing test deleted, renamed or rewritten.
+- [x] `npx vitest run`: before 1,908 passed / 248 files -> after 1,910 passed / 249 files, zero failures. Delta +2 tests / +1 file, all in the new file. Preview build OK. Live signed-in profile view unverified — /profile redirects to /auth and Supabase is external/unmanaged, so no session can be minted.
+
 ## CEF1a — Superseding test handles
 - [x] Exact example-only chart/index handles added; example forwarded into local IndexChart and attribute applied directly to existing button, no wrapper. All three handler families remain undefined in example mode, tabindex -1; connected attrs undefined. Original nine CE1 test blocks byte-identical. CEF1 chart/index selectors updated under CEF1a, all prior assertions retained; added tile/index button structure assertions and one connected handles/analytics case.
 - [x] Exact command `npx vitest run`: verified pre-CEF1 baseline 1,904 passed / 248 files -> CEF1 intermediate 1,906 passed + 1 failed = 1,907 / 248 -> final 1,908 passed / 248, zero failures. +4 relative to CE1 solely heroConnectExample.test.tsx (form, chart, index no analytics/navigation; connected handles absent and chart/index analytics retained). No tests deleted/renamed, no existing assertion rewritten. CEF1a expressly supersedes prior selector stop.
