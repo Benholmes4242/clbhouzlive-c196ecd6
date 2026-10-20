@@ -2,6 +2,7 @@
  * Shared connected hero rendering (CE1). Data ownership remains in ProfileHero;
  * the illustrative example supplies fixed props to this same markup, never a
  * parallel drawing. Connected output/geometry and counting fallbacks are frozen.
+ * Example taps are suppressed at source; inert is only a secondary safeguard.
  */
 import React from 'react';
 import type { TFunction } from 'i18next';
@@ -27,7 +28,7 @@ const MICRO: React.CSSProperties = { fontSize: 7.5, fontWeight: 700, letterSpaci
 function formatIndex(v: number): string {
   return v < 0 ? `+${Math.abs(v).toFixed(1)}` : v.toFixed(1);
 }
-const IndexChart: React.FC<{ points: number[]; color: string; fillTop: number; axisLeft: string; axisRight: string; lowLabel: string; onTap: () => void }> = ({ points, color, fillTop, axisLeft, axisRight, lowLabel, onTap }) => {
+const IndexChart: React.FC<{ points: number[]; color: string; fillTop: number; axisLeft: string; axisRight: string; lowLabel: string; onTap?: () => void; tabIndex?: number }> = ({ points, color, fillTop, axisLeft, axisRight, lowLabel, onTap, tabIndex }) => {
   const gid = React.useId().replace(/:/g, '');
   if (points.length < 2) return null;
   const min = Math.min(...points);
@@ -39,7 +40,7 @@ const IndexChart: React.FC<{ points: number[]; color: string; fillTop: number; a
   const lowY = yOf(min);
   const lastY = yOf(points[n - 1]);
   return (
-    <button type="button" onClick={onTap} style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', cursor: 'pointer', textAlign: 'left', fontFamily: SANS }}>
+    <button type="button" onClick={onTap} tabIndex={tabIndex} style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', cursor: 'pointer', textAlign: 'left', fontFamily: SANS }}>
       <div style={{ marginTop: 12, height: 64, position: 'relative' }}>
         <svg width="100%" height={64} viewBox="0 0 361 64" preserveAspectRatio="none" aria-hidden style={{ display: 'block', overflow: 'visible' }}>
           <defs>
@@ -99,7 +100,7 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
               <>
                 <div data-ghost-label={example ? '' : undefined} style={KICK}>{t('hero.handicapIndex', 'Handicap index')}</div>
                 <div style={{ marginTop: 5, display: 'flex', alignItems: 'flex-end', gap: 14 }}>
-                  <button type="button" onClick={tap('index')} style={{ padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 46, fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 0.92, color: A.INK, ...FIGS }}>
+                  <button type="button" onClick={example ? undefined : tap('index')} tabIndex={example ? -1 : undefined} style={{ padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 46, fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 0.92, color: A.INK, ...FIGS }}>
                     {formatIndex(shownIndex)}
                   </button>
                   {deltaLines.length > 0 && (
@@ -141,7 +142,8 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
                 lowLabel={t('hero.low', { value: formatIndex(Math.min(...series)), defaultValue: `Low ${formatIndex(Math.min(...series))}` })}
                 axisLeft={t('hero.windowAgo', { window: axisWindow, defaultValue: `${axisWindow} ago` })}
                 axisRight={t('hero.today', 'Today')}
-                onTap={() => {
+                tabIndex={example ? -1 : undefined}
+                onTap={example ? undefined : () => {
                   analyticsEvents.track('profile_index_chart_tap', { window_days: windowDays });
                   onStatTap('index');
                 }}
@@ -163,7 +165,8 @@ export const HeroHandicapDisplay: React.FC<Props> = ({
                         key={bar.id}
                         data-example-form-tile={example ? '' : undefined}
                         type="button"
-                        onClick={() => {
+                        tabIndex={example ? -1 : undefined}
+                        onClick={example ? undefined : () => {
                           analyticsEvents.track('profile_form_tile_tap', { whs_score_id: bar.id, position: i + 1 });
                           navigate(`/round/${bar.id}`);
                         }}
