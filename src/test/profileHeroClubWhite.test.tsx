@@ -44,7 +44,7 @@ describe('BRIEF_PROFILE_HERO_CLUB_WHITE', () => {
     expect(subline.style.fontSize).toBe('12.5px');
     expect(subline.style.fontWeight).toBe('600');
     expect(subline.style.marginTop).toBe('3px');
-    expect(subline.style.textShadow).toBe('0 1px 8px rgba(0, 0, 0, 0.5)');
+    expect(subline.style.textShadow).toBe('0 1px 8px rgba(0,0,0,0.5)');
     expect(subline.style.overflow).toBe('hidden');
     expect(subline.style.textOverflow).toBe('ellipsis');
     expect(subline.style.whiteSpace).toBe('nowrap');
