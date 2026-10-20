@@ -40,14 +40,14 @@ export const Door: React.FC<{ label: string; onClick: () => void; style?: React.
   </button>
 );
 
-/** The one solid amber call to action in PART THREE. Always /manage/handicap (H.10). */
+/** The one solid call to action in PART THREE. Always /manage/handicap (H.10). */
 export const Cta: React.FC<{ label: string; onClick: () => void }> = ({ label, onClick }) => (
   <button
     type="button"
     onClick={onClick}
     style={{
       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%',
-      marginTop: 14, background: A.AMBER, color: A.CANVAS, border: 0, borderRadius: 12, padding: 14,
+      marginTop: 14, background: A.INK, color: A.CANVAS, border: 0, borderRadius: 12, padding: 14,
       fontFamily: SANS, fontSize: 13.5, fontWeight: 800, letterSpacing: '0.02em', cursor: 'pointer',
     }}
   >
