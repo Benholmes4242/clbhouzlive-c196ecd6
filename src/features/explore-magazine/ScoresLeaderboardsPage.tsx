@@ -905,4 +905,8 @@ export function ScoresLeaderboardsPage({
       ) : null}
     </div>
   );
+
+  /* CB13 states 1 and 4 return the page untouched; state 3 frosts it. */
+  if (gate === 'gated') return <RoundsGate>{pageBody}</RoundsGate>;
+  return pageBody;
 }
