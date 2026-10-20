@@ -168,6 +168,12 @@ const ActionsRow: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <div style={{ marginTop: 11, display: 'grid', gridTemplateColumns: `repeat(${n}, 1fr)`, gap: 7 }}>{children}</div>;
 };
 
+/** Collapsed bio height in lines. Eight covers every bio the editor allows
+ *  (BIO_MAX 300) at phone widths, so a within-limit bio reads in full with no
+ *  control. The page still MEASURES overflow (ProfilePageV2 scrollHeight vs
+ *  clientHeight), so a longer legacy bio saved before the limit keeps More. */
+export const BIO_COLLAPSED_LINES = 8;
+
 export const ProfileHero: React.FC<Props> = ({
   userId,
   viewerUserId,
@@ -414,7 +420,7 @@ export const ProfileHero: React.FC<Props> = ({
               lineHeight: 1.5,
               color: A.BODY,
               overflowWrap: 'anywhere',
-              ...(bioExpanded ? {} : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }),
+              ...(bioExpanded ? {} : { display: '-webkit-box', WebkitLineClamp: BIO_COLLAPSED_LINES, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }),
             }}
           >
             {bio}
