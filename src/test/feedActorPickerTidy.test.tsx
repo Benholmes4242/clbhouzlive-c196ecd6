@@ -12,7 +12,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
  * null and the 20px/12px geometry are measured on the shipped component.
  */
 const actorState = vi.hoisted(() => ({
-  actors: [] as Array<{ id: string; type: string; name: string; avatarUrl: string | null }>,
+  actors: [] as Array<{ type: 'personal' | 'business'; id: string; name: string; avatarUrl?: string | null }>,
 }));
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
