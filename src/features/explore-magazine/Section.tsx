@@ -1,12 +1,18 @@
 import type { CSSProperties, ReactNode } from 'react';
+import { ChevronRight } from 'lucide-react';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { WHO_LEADS } from './whoLeads';
 
 /**
  * EX2 — the Rounds tab's one section head, moved unchanged out of
  * ScoresLeaderboardsPage so the sections it mounts can use it without an import
  * cycle back into the page. Do not re-export it from the page.
+ *
+ * CB3 — `Rail` and `SeeAll` joined it, moved unchanged out of the same page
+ * for the Competitions section. Same rule: the page imports this module, so
+ * the page must not re-export them.
  */
 
 export const GUTTER = 16;
@@ -89,5 +95,71 @@ export function Section({
       ) : null}
       <div style={{ marginTop: 12 }}>{children}</div>
     </section>
+  );
+}
+
+/** CB3 — moved unchanged out of ScoresLeaderboardsPage. The page's one
+ * see-all action: EYEBROW at A.MUTE, 13px chevron, no count. */
+export function SeeAll({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onPress}
+      style={{
+        marginTop: 12,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        padding: 0,
+        border: 'none',
+        background: 'transparent',
+        fontFamily: SANS,
+        ...EYEBROW,
+        color: A.MUTE,
+        cursor: 'pointer',
+      }}
+    >
+      {label}
+      <ChevronRight size={13} />
+    </button>
+  );
+}
+
+/** CB3 — moved unchanged out of ScoresLeaderboardsPage. The page's one
+ * horizontal rail: bleed to the edges, snap, gutter padding, end spacer,
+ * edge fade. */
+export function Rail({ children }: { children: ReactNode }) {
+  return (
+    <div style={{ position: 'relative', marginInline: -GUTTER }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: WHO_LEADS.rail.gap,
+          overflowX: 'auto',
+          scrollSnapType: 'x mandatory',
+          paddingInline: GUTTER,
+          scrollPaddingInline: GUTTER,
+          paddingTop: WHO_LEADS.rail.top,
+          paddingBottom: WHO_LEADS.rail.bottom,
+          scrollbarWidth: 'none',
+          willChange: 'transform',
+        }}
+      >
+        {children}
+        <span style={{ flex: '0 0 14px' }} aria-hidden />
+      </div>
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          width: 30,
+          pointerEvents: 'none',
+          background: `linear-gradient(to right, transparent, ${A.CANVAS})`,
+        }}
+      />
+    </div>
   );
 }
