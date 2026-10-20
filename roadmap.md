@@ -498,3 +498,7 @@
 - ProfileHero: collapsed bio clamp 2 -> exported `BIO_COLLAPSED_LINES = 8`. display -webkit-box, WebkitBoxOrient vertical and overflow hidden stay, so ProfilePageV2's scrollHeight vs clientHeight measurement still drives More / Less. BIO_MAX 300, button styling, meta row and spacing untouched; expanded state unchanged.
 - New src/test/profileBioFull.test.tsx: 6 tests (300-char fixture; clamp 8 + box props collapsed; expanded lifts clamp; no More/Less inside the clamp; More only when bioOverflows; Less only when bioExpanded). No existing tests changed. Suite 1,883 passed + 1 failed / 245 files -> 1,889 passed + 1 failed / 246 files (+6/+1, profileBioFull only); the 1 failure is the pre-existing reviewReceiptAverageLine selector issue already reported and awaiting authorization.
 - jsdom note: the -webkit- clamp is read off the element by name — typed CSSStyleDeclaration has no vendor member, and getPropertyValue('-webkit-line-clamp') proved order-dependent across the full suite.
+
+## CB11 — Remove Who leads what
+- [x] Verified line references and caller audit; user extended scope to the section sheet, state and private formatters. Shared Rail owns unchanged 10/12/18 spacing; §7 and protected helpers untouched.
+- [ ] Run final full suite and report inventory, dormant RPC, retained unused items and page order.

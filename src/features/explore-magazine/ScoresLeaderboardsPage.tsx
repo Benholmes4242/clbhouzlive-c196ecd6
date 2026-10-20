@@ -1,6 +1,6 @@
 import { useMemo, useState, type CSSProperties } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 import { supabase } from '@/integrations/supabase/client';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -32,11 +32,10 @@ import { fmtHcp } from '@/lib/whs/format';
 import { playDateAtLocalNoon } from '@/components/explore-tab-new/courseled/discoverWhen';
 import { SELF_ROW_TINT } from '@/components/explore-tab-new/courseled/tokens';
 import { standingOrdinal } from './ordinal';
-import { WHO_LEADS, whoLeadsPlaceholderHeight, whoLeadsYou } from './whoLeads';
 import { useFeatsWindow, type FeatWindow } from './useFeatsWindow';
 import { RARE_AIR, rareAirPlaceholderHeight } from './rareAir';
 import { RareAirLede, RareAirRail, RareAirYou } from './RareAirSection';
-import { GUTTER, Rail, Section, SeeAll } from './Section';
+import { GUTTER, Section, SeeAll } from './Section';
 import { RailChips } from '@/components/ui/RailChips';
 import { Top100ListProgressSheet } from '@/components/top100/sheets/Top100ListProgressSheet';
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
@@ -46,7 +45,7 @@ import { CLIMB, climbCross, climbOrder, climbPlaceholderHeight, type ClimbMode, 
 import { formatMonthLong } from '@/i18n/format';
 import { HundredBasis, HundredRail, HundredSubHead, HundredYou } from './TheHundredSection';
 
-/** CompactRow value size (the career, Top 100 and improvement sections). */
+/** CompactRow value size (the Top 100 and improvement sections). */
 export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
 
 /**
@@ -56,9 +55,9 @@ export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
  * sections (Standout rounds, Competitions, Just played — EX1 replaced §3, the
  * lead board, with them) and nothing below them. Sections, in order: head
  * (scope chips), Standout rounds, Competitions, Just played, §5 Feats this
- * year, §4 Most improved, §6 Who leads what, §7 Top 100 — the four below are
+ * year, §4 Most improved, §7 Top 100 — the three below are
  * platform facts. The order alternates section SHAPE (rows,
- * tiles, rows, rail, carousel) so no two neighbours read alike; anything added
+ * tiles, rows, carousel) so no two neighbours read alike; anything added
  * here is placed by its shape, not its subject. § numbers name sections, not
  * positions. Each section owns its read, holds its
  * own height while pending, and renders NOTHING when its read fails or is empty.
@@ -99,24 +98,6 @@ type CareerMetric =
   | 'birdies' | 'rounds' | 'sub_80' | 'eagles'
   | 'best_stableford' | 'best_score_diff';
 
-/** get_year_leaderboard.value is numeric, so it arrives as a string. The ONE
- *  per-metric formatter: a differential carries one decimal and an explicit
- *  sign; every other metric is an integer. */
-function fmtCareerValue(metric: CareerMetric, v: number | string | null | undefined): string {
-  const n = Number(v);
-  if (!Number.isFinite(n)) return '\u2014';
-  // True minus (U+2212), never a hyphen — as fmtToPar; explicit plus on positives.
-  if (metric === 'best_score_diff') return `${n > 0 ? '+' : n < 0 ? '\u2212' : ''}${Math.abs(n).toFixed(1)}`;
-  return String(Math.round(n));
-}
-
-/** Leader's distance from second, whichever way the board counts. */
-function fmtCareerMargin(metric: CareerMetric, a: number | string, b: number | string): { zero: boolean; text: string } {
-  const d = Math.abs(Number(a) - Number(b));
-  const text = metric === 'best_score_diff' ? d.toFixed(1) : String(Math.round(d));
-  return { zero: Number(text) === 0, text };
-}
-
 interface BoardSheetProps {
   open: boolean;
   onClose: () => void;
@@ -129,7 +110,7 @@ interface BoardSheetProps {
   children: React.ReactNode;
 }
 
-/** THE ONE SEE-ALL SHELL on this page: Top 100, Most improved and every §6 tile. */
+/** THE ONE SEE-ALL SHELL on this page: Top 100 and Most improved. */
 function BoardSheet({ open, onClose, titleId, title, subtitle, valueHeading, footnote, above, children }: BoardSheetProps) {
   const { t } = useTranslation('courses');
   const cap: React.CSSProperties = { fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase' };
@@ -237,9 +218,6 @@ function useYearImprovement(viewerId: string | undefined) {
  * the app's published name) while the metric key says "worldwide" (the
  * database's name). Neither changes here; they meet only on this line.
  */
-/** §6 rail fetch: the tile reads two rows, the sheet the field. */
-const CAREER_RAIL_LIMIT = 100;
-
 const TOP100_METRIC: Record<RankListSlug, CareerMetric> = {
   'gb-i': 'top_100_gbni_distinct',
   global: 'top_100_worldwide_distinct',
@@ -467,20 +445,6 @@ export function ScoresLeaderboardsPage({
     analyticsEvents.track('feats_window_changed', { window: next });
   };
 
-  /* W.1 — the window swaps the rpc on every board; the rpc is in the
-     query key, so each window caches separately. Only the selected window runs.
-     The two bests run on the year view only — see the gate at `career`. */
-  const [leadWindow, setLeadWindow] = useState<FeatWindow>('year');
-  const leadRpc = leadWindow === 'year' ? 'get_year_leaderboard' : 'get_career_leaderboard';
-  const bestsAvailable = leadWindow === 'year';
-  const birdiesC = useCareerBoard(userId, 'birdies', CAREER_RAIL_LIMIT, leadRpc);
-  const roundsC = useCareerBoard(userId, 'rounds', CAREER_RAIL_LIMIT, leadRpc);
-  const sub80C = useCareerBoard(userId, 'sub_80', CAREER_RAIL_LIMIT, leadRpc);
-  const eaglesC = useCareerBoard(userId, 'eagles', CAREER_RAIL_LIMIT, leadRpc);
-  const stablefordC = useCareerBoard(userId, 'best_stableford', CAREER_RAIL_LIMIT, leadRpc, bestsAvailable);
-  const scoreDiffC = useCareerBoard(userId, 'best_score_diff', CAREER_RAIL_LIMIT, leadRpc, bestsAvailable);
-  /* The tile reads rows 0-1; the sheet it opens reads the same query object. */
-  const [leaderSheet, setLeaderSheet] = useState<CareerMetric | null>(null);
   const [top100List, setTop100List] = useState<RankListSlug>(TOP100_DEFAULT);
   const top100 = useCareerBoard(userId, TOP100_METRIC[top100List], 100);
   const top100Defaulted = top100List === TOP100_DEFAULT;
@@ -575,40 +539,6 @@ export function ScoresLeaderboardsPage({
   const featTotals = featsYear.isSuccess ? featRows[0] ?? null : null;
   // First load only: isFetched drops on key change while placeholderData holds rows; isSuccess does not.
   const featsFirstLoad = !featsYear.isSuccess && featRows.length === 0;
-
-  /* ------------------------------------------------------------ §6 career */
-  const career = [
-    { metric: 'birdies', label: t('amateur.leaderboards.career.birdies'), q: birdiesC },
-    { metric: 'sub_80', label: t('amateur.leaderboards.career.sub80'), q: sub80C },
-    { metric: 'eagles', label: t('amateur.leaderboards.career.eagles'), q: eaglesC, noAvg: true },
-    { metric: 'rounds', label: t('amateur.leaderboards.career.rounds'), q: roundsC },
-    /* THE BESTS GATE. A tile holds its place and reads zero when its absence
-       is a fact about the world, as Rare air's albatross does. These two are
-       absent all time because get_career_leaderboard reads gam_user_milestones,
-       which stores counts, and cannot compute a maximum — that is our gap, not
-       the member's news, so on All time the tile goes rather than announcing
-       our plumbing on screen. They sit LAST so removing them never moves the
-       four tiles before them. Within the four that are always present, scoring
-       comes before activity, so the first tiles a member sees reward playing
-       well rather than playing often. */
-    ...(bestsAvailable
-      ? [
-          { metric: 'best_stableford', label: t('amateur.leaderboards.career.bestStableford'), q: stablefordC },
-          { metric: 'best_score_diff', label: t('amateur.leaderboards.career.bestScoreDiff'), q: scoreDiffC },
-        ]
-      : []),
-  ] as { metric: CareerMetric; label: string; q: typeof birdiesC; noAvg?: boolean }[];
-  /* NOTHING ELSE JOINS THIS RAIL: holes in one / albatrosses are §5, lowest gross §3, bogey-free §5. */
-  const careerSettled = career.every((c) => c.q.isFetched);
-  const careerShown = career.filter((c) => c.q.isSuccess && (c.q.data?.length ?? 0) > 0);
-  /* W.5 — an empty year asks ONE all-time board whether a way out exists. It
-     runs only in that case (1 January), never alongside a populated year. */
-  const yearEmpty = leadWindow === 'year' && careerSettled && careerShown.length === 0;
-  const allProbe = useCareerBoard(userId, 'rounds', CAREER_RAIL_LIMIT, 'get_career_leaderboard', yearEmpty);
-  const allHasRows = (allProbe.data?.length ?? 0) > 0;
-  const pickLeadWindow = (next: FeatWindow) => {
-    if (next !== leadWindow) setLeadWindow(next);
-  };
 
   /* ------------------------------------------------- §7 short board */
   const shortBoard = (
@@ -775,156 +705,7 @@ export function ScoresLeaderboardsPage({
         </Section>
       ) : null}
 
-      {/* §6 WHO LEADS WHAT — the field's leader of each metric, in the window the
-          toggle picks (CAREER_RAIL_LIMIT: every board holds the whole field, so
-          the tile reads rows 0-1 and the viewer's row, the sheet the field).
-          JANUARY IS THIN BY DESIGN on the year view: the RPC filters value > 0.
-          Never carry figures over; the empty year names the toggle instead. */}
-      {!careerSettled ? (
-        pending(whoLeadsPlaceholderHeight(!!userId))
-      ) : careerShown.length > 0 || (yearEmpty && allHasRows) ? (
-        <Section
-          contest
-          eyebrow={t('amateur.leaderboards.theField')}
-          title={t('amateur.leaderboards.whoLeads')}
-          metaAlign="center"
-          meta={(
-            <div
-              role="radiogroup"
-              aria-label={t('amateur.leaderboards.whoLeadsWindow')}
-              style={{
-                display: 'flex', gap: RARE_AIR.toggle.gap, padding: RARE_AIR.toggle.padding, borderRadius: 999, flex: 'none', alignSelf: 'center',
-                background: RARE_AIR.toggle.background, border: `1px solid ${RARE_AIR.toggle.border}`,
-              }}
-            >
-              {([
-                ['year', String(new Date().getFullYear())],
-                ['all', t('amateur.leaderboards.allTime')],
-              ] as const).map(([key, label]) => {
-                const selected = leadWindow === key;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    role="radio"
-                    aria-checked={selected}
-                    onClick={() => pickLeadWindow(key)}
-                    style={{
-                      height: RARE_AIR.toggle.height, padding: `0 ${RARE_AIR.toggle.sidePadding}px`, borderRadius: 999, border: 'none',
-                      fontFamily: SANS, fontSize: RARE_AIR.toggle.fontSize, fontWeight: 600, whiteSpace: 'nowrap',
-                      letterSpacing: 'normal', textTransform: 'none',
-                      background: selected ? RARE_AIR.toggle.fill : 'transparent',
-                      color: selected ? A.INK : A.MUTE,
-                    }}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        >
-          {careerShown.length === 0 ? (
-            <p style={{ margin: 0, fontFamily: SANS, fontSize: WHO_LEADS.empty.fontSize, lineHeight: WHO_LEADS.empty.lineHeight, color: A.MUTE }}>
-              {t('amateur.leaderboards.whoLeadsEmptyYear', { year: new Date().getFullYear(), allTime: t('amateur.leaderboards.allTime') })}
-            </p>
-          ) : (
-          <Rail>
-            {careerShown.map((c) => {
-              const rows = c.q.data!;
-              const r = rows[0];
-              const second = rows[1];
-              /* Decided from the VALUES, not is_tie (which marks a tie anywhere). */
-              const margin = second ? fmtCareerMargin(c.metric, r.value, second.value) : null;
-              const you = userId ? whoLeadsYou(rows, userId, i18n?.language ?? 'en') : null;
-              const mine = you?.kind === 'on' ? rows.find((x) => x.is_viewer) ?? rows.find((x) => x.user_id === userId) : undefined;
-              const lead = you?.kind === 'lead';
-              const W = WHO_LEADS.tile;
-              const fig = <span className="tabular-nums" style={{ fontWeight: W.you.figureWeight, color: A.INK }} />;
-              return (
-                <button
-                  key={c.metric}
-                  type="button"
-                  onClick={() => setLeaderSheet(c.metric)}
-                  style={{
-                    width: W.width, flex: 'none', boxSizing: 'border-box', scrollSnapAlign: 'start',
-                    padding: `${W.padTop}px ${W.padSide}px ${W.padBottom}px`, borderRadius: W.radius,
-                    border: `1px solid ${A.BORDER}`, background: A.PANEL, textAlign: 'left', fontFamily: SANS, cursor: 'pointer',
-                    // A <button> centres its content vertically; stack from the top.
-                    display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'stretch',
-                  }}
-                >
-                  <span style={{
-                    display: 'block', fontSize: W.name.fontSize, lineHeight: `${W.name.lineHeight}px`, fontWeight: W.name.fontWeight,
-                    letterSpacing: W.name.letterSpacing, textTransform: 'uppercase', color: A.MUTE,
-                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                  }}>
-                    {c.label}
-                  </span>
-                  <span className="tabular-nums" style={{
-                    display: 'block', marginTop: W.figure.marginTop, fontSize: W.figure.fontSize, fontWeight: W.figure.fontWeight,
-                    letterSpacing: W.figure.letterSpacing, lineHeight: 1, color: A.INK, /* never amber: the name and the you line mark the lead */
-                  }}>
-                    {fmtCareerValue(c.metric, r.value)}
-                  </span>
-                  {/* The avatar sits beside the leader's name at 20px (it was
-                      30px beside the value): the row says WHO, the figure WHAT. */}
-                  <span style={{ display: 'flex', alignItems: 'center', gap: W.leader.gap, marginTop: W.leader.marginTop, minWidth: 0 }}>
-                    <span style={{ flexShrink: 0, display: 'flex' }}>
-                      <MemberAvatar userId={r.user_id} name={r.display_name} photoUrl={r.photo_url} size={W.leader.avatar} />
-                    </span>
-                    <span style={{
-                      minWidth: 0, fontSize: W.leader.fontSize, lineHeight: `${W.leader.lineHeight}px`, fontWeight: W.leader.fontWeight,
-                      color: lead ? A.AMBER : A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                    }}>
-                      {nameOf(r.display_name)}
-                    </span>
-                  </span>
-                  {/* THE CLUB WAS REMOVED: where a member plays has no bearing on
-                      who leads a metric. The lesson from measuring it stands for
-                      the name and the margin line: Chromium measurements
-                      understate device widths, so treat a measured fit as a
-                      floor, not a budget. */}
-                  <span style={{
-                    display: 'block', marginTop: W.margin.marginTop, fontSize: W.margin.fontSize, lineHeight: `${W.margin.lineHeight}px`,
-                    color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                  }}>
-                    {margin == null
-                      ? '\u00A0'
-                      : margin.zero
-                        ? t('amateur.leaderboards.tiedTop')
-                        : t('amateur.leaderboards.clearOf', { n: margin.text, name: nameOf(second.display_name) })}
-                  </span>
-                  {you ? (
-                    <>
-                      <span aria-hidden style={{
-                        display: 'block', height: W.rule.height, background: A.SOFT,
-                        marginTop: W.rule.marginTop, marginInline: -W.padSide,
-                      }} />
-                      <span style={{
-                        display: 'block', marginTop: W.you.marginTop, fontSize: W.you.fontSize, lineHeight: `${W.you.lineHeight}px`,
-                        color: lead ? A.AMBER : A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                      }}>
-                        {you.kind === 'lead' ? t('amateur.leaderboards.whoLeadsYou.lead')
-                          : you.kind === 'absent' ? t('amateur.leaderboards.whoLeadsYou.absent')
-                          : (
-                            <Trans
-                              ns="courses"
-                              i18nKey="amateur.leaderboards.whoLeadsYou.on"
-                              values={{ pos: you.pos, value: fmtCareerValue(c.metric, mine!.value) }}
-                              components={{ b: fig }}
-                            />
-                          )}
-                      </span>
-                    </>
-                  ) : null}
-                </button>
-              );
-            })}
-          </Rail>
-          )}
-        </Section>
-      ) : null}
+      {/* §6 Who leads what removed — CB11. */}
 
       {/* §7 TOP 100 — get_career_leaderboard(TOP100_METRIC[list]). This section
           is get_career_leaderboard's ONLY consumer; its other branches
@@ -1036,24 +817,6 @@ export function ScoresLeaderboardsPage({
       >
         {climbPlaced.map((p) => improvedRow(p, true))}
       </BoardSheet>
-
-      {(() => {
-        const c = leaderSheet ? career.find((x) => x.metric === leaderSheet) : undefined;
-        const rows = c?.q.data ?? [];
-        const scope = t('amateur.leaderboards.improvedScope');
-        return (
-          <BoardSheet
-            open={!!c}
-            onClose={() => setLeaderSheet(null)}
-            titleId="leader-see-all-title"
-            title={c?.label ?? ''}
-            subtitle={rows.length > 0 ? `${scope} · ${membersText(Number(rows[0].total_members))}` : scope}
-            valueHeading={c?.label ?? ''}
-          >
-            {c ? shortBoard(rows, () => null, '', (r) => onMemberTap(r.user_id), { all: true, fmt: (r) => fmtCareerValue(c.metric, r.value) }) : null}
-          </BoardSheet>
-        );
-      })()}
 
       <BoardSheet
         open={top100SeeAllSheet}
