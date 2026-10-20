@@ -135,7 +135,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
       </div>
 
       {/* B — the subject and the verdict */}
-      <div style={{ flex: 'none', display: 'flex', alignItems: 'flex-start', gap: 12, padding: `8px ${GUTTER}px 12px` }}>
+      <div data-review-subject style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 12, padding: `8px ${GUTTER}px 12px` }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           {!courseName ? null : onOpenCourse ? (
             <button
@@ -154,15 +154,15 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
           ) : null}
         </div>
         {rating != null ? (
-        <div style={{ flex: 'none', textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+        <div data-review-score-col style={{ flex: 'none', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div
             data-review-score
             className="tabular-nums"
-            style={{ fontSize: 38, fontWeight: 800, lineHeight: 0.88, letterSpacing: '-0.045em', color: reviewLabelColor(rating) }}
+            style={{ fontSize: 16, fontWeight: 700, lineHeight: 1, letterSpacing: '-0.02em', color: reviewLabelColor(rating) }}
           >
             {formatRatingValue(rating)}
           </div>
-          <div data-review-tier style={{ marginTop: 5, lineHeight: 1 }}>
+          <div data-review-tier style={{ marginTop: 6, lineHeight: 1 }}>
             <ReviewVerdictLabel
               rating={rating}
               fontSize={9.5}
