@@ -143,7 +143,7 @@ export function CompetitionBoards({ viewerId, scope, enabled, onRowPress }: { vi
     <div data-competitions-section style={{ ...FIGS }}>
     <Section
       contest
-      eyebrow={t('amateur.competitions.eyebrow', { defaultValue: 'Home club golf' })}
+      eyebrow={t('amateur.competitions.eyebrow', { defaultValue: 'Home club tournament golf' })}
       title={t('amateur.competitions.title', { defaultValue: 'Competitions' })}
       meta={t('amateur.competitions.window', { defaultValue: 'Last 30 days' })}
     >
