@@ -8,7 +8,7 @@ import { playDateStandalone } from '@/components/explore-tab-new/courseled/disco
 import type { FeatBoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 
 import type { FeatWindow, FeatYearRow } from './useFeatsWindow';
-import { FEAT_I18N, RARE_AIR, RARE_AIR_TILE_HEIGHT, compareRates, rarityShare, rareAirRailRows } from './rareAir';
+import { FEAT_I18N, RARE_AIR, RARE_AIR_TILE_HEIGHT, compareRates, rarityShare, rareAirRailRows, rareAirRarestFeat } from './rareAir';
 
 const T = RARE_AIR.tile;
 const L = T.latest;
@@ -71,6 +71,7 @@ export function RareAirRail({
   const { t } = useTranslation('courses');
   const R = RARE_AIR.rail;
   const allOf = (k: string) => allRows.find((r) => r.feat_kind === k);
+  const rarestFeat = rareAirRarestFeat(rows, allRows);
   return (
     <>
       <div style={{ position: 'relative', marginInline: -R.side }}>
@@ -81,7 +82,7 @@ export function RareAirRail({
             scrollbarWidth: 'none', willChange: 'transform',
           }}
         >
-          {rareAirRailRows(rows).map((f, i) => {
+          {rareAirRailRows(rows).map((f) => {
             const all = allOf(f.feat_kind);
             const share = rarityShare(all);
             const cmp = window === 'year' ? compareRates(f, all) : null;
@@ -90,7 +91,6 @@ export function RareAirRail({
             const rate = f.events > 0
               ? t('amateur.leaderboards.featRarity', { n: Math.round(f.denominator / f.events).toLocaleString(), unit })
               : t('amateur.leaderboards.featNone', { n: f.denominator.toLocaleString(), unit });
-            const allRate = all && all.events > 0 ? Math.round(all.denominator / all.events).toLocaleString() : null;
             const has = !!f.latest_play_date;
             const lastAll = all?.latest_play_date ?? null;
             return (
@@ -123,7 +123,7 @@ export function RareAirRail({
                     }}>
                       {name}
                     </span>
-                    {i === 0 ? (
+                    {f.feat_kind === rarestFeat ? (
                       <span style={{
                         flexShrink: 0, fontSize: T.pill.fontSize, fontWeight: T.pill.fontWeight, letterSpacing: T.pill.letterSpacing,
                         textTransform: 'uppercase', color: A.AMBER, border: `1px solid ${T.pill.border}`, borderRadius: 999,
@@ -146,12 +146,10 @@ export function RareAirRail({
                       {f.events === 0 ? null : window === 'all'
                         ? (f.members > 0 ? t('amateur.leaderboards.nMembers', { count: f.members }) : null)
                         : cmp?.kind === 'tooFew' ? t('amateur.leaderboards.featCompare.tooFew')
-                        : cmp && allRate ? (
+                        : cmp ? (
                           <Trans
                             ns="courses"
                             i18nKey={cmp.kind === 'commoner' ? 'amateur.leaderboards.featCompare.more' : 'amateur.leaderboards.featCompare.less'}
-                            values={{ n: allRate, unit }}
-                            components={{ g: <span style={{ fontWeight: 700, color: A.GREEN }} /> }}
                           />
                         ) : null}
                     </span>

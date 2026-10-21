@@ -205,8 +205,8 @@
       "featNone": "None in {{n}} {{unit}}",
       "rarest": "Rarest",
       "featCompare": {
-        "more": "More often than all time — <g>1 in {{n}} {{unit}}</g>",
-        "less": "Less often than all time — 1 in {{n}} {{unit}}",
+        "more": "More often than all time",
+        "less": "Less often than all time",
         "tooFew": "Too few to compare"
       },
       "featLatest": {
