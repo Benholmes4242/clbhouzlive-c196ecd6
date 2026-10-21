@@ -95,6 +95,25 @@ export function roundsPerOccurrence(all: FeatYearRow | undefined): number | null
   return all.denominator_unit === 'holes' ? all.total_holes / all.events / 18 : all.total_rounds / all.events;
 }
 
+/** Badge ownership is all-time identity, independent of the achieved-first rail.
+ * No observed occurrences rank above finite occurrence rates (never change the
+ * zero-fill accent rule). Equal rates, including unobserved feats, retain the
+ * incoming RPC rarity order. Missing all-time data falls back to that same order.
+ */
+export function rareAirRarestFeat(rows: FeatYearRow[], allRows: FeatYearRow[]): FeatKind | null {
+  let rarest: FeatKind | null = null;
+  let highest = -Infinity;
+  for (const row of rows) {
+    const all = allRows.find((r) => r.feat_kind === row.feat_kind);
+    const rate = all ? roundsPerOccurrence(all) ?? Infinity : -Infinity;
+    if (rarest === null || rate > highest) {
+      rarest = row.feat_kind;
+      highest = rate;
+    }
+  }
+  return rarest;
+}
+
 /** Share of the rarity bar's track: log10(rpo)/log10(5000), floored at 0.08; 0 = no fill. */
 export function rarityShare(all: FeatYearRow | undefined): number {
   const rpo = roundsPerOccurrence(all);
