@@ -551,6 +551,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
       {/* Top scrim removed — chrome sits directly on the blurred media
           backdrop. Text/icons carry their own drop-shadow for legibility. */}
       <div
+        {...inertWhileScrubbing}
         style={{
           position: 'fixed',
           top: 0,
@@ -679,6 +680,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
       {/* Bottom-LEFT — author + info stack */}
       <div
+        {...inertWhileScrubbing}
         style={{
           position: 'fixed',
           bottom: stackBottom,
@@ -823,6 +825,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           The column is bottom-anchored, so dropping mute (its first child)
           shortens it from the top and the buttons beneath do not move. */}
       <div
+        {...inertWhileScrubbing}
         style={{
           position: 'fixed',
           right: 'max(12px, env(safe-area-inset-right, 0px))',
