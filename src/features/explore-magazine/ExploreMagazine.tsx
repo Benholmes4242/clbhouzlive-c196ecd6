@@ -526,6 +526,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
   const boardState = useAmateurBoardState(
     view === 'scores' ? userId : undefined,
     scoresBoardActive || boardPanelOpen,
+    'net', // CB25 visible default; recent-board landing scope probes stay unchanged.
   );
 
   const [revealed, setRevealed] = useState(STREAM_PAGE_SIZE);

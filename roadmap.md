@@ -1,5 +1,11 @@
 # Roadmap
 
+## CB25 — Leaderboards section returns
+- [ ] Remount four allowed boards on existing state/page and shared rows, head and See-all; default net without changing older entryBoardFor/scope probes.
+- [ ] Audit tests and add allowed-board rule coverage; full suite baseline 2,005/269, report every delta.
+- [ ] Verify 390px pill widths/no English scrolling, board taps and See-all; report frozen mock differences, page shapes and empty disappearance.
+- [ ] Authenticated real-data screenshot unavailable under external_unmanaged; label controlled evidence.
+
 ## CB24 — Remove Top 100 basis line
 - [x] Removed basis call/component, THE_HUNDRED.basis, HUNDRED_BASIS_HEIGHT and unused en/en-XA key; retained RANK_SCOPE_LABEL (page chips/slab/sheet still read it), Trans and blockGap. CB23 and frozen surfaces untouched; local comments updated.
 - [x] Only authorised theHundred.test.ts:57/58 heights assertions changed 334→288 and 522→476; head119+rows144+See-all25=288, signed-in adds slab100+strip88=476. Full bunx vitest run baseline and after 2,005/269, zero failures and no inventory delta; no other assertion edits/deletions/renames/additions.

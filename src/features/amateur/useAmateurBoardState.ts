@@ -119,7 +119,9 @@ export function circleRungSkippable(c: { isSuccess: boolean; isError?: boolean; 
   return c.isSuccess && c.data === 0;
 }
 
-export function useAmateurBoardState(userId: string | undefined, active = true) {
+/** CB25: caller-owned initial visible board leaves the established recent-board
+ * landing probes and scope resolution intact. Selection/reset still live here. */
+export function useAmateurBoardState(userId: string | undefined, active = true, initialBoard?: BoardKey) {
   const [filters, setFilters] = useState<BoardFilters>(UNRESOLVED_FILTERS);
   /* The resolved default. null until the ladder has resolved, and the board
      reads stay off until then — never render on one scope and swap. */
@@ -139,7 +141,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
   /* null = untouched: the member is on their resolved entry board. Once they
      pick, nothing re-applies the default for the rest of the visit. */
   const [boardPicked, setBoard] = useState<BoardKey | null>(null);
-  const board: BoardKey = boardPicked ?? entryBoard;
+  const board: BoardKey = boardPicked ?? initialBoard ?? entryBoard;
   const [courseBoard, setCourseBoard] = useState<CourseBoardKey>('played');
   const [panelOpen, setPanelOpen] = useState(false);
   /* Set only when THIS hook widened the pool for the member (state C), so the
@@ -287,7 +289,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true) 
   }, [entryFilters]);
 
   /* ONE DEFAULT OBJECT for the Reset button and the Filters badge. */
-  const canReset = !sameFilters(filters, entryFilters) || board !== entryBoard;
+  const canReset = !sameFilters(filters, entryFilters) || board !== (initialBoard ?? entryBoard);
   const sheetFilterCount = sheetOnlyDiffCount(filters, entryFilters);
 
   /* §7 — the page's segmented control writes scope through here. */
