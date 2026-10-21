@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB16 — Competition boards say whose field
+- [x] Read-only wording/test audit and full `bunx vitest run` baseline: 1,988 passing / 264 files, zero failures, matches last reported total. No existing test asserts subtitle player/players; shared subtitle default also says players. Separate card CTA uses `seeAllPlayers` / "See all players" and four existing tests protect/select it at competitionBoards.test.tsx:59,68,79,91.
+- [ ] Await Ben's ruling before changing CTA or its four protecting assertions/lookups; audit reported before application/test edits.
+- [ ] Change English subtitle count nouns and shared fallback to members; add English field-limit key and sheet-only quiet line; preserve ranking/figures/mark/colours. Add one sheet-versus-card render test and run/report full suite with reconciled counts. No SQL/migrations/RPC/feed_config/cap edits.
+
 ## BRIEF_TOP_TEN_OWNER_NAME_LABEL — Row score centring follow-up
 - [x] Preserved owner-name helper and labels; both row score columns now use display flex, flexDirection column, alignItems center, minWidth 42 and flexShrink 0; figures and labels use whiteSpace nowrap. Photo pills, font sizes/weights/spacing/colours, header and other strings unchanged. Local helper header corrected to describe minimum-width rows rather than fixed-width rows.
 - [x] Full `bunx vitest run`: 1,987 passing / 264 files before -> 1,988 passing / 264 files after, zero failures. Delta +1 solely `src/test/topTenOwnerLabelRender.test.tsx`: `both row score columns centre non-wrapping figures and labels with a 42px minimum` asserts flex/column/center/minWidth 42px/flexShrink 0, no fixed width and non-wrapping children. No existing test deleted, renamed, rewritten or assertion changed; topTenTileWidth untouched. Preview build OK 2026-10-21T08:40:10Z. Browser at 415x970 redirects the actual profile to /auth, zero page errors; screenshot reviewed, authenticated visual centring remains unverified on external_unmanaged Supabase. No SQL/migrations/RPC/feed_config/cap changes.
