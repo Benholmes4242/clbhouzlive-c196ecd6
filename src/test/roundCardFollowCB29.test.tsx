@@ -29,7 +29,7 @@ describe('CB29 follow control on round cards', () => {
   it('ExploreCard renders follow for another member and never opens the round on tap; absent on own round', () => {
     const onTap = vi.fn(); const onFollow = vi.fn();
     const v = render(<ExploreCard item={item} size="std" onTap={onTap} isFollowed={false} onFollow={onFollow} />);
-    const ctl = v.container.querySelector('[data-round-identity-row="true"] [data-round-follow="true"] button');
+    const ctl = v.container.querySelector('[data-round-author-row="true"] [data-round-follow="true"] button');
     expect(ctl).not.toBeNull();
     fireEvent.click(ctl!);
     expect(onFollow).toHaveBeenCalledTimes(1);
