@@ -49,6 +49,8 @@ interface BrowseCourseCardProps {
   onClick: () => void;
   variant?: 'browse' | 'top100';
   rank?: number | null;
+  /** Top 100 community view only: the official rank, printed under the name. */
+  officialRank?: number | null;
   viewerRounds?: number;
   /** Top 100 only: the viewer's best gross here, or null when unknown. */
   viewerBest?: number | null;
@@ -68,6 +70,7 @@ export function BrowseCourseCard({
   onClick,
   variant = 'browse',
   rank = null,
+  officialRank = null,
   viewerRounds = 0,
   viewerBest = null,
   recordHolder = null,
@@ -158,6 +161,11 @@ export function BrowseCourseCard({
             {!top100 ? (
               <div style={{ marginTop: 3, color: PHOTO_MUTE, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {location}
+              </div>
+            ) : null}
+            {top100 && officialRank != null ? (
+              <div style={{ marginTop: 3, color: PHOTO_MUTE, fontSize: 12, whiteSpace: 'nowrap' }}>
+                Official <span style={FIGS}>#{officialRank}</span>
               </div>
             ) : null}
           </div>

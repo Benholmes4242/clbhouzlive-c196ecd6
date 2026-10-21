@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Award, Search, X } from 'lucide-react';
+import { Award, Check, Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import BrowseCourseCard from './BrowseCourseCard';
 import type { StatBrowseRow } from './useStatBrowse';
-import { RailChips, railChipStyle } from '@/components/ui/RailChips';
+import { RailChips, railChipStyle, RailChipTrigger, APPLIED_FILL, RAIL_CHIP_WEIGHT } from '@/components/ui/RailChips';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { communityOrder } from './top100/communityOrder';
 import { PageLoadGate, usePageRevealed, useSectionReady } from './browse/PageLoadGate';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useGolfCoursesInfinite, type SearchedCourseWithRating } from '@/hooks/useGolfCoursesInfinite';
@@ -36,6 +38,20 @@ const LIST_NAMES: Record<string, string> = {
   europe: 'Europe Top 100',
   usa: 'USA Top 100',
 };
+
+type Top100Ranking = 'official' | 'community';
+const RANKING_OPTIONS: Array<{ value: Top100Ranking; label: string }> = [
+  { value: 'official', label: 'Official rating' },
+  { value: 'community', label: 'Community rating' },
+];
+
+function savedRanking(): Top100Ranking {
+  try {
+    return JSON.parse(sessionStorage.getItem('top100-last-filters') ?? '{}')?.ranking === 'community' ? 'community' : 'official';
+  } catch {
+    return 'official';
+  }
+}
 
 function savedList(): string {
   try {
@@ -107,6 +123,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [selectedList, setSelectedList] = useState(savedList);
+  const [ranking, setRanking] = useState<Top100Ranking>(savedRanking);
   const [searchOpen, setSearchOpen] = useState(false);
   const [nameQuery, setNameQuery] = useState('');
   const restored = useRef(false);
@@ -123,8 +140,12 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   const chooseList = (next: string) => {
     restored.current = true;
     chosenThisMount.current = true;
-    sessionStorage.setItem('top100-last-filters', JSON.stringify({ list: next }));
+    sessionStorage.setItem('top100-last-filters', JSON.stringify({ list: next, ranking }));
     setSelectedList(next);
+  };
+  const chooseRanking = (next: Top100Ranking) => {
+    sessionStorage.setItem('top100-last-filters', JSON.stringify({ list: selectedList, ranking: next }));
+    setRanking(next);
   };
 
   const courses = useMemo(() => {
@@ -133,21 +154,50 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   }, [data, renderedList]);
   const ids = useMemo(() => courses.map((course) => course.id), [courses]);
   const { data: enrichment, isLoading: enrichmentLoading } = useTop100Enrichment(ids, user?.id, renderedList);
-  /* Search narrows what is rendered only (client-side, no query). The head's
-     reviewed / tracked meta describes the whole list, so it keeps counting
-     the unfiltered rows. */
   const visibleCourses = useMemo(() => {
     const q = nameQuery.trim().toLowerCase();
     if (!q) return courses;
     return courses.filter((course) => (course.name ?? '').toLowerCase().includes(q));
   }, [courses, nameQuery]);
-  /* COMMUNITY counts: how many of the list ANYONE has rated / played. Not to be
-     confused with the VIEWER counts below (BRIEF_TOP_100_REBUILD §2). */
-  const communityRatedCount = courses.filter((course) => {
+  /* Community order is computed on the FULL list, then search filters each
+     group, so a search never renumbers positions. */
+  const community = useMemo(
+    () => communityOrder(
+      courses,
+      (c) => ({ rating: enrichment.get(c.id)?.rating ?? null, ratingCount: enrichment.get(c.id)?.ratingCount ?? 0 }),
+      (c) => rankFor(c, renderedList),
+      (c) => c.name ?? '',
+    ),
+    [courses, enrichment, renderedList],
+  );
+  const matchesQuery = (course: SearchedCourseWithRating) => {
+    const q = nameQuery.trim().toLowerCase();
+    return !q || (course.name ?? '').toLowerCase().includes(q);
+  };
+  const communityRated = community.rated.filter(({ course }) => matchesQuery(course));
+  const communityUnrated = community.unrated.filter(matchesQuery);
+  const communityPending = enrichmentLoading && !courses.some((course) => enrichment.has(course.id));
+  const renderCard = (course: SearchedCourseWithRating, rank: number | null, gapBelow: boolean, withOfficial: boolean) => {
     const item = enrichment.get(course.id);
-    return item?.rating != null && item.ratingCount > 0;
-  }).length;
-  const communityPlayedCount = courses.filter((course) => (enrichment.get(course.id)?.roundsTracked ?? 0) > 0).length;
+    const row = toBrowseRow(course, item, renderedList);
+    // The id is an anchor with no current consumer, kept for deep links.
+    return (
+      <div key={course.id} id={`top100-card-${course.id}`} style={{ scrollMarginTop: 'max(env(safe-area-inset-top, 0px), 47px)', marginBottom: gapBelow ? TOP100_CARD_GAP : 0 }}>
+        <BrowseCourseCard
+          row={row}
+          variant="top100"
+          rank={rank}
+          officialRank={withOfficial ? rankFor(course, renderedList) : undefined}
+          viewerRounds={item?.yourRounds ?? 0}
+          viewerBest={item?.yourBest ?? null}
+          recordHolder={item?.recordHolder ?? null}
+          players={item?.players ?? []}
+          difficultyPercentile={row.rounds > 0 ? row.difficulty_percentile : null}
+          onClick={() => openCourse(course.id)}
+        />
+      </div>
+    );
+  };
   const heading = LIST_NAMES[renderedList] ?? 'Top 100';
   /* VIEWER counts. Played and the denominator come from the per-list row of
      user_top100_progress_view for the ACTIVE scope — never the global total and
@@ -277,18 +327,71 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
       <section style={{ ...SECTION_WRAP, paddingBottom: 0 }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
           <SectionHead kicker="The list" tone="quiet" title={heading} />
-          <span style={{ color: A.MUTE, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
-            {communityRatedCount} reviewed · {communityPlayedCount} tracked
-          </span>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <RailChipTrigger label={ranking === 'community' ? 'Community rating' : 'Official rating'} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[180px]">
+              {RANKING_OPTIONS.map((opt) => (
+                <DropdownMenuItem
+                  key={opt.value}
+                  onSelect={() => chooseRanking(opt.value)}
+                  className="text-sm"
+                  style={
+                    ranking === opt.value
+                      ? { background: APPLIED_FILL, color: A.INK, fontWeight: RAIL_CHIP_WEIGHT, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }
+                      : undefined
+                  }
+                >
+                  {opt.label}
+                  {ranking === opt.value ? <Check size={14} color={A.INK} aria-hidden /> : null}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
+        {ranking === 'community' ? (
+          <div style={{ marginTop: 8, fontSize: 12, lineHeight: 1.4, color: A.DIM }}>
+            Ranked by clbhouz members' average rating.
+          </div>
+        ) : null}
       </section>
 
       <div style={{ paddingTop: 24 }}>
-        {isLoading ? <Top100CardListShell /> : isError ? (
+        {isLoading || (ranking === 'community' && communityPending) ? <Top100CardListShell /> : isError ? (
           <div style={{ padding: '48px 0', textAlign: 'center', color: A.MUTE }}>
             <Award size={20} aria-hidden />
             <p>Could not load this list.</p>
             <button type="button" onClick={() => refetch()} style={{ color: A.INK, fontWeight: 700 }}>Retry</button>
+          </div>
+        ) : ranking === 'community' ? (
+          <div>
+            {nameQuery.trim().length > 0 && communityRated.length === 0 && communityUnrated.length === 0 ? (
+              <div style={{ padding: '0 16px', color: A.MUTE, fontSize: 13 }}>
+                {`No course on this list matches ${nameQuery.trim()}.`}
+              </div>
+            ) : null}
+            {communityRated.map(({ course, position }, index) =>
+              renderCard(course, position, index < communityRated.length - 1, true))}
+            {communityUnrated.length > 0 ? (
+              <section
+                style={{
+                  ...(communityRated.length > 0 ? { marginTop: 40, borderTop: `1px solid ${A.TRACK}` } : {}),
+                  padding: '20px 16px 0',
+                }}
+              >
+                <SectionHead kicker="Not yet rated" tone="quiet" />
+                <div style={{ marginTop: 8, fontSize: 12, lineHeight: 1.4, color: A.DIM }}>
+                  {`${communityUnrated.length} ${communityUnrated.length === 1 ? 'course' : 'courses'} no member has rated, in official order.`}
+                </div>
+              </section>
+            ) : null}
+            {communityUnrated.length > 0 ? (
+              <div style={{ paddingTop: 24 }}>
+                {communityUnrated.map((course, index) =>
+                  renderCard(course, null, index < communityUnrated.length - 1, true))}
+              </div>
+            ) : null}
           </div>
         ) : (
           <div>
@@ -297,26 +400,8 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
                 {`No course on this list matches ${nameQuery.trim()}.`}
               </div>
             ) : null}
-            {visibleCourses.map((course, index) => {
-              const item = enrichment.get(course.id);
-              const row = toBrowseRow(course, item, renderedList);
-              // The id is an anchor with no current consumer, kept for deep links.
-              return (
-                <div key={course.id} id={`top100-card-${course.id}`} style={{ scrollMarginTop: 'max(env(safe-area-inset-top, 0px), 47px)', marginBottom: index < visibleCourses.length - 1 ? TOP100_CARD_GAP : 0 }}>
-                  <BrowseCourseCard
-                    row={row}
-                    variant="top100"
-                    rank={rankFor(course, renderedList)}
-                    viewerRounds={item?.yourRounds ?? 0}
-                    viewerBest={item?.yourBest ?? null}
-                    recordHolder={item?.recordHolder ?? null}
-                    players={item?.players ?? []}
-                    difficultyPercentile={row.rounds > 0 ? row.difficulty_percentile : null}
-                    onClick={() => openCourse(course.id)}
-                  />
-                </div>
-              );
-            })}
+            {visibleCourses.map((course, index) =>
+              renderCard(course, rankFor(course, renderedList), index < visibleCourses.length - 1, false))}
           </div>
         )}
       </div>
