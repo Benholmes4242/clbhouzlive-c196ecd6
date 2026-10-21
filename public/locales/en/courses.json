@@ -26,15 +26,10 @@
       "sheetBody": "A WHS handicap is what puts you on these boards. You don’t need a club for one.",
       "england": "England",
       "englandSub": "iGolf, from England Golf — a WHS handicap without joining a club.",
-      "scotland": "Scotland",
-      "scotlandSub": "Scottish Golf.",
-      "wales": "Wales",
-      "walesSub": "Wales Golf.",
-      "ireland": "Ireland",
-      "irelandSub": "Golf Ireland.",
-      "anywhere": "Any country",
-      "anywhereSub": "Join a club: full membership, competitions and a home course.",
-      "sheetConnect": "Already have one? Connect it"
+      "sheetConnect": "Already have one? Connect it",
+      "club": "Join a club",
+      "clubSub": "Full membership, competitions and a home course.",
+      "sheetReach": "clbhouz connects {{supported}} today. {{unsupported}} aren’t supported yet."
     },
     "competitions": {
       "eyebrow": "Tournament golf",
@@ -1148,7 +1143,7 @@
         "saidField": "the field at {{courseName}}",
         "saidMid": ", not you. Connect your handicap and ",
         "saidLine": "your own line is drawn straight over it",
-        "saidPost": " \u2014 including every round you played here before you connected."
+        "saidPost": " — including every round you played here before you connected."
       },
       "holeFacts": {
         "hardest": "Hardest hole",
@@ -1176,8 +1171,8 @@
       "grabs": {
         "boardsTitle_one": "{{unclaimed}} board unclaimed",
         "boardsTitle_other": "{{unclaimed}} boards unclaimed",
-        "grossHeld": "Gross record \u2014 {{value}}",
-        "grossHeldThin": "Best card here \u2014 {{value}}",
+        "grossHeld": "Gross record — {{value}}",
+        "grossHeldThin": "Best card here — {{value}}",
         "heldTag": "Held",
         "allBoards": "All boards",
         "held": "{{name}} holds the course record here with {{value}}.",
