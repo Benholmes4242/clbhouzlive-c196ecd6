@@ -59,7 +59,7 @@ const NAME_SHADOW = '0 1px 6px rgba(0,0,0,0.55)';
 const FACT_SHADOW = '0 1px 4px rgba(0,0,0,0.6)';
 
 export function ByRegionSection() {
-  const { user } = useSupabaseSession();
+  const { user, loading: sessionLoading } = useSupabaseSession();
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: truth, isLoading: truthLoading } = useCourseBrowseTruth();
   const home = useHomeClubStatus(user?.id);
@@ -69,21 +69,22 @@ export function ByRegionSection() {
 
   const rotated = useRef<{ lead: string | null; names: string[] } | null>(null);
   const regions = truth?.regions ?? [];
-  const loading = truthLoading || home.isLoading || homeRegionQuery.isLoading;
+  const loading = sessionLoading || truthLoading || home.isLoading || homeRegionQuery.isLoading;
   if (regions.length === 0) return loading ? <ByRegionShell /> : null;
 
   const lead = homeRegion ? regions.find((r) => r.region === homeRegion) ?? null : null;
-  // Once per visit: the first pick after everything loads is held for the mount.
-  if (!rotated.current && !loading) {
+  // Once per visit, but the held pick must belong to the lead it was picked for.
+  if (!loading && (!rotated.current || rotated.current.lead !== (lead?.region ?? null))) {
     const pool = [...regions].filter((r) => r !== lead).sort((a, b) => b.rounds - a.rounds).slice(0, REGION_POOL);
     const picked = pickRotating(pool, (r) => r.region, readRotationIds(REGION_LAST_KEY), lead ? REGIONS_WITH_LEAD : REGIONS_NO_LEAD);
     rotated.current = { lead: lead?.region ?? null, names: picked.map((r) => r.region) };
     writeRotationIds(REGION_LAST_KEY, rotated.current.names);
   }
   const held = rotated.current;
-  const rest = held
+  // Never more than lead + 4, or 5 (DEVICE_REVISION par 4); guards against a pick held from before the lead resolved.
+  const rest = (held
     ? held.names.map((n) => regions.find((r) => r.region === n)).filter((r): r is BrowseRegion => !!r && r !== lead)
-    : [];
+    : []).slice(0, lead ? REGIONS_WITH_LEAD : REGIONS_NO_LEAD);
   const tiles: Array<{ r: BrowseRegion; lead: boolean }> = [
     ...(lead ? [{ r: lead, lead: true }] : []),
     ...rest.map((r) => ({ r, lead: false })),

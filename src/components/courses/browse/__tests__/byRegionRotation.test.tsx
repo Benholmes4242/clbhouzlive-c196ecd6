@@ -4,10 +4,10 @@ import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { BrowseRegion } from '../../useStatBrowse';
 
-const s = vi.hoisted(() => ({ regions: [] as BrowseRegion[], clubId: null as string | null, homeRegion: null as string | null }));
+const s = vi.hoisted(() => ({ regions: [] as BrowseRegion[], clubId: null as string | null, homeRegion: null as string | null, session: { user: { id: 'u' } as { id: string } | null, loading: false } }));
 vi.mock('../../useStatBrowse', () => ({ useCourseBrowseTruth: () => ({ data: { regions: s.regions }, isLoading: false }) }));
 vi.mock('../PageLoadGate', () => ({ useSectionReady: () => {} }));
-vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'u' } }) }));
+vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => s.session }));
 vi.mock('@/features/home-club/useHomeClubStatus', () => ({ useHomeClubStatus: () => ({ clubId: s.clubId, isLoading: false }) }));
 vi.mock('@/features/home-club/homeClubPickerStore', () => ({ openHomeClubPicker: () => {} }));
 vi.mock('@/integrations/supabase/client', () => {
@@ -21,9 +21,10 @@ import { ByRegionSection, REGION_LAST_KEY } from '../ByRegionSection';
 
 const region = (i: number): BrowseRegion => ({ region: `Region ${i}`, subCountry: null, courses: 3, rounds: 100 - i, avgToPar: 5, imageUrl: null, imageCourseId: `c${i}`, imageCourseName: null });
 const draw = () => render(<MemoryRouter><QueryClientProvider client={new QueryClient()}><ByRegionSection /></QueryClientProvider></MemoryRouter>);
+const tree = (client: QueryClient) => <MemoryRouter><QueryClientProvider client={client}><ByRegionSection /></QueryClientProvider></MemoryRouter>;
 const names = (c: HTMLElement) => Array.from(c.querySelectorAll('section button[type="button"]')).map((b) => b.textContent ?? '').filter((t) => t.includes('Region'));
 
-beforeEach(() => { localStorage.clear(); s.regions = Array.from({ length: 11 }, (_, i) => region(i)); s.clubId = null; s.homeRegion = null; });
+beforeEach(() => { localStorage.clear(); s.regions = Array.from({ length: 11 }, (_, i) => region(i)); s.clubId = null; s.homeRegion = null; s.session = { user: { id: 'u' }, loading: false }; });
 
 describe('ByRegionSection rotation', () => {
   it('the lead is always the home region with Your patch, never in the rotated set', async () => {
@@ -49,5 +50,30 @@ describe('ByRegionSection rotation', () => {
     const buttons = Array.from(view.container.querySelectorAll<HTMLButtonElement>('section > div > button'));
     expect(buttons).toHaveLength(5);
     expect(buttons[4].style.gridColumn).toBe('span 2');
+  });
+  it('a lead arriving after the first pick re-picks to one large plus four', async () => {
+    const client = new QueryClient();
+    const view = render(tree(client));
+    expect(names(view.container)).toHaveLength(5);
+    s.clubId = 'club'; s.homeRegion = 'Region 7';
+    view.rerender(tree(client));
+    await view.findByText('Your patch');
+    const tiles = names(view.container);
+    expect(tiles).toHaveLength(5);
+    expect(tiles[0]).toContain('Your patch');
+    expect(tiles[0]).toContain('Region 7');
+    expect(tiles.slice(1).some((t) => t.includes('Region 7'))).toBe(false);
+  });
+  it('waits for the session before picking', async () => {
+    s.clubId = 'club'; s.homeRegion = 'Region 7';
+    s.session = { user: null, loading: true };
+    const client = new QueryClient();
+    const view = render(tree(client));
+    s.session = { user: { id: 'u' }, loading: false };
+    view.rerender(tree(client));
+    await view.findByText('Your patch');
+    const tiles = names(view.container);
+    expect(tiles).toHaveLength(5);
+    expect(tiles[0]).toContain('Your patch');
   });
 });
