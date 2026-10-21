@@ -71,7 +71,7 @@ describe('BRIEF_SCORE_LABEL_SPACING — review post overall score', () => {
     },
   } as never;
 
-  it('lifts the tier word to the same 4px gap as the categories', () => {
+  it('places the review post tier word at B2’s 6px gap', () => {
     const { container } = render(
       <MemoryRouter>
         <QueryClientProvider client={new QueryClient()}>
@@ -88,6 +88,6 @@ describe('BRIEF_SCORE_LABEL_SPACING — review post overall score', () => {
     );
     const tier = container.querySelector<HTMLElement>('[data-review-tier]');
     expect(tier).not.toBeNull();
-    expect(tier!.style.marginTop).toBe('4px');
+    expect(tier?.style.marginTop).toBe('6px');
   });
 });
