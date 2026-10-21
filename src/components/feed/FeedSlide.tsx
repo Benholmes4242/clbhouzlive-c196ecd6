@@ -1797,14 +1797,6 @@ const FullscreenMediaPager: React.FC<{
                 isActivePage={isActivePage}
                 isSlideActive={isSlideActive}
                 isSuggestedFeed={isSuggestedFeed}
-                pageCount={media.length}
-                onAdvance={() => {
-                  const el = scrollerRef.current;
-                  if (!el || !el.clientWidth) return;
-                  // Pager already moved on → ignore the stale end.
-                  if (Math.round(el.scrollLeft / el.clientWidth) !== i) return;
-                  el.scrollTo({ left: (i + 1) * el.clientWidth, behavior: 'smooth' });
-                }}
                 onFirstFrameReady={isActivePage ? onFirstFrameReady : undefined}
                 onZoomChange={isActivePage ? onZoomChange : undefined}
               />
@@ -1833,11 +1825,9 @@ const FullscreenPagerPage: React.FC<{
   isActivePage: boolean;
   isSlideActive: boolean;
   isSuggestedFeed: boolean;
-  pageCount: number;
-  onAdvance: () => void;
   onFirstFrameReady?: () => void;
   onZoomChange?: (zoomed: boolean) => void;
-}> = ({ post, media: m, pageIdx, openIdx, ownerKey, isActivePage, isSlideActive, pageCount, onAdvance, onFirstFrameReady, onZoomChange }) => {
+}> = ({ post, media: m, pageIdx, openIdx, ownerKey, isActivePage, isSlideActive, onFirstFrameReady, onZoomChange }) => {
   const { ref: zoomRef, imgRef, style: zoomStyle, scale: zoomScale, reset: resetZoom } =
     usePinchZoomPointer();
 
@@ -1890,8 +1880,8 @@ const FullscreenPagerPage: React.FC<{
           allowBorrow={pageIdx === openIdx}
           mediaW={m.width ?? 0}
           mediaH={m.height ?? 0}
-          loop={!(pageCount > 1 && pageIdx < pageCount - 1)}
-          onEnded={isActivePage ? onAdvance : undefined}
+          // Carousel videos loop and never auto-advance; members swipe on, as with photos (founder decision).
+          loop={true}
         />
       );
     }
