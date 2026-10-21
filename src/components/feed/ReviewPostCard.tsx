@@ -158,19 +158,19 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         </div>
       </div>
 
-      {/* D — B2's open score block. Each half drops independently. */}
+      {/* D — Sizes match the course card score block (BRIEF_COURSE_CARD_SCORE_BLOCK option B): overall 24, labels 11, figures 13, gaps 14 / 16 / 8. Each half drops independently. */}
       {rating != null || anyScore ? (
-        <div data-review-score-block style={{ flex: 'none', padding: `0 ${GUTTER}px 14px`, display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div data-review-score-block style={{ flex: 'none', padding: `0 ${GUTTER}px 14px`, display: 'flex', alignItems: 'center', gap: 14 }}>
         {rating != null ? (
-        <div data-review-score-col style={{ flex: '0 0 auto', paddingRight: 16, borderRight: `1px solid ${A.TRACK}`, textAlign: 'center' }}>
+        <div data-review-score-col style={{ flex: '0 0 auto', paddingRight: 14, borderRight: `1px solid ${A.TRACK}`, textAlign: 'center' }}>
           <div
             data-review-score
             className="tabular-nums"
-            style={{ ...FIGS, fontSize: 30, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.045em', color: reviewLabelColor(rating) }}
+            style={{ ...FIGS, fontSize: 24, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.045em', color: reviewLabelColor(rating) }}
           >
             {formatRatingValue(rating)}
           </div>
-          <div data-review-tier style={{ marginTop: 6, lineHeight: 1 }}>
+          <div data-review-tier style={{ marginTop: 5, lineHeight: 1 }}>
             <ReviewVerdictLabel
               rating={rating}
               fontSize={9}
@@ -181,13 +181,13 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         </div>
         ) : null}
         {anyScore ? (
-          <div data-review-categories style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 18, rowGap: 10 }}>
+          <div data-review-categories style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 16, rowGap: 8 }}>
             {SCORE_ORDER.map((key) => {
               const value = scores[key];
               return (
-                <div key={key} data-category={key} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                  <span data-category-label style={{ fontSize: 12, color: A.MUTE }}>{SCORE_LABELS[key]}</span>
-                  <span data-category-figure data-category-score={value == null ? undefined : value.toFixed(1)} className="tabular-nums" style={{ ...FIGS, fontSize: 14, fontWeight: 700, color: value == null ? A.DIM : courseSubScoreTone(value) }}>
+                <div key={key} data-category={key} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', minWidth: 0 }}>
+                  <span data-category-label style={{ fontSize: 11, color: A.MUTE, whiteSpace: 'nowrap' }}>{SCORE_LABELS[key]}</span>
+                  <span data-category-figure data-category-score={value == null ? undefined : value.toFixed(1)} className="tabular-nums" style={{ ...FIGS, fontSize: 13, fontWeight: 700, color: value == null ? A.DIM : courseSubScoreTone(value) }}>
                     {value == null ? '\u2014' : value.toFixed(1)}
                   </span>
                 </div>

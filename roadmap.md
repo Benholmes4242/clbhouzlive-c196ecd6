@@ -1,5 +1,9 @@
 # Roadmap
 
+## BRIEF_REVIEW_POST_SCORE_MATCH_CARDS
+- [ ] Compact block D only to option B sizes/spacing; preserve tones, verdict, dashes, drop rules and navigation. Update only the two authorised score-size test cases and add requested spacing assertions.
+- [ ] Run full suite and report inventory against2,060 passed+3 failed/279 files; existing divider and CB27 failures remain outside scope. Verify preview status and report any additional protected-test failure without editing it.
+
 ## BRIEF_COURSE_CARD_SCORE_BLOCK — stopped at validation
 - [x] Moved BrowseCourseCard headline/count below unchanged photography into opt-in CategoryScores split; preserved grid4/pairs, canonical tones and frozen photo elements. Facts use 10/8px seams and 13px embedded figures; both shared card-gap constants are 24px.
 - [x] Added categoryScoresSplit.test.tsx with six cases. No existing test deleted, renamed, rewritten or assertion changed; courseRatingConsistency.test.ts unedited and all 19 cases pass. Preview build OK 2026-10-21T12:33:26Z. No SQL/migrations/RPC/feed_config/cap changes.

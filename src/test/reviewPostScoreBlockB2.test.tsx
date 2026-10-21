@@ -32,15 +32,21 @@ describe('review post score block B2', () => {
     expect(element('[data-review-subject]').querySelector('[data-review-score]')).toBeNull();
     expect(element('[data-review-score-block]').querySelector('[data-review-score]')).toBeTruthy();
   });
-  it('renders the overall at 30 / 800 in its rating tone with a right divider', () => {
+  it('renders the overall at 24 / 800 in its rating tone with a right divider', () => {
     const { element } = card(9);
     const score = element('[data-review-score]');
-    expect(score.style.fontSize).toBe('30px');
+    expect(score.style.fontSize).toBe('24px');
     expect(score.style.fontWeight).toBe('800');
     expect(score.style.color).toBe(rgb(reviewLabelColor(9)));
     expect(element('[data-review-score-col]').style.borderRightWidth).toBe('1px');
     expect(element('[data-review-score-col]').style.borderRightStyle).toBe('solid');
     expect(element('[data-review-score-col]').style.borderRightColor.replace(/\s/g, '')).toBe(rgb(A.TRACK).replace(/\s/g, ''));
+    expect(element('[data-review-score-block]').style.gap).toBe('14px');
+    expect(element('[data-review-score-col]').style.paddingRight).toBe('14px');
+    expect(element('[data-review-categories]').style.columnGap).toBe('16px');
+    expect(element('[data-review-categories]').style.rowGap).toBe('8px');
+    expect(element('[data-category-label]').style.fontSize).toBe('11px');
+    expect(element('[data-category-figure]').style.fontSize).toBe('13px');
   });
   it('keeps a two-column grid with green 9.5 and muted 8.9 figures', () => {
     const { element } = card(9);

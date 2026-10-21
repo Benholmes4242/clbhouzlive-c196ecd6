@@ -23,9 +23,9 @@ const card = (rating: number) => render(
 ).container;
 
 describe('review post — B2 score below the course', () => {
-  it('the score figure is 30 / 800 / -0.045em', () => {
+  it('the score figure is 24 / 800 / -0.045em', () => {
     const s = card(8.2).querySelector('[data-review-score]') as HTMLElement;
-    expect(s.style.fontSize).toBe('30px');
+    expect(s.style.fontSize).toBe('24px');
     expect(s.style.fontWeight).toBe('800');
     expect(s.style.letterSpacing).toBe('-0.045em');
   });
