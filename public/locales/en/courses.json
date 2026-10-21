@@ -32,7 +32,7 @@
       "bodyCount_one": "{{count}} round",
       "bodyCount_other": "{{count}} rounds",
       "bodyRestCircle": "posted in your circle in the last fortnight. None of them yours.",
-      "bodyRestClub": "posted at your club in the last fortnight. None of them yours.",
+      "bodyRestClub": "posted by your club in the last fortnight. None of them yours.",
       "bodyRestEveryone": "posted across clbhouz in the last fortnight. None of them yours.",
       "cta": "Connect your handicap",
       "noHandicap": "I don’t have a handicap",
