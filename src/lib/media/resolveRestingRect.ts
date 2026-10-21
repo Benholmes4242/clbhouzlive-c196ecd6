@@ -11,6 +11,7 @@
  *   Examples: 9:16 portrait = 0.5625, 1:1 square = 1.0, 16:9 landscape = 1.78.
  *
  * Ratified product rule: NOTHING IS EVER CROPPED IN THE FULLSCREEN VIEWER.
+ *   the bottom of the usable area is the comment band (fullscreenBand.ts), not just the home indicator.
  *   • VIDEO and IMAGES both rest CONTAIN, centred inside the SAFE area so the
  *     letterbox bars clear the notch / home indicator. `mediaType` no longer
  *     affects the outcome (kept in the signature for call-site stability).
@@ -21,6 +22,7 @@
  * the whole frame is visible. A caller may re-invoke on `loadedmetadata` and
  * animate a corrective tween to the exact rect.
  */
+import { bandHeightPx } from './fullscreenBand';
 
 export interface Viewport {
   w: number;
@@ -135,6 +137,7 @@ export function readSafeAreaInsets(): Insets {
 }
 
 /** Convenience: build a Viewport for the current window.
+ * safeBottom includes the fullscreen comment band; callers are fullscreen media paths.
  *
  * iOS/WKWebView: window.innerHeight is the layout viewport, which can lag
  * the visible viewport during boot, dynamic-toolbar transitions, and
@@ -155,6 +158,7 @@ export function getCurrentViewport(): Viewport {
     w: hasWin ? (vvSane ? vv!.width : window.innerWidth) : 0,
     h: hasWin ? (vvSane ? vv!.height : window.innerHeight) : 0,
     ...insets,
+    safeBottom: bandHeightPx(insets.safeBottom),
   };
 }
 

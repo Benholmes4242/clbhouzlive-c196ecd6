@@ -16,7 +16,7 @@ import type { LaneId } from '@/video/lanePolicy';
 import { expectedOwnerKey, formatClock, fractionFromX, ownerMatches } from './scrubberMath';
 
 const FILLED = 'rgba(255,255,255,0.95)';
-const EMPTY = 'rgba(255,255,255,0.26)';
+const EMPTY = 'rgba(255,255,255,0.22)';
 
 function clampSlide(activePost: FeedPost | null | undefined, activeSlide: number | null | undefined): number {
   const n = activePost?.mediaItems?.length ?? 0;
@@ -210,7 +210,7 @@ export const FullscreenVideoScrubber: React.FC<Props> = ({ activePost, bottom, o
         onClick={(e) => e.stopPropagation()}
         onKeyDown={onKeyDown}
         style={{
-          position: 'fixed', left: 16, right: 16, bottom, height: 32,
+          position: 'fixed', left: 0, right: 0, bottom, height: 32,
           display: 'flex', alignItems: 'center',
           pointerEvents: 'auto', touchAction: 'none',
           zIndex: Z.echo,
@@ -219,14 +219,14 @@ export const FullscreenVideoScrubber: React.FC<Props> = ({ activePost, bottom, o
         <div
           ref={trackRef}
           style={{
-            width: '100%', height: dragging ? 5 : 3, borderRadius: 99,
+            width: '100%', height: dragging ? 4 : 2, borderRadius: 0,
             background: EMPTY, position: 'relative',
             transition: 'height 120ms ease',
           }}
         >
           <div
             style={{
-              height: '100%', borderRadius: 99, background: FILLED,
+              height: '100%', borderRadius: 0, background: FILLED,
               width: total > 0 ? 'calc(var(--fs-progress, 0) * 100%)' : 0,
             }}
           />
