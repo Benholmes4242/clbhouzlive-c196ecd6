@@ -302,7 +302,8 @@ function gridFor(ranked: boolean): string {
 }
 
 /** The sheet's column labels. The lead board has none (9.9). */
-export function BoardHeaderRow({ board }: { board: BoardKey }) {
+/** CB20 — `flush`: the parent (a Section) already owns the gutter, so the row adds no horizontal padding. Default keeps the sheet's inset. */
+export function BoardHeaderRow({ board, flush }: { board: BoardKey; flush?: boolean }) {
   const { t } = useTranslation('courses');
   const cols = boardColumns(board);
   const cap: React.CSSProperties = {
@@ -319,7 +320,7 @@ export function BoardHeaderRow({ board }: { board: BoardKey }) {
         gridTemplateColumns: gridFor(cols.ranked),
         columnGap: M.colGap,
         alignItems: 'center',
-        padding: `0 ${M.padX}px 6px`,
+        padding: `0 ${flush ? 0 : M.padX}px 6px`,
         /* Hairline clause: labels from data. */
         borderBottom: `1px solid ${A.BORDER}`,
       }}
@@ -338,12 +339,12 @@ export function BoardHeaderRow({ board }: { board: BoardKey }) {
 }
 
 /** 9.8 — the day-ladder separator, feed grammar only. */
-export function BoardDaySeparator({ label }: { label: string }) {
+export function BoardDaySeparator({ label, flush }: { label: string; flush?: boolean }) {
   return (
     <div
       data-board-day
       style={{
-        padding: `12px ${M.padX}px 7px`,
+        padding: `12px ${flush ? 0 : M.padX}px 7px`,
         fontFamily: SANS,
         fontSize: 9.5,
         fontWeight: 800,
@@ -373,6 +374,7 @@ export function BoardRowView({
   gap,
   pinned,
   onPress,
+  flush,
 }: {
   row: Row;
   board: BoardKey;
@@ -382,6 +384,8 @@ export function BoardRowView({
   /** The pinned self row: a 12px break above it (9.13). */
   pinned?: boolean;
   onPress?: (row: Row) => void;
+  /** CB20 — no horizontal padding: the parent Section owns the gutter. */
+  flush?: boolean;
 }) {
   const { t, i18n } = useTranslation('courses');
   const value = boardValue(row, board, t as never);
@@ -418,7 +422,7 @@ export function BoardRowView({
         gridTemplateColumns: gridFor(ranked),
         columnGap: M.colGap,
         alignItems: 'center',
-        padding: `${M.padY}px ${M.padX}px`,
+        padding: `${M.padY}px ${flush ? 0 : M.padX}px`,
         marginTop: pinned ? M.pinnedGap : 0,
         background: isSelf ? SELF_ROW_TINT : 'transparent',
         border: 'none',
