@@ -1,8 +1,8 @@
 # Roadmap
 
 ## BRIEF_TOP_TEN_OWNER_NAME_LABEL — Row score centring follow-up
-- [ ] Preserve the implemented owner-name helper and labels; centre both row score columns with column flex, minWidth 42 and non-wrapping figures/labels, leaving photo pills and all other presentation unchanged.
-- [ ] Add the requested row-column render case, run the full suite and reconcile counts against 1,987 passing / 264 files; report any existing assertion changes and verification limits.
+- [x] Preserved owner-name helper and labels; both row score columns now use display flex, flexDirection column, alignItems center, minWidth 42 and flexShrink 0; figures and labels use whiteSpace nowrap. Photo pills, font sizes/weights/spacing/colours, header and other strings unchanged. Local helper header corrected to describe minimum-width rows rather than fixed-width rows.
+- [x] Full `bunx vitest run`: 1,987 passing / 264 files before -> 1,988 passing / 264 files after, zero failures. Delta +1 solely `src/test/topTenOwnerLabelRender.test.tsx`: `both row score columns centre non-wrapping figures and labels with a 42px minimum` asserts flex/column/center/minWidth 42px/flexShrink 0, no fixed width and non-wrapping children. No existing test deleted, renamed, rewritten or assertion changed; topTenTileWidth untouched. Preview build OK 2026-10-21T08:40:10Z. Browser at 415x970 redirects the actual profile to /auth, zero page errors; screenshot reviewed, authenticated visual centring remains unverified on external_unmanaged Supabase. No SQL/migrations/RPC/feed_config/cap changes.
 
 ## BRIEF_TOP_TEN_OWNER_NAME_LABEL — The score label reads the owner's name
 - [x] `ownerScoreLabel` exported from ProfileTopTenRail.tsx: trim, empty/null -> null, over nine characters -> first eight + `\u2026`. `pillKicker` is now `isOwnProfile ? t('topTen.you','You') : (ownerScoreLabel(ownerName) ?? t('topTen.them','Them'))`, so one value feeds the glass pill on tiles 1-3 and the label under the score in rows 4-10. Uppercase styling, sizes, colours and layout unchanged; header sentence and every other string untouched; `topTen.them` kept as fallback.
