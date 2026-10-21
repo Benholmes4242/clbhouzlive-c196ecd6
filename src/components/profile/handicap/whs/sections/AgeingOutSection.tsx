@@ -46,7 +46,7 @@ const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number
   };
 
   return (
-    <section style={{ marginTop: 34 }}>
+    <section style={{ marginTop: 34, padding: '0 20px' }}>
       <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: CHART.AMBER }}>
         {t('common:handicap.ageingOut.kicker')}
       </div>
