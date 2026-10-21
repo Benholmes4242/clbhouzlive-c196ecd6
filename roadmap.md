@@ -1,9 +1,9 @@
 # Roadmap
 
 ## CB24 — Remove Top 100 basis line
-- [ ] Remove basis call/component and only audited unused keys/tokens; preserve CB23 and every frozen surface.
-- [ ] Update only authorised heights assertions: signed-out 334→288, signed-in 522→476; report arithmetic and full suite counts from 2,005/269.
-- [ ] Compare before/after signed-in/out rendered heights, review section screenshot, and report lost subline explanation and cleanup.
+- [x] Removed basis call/component, THE_HUNDRED.basis, HUNDRED_BASIS_HEIGHT and unused en/en-XA key; retained RANK_SCOPE_LABEL (page chips/slab/sheet still read it), Trans and blockGap. CB23 and frozen surfaces untouched; local comments updated.
+- [x] Only authorised theHundred.test.ts:57/58 heights assertions changed 334→288 and 522→476; head119+rows144+See-all25=288, signed-in adds slab100+strip88=476. Full bunx vitest run baseline and after 2,005/269, zero failures and no inventory delta; no other assertion edits/deletions/renames/additions.
+- [x] Reviewed synthetic actual-section screenshot at 394×970: out rendered331.234375→285.890625, in520.015625→474.671875, pending519.234375→473.890625. Render reduction45.34375 versus reserved46 reflects paragraph33.34375+gap12 versus rounded lines34+12; no compensation. Saved CB24_report.md and CB24_synthetic_section.png. Bare latest-course subline now unexplained intentionally; no replacement elsewhere on page/sheet. Locale JSON parses, cleanup refs absent, final preview build OK11:03:56Z; no SQL/migrations/RPC/feed_config/cap changes.
 - [ ] Authenticated live-data check unavailable under external_unmanaged; distinguish controlled section evidence from real member data.
 
 ## CB23 — Remove Top 100 sub-head
