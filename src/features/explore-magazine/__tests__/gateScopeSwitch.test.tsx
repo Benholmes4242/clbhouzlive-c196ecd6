@@ -33,7 +33,7 @@ import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSe
 import { DEFAULT_FILTERS, type BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 import { A } from '@/components/explore-tab-new/courseled/tokens';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
-import { fireEvent, waitFor } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
 import { FiltersPill } from '@/features/explore-magazine/ScoresFilterHead';
 import { OFFERED_RANKING_BOARD_KEYS, boardValueIsFigure } from '@/components/explore-tab-new/courseled/boardFilters';
 import { makeBoardState } from '@/test/factories/boardState';
