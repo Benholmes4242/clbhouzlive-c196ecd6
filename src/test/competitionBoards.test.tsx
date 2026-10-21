@@ -90,7 +90,8 @@ describe('CB1 competition boards', () => {
     await waitFor(() => expect(q('[data-competition-card]').length).toBe(1));
     fireEvent.click(screen.getByRole('button', { name: 'See all members' }));
     await waitFor(() => expect(q('[data-competition-field]').length).toBe(1));
-    const subtitle = q('[data-competition-field]')[0].querySelector('h2 + div')!;
+    const subtitle = document.querySelector('#competition-field-title + div');
+    if (!subtitle) throw new Error('Missing competition sheet subtitle');
     expect(subtitle.textContent).toContain('Competition');
     expect(subtitle.querySelectorAll('svg').length).toBe(1);
   });
@@ -103,7 +104,7 @@ describe('CB1 competition boards', () => {
     fireEvent.click(screen.getByRole('button', { name: 'See all members' }));
     await waitFor(() => expect(q('[data-competition-field]').length).toBe(1));
     expect(screen.getAllByText(limit)).toHaveLength(1);
-    expect(q('[data-competition-field]')[0]).toContainElement(screen.getByText(limit));
+    expect(screen.getByRole('dialog')).toContainElement(screen.getByText(limit));
     expect(q('[data-competition-card]')[0]).not.toContainElement(screen.getByText(limit));
   });
 });
