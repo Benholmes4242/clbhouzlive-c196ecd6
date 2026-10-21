@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +14,7 @@ import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { fmtToPar, playsToPar, plural } from './format';
 import { useSectionReady } from './PageLoadGate';
 import { ByRegionShell } from './sectionShells';
+import { pickRotating, readRotationIds, writeRotationIds } from './rotation';
 
 /**
  * SECTION 02 — BY REGION (BRIEF_COURSES_PAGE_REBUILD §4, amended by
@@ -29,6 +31,9 @@ export const REGION_LEAD_H = 168;
 export const REGION_TILE_H = 122;
 export const REGION_GAP = 2;
 export const REGION_TILES_NO_LEAD = REGIONS_NO_LEAD;
+/** Non-lead tiles rotate per visit from the top REGION_POOL by rounds. */
+export const REGION_POOL = 16;
+export const REGION_LAST_KEY = 'courses.regionTiles.last';
 
 
 /** The member's home region: primary_club_id → golf_courses.club_id → region. */
@@ -62,12 +67,23 @@ export function ByRegionSection() {
   const homeRegion = homeRegionQuery.data ?? null;
   useSectionReady('byRegion', !homeRegionQuery.isLoading && !truthLoading && !home.isLoading);
 
+  const rotated = useRef<{ lead: string | null; names: string[] } | null>(null);
   const regions = truth?.regions ?? [];
   const loading = truthLoading || home.isLoading || homeRegionQuery.isLoading;
   if (regions.length === 0) return loading ? <ByRegionShell /> : null;
 
   const lead = homeRegion ? regions.find((r) => r.region === homeRegion) ?? null : null;
-  const rest = [...regions].filter((r) => r !== lead).sort((a, b) => b.rounds - a.rounds).slice(0, lead ? REGIONS_WITH_LEAD : REGIONS_NO_LEAD);
+  // Once per visit: the first pick after everything loads is held for the mount.
+  if (!rotated.current && !loading) {
+    const pool = [...regions].filter((r) => r !== lead).sort((a, b) => b.rounds - a.rounds).slice(0, REGION_POOL);
+    const picked = pickRotating(pool, (r) => r.region, readRotationIds(REGION_LAST_KEY), lead ? REGIONS_WITH_LEAD : REGIONS_NO_LEAD);
+    rotated.current = { lead: lead?.region ?? null, names: picked.map((r) => r.region) };
+    writeRotationIds(REGION_LAST_KEY, rotated.current.names);
+  }
+  const held = rotated.current;
+  const rest = held
+    ? held.names.map((n) => regions.find((r) => r.region === n)).filter((r): r is BrowseRegion => !!r && r !== lead)
+    : [];
   const tiles: Array<{ r: BrowseRegion; lead: boolean }> = [
     ...(lead ? [{ r: lead, lead: true }] : []),
     ...rest.map((r) => ({ r, lead: false })),
