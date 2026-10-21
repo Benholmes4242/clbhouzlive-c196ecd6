@@ -23,9 +23,14 @@
  *       an inset glass pill 44px tall floating above the bottom edge. When it
  *       renders, the author column and rail clear it by COMMENT_BAR_BLOCK;
  *       when it does not, they sit on the safe-area floor. There are no
- *       bottom carousel dots and no bottom scrubber bar.
+ *       bottom carousel dots.
+ *     - VIDEO SCRUBBER: FullscreenVideoScrubber, a draggable 32px hit area at
+ *       bottomAnchor(SCRUBBER_GAP), shown only on a video slide
+ *       (showsVideoScrubber). The author column and rail lift to clear it.
+ *       While dragging, the author column, rail and top row fade to 0 and the
+ *       comment bar to 0.35.
  *   TOP STRIP: FullscreenTopProgress — a segmented strip carrying carousel
- *   position and video progress (not draggable; no seeking). The top chrome
+ *   position only (2+ items; not draggable; no seeking). The top chrome
  *   row is pushed down to clear it whenever it renders (showsTopProgress).
  *
  * THE COMMENT BAR IS A BUTTON, NOT AN INPUT. It opens CommentsSheetV2 with its
@@ -49,6 +54,10 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { FullscreenTopProgress, showsTopProgress } from './FullscreenTopProgress';
+import { FullscreenVideoScrubber, showsVideoScrubber } from './FullscreenVideoScrubber';
+
+const SCRUBBER_H = 32;
+const SCRUBBER_GAP = 6;
 import { useVideoProgressWriter } from '@/video/useVideoProgressWriter';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
@@ -369,6 +378,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const activeSlide = mediaCount > 0 && carouselSlide < mediaCount ? carouselSlide : 0;
   const activeMediaIsVideo =
     mediaCount > 0 && activePost?.mediaItems?.[activeSlide]?.type === 'video';
+  const [scrubbing, setScrubbing] = useState(false);
 
 
 
@@ -473,6 +483,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     ? `calc(${COMMENT_BAR_BLOCK} + ${gap}px)`
     : `calc(max(env(safe-area-inset-bottom, 0px), 24px) + ${gap}px)`;
   const showTopStrip = showsTopProgress(activePost);
+  const showScrubber = showsVideoScrubber(activePost, activePagerIdx ?? 0);
+  const stackBottom = bottomAnchor(showScrubber ? SCRUBBER_GAP + SCRUBBER_H + 8 : 26);
+  const fadeWhileScrubbing: React.CSSProperties = scrubbing
+    ? { opacity: 0, transition: 'opacity 150ms', pointerEvents: 'none' }
+    : { opacity: 1, transition: 'opacity 150ms' };
   const likeStr = formatCount(likeState.count);
   const commentStr = formatCount(commentCount);
   const timeLabel = timeAgo(activePost.createdAt);
@@ -523,7 +538,14 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   return (
     <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
-      <FullscreenTopProgress activePost={activePost} />
+      <div style={{ ...fadeWhileScrubbing, pointerEvents: 'none' }}>
+        <FullscreenTopProgress activePost={activePost} />
+      </div>
+      <FullscreenVideoScrubber
+        activePost={activePost}
+        bottom={bottomAnchor(SCRUBBER_GAP)}
+        onDraggingChange={setScrubbing}
+      />
       {/* Top scrim removed — chrome sits directly on the blurred media
           backdrop. Text/icons carry their own drop-shadow for legibility. */}
       <div
@@ -538,6 +560,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           paddingLeft: 'max(14px, env(safe-area-inset-left, 0px))',
           paddingRight: 'max(14px, env(safe-area-inset-right, 0px))',
           paddingBottom: 10,
+          ...fadeWhileScrubbing,
           display: 'flex',
           alignItems: 'flex-start',
           justifyContent: 'space-between',
@@ -656,11 +679,12 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
       <div
         style={{
           position: 'fixed',
-          bottom: bottomAnchor(26),
+          bottom: stackBottom,
           left: 'max(14px, env(safe-area-inset-left, 0px))',
           right: 64, // reserve space for right rail
           zIndex: Z.echo,
           pointerEvents: 'none',
+          ...fadeWhileScrubbing,
           fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           display: 'flex',
           alignItems: 'flex-start',
@@ -800,10 +824,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         style={{
           position: 'fixed',
           right: 'max(12px, env(safe-area-inset-right, 0px))',
-          bottom: bottomAnchor(26),
+          bottom: stackBottom,
           zIndex: Z.echo,
           display: 'flex', flexDirection: 'column', alignItems: 'center',
           gap: 20, pointerEvents: 'none',
+          ...fadeWhileScrubbing,
           fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         }}
       >
@@ -868,6 +893,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             border: '1px solid rgba(255,255,255,0.12)',
             padding: '0 5px', margin: 0,
             cursor: 'pointer', pointerEvents: 'auto', textAlign: 'left',
+            opacity: scrubbing ? 0.35 : 1, transition: 'opacity 150ms',
             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           }}
         >
