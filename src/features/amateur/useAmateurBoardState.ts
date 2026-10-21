@@ -87,6 +87,16 @@ export function entryBoardFor(): BoardKey {
  *  never tested. Reorder here, nowhere else. */
 export const LANDING_SCOPES: ScopeKey[] = ['circle', 'club', 'everyone'];
 
+/** CB39 — a probed rung is chosen only if its pool carries at least this many
+ *  rounds (pool_rounds from the probe's own read), alongside the
+ *  CIRCLE_ROW_FLOOR row test. Everyone is the floor and is never tested. */
+export const GATE_SCOPE_MIN_ROUNDS = 5;
+
+/** CB39 — one rung's pass test: enough rows to be a board AND enough rounds. */
+export function rungCarries(data: { rows: unknown[]; pool: { rounds: number } } | null | undefined): boolean {
+  return (data?.rows.length ?? 0) >= CIRCLE_ROW_FLOOR && (data?.pool.rounds ?? 0) >= GATE_SCOPE_MIN_ROUNDS;
+}
+
 /** Everything EXCEPT scope. Scope arrives from the LANDING_SCOPES ladder. */
 export const ENTRY_FILTERS: Omit<BoardFilters, 'scope'> = (() => {
   const { scope: _scope, ...rest } = normalizeFilters({ ...DEFAULT_FILTERS, window: '14', courses: 'any' });
@@ -177,7 +187,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true, 
   });
   const rungASkipped = homeClub.ready && !rungApplies(probeScopes[0]);
   const rungASettled = rungASkipped || rungA.isSuccess || rungA.isError;
-  const rungAOk = !rungASkipped && rungA.isSuccess && (rungA.data?.rows.length ?? 0) >= CIRCLE_ROW_FLOOR;
+  const rungAOk = !rungASkipped && rungA.isSuccess && rungCarries(rungA.data);
 
   const rungB = useBoardPage(userId, entryBoard, rungBFilters, {
     limit: PROBE_FETCH,
@@ -185,7 +195,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true, 
   });
   const rungBSkipped = homeClub.ready && !rungApplies(probeScopes[1]);
   const rungBSettled = rungBSkipped || rungB.isSuccess || rungB.isError;
-  const rungBOk = !rungBSkipped && rungB.isSuccess && (rungB.data?.rows.length ?? 0) >= CIRCLE_ROW_FLOOR;
+  const rungBOk = !rungBSkipped && rungB.isSuccess && rungCarries(rungB.data);
 
   let landing: ScopeKey | null = null;
   if (homeClub.ready && rungASettled) {
