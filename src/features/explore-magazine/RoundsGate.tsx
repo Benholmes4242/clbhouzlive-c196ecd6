@@ -186,9 +186,9 @@ function GateSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
     { key: 'club', href: null },
   ];
   const { supportedBodies, unsupportedHomeNations } = gateReach();
-  /** "A, B and C" — the brief's phrasing for the home-nations list. */
-  const andJoin = (names: string[]) =>
-    names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+  /** CB14.1 — two independent clauses; '' when neither list has a name, and
+   *  then the element below is not rendered at all. */
+  const reachLine = gateReachLine(supportedBodies, unsupportedHomeNations, t);
   return (
     <BottomSheet open={open} onClose={onClose} ariaLabelledBy="rounds-gate-sheet-title">
       <div style={{ padding: '12px 20px 32px', fontFamily: SANS }}>
@@ -224,15 +224,16 @@ function GateSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
             );
           })}
         </div>
-        {/* CB14 — the quiet truth line: not a row, no chevron, A.MUTE at the
-            sheet's small type. Lists are derived from WHS_COUNTRIES via
-            gateReach(), so the sentence tracks support as providers launch. */}
-        <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${A.SOFT}`, fontSize: 11.5, fontWeight: 600, lineHeight: 1.45, color: A.MUTE }}>
-          {t('amateur.gate.sheetReach', {
-            supported: andJoin(supportedBodies),
-            unsupported: andJoin(unsupportedHomeNations),
-          })}
-        </div>
+        {/* CB14/CB14.1 — the quiet truth line: not a row, no chevron, A.MUTE
+            at the sheet's small type. Lists are derived from WHS_COUNTRIES via
+            gateReach(), so the sentence tracks support as providers launch.
+            With nothing to say in either clause the element is absent, so an
+            empty line never takes its margin. */}
+        {reachLine ? (
+          <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${A.SOFT}`, fontSize: 11.5, fontWeight: 600, lineHeight: 1.45, color: A.MUTE }}>
+            {reachLine}
+          </div>
+        ) : null}
         <button
           type="button"
           onClick={() => { onClose(); navigate('/manage/handicap'); }}
