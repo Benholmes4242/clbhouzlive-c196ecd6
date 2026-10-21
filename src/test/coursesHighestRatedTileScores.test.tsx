@@ -2,7 +2,6 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 const listMock = vi.fn();
 vi.mock('@/components/courses/useStatBrowse', () => ({ useStatBrowseList: (args: unknown) => listMock(args) }));
@@ -28,16 +27,15 @@ const colorOf = (text: string) => screen.getByText(text).style.color;
 const probe = document.createElement('div');
 const norm = (c: string) => { probe.style.color = c; return probe.style.color; };
 const WHITE = norm('#FFFFFF');
-const GREEN = norm(A.GREEN);
 
 beforeEach(() => listMock.mockReset());
 afterEach(cleanup);
 
 describe('BRIEF_COURSES_HIGHEST_RATED_TILE_SCORES', () => {
-  it('a) breakdown scores at 9.0+ are green, below 9 white, missing is a white dash', () => {
+  it('a) every breakdown score is white, at 9.0+, below 9, and a missing one is a white dash', () => {
     renderRated(baseRow);
-    expect(colorOf('10.0')).toBe(GREEN);
-    expect(colorOf('9.0')).toBe(GREEN);
+    expect(colorOf('10.0')).toBe(WHITE);
+    expect(colorOf('9.0')).toBe(WHITE);
     expect(colorOf('8.9')).toBe(WHITE);
     expect(colorOf('-')).toBe(WHITE);
   });
@@ -50,9 +48,9 @@ describe('BRIEF_COURSES_HIGHEST_RATED_TILE_SCORES', () => {
     }
   });
 
-  it('c) the headline rating is green at 9.0 or more', () => {
+  it('c) the headline rating is white at 9.0 or more', () => {
     renderRated(baseRow);
-    expect(colorOf('9.4')).toBe(GREEN);
+    expect(colorOf('9.4')).toBe(WHITE);
   });
 
   it('d) the headline rating is white below 9.0', () => {
