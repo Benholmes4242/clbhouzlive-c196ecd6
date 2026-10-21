@@ -37,9 +37,9 @@
       "eyebrow": "Tournament golf",
       "title": "Competitions",
       "window": "Last 30 days",
-      "subtitleRest_one": "{{date}} · {{count}} player",
-      "subtitleRest_other": "{{date}} · {{count}} players",
-      "seeAllPlayers": "See all players"
+      "subtitleRest_one": "{{date}} · {{count}} member",
+      "subtitleRest_other": "{{date}} · {{count}} members",
+      "fieldLimit": "Members who played this competition. Golfers not on clbhouz aren't shown."
     },
     "board": {
       "backToStream": "Back to the stream",
