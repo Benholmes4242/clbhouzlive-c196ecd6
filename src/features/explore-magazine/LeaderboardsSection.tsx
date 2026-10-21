@@ -49,7 +49,7 @@ export function LeaderboardsSection({ state, viewerId, onRowPress, onSeeAll }: {
               <span style={{ marginTop: 3, lineHeight: '15px' }}>
                 <span data-board-tile-count style={{ fontSize: 14, fontWeight: 800, letterSpacing: '-0.02em', color: selected ? A.INK : A.BODY }}>{count ?? '\u2014'}</span>
                 <span style={{ fontSize: 9.5, fontWeight: 700, marginLeft: 4, color: selected ? A.MUTE : A.DIM }}>
-                  {t(boardCountsRounds(key) ? 'discover.filterBoard.rounds' : 'discover.filterBoard.members', { count: count ?? 0, defaultValue: boardCountsRounds(key) ? 'rounds' : 'members' })}
+                  {t(boardCountsRounds(key) ? 'discover.filterBoard.railRounds' : 'discover.filterBoard.railMembers', { count: count ?? 0, defaultValue: boardCountsRounds(key) ? 'rounds' : 'members' }).toLowerCase()}
                 </span>
               </span>
             </Button>;

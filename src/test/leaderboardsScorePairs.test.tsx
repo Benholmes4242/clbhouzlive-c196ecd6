@@ -9,7 +9,7 @@ import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSe
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LEADERBOARD_BOARDS } from '@/features/explore-magazine/LeaderboardsSection';
 import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFilters';
-import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
+import { boardRpcArgs, type BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import { A } from '@/components/explore-tab-new/courseled/tokens';
 
 const i18n = i18next.createInstance();
@@ -35,7 +35,7 @@ describe('CB27 shared rows', () => {
   });
   it('suppresses feats on all six choices while the Rare air eagle sheet retains its rarer feat', () => {
     const client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity } } });
-    client.setQueryData(['discover', 'board-see-all', 'viewer', 'eagle', DEFAULT_FILTERS], [row]);
+    client.setQueryData(['discover', 'board-see-all', boardRpcArgs('viewer', 'eagle', DEFAULT_FILTERS)], { pages: [[row]], pageParams: [0] });
     const { container } = render(<MemoryRouter><QueryClientProvider client={client}><I18nextProvider i18n={i18n}>
       {LEADERBOARD_BOARDS.map((board) => <BoardRowView key={board} row={row} board={board} isSelf={false} />)}
       <BoardSeeAllSheet open onClose={() => {}} userId="viewer" board="eagle" filters={DEFAULT_FILTERS} appliedParts={[]} onRowPress={() => {}} />
