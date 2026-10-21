@@ -35,7 +35,7 @@
       "sheetReachUnsupported": "{{unsupported}} aren’t supported yet."
     },
     "competitions": {
-      "eyebrow": "Tournament golf",
+      "eyebrow": "Home club golf",
       "title": "Competitions",
       "window": "Last 30 days",
       "subtitleRest_one": "{{date}} · {{count}} member",
