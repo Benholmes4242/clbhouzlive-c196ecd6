@@ -2,10 +2,20 @@
    page retains its canonical clearance; the explicit nav-adjacent exception
    removes breathing/safe-area space because the floating pill sits at 20px.
    Parent flex tracks, not observers or fixed reveal sizes, own remaining height. */
+/* CB42: the wrapper is the flex host at exactly viewport height, so main
+   fills from wherever it starts to the viewport bottom without knowing any
+   top inset. The var(--sat) term is gone: main never carries that inset. */
+[data-amateur-page]:has([data-rounds-gate]) {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 0;
+}
+
 main:has([data-rounds-gate]) {
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - var(--sat, 0px));
+  flex: 1 1 auto;
   min-height: 0;
   padding-bottom: calc(var(--nav-pill-h, 64px) + 20px) !important;
 }

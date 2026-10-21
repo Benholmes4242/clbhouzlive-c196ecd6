@@ -1,5 +1,12 @@
 # Roadmap
 
+## CB42 — Gate height fills to viewport bottom; diagnostic removal confirmed
+- [x] Part 1: wrapper div in AmateurPage.tsx gained `data-amateur-page=""`; roundsGate.css scopes `[data-amateur-page]:has([data-rounds-gate])` as flex host at height 100dvh/min-height 0, and main's `height: calc(100dvh - var(--sat, 0px))` became `flex: 1 1 auto` (var(--sat) term gone). padding-bottom expression, card 20px padding, nav offset, CB38 mask/opacity, CB36 rule, scope switch, five-round rule and copy untouched.
+- [x] Part 2: GateFootDiag already fully removed under CB41; `rg GateFootDiag src/` empty. Only remaining matches are historical roadmap entries. No test referenced it.
+- [x] No test asserted the height expression or var(--sat) term; no test changed. Full `npx vitest run`: 2,104 passed / 285 files before and after, zero failures. tsc clean; preview build OK 19:46:27Z.
+- [x] Controlled harness (real roundsGate.css, stand-in header 148px/nav 60px/card 278px/rows 110px): main rect.bottom equals innerHeight on all three sizes; no-handicap button to nav gap exactly 20px; no scroll introduced. 430x932: main 932, glimpse 426px, 3 rows. 390x844: main 844, glimpse 338px, 3 rows. 360x640: main 640, glimpse 134px, 1 row. Glimpse GAINS ~59px (brief predicted a loss; the 59px were dead space below the old main bottom, now usable). Authenticated live-gate check unavailable (external_unmanaged); harness evidence labelled controlled.
+- [ ] Authenticated real-phone verification of the gate remains open, blocked on a signed-in preview session.
+
 ## CB35 — Gate action and bullets
 - [x] Baseline `bunx vitest run`: 2,092 passed / 282 files, zero failures; matches last reported count. Only CTA role selector is roundsGateAnalytics.test.tsx:79, case “reports the white CTA tap before retaining its connect destination”; preserve its accessible button semantics and all assertions unchanged. No bullet-count/removed-string protecting assertion.
 - [x] Matched white inline text action, exactly two bullets (courses then index), and gate-only flex anchoring at the measured nav top. Frozen states, predicate, inert mask, sheet and analytics retained. No existing tests changed.

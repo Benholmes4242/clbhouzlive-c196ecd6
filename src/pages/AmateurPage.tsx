@@ -82,7 +82,7 @@ export default function AmateurPage() {
   }, []);
 
   return (
-    <div style={{ background: A.CANVAS, minHeight: '100dvh', fontFamily: SANS, ...FIGS }}>
+    <div data-amateur-page="" style={{ background: A.CANVAS, minHeight: '100dvh', fontFamily: SANS, ...FIGS }}>
       {/* TOP CLEARANCE: CHROME_CLEARANCE, the twin of NAV_CLEARANCE — the
           island row measures itself (safe-area inclusive, from the island's
           BOTTOM edge) and the first content starts below it. NOT an immersive
