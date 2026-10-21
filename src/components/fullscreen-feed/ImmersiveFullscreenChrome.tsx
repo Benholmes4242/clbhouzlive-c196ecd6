@@ -11,8 +11,8 @@
  *       ellipsis + rating chip at right; location · World #n at 10.5/600;
  *       row two the VIEWER's own record at the course (status pill, rounds,
  *       best). No course on the post -> no header.
- *   BOTTOM (no scrim — removed earlier; every element carries its own
- *   drop-shadow over the blurred media backdrop). From the top down:
+ *   BOTTOM: a fixed solid comment band reserves the same floor on every slide;
+ *   author and rail carry drop-shadows over the media above it. From the top down:
  *     - LEFT: 40px squircle avatar + column (name · [time · FollowPill] ·
  *       caption with one inline CTA at the end of line three — "Read more"
  *       (expands in place) or, on reviews, "Full review" (opens the sheet;
@@ -20,13 +20,12 @@
  *       with avatarRing="media"; it reserves its full size at first paint.
  *     - RIGHT: vertical action rail (mute, heart, comment, send, more)
  *     - BOTTOM-MOST: the comment bar (viewer avatar + "Add a comment…"),
- *       an inset glass pill 44px tall floating above the bottom edge. When it
- *       renders, the author column and rail clear it by COMMENT_BAR_BLOCK;
- *       when it does not, they sit on the safe-area floor. There are no
- *       bottom carousel dots.
+ *       an inset pill 44px tall inside the solid band. The band always renders,
+ *       including signed-out/read-only views; author and rail sit 16px above
+ *       its top edge on photos and videos. There are no bottom carousel dots.
  *     - VIDEO SCRUBBER: FullscreenVideoScrubber, a draggable 32px hit area at
- *       bottomAnchor(SCRUBBER_GAP), shown only on a video slide
- *       (showsVideoScrubber). The author column and rail lift to clear it.
+ *       centred on the band's top edge, shown only on a video slide.
+ *       It runs edge to edge without lifting the author column or rail.
  *       While dragging, the author column, rail and top row fade to 0 and the
  *       comment bar to 0.35.
  *   TOP STRIP: FullscreenTopProgress — a segmented strip carrying carousel
@@ -54,7 +53,9 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { FullscreenTopProgress, showsTopProgress } from './FullscreenTopProgress';
-import { FullscreenVideoScrubber, showsVideoScrubber } from './FullscreenVideoScrubber';
+import { FullscreenVideoScrubber } from './FullscreenVideoScrubber';
+import { COMMENT_BAR_H, BAND_H_CSS } from '@/lib/media/fullscreenBand';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { useVideoProgressWriter } from '@/video/useVideoProgressWriter';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
@@ -78,16 +79,10 @@ const CHEVRON_BG = 'rgba(0,0,0,0.32)';
 const CHIP_BG = 'rgba(0,0,0,0.40)';
 const ICON_SHADOW = 'drop-shadow(0 1px 3px rgba(0,0,0,0.55))';
 const TEXT_SHADOW = '0 1px 3px rgba(0,0,0,0.55)';
-/* The inset comment pill: 44px tall, floating COMMENT_BAR_BOTTOM above the
-   bottom edge (never inside the home indicator). COMMENT_BAR_BLOCK is the full
-   footprint the author column and rail clear. Change these together. */
-const COMMENT_BAR_H = 44;
 // 16 is a FLOOR, not a fixed offset: on home-indicator phones the pill sits above the indicator.
 const COMMENT_BAR_BOTTOM = 'max(16px, env(safe-area-inset-bottom, 0px))';
-const COMMENT_BAR_BLOCK = `calc(${COMMENT_BAR_H}px + ${COMMENT_BAR_BOTTOM})`;
-// The scrubber's 32px hit area and its gap above the comment bar.
+// The scrubber's 32px hit area, centred on the band's top edge.
 const SCRUBBER_H = 32;
-const SCRUBBER_GAP = 6;
 const META = 'rgba(255,255,255,0.62)';
 const META_STRONG = 'rgba(255,255,255,0.78)';
 const MICRO_LABEL = 'rgba(255,255,255,0.50)';
@@ -412,6 +407,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   if (feedEnded) {
     return (
       <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
+        <div data-fullscreen-band aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: BAND_H_CSS, background: PAGE_CANVAS, pointerEvents: 'none', zIndex: Z.echo }} />
         <div
           style={{
             position: 'fixed',
@@ -479,12 +475,8 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   // Same guard the rail's comment glyph uses (!readOnly), plus a signed-in
   // actor to comment as.
   const showCommentBar = !readOnly && !!activeActor && !!onCompose;
-  const bottomAnchor = (gap: number) => showCommentBar
-    ? `calc(${COMMENT_BAR_BLOCK} + ${gap}px)`
-    : `calc(max(env(safe-area-inset-bottom, 0px), 24px) + ${gap}px)`;
   const showTopStrip = showsTopProgress(activePost);
-  const showScrubber = showsVideoScrubber(activePost, activePagerIdx ?? 0);
-  const stackBottom = bottomAnchor(showScrubber ? SCRUBBER_GAP + SCRUBBER_H + 8 : 26);
+  const stackBottom = `calc(${BAND_H_CSS} + 16px)`;
   const fadeWhileScrubbing: React.CSSProperties = scrubbing
     ? { opacity: 0, transition: 'opacity 150ms', pointerEvents: 'none' }
     : { opacity: 1, transition: 'opacity 150ms' };
@@ -540,12 +532,13 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   return (
     <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
+      <div data-fullscreen-band aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: BAND_H_CSS, background: PAGE_CANVAS, pointerEvents: 'none', zIndex: Z.echo }} />
       <div style={{ ...fadeWhileScrubbing, pointerEvents: 'none' }}>
         <FullscreenTopProgress activePost={activePost} />
       </div>
       <FullscreenVideoScrubber
         activePost={activePost}
-        bottom={bottomAnchor(SCRUBBER_GAP)}
+        bottom={`calc(${BAND_H_CSS} - ${SCRUBBER_H / 2}px)`}
         onDraggingChange={setScrubbing}
       />
       {/* Top scrim removed — chrome sits directly on the blurred media
@@ -893,8 +886,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             zIndex: Z.echo + 1,
             display: 'flex', alignItems: 'center', gap: 10,
             borderRadius: 999,
-            background: 'rgba(18,20,22,0.78)',
-            backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)',
+            background: 'rgba(255,255,255,0.08)',
             border: '1px solid rgba(255,255,255,0.12)',
             padding: '0 5px', margin: 0,
             cursor: 'pointer', pointerEvents: 'auto', textAlign: 'left',
