@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
 
-import { roundsGateState } from '@/features/explore-magazine/RoundsGate';
+import { roundsGateState, gateReach } from '@/features/explore-magazine/RoundsGate';
+import { WHS_COUNTRIES } from '@/lib/whs/whsCountries';
+
+const enCourses = JSON.parse(
+  readFileSync(process.cwd() + '/public/locales/en/courses.json', 'utf8'),
+) as Record<string, Record<string, string>>;
 
 /* CB13 — the four gate states. The predicate under test: a settled
    useWhsConnection read with an undeleted connection row. */
