@@ -89,6 +89,33 @@ export function gateReach(): { supportedBodies: string[]; unsupportedHomeNations
   return { supportedBodies, unsupportedHomeNations };
 }
 
+/** "A, B and C" — the brief's phrasing for the home-nations list. */
+function andJoin(names: string[]): string {
+  return names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
+
+/** CB14.1 — the sheet's reach line, built from two independent clauses.
+ *  Each clause renders only when its own list has a name to give it: with
+ *  every home nation supported, the second clause would otherwise print an
+ *  empty subject ("… today.  aren't supported yet."), and with nothing
+ *  connected the first clause would do the same. Both lists empty returns ''
+ *  and the caller renders no element at all, so an empty line cannot take its
+ *  margin. Two present clauses are joined by exactly one space. */
+export function gateReachLine(
+  supportedBodies: string[],
+  unsupportedHomeNations: string[],
+  t: (k: string, o?: Record<string, unknown>) => string,
+): string {
+  const clauses: string[] = [];
+  if (supportedBodies.length > 0) {
+    clauses.push(t('amateur.gate.sheetReachSupported', { supported: andJoin(supportedBodies) }));
+  }
+  if (unsupportedHomeNations.length > 0) {
+    clauses.push(t('amateur.gate.sheetReachUnsupported', { unsupported: andJoin(unsupportedHomeNations) }));
+  }
+  return clauses.join(' ');
+}
+
 function GateCard({ onConnect, onNoHandicap }: { onConnect: () => void; onNoHandicap: () => void }) {
   const { t } = useTranslation('courses');
   const bullets = [
