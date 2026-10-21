@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB22 — Rare Air badge and comparison fit
+- [ ] Bind exactly one badge by all-time rarity identity, retain achieved-first order and all CB21 tokens; shorten only English more/less comparison copy and remove obsolete interpolation.
+- [ ] Add badge regression and tie/zero coverage without changing existing tests; run full suite from 2,001/268 baseline.
+- [ ] Measure named strings and 320px clipping; attempt real-data full-rail screenshot, report any hosted-read blocker explicitly.
+
 ## CB21 + CB21.1 — Rare Air smaller tiles and phone-first placeholder
 - [x] Applied all named local tile tokens: measured 244×178 → 190×156. Rail top 14; removed kicker/unused English key only. Stable positive-first sort runs on a copied rail rows prop; zeros and page totals retained. Frozen elements unchanged.
 - [x] CB21.1 withdraws the prior one-pixel rule. Placeholder terms: 18+11+5+20.9+8+36.25+12+14+156+18=299.15 out; signed-in adds 10+17.4+10+12=49.4 → 348.55. Comment documents unknowable wrapping, two-line lede/one-line slab, 18.125/17.4 per extra line, accepted wide error, CSS quantisation and external-margin exclusion. No fudge factor or measurement machinery.
