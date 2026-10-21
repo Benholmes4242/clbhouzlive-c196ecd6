@@ -1,5 +1,9 @@
 # Roadmap
 
+## BRIEF_TOP_TEN_OWNER_NAME_LABEL — Row score centring follow-up
+- [ ] Preserve the implemented owner-name helper and labels; centre both row score columns with column flex, minWidth 42 and non-wrapping figures/labels, leaving photo pills and all other presentation unchanged.
+- [ ] Add the requested row-column render case, run the full suite and reconcile counts against 1,987 passing / 264 files; report any existing assertion changes and verification limits.
+
 ## BRIEF_TOP_TEN_OWNER_NAME_LABEL — The score label reads the owner's name
 - [x] `ownerScoreLabel` exported from ProfileTopTenRail.tsx: trim, empty/null -> null, over nine characters -> first eight + `\u2026`. `pillKicker` is now `isOwnProfile ? t('topTen.you','You') : (ownerScoreLabel(ownerName) ?? t('topTen.them','Them'))`, so one value feeds the glass pill on tiles 1-3 and the label under the score in rows 4-10. Uppercase styling, sizes, colours and layout unchanged; header sentence and every other string untouched; `topTen.them` kept as fallback.
 - [x] New `src/test/topTenOwnerLabel.test.ts` (5 helper cases incl. exactly-nine stays whole) and `src/test/topTenOwnerLabelRender.test.tsx` (5 render cases: label appears five times = three pills + two rows, name present in pill and row, `Them` fallback on null, clipped name reaches the pill, own profile still `You`). The render case sits in a `.tsx` sibling because JSX cannot live in the named `.ts` file; its mocks are copied in full from topTenTileWidth.test.tsx with `t` additionally honouring a string default.
