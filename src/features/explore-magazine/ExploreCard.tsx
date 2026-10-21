@@ -551,9 +551,6 @@ function WhoLine({
   ) : null;
 
   if (roundIdentity && !pair) {
-    const ownRoundPostId = item.kind === 'round' && item.who?.is_viewer === true
-      ? (item.facts.post_id ?? null)
-      : null;
     const hasFigures = roundIdentity.net != null && roundIdentity.par != null;
     const under = hasFigures && roundIdentity.net! < roundIdentity.par!;
     const mGold = roundIdentity.medalsGold ?? 0;
@@ -611,41 +608,11 @@ function WhoLine({
           ) : <span />}
           </>)}
         </div>
+        {/* CB30 — the foot carries engagement only; the author, date, follow and
+            owner menu moved to RoundAuthorRow at the top of the card. */}
         <div data-round-identity-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, gap: 8, marginTop: 12 }}>
-          {avatar}
-          <span style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minWidth: 0, gap: 2 }}>
-            <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: nameColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{name}</span>
-            {/* Place -> who -> when: the course now lives on the photograph, so the
-                date takes its line and its material (A.MUTE, not A.DIM). */}
-            {roundIdentity.date ? (
-              <span data-round-identity-date="true" style={{ ...NUMF, fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{roundIdentity.date}</span>
-            ) : null}
-          </span>
-          {/* CB29 FOLLOW — sits with the person it concerns, before the actions.
-              Self-cancelling like the owner affordance: absent without onFollow,
-              never on the viewer's own round. stop() keeps the tap off the card button. */}
-          {onFollow && item.who?.is_viewer !== true ? (
-            <span
-              data-round-follow="true"
-              style={{ flex: '0 0 auto', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44, padding: '0 12px', margin: '-13px -12px', boxSizing: 'border-box' }}
-              onClickCapture={(event) => event.preventDefault()}
-              onClick={stop}
-            >
-              <FeedFollowPill isFollowed={!!isFollowed} onFollow={onFollow} />
-            </span>
-          ) : null}
-          {/* Actions opposite the person; each control keeps its own 44x44 hit area. */}
+          <span style={{ flex: '1 1 auto' }} />
           {reactions ? <span style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 14 }}>{reactions}</span> : null}
-          {/* OWNER AFFORDANCE — one card, both surfaces (Home and Explore).
-              Gated on the same isOwnRound test the card uses for its tint
-              (kind 'round' + who.is_viewer). Rounds only, keyed on
-              facts.post_id: a round with no wrapping post has nothing to
-              remove, so it offers nothing. */}
-          {ownRoundPostId ? (
-            <span style={{ flex: '0 0 auto' }} onClick={(e) => e.stopPropagation()}>
-              <PostOwnerMenu postId={ownRoundPostId} isOwnPost actorType="personal" variant="inline" />
-            </span>
-          ) : null}
         </div>
         {namesLineShows ? (
           <div data-round-reactions-row="true" style={{ display: 'flex', alignItems: 'center', minWidth: 0, marginTop: 6 }}>
@@ -852,6 +819,78 @@ function ReviewStatStrip({ breakdown }: { breakdown: ReviewBreakdown | undefined
         );
       })}
     </ul>
+  );
+}
+
+/* CB30 — THE ROUND CARD'S AUTHOR ROW, at the top of the card on both surfaces
+   (Home feed and Explore), as every other post opens. Avatar, then the name
+   with the date and follow state beneath; the owner menu at the right, where
+   normal posts put it. Follow and owner menu never both show: follow is gated
+   on not being the viewer, the menu on being the viewer. No score, kicker or
+   headline enters this row (FeedCard). */
+function RoundAuthorRow({ item, onWhoTap, isFollowed, onFollow }: {
+  item: StreamItem;
+  onWhoTap?: () => void;
+  isFollowed?: boolean;
+  onFollow?: () => void;
+}) {
+  const { t } = useTranslation('courses');
+  const who = item.who && (item.who.user_id || item.who.display_name?.trim()) ? item.who : null;
+  const isViewer = who?.is_viewer === true;
+  const name = isViewer
+    ? t('amateur.stream.you', 'You')
+    : who?.display_name?.trim() || t('amateur.stream.aMember', 'A member');
+  const date = railCaptionDate(item.facts.play_date ?? null);
+  const ownRoundPostId = item.kind === 'round' && isViewer ? (item.facts.post_id ?? null) : null;
+  const stop = (event: React.SyntheticEvent) => { event.stopPropagation(); event.preventDefault(); };
+  const whoTap = (event: React.SyntheticEvent) => {
+    if (!onWhoTap) return;
+    event.stopPropagation();
+    event.preventDefault();
+    onWhoTap();
+  };
+  return (
+    <span data-round-author-row="true" style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+      {who?.user_id ? (
+        <span
+          role={onWhoTap ? 'button' : undefined}
+          tabIndex={onWhoTap ? 0 : undefined}
+          data-round-author-avatar="true"
+          onClick={whoTap}
+          onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') whoTap(event); }}
+          style={{ display: 'inline-flex', flexShrink: 0, cursor: onWhoTap ? 'pointer' : 'default' }}
+        >
+          <SquircleAvatar size={34} src={who.photo_url} alt={name} userId={who.user_id} hairlineRing hideRing={false} />
+        </span>
+      ) : null}
+      <span style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minWidth: 0 }}>
+        <span data-round-author-name="true" style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, lineHeight: 1.25, color: isViewer ? A.AMBER : '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{name}</span>
+        {date || (onFollow && !isViewer) ? (
+          <span style={{ marginTop: 1, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+            {date ? (
+              <span data-round-identity-date="true" style={{ ...NUMF, fontFamily: SANS, fontSize: 11, fontWeight: 600, lineHeight: 1.25, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{date}</span>
+            ) : null}
+            {/* CB29 FOLLOW, moved here by CB30 with its treatment intact; stop()
+                keeps the tap off the card button. */}
+            {onFollow && !isViewer ? (
+              <span
+                data-round-follow="true"
+                style={{ flex: '0 0 auto', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44, padding: '0 12px', margin: '-13px -12px', boxSizing: 'border-box' }}
+                onClickCapture={(event) => event.preventDefault()}
+                onClick={stop}
+              >
+                <FeedFollowPill isFollowed={!!isFollowed} onFollow={onFollow} />
+              </span>
+            ) : null}
+          </span>
+        ) : null}
+      </span>
+      {ownRoundPostId ? (
+        <span style={{ flex: '0 0 auto' }} onClick={(e) => e.stopPropagation()}>
+          <PostOwnerMenu postId={ownRoundPostId} isOwnPost actorType="personal" variant="inline" />
+        </span>
+      ) : null}
+    </span>
   );
 }
 
@@ -1568,9 +1607,6 @@ export function ExploreCard({
      and play date; the plot on the canvas; the figures row; the poster row
      with actions; the celebrated-by line (the last three come from WhoLine). */
   if (feedPlot && item.kind === 'round' && size !== 'pair') {
-    const posterName = item.who?.is_viewer
-      ? t('amateur.stream.you', 'You')
-      : item.who?.display_name?.trim() || t('amateur.stream.aMember', 'A member');
     const playDate = railCaptionDate(item.facts.play_date ?? null);
     const homeCallout = homePanelCallout(callout, shape, collectRoundFeats(item.facts));
     /* FN1 — the plot is NET or absent. A settled shape that cannot be netted
@@ -1586,11 +1622,9 @@ export function ExploreCard({
         style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', cursor: 'pointer', color: A.INK, fontFamily: SANS, ...FIGS }}
       >
         <span data-feed-round-head="true" style={{ display: 'block', paddingInline: 4, paddingTop: 12 }}>
-          <span data-feed-round-course="true" style={{ display: 'block', fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} />
+          <span data-feed-round-course="true" style={{ display: 'block', marginTop: 12, fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {kickerPartsValue.course ?? item.subject?.course_name ?? ''}
-          </span>
-          <span data-feed-round-byline="true" style={{ display: 'block', marginTop: 2, fontSize: 11.5, lineHeight: 1.45, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {playDate ? `${posterName} · ${playDate}` : posterName}
           </span>
         </span>
         {shape && received ? <RoundTilePlot shape={shape} received={received} /> : null}
@@ -1640,6 +1674,11 @@ export function ExploreCard({
         ...FIGS,
       }}
     >
+      {item.kind === 'round' && size !== 'pair' && !onPhoto ? (
+        <span style={{ display: 'block', paddingInline: 4, paddingBottom: 12 }}>
+          <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} />
+        </span>
+      ) : null}
       <span style={{ position: 'relative', display: 'block', marginInline: bleed != null ? -bleed : undefined }}>{photo}</span>
       {!onPhoto && item.kind === 'round' && size !== 'pair' ? (
         <RoundStatStrip

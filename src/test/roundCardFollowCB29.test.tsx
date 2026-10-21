@@ -29,7 +29,7 @@ describe('CB29 follow control on round cards', () => {
   it('ExploreCard renders follow for another member and never opens the round on tap; absent on own round', () => {
     const onTap = vi.fn(); const onFollow = vi.fn();
     const v = render(<ExploreCard item={item} size="std" onTap={onTap} isFollowed={false} onFollow={onFollow} />);
-    const ctl = v.container.querySelector('[data-round-identity-row="true"] [data-round-follow="true"] button');
+    const ctl = v.container.querySelector('[data-round-author-row="true"] [data-round-follow="true"] button');
     expect(ctl).not.toBeNull();
     fireEvent.click(ctl!);
     expect(onFollow).toHaveBeenCalledTimes(1);
@@ -50,5 +50,22 @@ describe('CB29 follow control on round cards', () => {
     v.unmount();
     const own = render(<FeaturedRoundCard round={round} viewerId="author" onOpen={vi.fn()} isFollowed={false} onFollow={vi.fn()} />);
     expect(own.container.querySelector('[data-featured-follow]')).toBeNull();
+  });
+});
+
+describe('CB30 round card author appears once, at the top', () => {
+  it.each([['Explore', false], ['Home feed', true]] as const)('%s: name renders exactly once', (_l, feedPlot) => {
+    const v = render(<ExploreCard item={item} size="std" onTap={vi.fn()} feedPlot={feedPlot || undefined} onWhoTap={vi.fn()} />);
+    const hits = (v.container.textContent ?? '').split('Author').length - 1;
+    expect(hits).toBe(1);
+    expect(v.container.querySelector('[data-round-author-row="true"] [data-round-author-name="true"]')).not.toBeNull();
+    expect(v.container.querySelector('[data-feed-round-byline]')).toBeNull();
+  });
+  it('avatar tap opens the profile, not the round', () => {
+    const onTap = vi.fn(); const onWhoTap = vi.fn();
+    const v = render(<ExploreCard item={item} size="std" onTap={onTap} onWhoTap={onWhoTap} />);
+    fireEvent.click(v.container.querySelector('[data-round-author-avatar="true"]')!);
+    expect(onWhoTap).toHaveBeenCalledTimes(1);
+    expect(onTap).not.toHaveBeenCalled();
   });
 });
