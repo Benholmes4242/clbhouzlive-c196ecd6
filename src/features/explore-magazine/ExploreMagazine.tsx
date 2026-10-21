@@ -50,6 +50,7 @@ import type { RoundPressTarget } from '@/components/explore-tab-new/courseled/St
 
 import { CircleShelf } from './CircleShelf';
 import { ScoresLeaderboardsPage } from './ScoresLeaderboardsPage';
+import { UnknownConnectionFallback } from './UnknownConnectionFallback';
 import { StandingShelf } from './StandingShelf';
 import { ScoresStandingSlot } from './ConnectStandingInvite';
 
@@ -1570,6 +1571,8 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
           who cannot find the stream again will think the app broke. */}
       {scoresBoardActive ? (
         <div data-scores-board-container="" style={{ marginBottom: BLOCK_GAP }}>
+          {/* CB46 — instrumentation only; renders nothing. */}
+          <UnknownConnectionFallback userId={userId} />
           <ScoresLeaderboardsPage
             userId={userId}
             sessionKnown={sessionKnown}

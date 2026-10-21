@@ -256,6 +256,7 @@ export const EVENT_LABELS: Record<string, string> = {
   amateur_board_see_all_opened: 'Explore board see-all opened',
   amateur_board_widened_to_everyone: 'Explore board widened to everyone',
   amateur_scope_skipped_below_min: 'Gate scope skipped below five rounds',
+  rounds_gate_unknown_fallback: 'Gate skipped: handicap connection unknown',
   amateur_board_picker_opened: 'Explore board picker opened',
   amateur_board_cleared: 'Explore board cleared (back to stream)',
   amateur_see_everyone_tapped: 'Explore see-everyone tapped',
