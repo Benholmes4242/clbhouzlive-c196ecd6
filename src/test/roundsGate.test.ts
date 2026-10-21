@@ -16,8 +16,12 @@ describe('CB13 — the Rounds gate state', () => {
     expect(roundsGateState(undefined, { isSuccess: false, data: undefined })).toBe('signedOut');
   });
 
-  it('an unsettled or failed connection read holds the loading treatment', () => {
+  it('an unsettled connection read holds the loading treatment', () => {
     expect(roundsGateState('u1', { isSuccess: false, data: undefined })).toBe('loading');
+  });
+
+  it('CB45 — a settled failed read falls to the ungated page, never the gate', () => {
+    expect(roundsGateState('u1', { isSuccess: false, isError: true, data: undefined })).toBe('connected');
   });
 
   it('a settled read with no connection row gates the page', () => {

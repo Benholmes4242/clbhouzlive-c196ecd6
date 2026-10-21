@@ -661,4 +661,4 @@
 
 ## CB44 — One hold, one paint on the Rounds page
 - [x] Hold while session unknown, connection undecided, or In form unsettled; hold draws only the three section placeholders (no scope switch, nothing for In form). Suite 2,104 → 2,110 (+6 hold tests); three CB39 switch tests now wait for the hold to release.
-- [ ] Ruling needed: a failed connection read still holds (CB13 predicate treats failure as loading). Three placeholders can each exceed a section that settles absent.
+- [x] CB45: a settled failed connection read now releases the hold to the ungated page (CB13 amended). Placeholder-height ruling deferred to its own brief. Suite 2,110 → 2,111.

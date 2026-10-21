@@ -48,12 +48,23 @@ export type RoundsGateState = 'signedOut' | 'loading' | 'gated' | 'connected';
 
 /** The four CB13 states. `isSuccess`, never `!isLoading`: a disabled query is
  *  pending-idle, so isLoading is false before the read has ever run (see the
- *  warning on useWhsConnection). */
+ *  warning on useWhsConnection).
+ *
+ *  CB45 AMENDS CB13 — DO NOT RESTORE THE OLD RULE AS A "CORRECTNESS FIX".
+ *  A failed read (`isError`: react-query sets it only after the retry policy
+ *  has finished; a read still retrying stays pending) is SETTLED and falls to
+ *  the UNGATED page, 'connected'. CB44 made the hold indefinite, so "failed =
+ *  loading" would hold a member forever after a network blip. And the two
+ *  wrong answers are not equal: the ordinary page shown to a gated member
+ *  costs a conversion; the gate shown to a connected member tells them to
+ *  connect a handicap they already have. The gate is a conversion device, not
+ *  a privacy boundary, so on an unknown connection we fall toward the page. */
 export function roundsGateState(
   userId: string | undefined,
-  connection: { isSuccess: boolean; data: unknown },
+  connection: { isSuccess: boolean; isError?: boolean; data: unknown },
 ): RoundsGateState {
   if (!userId) return 'signedOut';
+  if (connection.isError) return 'connected';
   if (!connection.isSuccess) return 'loading';
   return connection.data ? 'connected' : 'gated';
 }
