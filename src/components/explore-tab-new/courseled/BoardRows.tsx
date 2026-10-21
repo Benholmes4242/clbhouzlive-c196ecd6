@@ -412,6 +412,7 @@ export function BoardRowView({
     <button
       type="button"
       onClick={() => onPress?.(row)}
+      data-board-row=""
       data-board-self={isSelf ? '' : undefined}
       style={{
         width: '100%',

@@ -856,6 +856,12 @@ export function ScoresLeaderboardsPage({
   );
 
   /* CB13 states 1 and 4 return the page untouched; state 3 frosts it. */
-  if (gate === 'gated') return <RoundsGate>{pageBody}</RoundsGate>;
+  if (gate === 'gated') {
+    /* CB36 — the gate's count is the landing board read's own pool_rounds
+       (get_board_page, already issued for the glimpse): no new query. Only a
+       settled fortnight read counts; otherwise the gate keeps its sentence. */
+    const pool = state.page.isSuccess && state.filters.window === '14' ? state.page.data?.pool.rounds ?? null : null;
+    return <RoundsGate roundCount={pool} scope={state.filters.scope}>{pageBody}</RoundsGate>;
+  }
   return pageBody;
 }
