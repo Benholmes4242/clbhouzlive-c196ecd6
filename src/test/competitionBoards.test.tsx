@@ -108,3 +108,23 @@ describe('CB1 competition boards', () => {
     expect(q('[data-competition-card]')[0]).not.toContainElement(screen.getByText(limit));
   });
 });
+
+describe('CB33 competitions honour S5.4', () => {
+  it('the viewer position and name are amber in the field sheet; another member is not', async () => {
+    const { A } = await import('@/components/explore-tab-new/courseled/tokens');
+    f.rpc.mockResolvedValue({ data: [row({ pos: 1, user_id: 'u1', whs_score_id: 's1' }), row({ pos: 2, user_id: 'v', whs_score_id: 's2', display_name: 'Me' })], error: null });
+    mount();
+    await waitFor(() => expect(q('[data-competition-card]').length).toBe(1));
+    fireEvent.click(screen.getByRole('button', { name: 'See all members' }));
+    await waitFor(() => expect(q('[data-competition-field]').length).toBe(1));
+    const rows = [...q('[data-competition-field-row]')] as HTMLElement[];
+    const parts = (r: HTMLElement) => { const s = r.querySelectorAll(':scope > span'); return { pos: s[0] as HTMLElement, name: s[2] as HTMLElement }; };
+    const mine = parts(rows.find((r) => r.hasAttribute('data-self'))!);
+    const other = parts(rows.find((r) => !r.hasAttribute('data-self'))!);
+    expect(mine.pos).toHaveStyle({ color: A.AMBER });
+    expect(mine.name).toHaveStyle({ color: A.AMBER });
+    expect(other.pos).toHaveStyle({ color: A.FAINT });
+    expect(other.pos).not.toHaveStyle({ color: A.AMBER });
+    expect(other.name).not.toHaveStyle({ color: A.AMBER });
+  });
+});

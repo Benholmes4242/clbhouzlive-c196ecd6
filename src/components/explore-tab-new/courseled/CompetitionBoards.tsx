@@ -32,7 +32,10 @@ import { groupCompetitionCards, useCompetitionBoards, type CompetitionBoardRow, 
  * field. Only the sheet carries the scope explanation; the CTA reuses the
  * shared member-list label to avoid duplicate copy keys.
  * ONE_SHELL moves the sheet-only explanation below rows, with canonical
- * shell header/columns; cards, row actions and the single read stay unchanged. */
+ * shell header/columns; cards, row actions and the single read stay unchanged.
+ * CB33: S5.4 — the viewer's position and name are amber on card and sheet
+ * (matching BoardRows). Only the sheet takes SELF_ROW_TINT: card rows are
+ * unpadded, so a tint would butt against the text at that size. */
 const PODIUM = 3;
 
 /** The subtitle's metadata, on card and sheet alike: the date and the field
@@ -58,7 +61,7 @@ function Heads({ netW, grossW, style }: { netW: number; grossW: number; style: R
   );
 }
 
-function Card({ card, onOpen, onRowPress }: { card: CompetitionCard; onOpen: () => void; onRowPress: (row: RoundPressTarget) => void }) {
+function Card({ card, viewerId, onOpen, onRowPress }: { card: CompetitionCard; viewerId: string | undefined; onOpen: () => void; onRowPress: (row: RoundPressTarget) => void }) {
   const { t } = useTranslation('courses');
   const subtitle = useSubtitleRest(card);
   return (
@@ -72,15 +75,15 @@ function Card({ card, onOpen, onRowPress }: { card: CompetitionCard; onOpen: () 
         <div style={{ lineHeight: 1.25, marginTop: 3, fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subtitle}</div>
       </button>
       <Heads netW={44} grossW={44} style={{ marginTop: 10 }} />
-      {card.rows.slice(0, PODIUM).map((r) => (
-        <button key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} type="button" data-competition-row onClick={() => onRowPress(r)}
+      {card.rows.slice(0, PODIUM).map((r) => { const isSelf = !!viewerId && r.user_id === viewerId; return (
+        <button key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} type="button" data-competition-row data-self={isSelf || undefined} onClick={() => onRowPress(r)}
           style={{ display: 'flex', alignItems: 'center', marginTop: 7, width: '100%', padding: 0, border: 'none', background: 'transparent', fontFamily: SANS, textAlign: 'left', cursor: 'pointer' }}>
-          <span style={{ lineHeight: 1.25, width: 22, flex: 'none', fontSize: 10, fontWeight: 800, color: A.FAINT }}>{posText(r)}</span>
-          <span style={{ lineHeight: 1.25, flex: 1, minWidth: 0, fontSize: 12.5, fontWeight: 600, color: A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.display_name ?? t('discover.aMember')}</span>
+          <span style={{ lineHeight: 1.25, width: 22, flex: 'none', fontSize: 10, fontWeight: 800, color: isSelf ? A.AMBER : A.FAINT }}>{posText(r)}</span>
+          <span style={{ lineHeight: 1.25, flex: 1, minWidth: 0, fontSize: 12.5, fontWeight: 600, color: isSelf ? A.AMBER : A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.display_name ?? t('discover.aMember')}</span>
           <span style={{ width: 44, flex: 'none', textAlign: 'center', fontSize: 13 }}><ScoreWithToPar score={r.net_score} par={r.course_par} kind="net" fontSize={13} /></span>
           <span style={{ width: 44, flex: 'none', textAlign: 'center' }}><ScoreWithToPar score={r.gross_score} par={r.course_par} kind="gross" fontSize={11.5} /></span>
         </button>
-      ))}
+      ); })}
       <div style={{ marginTop: 'auto' }}>
         <SeeAll label={t('amateur.leaderboards.seeAllMembers', { defaultValue: 'See all members' })} onPress={onOpen} size={9.5} />
       </div>
@@ -115,13 +118,13 @@ function FieldBody({ card, viewerId, onClose, onRowPress }: { card: CompetitionC
       >
         <div style={{ fontFamily: SANS, ...FIGS }}>
       {card.rows.map((r) => {
-        const self = !!viewerId && r.user_id === viewerId;
+        const isSelf = !!viewerId && r.user_id === viewerId;
         return (
-          <button key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} type="button" data-competition-field-row data-self={self || undefined} onClick={() => onRowPress(r)}
-            style={{ display: 'flex', alignItems: 'center', width: '100%', padding: '9px 16px', border: 'none', borderBottom: `1px solid ${A.SOFT}`, background: self ? SELF_ROW_TINT : 'transparent', fontFamily: SANS, textAlign: 'left', cursor: 'pointer' }}>
-            <span style={{ lineHeight: 1.25, width: 30, flex: 'none', fontSize: 10.5, fontWeight: 800, color: A.FAINT }}>{posText(r)}</span>
+          <button key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} type="button" data-competition-field-row data-self={isSelf || undefined} onClick={() => onRowPress(r)}
+            style={{ display: 'flex', alignItems: 'center', width: '100%', padding: '9px 16px', border: 'none', borderBottom: `1px solid ${A.SOFT}`, background: isSelf ? SELF_ROW_TINT : 'transparent', fontFamily: SANS, textAlign: 'left', cursor: 'pointer' }}>
+            <span style={{ lineHeight: 1.25, width: 30, flex: 'none', fontSize: 10.5, fontWeight: 800, color: isSelf ? A.AMBER : A.FAINT }}>{posText(r)}</span>
             <span style={{ display: 'flex', flex: 'none', height: 28, alignItems: 'center', marginRight: 10 }}><MemberAvatar userId={r.user_id} name={r.display_name} photoUrl={r.profile_photo_url} size={28} /></span>
-            <span style={{ lineHeight: 1.25, flex: 1, minWidth: 0, fontSize: 13, fontWeight: self ? 700 : 600, color: self ? A.INK : A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.display_name ?? t('discover.aMember')}</span>
+            <span style={{ lineHeight: 1.25, flex: 1, minWidth: 0, fontSize: 13, fontWeight: isSelf ? 700 : 600, color: isSelf ? A.AMBER : A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.display_name ?? t('discover.aMember')}</span>
             <span style={{ width: 48, flex: 'none', textAlign: 'center' }}><ScoreWithToPar score={r.net_score} par={r.course_par} kind="net" fontSize={14} /></span>
             <span style={{ width: 46, flex: 'none', textAlign: 'center' }}><ScoreWithToPar score={r.gross_score} par={r.course_par} kind="gross" fontSize={12} /></span>
           </button>
@@ -152,7 +155,7 @@ export function CompetitionBoards({ viewerId, scope, enabled, onRowPress }: { vi
       meta={t('amateur.competitions.window', { defaultValue: 'Last 30 days' })}
     >
       {frame.mode === 'hold' ? <HeldRows count={frame.heldCount} rowHeight={frame.rowHeight} /> : <div ref={frame.bodyRef}><Rail>
-        {cards.map((c) => <Card key={c.key} card={c} onOpen={() => setOpenKey(c.key)} onRowPress={onRowPress} />)}
+        {cards.map((c) => <Card key={c.key} card={c} viewerId={viewerId} onOpen={() => setOpenKey(c.key)} onRowPress={onRowPress} />)}
       </Rail></div>}
       <FieldSheet card={open} viewerId={viewerId} onClose={() => setOpenKey(null)} onRowPress={onRowPress} />
     </Section>
