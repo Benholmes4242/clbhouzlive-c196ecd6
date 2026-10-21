@@ -1,5 +1,10 @@
 # Roadmap
 
+## BRIEF_REVIEW_POST_SCORE_MATCH_CARDS
+- [x] Compacted block D only to option B sizes/spacing; preserved tones, verdict, dashes, drop rules and navigation. Authorised renames: reviewPostScoreBlockB2.test.tsx:35 'renders the overall at 30 / 800 in its rating tone with a right divider' becomes24; :38 `expect(score.style.fontSize).toBe('30px')` becomes24px. reviewPostScoreCompact.test.tsx:26 'the score figure is 30 / 800 / -0.045em' becomes24; :28 `expect(s.style.fontSize).toBe('30px')` becomes24px. These two cases reflect signed-off size change; every other existing assertion retained, six requested assertions added in B2. No tests deleted or other cases renamed/rewritten.
+- [x] Full `bunx vitest run`: before2,060 passed+3 failed=2,063/279 files; after2,059 passed+4 failed=2,063/279 files. No inventory delta. Both authorised files pass (8+3 cases). Preview build OK12:36:00Z; manual typecheck not run (preview harness ownership).
+- [ ] STOP: src/test/scoreLabelSpacing.test.tsx:91:35 `AssertionError: expected '5px' to be '6px' // Object.is equality`, case 'places the review post tier word at B2’s 6px gap'. Brief explicitly changes marginTop to5 but authorises only two other test files; protected assertion untouched awaiting Ben's ruling. Other three failures unchanged (divider formatting and CB27). No visual verification after stop. No SQL/migrations/RPC/feed_config/cap changes.
+
 ## BRIEF_COURSE_CARD_SCORE_BLOCK — stopped at validation
 - [x] Moved BrowseCourseCard headline/count below unchanged photography into opt-in CategoryScores split; preserved grid4/pairs, canonical tones and frozen photo elements. Facts use 10/8px seams and 13px embedded figures; both shared card-gap constants are 24px.
 - [x] Added categoryScoresSplit.test.tsx with six cases. No existing test deleted, renamed, rewritten or assertion changed; courseRatingConsistency.test.ts unedited and all 19 cases pass. Preview build OK 2026-10-21T12:33:26Z. No SQL/migrations/RPC/feed_config/cap changes.
