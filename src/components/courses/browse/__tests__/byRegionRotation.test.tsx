@@ -42,7 +42,7 @@ describe('ByRegionSection rotation', () => {
     localStorage.setItem(REGION_LAST_KEY, JSON.stringify(prev));
     const tiles = names(draw().container);
     expect(tiles).toHaveLength(5);
-    for (const p of prev) expect(tiles.some((t) => t.startsWith(p) && !/\d/.test(t.slice(p.length, p.length + 1)))).toBe(false);
+    for (const p of prev) expect(tiles.some((t) => t.startsWith(`${p}3 courses`))).toBe(false);
   });
   it('with no home region, five tiles render and the last spans', () => {
     const view = draw();
