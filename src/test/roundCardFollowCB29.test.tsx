@@ -2,7 +2,6 @@ import React from 'react';
 import { cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 
 import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
 import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard';
