@@ -512,11 +512,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   }
   if (timeLabel) authorMeta.push(<span key="t" style={{ flexShrink: 0 }}>{timeLabel}</span>);
 
-  // Review figures: their score, golfers, then each filled-in sub-score.
+  // Review figures: overall, golfers, then each filled-in sub-score.
   const review = activePost.isReview ? activePost.review : null;
   const reviewCells: { key: string; value: number; label: string; amber?: boolean }[] = [];
   if (review) {
-    if (review.rating != null) reviewCells.push({ key: 'r', value: Number(review.rating), label: 'THEIR SCORE', amber: true });
+    if (review.rating != null) reviewCells.push({ key: 'r', value: Number(review.rating), label: 'OVERALL', amber: true });
     for (const [field, label] of BREAKDOWN_CELLS) {
       const v = review.breakdown?.[field];
       if (v != null) reviewCells.push({ key: field, value: Number(v), label });
@@ -762,11 +762,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           {reviewCells.length > 0 && (
             <div style={{ marginTop: 11, display: 'flex', gap: 15, textShadow: TEXT_SHADOW }}>
               {reviewCells.map((c) => (
-                <div key={c.key} style={{ display: 'flex', flexDirection: 'column' }}>
+                <div key={c.key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
                   <span style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1, color: c.amber ? AMBER : '#FFFFFF', ...TABULAR }}>
                     {formatRatingValue(c.value)}
                   </span>
-                  <span style={{ marginTop: 3, fontSize: 7, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: MICRO_LABEL }}>
+                  <span style={{ marginTop: 3, fontSize: 7, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: MICRO_LABEL, whiteSpace: 'nowrap' }}>
                     {c.label}
                   </span>
                 </div>
