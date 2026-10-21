@@ -73,8 +73,7 @@
         "holes": "ホール",
         "rounds": "ラウンド"
       },
-      "top100": "トップ100コース",
-      "theListHundred": "{{list}}の100コース"
+      "top100": "トップ100コース"
     },
     "place": {
       "pair": "{{place}}、{{nation}}"

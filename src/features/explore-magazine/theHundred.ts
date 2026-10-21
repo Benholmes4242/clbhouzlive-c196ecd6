@@ -9,8 +9,6 @@ import { SEASON_ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMe
 export const THE_HUNDRED = {
   /** Space under the list chips, the slab and the basis sentence. */
   blockGap: 12,
-  /** Space above the course strip's sub-head. */
-  stripTop: 16,
   slab: {
     radius: 11,
     background: 'rgba(255,255,255,0.05)',
@@ -24,7 +22,6 @@ export const THE_HUNDRED = {
     caption: { marginTop: 6, fontSize: 9, lineHeight: 12, fontWeight: 800, letterSpacing: '0.1em' },
   },
   basis: { fontSize: 11.5, lineHeight: 1.45 },
-  subHead: { fontSize: 10, lineHeight: 14, fontWeight: 700, letterSpacing: '0.14em', countSize: 10 },
   rail: { gap: 8, endSpacer: 14, fade: 30 },
   tile: {
     width: 108,
@@ -54,9 +51,10 @@ const slabLine = Math.round(S.fontSize * S.lineHeight); // 17
 /** 11 + 2×17 + 9 + 4 + 6 + 12 + 12 = 88. */
 export const HUNDRED_SLAB_HEIGHT =
   S.padTop + 2 * slabLine + S.track.marginTop + S.track.height + S.caption.marginTop + S.caption.lineHeight + S.padBottom;
-/** Sub-head 16 + 14, tile row 76, gap below 12 = 118. */
+/** CB23: tile row 76 + gap below 12 = 88; removed sub-head 16 + 14.
+ * Signed-out has no list query/rail, so this reservation is signed-in only. */
 export const HUNDRED_STRIP_HEIGHT =
-  THE_HUNDRED.stripTop + THE_HUNDRED.subHead.lineHeight + THE_HUNDRED.tile.height + THE_HUNDRED.blockGap;
+  THE_HUNDRED.tile.height + THE_HUNDRED.blockGap;
 /** A Top 100 row with its progress bar: 6 + (14 + 1 + 12 + 5 + 3) + 6 + 1 hairline = 48. */
 export const HUNDRED_ROW_HEIGHT =
   SEASON_ROW_METRICS.padY * 2 + 14 + 1 + 12 + THE_HUNDRED.row.progress.marginTop + THE_HUNDRED.row.progress.height + 1;
@@ -68,8 +66,10 @@ export const HUNDRED_BASIS_HEIGHT = 2 * Math.round(THE_HUNDRED.basis.fontSize * 
 /**
  * Whole-section placeholder while the default list's board loads:
  * section top 24 + eyebrow 13 + 5 + title 23 + 12 + chips 30 + 12
- * + (slab 88 + 12, signed in) + basis 46 + (strip 118, signed in) + rows 144
- * + See all 12 + 13 = 334 signed out, 552 signed in.
+ * + (slab 88 + 12, signed in) + basis 46 + (strip 88, signed in) + rows 144
+ * + See all 12 + 13 = 334 signed out, 522 signed in (was 552).
+ * These inherited scalar estimates retain rounded lines and older head terms;
+ * they are not exact rendered border-box heights. CB23 removes only strip terms.
  */
 export function hundredPlaceholderHeight(signedIn: boolean): number {
   const head = 24 + 13 + 5 + 23 + 12 + 30 + THE_HUNDRED.blockGap;

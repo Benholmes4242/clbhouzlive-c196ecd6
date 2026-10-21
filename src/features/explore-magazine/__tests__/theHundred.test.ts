@@ -52,9 +52,9 @@ describe('The Hundred rail scroll', () => {
 describe('The Hundred placeholders', () => {
   it('heights', () => {
     expect(HUNDRED_SLAB_HEIGHT).toBe(88);
-    expect(HUNDRED_STRIP_HEIGHT).toBe(118);
+    expect(HUNDRED_STRIP_HEIGHT).toBe(88);
     expect(HUNDRED_ROWS_HEIGHT).toBe(144);
     expect(hundredPlaceholderHeight(false)).toBe(334);
-    expect(hundredPlaceholderHeight(true)).toBe(552);
+    expect(hundredPlaceholderHeight(true)).toBe(522);
   });
 });

@@ -94,24 +94,6 @@ export function HundredBasis({ list }: { list: string }) {
   );
 }
 
-/** The strip's sub-head: list name left, viewer's played count right. */
-export function HundredSubHead({ list, count }: { list: string; count: { played: number; total: number } | null }) {
-  const { t } = useTranslation('courses');
-  const base = { fontSize: H.subHead.fontSize, lineHeight: `${H.subHead.lineHeight}px`, fontWeight: H.subHead.fontWeight } as const;
-  return (
-    <div style={{ marginTop: H.stripTop, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-      <span style={{ ...base, letterSpacing: H.subHead.letterSpacing, textTransform: 'uppercase', color: A.DIM }}>
-        {t('amateur.leaderboards.theListHundred', { list })}
-      </span>
-      {count ? (
-        <span className="tabular-nums" style={{ ...base, fontSize: H.subHead.countSize, color: A.DIM, flexShrink: 0 }}>
-          {t('amateur.leaderboards.hundredPlayedCount', { played: count.played, total: count.total })}
-        </span>
-      ) : null}
-    </div>
-  );
-}
-
 /**
  * T.2 — THIS SECTION'S OWN RAIL. A copy of the shared Rail's frame (scroller,
  * end spacer, fade) so scroll control never reaches the rail Who leads what uses.

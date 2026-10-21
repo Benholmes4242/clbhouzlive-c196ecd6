@@ -73,8 +73,7 @@
         "holes": "홀",
         "rounds": "라운드"
       },
-      "top100": "톱 100 코스",
-      "theListHundred": "{{list}} 100곳"
+      "top100": "톱 100 코스"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"

@@ -45,7 +45,7 @@ import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
 import { THE_HUNDRED, HUNDRED_ROWS_HEIGHT, HUNDRED_SLAB_HEIGHT, hundredPlaceholderHeight, hundredSlab } from './theHundred';
 import { CLIMB, climbCross, climbOrder, climbPlaceholderHeight, type ClimbMode, type ClimbPlaced } from './climb';
 import { formatMonthLong } from '@/i18n/format';
-import { HundredBasis, HundredRail, HundredSubHead, HundredYou } from './TheHundredSection';
+import { HundredBasis, HundredRail, HundredYou } from './TheHundredSection';
 
 /** CompactRow value size (the Top 100 and improvement sections). */
 export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
@@ -781,20 +781,15 @@ export function ScoresLeaderboardsPage({
           ) : null}
           <HundredBasis list={RANK_SCOPE_LABEL[top100List]} />
           {/* A chip tap starts a fresh slug query. While it loads, reserve the
-              strip (sub-head + tile row) instead of holding the old list:
-              last list's photographs under the new list's caption is worse than
+              tile row instead of holding the old list:
+              last list's photographs under the new list's chip is worse than
               a brief empty rail. Deliberately NOT placeholderData. */}
           {userId && listCourses.isPending ? (
             <div style={{ marginBottom: THE_HUNDRED.blockGap }}>
-              <HundredSubHead list={RANK_SCOPE_LABEL[top100List]} count={null} />
               <div aria-hidden style={{ height: THE_HUNDRED.tile.height }} />
             </div>
           ) : listCourses.isSuccess && listTiles.length > 0 ? (
             <div style={{ marginBottom: THE_HUNDRED.blockGap }}>
-              <HundredSubHead
-                list={RANK_SCOPE_LABEL[top100List]}
-                count={{ played: listTiles.filter((c) => c.is_viewer_played).length, total: listTiles.length }}
-              />
               {/* Keyed by list: a new list remounts the rail, which sets its scroll once. */}
               <HundredRail key={top100List} tiles={listTiles} gutter={GUTTER} onOpenCourse={onOpenCourse} />
             </div>
