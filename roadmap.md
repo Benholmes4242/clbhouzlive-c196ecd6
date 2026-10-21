@@ -2,9 +2,10 @@
 
 ## CB23 — Remove Top 100 sub-head
 - [x] Removed both HundredSubHead calls/component, subHead/stripTop tokens and unused theListHundred/hundredPlayedCount keys in all locales where present; kept RANK_SCOPE_LABEL for chips/basis/slab/sheets/ExploreCard. Pending 76px spacer and rail key/geometry/blockGap frozen.
-- [x] Ben approved only theHundred.test.ts:55 strip 118→88 and :58 signed-in 552→522; case/name and other assertions untouched. Signed-out 334 = 119+46+144+25 excludes strip, slab 88 and rows 144 have no removed terms. Last full run 2,005/269 before and after; final locale cleanup rerun pending.
+- [x] Ben approved only theHundred.test.ts:55 strip 118→88 and :58 signed-in 552→522; case/name and other assertions untouched. Signed-out 334 = 119+46+144+25 excludes strip, slab 88 and rows 144 have no removed terms. Final full bunx vitest run after locale cleanup: 2,005/269 before and after, zero failures/count delta.
 - [x] Controlled actual section branch at 394×970: signed-out 331.234375 unchanged; signed-in 538.015625→520.015625; pending 537.234375→519.234375. Reservation 552→522; existing margin collapse means rendered reduction 18, not 30, with new residual ~2px. No compensation; report distinguishes synthetic board spacer from real data.
-- [ ] Final report/screenshot and full-suite rerun after locale cleanup; authenticated real-data screenshot unavailable under external_unmanaged. Played count remains in slab and own-row progress sheet; count semantics differ (board versus course rows). No SQL/migrations/RPC/feed_config/cap changes.
+- [x] Saved CB23_report.md and reviewed CB23_synthetic_section.png; all cleanup references absent and locale JSON parses. Preview build OK 10:56:42Z. Played count remains in slab and own-row progress sheet; count semantics differ (board versus course rows). No SQL/migrations/RPC/feed_config/cap changes.
+- [ ] Authenticated real-data screenshot/measurement unavailable under external_unmanaged; synthetic screenshot has a controlled 144px board spacer and no-photo tiles, not live member evidence.
 
 ## CB22 — Rare Air badge and comparison fit
 - [x] One identity-bound badge uses highest uncapped all-time rounds per occurrence; unobserved all-time feats rank above finite rates, ties retain incoming RPC rarity order. All CB21 tokens/order/zeros unchanged. Shortened only English more/less; removed allRate and Trans n/unit/g interpolation, retained unit for first rate line.
