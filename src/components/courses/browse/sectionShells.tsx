@@ -129,7 +129,7 @@ export function PhotoRailShell({ count }: { count: number }) {
   );
 }
 
-/** Toughest tracks: the 2x2 grid of square tiles. */
+/** Tough tracks: the 2x2 grid of square tiles. */
 export function HardestShell() {
   return (
     <HeadShell>
