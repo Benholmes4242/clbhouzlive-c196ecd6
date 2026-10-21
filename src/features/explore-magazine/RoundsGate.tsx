@@ -30,6 +30,7 @@ import { ChevronRight } from 'lucide-react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { WHS_COUNTRIES, getCountryById, type WhsCountry } from '@/lib/whs/whsCountries';
 import { EYEBROW } from './Section';
 
 export type RoundsGateState = 'signedOut' | 'loading' | 'gated' | 'connected';
@@ -59,15 +60,31 @@ const FROST: CSSProperties = {
 const REVEAL = 300;
 const REVEAL_EMPTY = 96;
 
-/** The sheet's outbound links — each row routes to the body's own official
- *  page. "Any country" has none: the only club finder we could verify is
- *  England-only, so that row is copy, not a link. */
+/** CB14 — the sheet's one outbound link. England is the only supported
+ *  provider (whsCountries.ts), so it is the only route we can honour; the
+ *  Scotland/Wales/Ireland links CB13 shipped were deleted because following
+ *  them cannot end in a connectable handicap. "Join a club" has no link:
+ *  there is no club finder we can verify beyond England. */
 const GATE_LINKS = {
   england: 'https://www.englandgolf.org/igolf',
-  scotland: 'https://www.scottishgolf.org/world-handicap-system',
-  wales: 'https://www.walesgolf.org/',
-  ireland: 'https://www.golfireland.ie/whs-for-golfers',
 } as const;
+
+/** CB14 — the sheet's quiet truth line, derived from WHS_COUNTRIES rather
+ *  than a fixed string, so it cannot drift the day a second provider
+ *  launches. Returns the supported bodies' names (joined "A and B") and the
+ *  unsupported home nations (Scotland, Wales, Ireland — comingSoon flags
+ *  like France/US are launch partnerships, not home nations, and stay
+ *  unmentioned). The sentence is assembled in the locale file from these
+ *  two lists. */
+const HOME_NATION_IDS = ['gb-sct', 'gb-wls', 'ie'] as const;
+
+export function gateReach(): { supportedBodies: string[]; unsupportedHomeNations: string[] } {
+  const supportedBodies = WHS_COUNTRIES.filter((c) => c.supported).map((c) => c.body);
+  const unsupportedHomeNations = HOME_NATION_IDS.map((id) => getCountryById(id))
+    .filter((c): c is WhsCountry => c !== null && !c.supported)
+    .map((c) => c.name);
+  return { supportedBodies, unsupportedHomeNations };
+}
 
 function GateCard({ onConnect, onNoHandicap }: { onConnect: () => void; onNoHandicap: () => void }) {
   const { t } = useTranslation('courses');
