@@ -4,6 +4,12 @@
  * Renders ONLY when a counting round is about to expire and the settled index
  * exceeds today's by more than 0.05, with a full twenty. Otherwise nothing —
  * no reassuring version. All figures come from deriveAgeingOut.
+ *
+ * GUTTERS: unlike its neighbours this section builds its own <section> instead of
+ * the HcpSection shell, so it carries the shell's `padding: '0 20px'` itself
+ * (BRIEF_HCP_AGEING_OUT_GUTTER). The 20px gutter is owned HERE, not by a wrapper —
+ * adding it to a parent would inset this block to 40px and break alignment with
+ * the box above and the sections below.
  */
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
@@ -46,7 +52,7 @@ const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number
   };
 
   return (
-    <section style={{ marginTop: 34 }}>
+    <section style={{ marginTop: 34, padding: '0 20px' }}>
       <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: CHART.AMBER }}>
         {t('common:handicap.ageingOut.kicker')}
       </div>
