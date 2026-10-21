@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Award, Check, Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-...
+
+import BrowseCourseCard from './BrowseCourseCard';
+import type { StatBrowseRow } from './useStatBrowse';
 import { RailChips, railChipStyle, RailChipTrigger, APPLIED_FILL, RAIL_CHIP_WEIGHT } from '@/components/ui/RailChips';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { communityOrder } from './top100/communityOrder';
