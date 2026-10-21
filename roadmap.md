@@ -658,3 +658,7 @@
 ## CB41 — Remove the CB40 diagnostic
 - [x] Deleted src/features/explore-magazine/GateFootDiag.tsx. Removed its import (RoundsGate.tsx:46) and the `<GateFootDiag />` mount (RoundsGate.tsx:359), both "CB40 TEMPORARY" comments taken with them. Nothing else touched: card 20px bottom padding, CB35 CSS rule, CB38 mask, CB36 short-screen rule and gated-state scope switch all retained; no layout, padding or height adjusted.
 - [x] `rg GateFootDiag src public index.html` returns no matches (file gone, no dangling reference). No test file referenced it — none edited, renamed or deleted. `tsc --noEmit -p tsconfig.json` clean; preview build OK 2026-10-21T19:35:39Z. Full `vitest run`: 2,104 passed / 285 files, zero failures — identical to the CB40 total, so no test was lost with the file. No SQL/migrations/RPC/feed_config changes; round_pool_cap 30.
+
+## CB44 — One hold, one paint on the Rounds page
+- [x] Hold while session unknown, connection undecided, or In form unsettled; hold draws only the three section placeholders (no scope switch, nothing for In form). Suite 2,104 → 2,110 (+6 hold tests); three CB39 switch tests now wait for the hold to release.
+- [ ] Ruling needed: a failed connection read still holds (CB13 predicate treats failure as loading). Three placeholders can each exceed a section that settles absent.

@@ -35,8 +35,17 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
  * it), the scroll memory, the scorecard opener and its round sheet, and the
  * shared floating glass islands — this page owns no header.
  */
+/* CB44 — the last session this page saw resolve, kept for the app session.
+   The session hook re-resolves asynchronously on every mount, so without this
+   a return visit would hold for a frame (or flash signed-out) although the
+   answer is already known. Overwritten by every live resolution. */
+let lastResolved: { userId: string | undefined } | null = null;
+
 export default function AmateurPage() {
-  const { user } = useSupabaseSession();
+  const live = useSupabaseSession();
+  if (!live.loading) lastResolved = { userId: live.user?.id };
+  const sessionKnown = !live.loading || lastResolved !== null;
+  const user = live.loading ? (lastResolved?.userId ? { id: lastResolved.userId } : null) : live.user;
   const opener = useScorecardOpener();
 
   useEffect(() => {
@@ -90,7 +99,7 @@ export default function AmateurPage() {
           start (BRIEF_EXPLORE_MAGAZINE §3a correction). The shell pays
           var(--sat); this page never does. */}
       <main style={{ padding: `${CHROME_CLEARANCE} 0 ${NAV_CLEARANCE}` }}>
-        <ExploreMagazine userId={user?.id} />
+        <ExploreMagazine userId={user?.id} sessionKnown={sessionKnown} />
       </main>
 
       <RoundDetailSheet

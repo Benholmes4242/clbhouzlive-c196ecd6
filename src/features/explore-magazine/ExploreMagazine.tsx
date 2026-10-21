@@ -426,7 +426,7 @@ function MomentsShelf({ pos, onDepart, onOpenCommunity }: { pos: number; onDepar
   );
 }
 
-export function ExploreMagazine({ userId }: { userId: string | undefined }) {
+export function ExploreMagazine({ userId, sessionKnown = true }: { userId: string | undefined; sessionKnown?: boolean }) {
   const { sentinelRef: chipSentinelRef, stuck: chipsStuck } = useStickySafeAreaState();
   const { t, i18n } = useTranslation('courses');
   const navigate = useNavigate();
@@ -1572,6 +1572,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
         <div data-scores-board-container="" style={{ marginBottom: BLOCK_GAP }}>
           <ScoresLeaderboardsPage
             userId={userId}
+            sessionKnown={sessionKnown}
             state={boardState}
             onRowPress={boardRowPress}
             onMemberTap={(id) => opener.openProfile(id)}

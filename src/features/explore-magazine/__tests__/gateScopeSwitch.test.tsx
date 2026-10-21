@@ -48,25 +48,30 @@ function mount() {
 }
 
 describe('CB39 scope switch', () => {
-  it('is absent in the gated state', () => {
+  /* CB44 — the page holds until In form's read settles, so each case waits
+     for the hold to release before asserting the settled page. */
+  it('is absent in the gated state', async () => {
     conn.current = null;
     const { container } = mount();
+    await waitFor(() => expect(container.querySelector('[data-rounds-hold]')).toBeNull());
     expect(container.querySelector('[data-rounds-gate]')).not.toBeNull();
     expect(container.querySelector('[data-scores-control-row]')).toBeNull();
   });
-  it('still renders for a connected member', () => {
+  it('still renders for a connected member', async () => {
     conn.current = { id: 'c' };
     const { container } = mount();
+    await waitFor(() => expect(container.querySelector('[data-rounds-hold]')).toBeNull());
     expect(container.querySelector('[data-rounds-gate]')).toBeNull();
     expect(container.querySelector('[data-scores-control-row]')).not.toBeNull();
   });
-  it('still renders for a signed-out viewer', () => {
+  it('still renders for a signed-out viewer', async () => {
     conn.current = null;
     const client = new QueryClient();
     const state = makeBoardState({});
     const { container } = rtlRender(<MemoryRouter><QueryClientProvider client={client}>
       <ScoresLeaderboardsPage userId={undefined} state={state} onOpenFilters={vi.fn()} onRowPress={vi.fn()} onMemberTap={vi.fn()} onOpenCourse={vi.fn()} />
     </QueryClientProvider></MemoryRouter>);
+    await waitFor(() => expect(container.querySelector('[data-rounds-hold]')).toBeNull());
     expect(container.querySelector('[data-scores-control-row]')).not.toBeNull();
   });
 });
