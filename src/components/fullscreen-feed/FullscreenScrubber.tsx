@@ -20,22 +20,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Z } from '@/config/zIndex';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { LaneId } from '@/video/lanePolicy';
-
-function expectedOwnerKey(postId: string | undefined, mediaIdx: number): string | null {
-  if (!postId) return null;
-  return postId.includes(':') ? postId : `${postId}:${mediaIdx}`;
-}
-
-// Owner-key match: engine returns either bare postId or `${postId}:${idx}`.
-function ownerMatches(snapPostId: string | null | undefined, expected: string): boolean {
-  if (!snapPostId) return false;
-  if (snapPostId === expected) return true;
-  // Legacy: engine stored bare id, expected is `${id}:0`.
-  if (!snapPostId.includes(':') && expected === `${snapPostId}:0`) return true;
-  // Or engine stored `${id}:0`, expected is bare.
-  if (!expected.includes(':') && snapPostId === `${expected}:0`) return true;
-  return false;
-}
+import { expectedOwnerKey, ownerMatches } from './scrubberMath';
 
 interface Props {
   activePost: FeedPost | null;
