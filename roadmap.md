@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB23 — Remove Top 100 sub-head
+- [ ] Remove both HundredSubHead call sites/component; preserve pending tile spacer and all frozen surfaces. Remove only unused keys/tokens after consumer audit; retain RANK_SCOPE_LABEL active consumers.
+- [ ] Protecting test `theHundred.test.ts:53–58` named before changes: strip 118; placeholder false 334 and true 552. Await ruling on strip 88 and signed-in 522; signed-out 334 stays. Keep case/name and slab/rows assertions.
+- [ ] Measure section/placeholder before and after, screenshot, report remaining played-count surfaces; full-suite baseline last reported 2,005/269. No SQL/migrations/RPC/feed_config/cap changes.
+
 ## CB22 — Rare Air badge and comparison fit
 - [x] One identity-bound badge uses highest uncapped all-time rounds per occurrence; unobserved all-time feats rank above finite rates, ties retain incoming RPC rarity order. All CB21 tokens/order/zeros unchanged. Shortened only English more/less; removed allRate and Trans n/unit/g interpolation, retained unit for first rate line.
 - [x] Full `bunx vitest run`: 2,001/268 before → 2,005/269 after, zero failures. +4 solely new rareAirBadge.test.tsx (render regression, ties, unobserved feats, cross-unit uncapped rarity); no existing tests changed. Preview build OK 2026-10-21T10:44:25Z.
