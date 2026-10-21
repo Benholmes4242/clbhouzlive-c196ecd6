@@ -151,13 +151,11 @@ function GateCard({ onConnect, onNoHandicap }: { onConnect: () => void; onNoHand
 function GateSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
-  const rows: { key: keyof typeof GATE_LINKS | 'anywhere'; href: string | null }[] = [
+  const rows: { key: 'england' | 'club'; href: string | null }[] = [
     { key: 'england', href: GATE_LINKS.england },
-    { key: 'scotland', href: GATE_LINKS.scotland },
-    { key: 'wales', href: GATE_LINKS.wales },
-    { key: 'ireland', href: GATE_LINKS.ireland },
-    { key: 'anywhere', href: null },
+    { key: 'club', href: null },
   ];
+  const { supportedBodies, unsupportedHomeNations } = gateReach();
   return (
     <BottomSheet open={open} onClose={onClose} ariaLabelledBy="rounds-gate-sheet-title">
       <div style={{ padding: '12px 20px 32px', fontFamily: SANS }}>
