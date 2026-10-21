@@ -21,6 +21,9 @@
  * The card is not dismissible: no close, no swipe-away, no remembered
  * dismissal. The white CTA and the sheet's foot both route to
  * /manage/handicap, the same destination as every other connect CTA (ERT1).
+ *
+ * CB14.1 — the sheet's reach line is two independent clauses, each rendered
+ * only when its own list has a name to give it: see gateReachLine.
  */
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
