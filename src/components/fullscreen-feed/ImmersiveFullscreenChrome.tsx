@@ -81,13 +81,13 @@ const TEXT_SHADOW = '0 1px 3px rgba(0,0,0,0.55)';
 /* The inset comment pill: 44px tall, floating COMMENT_BAR_BOTTOM above the
    bottom edge (never inside the home indicator). COMMENT_BAR_BLOCK is the full
    footprint the author column and rail clear. Change these together. */
-// The scrubber's 32px hit area and its gap above the comment bar.
-const SCRUBBER_H = 32;
-const SCRUBBER_GAP = 6;
 const COMMENT_BAR_H = 44;
 // 16 is a FLOOR, not a fixed offset: on home-indicator phones the pill sits above the indicator.
 const COMMENT_BAR_BOTTOM = 'max(16px, env(safe-area-inset-bottom, 0px))';
 const COMMENT_BAR_BLOCK = `calc(${COMMENT_BAR_H}px + ${COMMENT_BAR_BOTTOM})`;
+// The scrubber's 32px hit area and its gap above the comment bar.
+const SCRUBBER_H = 32;
+const SCRUBBER_GAP = 6;
 const META = 'rgba(255,255,255,0.62)';
 const META_STRONG = 'rgba(255,255,255,0.78)';
 const MICRO_LABEL = 'rgba(255,255,255,0.50)';
