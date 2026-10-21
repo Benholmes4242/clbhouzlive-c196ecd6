@@ -1,5 +1,11 @@
 # Roadmap
 
+## CB25 — Leaderboards section returns
+- [x] Remounted four allowed boards on existing state.page/shared rows/head/See-all; sole caller supplies optional net default, existing recent entryBoardFor/scope probes unchanged. Local headers record ownership and mandated shape exception; no other sections or BoardFilterPanel edited.
+- [x] No protecting assertions needed changes. Full bunx vitest run 2,005/269 → 2,011/270, zero failures; delta solely six new leaderboardsSection.test.tsx cases. No existing tests deleted/renamed/rewritten. Preview build OK11:15:25Z.
+- [x] Controlled actual section/query/sheet verified at390px: widths48.15625/66.140625/91.8125/72.390625, total299.5 including21 gaps; client/scroll358, no English scrolling. All board taps/values, score-id handoff, existing sheet, shared club/30day args and empty disappearance passed; no fixture errors. Reviewed screenshots, CB25_report.md records frozen mock differences, full shapes and no conflict-free scoped slot. No SQL/migrations/RPC/feed_config/cap changes.
+- [ ] Authenticated real-data screenshot unavailable under external_unmanaged; label controlled evidence.
+
 ## CB24 — Remove Top 100 basis line
 - [x] Removed basis call/component, THE_HUNDRED.basis, HUNDRED_BASIS_HEIGHT and unused en/en-XA key; retained RANK_SCOPE_LABEL (page chips/slab/sheet still read it), Trans and blockGap. CB23 and frozen surfaces untouched; local comments updated.
 - [x] Only authorised theHundred.test.ts:57/58 heights assertions changed 334→288 and 522→476; head119+rows144+See-all25=288, signed-in adds slab100+strip88=476. Full bunx vitest run baseline and after 2,005/269, zero failures and no inventory delta; no other assertion edits/deletions/renames/additions.

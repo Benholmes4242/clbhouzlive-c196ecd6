@@ -46,6 +46,7 @@ import { THE_HUNDRED, HUNDRED_ROWS_HEIGHT, HUNDRED_SLAB_HEIGHT, hundredPlacehold
 import { CLIMB, climbCross, climbOrder, climbPlaceholderHeight, type ClimbMode, type ClimbPlaced } from './climb';
 import { formatMonthLong } from '@/i18n/format';
 import { HundredRail, HundredYou } from './TheHundredSection';
+import { LeaderboardsSection } from './LeaderboardsSection';
 
 /** CompactRow value size (the Top 100 and improvement sections). */
 export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
@@ -53,14 +54,16 @@ export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
 /**
  * THE ROUNDS PAGE (BRIEF — THE LEADERBOARDS PAGE, structure A; EX1).
  *
- * EVERY SECTION ANSWERS A DIFFERENT QUESTION. Scope governs the three scoped
- * sections (Standout rounds, Competitions, Just played — EX1 replaced §3, the
- * lead board, with them) and nothing below them. Sections, in order: head
- * (scope chips), Standout rounds, Competitions, Just played, §5 Feats this
+ * EVERY SECTION ANSWERS A DIFFERENT QUESTION. Scope governs Standout rounds,
+ * Competitions, Just played and CB25's remounted Leaderboards only.
+ * Sections, in order: head
+ * (scope chips), Standout rounds, Competitions, Just played, Leaderboards, §5 Feats this
  * year, §4 Most improved, §7 Top 100 — the three below are
  * platform facts. The order alternates section SHAPE (rows,
  * tiles, rows, carousel) so no two neighbours read alike; anything added
  * here is placed by its shape, not its subject. § numbers name sections, not
+ * CB25 explicitly mandates adjacent Just played/Leaderboards rows as an exception;
+ * retain that placement rather than moving a section to repair the shape rule.
  * positions. Each section owns its read, holds its
  * own height while pending, and renders NOTHING when its read fails or is empty.
  */
@@ -625,12 +628,9 @@ export function ScoresLeaderboardsPage({
 
   const pageBody = (
     <div style={{ fontFamily: SANS }}>
-      {/* EX1 — THE BOARDS ARE UNMOUNTED, NOT DELETED: the board chip rail, its
-          rows, the basis sentence, the you slab and the Filters pill no longer
-          render here. BoardRows, BoardFilterPanel, BoardSeeAllSheet,
-          boardFilters, useBoardPage and useBoardFacets stay on disk; restoring
-          a board is re-adding a mount. The scope chips stay and drive
-          Standout rounds, Competitions and Just played. */}
+      {/* CB25 remounts only four ranking choices and the shared rows/read.
+          EX1's basis, you slab and Filters pill remain unmounted; the existing
+          scope control governs all four scoped sections. */}
       {state.ready ? (
         <>
           <div data-scores-control-row style={{ display: 'flex', alignItems: 'center', gap: 9, padding: `0 ${HEAD_GUTTER}px 12px` }}>
@@ -639,6 +639,8 @@ export function ScoresLeaderboardsPage({
           <StandoutRounds viewerId={userId} filters={state.filters} enabled={state.ready} onRowPress={onRowPress} />
           <CompetitionBoards viewerId={userId} scope={state.filters.scope} enabled={state.ready} onRowPress={onRowPress} />
           <JustPlayed viewerId={userId} filters={state.filters} enabled={state.ready} onRowPress={onRowPress} />
+          <LeaderboardsSection state={state} viewerId={userId} onRowPress={onRowPress}
+            onSeeAll={(board) => setSeeAll({ board, filters: state.filters })} />
         </>
       ) : null}
 

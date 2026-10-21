@@ -1,5 +1,15 @@
 {
   "amateur": {
+    "boards": {
+      "eyebrow": "The boards",
+      "title": "Leaderboards",
+      "short": {
+        "net": "Net",
+        "topar": "Gross",
+        "stableford": "Stableford",
+        "birdies": "Birdies"
+      }
+    },
     "standout": {
       "eyebrow": "In form",
       "title": "Standout rounds",
