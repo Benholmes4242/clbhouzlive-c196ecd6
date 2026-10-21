@@ -633,3 +633,7 @@
 - [x] Glimpse mask final stop 0.18@100% -> 0.10@92%, transparent@100% on both maskImage and WebkitMaskImage; opacity 0.74 unchanged. Computed mask verified; before/after screenshots show the cut now reaches zero (no ghosting above THE ROUNDS).
 - [x] 360x640 shows no board rows (spacer state) — verified pre-existing CB36 short-screen rule, identical before the change; not a CB38 regression, no compensation added.
 - [x] No test asserted the padding or mask; none edited. Full suite 2,094 passed / 283 files, zero failures (same total as CB36/CB37). Build OK 2026-10-21T18:53:45Z. Harness files deleted. No SQL/migrations/RPC/feed_config changes; round_pool_cap 30.
+
+## CB41 — Remove the CB40 diagnostic
+- [x] Deleted src/features/explore-magazine/GateFootDiag.tsx. Removed its import (RoundsGate.tsx:46) and the `<GateFootDiag />` mount (RoundsGate.tsx:359), both "CB40 TEMPORARY" comments taken with them. Nothing else touched: card 20px bottom padding, CB35 CSS rule, CB38 mask, CB36 short-screen rule and gated-state scope switch all retained; no layout, padding or height adjusted.
+- [x] `rg GateFootDiag src public index.html` returns no matches (file gone, no dangling reference). No test file referenced it — none edited, renamed or deleted. `tsc --noEmit -p tsconfig.json` clean; preview build OK 2026-10-21T19:35:39Z. Full `vitest run`: 2,104 passed / 285 files, zero failures — identical to the CB40 total, so no test was lost with the file. No SQL/migrations/RPC/feed_config changes; round_pool_cap 30.
