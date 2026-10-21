@@ -1,8 +1,9 @@
 # Roadmap
 
 ## CB27 — Six-board Leaderboards replacement
-- [ ] Replace CB25 controls with six outlined count tiles using existing facets; shared score-leading pairs, faint positions and ranking-only feat suppression.
-- [ ] Report superseded assertions, full-suite counts, count/ranking sources and page shapes; verify 390px tiles and interactions.
+- [x] Replaced CB25 controls with six outlined count tiles using existing facets; shared ScoreWithToPar leads gross/net, faint positions, six-board feat suppression with Rare air rules preserved. Existing page/read/filter owners unchanged; comments record local ownership.
+- [x] Full `bunx vitest run`: baseline2,018/271 zero failures; after2,022 executed/272 files =2,020 passed+2 failed. +1 count test in leaderboardsSection.test.tsx/+3 new leaderboardsScorePairs.test.tsx cases. Announced two superseded CB25 cases before updating; no other existing assertions changed. Build OK11:33:26Z. Count/ranking/shapes/exact failures saved in CB27_stop_report.md.
+- [ ] STOP — scoresLeadBoard.test.tsx:134 `AssertionError: expected '1' to be '−3' // Object.is equality`; :144 `AssertionError: expected '70' to be '−2' // Object.is equality`. Existing cases require to-par-leading cells/red main/amber position; await Ben's test ruling. No code/test corrections after failure. Requested390px screenshot/widths/height/total/interactions not run because verification stopped.
 - [ ] Authenticated real-member check depends on an available hosted session; controlled evidence must be labelled.
 
 ## Explore sheets — One shell
