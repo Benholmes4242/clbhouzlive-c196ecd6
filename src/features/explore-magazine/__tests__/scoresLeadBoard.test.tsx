@@ -128,11 +128,11 @@ describe('See-all sheet rows (retargeted from the page lead board, EX1b)', () =>
     expect(rows[1].style.background).toBe('rgba(247, 147, 30, 0.07)');
   });
 
-  it("the sheet on 'topar' leads with the to-par figure, then gross (sheet only)", async () => {
+  /* CB31 — retargeted to CB27: the raw gross leads, its to-par sits small beside it. */
+  it("the sheet on 'topar' leads with the gross score, its to-par beside it (sheet only)", async () => {
     const rows = await sheet('topar', [row(1, { gross_score: 69, course_par: 72 })]);
-    const cells = Array.from(rows[0].querySelectorAll('.tabular-nums')).map((n) => n.textContent);
-    expect(cells.at(-2)).toBe('\u22123');
-    expect(cells.at(-1)).toBe('69');
+    expect(rows[0].querySelector('[data-board-main]')?.textContent).toBe('69');
+    expect(rows[0].querySelector('[data-board-secondary]')?.textContent).toBe('\u22123');
   });
 
   it('in the sheet the viewing member keeps the score colour law; amber on position and name only', async () => {
