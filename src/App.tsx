@@ -563,6 +563,7 @@ function AppRoutes() {
         {/* Keep-alive routes - rendered by KeepAliveOutlet, but need placeholder for Router */}
         <Route path="/" element={null} />
         <Route path="/clubhouse" element={<Navigate to="/" replace />} />
+        <Route path="/__gate-fixture" element={<Suspense fallback={null}><GateSheetFixture /></Suspense>} />
 
 
         
