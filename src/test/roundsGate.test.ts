@@ -46,7 +46,7 @@ describe('CB14 — the sheet reach line is derived from the data', () => {
   });
 
   it('the locale carries the two sheet rows and the reach sentence, with no dishonoured rows left', () => {
-    const gate = enCourses.amateur as Record<string, string>;
+    const gate = (enCourses.amateur as Record<string, unknown>).gate as Record<string, string>;
     expect(Object.keys(gate)).not.toEqual(expect.arrayContaining(['scotland', 'wales', 'ireland', 'anywhere']));
     expect(gate.sheetReach).toContain('{{supported}}');
     expect(gate.sheetReach).toContain('{{unsupported}}');
