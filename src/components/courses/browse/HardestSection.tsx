@@ -7,6 +7,7 @@ import { useSectionReady } from './PageLoadGate';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { fmtToPar } from './format';
 import { HardestShell } from './sectionShells';
+import { pickRotating, readRotationIds, writeRotationIds } from './rotation';
 
 /* Tile geometry, read by the grid AND its shell (BRIEF_COURSES_SKELETONS 2.3). */
 export const TOUGH_TILE_H = 150;
@@ -20,27 +21,11 @@ const byToughest = (a: StatBrowseRow, b: StatBrowseRow) => (b.avg_to_par ?? -Inf
 
 /** Pure: four tough courses, preferring ones not shown last visit, toughest first. */
 export function pickToughFour(rows: StatBrowseRow[], previousIds: string[], rand: () => number = Math.random): StatBrowseRow[] {
-  if (rows.length <= TOUGH_COUNT) return [...rows].sort(byToughest);
-  const pool = [...rows];
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  const seen = new Set(previousIds);
-  const fresh = pool.filter((r) => !seen.has(r.course_id));
-  const stale = pool.filter((r) => seen.has(r.course_id));
-  return [...fresh, ...stale].slice(0, TOUGH_COUNT).sort(byToughest);
+  return pickRotating(rows, (r) => r.course_id, previousIds, TOUGH_COUNT, rand).sort(byToughest);
 }
 
-function readLast(): string[] {
-  try {
-    const v = JSON.parse(localStorage.getItem(TOUGH_LAST_KEY) ?? '[]');
-    return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
-  } catch { return []; }
-}
-function writeLast(ids: string[]) {
-  try { localStorage.setItem(TOUGH_LAST_KEY, JSON.stringify(ids)); } catch { /* storage unavailable */ }
-}
+const readLast = () => readRotationIds(TOUGH_LAST_KEY);
+const writeLast = (ids: string[]) => writeRotationIds(TOUGH_LAST_KEY, ids);
 
 /** SECTION 04 — THE HARDEST TESTS (BRIEF_COURSES_PAGE_REBUILD §6). */
 export function HardestSection() {
