@@ -1,4 +1,5 @@
 import React from 'react';
+import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 import type { SubjectContext } from '@/components/sheets/SubjectContextLine';
 import { useTranslation } from 'react-i18next';
 
@@ -392,12 +393,17 @@ function WhoLine({
   engagement,
   reviewIdentity,
   roundIdentity,
+  isFollowed,
+  onFollow,
 }: {
   item: StreamItem;
   size: CardSize;
   onPhoto: boolean;
   onWhoTap?: () => void;
   engagement?: RoundCardEngagement | null;
+  /** CB29. Follow state for the round author; the control self-cancels without onFollow. */
+  isFollowed?: boolean;
+  onFollow?: () => void;
   reviewIdentity?: { course: string | null; scope: string | null; date: string | null };
   roundIdentity?: { course: string | null; date: string | null; gross?: number | null; toPar?: number | null; net: number | null; par: number | null; handicapIndex?: number | null; deltaIndex?: number | null; medalsGold?: number | null; medalsSilver?: number | null; medalsBronze?: number | null; feedNet?: { courseHandicap: number | null } | null };
   // handicapIndex/deltaIndex are unread here today: the index returns to the name row in a later change — keep them on the prop.
@@ -615,6 +621,19 @@ function WhoLine({
               <span data-round-identity-date="true" style={{ ...NUMF, fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{roundIdentity.date}</span>
             ) : null}
           </span>
+          {/* CB29 FOLLOW — sits with the person it concerns, before the actions.
+              Self-cancelling like the owner affordance: absent without onFollow,
+              never on the viewer's own round. stop() keeps the tap off the card button. */}
+          {onFollow && item.who?.is_viewer !== true ? (
+            <span
+              data-round-follow="true"
+              style={{ flex: '0 0 auto', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44, padding: '0 12px', margin: '-13px -12px', boxSizing: 'border-box' }}
+              onClickCapture={(event) => event.preventDefault()}
+              onClick={stop}
+            >
+              <FeedFollowPill isFollowed={!!isFollowed} onFollow={onFollow} />
+            </span>
+          ) : null}
           {/* Actions opposite the person; each control keeps its own 44x44 hit area. */}
           {reactions ? <span style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 14 }}>{reactions}</span> : null}
           {/* OWNER AFFORDANCE — one card, both surfaces (Home and Explore).
@@ -848,7 +867,12 @@ export function ExploreCard({
   medals,
   bleed,
   feedPlot,
+  isFollowed,
+  onFollow,
 }: {
+  /** CB29. Optional follow control in the round author row; absent when not supplied. */
+  isFollowed?: boolean;
+  onFollow?: () => void;
   /** HOME ONLY. The px inset of the host column. When set, the photograph
    *  runs full bleed to the slab edges (negative margin of this amount, no
    *  radius) because every neighbour in the Home feed is full bleed; every
@@ -1590,6 +1614,8 @@ export function ExploreCard({
             onPhoto={false}
             onWhoTap={onWhoTap}
             engagement={engagement}
+            isFollowed={isFollowed}
+            onFollow={onFollow}
             roundIdentity={{ course: kickerPartsValue.course, date: playDate, gross: item.facts.gross ?? null, toPar: item.facts.to_par ?? null, net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null, medalsGold: medals?.gold ?? null, medalsSilver: medals?.silver ?? null, medalsBronze: medals?.bronze ?? null, feedNet: { courseHandicap: nettable ? courseHcp : null } }}
           />
         </span>
@@ -1643,6 +1669,8 @@ export function ExploreCard({
             onPhoto={false}
             onWhoTap={onWhoTap}
             engagement={engagement}
+            isFollowed={isFollowed}
+            onFollow={onFollow}
             roundIdentity={item.kind === 'round' && size !== 'pair'
               ? { course: kickerPartsValue.course, date: railCaptionDate(item.facts.play_date ?? null), gross: item.facts.gross ?? null, toPar: item.facts.to_par ?? null, net: item.facts.net ?? null, par: item.facts.course_par ?? null, handicapIndex: item.facts.current_handicap_index ?? null, deltaIndex: item.facts.delta_index ?? null, medalsGold: medals?.gold ?? null, medalsSilver: medals?.silver ?? null, medalsBronze: medals?.bronze ?? null }
               : undefined}

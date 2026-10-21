@@ -524,6 +524,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             engagement={roundEngagement}
             square
             pillLabel={tCourses('courseDetail.featured.featuredPill')}
+            isFollowed={mountFollowPill ? !!post.isFollowedByMe : undefined}
+            onFollow={mountFollowPill ? () => onFollow!(post) : undefined}
             onOpen={() => onRoundTap?.(post, postRound)}
           />
         </article>
@@ -551,6 +553,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           medals={roundMedals}
           onTap={() => { if (postRound) onRoundTap?.(post, postRound); }}
           onWhoTap={() => onProfile(post)}
+          isFollowed={mountFollowPill ? !!post.isFollowedByMe : undefined}
+          onFollow={mountFollowPill ? () => onFollow!(post) : undefined}
           engagement={{
             kind: 'celebrate',
             likeCount,
