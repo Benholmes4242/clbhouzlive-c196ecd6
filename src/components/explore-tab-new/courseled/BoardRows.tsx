@@ -303,13 +303,13 @@ function gridFor(ranked: boolean): string {
 
 /** The sheet's column labels. The lead board has none (9.9). */
 /** CB20 — `flush`: the parent (a Section) already owns the gutter, so the row adds no horizontal padding. Default keeps the sheet's inset. */
-export function BoardHeaderRow({ board, flush }: { board: BoardKey; flush?: boolean }) {
+export function BoardHeaderRow({ board, flush, sheet }: { board: BoardKey; flush?: boolean; sheet?: boolean }) {
   const { t } = useTranslation('courses');
   const cols = boardColumns(board);
   const cap: React.CSSProperties = {
-    fontSize: 9.5,
+    fontSize: sheet ? 10.5 : 9.5,
     fontWeight: 700,
-    letterSpacing: '0.13em',
+    letterSpacing: sheet ? '0.16em' : '0.13em',
     textTransform: 'uppercase',
     color: A.DIM,
   };

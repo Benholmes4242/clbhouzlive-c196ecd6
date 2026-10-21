@@ -1,5 +1,10 @@
 # Roadmap
 
+## Explore sheets — One shell
+- [ ] Extract canonical Top 100/Most improved shell unchanged; reuse in board and competition sheets, scoped columns and Just played title.
+- [ ] Add shell/see-all/competition structure tests, audit existing assertions, run full suite from 2,011/270.
+- [ ] Verify controlled sheet opening/closing and canonical equivalence; report real-member auth limitation.
+
 ## CB25 — Leaderboards section returns
 - [x] Remounted four allowed boards on existing state.page/shared rows/head/See-all; sole caller supplies optional net default, existing recent entryBoardFor/scope probes unchanged. Local headers record ownership and mandated shape exception; no other sections or BoardFilterPanel edited.
 - [x] No protecting assertions needed changes. Full bunx vitest run 2,005/269 → 2,011/270, zero failures; delta solely six new leaderboardsSection.test.tsx cases. No existing tests deleted/renamed/rewritten. Preview build OK11:15:25Z.
