@@ -50,7 +50,7 @@ import { Z } from '@/config/zIndex';
 import { BrowseCourseCard, PHOTO_H as BROWSE_PHOTO_H } from './BrowseCourseCard';
 
 /** Gap between browse cards; the list and its shell both read it. */
-const STAT_BROWSE_CARD_GAP = 32;
+const STAT_BROWSE_CARD_GAP = 24;
 import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import { AMBER, HAIRLINE_INK_8, HAIRLINE_INK_10, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';

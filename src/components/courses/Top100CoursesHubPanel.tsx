@@ -21,7 +21,7 @@ import { TheArgumentSection } from './top100/TheArgumentSection';
 import { ArgumentShell, Top100CardListShell, YourHundredShell } from './top100/top100Shells';
 
 /** Gap between cards in the Top 100 list; its shell reads this (BRIEF_COURSES_SKELETONS_3A). */
-export const TOP100_CARD_GAP = 32;
+export const TOP100_CARD_GAP = 24;
 import { argumentRows, qualifyingCount } from './top100/theArgument';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 

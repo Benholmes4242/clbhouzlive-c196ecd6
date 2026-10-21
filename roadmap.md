@@ -1,5 +1,12 @@
 # Roadmap
 
+## BRIEF_COURSE_CARD_SCORE_BLOCK — stopped at validation
+- [x] Moved BrowseCourseCard headline/count below unchanged photography into opt-in CategoryScores split; preserved grid4/pairs, canonical tones and frozen photo elements. Facts use 10/8px seams and 13px embedded figures; both shared card-gap constants are 24px.
+- [x] Added categoryScoresSplit.test.tsx with six cases. No existing test deleted, renamed, rewritten or assertion changed; courseRatingConsistency.test.ts unedited and all 19 cases pass. Preview build OK 2026-10-21T12:33:26Z. No SQL/migrations/RPC/feed_config/cap changes.
+- [ ] STOP: categoryScoresSplit.test.tsx:24:45 `AssertionError: expected 'rgba(255,255,255,0.08)' to be 'rgba(255, 255, 255, 0.08)' // Object.is equality`. New divider colour assertion has formatting mismatch; no correction after failure, awaiting Ben's ruling.
+- [x] Requested full `bunx vitest run`: 2,060 passed +3 failed =2,063 executed across279 files. Previous reported2,053 passed+2 failed reconciles with two added By region cases to2,055 passed+2 failed/278 files before this brief; six new split cases add five passing/one failing and one file. Known CB27 failures remain scoresLeadBoard.test.tsx:134 `AssertionError: expected '1' to be '−3' // Object.is equality`, :144 `AssertionError: expected '70' to be '−2' // Object.is equality`.
+- [ ] Browser/mock verification not run after stop; authenticated checks unavailable (external_unmanaged). Typecheck not manually run because preview harness owns it. Local header documents split ownership; root cross-cutting rules unchanged.
+
 ## CB27 — Six-board Leaderboards replacement
 - [x] Replaced CB25 controls with six outlined count tiles using existing facets; shared ScoreWithToPar leads gross/net, faint positions, six-board feat suppression with Rare air rules preserved. Existing page/read/filter owners unchanged; comments record local ownership.
 - [x] Full `bunx vitest run`: baseline2,018/271 zero failures; after2,022 executed/272 files =2,020 passed+2 failed. +1 count test in leaderboardsSection.test.tsx/+3 new leaderboardsScorePairs.test.tsx cases. Announced two superseded CB25 cases before updating; no other existing assertions changed. Build OK11:33:26Z. Count/ranking/shapes/exact failures saved in CB27_stop_report.md.

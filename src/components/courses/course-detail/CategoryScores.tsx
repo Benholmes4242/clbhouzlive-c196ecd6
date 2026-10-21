@@ -9,6 +9,8 @@
  *   columns four equal, 12px gap
  *
  * An absent category renders an EMPTY column — never a zero, never a dash.
+ * Course list cards opt into split; their overall lead is supplied by the card
+ * so headline tone stays separate from category tone. grid4/pairs stay independent.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -72,8 +74,39 @@ const CategoryScorePairs: React.FC<{ scores: CategoryScoreValues; marginTop: num
   </div>
 );
 
-export const CategoryScores: React.FC<{ scores: CategoryScoreValues; marginTop?: number; layout?: 'grid4' | 'pairs' }> = ({ scores, marginTop = 0, layout = 'grid4' }) => {
-  if (ORDER.every(({ key }) => scores[key] == null)) return null;
+export const CategoryScores: React.FC<{ scores: CategoryScoreValues; marginTop?: number; layout?: 'grid4' | 'pairs' | 'split'; lead?: React.ReactNode }> = ({ scores, marginTop = 0, layout = 'grid4', lead }) => {
+  const hasScores = ORDER.some(({ key }) => scores[key] != null);
+  const hasLead = lead != null && lead !== false;
+  if (!hasScores && !(layout === 'split' && hasLead)) return null;
+  if (layout === 'split') return (
+    <div
+      data-category-scores
+      style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop, fontFamily: SANS }}
+    >
+      {hasLead ? (
+        <div style={{ flex: '0 0 auto', ...(hasScores ? { paddingRight: 14, borderRight: `1px solid ${A.TRACK}` } : {}), textAlign: 'center' }}>
+          {lead}
+        </div>
+      ) : null}
+      {hasScores ? (
+        <div style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 16, rowGap: 8 }}>
+          {ORDER.map(({ key, label }) => {
+            const value = scores[key];
+            if (value == null) return <div key={key} data-category={key} aria-hidden style={{ minWidth: 0 }} />;
+            const tone = courseSubScoreTone(value);
+            return (
+              <div key={key} data-category={key} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', minWidth: 0 }}>
+                <span style={{ fontSize: 11, color: A.MUTE, whiteSpace: 'nowrap' }}>{label}</span>
+                <span data-category-figure data-category-score={value.toFixed(1)} style={{ ...FIGS, fontSize: 13, fontWeight: 700, color: tone }}>
+                  {value.toFixed(1)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
   if (layout === 'pairs') return <CategoryScorePairs scores={scores} marginTop={marginTop} />;
   return (
     <div
