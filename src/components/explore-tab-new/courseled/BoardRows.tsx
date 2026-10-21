@@ -437,8 +437,10 @@ export function BoardRowView({
             textAlign: 'center',
             fontSize: M.posSize,
             fontWeight: M.posWeight,
-            /* CB27: positions are context, never podium gold or member amber. */
-            color: A.FAINT,
+            /* CB32: two halves, both binding. No position is ever amber (or gold)
+               for rank — CB27. The viewer's own position is always amber for
+               identity — S5.4 (line 27): amber on this surface means YOU. */
+            color: isSelf ? A.AMBER : A.FAINT,
           }}
         >
           {/* A TIE STATES ITSELF: T4, never a silent second 4. */}
