@@ -35,6 +35,7 @@ import type { CircleRoundRow } from '@/hooks/gam/useCircleLatestRounds';
 import type { FeaturedRound } from './useFeaturedRound';
 import { goodHoleDots, SCORE_TRACE_PLOT_HEIGHT } from './roundTreatment';
 import { Skeleton } from '@/components/ui/skeleton';
+import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 /** Matches the Courses-tab lead course-record tile. 210 left no room for the
  *  trace and the text block to coexist. The pane may grow if copy wraps. */
 const PANE_H = 300;
@@ -116,6 +117,9 @@ function Headline({ r, unit }: { r: FeaturedRound; unit?: string | null }) {
 export const FeaturedRoundCard: React.FC<{
   round: FeaturedRound;
   viewerId?: string;
+  /** CB29. Optional follow control at the end of the band row; absent when not supplied. */
+  isFollowed?: boolean;
+  onFollow?: () => void;
   shape?: HoleShape | null;
   onOpen: () => void;
   /** Clap + comment in the gold strip (BRIEF_FEATURED_ROUND_ACTIONS). Optional:
@@ -130,6 +134,8 @@ export const FeaturedRoundCard: React.FC<{
 }> = ({
   round: r,
   viewerId,
+  isFollowed,
+  onFollow,
   shape = null,
   onOpen,
   engagement = null,
@@ -207,6 +213,19 @@ export const FeaturedRoundCard: React.FC<{
             ) : null}
           </span>
           {engagement ? <Actions engagement={engagement} mine={mine} /> : null}
+          {/* CB29 FOLLOW — end of the band row, beside the actions; never on the
+              viewer's own round. Stops the tap the same way Actions' open() does
+              (stopPropagation + preventDefault) so it never opens the round. */}
+          {onFollow && !mine ? (
+            <span
+              data-featured-follow="true"
+              style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44, textShadow: 'none' }}
+              onClickCapture={(ev) => ev.preventDefault()}
+              onClick={(ev) => { ev.stopPropagation(); ev.preventDefault(); }}
+            >
+              <FeedFollowPill isFollowed={!!isFollowed} onFollow={onFollow} />
+            </span>
+          ) : null}
         </div>
         <div style={{ marginTop: 11, paddingTop: 11, borderTop: `1px solid ${A.SOFT}`, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}>
           <FigureCell minHeight={34} label={t('amateur.stream.stat.gross', 'GROSS')} value={r.gross != null ? String(r.gross) : ''} suffix={grossSuffix} />
