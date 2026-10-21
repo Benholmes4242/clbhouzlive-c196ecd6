@@ -514,9 +514,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   // Review figures: overall, golfers, then each filled-in sub-score.
   const review = activePost.isReview ? activePost.review : null;
-  const reviewCells: { key: string; value: number; label: string; amber?: boolean }[] = [];
+  const reviewCells: { key: string; value: number; label: string }[] = [];
   if (review) {
-    if (review.rating != null) reviewCells.push({ key: 'r', value: Number(review.rating), label: 'OVERALL', amber: true });
+    if (review.rating != null) reviewCells.push({ key: 'r', value: Number(review.rating), label: 'OVERALL' });
     for (const [field, label] of BREAKDOWN_CELLS) {
       const v = review.breakdown?.[field];
       if (v != null) reviewCells.push({ key: field, value: Number(v), label });
@@ -763,7 +763,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             <div style={{ marginTop: 11, display: 'flex', gap: 15, textShadow: TEXT_SHADOW }}>
               {reviewCells.map((c) => (
                 <div key={c.key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                  <span style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1, color: c.amber ? AMBER : '#FFFFFF', ...TABULAR }}>
+                  <span style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1, color: '#FFFFFF', ...TABULAR }}>
                     {formatRatingValue(c.value)}
                   </span>
                   <span style={{ marginTop: 3, fontSize: 7, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: MICRO_LABEL, whiteSpace: 'nowrap' }}>

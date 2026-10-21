@@ -23,12 +23,13 @@ describe('fullscreen comment band', () => {
     expect(rect.top + rect.height).toBeLessThanOrEqual(754);
   });
 
-  it('contains a portrait video centred horizontally above the band', () => {
+  it('contains a portrait video, width-limited, centred above the band', () => {
     const rect = resolveRestingRect(900, 1600, viewport, 'video');
     expect(rect.fit).toBe('contain');
-    expect(rect.height).toBe(707);
-    expect(rect.top).toBe(47);
-    expect(rect.left + rect.width / 2).toBe(195);
+    expect(rect.width).toBe(390);
+    expect(rect.left).toBe(0);
+    expect(rect.height).toBeCloseTo(693.333, 2);
+    expect(rect.top + rect.height / 2).toBeCloseTo((47 + 754) / 2);
     expect(rect.top + rect.height).toBeLessThanOrEqual(754);
   });
 });
