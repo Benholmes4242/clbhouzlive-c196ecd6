@@ -1481,7 +1481,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
        get_round_feat_lines takes every round id currently in the stream in
        a single call; each card reads its own row out of that response. */
     <FeatRarityProvider ids={roundScoreIds.filter((id): id is string => !!id)}>
-    <div style={{ fontFamily: SANS }}>
+    <div data-explore-magazine="" style={{ fontFamily: SANS }}>
       {/* §3b THE VIEW CHIP ROW starts below the islands because AmateurPage's
           shell pays CHROME_CLEARANCE. On scroll, the shared islands ride away
           and this row pins directly beneath the notch. The sentinel drives the
@@ -1569,7 +1569,7 @@ export function ExploreMagazine({ userId }: { userId: string | undefined }) {
           widening sentence); the way back is STATED above it, because a member
           who cannot find the stream again will think the app broke. */}
       {scoresBoardActive ? (
-        <div style={{ marginBottom: BLOCK_GAP }}>
+        <div data-scores-board-container="" style={{ marginBottom: BLOCK_GAP }}>
           <ScoresLeaderboardsPage
             userId={userId}
             state={boardState}

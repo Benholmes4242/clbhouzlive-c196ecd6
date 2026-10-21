@@ -19,7 +19,7 @@
  * states: an undeleted row proves the federation connection exists.
  *
  * The card is not dismissible: no close, no swipe-away, no remembered
- * dismissal. The white CTA and the sheet's foot both route to
+ * dismissal. The white text action and the sheet's foot both route to
  * /manage/handicap, the same destination as every other connect CTA (ERT1).
  *
  * CB14.1 — the sheet's reach line is two independent clauses, each rendered
@@ -38,9 +38,11 @@ import { ChevronRight } from 'lucide-react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { Button } from '@/components/ui/button';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { WHS_COUNTRIES, getCountryById, type WhsCountry } from '@/lib/whs/whsCountries';
 import { EYEBROW } from './Section';
+import './roundsGate.css';
 
 export type RoundsGateState = 'signedOut' | 'loading' | 'gated' | 'connected';
 
@@ -63,10 +65,6 @@ const FROST: CSSProperties = {
   WebkitMaskImage: 'linear-gradient(to bottom, #000 0, #000 34%, transparent 100%)',
   maskImage: 'linear-gradient(to bottom, #000 0, #000 34%, transparent 100%)',
 };
-
-/** CB34 — the header's clip, as measured in the mock. A max, not a height, so
- *  an empty pool renders no header and the copy starts at the top. */
-const HEADER_MAX = 193.3;
 
 /** CB14 — the sheet's one outbound link. England is the only supported
  *  provider (whsCountries.ts), so it is the only route we can honour; the
@@ -124,16 +122,14 @@ export function gateReachLine(
 function GateCard({ onConnect, onNoHandicap }: { onConnect: () => void; onNoHandicap: () => void }) {
   const { t } = useTranslation('courses');
   const bullets = [
-    t('amateur.gate.bulletBoards'),
-    t('amateur.gate.bulletComps'),
-    t('amateur.gate.bulletIndex'),
     t('amateur.gate.bulletCourses'),
+    t('amateur.gate.bulletIndex'),
   ];
   return (
     <div
       data-rounds-gate-card=""
       style={{
-        padding: '22px 20px',
+        padding: '22px 20px 0',
       }}
     >
       <div style={{ ...EYEBROW, lineHeight: 1, color: A.AMBER }}>{t('amateur.gate.eyebrow')}</div>
@@ -151,24 +147,27 @@ function GateCard({ onConnect, onNoHandicap }: { onConnect: () => void; onNoHand
           </div>
         ))}
       </div>
-      <button
+      <Button
+        variant="ghost"
         type="button"
         onClick={onConnect}
         style={{
-          marginTop: 17, display: 'block', width: '100%', border: 0, cursor: 'pointer',
-          background: A.INK, color: A.CANVAS, borderRadius: 12, padding: 14,
-          fontFamily: SANS, fontSize: 13.5, fontWeight: 800, letterSpacing: '0.02em', textAlign: 'center',
+          marginTop: 17, display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-start', gap: 7,
+          minHeight: 44, height: 'auto', width: 'auto', border: 0, cursor: 'pointer',
+          background: 'transparent', color: A.INK, borderRadius: 0, padding: 0,
+          fontFamily: SANS, fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', textAlign: 'left',
         }}
       >
         {t('amateur.gate.cta')}
-      </button>
+        <ChevronRight size={15} style={{ width: 15, height: 15 }} />
+      </Button>
       {/* The quiet second path: the SeeAll treatment (EYEBROW, A.MUTE, 13px
-          chevron), centred as the mock has it. */}
+          chevron), left-aligned under the text action (CB35). */}
       <button
         type="button"
         onClick={onNoHandicap}
         style={{
-          marginTop: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, width: '100%',
+          marginTop: 13, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 4, width: '100%',
           border: 0, background: 'transparent', padding: 0, cursor: 'pointer',
           fontFamily: SANS, ...EYEBROW, color: A.MUTE,
         }}
@@ -271,16 +270,16 @@ export function RoundsGate({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div>
+    <div data-rounds-gate="" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
       <div
         aria-hidden
         data-rounds-gate-header=""
         ref={(el) => el?.setAttribute('inert', '')}
-        style={{ maxHeight: HEADER_MAX, overflow: 'hidden', ...FROST }}
+        style={{ flex: '1 1 0', minHeight: 0, overflow: 'hidden', ...FROST }}
       >
         {children}
       </div>
-      <div>
+      <div style={{ flexShrink: 0 }}>
         <GateCard onConnect={() => {
           analyticsEvents.track('rounds_gate_connect_tap', { gate_state: 'gated' });
           navigate('/manage/handicap');

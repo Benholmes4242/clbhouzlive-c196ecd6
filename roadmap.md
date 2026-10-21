@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB35 — Gate action and bullets
+- [x] Baseline `bunx vitest run`: 2,092 passed / 282 files, zero failures; matches last reported count. Only CTA role selector is roundsGateAnalytics.test.tsx:79, case “reports the white CTA tap before retaining its connect destination”; preserve its accessible button semantics and all assertions unchanged. No bullet-count/removed-string protecting assertion.
+- [x] Matched white inline text action, exactly two bullets (courses then index), and gate-only flex anchoring at the measured nav top. Frozen states, predicate, inert mask, sheet and analytics retained. No existing tests changed.
+- [x] Full `bunx vitest run`: 2,092 passed / 282 files before and after, zero failures, no inventory delta. Preview build OK. Controlled real-component 390×844 capture: header 308.05px; two fully visible rounds and third partly visible; card/nav seam 0px; action 196.44×44px; secondary gap 13px. StrictMode impression fired once; click fired connect event and navigated to /manage/handicap. Hosted authenticated end-to-end check unavailable (external_unmanaged); capture is controlled, not a signed-in live gate. Report and screenshot in Files. No SQL/migrations/RPC/feed_config/cap changes.
+
 ## BRIEF_REVIEW_POST_SCORE_MATCH_CARDS
 - [x] Compacted block D only to option B sizes/spacing; preserved tones, verdict, dashes, drop rules and navigation. Authorised renames: reviewPostScoreBlockB2.test.tsx:35 'renders the overall at 30 / 800 in its rating tone with a right divider' becomes24; :38 `expect(score.style.fontSize).toBe('30px')` becomes24px. reviewPostScoreCompact.test.tsx:26 'the score figure is 30 / 800 / -0.045em' becomes24; :28 `expect(s.style.fontSize).toBe('30px')` becomes24px. These two cases reflect signed-off size change; every other existing assertion retained, six requested assertions added in B2. No tests deleted or other cases renamed/rewritten.
 - [x] Full `bunx vitest run`: before2,060 passed+3 failed=2,063/279 files; after2,059 passed+4 failed=2,063/279 files. No inventory delta. Both authorised files pass (8+3 cases). Preview build OK12:36:00Z; manual typecheck not run (preview harness ownership).
