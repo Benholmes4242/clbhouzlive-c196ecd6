@@ -199,8 +199,8 @@ function GateSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
             gateReach(), so the sentence tracks support as providers launch. */}
         <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${A.SOFT}`, fontSize: 11.5, fontWeight: 600, lineHeight: 1.45, color: A.MUTE }}>
           {t('amateur.gate.sheetReach', {
-            supported: supportedBodies.join(' and '),
-            unsupported: unsupportedHomeNations.join(', '),
+            supported: andJoin(supportedBodies),
+            unsupported: andJoin(unsupportedHomeNations),
           })}
         </div>
         <button
