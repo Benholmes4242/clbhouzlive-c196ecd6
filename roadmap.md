@@ -1,5 +1,9 @@
 # Roadmap
 
+## CB15 — Instrument the gate
+- [ ] Add four RoundsGate-only analytics events using ProfileHero's track convention; preserve presentation, navigation, states and predicate.
+- [ ] Verify once-per-mount reporting, tap payloads and existing connection-completion join; run full suite against 1,968 passing / 261 files baseline (`bunx vitest run`).
+
 ## SR1 — Standout rounds
 - [x] Added the four-row read and section below scope chips (Ben's placement ruling), consuming state.filters from useAmateurBoardState and the same boardRowPress callback. Callback parameter narrowed to its existing score/user fields; handler body unchanged. courses namespace, English only. Frozen files/tests, RPCs, SQL, migrations, feed_config and cap untouched. Local headers own architecture; root AGENTS addition rejected by size budget, no root change.
 - [x] `npx vitest run`: 1,939/257 before -> 1,955/258 after, zero failures; +16 solely src/test/standoutRounds.test.tsx, no existing test edits. Preview build OK. Chromium real-component isolated transport: all four taps return corresponding score id; scope/window args and right label change together; no page errors; screenshots reviewed. Hosted authenticated acceptance unavailable (external_unmanaged).

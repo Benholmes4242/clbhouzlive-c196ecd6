@@ -24,6 +24,11 @@
  *
  * CB14.1 — the sheet's reach line is two independent clauses, each rendered
  * only when its own list has a name to give it: see gateReachLine.
+ *
+ * CB15 — ScoresLeaderboardsPage mounts this component only for `gated`.
+ * Reporting stays here: a ref latches the impression before track, surviving
+ * query-driven rerenders and StrictMode effect replay; a real remount resets
+ * it. Payloads carry gate_state (and row for row taps), never member/WHS data.
  */
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -33,6 +38,7 @@ import { ChevronRight } from 'lucide-react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { WHS_COUNTRIES, getCountryById, type WhsCountry } from '@/lib/whs/whsCountries';
 import { EYEBROW } from './Section';
 
@@ -216,11 +222,14 @@ function GateSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
               background: 'transparent', textAlign: 'left', fontFamily: SANS,
             };
             return r.href ? (
-              <button key={r.key} type="button" onClick={() => window.open(r.href as string, '_blank', 'noopener,noreferrer')} style={{ ...rowStyle, cursor: 'pointer' }}>
+              <button key={r.key} type="button" onClick={() => {
+                analyticsEvents.track('rounds_gate_sheet_row_tap', { gate_state: 'gated', row: r.key });
+                window.open(r.href as string, '_blank', 'noopener,noreferrer');
+              }} style={{ ...rowStyle, cursor: 'pointer' }}>
                 {body}
               </button>
             ) : (
-              <div key={r.key} style={rowStyle}>{body}</div>
+              <div key={r.key} onClick={() => analyticsEvents.track('rounds_gate_sheet_row_tap', { gate_state: 'gated', row: r.key })} style={rowStyle}>{body}</div>
             );
           })}
         </div>
@@ -260,6 +269,13 @@ export function RoundsGate({ children }: { children: ReactNode }) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [poolEmpty, setPoolEmpty] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const impressionTracked = useRef(false);
+
+  useEffect(() => {
+    if (impressionTracked.current) return;
+    impressionTracked.current = true;
+    analyticsEvents.track('rounds_gate_viewed', { gate_state: 'gated' });
+  }, []);
 
   useEffect(() => {
     const el = contentRef.current;
@@ -281,7 +297,13 @@ export function RoundsGate({ children }: { children: ReactNode }) {
         <div ref={contentRef}>{children}</div>
       </div>
       <div style={{ position: 'relative', paddingTop: poolEmpty ? REVEAL_EMPTY : REVEAL }}>
-        <GateCard onConnect={() => navigate('/manage/handicap')} onNoHandicap={() => setSheetOpen(true)} />
+        <GateCard onConnect={() => {
+          analyticsEvents.track('rounds_gate_connect_tap', { gate_state: 'gated' });
+          navigate('/manage/handicap');
+        }} onNoHandicap={() => {
+          analyticsEvents.track('rounds_gate_no_handicap_tap', { gate_state: 'gated' });
+          setSheetOpen(true);
+        }} />
       </div>
       <GateSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />
     </div>
