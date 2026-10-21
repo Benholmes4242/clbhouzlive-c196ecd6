@@ -55,9 +55,6 @@ import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { FullscreenTopProgress, showsTopProgress } from './FullscreenTopProgress';
 import { FullscreenVideoScrubber, showsVideoScrubber } from './FullscreenVideoScrubber';
-
-const SCRUBBER_H = 32;
-const SCRUBBER_GAP = 6;
 import { useVideoProgressWriter } from '@/video/useVideoProgressWriter';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
@@ -84,6 +81,9 @@ const TEXT_SHADOW = '0 1px 3px rgba(0,0,0,0.55)';
 /* The inset comment pill: 44px tall, floating COMMENT_BAR_BOTTOM above the
    bottom edge (never inside the home indicator). COMMENT_BAR_BLOCK is the full
    footprint the author column and rail clear. Change these together. */
+// The scrubber's 32px hit area and its gap above the comment bar.
+const SCRUBBER_H = 32;
+const SCRUBBER_GAP = 6;
 const COMMENT_BAR_H = 44;
 // 16 is a FLOOR, not a fixed offset: on home-indicator phones the pill sits above the indicator.
 const COMMENT_BAR_BOTTOM = 'max(16px, env(safe-area-inset-bottom, 0px))';
@@ -488,6 +488,8 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const fadeWhileScrubbing: React.CSSProperties = scrubbing
     ? { opacity: 0, transition: 'opacity 150ms', pointerEvents: 'none' }
     : { opacity: 1, transition: 'opacity 150ms' };
+  // inert, not pointerEvents: child buttons set pointerEvents 'auto' themselves; inert disables every descendant.
+  const inertWhileScrubbing = scrubbing ? ({ inert: '' } as Record<string, string>) : {};
   const likeStr = formatCount(likeState.count);
   const commentStr = formatCount(commentCount);
   const timeLabel = timeAgo(activePost.createdAt);
@@ -549,6 +551,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
       {/* Top scrim removed — chrome sits directly on the blurred media
           backdrop. Text/icons carry their own drop-shadow for legibility. */}
       <div
+        {...inertWhileScrubbing}
         style={{
           position: 'fixed',
           top: 0,
@@ -677,6 +680,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
       {/* Bottom-LEFT — author + info stack */}
       <div
+        {...inertWhileScrubbing}
         style={{
           position: 'fixed',
           bottom: stackBottom,
@@ -821,6 +825,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           The column is bottom-anchored, so dropping mute (its first child)
           shortens it from the top and the buttons beneath do not move. */}
       <div
+        {...inertWhileScrubbing}
         style={{
           position: 'fixed',
           right: 'max(12px, env(safe-area-inset-right, 0px))',

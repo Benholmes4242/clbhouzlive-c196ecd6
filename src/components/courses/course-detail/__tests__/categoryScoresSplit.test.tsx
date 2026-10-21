@@ -21,7 +21,7 @@ describe('CategoryScores split', () => {
     const wrapper = getByTestId('lead').parentElement;
     expect(wrapper?.style.borderRightWidth).toBe('1px');
     expect(wrapper?.style.borderRightStyle).toBe('solid');
-    expect(wrapper?.style.borderRightColor).toBe(normalizedColor(A.TRACK));
+    expect(wrapper?.style.borderRightColor.replace(/\s/g, '')).toBe(normalizedColor(A.TRACK).replace(/\s/g, ''));
     expect(wrapper?.style.paddingRight).toBe('14px');
     expect(Array.from(container.querySelectorAll('[data-category]')).map((cell) => cell.getAttribute('data-category'))).toEqual(['design', 'condition', 'clubhouse', 'facilities']);
     expect(container.querySelectorAll('[data-category-figure]')).toHaveLength(4);
