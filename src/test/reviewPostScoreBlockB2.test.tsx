@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { ReviewPostCard } from '@/components/feed/ReviewPostCard';
 import { reviewLabelColor } from '@/components/shared/ReviewGhostScore';
+import { getRatingTierLabel } from '@/lib/ratingTier';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => <span /> }));
@@ -70,7 +71,7 @@ describe('review post score block B2', () => {
   it('preserves verdict navigation and its accessible score label at 9px', () => {
     const { element, onReadReview } = card(9);
     const button = element('[data-review-tier] button');
-    expect(button.getAttribute('aria-label')).toBe('9.0 Exceptional');
+    expect(button.getAttribute('aria-label')).toBe(`9.0 ${getRatingTierLabel(9)}`);
     expect(element('[data-review-tier] span').style.fontSize).toBe('9px');
     fireEvent.click(button);
     expect(onReadReview).toHaveBeenCalledTimes(1);
