@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Section, Rail, SeeAll } from '@/features/explore-magazine/Section';
-import { BottomSheet } from '@/components/ui/BottomSheet';
+import { ExploreSheetShell } from './ExploreSheetShell';
 import { A, COMPETITION, SELF_ROW_TINT, FIGS, SANS } from './tokens';
 import type { BoardFilters } from './boardFilters';
 import { playDateAtLocalNoon } from './discoverWhen';
@@ -28,7 +28,9 @@ import { groupCompetitionCards, useCompetitionBoards, type CompetitionBoardRow, 
  * the standout rows render it, and the sheet's subtitle takes the same pill.
  * CB16: counts and positions describe members, not the complete competition
  * field. Only the sheet carries the scope explanation; the CTA reuses the
- * shared member-list label to avoid duplicate copy keys. */
+ * shared member-list label to avoid duplicate copy keys.
+ * ONE_SHELL moves the sheet-only explanation below rows, with canonical
+ * shell header/columns; cards, row actions and the single read stay unchanged. */
 const PODIUM = 3;
 
 /** The subtitle's metadata, on card and sheet alike: the date and the field
@@ -85,41 +87,36 @@ function Card({ card, onOpen, onRowPress }: { card: CompetitionCard; onOpen: () 
 }
 
 function FieldSheet({ card, viewerId, onClose, onRowPress }: { card: CompetitionCard | null; viewerId: string | undefined; onClose: () => void; onRowPress: (row: RoundPressTarget) => void }) {
-  const { t } = useTranslation('courses');
-  return (
-    <BottomSheet open={!!card} onClose={onClose} maxHeight="85dvh" ariaLabelledBy="competition-field-title">
-      {card ? <FieldBody card={card} viewerId={viewerId} onRowPress={onRowPress} t={t} /> : null}
-    </BottomSheet>
-  );
+  return card ? <FieldBody card={card} viewerId={viewerId} onClose={onClose} onRowPress={onRowPress} /> : null;
 }
 
-function FieldBody({ card, viewerId, onRowPress, t }: { card: CompetitionCard; viewerId: string | undefined; onRowPress: (row: RoundPressTarget) => void; t: (k: string, o?: Record<string, unknown>) => string }) {
+function FieldBody({ card, viewerId, onClose, onRowPress }: { card: CompetitionCard; viewerId: string | undefined; onClose: () => void; onRowPress: (row: RoundPressTarget) => void }) {
+  const { t } = useTranslation('courses');
   const subtitle = useSubtitleRest(card);
   return (
     <div data-competition-field style={{ fontFamily: SANS, ...FIGS }}>
-      <div style={{ padding: '14px 18px 0' }}>
-        <h2 id="competition-field-title" style={{ margin: 0, fontSize: 16, fontWeight: 700, color: A.INK, lineHeight: 1.25 }}>{card.course_name}</h2>
-        <div style={{ marginTop: 4, fontSize: 11.5, fontWeight: 600, color: A.DIM, lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {/* CB10 — the sentence keeps the FULL word at the subtitle's own size;
-              the trophy rides before it. inline-flex (never flex) so the line
-              still ellipsises; verticalAlign middle lifts the glyph off the
-              bottom-margin-edge baseline an inline-flex box would otherwise take. */}
+      <ExploreSheetShell open onClose={onClose} titleId="competition-field-title" title={card.course_name}
+        subtitle={<>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, verticalAlign: 'middle', color: COMPETITION }}>
             <CompetitionTrophy width={11} height={12} />
             {t('discover.filterBoard.competitionChip', { defaultValue: 'Competition' })}
           </span>
           {' · '}{subtitle}
-        </div>
-        <div style={{ marginTop: 4, fontSize: 11.5, color: A.DIM, lineHeight: 1.45 }}>
-          {t('amateur.competitions.fieldLimit', { defaultValue: "Members who played this competition. Golfers not on clbhouz aren't shown." })}
-        </div>
-      </div>
-      <Heads netW={48} grossW={46} style={{ margin: '14px 18px 0', paddingBottom: 7, borderBottom: `1px solid ${A.SOFT}` }} />
+        </>}
+        columns={<div style={{ display: 'flex', alignItems: 'center', padding: '10px 16px 6px', fontFamily: SANS, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, flexShrink: 0 }}>
+          <span style={{ flex: 1 }}>{t('amateur.leaderboards.member')}</span>
+          <span style={{ width: 48, textAlign: 'center' }}>{t('discover.filterBoard.col.net', { defaultValue: 'Net' })}</span>
+          <span style={{ width: 46, textAlign: 'center' }}>{t('discover.filterBoard.col.gross', { defaultValue: 'Gross' })}</span>
+        </div>}
+        footnote={<div style={{ padding: '0 16px' }}>{t('amateur.competitions.fieldLimit', { defaultValue: "Members who played this competition. Golfers not on clbhouz aren't shown." })}</div>}
+        bodyPadding="0 0 32px"
+      >
+        <div style={{ fontFamily: SANS, ...FIGS }}>
       {card.rows.map((r) => {
         const self = !!viewerId && r.user_id === viewerId;
         return (
           <button key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} type="button" data-competition-field-row data-self={self || undefined} onClick={() => onRowPress(r)}
-            style={{ display: 'flex', alignItems: 'center', width: '100%', padding: '9px 18px', border: 'none', borderBottom: `1px solid ${A.SOFT}`, background: self ? SELF_ROW_TINT : 'transparent', fontFamily: SANS, textAlign: 'left', cursor: 'pointer' }}>
+            style={{ display: 'flex', alignItems: 'center', width: '100%', padding: '9px 16px', border: 'none', borderBottom: `1px solid ${A.SOFT}`, background: self ? SELF_ROW_TINT : 'transparent', fontFamily: SANS, textAlign: 'left', cursor: 'pointer' }}>
             <span style={{ lineHeight: 1.25, width: 30, flex: 'none', fontSize: 10.5, fontWeight: 800, color: A.FAINT }}>{posText(r)}</span>
             <span style={{ display: 'flex', flex: 'none', height: 28, alignItems: 'center', marginRight: 10 }}><MemberAvatar userId={r.user_id} name={r.display_name} photoUrl={r.profile_photo_url} size={28} /></span>
             <span style={{ lineHeight: 1.25, flex: 1, minWidth: 0, fontSize: 13, fontWeight: self ? 700 : 600, color: self ? A.INK : A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.display_name ?? t('discover.aMember')}</span>
@@ -128,6 +125,8 @@ function FieldBody({ card, viewerId, onRowPress, t }: { card: CompetitionCard; v
           </button>
         );
       })}
+        </div>
+      </ExploreSheetShell>
     </div>
   );
 }

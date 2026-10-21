@@ -1,5 +1,11 @@
 # Roadmap
 
+## Explore sheets — One shell
+- [x] Extracted canonical shell/default markup/styles; existing Top100/Most improved contents unchanged. Board sheets use cap counts/no24px band and sheet-only typography; competition uses DONE/header/footnote and16px row inset; English Just played title updated. Local headers record shell/gutter ownership; cards/RPCs untouched.
+- [x] Full bunx vitest run 2,011/270→2,018/271, zero failures; seven added exploreSheetShell.test.tsx cases. Announced then updated only competitionBoards.test.tsx old93 subtitle locator and old106 containment assertion for portal/footnote; no deleted/renamed tests. Build OK11:25:00Z.
+- [x] Controlled394×970 actual shell/board/competition readers: opening/DONE/score handoff,14.5px titles/10.5px caps/16px field inset/footnote order verified; four screenshots reviewed, no fixture errors. Report saved; no SQL/migrations/feed_config/RPC/cap changes.
+- [ ] Authenticated real-member checks unavailable on external_unmanaged; controlled evidence explicitly labelled in report.
+
 ## CB25 — Leaderboards section returns
 - [x] Remounted four allowed boards on existing state.page/shared rows/head/See-all; sole caller supplies optional net default, existing recent entryBoardFor/scope probes unchanged. Local headers record ownership and mandated shape exception; no other sections or BoardFilterPanel edited.
 - [x] No protecting assertions needed changes. Full bunx vitest run 2,005/269 → 2,011/270, zero failures; delta solely six new leaderboardsSection.test.tsx cases. No existing tests deleted/renamed/rewritten. Preview build OK11:15:25Z.
