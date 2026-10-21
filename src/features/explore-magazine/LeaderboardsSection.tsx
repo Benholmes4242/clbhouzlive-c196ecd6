@@ -6,6 +6,8 @@ import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useB
 import { A, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
 import type { AmateurBoardState } from '@/features/amateur/useAmateurBoardState';
 import { GUTTER, Section, SeeAll } from './Section';
+import { useHeldFrame } from '@/components/explore-tab-new/courseled/useHeldFrame';
+import { HeldRows } from '@/components/explore-tab-new/courseled/HeldRows';
 
 /** CB27: mount state.page and facets.countFor('board', key), never another read.
  * Shared rows own all figures and
@@ -24,9 +26,14 @@ export function LeaderboardsSection({ state, viewerId, onRowPress, onSeeAll }: {
   onSeeAll: (board: BoardKey) => void;
 }) {
   const { t } = useTranslation('courses');
-  const rows = state.page.data?.rows ?? [];
   const board = state.board;
-  if (!state.ready || !state.page.isSuccess || state.page.isFetching || rows.length === 0 || !isLeaderboardBoard(board)) return null;
+  const settled = state.ready && state.page.isSuccess && !state.page.isFetching;
+  const rows = settled ? state.page.data?.rows ?? [] : [];
+  /* CB28: a tile tap or scope change holds this same mounted section (and so
+   * the same tile-strip node and its scrollLeft) with reserved row height;
+   * the selected tile reads state.board, which changes on tap. */
+  const frame = useHeldFrame({ active: settled && isLeaderboardBoard(board), pending: isLeaderboardBoard(board) && !settled && !state.page.isError, count: rows.slice(0, 5).length });
+  if (frame.mode === 'none' || !isLeaderboardBoard(board)) return null;
   const win = windowOption(state.filters.window);
   return (
     <div data-leaderboards-section style={{ ...FIGS }}>
@@ -56,8 +63,10 @@ export function LeaderboardsSection({ state, viewerId, onRowPress, onSeeAll }: {
           })}
         </div>
         <BoardHeaderRow board={board} flush />
-        {rows.slice(0, 5).map((row) => <BoardRowView key={`${row.pos}:${row.whs_score_id ?? row.user_id}`} row={row} board={board}
-          isSelf={!!viewerId && row.user_id === viewerId} onPress={onRowPress} flush />)}
+        {frame.mode === 'hold' ? <HeldRows count={frame.heldCount} rowHeight={frame.rowHeight} /> : <div ref={frame.bodyRef}>
+          {rows.slice(0, 5).map((row) => <BoardRowView key={`${row.pos}:${row.whs_score_id ?? row.user_id}`} row={row} board={board}
+            isSelf={!!viewerId && row.user_id === viewerId} onPress={onRowPress} flush />)}
+        </div>}
         <SeeAll label={t('amateur.leaderboards.seeAllMembers')} onPress={() => onSeeAll(board)} />
       </Section>
     </div>
