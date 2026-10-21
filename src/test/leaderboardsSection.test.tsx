@@ -28,24 +28,24 @@ function draw(state = populated(), onRowPress = vi.fn(), onSeeAll = vi.fn()) {
   </I18nextProvider></MemoryRouter>);
 }
 
-describe('CB25 Leaderboards remount', () => {
-  it('offers only net, topar, stableford and birdies, excluding all duplicate and retired routes', () => {
-    expect(LEADERBOARD_BOARDS).toEqual(['net', 'topar', 'stableford', 'birdies']);
+describe('CB27 Leaderboards remount', () => {
+  it('offers exactly recent, topar, net, stableford, improved and birdies in order', () => {
+    expect(LEADERBOARD_BOARDS).toEqual(['recent', 'topar', 'net', 'stableford', 'improved', 'birdies']);
     const { container } = draw();
     const offered = Array.from(container.querySelectorAll('[data-leaderboard-board]'));
-    expect(offered.map((el) => el.getAttribute('data-leaderboard-board'))).toEqual(['net', 'topar', 'stableford', 'birdies']);
+    expect(offered.map((el) => el.getAttribute('data-leaderboard-board'))).toEqual(['recent', 'topar', 'net', 'stableford', 'improved', 'birdies']);
     expect(offered.filter((el) => el.getAttribute('aria-checked') === 'true').map((el) => el.getAttribute('data-leaderboard-board'))).toEqual(['net']);
   });
   it('each alternative writes the existing board selection and never changes filters', () => {
     const state = populated();
     const { container } = draw(state);
-    for (const board of ['topar', 'stableford', 'birdies']) {
+    for (const board of ['recent', 'topar', 'stableford', 'improved', 'birdies']) {
       const control = container.querySelector(`[data-leaderboard-board="${board}"]`);
       if (!(control instanceof HTMLElement)) throw new Error(`Missing board ${board}`);
       fireEvent.click(control);
       expect(state.changeBoard).toHaveBeenLastCalledWith(board);
     }
-    expect(state.changeBoard).toHaveBeenCalledTimes(3);
+    expect(state.changeBoard).toHaveBeenCalledTimes(5);
     expect(state.changeFilters).not.toHaveBeenCalled();
     expect(state.changeScope).not.toHaveBeenCalled();
   });
@@ -80,5 +80,13 @@ describe('CB25 Leaderboards remount', () => {
     const state = populated();
     state.page = { ...state.page, isSuccess: false, isPending: true } as never;
     expect(draw(state).container.querySelector('[data-leaderboards-section]')).toBeNull();
+  });
+  it('reads all six counts from the existing board facet axis', () => {
+    const state = populated();
+    const counts = { recent: 22, topar: 14, net: 14, stableford: 4, improved: 4, birdies: 3 };
+    state.facets = { settled: true, resolved: true, openList: () => [], countFor: vi.fn((axis, key) => axis === 'board' ? counts[key as keyof typeof counts] ?? 0 : 0) };
+    const { container } = draw(state);
+    expect(Array.from(container.querySelectorAll('[data-board-tile-count]')).map((el) => Number(el.textContent))).toEqual([22, 14, 14, 4, 4, 3]);
+    for (const board of LEADERBOARD_BOARDS) expect(state.facets.countFor).toHaveBeenCalledWith('board', board);
   });
 });

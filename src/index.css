@@ -1,5 +1,11 @@
 /* Typography: SF Pro via the system stack — no webfont requests. */
 
+/* CB27: outlined board choices, never selected fills. */
+[data-leaderboard-tiles] {
+  --leaderboard-selected-border: rgba(255,255,255,0.90);
+  --leaderboard-rest-border: rgba(255,255,255,0.12);
+}
+
 
 @import './styles/hub-warm.css';
 @import './styles/liquid-glass.css';

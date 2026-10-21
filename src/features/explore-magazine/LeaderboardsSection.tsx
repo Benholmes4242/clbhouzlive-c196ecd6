@@ -1,28 +1,21 @@
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { BoardHeaderRow, BoardRowView } from '@/components/explore-tab-new/courseled/BoardRows';
-import { windowOption, type BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
+import { BOARD_LABELS, boardCountsRounds, windowOption, type BoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
 import { A, FIGS, SANS } from '@/components/explore-tab-new/courseled/tokens';
-import { FIELD_RAISED_REST_BORDER } from '@/lib/tokens/field';
 import type { AmateurBoardState } from '@/features/amateur/useAmateurBoardState';
-import { Section, SeeAll } from './Section';
+import { GUTTER, Section, SeeAll } from './Section';
 
-/** CB25: mount state.page, never another read. Shared rows own all figures and
+/** CB27: mount state.page and facets.countFor('board', key), never another read.
+ * Shared rows own all figures and
  * self treatment. Empty/unsettled reads remove this entire section, controls
  * included. Selection stays in the page's state; scope/window have one owner.
  * Shared header/row anatomy is frozen, not replaced by the standalone mock. */
-export const LEADERBOARD_BOARDS = ['net', 'topar', 'stableford', 'birdies'] as const satisfies readonly BoardKey[];
+export const LEADERBOARD_BOARDS = ['recent', 'topar', 'net', 'stableford', 'improved', 'birdies'] as const satisfies readonly BoardKey[];
 export type LeaderboardBoard = typeof LEADERBOARD_BOARDS[number];
 export const isLeaderboardBoard = (board: BoardKey): board is LeaderboardBoard =>
   LEADERBOARD_BOARDS.some((key) => key === board);
-
-const SHORT_LABELS = {
-  net: { key: 'amateur.boards.short.net', fallback: 'Net' },
-  topar: { key: 'amateur.boards.short.topar', fallback: 'Gross' },
-  stableford: { key: 'amateur.boards.short.stableford', fallback: 'Stableford' },
-  birdies: { key: 'amateur.boards.short.birdies', fallback: 'Birdies' },
-} as const;
 
 export function LeaderboardsSection({ state, viewerId, onRowPress, onSeeAll }: {
   state: AmateurBoardState;
@@ -39,17 +32,26 @@ export function LeaderboardsSection({ state, viewerId, onRowPress, onSeeAll }: {
     <div data-leaderboards-section style={{ ...FIGS }}>
       <Section contest eyebrow={t('amateur.boards.eyebrow', { defaultValue: 'The boards' })}
         title={t('amateur.boards.title', { defaultValue: 'Leaderboards' })} meta={t(win.i18n, win.label)}>
-        <div data-leaderboard-pills role="radiogroup" aria-label={t('amateur.boards.title', { defaultValue: 'Leaderboards' })}
-          style={{ display: 'flex', gap: 7, overflowX: 'auto', scrollbarWidth: 'none', willChange: 'transform', marginBottom: 14 }}>
+        <div data-leaderboard-tiles role="radiogroup" aria-label={t('amateur.boards.title', { defaultValue: 'Leaderboards' })}
+          style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', willChange: 'transform', marginInline: -GUTTER,
+            paddingInline: GUTTER, scrollPaddingInline: GUTTER, marginTop: 2, marginBottom: 15 }}>
           {LEADERBOARD_BOARDS.map((key) => {
             const selected = board === key;
+            const count = state.facets.countFor('board', key);
             return <Button key={key} type="button" variant="ghost" role="radio" aria-checked={selected} data-leaderboard-board={key}
               onClick={() => { if (!selected) state.changeBoard(key); }}
-              style={{ flexShrink: 0, height: 'auto', padding: '8px 14px', borderRadius: 999, fontFamily: SANS,
-                fontSize: 12.5, fontWeight: 700, lineHeight: 1.25, letterSpacing: 0, whiteSpace: 'nowrap',
-                background: selected ? A.INK : 'transparent', color: selected ? A.CANVAS : A.MUTE,
-                border: selected ? 'none' : `1px solid ${FIELD_RAISED_REST_BORDER}` }}>
-              {t(SHORT_LABELS[key].key, { defaultValue: SHORT_LABELS[key].fallback })}
+              style={{ flexShrink: 0, height: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0,
+                padding: '7px 11px 8px', borderRadius: 13, boxSizing: 'border-box', fontFamily: SANS, whiteSpace: 'nowrap',
+                background: 'transparent', border: `1px solid var(${selected ? '--leaderboard-selected-border' : '--leaderboard-rest-border'})` }}>
+              <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.11em', textTransform: 'uppercase', lineHeight: '11px', color: selected ? A.INK : A.MUTE }}>
+                {t(BOARD_LABELS[key].i18n, { defaultValue: BOARD_LABELS[key].label })}
+              </span>
+              <span style={{ marginTop: 3, lineHeight: '15px' }}>
+                <span data-board-tile-count style={{ fontSize: 14, fontWeight: 800, letterSpacing: '-0.02em', color: selected ? A.INK : A.BODY }}>{count ?? '\u2014'}</span>
+                <span style={{ fontSize: 9.5, fontWeight: 700, marginLeft: 4, color: selected ? A.MUTE : A.DIM }}>
+                  {t(boardCountsRounds(key) ? 'discover.filterBoard.rounds' : 'discover.filterBoard.members', { count: count ?? 0, defaultValue: boardCountsRounds(key) ? 'rounds' : 'members' })}
+                </span>
+              </span>
             </Button>;
           })}
         </div>
