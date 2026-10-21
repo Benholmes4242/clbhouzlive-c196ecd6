@@ -8,7 +8,6 @@ import { ScoreWithToPar } from './ScoreWithToPar';
 import { fmtToPar } from './scoreToPar';
 export { fmtToPar } from './scoreToPar';
 import { playDateStandalone, playDateUnderYearHeader } from './discoverWhen';
-import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { boardCountsRounds, isFeatBoard, type BoardKey, type FeatBoardKey } from './boardFilters';
 import type { ExploreRoundFeatKind } from '@/features/explore-magazine/roundFeatCollection';
 import type { BoardRow as Row } from './hooks/useBoardPage';
@@ -55,14 +54,14 @@ export function boardColumns(board: BoardKey): BoardColumns {
       };
     case 'topar':
       return {
-        value: { i18n: 'discover.filterBoard.col.toPar', label: 'TO PAR' },
-        secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
+        value: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
+        secondary: null,
         ranked: true,
       };
     case 'net':
       return {
         value: { i18n: 'discover.filterBoard.col.net', label: 'NET' },
-        secondary: { i18n: 'discover.filterBoard.col.gross', label: 'GROSS' },
+        secondary: null,
         ranked: true,
       };
     case 'stableford':
@@ -134,19 +133,11 @@ export function boardValue(
   switch (board) {
     case 'gross':
       return { text: r.gross_score != null ? String(r.gross_score) : '\u2014', tone: A.INK };
-    case 'topar': {
-      const p = toParOf(r);
-      return { text: fmtToPar(p), tone: p != null && p < 0 ? A.RED : A.INK };
-    }
-    /* AMENDMENT B2.1/B2.2 — THE NET BOARD RENDERS ITS RANKED FIGURE. The RPC
-       ranks 'net' on (net_score - course_par), so the column must show net TO
-       PAR or the board sorts on one number and displays another. The label
-       stays NET: "nett five under" is how a comp leaderboard reads. B2.4 — the
-       under-par colour law applies, true minus and never a hyphen. */
-    case 'net': {
-      const n = netToParOf(r);
-      return { text: fmtToPar(n), tone: n != null && n < 0 ? A.RED : A.INK };
-    }
+    /* CB27: raw score leads; ranking remains the RPC's to-par order. */
+    case 'topar':
+      return { text: r.gross_score != null ? String(r.gross_score) : '\u2014', tone: A.INK };
+    case 'net':
+      return { text: r.net_score != null ? String(r.net_score) : '\u2014', tone: A.INK };
     case 'stableford':
       return {
         text: r.stableford_points != null ? String(r.stableford_points) : '\u2014',
@@ -178,9 +169,15 @@ export function boardSecondary(r: Row, board: BoardKey): Cell | null {
     }
     case 'improved':
       return null;
+    case 'topar': {
+      const p = toParOf(r);
+      return { text: fmtToPar(p), tone: p != null && p < 0 ? A.RED : A.DIM };
+    }
+    case 'net': {
+      const p = netToParOf(r);
+      return { text: fmtToPar(p), tone: p != null && p < 0 ? A.RED : A.DIM };
+    }
     case 'recent':
-    case 'topar':
-    case 'net':
     case 'stableford':
     case 'birdies':
       return {
@@ -391,8 +388,8 @@ export function BoardRowView({
   const value = boardValue(row, board, t as never);
   const second = boardSecondary(row, board);
   const { ranked } = boardColumns(board);
-  // CB12: recent is a feed, not a feat sheet; preserve all other marker rules.
-  const feat = board === 'recent' ? null : boardFeatMarker(row, board, t);
+  // CB27: ranking choices carry no feat chip; Rare air sheet scoping is unchanged.
+  const feat = isFeatBoard(board) || board === 'gross' ? boardFeatMarker(row, board, t) : null;
   const course = row.course_name ?? t('discover.unknownCourse');
   /* Feed rows sit under day-ladder groups that state the year; a ranked board has no groups. */
   const date = ranked
@@ -440,8 +437,8 @@ export function BoardRowView({
             textAlign: 'center',
             fontSize: M.posSize,
             fontWeight: M.posWeight,
-            /* 9.12 — first place is gold; the member's own position stays amber. */
-            color: row.pos === 1 ? MEDAL_GOLD : isSelf ? A.AMBER : A.MUTE,
+            /* CB27: positions are context, never podium gold or member amber. */
+            color: A.FAINT,
           }}
         >
           {/* A TIE STATES ITSELF: T4, never a silent second 4. */}
@@ -545,6 +542,9 @@ export function BoardRowView({
       {board === 'recent' ? <span style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
         <span style={{ width: RECENT_SCORE_WIDTH, textAlign: 'center' }}><ScoreWithToPar score={row.net_score} par={row.course_par} kind="net" fontSize={M.recentNetSize} fontWeight={M.secondaryWeight} scoreHandle="main" /></span>
         <span style={{ width: RECENT_SCORE_WIDTH, textAlign: 'center' }}><ScoreWithToPar score={row.gross_score} par={row.course_par} kind="gross" fontSize={M.recentGrossSize} fontWeight={M.secondaryWeight} scoreHandle="secondary" /></span>
+      </span> : board === 'topar' || board === 'net' ? <span style={{ textAlign: 'right', minWidth: MAIN_FIG_MIN_W }}>
+        <ScoreWithToPar score={board === 'topar' ? row.gross_score : row.net_score} par={row.course_par}
+          kind={board === 'topar' ? 'gross' : 'net'} tone={A.INK} fontSize={M.figureSize} fontWeight={M.figureWeight} lineHeight={1} scoreHandle="main" />
       </span> : <span style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', columnGap: 3 }}>
         {/* S1.3 — THE FIGURE FOLLOWS THE COLOUR LAW, NEVER AMBER.
             18.5 — fixed min-width tracks so right edges align. */}

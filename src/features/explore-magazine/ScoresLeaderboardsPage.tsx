@@ -55,14 +55,14 @@ export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
  * THE ROUNDS PAGE (BRIEF — THE LEADERBOARDS PAGE, structure A; EX1).
  *
  * EVERY SECTION ANSWERS A DIFFERENT QUESTION. Scope governs Standout rounds,
- * Competitions, Just played and CB25's remounted Leaderboards only.
+ * Competitions, Just played and CB27's remounted Leaderboards only.
  * Sections, in order: head
  * (scope chips), Standout rounds, Competitions, Just played, Leaderboards, §5 Feats this
  * year, §4 Most improved, §7 Top 100 — the three below are
  * platform facts. The order alternates section SHAPE (rows,
  * tiles, rows, carousel) so no two neighbours read alike; anything added
  * here is placed by its shape, not its subject. § numbers name sections, not
- * CB25 explicitly mandates adjacent Just played/Leaderboards rows as an exception;
+ * CB27 explicitly mandates adjacent Just played/Leaderboards rows as an exception;
  * retain that placement rather than moving a section to repair the shape rule.
  * positions. Each section owns its read, holds its
  * own height while pending, and renders NOTHING when its read fails or is empty.
@@ -580,7 +580,7 @@ export function ScoresLeaderboardsPage({
 
   const pageBody = (
     <div style={{ fontFamily: SANS }}>
-      {/* CB25 remounts only four ranking choices and the shared rows/read.
+      {/* CB27 remounts six ranking choices and the shared rows/read/facet counts.
           EX1's basis, you slab and Filters pill remain unmounted; the existing
           scope control governs all four scoped sections. */}
       {state.ready ? (
