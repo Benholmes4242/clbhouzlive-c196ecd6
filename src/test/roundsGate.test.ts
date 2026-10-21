@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-import { roundsGateState, gateReach } from '@/features/explore-magazine/RoundsGate';
+import { roundsGateState, gateReach, gateReachLine } from '@/features/explore-magazine/RoundsGate';
 import { WHS_COUNTRIES } from '@/lib/whs/whsCountries';
 
 const enCourses = JSON.parse(
