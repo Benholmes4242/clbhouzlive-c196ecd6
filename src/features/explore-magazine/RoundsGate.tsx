@@ -43,6 +43,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { WHS_COUNTRIES, getCountryById, type WhsCountry } from '@/lib/whs/whsCountries';
 import { EYEBROW } from './Section';
 import './roundsGate.css';
+import { GateFootDiag } from './GateFootDiag'; // CB40 TEMPORARY — delete with GateFootDiag.tsx
 
 export type RoundsGateState = 'signedOut' | 'loading' | 'gated' | 'connected';
 
@@ -355,6 +356,7 @@ export function RoundsGate({ children, roundCount = null, scope = null }: {
         }} />
       </div>
       <GateSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />
+      <GateFootDiag />{/* CB40 TEMPORARY — delete with GateFootDiag.tsx */}
     </div>
   );
 }
