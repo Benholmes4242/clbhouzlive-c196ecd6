@@ -1,9 +1,9 @@
 import { useLayoutEffect, useRef } from 'react';
 
- * Used by StandoutRounds, JustPlayed, CompetitionBoards and LeaderboardsSection; a filter change never unmounts a populated section or carries old rows.
 /**
  * CB28 — A FILTER CHANGES WHAT IS UNDER THE HEADING, NOT THE PAGE.
  *
+ * Used by StandoutRounds, JustPlayed, CompetitionBoards and LeaderboardsSection; a filter change never unmounts a populated section or carries old rows.
  * A scoped section that was showing rows stays mounted while its own
  * filter-driven read is pending: the head renders as normal and the body is
  * replaced by a neutral placeholder holding the last settled row count at the
