@@ -191,6 +191,15 @@ function GateSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
             );
           })}
         </div>
+        {/* CB14 — the quiet truth line: not a row, no chevron, A.MUTE at the
+            sheet's small type. Lists are derived from WHS_COUNTRIES via
+            gateReach(), so the sentence tracks support as providers launch. */}
+        <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${A.SOFT}`, fontSize: 11.5, fontWeight: 600, lineHeight: 1.45, color: A.MUTE }}>
+          {t('amateur.gate.sheetReach', {
+            supported: supportedBodies.join(' and '),
+            unsupported: unsupportedHomeNations.join(', '),
+          })}
+        </div>
         <button
           type="button"
           onClick={() => { onClose(); navigate('/manage/handicap'); }}
