@@ -64,8 +64,22 @@ const CAPTURE_OPTS = { backgroundColor: '#000', scale: 2, logging: false, useCOR
  */
 const scoreTone = (score: number) => (score >= 9 ? A.GREEN : A.INK);
 
+/**
+ * BRIEF_TOP_TEN_OWNER_NAME_LABEL — the score label beside a rating on a VISITOR's
+ * Top 10 reads the owner's first name, not the generic "Them". Nine characters is
+ * the ceiling: the glass pill on the photograph tiles and the label under the score
+ * in rows four to ten are fixed-width affordances, and a username ("golfingwithellie")
+ * would otherwise widen the pill over the picture. Eight characters plus an ellipsis
+ * is nine cells of ink. Empty or absent returns null so the caller keeps "Them".
+ */
+export const ownerScoreLabel = (ownerName: string | null | undefined): string | null => {
+  const name = ownerName?.trim() ?? '';
+  if (!name) return null;
+  return name.length > 9 ? `${name.slice(0, 8)}…` : name;
+};
 
 const regionOf = (c: { sub_country?: string | null; region?: string | null; country?: string | null }) =>
+
   c.sub_country || c.region || c.country || null;
 
 /**
@@ -254,7 +268,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
 
   const n = topTen.length;
   const ratingOf = (c: TopTenCourse) => c.rating ?? ratingsMap[c.course_id] ?? null;
-  const pillKicker = isOwnProfile ? t('topTen.you', 'You') : t('topTen.them', 'Them');
+  const pillKicker = isOwnProfile ? t('topTen.you', 'You') : (ownerScoreLabel(ownerName) ?? t('topTen.them', 'Them'));
 
   const open = (c: TopTenCourse) => {
     analyticsEvents.track('profile_top10_card_tap', { course_id: c.course_id, position: c.position });
