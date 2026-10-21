@@ -142,8 +142,12 @@ describe('See-all sheet rows (retargeted from the page lead board, EX1b)', () =>
     const cells = self.querySelectorAll<HTMLElement>('.tabular-nums');
     const pos = cells[0];
     const value = self.querySelector<HTMLElement>('[data-board-main]')!;
-    expect(value.textContent).toBe('\u22122');
-    expect(value.style.color).toBe(toCss(A.RED));
+    // CB32: CB9 law — the big figure is never red; the to-par beside it carries it.
+    expect(value.textContent).toBe('70');
+    expect(value.parentElement!.style.color).toBe(toCss(A.INK));
+    const toPar = value.nextElementSibling as HTMLElement;
+    expect(toPar.textContent).toBe('\u22122');
+    expect(toPar.style.color).toBe(toCss(A.RED));
     expect(pos.style.color).toBe(toCss(A.AMBER));
     expect(within(self).getByText('Viewer').style.color).toBe(toCss(A.AMBER));
     expect(value.style.color).not.toBe(toCss(A.AMBER));
