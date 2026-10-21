@@ -627,3 +627,9 @@
 ## CB36 — gate rebalanced
 - [x] Fluid glimpse (0.74, 66%→0.18 mask), three bullets, live scoped count, short-screen rule. Suite 2,094/283 green.
 - [ ] Authenticated on-device check (blocked: preview sign-in not available).
+
+## CB38 — gate foot 20px clear of the nav
+- [x] Gate card bottom padding 2px -> 20px (RoundsGate.tsx); glimpse (flex 1) gave back exactly 18px. Measured distance from the no-handicap button's border box to the nav's top edge: 2px before -> exactly 20px after at 390x844, 393x852 and 360x640 (controlled harness: real RoundsGate + Section, 54px BOARD_ROW_METRICS rows, 64px nav stand-in at bottom:20 on the real #0A0A0C canvas; authenticated preview unavailable, external_unmanaged).
+- [x] Glimpse mask final stop 0.18@100% -> 0.10@92%, transparent@100% on both maskImage and WebkitMaskImage; opacity 0.74 unchanged. Computed mask verified; before/after screenshots show the cut now reaches zero (no ghosting above THE ROUNDS).
+- [x] 360x640 shows no board rows (spacer state) — verified pre-existing CB36 short-screen rule, identical before the change; not a CB38 regression, no compensation added.
+- [x] No test asserted the padding or mask; none edited. Full suite 2,094 passed / 283 files, zero failures (same total as CB36/CB37). Build OK 2026-10-21T18:53:45Z. Harness files deleted. No SQL/migrations/RPC/feed_config changes; round_pool_cap 30.
