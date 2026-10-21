@@ -15,10 +15,11 @@
     "gate": {
       "eyebrow": "The rounds",
       "title": "Your rounds aren’t here yet",
-      "body": "Every round on this page came from a synced handicap. Connect yours and you join the boards from your next card in.",
+      "body": "Every round on this page came from an official synced handicap. Connect yours and you join the boards from your next card in.",
       "bulletBoards": "Your rounds ranked against the field, net and gross",
       "bulletComps": "Club competitions you played, scored and placed",
       "bulletIndex": "Your index tracked every time it moves",
+      "bulletCourses": "Your rounds across the world's best courses",
       "cta": "Connect your handicap",
       "noHandicap": "I don’t have a handicap",
       "sheetEyebrow": "No handicap yet",
