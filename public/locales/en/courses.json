@@ -29,7 +29,9 @@
       "sheetConnect": "Already have one? Connect it",
       "club": "Join a club",
       "clubSub": "Full membership, competitions and a home course.",
-      "sheetReach": "clbhouz connects {{supported}} today. {{unsupported}} aren’t supported yet."
+      "sheetReach": "clbhouz connects {{supported}} today. {{unsupported}} aren’t supported yet.",
+      "sheetReachSupported": "clbhouz connects {{supported}} today.",
+      "sheetReachUnsupported": "{{unsupported}} aren’t supported yet."
     },
     "competitions": {
       "eyebrow": "Tournament golf",
