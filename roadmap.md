@@ -1,5 +1,11 @@
 # Roadmap
 
+## CB17 — Two copy changes on the gate card
+- [x] Read-only audit found no test asserting the body string or bullet count; no existing tests changed, added, deleted, renamed or rewritten.
+- [x] English body adds “an official synced handicap”; bulletCourses is “Your rounds across the world's best courses”, last in GateCard’s existing array. No presentation/state/logic/analytics/frost changes; REVEAL remains 300. No SQL/migrations/RPC/feed_config/cap changes.
+- [x] Full `bunx vitest run`: 1,989 passing / 264 files before -> 1,989 passing / 264 files after, zero failures, no inventory delta. Preview build OK at 2026-10-21T09:02:58Z.
+- [ ] STOP — shortest phone rendered, 320 × 568: actual RoundsGate component with real router/English i18next/global CSS in isolated Chromium page, nonempty pool and no outer chrome, card top 300, height 417.703125, bottom 717.703125 (149.703125 beyond viewport); CTA top 617.953125/bottom 666.203125, secondary top 679.203125/bottom 695.703125. Both actions require scrolling, so short-phone acceptance fails even without header/nav. No trimming or REVEAL/layout adjustment made; awaits Ben’s ruling. At current 394 × 970, isolated card top 300/height 365.203125/bottom 665.203125, CTA bottom 613.703125, secondary bottom 643.203125, both fit. Screenshots reviewed; zero final harness page errors. Hosted authenticated placement remains unverified on external_unmanaged Supabase; isolated measurement suffices to demonstrate the failure. Browser harness lives only in /tmp/browser/cb17, no app fixture route added.
+
 ## CB16 — Competition boards say whose field
 - [x] Read-only wording/test audit and full `bunx vitest run` baseline: 1,988 passing / 264 files, zero failures, matches last reported total. No existing test asserts subtitle player/players; shared subtitle default also says players. Separate card CTA uses `seeAllPlayers` / "See all players" and four existing tests protect/select it at competitionBoards.test.tsx:59,68,79,91.
 - [x] Ben authorised changing CTA/fallback and only four named test lines, with before/after assertion report. Added requirement: use existing `amateur.leaderboards.seeAllMembers` if plain duplicate and delete competition key. Search confirms both are plain strings without count or pluralisation, and only CompetitionBoards reads the competition key.

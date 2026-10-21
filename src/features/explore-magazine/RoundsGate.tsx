@@ -128,6 +128,7 @@ function GateCard({ onConnect, onNoHandicap }: { onConnect: () => void; onNoHand
     t('amateur.gate.bulletBoards'),
     t('amateur.gate.bulletComps'),
     t('amateur.gate.bulletIndex'),
+    t('amateur.gate.bulletCourses'),
   ];
   return (
     <div
