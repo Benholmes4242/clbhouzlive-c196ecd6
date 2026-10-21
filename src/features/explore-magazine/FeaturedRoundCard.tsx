@@ -219,7 +219,7 @@ export const FeaturedRoundCard: React.FC<{
           {onFollow && !mine ? (
             <span
               data-featured-follow="true"
-              style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44, textShadow: 'none' }}
+              style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44, padding: '0 12px', margin: '-13px -12px', boxSizing: 'border-box', textShadow: 'none' }}
               onClickCapture={(ev) => ev.preventDefault()}
               onClick={(ev) => { ev.stopPropagation(); ev.preventDefault(); }}
             >

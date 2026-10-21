@@ -627,7 +627,7 @@ function WhoLine({
           {onFollow && item.who?.is_viewer !== true ? (
             <span
               data-round-follow="true"
-              style={{ flex: '0 0 auto', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44 }}
+              style={{ flex: '0 0 auto', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44, padding: '0 12px', margin: '-13px -12px', boxSizing: 'border-box' }}
               onClickCapture={(event) => event.preventDefault()}
               onClick={stop}
             >
