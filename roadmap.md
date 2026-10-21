@@ -623,3 +623,7 @@
 - [x] IdentityHeader.tsx `data-view-profile-pill`: color A.AMBER -> A.INK, border `1px solid AMBER_PILL_BORDER` -> `1px solid DARK_HAIRLINE` (already imported for the avatar ring). fontSize 11.5, fontWeight 800, letterSpacing 0.04em, borderRadius 999, padding '5px 10px 5px 11px', whiteSpace nowrap and pointerEvents none untouched; text still "View profile ›". Unused local `AMBER_PILL_BORDER` const and its comment removed (it was a const, not an import); file header records that amber belongs to the notification tile, not this label. No other sheet surface changed.
 - [x] New src/test/profileSheetViewProfileWhite.test.tsx, three cases: pill colour is A.INK (and not amber), border is `1px solid` DARK_HAIRLINE (and not the old amber), frozen typography/shape/pass-through values unchanged. No existing test asserted this pill's colour or border — none edited, renamed or deleted.
 - [x] Full `bunx vitest run`: 1,989 passing / 264 files before -> 1,992 passing / 265 files after, zero failures; +3 tests / +1 file solely the new test file. tsgo --noEmit clean; preview build OK 2026-10-21T09:11:02Z. Hosted authenticated sheet readback unavailable (external_unmanaged); the test mounts the real IdentityHeader. No SQL/migrations/RPC/feed_config changes; round_pool_cap 30. CB14.1 sheetReach key conflict still open.
+
+## CB36 — gate rebalanced
+- [x] Fluid glimpse (0.74, 66%→0.18 mask), three bullets, live scoped count, short-screen rule. Suite 2,094/283 green.
+- [ ] Authenticated on-device check (blocked: preview sign-in not available).
