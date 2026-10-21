@@ -1,9 +1,10 @@
 # Roadmap
 
 ## CB22 — Rare Air badge and comparison fit
-- [ ] Bind exactly one badge by all-time rarity identity, retain achieved-first order and all CB21 tokens; shorten only English more/less comparison copy and remove obsolete interpolation.
-- [ ] Add badge regression and tie/zero coverage without changing existing tests; run full suite from 2,001/268 baseline.
-- [ ] Measure named strings and 320px clipping; attempt real-data full-rail screenshot, report any hosted-read blocker explicitly.
+- [x] One identity-bound badge uses highest uncapped all-time rounds per occurrence; unobserved all-time feats rank above finite rates, ties retain incoming RPC rarity order. All CB21 tokens/order/zeros unchanged. Shortened only English more/less; removed allRate and Trans n/unit/g interpolation, retained unit for first rate line.
+- [x] Full `bunx vitest run`: 2,001/268 before → 2,005/269 after, zero failures. +4 solely new rareAirBadge.test.tsx (render regression, ties, unobserved feats, cross-unit uncapped rarity); no existing tests changed. Preview build OK 2026-10-21T10:44:25Z.
+- [x] Actual component/English-provider synthetic measurements at 320: inner 166, 190×156 tiles, no name/rate/comparison clipping or page overflow, Eagles tap returns eagle, zero page errors. Full synthetic rail and individual tile screenshots reviewed. Widths and font caveat in CB22_report.md; no loaded font faces and actual SANS token uses system fallback, not Geist.
+- [ ] Real-data full-rail screenshot remains blocked: live get_feats_window read returned code 42501, `permission denied for view whs_friend_matches`; external_unmanaged session unavailable. Supplied screenshot is explicitly synthetic, not production evidence. No SQL/migrations/RPC/feed_config/cap changes.
 
 ## CB21 + CB21.1 — Rare Air smaller tiles and phone-first placeholder
 - [x] Applied all named local tile tokens: measured 244×178 → 190×156. Rail top 14; removed kicker/unused English key only. Stable positive-first sort runs on a copied rail rows prop; zeros and page totals retained. Frozen elements unchanged.
