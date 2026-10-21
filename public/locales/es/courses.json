@@ -73,8 +73,7 @@
         "holes": "hoyos",
         "rounds": "vueltas"
       },
-      "top100": "Top 100 campos",
-      "theListHundred": "Los cien de {{list}}"
+      "top100": "Top 100 campos"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"

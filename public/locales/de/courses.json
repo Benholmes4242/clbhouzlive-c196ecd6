@@ -73,8 +73,7 @@
         "holes": "Löcher",
         "rounds": "Runden"
       },
-      "top100": "Top-100-Plätze",
-      "theListHundred": "Die {{list}}-Hundert"
+      "top100": "Top-100-Plätze"
     },
     "place": {
       "pair": "{{place}}, {{nation}}"

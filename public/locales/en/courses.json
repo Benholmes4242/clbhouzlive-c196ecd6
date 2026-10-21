@@ -133,7 +133,6 @@
         "rounds": "rounds"
       },
       "top100": "Top 100 courses",
-      "theListHundred": "The {{list}} hundred",
       "feat": {
         "ace_one": "Hole in one",
         "ace_other": "Holes in one",
@@ -242,7 +241,6 @@
         "nobodyPast": "Nobody past {{n}}"
       },
       "hundredBasis": "Ranked on courses played from the <s>{{list}} Hundred</s>. Each member's latest is shown beneath their name.",
-      "hundredPlayedCount": "{{played}} of {{total}} played",
       "hundredPlayed": "Played",
       "coursesOfList": "Courses of {{n}}",
       "coursesPlayed": "Courses played",
