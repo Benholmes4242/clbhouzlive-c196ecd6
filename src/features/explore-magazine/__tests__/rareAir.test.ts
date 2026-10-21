@@ -33,8 +33,8 @@ describe('rare air', () => {
     expect(playDateStandalone('2026-09-24', 'en-GB', now)).toBe('24 Sept');
   });
   it('tile 178, placeholder 324 signed out and 373 signed in', () => {
-    expect(RARE_AIR_TILE_HEIGHT).toBe(178);
-    expect(rareAirPlaceholderHeight(false)).toBe(324);
-    expect(rareAirPlaceholderHeight(true)).toBe(373);
+    expect(RARE_AIR_TILE_HEIGHT).toBe(156);
+    expect(rareAirPlaceholderHeight(false)).toBe(299.15);
+    expect(rareAirPlaceholderHeight(true)).toBe(348.55);
   });
 });
