@@ -40,7 +40,7 @@ describe('review post score block B2', () => {
     expect(score.style.color).toBe(rgb(reviewLabelColor(9)));
     expect(element('[data-review-score-col]').style.borderRightWidth).toBe('1px');
     expect(element('[data-review-score-col]').style.borderRightStyle).toBe('solid');
-    expect(element('[data-review-score-col]').style.borderRightColor).toBe(rgb(A.TRACK));
+    expect(element('[data-review-score-col]').style.borderRightColor.replace(/\s/g, '')).toBe(rgb(A.TRACK).replace(/\s/g, ''));
   });
   it('keeps a two-column grid with green 9.5 and muted 8.9 figures', () => {
     const { element } = card(9);
