@@ -516,6 +516,12 @@
 - [x] Sheet reduced to two rows (England iGolf, Join a club); Scotland/Wales/Ireland/Any-country rows deleted as dishonoured links. Truth line derived from WHS_COUNTRIES via gateReach(); strings under amateur.gate, English only. `npx vitest run`: 1,952/260 -> 1,955/260, zero failures; +3 in roundsGate.test.ts, no existing test edits. tsgo clean, preview build OK.
 
 ## CB14.1 — The reach line drops its second clause when there is nothing to say
+<!-- New request: B2 review-post score block; tracked below. -->
 - [x] `amateur.gate.sheetReach` split into `sheetReachSupported` ("clbhouz connects {{supported}} today.") and `sheetReachUnsupported` ("{{unsupported}} aren't supported yet."). New pure `gateReachLine(supported, unsupported, t)` in RoundsGate.tsx renders each clause only when its own list is non-empty, joins two present clauses with exactly one space, and returns '' when both lists are empty; GateSheet then renders no element at all, so an empty line cannot take its margin. `andJoin` lifted to module scope. Today's rendered line is byte-identical to the old key's (verified against the real locale). Gate, four states, predicate, frost, card, CTA, sheet rows all untouched.
 - [x] `npx vitest run`: 1,955/260 -> 1,960/260, zero failures; +5 solely src/test/roundsGate.test.ts (empty unsupported, empty supported, both empty, single-space join, both clause keys carry only their own placeholder). The three CB14 cases unchanged. tsgo clean, preview build OK.
 - [ ] BLOCKED — CONFLICT: "Remove the old sheetReach key once nothing reads it" vs "Do not change the existing three CB14 tests." roundsGate.test.ts:51-52 reads `gate.sheetReach` (`expect(gate.sheetReach).toContain('{{supported}}')` / `toContain('{{unsupported}}')`), so deleting the key fails that protected case. Key left in place, unread by any component, pending Ben's ruling: authorise the two-assertion edit (or the case's deletion), or keep the key. No SQL/migrations/RPC/feed_config changes; round_pool_cap 30.
+
+## REVIEW_POST_SCORE_BLOCK_B2
+- [ ] Match the open overall-and-category block under the full-width course name; preserve all frozen sections and shared CategoryScores.
+- [ ] Add B2 coverage and update only superseded score-layout/category assertions; report each change and full-suite counts.
+- [ ] Verify preview, layout and review navigation; report unavailable hosted checks.
