@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
-import { BottomSheet } from '@/components/ui/BottomSheet';
+import { ExploreSheetShell } from './ExploreSheetShell';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { supabase } from '@/integrations/supabase/client';
 import { FIGS, SANS } from './tokens';
@@ -92,69 +92,25 @@ export function BoardSeeAllSheet({
     }
     return out;
   }, [grouped, rows, t, i18n?.language]);
-
+  // The shared cap subtitle counts rounds, not feat-specific headline copy.
+  const count = t(isFeatBoard(board) || boardCountsRounds(board)
+    ? 'discover.filterBoard.nRounds' : 'discover.filterBoard.nMembers', { count: total });
 
   return (
-    <BottomSheet
+    <ExploreSheetShell
       open={open}
       onClose={onClose}
-      maxHeight="85dvh"
-      ariaLabelledBy="board-see-all-title"
-      style={{ height: '85dvh', display: 'flex', flexDirection: 'column', paddingBottom: 0 }}
+      titleId="board-see-all-title"
+      title={title ?? t(BOARD_LABELS[board].i18n)}
+      subtitle={[...appliedParts, count].join(' · ')}
+      columns={<div style={{ flexShrink: 0, paddingTop: 10, fontFamily: SANS, ...FIGS }}><BoardHeaderRow board={board} sheet /></div>}
+      bodyPadding="0 0 calc(env(safe-area-inset-bottom, 0px) + 24px)"
     >
       <div
         style={{
-          flexShrink: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
-          padding: '10px 16px 12px',
-          /* Hairline clause: sheet controls from list. */
-          borderBottom: `1px solid ${A.BORDER}`,
-        }}
-      >
-        <h2
-          id="board-see-all-title"
-          style={{ ...KICKER, margin: 0, color: A.INK }}
-        >
-          {title ?? t(BOARD_LABELS[board].i18n)}
-        </h2>
-        <button
-          type="button"
-          onClick={onClose}
-          style={{ ...KICKER, padding: '8px 0', background: 'transparent', border: 'none', fontFamily: SANS, color: A.INK, cursor: 'pointer' }}
-        >
-          {t('discover.filterBoard.done')}
-        </button>
-      </div>
-      <div style={{ flexShrink: 0, padding: '16px 16px 12px', /* Hairline clause: sheet controls from list. */ borderBottom: `1px solid ${A.BORDER}`, fontFamily: SANS, ...FIGS }}>
-        <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 700, color: A.INK, textTransform: 'uppercase' }}>
-          {/* B.10 — feat boards say what the sheet counts: rounds WITH the feat. */}
-          {isFeatBoard(board)
-            ? t(`discover.filterBoard.featRounds.${board === 'clean_card' ? 'cleanCard' : board}`, { count: total })
-            : boardCountsRounds(board)
-            ? t('discover.filterBoard.nRounds', { count: total })
-            : t('discover.filterBoard.nMembers', { count: total })}
-        </div>
-        <div style={{ ...KICKER, marginTop: 6, color: A.MUTE }}>
-          {appliedParts.map((part, index) => (
-            <span key={`${part}:${index}`}>{index > 0 ? <> {'\u00B7'} </> : null}{part}</span>
-          ))}
-        </div>
-      </div>
-      <div style={{ flexShrink: 0, paddingTop: 8, fontFamily: SANS, ...FIGS }}>
-        <BoardHeaderRow board={board} />
-      </div>
-      <div
-        style={{
-          flex: 1,
-          minHeight: 0,
-          overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain',
           willChange: 'transform',
-          padding: '0 0 calc(env(safe-area-inset-bottom, 0px) + 24px)',
           fontFamily: SANS,
           ...FIGS,
         }}
@@ -205,7 +161,7 @@ export function BoardSeeAllSheet({
           </button>
         )}
       </div>
-    </BottomSheet>
+    </ExploreSheetShell>
   );
 }
 
