@@ -1,0 +1,30 @@
+/* CB35: only a mounted gate opts this page into a finite flex layout. The
+   page retains its canonical clearance; the explicit nav-adjacent exception
+   removes breathing/safe-area space because the floating pill sits at 20px.
+   Parent flex tracks, not observers or fixed reveal sizes, own remaining height. */
+main:has([data-rounds-gate]) {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--sat, 0px));
+  min-height: 0;
+  padding-bottom: calc(var(--nav-pill-h, 64px) + 20px) !important;
+}
+
+main:has([data-rounds-gate]) > [data-explore-magazine] {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+[data-explore-magazine]:has([data-rounds-gate]) > [data-stuck] {
+  flex-shrink: 0;
+}
+
+[data-scores-board-container]:has([data-rounds-gate]) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  margin-bottom: 0 !important;
+}
