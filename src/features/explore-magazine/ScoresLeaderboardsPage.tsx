@@ -35,6 +35,8 @@ import { standingOrdinal } from './ordinal';
 import { useFeatsWindow, type FeatWindow } from './useFeatsWindow';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { RoundsGate, roundsGateState } from './RoundsGate';
+import { roundsPageHeld } from './roundsPageHold';
+import { useStandoutRounds } from '@/components/explore-tab-new/courseled/hooks/useStandoutRounds';
 import { RARE_AIR, rareAirPlaceholderHeight } from './rareAir';
 import { RareAirLede, RareAirRail, RareAirYou } from './RareAirSection';
 import { GUTTER, Section, SeeAll } from './Section';
@@ -368,8 +370,11 @@ export function ScoresLeaderboardsPage({
   onRowPress,
   onMemberTap,
   onOpenCourse,
+  sessionKnown = true,
 }: {
   userId: string | undefined;
+  /** CB44 — false while the session is not yet known; that is undecided, never signed out. */
+  sessionKnown?: boolean;
   state: AmateurBoardState;
   /** EX1: unused since the Filters pill was unmounted; kept optional so the pill can be re-mounted without re-plumbing. */
   onOpenFilters?: () => void;
