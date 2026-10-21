@@ -1626,6 +1626,7 @@ export function ExploreCard({
           <span data-feed-round-course="true" style={{ display: 'block', marginTop: 12, fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {kickerPartsValue.course ?? item.subject?.course_name ?? ''}
           </span>
+        </span>
         {shape && received ? <RoundTilePlot shape={shape} received={received} /> : null}
         {/* BRIEF_ROUND_TILE_1_R2 -- the round-feat panel, beneath the plot and
             above the figures. When the plot's gold mark already names a rare
