@@ -64,8 +64,8 @@ export function roundsGateState(
  *  the cut, so the next section's eyebrow cannot ghost above the gate. */
 const FROST: CSSProperties = {
   opacity: 0.74,
-  WebkitMaskImage: 'linear-gradient(to bottom, #000 0, #000 66%, rgba(0,0,0,0.18) 100%)',
-  maskImage: 'linear-gradient(to bottom, #000 0, #000 66%, rgba(0,0,0,0.18) 100%)',
+  WebkitMaskImage: 'linear-gradient(to bottom, #000 0, #000 66%, rgba(0,0,0,0.10) 92%, transparent 100%)',
+  maskImage: 'linear-gradient(to bottom, #000 0, #000 66%, rgba(0,0,0,0.10) 92%, transparent 100%)',
 };
 
 /** CB36 — what counts as "one complete round" inside the glimpse. */
