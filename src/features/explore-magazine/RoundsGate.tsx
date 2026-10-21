@@ -152,7 +152,7 @@ function GateCard({ onConnect, onNoHandicap, roundCount, scope }: {
     <div
       data-rounds-gate-card=""
       style={{
-        padding: '14px 15px 20px',
+        padding: '14px 15px 2px',
       }}
     >
       <div style={{ ...EYEBROW, lineHeight: 1, color: A.AMBER }}>{t('amateur.gate.eyebrow')}</div>
