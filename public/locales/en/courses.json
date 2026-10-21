@@ -204,7 +204,6 @@
       "featsFromYear": "Out of <n>{{holes}}</n> holes and <n>{{rounds}}</n> rounds tracked on clbhouz this year.",
       "featNone": "None in {{n}} {{unit}}",
       "rarest": "Rarest",
-      "rarestFirst": "Rarest first",
       "featCompare": {
         "more": "More often than all time — <g>1 in {{n}} {{unit}}</g>",
         "less": "Less often than all time — 1 in {{n}} {{unit}}",

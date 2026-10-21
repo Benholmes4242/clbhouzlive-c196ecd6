@@ -8,7 +8,7 @@ import { playDateStandalone } from '@/components/explore-tab-new/courseled/disco
 import type { FeatBoardKey } from '@/components/explore-tab-new/courseled/boardFilters';
 
 import type { FeatWindow, FeatYearRow } from './useFeatsWindow';
-import { FEAT_I18N, RARE_AIR, RARE_AIR_TILE_HEIGHT, compareRates, rarityShare } from './rareAir';
+import { FEAT_I18N, RARE_AIR, RARE_AIR_TILE_HEIGHT, compareRates, rarityShare, rareAirRailRows } from './rareAir';
 
 const T = RARE_AIR.tile;
 const L = T.latest;
@@ -73,13 +73,6 @@ export function RareAirRail({
   const allOf = (k: string) => allRows.find((r) => r.feat_kind === k);
   return (
     <>
-      <div style={{
-        marginInline: -R.side, padding: RARE_AIR.label.padding, fontSize: RARE_AIR.label.fontSize,
-        fontWeight: RARE_AIR.label.fontWeight, letterSpacing: RARE_AIR.label.letterSpacing,
-        lineHeight: `${RARE_AIR.label.lineHeight - 2}px`, textTransform: 'uppercase', color: A.DIM,
-      }}>
-        {t('amateur.leaderboards.rarestFirst')}
-      </div>
       <div style={{ position: 'relative', marginInline: -R.side }}>
         <div
           style={{
@@ -88,7 +81,7 @@ export function RareAirRail({
             scrollbarWidth: 'none', willChange: 'transform',
           }}
         >
-          {rows.map((f, i) => {
+          {rareAirRailRows(rows).map((f, i) => {
             const all = allOf(f.feat_kind);
             const share = rarityShare(all);
             const cmp = window === 'year' ? compareRates(f, all) : null;
