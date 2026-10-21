@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
 
+ * Used by StandoutRounds, JustPlayed, CompetitionBoards and LeaderboardsSection; a filter change never unmounts a populated section or carries old rows.
 /**
  * CB28 — A FILTER CHANGES WHAT IS UNDER THE HEADING, NOT THE PAGE.
  *
