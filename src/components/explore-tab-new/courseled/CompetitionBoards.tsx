@@ -9,6 +9,8 @@ import { MemberAvatar } from './MemberAvatar';
 import { ScoreWithToPar } from './ScoreWithToPar';
 import { CompetitionTrophy } from './CompetitionMark';
 import type { RoundPressTarget } from './StandoutRounds';
+import { useHeldFrame } from './useHeldFrame';
+import { HeldRows } from './HeldRows';
 import { groupCompetitionCards, useCompetitionBoards, type CompetitionBoardRow, type CompetitionCard } from './hooks/useCompetitionBoards';
 
 /** CB3 (supersedes CB2): sits directly below Standout rounds. Reads the page's
@@ -135,8 +137,11 @@ export function CompetitionBoards({ viewerId, scope, enabled, onRowPress }: { vi
   const { t } = useTranslation('courses');
   const query = useCompetitionBoards(viewerId, scope, enabled);
   const [openKey, setOpenKey] = useState<string | null>(null);
-  if (!enabled || !query.isSuccess || !query.data?.length) return null;
-  const cards = groupCompetitionCards(query.data);
+  const data = query.isSuccess ? query.data ?? [] : [];
+  // CB28: the rail is one row; hold its measured height between two populated states.
+  const frame = useHeldFrame({ active: enabled && query.isSuccess, pending: enabled && query.isPending, count: data.length > 0 ? 1 : 0 });
+  if (frame.mode === 'none') return null;
+  const cards = groupCompetitionCards(data);
   const open = cards.find((c) => c.key === openKey) ?? null;
   return (
     <div data-competitions-section style={{ ...FIGS }}>
@@ -146,9 +151,9 @@ export function CompetitionBoards({ viewerId, scope, enabled, onRowPress }: { vi
       title={t('amateur.competitions.title', { defaultValue: 'Competitions' })}
       meta={t('amateur.competitions.window', { defaultValue: 'Last 30 days' })}
     >
-      <Rail>
+      {frame.mode === 'hold' ? <HeldRows count={frame.heldCount} rowHeight={frame.rowHeight} /> : <div ref={frame.bodyRef}><Rail>
         {cards.map((c) => <Card key={c.key} card={c} onOpen={() => setOpenKey(c.key)} onRowPress={onRowPress} />)}
-      </Rail>
+      </Rail></div>}
       <FieldSheet card={open} viewerId={viewerId} onClose={() => setOpenKey(null)} onRowPress={onRowPress} />
     </Section>
     </div>

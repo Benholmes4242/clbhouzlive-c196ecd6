@@ -10,6 +10,8 @@ import { useStandoutRounds, type StandoutRound } from './hooks/useStandoutRounds
 import { playDateAtLocalNoon } from './discoverWhen';
 import { standoutSentenceParts } from './standoutSentence';
 import { ScoreWithToPar } from './ScoreWithToPar';
+import { useHeldFrame } from './useHeldFrame';
+import { HeldRows } from './HeldRows';
 
 /** SR1: no independent filter state, no independent round navigation. The host
  * passes its authoritative filters and the very same board-row callback.
@@ -41,7 +43,10 @@ export function StandoutRounds({ viewerId, filters, enabled, onRowPress }: {
 }) {
   const { t, i18n } = useTranslation('courses');
   const query = useStandoutRounds(viewerId, filters, enabled);
-  if (!enabled || !query.isSuccess || !query.data?.length) return null;
+  const data = query.isSuccess ? query.data ?? [] : [];
+  // CB28: hold the frame between two populated states; absent otherwise.
+  const frame = useHeldFrame({ active: enabled && query.isSuccess, pending: enabled && query.isPending, count: data.length });
+  if (frame.mode === 'none') return null;
   const win = windowOption(filters.window);
   return (
     <div data-standout-section style={{ ...FIGS }}>
@@ -51,8 +56,8 @@ export function StandoutRounds({ viewerId, filters, enabled, onRowPress }: {
       title={t('amateur.standout.title', { defaultValue: 'Standout rounds' })}
       meta={t(win.i18n, { defaultValue: win.label })}
     >
-      <div>
-        {query.data.map((row) => {
+      {frame.mode === 'hold' ? <HeldRows count={frame.heldCount} rowHeight={frame.rowHeight} /> : <div ref={frame.bodyRef}>
+        {data.map((row) => {
           const { key, ...options } = standoutSentenceParts(row, i18n?.language);
           const date = playDateAtLocalNoon(row.play_date);
           const dateText = date ? `${date.toLocaleDateString(i18n?.language, { month: 'short' })} ${date.getDate()}` : '';
@@ -72,7 +77,7 @@ export function StandoutRounds({ viewerId, filters, enabled, onRowPress }: {
             <Figures row={row} />
           </Button>;
         })}
-      </div>
+      </div>}
     </Section>
     </div>
   );
