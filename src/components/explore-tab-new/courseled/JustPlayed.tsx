@@ -44,8 +44,8 @@ export function JustPlayed({
       title={t('amateur.justPlayed.title', { defaultValue: 'Just played' })}
       meta={t(win.i18n, win.label)}
     >
-      <BoardHeaderRow board="recent" />
-      {rows.map((r) => <BoardRowView key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} row={r} board="recent" isSelf={!!viewerId && r.user_id === viewerId} onPress={onRowPress} />)}
+      <BoardHeaderRow board="recent" flush />
+      {rows.map((r) => <BoardRowView key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} row={r} board="recent" isSelf={!!viewerId && r.user_id === viewerId} onPress={onRowPress} flush />)}
       <SeeAll label={t('amateur.leaderboards.seeAllRounds')} onPress={() => setSheet(true)} />
       {sheet ? (
         <BoardSeeAllSheet
