@@ -85,7 +85,7 @@ export function BrowseCourseCard({
       : row.avg_to_par < 0
         ? `−${Math.abs(row.avg_to_par).toFixed(1)}`
         : null;
-  const fig: React.CSSProperties = { ...FIGS, color: A.INK, fontSize: 14, fontWeight: 700, letterSpacing: '-0.04em' };
+  const fig: React.CSSProperties = { ...FIGS, color: A.INK, fontSize: 13, fontWeight: 700, letterSpacing: '-0.04em' };
   /* Comparison only at the ends of the field (>=80 harder, <=20 easier).
      "Easier" uses 100 - pct: the complement absorbs ties, immaterial at whole
      percentages — deliberate, do not "fix". */
@@ -98,6 +98,18 @@ export function BrowseCourseCard({
         ? { word: 'easier', value: 100 - pct }
         : null;
   const location = [row.region, row.sub_country].filter(Boolean).join(', ') || row.country;
+  const hasMembersLine = top100 && row.members > 0;
+  const lead = row.community_rating != null ? (
+    <>
+      {/* Below nine stays INK: the headline is never dimmed and must not use the category tone helper. */}
+      <div style={{ ...FIGS, fontSize: 24, fontWeight: 800, letterSpacing: '-0.045em', lineHeight: 1, color: row.community_rating >= SUB_SCORE_GREEN_MIN ? A.GREEN : A.INK }}>
+        {row.community_rating.toFixed(1)}
+      </div>
+      <div style={{ marginTop: 5, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1, color: A.DIM, whiteSpace: 'nowrap' }}>
+        {row.review_count} {row.review_count === 1 ? 'rating' : 'ratings'}
+      </div>
+    </>
+  ) : null;
   return (
     <button
       type="button"
@@ -169,28 +181,11 @@ export function BrowseCourseCard({
               </div>
             ) : null}
           </div>
-          {row.community_rating != null ? (
-            <div style={{ flexShrink: 0, textAlign: 'center' }}>
-              {/* Nine and above takes the shared green so the headline agrees with
-                  the category figures beneath it. Below nine stays INK, not MUTE,
-                  because this figure sits on a photograph. Do NOT swap this for
-                  the shared category tone helper in the analytical tokens module:
-                  it returns MUTE below 9 (right in a panel, wrong here — it would
-                  dim every card's score), and courseRatingConsistency asserts
-                  this card never reaches for it. */}
-              <div style={{ ...FIGS, color: row.community_rating >= SUB_SCORE_GREEN_MIN ? A.GREEN : A.INK, fontSize: top100 ? 24 : 26, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1 }}>
-                {row.community_rating.toFixed(1)}
-              </div>
-              <div style={{ marginTop: 4, marginRight: '-0.19em', color: PHOTO_DIM, fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-                {row.review_count} {row.review_count === 1 ? 'rating' : 'ratings'}
-              </div>
-            </div>
-          ) : null}
         </div>
       </div>
       <div style={{ padding: '0 20px' }}>
-        {top100 && row.members > 0 ? (
-          <div style={{ marginTop: 11, display: 'flex', alignItems: 'center', gap: 7, minWidth: 0, fontSize: 11, color: A.DIM }}>
+        {hasMembersLine ? (
+          <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 7, minWidth: 0, fontSize: 11, color: A.DIM }}>
             {players.length > 0 ? (
               <span
                 aria-hidden="true"
@@ -225,7 +220,7 @@ export function BrowseCourseCard({
           </div>
         ) : null}
         {hasRoundFacts ? (
-          <div style={{ marginTop: 11, whiteSpace: 'nowrap', color: A.DIM, fontSize: 11 }}>
+          <div style={{ marginTop: hasMembersLine ? 8 : 10, whiteSpace: 'nowrap', color: A.DIM, fontSize: 11 }}>
             Plays to{' '}
             {avg == null ? 'level par' : <span style={fig}>{avg}</span>}
             {' '}on average{comparison ? (
@@ -234,14 +229,16 @@ export function BrowseCourseCard({
           </div>
         ) : null}
         {top100 && row.rounds === 0 && viewerRounds === 0 ? (
-          <div style={{ marginTop: 11, fontSize: 11, lineHeight: 1.5 }}>
+          <div style={{ marginTop: hasMembersLine ? 8 : 10, fontSize: 11, lineHeight: 1.5 }}>
             <span style={{ color: A.FAINT }}>No member has logged an official round yet.</span>{' '}
             <span style={{ color: A.DIM }}>Be the first.</span>
           </div>
         ) : null}
         <CategoryScores
           scores={{ design: row.design_score, condition: row.condition_score, clubhouse: row.clubhouse_score, facilities: row.facilities_score }}
-          marginTop={14}
+          layout="split"
+          lead={lead}
+          marginTop={12}
         />
       </div>
     </button>
