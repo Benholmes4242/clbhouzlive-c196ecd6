@@ -2,7 +2,7 @@
 
 ## CB16 — Competition boards say whose field
 - [x] Read-only wording/test audit and full `bunx vitest run` baseline: 1,988 passing / 264 files, zero failures, matches last reported total. No existing test asserts subtitle player/players; shared subtitle default also says players. Separate card CTA uses `seeAllPlayers` / "See all players" and four existing tests protect/select it at competitionBoards.test.tsx:59,68,79,91.
-- [ ] Await Ben's ruling before changing CTA or its four protecting assertions/lookups; audit reported before application/test edits.
+- [x] Ben authorised changing CTA/fallback and only four named test lines, with before/after assertion report. Added requirement: use existing `amateur.leaderboards.seeAllMembers` if plain duplicate and delete competition key. Search confirms both are plain strings without count or pluralisation, and only CompetitionBoards reads the competition key.
 - [ ] Change English subtitle count nouns and shared fallback to members; add English field-limit key and sheet-only quiet line; preserve ranking/figures/mark/colours. Add one sheet-versus-card render test and run/report full suite with reconciled counts. No SQL/migrations/RPC/feed_config/cap edits.
 
 ## BRIEF_TOP_TEN_OWNER_NAME_LABEL — Row score centring follow-up
