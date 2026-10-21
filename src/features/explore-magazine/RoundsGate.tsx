@@ -59,12 +59,13 @@ export function roundsGateState(
 }
 
 /** CB36 — the glimpse: one compositing opacity plus the mask gradient, from
- *  gate-A-spec.html (solid to 66%, 0.18 at the foot) so the rounds read as
- *  content, not texture. */
+ *  gate-A-spec.html (solid to 66%) so the rounds read as content, not
+ *  texture. CB38 — the fade now reaches zero: 0.10 at 92%, transparent at
+ *  the cut, so the next section's eyebrow cannot ghost above the gate. */
 const FROST: CSSProperties = {
   opacity: 0.74,
-  WebkitMaskImage: 'linear-gradient(to bottom, #000 0, #000 66%, rgba(0,0,0,0.18) 100%)',
-  maskImage: 'linear-gradient(to bottom, #000 0, #000 66%, rgba(0,0,0,0.18) 100%)',
+  WebkitMaskImage: 'linear-gradient(to bottom, #000 0, #000 66%, rgba(0,0,0,0.10) 92%, transparent 100%)',
+  maskImage: 'linear-gradient(to bottom, #000 0, #000 66%, rgba(0,0,0,0.10) 92%, transparent 100%)',
 };
 
 /** CB36 — what counts as "one complete round" inside the glimpse. */
@@ -151,7 +152,7 @@ function GateCard({ onConnect, onNoHandicap, roundCount, scope }: {
     <div
       data-rounds-gate-card=""
       style={{
-        padding: '14px 15px 2px',
+        padding: '14px 15px 20px',
       }}
     >
       <div style={{ ...EYEBROW, lineHeight: 1, color: A.AMBER }}>{t('amateur.gate.eyebrow')}</div>
