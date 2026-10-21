@@ -25,7 +25,10 @@ import { groupCompetitionCards, useCompetitionBoards, type CompetitionBoardRow, 
  * CB4: a row tap — podium or field — opens that player's scorecard for the
  * round through the page's one opener; the sheet now opens only from the CTA
  * and the card's title/subtitle. Net and gross carry their to-par exactly as
- * the standout rows render it, and the sheet's subtitle takes the same pill. */
+ * the standout rows render it, and the sheet's subtitle takes the same pill.
+ * CB16: counts and positions describe members, not the complete competition
+ * field. Only the sheet carries the scope explanation; the CTA reuses the
+ * shared member-list label to avoid duplicate copy keys. */
 const PODIUM = 3;
 
 /** The subtitle's metadata, on card and sheet alike: the date and the field
@@ -34,7 +37,7 @@ function useSubtitleRest(card: CompetitionCard) {
   const { t, i18n } = useTranslation('courses');
   const d = playDateAtLocalNoon(card.comp_date);
   const date = d ? `${d.getDate()} ${d.toLocaleDateString(i18n?.language, { month: 'short' })}` : '';
-  return t('amateur.competitions.subtitleRest', { count: card.members, date, defaultValue: '{{date}} · {{count}} players' });
+  return t('amateur.competitions.subtitleRest', { count: card.members, date, defaultValue: '{{date}} · {{count}} members' });
 }
 
 /** A TIE STATES ITSELF: T4, never a silent second 4 (BoardRows.tsx). */
@@ -75,7 +78,7 @@ function Card({ card, onOpen, onRowPress }: { card: CompetitionCard; onOpen: () 
         </button>
       ))}
       <div style={{ marginTop: 'auto' }}>
-        <SeeAll label={t('amateur.competitions.seeAllPlayers', { defaultValue: 'See all players' })} onPress={onOpen} size={9.5} />
+        <SeeAll label={t('amateur.leaderboards.seeAllMembers', { defaultValue: 'See all members' })} onPress={onOpen} size={9.5} />
       </div>
     </div>
   );
@@ -106,6 +109,9 @@ function FieldBody({ card, viewerId, onRowPress, t }: { card: CompetitionCard; v
             {t('discover.filterBoard.competitionChip', { defaultValue: 'Competition' })}
           </span>
           {' · '}{subtitle}
+        </div>
+        <div style={{ marginTop: 4, fontSize: 11.5, color: A.DIM, lineHeight: 1.45 }}>
+          {t('amateur.competitions.fieldLimit', { defaultValue: "Members who played this competition. Golfers not on clbhouz aren't shown." })}
         </div>
       </div>
       <Heads netW={48} grossW={46} style={{ margin: '14px 18px 0', paddingBottom: 7, borderBottom: `1px solid ${A.SOFT}` }} />

@@ -56,7 +56,7 @@ describe('CB1 competition boards', () => {
     expect(first).toBe('T2');
     /* CB3: the "{n} more played" line is gone; every card carries the same
      * uncounted "See all players" CTA whatever the field size. */
-    expect(screen.getAllByRole('button', { name: 'See all players' }).length).toBe(2);
+    expect(screen.getAllByRole('button', { name: 'See all members' }).length).toBe(2);
     expect(document.querySelector('[data-competition-rest]')).toBeNull();
   });
   it('card shows three of the field; sheet shows every row from the same single call, tinting only the viewer', async () => {
@@ -65,7 +65,7 @@ describe('CB1 competition boards', () => {
     mount();
     await waitFor(() => expect(q('[data-competition-card]').length).toBe(1));
     expect(q('[data-competition-row]').length).toBe(3);
-    fireEvent.click(screen.getByRole('button', { name: 'See all players' }));
+    fireEvent.click(screen.getByRole('button', { name: 'See all members' }));
     await waitFor(() => expect(q('[data-competition-field]').length).toBe(1));
     expect(q('[data-competition-field-row]').length).toBe(5);
     expect([...q('[data-competition-field-row]')].map((r) => r.firstElementChild!.textContent)).toEqual(['1', 'T2', 'T2', '4', '5']);
@@ -76,7 +76,7 @@ describe('CB1 competition boards', () => {
     f.rpc.mockResolvedValue({ data: [row({ members: 3 })], error: null });
     mount();
     await waitFor(() => expect(q('[data-competition-card]').length).toBe(1));
-    expect(screen.getByRole('button', { name: 'See all players' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'See all members' })).toBeTruthy();
     /* CB4.7: the card root is no longer the button — the sheet opens from the
      * title/subtitle area (and the CTA); a podium row opens the scorecard. */
     fireEvent.click(q('[data-competition-open]')[0]);
@@ -88,10 +88,22 @@ describe('CB1 competition boards', () => {
     f.rpc.mockResolvedValue({ data: [row({ members: 3 })], error: null });
     mount();
     await waitFor(() => expect(q('[data-competition-card]').length).toBe(1));
-    fireEvent.click(screen.getByRole('button', { name: 'See all players' }));
+    fireEvent.click(screen.getByRole('button', { name: 'See all members' }));
     await waitFor(() => expect(q('[data-competition-field]').length).toBe(1));
     const subtitle = q('[data-competition-field]')[0].querySelector('h2 + div')!;
     expect(subtitle.textContent).toContain('Competition');
     expect(subtitle.querySelectorAll('svg').length).toBe(1);
+  });
+  it('CB16 renders the member-field limit only in the sheet, never on the rail card', async () => {
+    f.rpc.mockResolvedValue({ data: [row({ members: 3 })], error: null });
+    mount();
+    await waitFor(() => expect(q('[data-competition-card]').length).toBe(1));
+    const limit = "Members who played this competition. Golfers not on clbhouz aren't shown.";
+    expect(screen.queryByText(limit)).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'See all members' }));
+    await waitFor(() => expect(q('[data-competition-field]').length).toBe(1));
+    expect(screen.getAllByText(limit)).toHaveLength(1);
+    expect(q('[data-competition-field]')[0]).toContainElement(screen.getByText(limit));
+    expect(q('[data-competition-card]')[0]).not.toContainElement(screen.getByText(limit));
   });
 });
