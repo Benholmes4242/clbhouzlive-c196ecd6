@@ -56,18 +56,17 @@ export function roundsGateState(
   return connection.data ? 'connected' : 'gated';
 }
 
-/** The hero's frost: one compositing opacity plus the mask gradient. Stops are
- *  the mock's — solid to 42%, gone by 86%. */
+/** CB34 — the frosted header: one compositing opacity plus the mask gradient,
+ *  stops from the gate-page mock (solid to 34%, gone by 100%). */
 const FROST: CSSProperties = {
-  opacity: 0.5,
-  WebkitMaskImage: 'linear-gradient(to bottom, #000 0, #000 42%, transparent 86%)',
-  maskImage: 'linear-gradient(to bottom, #000 0, #000 42%, transparent 86%)',
+  opacity: 0.42,
+  WebkitMaskImage: 'linear-gradient(to bottom, #000 0, #000 34%, transparent 100%)',
+  maskImage: 'linear-gradient(to bottom, #000 0, #000 34%, transparent 100%)',
 };
 
-/** Frosted page visible above the card. An empty pool has nothing to frost,
- *  so the band collapses rather than leaving the card floating on black. */
-const REVEAL = 300;
-const REVEAL_EMPTY = 96;
+/** CB34 — the header's clip, as measured in the mock. A max, not a height, so
+ *  an empty pool renders no header and the copy starts at the top. */
+const HEADER_MAX = 193.3;
 
 /** CB14 — the sheet's one outbound link. England is the only supported
  *  provider (whsCountries.ts), so it is the only route we can honour; the
@@ -134,11 +133,7 @@ function GateCard({ onConnect, onNoHandicap }: { onConnect: () => void; onNoHand
     <div
       data-rounds-gate-card=""
       style={{
-        background: A.PANEL,
-        borderTop: `1px solid ${A.BORDER}`,
-        borderRadius: '20px 20px 0 0',
         padding: '22px 20px',
-        boxShadow: '0 -24px 60px rgba(0,0,0,0.72)',
       }}
     >
       <div style={{ ...EYEBROW, lineHeight: 1, color: A.AMBER }}>{t('amateur.gate.eyebrow')}</div>
@@ -261,15 +256,12 @@ function GateSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   );
 }
 
-/** The gated render: the real page cropped and faded behind the card. The
- *  frost is absolute over the whole block and inert — no tap, focus or
- *  keyboard reaches a row — while the card sits in flow at the bottom, so the
- *  block ends with the card and nothing below it. */
+/** The gated render (CB34): one page, one flow. The real page, cropped and
+ *  faded, is an inert in-flow header; the gate copy follows it on the page's
+ *  own canvas. Not a sheet, not a layer. */
 export function RoundsGate({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [poolEmpty, setPoolEmpty] = useState(false);
-  const contentRef = useRef<HTMLDivElement | null>(null);
   const impressionTracked = useRef(false);
 
   useEffect(() => {
@@ -278,26 +270,17 @@ export function RoundsGate({ children }: { children: ReactNode }) {
     analyticsEvents.track('rounds_gate_viewed', { gate_state: 'gated' });
   }, []);
 
-  useEffect(() => {
-    const el = contentRef.current;
-    if (!el) return;
-    const measure = () => setPoolEmpty(el.scrollHeight < 40);
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <div style={{ position: 'relative' }}>
+    <div>
       <div
         aria-hidden
+        data-rounds-gate-header=""
         ref={(el) => el?.setAttribute('inert', '')}
-        style={{ position: 'absolute', inset: 0, overflow: 'hidden', ...FROST }}
+        style={{ maxHeight: HEADER_MAX, overflow: 'hidden', ...FROST }}
       >
-        <div ref={contentRef}>{children}</div>
+        {children}
       </div>
-      <div style={{ position: 'relative', paddingTop: poolEmpty ? REVEAL_EMPTY : REVEAL }}>
+      <div>
         <GateCard onConnect={() => {
           analyticsEvents.track('rounds_gate_connect_tap', { gate_state: 'gated' });
           navigate('/manage/handicap');
