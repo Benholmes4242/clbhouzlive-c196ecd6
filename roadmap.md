@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB17 — Two copy changes on the gate card
+- [ ] Audit protected body/bullet-count assertions before changing them; preserve all tests pending any required ruling.
+- [ ] English body adds “an official synced handicap”; append bulletCourses last in GateCard’s existing array. No presentation/state/logic/analytics/frost changes.
+- [ ] Run full suite against last reported 1,989 passing / 264 files; measure full card and both actions on shortest phone with REVEAL unchanged at 300. Stop with measurements if they need scrolling.
+
 ## CB16 — Competition boards say whose field
 - [x] Read-only wording/test audit and full `bunx vitest run` baseline: 1,988 passing / 264 files, zero failures, matches last reported total. No existing test asserts subtitle player/players; shared subtitle default also says players. Separate card CTA uses `seeAllPlayers` / "See all players" and four existing tests protect/select it at competitionBoards.test.tsx:59,68,79,91.
 - [x] Ben authorised changing CTA/fallback and only four named test lines, with before/after assertion report. Added requirement: use existing `amateur.leaderboards.seeAllMembers` if plain duplicate and delete competition key. Search confirms both are plain strings without count or pluralisation, and only CompetitionBoards reads the competition key.
