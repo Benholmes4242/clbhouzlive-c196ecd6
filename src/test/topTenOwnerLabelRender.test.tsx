@@ -74,6 +74,23 @@ const renderRail = (props: { isOwnProfile: boolean; ownerName?: string | null })
 const labelCount = (text: string) => screen.queryAllByText(text).length;
 
 describe('BRIEF_TOP_TEN_OWNER_NAME_LABEL render', () => {
+  it('both row score columns centre non-wrapping figures and labels with a 42px minimum', () => {
+    renderRail({ isOwnProfile: false, ownerName: 'Thomas' });
+    const row = document.querySelector('[data-top-ten-course-id="c4"]');
+    expect(row).toBeInstanceOf(HTMLButtonElement);
+    if (!(row instanceof HTMLButtonElement)) throw new Error('Expected the position-four row');
+    const columns = Array.from(row.children).slice(-2);
+    expect(columns).toHaveLength(2);
+    for (const column of columns) {
+      expect(column).toHaveStyle({ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', flexShrink: '0' });
+      expect((column as HTMLElement).style.width).toBe('');
+      expect(column.children).toHaveLength(2);
+      for (const child of Array.from(column.children)) {
+        expect(child).toHaveStyle({ whiteSpace: 'nowrap' });
+      }
+    }
+  });
+
   it('a visitor sees the owner\'s first name on every score label', () => {
     renderRail({ isOwnProfile: false, ownerName: 'Thomas' });
     expect(labelCount('Thomas')).toBe(5);

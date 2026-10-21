@@ -67,10 +67,11 @@ const scoreTone = (score: number) => (score >= 9 ? A.GREEN : A.INK);
 /**
  * BRIEF_TOP_TEN_OWNER_NAME_LABEL — the score label beside a rating on a VISITOR's
  * Top 10 reads the owner's first name, not the generic "Them". Nine characters is
- * the ceiling: the glass pill on the photograph tiles and the label under the score
- * in rows four to ten are fixed-width affordances, and a username ("golfingwithellie")
- * would otherwise widen the pill over the picture. Eight characters plus an ellipsis
- * is nine cells of ink. Empty or absent returns null so the caller keeps "Them".
+ * the ceiling for both the glass pill and row label. Row score columns have a 42px
+ * minimum rather than a fixed width: each centres its figure above its non-wrapping
+ * label, yielding course-name space when needed. The photo pill stays side by side.
+ * Eight characters plus an ellipsis is nine cells of ink. Empty or absent returns
+ * null so the caller keeps "Them".
  */
 export const ownerScoreLabel = (ownerName: string | null | undefined): string | null => {
   const name = ownerName?.trim() ?? '';
@@ -402,13 +403,13 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                     <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
                     <RegionRankLine course={c} rank={rankOf(c.course_id)} style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, ...FIGS }} />
                   </span>
-                  <span style={{ width: 42, textAlign: 'center', flexShrink: 0 }}>
-                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: g != null ? A.MUTE : A.DIM, ...FIGS }}>{g != null ? g.toFixed(1) : '–'}</span>
-                    <span style={{ display: 'block', marginTop: 2, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{t('topTen.golfers', 'Golfers')}</span>
+                  <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 42, textAlign: 'center', flexShrink: 0 }}>
+                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: g != null ? A.MUTE : A.DIM, whiteSpace: 'nowrap', ...FIGS }}>{g != null ? g.toFixed(1) : '–'}</span>
+                    <span style={{ display: 'block', marginTop: 2, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap' }}>{t('topTen.golfers', 'Golfers')}</span>
                   </span>
-                  <span style={{ width: 42, textAlign: 'center', flexShrink: 0 }}>
-                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: r != null ? scoreTone(r) : A.DIM, ...FIGS }}>{r != null ? r.toFixed(1) : '–'}</span>
-                    <span style={{ display: 'block', marginTop: 2, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{pillKicker}</span>
+                  <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 42, textAlign: 'center', flexShrink: 0 }}>
+                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: r != null ? scoreTone(r) : A.DIM, whiteSpace: 'nowrap', ...FIGS }}>{r != null ? r.toFixed(1) : '–'}</span>
+                    <span style={{ display: 'block', marginTop: 2, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap' }}>{pillKicker}</span>
                   </span>
                 </button>
               );
