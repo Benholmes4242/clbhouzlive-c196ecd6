@@ -53,17 +53,14 @@ describe('review post — R.2 score colour', () => {
 });
 
 describe('review post — categories', () => {
-  // The em dash went on purpose: the review card now shares `CategoryScores` with
-  // the course page and the Reviews tab, and that block's rule — pinned by
-  // courseRatingConsistency — is an EMPTY cell for an unscored category. Do not
-  // put a dash back here alone; that would fork the one block.
-  it('an unscored category renders an empty cell and the grid keeps four columns', () => {
+  // B2 explicitly replaces the feed-only empty-cell rule; shared course grids stay unchanged.
+  it('an unscored category renders a dash and the grid keeps four cells in two columns', () => {
     const c = card(8, { ...all, clubhouse: null });
     expect(c.querySelectorAll('[data-category]').length).toBe(4);
-    expect((c.querySelector('[data-category-scores]') as HTMLElement).style.gridTemplateColumns).toBe('repeat(4, minmax(0, 1fr))');
-    const club = c.querySelector('[data-category="clubhouse"]')!;
+    expect((c.querySelector('[data-review-categories]') as HTMLElement).style.gridTemplateColumns).toBe('repeat(2, minmax(0, 1fr))');
+    const club = c.querySelector('[data-category="clubhouse"]') as HTMLElement;
     expect(club.querySelector('[data-category-score]')).toBeNull();
-    expect(club.textContent).toBe('');
+    expect(club.querySelector('[data-category-figure]')?.textContent).toBe('\u2014');
   });
 });
 
