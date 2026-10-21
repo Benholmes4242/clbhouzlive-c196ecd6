@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB27 — Six-board Leaderboards replacement
+- [ ] Replace CB25 controls with six outlined count tiles using existing facets; shared score-leading pairs, faint positions and ranking-only feat suppression.
+- [ ] Report superseded assertions, full-suite counts, count/ranking sources and page shapes; verify 390px tiles and interactions.
+- [ ] Authenticated real-member check depends on an available hosted session; controlled evidence must be labelled.
+
 ## Explore sheets — One shell
 - [x] Extracted canonical shell/default markup/styles; existing Top100/Most improved contents unchanged. Board sheets use cap counts/no24px band and sheet-only typography; competition uses DONE/header/footnote and16px row inset; English Just played title updated. Local headers record shell/gutter ownership; cards/RPCs untouched.
 - [x] Full bunx vitest run 2,011/270→2,018/271, zero failures; seven added exploreSheetShell.test.tsx cases. Announced then updated only competitionBoards.test.tsx old93 subtitle locator and old106 containment assertion for portal/footnote; no deleted/renamed tests. Build OK11:25:00Z.
