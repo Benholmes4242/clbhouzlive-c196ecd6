@@ -22,17 +22,17 @@ const card = (rating: number) => render(
   </QueryClientProvider></MemoryRouter>,
 ).container;
 
-describe('review post — compact score beside the course', () => {
-  it('the score figure is 16 / 700 / -0.02em', () => {
+describe('review post — B2 score below the course', () => {
+  it('the score figure is 30 / 800 / -0.045em', () => {
     const s = card(8.2).querySelector('[data-review-score]') as HTMLElement;
-    expect(s.style.fontSize).toBe('16px');
-    expect(s.style.fontWeight).toBe('700');
-    expect(s.style.letterSpacing).toBe('-0.02em');
+    expect(s.style.fontSize).toBe('30px');
+    expect(s.style.fontWeight).toBe('800');
+    expect(s.style.letterSpacing).toBe('-0.045em');
   });
-  it('the score column and the subject row are centred', () => {
+  it('the score column is text-centred inside the centred score block', () => {
     const c = card(8.2);
-    expect((c.querySelector('[data-review-score-col]') as HTMLElement).style.alignItems).toBe('center');
-    expect((c.querySelector('[data-review-subject]') as HTMLElement).style.alignItems).toBe('center');
+    expect((c.querySelector('[data-review-score-col]') as HTMLElement).style.textAlign).toBe('center');
+    expect((c.querySelector('[data-review-score-block]') as HTMLElement).style.alignItems).toBe('center');
   });
   it('the score colour follows the rating: green at 9.2, muted at 8.2', () => {
     expect((card(9.2).querySelector('[data-review-score]') as HTMLElement).style.color).toBe(toRgb(A.GREEN));

@@ -9,6 +9,8 @@
  * Every score colour resolves through the app's helpers: the overall figure
  * and tier word through reviewLabelColor / ReviewVerdictLabel, every category
  * through courseSubScoreTone. Green at 9.0 and above, mute below.
+ * B2: the feed owns its open two-column score layout and missing-value dashes;
+ * shared CategoryScores remains unchanged for course surfaces.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,8 +18,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
 import { ReviewVerdictLabel, reviewLabelColor } from '@/components/shared/ReviewGhostScore';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { CategoryScores } from '@/components/courses/course-detail/CategoryScores';
+import { A, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { formatRatingValue } from '@/utils/formatters';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 import { formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
@@ -27,6 +28,8 @@ import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, REV
 const GUTTER = 14;
 const NAME_SIZE = 15;
 const NAME_LINE = 1.25;
+const SCORE_ORDER = ['design', 'condition', 'clubhouse', 'facilities'] as const;
+const SCORE_LABELS = { design: 'Design', condition: 'Condition', clubhouse: 'Clubhouse', facilities: 'Facilities' };
 
 
 const COURSE_NAME_STYLE: React.CSSProperties = {
@@ -134,8 +137,8 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         </div>
       </div>
 
-      {/* B — the subject and the verdict */}
-      <div data-review-subject style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 12, padding: `8px ${GUTTER}px 12px` }}>
+      {/* B — the full-width subject; scores live together in D. */}
+      <div data-review-subject style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 12, padding: `8px ${GUTTER}px 14px` }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           {!courseName ? null : onOpenCourse ? (
             <button
@@ -153,32 +156,45 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
             <div style={{ marginTop: 3, fontSize: 12, lineHeight: 1.2, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{region}</div>
           ) : null}
         </div>
+      </div>
+
+      {/* D — B2's open score block. Each half drops independently. */}
+      {rating != null || anyScore ? (
+        <div data-review-score-block style={{ flex: 'none', padding: `0 ${GUTTER}px 14px`, display: 'flex', alignItems: 'center', gap: 16 }}>
         {rating != null ? (
-        <div data-review-score-col style={{ flex: 'none', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div data-review-score-col style={{ flex: '0 0 auto', paddingRight: 16, borderRight: `1px solid ${A.TRACK}`, textAlign: 'center' }}>
           <div
             data-review-score
             className="tabular-nums"
-            style={{ fontSize: 16, fontWeight: 700, lineHeight: 1, letterSpacing: '-0.02em', color: reviewLabelColor(rating) }}
+            style={{ ...FIGS, fontSize: 30, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.045em', color: reviewLabelColor(rating) }}
           >
             {formatRatingValue(rating)}
           </div>
-          <div data-review-tier style={{ marginTop: 4, lineHeight: 1 }}>
+          <div data-review-tier style={{ marginTop: 6, lineHeight: 1 }}>
             <ReviewVerdictLabel
               rating={rating}
-              fontSize={9.5}
+              fontSize={9}
               onClick={onReadReview}
               ariaLabel={`${formatRatingValue(rating)} ${getRatingTierLabel(rating)}`}
             />
           </div>
         </div>
         ) : null}
-      </div>
-
-      {/* D — what they scored. The shared course-page block (bar, figure,
-          label); a missing category keeps its empty column. */}
-      {anyScore ? (
-        <div data-review-categories style={{ flex: 'none', padding: `0 ${GUTTER}px 12px` }}>
-          <CategoryScores scores={scores} />
+        {anyScore ? (
+          <div data-review-categories style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 18, rowGap: 10 }}>
+            {SCORE_ORDER.map((key) => {
+              const value = scores[key];
+              return (
+                <div key={key} data-category={key} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                  <span data-category-label style={{ fontSize: 12, color: A.MUTE }}>{SCORE_LABELS[key]}</span>
+                  <span data-category-figure data-category-score={value == null ? undefined : value.toFixed(1)} className="tabular-nums" style={{ ...FIGS, fontSize: 14, fontWeight: 700, color: value == null ? A.DIM : courseSubScoreTone(value) }}>
+                    {value == null ? '\u2014' : value.toFixed(1)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        ) : null}
         </div>
       ) : null}
 
