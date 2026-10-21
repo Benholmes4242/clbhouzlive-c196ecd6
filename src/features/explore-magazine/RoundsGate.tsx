@@ -156,6 +156,9 @@ function GateSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
     { key: 'club', href: null },
   ];
   const { supportedBodies, unsupportedHomeNations } = gateReach();
+  /** "A, B and C" — the brief's phrasing for the home-nations list. */
+  const andJoin = (names: string[]) =>
+    names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
   return (
     <BottomSheet open={open} onClose={onClose} ariaLabelledBy="rounds-gate-sheet-title">
       <div style={{ padding: '12px 20px 32px', fontFamily: SANS }}>
