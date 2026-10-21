@@ -628,9 +628,10 @@ function WhoLine({
             <span
               data-round-follow="true"
               style={{ flex: '0 0 auto', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44 }}
-              onClick={(event) => { stop(event); onFollow(); }}
+              onClickCapture={(event) => event.preventDefault()}
+              onClick={stop}
             >
-              <FeedFollowPill isFollowed={!!isFollowed} onFollow={() => {}} />
+              <FeedFollowPill isFollowed={!!isFollowed} onFollow={onFollow} />
             </span>
           ) : null}
           {/* Actions opposite the person; each control keeps its own 44x44 hit area. */}
