@@ -559,24 +559,31 @@ export function ScoresLeaderboardsPage({
 
   const pending = (h: number) => <div aria-hidden style={{ height: h, marginInline: GUTTER, marginBottom: 24 }} />;
 
-  /* CB13 state 2 — the connection read has not settled (or failed): hold the
-     page's own loading treatment. The scoped sections render nothing while
-     pending today, so the shell is the control row plus the three section
-     placeholders, exactly what a first paint already shows. */
-  if (gate === 'loading') {
+  /* CB44 — the page's own observer of In form's read: same key and enabled
+     flag as StandoutRounds, so react-query dedupes it to one request. */
+  const inForm = useStandoutRounds(userId, state.filters, state.ready);
+  const held = roundsPageHeld({
+    sessionKnown,
+    signedIn: !!userId,
+    gate,
+    boardReady: state.ready,
+    inFormPending: inForm.isPending,
+  });
+
+  /* CB44 — THE HOLD (supersedes the CB13 state-2 shell). Only the three sized
+     section placeholders: no scope switch (CB39 hides it when gated, so it
+     would appear then vanish) and nothing for In form (it can settle absent).
+     No transition: the settled page replaces this in one paint. */
+  if (held) {
     return (
-      <div style={{ fontFamily: SANS }}>
-        {state.ready ? (
-          <div data-scores-control-row style={{ display: 'flex', alignItems: 'center', gap: 9, padding: `0 ${HEAD_GUTTER}px 12px` }}>
-            <ScopeSegments scope={scope} clubApplies={state.clubApplies} onScopeChange={state.changeScope} style={{ flex: 1, minWidth: 0 }} />
-          </div>
-        ) : null}
+      <div data-rounds-hold="" style={{ fontFamily: SANS }}>
         {pending(rareAirPlaceholderHeight(!!userId))}
         {pending(climbPlaceholderHeight(SHORT_ROWS))}
         {pending(hundredPlaceholderHeight(!!userId))}
       </div>
     );
   }
+
 
   const pageBody = (
     <div style={{ fontFamily: SANS }}>
