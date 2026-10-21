@@ -1,5 +1,11 @@
 # Roadmap
 
+## CB24 — Remove Top 100 basis line
+- [x] Removed basis call/component, THE_HUNDRED.basis, HUNDRED_BASIS_HEIGHT and unused en/en-XA key; retained RANK_SCOPE_LABEL (page chips/slab/sheet still read it), Trans and blockGap. CB23 and frozen surfaces untouched; local comments updated.
+- [x] Only authorised theHundred.test.ts:57/58 heights assertions changed 334→288 and 522→476; head119+rows144+See-all25=288, signed-in adds slab100+strip88=476. Full bunx vitest run baseline and after 2,005/269, zero failures and no inventory delta; no other assertion edits/deletions/renames/additions.
+- [x] Reviewed synthetic actual-section screenshot at 394×970: out rendered331.234375→285.890625, in520.015625→474.671875, pending519.234375→473.890625. Render reduction45.34375 versus reserved46 reflects paragraph33.34375+gap12 versus rounded lines34+12; no compensation. Saved CB24_report.md and CB24_synthetic_section.png. Bare latest-course subline now unexplained intentionally; no replacement elsewhere on page/sheet. Locale JSON parses, cleanup refs absent, final preview build OK11:03:56Z; no SQL/migrations/RPC/feed_config/cap changes.
+- [ ] Authenticated live-data check unavailable under external_unmanaged; distinguish controlled section evidence from real member data.
+
 ## CB23 — Remove Top 100 sub-head
 - [x] Removed both HundredSubHead calls/component, subHead/stripTop tokens and unused theListHundred/hundredPlayedCount keys in all locales where present; kept RANK_SCOPE_LABEL for chips/basis/slab/sheets/ExploreCard. Pending 76px spacer and rail key/geometry/blockGap frozen.
 - [x] Ben approved only theHundred.test.ts:55 strip 118→88 and :58 signed-in 552→522; case/name and other assertions untouched. Signed-out 334 = 119+46+144+25 excludes strip, slab 88 and rows 144 have no removed terms. Final full bunx vitest run after locale cleanup: 2,005/269 before and after, zero failures/count delta.

@@ -7,7 +7,7 @@ import { SEASON_ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMe
  * this section's and are not read.
  */
 export const THE_HUNDRED = {
-  /** Space under the list chips, the slab and the basis sentence. */
+  /** Space under the list chips, the slab and the tile rail. */
   blockGap: 12,
   slab: {
     radius: 11,
@@ -21,7 +21,6 @@ export const THE_HUNDRED = {
     track: { marginTop: 9, height: 4, background: 'rgba(255,255,255,0.08)' },
     caption: { marginTop: 6, fontSize: 9, lineHeight: 12, fontWeight: 800, letterSpacing: '0.1em' },
   },
-  basis: { fontSize: 11.5, lineHeight: 1.45 },
   rail: { gap: 8, endSpacer: 14, fade: 30 },
   tile: {
     width: 108,
@@ -60,21 +59,19 @@ export const HUNDRED_ROW_HEIGHT =
   SEASON_ROW_METRICS.padY * 2 + 14 + 1 + 12 + THE_HUNDRED.row.progress.marginTop + THE_HUNDRED.row.progress.height + 1;
 /** Rows area while the board loads: three rows, no pinned row = 144. */
 export const HUNDRED_ROWS_HEIGHT = 3 * HUNDRED_ROW_HEIGHT;
-/** Basis sentence: two lines of 11.5 × 1.45 (17) + 12 below = 46. */
-export const HUNDRED_BASIS_HEIGHT = 2 * Math.round(THE_HUNDRED.basis.fontSize * THE_HUNDRED.basis.lineHeight) + THE_HUNDRED.blockGap;
-
 /**
  * Whole-section placeholder while the default list's board loads:
  * section top 24 + eyebrow 13 + 5 + title 23 + 12 + chips 30 + 12
- * + (slab 88 + 12, signed in) + basis 46 + (strip 88, signed in) + rows 144
- * + See all 12 + 13 = 334 signed out, 522 signed in (was 552).
+ * + (slab 88 + 12 + strip 88, signed in) + rows 144
+ * + See all 12 + 13 = 288 signed out, 476 signed in.
  * These inherited scalar estimates retain rounded lines and older head terms;
- * they are not exact rendered border-box heights. CB23 removes only strip terms.
+ * they are not exact rendered border-box heights. CB23's strip stays 88;
+ * CB24 removes the shared 46px reservation from both viewer states.
  */
 export function hundredPlaceholderHeight(signedIn: boolean): number {
   const head = 24 + 13 + 5 + 23 + 12 + 30 + THE_HUNDRED.blockGap;
   const you = signedIn ? HUNDRED_SLAB_HEIGHT + THE_HUNDRED.blockGap + HUNDRED_STRIP_HEIGHT : 0;
-  return head + you + HUNDRED_BASIS_HEIGHT + HUNDRED_ROWS_HEIGHT + 12 + 13;
+  return head + you + HUNDRED_ROWS_HEIGHT + 12 + 13;
 }
 
 /* ------------------------------------------------------------ slab + rail */

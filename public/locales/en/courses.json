@@ -240,7 +240,6 @@
         "absent": "You haven't played one of the {{list}} Hundred yet.",
         "nobodyPast": "Nobody past {{n}}"
       },
-      "hundredBasis": "Ranked on courses played from the <s>{{list}} Hundred</s>. Each member's latest is shown beneath their name.",
       "hundredPlayed": "Played",
       "coursesOfList": "Courses of {{n}}",
       "coursesPlayed": "Courses played",

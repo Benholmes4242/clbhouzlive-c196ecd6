@@ -45,7 +45,7 @@ import { RANK_SCOPE_LABEL, type RankListSlug } from './useTop100RankIndex';
 import { THE_HUNDRED, HUNDRED_ROWS_HEIGHT, HUNDRED_SLAB_HEIGHT, hundredPlaceholderHeight, hundredSlab } from './theHundred';
 import { CLIMB, climbCross, climbOrder, climbPlaceholderHeight, type ClimbMode, type ClimbPlaced } from './climb';
 import { formatMonthLong } from '@/i18n/format';
-import { HundredBasis, HundredRail, HundredYou } from './TheHundredSection';
+import { HundredRail, HundredYou } from './TheHundredSection';
 
 /** CompactRow value size (the Top 100 and improvement sections). */
 export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
@@ -65,7 +65,8 @@ export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
  * own height while pending, and renders NOTHING when its read fails or is empty.
  */
 
-/* Phase 9.5 — the rail, control row, basis and you slab sit 16 in, as the rows do. */
+/* Phase 9.5 — the rail, control row and you slab sit 16 in, as the rows do.
+ * CB24 removes the basis and latest-course explanation only; other §7 surfaces stay unchanged. */
 const HEAD_GUTTER = 16;
 const SLAB_BG = 'rgba(255,255,255,0.05)';
 const SHORT_ROWS = 3;
@@ -586,7 +587,7 @@ export function ScoresLeaderboardsPage({
   const top100Rows = top100.data ?? [];
   /* last_course_name is scoped in SQL to the selected list, so it changes with
      the chip alongside the count. Never fall back to home_club. T.3 — the bare
-     course name; the basis sentence says what the line is. */
+     course name; CB24 intentionally removes its basis-sentence explanation. */
   const top100Secondary = (r: CareerRow): string | null => r.last_course_name || null;
   /* Same call as the progress sheet (same query key) — the sheet opens from cache. */
   const listCourses = useTop100ListProgress(userId ? top100List : undefined, userId, userId);
@@ -779,7 +780,6 @@ export function ScoresLeaderboardsPage({
               />
             ) : null
           ) : null}
-          <HundredBasis list={RANK_SCOPE_LABEL[top100List]} />
           {/* A chip tap starts a fresh slug query. While it loads, reserve the
               tile row instead of holding the old list:
               last list's photographs under the new list's chip is worse than
