@@ -87,14 +87,27 @@ export function entryBoardFor(): BoardKey {
  *  never tested. Reorder here, nowhere else. */
 export const LANDING_SCOPES: ScopeKey[] = ['circle', 'club', 'everyone'];
 
-/** CB39 — a probed rung is chosen only if its pool carries at least this many
- *  rounds (pool_rounds from the probe's own read), alongside the
- *  CIRCLE_ROW_FLOOR row test. Everyone is the floor and is never tested. */
+/** CB39/CB40 — GATED ONLY. A probed rung is chosen only if its pool carries
+ *  at least this many rounds (pool_rounds from the probe's own read). The
+ *  minimum is a property of the gate, not of the ladder: the gate's sentence
+ *  must argue for connecting, and "2 rounds posted in your circle" argues
+ *  against it. A connected member is not being argued with — four rows is
+ *  their own board, and they have a visible scope switch. Everyone is the
+ *  floor and is never tested. */
 export const GATE_SCOPE_MIN_ROUNDS = 5;
 
-/** CB39 — one rung's pass test: enough rows to be a board AND enough rounds. */
-export function rungCarries(data: { rows: unknown[]; pool: { rounds: number } } | null | undefined): boolean {
-  return (data?.rows.length ?? 0) >= CIRCLE_ROW_FLOOR && (data?.pool.rounds ?? 0) >= GATE_SCOPE_MIN_ROUNDS;
+type RungData = { rows: unknown[]; pool: { rounds: number } } | null | undefined;
+
+/** One rung's pass test: CIRCLE_ROW_FLOOR rows always; the rounds minimum
+ *  only when the viewer is gated. */
+export function rungCarries(data: RungData, gated: boolean): boolean {
+  const rowsOk = (data?.rows.length ?? 0) >= CIRCLE_ROW_FLOOR;
+  return gated ? rowsOk && (data?.pool.rounds ?? 0) >= GATE_SCOPE_MIN_ROUNDS : rowsOk;
+}
+
+/** CB40 — true when a rung passed the row test and was skipped only by the gated minimum. */
+export function skippedBelowMin(data: RungData, gated: boolean): boolean {
+  return gated && rungCarries(data, false) && !rungCarries(data, true);
 }
 
 /** Everything EXCEPT scope. Scope arrives from the LANDING_SCOPES ladder. */
@@ -147,6 +160,11 @@ export function useAmateurBoardState(userId: string | undefined, active = true, 
     manualHandicapIndex: profile?.manual_handicap_index ?? null,
     hasWhsConnection: !!whs.data,
   }).value;
+  /* CB40 — the gate state, from the SAME useWhsConnection read above (one
+     react-query key, no second request) and the same predicate RoundsGate
+     uses: signed in, settled, no connection row. An unsettled or failed read
+     is not gated, so the minimum never applies on a guess. */
+  const gated = !!userId && whs.isSuccess && !whs.data;
   const entryBoard = entryBoardFor();
   /* null = untouched: the member is on their resolved entry board. Once they
      pick, nothing re-applies the default for the rest of the visit. */
@@ -187,7 +205,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true, 
   });
   const rungASkipped = homeClub.ready && !rungApplies(probeScopes[0]);
   const rungASettled = rungASkipped || rungA.isSuccess || rungA.isError;
-  const rungAOk = !rungASkipped && rungA.isSuccess && rungCarries(rungA.data);
+  const rungAOk = !rungASkipped && rungA.isSuccess && rungCarries(rungA.data, gated);
 
   const rungB = useBoardPage(userId, entryBoard, rungBFilters, {
     limit: PROBE_FETCH,
@@ -195,7 +213,7 @@ export function useAmateurBoardState(userId: string | undefined, active = true, 
   });
   const rungBSkipped = homeClub.ready && !rungApplies(probeScopes[1]);
   const rungBSettled = rungBSkipped || rungB.isSuccess || rungB.isError;
-  const rungBOk = !rungBSkipped && rungB.isSuccess && rungCarries(rungB.data);
+  const rungBOk = !rungBSkipped && rungB.isSuccess && rungCarries(rungB.data, gated);
 
   let landing: ScopeKey | null = null;
   if (homeClub.ready && rungASettled) {
@@ -207,8 +225,22 @@ export function useAmateurBoardState(userId: string | undefined, active = true, 
   useEffect(() => {
     if (entry !== null || landing === null) return;
     const next = entryFiltersFor(landing);
+    /* CB40 — gated only: name each rung the minimum (not the row floor) passed over. */
+    const probes: [ScopeKey, boolean, RungData][] = [
+      [probeScopes[0], rungASkipped, rungA.data],
+      [probeScopes[1], rungBSkipped, rungB.data],
+    ];
+    for (const [scope, skipped, data] of probes) {
+      if (scope === landing) break;
+      if (!skipped && skippedBelowMin(data, gated)) {
+        analyticsEvents.track('amateur_scope_skipped_below_min', {
+          scope, rounds: data?.pool.rounds ?? 0, landed: landing, gate_state: 'gated',
+        });
+      }
+    }
     setEntry(next);
     if (!touched.current) setFilters(next);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- resolves once; probe data is read at that moment
   }, [entry, landing]);
 
   /* Kept for the head: whether Your club is a real choice for this member. */
