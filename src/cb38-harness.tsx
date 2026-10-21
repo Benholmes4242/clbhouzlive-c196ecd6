@@ -39,8 +39,8 @@ function Row({ n }: { n: number }) {
     <div
       data-board-row=""
       style={{
-        height: 54, boxSizing: 'border-box', display: 'flex', alignItems: 'center',
-        borderBottom: '0.5px solid rgba(15,23,42,0.08)', fontSize: 14.5, fontWeight: 700, fontFamily: 'sans-serif',
+        height: 54, boxSizing: 'border-box', display: 'flex', alignItems: 'center', color: '#F8FAFC',
+        borderBottom: '0.5px solid rgba(248,250,252,0.10)', fontSize: 14.5, fontWeight: 700, fontFamily: 'sans-serif',
       }}
     >
       Round {n}
@@ -54,14 +54,14 @@ function App() {
       <I18nextProvider i18n={i18n}>
         <main style={{ paddingTop: 148 }}>
           <div data-explore-magazine="">
-            <div data-stuck="" style={{ height: 40, display: 'flex', alignItems: 'center', padding: '0 16px', fontFamily: 'sans-serif', fontSize: 13, fontWeight: 700 }}>
+            <div data-stuck="" style={{ height: 40, display: 'flex', alignItems: 'center', padding: '0 16px', fontFamily: 'sans-serif', fontSize: 13, fontWeight: 700, color: '#F8FAFC' }}>
               Rounds
             </div>
             <div data-scores-board-container="">
               <RoundsGate roundCount={12} scope="everyone">
                 <div>
                   <div style={{ height: 48, padding: '0 16px 12px', boxSizing: 'border-box' }}>
-                    <div style={{ height: 36, borderRadius: 999, border: '1px solid rgba(15,23,42,0.12)' }} />
+                    <div style={{ height: 36, borderRadius: 999, border: '1px solid rgba(248,250,252,0.14)' }} />
                   </div>
                   <Section contest={false} eyebrow="Just played" title="Latest rounds">
                     <div>
