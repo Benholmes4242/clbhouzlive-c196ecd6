@@ -78,22 +78,6 @@ export function HundredYou({
   );
 }
 
-/** T.3 — the basis sentence under the slab. */
-export function HundredBasis({ list }: { list: string }) {
-  const { t } = useTranslation('courses');
-  return (
-    <p style={{ margin: `0 0 ${H.blockGap}px`, fontFamily: SANS, fontSize: H.basis.fontSize, lineHeight: H.basis.lineHeight, color: A.DIM }}>
-      <Trans
-        t={t}
-        ns="courses"
-        i18nKey="amateur.leaderboards.hundredBasis"
-        values={{ list }}
-        components={{ s: <span style={{ color: A.MUTE, fontWeight: 600 }} /> }}
-      />
-    </p>
-  );
-}
-
 /**
  * T.2 — THIS SECTION'S OWN RAIL. A copy of the shared Rail's frame (scroller,
  * end spacer, fade) so scroll control never reaches the rail Who leads what uses.

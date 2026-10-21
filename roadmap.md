@@ -1,5 +1,11 @@
 # Roadmap
 
+## CB24 — Remove Top 100 basis line
+- [ ] Remove basis call/component and only audited unused keys/tokens; preserve CB23 and every frozen surface.
+- [ ] Update only authorised heights assertions: signed-out 334→288, signed-in 522→476; report arithmetic and full suite counts from 2,005/269.
+- [ ] Compare before/after signed-in/out rendered heights, review section screenshot, and report lost subline explanation and cleanup.
+- [ ] Authenticated live-data check unavailable under external_unmanaged; distinguish controlled section evidence from real member data.
+
 ## CB23 — Remove Top 100 sub-head
 - [x] Removed both HundredSubHead calls/component, subHead/stripTop tokens and unused theListHundred/hundredPlayedCount keys in all locales where present; kept RANK_SCOPE_LABEL for chips/basis/slab/sheets/ExploreCard. Pending 76px spacer and rail key/geometry/blockGap frozen.
 - [x] Ben approved only theHundred.test.ts:55 strip 118→88 and :58 signed-in 552→522; case/name and other assertions untouched. Signed-out 334 = 119+46+144+25 excludes strip, slab 88 and rows 144 have no removed terms. Final full bunx vitest run after locale cleanup: 2,005/269 before and after, zero failures/count delta.

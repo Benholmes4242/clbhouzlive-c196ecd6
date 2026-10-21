@@ -54,7 +54,7 @@ describe('The Hundred placeholders', () => {
     expect(HUNDRED_SLAB_HEIGHT).toBe(88);
     expect(HUNDRED_STRIP_HEIGHT).toBe(88);
     expect(HUNDRED_ROWS_HEIGHT).toBe(144);
-    expect(hundredPlaceholderHeight(false)).toBe(334);
-    expect(hundredPlaceholderHeight(true)).toBe(522);
+    expect(hundredPlaceholderHeight(false)).toBe(288);
+    expect(hundredPlaceholderHeight(true)).toBe(476);
   });
 });
