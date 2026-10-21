@@ -1,5 +1,11 @@
 # Roadmap
 
+## CB21 — Rare Air smaller tiles, done first
+- [ ] Before editing protected tests, report `src/features/explore-magazine/__tests__/rareAir.test.ts:35-38`: `tile 178, placeholder 324 signed out and 373 signed in` asserts `expect(RARE_AIR_TILE_HEIGHT).toBe(178)`, `expect(rareAirPlaceholderHeight(false)).toBe(324)`, and `expect(rareAirPlaceholderHeight(true)).toBe(373)`. Await Ben’s ruling on updating this case under CB21.
+- [ ] Supplied brief names `rareair-spec.html`, but that mock is absent from both upload mounts. Obtain reference before resolving its 14px title-to-rail measurement with the frozen lede and you slab.
+- [ ] Measure before/after tile and section placeholder, implement only authorised local token changes, stable positive-event-first render sort and unused English kicker removal; preserve page featRows and all frozen elements.
+- [ ] Run full suite against last reported 1,998 tests / 267 files, reconcile every change, verify preview and provide real-data screenshot or name unavailable checks. No SQL, migrations, deployed RPC, feed_config or cap edits.
+
 ## CB17 — Two copy changes on the gate card
 - [x] Read-only audit found no test asserting the body string or bullet count; no existing tests changed, added, deleted, renamed or rewritten.
 - [x] English body adds “an official synced handicap”; bulletCourses is “Your rounds across the world's best courses”, last in GateCard’s existing array. No presentation/state/logic/analytics/frost changes; REVEAL remains 300. No SQL/migrations/RPC/feed_config/cap changes.
