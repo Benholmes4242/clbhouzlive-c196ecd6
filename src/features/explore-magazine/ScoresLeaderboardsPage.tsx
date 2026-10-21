@@ -587,7 +587,7 @@ export function ScoresLeaderboardsPage({
   const top100Rows = top100.data ?? [];
   /* last_course_name is scoped in SQL to the selected list, so it changes with
      the chip alongside the count. Never fall back to home_club. T.3 — the bare
-     course name; the basis sentence says what the line is. */
+     course name; CB24 intentionally removes its basis-sentence explanation. */
   const top100Secondary = (r: CareerRow): string | null => r.last_course_name || null;
   /* Same call as the progress sheet (same query key) — the sheet opens from cache. */
   const listCourses = useTop100ListProgress(userId ? top100List : undefined, userId, userId);
