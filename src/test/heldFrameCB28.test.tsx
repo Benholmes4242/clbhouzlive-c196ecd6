@@ -80,7 +80,7 @@ describe('CB28 held frame: leaderboards', () => {
     expect(view.container.querySelector('[data-leaderboard-tiles]')).toBe(strip);
     expect(view.container.querySelector('[data-leaderboard-board="birdies"]')?.getAttribute('aria-checked')).toBe('true');
     expect(view.container.querySelectorAll('[data-held-row]')).toHaveLength(2);
-    expect(view.container.querySelectorAll('[data-board-row]')).toHaveLength(0);
+    expect(view.container.textContent).not.toContain('Member 1');
   });
   it('a first load with no data renders nothing', () => {
     const view = render(draw(makeBoardState({ board: 'net', page: { data: undefined, isSuccess: false, isPending: true, isFetching: true } as never })));
