@@ -950,8 +950,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   )}
                 </div>
               )}
-              {reviewId && reactionCount > 0 && (
-                <LikedByRow postId={reviewId} count={reactionCount} source="review" subject={{ authorName: user.name || null, courseId: courseId ?? null, courseName: courseName ?? null, kind: 'review', gross: null, toPar: null, rating: rating ?? null }} surfaceColor={CANVAS} style={{ marginBottom: 8 }} />
+              {/* CB56 — content-sized bottom sheet: a growing line would lift its top edge. */}
+              {reviewId && (
+                <LikedByRow reserve postId={reviewId} count={reactionCount} source="review" subject={{ authorName: user.name || null, courseId: courseId ?? null, courseName: courseName ?? null, kind: 'review', gross: null, toPar: null, rating: rating ?? null }} surfaceColor={CANVAS} style={{ marginBottom: 8 }} />
               )}
               {reviewId && commentCount > 0 && commentPreview && (
                 <div style={{ marginBottom: 8 }}>

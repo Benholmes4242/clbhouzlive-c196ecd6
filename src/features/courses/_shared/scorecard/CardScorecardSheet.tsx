@@ -1103,8 +1103,10 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   )}
                 </div>
               )}
-              {engagement?.postId && engagement.likeCount > 0 && (
+              {/* CB56 — content-sized bottom sheet: a growing line would lift its top edge. */}
+              {engagement?.postId && (
                 <LikedByRow
+                  reserve
                   postId={engagement.postId}
                   count={engagement.likeCount}
                   source={engagement.likeSource ?? 'post'}
