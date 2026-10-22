@@ -53,7 +53,8 @@ const q = (sel: string) => document.body.querySelectorAll(sel);
 
 beforeEach(() => {
   document.body.innerHTML = '';
-  vi.spyOn(supabase, 'rpc').mockResolvedValue({ data: [], error: null, count: null, status: 200, statusText: 'OK' });
+  const rpcClient = supabase as unknown as { rpc: (...args: unknown[]) => Promise<unknown> };
+  vi.spyOn(rpcClient, 'rpc').mockResolvedValue({ data: [], error: null, count: null, status: 200, statusText: 'OK' });
 });
 afterEach(() => vi.restoreAllMocks());
 
