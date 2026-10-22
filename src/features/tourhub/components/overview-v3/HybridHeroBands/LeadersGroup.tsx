@@ -30,13 +30,14 @@ export function LeadersGroup(props: Props) {
   const eligible = leadersGroupVisible(phase, !isStrokeEvent(eventType) || entries.some(e => !!e.team), entries, leaderboardLoading) && currentRound != null && leaders.length > 0;
   const baseRound = leadersBaseRound(leaders, currentRound ?? 1);
   const current = useTeeTimesAll(tournamentId, baseRound, { enabled: eligible });
-  const draw = useDrawnRounds(tournamentId, { enabled: eligible && baseRound < (totalRounds ?? baseRound) });
+  const needsDraw = eligible && baseRound < (totalRounds ?? baseRound);
+  const draw = useDrawnRounds(tournamentId, { enabled: needsDraw });
   const shownRound = leadersShownRound(baseRound, current.data ?? [], leaders, entries, draw.data ?? [], totalRounds ?? baseRound);
   const next = useTeeTimesAll(tournamentId, shownRound, { enabled: eligible && shownRound !== baseRound });
   const selected = shownRound === baseRound ? current : next;
   const groups = selected.data ?? [];
   const group = pickLeadersGroup(groups, leaders, entries, shownRound);
-  if (!eligible || current.isLoading || selected.isLoading || !group || groups.length === 0) return null;
+  if (!eligible || current.isLoading || (needsDraw && draw.isLoading) || selected.isLoading || !group || groups.length === 0) return null;
   return <LeadersGroupContent {...props} round={shownRound} group={group} groups={groups} />;
 }
 
