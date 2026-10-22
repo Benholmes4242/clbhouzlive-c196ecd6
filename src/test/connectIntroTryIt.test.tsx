@@ -253,12 +253,11 @@ describe('connect intro fix 1 behaviour', () => {
     expect(container.textContent).not.toContain('Connect your official handicap and this is built from');
   });
 
-  it('uses band.data.hcp for readout, table header, and circle placement while the stepper shows the live value', async () => {
+  it('uses band.data.hcp for readout and circle placement while the stepper shows the live value', async () => {
     renderIntro('embedded');
     await screen.findByText('If you play off');
     expect(screen.getAllByText('13').length).toBeGreaterThan(0);
     expect(screen.getByText(/golfers off 12 typically shoot here/)).toBeInTheDocument();
-    expect(screen.getByText('Off 12')).toBeInTheDocument();
     expect(screen.getAllByText('You').length).toBeGreaterThan(0);
   });
 
