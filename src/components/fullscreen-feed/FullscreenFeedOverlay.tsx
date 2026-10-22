@@ -51,6 +51,7 @@ import { triggerHaptic } from '@/lib/ui/haptics';
 import { likeOnlyOnDoubleTap } from '@/components/fullscreen-feed/scrubberMath';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { FullscreenScrubber } from '@/components/fullscreen-feed/FullscreenScrubber';
+import { FullscreenBuffering } from '@/components/fullscreen-feed/FullscreenBuffering';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
 import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayload';
