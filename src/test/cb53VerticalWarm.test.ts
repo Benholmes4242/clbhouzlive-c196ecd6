@@ -20,6 +20,13 @@ const engine = vi.hoisted(() => {
     mountedHostOf: vi.fn(() => null),
     unmountLane: vi.fn(),
     mountLane: vi.fn(),
+    // CB53.1 — the warm path now steers quality through these; mocked so the
+    // stand-in engine mirrors the real API surface.
+    markVerticalWarmLent: vi.fn(),
+    clearVerticalWarmLent: vi.fn(),
+    nudgeLevelCap: vi.fn(),
+    applyFullscreenBuffering: vi.fn(),
+    restoreFeedBuffering: vi.fn(),
     setMuted: vi.fn((id: string, m: boolean) => { if (!m) state.unmuted.push(id); }),
     preload: vi.fn((id: string, o: { postId: string }) => {
       state.snaps.set(id, { postId: o.postId, state: 'paused' });

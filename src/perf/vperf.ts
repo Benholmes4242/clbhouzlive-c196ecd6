@@ -348,6 +348,9 @@ export interface MovingArmOpts {
   ceiling?: number | null;
   /** End the span as FAIL when the lane reports it cannot show video. */
   failOnLane?: boolean;
+  /** CB53.1 — tag the moving-frame end with the rendition height playing at
+   *  first motion (swipe.vertical quality comparison: warmed vs cold). */
+  tagStartHeight?: boolean;
 }
 
 interface MovingArm {
@@ -356,6 +359,7 @@ interface MovingArm {
   from: number | null;
   ceiling: number | null;
   failOnLane: boolean;
+  tagStartHeight: boolean;
 }
 
 const movingArms = new Map<string, MovingArm[]>();
@@ -369,7 +373,7 @@ export function normOwnerKey(k: string | null | undefined): string | null {
   return k.includes(':') ? k : `${k}:0`;
 }
 
-type LaneResolver = (laneId: string) => { el: HTMLVideoElement | null; owner: string | null } | null;
+type LaneResolver = (laneId: string) => { el: HTMLVideoElement | null; owner: string | null; height?: number | null } | null;
 let __laneResolver: LaneResolver | null = null;
 /** VideoEngine registers how to read the element/owner behind a lane id. */
 export function vperfSetLaneResolver(fn: LaneResolver | null): void { __laneResolver = fn; }
@@ -409,6 +413,7 @@ export function vperfArmMoving(laneId: string, spanId: string, opts: MovingArmOp
     from: opts.from ?? null,
     ceiling: opts.ceiling ?? null,
     failOnLane: !!opts.failOnLane,
+    tagStartHeight: !!opts.tagStartHeight,
   });
   movingArms.set(laneId, list);
   scheduleRvfc(laneId);
@@ -436,16 +441,25 @@ function checkMoving(laneId: string, t: number, owner: string | null, via: 'rvfc
   const list = movingArms.get(laneId);
   if (!list || list.length === 0 || !isFinite(t)) return;
   const o = normOwnerKey(owner);
+  const endTags = (arm: MovingArm): Record<string, unknown> => {
+    const tags: Record<string, unknown> = { closedBy: 'movingFrame', via };
+    if (arm.tagStartHeight) {
+      let height: number | null = null;
+      try { height = __laneResolver?.(laneId)?.height ?? null; } catch { height = null; }
+      tags.startHeight = height;
+    }
+    return tags;
+  };
   for (const arm of [...list]) {
     if (arm.owner != null && o !== arm.owner) continue;
     if (arm.ceiling != null) {
       const floor = arm.from ?? MOVING_AFTER_SEEK_S;
-      if (t > floor && t < arm.ceiling) vperfEnd(arm.spanId, { closedBy: 'movingFrame', via });
+      if (t > floor && t < arm.ceiling) vperfEnd(arm.spanId, endTags(arm));
       continue;
     }
     if (arm.from == null) { arm.from = t; continue; }
     if (t < arm.from - MOVING_REBASE_S) { arm.from = t; continue; }
-    if (t > arm.from) vperfEnd(arm.spanId, { closedBy: 'movingFrame', via });
+    if (t > arm.from) vperfEnd(arm.spanId, endTags(arm));
   }
 }
 
