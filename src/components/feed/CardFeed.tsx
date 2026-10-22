@@ -36,7 +36,7 @@ import { getPageScrollTop } from '@/lib/getScrollParent';
 
 import { VideoEngine } from '@/video/VideoEngine';
 import { feedLaneRoles, carouselNeighbourOverride } from '@/video/feedLaneRoles';
-import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted } from '@/perf/vperf';
+import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted, vperfFeedActivateVideo, vperfSupersede, vperfFeedScrollTick } from '@/perf/vperf';
 import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 
 import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
@@ -658,7 +658,10 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // continuously during scroll within the on-screen set.
   useEffect(() => {
     let raf = 0;
-    const onScroll = () => {
+    const onScroll = (e: Event) => {
+      // [VPERF] CB52 — inline frame-time sampling, own scroller only (this
+      // window capture listener also sees the fullscreen viewer's scrolls).
+      if (e.target === scrollerElRef.current) vperfFeedScrollTick('cardfeed', 'inline');
       // Signed scroll direction — reused as a directional tie-break in recheckActive.
       const st = scrollerElRef.current?.scrollTop ?? getPageScrollTop();
       const now = performance.now();
@@ -716,14 +719,29 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
     const mediaType: 'image' | 'video' = hasVideo ? 'video' : 'image';
     activateT0Ref.current = vperfFeedActivateStart('clubhouse');
-    // Resolve on next frame — feed-active event wiring already emits its
-    // own [VPERF] lines; here we just need earlyStarted + dualActiveMs.
+    // CB52 Part 2 — one span per promotion. Video: ends on the first MOVING
+    // frame on the active-role lane; warm = that lane already shows this
+    // owner's decoded frame. Superseded on the next promotion. Images keep
+    // their existing next-frame measurement.
+    const earlyStarted = vperfConsumeEarlyStarted(ownerKey);
+    if (mediaType === 'video') {
+      let laneId: string | null = null;
+      let snap: ReturnType<typeof VideoEngine.snapshot> | null = null;
+      try {
+        const l = feedLaneRoles.laneForRole('active');
+        laneId = l;
+        snap = VideoEngine.snapshot(l);
+      } catch { /* engine not booted */ }
+      if (!laneId) return;
+      const { spanId } = vperfFeedActivateVideo({ laneId, ownerKey, idx: playingIdx, snap, earlyStarted });
+      return () => vperfSupersede(spanId, { supersededBy: 'nextPromotion' });
+    }
     const raf = requestAnimationFrame(() => {
       vperfFeedActivateEnd({
         t0: activateT0Ref.current,
         idx: playingIdx,
         mediaType,
-        earlyStarted: vperfConsumeEarlyStarted(ownerKey),
+        earlyStarted,
       });
     });
     return () => cancelAnimationFrame(raf);

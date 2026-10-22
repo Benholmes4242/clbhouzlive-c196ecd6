@@ -39,7 +39,7 @@ import { getPrimaryScrollElement } from '@/lib/getScrollParent';
 import { VideoEngine } from '@/video/VideoEngine';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
-import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted } from '@/perf/vperf';
+import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted, vperfFeedActivateVideo, vperfSupersede, vperfFeedScrollTick } from '@/perf/vperf';
 import { FeedCard } from '@/components/feed/FeedCard';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -295,7 +295,9 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     const scroller: HTMLElement | Window = document.getElementById('root') ?? window;
     const readScrollTop = () =>
       scroller instanceof Window ? scroller.scrollY : (scroller as HTMLElement).scrollTop;
-    const onScroll = () => {
+    const onScroll = (e: Event) => {
+      // [VPERF] CB52 — inline frame-time sampling, page scroller only.
+      if (e.target === scroller || (scroller instanceof Window && e.target === document)) vperfFeedScrollTick('posts-tab', 'inline');
       const st = readScrollTop();
       const now = performance.now();
       const dy = st - lastScrollTopRef.current;
@@ -422,12 +424,29 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     const hasVideo = post.mediaItems?.some?.((m) => m?.type === 'video');
     const mediaType: 'image' | 'video' = hasVideo ? 'video' : 'image';
     activateT0Ref.current = vperfFeedActivateStart('posts-tab');
+    // CB52 Part 2 — one span per promotion. Video: ends on the first MOVING
+    // frame on the active-role lane; warm = that lane already shows this
+    // owner's decoded frame. Superseded on the next promotion. Images keep
+    // their existing next-frame measurement.
+    const earlyStarted = vperfConsumeEarlyStarted(ownerKey);
+    if (mediaType === 'video') {
+      let laneId: string | null = null;
+      let snap: ReturnType<typeof VideoEngine.snapshot> | null = null;
+      try {
+        const l = feedLaneRoles.laneForRole('active');
+        laneId = l;
+        snap = VideoEngine.snapshot(l);
+      } catch { /* engine not booted */ }
+      if (!laneId) return;
+      const { spanId } = vperfFeedActivateVideo({ laneId, ownerKey, idx: playingIdx, snap, earlyStarted });
+      return () => vperfSupersede(spanId, { supersededBy: 'nextPromotion' });
+    }
     const raf = requestAnimationFrame(() => {
       vperfFeedActivateEnd({
         t0: activateT0Ref.current,
         idx: playingIdx,
         mediaType,
-        earlyStarted: vperfConsumeEarlyStarted(ownerKey),
+        earlyStarted,
       });
     });
     return () => cancelAnimationFrame(raf);
