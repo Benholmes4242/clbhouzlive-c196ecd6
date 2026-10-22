@@ -406,7 +406,7 @@ export default function VideoPerfPage() {
                   {[
                     ['kind', 'Kind'], ['page', 'Page'], ['count', 'Count'],
                     ['p50', 'p50'], ['p95', 'p95'], ['worst', 'Worst'],
-                    ['passPct', 'PASS%'], ['slow', 'SLOW'], ['timeout', 'TO'], ['sup', 'SUP'],
+                    ['passPct', 'PASS%'], ['slow', 'SLOW'], ['timeout', 'TO'], ['fail', 'FAIL'], ['sup', 'SUP'],
                   ].map(([k, label]) => (
                     <th key={k} onClick={() => toggleSort(k)} style={thStyle}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -429,6 +429,7 @@ export default function VideoPerfPage() {
                     <td style={tdStyle}>{r.passPct != null ? `${r.passPct}%` : '—'}</td>
                     <td style={tdStyle}>{r.slow}</td>
                     <td style={tdStyle}>{r.timeout}</td>
+                    <td style={tdStyle}>{r.fail}</td>
                     <td style={tdStyle}>{r.sup}</td>
                   </tr>
                 ))}
