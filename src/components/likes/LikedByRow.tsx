@@ -291,7 +291,7 @@ export function LikedByRow({
             })}
           </span>
         )}
-        <span style={lineStyle}
+        <span style={lineStyle}>
           {copy}
         </span>
       </button>

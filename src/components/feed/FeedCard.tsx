@@ -686,7 +686,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
            a card. The like count in the actions row stays untappable: two
            targets six pixels apart is a mis-tap. Zero likes renders no line and
            no gap. */
-        const showLikedBy = likeCount > 0;
+        /* CB56 — the line always occupies its space (LikedByRow reserve), so a
+           first like fills it in place: the review card's photo and the
+           standard card's height never move. */
+        const showLikedBy = true;
 
         /* SECTION C — comments live INSIDE the footer, under the liked-by line,
            and only when there are comments to show. Rendered from the COMMENT,
@@ -763,6 +766,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   rating: post.review.rating ?? null,
                 } : null}
                 surfaceColor={CARD}
+                reserve
                 style={{
                   padding: compact ? `0 ${gutter}px ${likedByBottom ? 10 : 0}px` : `0 ${gutter}px ${likedByBottom}px`,
                 }}
