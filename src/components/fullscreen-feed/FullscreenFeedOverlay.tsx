@@ -47,6 +47,9 @@ function lockFullscreenViewportScroll(): () => void {
 
 
 import { ImmersiveFullscreenChrome } from '@/components/fullscreen-feed/ImmersiveFullscreenChrome';
+import { triggerHaptic } from '@/lib/ui/haptics';
+import { likeOnlyOnDoubleTap } from '@/components/fullscreen-feed/scrubberMath';
+import type { FeedPost } from '@/components/media-system/types/media';
 import { FullscreenScrubber } from '@/components/fullscreen-feed/FullscreenScrubber';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { useReviewSheetStore } from '@/stores/reviewSheetStore';
@@ -493,6 +496,12 @@ export function FullscreenFeedOverlay() {
   const { activeActor: ctxActor } = useActiveActor();
   const activeActor = ctxActor ?? { type: "personal" as const, id: userId ?? "" };
   const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
+  // CB49: double-tap only ever likes — same path as the rail's like button.
+  const handleDoubleTapLike = useCallback((post: FeedPost) => {
+    if (readOnly) return;
+    const fired = likeOnlyOnDoubleTap(getActiveLikeState(post).isLiked, () => handleLike(post));
+    triggerHaptic(fired ? 'medium' : 'light');
+  }, [readOnly, getActiveLikeState, handleLike]);
   const { followOverrides, handleFollow, handleFollowChange, getFollowState } = useClubhouseFollows({ userId });
   const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount } = useClubhouseComments();
   // Two entry points, two intents: the rail glyph lands on the thread, the
@@ -1006,6 +1015,7 @@ export function FullscreenFeedOverlay() {
                   <FullscreenScrubber
                     activePost={activePost}
                     activeIndex={activeIndex}
+                    onDoubleTapLike={handleDoubleTapLike}
                   />
 
                 </div>

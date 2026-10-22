@@ -317,6 +317,30 @@ class VideoEngineImpl {
     this.blockedListeners.add(fn);
     return () => this.blockedListeners.delete(fn);
   }
+  /** CB49: engine-level "is any lane playing" aggregate, the sole input to
+   * the app-root screen wake lock (useVideoWakeLock). A lane counts while its
+   * state is 'playing' (buffering keeps 'playing' here: 'waiting' never
+   * transitions state) and its policy is not 'always-muted' unless borrowed,
+   * so silent rail and grid previews never keep the screen awake. */
+  private anyPlaying = false;
+  private anyPlayingListeners = new Set<() => void>();
+  isAnyLanePlaying(): boolean { return this.anyPlaying; }
+  subscribeAnyPlaying(fn: () => void): () => void {
+    this.anyPlayingListeners.add(fn);
+    return () => this.anyPlayingListeners.delete(fn);
+  }
+  private recomputeAnyPlaying(): void {
+    let next = false;
+    for (const lane of this.lanes.values()) {
+      if (lane.state !== 'playing') continue;
+      if (lane.audioPolicy === 'always-muted' && !this.borrowedLanes.has(lane.id)) continue;
+      next = true;
+      break;
+    }
+    if (next === this.anyPlaying) return;
+    this.anyPlaying = next;
+    this.anyPlayingListeners.forEach((fn) => { try { fn(); } catch {} });
+  }
   private notifyBlocked(): void {
     this.blockedListeners.forEach((fn) => { try { fn(); } catch {} });
   }
@@ -407,6 +431,7 @@ class VideoEngineImpl {
 
   markBorrowed(laneId: LaneId): void {
     this.borrowedLanes.add(laneId);
+    this.recomputeAnyPlaying();
     DBG('markBorrowed', { laneId });
     logAudio('borrow.marked', { laneId, msSinceOpen: msSinceOpen() });
     // v9: reconciler picks up the borrow and routes audio to this lane.
@@ -415,6 +440,7 @@ class VideoEngineImpl {
 
   clearBorrowed(laneId: LaneId): void {
     this.borrowedLanes.delete(laneId);
+    this.recomputeAnyPlaying();
     // Same-element return: the next load() on this lane must not seek from
     // stale lastPos. The element's currentTime is the authority.
     this.sameElementReturn.add(laneId);
@@ -688,6 +714,7 @@ class VideoEngineImpl {
     const lane = this.getLane(laneId);
     if (lane.audioPolicy === policy) return;
     lane.audioPolicy = policy;
+    this.recomputeAnyPlaying();
     this.applyAudioPolicy(lane, 'policy-change');
   }
 
@@ -2005,6 +2032,7 @@ class VideoEngineImpl {
     // not), so they stay with the slot: 'fullscreen' keeps 'session', and
     // 'fullscreen-next' keeps 'always-muted' — never the speaker.
     const pa = la.audioPolicy; la.audioPolicy = lb.audioPolicy; lb.audioPolicy = pa;
+    this.recomputeAnyPlaying();
     const loopA = la.loop; la.loop = lb.loop; lb.loop = loopA;
     la.el.loop = la.loop; lb.el.loop = lb.loop;
     this.applyAudioPolicy(lb, 'role-promote');
@@ -2150,6 +2178,7 @@ class VideoEngineImpl {
   }
 
   private emit(lane: Lane, error?: string) {
+    this.recomputeAnyPlaying();
     const snap = this.snapshot(lane.id);
     if (error) snap.error = error;
     lane.listeners.forEach((l) => {
