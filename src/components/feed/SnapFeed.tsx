@@ -70,6 +70,8 @@ interface SnapFeedProps {
   surface?: 'feed' | 'fullscreen';
   /** When true, disables DB hooks (watch-progress, UCP, comments) that require a real post id. Used by gallery/flat viewers with synthetic ids. */
   readOnly?: boolean;
+  /** When true (Clubhouse-opened viewer only), append the end-of-feed slide once there are no more pages. */
+  showFeedEnd?: boolean;
 }
 
 export function SnapFeed({
@@ -82,6 +84,7 @@ export function SnapFeed({
   isFullscreen,
   surface = 'feed',
   readOnly = false,
+  showFeedEnd = false,
 }: SnapFeedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { openInviteSheet } = useInviteSheet();
@@ -856,7 +859,7 @@ export function SnapFeed({
         );
       })}
 
-      {!hasNextPage && posts.length > 0 && (
+      {showFeedEnd && !hasNextPage && posts.length > 0 && (
         <div
           data-index={posts.length}
           data-feed-ended
