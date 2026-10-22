@@ -1446,6 +1446,8 @@ const FullscreenMediaPager: React.FC<{
   onZoomChange?: (zoomed: boolean) => void;
 }> = ({ post, media, openIdx, isSlideActive, isSuggestedFeed, onFirstFrameReady, onZoomChange }) => {
   const scrollerRef = useRef<HTMLDivElement>(null);
+  /** [VPERF] CB52 — whether the last pager settle swapped fullscreen-next in. */
+  const lastSwapRef = useRef<boolean>(false);
   const [activePagerIdx, setActivePagerIdx] = useState(openIdx);
   const activePagerIdxRef = useRef(openIdx);
   activePagerIdxRef.current = activePagerIdx;
