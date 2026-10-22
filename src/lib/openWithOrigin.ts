@@ -22,7 +22,7 @@ import { RailLanePool } from '@/video/railLanePool';
 import { PrefetchController } from '@/video/PrefetchController';
 
 import { isPerfEnabled } from '@/perf/navTiming';
-import { vperfStart, vperfMark, vperfArmLane, vperfNextId, vperfMeta, vperfMotionTrace, vperfSetKind, vperfArmBorrowMount, vperfArmMovingFromSnapshot } from '@/perf/vperf';
+import { vperfStart, vperfMark, vperfArmLane, vperfNextId, vperfMeta, vperfMotionTrace, vperfSetKind, vperfArmBorrowMount, vperfArmMovingFromSnapshot, vperfArmMoving } from '@/perf/vperf';
 import { coldOpenRoute } from '@/perf/coldOpen';
 import { trace, traceGenId, traceRegisterOpen, elIdOf } from '@/perf/trace';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
@@ -543,10 +543,8 @@ export function openWithOrigin({
   });
 
   // [VPERF] end of the synchronous open() call — mark storeOpen phase and
-  // arm the target lane's next 'firstFrame' event to close the span
-  // (perceived open = frame painted). 'playing' is recorded as a LATER
-  // waypoint for diagnostics; on iOS HLS it fires well after first paint
-  // and must not close/extend the span.
+  // arm the per-path end condition below (CB52). firstFrame and 'playing'
+  // are waypoints only.
   vperfMark(fsOpenSpanId, 'storeOpen');
   const source: 'borrow' | 'lane' = borrow ? 'borrow' : 'lane';
   const isImage = mediaKind === 'image';
@@ -576,10 +574,16 @@ export function openWithOrigin({
     vperfArmLane('fullscreen', { spanId: fsOpenSpanId, endOn: 'playing', phase: 'playing' });
     let snap: ReturnType<typeof VideoEngine.snapshot> | null = null;
     try { snap = VideoEngine.snapshot('fullscreen'); } catch { snap = null; }
-    const { warm } = vperfArmMovingFromSnapshot(
-      'fullscreen', fsOpenSpanId, `${postId ?? 'unknown'}:${mediaIndex ?? 0}`, snap, { failOnLane: true },
-    );
-    vperfMeta(fsOpenSpanId, { warm });
+    if (mediaId || !postId) {
+      // Index resolved later from mediaId: owner unknown here, so baseline on
+      // the first observed playhead of whatever the lane shows next.
+      vperfArmMoving('fullscreen', fsOpenSpanId, { owner: null, from: null, failOnLane: true });
+    } else {
+      const { warm } = vperfArmMovingFromSnapshot(
+        'fullscreen', fsOpenSpanId, `${postId}:${mediaIndex ?? 0}`, snap, { failOnLane: true },
+      );
+      vperfMeta(fsOpenSpanId, { warm });
+    }
   }
 
   // [VPERF] fs.open motion trace — borrow opens only (the reported screen
