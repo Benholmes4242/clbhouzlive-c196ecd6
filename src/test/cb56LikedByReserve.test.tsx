@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, cleanup, fireEvent } from '@testing-library/react';
+import { render, cleanup } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { FeedPost } from '@/components/media-system/types/media';
 
@@ -8,7 +8,6 @@ import type { FeedPost } from '@/components/media-system/types/media';
    member with no business profile (the spacer must still right-align the
    action group). */
 const pickerState = vi.hoisted(() => ({ renderNull: false }));
-void fireEvent;
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('react-router-dom', () => ({ useNavigate: () => vi.fn() }));
