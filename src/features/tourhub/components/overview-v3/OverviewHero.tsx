@@ -178,7 +178,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   // positions); boardRound is null there, so no TODAY. Same query
   // key as HybridHero.tsx, so a completed slide is a cache hit.
   const boardTournamentId = !heroState || heroState.kind === 'upcoming' ? null : viewingTid;
-  const { data: boardLeaderboard } = useTourLeaderboard(boardTournamentId ?? '');
+  const { data: boardLeaderboard, isLoading: boardLeaderboardLoading } = useTourLeaderboard(boardTournamentId ?? '');
   const boardEntries = boardTournamentId ? (boardLeaderboard ?? []) : [];
   const boardRound = heroState && isInPlayState(heroState) ? heroState.round : null;
 
@@ -329,6 +329,8 @@ export function OverviewHero({ height }: OverviewHeroProps) {
           <HeroBoardSection
             tournamentId={bandTournamentId}
             entries={boardEntries}
+            leaderboardLoading={boardLeaderboardLoading}
+            eventType={activeSlide?.tournament.eventType ?? null}
             currentRound={boardRound}
             totalRounds={heroState && isInPlayState(heroState) ? heroState.totalRounds : null}
             phase={bandPhase}
