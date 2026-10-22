@@ -13,7 +13,7 @@ export function useReviewPost(reviewId: string | null | undefined, enabled: bool
   const { user } = useSupabaseSession();
   const userId = user?.id;
   return useQuery({
-    queryKey: ['review-post', reviewId],
+    queryKey: ['review-post', reviewId, activeActor?.type ?? 'personal', activeActor?.id ?? userId ?? null],
     enabled: !!reviewId && enabled,
     staleTime: 60_000,
     queryFn: async () => {
