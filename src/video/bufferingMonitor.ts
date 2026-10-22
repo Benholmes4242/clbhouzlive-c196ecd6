@@ -23,7 +23,8 @@ export class BufferingMonitor {
   start(): void {
     if (this.running) return;
     this.running = true;
-    this.last = this.read();
+    const next = this.read();
+    this.last = { currentTime: next.currentTime, firstFrame: next.firstFrame };
     this.lastProgress = Date.now();
     this.arm();
     this.sampler = setInterval(() => this.progress(), 100);
@@ -40,7 +41,7 @@ export class BufferingMonitor {
     // A loop wrapping to zero is also progress, not a frozen playhead.
     if (next.currentTime !== this.last.currentTime || (next.firstFrame && !this.last.firstFrame)) {
       this.lastProgress = Date.now();
-      this.last = next;
+      this.last = { currentTime: next.currentTime, firstFrame: next.firstFrame };
       if (this.buffering) {
         this.buffering = false;
         this.finish();

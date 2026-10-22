@@ -1,5 +1,9 @@
 # Roadmap
 
+## CB50.1 — Finish monitor value snapshots and borrow fixture
+- [x] Record brief: copy reader values in start/progress; complete authorized BorrowDescriptor fixture without assertions/casts; audit fullscreen layer and change only spinner z-index if needed. Freeze signed-off spinner, timing, event/caps, CB48/49, preview/legacy/native.
+- [ ] Validate full 2,162-test inventory, harness typecheck/build, and fullscreen stacking; name all pre-existing failures. Review-sheet TS2589 remains outside this brief.
+
 ## REVIEW_SHEET_OPENS_REAL_POST — STOP (new fixture type error)
 - [x] Only requested application files changed: new useReviewPost.ts calls the already-generated get_review_post RPC with canonical actor/session and feed mapping; ReviewBottomSheet.tsx replaces synthetic posts with real post/URL-or-stream matching and clamped pager fallback. No readOnly; stacking and return store unchanged.
 - [x] Authorized correction: reviewCourseNoReopen.test.tsx direct sheet renderer and reviewSheetCalibration.test.tsx sheet helper now use a fresh QueryClient with queries.retry false in QueryClientProvider. RPC spies return empty data/no error to prevent network calls. No test name or assertion changed. All 15 previously failing review cases now pass.

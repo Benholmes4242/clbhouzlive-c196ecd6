@@ -64,7 +64,7 @@ describe('CB50 engine and active presentation integration', () => {
   it('fullscreen observes active borrowed lane only, not a photo or closed viewer', async () => {
     await start();
     const post = { id: 'cb50', mediaItems: [{ type: 'video' }, { type: 'image' }] } as FeedPost;
-    useFullscreenFeedStore.setState({ isOpen: true, borrow: { laneId: 'feed-active', postId: 'cb50' } });
+    useFullscreenFeedStore.setState({ isOpen: true, borrow: { laneId: 'feed-active', postId: 'cb50', ownerKey: 'cb50:0', posterUrl: null, viewportW: 390, viewportH: 844 } });
     const result = render(<FullscreenBuffering activePost={post} />);
     act(() => vi.advanceTimersByTime(500)); expect(result.container.querySelector('[data-video-buffering="fullscreen"]')).not.toBeNull();
     act(() => useFullscreenFeedStore.setState({ activePagerIdx: 1 })); expect(result.container.querySelector('[data-video-buffering]')).toBeNull();
