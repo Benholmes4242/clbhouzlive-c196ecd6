@@ -51,6 +51,7 @@ import { useNavigate } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
+import { VideoEngine } from '@/video/VideoEngine';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { FullscreenTopProgress, showsTopProgress } from './FullscreenTopProgress';
 import { FullscreenVideoScrubber } from './FullscreenVideoScrubber';
@@ -350,11 +351,30 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const activePagerIdx = useFullscreenFeedStore((s) => s.activePagerIdx);
   const isTournamentCardActive = useClubhouseStore((s) => s.isTournamentCardActive);
   const isAudioMuted = useSessionAudio((s) => s.isMuted);
+  // The rail icon is the viewer's only sound control; while iOS forces muted playback it shows muted, and one tap restores sound.
+  const [soundBlocked, setSoundBlocked] = useState(false);
+  useEffect(() => {
+    return VideoEngine.onAutoplayBlocked(() => setSoundBlocked(true));
+  }, []);
+  useEffect(() => {
+    return useSessionAudio.subscribe((s, previous) => {
+      if (s.isMuted !== previous.isMuted) setSoundBlocked(false);
+    });
+  }, []);
+  useEffect(() => {
+    setSoundBlocked(false);
+  }, [activeIndex, activePagerIdx]);
+  const shownMuted = isAudioMuted || soundBlocked;
 
   const handleMuteTap = useCallback(() => {
     try { triggerHaptic('light'); } catch {}
-    useSessionAudio.getState().toggle();
-  }, []);
+    if (soundBlocked) {
+      useSessionAudio.getState().unmute();
+      setSoundBlocked(false);
+    } else {
+      useSessionAudio.getState().toggle();
+    }
+  }, [soundBlocked]);
 
   const activePost = posts[activeIndex] ?? null;
   // K.1: the member's position is saved on pause, close and a throttled interval.
@@ -833,9 +853,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         {activeMediaIsVideo && (
           <RailButton
             onClick={handleMuteTap}
-            ariaLabel={isAudioMuted ? 'Unmute' : 'Mute'}
+            ariaLabel={shownMuted ? 'Unmute' : 'Mute'}
           >
-            {isAudioMuted ? (
+            {shownMuted ? (
               <VolumeX size={32} stroke="#fff" strokeWidth={2} />
             ) : (
               <Volume2 size={32} stroke="#fff" strokeWidth={2} />

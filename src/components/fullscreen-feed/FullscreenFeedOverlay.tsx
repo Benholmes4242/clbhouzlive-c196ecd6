@@ -68,7 +68,6 @@ import { isPerfEnabled } from '@/perf/navTiming';
 import { coldOpenRevealSample, coldOpenIsActive } from '@/perf/coldOpen';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
-import { TapForSoundPill } from '@/audio/MuteButton';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { RailLanePool } from '@/video/railLanePool';
 import { originHostRegistry } from '@/video/originHostRegistry';
@@ -218,27 +217,6 @@ export function FullscreenFeedOverlay() {
   // every fixed child derive from this one value so chrome never detaches.
   const overlayZ = useFullscreenFeedStore(s => s.zIndex);
   const signalCloseAnimDone = useFullscreenFeedStore(s => s.signalCloseAnimDone);
-
-  // Autoplay-blocked → "Tap for sound" pill above the scrubber. Fires when
-  // the engine's unmuted play() is rejected on the 'fullscreen' lane (or
-  // the borrowed rail lane) and we degrade to muted playback. Any unmute
-  // (from this pill, MuteButton, MediaPreviewViewer) clears it.
-  const [showSoundPill, setShowSoundPill] = useState(false);
-  useEffect(() => {
-    if (!isOpen) setShowSoundPill(false);
-  }, [isOpen, activeIndex]);
-  useEffect(() => {
-    const unsub = VideoEngine.onAutoplayBlocked(() => {
-      if (isOpen) setShowSoundPill(true);
-    });
-    return unsub;
-  }, [isOpen]);
-  useEffect(() => {
-    const unsub = useSessionAudio.subscribe((s) => {
-      if (!s.isMuted) setShowSoundPill(false);
-    });
-    return unsub;
-  }, []);
 
   // ── [TRACE] fsLane.at.open + origin.lost ──────────────────────────────
   // fsLane.at.open: on every false→true transition of isOpen, snapshot the
@@ -1030,25 +1008,6 @@ export function FullscreenFeedOverlay() {
                     activeIndex={activeIndex}
                   />
 
-                  {showSoundPill && (
-                    <div
-                      style={{
-                        position: 'fixed',
-                        left: '50%',
-                        bottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)',
-                        transform: 'translateX(-50%)',
-                        zIndex: overlayZ + 2,
-                        pointerEvents: 'auto',
-                      }}
-                    >
-                      <TapForSoundPill
-                        onClick={() => {
-                          useSessionAudio.getState().unmute();
-                          setShowSoundPill(false);
-                        }}
-                      />
-                    </div>
-                  )}
                 </div>
 
                 {/* ── Blurred self-backdrop (surround) ──
