@@ -52,7 +52,7 @@ export function LeadersGroupContent({ tournamentId, entries, group, groups, roun
   const named = note?.names ?? [];
   const namesMarkup = named.map((name, i) => <span key={`${name}-${i}`}><span style={{ color: L.ink, fontWeight: 600 }}>{name}</span>{i < named.length - 2 ? ', ' : i === named.length - 2 ? t('overview.leadersGroup.and') : ''}</span>);
   return <>
-    <section data-leaders-group data-group-state={state} style={{ padding: '18px 20px 16px', color: L.ink }}>
+    <section data-leaders-group data-group-state={state} style={{ padding: '18px 20px 16px', color: L.ink, lineHeight: 'normal' }}>
       <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: L.amber }}>{t('overview.leadersGroup.kicker')}</div>
       <div data-leaders-group-state style={{ marginTop: 7, display: 'flex', alignItems: 'center', gap: 7, fontSize: 13.5, fontWeight: 600 }}>
         {state === 'onCourse' ? <span aria-hidden style={{ width: 7, height: 7, flexShrink: 0, borderRadius: '50%', background: L.live, boxShadow: L.halo }} /> : null}
