@@ -105,10 +105,11 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
 
       if (listsError) throw listsError;
 
-      // CANONICAL COUNT SOURCE: user_top100_progress_view
-      // This view is the single source of truth for per-list played counts.
-      // Do NOT re-derive counts by joining user_course_activity + course_top100_memberships —
-      // that path under-reports (see BRIEF: Top 100 tile/hero count wrong).
+      // CANONICAL COUNT SOURCE: user_top100_progress_view. courses_played_in_list = rated OR a
+      // logged WHS round (the same definition as get_top100_list_progress and
+      // get_career_leaderboard); courses_rated_in_list = rated only. Every active list returns
+      // a row, zeros included, and the view applies can_view_top100. Do not re-derive counts
+      // client-side.
       const { data: viewRows, error: viewError } = await supabase
         .from('user_top100_progress_view' as any)
         .select('list_id, list_slug, list_name, total_courses_in_list, courses_rated_in_list, courses_played_in_list')
