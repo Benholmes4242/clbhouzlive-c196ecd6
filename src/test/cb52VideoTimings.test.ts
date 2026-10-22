@@ -200,6 +200,8 @@ describe('CB52 pager swapped tag', () => {
 
 describe('CB52 hidden supersede', () => {
   it('supersedes open spans with supersededBy hidden and drops a pending activation', () => {
+    vperfOnHidden(); // clear spans left open by earlier cases
+    lines = [];
     const s = id('swipe');
     vperfStart(s, 'swipe.vertical');
     const t0 = performance.now();
