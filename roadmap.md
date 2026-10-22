@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB58 — Leaders' group
+- [x] Read brief/mock and audited source before building: round advances by scored/live participation or course-local date, not last card/first tee; IDs share sr_players.id. Baseline bunx vitest run: 2,233/303, no pre-existing failures. Git pull skipped because workspace Git is managed.
+- [ ] Implement shared selection/rendering and en/en-XA copy; existing tour-green ruling confirmed.
+- [ ] Validate selection, visibility, round handover, scorecard taps and 390×844 heights; full suite and harness result, accountable report.
+
 ## CB57 — Tour hero board removals and tie brackets
 - [x] Baseline `bunx vitest run`: 2,224 passed /302 files /0 failures. CB56 added five tests/one file since 2,219/301; no pre-existing failures. Git pull skipped: workspace Git is platform-managed.
 - [x] Removed specified separator, next-round/action rows and caller callback; shared stretched position-cell brackets, retained cap and protected helpers/locales/tee-alert code. Existing movement/card rules retained and reported, not silently removed.
