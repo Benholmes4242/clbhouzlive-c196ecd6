@@ -62,6 +62,9 @@ describe('CB58 pure leaders group rules', () => {
   it('keeps finished groups until the next draw is published', () => {
     const field = entries.map(e => ({ ...e, thru: 18 }));
     expect(leadersShownRound(1, [g, group(['d', 'e'])], allLeaders(field), field, [1], 4)).toBe(1);
+    // CB58.1 retarget: published draw + finished leaders alone is insufficient.
+    const morningField = [...field, entry('afternoon', 25, -2, 8)];
+    expect(leadersShownRound(1, [g, group(['d', 'e'])], allLeaders(morningField), morningField, [1, 2], 4)).toBe(1);
     expect(leadersShownRound(1, [g, group(['d', 'e'])], allLeaders(field), field, [1, 2], 4)).toBe(2);
   });
   it('does not switch when another leaders group is unfinished', () => {
@@ -101,6 +104,37 @@ describe('CB58 pure leaders group rules', () => {
 });
 
 describe('CB58 render and tap behavior', () => {
+  it('CB58.1 keeps Round 1 finished leaders while the afternoon field plays despite a published R2 draw', () => {
+    const field = [entry('a', 1, -8, 18), entry('b', 9, -5, 18), entry('c', 41, -2, 18), entry('afternoon', 25, -1, 8)];
+    const round = leadersShownRound(1, [g], allLeaders(field), field, [1, 2], 4);
+    expect(round).toBe(1);
+    const view = mount(<LeadersGroupContent {...props} entries={field} group={g} groups={[g]} round={round} />);
+    expect(view.container.querySelector('[data-group-state="finished"]')).not.toBeNull();
+  });
+  it('CB58.1 moves to Round 2 before-tee state only when the whole field finishes R1', () => {
+    const field = [...entries.slice(0, 3), entry('afternoon', 25)].map(e => ({ ...e, thru: 18, round_1: e.today }));
+    const round = leadersShownRound(1, [g], allLeaders(field), field, [1, 2], 4);
+    expect(round).toBe(2);
+    const view = mount(<LeadersGroupContent {...props} entries={field} group={g} groups={[g]} round={round} />);
+    expect(view.container.querySelector('[data-group-state="before"]')).not.toBeNull();
+    expect([...view.container.querySelectorAll('[data-group-thru], [data-group-today]')].every(e => e.textContent === '')).toBe(true);
+  });
+  it('CB58.1 suspended unfinished R1 stays on R1 overnight regardless of early current-round advancement', () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-10-24T03:00:00Z'));
+      const field = [entry('a', 1, -8, 18), entry('delayed', 25, -2, 12)];
+      const base = leadersBaseRound(allLeaders(field), 2);
+      expect(base).toBe(1);
+      expect(leadersShownRound(base, [g], allLeaders(field), field, [1, 2], 4)).toBe(1);
+    } finally { vi.useRealTimers(); }
+  });
+  it('CB58.1 CUT/MC/WD/DQ/MDF/DNS without R2 cards and scoreless entries do not block R2 to R3', () => {
+    const finishers = entries.slice(0, 3).map(e => ({ ...e, today_round: 2, thru: 18, round_1: -1, round_2: e.today }));
+    const excluded = ['CUT', 'MC', 'WD', 'DQ', 'MDF', 'DNS'].map(status => ({ ...entry(status, 55, null), round_1: -1, round_2: null, status }));
+    const field = [...finishers, ...excluded, { ...entry('scoreless', 99, null), score: null }];
+    expect(leadersShownRound(2, [g], allLeaders(field), field, [2, 3], 4)).toBe(3);
+  });
   it.each(['noGroups', 'leaderMissing', 'teeLoading', 'boardLoading', 'team'] as const)('renders nothing for %s', condition => {
     fixture.groups = condition === 'noGroups' ? [] : condition === 'leaderMissing' ? [group(['absent'])] : [g];
     fixture.loading = condition === 'teeLoading';
