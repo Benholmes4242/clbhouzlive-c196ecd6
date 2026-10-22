@@ -742,8 +742,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     const hasVideo = (post as any)?.mediaItems?.some?.((m: any) => m?.type === 'video');
     try {
       if (hasVideo) {
-        const activeLane = feedLaneRoles.laneForRole('active');
-        VideoEngine.setAudioFocus(activeLane, 'feed');
+        VideoEngine.setAudioFocus('active', 'feed');
       } else {
         VideoEngine.setAudioFocus(null, 'feed');
       }

@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
-// TODO: re-wire mediaStore in Brief 3
 
 /**
  * Manages app-lifecycle side effects for the Clubhouse feed:
  * - Screen Wake Lock acquisition
  *
- * Video pause/resume logic removed — mediaStore deleted in Brief 1.
- * Will be re-wired in Brief 3 with new scroll-snap feed.
+ * Video visibility pause/resume lives in VideoEngine (CB48), preserving
+ * mounted ownership and deliberate pause intent. Wake lock stays here.
  */
 export function useClubhouseLifecycle(
   _getStore?: () => { userPaused: boolean }

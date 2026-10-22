@@ -338,7 +338,7 @@ export const InlineVideo: React.FC<Props> = ({
           Discover rails already put it. Two things cannot own one corner. */}
       {isActive && !isProcessing && (
         <div style={{ position: 'absolute', left: 6, bottom: 6, zIndex: 30 }}>
-          <MuteButton size="sm" />
+          <MuteButton size="sm" laneId={laneId} />
         </div>
       )}
 
