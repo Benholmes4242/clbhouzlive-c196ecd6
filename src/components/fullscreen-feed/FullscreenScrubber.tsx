@@ -9,11 +9,10 @@
  * swipe (pager) or pinch (images). Only fires on a clean tap (<10px move,
  * <300ms, single finger) whose target is not the chrome or scrubber itself.
  *
- * Image slides: entire component becomes inert (scrubber hidden, tap-to-pause
- * skipped) — we detect this via useClubhouseStore.carouselPositions +
- * activePost.mediaItems.
+ * Image slides: no toggle, no hold, no flash — but CB49's double-tap like
+ * is handled HERE for images too (same window listeners).
  */
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -21,13 +20,21 @@ import { Z } from '@/config/zIndex';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { LaneId } from '@/video/lanePolicy';
 import { expectedOwnerKey, ownerMatches } from './scrubberMath';
+import { createTapHandler } from '@/components/feed/mediaTap';
+import { HeartBurst } from '@/components/feed/HeartBurst';
+
+/** Clean-gesture limits shared by tap and hold (unchanged from tap-to-pause). */
+const HOLD_MS = 300;
+const MOVE_PX = 10;
 
 interface Props {
   activePost: FeedPost | null;
   activeIndex: number;
+  /** CB49: double-tap like. Caller must like-only (never unlike). */
+  onDoubleTapLike?: (post: FeedPost) => void;
 }
 
-export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
+export const FullscreenScrubber: React.FC<Props> = ({ activePost, onDoubleTapLike }) => {
   // Pager-idx and borrow live in the fullscreen store — the ONLY sources of
   // truth for which media is currently active + which lane it's playing on.
   // clubhouseStore.carouselPositions is NOT consulted here (it lags the
@@ -51,13 +58,26 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
 
 
   const [flashIcon, setFlashIcon] = useState<'play' | 'pause' | null>(null);
+  const [burstKey, setBurstKey] = useState(0);
+  const [burstVisible, setBurstVisible] = useState(false);
+  const hideBurst = useCallback(() => setBurstVisible(false), []);
 
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Latest like callback/post without re-binding the window listeners.
+  const likeRef = useRef<{ fn?: (p: FeedPost) => void; post: FeedPost | null }>({ post: null });
+  likeRef.current = { fn: onDoubleTapLike, post: activePost };
 
-  // Tap-to-pause: window listener, filters clean single-finger taps that miss
-  // the chrome / scrubber. Only active while a video slide is showing.
+  // Gestures: window listeners filter clean single-finger presses that miss
+  // the chrome / scrubber / buttons. CB49:
+  //  - clean taps go through mediaTap's createTapHandler (DOUBLE_TAP_WINDOW_MS):
+  //    single = play/pause toggle (video only) AFTER the window; double = like
+  //    only (never unlike) + HeartBurst, with no playback change. Images get
+  //    the double-tap here too (the toggle side is a no-op on them).
+  //  - press-and-hold (video only): HOLD_MS still within MOVE_PX pauses via
+  //    the engine (viaViewer, owner-guarded) WITHOUT pausedOwnerKeys; release
+  //    restores the pre-hold state, and that pointer-up is never a tap.
   useEffect(() => {
-    if (!isVideo || !expectedKey) return;
+    if (!expectedKey) return;
 
     let startX = 0;
     let startY = 0;
@@ -65,11 +85,66 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
     let armed = false;
     let moved = false;
     let pointerCount = 0;
+    let holdTimer: ReturnType<typeof setTimeout> | null = null;
+    // Hold lifecycle: 'fired' once the hold elapsed (whether or not it paused);
+    // wasPlaying records the pre-hold state for release.
+    let holdFired = false;
+    let holdWasPlaying = false;
+
+    const flash = (icon: 'play' | 'pause') => {
+      setFlashIcon(icon);
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+      flashTimerRef.current = setTimeout(() => setFlashIcon(null), 400);
+    };
+
+    const toggle = () => {
+      if (!isVideo) return;
+      // viaViewer bypasses the borrow-swallow guard in VideoEngine so
+      // tap-pause works while playback is still on the borrowed rail lane.
+      try {
+        const s = VideoEngine.snapshot(laneId);
+        if (!ownerMatches(s.postId, expectedKey)) return;
+        if (s.state === 'playing') {
+          VideoEngine.pause(laneId, { callerPostId: expectedKey, viaViewer: true });
+          addPausedOwnerKey(expectedKey);
+          flash('pause');
+        } else {
+          removePausedOwnerKey(expectedKey);
+          void VideoEngine.play(laneId, { callerPostId: expectedKey, viaViewer: true });
+          flash('play');
+        }
+      } catch { /* noop */ }
+    };
+
+    const like = () => {
+      setBurstKey((k) => k + 1);
+      setBurstVisible(true);
+      const { fn, post } = likeRef.current;
+      if (fn && post) fn(post);
+    };
+
+    const tap = createTapHandler({ onSingle: toggle, onDouble: like });
+
+    const clearHoldTimer = () => {
+      if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+    };
+    const endHold = () => {
+      clearHoldTimer();
+      if (!holdFired) return;
+      holdFired = false;
+      if (!holdWasPlaying) return;
+      holdWasPlaying = false;
+      try {
+        const s = VideoEngine.snapshot(laneId);
+        if (!ownerMatches(s.postId, expectedKey)) return;
+        void VideoEngine.play(laneId, { callerPostId: expectedKey, viaViewer: true });
+      } catch { /* noop */ }
+    };
 
     const onDown = (e: PointerEvent) => {
       pointerCount++;
-      if (pointerCount > 1) { armed = false; return; }
-      // Skip taps that start on the chrome or scrubber.
+      if (pointerCount > 1) { armed = false; clearHoldTimer(); return; }
+      // Skip presses that start on the chrome or scrubber.
       const path = (e.composedPath?.() ?? []) as Element[];
       const inChrome = path.some((n) => {
         if (!(n instanceof Element)) return false;
@@ -91,42 +166,50 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
       startX = e.clientX;
       startY = e.clientY;
       startT = performance.now();
+      if (isVideo) {
+        clearHoldTimer();
+        holdTimer = setTimeout(() => {
+          holdTimer = null;
+          if (!armed || moved || pointerCount !== 1) return;
+          holdFired = true;
+          holdWasPlaying = false;
+          try {
+            const s = VideoEngine.snapshot(laneId);
+            if (!ownerMatches(s.postId, expectedKey)) return;
+            if (s.state === 'playing') {
+              holdWasPlaying = true;
+              // Temporary: deliberately NOT addPausedOwnerKey.
+              VideoEngine.pause(laneId, { callerPostId: expectedKey, viaViewer: true });
+            }
+          } catch { /* noop */ }
+        }, HOLD_MS);
+      }
     };
     const onMove = (e: PointerEvent) => {
       if (!armed) return;
       const dx = Math.abs(e.clientX - startX);
       const dy = Math.abs(e.clientY - startY);
-      if (dx > 10 || dy > 10) moved = true;
+      if (dx > MOVE_PX || dy > MOVE_PX) { moved = true; clearHoldTimer(); }
     };
     const onUp = (e: PointerEvent) => {
       pointerCount = Math.max(0, pointerCount - 1);
+      clearHoldTimer();
+      if (holdFired) {
+        // A hold's pointer-up is never a tap; restore once all fingers lift.
+        armed = false;
+        if (pointerCount === 0) endHold();
+        return;
+      }
       if (!armed) return;
       armed = false;
       const dt = performance.now() - startT;
-      if (moved || dt > 300) return;
-      // Clean tap — toggle play/pause via engine, owner-guarded. viaViewer
-      // bypasses the borrow-swallow guard in VideoEngine so tap-pause works
-      // while playback is still on the borrowed rail lane.
-      try {
-        const s = VideoEngine.snapshot(laneId);
-        if (!ownerMatches(s.postId, expectedKey)) return;
-        if (s.state === 'playing') {
-          VideoEngine.pause(laneId, { callerPostId: expectedKey, viaViewer: true });
-          addPausedOwnerKey(expectedKey);
-          setFlashIcon('pause');
-        } else {
-          removePausedOwnerKey(expectedKey);
-          void VideoEngine.play(laneId, { callerPostId: expectedKey, viaViewer: true });
-          setFlashIcon('play');
-        }
-        if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
-        flashTimerRef.current = setTimeout(() => setFlashIcon(null), 400);
-      } catch { /* noop */ }
-
+      if (moved || dt > HOLD_MS) return;
+      tap(e as unknown as React.MouseEvent);
     };
     const onCancel = () => {
       armed = false;
       pointerCount = 0;
+      endHold();
     };
 
     window.addEventListener('pointerdown', onDown, true);
@@ -138,6 +221,7 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
       window.removeEventListener('pointermove', onMove, true);
       window.removeEventListener('pointerup', onUp, true);
       window.removeEventListener('pointercancel', onCancel, true);
+      clearHoldTimer();
       if (flashTimerRef.current) {
         clearTimeout(flashTimerRef.current);
         flashTimerRef.current = null;
@@ -145,13 +229,19 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
     };
   }, [isVideo, expectedKey, laneId, addPausedOwnerKey, removePausedOwnerKey]);
 
-
-  if (!isVideo) return null;
-
   return (
     <>
+      {burstVisible && (
+        <div
+          data-fs-heart-burst
+          aria-hidden
+          style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: Z.echo + 4 }}
+        >
+          <HeartBurst key={burstKey} onDone={hideBurst} />
+        </div>
+      )}
       {/* Centre flash icon */}
-      {flashIcon && (
+      {isVideo && flashIcon && (
         <div
           aria-hidden
           style={{
@@ -175,7 +265,6 @@ export const FullscreenScrubber: React.FC<Props> = ({ activePost }) => {
         </div>
       )}
       <style>{`@keyframes fs-scrubber-flash { 0% { opacity: 0.95; transform: translate(-50%,-50%) scale(0.85); } 60% { opacity: 0.85; transform: translate(-50%,-50%) scale(1); } 100% { opacity: 0; transform: translate(-50%,-50%) scale(1.05); } }`}</style>
-
     </>
   );
 };

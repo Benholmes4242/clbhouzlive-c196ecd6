@@ -1,4 +1,5 @@
 import { applyMemberGolfQueryDefaults } from '@/lib/memberDataFreshness';
+import { useVideoWakeLock } from '@/video/useVideoWakeLock';
 import React, { Suspense, useEffect, useLayoutEffect, useMemo } from "react";
 import { trackedLazy } from '@/perf/navTiming';
 // Shadow React.lazy so EVERY route-level lazy import is automatically tracked
@@ -890,6 +891,8 @@ const AppInner: React.FC = () => {
   useReauthOnFocus();
   // iOS silent-switch tap-to-unmute hint.
   useSilentSwitchHint();
+  // CB49: sole video wake-lock owner (screen awake only while video plays).
+  useVideoWakeLock();
 
   // Push notification registration — runs on every cold launch.
   // Waits for the Median bridge to be ready (avoids TLS-cold-pool transport

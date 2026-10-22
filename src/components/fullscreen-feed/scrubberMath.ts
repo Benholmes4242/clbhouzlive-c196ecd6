@@ -36,3 +36,11 @@ export function ownerMatches(snapPostId: string | null | undefined, expected: st
   if (!expected.includes(':') && snapPostId === `${expected}:0`) return true;
   return false;
 }
+
+/** CB49: a fullscreen double tap only ever likes — never unlikes (IG parity).
+ *  Returns true when it fired the like. */
+export function likeOnlyOnDoubleTap(isLiked: boolean, like: () => void): boolean {
+  if (isLiked) return false;
+  like();
+  return true;
+}
