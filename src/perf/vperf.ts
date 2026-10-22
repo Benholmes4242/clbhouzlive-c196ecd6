@@ -43,7 +43,7 @@ import { writeBandwidthSample, getNetClass } from '@/video/bandwidthMemory';
 
 const SPAN_TTL_MS = 15_000;
 
-type Verdict = 'PASS' | 'SLOW' | 'TIMEOUT' | 'SUPERSEDED';
+type Verdict = 'PASS' | 'SLOW' | 'TIMEOUT' | 'SUPERSEDED' | 'FAIL';
 
 interface SpanRec {
   spanId: string;
@@ -74,11 +74,9 @@ interface SessionRec {
   laneId: string;
   t0: number;
   meta: Record<string, unknown>;
-  stallCount: number;
-  stallTotalMs: number;
-  longestStallMs: number;
-  waitingT0: number | null; // when a stall began (after startup)
-  hadFirstPlaying: boolean;
+  // CB52: the old stallCount/stallTotalMs counter is retired — it could never
+  // count a stall (see CB51 §6). CB50's `video_stall` analytics event is the
+  // stall source from now on.
   startFrames: number | null;
   startDropped: number | null;
   startLevel: number | null;
@@ -161,7 +159,7 @@ function finish(rec: SpanRec, verdict: Verdict, extra: Record<string, unknown>):
   clearTimeout(rec.timer);
   const totalMs = Math.round(performance.now() - rec.t0);
   const finalVerdict: Verdict =
-    verdict === 'TIMEOUT' ? 'TIMEOUT' : totalMs <= rec.budgetMs ? 'PASS' : 'SLOW';
+    verdict === 'TIMEOUT' || verdict === 'FAIL' ? verdict : totalMs <= rec.budgetMs ? 'PASS' : 'SLOW';
   emit(rec.kind, {
     totalMs,
     phases: rec.phases,
@@ -250,6 +248,8 @@ export function vperfSupersede(
 }
 
 function clearLaneArmsBySpan(spanId: string): void {
+  clearMovingArmsBySpan(spanId);
+  if (__pendingBorrowSpan === spanId) __pendingBorrowSpan = null;
   for (const [laneId, list] of laneArms) {
     const filtered = list.filter((a) => a.spanId !== spanId);
     if (filtered.length === 0) laneArms.delete(laneId);
@@ -305,10 +305,6 @@ export function vperfLaneEvent(
   data?: Record<string, unknown>,
 ): void {
   if (!on()) return;
-  // Feed session tracker first (its counters must run before span teardown).
-  if (event === 'waiting' || event === 'playing') {
-    sessionOnStateEdge(laneId, event);
-  }
   const list = laneArms.get(laneId);
   if (!list || list.length === 0) return;
   const remaining: LaneArm[] = [];
@@ -369,11 +365,6 @@ export function vperfSessionStart(
       const { el, startLevel, bwEstimate, seededBw, ...rest } = meta;
       return rest;
     })(),
-    stallCount: 0,
-    stallTotalMs: 0,
-    longestStallMs: 0,
-    waitingT0: null,
-    hadFirstPlaying: false,
     startFrames: q.totalFrames,
     startDropped: q.droppedFrames,
     startLevel: meta.startLevel ?? null,
@@ -394,42 +385,9 @@ export function vperfSessionStart(
   sessions.set(laneId, rec);
 }
 
-function sessionOnStateEdge(laneId: string, edge: 'waiting' | 'playing'): void {
-  const rec = sessions.get(laneId);
-  if (!rec) return;
-  const now = performance.now();
-  if (edge === 'waiting') {
-    // Exclude the initial startup — stalls only count AFTER the first
-    // sustained playing state. Also excludes seeks (which are separate S6
-    // spans; the seek handler calls vperfSessionSuppressNextStall).
-    if (!rec.hadFirstPlaying) return;
-    if ((rec as any)._suppressNextStall) {
-      (rec as any)._suppressNextStall = false;
-      return;
-    }
-    if (rec.waitingT0 == null) rec.waitingT0 = now;
-  } else if (edge === 'playing') {
-    if (!rec.hadFirstPlaying) {
-      rec.hadFirstPlaying = true;
-      return;
-    }
-    if (rec.waitingT0 != null) {
-      const dur = now - rec.waitingT0;
-      rec.waitingT0 = null;
-      rec.stallCount += 1;
-      rec.stallTotalMs += dur;
-      if (dur > rec.longestStallMs) rec.longestStallMs = dur;
-    }
-  }
-}
-
-/** Called by VideoEngine.seek so the resulting waiting→playing pair isn't
- *  counted as a rebuffer stall (that's the S6 seek span's territory). */
-export function vperfSessionSuppressNextStall(laneId: string): void {
-  const rec = sessions.get(laneId);
-  if (!rec) return;
-  (rec as any)._suppressNextStall = true;
-}
+/** CB52: retained as a no-op so existing callers compile; stall counting is
+ *  retired in favour of CB50's `video_stall` analytics. */
+export function vperfSessionSuppressNextStall(_laneId: string): void { /* retired */ }
 
 export function vperfSessionLevel(
   laneId: string,
@@ -455,13 +413,6 @@ export function vperfSessionEnd(laneId: string, reason: string): void {
   sessions.delete(laneId);
   clearTimeout(rec.timer);
   const now = performance.now();
-  // If we ended mid-stall, count the tail.
-  if (rec.waitingT0 != null) {
-    const dur = now - rec.waitingT0;
-    rec.stallCount += 1;
-    rec.stallTotalMs += dur;
-    if (dur > rec.longestStallMs) rec.longestStallMs = dur;
-  }
   const durationMs = Math.round(now - rec.t0);
   const el: HTMLVideoElement | null = (rec as any)._el ?? null;
   const q = readQualityDelta(el);
@@ -471,15 +422,9 @@ export function vperfSessionEnd(laneId: string, reason: string): void {
     q.droppedFrames != null && rec.startDropped != null
       ? q.droppedFrames - rec.startDropped
       : null;
-  const stallRatio = durationMs > 0 ? rec.stallTotalMs / durationMs : 0;
-  const longStall = rec.longestStallMs > 1000;
-  const verdict: Verdict = stallRatio <= 0.005 && !longStall ? 'PASS' : 'SLOW';
   emit('session', {
     laneId,
     durationMs,
-    stallCount: rec.stallCount,
-    stallTotalMs: Math.round(rec.stallTotalMs),
-    longestStallMs: Math.round(rec.longestStallMs),
     droppedFrames,
     totalFrames,
     levelSwitches: rec.levelSwitches,
@@ -489,8 +434,6 @@ export function vperfSessionEnd(laneId: string, reason: string): void {
     bwEstimateEnd: rec.bwEstimateEnd,
     seededBw: rec.seededBw,
     netClass: getNetClass(),
-    verdict,
-    longStall,
     reason,
     ...rec.meta,
   });
@@ -816,6 +759,8 @@ interface KindStat {
   slow: number;
   timeout: number;
   superseded: number;
+  /** CB52: spans closed as a real failure (lane error / save-data). */
+  failed?: number;
   totals: number[];  // fixed-size ring; length ≤ TOTALS_CAP, order not meaningful
   totalsIdx: number; // next write index once full
 }
@@ -834,10 +779,9 @@ function ringPush(arr: number[], idx: number, cap: number, v: number): number {
 
 const scorecardBuckets = new Map<string, KindStat>();      // key = `${kind}|${page}`
 const sessionHealth = {
+  // CB52: stall totals retired — CB50's `video_stall` is the stall source.
   sessionCount: 0,
-  totalStalls: 0,
   totalDurationMs: 0,
-  totalStallMs: 0,
   levelSwitches: 0,
   totalFrames: 0,
   droppedFrames: 0,
@@ -866,9 +810,7 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
 
   if (kind === 'session') {
     sessionHealth.sessionCount += 1;
-    sessionHealth.totalStalls += Number((payload as any).stallCount) || 0;
     sessionHealth.totalDurationMs += Number((payload as any).durationMs) || 0;
-    sessionHealth.totalStallMs += Number((payload as any).stallTotalMs) || 0;
     sessionHealth.levelSwitches += Number((payload as any).levelSwitches) || 0;
     sessionHealth.totalFrames += Number((payload as any).totalFrames) || 0;
     sessionHealth.droppedFrames += Number((payload as any).droppedFrames) || 0;
@@ -909,6 +851,12 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
   // SUPERSEDED spans (flick-past, abandoned open) are counted separately
   // and never contribute to pass/slow/timeout tallies or p50/p95 totals —
   // otherwise abandoned events would inflate SLOW verdicts.
+  if (verdict === 'FAIL') {
+    stat.count += 1;
+    stat.failed = (stat.failed ?? 0) + 1;
+    scorecardBuckets.set(key, stat);
+    return;
+  }
   if (verdict === 'SUPERSEDED') {
     stat.count += 1;
     stat.superseded = (stat.superseded ?? 0) + 1;
@@ -973,10 +921,9 @@ export function vperfScorecard(trigger: 'auto' | 'nav' | 'manual' = 'manual'): v
   }
 
   const sh = sessionHealth;
-  const stallRate = sh.totalDurationMs > 0 ? (sh.totalStallMs / sh.totalDurationMs) : 0;
   const dropRate = sh.totalFrames > 0 ? (sh.droppedFrames / sh.totalFrames) : 0;
   const avgLevelSw = sh.sessionCount > 0 ? (sh.levelSwitches / sh.sessionCount) : 0;
-  lines.push(`  session-health: sessions=${sh.sessionCount} stalls=${sh.totalStalls} stallRate=${(stallRate*100).toFixed(2)}% dropRate=${(dropRate*100).toFixed(2)}% avgLevelSw=${avgLevelSw.toFixed(2)}`);
+  lines.push(`  session-health: sessions=${sh.sessionCount} dropRate=${(dropRate*100).toFixed(2)}% avgLevelSw=${avgLevelSw.toFixed(2)}`);
   for (const [page, r] of feedRollup) {
     const longPct = r.frames > 0 ? (r.longFrames / r.frames) * 100 : 0;
     lines.push(`  feed@${page}: scrolls=${r.scrolls} longFrames=${longPct.toFixed(1)}% worstFrame=${Math.round(r.worstMs)}ms activateWarm=${r.activateWarm} activateCold=${r.activateCold}`);
@@ -1480,6 +1427,7 @@ export interface VperfBucketSnapshot {
   slow: number;
   timeout: number;
   superseded: number;
+  failed: number;
   totals: number[]; // copy — safe to serialise
 }
 
@@ -1507,6 +1455,7 @@ export function __vperfSnapshotTelemetry(): VperfSnapshot {
       slow: s.slow,
       timeout: s.timeout,
       superseded: s.superseded ?? 0,
+      failed: s.failed ?? 0,
       totals: s.totals.slice(),
     });
   }
@@ -1540,9 +1489,7 @@ export function __vperfSnapshotTelemetry(): VperfSnapshot {
 export function __vperfResetTelemetry(): void {
   scorecardBuckets.clear();
   sessionHealth.sessionCount = 0;
-  sessionHealth.totalStalls = 0;
   sessionHealth.totalDurationMs = 0;
-  sessionHealth.totalStallMs = 0;
   sessionHealth.levelSwitches = 0;
   sessionHealth.totalFrames = 0;
   sessionHealth.droppedFrames = 0;
