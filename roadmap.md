@@ -669,3 +669,6 @@
 
 ## Top 100 progress view played migration (record-only)
 - [x] Hook comment replaced with the rated-OR-WHS-round definition (useTop100ProgressForUser.ts). Migration file NOT written: project rule forbids writing migration files and the platform only creates them by executing SQL, which Ben already ran by hand. Exact SQL recorded at docs/sql/2026-10-22-top100-progress-view-played.sql instead.
+
+## Explore: remove Just played section
+- [x] Removed JustPlayed from the Rounds page (Competitions now followed directly by Leaderboards), deleted JustPlayed.tsx, dropped the CB28 'just' cases (authorised), comment-only updates in useHeldFrame.ts and scoresLeadBoard.test.tsx. BoardSeeAllSheet, useBoardPage, the 'recent' board and amateur.justPlayed.* keys kept.
