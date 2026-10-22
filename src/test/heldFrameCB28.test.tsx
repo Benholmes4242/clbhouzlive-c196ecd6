@@ -7,7 +7,6 @@ import { createInstance } from 'i18next';
 import en from '../../public/locales/en/courses.json';
 import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFilters';
 import { StandoutRounds } from '@/components/explore-tab-new/courseled/StandoutRounds';
-import { JustPlayed } from '@/components/explore-tab-new/courseled/JustPlayed';
 import { CompetitionBoards } from '@/components/explore-tab-new/courseled/CompetitionBoards';
 import { LeaderboardsSection } from '@/features/explore-magazine/LeaderboardsSection';
 import { makeBoardState } from './factories/boardState';
@@ -29,14 +28,13 @@ const row = (pos: number) => ({
 const ok = (n: number) => Promise.resolve({ data: Array.from({ length: n }, (_, i) => row(i + 1)), error: null });
 const never = () => new Promise(() => {});
 
-type Kind = 'standout' | 'just' | 'comps';
-const MARK: Record<Kind, string> = { standout: '[data-standout-section]', just: '[data-just-played-section]', comps: '[data-competitions-section]' };
+type Kind = 'standout' | 'comps';
+const MARK: Record<Kind, string> = { standout: '[data-standout-section]', comps: '[data-competitions-section]' };
 function mount(kind: Kind) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const el = (scope: 'everyone' | 'circle') => {
     const filters = { ...DEFAULT_FILTERS, scope } as never;
     const body = kind === 'standout' ? <StandoutRounds viewerId="v" filters={filters} enabled onRowPress={() => {}} />
-      : kind === 'just' ? <JustPlayed viewerId="v" filters={filters} enabled onRowPress={() => {}} />
       : <CompetitionBoards viewerId="v" scope={scope as never} enabled onRowPress={() => {}} />;
     return <MemoryRouter><QueryClientProvider client={client}><I18nextProvider i18n={i18n}>{body}</I18nextProvider></QueryClientProvider></MemoryRouter>;
   };
@@ -46,7 +44,7 @@ function mount(kind: Kind) {
 
 beforeEach(() => { f.rpc.mockReset(); });
 
-describe.each(['standout', 'just', 'comps'] as const)('CB28 held frame: %s', (kind) => {
+describe.each(['standout', 'comps'] as const)('CB28 held frame: %s', (kind) => {
   it('a filter change while rows are showing does not unmount the section', async () => {
     f.rpc.mockImplementation(() => ok(3));
     const view = mount(kind);

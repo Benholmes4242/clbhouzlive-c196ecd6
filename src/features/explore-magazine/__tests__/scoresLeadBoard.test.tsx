@@ -92,7 +92,7 @@ describe('Board rail (Phase 1, absorbs the retired BoardPicker tests)', () => {
 });
 
 /* EX1b — the lead board left the page; these guard the same behaviour where it
-   still ships: BoardSeeAllSheet, the sheet Just played opens. */
+   still ships: BoardSeeAllSheet, the sheet Leaderboards' See all opens. */
 async function sheet(board: BoardKey, rows: BoardRow[]) {
   rpcRows.current = rows;
   render(<BoardSeeAllSheet open onClose={vi.fn()} userId="viewer" board={board} filters={DEFAULT_FILTERS} appliedParts={[]} />);

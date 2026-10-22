@@ -8,7 +8,6 @@ import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { StandoutRounds, type RoundPressTarget } from '@/components/explore-tab-new/courseled/StandoutRounds';
 import { CompetitionBoards } from '@/components/explore-tab-new/courseled/CompetitionBoards';
-import { JustPlayed } from '@/components/explore-tab-new/courseled/JustPlayed';
 import { MemberAvatar } from '@/components/explore-tab-new/courseled/MemberAvatar';
 import { SEASON_ROW_METRICS } from '@/components/explore-tab-new/courseled/rowMetrics';
 import { BoardSeeAllSheet } from '@/components/explore-tab-new/courseled/BoardSeeAllSheet';
@@ -57,15 +56,14 @@ export const ROW_VALUE_SIZE = SEASON_ROW_METRICS.figureSize;
  * THE ROUNDS PAGE (BRIEF — THE LEADERBOARDS PAGE, structure A; EX1).
  *
  * EVERY SECTION ANSWERS A DIFFERENT QUESTION. Scope governs Standout rounds,
- * Competitions, Just played and CB27's remounted Leaderboards only.
+ * Competitions and CB27's remounted Leaderboards only.
  * Sections, in order: head
- * (scope chips), Standout rounds, Competitions, Just played, Leaderboards, §5 Feats this
+ * (scope chips), Standout rounds, Competitions, Leaderboards, §5 Feats this
  * year, §4 Most improved, §7 Top 100 — the three below are
  * platform facts. The order alternates section SHAPE (rows,
  * tiles, rows, carousel) so no two neighbours read alike; anything added
  * here is placed by its shape, not its subject. § numbers name sections, not
- * CB27 explicitly mandates adjacent Just played/Leaderboards rows as an exception;
- * retain that placement rather than moving a section to repair the shape rule.
+ * Just played was removed (founder decision, 2026-10-22); Leaderboards' Most recent board covers it.
  * positions. Each section owns its read, holds its
  * own height while pending, and renders NOTHING when its read fails or is empty.
  */
@@ -606,7 +604,6 @@ export function ScoresLeaderboardsPage({
           ) : null}
           <StandoutRounds viewerId={userId} filters={state.filters} enabled={state.ready} onRowPress={onRowPress} />
           <CompetitionBoards viewerId={userId} scope={state.filters.scope} enabled={state.ready} onRowPress={onRowPress} />
-          <JustPlayed viewerId={userId} filters={state.filters} enabled={state.ready} onRowPress={onRowPress} />
           <LeaderboardsSection state={state} viewerId={userId} onRowPress={onRowPress}
             onSeeAll={(board) => setSeeAll({ board, filters: state.filters })} />
         </>
