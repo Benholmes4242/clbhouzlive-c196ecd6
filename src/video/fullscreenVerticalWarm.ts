@@ -71,7 +71,7 @@ export function warmVerticalNeighbour(post: FeedPost | undefined | null): Vertic
   try {
     if (VideoEngine.isSaveDataGated()) return 'noop:save-data';
   } catch { return 'failed:engine'; }
-  const m = post.mediaItems?.[0] as (FeedPost['mediaItems'][number] & { hlsUrl?: string }) | undefined;
+  const m = post.mediaItems?.[0];
   if (!m || m.type !== 'video') return 'noop:not-video';
   const hlsUrl = m.hlsUrl;
   if (!hlsUrl || hlsUrl.startsWith('blob:')) return 'noop:no-hls-url';

@@ -73,6 +73,7 @@ import { coldOpenRevealSample, coldOpenIsActive } from '@/perf/coldOpen';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
+import { installVerticalWarmReturn, settleVertical, warmVerticalNeighbour } from '@/video/fullscreenVerticalWarm';
 import { RailLanePool } from '@/video/railLanePool';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import type { BorrowDescriptor } from '@/store/fullscreenFeedStore';
@@ -281,6 +282,28 @@ export function FullscreenFeedOverlay() {
   const borrowRef = useRef<BorrowDescriptor | null>(null);
   useEffect(() => { borrowRef.current = borrow; }, [borrow]);
 
+
+  // ── CB53 vertical decoder warm ──
+  // On open, warm the next post down on a lent feed lane; on every settle,
+  // swap it in when it holds the settled post (before activeIndex moves, so
+  // the new slide's 'fullscreen' load is an alreadyLoaded no-op), then warm
+  // the neighbour in the direction just swiped. Return happens on the close
+  // flip inside the module, before feed cards rebind.
+  useEffect(() => { installVerticalWarmReturn(); }, []);
+  useEffect(() => {
+    if (!isOpen) return;
+    const s = useFullscreenFeedStore.getState();
+    warmVerticalNeighbour(s.posts[s.startIndex + 1]);
+  }, [isOpen]);
+  const handleActiveIndexChange = useCallback((idx: number) => {
+    const s = useFullscreenFeedStore.getState();
+    const prev = s.activeIndex;
+    if (idx === prev) { setActiveIndex(idx); return; }
+    settleVertical(s.posts[idx]);
+    setActiveIndex(idx);
+    const dir = idx > prev ? 1 : -1;
+    warmVerticalNeighbour(useFullscreenFeedStore.getState().posts[idx + dir]);
+  }, [setActiveIndex]);
 
   // ── Swipe-away demotion (A1c: borrow is a one-shot property of the tap) ──
   // When the user swipes vertically off the opening slide, unmount the
@@ -986,7 +1009,7 @@ export function FullscreenFeedOverlay() {
                     onFollowChange={handleSnapFollowChange}
                     onFirstFrameReady={handleSnapFeedFirstFrame}
                     startIndex={startIndex}
-                    onActiveIndexChange={setActiveIndex}
+                    onActiveIndexChange={handleActiveIndexChange}
                     activeIndexOverride={activeIndex}
                     isFullscreen
                     surface="fullscreen"
