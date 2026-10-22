@@ -50,7 +50,8 @@ import { applyStartLevel, bandwidthSeed, upshiftForSurface, viewportPixelHeight,
 
 import { coldOpenAttach, coldOpenFirstFrame } from '@/perf/coldOpen';
 import { trace, traceLookup, elIdOf, traceGenElId } from '@/perf/trace';
-import { feedLaneRoles } from './feedLaneRoles';
+import { trackAudioBlock, type AudioBlockTrigger } from './audioBlockAnalytics';
+import { feedLaneRoles, type FeedRole } from './feedLaneRoles';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { audioDebugEnabled, logAudio, msSinceOpen, getEntries } from '@/perf/audioDebug';
 import { getLastCloseSnapshot } from '@/perf/positionContinuity';
@@ -131,6 +132,7 @@ export interface LaneSnapshot {
   duration: number;
   muted: boolean;
   firstFrame: boolean;
+  audioBlocked: boolean;
   /** RAW lane.postId — may be a bare postId or an ownerKey (`${postId}:${idx}`)
    *  depending on which entry point wrote last. Consumers should handle both
    *  shapes (exact match OR `${postId}:` prefix). Do NOT normalize here. */
@@ -299,14 +301,95 @@ class VideoEngineImpl {
   private driftCheckIv: number | null = null;
 
 
-  /**
-   * Autoplay-blocked signal — fires when a 'session' lane's unmuted play()
-   * is rejected by the browser and we degrade THIS lane to muted so playback
-   * continues. Consumers (feed slide, fullscreen overlay) show a
-   * "Tap for sound" pill in response. We deliberately do NOT write the
-   * session store here — the user's session intent stays "unmuted"; the
-   * pill's tap re-asserts it with a fresh user gesture.
+  /** CB48: sole blocked-sound authority. Only a gesture clears refusals.
+   * The 1000ms owner-bound unmute window covers WebKit's next-task pause,
+   * without attributing later buffering or ordinary pauses to sound denial.
+   * Engine pause paths disarm it BEFORE calling element.pause().
    */
+  private blockedLanes = new Set<LaneId>();
+  private blockedListeners = new Set<() => void>();
+  private unmuteAttempts = new Map<LaneId, { at: number; owner: string | null; trigger: AudioBlockTrigger }>();
+  private returnIntent = new Map<LaneId, string | null>();
+  private resumeOwners = new Map<LaneId, string | null>();
+  private gestureDepth = 0;
+
+  isAudioBlocked(laneId: LaneId): boolean { return this.blockedLanes.has(laneId); }
+  subscribeAudioBlocked(fn: () => void): () => void {
+    this.blockedListeners.add(fn);
+    return () => this.blockedListeners.delete(fn);
+  }
+  private notifyBlocked(): void {
+    this.blockedListeners.forEach((fn) => { try { fn(); } catch {} });
+  }
+  private audioSurface(lane: Lane): string {
+    // Borrowed feed/rail lanes report the actual fullscreen surface, not
+    // their physical lane family. Inline profile vs Clubhouse follows route.
+    if (useFullscreenFeedStore.getState().isOpen &&
+        (this.borrowedLanes.has(lane.id) || isFullscreenLane(lane.id))) return 'fullscreen';
+    if (lane.id.startsWith('rail-')) return 'rail';
+    return typeof location !== 'undefined' && /\/(profile|business)(\/|$)/.test(location.pathname) ? 'profile' : 'clubhouse';
+  }
+  private blockAudio(lane: Lane, trigger: AudioBlockTrigger): void {
+    this.unmuteAttempts.delete(lane.id);
+    this.resumeOwners.delete(lane.id);
+    if (!this.blockedLanes.has(lane.id)) {
+      this.blockedLanes.add(lane.id);
+      trackAudioBlock('video_audio_blocked', lane.id, lane.postId, this.audioSurface(lane), trigger);
+      this.notifyBlocked();
+      this.emitAutoplayBlocked(lane.id);
+    }
+    lane.el.muted = true;
+    this.emit(lane);
+    this.reconcileAudio('speaker-blocked');
+    if (lane.wantPlay && lane.mountedHost) void this.attemptPlay(lane, trigger);
+  }
+
+  /** Called synchronously from speaker taps/session unmute, never effects.
+   * Clear all blocked lanes, but rescue only the normal resolver's speaker:
+   * ONE_UNMUTED_LANE and duck/fullscreen/focus precedence remain authoritative.
+   */
+  unblockFromGesture(): void {
+    const rescued = new Set(this.blockedLanes);
+    this.blockedLanes.clear();
+    this.gestureDepth++;
+    try {
+      this.reconcileAudio('gesture-unblock');
+      const speaker = this.resolveSpeaker().speaker;
+      const lane = speaker ? this.lanes.get(speaker) : null;
+      if (lane && rescued.has(lane.id) && lane.wantPlay && lane.mountedHost) {
+        const owner = lane.postId;
+        const surface = this.audioSurface(lane);
+        void this.attemptPlay(lane, 'autoplay').then(() => {
+          if (lane.postId === owner && !lane.el.muted && !lane.el.paused && !this.isAudioBlocked(lane.id)) {
+            trackAudioBlock('video_audio_unblocked', lane.id, owner, surface);
+          }
+        });
+      }
+    } finally {
+      this.gestureDepth--;
+      rescued.forEach((id) => { const lane = this.lanes.get(id); if (lane) this.emit(lane); });
+      this.notifyBlocked();
+    }
+  }
+
+  /** Every engine-issued play uses the same owner-bound refusal fallback.
+   * Stale promises cannot block a recycled lane or restart a deliberate pause.
+   */
+  private attemptPlay(lane: Lane, trigger: AudioBlockTrigger = 'autoplay'): Promise<void> {
+    const owner = lane.postId;
+    const unmuted = !lane.el.muted;
+    const actualTrigger = this.resumeOwners.get(lane.id) === owner && this.resumeOwners.has(lane.id) ? 'resume' : trigger;
+    let result: Promise<void> | undefined;
+    try { result = lane.el.play(); } catch (error) { result = Promise.reject(error); }
+    return Promise.resolve(result).catch(() => {
+      if (lane.postId !== owner || !lane.wantPlay || !lane.mountedHost) return;
+      if (unmuted && (lane.audioPolicy === 'session' || this.borrowedLanes.has(lane.id))) {
+        this.blockAudio(lane, actualTrigger);
+      }
+    });
+  }
+
+  /** Legacy signal retained for existing subscribers; state lives only above. */
   private autoplayBlockedListeners = new Set<(laneId: LaneId) => void>();
 
   onAutoplayBlocked(fn: (laneId: LaneId) => void): () => void {
@@ -438,7 +521,8 @@ class VideoEngineImpl {
 
   /** v9: session mute/unmute → reconcile. */
   private onSessionAudioChange = (): void => {
-    this.reconcileAudio('session-change');
+    if (!useSessionAudio.getState().isMuted) this.unblockFromGesture();
+    else this.reconcileAudio('session-change');
   };
 
   /** Sheet ducking → reconcile. Non-empty duck set forces silence. */
@@ -449,16 +533,16 @@ class VideoEngineImpl {
   /**
    * v10 audio-focus registry — the reconciler's single non-fullscreen input.
    * Feed surfaces (SnapFeed on active-slide settle) and rail surfaces
-   * (useRailLane on lane acquisition) register the lane that owns audio.
+   * (useRailLane on lane acquisition) register the ROLE 'active' (CB48), resolved at every reconcile, or a physical lane for the close handoff.
    * Last write wins. `null` clears focus (silence unless the fullscreen
    * branch resolves a speaker).
    */
-  private audioFocus: { laneId: LaneId | null; source: string | null } = {
+  private audioFocus: { laneId: LaneId | FeedRole | null; source: string | null } = {
     laneId: null,
     source: null,
   };
 
-  setAudioFocus(laneId: LaneId | null, source: string): void {
+  setAudioFocus(laneId: LaneId | FeedRole | null, source: string): void {
     const prev = this.audioFocus;
     if (prev.laneId === laneId && prev.source === source) return;
     this.audioFocus = { laneId, source };
@@ -474,14 +558,30 @@ class VideoEngineImpl {
     this.reconcileAudio('focus-change');
   }
 
-  getAudioFocus(): { laneId: LaneId | null; source: string | null } {
+  getAudioFocus(): { laneId: LaneId | FeedRole | null; source: string | null } {
     return this.audioFocus;
   }
 
 
   private onVisibility = () => {
     if (typeof document === 'undefined') return;
-    if (document.hidden) this.pauseAll();
+    if (document.hidden) {
+      // Snapshot BEFORE pauseAll drops intent. A deliberate pause is absent.
+      this.lanes.forEach((lane) => {
+        if (lane.wantPlay && lane.mountedHost) this.returnIntent.set(lane.id, lane.postId);
+      });
+      this.pauseAll();
+    } else {
+      const recorded = new Map(this.returnIntent);
+      this.returnIntent.clear();
+      recorded.forEach((owner, id) => {
+        const lane = this.lanes.get(id);
+        if (!lane || !lane.mountedHost || lane.postId !== owner) return;
+        this.resumeOwners.set(id, owner);
+        void this.play(id);
+      });
+      this.reconcileAudio('visibility-resume');
+    }
   };
 
   private getLane(laneId: LaneId): Lane {
@@ -565,7 +665,7 @@ class VideoEngineImpl {
     // If play-intent is set (from a pre-mount play() or a still-loading source),
     // kick it off now — wantPlay persists through source changes.
     if (lane.wantPlay && lane.el.paused) {
-      const p = lane.el.play();
+      const p = this.attemptPlay(lane);
       if (p && typeof (p as Promise<void>).catch === 'function') {
         (p as Promise<void>).catch(() => { /* autoplay reject — safe */ });
       }
@@ -680,6 +780,9 @@ class VideoEngineImpl {
     lane.mountedHost = null;
     // The lane detached — any pending same-element-return hint is stale.
     this.sameElementReturn.delete(laneId);
+    this.returnIntent.delete(lane.id);
+    this.resumeOwners.delete(lane.id);
+    this.unmuteAttempts.delete(lane.id);
     lane.wantPlay = false;
     if (laneId === 'fullscreen') {
       this.resetFirstFrameForLane(lane, 'unmount');
@@ -779,6 +882,8 @@ class VideoEngineImpl {
     }
 
 
+    this.unmuteAttempts.delete(lane.id);
+    this.resumeOwners.delete(lane.id);
     lane.postId = postId;
 
 
@@ -1052,6 +1157,7 @@ class VideoEngineImpl {
     if (lane.hls && laneId.startsWith('feed-')) {
       try { lane.hls.config.maxBufferLength = FEED_PRELOAD_MAX_BUFFER_S; } catch { /* noop */ }
     }
+    this.unmuteAttempts.delete(lane.id);
     if (!lane.el.paused) lane.el.pause();
   }
 
@@ -1154,7 +1260,7 @@ class VideoEngineImpl {
           vperfSessionSuppressNextStall(lane.id);
           vperfArmLane(lane.id, { spanId: gapId, endOn: 'playing' });
           try { lane.el.currentTime = 0; } catch { /* noop */ }
-          const p = lane.el.play();
+          const p = this.attemptPlay(lane);
           if (p && typeof (p as Promise<void>).catch === 'function') {
             (p as Promise<void>).catch(() => { /* autoplay reject — safe */ });
           }
@@ -1192,6 +1298,12 @@ class VideoEngineImpl {
       this.transition(lane, 'playing');
     };
     const onPause = () => {
+      const attempt = this.unmuteAttempts.get(lane.id);
+      if (attempt && attempt.owner === lane.postId && Date.now() - attempt.at <= 1000 &&
+          lane.el.paused && lane.wantPlay && lane.mountedHost && !lane.el.muted && !document.hidden) {
+        this.blockAudio(lane, attempt.trigger);
+        return;
+      }
       if (lane.state !== 'error') this.transition(lane, 'paused');
       // Only emit sessions for real pauses (not the borrow guard's suppressed pauses).
       if (!lane.el.paused) return;
@@ -1210,7 +1322,7 @@ class VideoEngineImpl {
         // hls.js: get segment 0 in flight before the seek lands.
         if (lane.hls) { try { lane.hls.startLoad(0); } catch { /* noop */ } }
         try { lane.el.currentTime = 0; } catch { /* noop */ }
-        const p = lane.el.play();
+        const p = this.attemptPlay(lane);
         if (p && typeof (p as Promise<void>).catch === 'function') {
           (p as Promise<void>).catch(() => { /* autoplay reject — safe */ });
         }
@@ -1231,7 +1343,7 @@ class VideoEngineImpl {
       // Honor persistent play-intent: if play() was called before/while the
       // (new) source was loading, kick it off now that it's ready.
       if (lane.wantPlay && lane.mountedHost && lane.el.paused) {
-        const p = lane.el.play();
+        const p = this.attemptPlay(lane);
         if (p && typeof (p as Promise<void>).catch === 'function') {
           (p as Promise<void>).catch(() => { /* autoplay reject — safe */ });
         }
@@ -1326,30 +1438,14 @@ class VideoEngineImpl {
     // so the card sits on its poster until the viewer opens fullscreen.
     // Re-assert intent a few times while it is still wanted.
     this.armPlayWatchdog(laneId);
-    const p = lane.el.play();
-    return Promise.resolve(p).catch((err) => {
-      DBG(laneId, 'play() rejected', err);
-      // Unmuted-rejection fallback for 'session' lanes: WebKit rejects
-      // unmuted autoplay in cold contexts. Degrade THIS lane to muted so
-      // playback continues, and signal the pill layer. Do NOT touch the
-      // session store — the pill's tap re-asserts unmute with a gesture.
-      if (!lane.el.muted && lane.audioPolicy === 'session') {
-        lane.el.muted = true;
-        const p2 = lane.el.play();
-        Promise.resolve(p2).catch(() => { /* muted retry rejected — safe */ });
-        this.emitAutoplayBlocked(lane.id);
-        return;
-      }
-      // Belt-and-braces retry: muted lanes rarely reject, but one deferred
-      // retry removes the stuck-paused edge case where an autoplay-policy
-      // rejection would otherwise leave wantPlay=true with no recovery.
+    const owner = lane.postId;
+    return this.attemptPlay(lane).then(() => {
+      // Preserve the existing bounded 250ms muted retry, never stale ownership.
+      if (lane.postId !== owner || !lane.wantPlay || !lane.mountedHost || !lane.el.paused || !lane.el.muted) return;
       setTimeout(() => {
-        const cur = this.getLane(laneId);
-        if (!cur.wantPlay || !cur.mountedHost || !cur.el.paused) return;
-        try {
-          const p2 = cur.el.play();
-          Promise.resolve(p2).catch(() => { /* retry rejected — safe */ });
-        } catch {}
+        const cur = this.lanes.get(laneId);
+        if (!cur || cur.postId !== owner || !cur.wantPlay || !cur.mountedHost || !cur.el.paused) return;
+        void this.attemptPlay(cur);
       }, 250);
     });
   }
@@ -1370,7 +1466,7 @@ class VideoEngineImpl {
         if (typeof document !== 'undefined' && document.hidden) return;
         DBG(laneId, 'play.watchdog.retry', { delay: d, readyState: cur.el.readyState });
         try {
-          const p = cur.el.play();
+          const p = this.attemptPlay(cur);
           Promise.resolve(p).catch(() => { /* retry rejected — safe */ });
         } catch { /* noop */ }
       }, d),
@@ -1440,8 +1536,12 @@ class VideoEngineImpl {
     if (caller != null && lane.postId != null && normPause(caller) !== normPause(lane.postId)) {
       return;
     }
+    this.returnIntent.delete(lane.id);
+    this.resumeOwners.delete(lane.id);
+    this.unmuteAttempts.delete(lane.id);
     lane.wantPlay = false;
     this.clearPlayWatchdog(laneId);
+    this.unmuteAttempts.delete(lane.id);
     if (!lane.el.paused) lane.el.pause();
   }
 
@@ -1456,8 +1556,11 @@ class VideoEngineImpl {
           this.lastPos.set(lane.postId, t);
         }
       }
-      lane.wantPlay = false;
-      if (!lane.el.paused) lane.el.pause();
+      this.resumeOwners.delete(lane.id);
+    this.unmuteAttempts.delete(lane.id);
+    lane.wantPlay = false;
+      this.unmuteAttempts.delete(lane.id);
+    if (!lane.el.paused) lane.el.pause();
       this.emit(lane);
     });
   }
@@ -1506,7 +1609,7 @@ class VideoEngineImpl {
    * if any, is unmuted. 'always-muted' stays muted; 'local' is left alone.
    * This is the single writer for session-lane mute state.
    */
-  private reconcileAudio(reason: string): void {
+  private resolveSpeaker() {
     const sessionMuted = useSessionAudio.getState().isMuted;
     const fs = useFullscreenFeedStore.getState();
     const fsOpen = !!fs.isOpen;
@@ -1552,7 +1655,8 @@ class VideoEngineImpl {
       // v10: audio-focus registry replaces the role-map read. Feed and rail
       // surfaces register their active lane on settle; the reconciler picks
       // that lane (subject to per-lane eligibility) as the speaker.
-      const focusLaneId = this.audioFocus.laneId;
+      const focus = this.audioFocus.laneId;
+      const focusLaneId = focus === 'active' || focus === 'next' || focus === 'prev' ? feedLaneRoles.laneForRole(focus) : focus;
       if (!focusLaneId) {
         branch = 'none';
         whyNone = 'no-audio-focus';
@@ -1577,6 +1681,15 @@ class VideoEngineImpl {
       }
     }
 
+    if (speaker && this.blockedLanes.has(speaker)) {
+      speaker = null;
+      whyNone = 'speaker-blocked';
+    }
+    return { speaker, branch, whyNone, sessionMuted, fsOpen, borrowLaneId };
+  }
+
+  private reconcileAudio(reason: string): void {
+    const { speaker, branch, whyNone, sessionMuted, fsOpen, borrowLaneId } = this.resolveSpeaker();
     // Detect drift BEFORE we write, so the forensic snapshot captures the
     // divergent world we're about to correct.
     const changes: Array<{ laneId: LaneId; from: boolean; to: boolean; policy: LaneAudioPolicy }> = [];
@@ -1648,7 +1761,17 @@ class VideoEngineImpl {
     changes.forEach((c) => {
       if (c.to === false) {
         const lane = this.lanes.get(c.laneId);
-        if (lane) { lane.el.muted = false; this.emit(lane); }
+        if (lane) {
+          // WebKit may pause instead of rejecting an automatic unmute.
+          const inGesture = this.gestureDepth > 0 || (typeof navigator !== 'undefined' && navigator.userActivation?.isActive);
+          if (!inGesture) this.unmuteAttempts.set(lane.id, {
+            at: Date.now(), owner: lane.postId,
+            trigger: this.resumeOwners.has(lane.id) ? 'resume' : 'unmute',
+          });
+          else this.unmuteAttempts.delete(lane.id);
+          lane.el.muted = false;
+          this.emit(lane);
+        }
       }
     });
   }
@@ -1728,36 +1851,7 @@ class VideoEngineImpl {
           const fs = useFullscreenFeedStore.getState();
           const fsOpen = !!fs.isOpen;
           const borrowLaneId: LaneId | null = (fs.borrow?.laneId ?? null) as LaneId | null;
-          // Recompute the resolution INDEPENDENTLY of reconcileAudio so the
-          // heartbeat log is decoupled from reconcile's exit path (noop
-          // reconciles no longer hide the decision).
-          let speaker: LaneId | null = null;
-          let branch: 'session-muted' | 'borrow' | 'active-role' | 'fullscreen-solo' | 'none' = 'none';
-          let whyNone: string | null = null;
-          if (sessionMuted) { branch = 'none'; whyNone = 'session-muted'; }
-          else if (fsOpen) {
-            if (borrowLaneId) {
-              if (this.lanes.has(borrowLaneId)) { speaker = borrowLaneId; branch = 'borrow'; }
-              else { branch = 'none'; whyNone = 'overlay-borrow-lane-unmounted'; }
-            } else {
-              const fsLane = this.lanes.get('fullscreen');
-              if (!fsLane) { branch = 'none'; whyNone = 'overlay-fullscreen-lane-missing'; }
-              else if (!fsLane.wantPlay) { branch = 'none'; whyNone = 'overlay-fullscreen-not-want-play'; }
-              else { speaker = 'fullscreen'; branch = 'fullscreen-solo'; }
-            }
-          } else {
-            let activeLaneId: LaneId | null = null;
-            try { activeLaneId = feedLaneRoles.laneForRole('active'); } catch { /* noop */ }
-            if (!activeLaneId) { branch = 'none'; whyNone = 'no-active-role-assigned'; }
-            else {
-              const l = this.lanes.get(activeLaneId);
-              if (!l) { branch = 'none'; whyNone = 'role-lane-unmounted'; }
-              else if (!l.el) { branch = 'none'; whyNone = 'role-lane-no-el'; }
-              else if (l.audioPolicy === 'always-muted') { branch = 'none'; whyNone = 'role-lane-always-muted'; }
-              else if (!l.wantPlay) { branch = 'none'; whyNone = 'role-lane-not-want-play'; }
-              else { speaker = activeLaneId; branch = 'active-role'; }
-            }
-          }
+          const { speaker, branch, whyNone } = this.resolveSpeaker();
           const visiblePlayingLanes = this.computeVisiblePlayingLanes();
           // MISMATCH: a lane ≥50% visible, playing, session unmuted, and
           // NOT the speaker. v11: exclude always-muted-policy lanes — silent
@@ -1814,7 +1908,7 @@ class VideoEngineImpl {
         }
       });
     }
-    lane.el.muted = muted;
+    lane.el.muted = muted || this.blockedLanes.has(laneId);
     this.emit(lane);
     logAudio('setMuted.exit', {
       laneId, desired: muted, trigger, oneUnmutedEnforcedOn: enforcedOn,
@@ -1892,6 +1986,16 @@ class VideoEngineImpl {
     const lb = this.getLane(b);
     const la2 = la.listeners;
     const lb2 = lb.listeners;
+    const blockedA = this.blockedLanes.has(a);
+    const blockedB = this.blockedLanes.has(b);
+    if (blockedA !== blockedB) {
+      this.blockedLanes.delete(blockedA ? a : b);
+      this.blockedLanes.add(blockedA ? b : a);
+    }
+    this.unmuteAttempts.delete(a);
+    this.unmuteAttempts.delete(b);
+    this.resumeOwners.delete(a);
+    this.resumeOwners.delete(b);
     // Objects swap slots; ids and listener sets stay with the slot.
     la.id = b; la.listeners = lb2; la.el.dataset.laneId = b;
     lb.id = a; lb.listeners = la2; lb.el.dataset.laneId = a;
@@ -1912,6 +2016,7 @@ class VideoEngineImpl {
     la.wantPlay = false;
     this.clearPlayWatchdog(a);
     this.clearPlayWatchdog(b);
+    this.unmuteAttempts.delete(la.id);
     if (!la.el.paused) la.el.pause();
     const host = ensureHiddenHost();
     if (la.el.parentElement !== host) host.appendChild(la.el);
@@ -1921,6 +2026,7 @@ class VideoEngineImpl {
     if (lb.hls) { try { lb.hls.config.maxBufferLength = HLS_CONFIG.maxBufferLength; } catch { /* noop */ } }
     this.emit(lb);
     this.emit(la);
+    this.notifyBlocked();
     this.reconcileAudio('lane-swap');
     DBG('swapLanes', { a, b, aPostId: lb.postId, bPostId: la.postId });
     return true;
@@ -1944,6 +2050,9 @@ class VideoEngineImpl {
     lane.detachFns = [];
     lane.hlsUrl = null;
     this.resetFirstFrameForLane(lane, 'release');
+    this.returnIntent.delete(lane.id);
+    this.resumeOwners.delete(lane.id);
+    this.unmuteAttempts.delete(lane.id);
     lane.wantPlay = false;
     this.transition(lane, 'idle');
     DBG(laneId, 'released');
@@ -1958,6 +2067,7 @@ class VideoEngineImpl {
       readyState: lane.el.readyState,
       duration: isFinite(lane.el.duration) ? lane.el.duration : 0,
       muted: lane.el.muted,
+      audioBlocked: this.blockedLanes.has(laneId),
       firstFrame: lane.firstFrame,
       postId: lane.postId,
       endedCount: lane.endedCount,
