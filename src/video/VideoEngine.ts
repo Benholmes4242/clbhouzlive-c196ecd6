@@ -2065,6 +2065,17 @@ class VideoEngineImpl {
     return this.lanes.has(laneId);
   }
 
+  /** CB53 read-only accessors for the fullscreen vertical warm (lent feed lane). */
+  isSaveDataGated(): boolean {
+    return this.saveDataGated;
+  }
+  getAudioPolicy(laneId: LaneId): LaneAudioPolicy {
+    return this.getLane(laneId).audioPolicy;
+  }
+  mountedHostOf(laneId: LaneId): HTMLElement | null {
+    return this.getLane(laneId).mountedHost ?? null;
+  }
+
   /**
    * BRIEF_FULLSCREEN_PAGER_NEIGHBOUR_WARM §3 — exchange two lanes IN PLACE.
    * The decoded element, its hls instance and every piece of per-source state
