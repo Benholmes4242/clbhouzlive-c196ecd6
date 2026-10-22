@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useCallback, useState, useMemo } from 'react';
+import { wasVerticalSettleWarmed } from '@/video/fullscreenVerticalWarm';
 import { useLocation } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { FeedSlide } from './FeedSlide';
@@ -291,7 +292,9 @@ export function SnapFeed({
     let swipeSpanId: string | null = null;
     if (mediaType === 'video') {
       swipeSpanId = vperfNextId(`swipe.vertical:${post.id}`);
-      vperfStart(swipeSpanId, 'swipe.vertical', { postId: post.id, activeIndex, surface });
+      // CB53 — warmed: the viewer swapped a decoded lent feed lane in.
+      const warmed = surface === 'fullscreen' && wasVerticalSettleWarmed(post.id);
+      vperfStart(swipeSpanId, 'swipe.vertical', { postId: post.id, activeIndex, surface, warmed });
       vperfArmLane(armLane, { spanId: swipeSpanId, endOn: 'firstFrame', phase: 'firstFrame' });
       vperfArmLane(armLane, { spanId: swipeSpanId, endOn: 'playing', phase: 'playing' });
       let snap: ReturnType<typeof VideoEngine.snapshot> | null = null;
