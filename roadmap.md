@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB57 — Tour hero board removals and tie brackets
+- [x] Baseline `bunx vitest run`: 2,224 passed /302 files /0 failures. CB56 added five tests/one file since 2,219/301; no pre-existing failures. Git pull skipped: workspace Git is platform-managed.
+- [ ] Remove specified separator, next-round and action rows; share position-cell brackets, retain cap and protected helpers/locales/tee-alert code.
+- [ ] Validate full suite/harness and controlled three-phase heights/bracket coordinates; report remaining rules and navigation. No SQL/migrations/RPC/edge/feed_config/native changes; cap 30.
+
 ## CB50.1 — Finish monitor value snapshots and borrow fixture
 - [x] Record brief: copy reader values in start/progress; complete authorized BorrowDescriptor fixture without assertions/casts; audit fullscreen layer and change only spinner z-index if needed. Freeze signed-off spinner, timing, event/caps, CB48/49, preview/legacy/native.
 - [x] Full `bunx vitest run`: 2,162 passed /293 files /0 failures, from 2,158 passed/four failed with identical inventory. Four untouched cb50Buffering.test.ts cases at lines 24,28,32,47 now pass; engine fixture assertion/name unchanged; no test added/deleted/renamed/rewritten.
