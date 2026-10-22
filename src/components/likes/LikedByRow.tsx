@@ -54,8 +54,8 @@ export interface LikedByRowProps {
    */
   surfaceColor?: string;
   /** How the overlapping avatars are ringed. 'surface' rings them in
-   *  surfaceColor (a card or sheet ground). 'media' rings them in scrim and
-   *  adds the on-media drop shadow, for chrome over a photo or video.
+   *  surfaceColor (a card or sheet ground). 'media' has no outer ring; hairline
+   *  edge plus the on-media drop shadow, matching the fullscreen author avatar.
    *  'none' draws no avatars at all. */
   avatarRing?: 'surface' | 'media' | 'none';
   source?: LikeSource;
@@ -217,10 +217,10 @@ export function LikedByRow({
           >
             {Array.from({ length: isLoading ? Math.min(count, 3) : Math.min(likers.length, Math.min(count, 3)) }, (_, i) => {
               const liker = likers[i];
-              /* OUTER ring (surfaceColor) separates disc from disc; the INNER
-                 hairline (SquircleAvatar hairlineRing) gives each disc an edge on
-                 any ground. Not interchangeable — keep both. No overflow clip:
-                 it would cut the hairline overlay. */
+              /* OUTER ring (surfaceColor) separates disc from disc on a 'surface'
+                 ground only; the INNER hairline (SquircleAvatar hairlineRing)
+                 gives each disc an edge on any ground. Not interchangeable — keep
+                 both. No overflow clip: it would cut the hairline overlay. */
               const slot: React.CSSProperties = {
                 position: 'absolute',
                 top: 0,
@@ -229,7 +229,7 @@ export function LikedByRow({
                 height: 20,
                 flex: 'none',
                 borderRadius: '34%',
-                boxShadow: `0 0 0 1.5px ${avatarRing === 'media' ? 'rgba(0,0,0,0.55)' : surfaceColor}`,
+                ...(avatarRing === 'surface' ? { boxShadow: `0 0 0 1.5px ${surfaceColor}` } : null),
                 zIndex: 3 - i,
               };
               if (!liker) {
@@ -239,7 +239,9 @@ export function LikedByRow({
                     style={{
                       ...slot,
                       background: getAvatarFallbackGradient(null),
-                      boxShadow: `${slot.boxShadow}, inset 0 0 0 1px rgba(255,255,255,0.22)`,
+                      boxShadow: slot.boxShadow
+                        ? `${slot.boxShadow}, inset 0 0 0 1px rgba(255,255,255,0.22)`
+                        : 'inset 0 0 0 1px rgba(255,255,255,0.22)',
                     }}
                   />
                 );

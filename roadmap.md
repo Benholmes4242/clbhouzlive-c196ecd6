@@ -675,3 +675,6 @@
 
 ## Boards open on Most recent (BRIEF_BOARDS_DEFAULT_MOST_RECENT)
 - [x] ExploreMagazine's useAmateurBoardState call drops its 'net' initialBoard argument, so the visible board falls back to entryBoardFor() ('recent'); one-line comment added above the call. useAmateurBoardState.ts untouched. Suite 2,112 / 287 files / 0 failures; tsc clean.
+
+## Liked-by media avatars lose the outer ring (BRIEF_LIKED_BY_MEDIA_NO_RING)
+- [x] LikedByRow 'media' path: no outer boxShadow on the slots (surface-only), loading placeholder inset-only; hairline edge and the container's on-media drop shadow kept. 'surface' unchanged. Suite 2,112 / 287 / 0; tsc clean.
