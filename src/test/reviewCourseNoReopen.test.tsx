@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import type { CourseReview } from '@/hooks/useCourseReviews';
 
 const fixture = vi.hoisted(() => ({ rows: [] as CourseReview[], loading: false, closeFullscreen: vi.fn() }));
@@ -53,6 +54,7 @@ function highlighted() { return target()?.classList.contains('animate-soft-pulse
 
 beforeEach(() => {
   vi.useFakeTimers();
+  vi.spyOn(supabase, 'rpc').mockResolvedValue({ data: [], error: null, count: null, status: 200, statusText: 'OK' });
   fixture.rows = Array.from({ length: 10 }, (_, i) => row(`r${i}`));
   fixture.loading = false;
   fixture.closeFullscreen.mockClear();
@@ -66,7 +68,8 @@ afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks(); });
 describe('review COURSE navigation', () => {
   it.each(['r0', undefined])('closes both overlays in order without a sheet-opening URL (id=%s)', (reviewId) => {
     const close = vi.fn();
-    render(<MemoryRouter><ReviewBottomSheet isOpen onClose={close} user={{ id: 'member', name: 'Member' }} courseId="course" courseName="Course" rating={8} reviewId={reviewId} resolvedMedia={[]} resolvedReviewText="Review" /><LocationProbe /></MemoryRouter>);
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(<MemoryRouter><QueryClientProvider client={client}><ReviewBottomSheet isOpen onClose={close} user={{ id: 'member', name: 'Member' }} courseId="course" courseName="Course" rating={8} reviewId={reviewId} resolvedMedia={[]} resolvedReviewText="Review" /><LocationProbe /></QueryClientProvider></MemoryRouter>);
     const footer = document.querySelector('[data-review-foot-actions]');
     const courseButton = footer?.querySelectorAll('button')[0];
     expect(courseButton).toBeDefined();

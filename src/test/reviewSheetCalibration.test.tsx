@@ -1,7 +1,9 @@
 import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const stats = { current: null as null | { coursesRated: number; averageRating: number | null; memberSince: string | null } };
 vi.mock('@/hooks/useReviewerStats', () => ({ useReviewerStats: () => ({ data: stats.current }) }));
@@ -23,8 +25,10 @@ const AVGS = { avg_design_score: 8.6, avg_condition_score: 8.9, avg_clubhouse_sc
 
 function sheet(opts: { count: number; avg?: number | null; breakdown?: Record<string, number | null>; reviewerAvg?: number | null }) {
   stats.current = opts.reviewerAvg === undefined ? null : { coursesRated: 5, averageRating: opts.reviewerAvg, memberSince: '2026' };
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <MemoryRouter>
+      <QueryClientProvider client={client}>
       <ReviewBottomSheet
         isOpen
         onClose={() => {}}
@@ -40,13 +44,18 @@ function sheet(opts: { count: number; avg?: number | null; breakdown?: Record<st
         resolvedAggregate={{ avg_overall_score: opts.avg === undefined ? 8.7 : opts.avg, review_count: opts.count, ...AVGS }}
         onToggleReaction={() => {}}
       />
+      </QueryClientProvider>
     </MemoryRouter>,
   );
 }
 
 const q = (sel: string) => document.body.querySelectorAll(sel);
 
-beforeEach(() => { document.body.innerHTML = ''; });
+beforeEach(() => {
+  document.body.innerHTML = '';
+  vi.spyOn(supabase, 'rpc').mockResolvedValue({ data: [], error: null, count: null, status: 200, statusText: 'OK' });
+});
+afterEach(() => vi.restoreAllMocks());
 
 describe('calibration strip', () => {
   it('two cells with true-minus deviations when both figures exist', () => {
