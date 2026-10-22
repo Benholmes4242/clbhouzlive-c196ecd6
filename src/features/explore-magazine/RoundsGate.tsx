@@ -22,8 +22,7 @@
  * dismissal. The white text action and the sheet's foot both route to
  * /manage/handicap, the same destination as every other connect CTA (ERT1).
  *
- * CB14.1 — the sheet's reach line is two independent clauses, each rendered
- * only when its own list has a name to give it: see gateReachLine.
+ * The sheet shares the connect-page reach sentence through connectReach().
  *
  * CB15 — ScoresLeaderboardsPage mounts this component only for `gated`.
  * Reporting stays here: a ref latches the impression before track, surviving
@@ -40,7 +39,7 @@ import { SANS } from '@/components/explore-tab-new/courseled/tokens';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/button';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { WHS_COUNTRIES, getCountryById, type WhsCountry } from '@/lib/whs/whsCountries';
+import { connectReach } from '@/lib/whs/connectReach';
 import { EYEBROW } from './Section';
 import './roundsGate.css';
 
@@ -96,55 +95,10 @@ export type GateScope = 'circle' | 'club' | 'everyone';
 /** CB14 — the sheet's one outbound link. England is the only supported
  *  provider (whsCountries.ts), so it is the only route we can honour; the
  *  Scotland/Wales/Ireland links CB13 shipped were deleted because following
- *  them cannot end in a connectable handicap. "Join a club" has no link:
- *  there is no club finder we can verify beyond England. */
+ *  them cannot end in a connectable handicap. "Join a club" opens /courses. */
 const GATE_LINKS = {
   england: 'https://www.englandgolf.org/igolf',
 } as const;
-
-/** CB14 — the sheet's quiet truth line, derived from WHS_COUNTRIES rather
- *  than a fixed string, so it cannot drift the day a second provider
- *  launches. Returns the supported bodies' names (joined "A and B") and the
- *  unsupported home nations (Scotland, Wales, Ireland — comingSoon flags
- *  like France/US are launch partnerships, not home nations, and stay
- *  unmentioned). The sentence is assembled in the locale file from these
- *  two lists. */
-const HOME_NATION_IDS = ['gb-sct', 'gb-wls', 'ie'] as const;
-
-export function gateReach(): { supportedBodies: string[]; unsupportedHomeNations: string[] } {
-  const supportedBodies = WHS_COUNTRIES.filter((c) => c.supported).map((c) => c.body);
-  const unsupportedHomeNations = HOME_NATION_IDS.map((id) => getCountryById(id))
-    .filter((c): c is WhsCountry => c !== null && !c.supported)
-    .map((c) => c.name);
-  return { supportedBodies, unsupportedHomeNations };
-}
-
-/** "A, B and C" — the brief's phrasing for the home-nations list. */
-function andJoin(names: string[]): string {
-  return names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
-}
-
-/** CB14.1 — the sheet's reach line, built from two independent clauses.
- *  Each clause renders only when its own list has a name to give it: with
- *  every home nation supported, the second clause would otherwise print an
- *  empty subject ("… today.  aren't supported yet."), and with nothing
- *  connected the first clause would do the same. Both lists empty returns ''
- *  and the caller renders no element at all, so an empty line cannot take its
- *  margin. Two present clauses are joined by exactly one space. */
-export function gateReachLine(
-  supportedBodies: string[],
-  unsupportedHomeNations: string[],
-  t: (k: string, o?: Record<string, unknown>) => string,
-): string {
-  const clauses: string[] = [];
-  if (supportedBodies.length > 0) {
-    clauses.push(t('amateur.gate.sheetReachSupported', { supported: andJoin(supportedBodies) }));
-  }
-  if (unsupportedHomeNations.length > 0) {
-    clauses.push(t('amateur.gate.sheetReachUnsupported', { unsupported: andJoin(unsupportedHomeNations) }));
-  }
-  return clauses.join(' ');
-}
 
 function GateCard({ onConnect, onNoHandicap, roundCount, scope }: {
   onConnect: () => void; onNoHandicap: () => void; roundCount?: number | null; scope?: GateScope | null;
@@ -222,15 +176,12 @@ function GateCard({ onConnect, onNoHandicap, roundCount, scope }: {
 
 function GateSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation('courses');
+  const { t: tH } = useTranslation('handicap');
   const navigate = useNavigate();
-  const rows: { key: 'england' | 'club'; href: string | null }[] = [
+  const rows: ({ key: 'england' | 'club' } & ({ href: string; to?: never } | { to: string; href?: never }))[] = [
     { key: 'england', href: GATE_LINKS.england },
-    { key: 'club', href: null },
+    { key: 'club', to: '/courses' },
   ];
-  const { supportedBodies, unsupportedHomeNations } = gateReach();
-  /** CB14.1 — two independent clauses; '' when neither list has a name, and
-   *  then the element below is not rendered at all. */
-  const reachLine = gateReachLine(supportedBodies, unsupportedHomeNations, t);
   return (
     <BottomSheet open={open} onClose={onClose} ariaLabelledBy="rounds-gate-sheet-title">
       <div style={{ padding: '12px 20px 32px', fontFamily: SANS }}>
@@ -242,43 +193,36 @@ function GateSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
           {t('amateur.gate.sheetBody')}
         </div>
         <div style={{ marginTop: 16 }}>
-          {rows.map((r) => {
+          {rows.map((r, index) => {
             const body = (
               <>
                 <span style={{ flex: 1, minWidth: 0 }}>
                   <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, color: A.INK }}>{t(`amateur.gate.${r.key}`)}</span>
                   <span style={{ display: 'block', marginTop: 3, fontSize: 11.5, fontWeight: 600, lineHeight: 1.45, color: A.MUTE }}>{t(`amateur.gate.${r.key}Sub`)}</span>
                 </span>
-                {r.href ? <ChevronRight size={13} style={{ flex: 'none', color: A.MUTE }} /> : null}
+                <ChevronRight size={13} style={{ flex: 'none', color: A.MUTE }} />
               </>
             );
             const rowStyle: CSSProperties = {
               display: 'flex', alignItems: 'center', gap: 11, width: '100%',
-              padding: '11px 0', border: 0, borderBottom: `1px solid ${A.SOFT}`,
+              padding: '11px 0', border: 0, borderBottom: index === rows.length - 1 ? undefined : `1px solid ${A.SOFT}`,
               background: 'transparent', textAlign: 'left', fontFamily: SANS,
             };
-            return r.href ? (
-              <button key={r.key} type="button" onClick={() => {
+            return (
+              <Button variant="ghost" key={r.key} type="button" onClick={() => {
                 analyticsEvents.track('rounds_gate_sheet_row_tap', { gate_state: 'gated', row: r.key });
-                window.open(r.href as string, '_blank', 'noopener,noreferrer');
-              }} style={{ ...rowStyle, cursor: 'pointer' }}>
+                if (r.href) window.open(r.href, '_blank', 'noopener,noreferrer');
+                else if (r.to) { onClose(); navigate(r.to); }
+              }} style={{ ...rowStyle, cursor: 'pointer', height: 'auto', borderRadius: 0, whiteSpace: 'normal' }}>
                 {body}
-              </button>
-            ) : (
-              <div key={r.key} onClick={() => analyticsEvents.track('rounds_gate_sheet_row_tap', { gate_state: 'gated', row: r.key })} style={rowStyle}>{body}</div>
+              </Button>
             );
           })}
         </div>
-        {/* CB14/CB14.1 — the quiet truth line: not a row, no chevron, A.MUTE
-            at the sheet's small type. Lists are derived from WHS_COUNTRIES via
-            gateReach(), so the sentence tracks support as providers launch.
-            With nothing to say in either clause the element is absent, so an
-            empty line never takes its margin. */}
-        {reachLine ? (
+        {/* CB14 — renders the shared connect-page sentence from connectReach(). */}
           <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${A.SOFT}`, fontSize: 11.5, fontWeight: 600, lineHeight: 1.45, color: A.MUTE }}>
-            {reachLine}
+            {tH('whsConnect.intro.endLine', connectReach())}
           </div>
-        ) : null}
         <button
           type="button"
           onClick={() => { onClose(); navigate('/manage/handicap'); }}

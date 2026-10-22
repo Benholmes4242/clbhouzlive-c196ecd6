@@ -106,7 +106,7 @@ describe('CB15 — gate reporting', () => {
     open.mockRestore();
   });
 
-  it('reports the club row without turning it into a link or navigating', () => {
+  it('reports the club row, closes the sheet and navigates to Courses', () => {
     const open = vi.spyOn(window, 'open').mockImplementation(() => null);
     render(fixture());
     openSheet();
@@ -116,7 +116,7 @@ describe('CB15 — gate reporting', () => {
       ['rounds_gate_sheet_row_tap', { gate_state: 'gated', row: 'club' }],
     ]);
     expect(open).not.toHaveBeenCalled();
-    expect(screen.getByTestId('destination').textContent).toBe('/amateur');
+    expect(screen.getByTestId('destination').textContent).toBe('/courses');
     open.mockRestore();
   });
 });
