@@ -10,7 +10,16 @@
  *  - Lend: a feed lane that is not borrowed, not frozen, not the borrow's
  *    lane and not role 'active'. Role 'next' is preferred, then 'prev'
  *    ('prev' is where a returning borrow rejoins). The element is parked in
- *    the hidden host and its policy forced 'always-muted' — never the speaker.
+ *    the viewport-sized staging host (CB53.1 — never the 1px hidden host, so
+ *    the player-size cap and the opening rung measure the screen it will
+ *    play on) and its policy forced 'always-muted' — never the speaker.
+ *    While lent, the engine measures its opening rung like the fullscreen
+ *    lane (viewport height, 720 floor).
+ *  - CB53.1 swap quality: a successful settle calls nudgeLevelCap('fullscreen')
+ *    and applies the fullscreen buffer values (maxBufferLength 20,
+ *    backBufferLength 90) to the swapped-in instance; the return to the feed
+ *    restores the feed values (backBufferLength 30). hls.js 1.6.x reads both
+ *    config values live, so no rebuild is needed.
  *  - Warm only a neighbour whose FIRST media is a video with a real HLS url,
  *    owner `${postId}:0`, never under save-data.
  *  - Settle: swap only when the lent lane holds exactly the settled post's
@@ -37,6 +46,32 @@ interface Lent {
 let lent: Lent | null = null;
 let lastSettle: { postId: string; warmed: boolean } | null = null;
 const returnListeners = new Set<(laneId: LaneId) => void>();
+
+const STAGING_HOST_ID = '__video_engine_vertical_warm_staging__';
+
+/**
+ * CB53.1 — the lent lane warms in a viewport-sized offscreen staging host,
+ * never the 1px hidden host: hls.js's capLevelToPlayerSize and the opening
+ * rung both measure the element, so the warm must see the screen it will
+ * play on. visibility:hidden keeps layout (unlike display:none), so
+ * getBoundingClientRect reports the full viewport. The hidden host itself
+ * is unchanged for every other use.
+ */
+export function ensureVerticalWarmStagingHost(): HTMLElement {
+  if (typeof document === 'undefined') {
+    throw new Error('vertical warm staging requires a DOM');
+  }
+  let host = document.getElementById(STAGING_HOST_ID);
+  if (!host) {
+    host = document.createElement('div');
+    host.id = STAGING_HOST_ID;
+    host.setAttribute('aria-hidden', 'true');
+    host.style.cssText =
+      'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;visibility:hidden;';
+    document.body.appendChild(host);
+  }
+  return host;
+}
 
 export type VerticalWarmOutcome =
   | 'issued'
@@ -84,6 +119,8 @@ export function warmVerticalNeighbour(post: FeedPost | undefined | null): Vertic
       const savedHost = VideoEngine.mountedHostOf(id);
       VideoEngine.setAudioPolicy(id, 'always-muted');
       VideoEngine.unmountLane(id);
+      VideoEngine.mountLane(id, ensureVerticalWarmStagingHost());
+      VideoEngine.markVerticalWarmLent(id);
       lent = { laneId: id, prevPolicy, savedHost, ownerKey: null };
     }
     if (lent.ownerKey === ownerKey) return 'already';
@@ -111,6 +148,17 @@ export function settleVertical(post: FeedPost | undefined | null): boolean {
       const snap = VideoEngine.snapshot(lent.laneId);
       const loaded = snap.postId === lent.ownerKey && snap.state !== 'idle' && snap.state !== 'error';
       if (loaded) warmed = VideoEngine.swapLanes('fullscreen', lent.laneId);
+      if (warmed) {
+        // CB53.1 — the swapped-in instance was built as a feed lane: lift its
+        // player-size cap to a viewport rung now and give it the fullscreen
+        // buffer values, so a warmed open is as sharp and buffers like a cold
+        // fullscreen open. The swapped-out lane (old fullscreen content, now
+        // under the lent id) re-parks in the staging host so a subsequent
+        // warm is viewport-sized too.
+        try { VideoEngine.nudgeLevelCap('fullscreen'); } catch { /* noop */ }
+        try { VideoEngine.applyFullscreenBuffering('fullscreen'); } catch { /* noop */ }
+        try { VideoEngine.mountLane(lent.laneId, ensureVerticalWarmStagingHost()); } catch { /* noop */ }
+      }
     } catch { warmed = false; }
     // Swapped or not, the lent lane no longer holds a trusted warm.
     lent.ownerKey = null;
@@ -130,6 +178,11 @@ export function returnLentLane(): void {
   if (!l) return;
   lent = null;
   try {
+    // CB53.1 — the instance under this id may have been built as the
+    // fullscreen lane (post-swap): restore the feed buffer values and clear
+    // the fullscreen-like opening-rung mark before it returns to feed duty.
+    VideoEngine.clearVerticalWarmLent(l.laneId);
+    VideoEngine.restoreFeedBuffering(l.laneId);
     VideoEngine.release(l.laneId);
     VideoEngine.setAudioPolicy(l.laneId, l.prevPolicy);
     if (l.savedHost && l.savedHost.isConnected) VideoEngine.mountLane(l.laneId, l.savedHost);
