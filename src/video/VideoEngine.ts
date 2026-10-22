@@ -375,7 +375,7 @@ class VideoEngineImpl {
   /** Every engine-issued play uses the same owner-bound refusal fallback.
    * Stale promises cannot block a recycled lane or restart a deliberate pause.
    */
-  private attemptPlay(lane: Lane, trigger: AudioBlockTrigger = 'autoplay'): Promise<void> {
+  private attemptPlay(lane: Lane, trigger: AudioBlockTrigger = 'autoplay', onMutedReject?: () => void): Promise<void> {
     const owner = lane.postId;
     const unmuted = !lane.el.muted;
     const resumed = this.resumeOwners.get(lane.id);
@@ -386,6 +386,8 @@ class VideoEngineImpl {
       if (lane.postId !== owner || !lane.wantPlay || !lane.mountedHost) return;
       if (unmuted && (lane.audioPolicy === 'session' || this.borrowedLanes.has(lane.id))) {
         this.blockAudio(lane, actualTrigger);
+      } else {
+        onMutedReject?.();
       }
     });
   }
@@ -1440,9 +1442,8 @@ class VideoEngineImpl {
     // Re-assert intent a few times while it is still wanted.
     this.armPlayWatchdog(laneId);
     const owner = lane.postId;
-    return this.attemptPlay(lane).then(() => {
-      // Preserve the existing bounded 250ms muted retry, never stale ownership.
-      if (lane.postId !== owner || !lane.wantPlay || !lane.mountedHost || !lane.el.paused || !lane.el.muted) return;
+    return this.attemptPlay(lane, 'autoplay', () => {
+      // Preserve the existing bounded 250ms retry after a MUTED rejection.
       setTimeout(() => {
         const cur = this.lanes.get(laneId);
         if (!cur || cur.postId !== owner || !cur.wantPlay || !cur.mountedHost || !cur.el.paused) return;

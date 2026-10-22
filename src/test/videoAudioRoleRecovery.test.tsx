@@ -1,11 +1,11 @@
 import React from 'react';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { create } from 'zustand';
 
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 vi.mock('@/utils/analyticsSession', () => ({ getSessionId: vi.fn(() => 'cb48') }));
-vi.mock('@/store/fullscreenFeedStore', () => {
+vi.mock('@/store/fullscreenFeedStore', async () => {
+  const { create } = await import('zustand');
   const useFullscreenFeedStore = create(() => ({ isOpen: false, borrow: null }));
   return { useFullscreenFeedStore };
 });
