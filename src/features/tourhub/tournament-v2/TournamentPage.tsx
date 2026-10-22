@@ -83,17 +83,21 @@ export function TournamentPage() {
   useLeaderboardRealtime(pulse.state === 'live' ? tournamentId : null);
   useTournamentStatusRealtime();
 
-  const venueInput = useMemo(() => {
-    if (!meta) return null;
-    return {
-      venueName: meta.venue_name || meta.name || '',
-      venueCourseName: meta.venue_course_name,
-      city: meta.venue_city,
-      country: meta.venue_country,
-      state: meta.venue_state,
-    };
-  }, [meta]);
-  const { courseImage } = useSingleCourseImage(venueInput);
+  // CB55: the ONE Tour course-photo resolver, keyed by tournament id — the
+  // same resolution the Overview hero gets for this tournament.
+  const imageAdapter = useMemo(() => {
+    if (!tournamentId) return [];
+    return [{
+      id: tournamentId,
+      venue_name: meta?.venue_name ?? meta?.name ?? null,
+      venue_course_name: meta?.venue_course_name ?? null,
+      venue_city: meta?.venue_city ?? null,
+      venue_country: meta?.venue_country ?? null,
+      venue_state: meta?.venue_state ?? null,
+    }];
+  }, [tournamentId, meta]);
+  const { data: imageMap } = useBatchCourseImages(imageAdapter);
+  const courseImageUrl = tournamentId ? imageMap?.get(tournamentId) ?? null : null;
 
   // Round awareness: upcoming events show round 1; live/completed use
   // the tournament's current_round so the tab=tee-times deep link never
