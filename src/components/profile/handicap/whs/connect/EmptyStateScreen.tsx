@@ -8,7 +8,7 @@ import { openHomeClubPicker } from '@/features/home-club/homeClubPickerStore';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { SC_BOGEY_DARK } from '@/features/courses/components/holes/_constants';
-import { WHS_COUNTRIES } from '@/lib/whs/whsCountries';
+import { connectReach } from '@/lib/whs/connectReach';
 import { useConnectIntroCourse, type ConnectIntroCourse } from './useConnectIntroCourse';
 import { DIM, INK, AMBER, NUM, FONT } from './designTokens';
 import { FooterBar, Stage } from './Primitives';
@@ -519,9 +519,7 @@ const TrustSection: React.FC = () => {
 
 const EndBlock = React.forwardRef<HTMLDivElement, { onPickCountry: () => void; onDecline?: () => void; h: number; circleShown: boolean }>(({ onPickCountry, onDecline, h, circleShown }, ref) => {
   const { t } = useTranslation('handicap');
-  const live = WHS_COUNTRIES.filter((c) => c.supported).map((c) => c.name);
-  const notYet = WHS_COUNTRIES.filter((c) => !c.supported).length;
-  const liveText = live.length <= 1 ? live[0] ?? '' : `${live.slice(0, -1).join(', ')} and ${live[live.length - 1]}`;
+  const { live, count } = connectReach();
   const cta = () => {
     analyticsEvents.track('connect_intro_cta', { h, place: 'end', circle_shown: circleShown });
     onPickCountry();
@@ -529,7 +527,7 @@ const EndBlock = React.forwardRef<HTMLDivElement, { onPickCountry: () => void; o
   return (
     <div ref={ref} style={{ marginTop: 36, display: 'flex', flexDirection: 'column', gap: 12 }}>
       <button type="button" onClick={cta} style={primaryCtaStyle}>{t('whsConnect.intro.connectCta')}</button>
-      <div style={{ textAlign: 'center', fontSize: 12.5, lineHeight: 1.5, color: DIMMER }}>{t('whsConnect.intro.endLine', { live: liveText, count: notYet })}</div>
+      <div style={{ textAlign: 'center', fontSize: 12.5, lineHeight: 1.5, color: DIMMER }}>{t('whsConnect.intro.endLine', { live, count })}</div>
       {onDecline ? <DeclineButton onClick={onDecline} /> : null}
     </div>
   );
