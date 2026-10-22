@@ -1,10 +1,11 @@
 # Roadmap
 
-## REVIEW_SHEET_OPENS_REAL_POST — STOP (tests need a ruling)
+## REVIEW_SHEET_OPENS_REAL_POST — STOP (new fixture type error)
 - [x] Only requested application files changed: new useReviewPost.ts calls the already-generated get_review_post RPC with canonical actor/session and feed mapping; ReviewBottomSheet.tsx replaces synthetic posts with real post/URL-or-stream matching and clamped pager fallback. No readOnly; stacking and return store unchanged.
-- [ ] STOP: 15 new failures in reviewCourseNoReopen.test.tsx (2) and reviewSheetCalibration.test.tsx (13): `Error: No QueryClient set, use QueryClientProvider to set one` at useReviewPost.ts:15:10 / ReviewBottomSheet.tsx:415:32. Existing test renderers have no provider for the new query. No tests edited; await explicit authorization to wrap these renderers in a real provider without assertion changes.
+- [x] Authorized correction: reviewCourseNoReopen.test.tsx direct sheet renderer and reviewSheetCalibration.test.tsx sheet helper now use a fresh QueryClient with queries.retry false in QueryClientProvider. RPC spies return empty data/no error to prevent network calls. No test name or assertion changed. All 15 previously failing review cases now pass.
 - [x] Full `bunx vitest run` before: 2,158 passed / 4 CB50 failures =2,162 total/293 files; after: 2,143 passed /19 failures =2,162 total/293. Inventory unchanged; all 15 result changes named in /mnt/documents/Review_sheet_real_post_stop_report.md. Four earlier CB50 failures and BorrowDescriptor TS2739 at cb50BufferingEngine.test.tsx(67,53) remain untouched.
-- [ ] Full green suite/build and authenticated three-entrypoint round trip are blocked; external_unmanaged auth. No SQL/migrations/RPC/feed_config changes; round_pool_cap 30.
+- [x] Authorized rerun `bunx vitest run`: 2,158 passed / four pre-existing CB50 failures =2,162 total/293 files. Before correction 2,143 passed/19 failed; +15 passing, zero inventory delta. No test added/deleted/renamed/retargeted.
+- [ ] STOP: src/test/reviewCourseNoReopen.test.tsx(57,3): error TS2589: Type instantiation is excessively deep and possibly infinite. New RPC spy typecheck error; no correction after failure. Standing cb50BufferingEngine.test.tsx(67,53) TS2739 remains unchanged. Full build/typecheck and authenticated three-entrypoint verification not complete. Report /mnt/documents/Review_sheet_real_post_stop_report_v2.md. No SQL/migrations/RPC/feed_config changes; round_pool_cap 30.
 
 ## CB50 — Buffering spinner Design A (STOP, not complete)
 - [x] Fresh baseline `bunx vitest run`: 2,142 passed / 291 files / zero failures; CB49 added ten tests in two files since the recorded CB48.2 baseline of 2,132/289.
