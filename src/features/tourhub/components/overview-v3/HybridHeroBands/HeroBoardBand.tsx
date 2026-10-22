@@ -22,7 +22,8 @@
  *
  * CB57 order, one continuous dark surface with NO seam:
  *   photo → board rows (live/completed) or upcoming facts line (upcoming) →
- *   OUR PICKS block. No action row or next-round row; no hairlines between
+ *   OUR PICKS block → CB58 leaders' group (live individual events only).
+ *   No action row or next-round row; no hairlines between
  *   these blocks. Existing movement and pick-card internal rules are retained
  *   and reported under CB57, not silently removed.
  * There is no stat strip and no COURSE SHAPE panel in this file or in
@@ -41,7 +42,8 @@
  * and NO placeholder or reserved height for them (§1).
  *
  * CB57: board rows are fixed, never internally scrollable; the photo remains
- * the tournament door. No replacement section or reserved height is added.
+ * the tournament door. CB58 adds only the signed-off leaders' group, without
+ * placeholder or reserved height.
  */
 
 import React, { useMemo, useState } from 'react';
