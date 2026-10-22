@@ -7,6 +7,7 @@ import { todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable
 import { thruLabel } from '../../../tournament-v2/sections/MiniBoard';
 import type { TeeGroup } from '../../../tournament-v2/data/useTeeTimesAll';
 import { surnameOf } from '../../../_shared/playerName';
+import { isDemotedStatus } from '../../../_shared/resultStatus';
 import { nextDrawnRound } from './whatsNext';
 
 export type GroupState = 'before' | 'onCourse' | 'finished';
@@ -58,7 +59,15 @@ export function leadersBaseRound(leaders: BoardEntry[], currentRound: number): n
 export function leadersShownRound(baseRound: number, groups: TeeGroup[], leaders: BoardEntry[], entries: BoardEntry[], drawnRounds: number[], totalRounds: number): number {
   const candidates = candidateGroups(groups, leaders);
   const next = nextDrawnRound(baseRound, drawnRounds, totalRounds);
-  return candidates.length > 0 && candidates.every(g => groupState(g, entries, baseRound) === 'finished') && next != null ? next : baseRound;
+  // CB58.1: a finished morning leaders' group does not finish the field.
+  // Canonical board demotion vocabulary excludes CUT/MC/WD/DQ/MDF/DNS;
+  // scoreless entries have no card to complete and do not block the handover.
+  const field = entries.filter(e => e.score != null && !isDemotedStatus(e.status));
+  const fieldComplete = field.length > 0 && field.every(raw => {
+    const e = roundEntry(raw, baseRound);
+    return thruLabel(e, todayFromEntry(e, baseRound)) === 'F';
+  });
+  return candidates.length > 0 && fieldComplete && next != null ? next : baseRound;
 }
 export function leadersGroupVisible(phase: string, teamEvent: boolean, entries: BoardEntry[], loading: boolean): boolean {
   return phase === 'live' && !teamEvent && !loading && entries.some(e => typeof e.score === 'number' && Number.isFinite(e.score));
