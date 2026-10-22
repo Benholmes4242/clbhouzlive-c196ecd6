@@ -72,6 +72,19 @@
     }
   },
   "overview": {
+    "leadersGroup": {
+      "kicker": "[THE LEADERS' GROUP]",
+      "round": "[Round {{round}}]",
+      "onCourse": "[On the course]",
+      "finished": "[Finished]",
+      "teesOff": "[Tees off {{day}} {{time}}]",
+      "and": " and ",
+      "note": {
+        "one_one": "[<names/>, also at {{score}}, is in another group.]",
+        "named_other": "[<names/>, also at {{score}}, are in other groups.]",
+        "many_other": "[{{count}} other leaders, also at {{score}}, are in other groups.]"
+      }
+    },
     "ticker": {
       "top10Label": "[~~ŢŐƤ 10~~]",
       "alsoOutLabel": "[ĀĻŠŐ ŌŨŢ]",

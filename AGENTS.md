@@ -36,6 +36,7 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Course tab gaps and canon: see tabCanon.css and AboutSection.tsx; null chains stay aligned.
 - Course photo publication and metadata live in `src/lib/courseMedia`; shared payloads prevent entrypoint drift.
 - Media state/RPC ownership: see CourseMediaEmptyStates.tsx header.
+- Leaders' group round selection ownership: see leadersGroupRules.ts header; shared board helpers remain authoritative for score and thru cells.
 
 ## Briefs
 
