@@ -12,8 +12,8 @@ import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
  *   viewer → sheet:  the viewer's "read review ›" chrome opens THIS sheet while
  *                    the viewer stays open, so the sheet must paint ABOVE it —
  *                    REVIEW_SHEET_Z (240) > FS_OVERLAY_Z (200). Unchanged.
- *   sheet → viewer:  tapping a photo in the strip below opens the CANONICAL
- *                    fullscreen viewer (openWithOrigin, FLIP from the tile),
+ *   sheet → viewer:  tapping media opens the review's real post via get_review_post
+ *                    in the fullscreen viewer (openWithOrigin, FLIP from the tile),
  *                    which must paint ABOVE this sheet. The viewer takes its z
  *                    AT OPEN TIME: this sheet passes VIEWER_ABOVE_SHEETS_Z
  *                    (12200), clearing the sheet and any likers sheet. When the
@@ -45,12 +45,13 @@ import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { useReviewerStats } from '@/hooks/useReviewerStats';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useReviewMedia, type ReviewMediaItem } from './useReviewMedia';
+import { useReviewPost } from './useReviewPost';
+import { extractStreamId } from '@/components/media-system/utils/feedMapper';
 import { useReviewFallback } from '@/hooks/useReviewFallback';
 import { MentionText } from '@/components/mentions/MentionText';
 import { REVIEW_SHEET_Z, VIEWER_ABOVE_SHEETS_Z } from '@/lib/zLayers';
 import { footerTapProbeEnabled, recordFooterTap } from './footerTapProbe';
 import { openWithOrigin } from '@/lib/openWithOrigin';
-import type { FeedPost } from '@/components/media-system/types/media';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 import { getPublicProfilePath } from '@/lib/profileRoutes';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
@@ -411,58 +412,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
   // MEDIA (§3c) — prop when a caller has it, otherwise a lazy read.
   const { data: fetchedMedia } = useReviewMedia(reviewId ?? null, isOpen && !media?.length);
+  const { data: reviewPost } = useReviewPost(reviewId ?? null, isOpen);
   const allMedia = (resolvedMedia !== undefined ? resolvedMedia : (media?.length ? media : fetchedMedia)) ?? [];
   const mediaTotal = allMedia.length;
   /* §3 — at most nine tiles (three rows); the ninth carries "+N" when more exist.
      Order is fetchReviewMedia's (cover first, then created_at) — never re-sorted here. */
   const mediaGrid = allMedia.slice(0, REVIEW_MEDIA_GRID_CAP);
   const hiddenCount = Math.max(0, mediaTotal - REVIEW_MEDIA_GRID_CAP);
-
-  /* PHOTO TAP (§Part 1). The viewer receives ALL items so everything past the
-     cap is reachable by swiping from the ninth tile.
-     One synthetic FeedPost per media item, following CourseMoments. */
-  const reviewFullscreenPosts = useMemo<FeedPost[]>(
-    () =>
-      allMedia.map((m) => ({
-        id: m.id,
-        userId: user.id,
-        actorType: 'personal',
-        actorId: user.id,
-        username: user.username ?? '',
-        displayName: user.name,
-        avatarUrl: user.avatar ?? '',
-        isVerified: false,
-        creatorRelation: 'none',
-        caption: '',
-        mediaItems: [{
-          id: m.id,
-          type: m.mediaType,
-          hlsUrl: m.mediaType === 'video' ? m.mediaUrl : undefined,
-          imageUrl: m.mediaType === 'image' ? m.mediaUrl : undefined,
-          thumbnailUrl: m.posterUrl,
-          width: m.width ?? 0,
-          height: m.height ?? 0,
-        }],
-        createdAt: '',
-        // ⚠️ HARDCODED 0/false engagement fields.
-        // SAFE ONLY because the strip opens the viewer with readOnly:true —
-        // likes/comments UI is suppressed and no mutation can fire against
-        // these stubs. A review's likes live on the REVIEW, not on each
-        // photo: do NOT flip readOnly off or wire per-media engagement here,
-        // or every photo will read zeroed and any like will patch a stale delta.
-        likeCount: 0,
-        commentCount: 0,
-        shareCount: 0,
-        review: null,
-        isReview: false,
-        isLikedByMe: false,
-        isFollowedByMe: false,
-        courseName,
-        courseId,
-      }) as FeedPost),
-    [allMedia, user.id, user.username, user.name, user.avatar, courseName, courseId],
-  );
-
 
   /* §S.2 — all four columns whenever any category was scored; a skipped one
      keeps an em dash and draws no track. The tick is the course's average for
@@ -827,15 +783,29 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                         key={m.id}
                         type="button"
                         aria-label={isOverflowTile ? `Show all ${mediaTotal}` : `${kindLabel} ${index + 1} of ${mediaTotal}`}
-                        onClick={(e) => openWithOrigin({
-                          openedFrom: 'review-sheet',
-                          posts: reviewFullscreenPosts,
-                          index,
-                          originEl: e.currentTarget as HTMLElement,
-                          posterUrl: m.posterUrl ?? m.mediaUrl,
-                          readOnly: true,
-                          zIndex: VIEWER_ABOVE_SHEETS_Z,
-                        })}
+                        onClick={(e) => {
+                          const post = reviewPost;
+                          if (!post || post.mediaItems.length === 0) return;
+                          const streamId = m.mediaType === 'video' ? extractStreamId(m.mediaUrl) : null;
+                          const matchedIndex = post.mediaItems.findIndex((item) =>
+                            m.mediaType === 'image'
+                              ? item.type === 'image' && item.imageUrl === m.mediaUrl
+                              : item.type === 'video' && streamId !== null && item.streamId === streamId,
+                          );
+                          const mediaIndex = matchedIndex >= 0
+                            ? matchedIndex
+                            : Math.max(0, Math.min(index, post.mediaItems.length - 1));
+                          openWithOrigin({
+                            openedFrom: 'review-sheet',
+                            posts: [post],
+                            index: 0,
+                            ...(matchedIndex >= 0 ? { mediaId: post.mediaItems[matchedIndex]?.id } : {}),
+                            mediaIndex,
+                            originEl: e.currentTarget,
+                            posterUrl: m.posterUrl ?? m.mediaUrl,
+                            zIndex: VIEWER_ABOVE_SHEETS_Z,
+                          });
+                        }}
                         style={{
                           minWidth: 0,
                           height: 78,
