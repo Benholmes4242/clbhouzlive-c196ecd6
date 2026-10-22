@@ -51,7 +51,7 @@ import {
   MOVING_AFTER_SEEK_S,
 } from '@/perf/vperf';
 import { readSeededBandwidth } from './bandwidthMemory';
-import { applyStartLevel, bandwidthSeed, upshiftForSurface, viewportPixelHeight, elementPixelHeight } from './startLevel';
+import { applyStartLevel, bandwidthSeed, upshiftForSurface, viewportPixelHeight, startLevelMeasure } from './startLevel';
 
 import { coldOpenAttach, coldOpenFirstFrame } from '@/perf/coldOpen';
 import { trace, traceLookup, elIdOf, traceGenElId } from '@/perf/trace';
@@ -555,7 +555,12 @@ class VideoEngineImpl {
     // [VPERF] CB52 — read-only element/owner lookup for moving-frame spans.
     vperfSetLaneResolver((id) => {
       const l = this.lanes.get(id as LaneId);
-      return l ? { el: l.el, owner: l.postId } : null;
+      if (!l) return null;
+      // CB53.1 — current rendition height, read at a swipe.vertical span's
+      // first moving frame (startHeight). Null on the native HLS path,
+      // where there is no hls.js instance to read.
+      const lvl = l.hls?.levels?.[(l.hls as any).currentLevel ?? -1];
+      return { el: l.el, owner: l.postId, height: lvl?.height ?? null };
     });
     if (PAUSE_ON_HIDDEN && typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.onVisibility);
@@ -1105,14 +1110,18 @@ class VideoEngineImpl {
       // + known bandwidth instead of letting hls.js open on the 240p rung.
       // Rails stay on capLevelToPlayerSize (tile-sized) and are left alone.
       if (!isRail) {
-        const minHeight = isFullscreenLane(lane.id) ? 720 : 540;
+        // CB53.1 — a feed lane lent to the fullscreen vertical warm is
+        // measured like the fullscreen lane: it is parked in a viewport-sized
+        // staging host and plays on the full screen after the swap, so it
+        // gets the viewport measure and the 720 opening-rung floor. Feed
+        // lanes otherwise open at the CARD's rendered height (540 floor).
+        const fullscreenLike = isFullscreenLane(lane.id) || this.verticalWarmLent.has(lane.id);
+        const measure = startLevelMeasure(fullscreenLike, lane.el);
         const applied = applyStartLevel(
           hls as any,
-          // Feed lanes open at the CARD's rendered height; only the
-          // fullscreen lane opens at viewport height.
-          isFullscreenLane(lane.id) ? viewportPixelHeight() : elementPixelHeight(lane.el),
+          measure.renderedPixelHeight,
           (lane as any)._seededBw ?? null,
-          minHeight,
+          measure.minHeight,
         );
         DBG(lane.id, 'startLevel.applied', {
           level: applied,
@@ -2032,6 +2041,37 @@ class VideoEngineImpl {
     const h = (lane.el as HTMLVideoElement).videoHeight;
     if (!w || !h) return null;
     return w / h;
+  }
+
+  /** CB53.1 — feed lanes currently lent to the fullscreen vertical warm.
+   *  They are measured like the fullscreen lane at manifest time (viewport
+   *  height, 720 floor) because they play on the full screen after the swap. */
+  private verticalWarmLent = new Set<LaneId>();
+
+  /** CB53.1 — mark/unmark a feed lane as lent to the fullscreen vertical warm. */
+  markVerticalWarmLent(laneId: LaneId): void { this.verticalWarmLent.add(laneId); }
+  clearVerticalWarmLent(laneId: LaneId): void { this.verticalWarmLent.delete(laneId); }
+
+  /**
+   * CB53.1 — give a swapped-in instance the fullscreen lane's buffer values
+   * at runtime. hls.js 1.6.x reads config.maxBufferLength and
+   * config.backBufferLength live on every buffer check, so both steer the
+   * existing instance without a rebuild. No-op on the native HLS path.
+   */
+  applyFullscreenBuffering(laneId: LaneId): void {
+    const lane = this.lanes.get(laneId);
+    if (!lane?.hls) return;
+    try { lane.hls.config.maxBufferLength = HLS_CONFIG.maxBufferLength; } catch { /* noop */ }
+    try { lane.hls.config.backBufferLength = FULLSCREEN_HLS_OVERRIDES.backBufferLength; } catch { /* noop */ }
+  }
+
+  /** CB53.1 — restore the feed buffer values when a lane id returns to feed
+   *  duty (the instance under it may have been built as the fullscreen lane). */
+  restoreFeedBuffering(laneId: LaneId): void {
+    const lane = this.lanes.get(laneId);
+    if (!lane?.hls) return;
+    try { lane.hls.config.maxBufferLength = HLS_CONFIG.maxBufferLength; } catch { /* noop */ }
+    try { lane.hls.config.backBufferLength = HLS_CONFIG.backBufferLength; } catch { /* noop */ }
   }
 
   /**
