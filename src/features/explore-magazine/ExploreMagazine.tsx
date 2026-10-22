@@ -524,10 +524,10 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
   /* The title's chevron opens the lightweight ranking picker; the Filters pill opens the panel. */
   /* The title opens the sheet onto the board choice; Filters opens it without. */
   const scoresBoardActive = view === 'scores' && boardApplied;
+  /* No initialBoard: the boards open on Most recent via entryBoardFor() (founder decision 2026-10-22, supersedes CB25's 'net'). */
   const boardState = useAmateurBoardState(
     view === 'scores' ? userId : undefined,
     scoresBoardActive || boardPanelOpen,
-    'net', // CB25 visible default; recent-board landing scope probes stay unchanged.
   );
 
   const [revealed, setRevealed] = useState(STREAM_PAGE_SIZE);
