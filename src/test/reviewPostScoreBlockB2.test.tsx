@@ -86,8 +86,8 @@ describe('review post score block B2', () => {
   it('CB59: places Design/Clubhouse in the left pair and Condition/Facilities in the right', () => {
     const { element } = card(9);
     for (const [key, fig, word] of [['design', '1', '3'], ['clubhouse', '1', '3'], ['condition', '5', '7'], ['facilities', '5', '7']]) {
-      expect(element(`[data-category="${key}"] [data-category-figure]`).style.gridColumnStart).toBe(fig);
-      expect(element(`[data-category="${key}"] [data-category-label]`).style.gridColumnStart).toBe(word);
+      expect(element(`[data-category="${key}"] [data-category-figure]`).style.gridColumn).toMatch(new RegExp(`^${fig}( \/ auto)?$`));
+      expect(element(`[data-category="${key}"] [data-category-label]`).style.gridColumn).toMatch(new RegExp(`^${word}( \/ auto)?$`));
       expect(element(`[data-category="${key}"] [data-category-figure]`).style.justifySelf).toBe('end');
     }
   });
