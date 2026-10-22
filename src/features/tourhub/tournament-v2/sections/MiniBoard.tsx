@@ -201,7 +201,7 @@ export function shouldShowPrize(entries: Array<{ money?: number | null }>): bool
   return entries.some((row) => row.money != null);
 }
 
-function thruLabel(row: Row, today: number | null): string {
+export function thruLabel(row: Row, today: number | null): string {
   const s = row.status?.toUpperCase();
   if (s === 'MC' || s === 'CUT') return 'MC';
   if (s === 'WD') return 'WD';
