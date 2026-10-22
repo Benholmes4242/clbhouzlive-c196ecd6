@@ -43,14 +43,14 @@ describe('review post score block B2', () => {
     expect(element('[data-review-score-col]').style.borderRightColor.replace(/\s/g, '')).toBe(rgb(A.TRACK).replace(/\s/g, ''));
     expect(element('[data-review-score-block]').style.gap).toBe('14px');
     expect(element('[data-review-score-col]').style.paddingRight).toBe('14px');
-    expect(element('[data-review-categories]').style.columnGap).toBe('');
+    expect(element('[data-review-categories]').style.columnGap).toBe('16px');
     expect(element('[data-review-categories]').style.rowGap).toBe('8px');
     expect(element('[data-category-label]').style.fontSize).toBe('11px');
     expect(element('[data-category-figure]').style.fontSize).toBe('13px');
   });
   it('keeps a two-column grid with green 9.5 and muted 8.9 figures', () => {
     const { element } = card(9);
-    expect(element('[data-review-categories]').style.gridTemplateColumns).toBe('max-content 7px max-content minmax(14px, 34px) max-content 7px max-content');
+    expect(element('[data-review-categories]').style.gridTemplateColumns).toBe('repeat(2, minmax(0, 1fr))');
     expect(element('[data-category="condition"] [data-category-figure]').style.color).toBe(rgb(courseSubScoreTone(9.5)));
     expect(element('[data-category="design"] [data-category-figure]').style.color).toBe(rgb(courseSubScoreTone(8.9)));
   });
@@ -73,27 +73,6 @@ describe('review post score block B2', () => {
   });
   it('renders no score block when both are absent', () => {
     expect(card(null, {}).container.querySelector('[data-review-score-block]')).toBeNull();
-  });
-  it('CB59: puts each figure before its own word', () => {
-    const { container } = card(9);
-    container.querySelectorAll<HTMLElement>('[data-category]').forEach((cell) => {
-      const kids = Array.from(cell.children) as HTMLElement[];
-      expect(kids).toHaveLength(2);
-      expect(kids[0].hasAttribute('data-category-figure')).toBe(true);
-      expect(kids[1].hasAttribute('data-category-label')).toBe(true);
-    });
-  });
-  it('CB59: places Design/Clubhouse in the left pair and Condition/Facilities in the right', () => {
-    const { element } = card(9);
-    for (const [key, fig, word] of [['design', '1', '3'], ['clubhouse', '1', '3'], ['condition', '5', '7'], ['facilities', '5', '7']]) {
-      expect(element(`[data-category="${key}"] [data-category-figure]`).style.gridColumn).toMatch(new RegExp(`^${fig}( \/ auto)?$`));
-      expect(element(`[data-category="${key}"] [data-category-label]`).style.gridColumn).toMatch(new RegExp(`^${word}( \/ auto)?$`));
-      expect(element(`[data-category="${key}"] [data-category-figure]`).style.justifySelf).toBe('end');
-    }
-  });
-  it('CB59: each category wrapper is display contents', () => {
-    const { container } = card(9);
-    container.querySelectorAll<HTMLElement>('[data-category]').forEach((cell) => expect(cell.style.display).toBe('contents'));
   });
   it('preserves verdict navigation and its accessible score label at 9px', () => {
     const { element, onReadReview } = card(9);

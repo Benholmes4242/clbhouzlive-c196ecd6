@@ -57,11 +57,10 @@ describe('review post — categories', () => {
   it('an unscored category renders a dash and the grid keeps four cells in two columns', () => {
     const c = card(8, { ...all, clubhouse: null });
     expect(c.querySelectorAll('[data-category]').length).toBe(4);
-    expect((c.querySelector('[data-review-categories]') as HTMLElement).style.gridTemplateColumns).toBe('max-content 7px max-content minmax(14px, 34px) max-content 7px max-content');
+    expect((c.querySelector('[data-review-categories]') as HTMLElement).style.gridTemplateColumns).toBe('repeat(2, minmax(0, 1fr))');
     const club = c.querySelector('[data-category="clubhouse"]') as HTMLElement;
     expect(club.querySelector('[data-category-score]')).toBeNull();
     expect(club.querySelector('[data-category-figure]')?.textContent).toBe('\u2014');
-    expect(club.firstElementChild?.hasAttribute('data-category-figure')).toBe(true);
   });
 });
 
