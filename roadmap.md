@@ -723,8 +723,8 @@
 - [x] LikedByRow 'media' path: no outer boxShadow on the slots (surface-only), loading placeholder inset-only; hairline edge and the container's on-media drop shadow kept. 'surface' unchanged. Suite 2,112 / 287 / 0; tsc clean.
 
 ## CB54 — Picks sheet: restore four steps, relabel difficulty, lock picks at first tee
-- [ ] Part 1: restore step1-4 Lead/Body keys in en/tourhub.json + en-XA bracketed forms (README: no de/es/ja/ko — removed on purpose).
-- [ ] Part 2: figDifficulty -> "COURSE DIFFICULTY" (label only).
-- [ ] Part 3: status guard ('scheduled'/'created' only) in generate-predictions (server, authoritative) + useAIPredictions (client); boot-log version marker; deploy and confirm live.
-- [ ] Part 4: tests — locale key guard, lock decision (inprogress/closed refuse, scheduled/created generate), client no-invoke for started tournament with stale row.
-- [ ] Report suite before/after, typecheck, build; name retargets; stop on new failure.
+- [x] Part 1: restore step1-4 Lead/Body keys in en/tourhub.json + en-XA bracketed forms (README: no de/es/ja/ko — removed on purpose).
+- [x] Part 2: figDifficulty -> "COURSE DIFFICULTY" (label only).
+- [x] Part 3: status guard ('scheduled'/'created' only) in generate-predictions (server, authoritative) + useAIPredictions (client); boot-log version marker; deploy and confirm live.
+- [x] Part 4: tests — locale key guard, lock decision (inprogress/closed refuse, scheduled/created generate), client no-invoke for started tournament with stale row.
+- [x] Report suite before/after, typecheck, build; name retargets; stop on new failure.
