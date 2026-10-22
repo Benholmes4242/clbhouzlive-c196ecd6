@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB57 — Tour hero board removals and tie brackets
+- [x] Baseline `bunx vitest run`: 2,224 passed /302 files /0 failures. CB56 added five tests/one file since 2,219/301; no pre-existing failures. Git pull skipped: workspace Git is platform-managed.
+- [x] Removed specified separator, next-round/action rows and caller callback; shared stretched position-cell brackets, retained cap and protected helpers/locales/tee-alert code. Existing movement/card rules retained and reported, not silently removed.
+- [x] Full `bunx vitest run`: 2,233 passed /303 files /0 failures (+9 solely cb57HeroBoardRemovals.test.tsx); targeted 76/3 green. One authorized cap assertion retargeted in tourOverviewDesignA.test.ts, no rename/delete; tee-alert test unchanged. Harness build OK; no separate compiler result exposed. Controlled 430×786 three-phase measurements/screenshots passed; all five live brackets x42.5 from board/-7.5 from avatar, completed x40.5/-7.5. Empty upcoming height0. Live authenticated verification unavailable (external_unmanaged). No SQL/migrations/RPC/edge/feed_config/native changes; cap30.
+
 ## CB50.1 — Finish monitor value snapshots and borrow fixture
 - [x] Record brief: copy reader values in start/progress; complete authorized BorrowDescriptor fixture without assertions/casts; audit fullscreen layer and change only spinner z-index if needed. Freeze signed-off spinner, timing, event/caps, CB48/49, preview/legacy/native.
 - [x] Full `bunx vitest run`: 2,162 passed /293 files /0 failures, from 2,158 passed/four failed with identical inventory. Four untouched cb50Buffering.test.ts cases at lines 24,28,32,47 now pass; engine fixture assertion/name unchanged; no test added/deleted/renamed/rewritten.

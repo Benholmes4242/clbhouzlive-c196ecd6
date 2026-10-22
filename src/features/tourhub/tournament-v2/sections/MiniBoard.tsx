@@ -87,8 +87,8 @@ const THEME_TOKENS = {
 /* THE HERO DEFINES NO WIDTH OF ITS OWN. Every track reads BOARD_GEOMETRY
    from BoardTable, so the two boards cannot drift. TODAY has its own
    `today` width (it is not a round). The only deliberate difference is
-   row padding: 20 here, because this board aligns with the picks block and
-   action row in the same band; BoardTable keeps 16 for its seven columns. */
+   row padding: 20 here, because this board aligns with the picks block in
+   the same band (CB57); BoardTable keeps 16 for its seven columns. */
 const HERO_PAD_X = 20;
 /** Every numeric cell on the hero board: digits stack down a column. */
 const HERO_NUM = { fontVariantNumeric: 'tabular-nums lining-nums' as const, textAlign: 'right' as const };
@@ -381,19 +381,18 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 style={{ position: 'relative', display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, width: '100%', height: 'auto', borderRadius: 0, minHeight: showHeroShape ? 36 : 34, padding: showHeroShape ? `6px ${HERO_PAD_X}px` : `${entity.kind === 'team' ? 6 : 5}px ${HERO_PAD_X}px`, border: 'none', background: 'transparent', color: T.ink, textAlign: 'left', fontFamily: FONT, cursor: tappable ? 'pointer' : 'default' }}
                 className={tappable ? `${T.press} transition-colors` : undefined}
               >
-                {(showHeroShape || showOverviewPosition) && inTopTie ? (
-                  /* §D.3: the cap above states the position once; the row carries none. */
-                  <div data-hero-tie="capped"><span className="sr-only">{posText}</span></div>
-                ) : showHeroShape || showOverviewPosition ? (
-                  <div data-hero-tie={tieRole} style={{ position: 'relative', alignSelf: 'stretch', display: 'flex', alignItems: 'center', fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                    {/* ONE MARKER PER TIE: later rows carry it for screen readers only. */}
-                    {tieRole === 'middle' || tieRole === 'last' ? <span className="sr-only">{posText}</span> : posText}
+                {showHeroShape || showOverviewPosition ? (
+                  /* CB57: capped and lower ties use the SAME stretched grid
+                     cell and bracket; the cap still owns the visible T1 label. */
+                  <div data-hero-tie={inTopTie ? 'capped' : tieRole} style={{ position: 'relative', alignSelf: 'stretch', display: 'flex', alignItems: 'center', fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                    {/* ONE MARKER PER TIE: capped/later rows are screen-reader only. */}
+                    {inTopTie || tieRole === 'middle' || tieRole === 'last' ? <span className="sr-only">{posText}</span> : posText}
                     {tieRole !== 'solo' ? (
                       <span
                         aria-hidden
                         data-hero-tie-bracket
                         style={{
-                          position: 'absolute', right: 2, width: 1.5, borderRadius: 1, background: WHITE_ALPHA_12,
+                          position: 'absolute', right: 2, width: 1.5, borderRadius: 1, background: OVERVIEW.bracket,
                           /* Rows are padded, so the rule reaches through the padding
                              to meet its neighbour: start under the marker, end at the
                              last row's centre. */
@@ -456,10 +455,8 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 </span>
               </div>
               <div data-hero-tie-group style={{ position: 'relative' }}>
-                <span aria-hidden data-hero-tie-bracket style={{ position: 'absolute', left: 9, top: 2, bottom: 2, width: 1.5, borderRadius: 2, background: OVERVIEW.bracket }} />
                 {rows.slice(0, topTieLength).map((r, i) => renderRow(r, i, true))}
               </div>
-              <div aria-hidden data-hero-tie-separator style={{ height: 1, background: OVERVIEW.hairline, marginTop: 9 }} />
               {rows.slice(topTieLength).map((r, i) => renderRow(r, i + topTieLength, false))}
             </>
           );

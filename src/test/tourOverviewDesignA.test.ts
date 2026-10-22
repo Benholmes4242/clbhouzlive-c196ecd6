@@ -530,7 +530,8 @@ describe('BRIEF_TOUR_OVERVIEW_MOCK_EXACT coverage', () => {
     const group = view.container.querySelector('[data-hero-tie-group]')!;
     expect(group.querySelectorAll('[data-hero-tie="capped"]').length).toBe(3);
     group.querySelectorAll('[data-hero-tie="capped"]').forEach((cell) => {
-      expect(cell.querySelector(':not(.sr-only)')).toBeNull();
+      // CB57 adds an aria-hidden bracket, not a visible position label.
+      expect(cell.querySelector(':not(.sr-only):not([data-hero-tie-bracket])')).toBeNull();
     });
     view.unmount();
     const solo = mountLive([{ ...tied[0], position_tied: false }, { ...tied[3], position: 2 }] as BoardEntry[]);

@@ -20,9 +20,11 @@
  * carousel, tracking the active slide: the photo moves horizontally on swipe
  * while the board cross-fades in place.
  *
- * Order, one continuous dark surface with NO seam:
+ * CB57 order, one continuous dark surface with NO seam:
  *   photo → board rows (live/completed) or upcoming facts line (upcoming) →
- *   OUR PICKS block → action row (primary tournament door + secondary course).
+ *   OUR PICKS block. No action row or next-round row; no hairlines between
+ *   these blocks. Existing movement and pick-card internal rules are retained
+ *   and reported under CB57, not silently removed.
  * There is no stat strip and no COURSE SHAPE panel in this file or in
  * OverviewHero.tsx any more — older briefs described both; neither renders.
  * STRAIGHT bottom edge — the page canvas breathes below it, it does not tuck
@@ -38,16 +40,15 @@
  * The band renders on UPCOMING slides too. With no board there are no rows —
  * and NO placeholder or reserved height for them (§1).
  *
- * Board rows are fixed, never internally scrollable. The primary action is
- * the route to the rest of the board.
+ * CB57: board rows are fixed, never internally scrollable; the photo remains
+ * the tournament door. No replacement section or reserved height is added.
  */
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Trophy } from 'lucide-react';
 
-import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_08, WHITE_ALPHA_32, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_32, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useTourSelection } from '../../../context/TourSelectionContext';
@@ -55,12 +56,8 @@ import { PlayerAvatar } from '../../PlayerAvatar';
 import { useAIPredictions, type AITopContender } from '../../../hooks/useAIPredictions';
 import { useTournamentTeeTimes } from '../../../hooks/useTournamentTeeTimes';
 import { useTournamentLastYearTop4 } from '../../../hooks/useTournamentLastYearTop4';
-import { useTeeTimesAll } from '../../../tournament-v2/data/useTeeTimesAll';
-import { useDrawnRounds } from '../../../tournament-v2/data/useDrawnRounds';
-import { formatTimeHm } from '@/i18n/format';
 import { LastYearRow } from './LastYearRow';
-import { inRequiredRoundWindow, hasNextRound, leaderGroup, leaderOf, neededGross, nextDrawnRound } from './whatsNext';
-import { useTournamentVenueRecord } from '../../../overview/data/useTournamentVenueRecord';
+import { inRequiredRoundWindow, leaderOf, neededGross } from './whatsNext';
 import { surnameOf } from '../../../_shared/playerName';
 import { r } from '@/lib/radius';
 import { PicksSheet } from './PicksSheet';
@@ -71,7 +68,6 @@ import { OVERVIEW, pickMovementCards, type MovementCard } from '../overviewToken
 import { fmtScore } from '../../../utils/fmtScore';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { TeeAlertButton } from './TeeAlertButton';
 
 
 /**
@@ -212,7 +208,6 @@ interface HeroBoardSectionProps {
   totalRounds?: number | null;
   /** Venue par (to-par → gross conversion for the picks sheet's required round). */
   venuePar?: number | null;
-  onFullLeaderboard: () => void;
   onRowTap?: (playerId: string) => void;
 }
 
@@ -292,13 +287,10 @@ export function HeroBoardSection({
   championPlayerIds = [],
   venuePar = null,
   totalRounds = null,
-  onFullLeaderboard,
   onRowTap,
 }: HeroBoardSectionProps) {
   const { t } = useTranslation('tourhub');
-  const navigate = useNavigate();
   const hasBoard = phase !== 'upcoming' && shouldShowOverviewBoard(entries);
-  const { data: venueRecord } = useTournamentVenueRecord(tournamentId);
 
   const { viewingTournamentId, viewingTourSlug } = useTourSelection();
   const pickTourCode = viewingTourSlug ?? 'pga';
@@ -365,8 +357,6 @@ export function HeroBoardSection({
     return map;
   }, [inPlay, leader, picks, venuePar, boardByPlayer, currentRound, totalRounds]);
 
-  // Gated: no draw request unless in play with a round still to come; no
-  // tee-time request unless that next round is actually drawn.
   /* §C — ROUND N MOVEMENT. The same full-field boardMovementMap the MOV column
      used, so the guard is identical to the old hasMovement: in play, a prior
      round to rank against, at least one non-zero delta. */
@@ -412,11 +402,6 @@ export function HeroBoardSection({
   }, [inPlay, leader, picks, boardByPlayer, t]);
   const toReachWindow = inPlay && leader?.total != null && totalRounds != null && inRequiredRoundWindow(currentRound, totalRounds);
 
-  const drawGate = inPlay && totalRounds != null && hasNextRound(currentRound, totalRounds);
-  const { data: drawnRounds } = useDrawnRounds(tournamentId, { enabled: drawGate });
-  const nextRound = drawGate ? nextDrawnRound(currentRound, drawnRounds, totalRounds as number) : null;
-  const { data: nextGroups } = useTeeTimesAll(tournamentId, nextRound ?? 0, { enabled: nextRound != null });
-  const nextGroup = nextRound != null ? leaderGroup(nextGroups, leader?.playerId) : null;
 
   return (
     <div style={{ background: PAGE_CANVAS, fontFamily: FONT }}>
@@ -501,55 +486,6 @@ export function HeroBoardSection({
         />
       ) : null}
 
-      {nextRound != null && nextGroup ? (
-        <div data-overview-next-round style={{ padding: '14px 20px', borderTop: `1px solid ${WHITE_ALPHA_06}` }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
-          <div style={{ flexShrink: 0 }}>
-            <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: WHITE_ALPHA_65 }}>
-              {t('overview.hero.leadersOut', { round: nextRound })}
-            </div>
-            <div style={{ marginTop: 3, fontSize: 17, fontWeight: 800, color: INK, ...FIGS }}>{formatTimeHm(new Date(nextGroup.teeTime))}</div>
-          </div>
-          <div style={{ minWidth: 0, paddingTop: 15, fontSize: 13, fontWeight: 600, lineHeight: 1.4, color: INK }}>
-            {nextGroup.players.map((p) => p.name).join(', ')}
-          </div>
-          </div>
-          <TeeAlertButton tournamentId={tournamentId} round={nextRound} />
-        </div>
-      ) : null}
-
-      <div
-        data-overview-action-row
-        /* CORRECTIONS I.4: with the course button beside it the ROW carries the
-           top boundary and a 20px right / 12px bottom inset, so the course
-           button keeps its spacing and its 48px hit area. Alone, the CTA's own
-           top line is the row's boundary. */
-        style={venueRecord?.courseId
-          ? { display: 'flex', alignItems: 'center', gap: 8, borderTop: `1px solid ${OVERVIEW.hairline}`, padding: '0 20px 12px 0' }
-          : { display: 'flex', alignItems: 'center', gap: 8 }}
-      >
-        <button
-          type="button"
-          onClick={onFullLeaderboard}
-          data-overview-board-cta
-          /* §F.1 the mock's full-width row, not a filled pill. */
-          style={{ flex: '1 1 0', minWidth: 0, margin: 0, padding: 16, background: 'none', border: 'none', borderTop: venueRecord?.courseId ? 'none' : `1px solid ${OVERVIEW.hairline}`, borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, color: OVERVIEW.amber, fontFamily: FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', whiteSpace: 'nowrap' }}
-        >
-          {t(overviewTournamentDoorKey(phase))}
-          <ChevronRight size={16} color={OVERVIEW.amber} aria-hidden />
-        </button>
-        {venueRecord?.courseId ? (
-          <button
-            type="button"
-            onClick={() => navigate(`/courses/${venueRecord.courseId}`)}
-            data-overview-course-cta
-            style={{ flex: '1 1 0', minWidth: 0, minHeight: 48, margin: 0, padding: '0 12px', borderRadius: r.md, background: 'transparent', border: `1px solid ${WHITE_ALPHA_08}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: WHITE_ALPHA_65, fontFamily: FONT, fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.01em', cursor: 'pointer', whiteSpace: 'nowrap' }}
-          >
-            {t('overview.venueRecord.course')}
-            <ChevronRight size={16} aria-hidden />
-          </button>
-        ) : null}
-      </div>
     </div>
   );
 }
@@ -594,7 +530,7 @@ function PicksBlock({
 
   return (
     <div data-overview-picks style={{ background: PAGE_CANVAS }}>
-      <div style={{ padding: '14px 20px 9px', display: 'flex', alignItems: 'center', gap: 8, borderTop: `1px solid ${WHITE_ALPHA_06}` }}>
+      <div style={{ padding: '14px 20px 9px', display: 'flex', alignItems: 'center', gap: 8 }}>
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
             key, so band and sheet cannot drift apart in translation. */}

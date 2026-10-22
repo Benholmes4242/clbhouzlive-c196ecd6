@@ -136,7 +136,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
   /**
    * ONE SOURCE OF TRUTH FOR THE SLIDE'S STATE. deriveHeroState is the only
    * decision about what the on-screen slide IS; the result flows DOWN to both
-   * HybridHero (photo, champion) and HeroBoardSection (board, picks, actions).
+   * HybridHero (photo, champion) and HeroBoardSection (board, picks).
    * `slide.type` is never consulted for this — see the bucketing note in
    * useHeroCarouselData.
    */
@@ -315,8 +315,8 @@ export function OverviewHero({ height }: OverviewHeroProps) {
 
     {/* The band EXTENDS the hero downward. It tracks the active slide and
         cross-fades in place on swipe. On a live or completed slide it carries
-        the board; on an upcoming slide the upcoming facts and picks. The action
-        row always renders (§1). */}
+        the board; on an upcoming slide the upcoming facts and picks.
+        CB57 removes the action and next-round rows without reserving space. */}
     <AnimatePresence mode="wait" initial={false}>
       {bandTournamentId && (
         <motion.div
@@ -341,10 +341,6 @@ export function OverviewHero({ height }: OverviewHeroProps) {
             }
             championPlayerIds={championGate ? activeChampionMemberIds : []}
             venuePar={activeSlide?.tournament.venuePar ?? null}
-            onFullLeaderboard={() => {
-              const target = tournamentRoute(bandTournamentId, { kind: 'overview' });
-              navigate(target.to, { state: target.state });
-            }}
             onRowTap={(playerId) =>
               analyticsEvents.track('hero_board_row_tap', {
                 tournament_id: bandTournamentId,
