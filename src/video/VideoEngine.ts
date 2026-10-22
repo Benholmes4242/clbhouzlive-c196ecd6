@@ -51,6 +51,8 @@ import { applyStartLevel, bandwidthSeed, upshiftForSurface, viewportPixelHeight,
 import { coldOpenAttach, coldOpenFirstFrame } from '@/perf/coldOpen';
 import { trace, traceLookup, elIdOf, traceGenElId } from '@/perf/trace';
 import { trackAudioBlock, type AudioBlockTrigger } from './audioBlockAnalytics';
+import { BufferingMonitor, type StallEnd } from './bufferingMonitor';
+import { trackVisibleStall } from './stallAnalytics';
 import { feedLaneRoles, type FeedRole } from './feedLaneRoles';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { audioDebugEnabled, logAudio, msSinceOpen, getEntries } from '@/perf/audioDebug';
@@ -133,6 +135,8 @@ export interface LaneSnapshot {
   muted: boolean;
   firstFrame: boolean;
   audioBlocked: boolean;
+  /** CB50: visible-document play intent with no measured progress for 500ms. */
+  buffering: boolean;
   /** RAW lane.postId — may be a bare postId or an ownerKey (`${postId}:${idx}`)
    *  depending on which entry point wrote last. Consumers should handle both
    *  shapes (exact match OR `${postId}:` prefix). Do NOT normalize here. */
@@ -323,6 +327,41 @@ class VideoEngineImpl {
    * transitions state) and its policy is not 'always-muted' unless borrowed,
    * so silent rail and grid previews never keep the screen awake. */
   private anyPlaying = false;
+  // CB50 observers are keyed by lane object, so lane swaps cannot mix owners.
+  // Presentation leases are slot-keyed and held only by active feed/fullscreen
+  // indicators. Silent rails may buffer but never produce visible-stall events.
+  private bufferingMonitors = new Map<Lane, BufferingMonitor>();
+  private bufferingPresenters = new Map<LaneId, number>();
+  private stallSurfaces = new Map<Lane, string>();
+  private bufferingFor(lane: Lane): BufferingMonitor {
+    let monitor = this.bufferingMonitors.get(lane);
+    if (!monitor) {
+      monitor = new BufferingMonitor(
+        () => ({ currentTime: lane.el.currentTime || 0, firstFrame: lane.firstFrame }),
+        () => this.emit(lane),
+        (stall) => trackVisibleStall(lane.id, this.stallSurfaces.get(lane) ?? this.audioSurface(lane), lane.postId, stall),
+      );
+      this.bufferingMonitors.set(lane, monitor);
+    }
+    return monitor;
+  }
+  private stopBuffering(lane: Lane, reason: StallEnd): void { this.bufferingMonitors.get(lane)?.stop(reason); }
+  /** Presentation only: does not claim audio, mount a lane or change intent. */
+  presentBuffering(laneId: LaneId): () => void {
+    const lane = this.getLane(laneId);
+    this.bufferingPresenters.set(laneId, (this.bufferingPresenters.get(laneId) ?? 0) + 1);
+    this.stallSurfaces.set(lane, this.audioSurface(lane));
+    this.bufferingFor(lane).setPresented(true);
+    return () => {
+      const count = Math.max(0, (this.bufferingPresenters.get(laneId) ?? 1) - 1);
+      this.bufferingPresenters.set(laneId, count);
+      if (count) return;
+      const fs = useFullscreenFeedStore.getState();
+      const reason: StallEnd = document.hidden ? 'hidden' :
+        this.stallSurfaces.get(lane) === 'fullscreen' && (!fs.isOpen || (fs.closeAnim && fs.closeAnim !== 'idle')) ? 'close' : 'swipe';
+      this.bufferingFor(this.getLane(laneId)).setPresented(false, reason);
+    };
+  }
   private anyPlayingListeners = new Set<() => void>();
   isAnyLanePlaying(): boolean { return this.anyPlaying; }
   subscribeAnyPlaying(fn: () => void): () => void {
@@ -811,6 +850,7 @@ class VideoEngineImpl {
     this.resumeOwners.delete(lane.id);
     this.unmuteAttempts.delete(lane.id);
     lane.wantPlay = false;
+    this.stopBuffering(lane, 'swipe');
     if (laneId === 'fullscreen') {
       this.resetFirstFrameForLane(lane, 'unmount');
     }
@@ -900,6 +940,7 @@ class VideoEngineImpl {
       return;
     }
     (this as any)._lastLoadWasWarmSkip = false;
+    this.stopBuffering(lane, 'swipe');
     // Session re-point: if a session was running on this lane, close it out
     // before the new source takes over.
     const identityChanged = lane.postId != null && laneOwner !== callOwner;
@@ -933,6 +974,7 @@ class VideoEngineImpl {
     }
     // NOTE: do NOT clear wantPlay here — a mid-load play() intent must persist
     // so the engine can start playback once the new source reaches canplay.
+    if (lane.wantPlay && !document.hidden) this.bufferingFor(lane).start();
 
     if (posterUrl) lane.el.poster = posterUrl;
 
@@ -1297,6 +1339,7 @@ class VideoEngineImpl {
     };
 
     const onPlay = () => {
+      if (lane.wantPlay && !document.hidden) this.bufferingFor(lane).start();
       try { vt.onPlay(lane.postId, lane.el); } catch { /* analytics only */ }
       vperfLaneEvent(lane.id, 'playing');
       // Reveal as soon as the element reports it is actually playing. 'playing'
@@ -1331,6 +1374,7 @@ class VideoEngineImpl {
         this.blockAudio(lane, attempt.trigger);
         return;
       }
+      this.stopBuffering(lane, document.hidden ? 'hidden' : 'pause');
       if (lane.state !== 'error') this.transition(lane, 'paused');
       // Only emit sessions for real pauses (not the borrow guard's suppressed pauses).
       if (!lane.el.paused) return;
@@ -1356,11 +1400,13 @@ class VideoEngineImpl {
         return;
       }
       try { vt.onEnded(lane.el); } catch { /* analytics only */ }
+      this.stopBuffering(lane, 'ended');
       lane.endedCount++;
       this.emit(lane);
     };
 
     const onError = () => {
+      this.stopBuffering(lane, 'error');
       this.settleLoading(lane);
       this.transition(lane, 'error');
       vperfSessionEnd(lane.id, 'error');
@@ -1437,6 +1483,8 @@ class VideoEngineImpl {
       const laneOwner = norm(lane.postId);
       const callOwner = norm(caller);
 
+      if (laneOwner !== callOwner) this.stopBuffering(lane, 'swipe');
+
       if (lane.postId != null && laneOwner !== callOwner && lane.firstFrame) {
         lane.firstFrame = false;
         DBG(lane.id, 'firstFrame.reset', { reason: 'play.repoint', from: lane.postId, to: caller });
@@ -1446,6 +1494,7 @@ class VideoEngineImpl {
 
     // Persistent intent: set now, honored on mount + on canplay after (re)load.
     lane.wantPlay = true;
+    if (!document.hidden) this.bufferingFor(lane).start();
     // v9: NO activation-time audio claim here. The role-change subscription
     // (feedLaneRoles → reconcileAudio) is the single writer that promotes
     // the newly-active lane's audio. play() is now audio-neutral.
@@ -1566,6 +1615,7 @@ class VideoEngineImpl {
     this.resumeOwners.delete(lane.id);
     this.unmuteAttempts.delete(lane.id);
     lane.wantPlay = false;
+    this.stopBuffering(lane, 'pause');
     this.clearPlayWatchdog(laneId);
     if (!lane.el.paused) lane.el.pause();
   }
@@ -1584,6 +1634,7 @@ class VideoEngineImpl {
       this.resumeOwners.delete(lane.id);
       this.unmuteAttempts.delete(lane.id);
       lane.wantPlay = false;
+      this.stopBuffering(lane, document.hidden ? 'hidden' : 'pauseAll');
       if (!lane.el.paused) lane.el.pause();
       this.emit(lane);
     });
@@ -2023,6 +2074,10 @@ class VideoEngineImpl {
     this.resumeOwners.delete(a);
     this.resumeOwners.delete(b);
     // Objects swap slots; ids and listener sets stay with the slot.
+    this.stopBuffering(la, 'swipe');
+    this.stopBuffering(lb, 'swipe');
+    this.bufferingFor(la).setPresented(false, 'swipe');
+    this.bufferingFor(lb).setPresented(false, 'swipe');
     la.id = b; la.listeners = lb2; la.el.dataset.laneId = b;
     lb.id = a; lb.listeners = la2; lb.el.dataset.laneId = a;
     this.lanes.set(a, lb);
@@ -2048,6 +2103,9 @@ class VideoEngineImpl {
     const host = ensureHiddenHost();
     if (la.el.parentElement !== host) host.appendChild(la.el);
     la.mountedHost = null;
+    this.stallSurfaces.set(lb, this.audioSurface(lb));
+    this.bufferingFor(lb).setPresented((this.bufferingPresenters.get(a) ?? 0) > 0);
+    if (lb.wantPlay && !document.hidden) this.bufferingFor(lb).start();
     // Swapped-in side gets the full forward buffer back and its audio policy
     // re-applied under its new id; the parked side keeps its own policy.
     if (lb.hls) { try { lb.hls.config.maxBufferLength = HLS_CONFIG.maxBufferLength; } catch { /* noop */ } }
@@ -2062,6 +2120,7 @@ class VideoEngineImpl {
   /** Release the current source but keep the element+instance for reuse. */
   release(laneId: LaneId): void {
     const lane = this.getLane(laneId);
+    this.stopBuffering(lane, 'release');
     vperfSessionEnd(laneId, 'release');
     this.settleLoading(lane);
     if (lane.hls) {
@@ -2095,6 +2154,7 @@ class VideoEngineImpl {
       duration: isFinite(lane.el.duration) ? lane.el.duration : 0,
       muted: lane.el.muted,
       audioBlocked: this.blockedLanes.has(laneId),
+      buffering: this.bufferingMonitors.get(lane)?.buffering ?? false,
       firstFrame: lane.firstFrame,
       postId: lane.postId,
       endedCount: lane.endedCount,
@@ -2178,6 +2238,7 @@ class VideoEngineImpl {
   }
 
   private emit(lane: Lane, error?: string) {
+    this.bufferingMonitors.get(lane)?.progress();
     this.recomputeAnyPlaying();
     const snap = this.snapshot(lane.id);
     if (error) snap.error = error;

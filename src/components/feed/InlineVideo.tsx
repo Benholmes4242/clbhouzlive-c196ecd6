@@ -41,6 +41,7 @@ import {
   vperfHandoverFrame,
 } from '@/perf/vperf';
 import { isPerfEnabled } from '@/perf/navTiming';
+import { BufferingSpinner } from '@/components/media/BufferingSpinner';
 
 
 interface Props {
@@ -331,6 +332,8 @@ export const InlineVideo: React.FC<Props> = ({
       />
 
       {isProcessing && <VideoProcessingCard />}
+
+      <BufferingSpinner laneId={laneId} ownerKey={resolvedOwnerKey} active={isActive && !isProcessing} />
 
       {/* ONE VIDEO CHROME (BRIEF_VIDEO_CHROME_AND_FEED_LENGTH §1): mute is a
           CONTROL and sits bottom-LEFT; duration is a LABEL and owns

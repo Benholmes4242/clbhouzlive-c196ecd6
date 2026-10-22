@@ -26,6 +26,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CB50 signed-off Design A: status ink over media, identical in either theme. */
+:root {
+  --video-buffering-track: rgba(0,0,0,0.30);
+  --video-buffering-arc: #FFFFFF;
+  --video-buffering-shadow: drop-shadow(0 0 1.5px rgba(0,0,0,0.70)) drop-shadow(0 0 6px rgba(0,0,0,0.35));
+}
+.video-buffering-centre { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 3; pointer-events: none; }
+.video-buffering-centre--fullscreen { position: fixed; z-index: 29; }
+.video-buffering-arc { box-sizing: border-box; width: 30px; height: 30px; border: 3px solid var(--video-buffering-track); border-top-color: var(--video-buffering-arc); border-right-color: var(--video-buffering-arc); border-radius: 50%; filter: var(--video-buffering-shadow); animation: video-buffering-spin 0.9s linear infinite; }
+.video-buffering-arc--fullscreen { width: 40px; height: 40px; }
+@keyframes video-buffering-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .video-buffering-arc { animation: none; } }
+
 /* MEDIA_WALK_1: overlay effects refer to the walk's inherited semantic ink/canvas. */
 .hole-walk {
   --hole-walk-shadow: 0 1px 4px var(--hole-walk-canvas);
