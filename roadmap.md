@@ -1,5 +1,12 @@
 # Roadmap
 
+## CB48.1 — Finish snapshot completeness and unconditional unmute detection
+- [x] Added required audioBlocked:false to useVideoLane.ts NULL_SNAP. Only other LaneSnapshot literal is VideoEngine.snapshot(), already complete; no test/fixture literals found.
+- [x] Every reconciler engine unmute now arms the owner-bound attempt; gestureDepth had no other purpose and was removed. Added one passing unblockFromGesture self-pause case; all existing cases/assertions untouched.
+- [x] Original failure traced in temporary diagnostic copies (removed): before rotation active=feed-active,next=feed-prev,prev=feed-next; after down rotation active=feed-prev. Paused feed-next has no armed attempt and is already muted; pause event DOES fire, owner/wantPlay/mountedHost/visibility otherwise eligible. Isolated original case passed before edits. promoteToActive in setup swaps only active, not canonical next/prev. Sequence does not simulate an unmuted WebKit self-pause; no engine change to misclassify muted non-speaker pauses and no test edits made. Await explicit fixture-reset ruling.
+- [x] Full bunx vitest run: 2,131 passed +1 pre-existing failed =2,132 total/289 files; prior 2,131 total (2,130 passed/1 failed). Delta +1 solely new gesture case; zero deletions/renames/rewrites. Failure remains videoAudioRoleRecovery.test.tsx:118:53, AssertionError: expected false to be true // Object.is equality. Targeted 19 passed/1 failed. Automatic preview build OK 2026-10-22T05:58:11Z; separate typecheck not available from harness output, manual build/typecheck prohibited by environment.
+- [ ] STOP: original fixture has noncanonical next/prev roles; awaiting permission to restore canonical role preconditions without changing its four assertions. No new failures, no other pre-existing test failure. Authenticated real-phone checks remain unavailable.
+
 ## CB48 — Role-based sound and honest blocked-state controls
 - [x] Implemented role-capable focus and shared resolver for reconciliation/heartbeat; physical fullscreen close handoff unchanged.
 - [ ] STOP: engine self-pause fallback does not pass new test `src/test/videoAudioRoleRecovery.test.tsx:118:53`: `AssertionError: expected false to be true // Object.is equality`; no implementation/test correction after failure.

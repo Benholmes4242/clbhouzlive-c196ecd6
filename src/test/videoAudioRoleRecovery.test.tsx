@@ -125,6 +125,24 @@ describe('CB48 engine sound roles and recovery', () => {
     feedLaneRoles.rotate('down'); VideoEngine.pause('feed-next');
     expect(VideoEngine.isAudioBlocked('feed-next')).toBe(false);
   });
+  it('detects and recovers a self-pause within 1000ms after unblockFromGesture unmute', async () => {
+    await prepare('feed-active');
+    VideoEngine.setAudioFocus('active', 'feed');
+    useSessionAudio.getState().unmute();
+    vi.spyOn(element('feed-active'), 'play').mockRejectedValueOnce(new DOMException('denied', 'NotAllowedError'));
+    await VideoEngine.play('feed-active'); await tick();
+    expect(VideoEngine.isAudioBlocked('feed-active')).toBe(true);
+    // A different owner keeps the per-post analytics dedupe from hiding
+    // this second real refusal while the lane's blocked state is retained.
+    await prepare('feed-active', 'gesture:0');
+    VideoEngine.unblockFromGesture();
+    expect(element('feed-active').muted).toBe(false);
+    element('feed-active').pause(); await tick();
+    expect(VideoEngine.isAudioBlocked('feed-active')).toBe(true);
+    expect(element('feed-active').muted).toBe(true);
+    expect(element('feed-active').paused).toBe(false);
+    expect(analyticsEvents.track).toHaveBeenCalledWith('video_audio_blocked', expect.objectContaining({ post_id: 'gesture', trigger: 'unmute' }));
+  });
   it('does not classify a later pause outside the 1000ms window as sound refusal', async () => {
     await prepare('feed-next'); VideoEngine.setAudioFocus('active', 'feed'); useSessionAudio.getState().unmute();
     feedLaneRoles.rotate('down'); await vi.advanceTimersByTimeAsync(1001); element('feed-next').pause();

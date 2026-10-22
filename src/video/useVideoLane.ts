@@ -64,6 +64,7 @@ const NULL_SNAP: LaneSnapshot = {
   readyState: 0,
   duration: 0,
   muted: true,
+  audioBlocked: false,
   firstFrame: false,
   postId: null,
   endedCount: 0,
