@@ -323,6 +323,188 @@ export function vperfLaneEvent(
   else laneArms.set(laneId, remaining);
 }
 
+// ------------------------ CB52: first MOVING frame ------------------------
+//
+// ONE definition of "the member sees moving video": the first presented frame
+// (requestVideoFrameCallback where available, else timeupdate) on a lane
+// whose playhead has advanced past its value when the span was armed. After a
+// seek to 0 (loop) it is the first time currentTime > 0.05. Spans NEVER end on
+// 'play' / 'playing' / firstFrame — those fire too early, or not at all when
+// the video was already decoded. They stay as waypoints where they existed.
+//
+// Works for cold loads (baseline = first observed playhead for the owner),
+// already-decoded lanes (baseline = playhead at arm time) and lanes swapped in
+// from another slot (same as already-decoded: the resolver re-reads the
+// element behind the lane id every frame).
+
+export interface MovingArmOpts {
+  /** Expected owner key on the lane; progress for any other owner is ignored. */
+  owner?: string | null;
+  /** Playhead the video must advance past. null = first observed playhead. */
+  from?: number | null;
+  /** Seek-to-0 mode: progress only counts while currentTime < ceiling. */
+  ceiling?: number | null;
+  /** End the span as FAIL when the lane reports it cannot show video. */
+  failOnLane?: boolean;
+}
+
+interface MovingArm {
+  spanId: string;
+  owner: string | null;
+  from: number | null;
+  ceiling: number | null;
+  failOnLane: boolean;
+}
+
+const movingArms = new Map<string, MovingArm[]>();
+/** Backward jump (resume seek earlier than the baseline) re-baselines. */
+const MOVING_REBASE_S = 0.25;
+/** Seek-to-0 threshold. */
+export const MOVING_AFTER_SEEK_S = 0.05;
+
+export function normOwnerKey(k: string | null | undefined): string | null {
+  if (k == null) return null;
+  return k.includes(':') ? k : `${k}:0`;
+}
+
+type LaneResolver = (laneId: string) => { el: HTMLVideoElement | null; owner: string | null } | null;
+let __laneResolver: LaneResolver | null = null;
+/** VideoEngine registers how to read the element/owner behind a lane id. */
+export function vperfSetLaneResolver(fn: LaneResolver | null): void { __laneResolver = fn; }
+
+const rvfcLoops = new Map<string, { el: HTMLVideoElement; handle: number }>();
+
+function stopRvfc(laneId: string): void {
+  const loop = rvfcLoops.get(laneId);
+  if (!loop) return;
+  rvfcLoops.delete(laneId);
+  try { (loop.el as any).cancelVideoFrameCallback?.(loop.handle); } catch { /* noop */ }
+}
+
+function scheduleRvfc(laneId: string): void {
+  if (rvfcLoops.has(laneId) || !movingArms.has(laneId) || !__laneResolver) return;
+  let res: ReturnType<LaneResolver> = null;
+  try { res = __laneResolver(laneId); } catch { res = null; }
+  const el = res?.el as any;
+  if (!el || typeof el.requestVideoFrameCallback !== 'function') return;
+  const handle = el.requestVideoFrameCallback((_now: number, md: { mediaTime?: number }) => {
+    rvfcLoops.delete(laneId);
+    let owner: string | null = null;
+    try { owner = __laneResolver?.(laneId)?.owner ?? null; } catch { /* noop */ }
+    const t = typeof md?.mediaTime === 'number' ? md.mediaTime : (el.currentTime || 0);
+    checkMoving(laneId, t, owner, 'rvfc');
+    scheduleRvfc(laneId);
+  });
+  rvfcLoops.set(laneId, { el, handle });
+}
+
+export function vperfArmMoving(laneId: string, spanId: string, opts: MovingArmOpts = {}): void {
+  if (!on()) return;
+  const list = movingArms.get(laneId) ?? [];
+  list.push({
+    spanId,
+    owner: normOwnerKey(opts.owner ?? null),
+    from: opts.from ?? null,
+    ceiling: opts.ceiling ?? null,
+    failOnLane: !!opts.failOnLane,
+  });
+  movingArms.set(laneId, list);
+  scheduleRvfc(laneId);
+}
+
+/** Arm from a lane snapshot. warm = lane already shows the owner's frame. */
+export function vperfArmMovingFromSnapshot(
+  laneId: string,
+  spanId: string,
+  ownerKey: string,
+  snap: { postId: string | null; currentTime: number; firstFrame: boolean } | null,
+  extra: Omit<MovingArmOpts, 'owner' | 'from'> = {},
+): { warm: boolean } {
+  const owns = !!snap && normOwnerKey(snap.postId) === normOwnerKey(ownerKey);
+  const warm = owns && !!snap!.firstFrame;
+  vperfArmMoving(laneId, spanId, {
+    ...extra,
+    owner: ownerKey,
+    from: owns ? (snap!.currentTime || 0) : null,
+  });
+  return { warm };
+}
+
+function checkMoving(laneId: string, t: number, owner: string | null, via: 'rvfc' | 'timeupdate'): void {
+  const list = movingArms.get(laneId);
+  if (!list || list.length === 0 || !isFinite(t)) return;
+  const o = normOwnerKey(owner);
+  for (const arm of [...list]) {
+    if (arm.owner != null && o !== arm.owner) continue;
+    if (arm.ceiling != null) {
+      const floor = arm.from ?? MOVING_AFTER_SEEK_S;
+      if (t > floor && t < arm.ceiling) vperfEnd(arm.spanId, { closedBy: 'movingFrame', via });
+      continue;
+    }
+    if (arm.from == null) { arm.from = t; continue; }
+    if (t < arm.from - MOVING_REBASE_S) { arm.from = t; continue; }
+    if (t > arm.from) vperfEnd(arm.spanId, { closedBy: 'movingFrame', via });
+  }
+}
+
+/** VideoEngine calls this from its existing timeupdate listener. */
+export function vperfLaneProgress(laneId: string, currentTime: number, owner: string | null): void {
+  if (!on()) return;
+  checkMoving(laneId, currentTime, owner, 'timeupdate');
+}
+
+function clearMovingArmsBySpan(spanId: string): void {
+  for (const [laneId, list] of movingArms) {
+    const filtered = list.filter((a) => a.spanId !== spanId);
+    if (filtered.length === 0) { movingArms.delete(laneId); stopRvfc(laneId); }
+    else if (filtered.length !== list.length) movingArms.set(laneId, filtered);
+  }
+}
+
+/** A lane cannot show video (error / save-data). Ends failOnLane spans as FAIL. */
+export function vperfLaneFailure(laneId: string, closedBy: 'error' | 'saveData'): void {
+  if (!on()) return;
+  const list = movingArms.get(laneId);
+  if (!list) return;
+  for (const arm of [...list]) {
+    if (!arm.failOnLane) continue;
+    const rec = spans.get(arm.spanId);
+    if (!rec) continue;
+    spans.delete(arm.spanId);
+    clearLaneArmsBySpan(arm.spanId);
+    finish(rec, 'FAIL', { closedBy });
+  }
+}
+
+/** Re-kind an in-flight span (fs.open → fs.open.borrow|lane|image). Picks
+ *  up the new kind's DEFAULT_BUDGETS entry. */
+export function vperfSetKind(spanId: string, kind: string): void {
+  if (!on()) return;
+  const rec = spans.get(spanId);
+  if (!rec) return;
+  rec.kind = kind;
+  const b = DEFAULT_BUDGETS[kind];
+  if (typeof b === 'number') rec.budgetMs = b;
+}
+
+// Borrow opens end at the first paint AFTER the borrowed element is mounted
+// into the fullscreen host (BorrowedSlot's layout effect → two rAFs).
+let __pendingBorrowSpan: string | null = null;
+export function vperfArmBorrowMount(spanId: string): void {
+  if (!on()) return;
+  __pendingBorrowSpan = spanId;
+}
+export function vperfBorrowMounted(): void {
+  const id = __pendingBorrowSpan;
+  if (!id) return;
+  __pendingBorrowSpan = null;
+  const raf = typeof requestAnimationFrame === 'function'
+    ? requestAnimationFrame
+    : (cb: FrameRequestCallback) => setTimeout(() => cb(performance.now()), 16) as unknown as number;
+  vperfMark(id, 'borrowMounted');
+  raf(() => raf(() => vperfEnd(id, { closedBy: 'borrowMounted' })));
+}
+
 // ------------------------ Session health ------------------------
 
 function readQualityDelta(
