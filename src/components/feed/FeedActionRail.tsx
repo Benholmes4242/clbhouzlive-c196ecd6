@@ -195,7 +195,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
   const showJustFollowed = !readOnly && !isOwnPost && justFollowed && !!creator;
 
   const muteButton = isVideo ? (
-    <MuteButton size="md" />
+    <MuteButton size="md" laneId="active" />
   ) : null;
 
   // Heart pop animation key — bumps when transitioning to liked

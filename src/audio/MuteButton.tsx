@@ -15,13 +15,15 @@ import { Volume2, VolumeX } from 'lucide-react';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { VideoEngine, type LaneId } from '@/video/VideoEngine';
 import { useLaneAudioBlocked } from './useLaneAudioBlocked';
+import { feedLaneRoles } from '@/video/feedLaneRoles';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import * as audioDbg from '@/perf/audioDebug';
 
 type Size = 'sm' | 'md';
 
 interface MuteButtonProps {
   /** Session mode: physical lane this icon controls. Local mode ignores it. */
-  laneId?: LaneId | null;
+  laneId?: LaneId | 'active' | null;
   size?: Size;
   /** LOCAL mode: when provided, the button is controlled and never touches session audio. */
   muted?: boolean;
@@ -43,7 +45,14 @@ export const MuteButton: React.FC<MuteButtonProps> = ({
 }) => {
   const sessionMuted = useSessionAudio((s) => s.isMuted);
   const controlled = muted !== undefined;
-  const blocked = useLaneAudioBlocked(controlled ? null : laneId);
+  const activeLane = React.useSyncExternalStore(
+    (notify) => feedLaneRoles.subscribe(notify),
+    () => feedLaneRoles.laneForRole('active'),
+    () => feedLaneRoles.laneForRole('active'),
+  );
+  const viewerLane = useFullscreenFeedStore((s) => s.isOpen ? s.borrow?.laneId ?? 'fullscreen' : null);
+  const resolvedLane = laneId === 'active' ? viewerLane ?? activeLane : laneId;
+  const blocked = useLaneAudioBlocked(controlled ? null : resolvedLane);
   const isMuted = controlled ? !!muted : sessionMuted || blocked;
 
   const handleClick = (e: React.MouseEvent) => {

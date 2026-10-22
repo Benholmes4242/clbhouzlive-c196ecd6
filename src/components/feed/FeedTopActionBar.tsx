@@ -145,7 +145,7 @@ export const FeedTopActionBar: React.FC<FeedTopActionBarProps> = ({
             </button>
           )}
 
-          {isVideo && <MuteButton size="sm" />}
+          {isVideo && <MuteButton size="sm" laneId="active" />}
         </div>
 
         {/* RIGHT cluster — hidden in read-only (gallery) mode. */}

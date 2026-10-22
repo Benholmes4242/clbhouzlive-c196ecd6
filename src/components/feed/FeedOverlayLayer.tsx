@@ -328,7 +328,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             pointerEvents: overlayVisible ? 'auto' : 'none',
           }}
         >
-          <MuteButton size="sm" />
+          <MuteButton size="sm" laneId="active" />
         </div>
       )}
 
