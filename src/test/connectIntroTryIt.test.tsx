@@ -4,9 +4,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { readFileSync } from 'node:fs';
 import {
-  buildReadout,
   chooseCirclePeople,
-  costliestThree,
   displayCourseName,
   nextFooterHidden,
   startingHandicap,
@@ -18,7 +16,13 @@ const i18n = vi.hoisted(() => ({
   dict: {
     'whsConnect.intro.homeClubKicker': 'Your home club',
     'whsConnect.intro.change': 'Change',
-    'whsConnect.intro.tryHeadlineLine1': 'Which holes at',
+    'whsConnect.intro.fieldHeadlineLine2': 'takes {{shots}} shots',
+    'whsConnect.intro.fieldHeadlineLine3': 'off the field.',
+    'whsConnect.intro.fieldOver': 'over par, on average',
+    'whsConnect.intro.fieldAcross': 'across {{rounds}} rounds, every handicap',
+    'whsConnect.intro.fieldLabel': 'The field',
+    'whsConnect.intro.youLabel': 'You',
+    'whsConnect.intro.headlineLine1': 'Connect once.',
     'whsConnect.intro.tryHeadlineLine3': 'will cost you?',
     'whsConnect.intro.stepperLabel': 'If you play off',
     'whsConnect.intro.lowerHandicapAria': 'Lower handicap',
@@ -86,7 +90,7 @@ const state = vi.hoisted(() => ({
   home: { clubId: null as string | null, isFetched: false, isLoading: false },
   intro: { isPending: true, data: null as any },
   profile: { eg_handicap_index: null as number | null, manual_handicap_index: 13 as number | null },
-  band: null as any,
+  stats: null as any,
   circle: { circle: 1, connected: 1, people: [{ user_id: 'p1', name: 'Alice', avatar_url: null, club: 'Parkstone', index: 14 }] },
 }));
 
@@ -113,7 +117,7 @@ vi.mock('@/integrations/supabase/client', () => ({
       })),
     })),
     rpc: vi.fn(async (name: string) => {
-      if (name === 'get_connect_intro_band') return { data: state.band, error: null };
+      if (name === 'get_course_stats_detail') return { data: state.stats, error: null };
       if (name === 'get_connect_circle_preview') return { data: state.circle, error: null };
       return { data: null, error: null };
     }),
@@ -129,11 +133,6 @@ function holes() {
   return Array.from({ length: 18 }, (_, i) => ({ hole_no: i + 1, par: 4, stroke_index: i + 1, avg_to_par: i < 3 ? 1.5 - i * 0.1 : 0.2 }));
 }
 
-function loadedBand(hcp = 12) {
-  const block = { rounds: 9, golfers: 3, median_gross: 85, par: 71, holes: holes() };
-  return { available: true, hcp, band: { ...block, lo: 10, hi: 14 }, all: block };
-}
-
 function renderIntro(layout: 'page' | 'embedded' = 'page') {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(<QueryClientProvider client={qc}><EmptyStateScreen layout={layout} onPickCountry={() => {}} onDecline={() => {}} /></QueryClientProvider>);
@@ -145,7 +144,7 @@ beforeEach(() => {
   state.home = { clubId: null, isFetched: false, isLoading: false };
   state.intro = { isPending: true, data: null };
   state.profile = { eg_handicap_index: null, manual_handicap_index: 13 };
-  state.band = loadedBand(12);
+  state.stats = { course_id: 'course1', avg_over_par: 11.6, rounds_tracked: 912 };
   state.circle = { circle: 1, connected: 1, people: [{ user_id: 'p1', name: 'Alice', avatar_url: null, club: 'Parkstone', index: 14 }] };
   introSpy.mockImplementation(() => state.intro);
 });
@@ -168,48 +167,6 @@ describe('connect intro try-it helpers', () => {
     [{ manualHandicapIndex: null }, 18],
   ])('resolves starting handicap through display resolver', (input, expected) => {
     expect(startingHandicap(input)).toBe(expected);
-  });
-
-  it('chooses costliest three by avg, then lower stroke index, then lower hole', () => {
-    const holes = [
-      { hole_no: 4, par: 4, stroke_index: 7, avg_to_par: 1.1 },
-      { hole_no: 2, par: 4, stroke_index: 8, avg_to_par: 1.2 },
-      { hole_no: 3, par: 4, stroke_index: 5, avg_to_par: 1.2 },
-      { hole_no: 1, par: 4, stroke_index: 1, avg_to_par: 0.2 },
-    ];
-    expect(costliestThree(holes).map((h) => h.hole_no)).toEqual([3, 2, 4]);
-  });
-
-  it('builds band and all-golfer readout copy including scratch and plus ranges', () => {
-    const block = {
-      rounds: 9,
-      golfers: 3,
-      median_gross: 85,
-      par: 71,
-      holes: [
-        { hole_no: 18, par: 5, stroke_index: 4, avg_to_par: 1.2 },
-        { hole_no: 7, par: 4, stroke_index: 2, avg_to_par: 1.0 },
-        { hole_no: 2, par: 3, stroke_index: 9, avg_to_par: 0.9 },
-      ],
-    };
-    expect(buildReadout(block, { ...block, lo: -4, hi: 2 }, 0).baseline).toContain('golfers off scratch');
-    expect(buildReadout(block, { ...block, lo: -4, hi: 2 }, 0).source).toContain('off +4 to 2');
-    expect(buildReadout(block, null, 12).source).toBe('Not enough rounds yet from golfers off 12, so this is every golfer here: 9 rounds.');
-  });
-
-  it('switches readout wording for negative hole figures', () => {
-    const block = {
-      rounds: 1,
-      golfers: 1,
-      median_gross: 70,
-      par: 71,
-      holes: [
-        { hole_no: 1, par: 4, stroke_index: 1, avg_to_par: -0.1 },
-        { hole_no: 2, par: 4, stroke_index: 2, avg_to_par: -0.2 },
-        { hole_no: 3, par: 4, stroke_index: 3, avg_to_par: -0.3 },
-      ],
-    };
-    expect(buildReadout(block, null, 5).cost).toContain('against par.');
   });
 
   it('windows circle people and leaves the You row before the first higher index', () => {
@@ -238,7 +195,7 @@ describe('connect intro fix 1 behaviour', () => {
     state.session = { user: { id: 'u1' }, loading: false };
     state.home = { clubId: 'club1', isFetched: true, isLoading: false };
     state.intro = { isPending: false, data: { source: 'home', courseId: 'course1', courseName: 'Parkstone Golf Club', holes: holes(), totalRounds: 9 } };
-    state.band = loadedBand(12);
+    state.stats = { course_id: 'course1', avg_over_par: 11.6, rounds_tracked: 912 };
   });
 
   it('keeps footer out of fixed positioning and hides it in embedded layout', async () => {
@@ -249,16 +206,26 @@ describe('connect intro fix 1 behaviour', () => {
 
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     rerender(<QueryClientProvider client={qc}><EmptyStateScreen layout="embedded" onPickCountry={() => {}} onDecline={() => {}} /></QueryClientProvider>);
-    await screen.findByText('Which holes at');
+    await screen.findByText('takes 11.6 shots');
     expect(container.textContent).not.toContain('Connect your official handicap and this is built from');
   });
 
-  it('uses band.data.hcp for readout and circle placement while the stepper shows the live value', async () => {
+  it('shows the field verdict for the intro course and places the circle by the member\'s index', async () => {
     renderIntro('embedded');
-    await screen.findByText('If you play off');
-    expect(screen.getAllByText('13').length).toBeGreaterThan(0);
-    expect(screen.getByText(/golfers off 12 typically shoot here/)).toBeInTheDocument();
+    await screen.findByText('takes 11.6 shots');
+    expect(screen.getAllByText('+11.6').length).toBeGreaterThan(0);
+    expect(screen.getByText('across 912 rounds, every handicap')).toBeInTheDocument();
+    expect(screen.getByText('The field')).toBeInTheDocument();
     expect(screen.getAllByText('You').length).toBeGreaterThan(0);
+    const aliceRow = screen.getByText('Alice').parentElement?.parentElement;
+    expect(aliceRow?.previousElementSibling?.textContent).toContain('connect to take your place');
+  });
+
+  it('renders LegacyFallback when avg_over_par is null', async () => {
+    state.stats = { course_id: 'course1', avg_over_par: null, rounds_tracked: 912 };
+    renderIntro('embedded');
+    expect(await screen.findByText('Connect once.')).toBeInTheDocument();
+    expect(screen.queryByText('takes 11.6 shots')).toBeNull();
   });
 
   it('keeps the circle second sentence at one connected golfer', async () => {
@@ -268,7 +235,7 @@ describe('connect intro fix 1 behaviour', () => {
 
   it('fires connect_intro_viewed once after the loaded state renders', async () => {
     renderIntro('embedded');
-    await waitFor(() => expect(analyticsEvents.track).toHaveBeenCalledWith('connect_intro_viewed', { source: 'home', band: true, h0: 13 }));
+    await waitFor(() => expect(analyticsEvents.track).toHaveBeenCalledWith('connect_intro_viewed', { source: 'home', h0: 13 }));
     await waitFor(() => expect((analyticsEvents.track as any).mock.calls.filter((c: unknown[]) => c[0] === 'connect_intro_viewed')).toHaveLength(1));
   });
 });
