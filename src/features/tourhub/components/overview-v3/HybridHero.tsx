@@ -131,9 +131,19 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
   const { tournament } = slide;
   const { t } = useTranslation('tourhub');
 
+  // CB55: the ONE Tour course-photo resolver, keyed by tournament id — the
+  // same resolution Tournament Detail gets for this tournament. The venue
+  // fields feed the live catalogue search for unlinked, unsaved venues.
   const venueAdapter = useMemo(
-    () => tournament.id ? [{ id: tournament.id, venue_name: tournament.venueName }] : [],
-    [tournament.id, tournament.venueName],
+    () => tournament.id ? [{
+      id: tournament.id,
+      venue_name: tournament.venueName,
+      venue_course_name: tournament.venueCourseName,
+      venue_city: tournament.venueCity,
+      venue_state: tournament.venueState,
+      venue_country: tournament.venueCountry,
+    }] : [],
+    [tournament.id, tournament.venueName, tournament.venueCourseName, tournament.venueCity, tournament.venueState, tournament.venueCountry],
   );
   const { data: imageMap } = useBatchCourseImages(venueAdapter);
   const venueImageUrl = tournament.id ? imageMap?.get(tournament.id) ?? null : null;

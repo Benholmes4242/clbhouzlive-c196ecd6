@@ -237,7 +237,7 @@ export function TournamentPage() {
         <HeroSection
           meta={meta}
           state={pulse.state}
-          imageUrl={courseImage?.imageUrl ?? null}
+          imageUrl={courseImageUrl}
           tourCode={tourCode}
           contest={contest}
           fieldCount={fieldCount}
