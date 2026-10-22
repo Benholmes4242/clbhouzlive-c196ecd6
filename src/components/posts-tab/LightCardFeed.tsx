@@ -19,6 +19,7 @@
  *
  * Clubhouse `CardFeed`/`FeedCard` are untouched.
  */
+import { onLentLaneReturned } from '@/video/fullscreenVerticalWarm';
 import { dropUnresolvedRounds } from '@/components/feed/dropUnresolvedRounds';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
@@ -290,12 +291,17 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     };
   }, [recheckActive]);
 
+  const fsOpenForScroll = useFullscreenFeedStore((s) => s.isOpen);
+  const fsOpenScrollRef = useRef(fsOpenForScroll);
+  fsOpenScrollRef.current = fsOpenForScroll;
   useEffect(() => {
     let raf = 0;
     const scroller: HTMLElement | Window = document.getElementById('root') ?? window;
     const readScrollTop = () =>
       scroller instanceof Window ? scroller.scrollY : (scroller as HTMLElement).scrollTop;
     const onScroll = (e: Event) => {
+      // CB53 — no work while the fullscreen viewer is open.
+      if (fsOpenScrollRef.current) return;
       // [VPERF] CB52 — inline frame-time sampling, page scroller only.
       if (e.target === scroller || (scroller instanceof Window && e.target === document)) vperfFeedScrollTick('posts-tab', 'inline');
       const st = readScrollTop();
@@ -321,7 +327,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   }, [recheckActive]);
 
   // Symmetric neighbour warm-up via role lookup — see CardFeed.
-  useEffect(() => {
+  const warmNeighbourRoles = useCallback((roles: Array<'next' | 'prev'>) => {
     const warm = (role: 'next' | 'prev', post: FeedPost | undefined) => {
       const m = post?.mediaItems?.[0];
       if (!post || !m || m.type !== 'video' || !m.hlsUrl) return;
@@ -334,9 +340,18 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
         });
       } catch { /* engine may not be booted yet — safe to ignore */ }
     };
-    warm('next', posts[playingIdx + 1]);
-    warm('prev', posts[playingIdx - 1]);
+    for (const role of roles) warm(role, role === 'next' ? posts[playingIdx + 1] : posts[playingIdx - 1]);
   }, [playingIdx, posts]);
+  useEffect(() => {
+    warmNeighbourRoles(['next', 'prev']);
+  }, [warmNeighbourRoles]);
+  // CB53 — re-warm the neighbour role a returned lent lane now holds.
+  const warmNeighbourRolesRef = useRef(warmNeighbourRoles);
+  warmNeighbourRolesRef.current = warmNeighbourRoles;
+  useEffect(() => onLentLaneReturned((laneId) => {
+    const role = feedLaneRoles.roleForLane(laneId);
+    if (role === 'next' || role === 'prev') warmNeighbourRolesRef.current([role]);
+  }), []);
 
   // Promotion + fullscreen clears — see CardFeed for rationale.
   useEffect(() => {

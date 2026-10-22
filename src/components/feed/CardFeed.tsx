@@ -18,6 +18,7 @@
  *    WebView's `<video>` budget.
  *  - Persisted multi-media carousel position via `clubhouseStore`.
  */
+import { onLentLaneReturned } from '@/video/fullscreenVerticalWarm';
 import type { RoundCourseMeta } from './roundPostItem';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
 import { dropUnresolvedRounds } from './dropUnresolvedRounds';
@@ -497,7 +498,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     carouselNeighbourOverride.get,
     carouselNeighbourOverride.get,
   );
-  useEffect(() => {
+  const warmNeighbourRoles = useCallback((roles: Array<'next' | 'prev'>) => {
     const activePost = posts[playingIdx];
     const ownedBy =
       activePost && neighbourOverride && neighbourOverride.postId === activePost.id
@@ -526,9 +527,19 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
         });
       } catch { /* engine may not be booted yet — safe to ignore */ }
     };
-    warm('next', posts[playingIdx + 1]);
-    warm('prev', posts[playingIdx - 1]);
+    for (const role of roles) warm(role, role === 'next' ? posts[playingIdx + 1] : posts[playingIdx - 1]);
   }, [playingIdx, posts, neighbourOverride]);
+  useEffect(() => {
+    warmNeighbourRoles(['next', 'prev']);
+  }, [warmNeighbourRoles]);
+  // CB53 — the fullscreen viewer lent one of the neighbour lanes and released
+  // it on close; re-warm whichever neighbour role that lane now holds.
+  const warmNeighbourRolesRef = useRef(warmNeighbourRoles);
+  warmNeighbourRolesRef.current = warmNeighbourRoles;
+  useEffect(() => onLentLaneReturned((laneId) => {
+    const role = feedLaneRoles.roleForLane(laneId);
+    if (role === 'next' || role === 'prev') warmNeighbourRolesRef.current([role]);
+  }), []);
 
 
 
@@ -654,11 +665,17 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
     };
   }, [recheckActive, posts]);
 
+  const fsOpenForScroll = useFullscreenFeedStore((s) => s.isOpen);
+  const fsOpenScrollRef = useRef(fsOpenForScroll);
+  fsOpenScrollRef.current = fsOpenForScroll;
   // Re-evaluate on scroll — IntersectionObserver alone doesn't fire
   // continuously during scroll within the on-screen set.
   useEffect(() => {
     let raf = 0;
     const onScroll = (e: Event) => {
+      // CB53 — this window capture listener also hears the fullscreen
+      // viewer's own scrolls; while the viewer is open it does no work.
+      if (fsOpenScrollRef.current) return;
       // [VPERF] CB52 — inline frame-time sampling, own scroller only (this
       // window capture listener also sees the fullscreen viewer's scrolls).
       if (e.target === scrollerElRef.current) vperfFeedScrollTick('cardfeed', 'inline');
