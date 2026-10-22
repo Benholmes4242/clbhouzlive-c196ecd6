@@ -44,6 +44,11 @@ import {
   vperfStart,
   vperfMark,
   vperfNextId,
+  vperfLaneProgress,
+  vperfLaneFailure,
+  vperfArmMoving,
+  vperfSetLaneResolver,
+  MOVING_AFTER_SEEK_S,
 } from '@/perf/vperf';
 import { readSeededBandwidth } from './bandwidthMemory';
 import { applyStartLevel, bandwidthSeed, upshiftForSurface, viewportPixelHeight, elementPixelHeight } from './startLevel';
@@ -932,6 +937,8 @@ class VideoEngineImpl {
       } else if (lane.el.readyState >= 2) {
         lane.firstFrame = true;
         try { lane.el.removeAttribute('poster'); } catch {}
+        // [VPERF] CB52 — waypoint only; spans end on the first moving frame.
+        vperfLaneEvent(laneId, 'firstFrame', { warmSkip: true });
         this.emit(lane);
       }
       // Signal 'warm' cache hit to any pending autoplay arm — the caller
@@ -957,6 +964,7 @@ class VideoEngineImpl {
 
     if (this.saveDataGated) {
       DBG(laneId, 'skip load: save-data gated');
+      vperfLaneFailure(laneId, 'saveData');
       return;
     }
     if (this.loadingCount >= MAX_CONCURRENT_LOADS && lane.state !== 'ready' && lane.state !== 'playing') {
@@ -1314,6 +1322,8 @@ class VideoEngineImpl {
     };
 
     const onTime = () => {
+      // [VPERF] CB52 — moving-frame fallback where rVFC is unavailable.
+      vperfLaneProgress(lane.id, lane.el.currentTime || 0, lane.postId);
       try { vt.onTime(lane.postId, lane.el); } catch { /* analytics only */ }
       if (lane.postId) this.lastPos.set(lane.postId, lane.el.currentTime || 0);
       if (!lane.firstFrame) markReadyToShow('timeupdate');
@@ -1323,11 +1333,13 @@ class VideoEngineImpl {
       if (lane.loop && isFinite(dur) && dur > 0 && dur < 15) {
         const remaining = dur - (lane.el.currentTime || 0);
         if (remaining < 0.1) {
-          // [VPERF] S7 loop.gap — measure seek-to-0 → next 'playing' event.
+          // [VPERF] S7 loop.gap — seek-to-0 → first MOVING frame (CB52).
+          // 'play' never fires here (the element is still playing), so
+          // 'playing' is a waypoint only.
           const gapId = vperfNextId(`loop.gap:${lane.id}`);
           vperfStart(gapId, 'loop.gap', { laneId: lane.id, postId: lane.postId });
-          vperfSessionSuppressNextStall(lane.id);
-          vperfArmLane(lane.id, { spanId: gapId, endOn: 'playing' });
+          vperfArmLane(lane.id, { spanId: gapId, endOn: 'playing', phase: 'playing' });
+          vperfArmMoving(lane.id, gapId, { owner: lane.postId, from: MOVING_AFTER_SEEK_S, ceiling: (lane.el.currentTime || dur) - 0.05 });
           try { lane.el.currentTime = 0; } catch { /* noop */ }
           const p = this.attemptPlay(lane);
           if (p && typeof (p as Promise<void>).catch === 'function') {
@@ -1386,10 +1398,12 @@ class VideoEngineImpl {
     };
     const onEnded = () => {
       if (lane.loop) {
+        // [VPERF] loop.gap — seek-to-0 → first MOVING frame (CB52).
         const gapId = vperfNextId(`loop.gap:${lane.id}`);
+        const preSeek = lane.el.currentTime || lane.el.duration || 0;
         vperfStart(gapId, 'loop.gap', { laneId: lane.id, postId: lane.postId });
-        vperfSessionSuppressNextStall(lane.id);
-        vperfArmLane(lane.id, { spanId: gapId, endOn: 'playing' });
+        vperfArmLane(lane.id, { spanId: gapId, endOn: 'playing', phase: 'playing' });
+        vperfArmMoving(lane.id, gapId, { owner: lane.postId, from: MOVING_AFTER_SEEK_S, ceiling: isFinite(preSeek) && preSeek > 0.1 ? preSeek - 0.05 : null });
         // hls.js: get segment 0 in flight before the seek lands.
         if (lane.hls) { try { lane.hls.startLoad(0); } catch { /* noop */ } }
         try { lane.el.currentTime = 0; } catch { /* noop */ }
@@ -1410,6 +1424,7 @@ class VideoEngineImpl {
       this.settleLoading(lane);
       this.transition(lane, 'error');
       vperfSessionEnd(lane.id, 'error');
+      vperfLaneFailure(lane.id, 'error');
     };
     const onCanPlay = () => {
       vperfLaneEvent(lane.id, 'canplay');
