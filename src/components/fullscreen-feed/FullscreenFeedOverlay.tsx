@@ -1018,6 +1018,8 @@ export function FullscreenFeedOverlay() {
                     onDoubleTapLike={handleDoubleTapLike}
                   />
 
+                  <FullscreenBuffering activePost={activePost} />
+
                 </div>
 
                 {/* ── Blurred self-backdrop (surround) ──
