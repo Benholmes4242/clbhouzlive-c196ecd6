@@ -118,6 +118,8 @@ const DEFAULT_BUDGETS: Record<string, number> = {
 
 // -------- page tag (auto-injected into every emit) --------
 let __currentPage: string = 'unknown';
+/** performance.now() of the last visibilitychange → hidden (CB52 Part 5). */
+let __lastHiddenAt = -Infinity;
 export function vperfSetPage(page: string): void {
   __currentPage = page || 'unknown';
   // Trigger per-page nav summary when the page changes.
@@ -1165,13 +1167,18 @@ interface FeedScrollRec {
 const feedScroll = new Map<string, FeedScrollRec>();
 
 /** Called on scroll events. Coalesces sampling into one span per scroll burst. */
-export function vperfFeedScrollTick(key: string = 'default'): void {
+/** CB52: `surface` keys the rollup — `${page}:inline` for CardFeed /
+ *  LightCardFeed, `${page}:fullscreen` for SnapFeed — so they never mix.
+ *  Cost: rAF frame-time sampling only while a scroll burst is in progress
+ *  (one performance.now + a compare per frame); no layout reads, no React. */
+export function vperfFeedScrollTick(key: string = 'default', surface: 'inline' | 'fullscreen' = 'fullscreen'): void {
   if (!on()) return;
   const now = performance.now();
-  let rec = feedScroll.get(key);
+  const mapKey = `${key}|${surface}`;
+  let rec = feedScroll.get(mapKey);
   if (!rec) {
     rec = {
-      page: __currentPage,
+      page: `${__currentPage}:${surface}`,
       t0: now,
       frames: 0,
       longFrames: 0,
@@ -1190,13 +1197,13 @@ export function vperfFeedScrollTick(key: string = 'default'): void {
       rec!.rafId = requestAnimationFrame(sample);
     };
     rec.rafId = requestAnimationFrame(sample);
-    feedScroll.set(key, rec);
+    feedScroll.set(mapKey, rec);
   }
   clearTimeout(rec.idleTimer);
   rec.idleTimer = setTimeout(() => {
-    const r = feedScroll.get(key);
+    const r = feedScroll.get(mapKey);
     if (!r) return;
-    feedScroll.delete(key);
+    feedScroll.delete(mapKey);
     cancelAnimationFrame(r.rafId);
     const durationMs = Math.round(performance.now() - r.t0);
     emit('feed.scroll', {
@@ -1239,9 +1246,12 @@ export function vperfFeedActivateEnd(opts: {
   earlyStarted?: boolean;
 }): void {
   if (!on()) return;
+  // CB52 Part 5: a start that predates the last backgrounding is cleared.
+  if (opts.t0 <= __lastHiddenAt) return;
   const totalMs = Math.round(performance.now() - opts.t0);
   const budget = opts.mediaType === 'image' ? 250 : (opts.warm ? 120 : 600);
   emit('feed.activate', {
+    page: `${__currentPage}:inline`,
     idx: opts.idx,
     mediaType: opts.mediaType,
     warm: !!opts.warm,
@@ -1251,6 +1261,54 @@ export function vperfFeedActivateEnd(opts: {
     totalMs,
     budgetMs: budget,
     verdict: totalMs <= budget ? 'PASS' : 'SLOW',
+  });
+}
+
+/** CB52 Part 2 — inline-feed video activation (CardFeed / LightCardFeed).
+ *  One span per promotion; ends on the first moving frame on the active lane.
+ *  warm = the lane already shows this owner's decoded frame. Returns the span
+ *  id so the caller supersedes it on the next promotion. */
+export function vperfFeedActivateVideo(opts: {
+  laneId: string;
+  ownerKey: string;
+  idx: number;
+  snap: { postId: string | null; currentTime: number; firstFrame: boolean } | null;
+  earlyStarted?: boolean;
+  prefetched?: boolean;
+}): { spanId: string; warm: boolean } {
+  const spanId = vperfNextId(`feed.activate:${opts.ownerKey}`);
+  const owns = !!opts.snap && normOwnerKey(opts.snap.postId) === normOwnerKey(opts.ownerKey);
+  const warm = owns && !!opts.snap!.firstFrame;
+  vperfStart(spanId, 'feed.activate', {
+    page: `${__currentPage}:inline`,
+    idx: opts.idx,
+    mediaType: 'video',
+    warm,
+    prefetched: !!opts.prefetched,
+    earlyStarted: !!opts.earlyStarted,
+    dualActiveMs: __dualActiveMsTotal,
+    budgetMs: warm ? DEFAULT_BUDGETS['feed.activate.video.warm'] : DEFAULT_BUDGETS['feed.activate.video.cold'],
+  });
+  vperfArmMovingFromSnapshot(opts.laneId, spanId, opts.ownerKey, opts.snap);
+  return { spanId, warm };
+}
+
+// ---------------- CB52 Part 5: nothing runs while hidden ----------------
+/** Supersede every open span and clear pending activation / scroll samples. */
+export function vperfOnHidden(): void {
+  __lastHiddenAt = performance.now();
+  for (const id of [...spans.keys()]) vperfSupersede(id, { supersededBy: 'hidden' });
+  __pendingBorrowSpan = null;
+  lastActivateAt.clear();
+  for (const [k, r] of feedScroll) {
+    cancelAnimationFrame(r.rafId);
+    clearTimeout(r.idleTimer);
+    feedScroll.delete(k);
+  }
+}
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') vperfOnHidden();
   });
 }
 
