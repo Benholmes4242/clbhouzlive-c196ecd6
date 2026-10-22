@@ -665,4 +665,4 @@
 - [x] CB46: rounds_gate_unknown_fallback once per mount on a failed connection read; admin label added. Suite 2,111 → 2,114.
 
 ## CB47 — Media and audio audit (REPORT ONLY)
-- [ ] Confirm/correct 11 findings on audio focus, speaker icon, blocked lanes, gesture unlock, resume, silent switch, telemetry, buffering, Instagram parity, debug HUD access. No code changes; fixes briefed separately.
+- [x] Confirm/correct 11 findings on audio focus, speaker icon, blocked lanes, gesture unlock, resume, silent switch, telemetry, buffering, Instagram parity, debug HUD access. No code changes; fixes briefed separately. Report: /mnt/documents/CB47_media_audio_audit.md
