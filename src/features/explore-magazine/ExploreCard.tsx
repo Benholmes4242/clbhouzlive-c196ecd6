@@ -1618,6 +1618,7 @@ export function ExploreCard({
     const courseHcp = item.facts.course_handicap ?? null;
     const received = shape ? feedStrokesReceived(shape, courseHcp) : null;
     const nettable = courseHcp != null && (shape ? received != null : true);
+    const feedRoundCourse = kickerPartsValue.course ?? (item.subject?.course_name?.trim() || null);
     return (
       <button
         type="button"
@@ -1627,9 +1628,12 @@ export function ExploreCard({
       >
         <span data-feed-round-head="true" style={{ display: 'block', paddingInline: 4, paddingTop: 12 }}>
           <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} />
-          <span data-feed-round-course="true" style={{ display: 'block', marginTop: 12, fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {kickerPartsValue.course ?? item.subject?.course_name ?? ''}
-          </span>
+          {/* CB60 — no name, no line: the span and its 12px margin are absent. */}
+          {feedRoundCourse ? (
+            <span data-feed-round-course="true" style={{ display: 'block', marginTop: 12, fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {feedRoundCourse}
+            </span>
+          ) : null}
         </span>
         {shape && received ? <RoundTilePlot shape={shape} received={received} /> : null}
         {/* BRIEF_ROUND_TILE_1_R2 -- the round-feat panel, beneath the plot and

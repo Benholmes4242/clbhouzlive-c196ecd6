@@ -77,7 +77,10 @@ export function roundPostItem(
       : null,
     subject: {
       course_id: post.courseId ?? null,
-      course_name: post.courseName ?? meta?.name ?? null,
+      /* CB60 — catalogue name wins; the England Golf name is a plain-text
+         fallback for a round whose course is not linked yet. course_id stays
+         post.courseId, so nothing routes on the fallback. */
+      course_name: post.courseName ?? meta?.name ?? round?.whsCourseName ?? null,
       region: meta?.region ?? null,
       sub_country: meta?.subCountry ?? null,
       country: meta?.country ?? null,

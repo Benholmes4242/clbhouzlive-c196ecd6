@@ -97,6 +97,14 @@ export interface PostRound {
   cleanCard: boolean | null;
   slopeRating: number | null;
   longestBirdieRun: number | null;
+  /**
+   * CB60 — the round's England Golf course name (whs_scores -> whs_courses.name),
+   * read in the SAME whs_scores select as total_holes, the relation
+   * fetchRoundDetail (src/lib/whs/api.ts) uses for the round sheet. PLAIN TEXT
+   * ONLY: a fallback label when the post has no catalogue course. Never used to
+   * look a course up or to route anywhere.
+   */
+  whsCourseName?: string | null;
   /** null when the round has no hole detail - render without the strip. */
   holeShape: PostRoundHole[] | null;
   /**
@@ -250,7 +258,7 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
           .in('whs_score_id', ids),
         supabase
           .from('whs_scores')
-          .select('id, total_holes')
+          .select('id, total_holes, course:whs_courses(name)')
           .in('id', ids),
         supabase
           .from('whs_score_holes')
@@ -285,7 +293,10 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
       }
 
       const declaredLengths = new Map<string, number>();
-      for (const score of (scoresRes.data ?? []) as { id: string; total_holes: number | null }[]) {
+      const whsCourseNames = new Map<string, string>();
+      for (const score of ((scoresRes.data ?? []) as unknown) as { id: string; total_holes: number | null; course?: { name: string | null } | null }[]) {
+        const whsName = score.course?.name?.trim();
+        if (score.id && whsName) whsCourseNames.set(score.id, whsName);
         if (score.id && score.total_holes != null && Number.isFinite(Number(score.total_holes))) {
           declaredLengths.set(score.id, Number(score.total_holes));
         }
@@ -359,6 +370,7 @@ export function usePostRounds(scoreIds: string[], scope: string): PostRoundMapSt
           // NO scored played hole still resolves to null (the empty case).
           holeShape: renderableShape(shape),
           crown: crowns.get(id) ?? null,
+          whsCourseName: whsCourseNames.get(id) ?? null,
         });
       }
       // Merge over the previous map so rounds already on screen survive the
