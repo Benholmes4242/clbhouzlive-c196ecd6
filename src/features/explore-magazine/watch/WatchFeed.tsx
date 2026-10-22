@@ -6,6 +6,7 @@ import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
 import { useMomentsOfTheWeek, type Moment } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
 import { MomentsGrid } from '@/components/explore-tab-new/courseled/MomentsGrid';
+import { momentViewerPosts } from '../momentViewerPosts';
 import { RailChips } from '@/components/ui/RailChips';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
@@ -330,12 +331,13 @@ export function WatchFeed({
               : (key satisfies never);
   const chips = WATCH_CHIPS.map((key) => ({ id: key, label: chipLabel(key) }));
 
-  const openMoment = (moment: Moment) => {
+  const openMoment = (moment: Moment, list: Moment[]) => {
     analyticsEvents.track('amateur_watch_tapped', { kind: 'moment', filter });
     onDepart();
+    const { posts, index } = momentViewerPosts(list, moment);
     openWithOrigin({
-      posts: [moment.post],
-      index: 0,
+      posts,
+      index,
       originEl: null,
       posterUrl: moment.thumbnail,
       mediaIndex: moment.mediaIndex ?? 0,
@@ -383,7 +385,7 @@ export function WatchFeed({
                   labelled={false}
                   autoplayGroup="amateur-watch-moments"
                   style={{ width: '100%', height: '100%', display: 'block' }}
-                  onPress={() => openMoment(lead)}
+                  onPress={() => openMoment(lead, members.map((x) => x.lead))}
                 />
               </div>
               <span style={{ ...oneLine, marginTop: 7, fontSize: 12.5, fontWeight: 600 }}>{lead.post?.displayName || lead.post?.username}</span>
@@ -514,7 +516,7 @@ export function WatchFeed({
               {t('amateur.watch.communityMoments', '{{count}} moments', { count: (moments.data ?? []).length })}
             </div>
             <div style={{ paddingInline: 16 }}>
-              <MomentsGrid moments={moments.data ?? []} gap={4} tall={320} radius={10} autoplayGroup="amateur-watch-community" onTilePress={openMoment} />
+              <MomentsGrid moments={moments.data ?? []} gap={4} tall={320} radius={10} autoplayGroup="amateur-watch-community" onTilePress={(m) => openMoment(m, moments.data ?? [])} />
             </div>
           </>
         )

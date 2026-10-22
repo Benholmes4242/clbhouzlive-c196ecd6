@@ -6,6 +6,7 @@ import { MediaRailTile } from '@/components/explore-tab-new/courseled/MediaRailT
 import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
 import { useDiscoverMediaPreview } from '@/components/explore-tab-new/courseled/hooks/useDiscoverMediaPreview';
 import { useMomentsOfTheWeek } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
+import { momentViewerPosts } from './momentViewerPosts';
 import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
 import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
@@ -408,9 +409,10 @@ function MomentsShelf({ pos, onDepart, onOpenCommunity }: { pos: number; onDepar
             onPress={(tapped) => {
               analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'moments', pos });
               onDepart();
+              const { posts, index } = momentViewerPosts(tiles, tapped);
               openWithOrigin({
-                posts: tiles.map((entry) => entry.post),
-                index: Math.max(0, tiles.findIndex((entry) => entry.key === tapped.key)),
+                posts,
+                index,
                 originEl: null,
                 posterUrl: tapped.thumbnail,
                 mediaIndex: tapped.mediaIndex ?? 0,
