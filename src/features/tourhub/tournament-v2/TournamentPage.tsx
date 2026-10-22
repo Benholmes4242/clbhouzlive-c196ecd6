@@ -10,7 +10,7 @@
  *   - ScorecardSheet             — the ONE drill-in sheet
  *   - useFeaturedGroups          — overview RPC
  *   - useTournamentPulse         — EventState machine
- *   - useSingleCourseImage       — hero image
+ *   - useBatchCourseImages       — hero image (the ONE Tour resolver, CB55)
  *   - useEventMoments            — moments source
  *   - useTournamentTeeTimes /
  *     useTeeTimesAll             — Round-1 tee times
@@ -29,7 +29,7 @@ import { TourPageShell } from '../components/TourPageShell';
 
 import { useTournamentMeta } from '../leaderboard/useTournamentMeta';
 import { useTourLeaderboard } from '../hooks/useTourHubData';
-import { useSingleCourseImage } from '../hooks/useCourseImageResolver';
+import { useBatchCourseImages } from '../hooks/useBatchCourseImages';
 import { useTournamentPulse } from '../components/overview-v3/useTournamentPulse';
 import { useLeaderboardRealtime } from '../hooks/useLeaderboardRealtime';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
