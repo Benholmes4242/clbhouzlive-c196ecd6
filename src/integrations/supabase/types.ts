@@ -22520,6 +22520,64 @@ export type Database = {
           target_user_id: string
         }[]
       }
+      get_review_post: {
+        Args: {
+          p_review_id: string
+          p_viewer_actor_id?: string
+          p_viewer_actor_type?: string
+          p_viewer_id?: string
+        }
+        Returns: {
+          business_is_verified: boolean
+          business_logo_url: string
+          business_name: string
+          comment_count: number
+          course_country: string
+          course_id: string
+          course_name: string
+          course_region: string
+          creator_avatar_url: string
+          creator_display_name: string
+          creator_is_verified: boolean
+          creator_relation: string
+          creator_username: string
+          display_order: number
+          duration_seconds: number
+          engagement_score: number
+          height: number
+          is_followed_by_me: boolean
+          is_liked_by_me: boolean
+          like_count: number
+          media_id: string
+          media_type: string
+          media_url: string
+          post_actor_id: string
+          post_actor_type: string
+          post_content: string
+          post_created_at: string
+          post_id: string
+          post_status: string
+          post_tags: Json
+          post_user_id: string
+          poster_url: string
+          review_clubhouse_score: number
+          review_condition_score: number
+          review_course_country: string
+          review_course_id: string
+          review_course_image: string
+          review_course_name: string
+          review_course_region: string
+          review_course_sub_country: string
+          review_design_score: number
+          review_facilities_score: number
+          review_rating: number
+          review_text: string
+          share_count: number
+          source_review_id: string
+          stream_id: string
+          width: number
+        }[]
+      }
       get_review_receipt: {
         Args: { p_rating_id: string }
         Returns: {
