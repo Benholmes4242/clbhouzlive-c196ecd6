@@ -666,3 +666,6 @@
 
 ## CB47 — Media and audio audit (REPORT ONLY)
 - [x] Confirm/correct 11 findings on audio focus, speaker icon, blocked lanes, gesture unlock, resume, silent switch, telemetry, buffering, Instagram parity, debug HUD access. No code changes; fixes briefed separately. Report: /mnt/documents/CB47_media_audio_audit.md
+
+## Top 100 progress view played migration (record-only)
+- [x] Hook comment replaced with the rated-OR-WHS-round definition (useTop100ProgressForUser.ts). Migration file NOT written: project rule forbids writing migration files and the platform only creates them by executing SQL, which Ben already ran by hand. Exact SQL recorded at docs/sql/2026-10-22-top100-progress-view-played.sql instead.
