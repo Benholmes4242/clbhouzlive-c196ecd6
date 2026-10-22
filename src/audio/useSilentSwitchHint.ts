@@ -13,7 +13,7 @@
 import { useEffect } from 'react';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { toast } from '@/lib/toast';
-import { emitVideoTelemetry } from '@/video/telemetry';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const HINT_KEY = 'clbhouz-silent-switch-hint-count';
 const MAX_HINTS = 3;
@@ -43,7 +43,7 @@ export function useSilentSwitchHint() {
         // muted → unmuted transition (user gesture).
         if (readCount() < MAX_HINTS) {
           bumpCount();
-          emitVideoTelemetry('video.audio_denied', { hint: 'silent-switch', platform: 'ios' });
+          void analyticsEvents.track('video_silent_switch_hint', { platform: 'ios' });
           try {
             toast('No sound? Check your device silent switch', {
               duration: 3500,

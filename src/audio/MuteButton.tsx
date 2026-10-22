@@ -13,11 +13,15 @@
 import React from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
+import { VideoEngine, type LaneId } from '@/video/VideoEngine';
+import { useLaneAudioBlocked } from './useLaneAudioBlocked';
 import * as audioDbg from '@/perf/audioDebug';
 
 type Size = 'sm' | 'md';
 
 interface MuteButtonProps {
+  /** Session mode: physical lane this icon controls. Local mode ignores it. */
+  laneId?: LaneId | null;
   size?: Size;
   /** LOCAL mode: when provided, the button is controlled and never touches session audio. */
   muted?: boolean;
@@ -30,6 +34,7 @@ const GLASS_BG = 'rgba(0,0,0,0.45)';
 const GLASS_BLUR = 'blur(8px)';
 
 export const MuteButton: React.FC<MuteButtonProps> = ({
+  laneId,
   size = 'sm',
   muted,
   onToggle,
@@ -38,7 +43,8 @@ export const MuteButton: React.FC<MuteButtonProps> = ({
 }) => {
   const sessionMuted = useSessionAudio((s) => s.isMuted);
   const controlled = muted !== undefined;
-  const isMuted = controlled ? !!muted : sessionMuted;
+  const blocked = useLaneAudioBlocked(controlled ? null : laneId);
+  const isMuted = controlled ? !!muted : sessionMuted || blocked;
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -49,6 +55,8 @@ export const MuteButton: React.FC<MuteButtonProps> = ({
     }
     if (controlled) {
       onToggle?.();
+    } else if (!sessionMuted && blocked) {
+      VideoEngine.unblockFromGesture();
     } else {
       useSessionAudio.getState().toggle();
     }

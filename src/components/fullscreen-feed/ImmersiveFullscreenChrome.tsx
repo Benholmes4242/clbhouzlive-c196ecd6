@@ -52,6 +52,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { VideoEngine } from '@/video/VideoEngine';
+import { useLaneAudioBlocked } from '@/audio/useLaneAudioBlocked';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { FullscreenTopProgress, showsTopProgress } from './FullscreenTopProgress';
 import { FullscreenVideoScrubber } from './FullscreenVideoScrubber';
@@ -351,30 +352,19 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const activePagerIdx = useFullscreenFeedStore((s) => s.activePagerIdx);
   const isTournamentCardActive = useClubhouseStore((s) => s.isTournamentCardActive);
   const isAudioMuted = useSessionAudio((s) => s.isMuted);
-  // The rail icon is the viewer's only sound control; while iOS forces muted playback it shows muted, and one tap restores sound.
-  const [soundBlocked, setSoundBlocked] = useState(false);
-  useEffect(() => {
-    return VideoEngine.onAutoplayBlocked(() => setSoundBlocked(true));
-  }, []);
-  useEffect(() => {
-    return useSessionAudio.subscribe((s, previous) => {
-      if (s.isMuted !== previous.isMuted) setSoundBlocked(false);
-    });
-  }, []);
-  useEffect(() => {
-    setSoundBlocked(false);
-  }, [activeIndex, activePagerIdx]);
+  // CB48: the engine owns refusals; only the lane actually showing controls this icon.
+  const soundLaneId = useFullscreenFeedStore((s) => s.borrow?.laneId ?? 'fullscreen');
+  const soundBlocked = useLaneAudioBlocked(soundLaneId);
   const shownMuted = isAudioMuted || soundBlocked;
 
   const handleMuteTap = useCallback(() => {
     try { triggerHaptic('light'); } catch {}
-    if (soundBlocked) {
-      useSessionAudio.getState().unmute();
-      setSoundBlocked(false);
+    if (!isAudioMuted && soundBlocked) {
+      VideoEngine.unblockFromGesture();
     } else {
       useSessionAudio.getState().toggle();
     }
-  }, [soundBlocked]);
+  }, [soundBlocked, isAudioMuted]);
 
   const activePost = posts[activeIndex] ?? null;
   // K.1: the member's position is saved on pause, close and a throttled interval.

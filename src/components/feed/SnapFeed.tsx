@@ -220,7 +220,7 @@ export function SnapFeed({
     try {
       if (hasVideo) {
         const activeLane = feedLaneRoles.laneForRole('active');
-        VideoEngine.setAudioFocus(activeLane, 'feed');
+        VideoEngine.setAudioFocus('active', 'feed');
         if (audioDebugEnabled()) {
           try { logAudio('focus.reassert', { trigger: 'mount-or-fs-close', activeIndex, postId: post.id, activeLane }); } catch {}
         }
@@ -281,8 +281,7 @@ export function SnapFeed({
     if (surface !== 'fullscreen') {
       try {
         if (mediaType === 'video') {
-          const activeLane = feedLaneRoles.laneForRole('active');
-          VideoEngine.setAudioFocus(activeLane, 'feed');
+          VideoEngine.setAudioFocus('active', 'feed');
         } else {
           VideoEngine.setAudioFocus(null, 'feed');
         }

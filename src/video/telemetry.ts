@@ -12,7 +12,6 @@
 export type VideoTelemetryEvent =
   | 'video.stall'
   | 'video.first_frame_ms'
-  | 'video.audio_denied'
   | 'video.pool_evict'
   | 'video.pool_prewarm'
   | 'video.abr_switch';

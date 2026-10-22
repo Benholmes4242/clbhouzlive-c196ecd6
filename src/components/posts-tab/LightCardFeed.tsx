@@ -381,7 +381,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       // element stays paused. Issuing play + claiming audio focus here is the
       // Clubhouse-equivalent end state (playing, unmuted if the session is).
       const activeLane = feedLaneRoles.laneForRole('active');
-      VideoEngine.setAudioFocus(activeLane, 'feed');
+      VideoEngine.setAudioFocus('active', 'feed');
       void VideoEngine.play(activeLane, { callerPostId: target });
     } catch { /* engine not booted */ }
   }, [fsIsOpen]);
@@ -397,7 +397,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
     const hasVideo = post.mediaItems?.some?.((m) => m?.type === 'video');
     try {
       if (hasVideo) {
-        VideoEngine.setAudioFocus(feedLaneRoles.laneForRole('active'), 'feed');
+        VideoEngine.setAudioFocus('active', 'feed');
       } else {
         VideoEngine.setAudioFocus(null, 'feed');
       }
