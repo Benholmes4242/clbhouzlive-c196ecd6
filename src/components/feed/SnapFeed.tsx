@@ -8,7 +8,7 @@ import { haptic } from '@/utils/haptics';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfFeedActivateStart, vperfFeedActivateEnd, vperfEnd, vperfSupersede } from '@/perf/vperf';
+import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfSupersede, vperfArmMovingFromSnapshot, vperfMeta } from '@/perf/vperf';
 import { PrefetchController } from '@/video/PrefetchController';
 
 import { trace } from '@/perf/trace';
@@ -368,29 +368,10 @@ export function SnapFeed({
       }
     }
 
-    const finalize = () => {
-      if (activateDoneRef.current) return;
-      activateDoneRef.current = true;
-      const wasPrefetched = PrefetchController.wasPrefetched(`${post.id}:0`);
-      vperfFeedActivateEnd({
-        t0: activateT0Ref.current,
-        idx: activeIndex,
-        mediaType,
-        warm: activateWarmRef.current,
-        prefetched: wasPrefetched,
-      });
-    };
-    // Fallback finalize after 900ms if lane events never arrive (orphan guard).
-    const to = window.setTimeout(finalize, 900);
-    if (mediaType === 'image') requestAnimationFrame(() => { finalize(); });
     return () => {
-      clearTimeout(to);
-      finalize();
-      // Supersede any still-open spans for the OUTGOING slide — user
-      // swiped past before firstFrame arrived. vperfSupersede is a
-      // no-op if the span already closed via lane events or fallback.
+      // Supersede the still-open span for the OUTGOING slide — user swiped
+      // past before its first moving frame. No-op if it already closed.
       if (swipeSpanId) vperfSupersede(swipeSpanId, { supersededBy: 'deactivate' });
-      vperfSupersede(armId, { supersededBy: 'deactivate' });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex, isFullscreen]);
@@ -409,7 +390,7 @@ export function SnapFeed({
     let lastTs = performance.now();
     let lastDir: 1 | -1 | 0 = 0;
     const onScroll = () => {
-      vperfFeedScrollTick('snapfeed');
+      vperfFeedScrollTick('snapfeed', 'fullscreen');
       const now = performance.now();
       const top = el.scrollTop;
       const dt = now - lastTs;
