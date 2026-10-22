@@ -475,7 +475,16 @@ async function fetchPredictionsForTournament(tournament: any): Promise<AIPredict
   const isStaleLogic =
     !!aiPredictions && storedLogicVersion < PREDICTION_LOGIC_VERSION;
 
-  if (!aiPredictions || isStaleLogic) {
+  // CB54: picks lock at the first tee. Generation or regeneration is only
+  // requested while the tournament's status is 'scheduled' or 'created' —
+  // the same predicate generate-predictions enforces server-side (see
+  // supabase/functions/generate-predictions/picksLock.ts; the two copies
+  // must stay in sync). Once play has started, the stored row is served as
+  // it stands, whatever its logic_version; no row means no picks.
+  const tournamentOpenForPicks =
+    tournament?.status === 'scheduled' || tournament?.status === 'created';
+
+  if (tournamentOpenForPicks && (!aiPredictions || isStaleLogic)) {
     if (isStaleLogic) {
       console.log(
         `[useAIPredictions] Cached row for tournament ${tournament.id} is stale ` +

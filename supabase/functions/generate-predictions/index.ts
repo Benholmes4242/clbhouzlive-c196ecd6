@@ -19,6 +19,7 @@ import { extractPlayerStats, deriveSGProxies, formatStatsForPrompt } from './det
 import { calculateCourseFitScores, formatCourseFitForPrompt } from './courseFitCalculator.ts';
 import { calculateVenueHistoryScores, formatVenueHistoryForPrompt } from './venueHistory.ts';
 import { runConsensus } from './consensusEngine.ts';
+import { tournamentAcceptsNewPicks } from './picksLock.ts';
 import type { PlayerStats as EnrichedPlayerStats } from './detailedStats.ts';
 import type { CourseDNAProfile } from './courseFitCalculator.ts';
 
@@ -39,6 +40,7 @@ export const PREDICTION_LOGIC_VERSION = 4;
 interface Tournament {
   id: string;
   name: string;
+  status: string;
   venue_name: string;
   venue_city: string;
   venue_state: string;
@@ -76,6 +78,9 @@ interface PlayerStats {
 
 serve(async (req) => {
   const corsHeaders = corsFor(req.headers.get('Origin'));
+  // Boot-log version marker (same pattern as tournament-live-sync): the first
+  // line of every invoke, so the logs prove which build is live.
+  console.log('[generate-predictions] version=2026-10-22-picks-lock-at-first-tee');
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -205,6 +210,50 @@ serve(async (req) => {
     }
 
     console.log(`[generate-predictions] Processing: ${tournament.name}`);
+
+    // =============================================
+    // CB54: PICKS LOCK AT THE FIRST TEE
+    // =============================================
+    // Picks may be created or regenerated only while the tournament's status
+    // is 'scheduled' or 'created' — the same predicate
+    // validate-prediction-field-status uses. Once play has started, serve the
+    // stored row exactly as it stands (whatever its logic_version) and
+    // generate nothing; a tournament with no row stays without picks. This
+    // covers forceRegenerate requests and the weekly/Friday catch-up crons.
+    if (!tournamentAcceptsNewPicks(tournament.status)) {
+      console.log(
+        `[generate-predictions] ${tournament.name} status=${tournament.status} — picks locked at first tee; serving stored row as-is`,
+      );
+      const { data: lockedStored } = await supabase
+        .from('ai_predictions')
+        .select('*')
+        .eq('tournament_id', tournament.id)
+        .order('generated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (lockedStored) {
+        return new Response(
+          JSON.stringify({
+            success: true,
+            cached: true,
+            locked: true,
+            tournament: { id: tournament.id, name: tournament.name },
+            predictions: formatStoredPredictions(lockedStored),
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        );
+      }
+      return new Response(
+        JSON.stringify({
+          success: true,
+          skipped: true,
+          locked: true,
+          reason: 'tournament started, no stored predictions',
+          tournament: { id: tournament.id, name: tournament.name },
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
 
     // Determine ranking source per tour:
     //   PGA / DP World / etc. -> sr_world_rankings (OWGR)
