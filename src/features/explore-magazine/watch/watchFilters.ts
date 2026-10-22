@@ -1,11 +1,9 @@
 /**
  * THE WATCH CHIPS (BRIEF_WATCH_PAGE K.8): All / Quick hits / Long form /
- * Friends / Your courses. "Quick hits" and "Long form" filter on QUICK_HIT_MAX
+ * Your courses. "Quick hits" and "Long form" filter on QUICK_HIT_MAX
  * and nothing else — both reads are fetched and split client-side by duration.
  *
  * THE HONEST LIMITS, stated once here:
- *   Friends -> videos p_mode 'following' + clips p_filter 'following' (both
- *              server-side follow filters).
  *   Your courses -> clips p_filter 'played_courses' (server-side). The long-form
  *              RPC has NO played-courses mode, so long-form is the 'latest'
  *              read filtered client-side to the member's own courses; it only
@@ -18,8 +16,11 @@
  */
 
 /* "Your courses" was removed from the chips (user request, Oct 2026); the
-   played-courses clip read and its header note remain for the badge logic. */
-export const WATCH_CHIPS = ['all', 'quick', 'long', 'friends', 'community'] as const;
+   played-courses clip read and its header note remain for the badge logic.
+   Friends was removed from the chips (founder decision, 2026-10-22); the
+   'following' modes stay available server-side and only the client stops
+   asking for them. */
+export const WATCH_CHIPS = ['all', 'quick', 'long', 'community'] as const;
 export const WATCH_FILTERS = WATCH_CHIPS;
 
 export type WatchFilter = (typeof WATCH_FILTERS)[number];
@@ -29,8 +30,6 @@ export function videoParams(filter: WatchFilter): { mode: string } | null {
   switch (filter) {
     case 'community':
       return null;
-    case 'friends':
-      return { mode: 'following' };
     default:
       return { mode: 'latest' };
   }
@@ -41,8 +40,6 @@ export function clipParams(filter: WatchFilter): { mode: string; filter?: string
   switch (filter) {
     case 'community':
       return null;
-    case 'friends':
-      return { mode: 'latest', filter: 'following' };
     default:
       return { mode: 'trending' };
   }

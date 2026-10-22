@@ -324,8 +324,6 @@ export function WatchFeed({
         ? t('amateur.watch.chip.quick', 'Quick hits')
         : key === 'long'
           ? t('amateur.watch.chip.long', 'Long form')
-          : key === 'friends'
-            ? t('amateur.watch.chip.friends', 'Friends')
             : key === 'community'
               ? t('amateur.watch.chip.community', 'Community')
               : (key satisfies never);
