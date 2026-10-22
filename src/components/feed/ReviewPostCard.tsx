@@ -9,8 +9,11 @@
  * Every score colour resolves through the app's helpers: the overall figure
  * and tier word through reviewLabelColor / ReviewVerdictLabel, every category
  * through courseSubScoreTone. Green at 9.0 and above, mute below.
- * B2: the feed owns its open two-column score layout and missing-value dashes;
- * shared CategoryScores remains unchanged for course surfaces.
+ * B2/CB59: the feed owns its open score layout and missing-value dashes. CB59
+ * sets each category as a figure-first pair (figure, 7px, word) on one shared
+ * seven-track grid, so every figure sits beside its own word; figure tracks size
+ * to their widest figure and stay right-aligned. Shared CategoryScores remains
+ * unchanged for course surfaces.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -181,15 +184,16 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         </div>
         ) : null}
         {anyScore ? (
-          <div data-review-categories style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 16, rowGap: 8 }}>
-            {SCORE_ORDER.map((key) => {
+          <div data-review-categories style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: 'max-content 7px max-content minmax(14px, 34px) max-content 7px max-content', rowGap: 8, alignItems: 'baseline', justifyContent: 'start' }}>
+            {SCORE_ORDER.map((key, i) => {
               const value = scores[key];
+              const left = i % 2 === 0;
               return (
-                <div key={key} data-category={key} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', minWidth: 0 }}>
-                  <span data-category-label style={{ fontSize: 11, color: A.MUTE, whiteSpace: 'nowrap' }}>{SCORE_LABELS[key]}</span>
-                  <span data-category-figure data-category-score={value == null ? undefined : value.toFixed(1)} className="tabular-nums" style={{ ...FIGS, fontSize: 13, fontWeight: 700, color: value == null ? A.DIM : courseSubScoreTone(value) }}>
+                <div key={key} data-category={key} style={{ display: 'contents' }}>
+                  <span data-category-figure data-category-score={value == null ? undefined : value.toFixed(1)} className="tabular-nums" style={{ ...FIGS, gridColumn: left ? 1 : 5, justifySelf: 'end', textAlign: 'right', fontSize: 13, fontWeight: 700, color: value == null ? A.DIM : courseSubScoreTone(value) }}>
                     {value == null ? '\u2014' : value.toFixed(1)}
                   </span>
+                  <span data-category-label style={{ gridColumn: left ? 3 : 7, fontSize: 11, color: A.MUTE, whiteSpace: 'nowrap' }}>{SCORE_LABELS[key]}</span>
                 </div>
               );
             })}
