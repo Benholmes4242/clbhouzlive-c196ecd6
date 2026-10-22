@@ -7,6 +7,7 @@ import { useHomeClubStatus } from '@/features/home-club/useHomeClubStatus';
 import { openHomeClubPicker } from '@/features/home-club/homeClubPickerStore';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { SC_BOGEY_DARK } from '@/features/courses/components/holes/_constants';
 import { WHS_COUNTRIES } from '@/lib/whs/whsCountries';
 import { useConnectIntroCourse, type ConnectIntroCourse } from './useConnectIntroCourse';
 import { DIM, INK, AMBER, NUM, FONT } from './designTokens';
@@ -34,7 +35,9 @@ const QUIET = '#9AA3AF';
 const DIMMER = '#6B7380';
 const BAR = '#3A3F47';
 const GOOD = '#4ADE80';
+const COST = SC_BOGEY_DARK; // The connect intro's cost colour matches the course page's bogey blue.
 const HAIR = 'rgba(255,255,255,0.08)';
+const SECTION_DIVIDED: React.CSSProperties = { marginTop: 36, paddingTop: 36, borderTop: `1px solid ${HAIR}` };
 const FAINT_HAIR = 'rgba(255,255,255,0.06)';
 const AMBER_DASH = 'rgba(247,147,30,0.6)';
 const AMBER_DASH_STRONG = 'rgba(247,147,30,0.7)';
@@ -45,20 +48,8 @@ const AVATAR_BG = 'rgba(255,255,255,0.08)';
 const TRUST_STEPS = ['1', '2', '3'] as const;
 
 const EXAMPLE = {
-  beat: [
-    { score: '82', index: '11.3', good: true, active: false },
-    { score: '83', index: '11.4', good: true, active: false },
-    { score: '84', index: '11.6', good: true, active: true },
-    { score: '85', index: '11.8', good: false, active: false },
-    { score: '86', index: '11.8', good: false, active: false },
-    { score: '87', index: '11.8', good: false, active: false },
-  ],
   bars: [64, 46, 57, 36, 72, 43, 54, 32, 61, 50, 39, 68, 46, 36, 57, 43, 75, 50, 39, 54],
   counters: new Set([1, 3, 5, 7, 10, 13, 15, 18]),
-  ways: [
-    { titleKey: 'exampleWayDoubles', value: '10.4' },
-    { titleKey: 'exampleWayBackNine', value: '11.0' },
-  ],
 } as const;
 
 const courseNameSuffixes = [
@@ -372,13 +363,13 @@ const HoleChart: React.FC<{ block: IntroBlock; top: IntroHole[]; fetching: boole
     <div style={{ paddingTop: 18 }}>
       <div style={{ height: 22, display: 'grid', gridTemplateColumns: 'repeat(18, minmax(0, 1fr))', gap: 3, alignItems: 'end' }}>
         {holes.map((h, i) => (
-          <span key={i} style={{ textAlign: 'center', fontSize: 9, fontWeight: 800, color: AMBER, whiteSpace: 'nowrap' }}>{h && topSet.has(h.hole_no) ? signedOne(h.avg_to_par) : ''}</span>
+          <span key={i} style={{ textAlign: 'center', fontSize: 9, fontWeight: 800, color: COST, whiteSpace: 'nowrap' }}>{h && topSet.has(h.hole_no) ? signedOne(h.avg_to_par) : ''}</span>
         ))}
       </div>
       <div style={{ height: 150, display: 'grid', gridTemplateColumns: 'repeat(18, minmax(0, 1fr))', gap: 3, alignItems: 'end', opacity: fetching ? 0.6 : 1, transition: 'opacity 160ms ease' }}>
         {holes.map((h, i) => {
           const height = Math.max(4, Math.round((Math.min(Math.max(h?.avg_to_par ?? 0, 0), 2.8) / 2.8) * 150));
-          return <div key={i} style={{ height, borderRadius: 4, background: h && topSet.has(h.hole_no) ? AMBER : BAR, transition: 'height 220ms ease' }} />;
+          return <div key={i} style={{ height, borderRadius: 4, background: h && topSet.has(h.hole_no) ? COST : BAR, transition: 'height 220ms ease' }} />;
         })}
       </div>
       <div style={{ marginTop: 6, display: 'grid', gridTemplateColumns: 'repeat(18, minmax(0, 1fr))', gap: 3 }}>
@@ -412,17 +403,15 @@ const FirstScreen: React.FC<{
       <h1 ref={headlineRef} style={{ margin: '12px 0 0', fontSize: 40, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.02, color: SOFT_INK }}>
         <span style={{ display: 'block', whiteSpace: 'nowrap' }}>{t('whsConnect.intro.tryHeadlineLine1')}</span>
         <span style={{ display: 'block', whiteSpace: 'nowrap' }}>{displayCourseName(course.courseName)}</span>
-        <span style={{ display: 'block', whiteSpace: 'nowrap', color: AMBER }}>{t('whsConnect.intro.tryHeadlineLine3')}</span>
+        <span style={{ display: 'block', whiteSpace: 'nowrap', color: COST }}>{t('whsConnect.intro.tryHeadlineLine3')}</span>
       </h1>
       <Stepper value={h} onChange={setH} />
       <HoleChart block={block} top={top} fetching={fetching} />
       <div style={{ paddingTop: 18 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-          {readout.median ? <span style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, color: SOFT_INK, ...NUM }}>{readout.median}</span> : null}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {readout.median ? <span style={{ flexShrink: 0, fontSize: 44, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, color: SOFT_INK, ...NUM }}>{readout.median}</span> : null}
           <span style={{ fontSize: 14, lineHeight: 1.35, color: MID }}>{readout.baseline}</span>
         </div>
-        <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.45, color: MID }}>{readout.cost}</div>
-        <div style={{ marginTop: 6, fontSize: 12, color: DIMMER }}>{readout.source}</div>
       </div>
     </>
   );
@@ -445,66 +434,25 @@ const IntroFooter: React.FC<{ hidden: boolean; display: boolean; onTransitionEnd
   );
 };
 
-const YouTable: React.FC<{ block: IntroBlock; all: IntroBlock; band: IntroBand | null; h: number }> = ({ block, all, band, h }) => {
+const sectionHeadStyle: React.CSSProperties = { margin: 0, fontSize: 30, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.08, color: SOFT_INK };
+const sectionSubStyle: React.CSSProperties = { margin: '10px 0 0', fontSize: 14, lineHeight: 1.5, color: QUIET };
+
+const LastTwentySection: React.FC = () => {
   const { t } = useTranslation('handicap');
-  const top = costliestThree(block.holes);
-  const hardest = costliestThree(all.holes)[0]?.hole_no;
   return (
-    <section style={{ paddingTop: 32 }}>
-      <h2 style={sectionHeadStyle}>{t('whsConnect.intro.youTableHeadingLine1')}<br />{t('whsConnect.intro.youTableHeadingLine2')}<br /><span style={{ color: AMBER }}>{t('whsConnect.intro.youTableHeadingLine3')}</span></h2>
-      <p style={sectionSubStyle}>{t('whsConnect.intro.youTableSub')}</p>
-      <div style={{ marginTop: 18, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 84px 84px', columnGap: 8, paddingBottom: 8, borderBottom: `1px solid ${HAIR}`, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: DIMMER }}>
-        <span>{t('whsConnect.intro.youTableHole')}</span><span style={{ textAlign: 'right' }}>{band ? (h === 0 ? t('whsConnect.intro.youTableScratch') : t('whsConnect.intro.youTableOff', { hcp: h })) : t('whsConnect.intro.youTableAllGolfers')}</span><span style={{ textAlign: 'right' }}>{t('whsConnect.intro.youTableYou')}</span>
+    <section style={SECTION_DIVIDED}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+        <h2 style={sectionHeadStyle}>{t('whsConnect.intro.exampleCountTitle')}</h2>
+        <span style={{ flexShrink: 0, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: DIMMER }}>{t('whsConnect.intro.exampleKicker')}</span>
       </div>
-      {top.map((hole) => (
-        <div key={hole.hole_no} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 84px 84px', columnGap: 8, alignItems: 'center', padding: '14px 0', borderBottom: `1px solid ${HAIR}` }}>
-          <span><span style={{ display: 'block', fontSize: 16, fontWeight: 700 }}>{ordinal(hole.hole_no)}</span><span style={{ display: 'block', marginTop: 2, fontSize: 12.5, color: DIMMER }}>{t('whsConnect.intro.youTablePar', { par: hole.par })}{hardest === hole.hole_no ? ` · ${t('whsConnect.intro.youTableHardest')}` : ''}</span></span>
-          <span style={{ textAlign: 'right', fontSize: 18, fontWeight: 800, color: MID }}>{signedOne(hole.avg_to_par)}</span>
-          <span style={{ justifySelf: 'end', width: 64, height: 30, borderRadius: 10, border: `1.5px dashed ${AMBER_DASH}` }} />
-        </div>
-      ))}
+      <div style={{ marginTop: 18, height: 80, display: 'grid', gridTemplateColumns: 'repeat(20, minmax(0, 1fr))', gap: 3, alignItems: 'end' }}>
+        {EXAMPLE.bars.map((height, i) => <span key={i} style={{ height, borderRadius: 4, background: EXAMPLE.counters.has(i) ? GOOD : BAR }} />)}
+      </div>
+      <p style={exampleTextStyle}>{t('whsConnect.intro.exampleCountText')}</p>
     </section>
   );
 };
 
-const sectionHeadStyle: React.CSSProperties = { margin: 0, fontSize: 30, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.08, color: SOFT_INK };
-const sectionSubStyle: React.CSSProperties = { margin: '10px 0 0', fontSize: 14, lineHeight: 1.5, color: QUIET };
-
-const ExampleBlock: React.FC = () => {
-  const { t } = useTranslation('handicap');
-  return (
-    <section style={{ paddingTop: 52 }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <h2 style={sectionHeadStyle}>{t('whsConnect.intro.exampleHeading')}</h2>
-        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: DIMMER }}>{t('whsConnect.intro.exampleKicker')}</span>
-      </div>
-      <p style={sectionSubStyle}>{t('whsConnect.intro.exampleSub')}</p>
-      <div style={{ marginTop: 22, paddingTop: 18, borderTop: `1px solid ${HAIR}` }}>
-        <ExampleTitle n="01" title={t('whsConnect.intro.exampleBeatTitle')} />
-      <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 4 }}>
-        {EXAMPLE.beat.map((x) => <span key={x.score} style={{ height: 58, borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, border: x.active ? `1.5px solid ${SOFT_INK}` : `1px solid ${HAIR}`, background: x.active ? AVATAR_BG : undefined }}><span style={{ fontSize: 15, fontWeight: 800 }}>{x.score}</span><span style={{ fontSize: 11.5, fontWeight: 700, color: x.good ? GOOD : DIMMER }}>{x.index}</span></span>)}
-      </div>
-      <p style={exampleTextStyle}>{t('whsConnect.intro.exampleBeatText')}</p>
-    </div>
-    <div style={{ marginTop: 26, paddingTop: 18, borderTop: `1px solid ${HAIR}` }}>
-      <ExampleTitle n="02" title={t('whsConnect.intro.exampleCountTitle')} />
-      <div style={{ marginTop: 14, height: 80, display: 'grid', gridTemplateColumns: 'repeat(20, minmax(0, 1fr))', gap: 3, alignItems: 'end' }}>
-        {EXAMPLE.bars.map((height, i) => <span key={i} style={{ height, borderRadius: 4, background: EXAMPLE.counters.has(i) ? GOOD : BAR }} />)}
-      </div>
-      <p style={exampleTextStyle}>{t('whsConnect.intro.exampleCountText')}</p>
-    </div>
-    <div style={{ marginTop: 26, paddingTop: 18, borderTop: `1px solid ${HAIR}` }}>
-      <ExampleTitle n="03" title={t('whsConnect.intro.exampleWaysTitle')} />
-      <div style={{ marginTop: 12 }}>
-        {EXAMPLE.ways.map((x) => <div key={x.titleKey} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 12, alignItems: 'baseline', padding: '10px 0', borderBottom: `1px solid ${FAINT_HAIR}` }}><span style={{ fontSize: 14.5, fontWeight: 600, color: MID }}>{t(`whsConnect.intro.${x.titleKey}`)}</span><span style={{ fontSize: 18, fontWeight: 800, color: GOOD }}>{x.value}</span></div>)}
-      </div>
-      <p style={exampleTextStyle}>{t('whsConnect.intro.exampleWaysText')}</p>
-    </div>
-  </section>
-  );
-};
-
-const ExampleTitle: React.FC<{ n: string; title: string }> = ({ n, title }) => <div style={{ display: 'flex', gap: 12, alignItems: 'baseline' }}><span style={{ fontSize: 13, fontWeight: 800, color: AMBER }}>{n}</span><span style={{ fontSize: 18, fontWeight: 700 }}>{title}</span></div>;
 const exampleTextStyle: React.CSSProperties = { margin: '10px 0 0', fontSize: 13, lineHeight: 1.45, color: QUIET };
 
 const CircleSection: React.FC<{ preview: CirclePreview; h: number }> = ({ preview, h }) => {
@@ -522,7 +470,7 @@ const CircleSection: React.FC<{ preview: CirclePreview; h: number }> = ({ previe
   }
   if (!placed) rows.push('you');
   return (
-    <section style={{ paddingTop: 52 }}>
+    <section style={SECTION_DIVIDED}>
       <h2 style={sectionHeadStyle}>{t('whsConnect.intro.circleHeadingLine1')}<br />{t('whsConnect.intro.circleHeadingLine2')}</h2>
       <p style={sectionSubStyle}>{t('whsConnect.intro.circleSub', { count: preview.connected })}</p>
       <div style={{ margin: '16px -24px 0' }}>
@@ -555,7 +503,7 @@ function circleRowStyle(background?: string): React.CSSProperties {
 const TrustSection: React.FC = () => {
   const { t } = useTranslation('handicap');
   return (
-    <section style={{ paddingTop: 52 }}>
+    <section style={SECTION_DIVIDED}>
       <h2 style={sectionHeadStyle}>{t('whsConnect.intro.trustHeadingLine1')}<br />{t('whsConnect.intro.trustHeadingLine2')}</h2>
       <div style={{ marginTop: 18 }}>
         {TRUST_STEPS.map((x, i) => (
@@ -675,9 +623,8 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline, la
     <>
       <Stage ref={stageRef}>
         <FirstScreen course={intro.data} block={block} band={band.data.band} h={h} dataHcp={dataHcp} setH={setH} hasHomeClub={home.clubId != null} onChange={onChange} fetching={band.isFetching} />
-        <YouTable block={block} all={band.data.all} band={band.data.band} h={dataHcp} />
-        <ExampleBlock />
         {circle.isFetched && circle.data ? <CircleSection preview={circle.data} h={dataHcp} /> : null}
+        <LastTwentySection />
         <TrustSection />
         <EndBlock ref={endRef} onPickCountry={onPickCountry} onDecline={onDecline} h={dataHcp} circleShown={circleShown} />
         <div style={{ height: 40 }} />
