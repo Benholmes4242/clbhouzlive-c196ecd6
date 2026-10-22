@@ -76,6 +76,11 @@ export interface LikedByRowProps {
   fontWeight?: number;
   /** 1 (default) = single line with ellipsis; 2 = wraps, clamped to two (stacked feed cards). */
   lines?: 1 | 2;
+  /** CB56 — opt-in: with no likes, keep the line's space (same element style,
+   *  same minHeight, an empty line) so the first like fills it in place and
+   *  nothing above or below moves. aria-hidden, no tap target. Default off:
+   *  without it zero still renders nothing. */
+  reserve?: boolean;
 }
 
 export function LikedByRow({
@@ -93,6 +98,7 @@ export function LikedByRow({
   lines = 1,
   subject = null,
   color = 'rgba(248,250,252,0.65)',
+  reserve = false,
 }: LikedByRowProps) {
   const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
@@ -100,7 +106,41 @@ export function LikedByRow({
   // nothing. The line does not wait on it.
   const { likers, isLoading } = usePostLikers(postId, !!postId && count > 0, source);
 
-  if (!postId || count <= 0) return null;
+  /* ONE style for the row and its reserved box, so the two match in height by
+     construction: same element style, same minHeight, same text line. */
+  const rowStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    minHeight: 22,
+    width: '100%',
+    boxSizing: 'border-box',
+    padding: 0,
+    background: 'transparent',
+    border: 'none',
+    textAlign: 'left',
+    ...style,
+  };
+  const lineStyle: React.CSSProperties = {
+    minWidth: 0,
+    fontSize,
+    fontWeight,
+    color,
+    ...(lines === 2
+      ? { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }
+      : { whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }),
+    fontVariantNumeric: 'tabular-nums lining-nums',
+    letterSpacing: 0,
+  };
+
+  if (!postId || count <= 0) {
+    if (!reserve) return null;
+    return (
+      <div aria-hidden="true" data-liked-by-reserve="true" style={{ ...rowStyle, pointerEvents: 'none' }}>
+        <span style={lineStyle}>{'\u00a0'}</span>
+      </div>
+    );
+  }
 
   const names = likerFirstNames(likers, 2);
   // VIEWER-FIRST: usePostLikers sorts the viewer to the front. Their own name
@@ -184,19 +224,7 @@ export function LikedByRow({
         type="button"
         onClick={(e) => { e.stopPropagation(); setOpen(true); }}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.stopPropagation(); }}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          minHeight: 22,
-          width: '100%',
-          boxSizing: 'border-box',
-          padding: 0,
-          background: 'transparent',
-          border: 'none',
-          textAlign: 'left',
-          ...style,
-        }}
+        style={rowStyle}
       >
         {/* THE WIDTH LIVES ON THIS CONTAINER, NOT ON THE SLOTS. Slot COUNT is reserved
            from `count` (known at first paint); the faces come from `likers`, which has
@@ -263,19 +291,7 @@ export function LikedByRow({
             })}
           </span>
         )}
-        <span
-          style={{
-            minWidth: 0,
-            fontSize,
-            fontWeight,
-            color,
-            ...(lines === 2
-              ? { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }
-              : { whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }),
-            fontVariantNumeric: 'tabular-nums lining-nums',
-            letterSpacing: 0,
-          }}
-        >
+        <span style={lineStyle}>
           {copy}
         </span>
       </button>

@@ -797,7 +797,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             />
           ) : null}
 
-          {/* Likers row — LikedByRow returns null at zero; no second guard. */}
+          {/* Likers row — LikedByRow reserves its line at zero (CB56); no second guard. */}
           <div style={{ pointerEvents: 'auto', minWidth: 0 }} onClick={(e) => e.stopPropagation()}>
             <LikedByRow
               postId={activePost.id}
@@ -809,6 +809,8 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
                  surface, only the flag changes. */
               kind={reactionKindFor({ isRound: false, isReview: !!activePost.isReview })}
               avatarRing="media"
+              /* CB56 — the stack is bottom-anchored: a line growing in would lift the caption and author. */
+              reserve
               lines={1}
               fontSize={12.5}
               fontWeight={500}
