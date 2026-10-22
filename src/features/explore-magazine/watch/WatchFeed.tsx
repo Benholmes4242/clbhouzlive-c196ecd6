@@ -538,7 +538,7 @@ export function WatchFeed({
             </>
           ) : null}
 
-          {/* K.3 — QUICK HITS. The rail carries the GLASS duration badge, as every Poster always has. The grid and the lead carry the SOLID badge instead: at 3-column width a translucent badge over a bright poster is unreadable, and solid 62% black is legible whatever is behind it. An earlier version of this comment claimed the rail had no badge; it never matched the code. */}
+          {/* K.3 — QUICK HITS. The rail carries the GLASS duration badge, as every Poster always has. The grid carries the SOLID badge instead: at 3-column width a translucent badge over a bright poster is unreadable, and solid 62% black is legible whatever is behind it. An earlier version of this comment claimed the rail had no badge; it never matched the code. */}
           {clips.isError && quickRows.length === 0 && showsQuickHits(filter) ? (
             <ShelfRetry
               heading={t('amateur.watch.rail.quick', 'Quick hits')}
@@ -549,39 +549,12 @@ export function WatchFeed({
           ) : quickRows.length > 0 && quickGrid ? (
             <>
               {quickHeading}
-              {/* BC.1 — the lead is quickRows[0]; the grid renders quickRows.slice(1), never twice. */}
-              {(() => {
-                const lead = quickRows[0];
-                const who = creatorName(lead);
-                return (
-                  <div style={{ padding: '0 14px 16px' }}>
-                    <button type="button" data-watch-card="quick-lead" onClick={() => open('clip', quickPosts, quickRows, 0)} style={{ ...cardButton, width: '100%' }}>
-                      <Poster row={lead} height={null} aspect="16 / 10" posterH={720} radius={14} autoplay progress={barFor(lead)} badge="solid">
-                        <span
-                          style={{
-                            position: 'absolute', left: 10, top: 10, zIndex: 3, pointerEvents: 'none',
-                            fontSize: 9.5, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase',
-                            color: PAGE_CANVAS, background: A.AMBER, borderRadius: 5, padding: '3px 7px',
-                          }}
-                        >
-                          {t('amateur.watch.playing', 'Playing')}
-                        </span>
-                      </Poster>
-                      <span style={{ marginTop: 10, fontSize: 16, fontWeight: 700, lineHeight: 1.26, color: A.INK }}>
-                        {videoTitle(lead, t('amateur.watch.untitled', 'Untitled video'))}
-                      </span>
-                      {who ? <span style={{ ...oneLine, marginTop: 3, fontSize: 11.5, color: A.DIM }}>{who}</span> : null}
-                    </button>
-                  </div>
-                );
-              })()}
               <div data-watch-grid="quick" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, alignItems: 'start', padding: '0 14px' }}>
-                {quickRows.slice(1).map((row, i) => {
-                  const index = i + 1;
+                {quickRows.map((row, index) => {
                   const who = creatorName(row);
                   return (
                     <button key={`qh:${row.post_id}`} type="button" data-watch-card="quick" onClick={() => open('clip', quickPosts, quickRows, index)} style={{ ...cardButton, width: '100%', minWidth: 0 }}>
-                      {/* N.2: no autoplay in a 3-across grid; only the lead plays. */}
+                      {/* N.2: no autoplay in a 3-across grid. */}
                       <Poster row={row} height={null} aspect="126 / 224" posterH={480} radius={12} autoplay={false} progress={barFor(row)} badge="solid" />
                       <span style={{ ...clamp2, marginTop: 7, fontSize: 12.5, fontWeight: 600, lineHeight: 1.32 }}>
                         {videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}
