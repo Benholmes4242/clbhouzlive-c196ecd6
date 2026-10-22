@@ -672,3 +672,6 @@
 
 ## Explore: remove Just played section
 - [x] Removed JustPlayed from the Rounds page (Competitions now followed directly by Leaderboards), deleted JustPlayed.tsx, dropped the CB28 'just' cases (authorised), comment-only updates in useHeldFrame.ts and scoresLeadBoard.test.tsx. BoardSeeAllSheet, useBoardPage, the 'recent' board and amateur.justPlayed.* keys kept.
+
+## Boards open on Most recent (BRIEF_BOARDS_DEFAULT_MOST_RECENT)
+- [x] ExploreMagazine's useAmateurBoardState call drops its 'net' initialBoard argument, so the visible board falls back to entryBoardFor() ('recent'); one-line comment added above the call. useAmateurBoardState.ts untouched. Suite 2,112 / 287 files / 0 failures; tsc clean.
