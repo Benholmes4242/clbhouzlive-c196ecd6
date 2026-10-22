@@ -1,9 +1,10 @@
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { create } from 'zustand';
 
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
+vi.mock('@/utils/analyticsSession', () => ({ getSessionId: vi.fn(() => 'cb48') }));
 vi.mock('@/store/fullscreenFeedStore', () => {
   const useFullscreenFeedStore = create(() => ({ isOpen: false, borrow: null }));
   return { useFullscreenFeedStore };
@@ -15,6 +16,7 @@ import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { audioDuck } from '@/audio/audioDuckStore';
 import { MuteButton } from '@/audio/MuteButton';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { getSessionId } from '@/utils/analyticsSession';
 import { getEntries, setAudioDebugEnabled } from '@/perf/audioDebug';
 
 const tick = async () => { await Promise.resolve(); await Promise.resolve(); await Promise.resolve(); };
@@ -35,8 +37,11 @@ async function prepare(id: LaneId, owner = 'post:0') {
 }
 
 describe('CB48 engine sound roles and recovery', () => {
+  let testSession = 0;
+  beforeAll(() => vi.useFakeTimers());
+  afterAll(() => vi.useRealTimers());
   beforeEach(async () => {
-    vi.useFakeTimers();
+    vi.mocked(getSessionId).mockReturnValue(`cb48-${++testSession}`);
     Object.defineProperty(document, 'hidden', { configurable: true, value: false });
     vi.spyOn(HTMLMediaElement.prototype, 'canPlayType').mockReturnValue('probably');
     vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(function () {
@@ -60,7 +65,7 @@ describe('CB48 engine sound roles and recovery', () => {
     vi.mocked(analyticsEvents.track).mockClear();
     await tick();
   });
-  afterEach(() => { cleanup(); VideoEngine.pauseAll(); vi.restoreAllMocks(); vi.useRealTimers(); });
+  afterEach(() => { cleanup(); VideoEngine.pauseAll(); vi.restoreAllMocks(); });
 
   it('resolves active on every role rotation, without rewriting focus or moving elements', async () => {
     await prepare('feed-active'); await prepare('feed-next', 'later:0');
