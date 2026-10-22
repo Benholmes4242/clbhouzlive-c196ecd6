@@ -1,5 +1,11 @@
 # Roadmap
 
+## CB50.1 — Finish monitor value snapshots and borrow fixture
+- [x] Record brief: copy reader values in start/progress; complete authorized BorrowDescriptor fixture without assertions/casts; audit fullscreen layer and change only spinner z-index if needed. Freeze signed-off spinner, timing, event/caps, CB48/49, preview/legacy/native.
+- [x] Full `bunx vitest run`: 2,162 passed /293 files /0 failures, from 2,158 passed/four failed with identical inventory. Four untouched cb50Buffering.test.ts cases at lines 24,28,32,47 now pass; engine fixture assertion/name unchanged; no test added/deleted/renamed/rewritten.
+- [x] Source stacking audit: spinner fixed 29 above media/poster (1/2/borrow-wrapper 3), below chrome context 30 containing rail/author/scrubber 11500 and top-progress 11502, and sibling flash 11504. Keep 29: raising to 31 would cover chrome despite child values. Signed-in phone check unavailable (external-managed auth).
+- [ ] STOP: latest automatic harness typecheck 12:20:12Z contains only pre-existing `src/test/reviewCourseNoReopen.test.tsx(57,3): error TS2589: Type instantiation is excessively deep and possibly infinite.` CB50 BorrowDescriptor TS2739 resolved; typecheck/build not green, review fixture untouched as outside brief. Report /mnt/documents/CB50.1_validation_report.md. Protected playback/style/timing/analytics/backend/native scope unchanged.
+
 ## REVIEW_SHEET_OPENS_REAL_POST — STOP (new fixture type error)
 - [x] Only requested application files changed: new useReviewPost.ts calls the already-generated get_review_post RPC with canonical actor/session and feed mapping; ReviewBottomSheet.tsx replaces synthetic posts with real post/URL-or-stream matching and clamped pager fallback. No readOnly; stacking and return store unchanged.
 - [x] Authorized correction: reviewCourseNoReopen.test.tsx direct sheet renderer and reviewSheetCalibration.test.tsx sheet helper now use a fresh QueryClient with queries.retry false in QueryClientProvider. RPC spies return empty data/no error to prevent network calls. No test name or assertion changed. All 15 previously failing review cases now pass.
