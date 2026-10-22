@@ -206,6 +206,9 @@ export function FullscreenFeedOverlay() {
   // unmount automatically (the hook resets to false on cleanup).
   useSetChromeSuppressed(isOpen);
   const hasNextPage = useFullscreenFeedStore(s => s.hasNextPage);
+  // The end slide is Clubhouse-only, because its copy describes the Clubhouse feed; every other open stops at its last post.
+  const openedFrom = useFullscreenFeedStore(s => s.openedFrom);
+  const showFeedEnd = openedFrom === 'clubhouse';
   const fetchNextPage = useFullscreenFeedStore(s => s.fetchNextPage);
   const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
   const readOnly = useFullscreenFeedStore(s => s.readOnly);
@@ -978,6 +981,7 @@ export function FullscreenFeedOverlay() {
                     onRefresh={async () => {}}
                     isRefreshing={isFetchingNextPage}
                     hasNextPage={hasNextPage}
+                    showFeedEnd={showFeedEnd}
                     followOverrides={followOverrides}
                     onFollowChange={handleSnapFollowChange}
                     onFirstFrameReady={handleSnapFeedFirstFrame}
@@ -1010,7 +1014,7 @@ export function FullscreenFeedOverlay() {
                     golfCourse={golfCourse}
                     readOnly={readOnly}
                     onBeforeNavigate={() => handleClose({ reason: 'navigating' })}
-                    feedEnded={!hasNextPage && activeIndex >= posts.length}
+                    feedEnded={showFeedEnd && !hasNextPage && activeIndex >= posts.length}
                   />
 
                   <FullscreenScrubber
