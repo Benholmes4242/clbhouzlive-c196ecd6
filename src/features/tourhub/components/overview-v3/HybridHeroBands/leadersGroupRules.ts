@@ -60,10 +60,18 @@ export function leadersShownRound(baseRound: number, groups: TeeGroup[], leaders
   const candidates = candidateGroups(groups, leaders);
   const next = nextDrawnRound(baseRound, drawnRounds, totalRounds);
   // CB58.1: a finished morning leaders' group does not finish the field.
-  // Canonical board demotion vocabulary excludes CUT/MC/WD/DQ/MDF/DNS;
-  // scoreless entries have no card to complete and do not block the handover.
-  const field = entries.filter(e => e.score != null && !isDemotedStatus(e.status));
-  const fieldComplete = field.length > 0 && field.every(raw => {
+  // CB58.2: the field is the base round's tee sheet (`groups` must be the
+  // base round's groups, never the shown round's) UNION every scored entry,
+  // minus canonical demoted statuses (CUT/MC/WD/DQ/MDF/DNS). A tee-sheet
+  // player with no leaderboard row or no finished card blocks the handover.
+  const byId = new Map(entries.filter(e => e.player?.id).map(e => [e.player!.id, e]));
+  const ids = new Set<string>();
+  for (const g of groups) for (const p of g.players) if (p.id != null) ids.add(p.id);
+  for (const e of entries) if (e.score != null && e.player?.id) ids.add(e.player.id);
+  const field = [...ids].filter(id => !isDemotedStatus(byId.get(id)?.status));
+  const fieldComplete = field.length > 0 && field.every(id => {
+    const raw = byId.get(id);
+    if (!raw) return false;
     const e = roundEntry(raw, baseRound);
     return thruLabel(e, todayFromEntry(e, baseRound)) === 'F';
   });
