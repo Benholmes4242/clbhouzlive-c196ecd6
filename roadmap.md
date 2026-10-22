@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB48.1 — Finish snapshot completeness and unconditional unmute detection
+- [ ] Add the required idle snapshot field and audit every snapshot literal, including fixtures.
+- [ ] Arm every engine unmute without gesture guessing; add one gesture self-pause recovery case, retaining all existing assertions.
+- [ ] Explain the original failure with observed guard evidence; run targeted/full tests and inspect automatic typecheck/build results.
+
 ## CB48 — Role-based sound and honest blocked-state controls
 - [x] Implemented role-capable focus and shared resolver for reconciliation/heartbeat; physical fullscreen close handoff unchanged.
 - [ ] STOP: engine self-pause fallback does not pass new test `src/test/videoAudioRoleRecovery.test.tsx:118:53`: `AssertionError: expected false to be true // Object.is equality`; no implementation/test correction after failure.
