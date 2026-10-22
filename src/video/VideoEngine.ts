@@ -310,7 +310,7 @@ class VideoEngineImpl {
   private blockedListeners = new Set<() => void>();
   private unmuteAttempts = new Map<LaneId, { at: number; owner: string | null; trigger: AudioBlockTrigger }>();
   private returnIntent = new Map<LaneId, string | null>();
-  private resumeOwners = new Map<LaneId, string | null>();
+  private resumeOwners = new Map<LaneId, { owner: string | null; at: number }>();
   private gestureDepth = 0;
 
   isAudioBlocked(laneId: LaneId): boolean { return this.blockedLanes.has(laneId); }
@@ -378,7 +378,8 @@ class VideoEngineImpl {
   private attemptPlay(lane: Lane, trigger: AudioBlockTrigger = 'autoplay'): Promise<void> {
     const owner = lane.postId;
     const unmuted = !lane.el.muted;
-    const actualTrigger = this.resumeOwners.get(lane.id) === owner && this.resumeOwners.has(lane.id) ? 'resume' : trigger;
+    const resumed = this.resumeOwners.get(lane.id);
+    const actualTrigger = resumed?.owner === owner && Date.now() - resumed.at <= 1000 ? 'resume' : trigger;
     let result: Promise<void> | undefined;
     try { result = lane.el.play(); } catch (error) { result = Promise.reject(error); }
     return Promise.resolve(result).catch(() => {
@@ -577,7 +578,7 @@ class VideoEngineImpl {
       recorded.forEach((owner, id) => {
         const lane = this.lanes.get(id);
         if (!lane || !lane.mountedHost || lane.postId !== owner) return;
-        this.resumeOwners.set(id, owner);
+        this.resumeOwners.set(id, { owner, at: Date.now() });
         void this.play(id);
       });
       this.reconcileAudio('visibility-resume');
@@ -1541,7 +1542,6 @@ class VideoEngineImpl {
     this.unmuteAttempts.delete(lane.id);
     lane.wantPlay = false;
     this.clearPlayWatchdog(laneId);
-    this.unmuteAttempts.delete(lane.id);
     if (!lane.el.paused) lane.el.pause();
   }
 
@@ -1557,10 +1557,9 @@ class VideoEngineImpl {
         }
       }
       this.resumeOwners.delete(lane.id);
-    this.unmuteAttempts.delete(lane.id);
-    lane.wantPlay = false;
       this.unmuteAttempts.delete(lane.id);
-    if (!lane.el.paused) lane.el.pause();
+      lane.wantPlay = false;
+      if (!lane.el.paused) lane.el.pause();
       this.emit(lane);
     });
   }
@@ -1766,7 +1765,8 @@ class VideoEngineImpl {
           const inGesture = this.gestureDepth > 0 || (typeof navigator !== 'undefined' && navigator.userActivation?.isActive);
           if (!inGesture) this.unmuteAttempts.set(lane.id, {
             at: Date.now(), owner: lane.postId,
-            trigger: this.resumeOwners.has(lane.id) ? 'resume' : 'unmute',
+            trigger: this.resumeOwners.get(lane.id)?.owner === lane.postId &&
+              Date.now() - (this.resumeOwners.get(lane.id)?.at ?? 0) <= 1000 ? 'resume' : 'unmute',
           });
           else this.unmuteAttempts.delete(lane.id);
           lane.el.muted = false;
