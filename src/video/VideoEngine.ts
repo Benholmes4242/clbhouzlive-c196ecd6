@@ -311,7 +311,6 @@ class VideoEngineImpl {
   private unmuteAttempts = new Map<LaneId, { at: number; owner: string | null; trigger: AudioBlockTrigger }>();
   private returnIntent = new Map<LaneId, string | null>();
   private resumeOwners = new Map<LaneId, { owner: string | null; at: number }>();
-  private gestureDepth = 0;
 
   isAudioBlocked(laneId: LaneId): boolean { return this.blockedLanes.has(laneId); }
   subscribeAudioBlocked(fn: () => void): () => void {
@@ -351,7 +350,6 @@ class VideoEngineImpl {
   unblockFromGesture(): void {
     const rescued = new Set(this.blockedLanes);
     this.blockedLanes.clear();
-    this.gestureDepth++;
     try {
       this.reconcileAudio('gesture-unblock');
       const speaker = this.resolveSpeaker().speaker;
@@ -366,7 +364,6 @@ class VideoEngineImpl {
         });
       }
     } finally {
-      this.gestureDepth--;
       rescued.forEach((id) => { const lane = this.lanes.get(id); if (lane) this.emit(lane); });
       this.notifyBlocked();
     }
@@ -1762,14 +1759,15 @@ class VideoEngineImpl {
       if (c.to === false) {
         const lane = this.lanes.get(c.laneId);
         if (lane) {
-          // WebKit may pause instead of rejecting an automatic unmute.
-          const inGesture = this.gestureDepth > 0 || (typeof navigator !== 'undefined' && navigator.userActivation?.isActive);
-          if (!inGesture) this.unmuteAttempts.set(lane.id, {
+          // Arm EVERY engine unmute: genuine gesture unmutes are not paused
+          // by WebKit, so arming costs nothing. userActivation is only a guess:
+          // transient activation outlives its tap, and WebKit uses its own
+          // media gesture rules. Engine-issued pauses disarm before pausing.
+          this.unmuteAttempts.set(lane.id, {
             at: Date.now(), owner: lane.postId,
             trigger: this.resumeOwners.get(lane.id)?.owner === lane.postId &&
               Date.now() - (this.resumeOwners.get(lane.id)?.at ?? 0) <= 1000 ? 'resume' : 'unmute',
           });
-          else this.unmuteAttempts.delete(lane.id);
           lane.el.muted = false;
           this.emit(lane);
         }
