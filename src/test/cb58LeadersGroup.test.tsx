@@ -135,6 +135,22 @@ describe('CB58 render and tap behavior', () => {
     const field = [...finishers, ...excluded, { ...entry('scoreless', 99, null), score: null }];
     expect(leadersShownRound(2, [g], allLeaders(field), field, [2, 3], 4)).toBe(3);
   });
+  it('CB58.2 unstarted afternoon tee-sheet players (no row or score null) keep Round 1 despite a published R2 draw', () => {
+    const morning = [entry('a', 1, -8, 18), entry('b', 9, -5, 18), entry('c', 41, -2, 18)];
+    const field = [...morning, { ...entry('pm1', 50, null, 0), score: null, thru: null as unknown as number }];
+    const sheet = [g, group(['pm1', 'pm2'], '2026-10-23T19:00:00Z')];
+    expect(leadersShownRound(1, sheet, allLeaders(field), field, [1, 2], 4)).toBe(1);
+  });
+  it('CB58.2 afternoon tee-sheet players finished moves to Round 2', () => {
+    const field = [entry('a', 1, -8, 18), entry('b', 9, -5, 18), entry('c', 41, -2, 18), entry('pm1', 20, -1, 18), entry('pm2', 30, 0, 18)];
+    const sheet = [g, group(['pm1', 'pm2'], '2026-10-23T19:00:00Z')];
+    expect(leadersShownRound(1, sheet, allLeaders(field), field, [1, 2], 4)).toBe(2);
+  });
+  it('CB58.2 a WD tee-sheet player with no card does not block', () => {
+    const field = [entry('a', 1, -8, 18), entry('b', 9, -5, 18), entry('c', 41, -2, 18), { ...entry('wd', 99, null, 0), score: null, status: 'WD' }];
+    const sheet = [g, group(['wd'], '2026-10-23T19:00:00Z')];
+    expect(leadersShownRound(1, sheet, allLeaders(field), field, [1, 2], 4)).toBe(2);
+  });
   it.each(['noGroups', 'leaderMissing', 'teeLoading', 'boardLoading', 'team'] as const)('renders nothing for %s', condition => {
     fixture.groups = condition === 'noGroups' ? [] : condition === 'leaderMissing' ? [group(['absent'])] : [g];
     fixture.loading = condition === 'teeLoading';
