@@ -15,7 +15,7 @@ import { VideoEngine, type LaneId } from '@/video/VideoEngine';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { isPerfEnabled } from '@/perf/navTiming';
-import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark, vperfCloseMotionMark } from '@/perf/vperf';
+import { vperfStart, vperfArmLane, vperfNextId, vperfMotionMark, vperfCloseMotionMark, vperfArmMovingFromSnapshot, vperfBorrowMounted } from '@/perf/vperf';
 import { trace, traceLookup } from '@/perf/trace';
 import * as audioDbg from '@/perf/audioDebug';
 import { PrefetchController } from '@/video/PrefetchController';
@@ -1088,6 +1088,8 @@ const BorrowedFullscreenSlot: React.FC<{
     // Element is currently in the tile (or hidden host if tile evicted).
     // mountLane atomically moves it here; hls instance stays paired.
     VideoEngine.mountLane(borrow.laneId, el);
+    // [VPERF] CB52 — fs.open.borrow ends at the first paint after this mount.
+    vperfBorrowMounted();
     // Assert play-intent post-mount (Stage-7 PR-1 fix): sets wantPlay and
     // recovers any owner-caller pause that raced between pin + markBorrowed.
     // Belt-and-braces with the engine's borrow guard. Honors viewer pause
@@ -1592,6 +1594,7 @@ const FullscreenMediaPager: React.FC<{
             }
           } catch { /* engine not booted */ }
           trace('pager.swap', { surface: 'FSPAGER', from: fromIdx, to: idx, swapped });
+          lastSwapRef.current = swapped;
         }
         // Borrow demote — one-shot on first horizontal move.
         let demoteReason: 'borrow.demote' | null = null;
@@ -1638,17 +1641,23 @@ const FullscreenMediaPager: React.FC<{
         // Decoder warm: the next page in the direction just swiped.
         if (dir !== 0) warmNextLane(idx, dir);
 
-        // [VPERF] S5 swipe.pager — measure horizontal settle onto a video
-        // page. Closer on firstFrame, waypoint on playing (mirror fs.open).
+        // [VPERF] S5 swipe.pager — horizontal settle onto a video page. Ends
+        // on the first MOVING frame on 'fullscreen' (CB52), whether the page
+        // was cold-loaded or swapped in decoded from 'fullscreen-next';
+        // firstFrame / playing are waypoints. Tagged swapped: true|false.
         if (pageKind === 'video') {
           const spanId = vperfNextId(`swipe.pager:${post.id}:${idx}`);
           vperfStart(spanId, 'swipe.pager', {
             postId: post.id,
             mediaIndex: idx,
             pageKind: 'video',
+            swapped: lastSwapRef.current,
           });
-          vperfArmLane('fullscreen', { spanId, endOn: 'firstFrame' });
+          vperfArmLane('fullscreen', { spanId, endOn: 'firstFrame', phase: 'firstFrame' });
           vperfArmLane('fullscreen', { spanId, endOn: 'playing', phase: 'playing' });
+          let pagerSnap: ReturnType<typeof VideoEngine.snapshot> | null = null;
+          try { pagerSnap = VideoEngine.snapshot('fullscreen'); } catch { pagerSnap = null; }
+          vperfArmMovingFromSnapshot('fullscreen', spanId, `${post.id}:${idx}`, pagerSnap);
 
           // [FSPAGER] slide.mismatch guard — video pages only (already
           // gated by pageKind === 'video' above). Retained prior lane
