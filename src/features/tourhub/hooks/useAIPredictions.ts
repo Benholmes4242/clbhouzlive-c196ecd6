@@ -446,7 +446,8 @@ async function getPgaSeasonId(): Promise<string | null> {
   return seasons?.[0]?.id ?? null;
 }
 
-async function fetchPredictionsForTournament(tournament: any): Promise<AIPredictionData | null> {
+// Exported for tests (CB54 lock-at-first-tee guard coverage).
+export async function fetchPredictionsForTournament(tournament: any): Promise<AIPredictionData | null> {
   // Early skip: AI predictions currently assume single-player stroke-play tournaments.
   // Team / cup / match formats need separate predictor logic — not yet built.
   // Skipping prevents pollution of ai_predictions with player-shaped data for team events.
@@ -504,6 +505,9 @@ async function fetchPredictionsForTournament(tournament: any): Promise<AIPredict
     }
     return null;
   }
+
+  // Started tournament with no stored row: stays without picks (CB54).
+  if (!aiPredictions) return null;
 
   const rawPredictions = {
     topContenders: (aiPredictions.predictions || []) as any[],
