@@ -54,8 +54,8 @@ function highlighted() { return target()?.classList.contains('animate-soft-pulse
 
 beforeEach(() => {
   vi.useFakeTimers();
-  const rpcClient = supabase as unknown as { rpc: (...args: unknown[]) => Promise<unknown> };
-  vi.spyOn(rpcClient, 'rpc').mockResolvedValue({ data: [], error: null, count: null, status: 200, statusText: 'OK' });
+  const rpc = vi.spyOn(supabase as unknown as { rpc: (...args: unknown[]) => Promise<unknown> }, 'rpc');
+  rpc.mockResolvedValue({ data: [], error: null, count: null, status: 200, statusText: 'OK' });
   fixture.rows = Array.from({ length: 10 }, (_, i) => row(`r${i}`));
   fixture.loading = false;
   fixture.closeFullscreen.mockClear();
