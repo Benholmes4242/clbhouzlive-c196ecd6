@@ -552,6 +552,11 @@ class VideoEngineImpl {
     this.saveDataGated = shouldGateForSaveData();
     const host = ensureHiddenHost();
     for (const id of laneIds) this.createLane(id, host);
+    // [VPERF] CB52 — read-only element/owner lookup for moving-frame spans.
+    vperfSetLaneResolver((id) => {
+      const l = this.lanes.get(id as LaneId);
+      return l ? { el: l.el, owner: l.postId } : null;
+    });
     if (PAUSE_ON_HIDDEN && typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.onVisibility);
     }
