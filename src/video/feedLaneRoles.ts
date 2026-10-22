@@ -171,6 +171,19 @@ class FeedLaneRolesImpl {
     return () => this.listeners.delete(listener);
   }
 
+  /**
+   * TEST-ONLY reset — never call from product code. Restores the canonical
+   * role map (active = feed-active, next = feed-next, prev = feed-prev) and
+   * clears the frozen set, so a test file sharing this singleton starts each
+   * case from the same roles regardless of what earlier cases rotated or
+   * froze. Emits once so subscribers see the restored map.
+   */
+  __resetForTests(): void {
+    this.map = { active: 'feed-active', next: 'feed-next', prev: 'feed-prev' };
+    this.frozen.clear();
+    this.emit();
+  }
+
   private emit(): void {
     this.listeners.forEach((fn) => {
       try { fn(); } catch { /* noop */ }
