@@ -1,5 +1,12 @@
 # Roadmap
 
+## CB48 — Role-based sound and honest blocked-state controls
+- [ ] Resolve focus roles and debug speaker decisions through one engine resolver.
+- [ ] Engine-owned blocked lanes, gesture rescue and ownership-safe visibility resume.
+- [ ] Inline/fullscreen speaker controls and capped real-refusal analytics; silent-switch hint separate.
+- [ ] Audit close handoff, legacy pool reachability and historical test inventory; run full suite and report checks/limitations.
+- Held: element priming, buffering UI, wake-lock changes; preview and legacy pool path untouched.
+
 ## CB42 — Gate height fills to viewport bottom; diagnostic removal confirmed
 - [x] Part 1: wrapper div in AmateurPage.tsx gained `data-amateur-page=""`; roundsGate.css scopes `[data-amateur-page]:has([data-rounds-gate])` as flex host at height 100dvh/min-height 0, and main's `height: calc(100dvh - var(--sat, 0px))` became `flex: 1 1 auto` (var(--sat) term gone). padding-bottom expression, card 20px padding, nav offset, CB38 mask/opacity, CB36 rule, scope switch, five-round rule and copy untouched.
 - [x] Part 2: GateFootDiag already fully removed under CB41; `rg GateFootDiag src/` empty. Only remaining matches are historical roadmap entries. No test referenced it.
