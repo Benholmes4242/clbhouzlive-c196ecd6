@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Trans, useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -7,7 +7,8 @@ import { useHomeClubStatus } from '@/features/home-club/useHomeClubStatus';
 import { openHomeClubPicker } from '@/features/home-club/homeClubPickerStore';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { SC_BOGEY_DARK } from '@/features/courses/components/holes/_constants';
+import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
+import { formatNumber } from '@/i18n/format';
 import { connectReach } from '@/lib/whs/connectReach';
 import { useConnectIntroCourse, type ConnectIntroCourse } from './useConnectIntroCourse';
 import { DIM, INK, AMBER, NUM, FONT } from './designTokens';
@@ -19,10 +20,6 @@ interface Props {
   layout?: 'page' | 'embedded';
 }
 
-type IntroHole = { hole_no: number; par: number; stroke_index: number | null; avg_to_par: number };
-type IntroBlock = { rounds: number; golfers: number; median_gross: number | null; par: number | null; holes: IntroHole[] };
-type IntroBand = { lo: number; hi: number } & IntroBlock;
-type IntroBandResult = { available: boolean; reason?: 'unauthenticated' | 'unmapped' | 'thin'; hcp: number; band: IntroBand | null; all: IntroBlock | null };
 type CirclePerson = { user_id: string; name: string; avatar_url: string | null; club: string | null; index: number };
 type CirclePreview = { circle: number; connected: number; people: CirclePerson[] };
 
@@ -35,9 +32,9 @@ const QUIET = '#9AA3AF';
 const DIMMER = '#6B7380';
 const BAR = '#3A3F47';
 const GOOD = '#4ADE80';
-const COST = SC_BOGEY_DARK; // The connect intro's cost colour matches the course page's bogey blue.
 const HAIR = 'rgba(255,255,255,0.08)';
 const SECTION_DIVIDED: React.CSSProperties = { marginTop: 36, paddingTop: 36, borderTop: `1px solid ${HAIR}` };
+const SAID_HAIR = 'rgba(255,255,255,0.12)';
 const FAINT_HAIR = 'rgba(255,255,255,0.06)';
 const AMBER_DASH = 'rgba(247,147,30,0.6)';
 const AMBER_DASH_STRONG = 'rgba(247,147,30,0.7)';
@@ -82,79 +79,14 @@ export function startingHandicap(args: { egHandicapIndex?: number | null; manual
   return Math.max(0, Math.min(36, raw));
 }
 
-export function costliestThree(holes: IntroHole[]): IntroHole[] {
-  return [...holes]
-    .sort((a, b) => {
-      const avg = b.avg_to_par - a.avg_to_par;
-      if (avg !== 0) return avg;
-      const siA = a.stroke_index ?? Number.MAX_SAFE_INTEGER;
-      const siB = b.stroke_index ?? Number.MAX_SAFE_INTEGER;
-      if (siA !== siB) return siA - siB;
-      return a.hole_no - b.hole_no;
-    })
-    .slice(0, 3);
-}
-
-export function ordinal(n: number): string {
-  const mod100 = n % 100;
-  if (mod100 >= 11 && mod100 <= 13) return `${n}th`;
-  const mod10 = n % 10;
-  if (mod10 === 1) return `${n}st`;
-  if (mod10 === 2) return `${n}nd`;
-  if (mod10 === 3) return `${n}rd`;
-  return `${n}th`;
-}
-
 export function signedOne(n: number): string {
   const rounded = Math.round(n * 10) / 10;
   if (Object.is(rounded, -0) || rounded === 0) return '0.0';
   return rounded > 0 ? `+${rounded.toFixed(1)}` : rounded.toFixed(1).replace('-', '−');
 }
 
-function unsignedOne(n: number): string {
-  return Math.abs(Math.round(n * 10) / 10).toFixed(1);
-}
-
-export function rangeHcp(n: number): string {
-  return n < 0 ? `+${Math.abs(n)}` : String(n);
-}
-
 export function formatIndex(n: number): string {
   return n < 0 ? `+${Math.abs(n).toFixed(1)}` : n.toFixed(1);
-}
-
-type IntroT = (key: string, options?: Record<string, unknown>) => string;
-
-export function buildReadout(block: IntroBlock, band: IntroBand | null, h: number, t?: IntroT) {
-  const holes = costliestThree(block.holes);
-  const anyNegative = holes.some((x) => x.avg_to_par < 0);
-  const holeList = holes.map((x) => ordinal(x.hole_no));
-  const values = holes.map((x) => (anyNegative ? signedOne(x.avg_to_par) : unsignedOne(x.avg_to_par)));
-  const median = block.median_gross == null ? '' : String(Math.round(block.median_gross));
-  const par = block.par == null ? '' : String(block.par);
-  const label = hcpLabel(h, t);
-  return {
-    median,
-    baseline: band
-      ? t?.('whsConnect.intro.readoutBandBaseline', { median, hcp: label, par }) ?? `${median} is what golfers off ${label} typically shoot here, par ${par}.`
-      : t?.('whsConnect.intro.readoutAllBaseline', { median, par }) ?? `${median} is what golfers here typically shoot, par ${par}.`,
-    cost: t?.('whsConnect.intro.readoutCost', {
-      hole1: holeList[0],
-      hole2: holeList[1],
-      hole3: holeList[2],
-      value1: values[0],
-      value2: values[1],
-      value3: values[2],
-      ending: t(anyNegative ? 'whsConnect.intro.readoutAgainstPar' : 'whsConnect.intro.readoutOverPar'),
-    }) ?? `The ${holeList[0]}, ${holeList[1]} and ${holeList[2]} cost them most: ${values[0]}, ${values[1]} and ${values[2]} ${anyNegative ? 'against par.' : 'over par.'}`,
-    source: band
-      ? t?.('whsConnect.intro.readoutBandSource', { count: band.rounds, lo: rangeHcp(band.lo), hi: rangeHcp(band.hi) }) ?? `From ${band.rounds} ${band.rounds === 1 ? 'round' : 'rounds'} by golfers off ${rangeHcp(band.lo)} to ${rangeHcp(band.hi)} at this course.`
-      : t?.('whsConnect.intro.readoutAllSource', { count: block.rounds, hcp: label }) ?? `Not enough rounds yet from golfers off ${label}, so this is every golfer here: ${block.rounds} ${block.rounds === 1 ? 'round' : 'rounds'}.`,
-  };
-}
-
-export function hcpLabel(n: number, t?: IntroT): string {
-  return n === 0 ? t?.('whsConnect.intro.scratch') ?? 'scratch' : String(n);
 }
 
 export function nextFooterHidden(current: boolean, ratio: number): boolean {
@@ -174,15 +106,6 @@ export function chooseCirclePeople(people: CirclePerson[], h: number): CirclePer
     .sort((a, b) => a.index - b.index);
 }
 
-function useDebouncedValue<T>(value: T, delayMs: number): T {
-  const [debounced, setDebounced] = React.useState(value);
-  React.useEffect(() => {
-    const id = window.setTimeout(() => setDebounced(value), delayMs);
-    return () => window.clearTimeout(id);
-  }, [value, delayMs]);
-  return debounced;
-}
-
 function useOwnIntroProfile(userId: string | undefined, enabled: boolean) {
   return useQuery({
     queryKey: ['connect-intro-profile', userId ?? ''],
@@ -196,21 +119,6 @@ function useOwnIntroProfile(userId: string | undefined, enabled: boolean) {
         .maybeSingle();
       if (error) throw error;
       return data as { eg_handicap_index: number | null; manual_handicap_index: number | null } | null;
-    },
-  });
-}
-
-function useConnectIntroBand(courseId: string | undefined, h: number, enabled: boolean) {
-  const debouncedH = useDebouncedValue(h, 250);
-  return useQuery({
-    queryKey: ['connect-intro-band', courseId ?? '', debouncedH],
-    enabled: !!courseId && enabled,
-    staleTime: 10 * 60_000,
-    placeholderData: keepPreviousData,
-    queryFn: async (): Promise<IntroBandResult | null> => {
-      const { data, error } = await supabase.rpc('get_connect_intro_band', { p_course_id: courseId as string, p_hcp: debouncedH });
-      if (error) throw error;
-      return data as IntroBandResult | null;
     },
   });
 }
@@ -325,75 +233,19 @@ const IntroText: React.FC<{ k: string; options?: Record<string, unknown> }> = ({
   return <>{t(`whsConnect.intro.${k}`, options)}</>;
 };
 
-const Stepper: React.FC<{ value: number; onChange: (next: number) => void }> = ({ value, onChange }) => {
-  const { t } = useTranslation('handicap');
-  return (
-    <div style={{ paddingTop: 22, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-      <span style={{ fontSize: 15, fontWeight: 600, color: MID }}>{t('whsConnect.intro.stepperLabel')}</span>
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-        <button type="button" aria-label={t('whsConnect.intro.lowerHandicapAria')} disabled={value <= 0} onClick={() => onChange(Math.max(0, value - 1))} style={stepperButtonStyle(value <= 0)}>&minus;</button>
-        <span style={{ minWidth: 56, textAlign: 'center', fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', color: SOFT_INK, ...NUM }}>{value}</span>
-        <button type="button" aria-label={t('whsConnect.intro.higherHandicapAria')} disabled={value >= 36} onClick={() => onChange(Math.min(36, value + 1))} style={stepperButtonStyle(value >= 36)}>+</button>
-      </span>
-    </div>
-  );
-};
-
-function stepperButtonStyle(disabled: boolean): React.CSSProperties {
-  return {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    border: '1px solid rgba(255,255,255,0.14)',
-    background: 'transparent',
-    color: SOFT_INK,
-    fontFamily: FONT,
-    fontSize: 22,
-    fontWeight: 600,
-    opacity: disabled ? 0.4 : 1,
-    cursor: disabled ? 'default' : 'pointer',
-  };
-}
-
-const HoleChart: React.FC<{ block: IntroBlock; top: IntroHole[]; fetching: boolean }> = ({ block, top, fetching }) => {
-  const topSet = new Set(top.map((h) => h.hole_no));
-  const byHole = new Map(block.holes.map((h) => [h.hole_no, h]));
-  const holes = Array.from({ length: 18 }, (_, i) => byHole.get(i + 1));
-  return (
-    <div style={{ paddingTop: 18 }}>
-      <div style={{ height: 22, display: 'grid', gridTemplateColumns: 'repeat(18, minmax(0, 1fr))', gap: 3, alignItems: 'end' }}>
-        {holes.map((h, i) => (
-          <span key={i} style={{ textAlign: 'center', fontSize: 9, fontWeight: 800, color: COST, whiteSpace: 'nowrap' }}>{h && topSet.has(h.hole_no) ? signedOne(h.avg_to_par) : ''}</span>
-        ))}
-      </div>
-      <div style={{ height: 150, display: 'grid', gridTemplateColumns: 'repeat(18, minmax(0, 1fr))', gap: 3, alignItems: 'end', opacity: fetching ? 0.6 : 1, transition: 'opacity 160ms ease' }}>
-        {holes.map((h, i) => {
-          const height = Math.max(4, Math.round((Math.min(Math.max(h?.avg_to_par ?? 0, 0), 2.8) / 2.8) * 150));
-          return <div key={i} style={{ height, borderRadius: 4, background: h && topSet.has(h.hole_no) ? COST : BAR, transition: 'height 220ms ease' }} />;
-        })}
-      </div>
-      <div style={{ marginTop: 6, display: 'grid', gridTemplateColumns: 'repeat(18, minmax(0, 1fr))', gap: 3 }}>
-        {holes.map((_, i) => <span key={i} style={{ textAlign: 'center', fontSize: 9.5, fontWeight: 700, color: DIMMER }}>{i + 1}</span>)}
-      </div>
-    </div>
-  );
-};
-
+/** The intro and course You tab share the inclusive course-stats verdict source and availability gate. */
 const FirstScreen: React.FC<{
   course: ConnectIntroCourse;
-  block: IntroBlock;
-  band: IntroBand | null;
-  h: number;
-  dataHcp: number;
-  setH: (h: number) => void;
+  avgOverPar: number;
+  rounds: number;
   hasHomeClub: boolean;
   onChange: () => void;
-  fetching: boolean;
-}> = ({ course, block, band, h, dataHcp, setH, hasHomeClub, onChange, fetching }) => {
+}> = ({ course, avgOverPar, rounds, hasHomeClub, onChange }) => {
   const { t } = useTranslation('handicap');
-  const headlineRef = useFittedThreeLine([course.courseName]);
-  const top = costliestThree(block.holes);
-  const readout = buildReadout(block, band, dataHcp, t);
+  const courseName = displayCourseName(course.courseName);
+  const headlineRef = useFittedThreeLine([course.courseName, avgOverPar]);
+  const labelStyle: React.CSSProperties = { width: 92, flexShrink: 0, fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', lineHeight: 1.25, color: DIM };
+  const valueStyle: React.CSSProperties = { width: 44, flexShrink: 0, textAlign: 'right', fontSize: 14, fontWeight: 800, letterSpacing: '-0.02em', color: SOFT_INK, ...NUM };
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
@@ -401,17 +253,28 @@ const FirstScreen: React.FC<{
         <button type="button" onClick={onChange} style={{ background: 'none', border: 'none', padding: 0, fontFamily: FONT, fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: QUIET, cursor: 'pointer' }}>{t(hasHomeClub ? 'whsConnect.intro.change' : 'whsConnect.intro.setHomeClub')}</button>
       </div>
       <h1 ref={headlineRef} style={{ margin: '12px 0 0', fontSize: 40, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.02, color: SOFT_INK }}>
-        <span style={{ display: 'block', whiteSpace: 'nowrap' }}>{t('whsConnect.intro.tryHeadlineLine1')}</span>
-        <span style={{ display: 'block', whiteSpace: 'nowrap' }}>{displayCourseName(course.courseName)}</span>
-        <span style={{ display: 'block', whiteSpace: 'nowrap', color: COST }}>{t('whsConnect.intro.tryHeadlineLine3')}</span>
+        <span style={{ display: 'block', whiteSpace: 'nowrap' }}>{courseName}</span>
+        <span style={{ display: 'block', whiteSpace: 'nowrap' }}>{t('whsConnect.intro.fieldHeadlineLine2', { shots: avgOverPar.toFixed(1) })}</span>
+        <span style={{ display: 'block', whiteSpace: 'nowrap' }}>{t('whsConnect.intro.fieldHeadlineLine3')}</span>
       </h1>
-      <Stepper value={h} onChange={setH} />
-      <HoleChart block={block} top={top} fetching={fetching} />
-      <div style={{ paddingTop: 18 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {readout.median ? <span style={{ flexShrink: 0, fontSize: 44, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, color: SOFT_INK, ...NUM }}>{readout.median}</span> : null}
-          <span style={{ fontSize: 14, lineHeight: 1.35, color: MID }}>{readout.baseline}</span>
+      <div style={{ marginTop: 22, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <span style={{ flexShrink: 0, fontSize: 46, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1, color: SOFT_INK, ...NUM }}>{signedOne(avgOverPar)}</span>
+        <span><span style={{ display: 'block', fontSize: 14, fontWeight: 700, color: SOFT_INK }}>{t('whsConnect.intro.fieldOver')}</span><span style={{ display: 'block', marginTop: 2, fontSize: 12, color: DIMMER }}>{t('whsConnect.intro.fieldAcross', { rounds: formatNumber(rounds) })}</span></span>
+      </div>
+      <div style={{ marginTop: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <div style={labelStyle}>{t('whsConnect.intro.fieldLabel')}</div>
+          <div style={{ flex: 1, height: 10, borderRadius: 5, background: FAINT_HAIR, overflow: 'hidden' }}><div style={{ width: '100%', height: '100%', borderRadius: 5, background: SOFT_INK }} /></div>
+          <div style={valueStyle}>{signedOne(avgOverPar)}</div>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={labelStyle}>{t('whsConnect.intro.youLabel')}</div>
+          <div style={{ flex: 1, height: 10, borderRadius: 5, border: `1.5px dashed ${AMBER_DASH}`, boxSizing: 'border-box' }} />
+          <div style={{ ...valueStyle, letterSpacing: 0, color: AMBER }}>?</div>
+        </div>
+      </div>
+      <div style={{ marginTop: 18, paddingLeft: 12, borderLeft: `2px solid ${SAID_HAIR}`, fontSize: 14, lineHeight: 1.5, color: MID }}>
+        <Trans t={t} i18nKey="whsConnect.intro.fieldSaid" values={{ courseName }} components={{ 1: <b style={{ color: SOFT_INK }} />, 3: <b style={{ color: SOFT_INK }} /> }} />
       </div>
     </>
   );
@@ -545,21 +408,12 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline, la
   const intro = useConnectIntroCourse(homeSettled ? home.clubId : null, homeSettled);
   const profile = useOwnIntroProfile(userId, homeSettled);
   const h0 = React.useMemo(() => startingHandicap({ egHandicapIndex: profile.data?.eg_handicap_index, manualHandicapIndex: profile.data?.manual_handicap_index }), [profile.data?.eg_handicap_index, profile.data?.manual_handicap_index]);
-  const [h, setHState] = React.useState(h0);
-  const h0Applied = React.useRef(false);
-  React.useEffect(() => {
-    if (profile.isFetched && !h0Applied.current) {
-      h0Applied.current = true;
-      setHState(h0);
-    }
-  }, [h0, profile.isFetched]);
-  const band = useConnectIntroBand(intro.data?.courseId, h, !!intro.data);
+  const stats = useCourseStatsDetail(intro.data?.courseId, !!intro.data);
   const circle = useConnectCirclePreview(userId, !sessionLoading);
   const stageRef = React.useRef<HTMLDivElement>(null);
   const endRef = React.useRef<HTMLDivElement>(null);
   const [footerHidden, setFooterHidden] = React.useState(false);
   const [footerDisplay, setFooterDisplay] = React.useState(true);
-  const triedRef = React.useRef(false);
   const viewedRef = React.useRef(false);
   const immersive = layout === 'page';
 
@@ -570,14 +424,6 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline, la
     },
   });
 
-  const setH = (next: number) => {
-    if (!triedRef.current) {
-      triedRef.current = true;
-      analyticsEvents.track('connect_intro_hcp_tried', { from: h0, to: next });
-    }
-    setHState(next);
-  };
-
   React.useEffect(() => {
     const target = endRef.current;
     if (!immersive || !target) return;
@@ -587,19 +433,23 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline, la
     }, { root: null, threshold: [0, 0.3, 0.6, 1] });
     obs.observe(target);
     return () => obs.disconnect();
-  }, [immersive, intro.data, band.data]);
+  }, [immersive, intro.data, stats.data]);
 
   React.useEffect(() => {
     if (!footerHidden) setFooterDisplay(true);
   }, [footerHidden]);
 
-  const pending = !homeSettled || intro.isPending || (!!userId && profile.isPending) || (!!intro.data && band.isPending);
+  const pending = !homeSettled || intro.isPending || (!!userId && profile.isPending) || (!!intro.data && stats.isPending);
+
+  const avgOverPar = stats.data?.avg_over_par;
+  const rounds = stats.data?.rounds_tracked ?? 0;
+  const hasVerdict = avgOverPar != null && avgOverPar > 0 && rounds > 0;
 
   React.useEffect(() => {
-    if (pending || !intro.data || !band.data || viewedRef.current) return;
+    if (pending || !intro.data || !hasVerdict || viewedRef.current) return;
     viewedRef.current = true;
-    analyticsEvents.track('connect_intro_viewed', { source: intro.data.source, band: !!band.data.band, h0 });
-  }, [band.data, h0, intro.data, pending]);
+    analyticsEvents.track('connect_intro_viewed', { source: intro.data.source, h0 });
+  }, [hasVerdict, h0, intro.data, pending]);
 
   if (pending) {
     return (
@@ -611,23 +461,21 @@ export const EmptyStateScreen: React.FC<Props> = ({ onPickCountry, onDecline, la
   }
 
   if (!intro.data) return <LegacyFallback onPickCountry={onPickCountry} onDecline={onDecline} layout={layout} />;
-  if (!band.data || band.data.available === false || !band.data.all) return <LegacyFallback onPickCountry={onPickCountry} onDecline={onDecline} layout={layout} />;
+  if (!hasVerdict || avgOverPar == null) return <LegacyFallback onPickCountry={onPickCountry} onDecline={onDecline} layout={layout} />;
 
-  const block = band.data.band ?? band.data.all;
-  const dataHcp = band.data.hcp;
   const circleShown = !!circle.isFetched && (circle.data?.connected ?? 0) > 0;
 
   return (
     <>
       <Stage ref={stageRef}>
-        <FirstScreen course={intro.data} block={block} band={band.data.band} h={h} dataHcp={dataHcp} setH={setH} hasHomeClub={home.clubId != null} onChange={onChange} fetching={band.isFetching} />
-        {circle.isFetched && circle.data ? <CircleSection preview={circle.data} h={dataHcp} /> : null}
+        <FirstScreen course={intro.data} avgOverPar={avgOverPar} rounds={rounds} hasHomeClub={home.clubId != null} onChange={onChange} />
+        {circle.isFetched && circle.data ? <CircleSection preview={circle.data} h={h0} /> : null}
         <LastTwentySection />
         <TrustSection />
-        <EndBlock ref={endRef} onPickCountry={onPickCountry} onDecline={onDecline} h={dataHcp} circleShown={circleShown} />
+        <EndBlock ref={endRef} onPickCountry={onPickCountry} onDecline={onDecline} h={h0} circleShown={circleShown} />
         <div style={{ height: 40 }} />
       </Stage>
-      {immersive ? <IntroFooter hidden={footerHidden} display={footerDisplay} onTransitionEnd={() => { if (footerHidden) setFooterDisplay(false); }} onPickCountry={onPickCountry} onDecline={onDecline} h={dataHcp} circleShown={circleShown} /> : null}
+      {immersive ? <IntroFooter hidden={footerHidden} display={footerDisplay} onTransitionEnd={() => { if (footerHidden) setFooterDisplay(false); }} onPickCountry={onPickCountry} onDecline={onDecline} h={h0} circleShown={circleShown} /> : null}
     </>
   );
 };
