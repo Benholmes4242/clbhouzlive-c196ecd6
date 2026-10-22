@@ -1,10 +1,12 @@
 # Roadmap
 
 ## CB48 — Role-based sound and honest blocked-state controls
-- [ ] Resolve focus roles and debug speaker decisions through one engine resolver.
-- [ ] Engine-owned blocked lanes, gesture rescue and ownership-safe visibility resume.
-- [ ] Inline/fullscreen speaker controls and capped real-refusal analytics; silent-switch hint separate.
-- [ ] Audit close handoff, legacy pool reachability and historical test inventory; run full suite and report checks/limitations.
+- [x] Implemented role-capable focus and shared resolver for reconciliation/heartbeat; physical fullscreen close handoff unchanged.
+- [ ] STOP: engine self-pause fallback does not pass new test `src/test/videoAudioRoleRecovery.test.tsx:118:53`: `AssertionError: expected false to be true // Object.is equality`; no implementation/test correction after failure.
+- [ ] STOP: preview typecheck `src/video/useVideoLane.ts(60,7): error TS2741: Property 'audioBlocked' is missing in type '{ laneId: "feed-active"; state: "idle"; currentTime: number; readyState: number; duration: number; muted: true; firstFrame: false; postId: null; endedCount: number; }' but required in type 'LaneSnapshot'.` No correction after stop.
+- [x] Implemented (not accepted complete): engine blocked state/gesture rescue/visibility intent, inline/fullscreen icon wiring, real-refusal analytics and separate silent-switch hint. No existing test retargeted, deleted or renamed.
+- [x] Full `bunx vitest run`: before 2,112 passed/287 files/0 failures; after 2,130 passed +1 failed =2,131/289 files. +19 exclusively 14 new videoAudioRoleRecovery cases and 5 new videoAudioAnalytics cases. No pre-existing failures. Prior fullscreen pill change removed zero tests (305 tracked test files before/after; executable Vitest files 287).
+- [x] Close handoff/legacy pool audit recorded in `/mnt/documents/CB48_sound_stop_report.md`; legacy path unreachable through the sole fullscreen SnapFeed mount, but SnapVideoPlayer does contain live VideoSlot JSX despite stale poster-only header. Authenticated/phone checks not run after stop; external_unmanaged auth.
 - Held: element priming, buffering UI, wake-lock changes; preview and legacy pool path untouched.
 
 ## CB42 — Gate height fills to viewport bottom; diagnostic removal confirmed
