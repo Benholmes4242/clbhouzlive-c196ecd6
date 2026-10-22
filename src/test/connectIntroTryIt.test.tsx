@@ -82,6 +82,7 @@ vi.mock('react-i18next', () => {
   return {
     useTranslation: () => ({ t }),
     Trans: ({ i18nKey }: { i18nKey: string }) => <>{t(i18nKey)}</>,
+    initReactI18next: { type: '3rdParty', init: () => {} },
   };
 });
 
