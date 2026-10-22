@@ -34,6 +34,20 @@ const RANGE_DAYS: Record<RangeKey, number> = { '7d': 7, '30d': 30, '90d': 90 };
 
 const HEAD_KINDS = ['feed.activate', 'swipe.vertical', 'swipe.pager', 'fs.open'];
 
+/** CB52: fs.open is shipped split (fs.open.borrow / .lane / .image); the
+ *  summaries group them back under fs.open. The breakdown keeps the split. */
+export function headKindOf(kind: string): string {
+  return kind === 'fs.open' || kind.startsWith('fs.open.') ? 'fs.open' : kind;
+}
+
+/** CB52: feed rows are keyed `${page}:inline` / `${page}:fullscreen`. A base
+ *  page filter matches both; a suffixed filter matches exactly. */
+export function pageMatches(filter: string, page: string | null): boolean {
+  if (filter === 'all') return true;
+  if (!page) return false;
+  return page === filter || page.startsWith(`${filter}:`);
+}
+
 function toISO(daysAgo: number) {
   const d = new Date();
   d.setUTCHours(0, 0, 0, 0);
@@ -78,10 +92,11 @@ interface BucketAgg {
   slow: number;
   timeout: number;
   superseded: number;
+  failed: number;
 }
 
 function emptyAgg(): BucketAgg {
-  return { count: 0, p50w: 0, p95w: 0, worst: 0, pass: 0, slow: 0, timeout: 0, superseded: 0 };
+  return { count: 0, p50w: 0, p95w: 0, worst: 0, pass: 0, slow: 0, timeout: 0, superseded: 0, failed: 0 };
 }
 
 function foldBucket(a: BucketAgg, r: Row) {
@@ -94,6 +109,7 @@ function foldBucket(a: BucketAgg, r: Row) {
   a.slow += r.slow ?? 0;
   a.timeout += r.timeout ?? 0;
   a.superseded += r.superseded ?? 0;
+  a.failed += Number(r.extra?.failed) || 0;
 }
 
 function passPct(a: BucketAgg) {
@@ -142,13 +158,15 @@ export default function VideoPerfPage() {
   for (const r of rows) if (r.page) pagesSet.add(r.page);
   const pageOptions = ['all', ...Array.from(pagesSet).sort()];
 
-  const matchesPage = (r: Row) => pageFilter === 'all' || r.page === pageFilter;
+  const matchesPage = (r: Row) => pageMatches(pageFilter, r.page);
 
   // ── HEADLINE: p95 of feed.activate on worst page (current vs prev)
   const p95ByPage = new Map<string, BucketAgg>();
   const p95ByPagePrev = new Map<string, BucketAgg>();
-  let stallCurr = { stalls: 0, dur: 0 };
-  let stallPrev = { stalls: 0, dur: 0 };
+  // CB52: stall rate retired (CB50's video_stall is the stall source).
+  // Inline-feed scroll smoothness replaces it: long frames / frames.
+  const inlineCurr = { long: 0, frames: 0 };
+  const inlinePrev = { long: 0, frames: 0 };
   let prefCurr = { hits: 0, issued: 0 };
   let prefPrev = { hits: 0, issued: 0 };
   const sessionsCurr = new Set<string>();
@@ -164,10 +182,10 @@ export default function VideoPerfPage() {
       if (!map.has(key)) map.set(key, emptyAgg());
       foldBucket(map.get(key)!, r);
     }
-    if (r.row_kind === 'session' && r.extra) {
-      const bucket = curr ? stallCurr : stallPrev;
-      bucket.stalls += r.extra.totalStalls ?? 0;
-      bucket.dur += r.extra.totalDurationMs ?? 0;
+    if (r.row_kind === 'feed' && r.extra && r.page?.endsWith(':inline') && matchesPage(r)) {
+      const bucket = curr ? inlineCurr : inlinePrev;
+      bucket.long += Number(r.extra.longFrames) || 0;
+      bucket.frames += Number(r.extra.frames) || 0;
     }
     if (r.row_kind === 'prefetch' && r.extra) {
       const bucket = curr ? prefCurr : prefPrev;
@@ -187,8 +205,8 @@ export default function VideoPerfPage() {
   const worstPrevAgg = worstPage ? p95ByPagePrev.get(worstPage) : null;
   const worstP95Prev = worstPrevAgg && worstPrevAgg.count > 0 ? worstPrevAgg.p95w / worstPrevAgg.count : 0;
 
-  const stallRateCurr = stallCurr.dur > 0 ? (stallCurr.stalls / (stallCurr.dur / 1000)) : null;
-  const stallRatePrev = stallPrev.dur > 0 ? (stallPrev.stalls / (stallPrev.dur / 1000)) : null;
+  const inlineLongCurr = inlineCurr.frames > 0 ? (inlineCurr.long / inlineCurr.frames) * 100 : null;
+  const inlineLongPrev = inlinePrev.frames > 0 ? (inlinePrev.long / inlinePrev.frames) * 100 : null;
   const prefRateCurr = prefCurr.issued > 0 ? (prefCurr.hits / prefCurr.issued) * 100 : null;
   const prefRatePrev = prefPrev.issued > 0 ? (prefPrev.hits / prefPrev.issued) * 100 : null;
 
@@ -196,26 +214,21 @@ export default function VideoPerfPage() {
   const dayKeys: string[] = [];
   for (let i = days - 1; i >= 0; i--) dayKeys.push(dayKey(toISO(i)));
   const dailyByKind: Record<string, Record<string, BucketAgg>> = {};
-  const dailyStalls: Record<string, { stalls: number; dur: number }> = {};
   const dailyPassMix: Record<string, { pass: number; slow: number; timeout: number }> = {};
 
   for (const r of rows) {
     if (!inCurrent(r)) continue;
     if (!matchesPage(r)) continue;
     const day = dayKey(r.flushed_at);
-    if (r.row_kind === 'bucket' && r.kind && HEAD_KINDS.includes(r.kind)) {
-      dailyByKind[r.kind] = dailyByKind[r.kind] || {};
-      if (!dailyByKind[r.kind][day]) dailyByKind[r.kind][day] = emptyAgg();
-      foldBucket(dailyByKind[r.kind][day], r);
+    const hk = r.kind ? headKindOf(r.kind) : null;
+    if (r.row_kind === 'bucket' && hk && HEAD_KINDS.includes(hk)) {
+      dailyByKind[hk] = dailyByKind[hk] || {};
+      if (!dailyByKind[hk][day]) dailyByKind[hk][day] = emptyAgg();
+      foldBucket(dailyByKind[hk][day], r);
       if (!dailyPassMix[day]) dailyPassMix[day] = { pass: 0, slow: 0, timeout: 0 };
       dailyPassMix[day].pass += r.pass ?? 0;
       dailyPassMix[day].slow += r.slow ?? 0;
       dailyPassMix[day].timeout += r.timeout ?? 0;
-    }
-    if (r.row_kind === 'session' && r.extra) {
-      if (!dailyStalls[day]) dailyStalls[day] = { stalls: 0, dur: 0 };
-      dailyStalls[day].stalls += r.extra.totalStalls ?? 0;
-      dailyStalls[day].dur += r.extra.totalDurationMs ?? 0;
     }
   }
 
@@ -234,10 +247,6 @@ export default function VideoPerfPage() {
       row[k] = agg && agg.count > 0 ? Math.round(agg.p95w / agg.count) : null;
     }
     return row;
-  });
-  const stallSeries = dayKeys.map(d => {
-    const s = dailyStalls[d];
-    return { day: d.slice(5), stallsPerSec: s && s.dur > 0 ? +(s.stalls / (s.dur / 1000)).toFixed(3) : 0 };
   });
   const passMixSeries = dayKeys.map(d => {
     const s = dailyPassMix[d] || { pass: 0, slow: 0, timeout: 0 };
@@ -278,6 +287,7 @@ export default function VideoPerfPage() {
       slow: row.agg.slow,
       timeout: row.agg.timeout,
       sup: row.agg.superseded,
+      fail: row.agg.failed,
     };
   });
   const sorted = [...tableRows].sort((a: any, b: any) => {
@@ -334,10 +344,10 @@ export default function VideoPerfPage() {
           loading={isLoading}
         />
         <HeadlineCard
-          label="Stall rate (per sec)"
-          value={stallRateCurr != null ? stallRateCurr.toFixed(3) : '—'}
-          prev={stallRatePrev ?? 0}
-          curr={stallRateCurr ?? 0}
+          label="Inline feed long frames"
+          value={inlineLongCurr != null ? `${inlineLongCurr.toFixed(2)}%` : '—'}
+          prev={inlineLongPrev ?? 0}
+          curr={inlineLongCurr ?? 0}
           higherIsWorse
           loading={isLoading}
         />
@@ -377,9 +387,6 @@ export default function VideoPerfPage() {
       <ChartCard title="p95 (ms) by kind">
         <ChartLines data={p95Series} keys={HEAD_KINDS} />
       </ChartCard>
-      <ChartCard title="Stall rate (per second)">
-        <ChartLines data={stallSeries} keys={['stallsPerSec']} colorOverride={[t.danger]} />
-      </ChartCard>
       <ChartCard title="Outcome mix (PASS / SLOW / TO)">
         <ChartLines data={passMixSeries} keys={['PASS', 'SLOW', 'TO']} colorOverride={[t.ok, t.warn, t.danger]} />
       </ChartCard>
@@ -399,7 +406,7 @@ export default function VideoPerfPage() {
                   {[
                     ['kind', 'Kind'], ['page', 'Page'], ['count', 'Count'],
                     ['p50', 'p50'], ['p95', 'p95'], ['worst', 'Worst'],
-                    ['passPct', 'PASS%'], ['slow', 'SLOW'], ['timeout', 'TO'], ['sup', 'SUP'],
+                    ['passPct', 'PASS%'], ['slow', 'SLOW'], ['timeout', 'TO'], ['fail', 'FAIL'], ['sup', 'SUP'],
                   ].map(([k, label]) => (
                     <th key={k} onClick={() => toggleSort(k)} style={thStyle}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -422,6 +429,7 @@ export default function VideoPerfPage() {
                     <td style={tdStyle}>{r.passPct != null ? `${r.passPct}%` : '—'}</td>
                     <td style={tdStyle}>{r.slow}</td>
                     <td style={tdStyle}>{r.timeout}</td>
+                    <td style={tdStyle}>{r.fail}</td>
                     <td style={tdStyle}>{r.sup}</td>
                   </tr>
                 ))}

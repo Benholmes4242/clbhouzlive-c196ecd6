@@ -22,7 +22,7 @@ import { RailLanePool } from '@/video/railLanePool';
 import { PrefetchController } from '@/video/PrefetchController';
 
 import { isPerfEnabled } from '@/perf/navTiming';
-import { vperfStart, vperfMark, vperfArmLane, vperfNextId, vperfSetBudget, vperfMeta, vperfMotionTrace, vperfEnd } from '@/perf/vperf';
+import { vperfStart, vperfMark, vperfArmLane, vperfNextId, vperfMeta, vperfMotionTrace, vperfSetKind, vperfArmBorrowMount, vperfArmMovingFromSnapshot, vperfArmMoving } from '@/perf/vperf';
 import { coldOpenRoute } from '@/perf/coldOpen';
 import { trace, traceGenId, traceRegisterOpen, elIdOf } from '@/perf/trace';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
@@ -543,45 +543,46 @@ export function openWithOrigin({
   });
 
   // [VPERF] end of the synchronous open() call — mark storeOpen phase and
-  // arm the target lane's next 'firstFrame' event to close the span
-  // (perceived open = frame painted). 'playing' is recorded as a LATER
-  // waypoint for diagnostics; on iOS HLS it fires well after first paint
-  // and must not close/extend the span.
+  // arm the per-path end condition below (CB52). firstFrame and 'playing'
+  // are waypoints only.
   vperfMark(fsOpenSpanId, 'storeOpen');
   const source: 'borrow' | 'lane' = borrow ? 'borrow' : 'lane';
   const isImage = mediaKind === 'image';
   vperfMeta(fsOpenSpanId, { source, type: isImage ? 'image' : 'video' });
+  // CB52 Part 3 — split into fs.open.borrow / fs.open.lane / fs.open.image so
+  // buckets match DEFAULT_BUDGETS (vperfSetKind picks up each budget).
   if (isImage) {
     // Image path: 200ms to settled. Image branch has no lane events; settled
     // is marked by the overlay's clone onTransitionEnd (see FullscreenFeedOverlay).
-    vperfSetBudget(fsOpenSpanId, 200);
+    vperfSetKind(fsOpenSpanId, 'fs.open.image');
     // Stash spanId globally so the overlay can mark image phases without prop plumbing.
     try { (window as any).__vperfFsOpenSpanId = fsOpenSpanId; } catch {}
+  } else if (borrow) {
+    // Borrow opens reuse an already-playing element. Perceived open = the
+    // first paint AFTER BorrowedSlot actually mounts the element into the
+    // fullscreen host (vperfBorrowMounted, FeedSlide), not the first rAF
+    // after open(). 'playing' stays a later waypoint only.
+    vperfSetKind(fsOpenSpanId, 'fs.open.borrow');
+    vperfArmBorrowMount(fsOpenSpanId);
+    vperfArmLane(borrow.laneId, { spanId: fsOpenSpanId, endOn: 'playing', phase: 'playing' });
   } else {
-    vperfSetBudget(fsOpenSpanId, source === 'borrow' ? 150 : 500);
-    const targetLaneId: string = borrow ? borrow.laneId : 'fullscreen';
-    if (borrow) {
-      // Borrow opens reuse an already-decoded, already-playing lane — the
-      // engine's 'firstFrame' event only fires on a fresh decode, so arming
-      // endOn:'firstFrame' here would never resolve and every borrow span
-      // would hit the 15s watchdog (measurement artifact, not a real hang).
-      // Perceived open for a borrow is tap → element bound into the fs host,
-      // which happens on the next paint after storeOpen. Close the span at
-      // that paint via rAF; record 'playing' as a later waypoint only.
-      const raf =
-        typeof requestAnimationFrame === 'function'
-          ? requestAnimationFrame
-          : (cb: FrameRequestCallback) => setTimeout(() => cb(performance.now()), 16);
-      raf(() => {
-        vperfMark(fsOpenSpanId, 'borrowBind');
-        vperfEnd(fsOpenSpanId, { closedBy: 'borrowBind' });
-      });
-      vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'playing', phase: 'playing' });
+    // Lane (cold or already-decoded) opens end on the first MOVING frame on
+    // 'fullscreen'; firstFrame / playing are waypoints. A lane error or a
+    // save-data gated load ends the span at once as FAIL.
+    vperfSetKind(fsOpenSpanId, 'fs.open.lane');
+    vperfArmLane('fullscreen', { spanId: fsOpenSpanId, endOn: 'firstFrame', phase: 'firstFrame' });
+    vperfArmLane('fullscreen', { spanId: fsOpenSpanId, endOn: 'playing', phase: 'playing' });
+    let snap: ReturnType<typeof VideoEngine.snapshot> | null = null;
+    try { snap = VideoEngine.snapshot('fullscreen'); } catch { snap = null; }
+    if (mediaId || !postId) {
+      // Index resolved later from mediaId: owner unknown here, so baseline on
+      // the first observed playhead of whatever the lane shows next.
+      vperfArmMoving('fullscreen', fsOpenSpanId, { owner: null, from: null, failOnLane: true });
     } else {
-      // Cold opens do decode — firstFrame ENDS the span (perceived open).
-      // playing is a waypoint AFTER.
-      vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'firstFrame' });
-      vperfArmLane(targetLaneId, { spanId: fsOpenSpanId, endOn: 'playing', phase: 'playing' });
+      const { warm } = vperfArmMovingFromSnapshot(
+        'fullscreen', fsOpenSpanId, `${postId}:${mediaIndex ?? 0}`, snap, { failOnLane: true },
+      );
+      vperfMeta(fsOpenSpanId, { warm });
     }
   }
 

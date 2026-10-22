@@ -82,13 +82,16 @@ function detectDeviceClass(): string {
   return 'desktop';
 }
 
-function readBuildStamp(): string {
-  const w = typeof window !== 'undefined' ? (window as any) : {};
-  return String(
-    w.__BUILD_STAMP__ ??
-    (import.meta.env.VITE_APP_BUILD as string | undefined) ??
-    'unknown',
-  );
+/** CB52: the bare __BUILD_ID__ define — unique per build, the same id
+ *  analyticsEvents.ts ships. (The old window.__BUILD_STAMP__ property read was
+ *  never assigned, so every row said 'unknown'.) */
+export function readBuildStamp(): string {
+  return typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'unknown';
+}
+
+/** Readable build time, carried in every row's extra. */
+function readBuildTime(): string | null {
+  return typeof __BUILD_STAMP__ === 'string' ? __BUILD_STAMP__ : null;
 }
 
 function enrolSession(): void {
@@ -135,7 +138,7 @@ interface RollupRow {
   extra?: Record<string, unknown> | null;
 }
 
-function buildRows(snap: VperfSnapshot): RollupRow[] {
+export function buildRows(snap: VperfSnapshot): RollupRow[] {
   const rows: RollupRow[] = [];
   const base = {
     session_id: __sessionId!,
@@ -160,6 +163,8 @@ function buildRows(snap: VperfSnapshot): RollupRow[] {
       slow: b.slow,
       timeout: b.timeout,
       superseded: b.superseded,
+      // CB52: real failures (lane error / save-data) have no column; extra.
+      extra: { failed: b.failed },
     });
   }
 
@@ -207,6 +212,9 @@ function buildRows(snap: VperfSnapshot): RollupRow[] {
       extra: d.counts,
     });
   }
+  // CB52 Part 7: readable build time alongside the per-build id.
+  const buildTime = readBuildTime();
+  for (const r of rows) r.extra = { ...(r.extra ?? {}), build_stamp: buildTime };
   return rows;
 }
 

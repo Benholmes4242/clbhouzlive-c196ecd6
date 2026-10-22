@@ -8,7 +8,7 @@ import { haptic } from '@/utils/haptics';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfFeedActivateStart, vperfFeedActivateEnd, vperfEnd, vperfSupersede } from '@/perf/vperf';
+import { vperfStart, vperfArmLane, vperfNextId, vperfFeedScrollTick, vperfSupersede, vperfArmMovingFromSnapshot, vperfMeta } from '@/perf/vperf';
 import { PrefetchController } from '@/video/PrefetchController';
 
 import { trace } from '@/perf/trace';
@@ -234,18 +234,12 @@ export function SnapFeed({
   }, [surface, fsOpen, activeIndex, posts]);
 
 
-  // [VPERF] S4 swipe.vertical — a vertical settle on a video slide.
-  // Closes on the next 'firstFrame' event on the surface's active lane
-  // ('feed-active' in the Clubhouse feed; 'fullscreen' in the overlay —
-  // the singleton fullscreen lane is where the video actually plays, so
-  // arming feed-active there yielded 15001ms watchdog orphans). 'playing'
-  // is a phase waypoint only. Image slides skip the lane arm entirely
-  // (no lane events => the 900ms fallback below closes feed.activate;
-  // swipe.vertical is not started for image slides to avoid orphans).
+  // [VPERF] S4 swipe.vertical — a vertical settle on a video slide. The
+  // ONLY span for a fullscreen settle (CB52: feed.activate belongs to the
+  // inline feeds). Ends on the first MOVING frame on the surface's active
+  // lane ('fullscreen' in the overlay); firstFrame / playing are waypoints.
+  // Image slides have no lane events, so no span is started for them.
   const prevActiveRef = useRef<number>(activeIndex);
-  const activateT0Ref = useRef<number>(0);
-  const activateWarmRef = useRef<boolean>(false);
-  const activateDoneRef = useRef<boolean>(true);
   useEffect(() => {
     if (prevActiveRef.current === activeIndex) return;
     const fromIdx = prevActiveRef.current;
@@ -298,25 +292,12 @@ export function SnapFeed({
     if (mediaType === 'video') {
       swipeSpanId = vperfNextId(`swipe.vertical:${post.id}`);
       vperfStart(swipeSpanId, 'swipe.vertical', { postId: post.id, activeIndex, surface });
-      vperfArmLane(armLane, { spanId: swipeSpanId, endOn: 'firstFrame' });
+      vperfArmLane(armLane, { spanId: swipeSpanId, endOn: 'firstFrame', phase: 'firstFrame' });
       vperfArmLane(armLane, { spanId: swipeSpanId, endOn: 'playing', phase: 'playing' });
-    }
-
-    // [BASELINE] feed.activate — activation → media visible latency.
-    activateT0Ref.current = vperfFeedActivateStart();
-    activateDoneRef.current = false;
-    const armId = vperfNextId(`feed.activate:${post.id}`);
-    vperfStart(armId, mediaType === 'image' ? 'feed.activate.image' : 'feed.activate.video.cold', { idx: activeIndex, surface });
-    if (mediaType === 'video') {
-      vperfArmLane(armLane, { spanId: armId, endOn: 'firstFrame' });
-      vperfArmLane(armLane, { spanId: armId, endOn: 'playing', phase: 'playing' });
-    } else {
-      // Image slides have no lane events — close the armId span on the
-      // next frame via imageFallback so it never orphans to the 15s
-      // watchdog on either surface (inline OR fullscreen overlay).
-      requestAnimationFrame(() => {
-        vperfEnd(armId, { closedBy: 'imageFallback' });
-      });
+      let snap: ReturnType<typeof VideoEngine.snapshot> | null = null;
+      try { snap = VideoEngine.snapshot(armLane); } catch { snap = null; }
+      const { warm } = vperfArmMovingFromSnapshot(armLane, swipeSpanId, `${post.id}:0`, snap);
+      vperfMeta(swipeSpanId, { warm });
     }
 
     // [FSVERT] slide.change — vertical activeIndex transition. Fullscreen
@@ -387,29 +368,10 @@ export function SnapFeed({
       }
     }
 
-    const finalize = () => {
-      if (activateDoneRef.current) return;
-      activateDoneRef.current = true;
-      const wasPrefetched = PrefetchController.wasPrefetched(`${post.id}:0`);
-      vperfFeedActivateEnd({
-        t0: activateT0Ref.current,
-        idx: activeIndex,
-        mediaType,
-        warm: activateWarmRef.current,
-        prefetched: wasPrefetched,
-      });
-    };
-    // Fallback finalize after 900ms if lane events never arrive (orphan guard).
-    const to = window.setTimeout(finalize, 900);
-    if (mediaType === 'image') requestAnimationFrame(() => { finalize(); });
     return () => {
-      clearTimeout(to);
-      finalize();
-      // Supersede any still-open spans for the OUTGOING slide — user
-      // swiped past before firstFrame arrived. vperfSupersede is a
-      // no-op if the span already closed via lane events or fallback.
+      // Supersede the still-open span for the OUTGOING slide — user swiped
+      // past before its first moving frame. No-op if it already closed.
       if (swipeSpanId) vperfSupersede(swipeSpanId, { supersededBy: 'deactivate' });
-      vperfSupersede(armId, { supersededBy: 'deactivate' });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex, isFullscreen]);
@@ -428,7 +390,7 @@ export function SnapFeed({
     let lastTs = performance.now();
     let lastDir: 1 | -1 | 0 = 0;
     const onScroll = () => {
-      vperfFeedScrollTick('snapfeed');
+      vperfFeedScrollTick('snapfeed', 'fullscreen');
       const now = performance.now();
       const top = el.scrollTop;
       const dt = now - lastTs;

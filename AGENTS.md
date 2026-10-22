@@ -64,3 +64,4 @@ When a brief's stated rule and its signed-off mock disagree, do not pick one. Bo
 ### Counts
 
 Report the suite total before and after, and name the source of any delta. A count that moves under an "unchanged" report hides a real change.
+- Video perf spans end only via vperf's moving-frame helper (`vperfArmMoving*`), never on play/playing/firstFrame, so cold, decoded and swapped-in lanes are timed by one definition.

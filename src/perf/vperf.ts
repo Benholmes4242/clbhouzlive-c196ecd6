@@ -43,7 +43,7 @@ import { writeBandwidthSample, getNetClass } from '@/video/bandwidthMemory';
 
 const SPAN_TTL_MS = 15_000;
 
-type Verdict = 'PASS' | 'SLOW' | 'TIMEOUT' | 'SUPERSEDED';
+type Verdict = 'PASS' | 'SLOW' | 'TIMEOUT' | 'SUPERSEDED' | 'FAIL';
 
 interface SpanRec {
   spanId: string;
@@ -74,11 +74,9 @@ interface SessionRec {
   laneId: string;
   t0: number;
   meta: Record<string, unknown>;
-  stallCount: number;
-  stallTotalMs: number;
-  longestStallMs: number;
-  waitingT0: number | null; // when a stall began (after startup)
-  hadFirstPlaying: boolean;
+  // CB52: the old stallCount/stallTotalMs counter is retired — it could never
+  // count a stall (see CB51 §6). CB50's `video_stall` analytics event is the
+  // stall source from now on.
   startFrames: number | null;
   startDropped: number | null;
   startLevel: number | null;
@@ -120,6 +118,8 @@ const DEFAULT_BUDGETS: Record<string, number> = {
 
 // -------- page tag (auto-injected into every emit) --------
 let __currentPage: string = 'unknown';
+/** performance.now() of the last visibilitychange → hidden (CB52 Part 5). */
+let __lastHiddenAt = -Infinity;
 export function vperfSetPage(page: string): void {
   __currentPage = page || 'unknown';
   // Trigger per-page nav summary when the page changes.
@@ -161,7 +161,7 @@ function finish(rec: SpanRec, verdict: Verdict, extra: Record<string, unknown>):
   clearTimeout(rec.timer);
   const totalMs = Math.round(performance.now() - rec.t0);
   const finalVerdict: Verdict =
-    verdict === 'TIMEOUT' ? 'TIMEOUT' : totalMs <= rec.budgetMs ? 'PASS' : 'SLOW';
+    verdict === 'TIMEOUT' || verdict === 'FAIL' ? verdict : totalMs <= rec.budgetMs ? 'PASS' : 'SLOW';
   emit(rec.kind, {
     totalMs,
     phases: rec.phases,
@@ -250,6 +250,8 @@ export function vperfSupersede(
 }
 
 function clearLaneArmsBySpan(spanId: string): void {
+  clearMovingArmsBySpan(spanId);
+  if (__pendingBorrowSpan === spanId) __pendingBorrowSpan = null;
   for (const [laneId, list] of laneArms) {
     const filtered = list.filter((a) => a.spanId !== spanId);
     if (filtered.length === 0) laneArms.delete(laneId);
@@ -305,10 +307,6 @@ export function vperfLaneEvent(
   data?: Record<string, unknown>,
 ): void {
   if (!on()) return;
-  // Feed session tracker first (its counters must run before span teardown).
-  if (event === 'waiting' || event === 'playing') {
-    sessionOnStateEdge(laneId, event);
-  }
   const list = laneArms.get(laneId);
   if (!list || list.length === 0) return;
   const remaining: LaneArm[] = [];
@@ -325,6 +323,188 @@ export function vperfLaneEvent(
   }
   if (remaining.length === 0) laneArms.delete(laneId);
   else laneArms.set(laneId, remaining);
+}
+
+// ------------------------ CB52: first MOVING frame ------------------------
+//
+// ONE definition of "the member sees moving video": the first presented frame
+// (requestVideoFrameCallback where available, else timeupdate) on a lane
+// whose playhead has advanced past its value when the span was armed. After a
+// seek to 0 (loop) it is the first time currentTime > 0.05. Spans NEVER end on
+// 'play' / 'playing' / firstFrame — those fire too early, or not at all when
+// the video was already decoded. They stay as waypoints where they existed.
+//
+// Works for cold loads (baseline = first observed playhead for the owner),
+// already-decoded lanes (baseline = playhead at arm time) and lanes swapped in
+// from another slot (same as already-decoded: the resolver re-reads the
+// element behind the lane id every frame).
+
+export interface MovingArmOpts {
+  /** Expected owner key on the lane; progress for any other owner is ignored. */
+  owner?: string | null;
+  /** Playhead the video must advance past. null = first observed playhead. */
+  from?: number | null;
+  /** Seek-to-0 mode: progress only counts while currentTime < ceiling. */
+  ceiling?: number | null;
+  /** End the span as FAIL when the lane reports it cannot show video. */
+  failOnLane?: boolean;
+}
+
+interface MovingArm {
+  spanId: string;
+  owner: string | null;
+  from: number | null;
+  ceiling: number | null;
+  failOnLane: boolean;
+}
+
+const movingArms = new Map<string, MovingArm[]>();
+/** Backward jump (resume seek earlier than the baseline) re-baselines. */
+const MOVING_REBASE_S = 0.25;
+/** Seek-to-0 threshold. */
+export const MOVING_AFTER_SEEK_S = 0.05;
+
+export function normOwnerKey(k: string | null | undefined): string | null {
+  if (k == null) return null;
+  return k.includes(':') ? k : `${k}:0`;
+}
+
+type LaneResolver = (laneId: string) => { el: HTMLVideoElement | null; owner: string | null } | null;
+let __laneResolver: LaneResolver | null = null;
+/** VideoEngine registers how to read the element/owner behind a lane id. */
+export function vperfSetLaneResolver(fn: LaneResolver | null): void { __laneResolver = fn; }
+
+const rvfcLoops = new Map<string, { el: HTMLVideoElement; handle: number }>();
+
+function stopRvfc(laneId: string): void {
+  const loop = rvfcLoops.get(laneId);
+  if (!loop) return;
+  rvfcLoops.delete(laneId);
+  try { (loop.el as any).cancelVideoFrameCallback?.(loop.handle); } catch { /* noop */ }
+}
+
+function scheduleRvfc(laneId: string): void {
+  if (rvfcLoops.has(laneId) || !movingArms.has(laneId) || !__laneResolver) return;
+  let res: ReturnType<LaneResolver> = null;
+  try { res = __laneResolver(laneId); } catch { res = null; }
+  const el = res?.el as any;
+  if (!el || typeof el.requestVideoFrameCallback !== 'function') return;
+  const handle = el.requestVideoFrameCallback((_now: number, md: { mediaTime?: number }) => {
+    rvfcLoops.delete(laneId);
+    let owner: string | null = null;
+    try { owner = __laneResolver?.(laneId)?.owner ?? null; } catch { /* noop */ }
+    const t = typeof md?.mediaTime === 'number' ? md.mediaTime : (el.currentTime || 0);
+    checkMoving(laneId, t, owner, 'rvfc');
+    scheduleRvfc(laneId);
+  });
+  rvfcLoops.set(laneId, { el, handle });
+}
+
+export function vperfArmMoving(laneId: string, spanId: string, opts: MovingArmOpts = {}): void {
+  if (!on()) return;
+  const list = movingArms.get(laneId) ?? [];
+  list.push({
+    spanId,
+    owner: normOwnerKey(opts.owner ?? null),
+    from: opts.from ?? null,
+    ceiling: opts.ceiling ?? null,
+    failOnLane: !!opts.failOnLane,
+  });
+  movingArms.set(laneId, list);
+  scheduleRvfc(laneId);
+}
+
+/** Arm from a lane snapshot. warm = lane already shows the owner's frame. */
+export function vperfArmMovingFromSnapshot(
+  laneId: string,
+  spanId: string,
+  ownerKey: string,
+  snap: { postId: string | null; currentTime: number; firstFrame: boolean } | null,
+  extra: Omit<MovingArmOpts, 'owner' | 'from'> = {},
+): { warm: boolean } {
+  const owns = !!snap && normOwnerKey(snap.postId) === normOwnerKey(ownerKey);
+  const warm = owns && !!snap!.firstFrame;
+  vperfArmMoving(laneId, spanId, {
+    ...extra,
+    owner: ownerKey,
+    from: owns ? (snap!.currentTime || 0) : null,
+  });
+  return { warm };
+}
+
+function checkMoving(laneId: string, t: number, owner: string | null, via: 'rvfc' | 'timeupdate'): void {
+  const list = movingArms.get(laneId);
+  if (!list || list.length === 0 || !isFinite(t)) return;
+  const o = normOwnerKey(owner);
+  for (const arm of [...list]) {
+    if (arm.owner != null && o !== arm.owner) continue;
+    if (arm.ceiling != null) {
+      const floor = arm.from ?? MOVING_AFTER_SEEK_S;
+      if (t > floor && t < arm.ceiling) vperfEnd(arm.spanId, { closedBy: 'movingFrame', via });
+      continue;
+    }
+    if (arm.from == null) { arm.from = t; continue; }
+    if (t < arm.from - MOVING_REBASE_S) { arm.from = t; continue; }
+    if (t > arm.from) vperfEnd(arm.spanId, { closedBy: 'movingFrame', via });
+  }
+}
+
+/** VideoEngine calls this from its existing timeupdate listener. */
+export function vperfLaneProgress(laneId: string, currentTime: number, owner: string | null): void {
+  if (!on()) return;
+  checkMoving(laneId, currentTime, owner, 'timeupdate');
+}
+
+function clearMovingArmsBySpan(spanId: string): void {
+  for (const [laneId, list] of movingArms) {
+    const filtered = list.filter((a) => a.spanId !== spanId);
+    if (filtered.length === 0) { movingArms.delete(laneId); stopRvfc(laneId); }
+    else if (filtered.length !== list.length) movingArms.set(laneId, filtered);
+  }
+}
+
+/** A lane cannot show video (error / save-data). Ends failOnLane spans as FAIL. */
+export function vperfLaneFailure(laneId: string, closedBy: 'error' | 'saveData'): void {
+  if (!on()) return;
+  const list = movingArms.get(laneId);
+  if (!list) return;
+  for (const arm of [...list]) {
+    if (!arm.failOnLane) continue;
+    const rec = spans.get(arm.spanId);
+    if (!rec) continue;
+    spans.delete(arm.spanId);
+    clearLaneArmsBySpan(arm.spanId);
+    finish(rec, 'FAIL', { closedBy });
+  }
+}
+
+/** Re-kind an in-flight span (fs.open → fs.open.borrow|lane|image). Picks
+ *  up the new kind's DEFAULT_BUDGETS entry. */
+export function vperfSetKind(spanId: string, kind: string): void {
+  if (!on()) return;
+  const rec = spans.get(spanId);
+  if (!rec) return;
+  rec.kind = kind;
+  const b = DEFAULT_BUDGETS[kind];
+  if (typeof b === 'number') rec.budgetMs = b;
+}
+
+// Borrow opens end at the first paint AFTER the borrowed element is mounted
+// into the fullscreen host (BorrowedSlot's layout effect → two rAFs).
+let __pendingBorrowSpan: string | null = null;
+export function vperfArmBorrowMount(spanId: string): void {
+  if (!on()) return;
+  __pendingBorrowSpan = spanId;
+}
+export function vperfBorrowMounted(): void {
+  const id = __pendingBorrowSpan;
+  if (!id) return;
+  __pendingBorrowSpan = null;
+  const raf = typeof requestAnimationFrame === 'function'
+    ? requestAnimationFrame
+    : (cb: FrameRequestCallback) => setTimeout(() => cb(performance.now()), 16) as unknown as number;
+  vperfMark(id, 'borrowMounted');
+  raf(() => raf(() => vperfEnd(id, { closedBy: 'borrowMounted' })));
 }
 
 // ------------------------ Session health ------------------------
@@ -369,11 +549,6 @@ export function vperfSessionStart(
       const { el, startLevel, bwEstimate, seededBw, ...rest } = meta;
       return rest;
     })(),
-    stallCount: 0,
-    stallTotalMs: 0,
-    longestStallMs: 0,
-    waitingT0: null,
-    hadFirstPlaying: false,
     startFrames: q.totalFrames,
     startDropped: q.droppedFrames,
     startLevel: meta.startLevel ?? null,
@@ -394,42 +569,9 @@ export function vperfSessionStart(
   sessions.set(laneId, rec);
 }
 
-function sessionOnStateEdge(laneId: string, edge: 'waiting' | 'playing'): void {
-  const rec = sessions.get(laneId);
-  if (!rec) return;
-  const now = performance.now();
-  if (edge === 'waiting') {
-    // Exclude the initial startup — stalls only count AFTER the first
-    // sustained playing state. Also excludes seeks (which are separate S6
-    // spans; the seek handler calls vperfSessionSuppressNextStall).
-    if (!rec.hadFirstPlaying) return;
-    if ((rec as any)._suppressNextStall) {
-      (rec as any)._suppressNextStall = false;
-      return;
-    }
-    if (rec.waitingT0 == null) rec.waitingT0 = now;
-  } else if (edge === 'playing') {
-    if (!rec.hadFirstPlaying) {
-      rec.hadFirstPlaying = true;
-      return;
-    }
-    if (rec.waitingT0 != null) {
-      const dur = now - rec.waitingT0;
-      rec.waitingT0 = null;
-      rec.stallCount += 1;
-      rec.stallTotalMs += dur;
-      if (dur > rec.longestStallMs) rec.longestStallMs = dur;
-    }
-  }
-}
-
-/** Called by VideoEngine.seek so the resulting waiting→playing pair isn't
- *  counted as a rebuffer stall (that's the S6 seek span's territory). */
-export function vperfSessionSuppressNextStall(laneId: string): void {
-  const rec = sessions.get(laneId);
-  if (!rec) return;
-  (rec as any)._suppressNextStall = true;
-}
+/** CB52: retained as a no-op so existing callers compile; stall counting is
+ *  retired in favour of CB50's `video_stall` analytics. */
+export function vperfSessionSuppressNextStall(_laneId: string): void { /* retired */ }
 
 export function vperfSessionLevel(
   laneId: string,
@@ -455,13 +597,6 @@ export function vperfSessionEnd(laneId: string, reason: string): void {
   sessions.delete(laneId);
   clearTimeout(rec.timer);
   const now = performance.now();
-  // If we ended mid-stall, count the tail.
-  if (rec.waitingT0 != null) {
-    const dur = now - rec.waitingT0;
-    rec.stallCount += 1;
-    rec.stallTotalMs += dur;
-    if (dur > rec.longestStallMs) rec.longestStallMs = dur;
-  }
   const durationMs = Math.round(now - rec.t0);
   const el: HTMLVideoElement | null = (rec as any)._el ?? null;
   const q = readQualityDelta(el);
@@ -471,15 +606,9 @@ export function vperfSessionEnd(laneId: string, reason: string): void {
     q.droppedFrames != null && rec.startDropped != null
       ? q.droppedFrames - rec.startDropped
       : null;
-  const stallRatio = durationMs > 0 ? rec.stallTotalMs / durationMs : 0;
-  const longStall = rec.longestStallMs > 1000;
-  const verdict: Verdict = stallRatio <= 0.005 && !longStall ? 'PASS' : 'SLOW';
   emit('session', {
     laneId,
     durationMs,
-    stallCount: rec.stallCount,
-    stallTotalMs: Math.round(rec.stallTotalMs),
-    longestStallMs: Math.round(rec.longestStallMs),
     droppedFrames,
     totalFrames,
     levelSwitches: rec.levelSwitches,
@@ -489,8 +618,6 @@ export function vperfSessionEnd(laneId: string, reason: string): void {
     bwEstimateEnd: rec.bwEstimateEnd,
     seededBw: rec.seededBw,
     netClass: getNetClass(),
-    verdict,
-    longStall,
     reason,
     ...rec.meta,
   });
@@ -816,6 +943,8 @@ interface KindStat {
   slow: number;
   timeout: number;
   superseded: number;
+  /** CB52: spans closed as a real failure (lane error / save-data). */
+  failed?: number;
   totals: number[];  // fixed-size ring; length ≤ TOTALS_CAP, order not meaningful
   totalsIdx: number; // next write index once full
 }
@@ -834,10 +963,9 @@ function ringPush(arr: number[], idx: number, cap: number, v: number): number {
 
 const scorecardBuckets = new Map<string, KindStat>();      // key = `${kind}|${page}`
 const sessionHealth = {
+  // CB52: stall totals retired — CB50's `video_stall` is the stall source.
   sessionCount: 0,
-  totalStalls: 0,
   totalDurationMs: 0,
-  totalStallMs: 0,
   levelSwitches: 0,
   totalFrames: 0,
   droppedFrames: 0,
@@ -866,9 +994,7 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
 
   if (kind === 'session') {
     sessionHealth.sessionCount += 1;
-    sessionHealth.totalStalls += Number((payload as any).stallCount) || 0;
     sessionHealth.totalDurationMs += Number((payload as any).durationMs) || 0;
-    sessionHealth.totalStallMs += Number((payload as any).stallTotalMs) || 0;
     sessionHealth.levelSwitches += Number((payload as any).levelSwitches) || 0;
     sessionHealth.totalFrames += Number((payload as any).totalFrames) || 0;
     sessionHealth.droppedFrames += Number((payload as any).droppedFrames) || 0;
@@ -909,6 +1035,12 @@ function scorecardIngest(kind: string, payload: Record<string, unknown>): void {
   // SUPERSEDED spans (flick-past, abandoned open) are counted separately
   // and never contribute to pass/slow/timeout tallies or p50/p95 totals —
   // otherwise abandoned events would inflate SLOW verdicts.
+  if (verdict === 'FAIL') {
+    stat.count += 1;
+    stat.failed = (stat.failed ?? 0) + 1;
+    scorecardBuckets.set(key, stat);
+    return;
+  }
   if (verdict === 'SUPERSEDED') {
     stat.count += 1;
     stat.superseded = (stat.superseded ?? 0) + 1;
@@ -973,10 +1105,9 @@ export function vperfScorecard(trigger: 'auto' | 'nav' | 'manual' = 'manual'): v
   }
 
   const sh = sessionHealth;
-  const stallRate = sh.totalDurationMs > 0 ? (sh.totalStallMs / sh.totalDurationMs) : 0;
   const dropRate = sh.totalFrames > 0 ? (sh.droppedFrames / sh.totalFrames) : 0;
   const avgLevelSw = sh.sessionCount > 0 ? (sh.levelSwitches / sh.sessionCount) : 0;
-  lines.push(`  session-health: sessions=${sh.sessionCount} stalls=${sh.totalStalls} stallRate=${(stallRate*100).toFixed(2)}% dropRate=${(dropRate*100).toFixed(2)}% avgLevelSw=${avgLevelSw.toFixed(2)}`);
+  lines.push(`  session-health: sessions=${sh.sessionCount} dropRate=${(dropRate*100).toFixed(2)}% avgLevelSw=${avgLevelSw.toFixed(2)}`);
   for (const [page, r] of feedRollup) {
     const longPct = r.frames > 0 ? (r.longFrames / r.frames) * 100 : 0;
     lines.push(`  feed@${page}: scrolls=${r.scrolls} longFrames=${longPct.toFixed(1)}% worstFrame=${Math.round(r.worstMs)}ms activateWarm=${r.activateWarm} activateCold=${r.activateCold}`);
@@ -1036,13 +1167,18 @@ interface FeedScrollRec {
 const feedScroll = new Map<string, FeedScrollRec>();
 
 /** Called on scroll events. Coalesces sampling into one span per scroll burst. */
-export function vperfFeedScrollTick(key: string = 'default'): void {
+/** CB52: `surface` keys the rollup — `${page}:inline` for CardFeed /
+ *  LightCardFeed, `${page}:fullscreen` for SnapFeed — so they never mix.
+ *  Cost: rAF frame-time sampling only while a scroll burst is in progress
+ *  (one performance.now + a compare per frame); no layout reads, no React. */
+export function vperfFeedScrollTick(key: string = 'default', surface: 'inline' | 'fullscreen' = 'fullscreen'): void {
   if (!on()) return;
   const now = performance.now();
-  let rec = feedScroll.get(key);
+  const mapKey = `${key}|${surface}`;
+  let rec = feedScroll.get(mapKey);
   if (!rec) {
     rec = {
-      page: __currentPage,
+      page: `${__currentPage}:${surface}`,
       t0: now,
       frames: 0,
       longFrames: 0,
@@ -1061,13 +1197,13 @@ export function vperfFeedScrollTick(key: string = 'default'): void {
       rec!.rafId = requestAnimationFrame(sample);
     };
     rec.rafId = requestAnimationFrame(sample);
-    feedScroll.set(key, rec);
+    feedScroll.set(mapKey, rec);
   }
   clearTimeout(rec.idleTimer);
   rec.idleTimer = setTimeout(() => {
-    const r = feedScroll.get(key);
+    const r = feedScroll.get(mapKey);
     if (!r) return;
-    feedScroll.delete(key);
+    feedScroll.delete(mapKey);
     cancelAnimationFrame(r.rafId);
     const durationMs = Math.round(performance.now() - r.t0);
     emit('feed.scroll', {
@@ -1110,9 +1246,12 @@ export function vperfFeedActivateEnd(opts: {
   earlyStarted?: boolean;
 }): void {
   if (!on()) return;
+  // CB52 Part 5: a start that predates the last backgrounding is cleared.
+  if (opts.t0 <= __lastHiddenAt) return;
   const totalMs = Math.round(performance.now() - opts.t0);
   const budget = opts.mediaType === 'image' ? 250 : (opts.warm ? 120 : 600);
   emit('feed.activate', {
+    page: `${__currentPage}:inline`,
     idx: opts.idx,
     mediaType: opts.mediaType,
     warm: !!opts.warm,
@@ -1122,6 +1261,54 @@ export function vperfFeedActivateEnd(opts: {
     totalMs,
     budgetMs: budget,
     verdict: totalMs <= budget ? 'PASS' : 'SLOW',
+  });
+}
+
+/** CB52 Part 2 — inline-feed video activation (CardFeed / LightCardFeed).
+ *  One span per promotion; ends on the first moving frame on the active lane.
+ *  warm = the lane already shows this owner's decoded frame. Returns the span
+ *  id so the caller supersedes it on the next promotion. */
+export function vperfFeedActivateVideo(opts: {
+  laneId: string;
+  ownerKey: string;
+  idx: number;
+  snap: { postId: string | null; currentTime: number; firstFrame: boolean } | null;
+  earlyStarted?: boolean;
+  prefetched?: boolean;
+}): { spanId: string; warm: boolean } {
+  const spanId = vperfNextId(`feed.activate:${opts.ownerKey}`);
+  const owns = !!opts.snap && normOwnerKey(opts.snap.postId) === normOwnerKey(opts.ownerKey);
+  const warm = owns && !!opts.snap!.firstFrame;
+  vperfStart(spanId, 'feed.activate', {
+    page: `${__currentPage}:inline`,
+    idx: opts.idx,
+    mediaType: 'video',
+    warm,
+    prefetched: !!opts.prefetched,
+    earlyStarted: !!opts.earlyStarted,
+    dualActiveMs: __dualActiveMsTotal,
+    budgetMs: warm ? DEFAULT_BUDGETS['feed.activate.video.warm'] : DEFAULT_BUDGETS['feed.activate.video.cold'],
+  });
+  vperfArmMovingFromSnapshot(opts.laneId, spanId, opts.ownerKey, opts.snap);
+  return { spanId, warm };
+}
+
+// ---------------- CB52 Part 5: nothing runs while hidden ----------------
+/** Supersede every open span and clear pending activation / scroll samples. */
+export function vperfOnHidden(): void {
+  __lastHiddenAt = performance.now();
+  for (const id of [...spans.keys()]) vperfSupersede(id, { supersededBy: 'hidden' });
+  __pendingBorrowSpan = null;
+  lastActivateAt.clear();
+  for (const [k, r] of feedScroll) {
+    cancelAnimationFrame(r.rafId);
+    clearTimeout(r.idleTimer);
+    feedScroll.delete(k);
+  }
+}
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') vperfOnHidden();
   });
 }
 
@@ -1480,6 +1667,7 @@ export interface VperfBucketSnapshot {
   slow: number;
   timeout: number;
   superseded: number;
+  failed: number;
   totals: number[]; // copy — safe to serialise
 }
 
@@ -1507,6 +1695,7 @@ export function __vperfSnapshotTelemetry(): VperfSnapshot {
       slow: s.slow,
       timeout: s.timeout,
       superseded: s.superseded ?? 0,
+      failed: s.failed ?? 0,
       totals: s.totals.slice(),
     });
   }
@@ -1540,9 +1729,7 @@ export function __vperfSnapshotTelemetry(): VperfSnapshot {
 export function __vperfResetTelemetry(): void {
   scorecardBuckets.clear();
   sessionHealth.sessionCount = 0;
-  sessionHealth.totalStalls = 0;
   sessionHealth.totalDurationMs = 0;
-  sessionHealth.totalStallMs = 0;
   sessionHealth.levelSwitches = 0;
   sessionHealth.totalFrames = 0;
   sessionHealth.droppedFrames = 0;
