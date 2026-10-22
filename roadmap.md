@@ -1,5 +1,12 @@
 # Roadmap
 
+## CB50 — Buffering spinner Design A (STOP, not complete)
+- [x] Fresh baseline `bunx vitest run`: 2,142 passed / 291 files / zero failures; CB49 added ten tests in two files since the recorded CB48.2 baseline of 2,132/289.
+- [x] Added engine progress observation, buffering snapshot field (VideoEngine.snapshot and useVideoLane.NULL_SNAP), shared Design A spinner, active inline/fullscreen render sites and visible-stall session budget. Frozen playback/audio/gestures/watchdogs and legacy/preview files untouched.
+- [ ] STOP: full `bunx vitest run` is 2,158 passed / four new failures = 2,162 total / 293 files. Delta +20: 12 cb50Buffering.test.ts cases and eight cb50BufferingEngine.test.tsx cases. No existing test edited, renamed or deleted. Failures at cb50Buffering.test.ts:24:77, :28:51, :32:59 (expected true to be false) and :47:19 (expected spy once, calls 0). No correction after failure.
+- [ ] STOP: latest harness typecheck src/test/cb50BufferingEngine.test.tsx(67,53): TS2739 missing BorrowDescriptor ownerKey, posterUrl, viewportW, viewportH. Build OK preceded this test addition; final build/typecheck not green.
+- [ ] Reduced-motion browser check, real fullscreen visual verification and iOS playback remain unverified. Report: /mnt/documents/CB50_buffering_stop_report.md. No SQL/migrations/RPC/feed_config/native changes; round_pool_cap remains 30.
+
 ## CB48.2 — Restore canonical lane roles in the test fixture
 - [x] Added test-only `feedLaneRoles.__resetForTests()` (canonical map, frozen set cleared, one emit); only caller is the test file — confirmed by repo-wide search, no production call site.
 - [x] videoAudioRoleRecovery.test.tsx beforeEach now calls `__resetForTests()` instead of `promoteToActive('feed-active')`; no test body or assertion changed.
