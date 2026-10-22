@@ -299,7 +299,9 @@ export function SnapFeed({
       vperfArmLane(armLane, { spanId: swipeSpanId, endOn: 'playing', phase: 'playing' });
       let snap: ReturnType<typeof VideoEngine.snapshot> | null = null;
       try { snap = VideoEngine.snapshot(armLane); } catch { snap = null; }
-      const { warm } = vperfArmMovingFromSnapshot(armLane, swipeSpanId, `${post.id}:0`, snap);
+      // CB53.1 — startHeight: the rendition height playing at the first
+      // moving frame, so warmed and cold swipes compare on quality too.
+      const { warm } = vperfArmMovingFromSnapshot(armLane, swipeSpanId, `${post.id}:0`, snap, { tagStartHeight: true });
       vperfMeta(swipeSpanId, { warm });
     }
 

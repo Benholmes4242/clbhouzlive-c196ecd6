@@ -184,3 +184,19 @@ export function upshiftForSurface(
   return level;
 }
 
+/**
+ * CB53.1 — the surface measure for the opening rung. Fullscreen-like lanes
+ * (the fullscreen lane itself, and a feed lane lent to the vertical warm —
+ * parked in a viewport-sized staging host, playing full-screen after the
+ * swap) open at viewport height with the 720 floor; feed lanes open at the
+ * card's rendered height with the 540 floor.
+ */
+export function startLevelMeasure(
+  fullscreenLike: boolean,
+  el: Element | null | undefined,
+): { renderedPixelHeight: number; minHeight: number } {
+  return fullscreenLike
+    ? { renderedPixelHeight: viewportPixelHeight(), minHeight: 720 }
+    : { renderedPixelHeight: elementPixelHeight(el), minHeight: 540 };
+}
+
