@@ -59,7 +59,7 @@ describe('CB48 engine sound roles and recovery', () => {
     VideoEngine.unblockFromGesture();
     useFullscreenFeedStore.setState({ isOpen: false, borrow: null });
     audioDuck.reset();
-    feedLaneRoles.promoteToActive('feed-active');
+    feedLaneRoles.__resetForTests();
     VideoEngine.setAudioFocus(null, 'feed');
     setAudioDebugEnabled(false);
     vi.mocked(analyticsEvents.track).mockClear();
