@@ -89,7 +89,7 @@ describe('CB66 role matrix', () => {
       const trigger = q('[data-header-menu]') as HTMLElement | null;
       expect(!!trigger).toBe(menu.length > 0);
       if (trigger) {
-        fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false });
+        fireEvent.keyDown(trigger, { key: 'Enter' });
         const items = (await screen.findAllByRole('menuitem')).map((el) => el.getAttribute('data-menu-item'));
         expect(items).toEqual(menu);
       }
