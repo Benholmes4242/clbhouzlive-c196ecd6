@@ -186,7 +186,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
               const value = scores[key];
               return (
                 <div key={key} data-category={key} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', minWidth: 0 }}>
-                  <span data-category-label style={{ fontSize: 11, color: A.MUTE, whiteSpace: 'nowrap' }}>{SCORE_LABELS[key]}</span>
+                  <span data-category-label style={{ fontSize: 12, lineHeight: 1.2, color: A.DIM, whiteSpace: 'nowrap' }}>{SCORE_LABELS[key]}</span>
                   <span data-category-figure data-category-score={value == null ? undefined : value.toFixed(1)} className="tabular-nums" style={{ ...FIGS, fontSize: 13, fontWeight: 700, color: value == null ? A.DIM : courseSubScoreTone(value) }}>
                     {value == null ? '\u2014' : value.toFixed(1)}
                   </span>

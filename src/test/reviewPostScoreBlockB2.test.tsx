@@ -45,7 +45,8 @@ describe('review post score block B2', () => {
     expect(element('[data-review-score-col]').style.paddingRight).toBe('14px');
     expect(element('[data-review-categories]').style.columnGap).toBe('16px');
     expect(element('[data-review-categories]').style.rowGap).toBe('8px');
-    expect(element('[data-category-label]').style.fontSize).toBe('11px');
+    expect(element('[data-category-label]').style.fontSize).toBe('12px');
+    expect(element('[data-category-label]').style.color).toBe(rgb(A.DIM));
     expect(element('[data-category-figure]').style.fontSize).toBe('13px');
   });
   it('keeps a two-column grid with green 9.5 and muted 8.9 figures', () => {
