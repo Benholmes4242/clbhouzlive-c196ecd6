@@ -7,6 +7,7 @@ import { r } from '@/lib/radius';
 import { ReactionGlyph } from '@/lib/reactionKind';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
+import { CourseNameLink } from '@/components/shared/CourseNameLink';
 import { ExploreShelf } from './ExploreShelf';
 import type { StreamItem } from './streamItem';
 
@@ -49,10 +50,18 @@ export function HelpfulReviewsShelf({
         const own = !!item.who?.is_viewer;
         const name = own ? t('amateur.courseCard.you', 'You') : item.who?.display_name ?? t('amateur.courseCard.aMember', 'A member');
         return (
-          <button
+          // CB69 — non-button tile so the course name can be a real button.
+          <div
             key={item.id}
-            type="button"
+            role="button"
+            tabIndex={0}
             onClick={() => {
+              analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'reviews_helpful', pos });
+              onPress(item);
+            }}
+            onKeyDown={(e) => {
+              if (e.target !== e.currentTarget || (e.key !== 'Enter' && e.key !== ' ')) return;
+              e.preventDefault();
               analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'reviews_helpful', pos });
               onPress(item);
             }}
@@ -87,7 +96,16 @@ export function HelpfulReviewsShelf({
                   {name}
                 </div>
                 <div style={{ fontSize: 11, fontWeight: 500, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {item.subject?.course_name ?? ''}
+                  {item.subject?.course_name ? (
+                    <CourseNameLink
+                      courseId={item.subject?.course_id ?? null}
+                      textProps={{ 'data-helpful-review-course': '' }}
+                      wrapperStyle={{ display: 'inline', verticalAlign: 'baseline' }}
+                      style={{ display: 'inline' }}
+                    >
+                      {item.subject.course_name}
+                    </CourseNameLink>
+                  ) : ''}
                   {item.facts.rating != null ? (
                     <>
                       {' \u00B7 '}
@@ -105,7 +123,7 @@ export function HelpfulReviewsShelf({
                 </span>
               ) : null}
             </div>
-          </button>
+          </div>
         );
       })}
     </ExploreShelf>

@@ -1,3 +1,4 @@
+import { CourseNameLink } from '@/components/shared/CourseNameLink';
 import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 /**
  * ReviewBottomSheet — DARK floating glass review card.
@@ -359,6 +360,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     navigate(url);
   }, [courseId, reviewId, navigate, onClose, closeFullscreen]);
 
+  /* CB69 — the title's course name: close the sheet, then fullscreen, then
+     CourseNameLink opens /courses/:courseId (handleGoToReview's order). */
+  const handleCourseNameBeforeNavigate = useCallback(() => {
+    onClose();
+    closeFullscreen();
+  }, [onClose, closeFullscreen]);
+
   /* §S.5 — every rating of the course: the reviews tab, no single review. */
   const handleSeeAll = useCallback(() => {
     if (!courseId) return;
@@ -546,12 +554,19 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       letterSpacing: '-0.01em',
                       lineHeight: 1.08,
                       color: INK,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
+                      // CB69 — no overflow clip here: it would clip the name's
+                      // 44px hit area; the ellipsis lives on the name itself.
+                      minWidth: 0,
                     }}
                   >
-                    {courseName}
+                    <CourseNameLink
+                      as="div"
+                      courseId={courseId || null}
+                      onBeforeNavigate={handleCourseNameBeforeNavigate}
+                      style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                    >
+                      {courseName}
+                    </CourseNameLink>
                   </h1>
 
                   {locationStr && (

@@ -11,6 +11,7 @@
  * Presentation only. Placement and selection belong to reviewSlots.ts.
  */
 
+import { CourseNameLink } from '@/components/shared/CourseNameLink';
 import React from 'react';
 import { MentionText } from '@/components/mentions/MentionText';
 import { useTranslation } from 'react-i18next';
@@ -86,10 +87,18 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
         }}
       >
         {reviews.map((r) => (
-          <button
+          // CB69 — non-button tile so the course name can be a real button.
+          <div
             key={r.reviewId}
-            type="button"
+            role="button"
+            tabIndex={0}
             onClick={() => onReviewPress(r)}
+            onKeyDown={(e) => {
+              if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                onReviewPress(r);
+              }
+            }}
             style={{
               width: CARD_W,
               flexShrink: 0,
@@ -98,6 +107,7 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
               border: `1px solid ${HAIRLINE_INK_8}`,
               borderRadius: REVIEW_RADIUS,
               padding: REVIEW_PAD,
+              cursor: 'pointer',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
@@ -118,9 +128,13 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
               </span>
             </div>
 
-            <div
+            <CourseNameLink
+              as="div"
+              courseId={r.courseId}
+              textProps={{ 'data-review-rail-course': '' }}
+              wrapperStyle={{ marginTop: REVIEW_NAME.marginTop }}
               style={{
-                marginTop: REVIEW_NAME.marginTop,
+                ...(r.courseId ? null : { marginTop: REVIEW_NAME.marginTop }),
                 fontSize: REVIEW_NAME.size,
                 fontWeight: 700,
                 lineHeight: REVIEW_NAME.lineHeight,
@@ -129,7 +143,7 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
               }}
             >
               {r.courseName}
-            </div>
+            </CourseNameLink>
 
             <p
               style={{
@@ -146,7 +160,7 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
             <div style={{ marginTop: REVIEW_FOOT.marginTop }}>
               <Reviewer r={r} />
             </div>
-          </button>
+          </div>
         ))}
       </div>
     </section>

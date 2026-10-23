@@ -12,6 +12,7 @@ import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatFrostRating, splitCourseName } from '@/lib/frostPanel';
 import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
+import { CourseNameLink } from '@/components/shared/CourseNameLink';
 
 const FONTS = {
   sf: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
@@ -19,6 +20,10 @@ const FONTS = {
 
 export interface InlineReviewCardProps {
   courseName: string;
+  /** CB69 — the course name opens /courses/:courseId; plain text without it. */
+  courseId?: string | null;
+  /** CB69 — closes the viewer before the course page opens. */
+  onBeforeNavigate?: () => void;
   rating: number;
   courseRegion?: string | null;
   courseCountry?: string | null;
@@ -52,6 +57,8 @@ export interface InlineReviewCardProps {
 
 export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   courseName,
+  courseId,
+  onBeforeNavigate,
   rating,
   courseRegion,
   courseCountry,
@@ -88,11 +95,21 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
   const locationStr = locationParts.join(', ');
 
   return (
-    <motion.button
-      type="button"
+    // CB69 — a non-button tile (ReviewOverlayCore's pattern) so the course
+    // name inside can be a real button.
+    <motion.div
+      role="button"
+      tabIndex={0}
       onClick={(e) => {
         e.stopPropagation();
         onTap();
+      }}
+      onKeyDown={(e) => {
+        if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          e.stopPropagation();
+          onTap();
+        }
       }}
       onPointerDown={onPressStart}
       initial={false}
@@ -192,7 +209,11 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
       </div>
 
       {/* Course name caption */}
-      <div
+      <CourseNameLink
+        as="div"
+        courseId={courseId}
+        onBeforeNavigate={onBeforeNavigate}
+        textProps={{ 'data-inline-review-course': '' }}
         style={{
           fontSize: 19,
           fontWeight: 700,
@@ -205,7 +226,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         {derivedSubtitle && (
           <span style={{ fontWeight: 500, color: 'rgba(255,255,255,0.85)' }}> — {derivedSubtitle}</span>
         )}
-      </div>
+      </CourseNameLink>
 
       {locationStr && (
         <div
@@ -238,7 +259,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
           </span>
         </div>
       )}
-    </motion.button>
+    </motion.div>
   );
 };
 

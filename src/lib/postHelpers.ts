@@ -158,7 +158,8 @@ export function getReviewOverlayThemeByLabel(tierLabel: string): ReviewOverlayTh
  * Use this everywhere: Clubhouse, Profile Activity, Preview.
  */
 export interface ExtractedReviewData {
-  courseId: string;
+  /** CB69 — null when unknown, never '': '' defeats `??` and links nowhere. */
+  courseId: string | null;
   courseName: string;
   courseLocation?: string;
   rating: number;
@@ -179,7 +180,7 @@ export function extractReviewData(post: any): ExtractedReviewData | null {
   
   // Handle course data from multiple possible locations
   const course = post.course || post.golfCourse || {};
-  const courseId = post.course_id || post.courseId || course.id || '';
+  const courseId: string | null = post.course_id || post.courseId || course.id || null;
   const courseName = post.courseName || course.name || 'Golf Course';
   
   // Handle location - use format: Country, Region (e.g., "USA, Georgia" or "England, Surrey")

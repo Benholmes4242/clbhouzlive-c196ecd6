@@ -84,7 +84,7 @@ export function mapActivityPostToFeedPost(
   if (reviewData) {
     review = {
       reviewId: reviewData.sourceReviewId || '',
-      courseId: reviewData.courseId || '',
+      courseId: reviewData.courseId || null,
       courseName: reviewData.courseName || '',
       courseImageUrl: null,
       rating: reviewData.rating ?? 0,
