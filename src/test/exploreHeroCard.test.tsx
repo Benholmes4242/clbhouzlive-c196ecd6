@@ -256,7 +256,7 @@ describe('Explore card shapes', () => {
     const size = fullWidthCardSize(item);
     const { container } = render(<ExploreCard item={item} size={size} shape={null} onTap={() => undefined} />);
     const hero = container.querySelector<HTMLElement>('[data-explore-hero="true"]');
-    const image = container.querySelector<HTMLElement>('button > span > div');
+    const image = container.querySelector<HTMLElement>('[role="button"] > span > div');
     expect(size).toBe('std');
     expect(hero?.style.minHeight).toBe('340px');
     // A review's photo is a committed 340 height, not a floor (8 Oct).
@@ -465,7 +465,7 @@ describe('review tile fixed height', () => {
         <ExploreCard item={longReview()} size="std" shape={null} onTap={() => undefined} />
       </div>,
     );
-    const photos = Array.from(container.querySelectorAll<HTMLElement>('button > span > div'));
+    const photos = Array.from(container.querySelectorAll<HTMLElement>('[role="button"] > span > div'));
     expect(photos).toHaveLength(2);
     for (const photo of photos) {
       expect(photo.style.height).toBe('340px');
