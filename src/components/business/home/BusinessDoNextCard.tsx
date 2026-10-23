@@ -5,9 +5,12 @@
  * once; with no trigger it renders nothing at all (no heading, no space).
  * A source that errors drops only its own trigger (see doNext.ts). Sources:
  * the membership row (already settled by the page), pending team requests,
- * the unreplied-reviews read and useBusinessWeek (shared cache with This week).
+ * the unreplied-reviews summary count and useBusinessWeek (shared cache with This week).
+ * CB68.1: review_date is the golfer's played date, so no wait is claimed and the
+ * read fetches zero rows (summary only). Copy: common:business.doNext.*.
  */
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
 import { useBusinessPendingRequestsOldest } from '@/hooks/useBusinessPendingRequestsOldest';
@@ -15,13 +18,14 @@ import { useBusinessReviews } from '@/hooks/useBusinessReviews';
 import { useBusinessWeek } from '@/hooks/useBusinessWeek';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { H } from './BusinessHomeHeader';
-import { buildDoNext, type DoNextItem } from './doNext';
+import { buildDoNext, resolveDoNextMsg, resolveDoNextSub, type DoNextItem } from './doNext';
 
-/** Unreplied reviews read for the oldest wait; the summary count is authoritative. */
-export const DO_NEXT_REVIEWS_LIMIT = 500;
+/** Only the summary count is needed; no review rows are read. */
+export const DO_NEXT_REVIEWS_LIMIT = 0;
 
 export function BusinessDoNextCard({ membership }: { membership: BusinessMembership }) {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const { role, business } = membership;
   const manager = role === 'owner' || role === 'admin';
   const editorPlus = manager || role === 'editor';
@@ -41,17 +45,15 @@ export function BusinessDoNextCard({ membership }: { membership: BusinessMembers
   const items = useMemo<DoNextItem[]>(() => {
     if (!editorPlus || !settled) return [];
     const reviewsData = reviewsQ.data;
-    const oldestReview = reviewsData?.reviews.reduce<string | null>(
-      (min, r) => (!min || r.review_date < min ? r.review_date : min), null,
-    ) ?? null;
     return buildDoNext({
       role,
       business,
       pending: pendingQ.isError ? undefined : pendingQ.data,
-      reviews: reviewsQ.isError || !reviewsData ? undefined : { awaiting: reviewsData.summary.awaiting_reply, oldestAt: oldestReview },
+      reviews: reviewsQ.isError || !reviewsData ? undefined : { awaiting: reviewsData.summary.awaiting_reply },
       week: weekQ.isError ? undefined : weekQ.data,
+      locale: i18n?.language,
     });
-  }, [editorPlus, settled, role, business, pendingQ.isError, pendingQ.data, reviewsQ.isError, reviewsQ.data, weekQ.isError, weekQ.data]);
+  }, [editorPlus, settled, role, business, pendingQ.isError, pendingQ.data, reviewsQ.isError, reviewsQ.data, weekQ.isError, weekQ.data, i18n?.language]);
 
   if (items.length === 0) return null;
 
@@ -69,7 +71,7 @@ export function BusinessDoNextCard({ membership }: { membership: BusinessMembers
       style={{ margin: '12px 16px 0', background: H.card, border: `1px solid ${H.line}`, borderRadius: 18, padding: 16 }}
     >
       <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: H.mute }}>
-        Do next
+        {t('business.doNext.kicker')}
       </div>
       <div style={{ marginTop: 10 }}>
         {items.map((item, i) => (
@@ -92,9 +94,9 @@ export function BusinessDoNextCard({ membership }: { membership: BusinessMembers
               {i + 1}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <b style={{ display: 'block', fontSize: 14, fontWeight: 700, color: H.ink }}>{item.title}</b>
-              {item.sub && (
-                <span style={{ display: 'block', marginTop: 2, fontSize: 12, lineHeight: 1.38, color: H.mute }}>{item.sub}</span>
+              <b style={{ display: 'block', fontSize: 14, fontWeight: 700, color: H.ink }}>{resolveDoNextMsg(t, item.title)}</b>
+              {item.sub.length > 0 && (
+                <span style={{ display: 'block', marginTop: 2, fontSize: 12, lineHeight: 1.38, color: H.mute }}>{resolveDoNextSub(t, item.sub)}</span>
               )}
             </div>
             <button
@@ -106,7 +108,7 @@ export function BusinessDoNextCard({ membership }: { membership: BusinessMembers
                 background: H.actFill, color: H.ink, fontSize: 12.5, fontWeight: 700, display: 'flex', alignItems: 'center',
               }}
             >
-              {item.action}
+              {resolveDoNextMsg(t, item.action)}
             </button>
           </div>
         ))}
