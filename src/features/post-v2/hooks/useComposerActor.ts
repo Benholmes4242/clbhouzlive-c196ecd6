@@ -22,7 +22,7 @@ import type { ActiveActor, ActorType } from '@/types/actor';
 export function resolveAvailableActor(
   type: ActorType | null | undefined,
   id: string | null | undefined,
-  available: ActiveActor[],
+  available: readonly ActiveActor[],
 ): ActiveActor | null {
   if (!type || !id) return null;
   return available.find((a) => a.type === type && a.id === id) ?? null;
