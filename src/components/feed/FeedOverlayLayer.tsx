@@ -265,6 +265,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
               onReviewTap={() => onReviewTap?.()}
               isVisible={overlayVisible}
               whiteReadReview={topActionBar}
+              onBeforeNavigate={onBeforeNavigate}
             />
           </div>
         </div>

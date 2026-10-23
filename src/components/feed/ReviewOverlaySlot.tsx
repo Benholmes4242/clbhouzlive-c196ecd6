@@ -12,6 +12,8 @@ interface ReviewOverlaySlotProps {
   isVisible: boolean;
   /** When true, render the "Read review" affordance in white instead of amber. */
   whiteReadReview?: boolean;
+  /** CB69 — closes the viewer before the course name opens the course page. */
+  onBeforeNavigate?: () => void;
 }
 
 /**
@@ -24,6 +26,7 @@ export const ReviewOverlaySlot: React.FC<ReviewOverlaySlotProps> = ({
   onReviewTap,
   isVisible,
   whiteReadReview,
+  onBeforeNavigate,
 }) => {
   const { data: reviewerStats } = useReviewerStats(activePost.userId);
   const queryClient = useQueryClient();
@@ -35,6 +38,8 @@ export const ReviewOverlaySlot: React.FC<ReviewOverlaySlotProps> = ({
   return (
     <InlineReviewCard
       courseName={review.courseName}
+      courseId={review.courseId || activePost.courseId || null}
+      onBeforeNavigate={onBeforeNavigate}
       rating={review.rating}
       courseRegion={review.courseRegion}
       courseCountry={review.courseCountry}
