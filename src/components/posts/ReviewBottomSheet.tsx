@@ -56,7 +56,7 @@ import { getRatingTierLabel } from '@/lib/ratingTier';
 import { getPublicProfilePath } from '@/lib/profileRoutes';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
-import { GlassCardFootAction } from '@/features/courses/_shared/scorecard/GlassCardFootAction';
+import { SheetDoorButton } from '@/features/courses/_shared/scorecard/SheetDoorButton';
 import { LikedByRow } from '@/components/likes/LikedByRow';
 /* ReactionAction is now reached through RoundEngagementActions, which owns the
    canonical comment+reaction pair; the direct import is gone, the module is not.
@@ -603,12 +603,16 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 )}
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
+              <div data-review-player-row="true" style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
                 <SquircleAvatar size={28} src={user.avatar} alt={user.name} userId={user.id} fallback={initials} hairlineRing ringColor={DARK_HAIRLINE} />
-                <div style={{ flex: 1, minWidth: 0 }}>
+                <div data-sheet-player-name="true" style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 15, fontWeight: 600, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</div>
                   {metaSeg && <div style={{ marginTop: 2, fontSize: 12, color: BODY, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{metaSeg}</div>}
                 </div>
+                {(courseId || user.id) && <div data-sheet-doors="true" style={{ display: 'flex', gap: 6, flex: 'none' }}>
+                  {courseId && <SheetDoorButton door="course" label={t('courses:scorecard.viewCourse')} icon={MapPin} onClick={handleGoToReview} />}
+                  {user.id && <SheetDoorButton door="profile" label={t('courses:scorecard.viewProfile')} icon={User} onClick={handleGoToProfile} />}
+                </div>}
               </div>
 
               {/* §S.1 — THE CALIBRATION STRIP. Both cells always, or none: two
@@ -965,11 +969,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   />
                 </div>
               )}
-              {/* §S.6 — two doors: the course, and the reviewer by name. */}
-              <div data-review-foot-actions="true" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-                <GlassCardFootAction label={t('scorecard.viewCourse')} onClick={handleGoToReview} icon={MapPin} disabled={!courseId} />
-                <GlassCardFootAction label={user.name} onClick={handleGoToProfile} icon={User} disabled={!user.id} />
-              </div>
             </div>
           </motion.div>
 

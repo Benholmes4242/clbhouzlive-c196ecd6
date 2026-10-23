@@ -1,5 +1,11 @@
 # Roadmap
 
+## CB61 — Player-row sheet doors
+- [x] Read signed-off option A; full baseline `bunx vitest run`: 2,280 passed /305 files /0 failures, matching CB60. Git pull skipped because Git is platform-managed.
+- [ ] Move member Course/Profile actions to shared player-row buttons and inert swipe preview; preserve tour foot, Share, navigation and frozen head details.
+- [ ] Retarget only authorized review navigation/footer assertions; add requested regressions, run full suite and check harness diagnostics.
+- [ ] Measure before/after rows and feet at390px, long-name fit and hit targets; report remaining consumers and live verification limitations.
+
 ## CB58 — Leaders' group
 - [x] Read brief/mock and audited source before building: round advances by scored/live participation or course-local date, not last card/first tee; IDs share sr_players.id. Baseline bunx vitest run: 2,233/303, no pre-existing failures. Git pull skipped because workspace Git is managed.
 - [x] Implemented shared selection/rendering and en/en-XA copy; existing tour-green ruling confirmed. Historical completed cards scope stale thru/today without changing shared scoring helpers; shared event-format gate; existing scorecard sheet and analytics callback.

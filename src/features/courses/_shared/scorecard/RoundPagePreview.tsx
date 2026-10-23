@@ -95,6 +95,7 @@ export const RoundPagePreview: React.FC<RoundPagePreviewProps> = React.memo(({
         playerName={seed?.playerName ?? null}
         playerAvatarUrl={seed?.playerAvatarUrl ?? null}
         isOwner={isOwner}
+        previewDoors
       />
       <div
         style={{

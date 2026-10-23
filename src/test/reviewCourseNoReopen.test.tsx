@@ -71,8 +71,8 @@ describe('review COURSE navigation', () => {
     const close = vi.fn();
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     render(<MemoryRouter><QueryClientProvider client={client}><ReviewBottomSheet isOpen onClose={close} user={{ id: 'member', name: 'Member' }} courseId="course" courseName="Course" rating={8} reviewId={reviewId} resolvedMedia={[]} resolvedReviewText="Review" /><LocationProbe /></QueryClientProvider></MemoryRouter>);
-    const footer = document.querySelector('[data-review-foot-actions]');
-    const courseButton = footer?.querySelectorAll('button')[0];
+    const playerRow = document.querySelector('[data-review-player-row]');
+    const courseButton = playerRow?.querySelector('[data-sheet-door="course"]');
     expect(courseButton).toBeDefined();
     if (!courseButton) throw new Error('Missing COURSE action');
     fireEvent.click(courseButton);

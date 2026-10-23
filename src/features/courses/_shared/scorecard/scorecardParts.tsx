@@ -15,7 +15,8 @@ import { handicapPairDisplay } from '@/features/explore-magazine/circleHandicap'
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { RefreshCw, Table } from 'lucide-react';
+import { MapPin, RefreshCw, Table, User } from 'lucide-react';
+import { SheetDoorButton } from './SheetDoorButton';
 
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ScoreMark } from '@/features/courses/_shared/ScoreMark';
@@ -378,6 +379,10 @@ export interface RoundSummaryHeadProps {
    * is never relabelled as the index at the time.
    */
   playedOffIndex?: number | null;
+  onViewCourse?: () => void;
+  onViewProfile?: () => void;
+  /** CB61: draw the same doors in the seed-only preview, without handlers. */
+  previewDoors?: boolean;
   rail?: RailFigure[];
 }
 
@@ -391,6 +396,7 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
   showScore, gross, toPar, shownPar = 0, playedHoles = 0, coursePar,
   heroMuted, playerName, playerAvatarUrl, playerUserId,
   tourAvatarCandidates = [], isOwner = false, playerHcp, playerHcpDelta, playedOffIndex = null, rail = [],
+  onViewCourse, onViewProfile, previewDoors = false,
 }) => {
   const { t } = useTranslation(['courses']);
   const showChip = playerHcpDelta != null && Math.abs(playerHcpDelta) >= 0.05;
@@ -482,11 +488,11 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
       </div>
 
       {!isTour && showIdentity && (
-        <div style={{ display: 'flex', alignItems: 'center', marginTop: 10, minWidth: 0 }}>
+        <div data-scorecard-player-row="true" style={{ display: 'flex', alignItems: 'center', marginTop: 10, minWidth: 0 }}>
           <span style={{ flexShrink: 0, marginRight: 8 }}>
             <SquircleAvatar src={playerAvatarUrl ?? null} alt={playerName as string} userId={playerUserId ?? undefined} size={24} hairlineRing />
           </span>
-          <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          <span data-sheet-player-name="true" style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minWidth: 0 }}>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: isOwner ? A.AMBER : A.INK, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {playerName}
             </span>
@@ -504,6 +510,12 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
               </span>
             )}
           </span>
+          {(previewDoors || onViewCourse || onViewProfile) && (
+            <span data-sheet-doors="true" style={{ display: 'flex', gap: 6, flex: 'none', marginLeft: 10 }}>
+              {(previewDoors || onViewCourse) && <SheetDoorButton door="course" label={t('courses:scorecard.viewCourse')} icon={MapPin} onClick={onViewCourse} inert={previewDoors} />}
+              {(previewDoors || onViewProfile) && <SheetDoorButton door="profile" label={t('courses:scorecard.viewProfile')} icon={User} onClick={onViewProfile} inert={previewDoors} />}
+            </span>
+          )}
         </div>
       )}
 
