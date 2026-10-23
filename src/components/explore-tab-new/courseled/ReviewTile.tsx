@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { CourseNameLink } from '@/components/shared/CourseNameLink';
 import { MentionText } from '@/components/mentions/MentionText';
 import { Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -227,9 +228,18 @@ export function ReviewTile({
     .map(([key, label, value]) => ({ key, label, value: Number(value) }));
 
   return (
-    <button
-      type="button"
+    // CB69 — a non-button tile (ReviewOverlayCore's pattern) so the course
+    // name inside can be a real button.
+    <div
+      role="button"
+      tabIndex={0}
       onClick={() => onPress(r)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onPress(r);
+        }
+      }}
       style={{
         ...(isNew ? NEW_CARD_RING : null),
         position: 'relative',
@@ -417,7 +427,10 @@ export function ReviewTile({
         {/* BOTTOM BLOCK — course name as headline (two lines maximum, so a long
             club name cannot crowd the byline), then the byline. */}
         <div style={{ position: 'absolute', left: 13, right: 13, bottom: 11 }}>
-          <div
+          <CourseNameLink
+            as="div"
+            courseId={r.courseId}
+            textProps={{ 'data-review-tile-course': '' }}
             style={{
               fontSize: 15,
               fontWeight: 700,
@@ -428,7 +441,7 @@ export function ReviewTile({
             }}
           >
             {r.courseName || t('discover.unknownCourse', 'Course')}
-          </div>
+          </CourseNameLink>
           <div
             style={{
               ...LABEL,
@@ -540,7 +553,7 @@ export function ReviewTile({
           ))}
         </div>
       )}
-    </button>
+    </div>
 
   );
 }
