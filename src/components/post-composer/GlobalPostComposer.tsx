@@ -31,6 +31,8 @@ export function GlobalPostComposer() {
     editPostId,
     draftId,
     initialMedia,
+    initialActorType,
+    initialActorId,
     closePostStudio,
   } = usePostStudioStore();
   const navigate = useNavigate();
@@ -57,6 +59,8 @@ export function GlobalPostComposer() {
       editPostId={editPostId}
       draftId={draftId}
       initialMedia={initialMedia}
+      initialActorType={initialActorType}
+      initialActorId={initialActorId}
     />,
     document.body,
   );
