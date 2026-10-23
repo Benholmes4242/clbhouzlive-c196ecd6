@@ -105,7 +105,7 @@ export const InlineReviewCard: React.FC<InlineReviewCardProps> = ({
         onTap();
       }}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();
           e.stopPropagation();
           onTap();

@@ -235,7 +235,7 @@ export function ReviewTile({
       tabIndex={0}
       onClick={() => onPress(r)}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();
           onPress(r);
         }
