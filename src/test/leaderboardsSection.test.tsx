@@ -95,7 +95,8 @@ describe('CB27 Leaderboards remount', () => {
     const { container } = draw();
     const selected = container.querySelector('[data-leaderboard-board="net"]');
     if (!(selected instanceof HTMLElement)) throw new Error('Missing selected board tile');
-    expect(selected.style.background).toBe(APPLIED_FILL);
+    /* jsdom normalises the background shorthand's spacing, so assert its value. */
+    expect(selected.style.background).toBe('rgba(255, 255, 255, 0.06)');
     expect(selected.style.border).toBe(`1px solid ${SELECTED_EDGE}`);
     const resting = container.querySelector('[data-leaderboard-board="recent"]');
     if (!(resting instanceof HTMLElement)) throw new Error('Missing resting board tile');
