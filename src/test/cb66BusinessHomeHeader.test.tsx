@@ -229,9 +229,19 @@ describe('CB66 post and states', () => {
     expect(spy).toHaveBeenCalledWith({ actorType: 'business', actorId: 'b1' });
     spy.mockRestore();
   });
-  it('short name rule', () => {
+  it('short name rule (CB66.1)', () => {
     expect(shortBusinessName('clbhouz')).toBe('clbhouz');
+    expect(shortBusinessName('Hartwell Heath')).toBe('Hartwell Heath');
+    expect(shortBusinessName('North Green Academy')).toBe('North Green');
     expect(shortBusinessName('Fairway Fitting Co.')).toBe('Fairway');
+    expect(shortBusinessName('Sunningdale Golf Club')).toBe('Sunningdale');
+    expect(shortBusinessName('The Royal & Ancient Golf Club')).toBe('The Royal');
+    expect(shortBusinessName('Llanfairpwllgwyngyll Golf Club')).toBeNull();
+  });
+  it('button reads bare "Post" when even the first word is over 14 characters', () => {
+    state.businesses = [biz('b1', 'Llanfairpwllgwyngyll Golf Club', 'owner')];
+    page();
+    expect((q('[data-cta="post"]') as HTMLElement).textContent).toBe('Post');
   });
   it('loading is never structurally taller than the analyst header', () => {
     state.isLoading = true;
