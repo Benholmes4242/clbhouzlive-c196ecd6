@@ -18,7 +18,8 @@
  *                         data-watch-tile-index and openWithOrigin).
  *   - `isAutoplayActive` — activeIndices.has(flatIndex).
  */
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { ReactionGlyph } from '@/lib/reactionKind';
 import { FormatBadge } from '@/features/watch-v2/components/FormatBadge';
 import { formatCountShort as formatCount } from '@/i18n/format';
@@ -157,7 +158,12 @@ export function FeedCard({
     enabled: isVideo && !isAutoplayActive,
   });
 
+  // CB70: an image that fails to load shows the dark media panel (never the
+  // browser's broken-image glyph) and does not open into a blank slide.
+  const [imageFailed, setImageFailed] = useState(false);
+
   const handlePress = () => {
+    if (imageFailed && !isVideo) return;
     openWithOrigin({
       openedFrom,
       posts,
@@ -180,6 +186,7 @@ export function FeedCard({
       as="div"
       variant="media"
       onPress={handlePress}
+      aria-disabled={imageFailed && !isVideo ? true : undefined}
       onPrerouteArm={onPrerouteArm}
       onPreroute={onPreroute}
       onPrerouteCancel={onPrerouteCancel}
@@ -202,14 +209,16 @@ export function FeedCard({
           width: '100%',
           aspectRatio: aspect,
           borderRadius: tileRadius,
-          background: '#e5e9ef',
+          background: A.PANEL,
           overflow: 'hidden',
         }}
+        data-media-failed={imageFailed ? '' : undefined}
       >
-        {posterUrl ? (
+        {posterUrl && !imageFailed ? (
           <img
             src={posterUrl}
             alt=""
+            onError={() => setImageFailed(true)}
             loading="lazy"
             style={{
               width: '100%',

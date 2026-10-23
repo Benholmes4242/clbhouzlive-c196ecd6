@@ -93,3 +93,23 @@ describe('CB70 course media opens the tapped photo', () => {
     expect(useFullscreenFeedStore.getState().posts.map((p) => p.mediaItems[0].id)).toEqual(['a1', 'a2', 'b1', 'a3']);
   });
 });
+
+describe('CB70 broken course media image', () => {
+  afterEach(() => { cleanup(); useFullscreenFeedStore.setState({ isOpen: false, posts: [], restoreStack: [] } as any); });
+
+  it('a failed image shows the dark panel, no broken glyph, keeps its frame and does not open', () => {
+    const p = photo('Z', 'z1');
+    const { container } = render(
+      <FeedCard row={row(p)} feedPost={p} posts={[p]} flatIndex={0} isAutoplayActive={false}
+        openedFrom="course-media" bareTile hideCourseAttribution hideFormatBadge readOnlyFullscreen hideLikeCount />,
+    );
+    fireEvent.error(container.querySelector('img')!);
+    const frame = container.querySelector('[data-media-failed]') as HTMLElement;
+    expect(frame).not.toBeNull();
+    expect(container.querySelector('img')).toBeNull();
+    expect(frame.style.background).not.toBe('rgb(229, 233, 239)');
+    expect(frame.style.aspectRatio).toBe('9 / 14');
+    tap(container.querySelector('[data-watch-tile-index]')!);
+    expect(useFullscreenFeedStore.getState().isOpen).toBe(false);
+  });
+});
