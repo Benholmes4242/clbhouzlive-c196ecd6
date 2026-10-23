@@ -14,9 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useBusinessStats7d } from '@/hooks/useBusinessStats7d';
-import { formatNumber } from '@/i18n/format';
-import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 import { useBusinessPendingRequestsCount } from '@/hooks/useBusinessPendingRequestsCount';
 import { useBusinessAccessRequestsRealtime } from '@/hooks/useBusinessAccessRequestsRealtime';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
@@ -86,12 +83,6 @@ export function BusinessCommandCard({
   const clubCourses = membership.clubCourses ?? [];
   const courseSuffix = courseCountSuffix(clubCourses.length);
 
-  // Fetch 7-day stats for visits/impressions — only when expanded, to keep collapsed rows cheap.
-  const { data: stats, isLoading: statsLoading } = useBusinessStats7d(business?.id);
-
-  // Fetch TOTAL followers count (source of truth)
-  const { data: totalFollowers, isLoading: followersLoading } = useBusinessFollowersCount(business?.id);
-
   const { data: verificationRequest } = useBusinessVerificationRequest(business?.id);
 
   /**
@@ -149,8 +140,6 @@ export function BusinessCommandCard({
   const needsDomainVerification =
     verificationRequest?.requires_domain_check && !verificationRequest?.domain_confirmed;
 
-  // NOTE: figure rendering lives in `MetricCell`. Loading and absent render
-  // NOTHING; a genuine 0 renders "0" — zero visits is a fact, not a gap.
 
 
   const locationDisplay = getCityCountry({
@@ -245,39 +234,6 @@ export function BusinessCommandCard({
                     </span>
                   </button>
                 )}
-
-                {/* Metrics — ONE inset, three cells. Label above figure, window beneath. */}
-                <div
-                  style={{
-                    background: 'rgba(14,18,22,0.035)',
-                    borderRadius: 14,
-                    padding: '14px 12px 12px',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, minmax(0,1fr))',
-                  }}
-                >
-                  <MetricCell
-                    label={t('business.card.metrics.visits')}
-                    window={t('business.card.metrics.last7Days')}
-                    value={stats?.visits}
-                    loading={statsLoading}
-                    onClick={() => goto('/insights')}
-                  />
-                  <MetricCell
-                    label={t('business.card.metrics.followers')}
-                    window={t('business.card.metrics.allTime')}
-                    value={totalFollowers}
-                    loading={followersLoading}
-                    onClick={() => goto('/followers')}
-                  />
-                  <MetricCell
-                    label={t('business.card.metrics.impressions')}
-                    window={t('business.card.metrics.last7Days')}
-                    value={stats?.impressions}
-                    loading={statsLoading}
-                    onClick={() => goto('/insights')}
-                  />
-                </div>
 
                 {/* Actions — heading, then rows with no rules and no icon tiles. */}
                 <div>
@@ -616,76 +572,6 @@ export function BusinessCommandCard({
 /* ─────────────────────── sub-components ───────────────────────
    Both are LOCAL to this file — no other importers. */
 
-/**
- * One metric cell inside the shared inset. Three states, three renderings:
- * loading -> nothing, null/undefined -> nothing, 0 -> "0", else formatted.
- * The figure sits in a fixed 26px box so the panel cannot jump on arrival.
- */
-function MetricCell({
-  label,
-  window: windowLabel,
-  value,
-  loading,
-  onClick,
-}: {
-  label: string;
-  window: string;
-  value: number | null | undefined;
-  loading: boolean;
-  onClick?: () => void;
-}) {
-  const figure =
-    loading || value === null || value === undefined ? '' : formatNumber(value);
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex flex-col items-center justify-start active:opacity-70 transition-opacity"
-      style={{ background: 'transparent', border: 'none', minHeight: 44 }}
-    >
-      <span
-        style={{
-          color: BIZ.inkFaint,
-          fontSize: 11,
-          fontWeight: 700,
-          textTransform: 'uppercase',
-          letterSpacing: '0.10em',
-          lineHeight: 1,
-        }}
-      >
-        {label}
-      </span>
-      <span
-        className="tabular-nums lining-nums flex items-center"
-        style={{
-          height: 26,
-          color: BIZ.ink,
-          fontSize: 22,
-          fontWeight: 700,
-          letterSpacing: '-0.04em',
-          lineHeight: 1,
-          fontFeatureSettings: '"kern" 1, "liga" 1',
-        }}
-      >
-        {figure}
-      </span>
-      <span
-        style={{
-          color: BIZ.inkFaint,
-          // AXIS floor 10 exception: the window marker under a counter figure.
-          fontSize: 10,
-          fontWeight: 700,
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          lineHeight: 1,
-        }}
-      >
-        {windowLabel}
-      </span>
-    </button>
-  );
-}
 
 function ActionRow({
   icon: Icon,

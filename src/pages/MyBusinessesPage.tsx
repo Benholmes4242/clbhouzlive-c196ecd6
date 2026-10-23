@@ -11,6 +11,7 @@ import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import {
   BusinessHomeHeader, BusinessHomeHeaderSkeleton, BusinessSwitcher, H,
 } from '@/components/business/home/BusinessHomeHeader';
+import { BusinessWeekCard } from '@/components/business/home/BusinessWeekCard';
 
 /**
  * CB66 — Business home. One selected business and its header; below it the
@@ -142,6 +143,12 @@ const MyBusinessesPage = () => {
                   membership={selected}
                   userId={userId}
                   onRequestDelete={handleRequestDelete}
+                />
+                {/* CB67 — Section 2: This week, directly under the header. */}
+                <BusinessWeekCard
+                  key={`week-${selected.business.id}`}
+                  businessId={selected.business.id}
+                  name={selected.business.name}
                 />
                 <div className="pb-8">
                   <BusinessCommandCard
