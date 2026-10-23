@@ -112,13 +112,13 @@ export function ClaimYourCourseSheet({ open, onClose, businessId, businessName, 
         raw = error.message;
       }
       const m = String(raw).toLowerCase();
-      if (m.includes('already claimed')) toast.error(t('business.claimSheet.errors.alreadyClaimed'));
-      else if (m.includes('already under review')) toast.error(t('business.claimSheet.errors.underReview'));
-      else if (m.includes('not authorized')) toast.error(t('business.claimSheet.errors.notAuthorized'));
-      else toast.error(t('business.claimSheet.errors.generic'));
+      if (m.includes('already claimed')) toast.error(t('business.card.claimSheet.errors.alreadyClaimed'));
+      else if (m.includes('already under review')) toast.error(t('business.card.claimSheet.errors.underReview'));
+      else if (m.includes('not authorized')) toast.error(t('business.card.claimSheet.errors.notAuthorized'));
+      else toast.error(t('business.card.claimSheet.errors.generic'));
       return;
     }
-    toast.success(t('business.claimSheet.success'));
+    toast.success(t('business.card.claimSheet.success'));
     queryClient.invalidateQueries({ queryKey: ['business-course-claim', businessId] });
     queryClient.invalidateQueries({ queryKey: ['my-businesses', userProfileId] });
     onClose();
@@ -128,28 +128,28 @@ export function ClaimYourCourseSheet({ open, onClose, businessId, businessName, 
     <BottomSheet open={open} onClose={onClose} scrollBody ariaLabelledBy="claim-your-course-title">
       <div style={{ padding: '20px 20px 28px' }}>
         <h2 id="claim-your-course-title" style={{ color: BIZ.ink, fontSize: 18, fontWeight: 700, marginBottom: 4 }}>
-          {t('business.claimSheet.title')}
+          {t('business.card.claimSheet.title')}
         </h2>
         <p style={{ color: BIZ.inkMute, fontSize: 13, lineHeight: 1.45, marginBottom: 16 }}>
-          {t('business.claimSheet.intro', { name: businessName })}
+          {t('business.card.claimSheet.intro', { name: businessName })}
         </p>
 
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={t('business.claimSheet.searchPlaceholder')}
-          aria-label={t('business.claimSheet.searchPlaceholder')}
+          placeholder={t('business.card.claimSheet.searchPlaceholder')}
+          aria-label={t('business.card.claimSheet.searchPlaceholder')}
           className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full px-4 py-3 text-[15px] focus:outline-none`}
           style={{ color: BIZ.ink }}
         />
 
         <div style={{ marginTop: 8, marginBottom: 16 }}>
           {trimmed.length >= 2 && loading && (
-            <p style={{ color: BIZ.inkFaint, fontSize: 13, padding: '12px 0' }}>{t('business.claimSheet.searching')}</p>
+            <p style={{ color: BIZ.inkFaint, fontSize: 13, padding: '12px 0' }}>{t('business.card.claimSheet.searching')}</p>
           )}
           {trimmed.length >= 2 && !loading && data.length === 0 && (
-            <p style={{ color: BIZ.inkFaint, fontSize: 13, padding: '12px 0' }}>{t('business.claimSheet.noResults')}</p>
+            <p style={{ color: BIZ.inkFaint, fontSize: 13, padding: '12px 0' }}>{t('business.card.claimSheet.noResults')}</p>
           )}
           {trimmed.length >= 2 &&
             !loading &&
@@ -182,11 +182,11 @@ export function ClaimYourCourseSheet({ open, onClose, businessId, businessName, 
                     </span>
                     {state === 'managed' ? (
                       <span className="block" style={{ color: BIZ.inkFaint, fontSize: 12 }}>
-                        {t('business.claimSheet.managed')}
+                        {t('business.card.claimSheet.managed')}
                       </span>
                     ) : state === 'review' ? (
                       <span className="block" style={{ color: BIZ.inkFaint, fontSize: 12 }}>
-                        {t('business.claimSheet.underReview')}
+                        {t('business.card.claimSheet.underReview')}
                       </span>
                     ) : place ? (
                       <span className="block truncate" style={{ color: BIZ.inkFaint, fontSize: 12 }}>
@@ -206,28 +206,28 @@ export function ClaimYourCourseSheet({ open, onClose, businessId, businessName, 
           htmlFor="claim-your-course-note"
           style={{ display: 'block', fontSize: 13, fontWeight: 600, color: BIZ.ink, marginBottom: 6 }}
         >
-          {t('business.claimSheet.noteLabel')}{' '}
-          <span style={{ color: BIZ.inkFaint, fontWeight: 400 }}>{t('business.claimSheet.optional')}</span>
+          {t('business.card.claimSheet.noteLabel')}{' '}
+          <span style={{ color: BIZ.inkFaint, fontWeight: 400 }}>{t('business.card.claimSheet.optional')}</span>
         </label>
         <textarea
           id="claim-your-course-note"
           value={proofNote}
           onChange={(e) => setProofNote(e.target.value.slice(0, 500))}
-          placeholder={t('business.claimSheet.notePlaceholder')}
+          placeholder={t('business.card.claimSheet.notePlaceholder')}
           rows={3}
           maxLength={500}
           className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full px-3 py-2.5 text-[14px] focus:outline-none`}
           style={{ color: BIZ.ink, fontFamily: 'inherit', resize: 'vertical' }}
         />
         <p style={{ marginTop: 6, fontSize: 11, color: BIZ.inkFaint, lineHeight: 1.4 }}>
-          {t('business.claimSheet.noteHint')}
+          {t('business.card.claimSheet.noteHint')}
         </p>
 
         <Button className="w-full mt-5" disabled={!selected || submitting} onClick={submit}>
-          {t('business.claimSheet.submit', { name: businessName })}
+          {t('business.card.claimSheet.submit', { name: businessName })}
         </Button>
         <p className="text-center" style={{ marginTop: 12, fontSize: 12, color: BIZ.inkFaint }}>
-          {t('business.claimSheet.footer')}
+          {t('business.card.claimSheet.footer')}
         </p>
       </div>
     </BottomSheet>
