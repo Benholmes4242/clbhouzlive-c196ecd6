@@ -62,10 +62,21 @@ export function businessColour(id: string): string {
 export function businessInitials(name: string): string {
   return name.trim().split(/\s+/).slice(0, 2).map((w) => w.charAt(0)).join('').toUpperCase();
 }
-/** Full name when 16 characters or fewer, else the first word (never mid-word). */
-export function shortBusinessName(name: string): string {
-  const n = name.trim();
-  return n.length <= 16 ? n : n.split(/\s+/)[0];
+/**
+ * CB66.1: drop trailing words (and trailing punctuation-only words like "&")
+ * while the name is over 14 characters; never cut inside a word, never an
+ * ellipsis. Returns null when even the first word alone is over 14, so the
+ * button falls back to a bare "Post".
+ */
+export function shortBusinessName(name: string): string | null {
+  const words = name.trim().split(/\s+/);
+  const punctOnly = (w: string) => !/[\p{L}\p{N}]/u.test(w);
+  while (words.length > 1 && words.join(' ').length > 14) {
+    words.pop();
+    while (words.length > 1 && punctOnly(words[words.length - 1])) words.pop();
+  }
+  const result = words.join(' ');
+  return result.length <= 14 ? result : null;
 }
 
 export const ROLE_LINE: Record<BusinessMembership['role'], string> = {
@@ -304,7 +315,7 @@ export function BusinessHomeHeader({
               style={{ ...btn, background: H.ink, color: H.onInk, border: 'none' }}
             >
               <Plus className="shrink-0" style={{ width: 16, height: 16 }} strokeWidth={1.9} />
-              <span className="truncate">Post as {shortBusinessName(business.name)}</span>
+              <span className="truncate">{(() => { const s = shortBusinessName(business.name); return s ? `Post as ${s}` : 'Post'; })()}</span>
             </button>
           )}
           <button
