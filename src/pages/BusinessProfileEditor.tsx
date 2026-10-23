@@ -42,7 +42,7 @@ import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
 import { SelectedClub } from '@/components/business/ClubSearchDropdown';
 import { SelectedCollege } from '@/components/business/CollegeSearchDropdown';
-import { AddressValue } from '@/components/business/AddressAutocomplete';
+import { dbLocationPrecision, AddressValue } from '@/components/business/AddressAutocomplete';
 import { PinDropModal } from '@/components/business/PinDropModal';
 import { PhoneValue } from '@/components/business/PhoneInputWithDialCode';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';

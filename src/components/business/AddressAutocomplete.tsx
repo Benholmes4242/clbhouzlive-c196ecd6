@@ -7,6 +7,16 @@ import { AppLog } from '@/lib/logger';
 
 export type LocationPrecision = 'address' | 'poi' | 'postcode' | 'city' | 'region' | 'country' | 'pin' | 'unknown';
 
+/**
+ * CB65 §3: business_accounts.location_precision has a CHECK allowing only
+ * address/poi/postcode/city/region/country/pin (or null). 'unknown' is a
+ * client-only value; writing it would fail the whole save, so it maps to null.
+ */
+const DB_PRECISIONS = new Set(['address', 'poi', 'postcode', 'city', 'region', 'country', 'pin']);
+export function dbLocationPrecision(p: string | null | undefined): Exclude<LocationPrecision, 'unknown'> | null {
+  return p && DB_PRECISIONS.has(p) ? (p as Exclude<LocationPrecision, 'unknown'>) : null;
+}
+
 export interface AddressValue {
   label: string;
   addressLine1?: string;
