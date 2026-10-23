@@ -14,9 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useBusinessStats7d } from '@/hooks/useBusinessStats7d';
 import { formatNumber } from '@/i18n/format';
-import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 import { useBusinessPendingRequestsCount } from '@/hooks/useBusinessPendingRequestsCount';
 import { useBusinessAccessRequestsRealtime } from '@/hooks/useBusinessAccessRequestsRealtime';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
@@ -85,12 +83,6 @@ export function BusinessCommandCard({
   const { business, role } = membership;
   const clubCourses = membership.clubCourses ?? [];
   const courseSuffix = courseCountSuffix(clubCourses.length);
-
-  // Fetch 7-day stats for visits/impressions — only when expanded, to keep collapsed rows cheap.
-  const { data: stats, isLoading: statsLoading } = useBusinessStats7d(business?.id);
-
-  // Fetch TOTAL followers count (source of truth)
-  const { data: totalFollowers, isLoading: followersLoading } = useBusinessFollowersCount(business?.id);
 
   const { data: verificationRequest } = useBusinessVerificationRequest(business?.id);
 
@@ -245,39 +237,6 @@ export function BusinessCommandCard({
                     </span>
                   </button>
                 )}
-
-                {/* Metrics — ONE inset, three cells. Label above figure, window beneath. */}
-                <div
-                  style={{
-                    background: 'rgba(14,18,22,0.035)',
-                    borderRadius: 14,
-                    padding: '14px 12px 12px',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, minmax(0,1fr))',
-                  }}
-                >
-                  <MetricCell
-                    label={t('business.card.metrics.visits')}
-                    window={t('business.card.metrics.last7Days')}
-                    value={stats?.visits}
-                    loading={statsLoading}
-                    onClick={() => goto('/insights')}
-                  />
-                  <MetricCell
-                    label={t('business.card.metrics.followers')}
-                    window={t('business.card.metrics.allTime')}
-                    value={totalFollowers}
-                    loading={followersLoading}
-                    onClick={() => goto('/followers')}
-                  />
-                  <MetricCell
-                    label={t('business.card.metrics.impressions')}
-                    window={t('business.card.metrics.last7Days')}
-                    value={stats?.impressions}
-                    loading={statsLoading}
-                    onClick={() => goto('/insights')}
-                  />
-                </div>
 
                 {/* Actions — heading, then rows with no rules and no icon tiles. */}
                 <div>
