@@ -3,7 +3,8 @@
 ## Public delete-account information
 - [x] Confirmed Profile three-dot menu → Settings → Account Actions → Delete Account; baseline `bunx vitest run`: 2,289 passed /306 files /0 failures.
 - [x] Added static English legal page and lazy route; approved download/maintenance exemptions apply only to /delete-account, preserving privacy/terms.
-- [ ] Run full suite, inspect automatic build, and verify signed-out desktop/mobile page and privacy link; production acceptance awaits publication.
+- [x] Full `bunx vitest run`: 2,294 passed /307 files /0 failures, from 2,289/306; five additions only in publicDeleteAccountAccess.test.tsx, no existing tests changed. Automatic build OK. Signed-out localhost at1280×1800,390×844,320×568 shows all content without app chrome/overflow/runtime errors; footer opens /privacy, /terms remains reachable. No SQL/backend/config changes.
+- [ ] Verify https://clbhouz.co.uk/delete-account after publication; blocked on publication not requested in this brief.
 
 ## CB61 — Player-row sheet doors
 - [x] CB61.1: reproduced all three TS2741 errors using `bunx tsgo --noEmit -p tsconfig.app.json`; root command exits0 but files[] is empty. Fixed only rating9.6, empty courseId and empty user.id in cb61SheetDoors.test.tsx; all names/assertions unchanged. Root/application typecheck exits0; full `bunx vitest run` 2,289/306/0 unchanged; harness build OK. Controlled390×844 before/after rows and feet, long-name ellipsis and30px doors/44px hit targets measured; report /mnt/documents/CB61.1_report.md. No pre-existing test failures; three pre-existing fixture type errors cleared. Git pull skipped because workspace Git is platform-managed.
