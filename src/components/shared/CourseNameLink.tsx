@@ -16,7 +16,7 @@
  *   absolutely positioned hit area that takes no space.
  */
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useInRouterContext, useNavigate } from 'react-router-dom';
 
 type DataAttrs = Record<`data-${string}`, string | boolean | undefined>;
 
@@ -71,7 +71,16 @@ export function CourseNameLink({
 
 type ButtonProps = Omit<CourseNameLinkProps, 'courseId' | 'onNavigate'> & { go: () => void };
 
-function RoutedLink({ courseId, ...rest }: Omit<ButtonProps, 'go'> & { courseId: string }) {
+function RoutedLink(props: Omit<ButtonProps, 'go'> & { courseId: string }) {
+  // Outside a router there is nowhere to go: plain text, never a dead button.
+  if (!useInRouterContext()) {
+    const Text = props.as ?? 'span';
+    return <Text {...props.textProps} style={props.style}>{props.children}</Text>;
+  }
+  return <NavigatingLink {...props} />;
+}
+
+function NavigatingLink({ courseId, ...rest }: Omit<ButtonProps, 'go'> & { courseId: string }) {
   const navigate = useNavigate();
   return <LinkButton {...rest} go={() => navigate(`/courses/${courseId}`)} />;
 }
