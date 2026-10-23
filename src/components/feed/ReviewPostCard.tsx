@@ -12,6 +12,7 @@
  * B2: the feed owns its open two-column score layout and missing-value dashes;
  * shared CategoryScores remains unchanged for course surfaces.
  */
+import { CourseNameLink } from '@/components/shared/CourseNameLink';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -145,17 +146,15 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
       {/* B — the full-width subject; scores live together in D. */}
       <div data-review-subject style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 12, padding: `8px ${GUTTER}px 14px` }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          {!courseName ? null : onOpenCourse ? (
-            <button
-              type="button"
-              data-review-course
-              onClick={(e) => { e.stopPropagation(); onOpenCourse(); }}
-              style={{ ...COURSE_NAME_STYLE, maxWidth: '100%', padding: 0, background: 'transparent', border: 'none', textAlign: 'left', cursor: 'pointer' }}
+          {!courseName ? null : (
+            <CourseNameLink
+              as="div"
+              onNavigate={onOpenCourse}
+              textProps={{ 'data-review-course': '' }}
+              style={COURSE_NAME_STYLE}
             >
               {courseName}
-            </button>
-          ) : (
-            <div data-review-course style={COURSE_NAME_STYLE}>{courseName}</div>
+            </CourseNameLink>
           )}
           {region ? (
             <div style={{ marginTop: 3, fontSize: 12, lineHeight: 1.2, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{region}</div>
