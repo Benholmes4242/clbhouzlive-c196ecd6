@@ -47,7 +47,21 @@ describe('review post score block B2', () => {
     expect(element('[data-review-categories]').style.rowGap).toBe('8px');
     expect(element('[data-category-label]').style.fontSize).toBe('12px');
     expect(element('[data-category-label]').style.color).toBe(rgb(A.DIM));
+    expect(element('[data-category-label]').style.minWidth).toBe('0');
+    expect(element('[data-category-label]').style.textOverflow).toBe('ellipsis');
     expect(element('[data-category-figure]').style.fontSize).toBe('13px');
+    expect(element('[data-category-figure]').style.flexShrink).toBe('0');
+  });
+  it('prefixes design and condition with a hidable "Course" span and full aria-labels', () => {
+    const { element } = card(9);
+    for (const [key, full] of [['design', 'Course Design'], ['condition', 'Course Condition']] as const) {
+      const label = element(`[data-category="${key}"] [data-category-label]`);
+      expect(label.getAttribute('aria-label')).toBe(full);
+      const prefix = label.querySelector('[data-label-prefix]');
+      expect(prefix?.textContent?.trim()).toBe('Course');
+    }
+    expect(element('[data-category="clubhouse"] [data-category-label]').querySelector('[data-label-prefix]')).toBeNull();
+    expect(element('[data-category="facilities"] [data-category-label]').querySelector('[data-label-prefix]')).toBeNull();
   });
   it('keeps a two-column grid with green 9.5 and muted 8.9 figures', () => {
     const { element } = card(9);

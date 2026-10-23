@@ -29,7 +29,12 @@ const GUTTER = 14;
 const NAME_SIZE = 15;
 const NAME_LINE = 1.25;
 const SCORE_ORDER = ['design', 'condition', 'clubhouse', 'facilities'] as const;
-const SCORE_LABELS = { design: 'Design', condition: 'Condition', clubhouse: 'Clubhouse', facilities: 'Facilities' };
+const SCORE_LABELS = { design: 'Course Design', condition: 'Course Condition', clubhouse: 'Clubhouse', facilities: 'Facilities' };
+/* The "Course " prefix hides below a 260px categories container (container
+   query, never JS); the aria-label keeps the full words for screen readers. */
+const LABEL_PREFIX = 'Course ';
+const PREFIXED_KEYS = new Set<string>(['design', 'condition']);
+const LABEL_PREFIX_QUERY = `@container (width < 260px) { [data-review-categories] [data-label-prefix] { display: none; } }`;
 
 
 const COURSE_NAME_STYLE: React.CSSProperties = {
@@ -181,13 +186,23 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         </div>
         ) : null}
         {anyScore ? (
-          <div data-review-categories style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 16, rowGap: 8 }}>
+          <div data-review-categories style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 16, rowGap: 8, containerType: 'inline-size' }}>
+            <style>{LABEL_PREFIX_QUERY}</style>
             {SCORE_ORDER.map((key) => {
               const value = scores[key];
+              const label = SCORE_LABELS[key];
+              const prefixed = PREFIXED_KEYS.has(key);
               return (
-                <div key={key} data-category={key} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', minWidth: 0 }}>
-                  <span data-category-label style={{ fontSize: 12, lineHeight: 1.2, color: A.DIM, whiteSpace: 'nowrap' }}>{SCORE_LABELS[key]}</span>
-                  <span data-category-figure data-category-score={value == null ? undefined : value.toFixed(1)} className="tabular-nums" style={{ ...FIGS, fontSize: 13, fontWeight: 700, color: value == null ? A.DIM : courseSubScoreTone(value) }}>
+                <div key={key} data-category={key} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, minWidth: 0 }}>
+                  <span
+                    data-category-label
+                    aria-label={label}
+                    style={{ fontSize: 12, lineHeight: 1.2, color: A.DIM, flex: '1 1 auto', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  >
+                    {prefixed ? <span data-label-prefix>{LABEL_PREFIX}</span> : null}
+                    {prefixed ? label.slice(LABEL_PREFIX.length) : label}
+                  </span>
+                  <span data-category-figure data-category-score={value == null ? undefined : value.toFixed(1)} className="tabular-nums" style={{ ...FIGS, fontSize: 13, fontWeight: 700, flexShrink: 0, color: value == null ? A.DIM : courseSubScoreTone(value) }}>
                     {value == null ? '\u2014' : value.toFixed(1)}
                   </span>
                 </div>
