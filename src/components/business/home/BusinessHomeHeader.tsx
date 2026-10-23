@@ -14,6 +14,7 @@
  */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { LucideIcon } from 'lucide-react';
 import { MoreHorizontal, Plus, Eye, Share, Trash2, ShieldCheck, Globe, Clock, AlertCircle, Flag } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -150,7 +151,7 @@ function StatusRow({
   kind, icon: Icon, title, sub, action, onAction,
 }: {
   kind: string;
-  icon: React.ComponentType<{ style?: React.CSSProperties; strokeWidth?: number }>;
+  icon: LucideIcon;
   title: string; sub: string; action?: string; onAction?: () => void;
 }) {
   return (
