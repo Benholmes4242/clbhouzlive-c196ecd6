@@ -17,6 +17,18 @@ export interface BusinessMembership {
     is_verified: boolean;
     is_deleted: boolean | null;
     club_id: string | null;
+    /** CB68 Do next — profile fields read by completeness and the booking trigger. */
+    description?: string | null;
+    cover_image_url?: string | null;
+    booking_url?: string | null;
+    lat?: number | null;
+    lng?: number | null;
+    website?: string | null;
+    phone?: string | null;
+    email?: string | null;
+    social_links?: unknown;
+    opening_hours?: unknown;
+    show_opening_hours?: boolean | null;
   };
   /** Every course the business's club owns (golf_courses by club_id), by name.
    *  Empty when the business has no club. */
@@ -49,7 +61,18 @@ export function useMyBusinesses(userProfileId?: string) {
             logo_url,
             is_verified,
             is_deleted,
-            club_id
+            club_id,
+            description,
+            cover_image_url,
+            booking_url,
+            lat,
+            lng,
+            website,
+            phone,
+            email,
+            social_links,
+            opening_hours,
+            show_opening_hours
           )
         `)
         .eq('user_profile_id', userProfileId);

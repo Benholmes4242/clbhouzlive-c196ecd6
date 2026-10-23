@@ -12,6 +12,7 @@ import {
   BusinessHomeHeader, BusinessHomeHeaderSkeleton, BusinessSwitcher, H,
 } from '@/components/business/home/BusinessHomeHeader';
 import { BusinessWeekCard } from '@/components/business/home/BusinessWeekCard';
+import { BusinessDoNextCard } from '@/components/business/home/BusinessDoNextCard';
 
 /**
  * CB66 — Business home. One selected business and its header; below it the
@@ -150,6 +151,8 @@ const MyBusinessesPage = () => {
                   businessId={selected.business.id}
                   name={selected.business.name}
                 />
+                {/* CB68 — Section 3: Do next, directly under This week; absent when empty. */}
+                <BusinessDoNextCard key={`donext-${selected.business.id}`} membership={selected} />
                 <div className="pb-8">
                   <BusinessCommandCard
                     key={selected.business.id}
