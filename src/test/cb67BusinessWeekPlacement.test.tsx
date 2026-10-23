@@ -54,4 +54,13 @@ describe('CB67 placement', () => {
     expect(body.querySelector('[style*="grid-template-columns: repeat(3"]')).toBeNull();
     expect(rpc).toHaveBeenCalledWith('get_business_week', { p_business_id: 'b1' });
   });
+
+  it('renders the real header with the card as its immediate next sibling', () => {
+    rpc.mockReturnValue(new Promise(() => {}));
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const { container } = render(<QueryClientProvider client={qc}><MemoryRouter><MyBusinessesPage /></MemoryRouter></QueryClientProvider>);
+    const header = container.querySelector('[data-business-header]') as HTMLElement;
+    expect(header).not.toBeNull();
+    expect(header.nextElementSibling?.hasAttribute('data-business-week')).toBe(true);
+  });
 });
