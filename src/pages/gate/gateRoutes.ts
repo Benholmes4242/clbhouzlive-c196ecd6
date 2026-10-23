@@ -33,7 +33,8 @@ export type GateState =
 const EXEMPT_PREFIXES = ['/post/', '/tour/news', '/discover/news', '/privacy', '/terms', '/legal/', '/go/', '/get'];
 
 export function isGateExemptPath(pathname: string): boolean {
-  return EXEMPT_PREFIXES.some((p) => pathname === p || pathname.startsWith(p));
+  // The public deletion instructions are an exact route, not an app entrypoint.
+  return pathname === '/delete-account' || EXEMPT_PREFIXES.some((p) => pathname === p || pathname.startsWith(p));
 }
 
 export function resolveGateState(pathname: string): GateState {

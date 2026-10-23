@@ -1,0 +1,21 @@
+{
+  "title": "Delete your clbhouz account",
+  "intro": "clbhouz is run by CLBHOUZ LTD. You can delete your account and personal data at any time.",
+  "inApp": {
+    "title": "In the app",
+    "body": "Open clbhouz, go to your profile, open the three-dot menu, tap Settings, then under Account Actions tap Delete Account. Confirm, and your account is deleted straight away."
+  },
+  "withoutApp": {
+    "title": "Without the app",
+    "body": "Email support@clbhouz.co.uk from the email address on your account with the subject Delete my account. We will delete it within 30 days and confirm by email."
+  },
+  "deleted": {
+    "title": "What is deleted",
+    "body": "Your profile, posts, photos and videos, reviews and ratings, comments and likes, follows, your connected handicap and its rounds, and your notification settings."
+  },
+  "kept": {
+    "title": "What is kept",
+    "body": "Messages you sent stay in the other person's conversation but are shown as from Deleted member, with your name and photo removed. We may keep limited records where the law requires it."
+  },
+  "privacyLink": "Privacy policy"
+}
