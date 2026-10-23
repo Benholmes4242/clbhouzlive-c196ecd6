@@ -50,8 +50,9 @@ export function MaintenanceGate({ children }: { children: ReactNode }) {
   // Normal operation: one lightweight query per minute, no role check.
   if (!on) return <>{children}</>;
 
-  // Sign-in must stay reachable or admins cannot get in.
-  if (isAuthRoute(pathname)) return <>{children}</>;
+  // Sign-in and public deletion instructions must stay reachable. Existing
+  // privacy/terms maintenance behaviour is deliberately unchanged.
+  if (isAuthRoute(pathname) || pathname === '/delete-account') return <>{children}</>;
 
   return <WalledBranch message={message}>{children}</WalledBranch>;
 }

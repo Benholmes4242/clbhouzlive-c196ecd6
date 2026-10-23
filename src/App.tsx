@@ -438,6 +438,7 @@ const JoinLandingPage = lazy(() => import("./pages/public/JoinLandingPage"));
 const InviteLandingPage = lazy(() => import("./pages/public/InviteLandingPage"));
 const GetAppPage = lazy(() => import("./pages/public/GetAppPage"));
 const PrivacyPolicyPage = lazy(() => import("./pages/legal/PrivacyPolicyPage"));
+const DeleteAccountPage = lazy(() => import("./pages/legal/DeleteAccountPage"));
 const HandoffPage = lazy(() => import("./pages/gate/HandoffPage"));
 const TermsPage = lazy(() => import("./pages/legal/TermsPage"));
 const LegalDocumentPage = lazy(() => import("./pages/legal/LegalDocumentPage"));
@@ -785,6 +786,7 @@ function AppRoutes() {
         {/* Email handoff doormat. Exempt from the web gate; see gateRoutes.ts. */}
         <Route path="/go/:target" element={<Suspense fallback={null}><HandoffPage /></Suspense>} />
         <Route path="/privacy" element={<Suspense fallback={<GenericPageSkeleton />}><PrivacyPolicyPage /></Suspense>} />
+        <Route path="/delete-account" element={<Suspense fallback={<GenericPageSkeleton />}><DeleteAccountPage /></Suspense>} />
         <Route path="/terms" element={<Suspense fallback={<GenericPageSkeleton />}><TermsPage /></Suspense>} />
         <Route path="/legal/:slug" element={<Suspense fallback={<GenericPageSkeleton />}><LegalDocumentPage /></Suspense>} />
 
