@@ -21,7 +21,7 @@ export function ScoreWithToPar({ score, par, kind, fontSize, tone, lineHeight = 
   return (
     <span className="tabular-nums" style={{ lineHeight, fontSize, fontWeight, color: tone ?? (kind === 'net' ? A.INK : A.FAINT) }}>
       {scoreHandle ? <span data-board-main={scoreHandle === 'main' ? '' : undefined} data-board-secondary={scoreHandle === 'secondary' ? '' : undefined}>{figure}</span> : figure}
-      <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.01em', marginLeft: 3, color: under ? A.RED : A.DIM, lineHeight: 1 }}>{score == null || par == null ? '' : fmtToPar(score - par)}</span>
+      <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.01em', marginLeft: 3, color: under ? A.RED : A.DIM, lineHeight: 1 }}>{score == null || par == null ? '' : fmtToPar(score - par)}</span>
     </span>
   );
 }

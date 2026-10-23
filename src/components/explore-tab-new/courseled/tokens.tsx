@@ -29,8 +29,12 @@ export const LABEL: React.CSSProperties = { ...LABEL_LEGACY, fontWeight: 700, co
 
 export const GOLD = '#D8A93C';
 
-/** CHIP1.3 — a competition round. Not amber (the viewer) and not gold (a rare feat). */
-export const COMPETITION = '#9CB49A';
+/**
+ * CHIP1.3 — a competition round. Deliberately neutral grey (A.MUTE): a
+ * competition is a category, not a result, so it must not use a green. Not
+ * amber (the viewer) and not gold (a rare feat).
+ */
+export const COMPETITION = A.MUTE;
 
 /**
  * METAL SEMANTICS (BRIEF_BAND_TILES_PODIUM §0).
