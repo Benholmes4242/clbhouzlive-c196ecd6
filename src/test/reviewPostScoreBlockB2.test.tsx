@@ -63,9 +63,9 @@ describe('review post score block B2', () => {
     expect(element('[data-category="clubhouse"] [data-category-label]').querySelector('[data-label-prefix]')).toBeNull();
     expect(element('[data-category="facilities"] [data-category-label]').querySelector('[data-label-prefix]')).toBeNull();
   });
-  it('keeps a two-column grid with green 9.5 and muted 8.9 figures', () => {
+  it('keeps a four-track grid with green 9.5 and muted 8.9 figures', () => {
     const { element } = card(9);
-    expect(element('[data-review-categories]').style.gridTemplateColumns).toBe('repeat(2, minmax(0, 1fr))');
+    expect(element('[data-review-categories]').style.gridTemplateColumns).toBe('auto minmax(0, 1fr) auto minmax(0, 1fr)');
     expect(element('[data-category="condition"] [data-category-figure]').style.color).toBe(rgb(courseSubScoreTone(9.5)));
     expect(element('[data-category="design"] [data-category-figure]').style.color).toBe(rgb(courseSubScoreTone(8.9)));
   });
