@@ -25,6 +25,7 @@
  * ```
  */
 
+import { imageUploadFileName } from '@/lib/media/imageUploadName';
 import { useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
@@ -359,7 +360,8 @@ export function useMediaUpload(): UseMediaUploadReturn {
       // Prepare form data
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('fileName', file.name);
+      // CB71: never send a name without a real image extension.
+      formData.append('fileName', imageUploadFileName(file, file.name || `${Date.now()}`));
       formData.append('bucketType', options?.bucketType || 'clbhouz-post-images');
 
       // Upload with progress tracking
