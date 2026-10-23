@@ -54,6 +54,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
+import { shareBusinessProfile, withShareSource } from '@/lib/business/shareBusinessProfile';
 import { ReportSheet } from '@/components/moderation/ReportSheet';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
 import { supabase } from '@/integrations/supabase/client';
@@ -276,21 +277,9 @@ const BusinessProfilePage: React.FC = () => {
       isFollowing,
     });
   };
-  const buildShareUrl = () => {
-    const u = new URL(window.location.href);
-    u.searchParams.set('src', 'share');
-    return u.toString();
-  };
-  const handleShare = async () => {
-    const url = buildShareUrl();
-    if (business?.id) trackBusinessAction(business.id, 'share_profile', user?.id);
-    if (navigator.share) {
-      try { await navigator.share({ title: business?.name, url }); } catch { /* user cancelled share */ }
-    } else {
-      await navigator.clipboard.writeText(url);
-      toast.success('Copied to clipboard');
-    }
-  };
+  const buildShareUrl = () => withShareSource(window.location.href);
+  const handleShare = () =>
+    shareBusinessProfile({ businessId: business?.id, name: business?.name, url: buildShareUrl(), userId: user?.id });
   const handleCopyLink = async () => {
     await navigator.clipboard.writeText(buildShareUrl());
     toast.success('Copied to clipboard');
