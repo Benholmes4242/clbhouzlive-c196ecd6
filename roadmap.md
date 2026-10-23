@@ -5,6 +5,7 @@
 - [ ] Move member Course/Profile actions to shared player-row buttons and inert swipe preview; preserve tour foot, Share, navigation and frozen head details.
 - [ ] Retarget only authorized review navigation/footer assertions; add requested regressions, run full suite and check harness diagnostics.
 - [ ] Measure before/after rows and feet at390px, long-name fit and hit targets; report remaining consumers and live verification limitations.
+- [x] Implemented doors and authorized review selectors; `bunx vitest run`: 2,289 passed /306 files /0 failures (+9 solely cb61SheetDoors.test.tsx). Targeted35/3 green; no pre-existing failures. STOP: harness reports TS2741 at new fixture lines68,74 (missing rating),79 (missing user.id); no corrective edit made. Measurements/live verification unfinished; report CB61_stop_report.md names all retargets/errors. External-managed authentication also prevents signed-in end-to-end verification.
 
 ## CB58 — Leaders' group
 - [x] Read brief/mock and audited source before building: round advances by scored/live participation or course-local date, not last card/first tee; IDs share sr_players.id. Baseline bunx vitest run: 2,233/303, no pre-existing failures. Git pull skipped because workspace Git is managed.
