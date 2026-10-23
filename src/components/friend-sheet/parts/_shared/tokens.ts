@@ -20,7 +20,7 @@ export const LINE_2 = 'rgba(255,255,255,0.08)';      // hairline (same)
 export const AMBER = '#F7931E';
 export const AMBER_TINT = 'rgba(247,147,30,0.10)';
 export const GOLD = '#F7931E';                       // legacy alias — now amber
-export const GREEN = '#34D399';
+export const GREEN = '#2FA35A';
 export const RED = '#EF4444';
 
 export const FONT =

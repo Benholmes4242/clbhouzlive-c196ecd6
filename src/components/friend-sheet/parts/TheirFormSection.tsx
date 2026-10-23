@@ -38,11 +38,11 @@ export const TheirFormSection: React.FC<Props> = ({ handicap }) => {
 
   // Falling handicap = improving = green; rising handicap = declining = red.
   const chipBg = isImproving
-    ? 'rgba(52,211,153,0.12)'
+    ? 'rgba(47,163,90,0.12)'
     : isDeclining
       ? 'rgba(239,68,68,0.12)'
       : BG_2;
-  const chipColor = isImproving ? '#34D399' : isDeclining ? '#EF4444' : T60;
+  const chipColor = isImproving ? '#2FA35A' : isDeclining ? '#EF4444' : T60;
 
   return (
     <div style={{ padding: '4px 20px 14px', fontFamily: FONT }}>

@@ -57,7 +57,7 @@ const CHIPS: Array<{ key: ChipKey; label: string; filter: BusinessReviewFilter; 
 /* Rating figures follow the canonical display tone; the wash stays structural. */
 function ratingTone(rating: number): { bg: string; fg: string } {
   const fg = courseSubScoreTone(rating);
-  if (rating >= 9) return { bg: 'rgba(52,211,153,0.16)', fg };
+  if (rating >= 9) return { bg: 'rgba(47,163,90,0.16)', fg };
   if (rating >= 5) return { bg: AMBER_SOFT, fg };
   return { bg: 'rgba(255,107,107,0.16)', fg };
 }

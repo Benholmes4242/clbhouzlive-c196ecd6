@@ -65,7 +65,7 @@ export const A = {
   /**
    * The analytical green IS the score-band dark green (BRIEF_ONE_GREEN). One
    * green app-wide: do NOT re-fork this into a local hex. #34D77F was a
-   * near-miss of #34D399 and was visible wherever the two met.
+   * near-miss of #2FA35A (tournament green, BRIEF_TOURNAMENT_GREEN; was #34D399) and was visible wherever the two met.
    */
   GREEN: BAND_GREEN_DARK,
   /**

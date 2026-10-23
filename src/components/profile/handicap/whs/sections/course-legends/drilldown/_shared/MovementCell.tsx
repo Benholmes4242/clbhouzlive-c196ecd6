@@ -4,7 +4,7 @@ import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 /**
  * Movement glyph rendered between the name block and the score in
  * champion boards. Compete-tab language:
- *   climbed  → ▲n  in emerald  (light #059669 · dark #34D399)
+ *   climbed  → ▲n  in emerald  (light #059669 · dark #2FA35A)
  *   dropped  → ▼n  in RED      (INDEX_DELTA drifted: light #C8372B · dark #F87171)
  *   unchanged → em-dash in faint slate/white (0.30)
  *   absent from 30d board → nothing (name-side NEW badge covers it)
@@ -41,7 +41,7 @@ export const MovementCell: React.FC<Props> = ({
   size = 'row',
 }) => {
   const isLight = theme === 'light';
-  const climbed = isLight ? '#059669' : '#34D399';
+  const climbed = isLight ? '#059669' : '#2FA35A';
   const dropped = isLight ? INDEX_DELTA.light.drifted : INDEX_DELTA.dark.drifted;
   const dash    = isLight ? 'rgba(15,23,42,0.30)' : 'rgba(255,255,255,0.30)';
 

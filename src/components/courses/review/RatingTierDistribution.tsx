@@ -55,7 +55,7 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
     <div data-distribution className="grid items-center gap-x-2 gap-y-2" style={{ gridTemplateColumns: 'max-content 1fr 24px' }}>
       {distributionItems.map((item) => {
         const percentage = (item.count / denominator) * 100;
-        const bandFill = sample ? (item.key === activeTier ? A.IMPROVED : A.MUTE) : reviewTierColor(item.key as RatingTier, 'dark');
+        const bandFill = sample ? (item.key === activeTier ? (item.key === 'EXCEPTIONAL' ? A.GREEN : A.IMPROVED) : A.MUTE) : reviewTierColor(item.key as RatingTier, 'dark');
 
         return (
           <React.Fragment key={item.key}>

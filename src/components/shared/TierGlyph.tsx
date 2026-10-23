@@ -134,7 +134,7 @@ export function TierGlyph({ tierKey, color, size = 24, strokeWidth = 1.7 }: Prop
 export const TIER_COLOR_DARK = {
   achieved: 'rgba(241,245,249,0.88)',
   locked: 'rgba(241,245,249,0.28)',
-  current: '#34D399',
+  current: '#2FA35A',
   goat: '#F7931E',
 } as const;
 
@@ -142,7 +142,7 @@ export const TIER_COLOR_DARK = {
 export const TIER_COLOR_LIGHT = {
   achieved: '#0F172A',
   locked: 'rgba(15,23,42,0.25)',
-  current: '#34D399',
+  current: '#2FA35A',
   goat: '#F7931E',
 } as const;
 
