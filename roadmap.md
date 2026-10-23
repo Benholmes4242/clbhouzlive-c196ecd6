@@ -1,11 +1,11 @@
 # Roadmap
 
 ## CB61 — Player-row sheet doors
-- [ ] CB61.1: reproduce exact application type errors, fix only authorized fixtures without changing assertions, rerun full suite and finish controlled390px row/foot/long-name/hit-target measurements. Git pull remains prohibited by platform-managed Git.
+- [x] CB61.1: reproduced all three TS2741 errors using `bunx tsgo --noEmit -p tsconfig.app.json`; root command exits0 but files[] is empty. Fixed only rating9.6, empty courseId and empty user.id in cb61SheetDoors.test.tsx; all names/assertions unchanged. Root/application typecheck exits0; full `bunx vitest run` 2,289/306/0 unchanged; harness build OK. Controlled390×844 before/after rows and feet, long-name ellipsis and30px doors/44px hit targets measured; report /mnt/documents/CB61.1_report.md. No pre-existing test failures; three pre-existing fixture type errors cleared. Git pull skipped because workspace Git is platform-managed.
 - [x] Read signed-off option A; full baseline `bunx vitest run`: 2,280 passed /305 files /0 failures, matching CB60. Git pull skipped because Git is platform-managed.
-- [ ] Move member Course/Profile actions to shared player-row buttons and inert swipe preview; preserve tour foot, Share, navigation and frozen head details.
-- [ ] Retarget only authorized review navigation/footer assertions; add requested regressions, run full suite and check harness diagnostics.
-- [ ] Measure before/after rows and feet at390px, long-name fit and hit targets; report remaining consumers and live verification limitations.
+- [x] Move member Course/Profile actions to shared player-row buttons and inert swipe preview; preserve tour foot, Share, navigation and frozen head details.
+- [x] Retarget only authorized review navigation/footer assertions; add requested regressions, run full suite and check harness diagnostics.
+- [x] Measure before/after rows and feet at390px, long-name fit and hit targets; controlled measurements completed in CB61.1. Authenticated real-member navigation remains unavailable with external-managed authentication, not claimed verified.
 - [x] Implemented doors and authorized review selectors; `bunx vitest run`: 2,289 passed /306 files /0 failures (+9 solely cb61SheetDoors.test.tsx). Targeted35/3 green; no pre-existing failures. STOP: harness reports TS2741 at new fixture lines68,74 (missing rating),79 (missing user.id); no corrective edit made. Measurements/live verification unfinished; report CB61_stop_report.md names all retargets/errors. External-managed authentication also prevents signed-in end-to-end verification.
 
 ## CB58 — Leaders' group
