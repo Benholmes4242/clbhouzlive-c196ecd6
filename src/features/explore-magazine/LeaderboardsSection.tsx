@@ -50,7 +50,10 @@ export function LeaderboardsSection({ state, viewerId, onRowPress, onSeeAll }: {
               onClick={() => { if (!selected) state.changeBoard(key); }}
               style={{ flexShrink: 0, height: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0,
                 padding: '7px 11px 8px', borderRadius: 13, boxSizing: 'border-box', fontFamily: SANS, whiteSpace: 'nowrap',
-                background: 'transparent', border: `1px solid var(${selected ? '--leaderboard-selected-border' : '--leaderboard-rest-border'})` }}>
+                /* The boards' tiles take the canonical filled-selection ground:
+                   selected = 6% white fill with the bright edge, rest = hairline. */
+                background: selected ? APPLIED_FILL : 'transparent',
+                border: `1px solid ${selected ? SELECTED_EDGE : A.BORDER}` }}>
               <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.11em', textTransform: 'uppercase', lineHeight: '11px', color: selected ? A.INK : A.MUTE }}>
                 {t(BOARD_LABELS[key].i18n, { defaultValue: BOARD_LABELS[key].label })}
               </span>
