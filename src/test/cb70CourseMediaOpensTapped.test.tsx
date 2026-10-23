@@ -40,6 +40,11 @@ function renderGrid() {
   );
 }
 
+function tap(el: Element) {
+  fireEvent.pointerDown(el, { pointerId: 1, clientX: 5, clientY: 5, button: 0, isPrimary: true });
+  fireEvent.pointerUp(el, { pointerId: 1, clientX: 5, clientY: 5, button: 0, isPrimary: true });
+}
+
 const openedMediaId = () => {
   const s = useFullscreenFeedStore.getState();
   return s.posts[s.startIndex]?.mediaItems[0]?.id;
@@ -54,7 +59,7 @@ describe('CB70 course media opens the tapped photo', () => {
   it('tapping the second photo of a post opens the second photo, not the first', () => {
     const { container } = renderGrid();
     const tiles = container.querySelectorAll('[data-watch-tile-index]');
-    fireEvent.click(tiles[1]);
+    tap(tiles[1]);
     const s = useFullscreenFeedStore.getState();
     expect(s.isOpen).toBe(true);
     expect(s.startIndex).toBe(1);
@@ -64,7 +69,7 @@ describe('CB70 course media opens the tapped photo', () => {
 
   it('swiping on from the opened photo reaches the next tile in grid order', () => {
     const { container } = renderGrid();
-    fireEvent.click(container.querySelectorAll('[data-watch-tile-index]')[0]);
+    tap(container.querySelectorAll('[data-watch-tile-index]')[0]);
     const s = useFullscreenFeedStore.getState();
     expect(s.posts.map((p) => p.mediaItems[0].id)).toEqual(['a1', 'a2', 'b1']);
     expect(s.posts[s.startIndex + 1].mediaItems[0].id).toBe('a2');
