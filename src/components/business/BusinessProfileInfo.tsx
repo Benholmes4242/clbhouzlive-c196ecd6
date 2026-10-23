@@ -9,6 +9,7 @@ import { openExternalUrl } from '@/utils/median/openExternalUrl';
 import { trackBusinessAction } from '@/lib/businessAnalyticsTracking';
 import { useNearestCourse } from '@/hooks/useNearestCourse';
 import { formatDistanceKm } from '@/utils/formatDistance';
+import { displaysOpeningHours } from '@/lib/business/openingHours';
 
 const HOSPITALITY_CATEGORIES = new Set<string>([
   'Hotel / Accommodation',
@@ -166,14 +167,10 @@ export function BusinessProfileInfo({ business, userId }: BusinessProfileInfoPro
   };
   const hasContact = !!(business.phone || business.email || business.website);
 
-  // Opening hours: respect show_opening_hours AND must have >=1 non-empty day
+  // Opening hours: respect show_opening_hours AND must have >=1 non-empty day.
+  // Shared rule — business home completeness (CB68) counts by the same one.
   const oh = business.opening_hours || {};
-  const ohTyped = oh as Record<string, { open?: string; close?: string; closed?: boolean } | undefined>;
-  const ohHasContent = DAY_KEYS.some((k) => {
-    const h = ohTyped[k];
-    return !!h && (h.closed === true || (!!h.open && !!h.close));
-  });
-  const showOpeningHours = business.show_opening_hours === true && ohHasContent;
+  const showOpeningHours = displaysOpeningHours(business);
 
   // Location
   const shortLocation =
