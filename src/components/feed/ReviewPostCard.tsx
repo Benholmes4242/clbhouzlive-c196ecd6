@@ -158,7 +158,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         </div>
       </div>
 
-      {/* D — Sizes match the course card score block (BRIEF_COURSE_CARD_SCORE_BLOCK option B): overall 24, labels 11, figures 13, gaps 14 / 16 / 8. Each half drops independently. */}
+      {/* D — Sizes match the course card score block (BRIEF_COURSE_CARD_SCORE_BLOCK option B): overall 24, labels 12 (the location line's treatment, BRIEF_REVIEW_POST_CATEGORY_LABELS), figures 13, gaps 14 / 16 / 8. Each half drops independently. */}
       {rating != null || anyScore ? (
         <div data-review-score-block style={{ flex: 'none', padding: `0 ${GUTTER}px 14px`, display: 'flex', alignItems: 'center', gap: 14 }}>
         {rating != null ? (
