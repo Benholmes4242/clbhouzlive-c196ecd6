@@ -10,6 +10,8 @@ const DeleteAccountPage: React.FC = () => {
   const { t } = useTranslation('deleteAccount', { lng: 'en', useSuspense: true });
 
   return (
+    <div data-delete-account-page>
+    <style>{`[data-delete-account-page] [data-fixed-page-header] h1 { white-space: normal; line-height: 1.15; letter-spacing: 0; }`}</style>
     <ManagePageShell title={t('title')}>
       <div className="px-4 pt-4 pb-16">
         <main
@@ -33,6 +35,7 @@ const DeleteAccountPage: React.FC = () => {
         </main>
       </div>
     </ManagePageShell>
+    </div>
   );
 };
 

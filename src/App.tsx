@@ -235,7 +235,8 @@ const RootGate: React.FC = () => {
  *  the AppDownloadGate on cold web loads. */
 const AppShellOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const envStatus = useEnvStatus();
-  if (!isAppShellVisible(envStatus)) return null;
+  const { pathname } = useLocation();
+  if (pathname === '/delete-account' || !isAppShellVisible(envStatus)) return null;
   return <>{children}</>;
 };
 
