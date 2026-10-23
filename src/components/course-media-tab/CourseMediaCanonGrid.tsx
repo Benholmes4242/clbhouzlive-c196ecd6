@@ -164,15 +164,13 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
     });
   }, [isViewerOwnedHere, hasNextPage, isFetchingNextPage, setPaginationState]);
 
-  const groupedForViewer = useMemo(
-    () => postsForFullscreen ?? groupMultiMedia(posts),
-    [postsForFullscreen, posts],
-  );
-
+  // CB70: the viewer opens on the FLAT tile list (one slide per tile, grid
+  // order), so later pages append flat too — a grouped append would mix
+  // carousels into a per-photo swipe and skip or repeat photos.
   useEffect(() => {
     if (!isViewerOwnedHere) return;
-    useFullscreenFeedStore.getState().appendPosts(groupedForViewer);
-  }, [isViewerOwnedHere, groupedForViewer]);
+    useFullscreenFeedStore.getState().appendPosts(posts);
+  }, [isViewerOwnedHere, posts]);
 
   const cardRows = useMemo(() => posts.map(toFeedCardRow), [posts]);
 
