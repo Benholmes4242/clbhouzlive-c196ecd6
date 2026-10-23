@@ -29,10 +29,7 @@ vi.mock('@/hooks/useBusinessVerificationRequest', async () => {
 vi.mock('@/hooks/useBusinessCourseClaim', () => ({
   useBusinessCourseClaim: (id: string) => ({ data: state.claim[id] ?? null, isLoading: false }),
 }));
-vi.mock('@/components/business/BusinessCommandCard', () => ({
-  BusinessCommandCard: ({ membership }: { membership: BusinessMembership }) => <div data-body-for={membership.business.id} />,
-}));
-vi.mock('@/components/business/home/BusinessWeekCard', () => ({ BusinessWeekCard: () => null })); // Header tests render the page without a QueryClient; the card has its own tests: cb67BusinessWeek.test.tsx and cb67BusinessWeekPlacement.test.tsx.
+vi.mock('@/components/business/home/BusinessHomeSections', () => ({ BusinessHomeSections: () => null })); // Each section is tested in its own files: cb67BusinessWeek.test.tsx, cb67BusinessWeekPlacement.test.tsx, cb68DoNext.test.tsx, cb68DoNextPlacement.test.tsx.
 vi.mock('@/components/business/ClaimYourCourseSheet', () => ({
   ClaimYourCourseSheet: ({ open }: { open: boolean }) => (open ? <div data-claim-sheet="" /> : null),
 }));
