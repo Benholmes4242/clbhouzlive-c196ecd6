@@ -9,7 +9,7 @@ import { BusinessCommandCard } from '@/components/business/BusinessCommandCard';
 import { BusinessWeekCard } from './BusinessWeekCard';
 import { BusinessDoNextCard } from './BusinessDoNextCard';
 
-export function BusinessHomeSections({ membership, userId }: { membership: BusinessMembership; userId: string | undefined }) {
+export function BusinessHomeSections({ membership, userId }: { membership: BusinessMembership; userId: string }) {
   const id = membership.business.id;
   return (
     <>

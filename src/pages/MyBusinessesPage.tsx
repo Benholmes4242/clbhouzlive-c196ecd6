@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyBusinesses, type BusinessMembership } from '@/hooks/useMyBusinesses';
-import { BusinessCommandCard } from '@/components/business/BusinessCommandCard';
 import { BusinessEmptyState } from '@/components/business/BusinessEmptyState';
 import { DeleteBusinessDialog } from '@/components/business/DeleteBusinessDialog';
 import { useActiveActor } from '@/context/ActiveActorContext';
