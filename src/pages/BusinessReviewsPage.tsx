@@ -4,7 +4,7 @@ import { RailChips, APPLIED_FILL } from '@/components/ui/RailChips';
 import { formatHcp } from '@/lib/formatHcp';
 import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 import { TITLE, FIGURE } from '@/lib/tokens/type';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MessageSquare, Star, X, Edit3, Trash2, Sparkles } from 'lucide-react';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -449,7 +449,9 @@ export default function BusinessReviewsPage() {
   const canManage = !!membership?.canManage;
   const { data: businessProfile, isLoading: profileLoading } = useBusinessProfile(businessId);
 
-  const [chip, setChip] = useState<ChipKey>('all');
+  // CB68 — `?filter=unreplied` opens on the existing Awaiting reply chip.
+  const [searchParams] = useSearchParams();
+  const [chip, setChip] = useState<ChipKey>(() => (searchParams.get('filter') === 'unreplied' ? 'unreplied' : 'all'));
   const active = CHIPS.find((c) => c.key === chip)!;
   // Course scope is independent of the filter chip: neither resets the other.
   const [courseId, setCourseId] = useState<string | null>(null);
