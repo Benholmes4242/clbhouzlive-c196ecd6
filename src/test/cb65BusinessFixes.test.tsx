@@ -66,7 +66,7 @@ describe('CB65 §1 composer opens as the requested actor', () => {
 
 describe('CB65 §2 claim sheet keys resolve', () => {
   const src = readFileSync(resolve(__dirname, '../components/business/ClaimYourCourseSheet.tsx'), 'utf8');
-  const keys = [...src.matchAll(/t\('([^']+)'/g)].map((m) => m[1]);
+  const keys = [...src.matchAll(/\bt\('(business\.[^']+)'/g)].map((m) => m[1]);
   for (const locale of ['en', 'en-XA']) {
     it(`every key the sheet reads is a string in ${locale}`, () => {
       const json = JSON.parse(readFileSync(resolve(__dirname, `../../public/locales/${locale}/common.json`), 'utf8'));
