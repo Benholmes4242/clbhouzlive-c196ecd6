@@ -278,7 +278,17 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
     const intended: FeedPost | undefined = rawPosts[startIndex];
     if (!hasMedia(intended)) return; // never fall back to index 0
     const posts = rawPosts.filter(hasMedia);
-    startIndex = Math.max(0, posts.findIndex((p) => p.id === intended!.id));
+    // CB70: flat one-entry-per-media lists (Course → Media) repeat a post id
+    // per photo, so an id match alone collapses onto the post's FIRST photo.
+    // Prefer the exact entry, then id + tapped media id, then the id match.
+    let resolved = posts.indexOf(intended!);
+    if (resolved < 0 && options?.mediaId) {
+      resolved = posts.findIndex(
+        (p) => p.id === intended!.id && p.mediaItems?.[0]?.id === options.mediaId,
+      );
+    }
+    if (resolved < 0) resolved = posts.findIndex((p) => p.id === intended!.id);
+    startIndex = Math.max(0, resolved);
 
     const openingPost: any = posts[startIndex];
     const slidePostId: string | null = openingPost?.id ?? null;
@@ -568,9 +578,20 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   },
   appendPosts: (newPosts) => {
     set((s) => {
-      const existing = new Set(s.posts.map((p) => p.id));
+      // CB70: key on post id + first media id so a flat per-media list can
+      // append a later photo of a post already in the viewer. Grouped lists
+      // keep one key per post, exactly as before.
+      const keyOf = (p: FeedPost) => `${p.id}\u0000${p.mediaItems?.[0]?.id ?? ''}`;
+      const existingIds = new Set(s.posts.map((p) => p.id));
+      const existing = new Set(s.posts.map(keyOf));
       // Same media filter as open(): page two must not introduce blank slides.
-      const additions = newPosts.filter((p) => !existing.has(p.id) && hasMedia(p));
+      const additions = newPosts.filter((p) => {
+        if (!hasMedia(p) || existing.has(keyOf(p))) return false;
+        // A grouped entry for a post already shown flat would repeat photos.
+        if (existingIds.has(p.id) && (p.mediaItems?.length ?? 0) > 1) return false;
+        existing.add(keyOf(p));
+        return true;
+      });
       if (additions.length === 0) return s;
       return { posts: [...s.posts, ...additions] };
     });

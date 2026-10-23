@@ -725,23 +725,25 @@ export function SnapFeed({
     };
   }, [editorialCardKey, setIsTournamentCardActive]);
 
-  // Dev-only invariant: SnapFeed keys slides by post.id. Callers MUST pass a
-  // grouped-by-post array (apply groupMultiMedia upstream). If a duplicate id
-  // surfaces, surface it loudly so the buggy pipeline is fixed at its source
-  // rather than silently dropping media via a defensive dedup here.
+  // CB70: flat per-media lists repeat a post id per photo; duplicate React
+  // keys would reconcile sibling slides as one. Unique ids keep post.id.
+  const slideKeys = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const p of posts) counts.set(p.id, (counts.get(p.id) ?? 0) + 1);
+    return posts.map((p, i) =>
+      (counts.get(p.id) ?? 0) > 1 ? `${p.id}:${p.mediaItems?.[0]?.id ?? i}` : p.id,
+    );
+  }, [posts]);
+
+  // Dev-only invariant: slide keys (post.id, or post.id:mediaId for flat
+  // per-media lists such as Course → Media, CB70) must be unique. A repeat
+  // means the same media entry arrived twice — fix the pipeline upstream.
   if (process.env.NODE_ENV !== 'production') {
-    const ids = posts.map(p => p.id);
-    if (new Set(ids).size !== ids.length) {
+    if (new Set(slideKeys).size !== slideKeys.length) {
       // eslint-disable-next-line no-console
-      console.error(
-        '[SnapFeed] Ungrouped posts array received — caller must apply groupMultiMedia() before open(). Duplicate ids:',
-        ids,
-      );
+      console.error('[SnapFeed] Duplicate slide entries received. Keys:', slideKeys);
     }
   }
-
-
-
 
   return (
     <div
@@ -769,7 +771,7 @@ export function SnapFeed({
           const thumbnail = post.mediaItems?.[0]?.thumbnailUrl;
           return (
             <div
-              key={post.id}
+              key={slideKeys[idx]}
               ref={(el) => setSlideRef(idx, el)}
               data-index={idx}
               data-placeholder="virtual"
@@ -804,7 +806,7 @@ export function SnapFeed({
 
         return (
           <FeedSlide
-            key={post.id}
+            key={slideKeys[idx]}
             post={post}
             index={idx}
             setRef={getSlideRefCallback(idx)}

@@ -24,7 +24,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, AlertCircle } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { groupMultiMedia } from '@/components/media-system/utils/feedMapper';
 import { FeedCard, type FeedCardRow } from '@/components/feed-cards/FeedCard';
 import { packColumns } from '@/components/feed-cards/packColumns';
 import { useFullscreenFeedStore, useIsViewerOwnedBy } from '@/store/fullscreenFeedStore';
@@ -106,7 +105,7 @@ function SkeletonTile() {
 
 export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonGridProps>(({
   posts,
-  postsForFullscreen,
+  postsForFullscreen: _postsForFullscreen,
   isLoading,
   isError,
   hasNextPage,
@@ -164,15 +163,13 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
     });
   }, [isViewerOwnedHere, hasNextPage, isFetchingNextPage, setPaginationState]);
 
-  const groupedForViewer = useMemo(
-    () => postsForFullscreen ?? groupMultiMedia(posts),
-    [postsForFullscreen, posts],
-  );
-
+  // CB70: the viewer opens on the FLAT tile list (one slide per tile, grid
+  // order), so later pages append flat too — a grouped append would mix
+  // carousels into a per-photo swipe and skip or repeat photos.
   useEffect(() => {
     if (!isViewerOwnedHere) return;
-    useFullscreenFeedStore.getState().appendPosts(groupedForViewer);
-  }, [isViewerOwnedHere, groupedForViewer]);
+    useFullscreenFeedStore.getState().appendPosts(posts);
+  }, [isViewerOwnedHere, posts]);
 
   const cardRows = useMemo(() => posts.map(toFeedCardRow), [posts]);
 
