@@ -4,6 +4,8 @@ import { MemoryRouter } from 'react-router-dom';
 import i18next from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
 import courses from '../../public/locales/en/courses.json';
+import { APPLIED_FILL, SELECTED_EDGE } from '@/components/ui/RailChips';
+import { A } from '@/components/explore-tab-new/courseled/tokens';
 import { LeaderboardsSection, LEADERBOARD_BOARDS } from '@/features/explore-magazine/LeaderboardsSection';
 import { makeBoardState } from './factories/boardState';
 import type { BoardRow } from '@/components/explore-tab-new/courseled/hooks/useBoardPage';
@@ -88,5 +90,17 @@ describe('CB27 Leaderboards remount', () => {
     const { container } = draw(state);
     expect(Array.from(container.querySelectorAll('[data-board-tile-count]')).map((el) => Number(el.textContent))).toEqual([22, 14, 14, 4, 4, 3]);
     for (const board of LEADERBOARD_BOARDS) expect(state.facets.countFor).toHaveBeenCalledWith('board', board);
+  });
+  it('the active tile wears the canonical filled-selection ground, the rest the hairline', () => {
+    const { container } = draw();
+    const selected = container.querySelector('[data-leaderboard-board="net"]');
+    if (!(selected instanceof HTMLElement)) throw new Error('Missing selected board tile');
+    /* jsdom normalises the background shorthand's spacing, so assert its value. */
+    expect(selected.style.background).toBe('rgba(255, 255, 255, 0.06)');
+    expect(selected.style.border).toBe(`1px solid ${SELECTED_EDGE}`);
+    const resting = container.querySelector('[data-leaderboard-board="recent"]');
+    if (!(resting instanceof HTMLElement)) throw new Error('Missing resting board tile');
+    expect(resting.style.background).toBe('transparent');
+    expect(resting.style.border).toBe(`1px solid ${A.BORDER}`);
   });
 });
