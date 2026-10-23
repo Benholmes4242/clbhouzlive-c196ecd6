@@ -43,14 +43,14 @@ describe('review post score block B2', () => {
     expect(element('[data-review-score-col]').style.borderRightColor.replace(/\s/g, '')).toBe(rgb(A.TRACK).replace(/\s/g, ''));
     expect(element('[data-review-score-block]').style.gap).toBe('14px');
     expect(element('[data-review-score-col]').style.paddingRight).toBe('14px');
-    expect(element('[data-review-categories]').style.columnGap).toBe('16px');
+    expect(element('[data-review-categories]').style.gridTemplateColumns).toBe('auto minmax(0, 1fr) auto minmax(0, 1fr)');
     expect(element('[data-review-categories]').style.rowGap).toBe('8px');
     expect(element('[data-category-label]').style.fontSize).toBe('12px');
     expect(element('[data-category-label]').style.color).toBe(rgb(A.DIM));
     expect(element('[data-category-label]').style.minWidth).toBe('0');
     expect(element('[data-category-label]').style.textOverflow).toBe('ellipsis');
     expect(element('[data-category-figure]').style.fontSize).toBe('13px');
-    expect(element('[data-category-figure]').style.flexShrink).toBe('0');
+    expect(element('[data-category-figure]').style.textAlign).toBe('center');
   });
   it('prefixes design and condition with a hidable "Course" span and full aria-labels', () => {
     const { element } = card(9);

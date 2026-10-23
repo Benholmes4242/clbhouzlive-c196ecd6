@@ -186,23 +186,24 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         </div>
         ) : null}
         {anyScore ? (
-          <div data-review-categories style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 16, rowGap: 8, containerType: 'inline-size' }}>
+          <div data-review-categories style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: 'auto minmax(0, 1fr) auto minmax(0, 1fr)', columnGap: 0, rowGap: 8, alignItems: 'baseline', containerType: 'inline-size' }}>
             <style>{LABEL_PREFIX_QUERY}</style>
             {SCORE_ORDER.map((key) => {
               const value = scores[key];
               const label = SCORE_LABELS[key];
               const prefixed = PREFIXED_KEYS.has(key);
+              // Option B: display:contents wrapper so label and figure are direct grid cells.
               return (
-                <div key={key} data-category={key} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, minWidth: 0 }}>
+                <div key={key} data-category={key} style={{ display: 'contents' }}>
                   <span
                     data-category-label
                     aria-label={label}
-                    style={{ fontSize: 12, lineHeight: 1.2, color: A.DIM, flex: '1 1 auto', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                    style={{ fontSize: 12, lineHeight: 1.2, color: A.DIM, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                   >
                     {prefixed ? <span data-label-prefix>{LABEL_PREFIX}</span> : null}
                     {prefixed ? label.slice(LABEL_PREFIX.length) : label}
                   </span>
-                  <span data-category-figure data-category-score={value == null ? undefined : value.toFixed(1)} className="tabular-nums" style={{ ...FIGS, fontSize: 13, fontWeight: 700, flexShrink: 0, color: value == null ? A.DIM : courseSubScoreTone(value) }}>
+                  <span data-category-figure data-category-score={value == null ? undefined : value.toFixed(1)} className="tabular-nums" style={{ ...FIGS, fontSize: 13, fontWeight: 700, textAlign: 'center', paddingLeft: 8, paddingRight: 8, whiteSpace: 'nowrap', color: value == null ? A.DIM : courseSubScoreTone(value) }}>
                     {value == null ? '\u2014' : value.toFixed(1)}
                   </span>
                 </div>
