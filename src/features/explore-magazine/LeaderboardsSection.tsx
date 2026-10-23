@@ -8,6 +8,7 @@ import type { AmateurBoardState } from '@/features/amateur/useAmateurBoardState'
 import { GUTTER, Section, SeeAll } from './Section';
 import { useHeldFrame } from '@/components/explore-tab-new/courseled/useHeldFrame';
 import { HeldRows } from '@/components/explore-tab-new/courseled/HeldRows';
+import { APPLIED_FILL, SELECTED_EDGE } from '@/components/ui/RailChips';
 
 /** CB27: mount state.page and facets.countFor('board', key), never another read.
  * Shared rows own all figures and
