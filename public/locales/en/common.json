@@ -604,6 +604,64 @@
         "body": "Check your connection and try again.",
         "retry": "Try again"
       }
+    },
+    "doNext": {
+      "kicker": "Do next",
+      "actions": {
+        "review": "Review",
+        "reply": "Reply",
+        "post": "Post",
+        "add": "Add",
+        "finish": "Finish"
+      },
+      "team": {
+        "title_one": "{{count}} person asked to join your team",
+        "title_other": "{{count}} people asked to join your team",
+        "waiting": "Waiting since {{when}}.",
+        "since": {
+          "today": "today",
+          "yesterday": "yesterday",
+          "weekday": "{{day}}",
+          "date": "{{date}}"
+        }
+      },
+      "reviews": {
+        "title_one": "Reply to {{count}} review",
+        "title_other": "Reply to {{count}} reviews",
+        "sub": "Replies show on your course page."
+      },
+      "post": {
+        "title": "Post something this week",
+        "never": "You haven't posted as {{name}} yet.",
+        "quiet_one": "Nothing from {{name}} in {{count}} day.",
+        "quiet_other": "Nothing from {{name}} in {{count}} days.",
+        "followers_one": "Your {{count}} follower is the golfer most likely to see it.",
+        "followers_other": "Your {{count}} followers are the golfers most likely to see it."
+      },
+      "booking": {
+        "title": "Add a booking link",
+        "sub_one": "{{count}} tap through to your website this week. Send them straight to booking.",
+        "sub_other": "{{count}} taps through to your website this week. Send them straight to booking."
+      },
+      "profile": {
+        "title": "Finish your profile",
+        "sub": "{{done}} of {{total}} done. Missing: {{list}}.",
+        "list": {
+          "one": "{{a}}",
+          "two": "{{a}}, {{b}}",
+          "more_one": "{{a}}, {{b}} and {{count}} more",
+          "more_other": "{{a}}, {{b}} and {{count}} more"
+        },
+        "items": {
+          "logo": "logo",
+          "coverPhoto": "cover photo",
+          "description": "description",
+          "location": "location",
+          "contact": "contact details",
+          "social": "social links",
+          "openingHours": "opening hours"
+        }
+      }
     }
   },
   "handicap": {
