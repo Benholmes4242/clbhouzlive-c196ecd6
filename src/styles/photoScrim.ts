@@ -75,7 +75,7 @@ export const CHIP_GLASS: CSSProperties = {
                                  because BAND_GREEN / BAND_GREEN_DARK die on a
                                  bright sky.
 
-   THE CANVAS TOKENS (TOPAR_UNDER_DARK #E24B3F, BAND_GREEN_DARK #34D399) are
+   THE CANVAS TOKENS (TOPAR_UNDER_DARK #E24B3F, BAND_GREEN_DARK #2FA35A) are
    correct on the near-black canvas and must not be used on glass over photos.
 
    MEASURED LIMIT, REPORTED: over the brightest ground in the catalogue no

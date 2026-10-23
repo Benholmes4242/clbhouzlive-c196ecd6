@@ -58,7 +58,7 @@ const MyRatingsTierDivider: React.FC<MyRatingsTierDividerProps> = ({
                 fontSize: 11,
                 fontWeight: 700,
                 color: TIER_NAMES.includes(tierName)
-                  ? reviewTierColor(tierName as RatingTier, 'light')
+                  ? reviewTierColor(tierName as RatingTier, 'dark')
                   : INK_TERTIARY,
 
                 letterSpacing: '0.12em',

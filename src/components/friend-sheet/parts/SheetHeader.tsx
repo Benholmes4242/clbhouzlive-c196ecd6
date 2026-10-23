@@ -176,7 +176,7 @@ const Pill: React.FC<{ label: string; tone: 'friends' | 'whs' }> = ({
   const palette =
     tone === 'friends'
       ? {
-          bg: 'rgba(52,211,153,0.12)',
+          bg: 'rgba(47,163,90,0.12)',
           color: GREEN,
         }
       : {

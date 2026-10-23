@@ -333,4 +333,4 @@ export function ImageChip({
 /** The viewing member's own row, in both grammars and on the pinned copy. */
 export const SELF_ROW_TINT = 'rgba(247,147,30,0.07)';
 /** A cut on the index chip: A.GREEN's own hue at 35%. */
-export const INDEX_CUT_BORDER = 'rgba(52,211,153,0.35)';
+export const INDEX_CUT_BORDER = 'rgba(47,163,90,0.35)';

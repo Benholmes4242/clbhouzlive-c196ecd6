@@ -31,7 +31,7 @@ import { SC_FILL_BIRDIE_DK } from '@/features/courses/components/holes/_constant
 
 /** §2 — the verdict's two colours. Nothing else on the chart is coloured. */
 const HARDER = SC_FILL_BIRDIE_DK;
-const EASIER = '#34D399';
+const EASIER = '#2FA35A';
 const LINE_QUIET = 'rgba(255,255,255,0.13)';
 
 const GRID = '22px 14px 20px 1fr 26px';
