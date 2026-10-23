@@ -37,6 +37,7 @@
 // Emits the same pendingPostsStore/eventBus lifecycle the old orchestrator
 // did so feed pending cards + toasts remain unchanged.
 
+import { imageUploadFileName, assertSavableImageUrl } from '@/lib/media/imageUploadName';
 import { supabase } from '@/integrations/supabase/client';
 import { uploadEventBus } from '@/uploads/uploadEventBus';
 import { compressImage, COMPRESSION_PRESETS } from '@/uploads/imageCompression';
@@ -172,7 +173,7 @@ async function runImage(job: InternalJob, item: StageMediaItem, displayOrder: nu
   const result = await uploadToCloudflareR2(
     compressed.file,
     'clbhouz-post-images',
-    compressed.file.name,
+    imageUploadFileName(compressed.file, `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`),
     (bytesUploaded, bytesTotal) => {
       const pct = bytesTotal > 0 ? Math.round((bytesUploaded / bytesTotal) * 100) : 0;
       job.perFile[item.id] = pct;
@@ -192,6 +193,7 @@ async function runImage(job: InternalJob, item: StageMediaItem, displayOrder: nu
   if (!result.success || !result.publicUrl) {
     throw new Error(result.error || 'Image upload failed');
   }
+  assertSavableImageUrl(result.publicUrl, result.publicUrl);
   job.perFile[item.id] = 100;
   {
     const known = job.bytesById[item.id];
