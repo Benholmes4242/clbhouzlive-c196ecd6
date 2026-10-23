@@ -725,24 +725,6 @@ export function SnapFeed({
     };
   }, [editorialCardKey, setIsTournamentCardActive]);
 
-  // Dev-only invariant: SnapFeed keys slides by post.id. Callers MUST pass a
-  // grouped-by-post array (apply groupMultiMedia upstream). If a duplicate id
-  // surfaces, surface it loudly so the buggy pipeline is fixed at its source
-  // rather than silently dropping media via a defensive dedup here.
-  if (process.env.NODE_ENV !== 'production') {
-    const ids = posts.map(p => p.id);
-    if (new Set(ids).size !== ids.length) {
-      // eslint-disable-next-line no-console
-      console.error(
-        '[SnapFeed] Ungrouped posts array received — caller must apply groupMultiMedia() before open(). Duplicate ids:',
-        ids,
-      );
-    }
-  }
-
-
-
-
   // CB70: flat per-media lists repeat a post id per photo; duplicate React
   // keys would reconcile sibling slides as one. Unique ids keep post.id.
   const slideKeys = useMemo(() => {
@@ -752,6 +734,16 @@ export function SnapFeed({
       (counts.get(p.id) ?? 0) > 1 ? `${p.id}:${p.mediaItems?.[0]?.id ?? i}` : p.id,
     );
   }, [posts]);
+
+  // Dev-only invariant: slide keys (post.id, or post.id:mediaId for flat
+  // per-media lists such as Course → Media, CB70) must be unique. A repeat
+  // means the same media entry arrived twice — fix the pipeline upstream.
+  if (process.env.NODE_ENV !== 'production') {
+    if (new Set(slideKeys).size !== slideKeys.length) {
+      // eslint-disable-next-line no-console
+      console.error('[SnapFeed] Duplicate slide entries received. Keys:', slideKeys);
+    }
+  }
 
   return (
     <div
