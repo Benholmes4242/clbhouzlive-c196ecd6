@@ -769,7 +769,7 @@ export function SnapFeed({
           const thumbnail = post.mediaItems?.[0]?.thumbnailUrl;
           return (
             <div
-              key={post.id}
+              key={slideKeys[idx]}
               ref={(el) => setSlideRef(idx, el)}
               data-index={idx}
               data-placeholder="virtual"
@@ -804,7 +804,7 @@ export function SnapFeed({
 
         return (
           <FeedSlide
-            key={post.id}
+            key={slideKeys[idx]}
             post={post}
             index={idx}
             setRef={getSlideRefCallback(idx)}

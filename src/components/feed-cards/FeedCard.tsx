@@ -162,6 +162,10 @@ export function FeedCard({
       openedFrom,
       posts,
       index: flatIndex,
+      // CB70: the tapped tile's own media, so duplicate post ids in flat
+      // per-media lists can't open a sibling photo.
+      mediaId: feedPost.mediaItems[0]?.id ?? null,
+      mediaIndex: 0,
       originEl: rootRef.current as HTMLElement | null,
       posterUrl,
       railOwnerKey: ownerKey,
