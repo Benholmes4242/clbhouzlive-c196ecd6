@@ -1,4 +1,5 @@
 import React from 'react';
+import { CourseNameLink } from '@/components/shared/CourseNameLink';
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 import type { SubjectContext } from '@/components/sheets/SubjectContextLine';
 import { useTranslation } from 'react-i18next';
@@ -1024,12 +1025,14 @@ export function ExploreCard({
           style={{ display: 'flex', alignItems: 'baseline', gap: 10, minWidth: 0, marginTop: showScope ? 4 : 0 }}
         >
         {kickerPartsValue.course ? (
-          <span
-            data-explore-kicker-course="true"
+          <CourseNameLink
+            courseId={item.kind === 'review' ? item.subject?.course_id ?? null : null}
+            textProps={{ 'data-explore-kicker-course': 'true' }}
+            wrapperStyle={{ display: 'block', flex: '1 1 auto', minWidth: 0 }}
             style={{ display: 'block', flex: '1 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#FFFFFF' }}
           >
             {kickerPartsValue.course}
-          </span>
+          </CourseNameLink>
         ) : null}
         {!kickerPartsValue.course && kickerPartsValue.scope && size === 'pair' ? (
           <span
@@ -1333,15 +1336,17 @@ export function ExploreCard({
         ) : null}
         <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: 'auto', minWidth: 0, textAlign: 'right' }}>
           {kickerPartsValue.course ? (
-            <span
-              data-review-course-name="true"
+            <CourseNameLink
+              courseId={item.subject?.course_id ?? null}
+              textProps={{ 'data-review-course-name': 'true' }}
+              wrapperStyle={{ display: 'block', maxWidth: '100%', textAlign: 'right' }}
               style={{
                 maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 fontFamily: SANS, fontSize: 16, fontWeight: 700, color: '#FFFFFF', textShadow: HERO_TEXT_SHADOW,
               }}
             >
               {kickerPartsValue.course}
-            </span>
+            </CourseNameLink>
           ) : null}
           {reviewRegion ? (
             <span
@@ -1665,9 +1670,24 @@ export function ExploreCard({
     );
   }
 
+  // CB69 — a review card is a non-button tile (ReviewOverlayCore's pattern)
+  // so its course name can be a real button; other kinds are unchanged.
+  const reviewRoot = item.kind === 'review';
+  const Root: React.ElementType = reviewRoot ? 'div' : 'button';
+  const rootProps = reviewRoot
+    ? {
+        role: 'button',
+        tabIndex: 0,
+        onKeyDown: (e: React.KeyboardEvent) => {
+          if (e.target !== e.currentTarget || (e.key !== 'Enter' && e.key !== ' ')) return;
+          e.preventDefault();
+          onTap();
+        },
+      }
+    : { type: 'button' as const };
   return (
-    <button
-      type="button"
+    <Root
+      {...rootProps}
       onClick={onTap}
       style={{
         display: 'block',
@@ -1724,7 +1744,7 @@ export function ExploreCard({
           />
         </span>
       ) : null}
-    </button>
+    </Root>
   );
 }
 
