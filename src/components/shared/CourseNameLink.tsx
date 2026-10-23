@@ -59,21 +59,31 @@ export function CourseNameLink({
   onNavigate,
   ariaLabel,
 }: CourseNameLinkProps) {
-  const navigate = useNavigate();
   const Text = as;
-  const linked = !!courseId || !!onNavigate;
-
-  if (!linked) {
-    return <Text {...textProps} style={style}>{children}</Text>;
+  if (onNavigate) {
+    return <LinkButton go={onNavigate} {...{ children, style, textProps, as, wrapperStyle, onBeforeNavigate, ariaLabel }} />;
   }
+  if (courseId) {
+    return <RoutedLink courseId={courseId} {...{ children, style, textProps, as, wrapperStyle, onBeforeNavigate, ariaLabel }} />;
+  }
+  return <Text {...textProps} style={style}>{children}</Text>;
+}
 
+type ButtonProps = Omit<CourseNameLinkProps, 'courseId' | 'onNavigate'> & { go: () => void };
+
+function RoutedLink({ courseId, ...rest }: Omit<ButtonProps, 'go'> & { courseId: string }) {
+  const navigate = useNavigate();
+  return <LinkButton {...rest} go={() => navigate(`/courses/${courseId}`)} />;
+}
+
+function LinkButton({ go, children, style, textProps, as = 'span', wrapperStyle, onBeforeNavigate, ariaLabel }: ButtonProps) {
+  const Text = as;
   const stop = (e: React.SyntheticEvent) => e.stopPropagation();
   const open = (e: React.SyntheticEvent) => {
     e.stopPropagation();
     e.preventDefault();
     onBeforeNavigate?.();
-    if (onNavigate) onNavigate();
-    else navigate(`/courses/${courseId}`);
+    go();
   };
 
   return (
