@@ -2,6 +2,7 @@
 // Uploads media to R2 with drafts/ prefix for temporary storage
 // Handles both images (R2) and videos (Cloudflare Stream)
 
+import { imageUploadFileName, assertSavableImageUrl } from '@/lib/media/imageUploadName';
 import { supabase } from '@/integrations/supabase/client';
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
 import { uploadToCloudflareStream } from '@/utils/cloudflareStreamUpload';
@@ -59,14 +60,17 @@ export async function uploadDraftMediaFile(
       // Images go to R2 with drafts prefix in filename
       const timestamp = Date.now();
       const randomId = Math.random().toString(36).substring(2, 10);
-      const ext = file.name.split('.').pop() || 'jpg';
-      const fileName = `${DRAFTS_PATH_PREFIX}/${timestamp}-${randomId}.${ext}`;
+      const fileName = imageUploadFileName(file, `${DRAFTS_PATH_PREFIX}/${timestamp}-${randomId}`);
       
       const result = await uploadToCloudflareR2(file, DRAFTS_BUCKET_TYPE, fileName);
       if (!result.success || !result.publicUrl) {
         return { success: false, error: result.error || 'Image upload failed' };
       }
-      mediaUrl = result.publicUrl;
+      try {
+        mediaUrl = assertSavableImageUrl(result.publicUrl, result.publicUrl);
+      } catch (e) {
+        return { success: false, error: (e as Error).message };
+      }
     }
     
     // Store reference in database

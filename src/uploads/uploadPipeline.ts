@@ -8,6 +8,7 @@
 // Includes client-side image compression
 // Includes network awareness for offline handling
 
+import { imageUploadFileName, assertSavableImageUrl } from '@/lib/media/imageUploadName';
 import { supabase } from '@/integrations/supabase/client';
 import { uploadManager } from './UploadManager';
 import { uploadEventBus } from './uploadEventBus';
@@ -512,8 +513,6 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
 
       try {
         const fileName = `${Date.now()}-${index}-${Math.random().toString(36).substring(2, 15)}`;
-        const fileExtension = file.name.split('.').pop() || 'unknown';
-        const fullFileName = `${fileName}.${fileExtension}`;
 
         let publicUrl = '';
         const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
@@ -671,9 +670,9 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
             bytesTotal: fileToUpload.size,
           });
 
-          const result = await uploadToCloudflareR2(fileToUpload, 'clbhouz-post-images', fullFileName);
+          const result = await uploadToCloudflareR2(fileToUpload, 'clbhouz-post-images', imageUploadFileName(fileToUpload, fileName));
           if (result.success && result.publicUrl) {
-            publicUrl = result.publicUrl;
+            publicUrl = assertSavableImageUrl(result.publicUrl, result.publicUrl);
             
             // Emit complete progress
             uploadEventBus.emit('file:upload-progress', {
@@ -1113,8 +1112,6 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
 
     try {
       const fileName = `${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 15)}`;
-      const fileExtension = file.name.split('.').pop() || 'unknown';
-      const fullFileName = `${fileName}.${fileExtension}`;
       const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
 
       let publicUrl = '';
@@ -1184,9 +1181,9 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
           if (dims) { width = dims.width; height = dims.height; aspectRatioVal = dims.aspectRatio; orientation = dims.orientation; }
         }
         
-        const result = await uploadToCloudflareR2(fileToUpload, 'clbhouz-post-images', fullFileName);
+        const result = await uploadToCloudflareR2(fileToUpload, 'clbhouz-post-images', imageUploadFileName(fileToUpload, fileName));
         if (!result.success || !result.publicUrl) throw new Error(result.error || 'Image upload failed');
-        publicUrl = result.publicUrl;
+        publicUrl = assertSavableImageUrl(result.publicUrl, result.publicUrl);
       }
 
       // Get studio edits
@@ -1476,8 +1473,6 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
         });
         
         const fileName = `${Date.now()}-${index}-${Math.random().toString(36).substring(2, 15)}`;
-        const fileExtension = file.name.split('.').pop() || 'unknown';
-        const fullFileName = `${fileName}.${fileExtension}`;
         
         let publicUrl = '';
         const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
@@ -1631,11 +1626,11 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
           const result = await uploadToCloudflareR2(
             fileToUpload, 
             'clbhouz-review-images', // Different bucket than posts
-            fullFileName
+            imageUploadFileName(fileToUpload, fileName)
           );
           
           if (result.success && result.publicUrl) {
-            publicUrl = result.publicUrl;
+            publicUrl = assertSavableImageUrl(result.publicUrl, result.publicUrl);
             
             uploadEventBus.emit('file:upload-progress', {
               type: 'file:upload-progress',

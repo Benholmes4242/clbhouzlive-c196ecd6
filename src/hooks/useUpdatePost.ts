@@ -5,6 +5,7 @@
 // → fire-and-forget cleanup of the prior derivative). original_media_url
 // stays intact across recrops — it is the immutable source.
 
+import { imageUploadFileName, assertSavableImageUrl } from '@/lib/media/imageUploadName';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
@@ -130,10 +131,9 @@ export function useUpdatePost() {
           );
 
           for (const item of recropMedia) {
-            const ext = item.bakedFile.name.split('.').pop() || 'jpg';
-            const fileName = `${Date.now()}-recrop-${item.id}-${Math.random()
+            const fileName = imageUploadFileName(item.bakedFile, `${Date.now()}-recrop-${item.id}-${Math.random()
               .toString(36)
-              .slice(2, 10)}.${ext}`;
+              .slice(2, 10)}`);
             const up = await uploadToCloudflareR2(
               item.bakedFile,
               'clbhouz-post-images',
@@ -144,7 +144,7 @@ export function useUpdatePost() {
             }
             recropResults.push({
               id: item.id,
-              newUrl: up.publicUrl,
+              newUrl: assertSavableImageUrl(up.publicUrl, up.publicUrl),
               previousMediaUrl: item.previousMediaUrl,
             });
           }
@@ -188,11 +188,9 @@ export function useUpdatePost() {
                   original_media_url: null,
                 });
               } else {
-                const ext =
-                  (item.file.name.split('.').pop() || 'jpg').toLowerCase();
-                const fileName = `${Date.now()}-new-${Math.random()
+                const fileName = imageUploadFileName(item.file, `${Date.now()}-new-${Math.random()
                   .toString(36)
-                  .slice(2, 10)}.${ext}`;
+                  .slice(2, 10)}`);
                 const up = await uploadToCloudflareR2(
                   item.file,
                   'clbhouz-post-images',
@@ -203,11 +201,9 @@ export function useUpdatePost() {
                 }
                 let originalUrl: string | null = null;
                 if (item.originalFile) {
-                  const oext =
-                    (item.originalFile.name.split('.').pop() || 'jpg').toLowerCase();
-                  const origName = `${Date.now()}-new-original-${Math.random()
+                  const origName = imageUploadFileName(item.originalFile, `${Date.now()}-new-original-${Math.random()
                     .toString(36)
-                    .slice(2, 10)}.${oext}`;
+                    .slice(2, 10)}`);
                   const upOrig = await uploadToCloudflareR2(
                     item.originalFile,
                     'clbhouz-post-images',
@@ -218,12 +214,12 @@ export function useUpdatePost() {
                       upOrig.error || 'New media original upload failed',
                     );
                   }
-                  originalUrl = upOrig.publicUrl;
+                  originalUrl = assertSavableImageUrl(upOrig.publicUrl, upOrig.publicUrl);
                 }
                 newMediaResults.push({
                   displayOrder: item.displayOrder,
                   media_type: 'image',
-                  media_url: up.publicUrl,
+                  media_url: assertSavableImageUrl(up.publicUrl, up.publicUrl),
                   stream_id: null,
                   original_media_url: originalUrl,
                 });
