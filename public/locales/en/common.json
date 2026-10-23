@@ -551,6 +551,59 @@
       },
       "reviewsCount_one": "{{n}} review",
       "reviewsCount_other": "{{n}} reviews"
+    },
+    "week": {
+      "kicker": "This week",
+      "window": "Last 7 days",
+      "labels": {
+        "visits": "Visits",
+        "seenBy": "Seen by",
+        "newFollowers": "New followers"
+      },
+      "fullInsights": "Full insights",
+      "sub": {
+        "firstWeek": "first week",
+        "lastWeek": "{{value}} last week",
+        "same": "same as last week",
+        "total": "{{value}} in total"
+      },
+      "head": {
+        "firstWeek_one": "Your first week: {{value}} profile visit.",
+        "firstWeek_other": "Your first week: {{value}} profile visits.",
+        "visitsLead_one": "{{value}} profile visit, ",
+        "visitsLead_other": "{{value}} profile visits, ",
+        "more": "{{value}} more",
+        "fewer": "{{value}} fewer",
+        "thanLastWeek": " than last week.",
+        "same": "the same as last week.",
+        "seen_one": "{{value}} golfer saw {{name}} this week, but nobody opened the profile.",
+        "seen_other": "{{value}} golfers saw {{name}} this week, but nobody opened the profile.",
+        "quiet": "No golfer has seen {{name}} this week."
+      },
+      "reason": {
+        "never": "You haven't posted as {{name}} yet.",
+        "today": "Your last post as {{name}} was today.",
+        "yesterday": "Your last post as {{name}} was yesterday.",
+        "daysAgo_one": "Your last post as {{name}} was {{value}} day ago.",
+        "daysAgo_other": "Your last post as {{name}} was {{value}} days ago.",
+        "followers_one": "Your {{value}} follower is the golfer most likely to see a new post.",
+        "followers_other": "Your {{value}} followers are the golfers most likely to see a new post."
+      },
+      "taps": {
+        "website_one": "to your website",
+        "website_other": "to your website",
+        "directions_one": "direction",
+        "directions_other": "directions",
+        "call_one": "call",
+        "call_other": "calls",
+        "message_one": "message",
+        "message_other": "messages"
+      },
+      "error": {
+        "title": "This week's figures didn't load.",
+        "body": "Check your connection and try again.",
+        "retry": "Try again"
+      }
     }
   },
   "handicap": {
