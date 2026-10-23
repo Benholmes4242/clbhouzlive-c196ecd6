@@ -14,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { formatNumber } from '@/i18n/format';
 import { useBusinessPendingRequestsCount } from '@/hooks/useBusinessPendingRequestsCount';
 import { useBusinessAccessRequestsRealtime } from '@/hooks/useBusinessAccessRequestsRealtime';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
@@ -141,8 +140,6 @@ export function BusinessCommandCard({
   const needsDomainVerification =
     verificationRequest?.requires_domain_check && !verificationRequest?.domain_confirmed;
 
-  // NOTE: figure rendering lives in `MetricCell`. Loading and absent render
-  // NOTHING; a genuine 0 renders "0" — zero visits is a fact, not a gap.
 
 
   const locationDisplay = getCityCountry({
@@ -575,76 +572,6 @@ export function BusinessCommandCard({
 /* ─────────────────────── sub-components ───────────────────────
    Both are LOCAL to this file — no other importers. */
 
-/**
- * One metric cell inside the shared inset. Three states, three renderings:
- * loading -> nothing, null/undefined -> nothing, 0 -> "0", else formatted.
- * The figure sits in a fixed 26px box so the panel cannot jump on arrival.
- */
-function MetricCell({
-  label,
-  window: windowLabel,
-  value,
-  loading,
-  onClick,
-}: {
-  label: string;
-  window: string;
-  value: number | null | undefined;
-  loading: boolean;
-  onClick?: () => void;
-}) {
-  const figure =
-    loading || value === null || value === undefined ? '' : formatNumber(value);
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex flex-col items-center justify-start active:opacity-70 transition-opacity"
-      style={{ background: 'transparent', border: 'none', minHeight: 44 }}
-    >
-      <span
-        style={{
-          color: BIZ.inkFaint,
-          fontSize: 11,
-          fontWeight: 700,
-          textTransform: 'uppercase',
-          letterSpacing: '0.10em',
-          lineHeight: 1,
-        }}
-      >
-        {label}
-      </span>
-      <span
-        className="tabular-nums lining-nums flex items-center"
-        style={{
-          height: 26,
-          color: BIZ.ink,
-          fontSize: 22,
-          fontWeight: 700,
-          letterSpacing: '-0.04em',
-          lineHeight: 1,
-          fontFeatureSettings: '"kern" 1, "liga" 1',
-        }}
-      >
-        {figure}
-      </span>
-      <span
-        style={{
-          color: BIZ.inkFaint,
-          // AXIS floor 10 exception: the window marker under a counter figure.
-          fontSize: 10,
-          fontWeight: 700,
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          lineHeight: 1,
-        }}
-      >
-        {windowLabel}
-      </span>
-    </button>
-  );
-}
 
 function ActionRow({
   icon: Icon,
