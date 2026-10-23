@@ -26,7 +26,7 @@ function mount(node: React.ReactNode) {
   return render(<MemoryRouter><I18nextProvider i18n={i18n}>{node}</I18nextProvider></MemoryRouter>);
 }
 const round = { open: true, onClose: vi.fn(), eyebrowText: '', courseName: 'Course', playerName: 'Christopher Montgomerie-Smith', playerUserId: 'member', holes: [], presentation: 'page' as const };
-const review = { isOpen: true, onClose: vi.fn(), courseId: 'course', courseName: 'Course', user: { id: 'member', name: 'Christopher Montgomerie-Smith' }, resolvedMedia: [], resolvedReviewText: 'Review' };
+const review = { isOpen: true, onClose: vi.fn(), courseId: 'course', courseName: 'Course', rating: 9.6, user: { id: 'member', name: 'Christopher Montgomerie-Smith' }, resolvedMedia: [], resolvedReviewText: 'Review' };
 afterEach(cleanup);
 
 describe('CB61 player-row doors', () => {
@@ -71,12 +71,12 @@ describe('CB61 player-row doors', () => {
     expect(document.querySelector('[data-review-foot-actions]')).toBeNull();
   });
   it('review omits Course entirely without a course id', () => {
-    mount(<ReviewBottomSheet {...review} courseId={undefined} />);
+    mount(<ReviewBottomSheet {...review} courseId="" />);
     expect(document.querySelector('[data-sheet-door="course"]')).toBeNull();
     expect(document.querySelector('[data-sheet-door="profile"]')).not.toBeNull();
   });
   it('review omits Profile entirely without a user id', () => {
-    mount(<ReviewBottomSheet {...review} user={{ name: 'Member' }} />);
+    mount(<ReviewBottomSheet {...review} user={{ id: '', name: 'Member' }} />);
     expect(document.querySelector('[data-sheet-door="profile"]')).toBeNull();
     expect(document.querySelector('[data-sheet-door="course"]')).not.toBeNull();
   });
