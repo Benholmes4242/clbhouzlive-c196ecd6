@@ -29,7 +29,12 @@ const GUTTER = 14;
 const NAME_SIZE = 15;
 const NAME_LINE = 1.25;
 const SCORE_ORDER = ['design', 'condition', 'clubhouse', 'facilities'] as const;
-const SCORE_LABELS = { design: 'Design', condition: 'Condition', clubhouse: 'Clubhouse', facilities: 'Facilities' };
+const SCORE_LABELS = { design: 'Course Design', condition: 'Course Condition', clubhouse: 'Clubhouse', facilities: 'Facilities' };
+/* The "Course " prefix hides below a 260px categories container (container
+   query, never JS); the aria-label keeps the full words for screen readers. */
+const LABEL_PREFIX = 'Course ';
+const PREFIXED_KEYS = new Set<string>(['design', 'condition']);
+const LABEL_PREFIX_QUERY = `@container (width < 260px) { [data-review-categories] [data-label-prefix] { display: none; } }`;
 
 
 const COURSE_NAME_STYLE: React.CSSProperties = {
