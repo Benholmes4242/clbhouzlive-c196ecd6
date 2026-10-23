@@ -15,7 +15,7 @@ vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: ()
 // CB68.1 — copy is resolved through a real i18next instance loaded with the
 // shipped English catalogue, so these assertions read the rendered English.
 const i18n = i18next.createInstance();
-void i18n.init({ lng: 'en', resources: { en: { common: enCommon } }, defaultNS: 'common', interpolation: { escapeValue: false }, initImmediate: false });
+void i18n.init({ lng: 'en', resources: { en: { common: enCommon } }, defaultNS: 'common', interpolation: { escapeValue: false }, initAsync: false });
 const tt = (k: string, o?: Record<string, unknown>) => i18n.t(k, o) as string;
 const R = (m: DoNextMsg) => resolveDoNextMsg(tt, m);
 const built = (i: DoNextInputs) => buildDoNext(i).map((x) => ({ ...x, title: R(x.title), sub: resolveDoNextSub(tt, x.sub), action: R(x.action) }));
