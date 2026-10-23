@@ -94,10 +94,10 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
             tabIndex={0}
             onClick={() => onReviewPress(r)}
             onKeyDown={(e) => {
-                    if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
-                      e.preventDefault();
-                      onReviewPress(r);
-                    }
+              if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                onReviewPress(r);
+              }
             }}
             style={{
               width: CARD_W,
