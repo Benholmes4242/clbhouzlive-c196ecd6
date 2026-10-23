@@ -743,6 +743,16 @@ export function SnapFeed({
 
 
 
+  // CB70: flat per-media lists repeat a post id per photo; duplicate React
+  // keys would reconcile sibling slides as one. Unique ids keep post.id.
+  const slideKeys = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const p of posts) counts.set(p.id, (counts.get(p.id) ?? 0) + 1);
+    return posts.map((p, i) =>
+      (counts.get(p.id) ?? 0) > 1 ? `${p.id}:${p.mediaItems?.[0]?.id ?? i}` : p.id,
+    );
+  }, [posts]);
+
   return (
     <div
       ref={containerRef}
