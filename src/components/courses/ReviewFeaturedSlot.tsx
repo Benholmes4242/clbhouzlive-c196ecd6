@@ -12,6 +12,7 @@
  * would render a broken four-up.
  */
 
+import { CourseNameLink } from '@/components/shared/CourseNameLink';
 import React from 'react';
 import { MentionText } from '@/components/mentions/MentionText';
 import { useTranslation } from 'react-i18next';
@@ -42,9 +43,17 @@ export const ReviewFeaturedSlot: React.FC<Props> = ({ review: r, onReviewPress }
       <DiscoverSectionHeading title={t('statBrowse.reviews.heading')} />
 
 
-      <button
-        type="button"
+      {/* CB69 — non-button tile so the course name can be a real button. */}
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => onReviewPress(r)}
+      onKeyDown={(e) => {
+        if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          onReviewPress(r);
+        }
+      }}
         style={{
           display: 'block',
           width: '100%',
@@ -53,6 +62,7 @@ export const ReviewFeaturedSlot: React.FC<Props> = ({ review: r, onReviewPress }
           border: 0,
           padding: 0,
           marginTop: 10,
+          cursor: 'pointer',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
@@ -98,9 +108,14 @@ export const ReviewFeaturedSlot: React.FC<Props> = ({ review: r, onReviewPress }
               }}
             />
           )}
-          <span style={{ fontSize: 13, fontWeight: 700, color: INK, minWidth: 0 }}>
+          <CourseNameLink
+            courseId={r.courseId}
+            textProps={{ 'data-review-featured-course': '' }}
+            wrapperStyle={{ minWidth: 0 }}
+            style={{ fontSize: 13, fontWeight: 700, color: INK, minWidth: 0, display: 'inline' }}
+          >
             {r.courseName}
-          </span>
+          </CourseNameLink>
           <span style={{ fontSize: 12.5, color: INK_MUTE, whiteSpace: 'nowrap' }}>{name}</span>
         </div>
 
@@ -111,7 +126,7 @@ export const ReviewFeaturedSlot: React.FC<Props> = ({ review: r, onReviewPress }
           <SubScoreStack label={t('top100.stats.clubhouse')} score={Number(b.clubhouse)} />
           <SubScoreStack label={t('top100.stats.facilities')} score={Number(b.facilities)} />
         </div>
-      </button>
+      </div>
     </section>
   );
 };
