@@ -158,7 +158,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         </div>
       </div>
 
-      {/* D — Sizes match the course card score block (BRIEF_COURSE_CARD_SCORE_BLOCK option B): overall 24, labels 11, figures 13, gaps 14 / 16 / 8. Each half drops independently. */}
+      {/* D — Sizes match the course card score block (BRIEF_COURSE_CARD_SCORE_BLOCK option B): overall 24, labels 12 (the location line's treatment, BRIEF_REVIEW_POST_CATEGORY_LABELS), figures 13, gaps 14 / 16 / 8. Each half drops independently. */}
       {rating != null || anyScore ? (
         <div data-review-score-block style={{ flex: 'none', padding: `0 ${GUTTER}px 14px`, display: 'flex', alignItems: 'center', gap: 14 }}>
         {rating != null ? (
@@ -186,7 +186,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
               const value = scores[key];
               return (
                 <div key={key} data-category={key} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', minWidth: 0 }}>
-                  <span data-category-label style={{ fontSize: 11, color: A.MUTE, whiteSpace: 'nowrap' }}>{SCORE_LABELS[key]}</span>
+                  <span data-category-label style={{ fontSize: 12, lineHeight: 1.2, color: A.DIM, whiteSpace: 'nowrap' }}>{SCORE_LABELS[key]}</span>
                   <span data-category-figure data-category-score={value == null ? undefined : value.toFixed(1)} className="tabular-nums" style={{ ...FIGS, fontSize: 13, fontWeight: 700, color: value == null ? A.DIM : courseSubScoreTone(value) }}>
                     {value == null ? '\u2014' : value.toFixed(1)}
                   </span>
