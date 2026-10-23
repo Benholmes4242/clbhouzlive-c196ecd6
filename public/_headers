@@ -28,3 +28,8 @@
 /.well-known/apple-app-site-association
   Content-Type: application/json
   Cache-Control: no-cache
+
+# Android Digital Asset Links (same treatment as the AASA file).
+/.well-known/assetlinks.json
+  Content-Type: application/json
+  Cache-Control: no-cache
