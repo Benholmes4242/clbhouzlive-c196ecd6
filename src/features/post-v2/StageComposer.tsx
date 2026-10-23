@@ -22,7 +22,7 @@ import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, Pencil, X } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
-import { useActiveActor } from '@/context/ActiveActorContext';
+import { useComposerActor } from './hooks/useComposerActor';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -78,13 +78,16 @@ interface Props {
   editPostId?: string | null;
   /** Draft deep-link: hydrate the composer from this draft. */
   draftId?: string | null;
+  /** CB65: actor the opener asked for; honoured only if available (see useComposerActor). */
+  initialActorType?: 'personal' | 'business' | null;
+  initialActorId?: string | null;
 }
 
-export default function StageComposer({ onClose, onPosted, initialMedia = [], editPostId, draftId }: Props) {
+export default function StageComposer({ onClose, onPosted, initialMedia = [], editPostId, draftId, initialActorType, initialActorId }: Props) {
   const { profile } = useProfileData();
   const { t } = useTranslation('composer');
 
-  const { activeActor, setActiveActor } = useActiveActor();
+  const { activeActor, selectActor, applyDraftActor } = useComposerActor({ initialActorType, initialActorId, ignoreInitial: !!editPostId || !!draftId });
   const composer = useStageComposer();
   const { state, addFiles, removeAt, reorder, setActiveIndex, updateActive, setCaption, setCourse, setCourses, setScheduledAt, restoreDraft, hydrate, reset } = composer;
   const { submit, submitting } = usePostSubmit();
@@ -235,6 +238,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
       .maybeSingle()
       .then(({ data }) => {
         if (cancelled || !data) return;
+        applyDraftActor((data.actor_type as string) ?? null, (data.actor_id as string) ?? null);
         // Multi-course drafts stash the full ordered list in course_data.courses.
         const cd = (data.course_data as { courses?: Array<{ id: string; name: string; country: string | null }> } | null) ?? null;
         const savedCourses = cd?.courses ?? [];
@@ -252,7 +256,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
         if (!cancelled) setRestoredDraftId(data.id as string);
       });
     return () => { cancelled = true; };
-  }, [draftId, isEditMode, profile?.id, restoreDraft]);
+  }, [draftId, isEditMode, profile?.id, restoreDraft, applyDraftActor]);
 
   // C3 "Share this round" — open the composer pre-filled with the course and
   // the round the member tapped share on.
@@ -721,7 +725,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
           selected={state.courses}
           userId={profile?.id ?? null}
         />
-        <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => setActiveActor(a)} selectedId={activeActor?.id ?? null} />
+        <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => selectActor(a)} selectedId={activeActor?.id ?? null} />
   
         <ScheduleSheetV2
           open={sheet === 'schedule'}

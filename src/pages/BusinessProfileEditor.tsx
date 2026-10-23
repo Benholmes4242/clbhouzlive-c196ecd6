@@ -42,7 +42,7 @@ import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
 import { SelectedClub } from '@/components/business/ClubSearchDropdown';
 import { SelectedCollege } from '@/components/business/CollegeSearchDropdown';
-import { AddressValue } from '@/components/business/AddressAutocomplete';
+import { dbLocationPrecision, AddressValue } from '@/components/business/AddressAutocomplete';
 import { PinDropModal } from '@/components/business/PinDropModal';
 import { PhoneValue } from '@/components/business/PhoneInputWithDialCode';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
@@ -256,8 +256,8 @@ export default function BusinessProfileEditor() {
         postcode: business.postcode || undefined,
         country: business.country || undefined,
         countryCode: business.country || undefined,
-        lat: business.lat || undefined,
-        lng: business.lng || undefined,
+        lat: business.lat ?? undefined,
+        lng: business.lng ?? undefined,
         mapboxPlaceId: business.mapbox_place_id || undefined,
         precision: business.location_precision || 'city',
       });
@@ -405,8 +405,8 @@ export default function BusinessProfileEditor() {
             region: selectedClub.region || undefined,
             country: selectedClub.sub_country || selectedClub.country || '',
             countryCode: getCountryCodeFromClub(selectedClub) || '',
-            lat: selectedClub.latitude || undefined,
-            lng: selectedClub.longitude || undefined,
+            lat: selectedClub.latitude ?? undefined,
+            lng: selectedClub.longitude ?? undefined,
             precision: 'city',
           });
         }
@@ -577,7 +577,7 @@ export default function BusinessProfileEditor() {
           if (insertData.lat == null) insertData.lat = address.lat ?? null;
           if (insertData.lng == null) insertData.lng = address.lng ?? null;
           insertData.mapbox_place_id = address.mapboxPlaceId || null;
-          insertData.location_precision = address.precision || null;
+          insertData.location_precision = dbLocationPrecision(address.precision);
         }
 
         const { data: row, error: insertErr } = await supabase
@@ -747,10 +747,10 @@ export default function BusinessProfileEditor() {
           region: address.region || null,
           postcode: address.postcode || null,
           country: address.country || null,
-          lat: address.lat || null,
-          lng: address.lng || null,
+          lat: address.lat ?? null,
+          lng: address.lng ?? null,
           mapbox_place_id: address.mapboxPlaceId || null,
-          location_precision: address.precision || null,
+          location_precision: dbLocationPrecision(address.precision),
           location_updated_at: new Date().toISOString(),
         });
       }
