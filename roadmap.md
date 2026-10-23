@@ -1,6 +1,7 @@
 # Roadmap
 
 ## CB61 — Player-row sheet doors
+- [ ] CB61.1: reproduce exact application type errors, fix only authorized fixtures without changing assertions, rerun full suite and finish controlled390px row/foot/long-name/hit-target measurements. Git pull remains prohibited by platform-managed Git.
 - [x] Read signed-off option A; full baseline `bunx vitest run`: 2,280 passed /305 files /0 failures, matching CB60. Git pull skipped because Git is platform-managed.
 - [ ] Move member Course/Profile actions to shared player-row buttons and inert swipe preview; preserve tour foot, Share, navigation and frozen head details.
 - [ ] Retarget only authorized review navigation/footer assertions; add requested regressions, run full suite and check harness diagnostics.
