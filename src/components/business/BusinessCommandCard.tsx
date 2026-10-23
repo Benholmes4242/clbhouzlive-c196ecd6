@@ -48,6 +48,12 @@ interface BusinessCommandCardProps {
    * "delete-in-a-list-item" body pointer-events freeze.
    */
   onRequestDelete?: (input: { id: string; name: string }) => void;
+  /**
+   * CB66 §5 — render ONLY the expanded body (metrics + MANAGE rows), without
+   * the verification line, claim notice/button and View live profile, which
+   * the business home header now owns. No summary row, menu or claim sheet.
+   */
+  bodyOnly?: boolean;
 }
 
 // Access level labels for UI (not DB roles)
@@ -66,6 +72,7 @@ export function BusinessCommandCard({
   expanded = false,
   onToggle,
   onRequestDelete,
+  bodyOnly = false,
 }: BusinessCommandCardProps) {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
@@ -177,6 +184,177 @@ export function BusinessCommandCard({
     if (target.closest('[data-summary-ignore="true"]')) return;
     onToggle?.();
   };
+
+  const bodyContent = (
+              <div className="p-4 pt-3 space-y-3">
+                {/* BRIEF_CLAIM_AWARE_VERIFY_CARD §1 — claim acknowledgement.
+                    Shown ONLY when nothing has been submitted for verification
+                    ('none'), so we never stack two review notices. The copy
+                    states plainly that the two are independent: a claim decision
+                    does not produce verification, and verification does not
+                    resolve a claim. */}
+                {!bodyOnly && verificationState === 'none' &&
+                  (courseClaim?.status === 'pending' || courseClaim?.status === 'needs_more_info') && (
+                    <div className="flex items-start gap-2" style={{ paddingTop: 2 }}>
+                      <Clock className="shrink-0" style={{ width: 14, height: 14, color: BIZ.inkMute, marginTop: 2 }} />
+                      <p className="min-w-0" style={{ color: BIZ.inkMute, fontSize: 12.5, fontWeight: 500, lineHeight: 1.4 }}>
+                        <span style={{ color: BIZ.ink, fontWeight: 700 }}>
+                          {courseClaim.courseName
+                            ? `Your claim on ${courseClaim.courseName} is with our team.`
+                            : 'Your course claim is with our team.'}
+                        </span>{' '}
+                        That is a separate request from verification — whichever way it goes, you still
+                        need to verify this business to earn the badge.
+                      </p>
+                    </div>
+                  )}
+
+                {/* Verify status line — treatment only; copy per state is unchanged.
+                    No gradient, no tint, no bordered tile, no amber chevron. */}
+
+                {!bodyOnly && !isVerified && (
+                  <button
+                    type="button"
+                    onClick={() => goto('/verification')}
+                    className="w-full flex items-center gap-2 active:opacity-70 transition-opacity"
+                    style={{ background: 'transparent', border: 'none', minHeight: 44 }}
+                  >
+                    <ShieldCheck className="shrink-0" style={{ width: 14, height: 14, color: BIZ.inkMute }} />
+                    <span className="flex-1 text-left min-w-0">
+                      <span style={{ color: BIZ.ink, fontSize: 13, fontWeight: 700 }}>
+                        {verifyLabel}
+                      </span>
+                      {verificationState === 'none' && (
+                        <span style={{ color: BIZ.inkMute, fontSize: 12.5, fontWeight: 500 }}>
+                          {t('business.card.verify.tail')}
+                        </span>
+                      )}
+                    </span>
+                    <span
+                      className="shrink-0 inline-flex items-center gap-0.5"
+                      style={{
+                        color: BIZ.ink,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.10em',
+                      }}
+                    >
+                      {t('business.card.verify.action')}
+                      <ChevronRight style={{ width: 11, height: 11 }} />
+                    </span>
+                  </button>
+                )}
+
+                {/* Metrics — ONE inset, three cells. Label above figure, window beneath. */}
+                <div
+                  style={{
+                    background: 'rgba(14,18,22,0.035)',
+                    borderRadius: 14,
+                    padding: '14px 12px 12px',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, minmax(0,1fr))',
+                  }}
+                >
+                  <MetricCell
+                    label={t('business.card.metrics.visits')}
+                    window={t('business.card.metrics.last7Days')}
+                    value={stats?.visits}
+                    loading={statsLoading}
+                    onClick={() => goto('/insights')}
+                  />
+                  <MetricCell
+                    label={t('business.card.metrics.followers')}
+                    window={t('business.card.metrics.allTime')}
+                    value={totalFollowers}
+                    loading={followersLoading}
+                    onClick={() => goto('/followers')}
+                  />
+                  <MetricCell
+                    label={t('business.card.metrics.impressions')}
+                    window={t('business.card.metrics.last7Days')}
+                    value={stats?.impressions}
+                    loading={statsLoading}
+                    onClick={() => goto('/insights')}
+                  />
+                </div>
+
+                {/* Actions — heading, then rows with no rules and no icon tiles. */}
+                <div>
+                  <div
+                    style={{
+                      color: BIZ.inkFaint,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.10em',
+                      marginBottom: 2,
+                    }}
+                  >
+                    {t('business.card.manage')}
+                  </div>
+                  <ActionRow icon={Pencil} label={t('business.card.actions.edit')} onClick={() => goto('/edit')} />
+                  <ActionRow icon={BarChart3} label={t('business.card.actions.insights')} onClick={() => goto('/insights')} />
+                  {!bodyOnly && canClaimCourse && (
+                    <ActionRow
+                      icon={Flag}
+                      label={t('business.card.actions.claimCourse')}
+                      badge
+                      caption={[t('business.card.actions.claimCourseCaption')]}
+                      onClick={() => setClaimSheetOpen(true)}
+                    />
+                  )}
+                  {showClubAnalytics && (
+                    clubCourses.length > 1 ? (
+                      <ActionRow
+                        icon={Flag}
+                        label="Your courses"
+                        hint={String(clubCourses.length)}
+                        onClick={() => goto('/course')}
+                        caption={clubCourses.map((c) => c.name)}
+                      />
+                    ) : (
+                      <ActionRow icon={Flag} label="Your course" onClick={() => goto('/course')} />
+                    )
+                  )}
+                  {hasCourse && (
+                    <ActionRow
+                      icon={Star}
+                      label={t('business.card.actions.reviews')}
+                      onClick={() => goto('/reviews')}
+                      hint={
+                        avgReviewRating != null
+                          ? `${(Math.round(avgReviewRating * 10) / 10).toFixed(1)}`
+                          : undefined
+                      }
+                      badge={awaitingReplies > 0}
+                      caption={
+                        reviewCourses.length > 1
+                          ? reviewCourses.map(
+                              (c) =>
+                                `${courseNameWithinClub(c.course_name)} · ${c.count} ${c.count === 1 ? 'review' : 'reviews'}`,
+                            )
+                          : undefined
+                      }
+                    />
+                  )}
+                  {canManage && (
+                    <ActionRow
+                      icon={Users}
+                      label={t('business.card.actions.team')}
+                      onClick={() => goto('/team')}
+                      badge={hasPendingRequests}
+                    />
+                  )}
+                  {!bodyOnly && (
+                    <ActionRow icon={Eye} label={t('business.card.actions.viewProfile')} onClick={() => goto('')} />
+                  )}
+                </div>
+              </div>
+  );
+
+  // CB66 §5 — the business home renders only the body under its header.
+  if (bodyOnly) return <div data-business-body="">{bodyContent}</div>;
 
   return (
     <>
@@ -408,169 +586,7 @@ export function BusinessCommandCard({
             >
               <div style={{ height: '0.5px', background: BIZ.hair }} />
 
-              <div className="p-4 pt-3 space-y-3">
-                {/* BRIEF_CLAIM_AWARE_VERIFY_CARD §1 — claim acknowledgement.
-                    Shown ONLY when nothing has been submitted for verification
-                    ('none'), so we never stack two review notices. The copy
-                    states plainly that the two are independent: a claim decision
-                    does not produce verification, and verification does not
-                    resolve a claim. */}
-                {verificationState === 'none' &&
-                  (courseClaim?.status === 'pending' || courseClaim?.status === 'needs_more_info') && (
-                    <div className="flex items-start gap-2" style={{ paddingTop: 2 }}>
-                      <Clock className="shrink-0" style={{ width: 14, height: 14, color: BIZ.inkMute, marginTop: 2 }} />
-                      <p className="min-w-0" style={{ color: BIZ.inkMute, fontSize: 12.5, fontWeight: 500, lineHeight: 1.4 }}>
-                        <span style={{ color: BIZ.ink, fontWeight: 700 }}>
-                          {courseClaim.courseName
-                            ? `Your claim on ${courseClaim.courseName} is with our team.`
-                            : 'Your course claim is with our team.'}
-                        </span>{' '}
-                        That is a separate request from verification — whichever way it goes, you still
-                        need to verify this business to earn the badge.
-                      </p>
-                    </div>
-                  )}
-
-                {/* Verify status line — treatment only; copy per state is unchanged.
-                    No gradient, no tint, no bordered tile, no amber chevron. */}
-
-                {!isVerified && (
-                  <button
-                    type="button"
-                    onClick={() => goto('/verification')}
-                    className="w-full flex items-center gap-2 active:opacity-70 transition-opacity"
-                    style={{ background: 'transparent', border: 'none', minHeight: 44 }}
-                  >
-                    <ShieldCheck className="shrink-0" style={{ width: 14, height: 14, color: BIZ.inkMute }} />
-                    <span className="flex-1 text-left min-w-0">
-                      <span style={{ color: BIZ.ink, fontSize: 13, fontWeight: 700 }}>
-                        {verifyLabel}
-                      </span>
-                      {verificationState === 'none' && (
-                        <span style={{ color: BIZ.inkMute, fontSize: 12.5, fontWeight: 500 }}>
-                          {t('business.card.verify.tail')}
-                        </span>
-                      )}
-                    </span>
-                    <span
-                      className="shrink-0 inline-flex items-center gap-0.5"
-                      style={{
-                        color: BIZ.ink,
-                        fontSize: 11,
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.10em',
-                      }}
-                    >
-                      {t('business.card.verify.action')}
-                      <ChevronRight style={{ width: 11, height: 11 }} />
-                    </span>
-                  </button>
-                )}
-
-                {/* Metrics — ONE inset, three cells. Label above figure, window beneath. */}
-                <div
-                  style={{
-                    background: 'rgba(14,18,22,0.035)',
-                    borderRadius: 14,
-                    padding: '14px 12px 12px',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, minmax(0,1fr))',
-                  }}
-                >
-                  <MetricCell
-                    label={t('business.card.metrics.visits')}
-                    window={t('business.card.metrics.last7Days')}
-                    value={stats?.visits}
-                    loading={statsLoading}
-                    onClick={() => goto('/insights')}
-                  />
-                  <MetricCell
-                    label={t('business.card.metrics.followers')}
-                    window={t('business.card.metrics.allTime')}
-                    value={totalFollowers}
-                    loading={followersLoading}
-                    onClick={() => goto('/followers')}
-                  />
-                  <MetricCell
-                    label={t('business.card.metrics.impressions')}
-                    window={t('business.card.metrics.last7Days')}
-                    value={stats?.impressions}
-                    loading={statsLoading}
-                    onClick={() => goto('/insights')}
-                  />
-                </div>
-
-                {/* Actions — heading, then rows with no rules and no icon tiles. */}
-                <div>
-                  <div
-                    style={{
-                      color: BIZ.inkFaint,
-                      fontSize: 11,
-                      fontWeight: 700,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.10em',
-                      marginBottom: 2,
-                    }}
-                  >
-                    {t('business.card.manage')}
-                  </div>
-                  <ActionRow icon={Pencil} label={t('business.card.actions.edit')} onClick={() => goto('/edit')} />
-                  <ActionRow icon={BarChart3} label={t('business.card.actions.insights')} onClick={() => goto('/insights')} />
-                  {canClaimCourse && (
-                    <ActionRow
-                      icon={Flag}
-                      label={t('business.card.actions.claimCourse')}
-                      badge
-                      caption={[t('business.card.actions.claimCourseCaption')]}
-                      onClick={() => setClaimSheetOpen(true)}
-                    />
-                  )}
-                  {showClubAnalytics && (
-                    clubCourses.length > 1 ? (
-                      <ActionRow
-                        icon={Flag}
-                        label="Your courses"
-                        hint={String(clubCourses.length)}
-                        onClick={() => goto('/course')}
-                        caption={clubCourses.map((c) => c.name)}
-                      />
-                    ) : (
-                      <ActionRow icon={Flag} label="Your course" onClick={() => goto('/course')} />
-                    )
-                  )}
-                  {hasCourse && (
-                    <ActionRow
-                      icon={Star}
-                      label={t('business.card.actions.reviews')}
-                      onClick={() => goto('/reviews')}
-                      hint={
-                        avgReviewRating != null
-                          ? `${(Math.round(avgReviewRating * 10) / 10).toFixed(1)}`
-                          : undefined
-                      }
-                      badge={awaitingReplies > 0}
-                      caption={
-                        reviewCourses.length > 1
-                          ? reviewCourses.map(
-                              (c) =>
-                                `${courseNameWithinClub(c.course_name)} · ${c.count} ${c.count === 1 ? 'review' : 'reviews'}`,
-                            )
-                          : undefined
-                      }
-                    />
-                  )}
-                  {canManage && (
-                    <ActionRow
-                      icon={Users}
-                      label={t('business.card.actions.team')}
-                      onClick={() => goto('/team')}
-                      badge={hasPendingRequests}
-                    />
-                  )}
-                  <ActionRow icon={Eye} label={t('business.card.actions.viewProfile')} onClick={() => goto('')} />
-                </div>
-              </div>
+              {bodyContent}
 
             </motion.div>
           )}
