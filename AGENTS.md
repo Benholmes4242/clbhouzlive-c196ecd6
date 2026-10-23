@@ -29,6 +29,7 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - The admin Analytics page and its header pill read figures only from the five `get_admin_analytics_*` RPCs via `useAnalyticsLenses.ts`, never tables, because browser reads truncate at the row cap and staff filtering belongs to the server.
 - Admin Health and drawer query ownership: see src/features/admin/AdminDrawerStatus.tsx header.
 - Rankings hand all row taps to TourSection, which alone resolves directory names and sheet navigation, so linked and unlinked entrypoints cannot drift.
+- Review course names link only through `CourseNameLink` (see its header), so the id-or-plain-text rule and tap isolation live once.
 
 - Owner copy uses `profileOwnerVoice` to share grammar.
 - Sheet handicap ownership: see HcpStrip.tsx header; prevents connect-card flashes.
