@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyBusinesses, type BusinessMembership } from '@/hooks/useMyBusinesses';
 import { BusinessCommandCard } from '@/components/business/BusinessCommandCard';
@@ -50,7 +50,7 @@ const MyBusinessesPage = () => {
   );
 
   // Selected-on-load id, decided once per user when memberships first arrive.
-  const loadIdRef = useRef<string | null>(null);
+  const [loadId, setLoadId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -64,16 +64,15 @@ const MyBusinessesPage = () => {
       (stored && ids.has(stored) && stored) ||
       (actorId && ids.has(actorId) && actorId) ||
       az[0].business.id;
-    if (!loadIdRef.current || !ids.has(loadIdRef.current)) loadIdRef.current = pick;
+    setLoadId((prev) => (prev && ids.has(prev) ? prev : pick));
     setSelectedId(pick);
   }, [memberships, selectedId, userId, activeActor]);
 
   const ordered = useMemo(() => {
     const az = [...memberships].sort((a, b) => a.business.name.localeCompare(b.business.name));
-    const first = az.find((m) => m.business.id === loadIdRef.current);
+    const first = az.find((m) => m.business.id === loadId);
     return first ? [first, ...az.filter((m) => m !== first)] : az;
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- order is fixed once selection is decided
-  }, [memberships, selectedId && loadIdRef.current]);
+  }, [memberships, loadId]);
 
   const selected = ordered.find((m) => m.business.id === selectedId) ?? null;
 
