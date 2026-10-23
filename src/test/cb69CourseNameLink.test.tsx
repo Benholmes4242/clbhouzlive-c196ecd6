@@ -64,8 +64,6 @@ const streamReview = (courseId: string | null): StreamItem => ({
 type Surface = { name: string; mount: (courseId: string | null) => { c: HTMLElement; tile: ReturnType<typeof vi.fn> } };
 const surfaces: Surface[] = [
   { name: 'InlineReviewCard (fullscreen caption)', mount: (id) => { const tile = vi.fn(); const { container } = inRouter(<InlineReviewCard courseName="Swinley Forest" courseId={id} rating={8} reviewer={{ name: 'M' }} isVisible onTap={tile} />); return { c: container, tile }; } },
-  { name: 'ReviewPostCard (Clubhouse/profile feed)', mount: (id) => { const tile = vi.fn(); const post = { id: 'p', userId: 'u', actorId: 'u', displayName: 'M', avatarUrl: '', createdAt: new Date().toISOString(), caption: '', review: { reviewId: 'r', courseId: id, courseName: 'Swinley Forest', rating: 8, reviewText: 'x', breakdown: {} } } as never;
-    const { container } = inRouter(<div onClick={tile}><ReviewPostCard post={post} articleRef={() => {}} onProfile={vi.fn()} onReadReview={tile} onPrefetch={vi.fn()} footer={null} onOpenCourse={id ? () => { window.history; } : undefined} /></div>); return { c: container, tile }; } },
   { name: 'ReviewTile (course-led)', mount: (id) => { const tile = vi.fn(); const { container } = inRouter(<ReviewTile review={latest(id ?? '')} onPress={tile} />); return { c: container, tile }; } },
   { name: 'ReviewRailSlot', mount: (id) => { const tile = vi.fn(); const { container } = inRouter(<ReviewRailSlot reviews={[latest(id ?? '')]} onReviewPress={tile} />); return { c: container, tile }; } },
   { name: 'ReviewFeaturedSlot', mount: (id) => { const tile = vi.fn(); const { container } = inRouter(<ReviewFeaturedSlot review={latest(id ?? '')} onReviewPress={tile} />); return { c: container, tile }; } },
@@ -74,7 +72,7 @@ const surfaces: Surface[] = [
 ];
 
 describe('CB69 review course names open the course page', () => {
-  for (const s of surfaces.filter((x) => !x.name.startsWith('ReviewPostCard'))) {
+  for (const s of surfaces) {
     it(`${s.name}: the name is a button that opens /courses/:id without the tile's tap`, () => {
       const { c, tile } = s.mount('course-1');
       const btns = c.querySelectorAll('button[data-course-name-link]');
