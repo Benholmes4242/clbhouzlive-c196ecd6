@@ -47,12 +47,12 @@ export const ReviewFeaturedSlot: React.FC<Props> = ({ review: r, onReviewPress }
       <div
         role="button"
         tabIndex={0}
-        onClick={() => onReviewPress(r)}
-      onKeyDown={(e) => {
-        if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
-          e.preventDefault();
-          onReviewPress(r);
-        }
+          onClick={() => onReviewPress(r)}
+        onKeyDown={(e) => {
+          if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            onReviewPress(r);
+          }
       }}
         style={{
           display: 'block',
