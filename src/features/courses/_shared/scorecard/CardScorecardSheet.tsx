@@ -900,6 +900,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           playerHcp={playerHcp}
           playerHcpDelta={playerHcpDelta}
           playedOffIndex={isTour ? null : (courseContext?.indexAtTime ?? null)}
+          onViewCourse={onViewCourse}
+          onViewProfile={onViewProfile}
           rail={rail}
         />
 
@@ -1068,8 +1070,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             </>
           )}
 
-          {/* S3.3 — EXITS BELONG AT THE END. */}
-          {(engagement || onViewProfile || onViewCourse || onShareRound) && (
+          {/* CB61: member doors live in the head; tour exits and Share stay here. */}
+          {(engagement || (isTour && (onViewProfile || onViewCourse)) || onShareRound) && (
             <div
               data-scorecard-interactive="true"
               onClick={(event) => event.stopPropagation()}
@@ -1139,20 +1141,20 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
                   />
                 </div>
               )}
-              <div
+              {(isTour || (!engagement && onShareRound)) && <div
                 data-scorecard-exit-links="true"
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: `repeat(${[onViewCourse, onViewProfile, !engagement && onShareRound].filter(Boolean).length}, minmax(0, 1fr))`,
+                  gridTemplateColumns: `repeat(${[isTour && onViewCourse, isTour && onViewProfile, !engagement && onShareRound].filter(Boolean).length}, minmax(0, 1fr))`,
                   marginTop: 14,
                 }}
               >
-                {/* C.7 — the foot keeps two actions: the course, and the member by name. */}
-                {onViewCourse && <GlassCardFootAction label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} icon={MapPin} />}
-                {onViewProfile && <GlassCardFootAction label={isTour || !playerName ? t('courses:scorecard.viewProfile') : playerName} onClick={onViewProfile} icon={User} />}
+                {/* Tour identity and foot are intentionally unchanged by CB61. */}
+                {isTour && onViewCourse && <GlassCardFootAction label={t('courses:scorecard.viewCourse')} onClick={onViewCourse} icon={MapPin} />}
+                {isTour && onViewProfile && <GlassCardFootAction label={t('courses:scorecard.viewProfile')} onClick={onViewProfile} icon={User} />}
                 {/* With no engagement row there is nowhere else for Share to sit. */}
                 {!engagement && onShareRound && <GlassCardFootAction label={t('courses:scorecard.shareRound')} onClick={onShareRound} icon={Share} />}
-              </div>
+              </div>}
             </div>
           )}
         </div>

@@ -26,6 +26,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CB61: portalled round/review doors share global, theme-independent tokens. */
+:root {
+  --sheet-door-border: rgba(255,255,255,0.12);
+  --sheet-door-fill: rgba(255,255,255,0.04);
+}
+.sheet-door-button {
+  position: relative;
+  box-sizing: border-box;
+  height: 30px;
+  min-width: 44px;
+  padding: 0 11px 0 9px;
+  border-radius: 999px;
+  border: 1px solid var(--sheet-door-border);
+  background: var(--sheet-door-fill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
+  flex: none;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.sheet-door-button svg { width: 14px; height: 14px; opacity: 0.8; }
+.sheet-door-hit-area { position: absolute; inset: -8px -1px; }
+.sheet-door-button[aria-hidden="true"] { pointer-events: none; }
+
 /* CB50 signed-off Design A: status ink over media, identical in either theme. */
 :root {
   --video-buffering-track: rgba(0,0,0,0.30);

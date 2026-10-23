@@ -143,14 +143,15 @@ describe('see-all row and footer', () => {
     sheet({ count: 2, reviewerAvg: 7.6 });
     expect(screen.getByText('See all 2 ratings of Swinley Forest Golf Club')).toBeTruthy();
   });
-  it('share in the engagement row, foot has exactly two actions', () => {
+  it('share in the engagement row, player row has exactly two doors', () => {
     sheet({ count: 3, reviewerAvg: 7.6 });
     const eng = document.body.querySelector('[data-review-engagement]')!;
     expect(eng.querySelector('[data-review-share]')).not.toBeNull();
-    const foot = document.body.querySelector('[data-review-foot-actions]')!;
-    expect(foot.querySelectorAll('button').length).toBe(2);
-    expect(foot.querySelector('[data-review-share]')).toBeNull();
-    expect(foot.textContent).toContain('mikem84');
+    const playerRow = document.body.querySelector('[data-review-player-row]');
+    expect(playerRow?.querySelectorAll('button').length).toBe(2);
+    expect(playerRow?.querySelector('[data-review-share]')).toBeNull();
+    expect(playerRow?.textContent).toContain('mikem84');
+    expect(document.body.querySelector('[data-review-foot-actions]')).toBeNull();
   });
 });
 
