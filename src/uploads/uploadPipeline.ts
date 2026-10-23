@@ -513,8 +513,6 @@ async function processPostJob(jobId: string, job: any): Promise<void> {
 
       try {
         const fileName = `${Date.now()}-${index}-${Math.random().toString(36).substring(2, 15)}`;
-        const fileExtension = file.name.split('.').pop() || 'unknown';
-        const fullFileName = `${fileName}.${fileExtension}`;
 
         let publicUrl = '';
         const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
@@ -1114,8 +1112,6 @@ export async function retryFailedItems(jobId: string): Promise<boolean> {
 
     try {
       const fileName = `${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 15)}`;
-      const fileExtension = file.name.split('.').pop() || 'unknown';
-      const fullFileName = `${fileName}.${fileExtension}`;
       const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
 
       let publicUrl = '';
@@ -1477,8 +1473,6 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
         });
         
         const fileName = `${Date.now()}-${index}-${Math.random().toString(36).substring(2, 15)}`;
-        const fileExtension = file.name.split('.').pop() || 'unknown';
-        const fullFileName = `${fileName}.${fileExtension}`;
         
         let publicUrl = '';
         const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
