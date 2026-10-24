@@ -78,6 +78,9 @@ const richPlace = (c: TopTenShareCourse, variant: string | null) =>
 /** Post rows/tiles: one word — variant, else region, else sub_country. */
 const tersePlace = (c: TopTenShareCourse, variant: string | null) =>
   variant || c.region || c.sub_country || '';
+/** Hero (story and post): "variant · region, sub_country"; parts omitted when missing. */
+const heroPlace = (c: TopTenShareCourse, variant: string | null) =>
+  [variant, [c.region, c.sub_country].filter(Boolean).join(', ')].filter(Boolean).join(' · ');
 
 const initialsOf = (name: string) =>
   name
