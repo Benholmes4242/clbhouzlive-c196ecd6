@@ -86,7 +86,7 @@ export async function submitHolePhoto(post: FeedPost, courseId: string, memberId
   if (auth.user?.id !== memberId) throw new Error('Please sign in again before tagging.');
   const [sourceUrls, existing] = await Promise.all([fetchOwnPhotoUrls(courseId, memberId), fetchHolePhotos(courseId, memberId)]);
   if (!sourceUrls.includes(media.imageUrl)) throw new Error('This photograph is not yours at this course.');
-  if (existing.some(row => row.media_url === media.imageUrl && row.user_id === memberId)) throw new Error('This photograph is already tagged.');
+  if (existing.some(row => row.media_url === media.imageUrl && row.user_id === memberId)) throw Object.assign(new Error('That photo is already tagged.'), { code: '23505' });
   const name = new URL(media.imageUrl).pathname.split('/').pop() || 'photograph';
   const { exif } = await prepareHolePhoto(media.imageUrl);
   const verdict = holePhotoVerdict(exif, memberId, courseId, []);

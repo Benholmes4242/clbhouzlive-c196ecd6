@@ -22,6 +22,7 @@ import { useMediaUpload } from '@/uploads/hooks/useMediaUpload';
 import { HoleKnownPhotoPath, HolePhotoBatchPath } from './HolePhotoFastPaths';
 import { prepareHolePhoto, submitLibraryHolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { orderedBatch, type BatchPhoto } from '@/lib/courseMedia/holePhotoBatch';
+import { holePhotoErrorMessage } from '@/lib/courseMedia/holePhotoError';
 import { coursePhotoState } from '@/lib/courseMedia/emptyStates';
 import { CourseFirstPhotoPicker, CoursePhotoRetagPicker, CourseMediaNoPhotographs, CourseMediaNothing, CourseMediaNoHoleList, CourseMediaNotLive } from './CourseMediaEmptyStates';
 
@@ -84,7 +85,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
     if (addHole == null) return;
     setFastPending(true); setFastError(null);
     try { await tagging.submit.mutateAsync({ post: sourcePost(url), hole: addHole }); setAddHole(null); }
-    catch { setFastError('The photograph could not be tagged. The tag was not saved.'); }
+    catch (error) { setFastError(holePhotoErrorMessage(error)); }
     finally { setFastPending(false); }
   };
   const tagLibrary = async (file: File, hole = addHole) => {
@@ -98,7 +99,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       await cache.invalidateQueries({ queryKey: ['hole-photo-tags', courseId, user.id] });
       await cache.invalidateQueries({ queryKey: ['course-media-counts', courseId] });
       await cache.invalidateQueries({ queryKey: ['course-media-feed', courseId] });
-    } catch { setFastError('The photograph could not be tagged. The tag was not saved.'); }
+    } catch (error) { setFastError(holePhotoErrorMessage(error)); }
     finally { setFastPending(false); }
   };
   const beginBatch = async () => {
@@ -199,7 +200,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         tagging={tagging.ready && user && knownHoles ? { memberId: user.id, holeCount: knownHoles.length, taggedUrls: tagging.taggedUrls, taggedHoles: new Map((tagging.tags.data ?? []).filter(row => row.status === 'approved' && row.user_id === user.id).map(row => [row.media_url, row.hole_no])), onTag: startTag } : undefined}
       />}
       <CourseMediaNotLive rows={tagging.tags.data ?? []} memberId={user.id} courseId={courseId} onRetag={knownHoles && knownHoles.length > 0 ? row => { tagging.retag.reset(); setRetagPhoto(row); } : undefined} />
-      {retagPhoto && knownHoles && <CoursePhotoRetagPicker key={retagPhoto.id} row={retagPhoto} knownHoles={knownHoles} pending={tagging.retag.isPending} error={tagging.retag.error ? 'The photograph could not be retagged. The new tag was not saved.' : null} onClose={() => setRetagPhoto(null)} onSubmit={hole => tagging.retag.mutate({ row: retagPhoto, hole }, { onSuccess: () => setRetagPhoto(null) })} />}
+      {retagPhoto && knownHoles && <CoursePhotoRetagPicker key={retagPhoto.id} row={retagPhoto} knownHoles={knownHoles} pending={tagging.retag.isPending} error={tagging.retag.error ? holePhotoErrorMessage(tagging.retag.error, 'The photograph could not be retagged. The new tag was not saved.') : null} onClose={() => setRetagPhoto(null)} onSubmit={hole => tagging.retag.mutate({ row: retagPhoto, hole }, { onSuccess: () => setRetagPhoto(null) })} />}
       {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} pending={fastPending} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); }} />}
       {firstPhoto && knownHoles && <CourseFirstPhotoPicker knownHoles={knownHoles} pending={fastPending} error={fastError} onSubmit={tagLibrary} onClose={() => { setFirstPhoto(false); }} />}
       {batch && knownHoles && <HolePhotoBatchPath photos={batch} knownHoles={knownHoles} onClose={() => setBatch(null)} onTag={(url, hole) => tagging.submit.mutateAsync({ post: sourcePost(url), hole })} />}
@@ -208,7 +209,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
           initialHole={addHole} imageOptions={addHole == null ? undefined : ownOptions} onImageChange={url => setTagPost(sourcePost(url))}
           holeCount={knownHoles.length} knownHoleNumbers={knownHoles} usedHoles={(tagging.tags.data ?? []).filter(row => row.user_id === user.id).map(row => row.hole_no)}
           pending={tagging.submit.isPending}
-          error={tagging.submit.error ? 'The photograph could not be tagged. The tag was not saved.' : null}
+          error={tagging.submit.error ? holePhotoErrorMessage(tagging.submit.error) : null}
           onClose={() => setTagPost(null)}
           onSubmit={hole => tagging.submit.mutate({ post: tagPost, hole }, { onSuccess: () => setTagPost(null) })} />
       )}

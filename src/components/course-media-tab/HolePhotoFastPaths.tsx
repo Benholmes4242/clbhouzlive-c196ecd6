@@ -13,6 +13,7 @@ import { holeOrdinal } from '@/lib/courseMedia/holeWalk';
 import { capitalPhotoCount, spellPhotoCount, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { advanceBatch, closedHoleCount, startBatch, type BatchPhoto } from '@/lib/courseMedia/holePhotoBatch';
 import type { HolePhotoRound } from '@/lib/courseMedia/holePhotoVerdict';
+import { holePhotoErrorMessage } from '@/lib/courseMedia/holePhotoError';
 import './hole-photo-fast.css';
 
 const theme = { '--hole-walk-ink': A.INK, '--hole-walk-canvas': A.CANVAS, '--hole-walk-muted': A.MUTE, '--hole-walk-rule': A.BORDER, '--hole-walk-track': A.TRACK, '--hole-photo-panel': A.PANEL, '--hole-photo-success': A.IMPROVED } as CSSProperties;
@@ -51,7 +52,7 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onClose }: {
       const next = advanceBatch(state, photo.url, hole);
       setState(next); setSelected(null);
       if (next.index >= photos.length) onClose();
-    } catch { setError('The photograph could not be tagged. The tag was not saved.'); }
+    } catch (error) { setError(holePhotoErrorMessage(error)); }
     finally { setPending(false); }
   };
   const skip = () => { if (!photo) return; const next = advanceBatch(state, photo.url, null); setState(next); setSelected(null); setError(null); if (next.index >= photos.length) onClose(); };

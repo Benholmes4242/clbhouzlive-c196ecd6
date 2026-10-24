@@ -75,4 +75,24 @@ describe('MEDIA_FAST_1', () => {
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/b.jpg'));
     expect(tag).toHaveBeenCalledWith('/a.jpg', 7); expect(screen.getByRole('button', { name: 'Hole 4' })).toBeDisabled();
   });
+  it('a second and third photograph can be tagged to the same hole', async () => {
+    const tag = vi.fn().mockResolvedValue({ status: 'approved' } as HolePhoto);
+    const close = vi.fn();
+    render(<HolePhotoBatchPath photos={[photo('/a.jpg'), photo('/b.jpg'), photo('/c.jpg')]} knownHoles={[4, 7]} onTag={tag} onClose={close} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
+    await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/b.jpg'));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
+    await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/c.jpg'));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
+    await waitFor(() => expect(close).toHaveBeenCalledTimes(1));
+    expect(tag.mock.calls).toEqual([['/a.jpg', 4], ['/b.jpg', 4], ['/c.jpg', 4]]);
+  });
+  it('batch unique violations identify the duplicate photo and do not advance', async () => {
+    const tag = vi.fn().mockRejectedValue({ code: '23505' });
+    render(<HolePhotoBatchPath photos={[photo('/a.jpg'), photo('/b.jpg')]} knownHoles={[4]} onTag={tag} onClose={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
+    await screen.findByRole('alert');
+    expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/a.jpg');
+    expect(tag).toHaveBeenCalledWith('/a.jpg', 4);
+  });
 });

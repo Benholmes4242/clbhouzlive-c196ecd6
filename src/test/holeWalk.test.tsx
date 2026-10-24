@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
@@ -61,5 +61,56 @@ describe('MEDIA_WALK_1_R', () => {
     const submitted: number[] = [];
     render(<HolePhotoTagDialog imageUrl="/photo.jpg" initialHole={3} holeCount={2} knownHoleNumbers={[1, 3]} usedHoles={[]} pending={false} error={null} onClose={() => {}} onSubmit={n => submitted.push(n)} />);
     expect(screen.getByRole('button', { name: 'Hole 3' })).toHaveAttribute('aria-pressed', 'true'); fireEvent.click(screen.getByRole('button', { name: 'Hole 3' })); expect(submitted).toEqual([3]);
+  });
+  it('tile 4 opens its region directly after tile 6 and before tile 7', () => {
+    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[]} totalMedia={0} onAddFirst={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
+    const panel = screen.getByRole('region', { name: 'Hole 4' });
+    expect(panel.previousElementSibling).toBe(screen.getByRole('button', { name: 'Hole 6' }));
+    expect(panel.nextElementSibling).toBe(screen.getByRole('button', { name: 'Hole 7' }));
+  });
+  it('tapping tile 4 again closes its region and clears aria-pressed', () => {
+    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[]} totalMedia={0} onAddFirst={() => {}} />);
+    const button = screen.getByRole('button', { name: 'Hole 4' });
+    fireEvent.click(button); fireEvent.click(button);
+    expect(screen.queryByRole('region')).toBeNull();
+    expect(button).toHaveAttribute('aria-pressed', 'false');
+  });
+  it('switching from tile 4 to tile 11 moves the only region after tile 12', () => {
+    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[]} totalMedia={0} onAddFirst={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 11' }));
+    const panel = screen.getByRole('region', { name: 'Hole 11' });
+    expect(panel.previousElementSibling).toBe(screen.getByRole('button', { name: 'Hole 12' }));
+    expect(panel.nextElementSibling).toBe(screen.getByRole('button', { name: 'Hole 13' }));
+    expect(screen.getAllByRole('region')).toHaveLength(1);
+  });
+  it('tile 18 opens the region after the final tile', () => {
+    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[]} totalMedia={0} onAddFirst={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 18' }));
+    const panel = screen.getByRole('region', { name: 'Hole 18' });
+    expect(panel.previousElementSibling).toBe(screen.getByRole('button', { name: 'Hole 18' }));
+    expect(panel.nextElementSibling).toBeNull();
+  });
+  it('switching holes resets the displayed photograph to the first', () => {
+    render(<HoleWalk available holes={[hole(4), hole(11)]} rows={[photo('a', 4), photo('b', 4), photo('c', 11)]} totalMedia={3} onAddFirst={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
+    fireEvent.click(screen.getByRole('button', { name: 'View photograph' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 11' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
+    const panel = screen.getByRole('region', { name: 'Hole 4' });
+    expect(panel.querySelector('.hole-walk-photo img')).toHaveAttribute('src', '/photo-a.jpg');
+  });
+  it.each([['below', window.innerHeight + 1, 1], ['visible', 100, 0]] as const)('scrolls only when the region is %s the viewport', (_state, top, calls) => {
+    const scroll = vi.fn();
+    const original = HTMLElement.prototype.scrollIntoView;
+    HTMLElement.prototype.scrollIntoView = scroll;
+    const rect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ top } as DOMRect);
+    try {
+      render(<HoleWalk available holes={[hole(4)]} rows={[]} totalMedia={0} onAddFirst={() => {}} />);
+      fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
+      expect(scroll).toHaveBeenCalledTimes(calls);
+      if (calls) expect(scroll).toHaveBeenCalledWith({ block: 'nearest', behavior: 'smooth' });
+    } finally { rect.mockRestore(); HTMLElement.prototype.scrollIntoView = original; }
   });
 });
