@@ -1,6 +1,7 @@
 .hole-photo-fast { color: var(--hole-walk-ink); background: var(--hole-photo-panel); }
-.hole-photo-fast-sheet { left: 50%; top: auto; bottom: 0; transform: translateX(-50%); width: min(100%,393px); max-width: 393px; padding: 18px 18px 22px; gap: 14px; border-radius: 8px 8px 0 0; border-color: var(--hole-walk-rule); }
-.hole-photo-fast-grab { width: 36px; height: 4px; margin: 0 auto 1px; border-radius: 2px; background: var(--hole-walk-track); }
+/* Centred dialog, matching HolePhotoTagDialog: same width, radius, padding and
+ * centred position; taller content scrolls inside a viewport-capped box. */
+.hole-photo-fast-sheet { left: 50%; top: 50%; bottom: auto; transform: translate(-50%,-50%); width: calc(100% - 32px); max-width: 24rem; max-height: calc(100dvh - 48px); overflow-y: auto; padding: 16px; gap: 12px; border-radius: 8px; border-color: var(--hole-walk-rule); }
 .hole-photo-fast-title { font-size: 16px; font-weight: 700; line-height: 1.2; letter-spacing: 0; }
 .hole-photo-fast-lede { font-size: 12.5px; line-height: 1.5; color: var(--hole-walk-muted); }
 .hole-photo-fast-pile { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 5px; }
@@ -14,5 +15,3 @@
 .hole-photo-fast-action:hover { background: var(--hole-walk-ink); color: var(--hole-walk-canvas); }
 .hole-photo-fast-skip { background: transparent; color: var(--hole-walk-muted); border: 1px solid var(--hole-walk-rule); }
 .hole-photo-fast-skip:hover { background: transparent; color: var(--hole-walk-ink); }
-.hole-photo-fast-floor { border-left: 2px solid var(--hole-walk-rule); padding-left: 11px; font-size: 12px; line-height: 1.5; color: var(--hole-walk-muted); }
-.hole-photo-fast-floor strong { color: var(--hole-walk-ink); }
