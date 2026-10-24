@@ -46,7 +46,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
         {tile.hole.stroke_index != null && <div><b>{tile.hole.stroke_index}</b><span>Stroke index</span></div>}
         {field && <div><b style={{ color: field.tone }}>{field.text}</b><span>Field loses</span></div>}
       </div>
-      {tile.photos.length >= 2 && <div className="hole-walk-strip">{tile.photos.filter(photo => photo.id !== active?.id).map(photo => <Button variant="ghost" key={photo.id} aria-label="View photograph" className="hole-walk-thumbnail" onClick={() => setPhotoId(photo.id)}><img src={photo.media_url} alt={`Hole ${tile.hole.hole_no}`} loading="lazy" /></Button>{index === rowEnd && panel}</Fragment>)}</div>}
+      {tile.photos.length >= 2 && <div className="hole-walk-strip">{tile.photos.filter(photo => photo.id !== active?.id).map(photo => <Button variant="ghost" key={photo.id} aria-label="View photograph" className="hole-walk-thumbnail" onClick={() => setPhotoId(photo.id)}><img src={photo.media_url} alt={`Hole ${tile.hole.hole_no}`} loading="lazy" /></Button>)}</div>}
       {months.length > 0 && <div className="hole-walk-months">{months.map(item => <span key={item.month}>{capitalPhotoCount(item.count)} in {captureMonthLabel(item.month)}</span>)}</div>}
       {/* MEDIA_CTA_1: the sentence is absent below two photographs; at two or
           more it reads "shots of this hole", gaining "across {spelled} months"
