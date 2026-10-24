@@ -154,14 +154,17 @@ export async function submitHolePhoto(post: FeedPost, courseId: string, memberId
   if (authError) throw authError;
   if (auth.user?.id !== memberId) throw new Error('Please sign in again before tagging.');
   const [sources, existing] = await Promise.all([fetchOwnMediaSources(courseId, memberId), fetchHolePhotos(courseId, memberId)]);
-  const source = sources.find(item => item.url === url && item.mediaType === media.type);
+  const key = holeMediaKey(media);
+  const source = sources.find(item => item.mediaType === media.type && (item.url === url || holeMediaKey(item) === key));
   if (!source) throw new Error(`This ${kind} is not yours at this course.`);
-  if (existing.some(row => row.media_url === url && row.user_id === memberId)) throw Object.assign(new Error(`That ${kind} is already tagged.`), { code: '23505' });
-  const name = new URL(url).pathname.split('/').pop() || kind;
-  const { exif } = await prepareHolePhoto(url);
+  if (existing.some(row => row.user_id === memberId && (row.media_url === url || holeMediaKey({ mediaType: row.media_type, url: row.media_url, streamId: row.stream_id }) === key))) throw Object.assign(new Error(`That ${kind} is already tagged.`), { code: '23505' });
+  // The stored URL is always the source's canonical media_url, never the feed item's derived playback URL.
+  const canonicalUrl = source.url;
+  const name = new URL(canonicalUrl).pathname.split('/').pop() || kind;
+  const { exif } = await prepareHolePhoto(canonicalUrl);
   const verdict = holePhotoVerdict(exif, memberId, courseId, []);
   const { data, error } = await supabase.from('course_hole_media').insert({
-    course_id: courseId, user_id: memberId, hole_no: hole, media_url: url,
+    course_id: courseId, user_id: memberId, hole_no: hole, media_url: canonicalUrl,
     file_name: name, width: source.width || media.width || null, height: source.height || media.height || null,
     media_type: media.type,
     ...(media.type === 'video' ? { stream_id: source.streamId, poster_url: source.posterUrl, duration_seconds: source.durationSeconds } : {}), ...verdict,

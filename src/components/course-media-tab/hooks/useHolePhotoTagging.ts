@@ -26,7 +26,13 @@ export function useHolePhotoTagging(courseId: string, memberId: string | undefin
       await cache.invalidateQueries({ queryKey: ['hole-photo-tags', courseId, memberId] });
     },
   });
-  const taggedUrls = new Set((tags.data ?? []).filter(row => row.user_id === memberId).map(row => row.media_url));
+  // Raw canonical URLs plus stream-UID keys, so a feed video whose derived
+  // playback URL differs from its stored media_url still reads as tagged.
+  const taggedUrls = new Set<string>();
+  for (const row of (tags.data ?? []).filter(row => row.user_id === memberId)) {
+    taggedUrls.add(row.media_url);
+    taggedUrls.add(holeMediaKey({ mediaType: row.media_type, url: row.media_url, streamId: row.stream_id }));
+  }
   const retag = useMutation({
     mutationFn: ({ row, hole }: { row: HolePhoto; hole: number }) => {
       if (!memberId || !knownHoles) throw new Error('This photograph cannot be retagged.');
