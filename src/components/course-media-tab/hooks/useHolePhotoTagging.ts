@@ -3,7 +3,7 @@
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { fetchHolePhotos, fetchOwnPhotoSources, fetchOwnPhotoUrls, submitHolePhoto } from '@/lib/courseMedia/holePhotoData';
+import { fetchHolePhotos, fetchOwnPhotoSources, fetchOwnPhotoUrls, holeMediaKey, submitHolePhoto } from '@/lib/courseMedia/holePhotoData';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { retagHolePhoto } from '@/lib/courseMedia/retagHolePhoto';
 
@@ -41,6 +41,7 @@ export function useHolePhotoTagging(courseId: string, memberId: string | undefin
     onSuccess: async () => {
       await cache.invalidateQueries({ queryKey: ['hole-photo-tags', courseId, memberId] });
     },
+    onError: error => { console.error('[hole-tag] failed', error); },
   });
   return { tags, own, sources, taggedUrls, submit, retag, ready: enabled && tags.isSuccess && own.isSuccess };
 }
