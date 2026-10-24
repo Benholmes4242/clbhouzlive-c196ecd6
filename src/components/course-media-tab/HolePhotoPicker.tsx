@@ -1,6 +1,6 @@
 /** One picker for single photographs and batches (never the known-hole path).
  * The parent owns course count and used holes. Never fetch or assume a count.
- * data-state names closed/open/used independently of selection; closed wins.
+ * Every known hole is always selectable; used holes are marked, never closed.
  */
 import { Button } from '@/components/ui/button';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -10,19 +10,18 @@ interface HolePhotoPickerProps {
   holeCount: number;
   /** Preserve sparse known-hole numbers and order from the analysis RPC. */
   knownHoleNumbers?: readonly number[];
-  floor?: number;
   selectedHole: number | null;
   usedHoles?: readonly number[];
   onSelect: (hole: number) => void;
 }
 
-export function HolePhotoPicker({ holeCount, knownHoleNumbers, floor = 0, selectedHole, usedHoles = [], onSelect }: HolePhotoPickerProps) {
+export function HolePhotoPicker({ holeCount, knownHoleNumbers, selectedHole, usedHoles = [], onSelect }: HolePhotoPickerProps) {
   const numbers = knownHoleNumbers?.length === holeCount ? knownHoleNumbers : holeNumbers(holeCount);
-  const hasUsedHole = numbers.some(hole => usedHoles.includes(hole) && (knownHoleNumbers ? hole >= floor : selectableHole(hole, holeCount, floor)));
+  const hasUsedHole = numbers.some(hole => usedHoles.includes(hole) && (knownHoleNumbers ? true : selectableHole(hole, holeCount)));
   return (
     <div role="group" aria-label="Hole" className="grid grid-cols-6 gap-[6px]">
       {numbers.map(hole => {
-        const available = knownHoleNumbers ? hole >= floor : selectableHole(hole, holeCount, floor);
+        const available = knownHoleNumbers ? true : selectableHole(hole, holeCount);
         const selected = available && hole === selectedHole;
         const used = available && usedHoles.includes(hole);
         return (
@@ -46,7 +45,7 @@ export function HolePhotoPicker({ holeCount, knownHoleNumbers, floor = 0, select
       })}
       {hasUsedHole && <p className="col-span-full mt-1 text-[12px] leading-normal" style={{ color: A.DIM }}>
         <span aria-hidden="true" className="inline-block size-2 mr-1.5" style={{ background: A.IMPROVED }} />
-        You've already tagged a photo here. You can add more.
+        You've already tagged a photo or video here. You can add more.
       </p>}
     </div>
   );

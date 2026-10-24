@@ -56,6 +56,9 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
         {tile.hole.stroke_index != null && <div><b>{tile.hole.stroke_index}</b><span>Stroke index</span></div>}
         {field && <div><b style={{ color: field.tone }}>{field.text}</b><span>Field loses</span></div>}
       </div>
+      {/* A hole that already has media still takes more from an eligible member;
+          same entry point as "Add the first", which stays for empty holes. */}
+      {tile.photos.length >= 1 && <Button variant="ghost" className="hole-walk-add" onClick={() => onAddFirst(tile.hole.hole_no)}>Add a photo or video</Button>}
       {tile.photos.length >= 2 && <div className="hole-walk-strip">{tile.photos.filter(photo => photo.id !== active?.id).map(photo => <Button variant="ghost" key={photo.id} aria-label={photo.media_type === 'video' ? 'View video' : 'View photograph'} className="hole-walk-thumbnail" onClick={() => setPhotoId(photo.id)}><HoleMediaThumbnail url={photo.media_url} mediaType={photo.media_type} posterUrl={photo.poster_url} streamId={photo.stream_id} durationSeconds={photo.duration_seconds} alt={`Hole ${tile.hole.hole_no}`} /></Button>)}</div>}
       {months.length > 0 && <div className="hole-walk-months">{months.map(item => <span key={item.month}>{capitalPhotoCount(item.count)} in {captureMonthLabel(item.month)}</span>)}</div>}
       {/* MEDIA_CTA_1: the sentence is absent below two photographs; at two or
