@@ -3548,6 +3548,7 @@ export type Database = {
           auto_verdict: string | null
           course_id: string
           created_at: string
+          duration_seconds: number | null
           exif_captured_at: string | null
           exif_lat: number | null
           exif_lng: number | null
@@ -3555,12 +3556,15 @@ export type Database = {
           height: number | null
           hole_no: number
           id: string
+          media_type: string
           media_url: string
+          poster_url: string | null
           proof_score_id: string | null
           reject_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
+          stream_id: string | null
           user_id: string
           width: number | null
         }
@@ -3570,6 +3574,7 @@ export type Database = {
           auto_verdict?: string | null
           course_id: string
           created_at?: string
+          duration_seconds?: number | null
           exif_captured_at?: string | null
           exif_lat?: number | null
           exif_lng?: number | null
@@ -3577,12 +3582,15 @@ export type Database = {
           height?: number | null
           hole_no: number
           id?: string
+          media_type?: string
           media_url: string
+          poster_url?: string | null
           proof_score_id?: string | null
           reject_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
+          stream_id?: string | null
           user_id: string
           width?: number | null
         }
@@ -3592,6 +3600,7 @@ export type Database = {
           auto_verdict?: string | null
           course_id?: string
           created_at?: string
+          duration_seconds?: number | null
           exif_captured_at?: string | null
           exif_lat?: number | null
           exif_lng?: number | null
@@ -3599,12 +3608,15 @@ export type Database = {
           height?: number | null
           hole_no?: number
           id?: string
+          media_type?: string
           media_url?: string
+          poster_url?: string | null
           proof_score_id?: string | null
           reject_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
+          stream_id?: string | null
           user_id?: string
           width?: number | null
         }
