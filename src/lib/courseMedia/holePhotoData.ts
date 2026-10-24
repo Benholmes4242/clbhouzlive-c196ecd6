@@ -11,7 +11,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { readHolePhotoExif } from './holePhotoExif';
 import { holePhotoVerdict, type HolePhotoRound } from './holePhotoVerdict';
 import { streamPosterFrom } from '@/utils/mediaThumbs';
-import { buildHlsUrl } from '@/utils/streamId';
+import { buildHlsUrl, extractCloudflareUid } from '@/utils/streamId';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { ALLOWED_VIDEO_TYPES, POST_LIMITS } from '@/constants/postLimits';
 
@@ -34,6 +34,22 @@ export function holeMediaPoster(media: { media_url: string; media_type?: string;
 }
 export const holeSourceUrl = (media: FeedPost['mediaItems'][number] | undefined) => media?.imageUrl || media?.hlsUrl || media?.mp4Url || '';
 
+/** One media identity for every feed-item/source/tag match. A video's identity
+ * is its Cloudflare Stream UID (feed URLs are derived and never equal the
+ * stored media_url); an image's identity stays its canonical media URL. */
+type HoleMediaKeyInput = {
+  type?: string; mediaType?: string | null;
+  url?: string; imageUrl?: string; hlsUrl?: string | null; mp4Url?: string | null; streamId?: string | null;
+};
+export function holeMediaKey(media: HoleMediaKeyInput): string {
+  const url = media.url ?? media.imageUrl ?? media.hlsUrl ?? media.mp4Url ?? '';
+  if (media.mediaType === 'video' || media.type === 'video') {
+    const uid = media.streamId || extractCloudflareUid(media.hlsUrl ?? '') || extractCloudflareUid(url);
+    if (uid) return `stream:${uid}`;
+  }
+  return `url:${url}`;
+}
+
 export type HolePhoto = Database['public']['Tables']['course_hole_media']['Row'];
 const PAGE = 500;
 export async function readAllPages<T>(load: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }>): Promise<T[]> {
@@ -50,7 +66,8 @@ export async function readAllPages<T>(load: (from: number, to: number) => Promis
 export function canTagHolePhoto(post: FeedPost, memberId: string | undefined, knownCount: number | null, taggedUrls: ReadonlySet<string>): boolean {
   const media = post.mediaItems[0];
   return knownCount != null && knownCount > 0 && !!memberId && post.userId === memberId &&
-    post.actorType === 'personal' && (media?.type === 'image' || (media?.type === 'video' && !media.isProcessing)) && !!holeSourceUrl(media) && !taggedUrls.has(holeSourceUrl(media));
+    post.actorType === 'personal' && (media?.type === 'image' || (media?.type === 'video' && !media.isProcessing)) && !!holeSourceUrl(media) &&
+    !taggedUrls.has(holeSourceUrl(media)) && !taggedUrls.has(holeMediaKey(media));
 }
 
 export async function fetchHolePhotos(courseId: string, memberId: string) {
