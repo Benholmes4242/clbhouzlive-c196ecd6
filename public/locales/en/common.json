@@ -406,13 +406,97 @@
         "analyst": "Analyst"
       },
       "manage": {
-        "addJobTitle": "Add job title",
-        "addJobTitleAria": "Add job title",
-        "editJobTitleAria": "Edit job title",
+        "pendingInvites": "Pending invites"
+      },
+      "sectionTwo": {
+        "kicker": "Team",
+        "window": "Last 30 days",
         "hidden": "Hidden",
-        "members": "Members",
-        "pendingInvites": "Pending invites",
-        "public": "Public"
+        "addJobTitle": "Add job title",
+        "you": "You",
+        "youPrefix": "You · ",
+        "posts_one": "post",
+        "posts_other": "posts",
+        "replies_one": "reply",
+        "replies_other": "replies",
+        "activeWhen": "active {{when}}",
+        "lastActive": "Last active {{when}}",
+        "neverPosted": "Hasn't posted as {{business}} yet",
+        "inactive_one": "Not active in {{count}} week",
+        "inactive_other": "Not active in {{count}} weeks",
+        "reviewAccess": "Review access",
+        "when": {
+          "today": "today",
+          "yesterday": "yesterday",
+          "lastWeek": "last week",
+          "weeksAgo_one": "{{count}} week ago",
+          "weeksAgo_other": "{{count}} weeks ago"
+        },
+        "roles": {
+          "owner": "Owner",
+          "admin": "Admin",
+          "editor": "Editor",
+          "analyst": "Analyst"
+        },
+        "menu": {
+          "role": "Role",
+          "jobTitle": "Job title",
+          "visibility": "Show on the profile",
+          "hiddenFrom": "Hidden from {{business}}'s Team tab",
+          "makeOwner": "Make owner",
+          "remove": "Remove from team",
+          "leave": "Leave {{business}}",
+          "joined": "{{role}} · joined {{date}}",
+          "actions": "Actions for {{name}}"
+        },
+        "roleSheet": {
+          "title": "{{name}}'s role",
+          "line": "Changes take effect straight away.",
+          "kicker": "Role",
+          "current": "Current",
+          "make": {
+            "admin": "Make {{first}} an Admin",
+            "editor": "Make {{first}} an Editor",
+            "analyst": "Make {{first}} an Analyst"
+          },
+          "done": "{{first}} is now an {{role}}"
+        },
+        "jobSheet": {
+          "title": "{{name}}'s job title",
+          "line": "Shows under their name here and on the profile.",
+          "lineSelf": "Shows under your name here and on the profile.",
+          "hint": "For example: Head Professional, Bar Manager",
+          "save": "Save",
+          "remove": "Remove job title",
+          "saved": "Job title saved",
+          "removed": "Job title removed"
+        },
+        "ownerSheet": {
+          "title": "Make {{name}} the owner?",
+          "b1": "{{first}} can delete {{business}} and change anyone's role, including yours.",
+          "b2": "You become an Admin. Only {{first}} can make you owner again.",
+          "confirm": "Make {{first}} owner",
+          "done": "{{first}} is now the owner"
+        },
+        "removeSheet": {
+          "title": "Remove {{name}} from the team?",
+          "b1": "{{first}} loses access to {{business}} straight away.",
+          "b2": "Posts {{first}} made as {{business}} stay up.",
+          "b3": "You can invite {{first}} again at any time.",
+          "confirm": "Remove {{first}}",
+          "done": "{{first}} removed from the team"
+        },
+        "leaveSheet": {
+          "title": "Leave {{business}}?",
+          "b1": "You lose access straight away.",
+          "b2": "Posts you made as {{business}} stay up.",
+          "confirm": "Leave",
+          "done": "You left {{business}}"
+        },
+        "failed": "Something went wrong",
+        "loadFailed": "Couldn't load your team",
+        "loadFailedLine": "Check your connection and try again.",
+        "retry": "Retry"
       }
     },
     "hero": {

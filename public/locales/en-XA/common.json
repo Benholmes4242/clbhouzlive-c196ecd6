@@ -361,13 +361,97 @@
         "analyst": "[~~Áñáļýšţ~~]"
       },
       "manage": {
-        "addJobTitle": "[~~Áđđ ĵőƀ ţíţļé~~]",
-        "addJobTitleAria": "[~~Áđđ ĵőƀ ţíţļé~~]",
-        "editJobTitleAria": "[~~Éđíţ ĵőƀ ţíţļé~~]",
-        "hidden": "[~~Ĥíđđéñ~~]",
-        "members": "[~~Ṁéɱƀéřš~~]",
-        "pendingInvites": "[~~Ƥéñđíñĝ íñṽíţéš~~]",
-        "public": "[~~Ƥúƀļíĉ~~]"
+        "pendingInvites": "[~~Ƥéñđíñĝ íñṽíţéš~~]"
+      },
+      "sectionTwo": {
+        "kicker": "[~~Ţéám~~]",
+        "window": "[~~Ĺášţ 30 dáýš~~]",
+        "hidden": "[~~Ĥíddéñ~~]",
+        "addJobTitle": "[~~Ádd jób ţíţlé~~]",
+        "you": "[~~Ýóú~~]",
+        "youPrefix": "[~~Ýóú · ~~]",
+        "posts_one": "[~~póšţ~~]",
+        "posts_other": "[~~póšţš~~]",
+        "replies_one": "[~~ŕéplý~~]",
+        "replies_other": "[~~ŕéplíéš~~]",
+        "activeWhen": "[~~áçţívé {{when}}~~]",
+        "lastActive": "[~~Ĺášţ áçţívé {{when}}~~]",
+        "neverPosted": "[~~Ĥášñ'ţ póšţéd áš {{business}} ýéţ~~]",
+        "inactive_one": "[~~Ñóţ áçţívé íñ {{count}} wéék~~]",
+        "inactive_other": "[~~Ñóţ áçţívé íñ {{count}} wéékš~~]",
+        "reviewAccess": "[~~Ŕévíéw áççéšš~~]",
+        "when": {
+          "today": "[~~ţódáý~~]",
+          "yesterday": "[~~ýéšţéŕdáý~~]",
+          "lastWeek": "[~~lášţ wéék~~]",
+          "weeksAgo_one": "[~~{{count}} wéék ágó~~]",
+          "weeksAgo_other": "[~~{{count}} wéékš ágó~~]"
+        },
+        "roles": {
+          "owner": "[~~Owñéŕ~~]",
+          "admin": "[~~Ádmíñ~~]",
+          "editor": "[~~Édíţóŕ~~]",
+          "analyst": "[~~Áñálýšţ~~]"
+        },
+        "menu": {
+          "role": "[~~Ŕólé~~]",
+          "jobTitle": "[~~Jób ţíţlé~~]",
+          "visibility": "[~~Šhów óñ ţhé pŕófílé~~]",
+          "hiddenFrom": "[~~Ĥíddéñ fŕóm {{business}}'š Ţéám ţáb~~]",
+          "makeOwner": "[~~Ḿáké ówñéŕ~~]",
+          "remove": "[~~Ŕémóvé fŕóm ţéám~~]",
+          "leave": "[~~Ĺéávé {{business}}~~]",
+          "joined": "[~~{{role}} · jóíñéd {{date}}~~]",
+          "actions": "[~~Áçţíóñš fóŕ {{name}}~~]"
+        },
+        "roleSheet": {
+          "title": "[~~{{name}}'š ŕólé~~]",
+          "line": "[~~Cháñgéš ţáké éfféçţ šţŕáíghţ áwáý.~~]",
+          "kicker": "[~~Ŕólé~~]",
+          "current": "[~~Cúŕŕéñţ~~]",
+          "make": {
+            "admin": "[~~Ḿáké {{first}} áñ Ádmíñ~~]",
+            "editor": "[~~Ḿáké {{first}} áñ Édíţóŕ~~]",
+            "analyst": "[~~Ḿáké {{first}} áñ Áñálýšţ~~]"
+          },
+          "done": "[~~{{first}} íš ñów áñ {{role}}~~]"
+        },
+        "jobSheet": {
+          "title": "[~~{{name}}'š jób ţíţlé~~]",
+          "line": "[~~Šhówš úñdéŕ ţhéíŕ ñámé héŕé áñd óñ ţhé pŕófílé.~~]",
+          "lineSelf": "[~~Šhówš úñdéŕ ýóúŕ ñámé héŕé áñd óñ ţhé pŕófílé.~~]",
+          "hint": "[~~Fóŕ éxámplé: Ĥéád Ƥŕóféššíóñál, Báŕ Ḿáñágéŕ~~]",
+          "save": "[~~Šávé~~]",
+          "remove": "[~~Ŕémóvé jób ţíţlé~~]",
+          "saved": "[~~Jób ţíţlé šávéd~~]",
+          "removed": "[~~Jób ţíţlé ŕémóvéd~~]"
+        },
+        "ownerSheet": {
+          "title": "[~~Ḿáké {{name}} ţhé ówñéŕ?~~]",
+          "b1": "[~~{{first}} çáñ déléţé {{business}} áñd çháñgé áñýóñé'š ŕólé, íñçlúdíñg ýóúŕš.~~]",
+          "b2": "[~~Ýóú béçómé áñ Ádmíñ. Oñlý {{first}} çáñ máké ýóú ówñéŕ ágáíñ.~~]",
+          "confirm": "[~~Ḿáké {{first}} ówñéŕ~~]",
+          "done": "[~~{{first}} íš ñów ţhé ówñéŕ~~]"
+        },
+        "removeSheet": {
+          "title": "[~~Ŕémóvé {{name}} fŕóm ţhé ţéám?~~]",
+          "b1": "[~~{{first}} lóšéš áççéšš ţó {{business}} šţŕáíghţ áwáý.~~]",
+          "b2": "[~~Ƥóšţš {{first}} mádé áš {{business}} šţáý úp.~~]",
+          "b3": "[~~Ýóú çáñ íñvíţé {{first}} ágáíñ áţ áñý ţímé.~~]",
+          "confirm": "[~~Ŕémóvé {{first}}~~]",
+          "done": "[~~{{first}} ŕémóvéd fŕóm ţhé ţéám~~]"
+        },
+        "leaveSheet": {
+          "title": "[~~Ĺéávé {{business}}?~~]",
+          "b1": "[~~Ýóú lóšé áççéšš šţŕáíghţ áwáý.~~]",
+          "b2": "[~~Ƥóšţš ýóú mádé áš {{business}} šţáý úp.~~]",
+          "confirm": "[~~Ĺéávé~~]",
+          "done": "[~~Ýóú léfţ {{business}}~~]"
+        },
+        "failed": "[~~Šóméţhíñg wéñţ wŕóñg~~]",
+        "loadFailed": "[~~Cóúldñ'ţ lóád ýóúŕ ţéám~~]",
+        "loadFailedLine": "[~~Chéçk ýóúŕ çóññéçţíóñ áñd ţŕý ágáíñ.~~]",
+        "retry": "[~~Ŕéţŕý~~]"
       }
     },
     "hero": {
