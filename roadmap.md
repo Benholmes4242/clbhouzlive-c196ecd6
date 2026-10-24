@@ -1,5 +1,11 @@
 # Roadmap
 
+## HOLE_MEDIA_VIDEOS_STAGE_2
+- [ ] Extend both hole-library pickers and route videos through the review resilient uploader, preserving R2 photos and capture-date-only months.
+- [ ] Insert processing video contributions; isolate webhook metadata updates before the byte-identical post flow and deploy only that function.
+- [ ] Add tests without changing existing cases; run full suite against 2,518 /323 files baseline and inspect automatic compiler/build signals.
+- [ ] Verify upload → processing → ready display; report any unavailable live checks, all new strings, picker paths and deploy result.
+
 ## HOLE_MEDIA_VIDEOS_STAGE_1
 - [x] Apply founder rulings: change only mediaTrust line23 expected photo copy; restore EXIF-only captureMonth and the original missing-EXIF test, preserving all other video work.
 - [x] Full ruling suite `bunx vitest run`: 2,518 passed /323 files /0 failures, unchanged total from 2,518 (previously 2,517 passed /1 failed). Only mediaTrust.test.tsx and holeWalk.test.tsx changed in this ruling. Automatic preview build OK05:28:07Z. Manual tsc not run under the environment's harness-only checks rule; separate typecheck remains unverified.

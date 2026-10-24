@@ -12,6 +12,15 @@ import { HoleMediaVideo, HoleMediaThumbnail } from './HoleMediaVideo';
 import { captureMonth, captureMonthLabel, deriveHoleWalk, holeOrdinal, holePhotoMonths } from '@/lib/courseMedia/holeWalk';
 import './hole-walk.css';
 
+/** Stage 2: null duration is never playable. Shared with moderator previews
+ * so neither surface attaches HLS while encoding is still in progress. */
+export function HoleProcessingVideo({ media, label }: { media: { media_url: string; stream_id?: string | null; poster_url?: string | null }; label: string }) {
+  return <div className="hole-media-processing">
+    <img src={holeMediaPoster({ ...media, media_type: 'video' })} alt={label} onError={event => { event.currentTarget.hidden = true; }} />
+    <span className="hole-media-processing-label" style={{ color: A.DIM }}>Processing</span>
+  </div>;
+}
+
 export function HoleWalk({ available, holes, rows, totalMedia, courseName, authors, onAddFirst }: {
   available: boolean; holes: readonly CourseHole[]; rows: readonly HolePhoto[];
   totalMedia: number; courseName?: string; authors?: ReadonlyMap<string, string>;
@@ -39,7 +48,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       <p className="hole-walk-kicker" style={VERDICT_KICKER}>The {holeOrdinal(tile.hole.hole_no)}</p>
       <h2 className="hole-walk-title" style={TAB_TITLE}>Par {tile.hole.par}{tile.hole.yards != null && <> · {tile.hole.yards.toLocaleString()} yards</>}</h2>
       <div className={`hole-walk-photo ${active ? '' : 'hole-walk-photo-open'}`}>
-        {active ? <>{active.media_type === 'video' ? <HoleMediaVideo key={active.id} media={active} label={`Hole ${tile.hole.hole_no}`} /> : <img src={active.media_url} alt={`Hole ${tile.hole.hole_no}`} />}{(author || month) && <div className="hole-walk-caption">{author && <strong>{author}</strong>}{month && <span>{captureMonthLabel(month)}</span>}</div>}</> : <span>No shot yet</span>}
+        {active ? <>{active.media_type === 'video' ? (active.duration_seconds == null ? <HoleProcessingVideo key={active.id} media={active} label={`Hole ${tile.hole.hole_no}`} /> : <HoleMediaVideo key={active.id} media={active} label={`Hole ${tile.hole.hole_no}`} />) : <img src={active.media_url} alt={`Hole ${tile.hole.hole_no}`} />}{(author || month) && <div className="hole-walk-caption">{author && <strong>{author}</strong>}{month && <span>{captureMonthLabel(month)}</span>}</div>}</> : <span>No shot yet</span>}
       </div>
       <div className="hole-walk-stats">
         <div><b>{tile.hole.par}</b><span>Par</span></div>
@@ -67,7 +76,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
         {walk.tiles.map((item, index) => <Fragment key={item.hole.hole_no}><Button variant="ghost" aria-label={`Hole ${item.hole.hole_no}`} aria-pressed={selected === item.hole.hole_no}
           className={`hole-walk-tile ${item.photos.length ? '' : 'hole-walk-open'} ${selected === item.hole.hole_no ? 'hole-walk-selected' : ''}`}
           onClick={() => { setSelected(current => current === item.hole.hole_no ? null : item.hole.hole_no); setPhotoId(null); }}>
-          {item.photos[0] && <img src={holeMediaPoster(item.photos[0])} alt="" loading="lazy" />}
+          {item.photos[0] && <img src={holeMediaPoster(item.photos[0])} alt="" loading="lazy" onError={event => { if (item.photos[0]?.media_type === 'video' && item.photos[0]?.duration_seconds == null) { event.currentTarget.hidden = true; event.currentTarget.parentElement?.classList.add('hole-walk-processing-empty'); } }} />}
           <span className="hole-walk-number">{item.hole.hole_no}</span>
           <span className="hole-walk-count">{item.photos.length || 'Open'}</span>
         </Button>{index === rowEnd && panel}</Fragment>)}
