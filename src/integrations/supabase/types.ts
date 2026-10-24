@@ -20529,6 +20529,7 @@ export type Database = {
         Args: { p_business_id: string }
         Returns: Json
       }
+      get_business_team_feed: { Args: { p_business_id: string }; Returns: Json }
       get_business_week: { Args: { p_business_id: string }; Returns: Json }
       get_career_leaderboard: {
         Args: { p_limit?: number; p_metric: string; p_viewer: string }
