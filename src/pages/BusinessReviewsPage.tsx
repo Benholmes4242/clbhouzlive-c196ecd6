@@ -701,7 +701,7 @@ export default function BusinessReviewsPage() {
         </motion.div>
       </main>
 
-      {replyTarget && (
+      {replyTarget && canManage && (
         <ReplySheet
           open={!!replyTarget}
           onClose={() => setReplyTarget(null)}
