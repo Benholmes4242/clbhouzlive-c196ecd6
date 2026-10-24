@@ -463,7 +463,7 @@ export default function BusinessTeamPage() {
                         {label}
                       </p>
                       <p className="text-[11.5px]" style={{ color: INK_45 }}>
-                        Pending · {BUSINESS_ROLE_LABELS[invite.role]}
+                        {new Date(invite.expires_at).getTime() < Date.now() ? 'Expired' : 'Pending'} · {BUSINESS_ROLE_LABELS[invite.role]}
                       </p>
                     </div>
                     <button

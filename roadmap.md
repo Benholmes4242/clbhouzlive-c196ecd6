@@ -1,5 +1,11 @@
 # Roadmap
 
+## CB74 — Team fixes before rebuild
+- [x] Replace access decisions with TEAM_FIX_V1 RPC, preserve recovery/invalidation paths and add team/invite refresh on approve; align role labels.
+- [x] Label elapsed pending invites Expired without removing Revoke; guard invite form with membership canManage and existing route-loading skeleton.
+- [x] Full `bunx vitest run`: 2,430/319/0 before new tests → 2,450/320/0 after; +20 solely cb74TeamFixes.test.tsx, no existing tests edited/renamed/deleted and no pre-existing failures. Automatic preview build OK. Standalone typecheck prohibited by environment; not claimed. ASK answers and frozen mock differences recorded in /mnt/documents/CB74_report.md.
+- [ ] Authenticated live approval/invite verification unavailable on externally managed Supabase; do not claim live authorization or data persistence verified.
+
 ## CB72 — Omit placeholder business categories
 - [x] Business home and live business profile hero omit Other/empty categories, preserving each header's existing location format and every other category.
 - [x] Audited other category displays; left directory, success and verification surfaces and alternate profile category chip unchanged as audit-only.

@@ -45,12 +45,13 @@ interface AccessRequestsSectionProps {
   canManage: boolean;
 }
 
-// Normalize role for display: team_member → "Team member", manager → "Manager"
-function getRoleLabel(role: string): string {
+// Match the granted role: manager → Admin; team_member/other → Editor.
+export function getRoleLabel(role: string): string {
   switch (role?.toLowerCase()) {
-    case 'manager': return 'Manager';
-    case 'team_member': 
-    default: return 'Team member';
+    case 'manager':
+    case 'admin': return 'Admin';
+    case 'analyst': return 'Analyst';
+    default: return 'Editor';
   }
 }
 
@@ -111,7 +112,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
     staleTime: 0,
   });
 
-  // Handle approve via Edge Function
+  // TEAM_FIX_V1 owns authorization and membership creation; refusals are JSON results.
   const handleApprove = async (request: AccessRequest) => {
     // Prevent double-click
     if (loadingId) return;
@@ -125,13 +126,13 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
     await new Promise(resolve => setTimeout(resolve, 150));
     
     try {
-      const { data, error } = await supabase.functions.invoke(
-        'business-access-request-decide',
-        { body: { request_id: request.id, decision: 'approve' } }
+      const { data, error } = await (supabase.rpc as any)(
+        'decide_business_access_request',
+        { p_request_id: request.id, p_decision: 'approve', p_role: null }
       );
 
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      if (data?.success === false || data?.error) throw new Error(data?.error || 'Failed to approve request');
 
       if (data?.already_resolved) {
         toast.info(`Request already ${data.status}`);
@@ -147,6 +148,8 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
       void Promise.allSettled([
         queryClient.invalidateQueries({ queryKey: ['business-access-requests', businessId] }),
         queryClient.invalidateQueries({ queryKey: ['business-team-members', businessId] }),
+        queryClient.invalidateQueries({ queryKey: ['business-team', businessId] }),
+        queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] }),
         queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count', businessId] }),
         queryClient.invalidateQueries({ queryKey: ['business-members', businessId] }),
         queryClient.invalidateQueries({ queryKey: ['business-membership', businessId] }),
@@ -163,7 +166,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
     }
   };
 
-  // Handle decline via Edge Function
+  // Keep the existing decline recovery/toasts while using the authoritative RPC.
   const handleDecline = async (request: AccessRequest) => {
     // Prevent double-click
     if (loadingId) return;
@@ -178,13 +181,13 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
     await new Promise(resolve => setTimeout(resolve, 150));
     
     try {
-      const { data, error } = await supabase.functions.invoke(
-        'business-access-request-decide',
-        { body: { request_id: request.id, decision: 'decline' } }
+      const { data, error } = await (supabase.rpc as any)(
+        'decide_business_access_request',
+        { p_request_id: request.id, p_decision: 'decline', p_role: null }
       );
 
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      if (data?.success === false || data?.error) throw new Error(data?.error || 'Failed to decline request');
 
       if (data?.already_resolved) {
         toast.info(`Request already ${data.status}`);
