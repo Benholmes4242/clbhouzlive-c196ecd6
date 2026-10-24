@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { HardestSection } from './browse/HardestSection';
 import { HighestRatedSection } from './browse/HighestRatedSection';
+import { LatestHolesSection } from './browse/LatestHolesSection';
 import { LatestReviewsSection } from './browse/LatestReviewsSection';
 import { useBrowseReviews } from './useBrowseReviews';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
@@ -16,7 +17,7 @@ import { ByRegionSection, ALL_COURSES_ANCHOR } from './browse/ByRegionSection';
 import { MostPlayedSection } from './browse/MostPlayedSection';
 import { PageLoadGate, useSectionReady } from './browse/PageLoadGate';
 
-const GATE_IDS = ['whoPlaying', 'byRegion', 'mostPlayed', 'hardest', 'highestRated', 'latestReviews', 'figures'] as const;
+const GATE_IDS = ['whoPlaying', 'byRegion', 'mostPlayed', 'hardest', 'highestRated', 'latestHoles', 'latestReviews', 'figures'] as const;
 
 /** Reports page-owned readiness from inside the gate's context. */
 function GateReport({ id, ready }: { id: string; ready: boolean }) {
@@ -87,6 +88,7 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         <MostPlayedSection />
         <HardestSection />
         <HighestRatedSection />
+        <LatestHolesSection />
         <LatestReviewsSection reviews={reviewPool} onReviewPress={handleReviewTile} loading={reviewsLoading} />
         <section id={ALL_COURSES_ANCHOR} style={SECTION_WRAP}>
           <SectionHead tone="quiet" kicker="Every course we hold" />

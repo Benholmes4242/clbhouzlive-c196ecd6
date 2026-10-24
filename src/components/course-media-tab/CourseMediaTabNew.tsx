@@ -1,8 +1,8 @@
 import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Camera } from 'lucide-react';
 import { useCourseMedia, type CourseMediaFilter } from './hooks/useCourseMedia';
 import { CourseMediaHeader } from './CourseMediaHeader';
@@ -53,6 +53,16 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const [movePhoto, setMovePhoto] = useState<HolePhoto | null>(null);
   const [removePhoto, setRemovePhoto] = useState<HolePhoto | null>(null);
   const [walkFocus, setWalkFocus] = useState<{ hole: number; id: string; nonce: number } | null>(null);
+  // Route focus is consumed once after both reads settle; HoleWalk owns shot fallback.
+  const [searchParams] = useSearchParams();
+  const deepLinkFocused = useRef(false);
+  const linkedHole = searchParams.get('hole');
+  const linkedShot = searchParams.get('shot');
+  useEffect(() => {
+    if (deepLinkFocused.current || !walkHoles || !tagging.tags.isSuccess || !knownHoles?.includes(Number(linkedHole))) return;
+    deepLinkFocused.current = true;
+    setWalkFocus({ hole: Number(linkedHole), id: linkedShot ?? '', nonce: Date.now() });
+  }, [walkHoles, tagging.tags.isSuccess, knownHoles, linkedHole, linkedShot]);
   const kindOf = (row: HolePhoto) => row.media_type === 'video' ? 'video' : 'photo';
   const ordinalOf = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? 'th' : n % 10 === 1 ? 'st' : n % 10 === 2 ? 'nd' : n % 10 === 3 ? 'rd' : 'th'}`;
   const [fastPending, setFastPending] = useState(false);

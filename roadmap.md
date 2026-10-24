@@ -1,5 +1,10 @@
 # Roadmap
 
+## BRIEF_COURSES_LATEST_HOLES
+- [x] Full unchanged baseline `bunx vitest run`: 2,585 passed /328 files, zero failures; matches CB75.1.
+- [ ] Add the signed-off Latest holes rail/shell/readiness and once-per-mount Media hole/shot deep link; preserve existing sections and HoleWalk.
+- [ ] Add new regression coverage only, run full suite, and report live rail visibility and verification limits. No SQL/migrations/RPC/edge/feed_config/native changes; cap30 unchanged.
+
 ## BRIEF_HOLE_WALK_NO_ROUNDS
 - [x] Implemented Media-only eighteen-hole fallback and unscored panel/quiet line; default scored JSX and deriveHoleWalk retained, frozen flows untouched.
 - [ ] STOP: full bunx vitest run baseline 2,569 passed/326 files → 2,581 passed/1 failed =2,582 cases/327 files. +13 solely holeWalkNoRounds.test.tsx; all existing tests unchanged/pass. New automatic-restoration test fails at src/test/holeWalkNoRounds.test.tsx:115:23: `Error: expect(element).not.toHaveClass("hole-walk-panel-unscored")`; received `hole-walk-panel hole-walk-panel-unscored`. No correction after failure. Harness build OK16:47:32Z. Browser verification not attempted after stop; awaiting ruling on new fixture failure.
