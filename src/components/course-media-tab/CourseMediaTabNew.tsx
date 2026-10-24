@@ -26,7 +26,8 @@ import { pollStreamMetadata } from '@/utils/pollStreamMetadata';
 import { orderedBatch, type BatchPhoto } from '@/lib/courseMedia/holePhotoBatch';
 import { holePhotoErrorMessage } from '@/lib/courseMedia/holePhotoError';
 import { coursePhotoState } from '@/lib/courseMedia/emptyStates';
-import { CourseFirstPhotoPicker, CoursePhotoRetagPicker, CourseMediaNoPhotographs, CourseMediaNothing, CourseMediaNoHoleList, CourseMediaNotLive } from './CourseMediaEmptyStates';
+import { isHoleTagFromPost } from '@/lib/courseMedia/removeHoleTag';
+import { CourseFirstPhotoPicker, CoursePhotoRetagPicker, HoleTagRemoveDialog, CourseMediaNoPhotographs, CourseMediaNothing, CourseMediaNoHoleList, CourseMediaNotLive } from './CourseMediaEmptyStates';
 
 interface CourseMediaTabNewProps {
   courseId: string;
@@ -47,6 +48,11 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const [batch, setBatch] = useState<(BatchPhoto & Partial<OwnMediaSource>)[] | null>(null);
   const [firstPhoto, setFirstPhoto] = useState(false);
   const [retagPhoto, setRetagPhoto] = useState<HolePhoto | null>(null);
+  const [movePhoto, setMovePhoto] = useState<HolePhoto | null>(null);
+  const [removePhoto, setRemovePhoto] = useState<HolePhoto | null>(null);
+  const [walkFocus, setWalkFocus] = useState<{ hole: number; id: string; nonce: number } | null>(null);
+  const kindOf = (row: HolePhoto) => row.media_type === 'video' ? 'video' : 'photo';
+  const ordinalOf = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? 'th' : n % 10 === 1 ? 'st' : n % 10 === 2 ? 'nd' : n % 10 === 3 ? 'rd' : 'th'}`;
   const [fastPending, setFastPending] = useState(false);
   const [fastError, setFastError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
@@ -178,7 +184,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       />}
       {photoState === 'B' && analysis.data?.available && <CourseMediaNoPhotographs courseName={courseName} holes={analysis.data.holes} onHole={addFirst} onAddFirst={() => { setFastError(null); setFirstPhoto(true); }} />}
       {photoState === 'C' && <CourseMediaNothing courseName={courseName} onReview={() => navigate(`/courses/${courseId}/rate`)} />}
-      {photoState !== 'B' && photoState !== 'C' && analysis.data?.available && tagging.tags.isSuccess && <HoleWalk available={analysis.data.available} holes={analysis.data.holes} rows={tagging.tags.data ?? []} totalMedia={mediaCounts.total} courseName={courseName} authors={authors} onAddFirst={addFirst} />}
+      {photoState !== 'B' && photoState !== 'C' && analysis.data?.available && tagging.tags.isSuccess && <HoleWalk available={analysis.data.available} holes={analysis.data.holes} rows={tagging.tags.data ?? []} totalMedia={mediaCounts.total} courseName={courseName} authors={authors} onAddFirst={addFirst} memberId={user?.id} onMove={knownHoles && knownHoles.length > 0 ? row => { tagging.move.reset(); setMovePhoto(row); } : undefined} onRemove={knownHoles && knownHoles.length > 0 ? row => { tagging.remove.reset(); setRemovePhoto(row); } : undefined} focus={walkFocus} />}
       {tagging.ready && untaggedCount != null && untaggedCount > 0 && (
         <section className="px-5 pt-5">
           <p style={VERDICT_KICKER}>Everything else</p>
@@ -228,6 +234,8 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       />}
       <CourseMediaNotLive rows={tagging.tags.data ?? []} memberId={user.id} courseId={courseId} onRetag={knownHoles && knownHoles.length > 0 ? row => { tagging.retag.reset(); setRetagPhoto(row); } : undefined} />
       {retagPhoto && knownHoles && <CoursePhotoRetagPicker key={retagPhoto.id} row={retagPhoto} knownHoles={knownHoles} pending={tagging.retag.isPending} error={tagging.retag.error ? holePhotoErrorMessage(tagging.retag.error, `The ${retagPhoto.media_type === 'video' ? 'video' : 'photo'} could not be retagged. The new tag was not saved.`) : null} onClose={() => setRetagPhoto(null)} onSubmit={hole => tagging.retag.mutate({ row: retagPhoto, hole }, { onSuccess: () => setRetagPhoto(null) })} />}
+      {movePhoto && knownHoles && <CoursePhotoRetagPicker key={`move-${movePhoto.id}`} mode="move" row={movePhoto} knownHoles={knownHoles} pending={tagging.move.isPending} error={tagging.move.error ? holePhotoErrorMessage(tagging.move.error, `The ${kindOf(movePhoto)} could not be moved. It is still on the ${ordinalOf(movePhoto.hole_no)}.`) : null} onClose={() => setMovePhoto(null)} onSubmit={hole => tagging.move.mutate({ row: movePhoto, hole }, { onSuccess: () => { setMovePhoto(null); setWalkFocus({ hole, id: movePhoto.id, nonce: Date.now() }); } })} />}
+      {removePhoto && <HoleTagRemoveDialog key={`remove-${removePhoto.id}`} row={removePhoto} fromPost={tagging.sources.isSuccess ? isHoleTagFromPost(removePhoto, tagging.sources.data ?? []) : tagging.sources.isError ? false : null} pending={tagging.remove.isPending} error={tagging.remove.error ? holePhotoErrorMessage(tagging.remove.error, `The ${kindOf(removePhoto)} could not be removed. It is still on the ${ordinalOf(removePhoto.hole_no)}.`) : null} onClose={() => setRemovePhoto(null)} onConfirm={() => tagging.remove.mutate({ row: removePhoto }, { onSuccess: () => setRemovePhoto(null) })} />}
       {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} sources={tagging.sources.data} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); }} />}
       {firstPhoto && knownHoles && <CourseFirstPhotoPicker knownHoles={knownHoles} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onSubmit={tagLibrary} onClose={() => { setFirstPhoto(false); }} />}
       {batch && knownHoles && <HolePhotoBatchPath photos={batch} knownHoles={knownHoles} onClose={() => setBatch(null)} onTag={(url, hole) => tagging.submit.mutateAsync({ post: sourcePost(url), hole })} />}

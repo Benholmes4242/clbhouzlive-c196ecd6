@@ -59,17 +59,36 @@ export function CourseMediaNotLive({ rows, memberId, courseId, onRetag }: {
   </section>;
 }
 
-export function CoursePhotoRetagPicker({ row, knownHoles, pending, error, onSubmit, onClose }: {
+export function CoursePhotoRetagPicker({ row, knownHoles, pending, error, onSubmit, onClose, mode = 'retag' }: {
   row: HolePhoto; knownHoles: readonly number[]; pending: boolean; error: string | null;
-  onSubmit: (hole: number) => void; onClose: () => void;
+  onSubmit: (hole: number) => void; onClose: () => void; mode?: 'retag' | 'move';
 }) {
+  const move = mode === 'move';
   return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent className="media-empty" style={{ ...theme, background: A.PANEL }} onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
-    <DialogTitle>Retag the {row.hole_no}{ordinalSuffix(row.hole_no)}</DialogTitle>
-    <DialogDescription className="media-empty-lede">Choose a different hole.</DialogDescription>
-    {row.media_type === 'video' ? <div className="media-empty-retag-photo hole-media-preview"><HoleMediaThumbnail url={row.media_url} mediaType={row.media_type} streamId={row.stream_id} posterUrl={row.poster_url} durationSeconds={row.duration_seconds} alt="Your rejected video" /></div> : <img src={row.media_url} alt="Your rejected photograph" className="media-empty-retag-photo" />}
+    <DialogTitle>{move ? 'Move from the' : 'Retag the'} {row.hole_no}{ordinalSuffix(row.hole_no)}</DialogTitle>
+    <DialogDescription className="media-empty-lede">{move ? 'Choose the hole this was taken on.' : 'Choose a different hole.'}</DialogDescription>
+    {row.media_type === 'video' ? <div className="media-empty-retag-photo hole-media-preview"><HoleMediaThumbnail url={row.media_url} mediaType={row.media_type} streamId={row.stream_id} posterUrl={row.poster_url} durationSeconds={row.duration_seconds} alt={move ? 'Your video' : 'Your rejected video'} /></div> : <img src={row.media_url} alt={move ? 'Your photo' : 'Your rejected photograph'} className="media-empty-retag-photo" />}
     <HolePhotoPicker holeCount={knownHoles.length} knownHoleNumbers={knownHoles} selectedHole={row.hole_no} onSelect={value => { if (!pending && value !== row.hole_no) onSubmit(value); }} />
     {error && <p role="alert" className="media-empty-lede">{error}</p>}
     <Button variant="ghost" disabled={pending} onClick={onClose}>Cancel</Button>
+  </DialogContent></Dialog>;
+}
+
+/** Owner removal of a live tag; same shell, theme and pending lock as the retag picker. */
+export function HoleTagRemoveDialog({ row, fromPost, pending, error, onConfirm, onClose }: {
+  row: HolePhoto; fromPost: boolean | null; pending: boolean; error: string | null;
+  onConfirm: () => void; onClose: () => void;
+}) {
+  const video = row.media_type === 'video';
+  return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent className="media-empty" style={{ ...theme, background: A.PANEL }} onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
+    <DialogTitle>Remove from the {row.hole_no}{ordinalSuffix(row.hole_no)}?</DialogTitle>
+    <DialogDescription className="media-empty-lede">{fromPost === false ? "You added this straight to the hole, so it won't appear anywhere on clbhouz after this." : fromPost ? 'It comes off the hole walk. Your post or review keeps it.' : 'It comes off the hole walk.'}</DialogDescription>
+    {video ? <div className="media-empty-retag-photo hole-media-preview"><HoleMediaThumbnail url={row.media_url} mediaType={row.media_type} streamId={row.stream_id} posterUrl={row.poster_url} durationSeconds={row.duration_seconds} alt="Your video" /></div> : <img src={row.media_url} alt="Your photo" className="media-empty-retag-photo" />}
+    {error && <p role="alert" className="media-empty-lede">{error}</p>}
+    <div style={{ display: 'flex', flexDirection: 'column', marginTop: 16 }}>
+      <Button className="media-empty-action" style={{ width: '100%', marginTop: 0 }} disabled={pending || fromPost == null} onClick={onConfirm}>{pending ? 'Removing...' : 'Remove'}</Button>
+      <Button variant="ghost" style={{ minHeight: 44 }} disabled={pending} onClick={onClose}>Cancel</Button>
+    </div>
   </DialogContent></Dialog>;
 }
 

@@ -21,13 +21,21 @@ export function HoleProcessingVideo({ media, label }: { media: { media_url: stri
   </div>;
 }
 
-export function HoleWalk({ available, holes, rows, totalMedia, courseName, authors, onAddFirst }: {
+export function HoleWalk({ available, holes, rows, totalMedia, courseName, authors, onAddFirst, memberId, onMove, onRemove, focus }: {
   available: boolean; holes: readonly CourseHole[]; rows: readonly HolePhoto[];
   totalMedia: number; courseName?: string; authors?: ReadonlyMap<string, string>;
   onAddFirst: (hole: number) => void;
+  memberId?: string; onMove?: (row: HolePhoto) => void; onRemove?: (row: HolePhoto) => void;
+  focus?: { hole: number; id: string; nonce: number } | null;
 }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [photoId, setPhotoId] = useState<string | null>(null);
+  // A moved item is followed to its new hole by the caller's focus nonce.
+  useEffect(() => {
+    if (!focus) return;
+    setSelected(focus.hole); setPhotoId(focus.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focus?.nonce]);
   const panelRef = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!available || selected == null) return;
@@ -50,6 +58,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       <div className={`hole-walk-photo ${active ? '' : 'hole-walk-photo-open'}`}>
         {active ? <>{active.media_type === 'video' ? (active.duration_seconds == null ? <HoleProcessingVideo key={active.id} media={active} label={`Hole ${tile.hole.hole_no}`} /> : <HoleMediaVideo key={active.id} media={active} label={`Hole ${tile.hole.hole_no}`} />) : <img src={active.media_url} alt={`Hole ${tile.hole.hole_no}`} />}{(author || month) && <div className="hole-walk-caption">{author && <strong>{author}</strong>}{month && <span>{captureMonthLabel(month)}</span>}</div>}</> : <span>No shot yet</span>}
       </div>
+      {active && memberId && active.user_id === memberId && active.status === 'approved' && onMove && onRemove && <div className="hole-walk-owner"><span className="hole-walk-owner-label">Yours</span><span className="hole-walk-owner-actions"><Button variant="ghost" className="hole-walk-owner-action" onClick={() => onMove(active)}>Move to another hole</Button><span className="hole-walk-owner-dot" aria-hidden="true">{'\u00B7'}</span><Button variant="ghost" className="hole-walk-owner-action" onClick={() => onRemove(active)}>Remove</Button></span></div>}
       <div className="hole-walk-stats">
         <div><b>{tile.hole.par}</b><span>Par</span></div>
         {tile.hole.yards != null && <div><b>{tile.hole.yards.toLocaleString()}</b><span>Yards</span></div>}
