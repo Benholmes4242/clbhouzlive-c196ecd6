@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -96,5 +98,12 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     f.analysis = null; const view = mountTab(); expect(screen.queryByRole('region')).toBeNull();
     f.analysis = emptyAnalysis; f.rows = [photo(4, 'selected'), photo(7)]; view.rerender(view.make()); expect(screen.getByRole('region', { name: 'Hole 4' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); view.rerender(view.make()); expect(screen.getByRole('region', { name: 'Hole 7' })).toBeInTheDocument();
+  });
+  it('card type reads the signed-off mock letter-spacing and the rail declares no will-change', () => {
+    const css = readFileSync(resolve(process.cwd(), 'src/components/courses/browse/latestHoles.css'), 'utf8');
+    expect(css).toMatch(/\.latest-hole-number\s*\{[^}]*letter-spacing: -0\.05em;/);
+    expect(css).toMatch(/\.latest-hole-label\s*\{[^}]*letter-spacing: 0\.16em;/);
+    expect(css).toMatch(/\.latest-hole-course\s*\{[^}]*letter-spacing: -0\.03em;/);
+    expect(css).not.toContain('will-change');
   });
 });
