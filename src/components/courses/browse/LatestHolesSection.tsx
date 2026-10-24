@@ -11,7 +11,7 @@ import { LatestHolesShell } from './sectionShells';
 import './latestHoles.css';
 
 /** The RPC owns newest-first ordering, one shot per course and public eligibility.
- * Capture credit uses EXIF only; this rail never starts video playback.
+ * Credit shows the month the member added the shot to clbhouz (added_at), never its EXIF capture date; this rail never starts video playback.
  * Geometry is shared with the loading shell, not PhotoFigureCard.
  */
 export const LATEST_HOLE_W = 220;
@@ -28,6 +28,7 @@ export interface LatestHoleMedia {
   stream_id: string | null;
   duration_seconds: number | null;
   exif_captured_at: string | null;
+  added_at: string;
   created_at: string;
   member_id: string;
   member_name: string | null;
@@ -36,7 +37,7 @@ export interface LatestHoleMedia {
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-function captureCreditMonth(value: string | null): string | null {
+function addedCreditMonth(value: string | null): string | null {
   if (!value) return null;
   const date = new Date(value);
   if (!Number.isFinite(date.getTime())) return null;
@@ -45,7 +46,7 @@ function captureCreditMonth(value: string | null): string | null {
 
 function LatestHoleCard({ row }: { row: LatestHoleMedia }) {
   const navigate = useNavigate();
-  const credit = [row.member_name, captureCreditMonth(row.exif_captured_at)].filter(Boolean).join(' \u00B7 ');
+  const credit = [row.member_name, addedCreditMonth(row.added_at)].filter(Boolean).join(' \u00B7 ');
   const seconds = Math.round(row.duration_seconds ?? 0);
   const duration = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   return (
