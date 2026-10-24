@@ -45,15 +45,15 @@ function RouteState() {
 function mount(kind: 'requests' | 'team' | 'invite') {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
   const invalidate = vi.spyOn(client, 'invalidateQueries');
-  const tree = <QueryClientProvider client={client}><MemoryRouter initialEntries={[`/business/biz/team${kind === 'invite' ? '/invite' : ''}`]}>
+  const tree = () => <QueryClientProvider client={client}><MemoryRouter initialEntries={[`/business/biz/team${kind === 'invite' ? '/invite' : ''}`]}>
     <RouteState />
     <Routes>
       <Route path="/business/:businessId/team" element={kind === 'requests' ? <AccessRequestsSection businessId="biz" businessName="clbhouz" canManage /> : kind === 'team' ? <BusinessTeamPage /> : <div data-testid="team-destination" />} />
       <Route path="/business/:businessId/team/invite" element={<React.Profiler id="invite" onRender={() => mocks.formCommits.push(!!document.querySelector('input[type="text"]'))}><BusinessInvitePage /></React.Profiler>} />
     </Routes>
   </MemoryRouter></QueryClientProvider>;
-  const view = render(tree);
-  return { client, invalidate, refresh: () => view.rerender(tree) };
+  const view = render(tree());
+  return { client, invalidate, refresh: () => view.rerender(tree()) };
 }
 async function decide(action: 'Approve' | 'Decline') {
   fireEvent.click(await screen.findByRole('button', { name: action }));
