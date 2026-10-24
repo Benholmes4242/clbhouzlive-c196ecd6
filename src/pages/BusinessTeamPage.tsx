@@ -9,6 +9,7 @@ import { AccessRequestsSection } from '@/components/business/AccessRequestsSecti
 import { TeamSummary, TeamSubtitle } from '@/components/business/TeamSummary';
 import { TeamListSection } from '@/components/business/TeamListSection';
 import { TeamInvitesSection } from '@/components/business/TeamInvitesSection';
+import { TeamRoleTable, TeamActivityCard } from '@/components/business/TeamRolesActivity';
 import { useBusinessAccessRequests } from '@/hooks/useBusinessAccessRequests';
 import { Button } from '@/components/ui/button';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
@@ -80,6 +81,10 @@ export default function BusinessTeamPage() {
             canManage={canManage}
             viewerId={currentUserId}
           />
+
+          {/* CB78: section four, the role table and recent team activity (rules in teamFeed.ts). */}
+          <TeamRoleTable businessName={business?.name || ''} viewerRole={membership?.role} />
+          <TeamActivityCard businessId={businessId} businessName={business?.name || ''} canManage={canManage} viewerId={currentUserId} />
         </motion.div>
       </main>
 

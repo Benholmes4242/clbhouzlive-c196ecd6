@@ -69,8 +69,8 @@ function AccessRequestContents({ businessId, businessName, canManage, clubId, qu
       // Do not close a different row's sheet if this request resolves later.
       setSheet(current => current?.request.id === request.id ? null : current);
       const keys = decision === 'approve'
-        ? ['business-access-requests', 'business-team-members', 'business-team', 'business-invites', 'business-pending-requests-count', 'business-members', 'business-membership']
-        : ['business-access-requests', 'business-pending-requests-count'];
+        ? ['business-access-requests', 'business-team-feed', 'business-team-members', 'business-team', 'business-invites', 'business-pending-requests-count', 'business-members', 'business-membership']
+        : ['business-access-requests', 'business-team-feed', 'business-pending-requests-count'];
       void Promise.allSettled([
         ...keys.map(key => queryClient.invalidateQueries({ queryKey: [key, businessId] })),
         ...['activity-feed', 'activity-unread-count', 'notifications', 'unread-notifications-count'].map(key => queryClient.invalidateQueries({ queryKey: [key] })),

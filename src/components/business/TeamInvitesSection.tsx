@@ -51,7 +51,10 @@ export function TeamInvitesSection({ businessId, businessName, team, invites, ca
   const roleText = (r: BusinessRole) => t(`business.team.sectionTwo.roles.${r}`);
   const agoText = (a: Ago) => 'count' in a ? t(`${P}.ago.${a.key}`, { count: a.count }) : t(`${P}.ago.${a.key}`);
   const untilText = (u: Until) => u.key === 'days' ? t(`${P}.expiry.days`, { count: u.count }) : t(`${P}.expiry.${u.key}`);
-  const refreshInvites = () => queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] });
+  const refreshInvites = () => Promise.allSettled([
+    queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] }),
+    queryClient.invalidateQueries({ queryKey: ['business-team-feed', businessId] }),
+  ]);
 
   const callRpc = async (fn: string, args: Record<string, unknown>) => {
     const { data, error } = await (supabase.rpc as any)(fn, args);
@@ -107,6 +110,7 @@ export function TeamInvitesSection({ businessId, businessName, team, invites, ca
     setBusy(true);
     try {
       await revoke.mutateAsync(invite.id);
+      void queryClient.invalidateQueries({ queryKey: ['business-team-feed', businessId] });
       setSheet(null);
     } catch {
       /* useRevokeInvite toasts the failure; the sheet stays open */
