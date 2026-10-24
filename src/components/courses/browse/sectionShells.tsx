@@ -32,6 +32,7 @@ import {
 import { REGION_GAP, REGION_TILE_H, REGION_TILES_NO_LEAD } from './ByRegionSection';
 import { PHOTO_FIGURE_GAP, PHOTO_FIGURE_H, PHOTO_FIGURE_W } from './PhotoFigureCard';
 import { TOUGH_COUNT, TOUGH_GAP, TOUGH_TILE_H } from './HardestSection';
+import { LATEST_HOLE_W, LATEST_HOLE_H } from './LatestHolesSection';
 
 const RAIL_CLIPPED: React.CSSProperties = { ...RAIL_BLEED, overflow: 'hidden' };
 const BLEED: React.CSSProperties = { marginLeft: -16, marginRight: -16 };
@@ -130,6 +131,16 @@ export function PhotoRailShell({ count }: { count: number }) {
 }
 
 /** Tough tracks: the 2x2 grid of square tiles. */
+export function LatestHolesShell() {
+  return (
+    <HeadShell>
+      <div style={{ ...RAIL_CLIPPED, gap: PHOTO_FIGURE_GAP }}>
+        {[0, 1].map(i => <Bar key={i} style={{ width: LATEST_HOLE_W, height: LATEST_HOLE_H, borderRadius: 0, flex: 'none' }} />)}
+      </div>
+    </HeadShell>
+  );
+}
+
 export function HardestShell() {
   return (
     <HeadShell>

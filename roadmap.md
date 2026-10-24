@@ -1,5 +1,11 @@
 # Roadmap
 
+## BRIEF_COURSES_LATEST_HOLES
+- [x] Full unchanged baseline `bunx vitest run`: 2,585 passed /328 files, zero failures; matches CB75.1.
+- [x] Add Latest holes rail/shell/readiness and once-per-mount Media hole/shot deep link; existing sections and HoleWalk unchanged.
+- [x] Full `bunx vitest run`: 2,601 passed /329 files /0 failed/skipped/unhandled errors, from2,585/328; +16 solely new latestHolesSection.test.tsx, existing tests unchanged. Harness build OK19:10:48Z.
+- [ ] Authenticated live visibility/shot navigation unavailable with external_unmanaged session. Signed-out Courses stays /courses; get_latest_hole_media returns HTTP401/code42501 `permission denied for function get_latest_hole_media`, so rail absent. Temporary controlled browser mount failed to render; no visual-match claim. Report names limitations and zero-letter-spacing environment departure. No SQL/migrations/RPC/edge/feed_config/native changes; cap30 unchanged.
+
 ## BRIEF_HOLE_WALK_NO_ROUNDS
 - [x] Implemented Media-only eighteen-hole fallback and unscored panel/quiet line; default scored JSX and deriveHoleWalk retained, frozen flows untouched.
 - [ ] STOP: full bunx vitest run baseline 2,569 passed/326 files → 2,581 passed/1 failed =2,582 cases/327 files. +13 solely holeWalkNoRounds.test.tsx; all existing tests unchanged/pass. New automatic-restoration test fails at src/test/holeWalkNoRounds.test.tsx:115:23: `Error: expect(element).not.toHaveClass("hole-walk-panel-unscored")`; received `hole-walk-panel hole-walk-panel-unscored`. No correction after failure. Harness build OK16:47:32Z. Browser verification not attempted after stop; awaiting ruling on new fixture failure.
