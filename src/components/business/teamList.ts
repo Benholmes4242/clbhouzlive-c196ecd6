@@ -1,7 +1,15 @@
 import type { BusinessMember, BusinessRole } from '@/hooks/useBusinessTeam';
 
 /** CB76: pure rules for the Team list (section two). The menu matrix mirrors the
- * live RPC permissions exactly; the server stays authoritative for every write. */
+ * live RPC permissions exactly; the server stays authoritative for every write.
+ *
+ * PERMISSION SOURCE (CB78 ruling): the live rules are the DEPLOYED SECURITY DEFINER
+ * functions (update_business_member_role, remove_business_member,
+ * transfer_business_ownership, decide_business_access_request, resend_business_invite,
+ * update_business_invite_role, invite_business_member_by_user), replaced by hand
+ * (TEAM_FIX_V1) and never landed in the repo. The repo migrations and the owner-only
+ * business_members RLS rules are out of date for these actions; do not read them as
+ * the source. */
 
 export interface TeamActivity { user_id: string; posts_30d: number; replies_30d: number; last_active_at: string | null }
 export type MenuItem = 'role' | 'jobTitle' | 'visibility' | 'makeOwner' | 'remove' | 'leave';
