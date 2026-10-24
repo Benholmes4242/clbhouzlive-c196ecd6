@@ -1,5 +1,12 @@
 # Roadmap
 
+## CB75 — Team section 1
+- [x] Read the brief/reference and audit the header, team/invite reads, request decisions and protecting tests. Full baseline `bunx vitest run`: 2,467 passed /321 files /0 failures, matching the latest reported suite.
+- [ ] Resolve the required BottomSheet ASK: canonical surface #16161A, default radius20 and36×4 grabber differ from the reference #17171B/radius22/36×5. No global sheet changes authorised.
+- [ ] Implement Team header/subtitle/Invite, member summary and ordered waiting line, shared requests query and request rows; preserve section2.
+- [ ] Implement approve/decline sheets after the chrome ruling; retarget named CB74 decision tests, add CB75 rules tests and run the full suite.
+- [ ] Report every ASK, per-file diff and rendered measurements. Live owner/profile-field permission verification is unavailable with external_unmanaged authentication; source policy permits non-deleted profiles, but deployed permissions remain unverified. No SQL/migration/RPC/edge/config/native changes.
+
 ## CB74 — Team fixes before rebuild
 - [x] Replace access decisions with TEAM_FIX_V1 RPC, preserve recovery/invalidation paths and add team/invite refresh on approve; align role labels.
 - [x] Label elapsed pending invites Expired without removing Revoke; guard invite form with membership canManage and existing route-loading skeleton.
