@@ -20,7 +20,9 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMediaUpload } from '@/uploads/hooks/useMediaUpload';
 import { HoleKnownPhotoPath, HolePhotoBatchPath } from './HolePhotoFastPaths';
-import { prepareHolePhoto, submitLibraryHolePhoto } from '@/lib/courseMedia/holePhotoData';
+import { prepareHolePhoto, submitLibraryHolePhoto, submitLibraryHoleVideo, libraryHoleVideoError } from '@/lib/courseMedia/holePhotoData';
+import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
+import { pollStreamMetadata } from '@/utils/pollStreamMetadata';
 import { orderedBatch, type BatchPhoto } from '@/lib/courseMedia/holePhotoBatch';
 import { holePhotoErrorMessage } from '@/lib/courseMedia/holePhotoError';
 import { coursePhotoState } from '@/lib/courseMedia/emptyStates';
@@ -47,6 +49,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const [retagPhoto, setRetagPhoto] = useState<HolePhoto | null>(null);
   const [fastPending, setFastPending] = useState(false);
   const [fastError, setFastError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const cache = useQueryClient();
   const uploader = useMediaUpload();
 
@@ -92,18 +95,37 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
     finally { setFastPending(false); }
   };
   const tagLibrary = async (file: File, hole = addHole) => {
-    if (hole == null || !knownHoles || !user) return;
+    if (hole == null || !knownHoles || !user || fastPending) return;
+    const video = !file.type.startsWith('image/');
+    if (video) {
+      const validationError = libraryHoleVideoError(file);
+      if (validationError) { setFastError(validationError); return; }
+    }
     setFastPending(true); setFastError(null);
+    setUploadProgress(video ? 0 : null);
     try {
-      const uploaded = await uploader.upload(file, { bucketType: 'clbhouz-course-images', destination: 'r2' });
-      if (!uploaded.success || !uploaded.mediaUrl) throw new Error('Upload failed');
-      await submitLibraryHolePhoto(file, uploaded.mediaUrl, courseId, user.id, hole, knownHoles);
+      if (video) {
+        // Mirror the review controller's completion adapter, not its control
+        // promise: resilient upload resolves controls before bytes finish.
+        const streamId = await new Promise<string>((resolve, reject) => {
+          uploadVideoResilient({ file,
+            onProgress: (loaded, total) => setUploadProgress(total > 0 ? Math.round((loaded / total) * 100) : 0),
+            onSuccess: resolve, onError: reject,
+          }).catch(reject);
+        });
+        await submitLibraryHoleVideo(file, streamId, courseId, user.id, hole, knownHoles);
+        void pollStreamMetadata(streamId).then(() => cache.invalidateQueries({ queryKey: ['hole-photo-tags', courseId, user.id] })).catch(() => {});
+      } else {
+        const uploaded = await uploader.upload(file, { bucketType: 'clbhouz-course-images', destination: 'r2' });
+        if (!uploaded.success || !uploaded.mediaUrl) throw new Error('Upload failed');
+        await submitLibraryHolePhoto(file, uploaded.mediaUrl, courseId, user.id, hole, knownHoles);
+      }
       setAddHole(null); setFirstPhoto(false);
       await cache.invalidateQueries({ queryKey: ['hole-photo-tags', courseId, user.id] });
       await cache.invalidateQueries({ queryKey: ['course-media-counts', courseId] });
       await cache.invalidateQueries({ queryKey: ['course-media-feed', courseId] });
-    } catch (error) { setFastError(holePhotoErrorMessage(error)); }
-    finally { setFastPending(false); }
+    } catch (error) { setFastError(video ? 'The video could not be uploaded. Nothing was saved.' : holePhotoErrorMessage(error)); }
+    finally { setFastPending(false); setUploadProgress(null); }
   };
   const beginBatch = async () => {
     if (!tagging.sources.isSuccess) return;
@@ -204,8 +226,8 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       />}
       <CourseMediaNotLive rows={tagging.tags.data ?? []} memberId={user.id} courseId={courseId} onRetag={knownHoles && knownHoles.length > 0 ? row => { tagging.retag.reset(); setRetagPhoto(row); } : undefined} />
       {retagPhoto && knownHoles && <CoursePhotoRetagPicker key={retagPhoto.id} row={retagPhoto} knownHoles={knownHoles} pending={tagging.retag.isPending} error={tagging.retag.error ? holePhotoErrorMessage(tagging.retag.error, `The ${retagPhoto.media_type === 'video' ? 'video' : 'photo'} could not be retagged. The new tag was not saved.`) : null} onClose={() => setRetagPhoto(null)} onSubmit={hole => tagging.retag.mutate({ row: retagPhoto, hole }, { onSuccess: () => setRetagPhoto(null) })} />}
-      {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} sources={tagging.sources.data} pending={fastPending} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); }} />}
-      {firstPhoto && knownHoles && <CourseFirstPhotoPicker knownHoles={knownHoles} pending={fastPending} error={fastError} onSubmit={tagLibrary} onClose={() => { setFirstPhoto(false); }} />}
+      {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} sources={tagging.sources.data} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); }} />}
+      {firstPhoto && knownHoles && <CourseFirstPhotoPicker knownHoles={knownHoles} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onSubmit={tagLibrary} onClose={() => { setFirstPhoto(false); }} />}
       {batch && knownHoles && <HolePhotoBatchPath photos={batch} knownHoles={knownHoles} onClose={() => setBatch(null)} onTag={(url, hole) => tagging.submit.mutateAsync({ post: sourcePost(url), hole })} />}
       {tagPost && knownHoles && (
         <HolePhotoTagDialog key={addHole == null ? tagPost.mediaItems[0]?.id : `add-${addHole}`} imageUrl={holeSourceUrl(tagPost.mediaItems[0])} mediaSource={tagging.sources.data?.find(s => s.url === holeSourceUrl(tagPost.mediaItems[0]))} mediaSources={tagging.sources.data}
