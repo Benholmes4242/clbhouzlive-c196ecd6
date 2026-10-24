@@ -3,8 +3,8 @@
 ## HOLE_MEDIA_VIDEOS_STAGE_1
 - [ ] Include only encoded own published-post/review videos in sources and tagging; keep new library uploads image-only.
 - [ ] Add video posters/duration to existing tagging surfaces, hole panels and moderator review; reuse existing HLS and audio ownership.
-- [ ] Refresh only four founder-added course_hole_media type fields without SQL/migrations; preserve all other generated schema.
-- [ ] Retarget the authorised video-eligibility test, add source/insert/panel tests, run full suite from 2,502/322/0 and report changed copy/status rules/play control/verification limits.
+- [x] Confirm four founder-added course_hole_media fields already exist; generated schema unchanged, no SQL/migrations.
+- [ ] Validation stopped: full suite 2,517 passed /1 failed /323 files (2,518 total, +16 new tests). `src/test/mediaTrust.test.tsx:23:58` expects “This photograph cannot be retagged because it is not yours.” but image copy now says “This photo cannot be retagged because it is not yours.” Existing test unchanged; await ruling before continuing. Targeted 100/100 passed; preview build OK. Browser/audio validation not completed.
 
 ## CB75 — Team section 1
 - [x] Read the brief/reference and audit the header, team/invite reads, request decisions and protecting tests. Full baseline `bunx vitest run`: 2,467 passed /321 files /0 failures, matching the latest reported suite.
