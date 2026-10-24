@@ -22,13 +22,22 @@ export function getRoleLabel(role: string): string {
 /** CB75: the parent shares its requests observer with the summary/card. Standalone
  * callers retain the same hook/key. TEAM_FIX_V1 remains the decision authority;
  * JSON refusals leave the sheet and row intact; pending locks are row-scoped. */
-export function AccessRequestsSection({ businessId, businessName, canManage, clubId, requestsQuery }: {
+interface AccessRequestsProps {
   businessId: string; businessName: string; businessAvatarUrl?: string | null;
   canManage: boolean; clubId?: string | null;
   requestsQuery?: ReturnType<typeof useBusinessAccessRequests>;
-}) {
-  const ownQuery = useBusinessAccessRequests(businessId, canManage && !requestsQuery);
-  const query = requestsQuery ?? ownQuery;
+}
+
+export function AccessRequestsSection(props: AccessRequestsProps) {
+  return props.requestsQuery ? <AccessRequestContents {...props} query={props.requestsQuery} /> : <StandaloneRequests {...props} />;
+}
+
+function StandaloneRequests(props: AccessRequestsProps) {
+  const query = useBusinessAccessRequests(props.businessId, props.canManage);
+  return <AccessRequestContents {...props} query={query} />;
+}
+
+function AccessRequestContents({ businessId, businessName, canManage, clubId, query }: AccessRequestsProps & { query: ReturnType<typeof useBusinessAccessRequests> }) {
   const queryClient = useQueryClient();
   const { t } = useTranslation('common');
   const [sheet, setSheet] = useState<{ request: AccessRequest; decision: 'approve' | 'decline' } | null>(null);
