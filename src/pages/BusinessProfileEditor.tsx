@@ -63,6 +63,7 @@ import { OpeningHoursSection } from '@/components/business/editor/OpeningHoursSe
 import { VerificationNudgeSection } from '@/components/business/editor/VerificationNudgeSection';
 import { SocialSection } from '@/components/business/editor/SocialSection';
 import { NotificationsSection } from '@/components/business/editor/NotificationsSection';
+import { canEditBusinessProfile, protectBusinessPayload } from '@/components/business/editor/editorPermissions';
 import {
   DEFAULT_OPENING_HOURS,
   OpeningHours,
@@ -139,7 +140,7 @@ export default function BusinessProfileEditor() {
   // trigger refuses name/slug/category/club/notification_preferences for anyone
   // but owners and admins, so editors see those read-only and never send them.
   const isEditor = mode === 'edit' && membership?.role === 'editor';
-  const canEditProfile = !!membership && (membership.canManage || membership.role === 'editor');
+  const canEditProfile = canEditBusinessProfile(membership?.role);
   const canEdit = mode === 'create' || canEditProfile;
 
   /* ── identity ─────────────────────────────────────── */
@@ -232,7 +233,7 @@ export default function BusinessProfileEditor() {
   /* ── permission gate (edit) ───────────────────────── */
   useEffect(() => {
     // eslint-disable-next-line settled/no-not-loading-empty-check -- the branch requires membership to be present before reading its role.
-    if (mode === 'edit' && !membershipLoading && membership && !(membership.canManage || membership.role === 'editor')) {
+    if (mode === 'edit' && !membershipLoading && membership && !canEditBusinessProfile(membership.role)) {
       toast.error("You don't have permission to edit this business");
       navigate(`/business/${id}`);
     }
@@ -762,7 +763,7 @@ export default function BusinessProfileEditor() {
 
       const { error: updateErr } = await supabase
         .from('business_accounts')
-        .update(updatePayload)
+        .update(protectBusinessPayload(updatePayload, membership?.role))
         .eq('id', id);
       if (updateErr) throw new SaveStepError('update', updateErr);
 
@@ -804,7 +805,7 @@ export default function BusinessProfileEditor() {
     mode, user?.id, id, isValid, resolvedName, category, description, foundedYear, website, email,
     phone, bookingUrl, openingHours, social, address, businessName, isClubLinked, isGolfClub,
     selectedClub, claimProofNote, logo, cover, queryClient, navigate, uploadLogo, removeLogo, uploadCover, removeCover,
-    amenities, primaryAction, showOpeningHours, isEditor,
+    amenities, primaryAction, showOpeningHours, isEditor, membership?.role,
   ]);
 
   /* ── loading / error states (edit) ──────────────── */

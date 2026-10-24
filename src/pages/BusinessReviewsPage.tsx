@@ -293,7 +293,7 @@ function StatCell({ label, value, tone = 'ink' }: { label: string; value: string
 
 /* ─────────────── Review card ─────────────── */
 
-function ReviewCard({
+export function ReviewCard({
   r,
   currentUserId,
   onReply,
