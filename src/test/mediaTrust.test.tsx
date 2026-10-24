@@ -20,7 +20,7 @@ describe('MEDIA_TRUST_1_R3 publication and ownership', () => {
     render(<CourseMediaNotLive rows={[row, { ...row, id: 'other', hole_no: 9, reject_reason: 'wrong_hole' }]} memberId="member" courseId="course" onRetag={() => {}} />);
     expect(screen.queryByRole('button', { name: 'Retag the 2nd' })).toBeNull();
     expect(screen.getByRole('button', { name: 'Retag the 9th' })).toBeEnabled();
-    expect(screen.getAllByRole('status')[0].textContent).toContain('This photograph cannot be retagged because it is not yours.');
+    expect(screen.getAllByRole('status')[0].textContent).toContain('This photo cannot be retagged because it is not yours.');
   });
   it('historical pending rows never enter State D', () => {
     const { container } = render(<CourseMediaNotLive rows={[{ ...row, status: 'pending' }]} memberId="member" courseId="course" onRetag={() => {}} />);

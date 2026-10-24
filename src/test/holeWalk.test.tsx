@@ -34,7 +34,7 @@ describe('MEDIA_WALK_1_R', () => {
     expect(holePhotoMonths([photo('a', 1), photo('b', 1, 'pending', '2026-10')])).toEqual([]);
     expect(holePhotoMonths([photo('a', 1), photo('b', 1, 'approved', '2026-10')])).toEqual([{ month: '2026-05', count: 1 }, { month: '2026-10', count: 1 }]);
   });
-  it('missing EXIF uses the contribution month for shot captions', () => { expect(holePhotoMonths([{ ...photo('a', 1), exif_captured_at: null, created_at: '2026-10-01' }, photo('b', 1)])).toEqual([{ month: '2026-05', count: 1 }, { month: '2026-10', count: 1 }]); });
+  it('missing EXIF never substitutes upload month', () => { expect(holePhotoMonths([{ ...photo('a', 1), exif_captured_at: null, created_at: '2026-10-01' }, photo('b', 1)])).toEqual([]); });
   it('eight undated shots still count without season groups', () => {
     const rows = Array.from({ length: 8 }, (_, i) => ({ ...photo(String(i), 1), exif_captured_at: null, created_at: '2026-10-01' }));
     expect(deriveHoleWalk([hole(1)], rows).photoCount).toBe(8);
