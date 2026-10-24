@@ -1,10 +1,10 @@
 # Roadmap
 
 ## HOLE_MEDIA_VIDEOS_STAGE_2
-- [ ] Extend both hole-library pickers and route videos through the review resilient uploader, preserving R2 photos and capture-date-only months.
-- [ ] Insert processing video contributions; isolate webhook metadata updates before the byte-identical post flow and deploy only that function.
-- [ ] Add tests without changing existing cases; run full suite against 2,518 /323 files baseline and inspect automatic compiler/build signals.
-- [ ] Verify upload → processing → ready display; report any unavailable live checks, all new strings, picker paths and deploy result.
+- [x] Extend both hole-library pickers and route videos through review resilient uploader, preserving R2 photos and EXIF-only months. Founder ruling enforces 4 GiB, four MIME types and empty-MIME extension fallback; private SUPPORTED_VIDEO_TYPES reproduced from shared three-type list plus x-m4v without touching the review composer.
+- [x] Insert processing video contributions; isolate three guarded webhook metadata updates before the byte-identical post lookup-to-handler-end (verified against HEAD).
+- [x] Add only holeLibraryVideosStage2.test.tsx: 20 tests; targeted20/20. Full `bunx vitest run`: 2,538 passed /324 files /0 failed tests, but1 unhandled rejection and exit1. Delta from2,518/323 is exactly20 new tests/one file; no existing tests changed. Automatic preview build OK12:27:57Z; standalone tsc prohibited by environment, unverified.
+- [ ] STOP: ReferenceError: window is not defined, node_modules/react-dom/cjs/react-dom.development.js:10993:22; Vitest attributes it to src/test/tourOverviewDesignA.test.ts after environment teardown, via react-i18next onLoaded. No test or app correction after failure. Webhook deployment and live browser verification not attempted after stop; external_unmanaged also prevents authenticated checks. Report HOLE_MEDIA_VIDEOS_STAGE_2_stop_report.md.
 
 ## HOLE_MEDIA_VIDEOS_STAGE_1
 - [x] Apply founder rulings: change only mediaTrust line23 expected photo copy; restore EXIF-only captureMonth and the original missing-EXIF test, preserving all other video work.
