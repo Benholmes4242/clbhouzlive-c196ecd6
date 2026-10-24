@@ -13,6 +13,16 @@ import { holePhotoVerdict, type HolePhotoRound } from './holePhotoVerdict';
 import { streamPosterFrom } from '@/utils/mediaThumbs';
 import { buildHlsUrl } from '@/utils/streamId';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { ALLOWED_VIDEO_TYPES, POST_LIMITS } from '@/constants/postLimits';
+
+// useMediaUpload's SUPPORTED_VIDEO_TYPES is private to that hook. Compose its
+// same four-type set from the shared list without changing the review composer.
+const SUPPORTED_VIDEO_TYPES: readonly string[] = [...ALLOWED_VIDEO_TYPES, 'video/x-m4v'];
+export function libraryHoleVideoError(file: File): string | null {
+  const supported = SUPPORTED_VIDEO_TYPES.includes(file.type) || (!file.type && /\.(mp4|mov|m4v|webm)$/i.test(file.name));
+  if (!supported) return "That file type isn't supported.";
+  return file.size > POST_LIMITS.MAX_VIDEO_SIZE_BYTES ? 'That video is too large to upload.' : null;
+}
 
 export interface OwnMediaSource {
   url: string; createdAt: string; mediaType: 'image' | 'video';
@@ -99,7 +109,9 @@ export async function submitLibraryHolePhoto(file: File, url: string, courseId: 
 /** Stage 2 library videos use empty capture metadata; only the Stream webhook
  * fills encode metadata. Never infer a capture month from the upload date. */
 export async function submitLibraryHoleVideo(file: File, streamId: string, courseId: string, memberId: string, hole: number, knownHoles: readonly number[]): Promise<HolePhoto> {
-  if (!knownHoles.includes(hole) || !file.type.startsWith('video/') || !streamId) throw new Error('That file type isn\'t supported.');
+  const validationError = libraryHoleVideoError(file);
+  if (validationError) throw new Error(validationError);
+  if (!knownHoles.includes(hole) || !streamId) throw new Error('This video cannot be tagged.');
   const { data: auth, error: authError } = await supabase.auth.getUser();
   if (authError) throw authError;
   if (auth.user?.id !== memberId) throw new Error('Please sign in again before tagging.');
