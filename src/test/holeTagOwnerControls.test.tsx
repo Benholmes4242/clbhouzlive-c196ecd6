@@ -90,6 +90,7 @@ describe('remove and move dialogs', () => {
   it('from a post', () => { dialog(true); expect(screen.getByText('It comes off the hole walk. Your post or review keeps it.')).toBeTruthy(); expect(removeButton()).not.toBeDisabled(); });
   it('straight to the hole', () => { dialog(false); expect(screen.getByText(/added this straight to the hole/)).toBeTruthy(); expect(removeButton()).not.toBeDisabled(); });
   it('unknown source disables Remove', () => { dialog(null); expect(screen.getByText('It comes off the hole walk.')).toBeTruthy(); expect(removeButton()).toBeDisabled(); });
+  it('Remove is the solid ink pill, not the default outlined variant', () => { dialog(false); expect(removeButton().className).not.toContain('border-border/10'); });
   it('default retag mode is unchanged', () => {
     render(<CoursePhotoRetagPicker row={row({ status: 'rejected', hole_no: 12 })} knownHoles={[3, 12]} pending={false} error={null} onSubmit={() => {}} onClose={() => {}} />);
     expect(screen.getByRole('heading').textContent).toBe('Retag the 12th');
