@@ -12,6 +12,7 @@ vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: ()
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: vi.fn(async () => ({ data: null, error: null })), from: vi.fn(() => ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) })), channel: vi.fn(() => ({ on: vi.fn().mockReturnThis(), subscribe: vi.fn() })), removeChannel: vi.fn() } }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => mocks.session }));
 vi.mock('@/hooks/useBusinessMembership', () => ({ useBusinessMembership: () => mocks.membership }));
+vi.mock('@/hooks/useBottomNavVisibility', () => ({ useHideBottomNav: () => {} }));
 vi.mock('@/components/business/verification/VerificationFlowSheet', () => ({ default: () => null }));
 
 import { ReviewCard } from '@/pages/BusinessReviewsPage';
@@ -27,7 +28,7 @@ afterEach(() => cleanup());
 describe('CB78 Part C: reply button matches the table', () => {
   it.each([['owner', true], ['admin', true], ['editor', false], ['analyst', false]] as const)('%s sees reply button: %s', (role, shown) => {
     const canReply = role === 'owner' || role === 'admin';
-    render(<ReviewCard r={review} currentUserId="u" canReply={canReply} onReply={noop} onEdit={noop} onDelete={noop} />);
+    render(<MemoryRouter><ReviewCard r={review} currentUserId="u" canReply={canReply} onReply={noop} onEdit={noop} onDelete={noop} /></MemoryRouter>);
     expect(!!document.querySelector('[data-write-reply]')).toBe(shown);
   });
 });
