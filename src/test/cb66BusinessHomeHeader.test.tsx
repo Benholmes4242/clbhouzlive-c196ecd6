@@ -90,6 +90,20 @@ describe('CB72 business home identity category', () => {
   });
 });
 
+describe('CB75.1 role line', () => {
+  it('owner reads the owner line', () => {
+    state.businesses = [biz('b1', 'Fairway Fitting Co.', 'owner')];
+    page();
+    expect(q('[data-role-line]')?.textContent).toBe("You're the owner");
+  });
+
+  it('admin reads the admin line', () => {
+    state.businesses = [biz('b1', 'Fairway Fitting Co.', 'admin')];
+    page();
+    expect(q('[data-role-line]')?.textContent).toBe("You're an admin");
+  });
+});
+
 describe('CB66 role matrix', () => {
   const cases: Array<[BusinessMembership['role'], boolean, boolean, string[]]> = [
     ['owner', true, true, ['share', 'delete']],
