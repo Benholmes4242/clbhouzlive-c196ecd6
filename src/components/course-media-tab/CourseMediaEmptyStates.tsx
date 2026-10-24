@@ -86,7 +86,7 @@ export function HoleTagRemoveDialog({ row, fromPost, pending, error, onConfirm, 
     {video ? <div className="media-empty-retag-photo hole-media-preview"><HoleMediaThumbnail url={row.media_url} mediaType={row.media_type} streamId={row.stream_id} posterUrl={row.poster_url} durationSeconds={row.duration_seconds} alt="Your video" /></div> : <img src={row.media_url} alt="Your photo" className="media-empty-retag-photo" />}
     {error && <p role="alert" className="media-empty-lede">{error}</p>}
     <div style={{ display: 'flex', flexDirection: 'column', marginTop: 16 }}>
-      <Button className="media-empty-action" style={{ width: '100%', marginTop: 0 }} disabled={pending || fromPost == null} onClick={onConfirm}>{pending ? 'Removing...' : 'Remove'}</Button>
+      <Button variant="ghost" className="media-empty-action" style={{ width: '100%', marginTop: 0 }} disabled={pending || fromPost == null} onClick={onConfirm}>{pending ? 'Removing...' : 'Remove'}</Button>
       <Button variant="ghost" style={{ minHeight: 44 }} disabled={pending} onClick={onClose}>Cancel</Button>
     </div>
   </DialogContent></Dialog>;
