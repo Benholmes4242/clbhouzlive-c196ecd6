@@ -13,6 +13,7 @@ import { MEDIA_CATALOGUE_TOTAL, MEDIA_EMPTY_SNAPSHOT, privateHolePhotos, photoDa
 import { memberReasonSentence } from '@/lib/courseMedia/memberReasonSentence';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { capitalPhotoCount, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
+import { HoleMediaThumbnail } from './HoleMediaVideo';
 import { HolePhotoPicker } from './HolePhotoPicker';
 import './media-empty.css';
 
@@ -48,12 +49,12 @@ export function CourseMediaNotLive({ rows, memberId, courseId, onRetag }: {
       return <div key={row.id} role="status" className="media-empty-status" data-status={row.status}>
         <X className="h-4 w-4 shrink-0" />
         <p><strong>Not published · The {row.hole_no}{ordinalSuffix(row.hole_no)}.</strong>{' '}
-          {reviewed && <>Reviewed on {reviewed}. </>}<strong>{memberReasonSentence(row.reject_reason)}</strong>{row.reject_reason === 'not_your_photo' && <> This photograph cannot be retagged because it is not yours.</>}
+          {reviewed && <>Reviewed on {reviewed}. </>}<strong>{row.media_type === 'video' ? memberReasonSentence(row.reject_reason).replace(/photo/g, 'video') : memberReasonSentence(row.reject_reason)}</strong>{row.reject_reason === 'not_your_photo' && <> This {row.media_type === 'video' ? 'video' : 'photo'} cannot be retagged because it is not yours.</>}
         </p>
       </div>;
     })}</div>
-    <div className="media-empty-thumbnails">{own.map(row => <div key={row.id} className="media-empty-thumbnail"><img src={row.media_url} alt={`Your rejected photograph of hole ${row.hole_no}`} /><span>{row.hole_no}</span></div>)}</div>
-    {own.some(row => row.status === 'rejected') && <p className="media-empty-said">A rejected photograph stays yours and stays private.</p>}
+    <div className="media-empty-thumbnails">{own.map(row => <div key={row.id} className="media-empty-thumbnail"><HoleMediaThumbnail url={row.media_url} mediaType={row.media_type} streamId={row.stream_id} posterUrl={row.poster_url} durationSeconds={row.duration_seconds} alt={`Your rejected ${row.media_type === 'video' ? 'video' : 'photograph'} of hole ${row.hole_no}`} /><span>{row.hole_no}</span></div>)}</div>
+    {own.some(row => row.status === 'rejected') && <p className="media-empty-said">A rejected photo or video stays yours and stays private.</p>}
     {onRetag && own.filter(row => row.reject_reason !== 'not_your_photo').map(row => <Button key={row.id} variant="ghost" className="media-empty-action media-empty-retag-action" onClick={() => onRetag(row)}>Retag the {row.hole_no}{ordinalSuffix(row.hole_no)}</Button>)}
   </section>;
 }
@@ -65,7 +66,7 @@ export function CoursePhotoRetagPicker({ row, knownHoles, pending, error, onSubm
   return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent className="media-empty" style={{ ...theme, background: A.PANEL }} onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
     <DialogTitle>Retag the {row.hole_no}{ordinalSuffix(row.hole_no)}</DialogTitle>
     <DialogDescription className="media-empty-lede">Choose a different hole.</DialogDescription>
-    <img src={row.media_url} alt="Your rejected photograph" className="media-empty-retag-photo" />
+    {row.media_type === 'video' ? <div className="media-empty-retag-photo hole-media-preview"><HoleMediaThumbnail url={row.media_url} mediaType={row.media_type} streamId={row.stream_id} posterUrl={row.poster_url} durationSeconds={row.duration_seconds} alt="Your rejected video" /></div> : <img src={row.media_url} alt="Your rejected photograph" className="media-empty-retag-photo" />}
     <HolePhotoPicker holeCount={knownHoles.length} knownHoleNumbers={knownHoles} selectedHole={row.hole_no} onSelect={value => { if (!pending && value !== row.hole_no) onSubmit(value); }} />
     {error && <p role="alert" className="media-empty-lede">{error}</p>}
     <Button variant="ghost" disabled={pending} onClick={onClose}>Cancel</Button>

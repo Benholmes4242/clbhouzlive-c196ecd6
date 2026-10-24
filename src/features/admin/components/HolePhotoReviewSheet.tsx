@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { adminTheme as t } from '../theme';
 import AdminSheet from './AdminSheet';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { HoleMediaVideo } from '@/components/course-media-tab/HoleMediaVideo';
 import {
   HOLE_PHOTO_REJECT_REASONS,
   
@@ -176,7 +177,7 @@ export default function HolePhotoReviewSheet({ row, onClose }: Props) {
     <AdminSheet
       open={row !== null}
       onClose={onClose}
-      title={`Hole ${row.hole_no} photo`}
+      title={`Hole ${row.hole_no} ${row.media_type === 'video' ? 'video' : 'photo'}`}
       subtitle={row.courseName ?? undefined}
       maxWidth={560}
       footer={
@@ -199,15 +200,15 @@ export default function HolePhotoReviewSheet({ row, onClose }: Props) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         {/* Submitted photo */}
         <div>
-          <div style={label}>Submitted photo</div>
-          <img
+          <div style={label}>Submitted {row.media_type === 'video' ? 'video' : 'photo'}</div>
+          {row.media_type === 'video' ? <HoleMediaVideo key={row.id} media={row} label={`Hole ${row.hole_no} submission`} /> : <img
             src={row.media_url}
             alt={`Hole ${row.hole_no} submission`}
             style={{
               marginTop: 6, width: '100%', borderRadius: t.radius.md,
               border: `1px solid ${t.line}`, display: 'block', objectFit: 'cover',
             }}
-          />
+          />}
         </div>
 
         {/* Course reference */}
@@ -257,11 +258,11 @@ export default function HolePhotoReviewSheet({ row, onClose }: Props) {
         {live.data && live.data.id !== row.id && (
           <div style={{ border: `1px solid ${t.line}`, borderRadius: t.radius.md, padding: 12 }}>
             <div style={label}>Already live on this hole</div>
-            <img
+            {live.data.media_type === 'video' ? <HoleMediaVideo key={live.data.id} media={live.data} label="Live hole video" /> : <img
               src={live.data.media_url}
               alt="Live hole photo"
               style={{ marginTop: 6, width: '100%', height: 120, objectFit: 'cover', borderRadius: t.radius.md }}
-            />
+            />}
             <div style={{ fontSize: 12, color: t.inkMuted, marginTop: 6 }}>
               By {live.data.contributorName ?? 'a member'}
             </div>

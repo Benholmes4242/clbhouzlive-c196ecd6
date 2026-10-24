@@ -27,9 +27,10 @@ describe('MEDIA_ENGINE_1_R2 tagging rules', () => {
     render(<HolePhotoTagButton post={post} memberId="member" holeCount={null} taggedUrls={new Set()} onTag={() => {}} />);
     expect(screen.queryByRole('button')).toBeNull();
   });
-  it('business-authored items and videos cannot be tagged', () => {
+  it('business-authored items and unfinished videos cannot be tagged', () => {
     expect(canTagHolePhoto({ ...post, actorType: 'business' }, 'member', 9, new Set())).toBe(false);
-    expect(canTagHolePhoto({ ...post, mediaItems: [{ ...post.mediaItems[0], type: 'video' }] }, 'member', 9, new Set())).toBe(false);
+    expect(canTagHolePhoto({ ...post, mediaItems: [{ ...post.mediaItems[0], type: 'video', isProcessing: true }] }, 'member', 9, new Set())).toBe(false);
+    expect(canTagHolePhoto({ ...post, mediaItems: [{ ...post.mediaItems[0], type: 'video', isProcessing: false }] }, 'member', 9, new Set())).toBe(true);
   });
   it('sparse analysis holes preserve the RPC’s numbers and order', () => {
     render(<HolePhotoPicker holeCount={3} knownHoleNumbers={[2, 7, 11]} selectedHole={null} onSelect={() => {}} />);
