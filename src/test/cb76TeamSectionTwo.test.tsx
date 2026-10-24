@@ -93,11 +93,10 @@ describe('CB76 rows', () => {
     mount([m('olivia', 'owner'), m('adam', 'admin'), m('eve', 'editor'), m('ed', 'editor'), m('ana', 'analyst')]);
     expect(document.querySelector('[data-team-activity]')).toBeNull();
     await waitFor(() => expect(row('olivia').querySelector('[data-team-activity]')).toBeTruthy());
-    const text = (id: string) => [...row(id).querySelectorAll('[data-team-activity]')].map(e => (e.lastChild as HTMLElement | null)?.textContent ?? '').join('') || row(id).querySelector('[data-team-activity]')?.textContent;
     expect(row('olivia').querySelector('[data-team-activity]')?.textContent).toContain('You · 6 posts · active today');
     expect(row('adam').querySelector('[data-team-activity]')?.textContent).toContain('1 post · 1 reply · active yesterday');
     expect(row('eve').querySelector('[data-team-activity]')?.textContent).toContain("Hasn't posted as Royal Example Golf Club yet");
-    expect(text('ed')).toContain('Not active in 8 weeks · Review access');
+    expect(row('ed').querySelector('[data-team-activity]')?.textContent).toContain('Not active in 8 weeks · Review access');
     expect(row('ana').querySelector('[data-team-activity]')).toBeNull();
     fireEvent.click(row('ed').querySelector('[data-team-review-access]') as HTMLElement);
     expect(screen.getByRole('dialog').querySelector('[data-team-menu]')).toBeTruthy();

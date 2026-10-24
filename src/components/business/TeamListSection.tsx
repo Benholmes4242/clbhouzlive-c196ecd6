@@ -18,6 +18,8 @@ import { activityLine, memberFirstName, memberMenu, sortTeam, type ActivityLine,
  * leaves the sheet open with nothing changed locally. Sheet chrome is BottomSheet's. */
 
 const P = 'business.team.sectionTwo';
+/** Supabase errors are plain objects; Error instances and both carry `message`. */
+const errorMessage = (error: unknown) => (error && typeof error === 'object' && 'message' in error ? String((error as { message: unknown }).message || '') : '');
 const ASSIGNABLE: AssignableBusinessRole[] = ['admin', 'editor', 'analyst'];
 type SheetKind = 'menu' | 'role' | 'jobTitle' | 'makeOwner' | 'remove' | 'leave';
 
@@ -93,7 +95,7 @@ export function TeamListSection({ businessId, businessName, team, viewerRole, vi
       await run(fn, args, jsonResult);
       await after();
     } catch (error) {
-      toast.error(error instanceof Error && error.message ? error.message : t(`${P}.failed`));
+      toast.error(errorMessage(error) || t(`${P}.failed`));
     } finally {
       setBusy(false);
     }
@@ -115,7 +117,7 @@ export function TeamListSection({ businessId, businessName, team, viewerRole, vi
       await refresh();
     } catch (error) {
       setVisOverride(o => ({ ...o, [m.user_profile_id]: !next }));
-      toast.error(error instanceof Error && error.message ? error.message : t(`${P}.failed`));
+      toast.error(errorMessage(error) || t(`${P}.failed`));
     } finally {
       setVisSaving(false);
     }
