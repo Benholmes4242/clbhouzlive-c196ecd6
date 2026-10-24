@@ -132,6 +132,12 @@
 .team-list-bullets { margin: 14px 20px 0; padding: 0; list-style: none; }
 .team-list-bullets li { position: relative; padding-left: 16px; font-size: 13px; line-height: 1.45; color: var(--team-muted); margin-top: 6px; }
 .team-list-bullets li::before { content: ""; position: absolute; left: 2px; top: 8px; width: 5px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.35); }
+/* CB77 section three: invites (card/rows reuse .team-list*). */
+.team-invite-row { align-items: flex-start; }
+.team-invite-mail { background: #232329; color: var(--team-muted); }
+.team-invite-expired { color: var(--team-muted); }
+.team-invite-resend { margin-top: 10px; display: inline-flex; align-items: center; }
+.team-invite-more { margin-top: 6px; }
 
 /* CB61: portalled round/review doors share global, theme-independent tokens. */
 :root {
