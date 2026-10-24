@@ -135,7 +135,12 @@ export default function BusinessProfileEditor() {
   const { data: membership, isLoading: membershipLoading } = useBusinessMembership(
     mode === 'edit' ? id : undefined
   );
-  const canEdit = mode === 'create' || membership?.canManage;
+  // CB78: editors may edit the profile. The live guard_business_protected_fields
+  // trigger refuses name/slug/category/club/notification_preferences for anyone
+  // but owners and admins, so editors see those read-only and never send them.
+  const isEditor = mode === 'edit' && membership?.role === 'editor';
+  const canEditProfile = !!membership && (membership.canManage || membership.role === 'editor');
+  const canEdit = mode === 'create' || canEditProfile;
 
   /* ── identity ─────────────────────────────────────── */
   const [category, setCategory] = useState(
@@ -226,8 +231,8 @@ export default function BusinessProfileEditor() {
 
   /* ── permission gate (edit) ───────────────────────── */
   useEffect(() => {
-    // eslint-disable-next-line settled/no-not-loading-empty-check -- the branch requires membership to be present before reading canManage.
-    if (mode === 'edit' && !membershipLoading && membership && !membership.canManage) {
+    // eslint-disable-next-line settled/no-not-loading-empty-check -- the branch requires membership to be present before reading its role.
+    if (mode === 'edit' && !membershipLoading && membership && !(membership.canManage || membership.role === 'editor')) {
       toast.error("You don't have permission to edit this business");
       navigate(`/business/${id}`);
     }
@@ -734,7 +739,7 @@ export default function BusinessProfileEditor() {
 
         updated_at: new Date().toISOString(),
       };
-      if (!isClubLinked) {
+      if (!isClubLinked && !isEditor) {
         updatePayload.name = businessName;
       }
       if (!isClubLinked && address) {
@@ -903,6 +908,7 @@ export default function BusinessProfileEditor() {
             businessName={businessName}
             setBusinessName={setBusinessName}
             isClubLinked={isClubLinked}
+            nameLocked={isEditor}
             existingSubject={isUniversity ? 'college' : 'club'}
             existingBusinessForClub={existingBusinessForClub}
             onRequestAccess={() => setShowRequestAccessModal(true)}
@@ -1022,12 +1028,12 @@ export default function BusinessProfileEditor() {
           {/* 8. SOCIAL */}
           <SocialSection social={social} setSocial={setSocial} />
 
-          {mode === 'edit' && business?.id && (
+          {mode === 'edit' && business?.id && !isEditor && (
             <NotificationsSection businessId={business.id} />
           )}
 
           {/* 9. VERIFICATION NUDGE */}
-          <VerificationNudgeSection />
+          {!isEditor && <VerificationNudgeSection />}
 
 
 
