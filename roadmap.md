@@ -1,5 +1,9 @@
 # Roadmap
 
+## BRIEF_HOLE_WALK_NO_ROUNDS
+- [x] Implemented Media-only eighteen-hole fallback and unscored panel/quiet line; default scored JSX and deriveHoleWalk retained, frozen flows untouched.
+- [ ] STOP: full bunx vitest run baseline 2,569 passed/326 files → 2,581 passed/1 failed =2,582 cases/327 files. +13 solely holeWalkNoRounds.test.tsx; all existing tests unchanged/pass. New automatic-restoration test fails at src/test/holeWalkNoRounds.test.tsx:115:23: `Error: expect(element).not.toHaveClass("hole-walk-panel-unscored")`; received `hole-walk-panel hole-walk-panel-unscored`. No correction after failure. Harness build OK16:47:32Z. Browser verification not attempted after stop; awaiting ruling on new fixture failure.
+
 ## HOLE_MEDIA_VIDEOS_STAGE_2
 - [x] Final timing ruling: remove only the authorised beforeAll namespace preload and unused beforeAll import; retain afterEach cleanup/imports and every test name/assertion/value. Inventory remains 2,538 cases/324 files.
 - [x] Two consecutive full `bunx vitest run` runs: run1 2,538 passed/324 files, run2 2,538 passed/324 files; both exit0 with zero failures/skips/unhandled errors. Inventory unchanged; no test names/assertions/expected values changed, no tests deleted/renamed/rewritten. cloudflare-stream-webhook deployment succeeded; submitted source SHA-256 3fe9b5af8e0393709486e0242dbce8b1330741f0325dade428239ebe1e60eef2. Automatic preview build OK12:44:28Z. Live webhook processing remains unverified; no SQL/migrations/feed_config changes, cap30 unchanged.
