@@ -16,6 +16,7 @@ import { useHolePhotoTagging } from './hooks/useHolePhotoTagging';
 import { HolePhotoTagDialog } from './HolePhotoTagDialog';
 import { capitalPhotoCount, holeMediaKey, holeSourceUrl, type OwnMediaSource, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { HoleWalk } from './HoleWalk';
+import { courseWalkHoles } from '@/lib/courseMedia/holeWalk';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMediaUpload } from '@/uploads/hooks/useMediaUpload';
@@ -39,9 +40,10 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<CourseMediaFilter>('all');
-  // MEDIA_ENGINE_1_R2: same source as About/You; no resolver or fallback.
+  // Same analysis source as About/You; empty available analysis falls back only in Media.
   const analysis = useCourseHoleAnalysis(user ? courseId : undefined);
-  const knownHoles = analysis.data?.available ? [...analysis.data.holes].sort((a, b) => a.hole_no - b.hole_no).map(hole => hole.hole_no) : null;
+  const walkHoles = courseWalkHoles(analysis.data);
+  const knownHoles = walkHoles ? [...walkHoles.holes].sort((a, b) => a.hole_no - b.hole_no).map(hole => hole.hole_no) : null;
   const tagging = useHolePhotoTagging(courseId, user?.id, knownHoles);
   const [tagPost, setTagPost] = useState<FeedPost | null>(null);
   const [addHole, setAddHole] = useState<number | null>(null);
@@ -147,7 +149,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const authors = new Map(posts.filter(post => post.actorType === 'personal' && post.displayName).map(post => [post.userId, post.displayName]));
   // Loaded zero is a fact; default/loading zero is not State B or C.
   const photoState = countsReady && analysis.isSuccess && analysis.data
-    ? coursePhotoState(mediaCounts.total > 0 || (tagging.tags.data ?? []).some(row => row.status === 'approved'), analysis.data.available)
+    ? coursePhotoState(mediaCounts.total > 0 || (tagging.tags.data ?? []).some(row => row.status === 'approved'), walkHoles != null)
     : null;
 
   if (!user) {
@@ -182,9 +184,9 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         onFilterChange={handleFilterChange}
         courseId={courseId}
       />}
-      {photoState === 'B' && analysis.data?.available && <CourseMediaNoPhotographs courseName={courseName} holes={analysis.data.holes} onHole={addFirst} onAddFirst={() => { setFastError(null); setFirstPhoto(true); }} />}
+      {photoState === 'B' && walkHoles && <CourseMediaNoPhotographs courseName={courseName} holes={walkHoles.holes} onHole={addFirst} onAddFirst={() => { setFastError(null); setFirstPhoto(true); }} />}
       {photoState === 'C' && <CourseMediaNothing courseName={courseName} onReview={() => navigate(`/courses/${courseId}/rate`)} />}
-      {photoState !== 'B' && photoState !== 'C' && analysis.data?.available && tagging.tags.isSuccess && <HoleWalk available={analysis.data.available} holes={analysis.data.holes} rows={tagging.tags.data ?? []} totalMedia={mediaCounts.total} courseName={courseName} authors={authors} onAddFirst={addFirst} memberId={user?.id} onMove={knownHoles && knownHoles.length > 0 ? row => { tagging.move.reset(); setMovePhoto(row); } : undefined} onRemove={knownHoles && knownHoles.length > 0 ? row => { tagging.remove.reset(); setRemovePhoto(row); } : undefined} focus={walkFocus} />}
+      {photoState !== 'B' && photoState !== 'C' && walkHoles && tagging.tags.isSuccess && <HoleWalk available={true} holes={walkHoles.holes} scored={walkHoles.scored} rows={tagging.tags.data ?? []} totalMedia={mediaCounts.total} courseName={courseName} authors={authors} onAddFirst={addFirst} memberId={user?.id} onMove={knownHoles && knownHoles.length > 0 ? row => { tagging.move.reset(); setMovePhoto(row); } : undefined} onRemove={knownHoles && knownHoles.length > 0 ? row => { tagging.remove.reset(); setRemovePhoto(row); } : undefined} focus={walkFocus} />}
       {tagging.ready && untaggedCount != null && untaggedCount > 0 && (
         <section className="px-5 pt-5">
           <p style={VERDICT_KICKER}>Everything else</p>

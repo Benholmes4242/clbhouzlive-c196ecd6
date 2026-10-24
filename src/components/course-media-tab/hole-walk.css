@@ -56,3 +56,6 @@
 .hole-walk-owner-action:hover { background: transparent; color: var(--hole-walk-ink); }
 .hole-walk-owner-dot { font-size: 12px; color: var(--hole-walk-faint); }
 .hole-walk-owner + .hole-walk-stats { margin-top: 9px; }
+.hole-walk-panel-unscored .hole-walk-photo { margin-top: 12px; }
+.hole-walk-panel-unscored .hole-walk-owner + .hole-walk-add { margin-top: 6px; }
+.hole-walk-quiet { margin-top: 10px; font-size: 12.5px; line-height: 1.5; color: var(--hole-walk-dim); }

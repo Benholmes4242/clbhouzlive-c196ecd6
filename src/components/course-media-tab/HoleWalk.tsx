@@ -21,12 +21,13 @@ export function HoleProcessingVideo({ media, label }: { media: { media_url: stri
   </div>;
 }
 
-export function HoleWalk({ available, holes, rows, totalMedia, courseName, authors, onAddFirst, memberId, onMove, onRemove, focus }: {
+export function HoleWalk({ available, holes, rows, totalMedia, courseName, authors, onAddFirst, memberId, onMove, onRemove, focus, scored = true }: {
   available: boolean; holes: readonly CourseHole[]; rows: readonly HolePhoto[];
   totalMedia: number; courseName?: string; authors?: ReadonlyMap<string, string>;
   onAddFirst: (hole: number) => void;
   memberId?: string; onMove?: (row: HolePhoto) => void; onRemove?: (row: HolePhoto) => void;
   focus?: { hole: number; id: string; nonce: number } | null;
+  scored?: boolean;
 }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [photoId, setPhotoId] = useState<string | null>(null);
@@ -52,19 +53,19 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
   const field = tile ? toParParts(tile.hole.avg_to_par) : null;
   const author = active ? authors?.get(active.user_id) : undefined;
   const month = active ? captureMonth(active) : null;
-  const panel = tile && <section ref={panelRef} className="hole-walk-panel" role="region" aria-label={`Hole ${tile.hole.hole_no}`}>
+  const panel = tile && <section ref={panelRef} className={scored ? 'hole-walk-panel' : 'hole-walk-panel hole-walk-panel-unscored'} role="region" aria-label={`Hole ${tile.hole.hole_no}`}>
       <p className="hole-walk-kicker" style={VERDICT_KICKER}>The {holeOrdinal(tile.hole.hole_no)}</p>
-      <h2 className="hole-walk-title" style={TAB_TITLE}>Par {tile.hole.par}{tile.hole.yards != null && <> · {tile.hole.yards.toLocaleString()} yards</>}</h2>
+      {scored && <h2 className="hole-walk-title" style={TAB_TITLE}>Par {tile.hole.par}{tile.hole.yards != null && <> · {tile.hole.yards.toLocaleString()} yards</>}</h2>}
       <div className={`hole-walk-photo ${active ? '' : 'hole-walk-photo-open'}`}>
         {active ? <>{active.media_type === 'video' ? (active.duration_seconds == null ? <HoleProcessingVideo key={active.id} media={active} label={`Hole ${tile.hole.hole_no}`} /> : <HoleMediaVideo key={active.id} media={active} label={`Hole ${tile.hole.hole_no}`} />) : <img src={active.media_url} alt={`Hole ${tile.hole.hole_no}`} />}{(author || month) && <div className="hole-walk-caption">{author && <strong>{author}</strong>}{month && <span>{captureMonthLabel(month)}</span>}</div>}</> : <span>No shot yet</span>}
       </div>
       {active && memberId && active.user_id === memberId && active.status === 'approved' && onMove && onRemove && <div className="hole-walk-owner"><span className="hole-walk-owner-label">Yours</span><span className="hole-walk-owner-actions"><Button variant="ghost" className="hole-walk-owner-action" onClick={() => onMove(active)}>Move to another hole</Button><span className="hole-walk-owner-dot" aria-hidden="true">{'\u00B7'}</span><Button variant="ghost" className="hole-walk-owner-action" onClick={() => onRemove(active)}>Remove</Button></span></div>}
-      <div className="hole-walk-stats">
+      {scored && <div className="hole-walk-stats">
         <div><b>{tile.hole.par}</b><span>Par</span></div>
         {tile.hole.yards != null && <div><b>{tile.hole.yards.toLocaleString()}</b><span>Yards</span></div>}
         {tile.hole.stroke_index != null && <div><b>{tile.hole.stroke_index}</b><span>Stroke index</span></div>}
         {field && <div><b style={{ color: field.tone }}>{field.text}</b><span>Field loses</span></div>}
-      </div>
+      </div>}
       {/* A hole that already has media still takes more from an eligible member;
           same entry point as "Add the first", which stays for empty holes. */}
       {tile.photos.length >= 1 && <Button variant="ghost" className="hole-walk-add" onClick={() => onAddFirst(tile.hole.hole_no)}>Add a photo or video</Button>}
@@ -98,6 +99,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
         {walk.most != null && <>The <strong>{holeOrdinal(walk.most)}</strong> is the most photographed hole on the course. </>}
         {walk.openCount > 0 && <><strong>{capitalPhotoCount(walk.openCount)} holes here have never been shot</strong>{walk.hardestOpen != null ? <> — including the <strong>{holeOrdinal(walk.hardestOpen)}</strong>, which the field loses most shots to.</> : '.'}</>}
       </p>}
+      {!tile && !scored && <p className="hole-walk-quiet">No rounds have been posted here yet, so par and yardage are still to come. They fill in with the first tracked round.</p>}
     </section>
 
   </div>;

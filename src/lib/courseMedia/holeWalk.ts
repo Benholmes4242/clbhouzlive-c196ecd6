@@ -2,9 +2,22 @@
  * - Hole-walk public counts share `courseMedia/holeWalk.ts`: no pending.
  * Photo and video display months use EXIF capture timestamp only, never contribution date.
  * Publication is unchanged; row counts include both media types; no alias inference.
+ * Media alone uses courseWalkHoles for empty available analysis; other tabs
+ * retain the analysis hook's original holes so invented scoring never leaks.
  */
-import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
+import type { CourseHole, CourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import { capitalPhotoCount, spellPhotoCount, type HolePhoto } from './holePhotoData';
+
+export const UNSCORED_HOLE_COUNT = 18;
+export function courseWalkHoles(data: CourseHoleAnalysis | null | undefined): { holes: CourseHole[]; scored: boolean } | null {
+  if (!data || !data.available) return null;
+  if (data.holes.length > 0) return { holes: data.holes, scored: true };
+  return { holes: Array.from({ length: UNSCORED_HOLE_COUNT }, (_, i) => ({
+    hole_no: i + 1, par: 0, yards: null, stroke_index: null, rounds: 0,
+    avg_to_par: Number.NaN, avg_gross: Number.NaN,
+    dist: { ace: 0, albatross: 0, eagle: 0, birdie: 0, par: 0, bogey: 0, double: 0 },
+  })), scored: false };
+}
 
 const ORDINALS = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'seventeenth', 'eighteenth'];
 export const holeOrdinal = (hole: number) => ORDINALS[hole - 1] ?? `${hole}th`;

@@ -1,5 +1,9 @@
 # Roadmap
 
+## BRIEF_HOLE_WALK_NO_ROUNDS
+- [ ] Add Media-only eighteen-hole fallback and unscored panel/quiet line; preserve scored output and frozen flows.
+- [ ] Add only holeWalkNoRounds.test.tsx, run full suite and verify rendered states. Baseline bunx vitest run: 2,569 passed /326 files, zero failures/skips/unhandled errors.
+
 ## HOLE_MEDIA_VIDEOS_STAGE_2
 - [x] Final timing ruling: remove only the authorised beforeAll namespace preload and unused beforeAll import; retain afterEach cleanup/imports and every test name/assertion/value. Inventory remains 2,538 cases/324 files.
 - [x] Two consecutive full `bunx vitest run` runs: run1 2,538 passed/324 files, run2 2,538 passed/324 files; both exit0 with zero failures/skips/unhandled errors. Inventory unchanged; no test names/assertions/expected values changed, no tests deleted/renamed/rewritten. cloudflare-stream-webhook deployment succeeded; submitted source SHA-256 3fe9b5af8e0393709486e0242dbce8b1330741f0325dade428239ebe1e60eef2. Automatic preview build OK12:44:28Z. Live webhook processing remains unverified; no SQL/migrations/feed_config changes, cap30 unchanged.
