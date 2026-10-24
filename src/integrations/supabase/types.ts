@@ -21862,6 +21862,7 @@ export type Database = {
       get_latest_hole_media: {
         Args: { p_limit?: number }
         Returns: {
+          added_at: string
           course_id: string
           course_name: string
           created_at: string
