@@ -37,8 +37,8 @@ beforeEach(() => { vi.clearAllMocks(); f.analysis = emptyAnalysis; f.rows = [pho
 afterEach(cleanup);
 function mountTab() {
   const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const tab = <MemoryRouter><QueryClientProvider client={cache}><CourseMediaTabNew courseId="course" courseName="Old Head Golf Links" /></QueryClientProvider></MemoryRouter>;
-  return { ...render(tab), tab };
+  const make = () => <MemoryRouter><QueryClientProvider client={cache}><CourseMediaTabNew courseId="course" courseName="Old Head Golf Links" /></QueryClientProvider></MemoryRouter>;
+  return { ...render(make()), make };
 }
 
 describe('BRIEF_HOLE_WALK_NO_ROUNDS', () => {
@@ -110,7 +110,7 @@ describe('BRIEF_HOLE_WALK_NO_ROUNDS', () => {
   it('Media automatically restores real scored holes when analysis receives rounds', () => {
     const view = mountTab(); fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
     f.analysis = { available: true, total_rounds: 10, holes: [hole(4)] };
-    view.rerender(view.tab);
+    view.rerender(view.make());
     const panel = screen.getByRole('region', { name: 'Hole 4' });
     expect(panel).not.toHaveClass('hole-walk-panel-unscored'); expect(panel.querySelector('.hole-walk-stats')).not.toBeNull();
     expect(panel.querySelector('.hole-walk-title')?.textContent).toBe('Par 4 · 412 yards');
