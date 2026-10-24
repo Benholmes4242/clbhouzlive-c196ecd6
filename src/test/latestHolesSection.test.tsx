@@ -1,0 +1,100 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter, useLocation } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { CourseHole, CourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
+import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
+
+const f = vi.hoisted(() => ({ latest: [] as import('@/components/courses/browse/LatestHolesSection').LatestHoleMedia[], loading: false, error: false, rpc: vi.fn(), analysis: null as CourseHoleAnalysis | null, rows: [] as HolePhoto[], total: 8, known: vi.fn() }));
+vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
+vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'member' } }) }));
+vi.mock('@/hooks/gam/useCourseHoleAnalysis', () => ({ useCourseHoleAnalysis: () => ({ isSuccess: true, data: f.analysis }) }));
+vi.mock('@/components/course-media-tab/hooks/useHolePhotoTagging', () => ({ useHolePhotoTagging: (_course: string, _member: string, known: number[] | null) => {
+  f.known(known);
+  return { ready: true, own: { data: [] }, sources: { data: [], isSuccess: true }, tags: { data: f.rows, isSuccess: true }, taggedUrls: new Set(), submit: { reset: vi.fn() }, move: { reset: vi.fn() }, remove: { reset: vi.fn() } };
+} }));
+vi.mock('@/components/course-media-tab/hooks/useCourseMedia', () => ({ useCourseMedia: () => ({ posts: [], postsForFullscreen: [], mediaCounts: { total: f.total, photos: f.total, videos: 0 }, countsReady: true }) }));
+vi.mock('@/uploads/hooks/useMediaUpload', () => ({ useMediaUpload: () => ({ upload: vi.fn() }) }));
+vi.mock('@/components/course-media-tab/CourseMediaCanonGrid', () => ({ CourseMediaCanonGrid: () => null }));
+vi.mock('@/components/course-media-tab/CourseMediaHeader', () => ({ CourseMediaHeader: () => null }));
+vi.mock('@/components/common/ScrollToTopGlass', () => ({ default: () => null }));
+
+vi.mock('@/hooks/gam/_useGamRpc', () => ({ useGamRpc: (...args: unknown[]) => { f.rpc(...args); return { data: f.latest, isLoading: f.loading, isError: f.error }; } }));
+
+import { LatestHolesSection } from '@/components/courses/browse/LatestHolesSection';
+import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
+import type { LatestHoleMedia } from '@/components/courses/browse/LatestHolesSection';
+import { courseWalkHoles, deriveHoleWalk, UNSCORED_HOLE_COUNT } from '@/lib/courseMedia/holeWalk';
+import { HoleWalk } from '@/components/course-media-tab/HoleWalk';
+import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';
+
+const emptyAnalysis: CourseHoleAnalysis = { available: true, total_rounds: 0, holes: [] };
+const hole = (n: number): CourseHole => ({ hole_no: n, par: 4, yards: 412, stroke_index: 3, rounds: 10, avg_to_par: 1, avg_gross: 5, dist: { ace: 0, albatross: 0, eagle: 0, birdie: 0, par: 5, bogey: 5, double: 0 } });
+const photo = (n: number, id = String(n)): HolePhoto => ({ id, course_id: 'course', hole_no: n, status: 'approved', user_id: 'member', media_type: 'image', media_url: `/photo-${id}.jpg`, exif_captured_at: null }) as HolePhoto;
+const numbers = Array.from({ length: 18 }, (_, i) => i + 1);
+const quiet = 'No rounds have been posted here yet, so par and yardage are still to come. They fill in with the first tracked round.';
+function unscored() {
+  const result = courseWalkHoles(emptyAnalysis);
+  if (!result) throw new Error('Expected available unscored holes');
+  return result.holes;
+}
+beforeEach(() => { vi.clearAllMocks(); f.analysis = emptyAnalysis; f.rows = [photo(1), photo(4), photo(7), photo(15)]; f.total = 8; f.latest = [latest('first'), latest('second'), latest('third')]; f.loading = false; f.error = false; });
+afterEach(cleanup);
+function mountTab(entry = '/courses/course?tab=media&hole=4&shot=selected') {
+  const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const make = () => <MemoryRouter initialEntries={[entry]}><QueryClientProvider client={cache}><CourseMediaTabNew courseId="course" courseName="Old Head Golf Links" /></QueryClientProvider></MemoryRouter>;
+  return { ...render(make()), make };
+}
+
+
+function latest(id: string, overrides: Partial<LatestHoleMedia> = {}): LatestHoleMedia {
+  return { id, course_id: `course-${id}`, course_name: `Course ${id}`, hole_no: 4, media_type: 'image', media_url: `/photo-${id}.jpg`, poster_url: null, stream_id: null, duration_seconds: null, exif_captured_at: '2026-09-14T12:00:00Z', created_at: '2026-10-24T12:00:00Z', member_id: 'member', member_name: 'Thomas Holmes', par: 3, yards: 182, ...overrides };
+}
+function Location() { const location = useLocation(); return <output data-testid="destination">{location.pathname}{location.search}</output>; }
+function mountRail() { return render(<MemoryRouter><LatestHolesSection /><Location /></MemoryRouter>); }
+
+describe('BRIEF_COURSES_LATEST_HOLES', () => {
+  it.each([0, 1, 2])('fewer than three rows hides the rail (%i)', count => {
+    f.latest = f.latest.slice(0, count); mountRail(); expect(screen.queryAllByRole('button')).toHaveLength(0);
+  });
+  it('three cards retain RPC order and the specified query contract', () => {
+    mountRail(); expect(screen.getAllByRole('button').map(b => b.getAttribute('aria-label'))).toEqual(['Hole 4, Course first', 'Hole 4, Course second', 'Hole 4, Course third']);
+    expect(f.rpc).toHaveBeenCalledWith('get_latest_hole_media', { p_limit: 10 }, { staleTime: 60_000 });
+  });
+  it('an RPC error hides even cached rows', () => { f.error = true; mountRail(); expect(screen.queryAllByRole('button')).toHaveLength(0); });
+  it('loading draws the shell without interactive cards', () => { f.loading = true; const view = mountRail(); expect(view.container.querySelector('section[aria-hidden]')).not.toBeNull(); expect(screen.queryAllByRole('button')).toHaveLength(0); });
+  it('labels distinguish scored, unscored and absent yardage', () => {
+    f.latest = [latest('first'), latest('second', { par: null, yards: null }), latest('third', { yards: null })];
+    mountRail(); expect(screen.getByText('Par 3 · 182 yds')).toBeInTheDocument(); expect(screen.getByText('Hole')).toBeInTheDocument(); expect(screen.getByText('Par 3')).toBeInTheDocument();
+  });
+  it('credit uses EXIF September and never creation date when EXIF is absent', () => {
+    f.latest = [latest('first'), latest('second', { exif_captured_at: null }), latest('third', { member_name: null, exif_captured_at: null })];
+    const view = mountRail(); expect(screen.getByText('Thomas Holmes · Sep 2026')).toBeInTheDocument(); expect(screen.getByText('Thomas Holmes')).toBeInTheDocument();
+    expect(view.container.querySelectorAll('.latest-hole-credit')).toHaveLength(2); expect(view.container.textContent).not.toContain('Oct 2026');
+  });
+  it('credit month is UTC, not the timestamp offset month', () => {
+    f.latest[0] = latest('first', { exif_captured_at: '2026-10-01T00:30:00+02:00' }); mountRail(); expect(screen.getAllByText('Thomas Holmes · Sep 2026')).toHaveLength(3);
+  });
+  it('video uses its shared poster and rounded duration while images have no chip', () => {
+    const video = latest('first', { media_type: 'video', poster_url: '/video-poster.jpg', duration_seconds: 14.2 }); f.latest[0] = video;
+    const view = mountRail(); const cards = screen.getAllByRole('button'); expect(cards[0].querySelector('img')).toHaveAttribute('src', holeMediaPoster(video));
+    expect(cards[0].querySelector('.glass-chip')?.textContent).toBe('0:14'); expect(cards[1].querySelector('.glass-chip')).toBeNull(); expect(view.container.querySelector('video')).toBeNull();
+  });
+  it('video duration formats longer than one minute', () => { f.latest[0] = latest('first', { media_type: 'video', duration_seconds: 75 }); mountRail(); expect(screen.getByText('1:15')).toBeInTheDocument(); });
+  it('card navigates to its course, hole and shot', () => {
+    mountRail(); fireEvent.click(screen.getByRole('button', { name: 'Hole 4, Course second' })); expect(screen.getByTestId('destination')).toHaveTextContent('/courses/course-second?tab=media&hole=4&shot=second');
+  });
+  it('Media deep link opens hole four with the selected shot, not its first shot', () => {
+    f.rows = [photo(4, 'first'), photo(4, 'selected')]; mountTab();
+    const panel = screen.getByRole('region', { name: 'Hole 4' }); expect(panel.querySelector('.hole-walk-photo > img')).toHaveAttribute('src', '/photo-selected.jpg');
+  });
+  it('missing linked shot falls back to the hole first shot', () => {
+    f.rows = [photo(4, 'first')]; mountTab(); expect(screen.getByRole('region', { name: 'Hole 4' }).querySelector('.hole-walk-photo > img')).toHaveAttribute('src', '/photo-first.jpg');
+  });
+  it('unknown hole never opens a panel', () => { mountTab('/courses/course?tab=media&hole=99&shot=selected'); expect(screen.queryByRole('region')).toBeNull(); });
+  it('deep link waits for known holes and does not reapply after user selection', () => {
+    f.analysis = null; const view = mountTab(); expect(screen.queryByRole('region')).toBeNull();
+    f.analysis = emptyAnalysis; f.rows = [photo(4, 'selected'), photo(7)]; view.rerender(view.make()); expect(screen.getByRole('region', { name: 'Hole 4' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); view.rerender(view.make()); expect(screen.getByRole('region', { name: 'Hole 7' })).toBeInTheDocument();
+  });
+});
