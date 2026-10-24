@@ -25,6 +25,7 @@ export function useHolePhotoTagging(courseId: string, memberId: string | undefin
     onSuccess: async () => {
       await cache.invalidateQueries({ queryKey: ['hole-photo-tags', courseId, memberId] });
     },
+    onError: error => { console.error('[hole-tag] failed', error); },
   });
   // Raw canonical URLs plus stream-UID keys, so a feed video whose derived
   // playback URL differs from its stored media_url still reads as tagged.
