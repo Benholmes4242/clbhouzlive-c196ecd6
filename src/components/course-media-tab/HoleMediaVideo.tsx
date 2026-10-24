@@ -25,6 +25,7 @@ export function HoleMediaVideo({ media, label }: {
   const id = useId();
   const duckKey = `hole-media-${id}`;
   const poster = holeMediaPoster({ ...media, media_type: 'video' });
+  const stopRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     const video = videoRef.current;
     return () => {
@@ -42,6 +43,7 @@ export function HoleMediaVideo({ media, label }: {
     setPlaying(false);
     audioDuck.release(duckKey);
   };
+  stopRef.current = pause;
   const play = () => {
     const video = videoRef.current;
     if (!video) return;

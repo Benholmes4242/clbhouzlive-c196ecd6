@@ -38,6 +38,10 @@ export interface HolePhotoQueueRow {
   hole_no: number;
   user_id: string;
   media_url: string;
+  media_type?: string;
+  stream_id?: string | null;
+  poster_url?: string | null;
+  duration_seconds?: number | null;
   width: number | null;
   height: number | null;
   status: HolePhotoStatus;
@@ -54,7 +58,7 @@ export interface HolePhotoQueueRow {
 }
 
 const COLS =
-  'id, course_id, hole_no, user_id, media_url, width, height, status, reject_reason, proof_score_id, created_at, reviewed_at, auto_verdict, auto_confidence, auto_notes';
+  'id, course_id, hole_no, user_id, media_url, media_type, stream_id, poster_url, duration_seconds, width, height, status, reject_reason, proof_score_id, created_at, reviewed_at, auto_verdict, auto_confidence, auto_notes';
 
 const sb: any = supabase;
 

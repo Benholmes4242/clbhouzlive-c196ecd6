@@ -54,7 +54,7 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onClose }: {
       const next = advanceBatch(state, photo.url, hole);
       setState(next); setSelected(null);
       if (next.index >= photos.length) onClose();
-    } catch (error) { setError(holePhotoErrorMessage(error)); }
+    } catch (error) { setError(holePhotoErrorMessage(error, `The ${photo.mediaType === 'video' ? 'video' : 'photo'} could not be tagged. The tag was not saved.`, photo.mediaType === 'video' ? 'video' : 'image')); }
     finally { setPending(false); }
   };
   const skip = () => { if (!photo) return; const next = advanceBatch(state, photo.url, null); setState(next); setSelected(null); setError(null); if (next.index >= photos.length) onClose(); };
