@@ -2,11 +2,11 @@
 
 ## HOLE_MEDIA_VIDEOS_STAGE_1
 - [x] Apply founder rulings: change only mediaTrust line23 expected photo copy; restore EXIF-only captureMonth and the original missing-EXIF test, preserving all other video work.
-- [ ] Run full suite for rulings from 2,518 total /323 files (2,517 passed /1 failed); report both changed test files and automatic checks. Manual typecheck cannot run under the environment's harness-only checks rule.
+- [x] Full ruling suite `bunx vitest run`: 2,518 passed /323 files /0 failures, unchanged total from 2,518 (previously 2,517 passed /1 failed). Only mediaTrust.test.tsx and holeWalk.test.tsx changed in this ruling. Automatic preview build OK05:28:07Z. Manual tsc not run under the environment's harness-only checks rule; separate typecheck remains unverified.
 - [ ] Include only encoded own published-post/review videos in sources and tagging; keep new library uploads image-only.
 - [ ] Add video posters/duration to existing tagging surfaces, hole panels and moderator review; reuse existing HLS and audio ownership.
 - [x] Confirm four founder-added course_hole_media fields already exist; generated schema unchanged, no SQL/migrations.
-- [ ] Validation stopped: full suite 2,517 passed /1 failed /323 files (2,518 total, +16 new tests). `src/test/mediaTrust.test.tsx:23:58` expects “This photograph cannot be retagged because it is not yours.” but image copy now says “This photo cannot be retagged because it is not yours.” Existing test unchanged; await ruling before continuing. Targeted 100/100 passed; preview build OK. Browser/audio validation not completed.
+- [x] Previous protected-copy stop resolved by founder's exact line23 authorization; missing-EXIF test name and original empty-array assertion restored. Full suite now green. Broader browser/audio validation remains uncompleted; no claim of live persisted video-flow verification.
 
 ## CB75 — Team section 1
 - [x] Read the brief/reference and audit the header, team/invite reads, request decisions and protecting tests. Full baseline `bunx vitest run`: 2,467 passed /321 files /0 failures, matching the latest reported suite.
