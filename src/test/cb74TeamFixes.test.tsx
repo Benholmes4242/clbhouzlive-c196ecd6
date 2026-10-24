@@ -138,12 +138,16 @@ describe('CB74 authoritative access decisions', () => {
 });
 
 describe('CB74 elapsed pending invite rows', () => {
-  it.each([[-1, 'Expired'], [1, 'Pending']] as const)('an invite expiring %s day from now retains its row and revoke action', async (offset, status) => {
-    mocks.invites = [{ id: 'invite-1', status: 'pending', role: 'admin', expires_at: new Date(Date.now() + offset * 86400000).toISOString(), invitee_email: 'invitee@example.test' }];
+  it.each([[-1, 'expired'], [1, 'live']] as const)('an invite expiring %s day from now retains its row in the CB77 invites card', async (offset, state) => {
+    mocks.invites = [{ id: 'invite-1', status: 'pending', role: 'admin', created_at: new Date(Date.now() - 86400000).toISOString(), expires_at: new Date(Date.now() + offset * 86400000).toISOString(), invitee_email: 'invitee@example.test', invitee_user_id: null }];
     mount('team');
-    expect(await screen.findByText(`${status} · Admin`)).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Revoke' }));
-    expect(mocks.mutate).toHaveBeenCalledWith('invite-1');
+    const row = await waitFor(() => { const r = document.querySelector('[data-invite-row="invite-1"]'); expect(r).toBeTruthy(); return r as HTMLElement; });
+    expect(row.querySelector(`[data-invite-when="${state}"]`)).toBeTruthy();
+    expect(row.querySelector('[data-invite-resend]')).toBeTruthy();
+    fireEvent.click(row.querySelector('[data-invite-more]') as HTMLElement);
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.querySelector('[data-invite-item="cancel"]')).toBeTruthy();
+    expect(!!dialog.querySelector('[data-invite-item="copy"]')).toBe(state === 'live');
   });
 });
 
