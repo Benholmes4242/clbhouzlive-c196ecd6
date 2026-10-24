@@ -3,7 +3,7 @@
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { fetchHolePhotos, fetchOwnPhotoSources, fetchOwnPhotoUrls, submitHolePhoto } from '@/lib/courseMedia/holePhotoData';
+import { fetchHolePhotos, fetchOwnPhotoSources, fetchOwnPhotoUrls, holeMediaKey, submitHolePhoto } from '@/lib/courseMedia/holePhotoData';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { retagHolePhoto } from '@/lib/courseMedia/retagHolePhoto';
 
@@ -25,8 +25,15 @@ export function useHolePhotoTagging(courseId: string, memberId: string | undefin
     onSuccess: async () => {
       await cache.invalidateQueries({ queryKey: ['hole-photo-tags', courseId, memberId] });
     },
+    onError: error => { console.error('[hole-tag] failed', error); },
   });
-  const taggedUrls = new Set((tags.data ?? []).filter(row => row.user_id === memberId).map(row => row.media_url));
+  // Raw canonical URLs plus stream-UID keys, so a feed video whose derived
+  // playback URL differs from its stored media_url still reads as tagged.
+  const taggedUrls = new Set<string>();
+  for (const row of (tags.data ?? []).filter(row => row.user_id === memberId)) {
+    taggedUrls.add(row.media_url);
+    taggedUrls.add(holeMediaKey({ mediaType: row.media_type, url: row.media_url, streamId: row.stream_id }));
+  }
   const retag = useMutation({
     mutationFn: ({ row, hole }: { row: HolePhoto; hole: number }) => {
       if (!memberId || !knownHoles) throw new Error('This photograph cannot be retagged.');
@@ -35,6 +42,7 @@ export function useHolePhotoTagging(courseId: string, memberId: string | undefin
     onSuccess: async () => {
       await cache.invalidateQueries({ queryKey: ['hole-photo-tags', courseId, memberId] });
     },
+    onError: error => { console.error('[hole-tag] failed', error); },
   });
   return { tags, own, sources, taggedUrls, submit, retag, ready: enabled && tags.isSuccess && own.isSuccess };
 }

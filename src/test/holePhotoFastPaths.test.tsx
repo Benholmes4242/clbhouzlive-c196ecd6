@@ -43,10 +43,10 @@ describe('MEDIA_FAST_1', () => {
     expect(advanceBatch(state, 'b', 7).tags).toEqual({ a: 7, b: 7 });
     expect(() => advanceBatch(state, 'b', 4)).toThrow('This hole is closed.');
   });
-  it('closed always beats used, seventh remains green and selectable', () => {
-    render(<HolePhotoPicker holeCount={9} floor={7} selectedHole={null} usedHoles={[4, 7]} onSelect={() => {}} />);
+  it('no hole is ever closed; tagged holes read green and stay selectable', () => {
+    render(<HolePhotoPicker holeCount={9} selectedHole={null} usedHoles={[4, 7]} onSelect={() => {}} />);
     const four = screen.getByRole('button', { name: 'Hole 4' }); const seven = screen.getByRole('button', { name: 'Hole 7' });
-    expect(four).toBeDisabled(); expect(four).toHaveAttribute('data-state', 'closed');
+    expect(four).toBeEnabled(); expect(four).toHaveAttribute('data-state', 'used');
     expect(seven).toBeEnabled(); expect(seven).toHaveAttribute('data-state', 'used');
     expect(screen.getByRole('button', { name: 'Hole 8' })).toHaveAttribute('data-state', 'open');
   });
@@ -73,7 +73,7 @@ describe('MEDIA_FAST_1', () => {
     render(<HolePhotoBatchPath photos={[photo('/a.jpg'), photo('/b.jpg')]} rounds={[round]} memberId="member" courseId="course" knownHoles={[4, 7]} onTag={tag} onClose={() => {}} />);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/b.jpg'));
-    expect(tag).toHaveBeenCalledWith('/a.jpg', 7); expect(screen.getByRole('button', { name: 'Hole 4' })).toBeDisabled();
+    expect(tag).toHaveBeenCalledWith('/a.jpg', 7); expect(screen.getByRole('button', { name: 'Hole 4' })).toBeEnabled();
   });
   it('a second and third photograph can be tagged to the same hole', async () => {
     const tag = vi.fn().mockResolvedValue({ status: 'approved' } as HolePhoto);

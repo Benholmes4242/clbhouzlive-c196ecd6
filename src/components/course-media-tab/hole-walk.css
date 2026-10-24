@@ -20,7 +20,8 @@
 .hole-walk-observation strong { color: var(--hole-walk-ink); }
 .hole-walk-photo { position: relative; margin-top: 14px; border-radius: 12px; overflow: hidden; aspect-ratio: 4/3; border: 1px solid var(--hole-walk-soft); }
 .hole-walk-photo-open { display: flex; align-items: center; justify-content: center; border-style: dashed; border-color: var(--hole-walk-faint); color: var(--hole-walk-faint); font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
-.hole-walk-caption { position: absolute; bottom: 0; left: 0; right: 0; padding: 26px 12px 10px; background: var(--hole-walk-caption-ground); font-size: 12px; }
+.hole-walk-caption { position: absolute; bottom: 0; left: 0; right: 0; padding: 26px 12px 10px; font-size: 12px; }
+.hole-walk-caption strong { text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
 .hole-walk-caption span { display: block; margin-top: 2px; color: var(--hole-walk-muted); font-size: 11px; }
 .hole-walk-stats { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 13px; }
 .hole-walk-stats b { display: block; font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }

@@ -14,7 +14,7 @@ import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useHolePhotoTagging } from './hooks/useHolePhotoTagging';
 import { HolePhotoTagDialog } from './HolePhotoTagDialog';
-import { capitalPhotoCount, holeSourceUrl, type OwnMediaSource, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
+import { capitalPhotoCount, holeMediaKey, holeSourceUrl, type OwnMediaSource, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { HoleWalk } from './HoleWalk';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useQueryClient } from '@tanstack/react-query';
@@ -77,8 +77,10 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   };
 
   const gridRef = React.useRef<HTMLDivElement>(null);
-  const untaggedCount = tagging.ready ? (tagging.own.data ?? []).filter(url => !tagging.taggedUrls.has(url)).length : null;
-  const ownOptions = (tagging.own.data ?? []).filter(url => !tagging.taggedUrls.has(url));
+  // Untagged identity matches the tag store: raw canonical URL or stream-UID key.
+  const isTaggedSource = (source: OwnMediaSource) => tagging.taggedUrls.has(source.url) || tagging.taggedUrls.has(holeMediaKey(source));
+  const untaggedCount = tagging.ready ? (tagging.sources.data ?? []).filter(source => !isTaggedSource(source)).length : null;
+  const ownOptions = (tagging.sources.data ?? []).filter(source => !isTaggedSource(source)).map(source => source.url);
   const sourcePost = (url: string): FeedPost => {
     const source = tagging.sources.data?.find(s => s.url === url);
     const found = posts.find(post => post.userId === user?.id && holeSourceUrl(post.mediaItems[0]) === url);
@@ -91,7 +93,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
     if (addHole == null) return;
     setFastPending(true); setFastError(null);
     try { await tagging.submit.mutateAsync({ post: sourcePost(url), hole: addHole }); setAddHole(null); }
-    catch (error) { const video = tagging.sources.data?.find(s => s.url === url)?.mediaType === 'video'; setFastError(holePhotoErrorMessage(error, `The ${video ? 'video' : 'photo'} could not be tagged. The tag was not saved.`, video ? 'video' : 'image')); }
+    catch (error) { console.error('[hole-tag] failed', error); const video = tagging.sources.data?.find(s => s.url === url)?.mediaType === 'video'; setFastError(holePhotoErrorMessage(error, `The ${video ? 'video' : 'photo'} could not be tagged. The tag was not saved.`, video ? 'video' : 'image')); }
     finally { setFastPending(false); }
   };
   const tagLibrary = async (file: File, hole = addHole) => {
@@ -124,14 +126,14 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       await cache.invalidateQueries({ queryKey: ['hole-photo-tags', courseId, user.id] });
       await cache.invalidateQueries({ queryKey: ['course-media-counts', courseId] });
       await cache.invalidateQueries({ queryKey: ['course-media-feed', courseId] });
-    } catch (error) { setFastError(video ? 'The video could not be uploaded. Nothing was saved.' : holePhotoErrorMessage(error)); }
+    } catch (error) { console.error('[hole-tag] failed', error); setFastError(video ? 'The video could not be uploaded. Nothing was saved.' : holePhotoErrorMessage(error)); }
     finally { setFastPending(false); setUploadProgress(null); }
   };
   const beginBatch = async () => {
     if (!tagging.sources.isSuccess) return;
     setFastPending(true); setFastError(null);
     try {
-      const photos = await Promise.all(tagging.sources.data.filter(photo => !tagging.taggedUrls.has(photo.url)).map(async photo => ({ ...photo, exif: (await prepareHolePhoto(photo.url)).exif })));
+      const photos = await Promise.all(tagging.sources.data.filter(photo => !isTaggedSource(photo)).map(async photo => ({ ...photo, exif: (await prepareHolePhoto(photo.url)).exif })));
       if (photos.length) setBatch(orderedBatch(photos));
     } catch { setFastError('The photos or videos could not be prepared for tagging. No tags were saved.'); }
     finally { setFastPending(false); }
@@ -230,7 +232,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       {firstPhoto && knownHoles && <CourseFirstPhotoPicker knownHoles={knownHoles} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onSubmit={tagLibrary} onClose={() => { setFirstPhoto(false); }} />}
       {batch && knownHoles && <HolePhotoBatchPath photos={batch} knownHoles={knownHoles} onClose={() => setBatch(null)} onTag={(url, hole) => tagging.submit.mutateAsync({ post: sourcePost(url), hole })} />}
       {tagPost && knownHoles && (
-        <HolePhotoTagDialog key={addHole == null ? tagPost.mediaItems[0]?.id : `add-${addHole}`} imageUrl={holeSourceUrl(tagPost.mediaItems[0])} mediaSource={tagging.sources.data?.find(s => s.url === holeSourceUrl(tagPost.mediaItems[0]))} mediaSources={tagging.sources.data}
+        <HolePhotoTagDialog key={addHole == null ? tagPost.mediaItems[0]?.id : `add-${addHole}`} imageUrl={holeSourceUrl(tagPost.mediaItems[0])} mediaSource={tagging.sources.data?.find(s => s.url === holeSourceUrl(tagPost.mediaItems[0]) || holeMediaKey(s) === holeMediaKey(tagPost.mediaItems[0]))} mediaSources={tagging.sources.data}
           initialHole={addHole} imageOptions={addHole == null ? undefined : ownOptions} onImageChange={url => setTagPost(sourcePost(url))}
           holeCount={knownHoles.length} knownHoleNumbers={knownHoles} usedHoles={(tagging.tags.data ?? []).filter(row => row.user_id === user.id).map(row => row.hole_no)}
           pending={tagging.submit.isPending}
