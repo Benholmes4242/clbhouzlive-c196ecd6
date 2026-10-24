@@ -88,7 +88,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
     if (addHole == null) return;
     setFastPending(true); setFastError(null);
     try { await tagging.submit.mutateAsync({ post: sourcePost(url), hole: addHole }); setAddHole(null); }
-    catch (error) { setFastError(holePhotoErrorMessage(error)); }
+    catch (error) { const video = tagging.sources.data?.find(s => s.url === url)?.mediaType === 'video'; setFastError(holePhotoErrorMessage(error, `The ${video ? 'video' : 'photo'} could not be tagged. The tag was not saved.`, video ? 'video' : 'image')); }
     finally { setFastPending(false); }
   };
   const tagLibrary = async (file: File, hole = addHole) => {
@@ -212,7 +212,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
           initialHole={addHole} imageOptions={addHole == null ? undefined : ownOptions} onImageChange={url => setTagPost(sourcePost(url))}
           holeCount={knownHoles.length} knownHoleNumbers={knownHoles} usedHoles={(tagging.tags.data ?? []).filter(row => row.user_id === user.id).map(row => row.hole_no)}
           pending={tagging.submit.isPending}
-          error={tagging.submit.error ? holePhotoErrorMessage(tagging.submit.error) : null}
+          error={tagging.submit.error ? holePhotoErrorMessage(tagging.submit.error, `The ${tagPost.mediaItems[0]?.type === 'video' ? 'video' : 'photo'} could not be tagged. The tag was not saved.`, tagPost.mediaItems[0]?.type === 'video' ? 'video' : 'image') : null}
           onClose={() => setTagPost(null)}
           onSubmit={hole => tagging.submit.mutate({ post: tagPost, hole }, { onSuccess: () => setTagPost(null) })} />
       )}

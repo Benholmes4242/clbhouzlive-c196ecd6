@@ -12,6 +12,7 @@ import './hole-walk.css';
  * One local speaker and the existing global audioDuck silence engine lanes.
  * HLS attachment owns teardown; no autoplay/engine-lane borrowing. */
 let activeVideo: HTMLVideoElement | null = null;
+let stopActiveVideo: (() => void) | null = null;
 export function HoleMediaVideo({ media, label }: {
   media: { media_url: string; stream_id?: string | null; poster_url?: string | null; duration_seconds?: number | null };
   label: string;
@@ -34,7 +35,7 @@ export function HoleMediaVideo({ media, label }: {
       attachment.current?.detach();
       attachment.current = null;
       audioDuck.release(duckKey);
-      if (activeVideo === video) activeVideo = null;
+      if (activeVideo === video) { activeVideo = null; stopActiveVideo = null; }
     };
   }, [media.media_url, duckKey]);
   const pause = () => {
@@ -48,8 +49,9 @@ export function HoleMediaVideo({ media, label }: {
     const video = videoRef.current;
     if (!video) return;
     if (playing || pendingPlay.current) { pause(); return; }
-    if (activeVideo && activeVideo !== video) activeVideo.pause();
+    if (activeVideo && activeVideo !== video) stopActiveVideo?.();
     activeVideo = video;
+    stopActiveVideo = () => stopRef.current?.();
     audioDuck.hold(duckKey);
     video.muted = false;
     setFailed(false);
@@ -60,7 +62,7 @@ export function HoleMediaVideo({ media, label }: {
         pause(); setFailed(true); setStarted(false);
         attachment.current?.detach(); attachment.current = null;
       });
-      else video.src = media.media_url;
+      else { video.src = media.media_url; attachment.current = { detach: () => { video.pause(); video.removeAttribute('src'); video.load(); } }; }
     }
     // Calling in the tap preserves sound permission; canplay retries after lazy HLS attaches.
     void video.play().catch(() => { if (video.readyState >= 2) { pause(); setFailed(true); } });
