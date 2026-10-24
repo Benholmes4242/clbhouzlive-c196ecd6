@@ -360,9 +360,56 @@
         "editor": "[~~Éđíţőř~~]",
         "analyst": "[~~Áñáļýšţ~~]"
       },
-      "manage": {
-        "pendingInvites": "[~~Ƥéñđíñĝ íñṽíţéš~~]"
-      },
+      "sectionThree": {
+          "kicker": "[~~Íñvítéš~~]",
+          "invitedAs": "[~~Íñvítéd áš {{role}}~~]",
+          "invitedAsBy": "[~~Íñvítéd áš {{role}} bý {{first}}~~]",
+          "sentExpires": "[~~Séñt {{sent}} · éxpíŕéš {{expiry}}~~]",
+          "expired": "[~~Éxpíŕéd {{ago}}~~]",
+          "ago": {
+            "today": "[~~tódáý~~]",
+            "yesterday": "[~~ýéštéŕdáý~~]",
+            "days_one": "[~~{{count}} dáý ágó~~]",
+            "days_other": "[~~{{count}} dáýš ágó~~]",
+            "weeks_one": "[~~{{count}} wéék ágó~~]",
+            "weeks_other": "[~~{{count}} wéékš ágó~~]"
+          },
+          "expiry": {
+            "today": "[~~tódáý~~]",
+            "tomorrow": "[~~tómóŕŕów~~]",
+            "days_one": "[~~íñ {{count}} dáý~~]",
+            "days_other": "[~~íñ {{count}} dáýš~~]"
+          },
+          "resend": "[~~Réšéñd~~]",
+          "resent": "[~~Íñvíté šéñt tó {{name}} ágáíñ~~]",
+          "menu": {
+            "actions": "[~~Áçtíóñš fóŕ {{name}}~~]",
+            "head": "[~~Íñvítéd áš {{role}} · šéñt {{sent}}~~]",
+            "copy": "[~~Cópý íñvíté líñk~~]",
+            "copyGolfer": "[~~Óñlý wóŕkš whéñ {{first}} íš šígñéd íñ~~]",
+            "copyEmail": "[~~Áñýóñé wíth thíš líñk çáñ jóíñ áš áñ {{role}}~~]",
+            "copied": "[~~Líñk çópíéd~~]",
+            "copyFailed": "[~~Cóúldñ't çópý thé líñk~~]",
+            "changeRole": "[~~Cháñgé ŕólé~~]",
+            "changeRoleSub": "[~~Séñdš thé íñvíté ágáíñ wíth thé ñéw ŕólé~~]",
+            "cancel": "[~~Cáñçél íñvíté~~]"
+          },
+          "roleSheet": {
+            "title": "[~~{{name}}'š íñvíté~~]",
+            "line": "[~~Théý'll gét thé íñvíté ágáíñ wíth thé ñéw ŕólé.~~]",
+            "chooseNew": "[~~Chóóšé á ñéw ŕólé~~]",
+            "send": "[~~Séñd ágáíñ áš {{role}}~~]",
+            "done": "[~~Íñvíté šéñt tó {{first}} áš {{role}}~~]"
+          },
+          "cancelSheet": {
+            "title": "[~~Cáñçél {{name}}'š íñvíté?~~]",
+            "b1": "[~~Thé íñvíté áñd ítš líñk štóp wóŕkíñg štŕáíght áwáý.~~]",
+            "b2": "[~~Yóú çáñ íñvíté {{first}} ágáíñ át áñý tímé.~~]",
+            "confirm": "[~~Cáñçél íñvíté~~]",
+            "keep": "[~~Kéép ít~~]",
+            "done": "[~~Íñvíté çáñçélléd~~]"
+          }
+        },
       "sectionTwo": {
         "kicker": "[~~Ţéám~~]",
         "window": "[~~Ĺášţ 30 dáýš~~]",

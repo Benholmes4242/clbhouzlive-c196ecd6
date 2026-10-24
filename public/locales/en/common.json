@@ -405,9 +405,56 @@
         "editor": "Editor",
         "analyst": "Analyst"
       },
-      "manage": {
-        "pendingInvites": "Pending invites"
-      },
+      "sectionThree": {
+          "kicker": "Invites",
+          "invitedAs": "Invited as {{role}}",
+          "invitedAsBy": "Invited as {{role}} by {{first}}",
+          "sentExpires": "Sent {{sent}} · expires {{expiry}}",
+          "expired": "Expired {{ago}}",
+          "ago": {
+            "today": "today",
+            "yesterday": "yesterday",
+            "days_one": "{{count}} day ago",
+            "days_other": "{{count}} days ago",
+            "weeks_one": "{{count}} week ago",
+            "weeks_other": "{{count}} weeks ago"
+          },
+          "expiry": {
+            "today": "today",
+            "tomorrow": "tomorrow",
+            "days_one": "in {{count}} day",
+            "days_other": "in {{count}} days"
+          },
+          "resend": "Resend",
+          "resent": "Invite sent to {{name}} again",
+          "menu": {
+            "actions": "Actions for {{name}}",
+            "head": "Invited as {{role}} · sent {{sent}}",
+            "copy": "Copy invite link",
+            "copyGolfer": "Only works when {{first}} is signed in",
+            "copyEmail": "Anyone with this link can join as an {{role}}",
+            "copied": "Link copied",
+            "copyFailed": "Couldn't copy the link",
+            "changeRole": "Change role",
+            "changeRoleSub": "Sends the invite again with the new role",
+            "cancel": "Cancel invite"
+          },
+          "roleSheet": {
+            "title": "{{name}}'s invite",
+            "line": "They'll get the invite again with the new role.",
+            "chooseNew": "Choose a new role",
+            "send": "Send again as {{role}}",
+            "done": "Invite sent to {{first}} as {{role}}"
+          },
+          "cancelSheet": {
+            "title": "Cancel {{name}}'s invite?",
+            "b1": "The invite and its link stop working straight away.",
+            "b2": "You can invite {{first}} again at any time.",
+            "confirm": "Cancel invite",
+            "keep": "Keep it",
+            "done": "Invite cancelled"
+          }
+        },
       "sectionTwo": {
         "kicker": "Team",
         "window": "Last 30 days",
