@@ -1,8 +1,9 @@
 /** MEDIA_ENGINE_1_R: a known course count is a required input; no default or
- * fallback. The monotonic floor is exclusive: only holes below it are disabled.
+ * fallback. The batch walk-forward floor is retired: every known hole is
+ * always selectable.
  */
-export function selectableHole(hole: number, holeCount: number, floor: number): boolean {
-  return Number.isInteger(hole) && hole >= 1 && hole <= holeCount && hole >= floor;
+export function selectableHole(hole: number, holeCount: number): boolean {
+  return Number.isInteger(hole) && hole >= 1 && hole <= holeCount;
 }
 
 export function holeNumbers(holeCount: number): number[] {
