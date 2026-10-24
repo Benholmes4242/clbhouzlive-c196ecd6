@@ -3,7 +3,7 @@
 ## CB74 — Team fixes before rebuild
 - [x] Replace access decisions with TEAM_FIX_V1 RPC, preserve recovery/invalidation paths and add team/invite refresh on approve; align role labels.
 - [x] Label elapsed pending invites Expired without removing Revoke; guard invite form with membership canManage and existing route-loading skeleton.
-- [ ] Add requested regressions, run full suite, answer response/i18n/count/route audits, and check preview diagnostics. Baseline last reported 2,430 tests /319 files /0 failures.
+- [x] Full `bunx vitest run`: 2,430/319/0 before new tests → 2,450/320/0 after; +20 solely cb74TeamFixes.test.tsx, no existing tests edited/renamed/deleted and no pre-existing failures. Automatic preview build OK. Standalone typecheck prohibited by environment; not claimed. ASK answers and frozen mock differences recorded in /mnt/documents/CB74_report.md.
 - [ ] Authenticated live approval/invite verification unavailable on externally managed Supabase; do not claim live authorization or data persistence verified.
 
 ## CB72 — Omit placeholder business categories
