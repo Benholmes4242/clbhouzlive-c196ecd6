@@ -70,6 +70,26 @@ beforeEach(() => {
   state.claim = {};
 });
 
+describe('CB72 business home identity category', () => {
+  it('Other renders location alone with no leading separator', () => {
+    state.businesses = [biz('b1', 'Business', 'analyst', { category: 'Other', city: 'London', country: 'United Kingdom' })];
+    page();
+    expect(q('[data-subline]')?.textContent).toBe('London, United Kingdom');
+  });
+
+  it('empty category renders location alone with no leading separator', () => {
+    state.businesses = [biz('b1', 'Business', 'analyst', { category: '', city: 'London', country: 'United Kingdom' })];
+    page();
+    expect(q('[data-subline]')?.textContent).toBe('London, United Kingdom');
+  });
+
+  it('other categories keep the existing category and location line', () => {
+    state.businesses = [biz('b1', 'Business', 'analyst', { category: 'Club Fitter', city: 'London', country: 'United Kingdom' })];
+    page();
+    expect(q('[data-subline]')?.textContent).toBe('Club Fitter · London, United Kingdom');
+  });
+});
+
 describe('CB66 role matrix', () => {
   const cases: Array<[BusinessMembership['role'], boolean, boolean, string[]]> = [
     ['owner', true, true, ['share', 'delete']],

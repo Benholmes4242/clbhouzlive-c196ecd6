@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB72 — Omit placeholder business categories
+- [x] Business home and live business profile hero omit Other/empty categories, preserving each header's existing location format and every other category.
+- [x] Audited other category displays; left directory, success and verification surfaces and alternate profile category chip unchanged as audit-only.
+- [x] Full `bunx vitest run`: baseline 2,412/316/0; final 2,418/317/0. Three new cases in cb66BusinessHomeHeader.test.tsx and three in cb72BusinessProfileCategory.test.tsx; no existing tests renamed/deleted/rewritten. Automatic preview build OK; standalone typecheck not run under environment restrictions. No pre-existing failures. Authenticated live-header check unavailable; real home page and hero identity rendering covered by tests.
+
 ## Public delete-account information
 - [x] Confirmed Profile three-dot menu → Settings → Account Actions → Delete Account; baseline `bunx vitest run`: 2,289 passed /306 files /0 failures.
 - [x] Added static English legal page and lazy route; approved download/maintenance exemptions apply only to /delete-account, preserving privacy/terms.
