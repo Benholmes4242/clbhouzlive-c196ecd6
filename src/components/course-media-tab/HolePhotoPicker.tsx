@@ -18,6 +18,7 @@ interface HolePhotoPickerProps {
 
 export function HolePhotoPicker({ holeCount, knownHoleNumbers, floor = 0, selectedHole, usedHoles = [], onSelect }: HolePhotoPickerProps) {
   const numbers = knownHoleNumbers?.length === holeCount ? knownHoleNumbers : holeNumbers(holeCount);
+  const hasUsedHole = numbers.some(hole => usedHoles.includes(hole) && (knownHoleNumbers ? hole >= floor : selectableHole(hole, holeCount, floor)));
   return (
     <div role="group" aria-label="Hole" className="grid grid-cols-6 gap-[6px]">
       {numbers.map(hole => {
@@ -43,6 +44,10 @@ export function HolePhotoPicker({ holeCount, knownHoleNumbers, floor = 0, select
           >{hole}</Button>
         );
       })}
+      {hasUsedHole && <p className="col-span-full mt-1 text-[12px] leading-normal" style={{ color: A.DIM }}>
+        <span aria-hidden="true" className="inline-block size-2 mr-1.5" style={{ background: A.IMPROVED }} />
+        You've already tagged a photo here. You can add more.
+      </p>}
     </div>
   );
 }
