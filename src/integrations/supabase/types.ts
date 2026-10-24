@@ -19609,6 +19609,10 @@ export type Database = {
           tour_name: string
         }[]
       }
+      business_is_new_and_unowned: {
+        Args: { p_business_id: string; p_user_id: string }
+        Returns: boolean
+      }
       calculate_user_division: {
         Args: { p_courses_logged: number }
         Returns: string
@@ -19740,6 +19744,10 @@ export type Database = {
       }
       create_round_posts: { Args: never; Returns: number }
       current_auth_uid: { Args: never; Returns: string }
+      decide_business_access_request: {
+        Args: { p_decision: string; p_request_id: string; p_role?: string }
+        Returns: Json
+      }
       decide_golfer_verification: {
         Args: {
           p_decision: string
@@ -24845,6 +24853,7 @@ export type Database = {
         Args: { _admin_note: string; _request_id: string }
         Returns: undefined
       }
+      resend_business_invite: { Args: { p_invite_id: string }; Returns: Json }
       reset_watch_personalization: {
         Args: { p_user_id: string }
         Returns: undefined
@@ -25792,6 +25801,10 @@ export type Database = {
           p_user_id?: string
         }
         Returns: string
+      }
+      transfer_business_ownership: {
+        Args: { p_business_id: string; p_new_owner_user_id: string }
+        Returns: Json
       }
       trigger_video_metadata_backfill: { Args: never; Returns: undefined }
       trigger_watch_editorial_blurb_refresh: { Args: never; Returns: undefined }
