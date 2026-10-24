@@ -49,7 +49,7 @@ export function TeamInvitesSection({ businessId, businessName, team, invites, ca
   if (!rows.length) return null;
 
   const roleText = (r: BusinessRole) => t(`business.team.sectionTwo.roles.${r}`);
-  const agoText = (a: Ago) => a.key === 'today' || a.key === 'yesterday' ? t(`${P}.ago.${a.key}`) : t(`${P}.ago.${a.key}`, { count: a.count });
+  const agoText = (a: Ago) => 'count' in a ? t(`${P}.ago.${a.key}`, { count: a.count }) : t(`${P}.ago.${a.key}`);
   const untilText = (u: Until) => u.key === 'days' ? t(`${P}.expiry.days`, { count: u.count }) : t(`${P}.expiry.${u.key}`);
   const refreshInvites = () => queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] });
 
