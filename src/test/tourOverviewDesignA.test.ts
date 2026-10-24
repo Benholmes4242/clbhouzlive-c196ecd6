@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import i18n from 'i18next';
 import enTourhub from '../../public/locales/en/tourhub.json';
 import { resolveChampionPlayerId, pickWonTournament } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
-import { render } from '@testing-library/react';
+import { cleanup, render } from '@testing-library/react';
 import { createElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -27,6 +27,12 @@ import type { TourStory } from '@/features/tourhub/news/useTourStories';
 import type { ComingUpRow } from '@/features/tourhub/overview/data/useComingUp';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 import { surnameOf } from '@/features/tourhub/_shared/playerName';
+
+beforeAll(async () => {
+  i18n.addResourceBundle(i18n.language || 'en', 'tourhub', enTourhub, true, true);
+  await i18n.loadNamespaces('tourhub');
+});
+afterEach(() => cleanup());
 
 const NOW = new Date('2026-09-17T12:00:00Z');
 

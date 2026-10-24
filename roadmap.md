@@ -1,6 +1,7 @@
 # Roadmap
 
 ## HOLE_MEDIA_VIDEOS_STAGE_2
+- [ ] Apply authorised tourOverviewDesignA.test.ts top-level namespace preload and render cleanup only; preserve all names/assertions/values. Run full suite twice consecutively; deploy webhook only after both are clean.
 - [x] Extend both hole-library pickers and route videos through review resilient uploader, preserving R2 photos and EXIF-only months. Founder ruling enforces 4 GiB, four MIME types and empty-MIME extension fallback; private SUPPORTED_VIDEO_TYPES reproduced from shared three-type list plus x-m4v without touching the review composer.
 - [x] Insert processing video contributions; isolate three guarded webhook metadata updates before the byte-identical post lookup-to-handler-end (verified against HEAD).
 - [x] Add only holeLibraryVideosStage2.test.tsx: 20 tests; targeted20/20. Full `bunx vitest run`: 2,538 passed /324 files /0 failed tests, but1 unhandled rejection and exit1. Delta from2,518/323 is exactly20 new tests/one file; no existing tests changed. Automatic preview build OK12:27:57Z; standalone tsc prohibited by environment, unverified.
