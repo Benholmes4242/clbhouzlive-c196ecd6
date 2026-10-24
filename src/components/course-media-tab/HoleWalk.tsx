@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { A, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
-import { capitalPhotoCount } from '@/lib/courseMedia/holePhotoData';
+import { capitalPhotoCount, holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
+import { HoleMediaVideo, HoleMediaThumbnail } from './HoleMediaVideo';
 import { captureMonth, captureMonthLabel, deriveHoleWalk, holeOrdinal, holePhotoMonths } from '@/lib/courseMedia/holeWalk';
 import './hole-walk.css';
 
@@ -38,7 +39,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       <p className="hole-walk-kicker" style={VERDICT_KICKER}>The {holeOrdinal(tile.hole.hole_no)}</p>
       <h2 className="hole-walk-title" style={TAB_TITLE}>Par {tile.hole.par}{tile.hole.yards != null && <> · {tile.hole.yards.toLocaleString()} yards</>}</h2>
       <div className={`hole-walk-photo ${active ? '' : 'hole-walk-photo-open'}`}>
-        {active ? <><img src={active.media_url} alt={`Hole ${tile.hole.hole_no}`} />{(author || month) && <div className="hole-walk-caption">{author && <strong>{author}</strong>}{month && <span>{captureMonthLabel(month)}</span>}</div>}</> : <span>No photograph yet</span>}
+        {active ? <>{active.media_type === 'video' ? <HoleMediaVideo key={active.id} media={active} label={`Hole ${tile.hole.hole_no}`} /> : <img src={active.media_url} alt={`Hole ${tile.hole.hole_no}`} />}{(author || month) && <div className="hole-walk-caption">{author && <strong>{author}</strong>}{month && <span>{captureMonthLabel(month)}</span>}</div>}</> : <span>No shot yet</span>}
       </div>
       <div className="hole-walk-stats">
         <div><b>{tile.hole.par}</b><span>Par</span></div>
@@ -46,13 +47,13 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
         {tile.hole.stroke_index != null && <div><b>{tile.hole.stroke_index}</b><span>Stroke index</span></div>}
         {field && <div><b style={{ color: field.tone }}>{field.text}</b><span>Field loses</span></div>}
       </div>
-      {tile.photos.length >= 2 && <div className="hole-walk-strip">{tile.photos.filter(photo => photo.id !== active?.id).map(photo => <Button variant="ghost" key={photo.id} aria-label="View photograph" className="hole-walk-thumbnail" onClick={() => setPhotoId(photo.id)}><img src={photo.media_url} alt={`Hole ${tile.hole.hole_no}`} loading="lazy" /></Button>)}</div>}
+      {tile.photos.length >= 2 && <div className="hole-walk-strip">{tile.photos.filter(photo => photo.id !== active?.id).map(photo => <Button variant="ghost" key={photo.id} aria-label={photo.media_type === 'video' ? 'View video' : 'View photograph'} className="hole-walk-thumbnail" onClick={() => setPhotoId(photo.id)}><HoleMediaThumbnail url={photo.media_url} mediaType={photo.media_type} posterUrl={photo.poster_url} streamId={photo.stream_id} durationSeconds={photo.duration_seconds} alt={`Hole ${tile.hole.hole_no}`} /></Button>)}</div>}
       {months.length > 0 && <div className="hole-walk-months">{months.map(item => <span key={item.month}>{capitalPhotoCount(item.count)} in {captureMonthLabel(item.month)}</span>)}</div>}
       {/* MEDIA_CTA_1: the sentence is absent below two photographs; at two or
           more it reads "shots of this hole", gaining "across {spelled} months"
           (never seasons) only when the photographs span two or more months. */}
       {tile.photos.length >= 2 && <p className="hole-walk-observation">{capitalPhotoCount(tile.photos.length)} shots of this hole{months.length > 0 && <> across {months.length === 2 ? 'two' : capitalPhotoCount(months.length).toLowerCase()} months</>}.</p>}
-      {!active && <><p className="hole-walk-observation">{walk.hardestOpen === tile.hole.hole_no && <>The field loses more shots here than on any hole{courseName ? ` at ${courseName}` : ' on the course'}. </>}<strong>Nobody has photographed it.</strong></p>
+      {!active && <><p className="hole-walk-observation">{walk.hardestOpen === tile.hole.hole_no && <>The field loses more shots here than on any hole{courseName ? ` at ${courseName}` : ' on the course'}. </>}<strong>Nobody has shot it yet.</strong></p>
         <Button variant="ghost" className="hole-walk-add" onClick={() => onAddFirst(tile.hole.hole_no)}>Add the first</Button></>}
     </section>;
   const selectedIndex = walk.tiles.findIndex(item => item.hole.hole_no === selected);
@@ -66,12 +67,12 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
         {walk.tiles.map((item, index) => <Fragment key={item.hole.hole_no}><Button variant="ghost" aria-label={`Hole ${item.hole.hole_no}`} aria-pressed={selected === item.hole.hole_no}
           className={`hole-walk-tile ${item.photos.length ? '' : 'hole-walk-open'} ${selected === item.hole.hole_no ? 'hole-walk-selected' : ''}`}
           onClick={() => { setSelected(current => current === item.hole.hole_no ? null : item.hole.hole_no); setPhotoId(null); }}>
-          {item.photos[0] && <img src={item.photos[0].media_url} alt="" loading="lazy" />}
+          {item.photos[0] && <img src={holeMediaPoster(item.photos[0])} alt="" loading="lazy" />}
           <span className="hole-walk-number">{item.hole.hole_no}</span>
           <span className="hole-walk-count">{item.photos.length || 'Open'}</span>
         </Button>{index === rowEnd && panel}</Fragment>)}
       </div>
-      <div className="hole-walk-legend"><span><i className="hole-walk-swatch" />Photographed</span><span><i className="hole-walk-swatch hole-walk-swatch-open" />Nobody has yet</span></div>
+      <div className="hole-walk-legend"><span><i className="hole-walk-swatch" />Shot</span><span><i className="hole-walk-swatch hole-walk-swatch-open" />Nobody has yet</span></div>
       {!tile && (walk.most != null || walk.openCount > 0) && <p className="hole-walk-observation">
         {walk.most != null && <>The <strong>{holeOrdinal(walk.most)}</strong> is the most photographed hole on the course. </>}
         {walk.openCount > 0 && <><strong>{capitalPhotoCount(walk.openCount)} holes here have never been shot</strong>{walk.hardestOpen != null ? <> — including the <strong>{holeOrdinal(walk.hardestOpen)}</strong>, which the field loses most shots to.</> : '.'}</>}

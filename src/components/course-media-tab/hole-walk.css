@@ -31,3 +31,14 @@
 .hole-walk-months span { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--hole-walk-body); background: var(--hole-walk-track); border: 1px solid var(--hole-walk-soft); border-radius: 999px; padding: 3px 9px; }
 .hole-walk-add { margin-top: 15px; border-radius: 999px; background: var(--hole-walk-ink); color: var(--hole-walk-canvas); font-size: 14px; font-weight: 700; padding: 11px 22px; height: auto; }
 .hole-walk-add:hover { background: var(--hole-walk-ink); color: var(--hole-walk-canvas); }
+.hole-media-video { position: relative; width: 100%; height: 100%; aspect-ratio: 4/3; overflow: hidden; }
+.hole-media-video > img, .hole-media-video > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hole-media-video > video { opacity: 0; }
+.hole-media-video > video.is-started { opacity: 1; }
+.hole-media-play { position: absolute; z-index: 3; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 56px; height: 56px; border-radius: 50%; padding: 0; color: var(--hole-walk-ink, var(--text-primary)); }
+.hole-media-play svg { width: 24px; height: 24px; }
+.hole-media-pause-target { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; padding: 0; border-radius: 0; background: transparent; }
+.hole-media-preview { position: relative; }
+.hole-walk-thumbnail { position: relative; }
+.hole-walk-caption:has(+ .unused) { pointer-events: none; }
+.hole-walk-photo:has(.hole-media-video) .hole-walk-caption { pointer-events: none; padding-right: 68px; }
