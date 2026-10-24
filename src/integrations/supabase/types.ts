@@ -21859,6 +21859,26 @@ export type Database = {
         }[]
       }
       get_inviter_first_name: { Args: { p_ref: string }; Returns: string }
+      get_latest_hole_media: {
+        Args: { p_limit?: number }
+        Returns: {
+          course_id: string
+          course_name: string
+          created_at: string
+          duration_seconds: number
+          exif_captured_at: string
+          hole_no: number
+          id: string
+          media_type: string
+          media_url: string
+          member_id: string
+          member_name: string
+          par: number
+          poster_url: string
+          stream_id: string
+          yards: number
+        }[]
+      }
       get_leaderboard_countries: {
         Args: never
         Returns: {
