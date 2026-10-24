@@ -26,7 +26,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import html2canvas from 'html2canvas';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserTopTenCourses, type TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { useTopTenReactions, REACTION_CONFIG, type ReactionType } from '@/hooks/useTopTenReactions';
@@ -38,7 +37,7 @@ import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/to
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTopTenVisibility } from '@/components/profile/hooks/useTopTenVisibility';
-import { toast } from '@/lib/toast';
+import { TopTenShareSheet } from '@/components/profile/hero/topTenShare/TopTenShareSheet';
 import { MessageCircle } from 'lucide-react';
 import { numberWord } from '@/lib/text/numbers';
 // Used by the owner progress invitation (unchanged), not by any header copy.
@@ -53,8 +52,6 @@ const CAPTION_SUB = 'rgba(255,255,255,0.74)';
 const SLOT_DASH = 'rgba(248,250,252,0.26)';
 const SLOT_NEXT = 'rgba(248,250,252,0.55)';
 const PRESSED_BORDER = 'rgba(247,147,30,0.55)';
-const SHARE_BG = 'linear-gradient(170deg, #101417, #0A0A0C 60%)';
-const CAPTURE_OPTS = { backgroundColor: '#000', scale: 2, logging: false, useCORS: true };
 
 /**
  * THE SCORE TONE IS GREEN AT 9.0+, INK OTHERWISE. Deliberately NOT
@@ -156,8 +153,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   const { topTen: rawTopTen, isLoading } = useUserTopTenCourses(userId);
   const [commentsOpen, setCommentsOpen] = React.useState(false);
   const [commentsCourseId, setCommentsCourseId] = React.useState<string | null>(initialCourseId);
-  const [sharing, setSharing] = React.useState(false);
-  const shareRef = React.useRef<HTMLDivElement>(null);
+  const [shareOpen, setShareOpen] = React.useState(false);
 
   const { user } = useSupabaseSession();
   const viewerId = user?.id;
