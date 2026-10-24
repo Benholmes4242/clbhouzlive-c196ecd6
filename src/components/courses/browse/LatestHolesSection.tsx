@@ -77,7 +77,7 @@ export function LatestHolesSection() {
   if (isError || !data || data.length < 3) return null;
   return <section style={SECTION_WRAP}>
     <SectionHead tone="amber" kicker="Through members' eyes" title="Latest holes" />
-    <div className="scrollbar-hide latest-holes-rail" style={{ ...RAIL_BLEED, gap: PHOTO_FIGURE_GAP, marginTop: HEAD_GAP }}>
+    <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: PHOTO_FIGURE_GAP, marginTop: HEAD_GAP }}>
       {data.map(row => <LatestHoleCard key={row.id} row={row} />)}
     </div>
   </section>;
