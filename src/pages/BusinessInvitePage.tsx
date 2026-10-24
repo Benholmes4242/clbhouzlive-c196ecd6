@@ -9,6 +9,7 @@ import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import {
   useCreateInvite, useCreateInviteByUser,
@@ -44,14 +45,16 @@ export default function BusinessInvitePage() {
 
   useHideBottomNav();
 
-  const { data: membership, isLoading: membershipLoading } = useBusinessMembership(businessId);
+  const { session, loading: sessionLoading } = useSupabaseSession();
+  const { data: membership, isPending: membershipPending } = useBusinessMembership(businessId);
+  const waiting = sessionLoading || (!!session?.user?.id && membershipPending);
   const canManage = !!membership?.canManage;
   // This guard hides the form; the invite RPCs remain the authorization boundary.
   useEffect(() => {
-    if (!membershipLoading && !canManage && businessId) {
+    if (!waiting && !canManage && businessId) {
       navigate(`/business/${businessId}/team`, { replace: true });
     }
-  }, [membershipLoading, canManage, businessId, navigate]);
+  }, [waiting, canManage, businessId, navigate]);
 
   const createEmailInvite = useCreateInvite(businessId || '');
   const createUserInvite = useCreateInviteByUser(businessId || '');
@@ -68,7 +71,7 @@ export default function BusinessInvitePage() {
   useEffect(() => {
     let cancelled = false;
     async function run() {
-      if (membershipLoading || !canManage || pickedUser) return;
+      if (waiting || !canManage || pickedUser) return;
       const q = debounced.trim();
       if (q.length < 2 || EMAIL_RE.test(q)) {
         setResults([]);
@@ -92,12 +95,12 @@ export default function BusinessInvitePage() {
     }
     run();
     return () => { cancelled = true; };
-  }, [debounced, pickedUser, membershipLoading, canManage]);
+  }, [debounced, pickedUser, waiting, canManage]);
 
   const canSend = !!businessId && !!role && (pickedUser || (isEmail && !!query.trim()));
 
   const handleSend = async () => {
-    if (!businessId || !canSend || membershipLoading || !canManage) return;
+    if (!businessId || !canSend || waiting || !canManage) return;
     try {
       if (pickedUser) {
         await createUserInvite.mutateAsync({ userId: pickedUser.id, role });
@@ -112,7 +115,7 @@ export default function BusinessInvitePage() {
 
   const pending = createEmailInvite.isPending || createUserInvite.isPending;
 
-  if (membershipLoading) return <GenericPageSkeleton />;
+  if (waiting) return <GenericPageSkeleton />;
   if (!canManage) return null;
 
   return (

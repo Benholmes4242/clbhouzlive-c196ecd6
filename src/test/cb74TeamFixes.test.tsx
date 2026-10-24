@@ -1,12 +1,15 @@
 import React from 'react';
 import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest';
-import { cleanup, render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { cleanup, render, screen, fireEvent, waitFor, within, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Routes, Route, useLocation, useNavigationType } from 'react-router-dom';
 
 const mocks = vi.hoisted(() => ({
   rpc: vi.fn(), invoke: vi.fn(), from: vi.fn(), error: vi.fn(), success: vi.fn(), info: vi.fn(),
-  membership: { data: { role: 'owner', canManage: true } as { role: string; canManage: boolean } | null, isLoading: false },
+  session: { session: { user: { id: 'owner' } } as { user: { id: string } } | null, loading: false },
+  membershipResult: Promise.resolve({ data: { role: 'owner' } as { role: string } | null, error: null }),
+  membershipRead: vi.fn(),
+  routeChanges: [] as string[], formCommits: [] as boolean[],
   invites: [] as Array<Record<string, unknown>>,
   mutate: vi.fn(),
 }));
@@ -15,9 +18,8 @@ vi.mock('@/lib/toast', () => ({ toast: { error: mocks.error, success: mocks.succ
 vi.mock('@/lib/logger', () => ({ AppLog: { debug: vi.fn(), error: vi.fn() } }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/i18n/format', () => ({ formatRelativeAgoLong: () => '1 day ago' }));
-vi.mock('@/hooks/useBusinessMembership', () => ({ useBusinessMembership: () => mocks.membership }));
 vi.mock('@/hooks/useBusinessProfile', () => ({ useBusinessProfile: () => ({ data: { name: 'clbhouz' } }) }));
-vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'owner' } }) }));
+vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ ...mocks.session, user: mocks.session.session?.user ?? null }) }));
 vi.mock('@/hooks/useBottomNavVisibility', () => ({ useHideBottomNav: () => {} }));
 vi.mock('@/components/manage/ManagePageShell', () => ({ ManagePageShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div> }));
 vi.mock('@/hooks/useBusinessTeam', async (importOriginal) => {
@@ -37,19 +39,21 @@ const request = { id: 'request-1', business_id: 'biz', requester_user_profile_id
 function RouteState() {
   const location = useLocation();
   const navigation = useNavigationType();
+  React.useEffect(() => { mocks.routeChanges.push(`${location.pathname}:${navigation}`); }, [location.pathname, navigation]);
   return <output data-testid="route-state">{location.pathname}:{navigation}</output>;
 }
 function mount(kind: 'requests' | 'team' | 'invite') {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
   const invalidate = vi.spyOn(client, 'invalidateQueries');
-  render(<QueryClientProvider client={client}><MemoryRouter initialEntries={[`/business/biz/team${kind === 'invite' ? '/invite' : ''}`]}>
+  const tree = () => <QueryClientProvider client={client}><MemoryRouter initialEntries={[`/business/biz/team${kind === 'invite' ? '/invite' : ''}`]}>
     <RouteState />
     <Routes>
       <Route path="/business/:businessId/team" element={kind === 'requests' ? <AccessRequestsSection businessId="biz" businessName="clbhouz" canManage /> : kind === 'team' ? <BusinessTeamPage /> : <div data-testid="team-destination" />} />
-      <Route path="/business/:businessId/team/invite" element={<BusinessInvitePage />} />
+      <Route path="/business/:businessId/team/invite" element={<React.Profiler id="invite" onRender={() => mocks.formCommits.push(!!document.querySelector('input[type="text"]'))}><BusinessInvitePage /></React.Profiler>} />
     </Routes>
-  </MemoryRouter></QueryClientProvider>);
-  return { client, invalidate };
+  </MemoryRouter></QueryClientProvider>;
+  const view = render(tree());
+  return { client, invalidate, refresh: () => view.rerender(tree()) };
 }
 async function decide(action: 'Approve' | 'Decline') {
   fireEvent.click(await screen.findByRole('button', { name: action }));
@@ -57,10 +61,18 @@ async function decide(action: 'Approve' | 'Decline') {
 }
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.membership = { data: { role: 'owner', canManage: true }, isLoading: false };
+  mocks.session = { session: { user: { id: 'owner' } }, loading: false };
+  mocks.membershipResult = Promise.resolve({ data: { role: 'owner' }, error: null });
+  mocks.routeChanges = []; mocks.formCommits = [];
   mocks.invites = [];
   mocks.rpc.mockResolvedValue({ data: { success: true, status: 'approved', role: 'admin' }, error: null });
   mocks.from.mockImplementation((table: string) => {
+    if (table === 'business_members') {
+      const chain = { select: vi.fn(), eq: vi.fn(), maybeSingle: mocks.membershipRead };
+      chain.select.mockReturnValue(chain); chain.eq.mockReturnValue(chain);
+      mocks.membershipRead.mockImplementation(() => mocks.membershipResult);
+      return chain;
+    }
     if (table === 'business_access_requests') {
       const chain = { select: vi.fn(), eq: vi.fn(), order: vi.fn().mockResolvedValue({ data: [request], error: null }) };
       chain.select.mockReturnValue(chain); chain.eq.mockReturnValue(chain); return chain;
@@ -118,37 +130,80 @@ describe('CB74 authoritative access decisions', () => {
 });
 
 describe('CB74 elapsed pending invite rows', () => {
-  it.each([[-1, 'Expired'], [1, 'Pending']] as const)('an invite expiring %s day from now retains its row and revoke action', (offset, status) => {
+  it.each([[-1, 'Expired'], [1, 'Pending']] as const)('an invite expiring %s day from now retains its row and revoke action', async (offset, status) => {
     mocks.invites = [{ id: 'invite-1', status: 'pending', role: 'admin', expires_at: new Date(Date.now() + offset * 86400000).toISOString(), invitee_email: 'invitee@example.test' }];
     mount('team');
-    expect(screen.getByText(`${status} · Admin`)).toBeTruthy();
+    expect(await screen.findByText(`${status} · Admin`)).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Revoke' }));
     expect(mocks.mutate).toHaveBeenCalledWith('invite-1');
   });
 });
 
 describe('CB74 invite membership guard', () => {
-  it.each(['editor', 'analyst', 'non-member'])('%s redirects with replace and never renders the form', (role) => {
-    mocks.membership.data = role === 'non-member' ? null : { role, canManage: false };
+  it.each(['editor', 'analyst', 'non-member'])('%s redirects with replace and never renders the form', async (role) => {
+    mocks.membershipResult = Promise.resolve({ data: role === 'non-member' ? null : { role }, error: null });
     mount('invite');
+    await screen.findByTestId('team-destination');
     expect(screen.queryByRole('textbox')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Send invite' })).toBeNull();
     expect(screen.getByTestId('team-destination')).toBeTruthy();
     expect(screen.getByTestId('route-state').textContent).toBe('/business/biz/team:REPLACE');
+    expect(mocks.routeChanges.filter(value => value === '/business/biz/team:REPLACE')).toHaveLength(1);
+    expect(mocks.formCommits).not.toContain(true);
   });
-  it.each(['owner', 'admin'])('%s can see the form', (role) => {
-    mocks.membership.data = { role, canManage: true };
-    mount('invite');
-    expect(screen.getByRole('textbox')).toBeTruthy();
+  it.each(['owner', 'admin'])('%s waits for session and membership before seeing the form without any redirect', async (role) => {
+    mocks.session = { session: null, loading: true };
+    let resolveMembership: (result: { data: { role: string } | null; error: null }) => void = () => {};
+    mocks.membershipResult = new Promise(resolve => { resolveMembership = resolve; });
+    const { refresh } = mount('invite');
+    expect(document.querySelector('.page-with-header')).toBeTruthy();
+    expect(mocks.membershipRead).not.toHaveBeenCalled();
+    expect(mocks.routeChanges).toEqual(['/business/biz/team/invite:POP']);
+    mocks.session = { session: { user: { id: 'owner' } }, loading: false };
+    refresh();
+    await waitFor(() => expect(mocks.membershipRead).toHaveBeenCalledTimes(1));
+    expect(document.querySelector('.page-with-header')).toBeTruthy();
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(mocks.routeChanges).toEqual(['/business/biz/team/invite:POP']);
+    await act(async () => { resolveMembership({ data: { role }, error: null }); });
+    expect(await screen.findByRole('textbox')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Send invite' })).toBeTruthy();
     expect(screen.queryByTestId('team-destination')).toBeNull();
+    expect(mocks.routeChanges).toEqual(['/business/biz/team/invite:POP']);
   });
-  it('loading membership shows the existing page skeleton, not the form or a redirect', () => {
-    mocks.membership = { data: null, isLoading: true };
+  it('resolving session shows the existing page skeleton, not the form or a redirect', () => {
+    mocks.session = { session: null, loading: true };
     mount('invite');
     expect(screen.queryByRole('textbox')).toBeNull();
     expect(screen.queryByTestId('team-destination')).toBeNull();
     expect(screen.getByTestId('route-state').textContent).toBe('/business/biz/team/invite:POP');
     expect(document.querySelector('.page-with-header')).toBeTruthy();
+    expect(mocks.membershipRead).not.toHaveBeenCalled();
+    expect(mocks.routeChanges).toEqual(['/business/biz/team/invite:POP']);
+  });
+  it('session resolves to editor before membership denial redirects exactly once with no form commit', async () => {
+    mocks.session = { session: null, loading: true };
+    let resolveMembership: (result: { data: { role: string } | null; error: null }) => void = () => {};
+    mocks.membershipResult = new Promise(resolve => { resolveMembership = resolve; });
+    const { refresh } = mount('invite');
+    mocks.session = { session: { user: { id: 'editor-user' } }, loading: false };
+    refresh();
+    await waitFor(() => expect(mocks.membershipRead).toHaveBeenCalledTimes(1));
+    expect(mocks.routeChanges).toEqual(['/business/biz/team/invite:POP']);
+    await act(async () => { resolveMembership({ data: { role: 'editor' }, error: null }); });
+    await screen.findByTestId('team-destination');
+    expect(mocks.routeChanges).toEqual(['/business/biz/team/invite:POP', '/business/biz/team:REPLACE']);
+    expect(mocks.formCommits).not.toContain(true);
+  });
+  it('session settles signed out and redirects once without rendering the form', async () => {
+    mocks.session = { session: null, loading: true };
+    const { refresh } = mount('invite');
+    expect(mocks.routeChanges).toEqual(['/business/biz/team/invite:POP']);
+    mocks.session = { session: null, loading: false };
+    refresh();
+    await screen.findByTestId('team-destination');
+    expect(mocks.routeChanges).toEqual(['/business/biz/team/invite:POP', '/business/biz/team:REPLACE']);
+    expect(mocks.membershipRead).not.toHaveBeenCalled();
+    expect(mocks.formCommits).not.toContain(true);
   });
 });
