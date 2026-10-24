@@ -185,7 +185,8 @@ export default function BusinessTeamPage() {
 
   useHideBottomNav();
 
-  const { data: membership } = useBusinessMembership(businessId);
+  const membershipQuery = useBusinessMembership(businessId);
+  const { data: membership } = membershipQuery;
   const { data: business } = useBusinessProfile(businessId);
   const { data: team, isLoading: teamLoading, isError: teamError, refetch: refetchTeam } = useBusinessTeam(businessId);
   const invitesQuery = useBusinessInvites(businessId);
@@ -360,7 +361,7 @@ export default function BusinessTeamPage() {
         <TeamSummary team={team || []} invites={invitesQuery.isError ? [] : invites || []}
           businessName={business?.name || ''} loading={teamLoading} failed={teamError}
           canManage={canManage} requestCount={requestsQuery.isError ? 0 : requestsQuery.data?.length || 0}
-          waitingSettled={!invitesQuery.isPending && (!canManage || !requestsQuery.isPending)} />
+          waitingSettled={!membershipQuery.isPending && !invitesQuery.isPending && (!canManage || !requestsQuery.isPending)} />
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
           <AccessRequestsSection
             businessId={businessId}
