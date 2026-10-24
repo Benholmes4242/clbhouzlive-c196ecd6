@@ -83,7 +83,9 @@ export const BusinessProfileHero: React.FC<Props> = ({
 
   const metaLine = React.useMemo(() => {
     const bits: string[] = [];
-    if (category) bits.push(sentenceCase(category));
+    // CB72: omit the placeholder without changing category or location styling.
+    const categoryLabel = category ? sentenceCase(category) : '';
+    if (categoryLabel && categoryLabel !== 'Other') bits.push(categoryLabel);
     const place = city || region || country || null;
     if (place) bits.push(place);
     return bits.length ? bits.join(' \u00B7 ') : null;

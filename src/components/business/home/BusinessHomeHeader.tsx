@@ -250,7 +250,9 @@ export function BusinessHomeHeader({
   const canManage = role === 'owner' || role === 'admin';
   const canPost = role !== 'analyst';
   const loc = getCityCountry({ city: business.city, region: business.region, country: business.country, location: business.location });
-  const subline = [business.category?.trim() || null, loc].filter(Boolean).join(' · ');
+  // CB72: Other is a placeholder, not part of the business identity.
+  const category = business.category?.trim();
+  const subline = [category && category !== 'Other' ? category : null, loc].filter(Boolean).join(' · ');
   const slugOrId = business.slug || business.id;
 
   const btn: React.CSSProperties = {
