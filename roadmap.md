@@ -1,6 +1,8 @@
 # Roadmap
 
 ## HOLE_MEDIA_VIDEOS_STAGE_2
+- [x] Applied authorised tourOverviewDesignA.test.ts top-level namespace preload and render cleanup only; all names/assertions/expected values unchanged, zero inventory delta.
+- [ ] RULING STOP: first `bunx vitest run` exits1: src/test/tourOverviewDesignA.test.ts:31:1, `Error: Hook timed out in 10000ms.` 2,477 passed /61 skipped =2,538 inventory;323 passed files/1 failed suite. No unhandled-error section reported. Second run and webhook deployment not attempted after failure; no further code/test changes. Report HOLE_MEDIA_VIDEOS_STAGE_2_ruling_stop_report.md.
 - [x] Extend both hole-library pickers and route videos through review resilient uploader, preserving R2 photos and EXIF-only months. Founder ruling enforces 4 GiB, four MIME types and empty-MIME extension fallback; private SUPPORTED_VIDEO_TYPES reproduced from shared three-type list plus x-m4v without touching the review composer.
 - [x] Insert processing video contributions; isolate three guarded webhook metadata updates before the byte-identical post lookup-to-handler-end (verified against HEAD).
 - [x] Add only holeLibraryVideosStage2.test.tsx: 20 tests; targeted20/20. Full `bunx vitest run`: 2,538 passed /324 files /0 failed tests, but1 unhandled rejection and exit1. Delta from2,518/323 is exactly20 new tests/one file; no existing tests changed. Automatic preview build OK12:27:57Z; standalone tsc prohibited by environment, unverified.
