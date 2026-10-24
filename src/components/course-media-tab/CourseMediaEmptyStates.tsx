@@ -110,7 +110,7 @@ export function CourseFirstPhotoPicker({ knownHoles, pending, uploadProgress, er
   return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent className="media-empty" style={{ ...theme, background: A.PANEL }} onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
     <DialogTitle>Add the first photograph</DialogTitle>
     <DialogDescription className="sr-only">Choose the hole and a photograph from your library.</DialogDescription>
-    <HolePhotoPicker holeCount={knownHoles.length} knownHoleNumbers={knownHoles} floor={0} selectedHole={hole} usedHoles={[]} onSelect={n => { if (!pending) setHole(n); }} />
+    <HolePhotoPicker holeCount={knownHoles.length} knownHoleNumbers={knownHoles} selectedHole={hole} usedHoles={[]} onSelect={n => { if (!pending) setHole(n); }} />
     <input ref={input} type="file" accept="image/*,video/*" hidden disabled={pending} onChange={event => { const file = event.target.files?.[0]; if (file && hole != null) onSubmit(file, hole); event.target.value = ''; }} />
     {error && <p role="alert" className="media-empty-lede">{error}</p>}
     <Button variant="ghost" className="media-empty-action" disabled={pending || hole == null} onClick={() => input.current?.click()}>{pending ? <><Loader2 className="animate-spin" />{uploadProgress != null ? `Uploading ${uploadProgress}%` : 'Tagging'}</> : 'Choose from your library'}</Button>
