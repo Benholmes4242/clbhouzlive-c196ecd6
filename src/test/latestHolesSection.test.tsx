@@ -69,13 +69,18 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     f.latest = [latest('first'), latest('second', { par: null, yards: null }), latest('third', { yards: null })];
     mountRail(); expect(screen.getByText('Par 3 · 182 yds')).toBeInTheDocument(); expect(screen.getByText('Hole')).toBeInTheDocument(); expect(screen.getByText('Par 3')).toBeInTheDocument();
   });
-  it('credit uses EXIF September and never creation date when EXIF is absent', () => {
-    f.latest = [latest('first'), latest('second', { exif_captured_at: null }), latest('third', { member_name: null, exif_captured_at: null })];
-    const view = mountRail(); expect(screen.getByText('Thomas Holmes · Sep 2026')).toBeInTheDocument(); expect(screen.getByText('Thomas Holmes')).toBeInTheDocument();
-    expect(view.container.querySelectorAll('.latest-hole-credit')).toHaveLength(2); expect(view.container.textContent).not.toContain('Oct 2026');
+  it('credit uses the added date and ignores EXIF capture', () => {
+    f.latest = [latest('first'), latest('second', { exif_captured_at: '2020-01-05T12:00:00Z' }), latest('third', { exif_captured_at: null })];
+    const view = mountRail(); expect(screen.getAllByText('Thomas Holmes · Jun 2025')).toHaveLength(3);
+    expect(view.container.textContent).not.toContain('Sep 2026'); expect(view.container.textContent).not.toContain('Jan 2020');
+  });
+  it('member_name null shows the added month alone', () => {
+    f.latest = [latest('first'), latest('second', { member_name: null }), latest('third')];
+    const view = mountRail(); expect(screen.getByText('Jun 2025')).toBeInTheDocument();
+    expect(view.container.querySelectorAll('.latest-hole-credit')).toHaveLength(3);
   });
   it('credit month is UTC, not the timestamp offset month', () => {
-    f.latest[0] = latest('first', { exif_captured_at: '2026-10-01T00:30:00+02:00' }); mountRail(); expect(screen.getAllByText('Thomas Holmes · Sep 2026')).toHaveLength(3);
+    f.latest[0] = latest('first', { added_at: '2025-07-01T00:30:00+02:00' }); mountRail(); expect(screen.getAllByText('Thomas Holmes · Jun 2025')).toHaveLength(3);
   });
   it('video uses its shared poster and rounded duration while images have no chip', () => {
     const video = latest('first', { media_type: 'video', poster_url: '/video-poster.jpg', duration_seconds: 14.2 }); f.latest[0] = video;
