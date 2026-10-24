@@ -26,7 +26,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import html2canvas from 'html2canvas';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserTopTenCourses, type TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { useTopTenReactions, REACTION_CONFIG, type ReactionType } from '@/hooks/useTopTenReactions';
@@ -38,7 +37,7 @@ import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/to
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTopTenVisibility } from '@/components/profile/hooks/useTopTenVisibility';
-import { toast } from '@/lib/toast';
+import { TopTenShareSheet } from '@/components/profile/hero/topTenShare/TopTenShareSheet';
 import { MessageCircle } from 'lucide-react';
 import { numberWord } from '@/lib/text/numbers';
 // Used by the owner progress invitation (unchanged), not by any header copy.
@@ -53,8 +52,6 @@ const CAPTION_SUB = 'rgba(255,255,255,0.74)';
 const SLOT_DASH = 'rgba(248,250,252,0.26)';
 const SLOT_NEXT = 'rgba(248,250,252,0.55)';
 const PRESSED_BORDER = 'rgba(247,147,30,0.55)';
-const SHARE_BG = 'linear-gradient(170deg, #101417, #0A0A0C 60%)';
-const CAPTURE_OPTS = { backgroundColor: '#000', scale: 2, logging: false, useCORS: true };
 
 /**
  * THE SCORE TONE IS GREEN AT 9.0+, INK OTHERWISE. Deliberately NOT
@@ -156,8 +153,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   const { topTen: rawTopTen, isLoading } = useUserTopTenCourses(userId);
   const [commentsOpen, setCommentsOpen] = React.useState(false);
   const [commentsCourseId, setCommentsCourseId] = React.useState<string | null>(initialCourseId);
-  const [sharing, setSharing] = React.useState(false);
-  const shareRef = React.useRef<HTMLDivElement>(null);
+  const [shareOpen, setShareOpen] = React.useState(false);
 
   const { user } = useSupabaseSession();
   const viewerId = user?.id;
@@ -469,41 +465,10 @@ export const ProfileTopTenRail: React.FC<Props> = ({
     );
   };
 
-  // ── Share card ────────────────────────────────────────────────────────
-  const handleShare = async () => {
-    const el = shareRef.current;
-    if (!el || sharing) return;
-    setSharing(true);
-    try {
-      const canvas = await html2canvas(el, CAPTURE_OPTS);
-      const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/png'));
-      if (!blob) throw new Error('capture failed');
-      const file = new File([blob], 'my-top-10.png', { type: 'image/png' });
-      if (typeof navigator !== 'undefined' && navigator.share && navigator.canShare?.({ files: [file] })) {
-        try {
-          await navigator.share({ files: [file], title: t('topTen.share.cardTitle', 'My top 10') });
-          return;
-        } catch (err) {
-          if ((err as Error).name === 'AbortError') return;
-        }
-      }
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'my-top-10.png';
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    } catch {
-      toast.error("Couldn't create your card");
-    } finally {
-      setSharing(false);
-    }
-  };
-
-  const shareSub = [
-    shareIdentity?.rounds != null ? t('topTen.share.rounds', { count: shareIdentity.rounds, defaultValue: '{{count}} rounds' }) : null,
-    shareIdentity?.rated != null ? t('topTen.share.rated', { count: shareIdentity.rated, defaultValue: '{{count}} rated' }) : null,
-  ].filter(Boolean).join(' · ');
+  // ── Share (BRIEF_TOP_TEN_SHARE_CARD_V2) ────────────────────────────────
+  // The row is unchanged; Create now opens TopTenShareSheet, which owns the
+  // preview, toggles and html2canvas capture of the full-size card.
+  const shareCourses = topTen.map((c) => ({ ...c, rating: ratingOf(c) }));
 
   const shareRow = isOwnProfile && n >= 3 && (
     <>
@@ -512,47 +477,19 @@ export const ProfileTopTenRail: React.FC<Props> = ({
           <div style={{ fontSize: 13, fontWeight: 700, color: A.INK }}>{t('topTen.share.title', 'Share your ten')}</div>
           <div style={{ marginTop: 3, fontSize: 11, fontWeight: 600, color: A.DIM, lineHeight: 1.4 }}>{t('topTen.share.body', 'A card for Instagram, WhatsApp or the group chat.')}</div>
         </div>
-        <button type="button" onClick={handleShare} disabled={sharing}
-          style={{ background: A.INK, color: A.CANVAS, border: 'none', borderRadius: 12, padding: '9px 14px', fontFamily: SANS, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', flexShrink: 0, opacity: sharing ? 0.6 : 1 }}>
+        <button type="button" onClick={() => setShareOpen(true)}
+          style={{ background: A.INK, color: A.CANVAS, border: 'none', borderRadius: 12, padding: '9px 14px', fontFamily: SANS, fontSize: 12.5, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
           {t('topTen.share.cta', 'Create')}
         </button>
       </div>
-      {/* Off-screen, type-only card captured by html2canvas. No course photos. */}
-      <div aria-hidden style={{ position: 'fixed', left: -10000, top: 0, pointerEvents: 'none' }}>
-        <div ref={shareRef} style={{ width: 330, background: SHARE_BG, border: `1px solid ${A.HAIRLINE}`, borderRadius: 18, padding: '22px 20px', fontFamily: SANS, boxSizing: 'border-box' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {shareIdentity?.avatarUrl ? (
-              <img src={shareIdentity.avatarUrl} crossOrigin="anonymous" alt="" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover' }} />
-            ) : (
-              <div style={{ width: 30, height: 30, borderRadius: '50%', background: A.TRACK }} />
-            )}
-            <span style={{ fontSize: 13, fontWeight: 700, color: A.INK }}>{shareIdentity?.displayName ?? ''}</span>
-            {shareIdentity?.handicapIndex != null && (
-              <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.DIM, ...FIGS }}>
-                {t('topTen.share.hcp', { value: shareIdentity.handicapIndex.toFixed(1), defaultValue: '{{value}} hcp' })}
-              </span>
-            )}
-          </div>
-          <div style={{ marginTop: 16, fontSize: 23, fontWeight: 700, letterSpacing: '-0.025em', color: A.INK }}>{t('topTen.share.cardTitle', 'My top 10')}</div>
-          {shareSub && <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, ...FIGS }}>{shareSub}</div>}
-          <div style={{ marginTop: 16 }}>
-            {topTen.map((c, i) => {
-              const r = ratingOf(c);
-              return (
-                <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 0', borderTop: i > 0 ? `1px solid ${A.SOFT}` : 'none', fontSize: 12 }}>
-                  <span style={{ width: 15, fontWeight: 700, color: A.DIM, ...FIGS }}>{c.position}</span>
-                  <span style={{ flex: 1, minWidth: 0, fontWeight: 600, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
-                  <span style={{ fontWeight: 700, color: A.MUTE, ...FIGS }}>{r != null ? r.toFixed(1) : ''}</span>
-                </div>
-              );
-            })}
-          </div>
-          <div style={{ marginTop: 18, paddingTop: 12, borderTop: `1px solid ${A.HAIRLINE}`, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>clbhouz</span>
-            <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>{t('topTen.share.tagline', 'stay in play.')}</span>
-          </div>
-        </div>
-      </div>
+      {shareOpen && (
+        <TopTenShareSheet
+          open={shareOpen}
+          onClose={() => setShareOpen(false)}
+          courses={shareCourses}
+          identity={shareIdentity ?? { displayName: '' }}
+        />
+      )}
     </>
   );
 
