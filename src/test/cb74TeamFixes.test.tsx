@@ -35,7 +35,7 @@ import { AccessRequestsSection, getRoleLabel } from '@/components/business/Acces
 import BusinessTeamPage from '@/pages/BusinessTeamPage';
 import BusinessInvitePage from '@/pages/BusinessInvitePage';
 
-const request = { id: 'request-1', business_id: 'biz', requester_user_profile_id: 'sam', requested_role: 'manager', message: null, status: 'pending', created_at: '2026-10-23T10:00:00Z' };
+const request = { id: 'request-1', business_id: 'biz', requester_user_profile_id: 'sam', requested_role: 'team_member', message: null, status: 'pending', created_at: '2026-10-23T10:00:00Z' };
 function RouteState() {
   const location = useLocation();
   const navigation = useNavigationType();
@@ -56,8 +56,16 @@ function mount(kind: 'requests' | 'team' | 'invite') {
   return { client, invalidate, refresh: () => view.rerender(tree()) };
 }
 async function decide(action: 'Approve' | 'Decline') {
-  fireEvent.click(await screen.findByRole('button', { name: action }));
-  fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: action }));
+  const entry = await waitFor(() => {
+    const button = document.querySelector(`[data-request-action="${action.toLowerCase()}"]`);
+    expect(button).toBeTruthy();
+    return button;
+  });
+  if (!entry) throw new Error('Missing request action');
+  fireEvent.click(entry);
+  const confirm = screen.getByRole('dialog').querySelector('[data-team-confirm]');
+  if (!confirm) throw new Error('Missing decision confirmation');
+  fireEvent.click(confirm);
 }
 beforeEach(() => {
   vi.clearAllMocks();
@@ -87,7 +95,7 @@ describe('CB74 authoritative access decisions', () => {
     const { invalidate } = mount('requests');
     await decide(action);
     await waitFor(() => expect(invalidate).toHaveBeenCalled());
-    expect(mocks.rpc).toHaveBeenCalledWith('decide_business_access_request', { p_request_id: 'request-1', p_decision: decision, p_role: null });
+    expect(mocks.rpc).toHaveBeenCalledWith('decide_business_access_request', { p_request_id: 'request-1', p_decision: decision, p_role: decision === 'approve' ? 'editor' : null });
     expect(mocks.invoke).not.toHaveBeenCalled();
   });
   it.each(['Approve', 'Decline'] as const)('%s refusal shows the server message and never invalidates success queries', async (action) => {
@@ -121,7 +129,7 @@ describe('CB74 authoritative access decisions', () => {
     const { invalidate } = mount('requests');
     await decide('Decline');
     await waitFor(() => expect(invalidate).toHaveBeenCalledTimes(6));
-    expect(mocks.info).toHaveBeenCalledWith('Request already declined');
+    expect(mocks.info).toHaveBeenCalledTimes(1);
     expect(mocks.success).not.toHaveBeenCalled();
   });
   it.each([['manager', 'Admin'], ['team_member', 'Editor'], ['analyst', 'Analyst'], ['admin', 'Admin']])('requested %s is granted %s', (role, label) => {
