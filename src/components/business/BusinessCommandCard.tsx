@@ -446,7 +446,7 @@ export function BusinessCommandCard({
                     <Star className="h-4 w-4" style={{ color: BIZ.inkMute }} />
                     Reviews
                     {awaitingReplies > 0 && (
-                      <span className="ml-auto h-2 w-2 rounded-full" style={{ background: BIZ.amber }} />
+                      <span className="ml-auto h-2 w-2 rounded-full" style={{ background: BIZ.ink }} />
                     )}
                   </DropdownMenuItem>
                 )}
@@ -466,7 +466,7 @@ export function BusinessCommandCard({
                       <Users className="h-4 w-4" style={{ color: BIZ.inkMute }} />
                       Manage team
                       {hasPendingRequests && (
-                        <span className="ml-auto h-2 w-2 rounded-full" style={{ background: BIZ.amber }} />
+                        <span className="ml-auto h-2 w-2 rounded-full" style={{ background: BIZ.ink }} />
                       )}
                     </DropdownMenuItem>
 
@@ -607,7 +607,7 @@ function ActionRow({
       {badge && (
         <span
           className="rounded-full shrink-0"
-          style={{ width: 6, height: 6, background: BIZ.amber }}
+          style={{ width: 6, height: 6, background: BIZ.ink }}
         />
       )}
       <ChevronRight className="shrink-0" style={{ width: 14, height: 14, color: BIZ.inkFaint }} />

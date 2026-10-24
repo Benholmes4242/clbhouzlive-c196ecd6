@@ -80,8 +80,8 @@ export function shortBusinessName(name: string): string | null {
 }
 
 export const ROLE_LINE: Record<BusinessMembership['role'], string> = {
-  owner: "You're the primary manager",
-  admin: "You're a manager",
+  owner: "You're the owner",
+  admin: "You're an admin",
   editor: "You're an editor",
   analyst: "You're an analyst",
 };
