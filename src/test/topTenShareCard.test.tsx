@@ -82,4 +82,11 @@ describe('BRIEF_TOP_TEN_SHARE_CARD_V2 card render (story)', () => {
     expect(container.textContent).not.toContain('clbhouz.co.uk');
     expect(container.textContent).not.toContain('stay in play.');
   });
+
+  it('the hero place reads variant, then region and sub_country', () => {
+    const { container } = renderCard(true);
+    expect(container.querySelector('[data-share-hero]')?.textContent).toContain(
+      'Ailsa · Ayrshire, Scotland',
+    );
+  });
 });

@@ -207,11 +207,7 @@ export const TopTenShareCard: React.FC<Props> = ({
                 {heroName.short}
               </div>
               <div style={{ marginTop: story ? 6 : 3, fontSize: story ? 12 : 11, fontWeight: 600, lineHeight: story ? 1.3 : undefined, color: ON_PHOTO_SUB }}>
-                {/* CONFLICT FLAGGED IN REPORT: brief §2 says hero place is region +
-                    sub_country joined with ", "; both signed-off mocks draw the
-                    hero place WITH the variant ("Ailsa · Ayrshire, Scotland").
-                    The brief's written rule is implemented here pending a ruling. */}
-                {[hero.region, hero.sub_country].filter(Boolean).join(', ')}
+                {heroPlace(hero, heroName.variant)}
               </div>
             </div>
             <div style={{ flexShrink: 0, textAlign: 'right' }}>

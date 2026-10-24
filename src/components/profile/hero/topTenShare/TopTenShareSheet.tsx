@@ -68,6 +68,13 @@ export const TopTenShareSheet: React.FC<Props> = ({ open, onClose, courses, iden
             next[i] = url;
           } catch {
             /* null slot -> the card renders its #16161A panel */
+            let host: string | null = null;
+            try {
+              host = new URL(src).hostname;
+            } catch {
+              /* unparseable src: report the failure with no host */
+            }
+            console.warn('[top10-share] photo failed', { position: c?.position, host });
           }
         }),
       );
