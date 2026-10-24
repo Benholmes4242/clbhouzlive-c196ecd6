@@ -500,6 +500,47 @@
         "loadFailed": "[~~Cóúldñ'ţ lóád ýóúŕ ţéám~~]",
         "loadFailedLine": "[~~Chéçk ýóúŕ çóññéçţíóñ áñd ţŕý ágáíñ.~~]",
         "retry": "[~~Ŕéţŕý~~]"
+      },
+      "sectionFour": {
+        "rolesKicker": "[Whát éách rólé cán dó]",
+        "activityKicker": "[Récént téám áctívíty]",
+        "abilities": {
+          "post": "[Póst ás {{business}}]",
+          "edit": "[Édít thé prófílé]",
+          "insights": "[Séé ínsíghts]",
+          "reply": "[Réply tó révíéws]",
+          "team": "[Mánágé thé téám]",
+          "verify": "[Vérífícátíón ánd cóúrsé cláíms]",
+          "delete": "[Délété thé búsínéss]"
+        },
+        "note": "[Ównérs ánd ádmíns séé thé téám's áctívíty. Yóúr ówn cólúmn ís thé bríght óné.]",
+        "you": "[Yóú]",
+        "seeAll": "[Séé áll áctívíty]",
+        "kinds": {
+          "post": "[póstéd ás {{business}}]",
+          "post_folded_one": "[póstéd {{count}} tímé ás {{business}}]",
+          "post_folded_other": "[póstéd {{count}} tímés ás {{business}}]",
+          "review_reply": "[réplíéd tó á révíéw]",
+          "review_reply_folded_one": "[réplíéd tó {{count}} révíéw]",
+          "review_reply_folded_other": "[réplíéd tó {{count}} révíéws]",
+          "team_invite_sent": "[ínvítéd {{person}} ás án {{role}}]",
+          "team_invite_resent": "[résént {{person}}'s ínvíté]",
+          "team_invite_role_changed": "[chángéd {{person}}'s ínvíté tó {{role}}]",
+          "team_invite_accepted": "[jóínéd ás án {{role}}]",
+          "team_request_approved": "[áddéd {{person}} ás án {{role}}]",
+          "team_request_declined": "[déclínéd {{person}}'s réqúést]",
+          "team_role_changed": "[mádé {{person}} án {{role}}]",
+          "team_ownership_transferred": "[mádé {{person}} thé ównér]",
+          "team_member_removed": "[rémóvéd {{person}}]",
+          "team_member_left": "[léft thé téám]"
+        },
+        "time": {
+          "now": "[nów]",
+          "hours_one": "[{{count}}h]",
+          "hours_other": "[{{count}}h]",
+          "today": "[Tódáy]",
+          "yesterday": "[Yéstérdáy]"
+        }
       }
     },
     "hero": {
