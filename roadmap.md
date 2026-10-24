@@ -1,8 +1,8 @@
 # Roadmap
 
 ## BRIEF_HOLE_WALK_NO_ROUNDS
-- [ ] Add Media-only eighteen-hole fallback and unscored panel/quiet line; preserve scored output and frozen flows.
-- [ ] Add only holeWalkNoRounds.test.tsx, run full suite and verify rendered states. Baseline bunx vitest run: 2,569 passed /326 files, zero failures/skips/unhandled errors.
+- [x] Implemented Media-only eighteen-hole fallback and unscored panel/quiet line; default scored JSX and deriveHoleWalk retained, frozen flows untouched.
+- [ ] STOP: full bunx vitest run baseline 2,569 passed/326 files → 2,581 passed/1 failed =2,582 cases/327 files. +13 solely holeWalkNoRounds.test.tsx; all existing tests unchanged/pass. New automatic-restoration test fails at src/test/holeWalkNoRounds.test.tsx:115:23: `Error: expect(element).not.toHaveClass("hole-walk-panel-unscored")`; received `hole-walk-panel hole-walk-panel-unscored`. No correction after failure. Harness build OK16:47:32Z. Browser verification not attempted after stop; awaiting ruling on new fixture failure.
 
 ## HOLE_MEDIA_VIDEOS_STAGE_2
 - [x] Final timing ruling: remove only the authorised beforeAll namespace preload and unused beforeAll import; retain afterEach cleanup/imports and every test name/assertion/value. Inventory remains 2,538 cases/324 files.
