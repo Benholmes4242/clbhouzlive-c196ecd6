@@ -454,6 +454,7 @@
           "line": "Changes take effect straight away.",
           "kicker": "Role",
           "current": "Current",
+          "chooseNew": "Choose a new role",
           "make": {
             "admin": "Make {{first}} an Admin",
             "editor": "Make {{first}} an Editor",

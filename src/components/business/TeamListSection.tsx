@@ -194,7 +194,7 @@ export function TeamListSection({ businessId, businessName, team, viewerRole, vi
             <span className="team-role-content"><span className="team-role-title">{t(`business.team.sectionOne.roles.${role}`)}{s.role === role && <span className="team-role-asked" data-current-role={role}>{t(`${P}.roleSheet.current`)}</span>}</span><span className="team-role-description">{t(`business.team.sectionOne.descriptions.${role}`, { business: businessName })}</span></span>
           </Button>)}
         </div>
-        {buttons(t(`${P}.roleSheet.make.${pickedRole ?? (s.role === 'owner' ? 'admin' : s.role)}`, { first: sFirst }), () => {
+        {buttons(pickedRole && pickedRole !== s.role ? t(`${P}.roleSheet.make.${pickedRole}`, { first: sFirst }) : t(`${P}.roleSheet.chooseNew`), () => {
           if (!pickedRole) return;
           const role = pickedRole;
           void write('update_business_member_role', { p_business_id: businessId, p_member_user_id: s.user_profile_id, p_new_role: role }, true, async () => {
