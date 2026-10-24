@@ -48,4 +48,10 @@
 .hole-media-processing > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .hole-media-processing-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 11px; font-weight: 700; }
 .hole-walk-processing-empty { background: transparent; }
-.hole-walk-processing-empty .hole-walk-number { color: var(--hole-walk-dim); text-shadow: none; }
+.hole-walk-processing-empty .hole-walk-number { color: var(--hole-walk-dim); text-shadow: none; }.hole-walk-owner { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 4px; min-height: 44px; }
+.hole-walk-owner-label { font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--hole-walk-dim); }
+.hole-walk-owner-actions { display: flex; align-items: center; gap: 4px; }
+.hole-walk-owner-action { height: auto; min-height: 44px; padding: 0 6px; background: transparent; font-size: 12.5px; font-weight: 700; color: var(--hole-walk-muted); }
+.hole-walk-owner-action:hover { background: transparent; color: var(--hole-walk-ink); }
+.hole-walk-owner-dot { font-size: 12px; color: var(--hole-walk-faint); }
+.hole-walk-owner + .hole-walk-stats { margin-top: 9px; }

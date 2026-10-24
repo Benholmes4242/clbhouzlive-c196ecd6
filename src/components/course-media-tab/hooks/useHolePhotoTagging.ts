@@ -6,6 +6,8 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { fetchHolePhotos, fetchOwnPhotoSources, fetchOwnPhotoUrls, holeMediaKey, submitHolePhoto } from '@/lib/courseMedia/holePhotoData';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { retagHolePhoto } from '@/lib/courseMedia/retagHolePhoto';
+import { moveHoleTag } from '@/lib/courseMedia/moveHoleTag';
+import { removeHoleTag } from '@/lib/courseMedia/removeHoleTag';
 
 export function useHolePhotoTagging(courseId: string, memberId: string | undefined, knownHoles: readonly number[] | null) {
   const cache = useQueryClient();
@@ -44,5 +46,27 @@ export function useHolePhotoTagging(courseId: string, memberId: string | undefin
     },
     onError: error => { console.error('[hole-tag] failed', error); },
   });
-  return { tags, own, sources, taggedUrls, submit, retag, ready: enabled && tags.isSuccess && own.isSuccess };
+  // Owner controls on live tags. The Media tab reads course_hole_media only
+  // through the tags query above, so it is the one key to invalidate.
+  const move = useMutation({
+    mutationFn: ({ row, hole }: { row: HolePhoto; hole: number }) => {
+      if (!memberId || !knownHoles) throw new Error('This photograph cannot be moved.');
+      return moveHoleTag(row, hole, courseId, memberId, knownHoles);
+    },
+    onSuccess: async () => {
+      await cache.invalidateQueries({ queryKey: ['hole-photo-tags', courseId, memberId] });
+    },
+    onError: error => { console.error('[hole-tag] failed', error); },
+  });
+  const remove = useMutation({
+    mutationFn: ({ row }: { row: HolePhoto }) => {
+      if (!memberId) throw new Error('This photograph cannot be removed.');
+      return removeHoleTag(row, memberId);
+    },
+    onSuccess: async () => {
+      await cache.invalidateQueries({ queryKey: ['hole-photo-tags', courseId, memberId] });
+    },
+    onError: error => { console.error('[hole-tag] failed', error); },
+  });
+  return { tags, own, sources, taggedUrls, submit, retag, move, remove, ready: enabled && tags.isSuccess && own.isSuccess };
 }
