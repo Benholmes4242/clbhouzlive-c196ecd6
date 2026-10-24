@@ -154,6 +154,29 @@ Deno.serve(async (req) => {
       `[stream-webhook] Ready: ${uid} — ${width}x${height} ${durationSeconds}s`
     );
 
+    // Stage 2: independent hole contributions. Guard each nullable dimension
+    // before setting duration; never overwrite metadata or affect post handling.
+    try {
+      if (durationSeconds != null && durationSeconds > 0) {
+        if (width != null && width > 0) {
+          const { error } = await supabase.from('course_hole_media').update({ width })
+            .eq('stream_id', uid).eq('media_type', 'video').is('duration_seconds', null).is('width', null);
+          if (error) console.error('[stream-webhook] hole media width:', error);
+        }
+        if (height != null && height > 0) {
+          const { error } = await supabase.from('course_hole_media').update({ height })
+            .eq('stream_id', uid).eq('media_type', 'video').is('duration_seconds', null).is('height', null);
+          if (error) console.error('[stream-webhook] hole media height:', error);
+        }
+        const { data: updated, error } = await supabase.from('course_hole_media').update({ duration_seconds: durationSeconds })
+          .eq('stream_id', uid).eq('media_type', 'video').is('duration_seconds', null).select('id');
+        if (error) throw error;
+        console.log(`[stream-webhook] hole media updated: ${updated?.length ?? 0} row(s)`);
+      }
+    } catch (holeMediaError) {
+      console.error('[stream-webhook] Non-fatal: hole media update failed:', holeMediaError);
+    }
+
     // Find post_media by stream_id or URL match
     const { data: mediaRows, error: findError } = await supabase
       .from('post_media')

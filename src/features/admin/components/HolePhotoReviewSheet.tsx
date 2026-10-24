@@ -12,6 +12,7 @@ import { adminTheme as t } from '../theme';
 import AdminSheet from './AdminSheet';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { HoleMediaVideo } from '@/components/course-media-tab/HoleMediaVideo';
+import { HoleProcessingVideo } from '@/components/course-media-tab/HoleWalk';
 import {
   HOLE_PHOTO_REJECT_REASONS,
   
@@ -201,7 +202,7 @@ export default function HolePhotoReviewSheet({ row, onClose }: Props) {
         {/* Submitted photo */}
         <div>
           <div style={label}>Submitted {row.media_type === 'video' ? 'video' : 'photo'}</div>
-          {row.media_type === 'video' ? <HoleMediaVideo key={row.id} media={row} label={`Hole ${row.hole_no} submission`} /> : <img
+          {row.media_type === 'video' ? (row.duration_seconds == null ? <HoleProcessingVideo key={row.id} media={row} label={`Hole ${row.hole_no} submission`} /> : <HoleMediaVideo key={row.id} media={row} label={`Hole ${row.hole_no} submission`} />) : <img
             src={row.media_url}
             alt={`Hole ${row.hole_no} submission`}
             style={{
@@ -258,7 +259,7 @@ export default function HolePhotoReviewSheet({ row, onClose }: Props) {
         {live.data && live.data.id !== row.id && (
           <div style={{ border: `1px solid ${t.line}`, borderRadius: t.radius.md, padding: 12 }}>
             <div style={label}>Already live on this hole</div>
-            {live.data.media_type === 'video' ? <HoleMediaVideo key={live.data.id} media={live.data} label="Live hole video" /> : <img
+            {live.data.media_type === 'video' ? (live.data.duration_seconds == null ? <HoleProcessingVideo key={live.data.id} media={live.data} label="Live hole video" /> : <HoleMediaVideo key={live.data.id} media={live.data} label="Live hole video" />) : <img
               src={live.data.media_url}
               alt="Live hole photo"
               style={{ marginTop: 6, width: '100%', height: 120, objectFit: 'cover', borderRadius: t.radius.md }}

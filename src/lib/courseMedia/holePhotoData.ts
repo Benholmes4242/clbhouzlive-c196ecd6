@@ -12,6 +12,7 @@ import { readHolePhotoExif } from './holePhotoExif';
 import { holePhotoVerdict, type HolePhotoRound } from './holePhotoVerdict';
 import { streamPosterFrom } from '@/utils/mediaThumbs';
 import { buildHlsUrl } from '@/utils/streamId';
+import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 export interface OwnMediaSource {
   url: string; createdAt: string; mediaType: 'image' | 'video';
@@ -91,6 +92,24 @@ export async function submitLibraryHolePhoto(file: File, url: string, courseId: 
   // Metadata failure never blocks publication; URL-only inputs never parse.
   const exif = await readHolePhotoExif(file).catch(() => ({ capturedAt: null, captureDay: null, latitude: null, longitude: null }));
   const { data, error } = await supabase.from('course_hole_media').insert({ course_id: courseId, user_id: memberId, hole_no: hole, media_url: url, file_name: file.name, ...holePhotoVerdict(exif, memberId, courseId, []) }).select('*').single();
+  if (error) throw error;
+  return data;
+}
+
+/** Stage 2 library videos use empty capture metadata; only the Stream webhook
+ * fills encode metadata. Never infer a capture month from the upload date. */
+export async function submitLibraryHoleVideo(file: File, streamId: string, courseId: string, memberId: string, hole: number, knownHoles: readonly number[]): Promise<HolePhoto> {
+  if (!knownHoles.includes(hole) || !file.type.startsWith('video/') || !streamId) throw new Error('That file type isn\'t supported.');
+  const { data: auth, error: authError } = await supabase.auth.getUser();
+  if (authError) throw authError;
+  if (auth.user?.id !== memberId) throw new Error('Please sign in again before tagging.');
+  const { exif } = await prepareHolePhoto('');
+  const { data, error } = await supabase.from('course_hole_media').insert({
+    course_id: courseId, user_id: memberId, hole_no: hole, file_name: file.name,
+    media_type: 'video', stream_id: streamId, media_url: generateStreamHlsUrl(streamId),
+    poster_url: generateStreamThumbnailUrl(streamId), duration_seconds: null, width: null, height: null,
+    ...holePhotoVerdict(exif, memberId, courseId, []),
+  }).select('*').single();
   if (error) throw error;
   return data;
 }

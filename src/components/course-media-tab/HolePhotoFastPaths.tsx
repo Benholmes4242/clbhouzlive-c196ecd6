@@ -20,18 +20,18 @@ import './hole-photo-fast.css';
 
 const theme = { '--hole-walk-ink': A.INK, '--hole-walk-canvas': A.CANVAS, '--hole-walk-muted': A.MUTE, '--hole-walk-rule': A.BORDER, '--hole-walk-track': A.TRACK, '--hole-photo-panel': A.PANEL, '--hole-photo-success': A.IMPROVED } as CSSProperties;
 
-export function HoleKnownPhotoPath({ hole, photos, sources = [], pending, error, onChoose, onLibrary, onClose }: {
-  hole: number; photos: readonly string[]; sources?: readonly OwnMediaSource[]; round?: HolePhotoRound; pending: boolean; result?: HolePhoto | null; error: string | null;
+export function HoleKnownPhotoPath({ hole, photos, sources = [], pending, uploadProgress, error, onChoose, onLibrary, onClose }: {
+  hole: number; photos: readonly string[]; sources?: readonly OwnMediaSource[]; round?: HolePhotoRound; pending: boolean; uploadProgress?: number | null; result?: HolePhoto | null; error: string | null;
   onChoose: (url: string) => void; onLibrary: (file: File) => void; onClose: () => void;
 }) {
   const input = useRef<HTMLInputElement>(null);
-  return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent style={theme} className="hole-photo-fast hole-photo-fast-sheet">
+  return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent style={theme} className="hole-photo-fast hole-photo-fast-sheet" onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
     <div className="hole-photo-fast-grab" />
     <DialogTitle className="hole-photo-fast-title">Add a photo or video of the {holeOrdinal(hole)}</DialogTitle>
     <DialogDescription className="hole-photo-fast-lede">The hole is already set. Pick a photo or video and it is done.</DialogDescription>
       <div className="hole-photo-fast-pile">{photos.map(url => { const source = sources.find(s => s.url === url); const video = source?.mediaType === 'video'; return <Button key={url} variant="ghost" className="hole-photo-fast-photo hole-media-preview" aria-label={video ? 'Choose video' : 'Choose photograph'} disabled={pending} onClick={() => onChoose(url)}><HoleMediaThumbnail url={url} {...source} alt={video ? 'Your video' : 'Your photograph'} /></Button>; })}</div>
-      <input ref={input} type="file" accept="image/*" hidden disabled={pending} onChange={event => { const file = event.target.files?.[0]; if (file) onLibrary(file); event.target.value = ''; }} />
-      <Button variant="ghost" className="hole-photo-fast-action" disabled={pending} onClick={() => input.current?.click()}>{pending ? <><Loader2 className="animate-spin" />Tagging</> : 'Choose from your library'}</Button>
+      <input ref={input} type="file" accept="image/*,video/*" hidden disabled={pending} onChange={event => { const file = event.target.files?.[0]; if (file) onLibrary(file); event.target.value = ''; }} />
+      <Button variant="ghost" className="hole-photo-fast-action" disabled={pending} onClick={() => input.current?.click()}>{pending ? <><Loader2 className="animate-spin" />{uploadProgress != null ? `Uploading ${uploadProgress}%` : 'Tagging'}</> : 'Choose from your library'}</Button>
     {error && <p role="alert" className="hole-photo-fast-lede">{error}</p>}
   </DialogContent></Dialog>;
 }

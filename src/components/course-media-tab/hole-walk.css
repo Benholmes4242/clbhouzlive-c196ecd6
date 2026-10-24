@@ -43,3 +43,8 @@
 .hole-tag-video-preview img { width: 100%; height: 100%; object-fit: contain; }
 .hole-walk-thumbnail { position: relative; }
 .hole-walk-photo:has(.hole-media-video) .hole-walk-caption { pointer-events: none; padding-right: 68px; }
+.hole-media-processing { position: relative; width: 100%; height: 100%; aspect-ratio: 4/3; overflow: hidden; }
+.hole-media-processing > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hole-media-processing-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 11px; font-weight: 700; }
+.hole-walk-processing-empty { background: transparent; }
+.hole-walk-processing-empty .hole-walk-number { color: var(--hole-walk-dim); text-shadow: none; }
