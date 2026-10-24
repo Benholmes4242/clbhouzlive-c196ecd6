@@ -25852,6 +25852,10 @@ export type Database = {
       unaccent: { Args: { "": string }; Returns: string }
       unblock_user: { Args: { p_blocked_id: string }; Returns: undefined }
       unlockrows: { Args: { "": string }; Returns: number }
+      update_business_invite_role: {
+        Args: { p_invite_id: string; p_role: string }
+        Returns: Json
+      }
       update_business_member_role: {
         Args: {
           p_business_id: string

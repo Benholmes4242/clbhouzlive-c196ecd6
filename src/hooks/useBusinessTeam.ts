@@ -106,7 +106,8 @@ export function useBusinessInvites(businessId?: string) {
   });
 }
 
-async function fireInviteEmail(inviteId: string) {
+/** Sends the invite email via send-business-invite; fire-and-forget. Exported for CB77 resend/role change. */
+export async function fireInviteEmail(inviteId: string) {
   try {
     await supabase.functions.invoke('send-business-invite', { body: { inviteId } });
   } catch (e) {
@@ -177,7 +178,7 @@ export function useCreateInviteByUser(businessId: string) {
   });
 }
 
-export function useRevokeInvite(businessId: string) {
+export function useRevokeInvite(businessId: string, options?: { successMessage?: string }) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -191,7 +192,7 @@ export function useRevokeInvite(businessId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] });
-      toast.success('Invitation revoked');
+      toast.success(options?.successMessage ?? 'Invitation revoked');
     },
     onError: () => {
       toast.error('Failed to revoke invite');
