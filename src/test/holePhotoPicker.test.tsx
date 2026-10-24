@@ -10,13 +10,14 @@ describe('MEDIA_ENGINE_1_R course-count picker', () => {
     expect(screen.getByRole('button', { name: 'Hole 9' })).toBeEnabled();
     expect(screen.queryByRole('button', { name: 'Hole 18' })).toBeNull();
   });
-  it('holes below the floor cannot be selected and the floor itself can', () => {
+  it('every known hole is selectable; only holes outside the count are refused', () => {
     const selected: number[] = [];
-    render(<HolePhotoPicker holeCount={9} floor={4} selectedHole={null} onSelect={hole => selected.push(hole)} />);
+    render(<HolePhotoPicker holeCount={9} selectedHole={null} onSelect={hole => selected.push(hole)} />);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 3' }));
     fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
-    expect(selected).toEqual([4]);
-    expect(selectableHole(3, 9, 4)).toBe(false);
+    expect(selected).toEqual([3, 4]);
+    expect(selectableHole(3, 9)).toBe(true);
+    expect(selectableHole(10, 9)).toBe(false);
   });
   it('does not turn an invalid count into eighteen', () => {
     expect(holeNumbers(0)).toEqual([]);
@@ -35,8 +36,8 @@ describe('MEDIA_ENGINE_1_R course-count picker', () => {
     const { container } = render(<HolePhotoPicker holeCount={3} selectedHole={null} onSelect={() => {}} />);
     expect(container.querySelector('p')).toBeNull();
   });
-  it('used holes outside the shown list or below the floor do not draw the explanation', () => {
-    const { container } = render(<HolePhotoPicker holeCount={3} floor={3} selectedHole={null} usedHoles={[1, 9]} onSelect={() => {}} />);
+  it('used holes outside the shown list do not draw the explanation', () => {
+    const { container } = render(<HolePhotoPicker holeCount={3} selectedHole={null} usedHoles={[9]} onSelect={() => {}} />);
     expect(container.querySelector('p')).toBeNull();
   });
 });
