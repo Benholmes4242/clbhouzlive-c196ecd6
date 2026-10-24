@@ -1,6 +1,8 @@
 # Roadmap
 
 ## HOLE_MEDIA_VIDEOS_STAGE_1
+- [x] Apply founder rulings: change only mediaTrust line23 expected photo copy; restore EXIF-only captureMonth and the original missing-EXIF test, preserving all other video work.
+- [ ] Run full suite for rulings from 2,518 total /323 files (2,517 passed /1 failed); report both changed test files and automatic checks. Manual typecheck cannot run under the environment's harness-only checks rule.
 - [ ] Include only encoded own published-post/review videos in sources and tagging; keep new library uploads image-only.
 - [ ] Add video posters/duration to existing tagging surfaces, hole panels and moderator review; reuse existing HLS and audio ownership.
 - [x] Confirm four founder-added course_hole_media fields already exist; generated schema unchanged, no SQL/migrations.
