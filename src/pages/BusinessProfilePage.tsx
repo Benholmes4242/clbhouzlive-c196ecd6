@@ -462,6 +462,16 @@ const BusinessProfilePage: React.FC = () => {
                   </>
                 ) : (
                   <>
+                    {/* CB78: editors can edit the profile too. */}
+                    {membership?.role === 'editor' && (
+                      <>
+                        <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
+                          <Pencil className="h-4 w-4 mr-2" />
+                          Edit business profile
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </>
+                    )}
                     <DropdownMenuItem onClick={handleShare}>
                       <Share2 className="h-4 w-4 mr-2" />
                       Share profile
