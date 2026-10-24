@@ -20,6 +20,73 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CB75: Team section-one roles; scope excludes the frozen member/invite lists.
+   Sheet chrome remains owned by BottomSheet (founder ruling). */
+:root {
+  --team-ink: #F8FAFC;
+  --team-muted: rgba(248,250,252,0.62);
+  --team-dim: rgba(248,250,252,0.42);
+  --team-inverted-ink: #0B0B0D;
+  --team-request-surface: #17171B;
+  --team-role-surface: #1C1C21;
+  --team-avatar-surface: #26262C;
+  --team-invite-surface: #232329;
+  --team-border: rgba(255,255,255,0.08);
+  --team-hairline: rgba(255,255,255,0.06);
+  --team-control-border: rgba(255,255,255,0.14);
+  --team-badge-border: rgba(255,255,255,0.16);
+  --team-control-fill: rgba(255,255,255,0.04);
+  --team-invite-border: rgba(255,255,255,0.25);
+  --team-radio-border: rgba(255,255,255,0.3);
+  --team-selected-border: rgba(255,255,255,0.9);
+}
+[data-fixed-page-header]:has(.manage-header-subtitle) h1 { transform: translateY(-7px); }
+.manage-header-subtitle { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 24px); left: 108px; right: 108px; height: 15px; display: flex; justify-content: center; pointer-events: none; font-size: 11.5px; line-height: 14px; font-weight: 600; color: var(--team-dim); text-align: center; }
+.team-subtitle-name { display: block; width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.team-header-invite { height: 34px; padding: 0 13px; border-radius: 17px; background: var(--team-ink); color: var(--team-inverted-ink); font-size: 13px; font-weight: 700; gap: 6px; border: 0; }
+.team-summary { padding: 14px 0 4px; display: flex; align-items: center; gap: 12px; min-height: 52px; color: var(--team-ink); }
+.team-summary-stack { display: flex; flex: none; }
+.team-summary-avatar { width: 34px; height: 34px; flex: none; border-radius: 11px; border: 2px solid var(--team-inverted-ink); margin-left: -8px; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; background: var(--team-avatar-surface); color: var(--team-muted); }
+.team-summary-avatar:first-child { margin-left: 0; }
+.team-summary-avatar--invite { background: var(--team-invite-surface); border: 2px dashed var(--team-invite-border); }
+.team-summary-avatar img, .team-request-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.team-summary-text { min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+.team-summary-waiting { font-size: 12px; font-weight: 500; color: var(--team-muted); }
+.team-summary-skeleton-tile { width: 34px; height: 34px; border-radius: 11px; background: var(--team-hairline); flex: none; }
+.team-summary-skeleton-bar { height: 14px; width: 160px; max-width: 100%; border-radius: 4px; background: var(--team-hairline); }
+.team-requests { margin: 12px 0; background: var(--team-request-surface); border: 1px solid var(--team-border); border-radius: 18px; padding: 14px 16px 6px; }
+.team-request-kicker { font-size: 10.5px; line-height: 1.4; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--team-muted); display: flex; justify-content: space-between; }
+.team-request-count { color: var(--team-dim); letter-spacing: .12em; }
+.team-request-row { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--team-hairline); }
+.team-request-row:nth-child(2) { border-top: 0; }
+.team-request-avatar { width: 44px; height: 44px; border-radius: 14px; flex: none; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; background: var(--team-avatar-surface); color: var(--team-muted); }
+.team-request-person { flex: 1; min-width: 0; }
+.team-request-name { display: flex; align-items: center; gap: 7px; font-size: 15px; line-height: 1.4; font-weight: 700; color: var(--team-ink); min-width: 0; white-space: nowrap; }
+.team-request-name > span:first-child { overflow: hidden; text-overflow: ellipsis; }
+.team-request-role { flex: none; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 6px; border: 1px solid var(--team-badge-border); color: var(--team-muted); }
+.team-request-meta { margin-top: 2px; font-size: 12.5px; line-height: 1.4; color: var(--team-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.team-request-quote { margin-top: 6px; font-size: 12.5px; line-height: 1.4; color: var(--team-muted); border-left: 2px solid var(--team-control-border); padding-left: 8px; overflow-wrap: anywhere; }
+.team-request-actions { display: flex; margin-top: 10px; gap: 8px; }
+.team-request-pill { height: 30px; padding: 0 13px; border-radius: 15px; font-size: 12.5px; font-weight: 700; background: var(--team-control-fill); border: 1px solid var(--team-control-border); color: var(--team-ink); }
+.team-request-pill--approve { background: var(--team-ink); color: var(--team-inverted-ink); border-color: var(--team-ink); }
+.team-request-pill:disabled { opacity: .4; }
+.team-sheet-title { padding: 0 20px; margin: 0; font-size: 18px; line-height: 1.4; font-weight: 700; letter-spacing: 0; color: var(--team-ink); overflow-wrap: anywhere; }
+.team-sheet-line { padding: 6px 20px 0; font-size: 13px; line-height: 1.45; color: var(--team-muted); }
+.team-sheet-kicker { padding: 16px 20px 0; }
+.team-role-cards { margin: 8px 16px 0; display: flex; flex-direction: column; gap: 8px; }
+.team-role-card { height: auto; padding: 13px 14px; gap: 12px; display: flex; justify-content: flex-start; align-items: flex-start; border-radius: 16px; background: var(--team-role-surface); border: 1px solid var(--team-border); text-align: left; color: var(--team-ink); }
+.team-role-card[aria-checked="true"] { border-color: var(--team-selected-border); }
+.team-role-radio { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--team-radio-border); flex: none; margin-top: 1px; }
+.team-role-card[aria-checked="true"] .team-role-radio { border: 6px solid var(--team-ink); }
+.team-role-content { display: block; min-width: 0; }
+.team-role-title { font-size: 15px; line-height: 1.4; font-weight: 700; }
+.team-role-asked { display: inline; margin-left: 6px; font-size: 11px; font-weight: 700; color: var(--team-dim); }
+.team-role-description { display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.4; font-weight: 400; color: var(--team-muted); }
+.team-sheet-buttons { margin: 18px 16px 0; }
+.team-sheet-confirm { width: 100%; height: 52px; border-radius: 16px; background: var(--team-ink); color: var(--team-inverted-ink); font-size: 15px; font-weight: 700; }
+.team-sheet-cancel { width: 100%; height: 46px; margin-top: 8px; border-radius: 16px; font-size: 14.5px; font-weight: 700; color: var(--team-muted); }
+.team-decision-sheet > div:last-child { will-change: transform; }
+
 /* CB61: portalled round/review doors share global, theme-independent tokens. */
 :root {
   --sheet-door-border: rgba(255,255,255,0.12);

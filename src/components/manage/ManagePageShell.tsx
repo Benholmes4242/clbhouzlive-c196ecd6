@@ -8,6 +8,8 @@ import { FixedPageHeader } from '@/components/chrome/FixedPageHeader';
 
 interface Props {
   title: string;
+  /** Optional centred second identity line; stays inside the existing header height. */
+  subtitle?: React.ReactNode;
   children: React.ReactNode;
   /** Optional right-aligned slot (e.g. Save). */
   right?: React.ReactNode;
@@ -36,7 +38,7 @@ interface Props {
  * on top of that. Do NOT snapshot safe-area here — it would double the
  * inset and open a visible gap under the notch on device.
  */
-export function ManagePageShell({ title, children, right, onBack, belowTitle, fill = false }: Props) {
+export function ManagePageShell({ title, subtitle, children, right, onBack, belowTitle, fill = false }: Props) {
   const bg = PAGE_BG;
   const navigate = useNavigate();
   const handleBack = () => (onBack ? onBack() : navigate(-1));
@@ -59,7 +61,7 @@ export function ManagePageShell({ title, children, right, onBack, belowTitle, fi
           title={title}
           onBack={handleBack}
           right={right}
-          below={belowTitle}
+          below={<>{subtitle && <div className="manage-header-subtitle">{subtitle}</div>}{belowTitle}</>}
         />
 
         <div

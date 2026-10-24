@@ -356,6 +356,49 @@
       "count_one": "{{count}} person",
       "count_other": "{{count}} people",
       "member": "Team member",
+      "sectionOne": {
+        "title": "Team",
+        "invite": "Invite",
+        "runs_one": "{{count}} person runs {{business}}",
+        "runs_other": "{{count}} people run {{business}}",
+        "requests_one": "{{count}} person asked to join",
+        "requests_other": "{{count}} people asked to join",
+        "live_one": "{{count}} invite waiting for {{name}}",
+        "live_other": "{{count}} invites waiting",
+        "expired_one": "{{name}}'s invite has expired",
+        "expired_other": "{{count}} invites have expired",
+        "askedToJoin": "Asked to join",
+        "user": "A user",
+        "today": "today",
+        "yesterday": "yesterday",
+        "playsHere": "Plays here · Asked {{when}}",
+        "usernameAsked": "@{{username}} · Asked {{when}}",
+        "asked": "Asked {{when}}",
+        "approve": "Approve",
+        "decline": "Decline",
+        "addTitle": "Add {{name}} to {{business}}",
+        "addLine": "Choose what {{first}} can do. You can change it later.",
+        "declineTitle": "Decline {{name}}'s request?",
+        "declineLine": "{{first}} will be told it wasn't approved, and can ask again later.",
+        "role": "Role",
+        "roles": {
+          "admin": "Admin",
+          "editor": "Editor",
+          "analyst": "Analyst"
+        },
+        "askedFor": "{{first}} asked for this",
+        "descriptions": {
+          "admin": "Everything except deleting the business: team, verification, reviews, posts, profile.",
+          "editor": "Posts as {{business}} and edits the profile. Can't manage the team.",
+          "analyst": "Sees insights only. Can't post or edit."
+        },
+        "addAs": "Add as {{role}}",
+        "joined": "{{name}} joined as {{role}}",
+        "declined": "Request declined",
+        "alreadyResolved": "Request already {{status}}",
+        "approveFailed": "Failed to approve request",
+        "declineFailed": "Failed to decline request"
+      },
       "role": {
         "owner": "Owner",
         "admin": "Manager",
@@ -363,7 +406,6 @@
         "analyst": "Analyst"
       },
       "manage": {
-        "accessRequests": "Access requests",
         "addJobTitle": "Add job title",
         "addJobTitleAria": "Add job title",
         "editJobTitleAria": "Edit job title",

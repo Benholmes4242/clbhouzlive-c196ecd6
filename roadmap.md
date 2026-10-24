@@ -2,10 +2,11 @@
 
 ## CB75 — Team section 1
 - [x] Read the brief/reference and audit the header, team/invite reads, request decisions and protecting tests. Full baseline `bunx vitest run`: 2,467 passed /321 files /0 failures, matching the latest reported suite.
-- [ ] Resolve the required BottomSheet ASK: canonical surface #16161A, default radius20 and36×4 grabber differ from the reference #17171B/radius22/36×5. No global sheet changes authorised.
-- [ ] Implement Team header/subtitle/Invite, member summary and ordered waiting line, shared requests query and request rows; preserve section2.
-- [ ] Implement approve/decline sheets after the chrome ruling; retarget named CB74 decision tests, add CB75 rules tests and run the full suite.
-- [ ] Report every ASK, per-file diff and rendered measurements. Live owner/profile-field permission verification is unavailable with external_unmanaged authentication; source policy permits non-deleted profiles, but deployed permissions remain unverified. No SQL/migration/RPC/edge/config/native changes.
+- [x] Founder ruling: preserve BottomSheet's own #16161A surface, radius20 and36×4 handle; role cards #1C1C21. Shared sheet unchanged.
+- [x] Implement Team header/subtitle/Invite, member summary and ordered waiting line, shared requests query and request rows; preserve section2. Membership also settles before waiting copy, preventing an invite/request flash.
+- [x] Approve/decline sheets and row-scoped locks; CB74 decision helper/RPC assertion retargeted without count/name changes. Full final `bunx vitest run`: 2,502 passed /322 files /0 failures (+35 solely cb75TeamSectionOne.test.tsx). No pre-existing failures; automatic preview build OK05:08:56Z. No manual build/typecheck run.
+- [x] ASK answers, per-file diff and controlled rendered measurements in CB75_report.md. Chromium390×844: summary358×53.078125, quoted row324×145.890625, approve sheet390×515.21875; controlled refusal→Analyst success→summary update→decline→card removal passed, final page errors0. Screenshot review and320/1280 empty-state overflow checks complete.
+- [ ] Live owner/profile-field permission verification is unavailable with external_unmanaged authentication; source policy permits non-deleted profiles, but deployed permissions and persisted live decisions remain unverified. No SQL/migration/RPC/edge/config/native changes; cap30 unchanged.
 
 ## CB74 — Team fixes before rebuild
 - [x] Replace access decisions with TEAM_FIX_V1 RPC, preserve recovery/invalidation paths and add team/invite refresh on approve; align role labels.

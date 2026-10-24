@@ -1,49 +1,13 @@
-import React, { useState } from 'react';
-import { BIZ } from '@/components/business/businessTokens';
-import { TITLE } from '@/lib/tokens/type';
-import { Loader2 } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
-import { formatRelativeAgoLong } from '@/i18n/format';
 import { AppLog } from '@/lib/logger';
 import { useTranslation } from 'react-i18next';
-import { A, BIZ_KICKER, BIZ_BODY, bizFigure } from '@/features/courses/components/holes/analytical/tokens';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-
-interface AccessRequest {
-  id: string;
-  business_id: string;
-  requester_user_profile_id: string;
-  requested_role: string;
-  message: string | null;
-  status: string;
-  created_at: string;
-  requester: {
-    id: string;
-    display_name: string | null;
-    username: string | null;
-    profile_photo_url: string | null;
-  };
-}
-
-interface AccessRequestsSectionProps {
-  businessId: string;
-  businessName: string;
-  businessAvatarUrl?: string | null;
-  canManage: boolean;
-}
+import { useBusinessAccessRequests, type AccessRequest } from '@/hooks/useBusinessAccessRequests';
+import { requestPlaysHere, requestWhen, teamInitials } from './teamSummary';
 
 // Match the granted role: manager → Admin; team_member/other → Editor.
 export function getRoleLabel(role: string): string {
@@ -55,317 +19,119 @@ export function getRoleLabel(role: string): string {
   }
 }
 
-export function AccessRequestsSection({ businessId, businessName, businessAvatarUrl, canManage }: AccessRequestsSectionProps) {
+/** CB75: the parent shares its requests observer with the summary/card. Standalone
+ * callers retain the same hook/key. TEAM_FIX_V1 remains the decision authority;
+ * JSON refusals leave the sheet and row intact; pending locks are row-scoped. */
+interface AccessRequestsProps {
+  businessId: string; businessName: string; businessAvatarUrl?: string | null;
+  canManage: boolean; clubId?: string | null;
+  requestsQuery?: ReturnType<typeof useBusinessAccessRequests>;
+}
+
+export function AccessRequestsSection(props: AccessRequestsProps) {
+  return props.requestsQuery ? <AccessRequestContents {...props} query={props.requestsQuery} /> : <StandaloneRequests {...props} />;
+}
+
+function StandaloneRequests(props: AccessRequestsProps) {
+  const query = useBusinessAccessRequests(props.businessId, props.canManage);
+  return <AccessRequestContents {...props} query={query} />;
+}
+
+function AccessRequestContents({ businessId, businessName, canManage, clubId, query }: AccessRequestsProps & { query: ReturnType<typeof useBusinessAccessRequests> }) {
   const queryClient = useQueryClient();
   const { t } = useTranslation('common');
-  const [confirmApprove, setConfirmApprove] = useState<AccessRequest | null>(null);
-  const [confirmDecline, setConfirmDecline] = useState<AccessRequest | null>(null);
-  const [loadingId, setLoadingId] = useState<string | null>(null);
-
-  // Fetch pending access requests
-  const { data: requests, isLoading } = useQuery({
-    queryKey: ['business-access-requests', businessId],
-    queryFn: async () => {
-      AppLog.debug('AccessRequestsSection', 'Fetching access requests for business:', businessId);
-      const { data, error } = await supabase
-        .from('business_access_requests')
-        .select(`
-          id,
-          business_id,
-          requester_user_profile_id,
-          requested_role,
-          message,
-          status,
-          created_at
-        `)
-        .eq('business_id', businessId)
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      AppLog.debug('AccessRequestsSection', 'Fetched requests:', data?.length ?? 0);
-
-      // Fetch requester profiles separately
-      if (!data || data.length === 0) return [];
-      
-      const requesterIds = data.map(r => r.requester_user_profile_id);
-      const { data: profiles } = await supabase
-        .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url')
-        .in('id', requesterIds);
-
-      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
-      
-      return data.map(r => ({
-        ...r,
-        requester: profileMap.get(r.requester_user_profile_id) || {
-          id: r.requester_user_profile_id,
-          display_name: null,
-          username: null,
-          profile_photo_url: null,
-        },
-      })) as AccessRequest[];
-    },
-    enabled: canManage,
-    // Ensure fresh data when navigating to the page (global refetchOnMount: true)
-    staleTime: 0,
-  });
-
-  // TEAM_FIX_V1 owns authorization and membership creation; refusals are JSON results.
-  const handleApprove = async (request: AccessRequest) => {
-    // Prevent double-click
-    if (loadingId) return;
-    
-    setLoadingId(request.id);
-    
-    // Ticket B: Close dialog FIRST, then wait for animation before proceeding
-    setConfirmApprove(null);
-    
-    // Wait for dialog close animation to complete and Radix cleanup
-    await new Promise(resolve => setTimeout(resolve, 150));
-    
+  const [sheet, setSheet] = useState<{ request: AccessRequest; decision: 'approve' | 'decline' } | null>(null);
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'editor' | 'analyst'>('editor');
+  const [pending, setPending] = useState<Set<string>>(new Set());
+  const pendingRef = useRef(new Set<string>());
+  const prefix = 'business.team.sectionOne';
+  const nameOf = (request: AccessRequest) => request.requester.display_name || (request.requester.username ? `@${request.requester.username}` : t(`${prefix}.user`));
+  const firstOf = (request: AccessRequest) => request.requester.display_name?.trim().split(/\s+/)[0] || (request.requester.username ? `@${request.requester.username}` : t(`${prefix}.user`));
+  const roleText = (role: string) => t(`${prefix}.roles.${role}`);
+  const open = (request: AccessRequest, decision: 'approve' | 'decline') => {
+    setSelectedRole(getRoleLabel(request.requested_role).toLowerCase() as 'admin' | 'editor' | 'analyst');
+    setSheet({ request, decision });
+  };
+  const decide = async (request: AccessRequest, decision: 'approve' | 'decline', role: string | null) => {
+    if (pendingRef.current.has(request.id)) return;
+    pendingRef.current.add(request.id);
+    setPending(new Set(pendingRef.current));
     try {
-      const { data, error } = await (supabase.rpc as any)(
-        'decide_business_access_request',
-        { p_request_id: request.id, p_decision: 'approve', p_role: null }
-      );
-
+      const { data, error } = await supabase.rpc('decide_business_access_request', {
+        p_request_id: request.id, p_decision: decision, p_role: role,
+      });
       if (error) throw error;
-      if (data?.success === false || data?.error) throw new Error(data?.error || 'Failed to approve request');
-
-      if (data?.already_resolved) {
-        toast.info(`Request already ${data.status}`);
-      } else {
-        toast.success("Request approved");
-      }
-
-      // Wait another frame to ensure UI is stable before invalidations
-      await new Promise(resolve => requestAnimationFrame(resolve));
-
-      // Invalidate relevant queries (fire-and-forget so UI always recovers)
-      // Include notifications + unread-count to clear orange dot for this resolved request
+      const result = data as { success?: boolean; error?: string; already_resolved?: boolean; status?: string } | null;
+      if (result?.success === false || result?.error) throw new Error(result.error || t(`${prefix}.${decision}Failed`));
+      if (result?.already_resolved) toast.info(t(`${prefix}.alreadyResolved`, { status: result.status }));
+      else if (decision === 'approve') toast.success(t(`${prefix}.joined`, { name: nameOf(request), role: roleText(role ?? 'editor') }));
+      else toast.success(t(`${prefix}.declined`));
+      // Do not close a different row's sheet if this request resolves later.
+      setSheet(current => current?.request.id === request.id ? null : current);
+      const keys = decision === 'approve'
+        ? ['business-access-requests', 'business-team-members', 'business-team', 'business-invites', 'business-pending-requests-count', 'business-members', 'business-membership']
+        : ['business-access-requests', 'business-pending-requests-count'];
       void Promise.allSettled([
-        queryClient.invalidateQueries({ queryKey: ['business-access-requests', businessId] }),
-        queryClient.invalidateQueries({ queryKey: ['business-team-members', businessId] }),
-        queryClient.invalidateQueries({ queryKey: ['business-team', businessId] }),
-        queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] }),
-        queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count', businessId] }),
-        queryClient.invalidateQueries({ queryKey: ['business-members', businessId] }),
-        queryClient.invalidateQueries({ queryKey: ['business-membership', businessId] }),
-        queryClient.invalidateQueries({ queryKey: ['activity-feed'] }),
-        queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] }),
-        queryClient.invalidateQueries({ queryKey: ['notifications'] }),
-        queryClient.invalidateQueries({ queryKey: ['unread-notifications-count'] }),
+        ...keys.map(key => queryClient.invalidateQueries({ queryKey: [key, businessId] })),
+        ...['activity-feed', 'activity-unread-count', 'notifications', 'unread-notifications-count'].map(key => queryClient.invalidateQueries({ queryKey: [key] })),
       ]);
-    } catch (e: unknown) {
-      AppLog.error('AccessRequestsSection', 'Approve error:', e);
-      toast.error((e as Error)?.message ?? 'Failed to approve request');
+    } catch (error) {
+      AppLog.error('AccessRequestsSection', `${decision} error:`, error);
+      toast.error(error instanceof Error ? error.message : t(`${prefix}.${decision}Failed`));
     } finally {
-      setLoadingId(null);
+      pendingRef.current.delete(request.id);
+      setPending(new Set(pendingRef.current));
     }
   };
-
-  // Keep the existing decline recovery/toasts while using the authoritative RPC.
-  const handleDecline = async (request: AccessRequest) => {
-    // Prevent double-click
-    if (loadingId) return;
-    
-    const requesterName = request.requester.display_name || request.requester.username || 'A user';
-    setLoadingId(request.id);
-    
-    // Ticket B: Close dialog FIRST, then wait for animation before proceeding
-    setConfirmDecline(null);
-    
-    // Wait for dialog close animation to complete and Radix cleanup
-    await new Promise(resolve => setTimeout(resolve, 150));
-    
-    try {
-      const { data, error } = await (supabase.rpc as any)(
-        'decide_business_access_request',
-        { p_request_id: request.id, p_decision: 'decline', p_role: null }
-      );
-
-      if (error) throw error;
-      if (data?.success === false || data?.error) throw new Error(data?.error || 'Failed to decline request');
-
-      if (data?.already_resolved) {
-        toast.info(`Request already ${data.status}`);
-      } else {
-        toast.success(`Declined ${requesterName}'s request`);
-      }
-
-      // Wait another frame to ensure UI is stable before invalidations
-      await new Promise(resolve => requestAnimationFrame(resolve));
-
-      // Invalidate relevant queries (fire-and-forget so UI always recovers)
-      // Include notifications + unread-count to clear orange dot for this resolved request
-      void Promise.allSettled([
-        queryClient.invalidateQueries({ queryKey: ['business-access-requests', businessId] }),
-        queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count', businessId] }),
-        queryClient.invalidateQueries({ queryKey: ['activity-feed'] }),
-        queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] }),
-        queryClient.invalidateQueries({ queryKey: ['notifications'] }),
-        queryClient.invalidateQueries({ queryKey: ['unread-notifications-count'] }),
-      ]);
-    } catch (e: unknown) {
-      AppLog.error('AccessRequestsSection', 'Decline error:', e);
-      toast.error((e as Error)?.message ?? 'Failed to decline request');
-    } finally {
-      setLoadingId(null);
-    }
-  };
-
-  if (!canManage) return null;
-  if (isLoading) return null;
-
-  /* ZERO REQUESTS -> NOTHING. Not a heading, not the word "None". Requests
-     arrive as notifications; a placeholder announcing its own absence sat
-     above the only thing on the page that matters. */
-  if (!requests || requests.length === 0) return null;
-
-  return (
-    <>
-      <section
-        className="mb-6"
-        style={{
-          background: BIZ.card,
-          border: `1px solid ${BIZ.hair}`,
-          borderRadius: 14,
-          padding: '4px 16px',
-        }}
-      >
-        <div className="pt-3 pb-1 flex items-center justify-between">
-          <span style={BIZ_KICKER}>{t('business.team.manage.accessRequests')}</span>
-          <span style={bizFigure(15)}>{requests.length}</span>
-        </div>
-
-        {/* Request cards */}
-        <div className="space-y-3" style={{ paddingBottom: 12 }}>
-            {requests.map((request) => {
-              const requesterName = request.requester.display_name || request.requester.username || 'A user';
-              const roleLabel = getRoleLabel(request.requested_role);
-              const timeAgo = formatRelativeAgoLong(request.created_at).replace(/ ago$/, '');
-
-              return (
-                <div 
-                  key={request.id} 
-                  className="p-3 rounded-sq-sm bg-card border border-border/[0.05] space-y-2"
-                >
-                  {/* Top row: Avatar + Name + Role */}
-                  <div className="flex items-start gap-3">
-                    <SquircleAvatar
-                      src={request.requester.profile_photo_url || undefined}
-                      alt={requesterName}
-                      userId={request.requester_user_profile_id}
-                      size={40}
-                      hairlineRing
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="truncate" style={{ fontSize: 14.5, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK }}>
-                        {requesterName}
-                      </p>
-                      <p style={{ ...BIZ_BODY, marginTop: 2 }}>
-                        Requested {roleLabel} access
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Optional message */}
-                  {request.message && (
-                    <div className="mt-2">
-                      <p className="text-[12px] font-medium text-muted-foreground/70 mb-0.5">
-                        Message
-                      </p>
-                      <p className="text-[13px] font-normal leading-[18px] text-foreground">
-                        {request.message}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Timestamp */}
-                  <p className="text-[12px] font-normal text-muted-foreground/70 mt-1.5">
-                    Requested {timeAgo} ago
-                  </p>
-
-                  {/* Action buttons */}
-                  <div className="flex gap-2 mt-2.5 justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setConfirmDecline(request)}
-                      disabled={loadingId !== null}
-                      className="h-9 px-3.5 rounded-sq-xs text-[14px] font-semibold text-destructive border-destructive/30 hover:bg-destructive/10"
-                    >
-                      {loadingId === request.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        'Decline'
-                      )}
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => setConfirmApprove(request)}
-                      disabled={loadingId !== null}
-                      className="h-9 px-3.5 rounded-sq-xs text-[14px] font-semibold bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0"
-                    >
-                      {loadingId === request.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        'Approve'
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              );
+  if (!canManage || query.isPending || query.isError || !query.data?.length) return null;
+  const activeRequest = sheet?.request;
+  const first = activeRequest ? firstOf(activeRequest) : '';
+  const busy = !!activeRequest && pending.has(activeRequest.id);
+  return <>
+    <section className="team-requests" data-team-requests>
+      <div className="team-request-kicker"><span>{t(`${prefix}.askedToJoin`)}</span><span className="team-request-count">{query.data.length}</span></div>
+      {query.data.map(request => {
+        const name = nameOf(request);
+        const date = requestWhen(request.created_at, new Date());
+        const when = date.key === 'date' ? date.value : t(`${prefix}.${date.key}`);
+        const playsHere = requestPlaysHere(clubId, request.requester);
+        const meta = playsHere ? t(`${prefix}.playsHere`, { when }) : request.requester.username
+          ? t(`${prefix}.usernameAsked`, { username: request.requester.username, when }) : t(`${prefix}.asked`, { when });
+        return <div className="team-request-row" key={request.id} data-request-id={request.id}>
+          <div className="team-request-avatar">{request.requester.profile_photo_url ? <img src={request.requester.profile_photo_url} alt={name} /> : teamInitials(name)}</div>
+          <div className="team-request-person">
+            <div className="team-request-name"><span>{name}</span><span className="team-request-role">{roleText(getRoleLabel(request.requested_role).toLowerCase())}</span></div>
+            <p className="team-request-meta" data-plays-here={playsHere}>{meta}</p>
+            {request.message && <blockquote className="team-request-quote">{request.message}</blockquote>}
+            <div className="team-request-actions">
+              <Button variant="ghost" className="team-request-pill team-request-pill--approve" data-request-action="approve" onClick={() => open(request, 'approve')} disabled={pending.has(request.id)}>{t(`${prefix}.approve`)}</Button>
+              <Button variant="ghost" className="team-request-pill" data-request-action="decline" onClick={() => open(request, 'decline')} disabled={pending.has(request.id)}>{t(`${prefix}.decline`)}</Button>
+            </div>
+          </div>
+        </div>;
+      })}
+    </section>
+    <BottomSheet open={!!sheet} onClose={() => setSheet(null)} ariaLabelledBy="team-decision-title" className="team-decision-sheet" scrollBody>
+      {activeRequest && <>
+        <h2 id="team-decision-title" className="team-sheet-title">{t(`${prefix}.${sheet?.decision === 'approve' ? 'addTitle' : 'declineTitle'}`, { name: nameOf(activeRequest), business: businessName })}</h2>
+        <p className="team-sheet-line">{t(`${prefix}.${sheet?.decision === 'approve' ? 'addLine' : 'declineLine'}`, { first })}</p>
+        {sheet?.decision === 'approve' && <>
+          <div className="team-request-kicker team-sheet-kicker">{t(`${prefix}.role`)}</div>
+          <div role="radiogroup" aria-label={t(`${prefix}.role`)} className="team-role-cards">
+            {(['admin', 'editor', 'analyst'] as const).map(role => {
+              const asked = getRoleLabel(activeRequest.requested_role).toLowerCase() === role;
+              return <Button variant="ghost" role="radio" aria-checked={selectedRole === role} key={role} className="team-role-card" onClick={() => setSelectedRole(role)}>
+                <span className="team-role-radio" aria-hidden="true" />
+                <span className="team-role-content"><span className="team-role-title">{roleText(role)}{asked && <span className="team-role-asked" data-requested-role={role}>{t(`${prefix}.askedFor`, { first })}</span>}</span><span className="team-role-description">{t(`${prefix}.descriptions.${role}`, { business: businessName })}</span></span>
+              </Button>;
             })}
+          </div>
+        </>}
+        <div className="team-sheet-buttons">
+          <Button variant="ghost" className="team-sheet-confirm" data-team-confirm={sheet?.decision} disabled={busy} onClick={() => { if (sheet) void decide(activeRequest, sheet.decision, sheet.decision === 'approve' ? selectedRole : null); }}>{sheet?.decision === 'approve' ? t(`${prefix}.addAs`, { role: roleText(selectedRole) }) : t(`${prefix}.decline`)}</Button>
+          <Button variant="ghost" className="team-sheet-cancel" onClick={() => setSheet(null)}>{t('action.cancel')}</Button>
         </div>
-      </section>
-
-      {/* Approve Confirmation Modal */}
-      <AlertDialog open={!!confirmApprove} onOpenChange={(open) => !open && setConfirmApprove(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle style={TITLE}>Approve request?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Add {confirmApprove?.requester.display_name || confirmApprove?.requester.username || 'this user'} to {businessName} as {getRoleLabel(confirmApprove?.requested_role || '')}.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={loadingId !== null}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={() => confirmApprove && handleApprove(confirmApprove)}
-              disabled={loadingId !== null}
-            >
-              {loadingId === confirmApprove?.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Approve
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Decline Confirmation Modal */}
-      <AlertDialog open={!!confirmDecline} onOpenChange={(open) => !open && setConfirmDecline(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle style={TITLE}>Decline request?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Decline {confirmDecline?.requester.display_name || confirmDecline?.requester.username || 'this user'}'s request to join {businessName}.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={loadingId !== null}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={() => confirmDecline && handleDecline(confirmDecline)}
-              disabled={loadingId !== null}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {loadingId === confirmDecline?.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Decline
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
-  );
+      </>}
+    </BottomSheet>
+  </>;
 }

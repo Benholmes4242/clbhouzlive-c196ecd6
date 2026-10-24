@@ -311,6 +311,49 @@
       "count_one": "[~~{{count}} ƥéřšőñ~~]",
       "count_other": "[~~{{count}} ƥéőƥļé~~]",
       "member": "[~~Ţéáɱ ɱéɱƀéř~~]",
+      "sectionOne": {
+        "title": "[~~Téám~~]",
+        "invite": "[~~Ínvíté~~]",
+        "runs_one": "[~~{{count}} pérsón rúns {{business}}~~]",
+        "runs_other": "[~~{{count}} péóplé rún {{business}}~~]",
+        "requests_one": "[~~{{count}} pérsón áskéd tó jóín~~]",
+        "requests_other": "[~~{{count}} péóplé áskéd tó jóín~~]",
+        "live_one": "[~~{{count}} ínvíté wáítíng fór {{name}}~~]",
+        "live_other": "[~~{{count}} ínvítés wáítíng~~]",
+        "expired_one": "[~~{{name}}'s ínvíté hás éxpíréd~~]",
+        "expired_other": "[~~{{count}} ínvítés hávé éxpíréd~~]",
+        "askedToJoin": "[~~Áskéd tó jóín~~]",
+        "user": "[~~Á úsér~~]",
+        "today": "[~~tódáy~~]",
+        "yesterday": "[~~yéstérdáy~~]",
+        "playsHere": "[~~Pláys héré · Áskéd {{when}}~~]",
+        "usernameAsked": "[~~@{{username}} · Áskéd {{when}}~~]",
+        "asked": "[~~Áskéd {{when}}~~]",
+        "approve": "[~~Áppróvé~~]",
+        "decline": "[~~Déclíné~~]",
+        "addTitle": "[~~Ádd {{name}} tó {{business}}~~]",
+        "addLine": "[~~Chóósé whát {{first}} cán dó. Yóú cán chángé ít látér.~~]",
+        "declineTitle": "[~~Déclíné {{name}}'s réqúést?~~]",
+        "declineLine": "[~~{{first}} wíll bé tóld ít wásn't áppróvéd, ánd cán ásk ágáín látér.~~]",
+        "role": "[~~Rólé~~]",
+        "roles": {
+          "admin": "[~~Ádmín~~]",
+          "editor": "[~~Édítór~~]",
+          "analyst": "[~~Ánályst~~]"
+        },
+        "askedFor": "[~~{{first}} áskéd fór thís~~]",
+        "descriptions": {
+          "admin": "[~~Évérythíng éxcépt délétíng thé búsínéss: téám, vérífícátíón, révíéws, pósts, prófílé.~~]",
+          "editor": "[~~Pósts ás {{business}} ánd édíts thé prófílé. Cán't mánágé thé téám.~~]",
+          "analyst": "[~~Séés ínsíghts ónly. Cán't póst ór édít.~~]"
+        },
+        "addAs": "[~~Ádd ás {{role}}~~]",
+        "joined": "[~~{{name}} jóínéd ás {{role}}~~]",
+        "declined": "[~~Réqúést déclínéd~~]",
+        "alreadyResolved": "[~~Réqúést álréády {{status}}~~]",
+        "approveFailed": "[~~Fáíléd tó áppróvé réqúést~~]",
+        "declineFailed": "[~~Fáíléd tó déclíné réqúést~~]"
+      },
       "role": {
         "owner": "[~~Őŵñéř~~]",
         "admin": "[~~Ṁáñáĝéř~~]",
@@ -318,7 +361,6 @@
         "analyst": "[~~Áñáļýšţ~~]"
       },
       "manage": {
-        "accessRequests": "[~~Áĉĉéšš řéʠúéšţš~~]",
         "addJobTitle": "[~~Áđđ ĵőƀ ţíţļé~~]",
         "addJobTitleAria": "[~~Áđđ ĵőƀ ţíţļé~~]",
         "editJobTitleAria": "[~~Éđíţ ĵőƀ ţíţļé~~]",

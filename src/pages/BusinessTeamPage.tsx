@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   MoreHorizontal, Trash2,
-  Eye, EyeOff, Mail, AtSign, UserPlus, Plus, Pencil, ChevronRight,
+  Eye, EyeOff, Mail, AtSign, Plus, Pencil, ChevronRight,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -21,6 +21,9 @@ import {
   BUSINESS_ROLE_LABELS, BusinessMember, BusinessRole, AssignableBusinessRole,
 } from '@/hooks/useBusinessTeam';
 import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';
+import { TeamSummary, TeamSubtitle } from '@/components/business/TeamSummary';
+import { useBusinessAccessRequests } from '@/hooks/useBusinessAccessRequests';
+import { Button } from '@/components/ui/button';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTranslation } from 'react-i18next';
@@ -31,9 +34,8 @@ import {
 /* NO PRIVATE PALETTE - see BusinessReviewsPage. Shared manage vocabulary,
    derived from the analytical `A` ramp. Declare a colour here and the next
    import-tracing audit cannot see this file. */
-import { INK, INK_45, HAIR, CARD_BG, PAGE_BG, DANGER } from '@/components/manage/ui';
+import { INK, INK_45, HAIR, CARD_BG, DANGER } from '@/components/manage/ui';
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
-import { surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 const ASSIGNABLE_ROLES: AssignableBusinessRole[] = ['admin', 'editor', 'analyst'];
 
@@ -183,10 +185,12 @@ export default function BusinessTeamPage() {
 
   useHideBottomNav();
 
-  const { data: membership } = useBusinessMembership(businessId);
+  const membershipQuery = useBusinessMembership(businessId);
+  const { data: membership } = membershipQuery;
   const { data: business } = useBusinessProfile(businessId);
   const { data: team, isLoading: teamLoading, isError: teamError, refetch: refetchTeam } = useBusinessTeam(businessId);
-  const { data: invites } = useBusinessInvites(businessId);
+  const invitesQuery = useBusinessInvites(businessId);
+  const { data: invites } = invitesQuery;
   const removeMember = useRemoveMember(businessId || '');
   const updateRole = useUpdateMemberRole(businessId || '');
   const revokeInvite = useRevokeInvite(businessId || '');
@@ -201,6 +205,7 @@ export default function BusinessTeamPage() {
   });
 
   const canManage = !!membership?.canManage;
+  const requestsQuery = useBusinessAccessRequests(businessId, canManage);
   const pendingInvites = (invites || []).filter((i) => i.status === 'pending');
 
   const handleRemoveMember = async () => {
@@ -345,18 +350,26 @@ export default function BusinessTeamPage() {
   };
 
   return (
-    <ManagePageShell title="Manage team">
-      <main className="px-4 pt-4 pb-22 max-w-lg mx-auto">
+    <ManagePageShell
+      title={t('business.team.sectionOne.title')}
+      subtitle={business?.name ? <TeamSubtitle name={business.name} /> : undefined}
+      right={canManage ? <Button variant="ghost" className="team-header-invite" onClick={() => navigate(`/business/${businessId}/team/invite`)}><Plus size={16} strokeWidth={1.9} />{t('business.team.sectionOne.invite')}</Button> : undefined}
+    >
+      {/* CB75: shell owns the normal safe-area+32 bottom; no duplicate CTA clearance.
+          Summary/card share one requests observer. Section-two contents stay unchanged. */}
+      <main className="px-4 pb-0 max-w-lg mx-auto">
+        <TeamSummary team={team || []} invites={invitesQuery.isError ? [] : invites || []}
+          businessName={business?.name || ''} loading={teamLoading} failed={teamError}
+          canManage={canManage} requestCount={requestsQuery.isError ? 0 : requestsQuery.data?.length || 0}
+          waitingSettled={!membershipQuery.isPending && !invitesQuery.isPending && (!canManage || !requestsQuery.isPending)} />
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="mb-4" style={BIZ_BODY}>
-            Invite people to help manage this business. Public members appear on your profile's Team tab.
-          </p>
-
           <AccessRequestsSection
             businessId={businessId}
             businessName={business?.name || 'Business'}
             businessAvatarUrl={business?.logo_url}
             canManage={canManage}
+            clubId={business?.club_id}
+            requestsQuery={requestsQuery}
           />
 
           {/* MEMBERS */}
@@ -486,42 +499,6 @@ export default function BusinessTeamPage() {
           )}
         </motion.div>
       </main>
-
-      {/* Sticky CTA */}
-      {canManage && (
-        <div
-          className="fixed left-0 right-0 pointer-events-none"
-          style={{ bottom: 0, zIndex: 40 }}
-        >
-          <div
-            className="pointer-events-auto md:max-w-[440px] md:mx-auto px-4"
-            style={{
-              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
-              paddingTop: 12,
-              background: `linear-gradient(to top, ${PAGE_BG} 60%, ${surfaceWithAlpha(PAGE_BG, 0)})`,
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => navigate(`/business/${businessId}/team/invite`)}
-              className="w-full flex items-center justify-center gap-2 active:opacity-90"
-              style={{
-                minHeight: 50,
-                borderRadius: 999,
-                background: INK,
-                color: A.CANVAS,
-                fontSize: 14.5,
-                fontWeight: 700,
-                letterSpacing: '-0.01em',
-                border: 'none',
-              }}
-            >
-              <UserPlus size={18} strokeWidth={2.25} />
-              Invite teammate
-            </button>
-          </div>
-        </div>
-      )}
 
       <ConfirmModal
         isOpen={removeConfirm.open}
