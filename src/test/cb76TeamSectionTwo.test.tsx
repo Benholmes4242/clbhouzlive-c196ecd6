@@ -133,6 +133,17 @@ describe('CB76 menu and sheets', () => {
     await waitFor(() => expect(mocks.rpc).toHaveBeenCalledWith('update_business_member_role', { p_business_id: 'biz', p_member_user_id: 'ed', p_new_role: 'analyst' }));
     await waitFor(() => expect(mocks.success).toHaveBeenCalledWith('Ed is now an Analyst'));
   });
+  it('role sheet disabled button says what is missing until a different role is picked', async () => {
+    mount([m('olivia', 'owner'), m('ed', 'editor')]);
+    fireEvent.click((await openMenu('ed')).querySelector('[data-menu-item="role"]') as HTMLElement);
+    const dialog = screen.getByRole('dialog');
+    const confirm = dialog.querySelector('[data-team-list-confirm]') as HTMLButtonElement;
+    expect(confirm.disabled).toBe(true);
+    expect(confirm.textContent).toBe('Choose a new role');
+    fireEvent.click(within(dialog).getByRole('radio', { name: /Admin/ }));
+    expect(confirm.disabled).toBe(false);
+    expect(confirm.textContent).toBe('Make Ed an Admin');
+  });
   it('job title has maxLength 40 and a counter; Remove sends empty', async () => {
     mount([m('olivia', 'owner'), m('ed', 'editor', { job_title: 'Coach' })]);
     fireEvent.click((await openMenu('ed')).querySelector('[data-menu-item="jobTitle"]') as HTMLElement);
