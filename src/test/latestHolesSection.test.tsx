@@ -50,7 +50,7 @@ function mountTab(entry = '/courses/course?tab=media&hole=4&shot=selected') {
 
 
 function latest(id: string, overrides: Partial<LatestHoleMedia> = {}): LatestHoleMedia {
-  return { id, course_id: `course-${id}`, course_name: `Course ${id}`, hole_no: 4, media_type: 'image', media_url: `/photo-${id}.jpg`, poster_url: null, stream_id: null, duration_seconds: null, exif_captured_at: '2026-09-14T12:00:00Z', created_at: '2026-10-24T12:00:00Z', member_id: 'member', member_name: 'Thomas Holmes', par: 3, yards: 182, ...overrides };
+  return { id, course_id: `course-${id}`, course_name: `Course ${id}`, hole_no: 4, media_type: 'image', media_url: `/photo-${id}.jpg`, poster_url: null, stream_id: null, duration_seconds: null, exif_captured_at: '2026-09-14T12:00:00Z', added_at: '2025-06-12T10:00:00Z', created_at: '2026-10-24T12:00:00Z', member_id: 'member', member_name: 'Thomas Holmes', par: 3, yards: 182, ...overrides };
 }
 function Location() { const location = useLocation(); return <output data-testid="destination">{location.pathname}{location.search}</output>; }
 function mountRail() { return render(<MemoryRouter><LatestHolesSection /><Location /></MemoryRouter>); }
