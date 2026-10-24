@@ -33,6 +33,8 @@ export interface IdentitySectionProps {
   businessName: string;
   setBusinessName: (v: string) => void;
   isClubLinked: boolean;
+  /** CB78: editors see the name read-only (the database refuses it). */
+  nameLocked?: boolean;
   existingBusinessForClub: { id: string; name: string } | null;
   /** What the duplicate is matched on — worded in the warning. */
   existingSubject?: 'club' | 'college';
@@ -57,6 +59,7 @@ export function IdentitySection({
   businessName,
   setBusinessName,
   isClubLinked,
+  nameLocked = false,
   existingBusinessForClub,
   existingSubject = 'club',
   onRequestAccess,
@@ -163,6 +166,14 @@ export function IdentitySection({
                 >
                   Can't find your course? Request we add it
                 </button>
+              </>
+            ) : nameLocked && mode === 'edit' && !isClubLinked ? (
+              <>
+                <div className={LOCKED_CLASS} style={LOCKED_STYLE} data-name-locked="">
+                  <Lock className="w-4 h-4 flex-shrink-0" />
+                  {businessName}
+                </div>
+                <p className={HINT_CLASS}>Only owners and admins can change the name.</p>
               </>
             ) : isClubLinked ? (
               <>

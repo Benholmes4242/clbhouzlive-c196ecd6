@@ -293,22 +293,25 @@ function StatCell({ label, value, tone = 'ink' }: { label: string; value: string
 
 /* ─────────────── Review card ─────────────── */
 
-function ReviewCard({
+export function ReviewCard({
   r,
   currentUserId,
   onReply,
   onEdit,
   onDelete,
+  canReply,
 }: {
   r: BusinessReview;
   currentUserId: string | undefined;
+  /** CB78 Part C: owners/admins only, matching review_responses INSERT. */
+  canReply: boolean;
   onReply: (r: BusinessReview) => void;
   onEdit: (r: BusinessReview) => void;
   onDelete: (r: BusinessReview) => void;
 }) {
   const name = r.reviewer.display_name || r.reviewer.username || 'Golfer';
   const hasReply = !!r.response;
-  const isOwnReply = hasReply && r.response?.responded_by === currentUserId;
+  const isOwnReply = canReply && hasReply && r.response?.responded_by === currentUserId;
 
   const bodyRef = useRef<HTMLParagraphElement>(null);
   const [expanded, setExpanded] = useState(false);
@@ -420,10 +423,11 @@ function ReviewCard({
             </div>
           )}
         </div>
-      ) : (
+      ) : canReply ? (
         <>
           <div style={{ height: 1, background: HAIR, margin: '11px -14px' }} />
           <button
+            data-write-reply=""
             onClick={() => onReply(r)}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-bold active:opacity-80"
             style={{ background: APPLIED_FILL, color: INK, border: 'none', borderRadius: 11 }}
@@ -431,7 +435,7 @@ function ReviewCard({
             <MessageSquare size={12} strokeWidth={2.5} /> Write a reply
           </button>
         </>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -679,6 +683,7 @@ export default function BusinessReviewsPage() {
                   key={r.id}
                   r={r}
                   currentUserId={currentUserId}
+                  canReply={canManage}
                   onReply={(rv) => setReplyTarget({ review: rv, mode: 'create' })}
                   onEdit={(rv) => setReplyTarget({ review: rv, mode: 'edit' })}
                   onDelete={(rv) => setDeleteTarget(rv)}
@@ -696,7 +701,7 @@ export default function BusinessReviewsPage() {
         </motion.div>
       </main>
 
-      {replyTarget && (
+      {replyTarget && canManage && (
         <ReplySheet
           open={!!replyTarget}
           onClose={() => setReplyTarget(null)}

@@ -545,6 +545,47 @@
         "loadFailed": "Couldn't load your team",
         "loadFailedLine": "Check your connection and try again.",
         "retry": "Retry"
+      },
+      "sectionFour": {
+        "rolesKicker": "What each role can do",
+        "activityKicker": "Recent team activity",
+        "abilities": {
+          "post": "Post as {{business}}",
+          "edit": "Edit the profile",
+          "insights": "See insights",
+          "reply": "Reply to reviews",
+          "team": "Manage the team",
+          "verify": "Verification and course claims",
+          "delete": "Delete the business"
+        },
+        "note": "Owners and admins see the team's activity. Your own column is the bright one.",
+        "you": "You",
+        "seeAll": "See all activity",
+        "kinds": {
+          "post": "posted as {{business}}",
+          "post_folded_one": "posted {{count}} time as {{business}}",
+          "post_folded_other": "posted {{count}} times as {{business}}",
+          "review_reply": "replied to a review",
+          "review_reply_folded_one": "replied to {{count}} review",
+          "review_reply_folded_other": "replied to {{count}} reviews",
+          "team_invite_sent": "invited {{person}} as an {{role}}",
+          "team_invite_resent": "resent {{person}}'s invite",
+          "team_invite_role_changed": "changed {{person}}'s invite to {{role}}",
+          "team_invite_accepted": "joined as an {{role}}",
+          "team_request_approved": "added {{person}} as an {{role}}",
+          "team_request_declined": "declined {{person}}'s request",
+          "team_role_changed": "made {{person}} an {{role}}",
+          "team_ownership_transferred": "made {{person}} the owner",
+          "team_member_removed": "removed {{person}}",
+          "team_member_left": "left the team"
+        },
+        "time": {
+          "now": "now",
+          "hours_one": "{{count}}h",
+          "hours_other": "{{count}}h",
+          "today": "Today",
+          "yesterday": "Yesterday"
+        }
       }
     },
     "hero": {

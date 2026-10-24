@@ -79,6 +79,7 @@ export function TeamListSection({ businessId, businessName, team, viewerRole, vi
   const refresh = (extra: string[] = []) => Promise.allSettled([
     queryClient.invalidateQueries({ queryKey: ['business-team', businessId] }),
     queryClient.invalidateQueries({ queryKey: ['business-team-activity', businessId] }),
+    queryClient.invalidateQueries({ queryKey: ['business-team-feed', businessId] }),
     ...extra.map(key => queryClient.invalidateQueries({ queryKey: [key, businessId] })),
   ]);
 

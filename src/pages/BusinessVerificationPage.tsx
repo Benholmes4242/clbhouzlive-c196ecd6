@@ -14,7 +14,7 @@
  *
  * NOTHING about the Phase 1-5B logic, RPCs, states or queries changes here.
  */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -24,6 +24,7 @@ import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { INK, INK_45, INK_60, HAIR, SF_STACK, ManageCard } from '@/components/manage/ui';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import {
   useBusinessVerificationRealtime,
@@ -66,7 +67,15 @@ const CRITERIA_PATH = '/legal/business-verification';
 export default function BusinessVerificationPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { user } = useSupabaseSession();
+  const { user, session, loading: sessionLoading } = useSupabaseSession();
+  // CB78 Part C: owners and admins only. Waits for session and membership
+  // (CB74.1 pattern) so an owner is never bounced on a cold open.
+  const { data: membership, isPending: membershipPending } = useBusinessMembership(id);
+  const waitingRole = sessionLoading || (!!session?.user?.id && membershipPending);
+  const canManage = !!membership?.canManage;
+  useEffect(() => {
+    if (!waitingRole && !canManage) navigate('/businesses/manage', { replace: true });
+  }, [waitingRole, canManage, navigate]);
 
   useHideBottomNav();
   useBusinessVerificationRealtime(id);
@@ -122,6 +131,8 @@ export default function BusinessVerificationPage() {
       verified={state === 'verified'}
     />
   ) : null;
+
+  if (waitingRole || !canManage) return null;
 
   return (
     <ManagePageShell title="Verification">
