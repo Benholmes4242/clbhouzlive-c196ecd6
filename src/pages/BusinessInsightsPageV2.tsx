@@ -19,7 +19,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Lock, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
@@ -30,6 +30,7 @@ import { useBusinessInsights } from '@/hooks/useBusinessInsights';
 import { useBusinessInsightsFunnel } from '@/hooks/useBusinessInsightsFunnel';
 import { InsightsFunnel } from '@/components/business/insights/InsightsFunnel';
 import { InsightsVisitsSection } from '@/components/business/insights/InsightsVisitsSection';
+import { InsightsAudienceSection } from '@/components/business/insights/InsightsAudienceSection';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Button } from '@/components/ui/button';
@@ -369,33 +370,12 @@ const BusinessInsightsPageV2 = () => {
           <InsightsVisitsSection businessId={business.id} range={dateRange} />
         </div>
 
-        {/* ── AUDIENCE (locked) ──
-            The four handicap bands and the four "Location {i}" rows are GONE.
-            They were a mock-up of data that does not exist, shown to a paying
-            business as though it were real data greyed out. What stands here
-            is the member's REAL unique-visitor count and the real reason the
-            breakdown is withheld. NOTE: the unlock threshold is not defined
-            anywhere in the codebase, so no target number is claimed here -
-            see the report accompanying this change. */}
-        <InsightCard
-          kicker="AUDIENCE"
-          title="Who's viewing you"
-          action={
-            <span className="inline-flex items-center gap-1" style={BIZ_LABEL}>
-              <Lock style={{ width: 9, height: 9 }} /> {t('business.insights.audience.locked')}
-            </span>
-          }
-        >
-          <ChartInset height={120} center>
-            {insightsLoading ? (
-              <Skeleton className="h-8 w-16" />
-            ) : (
-              <span className="tabular-nums" style={bizFigure(30)}>{formatNum(h.unique_visitors.value)}</span>
-            )}
-            <p style={{ ...BIZ_LABEL, marginTop: 7 }}>{t('business.insights.audience.visitorsLabel')}</p>
-          </ChartInset>
-          <p style={BIZ_BODY}>{t('business.insights.audience.body')}</p>
-        </InsightCard>
+        {/* ── CB84: YOUR GOLFERS (replaces the permanently locked "Who's
+            viewing you" card). Draws nothing until the audience read settles,
+            nothing at all if it fails, and ignores the 7/30/90 picker. ── */}
+        <div className="-mx-4 md:-mx-6 !mt-0">
+          <InsightsAudienceSection businessId={business.id} businessName={business.name} />
+        </div>
 
         {/* ── FOLLOWERS ── */}
         <InsightCard
