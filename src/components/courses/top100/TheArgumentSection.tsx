@@ -17,9 +17,12 @@ interface Props {
   qualifying: number;
   showGolfersLink: boolean;
   onSeeGolfersList: () => void;
+  /** BRIEF_TOP100_MONTHLY_MOVE: golfers' position four weeks ago, per course.
+   *  Absent or missing a course = no trend line, no reserved height. */
+  baseline?: Map<string, number>;
 }
 
-function ArgumentGroup({ label, tone, rows }: { label: string; tone: string; rows: ArgumentRow[] }) {
+function ArgumentGroup({ label, tone, rows, baseline }: { label: string; tone: string; rows: ArgumentRow[]; baseline?: Map<string, number> }) {
   if (rows.length === 0) return null;
   return (
     <div style={{ marginTop: 18 }}>
@@ -27,11 +30,16 @@ function ArgumentGroup({ label, tone, rows }: { label: string; tone: string; row
         <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: tone, flexShrink: 0 }} />
         {label}
       </div>
-      <div style={{ display: 'grid', gap: ARGUMENT_ROW_GAP, marginTop: 10 }}>
+      {/* minmax(0, 1fr): a long course name ellipsises instead of pushing the
+          right-hand column off the edge (the mock hit this with
+          "Royal County Down (Championship)"). */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: ARGUMENT_ROW_GAP, marginTop: 10 }}>
         {rows.map((r) => {
           const up = r.divergence > 0;
           const rowTone = up ? A.GREEN : A.RED;
           const Arrow = up ? ArrowUp : ArrowDown;
+          /* Positive = golfers moved it UP over the last four weeks. */
+          const move = baseline?.has(r.id) ? (baseline.get(r.id) as number) - r.memberRank : null;
           return (
             <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ width: ARGUMENT_THUMB.size, height: ARGUMENT_THUMB.size, borderRadius: ARGUMENT_THUMB.radius, overflow: 'hidden', flexShrink: 0 }}>
