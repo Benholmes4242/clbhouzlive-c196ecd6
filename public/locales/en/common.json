@@ -351,6 +351,10 @@
       "follow": "FOLLOW",
       "directions": "Get directions"
     },
+    "reviews": {
+      "replyTeamMembersOnly": "Only team members can reply to reviews.",
+      "replyOwnersAdminsOnly": "Only owners and admins can reply to reviews."
+    },
     "team": {
       "kicker": "TEAM",
       "count_one": "{{count}} person",

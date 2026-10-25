@@ -116,8 +116,8 @@ describe('CB74 authoritative access decisions', () => {
   it('successful approval preserves all invalidations and adds team and invites', async () => {
     const { invalidate } = mount('requests');
     await decide('Approve');
-    await waitFor(() => expect(invalidate).toHaveBeenCalledTimes(11));
-    for (const key of ['business-access-requests', 'business-team-members', 'business-team', 'business-invites', 'business-pending-requests-count', 'business-members', 'business-membership']) {
+    await waitFor(() => expect(invalidate).toHaveBeenCalledTimes(12));
+    for (const key of ['business-access-requests', 'business-team-members', 'business-team', 'business-invites', 'business-pending-requests-count', 'business-members', 'business-membership', 'business-team-feed']) {
       expect(invalidate).toHaveBeenCalledWith({ queryKey: [key, 'biz'] });
     }
     for (const key of ['activity-feed', 'activity-unread-count', 'notifications', 'unread-notifications-count']) {
@@ -128,7 +128,8 @@ describe('CB74 authoritative access decisions', () => {
     mocks.rpc.mockResolvedValue({ data: { success: true, already_resolved: true, status: 'declined' }, error: null });
     const { invalidate } = mount('requests');
     await decide('Decline');
-    await waitFor(() => expect(invalidate).toHaveBeenCalledTimes(6));
+    await waitFor(() => expect(invalidate).toHaveBeenCalledTimes(7));
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['business-team-feed', 'biz'] });
     expect(mocks.info).toHaveBeenCalledTimes(1);
     expect(mocks.success).not.toHaveBeenCalled();
   });
