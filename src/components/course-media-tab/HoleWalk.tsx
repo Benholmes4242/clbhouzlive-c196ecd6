@@ -44,9 +44,6 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
 }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [photoId, setPhotoId] = useState<string | null>(null);
-  // Index into the open hole's READY shots (processing videos are left out);
-  // null while the fullscreen viewer is closed.
-  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   // A moved item is followed to its new hole by the caller's focus nonce.
   useEffect(() => {
     if (!focus) return;
@@ -127,14 +124,27 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
   // Every image or ready video on the hole, in panel order; processing videos
   // are left out of the viewer entirely.
   const playable = photos.filter(photo => photo.media_type !== 'video' || photo.duration_seconds != null);
-  const viewerItems: OrderedMediaItem[] = !tile ? [] : buildHoleViewerItems(
-    playable.map(photo => ({ ...photo, author: authors?.get(photo.user_id), par: tile.hole.par, yards: tile.hole.yards })),
-    { courseName, scored },
-  );
 
+  // §4 — the tapped slide opens the canonical viewer over every ready shot on
+  // the hole, one page per shot, landing on the tapped shot. The frame stays
+  // on the tapped shot when the viewer closes (it has no index callback).
   const openViewer = (id: string) => {
     const index = playable.findIndex(photo => photo.id === id);
-    if (index >= 0) setViewerIndex(index);
+    if (index < 0) return;
+    const tapped = playable[index];
+    const posts = holeShotsToFeedPosts(
+      playable.map(photo => ({ ...photo, member_id: photo.user_id, member_name: authors?.get(photo.user_id) ?? null })),
+      courseName,
+    );
+    openWithOrigin({
+      posts,
+      index,
+      originEl: null,
+      posterUrl: tapped.media_type === 'video' ? holeMediaPoster(tapped) : tapped.media_url,
+      mediaId: id,
+      openedFrom: 'course-media',
+      options: { readOnly: true },
+    });
   };
 
   const panel = tile && <section ref={panelRef} className={scored ? 'hole-walk-panel' : 'hole-walk-panel hole-walk-panel-unscored'} role="region" aria-label={`Hole ${tile.hole.hole_no}`}>
