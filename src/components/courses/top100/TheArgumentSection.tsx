@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowDown, ArrowUp, ChevronRight } from 'lucide-react';
+import { ArrowDown, ArrowUp } from 'lucide-react';
 
 import { SectionHead, SECTION_WRAP } from '@/components/courses/browse/SectionHead';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
@@ -14,9 +14,6 @@ export const ARGUMENT_ROW_GAP = 12;
 interface Props {
   higher: ArgumentRow[];
   lower: ArgumentRow[];
-
-  showGolfersLink: boolean;
-  onSeeGolfersList: () => void;
   /** BRIEF_TOP100_MONTHLY_MOVE: golfers' position four weeks ago, per course.
    *  Absent or missing a course = no trend line, no reserved height. */
   baseline?: Map<string, number>;
@@ -90,7 +87,7 @@ function ArgumentGroup({ label, rows, baseline }: { label: string; rows: Argumen
 }
 
 /** BRIEF_TOP100_GOLFERS_VS_OFFICIAL. The caller renders nothing when both groups are empty. */
-export function TheArgumentSection({ higher, lower, showGolfersLink, onSeeGolfersList, baseline }: Props) {
+export function TheArgumentSection({ higher, lower, baseline }: Props) {
   if (higher.length === 0 && lower.length === 0) return null;
   return (
     <section style={SECTION_WRAP}>
@@ -103,17 +100,6 @@ export function TheArgumentSection({ higher, lower, showGolfersLink, onSeeGolfer
       </div>
       <ArgumentGroup label="Golfers rate higher" rows={higher} baseline={baseline} />
       <ArgumentGroup label="Golfers rate lower" rows={lower} baseline={baseline} />
-
-      {showGolfersLink ? (
-        <button
-          type="button"
-          onClick={onSeeGolfersList}
-          style={{ marginTop: 18, minHeight: 44, display: 'inline-flex', alignItems: 'center', gap: 4, background: 'none', border: 0, padding: 0, fontSize: 13, fontWeight: 700, color: A.INK, cursor: 'pointer' }}
-        >
-          See the golfers' list
-          <ChevronRight size={14} strokeWidth={2.5} aria-hidden />
-        </button>
-      ) : null}
     </section>
   );
 }

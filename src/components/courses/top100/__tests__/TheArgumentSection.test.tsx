@@ -1,5 +1,5 @@
 import React from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 
 import { TheArgumentSection } from '../TheArgumentSection';
@@ -24,8 +24,6 @@ const renderSection = (props: Partial<React.ComponentProps<typeof TheArgumentSec
     <TheArgumentSection
       higher={[]}
       lower={[]}
-      showGolfersLink
-      onSeeGolfersList={vi.fn()}
       {...props}
 
     />,
@@ -100,14 +98,12 @@ describe('TheArgumentSection', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('the golfers-link button shows only when showGolfersLink and calls onSeeGolfersList', () => {
-    const onSeeGolfersList = vi.fn();
-    const { unmount } = renderSection({ higher: [row({})], showGolfersLink: true, onSeeGolfersList });
-    screen.getByRole('button', { name: /See the golfers' list/ }).click();
-    expect(onSeeGolfersList).toHaveBeenCalledTimes(1);
-    unmount();
-    renderSection({ higher: [row({})], showGolfersLink: false });
-    expect(screen.queryByRole('button', { name: /See the golfers' list/ })).toBeNull();
+  it('renders no golfers-list link', () => {
+    const { container } = renderSection({
+      higher: [row({})],
+      lower: [row({ id: 'c2', memberRank: 5, listRank: 2, divergence: -3 })],
+    });
+    expect(container.textContent).not.toContain("See the golfers' list");
   });
 });
 
