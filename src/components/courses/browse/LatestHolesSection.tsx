@@ -18,11 +18,12 @@ import './latestHoles.css';
 /** The RPC owns newest-first ordering, up to two shots per course, at most 30, and public eligibility.
  * Credit shows the month the member added the shot to clbhouz (added_at), never its EXIF capture date; this rail never starts video playback.
  * Geometry is shared with the loading shell, not PhotoFigureCard.
- * BRIEF_COURSES_LATEST_FROM_COURSES §6: a tap no longer routes to the course
- * page — it opens MediaPreviewViewer over EVERY ready shot on that hole
- * (get_hole_media, the hole walk's order), landing on the tapped shot, with
- * the rubber-band edge bounce. The ?tab=media&hole=&shot= deep link in
- * CourseMediaTabNew is unchanged.
+ * BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §2: a tap opens the CANONICAL
+ * full-screen viewer (FullscreenFeedOverlay via openWithOrigin, readOnly)
+ * over EVERY ready shot on that hole (get_hole_media, the hole walk's order),
+ * each shot its own page credited to the member who added it, landing on the
+ * tapped shot. The ?tab=media&hole=&shot= deep link in CourseMediaTabNew is
+ * unchanged.
  */
 export const LATEST_HOLE_W = 220;
 export const LATEST_HOLE_H = 293;
@@ -94,7 +95,6 @@ export function LatestHolesSection() {
   const { data, isLoading, isError } = useGamRpc<LatestHoleMedia[]>('get_latest_hole_media', { p_limit: 30 }, { staleTime: 60_000 });
   useSectionReady('latestHoles', !isLoading);
   const [pending, setPending] = useState<LatestHoleMedia | null>(null);
-  const [viewer, setViewer] = useState<{ items: ReturnType<typeof buildHoleViewerItems>; index: number } | null>(null);
 
   const holeQuery = useQuery<HoleMediaRow[]>({
     queryKey: ['hole-media', pending?.course_id, pending?.hole_no],
