@@ -590,6 +590,29 @@
           "today": "Today",
           "yesterday": "Yesterday"
         }
+      },
+      "sectionFive": {
+        "title": "Invite to team",
+        "searchPlaceholder": "Name, @handle or email",
+        "homeClubGroup": "Home club: {{club}}",
+        "followGroup": "Follow {{business}}",
+        "playsHere": "plays here",
+        "followedThisWeek": "followed this week",
+        "followedIn": "followed in {{month}}",
+        "onTheTeam": "On the team",
+        "invitePending": "Invite pending",
+        "inviteByEmail": "Invite by email",
+        "change": "Change",
+        "roleKicker": "Role",
+        "chooseSomeone": "Choose someone to invite",
+        "chooseRole": "Choose a role",
+        "inviteUserCta": "Invite {{first}} as an {{role}}",
+        "inviteEmailCta": "Invite by email as an {{role}}",
+        "finePerson": "They get a clbhouz notification and an email. Invites last 14 days.",
+        "fineEmail": "They get an email with a link to join. Anyone with the link can use it, so send it only to the right address. It lasts 14 days.",
+        "sentUser": "Invite sent to {{first}}",
+        "sentEmail": "Invite sent to {{email}}",
+        "sending": "Sending\u2026"
       }
     },
     "hero": {
