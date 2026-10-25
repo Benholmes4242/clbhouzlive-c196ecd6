@@ -1,15 +1,23 @@
 /** BRIEF_COURSES_LATEST_FROM_COURSES §1-3 — "Through members' eyes / Latest
  * from the courses": one card per course from get_latest_course_media (RPC
  * owns one row per course, newest member shot first, at most 30; we ask for
- * 15). Tapping a tile opens the course's WHOLE media set full screen through
- * the same useGalleryCourseMedia + openWithOrigin path the Watch review
- * tiles use — same order and viewer as the course Media tab. This rail never
- * starts video playback; video tiles draw their poster. */
+ * 15). BRIEF_LATEST_COURSES_FLAT_VIEWER — tapping a tile opens ONE sideways
+ * run through every photo and video of that course, starting on the tapped
+ * shot, in the same full-screen viewer the Latest holes cards use
+ * (MediaPreviewViewer with edgeBounce). The set is still the course's media
+ * from get_course_media_v2 via useGalleryCourseMedia, in the Media tab's
+ * order, flattened post-then-media; each shot is credited to the member who
+ * added it. This rail never starts video playback; video tiles draw their
+ * poster. */
 import { useEffect, useState } from 'react';
 import { useGamRpc } from '@/hooks/gam/_useGamRpc';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useGalleryCourseMedia } from '@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia';
-import { openWithOrigin } from '@/lib/openWithOrigin';
+import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
+import type { OrderedMediaItem } from '@/components/shared/media/types';
+import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
+import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
+import { buildHlsUrl } from '@/utils/streamId';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import { useSectionReady } from './PageLoadGate';
@@ -47,10 +55,10 @@ export interface LatestCourseMedia {
 
 interface PendingOpen {
   courseId: string;
+  courseName: string;
   postId: string;
   mediaId: string;
   mediaUrl: string;
-  posterUrl: string | null;
 }
 
 const tileImage = (tile: LatestCourseMediaTile) =>
@@ -63,6 +71,57 @@ function creditLine(row: LatestCourseMedia): string | null {
   if (others <= 0) return name;
   if (others === 1) return `${name} and 1 other`;
   return `${name} and ${others} others`;
+}
+
+/** BRIEF_LATEST_COURSES_FLAT_VIEWER §2 — one flat run through every shot of
+ * the course, posts in order then each post's media in order. Processing
+ * videos and videos with no playable source (no hlsUrl, mp4Url or streamId)
+ * are skipped. */
+function flattenShots(posts: readonly FeedPost[]): Array<{ post: FeedPost; item: MediaItem }> {
+  const flat: Array<{ post: FeedPost; item: MediaItem }> = [];
+  for (const post of posts) {
+    for (const item of post.mediaItems) {
+      if (item.type === 'video' && (item.isProcessing || (!item.hlsUrl && !item.mp4Url && !item.streamId))) continue;
+      flat.push({ post, item });
+    }
+  }
+  return flat;
+}
+
+/** §3 — the flat position of the tapped shot: media id, then any url match,
+ * then the first item of the tapped post, then 0. */
+function flatStartIndex(flat: Array<{ post: FeedPost; item: MediaItem }>, pending: PendingOpen): number {
+  let index = flat.findIndex(s => s.item.id === pending.mediaId);
+  if (index < 0) {
+    index = flat.findIndex(s =>
+      s.item.imageUrl === pending.mediaUrl || s.item.mp4Url === pending.mediaUrl
+      || s.item.hlsUrl === pending.mediaUrl || s.item.thumbnailUrl === pending.mediaUrl);
+  }
+  if (index < 0) index = flat.findIndex(s => s.post.id === pending.postId);
+  return index < 0 ? 0 : index;
+}
+
+/** §4 — one OrderedMediaItem per shot; the credit names the member who added
+ * it and the month they added it (addedMonthLabel, shared with the rails). */
+function toViewerItems(flat: Array<{ post: FeedPost; item: MediaItem }>, courseName: string): OrderedMediaItem[] {
+  return flat.map(({ post, item }, index) => {
+    const video = item.type === 'video';
+    const hlsUrl = video ? (item.hlsUrl ?? (item.streamId ? buildHlsUrl(item.streamId) : undefined)) : undefined;
+    const credit = [post.displayName, addedMonthLabel(post.createdAt)].filter(Boolean).join(' · ');
+    return {
+      id: item.id,
+      type: item.type,
+      order: index,
+      previewUrl: video ? (hlsUrl ? item.thumbnailUrl ?? '' : item.mp4Url ?? '') : item.imageUrl ?? '',
+      thumbnailUrl: item.thumbnailUrl ?? item.imageUrl,
+      hlsUrl,
+      caption: {
+        kicker: "Through members' eyes",
+        title: courseName,
+        credit: credit || undefined,
+      },
+    };
+  });
 }
 
 function LatestCourseCard({ row, pending, onOpen }: {
@@ -136,7 +195,7 @@ function LatestCourseCard({ row, pending, onOpen }: {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: '#FFFFFF', fontSize: 11, paddingLeft: 2,
                 }}
-              >{'\u25B6'}</span>
+              >{'▶'}</span>
             )}
             {i === 2 && row.media_count > 3 && (
               <div style={{
@@ -159,39 +218,21 @@ export function LatestCoursesSection() {
   const { data, isLoading, isError } = useGamRpc<LatestCourseMedia[]>('get_latest_course_media', { p_limit: 15 }, { staleTime: 60_000 });
   useSectionReady('latestCourses', !isLoading);
   const [pending, setPending] = useState<PendingOpen | null>(null);
+  const [viewer, setViewer] = useState<{ items: OrderedMediaItem[]; start: number } | null>(null);
   const gallery = useGalleryCourseMedia(pending?.courseId ?? null, user?.id);
 
-  // S3 — the set is the COURSE's media, in the course page's own order. Entry
-  // lands on the tapped tile: find the slide carrying that media id, with the
-  // url / post-id / first-post fallbacks in that order.
+  // §1-5 — once the course's media set arrives, flatten it into one sideways
+  // run and open MediaPreviewViewer on the tapped shot (media id, then url,
+  // then post id, then 0). An empty or errored set just clears the tap.
   useEffect(() => {
     if (!pending) return;
     if (gallery.isError) { setPending(null); return; }
     const posts = gallery.data;
     if (!posts) return;
-    if (posts.length === 0) { setPending(null); return; }
-    let index = posts.findIndex(p => p.id === pending.postId && p.mediaItems.some(m => m.id === pending.mediaId));
-    if (index < 0) {
-      index = posts.findIndex(p => p.mediaItems.some(m =>
-        m.imageUrl === pending.mediaUrl || m.mp4Url === pending.mediaUrl
-        || m.hlsUrl === pending.mediaUrl || m.thumbnailUrl === pending.mediaUrl));
-    }
-    if (index < 0) index = posts.findIndex(p => p.id === pending.postId);
-    if (index < 0) index = 0;
-    const post = posts[index];
-    const media = post.mediaItems.find(m => m.id === pending.mediaId)
-      ?? post.mediaItems.find(m => m.imageUrl === pending.mediaUrl || m.mp4Url === pending.mediaUrl
-        || m.hlsUrl === pending.mediaUrl || m.thumbnailUrl === pending.mediaUrl)
-      ?? post.mediaItems[0];
-    openWithOrigin({
-      posts,
-      index,
-      originEl: null,
-      posterUrl: pending.posterUrl,
-      mediaId: media?.id ?? null,
-      openedFrom: 'course-media',
-      options: { readOnly: true },
-    });
+    const flat = flattenShots(posts);
+    if (flat.length === 0) { setPending(null); return; }
+    const start = flatStartIndex(flat, pending);
+    setViewer({ items: toViewerItems(flat, pending.courseName), start });
     setPending(null);
   }, [gallery.data, gallery.isError, pending]);
 
@@ -210,15 +251,23 @@ export function LatestCoursesSection() {
               if (pending) return;
               setPending({
                 courseId: row.course_id,
+                courseName: row.course_name,
                 postId: tile.post_id,
                 mediaId: tile.media_id,
                 mediaUrl: tile.media_url,
-                posterUrl: tile.poster_url ?? (tile.media_type === 'video' ? holeMediaPoster(tile) : tile.media_url),
               });
             }}
           />
         ))}
       </div>
+      {viewer && (
+        <MediaPreviewViewer
+          items={viewer.items}
+          initialIndex={viewer.start}
+          edgeBounce
+          onClose={() => setViewer(null)}
+        />
+      )}
     </section>
   );
 }
