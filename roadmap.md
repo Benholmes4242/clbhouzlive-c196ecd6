@@ -1,5 +1,9 @@
 # Roadmap
 
+## BRIEF_ADMIN_HOLE_TAGGING
+- [ ] Add server-authoritative admin check, admin untagged read and optional batch credit/duplicate handling; preserve all member paths and tests.
+- [ ] Verify RPC/readback/cache rules and admin-only visibility with new tests; run full suite from2,861/347 and report limitations.
+
 ## CB83 — Insights section two
 - [x] Replaced visits/discovery with UTC bars, post markers, busiest-period sentence and merged sources; CB82 and later card source unchanged.
 - [x] Added en/en-XA and 41 tests in cb83InsightsVisits (35) / cb83InsightsLoading (6). Retargeted two named CB82 page cases only, stable post-date fixture added. Full bunx vitest run 2,861 passed/347 files, zero failures from 2,820/345; latest automatic build OK.
