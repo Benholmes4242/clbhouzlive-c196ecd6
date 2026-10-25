@@ -21893,6 +21893,7 @@ export type Database = {
           id: string
           media_type: string
           media_url: string
+          member_avatar_url: string
           member_id: string
           member_name: string
           par: number
