@@ -14,7 +14,7 @@ import { HoleWalk } from '@/components/course-media-tab/HoleWalk';
 import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
 
-afterEach(() => cleanup());
+afterEach(() => { cleanup(); f.open.mockClear(); });
 
 const hole = (n: number): CourseHole => ({ hole_no: n, par: 4, yards: 432, stroke_index: 1, avg_to_par: 0.8, avg_gross: 4.8, rounds: 10, dist: { ace: 0, albatross: 0, eagle: 0, birdie: 1, par: 5, bogey: 3, double: 1 } });
 const shot = (id: string, over: Partial<HolePhoto> = {}): HolePhoto => ({
