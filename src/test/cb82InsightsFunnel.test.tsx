@@ -204,7 +204,7 @@ describe('CB82 page', () => {
     const { container } = renderPage();
     const sawFig = () => container.querySelector('[data-row="saw"] [data-figure]')?.textContent;
     await waitFor(() => expect(sawFig()).toBe('30'));
-    fireEvent.click(screen.getByRole('button', { name: /7 days/ }) ?? screen.getByText('7 days'));
+    fireEvent.click(screen.getByText('7 days'));
     await waitFor(() => expect(pending).not.toBeNull());
     expect(sawFig()).toBe('30');
     await act(async () => { pending!({ data: raw(7), error: null }); });
