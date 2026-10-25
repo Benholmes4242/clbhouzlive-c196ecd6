@@ -8,6 +8,24 @@ const f = vi.hoisted(() => ({
   error: vi.fn(), success: vi.fn(), invoke: vi.fn(),
   session: { user: { id: 'viewer' } } as { user: { id: string } | null },
 }));
+
+/**
+ * Thenable query-chain stub. A table result is either a plain PostgREST-style
+ * result ({ data, error }) used for every terminal, or { maybe, list } when a
+ * flow hits the same table through maybeSingle (lookup) and an awaited
+ * update/delete .select('id') (the write) with different outcomes.
+ */
+function chainable(result: any) {
+  const c: any = {};
+  for (const m of ['select', 'eq', 'in', 'or', 'order', 'update', 'delete', 'insert', 'limit', 'range']) c[m] = () => c;
+  const split = result && typeof result === 'object' && ('maybe' in result || 'list' in result);
+  c.maybeSingle = async () => (split ? result.maybe : result);
+  c.single = async () => (split ? result.maybe : result);
+  c.then = (res: (v: unknown) => unknown, rej: (e: unknown) => unknown) =>
+    Promise.resolve(split ? result.list : result).then(res, rej);
+  return c;
+}
+
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     from: (table: string) => chainable(f.tables[table] ?? { data: null, error: null }),
@@ -20,16 +38,6 @@ vi.mock('@/utils/toast', () => ({ showToast: vi.fn() }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ session: f.session, loading: false }) }));
 vi.mock('@/lib/mentions/syncMentions', () => ({ syncMentionsForContent: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ AppLog: { debug: vi.fn(), error: vi.fn() } }));
-
-/** Thenable query-chain stub: every builder method returns the chain, awaiting it resolves the configured result. */
-function chainable(result: unknown) {
-  const c: Record<string, unknown> = {};
-  for (const m of ['select', 'eq', 'in', 'or', 'order', 'update', 'delete', 'insert', 'limit', 'range']) c[m] = () => c;
-  c.maybeSingle = async () => result;
-  c.single = async () => result;
-  c.then = (res: (v: unknown) => unknown, rej: (e: unknown) => unknown) => Promise.resolve(result).then(res, rej);
-  return c;
-}
 
 import { canManagePost, POST_CHANGE_REFUSED } from '@/lib/canManagePost';
 import { useEditablePost } from '@/hooks/useEditablePost';
@@ -130,40 +138,24 @@ describe('CB80 zero-row writes fail loudly', () => {
   });
 
   it('usePostDeletion: 0 rows → refusal toast and no invalidation; 1 row → success', async () => {
-    f.tables = {
-      posts: { data: { id: 'p1', source_review_id: null }, error: null },
-      post_media: { data: [], error: null },
-    };
-    const { result } = renderHook(() => usePostDeletion(), { wrapper });
-    // The delete chain must resolve 0 rows while the lookup returns the post.
-    const postsChain = { data: { id: 'p1', source_review_id: null }, error: null };
-    f.tables.posts = postsChain;
     const client = new QueryClient();
     const invalidate = vi.spyOn(client, 'invalidateQueries');
     const w = ({ children }: { children: React.ReactNode }) => <QueryClientProvider client={client}>{children}</QueryClientProvider>;
-    const hooked = renderHook(() => usePostDeletion(), { wrapper: w });
+    const { result } = renderHook(() => usePostDeletion(), { wrapper: w });
 
-    // 0-row delete: override the chain so delete().select() resolves empty.
-    f.tables.posts = {
-      then: undefined,
+    f.tables = {
+      posts: { maybe: { data: { id: 'p1', source_review_id: null }, error: null }, list: { data: [], error: null } },
+      post_media: { data: [], error: null },
     };
-    const deleteResult: { data: unknown[] } = { data: [] };
-    const origFrom = postsChain;
-    void origFrom;
-    f.tables.posts = deleteResult;
-    // lookup needs the post row again — give maybeSingle the row, delete the empty array.
-    f.tables.posts = {
-      maybe: { data: { id: 'p1', source_review_id: null }, error: null },
-      list: deleteResult,
-    };
-    // chainable resolves one result for both terminals, so split via two tables is impossible;
-    // instead point the hook at a table stub that distinguishes maybeSingle from await.
-    f.tables.posts = {
-      __maybe: { data: { id: 'p1', source_review_id: null }, error: null },
-      __list: { data: [], error: null },
-    };
-    expect(invalidate).toBeDefined();
-    expect(hooked).toBeDefined();
+    const refused = await result.current.deletePost('p1');
+    expect(refused.success).toBe(false);
+    expect(f.error).toHaveBeenCalledWith('Delete failed', expect.objectContaining({ description: POST_CHANGE_REFUSED }));
+    expect(invalidate).not.toHaveBeenCalled();
+
+    f.error.mockClear();
+    f.tables.posts = { maybe: { data: { id: 'p1', source_review_id: null }, error: null }, list: { data: [{ id: 'p1' }], error: null } };
+    const ok = await result.current.deletePost('p1');
+    expect(ok.success).toBe(true);
   });
 });
 
@@ -185,18 +177,23 @@ describe('CB80 scheduled posts service', () => {
 describe('CB80 scheduled posts sheet', () => {
   const scheduledRow = { id: 'p1', content: 'Tee time', scheduled_at: '2026-10-30T09:00:00Z', actor_type: 'personal' };
   it('cancel with 0 rows toasts the refusal and keeps the row', async () => {
-    let deleteResult: unknown = { data: [], error: null };
-    f.tables = {};
-    // Per-call stub: the refresh select returns the row; the delete returns 0 rows.
-    const supabaseMock = await import('@/integrations/supabase/client');
-    void supabaseMock;
-    f.tables.posts = { data: [scheduledRow], error: null };
+    f.tables = { posts: { data: [scheduledRow], error: null } };
     render(<ScheduledPostsSheetV2 open onClose={() => {}} userId="viewer" />);
     expect(await screen.findByText('Tee time')).toBeTruthy();
-    // Switch the posts table to the 0-row delete result before confirming.
-    void deleteResult;
+    // The delete now affects 0 rows (RLS refusal); the row must stay put.
+    f.tables.posts = { data: [], error: null };
     fireEvent.click(screen.getByLabelText('Cancel'));
     fireEvent.click(screen.getByText('Yes'));
-    await waitFor(() => expect(f.error).toHaveBeenCalled());
+    await waitFor(() => expect(f.error).toHaveBeenCalledWith(POST_CHANGE_REFUSED));
+    expect(screen.getByText('Tee time')).toBeTruthy();
+  });
+  it('cancel with 1 row removes it as before', async () => {
+    f.tables = { posts: { data: [scheduledRow], error: null } };
+    render(<ScheduledPostsSheetV2 open onClose={() => {}} userId="viewer" />);
+    expect(await screen.findByText('Tee time')).toBeTruthy();
+    fireEvent.click(screen.getByLabelText('Cancel'));
+    fireEvent.click(screen.getByText('Yes'));
+    await waitFor(() => expect(screen.queryByText('Tee time')).toBeNull());
+    expect(f.error).not.toHaveBeenCalled();
   });
 });
