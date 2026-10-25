@@ -143,7 +143,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       posterUrl: tapped.media_type === 'video' ? holeMediaPoster(tapped) : tapped.media_url,
       mediaId: id,
       openedFrom: 'course-media',
-      options: { readOnly: true },
+      options: { readOnly: true, syntheticPosts: true },
     });
   };
 
