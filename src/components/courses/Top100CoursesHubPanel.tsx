@@ -22,7 +22,7 @@ import { ArgumentShell, Top100CardListShell, YourHundredShell } from './top100/t
 
 /** Gap between cards in the Top 100 list; its shell reads this (BRIEF_COURSES_SKELETONS_3A). */
 export const TOP100_CARD_GAP = 24;
-import { argumentRows, qualifyingCount } from './top100/theArgument';
+import { argumentGroups, qualifyingCount } from './top100/theArgument';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 
 const LISTS = [
@@ -231,8 +231,14 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
     const e = enrichment.get(c.id);
     return { id: c.id, name: c.name ?? '', imageUrl: c.thumbnail_image ?? null, publishedRank: rankFor(c, renderedList), rating: e?.rating ?? null, ratingCount: e?.ratingCount ?? 0 };
   });
-  const argument = argumentRows(argumentInputs);
+  const { higher: argumentHigher, lower: argumentLower } = argumentGroups(argumentInputs);
   const argumentQualifying = qualifyingCount(argumentInputs);
+  const listSectionRef = useRef<HTMLElement | null>(null);
+  /* "See the golfers' list": switch the ranking and bring The list into view. */
+  const seeGolfersList = () => {
+    chooseRanking('community');
+    listSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const revealed = usePageRevealed();
   useEffect(() => {
@@ -319,12 +325,18 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
       ) : user && (isLoading || (user?.id ? !progressFetchedAfterMount : progressLoading)) && (!progressFetchedAfterMount || viewerPlayed >= 5) ? (
         <YourHundredShell />
       ) : null}
-      {argument.length > 0 ? (
-        <TheArgumentSection rows={argument} qualifying={argumentQualifying} />
+      {argumentHigher.length + argumentLower.length > 0 ? (
+        <TheArgumentSection
+          higher={argumentHigher}
+          lower={argumentLower}
+          qualifying={argumentQualifying}
+          showGolfersLink={ranking !== 'community'}
+          onSeeGolfersList={seeGolfersList}
+        />
       ) : isLoading || enrichmentLoading ? (
         <ArgumentShell />
       ) : null}
-      <section style={{ ...SECTION_WRAP, paddingBottom: 0 }}>
+      <section ref={listSectionRef} style={{ ...SECTION_WRAP, paddingBottom: 0 }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
           <SectionHead kicker="The list" tone="quiet" title={heading} />
           <DropdownMenu>
