@@ -1,8 +1,12 @@
 # Roadmap
 
+## BRIEF_MEMBER_SHOTS_VIEWER_POLISH_FIX
+- [ ] STOP before edits: requested title letter-spacing -0.02em contradicts developer instruction “Letter spacing must be 0, not negative.” User explicitly requests stopping/quoting that source rather than overriding the brief. No correction/test/typecheck run for this follow-up; existing caption failure and TS2322 remain.
+
 ## CB79.2 — Invite history
-- [ ] Mark Team entrypoints with fromTeam and pop back/success; cold opens replace Team. Preserve guard, query invalidations and success toast.
-- [ ] Add real-history navigation tests, audit other entries, run full suite and report counts against 2,794/343 (one standing member-caption failure and TS2322 outside this brief).
+- [x] Team's sole Invite entry carries fromTeam; back/success pop, cold opens replace. Guard and invalidations unchanged; opt-in hook toast suppression lets Team-origin success toast fire after navigation without duplicates.
+- [x] Three real-history tests pass; targeted `bunx vitest run src/test/cb792InviteHistory.test.tsx src/test/cb79InvitePage.test.tsx src/test/cb74TeamFixes.test.tsx` 38/3 green. No existing tests changed.
+- [ ] STOP full `bunx vitest run`: 2,794/343 before → 2,797/344 (2,795 passed/2 failed). +3 solely cb792InviteHistory.test.tsx. New failure coursesHighestRatedTen.test.tsx:53:3 “Error: Test timed out in 5000ms.” Existing memberShotCredit.test.tsx:70:84 avatar-initial assertion and ImmersiveFullscreenChrome.tsx(559,9) TS2322 remain. No corrective edits/retries after timeout. Live authenticated browser unavailable; report CB79.2_Invite_history_stop_report.md.
 
 ## BRIEF_MEMBER_SHOTS_VIEWER_POLISH
 - [x] Received authorisation for six hole-open fixture/provider/wait updates preserving assertions, plus Latest courses' credit field assertion; applied them.
