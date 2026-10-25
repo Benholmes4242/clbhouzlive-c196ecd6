@@ -20,6 +20,8 @@ export interface MediaItem {
    *  state instead of attempting an HLS load — hlsUrl is intentionally
    *  undefined while this is true. */
   isProcessing?: boolean;
+  /** Member-shot galleries retain the contributor and added month per slide. */
+  credit?: string;
 }
 
 /** Feed tab modes */

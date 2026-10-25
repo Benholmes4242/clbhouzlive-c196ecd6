@@ -1,5 +1,10 @@
 # Roadmap
 
+## BRIEF_MEMBER_SHOTS_SWIPE_ACROSS
+- [ ] Build one synthetic carousel per course/hole with ordered ready shots and per-item credits; retain real-post behaviour and synthetic request gates.
+- [ ] Retarget only authorised member-shot tests; verify full suite against 2,782 passed /341 files and report each changed test.
+- [ ] Audit post-keyed requests and horizontal end behaviour; native iOS/Android bounce requires device validation unavailable here.
+
 ## BRIEF_COURSES_LATEST_HOLES
 - [x] Full unchanged baseline `bunx vitest run`: 2,585 passed /328 files, zero failures; matches CB75.1.
 - [x] Add Latest holes rail/shell/readiness and once-per-mount Media hole/shot deep link; existing sections and HoleWalk unchanged.

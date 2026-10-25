@@ -6,7 +6,7 @@
  * readOnly) over ONE run through every photo and video of that course,
  * starting on the tapped shot. The set is still the course's media from
  * get_course_media_v2 via useGalleryCourseMedia, in the Media tab's order,
- * exploded post-then-media into one page per shot, each credited to the
+ * flattened post-then-media into one sideways carousel, each credited to the
  * member who added it. This rail never starts video playback; video tiles
  * draw their poster. */
 import { useEffect, useState } from 'react';
@@ -53,6 +53,7 @@ export interface LatestCourseMedia {
 
 interface PendingOpen {
   courseId: string;
+  courseName: string;
   postId: string;
   mediaId: string;
   mediaUrl: string;
@@ -71,19 +72,14 @@ function creditLine(row: LatestCourseMedia): string | null {
   return `${name} and ${others} others`;
 }
 
-/** §3 — the position of the tapped shot in the exploded list: media id, then
- * any url match, then the first shot of the tapped post, then 0. */
-function shotStartIndex(posts: readonly FeedPost[], pending: PendingOpen): number {
-  let index = posts.findIndex(p => p.mediaItems[0]?.id === pending.mediaId);
-  if (index < 0) {
-    index = posts.findIndex(p => {
-      const item = p.mediaItems[0];
-      return item != null && (item.imageUrl === pending.mediaUrl || item.mp4Url === pending.mediaUrl
-        || item.hlsUrl === pending.mediaUrl || item.thumbnailUrl === pending.mediaUrl);
-    });
-  }
-  if (index < 0) index = posts.findIndex(p => p.id.startsWith(`${pending.postId}::`));
-  return index < 0 ? 0 : index;
+/** Existing start ladder: media id, URL, first ready item of source post, first item. */
+function shotStartId(source: readonly FeedPost[], post: FeedPost, pending: PendingOpen): string | null {
+  const items = post.mediaItems;
+  const direct = items.find(item => item.id === pending.mediaId);
+  const url = items.find(item => item.imageUrl === pending.mediaUrl || item.mp4Url === pending.mediaUrl
+    || item.hlsUrl === pending.mediaUrl || item.thumbnailUrl === pending.mediaUrl);
+  const sourceIds = new Set(source.find(p => p.id === pending.postId)?.mediaItems.map(item => item.id) ?? []);
+  return (direct ?? url ?? items.find(item => sourceIds.has(item.id)) ?? items[0])?.id ?? null;
 }
 
 function LatestCourseCard({ row, pending, onOpen }: {
@@ -182,7 +178,7 @@ export function LatestCoursesSection() {
   const [pending, setPending] = useState<PendingOpen | null>(null);
   const gallery = useGalleryCourseMedia(pending?.courseId ?? null, user?.id);
 
-  // §1-3 — once the course's media set arrives, explode it into one page per
+  // §1-3 — once the course's media set arrives, combine it into one sideways run through every
   // shot and open the canonical viewer on the tapped shot (media id, then
   // url, then post id, then 0). An empty or errored set just clears the tap.
   useEffect(() => {
@@ -190,15 +186,17 @@ export function LatestCoursesSection() {
     if (gallery.isError) { setPending(null); return; }
     const data = gallery.data;
     if (!data) return;
-    const posts = coursePostsToShotPosts(data);
+    const posts = coursePostsToShotPosts(data, pending.courseId, pending.courseName);
     if (posts.length === 0) { setPending(null); return; }
-    const start = shotStartIndex(posts, pending);
+    const post = posts[0];
+    if (!post) { setPending(null); return; }
+    const mediaId = shotStartId(data, post, pending);
     openWithOrigin({
       posts,
-      index: start,
+      index: 0,
       originEl: null,
       posterUrl: pending.posterUrl,
-      mediaId: posts[start].mediaItems[0]?.id ?? null,
+      mediaId,
       openedFrom: 'course-media',
       options: { readOnly: true, syntheticPosts: true },
     });
@@ -220,6 +218,7 @@ export function LatestCoursesSection() {
               if (pending) return;
               setPending({
                 courseId: row.course_id,
+                courseName: row.course_name,
                 postId: tile.post_id,
                 mediaId: tile.media_id,
                 mediaUrl: tile.media_url,

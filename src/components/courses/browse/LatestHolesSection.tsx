@@ -21,7 +21,7 @@ import './latestHoles.css';
  * BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §2: a tap opens the CANONICAL
  * full-screen viewer (FullscreenFeedOverlay via openWithOrigin, readOnly)
  * over EVERY ready shot on that hole (get_hole_media, the hole walk's order),
- * each shot its own page credited to the member who added it, landing on the
+ * one sideways carousel with each shot credited to its contributor, landing on the
  * tapped shot. The ?tab=media&hole=&shot= deep link in CourseMediaTabNew is
  * unchanged.
  */
@@ -101,8 +101,9 @@ export function LatestHolesSection() {
     enabled: !!pending,
     staleTime: 60_000,
     queryFn: async () => {
+      if (!pending) return [];
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: rows, error } = await (supabase.rpc as any)('get_hole_media', { p_course_id: pending!.course_id, p_hole_no: pending!.hole_no });
+      const { data: rows, error } = await (supabase.rpc as any)('get_hole_media', { p_course_id: pending.course_id, p_hole_no: pending.hole_no });
       if (error) throw error;
       return (rows ?? []) as HoleMediaRow[];
     },
@@ -113,16 +114,16 @@ export function LatestHolesSection() {
     if (holeQuery.isError) { setPending(null); return; }
     const rows = holeQuery.data;
     if (!rows) return;
-    const posts = holeShotsToFeedPosts(rows, pending.course_name);
+    const posts = holeShotsToFeedPosts(rows, pending.course_name, pending.course_id, pending.hole_no);
     if (posts.length === 0) { setPending(null); return; }
-    const index = posts.findIndex(post => post.id === pending.id);
-    const start = index >= 0 ? index : 0;
+    const items = posts[0]?.mediaItems ?? [];
+    const tapped = items.find(item => item.id === pending.id) ?? items[0];
     openWithOrigin({
       posts,
-      index: start,
+      index: 0,
       originEl: null,
       posterUrl: pending.media_type === 'video' ? holeMediaPoster(pending) : pending.media_url,
-      mediaId: posts[start].mediaItems[0]?.id ?? null,
+      mediaId: tapped?.id ?? null,
       openedFrom: 'course-media',
       options: { readOnly: true, syntheticPosts: true },
     });

@@ -1,0 +1,10 @@
+:root {
+  --member-shot-credit-ink: rgba(255, 255, 255, 0.72);
+}
+
+.member-shot-credit {
+  font-size: 12.5px;
+  color: var(--member-shot-credit-ink);
+  line-height: 1.35;
+  margin-top: 4px;
+}

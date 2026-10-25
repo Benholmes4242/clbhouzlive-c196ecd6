@@ -61,6 +61,7 @@ import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { useVideoProgressWriter } from '@/video/useVideoProgressWriter';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
+import { MemberShotCredit } from './MemberShotCredit';
 
 import { FeedFollowPill } from '@/components/feed/FeedFollowPill';
 import { Z } from '@/config/zIndex';
@@ -802,8 +803,10 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             />
           ) : null}
 
+          <MemberShotCredit syntheticPosts={syntheticPosts} item={activePost.mediaItems[activeSlide]} />
+
           {/* Likers row — LikedByRow reserves its line at zero (CB56); no second guard. */}
-          <div style={{ pointerEvents: 'auto', minWidth: 0 }} onClick={(e) => e.stopPropagation()}>
+          {!syntheticPosts && <div style={{ pointerEvents: 'auto', minWidth: 0 }} onClick={(e) => e.stopPropagation()}>
             <LikedByRow
               postId={activePost.id}
               count={likeState.count}
@@ -822,7 +825,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
               color="rgba(255,255,255,0.86)"
               style={{ marginTop: 9, textShadow: TEXT_SHADOW }}
             />
-          </div>
+          </div>}
         </div>
 
       </div>
