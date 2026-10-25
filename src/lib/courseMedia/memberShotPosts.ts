@@ -1,7 +1,7 @@
 /** BRIEF_MEMBER_SHOTS_SWIPE_ACROSS — one synthetic post owns the canonical
  * horizontal carousel for a course or hole; memberShot captions belong to media items.
- * BRIEF_MEMBER_SHOTS_VIEWER_POLISH: both hole entrypoints use get_hole_media
- * rows for member avatars and scored/unscored caption data.
+ * Latest holes maps the rail snapshot; HoleWalk keeps get_hole_media. Shared
+ * hole captions split course title from scored detail, avoiding entrypoint drift.
  * Every caller must set readOnly and syntheticPosts. Synthetic ids never
  * enter real-post requests; real-post and vertical paging behaviour is frozen. */
 import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
@@ -13,6 +13,7 @@ import { shareCourseName } from '@/lib/courses/shareCourseName';
 export interface MemberShotRow {
   id: string;
   course_id: string;
+  course_name?: string | null;
   media_type: string;
   media_url: string;
   poster_url?: string | null;
@@ -52,11 +53,16 @@ function syntheticPost(id: string, courseId: string, courseName: string, display
   }];
 }
 
-/** Preserve get_hole_media / hole-walk order, skipping null-duration videos. */
-export function holeShotsToFeedPosts(rows: readonly MemberShotRow[], courseName = '',
-  courseId = rows[0]?.course_id ?? '', holeNo = 0, thumbnail?: string | null): FeedPost[] {
-  const { short, variant } = shareCourseName(courseName);
-  const coursePart = short + (variant ? ` (${variant})` : '');
+const shortCoursePart = (name: string) => {
+  const { short, variant } = shareCourseName(name);
+  return short + (variant ? ` (${variant})` : '');
+};
+const holeDetail = (row: MemberShotRow) => row.par != null
+  ? `Par ${row.par}${row.yards != null ? ` · ${row.yards} yards` : ''}` : undefined;
+
+/** One mapping owns ready-video filtering, item ids and hole caption facts. */
+function holeShotItems(rows: readonly MemberShotRow[], courseName: string, holeNo: number,
+  perItemCourse = false) {
   const readyRows = rows.filter(row => row.media_type !== 'video' || row.duration_seconds != null);
   const hubRows: HubRpcRow[] = readyRows.map(row => ({
     post_id: row.id, media_id: row.id, post_created_at: row.added_at ?? null,
@@ -64,23 +70,37 @@ export function holeShotsToFeedPosts(rows: readonly MemberShotRow[], courseName 
     media_type: row.media_type, media_url: row.media_url, poster_url: row.poster_url ?? null,
     stream_id: row.stream_id ?? null, duration_seconds: row.duration_seconds ?? null,
     width: row.width ?? null, height: row.height ?? null, creator_display_name: row.member_name ?? null,
-    review_course_id: row.course_id, review_course_name: courseName,
+    review_course_id: row.course_id, review_course_name: perItemCourse ? row.course_name ?? '' : courseName,
     like_count: 0, comment_count: 0, share_count: 0,
   }));
-  const mapped = toFeedPosts(hubRows);
-  const shots = mapped.flatMap((post, index) => post.mediaItems.map(item => ({
-    item: { ...item, memberShot: {
-      kicker: `The ${holeOrdinal(readyRows[index]?.hole_no ?? holeNo)}`,
-      title: coursePart + (readyRows[index]?.par != null
-        ? ` · Par ${readyRows[index].par}${readyRows[index].yards != null ? ` · ${readyRows[index].yards} yards` : ''}` : ''),
-      credit: credit(readyRows[index]?.member_name, readyRows[index]?.added_at),
-      avatarUrl: readyRows[index]?.member_avatar_url ?? null,
-      memberName: readyRows[index]?.member_name ?? '',
-    } },
-    date: readyRows[index]?.added_at,
-  })));
+  return toFeedPosts(hubRows).flatMap((post, index) => {
+    const row = readyRows[index];
+    if (!row) return [];
+    return post.mediaItems.map(item => ({
+      item: { ...item, memberShot: {
+        kicker: `The ${holeOrdinal(row.hole_no ?? holeNo)}`,
+        title: shortCoursePart(perItemCourse ? row.course_name ?? '' : courseName),
+        detail: holeDetail(row),
+        credit: credit(row.member_name, row.added_at),
+        avatarUrl: row.member_avatar_url ?? null,
+        memberName: row.member_name ?? '',
+        ...(perItemCourse ? { courseId: row.course_id, courseName: row.course_name ?? '' } : {}),
+      } }, date: row.added_at,
+    }));
+  });
+}
+
+/** Preserve get_hole_media / hole-walk order, skipping null-duration videos. */
+export function holeShotsToFeedPosts(rows: readonly MemberShotRow[], courseName = '',
+  courseId = rows[0]?.course_id ?? '', holeNo = 0, thumbnail?: string | null): FeedPost[] {
   return syntheticPost(`shots:hole:${courseId}:${holeNo}`, courseId, courseName,
-    `${courseName} · The ${holeOrdinal(holeNo)}`, thumbnail, shots);
+    `${courseName} · The ${holeOrdinal(holeNo)}`, thumbnail, holeShotItems(rows, courseName, holeNo));
+}
+
+/** Every ready rail row is one slide, in RPC order; the header follows its course. */
+export function latestHolesToFeedPosts(rows: readonly MemberShotRow[]): FeedPost[] {
+  return syntheticPost('shots:latest-holes', '', '', 'Latest holes', null,
+    holeShotItems(rows, '', 0, true));
 }
 
 /** Preserve Media-tab post-then-media order and the existing ready-source filter. */
