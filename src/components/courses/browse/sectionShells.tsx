@@ -33,6 +33,7 @@ import { REGION_GAP, REGION_TILE_H, REGION_TILES_NO_LEAD } from './ByRegionSecti
 import { PHOTO_FIGURE_GAP, PHOTO_FIGURE_H, PHOTO_FIGURE_W } from './PhotoFigureCard';
 import { TOUGH_COUNT, TOUGH_GAP, TOUGH_TILE_H } from './HardestSection';
 import { LATEST_HOLE_W, LATEST_HOLE_H } from './LatestHolesSection';
+import { LATEST_COURSE_W, LATEST_COURSE_H } from './LatestCoursesSection';
 
 const RAIL_CLIPPED: React.CSSProperties = { ...RAIL_BLEED, overflow: 'hidden' };
 const BLEED: React.CSSProperties = { marginLeft: -16, marginRight: -16 };
@@ -125,6 +126,17 @@ export function PhotoRailShell({ count }: { count: number }) {
         {Array.from({ length: count }, (_, i) => (
           <Bar key={i} style={{ width: PHOTO_FIGURE_W, height: PHOTO_FIGURE_H, flex: 'none', borderRadius: 0 }} />
         ))}
+      </div>
+    </HeadShell>
+  );
+}
+
+/** Latest from the courses: two 300x230 cards, clipped. */
+export function LatestCoursesShell() {
+  return (
+    <HeadShell>
+      <div style={{ ...RAIL_CLIPPED, gap: PHOTO_FIGURE_GAP }}>
+        {[0, 1].map(i => <Bar key={i} style={{ width: LATEST_COURSE_W, height: LATEST_COURSE_H, borderRadius: 0, flex: 'none' }} />)}
       </div>
     </HeadShell>
   );

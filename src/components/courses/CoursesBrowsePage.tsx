@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { HardestSection } from './browse/HardestSection';
 import { HighestRatedSection } from './browse/HighestRatedSection';
+import { LatestCoursesSection } from './browse/LatestCoursesSection';
 import { LatestHolesSection } from './browse/LatestHolesSection';
 import { LatestReviewsSection } from './browse/LatestReviewsSection';
 import { useBrowseReviews } from './useBrowseReviews';
@@ -17,7 +18,7 @@ import { ByRegionSection, ALL_COURSES_ANCHOR } from './browse/ByRegionSection';
 import { MostPlayedSection } from './browse/MostPlayedSection';
 import { PageLoadGate, useSectionReady } from './browse/PageLoadGate';
 
-const GATE_IDS = ['whoPlaying', 'byRegion', 'mostPlayed', 'hardest', 'highestRated', 'latestHoles', 'latestReviews', 'figures'] as const;
+const GATE_IDS = ['whoPlaying', 'byRegion', 'latestCourses', 'mostPlayed', 'hardest', 'highestRated', 'latestHoles', 'latestReviews', 'figures'] as const;
 
 /** Reports page-owned readiness from inside the gate's context. */
 function GateReport({ id, ready }: { id: string; ready: boolean }) {
@@ -85,6 +86,7 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         <GateReport id="figures" ready={!truthLoading} />
         <WhoPlayingSection />
         <ByRegionSection />
+        <LatestCoursesSection />
         <MostPlayedSection />
         <HardestSection />
         <HighestRatedSection />
