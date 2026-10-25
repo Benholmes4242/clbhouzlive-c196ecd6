@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB83.1 — Busiest-day post counts
+- [x] Count posts on the applicable UTC same/previous day; add twice/times clauses in en/en-XA, leaving weekly wording unchanged.
+- [x] Full `bunx vitest run`: 2,886 passed/349 files, zero failures/skips, from 2,879/348; seven added cases solely in cb831InsightsPostCount.test.tsx, existing tests unchanged.
+- [x] Automatic check 21:00:05Z confirms only pre-existing src/test/adminHoleTagging.test.tsx(50,85): error TS2339: Property 'staleTime' does not exist on type 'QueryOptions<unknown, Error, unknown, QueryKey, never>'. Test untouched; stop remains limited to this existing compiler error. Protected backend/config/native scope untouched.
+
 ## BRIEF_ADMIN_HOLE_TAGGING
 - [x] Added server-authoritative admin check, admin untagged read and opt-in batch credit/duplicate handling; member source paths and all existing tests unchanged.
 - [x] Full bunx vitest run2,879 passed/348 files, zero failures from2,861/347 (+18 only adminHoleTagging.test.tsx). RPC/readback/required invalidations, visibility, order and unchanged member path covered.

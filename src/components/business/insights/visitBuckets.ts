@@ -26,9 +26,11 @@ export function axisIndices(length: number, days: number): number[] {
 export function busiestPeriod(buckets: VisitBucket[], dates: string[], days: number, today = utcDay(new Date())) {
   const best = buckets.reduce<VisitBucket | null>((a, b) => b.total > 0 && (!a || b.total >= a.total) ? b : a, null);
   if (!best) return null;
-  const posted = new Set(dates.map(date => utcDay(date)));
-  const relation = days === 90 ? null : posted.has(best.day) ? 'same' : posted.has(previousDay(best.day)) ? 'after' : null;
-  return { ...best, relation, dateKind: days === 90 ? 'date' : best.day === today ? 'today' : best.day === previousDay(today) ? 'yesterday' : 'date' } as const;
+  const posted = dates.map(date => utcDay(date));
+  const relation = days === 90 ? null : posted.includes(best.day) ? 'same' : posted.includes(previousDay(best.day)) ? 'after' : null;
+  // CB83.1 counts only the clause's UTC day, never both adjacent days.
+  const postCount = relation ? posted.filter(day => day === (relation === 'same' ? best.day : previousDay(best.day))).length : 0;
+  return { ...best, relation, postCount, dateKind: days === 90 ? 'date' : best.day === today ? 'today' : best.day === previousDay(today) ? 'yesterday' : 'date' } as const;
 }
 export function sourceName(source: string | null): SourceName {
   switch (source) {
