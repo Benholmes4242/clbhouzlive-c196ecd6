@@ -21845,6 +21845,25 @@ export type Database = {
           rounds_tracked: number
         }[]
       }
+      get_hole_media: {
+        Args: { p_course_id: string; p_hole_no: number }
+        Returns: {
+          added_at: string
+          course_id: string
+          course_name: string
+          duration_seconds: number
+          hole_no: number
+          id: string
+          media_type: string
+          media_url: string
+          member_id: string
+          member_name: string
+          par: number
+          poster_url: string
+          stream_id: string
+          yards: number
+        }[]
+      }
       get_home_clubs: { Args: never; Returns: Json }
       get_home_clubs_for_user:
         | { Args: { p_user_profile_id: string }; Returns: Json }
@@ -21875,6 +21894,17 @@ export type Database = {
         }[]
       }
       get_inviter_first_name: { Args: { p_ref: string }; Returns: string }
+      get_latest_course_media: {
+        Args: { p_limit?: number }
+        Returns: {
+          contributor_count: number
+          course_id: string
+          course_name: string
+          latest_member_name: string
+          media_count: number
+          tiles: Json
+        }[]
+      }
       get_latest_hole_media: {
         Args: { p_limit?: number }
         Returns: {
