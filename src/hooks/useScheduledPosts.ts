@@ -14,6 +14,7 @@ import {
   type ScheduledPostForEdit,
   type UpdateScheduledPostData,
 } from '@/services/posts/scheduledPosts';
+import { POST_CHANGE_REFUSED } from '@/lib/canManagePost';
 
 const SCHEDULED_POSTS_KEY = ['scheduled-posts'];
 const SCHEDULED_COUNT_KEY = ['scheduled-posts-count'];
