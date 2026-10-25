@@ -789,7 +789,7 @@
         "headOpened_other": "{{n}} opened your profile.",
         "headNone": "No golfers have seen {{business}} yet.",
         "subPeriod": "Last {{days}} days.",
-        "subTopPost": "“{{preview}}” reached the most golfers.",
+        "subTopPost": "\"{{preview}}\" reached the most golfers.",
         "subNone": "Golfers find a business through its posts and the business directory.",
         "kicker": "From seen to acted",
         "kickerDays": "{{days}} days",
