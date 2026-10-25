@@ -58,7 +58,7 @@ describe('Stage1 hole video display and lifecycle', () => {
     expect(args.posts).toHaveLength(1);
     expect(args.posts[0].mediaItems[0].type).toBe('video');
     expect(args.posts[0].mediaItems[0].hlsUrl).toContain(`/${source.stream_id}/manifest/video.m3u8`);
-    expect(args.options).toEqual({ readOnly: true });
+    expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
     expect(f.attach).not.toHaveBeenCalled();
   });
   it('known-hole pile shows eligible video poster and duration', () => { render(<HoleKnownPhotoPath hole={7} photos={[url]} sources={[{ url, createdAt: '', mediaType: 'video', streamId: source.stream_id, posterUrl: '/poster.jpg', durationSeconds: 42, width: 640, height: 480 }]} pending={false} error={null} onChoose={() => {}} onLibrary={() => {}} onClose={() => {}} />); expect(screen.getByRole('button', { name: 'Choose video' }).querySelector('img')).toHaveAttribute('src', '/poster.jpg'); });

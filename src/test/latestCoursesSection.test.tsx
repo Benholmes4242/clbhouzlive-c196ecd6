@@ -173,7 +173,7 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     expect(args.index).toBe(4);
     expect(args.mediaId).toBe('m5');
     expect(args.openedFrom).toBe('course-media');
-    expect(args.options).toEqual({ readOnly: true });
+    expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
     expect(args.posts[4].displayName).toBe('Thomas Holmes');
   });
 
