@@ -20,14 +20,24 @@
 .hole-walk-observation strong { color: var(--hole-walk-ink); }
 .hole-walk-photo { position: relative; margin-top: 14px; border-radius: 12px; overflow: hidden; aspect-ratio: 4/3; border: 1px solid var(--hole-walk-soft); }
 .hole-walk-photo-open { display: flex; align-items: center; justify-content: center; border-style: dashed; border-color: var(--hole-walk-faint); color: var(--hole-walk-faint); font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
-.hole-walk-caption { position: absolute; bottom: 0; left: 0; right: 0; padding: 26px 12px 10px; font-size: 12px; }
-.hole-walk-caption strong { text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
-.hole-walk-caption span { display: block; margin-top: 2px; color: var(--hole-walk-muted); font-size: 11px; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
+/* BRIEF_HOLE_PANEL_CAROUSEL: one line, ink, the added-to-clbhouz month. */
+.hole-walk-caption { position: absolute; bottom: 0; left: 0; right: 0; padding: 26px 12px 10px; font-size: 12px; color: var(--hole-walk-ink); text-shadow: 0 1px 3px rgba(0,0,0,0.6); pointer-events: none; }
 .hole-walk-stats { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 13px; }
 .hole-walk-stats b { display: block; font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .hole-walk-stats span { display: block; font-size: 9.5px; font-weight: 700; color: var(--hole-walk-dim); text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
-.hole-walk-strip { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 4px; margin-top: 12px; }
-.hole-walk-thumbnail { aspect-ratio: 1; height: auto; min-width: 0; padding: 0; overflow: hidden; border-radius: 7px; }
+/* BRIEF_HOLE_PANEL_CAROUSEL: the strip lists EVERY shot, active included. */
+.hole-walk-strip { display: flex; gap: 4px; margin-top: 8px; overflow-x: auto; scrollbar-width: none; }
+.hole-walk-strip::-webkit-scrollbar { display: none; }
+.hole-walk-thumbnail { position: relative; flex: none; width: 52px; height: 52px; padding: 0; border: 0; border-radius: 7px; overflow: hidden; background: var(--hole-walk-panel); opacity: 0.55; cursor: pointer; }
+.hole-walk-thumbnail-active { opacity: 1; }
+.hole-walk-thumbnail-active::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 2px var(--hole-walk-ink); }
+.hole-walk-thumb-play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.7); pointer-events: none; }
+.hole-walk-track { display: flex; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.hole-walk-track::-webkit-scrollbar { display: none; }
+.hole-walk-slide { position: relative; flex: 0 0 100%; height: 100%; scroll-snap-align: start; cursor: zoom-in; }
+.hole-walk-slide > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hole-walk-frame-count { position: absolute; top: 10px; right: 10px; z-index: 2; height: 24px; padding: 0 9px; border-radius: 999px; display: flex; align-items: center; font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; color: #fff; background: rgba(24,30,26,0.40); border: 1px solid rgba(255,255,255,0.28); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); pointer-events: none; }
+.hole-walk-play-disc { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; padding-left: 4px; color: #fff; background: rgba(24,30,26,0.40); border: 1px solid rgba(255,255,255,0.28); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); pointer-events: none; }
 .hole-walk-months { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
 .hole-walk-months span { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--hole-walk-body); background: var(--hole-walk-track); border: 1px solid var(--hole-walk-soft); border-radius: 999px; padding: 3px 9px; }
 .hole-walk-add { margin-top: 15px; border-radius: 999px; background: var(--hole-walk-ink); color: var(--hole-walk-canvas); font-size: 14px; font-weight: 700; padding: 11px 22px; height: auto; }
@@ -42,8 +52,6 @@
 .hole-media-preview { position: relative; }
 .hole-tag-video-preview { position: relative; width: 100%; height: 160px; overflow: hidden; border-radius: 8px; }
 .hole-tag-video-preview img { width: 100%; height: 100%; object-fit: contain; }
-.hole-walk-thumbnail { position: relative; }
-.hole-walk-photo:has(.hole-media-video) .hole-walk-caption { pointer-events: none; padding-right: 68px; }
 .hole-media-processing { position: relative; width: 100%; height: 100%; aspect-ratio: 4/3; overflow: hidden; }
 .hole-media-processing > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .hole-media-processing-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 11px; font-weight: 700; }

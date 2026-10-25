@@ -37,7 +37,7 @@ describe('BRIEF_HOLE_TAG_OWNER_CONTROLS owner row', () => {
   it('hides when a strip thumbnail of someone else’s item is viewed', () => {
     walk([row(), row({ id: 'theirs', user_id: 'other', media_url: '/theirs.jpg' })]);
     expect(ownerRow()).not.toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'View photograph' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Show shot 2 of 2' }));
     expect(ownerRow()).toBeNull();
   });
 });

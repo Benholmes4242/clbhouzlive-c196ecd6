@@ -53,9 +53,11 @@ describe('MEDIA_WALK_1_R', () => {
     const selected: number[] = []; render(<HoleWalk available holes={[hole(3)]} rows={[]} totalMedia={0} onAddFirst={n => selected.push(n)} />);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 3' })); fireEvent.click(screen.getByRole('button', { name: 'Add the first' })); expect(selected).toEqual([3]);
   });
-  it('eight photos reconcile as active plus seven selectable thumbnails', () => {
+  it('eight photos reconcile as eight selectable thumbnails including the active shot', () => {
     render(<HoleWalk available holes={[hole(9)]} rows={Array.from({ length: 8 }, (_, i) => photo(String(i), 9))} totalMedia={8} onAddFirst={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 9' })); expect(screen.getAllByRole('button', { name: 'View photograph' })).toHaveLength(7);
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 9' }));
+    expect(screen.getAllByRole('button', { name: /^Show shot \d of 8$/ })).toHaveLength(8);
+    expect(screen.getByRole('button', { name: 'Show shot 1 of 8' })).toHaveAttribute('aria-current', 'true');
   });
   it('existing picker preselects and submits selected hole', () => {
     const submitted: number[] = [];
@@ -95,7 +97,7 @@ describe('MEDIA_WALK_1_R', () => {
   it('switching holes resets the displayed photograph to the first', () => {
     render(<HoleWalk available holes={[hole(4), hole(11)]} rows={[photo('a', 4), photo('b', 4), photo('c', 11)]} totalMedia={3} onAddFirst={() => {}} />);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
-    fireEvent.click(screen.getByRole('button', { name: 'View photograph' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Show shot 2 of 2' }));
     fireEvent.click(screen.getByRole('button', { name: 'Hole 11' }));
     fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
     const panel = screen.getByRole('region', { name: 'Hole 4' });

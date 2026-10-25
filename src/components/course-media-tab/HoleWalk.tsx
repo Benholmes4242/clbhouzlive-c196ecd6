@@ -1,15 +1,26 @@
 import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
 /** One mounted grid owns the row-local detail panel and conditional scroll.
  * Real stored photos supply imagery, never illustrative mock art.
- */
+ * BRIEF_HOLE_PANEL_CAROUSEL: the panel frame is a swipeable track with one
+ * slide per shot, a thumbnail strip of EVERY shot (active included), and a
+ * tap on a ready slide opens MediaPreviewViewer through every ready shot on
+ * the hole. Captions and viewer credits read added_at (when the member added
+ * the shot to clbhouz); the month chips and "across N months" keep EXIF.
+ * The panel never plays video inline — a ready video slide is its poster plus
+ * a decorative glass disc, and playback lives in the fullscreen viewer. */
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';
 import { A, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { capitalPhotoCount, holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
-import { HoleMediaVideo, HoleMediaThumbnail } from './HoleMediaVideo';
-import { captureMonth, captureMonthLabel, deriveHoleWalk, holeOrdinal, holePhotoMonths } from '@/lib/courseMedia/holeWalk';
+import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
+import { shareCourseName } from '@/lib/courses/shareCourseName';
+import { buildHlsUrl } from '@/utils/streamId';
+import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
+import type { OrderedMediaItem } from '@/components/shared/media/types';
+import { HoleMediaThumbnail } from './HoleMediaVideo';
+import { captureMonthLabel, deriveHoleWalk, holeOrdinal, holePhotoMonths } from '@/lib/courseMedia/holeWalk';
 import './hole-walk.css';
 
 /** Stage 2: null duration is never playable. Shared with moderator previews
@@ -31,6 +42,9 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
 }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [photoId, setPhotoId] = useState<string | null>(null);
+  // Index into the open hole's READY shots (processing videos are left out);
+  // null while the fullscreen viewer is closed.
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   // A moved item is followed to its new hole by the caller's focus nonce.
   useEffect(() => {
     if (!focus) return;
@@ -45,20 +59,135 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
   }, [selected, available]);
-  if (!available || !holes.length) return null;
-  const walk = deriveHoleWalk(holes, rows);
-  const tile = walk.tiles.find(item => item.hole.hole_no === selected);
-  const active = tile?.photos.find(photo => photo.id === photoId) ?? tile?.photos[0];
+
+  const trackRef = useRef<HTMLDivElement>(null);
+  const activeThumbRef = useRef<HTMLButtonElement>(null);
+  const rafRef = useRef(0);
+  // Set when a scroll-driven photoId change is in flight, so the programmatic
+  // scroll effect does not scroll the track back to where it already is.
+  const scrollDrivenRef = useRef(false);
+  // Strip taps slide smoothly; focus/deep link and panel open jump instantly.
+  const behaviorRef = useRef<ScrollBehavior>('auto');
+  const photoIdRef = useRef(photoId);
+  photoIdRef.current = photoId;
+  const tileRef = useRef<{ photos: readonly HolePhoto[] } | null>(null);
+  useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
+
+  const show = available && holes.length > 0;
+  const walk = show ? deriveHoleWalk(holes, rows) : null;
+  const tile = walk?.tiles.find(item => item.hole.hole_no === selected);
+  tileRef.current = tile ?? null;
+  const photos = tile?.photos ?? [];
+  const activeIndex = tile ? Math.max(0, photos.findIndex(photo => photo.id === photoId)) : 0;
+
+  // photoId changed from anywhere other than a track swipe: bring the frame
+  // to that shot (smooth from the strip, instant for focus/panel open).
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || !tileRef.current) return;
+    if (scrollDrivenRef.current) { scrollDrivenRef.current = false; return; }
+    const width = track.clientWidth;
+    if (!width) return;
+    const index = Math.max(0, tileRef.current.photos.findIndex(photo => photo.id === photoIdRef.current));
+    if (Math.round(track.scrollLeft / width) !== index) {
+      track.scrollTo?.({ left: index * width, behavior: behaviorRef.current });
+    }
+    behaviorRef.current = 'auto';
+  }, [photoId, selected, available]);
+
+  // Keep the active thumbnail in view as the active shot changes.
+  useEffect(() => {
+    activeThumbRef.current?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+  }, [activeIndex, selected]);
+
+  const onTrackScroll = () => {
+    const track = trackRef.current;
+    if (!track || rafRef.current) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = 0;
+      const width = track.clientWidth;
+      const current = tileRef.current;
+      if (!width || !current) return;
+      const i = Math.round(track.scrollLeft / width);
+      const photo = current.photos[i];
+      if (photo && photo.id !== photoIdRef.current) {
+        scrollDrivenRef.current = true;
+        setPhotoId(photo.id);
+      }
+    });
+  };
+
+  if (!show || !walk) return null;
   const months = tile ? holePhotoMonths(tile.photos) : [];
   const field = tile ? toParParts(tile.hole.avg_to_par) : null;
-  const author = active ? authors?.get(active.user_id) : undefined;
-  const month = active ? captureMonth(active) : null;
+  const active = photos[activeIndex];
+
+  // Every image or ready video on the hole, in panel order; processing videos
+  // are left out of the viewer entirely.
+  const playable = photos.filter(photo => photo.media_type !== 'video' || photo.duration_seconds != null);
+  const viewerItems: OrderedMediaItem[] = !tile ? [] : playable.map((photo, order) => {
+    const video = photo.media_type === 'video';
+    const { short, variant } = shareCourseName(courseName);
+    const coursePart = short + (variant ? ` (${variant})` : '');
+    const parPart = scored ? ` · Par ${tile.hole.par}${tile.hole.yards != null ? ` · ${tile.hole.yards} yards` : ''}` : '';
+    const credit = [authors?.get(photo.user_id), addedMonthLabel(photo.added_at)].filter(Boolean).join(' · ');
+    return {
+      id: photo.id,
+      type: video ? 'video' as const : 'image' as const,
+      order,
+      previewUrl: video ? holeMediaPoster(photo) : photo.media_url,
+      thumbnailUrl: holeMediaPoster(photo),
+      hlsUrl: video ? buildHlsUrl(photo.stream_id || photo.media_url) : undefined,
+      caption: {
+        kicker: `The ${holeOrdinal(tile.hole.hole_no)}`,
+        title: coursePart + parPart,
+        credit: credit || undefined,
+      },
+    };
+  });
+
+  const openViewer = (id: string) => {
+    const index = playable.findIndex(photo => photo.id === id);
+    if (index >= 0) setViewerIndex(index);
+  };
+
   const panel = tile && <section ref={panelRef} className={scored ? 'hole-walk-panel' : 'hole-walk-panel hole-walk-panel-unscored'} role="region" aria-label={`Hole ${tile.hole.hole_no}`}>
       <p className="hole-walk-kicker" style={VERDICT_KICKER}>The {holeOrdinal(tile.hole.hole_no)}</p>
       {scored && <h2 className="hole-walk-title" style={TAB_TITLE}>Par {tile.hole.par}{tile.hole.yards != null && <> · {tile.hole.yards.toLocaleString()} yards</>}</h2>}
       <div className={`hole-walk-photo ${active ? '' : 'hole-walk-photo-open'}`}>
-        {active ? <>{active.media_type === 'video' ? (active.duration_seconds == null ? <HoleProcessingVideo key={active.id} media={active} label={`Hole ${tile.hole.hole_no}`} /> : <HoleMediaVideo key={active.id} media={active} label={`Hole ${tile.hole.hole_no}`} />) : <img src={active.media_url} alt={`Hole ${tile.hole.hole_no}`} />}{(author || month) && <div className="hole-walk-caption">{author && <strong>{author}</strong>}{month && <span>{captureMonthLabel(month)}</span>}</div>}</> : <span>No shot yet</span>}
+        {active ? <>
+          {photos.length >= 2 && <span className="glass-chip hole-walk-frame-count">{activeIndex + 1} / {photos.length}</span>}
+          <div className="hole-walk-track" ref={trackRef} onScroll={onTrackScroll}>
+            {photos.map(photo => {
+              const processing = photo.media_type === 'video' && photo.duration_seconds == null;
+              const slideAuthor = authors?.get(photo.user_id);
+              const slideMonth = addedMonthLabel(photo.added_at);
+              return <div key={photo.id} className="hole-walk-slide" onClick={() => { if (!processing) openViewer(photo.id); }}>
+                {photo.media_type === 'video'
+                  ? (processing
+                    ? <HoleProcessingVideo media={photo} label={`Hole ${tile.hole.hole_no}`} />
+                    : <>
+                      <img src={holeMediaPoster(photo)} alt={`Hole ${tile.hole.hole_no}`} />
+                      <span className="glass-chip hole-walk-play-disc" aria-hidden="true">{'\u25B6'}</span>
+                    </>)
+                  : <img src={photo.media_url} alt={`Hole ${tile.hole.hole_no}`} />}
+                {(slideAuthor || slideMonth) && <div className="hole-walk-caption">{slideAuthor && <strong>{slideAuthor}</strong>}{slideMonth && ` · ${slideMonth}`}</div>}
+              </div>;
+            })}
+          </div>
+        </> : <span>No shot yet</span>}
       </div>
+      {photos.length >= 2 && <div className="hole-walk-strip">
+        {photos.map((photo, index) => <button type="button" key={photo.id}
+          ref={index === activeIndex ? activeThumbRef : undefined}
+          className={`hole-walk-thumbnail ${index === activeIndex ? 'hole-walk-thumbnail-active' : ''}`}
+          aria-label={`Show shot ${index + 1} of ${photos.length}`}
+          aria-current={index === activeIndex ? 'true' : undefined}
+          onClick={() => { behaviorRef.current = 'smooth'; setPhotoId(photo.id); }}>
+          <HoleMediaThumbnail url={photo.media_url} mediaType={photo.media_type} posterUrl={photo.poster_url} streamId={photo.stream_id} durationSeconds={photo.duration_seconds} alt={`Hole ${tile.hole.hole_no}`} />
+          {photo.media_type === 'video' && <span className="hole-walk-thumb-play" aria-hidden="true">{'\u25B6'}</span>}
+        </button>)}
+      </div>}
       {active && memberId && active.user_id === memberId && active.status === 'approved' && onMove && onRemove && <div className="hole-walk-owner"><span className="hole-walk-owner-label">Yours</span><span className="hole-walk-owner-actions"><Button variant="ghost" className="hole-walk-owner-action" onClick={() => onMove(active)}>Move to another hole</Button><span className="hole-walk-owner-dot" aria-hidden="true">{'\u00B7'}</span><Button variant="ghost" className="hole-walk-owner-action" onClick={() => onRemove(active)}>Remove</Button></span></div>}
       {scored && <div className="hole-walk-stats">
         <div><b>{tile.hole.par}</b><span>Par</span></div>
@@ -69,7 +198,6 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       {/* A hole that already has media still takes more from an eligible member;
           same entry point as "Add the first", which stays for empty holes. */}
       {tile.photos.length >= 1 && <Button variant="ghost" className="hole-walk-add" onClick={() => onAddFirst(tile.hole.hole_no)}>Add a photo or video</Button>}
-      {tile.photos.length >= 2 && <div className="hole-walk-strip">{tile.photos.filter(photo => photo.id !== active?.id).map(photo => <Button variant="ghost" key={photo.id} aria-label={photo.media_type === 'video' ? 'View video' : 'View photograph'} className="hole-walk-thumbnail" onClick={() => setPhotoId(photo.id)}><HoleMediaThumbnail url={photo.media_url} mediaType={photo.media_type} posterUrl={photo.poster_url} streamId={photo.stream_id} durationSeconds={photo.duration_seconds} alt={`Hole ${tile.hole.hole_no}`} /></Button>)}</div>}
       {months.length > 0 && <div className="hole-walk-months">{months.map(item => <span key={item.month}>{capitalPhotoCount(item.count)} in {captureMonthLabel(item.month)}</span>)}</div>}
       {/* MEDIA_CTA_1: the sentence is absent below two photographs; at two or
           more it reads "shots of this hole", gaining "across {spelled} months"
@@ -80,7 +208,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
     </section>;
   const selectedIndex = walk.tiles.findIndex(item => item.hole.hole_no === selected);
   const rowEnd = selectedIndex < 0 ? -1 : Math.min(Math.ceil((selectedIndex + 1) / 3) * 3, walk.tiles.length) - 1;
-  return <div className="hole-walk" style={{ color: A.INK, '--hole-walk-ink': A.INK, '--hole-walk-canvas': A.CANVAS, '--hole-walk-muted': A.MUTE, '--hole-walk-body': A.BODY, '--hole-walk-dim': A.DIM, '--hole-walk-faint': A.FAINT, '--hole-walk-soft': A.SOFT, '--hole-walk-rule': A.SOFT, '--hole-walk-track': A.TRACK } as CSSProperties}>
+  return <div className="hole-walk" style={{ color: A.INK, '--hole-walk-ink': A.INK, '--hole-walk-canvas': A.CANVAS, '--hole-walk-muted': A.MUTE, '--hole-walk-body': A.BODY, '--hole-walk-dim': A.DIM, '--hole-walk-faint': A.FAINT, '--hole-walk-soft': A.SOFT, '--hole-walk-rule': A.SOFT, '--hole-walk-track': A.TRACK, '--hole-walk-panel': A.PANEL } as CSSProperties}>
     <section className="hole-walk-section">
       <p className="hole-walk-kicker" style={VERDICT_KICKER}>Walk the course</p>
       <h2 className="hole-walk-title" style={TAB_TITLE}>{walk.headline}</h2>
@@ -101,6 +229,11 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       </p>}
       {!tile && !scored && <p className="hole-walk-quiet">No rounds have been posted here yet, so par and yardage are still to come. They fill in with the first tracked round.</p>}
     </section>
-
+    {viewerIndex != null && tile && viewerItems.length > 0 && <MediaPreviewViewer
+      items={viewerItems}
+      initialIndex={viewerIndex}
+      onClose={() => setViewerIndex(null)}
+      onIndexChange={index => { const photo = playable[index]; if (photo) setPhotoId(photo.id); }}
+    />}
   </div>;
 }
