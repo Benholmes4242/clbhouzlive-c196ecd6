@@ -163,10 +163,8 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
       ],
       isError: false,
     };
-    mount();
-    // tile 2 of card alpha carries media_id media-alpha-2 → match it to m5
+    // tile 2 of card alpha carries the media id of the 2nd shot of the 2nd post
     f.rows[0] = course('alpha', { tiles: [tile('alpha-1', { post_id: 'post-alpha-1', media_id: 'm1' }), tile('alpha-2', { post_id: 'post-alpha-2', media_id: 'm5' }), tile('alpha-3', { post_id: 'post-alpha-1', media_id: 'm2' })] });
-    cleanup();
     mount();
     fireEvent.click(screen.getByLabelText('Open Course alpha shot 2 of 14'));
     await waitFor(() => expect(f.viewer).toHaveBeenCalledTimes(1));
