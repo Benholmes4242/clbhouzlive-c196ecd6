@@ -12,6 +12,7 @@ import ScheduleSheetV2 from './ScheduleSheetV2';
 import { CalendarClock, Trash2 } from 'lucide-react';
 import { formatSchedule } from '../lib/formatSchedule';
 import { CT } from '@/features/_shared/composerTokens';
+import { POST_CHANGE_REFUSED } from '@/lib/canManagePost';
 import { MEMBER_CELL } from '@/lib/tokens/surfaces';
 
 interface Row {

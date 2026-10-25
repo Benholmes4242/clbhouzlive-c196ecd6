@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { showToast } from '@/utils/toast';
 import { postKeys } from '@/queryKeys/posts';
 import { scheduleRadixBodyLockSanitize } from '@/lib/radixLockSanitizer';
+import { POST_CHANGE_REFUSED } from '@/lib/canManagePost';
 
 export const usePostDeletion = () => {
   const queryClient = useQueryClient();

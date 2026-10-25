@@ -11,6 +11,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { syncMentionsForContent } from '@/lib/mentions/syncMentions';
+import { POST_CHANGE_REFUSED } from '@/lib/canManagePost';
 
 /**
  * AUDIENCE COPY RULE — READ BEFORE BUILDING ANY VISIBILITY PICKER.
