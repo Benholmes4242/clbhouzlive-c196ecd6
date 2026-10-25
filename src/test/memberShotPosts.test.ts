@@ -27,6 +27,7 @@ vi.mock('@/video/VideoEngine', () => ({
 
 import { holeShotsToFeedPosts, coursePostsToShotPosts, type MemberShotRow } from '@/lib/courseMedia/memberShotPosts';
 import { useVideoProgressWriter } from '@/video/useVideoProgressWriter';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 const src = (p: string) => readFileSync(resolve(process.cwd(), p), 'utf8');
@@ -137,7 +138,7 @@ describe('syntheticPosts gates for synthetic post ids (BRIEF_SYNTHETIC_SHOT_GATE
     const wrapper = ({ children }: { children: ReactNode }) => createElement(QueryClientProvider, { client: cache }, children);
     const videoPost = { id: 'p1', mediaItems: [{ id: 'm1', type: 'video', hlsUrl: 'https://stream/m1.m3u8' }] } as unknown as FeedPost;
 
-    // readOnly path: null post — no subscription, no write.
+    // syntheticPosts path: null post — no subscription, no write.
     h.listener = null;
     const gated = renderHook(() => useVideoProgressWriter(null), { wrapper });
     expect(h.listener).toBeNull();
@@ -145,7 +146,7 @@ describe('syntheticPosts gates for synthetic post ids (BRIEF_SYNTHETIC_SHOT_GATE
     gated.unmount();
     expect(h.upsert).not.toHaveBeenCalled();
 
-    // readOnly false path: the post flows through and a pause writes progress.
+    // syntheticPosts false path (readOnly or not): the post flows through and a pause writes progress.
     const live = renderHook(() => useVideoProgressWriter(videoPost), { wrapper });
     expect(h.listener).not.toBeNull();
     h.listener?.({ postId: 'p1', currentTime: 5, duration: 60, state: 'playing' });
