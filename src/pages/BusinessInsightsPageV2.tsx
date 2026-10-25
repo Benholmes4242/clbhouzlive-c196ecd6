@@ -15,13 +15,13 @@
  * Type: the shared BUSINESS TYPE SCALE (BIZ_KICKER / BIZ_LABEL / BIZ_TITLE /
  * BIZ_BODY / bizFigure) from analytical/tokens. Nothing here renders at 800.
  */
-import { useState, useEffect, useMemo, useId } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Lock, ChevronRight } from 'lucide-react';
 import {
-  ComposedChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
@@ -29,6 +29,7 @@ import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
 import { useBusinessInsights } from '@/hooks/useBusinessInsights';
 import { useBusinessInsightsFunnel } from '@/hooks/useBusinessInsightsFunnel';
 import { InsightsFunnel } from '@/components/business/insights/InsightsFunnel';
+import { InsightsVisitsSection } from '@/components/business/insights/InsightsVisitsSection';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Button } from '@/components/ui/button';
@@ -48,10 +49,6 @@ const RANGE_DAYS: Record<DateRange, number> = { '7d': 7, '30d': 30, '90d': 90 };
  *  impression count and says why, rather than printing a number it disowns. */
 const RATE_MIN_IMPRESSIONS = 500;
 
-/** Below this many total discovery events, rows show counts only - one
- *  impression is not "100%". */
-const DISCOVERY_MIN_TOTAL = 10;
-
 /** Bar fill on a dark track: ink at reduced alpha, lighter than A.TRACK, so
  *  the filled part reads as filled rather than as a hole in the track. */
 const BAR_FILL = A.DIM;
@@ -64,16 +61,6 @@ const formatNum = (n: number) => formatNumber(n ?? 0);
 const formatDay = (iso: string) => {
   try { return formatDayMonthShortGB(iso); }
   catch { return iso; }
-};
-
-const SOURCE_LABEL: Record<string, string> = {
-  direct: 'Direct',
-  directory: 'Directory',
-  search: 'Search',
-  feed: 'Feed',
-  shared: 'Shared link',
-  course_page: 'Course page',
-  content: 'From content',
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -205,74 +192,6 @@ const InsetMessage = ({ title, body }: { title?: string; body: string }) => (
     <p style={{ ...BIZ_BODY, maxWidth: 280 }}>{body}</p>
   </>
 );
-
-// ─────────────────────────────────────────────────────────────
-// Section: Visits over time
-// ─────────────────────────────────────────────────────────────
-const VisitsChart = ({ data, emptyLabel }: { data: { day: string; total: number; unique: number }[]; emptyLabel: string }) => {
-  const gradId = `visitsInk-${useId().replace(/:/g, '')}`;
-  // ABSENCE of rows is "no data"; a gap-filled series of zeros is a fact.
-  const hasData = data.length > 0;
-  if (!hasData) return <ChartInset height={220} center><InsetMessage body={emptyLabel} /></ChartInset>;
-  const rows = data.map(d => ({ day: formatDay(d.day), Total: d.total, Unique: d.unique }));
-  return (
-    <ChartInset height={220}>
-      <div style={{ width: '100%', height: 204 }}>
-        <ResponsiveContainer>
-          <ComposedChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={A.INK} stopOpacity={0.18} />
-                <stop offset="100%" stopColor={A.INK} stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid stroke={A.TRACK} strokeDasharray="2 4" vertical={false} />
-            <XAxis dataKey="day" tick={{ fill: A.MUTE, fontSize: 10 /* AXIS floor 10: chart tick, a coordinate */ }} axisLine={false} tickLine={false} minTickGap={20} />
-            <YAxis tick={{ fill: A.MUTE, fontSize: 10 /* AXIS floor 10: chart tick, a coordinate */ }} axisLine={false} tickLine={false} width={28} allowDecimals={false} />
-            <Tooltip contentStyle={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, borderRadius: 8, fontSize: 12, color: A.INK }} labelStyle={{ color: A.MUTE }} />
-            <Legend wrapperStyle={{ fontSize: 11, color: A.MUTE }} iconType="circle" iconSize={8} />
-            <Area type="monotone" dataKey="Total" stroke={A.INK} strokeWidth={2} fill={`url(#${gradId})`} />
-            <Line type="monotone" dataKey="Unique" stroke={A.MUTE} strokeWidth={1.75} dot={false} />
-          </ComposedChart>
-        </ResponsiveContainer>
-      </div>
-    </ChartInset>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────
-// Section: Discovery sources (horizontal % bars)
-// ─────────────────────────────────────────────────────────────
-const DiscoveryBars = ({ sources, emptyLabel }: { sources: { source: string; count: number }[]; emptyLabel: string }) => {
-  const total = sources.reduce((a, s) => a + s.count, 0);
-  if (total === 0) return <ChartInset height={120} center><InsetMessage body={emptyLabel} /></ChartInset>;
-  const rows = [...sources].sort((a, b) => b.count - a.count);
-  return (
-    <ChartInset height={120}>
-      <div className="space-y-3 p-2.5">
-        {rows.map(r => {
-          const pct = (r.count / total) * 100;
-          const showPct = total >= DISCOVERY_MIN_TOTAL;
-          return (
-            <div key={r.source}>
-              <div className="flex items-baseline justify-between mb-1.5">
-                <span style={{ fontSize: 13, fontWeight: 500, color: A.INK }}>{SOURCE_LABEL[r.source] ?? r.source}</span>
-                <span className="tabular-nums" style={{ fontSize: 13, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, ...numFeat }}>
-                  {showPct
-                    ? <>{pct.toFixed(0)}% <span style={{ fontWeight: 400, color: A.MUTE }}>&middot; {formatNum(r.count)}</span></>
-                    : formatNum(r.count)}
-                </span>
-              </div>
-              <div className="rounded-full overflow-hidden" style={{ height: BIZ_TRACK_H, background: A.TRACK }}>
-                <div className="h-full rounded-full" style={{ width: `${pct}%`, background: BAR_FILL }} />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </ChartInset>
-  );
-};
 
 // ─────────────────────────────────────────────────────────────
 // Section: Followers growth
@@ -446,18 +365,9 @@ const BusinessInsightsPageV2 = () => {
           </div>
         )}
 
-        {/* ── VISITORS ── */}
-        <InsightCard kicker="VISITORS" title="Profile visits over time">
-          {insightsLoading
-            ? <Skeleton className="h-[220px] w-full rounded-[13px]" />
-            : <VisitsChart data={insights.visits_series} emptyLabel={t('business.insights.empty.visits')} />}
-        </InsightCard>
-
-        <InsightCard kicker="DISCOVERY" title="How golfers discover you">
-          {insightsLoading
-            ? <Skeleton className="h-[120px] w-full rounded-[13px]" />
-            : <DiscoveryBars sources={insights.sources} emptyLabel={t('business.insights.empty.discovery')} />}
-        </InsightCard>
+        <div className="-mx-4 md:-mx-6 !mt-0">
+          <InsightsVisitsSection businessId={business.id} range={dateRange} />
+        </div>
 
         {/* ── AUDIENCE (locked) ──
             The four handicap bands and the four "Location {i}" rows are GONE.
