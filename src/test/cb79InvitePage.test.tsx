@@ -116,11 +116,11 @@ describe('CB79 suggestions', () => {
       { user_id: 'u-m', display_name: 'Mike', username: 'mike', profile_photo_url: null, reason: 'follower', followed_at: null },
     ];
     mount();
-    await screen.findByText('Alpha');
-    const names = Array.from(document.querySelectorAll('main section span span')).map((el) => el.textContent);
-    const order = ['Beta', 'Alpha', 'Zulu', 'Mike'].map((n) => names.indexOf(n));
-    expect(order.every((i) => i >= 0)).toBe(true);
-    expect(order).toEqual([...order].sort((a, b) => a - b));
+    const beta = await screen.findByText('Beta');
+    const before = (a: Node, b: Node) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(before(beta, screen.getByText('Alpha'))).toBe(true);
+    expect(before(screen.getByText('Alpha'), screen.getByText('Zulu'))).toBe(true);
+    expect(before(screen.getByText('Zulu'), screen.getByText('Mike'))).toBe(true);
   });
 
   it('skips a group with nobody in it', async () => {
