@@ -20486,6 +20486,10 @@ export type Database = {
         Args: { p_business_id: string; p_days?: number }
         Returns: Json
       }
+      get_business_invite_suggestions: {
+        Args: { p_business_id: string }
+        Returns: Json
+      }
       get_business_profile_analytics: {
         Args: { p_business_profile_id: string; p_days?: number }
         Returns: {
