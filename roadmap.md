@@ -2,18 +2,18 @@
 
 ## BRIEF_MEMBER_SHOTS_VIEWER_POLISH_FIX
 - [x] Resolved spacing hold: user drops clause 4 and spacing test; title stays at 0.
-- [ ] Correct authorised text-column assertion, safe-area scrubber string and active-video caption clearance; add two placement tests only.
-- [ ] Run full suite against 2,797/344 baseline (two failures) and inspect automatic typecheck; manual typecheck prohibited by environment. Report named edits/counts and any standing failure.
+- [x] Corrected authorised text-column assertion plus member T/no-relative-time checks, safe-area scrubber string and active-video caption clearance; added two placement tests only. Title spacing stays 0.
+- [x] Full `bunx vitest run`: 2,799 passed/344 files, zero failures/skips/unhandled errors, from2,797/344 (+2 solely memberShotCredit.test.tsx). Previously failed member caption and unchanged coursesHighestRatedTen scan pass. Automatic check19:35:24Z build OK/no type errors; separate manual typecheck prohibited, not run. Controlled browser measured image24px/video48px and reviewed both caption screenshots; live authenticated/native checks unavailable. Report Member_shots_viewer_polish_fix_report.md.
 
 ## CB79.2 — Invite history
 - [x] Team's sole Invite entry carries fromTeam; back/success pop, cold opens replace. Guard and invalidations unchanged; opt-in hook toast suppression lets Team-origin success toast fire after navigation without duplicates.
 - [x] Three real-history tests pass; targeted `bunx vitest run src/test/cb792InviteHistory.test.tsx src/test/cb79InvitePage.test.tsx src/test/cb74TeamFixes.test.tsx` 38/3 green. No existing tests changed.
-- [ ] STOP full `bunx vitest run`: 2,794/343 before → 2,797/344 (2,795 passed/2 failed). +3 solely cb792InviteHistory.test.tsx. New failure coursesHighestRatedTen.test.tsx:53:3 “Error: Test timed out in 5000ms.” Existing memberShotCredit.test.tsx:70:84 avatar-initial assertion and ImmersiveFullscreenChrome.tsx(559,9) TS2322 remain. No corrective edits/retries after timeout. Live authenticated browser unavailable; report CB79.2_Invite_history_stop_report.md.
+- [x] Previous STOP resolved in viewer-polish-fix full run: all2,799/344 pass including unchanged coursesHighestRatedTen and all3 CB79.2 tests; automatic build OK/no surviving type errors. Historical CB79.2 run2,797/344 had timeout and caption failure; no CB79.2 source/test changes in subsequent fix. Live authenticated browser remains unavailable; historical report CB79.2_Invite_history_stop_report.md.
 
 ## BRIEF_MEMBER_SHOTS_VIEWER_POLISH
 - [x] Received authorisation for six hole-open fixture/provider/wait updates preserving assertions, plus Latest courses' credit field assertion; applied them.
 - [x] Implemented synthetic-only full-height geometry, active member caption/avatar and shared get_hole_media query; normal author/header paths retained.
-- [ ] STOP: full `bunx vitest run` 2,788/342 baseline → 2,794/343 inventory: 2,793 passed/1 failed, zero skips. New memberShotCredit.test.tsx:70:84 exact text assertion receives avatar initial T before caption. No corrective edit after failure. Also surviving harness TS2322 at ImmersiveFullscreenChrome.tsx(559,9): Type 'string | number' is not assignable to type 'string'. Type 'number' is not assignable to type 'string'. Await correction authorisation; browser validation not performed, external_unmanaged live authentication unavailable. Report Member_shots_viewer_polish_stop_report.md names all test changes; no prohibited backend/config changes.
+- [x] Previous caption/TS2322 stop resolved by explicitly authorised viewer-polish-fix: full2,799/344 pass and automatic build OK. Historical run2,794/343 and stop report retained. Live authenticated/native swipe checks remain unavailable; controlled active caption switch and real-chrome tests verified.
 
 ## BRIEF_MEMBER_SHOTS_SWIPE_ACROSS
 - [x] Build one synthetic carousel per course/hole with ordered ready shots and per-item credits; retain real-post behaviour and synthetic request gates. Added synthetic fullscreen post_views and likers mount gates; module headers own the local contract.
