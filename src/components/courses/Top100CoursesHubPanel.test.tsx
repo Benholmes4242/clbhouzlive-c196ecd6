@@ -225,8 +225,10 @@ describe('BRIEF_TOP100_OFFICIAL_RANK_AND_TAP — panel navigation', () => {
   it('argument row opens its course through the scroll-preserving main-list handler', () => {
     const root = document.createElement('div');
     root.id = 'root';
-    root.scrollTop = 237;
+    root.style.overflowY = 'auto';
+    root.style.height = '400px';
     document.body.appendChild(root);
+    Object.defineProperty(root, 'scrollTop', { value: 237, configurable: true });
     try {
       mountWithArgument();
       expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd of the 4 rated')).toBeInTheDocument();
