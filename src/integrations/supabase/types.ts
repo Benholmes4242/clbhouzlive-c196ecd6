@@ -19637,6 +19637,10 @@ export type Database = {
         Returns: boolean
       }
       can_manage_business: { Args: { _business_id: string }; Returns: boolean }
+      can_manage_business_post: {
+        Args: { p_actor_id: string; p_actor_type: string; p_author: string }
+        Returns: boolean
+      }
       can_moderate: { Args: never; Returns: boolean }
       can_view_followers_post: {
         Args: {
