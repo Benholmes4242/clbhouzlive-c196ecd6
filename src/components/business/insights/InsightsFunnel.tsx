@@ -136,7 +136,7 @@ export function InsightsFunnel({ funnel, businessName, days, canPost, onPost }: 
   return (
     <div data-section="insights-funnel">
       <div data-headline style={{ padding: '16px 20px 2px' }}>
-        <p style={{ margin: 0, fontSize: 24, fontWeight: 700, letterSpacing: 0, lineHeight: 1.2, color: FUNNEL_INK }}>
+        <p style={{ margin: 0, fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.2, color: FUNNEL_INK }}>
           {saw === 0 ? (
             <span data-variant="none">{k('headNone', { business: businessName })}</span>
           ) : (
