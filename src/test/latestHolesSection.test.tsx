@@ -61,7 +61,14 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
   });
   it('three cards retain RPC order and the specified query contract', () => {
     mountRail(); expect(screen.getAllByRole('button').map(b => b.getAttribute('aria-label'))).toEqual(['Hole 4, Course first', 'Hole 4, Course second', 'Hole 4, Course third']);
-    expect(f.rpc).toHaveBeenCalledWith('get_latest_hole_media', { p_limit: 10 }, { staleTime: 60_000 });
+    expect(f.rpc).toHaveBeenCalledWith('get_latest_hole_media', { p_limit: 30 }, { staleTime: 60_000 });
+  });
+  it('two shots from one course render as two cards', () => {
+    f.latest = [latest('first'), latest('second', { course_id: 'course-first', course_name: 'Course first' }), latest('third')];
+    mountRail(); const cards = screen.getAllByRole('button');
+    expect(cards).toHaveLength(3);
+    expect(cards.map(c => c.getAttribute('aria-label'))).toEqual(['Hole 4, Course first', 'Hole 4, Course first', 'Hole 4, Course third']);
+    fireEvent.click(cards[1]); expect(screen.getByTestId('destination')).toHaveTextContent('/courses/course-first?tab=media&hole=4&shot=second');
   });
   it('an RPC error hides even cached rows', () => { f.error = true; mountRail(); expect(screen.queryAllByRole('button')).toHaveLength(0); });
   it('loading draws the shell without interactive cards', () => { f.loading = true; const view = mountRail(); expect(view.container.querySelector('section[aria-hidden]')).not.toBeNull(); expect(screen.queryAllByRole('button')).toHaveLength(0); });
