@@ -1,4 +1,6 @@
 import React from 'react';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -17,7 +19,8 @@ vi.mock('@/audio/useLaneAudioBlocked', () => ({ useLaneAudioBlocked: () => false
 vi.mock('@/video/useVideoProgressWriter', () => ({ useVideoProgressWriter: () => {} }));
 vi.mock('@/components/likes/LikedByRow', () => ({ LikedByRow: () => null }));
 vi.mock('@/components/fullscreen-feed/FullscreenTopProgress', () => ({ FullscreenTopProgress: () => null, showsTopProgress: () => false }));
-vi.mock('@/components/fullscreen-feed/FullscreenVideoScrubber', () => ({ FullscreenVideoScrubber: () => null }));
+const scrubber = vi.hoisted(() => ({ render: vi.fn() }));
+vi.mock('@/components/fullscreen-feed/FullscreenVideoScrubber', () => ({ FullscreenVideoScrubber: (props: { bottom: string }) => { scrubber.render(props); return null; } }));
 
 const post: FeedPost = {
   id: 'shots:course:course', userId: '', actorId: '', actorType: 'personal', username: '',
@@ -31,9 +34,9 @@ const post: FeedPost = {
   ],
 };
 
-function mount(syntheticPosts: boolean) {
+function mount(syntheticPosts: boolean, shownPost = post) {
   return render(<MemoryRouter><ImmersiveFullscreenChrome
-    posts={[post]} activeIndex={0} syntheticPosts={syntheticPosts} readOnly
+    posts={[shownPost]} activeIndex={0} syntheticPosts={syntheticPosts} readOnly
     onClose={vi.fn()} onLike={vi.fn()} onComment={vi.fn()} onShare={vi.fn()}
     onMore={vi.fn()} getLikeState={() => ({ isLiked: false, count: 0 })}
     getCommentCount={() => 0} getFollowState={() => false} onFollow={vi.fn()}
@@ -67,7 +70,10 @@ describe('member-shot caption in the real fullscreen chrome', () => {
     const view = mount(true);
     expect(view.container.querySelector('[data-fullscreen-band]')).toBeNull();
     expect(screen.queryByRole('button', { name: /profile/ })).toBeNull();
-    expect(view.container.querySelector('[data-member-shot-credit]')?.textContent).toBe("Through members' eyesRoyal PortrushThomas Holmes · Mar 2026");
+    const block = view.container.querySelector('[data-member-shot-credit]');
+    expect(block?.querySelector('.member-shot-text')?.textContent).toBe("Through members' eyesRoyal PortrushThomas Holmes · Mar 2026");
+    expect(block?.querySelector('[data-avatar-fallback]')).toHaveTextContent('T');
+    expect(block?.textContent).not.toMatch(/\b\d+(s|m|h|d|w|mo|y)\b/);
   });
 
   it('a missing avatar uses the active member initial, never the course initial', () => {
@@ -85,5 +91,24 @@ describe('member-shot caption in the real fullscreen chrome', () => {
     expect(view.container.querySelector('[data-member-shot-credit]')).toBeNull();
     act(() => useFullscreenFeedStore.getState().setActivePagerIdx(1));
     expect(view.container.querySelector('[data-member-shot-credit]')).toBeNull();
+  });
+
+  it('synthetic scrubber bottom is the safe-area string', () => {
+    mount(true);
+    expect(scrubber.render).toHaveBeenLastCalledWith(expect.objectContaining({ bottom: 'env(safe-area-inset-bottom, 0px)' }));
+  });
+
+  it('caption bottom switches between image and active video clearance as the carousel moves', () => {
+    const shownPost: FeedPost = { ...post, mediaItems: [post.mediaItems[0], { ...post.mediaItems[1], type: 'video', hlsUrl: '/video.m3u8' }] };
+    const view = mount(true, shownPost);
+    const caption = () => view.container.querySelector('[data-member-shot-credit]');
+    expect(caption()).not.toHaveClass('member-shot-caption-video');
+    act(() => useFullscreenFeedStore.getState().setActivePagerIdx(1));
+    expect(caption()).toHaveClass('member-shot-caption-video');
+    act(() => useFullscreenFeedStore.getState().setActivePagerIdx(0));
+    expect(caption()).not.toHaveClass('member-shot-caption-video');
+    const css = readFileSync(resolve(process.cwd(), 'src/components/fullscreen-feed/member-shot-credit.css'), 'utf8');
+    expect(css).toMatch(/\.member-shot-caption\s*\{[^}]*bottom: calc\(24px \+ env\(safe-area-inset-bottom\)\);/);
+    expect(css).toMatch(/\.member-shot-caption-video\s*\{[^}]*bottom: calc\(48px \+ env\(safe-area-inset-bottom\)\);/);
   });
 });

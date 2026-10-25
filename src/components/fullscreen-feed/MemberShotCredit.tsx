@@ -8,7 +8,7 @@ import './member-shot-credit.css';
 export function MemberShotCredit({ syntheticPosts, item }: { syntheticPosts: boolean; item?: MediaItem }) {
   const shot = item?.memberShot;
   if (!syntheticPosts || !shot) return null;
-  return <div data-member-shot-credit className="member-shot-caption">
+  return <div data-member-shot-credit className={`member-shot-caption${item?.type === 'video' ? ' member-shot-caption-video' : ''}`}>
     <div className="member-shot-avatar">
       <SquircleAvatar key={item?.id} size={40} src={shot.avatarUrl} alt={shot.memberName}
         fallback={shot.memberName.trim().charAt(0).toUpperCase() || '?'} hairlineRing />

@@ -8,6 +8,9 @@
   align-items: flex-end;
   pointer-events: none;
 }
+.member-shot-caption-video {
+  bottom: calc(48px + env(safe-area-inset-bottom));
+}
 .member-shot-avatar { flex: none; pointer-events: auto; }
 .member-shot-text { min-width: 0; }
 .member-shot-title {

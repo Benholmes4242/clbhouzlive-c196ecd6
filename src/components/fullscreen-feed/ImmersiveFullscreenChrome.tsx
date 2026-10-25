@@ -556,7 +556,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
       </div>
       <FullscreenVideoScrubber
         activePost={activePost}
-        bottom={syntheticPosts ? 0 : `calc(${BAND_H_CSS} - ${SCRUBBER_H / 2}px)`}
+        bottom={syntheticPosts ? 'env(safe-area-inset-bottom, 0px)' : `calc(${BAND_H_CSS} - ${SCRUBBER_H / 2}px)`}
         onDraggingChange={setScrubbing}
       />
       {/* Top scrim removed — chrome sits directly on the blurred media

@@ -1,7 +1,9 @@
 # Roadmap
 
 ## BRIEF_MEMBER_SHOTS_VIEWER_POLISH_FIX
-- [ ] STOP before edits: requested title letter-spacing -0.02em contradicts developer instruction “Letter spacing must be 0, not negative.” User explicitly requests stopping/quoting that source rather than overriding the brief. No correction/test/typecheck run for this follow-up; existing caption failure and TS2322 remain.
+- [x] Resolved spacing hold: user drops clause 4 and spacing test; title stays at 0.
+- [ ] Correct authorised text-column assertion, safe-area scrubber string and active-video caption clearance; add two placement tests only.
+- [ ] Run full suite against 2,797/344 baseline (two failures) and inspect automatic typecheck; manual typecheck prohibited by environment. Report named edits/counts and any standing failure.
 
 ## CB79.2 — Invite history
 - [x] Team's sole Invite entry carries fromTeam; back/success pop, cold opens replace. Guard and invalidations unchanged; opt-in hook toast suppression lets Team-origin success toast fire after navigation without duplicates.
