@@ -37,17 +37,9 @@ export interface LatestHoleMedia {
   yards: number | null;
 }
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-function addedCreditMonth(value: string | null): string | null {
-  if (!value) return null;
-  const date = new Date(value);
-  if (!Number.isFinite(date.getTime())) return null;
-  return `${MONTHS[date.getUTCMonth()]} ${String(date.getUTCFullYear()).padStart(4, '0')}`;
-}
-
 function LatestHoleCard({ row }: { row: LatestHoleMedia }) {
   const navigate = useNavigate();
-  const credit = [row.member_name, addedCreditMonth(row.added_at)].filter(Boolean).join(' \u00B7 ');
+  const credit = [row.member_name, addedMonthLabel(row.added_at)].filter(Boolean).join(' \u00B7 ');
   const seconds = Math.round(row.duration_seconds ?? 0);
   const duration = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   return (
