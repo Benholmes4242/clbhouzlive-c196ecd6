@@ -70,16 +70,57 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
   const behaviorRef = useRef<ScrollBehavior>('auto');
   const photoIdRef = useRef(photoId);
   photoIdRef.current = photoId;
+  const tileRef = useRef<{ photos: readonly HolePhoto[] } | null>(null);
   useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
 
-  if (!available || !holes.length) return null;
-  const walk = deriveHoleWalk(holes, rows);
-  const tile = walk.tiles.find(item => item.hole.hole_no === selected);
+  const show = available && holes.length > 0;
+  const walk = show ? deriveHoleWalk(holes, rows) : null;
+  const tile = walk?.tiles.find(item => item.hole.hole_no === selected);
+  tileRef.current = tile ?? null;
   const photos = tile?.photos ?? [];
   const activeIndex = tile ? Math.max(0, photos.findIndex(photo => photo.id === photoId)) : 0;
-  const active = photos[activeIndex];
+
+  // photoId changed from anywhere other than a track swipe: bring the frame
+  // to that shot (smooth from the strip, instant for focus/panel open).
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || !tileRef.current) return;
+    if (scrollDrivenRef.current) { scrollDrivenRef.current = false; return; }
+    const width = track.clientWidth;
+    if (!width) return;
+    const index = Math.max(0, tileRef.current.photos.findIndex(photo => photo.id === photoIdRef.current));
+    if (Math.round(track.scrollLeft / width) !== index) {
+      track.scrollTo?.({ left: index * width, behavior: behaviorRef.current });
+    }
+    behaviorRef.current = 'auto';
+  }, [photoId, selected, available]);
+
+  // Keep the active thumbnail in view as the active shot changes.
+  useEffect(() => {
+    activeThumbRef.current?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+  }, [activeIndex, selected]);
+
+  const onTrackScroll = () => {
+    const track = trackRef.current;
+    if (!track || rafRef.current) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = 0;
+      const width = track.clientWidth;
+      const current = tileRef.current;
+      if (!width || !current) return;
+      const i = Math.round(track.scrollLeft / width);
+      const photo = current.photos[i];
+      if (photo && photo.id !== photoIdRef.current) {
+        scrollDrivenRef.current = true;
+        setPhotoId(photo.id);
+      }
+    });
+  };
+
+  if (!show || !walk) return null;
   const months = tile ? holePhotoMonths(tile.photos) : [];
   const field = tile ? toParParts(tile.hole.avg_to_par) : null;
+  const active = photos[activeIndex];
 
   // Every image or ready video on the hole, in panel order; processing videos
   // are left out of the viewer entirely.
@@ -88,7 +129,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
     const video = photo.media_type === 'video';
     const { short, variant } = shareCourseName(courseName);
     const coursePart = short + (variant ? ` (${variant})` : '');
-    const parPart = scored ? ` ・ Par ${tile.hole.par}${tile.hole.yards != null ? ` ・ ${tile.hole.yards} yards` : ''}` : '';
+    const parPart = scored ? ` · Par ${tile.hole.par}${tile.hole.yards != null ? ` · ${tile.hole.yards} yards` : ''}` : '';
     const credit = [authors?.get(photo.user_id), addedMonthLabel(photo.added_at)].filter(Boolean).join(' · ');
     return {
       id: photo.id,
@@ -109,42 +150,6 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
     const index = playable.findIndex(photo => photo.id === id);
     if (index >= 0) setViewerIndex(index);
   };
-
-  const onTrackScroll = () => {
-    const track = trackRef.current;
-    if (!track || rafRef.current) return;
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = 0;
-      const width = track.clientWidth;
-      if (!width) return;
-      const i = Math.round(track.scrollLeft / width);
-      const photo = photos[i];
-      if (photo && photo.id !== photoIdRef.current) {
-        scrollDrivenRef.current = true;
-        setPhotoId(photo.id);
-      }
-    });
-  };
-
-  // photoId changed from anywhere other than a track swipe: bring the frame
-  // to that shot (smooth from the strip, instant for focus/panel open).
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track || !tile) return;
-    if (scrollDrivenRef.current) { scrollDrivenRef.current = false; return; }
-    const width = track.clientWidth;
-    if (!width) return;
-    if (Math.round(track.scrollLeft / width) !== activeIndex) {
-      track.scrollTo?.({ left: activeIndex * width, behavior: behaviorRef.current });
-    }
-    behaviorRef.current = 'auto';
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [photoId, selected, available]);
-
-  // Keep the active thumbnail in view as the active shot changes.
-  useEffect(() => {
-    activeThumbRef.current?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
-  }, [activeIndex, selected]);
 
   const panel = tile && <section ref={panelRef} className={scored ? 'hole-walk-panel' : 'hole-walk-panel hole-walk-panel-unscored'} role="region" aria-label={`Hole ${tile.hole.hole_no}`}>
       <p className="hole-walk-kicker" style={VERDICT_KICKER}>The {holeOrdinal(tile.hole.hole_no)}</p>
