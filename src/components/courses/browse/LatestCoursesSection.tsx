@@ -1,23 +1,21 @@
 /** BRIEF_COURSES_LATEST_FROM_COURSES §1-3 — "Through members' eyes / Latest
  * from the courses": one card per course from get_latest_course_media (RPC
  * owns one row per course, newest member shot first, at most 30; we ask for
- * 15). BRIEF_LATEST_COURSES_FLAT_VIEWER — tapping a tile opens ONE sideways
- * run through every photo and video of that course, starting on the tapped
- * shot, in the same full-screen viewer the Latest holes cards use
- * (MediaPreviewViewer with edgeBounce). The set is still the course's media
- * from get_course_media_v2 via useGalleryCourseMedia, in the Media tab's
- * order, flattened post-then-media; each shot is credited to the member who
- * added it. This rail never starts video playback; video tiles draw their
- * poster. */
+ * 15). BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §3 — tapping a tile opens the
+ * CANONICAL full-screen viewer (FullscreenFeedOverlay via openWithOrigin,
+ * readOnly) over ONE run through every photo and video of that course,
+ * starting on the tapped shot. The set is still the course's media from
+ * get_course_media_v2 via useGalleryCourseMedia, in the Media tab's order,
+ * exploded post-then-media into one page per shot, each credited to the
+ * member who added it. This rail never starts video playback; video tiles
+ * draw their poster. */
 import { useEffect, useState } from 'react';
 import { useGamRpc } from '@/hooks/gam/_useGamRpc';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useGalleryCourseMedia } from '@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia';
-import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
-import type { OrderedMediaItem } from '@/components/shared/media/types';
-import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
-import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
-import { buildHlsUrl } from '@/utils/streamId';
+import { coursePostsToShotPosts } from '@/lib/courseMedia/memberShotPosts';
+import { openWithOrigin } from '@/lib/openWithOrigin';
+import type { FeedPost } from '@/components/media-system/types/media';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import { useSectionReady } from './PageLoadGate';
@@ -55,10 +53,10 @@ export interface LatestCourseMedia {
 
 interface PendingOpen {
   courseId: string;
-  courseName: string;
   postId: string;
   mediaId: string;
   mediaUrl: string;
+  posterUrl: string | null;
 }
 
 const tileImage = (tile: LatestCourseMediaTile) =>
@@ -73,55 +71,19 @@ function creditLine(row: LatestCourseMedia): string | null {
   return `${name} and ${others} others`;
 }
 
-/** BRIEF_LATEST_COURSES_FLAT_VIEWER §2 — one flat run through every shot of
- * the course, posts in order then each post's media in order. Processing
- * videos and videos with no playable source (no hlsUrl, mp4Url or streamId)
- * are skipped. */
-function flattenShots(posts: readonly FeedPost[]): Array<{ post: FeedPost; item: MediaItem }> {
-  const flat: Array<{ post: FeedPost; item: MediaItem }> = [];
-  for (const post of posts) {
-    for (const item of post.mediaItems) {
-      if (item.type === 'video' && (item.isProcessing || (!item.hlsUrl && !item.mp4Url && !item.streamId))) continue;
-      flat.push({ post, item });
-    }
-  }
-  return flat;
-}
-
-/** §3 — the flat position of the tapped shot: media id, then any url match,
- * then the first item of the tapped post, then 0. */
-function flatStartIndex(flat: Array<{ post: FeedPost; item: MediaItem }>, pending: PendingOpen): number {
-  let index = flat.findIndex(s => s.item.id === pending.mediaId);
+/** §3 — the position of the tapped shot in the exploded list: media id, then
+ * any url match, then the first shot of the tapped post, then 0. */
+function shotStartIndex(posts: readonly FeedPost[], pending: PendingOpen): number {
+  let index = posts.findIndex(p => p.mediaItems[0]?.id === pending.mediaId);
   if (index < 0) {
-    index = flat.findIndex(s =>
-      s.item.imageUrl === pending.mediaUrl || s.item.mp4Url === pending.mediaUrl
-      || s.item.hlsUrl === pending.mediaUrl || s.item.thumbnailUrl === pending.mediaUrl);
+    index = posts.findIndex(p => {
+      const item = p.mediaItems[0];
+      return item != null && (item.imageUrl === pending.mediaUrl || item.mp4Url === pending.mediaUrl
+        || item.hlsUrl === pending.mediaUrl || item.thumbnailUrl === pending.mediaUrl);
+    });
   }
-  if (index < 0) index = flat.findIndex(s => s.post.id === pending.postId);
+  if (index < 0) index = posts.findIndex(p => p.id.startsWith(`${pending.postId}::`));
   return index < 0 ? 0 : index;
-}
-
-/** §4 — one OrderedMediaItem per shot; the credit names the member who added
- * it and the month they added it (addedMonthLabel, shared with the rails). */
-function toViewerItems(flat: Array<{ post: FeedPost; item: MediaItem }>, courseName: string): OrderedMediaItem[] {
-  return flat.map(({ post, item }, index) => {
-    const video = item.type === 'video';
-    const hlsUrl = video ? (item.hlsUrl ?? (item.streamId ? buildHlsUrl(item.streamId) : undefined)) : undefined;
-    const credit = [post.displayName, addedMonthLabel(post.createdAt)].filter(Boolean).join(' · ');
-    return {
-      id: item.id,
-      type: item.type,
-      order: index,
-      previewUrl: video ? (hlsUrl ? item.thumbnailUrl ?? '' : item.mp4Url ?? '') : item.imageUrl ?? '',
-      thumbnailUrl: item.thumbnailUrl ?? item.imageUrl,
-      hlsUrl,
-      caption: {
-        kicker: "Through members' eyes",
-        title: courseName,
-        credit: credit || undefined,
-      },
-    };
-  });
 }
 
 function LatestCourseCard({ row, pending, onOpen }: {
