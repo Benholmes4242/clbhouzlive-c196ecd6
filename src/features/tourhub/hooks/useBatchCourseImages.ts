@@ -54,6 +54,7 @@ const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
   'The Club at Indian Creek': clubAtIndianCreek.url,
   'Canyon Meadows G&CC': canyonMeadowsGCC.url,
   'Canyon Meadows Golf & Country Club': canyonMeadowsGCC.url,
+  'Norwood Hills Country Club': norwoodHillsCC.url,
 };
 
 export interface TournamentImageInput {
