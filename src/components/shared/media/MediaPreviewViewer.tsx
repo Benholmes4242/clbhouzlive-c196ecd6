@@ -323,6 +323,7 @@ export function MediaPreviewViewer({
           supplied one (the hole walk does; every other caller is unchanged). */}
       {item.caption && (
         <div
+          data-viewer-caption
           style={{
             position: 'absolute',
             left: 20,
