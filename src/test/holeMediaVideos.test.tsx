@@ -4,10 +4,10 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 
-const f = vi.hoisted(() => ({ from: vi.fn(), auth: vi.fn(), insert: vi.fn(), attach: vi.fn(), detach: vi.fn(), posts: [] as Record<string, unknown>[], reviews: [] as Record<string, unknown>[], viewer: undefined as { items: Array<{ type: string; hlsUrl?: string }> } | undefined }));
+const f = vi.hoisted(() => ({ from: vi.fn(), auth: vi.fn(), insert: vi.fn(), attach: vi.fn(), detach: vi.fn(), posts: [] as Record<string, unknown>[], reviews: [] as Record<string, unknown>[], open: vi.fn() }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: f.from, auth: { getUser: f.auth } } }));
 vi.mock('@/components/explore-tab-new/courseled/tileHlsPlayer', () => ({ attachTileHls: f.attach }));
-vi.mock('@/components/shared/media/MediaPreviewViewer', () => ({ MediaPreviewViewer: (props: { items: Array<{ type: string; hlsUrl?: string }> }) => { f.viewer = props; return null; } }));
+vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: (...args: unknown[]) => f.open(...args) }));
 import { canTagHolePhoto, fetchOwnMediaSources, submitHolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { HoleWalk } from '@/components/course-media-tab/HoleWalk';
 import { HoleKnownPhotoPath, HolePhotoBatchPath } from '@/components/course-media-tab/HolePhotoFastPaths';
@@ -20,7 +20,7 @@ const post = { userId: 'member', actorType: 'personal', mediaItems: [{ id: 'vide
 const row = { id: 'video', course_id: 'course', hole_no: 7, user_id: 'member', media_url: url, media_type: 'video', stream_id: source.stream_id, poster_url: '/poster.jpg', duration_seconds: 42, status: 'approved', exif_captured_at: null, created_at: '2026-10-24' } as HolePhoto;
 const hole = { hole_no: 7, par: 4, yards: 400, stroke_index: 1, avg_to_par: 1, avg_gross: 5, rounds: 10, dist: { ace: 0, albatross: 0, eagle: 0, birdie: 0, par: 5, bogey: 5, double: 0 } } as CourseHole;
 beforeEach(() => {
-  vi.clearAllMocks(); f.posts = []; f.reviews = []; f.viewer = undefined;
+  vi.clearAllMocks(); f.posts = []; f.reviews = [];
   f.auth.mockResolvedValue({ data: { user: { id: 'member' } }, error: null });
   f.insert.mockReturnValue({ select: () => ({ single: async () => ({ data: row, error: null }) }) });
   f.attach.mockReturnValue({ detach: f.detach });
@@ -53,9 +53,12 @@ describe('Stage1 hole video display and lifecycle', () => {
     expect(slide.querySelector('img')).toHaveAttribute('src', '/poster.jpg');
     expect(slide.querySelector('.hole-walk-play-disc')).toBeTruthy();
     fireEvent.click(slide);
-    expect(f.viewer?.items).toHaveLength(1);
-    expect(f.viewer?.items[0].type).toBe('video');
-    expect(f.viewer?.items[0].hlsUrl).toContain(`/${source.stream_id}/manifest/video.m3u8`);
+    expect(f.open).toHaveBeenCalledTimes(1);
+    const args = f.open.mock.calls[0][0] as { posts: Array<{ mediaItems: Array<{ type: string; hlsUrl?: string }> }>; options?: { readOnly?: boolean } };
+    expect(args.posts).toHaveLength(1);
+    expect(args.posts[0].mediaItems[0].type).toBe('video');
+    expect(args.posts[0].mediaItems[0].hlsUrl).toContain(`/${source.stream_id}/manifest/video.m3u8`);
+    expect(args.options).toEqual({ readOnly: true });
     expect(f.attach).not.toHaveBeenCalled();
   });
   it('known-hole pile shows eligible video poster and duration', () => { render(<HoleKnownPhotoPath hole={7} photos={[url]} sources={[{ url, createdAt: '', mediaType: 'video', streamId: source.stream_id, posterUrl: '/poster.jpg', durationSeconds: 42, width: 640, height: 480 }]} pending={false} error={null} onChoose={() => {}} onLibrary={() => {}} onClose={() => {}} />); expect(screen.getByRole('button', { name: 'Choose video' }).querySelector('img')).toHaveAttribute('src', '/poster.jpg'); });

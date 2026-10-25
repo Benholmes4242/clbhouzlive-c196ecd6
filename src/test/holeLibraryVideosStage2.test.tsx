@@ -6,8 +6,8 @@ import type { TusUploadOptions } from '@/uploads/tusVideoUpload';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 
-const f = vi.hoisted(() => ({ upload: vi.fn(), resilient: vi.fn(), poll: vi.fn(), insert: vi.fn(), auth: vi.fn(), exif: vi.fn(), viewer: undefined as { items: Array<{ type: string; hlsUrl?: string }> } | undefined }));
-vi.mock('@/components/shared/media/MediaPreviewViewer', () => ({ MediaPreviewViewer: (props: { items: Array<{ type: string; hlsUrl?: string }> }) => { f.viewer = props; return null; } }));
+const f = vi.hoisted(() => ({ upload: vi.fn(), resilient: vi.fn(), poll: vi.fn(), insert: vi.fn(), auth: vi.fn(), exif: vi.fn(), open: vi.fn() }));
+vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: (...args: unknown[]) => f.open(...args) }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'member' } }) }));
 vi.mock('@/uploads/hooks/useMediaUpload', () => ({ useMediaUpload: () => ({ upload: f.upload }) }));
