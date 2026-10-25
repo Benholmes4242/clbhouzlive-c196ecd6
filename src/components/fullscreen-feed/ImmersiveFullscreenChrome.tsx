@@ -368,7 +368,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   const activePost = posts[activeIndex] ?? null;
   // K.1: the member's position is saved on pause, close and a throttled interval.
-  useVideoProgressWriter(activePost);
+  // readOnly opens carry synthetic post ids — never write video_progress for
+  // them (BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §5).
+  useVideoProgressWriter(readOnly ? null : activePost);
 
   // Prefer the FullscreenMediaPager's live index (updates on every scroll
   // settle inside the fullscreen viewer). Fall back to the clubhouseStore
