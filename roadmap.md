@@ -1,5 +1,11 @@
 # Roadmap
 
+## CB83 — Insights section two
+- [x] Replaced visits/discovery with UTC bars, post markers, busiest-period sentence and merged sources; CB82 and later card source unchanged.
+- [x] Added en/en-XA and 41 tests in cb83InsightsVisits (35) / cb83InsightsLoading (6). Retargeted two named CB82 page cases only, stable post-date fixture added. Full bunx vitest run 2,861 passed/347 files, zero failures from 2,820/345; latest automatic build OK.
+- [x] Controlled browser 7/30/90 bars 7/30/13 and axis labels 7/4/4, empty/no sources verified; screenshots reviewed and no section overflow at320/430/1280. Dedicated chart keeps club analytics untouched; deleted only empty.visits/discovery in en/en-XA. Report CB83_Insights_section_two_report.md.
+- [ ] Live authenticated Insights reads/markers remain unverified: external_unmanaged authentication cannot be restored here.
+
 ## BRIEF_MEMBER_SHOTS_VIEWER_POLISH_FIX
 - [x] Resolved spacing hold: user drops clause 4 and spacing test; title stays at 0.
 - [x] Corrected authorised text-column assertion plus member T/no-relative-time checks, safe-area scrubber string and active-video caption clearance; added two placement tests only. Title spacing stays 0.

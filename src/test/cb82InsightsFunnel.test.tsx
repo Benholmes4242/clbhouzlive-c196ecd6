@@ -23,6 +23,8 @@ vi.mock('@/hooks/useBusinessMembership', () => ({
 }));
 vi.mock('@/hooks/useBusinessReviewStats', () => ({ useBusinessReviewStats: () => ({ data: null, isLoading: false, error: null, refetch: vi.fn() }) }));
 vi.mock('@/hooks/useBottomNavVisibility', () => ({ useHideBottomNav: () => {} }));
+const postDays = vi.hoisted(() => ({ data: [] as string[], isFetched: true, isPlaceholderData: false, isError: false }));
+vi.mock('@/hooks/useBusinessPostDays', () => ({ useBusinessPostDays: () => postDays }));
 const openPostStudio = vi.fn();
 vi.mock('@/stores/usePostStudioStore', () => ({ usePostStudioStore: { getState: () => ({ openPostStudio }) } }));
 
@@ -187,7 +189,9 @@ describe('CB82 page', () => {
     const { container } = renderPage();
     await waitFor(() => expect(container.querySelector('[data-section="insights-funnel"]')).not.toBeNull());
     expect(screen.queryByText('OVERVIEW')).toBeNull();
-    for (const k of ['VISITORS', 'DISCOVERY', 'CONTENT', 'ENGAGEMENT']) expect(screen.getByText(k)).toBeTruthy();
+    await waitFor(() => expect(container.querySelector('[data-card="visits"]')).not.toBeNull());
+    expect(container.querySelector('[data-card="sources"]')).not.toBeNull();
+    for (const k of ['CONTENT', 'ENGAGEMENT']) expect(screen.getByText(k)).toBeTruthy();
     expect(screen.getAllByText('AUDIENCE')).toHaveLength(2);
   });
 
@@ -197,7 +201,8 @@ describe('CB82 page', () => {
     await waitFor(() => expect(rpc).toHaveBeenCalledWith('get_business_insights_funnel', expect.anything()));
     await act(async () => { await Promise.resolve(); });
     expect(container.querySelector('[data-section="insights-funnel"]')).toBeNull();
-    expect(screen.getByText('VISITORS')).toBeTruthy();
+    expect(screen.getByText('CONTENT')).toBeTruthy();
+    expect(container.querySelector('[data-section="insights-visits"]')).toBeNull();
   });
 
   it('switching period keeps the previous figures until the new ones arrive', async () => {

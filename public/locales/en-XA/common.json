@@ -713,8 +713,6 @@
         "total": "[~~Ţőţáļ~~]"
       },
       "empty": {
-        "visits": "[~~Ñő ṽíšíţš ýéţ íñ ţĥíš ƥéříőđ.~~]",
-        "discovery": "[~~Ñő đíšĉőṽéřý đáţá ýéţ íñ ţĥíš ƥéříőđ.~~]",
         "followersTitle": "[~~Ƒőļļőŵéř ĝřőŵţĥ~~]",
         "followersBody": "[~~Ƒőļļőŵéř áĉţíṽíţý ŵíļļ áƥƥéář ĥéřé áš íţ ĥáƥƥéñš.~~]",
         "posts": "[~~Ñő ƥőšţš ƥúƀļíšĥéđ íñ ţĥíš ƥéříőđ.~~]"
@@ -737,6 +735,39 @@
       },
       "reviewsCount_one": "[~~{{n}} řéṽíéŵ~~]",
       "reviewsCount_other": "[~~{{n}} řéṽíéŵš~~]",
+      "visits": {
+        "kicker": "[~~Profile visits~~]",
+        "weeklyKicker": "[~~Profile visits a week~~]",
+        "visitCount_one": "[~~{{n}} visit~~]",
+        "visitCount_other": "[~~{{n}} visits~~]",
+        "golferCount_one": "[~~{{n}} golfer~~]",
+        "golferCount_other": "[~~{{n}} golfers~~]",
+        "legendVisits": "[~~Profile visits~~]",
+        "legendPosts": "[~~A day you posted~~]",
+        "today": "[~~today~~]",
+        "yesterday": "[~~yesterday~~]",
+        "postedSame": "[~~the day you posted.~~]",
+        "postedAfter": "[~~the day after you posted.~~]",
+        "empty": "[~~No profile visits in the last {{days}} days.~~]",
+        "sourcesKicker": "[~~How they found you~~]",
+        "sourcesUnit": "[~~Visits~~]",
+        "fine": "[~~\"Somewhere else\" is a visit the app couldn't trace, such as a saved or typed link.~~]",
+        "sources": {
+          "search": "[~~Search~~]",
+          "feed": "[~~The Clubhouse feed~~]",
+          "content": "[~~Your posts~~]",
+          "course": "[~~Your course page~~]",
+          "directory": "[~~Business directory~~]",
+          "shared": "[~~A shared link~~]",
+          "other": "[~~Somewhere else~~]"
+        },
+        "busiestDay_one": "[~~Your busiest day was {{date}}, with {{n}} visit.~~]",
+        "busiestDay_other": "[~~Your busiest day was {{date}}, with {{n}} visits.~~]",
+        "busiestDayPosted_one": "[~~Your busiest day was {{date}}, with {{n}} visit,~~]",
+        "busiestDayPosted_other": "[~~Your busiest day was {{date}}, with {{n}} visits,~~]",
+        "busiestWeek_one": "[~~Your busiest week was {{date}}, with {{n}} visit.~~]",
+        "busiestWeek_other": "[~~Your busiest week was {{date}}, with {{n}} visits.~~]"
+      },
       "funnel": {
         "headSaw_one": "[~~{{n}} ĝőļƒéř šáŵ {{business}}.~~]",
         "headSaw_other": "[~~{{n}} ĝőļƒéřš šáŵ {{business}}.~~]",

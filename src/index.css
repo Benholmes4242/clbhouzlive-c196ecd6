@@ -23,6 +23,9 @@
 /* CB75: Team section-one roles; scope excludes the frozen member/invite lists.
    Sheet chrome remains owned by BottomSheet (founder ruling). */
 :root {
+  --insights-inset: #1E1E23;
+  --insights-bar: rgba(248,250,252,0.88);
+  --insights-zero: rgba(255,255,255,0.10);
   --member-shot-title-ink: #FFFFFF;
   --member-shot-credit-ink: rgba(255,255,255,0.72);
   --team-ink: #F8FAFC;
@@ -4900,3 +4903,34 @@ em-emoji-picker input:focus {
     opacity: 1 !important;
   }
 }
+
+/* CB83: isolated visits bars; CB82 and club analytics unchanged. */
+.insights-visits-card { margin: 14px 16px 0; background: var(--team-request-surface); border: 1px solid var(--team-border); border-radius: 18px; padding: 16px; color: var(--team-ink); }
+.insights-visits-kicker { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 10.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--team-muted); }
+.insights-visits-kicker > span:last-child { color: var(--team-dim); letter-spacing: .12em; text-align: right; }
+.insights-visits-chart { margin-top: 12px; background: var(--insights-inset); border-radius: 13px; padding: 12px 12px 8px; }
+.insights-visits-bars { display: flex; align-items: flex-end; gap: 3px; height: 110px; padding-top: 22px; position: relative; }
+.insights-visits-column { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; position: relative; }
+.insights-visits-bar { flex: none; width: 100%; background: var(--insights-bar); border-radius: 2px 2px 0 0; }
+.insights-visits-bar[data-zero="true"] { background: var(--insights-zero); border-radius: 1px; }
+.insights-visits-number { font-size: 10px; font-weight: 700; color: var(--team-muted); margin-bottom: 3px; }
+.insights-visits-marker { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 11px; height: 11px; border-radius: 50%; background: var(--insights-inset); border: 1.5px solid var(--team-ink); }
+.insights-visits-marker > span { position: absolute; left: 12px; top: -3px; font-size: 9.5px; font-weight: 800; color: var(--team-muted); }
+.insights-visits-axis { display: flex; justify-content: space-between; margin-top: 6px; font-size: 10.5px; color: var(--team-dim); }
+.insights-visits-axis[data-weekdays="true"] { gap: 3px; }
+.insights-visits-axis[data-weekdays="true"] > span { flex: 1; min-width: 0; text-align: center; }
+.insights-visits-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; font-size: 11px; color: var(--team-dim); }
+.insights-visits-legend > span { display: flex; align-items: center; gap: 6px; }
+.insights-visits-square, .insights-visits-ring { width: 10px; height: 10px; flex: none; }
+.insights-visits-square { border-radius: 2px; background: var(--insights-bar); }
+.insights-visits-ring { border-radius: 50%; border: 1.5px solid var(--team-ink); background: var(--insights-inset); }
+.insights-visits-note { margin: 10px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--team-muted); }
+.insights-visits-note b { font-weight: 600; color: var(--team-ink); }
+.insights-source-rows { margin-top: 12px; }
+.insights-source-row { display: grid; grid-template-columns: 120px minmax(0, 1fr) 30px; gap: 10px; align-items: center; padding: 7px 0; font-size: 12.5px; color: var(--team-muted); }
+.insights-source-track { height: 8px; border-radius: 4px; background: var(--team-hairline); position: relative; }
+.insights-source-track i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--team-ink); }
+.insights-source-value { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; color: var(--team-ink); }
+.insights-source-row[data-source="other"], .insights-source-row[data-source="other"] .insights-source-value { color: var(--team-dim); }
+.insights-source-row[data-source="other"] i { background: var(--team-dim); }
+.insights-source-fine { margin: 8px 0 0; font-size: 11.5px; line-height: 1.45; color: var(--team-dim); }

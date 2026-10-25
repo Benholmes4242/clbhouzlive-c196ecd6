@@ -758,8 +758,6 @@
         "total": "Total"
       },
       "empty": {
-        "visits": "No visits yet in this period.",
-        "discovery": "No discovery data yet in this period.",
         "followersTitle": "Follower growth",
         "followersBody": "Follower activity will appear here as it happens.",
         "posts": "No posts published in this period."
@@ -782,6 +780,39 @@
       },
       "reviewsCount_one": "{{n}} review",
       "reviewsCount_other": "{{n}} reviews",
+      "visits": {
+        "kicker": "Profile visits",
+        "weeklyKicker": "Profile visits a week",
+        "visitCount_one": "{{n}} visit",
+        "visitCount_other": "{{n}} visits",
+        "golferCount_one": "{{n}} golfer",
+        "golferCount_other": "{{n}} golfers",
+        "legendVisits": "Profile visits",
+        "legendPosts": "A day you posted",
+        "today": "today",
+        "yesterday": "yesterday",
+        "postedSame": "the day you posted.",
+        "postedAfter": "the day after you posted.",
+        "empty": "No profile visits in the last {{days}} days.",
+        "sourcesKicker": "How they found you",
+        "sourcesUnit": "Visits",
+        "fine": "\"Somewhere else\" is a visit the app couldn't trace, such as a saved or typed link.",
+        "sources": {
+          "search": "Search",
+          "feed": "The Clubhouse feed",
+          "content": "Your posts",
+          "course": "Your course page",
+          "directory": "Business directory",
+          "shared": "A shared link",
+          "other": "Somewhere else"
+        },
+        "busiestDay_one": "Your busiest day was {{date}}, with {{n}} visit.",
+        "busiestDay_other": "Your busiest day was {{date}}, with {{n}} visits.",
+        "busiestDayPosted_one": "Your busiest day was {{date}}, with {{n}} visit,",
+        "busiestDayPosted_other": "Your busiest day was {{date}}, with {{n}} visits,",
+        "busiestWeek_one": "Your busiest week was {{date}}, with {{n}} visit.",
+        "busiestWeek_other": "Your busiest week was {{date}}, with {{n}} visits."
+      },
       "funnel": {
         "headSaw_one": "{{n}} golfer saw {{business}}.",
         "headSaw_other": "{{n}} golfers saw {{business}}.",

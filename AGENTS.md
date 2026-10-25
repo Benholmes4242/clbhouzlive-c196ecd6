@@ -39,6 +39,7 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Media state/RPC ownership: see CourseMediaEmptyStates.tsx header.
 - Latest holes rail query/order/geometry ownership: see LatestHolesSection.tsx header; Media consumes initial URL focus once and HoleWalk retains shot fallback ownership.
 - Leaders' group round selection ownership: see leadersGroupRules.ts header; shared board helpers remain authoritative for score and thru cells.
+- Insights visits/source snapshot and UTC bucket ownership: see InsightsVisitsSection.tsx and visitBuckets.ts headers; club analytics remains independent.
 
 ## Briefs
 
