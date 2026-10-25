@@ -20,6 +20,7 @@ vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user
 vi.mock('@/hooks/useGolfCoursesInfinite', () => ({ useGolfCoursesInfinite: f.courses }));
 vi.mock('@/hooks/top100/useTop100Enrichment', () => ({ useTop100Enrichment: f.enrichment }));
 vi.mock('@/hooks/useTop100ProgressForUser', () => ({ useTop100ProgressForUser: f.progress }));
+vi.mock('@/hooks/top100/useTop100GolferBaseline', () => ({ useTop100GolferBaseline: f.baseline }));
 vi.mock('./browse/PageLoadGate', () => ({
   PageLoadGate: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   usePageRevealed: () => true,
