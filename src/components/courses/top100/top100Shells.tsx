@@ -84,7 +84,8 @@ export function ArgumentShell() {
           <Bar style={{ width: ARGUMENT_THUMB.size, height: ARGUMENT_THUMB.size, borderRadius: ARGUMENT_THUMB.radius, flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0, display: 'grid', gap: 6 }}>
             <Bar style={{ height: 11, width: '60%' }} />
-            <Bar style={{ height: 9, width: '40%' }} />
+            <Bar style={{ height: 9, width: '45%' }} />
+            <Bar style={{ height: 9, width: '35%' }} />
           </div>
         </div>
       </div>

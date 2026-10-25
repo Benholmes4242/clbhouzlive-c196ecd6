@@ -7,7 +7,7 @@
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const f = vi.hoisted(() => ({
@@ -61,9 +61,15 @@ function mount() {
     <QueryClientProvider client={client}>
       <MemoryRouter>
         <Top100CoursesHubPanel />
+        <LocationProbe />
       </MemoryRouter>
     </QueryClientProvider>,
   );
+}
+
+function LocationProbe() {
+  const location = useLocation();
+  return <output data-testid="course-location">{location.pathname}</output>;
 }
 
 const sectionAbsent = () => {
@@ -180,12 +186,14 @@ describe('BRIEF_TOP100_GOLFERS_VS_OFFICIAL — panel wiring', () => {
       screen.getByText("The courses that vary the most between the golfers' ratings and the official rankings."),
     ).toBeInTheDocument();
     expect(screen.getByText('Course 4')).toBeInTheDocument();
-    expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd versus 4th on the official list')).toBeInTheDocument();
+    expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd of the 4 rated')).toBeInTheDocument();
+    expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 4th')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
     // GB&I: c4 is not on the list, so three qualify and the groups recompute.
     expect(screen.queryByText(/courses on this list/)).toBeNull();
     expect(screen.queryByText('Course 4')).toBeNull();
-    expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd versus 3rd on the official list')).toBeInTheDocument();
+    expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd of the 3 rated')).toBeInTheDocument();
+    expect(screen.getByText((_, el) => el?.textContent === 'Officially ranked 3rd')).toBeInTheDocument();
   });
 
 });
@@ -210,5 +218,23 @@ describe('BRIEF_TOP100_MONTHLY_MOVE — panel wiring', () => {
     mountWithArgument();
     expect(screen.queryByText(/this month/)).toBeNull();
     expect(screen.queryByText('No change')).toBeNull();
+  });
+});
+
+describe('BRIEF_TOP100_OFFICIAL_RANK_AND_TAP — panel navigation', () => {
+  it('argument row opens its course through the scroll-preserving main-list handler', () => {
+    const root = document.createElement('div');
+    root.id = 'root';
+    root.scrollTop = 237;
+    document.body.appendChild(root);
+    try {
+      mountWithArgument();
+      expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd of the 4 rated')).toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: 'Course 4, open course' }));
+      expect(sessionStorage.getItem('top100-scroll')).toBe('237');
+      expect(screen.getByTestId('course-location')).toHaveTextContent('/courses/c4');
+    } finally {
+      root.remove();
+    }
   });
 });
