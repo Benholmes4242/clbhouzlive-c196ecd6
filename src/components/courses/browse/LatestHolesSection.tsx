@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGamRpc } from '@/hooks/gam/_useGamRpc';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
+import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { useSectionReady } from './PageLoadGate';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
