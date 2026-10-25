@@ -21,7 +21,8 @@ const shot = (id: string, over: Partial<HolePhoto> = {}): HolePhoto => ({
   added_at: '2026-03-11T10:00:00Z', ...over,
 }) as HolePhoto;
 const video = (id: string, duration: number | null): HolePhoto => shot(id, {
-  media_type: 'video', stream_id: `stream-${id}`, poster_url: `/${id}-poster.jpg`, duration_seconds: duration,
+  // buildHlsUrl only accepts a 32-hex Cloudflare UID, so the fixture uses one.
+  media_type: 'video', stream_id: id.padEnd(32, '0').slice(0, 32).replace(/[^a-f0-9]/gi, '0'), poster_url: `/${id}-poster.jpg`, duration_seconds: duration,
 });
 const authors = new Map([['u1', 'Thomas Holmes'], ['u2', 'Benjamin Holmes']]);
 
