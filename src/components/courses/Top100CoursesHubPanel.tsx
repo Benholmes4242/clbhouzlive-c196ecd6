@@ -237,12 +237,6 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
      list the rows on screen belong to. Empty while loading or on error — the
      section never waits on it. */
   const argumentBaseline = useTop100GolferBaseline(renderedList);
-  const listSectionRef = useRef<HTMLElement | null>(null);
-  /* "See the golfers' list": switch the ranking and bring The list into view. */
-  const seeGolfersList = () => {
-    chooseRanking('community');
-    listSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
 
   const revealed = usePageRevealed();
   useEffect(() => {
@@ -333,14 +327,12 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
         <TheArgumentSection
           higher={argumentHigher}
           lower={argumentLower}
-          showGolfersLink={ranking !== 'community'}
-          onSeeGolfersList={seeGolfersList}
           baseline={argumentBaseline}
         />
       ) : isLoading || enrichmentLoading ? (
         <ArgumentShell />
       ) : null}
-      <section ref={listSectionRef} style={{ ...SECTION_WRAP, paddingBottom: 0 }}>
+      <section style={{ ...SECTION_WRAP, paddingBottom: 0 }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
           <SectionHead kicker="The list" tone="quiet" title={heading} />
           <DropdownMenu>
