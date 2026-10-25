@@ -15,7 +15,7 @@ import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton'
 import { shortBusinessName } from '@/components/business/home/BusinessHomeHeader';
 import {
   useBusinessTeam, useBusinessInvites, useCreateInvite, useCreateInviteByUser,
-  AssignableBusinessRole,
+  AssignableBusinessRole, BUSINESS_ROLE_LABELS,
 } from '@/hooks/useBusinessTeam';
 
 /* CB79 Team section 5 — the invite screen (team-s5.html is the signed-off spec).
@@ -284,8 +284,8 @@ export default function BusinessInvitePage() {
     : !role
       ? t('business.team.sectionFive.chooseRole', { defaultValue: 'Choose a role' })
       : pickedUser
-        ? t('business.team.sectionFive.inviteUserCta', { first: firstName, role: t(`business.team.sectionOne.roles.${role}`), defaultValue: `Invite ${firstName} as an ${role}` })
-        : t('business.team.sectionFive.inviteEmailCta', { role: t(`business.team.sectionOne.roles.${role}`), defaultValue: `Invite by email as an ${role}` });
+        ? t('business.team.sectionFive.inviteUserCta', { first: firstName, role: t(`business.team.sectionOne.roles.${role}`, { defaultValue: BUSINESS_ROLE_LABELS[role] }), defaultValue: `Invite ${firstName} as an ${BUSINESS_ROLE_LABELS[role]}` })
+        : t('business.team.sectionFive.inviteEmailCta', { role: t(`business.team.sectionOne.roles.${role}`, { defaultValue: BUSINESS_ROLE_LABELS[role] }), defaultValue: `Invite by email as an ${BUSINESS_ROLE_LABELS[role]}` });
 
   return (
     <ManagePageShell
