@@ -1,4 +1,5 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MentionText } from '@/components/mentions/MentionText';
 import { RailChips, APPLIED_FILL } from '@/components/ui/RailChips';
 import { formatHcp } from '@/lib/formatHcp';
@@ -444,6 +445,7 @@ export function ReviewCard({
 
 export default function BusinessReviewsPage() {
   const { id: businessId } = useParams<{ id: string }>();
+  const { t } = useTranslation();
   useHideBottomNav();
 
   const { session } = useSupabaseSession();
@@ -695,7 +697,7 @@ export default function BusinessReviewsPage() {
           {/* eslint-disable-next-line settled/no-not-loading-empty-check -- canManage is a permission boolean, not query data. */}
           {!canManage && !isLoading && (
             <p className="mt-4 text-[11.5px] text-center" style={{ color: INK_45 }}>
-              Only team members can reply to reviews.
+              {membership ? t('business.reviews.replyOwnersAdminsOnly') : t('business.reviews.replyTeamMembersOnly')}
             </p>
           )}
         </motion.div>
