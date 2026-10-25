@@ -103,16 +103,33 @@ describe('coursePostsToShotPosts', () => {
   });
 });
 
-describe('readOnly gates for synthetic post ids (§5)', () => {
-  it('the overlay never tracks impressions or looks up scorecards when readOnly', () => {
+describe('syntheticPosts gates for synthetic post ids (BRIEF_SYNTHETIC_SHOT_GATES)', () => {
+  it('the overlay never tracks impressions or looks up scorecards when syntheticPosts, keyed on syntheticPosts not readOnly', () => {
     const overlay = src('src/components/fullscreen-feed/FullscreenFeedOverlay.tsx');
-    expect(overlay).toContain('if (!isOpen || !activePost?.id || readOnly) return;');
-    expect(overlay).toMatch(/activePostIdForScore && !readOnly/);
+    expect(overlay).toContain('if (!isOpen || !activePost?.id || syntheticPosts) return;');
+    expect(overlay).toMatch(/activePostIdForScore && !syntheticPosts/);
+    expect(overlay).not.toContain('if (!isOpen || !activePost?.id || readOnly) return;');
+    expect(overlay).not.toMatch(/activePostIdForScore && !readOnly/);
   });
 
-  it('the chrome never writes video progress when readOnly', () => {
+  it('the chrome never writes video progress when syntheticPosts, keyed on syntheticPosts not readOnly', () => {
     const chrome = src('src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx');
-    expect(chrome).toContain('useVideoProgressWriter(readOnly ? null : activePost)');
+    expect(chrome).toContain('useVideoProgressWriter(syntheticPosts ? null : activePost)');
+    expect(chrome).not.toContain('useVideoProgressWriter(readOnly ? null : activePost)');
+  });
+
+  it('the store sets syntheticPosts on open and resets it to false on close', () => {
+    const store = useFullscreenFeedStore.getState();
+    const post = { id: 'shot-1', mediaItems: [{ id: 'shot-1', type: 'image', imageUrl: '/s.jpg' }] } as unknown as FeedPost;
+    store.open([post], 0, { readOnly: true, syntheticPosts: true });
+    expect(useFullscreenFeedStore.getState().syntheticPosts).toBe(true);
+    expect(useFullscreenFeedStore.getState().readOnly).toBe(true);
+    useFullscreenFeedStore.getState().close();
+    expect(useFullscreenFeedStore.getState().syntheticPosts).toBe(false);
+    // A real-post readOnly open (Explore review tiles etc.) never sets it.
+    useFullscreenFeedStore.getState().open([post], 0, { readOnly: true });
+    expect(useFullscreenFeedStore.getState().syntheticPosts).toBe(false);
+    useFullscreenFeedStore.getState().close();
   });
 
   it('a null post (the readOnly path) never subscribes or writes; a real video post writes on pause', () => {
