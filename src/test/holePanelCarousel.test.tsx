@@ -78,49 +78,55 @@ describe('BRIEF_HOLE_PANEL_CAROUSEL frame and strip', () => {
   });
 });
 
-describe('BRIEF_HOLE_PANEL_CAROUSEL fullscreen viewer', () => {
-  const viewer = () => {
-    const el = document.querySelector('.fixed.inset-0');
-    expect(el).not.toBeNull();
-    return within(el as HTMLElement);
+describe('BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS hole walk fullscreen', () => {
+  const lastOpen = () => f.open.mock.calls[f.open.mock.calls.length - 1][0] as {
+    posts: Array<{ id: string; displayName: string; courseName?: string; mediaItems: Array<{ id: string; type: string; hlsUrl?: string }> }>;
+    index: number;
+    mediaId: string | null;
+    openedFrom: string;
+    options?: { readOnly?: boolean };
   };
-  it('tapping the second slide opens the viewer on that shot with the hole caption', () => {
+
+  it('tapping the second slide opens the canonical viewer readOnly on that shot, credited to its member', () => {
     walk([shot('a'), shot('b', { user_id: 'u2', added_at: '2026-06-02T09:00:00Z' }), video('c', 42)]);
     fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[1] as HTMLElement);
-    expect(viewer().getByText('2 / 3')).toBeInTheDocument();
-    expect(viewer().getByText('The fourteenth')).toBeInTheDocument();
-    expect(viewer().getByText('Royal Portrush (Dunluce) · Par 4 · 432 yards')).toBeInTheDocument();
-    expect(viewer().getByText('Benjamin Holmes · Jun 2026')).toBeInTheDocument();
+    expect(f.open).toHaveBeenCalledTimes(1);
+    const args = lastOpen();
+    expect(args.posts.map(p => p.id)).toEqual(['a', 'b', 'c']);
+    expect(args.index).toBe(1);
+    expect(args.mediaId).toBe('b');
+    expect(args.openedFrom).toBe('course-media');
+    expect(args.options).toEqual({ readOnly: true });
+    expect(args.posts[1].displayName).toBe('Benjamin Holmes');
+    expect(args.posts[1].courseName).toBe('Royal Portrush Golf Club (Dunluce)');
   });
 
-  it('a processing video slide does not open the viewer and is not in its items', () => {
+  it('a processing video slide does not open the viewer and is not in its posts', () => {
     walk([shot('a'), video('p', null)]);
     fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[1] as HTMLElement);
-    expect(document.querySelector('[data-viewer-caption]')).toBeNull();
+    expect(f.open).not.toHaveBeenCalled();
     fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[0] as HTMLElement);
-    expect(viewer().getByText('The fourteenth')).toBeInTheDocument();
-    expect(viewer().queryByText('1 / 2')).toBeNull();
-    expect(viewer().getByText('Thomas Holmes · Mar 2026')).toBeInTheDocument();
+    expect(f.open).toHaveBeenCalledTimes(1);
+    expect(lastOpen().posts.map(p => p.id)).toEqual(['a']);
+    expect(lastOpen().posts[0].displayName).toBe('Thomas Holmes');
   });
 
-  it('closing the viewer returns the frame to the shot that was showing', () => {
+  it('the frame stays on the tapped shot while the canonical viewer is open', () => {
     walk([shot('a'), shot('b', { user_id: 'u2', added_at: '2026-06-02T09:00:00Z' }), video('c', 42)]);
-    fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[0] as HTMLElement);
-    fireEvent.click(viewer().getByRole('button', { name: 'Next' }));
-    expect(viewer().getByText('2 / 3')).toBeInTheDocument();
-    fireEvent.click(viewer().getByRole('button', { name: 'Back' }));
+    fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[1] as HTMLElement);
+    expect(f.open).toHaveBeenCalledTimes(1);
+    expect(lastOpen().index).toBe(1);
     expect(panel().querySelector('.hole-walk-frame-count')?.textContent).toBe('2 / 3');
     expect(screen.getByRole('button', { name: 'Show shot 2 of 3' })).toHaveAttribute('aria-current', 'true');
   });
 
-  it('a video item carries hlsUrl and the viewer attaches the stream instead of src', () => {
+  it('a video shot reaches the viewer with its stream hlsUrl', () => {
     walk([video('c', 42)]);
-    hls.attach.mockClear();
     fireEvent.click(panel().querySelector('.hole-walk-slide') as HTMLElement);
-    const el = document.querySelector('video');
-    expect(el).not.toBeNull();
-    expect(el?.getAttribute('src')).toBeNull();
-    expect(hls.attach).toHaveBeenCalledTimes(1);
+    expect(f.open).toHaveBeenCalledTimes(1);
+    const item = lastOpen().posts[0].mediaItems[0];
+    expect(item.type).toBe('video');
+    expect(item.hlsUrl).toContain('/manifest/video.m3u8');
   });
 });
 
