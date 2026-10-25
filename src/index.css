@@ -23,6 +23,8 @@
 /* CB75: Team section-one roles; scope excludes the frozen member/invite lists.
    Sheet chrome remains owned by BottomSheet (founder ruling). */
 :root {
+  --member-shot-title-ink: #FFFFFF;
+  --member-shot-credit-ink: rgba(255,255,255,0.72);
   --team-ink: #F8FAFC;
   --team-muted: rgba(248,250,252,0.62);
   --team-dim: rgba(248,250,252,0.42);

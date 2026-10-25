@@ -1,11 +1,14 @@
 /** BRIEF_MEMBER_SHOTS_SWIPE_ACROSS — one synthetic post owns the canonical
- * horizontal carousel for a course or hole; credits belong to media items.
+ * horizontal carousel for a course or hole; memberShot captions belong to media items.
+ * BRIEF_MEMBER_SHOTS_VIEWER_POLISH: both hole entrypoints use get_hole_media
+ * rows for member avatars and scored/unscored caption data.
  * Every caller must set readOnly and syntheticPosts. Synthetic ids never
  * enter real-post requests; real-post and vertical paging behaviour is frozen. */
 import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
 import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 import { addedMonthLabel } from './addedMonth';
 import { holeOrdinal } from './holeWalk';
+import { shareCourseName } from '@/lib/courses/shareCourseName';
 
 export interface MemberShotRow {
   id: string;
@@ -20,6 +23,10 @@ export interface MemberShotRow {
   added_at?: string | null;
   member_id?: string | null;
   member_name?: string | null;
+  member_avatar_url?: string | null;
+  hole_no?: number;
+  par?: number | null;
+  yards?: number | null;
 }
 
 
@@ -48,6 +55,8 @@ function syntheticPost(id: string, courseId: string, courseName: string, display
 /** Preserve get_hole_media / hole-walk order, skipping null-duration videos. */
 export function holeShotsToFeedPosts(rows: readonly MemberShotRow[], courseName = '',
   courseId = rows[0]?.course_id ?? '', holeNo = 0, thumbnail?: string | null): FeedPost[] {
+  const { short, variant } = shareCourseName(courseName);
+  const coursePart = short + (variant ? ` (${variant})` : '');
   const readyRows = rows.filter(row => row.media_type !== 'video' || row.duration_seconds != null);
   const hubRows: HubRpcRow[] = readyRows.map(row => ({
     post_id: row.id, media_id: row.id, post_created_at: row.added_at ?? null,
@@ -60,7 +69,14 @@ export function holeShotsToFeedPosts(rows: readonly MemberShotRow[], courseName 
   }));
   const mapped = toFeedPosts(hubRows);
   const shots = mapped.flatMap((post, index) => post.mediaItems.map(item => ({
-    item: { ...item, credit: credit(readyRows[index]?.member_name, readyRows[index]?.added_at) },
+    item: { ...item, memberShot: {
+      kicker: `The ${holeOrdinal(readyRows[index]?.hole_no ?? holeNo)}`,
+      title: coursePart + (readyRows[index]?.par != null
+        ? ` · Par ${readyRows[index].par}${readyRows[index].yards != null ? ` · ${readyRows[index].yards} yards` : ''}` : ''),
+      credit: credit(readyRows[index]?.member_name, readyRows[index]?.added_at),
+      avatarUrl: readyRows[index]?.member_avatar_url ?? null,
+      memberName: readyRows[index]?.member_name ?? '',
+    } },
     date: readyRows[index]?.added_at,
   })));
   return syntheticPost(`shots:hole:${courseId}:${holeNo}`, courseId, courseName,
@@ -72,7 +88,11 @@ export function coursePostsToShotPosts(posts: readonly FeedPost[],
   courseId = posts[0]?.courseId ?? '', courseName = posts[0]?.courseName ?? '',
   thumbnail = posts.find(post => post.courseThumbnailImage)?.courseThumbnailImage): FeedPost[] {
   const shots = posts.flatMap(post => post.mediaItems.filter(ready).map(item => ({
-    item: { ...item, credit: credit(post.displayName, post.createdAt) }, date: post.createdAt,
+    item: { ...item, memberShot: {
+      kicker: "Through members' eyes", title: courseName,
+      credit: credit(post.displayName, post.createdAt),
+      avatarUrl: post.avatarUrl || null, memberName: post.displayName,
+    } }, date: post.createdAt,
   })));
   return syntheticPost(`shots:course:${courseId}`, courseId, courseName, courseName, thumbnail, shots);
 }

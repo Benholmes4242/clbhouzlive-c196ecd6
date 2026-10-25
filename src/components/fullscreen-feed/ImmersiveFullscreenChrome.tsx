@@ -11,6 +11,8 @@
  *       ellipsis + rating chip at right; location · World #n at 10.5/600;
  *       row two the VIEWER's own record at the course (status pill, rounds,
  *       best). No course on the post -> no header.
+ *   Synthetic member-shot opens replace the author row with the active media
+ *   caption and reserve no comment footer; normal-post geometry stays frozen.
  *   BOTTOM: a fixed solid comment band reserves the same floor on every slide;
  *   author and rail carry drop-shadows over the media above it. From the top down:
  *     - LEFT: 40px squircle avatar + column (name · [time · FollowPill] ·
@@ -423,7 +425,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   if (feedEnded) {
     return (
       <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
-        <div data-fullscreen-band aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: BAND_H_CSS, background: PAGE_CANVAS, pointerEvents: 'none', zIndex: Z.echo }} />
+        {!syntheticPosts && <div data-fullscreen-band aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: BAND_H_CSS, background: PAGE_CANVAS, pointerEvents: 'none', zIndex: Z.echo }} />}
         <div
           style={{
             position: 'fixed',
@@ -490,9 +492,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   // Same guard the rail's comment glyph uses (!readOnly), plus a signed-in
   // actor to comment as.
-  const showCommentBar = !readOnly && !!activeActor && !!onCompose;
+  const showCommentBar = !syntheticPosts && !readOnly && !!activeActor && !!onCompose;
   const showTopStrip = showsTopProgress(activePost);
-  const stackBottom = `calc(${BAND_H_CSS} + 16px)`;
+  const stackBottom = syntheticPosts ? 'calc(24px + env(safe-area-inset-bottom))' : `calc(${BAND_H_CSS} + 16px)`;
   const fadeWhileScrubbing: React.CSSProperties = scrubbing
     ? { opacity: 0, transition: 'opacity 150ms', pointerEvents: 'none' }
     : { opacity: 1, transition: 'opacity 150ms' };
@@ -548,13 +550,13 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   return (
     <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
-      <div data-fullscreen-band aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: BAND_H_CSS, background: PAGE_CANVAS, pointerEvents: 'none', zIndex: Z.echo }} />
+      {!syntheticPosts && <div data-fullscreen-band aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: BAND_H_CSS, background: PAGE_CANVAS, pointerEvents: 'none', zIndex: Z.echo }} />}
       <div style={{ ...fadeWhileScrubbing, pointerEvents: 'none' }}>
         <FullscreenTopProgress activePost={activePost} />
       </div>
       <FullscreenVideoScrubber
         activePost={activePost}
-        bottom={`calc(${BAND_H_CSS} - ${SCRUBBER_H / 2}px)`}
+        bottom={syntheticPosts ? 0 : `calc(${BAND_H_CSS} - ${SCRUBBER_H / 2}px)`}
         onDraggingChange={setScrubbing}
       />
       {/* Top scrim removed — chrome sits directly on the blurred media
@@ -687,8 +689,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
       {/* Bottom scrim removed — author strip + action rail sit on the
           blurred backdrop; each element carries its own drop-shadow. */}
 
-      {/* Bottom-LEFT — author + info stack */}
-      <div
+      {syntheticPosts && <div style={{ zIndex: Z.echo, position: 'relative', ...fadeWhileScrubbing }} {...inertWhileScrubbing}><MemberShotCredit syntheticPosts={syntheticPosts} item={activePost.mediaItems[activeSlide]} /></div>}
+      {/* Bottom-LEFT — author + info stack (real posts only) */}
+      {!syntheticPosts && <div
         {...inertWhileScrubbing}
         style={{
           position: 'fixed',
@@ -803,8 +806,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             />
           ) : null}
 
-          <MemberShotCredit syntheticPosts={syntheticPosts} item={activePost.mediaItems[activeSlide]} />
-
           {/* Likers row — LikedByRow reserves its line at zero (CB56); no second guard. */}
           {!syntheticPosts && <div style={{ pointerEvents: 'auto', minWidth: 0 }} onClick={(e) => e.stopPropagation()}>
             <LikedByRow
@@ -828,7 +829,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           </div>}
         </div>
 
-      </div>
+      </div>}
 
       {/* Bottom-RIGHT — vertical action rail (no avatar).
           ONE wrapper, always mounted. Mute is exempt from the !readOnly gate

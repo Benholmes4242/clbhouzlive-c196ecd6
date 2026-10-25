@@ -145,7 +145,7 @@ export function readSafeAreaInsets(): Insets {
  * manifested as the fullscreen "top-pinned sliver". Prefer visualViewport
  * dimensions when available; fall back to innerWidth/innerHeight otherwise.
  */
-export function getCurrentViewport(): Viewport {
+export function getCurrentViewport(syntheticPosts = false): Viewport {
   const insets = readSafeAreaInsets();
   const hasWin = typeof window !== 'undefined';
   const vv = hasWin ? window.visualViewport : null;
@@ -158,7 +158,8 @@ export function getCurrentViewport(): Viewport {
     w: hasWin ? (vvSane ? vv!.width : window.innerWidth) : 0,
     h: hasWin ? (vvSane ? vv!.height : window.innerHeight) : 0,
     ...insets,
-    safeBottom: bandHeightPx(insets.safeBottom),
+    // Synthetic member-shot media has no reserved footer, including its safe padding.
+    safeBottom: syntheticPosts ? 0 : bandHeightPx(insets.safeBottom),
   };
 }
 

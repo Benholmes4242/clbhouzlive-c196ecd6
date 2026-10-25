@@ -20,8 +20,14 @@ export interface MediaItem {
    *  state instead of attempting an HLS load — hlsUrl is intentionally
    *  undefined while this is true. */
   isProcessing?: boolean;
-  /** Member-shot galleries retain the contributor and added month per slide. */
-  credit?: string;
+  /** Synthetic member-shot caption follows the active media, never the post author. */
+  memberShot?: {
+    kicker: string;
+    title: string;
+    credit: string;
+    avatarUrl: string | null;
+    memberName: string;
+  };
 }
 
 /** Feed tab modes */
