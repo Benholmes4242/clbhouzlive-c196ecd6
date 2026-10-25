@@ -233,7 +233,6 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
     return { id: c.id, name: c.name ?? '', imageUrl: c.thumbnail_image ?? null, publishedRank: rankFor(c, renderedList), rating: e?.rating ?? null, ratingCount: e?.ratingCount ?? 0 };
   });
   const { higher: argumentHigher, lower: argumentLower } = argumentGroups(argumentInputs);
-  const argumentQualifying = qualifyingCount(argumentInputs);
   /* BRIEF_TOP100_MONTHLY_MOVE: the golfers' order four weeks ago, for the
      list the rows on screen belong to. Empty while loading or on error — the
      section never waits on it. */
@@ -334,7 +333,6 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
         <TheArgumentSection
           higher={argumentHigher}
           lower={argumentLower}
-          qualifying={argumentQualifying}
           showGolfersLink={ranking !== 'community'}
           onSeeGolfersList={seeGolfersList}
           baseline={argumentBaseline}
