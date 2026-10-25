@@ -58,12 +58,14 @@ export default function ScheduledPostsSheetV2({ open, onClose, userId, onCountCh
     if (!dt) { setReschedTarget(null); return; }
     setBusyId(id);
     try {
-      const { error } = await supabase.from('posts').update({ scheduled_at: dt.toISOString() }).eq('id', id);
+      // BIZ_POSTS_V1: an RLS refusal affects 0 rows without erroring.
+      const { data, error } = await supabase.from('posts').update({ scheduled_at: dt.toISOString() }).eq('id', id).select('id');
       if (error) throw error;
+      if (!data?.length) throw new Error(POST_CHANGE_REFUSED);
       setReschedTarget(null);
       await refresh();
-    } catch {
-      toast.error("Couldn't reschedule. Please try again.");
+    } catch (e) {
+      toast.error(e instanceof Error && e.message === POST_CHANGE_REFUSED ? POST_CHANGE_REFUSED : "Couldn't reschedule. Please try again.");
     } finally {
       setBusyId(null);
     }
@@ -72,12 +74,14 @@ export default function ScheduledPostsSheetV2({ open, onClose, userId, onCountCh
   const performCancel = async (id: string) => {
     setBusyId(id);
     try {
-      const { error } = await supabase.from('posts').delete().eq('id', id);
+      // BIZ_POSTS_V1: an RLS refusal affects 0 rows without erroring.
+      const { data, error } = await supabase.from('posts').delete().eq('id', id).select('id');
       if (error) throw error;
+      if (!data?.length) throw new Error(POST_CHANGE_REFUSED);
       setConfirmCancelId(null);
       await refresh();
-    } catch {
-      toast.error("Couldn't cancel. Please try again.");
+    } catch (e) {
+      toast.error(e instanceof Error && e.message === POST_CHANGE_REFUSED ? POST_CHANGE_REFUSED : "Couldn't cancel. Please try again.");
     } finally {
       setBusyId(null);
     }
