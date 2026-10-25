@@ -192,7 +192,10 @@ describe('CB82 page', () => {
     await waitFor(() => expect(container.querySelector('[data-card="visits"]')).not.toBeNull());
     expect(container.querySelector('[data-card="sources"]')).not.toBeNull();
     for (const k of ['CONTENT', 'ENGAGEMENT']) expect(screen.getByText(k)).toBeTruthy();
-    expect(screen.getAllByText('AUDIENCE')).toHaveLength(2);
+    // CB84 replaced the locked "Who's viewing you" card with YOUR GOLFERS;
+    // only the Follower growth card still carries the AUDIENCE kicker.
+    expect(screen.getAllByText('AUDIENCE')).toHaveLength(1);
+    expect(screen.queryByText("Who's viewing you")).toBeNull();
   });
 
   it('failed read renders no headline or card; rest carries on', async () => {
