@@ -44,7 +44,7 @@ function unscored() {
 }
 const holeRow = (id: string, over: Record<string, unknown> = {}) => ({ id, course_id: 'course-second', course_name: 'Course second', hole_no: 4, media_type: 'image', media_url: `/hole-${id}.jpg`, poster_url: null, stream_id: null, duration_seconds: null, added_at: '2025-06-12T10:00:00Z', member_id: 'member', member_name: 'Thomas Holmes', par: 3, yards: 182, ...over });
 beforeEach(() => {
-  vi.clearAllMocks(); f.analysis = emptyAnalysis; f.rows = [photo(1), photo(4), photo(7), photo(15)]; f.total = 8; f.latest = [latest('first'), latest('second'), latest('third')]; f.loading = false; f.error = false; f.viewer = null;
+  vi.clearAllMocks(); f.analysis = emptyAnalysis; f.rows = [photo(1), photo(4), photo(7), photo(15)]; f.total = 8; f.latest = [latest('first'), latest('second'), latest('third')]; f.loading = false; f.error = false;
   f.holeRpc.mockResolvedValue({ data: [holeRow('h1'), holeRow('second'), holeRow('h3')], error: null });
 });
 afterEach(cleanup);
@@ -105,13 +105,23 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
   it('the kicker reads "Hole by hole"', () => {
     mountRail(); expect(screen.getByText('Hole by hole')).toBeInTheDocument(); expect(screen.getByText('Latest holes')).toBeInTheDocument();
   });
-  it('a tap fetches the hole shots and opens the viewer on the tapped shot with edge bounce', async () => {
+  it('a tap fetches the hole shots and opens the canonical viewer readOnly on the tapped shot', async () => {
     mountRail(); fireEvent.click(screen.getByRole('button', { name: 'Hole 4, Course second' }));
     await waitFor(() => expect(f.holeRpc).toHaveBeenCalledWith('get_hole_media', { p_course_id: 'course-second', p_hole_no: 4 }));
-    await waitFor(() => expect(f.viewer).not.toBeNull());
-    expect(f.viewer?.items.map(item => item.id)).toEqual(['h1', 'second', 'h3']);
-    expect(f.viewer?.initialIndex).toBe(1);
-    expect(f.viewer?.edgeBounce).toBe(true);
+    await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
+    const args = f.open.mock.calls[0][0] as { posts: Array<{ id: string; displayName: string; courseName?: string }>; index: number; mediaId: string | null; openedFrom: string; options?: { readOnly?: boolean } };
+    expect(args.posts.map(post => post.id)).toEqual(['h1', 'second', 'h3']);
+    expect(args.index).toBe(1);
+    expect(args.mediaId).toBe('second');
+    expect(args.openedFrom).toBe('course-media');
+    expect(args.options).toEqual({ readOnly: true });
+    expect(args.posts[1].displayName).toBe('Thomas Holmes');
+    expect(args.posts[1].courseName).toBe('Course second');
+  });
+  it('the section opens the canonical viewer, never MediaPreviewViewer', () => {
+    const source = readFileSync(resolve(process.cwd(), 'src/components/courses/browse/LatestHolesSection.tsx'), 'utf8');
+    expect(source).not.toContain('MediaPreviewViewer');
+    expect(source).toContain('openWithOrigin');
   });
   it('while the hole shots load the card dims and further taps are ignored', async () => {
     f.holeRpc.mockReturnValue(new Promise(() => {}));
@@ -120,7 +130,7 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     await waitFor(() => expect(card.style.opacity).toBe('0.7'));
     fireEvent.click(card);
     expect(f.holeRpc).toHaveBeenCalledTimes(1);
-    expect(f.viewer).toBeNull();
+    expect(f.open).not.toHaveBeenCalled();
   });
   it('Media deep link opens hole four with the selected shot, not its first shot', () => {
     f.rows = [photo(4, 'first'), photo(4, 'selected')]; mountTab();
