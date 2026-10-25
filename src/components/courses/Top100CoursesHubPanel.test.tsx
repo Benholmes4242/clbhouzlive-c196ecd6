@@ -177,11 +177,11 @@ describe('BRIEF_TOP100_GOLFERS_VS_OFFICIAL — panel wiring', () => {
     // Global: four qualify; c4 rises (members 2nd, list 4th), c2 falls.
     expect(screen.getByText(/out of the 4 courses on this list/)).toBeInTheDocument();
     expect(screen.getByText('Course 4')).toBeInTheDocument();
-    expect(screen.getByText(/Golfers rank it 2nd versus 4th on the official list/)).toBeInTheDocument();
+    expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd versus 4th on the official list')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
     // GB&I: c4 is not on the list, so three qualify and the groups recompute.
     expect(screen.getByText(/out of the 3 courses on this list/)).toBeInTheDocument();
     expect(screen.queryByText('Course 4')).toBeNull();
-    expect(screen.getByText(/Golfers rank it 2nd versus 3rd on the official list/)).toBeInTheDocument();
+    expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd versus 3rd on the official list')).toBeInTheDocument();
   });
 });
