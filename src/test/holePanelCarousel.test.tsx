@@ -1,6 +1,6 @@
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 
@@ -76,31 +76,36 @@ describe('BRIEF_HOLE_PANEL_CAROUSEL frame and strip', () => {
 });
 
 describe('BRIEF_HOLE_PANEL_CAROUSEL fullscreen viewer', () => {
+  const viewer = () => {
+    const el = document.querySelector('.fixed.inset-0');
+    expect(el).not.toBeNull();
+    return within(el as HTMLElement);
+  };
   it('tapping the second slide opens the viewer on that shot with the hole caption', () => {
     walk([shot('a'), shot('b', { user_id: 'u2', added_at: '2026-06-02T09:00:00Z' }), video('c', 42)]);
     fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[1] as HTMLElement);
-    expect(screen.getByText('2 / 3')).toBeInTheDocument();
-    expect(screen.getByText('The fourteenth')).toBeInTheDocument();
-    expect(screen.getByText('Royal Portrush (Dunluce) · Par 4 · 432 yards')).toBeInTheDocument();
-    expect(screen.getByText('Benjamin Holmes · Jun 2026')).toBeInTheDocument();
+    expect(viewer().getByText('2 / 3')).toBeInTheDocument();
+    expect(viewer().getByText('The fourteenth')).toBeInTheDocument();
+    expect(viewer().getByText('Royal Portrush (Dunluce) · Par 4 · 432 yards')).toBeInTheDocument();
+    expect(viewer().getByText('Benjamin Holmes · Jun 2026')).toBeInTheDocument();
   });
 
   it('a processing video slide does not open the viewer and is not in its items', () => {
     walk([shot('a'), video('p', null)]);
     fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[1] as HTMLElement);
-    expect(screen.queryByText('The fourteenth')).toBeNull();
+    expect(document.querySelector('[data-viewer-caption]')).toBeNull();
     fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[0] as HTMLElement);
-    expect(screen.getByText('The fourteenth')).toBeInTheDocument();
-    expect(screen.queryByText('1 / 2')).toBeNull();
-    expect(screen.getByText('Thomas Holmes · Mar 2026')).toBeInTheDocument();
+    expect(viewer().getByText('The fourteenth')).toBeInTheDocument();
+    expect(viewer().queryByText('1 / 2')).toBeNull();
+    expect(viewer().getByText('Thomas Holmes · Mar 2026')).toBeInTheDocument();
   });
 
   it('closing the viewer returns the frame to the shot that was showing', () => {
     walk([shot('a'), shot('b', { user_id: 'u2', added_at: '2026-06-02T09:00:00Z' }), video('c', 42)]);
     fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[0] as HTMLElement);
-    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
-    expect(screen.getByText('2 / 3')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    fireEvent.click(viewer().getByRole('button', { name: 'Next' }));
+    expect(viewer().getByText('2 / 3')).toBeInTheDocument();
+    fireEvent.click(viewer().getByRole('button', { name: 'Back' }));
     expect(panel().querySelector('.hole-walk-frame-count')?.textContent).toBe('2 / 3');
     expect(screen.getByRole('button', { name: 'Show shot 2 of 3' })).toHaveAttribute('aria-current', 'true');
   });
