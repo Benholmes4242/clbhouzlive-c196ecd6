@@ -2,7 +2,8 @@
 
 ## BRIEF_TOP100_OFFICIAL_RANK_AND_TAP
 - [x] Show active rated denominator and published rank; row taps reuse main-list scroll preservation, with chevrons and three shell bars. Maths/frozen styling unchanged.
-- [ ] Run full suite and inspect automatic checks; report cases/files against 2,903/350 baseline. Manual typecheck prohibited and live authentication unavailable (external_unmanaged).
+- [x] Full `bunx vitest run`: 2,908 passed/1 failed, 2,909 total/350 files; baseline2,903/350 +6 (five section cases, one panel navigation case). Three authorised existing cases retargeted only. Automatic build23:07:01Z OK; manual typecheck prohibited, separate result unavailable.
+- [ ] STOP: src/components/courses/Top100CoursesHubPanel.test.tsx:234:55, `AssertionError: expected '0' to be '237' // Object.is equality`, new case “argument row opens its course through the scroll-preserving main-list handler”. Fixture root lacks scroll-container overflow, so resolver chooses document at0; no correction after failure. Await authorisation for fixture-only overflow setup. Live authentication unavailable (external_unmanaged); no browser check after stop.
 
 ## CB83.1 — Busiest-day post counts
 - [x] Count posts on the applicable UTC same/previous day; add twice/times clauses in en/en-XA, leaving weekly wording unchanged.
