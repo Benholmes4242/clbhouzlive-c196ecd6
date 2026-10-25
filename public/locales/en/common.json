@@ -749,10 +749,25 @@
       }
     },
     "insights": {
-      "audience": {
-        "locked": "Locked",
-        "visitorsLabel": "Unique visitors in this period",
-        "body": "Handicap ranges and top locations need a bigger audience first. A breakdown of this few people would identify them, so we hold it back until then."
+      "golfers": {
+        "kicker": "Your golfers",
+        "followers_one": "{{n}} follower",
+        "followers_other": "{{n}} followers",
+        "titleMost": "Most play off {{band}}",
+        "titleOneBand": "{{n}} of your followers play off a handicap",
+        "tileHandicap": "play off a handicap the app can read",
+        "tileMedian": "typical handicap, the middle of the {{n}}",
+        "handicapsKicker": "Their handicaps",
+        "regionsKicker": "Where they play",
+        "elsewhere": "Elsewhere",
+        "fine": "From your followers who play off a handicap or show their home club. A group under 5 golfers is joined to its neighbour, and a region under 5 folds into \"Elsewhere\", so nobody can be picked out. Not affected by the 7, 30 or 90 days above.",
+        "notEnoughTitle": "Not enough golfers to break down yet",
+        "lead_one": "{{n}} of your followers plays off a handicap.",
+        "lead_other": "{{n}} of your followers play off a handicap.",
+        "leadZero": "None of your followers plays off a handicap yet.",
+        "notEnoughBody": "Their handicaps and where they play will show once 10 do, so nobody can be picked out.",
+        "notAffected": "Not affected by the 7, 30 or 90 days above.",
+        "noneTitle": "No golfers follow {{business}} yet."
       },
       "followers": {
         "total": "Total"
