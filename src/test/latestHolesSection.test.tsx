@@ -100,10 +100,17 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
   });
   it('Media deep link opens hole four with the selected shot, not its first shot', () => {
     f.rows = [photo(4, 'first'), photo(4, 'selected')]; mountTab();
-    const panel = screen.getByRole('region', { name: 'Hole 4' }); expect(panel.querySelector('.hole-walk-photo > img')).toHaveAttribute('src', '/photo-selected.jpg');
+    const panel = screen.getByRole('region', { name: 'Hole 4' });
+    expect(panel.querySelector('.hole-walk-frame-count')).toHaveTextContent('2 / 2');
+    expect(panel.querySelectorAll('.hole-walk-thumbnail')[1]).toHaveAttribute('aria-current', 'true');
+    expect(panel.querySelectorAll('.hole-walk-slide')[1].querySelector('img')).toHaveAttribute('src', '/photo-selected.jpg');
   });
   it('missing linked shot falls back to the hole first shot', () => {
-    f.rows = [photo(4, 'first')]; mountTab(); expect(screen.getByRole('region', { name: 'Hole 4' }).querySelector('.hole-walk-photo > img')).toHaveAttribute('src', '/photo-first.jpg');
+    f.rows = [photo(4, 'first'), photo(4, 'other')]; mountTab();
+    const panel = screen.getByRole('region', { name: 'Hole 4' });
+    expect(panel.querySelector('.hole-walk-frame-count')).toHaveTextContent('1 / 2');
+    expect(panel.querySelectorAll('.hole-walk-thumbnail')[0]).toHaveAttribute('aria-current', 'true');
+    expect(panel.querySelectorAll('.hole-walk-slide')[0].querySelector('img')).toHaveAttribute('src', '/photo-first.jpg');
   });
   it('unknown hole never opens a panel', () => { mountTab('/courses/course?tab=media&hole=99&shot=selected'); expect(screen.queryByRole('region')).toBeNull(); });
   it('deep link waits for known holes and does not reapply after user selection', () => {
