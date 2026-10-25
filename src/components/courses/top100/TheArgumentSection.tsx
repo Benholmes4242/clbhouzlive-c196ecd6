@@ -1,7 +1,7 @@
 import React from 'react';
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronRight } from 'lucide-react';
 
-import { SectionHead, HEAD_GAP, SECTION_WRAP } from '@/components/courses/browse/SectionHead';
+import { SectionHead, SECTION_WRAP } from '@/components/courses/browse/SectionHead';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import type { ArgumentRow } from './theArgument';
@@ -11,15 +11,26 @@ import { ordinal } from '@/lib/text/numbers';
 export const ARGUMENT_THUMB = { size: 52, radius: 8 } as const;
 export const ARGUMENT_ROW_GAP = 12;
 
-/** BRIEF_TOP_100_REBUILD §3. The caller renders nothing when rows is empty. */
-export function TheArgumentSection({ rows, qualifying }: { rows: ArgumentRow[]; qualifying: number }) {
+interface Props {
+  higher: ArgumentRow[];
+  lower: ArgumentRow[];
+  qualifying: number;
+  showGolfersLink: boolean;
+  onSeeGolfersList: () => void;
+}
+
+function ArgumentGroup({ label, tone, rows }: { label: string; tone: string; rows: ArgumentRow[] }) {
+  if (rows.length === 0) return null;
   return (
-    <section style={SECTION_WRAP}>
-      <SectionHead kicker="Golfers versus the list" title="Where the ratings and the rankings differ" />
-      <div style={{ marginTop: HEAD_GAP, display: 'grid', gap: ARGUMENT_ROW_GAP }}>
+    <div style={{ marginTop: 18 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.BODY }}>
+        <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: tone, flexShrink: 0 }} />
+        {label}
+      </div>
+      <div style={{ display: 'grid', gap: ARGUMENT_ROW_GAP, marginTop: 10 }}>
         {rows.map((r) => {
           const up = r.divergence > 0;
-          const tone = up ? A.GREEN : A.RED;
+          const rowTone = up ? A.GREEN : A.RED;
           const Arrow = up ? ArrowUp : ArrowDown;
           return (
             <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -28,17 +39,20 @@ export function TheArgumentSection({ rows, qualifying }: { rows: ArgumentRow[]; 
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</div>
-                {/* Two lines, one fact each: the list's position, then the community's. The member rating value and the rating count are deliberately NOT printed here — this section is about where a course SITS, not what it scored. rating and ratingCount are still required in theArgument.ts (rating orders memberRank, ratingCount gates MIN_RATINGS), so do not remove them from the types because this row stopped showing them. */}
-                <div style={{ fontSize: 11, color: A.DIM, marginTop: 3, fontVariantNumeric: 'tabular-nums' }}>
-                  Official rank <b style={{ color: A.BODY, fontWeight: 600 }}>#{r.publishedRank}</b>
-                </div>
-                <div style={{ fontSize: 11, color: A.DIM, marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>
-                  Golfers rank it <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.memberRank)}</b> of the{' '}
-                  <b style={{ color: A.BODY, fontWeight: 600 }}>{qualifying}</b> rated
+                {/* One line, both positions within the qualifying set. The member
+                    rating value, the rating count and the rank out of 100 are
+                    deliberately NOT printed here — this section is about where a
+                    course SITS, not what it scored. rating and ratingCount are
+                    still required in theArgument.ts (rating orders memberRank,
+                    ratingCount gates MIN_RATINGS), so do not remove them from
+                    the types because this row stopped showing them. */}
+                <div style={{ marginTop: 3, fontSize: 11.5, lineHeight: 1.35, color: A.DIM, fontVariantNumeric: 'tabular-nums' }}>
+                  Golfers rank it <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.memberRank)}</b> versus{' '}
+                  <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.listRank)}</b> on the official list
                 </div>
               </div>
               <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 17, fontWeight: 800, color: tone, fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 17, fontWeight: 800, color: rowTone, fontVariantNumeric: 'tabular-nums' }}>
                   <Arrow size={14} strokeWidth={3} aria-hidden />
                   {Math.abs(r.divergence)}
                 </div>
@@ -47,6 +61,31 @@ export function TheArgumentSection({ rows, qualifying }: { rows: ArgumentRow[]; 
           );
         })}
       </div>
+    </div>
+  );
+}
+
+/** BRIEF_TOP100_GOLFERS_VS_OFFICIAL. The caller renders nothing when both groups are empty. */
+export function TheArgumentSection({ higher, lower, qualifying, showGolfersLink, onSeeGolfersList }: Props) {
+  if (higher.length === 0 && lower.length === 0) return null;
+  return (
+    <section style={SECTION_WRAP}>
+      <SectionHead kicker="Golfers versus the official list" title="Where the ratings and the rankings differ" />
+      <div style={{ marginTop: 8, fontSize: 12.5, lineHeight: 1.5, color: A.MUTE }}>
+        {`The courses that vary the most between the golfers' ratings and the official rankings. Positions are out of the ${qualifying} courses on this list that golfers have rated.`}
+      </div>
+      <ArgumentGroup label="Golfers rate higher" tone={A.GREEN} rows={higher} />
+      <ArgumentGroup label="Golfers rate lower" tone={A.RED} rows={lower} />
+      {showGolfersLink ? (
+        <button
+          type="button"
+          onClick={onSeeGolfersList}
+          style={{ marginTop: 18, minHeight: 44, display: 'inline-flex', alignItems: 'center', gap: 4, background: 'none', border: 0, padding: 0, fontSize: 13, fontWeight: 700, color: A.INK, cursor: 'pointer' }}
+        >
+          See the golfers' list
+          <ChevronRight size={14} strokeWidth={2.5} aria-hidden />
+        </button>
+      ) : null}
     </section>
   );
 }

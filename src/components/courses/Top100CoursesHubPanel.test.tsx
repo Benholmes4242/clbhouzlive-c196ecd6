@@ -73,6 +73,7 @@ const sectionAbsent = () => {
 
 beforeEach(() => {
   sessionStorage.clear();
+  Element.prototype.scrollIntoView = vi.fn();
   f.courses.mockReturnValue({
     data: { pages: [COURSES] },
     isLoading: false,
@@ -121,5 +122,66 @@ describe('HUNDRED_FIT_1_R — the under-five gate', () => {
     sectionAbsent();
     // The page itself never remounted: the list head for the new scope is on screen.
     expect(screen.getByText('GB&I Top 100')).toBeInTheDocument();
+  });
+});
+
+/* BRIEF_TOP100_GOLFERS_VS_OFFICIAL — the argument section against the panel. */
+const ARG_COURSES = [
+  { id: 'c1', rankGlobal: 1, rankGbi: 1, rating: 9 },
+  { id: 'c2', rankGlobal: 2, rankGbi: 2, rating: 5 },
+  { id: 'c3', rankGlobal: 3, rankGbi: 3, rating: 6 },
+  { id: 'c4', rankGlobal: 4, rankGbi: null, rating: 7 },
+].map(({ id, rankGlobal, rankGbi, rating }) => ({
+  id,
+  name: `Course ${id.slice(1)}`,
+  country: 'England',
+  region: null,
+  sub_country: null,
+  thumbnail_image: null,
+  global_rank: rankGlobal,
+  regional_rank: null,
+  rating,
+  list_memberships: [
+    { list_slug: 'global', rank: rankGlobal },
+    ...(rankGbi == null ? [] : [{ list_slug: 'gb-i', rank: rankGbi }]),
+  ],
+}));
+
+function mountWithArgument() {
+  f.courses.mockReturnValue({
+    data: { pages: [ARG_COURSES] },
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+    isPlaceholderData: false,
+  });
+  f.enrichment.mockReturnValue({
+    data: new Map(ARG_COURSES.map((c) => [c.id, { rating: c.rating, ratingCount: 5 }])),
+    isLoading: false,
+  });
+  f.progress.mockReturnValue({ data: progressData(0, 0), isLoading: false, isFetchedAfterMount: true });
+  return mount();
+}
+
+describe('BRIEF_TOP100_GOLFERS_VS_OFFICIAL — panel wiring', () => {
+  it('the link shows when ranking is official, and clicking it switches the dropdown to Community rating', () => {
+    mountWithArgument();
+    expect(screen.getByText('Official rating')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /See the golfers' list/ }));
+    expect(screen.getByText('Community rating')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /See the golfers' list/ })).toBeNull();
+  });
+
+  it('switching the active list from Global to GB&I recomputes both groups and the lede count', () => {
+    mountWithArgument();
+    // Global: four qualify; c4 rises (members 2nd, list 4th), c2 falls.
+    expect(screen.getByText(/out of the 4 courses on this list/)).toBeInTheDocument();
+    expect(screen.getByText('Course 4')).toBeInTheDocument();
+    expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd versus 4th on the official list')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
+    // GB&I: c4 is not on the list, so three qualify and the groups recompute.
+    expect(screen.getByText(/out of the 3 courses on this list/)).toBeInTheDocument();
+    expect(screen.queryByText('Course 4')).toBeNull();
+    expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd versus 3rd on the official list')).toBeInTheDocument();
   });
 });
