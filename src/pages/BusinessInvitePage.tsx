@@ -433,10 +433,10 @@ export default function BusinessInvitePage() {
                   <Radio on={selected} />
                   <span>
                     <span className="block" style={{ fontSize: 14.5, fontWeight: 700, color: INK }}>
-                      {t(`business.team.sectionOne.roles.${r}`)}
+                      {t(`business.team.sectionOne.roles.${r}`, { defaultValue: BUSINESS_ROLE_LABELS[r] })}
                     </span>
                     <span className="block" style={{ fontSize: 12, lineHeight: 1.4, color: MUTE, marginTop: 3 }}>
-                      {t(`business.team.sectionOne.descriptions.${r}`, { business: businessName })}
+                      {t(`business.team.sectionOne.descriptions.${r}`, { business: businessName, defaultValue: '' })}
                     </span>
                   </span>
                 </button>
