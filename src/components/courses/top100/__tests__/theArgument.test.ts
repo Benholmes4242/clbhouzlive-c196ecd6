@@ -31,10 +31,12 @@ describe('The argument — argumentGroups', () => {
     expect(lower.map((r) => r.divergence)).toEqual([-7, -5, -3]);
   });
   it('equal divergences order by published rank', () => {
-    // Members: x and y both rated 8 → tie broken by published rank (x first).
-    const { higher } = argumentGroups([c('x', 5, 8), c('y', 6, 8), c('z', 7, 1)]);
-    expect(higher.map((r) => r.id)).toEqual(['x', 'y']);
-    expect(higher[0].divergence).toBe(2);
+    // Members: y and z tie at 8 (published rank breaks the member-order tie),
+    // x last → y and z both rise by 1; the lower published rank prints first.
+    const { higher, lower } = argumentGroups([c('x', 5, 1), c('y', 6, 8), c('z', 7, 8)]);
+    expect(higher.map((r) => r.id)).toEqual(['y', 'z']);
+    expect(higher[0].divergence).toBe(1);
+    expect(lower.map((r) => r.id)).toEqual(['x']);
   });
   it('excludes courses whose divergence is zero', () => {
     const { higher, lower } = argumentGroups([c('a', 1, 9), c('b', 2, 8), c('c', 3, 7)]);
