@@ -15,6 +15,8 @@ import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { MuteButton, TapForSoundPill } from '@/audio/MuteButton';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
+import { attachTileHls } from '@/components/explore-tab-new/courseled/tileHlsPlayer';
+import { VERDICT_KICKER } from '@/components/courses/course-detail/about/AboutSection';
 import type { OrderedMediaItem } from './types';
 
 interface MediaPreviewViewerProps {
@@ -24,6 +26,10 @@ interface MediaPreviewViewerProps {
   onSetCover?: (index: number) => void;
   coverIndex?: number;
   showStudio?: boolean;
+  /** BRIEF_HOLE_PANEL_CAROUSEL §5 — reports the showing item so a caller can
+   * restore its own selection when the viewer closes. Optional; existing
+   * callers see no change. */
+  onIndexChange?: (index: number) => void;
 }
 
 export function MediaPreviewViewer({
@@ -32,6 +38,7 @@ export function MediaPreviewViewer({
   onClose,
   onSetCover,
   coverIndex = 0,
+  onIndexChange,
 }: MediaPreviewViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const { ref: zoomRef, imgRef, style: zoomStyle, scale, reset: resetZoom } = usePinchZoomPointer();
@@ -58,14 +65,26 @@ export function MediaPreviewViewer({
     resetZoom();
   }, [currentIndex, resetZoom]);
 
+  // Report the showing item so a caller (the hole walk) can restore its own
+  // selection to the shot showing when the viewer closes.
+  const onIndexChangeRef = useRef(onIndexChange);
+  onIndexChangeRef.current = onIndexChange;
+  useEffect(() => {
+    onIndexChangeRef.current?.(currentIndex);
+  }, [currentIndex]);
+
   // Session-wired playback for video items. We drive play() imperatively so
   // an unmuted rejection is catchable — degrade this element to muted and
   // show the "Tap for sound" pill (does NOT touch the session store).
+  // An item with hlsUrl attaches the stream (native HLS on Safari/iOS, hls.js
+  // elsewhere) instead of src=previewUrl; the attachment is torn down on
+  // slide change and on close.
   useEffect(() => {
     if (!item || item.type !== 'video') return;
     setShowPill(false);
     const el = videoRef.current;
     if (!el) return;
+    const attachment = item.hlsUrl ? attachTileHls(el, item.hlsUrl, () => {}) : null;
     el.muted = useSessionAudio.getState().isMuted;
     Promise.resolve(el.play()).catch(() => {
       if (!el.muted) {
@@ -74,6 +93,7 @@ export function MediaPreviewViewer({
         Promise.resolve(el.play()).catch(() => {});
       }
     });
+    return () => { attachment?.detach(); };
   }, [item?.id, item?.type]);
 
   // Session store → element sync while open (both directions of change).
