@@ -73,6 +73,7 @@ const sectionAbsent = () => {
 
 beforeEach(() => {
   sessionStorage.clear();
+  Element.prototype.scrollIntoView = vi.fn();
   f.courses.mockReturnValue({
     data: { pages: [COURSES] },
     isLoading: false,
