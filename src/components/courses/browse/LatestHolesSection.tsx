@@ -10,7 +10,7 @@ import { PHOTO_FIGURE_GAP } from './PhotoFigureCard';
 import { LatestHolesShell } from './sectionShells';
 import './latestHoles.css';
 
-/** The RPC owns newest-first ordering, one shot per course and public eligibility.
+/** The RPC owns newest-first ordering, up to two shots per course, at most 30, and public eligibility.
  * Credit shows the month the member added the shot to clbhouz (added_at), never its EXIF capture date; this rail never starts video playback.
  * Geometry is shared with the loading shell, not PhotoFigureCard.
  */
@@ -72,7 +72,7 @@ function LatestHoleCard({ row }: { row: LatestHoleMedia }) {
 }
 
 export function LatestHolesSection() {
-  const { data, isLoading, isError } = useGamRpc<LatestHoleMedia[]>('get_latest_hole_media', { p_limit: 10 }, { staleTime: 60_000 });
+  const { data, isLoading, isError } = useGamRpc<LatestHoleMedia[]>('get_latest_hole_media', { p_limit: 30 }, { staleTime: 60_000 });
   useSectionReady('latestHoles', !isLoading);
   if (isLoading) return <LatestHolesShell />;
   if (isError || !data || data.length < 3) return null;
