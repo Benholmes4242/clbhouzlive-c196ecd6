@@ -116,7 +116,9 @@ export async function fireInviteEmail(inviteId: string) {
   }
 }
 
-export function useCreateInvite(businessId: string, options?: { successMessage?: string }) {
+/** CB79.2: Team-origin screens may defer success toast until after navigation;
+ * mutation invalidations and refusal toasts remain owned here for all callers. */
+export function useCreateInvite(businessId: string, options?: { successMessage?: string; showSuccessToast?: boolean }) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -143,7 +145,7 @@ export function useCreateInvite(businessId: string, options?: { successMessage?:
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] });
-      toast.success(options?.successMessage ?? 'Invitation sent');
+      if (options?.showSuccessToast !== false) toast.success(options?.successMessage ?? 'Invitation sent');
     },
     onError: (error: Error) => {
       toast.error('Failed to send invitation', { description: error.message });
@@ -151,7 +153,7 @@ export function useCreateInvite(businessId: string, options?: { successMessage?:
   });
 }
 
-export function useCreateInviteByUser(businessId: string, options?: { successMessage?: string }) {
+export function useCreateInviteByUser(businessId: string, options?: { successMessage?: string; showSuccessToast?: boolean }) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -170,7 +172,7 @@ export function useCreateInviteByUser(businessId: string, options?: { successMes
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] });
-      toast.success(options?.successMessage ?? 'Invitation sent');
+      if (options?.showSuccessToast !== false) toast.success(options?.successMessage ?? 'Invitation sent');
     },
     onError: (error: Error) => {
       toast.error('Failed to send invitation', { description: error.message });

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Search, Mail } from 'lucide-react';
@@ -12,6 +12,7 @@ import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+import { toast } from '@/lib/toast';
 import { shortBusinessName } from '@/components/business/home/BusinessHomeHeader';
 import {
   useBusinessTeam, useBusinessInvites, useCreateInvite, useCreateInviteByUser,
@@ -88,6 +89,14 @@ function Radio({ on }: { on: boolean }) {
 export default function BusinessInvitePage() {
   const { businessId } = useParams<{ businessId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromTeam = location.state?.fromTeam === true;
+  // CB79.2: a Team-origin invite pops its existing entry, never pushes Team.
+  // Cold/deep opens replace Invite with Team so the back stack cannot loop.
+  const returnToTeam = () => {
+    if (fromTeam) navigate(-1);
+    else if (businessId) navigate(`/business/${businessId}/team`, { replace: true });
+  };
   const queryClient = useQueryClient();
   const { t } = useTranslation();
 
@@ -175,8 +184,8 @@ export default function BusinessInvitePage() {
   const sentMessage = pickedUser
     ? t('business.team.sectionFive.sentUser', { first: firstName, defaultValue: `Invite sent to ${firstName}` })
     : t('business.team.sectionFive.sentEmail', { email: emailAddress, defaultValue: `Invite sent to ${emailAddress}` });
-  const createEmailInvite = useCreateInvite(businessId || '', { successMessage: sentMessage });
-  const createUserInvite = useCreateInviteByUser(businessId || '', { successMessage: sentMessage });
+  const createEmailInvite = useCreateInvite(businessId || '', { successMessage: sentMessage, showSuccessToast: !fromTeam });
+  const createUserInvite = useCreateInviteByUser(businessId || '', { successMessage: sentMessage, showSuccessToast: !fromTeam });
   const pending = createEmailInvite.isPending || createUserInvite.isPending;
 
   const hasRecipient = !!pickedUser || isEmail;
@@ -199,7 +208,8 @@ export default function BusinessInvitePage() {
       }
       queryClient.invalidateQueries({ queryKey: ['business-invite-suggestions', businessId] });
       queryClient.invalidateQueries({ queryKey: ['business-team-feed', businessId] });
-      navigate(`/business/${businessId}/team`, { replace: true });
+      returnToTeam();
+      if (fromTeam) toast.success(sentMessage);
     } catch {
       /* the hook toasts the refusal; the screen stays exactly as it was */
     }
@@ -281,7 +291,7 @@ export default function BusinessInvitePage() {
     <ManagePageShell
       title={t('business.team.sectionFive.title', { defaultValue: 'Invite to team' })}
       subtitle={subtitle}
-      onBack={() => businessId && navigate(`/business/${businessId}/team`)}
+      onBack={returnToTeam}
     >
       <main className="max-w-lg mx-auto" style={{ paddingBottom: 170 }}>
         {!pickedUser && (
