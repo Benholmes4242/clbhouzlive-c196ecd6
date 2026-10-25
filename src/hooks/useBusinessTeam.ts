@@ -116,7 +116,7 @@ export async function fireInviteEmail(inviteId: string) {
   }
 }
 
-export function useCreateInvite(businessId: string) {
+export function useCreateInvite(businessId: string, options?: { successMessage?: string }) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -143,7 +143,7 @@ export function useCreateInvite(businessId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] });
-      toast.success('Invitation sent');
+      toast.success(options?.successMessage ?? 'Invitation sent');
     },
     onError: (error: Error) => {
       toast.error('Failed to send invitation', { description: error.message });
@@ -151,7 +151,7 @@ export function useCreateInvite(businessId: string) {
   });
 }
 
-export function useCreateInviteByUser(businessId: string) {
+export function useCreateInviteByUser(businessId: string, options?: { successMessage?: string }) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -170,7 +170,7 @@ export function useCreateInviteByUser(businessId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] });
-      toast.success('Invitation sent');
+      toast.success(options?.successMessage ?? 'Invitation sent');
     },
     onError: (error: Error) => {
       toast.error('Failed to send invitation', { description: error.message });

@@ -545,6 +545,29 @@
           "today": "[~~Tódáy~~]",
           "yesterday": "[~~Yéstérdáy~~]"
         }
+      },
+      "sectionFive": {
+        "title": "[~~Ínvíté tó téám~~]",
+        "searchPlaceholder": "[~~Námé, @hándlé ór émáíl~~]",
+        "homeClubGroup": "[~~Hómé clúb: {{club}}~~]",
+        "followGroup": "[~~Fóllów {{business}}~~]",
+        "playsHere": "[~~pláys héré~~]",
+        "followedThisWeek": "[~~fóllówéd thís wéék~~]",
+        "followedIn": "[~~fóllówéd ín {{month}}~~]",
+        "onTheTeam": "[~~Ón thé téám~~]",
+        "invitePending": "[~~Ínvíté péndíng~~]",
+        "inviteByEmail": "[~~Ínvíté by émáíl~~]",
+        "change": "[~~Chángé~~]",
+        "roleKicker": "[~~Rólé~~]",
+        "chooseSomeone": "[~~Chóósé sóméóné tó ínvíté~~]",
+        "chooseRole": "[~~Chóósé á rólé~~]",
+        "inviteUserCta": "[~~Ínvíté {{first}} ás án {{role}}~~]",
+        "inviteEmailCta": "[~~Ínvíté by émáíl ás án {{role}}~~]",
+        "finePerson": "[~~Théy gét á clbhouz nótífícátíón ánd án émáíl. Ínvítés lást 14 dáys.~~]",
+        "fineEmail": "[~~Théy gét án émáíl wíth á línk tó jóín. Ányóné wíth thé línk cán úsé ít, só sénd ít ónly tó thé ríght áddréss. Ít lásts 14 dáys.~~]",
+        "sentUser": "[~~Ínvíté sént tó {{first}}~~]",
+        "sentEmail": "[~~Ínvíté sént tó {{email}}~~]",
+        "sending": "[~~Séndíng\u2026~~]"
       }
     },
     "hero": {

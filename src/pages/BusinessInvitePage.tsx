@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Search, Mail, AtSign, Shield, Edit3, BarChart3, Check, X, UserPlus } from 'lucide-react';
-import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
-import { motion } from 'framer-motion';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { Search, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
@@ -10,19 +10,31 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+import { shortBusinessName } from '@/components/business/home/BusinessHomeHeader';
 import {
-  useCreateInvite, useCreateInviteByUser,
+  useBusinessTeam, useBusinessInvites, useCreateInvite, useCreateInviteByUser,
   AssignableBusinessRole, BUSINESS_ROLE_LABELS,
 } from '@/hooks/useBusinessTeam';
 
-/* NO PRIVATE PALETTE - see BusinessReviewsPage. Shared manage vocabulary,
-   derived from the analytical `A` ramp. */
-import { INK, INK_45, HAIR, CARD_BG, PAGE_BG } from '@/components/manage/ui';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { APPLIED_FILL, SELECTED_EDGE } from '@/components/ui/RailChips';
-import { surfaceWithAlpha } from '@/lib/tokens/surfaces';
+/* CB79 Team section 5 — the invite screen (team-s5.html is the signed-off spec).
+   Suggestions come from get_business_invite_suggestions (INVITE_SUGGEST_V1, not
+   yet in types.ts — the (supabase.rpc as any) pattern). Sending stays with
+   useCreateInviteByUser / useCreateInvite; both fire the email. The CB74.1
+   membership guard below is unchanged. */
 
+const CANVAS = '#0B0B0D';
+const CARD = '#17171B';
+const ROLE_CARD = '#1C1C21';
+const FIELD_BG = '#141418';
+const MAIL_TILE = '#232329';
+const INK = '#F8FAFC';
+const MUTE = 'rgba(248,250,252,0.62)';
+const DIM = 'rgba(248,250,252,0.42)';
+const LINE = 'rgba(255,255,255,0.08)';
+const HAIR = 'rgba(255,255,255,0.06)';
+const SELECTED_EDGE = 'rgba(255,255,255,0.9)';
 
 interface UserResult {
   id: string;
@@ -31,17 +43,54 @@ interface UserResult {
   profile_photo_url: string | null;
 }
 
-const ROLES: ReadonlyArray<{ value: AssignableBusinessRole; label: string; description: string; icon: typeof Shield }> = [
-  { value: 'admin', label: 'Admin', description: 'Manage the business profile, posts, and team.', icon: Shield },
-  { value: 'editor', label: 'Editor', description: 'Create and publish posts as the business.', icon: Edit3 },
-  { value: 'analyst', label: 'Analyst', description: 'View insights and analytics only.', icon: BarChart3 },
-];
+interface InviteSuggestion {
+  user_id: string;
+  display_name: string | null;
+  username: string | null;
+  profile_photo_url: string | null;
+  reason: 'home_club' | 'follower';
+  followed_at: string | null;
+}
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const ROLE_ORDER: AssignableBusinessRole[] = ['admin', 'editor', 'analyst'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+/** INVITE_SUGGEST_V1: up to 10 golfers, home club first then newest followers. */
+function useBusinessInviteSuggestions(businessId: string | undefined, enabled: boolean) {
+  return useQuery({
+    queryKey: ['business-invite-suggestions', businessId],
+    enabled: !!businessId && enabled,
+    queryFn: async () => {
+      const res = (await (supabase.rpc as any)('get_business_invite_suggestions', { p_business_id: businessId })) ?? {};
+      if (res.error) throw res.error;
+      return (Array.isArray(res.data) ? res.data : []) as InviteSuggestion[];
+    },
+  });
+}
+
+function firstNameOf(name: string | null | undefined, username: string | null | undefined): string {
+  const source = (name || username || '').trim();
+  return source.split(/\s+/)[0] || '';
+}
+
+function Radio({ on }: { on: boolean }) {
+  return (
+    <span
+      aria-hidden
+      style={{
+        width: 22, height: 22, borderRadius: 11, flex: 'none',
+        border: on ? `6px solid ${INK}` : '1.5px solid rgba(255,255,255,0.3)',
+      }}
+    />
+  );
+}
 
 export default function BusinessInvitePage() {
   const { businessId } = useParams<{ businessId: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   useHideBottomNav();
 
@@ -56,17 +105,37 @@ export default function BusinessInvitePage() {
     }
   }, [waiting, canManage, businessId, navigate]);
 
-  const createEmailInvite = useCreateInvite(businessId || '');
-  const createUserInvite = useCreateInviteByUser(businessId || '');
+  const { data: business } = useBusinessProfile(businessId);
+  const { data: members } = useBusinessTeam(businessId);
+  const { data: invites } = useBusinessInvites(businessId);
+  const { data: suggestions } = useBusinessInviteSuggestions(businessId, !waiting && canManage);
+
+  const businessName = business?.name || '';
+  const subtitle = businessName ? (shortBusinessName(businessName) ?? businessName) : undefined;
 
   const [query, setQuery] = useState('');
+  const [savedQuery, setSavedQuery] = useState('');
   const [pickedUser, setPickedUser] = useState<UserResult | null>(null);
-  const [role, setRole] = useState<AssignableBusinessRole>('editor');
+  const [role, setRole] = useState<AssignableBusinessRole | null>(null);
   const [results, setResults] = useState<UserResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [focused, setFocused] = useState(false);
 
   const debounced = useDebounce(query, 250);
   const isEmail = useMemo(() => EMAIL_RE.test(query.trim()), [query]);
+
+  const teamIds = useMemo(
+    () => new Set((members || []).map((m) => m.user_profile_id)),
+    [members],
+  );
+  const pendingInviteIds = useMemo(
+    () => new Set(
+      (invites || [])
+        .filter((i) => i.status === 'pending' && new Date(i.expires_at).getTime() > Date.now() && i.invitee_user_id)
+        .map((i) => i.invitee_user_id as string),
+    ),
+    [invites],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -79,7 +148,12 @@ export default function BusinessInvitePage() {
       }
       setIsSearching(true);
       try {
-        const clean = q.replace(/^@/, '');
+        // Strip characters that break a PostgREST .or() filter before interpolating.
+        const clean = q.replace(/^@/, '').replace(/[(),%*\\]/g, '');
+        if (!clean) {
+          if (!cancelled) setResults([]);
+          return;
+        }
         const { data, error } = await supabase
           .from('public_profiles')
           .select('id, username, display_name, profile_photo_url')
@@ -97,227 +171,308 @@ export default function BusinessInvitePage() {
     return () => { cancelled = true; };
   }, [debounced, pickedUser, waiting, canManage]);
 
-  const canSend = !!businessId && !!role && (pickedUser || (isEmail && !!query.trim()));
+  const firstName = pickedUser ? firstNameOf(pickedUser.display_name, pickedUser.username) : '';
+  const emailAddress = query.trim();
+  const sentMessage = pickedUser
+    ? t('business.team.sectionFive.sentUser', { first: firstName, defaultValue: `Invite sent to ${firstName}` })
+    : t('business.team.sectionFive.sentEmail', { email: emailAddress, defaultValue: `Invite sent to ${emailAddress}` });
+  const createEmailInvite = useCreateInvite(businessId || '', { successMessage: sentMessage });
+  const createUserInvite = useCreateInviteByUser(businessId || '', { successMessage: sentMessage });
+  const pending = createEmailInvite.isPending || createUserInvite.isPending;
+
+  const hasRecipient = !!pickedUser || isEmail;
+  const canSend = !!businessId && !!role && hasRecipient && !waiting && canManage;
+
+  const pickUser = (u: UserResult) => {
+    setSavedQuery(query);
+    setPickedUser(u);
+    setQuery('');
+    setResults([]);
+  };
 
   const handleSend = async () => {
-    if (!businessId || !canSend || waiting || !canManage) return;
+    if (!businessId || !canSend || !role) return;
     try {
       if (pickedUser) {
         await createUserInvite.mutateAsync({ userId: pickedUser.id, role });
       } else {
-        await createEmailInvite.mutateAsync({ email: query.trim(), role });
+        await createEmailInvite.mutateAsync({ email: emailAddress, role });
       }
-      navigate(-1);
+      queryClient.invalidateQueries({ queryKey: ['business-invite-suggestions', businessId] });
+      queryClient.invalidateQueries({ queryKey: ['business-team-feed', businessId] });
+      navigate(`/business/${businessId}/team`, { replace: true });
     } catch {
-      /* toast handled in hook */
+      /* the hook toasts the refusal; the screen stays exactly as it was */
     }
   };
-
-  const pending = createEmailInvite.isPending || createUserInvite.isPending;
 
   if (waiting) return <GenericPageSkeleton />;
   if (!canManage) return null;
 
-  return (
-    <ManagePageShell title="Invite to team">
-      <main className="px-4 pt-4 pb-22 max-w-lg mx-auto">
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-[13px] leading-relaxed mb-5" style={{ color: INK_45 }}>
-            They'll get an email and a clbhouz notification to accept. You can change their role or remove access anytime.
-          </p>
+  const homeClub = (suggestions || []).filter((s) => s.reason === 'home_club');
+  const followers = (suggestions || []).filter((s) => s.reason === 'follower');
+  const showSuggestions = !pickedUser && query.trim().length === 0;
+  const showSearchCard = !pickedUser && query.trim().length >= 2;
 
-          {/* Recipient */}
+  const followerSub = (s: InviteSuggestion): string => {
+    const handle = `@${s.username || ''}`;
+    if (!s.followed_at) return handle;
+    const at = new Date(s.followed_at).getTime();
+    if (Date.now() - at < 7 * 86400000) {
+      return `${handle} · ${t('business.team.sectionFive.followedThisWeek', { defaultValue: 'followed this week' })}`;
+    }
+    const d = new Date(at);
+    const month = MONTHS[d.getUTCMonth()];
+    const label = d.getUTCFullYear() === new Date().getUTCFullYear() ? month : `${month} ${d.getUTCFullYear()}`;
+    return `${handle} · ${t('business.team.sectionFive.followedIn', { month: label, defaultValue: `followed in ${label}` })}`;
+  };
+
+  const renderPersonRow = (
+    key: string,
+    person: { id: string; username: string | null; display_name: string | null; profile_photo_url: string | null },
+    sub: string,
+    first: boolean,
+  ) => {
+    const onTeam = teamIds.has(person.id);
+    const invitePending = pendingInviteIds.has(person.id);
+    const blocked = onTeam || invitePending;
+    const name = person.display_name || person.username || '';
+    return (
+      <button
+        key={key}
+        type="button"
+        disabled={blocked}
+        onClick={() => pickUser({ id: person.id, username: person.username || '', display_name: person.display_name, profile_photo_url: person.profile_photo_url })}
+        className="w-full flex items-center text-left"
+        style={{ gap: 12, padding: '11px 0', borderTop: first ? 'none' : `1px solid ${HAIR}` }}
+      >
+        <SquircleAvatar
+          src={person.profile_photo_url || undefined}
+          alt={name}
+          userId={person.id}
+          size={40}
+          hairlineRing
+          ringColor={DARK_HAIRLINE}
+        />
+        <span style={{ flex: 1, minWidth: 0 }}>
+          <span className="block truncate" style={{ fontSize: 15, fontWeight: 700, color: blocked ? MUTE : INK }}>{name}</span>
+          <span className="block truncate" style={{ fontSize: 12, color: DIM, marginTop: 2 }}>{sub}</span>
+        </span>
+        {blocked ? (
+          <span style={{ flex: 'none', fontSize: 11.5, fontWeight: 700, color: DIM }}>
+            {onTeam
+              ? t('business.team.sectionFive.onTheTeam', { defaultValue: 'On the team' })
+              : t('business.team.sectionFive.invitePending', { defaultValue: 'Invite pending' })}
+          </span>
+        ) : (
+          <Radio on={false} />
+        )}
+      </button>
+    );
+  };
+
+  const cardStyle: React.CSSProperties = {
+    margin: '8px 16px 0', background: CARD, border: `1px solid ${LINE}`, borderRadius: 16, padding: '0 14px',
+  };
+  const headingStyle: React.CSSProperties = {
+    padding: '18px 20px 0', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em',
+    textTransform: 'uppercase', color: MUTE,
+  };
+
+  const buttonLabel = !hasRecipient
+    ? t('business.team.sectionFive.chooseSomeone', { defaultValue: 'Choose someone to invite' })
+    : !role
+      ? t('business.team.sectionFive.chooseRole', { defaultValue: 'Choose a role' })
+      : pickedUser
+        ? t('business.team.sectionFive.inviteUserCta', { first: firstName, role: t(`business.team.sectionOne.roles.${role}`, { defaultValue: BUSINESS_ROLE_LABELS[role] }), defaultValue: `Invite ${firstName} as an ${BUSINESS_ROLE_LABELS[role]}` })
+        : t('business.team.sectionFive.inviteEmailCta', { role: t(`business.team.sectionOne.roles.${role}`, { defaultValue: BUSINESS_ROLE_LABELS[role] }), defaultValue: `Invite by email as an ${BUSINESS_ROLE_LABELS[role]}` });
+
+  return (
+    <ManagePageShell
+      title={t('business.team.sectionFive.title', { defaultValue: 'Invite to team' })}
+      subtitle={subtitle}
+      onBack={() => businessId && navigate(`/business/${businessId}/team`)}
+    >
+      <main className="max-w-lg mx-auto" style={{ paddingBottom: 170 }}>
+        {!pickedUser && (
           <div
-            className="mb-5"
+            className="flex items-center"
             style={{
-              background: CARD_BG,
-              border: `1px solid ${HAIR}`,
-              borderRadius: 14,
-              padding: 14,
+              margin: '12px 16px 0', height: 48, borderRadius: 14, background: FIELD_BG,
+              border: `1px solid ${focused ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.14)'}`,
+              gap: 10, padding: '0 14px',
             }}
           >
-            <label className="text-[11px] font-bold uppercase tracking-[0.10em]" style={{ color: INK_45 }}>
-              Recipient
-            </label>
-
-            {pickedUser ? (
-              <div className="mt-2 flex items-center gap-3 py-2">
-                <SquircleAvatar
-                  src={pickedUser.profile_photo_url || undefined}
-                  alt={pickedUser.display_name || pickedUser.username}
-                  userId={pickedUser.id}
-                  size={40}
-                  hairlineRing
-                  ringColor={DARK_HAIRLINE}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-[14px] truncate" style={{ color: INK }}>
-                    {pickedUser.display_name || pickedUser.username}
-                  </p>
-                  <p className="text-[12px] truncate" style={{ color: INK_45 }}>@{pickedUser.username}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => { setPickedUser(null); setQuery(''); }}
-                  className="h-8 w-8 flex items-center justify-center rounded-full active:bg-black/[0.06]"
-                  aria-label="Clear recipient"
-                >
-                  <X size={16} color={INK_45} />
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="relative mt-2">
-                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: INK_45 }} />
-                  <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Email or @handle"
-                    autoCapitalize="none"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    /* FIELD CANON (lib/tokens/field.ts). Height is
-                       padding-derived (~42px) inside the recipient card. */
-                    className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS} w-full pl-10 pr-3 py-2.5 text-[14px] outline-none`}
-                    style={{ color: INK }}
-                  />
-                </div>
-
-                {/* State hints */}
-                {query.trim().length >= 2 && (
-                  <div className="mt-3 space-y-1">
-                    {isEmail ? (
-                      <div className="flex items-center gap-2 py-2 px-1 text-[13px]" style={{ color: INK_45 }}>
-                        <Mail size={14} />
-                        Will send an email invite to <span className="font-semibold" style={{ color: INK }}>{query.trim()}</span>
-                      </div>
-                    ) : isSearching ? (
-                      <div className="py-3 text-center text-[12px]" style={{ color: INK_45 }}>Searching…</div>
-                    ) : results.length > 0 ? (
-                      results.map((u) => (
-                        <button
-                          key={u.id}
-                          type="button"
-                          onClick={() => { setPickedUser(u); setQuery(''); setResults([]); }}
-                          className="w-full flex items-center gap-3 py-2 px-1 rounded-lg active:bg-black/[0.03] text-left"
-                        >
-                          <SquircleAvatar
-                            src={u.profile_photo_url || undefined}
-                            alt={u.display_name || u.username}
-                            userId={u.id}
-                            size={36}
-                            hairlineRing
-                            ringColor={DARK_HAIRLINE}
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-[13.5px] truncate" style={{ color: INK }}>
-                              {u.display_name || u.username}
-                            </p>
-                            <p className="text-[11.5px] truncate" style={{ color: INK_45 }}>@{u.username}</p>
-                          </div>
-                          <AtSign size={14} color={INK_45} />
-                        </button>
-                      ))
-                    ) : (
-                      <div className="py-3 text-center text-[12px]" style={{ color: INK_45 }}>
-                        No user found. Enter an email to send an invite by mail.
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
+            <Search size={17} style={{ color: DIM, flex: 'none' }} />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              placeholder={t('business.team.sectionFive.searchPlaceholder', { defaultValue: 'Name, @handle or email' })}
+              autoCapitalize="none"
+              autoComplete="off"
+              autoCorrect="off"
+              className="flex-1 min-w-0 bg-transparent outline-none placeholder:text-[rgba(248,250,252,0.42)]"
+              style={{ fontSize: 15, color: INK, caretColor: '#F7931E' }}
+            />
           </div>
+        )}
 
-          {/* Roles */}
-          <div className="mb-5">
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-[0.10em]" style={{ color: INK_45 }}>
-                Role
+        {/* Suggestions — only before anyone types */}
+        {showSuggestions && homeClub.length > 0 && (
+          <section>
+            <h2 style={headingStyle}>
+              {t('business.team.sectionFive.homeClubGroup', { club: business?.club_name || '', defaultValue: `Home club: ${business?.club_name || ''}` })}
+            </h2>
+            <div style={cardStyle}>
+              {homeClub.map((s, i) => renderPersonRow(
+                s.user_id,
+                { id: s.user_id, username: s.username, display_name: s.display_name, profile_photo_url: s.profile_photo_url },
+                `@${s.username || ''} · ${t('business.team.sectionFive.playsHere', { defaultValue: 'plays here' })}`,
+                i === 0,
+              ))}
+            </div>
+          </section>
+        )}
+        {showSuggestions && followers.length > 0 && (
+          <section>
+            <h2 style={headingStyle}>
+              {t('business.team.sectionFive.followGroup', { business: businessName, defaultValue: `Follow ${businessName}` })}
+            </h2>
+            <div style={cardStyle}>
+              {followers.map((s, i) => renderPersonRow(
+                s.user_id,
+                { id: s.user_id, username: s.username, display_name: s.display_name, profile_photo_url: s.profile_photo_url },
+                followerSub(s),
+                i === 0,
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Search results / email row */}
+        {showSearchCard && !isEmail && results.length > 0 && (
+          <div style={{ ...cardStyle, marginTop: 12 }}>
+            {results.map((u, i) => renderPersonRow(u.id, u, `@${u.username}`, i === 0))}
+          </div>
+        )}
+        {showSearchCard && !isEmail && !isSearching && results.length === 0 && null}
+        {showSearchCard && isEmail && (
+          <div style={{ ...cardStyle, marginTop: 12 }}>
+            <div className="flex items-center" style={{ gap: 12, padding: '11px 0' }}>
+              <span
+                className="flex items-center justify-center"
+                style={{ width: 40, height: 40, borderRadius: 13, background: MAIL_TILE, color: MUTE, flex: 'none' }}
+              >
+                <Mail size={17} />
               </span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span className="block truncate" style={{ fontSize: 15, fontWeight: 700, color: INK }}>
+                  {t('business.team.sectionFive.inviteByEmail', { defaultValue: 'Invite by email' })}
+                </span>
+                <span className="block truncate" style={{ fontSize: 12, color: DIM, marginTop: 2 }}>{emailAddress}</span>
+              </span>
+              <Radio on />
             </div>
-            <div className="space-y-2">
-              {ROLES.map((r) => {
-                const Icon = r.icon;
-                const selected = role === r.value;
-                return (
-                  <button
-                    key={r.value}
-                    type="button"
-                    onClick={() => setRole(r.value)}
-                    className="w-full flex items-start gap-3 p-3.5 text-left active:opacity-90"
-                    style={{
-                      background: selected ? APPLIED_FILL : CARD_BG,
-                      border: `1px solid ${selected ? SELECTED_EDGE : HAIR}`,
-                      borderRadius: 14,
-                    }}
-                  >
-                    <div
-                      className="h-9 w-9 flex items-center justify-center shrink-0"
-                      style={{
-                        background: APPLIED_FILL,
-                        borderRadius: 10,
-                      }}
-                    >
-                      <Icon size={16} color={selected ? A.INK : INK_45} strokeWidth={2.25} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold text-[14.5px]" style={{ color: INK }}>{r.label}</p>
-                        {selected && (
-                          <span
-                            className="inline-flex items-center justify-center h-4 w-4 rounded-full"
-                            style={{ background: A.INK }}
-                          >
-                            <Check size={10} color={A.CANVAS} strokeWidth={3} />
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[12.5px] leading-snug mt-0.5" style={{ color: INK_45 }}>
-                        {r.description}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-            <p className="text-[11.5px] mt-2" style={{ color: INK_45 }}>
-              Owners have full control and can't be assigned here.
-            </p>
           </div>
-        </motion.div>
+        )}
+
+        {/* Chosen person chip */}
+        {pickedUser && (
+          <div
+            className="flex items-center"
+            style={{
+              margin: '12px 16px 0', minHeight: 56, borderRadius: 16, background: CARD,
+              border: `1px solid ${SELECTED_EDGE}`, padding: '8px 12px 8px 8px', gap: 12,
+            }}
+          >
+            <SquircleAvatar
+              src={pickedUser.profile_photo_url || undefined}
+              alt={pickedUser.display_name || pickedUser.username}
+              userId={pickedUser.id}
+              size={40}
+              hairlineRing
+              ringColor={DARK_HAIRLINE}
+            />
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <span className="block truncate" style={{ fontSize: 15, fontWeight: 700, color: INK }}>
+                {pickedUser.display_name || pickedUser.username}
+              </span>
+              <span className="block truncate" style={{ fontSize: 12, color: DIM, marginTop: 2 }}>@{pickedUser.username}</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => { setPickedUser(null); setQuery(savedQuery); }}
+              style={{ fontSize: 13, fontWeight: 700, color: DIM, flex: 'none' }}
+            >
+              {t('business.team.sectionFive.change', { defaultValue: 'Change' })}
+            </button>
+          </div>
+        )}
+
+        {/* Role — only once someone is chosen (person chip or email row) */}
+        {hasRecipient && (
+          <section>
+            <h2 style={headingStyle}>{t('business.team.sectionFive.roleKicker', { defaultValue: 'Role' })}</h2>
+            {ROLE_ORDER.map((r) => {
+              const selected = role === r;
+              return (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setRole(r)}
+                  className="w-full flex items-start text-left"
+                  style={{
+                    margin: '8px 16px 0', padding: '12px 14px', borderRadius: 16, background: ROLE_CARD,
+                    border: `1px solid ${selected ? SELECTED_EDGE : LINE}`, gap: 12,
+                    width: 'calc(100% - 32px)',
+                  }}
+                >
+                  <Radio on={selected} />
+                  <span>
+                    <span className="block" style={{ fontSize: 14.5, fontWeight: 700, color: INK }}>
+                      {t(`business.team.sectionOne.roles.${r}`, { defaultValue: BUSINESS_ROLE_LABELS[r] })}
+                    </span>
+                    <span className="block" style={{ fontSize: 12, lineHeight: 1.4, color: MUTE, marginTop: 3 }}>
+                      {t(`business.team.sectionOne.descriptions.${r}`, { business: businessName, defaultValue: '' })}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </section>
+        )}
       </main>
 
-      {/* Sticky footer */}
+      {/* Pinned footer */}
       <div className="fixed left-0 right-0 pointer-events-none" style={{ bottom: 0, zIndex: 40 }}>
         <div
-          className="pointer-events-auto md:max-w-[440px] md:mx-auto px-4"
+          className="pointer-events-auto md:max-w-[440px] md:mx-auto"
           style={{
-            paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
-            paddingTop: 12,
-            background: `linear-gradient(to top, ${PAGE_BG} 60%, ${surfaceWithAlpha(PAGE_BG, 0)})`,
+            padding: '12px 16px max(env(safe-area-inset-bottom, 0px), 26px)',
+            background: `linear-gradient(to top, ${CANVAS} 70%, transparent)`,
           }}
         >
           <button
             type="button"
             onClick={handleSend}
             disabled={!canSend || pending}
-            className={`w-full flex items-center justify-center gap-2 active:opacity-90 ${pending ? '' : 'disabled:opacity-50'}`}
+            className="w-full flex items-center justify-center active:opacity-90"
             style={{
-              minHeight: 52,
-              borderRadius: 14,
-              background: INK,
-              color: A.CANVAS,
-              fontSize: 15,
-              fontWeight: 700,
-              letterSpacing: '-0.01em',
-              border: 'none',
+              height: 52, borderRadius: 16, background: INK, color: CANVAS,
+              fontSize: 15, fontWeight: 700, border: 'none',
+              opacity: !canSend || pending ? 0.32 : 1,
             }}
           >
-            <UserPlus size={18} strokeWidth={2.25} />
-            {pending ? 'Sending…' : 'Send invite'}
+            {pending ? t('business.team.sectionFive.sending', { defaultValue: 'Sending…' }) : buttonLabel}
           </button>
+          <p style={{ marginTop: 8, textAlign: 'center', fontSize: 11.5, lineHeight: 1.4, color: DIM }}>
+            {isEmail && !pickedUser
+              ? t('business.team.sectionFive.fineEmail', { defaultValue: 'They get an email with a link to join. Anyone with the link can use it, so send it only to the right address. It lasts 14 days.' })
+              : t('business.team.sectionFive.finePerson', { defaultValue: 'They get a clbhouz notification and an email. Invites last 14 days.' })}
+          </p>
         </div>
       </div>
     </ManagePageShell>
