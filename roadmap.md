@@ -1,5 +1,10 @@
 # Roadmap
 
+## BRIEF_MEMBER_SHOTS_VIEWER_POLISH
+- [ ] Await ruling: required on-tap get_hole_media read conflicts with six synchronous existing viewer-open tests outside the two authorised test files; those tests lack RPC fixtures and/or QueryClient providers. No implementation edits made.
+- [ ] Implement synthetic-only full-height media and active member caption/avatar; preserve normal viewer and top header.
+- [ ] Add requested coverage, name authorised retargets, run full suite against last reported baseline 2,788 tests /342 files, and report verification limits.
+
 ## BRIEF_MEMBER_SHOTS_SWIPE_ACROSS
 - [x] Build one synthetic carousel per course/hole with ordered ready shots and per-item credits; retain real-post behaviour and synthetic request gates. Added synthetic fullscreen post_views and likers mount gates; module headers own the local contract.
 - [x] Authorised retargets in four existing files; full bunx vitest run 2,782/341 → 2,787/342, zero failures (+2 builder/gate tests, +3 new actual-chrome tests). Targeted103/7 green; automatic build OK14:55:34Z. Detailed report Member_shots_swipe_across_report.md names every changed case and assertion.
