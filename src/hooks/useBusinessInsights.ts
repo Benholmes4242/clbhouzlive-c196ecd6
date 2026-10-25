@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export type InsightsRange = '7d' | '30d' | '90d';
@@ -67,9 +67,10 @@ export function useBusinessInsights(businessId: string | undefined, range: Insig
     queryKey: ['business-insights', businessId, days],
     enabled: !!businessId,
     staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
     queryFn: async (): Promise<BusinessInsights> => {
       const { data, error } = await supabase.rpc('get_business_insights', {
-        p_business_id: businessId!,
+        p_business_id: businessId ?? '',
         p_days: days,
       });
       if (error) throw error;
@@ -115,6 +116,8 @@ export function useBusinessInsights(businessId: string | undefined, range: Insig
     days,
     data: query.data ?? EMPTY,
     isLoading: query.isLoading,
+    isFetched: query.isFetched,
+    isPlaceholderData: query.isPlaceholderData,
     error: query.error,
     refetch: query.refetch,
   };

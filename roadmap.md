@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB83 — Insights section two
+- [ ] Replace visits/discovery cards with UTC bars, post markers, busiest-period sentence and merged sources; preserve CB82 and later cards.
+- [ ] Add en/en-XA copy/rule tests; report named CB82 retargets and full-suite counts from 2,820/345.
+- [ ] Verify rendering and report per-file diff, chart choice, deleted keys and live limitations.
+
 ## BRIEF_MEMBER_SHOTS_VIEWER_POLISH_FIX
 - [x] Resolved spacing hold: user drops clause 4 and spacing test; title stays at 0.
 - [x] Corrected authorised text-column assertion plus member T/no-relative-time checks, safe-area scrubber string and active-video caption clearance; added two placement tests only. Title spacing stays 0.
