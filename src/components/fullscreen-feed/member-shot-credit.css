@@ -12,7 +12,7 @@
   bottom: calc(48px + env(safe-area-inset-bottom));
 }
 .member-shot-avatar { flex: none; pointer-events: auto; }
-.member-shot-text { min-width: 0; }
+.member-shot-text { flex: 1; min-width: 0; }
 .member-shot-title {
   margin-top: 6px;
   font-size: 19px;
@@ -20,10 +20,20 @@
   letter-spacing: 0;
   line-height: 1.15;
   color: var(--member-shot-title-ink);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   overflow: hidden;
+}
+.member-shot-detail {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--member-shot-title-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .member-shot-credit {
   font-size: 12.5px;
