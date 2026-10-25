@@ -248,7 +248,7 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     const [run] = lastOpen().posts;
     expect(run.displayName).toBe('Course alpha');
     expect(run.createdAt).toBe('2026-09-02T08:00:00Z');
-    expect(run.mediaItems.map(item => item.credit)).toEqual(['Thomas Holmes · Mar 2026', 'St Andrews Links · Sep 2026']);
+    expect(run.mediaItems.map(item => item.memberShot?.credit)).toEqual(['Thomas Holmes · Mar 2026', 'St Andrews Links · Sep 2026']);
   });
 
   it('video items retain their playback fields, hls url included', async () => {

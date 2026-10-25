@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useGamRpc } from '@/hooks/gam/_useGamRpc';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
 import { holeShotsToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
+import { holeMediaQuery } from '@/lib/courseMedia/holeMediaQuery';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { useSectionReady } from './PageLoadGate';
@@ -47,24 +47,6 @@ export interface LatestHoleMedia {
   yards: number | null;
 }
 
-/** get_hole_media row: every ready, approved shot on one hole, walk order. */
-interface HoleMediaRow {
-  id: string;
-  course_id: string;
-  course_name: string;
-  hole_no: number;
-  media_type: 'image' | 'video';
-  media_url: string;
-  poster_url: string | null;
-  stream_id: string | null;
-  duration_seconds: number | null;
-  added_at: string;
-  member_id: string;
-  member_name: string | null;
-  par: number | null;
-  yards: number | null;
-}
-
 function LatestHoleCard({ row, pending, onOpen }: { row: LatestHoleMedia; pending: boolean; onOpen: (row: LatestHoleMedia) => void }) {
   const credit = [row.member_name, addedMonthLabel(row.added_at)].filter(Boolean).join(' · ');
   const seconds = Math.round(row.duration_seconds ?? 0);
@@ -96,17 +78,9 @@ export function LatestHolesSection() {
   useSectionReady('latestHoles', !isLoading);
   const [pending, setPending] = useState<LatestHoleMedia | null>(null);
 
-  const holeQuery = useQuery<HoleMediaRow[]>({
-    queryKey: ['hole-media', pending?.course_id, pending?.hole_no],
+  const holeQuery = useQuery({
+    ...holeMediaQuery(pending?.course_id ?? '', pending?.hole_no ?? 0),
     enabled: !!pending,
-    staleTime: 60_000,
-    queryFn: async () => {
-      if (!pending) return [];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: rows, error } = await (supabase.rpc as any)('get_hole_media', { p_course_id: pending.course_id, p_hole_no: pending.hole_no });
-      if (error) throw error;
-      return (rows ?? []) as HoleMediaRow[];
-    },
   });
 
   useEffect(() => {

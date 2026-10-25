@@ -425,7 +425,7 @@ export function FullscreenFeedOverlay() {
       beginCloseAnim('borrow');
     } else {
       // Non-borrow: mount reverse clone at the resting rect → tile rect.
-      const vp = getCurrentViewport();
+      const vp = getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts);
       const omw = o!.originMediaW ?? 0;
       const omh = o!.originMediaH ?? 0;
       const useMediaDims = omw > 0 && omh > 0;
@@ -788,7 +788,7 @@ export function FullscreenFeedOverlay() {
       let raf2: number | null = null;
       const raf1 = requestAnimationFrame(() => {
         raf2 = requestAnimationFrame(() => {
-          const vp = getCurrentViewport();
+          const vp = getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts);
           const omw = origin.originMediaW ?? 0;
           const omh = origin.originMediaH ?? 0;
           const useMediaDims = omw > 0 && omh > 0;

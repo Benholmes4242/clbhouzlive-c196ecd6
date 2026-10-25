@@ -393,7 +393,7 @@ const PostViewSentinel: React.FC<{ postId: string }> = ({ postId }) => {
  * Computes the resting rect from a layout effect on mount, then re-resolves
  * on visualViewport resize + orientationchange while the slide is active.
  *
- * Necessary because getCurrentViewport() prefers visualViewport, and in
+ * Necessary because getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts) prefers visualViewport, and in
  * Median/WKWebView vv can read degenerate at overlay-mount tick (during body
  * scroll-lock), which — combined with a one-shot render-tick read — baked a
  * zero-sized rect that never re-measured: image slides rendered white.
@@ -408,11 +408,11 @@ const FullscreenImageSlot: React.FC<{
   zoomStyle: React.CSSProperties;
 }> = ({ imgSrc, mediaW, mediaH, isActive, zoomRef, imgRef, zoomStyle }) => {
   const [fsRect, setFsRect] = React.useState<RestingRect>(() =>
-    resolveRestingRect(mediaW, mediaH, getCurrentViewport(), 'image'),
+    resolveRestingRect(mediaW, mediaH, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'image'),
   );
   React.useLayoutEffect(() => {
     const measure = () => {
-      const next = resolveRestingRect(mediaW, mediaH, getCurrentViewport(), 'image');
+      const next = resolveRestingRect(mediaW, mediaH, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'image');
       setFsRect((prev) =>
         prev.top === next.top && prev.left === next.left
           && prev.width === next.width && prev.height === next.height
@@ -565,7 +565,7 @@ const FullscreenVideoSlot: React.FC<{
     return { w: mediaW, h: mediaH };
   }, [laneAspect, mediaW, mediaH]);
   const [settledRect, setSettledRect] = React.useState<RestingRect>(() =>
-    resolveRestingRect(dims.w, dims.h, getCurrentViewport(), 'video'),
+    resolveRestingRect(dims.w, dims.h, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'video'),
   );
   // Poll the engine for the lane's intrinsic aspect until metadata lands.
   React.useEffect(() => {
@@ -592,7 +592,7 @@ const FullscreenVideoSlot: React.FC<{
   React.useLayoutEffect(() => {
     if (isBorrowSlide) return;
     const measure = () => {
-      const next = resolveRestingRect(dims.w, dims.h, getCurrentViewport(), 'video');
+      const next = resolveRestingRect(dims.w, dims.h, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'video');
       setSettledRect((prev) =>
         prev.top === next.top && prev.left === next.left
           && prev.width === next.width && prev.height === next.height
@@ -1021,7 +1021,7 @@ const BorrowedFullscreenSlot: React.FC<{
   // when the engine hasn't published a lane aspect yet.
   const originSnap = useFullscreenFeedStore.getState().origin;
   const initialTargetRect = React.useMemo(() => {
-    const vp = getCurrentViewport();
+    const vp = getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts);
     const laneAspect = VideoEngine.getLaneAspect(borrow.laneId);
     let mw = 0;
     let mh = 0;
@@ -1161,7 +1161,7 @@ const BorrowedFullscreenSlot: React.FC<{
     // Emit [DECIDE] restingRect.late when we fall past step 1 so we can
     // quantify how often the tail fires (drives whether a corrective tween
     // is worth building).
-    const vp = getCurrentViewport();
+    const vp = getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts);
     const laneAspect = VideoEngine.getLaneAspect(borrow.laneId);
     let mw = 0;
     let mh = 0;
@@ -1211,7 +1211,7 @@ const BorrowedFullscreenSlot: React.FC<{
         if (cancelled) return true;
         const a = VideoEngine.getLaneAspect(borrow.laneId);
         if (!a || a <= 0) return false;
-        const nextRect = resolveRestingRect(a * 1000, 1000, getCurrentViewport(), 'video');
+        const nextRect = resolveRestingRect(a * 1000, 1000, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'video');
         const cur = targetRectRef.current;
         if (!cur || (cur.fit === nextRect.fit && Math.abs(cur.height - nextRect.height) < 1)) return true;
         targetRectRef.current = nextRect;
@@ -1840,7 +1840,7 @@ const FullscreenPagerPage: React.FC<{
       (!(m as any).isProcessing && (m as any).streamId
         ? generateStreamHlsUrl((m as any).streamId)
         : null);
-    const videoRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(), 'video');
+    const videoRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'video');
     if (isActivePage && mHlsUrl) {
       return (
         <FullscreenVideoSlot
@@ -1884,7 +1884,7 @@ const FullscreenPagerPage: React.FC<{
 
   if (m?.type === 'image') {
     const imgSrc = m.imageUrl || m.thumbnailUrl || '';
-    const imgRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(), 'image');
+    const imgRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'image');
     return (
       <div className="absolute inset-0 overflow-hidden">
         {/* Active page: transparent over the single backdrop behind the

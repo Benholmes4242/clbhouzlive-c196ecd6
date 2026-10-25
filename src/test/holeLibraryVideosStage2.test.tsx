@@ -6,7 +6,7 @@ import type { TusUploadOptions } from '@/uploads/tusVideoUpload';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 
-const f = vi.hoisted(() => ({ upload: vi.fn(), resilient: vi.fn(), poll: vi.fn(), insert: vi.fn(), auth: vi.fn(), exif: vi.fn(), open: vi.fn() }));
+const f = vi.hoisted(() => ({ rpc: vi.fn(), upload: vi.fn(), resilient: vi.fn(), poll: vi.fn(), insert: vi.fn(), auth: vi.fn(), exif: vi.fn(), open: vi.fn() }));
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: (...args: unknown[]) => f.open(...args) }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'member' } }) }));
@@ -14,7 +14,7 @@ vi.mock('@/uploads/hooks/useMediaUpload', () => ({ useMediaUpload: () => ({ uplo
 vi.mock('@/uploads/resilientVideoUpload', () => ({ uploadVideoResilient: f.resilient }));
 vi.mock('@/utils/pollStreamMetadata', () => ({ pollStreamMetadata: f.poll }));
 vi.mock('@/lib/courseMedia/holePhotoExif', () => ({ readHolePhotoExif: f.exif }));
-vi.mock('@/integrations/supabase/client', () => ({ supabase: { auth: { getUser: f.auth }, from: () => ({ insert: f.insert }) } }));
+vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: f.rpc, auth: { getUser: f.auth }, from: () => ({ insert: f.insert }) } }));
 vi.mock('@/hooks/gam/useCourseHoleAnalysis', () => ({ useCourseHoleAnalysis: () => ({ isSuccess: true, data: { available: true, holes: [hole] } }) }));
 vi.mock('@/components/course-media-tab/hooks/useHolePhotoTagging', () => ({ useHolePhotoTagging: () => ({ ready: true, own: { data: [] }, sources: { data: [], isSuccess: true }, tags: { data: [], isSuccess: true }, taggedUrls: new Set(), submit: { reset: vi.fn() } }) }));
 vi.mock('@/components/course-media-tab/hooks/useCourseMedia', () => ({ useCourseMedia: () => ({ posts: [], postsForFullscreen: [], mediaCounts: { total: 0, photos: 0, videos: 0 }, countsReady: true }) }));
@@ -106,18 +106,20 @@ describe('Founder size and type ruling', () => {
   it('rejects one byte over 4 GiB', () => { const file = new File([], 'v.mp4', { type: 'video/mp4' }); Object.defineProperty(file, 'size', { value: 4294967297 }); expect(libraryHoleVideoError(file)).toBe('That video is too large to upload.'); });
 });
 describe('Stage 2 encode display', () => {
-  it('null duration has no playable element; metadata refresh makes the shot open in the viewer', () => {
-    const view = render(<HoleWalk available holes={[hole]} rows={[row]} totalMedia={1} onAddFirst={() => {}} />);
+  it('null duration has no playable element; metadata refresh makes the shot open in the viewer', async () => {
+    const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    f.rpc.mockResolvedValue({ data: [{ ...row, duration_seconds: 42, member_avatar_url: null }], error: null });
+    const view = render(<QueryClientProvider client={cache}><HoleWalk available holes={[hole]} rows={[row]} totalMedia={1} onAddFirst={() => {}} /></QueryClientProvider>);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));
     expect(screen.queryByRole('button', { name: 'Play video' })).toBeNull(); expect(view.container.querySelector('video')).toBeNull();
     expect(view.container.querySelector('.hole-media-processing')).toBeInTheDocument();
     fireEvent.click(view.container.querySelector('.hole-walk-slide') as HTMLElement);
     expect(f.open).not.toHaveBeenCalled();
-    view.rerender(<HoleWalk available holes={[hole]} rows={[{ ...row, duration_seconds: 42 }]} totalMedia={1} onAddFirst={() => {}} />);
+    view.rerender(<QueryClientProvider client={cache}><HoleWalk available holes={[hole]} rows={[{ ...row, duration_seconds: 42 }]} totalMedia={1} onAddFirst={() => {}} /></QueryClientProvider>);
     expect(view.container.querySelector('.hole-media-processing')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Play video' })).toBeNull();
     fireEvent.click(view.container.querySelector('.hole-walk-slide') as HTMLElement);
-    expect(f.open).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
     const args = f.open.mock.calls[0][0] as { posts: Array<{ mediaItems: Array<{ type: string }> }>; options?: { readOnly?: boolean } };
     expect(args.posts).toHaveLength(1);
     expect(args.posts[0].mediaItems[0].type).toBe('video');

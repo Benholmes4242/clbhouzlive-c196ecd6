@@ -1,10 +1,30 @@
-:root {
-  --member-shot-credit-ink: rgba(255, 255, 255, 0.72);
+.member-shot-caption {
+  position: fixed;
+  left: 20px;
+  right: 20px;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  pointer-events: none;
 }
-
+.member-shot-avatar { flex: none; pointer-events: auto; }
+.member-shot-text { min-width: 0; }
+.member-shot-title {
+  margin-top: 6px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.15;
+  color: var(--member-shot-title-ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .member-shot-credit {
   font-size: 12.5px;
   color: var(--member-shot-credit-ink);
   line-height: 1.35;
-  margin-top: 4px;
+  margin-top: 5px;
 }
