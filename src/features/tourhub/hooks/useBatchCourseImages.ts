@@ -37,6 +37,7 @@ import hazeltineNational from '@/assets/courses/hazeltine-national-golf-club.jpg
 import sedgefieldCC from '@/assets/courses/sedgefield-country-club.jpg.asset.json';
 import clubAtIndianCreek from '@/assets/courses/club-at-indian-creek.jpg.asset.json';
 import canyonMeadowsGCC from '@/assets/courses/canyon-meadows-gcc.jpg.asset.json';
+import norwoodHillsCC from '@/assets/courses/norwood-hills-country-club.jpg.asset.json';
 
 /**
  * Static venue image overrides for courses not yet in the database.
@@ -53,6 +54,7 @@ const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
   'The Club at Indian Creek': clubAtIndianCreek.url,
   'Canyon Meadows G&CC': canyonMeadowsGCC.url,
   'Canyon Meadows Golf & Country Club': canyonMeadowsGCC.url,
+  'Norwood Hills Country Club': norwoodHillsCC.url,
 };
 
 export interface TournamentImageInput {
