@@ -54,7 +54,6 @@ interface InviteSuggestion {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ROLE_ORDER: AssignableBusinessRole[] = ['admin', 'editor', 'analyst'];
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 /** INVITE_SUGGEST_V1: up to 10 golfers, home club first then newest followers. */
 function useBusinessInviteSuggestions(businessId: string | undefined, enabled: boolean) {
@@ -214,18 +213,9 @@ export default function BusinessInvitePage() {
   const showSuggestions = !pickedUser && query.trim().length === 0;
   const showSearchCard = !pickedUser && query.trim().length >= 2;
 
-  const followerSub = (s: InviteSuggestion): string => {
-    const handle = `@${s.username || ''}`;
-    if (!s.followed_at) return handle;
-    const at = new Date(s.followed_at).getTime();
-    if (Date.now() - at < 7 * 86400000) {
-      return `${handle} · ${t('business.team.sectionFive.followedThisWeek', { defaultValue: 'followed this week' })}`;
-    }
-    const d = new Date(at);
-    const month = MONTHS[d.getUTCMonth()];
-    const label = d.getUTCFullYear() === new Date().getUTCFullYear() ? month : `${month} ${d.getUTCFullYear()}`;
-    return `${handle} · ${t('business.team.sectionFive.followedIn', { month: label, defaultValue: `followed in ${label}` })}`;
-  };
+  // INVITE_SUGGEST_V2: follow dates were reset by the follows-table merge, so
+  // the follower sub-line is just the handle — the group heading says why.
+  const followerSub = (s: InviteSuggestion): string => `@${s.username || ''}`;
 
   const renderPersonRow = (
     key: string,
