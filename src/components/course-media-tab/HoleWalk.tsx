@@ -131,7 +131,6 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
   const openViewer = (id: string) => {
     const index = playable.findIndex(photo => photo.id === id);
     if (index < 0) return;
-    setCurrent(index);
     const tapped = playable[index];
     const posts = holeShotsToFeedPosts(
       playable.map(photo => ({ ...photo, member_id: photo.user_id, member_name: authors?.get(photo.user_id) ?? null })),

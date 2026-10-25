@@ -111,13 +111,13 @@ describe('BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS hole walk fullscreen', () => {
     expect(lastOpen().posts[0].displayName).toBe('Thomas Holmes');
   });
 
-  it('the frame stays on the tapped shot while the canonical viewer is open', () => {
+  it('opening the viewer leaves the frame where it was', () => {
     walk([shot('a'), shot('b', { user_id: 'u2', added_at: '2026-06-02T09:00:00Z' }), video('c', 42)]);
     fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[1] as HTMLElement);
     expect(f.open).toHaveBeenCalledTimes(1);
     expect(lastOpen().index).toBe(1);
-    expect(panel().querySelector('.hole-walk-frame-count')?.textContent).toBe('2 / 3');
-    expect(screen.getByRole('button', { name: 'Show shot 2 of 3' })).toHaveAttribute('aria-current', 'true');
+    expect(panel().querySelector('.hole-walk-frame-count')?.textContent).toBe('1 / 3');
+    expect(screen.getByRole('button', { name: 'Show shot 1 of 3' })).toHaveAttribute('aria-current', 'true');
   });
 
   it('a video shot reaches the viewer with its stream hlsUrl', () => {
