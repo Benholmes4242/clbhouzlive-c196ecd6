@@ -6,7 +6,9 @@ import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 const hls = vi.hoisted(() => ({ attach: vi.fn(() => ({ detach: vi.fn() })) }));
+const f = vi.hoisted(() => ({ open: vi.fn() }));
 vi.mock('@/components/explore-tab-new/courseled/tileHlsPlayer', () => ({ attachTileHls: hls.attach }));
+vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: (...args: unknown[]) => f.open(...args) }));
 
 import { HoleWalk } from '@/components/course-media-tab/HoleWalk';
 import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
