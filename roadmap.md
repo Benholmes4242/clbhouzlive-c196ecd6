@@ -1,8 +1,10 @@
 # Roadmap
 
 ## BRIEF_ADMIN_HOLE_TAGGING
-- [ ] Add server-authoritative admin check, admin untagged read and optional batch credit/duplicate handling; preserve all member paths and tests.
-- [ ] Verify RPC/readback/cache rules and admin-only visibility with new tests; run full suite from2,861/347 and report limitations.
+- [x] Added server-authoritative admin check, admin untagged read and opt-in batch credit/duplicate handling; member source paths and all existing tests unchanged.
+- [x] Full bunx vitest run2,879 passed/348 files, zero failures from2,861/347 (+18 only adminHoleTagging.test.tsx). RPC/readback/required invalidations, visibility, order and unchanged member path covered.
+- [ ] STOP: src/test/adminHoleTagging.test.tsx(50,85): error TS2339: Property 'staleTime' does not exist on type 'QueryOptions<unknown, Error, unknown, QueryKey, never>'. New test accesses cache options through a narrower type; no correction after completed-edit stop. Build/typecheck not clean.
+- [ ] Live authenticated admin tagging/readback and member attribution verification unavailable (external_unmanaged); browser validation not attempted after compiler stop. Report Admin_hole_tagging_stop_report.md.
 
 ## CB83 — Insights section two
 - [x] Replaced visits/discovery with UTC bars, post markers, busiest-period sentence and merged sources; CB82 and later card source unchanged.
