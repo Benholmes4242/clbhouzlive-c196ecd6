@@ -113,12 +113,19 @@ export function LatestHolesSection() {
     if (holeQuery.isError) { setPending(null); return; }
     const rows = holeQuery.data;
     if (!rows) return;
-    if (rows.length === 0) { setPending(null); return; }
-    const shots: HoleViewerShot[] = rows.map(row => ({ ...row, author: row.member_name }));
-    const items = buildHoleViewerItems(shots, { courseName: pending.course_name, scored: pending.par != null });
-    if (items.length === 0) { setPending(null); return; }
-    const index = items.findIndex(item => item.id === pending.id);
-    setViewer({ items, index: index >= 0 ? index : 0 });
+    const posts = holeShotsToFeedPosts(rows, pending.course_name);
+    if (posts.length === 0) { setPending(null); return; }
+    const index = posts.findIndex(post => post.id === pending.id);
+    const start = index >= 0 ? index : 0;
+    openWithOrigin({
+      posts,
+      index: start,
+      originEl: null,
+      posterUrl: pending.media_type === 'video' ? holeMediaPoster(pending) : pending.media_url,
+      mediaId: posts[start].mediaItems[0]?.id ?? null,
+      openedFrom: 'course-media',
+      options: { readOnly: true },
+    });
     setPending(null);
   }, [holeQuery.data, holeQuery.isError, pending]);
 
@@ -130,11 +137,5 @@ export function LatestHolesSection() {
       {data.map(row => <LatestHoleCard key={row.id} row={row} pending={pending?.id === row.id}
         onOpen={tapped => { if (!pending) setPending(tapped); }} />)}
     </div>
-    {viewer && <MediaPreviewViewer
-      items={viewer.items}
-      initialIndex={viewer.index}
-      onClose={() => setViewer(null)}
-      edgeBounce
-    />}
   </section>;
 }
