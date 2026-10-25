@@ -47,7 +47,7 @@ describe('admin privilege and queue reads', () => {
   it('loading is false and settled true is scoped by user with ten-minute stale time', async () => {
     const { wrapper, cache } = setup(); const { result } = renderHook(useIsAdmin, { wrapper }); expect(result.current).toBe(false);
     await waitFor(() => expect(result.current).toBe(true)); expect(f.rpc).toHaveBeenCalledWith('is_admin');
-    expect(cache.getQueryCache().find({ queryKey: ['is-admin', 'admin'] })?.options.staleTime).toBe(600000);
+    expect((cache.getQueryCache().find({ queryKey: ['is-admin', 'admin'] })?.options as { staleTime?: number } | undefined)?.staleTime).toBe(600000);
   });
   it('admin-check error returns false', async () => {
     f.rpc.mockResolvedValue({ data: null, error: { code: '42501' } });
