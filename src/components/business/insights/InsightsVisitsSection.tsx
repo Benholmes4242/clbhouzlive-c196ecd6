@@ -34,7 +34,7 @@ export function InsightsVisitsCards({ insights, funnel, dates, days }: Omit<Snap
       <VisitsBars buckets={buckets} days={days} />
       <div className="insights-visits-legend"><span><i className="insights-visits-square" />{k('legendVisits')}</span><span><i className="insights-visits-ring" />{k('legendPosts')}</span></div>
       <p className="insights-visits-note" data-busiest-day={best?.day} data-date-kind={best?.dateKind} data-post-relation={best?.relation ?? 'none'} data-weekly={days === 90} data-empty={!best}>
-        {best ? <><b>{k(days === 90 ? 'busiestWeek' : best.relation ? 'busiestDayPosted' : 'busiestDay', { date, count: best.total, n: formatNumber(best.total) })}</b>{best.relation && <> {k(best.relation === 'same' ? 'postedSame' : 'postedAfter')}</>}</> : k('empty', { days })}
+        {best ? <><b>{k(days === 90 ? 'busiestWeek' : best.relation ? 'busiestDayPosted' : 'busiestDay', { date, count: best.total, n: formatNumber(best.total) })}</b>{best.relation && <> {k(`${best.relation === 'same' ? 'postedSame' : 'postedAfter'}${best.postCount === 2 ? 'Twice' : best.postCount >= 3 ? 'Times' : ''}`, { n: formatNumber(best.postCount) })}</>}</> : k('empty', { days })}
       </p>
     </section>
     {funnel.opened.visits > 0 && <section className="insights-visits-card" data-card="sources">
