@@ -610,7 +610,7 @@
         "fineEmail": "They get an email with a link to join. Anyone with the link can use it, so send it only to the right address. It lasts 14 days.",
         "sentUser": "Invite sent to {{first}}",
         "sentEmail": "Invite sent to {{email}}",
-        "sending": "Sending\u2026"
+        "sending": "Sending…"
       }
     },
     "hero": {
@@ -749,15 +749,6 @@
       }
     },
     "insights": {
-      "metric": {
-        "profileViews": "Profile views",
-        "uniqueVisitors": "Unique visitors",
-        "directoryImpressions": "Directory impressions",
-        "clickOuts": "Click-outs",
-        "newFollowers": "New followers",
-        "messageClicks": "Message clicks"
-      },
-      "deltaCaption": "Change vs the previous {{range}}",
       "audience": {
         "locked": "Locked",
         "visitorsLabel": "Unique visitors in this period",
@@ -790,7 +781,37 @@
         "comments_other": "{{n}} comments"
       },
       "reviewsCount_one": "{{n}} review",
-      "reviewsCount_other": "{{n}} reviews"
+      "reviewsCount_other": "{{n}} reviews",
+      "funnel": {
+        "headSaw_one": "{{n}} golfer saw {{business}}.",
+        "headSaw_other": "{{n}} golfers saw {{business}}.",
+        "headOpened_one": "{{n}} opened your profile.",
+        "headOpened_other": "{{n}} opened your profile.",
+        "headNone": "No golfers have seen {{business}} yet.",
+        "subPeriod": "Last {{days}} days.",
+        "subTopPost": "\"{{preview}}\" reached the most golfers.",
+        "subNone": "Golfers find a business through its posts and the business directory.",
+        "kicker": "From seen to acted",
+        "kickerDays": "{{days}} days",
+        "rowSaw": "Saw you",
+        "rowOpened": "Opened your profile",
+        "rowFollowed": "Followed",
+        "rowTapped": "Tapped through",
+        "subSaw": "your posts and the business directory",
+        "subVisits_one": "{{n}} visit",
+        "subVisits_other": "{{n}} visits",
+        "subFollowed_one": "{{n}} in total",
+        "subFollowed_other": "{{n}} in total",
+        "subTapped": "website, phone, directions or message",
+        "changeUp": "+{{n}}",
+        "changeDown": "{{n}} fewer",
+        "postAs": "Post as {{business}}",
+        "leakStopLead": "Most golfers stop before your profile.",
+        "leakStopBody": "{{opened}} of the {{saw}} who saw {{business}} opened it.",
+        "leakLeftLead_one": "{{n}} golfer opened your profile and left.",
+        "leakLeftLead_other": "{{n}} golfers opened your profile and left.",
+        "leakLeftBody": "Nobody followed or tapped through."
+      }
     },
     "week": {
       "kicker": "This week",

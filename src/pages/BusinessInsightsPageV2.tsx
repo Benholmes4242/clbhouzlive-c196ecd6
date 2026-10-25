@@ -4,8 +4,8 @@
  * The rules this file now encodes, because four of them were being broken:
  *   - 0 IS A FACT. A metric of zero renders "0". Only absent renders nothing,
  *     and only while the query is in flight (the Skeleton path).
- *   - A PERCENTAGE IS A SAMPLE-SIZE CLAIM. Below DELTA_MIN_BASE the delta is
- *     an absolute change, so 1 -> 13 reads "+12" and never "+1200%".
+ *   - The headline/funnel (CB82, InsightsFunnel) owns period changes:
+ *     absolute below a base of 20, never red.
  *   - NOTHING IS INVENTED. No placeholder rows, no mock bars, no fabricated
  *     locations. A locked section says what it is waiting for and shows the
  *     member's REAL progress towards it.
@@ -26,7 +26,10 @@ import {
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
-import { useBusinessInsights, deltaPct } from '@/hooks/useBusinessInsights';
+import { useBusinessInsights } from '@/hooks/useBusinessInsights';
+import { useBusinessInsightsFunnel } from '@/hooks/useBusinessInsightsFunnel';
+import { InsightsFunnel } from '@/components/business/insights/InsightsFunnel';
+import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Button } from '@/components/ui/button';
 import { RailChips } from '@/components/ui/RailChips';
@@ -39,12 +42,7 @@ import {
 } from '@/features/courses/components/holes/analytical/tokens';
 
 type DateRange = '7d' | '30d' | '90d';
-
-/**
- * A percentage below this previous-period base is arithmetic, not insight:
- * 1 -> 13 is "+12", not "+1200%". At or above it, the percentage stands.
- */
-const DELTA_MIN_BASE = 20;
+const RANGE_DAYS: Record<DateRange, number> = { '7d': 7, '30d': 30, '90d': 90 };
 
 /** Below this many impressions the rate is WITHHELD: the page states the
  *  impression count and says why, rather than printing a number it disowns. */
@@ -58,8 +56,6 @@ const DISCOVERY_MIN_TOTAL = 10;
  *  the filled part reads as filled rather than as a hole in the track. */
 const BAR_FILL = A.DIM;
 
-const GREEN = A.GREEN;
-const RED = A.RED;
 
 const cardStyle: React.CSSProperties = { background: BIZ.card, border: `1px solid ${BIZ.hair}` };
 const numFeat: React.CSSProperties = { fontFeatureSettings: '"kern" 1, "liga" 1' };
@@ -177,92 +173,6 @@ const InsightCard = ({ title, kicker, action, children }: {
     </div>
     {children}
   </section>
-);
-
-/** Solid triangle. A figure with an arrow is a MOVEMENT, so it keeps the
- *  green-up / red-down improvement convention. */
-const Triangle = ({ up, color }: { up: boolean; color: string }) => (
-  <span
-    aria-hidden
-    style={{
-      display: 'inline-block',
-      width: 0,
-      height: 0,
-      borderLeft: '3.2px solid transparent',
-      borderRight: '3.2px solid transparent',
-      ...(up
-        ? { borderBottom: `4.4px solid ${color}` }
-        : { borderTop: `4.4px solid ${color}` }),
-    }}
-  />
-);
-
-/**
- * The delta. THE FLOOR LIVES HERE, not in the shared deltaPct helper (whose
- * only consumer is this page).
- *   prev < DELTA_MIN_BASE -> absolute change WITH its base ("+12 vs 1"), so
- *                            the unit switch is visible on the surface
- *   prev >= DELTA_MIN_BASE -> percentage, as before
- *   value === prev         -> nothing at all, never "0%"
- */
-const Delta = ({ value, prev }: { value: number; prev: number }) => {
-  if (value === prev) return null;
-
-  const up = value > prev;
-  const color = up ? GREEN : RED;
-
-  let text: string;
-  if (prev < DELTA_MIN_BASE) {
-    const diff = value - prev;
-    text = `${diff > 0 ? '+' : '\u2212'}${formatNum(Math.abs(diff))} vs ${formatNum(prev)}`;
-  } else {
-    const pct = deltaPct(value, prev) as number;
-    const abs = Math.abs(pct);
-    text = `${pct >= 0 ? '+' : '\u2212'}${abs.toFixed(abs >= 10 ? 0 : 1)}%`;
-  }
-
-  return (
-    <span
-      className="inline-flex items-center gap-1 tabular-nums"
-      style={{ fontSize: 11, fontWeight: 700, letterSpacing: '-0.01em', color, ...numFeat }}
-    >
-      <Triangle up={up} color={color} />
-      {text}
-    </span>
-  );
-};
-
-/**
- * One overview cell. No border, no fill, no glyph - the page is a page of
- * panels already, and every row here is analytics, so a chart icon carries
- * nothing the label does not. The delta sits in a FIXED-height box so cells
- * without one stay aligned with cells that have one.
- */
-const MetricCell = ({ label, value, prev, loading }: {
-  label: string; value: number; prev: number; loading: boolean;
-}) => (
-  <div className="flex flex-col items-center text-center gap-1.5">
-    <span
-      style={{
-        ...BIZ_LABEL,
-        lineHeight: 1.25,
-        minHeight: 28,
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'center',
-      }}
-    >
-      {label}
-    </span>
-    {loading ? (
-      <Skeleton className="h-7 w-12" />
-    ) : (
-      <span className="tabular-nums" style={bizFigure(24)}>{formatNum(value)}</span>
-    )}
-    <span style={{ height: 15, display: 'flex', alignItems: 'center' }}>
-      {!loading && <Delta value={value} prev={prev} />}
-    </span>
-  </div>
 );
 
 /**
@@ -447,6 +357,7 @@ const BusinessInsightsPageV2 = () => {
   const { data: business, isLoading: businessLoading } = useBusinessProfile(id);
   const { data: membership, isLoading: membershipLoading, isFetched: membershipFetched } = useBusinessMembership(id);
   const { data: insights, isLoading: insightsLoading } = useBusinessInsights(business?.id, dateRange);
+  const { data: funnel, isError: funnelError } = useBusinessInsightsFunnel(business?.id, RANGE_DAYS[dateRange]);
 
   const isLoading = businessLoading || membershipLoading;
 
@@ -503,6 +414,7 @@ const BusinessInsightsPageV2 = () => {
 
   const rangeLabels: Record<DateRange, string> = { '7d': '7 days', '30d': '30 days', '90d': '90 days' };
   const h = insights.headline;
+  const canPost = !!membership.role && ['owner', 'admin', 'editor'].includes(membership.role);
 
   const rangePicker = (
     <div className="flex justify-center pb-3">
@@ -516,27 +428,23 @@ const BusinessInsightsPageV2 = () => {
   );
 
   return (
-    <ManagePageShell title="Insights" belowTitle={rangePicker}>
+    <ManagePageShell title="Insights" subtitle={business.name} belowTitle={rangePicker}>
 
       <div className="mx-auto px-4 md:px-6 py-6 space-y-5 md:space-y-6">
-        {/* ── OVERVIEW: ONE panel, one grid, no per-cell chrome ── */}
-        <section className="rounded-[18px] p-4 md:p-5" style={cardStyle}>
-          <p style={{ ...BIZ_KICKER, marginBottom: 18 }}>OVERVIEW</p>
-          <div
-            className="grid grid-cols-3"
-            style={{ rowGap: 24, columnGap: 10 }}
-          >
-            <MetricCell label={t('business.insights.metric.profileViews')} value={h.profile_views.value} prev={h.profile_views.prev} loading={insightsLoading} />
-            <MetricCell label={t('business.insights.metric.uniqueVisitors')} value={h.unique_visitors.value} prev={h.unique_visitors.prev} loading={insightsLoading} />
-            <MetricCell label={t('business.insights.metric.directoryImpressions')} value={h.directory_impressions.value} prev={h.directory_impressions.prev} loading={insightsLoading} />
-            <MetricCell label={t('business.insights.metric.clickOuts')} value={h.click_outs.value} prev={h.click_outs.prev} loading={insightsLoading} />
-            <MetricCell label={t('business.insights.metric.newFollowers')} value={h.new_followers.value} prev={h.new_followers.prev} loading={insightsLoading} />
-            <MetricCell label={t('business.insights.metric.messageClicks')} value={h.message_clicks.value} prev={h.message_clicks.prev} loading={insightsLoading} />
+        {/* ── CB82: headline + "from seen to acted" (replaces OVERVIEW). Draws
+            nothing until the first read settles or if it fails; period
+            switches keep the previous figures. ── */}
+        {funnel && !funnelError && (
+          <div className="-mx-4 md:-mx-6 -mt-6">
+            <InsightsFunnel
+              funnel={funnel}
+              businessName={business.name}
+              days={RANGE_DAYS[dateRange]}
+              canPost={canPost}
+              onPost={() => usePostStudioStore.getState().openPostStudio({ actorType: 'business', actorId: business.id })}
+            />
           </div>
-          <p style={{ ...BIZ_LABEL, marginTop: 18, textAlign: 'center' }}>
-            {t('business.insights.deltaCaption', { range: rangeLabels[dateRange] })}
-          </p>
-        </section>
+        )}
 
         {/* ── VISITORS ── */}
         <InsightCard kicker="VISITORS" title="Profile visits over time">
