@@ -14,6 +14,7 @@ const f = vi.hoisted(() => ({
   courses: vi.fn(),
   enrichment: vi.fn(),
   progress: vi.fn(),
+  baseline: vi.fn(),
 }));
 
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'u1' } }) }));

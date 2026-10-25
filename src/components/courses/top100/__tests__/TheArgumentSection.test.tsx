@@ -4,6 +4,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 
 import { TheArgumentSection } from '../TheArgumentSection';
 import type { ArgumentRow } from '../theArgument';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 const row = (over: Partial<ArgumentRow>): ArgumentRow => ({
   id: 'c1',
