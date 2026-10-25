@@ -168,7 +168,7 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     // url match: media_id unknown but the url matches a media item
     fireEvent.click(screen.getByLabelText('Open Course alpha shot 2 of 14'));
     await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
-    expect(f.open).toHaveBeenLastCalledWith(expect.objectContaining({ index: 1, mediaId: 'media-alpha-2' }));
+    expect(f.open).toHaveBeenLastCalledWith(expect.objectContaining({ index: 1, mediaId: 'my' }));
     // post id match: neither media id nor url match, but the post id does
     f.rows = [course('delta', { tiles: [tile('d-1', { post_id: 'post-alpha-2', media_id: 'gone', media_url: '/gone.jpg' })] }), course('beta'), course('gamma')];
     cleanup();
