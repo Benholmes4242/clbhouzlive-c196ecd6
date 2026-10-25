@@ -552,8 +552,6 @@
         "homeClubGroup": "[~~Hómé clúb: {{club}}~~]",
         "followGroup": "[~~Fóllów {{business}}~~]",
         "playsHere": "[~~pláys héré~~]",
-        "followedThisWeek": "[~~fóllówéd thís wéék~~]",
-        "followedIn": "[~~fóllówéd ín {{month}}~~]",
         "onTheTeam": "[~~Ón thé téám~~]",
         "invitePending": "[~~Ínvíté péndíng~~]",
         "inviteByEmail": "[~~Ínvíté by émáíl~~]",

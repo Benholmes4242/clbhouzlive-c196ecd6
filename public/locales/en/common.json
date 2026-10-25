@@ -597,8 +597,6 @@
         "homeClubGroup": "Home club: {{club}}",
         "followGroup": "Follow {{business}}",
         "playsHere": "plays here",
-        "followedThisWeek": "followed this week",
-        "followedIn": "followed in {{month}}",
         "onTheTeam": "On the team",
         "invitePending": "Invite pending",
         "inviteByEmail": "Invite by email",
