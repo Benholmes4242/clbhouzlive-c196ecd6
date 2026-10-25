@@ -7,8 +7,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { CourseHole, CourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 
-const f = vi.hoisted(() => ({ latest: [] as import('@/components/courses/browse/LatestHolesSection').LatestHoleMedia[], loading: false, error: false, rpc: vi.fn(), analysis: null as CourseHoleAnalysis | null, rows: [] as HolePhoto[], total: 8, known: vi.fn() }));
+const f = vi.hoisted(() => ({ latest: [] as import('@/components/courses/browse/LatestHolesSection').LatestHoleMedia[], loading: false, error: false, rpc: vi.fn(), analysis: null as CourseHoleAnalysis | null, rows: [] as HolePhoto[], total: 8, known: vi.fn(), holeRpc: vi.fn(), viewer: null as null | { items: Array<{ id: string }>; initialIndex: number; edgeBounce?: boolean } }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
+vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: (...args: unknown[]) => f.holeRpc(...args) } }));
+vi.mock('@/components/shared/media/MediaPreviewViewer', () => ({ MediaPreviewViewer: (props: { items: Array<{ id: string }>; initialIndex: number; edgeBounce?: boolean }) => { f.viewer = props; return null; } }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'member' } }) }));
 vi.mock('@/hooks/gam/useCourseHoleAnalysis', () => ({ useCourseHoleAnalysis: () => ({ isSuccess: true, data: f.analysis }) }));
 vi.mock('@/components/course-media-tab/hooks/useHolePhotoTagging', () => ({ useHolePhotoTagging: (_course: string, _member: string, known: number[] | null) => {
@@ -40,7 +42,11 @@ function unscored() {
   if (!result) throw new Error('Expected available unscored holes');
   return result.holes;
 }
-beforeEach(() => { vi.clearAllMocks(); f.analysis = emptyAnalysis; f.rows = [photo(1), photo(4), photo(7), photo(15)]; f.total = 8; f.latest = [latest('first'), latest('second'), latest('third')]; f.loading = false; f.error = false; });
+const holeRow = (id: string, over: Record<string, unknown> = {}) => ({ id, course_id: 'course-second', course_name: 'Course second', hole_no: 4, media_type: 'image', media_url: `/hole-${id}.jpg`, poster_url: null, stream_id: null, duration_seconds: null, added_at: '2025-06-12T10:00:00Z', member_id: 'member', member_name: 'Thomas Holmes', par: 3, yards: 182, ...over });
+beforeEach(() => {
+  vi.clearAllMocks(); f.analysis = emptyAnalysis; f.rows = [photo(1), photo(4), photo(7), photo(15)]; f.total = 8; f.latest = [latest('first'), latest('second'), latest('third')]; f.loading = false; f.error = false; f.viewer = null;
+  f.holeRpc.mockResolvedValue({ data: [holeRow('h1'), holeRow('second'), holeRow('h3')], error: null });
+});
 afterEach(cleanup);
 function mountTab(entry = '/courses/course?tab=media&hole=4&shot=selected') {
   const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -52,8 +58,10 @@ function mountTab(entry = '/courses/course?tab=media&hole=4&shot=selected') {
 function latest(id: string, overrides: Partial<LatestHoleMedia> = {}): LatestHoleMedia {
   return { id, course_id: `course-${id}`, course_name: `Course ${id}`, hole_no: 4, media_type: 'image', media_url: `/photo-${id}.jpg`, poster_url: null, stream_id: null, duration_seconds: null, exif_captured_at: '2026-09-14T12:00:00Z', added_at: '2025-06-12T10:00:00Z', created_at: '2026-10-24T12:00:00Z', member_id: 'member', member_name: 'Thomas Holmes', par: 3, yards: 182, ...overrides };
 }
-function Location() { const location = useLocation(); return <output data-testid="destination">{location.pathname}{location.search}</output>; }
-function mountRail() { return render(<MemoryRouter><LatestHolesSection /><Location /></MemoryRouter>); }
+function mountRail() {
+  const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(<MemoryRouter><QueryClientProvider client={cache}><LatestHolesSection /></QueryClientProvider></MemoryRouter>);
+}
 
 describe('BRIEF_COURSES_LATEST_HOLES', () => {
   it.each([0, 1, 2])('fewer than three rows hides the rail (%i)', count => {
@@ -68,7 +76,6 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     mountRail(); const cards = screen.getAllByRole('button');
     expect(cards).toHaveLength(3);
     expect(cards.map(c => c.getAttribute('aria-label'))).toEqual(['Hole 4, Course first', 'Hole 4, Course first', 'Hole 4, Course third']);
-    fireEvent.click(cards[1]); expect(screen.getByTestId('destination')).toHaveTextContent('/courses/course-first?tab=media&hole=4&shot=second');
   });
   it('an RPC error hides even cached rows', () => { f.error = true; mountRail(); expect(screen.queryAllByRole('button')).toHaveLength(0); });
   it('loading draws the shell without interactive cards', () => { f.loading = true; const view = mountRail(); expect(view.container.querySelector('section[aria-hidden]')).not.toBeNull(); expect(screen.queryAllByRole('button')).toHaveLength(0); });
@@ -95,8 +102,25 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     expect(cards[0].querySelector('.glass-chip')?.textContent).toBe('0:14'); expect(cards[1].querySelector('.glass-chip')).toBeNull(); expect(view.container.querySelector('video')).toBeNull();
   });
   it('video duration formats longer than one minute', () => { f.latest[0] = latest('first', { media_type: 'video', duration_seconds: 75 }); mountRail(); expect(screen.getByText('1:15')).toBeInTheDocument(); });
-  it('card navigates to its course, hole and shot', () => {
-    mountRail(); fireEvent.click(screen.getByRole('button', { name: 'Hole 4, Course second' })); expect(screen.getByTestId('destination')).toHaveTextContent('/courses/course-second?tab=media&hole=4&shot=second');
+  it('the kicker reads "Hole by hole"', () => {
+    mountRail(); expect(screen.getByText('Hole by hole')).toBeInTheDocument(); expect(screen.getByText('Latest holes')).toBeInTheDocument();
+  });
+  it('a tap fetches the hole shots and opens the viewer on the tapped shot with edge bounce', async () => {
+    mountRail(); fireEvent.click(screen.getByRole('button', { name: 'Hole 4, Course second' }));
+    await waitFor(() => expect(f.holeRpc).toHaveBeenCalledWith('get_hole_media', { p_course_id: 'course-second', p_hole_no: 4 }));
+    await waitFor(() => expect(f.viewer).not.toBeNull());
+    expect(f.viewer?.items.map(item => item.id)).toEqual(['h1', 'second', 'h3']);
+    expect(f.viewer?.initialIndex).toBe(1);
+    expect(f.viewer?.edgeBounce).toBe(true);
+  });
+  it('while the hole shots load the card dims and further taps are ignored', async () => {
+    f.holeRpc.mockReturnValue(new Promise(() => {}));
+    mountRail(); const card = screen.getByRole('button', { name: 'Hole 4, Course second' });
+    fireEvent.click(card);
+    await waitFor(() => expect(card.style.opacity).toBe('0.7'));
+    fireEvent.click(card);
+    expect(f.holeRpc).toHaveBeenCalledTimes(1);
+    expect(f.viewer).toBeNull();
   });
   it('Media deep link opens hole four with the selected shot, not its first shot', () => {
     f.rows = [photo(4, 'first'), photo(4, 'selected')]; mountTab();
