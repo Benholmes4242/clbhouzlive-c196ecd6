@@ -213,6 +213,7 @@ export function FullscreenFeedOverlay() {
   const fetchNextPage = useFullscreenFeedStore(s => s.fetchNextPage);
   const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
   const readOnly = useFullscreenFeedStore(s => s.readOnly);
+  const syntheticPosts = useFullscreenFeedStore(s => s.syntheticPosts);
   const origin = useFullscreenFeedStore(s => s.origin);
   const borrow = useFullscreenFeedStore(s => s.borrow);
   const clearBorrow = useFullscreenFeedStore(s => s.clearBorrow);
@@ -546,10 +547,10 @@ export function FullscreenFeedOverlay() {
   const { activePost, golfCourse } = useActivePostDerived(posts, activeIndex);
   // Comments live at the subject's address: round (score id) beats review beats post.
   const activePostIdForScore = activePost?.id;
-  // readOnly opens carry synthetic post ids — never look them up in posts /
-  // gam_round_stats (BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §5).
+  // syntheticPosts opens carry synthetic post ids — never look them up in
+  // posts / gam_round_stats (BRIEF_SYNTHETIC_SHOT_GATES).
   const activeScoreIdMap = usePostScoreIds(
-    useMemo(() => (activePostIdForScore && !readOnly ? [activePostIdForScore] : []), [activePostIdForScore, readOnly]),
+    useMemo(() => (activePostIdForScore && !syntheticPosts ? [activePostIdForScore] : []), [activePostIdForScore, syntheticPosts]),
     'fullscreen',
   );
   const commentScoreId = activePost?.id ? activeScoreIdMap.get(activePost.id) ?? null : null;
@@ -572,12 +573,12 @@ export function FullscreenFeedOverlay() {
   const { data: reviewerStats } = useReviewerStats(activePost?.userId);
 
   // Phase 0 impression tracker — count each active fullscreen post view.
-  // readOnly opens (member-shot rails) carry synthetic post ids that must
-  // never reach record_post_impressions — BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §5.
+  // syntheticPosts opens (member-shot rails) carry synthetic post ids that
+  // must never reach record_post_impressions — BRIEF_SYNTHETIC_SHOT_GATES.
   useEffect(() => {
-    if (!isOpen || !activePost?.id || readOnly) return;
+    if (!isOpen || !activePost?.id || syntheticPosts) return;
     trackImpression(activePost.id);
-  }, [isOpen, activePost?.id, readOnly]);
+  }, [isOpen, activePost?.id, syntheticPosts]);
 
   // Watch-progress tracking lives inside SnapFeed (the actual video host),
   // which the overlay renders below.
@@ -1042,6 +1043,7 @@ export function FullscreenFeedOverlay() {
                     isOwnPost={isOwnPost}
                     golfCourse={golfCourse}
                     readOnly={readOnly}
+                    syntheticPosts={syntheticPosts}
                     onBeforeNavigate={() => handleClose({ reason: 'navigating' })}
                     feedEnded={showFeedEnd && !hasNextPage && activeIndex >= posts.length}
                   />

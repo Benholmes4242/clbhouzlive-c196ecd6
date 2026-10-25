@@ -306,6 +306,8 @@ interface Props {
   isOwnPost: boolean;
   golfCourse?: { id?: string | null; name?: string | null; courseCountry?: string | null } | null;
   readOnly?: boolean;
+  /** Member-shot opens only: synthetic post ids — the progress writer stays off. */
+  syntheticPosts?: boolean;
   onBeforeNavigate?: () => void;
   /** When true, only the back chevron renders — the user is on the end-of-feed plate. */
   feedEnded?: boolean;
@@ -329,6 +331,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   isOwnPost,
   golfCourse,
   readOnly = false,
+  syntheticPosts = false,
   onBeforeNavigate,
   feedEnded = false,
 }: Props) {
@@ -368,9 +371,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   const activePost = posts[activeIndex] ?? null;
   // K.1: the member's position is saved on pause, close and a throttled interval.
-  // readOnly opens carry synthetic post ids — never write video_progress for
-  // them (BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §5).
-  useVideoProgressWriter(readOnly ? null : activePost);
+  // syntheticPosts opens carry synthetic post ids — never write video_progress
+  // for them (BRIEF_SYNTHETIC_SHOT_GATES).
+  useVideoProgressWriter(syntheticPosts ? null : activePost);
 
   // Prefer the FullscreenMediaPager's live index (updates on every scroll
   // settle inside the fullscreen viewer). Fall back to the clubhouseStore
