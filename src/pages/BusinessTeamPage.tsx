@@ -41,7 +41,7 @@ export default function BusinessTeamPage() {
     <ManagePageShell
       title={t('business.team.sectionOne.title')}
       subtitle={business?.name ? <TeamSubtitle name={business.name} /> : undefined}
-      right={canManage ? <Button variant="ghost" className="team-header-invite" onClick={() => navigate(`/business/${businessId}/team/invite`)}><Plus size={16} strokeWidth={1.9} />{t('business.team.sectionOne.invite')}</Button> : undefined}
+      right={canManage ? <Button variant="ghost" className="team-header-invite" onClick={() => navigate(`/business/${businessId}/team/invite`, { state: { fromTeam: true } })}><Plus size={16} strokeWidth={1.9} />{t('business.team.sectionOne.invite')}</Button> : undefined}
     >
       {/* CB75: shell owns the normal safe-area+32 bottom; no duplicate CTA clearance.
           Summary/card share one requests observer. Section-two contents stay unchanged. */}
