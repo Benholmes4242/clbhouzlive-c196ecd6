@@ -180,21 +180,28 @@ export function LatestCoursesSection() {
   const { data, isLoading, isError } = useGamRpc<LatestCourseMedia[]>('get_latest_course_media', { p_limit: 15 }, { staleTime: 60_000 });
   useSectionReady('latestCourses', !isLoading);
   const [pending, setPending] = useState<PendingOpen | null>(null);
-  const [viewer, setViewer] = useState<{ items: OrderedMediaItem[]; start: number } | null>(null);
   const gallery = useGalleryCourseMedia(pending?.courseId ?? null, user?.id);
 
-  // §1-5 — once the course's media set arrives, flatten it into one sideways
-  // run and open MediaPreviewViewer on the tapped shot (media id, then url,
-  // then post id, then 0). An empty or errored set just clears the tap.
+  // §1-3 — once the course's media set arrives, explode it into one page per
+  // shot and open the canonical viewer on the tapped shot (media id, then
+  // url, then post id, then 0). An empty or errored set just clears the tap.
   useEffect(() => {
     if (!pending) return;
     if (gallery.isError) { setPending(null); return; }
-    const posts = gallery.data;
-    if (!posts) return;
-    const flat = flattenShots(posts);
-    if (flat.length === 0) { setPending(null); return; }
-    const start = flatStartIndex(flat, pending);
-    setViewer({ items: toViewerItems(flat, pending.courseName), start });
+    const data = gallery.data;
+    if (!data) return;
+    const posts = coursePostsToShotPosts(data);
+    if (posts.length === 0) { setPending(null); return; }
+    const start = shotStartIndex(posts, pending);
+    openWithOrigin({
+      posts,
+      index: start,
+      originEl: null,
+      posterUrl: pending.posterUrl,
+      mediaId: posts[start].mediaItems[0]?.id ?? null,
+      openedFrom: 'course-media',
+      options: { readOnly: true },
+    });
     setPending(null);
   }, [gallery.data, gallery.isError, pending]);
 
@@ -213,23 +220,15 @@ export function LatestCoursesSection() {
               if (pending) return;
               setPending({
                 courseId: row.course_id,
-                courseName: row.course_name,
                 postId: tile.post_id,
                 mediaId: tile.media_id,
                 mediaUrl: tile.media_url,
+                posterUrl: tile.poster_url ?? (tile.media_type === 'video' ? holeMediaPoster(tile) : tile.media_url),
               });
             }}
           />
         ))}
       </div>
-      {viewer && (
-        <MediaPreviewViewer
-          items={viewer.items}
-          initialIndex={viewer.start}
-          edgeBounce
-          onClose={() => setViewer(null)}
-        />
-      )}
     </section>
   );
 }
