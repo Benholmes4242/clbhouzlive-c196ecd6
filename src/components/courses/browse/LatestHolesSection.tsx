@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { useGamRpc } from '@/hooks/gam/_useGamRpc';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
-import { holeShotsToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
-import { holeMediaQuery } from '@/lib/courseMedia/holeMediaQuery';
+import { latestHolesToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { useSectionReady } from './PageLoadGate';
@@ -20,7 +18,7 @@ import './latestHoles.css';
  * Geometry is shared with the loading shell, not PhotoFigureCard.
  * BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §2: a tap opens the CANONICAL
  * full-screen viewer (FullscreenFeedOverlay via openWithOrigin, readOnly)
- * over EVERY ready shot on that hole (get_hole_media, the hole walk's order),
+ * over EVERY ready card on the rail in RPC order, without another network read,
  * one sideways carousel with each shot credited to its contributor, landing on the
  * tapped shot. The ?tab=media&hole=&shot= deep link in CourseMediaTabNew is
  * unchanged.
@@ -43,17 +41,18 @@ export interface LatestHoleMedia {
   created_at: string;
   member_id: string;
   member_name: string | null;
+  member_avatar_url: string | null;
   par: number | null;
   yards: number | null;
 }
 
-function LatestHoleCard({ row, pending, onOpen }: { row: LatestHoleMedia; pending: boolean; onOpen: (row: LatestHoleMedia) => void }) {
+function LatestHoleCard({ row, onOpen }: { row: LatestHoleMedia; onOpen: (row: LatestHoleMedia) => void }) {
   const credit = [row.member_name, addedMonthLabel(row.added_at)].filter(Boolean).join(' · ');
   const seconds = Math.round(row.duration_seconds ?? 0);
   const duration = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   return (
     <button type="button" className="latest-hole-card" aria-label={`Hole ${row.hole_no}, ${row.course_name}`}
-      style={{ width: LATEST_HOLE_W, height: LATEST_HOLE_H, background: A.PANEL, opacity: pending ? 0.7 : 1 }}
+      style={{ width: LATEST_HOLE_W, height: LATEST_HOLE_H, background: A.PANEL, opacity: 1 }}
       onClick={() => onOpen(row)}>
       <img src={row.media_type === 'video' ? holeMediaPoster(row) : row.media_url} alt="" loading="lazy" onError={event => { event.currentTarget.hidden = true; }} />
       <div className="latest-hole-scrim" style={{ background: SCRIM_STANDOUT }} />
@@ -76,41 +75,25 @@ function LatestHoleCard({ row, pending, onOpen }: { row: LatestHoleMedia; pendin
 export function LatestHolesSection() {
   const { data, isLoading, isError } = useGamRpc<LatestHoleMedia[]>('get_latest_hole_media', { p_limit: 30 }, { staleTime: 60_000 });
   useSectionReady('latestHoles', !isLoading);
-  const [pending, setPending] = useState<LatestHoleMedia | null>(null);
-
-  const holeQuery = useQuery({
-    ...holeMediaQuery(pending?.course_id ?? '', pending?.hole_no ?? 0),
-    enabled: !!pending,
-  });
-
-  useEffect(() => {
-    if (!pending) return;
-    if (holeQuery.isError) { setPending(null); return; }
-    const rows = holeQuery.data;
-    if (!rows) return;
-    const posts = holeShotsToFeedPosts(rows, pending.course_name, pending.course_id, pending.hole_no);
-    if (posts.length === 0) { setPending(null); return; }
-    const items = posts[0]?.mediaItems ?? [];
-    const tapped = items.find(item => item.id === pending.id) ?? items[0];
+  const posts = useMemo(() => latestHolesToFeedPosts(data ?? []), [data]);
+  const onOpen = (tapped: LatestHoleMedia) => {
     openWithOrigin({
       posts,
       index: 0,
       originEl: null,
-      posterUrl: pending.media_type === 'video' ? holeMediaPoster(pending) : pending.media_url,
-      mediaId: tapped?.id ?? null,
+      posterUrl: tapped.media_type === 'video' ? holeMediaPoster(tapped) : tapped.media_url,
+      mediaId: tapped.id,
       openedFrom: 'course-media',
       options: { readOnly: true, syntheticPosts: true },
     });
-    setPending(null);
-  }, [holeQuery.data, holeQuery.isError, pending]);
+  };
 
   if (isLoading) return <LatestHolesShell />;
   if (isError || !data || data.length < 3) return null;
   return <section style={SECTION_WRAP}>
     <SectionHead tone="amber" kicker="Hole by hole" title="Latest holes" />
     <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: PHOTO_FIGURE_GAP, marginTop: HEAD_GAP }}>
-      {data.map(row => <LatestHoleCard key={row.id} row={row} pending={pending?.id === row.id}
-        onOpen={tapped => { if (!pending) setPending(tapped); }} />)}
+      {data.map(row => <LatestHoleCard key={row.id} row={row} onOpen={onOpen} />)}
     </div>
   </section>;
 }

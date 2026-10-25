@@ -389,8 +389,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   // outgoing post could otherwise resolve to undefined on a new single-media
   // post and hide the speaker on an actual video.
   const activeSlide = mediaCount > 0 && carouselSlide < mediaCount ? carouselSlide : 0;
+  const activeMediaItem = activePost?.mediaItems?.[activeSlide];
+  const shotCourse = syntheticPosts && activeMediaItem?.memberShot?.courseId
+    ? activeMediaItem.memberShot : null;
   const activeMediaIsVideo =
-    mediaCount > 0 && activePost?.mediaItems?.[activeSlide]?.type === 'video';
+    mediaCount > 0 && activeMediaItem?.type === 'video';
   const [scrubbing, setScrubbing] = useState(false);
 
 
@@ -414,9 +417,9 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   });
   // THE ONE resolved course id — the header, chip and record all read it.
   const resolvedCourseId =
-    hookPost?.review?.courseId ?? golfCourse?.id ?? hookPost?.courseId ?? null;
+    shotCourse?.courseId ?? hookPost?.review?.courseId ?? golfCourse?.id ?? hookPost?.courseId ?? null;
   const { data: ratingAggregate } = useCourseRatingAggregates(
-    hooksLive && hookPost?.courseRating == null ? resolvedCourseId ?? undefined : undefined,
+    hooksLive && (shotCourse || hookPost?.courseRating == null) ? resolvedCourseId ?? undefined : undefined,
   );
   // The VIEWER's own record at this course. Lazy: only while the viewer is live.
   const personal = useCoursePersonalStatus(hooksLive ? resolvedCourseId ?? undefined : undefined);
@@ -470,11 +473,11 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const isFollowed = canonicalFollowing ?? getFollowState(activePost);
 
   const courseName =
-    activePost.review?.courseName ??
+    shotCourse?.courseName ?? activePost.review?.courseName ??
     golfCourse?.name ??
     activePost.courseName ??
     null;
-  const courseLocation =
+  const courseLocation = shotCourse ? null :
     activePost.review?.courseSubCountry ??
     activePost.review?.courseCountry ??
     (activePost as any).courseSubCountry ??
@@ -485,7 +488,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   // (tag-only posts, older RPCs). Resolve the community rating from
   // course_rating_aggregates when the payload is missing it.
   const courseRating =
-    activePost.courseRating ??
+    (shotCourse ? null : activePost.courseRating) ??
     (ratingAggregate?.avg_overall_score != null ? Number(ratingAggregate.avg_overall_score) : null);
   const showCourseChip = courseRating != null;
   const courseRatingLabel = courseRating == null ? '' : formatRatingValue(courseRating);
@@ -542,7 +545,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   }
 
   const handleCourseTap = () => {
-    const cid = activePost.review?.courseId ?? golfCourse?.id ?? activePost.courseId;
+    const cid = shotCourse?.courseId ?? activePost.review?.courseId ?? golfCourse?.id ?? activePost.courseId;
     if (!cid) return;
     onBeforeNavigate?.();
     navigate(`/courses/${cid}`);

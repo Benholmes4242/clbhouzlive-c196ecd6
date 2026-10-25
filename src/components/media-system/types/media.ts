@@ -24,6 +24,9 @@ export interface MediaItem {
   memberShot?: {
     kicker: string;
     title: string;
+    detail?: string;
+    courseId?: string;
+    courseName?: string;
     credit: string;
     avatarUrl: string | null;
     memberName: string;

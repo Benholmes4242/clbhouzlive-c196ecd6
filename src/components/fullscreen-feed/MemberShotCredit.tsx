@@ -16,6 +16,7 @@ export function MemberShotCredit({ syntheticPosts, item }: { syntheticPosts: boo
     <div className="member-shot-text">
       <div style={VERDICT_KICKER}>{shot.kicker}</div>
       <div className="member-shot-title">{shot.title}</div>
+      {shot.detail && <div className="member-shot-detail">{shot.detail}</div>}
       <div className="member-shot-credit">{shot.credit}</div>
     </div>
   </div>;
