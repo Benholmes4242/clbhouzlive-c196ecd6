@@ -24,6 +24,7 @@ import { ArgumentShell, Top100CardListShell, YourHundredShell } from './top100/t
 export const TOP100_CARD_GAP = 24;
 import { argumentGroups, qualifyingCount } from './top100/theArgument';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
+import { useTop100GolferBaseline } from '@/hooks/top100/useTop100GolferBaseline';
 
 const LISTS = [
   { id: 'global', label: 'Global' },

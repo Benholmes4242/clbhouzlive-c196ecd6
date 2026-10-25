@@ -96,8 +96,8 @@ export function TheArgumentSection({ higher, lower, qualifying, showGolfersLink,
       <div style={{ marginTop: 8, fontSize: 12.5, lineHeight: 1.5, color: A.MUTE }}>
         {`The courses that vary the most between the golfers' ratings and the official rankings. Positions are out of the ${qualifying} courses on this list that golfers have rated.`}
       </div>
-      <ArgumentGroup label="Golfers rate higher" tone={A.GREEN} rows={higher} />
-      <ArgumentGroup label="Golfers rate lower" tone={A.RED} rows={lower} />
+      <ArgumentGroup label="Golfers rate higher" tone={A.GREEN} rows={higher} baseline={baseline} />
+      <ArgumentGroup label="Golfers rate lower" tone={A.RED} rows={lower} baseline={baseline} />
       {showGolfersLink ? (
         <button
           type="button"
