@@ -158,7 +158,7 @@ describe('CB74 invite membership guard', () => {
     mount('invite');
     await screen.findByTestId('team-destination');
     expect(screen.queryByRole('textbox')).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Send invite' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Choose someone to invite' })).toBeNull();
     expect(screen.getByTestId('team-destination')).toBeTruthy();
     expect(screen.getByTestId('route-state').textContent).toBe('/business/biz/team:REPLACE');
     expect(mocks.routeChanges.filter(value => value === '/business/biz/team:REPLACE')).toHaveLength(1);
@@ -180,7 +180,7 @@ describe('CB74 invite membership guard', () => {
     expect(mocks.routeChanges).toEqual(['/business/biz/team/invite:POP']);
     await act(async () => { resolveMembership({ data: { role }, error: null }); });
     expect(await screen.findByRole('textbox')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Send invite' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Choose someone to invite' })).toBeTruthy();
     expect(screen.queryByTestId('team-destination')).toBeNull();
     expect(mocks.routeChanges).toEqual(['/business/biz/team/invite:POP']);
   });
