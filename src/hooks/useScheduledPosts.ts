@@ -45,8 +45,8 @@ export function useScheduledPosts() {
       queryClient.invalidateQueries({ queryKey: SCHEDULED_POSTS_KEY });
       toast.success('Post rescheduled');
     },
-    onError: () => {
-      toast.error('Failed to reschedule');
+    onError: (err) => {
+      toast.error(err instanceof Error && err.message === POST_CHANGE_REFUSED ? POST_CHANGE_REFUSED : 'Failed to reschedule');
     },
   });
 
@@ -58,8 +58,8 @@ export function useScheduledPosts() {
       queryClient.invalidateQueries({ queryKey: SCHEDULED_POSTS_KEY });
       queryClient.invalidateQueries({ queryKey: SCHEDULED_COUNT_KEY });
     },
-    onError: () => {
-      toast.error('Failed to update');
+    onError: (err) => {
+      toast.error(err instanceof Error && err.message === POST_CHANGE_REFUSED ? POST_CHANGE_REFUSED : 'Failed to update');
     },
   });
 
