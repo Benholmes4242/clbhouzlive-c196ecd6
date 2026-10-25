@@ -15,8 +15,7 @@ import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { capitalPhotoCount, holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
-import { shareCourseName } from '@/lib/courses/shareCourseName';
-import { buildHlsUrl } from '@/utils/streamId';
+import { buildHoleViewerItems } from '@/lib/courseMedia/holeViewerItems';
 import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
 import type { OrderedMediaItem } from '@/components/shared/media/types';
 import { HoleMediaThumbnail } from './HoleMediaVideo';
@@ -125,26 +124,10 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
   // Every image or ready video on the hole, in panel order; processing videos
   // are left out of the viewer entirely.
   const playable = photos.filter(photo => photo.media_type !== 'video' || photo.duration_seconds != null);
-  const viewerItems: OrderedMediaItem[] = !tile ? [] : playable.map((photo, order) => {
-    const video = photo.media_type === 'video';
-    const { short, variant } = shareCourseName(courseName);
-    const coursePart = short + (variant ? ` (${variant})` : '');
-    const parPart = scored ? ` · Par ${tile.hole.par}${tile.hole.yards != null ? ` · ${tile.hole.yards} yards` : ''}` : '';
-    const credit = [authors?.get(photo.user_id), addedMonthLabel(photo.added_at)].filter(Boolean).join(' · ');
-    return {
-      id: photo.id,
-      type: video ? 'video' as const : 'image' as const,
-      order,
-      previewUrl: video ? holeMediaPoster(photo) : photo.media_url,
-      thumbnailUrl: holeMediaPoster(photo),
-      hlsUrl: video ? buildHlsUrl(photo.stream_id || photo.media_url) : undefined,
-      caption: {
-        kicker: `The ${holeOrdinal(tile.hole.hole_no)}`,
-        title: coursePart + parPart,
-        credit: credit || undefined,
-      },
-    };
-  });
+  const viewerItems: OrderedMediaItem[] = !tile ? [] : buildHoleViewerItems(
+    playable.map(photo => ({ ...photo, author: authors?.get(photo.user_id), par: tile.hole.par, yards: tile.hole.yards })),
+    { courseName, scored },
+  );
 
   const openViewer = (id: string) => {
     const index = playable.findIndex(photo => photo.id === id);
@@ -234,6 +217,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       initialIndex={viewerIndex}
       onClose={() => setViewerIndex(null)}
       onIndexChange={index => { const photo = playable[index]; if (photo) setPhotoId(photo.id); }}
+      edgeBounce
     />}
   </div>;
 }

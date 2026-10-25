@@ -30,7 +30,17 @@ interface MediaPreviewViewerProps {
    * restore its own selection when the viewer closes. Optional; existing
    * callers see no change. */
   onIndexChange?: (index: number) => void;
+  /** BRIEF_COURSES_LATEST_FROM_COURSES §8 — rubber-band at the first/last
+   * shot: a drag past either edge moves the media by dx * 0.35 (max 80px)
+   * and springs back on release without changing the index. Default false;
+   * callers that omit it behave exactly as before. */
+  edgeBounce?: boolean;
 }
+
+/** Edge-bounce travel cap and spring-back timing (BRIEF §8). */
+const EDGE_BOUNCE_CAP = 80;
+const EDGE_BOUNCE_FACTOR = 0.35;
+const EDGE_BOUNCE_MS = 250;
 
 export function MediaPreviewViewer({
   items,
@@ -39,6 +49,7 @@ export function MediaPreviewViewer({
   onSetCover,
   coverIndex = 0,
   onIndexChange,
+  edgeBounce = false,
 }: MediaPreviewViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const { ref: zoomRef, imgRef, style: zoomStyle, scale, reset: resetZoom } = usePinchZoomPointer();
@@ -46,6 +57,11 @@ export function MediaPreviewViewer({
   const item = items[currentIndex];
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [showPill, setShowPill] = useState(false);
+  const [edgeOffset, setEdgeOffset] = useState(0);
+  const edgeOffsetRef = useRef(0);
+  edgeOffsetRef.current = edgeOffset;
+  const edgeAnimRef = useRef(0);
+  useEffect(() => () => { if (edgeAnimRef.current) cancelAnimationFrame(edgeAnimRef.current); }, []);
 
   const swipeRef = useSwipeGesture({
     onSwipeLeft: () => {
@@ -57,6 +73,31 @@ export function MediaPreviewViewer({
     onSwipeDown: () => {
       if (!isZoomed) onClose();
     },
+    onSwiping: edgeBounce ? (deltaX) => {
+      if (isZoomed) return;
+      const single = items.length === 1;
+      const pastFirst = currentIndex === 0 && deltaX > 0;
+      const pastLast = currentIndex === items.length - 1 && deltaX < 0;
+      if (pastFirst || pastLast || (single && deltaX !== 0)) {
+        if (edgeAnimRef.current) { cancelAnimationFrame(edgeAnimRef.current); edgeAnimRef.current = 0; }
+        setEdgeOffset(Math.max(-EDGE_BOUNCE_CAP, Math.min(EDGE_BOUNCE_CAP, deltaX * EDGE_BOUNCE_FACTOR)));
+      }
+    } : undefined,
+    onSwipeEnd: edgeBounce ? () => {
+      const from = edgeOffsetRef.current;
+      if (!from) return;
+      // The clock comes from the first rAF tick, not performance.now(): the
+      // rAF timestamp origin is not guaranteed to match it.
+      let start: number | null = null;
+      const tick = (now: number) => {
+        if (start === null) start = now;
+        const t = Math.min(1, (now - start) / EDGE_BOUNCE_MS);
+        const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+        setEdgeOffset(t >= 1 ? 0 : from * (1 - eased));
+        if (t < 1) edgeAnimRef.current = requestAnimationFrame(tick);
+      };
+      edgeAnimRef.current = requestAnimationFrame(tick);
+    } : undefined,
     threshold: 60,
   });
 
@@ -237,7 +278,10 @@ export function MediaPreviewViewer({
       <div
         ref={swipeRef}
         className="absolute inset-0 flex items-center justify-center"
-        style={{ touchAction: isZoomed ? 'none' : 'pan-y' }}
+        style={{
+          touchAction: isZoomed ? 'none' : 'pan-y',
+          transform: edgeOffset ? `translateX(${edgeOffset}px)` : undefined,
+        }}
       >
 
         {item.type === 'video' ? (

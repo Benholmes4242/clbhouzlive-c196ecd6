@@ -799,3 +799,11 @@
 - [x] Part 3: status guard ('scheduled'/'created' only) in generate-predictions (server, authoritative) + useAIPredictions (client); boot-log version marker; deploy and confirm live.
 - [x] Part 4: tests — locale key guard, lock decision (inprogress/closed refuse, scheduled/created generate), client no-invoke for started tournament with stale row.
 - [x] Report suite before/after, typecheck, build; name retargets; stop on new failure.
+
+## BRIEF_COURSES_LATEST_FROM_COURSES
+- [x] LatestCoursesSection rail (get_latest_course_media p_limit 15), card grid 198+100/114+114, credit grammar, +N overlay, glass discs; tap opens whole course media set via useGalleryCourseMedia + openWithOrigin ('course-media', readOnly) with mediaId/url/postId/0 fallback ladder; pending dims card and ignores taps.
+- [x] LatestCoursesShell in sectionShells; CoursesBrowsePage renders it between ByRegion and MostPlayed; GATE_IDS gains 'latestCourses' after 'byRegion'.
+- [x] Latest holes kicker "Hole by hole"; tap fetches get_hole_media (key ['hole-media', course, hole], stale 60s) and opens MediaPreviewViewer at tapped shot with edgeBounce; deep link unchanged.
+- [x] Shared buildHoleViewerItems extracted to src/lib/courseMedia/holeViewerItems.ts; HoleWalk consumes it (output unchanged) and passes edgeBounce.
+- [x] MediaPreviewViewer optional edgeBounce prop: dx*0.35 capped 80px, 250ms ease-out spring-back, index unchanged; default false.
+- [x] Full `bunx vitest run`: 2,748 passed /339 files /0 failed, from 2,707/335 (+41 tests, +4 files: latestCoursesSection.test.tsx, holeViewerItems.test.ts, mediaPreviewEdgeBounce.test.tsx, latestHolesSection.test.tsx net +2). Authorized retargets in latestHolesSection.test.tsx: navigation-on-tap assertions and kicker. tsgo clean. Live RPC/auth verification unavailable (external_unmanaged). No SQL/migrations/RPC/feed_config changes; cap 30.
