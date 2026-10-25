@@ -83,6 +83,8 @@ export const FeedSlide = memo(function FeedSlide({
   mediaId = null,
 }: FeedSlideProps) {
   const { user } = useSupabaseSession();
+  // Synthetic member-shot fullscreen opens must never insert post_views.
+  const syntheticPosts = useFullscreenFeedStore(s => s.syntheticPosts);
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
   const activeIndex = activeIndexOverride ?? storeActiveIndex;
   const isActive = activeIndex === index;
@@ -349,7 +351,7 @@ export const FeedSlide = memo(function FeedSlide({
         post.postType === 'course_of_week_card') && (
         <div data-pga-sentinel="true" className="absolute inset-0 pointer-events-none" />
       )}
-      <PostViewSentinel postId={post.id} />
+      {!(isFullscreen && syntheticPosts) && <PostViewSentinel postId={post.id} />}
 
       {singleBackdropSrc != null && <FullscreenBackdrop src={singleBackdropSrc} />}
       {renderContent()}

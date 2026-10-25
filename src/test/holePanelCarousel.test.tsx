@@ -92,13 +92,14 @@ describe('BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS hole walk fullscreen', () => {
     fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[1] as HTMLElement);
     expect(f.open).toHaveBeenCalledTimes(1);
     const args = lastOpen();
-    expect(args.posts.map(p => p.id)).toEqual(['a', 'b', 'c']);
-    expect(args.index).toBe(1);
+    expect(args.posts).toHaveLength(1);
+    expect(args.posts[0].mediaItems.map(item => item.id)).toEqual(['a', 'b', 'c']);
+    expect(args.index).toBe(0);
     expect(args.mediaId).toBe('b');
     expect(args.openedFrom).toBe('course-media');
     expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
-    expect(args.posts[1].displayName).toBe('Benjamin Holmes');
-    expect(args.posts[1].courseName).toBe('Royal Portrush Golf Club (Dunluce)');
+    expect(args.posts[0].displayName).toBe('Royal Portrush Golf Club (Dunluce) · The fourteenth');
+    expect(args.posts[0].courseName).toBe('Royal Portrush Golf Club (Dunluce)');
   });
 
   it('a processing video slide does not open the viewer and is not in its posts', () => {
@@ -107,15 +108,17 @@ describe('BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS hole walk fullscreen', () => {
     expect(f.open).not.toHaveBeenCalled();
     fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[0] as HTMLElement);
     expect(f.open).toHaveBeenCalledTimes(1);
-    expect(lastOpen().posts.map(p => p.id)).toEqual(['a']);
-    expect(lastOpen().posts[0].displayName).toBe('Thomas Holmes');
+    expect(lastOpen().posts).toHaveLength(1);
+    expect(lastOpen().posts[0].mediaItems.map(item => item.id)).toEqual(['a']);
+    expect(lastOpen().posts[0].displayName).toBe('Royal Portrush Golf Club (Dunluce) · The fourteenth');
   });
 
   it('opening the viewer leaves the frame where it was', () => {
     walk([shot('a'), shot('b', { user_id: 'u2', added_at: '2026-06-02T09:00:00Z' }), video('c', 42)]);
     fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[1] as HTMLElement);
     expect(f.open).toHaveBeenCalledTimes(1);
-    expect(lastOpen().index).toBe(1);
+    expect(lastOpen().index).toBe(0);
+    expect(lastOpen().mediaId).toBe('b');
     expect(panel().querySelector('.hole-walk-frame-count')?.textContent).toBe('1 / 3');
     expect(screen.getByRole('button', { name: 'Show shot 1 of 3' })).toHaveAttribute('aria-current', 'true');
   });
