@@ -32,6 +32,7 @@ import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { POST_COMPOSER_Z } from '@/lib/zLayers';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
+import { POST_CHANGE_REFUSED } from '@/lib/canManagePost';
 
 import { useStageComposer, MAX_MEDIA, type StageMediaItem } from './hooks/useStageComposer';
 import { useTranslation } from 'react-i18next';
@@ -482,8 +483,10 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
       if (editStatus?.status === 'scheduled') {
         patch.scheduled_at = state.scheduledAt ? state.scheduledAt.toISOString() : null;
       }
-      const { error: upErr } = await supabase.from('posts').update(patch as never).eq('id', editPostId);
+      // BIZ_POSTS_V1: an RLS refusal affects 0 rows without erroring.
+      const { data: patched, error: upErr } = await supabase.from('posts').update(patch as never).eq('id', editPostId).select('id');
       if (upErr) throw upErr;
+      if (!(patched as unknown[] | null)?.length) throw new Error(POST_CHANGE_REFUSED);
 
       // Sync the single-course junction row to the primary course (best-effort;
       // full multi-course junction editing stays with useUpdatePost).

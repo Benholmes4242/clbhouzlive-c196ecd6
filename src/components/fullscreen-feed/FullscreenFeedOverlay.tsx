@@ -63,7 +63,7 @@ import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShar
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
+import { useManageableBusinessIds, useTeamBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { getActorRouteByType } from '@/types/actor';
 
@@ -553,6 +553,7 @@ export function FullscreenFeedOverlay() {
   const commentScoreId = activePost?.id ? activeScoreIdMap.get(activePost.id) ?? null : null;
   const commentReviewId = activePost?.review?.reviewId ?? null;
   const manageableBusinessIds = useManageableBusinessIds(userId);
+  const teamBusinessIds = useTeamBusinessIds(userId);
   const isOwnPost = canManagePost(
     activePost
       ? {
@@ -563,6 +564,7 @@ export function FullscreenFeedOverlay() {
       : null,
     userId,
     manageableBusinessIds,
+    teamBusinessIds,
   );
   const openReviewSheet = useReviewSheetStore((s) => s.open);
   const { data: reviewerStats } = useReviewerStats(activePost?.userId);

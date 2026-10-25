@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { showToast } from '@/utils/toast';
 import { postKeys } from '@/queryKeys/posts';
 import { scheduleRadixBodyLockSanitize } from '@/lib/radixLockSanitizer';
+import { POST_CHANGE_REFUSED } from '@/lib/canManagePost';
 
 export const usePostDeletion = () => {
   const queryClient = useQueryClient();
@@ -60,15 +61,19 @@ export const usePostDeletion = () => {
 
       // 2. Delete the post. FK cascades handle post_media, post_tags,
       //    post_courses, post_likes, post_comments, post_shares, etc.
-      const { error: postError } = await supabase
+      //    BIZ_POSTS_V1: an RLS refusal affects 0 rows without erroring —
+      //    treat that as a failure.
+      const { data: deleted, error: postError } = await supabase
         .from('posts')
         .delete()
-        .eq('id', postId);
+        .eq('id', postId)
+        .select('id');
 
       if (postError) {
         console.error('Error deleting post:', postError);
         throw new Error(`Failed to delete post: ${postError.message}`);
       }
+      if (!deleted?.length) throw new Error(POST_CHANGE_REFUSED);
 
       // 3. Fire-and-forget external storage cleanup (Cloudflare Stream + R2).
       //    Reuses cleanup-review-media — it's media-type-agnostic.

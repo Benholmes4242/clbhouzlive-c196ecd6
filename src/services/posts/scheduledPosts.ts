@@ -2,6 +2,7 @@
 // Handles CRUD for scheduled posts
 
 import { supabase } from '@/integrations/supabase/client';
+import { POST_CHANGE_REFUSED } from '@/lib/canManagePost';
 
 export interface ScheduledPostMedia {
   id: string;
@@ -201,16 +202,19 @@ export async function updateScheduledPost(
   if (data.visibility) updatePayload.visibility = data.visibility;
   if (data.courseId !== undefined) updatePayload.course_id = data.courseId;
 
-  const { error } = await supabase
+  // BIZ_POSTS_V1: an RLS refusal affects 0 rows without erroring.
+  const { data: patched, error } = await supabase
     .from('posts')
     .update(updatePayload)
     .eq('id', postId)
-    .in('status', ['scheduled', 'failed']);
+    .in('status', ['scheduled', 'failed'])
+    .select('id');
 
   if (error) {
     console.error('[scheduledPosts] Error updating:', error);
     return false;
   }
+  if (!patched?.length) throw new Error(POST_CHANGE_REFUSED);
   return true;
 }
 
@@ -219,19 +223,22 @@ export async function updateScheduledPost(
  * 'scheduled' so the publisher will retry it.
  */
 export async function reschedulePost(postId: string, newScheduledAt: Date): Promise<boolean> {
-  const { error } = await supabase
+  // BIZ_POSTS_V1: an RLS refusal affects 0 rows without erroring.
+  const { data: patched, error } = await supabase
     .from('posts')
     .update({
       scheduled_at: newScheduledAt.toISOString(),
       status: 'scheduled',
     })
     .eq('id', postId)
-    .in('status', ['scheduled', 'failed']);
+    .in('status', ['scheduled', 'failed'])
+    .select('id');
 
   if (error) {
     console.error('[scheduledPosts] Error rescheduling:', error);
     return false;
   }
+  if (!patched?.length) throw new Error(POST_CHANGE_REFUSED);
   return true;
 }
 

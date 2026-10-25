@@ -26,7 +26,7 @@ import { buildReviewSheetPayload } from '@/components/posts/buildReviewSheetPayl
 import { MessageCircle, Share } from 'lucide-react';
 import { reactionGlyph, ReactionGlyph, AMBER } from '@/lib/reactionKind';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
-import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
+import { useManageableBusinessIds, useTeamBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
@@ -384,10 +384,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     post.creatorRelation !== 'system' &&
     post.userId !== currentUserId;
   const manageableBusinessIds = useManageableBusinessIds(currentUserId);
+  const teamBusinessIds = useTeamBusinessIds(currentUserId);
   const canManage = canManagePost(
     { userId: post.userId, actorType: post.actorType === 'business' ? 'business' : 'personal', actorId: post.actorId },
     currentUserId,
     manageableBusinessIds,
+    teamBusinessIds,
   );
   const items = post.mediaItems ?? [];
   const isMulti = items.length > 1;

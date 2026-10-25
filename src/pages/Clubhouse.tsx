@@ -56,7 +56,7 @@ import { useReviewerStats } from '@/hooks/useReviewerStats';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getActorRouteByType } from '@/types/actor';
-import { useManageableBusinessIds } from '@/hooks/useManageableBusinessIds';
+import { useManageableBusinessIds, useTeamBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
 
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
@@ -466,6 +466,7 @@ const ClubhouseContent = () => {
   }, [seasonRecap]);
   
   const manageableBusinessIds = useManageableBusinessIds(user?.id);
+  const teamBusinessIds = useTeamBusinessIds(user?.id);
   const isOwnPost = canManagePost(
     activePost
       ? {
@@ -476,6 +477,7 @@ const ClubhouseContent = () => {
       : null,
     user?.id,
     manageableBusinessIds,
+    teamBusinessIds,
   );
 
   // ── Review tap handler ──
