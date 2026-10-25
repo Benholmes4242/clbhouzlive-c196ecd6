@@ -113,12 +113,15 @@ describe('Stage 2 encode display', () => {
     expect(screen.queryByRole('button', { name: 'Play video' })).toBeNull(); expect(view.container.querySelector('video')).toBeNull();
     expect(view.container.querySelector('.hole-media-processing')).toBeInTheDocument();
     fireEvent.click(view.container.querySelector('.hole-walk-slide') as HTMLElement);
-    expect(f.viewer).toBeUndefined();
+    expect(f.open).not.toHaveBeenCalled();
     view.rerender(<HoleWalk available holes={[hole]} rows={[{ ...row, duration_seconds: 42 }]} totalMedia={1} onAddFirst={() => {}} />);
     expect(view.container.querySelector('.hole-media-processing')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Play video' })).toBeNull();
     fireEvent.click(view.container.querySelector('.hole-walk-slide') as HTMLElement);
-    expect(f.viewer?.items).toHaveLength(1);
-    expect(f.viewer?.items[0].type).toBe('video');
+    expect(f.open).toHaveBeenCalledTimes(1);
+    const args = f.open.mock.calls[0][0] as { posts: Array<{ mediaItems: Array<{ type: string }> }>; options?: { readOnly?: boolean } };
+    expect(args.posts).toHaveLength(1);
+    expect(args.posts[0].mediaItems[0].type).toBe('video');
+    expect(args.options).toEqual({ readOnly: true });
   });
 });
