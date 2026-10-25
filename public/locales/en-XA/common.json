@@ -565,7 +565,7 @@
         "fineEmail": "[~~Théy gét án émáíl wíth á línk tó jóín. Ányóné wíth thé línk cán úsé ít, só sénd ít ónly tó thé ríght áddréss. Ít lásts 14 dáys.~~]",
         "sentUser": "[~~Ínvíté sént tó {{first}}~~]",
         "sentEmail": "[~~Ínvíté sént tó {{email}}~~]",
-        "sending": "[~~Séndíng\u2026~~]"
+        "sending": "[~~Séndíng…~~]"
       }
     },
     "hero": {
@@ -704,15 +704,6 @@
       }
     },
     "insights": {
-      "metric": {
-        "profileViews": "[~~Ƥřőƒíļé ṽíéŵš~~]",
-        "uniqueVisitors": "[~~Úñíʠúé ṽíšíţőřš~~]",
-        "directoryImpressions": "[~~Đířéĉţőřý íɱƥřéššíőñš~~]",
-        "clickOuts": "[~~Ĉļíĉǩ-őúţš~~]",
-        "newFollowers": "[~~Ñéŵ ƒőļļőŵéřš~~]",
-        "messageClicks": "[~~Ṁéššáĝé ĉļíĉǩš~~]"
-      },
-      "deltaCaption": "[~~Ĉĥáñĝé ṽš ţĥé ƥřéṽíőúš {{range}}~~]",
       "audience": {
         "locked": "[~~Ļőĉǩéđ~~]",
         "visitorsLabel": "[~~Úñíʠúé ṽíšíţőřš íñ ţĥíš ƥéříőđ~~]",
@@ -745,7 +736,37 @@
         "comments_other": "[~~{{n}} ĉőɱɱéñţš~~]"
       },
       "reviewsCount_one": "[~~{{n}} řéṽíéŵ~~]",
-      "reviewsCount_other": "[~~{{n}} řéṽíéŵš~~]"
+      "reviewsCount_other": "[~~{{n}} řéṽíéŵš~~]",
+      "funnel": {
+        "headSaw_one": "[~~{{n}} ĝőļƒéř šáŵ {{business}}.~~]",
+        "headSaw_other": "[~~{{n}} ĝőļƒéřš šáŵ {{business}}.~~]",
+        "headOpened_one": "[~~{{n}} őƥéñéđ ýőúř ƥřőƒíļé.~~]",
+        "headOpened_other": "[~~{{n}} őƥéñéđ ýőúř ƥřőƒíļé.~~]",
+        "headNone": "[~~Ñő ĝőļƒéřš ĥáṽé šééñ {{business}} ýéţ.~~]",
+        "subPeriod": "[~~Ļášţ {{days}} đáýš.~~]",
+        "subTopPost": "[~~“{{preview}}” řéáĉĥéđ ţĥé ɱőšţ ĝőļƒéřš.~~]",
+        "subNone": "[~~Ĝőļƒéřš ƒíñđ á ƀúšíñéšš ţĥřőúĝĥ íţš ƥőšţš áñđ ţĥé ƀúšíñéšš đířéĉţőřý.~~]",
+        "kicker": "[~~Ƒřőɱ šééñ ţő áĉţéđ~~]",
+        "kickerDays": "[~~{{days}} đáýš~~]",
+        "rowSaw": "[~~Šáŵ ýőú~~]",
+        "rowOpened": "[~~Őƥéñéđ ýőúř ƥřőƒíļé~~]",
+        "rowFollowed": "[~~Ƒőļļőŵéđ~~]",
+        "rowTapped": "[~~Ţáƥƥéđ ţĥřőúĝĥ~~]",
+        "subSaw": "[~~ýőúř ƥőšţš áñđ ţĥé ƀúšíñéšš đířéĉţőřý~~]",
+        "subVisits_one": "[~~{{n}} ṽíšíţ~~]",
+        "subVisits_other": "[~~{{n}} ṽíšíţš~~]",
+        "subFollowed_one": "[~~{{n}} íñ ţőţáļ~~]",
+        "subFollowed_other": "[~~{{n}} íñ ţőţáļ~~]",
+        "subTapped": "[~~ŵéƀšíţé, ƥĥőñé, đířéĉţíőñš őř ɱéššáĝé~~]",
+        "changeUp": "[~~+{{n}}~~]",
+        "changeDown": "[~~{{n}} ƒéŵéř~~]",
+        "postAs": "[~~Ƥőšţ áš {{business}}~~]",
+        "leakStopLead": "[~~Ṁőšţ ĝőļƒéřš šţőƥ ƀéƒőřé ýőúř ƥřőƒíļé.~~]",
+        "leakStopBody": "[~~{{opened}} őƒ ţĥé {{saw}} ŵĥő šáŵ {{business}} őƥéñéđ íţ.~~]",
+        "leakLeftLead_one": "[~~{{n}} ĝőļƒéř őƥéñéđ ýőúř ƥřőƒíļé áñđ ļéƒţ.~~]",
+        "leakLeftLead_other": "[~~{{n}} ĝőļƒéřš őƥéñéđ ýőúř ƥřőƒíļé áñđ ļéƒţ.~~]",
+        "leakLeftBody": "[~~Ñőƀőđý ƒőļļőŵéđ őř ţáƥƥéđ ţĥřőúĝĥ.~~]"
+      }
     },
     "week": {
       "kicker": "[~~Ţĥíš ŵééǩ~~]",
