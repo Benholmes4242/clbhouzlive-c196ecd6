@@ -2,12 +2,16 @@ import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/ab
 /** One mounted grid owns the row-local detail panel and conditional scroll.
  * Real stored photos supply imagery, never illustrative mock art.
  * BRIEF_HOLE_PANEL_CAROUSEL: the panel frame is a swipeable track with one
- * slide per shot, a thumbnail strip of EVERY shot (active included), and a
- * tap on a ready slide opens MediaPreviewViewer through every ready shot on
- * the hole. Captions and viewer credits read added_at (when the member added
- * the shot to clbhouz); the month chips and "across N months" keep EXIF.
- * The panel never plays video inline — a ready video slide is its poster plus
- * a decorative glass disc, and playback lives in the fullscreen viewer. */
+ * slide per shot and a thumbnail strip of EVERY shot (active included).
+ * BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §4: a tap on a ready slide opens
+ * the CANONICAL full-screen viewer (FullscreenFeedOverlay via openWithOrigin,
+ * readOnly) through every ready shot on the hole, each shot its own page
+ * credited to the member who added it; closing returns to the panel with the
+ * frame left on the tapped shot. Captions read added_at (when the member
+ * added the shot to clbhouz); the month chips and "across N months" keep
+ * EXIF. The panel never plays video inline — a ready video slide is its
+ * poster plus a decorative glass disc, and playback lives in the fullscreen
+ * viewer. */
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';
 import { A, toParParts } from '@/features/courses/components/holes/analytical/tokens';
@@ -15,9 +19,8 @@ import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { capitalPhotoCount, holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
-import { buildHoleViewerItems } from '@/lib/courseMedia/holeViewerItems';
-import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
-import type { OrderedMediaItem } from '@/components/shared/media/types';
+import { holeShotsToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import { HoleMediaThumbnail } from './HoleMediaVideo';
 import { captureMonthLabel, deriveHoleWalk, holeOrdinal, holePhotoMonths } from '@/lib/courseMedia/holeWalk';
 import './hole-walk.css';
