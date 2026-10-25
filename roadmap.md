@@ -1,8 +1,9 @@
 # Roadmap
 
 ## BRIEF_LATEST_HOLES_SWIPE_AND_CAPTION
-- [ ] Separate caption details, rail-wide immediate synthetic run and active-shot course header; frozen entrypoints/offsets unchanged.
-- [ ] Retarget only four authorised cases, add requested coverage, run full suite; prior baseline 2,909 total/350 files, known Top100 scroll fixture failure remains unauthorised.
+- [x] Separate caption details, rail-wide immediate synthetic run and active-shot course header; frozen entrypoints/offsets unchanged.
+- [x] Retargeted four authorised cases; added nine cases (+2 memberShotPosts, +7 latestHolesSwipeCaption). Full bunx vitest run: 2,917 passed/1 failed, 2,918 total/351 files, from 2,909/350. Only existing Top100CoursesHubPanel.test.tsx:234:55 failure remains: expected '0' to be '237'. Latest automatic typecheck/build23:15:32Z OK; manual typecheck prohibited.
+- [ ] Live authenticated swipe/header/navigation verification unavailable (external_unmanaged); known Top100 scroll failure awaits fixture authorisation in its own task.
 
 ## BRIEF_TOP100_OFFICIAL_RANK_AND_TAP
 - [x] Show active rated denominator and published rank; row taps reuse main-list scroll preservation, with chevrons and three shell bars. Maths/frozen styling unchanged.
