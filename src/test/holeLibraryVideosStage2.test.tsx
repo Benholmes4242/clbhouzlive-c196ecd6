@@ -6,7 +6,8 @@ import type { TusUploadOptions } from '@/uploads/tusVideoUpload';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 
-const f = vi.hoisted(() => ({ upload: vi.fn(), resilient: vi.fn(), poll: vi.fn(), insert: vi.fn(), auth: vi.fn(), exif: vi.fn() }));
+const f = vi.hoisted(() => ({ upload: vi.fn(), resilient: vi.fn(), poll: vi.fn(), insert: vi.fn(), auth: vi.fn(), exif: vi.fn(), viewer: undefined as { items: Array<{ type: string; hlsUrl?: string }> } | undefined }));
+vi.mock('@/components/shared/media/MediaPreviewViewer', () => ({ MediaPreviewViewer: (props: { items: Array<{ type: string; hlsUrl?: string }> }) => { f.viewer = props; return null; } }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'member' } }) }));
 vi.mock('@/uploads/hooks/useMediaUpload', () => ({ useMediaUpload: () => ({ upload: f.upload }) }));
@@ -105,12 +106,18 @@ describe('Founder size and type ruling', () => {
   it('rejects one byte over 4 GiB', () => { const file = new File([], 'v.mp4', { type: 'video/mp4' }); Object.defineProperty(file, 'size', { value: 4294967297 }); expect(libraryHoleVideoError(file)).toBe('That video is too large to upload.'); });
 });
 describe('Stage 2 encode display', () => {
-  it('null duration has no playable element; metadata refresh enables the existing player', () => {
+  it('null duration has no playable element; metadata refresh makes the shot open in the viewer', () => {
     const view = render(<HoleWalk available holes={[hole]} rows={[row]} totalMedia={1} onAddFirst={() => {}} />);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));
     expect(screen.queryByRole('button', { name: 'Play video' })).toBeNull(); expect(view.container.querySelector('video')).toBeNull();
     expect(view.container.querySelector('.hole-media-processing')).toBeInTheDocument();
+    fireEvent.click(view.container.querySelector('.hole-walk-slide') as HTMLElement);
+    expect(f.viewer).toBeUndefined();
     view.rerender(<HoleWalk available holes={[hole]} rows={[{ ...row, duration_seconds: 42 }]} totalMedia={1} onAddFirst={() => {}} />);
-    expect(screen.getByRole('button', { name: 'Play video' })).toBeInTheDocument();
+    expect(view.container.querySelector('.hole-media-processing')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Play video' })).toBeNull();
+    fireEvent.click(view.container.querySelector('.hole-walk-slide') as HTMLElement);
+    expect(f.viewer?.items).toHaveLength(1);
+    expect(f.viewer?.items[0].type).toBe('video');
   });
 });

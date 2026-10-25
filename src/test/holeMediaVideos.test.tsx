@@ -20,7 +20,7 @@ const post = { userId: 'member', actorType: 'personal', mediaItems: [{ id: 'vide
 const row = { id: 'video', course_id: 'course', hole_no: 7, user_id: 'member', media_url: url, media_type: 'video', stream_id: source.stream_id, poster_url: '/poster.jpg', duration_seconds: 42, status: 'approved', exif_captured_at: null, created_at: '2026-10-24' } as HolePhoto;
 const hole = { hole_no: 7, par: 4, yards: 400, stroke_index: 1, avg_to_par: 1, avg_gross: 5, rounds: 10, dist: { ace: 0, albatross: 0, eagle: 0, birdie: 0, par: 5, bogey: 5, double: 0 } } as CourseHole;
 beforeEach(() => {
-  vi.clearAllMocks(); f.posts = []; f.reviews = [];
+  vi.clearAllMocks(); f.posts = []; f.reviews = []; f.viewer = undefined;
   f.auth.mockResolvedValue({ data: { user: { id: 'member' } }, error: null });
   f.insert.mockReturnValue({ select: () => ({ single: async () => ({ data: row, error: null }) }) });
   f.attach.mockReturnValue({ detach: f.detach });
