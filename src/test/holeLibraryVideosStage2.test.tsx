@@ -31,7 +31,6 @@ const hole: CourseHole = { hole_no: 7, par: 4, yards: 400, stroke_index: 1, avg_
 const row = { id: 'v', media_type: 'video', media_url: generateStreamHlsUrl(sid), poster_url: '/poster.jpg', stream_id: sid, duration_seconds: null, hole_no: 7, status: 'approved', user_id: 'member', exif_captured_at: null } as HolePhoto;
 beforeEach(() => {
   vi.clearAllMocks();
-  f.viewer = undefined;
   f.auth.mockResolvedValue({ data: { user: { id: 'member' } }, error: null });
   f.insert.mockReturnValue({ select: () => ({ single: async () => ({ data: row, error: null }) }) });
   f.exif.mockResolvedValue({ capturedAt: null, captureDay: null, latitude: null, longitude: null });
