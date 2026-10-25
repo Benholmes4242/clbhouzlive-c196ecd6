@@ -1,5 +1,9 @@
 # Roadmap
 
+## BRIEF_TOP100_OFFICIAL_RANK_AND_TAP
+- [x] Show active rated denominator and published rank; row taps reuse main-list scroll preservation, with chevrons and three shell bars. Maths/frozen styling unchanged.
+- [ ] Run full suite and inspect automatic checks; report cases/files against 2,903/350 baseline. Manual typecheck prohibited and live authentication unavailable (external_unmanaged).
+
 ## CB83.1 — Busiest-day post counts
 - [x] Count posts on the applicable UTC same/previous day; add twice/times clauses in en/en-XA, leaving weekly wording unchanged.
 - [x] Full `bunx vitest run`: 2,886 passed/349 files, zero failures/skips, from 2,879/348; seven added cases solely in cb831InsightsPostCount.test.tsx, existing tests unchanged.
