@@ -2,12 +2,16 @@ import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/ab
 /** One mounted grid owns the row-local detail panel and conditional scroll.
  * Real stored photos supply imagery, never illustrative mock art.
  * BRIEF_HOLE_PANEL_CAROUSEL: the panel frame is a swipeable track with one
- * slide per shot, a thumbnail strip of EVERY shot (active included), and a
- * tap on a ready slide opens MediaPreviewViewer through every ready shot on
- * the hole. Captions and viewer credits read added_at (when the member added
- * the shot to clbhouz); the month chips and "across N months" keep EXIF.
- * The panel never plays video inline — a ready video slide is its poster plus
- * a decorative glass disc, and playback lives in the fullscreen viewer. */
+ * slide per shot and a thumbnail strip of EVERY shot (active included).
+ * BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §4: a tap on a ready slide opens
+ * the CANONICAL full-screen viewer (FullscreenFeedOverlay via openWithOrigin,
+ * readOnly) through every ready shot on the hole, each shot its own page
+ * credited to the member who added it; closing returns to the panel with the
+ * frame left on the tapped shot. Captions read added_at (when the member
+ * added the shot to clbhouz); the month chips and "across N months" keep
+ * EXIF. The panel never plays video inline — a ready video slide is its
+ * poster plus a decorative glass disc, and playback lives in the fullscreen
+ * viewer. */
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';
 import { A, toParParts } from '@/features/courses/components/holes/analytical/tokens';
@@ -15,9 +19,8 @@ import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { capitalPhotoCount, holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
-import { buildHoleViewerItems } from '@/lib/courseMedia/holeViewerItems';
-import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
-import type { OrderedMediaItem } from '@/components/shared/media/types';
+import { holeShotsToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
+import { openWithOrigin } from '@/lib/openWithOrigin';
 import { HoleMediaThumbnail } from './HoleMediaVideo';
 import { captureMonthLabel, deriveHoleWalk, holeOrdinal, holePhotoMonths } from '@/lib/courseMedia/holeWalk';
 import './hole-walk.css';
@@ -41,9 +44,6 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
 }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [photoId, setPhotoId] = useState<string | null>(null);
-  // Index into the open hole's READY shots (processing videos are left out);
-  // null while the fullscreen viewer is closed.
-  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   // A moved item is followed to its new hole by the caller's focus nonce.
   useEffect(() => {
     if (!focus) return;
@@ -124,14 +124,27 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
   // Every image or ready video on the hole, in panel order; processing videos
   // are left out of the viewer entirely.
   const playable = photos.filter(photo => photo.media_type !== 'video' || photo.duration_seconds != null);
-  const viewerItems: OrderedMediaItem[] = !tile ? [] : buildHoleViewerItems(
-    playable.map(photo => ({ ...photo, author: authors?.get(photo.user_id), par: tile.hole.par, yards: tile.hole.yards })),
-    { courseName, scored },
-  );
 
+  // §4 — the tapped slide opens the canonical viewer over every ready shot on
+  // the hole, one page per shot, landing on the tapped shot. The frame stays
+  // on the tapped shot when the viewer closes (it has no index callback).
   const openViewer = (id: string) => {
     const index = playable.findIndex(photo => photo.id === id);
-    if (index >= 0) setViewerIndex(index);
+    if (index < 0) return;
+    const tapped = playable[index];
+    const posts = holeShotsToFeedPosts(
+      playable.map(photo => ({ ...photo, member_id: photo.user_id, member_name: authors?.get(photo.user_id) ?? null })),
+      courseName,
+    );
+    openWithOrigin({
+      posts,
+      index,
+      originEl: null,
+      posterUrl: tapped.media_type === 'video' ? holeMediaPoster(tapped) : tapped.media_url,
+      mediaId: id,
+      openedFrom: 'course-media',
+      options: { readOnly: true },
+    });
   };
 
   const panel = tile && <section ref={panelRef} className={scored ? 'hole-walk-panel' : 'hole-walk-panel hole-walk-panel-unscored'} role="region" aria-label={`Hole ${tile.hole.hole_no}`}>
@@ -212,12 +225,5 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       </p>}
       {!tile && !scored && <p className="hole-walk-quiet">No rounds have been posted here yet, so par and yardage are still to come. They fill in with the first tracked round.</p>}
     </section>
-    {viewerIndex != null && tile && viewerItems.length > 0 && <MediaPreviewViewer
-      items={viewerItems}
-      initialIndex={viewerIndex}
-      onClose={() => setViewerIndex(null)}
-      onIndexChange={index => { const photo = playable[index]; if (photo) setPhotoId(photo.id); }}
-      edgeBounce
-    />}
   </div>;
 }

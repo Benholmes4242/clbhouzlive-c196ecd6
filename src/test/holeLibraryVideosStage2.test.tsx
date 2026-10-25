@@ -6,8 +6,8 @@ import type { TusUploadOptions } from '@/uploads/tusVideoUpload';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 
-const f = vi.hoisted(() => ({ upload: vi.fn(), resilient: vi.fn(), poll: vi.fn(), insert: vi.fn(), auth: vi.fn(), exif: vi.fn(), viewer: undefined as { items: Array<{ type: string; hlsUrl?: string }> } | undefined }));
-vi.mock('@/components/shared/media/MediaPreviewViewer', () => ({ MediaPreviewViewer: (props: { items: Array<{ type: string; hlsUrl?: string }> }) => { f.viewer = props; return null; } }));
+const f = vi.hoisted(() => ({ upload: vi.fn(), resilient: vi.fn(), poll: vi.fn(), insert: vi.fn(), auth: vi.fn(), exif: vi.fn(), open: vi.fn() }));
+vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: (...args: unknown[]) => f.open(...args) }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'member' } }) }));
 vi.mock('@/uploads/hooks/useMediaUpload', () => ({ useMediaUpload: () => ({ upload: f.upload }) }));
@@ -31,7 +31,6 @@ const hole: CourseHole = { hole_no: 7, par: 4, yards: 400, stroke_index: 1, avg_
 const row = { id: 'v', media_type: 'video', media_url: generateStreamHlsUrl(sid), poster_url: '/poster.jpg', stream_id: sid, duration_seconds: null, hole_no: 7, status: 'approved', user_id: 'member', exif_captured_at: null } as HolePhoto;
 beforeEach(() => {
   vi.clearAllMocks();
-  f.viewer = undefined;
   f.auth.mockResolvedValue({ data: { user: { id: 'member' } }, error: null });
   f.insert.mockReturnValue({ select: () => ({ single: async () => ({ data: row, error: null }) }) });
   f.exif.mockResolvedValue({ capturedAt: null, captureDay: null, latitude: null, longitude: null });
@@ -113,12 +112,15 @@ describe('Stage 2 encode display', () => {
     expect(screen.queryByRole('button', { name: 'Play video' })).toBeNull(); expect(view.container.querySelector('video')).toBeNull();
     expect(view.container.querySelector('.hole-media-processing')).toBeInTheDocument();
     fireEvent.click(view.container.querySelector('.hole-walk-slide') as HTMLElement);
-    expect(f.viewer).toBeUndefined();
+    expect(f.open).not.toHaveBeenCalled();
     view.rerender(<HoleWalk available holes={[hole]} rows={[{ ...row, duration_seconds: 42 }]} totalMedia={1} onAddFirst={() => {}} />);
     expect(view.container.querySelector('.hole-media-processing')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Play video' })).toBeNull();
     fireEvent.click(view.container.querySelector('.hole-walk-slide') as HTMLElement);
-    expect(f.viewer?.items).toHaveLength(1);
-    expect(f.viewer?.items[0].type).toBe('video');
+    expect(f.open).toHaveBeenCalledTimes(1);
+    const args = f.open.mock.calls[0][0] as { posts: Array<{ mediaItems: Array<{ type: string }> }>; options?: { readOnly?: boolean } };
+    expect(args.posts).toHaveLength(1);
+    expect(args.posts[0].mediaItems[0].type).toBe('video');
+    expect(args.options).toEqual({ readOnly: true });
   });
 });
