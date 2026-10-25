@@ -1,5 +1,9 @@
 # Roadmap
 
+## CB79.2 — Invite history
+- [ ] Mark Team entrypoints with fromTeam and pop back/success; cold opens replace Team. Preserve guard, query invalidations and success toast.
+- [ ] Add real-history navigation tests, audit other entries, run full suite and report counts against 2,794/343 (one standing member-caption failure and TS2322 outside this brief).
+
 ## BRIEF_MEMBER_SHOTS_VIEWER_POLISH
 - [x] Received authorisation for six hole-open fixture/provider/wait updates preserving assertions, plus Latest courses' credit field assertion; applied them.
 - [x] Implemented synthetic-only full-height geometry, active member caption/avatar and shared get_hole_media query; normal author/header paths retained.
