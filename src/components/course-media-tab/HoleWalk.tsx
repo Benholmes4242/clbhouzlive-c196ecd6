@@ -13,6 +13,7 @@ import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/ab
  * poster plus a decorative glass disc, and playback lives in the fullscreen
  * viewer. */
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { A, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
@@ -20,6 +21,7 @@ import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { capitalPhotoCount, holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
 import { holeShotsToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
+import { holeMediaQuery } from '@/lib/courseMedia/holeMediaQuery';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { HoleMediaThumbnail } from './HoleMediaVideo';
 import { captureMonthLabel, deriveHoleWalk, holeOrdinal, holePhotoMonths } from '@/lib/courseMedia/holeWalk';
@@ -42,6 +44,8 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
   focus?: { hole: number; id: string; nonce: number } | null;
   scored?: boolean;
 }) {
+  const queryClient = useQueryClient();
+  const openingRef = useRef(false);
   const [selected, setSelected] = useState<number | null>(null);
   const [photoId, setPhotoId] = useState<string | null>(null);
   // A moved item is followed to its new hole by the caller's focus nonce.
@@ -128,14 +132,15 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
   // §4 — the tapped slide opens the canonical viewer over every ready shot on
   // the hole, one horizontal run, landing on the tapped shot. The frame stays
   // on the tapped shot when the viewer closes (it has no index callback).
-  const openViewer = (id: string) => {
+  const openViewer = async (id: string) => {
     const index = playable.findIndex(photo => photo.id === id);
-    if (index < 0) return;
+    if (index < 0 || openingRef.current) return;
     const tapped = playable[index];
-    const posts = holeShotsToFeedPosts(
-      playable.map(photo => ({ ...photo, member_id: photo.user_id, member_name: authors?.get(photo.user_id) ?? null })),
-      courseName, tapped.course_id, tapped.hole_no,
-    );
+    openingRef.current = true;
+    try {
+    const mediaRows = await queryClient.fetchQuery(holeMediaQuery(tapped.course_id, tapped.hole_no));
+    const posts = holeShotsToFeedPosts(mediaRows, courseName, tapped.course_id, tapped.hole_no);
+    if (!posts[0]?.mediaItems.some(item => item.id === id)) return;
     openWithOrigin({
       posts,
       index: 0,
@@ -145,6 +150,11 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       openedFrom: 'course-media',
       options: { readOnly: true, syntheticPosts: true },
     });
+    } catch {
+      // A refused/unavailable read never opens synthetic fallback identities.
+    } finally {
+      openingRef.current = false;
+    }
   };
 
   const panel = tile && <section ref={panelRef} className={scored ? 'hole-walk-panel' : 'hole-walk-panel hole-walk-panel-unscored'} role="region" aria-label={`Hole ${tile.hole.hole_no}`}>
