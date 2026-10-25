@@ -84,6 +84,7 @@ beforeEach(() => {
     isPlaceholderData: false,
   });
   f.enrichment.mockReturnValue({ data: new Map(), isLoading: false });
+  f.baseline.mockReturnValue(new Map());
 });
 
 afterEach(cleanup);
@@ -185,5 +186,28 @@ describe('BRIEF_TOP100_GOLFERS_VS_OFFICIAL — panel wiring', () => {
     expect(screen.getByText(/out of the 3 courses on this list/)).toBeInTheDocument();
     expect(screen.queryByText('Course 4')).toBeNull();
     expect(screen.getByText((_, el) => el?.textContent === 'Golfers rank it 2nd versus 3rd on the official list')).toBeInTheDocument();
+  });
+});
+
+/* BRIEF_TOP100_MONTHLY_MOVE — the baseline hook follows the rendered list. */
+describe('BRIEF_TOP100_MONTHLY_MOVE — panel wiring', () => {
+  it('the baseline hook is called with the active list slug and re-queries when the list changes', () => {
+    mountWithArgument();
+    expect(f.baseline).toHaveBeenCalledWith('global');
+    fireEvent.click(screen.getByRole('tab', { name: 'GB&I' }));
+    expect(f.baseline).toHaveBeenCalledWith('gb-i');
+  });
+
+  it('a baseline position prints the trend line under the row’s arrow', () => {
+    // Global qualifying set: c1 members 1st, c4 members 2nd (list 4th) — c4 is the riser.
+    f.baseline.mockReturnValue(new Map([['c4', 4]]));
+    mountWithArgument();
+    expect(screen.getByText('↑2 this month')).toBeInTheDocument();
+  });
+
+  it('an empty baseline renders no trend line', () => {
+    mountWithArgument();
+    expect(screen.queryByText(/this month/)).toBeNull();
+    expect(screen.queryByText('No change')).toBeNull();
   });
 });
