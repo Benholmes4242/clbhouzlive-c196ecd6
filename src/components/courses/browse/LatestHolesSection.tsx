@@ -1,8 +1,12 @@
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useGamRpc } from '@/hooks/gam/_useGamRpc';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
+import { buildHoleViewerItems, type HoleViewerShot } from '@/lib/courseMedia/holeViewerItems';
+import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { useSectionReady } from './PageLoadGate';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
@@ -14,6 +18,11 @@ import './latestHoles.css';
 /** The RPC owns newest-first ordering, up to two shots per course, at most 30, and public eligibility.
  * Credit shows the month the member added the shot to clbhouz (added_at), never its EXIF capture date; this rail never starts video playback.
  * Geometry is shared with the loading shell, not PhotoFigureCard.
+ * BRIEF_COURSES_LATEST_FROM_COURSES §6: a tap no longer routes to the course
+ * page — it opens MediaPreviewViewer over EVERY ready shot on that hole
+ * (get_hole_media, the hole walk's order), landing on the tapped shot, with
+ * the rubber-band edge bounce. The ?tab=media&hole=&shot= deep link in
+ * CourseMediaTabNew is unchanged.
  */
 export const LATEST_HOLE_W = 220;
 export const LATEST_HOLE_H = 293;
@@ -37,20 +46,37 @@ export interface LatestHoleMedia {
   yards: number | null;
 }
 
-function LatestHoleCard({ row }: { row: LatestHoleMedia }) {
-  const navigate = useNavigate();
-  const credit = [row.member_name, addedMonthLabel(row.added_at)].filter(Boolean).join(' \u00B7 ');
+/** get_hole_media row: every ready, approved shot on one hole, walk order. */
+interface HoleMediaRow {
+  id: string;
+  course_id: string;
+  course_name: string;
+  hole_no: number;
+  media_type: 'image' | 'video';
+  media_url: string;
+  poster_url: string | null;
+  stream_id: string | null;
+  duration_seconds: number | null;
+  added_at: string;
+  member_id: string;
+  member_name: string | null;
+  par: number | null;
+  yards: number | null;
+}
+
+function LatestHoleCard({ row, pending, onOpen }: { row: LatestHoleMedia; pending: boolean; onOpen: (row: LatestHoleMedia) => void }) {
+  const credit = [row.member_name, addedMonthLabel(row.added_at)].filter(Boolean).join(' · ');
   const seconds = Math.round(row.duration_seconds ?? 0);
   const duration = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   return (
     <button type="button" className="latest-hole-card" aria-label={`Hole ${row.hole_no}, ${row.course_name}`}
-      style={{ width: LATEST_HOLE_W, height: LATEST_HOLE_H, background: A.PANEL }}
-      onClick={() => navigate(`/courses/${row.course_id}?tab=media&hole=${row.hole_no}&shot=${row.id}`)}>
+      style={{ width: LATEST_HOLE_W, height: LATEST_HOLE_H, background: A.PANEL, opacity: pending ? 0.7 : 1 }}
+      onClick={() => onOpen(row)}>
       <img src={row.media_type === 'video' ? holeMediaPoster(row) : row.media_url} alt="" loading="lazy" onError={event => { event.currentTarget.hidden = true; }} />
       <div className="latest-hole-scrim" style={{ background: SCRIM_STANDOUT }} />
       <div className="latest-hole-figure">
         <div className="latest-hole-number">{row.hole_no}</div>
-        <div className="latest-hole-label">{row.par != null ? `Par ${row.par}${row.yards != null ? ` \u00B7 ${row.yards} yds` : ''}` : 'Hole'}</div>
+        <div className="latest-hole-label">{row.par != null ? `Par ${row.par}${row.yards != null ? ` · ${row.yards} yds` : ''}` : 'Hole'}</div>
       </div>
       <div className="latest-hole-name">
         <div className="latest-hole-course">{row.course_name}</div>
@@ -67,12 +93,48 @@ function LatestHoleCard({ row }: { row: LatestHoleMedia }) {
 export function LatestHolesSection() {
   const { data, isLoading, isError } = useGamRpc<LatestHoleMedia[]>('get_latest_hole_media', { p_limit: 30 }, { staleTime: 60_000 });
   useSectionReady('latestHoles', !isLoading);
+  const [pending, setPending] = useState<LatestHoleMedia | null>(null);
+  const [viewer, setViewer] = useState<{ items: ReturnType<typeof buildHoleViewerItems>; index: number } | null>(null);
+
+  const holeQuery = useQuery<HoleMediaRow[]>({
+    queryKey: ['hole-media', pending?.course_id, pending?.hole_no],
+    enabled: !!pending,
+    staleTime: 60_000,
+    queryFn: async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: rows, error } = await (supabase.rpc as any)('get_hole_media', { p_course_id: pending!.course_id, p_hole_no: pending!.hole_no });
+      if (error) throw error;
+      return (rows ?? []) as HoleMediaRow[];
+    },
+  });
+
+  useEffect(() => {
+    if (!pending) return;
+    if (holeQuery.isError) { setPending(null); return; }
+    const rows = holeQuery.data;
+    if (!rows) return;
+    if (rows.length === 0) { setPending(null); return; }
+    const shots: HoleViewerShot[] = rows.map(row => ({ ...row, author: row.member_name }));
+    const items = buildHoleViewerItems(shots, { courseName: pending.course_name, scored: pending.par != null });
+    if (items.length === 0) { setPending(null); return; }
+    const index = items.findIndex(item => item.id === pending.id);
+    setViewer({ items, index: index >= 0 ? index : 0 });
+    setPending(null);
+  }, [holeQuery.data, holeQuery.isError, pending]);
+
   if (isLoading) return <LatestHolesShell />;
   if (isError || !data || data.length < 3) return null;
   return <section style={SECTION_WRAP}>
-    <SectionHead tone="amber" kicker="Through members' eyes" title="Latest holes" />
+    <SectionHead tone="amber" kicker="Hole by hole" title="Latest holes" />
     <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: PHOTO_FIGURE_GAP, marginTop: HEAD_GAP }}>
-      {data.map(row => <LatestHoleCard key={row.id} row={row} />)}
+      {data.map(row => <LatestHoleCard key={row.id} row={row} pending={pending?.id === row.id}
+        onOpen={tapped => { if (!pending) setPending(tapped); }} />)}
     </div>
+    {viewer && <MediaPreviewViewer
+      items={viewer.items}
+      initialIndex={viewer.index}
+      onClose={() => setViewer(null)}
+      edgeBounce
+    />}
   </section>;
 }
