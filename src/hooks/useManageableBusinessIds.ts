@@ -31,3 +31,23 @@ export function useManageableBusinessIds(viewerId?: string): ReadonlySet<string>
     return ids;
   }, [memberships]);
 }
+
+/**
+ * BIZ_POSTS_V1: businesses where the viewer is on the team at all
+ * (owner/admin/editor). `canManagePost` uses it for the author clause —
+ * the author of a business post keeps Edit/Delete while still on the team.
+ */
+export function useTeamBusinessIds(viewerId?: string): ReadonlySet<string> {
+  const { data: memberships } = useMyBusinesses(viewerId);
+
+  return useMemo(() => {
+    if (!memberships?.length) return EMPTY_SET;
+    const ids = new Set<string>();
+    for (const m of memberships) {
+      if ((m.role === 'owner' || m.role === 'admin' || m.role === 'editor') && m.business?.id) {
+        ids.add(m.business.id);
+      }
+    }
+    return ids;
+  }, [memberships]);
+}

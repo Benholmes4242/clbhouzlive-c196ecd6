@@ -87,9 +87,12 @@ export function useEditablePost(postId: string | null | undefined) {
       if (postError) throw postError;
       if (!post) return null;
 
-      // Ownership / management check.
-      let canManage = post.user_id === viewerId;
-      if (!canManage && post.actor_type === 'business' && post.actor_id) {
+      // Ownership / management check (BIZ_POSTS_V1). Personal posts need the
+      // author. Business posts need a current owner/admin of actor_id, or the
+      // author while they're still owner/admin/editor of it — leaving the
+      // team ends the author's access.
+      let canManage = false;
+      if (post.actor_type === 'business' && post.actor_id) {
         const { data: membership } = await supabase
           .from('business_members')
           .select('role')
@@ -97,7 +100,11 @@ export function useEditablePost(postId: string | null | undefined) {
           .eq('user_profile_id', viewerId)
           .maybeSingle();
         const role = membership?.role as string | undefined;
-        canManage = !!role && ['owner', 'admin'].includes(role);
+        canManage =
+          (!!role && ['owner', 'admin'].includes(role)) ||
+          (post.user_id === viewerId && !!role && ['owner', 'admin', 'editor'].includes(role));
+      } else {
+        canManage = post.user_id === viewerId;
       }
 
       // Review-derived posts are managed from the review, not here.
