@@ -275,7 +275,10 @@ export function MediaPreviewViewer({
       <div
         ref={swipeRef}
         className="absolute inset-0 flex items-center justify-center"
-        style={{ touchAction: isZoomed ? 'none' : 'pan-y' }}
+        style={{
+          touchAction: isZoomed ? 'none' : 'pan-y',
+          transform: edgeOffset ? `translateX(${edgeOffset}px)` : undefined,
+        }}
       >
 
         {item.type === 'video' ? (
