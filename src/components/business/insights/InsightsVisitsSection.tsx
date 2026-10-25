@@ -9,7 +9,7 @@ import { useBusinessPostDays } from '@/hooks/useBusinessPostDays';
 import { formatNumber } from '@/i18n/format';
 import { axisIndices, busiestPeriod, sourceBuckets, visitBuckets, type VisitBucket } from './visitBuckets';
 interface Snapshot { insights: BusinessInsights; funnel: BusinessInsightsFunnel; dates: string[]; days: number; businessId: string }
-const dayLabel = (day: string, weekday = false) => new Intl.DateTimeFormat('en-GB', weekday ? { weekday: 'short', timeZone: 'UTC' } : { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(`${day}T00:00:00Z`));
+const dayLabel = (day: string, weekday = false) => new Intl.DateTimeFormat('en-GB', weekday ? { weekday: 'short', timeZone: 'UTC' } : { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(`${day}T00:00:00Z`)).replace('Sept', 'Sep');
 export function VisitsBars({ buckets, days }: { buckets: VisitBucket[]; days: number }) {
   const max = Math.max(1, ...buckets.map(b => b.total));
   return <div className="insights-visits-chart"><div className="insights-visits-bars">
