@@ -143,7 +143,7 @@ export function useCreateInvite(businessId: string, options?: { successMessage?:
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] });
-      toast.success('Invitation sent');
+      toast.success(options?.successMessage ?? 'Invitation sent');
     },
     onError: (error: Error) => {
       toast.error('Failed to send invitation', { description: error.message });
@@ -170,7 +170,7 @@ export function useCreateInviteByUser(businessId: string, options?: { successMes
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] });
-      toast.success('Invitation sent');
+      toast.success(options?.successMessage ?? 'Invitation sent');
     },
     onError: (error: Error) => {
       toast.error('Failed to send invitation', { description: error.message });
