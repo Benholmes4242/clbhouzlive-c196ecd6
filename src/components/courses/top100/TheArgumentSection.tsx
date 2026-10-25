@@ -59,11 +59,25 @@ function ArgumentGroup({ label, tone, rows, baseline }: { label: string; tone: s
                   <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.listRank)}</b> on the official list
                 </div>
               </div>
-              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+              <div style={{ flexShrink: 0, textAlign: 'right' }}>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 17, fontWeight: 800, color: rowTone, fontVariantNumeric: 'tabular-nums' }}>
                   <Arrow size={14} strokeWidth={3} aria-hidden />
                   {Math.abs(r.divergence)}
                 </div>
+                {move !== null ? (
+                  <div
+                    style={{
+                      marginTop: 3,
+                      fontSize: 10,
+                      fontWeight: 600,
+                      whiteSpace: 'nowrap',
+                      fontVariantNumeric: 'tabular-nums',
+                      color: move > 0 ? A.GREEN : move < 0 ? A.RED : A.DIM,
+                    }}
+                  >
+                    {move > 0 ? `↑${move} this month` : move < 0 ? `↓${Math.abs(move)} this month` : 'No change'}
+                  </div>
+                ) : null}
               </div>
             </div>
           );
@@ -74,7 +88,7 @@ function ArgumentGroup({ label, tone, rows, baseline }: { label: string; tone: s
 }
 
 /** BRIEF_TOP100_GOLFERS_VS_OFFICIAL. The caller renders nothing when both groups are empty. */
-export function TheArgumentSection({ higher, lower, qualifying, showGolfersLink, onSeeGolfersList }: Props) {
+export function TheArgumentSection({ higher, lower, qualifying, showGolfersLink, onSeeGolfersList, baseline }: Props) {
   if (higher.length === 0 && lower.length === 0) return null;
   return (
     <section style={SECTION_WRAP}>
