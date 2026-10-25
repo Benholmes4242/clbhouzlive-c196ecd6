@@ -5,7 +5,7 @@ import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/ab
  * slide per shot and a thumbnail strip of EVERY shot (active included).
  * BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §4: a tap on a ready slide opens
  * the CANONICAL full-screen viewer (FullscreenFeedOverlay via openWithOrigin,
- * readOnly) through every ready shot on the hole, each shot its own page
+ * readOnly) through every ready shot on the hole, one sideways carousel
  * credited to the member who added it; closing returns to the panel with the
  * frame left on the tapped shot. Captions read added_at (when the member
  * added the shot to clbhouz); the month chips and "across N months" keep
@@ -126,7 +126,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
   const playable = photos.filter(photo => photo.media_type !== 'video' || photo.duration_seconds != null);
 
   // §4 — the tapped slide opens the canonical viewer over every ready shot on
-  // the hole, one page per shot, landing on the tapped shot. The frame stays
+  // the hole, one horizontal run, landing on the tapped shot. The frame stays
   // on the tapped shot when the viewer closes (it has no index callback).
   const openViewer = (id: string) => {
     const index = playable.findIndex(photo => photo.id === id);
@@ -134,11 +134,11 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
     const tapped = playable[index];
     const posts = holeShotsToFeedPosts(
       playable.map(photo => ({ ...photo, member_id: photo.user_id, member_name: authors?.get(photo.user_id) ?? null })),
-      courseName,
+      courseName, tapped.course_id, tapped.hole_no,
     );
     openWithOrigin({
       posts,
-      index,
+      index: 0,
       originEl: null,
       posterUrl: tapped.media_type === 'video' ? holeMediaPoster(tapped) : tapped.media_url,
       mediaId: id,

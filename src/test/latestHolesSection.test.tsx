@@ -110,13 +110,14 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     await waitFor(() => expect(f.holeRpc).toHaveBeenCalledWith('get_hole_media', { p_course_id: 'course-second', p_hole_no: 4 }));
     await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
     const args = f.open.mock.calls[0][0] as { posts: Array<{ id: string; displayName: string; courseName?: string }>; index: number; mediaId: string | null; openedFrom: string; options?: { readOnly?: boolean } };
-    expect(args.posts.map(post => post.id)).toEqual(['h1', 'second', 'h3']);
-    expect(args.index).toBe(1);
+    expect(args.posts).toHaveLength(1);
+    expect(args.posts[0].id).toBe('shots:hole:course-second:4');
+    expect(args.index).toBe(0);
     expect(args.mediaId).toBe('second');
     expect(args.openedFrom).toBe('course-media');
     expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
-    expect(args.posts[1].displayName).toBe('Thomas Holmes');
-    expect(args.posts[1].courseName).toBe('Course second');
+    expect(args.posts[0].displayName).toBe('Course second · The fourth');
+    expect(args.posts[0].courseName).toBe('Course second');
   });
   it('the section opens the canonical viewer, never MediaPreviewViewer', () => {
     const source = readFileSync(resolve(process.cwd(), 'src/components/courses/browse/LatestHolesSection.tsx'), 'utf8');

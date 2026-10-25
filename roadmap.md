@@ -1,5 +1,11 @@
 # Roadmap
 
+## BRIEF_MEMBER_SHOTS_SWIPE_ACROSS
+- [x] Build one synthetic carousel per course/hole with ordered ready shots and per-item credits; retain real-post behaviour and synthetic request gates. Added synthetic fullscreen post_views and likers mount gates; module headers own the local contract.
+- [x] Authorised retargets in four existing files; full bunx vitest run 2,782/341 → 2,787/342, zero failures (+2 builder/gate tests, +3 new actual-chrome tests). Targeted103/7 green; automatic build OK14:55:34Z. Detailed report Member_shots_swipe_across_report.md names every changed case and assertion.
+- [x] Audited post-keyed requests and horizontal native scroll-snap configuration; no custom bounce added.
+- [ ] Native iOS/Android bounce and live signed-in card→viewer→swipe checks unavailable (external_unmanaged session/device access). Controlled actual carousel opening on tapped b verified; browser programmatic credit-change check timed out; actual-chrome tests pass.
+
 ## BRIEF_COURSES_LATEST_HOLES
 - [x] Full unchanged baseline `bunx vitest run`: 2,585 passed /328 files, zero failures; matches CB75.1.
 - [x] Add Latest holes rail/shell/readiness and once-per-mount Media hole/shot deep link; existing sections and HoleWalk unchanged.

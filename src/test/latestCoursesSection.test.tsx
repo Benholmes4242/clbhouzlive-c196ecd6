@@ -155,7 +155,7 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     for (const cell of empties) expect(cell.children).toHaveLength(0);
   });
 
-  it('BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS: two posts explode to five pages in post-then-media order and the tapped shot sets the index', async () => {
+  it('BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS: two posts combine into one five-item carousel in post-then-media order and the tapped shot sets mediaId', async () => {
     f.gallery = {
       data: [
         post('post-alpha-1', [shot('m1'), shot('m2'), shot('m3')]),
@@ -169,12 +169,14 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     fireEvent.click(screen.getByLabelText('Open Course alpha shot 2 of 14'));
     await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
     const args = lastOpen();
-    expect(args.posts.map(p => p.id)).toEqual(['post-alpha-1::m1', 'post-alpha-1::m2', 'post-alpha-1::m3', 'post-alpha-2::m4', 'post-alpha-2::m5']);
-    expect(args.index).toBe(4);
+    expect(args.posts).toHaveLength(1);
+    expect(args.posts[0].id).toBe('shots:course:course-alpha');
+    expect(args.posts[0].mediaItems.map(item => item.id)).toEqual(['m1', 'm2', 'm3', 'm4', 'm5']);
+    expect(args.index).toBe(0);
     expect(args.mediaId).toBe('m5');
     expect(args.openedFrom).toBe('course-media');
     expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
-    expect(args.posts[4].displayName).toBe('Thomas Holmes');
+    expect(args.posts[0].displayName).toBe('Course alpha');
   });
 
   it('start-index fallbacks: url match, then first shot of the post id, then 0', async () => {
@@ -189,14 +191,16 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     // url match: media_id unknown but the media_url matches an item's imageUrl
     fireEvent.click(screen.getByLabelText('Open Course alpha shot 2 of 14'));
     await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
-    expect(lastOpen().index).toBe(1);
+    expect(lastOpen().index).toBe(0);
+    expect(lastOpen().mediaId).toBe('my');
     // post id match: neither media id nor url match, but the post id does
     f.rows = [course('delta', { tiles: [tile('d-1', { post_id: 'post-alpha-2', media_id: 'gone', media_url: '/gone.jpg' })] }), course('beta'), course('gamma')];
     cleanup();
     mount();
     fireEvent.click(screen.getByLabelText('Open Course delta shot 1 of 14'));
     await waitFor(() => expect(f.open).toHaveBeenCalledTimes(2));
-    expect(lastOpen().index).toBe(1);
+    expect(lastOpen().index).toBe(0);
+    expect(lastOpen().mediaId).toBe('my');
     // nothing matches: index 0
     f.rows = [course('epsilon', { tiles: [tile('e-1', { post_id: 'gone', media_id: 'gone', media_url: '/gone.jpg' })] }), course('beta'), course('gamma')];
     cleanup();
@@ -204,9 +208,10 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     fireEvent.click(screen.getByLabelText('Open Course epsilon shot 1 of 14'));
     await waitFor(() => expect(f.open).toHaveBeenCalledTimes(3));
     expect(lastOpen().index).toBe(0);
+    expect(lastOpen().mediaId).toBe('mx');
   });
 
-  it('a processing video is skipped and the later indexes shift up', async () => {
+  it('a processing video is skipped and the later shot is selected by mediaId', async () => {
     f.gallery = {
       data: [
         post('post-alpha-1', [
@@ -223,11 +228,13 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     fireEvent.click(screen.getByLabelText('Open Course alpha shot 1 of 14'));
     await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
     const args = lastOpen();
-    expect(args.posts.map(p => p.id)).toEqual(['post-alpha-1::m1', 'post-alpha-1::v2', 'post-alpha-1::m2']);
-    expect(args.index).toBe(2);
+    expect(args.posts).toHaveLength(1);
+    expect(args.posts[0].mediaItems.map(item => item.id)).toEqual(['m1', 'v2', 'm2']);
+    expect(args.index).toBe(0);
+    expect(args.mediaId).toBe('m2');
   });
 
-  it('each page keeps the real post author and date; a business post credits its displayName', async () => {
+  it('each item keeps the real post author and month; a business post credits its displayName', async () => {
     f.gallery = {
       data: [
         post('post-alpha-1', [shot('m1')]),
@@ -238,14 +245,13 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     mount();
     fireEvent.click(screen.getByLabelText('Open Course alpha shot 1 of 14'));
     await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
-    const [first, second] = lastOpen().posts;
-    expect(first.displayName).toBe('Thomas Holmes');
-    expect(first.createdAt).toBe('2026-03-11T12:00:00Z');
-    expect(second.displayName).toBe('St Andrews Links');
-    expect(second.createdAt).toBe('2026-09-02T08:00:00Z');
+    const [run] = lastOpen().posts;
+    expect(run.displayName).toBe('Course alpha');
+    expect(run.createdAt).toBe('2026-09-02T08:00:00Z');
+    expect(run.mediaItems.map(item => item.credit)).toEqual(['Thomas Holmes · Mar 2026', 'St Andrews Links · Sep 2026']);
   });
 
-  it('video pages carry their media item unchanged, hls url included', async () => {
+  it('video items retain their playback fields, hls url included', async () => {
     f.gallery = {
       data: [
         post('post-alpha-1', [
@@ -258,9 +264,9 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     mount();
     fireEvent.click(screen.getByLabelText('Open Course alpha shot 1 of 14'));
     await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
-    const [hls, mp4] = lastOpen().posts;
-    expect(hls.mediaItems[0]).toMatchObject({ id: 'v1', type: 'video', hlsUrl: 'https://stream/v1.m3u8', thumbnailUrl: '/v1-poster.jpg' });
-    expect(mp4.mediaItems[0]).toMatchObject({ id: 'v2', type: 'video', mp4Url: '/v2.mp4' });
+    const [hls, mp4] = lastOpen().posts[0].mediaItems;
+    expect(hls).toMatchObject({ id: 'v1', type: 'video', hlsUrl: 'https://stream/v1.m3u8', thumbnailUrl: '/v1-poster.jpg' });
+    expect(mp4).toMatchObject({ id: 'v2', type: 'video', mp4Url: '/v2.mp4' });
   });
 
   it('while the open is pending the card dims and further taps are ignored', async () => {
