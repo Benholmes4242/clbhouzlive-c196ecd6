@@ -116,7 +116,7 @@ export async function fireInviteEmail(inviteId: string) {
   }
 }
 
-export function useCreateInvite(businessId: string) {
+export function useCreateInvite(businessId: string, options?: { successMessage?: string }) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -151,7 +151,7 @@ export function useCreateInvite(businessId: string) {
   });
 }
 
-export function useCreateInviteByUser(businessId: string) {
+export function useCreateInviteByUser(businessId: string, options?: { successMessage?: string }) {
   const queryClient = useQueryClient();
 
   return useMutation({
