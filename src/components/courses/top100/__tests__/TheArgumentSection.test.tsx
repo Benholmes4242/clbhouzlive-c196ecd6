@@ -24,10 +24,10 @@ const renderSection = (props: Partial<React.ComponentProps<typeof TheArgumentSec
     <TheArgumentSection
       higher={[]}
       lower={[]}
-      qualifying={7}
       showGolfersLink
       onSeeGolfersList={vi.fn()}
       {...props}
+
     />,
   );
 
@@ -54,12 +54,40 @@ describe('TheArgumentSection', () => {
     expect(screen.getByText('9')).toBeInTheDocument();
   });
 
-  it('the lede prints the qualifying count', () => {
-    renderSection({ higher: [row({})], qualifying: 14 });
+  it('the lede is one sentence and prints no qualifying count', () => {
+    const { container } = renderSection({ higher: [row({})] });
     expect(
-      screen.getByText(/Positions are out of the 14 courses on this list that golfers have rated\./),
+      screen.getByText("The courses that vary the most between the golfers' ratings and the official rankings."),
     ).toBeInTheDocument();
+    expect(container.textContent).not.toContain('19 courses');
+    expect(container.textContent).not.toContain('courses on this list');
   });
+
+  it('group labels are eyebrows with no coloured dot', () => {
+    renderSection({
+      higher: [row({})],
+      lower: [row({ id: 'c2', memberRank: 5, listRank: 2, divergence: -3 })],
+    });
+    for (const label of ['Golfers rate higher', 'Golfers rate lower']) {
+      const el = screen.getByText(label);
+      expect(el).toHaveStyle({
+        fontSize: '11px',
+        fontWeight: '700',
+        letterSpacing: '0.16em',
+        textTransform: 'uppercase',
+        color: A.MUTE,
+      });
+      // The dot element is gone: the label holds its text and nothing else.
+      expect(el.children).toHaveLength(0);
+      expect(el.querySelector('span')).toBeNull();
+    }
+    // Spacing kept: 18 before each group, 10 before its rows.
+    const group = screen.getByText('Golfers rate higher').parentElement as HTMLElement;
+    expect(group).toHaveStyle({ marginTop: '18px' });
+    const rows = group.querySelector('div[style*="grid-template-columns"]') as HTMLElement;
+    expect(rows).toHaveStyle({ marginTop: '10px' });
+  });
+
 
   it('a group with no rows renders no head', () => {
     renderSection({ higher: [row({})], lower: [] });
