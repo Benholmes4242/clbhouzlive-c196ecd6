@@ -3566,6 +3566,7 @@ export type Database = {
           reviewed_by: string | null
           status: string
           stream_id: string | null
+          tagged_by: string | null
           user_id: string
           width: number | null
         }
@@ -3593,6 +3594,7 @@ export type Database = {
           reviewed_by?: string | null
           status?: string
           stream_id?: string | null
+          tagged_by?: string | null
           user_id: string
           width?: number | null
         }
@@ -3620,6 +3622,7 @@ export type Database = {
           reviewed_by?: string | null
           status?: string
           stream_id?: string | null
+          tagged_by?: string | null
           user_id?: string
           width?: number | null
         }
@@ -19441,6 +19444,21 @@ export type Database = {
           worst_seen: string
         }[]
       }
+      admin_get_untagged_course_media: {
+        Args: { p_course_id: string }
+        Returns: {
+          created_at: string
+          duration_seconds: number
+          media_id: string
+          media_type: string
+          media_url: string
+          owner_id: string
+          owner_name: string
+          poster_url: string
+          source: string
+          stream_id: string
+        }[]
+      }
       admin_guard: { Args: never; Returns: undefined }
       admin_is_bot_ua: { Args: { p_ua: string }; Returns: boolean }
       admin_is_full: { Args: never; Returns: boolean }
@@ -19520,6 +19538,10 @@ export type Database = {
           slug: string
           user_id: string
         }[]
+      }
+      admin_tag_hole_media: {
+        Args: { p_course_id: string; p_hole_no: number; p_media_id: string }
+        Returns: string
       }
       admin_waitlist_summary: {
         Args: never
