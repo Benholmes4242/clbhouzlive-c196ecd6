@@ -13243,6 +13243,42 @@ export type Database = {
           },
         ]
       }
+      top100_golfer_rank_snapshots: {
+        Row: {
+          course_id: string
+          created_at: string
+          golfer_position: number
+          list_position: number
+          list_slug: string
+          qualifying: number
+          rating: number
+          rating_count: number
+          snapshot_date: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          golfer_position: number
+          list_position: number
+          list_slug: string
+          qualifying: number
+          rating: number
+          rating_count: number
+          snapshot_date: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          golfer_position?: number
+          list_position?: number
+          list_slug?: string
+          qualifying?: number
+          rating?: number
+          rating_count?: number
+          snapshot_date?: string
+        }
+        Relationships: []
+      }
       top100_lists: {
         Row: {
           created_at: string | null
@@ -19669,6 +19705,7 @@ export type Database = {
       capture_handicap_snapshot: { Args: never; Returns: undefined }
       capture_leaderboard_snapshot: { Args: never; Returns: undefined }
       capture_top100_alltime_snapshot: { Args: never; Returns: undefined }
+      capture_top100_golfer_ranks: { Args: never; Returns: number }
       capture_top100_snapshot: {
         Args: { p_season_id: string }
         Returns: undefined
@@ -23387,6 +23424,14 @@ export type Database = {
       get_top100_friends_snapshot: {
         Args: { target_user_id: string }
         Returns: Json
+      }
+      get_top100_golfer_rank_baseline: {
+        Args: { p_list_slug: string }
+        Returns: {
+          course_id: string
+          golfer_position: number
+          snapshot_date: string
+        }[]
       }
       get_top100_leaderboard: {
         Args: {

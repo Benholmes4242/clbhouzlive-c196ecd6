@@ -24,6 +24,7 @@ import { ArgumentShell, Top100CardListShell, YourHundredShell } from './top100/t
 export const TOP100_CARD_GAP = 24;
 import { argumentGroups, qualifyingCount } from './top100/theArgument';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
+import { useTop100GolferBaseline } from '@/hooks/top100/useTop100GolferBaseline';
 
 const LISTS = [
   { id: 'global', label: 'Global' },
@@ -233,6 +234,10 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
   });
   const { higher: argumentHigher, lower: argumentLower } = argumentGroups(argumentInputs);
   const argumentQualifying = qualifyingCount(argumentInputs);
+  /* BRIEF_TOP100_MONTHLY_MOVE: the golfers' order four weeks ago, for the
+     list the rows on screen belong to. Empty while loading or on error — the
+     section never waits on it. */
+  const argumentBaseline = useTop100GolferBaseline(renderedList);
   const listSectionRef = useRef<HTMLElement | null>(null);
   /* "See the golfers' list": switch the ranking and bring The list into view. */
   const seeGolfersList = () => {
@@ -332,6 +337,7 @@ const Top100CoursesHubPanel: React.FC<Props> = ({ shellTabs }) => {
           qualifying={argumentQualifying}
           showGolfersLink={ranking !== 'community'}
           onSeeGolfersList={seeGolfersList}
+          baseline={argumentBaseline}
         />
       ) : isLoading || enrichmentLoading ? (
         <ArgumentShell />

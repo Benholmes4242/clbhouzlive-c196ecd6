@@ -17,9 +17,12 @@ interface Props {
   qualifying: number;
   showGolfersLink: boolean;
   onSeeGolfersList: () => void;
+  /** BRIEF_TOP100_MONTHLY_MOVE: golfers' position four weeks ago, per course.
+   *  Absent or missing a course = no trend line, no reserved height. */
+  baseline?: Map<string, number>;
 }
 
-function ArgumentGroup({ label, tone, rows }: { label: string; tone: string; rows: ArgumentRow[] }) {
+function ArgumentGroup({ label, tone, rows, baseline }: { label: string; tone: string; rows: ArgumentRow[]; baseline?: Map<string, number> }) {
   if (rows.length === 0) return null;
   return (
     <div style={{ marginTop: 18 }}>
@@ -27,11 +30,16 @@ function ArgumentGroup({ label, tone, rows }: { label: string; tone: string; row
         <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: tone, flexShrink: 0 }} />
         {label}
       </div>
-      <div style={{ display: 'grid', gap: ARGUMENT_ROW_GAP, marginTop: 10 }}>
+      {/* minmax(0, 1fr): a long course name ellipsises instead of pushing the
+          right-hand column off the edge (the mock hit this with
+          "Royal County Down (Championship)"). */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: ARGUMENT_ROW_GAP, marginTop: 10 }}>
         {rows.map((r) => {
           const up = r.divergence > 0;
           const rowTone = up ? A.GREEN : A.RED;
           const Arrow = up ? ArrowUp : ArrowDown;
+          /* Positive = golfers moved it UP over the last four weeks. */
+          const move = baseline?.has(r.id) ? (baseline.get(r.id) as number) - r.memberRank : null;
           return (
             <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ width: ARGUMENT_THUMB.size, height: ARGUMENT_THUMB.size, borderRadius: ARGUMENT_THUMB.radius, overflow: 'hidden', flexShrink: 0 }}>
@@ -51,11 +59,25 @@ function ArgumentGroup({ label, tone, rows }: { label: string; tone: string; row
                   <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.listRank)}</b> on the official list
                 </div>
               </div>
-              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+              <div style={{ flexShrink: 0, textAlign: 'right' }}>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 17, fontWeight: 800, color: rowTone, fontVariantNumeric: 'tabular-nums' }}>
                   <Arrow size={14} strokeWidth={3} aria-hidden />
                   {Math.abs(r.divergence)}
                 </div>
+                {move !== null ? (
+                  <div
+                    style={{
+                      marginTop: 3,
+                      fontSize: 10,
+                      fontWeight: 600,
+                      whiteSpace: 'nowrap',
+                      fontVariantNumeric: 'tabular-nums',
+                      color: move > 0 ? A.GREEN : move < 0 ? A.RED : A.DIM,
+                    }}
+                  >
+                    {move > 0 ? `↑${move} this month` : move < 0 ? `↓${Math.abs(move)} this month` : 'No change'}
+                  </div>
+                ) : null}
               </div>
             </div>
           );
@@ -66,7 +88,7 @@ function ArgumentGroup({ label, tone, rows }: { label: string; tone: string; row
 }
 
 /** BRIEF_TOP100_GOLFERS_VS_OFFICIAL. The caller renders nothing when both groups are empty. */
-export function TheArgumentSection({ higher, lower, qualifying, showGolfersLink, onSeeGolfersList }: Props) {
+export function TheArgumentSection({ higher, lower, qualifying, showGolfersLink, onSeeGolfersList, baseline }: Props) {
   if (higher.length === 0 && lower.length === 0) return null;
   return (
     <section style={SECTION_WRAP}>
@@ -74,8 +96,8 @@ export function TheArgumentSection({ higher, lower, qualifying, showGolfersLink,
       <div style={{ marginTop: 8, fontSize: 12.5, lineHeight: 1.5, color: A.MUTE }}>
         {`The courses that vary the most between the golfers' ratings and the official rankings. Positions are out of the ${qualifying} courses on this list that golfers have rated.`}
       </div>
-      <ArgumentGroup label="Golfers rate higher" tone={A.GREEN} rows={higher} />
-      <ArgumentGroup label="Golfers rate lower" tone={A.RED} rows={lower} />
+      <ArgumentGroup label="Golfers rate higher" tone={A.GREEN} rows={higher} baseline={baseline} />
+      <ArgumentGroup label="Golfers rate lower" tone={A.RED} rows={lower} baseline={baseline} />
       {showGolfersLink ? (
         <button
           type="button"
