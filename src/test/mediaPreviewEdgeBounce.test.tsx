@@ -15,7 +15,7 @@ const items = [
 ];
 
 const swipeSurface = () => {
-  const el = document.querySelector('.fixed.inset-0 [style*="touch-action"]') as HTMLElement | null;
+  const el = document.querySelector('.fixed.inset-0 .absolute.inset-0.flex') as HTMLElement | null;
   expect(el).not.toBeNull();
   return el as HTMLElement;
 };
