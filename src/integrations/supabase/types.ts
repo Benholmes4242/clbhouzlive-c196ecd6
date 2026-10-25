@@ -20545,6 +20545,7 @@ export type Database = {
         Args: { p_business_id: string; p_user_profile_id: string }
         Returns: string
       }
+      get_business_audience: { Args: { p_business_id: string }; Returns: Json }
       get_business_insights: {
         Args: { p_business_id: string; p_days?: number }
         Returns: Json
