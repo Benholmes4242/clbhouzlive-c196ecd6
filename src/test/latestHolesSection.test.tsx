@@ -56,7 +56,7 @@ function mountTab(entry = '/courses/course?tab=media&hole=4&shot=selected') {
 
 
 function latest(id: string, overrides: Partial<LatestHoleMedia> = {}): LatestHoleMedia {
-  return { id, course_id: `course-${id}`, course_name: `Course ${id}`, hole_no: 4, media_type: 'image', media_url: `/photo-${id}.jpg`, poster_url: null, stream_id: null, duration_seconds: null, exif_captured_at: '2026-09-14T12:00:00Z', added_at: '2025-06-12T10:00:00Z', created_at: '2026-10-24T12:00:00Z', member_id: 'member', member_name: 'Thomas Holmes', par: 3, yards: 182, ...overrides };
+  return { id, course_id: `course-${id}`, course_name: `Course ${id}`, hole_no: 4, media_type: 'image', media_url: `/photo-${id}.jpg`, poster_url: null, stream_id: null, duration_seconds: null, exif_captured_at: '2026-09-14T12:00:00Z', added_at: '2025-06-12T10:00:00Z', created_at: '2026-10-24T12:00:00Z', member_id: 'member', member_name: 'Thomas Holmes', member_avatar_url: null, par: 3, yards: 182, ...overrides };
 }
 function mountRail() {
   const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -105,33 +105,34 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
   it('the kicker reads "Hole by hole"', () => {
     mountRail(); expect(screen.getByText('Hole by hole')).toBeInTheDocument(); expect(screen.getByText('Latest holes')).toBeInTheDocument();
   });
-  it('a tap fetches the hole shots and opens the canonical viewer readOnly on the tapped shot', async () => {
+  it('a tap opens the canonical viewer readOnly on the tapped shot across the whole rail', () => {
     mountRail(); fireEvent.click(screen.getByRole('button', { name: 'Hole 4, Course second' }));
-    await waitFor(() => expect(f.holeRpc).toHaveBeenCalledWith('get_hole_media', { p_course_id: 'course-second', p_hole_no: 4 }));
-    await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
-    const args = f.open.mock.calls[0][0] as { posts: Array<{ id: string; displayName: string; courseName?: string }>; index: number; mediaId: string | null; openedFrom: string; options?: { readOnly?: boolean } };
+    expect(f.holeRpc).not.toHaveBeenCalled();
+    expect(f.open).toHaveBeenCalledTimes(1);
+    const args = f.open.mock.calls[0][0] as { posts: Array<{ id: string; displayName: string; courseName?: string; mediaItems: Array<{ id: string }> }>; index: number; mediaId: string | null; openedFrom: string; options?: { readOnly?: boolean } };
     expect(args.posts).toHaveLength(1);
-    expect(args.posts[0].id).toBe('shots:hole:course-second:4');
+    expect(args.posts[0].id).toBe('shots:latest-holes');
+    expect(args.posts[0].mediaItems.map(item => item.id)).toEqual(['first', 'second', 'third']);
     expect(args.index).toBe(0);
     expect(args.mediaId).toBe('second');
     expect(args.openedFrom).toBe('course-media');
     expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
-    expect(args.posts[0].displayName).toBe('Course second · The fourth');
-    expect(args.posts[0].courseName).toBe('Course second');
+    expect(args.posts[0].displayName).toBe('Latest holes');
+    expect(args.posts[0].courseName).toBe('');
   });
   it('the section opens the canonical viewer, never MediaPreviewViewer', () => {
     const source = readFileSync(resolve(process.cwd(), 'src/components/courses/browse/LatestHolesSection.tsx'), 'utf8');
     expect(source).not.toContain('MediaPreviewViewer');
     expect(source).toContain('openWithOrigin');
   });
-  it('while the hole shots load the card dims and further taps are ignored', async () => {
+  it('a tap opens immediately with no network wait', () => {
     f.holeRpc.mockReturnValue(new Promise(() => {}));
     mountRail(); const card = screen.getByRole('button', { name: 'Hole 4, Course second' });
     fireEvent.click(card);
-    await waitFor(() => expect(card.style.opacity).toBe('0.7'));
+    expect(f.open).toHaveBeenCalledTimes(1);
+    expect(f.holeRpc).not.toHaveBeenCalled();
     fireEvent.click(card);
-    expect(f.holeRpc).toHaveBeenCalledTimes(1);
-    expect(f.open).not.toHaveBeenCalled();
+    expect(f.open).toHaveBeenCalledTimes(2);
   });
   it('Media deep link opens hole four with the selected shot, not its first shot', () => {
     f.rows = [photo(4, 'first'), photo(4, 'selected')]; mountTab();

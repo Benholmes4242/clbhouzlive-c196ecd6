@@ -25,7 +25,7 @@ vi.mock('@/video/VideoEngine', () => ({
   },
 }));
 
-import { holeShotsToFeedPosts, coursePostsToShotPosts, type MemberShotRow } from '@/lib/courseMedia/memberShotPosts';
+import { holeShotsToFeedPosts, coursePostsToShotPosts, latestHolesToFeedPosts, type MemberShotRow } from '@/lib/courseMedia/memberShotPosts';
 import { useVideoProgressWriter } from '@/video/useVideoProgressWriter';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -120,12 +120,14 @@ describe('coursePostsToShotPosts', () => {
 describe('member-shot caption payloads', () => {
   it('hole captions use ordinal, short course, scored facts, added month and member avatar', () => {
     const [post] = holeShotsToFeedPosts([shotRow('a', { hole_no: 15, par: 4, yards: 412, member_name: 'Benjamin Holmes', member_avatar_url: '/ben.jpg', added_at: '2026-01-11T10:00:00Z' })], 'Druids Glen Golf Club', 'course-1', 15);
-    expect(post.mediaItems[0].memberShot).toEqual({ kicker: 'The fifteenth', title: 'Druids Glen · Par 4 · 412 yards', credit: 'Benjamin Holmes · Jan 2026', avatarUrl: '/ben.jpg', memberName: 'Benjamin Holmes' });
+    expect(post.mediaItems[0].memberShot).toEqual({ kicker: 'The fifteenth', title: 'Druids Glen', detail: 'Par 4 · 412 yards', credit: 'Benjamin Holmes · Jan 2026', avatarUrl: '/ben.jpg', memberName: 'Benjamin Holmes' });
   });
   it('unscored captions keep the course variant alone; null yards are omitted', () => {
     const [post] = holeShotsToFeedPosts([shotRow('a', { par: null }), shotRow('b', { par: 4, yards: null })], 'Royal Portrush Golf Club (Dunluce)', 'course-1', 14);
     expect(post.mediaItems[0].memberShot?.title).toBe('Royal Portrush (Dunluce)');
-    expect(post.mediaItems[1].memberShot?.title).toBe('Royal Portrush (Dunluce) · Par 4');
+    expect(post.mediaItems[1].memberShot?.title).toBe('Royal Portrush (Dunluce)');
+    expect(post.mediaItems[0].memberShot?.detail).toBeUndefined();
+    expect(post.mediaItems[1].memberShot?.detail).toBe('Par 4');
   });
   it('course captions retain the card name and source post member, month and avatar', () => {
     const source = { courseId: 'course-1', courseName: 'Druids Glen Golf Club', displayName: 'Thomas Holmes', createdAt: '2026-03-11T10:00:00Z', avatarUrl: '/thomas.jpg', mediaItems: [{ id: 'a', type: 'image', imageUrl: '/a.jpg', width: 100, height: 100 }] } as FeedPost;
@@ -191,5 +193,26 @@ describe('syntheticPosts gates for synthetic post ids (BRIEF_SYNTHETIC_SHOT_GATE
       { onConflict: 'user_id,post_id' },
     );
     live.unmount();
+  });
+});
+
+
+describe('latestHolesToFeedPosts', () => {
+  it('carries ordered per-item course identity, avatar and scored detail across the rail', () => {
+    const [post] = latestHolesToFeedPosts([
+      shotRow('druids', { course_name: 'Druids Glen Golf Club', course_id: 'druids', hole_no: 15, par: 4, yards: 412, member_avatar_url: '/thomas.jpg' }),
+      shotRow('sundridge', { course_name: 'Sundridge Park Golf Club', course_id: 'sundridge', hole_no: 2, par: 3, yards: null, member_name: null }),
+    ]);
+    expect(post).toMatchObject({ id: 'shots:latest-holes', displayName: 'Latest holes', courseId: '', courseName: '' });
+    expect(post.mediaItems.map(item => item.id)).toEqual(['druids', 'sundridge']);
+    expect(post.mediaItems[0].memberShot).toEqual({ kicker: 'The fifteenth', title: 'Druids Glen', detail: 'Par 4 · 412 yards', credit: 'Thomas Holmes · Mar 2026', avatarUrl: '/thomas.jpg', memberName: 'Thomas Holmes', courseId: 'druids', courseName: 'Druids Glen Golf Club' });
+    expect(post.mediaItems[1].memberShot).toMatchObject({ kicker: 'The second', detail: 'Par 3', credit: 'Mar 2026', memberName: '', avatarUrl: null, courseId: 'sundridge', courseName: 'Sundridge Park Golf Club' });
+  });
+  it('skips null-duration videos without disturbing the remaining rail order', () => {
+    const streamId = 'b'.repeat(32);
+    const [post] = latestHolesToFeedPosts([shotRow('first'), shotRow('processing', { media_type: 'video', stream_id: streamId }), shotRow('ready', { media_type: 'video', stream_id: streamId, duration_seconds: 25 }), shotRow('last')]);
+    expect(post.mediaItems.map(item => item.id)).toEqual(['first', 'ready', 'last']);
+    expect(post.mediaItems[1]).toMatchObject({ type: 'video', streamId, duration: 25 });
+    expect(latestHolesToFeedPosts([])).toEqual([]);
   });
 });
