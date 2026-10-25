@@ -16,6 +16,7 @@ import type { HolePhotoRound } from '@/lib/courseMedia/holePhotoVerdict';
 import { HoleMediaThumbnail } from './HoleMediaVideo';
 import type { OwnMediaSource } from '@/lib/courseMedia/holePhotoData';
 import { holePhotoErrorMessage } from '@/lib/courseMedia/holePhotoError';
+import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
 import './hole-photo-fast.css';
 
 const theme = { '--hole-walk-ink': A.INK, '--hole-walk-canvas': A.CANVAS, '--hole-walk-muted': A.MUTE, '--hole-walk-rule': A.BORDER, '--hole-walk-track': A.TRACK, '--hole-photo-panel': A.PANEL, '--hole-photo-success': A.IMPROVED } as CSSProperties;
@@ -35,8 +36,8 @@ export function HoleKnownPhotoPath({ hole, photos, sources = [], pending, upload
   </DialogContent></Dialog>;
 }
 
-export function HolePhotoBatchPath({ photos, knownHoles, onTag, onClose }: {
-  photos: readonly (BatchPhoto & Partial<OwnMediaSource>)[]; rounds?: readonly HolePhotoRound[]; memberId?: string; courseId?: string; knownHoles: readonly number[];
+export function HolePhotoBatchPath({ photos, knownHoles, onTag, onClose, adminMode = false }: {
+  photos: readonly (BatchPhoto & Partial<OwnMediaSource> & { ownerName?: string })[]; rounds?: readonly HolePhotoRound[]; memberId?: string; courseId?: string; knownHoles: readonly number[]; adminMode?: boolean;
   onTag: (url: string, hole: number) => Promise<HolePhoto>; onClose: () => void;
 }) {
   const [state, setState] = useState(startBatch);
@@ -55,7 +56,17 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onClose }: {
       const next = advanceBatch({ ...state, floor: 0 }, photo.url, hole);
       setState({ ...next, floor: 0 }); setSelected(null);
       if (next.index >= photos.length) onClose();
-    } catch (error) { console.error('[hole-tag] failed', error); setError(holePhotoErrorMessage(error, `The ${photo.mediaType === 'video' ? 'video' : 'photo'} could not be tagged. The tag was not saved.`, photo.mediaType === 'video' ? 'video' : 'image')); }
+    } catch (error) {
+      if (adminMode && typeof error === 'object' && error !== null && 'code' in error && error.code === '23505') {
+        // Admin duplicates are stale list entries, not successful tags. Skip
+        // without assigning a hole; member duplicate handling stays unchanged.
+        const next = advanceBatch(state, photo.url, null);
+        setState(next); setSelected(null); setError('That shot is already tagged.');
+        if (next.index >= photos.length) onClose();
+      } else {
+        console.error('[hole-tag] failed', error); setError(holePhotoErrorMessage(error, `The ${photo.mediaType === 'video' ? 'video' : 'photo'} could not be tagged. The tag was not saved.`, photo.mediaType === 'video' ? 'video' : 'image'));
+      }
+    }
     finally { setPending(false); }
   };
   const skip = () => { if (!photo) return; const next = advanceBatch(state, photo.url, null); setState(next); setSelected(null); setError(null); if (next.index >= photos.length) onClose(); };
@@ -64,6 +75,7 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onClose }: {
     <DialogTitle className="hole-photo-fast-title">Which hole is this?</DialogTitle>
     <DialogDescription className="hole-photo-fast-lede">{capitalPhotoCount(photos.length)} photos or videos, oldest first. <strong>{capitalPhotoCount(state.index + 1)} of {spellPhotoCount(photos.length)}.</strong></DialogDescription>
     <div className="hole-photo-fast-thumbs">{photos.map((item, index) => <div key={item.url} className={`hole-photo-fast-photo ${index === state.index ? 'is-current' : ''}`}><HoleMediaThumbnail {...item} alt={item.mediaType === 'video' ? (index === state.index ? 'Current video' : 'Batch video') : (index === state.index ? 'Current photograph' : 'Batch photograph')} />{state.tags[item.url] != null && <span className="hole-photo-fast-tag">{state.tags[item.url]}</span>}</div>)}</div>
+    {adminMode && photo.ownerName && <p className="hole-photo-fast-lede" style={{ fontSize: 12.5, color: A.MUTE }}>{[photo.ownerName, addedMonthLabel(photo.createdAt)].filter(Boolean).join(' · ')}</p>}
     <HolePhotoPicker holeCount={knownHoles.length} knownHoleNumbers={knownHoles} selectedHole={selected} usedHoles={Object.values(state.tags)} onSelect={hole => { void advance(hole); }} />
     {error && <p role="alert" className="hole-photo-fast-lede">{error}</p>}
     <Button variant="ghost" className="hole-photo-fast-action hole-photo-fast-skip" disabled={pending} onClick={skip}>Skip this one</Button>

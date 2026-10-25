@@ -40,6 +40,7 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Latest holes rail query/order/geometry ownership: see LatestHolesSection.tsx header; Media consumes initial URL focus once and HoleWalk retains shot fallback ownership.
 - Leaders' group round selection ownership: see leadersGroupRules.ts header; shared board helpers remain authoritative for score and thru cells.
 - Insights visits/source snapshot and UTC bucket ownership: see InsightsVisitsSection.tsx and visitBuckets.ts headers; club analytics remains independent.
+- Admin hole tagging is an opt-in batch mode backed only by the admin RPCs; AdminHoleTagging.tsx owns attribution and cache refresh so member writes stay untouched.
 
 ## Briefs
 

@@ -14,6 +14,7 @@ import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import { useHolePhotoTagging } from './hooks/useHolePhotoTagging';
 import { HolePhotoTagDialog } from './HolePhotoTagDialog';
+import { AdminHoleTagging } from './AdminHoleTagging';
 import { capitalPhotoCount, holeMediaKey, holeSourceUrl, type OwnMediaSource, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { HoleWalk } from './HoleWalk';
 import { courseWalkHoles } from '@/lib/courseMedia/holeWalk';
@@ -227,6 +228,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
           {fastError && addHole == null && <p role="alert" className="text-sm">{fastError}</p>}
         </section>
       )}
+      <AdminHoleTagging key={courseId} courseId={courseId} knownHoles={knownHoles} />
       {photoState === 'A' && <CourseMediaNoHoleList courseName={courseName} photoCount={mediaCounts.photos}>
         <CourseMediaCanonGrid posts={posts} postsForFullscreen={postsForFullscreen} isLoading={isLoading} isError={isError} hasNextPage={hasNextPage ?? false} isFetchingNextPage={isFetchingNextPage} fetchNextPage={fetchNextPage} refetch={refetch} courseName={courseName} courseId={courseId} noHolePreviewCount={mediaCounts.total} />
       </CourseMediaNoHoleList>}
