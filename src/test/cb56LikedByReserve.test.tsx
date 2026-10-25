@@ -24,7 +24,7 @@ vi.mock('@/store/clubhouseStore', () => ({
 }));
 vi.mock('@/stores/reviewSheetStore', () => ({ useReviewSheetStore: () => vi.fn() }));
 vi.mock('@/hooks/useReviewerStats', () => ({ useReviewerStats: () => ({ data: null }) }));
-vi.mock('@/hooks/useManageableBusinessIds', () => ({ useManageableBusinessIds: () => [] }));
+vi.mock('@/hooks/useManageableBusinessIds', () => ({ useManageableBusinessIds: () => [], useTeamBusinessIds: () => [] }));
 vi.mock('@/lib/impressions/useImpressionObserver', () => ({ useImpressionObserver: () => {} }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: () => ({ select: () => Promise.resolve({ data: [], error: null }) }) } }));
 vi.mock('@/components/feed/FeedActorPicker', () => ({
