@@ -225,12 +225,5 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       </p>}
       {!tile && !scored && <p className="hole-walk-quiet">No rounds have been posted here yet, so par and yardage are still to come. They fill in with the first tracked round.</p>}
     </section>
-    {viewerIndex != null && tile && viewerItems.length > 0 && <MediaPreviewViewer
-      items={viewerItems}
-      initialIndex={viewerIndex}
-      onClose={() => setViewerIndex(null)}
-      onIndexChange={index => { const photo = playable[index]; if (photo) setPhotoId(photo.id); }}
-      edgeBounce
-    />}
   </div>;
 }
