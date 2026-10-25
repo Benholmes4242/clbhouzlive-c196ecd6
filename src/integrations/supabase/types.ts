@@ -3543,6 +3543,7 @@ export type Database = {
       }
       course_hole_media: {
         Row: {
+          added_at: string
           auto_confidence: number | null
           auto_notes: string | null
           auto_verdict: string | null
@@ -3569,6 +3570,7 @@ export type Database = {
           width: number | null
         }
         Insert: {
+          added_at?: string
           auto_confidence?: number | null
           auto_notes?: string | null
           auto_verdict?: string | null
@@ -3595,6 +3597,7 @@ export type Database = {
           width?: number | null
         }
         Update: {
+          added_at?: string
           auto_confidence?: number | null
           auto_notes?: string | null
           auto_verdict?: string | null
