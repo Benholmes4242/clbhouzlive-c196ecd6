@@ -103,8 +103,24 @@ describe('CB79 suggestions', () => {
     expect(texts).toEqual(['Home club: Hartwell Heath', 'Follow Hartwell Heath']);
     expect(screen.getByText('Olivia Brennan')).toBeTruthy();
     expect(screen.getByText('@oliviab · plays here')).toBeTruthy();
-    expect(screen.getByText('@katesims · followed this week')).toBeTruthy();
-    expect(screen.getByText('@priyanair · followed in August 2025')).toBeTruthy();
+    // CB79.1: follower rows carry only the handle; the heading says why.
+    expect(screen.getByText('@katesims')).toBeTruthy();
+    expect(screen.getByText('@priyanair')).toBeTruthy();
+  });
+
+  it('keeps the server order within each group without re-sorting', async () => {
+    mocks.suggestions = [
+      { user_id: 'u-b', display_name: 'Beta', username: 'beta', profile_photo_url: null, reason: 'home_club', followed_at: null },
+      { user_id: 'u-a', display_name: 'Alpha', username: 'alpha', profile_photo_url: null, reason: 'home_club', followed_at: null },
+      { user_id: 'u-z', display_name: 'Zulu', username: 'zulu', profile_photo_url: null, reason: 'follower', followed_at: null },
+      { user_id: 'u-m', display_name: 'Mike', username: 'mike', profile_photo_url: null, reason: 'follower', followed_at: null },
+    ];
+    mount();
+    await screen.findByText('Alpha');
+    const names = Array.from(document.querySelectorAll('main section span span')).map((el) => el.textContent);
+    const order = ['Beta', 'Alpha', 'Zulu', 'Mike'].map((n) => names.indexOf(n));
+    expect(order.every((i) => i >= 0)).toBe(true);
+    expect(order).toEqual([...order].sort((a, b) => a - b));
   });
 
   it('skips a group with nobody in it', async () => {
