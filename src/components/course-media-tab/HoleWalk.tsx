@@ -12,8 +12,8 @@ import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/ab
  * EXIF. The panel never plays video inline — a ready video slide is its
  * poster plus a decorative glass disc, and playback lives in the fullscreen
  * viewer. */
-import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { Fragment, useContext, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { QueryClientContext } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { A, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
@@ -44,7 +44,8 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
   focus?: { hole: number; id: string; nonce: number } | null;
   scored?: boolean;
 }) {
-  const queryClient = useQueryClient();
+  // The grid itself performs no reads; only viewer taps require the app cache.
+  const queryClient = useContext(QueryClientContext);
   const openingRef = useRef(false);
   const [selected, setSelected] = useState<number | null>(null);
   const [photoId, setPhotoId] = useState<string | null>(null);
@@ -134,7 +135,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
   // on the tapped shot when the viewer closes (it has no index callback).
   const openViewer = async (id: string) => {
     const index = playable.findIndex(photo => photo.id === id);
-    if (index < 0 || openingRef.current) return;
+    if (index < 0 || openingRef.current || !queryClient) return;
     const tapped = playable[index];
     openingRef.current = true;
     try {

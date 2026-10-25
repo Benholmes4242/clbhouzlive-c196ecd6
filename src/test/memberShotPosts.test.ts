@@ -47,7 +47,7 @@ describe('holeShotsToFeedPosts', () => {
     expect(post.displayName).toBe('Royal Portrush (Dunluce) · The fourteenth');
     expect(post.avatarUrl).toBe('/course.jpg');
     expect(post.mediaItems.map(item => item.id)).toEqual(['a', 'b', 'c']);
-    expect(post.mediaItems.map(item => item.credit)).toEqual(['Thomas Holmes · Mar 2026', 'Benjamin Holmes · Jun 2026', 'Thomas Holmes · Mar 2026']);
+    expect(post.mediaItems.map(item => item.memberShot?.credit)).toEqual(['Thomas Holmes · Mar 2026', 'Benjamin Holmes · Jun 2026', 'Thomas Holmes · Mar 2026']);
     expect(post.courseName).toBe('Royal Portrush (Dunluce)');
     expect(post.courseId).toBe('course-1');
     expect([post.likeCount, post.commentCount, post.shareCount]).toEqual([0, 0, 0]);
@@ -89,7 +89,7 @@ describe('coursePostsToShotPosts', () => {
     expect(posts[0].displayName).toBe('Course');
     expect(posts[0].avatarUrl).toBe('/course.jpg');
     expect(posts[0].mediaItems.map(item => item.id)).toEqual(['m1', 'm2', 'm3', 'm4', 'm5']);
-    expect(posts[0].mediaItems.map(item => item.credit)).toEqual(['Thomas Holmes · Mar 2026', 'Thomas Holmes · Mar 2026', 'Thomas Holmes · Mar 2026', 'St Andrews Links · Sep 2026', 'St Andrews Links · Sep 2026']);
+    expect(posts[0].mediaItems.map(item => item.memberShot?.credit)).toEqual(['Thomas Holmes · Mar 2026', 'Thomas Holmes · Mar 2026', 'Thomas Holmes · Mar 2026', 'St Andrews Links · Sep 2026', 'St Andrews Links · Sep 2026']);
     expect(posts[0].createdAt).toBe('2026-09-02T08:00:00Z');
     expect(posts[0].review).toBeNull();
     expect(posts[0].caption).toBe('');
@@ -113,7 +113,23 @@ describe('coursePostsToShotPosts', () => {
     expect(holeShotsToFeedPosts([])).toEqual([]);
     const posts = holeShotsToFeedPosts([shotRow('a', { member_name: null, added_at: null }), shotRow('b', { member_name: null, added_at: '2026-03-31T23:30:00-02:00' })], 'Course', 'course-1', 1);
     expect(posts[0].avatarUrl).toBe('');
-    expect(posts[0].mediaItems.map(item => item.credit)).toEqual(['', 'Apr 2026']);
+    expect(posts[0].mediaItems.map(item => item.memberShot?.credit)).toEqual(['', 'Apr 2026']);
+  });
+});
+
+describe('member-shot caption payloads', () => {
+  it('hole captions use ordinal, short course, scored facts, added month and member avatar', () => {
+    const [post] = holeShotsToFeedPosts([shotRow('a', { hole_no: 15, par: 4, yards: 412, member_name: 'Benjamin Holmes', member_avatar_url: '/ben.jpg', added_at: '2026-01-11T10:00:00Z' })], 'Druids Glen Golf Club', 'course-1', 15);
+    expect(post.mediaItems[0].memberShot).toEqual({ kicker: 'The fifteenth', title: 'Druids Glen · Par 4 · 412 yards', credit: 'Benjamin Holmes · Jan 2026', avatarUrl: '/ben.jpg', memberName: 'Benjamin Holmes' });
+  });
+  it('unscored captions keep the course variant alone; null yards are omitted', () => {
+    const [post] = holeShotsToFeedPosts([shotRow('a', { par: null }), shotRow('b', { par: 4, yards: null })], 'Royal Portrush Golf Club (Dunluce)', 'course-1', 14);
+    expect(post.mediaItems[0].memberShot?.title).toBe('Royal Portrush (Dunluce)');
+    expect(post.mediaItems[1].memberShot?.title).toBe('Royal Portrush (Dunluce) · Par 4');
+  });
+  it('course captions retain the card name and source post member, month and avatar', () => {
+    const source = { courseId: 'course-1', courseName: 'Druids Glen Golf Club', displayName: 'Thomas Holmes', createdAt: '2026-03-11T10:00:00Z', avatarUrl: '/thomas.jpg', mediaItems: [{ id: 'a', type: 'image', imageUrl: '/a.jpg', width: 100, height: 100 }] } as FeedPost;
+    expect(coursePostsToShotPosts([source])[0].mediaItems[0].memberShot).toEqual({ kicker: "Through members' eyes", title: 'Druids Glen Golf Club', credit: 'Thomas Holmes · Mar 2026', avatarUrl: '/thomas.jpg', memberName: 'Thomas Holmes' });
   });
 });
 
