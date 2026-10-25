@@ -167,12 +167,10 @@ function mountWithArgument() {
 }
 
 describe('BRIEF_TOP100_GOLFERS_VS_OFFICIAL — panel wiring', () => {
-  it('the link shows when ranking is official, and clicking it switches the dropdown to Community rating', () => {
+  it('the section renders no golfers-list link and the ranking trigger still reads Official rating', () => {
     mountWithArgument();
     expect(screen.getByText('Official rating')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /See the golfers' list/ }));
-    expect(screen.getByText('Community rating')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /See the golfers' list/ })).toBeNull();
+    expect(screen.queryByText(/See the golfers' list/)).toBeNull();
   });
 
   it('switching the active list from Global to GB&I recomputes both groups', () => {
