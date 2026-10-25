@@ -86,8 +86,11 @@ export function MediaPreviewViewer({
     onSwipeEnd: edgeBounce ? () => {
       const from = edgeOffsetRef.current;
       if (!from) return;
-      const start = performance.now();
+      // The clock comes from the first rAF tick, not performance.now(): the
+      // rAF timestamp origin is not guaranteed to match it.
+      let start: number | null = null;
       const tick = (now: number) => {
+        if (start === null) start = now;
         const t = Math.min(1, (now - start) / EDGE_BOUNCE_MS);
         const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
         setEdgeOffset(t >= 1 ? 0 : from * (1 - eased));
