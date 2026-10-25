@@ -210,7 +210,7 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
         post('post-alpha-1', [
           shot('m1'),
           shot('v1', { type: 'video', isProcessing: true, thumbnailUrl: '/v1.jpg' }),
-          shot('v2', { type: 'video', thumbnailUrl: '/v2.jpg' }),
+          shot('v2', { type: 'video', hlsUrl: 'https://stream/v2.m3u8', thumbnailUrl: '/v2.jpg' }),
           shot('m2'),
         ]),
       ],
