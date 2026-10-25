@@ -1,14 +1,17 @@
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 const hls = vi.hoisted(() => ({ attach: vi.fn(() => ({ detach: vi.fn() })) }));
-const f = vi.hoisted(() => ({ open: vi.fn() }));
+const f = vi.hoisted(() => ({ open: vi.fn(), rpc: vi.fn() }));
 vi.mock('@/components/explore-tab-new/courseled/tileHlsPlayer', () => ({ attachTileHls: hls.attach }));
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: (...args: unknown[]) => f.open(...args) }));
+
+vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: (...args: unknown[]) => f.rpc(...args) } }));
 
 import { HoleWalk } from '@/components/course-media-tab/HoleWalk';
 import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
@@ -29,7 +32,9 @@ const video = (id: string, duration: number | null): HolePhoto => shot(id, {
 const authors = new Map([['u1', 'Thomas Holmes'], ['u2', 'Benjamin Holmes']]);
 
 const walk = (rows: HolePhoto[], props: Partial<Parameters<typeof HoleWalk>[0]> = {}) => {
-  const view = render(<HoleWalk available holes={[hole(14)]} rows={rows} totalMedia={rows.length} courseName="Royal Portrush Golf Club (Dunluce)" authors={authors} onAddFirst={() => {}} {...props} />);
+  const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  f.rpc.mockResolvedValue({ data: rows.map(row => ({ ...row, member_id: row.user_id, member_name: authors.get(row.user_id), par: 4, yards: 432 })), error: null });
+  const view = render(<QueryClientProvider client={cache}><HoleWalk available holes={[hole(14)]} rows={rows} totalMedia={rows.length} courseName="Royal Portrush Golf Club (Dunluce)" authors={authors} onAddFirst={() => {}} {...props} /></QueryClientProvider>);
   fireEvent.click(screen.getByRole('button', { name: 'Hole 14' }));
   return view;
 };
@@ -87,10 +92,10 @@ describe('BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS hole walk fullscreen', () => {
     options?: { readOnly?: boolean };
   };
 
-  it('tapping the second slide opens the canonical viewer readOnly on that shot, credited to its member', () => {
+  it('tapping the second slide opens the canonical viewer readOnly on that shot, credited to its member', async () => {
     walk([shot('a'), shot('b', { user_id: 'u2', added_at: '2026-06-02T09:00:00Z' }), video('c', 42)]);
     fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[1] as HTMLElement);
-    expect(f.open).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
     const args = lastOpen();
     expect(args.posts).toHaveLength(1);
     expect(args.posts[0].mediaItems.map(item => item.id)).toEqual(['a', 'b', 'c']);
@@ -102,31 +107,31 @@ describe('BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS hole walk fullscreen', () => {
     expect(args.posts[0].courseName).toBe('Royal Portrush Golf Club (Dunluce)');
   });
 
-  it('a processing video slide does not open the viewer and is not in its posts', () => {
+  it('a processing video slide does not open the viewer and is not in its posts', async () => {
     walk([shot('a'), video('p', null)]);
     fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[1] as HTMLElement);
     expect(f.open).not.toHaveBeenCalled();
     fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[0] as HTMLElement);
-    expect(f.open).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
     expect(lastOpen().posts).toHaveLength(1);
     expect(lastOpen().posts[0].mediaItems.map(item => item.id)).toEqual(['a']);
     expect(lastOpen().posts[0].displayName).toBe('Royal Portrush Golf Club (Dunluce) · The fourteenth');
   });
 
-  it('opening the viewer leaves the frame where it was', () => {
+  it('opening the viewer leaves the frame where it was', async () => {
     walk([shot('a'), shot('b', { user_id: 'u2', added_at: '2026-06-02T09:00:00Z' }), video('c', 42)]);
     fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[1] as HTMLElement);
-    expect(f.open).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
     expect(lastOpen().index).toBe(0);
     expect(lastOpen().mediaId).toBe('b');
     expect(panel().querySelector('.hole-walk-frame-count')?.textContent).toBe('1 / 3');
     expect(screen.getByRole('button', { name: 'Show shot 1 of 3' })).toHaveAttribute('aria-current', 'true');
   });
 
-  it('a video shot reaches the viewer with its stream hlsUrl', () => {
+  it('a video shot reaches the viewer with its stream hlsUrl', async () => {
     walk([video('c', 42)]);
     fireEvent.click(panel().querySelector('.hole-walk-slide') as HTMLElement);
-    expect(f.open).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
     const item = lastOpen().posts[0].mediaItems[0];
     expect(item.type).toBe('video');
     expect(item.hlsUrl).toContain('/manifest/video.m3u8');

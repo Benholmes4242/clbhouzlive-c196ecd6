@@ -1,11 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 
-const f = vi.hoisted(() => ({ from: vi.fn(), auth: vi.fn(), insert: vi.fn(), attach: vi.fn(), detach: vi.fn(), posts: [] as Record<string, unknown>[], reviews: [] as Record<string, unknown>[], open: vi.fn() }));
-vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: f.from, auth: { getUser: f.auth } } }));
+const f = vi.hoisted(() => ({ rpc: vi.fn(), from: vi.fn(), auth: vi.fn(), insert: vi.fn(), attach: vi.fn(), detach: vi.fn(), posts: [] as Record<string, unknown>[], reviews: [] as Record<string, unknown>[], open: vi.fn() }));
+vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: f.rpc, from: f.from, auth: { getUser: f.auth } } }));
 vi.mock('@/components/explore-tab-new/courseled/tileHlsPlayer', () => ({ attachTileHls: f.attach }));
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: (...args: unknown[]) => f.open(...args) }));
 import { canTagHolePhoto, fetchOwnMediaSources, submitHolePhoto } from '@/lib/courseMedia/holePhotoData';
@@ -41,8 +42,10 @@ describe('Stage1 encoded hole-video sources', () => {
   it('processing video is not eligible', () => expect(canTagHolePhoto({ ...post, mediaItems: [{ ...post.mediaItems[0], isProcessing: true }] }, 'member', 1, new Set())).toBe(false));
 });
 describe('Stage1 hole video display and lifecycle', () => {
-  it('video-only hole uses poster and count one and opens the viewer with the stream', () => {
-    render(<HoleWalk available holes={[hole]} rows={[row]} totalMedia={1} onAddFirst={() => {}} />);
+  it('video-only hole uses poster and count one and opens the viewer with the stream', async () => {
+    const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    f.rpc.mockResolvedValue({ data: [{ ...row, member_id: row.user_id, member_avatar_url: null }], error: null });
+    render(<QueryClientProvider client={cache}><HoleWalk available holes={[hole]} rows={[row]} totalMedia={1} onAddFirst={() => {}} /></QueryClientProvider>);
     const tile = screen.getByRole('button', { name: 'Hole 7' });
     expect(tile.querySelector('img')).toHaveAttribute('src', '/poster.jpg');
     expect(tile.querySelector('.hole-walk-count')).toHaveTextContent('1');
@@ -53,7 +56,7 @@ describe('Stage1 hole video display and lifecycle', () => {
     expect(slide.querySelector('img')).toHaveAttribute('src', '/poster.jpg');
     expect(slide.querySelector('.hole-walk-play-disc')).toBeTruthy();
     fireEvent.click(slide);
-    expect(f.open).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
     const args = f.open.mock.calls[0][0] as { posts: Array<{ mediaItems: Array<{ type: string; hlsUrl?: string }> }>; options?: { readOnly?: boolean } };
     expect(args.posts).toHaveLength(1);
     expect(args.posts[0].mediaItems[0].type).toBe('video');
