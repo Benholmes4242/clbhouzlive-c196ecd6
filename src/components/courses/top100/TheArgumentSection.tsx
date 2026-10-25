@@ -14,7 +14,7 @@ export const ARGUMENT_ROW_GAP = 12;
 interface Props {
   higher: ArgumentRow[];
   lower: ArgumentRow[];
-  qualifying: number;
+
   showGolfersLink: boolean;
   onSeeGolfersList: () => void;
   /** BRIEF_TOP100_MONTHLY_MOVE: golfers' position four weeks ago, per course.
@@ -22,14 +22,16 @@ interface Props {
   baseline?: Map<string, number>;
 }
 
-function ArgumentGroup({ label, tone, rows, baseline }: { label: string; tone: string; rows: ArgumentRow[]; baseline?: Map<string, number> }) {
+function ArgumentGroup({ label, rows, baseline }: { label: string; rows: ArgumentRow[]; baseline?: Map<string, number> }) {
   if (rows.length === 0) return null;
   return (
     <div style={{ marginTop: 18 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.BODY }}>
-        <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: tone, flexShrink: 0 }} />
+      {/* The Courses page eyebrow (the SectionHead 'quiet' tone): the coloured
+          dot is gone, so the label carries no tone of its own. */}
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', lineHeight: 1, color: A.MUTE }}>
         {label}
       </div>
+
       {/* minmax(0, 1fr): a long course name ellipsises instead of pushing the
           right-hand column off the edge (the mock hit this with
           "Royal County Down (Championship)"). */}
@@ -88,16 +90,20 @@ function ArgumentGroup({ label, tone, rows, baseline }: { label: string; tone: s
 }
 
 /** BRIEF_TOP100_GOLFERS_VS_OFFICIAL. The caller renders nothing when both groups are empty. */
-export function TheArgumentSection({ higher, lower, qualifying, showGolfersLink, onSeeGolfersList, baseline }: Props) {
+export function TheArgumentSection({ higher, lower, showGolfersLink, onSeeGolfersList, baseline }: Props) {
   if (higher.length === 0 && lower.length === 0) return null;
   return (
     <section style={SECTION_WRAP}>
       <SectionHead kicker="Golfers versus the official list" title="Where the ratings and the rankings differ" />
-      <div style={{ marginTop: 8, fontSize: 12.5, lineHeight: 1.5, color: A.MUTE }}>
-        {`The courses that vary the most between the golfers' ratings and the official rankings. Positions are out of the ${qualifying} courses on this list that golfers have rated.`}
+      {/* Sub-line geometry matches "The list" ("Ranked by clbhouz members'
+          average rating."): 8 / 12 / 1.4 / A.DIM. The qualifying count is no
+          longer printed. */}
+      <div style={{ marginTop: 8, fontSize: 12, lineHeight: 1.4, color: A.DIM }}>
+        The courses that vary the most between the golfers' ratings and the official rankings.
       </div>
-      <ArgumentGroup label="Golfers rate higher" tone={A.GREEN} rows={higher} baseline={baseline} />
-      <ArgumentGroup label="Golfers rate lower" tone={A.RED} rows={lower} baseline={baseline} />
+      <ArgumentGroup label="Golfers rate higher" rows={higher} baseline={baseline} />
+      <ArgumentGroup label="Golfers rate lower" rows={lower} baseline={baseline} />
+
       {showGolfersLink ? (
         <button
           type="button"
