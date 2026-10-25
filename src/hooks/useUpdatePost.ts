@@ -270,16 +270,19 @@ export function useUpdatePost() {
         }
       }
 
-      // 2. Patch the post row.
-      const { error: postError } = await supabase
+      // 2. Patch the post row. BIZ_POSTS_V1: an RLS refusal affects 0 rows
+      //    without erroring — treat that as a failure.
+      const { data: patched, error: postError } = await supabase
         .from('posts')
         .update({
           content: caption?.length ? caption : null,
           visibility,
           course_id: primaryCourseId,
         })
-        .eq('id', postId);
+        .eq('id', postId)
+        .select('id');
       if (postError) throw postError;
+      if (!patched?.length) throw new Error(POST_CHANGE_REFUSED);
 
       // 2b. Mentions v2 — diff-sync mention rows against the new caption.
       // Removed markup → DELETE (no notification); added → INSERT (single
