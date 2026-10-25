@@ -564,6 +564,7 @@ export function FullscreenFeedOverlay() {
       : null,
     userId,
     manageableBusinessIds,
+    teamBusinessIds,
   );
   const openReviewSheet = useReviewSheetStore((s) => s.open);
   const { data: reviewerStats } = useReviewerStats(activePost?.userId);

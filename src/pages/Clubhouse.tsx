@@ -477,6 +477,7 @@ const ClubhouseContent = () => {
       : null,
     user?.id,
     manageableBusinessIds,
+    teamBusinessIds,
   );
 
   // ── Review tap handler ──
