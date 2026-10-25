@@ -128,6 +128,8 @@ interface OpenWithOriginArgs {
     fetchNextPage?: () => void;
     isFetchingNextPage?: boolean;
     readOnly?: boolean;
+    /** Member-shot opens only: synthetic post ids, so post-keyed requests stay off. */
+    syntheticPosts?: boolean;
   };
 }
 

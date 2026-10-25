@@ -124,7 +124,7 @@ export function LatestHolesSection() {
       posterUrl: pending.media_type === 'video' ? holeMediaPoster(pending) : pending.media_url,
       mediaId: posts[start].mediaItems[0]?.id ?? null,
       openedFrom: 'course-media',
-      options: { readOnly: true },
+      options: { readOnly: true, syntheticPosts: true },
     });
     setPending(null);
   }, [holeQuery.data, holeQuery.isError, pending]);

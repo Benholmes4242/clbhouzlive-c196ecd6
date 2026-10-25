@@ -96,7 +96,7 @@ describe('BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS hole walk fullscreen', () => {
     expect(args.index).toBe(1);
     expect(args.mediaId).toBe('b');
     expect(args.openedFrom).toBe('course-media');
-    expect(args.options).toEqual({ readOnly: true });
+    expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
     expect(args.posts[1].displayName).toBe('Benjamin Holmes');
     expect(args.posts[1].courseName).toBe('Royal Portrush Golf Club (Dunluce)');
   });

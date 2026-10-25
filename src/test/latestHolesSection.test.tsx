@@ -114,7 +114,7 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     expect(args.index).toBe(1);
     expect(args.mediaId).toBe('second');
     expect(args.openedFrom).toBe('course-media');
-    expect(args.options).toEqual({ readOnly: true });
+    expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
     expect(args.posts[1].displayName).toBe('Thomas Holmes');
     expect(args.posts[1].courseName).toBe('Course second');
   });

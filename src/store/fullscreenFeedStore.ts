@@ -91,6 +91,11 @@ interface OpenOptions {
    *  Used by course-detail media entry points. Defaults false so Clubhouse
    *  and deep-link openers keep social actions. */
   readOnly?: boolean;
+  /** BRIEF_SYNTHETIC_SHOT_GATES — the posts carry synthetic ids (member-shot
+   *  rails), so post-keyed requests (impressions, scorecard lookup, video
+   *  progress) must not fire. Distinct from readOnly: real-post gallery opens
+   *  are readOnly but keep all three. Only member-shot opens set this. */
+  syntheticPosts?: boolean;
   /** Two-way resume: seconds to seek fullscreen lane to on first paint. */
   startPosition?: number;
   /** Positional media index within the opening post. Kept as a cheap
@@ -129,6 +134,7 @@ export interface FullscreenEntry {
   startIndex: number;
   activeIndex: number;
   readOnly: boolean;
+  syntheticPosts: boolean;
   openedFrom: string | null;
   zIndex: number;
   mediaIndex: number;
@@ -155,6 +161,7 @@ interface FullscreenFeedState {
   fetchNextPage: (() => void) | null;
   isFetchingNextPage: boolean;
   readOnly: boolean;
+  syntheticPosts: boolean;
   origin: OpenOrigin | null;
   startPosition: number;
   mediaIndex: number;
@@ -235,6 +242,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
   fetchNextPage: null,
   isFetchingNextPage: false,
   readOnly: false,
+  syntheticPosts: false,
   origin: null,
   startPosition: 0,
   mediaIndex: 0,
@@ -365,6 +373,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
           startIndex: prev.startIndex,
           activeIndex: prev.activeIndex,
           readOnly: prev.readOnly,
+          syntheticPosts: prev.syntheticPosts,
           openedFrom: prev.openedFrom,
           zIndex: prev.zIndex,
           mediaIndex: prev.mediaIndex,
@@ -387,6 +396,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       fetchNextPage: options?.fetchNextPage ?? null,
       isFetchingNextPage: options?.isFetchingNextPage ?? false,
       readOnly: !!options?.readOnly,
+      syntheticPosts: !!options?.syntheticPosts,
       origin: options?.origin ?? null,
       startPosition: options?.startPosition ?? 0,
       mediaIndex: options?.mediaIndex ?? 0,
@@ -541,6 +551,7 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       fetchNextPage: null,
       isFetchingNextPage: false,
       readOnly: false,
+      syntheticPosts: false,
       origin: null,
       startPosition: 0,
       mediaIndex: 0,

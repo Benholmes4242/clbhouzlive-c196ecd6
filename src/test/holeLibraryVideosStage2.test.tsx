@@ -121,6 +121,6 @@ describe('Stage 2 encode display', () => {
     const args = f.open.mock.calls[0][0] as { posts: Array<{ mediaItems: Array<{ type: string }> }>; options?: { readOnly?: boolean } };
     expect(args.posts).toHaveLength(1);
     expect(args.posts[0].mediaItems[0].type).toBe('video');
-    expect(args.options).toEqual({ readOnly: true });
+    expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
   });
 });
