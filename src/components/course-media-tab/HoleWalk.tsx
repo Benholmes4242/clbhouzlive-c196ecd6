@@ -17,6 +17,7 @@ import { capitalPhotoCount, holeMediaPoster } from '@/lib/courseMedia/holePhotoD
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
 import { buildHoleViewerItems } from '@/lib/courseMedia/holeViewerItems';
 import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
+import type { OrderedMediaItem } from '@/components/shared/media/types';
 import { HoleMediaThumbnail } from './HoleMediaVideo';
 import { captureMonthLabel, deriveHoleWalk, holeOrdinal, holePhotoMonths } from '@/lib/courseMedia/holeWalk';
 import './hole-walk.css';
@@ -216,6 +217,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       initialIndex={viewerIndex}
       onClose={() => setViewerIndex(null)}
       onIndexChange={index => { const photo = playable[index]; if (photo) setPhotoId(photo.id); }}
+      edgeBounce
     />}
   </div>;
 }
