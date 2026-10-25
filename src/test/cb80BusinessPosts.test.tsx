@@ -17,12 +17,19 @@ const f = vi.hoisted(() => ({
  */
 function chainable(result: any) {
   const c: any = {};
-  for (const m of ['select', 'eq', 'in', 'or', 'order', 'update', 'delete', 'insert', 'limit', 'range']) c[m] = () => c;
-  const split = result && typeof result === 'object' && ('maybe' in result || 'list' in result);
-  c.maybeSingle = async () => (split ? result.maybe : result);
-  c.single = async () => (split ? result.maybe : result);
+  let mode = 'read';
+  for (const m of ['select', 'eq', 'in', 'or', 'order', 'insert', 'limit', 'range']) c[m] = () => c;
+  c.update = () => { mode = 'update'; return c; };
+  c.delete = () => { mode = 'delete'; return c; };
+  const resolve = () => (typeof result === 'function' ? result(mode) : result);
+  const split = () => {
+    const r = resolve();
+    return r && typeof r === 'object' && ('maybe' in r || 'list' in r);
+  };
+  c.maybeSingle = async () => (split() ? resolve().maybe : resolve());
+  c.single = async () => (split() ? resolve().maybe : resolve());
   c.then = (res: (v: unknown) => unknown, rej: (e: unknown) => unknown) =>
-    Promise.resolve(split ? result.list : result).then(res, rej);
+    Promise.resolve(split() ? resolve().list : resolve()).then(res, rej);
   return c;
 }
 
@@ -188,7 +195,13 @@ describe('CB80 scheduled posts sheet', () => {
     expect(screen.getByText('Tee time')).toBeTruthy();
   });
   it('cancel with 1 row removes it as before', async () => {
-    f.tables = { posts: { data: [scheduledRow], error: null } };
+    let deleted = false;
+    f.tables = {
+      posts: (mode: string) =>
+        mode === 'delete'
+          ? (deleted = true, { data: [{ id: 'p1' }], error: null })
+          : { data: deleted ? [] : [scheduledRow], error: null },
+    };
     render(<ScheduledPostsSheetV2 open onClose={() => {}} userId="viewer" />);
     expect(await screen.findByText('Tee time')).toBeTruthy();
     fireEvent.click(screen.getByLabelText('Cancel'));
