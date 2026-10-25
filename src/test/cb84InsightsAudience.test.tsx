@@ -137,17 +137,17 @@ describe('CB84 ready card', () => {
     expect(last.hasAttribute('data-elsewhere')).toBe(true);
     expect((last.querySelector('i') as HTMLElement).style.width).toBe('100%');
   });
-  it('Elsewhere is omitted when 0; the whole block is absent when elsewhere is null', async () => {
-    const { container, rerender } = renderCard(audience({ elsewhere: 0 }));
+  it('Elsewhere is omitted when 0', async () => {
+    const { container } = renderCard(audience({ elsewhere: 0 }));
     await waitFor(() => expect(container.querySelector('[data-rows="regions"]')).not.toBeNull());
     expect(container.querySelector('[data-region="elsewhere"]')).toBeNull();
     expect(container.querySelectorAll('[data-rows="regions"] .insights-audience-row')).toHaveLength(3);
-
-    rpc.mockResolvedValue({ data: audience({ elsewhere: null }), error: null });
-    const qc2 = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-    rerender(<QueryClientProvider client={qc2}><InsightsAudienceSection businessId="b1" businessName="Pro Shop" /></QueryClientProvider>);
-    await waitFor(() => expect(container.querySelector('[data-rows="regions"]')).toBeNull());
-    expect(container.querySelector('[data-card="audience"]')).not.toBeNull();
+  });
+  it('the whole regions block is absent when elsewhere is null', async () => {
+    const { container } = renderCard(audience({ elsewhere: null }));
+    await waitFor(() => expect(container.querySelector('[data-card="audience"]')).not.toBeNull());
+    expect(container.querySelector('[data-rows="regions"]')).toBeNull();
+    expect(container.querySelector('[data-rows="bands"]')).not.toBeNull();
   });
 });
 
@@ -185,6 +185,7 @@ describe('CB84 not_enough and none', () => {
 
 describe('CB84 page', () => {
   beforeEach(() => {
+    rpc.mockClear();
     rpc.mockImplementation((name: string) => {
       if (name === 'get_business_audience') return Promise.resolve({ data: audience(), error: null });
       if (name === 'get_business_insights_funnel') {
