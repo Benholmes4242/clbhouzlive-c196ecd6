@@ -1,9 +1,9 @@
 # Roadmap
 
 ## BRIEF_MEMBER_SHOTS_VIEWER_POLISH
-- [ ] Await ruling: required on-tap get_hole_media read conflicts with six synchronous existing viewer-open tests outside the two authorised test files; those tests lack RPC fixtures and/or QueryClient providers. No implementation edits made.
-- [ ] Implement synthetic-only full-height media and active member caption/avatar; preserve normal viewer and top header.
-- [ ] Add requested coverage, name authorised retargets, run full suite against last reported baseline 2,788 tests /342 files, and report verification limits.
+- [x] Received authorisation for six hole-open fixture/provider/wait updates preserving assertions, plus Latest courses' credit field assertion; applied them.
+- [x] Implemented synthetic-only full-height geometry, active member caption/avatar and shared get_hole_media query; normal author/header paths retained.
+- [ ] STOP: full `bunx vitest run` 2,788/342 baseline → 2,794/343 inventory: 2,793 passed/1 failed, zero skips. New memberShotCredit.test.tsx:70:84 exact text assertion receives avatar initial T before caption. No corrective edit after failure. Also surviving harness TS2322 at ImmersiveFullscreenChrome.tsx(559,9): Type 'string | number' is not assignable to type 'string'. Type 'number' is not assignable to type 'string'. Await correction authorisation; browser validation not performed, external_unmanaged live authentication unavailable. Report Member_shots_viewer_polish_stop_report.md names all test changes; no prohibited backend/config changes.
 
 ## BRIEF_MEMBER_SHOTS_SWIPE_ACROSS
 - [x] Build one synthetic carousel per course/hole with ordered ready shots and per-item credits; retain real-post behaviour and synthetic request gates. Added synthetic fullscreen post_views and likers mount gates; module headers own the local contract.
