@@ -249,7 +249,7 @@ export function MediaPreviewViewer({
           <video
             key={item.id}
             ref={videoRef}
-            src={item.previewUrl}
+            src={item.hlsUrl ? undefined : item.previewUrl}
             poster={item.thumbnailUrl}
             controls
             playsInline
@@ -316,6 +316,31 @@ export function MediaPreviewViewer({
           }}
         >
           <MuteButton size="md" />
+        </div>
+      )}
+
+      {/* Caption — bottom-left over the backdrop, only when the caller
+          supplied one (the hole walk does; every other caller is unchanged). */}
+      {item.caption && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 20,
+            right: 20,
+            bottom: 'calc(40px + env(safe-area-inset-bottom, 0px))',
+            zIndex: 11,
+            pointerEvents: 'none',
+          }}
+        >
+          <div style={VERDICT_KICKER}>{item.caption.kicker}</div>
+          <div style={{ marginTop: 6, fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: '#ffffff' }}>
+            {item.caption.title}
+          </div>
+          {item.caption.credit && (
+            <div style={{ marginTop: 5, fontSize: 12.5, color: 'rgba(255,255,255,0.72)' }}>
+              {item.caption.credit}
+            </div>
+          )}
         </div>
       )}
 
