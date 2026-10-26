@@ -144,7 +144,7 @@ export function ReviewHoleTags(props: Props) {
                 </button>;
               })}</div>
             </div>
-            <HolePhotoPicker holeCount={props.holes.length} knownHoleNumbers={props.holes} selectedHole={inTaggedState ? activeHole ?? null : selected} disabled={allTagged || inTaggedState} dimOthers={inTaggedState} onSelect={hole => { if (!allTagged && !inTaggedState) setSelected(hole); }} />
+            <HolePhotoPicker holeCount={props.holes.length} knownHoleNumbers={props.holes} selectedHole={inTaggedState ? activeHole ?? null : selected} disabled={allTagged || inTaggedState} dimOthers={inTaggedState} onSelect={hole => { if (!allTagged && !inTaggedState) setSelected(prev => (prev === hole ? null : hole)); }} />
             <button type="button" className="hole-photo-batch-confirm" disabled={!confirmEnabled} data-enabled={confirmEnabled || undefined} onClick={() => { if (inTaggedState) removeTag(); else confirmTag(); }}>{inTaggedState ? 'Remove tag' : allTagged ? 'All tagged' : 'Confirm tag'}</button>
           </>}
         </div>

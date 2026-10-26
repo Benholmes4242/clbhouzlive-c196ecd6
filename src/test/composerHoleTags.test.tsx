@@ -95,6 +95,19 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
     expect(assign).not.toHaveBeenCalled();
     expect(screen.queryByRole('dialog')).not.toBeNull();
   });
+  it('tapping the selected hole again deselects it and disables Confirm tag; a different tap moves the selection', () => {
+    render(<ReviewHoleTags {...props({})} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Tag photo 1' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 2' }));
+    expect(screen.getByRole('button', { name: 'Hole 2' })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 2' }));
+    expect(screen.getByRole('button', { name: 'Hole 2' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'Confirm tag' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 9' }));
+    expect(screen.getByRole('button', { name: 'Hole 9' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Hole 2' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'Confirm tag' })).toBeEnabled();
+  });
   it('two photographs can choose the same used hole', () => {
     const assign = vi.fn(); render(<ReviewHoleTags {...props({ shots: [photo, { ...photo, id: 'q' }], assignments: { p: 2 }, assign })} />);
     fireEvent.click(screen.getByRole('button', { name: 'Tag photo 2' }));
