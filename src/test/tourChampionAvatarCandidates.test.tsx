@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render } from '@testing-library/react';
 import { ChampionStrip } from '@/features/tourhub/components/overview-v3/HybridHeroBands/ChampionStrip';
 import { HybridHero } from '@/features/tourhub/components/overview-v3/HybridHero';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
+import { MemoryRouter } from 'react-router-dom';
 
 const fixture = vi.hoisted(() => ({ championProps: null as null | { avatarCandidates?: string[]; playerKey?: string | null } }));
 
@@ -49,7 +50,7 @@ describe('Tour champion avatar candidates', () => {
       winnerName: 'Eugenio Lopez-Chacarra', winnerPhotoUrl: null, winnerHeadshotOverride: 'Eugenio renamed',
       winnerPgaTourId: null, winnerScore: '-17', leaderScore: -17, leaderName: 'Eugenio Lopez-Chacarra', currentRound: 4, currentRoundStatus: null,
     } };
-    render(<HybridHero slide={slide} state={{ kind: 'results', variant: 'standard', finishDate: '2026-10-18', meta: '' }} now={new Date('2026-10-19')} activeTournamentId={null} onSelectTour={() => {}} onOpenTournament={() => {}} />);
+    render(<MemoryRouter><HybridHero slide={slide} state={{ kind: 'results', variant: 'standard', finishDate: '2026-10-18', meta: '' }} now={new Date('2026-10-19')} activeTournamentId={null} onSelectTour={() => {}} onOpenTournament={() => {}} /></MemoryRouter>);
     const candidates = fixture.championProps?.avatarCandidates ?? [];
     expect(candidates.length).toBeGreaterThan(1);
     expect(candidates.some(url => url.includes('/DP%20World%20Tour/Eugenio%20renamed.webp'))).toBe(true);

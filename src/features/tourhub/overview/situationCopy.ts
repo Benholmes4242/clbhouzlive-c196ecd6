@@ -100,3 +100,22 @@ export function visibleSituationNote(
   const days = daysAfterEnd(endDate, now);
   return days != null && days >= 0 && days <= SITUATION_NOTE_DAYS ? text : null;
 }
+
+/**
+ * BRIEF_TOUR_CLOSE_ONLY_WHEN_FINAL §3: the finished-result champion narrative,
+ * prefixed with the shortened sentence when the event was shortened. Built
+ * from situationSegments so the copy lives once; unshortened events return
+ * the narrative unchanged.
+ */
+export function championNarrative(args: {
+  state: HeroState;
+  entries: RoundRow[];
+  scheduledRounds: number;
+  narrative: string | null;
+  t: TFunction;
+}): string | null {
+  const headline: HeadlineSegment[] = args.narrative ? [{ text: args.narrative, figure: false }] : [];
+  const segs = situationSegments({ state: args.state, entries: args.entries, scheduledRounds: args.scheduledRounds, headline, t: args.t });
+  const text = segs.map((s) => s.text).join('');
+  return text.length > 0 ? text : args.narrative;
+}

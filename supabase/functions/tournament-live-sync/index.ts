@@ -18,7 +18,7 @@ import { getActiveRound } from '../_shared/roundState.ts'
 import { dispatchTeeAlerts } from './teeAlerts.ts'
 import { shouldFetchLeaderboard, shouldFetchScorecards, shouldFetchHoleStats, shouldFetchInPlayTeeTimes, shouldResolveStatus, shouldFetchPreEventTeeTimes, nextTeeTimesRound } from '../_shared/sportradarCadence.ts'
 import { logSportradarCall } from '../_shared/sportradarCallLog.ts'
-import { LIVE_POLL_STATUSES, STALE_AUTO_CLOSE_STATUSES, CLOSED_FEED_STATUSES, statusToWrite, soleWinnerSrId } from './liveStatus.ts'
+import { LIVE_POLL_STATUSES, STALE_AUTO_CLOSE_STATUSES, CLOSED_FEED_STATUSES, statusToWrite, soleWinnerSrId, shouldDateClose, dateClosePayload } from './liveStatus.ts'
 
 const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
 const getTourBaseUrl = (tour: string = 'pga') =>
@@ -113,23 +113,37 @@ Deno.serve(async (req) => {
     //    Nothing polls after the final group finishes, so before closing, each
     //    stale event gets ONE full leaderboard fetch; when the feed reports it
     //    closed, that pass writes the final rounds without the thru gate.
+    //    BRIEF_TOUR_CLOSE_ONLY_WHEN_FINAL: an event closes by date only when
+    //    that fetch reported a final feed status, or its end_date is more than
+    //    STALE_CLOSE_BACKSTOP_DAYS ago. A date close never names a winner.
     const { data: staleCandidates } = await supabase
       .from('sr_tournaments')
-      .select('id, sr_id, name, season_id, start_date, timezone')
+      .select('id, sr_id, name, season_id, start_date, end_date, timezone')
       .in('status', STALE_AUTO_CLOSE_STATUSES) // never a playoff/suspended event
       .lt('end_date', today);
+    const staleTournaments: Array<{ id: string; name: string }> = [];
     for (const t of staleCandidates ?? []) {
-      try { await reconcileFinal(supabase, sportradarApiKey, t); }
-      catch (e: any) { console.error(`[LiveSync] Close-out fetch failed for ${t.name}:`, e?.message ?? String(e)); }
+      let final = false;
+      let feedStatus: string | undefined;
+      try {
+        const r = await reconcileFinal(supabase, sportradarApiKey, t);
+        final = r.final; feedStatus = r.sportradarStatus;
+      } catch (e: any) { console.error(`[LiveSync] Close-out fetch failed for ${t.name}:`, e?.message ?? String(e)); }
+      if (!shouldDateClose(final, String(t.end_date), today)) {
+        console.log(`[LiveSync] Left open ${t.name}: feed '${feedStatus ?? 'unknown'}', end_date ${t.end_date}`);
+        continue;
+      }
+      const { data: closed, error: closeErr } = await supabase
+        .from('sr_tournaments')
+        .update(dateClosePayload())
+        .eq('id', t.id)
+        .in('status', STALE_AUTO_CLOSE_STATUSES)
+        .select('id, name');
+      if (closeErr) console.error(`[LiveSync] Date close failed for ${t.name}:`, closeErr.message);
+      else if (closed?.length) staleTournaments.push(...closed);
     }
-    const { data: staleTournaments } = await supabase
-      .from('sr_tournaments')
-      .update({ status: 'closed' })
-      .in('status', STALE_AUTO_CLOSE_STATUSES)
-      .lt('end_date', today)
-      .select('id, name');
 
-    if (staleTournaments?.length) {
+    if (staleTournaments.length) {
       console.log(`[LiveSync] Auto-closed ${staleTournaments.length} stale tournament(s):`,
         staleTournaments.map((t: any) => t.name).join(', '));
     }
@@ -268,7 +282,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`[LiveSync] version=2026-10-26-playoff-suspended-v4`);
+    console.log(`[LiveSync] version=2026-10-26-close-only-when-final-v5`);
     console.log(`[LiveSync] Found ${liveTournaments.length} inprogress tournament(s)`);
 
     // ── Sync all tournaments (gated ones get stamped, not skipped) ────
@@ -306,7 +320,7 @@ Deno.serve(async (req) => {
           durationMs: r.durationMs,
         })),
         summary: { inHoursCount, gatedCount, totalRecords, totalDuration },
-        staleClosed: staleTournaments?.length || 0,
+        staleClosed: staleTournaments.length,
         statusResolved: resolved,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

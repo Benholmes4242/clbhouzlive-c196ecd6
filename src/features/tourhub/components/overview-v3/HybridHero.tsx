@@ -21,7 +21,7 @@ import { ChampionStrip } from './HybridHeroBands/ChampionStrip';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { resolveBoardEntity, resolveChampionEntry, teamNamesNeedInitials } from '../../_shared/boardEntity';
 import { SituationBand } from './HybridHeroBands/SituationBand';
-import { situationSegments, visibleSituationNote } from '../../overview/situationCopy';
+import { situationSegments, visibleSituationNote, championNarrative } from '../../overview/situationCopy';
 import { roundsFromSchedule } from './HybridHero.utils';
 import { tournamentHeadline, tournamentHeadlineSegments } from '../../overview/magazineCopy';
 
@@ -248,7 +248,13 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
   // event's leaderboard only (BRIEF_TOUR_CHAMPION_TRUTH X.1). A sentence that
   // states a score must be derived from the score, never asked for.
   const championSentence = champion
-    ? tournamentHeadline({ tournament, state, leaderboard: rows, t, closingRound: champion.closingRound })
+    ? championNarrative({
+        state,
+        entries: rows,
+        scheduledRounds: roundsFromSchedule(tournament.startDate, tournament.endDate),
+        narrative: tournamentHeadline({ tournament, state, leaderboard: rows, t, closingRound: champion.closingRound }),
+        t,
+      })
     : null;
 
   const startDay = tournament.startDate
