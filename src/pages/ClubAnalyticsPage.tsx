@@ -41,6 +41,8 @@ import type { ClubCourseRef } from '@/features/business/clubAnalytics/types';
 import { useQuery } from '@tanstack/react-query';
 import { fetchGolfClub } from '@/features/business/claimClub';
 import { RequestAnotherCourseSheet } from '@/components/business/RequestAnotherCourseSheet';
+import { courseLead } from '@/features/business/clubAnalytics/courseLead';
+import '@/features/business/clubAnalytics/courseLead.css';
 
 const TITLE = 'Your course';
 /** §4 — plural when the club owns more than one course. */
@@ -87,9 +89,11 @@ const SectionGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => 
  * in The sample. It fetches only the course it is given, so one selection is
  * one RPC and a re-selected course is served from the react-query cache.
  */
-const CourseBlock: React.FC<{ course: ClubCourseRef }> = ({ course }) => {
+// CB91: the lead shares this selected-course read; no independent queries or fallback to seed figures.
+const CourseBlock: React.FC<{ course: ClubCourseRef; courseCount: number; businessName: string }> = ({ course, courseCount, businessName }) => {
   const navigate = useNavigate();
   const { data: result, isLoading } = useClubCourseAnalytics(course.course_id);
+  const lead = !isLoading && result?.state === 'ok' ? courseLead(result.data, { courseCount, businessName }) : null;
 
   return (
     <section>
@@ -126,6 +130,14 @@ const CourseBlock: React.FC<{ course: ClubCourseRef }> = ({ course }) => {
 
           {!isLoading && result?.state === 'ok' && (
             <>
+              {lead && <div className="club-course-lead">
+                {lead.early && <div className="club-course-lead-early">Early data</div>}
+                {(lead.headline || lead.emphasis) && <p className="club-course-lead-headline">
+                  {lead.headline}{lead.headline && lead.emphasis ? ' ' : ''}
+                  {lead.emphasis && <span className="club-course-lead-emphasis">{lead.emphasis}</span>}
+                </p>}
+                <p className="club-course-lead-line">{lead.line}</p>
+              </div>}
               {/* §1b — THE VERDICT STRIP LEADS: mean gross, hardest hole, comp share. */}
               <SectionGuard><VerdictStrip data={result.data} /></SectionGuard>
               {/* §7 — the sample is stated before the rest of the figures. */}
@@ -373,25 +385,8 @@ export default function ClubAnalyticsPage() {
 
 
   return (
-    <ManagePageShell title={titleFor(courses.length)}>
+    <ManagePageShell title={titleFor(courses.length)} subtitle={business.name}>
       <div style={{ padding: '16px 16px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
-        {courses.length > 1 && (
-          <p style={{ ...BIZ_BODY, margin: 0, fontSize: 12.5 }}>
-            Your club has {courses.length} courses. Each is measured on its own — a stroke index belongs to a course, so
-            we never average them together.
-          </p>
-        )}
-
-        {business.club_id && (
-          <RequestAnotherCourse
-            businessId={business.id}
-            businessName={business.name}
-            clubId={business.club_id}
-            fallbackClubName={business.club_name ?? null}
-            existingCourses={courses.map((c) => ({ course_id: c.course_id, course_name: c.course_name }))}
-            body="Every course your club owns gets its own page on clbhouz — its own scores, reviews and the figures below. If one is missing from this list, tell us and we will add it."
-          />
-        )}
 
         {courses.length > 1 && (
           <RailChips
@@ -406,7 +401,18 @@ export default function ClubAnalyticsPage() {
           />
         )}
 
-        {selected && <CourseBlock key={selected.course_id} course={selected} />}
+        {selected && <CourseBlock key={selected.course_id} course={selected} courseCount={courses.length} businessName={business.name} />}
+
+        {business.club_id && (
+          <RequestAnotherCourse
+            businessId={business.id}
+            businessName={business.name}
+            clubId={business.club_id}
+            fallbackClubName={business.club_name ?? null}
+            existingCourses={courses.map((c) => ({ course_id: c.course_id, course_name: c.course_name }))}
+            body="Every course your club owns gets its own page on clbhouz — its own scores, reviews and the figures below. If one is missing from this list, tell us and we will add it."
+          />
+        )}
 
         <p style={{ ...BIZ_BODY, fontSize: 11.5, margin: 0, color: A.DIM }}>
           Everything on this page is an aggregate across rounds played on your courses. No individual member, round or
