@@ -9,9 +9,9 @@ import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/ab
  * credited to the member who added it; closing returns to the panel with the
  * frame left on the tapped shot. Captions read added_at (when the member
  * added the shot to clbhouz); the month chips and "across N months" keep
- * EXIF. The panel never plays video inline — a ready video slide is its
- * poster plus a decorative glass disc, and playback lives in the fullscreen
- * viewer. */
+ * EXIF. The active ready video autoplays muted inline via the review-tile
+ * coordinator; blocked/failed autoplay retains its poster and glass disc.
+ * Taps still open the canonical fullscreen viewer. */
 import { Fragment, useContext, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { QueryClientContext } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,7 @@ import { holeShotsToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
 import { holeMediaQuery } from '@/lib/courseMedia/holeMediaQuery';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { HoleMediaThumbnail } from './HoleMediaVideo';
+import { HoleInlineVideo } from './HoleInlineVideo';
 import { captureMonthLabel, deriveHoleWalk, holeOrdinal, holePhotoMonths } from '@/lib/courseMedia/holeWalk';
 import './hole-walk.css';
 
@@ -36,13 +37,14 @@ export function HoleProcessingVideo({ media, label }: { media: { media_url: stri
   </div>;
 }
 
-export function HoleWalk({ available, holes, rows, totalMedia, courseName, authors, onAddFirst, memberId, onMove, onRemove, focus, scored = true }: {
+export function HoleWalk({ available, holes, rows, totalMedia, courseName, authors, onAddFirst, memberId, onMove, onRemove, focus, scored = true, mediaPaused = false }: {
   available: boolean; holes: readonly CourseHole[]; rows: readonly HolePhoto[];
   totalMedia: number; courseName?: string; authors?: ReadonlyMap<string, string>;
   onAddFirst: (hole: number) => void;
   memberId?: string; onMove?: (row: HolePhoto) => void; onRemove?: (row: HolePhoto) => void;
   focus?: { hole: number; id: string; nonce: number } | null;
   scored?: boolean;
+  mediaPaused?: boolean;
 }) {
   // The grid itself performs no reads; only viewer taps require the app cache.
   const queryClient = useContext(QueryClientContext);
@@ -165,7 +167,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
         {active ? <>
           {photos.length >= 2 && <span className="glass-chip hole-walk-frame-count">{activeIndex + 1} / {photos.length}</span>}
           <div className="hole-walk-track" ref={trackRef} onScroll={onTrackScroll}>
-            {photos.map(photo => {
+            {photos.map((photo, index) => {
               const processing = photo.media_type === 'video' && photo.duration_seconds == null;
               const slideAuthor = authors?.get(photo.user_id);
               const slideMonth = addedMonthLabel(photo.added_at);
@@ -173,10 +175,9 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
                 {photo.media_type === 'video'
                   ? (processing
                     ? <HoleProcessingVideo media={photo} label={`Hole ${tile.hole.hole_no}`} />
-                    : <>
-                      <img src={holeMediaPoster(photo)} alt={`Hole ${tile.hole.hole_no}`} />
-                      <span className="glass-chip hole-walk-play-disc" aria-hidden="true">{'\u25B6'}</span>
-                    </>)
+                    : <HoleInlineVideo media={photo} alt={`Hole ${tile.hole.hole_no}`} fit="cover"
+                      autoplayGroup="hole-walk" active={index === activeIndex} paused={mediaPaused}
+                      fallback={<span className="glass-chip hole-walk-play-disc" aria-hidden="true">{'\u25B6'}</span>} />)
                   : <img src={photo.media_url} alt={`Hole ${tile.hole.hole_no}`} />}
                 {(slideAuthor || slideMonth) && <div className="hole-walk-caption">{slideAuthor && <strong>{slideAuthor}</strong>}{slideMonth && ` · ${slideMonth}`}</div>}
               </div>;
