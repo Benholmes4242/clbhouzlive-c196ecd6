@@ -16,7 +16,7 @@ vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } 
 vi.mock('@/uploads/resilientVideoUpload', () => ({ uploadVideoResilient: vi.fn() }));
 
 import { ReviewHoleTags } from '@/features/review-v2/components/ReviewHoleTags';
-import { RV2 } from '@/features/review-v2/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 import { useReviewHoleTags } from '@/features/review-v2/hooks/useReviewHoleTags';
 import { writeComposerHolePhoto, composerPhotoVerdict, type ComposerHoleJob } from '@/lib/courseMedia/composerHolePhotos';
@@ -30,7 +30,7 @@ const exif = { captureDay: '2026-06-02', capturedAt: '2026-06-02T12:00:00', lati
 const photo: MediaItem = { id: 'p', type: 'image', previewUrl: '/photo.jpg', status: 'pending', progress: 0, file: new File(['photo'], 'photo.jpg', { type: 'image/jpeg' }) };
 const video: MediaItem = { id: 'v', type: 'video', previewUrl: '/clip.mp4', posterUrl: '/poster.jpg', streamId: 'stream-1', durationSeconds: 75, status: 'pending', progress: 0, file: new File(['video'], 'clip.mp4', { type: 'video/mp4' }) };
 const job: ComposerHoleJob = { courseId: 'course', assignments: { p: 2 }, knownHoles: [2, 9], proofScoreId: null };
-const props = (overrides: Record<string, unknown> = {}) => ({ holes: [2, 9], shots: [photo], rounds: [], chosenRound: null, chooseRound: vi.fn(), assignments: {}, assign: vi.fn(), metadata: {}, capture: () => job, ...overrides } as ReturnType<typeof useReviewHoleTags>);
+const props = (overrides: Record<string, unknown> = {}) => ({ holes: [2, 9], shots: [photo], rounds: [], chosenRound: null, chooseRound: vi.fn(), assignments: {}, assign: vi.fn(), unassign: vi.fn(), metadata: {}, capture: () => job, ...overrides } as ReturnType<typeof useReviewHoleTags>);
 const wrapper = ({ children }: { children: React.ReactNode }) => <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>{children}</QueryClientProvider>;
 
 beforeEach(() => {
@@ -63,14 +63,21 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
     expect(screen.getByRole('button', { name: 'Tag video 1' })).toHaveTextContent('1:15');
     expect(screen.getByRole('button', { name: 'Tag photo 1' })).toHaveTextContent('No date on file');
   });
-  it('the video sheet shows the duration badge and Your video, never a Taken chip', () => {
+  it('the video hero plays inline with its poster and duration badge, never a Taken chip', () => {
     render(<ReviewHoleTags {...props({ shots: [video] })} />);
     fireEvent.click(screen.getByRole('button', { name: 'Tag video 1' }));
     const sheet = screen.getByRole('dialog');
-    expect(sheet.querySelector('img[alt="Your video"]')).toHaveAttribute('src', '/poster.jpg');
+    const heroVideo = sheet.querySelector('video');
+    expect(heroVideo).not.toBeNull();
+    expect(heroVideo).toHaveAttribute('src', '/clip.mp4');
+    expect(heroVideo).toHaveAttribute('poster', '/poster.jpg');
+    expect(heroVideo).toHaveAttribute('muted');
+    expect(heroVideo).toHaveAttribute('autoplay');
+    expect(heroVideo).toHaveAttribute('loop');
+    expect(heroVideo).toHaveAttribute('playsinline');
+    expect(sheet.querySelector('img[alt="Your video"]')).toBeNull();
     expect(sheet).toHaveTextContent('1:15');
     expect(sheet.textContent).not.toMatch(/Taken|No date/);
-    expect(sheet.querySelector('video')).toBeNull();
   });
   it('nine actual holes yield nine selectable chips without padding', () => {
     render(<ReviewHoleTags {...props({ holes: [1,2,3,4,5,6,7,8,9] })} />);
@@ -78,30 +85,32 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
     expect(screen.getAllByRole('button', { name: /^Hole / })).toHaveLength(9);
     expect(screen.queryByRole('button', { name: 'Hole 10' })).toBeNull();
   });
-  it('a lower already-used hole remains selectable and closes immediately', () => {
-    const assign = vi.fn(); render(<ReviewHoleTags {...props({ assignments: { p: 9 }, assign })} />);
+  it('a lower already-used hole stays selectable and a selection only highlights it', () => {
+    const assign = vi.fn(); render(<ReviewHoleTags {...props({ assign })} />);
     fireEvent.click(screen.getByRole('button', { name: 'Tag photo 1' }));
     expect(screen.getByRole('button', { name: 'Hole 9' })).toHaveAttribute('data-state', 'open');
     expect(screen.getByRole('button', { name: 'Hole 2' })).toBeEnabled();
     fireEvent.click(screen.getByRole('button', { name: 'Hole 2' }));
-    expect(assign).toHaveBeenCalledWith('p', 2); expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Hole 2' })).toHaveAttribute('aria-pressed', 'true');
+    expect(assign).not.toHaveBeenCalled();
+    expect(screen.queryByRole('dialog')).not.toBeNull();
   });
   it('two photographs can choose the same used hole', () => {
     const assign = vi.fn(); render(<ReviewHoleTags {...props({ shots: [photo, { ...photo, id: 'q' }], assignments: { p: 2 }, assign })} />);
     fireEvent.click(screen.getByRole('button', { name: 'Tag photo 2' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 2' })); expect(assign).toHaveBeenCalledWith('q', 2);
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 2' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    expect(assign).toHaveBeenCalledWith('q', 2);
   });
   it('a used hole renders exactly like every other hole in the grid', () => {
-    render(<ReviewHoleTags {...props({ assignments: { p: 9 } })} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Tag photo 1' }));
+    render(<ReviewHoleTags {...props({ shots: [photo, { ...photo, id: 'q' }], assignments: { p: 9 } })} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Tag photo 2' }));
     const buttons = screen.getAllByRole('button', { name: /^Hole / });
     expect(buttons).toHaveLength(2);
-    for (const btn of buttons) {
-      expect(btn).toHaveStyle({ color: RV2.secondary });
-      expect(btn).toHaveStyle({ border: `1px solid ${RV2.hairlineStrong}` });
-      expect(btn).not.toHaveStyle({ color: RV2.success });
-    }
-    expect(screen.getByRole('button', { name: 'Hole 9' })).toHaveStyle({ background: RV2.trackStrong });
+    expect(new Set(buttons.map(btn => btn.style.border)).size).toBe(1);
+    expect(new Set(buttons.map(btn => btn.style.color)).size).toBe(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 9' }));
+    expect(screen.getByRole('button', { name: 'Hole 9' })).toHaveStyle({ background: A.INK, color: A.CANVAS });
   });
   it('the sheet never prints the green-hole explanation', () => {
     render(<ReviewHoleTags {...props({ shots: [photo, { ...photo, id: 'q' }], assignments: { p: 9 } })} />);
@@ -110,6 +119,59 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
     expect(dialog.textContent).not.toMatch(/green/i);
     expect(dialog.textContent).not.toMatch(/already used/i);
     expect(screen.queryByText(/because you have already used/)).toBeNull();
+  });
+
+  it('Confirm tag assigns and advances to the next untagged shot', () => {
+    const assign = vi.fn();
+    render(<ReviewHoleTags {...props({ shots: [photo, video, { ...photo, id: 'q' }], assignments: { v: 2 }, assign })} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Tag photo 1' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 2' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    expect(assign).toHaveBeenCalledWith('p', 2);
+    const sheet = screen.getByRole('dialog');
+    expect(sheet).toHaveTextContent('Photo tagged to the 2nd.');
+    expect(sheet.querySelector('[data-chip]')).toHaveTextContent('3 / 3');
+    expect(screen.getByRole('button', { name: 'Confirm tag' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Hole 9' })).toHaveAttribute('aria-pressed', 'false');
+  });
+  it('tapping a tagged thumbnail shows Remove tag and dims the other holes', () => {
+    render(<ReviewHoleTags {...props({ shots: [photo, video], assignments: { v: 2 } })} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Tag photo 1' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Shot 2 of 2, tagged to the 2nd' }));
+    expect(screen.getByRole('button', { name: 'Remove tag' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Hole 2' })).toHaveStyle({ background: A.INK });
+    expect(screen.getByRole('button', { name: 'Hole 9' })).toHaveStyle({ opacity: '0.4' });
+  });
+  it('Remove tag clears the assignment and re-enables the grid', () => {
+    const unassign = vi.fn();
+    render(<ReviewHoleTags {...props({ assignments: { p: 9 }, unassign })} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Tag photo 1' }));
+    expect(screen.getByRole('button', { name: 'Remove tag' })).toBeEnabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Remove tag' }));
+    expect(unassign).toHaveBeenCalledWith('p');
+    expect(screen.getByRole('dialog')).toHaveTextContent('Tag removed. Pick the right hole.');
+    expect(screen.getByRole('button', { name: 'Hole 9' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Confirm tag' })).toBeDisabled();
+  });
+  it('with every shot tagged the button reads All tagged and is disabled', () => {
+    const assign = vi.fn();
+    render(<ReviewHoleTags {...props({ shots: [photo, video], assignments: { p: 9 }, assign })} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Tag video 1' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 2' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    expect(assign).toHaveBeenCalledWith('v', 2);
+    expect(screen.getByRole('button', { name: 'All tagged' })).toBeDisabled();
+    expect(screen.getByRole('dialog')).toHaveTextContent('Video tagged to the 2nd.');
+  });
+  it('the sheet body clears the home indicator and wears the Media tab theme', () => {
+    render(<ReviewHoleTags {...props({})} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Tag photo 1' }));
+    const sheet = screen.getByRole('dialog') as HTMLElement;
+    const body = sheet.querySelector('[data-sheet-body]') as HTMLElement;
+    expect(body).toHaveStyle({ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' });
+    expect(body).toHaveStyle({ paddingTop: '10px' });
+    expect(sheet.style.getPropertyValue('--hole-walk-ink')).toBe(A.INK);
+    expect(sheet.style.getPropertyValue('--hole-photo-success')).toBe(A.IMPROVED);
   });
 
   it('assignments are client-only until capture, exclude removed files and include tagged videos', async () => {
