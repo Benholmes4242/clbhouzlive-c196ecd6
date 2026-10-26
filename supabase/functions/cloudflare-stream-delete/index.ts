@@ -103,7 +103,7 @@ serve(async (req) => {
 
     // Get Cloudflare credentials
     const accountId = Deno.env.get("CLOUDFLARE_ACCOUNT_ID");
-    const streamToken = Deno.env.get("CLOUDFLARE_STREAM_API_TOKEN");
+    const streamToken = Deno.env.get("CLOUDFLARE_STREAM_API_TOKEN") ?? Deno.env.get("CLOUDFLARE_API_TOKEN");
 
     if (!accountId || !streamToken) {
       console.error("Missing Cloudflare credentials");

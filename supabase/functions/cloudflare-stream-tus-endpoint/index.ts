@@ -38,10 +38,9 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await client.auth.getUser(authHeader.slice(7));
     if (authError || !user) return new Response(JSON.stringify({ error: 'Unauthorized', version: VERSION }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     const accountId = Deno.env.get("CLOUDFLARE_ACCOUNT_ID");
-    const streamToken = Deno.env.get("CLOUDFLARE_API_KEY");
-    const gatewayKey = Deno.env.get("LOVABLE_API_KEY");
+    const streamToken = Deno.env.get("CLOUDFLARE_STREAM_API_TOKEN") ?? Deno.env.get("CLOUDFLARE_API_TOKEN");
 
-    if (!accountId || !streamToken || !gatewayKey) {
+    if (!accountId || !streamToken) {
       return new Response(JSON.stringify({ error: "Missing Cloudflare credentials" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -69,12 +68,11 @@ serve(async (req) => {
     });
 
     const response = await fetch(
-      `https://connector-gateway.lovable.dev/cloudflare/client/v4/accounts/${accountId}/stream?direct_user=true`,
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream?direct_user=true`,
       {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${gatewayKey}`,
-          "X-Connection-Api-Key": streamToken,
+          "Authorization": `Bearer ${streamToken}`,
           "Upload-Creator": user.id,
           "Tus-Resumable": "1.0.0",
           "Upload-Length": fileSizeBytes.toString(),
