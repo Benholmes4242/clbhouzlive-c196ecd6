@@ -56,16 +56,21 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
   const [existing] = useState(() => [...existingHoleTags]);
   const [currentUrl, setCurrentUrl] = useState<string | undefined>(() => photos[0]?.url);
   const [tags, setTags] = useState<Readonly<Record<string, number>>>({});
+  const [rows, setRows] = useState<Readonly<Record<string, HolePhoto>>>({});
   const [unavailable, setUnavailable] = useState<ReadonlySet<string>>(() => new Set());
   const [selected, setSelected] = useState<number | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<string | null>(null);
+  const [reviewing, setReviewing] = useState(false);
+  const [removedNotice, setRemovedNotice] = useState(false);
   const thumbs = useRef(new Map<string, HTMLButtonElement>());
   const index = Math.max(0, photos.findIndex(p => p.url === currentUrl));
   const photo = photos[index];
   const done = (url: string, t = tags, u = unavailable) => t[url] != null || u.has(url);
   const allTagged = photos.length > 0 && photos.every(p => done(p.url));
+  const taggedHole = photo ? tags[photo.url] : undefined;
+  const inTaggedState = !!onRemove && reviewing && taggedHole != null;
   const nextUntagged = (from: number, t: Record<string, number>, u: ReadonlySet<string>) => {
     for (let step = 1; step <= photos.length; step++) {
       const candidate = photos[(from + step) % photos.length];
