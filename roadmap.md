@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB94 — Card against course
+- [x] Replace club IndexDisagreesSection chart with neutral grouped list from buildSiLadder only; shared chart/helper and CB91–CB93 frozen. No reads added.
+- [x] Add8 new cases in cb94CardAgainstCourse.test.tsx; no existing tests changed/deleted/renamed/retargeted. Targeted39/4 pass; full bunx vitest run3,208/373 pass, zero failures, from3,200/372 (+8/+1 solely CB94). No pre-existing failures observed. Harness build OK14:16:51Z; standalone typecheck not run under environment policy.
+- [x] Controlled actual card438x970: flagged groups, agree and under100 states verified, no overflow; screenshots reviewed. Brief-provided Sundridge helper-result values tested; no reusable real input fixture or direct shared-chart tests found. Live Sundridge inputs/authenticated page remain unverified (external_unmanaged). Shared chart/helper files and existing consumers unchanged. Report CB94_Card_against_course_report.md.
+
 ## CB93 — Your courses section 3
 - [x] Update HoleBySection: hardest-first default, five-column table, ranked headline, single expanded per-hole split, HIP card paint and full-round empty state; CB91/CB92 and all other sections frozen. Reuse HIP, score colours, ramp, toParParts and howItPlaysShare.
 - [x] User approved passing existing businessName/courseCount through the single page call for CB91's exact label; no new reads.
