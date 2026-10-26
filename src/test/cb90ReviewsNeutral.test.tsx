@@ -115,7 +115,7 @@ describe('CB90 reviews neutral paint and reply close', () => {
     state.data = { ...populated, courses };
     const view = mount();
     state.data = { ...result(0), courses };
-    fireEvent.click(screen.getByRole('button', { name: /West Course/ }));
+    fireEvent.click(screen.getByRole('tab', { name: /West Course/ }));
     iconTile(view.container, 'sparkles');
   });
   it.each([
