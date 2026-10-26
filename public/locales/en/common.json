@@ -774,8 +774,7 @@
       },
       "empty": {
         "followersTitle": "Follower growth",
-        "followersBody": "Follower activity will appear here as it happens.",
-        "posts": "No posts published in this period."
+        "followersBody": "Follower activity will appear here as it happens."
       },
       "rate": {
         "from_one": "From {{n}} impression",
@@ -784,14 +783,6 @@
         "tooFew": "Not enough impressions yet to give a meaningful rate.",
         "benchmark": "Likes and comments as a share of impressions.",
         "impressionsLabel": "Impressions"
-      },
-      "topPosts": {
-        "impressions_one": "{{n}} impression",
-        "impressions_other": "{{n}} impressions",
-        "likes_one": "{{n}} like",
-        "likes_other": "{{n}} likes",
-        "comments_one": "{{n}} comment",
-        "comments_other": "{{n}} comments"
       },
       "reviewsCount_one": "{{n}} review",
       "reviewsCount_other": "{{n}} reviews",
@@ -861,6 +852,38 @@
         "leakLeftLead_one": "{{n}} golfer opened your profile and left.",
         "leakLeftLead_other": "{{n}} golfers opened your profile and left.",
         "leakLeftBody": "Nobody followed or tapped through."
+      },
+      "posts": {
+        "kicker": "Your posts",
+        "reachedLabel": "Golfers reached",
+        "titleOutsized": "One post reached more than the rest put together",
+        "titleBest_one": "Your best post reached {{n}} golfer",
+        "titleBest_other": "Your best post reached {{n}} golfers",
+        "titleNone_one": "Your post hasn't reached anyone yet",
+        "titleNone_other": "Your {{n}} posts haven't reached anyone yet",
+        "titleNothing_7": "No posts in the last 7 days",
+        "titleNothing_30": "No posts in the last 30 days",
+        "titleNothing_90": "No posts in the last 90 days",
+        "noCaption": "A post without a caption",
+        "likes_one": "{{n}} like",
+        "likes_other": "{{n}} likes",
+        "comments_one": "{{n}} comment",
+        "comments_other": "{{n}} comments",
+        "notFollowing_one": "{{n}} doesn't follow you",
+        "notFollowing_other": "{{n}} don't follow you",
+        "foldAllZero_one": "{{n}} more post hasn't reached anyone yet",
+        "foldAllZero_other": "{{n}} more posts haven't reached anyone yet",
+        "foldNoneZero_one": "{{n}} more post reached fewer golfers",
+        "foldNoneZero_other": "{{n}} more posts reached fewer golfers",
+        "foldMixed": "{{n}} more posts, {{z}} not reached yet",
+        "show": "Show",
+        "showFewer": "Show fewer",
+        "fineReached": "A golfer counts once per post, on the day it first reached their screen. Your own team isn't counted.",
+        "fineNone": "Golfers see your posts in their Clubhouse feed. Your own team isn't counted.",
+        "lastReached_one": "Your last post went up on <b>{{date}}</b> and reached <b>{{n}} golfer</b>.",
+        "lastReached_other": "Your last post went up on <b>{{date}}</b> and reached <b>{{n}} golfers</b>.",
+        "lastZero": "Your last post went up on <b>{{date}}</b> and hasn't reached anyone yet.",
+        "write": "Write a post"
       }
     },
     "week": {
