@@ -30,7 +30,6 @@ export function ReviewHoleTags(props: Props) {
   if (!props.holes.length || !props.shots.length) return null;
   const active = props.shots.find(shot => shot.id === activeId);
   const tagged = props.shots.filter(shot => props.assignments[shot.id] != null);
-  const used = [...new Set(tagged.map(shot => props.assignments[shot.id]))];
   const info = active ? props.metadata[active.id] : undefined;
   const summary = props.shots.length === tagged.length
     ? `${capitalPhotoCount(tagged.length)} on a hole. All still post with your review.`
@@ -72,11 +71,11 @@ export function ReviewHoleTags(props: Props) {
             ? <div className="relative mt-3 aspect-[4/3] overflow-hidden rounded-lg"><img src={active.posterUrl ?? active.previewUrl} alt="Your video" className="w-full h-full object-cover" /><GlassDurationBadge seconds={active.durationSeconds} bottom={8} right={8} fontSize={11} /></div>
             : <div className="relative mt-3 aspect-[4/3] overflow-hidden rounded-lg"><img src={active.previewUrl} alt="Your photograph" className="w-full h-full object-cover" /><span className="absolute bottom-2 left-2 rounded px-2 py-1 text-[11px] font-bold" style={{ color: RV2.ink, background: RV2.scrim }}>{info?.exif.captureDay ? `Taken ${dateLabel(info.exif.captureDay, true)}` : 'No date on this file'}</span></div>)}
           <div role="group" aria-label="Hole" className={`grid gap-[6px] mt-4 ${props.holes.length === 9 ? 'grid-cols-5' : 'grid-cols-6'}`}>
-            {props.holes.map(hole => <Button key={hole} variant="ghost" aria-label={`Hole ${hole}`} aria-pressed={!!active && props.assignments[active.id] === hole} data-state={used.includes(hole) ? 'used' : 'open'} className="aspect-square h-auto min-w-0 p-0 rounded-lg text-sm font-bold tabular-nums" style={{ border: `1px solid ${used.includes(hole) ? RV2.success : RV2.hairlineStrong}`, color: used.includes(hole) ? RV2.success : RV2.secondary, background: active && props.assignments[active.id] === hole ? RV2.trackStrong : 'transparent' }} onClick={() => { if (active) props.assign(active.id, hole); setActiveId(null); }}>{hole}</Button>)}
+            {props.holes.map(hole => <Button key={hole} variant="ghost" aria-label={`Hole ${hole}`} aria-pressed={!!active && props.assignments[active.id] === hole} data-state="open" className="aspect-square h-auto min-w-0 p-0 rounded-lg text-sm font-bold tabular-nums" style={{ border: `1px solid ${RV2.hairlineStrong}`, color: RV2.secondary, background: active && props.assignments[active.id] === hole ? RV2.trackStrong : 'transparent' }} onClick={() => { if (active) props.assign(active.id, hole); setActiveId(null); }}>{hole}</Button>)}
           </div>
-          {used.length > 0 && <p className="mt-3" style={note}>The {used.map(ordinal).join(' and ')} {used.length === 1 ? 'is' : 'are'} green because you have already used {used.length === 1 ? 'it' : 'them'} in this review. You can use one twice — two photographs of the same hole is a normal thing to post.</p>}
         </div>
       </SheetContent>
+
     </Sheet>
     <Sheet open={roundOpen} onOpenChange={setRoundOpen}>
       <SheetContent side="bottom" className="rounded-t-lg sm:max-w-[480px] sm:mx-auto" style={{ background: RV2.canvas, color: RV2.ink }}>

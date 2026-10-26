@@ -16,6 +16,8 @@ vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } 
 vi.mock('@/uploads/resilientVideoUpload', () => ({ uploadVideoResilient: vi.fn() }));
 
 import { ReviewHoleTags } from '@/features/review-v2/components/ReviewHoleTags';
+import { RV2 } from '@/features/review-v2/tokens';
+
 import { useReviewHoleTags } from '@/features/review-v2/hooks/useReviewHoleTags';
 import { writeComposerHolePhoto, composerPhotoVerdict, type ComposerHoleJob } from '@/lib/courseMedia/composerHolePhotos';
 import { uploadAndPublishReview, startReviewUpload } from '@/features/review-v2/lib/reviewUploadController';
@@ -79,7 +81,7 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
   it('a lower already-used hole remains selectable and closes immediately', () => {
     const assign = vi.fn(); render(<ReviewHoleTags {...props({ assignments: { p: 9 }, assign })} />);
     fireEvent.click(screen.getByRole('button', { name: 'Tag photo 1' }));
-    expect(screen.getByRole('button', { name: 'Hole 9' })).toHaveAttribute('data-state', 'used');
+    expect(screen.getByRole('button', { name: 'Hole 9' })).toHaveAttribute('data-state', 'open');
     expect(screen.getByRole('button', { name: 'Hole 2' })).toBeEnabled();
     fireEvent.click(screen.getByRole('button', { name: 'Hole 2' }));
     expect(assign).toHaveBeenCalledWith('p', 2); expect(screen.queryByRole('dialog')).toBeNull();
@@ -89,6 +91,27 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Tag photo 2' }));
     fireEvent.click(screen.getByRole('button', { name: 'Hole 2' })); expect(assign).toHaveBeenCalledWith('q', 2);
   });
+  it('a used hole renders exactly like every other hole in the grid', () => {
+    render(<ReviewHoleTags {...props({ assignments: { p: 9 } })} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Tag photo 1' }));
+    const buttons = screen.getAllByRole('button', { name: /^Hole / });
+    expect(buttons).toHaveLength(2);
+    for (const btn of buttons) {
+      expect(btn).toHaveStyle({ color: RV2.secondary });
+      expect(btn).toHaveStyle({ border: `1px solid ${RV2.hairlineStrong}` });
+      expect(btn).not.toHaveStyle({ color: RV2.success });
+    }
+    expect(screen.getByRole('button', { name: 'Hole 9' })).toHaveStyle({ background: RV2.trackStrong });
+  });
+  it('the sheet never prints the green-hole explanation', () => {
+    render(<ReviewHoleTags {...props({ shots: [photo, { ...photo, id: 'q' }], assignments: { p: 9 } })} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Tag photo 1' }));
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.textContent).not.toMatch(/green/i);
+    expect(dialog.textContent).not.toMatch(/already used/i);
+    expect(screen.queryByText(/because you have already used/)).toBeNull();
+  });
+
   it('assignments are client-only until capture, exclude removed files and include tagged videos', async () => {
     const { result, rerender } = renderHook(({ items }) => useReviewHoleTags('course', 'member', items), { initialProps: { items: [photo, video] }, wrapper });
     act(() => { result.current.assign('p', 9); result.current.assign('v', 2); });
