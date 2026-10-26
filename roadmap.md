@@ -1,6 +1,7 @@
 # Roadmap
 
 ## BRIEF_REVIEW_MEDIA_UPLOAD_PROGRESS
+- [ ] OWNERSHIP ruling received: authenticated TUS Upload-Creator stamp/client-owner stripping, creator or owned legacy-row Stream checks, owned-row deletes and real canonical own-folder R2 deletes first; then resume original brief and required regressions. Photo R2 key names confirmed set; Cloudflare connector unavailable and connection card opened before provider code changes. No SQL or migrations.
 - [ ] STOP before early-upload/cleanup implementation: review resilient TUS uploads record no trusted caller ownership marker. tusVideoUpload.ts:43–54 supplies filename/client metadata only; cloudflare-stream-tus-endpoint/index.ts:40–58 forwards metadata without auth.getUser. cleanup-review-media/index.ts:98–107 deletes caller-provided stream_id directly after authenticating only the requester. Cannot prove ownership for an unattached Stream asset. Requires an approved authenticated server ownership marker at creation and verification before deletion; no unverified videos deleted.
 - [ ] Upload-on-add, two-slot queue and joined publish are blocked by unsafe abandon cleanup for preuploaded videos; no application/test/edge edits or deployments made. Probe/tray/batch/footer work not started under the explicit STOP clause. Existing baseline 3,208 tests/373 files; no tests rerun and no independent typecheck for this audit. Detailed report Review_media_upload_progress_stop_report.md.
 
