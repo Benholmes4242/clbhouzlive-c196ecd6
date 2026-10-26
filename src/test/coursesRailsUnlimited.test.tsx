@@ -27,6 +27,19 @@ const course = (i: number): LatestCourseMedia => ({ course_id: `c-${i}`, course_
 const page = (spec: Kind, start = 0, count: number = spec.size): Row[] => Array.from({ length: count }, (_, i) => spec.kind === 'holes' ? hole(start + i) : course(start + i));
 const cursor = (row: Row) => 'id' in row ? { p_before_at: row.created_at, p_before_id: row.id } : { p_before_at: row.latest_at, p_before_id: row.course_id };
 type Observer = { callback: IntersectionObserverCallback; options?: IntersectionObserverInit; target?: Element; active: boolean };
+// Shared setup installs a writable, non-configurable class. Extend it rather than
+// asking stubGlobal to redefine its descriptor; restore the original class per test.
+const SharedObserver = globalThis.IntersectionObserver;
+class FakeObserver extends SharedObserver {
+  entry: Observer;
+  constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {
+    super(callback, options);
+    this.entry = { callback, options, active: true };
+    observers.push(this.entry);
+  }
+  observe(target: Element) { this.entry.target = target; }
+  disconnect() { this.entry.active = false; }
+}
 let observers: Observer[];
 let clients: QueryClient[];
 let pages: Row[][];
@@ -46,12 +59,7 @@ const cards = (view: ReturnType<typeof mount>, spec: Kind) => view.container.que
 beforeEach(() => {
   vi.clearAllMocks(); observers = []; clients = []; pages = [];
   useFullscreenFeedStore.setState({ isOpen: false });
-  vi.stubGlobal('IntersectionObserver', class {
-    entry: Observer;
-    constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) { this.entry = { callback, options, active: true }; observers.push(this.entry); }
-    observe(target: Element) { this.entry.target = target; }
-    disconnect() { this.entry.active = false; }
-  });
+  globalThis.IntersectionObserver = FakeObserver;
   f.rpc.mockImplementation(async (name: string, args?: Record<string, unknown>) => {
     if (name.startsWith('get_latest_')) return { data: pages[args?.p_before_id ? 1 : 0] ?? [], error: null };
     if (name === 'is_admin') return { data: true, error: null };
@@ -60,7 +68,7 @@ beforeEach(() => {
   });
   f.single.mockResolvedValue({ data: { id: 'tag', user_id: 'member', hole_no: 4, status: 'approved' }, error: null });
 });
-afterEach(() => { cleanup(); clients.forEach(client => client.clear()); useFullscreenFeedStore.setState({ isOpen: false }); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); clients.forEach(client => client.clear()); useFullscreenFeedStore.setState({ isOpen: false }); globalThis.IntersectionObserver = SharedObserver; vi.unstubAllGlobals(); });
 
 describe.each(kinds)('$kind unlimited rail', spec => {
   it('requests the first page with its page size and no cursor', async () => {
