@@ -68,7 +68,8 @@ export function ReviewHoleTags(props: Props) {
       if (props.assignments[id] != null) { setReviewing(true); setSelected(null); setConfirmation(null); setRemovedNotice(false); }
       return;
     }
-    focus(id);
+    setActiveId(id); setSelected(null); setConfirmation(null); setRemovedNotice(false);
+    setReviewing(props.assignments[id] != null);
   };
   const confirmTag = () => {
     if (!active || selected == null || inTaggedState || allTagged) return;
