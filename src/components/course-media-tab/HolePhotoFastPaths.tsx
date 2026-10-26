@@ -41,12 +41,17 @@ export function HoleKnownPhotoPath({ hole, photos, sources = [], pending, upload
 
 /** BRIEF_HOLE_TAG_BATCH_V3: one large current shot, a single sideways row of
  * tappable thumbnails, a hole grid that only selects, and "Confirm tag" that
- * writes. The window stays open until closed; there is no Skip or Done. */
-export function HolePhotoBatchPath({ photos, knownHoles, onTag, onClose, adminMode = false, existingHoleTags = [] }: {
+ * writes. The window stays open until closed; there is no Skip or Done.
+ * BRIEF_HOLE_TAG_BATCH_REMOVE_TAG: with onRemove, tapping a tagged thumbnail
+ * reopens it in a locked "tagged" state whose only write is Remove tag. */
+export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClose, adminMode = false, existingHoleTags = [] }: {
   photos: readonly (BatchPhoto & Partial<OwnMediaSource> & { ownerName?: string })[]; rounds?: readonly HolePhotoRound[]; memberId?: string; courseId?: string; knownHoles: readonly number[]; adminMode?: boolean;
   /** The member's own non-rejected tags at this course, one entry per tag. */
   existingHoleTags?: readonly number[];
-  onTag: (url: string, hole: number) => Promise<HolePhoto>; onClose: () => void;
+  onTag: (url: string, hole: number) => Promise<HolePhoto>;
+  /** Removes a tag made in this batch. Absent: tagged thumbnails stay inert. */
+  onRemove?: (row: HolePhoto) => Promise<void>;
+  onClose: () => void;
 }) {
   const [existing] = useState(() => [...existingHoleTags]);
   const [currentUrl, setCurrentUrl] = useState<string | undefined>(() => photos[0]?.url);
