@@ -33,18 +33,18 @@ import {
 /* NO PRIVATE PALETTE. This page declared its own INK/HAIR/CARD_BG/GREEN/RED
    and imported nothing, which is why two import-tracing sweeps could not see
    it. Colours come from the shared manage vocabulary (itself derived from the
-   analytical `A` ramp) and from BIZ for the amber wash. Add a colour here and
-   the next audit is blind again. */
+   analytical `A` ramp). CB90: notice figures stay neutral; rating foregrounds
+   retain the shared score rule. Add a colour here and the next audit is
+   blind again. */
 /* GREEN is gone: its only two uses were band colours, now the canon's.
    RED stays — it is DANGER, used by the 1000-char warning and the delete/error
    blocks, a different quantity on a different scale. */
 import { INK, INK_45, HAIR, CARD_BG, PAGE_BG, DANGER as RED } from '@/components/manage/ui';
 import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
-import { BIZ } from '@/components/business/businessTokens';
 import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
-const AMBER = A.AMBER;
-const AMBER_SOFT = BIZ.amberTint;
+/* Dark ink on the white Retry button. */
+const ON_INK = '#0B0B0D';
 
 type ChipKey = 'all' | 'unreplied' | 'recent' | 'lowest';
 
@@ -59,7 +59,7 @@ const CHIPS: Array<{ key: ChipKey; label: string; filter: BusinessReviewFilter; 
 function ratingTone(rating: number): { bg: string; fg: string } {
   const fg = courseSubScoreTone(rating);
   if (rating >= 9) return { bg: 'rgba(47,163,90,0.16)', fg };
-  if (rating >= 5) return { bg: AMBER_SOFT, fg };
+  if (rating >= 5) return { bg: A.SOFT, fg };
   return { bg: 'rgba(255,107,107,0.16)', fg };
 }
 
@@ -121,6 +121,7 @@ function ReplySheet({
     <Sheet open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
       <SheetContent
         side="bottom"
+        hideCloseButton
         className="p-0 border-0 rounded-t-2xl max-h-[85dvh] overflow-hidden"
         style={{ background: PAGE_BG }}
       >
@@ -271,13 +272,13 @@ function Distribution({ dist }: { dist: Array<{ bucket: number; count: number }>
   );
 }
 
-function StatCell({ label, value, tone = 'ink' }: { label: string; value: string; tone?: 'ink' | 'amber' }) {
+function StatCell({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex-1 text-center py-2">
       <div
         className="tabular-nums"
         style={{
-          color: tone === 'amber' ? AMBER : INK,
+          color: INK,
           fontSize: 18,
           fontWeight: 700,
           letterSpacing: '-0.01em',
@@ -342,9 +343,9 @@ export function ReviewCard({
       {!hasReply && (
         <div
           className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.15em]"
-          style={{ color: BIZ.amber, marginBottom: 9 }}
+          style={{ color: A.MUTE, marginBottom: 9 }}
         >
-          <span style={{ width: 6, height: 6, borderRadius: 3, background: BIZ.amber }} />
+          <span style={{ width: 6, height: 6, borderRadius: 3, background: INK }} />
           Awaiting reply
         </div>
       )}
@@ -493,9 +494,9 @@ export default function BusinessReviewsPage() {
         <main className="px-4 pt-16 pb-22 max-w-lg mx-auto text-center">
           <div
             className="mx-auto mb-4 flex items-center justify-center"
-            style={{ width: 56, height: 56, borderRadius: 16, background: AMBER_SOFT }}
+            style={{ width: 56, height: 56, borderRadius: 16, background: A.SOFT }}
           >
-            <Star size={24} strokeWidth={2} style={{ color: AMBER }} />
+            <Star size={24} strokeWidth={2} style={{ color: INK }} />
           </div>
           <h2 style={{ ...TITLE, color: INK }}>
             Reviews are for golf course profiles
@@ -565,7 +566,6 @@ export default function BusinessReviewsPage() {
                   <StatCell
                     label="Awaiting"
                     value={String(summary?.awaiting_reply ?? 0)}
-                    tone={(summary?.awaiting_reply ?? 0) > 0 ? 'amber' : 'ink'}
                   />
                   <div style={{ width: 1, height: 24, background: HAIR }} />
                   <StatCell label="Reply rate" value={`${Math.round(summary?.reply_rate ?? 0)}%`} />
@@ -627,8 +627,8 @@ export default function BusinessReviewsPage() {
               <button
                 type="button"
                 onClick={() => refetch()}
-                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[12.5px] font-bold text-white active:opacity-90"
-                style={{ background: AMBER, border: 'none' }}
+                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[12.5px] font-bold active:opacity-90"
+                style={{ background: INK, color: ON_INK, border: 'none' }}
               >
                 Retry
               </button>
@@ -640,9 +640,9 @@ export default function BusinessReviewsPage() {
             >
               <div
                 className="mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-3"
-                style={{ background: AMBER_SOFT }}
+                style={{ background: A.SOFT }}
               >
-                <Sparkles size={22} style={{ color: AMBER }} />
+                <Sparkles size={22} style={{ color: INK }} />
               </div>
               <div className="text-[16px] font-bold" style={{ color: INK }}>
                 No reviews for the {courseNameWithinClub(selectedCourse.course_name)} yet
@@ -660,9 +660,9 @@ export default function BusinessReviewsPage() {
             >
               <div
                 className="mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-3"
-                style={{ background: AMBER_SOFT }}
+                style={{ background: A.SOFT }}
               >
-                <Sparkles size={22} style={{ color: AMBER }} />
+                <Sparkles size={22} style={{ color: INK }} />
               </div>
               <div className="text-[16px] font-bold" style={{ color: INK }}>
                 No reviews yet

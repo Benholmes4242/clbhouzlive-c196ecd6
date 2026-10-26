@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB90 — Reviews neutral paint and one reply close control
+- [x] Read the brief and audit existing reviews assertions; none require retargeting. Preserve reply behaviour, rating foregrounds and outer-band washes.
+- [x] Replace page-only notice/empty/error/mid-rating paint; hide the shared sheet close control only here. Add 12 new cases in cb90ReviewsNeutral.test.tsx; existing tests untouched.
+- [ ] STOP: src/test/cb90ReviewsNeutral.test.tsx:118:28, “CB90 reviews neutral paint and reply close > the selected-course empty Sparkles tile is neutral”: TestingLibraryElementError: Unable to find an accessible element with the role "button" and name `/West Course/`. Existing RailChips exposes role="tab"; new fixture selector is wrong. No correction after failure. Targeted bunx vitest run src/test/cb90ReviewsNeutral.test.tsx: 11 passed / 1 failed / 12 total. Full suite not run after stop; last reported baseline 3,119 / 365 files / zero failures; candidate inventory 3,131 / 366 (+12 new cases / +1 file), unverified. Latest automatic build 12:25:55Z OK. Live authenticated verification unavailable (external_unmanaged).
+
 ## CB87 — Signup detection and database-owned clbhouz follow
 - [x] Remove the app-side follow and use parsed confirmation/creation timestamps for all three signup-success events. Exported business ID has no consumers; separate onboarding-nudges local constant unchanged. No other equality sites; no existing tests retargeted.
 - [x] Add 16 helper tests and 7 AuthForm/audit tests. Targeted bunx vitest run src/lib/auth/isNewSignup.test.ts src/test/cb87SignupAnalytics.test.tsx: 23/23. Full bunx vitest run: 3,031 passed / 1 failed, 3,032 total / 359 files, versus 3,009 / 357 (+23 / +2). Prior AdminShell failure did not recur. Automatic build 09:18:17Z OK. Report: CB87_signup_stop_report.md.
