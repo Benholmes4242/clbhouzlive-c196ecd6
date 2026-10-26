@@ -37,7 +37,7 @@ import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { BIZ } from '@/components/business/businessTokens';
 import { formatNumber, formatDayMonthShortGB } from '@/i18n/format';
 import {
-  A, BIZ_KICKER, BIZ_LABEL, BIZ_TITLE, BIZ_BODY, bizFigure, BIZ_INSET, BIZ_TRACK_H,
+  A, BIZ_KICKER, BIZ_LABEL, BIZ_TITLE, BIZ_BODY, bizFigure, BIZ_TRACK_H,
 } from '@/features/courses/components/holes/analytical/tokens';
 
 type DateRange = '7d' | '30d' | '90d';
@@ -56,10 +56,6 @@ const cardStyle: React.CSSProperties = { background: BIZ.card, border: `1px soli
 const numFeat: React.CSSProperties = { fontFeatureSettings: '"kern" 1, "liga" 1' };
 
 const formatNum = (n: number) => formatNumber(n ?? 0);
-const formatDay = (iso: string) => {
-  try { return formatDayMonthShortGB(iso); }
-  catch { return iso; }
-};
 
 // ─────────────────────────────────────────────────────────────
 // Reused Reviews section (structure untouched; amber -> neutral ink only)
@@ -141,24 +137,6 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
     </>
   );
 };
-
-// ─────────────────────────────────────────────────────────────
-// Building blocks
-// ─────────────────────────────────────────────────────────────
-const InsightCard = ({ title, kicker, action, children }: {
-  title: string; kicker?: string; action?: React.ReactNode; children: React.ReactNode;
-}) => (
-  <section className="rounded-[18px] p-4 md:p-5 space-y-4" style={cardStyle}>
-    <div className="flex items-start justify-between gap-3">
-      <div>
-        {kicker && <p className="mb-1.5" style={BIZ_KICKER}>{kicker}</p>}
-        <h3 style={BIZ_TITLE}>{title}</h3>
-      </div>
-      {action}
-    </div>
-    {children}
-  </section>
-);
 
 // ─────────────────────────────────────────────────────────────
 // Page
