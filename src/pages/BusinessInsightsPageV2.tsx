@@ -19,9 +19,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-} from 'recharts';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
@@ -30,6 +27,7 @@ import { useBusinessInsightsFunnel } from '@/hooks/useBusinessInsightsFunnel';
 import { InsightsFunnel } from '@/components/business/insights/InsightsFunnel';
 import { InsightsVisitsSection } from '@/components/business/insights/InsightsVisitsSection';
 import { InsightsAudienceSection } from '@/components/business/insights/InsightsAudienceSection';
+import { InsightsFollowersSection } from '@/components/business/insights/InsightsFollowersSection';
 import { InsightsPostsSection } from '@/components/business/insights/InsightsPostsSection';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
@@ -37,9 +35,9 @@ import { Button } from '@/components/ui/button';
 import { RailChips } from '@/components/ui/RailChips';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { BIZ } from '@/components/business/businessTokens';
-import { formatNumber, formatDayMonthShortGB } from '@/i18n/format';
+import { formatNumber } from '@/i18n/format';
 import {
-  A, BIZ_KICKER, BIZ_LABEL, BIZ_TITLE, BIZ_BODY, bizFigure, BIZ_INSET, BIZ_TRACK_H,
+  A, BIZ_KICKER, BIZ_LABEL, BIZ_TITLE, BIZ_BODY, bizFigure, BIZ_TRACK_H,
 } from '@/features/courses/components/holes/analytical/tokens';
 
 type DateRange = '7d' | '30d' | '90d';
@@ -58,10 +56,6 @@ const cardStyle: React.CSSProperties = { background: BIZ.card, border: `1px soli
 const numFeat: React.CSSProperties = { fontFeatureSettings: '"kern" 1, "liga" 1' };
 
 const formatNum = (n: number) => formatNumber(n ?? 0);
-const formatDay = (iso: string) => {
-  try { return formatDayMonthShortGB(iso); }
-  catch { return iso; }
-};
 
 // ─────────────────────────────────────────────────────────────
 // Reused Reviews section (structure untouched; amber -> neutral ink only)
@@ -145,88 +139,6 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
 };
 
 // ─────────────────────────────────────────────────────────────
-// Building blocks
-// ─────────────────────────────────────────────────────────────
-const InsightCard = ({ title, kicker, action, children }: {
-  title: string; kicker?: string; action?: React.ReactNode; children: React.ReactNode;
-}) => (
-  <section className="rounded-[18px] p-4 md:p-5 space-y-4" style={cardStyle}>
-    <div className="flex items-start justify-between gap-3">
-      <div>
-        {kicker && <p className="mb-1.5" style={BIZ_KICKER}>{kicker}</p>}
-        <h3 style={BIZ_TITLE}>{title}</h3>
-      </div>
-      {action}
-    </div>
-    {children}
-  </section>
-);
-
-/**
- * THE one chart inset. Every chart region sits in it whether it has data or
- * not, so the page does not change shape as data arrives. No border, and no
- * dashes - a broken edge says something is missing, and nothing is missing.
- */
-const ChartInset = ({ children, height, center = false }: {
-  children: React.ReactNode; height?: number; center?: boolean;
-}) => (
-  <div
-    style={{
-      ...BIZ_INSET,
-      minHeight: height,
-      padding: center ? '20px 16px' : '10px 6px 6px',
-      display: center ? 'flex' : undefined,
-      flexDirection: center ? 'column' : undefined,
-      alignItems: center ? 'center' : undefined,
-      justifyContent: center ? 'center' : undefined,
-      textAlign: center ? 'center' : undefined,
-    }}
-  >
-    {children}
-  </div>
-);
-
-const InsetMessage = ({ title, body }: { title?: string; body: string }) => (
-  <>
-    {title && <p style={{ ...BIZ_LABEL, marginBottom: 6 }}>{title}</p>}
-    <p style={{ ...BIZ_BODY, maxWidth: 280 }}>{body}</p>
-  </>
-);
-
-// ─────────────────────────────────────────────────────────────
-// Section: Followers growth
-// ─────────────────────────────────────────────────────────────
-const FollowersChart = ({ data, emptyTitle, emptyBody }: {
-  data: { day: string; count: number }[]; emptyTitle: string; emptyBody: string;
-}) => {
-  // ABSENCE of rows is "no data"; a flat zero line is the truthful answer.
-  const hasData = data.length > 0;
-  if (!hasData) {
-    return (
-      <ChartInset height={200} center>
-        <InsetMessage title={emptyTitle} body={emptyBody} />
-      </ChartInset>
-    );
-  }
-  const rows = data.map(d => ({ day: formatDay(d.day), Followers: d.count }));
-  return (
-    <ChartInset height={200}>
-      <div style={{ width: '100%', height: 184 }}>
-        <ResponsiveContainer>
-          <LineChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-            <CartesianGrid stroke={A.TRACK} strokeDasharray="2 4" vertical={false} />
-            <XAxis dataKey="day" tick={{ fill: A.MUTE, fontSize: 10 /* AXIS floor 10: chart tick, a coordinate */ }} axisLine={false} tickLine={false} minTickGap={20} />
-            <YAxis tick={{ fill: A.MUTE, fontSize: 10 /* AXIS floor 10: chart tick, a coordinate */ }} axisLine={false} tickLine={false} width={28} allowDecimals={false} />
-            <Tooltip contentStyle={{ background: A.PANEL, border: `1px solid ${A.BORDER}`, borderRadius: 8, fontSize: 12, color: A.INK }} labelStyle={{ color: A.MUTE }} />
-            <Line type="monotone" dataKey="Followers" stroke={A.INK} strokeWidth={2} dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    </ChartInset>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────
 // Page
 // ─────────────────────────────────────────────────────────────
 const BusinessInsightsPageV2 = () => {
@@ -295,7 +207,6 @@ const BusinessInsightsPageV2 = () => {
   }
 
   const rangeLabels: Record<DateRange, string> = { '7d': '7 days', '30d': '30 days', '90d': '90 days' };
-  const h = insights.headline;
   const canPost = !!membership.role && ['owner', 'admin', 'editor'].includes(membership.role);
 
   const rangePicker = (
@@ -339,27 +250,12 @@ const BusinessInsightsPageV2 = () => {
           <InsightsAudienceSection businessId={business.id} businessName={business.name} />
         </div>
 
-        {/* ── FOLLOWERS ── */}
-        <InsightCard
-          kicker="AUDIENCE"
-          title="Follower growth"
-          action={
-            <div className="text-right">
-              <p style={BIZ_LABEL}>{t('business.insights.followers.total')}</p>
-              <p className="tabular-nums mt-1" style={bizFigure(19)}>{formatNum(h.total_followers)}</p>
-            </div>
-          }
-        >
-          {insightsLoading
-            ? <Skeleton className="h-[200px] w-full rounded-[13px]" />
-            : (
-              <FollowersChart
-                data={insights.followers_series}
-                emptyTitle={t('business.insights.empty.followersTitle')}
-                emptyBody={t('business.insights.empty.followersBody')}
-              />
-            )}
-        </InsightCard>
+        {/* ── CB86: FOLLOWERS (replaces AUDIENCE · Follower growth). Draws
+            nothing until the first read settles or if it fails; period
+            switches keep the previous card. ── */}
+        <div className="-mx-4 md:-mx-6 !mt-0">
+          <InsightsFollowersSection businessId={business.id} businessName={business.name} days={RANGE_DAYS[dateRange]} />
+        </div>
 
         {/* ── CB85: YOUR POSTS (replaces CONTENT · Top posts). Draws nothing
             until the first read settles or if it fails; period switches keep

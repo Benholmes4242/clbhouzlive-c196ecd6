@@ -4974,3 +4974,16 @@ em-emoji-picker input:focus {
 .insights-posts-last { margin: 4px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--team-muted); }
 .insights-posts-last b { color: var(--team-ink); font-weight: 600; }
 .insights-posts-write { margin-top: 14px; width: 100%; height: 40px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.9); background: transparent; color: var(--team-ink); font-size: 13.5px; font-weight: 700; }
+/* CB86 — Insights section 5 "Followers" */
+.insights-followers-card { margin: 14px 16px 0; background: var(--team-request-surface); border: 1px solid var(--team-border); border-radius: 18px; padding: 16px; color: var(--team-ink); }
+.insights-followers-title { margin: 6px 0 0; font-size: 17px; font-weight: 700; letter-spacing: -.01em; line-height: 1.3; }
+.insights-followers-change { margin-left: 8px; font-size: 13px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
+.insights-followers-last { margin: 4px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--team-muted); }
+.insights-followers-last b { color: var(--team-ink); font-weight: 600; }
+.insights-followers-inset { margin-top: 12px; background: var(--insights-inset); border-radius: 13px; padding: 14px; }
+.insights-followers-reached { font-size: 22px; font-weight: 700; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.insights-followers-of { margin-left: 4px; font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--team-dim); }
+.insights-followers-saw { margin: 2px 0 0; font-size: 12.5px; line-height: 1.4; color: var(--team-muted); }
+.insights-followers-bar { margin-top: 10px; height: 6px; border-radius: 3px; background: var(--team-hairline); position: relative; }
+.insights-followers-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: var(--team-ink); }
+.insights-followers-fine { margin: 10px 0 0; font-size: 11.5px; line-height: 1.45; color: var(--team-dim); }
