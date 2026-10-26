@@ -148,14 +148,16 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
       <span className="hole-photo-batch-chip" data-chip>{`${index + 1} / ${photos.length}`}</span>
     </div>
     {adminMode && photo.ownerName && <p className="hole-photo-batch-owner">{[photo.ownerName, addedMonthLabel(photo.createdAt)].filter(Boolean).join(' \u00B7 ')}</p>}
-    {confirmation && !error && <p role="status" aria-live="polite" className="hole-photo-batch-ok"><Check size={14} strokeWidth={3} style={{ color: A.IMPROVED }} aria-hidden="true" /><span>{confirmation}</span></p>}
+    {confirmation && !error && !inTaggedState && <p role="status" aria-live="polite" className="hole-photo-batch-ok"><Check size={14} strokeWidth={3} style={{ color: A.IMPROVED }} aria-hidden="true" /><span>{confirmation}</span></p>}
+    {inTaggedState && taggedHole != null && <p role="status" aria-live="polite" className="hole-photo-batch-ok"><span>{`Tagged to the ${ordinal(taggedHole)}. Remove the tag to choose a different hole.`}</span></p>}
+    {removedNotice && !inTaggedState && <p role="status" aria-live="polite" className="hole-photo-batch-ok"><span>Tag removed. Pick the right hole.</span></p>}
     <div className="hole-photo-batch-strip" data-strip>
       <div className="hole-photo-batch-row">{photos.map((item, i) => {
         const hole = tags[item.url]; const gone = unavailable.has(item.url); const current = item.url === photo.url;
         return <button key={item.url} type="button" ref={el => { if (el) thumbs.current.set(item.url, el); else thumbs.current.delete(item.url); }}
           className={`hole-photo-batch-thumb${current ? ' is-current' : ''}${hole != null || gone ? ' is-done' : ''}`}
           aria-label={`Shot ${i + 1} of ${photos.length}${hole != null ? `, tagged to the ${ordinal(hole)}` : ''}`}
-          aria-current={current ? 'true' : undefined} aria-disabled={hole != null || gone ? 'true' : undefined}
+          aria-current={current ? 'true' : undefined} aria-disabled={gone || (hole != null && !onRemove) ? 'true' : undefined}
           data-tagged={hole ?? undefined} data-unavailable={gone || undefined}
           onClick={() => choose(item.url)}>
           <HoleMediaThumbnail {...item} alt="" />
