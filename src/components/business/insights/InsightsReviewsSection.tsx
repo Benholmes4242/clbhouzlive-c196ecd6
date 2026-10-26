@@ -4,10 +4,13 @@
  * if it fails or the server says the business is not linked; period switches
  * keep the previous card. Every figure (averages, ranks, unreplied) is the
  * server's, displayed as given. Rating/score figures of SUB_SCORE_GREEN_MIN
- * and above read A.GREEN, as on the reviews page.
+ * and above read A.GREEN, as on the reviews page. Course rows name the course
+ * inside the club with courseNameWithinClub, as the reviews page does, so a
+ * multi-course club reads "East Course", not the stored full name.
  */
 import { useTranslation } from 'react-i18next';
 import { formatNumber } from '@/i18n/format';
+import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 import { A, SUB_SCORE_GREEN_MIN } from '@/features/courses/components/holes/analytical/tokens';
 import { useBusinessReviewSummary, type BusinessReviewSummary, type ReviewSummaryScore } from '@/hooks/useBusinessReviewSummary';
 
@@ -77,7 +80,7 @@ const Card = ({ d, days, businessName, businessId, canManage, onNavigate, k }: {
           {d.courses.map(c => (
             <div key={c.course_id} className="insights-reviews-course" data-course={c.course_id}>
               <div>
-                <div className="insights-reviews-course-name">{c.name}</div>
+                <div className="insights-reviews-course-name">{courseNameWithinClub(c.name)}</div>
                 <div className="insights-reviews-course-sub" data-course-rank={c.rank != null && c.rank_of != null ? 'yes' : 'no'}>
                   {k('courseReviews', { count: c.reviews, n: formatNumber(c.reviews) })}
                   {c.rank != null && c.rank_of != null && k('courseRank', { rank: ordinal(c.rank), of: formatNumber(c.rank_of), county: c.county ?? '' })}
