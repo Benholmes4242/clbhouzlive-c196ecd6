@@ -1,8 +1,9 @@
 # Roadmap
 
 ## BRIEF_HOLE_PANEL_VIDEO_AUTOPLAY_V2
-- [ ] Add shared muted active-shot autoplay using the existing tile coordinator; pause beneath tagging dialogs and fullscreen.
-- [ ] Add playback/fallback/integration regressions, run the full suite, and report automatic typecheck/build status against 2,993 tests / 356 files.
+- [x] Add shared muted active-shot autoplay using the existing tile coordinator; pause beneath tagging dialogs and fullscreen. Manual players, thumbnails, processing and viewer unchanged.
+- [x] Added 16 cases in holeInlineAutoplay.test.tsx; two approved existing disc cases use reduced-motion fixtures with assertions unchanged. Targeted 44/3 passed. Full bunx vitest run: 3,008 passed / 1 failed, 3,009 total / 357 files, from 2,993/356 (+16/+1). Automatic build 09:07:25Z OK; standalone typecheck prohibited, not run.
+- [ ] STOP: src/features/admin/AdminShell.test.tsx:88:25, case /admin-v2/health?tab=settings redirects to /admin-v2/settings. TestingLibraryElementError: Unable to find an element with the text: Settings page. No correction or rerun after failure; browser verification not attempted after stop. Report Hole_inline_autoplay_V2_report.md.
 
 ## BRIEF_LATEST_HOLES_SWIPE_AND_CAPTION
 - [x] Separate caption details, rail-wide immediate synthetic run and active-shot course header; frozen entrypoints/offsets unchanged.
