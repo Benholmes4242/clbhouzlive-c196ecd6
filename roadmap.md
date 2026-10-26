@@ -915,3 +915,7 @@
 - [x] MediaPreviewViewer optional edgeBounce prop: dx*0.35 capped 80px, 250ms ease-out spring-back, index unchanged; default false.
 - [x] Full `bunx vitest run`: 2,748 passed /339 files /0 failed, from 2,707/335 (+41 tests, +4 files: latestCoursesSection.test.tsx, holeViewerItems.test.ts, mediaPreviewEdgeBounce.test.tsx, latestHolesSection.test.tsx net +2). Authorized retargets in latestHolesSection.test.tsx: navigation-on-tap assertions and kicker. tsgo clean. Live RPC/auth verification unavailable (external_unmanaged). No SQL/migrations/RPC/feed_config changes; cap 30.
 - [x] CB84 Insights section 3 "Your golfers": useBusinessAudience (key ['business-audience', id], period-independent) + InsightsAudienceSection replacing the locked "Who's viewing you" card; ready/not_enough/none states, server-merged bands/regions rendered as returned; audience locale keys removed (en/en-XA); cb82 AUDIENCE-count assertion retargeted 2→1 (authorized). Suite 2,903/350 clean; tsc clean. Live RPC read unverified. No SQL/RPC/config changes; cap 30.
+
+## CB98.1 — page foot wording
+- [x] Privacy foot line on Your courses now reads the signed-off mock sentence exactly (ClubAnalyticsPage.tsx); styling unchanged.
+- [x] Retargeted the only assertion of the old sentence, cb91CoursesTop.test.tsx:43 regex. Full bunx vitest run 3,293 passed /381 files /0 failed (unchanged total, no new files); tsc clean; harness build OK.
