@@ -127,9 +127,15 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
     finally { setPending(false); }
   };
   const choose = (url: string) => {
-    if (pending || url === currentUrl) return;
+    if (pending) return;
     const hole = tags[url];
     if (unavailable.has(url) || (hole != null && !onRemove)) return;
+    if (url === currentUrl) {
+      // Tapping the current shot again only matters once it is tagged: enter
+      // the tagged state (the "All tagged" button otherwise hides it).
+      if (hole != null) { setReviewing(true); setConfirmation(null); setRemovedNotice(false); }
+      return;
+    }
     setCurrentUrl(url); setSelected(null); setConfirmation(null); setRemovedNotice(false);
     setReviewing(hole != null);
   };
