@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
-import { useGamRpc } from '@/hooks/gam/_useGamRpc';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
@@ -10,10 +12,15 @@ import { useSectionReady } from './PageLoadGate';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { RAIL_BLEED } from './format';
 import { PHOTO_FIGURE_GAP } from './PhotoFigureCard';
-import { LatestHolesShell } from './sectionShells';
+import { LatestHolesShell, LatestHoleSkeletonCard } from './sectionShells';
+import { dedupeRailRows, useRailPagination } from './useRailPagination';
 import './latestHoles.css';
 
-/** The RPC owns newest-first ordering, up to two shots per course, at most 30, and public eligibility.
+/** The RPC owns newest-first ordering, up to two shots per course and public eligibility.
+ * Cursor pages have no total cap; created_at/id belong to the last raw row, not the deduped cards.
+ * The gam_rpc/name prefix preserves AdminHoleTagging predicate invalidation.
+ * First-page readiness/minimum are independent of later fetches; fullscreen freezes pagination
+ * and receives a snapshot of every loaded row at the moment of the tap.
  * Credit shows the month the member added the shot to clbhouz (added_at), never its EXIF capture date; this rail never starts video playback.
  * Geometry is shared with the loading shell, not PhotoFigureCard.
  * BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §2: a tap opens the CANONICAL
@@ -25,6 +32,8 @@ import './latestHoles.css';
  */
 export const LATEST_HOLE_W = 220;
 export const LATEST_HOLE_H = 293;
+export const LATEST_HOLE_PAGE_SIZE = 20;
+const holesViewerOpen = () => useFullscreenFeedStore.getState().isOpen;
 
 export interface LatestHoleMedia {
   id: string;
@@ -73,9 +82,29 @@ function LatestHoleCard({ row, onOpen }: { row: LatestHoleMedia; onOpen: (row: L
 }
 
 export function LatestHolesSection() {
-  const { data, isLoading, isError } = useGamRpc<LatestHoleMedia[]>('get_latest_hole_media', { p_limit: 30 }, { staleTime: 60_000 });
+  const viewerOpen = useFullscreenFeedStore(state => state.isOpen);
+  const { data, isLoading, isError, hasNextPage, isFetching, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
+    queryKey: ['gam_rpc', 'get_latest_hole_media', 'infinite'],
+    initialPageParam: undefined as { at: string; id: string } | undefined,
+    queryFn: async ({ pageParam }) => {
+      const args = { p_limit: LATEST_HOLE_PAGE_SIZE, ...(pageParam ? { p_before_at: pageParam.at, p_before_id: pageParam.id } : {}) };
+      // RPC cursor arguments are already deployed; generated client types may lag that contract.
+      const { data, error } = await (supabase.rpc as unknown as (name: string, args: Record<string, unknown>) => Promise<{ data: LatestHoleMedia[] | null; error: unknown }>)('get_latest_hole_media', args);
+      if (error) throw error;
+      return data ?? [];
+    },
+    getNextPageParam: page => {
+      const last = page[page.length - 1];
+      return page.length < LATEST_HOLE_PAGE_SIZE || !last ? undefined : { at: last.created_at, id: last.id };
+    },
+    staleTime: 60_000,
+    enabled: !viewerOpen,
+  });
   useSectionReady('latestHoles', !isLoading);
-  const posts = useMemo(() => latestHolesToFeedPosts(data ?? []), [data]);
+  const rows = useMemo(() => dedupeRailRows(data?.pages ?? [], row => row.id), [data]);
+  const visible = !isLoading && !isError && (data?.pages[0]?.length ?? 0) >= 3;
+  const { railRef, sentinelRef } = useRailPagination({ hasNextPage, isFetching, fetchNextPage, cardWidth: LATEST_HOLE_W, pageCount: data?.pages.length ?? 0, visible, blocked: viewerOpen, isBlocked: holesViewerOpen });
+  const posts = useMemo(() => latestHolesToFeedPosts(rows), [rows]);
   const onOpen = (tapped: LatestHoleMedia) => {
     openWithOrigin({
       posts,
@@ -89,11 +118,13 @@ export function LatestHolesSection() {
   };
 
   if (isLoading) return <LatestHolesShell />;
-  if (isError || !data || data.length < 3) return null;
+  if (!visible) return null;
   return <section style={SECTION_WRAP}>
     <SectionHead tone="amber" kicker="Hole by hole" title="Latest holes" />
-    <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: PHOTO_FIGURE_GAP, marginTop: HEAD_GAP }}>
-      {data.map(row => <LatestHoleCard key={row.id} row={row} onOpen={onOpen} />)}
+    <div ref={railRef} className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: PHOTO_FIGURE_GAP, marginTop: HEAD_GAP, willChange: 'transform' }}>
+      {rows.map(row => <LatestHoleCard key={row.id} row={row} onOpen={onOpen} />)}
+      {isFetchingNextPage && <LatestHoleSkeletonCard />}
+      {hasNextPage && <div ref={sentinelRef} aria-hidden style={{ width: 1, flex: 'none', alignSelf: 'stretch' }} />}
     </div>
   </section>;
 }

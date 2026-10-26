@@ -15,7 +15,8 @@ const f = vi.hoisted(() => ({
 }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'member' } }) }));
-vi.mock('@/hooks/gam/_useGamRpc', () => ({ useGamRpc: (...args: unknown[]) => { f.rpc(...args); return { data: f.rows, isLoading: f.loading, isError: f.error }; } }));
+vi.mock('@tanstack/react-query', async importOriginal => ({ ...await importOriginal<typeof import('@tanstack/react-query')>(), useInfiniteQuery: (options: unknown) => { f.rpc(options); return { data: { pages: [f.rows] }, isLoading: f.loading, isError: f.error, hasNextPage: false, isFetching: f.loading, isFetchingNextPage: false, fetchNextPage: vi.fn() }; } }));
+vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: vi.fn().mockResolvedValue({ data: [], error: null }) } }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia', () => ({ useGalleryCourseMedia: () => f.gallery }));
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: (...args: unknown[]) => f.open(...args) }));
 
@@ -27,7 +28,7 @@ const tile = (id: string, over: Partial<LatestCourseMediaTile> = {}): LatestCour
   poster_url: null, stream_id: null, duration_seconds: null, created_at: '2026-10-20T12:00:00Z', ...over,
 });
 const course = (id: string, over: Partial<LatestCourseMedia> = {}): LatestCourseMedia => ({
-  course_id: `course-${id}`, course_name: `Course ${id}`, media_count: 14, contributor_count: 3,
+  course_id: `course-${id}`, latest_at: '2026-10-20T12:00:00Z', course_name: `Course ${id}`, media_count: 14, contributor_count: 3,
   latest_member_name: 'Mark Eldridge', tiles: [tile(`${id}-1`), tile(`${id}-2`), tile(`${id}-3`)], ...over,
 });
 
@@ -89,7 +90,7 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     expect(screen.getAllByText('Member shots')).toHaveLength(3);
     expect(screen.getByText('Course alpha')).toBeInTheDocument();
     expect(screen.getAllByText('Mark Eldridge and 2 others')).toHaveLength(3);
-    expect(f.rpc).toHaveBeenCalledWith('get_latest_course_media', { p_limit: 15 }, { staleTime: 60_000 });
+    expect(f.rpc).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['gam_rpc', 'get_latest_course_media', 'infinite'], staleTime: 60_000 }));
   });
 
   it('credit grammar: one other, no others, and an empty name omits the line', () => {

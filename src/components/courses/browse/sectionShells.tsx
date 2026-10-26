@@ -132,11 +132,19 @@ export function PhotoRailShell({ count }: { count: number }) {
 }
 
 /** Latest from the courses: two 300x230 cards, clipped. */
+export function LatestCourseSkeletonCard() {
+  return <Bar className="latest-course-skeleton-card" style={{ width: LATEST_COURSE_W, height: LATEST_COURSE_H, borderRadius: 0, flex: 'none' }} />;
+}
+
+export function LatestHoleSkeletonCard() {
+  return <Bar className="latest-hole-skeleton-card" style={{ width: LATEST_HOLE_W, height: LATEST_HOLE_H, borderRadius: 0, flex: 'none' }} />;
+}
+
 export function LatestCoursesShell() {
   return (
     <HeadShell>
       <div style={{ ...RAIL_CLIPPED, gap: PHOTO_FIGURE_GAP }}>
-        {[0, 1].map(i => <Bar key={i} style={{ width: LATEST_COURSE_W, height: LATEST_COURSE_H, borderRadius: 0, flex: 'none' }} />)}
+        {[0, 1].map(i => <LatestCourseSkeletonCard key={i} />)}
       </div>
     </HeadShell>
   );
@@ -147,7 +155,7 @@ export function LatestHolesShell() {
   return (
     <HeadShell>
       <div style={{ ...RAIL_CLIPPED, gap: PHOTO_FIGURE_GAP }}>
-        {[0, 1].map(i => <Bar key={i} style={{ width: LATEST_HOLE_W, height: LATEST_HOLE_H, borderRadius: 0, flex: 'none' }} />)}
+        {[0, 1].map(i => <LatestHoleSkeletonCard key={i} />)}
       </div>
     </HeadShell>
   );
