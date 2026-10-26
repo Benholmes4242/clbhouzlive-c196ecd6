@@ -1,59 +1,60 @@
 /**
- * BusinessEmptyState — BRIEF_BUSINESS_EMPTY_STATE_V3.
+ * BusinessEmptyState — CB102 welcome for every golf business (biz-welcome.html).
+ * Supersedes V3. Renders inside MyBusinessesPage → ManagePageShell only when the
+ * member has no businesses.
  *
- * This SUPERSEDES V1/V2. The photographic hero, the dark stat block, the four
- * example miniatures and the sticky CTA are all gone. Recorded so it is not
- * revisited:
- *
- *   1. This is a SETTINGS page. It lives inside ManagePageShell next to every
- *      other /manage/* surface, so it reads as one of them.
- *   2. A LIST carries every BUSINESS_CATEGORIES entry. Four photographed examples
- *      left six categories out, which told a university or a retailer the
- *      platform was not for them.
- *   3. The examples needed assets that represent no real business, so every one
- *      had to carry an EXAMPLE tag and no figures — the sign the approach was
- *      wrong.
- *
- * WHAT SURVIVES: the live figures from get_platform_reach() with their 30-day
- * deltas, and "counted live as they happen" (business insights read a live view
- * over business_profile_events — NOT a daily rollup).
- *
- * HONESTY RULES THAT STILL BIND:
- *   - Nothing claims a number it cannot show.
- *   - NOTHING implies verified businesses rank higher in discovery. Nothing
- *     boosts is_verified in search or the directory, and that claim was removed
- *     in Verification Phase 1. It does not come back.
- *
- * The badge is the real one — VerifiedBadge, lucide BadgeCheck in amber. It is
- * the ONE place amber appears on this page.
+ * - The "Your insights" card is a FIXED SAMPLE (SAMPLE_INSIGHTS), labelled
+ *   Sample. It fetches nothing and must never show real data.
+ * - "On clbhouz today" reads get_platform_reach_v2 (rounds, reviews only; no
+ *   golfers row). A failed read hides the card and its footnote.
+ * - Amber appears only inside the real VerifiedBadge. Green only for deltas.
+ * - Nothing implies verified businesses rank higher in discovery.
  */
+import type React from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePlatformReach } from '@/hooks/usePlatformReach';
-import { BUSINESS_CATEGORIES } from '@/constants/businessCategories';
+import { ArrowRight, Search, MessageSquare, MessageCircle, BarChart3 } from 'lucide-react';
+import { usePlatformReachV2 } from '@/hooks/usePlatformReachV2';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  SF_STACK,
-  INK,
-  INK_45,
-  INK_60,
-  HAIR,
-  GREEN,
-  ManageCard,
-} from '@/components/manage/ui';
-import {
-  Intro,
-  Group,
-  Row,
-  RowList,
-  GroupHeader,
-  Footnote,
-  FilledButton,
-} from '@/components/business/verification/manageRows';
 
-interface BusinessEmptyStateProps {
-  onCreate: () => void;
-}
+const CANVAS = '#0B0B0D';
+const CARD = '#17171B';
+const INSET = '#1E1E23';
+const HAIR = 'rgba(255,255,255,0.08)';
+const INK = '#F8FAFC';
+const MUTE = 'rgba(248,250,252,0.62)';
+const DIM = 'rgba(248,250,252,0.42)';
+const GREEN = '#34D399';
+
+export const SAMPLE_INSIGHTS = {
+  funnel: [
+    { value: 46, label: 'golfers saw your posts' },
+    { value: 12, label: 'opened your profile' },
+    { value: 5, label: 'new followers' },
+  ],
+  bands: [
+    { label: 'Plus–5', pct: 50, count: 3 },
+    { label: '6–12', pct: 100, count: 6 },
+    { label: '13–20', pct: 67, count: 4 },
+    { label: '21+', pct: 17, count: 1 },
+  ],
+} as const;
+
+const GETS = [
+  { Icon: Search, title: 'A profile golfers can find', line: 'In search and the directory, next to the courses golfers already browse.' },
+  { Icon: MessageSquare, title: 'Posts in the Clubhouse feed', line: 'News, offers and events go straight to the golfers who follow you.' },
+  { Icon: MessageCircle, title: 'Golfers can message you', line: 'One tap from your profile to a conversation.' },
+  { Icon: BarChart3, title: 'Insights from real golfers', line: 'Who saw you, who followed, and how they play.' },
+];
+
+const TYPES = [
+  ['Golf clubs', 'Also get every round on your courses read hole by hole, and reply to your course reviews.'],
+  ['Ranges, academies, coaches and colleges', 'Show golfers your sessions and teams, and see the handicaps of who follows you.'],
+  ['Shops and club fitters', 'Put new stock and fitting days in front of golfers who follow you.'],
+  ['Resorts and hotels', 'Show your courses and stays to golfers who follow you.'],
+  ['Restaurants, cafes and bars', 'Be found by golfers on their way to or from a round.'],
+  ['Brands and creators', 'Post to golfers and see who engages, band by band.'],
+];
 
 /** Grouped figures, tolerant of a malformed language tag. */
 function fmt(n: number, locale: string): string {
@@ -64,170 +65,178 @@ function fmt(n: number, locale: string): string {
   }
 }
 
-/**
- * A total, with its 30-day movement beside it in GREEN. A zero or missing delta
- * renders NOTHING: a flat month reads as "no news", never as "stalled".
- */
-function Figure({
-  total,
-  delta,
-  locale,
-}: {
-  total: number;
-  delta: number;
-  locale: string;
-}) {
+const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: MUTE };
+const rightLabel: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: DIM, whiteSpace: 'nowrap' };
+const cardStyle: React.CSSProperties = { background: CARD, border: `1px solid ${HAIR}`, borderRadius: 18, padding: 16, marginBottom: 14 };
+const titleStyle: React.CSSProperties = { fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.3, color: INK, margin: 0 };
+const rowTitle: React.CSSProperties = { display: 'block', fontSize: 15, fontWeight: 600, lineHeight: 1.3, color: INK };
+const rowLine: React.CSSProperties = { display: 'block', fontSize: 13, lineHeight: 1.4, color: MUTE, marginTop: 3 };
+
+function CreatePill({ onClick }: { onClick: () => void }) {
   return (
-    <span
+    <button
+      type="button"
+      data-create-pill=""
+      onClick={onClick}
       style={{
-        display: 'inline-flex',
-        alignItems: 'baseline',
-        gap: 8,
-        fontVariantNumeric: 'tabular-nums lining-nums',
+        display: 'inline-flex', alignItems: 'center', height: 42, padding: '0 18px 0 20px',
+        borderRadius: 999, background: INK, color: CANVAS, fontSize: 15, fontWeight: 600,
+        letterSpacing: '-0.005em', border: 'none', cursor: 'pointer',
       }}
     >
-      <span style={{ fontSize: 15.5, fontWeight: 400, color: INK }}>{fmt(total, locale)}</span>
-      {delta > 0 && (
-        <span style={{ fontSize: 13.5, fontWeight: 400, color: GREEN }}>
-          +{fmt(delta, locale)}
-        </span>
-      )}
-    </span>
+      Create a business profile
+      <ArrowRight size={16} style={{ marginLeft: 8 }} aria-hidden />
+    </button>
   );
 }
 
-export function BusinessEmptyState({ onCreate }: BusinessEmptyStateProps) {
-  const { i18n } = useTranslation();
-  const locale = i18n.language || 'en';
-  const { data: reach, isLoading } = usePlatformReach();
+function Card({ id, children, style }: { id: string; children: React.ReactNode; style?: React.CSSProperties }) {
+  return <section data-card={id} style={{ ...cardStyle, ...style }}>{children}</section>;
+}
 
+function Figures({ locale }: { locale: string }) {
+  const { data, isLoading, isError } = usePlatformReachV2();
+  if (isError) return null;
+  const rows = data
+    ? [
+        { label: 'Rounds read hole by hole', total: data.rounds, delta: data.roundsDelta },
+        { label: 'Course reviews', total: data.reviews, delta: data.reviewsDelta },
+      ]
+    : null;
   return (
-    <div className="w-full max-w-xl mx-auto">
-      {/* §1.3 NO LARGE HEADING — the title is ManagePageShell's, at 18/600. */}
-      <Intro>
-        A business profile puts you where golfers already are — searchable, followable, and
-        reviewable by members who track their rounds here.
-      </Intro>
-
-      {/* ─────────────── ON CLBHOUZ TODAY — live, never typed ─────────────── */}
-      <Group header="On clbhouz today" footnote="Green figures are the last 30 days.">
-        {isLoading || !reach ? (
-          <div className="px-[14px] py-4 space-y-3">
+    <>
+      <Card id="figures" style={{ marginBottom: 8 }}>
+        <div style={{ ...kicker, marginBottom: 10 }}>On clbhouz today</div>
+        {isLoading || !rows ? (
+          <div data-figures-loading="" style={{ display: 'grid', gap: 12, padding: '11px 0' }}>
             <Skeleton className="h-4 w-2/3 rounded" />
-            <Skeleton className="h-4 w-1/2 rounded" />
             <Skeleton className="h-4 w-1/2 rounded" />
           </div>
         ) : (
-          <RowList>
-            {/* The course count LEADS — it is the impressive one. */}
-            <Row
-              label="Courses"
-              value={<Figure total={reach.coursesTotal} delta={reach.coursesDelta} locale={locale} />}
-            />
-            <Row
-              label="Rounds tracked"
-              value={<Figure total={reach.roundsTotal} delta={reach.roundsDelta} locale={locale} />}
-            />
-            <Row
-              label="Course reviews"
-              value={<Figure total={reach.reviewsTotal} delta={reach.reviewsDelta} locale={locale} />}
-            />
-          </RowList>
-        )}
-      </Group>
-
-      {/* ─────────────────────────── WHAT YOU GET ─────────────────────────── */}
-      <Group header="What you get">
-        <RowList>
-          <Row
-            label="A profile golfers can find"
-            sub="You appear in search and the directory, alongside the courses golfers already browse."
-          />
-          <Row
-            label="Reviews from real golfers"
-            sub="Reviews come from members with tracked rounds — not anonymous accounts."
-          />
-          {/* §4.2 — the insights read a LIVE view over business_profile_events. */}
-          <Row
-            label="Your reach, counted"
-            sub="Views, follows and engagement, counted live as they happen."
-          />
-        </RowList>
-      </Group>
-
-      {/* ─── WHO IT'S FOR — all ten categories, verbatim. This replaces the
-              photographs, and it is the group that keeps every kind of golf
-              business in the room. ─── */}
-      <section style={{ marginBottom: 20 }}>
-        <GroupHeader>Who it's for</GroupHeader>
-        <ManageCard padding={14}>
-          <div className="flex flex-wrap gap-2">
-            {BUSINESS_CATEGORIES.map((category) => (
-              <span
-                key={category}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  minHeight: 32,
-                  padding: '6px 11px',
-                  borderRadius: 999,
-                  border: `1px solid ${HAIR}`,
-                  fontFamily: SF_STACK,
-                  fontSize: 13.5,
-                  fontWeight: 400,
-                  color: INK_60,
-                  letterSpacing: '-0.005em',
-                }}
-              >
-                {category}
+          rows.map((r, i) => (
+            <div
+              key={r.label}
+              data-figure-row=""
+              style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '11px 0',
+                fontSize: 15, color: INK, borderTop: i === 1 ? `1px solid ${HAIR}` : undefined,
+              }}
+            >
+              <span>{r.label}</span>
+              <span style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+                {fmt(r.total, locale)}
+                {r.delta > 0 && (
+                  <span data-delta="" style={{ color: GREEN, fontSize: 13.5, marginLeft: 8 }}>+{fmt(r.delta, locale)}</span>
+                )}
               </span>
-            ))}
-          </div>
-        </ManageCard>
-        <Footnote>Any golf business. You pick your category when you create the profile.</Footnote>
-      </section>
+            </div>
+          ))
+        )}
+      </Card>
+      <p data-figures-footnote="" style={{ fontSize: 12.5, lineHeight: 1.45, color: DIM, margin: '2px 4px 14px' }}>
+        Green figures are the last 30 days.
+      </p>
+    </>
+  );
+}
 
-      {/* ──────────────────────────── VERIFICATION ──────────────────────────── */}
-      <section style={{ marginBottom: 20 }}>
-        <GroupHeader>Verification</GroupHeader>
-        <ManageCard padding={0}>
-          {/* NO DISCOVERY CLAIM. Nothing boosts is_verified in search or the
-              directory, so the row says what verification IS and nothing more. */}
-          <Row
-            label="Verified businesses carry a badge"
-            sub="Free, reviewed by a person, and available once your profile exists."
-          />
-        </ManageCard>
-        <p
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            fontFamily: SF_STACK,
-            fontSize: 13,
-            fontWeight: 400,
-            lineHeight: 1.45,
-            color: INK_45,
-            margin: '8px 4px 0',
-          }}
-        >
-          <VerifiedBadge size="sm" />
-          <span>This is the badge.</span>
+export function BusinessEmptyState({ onCreate }: { onCreate: () => void }) {
+  const { i18n } = useTranslation();
+  const locale = i18n?.language || 'en';
+
+  return (
+    <div style={{ padding: '20px 16px 28px', background: CANVAS, color: INK }}>
+      {/* 1. Opening */}
+      <div data-card="opening" style={{ padding: '6px 2px 22px' }}>
+        <div style={kicker}>Golf businesses on clbhouz</div>
+        <h2 style={{ fontSize: 27, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.16, marginTop: 10, color: INK }}>
+          Reach golfers who track every round.<span style={{ color: MUTE }}> And know exactly who they are.</span>
+        </h2>
+        <p style={{ fontSize: 14.5, lineHeight: 1.45, color: MUTE, marginTop: 10 }}>
+          For every golf business: clubs, ranges, academies, coaches, shops, fitters, resorts, hotels, restaurants and brands. Free, and it takes about a minute.
         </p>
-      </section>
+        <div style={{ marginTop: 18 }}><CreatePill onClick={onCreate} /></div>
+      </div>
 
-      {/* ─────────────────────────── BEFORE YOU START ─────────────────────────── */}
-      <Group header="Before you start">
-        <RowList>
-          <Row label="Cost" value="Free" />
-          <Row label="Time" value="About a minute" />
-          <Row label="You'll need" value="A name and a category" />
-        </RowList>
-      </Group>
+      {/* 2. What every business gets */}
+      <Card id="gets">
+        <div style={{ ...kicker, marginBottom: 10 }}>What every business gets</div>
+        {GETS.map(({ Icon, title, line }) => (
+          <div key={title} data-row="" style={{ display: 'grid', gridTemplateColumns: '34px minmax(0,1fr)', gap: 12, padding: '12px 0', borderTop: `1px solid ${HAIR}`, alignItems: 'start' }}>
+            <span style={{ width: 34, height: 34, borderRadius: 10, background: INSET, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Icon size={17} strokeWidth={1.9} color="rgba(248,250,252,0.85)" aria-hidden />
+            </span>
+            <div><b style={rowTitle}>{title}</b><span style={rowLine}>{line}</span></div>
+          </div>
+        ))}
+      </Card>
 
-      {/* §2.3 ONE filled button, at the foot, NOT sticky. */}
-      <div style={{ marginTop: 8, paddingBottom: 8 }}>
-        <FilledButton onClick={onCreate}>Create Business Profile</FilledButton>
+      {/* 3. Your insights — fixed sample, fetches nothing */}
+      <Card id="sample">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 10 }}>
+          <div style={kicker}>Your insights</div>
+          <div style={rightLabel}>Sample</div>
+        </div>
+        <p style={titleStyle}>Know who follows you, by handicap.<span style={{ color: MUTE }}> No other platform can tell you.</span></p>
+        <p style={{ fontSize: 13.5, lineHeight: 1.45, color: MUTE, marginTop: 6 }}>
+          Handicaps come from each golfer's own WHS record, so the bands are real, not guessed.
+        </p>
+        <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+          {SAMPLE_INSIGHTS.funnel.map((f) => (
+            <div key={f.label} data-funnel="" style={{ flex: 1, background: INSET, borderRadius: 13, padding: '11px 10px' }}>
+              <b data-value="" style={{ display: 'block', fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em', fontVariantNumeric: 'tabular-nums', color: INK }}>{f.value}</b>
+              <span style={{ display: 'block', fontSize: 11.5, lineHeight: 1.3, color: MUTE, marginTop: 3 }}>{f.label}</span>
+            </div>
+          ))}
+        </div>
+        <div style={{ ...rightLabel, margin: '16px 0 4px' }}>Your golfers</div>
+        {SAMPLE_INSIGHTS.bands.map((b) => (
+          <div key={b.label} data-band="" style={{ display: 'grid', gridTemplateColumns: '62px minmax(0,1fr) 26px', alignItems: 'center', gap: 10, padding: '6px 0', fontSize: 13, fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ color: MUTE }}>{b.label}</span>
+            <span style={{ height: 8, borderRadius: 4, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+              <span style={{ display: 'block', height: '100%', width: `${b.pct}%`, background: 'rgba(248,250,252,0.78)', borderRadius: 4 }} />
+            </span>
+            <span data-count="" style={{ textAlign: 'right', fontWeight: 600, color: INK }}>{b.count}</span>
+          </div>
+        ))}
+      </Card>
+
+      {/* 4. Built for your kind of business */}
+      <Card id="types">
+        <div style={{ ...kicker, marginBottom: 10 }}>Built for your kind of business</div>
+        {TYPES.map(([title, line]) => (
+          <div key={title} data-row="" style={{ padding: '12px 0', borderTop: `1px solid ${HAIR}` }}>
+            <b style={rowTitle}>{title}</b><span style={rowLine}>{line}</span>
+          </div>
+        ))}
+      </Card>
+
+      {/* 5. How it works */}
+      <Card id="steps">
+        <div style={{ ...kicker, marginBottom: 10 }}>How it works</div>
+        {[
+          { n: 1, title: <>Create a profile</>, line: 'Free, about a minute. A name and a category.' },
+          { n: 2, title: <>Post and grow</>, line: 'Golfers find you, follow you and message you. Your insights fill in as they do.' },
+          {
+            n: 3,
+            title: <>Get verified<span style={{ marginLeft: 4, display: 'inline-flex', verticalAlign: 'middle' }}><VerifiedBadge size="sm" /></span></>,
+            line: 'Free, checked by a person. Golf clubs also claim their courses here.',
+          },
+        ].map((s) => (
+          <div key={s.n} data-step="" style={{ display: 'grid', gridTemplateColumns: '28px minmax(0,1fr)', gap: 12, padding: '12px 0', borderTop: `1px solid ${HAIR}`, alignItems: 'start' }}>
+            <span style={{ width: 26, height: 26, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12.5, fontWeight: 700, color: INK }}>{s.n}</span>
+            <div><b style={rowTitle}>{s.title}</b><span style={rowLine}>{s.line}</span></div>
+          </div>
+        ))}
+      </Card>
+
+      {/* 6. On clbhouz today */}
+      <Figures locale={locale} />
+
+      {/* 7. Foot */}
+      <div data-card="foot" style={{ textAlign: 'center', paddingTop: 6 }}>
+        <CreatePill onClick={onCreate} />
+        <p style={{ fontSize: 12.5, color: DIM, marginTop: 10 }}>Free. About a minute.</p>
       </div>
     </div>
   );
