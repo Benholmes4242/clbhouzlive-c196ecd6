@@ -1,7 +1,7 @@
 # Roadmap
 
 ## CB91 — Your courses section 1
-- [ ] Obtain courses-s1.html: brief names it as the signed-off exact-match spec, but this message exposes only the Markdown brief; upload-directory inspection timed out. No page/source/test changes made pending the reference.
+- [x] Received and read courses-s1.html; written brief wins changed typography (23px) and selected-course rules; frozen shell/chips/lower sections retain existing design.
 - [ ] Implement selected-course lead helper, loaded header subtitle and moved request panel; preserve chips, unclaimed/gate/notice states and every lower section.
 - [ ] Add helper/page coverage, name authorized retargets and report full-suite counts. Pre-existing rails failures: two sentinel timeouts at coursesRailsUnlimited.test.tsx:80:3 and admin hidden-background role query at :158:18; unrelated tests/source stay untouched.
 
