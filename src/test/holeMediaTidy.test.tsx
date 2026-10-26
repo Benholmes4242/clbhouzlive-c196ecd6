@@ -58,7 +58,7 @@ describe('HOLE_MEDIA_TIDY batch path without a floor', () => {
   it('after tagging an item to hole 4, holes 1-3 stay enabled and no closed-holes paragraph renders', async () => {
     const tag = vi.fn().mockResolvedValue({ status: 'approved' } as HolePhoto);
     render(<HolePhotoBatchPath photos={[batchPhoto('/a.jpg'), batchPhoto('/b.jpg')]} knownHoles={[1, 2, 3, 4]} onTag={tag} onClose={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/b.jpg'));
     expect(tag).toHaveBeenCalledWith('/a.jpg', 4);
     for (const n of [1, 2, 3]) expect(screen.getByRole('button', { name: `Hole ${n}` })).toBeEnabled();
