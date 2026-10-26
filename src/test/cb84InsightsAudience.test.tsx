@@ -212,7 +212,7 @@ describe('CB84 page', () => {
     const { container } = renderPage();
     await waitFor(() => expect(container.querySelector('[data-card="audience"]')).not.toBeNull());
     expect(container.querySelector('[data-card="audience"]')!.getAttribute('data-state')).toBe('ready');
-    expect(container.querySelector('[data-card="visits"]')).not.toBeNull();
+    await waitFor(() => expect(container.querySelector('[data-card="visits"]')).not.toBeNull());
   });
 
   it('the card does not refetch when the 7/30/90 picker changes', async () => {
