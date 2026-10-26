@@ -86,12 +86,13 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
     const hole = selected;
     setPending(true); setError(null);
     try {
-      await onTag(photo.url, hole);
+      const row = await onTag(photo.url, hole);
       const nextTags = { ...tags, [photo.url]: hole };
       setTags(nextTags);
+      setRows({ ...rows, [photo.url]: row });
       const count = existing.filter(h => h === hole).length + Object.values(nextTags).filter(h => h === hole).length;
       setConfirmation(adminMode ? adminTagConfirmation(hole, photo.ownerName) : memberTagConfirmation(hole, count));
-      setSelected(null);
+      setSelected(null); setReviewing(false); setRemovedNotice(false);
       const next = nextUntagged(index, nextTags, unavailable);
       if (next) setCurrentUrl(next);
     } catch (error) {
@@ -109,13 +110,33 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
     }
     finally { setPending(false); }
   };
+  const remove = async () => {
+    if (!photo || !onRemove || pending || taggedHole == null) return;
+    const row = rows[photo.url];
+    if (!row) return;
+    setPending(true); setError(null);
+    try {
+      await onRemove(row);
+      const nextTags = { ...tags }; delete nextTags[photo.url]; setTags(nextTags);
+      const nextRows = { ...rows }; delete nextRows[photo.url]; setRows(nextRows);
+      setReviewing(false); setSelected(null); setConfirmation(null); setRemovedNotice(true);
+    } catch (removeError) {
+      console.error('[hole-tag] remove failed', removeError);
+      setError(`The ${photo.mediaType === 'video' ? 'video' : 'photo'} could not be removed. It is still on the ${ordinal(taggedHole)}.`);
+    }
+    finally { setPending(false); }
+  };
   const choose = (url: string) => {
-    if (pending || done(url) || url === currentUrl) return;
-    setCurrentUrl(url); setSelected(null);
+    if (pending || url === currentUrl) return;
+    const hole = tags[url];
+    if (unavailable.has(url) || (hole != null && !onRemove)) return;
+    setCurrentUrl(url); setSelected(null); setConfirmation(null); setRemovedNotice(false);
+    setReviewing(hole != null);
   };
   if (!photo) return null;
   const video = photo.mediaType === 'video';
-  const canConfirm = !pending && !allTagged && selected != null && !done(photo.url);
+  const canConfirm = !pending && !allTagged && !inTaggedState && selected != null && !done(photo.url);
+  const canRemove = inTaggedState && !pending;
   return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent style={theme} className="hole-photo-fast hole-photo-fast-sheet hole-photo-batch" onOpenAutoFocus={event => { event.preventDefault(); (event.currentTarget as HTMLElement | null)?.focus(); }} onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
     <div className="hole-photo-batch-top">
       <DialogTitle className="hole-photo-fast-title">Which hole is this?</DialogTitle>
