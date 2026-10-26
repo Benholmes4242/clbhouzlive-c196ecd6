@@ -48,9 +48,9 @@
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Trophy } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 
-import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_32, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useTourSelection } from '../../../context/TourSelectionContext';
@@ -61,7 +61,6 @@ import { useTournamentLastYearTop4 } from '../../../hooks/useTournamentLastYearT
 import { LastYearRow } from './LastYearRow';
 import { inRequiredRoundWindow, leaderOf, neededGross } from './whatsNext';
 import { surnameOf } from '../../../_shared/playerName';
-import { r } from '@/lib/radius';
 import { PicksSheet } from './PicksSheet';
 import type { HeroState } from '../HybridHero.utils';
 import { boardMovementMap, todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
@@ -549,7 +548,7 @@ function PicksBlock({
         <p data-overview-picks-intro style={{ margin: '0 20px 9px', marginTop: 0, fontSize: 12.5, lineHeight: 1.5, color: OVERVIEW.soft }}>{intro}</p>
       ) : null}
 
-      <div style={{ padding: '0 16px 14px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+      <div data-overview-picks-grid style={{ padding: '0 16px 14px', display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>
         {cards.map((p, i) => {
           const line = boardByPlayer.get(String(p.playerId));
           const settledRaw = phase === 'completed' ? settledFigureFor(line) : null;
@@ -594,40 +593,38 @@ function PicksBlock({
               onClick={onOpenPick}
               aria-label={t('overview.picksSheet.cardAria', { name: p.playerName, defaultValue: `Why we picked ${p.playerName}` })}
               className="active:opacity-70 transition-opacity"
-              style={{ position: 'relative', margin: 0, fontFamily: FONT, color: 'inherit', cursor: 'pointer', background: WHITE_ALPHA_06, border: `1px solid ${WHITE_ALPHA_06}`, borderRadius: r.sm, padding: '11px 10px', textAlign: 'center', minWidth: 0 }}
+              /* Signed-off Board B: outlined landscape chip, three across, no fill. */
+              style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontFamily: FONT, color: 'inherit', cursor: 'pointer', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: 8, textAlign: 'left', minWidth: 0 }}
             >
-              <ChevronRight size={12} strokeWidth={2.6} color={WHITE_ALPHA_32} aria-hidden style={{ position: 'absolute', top: 7, right: 7 }} />
               {/* The shared resolver walks the headshot folder chain itself;
                   photoUrl is tried FIRST when present. No second resolver. */}
-              <div style={{ display: 'flex', justifyContent: 'center', margin: '0 auto 8px' }}>
+              <div data-overview-pick-avatar style={{ flex: 'none', display: 'flex' }}>
                 <PlayerAvatar
                   playerId={String(p.playerId ?? '')}
                   playerName={p.playerName}
                   tourCode={tourCode}
                   photoUrl={p.photoUrl ?? null}
                   headshotOverride={p.headshotOverride ?? null}
-                  size="sm"
+                  size={30}
                 />
               </div>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {surnameOf(p.playerName)}
-              </div>
-              {figureLine ? (
-                <div style={{ marginTop: 5, fontSize: 12, fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4, ...FIGS }}>
-                  {figureLine}
+              <div data-overview-pick-text style={{ minWidth: 0 }}>
+                <div data-overview-pick-name style={{ fontSize: 12.5, fontWeight: 700, color: '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {surnameOf(p.playerName)}
                 </div>
-              ) : null}
-              {/* CORRECTIONS I.2: a pick leading or level has nothing to reach — no
-                  label, no divider, no dash. The dash is only for a target
-                  genuinely out of reach. */}
-              {neededByPlayer && toReachScore && !(line?.score != null && leaderTotal != null && line.score <= leaderTotal) ? (
-                <div data-overview-pick-to-reach style={{ borderTop: `1px solid ${OVERVIEW.hairline}`, paddingTop: 7, marginTop: 7 }}>
-                  <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: OVERVIEW.mute }}>{t('overview.picksToReach', { score: toReachScore })}</div>
-                  <div style={{ display: 'block', marginTop: 3, fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em', color: OVERVIEW.ink, ...FIGS }}>
-                    {neededByPlayer.get(String(p.playerId)) ?? '\u2014'}
+                {figureLine ? (
+                  <div data-overview-pick-figure style={{ marginTop: 2, fontSize: 11.5, fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-start', gap: 4, whiteSpace: 'nowrap', ...FIGS }}>
+                    {figureLine}
                   </div>
-                </div>
-              ) : null}
+                ) : null}
+                {/* CORRECTIONS I.2: a pick leading or level has nothing to reach — no
+                    line at all. The dash is only for a target genuinely out of reach. */}
+                {neededByPlayer && toReachScore && !(line?.score != null && leaderTotal != null && line.score <= leaderTotal) ? (
+                  <div data-overview-pick-to-reach style={{ marginTop: 2, fontSize: 10, fontWeight: 700, color: OVERVIEW.mute, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...FIGS }}>
+                    {`${t('overview.picksToReach', { score: toReachScore })} ${neededByPlayer.get(String(p.playerId)) ?? '\u2014'}`}
+                  </div>
+                ) : null}
+              </div>
             </button>
           );
         })}

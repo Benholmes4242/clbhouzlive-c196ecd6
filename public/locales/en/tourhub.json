@@ -285,7 +285,8 @@
       "10": "Ten"
     },
     "situation": {
-      "label": "The situation"
+      "label": "The situation",
+      "fullBoard": "Full board"
     },
     "picksIntro": {
       "leads": "{{name}} leads for us. Each card shows the round our picks would need to reach {{score}}.",
