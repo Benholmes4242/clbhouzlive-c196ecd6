@@ -25,7 +25,8 @@ import { mediaCountKey } from './lib/mediaUploadSummary';
  * user_top10_exclusions directly.
  */
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { claimOverlayChrome, releaseOverlayChrome } from '@/lib/routeChrome';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { notifyComposerCompleted } from '@/features/composer-flow/composerFlowStore';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -1458,6 +1459,18 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 }
 
 export default function ReviewComposerV2() {
+  // Route and overlay mounts delegate notch ownership to the claim stack,
+  // so route reassertions cannot repaint it while the wizard is open.
+  useLayoutEffect(() => {
+    claimOverlayChrome({
+      id: 'review-composer',
+      statusBarStyle: 'light',
+      statusBarColor: 'FF' + RV2.canvas.replace('#', '').toUpperCase(),
+      shieldColor: RV2.canvas,
+    });
+    return () => releaseOverlayChrome('review-composer');
+  }, []);
+
   return (
     <AccessControl requireAuth={true} noBlockingLoader={true}>
       <div className="w-full md:max-w-[440px] md:mx-auto">

@@ -29,6 +29,7 @@ import { MomentsLibrarySkeleton } from '@/components/skeletons/MediaLibrarySkele
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { clearAppBadge } from '@/utils/pushBadge';
 import { LIGHT_ROUTE_CANVAS } from '@/lib/tokens/surfaces';
+import { RV2 } from '@/features/review-v2/tokens';
 
 import { ScrollRestoration } from '@/components/ScrollRestoration';
 import { LockAnchorSync } from '@/components/LockAnchorSync';
@@ -405,7 +406,7 @@ const ReviewComposerOverlay: React.FC = () => {
       zIndex: 10000,
       overflowY: 'auto',
       WebkitOverflowScrolling: 'touch',
-      background: LIGHT_ROUTE_CANVAS,
+      background: RV2.canvas,
     }}
   >
     <ReviewComposerRoute />

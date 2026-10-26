@@ -1,5 +1,9 @@
 # Roadmap
 
+## Review wizard notch canvas
+- [x] Claim review chrome through the existing overlay API on wizard mount; release on unmount. Overlay wrapper uses RV2.canvas; other chrome and tokens unchanged.
+- [x] `bunx vitest run src/test/reviewComposerChrome.test.tsx`: 1/1 passed; `bunx vitest run`: 3,328/3,328 passed across 386 files, zero failures. Baseline 3,327/385 plus one new lifecycle case/file; no existing tests changed, renamed or deleted. CB99 ruling test passes. Automatic build 18:08:34Z OK; native/signed-in visual verification unavailable with external_unmanaged authentication.
+
 ## CB99 — Insights on the course
 - [x] Added useBusinessCourseActivity and InsightsCourseSection after Reviews; server totals/order/privacy unchanged, sections 1–7 frozen. Added scoped global styles and en/en-XA copy; title tracking stays 0 under environment restriction rather than requested -0.01em.
 - [ ] STOP: src/test/cb99InsightsCourse.test.tsx:75:71, “query key and arguments include each picker period; old snapshot remains until settled”: AssertionError: expected undefined to be truthy. Fixture sets gcTime: 0, so inactive 30-day cache is removed before final assertion. No assertion or fixture correction after failure. Targeted bunx vitest run src/test/cb99InsightsCourse.test.tsx src/test/cb89InsightsReviews.test.tsx src/test/cb88InsightsEngagement.test.tsx: 65 passed/1 failed/66 total/3 files (CB99 24/25; CB89 23/23; CB88 18/18). No existing tests changed. Last full baseline3,293/381; +25 new cases/one file = candidate3,318/382, full run not executed after stop.
