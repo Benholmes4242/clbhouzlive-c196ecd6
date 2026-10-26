@@ -120,7 +120,7 @@ describe('situation_note', () => {
     expect(visibleSituationNote('  ', LIVE, '2026-10-25')).toBeNull();
   });
   it('renders as a second paragraph inside SituationBand', () => {
-    const { container } = render(<I18nextProvider i18n={lang}><SituationBand segments={[{ text: 'Sentence.' }]} note={note} /></I18nextProvider>);
+    const { container } = render(<I18nextProvider i18n={lang}><SituationBand segments={[{ text: 'Sentence.', figure: false }]} note={note} /></I18nextProvider>);
     const p = container.querySelector('[data-overview-situation] [data-overview-situation-note]') as HTMLElement;
     expect(p.textContent).toBe(note);
     expect(p.style.marginTop).toBe('6px');
