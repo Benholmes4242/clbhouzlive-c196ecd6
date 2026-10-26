@@ -1,7 +1,8 @@
 /** One picker for single photographs and batches (never the known-hole path).
  * The parent owns course count. Never fetch or assume a count.
  * Every known hole is always selectable and drawn the same; there is no
- * used-hole treatment (BRIEF_HOLE_TAG_BATCH_V3).
+ * used-hole treatment (BRIEF_HOLE_TAG_BATCH_V3). dimOthers is the batch
+ * tagged-review state: the shot's own hole stays selected, the rest dim.
  */
 import { Button } from '@/components/ui/button';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -14,10 +15,12 @@ interface HolePhotoPickerProps {
   selectedHole: number | null;
   /** Disables every hole (the batch once nothing is left to tag). */
   disabled?: boolean;
+  /** Dims every non-selected hole to 0.4 while the selected one stays solid. */
+  dimOthers?: boolean;
   onSelect: (hole: number) => void;
 }
 
-export function HolePhotoPicker({ holeCount, knownHoleNumbers, selectedHole, disabled = false, onSelect }: HolePhotoPickerProps) {
+export function HolePhotoPicker({ holeCount, knownHoleNumbers, selectedHole, disabled = false, dimOthers = false, onSelect }: HolePhotoPickerProps) {
   const numbers = knownHoleNumbers?.length === holeCount ? knownHoleNumbers : holeNumbers(holeCount);
   return (
     <div role="group" aria-label="Hole" className="grid grid-cols-6 gap-[6px]">
@@ -38,7 +41,7 @@ export function HolePhotoPicker({ holeCount, knownHoleNumbers, selectedHole, dis
               border: `1px ${available ? 'solid' : 'dashed'} ${selected ? A.INK : `color-mix(in srgb, ${A.INK} 12%, transparent)`}`,
               background: selected ? A.INK : 'transparent',
               color: selected ? A.CANVAS : A.BODY,
-              opacity: available ? 1 : 0.18,
+              opacity: !available ? 0.18 : dimOthers && !selected ? 0.4 : 1,
             }}
           >{hole}</Button>
         );
