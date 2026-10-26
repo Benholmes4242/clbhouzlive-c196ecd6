@@ -1,5 +1,9 @@
 # Roadmap
 
+## BRIEF_SYNC_WHS_DUE_FAILURE_TYPE
+- [x] Widen retry/failure parameter types to shared EgErrorKind excluding preauth_expired, retaining ok for success. Type-only call-site assertions preserve existing runtime paths; auth early return remains unchanged, member-token reads cannot throw preauth_expired. SyncResult.status already string. not_found/bad_request retain default backoff; all writes/timing unchanged.
+- [ ] Deno check, full suite, deploy sync-whs-due and confirm platform deployment version. Pre-existing CB90 selector failure remains untouched.
+
 ## CB90 — Reviews neutral paint and one reply close control
 - [x] Read the brief and audit existing reviews assertions; none require retargeting. Preserve reply behaviour, rating foregrounds and outer-band washes.
 - [x] Replace page-only notice/empty/error/mid-rating paint; hide the shared sheet close control only here. Add 12 new cases in cb90ReviewsNeutral.test.tsx; existing tests untouched.

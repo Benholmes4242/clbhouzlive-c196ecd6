@@ -18,6 +18,7 @@ import {
   egListScores,
   egListFriends,
   EgApiError,
+  type EgErrorKind,
   getPreAuthToken,
   preAuthExpiry,
   insertHandicapSnapshotIfChanged,
@@ -132,7 +133,7 @@ function adminClient(): SupabaseClient {
  * eventually stop them.
  */
 function computeNextSyncAfter(
-  status: "ok" | "auth_failed" | "rate_limited" | "transient_error" | "unknown_error",
+  status: "ok" | Exclude<EgErrorKind, "preauth_expired">,
   consecutiveFailures: number,
 ): string {
   const now = Date.now();
@@ -187,7 +188,7 @@ async function syncOneConnection(
       }
       result.status = err.kind;
       result.error = err.message;
-      await markFailure(admin, conn, err.kind, err.message);
+      await markFailure(admin, conn, err.kind as Exclude<EgErrorKind, "preauth_expired">, err.message);
       return result;
     }
     result.status = "unknown_error";
@@ -220,7 +221,7 @@ async function syncOneConnection(
     if (err instanceof EgApiError) {
       result.status = err.kind;
       result.error = err.message;
-      await markFailure(admin, conn, err.kind, err.message);
+      await markFailure(admin, conn, err.kind as Exclude<EgErrorKind, "preauth_expired">, err.message);
       return result;
     }
     result.status = "transient_error";
@@ -475,7 +476,7 @@ async function maybeEnqueueAnalyticsPush(
 async function markFailure(
   admin: SupabaseClient,
   conn: ConnectionRow,
-  status: "auth_failed" | "rate_limited" | "transient_error" | "unknown_error",
+  status: Exclude<EgErrorKind, "preauth_expired">,
   errorMessage: string,
 ): Promise<void> {
   const newFailureCount = conn.consecutive_failures + 1;
