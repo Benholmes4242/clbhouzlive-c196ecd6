@@ -191,7 +191,10 @@ describe('CB82 page', () => {
     expect(screen.queryByText('OVERVIEW')).toBeNull();
     await waitFor(() => expect(container.querySelector('[data-card="visits"]')).not.toBeNull());
     expect(container.querySelector('[data-card="sources"]')).not.toBeNull();
-    for (const k of ['CONTENT', 'ENGAGEMENT']) expect(screen.getByText(k)).toBeTruthy();
+    // CB85 replaced CONTENT · Top posts with the YOUR POSTS card.
+    await waitFor(() => expect(container.querySelector('[data-card="posts"]')).not.toBeNull());
+    expect(screen.queryByText('CONTENT')).toBeNull();
+    expect(screen.getByText('ENGAGEMENT')).toBeTruthy();
     // CB84 replaced the locked "Who's viewing you" card with YOUR GOLFERS;
     // only the Follower growth card still carries the AUDIENCE kicker.
     expect(screen.getAllByText('AUDIENCE')).toHaveLength(1);
@@ -204,7 +207,7 @@ describe('CB82 page', () => {
     await waitFor(() => expect(rpc).toHaveBeenCalledWith('get_business_insights_funnel', expect.anything()));
     await act(async () => { await Promise.resolve(); });
     expect(container.querySelector('[data-section="insights-funnel"]')).toBeNull();
-    expect(screen.getByText('CONTENT')).toBeTruthy();
+    expect(screen.getByText('ENGAGEMENT')).toBeTruthy();
     expect(container.querySelector('[data-section="insights-visits"]')).toBeNull();
   });
 
