@@ -1,4 +1,5 @@
 import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
+import rorySabbatini from '@/assets/players/rory-sabbatini.webp.asset.json';
 
 /**
  * Canonical player-avatar resolver — single source of truth for every tour
@@ -8,6 +9,15 @@ import { getPlayerHeadshotCandidates } from '@/utils/playerHeadshot';
                       />, which walks the
  * list and falls back to canonical initials when all miss.
  */
+/** Uploaded headshots keyed by normalised player name; tried before every other source. */
+const PLAYER_PHOTO_UPLOADS: Record<string, string> = {
+  'rory sabbatini': rorySabbatini.url,
+};
+const normName = (n: string) => n.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+export function uploadedPlayerPhoto(name?: string | null): string | null {
+  return name ? PLAYER_PHOTO_UPLOADS[normName(name)] ?? null : null;
+}
+
 export function resolvePlayerAvatarCandidates(
   opts: {
     name?: string | null;
@@ -30,7 +40,7 @@ export function resolvePlayerAvatarCandidates(
         }
       })()
     : [];
-  return [direct, ...list]
+  return [uploadedPlayerPhoto(name), direct, ...list]
     .filter((u): u is string => Boolean(u))
     .filter((u, i, a) => a.indexOf(u) === i);
 }
