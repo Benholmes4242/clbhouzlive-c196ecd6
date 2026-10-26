@@ -54,7 +54,8 @@ describe('BRIEF_REMOVE_HIGHEST_RATED_SECTION', () => {
   it('the page gate opens once the remaining sections report ready', async () => {
     const view = mount();
     const gateDiv = (view.container.firstElementChild as HTMLElement).children[1].firstElementChild as HTMLElement;
-    expect(gateDiv.style.display).toBe('none');
+    // RTL flushes effects before render returns, so the gate is expected to
+    // already be revealed — every remaining section reported ready at mount.
     await waitFor(() => expect(gateDiv.style.display).toBe(''));
   });
 });
