@@ -22544,6 +22544,7 @@ export type Database = {
           rounds_total: number
         }[]
       }
+      get_platform_reach_v2: { Args: never; Returns: Json }
       get_played_unrated_courses: {
         Args: { p_user_id: string }
         Returns: {
