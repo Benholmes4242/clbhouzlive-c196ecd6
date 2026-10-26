@@ -2,6 +2,9 @@
 // Provides a TUS-compatible upload URL for resumable video uploads
 // Reference: https://developers.cloudflare.com/stream/uploading-videos/upload-video-file/#tus-specification
 
+import { createClient } from 'npm:@supabase/supabase-js@2';
+import { creatorMetadata } from '../_shared/reviewMediaOwnership.ts';
+export const VERSION = '2026-10-26-review-owner-v1';
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
 import { corsFor } from '../_shared/cors.ts';
 import { normalizeError } from "../_shared/normalize-error.ts";
@@ -19,6 +22,7 @@ serve(async (req) => {
     return new Response("ok", { status: 200, headers: corsHeaders });
   }
 
+  if (req.method === "GET") return new Response(JSON.stringify({ version: VERSION }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
@@ -27,10 +31,17 @@ serve(async (req) => {
   }
 
   try {
+    const authHeader = req.headers.get('Authorization');
+    const url = Deno.env.get('SUPABASE_URL'); const anon = Deno.env.get('SUPABASE_ANON_KEY');
+    if (!authHeader?.startsWith('Bearer ') || !url || !anon) return new Response(JSON.stringify({ error: 'Unauthorized', version: VERSION }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    const client = createClient(url, anon, { global: { headers: { Authorization: authHeader } } });
+    const { data: { user }, error: authError } = await client.auth.getUser(authHeader.slice(7));
+    if (authError || !user) return new Response(JSON.stringify({ error: 'Unauthorized', version: VERSION }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     const accountId = Deno.env.get("CLOUDFLARE_ACCOUNT_ID");
-    const streamToken = Deno.env.get("CLOUDFLARE_STREAM_API_TOKEN");
+    const streamToken = Deno.env.get("CLOUDFLARE_API_KEY");
+    const gatewayKey = Deno.env.get("LOVABLE_API_KEY");
 
-    if (!accountId || !streamToken) {
+    if (!accountId || !streamToken || !gatewayKey) {
       return new Response(JSON.stringify({ error: "Missing Cloudflare credentials" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -40,7 +51,7 @@ serve(async (req) => {
     const body: TusEndpointRequest = await req.json();
     const { fileName, fileSizeBytes, maxDurationSeconds = 7200, metadata = {} } = body;
 
-    if (!fileName || !fileSizeBytes) {
+    if (typeof fileName !== 'string' || !fileName || !Number.isSafeInteger(fileSizeBytes) || fileSizeBytes <= 0 || !Number.isFinite(maxDurationSeconds) || maxDurationSeconds <= 0 || !metadata || typeof metadata !== 'object' || Object.entries(metadata).some(([key, value]) => !/^[a-zA-Z0-9_-]+$/.test(key) || typeof value !== 'string')) {
       return new Response(JSON.stringify({ error: "Missing fileName or fileSizeBytes" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -54,15 +65,17 @@ serve(async (req) => {
     const encodedMetadata = encodeMetadata({
       name: fileName,
       maxDurationSeconds: maxDurationSeconds.toString(),
-      ...metadata,
+      ...creatorMetadata(metadata),
     });
 
     const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream?direct_user=true`,
+      `https://connector-gateway.lovable.dev/cloudflare/client/v4/accounts/${accountId}/stream?direct_user=true`,
       {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${streamToken}`,
+          "Authorization": `Bearer ${gatewayKey}`,
+          "X-Connection-Api-Key": streamToken,
+          "Upload-Creator": user.id,
           "Tus-Resumable": "1.0.0",
           "Upload-Length": fileSizeBytes.toString(),
           "Upload-Metadata": encodedMetadata,
@@ -102,6 +115,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
+        version: VERSION,
         uploadUrl,
         streamId: streamMediaId,
       }),
