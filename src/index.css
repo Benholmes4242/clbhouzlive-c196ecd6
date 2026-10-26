@@ -51,10 +51,11 @@
 .review-upload-no-preview { width:100%; height:100%; display:grid; place-items:center; background:var(--review-upload-no-preview); color:var(--review-upload-dim); }
 .review-upload-duration { position:absolute; left:4px; bottom:4px; font-size:9.5px; font-weight:700; padding:1px 4px; border-radius:4px; background:var(--review-upload-badge); color:var(--review-upload-ink); font-variant-numeric:tabular-nums; }
 .review-upload-overlay { position:absolute; inset:0; display:grid; place-items:center; background:var(--review-upload-overlay); color:var(--review-upload-ink); border-radius:0; padding:0; height:100%; width:100%; letter-spacing:0; }
-.review-upload-ring { width:36px; height:36px; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); }
+.review-upload-ring { width:44px; height:44px; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); }
 .review-upload-ring-track { stroke:var(--review-upload-track); }
 .review-upload-ring-fill { stroke:var(--review-upload-amber); }
-.review-upload-percent { position:relative; font-size:10px; font-weight:800; font-variant-numeric:tabular-nums; }
+.review-upload-percent { position:relative; font-size:10px; font-weight:700; line-height:1; letter-spacing:0; font-variant-numeric:tabular-nums; }
+.review-upload-percent-sign { font-size:7.5px; font-weight:700; opacity:0.7; letter-spacing:0; }
 .review-upload-waiting { font-size:9.5px; font-weight:700; color:var(--review-upload-body); }
 .review-upload-failed { background:var(--review-upload-failed); font-size:10.5px; font-weight:800; }
 .review-upload-tick { position:absolute; left:4px; top:4px; width:16px; height:16px; border-radius:50%; display:grid; place-items:center; background:var(--review-upload-badge); color:var(--review-upload-improved); }
