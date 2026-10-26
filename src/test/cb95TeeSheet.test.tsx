@@ -2,7 +2,7 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import { weekRoom } from '@/features/business/clubAnalytics/courseLead';
-import { TeeSheetSection, YearOnYearSection, teeSheetModel, teeSheetWeekLine } from '@/features/business/clubAnalytics/sections';
+import { TeeSheetSection, SampleSection, teeSheetModel, teeSheetWeekLine } from '@/features/business/clubAnalytics/sections';
 import type { ClubCourseAnalytics } from '@/features/business/clubAnalytics/types';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
@@ -75,15 +75,15 @@ describe('CB95 chart selection and coverage separation', () => {
     render(<TeeSheetSection data={data({ weekdays: [] })} />);
     expect(screen.getByTestId('month-chart')).toBeInTheDocument(); expect(screen.queryByTestId('week-chart')).toBeNull();
   });
-  it('year-on-year is a separate next sibling and retains the hollow partial bar', () => {
+  it('year coverage moves into The sample and retains the hollow partial bar', () => {
     const selected = data({ years: [{ year: 2026, rounds: 7, partial: true }, { year: 2025, rounds: 10 }] });
-    render(<><TeeSheetSection data={selected} /><YearOnYearSection data={selected} /></>);
-    const coverage = screen.getByTestId('year-on-year');
-    expect(screen.getByTestId('tee-sheet').nextElementSibling).toBe(coverage);
+    render(<SampleSection data={selected} />);
+    const coverage = screen.getByTestId('sample-years');
     expect(coverage.querySelectorAll('[style*="dashed"]')).toHaveLength(1);
   });
-  it('a single coverage year still omits year-on-year', () => {
-    render(<YearOnYearSection data={data({ years: [{ year: 2026, rounds: 7, partial: true }] })} />);
-    expect(screen.queryByTestId('year-on-year')).toBeNull();
+  it('a single coverage year still omits the year bars', () => {
+    render(<SampleSection data={data({ years: [{ year: 2026, rounds: 7, partial: true }] })} />);
+    expect(screen.queryByTestId('sample-years')).toBeNull();
   });
+;
 });
