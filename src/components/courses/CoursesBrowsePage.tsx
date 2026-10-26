@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 import { HardestSection } from './browse/HardestSection';
-import { HighestRatedSection } from './browse/HighestRatedSection';
 import { LatestCoursesSection } from './browse/LatestCoursesSection';
 import { LatestHolesSection } from './browse/LatestHolesSection';
 import { LatestReviewsSection } from './browse/LatestReviewsSection';
@@ -18,7 +17,7 @@ import { ByRegionSection, ALL_COURSES_ANCHOR } from './browse/ByRegionSection';
 import { MostPlayedSection } from './browse/MostPlayedSection';
 import { PageLoadGate, useSectionReady } from './browse/PageLoadGate';
 
-const GATE_IDS = ['whoPlaying', 'byRegion', 'latestCourses', 'mostPlayed', 'hardest', 'highestRated', 'latestHoles', 'latestReviews', 'figures'] as const;
+const GATE_IDS = ['whoPlaying', 'byRegion', 'latestCourses', 'mostPlayed', 'hardest', 'latestHoles', 'latestReviews', 'figures'] as const;
 
 /** Reports page-owned readiness from inside the gate's context. */
 function GateReport({ id, ready }: { id: string; ready: boolean }) {
@@ -27,7 +26,7 @@ function GateReport({ id, ready }: { id: string; ready: boolean }) {
 }
 
 /**
- * CoursesBrowsePage — the Courses tab: six sections above the list
+ * CoursesBrowsePage — the Courses tab: five sections above the list
  * (BRIEF_COURSES_PAGE_REBUILD, revised by DEVICE_REVISION). Holds no layout
  * beyond stacking them. The sections above the list are app-wide and never read the country/region URL params;
  * those belong to section 08 (StatBrowse) alone.
@@ -89,7 +88,6 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         <LatestCoursesSection />
         <MostPlayedSection />
         <HardestSection />
-        <HighestRatedSection />
         <LatestHolesSection />
         <LatestReviewsSection reviews={reviewPool} onReviewPress={handleReviewTile} loading={reviewsLoading} />
         <section id={ALL_COURSES_ANCHOR} style={SECTION_WRAP}>
