@@ -10,7 +10,7 @@
  *     locations. A locked section says what it is waiting for and shows the
  *     member's REAL progress towards it.
  *
- * Type: the shared BUSINESS TYPE SCALE (BIZ_KICKER / BIZ_LABEL / BIZ_TITLE /
+ * Type: the shared BUSINESS TYPE SCALE (BIZ_TITLE /
  * BIZ_BODY / bizFigure) from analytical/tokens. Nothing here renders at 800.
  */
 import { useState, useEffect } from 'react';
@@ -35,7 +35,7 @@ import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { BIZ } from '@/components/business/businessTokens';
 import { formatNumber } from '@/i18n/format';
 import {
-  A, BIZ_KICKER, BIZ_LABEL, BIZ_TITLE, BIZ_BODY, bizFigure, BIZ_TRACK_H,
+  A, BIZ_TITLE, BIZ_BODY, bizFigure, BIZ_TRACK_H,
 } from '@/features/courses/components/holes/analytical/tokens';
 
 type DateRange = '7d' | '30d' | '90d';
