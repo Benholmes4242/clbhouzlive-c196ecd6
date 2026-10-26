@@ -154,13 +154,36 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
     expect(screen.getByRole('button', { name: 'Hole 9' })).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Confirm tag' })).toBeDisabled();
   });
-  it('with every shot tagged the button reads All tagged and is disabled', () => {
+  it('with every shot tagged a row open shows the tagged state with Remove tag', () => {
     render(<ReviewHoleTags {...props({ shots: [photo, video], assignments: { p: 9, v: 2 } })} />);
     fireEvent.click(screen.getByRole('button', { name: 'Tag photo 1' }));
+    expect(screen.getByRole('button', { name: 'Remove tag' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Hole 9' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Hole 2' })).toHaveStyle({ opacity: '0.4' });
+  });
+  it('confirming the last tagged shot reads All tagged and is disabled', () => {
+    const assign = vi.fn();
+    render(<ReviewHoleTags {...props({ shots: [photo, video], assignments: { p: 2 }, assign })} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Tag video 1' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 2' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    expect(assign).toHaveBeenCalledWith('v', 2);
     expect(screen.getByRole('button', { name: 'All tagged' })).toBeDisabled();
-    expect(screen.queryByRole('button', { name: 'Confirm tag' })).toBeNull();
+  });
+  it('opening a row on a tagged shot enters the tagged state; an untagged row starts fresh', () => {
+    render(<ReviewHoleTags {...props({ shots: [photo, { ...photo, id: 'q' }], holes: [7, 9], assignments: { p: 7 } })} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Tag photo 1' }));
+    expect(screen.getByText('Tagged to the 7th. Remove the tag to choose a different hole.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Remove tag' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Hole 7' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Hole 9' })).toHaveStyle({ opacity: '0.4' });
+    cleanup();
+    render(<ReviewHoleTags {...props({ shots: [photo, { ...photo, id: 'q' }], holes: [7, 9] })} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Tag photo 1' }));
     expect(screen.queryByRole('button', { name: 'Remove tag' })).toBeNull();
-    expect(screen.getByRole('button', { name: 'Hole 9' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Confirm tag' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Hole 7' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'Hole 9' })).not.toHaveStyle({ opacity: '0.4' });
   });
   it('the sheet body clears the home indicator and wears the Media tab theme', () => {
     render(<ReviewHoleTags {...props({})} />);
