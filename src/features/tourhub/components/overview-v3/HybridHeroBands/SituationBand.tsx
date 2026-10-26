@@ -11,8 +11,9 @@ import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import type { HeadlineSegment } from '../../../overview/magazineCopy';
 import { AMBER, FONT, INK, OVERVIEW_SITUATION_INK, WHITE_ALPHA_32 } from '../../../_shared/tokens';
+import { OVERVIEW } from '../overviewTokens';
 
-export function SituationBand({ segments, onFullBoard }: { segments: HeadlineSegment[]; onFullBoard?: () => void }) {
+export function SituationBand({ segments, onFullBoard, note }: { segments: HeadlineSegment[]; onFullBoard?: () => void; /** Visible situation_note (caller applies its window). */ note?: string | null }) {
   const { t } = useTranslation('tourhub');
   const label = (
     <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: AMBER }}>
@@ -48,6 +49,9 @@ export function SituationBand({ segments, onFullBoard }: { segments: HeadlineSeg
           ),
         )}
       </p>
+      {note ? (
+        <p data-overview-situation-note style={{ margin: '6px 0 0', fontSize: 12.5, lineHeight: 1.5, color: OVERVIEW.soft }}>{note}</p>
+      ) : null}
     </div>
   );
 }

@@ -70,6 +70,8 @@ export function PhotoBand({
     ? t('overview.hero.stateLive')
     : isSuspended
       ? t('overview.hero.stateSuspended')
+    : state.kind === 'results' && state.variant === 'awaiting-playoff'
+      ? t('overview.hero.statePlayoff', { defaultValue: 'PLAYOFF' }) // never RESULTS; no live dot
     : isUpcoming && startDay
       ? t('overview.hero.starts', { day: startDay })
       : t('overview.hero.stateFinal');

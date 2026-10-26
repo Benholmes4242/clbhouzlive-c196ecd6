@@ -21,6 +21,8 @@ import { ChampionStrip } from './HybridHeroBands/ChampionStrip';
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { resolveBoardEntity, resolveChampionEntry, teamNamesNeedInitials } from '../../_shared/boardEntity';
 import { SituationBand } from './HybridHeroBands/SituationBand';
+import { situationSegments, visibleSituationNote } from '../../overview/situationCopy';
+import { roundsFromSchedule } from './HybridHero.utils';
 import { tournamentHeadline, tournamentHeadlineSegments } from '../../overview/magazineCopy';
 
 export interface HybridHeroProps {
@@ -233,8 +235,15 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
   // a results variant but not finished, so it takes the band.
   const showSituation = state.kind !== 'results' || state.variant === 'awaiting-playoff';
   const situation = showSituation
-    ? tournamentHeadlineSegments({ tournament, state, leaderboard: rows, t })
+    ? situationSegments({
+        state,
+        entries: rows,
+        scheduledRounds: roundsFromSchedule(tournament.startDate, tournament.endDate),
+        headline: tournamentHeadlineSegments({ tournament, state, leaderboard: rows, t }),
+        t,
+      })
     : null;
+  const situationNote = visibleSituationNote(tournament.situationNote, state, tournament.endDate, now);
   // Completed: ONE sentence, inside the champion strip, composed from THIS
   // event's leaderboard only (BRIEF_TOUR_CHAMPION_TRUTH X.1). A sentence that
   // states a score must be derived from the score, never asked for.
@@ -261,7 +270,7 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
         heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
         onOpen={onOpenTournament}
       />
-      {situation ? <SituationBand segments={situation} onFullBoard={fullBoardAvailable ? openFullBoard : undefined} /> : null}
+      {situation && situation.length > 0 ? <SituationBand segments={situation} note={situationNote} onFullBoard={fullBoardAvailable ? openFullBoard : undefined} /> : null}
       {fullBoardAvailable ? (
         <FullBoardSheet
           open={fullBoardOpen}

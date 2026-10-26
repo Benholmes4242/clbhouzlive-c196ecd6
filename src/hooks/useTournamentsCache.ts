@@ -22,7 +22,7 @@ const CACHE_SELECT = `
   id, name, status, event_type, start_date, end_date, purse, currency, winning_share,
   venue_id, venue_name, venue_course_name, venue_city, venue_state, venue_country, venue_par, venue_yardage,
   winner_id, defending_champion, champion_narrative, season_id,
-  current_round, current_round_status,
+  current_round, current_round_status, situation_note,
   season:sr_seasons!inner(id, tour_id, tour_name, year)
 `;
 
@@ -50,6 +50,8 @@ export interface CachedTournament {
   season_id: string | null;
   current_round: number | null;
   current_round_status: string | null;
+  /** Hand-set editorial note (e.g. why a round was cancelled). Nullable. */
+  situation_note?: string | null;
   
   season: {
     id: string;

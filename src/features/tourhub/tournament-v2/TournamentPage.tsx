@@ -49,6 +49,11 @@ import { MomentsSection } from './sections/MomentsSection';
 import { EventInfoSection } from './sections/EventInfoSection';
 import { StorySection } from './sections/StorySection';
 import { FullBoardSheet } from './sections/FullBoardSheet';
+import { SituationBand } from '../components/overview-v3/HybridHeroBands/SituationBand';
+import { deriveHeroState, roundsFromSchedule } from '../components/overview-v3/HybridHero.utils';
+import { tournamentHeadlineSegments } from '../overview/magazineCopy';
+import { shortenedApplies, shortenedTo, situationSegments, visibleSituationNote } from '../overview/situationCopy';
+import type { HeroTournament } from '../hooks/useHeroCarouselData';
 
 import { useTeeTimesAll } from './data/useTeeTimesAll';
 import { useTournamentStory } from './data/useTournamentStory';
@@ -222,6 +227,29 @@ export function TournamentPage() {
     setFullBoardOpen(true);
   };
 
+  /* BRIEF_TOUR_PLAYOFF_AND_SHORTENED_EVENTS §6: the overview's situation copy,
+     from the same builder, above the board eyebrow when the event awaits a
+     playoff, was shortened, or carries a visible situation_note. */
+  const situationTournament = {
+    id: meta.id, name: meta.name ?? '', status: meta.status ?? '',
+    startDate: meta.start_date ?? '', endDate: meta.end_date ?? '',
+    currentRound: meta.current_round ?? null, defendingChampion: meta.defending_champion ?? null,
+  } as unknown as HeroTournament;
+  const situationState = deriveHeroState(situationTournament);
+  const awaitingPlayoff = situationState.kind === 'results' && situationState.variant === 'awaiting-playoff';
+  const scheduledRounds = roundsFromSchedule(meta.start_date, meta.end_date);
+  const isShortened = strokeBoard && shortenedApplies(situationState) && shortenedTo(leaderboardRows, scheduledRounds) != null;
+  const situationNote = visibleSituationNote(meta.situation_note, situationState, meta.end_date);
+  const situationCopy = awaitingPlayoff || isShortened || situationNote
+    ? situationSegments({
+        state: situationState,
+        entries: strokeBoard ? leaderboardRows : [],
+        scheduledRounds,
+        headline: strokeBoard ? tournamentHeadlineSegments({ tournament: situationTournament, state: situationState, leaderboard: leaderboardRows, t }) : [],
+        t,
+      })
+    : null;
+
 
 
   return (
@@ -252,6 +280,7 @@ export function TournamentPage() {
 
         {/* THE ACT */}
         <section id="the-act">
+          {situationCopy ? <div data-tournament-situation><SituationBand segments={situationCopy} note={situationNote} /></div> : null}
           {pulse.state === 'live' && (
             <>
               {hasBoard && (
@@ -265,7 +294,7 @@ export function TournamentPage() {
 
           {pulse.state === 'completed' && hasBoard && (
             <>
-              <SectionEyebrow kicker={t('tournament.shell.leaderboard.finalEyebrow')} actionLabel={t('tournament.shell.leaderboard.fullBoardAction')} onAction={openFullBoard} />
+              <SectionEyebrow kicker={awaitingPlayoff ? t('tournament.shell.board.eyebrow') : t('tournament.shell.leaderboard.finalEyebrow')} actionLabel={t('tournament.shell.leaderboard.fullBoardAction')} onAction={openFullBoard} />
               <MiniBoard tournamentId={tournamentId!} entries={leaderboardRows} currentRound={meta?.current_round ?? null} phase="completed" />
             </>
           )}

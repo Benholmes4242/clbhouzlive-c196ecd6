@@ -120,6 +120,7 @@
     "hero": {
       "stateLive": "[LIVE]",
       "stateFinal": "[~~ŘÉŠÚĻŢŠ~~]",
+      "statePlayoff": "[PLAYOFF]",
       "factRound": "[ROUND]",
       "ourPicks": "[OUR TOURNAMENT PICKS]",
       "leaderLabel": "[Leader]",
@@ -262,7 +263,9 @@
     },
     "situation": {
       "label": "[~~Ţĥé šíţúáţíőñ~~]",
-      "fullBoard": "[~~Ƒúľľ ƀőáŕď~~]"
+      "fullBoard": "[~~Ƒúľľ ƀőáŕď~~]",
+      "roundCancelled": "[Round {{cancelled}} was cancelled, so the event finished after {{holes}} holes.]",
+      "cutTo": "[The event was cut to {{holes}} holes.]"
     },
     "picksIntro": {
       "leads": "[~~{{name}} ļéáđš ƒőř úš. Éáĉĥ ĉářđ šĥőŵš ţĥé řőúñđ őúř ƥíĉǩš ŵőúļđ ñééđ ţő řéáĉĥ {{score}}.~~]",

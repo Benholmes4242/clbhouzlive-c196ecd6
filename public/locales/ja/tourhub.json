@@ -107,6 +107,7 @@
     "hero": {
       "stateLive": "ライブ",
       "stateFinal": "結果",
+      "statePlayoff": "PLAYOFF",
       "factRound": "ラウンド"
     },
     "leaderboardBand": {

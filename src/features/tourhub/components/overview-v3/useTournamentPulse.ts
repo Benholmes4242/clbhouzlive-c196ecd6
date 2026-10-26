@@ -7,7 +7,8 @@
  *   COMPLETED: closed, complete
  *
  * Rules:
- *   - live      = LIVE status AND today within [start_date, end_date]
+ *   - live      = LIVE status AND today within [start_date, end_date], or a
+ *                 PLAYOFF/SUSPENDED status whose end_date is within 3 days
  *   - completed = COMPLETED status OR end_date in the past
  *   - upcoming  = otherwise
  */
@@ -29,9 +30,9 @@ export const LIVE_STATUSES = new Set([
 
 export const COMPLETED_STATUSES = new Set(['closed', 'complete', 'completed']);
 
-export function endDateInPast(endISO: string | null): boolean {
+export function endDateInPast(endISO: string | null, now = new Date()): boolean {
   if (!endISO) return false;
-  const today = new Date();
+  const today = new Date(now);
   today.setHours(0, 0, 0, 0);
   const end = new Date(endISO);
   end.setHours(23, 59, 59, 999);
@@ -45,9 +46,9 @@ interface PulseRow {
   status: string | null;
 }
 
-function withinWindow(startISO: string | null, endISO: string | null): boolean {
+function withinWindow(startISO: string | null, endISO: string | null, now = new Date()): boolean {
   if (!startISO || !endISO) return false;
-  const today = new Date();
+  const today = new Date(now);
   today.setHours(0, 0, 0, 0);
   const start = new Date(startISO);
   const end = new Date(endISO);
@@ -91,12 +92,33 @@ export function useTournamentPulse(tournamentId: string | null | undefined): Tou
 
   if (!id || !data) return { state: 'upcoming', isLive: false };
 
-  const statusLc = (data.status ?? '').toLowerCase();
-  const isLive = LIVE_STATUSES.has(statusLc) && withinWindow(data.start_date, data.end_date);
-  if (isLive) return { state: 'live', isLive: true };
+  const state = pulseStateFor(data);
+  return { state, isLive: state === 'live' };
+}
 
-  const isCompleted = COMPLETED_STATUSES.has(statusLc) || endDateInPast(data.end_date);
-  if (isCompleted) return { state: 'completed', isLive: false };
+/** PLAYOFF/SUSPENDED statuses stay live for this many days after end_date. */
+export const HELD_GRACE_DAYS = 3;
+const HELD_STATUSES = new Set(['playoff', 'inplayoff', 'in_playoff', 'suspended', 'delayed', 'weather', 'holdup']);
 
-  return { state: 'upcoming', isLive: false };
+/** end_date fell within the last `days` days (today excluded — that is the window). */
+export function endedWithinDays(endISO: string | null, days: number, now = new Date()): boolean {
+  if (!endISO) return false;
+  const today = new Date(now); today.setHours(0, 0, 0, 0);
+  const end = new Date(endISO); end.setHours(0, 0, 0, 0);
+  const diff = Math.round((today.getTime() - end.getTime()) / 86_400_000);
+  return diff >= 1 && diff <= days;
+}
+
+/**
+ * Pure lifecycle decision. 'inprogress' keeps the window rule; a PLAYOFF or
+ * SUSPENDED status is also live for HELD_GRACE_DAYS after end_date (a Monday
+ * playoff after a Sunday finish). A closed/complete status is completed.
+ */
+export function pulseStateFor(row: Pick<PulseRow, 'start_date' | 'end_date' | 'status'>, now = new Date()): TournamentPulseState {
+  const statusLc = (row.status ?? '').toLowerCase();
+  if (COMPLETED_STATUSES.has(statusLc)) return 'completed';
+  if (LIVE_STATUSES.has(statusLc) && withinWindow(row.start_date, row.end_date, now)) return 'live';
+  if (HELD_STATUSES.has(statusLc) && endedWithinDays(row.end_date, HELD_GRACE_DAYS, now)) return 'live';
+  if (endDateInPast(row.end_date, now)) return 'completed';
+  return 'upcoming';
 }

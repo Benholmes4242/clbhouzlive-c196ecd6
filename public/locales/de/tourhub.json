@@ -107,6 +107,7 @@
     "hero": {
       "stateLive": "LIVE",
       "stateFinal": "ERGEBNISSE",
+      "statePlayoff": "PLAYOFF",
       "factRound": "RUNDE"
     },
     "leaderboardBand": {
