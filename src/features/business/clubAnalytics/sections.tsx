@@ -101,37 +101,6 @@ const fmt = (v: number | null | undefined) => (v ?? 0).toLocaleString();
 
 const roundsLabel = (n: number | null | undefined) => `${fmt(n)} ${n === 1 ? 'round' : 'rounds'}`;
 
-/* ─────────────────── THE THREE-FIGURE STRIP ─────────────────── */
-
-/**
- * §1b / §7 — ONE GRID SERVES THE VERDICT STRIP AND THE SAMPLE. 1fr/1fr/1fr,
- * 1px gaps showing the border through, so the figures read as one instrument
- * rather than three loose numbers.
- */
-export const StatStrip: React.FC<{ cells: { figure: string; label: string; tone?: string }[]; twoLineLabels?: boolean }> = ({ cells, twoLineLabels }) => (
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: `repeat(${cells.length}, 1fr)`,
-      gap: 1,
-      background: A.BORDER,
-      border: `1px solid ${A.BORDER}`,
-      borderRadius: 12,
-      overflow: 'hidden',
-      fontFamily: SANS,
-      ...FIGS,
-    }}
-  >
-    {cells.map((c) => (
-      <div key={c.label} style={{ background: A.PANEL, padding: '13px 12px', textAlign: 'center' }}>
-        <div style={bizFigure(21, c.tone ?? A.INK)}>{c.figure}</div>
-        {/* LABEL_FITS §3 — every cell reserves two lines so figures share a baseline. */}
-        <div style={{ ...LABEL, marginTop: 6, ...(twoLineLabels ? { lineHeight: 1.3, minHeight: '2.6em' } : null) }}>{c.label}</div>
-      </div>
-    ))}
-  </div>
-);
-
 /* ─────────────────── WHERE YOUR INDEX DISAGREES ─────────────────── */
 
 /**
@@ -202,35 +171,66 @@ export const IndexDisagreesSection: React.FC<{ data: ClubCourseAnalytics }> = ({
 
 /* ─────────────────── THE SAMPLE, STATED PLAINLY ─────────────────── */
 
-/**
- * §7 — THE SAMPLE IS A STAT ROW, in the same grid as the verdict strip. It is
- * the honest bit and it is also the pitch: seventeen of Sundridge's members
- * have connected and the club has hundreds. A club shown 817 rounds without the
- * member count reads it as the whole picture.
- */
-export const SampleSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
-  const since = monthYear(data.first_round);
-  const sinceYear = data.first_round ? data.first_round.slice(0, 4) : null;
+/** CB98: the sample closes the page and absorbs year-on-year coverage and the
+ * competition split. It reads only the selected payload. */
+const FULL_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+export function sampleFinePrint(data: ClubCourseAnalytics, partialYear: number | null): string {
+  const out: string[] = [];
+  if (partialYear != null) out.push(`${partialYear} so far, drawn hollow.`);
+  const r = data.rounds ?? 0; const c = data.complete_rounds ?? 0;
+  if (r === 1) out.push(c >= 1 ? 'The one round carries all 18 holes, and the hole figures come from it.' : 'The one round does not carry all 18 holes yet.');
+  else if (c === 0) out.push(`None of the ${fmt(r)} rounds carries all 18 holes yet.`);
+  else out.push(`${fmt(c)} of the ${fmt(r)} rounds carry all 18 holes, and the hole figures come from those.`);
+  if (data.competition) out.push(`${fmt(data.competition.competition)} were competition rounds and ${fmt(data.competition.social)} social.`);
+  return out.join(' ');
+}
 
+export const SampleSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
+  const fr = data.first_round ? new Date(`${data.first_round.slice(0, 10)}T00:00:00Z`) : null;
+  const ok = fr && !Number.isNaN(fr.getTime());
+  const since = ok ? `${FULL_MONTHS[fr!.getUTCMonth()]} ${fr!.getUTCFullYear()}` : null;
+  const years = [...(data.years ?? [])].sort((a, b) => a.year - b.year);
+  const bars = years.length >= 2;
+  const partial = bars ? years.find(y => y.partial) ?? null : null;
+  const complete = years.filter(y => !y.partial);
+  const top = complete.length ? complete.reduce((b, y) => (y.rounds > b.rounds ? y : b)) : null;
+  const max = Math.max(1, ...years.map(y => y.rounds));
+  const lead = 'Every golfer who connects their handicap adds their rounds here';
+  const line = bars ? `${lead}${since ? `, back to ${since}` : ''}, so each year holds more:` : `${lead}${since ? `, back to ${since}` : ''}.`;
+  const cells = [
+    { figure: fmt(data.members), label: 'Golfers' },
+    { figure: fmt(data.rounds), label: 'Rounds' },
+    { figure: ok ? String(fr!.getUTCFullYear()) : '–', label: 'Since' },
+  ];
   return (
-    <Panel kicker="The sample" style={CARD}>
-      <StatStrip
-        cells={[
-          { figure: fmt(data.members), label: data.members === 1 ? 'Member' : 'Members' },
-          { figure: fmt(data.rounds), label: data.rounds === 1 ? 'Round' : 'Rounds' },
-          { figure: sinceYear ?? '—', label: 'Since' },
-        ]}
-      />
-      <Body style={{ marginTop: 12 }}>
-        That is every member of your club who has connected their handicap record to clbhouz, and every round of theirs
-        played here{since ? ` since ${since}` : ''}. The more of your members are connected, the sharper this picture
-        gets — each one adds rounds to every figure below.
-      </Body>
-      <Body style={{ marginTop: 10, fontSize: 12, color: A.DIM }}>
-        {fmt(data.complete_rounds)} of those rounds carry all 18 holes, and hole figures are taken from
-        those. {data.avg_gross != null ? `The mean 18-hole gross returned here is ${data.avg_gross}.` : ''}
-      </Body>
-    </Panel>
+    <section data-testid="sample" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS }}>
+      <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>The sample</div>
+      <div style={{ marginTop: 12, background: HIP.TILE, borderRadius: 13, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
+        {cells.map((c, i) => (
+          <div key={c.label} data-testid="sample-cell" style={{ padding: '11px 8px', textAlign: 'center', borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.06)' : undefined }}>
+            <div data-testid="sample-figure" style={{ fontSize: 19, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: HIP.INK }}>{c.figure}</div>
+            <div style={{ marginTop: 2, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM }}>{c.label}</div>
+          </div>
+        ))}
+      </div>
+      <div data-testid="sample-line" style={{ marginTop: 10, fontSize: 12.5, lineHeight: 1.45, color: HIP.MUTE }}>{line}</div>
+      {bars && (
+        <div className="tee-sheet-inset" data-testid="sample-years">
+          <div className="tee-sheet-bars">{years.map(y => {
+            const tone = y.partial ? 'partial' : top && y.year === top.year ? 'busiest' : 'ordinary';
+            const h = Math.max(3, (y.rounds / max) * 56);
+            return (
+              <div key={y.year} className="tee-sheet-column" data-testid="sample-year" data-year={y.year} data-tone={tone}>
+                <div className="tee-sheet-count" style={tone === 'busiest' ? { color: HIP.INK } : undefined}>{fmt(y.rounds)}</div>
+                <div className="tee-sheet-bar" style={{ height: h, background: tone === 'busiest' ? HIP.INK : tone === 'partial' ? 'transparent' : 'rgba(248,250,252,0.28)', ...(tone === 'partial' ? { border: '1px dashed rgba(248,250,252,0.42)', borderBottom: 'none', boxSizing: 'border-box' } : null) }} />
+              </div>
+            );
+          })}</div>
+          <div className="tee-sheet-axis">{years.map(y => <span key={y.year}>{String(y.year).slice(2)}</span>)}</div>
+        </div>
+      )}
+      <div data-testid="sample-fine" style={{ marginTop: 10, fontSize: 11.5, lineHeight: 1.45, color: HIP.DIM }}>{sampleFinePrint(data, partial?.year ?? null)}</div>
+    </section>
   );
 };
 
@@ -609,39 +609,6 @@ export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) =
 
 /* ─────────────────── WHEN MEMBERS PLAY ─────────────────── */
 
-const BarRow: React.FC<{
-  labels: string[];
-  values: number[];
-  peakInk?: boolean;
-  /** §6.4 — a partial period is drawn HOLLOW and never read as a fall. */
-  hollow?: boolean[];
-}> = ({ labels, values, peakInk = true, hollow }) => {
-  const max = Math.max(1, ...values);
-  return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 96 }}>
-      {labels.map((label, i) => {
-        const count = values[i] ?? 0;
-        const isHollow = hollow?.[i] ?? false;
-        const isPeak = peakInk && !isHollow && count > 0 && count === max;
-        return (
-          <div key={label} style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
-            <div style={{ ...bizFigure(10, isPeak ? A.INK : A.DIM), marginBottom: 4 }}>{count}</div>
-            <div
-              style={{
-                height: Math.max(count > 0 ? 4 : 2, (count / max) * 58),
-                borderRadius: 2,
-                background: isHollow ? 'transparent' : isPeak ? A.INK : inkWithAlpha(SURFACE.dark.ink, 0.22),
-                border: isHollow ? `1px dashed ${A.MUTE}` : undefined,
-                boxSizing: 'border-box',
-              }}
-            />
-            <div style={{ ...LABEL, marginTop: 5 }}>{label}</div>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
 
 /** CB95: weekday conclusions belong to weekRoom; month ties are calendar-first.
  * Both charts read only this selected payload. Coverage stays a separate card.
@@ -693,34 +660,6 @@ export const TeeSheetSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
       <p className="tee-sheet-fine">From {fmt(m.week?.total ?? 0)} rounds by the day they were played, from golfers who have connected their handicap. Rounds carry no time of day, so this cannot split mornings from afternoons.</p>
     </>}
   </section>;
-};
-
-export const YearOnYearSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
-  const years = [...(data.years ?? [])].sort((a, b) => a.year - b.year);
-  const partialYear = years.find((y) => y.partial);
-  if (years.length <= 1) return null;
-  return (
-    <section className="tee-sheet-card" data-testid="year-on-year">
-          <div className="tee-sheet-kicker">YEAR ON YEAR</div>
-          <Inset>
-            <BarRow
-              labels={years.map((y) => String(y.year).slice(2))}
-              values={years.map((y) => y.rounds)}
-              hollow={years.map((y) => Boolean(y.partial))}
-            />
-          </Inset>
-          {/* §6.4 — A PART-YEAR IS NOT A FALL. */}
-          {partialYear && (
-            <Body style={{ marginTop: 10, fontSize: 12, color: 'var(--tee-sheet-dim)' }}>
-              {partialYear.year} is still in progress, drawn hollow. It is not comparable with a completed year yet.
-            </Body>
-          )}
-          <Body style={{ marginTop: 10, fontSize: 11.5, color: A.DIM }}>
-            This is rounds we hold, not rounds played. It rises as more of your members connect, so read it as coverage
-            first and demand second.
-          </Body>
-    </section>
-  );
 };
 
 /* ─────────────────── WHO PLAYS HERE ─────────────────── */
@@ -776,53 +715,6 @@ export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
         Each round is counted at the handicap index the golfer held that day, not today's.
       </div>
     </section>
-  );
-};
-
-/* ─────────────────── COMPETITION OR SOCIAL ─────────────────── */
-
-export const CompetitionSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
-  const c = data.competition;
-  const total = (c?.competition ?? 0) + (c?.social ?? 0);
-  if (!c || total === 0) {
-    return (
-      <Panel kicker="Competition or social" style={CARD}>
-        <Body>We hold no rounds marked competition or social for this course.</Body>
-      </Panel>
-    );
-  }
-
-  const rows = [
-    { label: 'Competition rounds', count: c.competition, colour: A.INK },
-    { label: 'Social rounds', count: c.social, colour: 'rgba(248,250,252,0.42)' },
-  ];
-
-  return (
-    <Panel kicker="Competition or social" aside={`${fmt(total)} rounds`} style={CARD}>
-      <Inset>
-        <div style={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', background: A.TRACK }}>
-          {rows.map((r) =>
-            r.count === 0 ? null : (
-              <i key={r.label} style={{ width: `${Math.max(MIN_BAR_PCT, (r.count / total) * 100)}%`, background: r.colour }} />
-            ),
-          )}
-        </div>
-        <div style={{ marginTop: 14, display: 'flex', gap: 24 }}>
-          {rows.map((r) => (
-            <div key={r.label} style={{ textAlign: 'center' }}>
-              <div style={bizFigure(19, A.INK)}>{fmt(r.count)}</div>
-              <div style={{ ...LABEL, marginTop: 4 }}>
-                {r.label} · {share(r.count, total)}
-              </div>
-            </div>
-          ))}
-        </div>
-      </Inset>
-      <Body style={{ marginTop: 12, fontSize: 11.5, color: A.DIM }}>
-        A competition round is one the member entered in a club competition rather than played socially, as recorded on
-        their handicap record.
-      </Body>
-    </Panel>
   );
 };
 

@@ -15,7 +15,7 @@ vi.mock('@/features/business/claimClub', () => ({ fetchGolfClub: async () => ({ 
 vi.mock('@/components/business/RequestAnotherCourseSheet', () => ({ RequestAnotherCourseSheet: () => null }));
 vi.mock('@/features/business/clubAnalytics/sections', () => {
   const section = (name: string) => ({ data }: { data: ClubCourseAnalytics }) => { f.sections(name, data.course_id); return <div data-section={name}>{name}</div>; };
-  return Object.fromEntries(['HowItPlaysSection', 'SampleSection', 'HoleBySection', 'IndexDisagreesSection', 'RecordBookSection', 'TeesSection', 'TeeSheetSection', 'YearOnYearSection', 'WhoPlaysSection', 'CompetitionSection'].map(name => [name, section(name)]));
+  return Object.fromEntries(['HowItPlaysSection', 'HoleBySection', 'IndexDisagreesSection', 'TeeSheetSection', 'WhoPlaysSection', 'TeesSection', 'RecordBookSection', 'SampleSection'].map(name => [name, section(name)]));
 });
 import ClubAnalyticsPage from '@/pages/ClubAnalyticsPage';
 
@@ -38,7 +38,7 @@ describe('CB91 Your courses top', () => {
   });
   it('request panel follows the entire course block and precedes privacy', () => {
     const view = mount();
-    const last = view.container.querySelector('[data-section="CompetitionSection"]');
+    const last = view.container.querySelector('[data-section="SampleSection"]');
     const request = screen.getByText('Missing a course?');
     const privacy = screen.getByText(/Everything on this page is an aggregate/);
     if (!last) throw new Error('Missing final course section');
@@ -58,8 +58,8 @@ describe('CB91 Your courses top', () => {
     fireEvent.click(screen.getByRole('tab', { name: /West Course/ }));
     expect(view.container.querySelector('.club-course-lead-headline')).toHaveTextContent('Golfers on clbhouz go round the West Course in 79.4.');
     expect(view.container.querySelector('.club-course-lead-line')).toHaveTextContent('From 863 rounds');
-    expect(Array.from(view.container.querySelectorAll('[data-section]')).map(el => el.getAttribute('data-section'))).toEqual(['HowItPlaysSection', 'SampleSection', 'HoleBySection', 'IndexDisagreesSection', 'RecordBookSection', 'TeesSection', 'TeeSheetSection', 'YearOnYearSection', 'WhoPlaysSection', 'CompetitionSection']);
-    for (const name of ['HowItPlaysSection', 'SampleSection', 'HoleBySection', 'IndexDisagreesSection', 'RecordBookSection', 'TeesSection', 'TeeSheetSection', 'YearOnYearSection', 'WhoPlaysSection', 'CompetitionSection']) expect(f.sections).toHaveBeenCalledWith(name, 'west');
+    expect(Array.from(view.container.querySelectorAll('[data-section]')).map(el => el.getAttribute('data-section'))).toEqual(['HowItPlaysSection', 'HoleBySection', 'IndexDisagreesSection', 'TeeSheetSection', 'WhoPlaysSection', 'TeesSection', 'RecordBookSection', 'SampleSection']);
+    for (const name of ['HowItPlaysSection', 'HoleBySection', 'IndexDisagreesSection', 'TeeSheetSection', 'WhoPlaysSection', 'TeesSection', 'RecordBookSection', 'SampleSection']) expect(f.sections).toHaveBeenCalledWith(name, 'west');
   });
   it('one course has a singular header, no chips and a business-name lead', () => {
     f.rows.east.club_courses = []; f.businessName = 'Hartwell Heath Golf Club'; const view = mount();
