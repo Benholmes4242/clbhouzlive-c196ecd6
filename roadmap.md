@@ -2,7 +2,7 @@
 
 ## Review wizard notch canvas
 - [x] Claim review chrome through the existing overlay API on wizard mount; release on unmount. Overlay wrapper uses RV2.canvas; other chrome and tokens unchanged.
-- [ ] Run the new lifecycle test, then full suite; baseline 3,327 tests across 385 files, expected +1 test/+1 file.
+- [x] `bunx vitest run src/test/reviewComposerChrome.test.tsx`: 1/1 passed; `bunx vitest run`: 3,328/3,328 passed across 386 files, zero failures. Baseline 3,327/385 plus one new lifecycle case/file; no existing tests changed, renamed or deleted. CB99 ruling test passes. Automatic build 18:08:34Z OK; native/signed-in visual verification unavailable with external_unmanaged authentication.
 
 ## CB99 — Insights on the course
 - [x] Added useBusinessCourseActivity and InsightsCourseSection after Reviews; server totals/order/privacy unchanged, sections 1–7 frozen. Added scoped global styles and en/en-XA copy; title tracking stays 0 under environment restriction rather than requested -0.01em.
