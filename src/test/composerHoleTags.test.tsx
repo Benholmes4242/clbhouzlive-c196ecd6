@@ -178,4 +178,16 @@ describe('COMPOSER_HOLES_1_R2 independent job writes', () => {
     await joined; await waitFor(() => expect(f.insert).toHaveBeenCalled());
     expect(f.invoke).toHaveBeenCalledTimes(1);
   });
+  it('the upload controller passes a video through with its stream id and poster', async () => {
+    vi.mocked(uploadVideoResilient).mockImplementation((opts: any) => { opts.onSuccess('stream-1'); return Promise.resolve(); });
+    f.rpc.mockResolvedValue({ data: 'rating', error: null });
+    const outcome = await uploadAndPublishReview('video-tags', 'member', 'pending', [{ id: 'v', type: 'video', file: video.file as File, durationSeconds: 75 }], undefined, { ...job, assignments: { v: 9 } });
+    expect(outcome.ok).toBe(true);
+    await waitFor(() => expect(f.insert).toHaveBeenCalledWith(expect.objectContaining({ media_type: 'video', stream_id: 'stream-1', hole_no: 9, duration_seconds: 75 })));
+  });
+  it('the media pipeline passes a video through with its stream id and poster', async () => {
+    const { result } = renderHook(() => useReviewMediaPipeline({ userId: 'member', existingMedia: [{ id: 'm1', media_url: generateStreamHlsUrl('stream-1'), media_type: 'video', poster_url: '/poster.jpg', stream_id: 'stream-1' }] }), { wrapper });
+    act(() => result.current.writeUploadedHolePhotos({ ...job, assignments: { 'existing-m1': 2 } }));
+    await waitFor(() => expect(f.insert).toHaveBeenCalledWith(expect.objectContaining({ media_type: 'video', stream_id: 'stream-1', hole_no: 2, poster_url: '/poster.jpg' })));
+  });
 });
