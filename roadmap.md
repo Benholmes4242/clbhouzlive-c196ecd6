@@ -2,8 +2,9 @@
 
 ## CB91 — Your courses section 1
 - [x] Received and read courses-s1.html; written brief wins changed typography (23px) and selected-course rules; frozen shell/chips/lower sections retain existing design.
-- [ ] Implement selected-course lead helper, loaded header subtitle and moved request panel; preserve chips, unclaimed/gate/notice states and every lower section.
-- [ ] Add helper/page coverage, name authorized retargets and report full-suite counts. Pre-existing rails failures: two sentinel timeouts at coursesRailsUnlimited.test.tsx:80:3 and admin hidden-background role query at :158:18; unrelated tests/source stay untouched.
+- [x] Implement selected-course pure lead, loaded business subtitle and unchanged request panel after course block/before privacy. Chips, gates/notices/unclaimed and all lower sections untouched.
+- [x] Add 22 courseLead.test.ts cases and 6 cb91CoursesTop.test.tsx cases; no existing tests retargeted/deleted/renamed/rewritten. Targeted28/2 pass. Full bunx vitest run:3,171 passed/3 pre-existing failed/3,174 total/369 files. Baseline3,131/366 +15 rails/one file +28 CB91/two files =3,174/369.
+- [ ] STOP remains scoped to prior rails failures: both cursor/repeated-callback cases at coursesRailsUnlimited.test.tsx:80:3, Error: Test timed out in 5000ms; admin invalidation case at :158:18, TestingLibraryElementError: Unable to find role="button" and name "Hole 4, Course 50". No new failures or changes to these tests. Automatic build13:16:23Z OK; manual typecheck prohibited. Live exact visual/authenticated selected-course verification unavailable (external_unmanaged), not claimed. Report CB91_Your_courses_top_report.md.
 
 ## BRIEF_COURSES_RAILS_UNLIMITED
 - [x] BRIEF_COURSES_RAILS_UNLIMITED_FIXTURE: only the new test file extends the shared observer class and assigns/restores the writable global; unstubAllGlobals retained. Assertions/source/other tests/lettering untouched.
