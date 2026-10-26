@@ -14,7 +14,7 @@ const photo = (url: string, ownerName?: string): BatchPhoto & { ownerName?: stri
 const shots = (n: number) => Array.from({ length: n }, (_, i) => photo(`/${i + 1}.jpg`));
 const ok = () => vi.fn().mockResolvedValue({ status: 'approved' } as HolePhoto);
 const hero = () => screen.getByAltText('Current photograph');
-const confirmBtn = () => screen.getByRole('button', { name: /Confirm tag|Tagging\.\.\.|All tagged/ });
+const confirmBtn = () => screen.getByRole('button', { name: /Confirm tag|Tagging\.\.\.|All tagged|Remove tag|Removing\.\.\./ });
 const pick = (n: number) => fireEvent.click(screen.getByRole('button', { name: `Hole ${n}` }));
 const confirm = () => fireEvent.click(confirmBtn());
 afterEach(cleanup);
@@ -79,15 +79,27 @@ describe('thumbnails and hero', () => {
     expect(hero()).toHaveAttribute('src', '/2.jpg'); expect(tag).not.toHaveBeenCalled();
     expect(screen.getByRole('button', { name: 'Shot 2 of 3' })).toHaveAttribute('aria-current', 'true');
   });
-  it('a tagged thumbnail cannot be re-tagged', async () => {
-    const tag = ok(); render(<HolePhotoBatchPath photos={shots(3)} knownHoles={[4]} onTag={tag} onClose={() => {}} />);
+  it('a tagged thumbnail reopens for removal with onRemove and stays inert without it', async () => {
+    const tag = ok(); const remove = vi.fn().mockResolvedValue(undefined);
+    const view = render(<HolePhotoBatchPath photos={shots(3)} knownHoles={[4]} onTag={tag} onRemove={remove} onClose={() => {}} />);
     pick(4); confirm();
     const tagged = await screen.findByRole('button', { name: 'Shot 1 of 3, tagged to the 4th' });
-    expect(tagged).toHaveAttribute('aria-disabled', 'true');
+    expect(tagged).not.toHaveAttribute('aria-disabled');
     expect(tagged.querySelector('.hole-photo-batch-badge')?.textContent).toBe('4');
     fireEvent.click(tagged);
+    expect(hero()).toHaveAttribute('src', '/1.jpg');
+    expect(tagged).toHaveAttribute('aria-current', 'true');
+    expect(confirmBtn()).toHaveTextContent('Remove tag');
+    expect(tag).toHaveBeenCalledTimes(1); expect(remove).not.toHaveBeenCalled();
+    view.unmount();
+    const tag2 = ok();
+    render(<HolePhotoBatchPath photos={shots(3)} knownHoles={[4]} onTag={tag2} onClose={() => {}} />);
+    pick(4); confirm();
+    const inert = await screen.findByRole('button', { name: 'Shot 1 of 3, tagged to the 4th' });
+    expect(inert).toHaveAttribute('aria-disabled', 'true');
+    fireEvent.click(inert);
     expect(hero()).toHaveAttribute('src', '/2.jpg');
-    expect(tag).toHaveBeenCalledTimes(1);
+    expect(tag2).toHaveBeenCalledTimes(1);
   });
   it('the chip shows position / n', () => {
     const { baseElement } = render(<HolePhotoBatchPath photos={shots(12)} knownHoles={[4]} onTag={ok()} onClose={() => {}} />);
@@ -173,5 +185,98 @@ describe('picker has no used-hole treatment', () => {
     render(<HolePhotoTagDialog imageUrl="/p.jpg" holeCount={3} knownHoleNumbers={[1, 2, 3]} pending={false} error={null} onClose={() => {}} onSubmit={submit} />);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 2' })); expect(submit).toHaveBeenCalledWith(2);
     expect(screen.queryByText(/already tagged/)).toBeNull();
+  });
+});
+
+describe('remove tag in the batch window', () => {
+  const tagOne = async (tag = ok(), remove = vi.fn().mockResolvedValue(undefined), n = 3, holes: number[] = [4, 7]) => {
+    render(<HolePhotoBatchPath photos={shots(n)} knownHoles={holes} onTag={tag} onRemove={remove} onClose={() => {}} />);
+    pick(4); confirm();
+    const tagged = await screen.findByRole('button', { name: 'Shot 1 of 3, tagged to the 4th' });
+    fireEvent.click(tagged);
+    return { tag, remove, tagged };
+  };
+  it('tagged state selects the hole, locks and dims the grid, and shows the line and Remove tag', async () => {
+    await tagOne();
+    expect(screen.getByRole('button', { name: 'Hole 4' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Hole 4' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Hole 7' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Hole 7' }).style.opacity).toBe('0.4');
+    expect(screen.getByRole('button', { name: 'Hole 4' }).style.opacity).not.toBe('0.4');
+    expect(screen.getByRole('status')).toHaveTextContent('Tagged to the 4th. Remove the tag to choose a different hole.');
+    expect(screen.getByRole('status').querySelector('svg')).toBeNull();
+    expect(confirmBtn()).toHaveTextContent('Remove tag'); expect(confirmBtn()).toBeEnabled();
+  });
+  it('Remove tag calls onRemove with the stored row; success clears the badge and re-enables the grid', async () => {
+    const row = { id: 'tag-1', hole_no: 4, status: 'approved' } as HolePhoto;
+    const tag = vi.fn().mockResolvedValue(row); const remove = vi.fn().mockResolvedValue(undefined);
+    await tagOne(tag, remove);
+    fireEvent.click(confirmBtn());
+    await waitFor(() => expect(remove).toHaveBeenCalledWith(row));
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Tag removed. Pick the right hole.'));
+    expect(screen.getByRole('button', { name: 'Shot 1 of 3' }).querySelector('.hole-photo-batch-badge')).toBeNull();
+    expect(hero()).toHaveAttribute('src', '/1.jpg');
+    expect(screen.getByRole('button', { name: 'Hole 7' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Hole 7' }).style.opacity).not.toBe('0.4');
+    expect(confirmBtn()).toHaveTextContent('Confirm tag'); expect(confirmBtn()).toBeDisabled();
+  });
+  it('the freed shot can be confirmed on a different hole', async () => {
+    const tag = ok(); await tagOne(tag);
+    fireEvent.click(confirmBtn());
+    await screen.findByText('Tag removed. Pick the right hole.');
+    pick(7); confirm();
+    await waitFor(() => expect(tag).toHaveBeenCalledWith('/1.jpg', 7));
+    expect(tag).toHaveBeenCalledTimes(2);
+  });
+  it('a member count after remove-and-retag excludes the removed tag', async () => {
+    const tag = ok();
+    render(<HolePhotoBatchPath photos={shots(2)} knownHoles={[9]} existingHoleTags={[9]} onTag={tag} onRemove={vi.fn().mockResolvedValue(undefined)} onClose={() => {}} />);
+    pick(9); confirm();
+    expect(await screen.findByRole('status')).toHaveTextContent('Tag confirmed. This is your second tag on the 9th.');
+    fireEvent.click(await screen.findByRole('button', { name: 'Shot 1 of 2, tagged to the 9th' }));
+    fireEvent.click(confirmBtn());
+    await screen.findByText('Tag removed. Pick the right hole.');
+    pick(9); confirm();
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Tag confirmed. This is your second tag on the 9th.'));
+  });
+  it('a remove error keeps the tag and shows the message', async () => {
+    const remove = vi.fn().mockRejectedValue(new Error('nope'));
+    await tagOne(ok(), remove);
+    fireEvent.click(confirmBtn());
+    expect(await screen.findByRole('alert')).toHaveTextContent('The photo could not be removed. It is still on the 4th.');
+    expect(screen.getByRole('button', { name: 'Shot 1 of 3, tagged to the 4th' }).querySelector('.hole-photo-batch-badge')?.textContent).toBe('4');
+    expect(confirmBtn()).toHaveTextContent('Remove tag');
+    expect(screen.getByRole('button', { name: 'Hole 4' })).toHaveAttribute('aria-pressed', 'true');
+  });
+  it('"Removing..." disables the button and the cross', async () => {
+    let release!: () => void;
+    const remove = vi.fn(() => new Promise<void>(res => { release = res; }));
+    await tagOne(ok(), remove);
+    fireEvent.click(confirmBtn());
+    await waitFor(() => expect(confirmBtn()).toHaveTextContent('Removing...'));
+    expect(confirmBtn()).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Close' })).toBeDisabled();
+    await act(async () => { release(); });
+    await screen.findByText('Tag removed. Pick the right hole.');
+  });
+  it('admin-unavailable shots stay non-interactive with onRemove present', async () => {
+    const tag = vi.fn().mockRejectedValueOnce({ code: '23505' }).mockResolvedValue({ status: 'approved' } as HolePhoto);
+    render(<HolePhotoBatchPath adminMode photos={shots(2)} knownHoles={[4]} onTag={tag} onRemove={vi.fn()} onClose={() => {}} />);
+    pick(4); confirm();
+    expect(await screen.findByRole('alert')).toHaveTextContent('That shot is already tagged.');
+    const first = screen.getByRole('button', { name: 'Shot 1 of 2' });
+    expect(first).toHaveAttribute('aria-disabled', 'true');
+    fireEvent.click(first);
+    expect(hero()).toHaveAttribute('src', '/2.jpg');
+    expect(confirmBtn()).not.toHaveTextContent('Remove tag');
+  });
+  it('from "All tagged", tapping a thumbnail shows Remove tag', async () => {
+    render(<HolePhotoBatchPath photos={shots(1)} knownHoles={[4]} onTag={ok()} onRemove={vi.fn().mockResolvedValue(undefined)} onClose={() => {}} />);
+    pick(4); confirm();
+    await waitFor(() => expect(confirmBtn()).toHaveTextContent('All tagged'));
+    expect(confirmBtn()).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Shot 1 of 1, tagged to the 4th' }));
+    expect(confirmBtn()).toHaveTextContent('Remove tag'); expect(confirmBtn()).toBeEnabled();
+    expect(screen.getByRole('status')).toHaveTextContent('Tagged to the 4th. Remove the tag to choose a different hole.');
   });
 });
