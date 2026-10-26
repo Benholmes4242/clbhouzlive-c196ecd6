@@ -253,9 +253,7 @@
         "likes_other": "{{n}} me gusta",
         "comments_one": "{{n}} comentario",
         "comments_other": "{{n}} comentarios"
-      },
-      "reviewsCount_one": "{{n}} reseña",
-      "reviewsCount_other": "{{n}} reseñas"
+      }
     },
     "team": {
       "member": "Team member",

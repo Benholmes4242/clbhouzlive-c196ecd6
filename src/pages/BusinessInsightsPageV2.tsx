@@ -19,7 +19,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
-import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
 import { useBusinessInsightsFunnel } from '@/hooks/useBusinessInsightsFunnel';
 import { InsightsFunnel } from '@/components/business/insights/InsightsFunnel';
 import { InsightsVisitsSection } from '@/components/business/insights/InsightsVisitsSection';
@@ -27,6 +26,7 @@ import { InsightsAudienceSection } from '@/components/business/insights/Insights
 import { InsightsFollowersSection } from '@/components/business/insights/InsightsFollowersSection';
 import { InsightsPostsSection } from '@/components/business/insights/InsightsPostsSection';
 import { InsightsEngagementSection } from '@/components/business/insights/InsightsEngagementSection';
+import { InsightsReviewsSection } from '@/components/business/insights/InsightsReviewsSection';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Button } from '@/components/ui/button';
@@ -50,87 +50,6 @@ const cardStyle: React.CSSProperties = { background: BIZ.card, border: `1px soli
 const numFeat: React.CSSProperties = { fontFeatureSettings: '"kern" 1, "liga" 1' };
 
 const formatNum = (n: number) => formatNumber(n ?? 0);
-
-// ─────────────────────────────────────────────────────────────
-// Reused Reviews section (structure untouched; amber -> neutral ink only)
-// ─────────────────────────────────────────────────────────────
-const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate: (path: string) => void }) => {
-  const { t } = useTranslation('common');
-  const { data: reviewStats, isLoading, error, refetch } = useBusinessReviewStats(businessId);
-
-  const shell = (children: React.ReactNode) => (
-    <section className="rounded-[18px] p-4 md:p-5 space-y-5" style={cardStyle}>
-      <h3 style={BIZ_TITLE}>Reviews &amp; reputation</h3>
-      {children}
-    </section>
-  );
-
-  if (error) return shell(
-    <div className="space-y-3">
-      <p style={BIZ_BODY}>Failed to load review stats.</p>
-      <button
-        type="button"
-        onClick={() => refetch()}
-        className="inline-flex items-center gap-1.5 px-3.5 rounded-full text-[13px] font-bold active:opacity-90"
-        style={{ background: A.INK, color: A.CANVAS, border: 'none', minHeight: 44 }}
-      >
-        Retry
-      </button>
-    </div>
-  );
-  if (isLoading) return shell(<><Skeleton className="h-20 rounded-2xl" /><Skeleton className="h-20 rounded-2xl" /></>);
-  if (!reviewStats) {
-    return shell(
-      <>
-        <p className="text-center py-6" style={BIZ_BODY}>
-          No reviews yet. Once golfers review your courses, you'll see ratings and feedback here.
-        </p>
-        <div className="flex justify-center">
-          <button
-            onClick={() => navigate(`/business/${businessId}/reviews`)}
-            className="inline-flex items-center gap-1.5 px-3.5 rounded-full text-[13px] font-bold active:opacity-90"
-            style={{ background: A.INK, color: A.CANVAS, border: 'none', minHeight: 44 }}
-          >
-            Manage reviews
-          </button>
-        </div>
-      </>
-    );
-  }
-
-  const maxCount = Math.max(...reviewStats.distribution.map(d => d.count), 1);
-  return shell(
-    <>
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="flex-shrink-0">
-          <div className="flex items-baseline gap-1">
-            <span className="tabular-nums" style={bizFigure(30)}>{reviewStats.avgRating}</span>
-            <span style={{ ...BIZ_BODY, color: A.DIM }}>/ 10</span>
-          </div>
-          <p className="mt-1" style={BIZ_BODY}>{t('business.insights.reviewsCount', { count: reviewStats.totalReviews, n: formatNum(reviewStats.totalReviews) })}</p>
-        </div>
-        <div className="flex-1 space-y-1.5">
-          {reviewStats.distribution.slice().reverse().map(item => (
-            <div key={item.score} className="flex items-center gap-2">
-              <span className="text-[11px] w-5 text-right tabular-nums" style={{ color: A.MUTE, ...numFeat }}>{item.score}</span>
-              <div className="flex-1 rounded-full overflow-hidden" style={{ height: BIZ_TRACK_H, background: A.TRACK }}>
-                <div className="h-full rounded-full" style={{ width: `${(item.count / maxCount) * 100}%`, background: BAR_FILL }} />
-              </div>
-              <span className="text-[11px] w-6 text-right tabular-nums" style={{ color: A.MUTE, ...numFeat }}>{item.count}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-      <button
-        onClick={() => navigate(`/business/${businessId}/reviews`)}
-        className="inline-flex items-center gap-1.5 px-3.5 rounded-full text-[13px] font-bold active:opacity-90"
-        style={{ background: A.INK, color: A.CANVAS, border: 'none', minHeight: 44 }}
-      >
-        Manage reviews
-      </button>
-    </>
-  );
-};
 
 // ─────────────────────────────────────────────────────────────
 // Page
@@ -262,8 +181,14 @@ const BusinessInsightsPageV2 = () => {
           <InsightsEngagementSection businessId={business.id} days={RANGE_DAYS[dateRange]} />
         </div>
 
-        {/* ── REPUTATION (course-linked only) ── */}
-        {business.club_id && <ReviewsSection businessId={business.id} navigate={navigate} />}
+        {/* ── CB89: REVIEWS (replaces Reviews & reputation; club-linked only).
+            Draws nothing until the first read settles, if it fails, or if the
+            server says unlinked; period switches keep the previous card. ── */}
+        {business.club_id && (
+          <div className="-mx-4 md:-mx-6 !mt-0">
+            <InsightsReviewsSection businessId={business.id} businessName={business.name} days={RANGE_DAYS[dateRange]} canManage={!!membership.canManage} onNavigate={navigate} />
+          </div>
+        )}
       </div>
     </ManagePageShell>
   );
