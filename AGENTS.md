@@ -38,6 +38,7 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Course photo publication and metadata live in `src/lib/courseMedia`; shared payloads prevent entrypoint drift.
 - Media state/RPC ownership: see CourseMediaEmptyStates.tsx header.
 - Latest holes rail query/order/geometry ownership: see LatestHolesSection.tsx header; Media consumes initial URL focus once and HoleWalk retains shot fallback ownership.
+- Course rails share rail-local observation and stable deduplication in useRailPagination.ts; each section owns its RPC cursor and first-page rules, so pagination cannot drift into page scrolling or viewer fetching.
 - Leaders' group round selection ownership: see leadersGroupRules.ts header; shared board helpers remain authoritative for score and thru cells.
 - Insights visits/source snapshot and UTC bucket ownership: see InsightsVisitsSection.tsx and visitBuckets.ts headers; club analytics remains independent.
 - Admin hole tagging is an opt-in batch mode backed only by the admin RPCs; AdminHoleTagging.tsx owns attribution and cache refresh so member writes stay untouched.

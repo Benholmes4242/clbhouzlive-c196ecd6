@@ -1,7 +1,9 @@
 /** BRIEF_COURSES_LATEST_FROM_COURSES §1-3 — "Through members' eyes / Latest
  * from the courses": one card per course from get_latest_course_media (RPC
- * owns one row per course, newest member shot first, at most 30; we ask for
- * 15). BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §3 — tapping a tile opens the
+ * owns one row per course, newest member shot first and three-shot eligibility).
+ * Cursor pages of ten have no total cap: latest_at/course_id comes from the last
+ * raw row; first-page minimum/readiness and the existing tap ladder stay unchanged.
+ * BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §3 — tapping a tile opens the
  * CANONICAL full-screen viewer (FullscreenFeedOverlay via openWithOrigin,
  * readOnly) over ONE run through every photo and video of that course,
  * starting on the tapped shot. The set is still the course's media from
@@ -9,8 +11,9 @@
  * flattened post-then-media into one sideways carousel, each credited to the
  * member who added it. This rail never starts video playback; video tiles
  * draw their poster. */
-import { useEffect, useState } from 'react';
-import { useGamRpc } from '@/hooks/gam/_useGamRpc';
+import { useEffect, useMemo, useState } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useGalleryCourseMedia } from '@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia';
 import { coursePostsToShotPosts } from '@/lib/courseMedia/memberShotPosts';
@@ -22,7 +25,8 @@ import { useSectionReady } from './PageLoadGate';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { RAIL_BLEED } from './format';
 import { PHOTO_FIGURE_GAP } from './PhotoFigureCard';
-import { LatestCoursesShell } from './sectionShells';
+import { LatestCoursesShell, LatestCourseSkeletonCard } from './sectionShells';
+import { dedupeRailRows, useRailPagination } from './useRailPagination';
 
 /* Card geometry, read by the card AND its shell (BRIEF_COURSES_SKELETONS 2.3). */
 export const LATEST_COURSE_W = 300;
@@ -30,6 +34,7 @@ export const LATEST_COURSE_H = 230;
 export const LATEST_COURSE_BIG_W = 198;
 export const LATEST_COURSE_SMALL_W = 100;
 export const LATEST_COURSE_SMALL_H = 114;
+export const LATEST_COURSE_PAGE_SIZE = 10;
 
 export interface LatestCourseMediaTile {
   post_id: string;
@@ -44,6 +49,7 @@ export interface LatestCourseMediaTile {
 
 export interface LatestCourseMedia {
   course_id: string;
+  latest_at: string;
   course_name: string;
   media_count: number;
   contributor_count: number;
@@ -173,8 +179,25 @@ function LatestCourseCard({ row, pending, onOpen }: {
 
 export function LatestCoursesSection() {
   const { user } = useSupabaseSession();
-  const { data, isLoading, isError } = useGamRpc<LatestCourseMedia[]>('get_latest_course_media', { p_limit: 15 }, { staleTime: 60_000 });
+  const { data, isLoading, isError, hasNextPage, isFetching, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
+    queryKey: ['gam_rpc', 'get_latest_course_media', 'infinite'],
+    initialPageParam: undefined as { at: string; id: string } | undefined,
+    queryFn: async ({ pageParam }) => {
+      const args = { p_limit: LATEST_COURSE_PAGE_SIZE, ...(pageParam ? { p_before_at: pageParam.at, p_before_id: pageParam.id } : {}) };
+      const { data, error } = await (supabase.rpc as unknown as (name: string, args: Record<string, unknown>) => Promise<{ data: LatestCourseMedia[] | null; error: unknown }>)('get_latest_course_media', args);
+      if (error) throw error;
+      return data ?? [];
+    },
+    getNextPageParam: page => {
+      const last = page[page.length - 1];
+      return page.length < LATEST_COURSE_PAGE_SIZE || !last ? undefined : { at: last.latest_at, id: last.course_id };
+    },
+    staleTime: 60_000,
+  });
   useSectionReady('latestCourses', !isLoading);
+  const rows = useMemo(() => dedupeRailRows(data?.pages ?? [], row => row.course_id), [data]);
+  const visible = !isLoading && !isError && (data?.pages[0]?.length ?? 0) >= 3;
+  const { railRef, sentinelRef } = useRailPagination({ hasNextPage, isFetching, fetchNextPage, cardWidth: LATEST_COURSE_W, pageCount: data?.pages.length ?? 0, visible });
   const [pending, setPending] = useState<PendingOpen | null>(null);
   const gallery = useGalleryCourseMedia(pending?.courseId ?? null, user?.id);
 
@@ -204,12 +227,12 @@ export function LatestCoursesSection() {
   }, [gallery.data, gallery.isError, pending]);
 
   if (isLoading) return <LatestCoursesShell />;
-  if (isError || !data || data.length < 3) return null;
+  if (!visible) return null;
   return (
     <section style={SECTION_WRAP}>
       <SectionHead tone="amber" kicker="Through members' eyes" title="Latest from the courses" />
-      <div className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: PHOTO_FIGURE_GAP, marginTop: HEAD_GAP }}>
-        {data.map(row => (
+      <div ref={railRef} className="scrollbar-hide" style={{ ...RAIL_BLEED, gap: PHOTO_FIGURE_GAP, marginTop: HEAD_GAP, willChange: 'transform' }}>
+        {rows.map(row => (
           <LatestCourseCard
             key={row.course_id}
             row={row}
@@ -227,6 +250,8 @@ export function LatestCoursesSection() {
             }}
           />
         ))}
+        {isFetchingNextPage && <LatestCourseSkeletonCard />}
+        {hasNextPage && <div ref={sentinelRef} aria-hidden style={{ width: 1, flex: 'none', alignSelf: 'stretch' }} />}
       </div>
     </section>
   );

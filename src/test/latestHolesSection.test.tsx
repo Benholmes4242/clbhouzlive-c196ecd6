@@ -23,7 +23,7 @@ vi.mock('@/components/course-media-tab/CourseMediaCanonGrid', () => ({ CourseMed
 vi.mock('@/components/course-media-tab/CourseMediaHeader', () => ({ CourseMediaHeader: () => null }));
 vi.mock('@/components/common/ScrollToTopGlass', () => ({ default: () => null }));
 
-vi.mock('@/hooks/gam/_useGamRpc', () => ({ useGamRpc: (...args: unknown[]) => { f.rpc(...args); return { data: f.latest, isLoading: f.loading, isError: f.error }; } }));
+vi.mock('@tanstack/react-query', async importOriginal => ({ ...await importOriginal<typeof import('@tanstack/react-query')>(), useInfiniteQuery: (options: unknown) => { f.rpc(options); return { data: { pages: [f.latest] }, isLoading: f.loading, isError: f.error, hasNextPage: false, isFetching: f.loading, isFetchingNextPage: false, fetchNextPage: vi.fn() }; } }));
 
 import { LatestHolesSection } from '@/components/courses/browse/LatestHolesSection';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
@@ -69,7 +69,11 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
   });
   it('three cards retain RPC order and the specified query contract', () => {
     mountRail(); expect(screen.getAllByRole('button').map(b => b.getAttribute('aria-label'))).toEqual(['Hole 4, Course first', 'Hole 4, Course second', 'Hole 4, Course third']);
-    expect(f.rpc).toHaveBeenCalledWith('get_latest_hole_media', { p_limit: 30 }, { staleTime: 60_000 });
+    expect(f.rpc).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['gam_rpc', 'get_latest_hole_media', 'infinite'], staleTime: 60_000 }));
+    const options = f.rpc.mock.calls[0][0];
+    const request = options.queryFn({ pageParam: undefined });
+    expect(f.holeRpc).toHaveBeenCalledWith('get_latest_hole_media', { p_limit: 20 });
+    return request;
   });
   it('two shots from one course render as two cards', () => {
     f.latest = [latest('first'), latest('second', { course_id: 'course-first', course_name: 'Course first' }), latest('third')];

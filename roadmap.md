@@ -1,10 +1,11 @@
 # Roadmap
 
 ## BRIEF_COURSES_RAILS_UNLIMITED
-- [ ] Cursor-page both course rails, dedupe loaded rows, observe rail ends and pause holes pagination beneath fullscreen. Preserve first-page readiness/minimums and existing course tap behavior.
-- [ ] Add pagination/invalidation/loaded-viewer tests; retarget only authorized single-query fixtures and limit assertions. Baseline: 3,131 tests / 366 files, zero failures (CB90.1).
-- [ ] Run targeted and full Vitest suites; report automatic type/build diagnostics and live verification limitations.
-- [ ] Resolve typography conflict: brief freezes card designs and says letter spacing stays zero or positive, while existing cards use -0.05em/-0.03em and latestHolesSection protects these; preserve frozen designs pending ruling.
+- [x] Implement cursor-page rails, loaded-row dedupe, rail-local observer/end skeleton and fullscreen holes paging gate. First-page minimum/readiness and course tap behavior preserved; not accepted as verified after test stop.
+- [x] Add 15 cases in coursesRailsUnlimited.test.tsx; retarget only latestHolesSection/latestCoursesSection single-query fixture/contract assertions. Baseline 3,131 / 366; candidate 3,146 / 367 (+15 / +1), full count unverified.
+- [ ] STOP: src/test/coursesRailsUnlimited.test.tsx:49:6 — TypeError: Cannot redefine property: IntersectionObserver. All 15 new cases fail in beforeEach; 68 existing cases pass. No test fix or rerun after failure. Await exact fixture-only authorization; setup.ts defines the global non-configurable. Full suite and browser flow not run after stop; hosted authenticated checks also unavailable (external_unmanaged).
+- [x] Targeted command: bunx vitest run src/test/coursesRailsUnlimited.test.tsx src/test/latestHolesSection.test.tsx src/test/latestCoursesSection.test.tsx src/test/latestHolesSwipeCaption.test.tsx src/test/adminHoleTagging.test.tsx — 68 passed / 15 failed / 83 total / 5 files. Latest automatic build 12:56:40Z OK, earlier findLast intermediate errors cleared before test run. No separate manual typecheck (environment prohibition). Report Courses_rails_unlimited_stop_report.md.
+- [x] Founder ruling: existing negative card letter spacing and its protecting test stay exactly unchanged; zero-or-positive applies only to new additions.
 
 ## BRIEF_SYNC_WHS_DUE_FAILURE_TYPE
 - [x] Widen retry/failure parameter types to shared EgErrorKind excluding preauth_expired, retaining ok for success. Type-only call-site assertions preserve existing runtime paths; auth early return remains unchanged, member-token reads cannot throw preauth_expired. SyncResult.status already string. not_found/bad_request retain default backoff; all writes/timing unchanged.
