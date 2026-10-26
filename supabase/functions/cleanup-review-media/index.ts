@@ -20,13 +20,13 @@ serve(async req => {
     const body = await req.json();
     if (!Array.isArray(body.mediaItems) || body.mediaItems.length > 100 || body.mediaItems.some((i: CleanupItem) => !i || (i.media_type !== 'image' && i.media_type !== 'video') || typeof i.media_url !== 'string' || (i.id != null && typeof i.id !== 'string') || (i.stream_id != null && (typeof i.stream_id !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(i.stream_id))))) return respond({ error: 'Invalid mediaItems' }, 400);
     const account = Deno.env.get('CLOUDFLARE_ACCOUNT_ID');
-    const connection = Deno.env.get('CLOUDFLARE_API_KEY'); const gatewayKey = Deno.env.get('LOVABLE_API_KEY');
+    const streamToken = Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN') ?? Deno.env.get('CLOUDFLARE_API_TOKEN');
     const access = Deno.env.get('R2_ACCESS_KEY_ID'); const secret = Deno.env.get('R2_SECRET_ACCESS_KEY');
     const bucket = Deno.env.get('R2_BUCKET') || 'clbhouz-media';
-    if (!account || !connection || !gatewayKey) return respond({ error: 'Cloudflare connection credentials missing' }, 503);
+    if (!account || !streamToken) return respond({ error: 'Cloudflare connection credentials missing' }, 503);
     if (body.mediaItems.some((i: CleanupItem) => i.media_type === 'image') && (!access || !secret)) return respond({ error: 'Photo deletion requires R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY' }, 503);
     const cf = async (id: string, method: string) => {
-      const response = await fetch(`https://connector-gateway.lovable.dev/cloudflare/client/v4/accounts/${account}/stream/${encodeURIComponent(id)}`, { method, headers: { Authorization: `Bearer ${gatewayKey}`, 'X-Connection-Api-Key': connection } });
+      const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/stream/${encodeURIComponent(id)}`, { method, headers: { Authorization: `Bearer ${streamToken}` } });
       const text = await response.text();
       if (response.status === 404) return null;
       if (!response.ok) throw new Error(`Cloudflare ${response.status}: ${text}`);
