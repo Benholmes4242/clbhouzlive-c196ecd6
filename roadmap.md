@@ -1,5 +1,9 @@
 # Roadmap
 
+## CB87 — Signup detection and database-owned clbhouz follow
+- [ ] Remove the app-side follow and use parsed confirmation/creation timestamps for all three signup-success events.
+- [ ] Add helper and email/Apple/Google regressions; answer reference audits and report full-suite counts against 3,009 tests / 357 files (one prior AdminShell timeout).
+
 ## BRIEF_HOLE_PANEL_VIDEO_AUTOPLAY_V2
 - [x] Add shared muted active-shot autoplay using the existing tile coordinator; pause beneath tagging dialogs and fullscreen. Manual players, thumbnails, processing and viewer unchanged.
 - [x] Added 16 cases in holeInlineAutoplay.test.tsx; two approved existing disc cases use reduced-motion fixtures with assertions unchanged. Targeted 44/3 passed. Full bunx vitest run: 3,008 passed / 1 failed, 3,009 total / 357 files, from 2,993/356 (+16/+1). Automatic build 09:07:25Z OK; standalone typecheck prohibited, not run.
