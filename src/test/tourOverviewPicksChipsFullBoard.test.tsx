@@ -82,7 +82,7 @@ describe('picks chips (Board B)', () => {
     const text = card.querySelector('[data-overview-pick-text]') as HTMLElement;
     expect(card.firstElementChild).toBe(avatar);
     expect(avatar.nextElementSibling).toBe(text);
-    expect(avatar.style.flex).toBe('none');
+    expect(avatar.style.flex).toBe('0 0 auto');
     const sized = avatar.querySelector<HTMLElement>('[style*="30px"]');
     expect(sized).not.toBeNull();
   });
@@ -91,7 +91,7 @@ describe('picks chips (Board B)', () => {
     f.picks = [{ playerId: 'p3', playerName: 'B Three' }];
     const { container } = mountPicks();
     const figure = container.querySelector('[data-overview-pick-figure]') as HTMLElement;
-    expect(figure.textContent).toBe('4-7');
+    expect(figure.textContent).toBe('4\u22127');
     expect(figure.previousElementSibling?.hasAttribute('data-overview-pick-name')).toBe(true);
   });
 
@@ -118,7 +118,7 @@ describe('picks chips (Board B)', () => {
     expect(name.style.whiteSpace).toBe('nowrap');
     expect(name.style.overflow).toBe('hidden');
     expect(name.style.textOverflow).toBe('ellipsis');
-    expect((name.parentElement as HTMLElement).style.minWidth).toBe('0px');
+    expect((name.parentElement as HTMLElement).style.minWidth).toBe('0');
   });
 });
 
@@ -165,7 +165,7 @@ describe('situation row "Full board"', () => {
 
   it('is absent without a stroke board', () => {
     f.rows = field;
-    mountHero(LIVE, vi.fn(), slide('team_match_play'));
+    mountHero(LIVE, vi.fn(), slide('cup'));
     expect(document.querySelector('[data-overview-full-board]')).toBeNull();
     cleanup();
     f.rows = [];
