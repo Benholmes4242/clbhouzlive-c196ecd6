@@ -33,6 +33,7 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 
 - Owner copy uses `profileOwnerVoice` to share grammar.
 - Club analytics opening copy is computed by courseLead from the selected CourseBlock payload only; no seed fallback or additional reads, so chip switches cannot mix courses.
+- Club weekday conclusions share weekRoom between the lead and tee-sheet card; selected-course conclusions must not drift between surfaces.
 - Sheet handicap ownership: see HcpStrip.tsx header; prevents connect-card flashes.
 - Small-sample Reviews reuse SingleReview's RaterReviewRow, so context and media cannot drift.
 - Course tab gaps and canon: see tabCanon.css and AboutSection.tsx; null chains stay aligned.
