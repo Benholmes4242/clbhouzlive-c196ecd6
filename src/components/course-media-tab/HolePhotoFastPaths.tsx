@@ -165,8 +165,8 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
         </button>;
       })}</div>
     </div>
-    <HolePhotoPicker holeCount={knownHoles.length} knownHoleNumbers={knownHoles} selectedHole={selected} disabled={allTagged} onSelect={hole => { if (!pending && !allTagged && !done(photo.url)) setSelected(hole); }} />
+    <HolePhotoPicker holeCount={knownHoles.length} knownHoleNumbers={knownHoles} selectedHole={inTaggedState ? taggedHole ?? null : selected} disabled={allTagged || inTaggedState} dimOthers={inTaggedState} onSelect={hole => { if (!pending && !allTagged && !inTaggedState && !done(photo.url)) setSelected(hole); }} />
     {error && <p role="alert" className="hole-photo-fast-lede">{error}</p>}
-    <button type="button" className="hole-photo-batch-confirm" disabled={!canConfirm} data-enabled={canConfirm || undefined} onClick={() => { void confirm(); }}>{pending ? 'Tagging...' : allTagged ? 'All tagged' : 'Confirm tag'}</button>
+    <button type="button" className="hole-photo-batch-confirm" disabled={!canConfirm && !canRemove} data-enabled={canConfirm || canRemove || undefined} onClick={() => { if (inTaggedState) void remove(); else void confirm(); }}>{pending ? (inTaggedState ? 'Removing...' : 'Tagging...') : inTaggedState ? 'Remove tag' : allTagged ? 'All tagged' : 'Confirm tag'}</button>
   </DialogContent></Dialog>;
 }
