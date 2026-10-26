@@ -1,7 +1,7 @@
 /** BRIEF_HOLE_TAG_BATCH_V3 §4 — single-shot tagging fires the member toast. */
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 const f = vi.hoisted(() => ({ toast: vi.fn(), mutate: vi.fn() }));
@@ -34,7 +34,7 @@ describe('single-shot toast', () => {
     const qc = new QueryClient();
     render(<MemoryRouter><QueryClientProvider client={qc}><CourseMediaTabNew courseId="course" /></QueryClientProvider></MemoryRouter>);
     fireEvent.click(await screen.findByRole('button', { name: 'open-tag' }));
-    fireEvent.click(await screen.findByRole('button', { name: 'Hole 9' }));
+    fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Hole 9' }));
     await waitFor(() => expect(f.toast).toHaveBeenCalledWith('Tag confirmed. This is your second tag on the 9th.'));
     expect(screen.queryByRole('dialog')).toBeNull();
   });
