@@ -14,7 +14,7 @@ vi.mock('@/hooks/useBusinessPendingRequestsCount', () => ({ useBusinessPendingRe
 vi.mock('@/hooks/useBusinessAccessRequestsRealtime', () => ({ useBusinessAccessRequestsRealtime: () => {} }));
 vi.mock('@/hooks/useBusinessVerificationRequest', async () => {
   const actual = await vi.importActual<typeof import('@/hooks/useBusinessVerificationRequest')>('@/hooks/useBusinessVerificationRequest');
-  return { ...actual, useBusinessVerificationRequest: () => ({ data: { status: 'approved' } }) };
+  return { ...actual, useBusinessVerificationRequest: () => ({ data: null }) };
 });
 vi.mock('@/hooks/useBusinessCourseClaim', () => ({ useBusinessCourseClaim: () => ({ data: null }) }));
 vi.mock('@/hooks/useBusinessReviews', () => ({ useBusinessReviews: () => ({ data: null }) }));
