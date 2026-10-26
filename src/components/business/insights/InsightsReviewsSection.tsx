@@ -52,7 +52,8 @@ const Card = ({ d, days, businessName, businessId, canManage, onNavigate, k }: {
     );
   }
   const one = d.courses.length === 1 ? d.courses[0] : null;
-  const rankPart = one && one.rank != null && one.rank_of != null
+  const ranked = !!one && one.rank != null && one.rank_of != null;
+  const rankPart = ranked && one
     ? k('rankLead', { rank: ordinal(one.rank), of: formatNumber(one.rank_of), county: one.county ?? '' })
     : '';
   const newKey = d.new_count === 0 ? `newNone_${days}` : d.new_count === 1 ? `newOne_${days}` : `newMany_${days}`;
@@ -68,8 +69,8 @@ const Card = ({ d, days, businessName, businessId, canManage, onNavigate, k }: {
       <h3 className="insights-reviews-title" data-title="ready">
         {pre}<span data-avg style={{ color: ratingTone(d.avg) }}>{d.avg != null ? fig(d.avg) : ''}</span>{post}
       </h3>
-      <p className="insights-reviews-line" data-line="ready" data-rank={rankPart ? 'yes' : 'no'} data-new={newKey}>
-        {rankPart && bolded(rankPart)}{bolded(newPart)}
+      <p className="insights-reviews-line" data-line="ready" data-rank={ranked ? 'yes' : 'no'} data-new={newKey}>
+        {ranked && bolded(rankPart)}{bolded(newPart)}
       </p>
       {d.courses.length >= 2 && (
         <div className="insights-reviews-courses" data-courses>
