@@ -131,7 +131,26 @@ describe('COMPOSER_HOLES_1_R2 independent job writes', () => {
   });
   it('untagged photographs and videos never write hole rows', async () => {
     await writeComposerHolePhoto(job, 'member', { ...photo, id: 'untagged' }, 'url');
-    await writeComposerHolePhoto(job, 'member', { ...photo, type: 'video' }, 'url'); expect(f.from).not.toHaveBeenCalled();
+    await writeComposerHolePhoto(job, 'member', { ...video, id: 'untagged-v' }, 'url'); expect(f.from).not.toHaveBeenCalled();
+  });
+  it('a tagged video writes one row with stream fields from the item', async () => {
+    await writeComposerHolePhoto({ ...job, assignments: { v: 9 } }, 'member', video, generateStreamHlsUrl('stream-1'));
+    expect(f.insert).toHaveBeenCalledTimes(1);
+    expect(f.insert).toHaveBeenCalledWith(expect.objectContaining({
+      course_id: 'course', hole_no: 9, user_id: 'member', media_type: 'video', stream_id: 'stream-1',
+      media_url: generateStreamHlsUrl('stream-1'), poster_url: '/poster.jpg', duration_seconds: 75,
+    }));
+    expect(f.exif).not.toHaveBeenCalled();
+  });
+  it('a tagged video with no streamId writes nothing', async () => {
+    await writeComposerHolePhoto({ ...job, assignments: { v: 9 } }, 'member', { ...video, streamId: null }, 'url');
+    expect(f.from).not.toHaveBeenCalled();
+  });
+  it('the duplicate check matches on stream_id', async () => {
+    f.limit.mockResolvedValueOnce({ data: [{ id: 'dup' }], error: null });
+    await writeComposerHolePhoto({ ...job, assignments: { v: 9 } }, 'member', video, generateStreamHlsUrl('stream-1'));
+    expect(f.or).toHaveBeenCalledWith(`media_url.eq.${generateStreamHlsUrl('stream-1')},stream_id.eq.stream-1`);
+    expect(f.insert).not.toHaveBeenCalled();
   });
   it('hole insert rejection is swallowed and does not reject the job', async () => {
     f.insert.mockRejectedValue(new Error('refused')); await expect(writeComposerHolePhoto(job, 'member', photo, 'url')).resolves.toBeUndefined();
