@@ -20,7 +20,7 @@ vi.mock('@/components/course-media-tab/hooks/useHolePhotoTagging', () => ({ useH
   taggedUrls: new Set(), submit: { reset: vi.fn(), mutate: f.mutate, isPending: false, error: null },
   retag: { reset: vi.fn() }, move: {}, remove: {},
 }) }));
-vi.mock('@/components/course-media-tab/hooks/useCourseMedia', () => ({ useCourseMedia: () => ({ posts: [{ id: 'p', userId: 'me', actorType: 'personal', mediaItems: [{ id: 'm', type: 'image', url: '/p.jpg' }] }], postsForFullscreen: [], mediaCounts: { total: 1, photos: 1, videos: 0 }, countsReady: true }) }));
+vi.mock('@/components/course-media-tab/hooks/useCourseMedia', () => ({ useCourseMedia: () => ({ posts: [{ id: 'p', userId: 'me', actorType: 'personal', mediaItems: [{ id: 'm', type: 'image', imageUrl: '/p.jpg' }] }], postsForFullscreen: [], mediaCounts: { total: 1, photos: 1, videos: 0 }, countsReady: true }) }));
 vi.mock('@/uploads/hooks/useMediaUpload', () => ({ useMediaUpload: () => ({ upload: vi.fn() }) }));
 vi.mock('@/components/course-media-tab/CourseMediaCanonGrid', () => ({ CourseMediaCanonGrid: React.forwardRef((props: { posts: unknown[]; tagging?: { onTag: (p: unknown) => void } }, _ref) => props.tagging ? <button type="button" onClick={() => props.tagging!.onTag(props.posts[0])}>open-tag</button> : null) }));
 vi.mock('@/components/course-media-tab/CourseMediaHeader', () => ({ CourseMediaHeader: () => null }));
@@ -35,7 +35,6 @@ describe('single-shot toast', () => {
     render(<MemoryRouter><QueryClientProvider client={qc}><CourseMediaTabNew courseId="course" /></QueryClientProvider></MemoryRouter>);
     fireEvent.click(await screen.findByRole('button', { name: 'open-tag' }));
     fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Hole 9' }));
-    console.log('MUTATE', f.mutate.mock.calls.length, document.querySelector('[role=dialog]')?.textContent?.slice(0,200));
     await waitFor(() => expect(f.toast).toHaveBeenCalledWith('Tag confirmed. This is your second tag on the 9th.'));
     expect(screen.queryByRole('dialog')).toBeNull();
   });
