@@ -15,7 +15,7 @@ import { BusinessEmptyState } from '@/components/business/BusinessEmptyState';
 import { BUSINESS_CATEGORIES } from '@/constants/businessCategories';
 
 const ok = (rounds_delta = 45, reviews_delta = 0) =>
-  rpc.mockResolvedValue({ data: { rounds: 3985, rounds_delta, golfers: 26, golfers_delta: 4, reviews: 213, reviews_delta }, error: null });
+  rpc.mockResolvedValue({ data: { rounds: 3985, rounds_delta, golfers: 7777, golfers_delta: 4, reviews: 213, reviews_delta }, error: null });
 
 function mount(onCreate = vi.fn()) {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -81,7 +81,7 @@ describe('CB102 business welcome', () => {
     expect(rows[0].querySelector('[data-delta]')?.textContent).toBe('+45');
     expect(rows[1].textContent).toContain('213');
     expect(rows[1].querySelector('[data-delta]')).toBeNull();
-    expect(container.textContent).not.toContain('26');
+    expect(container.querySelector('[data-card="figures"]')?.textContent).not.toContain('7,777');
   });
 
   it('a failed read hides card and footnote', async () => {
