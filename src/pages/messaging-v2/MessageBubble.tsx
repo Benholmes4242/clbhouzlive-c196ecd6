@@ -405,7 +405,7 @@ export const MessageBubble: React.FC<Props> = ({
         <div
           className="flex items-center gap-1.5"
           style={{ position: "relative", 
-            marginTop: 4,
+            marginTop: 8,
             paddingLeft: isOutgoing ? 0 : 4,
             paddingRight: isOutgoing ? 4 : 0,
           }}
