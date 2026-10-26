@@ -83,6 +83,6 @@ export function AdminHoleTagging({ courseId, knownHoles }: { courseId: string; k
       <p className="mt-2 text-[12.5px] leading-normal" style={{ color: A.MUTE }}>Each tag is saved as the member's own.</p>
     </section>}
     {notice && !batch && <p role="alert" className="px-5 text-[12.5px]" style={{ color: A.MUTE }}>{notice}</p>}
-    {batch && <HolePhotoBatchPath adminMode photos={batch} knownHoles={knownHoles} onTag={tag} onClose={() => setBatch(null)} />}
+    {batch && <HolePhotoBatchPath adminMode photos={batch} knownHoles={knownHoles} onTag={tag} onRemove={untag} onClose={() => setBatch(null)} />}
   </>;
 }
