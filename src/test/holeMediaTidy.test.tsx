@@ -47,7 +47,7 @@ describe('HOLE_MEDIA_TIDY stream-UID identity', () => {
     expect(f.insert).toHaveBeenCalledWith(expect.objectContaining({ hole_no: 7, media_type: 'video', media_url: canonical, stream_id: UID }));
   });
   it('the tag dialog renders the poster, never an img holding a video URL', () => {
-    render(<HolePhotoTagDialog imageUrl={derived} mediaSource={{ mediaType: 'video', posterUrl: '/poster.jpg', streamId: UID }} holeCount={2} knownHoleNumbers={[1, 2]} usedHoles={[]} pending={false} error={null} onClose={() => {}} onSubmit={() => {}} />);
+    render(<HolePhotoTagDialog imageUrl={derived} mediaSource={{ mediaType: 'video', posterUrl: '/poster.jpg', streamId: UID }} holeCount={2} knownHoleNumbers={[1, 2]} pending={false} error={null} onClose={() => {}} onSubmit={() => {}} />);
     const images = Array.from(document.querySelectorAll('img'));
     expect(images.some(img => img.src.includes('manifest/video.m3u8'))).toBe(false);
     expect(screen.getByAltText('Your video')).toHaveAttribute('src', '/poster.jpg');

@@ -252,15 +252,15 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       {removePhoto && <HoleTagRemoveDialog key={`remove-${removePhoto.id}`} row={removePhoto} fromPost={tagging.sources.isSuccess ? isHoleTagFromPost(removePhoto, tagging.sources.data ?? []) : tagging.sources.isError ? false : null} pending={tagging.remove.isPending} error={tagging.remove.error ? holePhotoErrorMessage(tagging.remove.error, `The ${kindOf(removePhoto)} could not be removed. It is still on the ${ordinalOf(removePhoto.hole_no)}.`) : null} onClose={() => setRemovePhoto(null)} onConfirm={() => tagging.remove.mutate({ row: removePhoto }, { onSuccess: () => setRemovePhoto(null) })} />}
       {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} sources={tagging.sources.data} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); }} />}
       {firstPhoto && knownHoles && <CourseFirstPhotoPicker knownHoles={knownHoles} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onSubmit={tagLibrary} onClose={() => { setFirstPhoto(false); }} />}
-      {batch && knownHoles && <HolePhotoBatchPath photos={batch} knownHoles={knownHoles} onClose={() => setBatch(null)} onTag={(url, hole) => tagging.submit.mutateAsync({ post: sourcePost(url), hole })} />}
+      {batch && knownHoles && <HolePhotoBatchPath photos={batch} knownHoles={knownHoles} existingHoleTags={ownHoleTags} onClose={() => setBatch(null)} onTag={(url, hole) => tagging.submit.mutateAsync({ post: sourcePost(url), hole })} />}
       {tagPost && knownHoles && (
         <HolePhotoTagDialog key={addHole == null ? tagPost.mediaItems[0]?.id : `add-${addHole}`} imageUrl={holeSourceUrl(tagPost.mediaItems[0])} mediaSource={tagging.sources.data?.find(s => s.url === holeSourceUrl(tagPost.mediaItems[0]) || holeMediaKey(s) === holeMediaKey(tagPost.mediaItems[0]))} mediaSources={tagging.sources.data}
           initialHole={addHole} imageOptions={addHole == null ? undefined : ownOptions} onImageChange={url => setTagPost(sourcePost(url))}
-          holeCount={knownHoles.length} knownHoleNumbers={knownHoles} usedHoles={(tagging.tags.data ?? []).filter(row => row.user_id === user.id).map(row => row.hole_no)}
+          holeCount={knownHoles.length} knownHoleNumbers={knownHoles}
           pending={tagging.submit.isPending}
           error={tagging.submit.error ? holePhotoErrorMessage(tagging.submit.error, `The ${tagPost.mediaItems[0]?.type === 'video' ? 'video' : 'photo'} could not be tagged. The tag was not saved.`, tagPost.mediaItems[0]?.type === 'video' ? 'video' : 'image') : null}
           onClose={() => setTagPost(null)}
-          onSubmit={hole => tagging.submit.mutate({ post: tagPost, hole }, { onSuccess: () => setTagPost(null) })} />
+          onSubmit={hole => tagging.submit.mutate({ post: tagPost, hole }, { onSuccess: () => { const count = ownHoleTags.filter(h => h === hole).length + 1; setTagPost(null); toast(memberTagConfirmation(hole, count)); } })} />
       )}
       <ScrollToTopGlass />
     </div>
