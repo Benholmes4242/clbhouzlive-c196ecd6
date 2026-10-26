@@ -40,5 +40,6 @@ export function useReviewHoleTags(courseId: string, userId: string | null, items
   };
   return { holes, shots, rounds: rounds.data ?? [], chosenRound, chooseRound: setChosenId, assignments,
     assign: (id: string, hole: number) => { if (holes.includes(hole)) setAssignments(prev => ({ ...prev, [id]: hole })); },
+    unassign: (id: string) => { setAssignments(prev => { const next = { ...prev }; delete next[id]; return next; }); },
     metadata: metadata.data ?? {}, capture };
 }
