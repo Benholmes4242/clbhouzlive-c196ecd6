@@ -58,6 +58,18 @@ export function AdminHoleTagging({ courseId, knownHoles }: { courseId: string; k
       throw error;
     }
   };
+  /** BRIEF_HOLE_TAG_BATCH_REMOVE_TAG: the server owns the delete; the client
+   * only calls the admin RPC and refreshes the same viewers as a tag. */
+  const untag = async (row: HolePhoto) => {
+    const { error } = await supabase.rpc('admin_untag_hole_media', { p_tag_id: row.id });
+    if (error) throw error;
+    await Promise.all([
+      cache.invalidateQueries({ queryKey: ['hole-photo-tags', courseId] }),
+      cache.invalidateQueries({ queryKey: ['admin-untagged-course-media', courseId] }),
+      cache.invalidateQueries({ predicate: q => q.queryKey.includes('get_latest_hole_media') }),
+      cache.invalidateQueries({ queryKey: ['hole-media', courseId, row.hole_no] }),
+    ]);
+  };
   if (!isAdmin || !knownHoles) return null;
   return <>
     {query.isSuccess && rows.length > 0 && <section className="px-5 pt-5">
