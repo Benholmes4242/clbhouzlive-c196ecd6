@@ -229,7 +229,7 @@ describe('CB85 page', () => {
     // CB86: the FOLLOWERS card replaced Follower growth.
     expect(queryByText('Follower growth')).toBeNull();
     await waitFor(() => expect(container.querySelector('[data-card="followers"]')).not.toBeNull());
-    expect(getByText('ENGAGEMENT')).toBeTruthy();
+    expect(queryByText('Engagement rate')).toBeNull();
     expect(getByText('Reviews & reputation')).toBeTruthy();
   });
 });
