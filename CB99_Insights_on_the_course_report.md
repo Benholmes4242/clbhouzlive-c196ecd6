@@ -6,7 +6,7 @@ Implemented, but stopped at one new test failure; not accepted as fully verified
 - `src/hooks/useBusinessCourseActivity.ts` (new): reads only `get_business_course_activity` with business ID and picker days; period-keyed query and `keepPreviousData`. RPC errors propagate; no client recounting or privacy filtering.
 - `src/components/business/insights/InsightsCourseSection.tsx` (new): available/failed/loading/zero/positive states; trimmed club name; shared change, course-label and date helpers; server split counts, course and regional rows, visitor/repeat note, fine print and Your courses action. Previous card uses its payload's period while a new read loads.
 - `src/pages/BusinessInsightsPageV2.tsx`: imports and appends the card after Reviews. Sections 1–7 unchanged.
-- `src/index.css`: scoped card styles and two semantic tokens. Requested title tracking `-0.01em` is **not implemented**: environment instruction requires zero tracking for additions. Existing preceding titles untouched. All other stated styling implemented, not browser-verified.
+- `src/index.css`: scoped card styles and two semantic tokens. CB99.1: title tracking set to `-0.01em`; period-switch fixture uses gcTime Infinity. Existing preceding titles untouched. All other stated styling implemented, not browser-verified.
 - `public/locales/en/common.json`, `public/locales/en-XA/common.json`: new courseCard copy and singular/plural forms only; existing copy unchanged.
 - `src/test/cb99InsightsCourse.test.tsx` (new): 25 cases covering conditional states, counts, shared helpers, query switches and page order. No existing test retargeted, deleted, renamed or rewritten.
 - `AGENTS.md`: one ownership pointer to new module headers.

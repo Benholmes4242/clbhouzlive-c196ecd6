@@ -16923,6 +16923,69 @@ export type Database = {
           },
         ]
       }
+      welcome_messages: {
+        Row: {
+          conversation_id: string | null
+          message_id: string | null
+          push_queued: boolean
+          sent_at: string
+          user_id: string
+          variant: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          message_id?: string | null
+          push_queued?: boolean
+          sent_at?: string
+          user_id: string
+          variant: string
+        }
+        Update: {
+          conversation_id?: string | null
+          message_id?: string | null
+          push_queued?: boolean
+          sent_at?: string
+          user_id?: string
+          variant?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "welcome_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "welcome_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "welcome_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "welcome_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "welcome_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       whs_ai_insights: {
         Row: {
           connection_id: string
@@ -25100,6 +25163,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      run_welcome_dms: { Args: { p_limit?: number }; Returns: Json }
       search_empty_state_v2: { Args: never; Returns: Json }
       search_golf_clubs: {
         Args: { p_limit?: number; p_query: string }
@@ -25163,6 +25227,7 @@ export type Database = {
       send_tour_sunday_push: { Args: never; Returns: number }
       send_tour_thursday_push: { Args: never; Returns: number }
       send_user_ping: { Args: { p_recipient_id: string }; Returns: undefined }
+      send_welcome_dm: { Args: { p_user_id: string }; Returns: string }
       send_whs_connection_nudge: {
         Args: { p_recipient_id: string }
         Returns: Json
