@@ -21980,18 +21980,19 @@ export type Database = {
       }
       get_inviter_first_name: { Args: { p_ref: string }; Returns: string }
       get_latest_course_media: {
-        Args: { p_limit?: number }
+        Args: { p_before_at?: string; p_before_id?: string; p_limit?: number }
         Returns: {
           contributor_count: number
           course_id: string
           course_name: string
+          latest_at: string
           latest_member_name: string
           media_count: number
           tiles: Json
         }[]
       }
       get_latest_hole_media: {
-        Args: { p_limit?: number }
+        Args: { p_before_at?: string; p_before_id?: string; p_limit?: number }
         Returns: {
           added_at: string
           course_id: string
