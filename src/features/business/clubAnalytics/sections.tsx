@@ -6,8 +6,8 @@
  * between them. There is no outer container with internal rules.
  *
  * ORDER, and the order is an argument:
- *   verdict strip, WHERE YOUR INDEX DISAGREES, THE SAMPLE, HOLE BY HOLE,
- *   WHAT GETS MADE HERE, THE COURSE RECORD,
+ *   HOW IT PLAYS (CB92), THE SAMPLE, HOLE BY HOLE, WHERE YOUR INDEX DISAGREES,
+ *   THE COURSE RECORD,
  *   YOUR TEES, WHEN MEMBERS PLAY, WHO PLAYS HERE, COMPETITION OR SOCIAL.
  * The ladder leads because it is the richest thing that renders on the samples
  * clubs currently have. It is a DIFFICULTY order and nothing on this page
@@ -127,29 +127,6 @@ export const StatStrip: React.FC<{ cells: { figure: string; label: string; tone?
     ))}
   </div>
 );
-
-/**
- * §1b — THE VERDICT STRIP OPENS EACH COURSE BLOCK, above everything. Mean
- * gross, the hardest hole, and the competition share: the three things a club
- * secretary looks for before deciding whether to keep reading.
- */
-export const VerdictStrip: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
-  const hardest = [...(data.holes ?? [])].sort((a, b) => a.measured_rank - b.measured_rank)[0];
-  const c = data.competition;
-  const compTotal = (c?.competition ?? 0) + (c?.social ?? 0);
-  const compPct = compTotal > 0 ? Math.round(((c?.competition ?? 0) / compTotal) * 100) : null;
-
-  return (
-    <StatStrip
-      twoLineLabels
-      cells={[
-        { figure: data.avg_gross == null ? '—' : String(data.avg_gross), label: 'Mean gross score' },
-        { figure: hardest ? String(hardest.hole_no) : '—', label: 'Hardest hole' },
-        { figure: compPct == null ? '—' : `${compPct}%`, label: 'Competition rounds' },
-      ]}
-    />
-  );
-};
 
 /* ─────────────────── WHERE YOUR INDEX DISAGREES ─────────────────── */
 
@@ -421,94 +398,110 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
   );
 };
 
-/* ─────────────────── WHAT GETS MADE HERE ─────────────────── */
-
-interface Outcome { key: string; label: string; count: number; colour: string }
+/* ─────────────────── HOW IT PLAYS (CB92) ─────────────────── */
 
 /**
- * §4 — SCORING COLOURS COME FROM THE CANON. red = under par, neutral = over
- * par, gold = celebration. Bogey and double are separated by BRIGHTNESS, not
- * hue: that is deliberate and recorded in _constants.ts. Do not colour them.
- *
- * EMPTY TIERS COLLAPSE. Three consecutive zero rows eat a third of the card, so
- * only tiers with a count are drawn and the rest fold into one sentence.
+ * CB92 — HOW IT PLAYS replaces the old verdict strip and "What gets made here".
+ * Three tiles that read on their own, then one scoring split best to worst in
+ * the scorecard colours. Reads only the existing ClubCourseAnalytics payload.
+ * Under 50 rounds the card is identical: nothing is hidden for being small.
+ * The outcome split inside HoleBySection is NOT this one and is untouched.
  */
-export const ScoringSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
-  const o = data.outcomes;
-  if (!o) {
-    return (
-      <Panel kicker="What gets made here" style={CARD}>
-        <Body>We hold no scored holes for this course, so there is no distribution to show.</Body>
-      </Panel>
-    );
-  }
+const HIP = {
+  CARD: '#17171B', LINE: 'rgba(255,255,255,0.08)', TILE: '#1E1E23',
+  INK: '#F8FAFC', MUTE: 'rgba(248,250,252,0.62)', DIM: 'rgba(248,250,252,0.42)',
+} as const;
 
-  const rows: Outcome[] = [
-    { key: 'ace', label: 'Hole in one', count: o.ace, colour: SC_ACE_DARK },
-    { key: 'albatross', label: 'Albatross', count: o.albatross, colour: SC_ALBATROSS_DARK },
-    { key: 'eagle', label: 'Eagle', count: o.eagle, colour: SC_EAGLE_DARK },
-    { key: 'birdie', label: 'Birdie', count: o.birdie, colour: SC_BIRDIE_DARK },
-    { key: 'par', label: 'Par', count: o.par, colour: SC_PAR_DARK },
-    { key: 'bogey', label: 'Bogey', count: o.bogey, colour: SC_BOGEY_DARK },
-    { key: 'double_plus', label: 'Double +', count: o.double_plus, colour: SC_DOUBLE_DARK },
+export interface HowItPlaysOutcome { key: string; label: string; count: number; colour: string }
+
+/** Whole %; one decimal under 1%; "<0.1%" under 0.1%. Zero is a fact: "0%". */
+export function howItPlaysShare(count: number, total: number): string {
+  if (count <= 0 || total <= 0) return '0%';
+  const pct = (count / total) * 100;
+  if (pct < 0.1) return '<0.1%';
+  if (pct < 1) return `${pct.toFixed(1)}%`;
+  return `${Math.round(pct)}%`;
+}
+
+export function howItPlaysModel(data: ClubCourseAnalytics) {
+  const o = data.outcomes ?? { ace: 0, albatross: 0, eagle: 0, birdie: 0, par: 0, bogey: 0, double_plus: 0 };
+  const total = data.outcomes_total ?? 0;
+  const all: (HowItPlaysOutcome & { optional: boolean })[] = [
+    { key: 'ace', label: 'Hole in one', count: o.ace ?? 0, colour: SC_ACE_DARK, optional: true },
+    { key: 'albatross', label: 'Albatross', count: o.albatross ?? 0, colour: SC_ALBATROSS_DARK, optional: true },
+    { key: 'eagle', label: 'Eagle', count: o.eagle ?? 0, colour: SC_EAGLE_DARK, optional: true },
+    { key: 'birdie', label: 'Birdie', count: o.birdie ?? 0, colour: SC_BIRDIE_DARK, optional: false },
+    { key: 'par', label: 'Par', count: o.par ?? 0, colour: SC_PAR_DARK, optional: false },
+    { key: 'bogey', label: 'Bogey', count: o.bogey ?? 0, colour: SC_BOGEY_DARK, optional: false },
+    { key: 'double_plus', label: 'Double +', count: o.double_plus ?? 0, colour: SC_DOUBLE_DARK, optional: false },
   ];
-  const total = data.outcomes_total || rows.reduce((s, r) => s + r.count, 0);
+  const rows = all.filter((r) => !r.optional || r.count > 0).map(({ optional: _o, ...r }) => r);
+  const zeros = all.filter((r) => r.optional && r.count <= 0).map((r) => r.label.toLowerCase());
+  const note =
+    zeros.length === 0 ? null
+      : zeros.length === 1 ? `No ${zeros[0]} here yet.`
+      : zeros.length === 2 ? `No ${zeros[0]} or ${zeros[1]} here yet.`
+      : 'No hole in one, albatross or eagle here yet.';
 
-  if (total === 0) {
-    return (
-      <Panel kicker="What gets made here" style={CARD}>
-        <Body>We hold no scored holes for this course, so there is no distribution to show.</Body>
-      </Panel>
-    );
-  }
+  const avg = data.avg_gross == null
+    ? { figure: '–', label: 'typical 18-hole score, once a full round is in' }
+    : { figure: Number(data.avg_gross).toFixed(1), label: 'typical 18-hole score' };
 
-  const present = rows.filter((r) => r.count > 0);
-  const absent = rows.filter((r) => r.count === 0);
-  const absentNames = absent.map((r) => r.label.toLowerCase().replace('double +', 'double bogey or worse'));
-  const absentLine =
-    absentNames.length === 0
-      ? null
-      : `No ${absentNames.length === 1 ? absentNames[0] : `${absentNames.slice(0, -1).join(', ')} or ${absentNames[absentNames.length - 1]}`} recorded here yet.`;
+  const better = (o.par ?? 0) + (o.birdie ?? 0) + (o.eagle ?? 0) + (o.albatross ?? 0) + (o.ace ?? 0);
+  const parOrBetter = { figure: total > 0 ? `${Math.round((better / total) * 100)}%` : '–', label: 'of holes made in par or better' };
 
+  const rank1 = (data.holes ?? []).find((h) => h.measured_rank === 1);
+  const hardest = (data.complete_rounds ?? 0) <= 0 || !rank1
+    ? { figure: '–', label: 'hardest hole, once a full round is in' }
+    : {
+      figure: String(rank1.hole_no),
+      label: rank1.stroke_index == null ? 'hardest hole'
+        : rank1.stroke_index === 1 ? 'hardest hole, as your card says'
+        : `hardest hole; your card makes it ${rank1.stroke_index}`,
+    };
+
+  return { total, tiles: [avg, parOrBetter, hardest], rows: total > 0 ? rows : [], note: total > 0 ? note : null };
+}
+
+export const HowItPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
+  const m = howItPlaysModel(data);
+  const minGrow = m.total * 0.006;
   return (
-    <Panel kicker="What gets made here" aside={`${fmt(total)} holes`}
-      subline="Every scored hole on your course, best to worst." style={CARD}>
-      <Inset>
-        <div style={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', background: A.TRACK }}>
-          {present.map((r) => (
-            <i key={r.key} style={{ width: `${Math.max(MIN_BAR_PCT, (r.count / total) * 100)}%`, background: r.colour }} />
-          ))}
-        </div>
-
-        <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {present.map((r) => {
-            const pct = Math.max(MIN_BAR_PCT, (r.count / total) * 100);
-            return (
-              <div key={r.key}>
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
-                    <i style={{ width: 7, height: 7, borderRadius: 2, background: r.colour, flexShrink: 0 }} />
-                    <span style={{ fontSize: 12.5, fontWeight: 600, color: A.BODY }}>{r.label}</span>
-                  </span>
-                  <span style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                    <span style={bizFigure(15, A.INK)}>{fmt(r.count)}</span>
-                    <span style={{ fontSize: 11.5, fontWeight: 600, color: A.DIM, minWidth: 34, textAlign: 'right' }}>
-                      {share(r.count, total)}
-                    </span>
-                  </span>
+    <section data-testid="how-it-plays" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>
+        <span>HOW IT PLAYS</span>
+        <span data-testid="how-it-plays-total" style={{ color: HIP.DIM, letterSpacing: '0.12em' }}>{`${fmt(m.total)} HOLES`}</span>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 12 }}>
+        {m.tiles.map((t, i) => (
+          <div key={i} data-testid="how-it-plays-tile" style={{ background: HIP.TILE, borderRadius: 13, padding: '11px 10px' }}>
+            <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em', fontVariantNumeric: 'tabular-nums', color: HIP.INK }}>{t.figure}</div>
+            <div style={{ marginTop: 2, fontSize: 11, lineHeight: 1.3, color: HIP.MUTE }}>{t.label}</div>
+          </div>
+        ))}
+      </div>
+      {m.total > 0 && (
+        <>
+          <div data-testid="how-it-plays-bar" style={{ marginTop: 14, display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', gap: 2 }}>
+            {m.rows.filter((r) => r.count > 0).map((r) => (
+              <i key={r.key} data-key={r.key} style={{ display: 'block', height: '100%', flexGrow: Math.max(r.count, minGrow), flexBasis: 0, background: r.colour }} />
+            ))}
+          </div>
+          <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: '1fr auto 40px', rowGap: 7, columnGap: 10, fontSize: 12.5, alignItems: 'baseline' }}>
+            {m.rows.map((r) => (
+              <React.Fragment key={r.key}>
+                <div data-testid="how-it-plays-row" style={{ color: HIP.MUTE, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <s style={{ width: 8, height: 8, borderRadius: 2, display: 'inline-block', background: r.colour, textDecoration: 'none' }} />{r.label}
                 </div>
-                <div style={{ height: 5, borderRadius: 3, background: A.TRACK, marginTop: 5, overflow: 'hidden' }}>
-                  <i style={{ display: 'block', height: '100%', width: `${pct}%`, background: r.colour }} />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </Inset>
-      {absentLine && (
-        <Body style={{ marginTop: 12, fontSize: 12 }}>{absentLine}</Body>
+                <div style={{ textAlign: 'right', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: HIP.INK }}>{fmt(r.count)}</div>
+                <div style={{ textAlign: 'right', fontSize: 11.5, fontVariantNumeric: 'tabular-nums', color: HIP.DIM }}>{howItPlaysShare(r.count, m.total)}</div>
+              </React.Fragment>
+            ))}
+          </div>
+          {m.note && <p data-testid="how-it-plays-note" style={{ margin: '10px 0 0', fontSize: 12.5, lineHeight: 1.45, color: HIP.MUTE }}>{m.note}</p>}
+        </>
       )}
-    </Panel>
+    </section>
   );
 };
 
