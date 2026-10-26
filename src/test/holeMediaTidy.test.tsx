@@ -47,7 +47,7 @@ describe('HOLE_MEDIA_TIDY stream-UID identity', () => {
     expect(f.insert).toHaveBeenCalledWith(expect.objectContaining({ hole_no: 7, media_type: 'video', media_url: canonical, stream_id: UID }));
   });
   it('the tag dialog renders the poster, never an img holding a video URL', () => {
-    render(<HolePhotoTagDialog imageUrl={derived} mediaSource={{ mediaType: 'video', posterUrl: '/poster.jpg', streamId: UID }} holeCount={2} knownHoleNumbers={[1, 2]} usedHoles={[]} pending={false} error={null} onClose={() => {}} onSubmit={() => {}} />);
+    render(<HolePhotoTagDialog imageUrl={derived} mediaSource={{ mediaType: 'video', posterUrl: '/poster.jpg', streamId: UID }} holeCount={2} knownHoleNumbers={[1, 2]} pending={false} error={null} onClose={() => {}} onSubmit={() => {}} />);
     const images = Array.from(document.querySelectorAll('img'));
     expect(images.some(img => img.src.includes('manifest/video.m3u8'))).toBe(false);
     expect(screen.getByAltText('Your video')).toHaveAttribute('src', '/poster.jpg');
@@ -58,7 +58,7 @@ describe('HOLE_MEDIA_TIDY batch path without a floor', () => {
   it('after tagging an item to hole 4, holes 1-3 stay enabled and no closed-holes paragraph renders', async () => {
     const tag = vi.fn().mockResolvedValue({ status: 'approved' } as HolePhoto);
     render(<HolePhotoBatchPath photos={[batchPhoto('/a.jpg'), batchPhoto('/b.jpg')]} knownHoles={[1, 2, 3, 4]} onTag={tag} onClose={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/b.jpg'));
     expect(tag).toHaveBeenCalledWith('/a.jpg', 4);
     for (const n of [1, 2, 3]) expect(screen.getByRole('button', { name: `Hole ${n}` })).toBeEnabled();

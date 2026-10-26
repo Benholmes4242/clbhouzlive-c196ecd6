@@ -82,7 +82,7 @@ describe('admin block and batch', () => {
   it('opens oldest-first batch and active owner month', async () => {
     mount(); fireEvent.click(await screen.findByRole('button', { name: 'Tag them' }));
     expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/earlier.jpg'); expect(screen.getByText('Thomas Holmes · Sep 2026')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Skip this one' })); expect(screen.getByText('Thomas Holmes · Oct 2026')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Shot 2 of 2' })); expect(screen.getByText('Thomas Holmes · Oct 2026')).toBeInTheDocument();
   });
   it('empty owner name hides owner line', async () => {
     rows = [row('only', '2026-10-01', '')]; mount(); fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); expect(screen.queryByText(/Oct 2026/)).toBeNull();
@@ -93,7 +93,7 @@ describe('admin block and batch', () => {
   });
   it('tag passes media id/hole, reads returned row and refreshes all required keys', async () => {
     const view = mount(); view.cache.setQueryData(['gam', 'get_latest_hole_media', { p_limit: 30 }], []);
-    fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/later.jpg'));
     expect(f.rpc).toHaveBeenCalledWith('admin_tag_hole_media', { p_course_id: 'course', p_media_id: 'earlier', p_hole_no: 7 });
     expect(f.from).toHaveBeenCalledWith('course_hole_media'); expect(f.select).toHaveBeenCalledWith('*'); expect(f.eq).toHaveBeenCalledWith('id', 'new-tag');
@@ -102,18 +102,18 @@ describe('admin block and batch', () => {
   });
   it('23505 displays message and advances without member mutation', async () => {
     const original = f.rpc.getMockImplementation(); f.rpc.mockImplementation((name: string, args: unknown) => name === 'admin_tag_hole_media' ? Promise.resolve({ data: null, error: { code: '23505' } }) : original?.(name, args));
-    mount(); fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
+    mount(); fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/later.jpg')); expect(screen.getByRole('alert')).toHaveTextContent('That shot is already tagged.'); expect(f.memberSubmit).not.toHaveBeenCalled();
   });
   it('other error keeps current shot and existing error handling', async () => {
     const original = f.rpc.getMockImplementation(); f.rpc.mockImplementation((name: string, args: unknown) => name === 'admin_tag_hole_media' ? Promise.resolve({ data: null, error: { code: '42501' } }) : original?.(name, args));
-    mount(); fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); await screen.findByRole('alert'); expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/earlier.jpg');
+    mount(); fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' })); await screen.findByRole('alert'); expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/earlier.jpg');
   });
   it('readback resolves member-owned row without client insert', async () => { const result = await tagAdminHole('course', 'earlier', 7); expect(result.user_id).toBe('member'); expect(result.id).toBe('new-tag'); });
   it('member own block stays before admin and uses unchanged member write', async () => {
     f.own = true; const { wrapper } = setup(); render(<CourseMediaTabNew courseId="course" />, { wrapper });
     const own = screen.getByRole('heading', { name: 'One of yours is untagged' }); const admin = await screen.findByRole('heading', { name: 'Two untagged shots here' }); expect(own.compareDocumentPosition(admin) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    fireEvent.click(screen.getAllByRole('button', { name: 'Tag them' })[0] as HTMLElement); await screen.findByRole('dialog'); fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));
+    fireEvent.click(screen.getAllByRole('button', { name: 'Tag them' })[0] as HTMLElement); await screen.findByRole('dialog'); fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
     await waitFor(() => expect(f.memberSubmit).toHaveBeenCalled()); expect(f.memberSubmit).toHaveBeenCalledWith(expect.objectContaining({ hole: 7, post: expect.objectContaining({ userId: 'admin' }) })); expect(f.rpc).not.toHaveBeenCalledWith('admin_tag_hole_media', expect.anything());
   });
 });
