@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB99 — Insights on the course
+- [ ] Add period-keyed server read and signed-off course activity card after Reviews; freeze sections 1–7.
+- [ ] Add new conditional-state, query-switch and page-order tests; run targeted and full suite from baseline 3,293/381.
+- [ ] Verify browser states where available and report per-file diff, counts, pre-existing failures and limitations.
+
 ## CB95 — Where the tee sheet has room
 - [x] Extract shared weekRoom without changing CB91 courseLead tests; replace seasonality with tee-sheet week/year card and separate unchanged year-on-year content.
 - [x] Add22 tests in cb95TeeSheet.test.tsx; targeted84/7 pass, unchanged22 CB91 helper tests green. Retarget only cb91CoursesTop section list/mock from SeasonalitySection to TeeSheetSection + YearOnYearSection; no count delta there. Full bunx vitest run3,244 passed/18 pre-existing failed/3,262 total/376 files. Last verified full3,208/373 +14 ownership +18 progress +22 CB95 =3,262/376; no new failures. Existing reviewUploadProgress.test.tsx:30:6 Error: createObjectURL does not exist remains untouched in all18 cases. Harness build OK14:49:41Z; standalone typecheck prohibited, not run.
