@@ -8,6 +8,7 @@ import {
   Bed,
   UtensilsCrossed,
   Beer,
+  Target,
   LucideIcon
 } from 'lucide-react';
 
@@ -34,6 +35,7 @@ export interface BusinessCategoryOption {
 export const BUSINESS_CATEGORIES_WITH_ICONS = [
   { value: 'Golf Club', label: 'Golf Club', icon: Flag },
   { value: 'Golf Academy', label: 'Golf Academy', icon: GraduationCap },
+  { value: 'Driving Range', label: 'Driving Range', icon: Target },
   { value: 'Coach / Instructor', label: 'Coach / Instructor', icon: GraduationCap },
   { value: 'University / College', label: 'University / College', icon: GraduationCap, subtitle: 'Institution, team, or athletics program' },
   { value: 'Creator', label: 'Creator', icon: Sparkles, subtitle: 'Content creator, influencer, or media brand' },

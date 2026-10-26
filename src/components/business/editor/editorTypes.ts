@@ -85,6 +85,7 @@ const FACILITIES_BY_CATEGORY: Record<BusinessCategoryValue, string[]> = {
     'Changing rooms', 'Parking',
   ],
   'Golf Academy': COACHING,
+  'Driving Range': COACHING,
   'Coach / Instructor': COACHING,
   'University / College': GENERAL,
   'Creator': [],
