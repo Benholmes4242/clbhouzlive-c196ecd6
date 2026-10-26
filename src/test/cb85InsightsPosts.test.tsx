@@ -228,6 +228,6 @@ describe('CB85 page', () => {
     expect(queryByText('CONTENT')).toBeNull();
     expect(getByText('Follower growth')).toBeTruthy();
     expect(getByText('ENGAGEMENT')).toBeTruthy();
-    await waitFor(() => expect(getByText(/REPUTATION|Reviews/i)).toBeTruthy());
+    expect(getByText('Reviews & reputation')).toBeTruthy();
   });
 });
