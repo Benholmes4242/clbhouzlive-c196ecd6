@@ -179,7 +179,7 @@ describe('COMPOSER_HOLES_1_R2 independent job writes', () => {
     expect(f.invoke).toHaveBeenCalledTimes(1);
   });
   it('the upload controller passes a video through with its stream id and poster', async () => {
-    vi.mocked(uploadVideoResilient).mockImplementation((opts: any) => { opts.onSuccess('stream-1'); return Promise.resolve(); });
+    vi.mocked(uploadVideoResilient).mockImplementation((opts: any) => { opts.onSuccess('stream-1'); return Promise.resolve({} as Awaited<ReturnType<typeof uploadVideoResilient>>); });
     f.rpc.mockResolvedValue({ data: 'rating', error: null });
     const outcome = await uploadAndPublishReview('video-tags', 'member', 'pending', [{ id: 'v', type: 'video', file: video.file as File, durationSeconds: 75 }], undefined, { ...job, assignments: { v: 9 } });
     expect(outcome.ok).toBe(true);
