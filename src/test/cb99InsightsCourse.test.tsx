@@ -75,11 +75,11 @@ describe('CB99 empty and period states', () => {
     expect(v.qc.getQueryData(['business-course-activity', 'b1', 30])).toBeTruthy();
   });
   it('a failed period switch hides previous card', async () => { const v = setup(); await ready(v.container); rpc.mockResolvedValue({ data: null, error: { code: '42501' } }); v.switchDays(7); await settled(v.qc, 7); await waitFor(() => expect(v.container.querySelector('[data-card="course"]')).toBeNull()); });
-  it('course card follows Reviews; the other sections still settle', async () => {
-    rpc.mockImplementation((name: string) => Promise.resolve({ data: name === 'get_business_course_activity' ? base : name === 'get_business_review_summary' ? { linked: true, total: 0, courses: [], scores: [] } : name === 'get_business_engagement' ? { has_posts: true, reached: 0 } : {}, error: null }));
+  it('course card follows Reviews; sections one to seven still settle', async () => {
+    rpc.mockImplementation((name: string) => Promise.resolve({ data: name === 'get_business_course_activity' ? base : name === 'get_business_review_summary' ? { linked: true, total: 0, courses: [], scores: [] } : name === 'get_business_engagement' ? { has_posts: true, reached: 0 } : name === 'get_business_audience' ? { followers_total: 94, with_handicap: 26, state: 'ready', median: 13.8, bands: [{ from: 0, to: 1, count: 13 }, { from: 2, to: 2, count: 8 }, { from: 3, to: 3, count: 5 }], regions: [{ region: 'Kent', count: 9 }, { region: 'Surrey', count: 7 }, { region: 'Northern Ireland', count: 5 }], elsewhere: 15 } : {}, error: null }));
     const qc = client();
     const v = render(<QueryClientProvider client={qc}><MemoryRouter initialEntries={['/business/b1/insights']}><Routes><Route path="/business/:id/insights" element={<BusinessInsightsPageV2 />} /></Routes></MemoryRouter></QueryClientProvider>);
-    for (const selector of ['[data-section="insights-funnel"]', ...['visits', 'followers', 'posts', 'engagement', 'reviews', 'course'].map(s => `[data-card="${s}"]`)]) await waitFor(() => expect(v.container.querySelector(selector)).not.toBeNull());
+    for (const selector of ['[data-section="insights-funnel"]', ...['visits', 'audience', 'followers', 'posts', 'engagement', 'reviews', 'course'].map(s => `[data-card="${s}"]`)]) await waitFor(() => expect(v.container.querySelector(selector)).not.toBeNull());
     const cards = [...v.container.querySelectorAll('[data-card]')].map(e => e.getAttribute('data-card'));
     expect(cards.slice(-2)).toEqual(['reviews', 'course']);
   });
