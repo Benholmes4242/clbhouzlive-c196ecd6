@@ -4,7 +4,7 @@
 - [x] Update HoleBySection: hardest-first default, five-column table, ranked headline, single expanded per-hole split, HIP card paint and full-round empty state; CB91/CB92 and all other sections frozen. Reuse HIP, score colours, ramp, toParParts and howItPlaysShare.
 - [x] User approved passing existing businessName/courseCount through the single page call for CB91's exact label; no new reads.
 - [x] Add 14 behavior tests in cb93HoleByHole.test.tsx; no existing tests changed/deleted/renamed/retargeted. Targeted command (new file + CB91/CB92 files) 32/32. Full bunx vitest run: 3,200 passed/372 files, zero failures, from last reported 3,186/371 (+14/+1 solely CB93). No pre-existing failures observed. Harness build OK13:59:57Z; standalone typecheck not run under environment policy.
-- [x] Controlled actual component at438x970: default, expand, card-order toggle and retained open hole verified; no card overflow. Reviewed screenshots. Live authenticated course reads unverified (external_unmanaged); no live-data claims. Header uses house Geist to fit fixed columns.
+- [x] Controlled actual component at438x970: default, expand, card-order toggle and retained open hole verified; no card overflow. Reviewed screenshots. Live authenticated course reads unverified (external_unmanaged); no live-data claims. Header uses house Geist and local horizontal HOLE text fit within fixed columns. Final full-suite rerun3,200/372 passes; final harness build OK14:06:35Z.
 
 ## CB91 — Your courses section 1
 - [x] Received and read courses-s1.html; written brief wins changed typography (23px) and selected-course rules; frozen shell/chips/lower sections retain existing design.

@@ -9,7 +9,8 @@
 ## Checks
 - `bunx vitest run src/test/cb93HoleByHole.test.tsx src/test/cb92HowItPlays.test.tsx src/test/cb92HowItPlaysPage.test.tsx src/test/cb91CoursesTop.test.tsx`: **32 passed**, four files.
 - `bunx vitest run`: **3,200 passed**, 372 files, zero failures. Last reported baseline **3,186 / 371** plus exactly **14 / 1** in the new CB93 file. Pre-existing failures: **none observed**.
-- Automatic preview build: **build OK**, 2026-10-26T13:59:57Z. Standalone typecheck not run because the environment reserves build/typechecking for its automatic checks.
+- Final full-suite rerun after heading-fit adjustment: **3,200 passed / 372 files**, zero failures. Automatic preview build: **build OK**, 2026-10-26T14:06:35Z. Standalone typecheck not run because the environment reserves build/typechecking for its automatic checks.
+- The fixed 30px HOLE header required a 0.9 horizontal text fit; nominal 9.5px type and the specified grid remain unchanged. This is a local fit adjustment, not a shared typography change.
 - Controlled actual component at 438 × 970: hardest-first order, expanded hole, card-order switch and retained open hole verified; screenshots reviewed, no card overflow. Mock illustrative score/yardage values were not added to production data. The brief's 44px final column wins over the mock's 40px CSS.
 - Live authenticated page/readback remains unverified: this project uses externally managed authentication, unavailable for automated session restoration.
 
