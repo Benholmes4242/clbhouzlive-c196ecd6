@@ -25,6 +25,7 @@
  *   - SCORING COLOUR COMES FROM THE CANON (§4). red = under par, neutral = over
  *     par. Birdie is NEVER the same colour as Double+.
  */
+import { whoPlaysLead } from './whoPlaysLead';
 import React from 'react';
 import {
   A, SANS, FIGS, NUM, LABEL, Panel, BIZ_LABEL, BIZ_BODY, bizFigure,
@@ -834,59 +835,55 @@ export const YearOnYearSection: React.FC<{ data: ClubCourseAnalytics }> = ({ dat
 
 export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
   const bands = data.handicap_bands ?? [];
-  const total = data.handicap_rounds || bands.reduce((s, b) => s + b.rounds, 0);
-  if (bands.length === 0 || total === 0) {
+  const T = bands.reduce((s, b) => s + b.rounds, 0);
+  const shell: React.CSSProperties = { background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS };
+  const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };
+  if (bands.length === 0 || T === 0) {
     return (
-      <Panel kicker="Who plays here" style={CARD}>
-        <Body>None of the rounds we hold carried a handicap index at the time of play, so there is no split to show.</Body>
-      </Panel>
+      <section data-testid="who-plays" style={shell}>
+        <div style={kicker}>Who plays here</div>
+        <div style={{ marginTop: 6, fontSize: 12.5, lineHeight: 1.45, color: HIP.MUTE }}>We hold no rounds with a handicap index on this course yet.</div>
+      </section>
     );
   }
-
-  const max = bands.reduce((m, b) => Math.max(m, b.rounds), 1);
-  const memberSum = bands.reduce((s, b) => s + b.members, 0);
-
+  const lead = whoPlaysLead(bands);
+  const few = new Set(lead.few);
+  const max = bands.reduce((m, b) => Math.max(m, b.rounds), 0);
   return (
-    <Panel
-      kicker="Who plays here"
-      aside={`${fmt(total)} rounds`}
-      subline="The handicap index each player held at the time of the round, not the index they hold today."
-      style={CARD}
-    >
-      <Inset>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {bands.map((b) => (
-            <div key={b.label}>
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
-                <span style={{ fontSize: 12.5, fontWeight: 600, color: A.BODY }}>{b.label}</span>
-                <span style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                  <span style={bizFigure(15, A.INK)}>{fmt(b.rounds)}</span>
-                  <span style={{ fontSize: 11.5, fontWeight: 600, color: A.DIM, minWidth: 34, textAlign: 'right' }}>
-                    {share(b.rounds, total)}
-                  </span>
-                </span>
-              </div>
-              <div style={{ height: 5, borderRadius: 3, background: A.TRACK, marginTop: 5, overflow: 'hidden' }}>
-                {b.rounds > 0 && (
-                  <i style={{ display: 'block', height: '100%', width: `${(b.rounds / max) * 100}%`, background: inkWithAlpha(SURFACE.dark.ink, 0.42) }} />
-                )}
-              </div>
-              {/* A BAND WITH 400 ROUNDS FROM 2 MEMBERS IS NOT 400 GOLFERS. */}
-              <div style={{ ...LABEL, marginTop: 5 }}>
-                {fmt(b.members)} {b.members === 1 ? 'golfer' : 'golfers'}
-              </div>
-            </div>
-          ))}
+    <section data-testid="who-plays" style={shell}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+        <span style={kicker}>Who plays here</span>
+        <span style={{ ...kicker, letterSpacing: '0.12em', color: HIP.DIM }}>{fmt(data.handicap_rounds)} rounds</span>
+      </div>
+      {lead.title && <div data-testid="who-plays-title" style={{ marginTop: 6, fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.3, color: HIP.INK }}>{lead.title}</div>}
+      {lead.line && (
+        <div data-testid="who-plays-line" style={{ marginTop: 4, fontSize: 12.5, lineHeight: 1.45, color: HIP.MUTE }}>
+          {lead.line.kind === 'none'
+            ? `No rounds yet from golfers off ${lead.line.y} and above.`
+            : <>Golfers off {lead.line.y} and above play <b style={{ color: HIP.INK, fontWeight: 600 }}>{lead.line.q}%</b>: the group you see least.</>}
         </div>
-      </Inset>
-      {/* §6.3 — THE COUNTS ADD TO MORE THAN THE MEMBER TOTAL ON PURPOSE. */}
-      <Body style={{ marginTop: 12, fontSize: 11.5, color: A.DIM }}>
-        These golfer counts add to {fmt(memberSum)}, more than the {fmt(data.members)} golfers
-        behind this course, and that is correct: an index moves over the years, so one person appears in every band they
-        have played to. Rounds and members are separate figures — a band can carry hundreds of rounds from a handful of
-        regulars, and it should not be read as a headcount.
-      </Body>
-    </Panel>
+      )}
+      <div style={{ marginTop: 10 }}>
+        {bands.map((b, i) => {
+          const isFew = few.has(i);
+          const w = max > 0 && b.rounds > 0 ? Math.max(1, (b.rounds / max) * 100) : 0;
+          return (
+            <div key={b.label} data-testid="who-plays-row" data-few={isFew ? 'true' : 'false'}
+              style={{ display: 'grid', gridTemplateColumns: '96px minmax(0,1fr) 40px 36px', gap: 8, padding: '6px 0', fontSize: 12.5, alignItems: 'center' }}>
+              <span style={{ color: isFew ? HIP.DIM : HIP.MUTE }}>{b.label.replace(/and above/, 'and up')}</span>
+              <span style={{ height: 8, borderRadius: 4, background: 'rgba(255,255,255,0.06)', overflow: 'hidden', display: 'block' }}>
+                {w > 0 && <i style={{ display: 'block', height: '100%', width: `${w}%`, background: isFew ? HIP.DIM : HIP.INK }} />}
+              </span>
+              <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', textAlign: 'right', color: isFew ? HIP.DIM : HIP.INK }}>{fmt(b.rounds)}</span>
+              <span style={{ fontSize: 11.5, textAlign: 'right', color: HIP.DIM, fontVariantNumeric: 'tabular-nums' }}>{howItPlaysShare(b.rounds, T)}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ marginTop: 10, fontSize: 11.5, lineHeight: 1.45, color: HIP.DIM }}>
+        Each round is counted at the handicap index the golfer held that day, not today's.
+      </div>
+    </section>
   );
 };
 
