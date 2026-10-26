@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB91 — Your courses section 1
+- [ ] Obtain courses-s1.html: brief names it as the signed-off exact-match spec, but this message exposes only the Markdown brief; upload-directory inspection timed out. No page/source/test changes made pending the reference.
+- [ ] Implement selected-course lead helper, loaded header subtitle and moved request panel; preserve chips, unclaimed/gate/notice states and every lower section.
+- [ ] Add helper/page coverage, name authorized retargets and report full-suite counts. Pre-existing rails failures: two sentinel timeouts at coursesRailsUnlimited.test.tsx:80:3 and admin hidden-background role query at :158:18; unrelated tests/source stay untouched.
+
 ## BRIEF_COURSES_RAILS_UNLIMITED
 - [x] BRIEF_COURSES_RAILS_UNLIMITED_FIXTURE: only the new test file extends the shared observer class and assigns/restores the writable global; unstubAllGlobals retained. Assertions/source/other tests/lettering untouched.
 - [ ] FIXTURE STOP: bunx vitest run src/test/coursesRailsUnlimited.test.tsx — 12 passed / 3 failed / 15 total. Both sentinel cursor/repeated-callback cases at :80:3: Error: Test timed out in 5000ms. Admin refetch case at :158:18: TestingLibraryElementError: Unable to find role="button" and name "Hole 4, Course 50" (card appears in runner DOM but is under aria-hidden while batch dialog remains open). No further correction or rerun; needs authorization beyond observer fixture. Full suite not run after stop; standalone typecheck prohibited by environment, latest automatic build13:06:05Z OK. Full baseline3,131/366; candidate3,146/367 unchanged and unverified. Report Courses_rails_unlimited_fixture_report.md.
