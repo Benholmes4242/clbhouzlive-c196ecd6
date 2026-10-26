@@ -15,6 +15,8 @@ import { capitalPhotoCount, type HolePhoto } from '@/lib/courseMedia/holePhotoDa
 import { type BatchPhoto } from '@/lib/courseMedia/holePhotoBatch';
 import type { HolePhotoRound } from '@/lib/courseMedia/holePhotoVerdict';
 import { HoleMediaThumbnail } from './HoleMediaVideo';
+import { HoleInlineVideo } from './HoleInlineVideo';
+import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import type { OwnMediaSource } from '@/lib/courseMedia/holePhotoData';
 import { holePhotoErrorMessage } from '@/lib/courseMedia/holePhotoError';
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
@@ -150,7 +152,8 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
     </div>
     <DialogDescription className="hole-photo-fast-lede">{capitalPhotoCount(photos.length)} photos or videos, oldest first. Tap any one to tag it.</DialogDescription>
     <div className="hole-photo-batch-hero" data-hero={photo.url}>
-      {video ? <HoleMediaThumbnail {...photo} alt="Current video" /> : <img src={photo.url} alt="Current photograph" />}
+      {video ? <><HoleInlineVideo key={photo.url} media={{ media_url: photo.url, stream_id: photo.streamId, poster_url: photo.posterUrl, duration_seconds: photo.durationSeconds }} alt="Current video" fit="contain" autoplayGroup="hole-tag-batch" active />
+        <GlassDurationBadge seconds={photo.durationSeconds} fontSize={9} bottom={3} right={3} /></> : <img src={photo.url} alt="Current photograph" />}
       <span className="hole-photo-batch-chip" data-chip>{`${index + 1} / ${photos.length}`}</span>
     </div>
     {adminMode && photo.ownerName && <p className="hole-photo-batch-owner">{[photo.ownerName, addedMonthLabel(photo.createdAt)].filter(Boolean).join(' \u00B7 ')}</p>}

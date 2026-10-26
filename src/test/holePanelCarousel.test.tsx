@@ -76,10 +76,12 @@ describe('BRIEF_HOLE_PANEL_CAROUSEL frame and strip', () => {
   });
 
   it('a video slide shows its poster with the decorative disc and never a playable element', () => {
+    const motion = vi.spyOn(window, 'matchMedia').mockImplementation(query => ({ matches: query === '(prefers-reduced-motion: reduce)', media: query, onchange: null, addListener: vi.fn(), removeListener: vi.fn(), addEventListener: vi.fn(), removeEventListener: vi.fn(), dispatchEvent: vi.fn() }));
     walk([video('c', 42)]);
     expect(panel().querySelector('.hole-walk-play-disc')).not.toBeNull();
     expect(panel().querySelector('video')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Play video' })).toBeNull();
+    motion.mockRestore();
   });
 });
 
