@@ -41,7 +41,7 @@ import { buildSiLadder, SI_PLACES_GATE } from '@/features/courses/_shared/siLadd
 import { numberWord, ordinal } from '@/lib/text/numbers';
 import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 import type { ClubCourseAnalytics, ClubAnalyticsTee } from './types';
-import { sortTees, yd } from './tees';
+import { sortTees } from './tees';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
 import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
@@ -479,6 +479,13 @@ export const HowItPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ dat
  * EMPTY IS EMPTY. Any figure can be null on a course with no legends rows; that
  * figure is omitted rather than rendered as a dash or a zero.
  */
+const S7_CARD: React.CSSProperties = { background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS };
+const S7_KICKER: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };
+const S7_ASIDE: React.CSSProperties = { ...S7_KICKER, letterSpacing: '0.12em', color: HIP.DIM };
+const S7_TITLE: React.CSSProperties = { marginTop: 6, fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.3, color: HIP.INK };
+const S7_FINE: React.CSSProperties = { marginTop: 10, fontSize: 11.5, lineHeight: 1.45, color: HIP.DIM };
+const S7_HAIR = '1px solid rgba(255,255,255,0.06)';
+
 export const RecordBookSection: React.FC<{ data: ClubCourseAnalytics; onSeeChampions?: () => void }> = ({
   data,
   onSeeChampions,
@@ -489,229 +496,107 @@ export const RecordBookSection: React.FC<{ data: ClubCourseAnalytics; onSeeChamp
   const stableford = rb?.best_stableford;
   const holders = rb?.holders_ever ?? gross?.changed_hands ?? null;
   const since = rb?.rounds_since_record ?? null;
+  if (!rb || (gross?.value == null && birdies?.value == null && stableford?.value == null)) return null;
 
-  if (!rb || (gross?.value == null && birdies?.value == null && stableford?.value == null)) {
-    return (
-      <Panel kicker="The course record" style={CARD}>
-        <Body>
-          No record has been set on this course by a connected member yet. The first one appears here as soon as it is.
-        </Body>
-      </Panel>
-    );
-  }
-
-  // §1 — the hero's own sentence. Each clause appears only when its field does.
-  const middle: string[] = [];
-  if (holders != null && holders > 1) middle.push(`${fmt(holders)} members have held this record`);
-  if (since != null && since > 0) middle.push(`${fmt(since)} rounds have been played here since it was set`);
-  const heroSentence = [
-    gross?.attained_at ? `Set on ${dayMonthYear(gross.attained_at)}.` : null,
-    middle.length === 2
-      ? `${middle[0]}, and ${middle[1].charAt(0).toLowerCase()}${middle[1].slice(1)}.`
-      : middle.length === 1
-        ? `${middle[0]}.`
-        : null,
-    since === 0 ? 'It was set in the most recent round played here.' : null,
-  ]
-    .filter(Boolean)
-    .join(' ');
-
-  // §2 — round records first, career totals second. Each row dates ITSELF.
   const rows: { name: string; meta: string | null; value: string }[] = [];
+  if (gross?.value != null) {
+    const parts: string[] = [];
+    const d = dayMonthYear(gross.attained_at); if (d) parts.push(`Set ${d}`);
+    if (since != null && since > 0) parts.push(`${fmt(since)} ${since === 1 ? 'round' : 'rounds'} since`);
+    if (holders != null && holders > 1) parts.push(`${fmt(holders)} golfers have held it`);
+    rows.push({ name: 'Course record', meta: parts.length ? parts.join(' · ') : null, value: fmt(gross.value) });
+  }
   if (stableford?.value != null) {
-    const yrs = stableford.attained_at ? yearsSince(stableford.attained_at) : null;
-    rows.push({
-      name: 'Best Stableford',
-      meta: stableford.attained_at
-        ? `Set ${dayMonthYear(stableford.attained_at)}${yrs != null && yrs >= 2 ? ` · has stood ${Math.floor(yrs)} years` : ''}`
-        : null,
-      value: fmt(stableford.value),
-    });
+    const d = dayMonthYear(stableford.attained_at);
+    const yrs = Math.floor(yearsSince(stableford.attained_at) ?? 0);
+    rows.push({ name: 'Best Stableford', meta: d ? `Set ${d}${yrs >= 1 ? ` · has stood ${yrs} ${yrs === 1 ? 'year' : 'years'}` : ''}` : null, value: fmt(stableford.value) });
   }
-  if (birdies?.value != null) {
-    rows.push({ name: 'Most birdies by one member', meta: 'A career total on this course, not one round', value: fmt(birdies.value) });
-  }
-  const hasHero = gross?.value != null;
+  if (birdies?.value != null) rows.push({ name: 'Most birdies by one golfer', meta: 'A career total here, not one round', value: fmt(birdies.value) });
 
   return (
-    <Panel kicker="The course record" style={CARD}>
-      {hasHero && (
-        <>
-          <div style={bizFigure(46, A.INK)}>{gross!.value}</div>
-          <div style={{ ...LABEL, marginTop: 8 }}>Lowest gross</div>
-          {heroSentence && <Body style={{ marginTop: 12 }}>{heroSentence}</Body>}
-        </>
-      )}
-
-      {rows.length > 0 && (
-        <div style={hasHero ? { borderTop: `1px solid ${A.BORDER}`, marginTop: 16, paddingTop: 4, marginBottom: 16 } : { marginBottom: 16 }}>
-          {rows.map((r, i) => (
-            <div
-              key={r.name}
-              style={{
-                display: 'flex',
-                alignItems: 'baseline',
-                gap: 12,
-                padding: '12px 0',
-                borderTop: i > 0 ? `1px solid ${A.SOFT}` : undefined,
-              }}
-            >
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, fontFamily: SANS }}>{r.name}</div>
-                {r.meta && (
-                  <div style={{ marginTop: 3, fontSize: 11.5, lineHeight: 1.4, color: A.DIM, fontFamily: SANS }}>{r.meta}</div>
-                )}
-              </div>
-              <div className="tabular-nums lining-nums" style={{ flex: 'none', ...bizFigure(20, A.INK) }}>{r.value}</div>
+    <section data-testid="records" style={S7_CARD}>
+      <div style={S7_KICKER}>Records</div>
+      <div style={{ marginTop: 8 }}>
+        {rows.map((r, i) => (
+          <div key={r.name} data-testid="record-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, padding: i === 0 ? '4px 0 10px' : '10px 0', borderTop: i === 0 ? undefined : S7_HAIR }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 13.5, fontWeight: 600, color: HIP.INK }}>{r.name}</div>
+              {r.meta && <div data-testid="record-meta" style={{ marginTop: 2, fontSize: 11.5, fontWeight: 500, color: HIP.DIM }}>{r.meta}</div>}
             </div>
-          ))}
-        </div>
-      )}
-
-      <Body style={{ marginTop: rows.length > 0 ? 0 : 12, fontSize: 11.5, color: A.DIM }}>
-        Nobody is named on this page. Names live on your course's Champions tab, where each member controls whether
-        they appear.
-      </Body>
-
+            <div data-testid="record-value" style={{ flex: 'none', fontSize: 22, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: HIP.INK }}>{r.value}</div>
+          </div>
+        ))}
+      </div>
       {onSeeChampions && (
-        <button
-          type="button"
-          onClick={onSeeChampions}
-          style={{
-            marginTop: 12,
-            border: 'none',
-            background: 'transparent',
-            padding: 0,
-            fontFamily: SANS,
-            fontSize: 12.5,
-            fontWeight: 700,
-            color: A.INK,
-            cursor: 'pointer',
-          }}
-        >
-          See who holds them
+        <button type="button" onClick={onSeeChampions}
+          style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 12, paddingLeft: 0, paddingRight: 0, paddingBottom: 0, border: 'none', borderTop: S7_HAIR, background: 'transparent', fontFamily: SANS, fontSize: 13, fontWeight: 700, color: HIP.INK, cursor: 'pointer', textAlign: 'left' }}>
+          <span>See who holds them</span><span aria-hidden style={{ color: HIP.MUTE }}>›</span>
         </button>
       )}
-    </Panel>
+      <div style={S7_FINE}>Nobody is named here. Names live on the course's Champions tab, where each golfer decides whether they appear.</div>
+    </section>
   );
 };
 
-/* ─────────────────── YOUR TEES, AND WHO PLAYS THEM ─────────────────── */
+/* ─────────────────── YOUR TEES (CB97) ─────────────────── */
 
-/**
- * §6.1 / §6.2 — THE YARDAGE IS THE LABEL. The shipped page invented "back",
- * "middle", "middle", "middle", "forward" directly above its own footnote saying
- * we do not guess what a club calls a tee. The names are gone.
- *
- * And the table is now readable: one yardage, its score, a bar for how much of
- * the play sits there, and ONE PLAIN SENTENCE naming who plays it. Three counts
- * and three percentages per row was a spreadsheet, not a page.
- *
- * The mix denominator is `with_index`, NEVER `rounds`. Below ten indexed rounds
- * a split is noise and no sentence is drawn.
- */
-const MIX_FLOOR = 10;
+const TEE_HEAD7: React.CSSProperties = { fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM };
+const TEE_GRID7: React.CSSProperties = { display: 'grid', gridTemplateColumns: '1fr 54px 48px', gap: 8, alignItems: 'baseline' };
 
-function whoPlaysIt(t: ClubAnalyticsTee): string | null {
-  const withIndex = t.with_index ?? 0;
-  if (withIndex < MIX_FLOOR) return null;
-  const low = (t.low ?? 0) / withIndex;
-  const mid = (t.mid ?? 0) / withIndex;
-  if (low >= 0.9) return 'Almost entirely single figures';
-  if (low >= 0.72) return 'Mostly single figures';
-  if (low + mid >= 0.55) return 'Single figures and mid handicaps';
-  return 'A mixed field';
+export function teesTitle(tees: ClubAnalyticsTee[]): string | null {
+  if (tees.length === 0) return null;
+  if (tees.length === 1) return `Every round we hold is played off ${fmt(tees[0].yards)} yards`;
+  const sum = tees.reduce((s, t) => s + t.rounds, 0);
+  const top = tees.reduce((b, t) => (t.rounds > b.rounds || (t.rounds === b.rounds && t.yards > b.yards) ? t : b));
+  return `${sum > 0 ? Math.round((top.rounds / sum) * 100) : 0}% of rounds are played off ${fmt(top.yards)} yards`;
 }
-
-const TEE_GRID: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: '1fr 64px 62px',
-  gap: 10,
-  alignItems: 'baseline',
-};
-const TEE_HEAD: React.CSSProperties = {
-  fontFamily: SANS,
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: '0.13em',
-  textTransform: 'uppercase',
-  color: A.DIM,
-};
 
 export const TeesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
   const tees = sortTees(data.tees ?? []);
-  const totalRounds = tees.reduce((s, t) => s + t.rounds, 0);
-
+  const sum = tees.reduce((s, t) => s + t.rounds, 0);
   if (tees.length === 0) {
     return (
-      <Panel kicker="Your tees" style={CARD}>
-        <Body>
-          We hold no yardages on these rounds, so we cannot tell which tees were played. Nothing here is estimated.
-        </Body>
-      </Panel>
+      <section data-testid="tees" style={S7_CARD}>
+        <div style={S7_KICKER}>Your tees</div>
+        <div style={{ marginTop: 6, fontSize: 12.5, lineHeight: 1.45, color: HIP.MUTE }}>No yardage has 10 rounds on it yet.</div>
+      </section>
     );
   }
-
+  const busiest = tees.reduce((m, t) => Math.max(m, t.rounds), 0);
   return (
-    <Panel
-      kicker="Your tees"
-      aside={`${fmt(totalRounds)} rounds`}
-      subline={
-        tees.length === 1
-          ? 'Every measured round was played off one yardage.'
-          : `Your rounds were played off ${tees.length} measured yardages, longest first.`
-      }
-      style={CARD}
-    >
-      <Inset>
-        <div style={{ ...TEE_GRID, paddingBottom: 10 }}>
-          <span style={TEE_HEAD}>Yardage</span>
-          <span style={{ ...TEE_HEAD, textAlign: 'right' }}>Rounds</span>
-          <span style={{ ...TEE_HEAD, textAlign: 'right' }}>To par</span>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {tees.map((t) => {
-            const parts = toParParts(t.avg_to_par);
-            const who = whoPlaysIt(t);
-            const barPct = totalRounds > 0 ? (t.rounds / totalRounds) * 100 : 0;
-            const num: React.CSSProperties = { fontSize: 13, fontWeight: 700, textAlign: 'right', ...FIGS };
-            return (
-              <div key={t.yards} style={{ fontFamily: SANS, ...FIGS }}>
-                <div style={TEE_GRID}>
-                  {/* NO NAME. The yardage is the label. */}
-                  <span style={bizFigure(15, A.INK)}>{yd(t.yards)}</span>
-                  <span style={{ ...num, color: A.INK }}>{fmt(t.rounds)}</span>
-                  <span style={{ ...num, color: parts?.tone ?? A.INK }}>{parts?.text ?? '0'}</span>
-                </div>
-                <div style={{ height: 5, borderRadius: 3, background: A.TRACK, marginTop: 6, overflow: 'hidden' }}>
-                  <i
-                    style={{
-                      display: 'block',
-                      height: '100%',
-                      width: t.rounds > 0 ? `${Math.max(MIN_BAR_PCT, barPct)}%` : '0%',
-                      background: A.INK,
-                    }}
-                  />
-                </div>
-                <div style={{ fontSize: 11.5, lineHeight: 1.4, color: A.DIM, marginTop: 6 }}>
-                  {`${share(t.rounds, totalRounds)} of play`}
-                  {who ? ` · ${who}` : ''}
-                  {who && t.mean_index != null ? `, mean index ${t.mean_index.toFixed(1)}` : ''}
-                </div>
+    <section data-testid="tees" style={S7_CARD}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+        <span style={S7_KICKER}>Your tees</span>
+        <span style={S7_ASIDE}>{fmt(sum)} rounds</span>
+      </div>
+      <div data-testid="tees-title" style={S7_TITLE}>{teesTitle(tees)}</div>
+      <div style={{ ...TEE_GRID7, marginTop: 10, paddingBottom: 4 }}>
+        <span style={TEE_HEAD7}>Yardage</span>
+        <span style={{ ...TEE_HEAD7, textAlign: 'right' }}>Rounds</span>
+        <span style={{ ...TEE_HEAD7, textAlign: 'right' }}>To par</span>
+      </div>
+      {tees.map((t) => {
+        const parts = toParParts(t.avg_to_par);
+        const mi = t.mean_index == null ? null : (t.mean_index < 0 ? `+${Math.abs(t.mean_index).toFixed(1)}` : t.mean_index.toFixed(1));
+        const num: React.CSSProperties = { fontWeight: 700, textAlign: 'right', fontVariantNumeric: 'tabular-nums' };
+        return (
+          <div key={t.yards} data-testid="tee-row" style={{ ...TEE_GRID7, padding: '8px 0', borderTop: S7_HAIR, fontSize: 13 }}>
+            <div>
+              <div style={{ fontWeight: 700, color: HIP.INK, fontVariantNumeric: 'tabular-nums' }}>{fmt(t.yards)} yd</div>
+              <div data-testid="tee-sub" style={{ marginTop: 2, fontSize: 11, fontWeight: 500, color: HIP.DIM }}>
+                {`${sum > 0 ? Math.round((t.rounds / sum) * 100) : 0}% of play${mi ? ` · mean index ${mi}` : ''}`}
               </div>
-            );
-          })}
-        </div>
-      </Inset>
-      <Body style={{ marginTop: 12 }}>
-        Scores differ between yardages mostly because of who chooses them, so this does not rank your tees by
-        difficulty.
-      </Body>
-      <Body style={{ marginTop: 8, fontSize: 11.5, color: A.DIM }}>
-        Yardages come from the rounds themselves, rounded to the nearest hundred. We do not know which colour your club
-        calls each tee, so we do not name them.
-      </Body>
-    </Panel>
+            </div>
+            <span style={{ ...num, color: HIP.INK }}>{fmt(t.rounds)}</span>
+            <span style={{ ...num, color: parts?.tone ?? HIP.INK }}>{parts?.text ?? '0'}</span>
+            <div style={{ gridColumn: '1 / -1', marginTop: 7, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+              <i data-testid="tee-bar" style={{ display: 'block', height: '100%', width: `${busiest > 0 ? (t.rounds / busiest) * 100 : 0}%`, background: HIP.INK }} />
+            </div>
+          </div>
+        );
+      })}
+      <div style={S7_FINE}>Yardages come from the rounds themselves, to the nearest hundred, so we don't name tee colours. Scores differ between tees mostly because of who picks each one.</div>
+    </section>
   );
 };
 
