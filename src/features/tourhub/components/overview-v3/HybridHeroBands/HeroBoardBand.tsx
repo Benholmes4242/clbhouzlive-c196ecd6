@@ -48,9 +48,9 @@
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Trophy } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 
-import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_06, WHITE_ALPHA_32, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
+import { AMBER, FONT, GOLD, INK, WHITE_ALPHA_65, TOPAR_UNDER_DARK } from '../../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { MiniBoard } from '../../../tournament-v2/sections/MiniBoard';
 import { useTourSelection } from '../../../context/TourSelectionContext';
@@ -61,7 +61,6 @@ import { useTournamentLastYearTop4 } from '../../../hooks/useTournamentLastYearT
 import { LastYearRow } from './LastYearRow';
 import { inRequiredRoundWindow, leaderOf, neededGross } from './whatsNext';
 import { surnameOf } from '../../../_shared/playerName';
-import { r } from '@/lib/radius';
 import { PicksSheet } from './PicksSheet';
 import type { HeroState } from '../HybridHero.utils';
 import { boardMovementMap, todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
