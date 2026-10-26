@@ -18,7 +18,7 @@ import { getActiveRound } from '../_shared/roundState.ts'
 import { dispatchTeeAlerts } from './teeAlerts.ts'
 import { shouldFetchLeaderboard, shouldFetchScorecards, shouldFetchHoleStats, shouldFetchInPlayTeeTimes, shouldResolveStatus, shouldFetchPreEventTeeTimes, nextTeeTimesRound } from '../_shared/sportradarCadence.ts'
 import { logSportradarCall } from '../_shared/sportradarCallLog.ts'
-import { LIVE_POLL_STATUSES, STALE_AUTO_CLOSE_STATUSES, CLOSED_FEED_STATUSES, statusToWrite, soleWinnerSrId } from './liveStatus.ts'
+import { LIVE_POLL_STATUSES, STALE_AUTO_CLOSE_STATUSES, CLOSED_FEED_STATUSES, statusToWrite, soleWinnerSrId, shouldDateClose, dateClosePayload } from './liveStatus.ts'
 
 const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
 const getTourBaseUrl = (tour: string = 'pga') =>
