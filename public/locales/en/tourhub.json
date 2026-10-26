@@ -139,6 +139,7 @@
       "purse": "PURSE",
       "stateLive": "LIVE",
       "stateFinal": "RESULTS",
+      "statePlayoff": "PLAYOFF",
       "factRound": "ROUND",
       "starts": "Starts {{day}}",
       "days": "Days",
@@ -286,7 +287,9 @@
     },
     "situation": {
       "label": "The situation",
-      "fullBoard": "Full board"
+      "fullBoard": "Full board",
+      "roundCancelled": "Round {{cancelled}} was cancelled, so the event finished after {{holes}} holes.",
+      "cutTo": "The event was cut to {{holes}} holes."
     },
     "picksIntro": {
       "leads": "{{name}} leads for us. Each card shows the round our picks would need to reach {{score}}.",
