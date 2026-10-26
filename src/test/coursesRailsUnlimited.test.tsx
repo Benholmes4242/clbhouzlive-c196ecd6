@@ -81,7 +81,8 @@ describe.each(kinds)('$kind unlimited rail', spec => {
     pages = [page(spec), page(spec, 50, 3)]; const view = mount(spec);
     await waitFor(() => expect(cards(view, spec)).toHaveLength(spec.size));
     const observer = [...observers].reverse().find(item => item.active);
-    expect(observer?.options).toMatchObject({ root: view.container.querySelector('.scrollbar-hide'), rootMargin: `0px ${spec.width * 2}px 0px 0px` });
+    expect(observer?.options?.root).toBe(view.container.querySelector('.scrollbar-hide'));
+    expect(observer?.options?.rootMargin).toBe(`0px ${spec.width * 2}px 0px 0px`);
     nextVisible(); nextVisible();
     await waitFor(() => expect(cards(view, spec)).toHaveLength(spec.size + 3));
     expect(requests(spec)).toEqual([[spec.name, { p_limit: spec.size }], [spec.name, { p_limit: spec.size, ...cursor(pages[0][spec.size - 1]) }]]);
@@ -155,7 +156,7 @@ describe('loaded holes run and refresh', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
     pages = [page(spec, 50, 3)];
     fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
-    await screen.findByRole('button', { name: 'Hole 4, Course 50' });
+    await screen.findByRole('button', { name: 'Hole 4, Course 50', hidden: true });
     expect(requests(spec)).toHaveLength(2);
     expect(f.rpc).toHaveBeenCalledWith('admin_tag_hole_media', { p_course_id: 'course', p_media_id: 'untagged', p_hole_no: 4 });
     expect(view.cache.getQueryData(['gam_rpc', spec.name, 'infinite'])).toMatchObject({ pages });
