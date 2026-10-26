@@ -4,12 +4,14 @@ import { ChampionStrip } from '@/features/tourhub/components/overview-v3/HybridH
 import { HybridHero } from '@/features/tourhub/components/overview-v3/HybridHero';
 import type { HeroSlide } from '@/features/tourhub/hooks/useHeroCarouselData';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const fixture = vi.hoisted(() => ({ championProps: null as null | { avatarCandidates?: string[]; playerKey?: string | null } }));
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/features/tourhub/hooks/useTourHubData', () => ({ useTourLeaderboard: () => ({ data: [{ id: 'winner-row', position: 1, score: -17, player: { sr_id: 'winner-key', full_name: 'Eugenio Lopez-Chacarra' } }] }) }));
 vi.mock('@/features/tourhub/hooks/useBatchCourseImages', () => ({ useBatchCourseImages: () => ({ data: new Map() }) }));
+vi.mock('@/features/tourhub/hooks/useLiveTournaments', async importOriginal => ({ ...(await importOriginal<typeof import('@/features/tourhub/hooks/useLiveTournaments')>()), useLiveTournaments: () => ({ data: [], isLoading: false, isError: false }) }));
 vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand', () => ({ PhotoBand: () => null }));
 vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/ChampionStrip', async importOriginal => {
   const actual = await importOriginal<typeof import('@/features/tourhub/components/overview-v3/HybridHeroBands/ChampionStrip')>();
@@ -50,7 +52,7 @@ describe('Tour champion avatar candidates', () => {
       winnerName: 'Eugenio Lopez-Chacarra', winnerPhotoUrl: null, winnerHeadshotOverride: 'Eugenio renamed',
       winnerPgaTourId: null, winnerScore: '-17', leaderScore: -17, leaderName: 'Eugenio Lopez-Chacarra', currentRound: 4, currentRoundStatus: null,
     } };
-    render(<MemoryRouter><HybridHero slide={slide} state={{ kind: 'results', variant: 'standard', finishDate: '2026-10-18', meta: '' }} now={new Date('2026-10-19')} activeTournamentId={null} onSelectTour={() => {}} onOpenTournament={() => {}} /></MemoryRouter>);
+    render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter><HybridHero slide={slide} state={{ kind: 'results', variant: 'standard', finishDate: '2026-10-18', meta: '' }} now={new Date('2026-10-19')} activeTournamentId={null} onSelectTour={() => {}} onOpenTournament={() => {}} /></MemoryRouter></QueryClientProvider>);
     const candidates = fixture.championProps?.avatarCandidates ?? [];
     expect(candidates.length).toBeGreaterThan(1);
     expect(candidates.some(url => url.includes('/DP%20World%20Tour/Eugenio%20renamed.webp'))).toBe(true);
