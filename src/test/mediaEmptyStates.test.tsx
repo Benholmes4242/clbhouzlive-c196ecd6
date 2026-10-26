@@ -31,6 +31,18 @@ describe('MEDIA_EMPTY_1 B/C rules', () => {
     expect(tiles).toHaveLength(3);
     for (const tile of tiles) { expect(tile).toHaveAttribute('data-state', 'open'); expect(tile).toHaveAttribute('aria-pressed', 'false'); expect(tile).toBeEnabled(); }
   });
+  it('tapping the selected hole again deselects it and disables the library action; a different tap moves the selection', () => {
+    render(<CourseFirstPhotoPicker knownHoles={[2, 7]} pending={false} result={null} error={null} onSubmit={() => {}} onClose={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));
+    expect(screen.getByRole('button', { name: 'Hole 7' })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));
+    expect(screen.getByRole('button', { name: 'Hole 7' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'Choose from your library' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 2' }));
+    expect(screen.getByRole('button', { name: 'Hole 2' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Hole 7' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'Choose from your library' })).toBeEnabled();
+  });
   it('B first-photo picker submits the original File with the chosen hole', () => {
     const submit = vi.fn(); render(<CourseFirstPhotoPicker knownHoles={[2, 7]} pending={false} result={null} error={null} onSubmit={submit} onClose={() => {}} />);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));

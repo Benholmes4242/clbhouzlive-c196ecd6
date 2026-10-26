@@ -26,6 +26,19 @@ describe('selection and confirm', () => {
     expect(tag).not.toHaveBeenCalled();
     expect(screen.getByRole('button', { name: 'Hole 7' })).toHaveAttribute('aria-pressed', 'true');
   });
+  it('tapping the selected hole again deselects it and disables Confirm tag; a different tap moves the selection', () => {
+    const tag = ok(); render(<HolePhotoBatchPath photos={shots(2)} knownHoles={[4, 7]} onTag={tag} onClose={() => {}} />);
+    pick(7);
+    expect(screen.getByRole('button', { name: 'Hole 7' })).toHaveAttribute('aria-pressed', 'true');
+    pick(7);
+    expect(screen.getByRole('button', { name: 'Hole 7' })).toHaveAttribute('aria-pressed', 'false');
+    expect(confirmBtn()).toBeDisabled();
+    pick(4);
+    expect(screen.getByRole('button', { name: 'Hole 4' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Hole 7' })).toHaveAttribute('aria-pressed', 'false');
+    expect(confirmBtn()).toBeEnabled();
+    expect(tag).not.toHaveBeenCalled();
+  });
   it('Confirm tag is disabled with no selection, enabled with one, and tags the current url and hole', async () => {
     const tag = ok(); render(<HolePhotoBatchPath photos={shots(2)} knownHoles={[4, 7]} onTag={tag} onClose={() => {}} />);
     expect(confirmBtn()).toBeDisabled(); expect(confirmBtn()).toHaveTextContent('Confirm tag');
