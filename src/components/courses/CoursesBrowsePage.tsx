@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 import { HardestSection } from './browse/HardestSection';
-import { HighestRatedSection } from './browse/HighestRatedSection';
 import { LatestCoursesSection } from './browse/LatestCoursesSection';
 import { LatestHolesSection } from './browse/LatestHolesSection';
 import { LatestReviewsSection } from './browse/LatestReviewsSection';

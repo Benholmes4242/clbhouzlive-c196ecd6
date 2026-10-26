@@ -5,7 +5,7 @@ import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import type { StatBrowseRow } from '../useStatBrowse';
 
 /**
- * PhotoFigureCard — the 300 x 230 rail card shared by sections 03 and 05
+ * PhotoFigureCard — the 300 x 230 rail card shared by section 03
  * (BRIEF_COURSES_PAGE_DEVICE_REVISION §6). One card, different figures.
  * BrowseCourseCard is full-width and shared with Top 100, so it is not this.
  */
@@ -16,8 +16,6 @@ export const PHOTO_FIGURE_H = 230;
 export const PHOTO_FIGURE_GAP = 2;
 /** The regulars (Most played) shows exactly this many cards (BRIEF_COURSES_REGULARS_FIVE). */
 export const MOST_PLAYED_COUNT = 5;
-/** Highest rated shows exactly this many cards (BRIEF_COURSES_HIGHEST_RATED_TEN). */
-export const HIGHEST_RATED_COUNT = 10;
 
 export function PhotoFigureCard({ row, figure, figureColor = '#FFFFFF', figureLabel, footer, nameBottom = 15 }: {
   row: StatBrowseRow;
