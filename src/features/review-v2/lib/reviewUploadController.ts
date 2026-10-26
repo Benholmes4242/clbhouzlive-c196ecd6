@@ -50,6 +50,7 @@ export interface ReviewUploadInput {
   width?: number | null;
   height?: number | null;
   durationSeconds?: number | null;
+  preflight?: Promise<ReviewUploadInput | null>;
   trackBytes?: boolean;
   uploadedUrl?: string | null;
   streamId?: string | null;
@@ -130,7 +131,7 @@ async function uploadVideo(item: ReviewUploadInput, onProgress: (pct: number) =>
 }
 
 export interface PreuploadState { status: 'pending' | 'uploading' | 'uploaded' | 'failed'; progress: number; result?: ReviewUploadResult; }
-interface PreuploadEntry { input: ReviewUploadInput; userId: string; state: PreuploadState; promise: Promise<ReviewUploadResult>; resolve: (r: ReviewUploadResult) => void; abort: AbortController; removed: boolean; }
+interface PreuploadEntry { input: ReviewUploadInput; userId: string; state: PreuploadState; promise: Promise<ReviewUploadResult>; resolve: (r: ReviewUploadResult) => void; abort: AbortController; removed: boolean; eligible: boolean; }
 const composers = new Map<string, { entries: Map<string, PreuploadEntry>; queue: PreuploadEntry[]; active: number; published: boolean; abandoned: boolean; listeners: Set<(id: string, s: PreuploadState) => void> }>();
 function composerUploads(key: string) { let c = composers.get(key); if (!c) { c = { entries: new Map(), queue: [], active: 0, published: false, abandoned: false, listeners: new Set() }; composers.set(key, c); } return c; }
 export function cleanupPreuploadedAssets(results: ReviewUploadResult[]): void {
@@ -143,7 +144,9 @@ export function subscribeToPreuploads(key: string, listener: (id: string, state:
 function pump(key: string): void {
   const c = composerUploads(key);
   while (c.active < 2 && c.queue.length && !c.abandoned) {
-    const e = c.queue.shift(); if (!e || e.removed) continue;
+    const index = c.queue.findIndex(e => e.eligible && !e.removed);
+    if (index < 0) break;
+    const [e] = c.queue.splice(index, 1); if (!e || e.removed) continue;
     c.active++; e.state = { status: 'uploading', progress: 0 };
     const emit = () => { for (const l of c.listeners) l(e.input.id, e.state); }; emit();
     const progress = (pct: number) => { e.state = { status: 'uploading', progress: pct }; emit(); };
@@ -152,7 +155,7 @@ function pump(key: string): void {
       .then(result => {
         e.state = { status: result.ok ? 'uploaded' : 'failed', progress: result.ok ? 100 : e.state.progress, result }; emit();
         if ((e.removed || c.abandoned) && result.ok) cleanupPreuploadedAssets([result]);
-        e.resolve(result); c.active--; pump(key);
+        e.resolve(result); c.active--; if (!c.abandoned) pump(key);
       });
   }
 }
@@ -161,8 +164,13 @@ export function enqueueReviewUpload(key: string, userId: string, input: ReviewUp
   if (old && !(retry && old.state.status === 'failed')) return old.promise;
   let resolve: (r: ReviewUploadResult) => void = () => {};
   const promise = new Promise<ReviewUploadResult>(r => { resolve = r; });
-  const e: PreuploadEntry = { input, userId, promise, resolve, state: { status: 'pending', progress: 0 }, abort: new AbortController(), removed: false };
-  c.entries.set(input.id, e); c.queue.push(e); pump(key); return promise;
+  const e: PreuploadEntry = { input, userId, promise, resolve, state: { status: 'pending', progress: 0 }, abort: new AbortController(), removed: false, eligible: !input.preflight };
+  c.entries.set(input.id, e); c.queue.push(e);
+  if (input.preflight) void input.preflight.then(valid => {
+    if (!valid || e.removed || c.abandoned) { e.removed = true; e.resolve({ id: input.id, ok: false, error: 'Video unavailable' }); return; }
+    e.input = valid; e.eligible = true; pump(key);
+  }).catch(() => { e.state = { status: 'failed', progress: 0 }; e.resolve({ id: input.id, ok: false, error: 'Could not read video' }); for (const l of c.listeners) l(input.id, e.state); });
+  pump(key); return promise;
 }
 export function removeReviewPreupload(key: string, id: string): void {
   const c = composers.get(key); const e = c?.entries.get(id); if (!c || !e) return;
@@ -200,7 +208,7 @@ async function runJob(
     emit(job);
   }));
 
-  return results;
+  return items.map(item => results.find(r => r.id === item.id)).filter((r): r is ReviewUploadResult => !!r);
 }
 
 /**

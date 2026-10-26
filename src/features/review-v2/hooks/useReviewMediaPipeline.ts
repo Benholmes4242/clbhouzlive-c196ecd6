@@ -159,31 +159,32 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
         void enqueueReviewUpload(uploadKeyRef.current, userId, { id: item.id, type: item.type, file: item.file, trackBytes: true });
       }
 
-      // PASS TWO — probe every file in parallel, patching each as it lands.
-      const patch = (id: string, p: Partial<MediaItem>) =>
-        patchItems(prev => prev.map(i => i.id === id ? { ...i, ...p } : i));
-      await Promise.all(
-        added.map(async (item) => {
-          const file = item.file as File;
-          try {
-            if (item.type === 'video') {
-              const { duration, posterUrl } = await probeVideo(file, registerBlob);
-              if (duration > REVIEW_V2_LIMITS.MAX_VIDEO_SECONDS) {
-                patchItems(prev => prev.filter(i => i.id !== item.id));
-                setPickerError('Videos need to be 3 minutes or under.');
-                return;
-              }
-              patch(item.id, { durationSeconds: duration, posterUrl, analysing: false });
-              if (userId && itemsRef.current.some(i => i.id === item.id)) void enqueueReviewUpload(uploadKeyRef.current, userId, { id: item.id, type: item.type, file, durationSeconds: duration, posterUrl, trackBytes: true });
-            } else {
-              const dims = await probeImageDims(file);
-              patch(item.id, { width: dims?.width ?? null, height: dims?.height ?? null, analysing: false });
-            }
-          } catch {
-            patch(item.id, { analysing: false, status: item.type === 'video' ? 'failed' : item.status, error: item.type === 'video' ? 'Could not read video' : undefined });
+      // The controller reserves every tile in tray order. Video bytes are gated
+      // by the serial probe, including when publish joins before it settles.
+      const probes = added.map(async item => {
+        const file = item.file;
+        if (!file) return;
+        if (item.type === 'image') {
+          const dims = await probeImageDims(file);
+          patchItems(prev => prev.map(i => i.id === item.id ? { ...i, width: dims?.width ?? null, height: dims?.height ?? null } : i));
+          return;
+        }
+        const preflight = probeVideo(file, registerBlob).then(({ duration, posterUrl }) => {
+          if (duration > REVIEW_V2_LIMITS.MAX_VIDEO_SECONDS) {
+            patchItems(prev => prev.filter(i => i.id !== item.id));
+            setPickerError('Videos need to be 3 minutes or under.'); return null;
           }
-        }),
-      );
+          patchItems(prev => prev.map(i => i.id === item.id ? { ...i, durationSeconds: duration, posterUrl, analysing: false } : i));
+          if (!itemsRef.current.some(i => i.id === item.id) || !userId) return null;
+          return { id: item.id, type: item.type, file, durationSeconds: duration, posterUrl, trackBytes: true };
+        }).catch(() => {
+          patchItems(prev => prev.map(i => i.id === item.id ? { ...i, analysing: false, status: 'failed', error: 'Could not read video' } : i));
+          return null;
+        });
+        if (userId) void enqueueReviewUpload(uploadKeyRef.current, userId, { id: item.id, type: item.type, file, preflight, trackBytes: true });
+        await preflight;
+      });
+      await Promise.all(probes);
     },
     [userId, patchItems],
   );
@@ -196,7 +197,6 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
 
     // Existing media -> delete DB row + cleanup asset.
     if (target.isExisting && target.dbRowId) {
-      await supabase.from('course_review_media').delete().eq('id', target.dbRowId);
       supabase.functions
         .invoke('cleanup-review-media', {
           body: {
@@ -533,7 +533,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
           progress: 100,
           uploadedUrl: r.uploadedUrl ?? null,
           streamId: r.streamId ?? null,
-          posterUrl: r.posterUrl ?? null,
+          posterUrl: itemsRef.current.find(i => i.id === r.id)?.posterUrl ?? r.posterUrl ?? null,
           error: undefined,
         });
       } else {
@@ -699,7 +699,15 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
         return;
       }
       if (!userId || !it.file) return;
-      if (it.type === 'video' && it.durationSeconds == null) return;
+      if (it.type === 'video' && it.durationSeconds == null) {
+        updateItem(id, { analysing: true });
+        try {
+          const probe = await probeVideo(it.file, registerBlob);
+          if (probe.duration > REVIEW_V2_LIMITS.MAX_VIDEO_SECONDS) { await removeItem(id); setPickerError('Videos need to be 3 minutes or under.'); return; }
+          it.durationSeconds = probe.duration; it.posterUrl = probe.posterUrl;
+          updateItem(id, { ...probe, durationSeconds: probe.duration, analysing: false });
+        } catch { updateItem(id, { analysing: false, status: 'failed' }); return; }
+      }
       updateItem(id, { status: 'pending', progress: 0, error: undefined });
       await enqueueReviewUpload(uploadKeyRef.current, userId, { ...it, file: it.file, trackBytes: true }, true);
     },
