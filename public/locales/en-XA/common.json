@@ -724,14 +724,6 @@
         "notAffected": "[~~Ñőţ áƒƒéĉţéđ ƀý ţĥé 7, 30 őř 90 đáýš áƀőṽé.~~]",
         "noneTitle": "[~~Ñő ĝőļƒéřš ƒőļļőŵ {{business}} ýéţ.~~]"
       },
-      "rate": {
-        "from_one": "[~~Ƒřőɱ {{n}} íɱƥřéššíőñ~~]",
-        "from_other": "[~~Ƒřőɱ {{n}} íɱƥřéššíőñš~~]",
-        "none": "[~~Ƥúƀļíšĥ ƥőšţš áñđ ĝáţĥéř íɱƥřéššíőñš ţő šéé ýőúř éñĝáĝéɱéñţ řáţé.~~]",
-        "tooFew": "[~~Ñőţ éñőúĝĥ íɱƥřéššíőñš ýéţ ţő ĝíṽé á ɱéáñíñĝƒúļ řáţé.~~]",
-        "benchmark": "[~~Ļíǩéš áñđ ĉőɱɱéñţš áš á šĥářé őƒ íɱƥřéššíőñš.~~]",
-        "impressionsLabel": "[~~Íɱƥřéššíőñš~~]"
-      },
       "reviewsCount_one": "[~~{{n}} řéṽíéŵ~~]",
       "reviewsCount_other": "[~~{{n}} řéṽíéŵš~~]",
       "visits": {
@@ -832,6 +824,29 @@
         "lastReached_other": "[~~Ýőúř ļášţ ƥőšţ ŵéñţ úƥ őñ <b>{{date}}</b> áñđ řéáĉĥéđ <b>{{n}} ĝőļƒéřš</b>.~~]",
         "lastZero": "[~~Ýőúř ļášţ ƥőšţ ŵéñţ úƥ őñ <b>{{date}}</b> áñđ ĥášñ'ţ řéáĉĥéđ áñýőñé ýéţ.~~]",
         "write": "[~~Ŵříţé á ƥőšţ~~]"
+      },
+      "engagementCard": {
+        "kicker": "[~~Éñgágéméñt~~]",
+        "title": "[~~{{x}} őf thé {{n}} gőlférš yőúr pőštš réáĉhéd líkéd őr ĉőmméñtéd~~]",
+        "titleNone": "[~~Ñőñé őf thé {{n}} gőlférš yőúr pőštš réáĉhéd líkéd őr ĉőmméñtéd~~]",
+        "titleOne": "[~~Thé 1 gőlfér yőúr pőštš réáĉhéd líkéd őr ĉőmméñtéd~~]",
+        "titleOneNone": "[~~Thé 1 gőlfér yőúr pőštš réáĉhéd dídñ't líké őr ĉőmméñt~~]",
+        "empty_7": "[~~Yőúr pőštš dídñ't réáĉh áñyőñé íñ thé lášt 7 dáyš~~]",
+        "empty_30": "[~~Yőúr pőštš dídñ't réáĉh áñyőñé íñ thé lášt 30 dáyš~~]",
+        "empty_90": "[~~Yőúr pőštš dídñ't réáĉh áñyőñé íñ thé lášt 90 dáyš~~]",
+        "changeUp": "[~~+{{n}}~~]",
+        "changeUpPct": "[~~+{{n}}%~~]",
+        "changeDown": "[~~{{n}} féwér~~]",
+        "changeDownPct": "[~~{{n}}% féwér~~]",
+        "ratioHalf": "[~~Thát'š <b>mőré tháñ hálf</b>.~~]",
+        "ratioExact": "[~~Thát'š <b>1 íñ {{n}}</b>.~~]",
+        "ratioAbout": "[~~Thát'š ábőút <b>1 íñ {{n}}</b>.~~]",
+        "likes_one": "[~~líké~~]",
+        "likes_other": "[~~líkéš~~]",
+        "comments_one": "[~~ĉőmméñt~~]",
+        "comments_other": "[~~ĉőmméñtš~~]",
+        "fine": "[~~Líkéš áñd ĉőmméñtš mádé íñ thé péríőd őñ áñy őf yőúr pőštš. Á gőlfér ĉőúñtš őñĉé, hőwévér máñy tíméš théy líkéd őr ĉőmméñtéd. Yőúr őwñ téám íšñ't ĉőúñtéd.~~]",
+        "fineNone": "[~~Líkéš áñd ĉőmméñtš mádé íñ thé péríőd őñ áñy őf yőúr pőštš. Yőúr őwñ téám íšñ't ĉőúñtéd.~~]"
       },
       "followersCard": {
         "kicker": "[~~Ƒőļļőŵéřš~~]",

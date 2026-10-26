@@ -769,14 +769,6 @@
         "notAffected": "Not affected by the 7, 30 or 90 days above.",
         "noneTitle": "No golfers follow {{business}} yet."
       },
-      "rate": {
-        "from_one": "From {{n}} impression",
-        "from_other": "From {{n}} impressions",
-        "none": "Publish posts and gather impressions to see your engagement rate.",
-        "tooFew": "Not enough impressions yet to give a meaningful rate.",
-        "benchmark": "Likes and comments as a share of impressions.",
-        "impressionsLabel": "Impressions"
-      },
       "reviewsCount_one": "{{n}} review",
       "reviewsCount_other": "{{n}} reviews",
       "visits": {
@@ -877,6 +869,29 @@
         "lastReached_other": "Your last post went up on <b>{{date}}</b> and reached <b>{{n}} golfers</b>.",
         "lastZero": "Your last post went up on <b>{{date}}</b> and hasn't reached anyone yet.",
         "write": "Write a post"
+      },
+      "engagementCard": {
+        "kicker": "Engagement",
+        "title": "{{x}} of the {{n}} golfers your posts reached liked or commented",
+        "titleNone": "None of the {{n}} golfers your posts reached liked or commented",
+        "titleOne": "The 1 golfer your posts reached liked or commented",
+        "titleOneNone": "The 1 golfer your posts reached didn't like or comment",
+        "empty_7": "Your posts didn't reach anyone in the last 7 days",
+        "empty_30": "Your posts didn't reach anyone in the last 30 days",
+        "empty_90": "Your posts didn't reach anyone in the last 90 days",
+        "changeUp": "+{{n}}",
+        "changeUpPct": "+{{n}}%",
+        "changeDown": "{{n}} fewer",
+        "changeDownPct": "{{n}}% fewer",
+        "ratioHalf": "That's <b>more than half</b>.",
+        "ratioExact": "That's <b>1 in {{n}}</b>.",
+        "ratioAbout": "That's about <b>1 in {{n}}</b>.",
+        "likes_one": "like",
+        "likes_other": "likes",
+        "comments_one": "comment",
+        "comments_other": "comments",
+        "fine": "Likes and comments made in the period on any of your posts. A golfer counts once, however many times they liked or commented. Your own team isn't counted.",
+        "fineNone": "Likes and comments made in the period on any of your posts. Your own team isn't counted."
       },
       "followersCard": {
         "kicker": "Followers",
