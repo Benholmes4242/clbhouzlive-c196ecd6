@@ -145,7 +145,7 @@ export function BusinessEmptyState({ onCreate }: { onCreate: () => void }) {
   const locale = i18n?.language || 'en';
 
   return (
-    <div style={{ padding: '20px 16px 28px', background: CANVAS, color: INK }}>
+    <div style={{ padding: '4px 0 0', background: CANVAS, color: INK }}>
       {/* 1. Opening */}
       <div data-card="opening" style={{ padding: '6px 2px 22px' }}>
         <div style={kicker}>Golf businesses on clbhouz</div>
