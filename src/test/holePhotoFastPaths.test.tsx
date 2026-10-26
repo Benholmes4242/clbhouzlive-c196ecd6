@@ -43,11 +43,12 @@ describe('MEDIA_FAST_1', () => {
     expect(advanceBatch(state, 'b', 7).tags).toEqual({ a: 7, b: 7 });
     expect(() => advanceBatch(state, 'b', 4)).toThrow('This hole is closed.');
   });
-  it('no hole is ever closed; tagged holes read green and stay selectable', () => {
-    render(<HolePhotoPicker holeCount={9} selectedHole={null} usedHoles={[4, 7]} onSelect={() => {}} />);
+  it('no hole is ever closed; every known hole is plain and selectable', () => {
+    const { container } = render(<HolePhotoPicker holeCount={9} selectedHole={null} onSelect={() => {}} />);
     const four = screen.getByRole('button', { name: 'Hole 4' }); const seven = screen.getByRole('button', { name: 'Hole 7' });
-    expect(four).toBeEnabled(); expect(four).toHaveAttribute('data-state', 'used');
-    expect(seven).toBeEnabled(); expect(seven).toHaveAttribute('data-state', 'used');
+    expect(four).toBeEnabled(); expect(four).toHaveAttribute('data-state', 'open');
+    expect(seven).toBeEnabled(); expect(seven).toHaveAttribute('data-state', 'open');
+    expect(container.querySelector('p')).toBeNull();
     expect(screen.getByRole('button', { name: 'Hole 8' })).toHaveAttribute('data-state', 'open');
   });
   it('five matching EXIF photos all publish', () => {
@@ -62,16 +63,16 @@ describe('MEDIA_FAST_1', () => {
   it('batch is oldest first using capture date before contribution date', () => {
     expect(orderedBatch([photo('later', '2026-05-15'), photo('earlier'), photo('undated', null)]).map(p => p.url)).toEqual(['earlier', 'later', 'undated']);
   });
-  it('skipping in the batch invokes no write and source remains available in a later batch', () => {
+  it('tapping the second thumbnail writes nothing, makes it the hero, and a fresh batch starts on the first shot', () => {
     const tag = vi.fn(); const props = { photos: [photo('/a.jpg'), photo('/b.jpg')], rounds: [round], memberId: 'member', courseId: 'course', knownHoles: [4, 7], onTag: tag, onClose: () => {} };
-    const view = render(<HolePhotoBatchPath {...props} />); fireEvent.click(screen.getByRole('button', { name: 'Skip this one' }));
+    const view = render(<HolePhotoBatchPath {...props} />); fireEvent.click(screen.getByRole('button', { name: 'Shot 2 of 2' }));
     expect(tag).not.toHaveBeenCalled(); expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/b.jpg');
     view.unmount(); render(<HolePhotoBatchPath {...props} />); expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/a.jpg');
   });
   it('successful next tags exact URL and hole then advances', async () => {
     const tag = vi.fn().mockResolvedValue({ status: 'approved' } as HolePhoto);
     render(<HolePhotoBatchPath photos={[photo('/a.jpg'), photo('/b.jpg')]} rounds={[round]} memberId="member" courseId="course" knownHoles={[4, 7]} onTag={tag} onClose={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/b.jpg'));
     expect(tag).toHaveBeenCalledWith('/a.jpg', 7); expect(screen.getByRole('button', { name: 'Hole 4' })).toBeEnabled();
   });
@@ -79,18 +80,21 @@ describe('MEDIA_FAST_1', () => {
     const tag = vi.fn().mockResolvedValue({ status: 'approved' } as HolePhoto);
     const close = vi.fn();
     render(<HolePhotoBatchPath photos={[photo('/a.jpg'), photo('/b.jpg'), photo('/c.jpg')]} knownHoles={[4, 7]} onTag={tag} onClose={close} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/b.jpg'));
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/c.jpg'));
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
-    await waitFor(() => expect(close).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    // The batch now stays open showing "All tagged"; only Close closes it.
+    await waitFor(() => expect(screen.getByRole('button', { name: 'All tagged' })).toBeDisabled());
+    expect(close).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Close' })); expect(close).toHaveBeenCalledTimes(1);
     expect(tag.mock.calls).toEqual([['/a.jpg', 4], ['/b.jpg', 4], ['/c.jpg', 4]]);
   });
   it('batch unique violations identify the duplicate photo and do not advance', async () => {
     const tag = vi.fn().mockRejectedValue({ code: '23505' });
     render(<HolePhotoBatchPath photos={[photo('/a.jpg'), photo('/b.jpg')]} knownHoles={[4]} onTag={tag} onClose={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
     await screen.findByRole('alert');
     expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/a.jpg');
     expect(tag).toHaveBeenCalledWith('/a.jpg', 4);
