@@ -20,7 +20,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { requireInternalSecret } from "../_shared/internalAuth.ts";
 
 import { corsFor } from '../_shared/cors.ts';
-const FUNCTION_VERSION = "2026-08-11-cors-and-error-queue-v2";
+import { parseCoursesBody, neverProcessed } from "./coursesMode.ts";
+const FUNCTION_VERSION = "2026-10-26-courses-mode-v3";
 const LOCK_NAME = "gam-course-mapping-orchestrator";
 const BATCH_SIZE = 25;
 const TIER_1_3_METHODS = new Set([
@@ -68,12 +69,25 @@ Deno.serve(async (req) => {
     return json({ mode: "backfill_unmatched", seeded, version: FUNCTION_VERSION });
   }
 
+  // ---- 'courses' mode: a sync just brought these WHS courses ------------
+  // Only never-processed ids (no map row at all) run; everything else stays
+  // with the six-hourly normal run.
+  const mode: "normal" | "courses" = body?.mode === "courses" ? "courses" : "normal";
+  let requestedIds: string[] = [];
+  if (mode === "courses") {
+    const parsed = parseCoursesBody(body);
+    if (!parsed.ok) return json({ mode, error: parsed.error }, 400);
+    requestedIds = parsed.ids;
+  }
+
   const runStartedAt = new Date().toISOString();
   console.log(JSON.stringify({
     event: "orchestrator_run_start",
     version: FUNCTION_VERSION,
     run_started_at: runStartedAt,
     batch_size: BATCH_SIZE,
+    mode,
+    ...(mode === "courses" ? { requested_count: requestedIds.length } : {}),
   }));
 
 
@@ -91,12 +105,27 @@ Deno.serve(async (req) => {
     console.log(JSON.stringify({
       event: "orchestrator_run_skipped",
       reason: "lock_busy",
+      mode,
     }));
-    return json({ skipped: true, reason: "lock_busy" }, 200);
+    return json({ skipped: true, reason: "lock_busy", mode }, 200);
   }
 
   try {
     // ---- Pick batch -------------------------------------------------------
+    let candidates: string[];
+    if (mode === "courses") {
+      const { data: rowsForIds, error: idsErr } = requestedIds.length
+        ? await supabase.from("whs_to_golf_course_map").select("whs_course_id").in("whs_course_id", requestedIds)
+        : { data: [], error: null };
+      if (idsErr) throw idsErr;
+      candidates = neverProcessed(requestedIds, (rowsForIds ?? []).map((r: any) => r.whs_course_id as string));
+      console.log(JSON.stringify({
+        event: "orchestrator_batch_selected",
+        mode,
+        requested_count: requestedIds.length,
+        batch_count: candidates.length,
+      }));
+    } else {
     // Unmapped = whs_courses with no map row, OR map row with golf_course_id IS NULL.
     // We pull candidates by combining both shapes. To keep it simple, fetch
     // whs_course ids that have no mapped golf_course_id yet.
@@ -122,7 +151,7 @@ Deno.serve(async (req) => {
       .map((c: any) => c.id as string)
       .filter((id) => !mappedSet.has(id) && !unmappedFromMap.includes(id));
 
-    const candidates = [...missingMapRow, ...unmappedFromMap].slice(
+    candidates = [...missingMapRow, ...unmappedFromMap].slice(
       0,
       BATCH_SIZE,
     );
@@ -132,6 +161,7 @@ Deno.serve(async (req) => {
       total_unmapped: missingMapRow.length + unmappedFromMap.length,
       batch_count: candidates.length,
     }));
+    }
 
     if (candidates.length === 0) {
       console.log(JSON.stringify({ event: "orchestrator_run_end_empty" }));
@@ -139,6 +169,7 @@ Deno.serve(async (req) => {
         processed: 0,
         message: "No unmapped WHS courses",
         run_started_at: runStartedAt,
+        mode,
       });
     }
 
@@ -324,6 +355,7 @@ Deno.serve(async (req) => {
       run_ended_at: runEndedAt,
       processed: candidates.length,
       counts,
+      mode,
     }));
 
     // Suppress unused var warning on projectRef
@@ -343,6 +375,7 @@ Deno.serve(async (req) => {
       run_started_at: runStartedAt,
       run_ended_at: runEndedAt,
       version: FUNCTION_VERSION,
+      mode,
       ...(allErrored ? { error: "all_courses_errored" } : {}),
     }, allErrored ? 500 : 200);
 

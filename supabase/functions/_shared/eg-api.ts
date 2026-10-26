@@ -506,6 +506,7 @@ export async function egListFriends(
 //   - whs_scores  keyed on (connection_id, whs_score_uid)
 //   - whs_friends keyed on (connection_id, friend_passport_id)
 
+import { requestCourseMapping } from "./courseMappingTrigger.ts";
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 export interface SyncSummary {
@@ -660,6 +661,17 @@ export async function upsertScores(
   if (scores.length === 0) return empty;
 
   const courseRows = await upsertCoursesFromScores(client, scores);
+
+  // BRIEF_COURSE_MAPPING_ON_SYNC: match never-processed courses now, most
+  // played in this sync first. Fire-and-forget; never awaited, never throws.
+  {
+    const roundCounts = new Map<string, number>();
+    for (const s of scores) {
+      const id = courseRows.get(s.Course?.CourseId ?? -1);
+      if (id) roundCounts.set(id, (roundCounts.get(id) ?? 0) + 1);
+    }
+    requestCourseMapping(client, [...courseRows.values()], roundCounts);
+  }
 
   const rows = scores
     .filter((s) => s.WHSScoreUID != null) // can't dedup without UID
