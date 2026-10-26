@@ -1,8 +1,9 @@
 # Roadmap
 
 ## CB87 — Signup detection and database-owned clbhouz follow
-- [ ] Remove the app-side follow and use parsed confirmation/creation timestamps for all three signup-success events.
-- [ ] Add helper and email/Apple/Google regressions; answer reference audits and report full-suite counts against 3,009 tests / 357 files (one prior AdminShell timeout).
+- [x] Remove the app-side follow and use parsed confirmation/creation timestamps for all three signup-success events. Exported business ID has no consumers; separate onboarding-nudges local constant unchanged. No other equality sites; no existing tests retargeted.
+- [x] Add 16 helper tests and 7 AuthForm/audit tests. Targeted bunx vitest run src/lib/auth/isNewSignup.test.ts src/test/cb87SignupAnalytics.test.tsx: 23/23. Full bunx vitest run: 3,031 passed / 1 failed, 3,032 total / 359 files, versus 3,009 / 357 (+23 / +2). Prior AdminShell failure did not recur. Automatic build 09:18:17Z OK. Report: CB87_signup_stop_report.md.
+- [ ] STOP: src/test/cb84InsightsAudience.test.tsx:215:65, CB84 page > the old "Who's viewing you" card is gone; the other cards still render. AssertionError: expected null not to be null. No fixes, reruns, standalone typecheck or live verification after this new failure.
 
 ## BRIEF_HOLE_PANEL_VIDEO_AUTOPLAY_V2
 - [x] Add shared muted active-shot autoplay using the existing tile coordinator; pause beneath tagging dialogs and fullscreen. Manual players, thumbnails, processing and viewer unchanged.
