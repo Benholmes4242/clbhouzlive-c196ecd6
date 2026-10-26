@@ -149,19 +149,19 @@ vi.mock('@/features/tourhub/tournament-v2/data/useTournamentHoleAnalysis', () =>
 vi.mock('@/features/tourhub/tournament-v2/data/useDrawnRounds', () => ({ useDrawnRounds: () => ({ data: [] }) }));
 vi.mock('@/features/tourhub/tournament-v2/data/useTeeTimesAll', () => ({ useTeeTimesAll: () => ({ data: [] }) }));
 vi.mock('@/features/tourhub/tournament-v2/data/useTournamentStory', () => ({ useTournamentStory: () => ({ data: null }) }));
-const stub = (name: string) => ({ [name]: () => null });
-vi.mock('@/features/tourhub/tournament-v2/sections/HeroSection', () => stub('HeroSection'));
-vi.mock('@/features/tourhub/tournament-v2/sections/ContestSection', () => stub('ContestSection'));
-vi.mock('@/features/tourhub/tournament-v2/sections/MoveSection', () => stub('MoveSection'));
-vi.mock('@/features/tourhub/tournament-v2/sections/MiniBoard', () => stub('MiniBoard'));
-vi.mock('@/features/tourhub/_shared/OnTheCourse', () => stub('OnTheCourse'));
-vi.mock('@/features/tourhub/tournament-v2/sections/AllTeeTimesSheet', () => stub('AllTeeTimesSheet'));
-vi.mock('@/features/tourhub/tournament-v2/sections/TeeTimesRail', () => stub('TeeTimesRail'));
-vi.mock('@/features/tourhub/tournament-v2/sections/CourseSection', () => stub('CourseSection'));
-vi.mock('@/features/tourhub/tournament-v2/sections/MomentsSection', () => stub('MomentsSection'));
-vi.mock('@/features/tourhub/tournament-v2/sections/EventInfoSection', () => stub('EventInfoSection'));
-vi.mock('@/features/tourhub/tournament-v2/sections/StorySection', () => stub('StorySection'));
-vi.mock('@/features/tourhub/tournament-v2/sections/FullBoardSheet', () => stub('FullBoardSheet'));
+
+vi.mock('@/features/tourhub/tournament-v2/sections/HeroSection', () => ({ HeroSection: () => null }));
+vi.mock('@/features/tourhub/tournament-v2/sections/ContestSection', () => ({ ContestSection: () => null }));
+vi.mock('@/features/tourhub/tournament-v2/sections/MoveSection', () => ({ MoveSection: () => null }));
+vi.mock('@/features/tourhub/tournament-v2/sections/MiniBoard', () => ({ MiniBoard: () => null }));
+vi.mock('@/features/tourhub/_shared/OnTheCourse', () => ({ OnTheCourse: () => null }));
+vi.mock('@/features/tourhub/tournament-v2/sections/AllTeeTimesSheet', () => ({ AllTeeTimesSheet: () => null }));
+vi.mock('@/features/tourhub/tournament-v2/sections/TeeTimesRail', () => ({ TeeTimesRail: () => null }));
+vi.mock('@/features/tourhub/tournament-v2/sections/CourseSection', () => ({ CourseSection: () => null }));
+vi.mock('@/features/tourhub/tournament-v2/sections/MomentsSection', () => ({ MomentsSection: () => null }));
+vi.mock('@/features/tourhub/tournament-v2/sections/EventInfoSection', () => ({ EventInfoSection: () => null }));
+vi.mock('@/features/tourhub/tournament-v2/sections/StorySection', () => ({ StorySection: () => null }));
+vi.mock('@/features/tourhub/tournament-v2/sections/FullBoardSheet', () => ({ FullBoardSheet: () => null }));
 
 import { TournamentPage } from '@/features/tourhub/tournament-v2/TournamentPage';
 
