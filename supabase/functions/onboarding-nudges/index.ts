@@ -23,7 +23,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsFor } from '../_shared/cors.ts';
 
-export const FUNCTION_VERSION = '2026-09-01-v1-onboarding-nudges';
+export const FUNCTION_VERSION = '2026-10-26-v2-onboarding-nudges';
 
 /**
  * EMAIL ONLY. clbhouz.co.uk is the canonical host (.com only 301s to it).
