@@ -1,5 +1,9 @@
 # Roadmap
 
+## Review media tray — Add tile leads the strip
+- [x] Moved the one Add control ahead of items.map in MediaTray.tsx so the 72px square sits at the strip's front once anything is picked; empty tray keeps the full-width row, ceiling/disabled still hide it, item order and tile contents unchanged.
+- [x] `bunx vitest run src/test/mediaTrayAddTileFirst.test.tsx`: 4/4; review-v2 group (`src/features/review-v2` + reviewUploadProgress + reviewComposerChrome): 43/43. Full `bunx vitest run`: 3,332/3,332 across 387 files, from 3,328/386 (+4/+1 solely the new file); no existing test changed. Automatic build OK 19:52:47Z. Signed-in/phone visual check unavailable (external_unmanaged).
+
 ## Restore Stream uploads and cleanup
 - [ ] Credential blocker: earlier My Cloudflare API connection is linked but gateway-only; CLOUDFLARE_STREAM_API_TOKEN absent from secret listing. CLOUDFLARE_API_TOKEN exists; awaiting confirmation that it is the supplied Stream token. No secret values read or copied.
 - [ ] Restore direct API calls in the two specified functions, preserving validation and ownership; bump versions and deploy.

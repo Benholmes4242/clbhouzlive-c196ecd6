@@ -51,61 +51,12 @@ export function MediaTray({
           scrollbarWidth: 'none',
         }}
       >
-        {items.map((it) => (
-          <div
-            key={it.id}
-            style={{
-              position: 'relative',
-              width: 72,
-              height: 72,
-              borderRadius: 12,
-              overflow: 'hidden',
-              background: RV2.ghost,
-              flexShrink: 0,
-              border: `1px solid ${RV2.hairline}`,
-            }}
-          >
-            <ReviewMediaPreview {...it} />
-            {it.type === 'video' && it.durationSeconds != null && <span className="review-upload-duration">{Math.floor(it.durationSeconds / 60)}:{String(Math.floor(it.durationSeconds % 60)).padStart(2, '0')}</span>}
-            {it.analysing ? <div className="review-upload-overlay" aria-label="Preparing"><Loader2 size={18} className="motion-safe:animate-spin" /></div>
-              : it.status === 'uploading' ? <div className="review-upload-overlay" role="progressbar" aria-label="Upload progress" aria-valuenow={Math.round(it.progress)} aria-valuemin={0} aria-valuemax={100}>
-                <svg className="review-upload-ring" viewBox="0 0 36 36"><circle className="review-upload-ring-track" cx="18" cy="18" r="15.25" strokeWidth="2.5" fill="none" /><circle className="review-upload-ring-fill" cx="18" cy="18" r="15.25" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeDasharray={2 * Math.PI * 15.25} strokeDashoffset={2 * Math.PI * 15.25 * (1 - Math.max(0, Math.min(100, it.progress)) / 100)} transform="rotate(-90 18 18)" /></svg>
-                <span className="review-upload-percent">{Math.round(it.progress)}<span className="review-upload-percent-sign">%</span></span>
-              </div> : it.status === 'pending' ? <div className="review-upload-overlay"><span className="review-upload-waiting">Waiting</span></div>
-              : it.status === 'failed' ? <Button variant="ghost" type="button" onClick={() => onRetry?.(it.id)} aria-label="Retry upload" className="review-upload-overlay review-upload-failed">Retry</Button>
-              : it.status === 'uploaded' || it.status === 'ready' ? <span className="review-upload-tick" aria-label="Uploaded"><Check size={11} strokeWidth={3.2} /></span> : null}
-
-            <button
-              type="button"
-              onClick={() => onRemove(it.id)}
-              aria-label="Remove"
-              style={{
-                position: 'absolute',
-                top: 4,
-                right: 4,
-                width: 20,
-                height: 20,
-                borderRadius: '50%',
-                border: 'none',
-                background: 'rgba(0,0,0,0.6)',
-                color: RV2.onDark,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                padding: 0,
-              }}
-            >
-              <X size={12} />
-            </button>
-          </div>
-        ))}
-
         {/* ONE add control, two presentations: while the tray is empty it is a
             full-width row (an empty strip is a strip of nothing, so the width is
             free — ~5x the tap area at the same 72px height); from the first item
-            on it is the 72px square at the end of the strip. Same onClick, same
-            hidden input, same aria-label. */}
+            on it is the 72px square at the FRONT of the strip, so it is never
+            parked past the right edge of the screen. Same onClick, same
+            hidden input, same aria-label. Items follow it in the order chosen. */}
         {canAdd && (
           <button
             type="button"
@@ -177,6 +128,56 @@ export function MediaTray({
             )}
           </button>
         )}
+
+        {items.map((it) => (
+          <div
+            key={it.id}
+            style={{
+              position: 'relative',
+              width: 72,
+              height: 72,
+              borderRadius: 12,
+              overflow: 'hidden',
+              background: RV2.ghost,
+              flexShrink: 0,
+              border: `1px solid ${RV2.hairline}`,
+            }}
+          >
+            <ReviewMediaPreview {...it} />
+            {it.type === 'video' && it.durationSeconds != null && <span className="review-upload-duration">{Math.floor(it.durationSeconds / 60)}:{String(Math.floor(it.durationSeconds % 60)).padStart(2, '0')}</span>}
+            {it.analysing ? <div className="review-upload-overlay" aria-label="Preparing"><Loader2 size={18} className="motion-safe:animate-spin" /></div>
+              : it.status === 'uploading' ? <div className="review-upload-overlay" role="progressbar" aria-label="Upload progress" aria-valuenow={Math.round(it.progress)} aria-valuemin={0} aria-valuemax={100}>
+                <svg className="review-upload-ring" viewBox="0 0 36 36"><circle className="review-upload-ring-track" cx="18" cy="18" r="15.25" strokeWidth="2.5" fill="none" /><circle className="review-upload-ring-fill" cx="18" cy="18" r="15.25" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeDasharray={2 * Math.PI * 15.25} strokeDashoffset={2 * Math.PI * 15.25 * (1 - Math.max(0, Math.min(100, it.progress)) / 100)} transform="rotate(-90 18 18)" /></svg>
+                <span className="review-upload-percent">{Math.round(it.progress)}<span className="review-upload-percent-sign">%</span></span>
+              </div> : it.status === 'pending' ? <div className="review-upload-overlay"><span className="review-upload-waiting">Waiting</span></div>
+              : it.status === 'failed' ? <Button variant="ghost" type="button" onClick={() => onRetry?.(it.id)} aria-label="Retry upload" className="review-upload-overlay review-upload-failed">Retry</Button>
+              : it.status === 'uploaded' || it.status === 'ready' ? <span className="review-upload-tick" aria-label="Uploaded"><Check size={11} strokeWidth={3.2} /></span> : null}
+
+            <button
+              type="button"
+              onClick={() => onRemove(it.id)}
+              aria-label="Remove"
+              style={{
+                position: 'absolute',
+                top: 4,
+                right: 4,
+                width: 20,
+                height: 20,
+                borderRadius: '50%',
+                border: 'none',
+                background: 'rgba(0,0,0,0.6)',
+                color: RV2.onDark,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                padding: 0,
+              }}
+            >
+              <X size={12} />
+            </button>
+          </div>
+        ))}
       </div>
 
       {batch.total > 0 && <div className="review-upload-batch" aria-live="polite">
