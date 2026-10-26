@@ -85,7 +85,11 @@ const FACILITIES_BY_CATEGORY: Record<BusinessCategoryValue, string[]> = {
     'Changing rooms', 'Parking',
   ],
   'Golf Academy': COACHING,
-  'Driving Range': COACHING,
+  'Driving Range': [
+    'Covered bays', 'Floodlit', 'Grass tees', 'Ball-tracking technology',
+    'Short-game area', 'Putting green', 'Lessons', 'Club hire', 'Pro shop',
+    'Cafe / bar', 'Parking',
+  ],
   'Coach / Instructor': COACHING,
   'University / College': GENERAL,
   'Creator': [],
