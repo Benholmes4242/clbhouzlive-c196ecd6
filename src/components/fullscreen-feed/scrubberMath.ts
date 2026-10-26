@@ -21,9 +21,11 @@ export function formatClock(seconds: number): string {
   return h >= 1 ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`;
 }
 
-export function expectedOwnerKey(postId: string | undefined, mediaIdx: number): string | null {
+/** Callers supply a post id, never an owner key. Append the slide index even
+ * when a synthetic post id already contains colons, matching FeedSlide. */
+export function expectedOwnerKey(postId: string | undefined, mediaIdx?: number | null): string | null {
   if (!postId) return null;
-  return postId.includes(':') ? postId : `${postId}:${mediaIdx}`;
+  return `${postId}:${mediaIdx ?? 0}`;
 }
 
 // Owner-key match: engine returns either bare postId or `${postId}:${idx}`.
