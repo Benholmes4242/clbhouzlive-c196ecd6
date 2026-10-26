@@ -44,9 +44,10 @@ import { sortTees, yd } from './tees';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
 import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
+import { weekRoom } from './courseLead';
+import './teeSheet.css';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 
 
@@ -749,60 +750,65 @@ const BarRow: React.FC<{
   );
 };
 
-export const SeasonalitySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
-  const months = data.months ?? [];
-  const total = months.reduce((s, m) => s + m.rounds, 0);
-  if (total === 0) {
-    return (
-      <Panel kicker="When members play" style={CARD}>
-        <Body>We hold no dated rounds on this course, so there is no seasonal pattern to show.</Body>
-      </Panel>
-    );
-  }
+/** CB95: weekday conclusions belong to weekRoom; month ties are calendar-first.
+ * Both charts read only this selected payload. Coverage stays a separate card.
+ */
+export function teeSheetModel(data: ClubCourseAnalytics) {
+  const week = weekRoom(data.weekdays ?? []);
+  const values = MONTHS.map((_, i) => data.months?.find(m => m.month === i + 1)?.rounds ?? 0);
+  const total = values.reduce((sum, rounds) => sum + rounds, 0);
+  const fullMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const busiest = values.indexOf(Math.max(...values));
+  const quietest = values.indexOf(Math.min(...values));
+  const summer = values.slice(3, 9).reduce((sum, rounds) => sum + rounds, 0);
+  return { week, values, total, busiest, quietest, monthLead: `${fullMonths[busiest]} is your busiest month`, monthRest: ` and ${fullMonths[quietest]} your quietest; ${total > 0 ? Math.round(summer / total * 100) : 0}% of play lands between April and September.` };
+}
 
-  const values = MONTHS.map((_, i) => months.find((m) => m.month === i + 1)?.rounds ?? 0);
-  const peakIdx = values.indexOf(Math.max(...values));
-  const summer = values.slice(3, 9).reduce((s, v) => s + v, 0);
+export function teeSheetWeekLine(week: NonNullable<ReturnType<typeof weekRoom>>) {
+  const { quietRounds: q, total } = week;
+  return { prefix: q > 0 && q * 10 < total ? 'Only ' : '', bold: q === 0 ? 'No rounds' : `${fmt(q)} of ${fmt(total)} rounds`, rest: ` ${q === 1 ? 'was' : 'were'} played on a ${week.quiet.map(day => day.name).join(' or ')}.` };
+}
 
-  const weekdays = data.weekdays ?? [];
-  const dowValues = DOW.map((_, i) => weekdays.find((w) => w.dow === i + 1)?.rounds ?? 0);
-  const midweek = dowValues.slice(0, 5).reduce((s, v) => s + v, 0);
-  const weekend = dowValues[5] + dowValues[6];
-  const dowTotal = midweek + weekend;
+const TeeSheetBars: React.FC<{ values: number[]; labels: string[]; busiest: number; quiet: number[]; height: number; name: string }> = ({ values, labels, busiest, quiet, height, name }) => {
+  const max = Math.max(1, ...values);
+  return <div className="tee-sheet-inset" data-testid={`${name}-chart`}>
+    <div className="tee-sheet-bars">{values.map((rounds, i) => <div key={i} className="tee-sheet-column" data-tone={i === busiest ? 'busiest' : quiet.includes(i) ? 'quiet' : 'ordinary'}>
+      <div className="tee-sheet-count">{fmt(rounds)}</div>
+      <div className="tee-sheet-bar" style={{ height: Math.max(3, rounds / max * height) }} />
+    </div>)}</div>
+    <div className="tee-sheet-axis">{labels.map((label, i) => <span key={i}>{label}</span>)}</div>
+  </div>;
+};
 
+export const TeeSheetSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
+  const m = teeSheetModel(data);
+  const line = m.week ? teeSheetWeekLine(m.week) : null;
+  return <section className="tee-sheet-card" data-testid="tee-sheet">
+    <div className="tee-sheet-kicker">WHERE THE TEE SHEET HAS ROOM</div>
+    {!m.week && m.total === 0 ? <p className="tee-sheet-line">We hold no dated rounds on this course yet.</p> : <>
+      {m.week && line && <>
+        <h3 className="tee-sheet-title">{m.week.busiest.name} is busiest. {m.week.quiet.map(day => day.name).join(' and ')} {m.week.quiet.length === 2 ? 'have' : 'has'} the most room</h3>
+        <p className="tee-sheet-line">{line.prefix}<b>{line.bold}</b>{line.rest}</p>
+        <h4 className="tee-sheet-subheading">ACROSS THE WEEK</h4>
+        <TeeSheetBars name="week" values={Array.from({ length: 7 }, (_, i) => data.weekdays.find(day => day.dow === i + 1)?.rounds ?? 0)} labels={['M', 'T', 'W', 'T', 'F', 'S', 'S']} busiest={m.week.busiest.dow - 1} quiet={m.week.quiet.map(day => day.dow - 1)} height={72} />
+      </>}
+      {m.total > 0 && <>
+        <h4 className="tee-sheet-subheading">ACROSS THE YEAR</h4>
+        <p className="tee-sheet-line tee-sheet-year-line"><b>{m.monthLead}</b>{m.monthRest}</p>
+        <TeeSheetBars name="month" values={m.values} labels={['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']} busiest={m.busiest} quiet={[m.quietest]} height={60} />
+      </>}
+      <p className="tee-sheet-fine">From {fmt(m.week?.total ?? 0)} rounds by the day they were played, from golfers who have connected their handicap. Rounds carry no time of day, so this cannot split mornings from afternoons.</p>
+    </>}
+  </section>;
+};
+
+export const YearOnYearSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
   const years = [...(data.years ?? [])].sort((a, b) => a.year - b.year);
   const partialYear = years.find((y) => y.partial);
-
+  if (years.length <= 1) return null;
   return (
-    <Panel kicker="When members play" aside={`${fmt(total)} rounds`} style={CARD}>
-      <div style={{ ...BIZ_LABEL, marginBottom: 8 }}>Across the year</div>
-      <Inset>
-        <BarRow labels={MONTHS.map((m) => m[0])} values={values} />
-      </Inset>
-      <Body style={{ marginTop: 10 }}>
-        {MONTHS[peakIdx]} is your busiest month
-        {summer / total >= 0.7
-          ? ', and the great majority of play lands between April and September.'
-          : ', and play is spread fairly evenly across the year.'}
-      </Body>
-
-      {dowTotal > 0 && (
-        <>
-          <div style={{ ...BIZ_LABEL, margin: '18px 0 8px' }}>Across the week</div>
-          <Inset>
-            <BarRow labels={DOW.map((d) => d[0])} values={dowValues} />
-          </Inset>
-          <Body style={{ marginTop: 10 }}>
-            {weekend / dowTotal >= 0.5
-              ? 'Most of the play we hold lands at the weekend, so midweek is where your tee sheet has room.'
-              : 'Most of the play we hold lands midweek, which is unusual and worth reading against your visitor pricing.'}
-          </Body>
-        </>
-      )}
-
-      {years.length > 1 && (
-        <>
-          <div style={{ ...BIZ_LABEL, margin: '18px 0 8px' }}>Year on year</div>
+    <section className="tee-sheet-card" data-testid="year-on-year">
+          <div className="tee-sheet-kicker">YEAR ON YEAR</div>
           <Inset>
             <BarRow
               labels={years.map((y) => String(y.year).slice(2))}
@@ -812,7 +818,7 @@ export const SeasonalitySection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
           </Inset>
           {/* §6.4 — A PART-YEAR IS NOT A FALL. */}
           {partialYear && (
-            <Body style={{ marginTop: 10, fontSize: 12, color: A.AMBER }}>
+            <Body style={{ marginTop: 10, fontSize: 12, color: 'var(--tee-sheet-dim)' }}>
               {partialYear.year} is still in progress, drawn hollow. It is not comparable with a completed year yet.
             </Body>
           )}
@@ -820,9 +826,7 @@ export const SeasonalitySection: React.FC<{ data: ClubCourseAnalytics }> = ({ da
             This is rounds we hold, not rounds played. It rises as more of your members connect, so read it as coverage
             first and demand second.
           </Body>
-        </>
-      )}
-    </Panel>
+    </section>
   );
 };
 

@@ -20,6 +20,17 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --tee-sheet-card:#17171B;
+  --tee-sheet-line:rgba(255,255,255,.08);
+  --tee-sheet-inset:#1E1E23;
+  --tee-sheet-ink:#F8FAFC;
+  --tee-sheet-muted:rgba(248,250,252,.62);
+  --tee-sheet-dim:rgba(248,250,252,.42);
+  --tee-sheet-bar:rgba(248,250,252,.28);
+  --tee-sheet-quiet:rgba(248,250,252,.12);
+}
+
 /* Review-only upload tokens and fixed tile states; post composer stays unchanged. */
 :root {
   --review-upload-overlay: rgba(10,10,12,0.55);

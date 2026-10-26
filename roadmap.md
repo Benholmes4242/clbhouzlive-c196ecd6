@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB95 — Where the tee sheet has room
+- [x] Extract shared weekRoom without changing CB91 courseLead tests; replace seasonality with tee-sheet week/year card and separate unchanged year-on-year content.
+- [ ] Add edge-case tests, verify CB91 and full-suite counts, report pre-existing upload fixture failures and any new failure.
+- [ ] Verify phone-width card rendering; live authenticated course data unavailable under external-managed auth.
+
 ## BRIEF_REVIEW_MEDIA_UPLOAD_PROGRESS
 - [x] OWNERSHIP foundation: Cloudflare connection linked; TUS auth.getUser, server Upload-Creator and stripped creator/owner metadata; creator/owned-legacy-row Stream cleanup, owned-row deletion and real signed R2 HEAD/DELETE. Both deployed GET versions confirmed 2026-10-26-review-owner-v1; unsigned POST401 verified. Deno check --node-modules-dir=auto passed after dependency/request-type fixes. No SQL/migrations.
 - [x] Initial ownership stop superseded by OWNERSHIP ruling. Added14 ownership cases, all pass. Review upload controller/hook now have two-slot preuploads and joins, serial probes/no-preview and Stream poster fallback, exact tray/batch states and count-aware footer keys. Existing-media removal delegates cleanup before row deletion so legacy proof survives. Signed-in live creation/cleanup not verified (external_unmanaged).
