@@ -58,10 +58,10 @@ serve(async req => {
           const aws = new AwsClient({ accessKeyId: access, secretAccessKey: secret, service: 's3', region: 'auto' });
           const target = `https://${account}.r2.cloudflarestorage.com/${encodeURIComponent(bucket)}/${key.split('/').map(encodeURIComponent).join('/')}`;
           // HEAD distinguishes absent objects: S3 DELETE itself returns 204 even if absent.
-          const head = await aws.fetch(target, { method: 'HEAD' }); await head.arrayBuffer();
+          const head = await aws.fetch(new Request(target, { method: 'HEAD' })); await head.arrayBuffer();
           if (head.status === 404) return 'not_found';
           if (!head.ok) throw new Error(`R2 HEAD failed: ${head.status}`);
-          const deleted = await aws.fetch(target, { method: 'DELETE' }); const text = await deleted.text();
+          const deleted = await aws.fetch(new Request(target, { method: 'DELETE' })); const text = await deleted.text();
           if (!deleted.ok) throw new Error(`R2 DELETE failed: ${deleted.status} ${text}`);
           return 'deleted' as CleanupStatus;
         },
