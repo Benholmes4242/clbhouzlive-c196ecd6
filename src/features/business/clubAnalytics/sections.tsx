@@ -496,7 +496,14 @@ export const RecordBookSection: React.FC<{ data: ClubCourseAnalytics; onSeeChamp
   const stableford = rb?.best_stableford;
   const holders = rb?.holders_ever ?? gross?.changed_hands ?? null;
   const since = rb?.rounds_since_record ?? null;
-  if (!rb || (gross?.value == null && birdies?.value == null && stableford?.value == null)) return null;
+  if (!rb || (gross?.value == null && birdies?.value == null && stableford?.value == null)) {
+    return (
+      <section data-testid="records" style={S7_CARD}>
+        <div style={S7_KICKER}>Records</div>
+        <div style={{ marginTop: 6, fontSize: 12.5, lineHeight: 1.45, color: HIP.MUTE }}>No record has been set on this course by a connected member yet. The first one appears here as soon as it is.</div>
+      </section>
+    );
+  }
 
   const rows: { name: string; meta: string | null; value: string }[] = [];
   if (gross?.value != null) {

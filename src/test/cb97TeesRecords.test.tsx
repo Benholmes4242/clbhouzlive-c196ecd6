@@ -58,8 +58,11 @@ describe('CB97 Records', () => {
     expect(screen.getAllByTestId('record-meta').map(e => e.textContent)).toEqual(['Set 27 Jun 2026', 'Set 2 Jan 2026']);
     expect(screen.getAllByTestId('record-row')).toHaveLength(2);
   });
-  it('no values renders no card', () => {
-    const v = render(<RecordBookSection data={D(RB({ lowest_gross: null, best_stableford: null, most_birdies: null }))} />);
-    expect(v.container.innerHTML).toBe('');
+  it('no values renders the empty records card', () => {
+    const v = render(<RecordBookSection data={D(RB({ lowest_gross: null, best_stableford: null, most_birdies: null }))} onSeeChampions={() => {}} />);
+    expect(screen.getByTestId('records')).toBeTruthy();
+    expect(screen.queryAllByTestId('record-row')).toHaveLength(0);
+    expect(screen.queryByRole('button')).toBeNull();
+    expect(v.container.textContent).toContain('No record has been set on this course by a connected member yet.');
   });
 });
