@@ -2,7 +2,9 @@
 
 ## BRIEF_SYNC_WHS_DUE_FAILURE_TYPE
 - [x] Widen retry/failure parameter types to shared EgErrorKind excluding preauth_expired, retaining ok for success. Type-only call-site assertions preserve existing runtime paths; auth early return remains unchanged, member-token reads cannot throw preauth_expired. SyncResult.status already string. not_found/bad_request retain default backoff; all writes/timing unchanged.
-- [ ] Deno check, full suite, deploy sync-whs-due and confirm platform deployment version. Pre-existing CB90 selector failure remains untouched.
+- [x] deno check supabase/functions/sync-whs-due/index.ts clean. bunx vitest run: 3,130 passed / 1 pre-existing CB90 selector failure / 3,131 total / 366 files. No tests changed; prior full 3,119/365 plus CB90's 12 cases/one file reconciles exactly. No new failures.
+- [x] Deployed sync-whs-due successfully; submitted source SHA-256 be66e55815d33f44de2801a5981eff5120f9f4fe7bdcd5b3d22182bf6034a81a. No SQL or timing/write/runtime changes.
+- [ ] Platform deployment version/live SHA unverified: deploy tool returned success and submitted SHA only; function exposes no version and available read-only metadata tools/routes do not list deployed versions. No cron invocation made because it writes data. Pre-existing CB90 failure at src/test/cb90ReviewsNeutral.test.tsx:118:28 remains untouched.
 
 ## CB90 — Reviews neutral paint and one reply close control
 - [x] Read the brief and audit existing reviews assertions; none require retargeting. Preserve reply behaviour, rating foregrounds and outer-band washes.
