@@ -29,6 +29,8 @@ import { orderedBatch, type BatchPhoto } from '@/lib/courseMedia/holePhotoBatch'
 import { holePhotoErrorMessage } from '@/lib/courseMedia/holePhotoError';
 import { coursePhotoState } from '@/lib/courseMedia/emptyStates';
 import { isHoleTagFromPost } from '@/lib/courseMedia/removeHoleTag';
+import { memberTagConfirmation } from '@/lib/courseMedia/holeTagConfirmation';
+import { toast } from 'sonner';
 import { CourseFirstPhotoPicker, CoursePhotoRetagPicker, HoleTagRemoveDialog, CourseMediaNoPhotographs, CourseMediaNothing, CourseMediaNoHoleList, CourseMediaNotLive } from './CourseMediaEmptyStates';
 
 interface CourseMediaTabNewProps {
@@ -162,6 +164,9 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const photoState = countsReady && analysis.isSuccess && analysis.data
     ? coursePhotoState(mediaCounts.total > 0 || (tagging.tags.data ?? []).some(row => row.status === 'approved'), walkHoles != null)
     : null;
+  // The member's own non-rejected tags, one entry per tag, so confirmations can
+  // say "your second tag on the 9th" (BRIEF_HOLE_TAG_BATCH_V3).
+  const ownHoleTags = user ? (tagging.tags.data ?? []).filter(row => row.user_id === user.id && row.status !== 'rejected').map(row => row.hole_no) : [];
 
   if (!user) {
     return (
