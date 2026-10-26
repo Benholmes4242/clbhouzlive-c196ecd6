@@ -12317,6 +12317,7 @@ export type Database = {
           raw_data: Json | null
           scoring_system: string | null
           season_id: string | null
+          situation_note: string | null
           sr_id: string
           start_date: string | null
           status: string | null
@@ -12364,6 +12365,7 @@ export type Database = {
           raw_data?: Json | null
           scoring_system?: string | null
           season_id?: string | null
+          situation_note?: string | null
           sr_id: string
           start_date?: string | null
           status?: string | null
@@ -12411,6 +12413,7 @@ export type Database = {
           raw_data?: Json | null
           scoring_system?: string | null
           season_id?: string | null
+          situation_note?: string | null
           sr_id?: string
           start_date?: string | null
           status?: string | null

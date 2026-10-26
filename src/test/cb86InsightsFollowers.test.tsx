@@ -179,7 +179,7 @@ describe('CB86 page', () => {
     await waitFor(() => expect(container.querySelector('[data-card="followers"]')).not.toBeNull());
     await waitFor(() => expect(container.querySelector('[data-card="posts"]')).not.toBeNull());
     expect(container.querySelector('[data-section="insights-funnel"]')).not.toBeNull();
-    expect(container.querySelector('[data-card="visits"]')).not.toBeNull();
+    await waitFor(() => expect(container.querySelector('[data-card="visits"]')).not.toBeNull());
     expect(queryByText('Follower growth')).toBeNull();
     expect(queryByText('AUDIENCE')).toBeNull();
     expect(getByText('ENGAGEMENT')).toBeTruthy();
