@@ -769,13 +769,6 @@
         "notAffected": "Not affected by the 7, 30 or 90 days above.",
         "noneTitle": "No golfers follow {{business}} yet."
       },
-      "followers": {
-        "total": "Total"
-      },
-      "empty": {
-        "followersTitle": "Follower growth",
-        "followersBody": "Follower activity will appear here as it happens."
-      },
       "rate": {
         "from_one": "From {{n}} impression",
         "from_other": "From {{n}} impressions",
@@ -884,6 +877,35 @@
         "lastReached_other": "Your last post went up on <b>{{date}}</b> and reached <b>{{n}} golfers</b>.",
         "lastZero": "Your last post went up on <b>{{date}}</b> and hasn't reached anyone yet.",
         "write": "Write a post"
+      },
+      "followersCard": {
+        "kicker": "Followers",
+        "inTotal": "{{n}} in total",
+        "noneTitle": "No golfers follow {{business}} yet",
+        "title_7_one": "{{n}} new follower in 7 days",
+        "title_7_other": "{{n}} new followers in 7 days",
+        "titleZero_7": "No new followers in 7 days",
+        "saw_7_one": "follower saw at least one of your posts in the last 7 days.",
+        "saw_7_other": "followers saw at least one of your posts in the last 7 days.",
+        "title_30_one": "{{n}} new follower in 30 days",
+        "title_30_other": "{{n}} new followers in 30 days",
+        "titleZero_30": "No new followers in 30 days",
+        "saw_30_one": "follower saw at least one of your posts in the last 30 days.",
+        "saw_30_other": "followers saw at least one of your posts in the last 30 days.",
+        "title_90_one": "{{n}} new follower in 90 days",
+        "title_90_other": "{{n}} new followers in 90 days",
+        "titleZero_90": "No new followers in 90 days",
+        "saw_90_one": "follower saw at least one of your posts in the last 90 days.",
+        "saw_90_other": "followers saw at least one of your posts in the last 90 days.",
+        "changeUp": "+{{n}}",
+        "changeUpPct": "+{{n}}%",
+        "changeDown": "{{n}} fewer",
+        "changeDownPct": "{{n}}% fewer",
+        "lastDate": "The last one followed you on <b>{{date}}</b>.",
+        "lastToday": "The last one followed you <b>today</b>.",
+        "lastYesterday": "The last one followed you <b>yesterday</b>.",
+        "of": "of {{n}}",
+        "mergeFine": "Follows from before 28 Aug 2026 have no date, so they never count as new."
       }
     },
     "week": {
