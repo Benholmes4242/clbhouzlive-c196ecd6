@@ -260,7 +260,7 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics; businessName?:
     ? (hardest && easiest ? `Hole ${hardest.hole_no} plays hardest, hole ${easiest.hole_no} easiest` : 'Hole by hole')
     : 'Hole by hole fills in with the first full round';
   const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };
-  const heading: React.CSSProperties = { fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM, whiteSpace: 'nowrap' };
+  const heading: React.CSSProperties = { fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM, whiteSpace: 'nowrap', fontFamily: 'Geist, sans-serif' };
 
   return (
     <section data-testid="hole-by-hole" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS, ...FIGS }}>
