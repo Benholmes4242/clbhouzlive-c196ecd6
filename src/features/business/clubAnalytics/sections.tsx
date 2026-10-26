@@ -41,7 +41,7 @@ import { buildSiLadder, SI_PLACES_GATE } from '@/features/courses/_shared/siLadd
 import { numberWord, ordinal } from '@/lib/text/numbers';
 import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 import type { ClubCourseAnalytics, ClubAnalyticsTee } from './types';
-import { sortTees, yd } from './tees';
+import { sortTees } from './tees';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
 import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
