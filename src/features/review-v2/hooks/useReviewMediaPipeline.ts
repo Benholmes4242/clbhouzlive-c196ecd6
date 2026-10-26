@@ -802,8 +802,10 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
   // need no attach row; pending files are enriched by the background job.
   const writeUploadedHolePhotos = useCallback((holeJob?: ComposerHoleJob) => {
     if (!userId || !holeJob) return;
+    // BRIEF_REVIEW_WIZARD_VIDEO_HOLE_TAGS: videos tag too; the item carries
+    // streamId/posterUrl/durationSeconds/width/height through to the writer.
     for (const item of itemsRef.current) {
-      if (item.type === 'image' && item.uploadedUrl) void writeComposerHolePhoto(holeJob, userId, item, item.uploadedUrl);
+      if ((item.type === 'image' || item.type === 'video') && item.uploadedUrl) void writeComposerHolePhoto(holeJob, userId, item, item.uploadedUrl);
     }
   }, [userId]);
 
