@@ -178,14 +178,12 @@ function ReplySheet({
             className={`w-full resize-none outline-none ${FIELD_PAINT_RAISED_CLASS} ${FIELD_PLACEHOLDER_CLASS}`}
             style={{ padding: '12px 14px', fontSize: 15, color: INK, fontFamily: 'inherit' }}
           />
-          <div className="flex items-center justify-between">
-            <span className="text-[12px]" style={{ color: INK_45 }}>
-              Posted publicly as the business
-            </span>
+          <div className="flex items-center justify-end">
             <span className="text-[12px] tabular-nums" style={{ color: count > 900 ? RED : INK_45 }}>
               {count}/1000
             </span>
           </div>
+
         </div>
 
         <div className="px-4 pt-3 pb-0" style={{ borderTop: `1px solid ${HAIR}`, paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}>

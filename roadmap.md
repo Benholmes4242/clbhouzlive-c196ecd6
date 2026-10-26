@@ -924,3 +924,8 @@
 ## CB98.1 — page foot wording
 - [x] Privacy foot line on Your courses now reads the signed-off mock sentence exactly (ClubAnalyticsPage.tsx); styling unchanged.
 - [x] Retargeted the only assertion of the old sentence, cb91CoursesTop.test.tsx:43 regex. Full bunx vitest run 3,293 passed /381 files /0 failed (unchanged total, no new files); tsc clean; harness build OK.
+
+## CB101 — Reviews reply sheet: one identity line
+- [x] Removed the "Posted publicly as the business" span under the textarea in BusinessReviewsPage.tsx; the row is now justify-end and holds only the counter (12px, tabular-nums, INK_45, RED above 900 unchanged). Header line untouched.
+- [x] No existing test asserted the phrase (grep: none), so none was retargeted. Added src/test/cb101ReplySheetLine.test.tsx (2 cases: line reads once inside the header; counter row holds only "0/1000" and keeps the header line's colour).
+- [x] Full bunx vitest run 3,320 passed / 1 failed / 3,321 tests / 384 files; tsc clean; harness build OK. The one failure is pre-existing: cb99InsightsCourse.test.tsx:82 "course card follows Reviews; sections one to seven still settle" (expected null not to be null), carried from CB100.
