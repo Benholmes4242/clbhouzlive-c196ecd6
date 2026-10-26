@@ -40,7 +40,7 @@ describe('CB91 Your courses top', () => {
     const view = mount();
     const last = view.container.querySelector('[data-section="SampleSection"]');
     const request = screen.getByText('Missing a course?');
-    const privacy = screen.getByText(/Everything on this page is an aggregate/);
+    const privacy = screen.getByText(/Every figure here is a total across rounds/);
     if (!last) throw new Error('Missing final course section');
     expect(last.compareDocumentPosition(request) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(request.compareDocumentPosition(privacy) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();

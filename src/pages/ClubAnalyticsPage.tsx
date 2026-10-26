@@ -431,8 +431,8 @@ export default function ClubAnalyticsPage() {
           )}
           <div data-testid="page-foot" style={{ padding: '18px 4px 4px' }}>
             <p style={{ fontSize: 11.5, lineHeight: 1.45, margin: 0, color: 'rgba(248,250,252,0.42)' }}>
-              Everything on this page is an aggregate across rounds played on your courses. No individual member, round or
-              score is shown here, and none is available to your club.
+              Every figure here is a total across rounds on your courses. No member, round or score is shown, and none is
+              available to your club.
             </p>
             <button type="button" onClick={() => navigate(`/business/${business.id}/insights`)}
               style={{ marginTop: 12, width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: 'none', background: 'transparent', padding: 0, fontSize: 13, fontWeight: 700, color: '#F8FAFC', cursor: 'pointer', fontFamily: 'inherit' }}>
