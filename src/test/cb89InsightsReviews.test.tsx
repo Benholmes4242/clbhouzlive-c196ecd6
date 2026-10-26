@@ -106,6 +106,28 @@ describe('CB89 courses and rank', () => {
     expect((rows[0].querySelector('[data-course-avg]') as HTMLElement).style.color).toBe(GREEN);
     expect((rows[1].querySelector('[data-course-avg]') as HTMLElement).style.color).not.toBe(GREEN);
   });
+  it('CB89.1 a parenthesised course name prints only the course', async () => {
+    const c = await card(renderCard({
+      ...base,
+      courses: [
+        { ...course('a', 11, 9.2, 2, 30), name: 'Sundridge Park Golf Club (East Course)' },
+        { ...course('b', 1, 7), name: 'Sundridge Park Golf Club (West Course)' },
+      ],
+    }).container);
+    expect([...c.querySelectorAll('.insights-reviews-course-name')].map(n => n.textContent))
+      .toEqual(['East Course', 'West Course']);
+  });
+  it('CB89.1 a name with no brackets prints unchanged', async () => {
+    const c = await card(renderCard({
+      ...base,
+      courses: [
+        { ...course('a', 11, 9.2, 2, 30), name: 'Eltham Warren Golf Club' },
+        { ...course('b', 1, 7), name: 'Royal Lytham & St Annes' },
+      ],
+    }).container);
+    expect([...c.querySelectorAll('.insights-reviews-course-name')].map(n => n.textContent))
+      .toEqual(['Eltham Warren Golf Club', 'Royal Lytham & St Annes']);
+  });
 });
 
 describe('CB89 new-reviews line', () => {
