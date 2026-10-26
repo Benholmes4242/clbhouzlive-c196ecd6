@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB93 — Your courses section 3
+- [ ] Update HoleBySection only: hardest-first default, five-column table, ranked headline, single expanded per-hole split, HIP card paint and full-round empty state; CB91/CB92 and all other sections frozen.
+- [ ] Scope ruling needed: the no-full-rounds copy requires CB91's trimmed business-name label, but HoleBySection receives only the analytics payload. Request permission to pass existing businessName/courseCount through its single page call; no new reads.
+- [ ] Add new behavior tests; no existing direct HoleBySection assertions need retargeting. Run full bunx vitest run; last reported baseline 3,186 tests/371 files, zero failures. Preserve all prohibited backend/config/native scope.
+
 ## CB91 — Your courses section 1
 - [x] Received and read courses-s1.html; written brief wins changed typography (23px) and selected-course rules; frozen shell/chips/lower sections retain existing design.
 - [x] Implement selected-course pure lead, loaded business subtitle and unchanged request panel after course block/before privacy. Chips, gates/notices/unclaimed and all lower sections untouched.
