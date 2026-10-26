@@ -64,7 +64,7 @@ export function CoursePhotoRetagPicker({ row, knownHoles, pending, error, onSubm
   onSubmit: (hole: number) => void; onClose: () => void; mode?: 'retag' | 'move';
 }) {
   const move = mode === 'move';
-  return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent className="media-empty" style={{ ...theme, background: A.PANEL }} onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
+  return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent className="media-empty media-empty-dialog" style={{ ...theme, background: A.PANEL }} onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
     <DialogTitle>{move ? 'Move from the' : 'Retag the'} {row.hole_no}{ordinalSuffix(row.hole_no)}</DialogTitle>
     <DialogDescription className="media-empty-lede">{move ? 'Choose the hole this was taken on.' : 'Choose a different hole.'}</DialogDescription>
     {row.media_type === 'video' ? <div className="media-empty-retag-photo hole-media-preview"><HoleMediaThumbnail url={row.media_url} mediaType={row.media_type} streamId={row.stream_id} posterUrl={row.poster_url} durationSeconds={row.duration_seconds} alt={move ? 'Your video' : 'Your rejected video'} /></div> : <img src={row.media_url} alt={move ? 'Your photo' : 'Your rejected photograph'} className="media-empty-retag-photo" />}
@@ -80,7 +80,7 @@ export function HoleTagRemoveDialog({ row, fromPost, pending, error, onConfirm, 
   onConfirm: () => void; onClose: () => void;
 }) {
   const video = row.media_type === 'video';
-  return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent className="media-empty" style={{ ...theme, background: A.PANEL }} onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
+  return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent className="media-empty media-empty-dialog" style={{ ...theme, background: A.PANEL }} onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
     <DialogTitle>Remove from the {row.hole_no}{ordinalSuffix(row.hole_no)}?</DialogTitle>
     <DialogDescription className="media-empty-lede">{fromPost === false ? "You added this straight to the hole, so it won't appear anywhere on clbhouz after this." : fromPost ? 'It comes off the hole walk. Your post or review keeps it.' : 'It comes off the hole walk.'}</DialogDescription>
     {video ? <div className="media-empty-retag-photo hole-media-preview"><HoleMediaThumbnail url={row.media_url} mediaType={row.media_type} streamId={row.stream_id} posterUrl={row.poster_url} durationSeconds={row.duration_seconds} alt="Your video" /></div> : <img src={row.media_url} alt="Your photo" className="media-empty-retag-photo" />}
