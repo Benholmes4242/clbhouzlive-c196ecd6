@@ -1,7 +1,7 @@
 # Roadmap
 
 ## CB102.1 — Welcome gutters and Driving Range facilities
-- [ ] Welcome spacing blocked by conflicting clauses: prescribed outer padding leaves the opening's existing 6px top / 2px side inset, so kicker offsets would be 26px / 18px rather than required 20px / 16px. ManagePageShell also adds 32px below the wrapper, so pb-7 cannot yield 28px to the scroll end. Await ruling before spacing edits. Signed-in browser measurements unavailable (external_unmanaged).
+- [x] Corrected ruling: apply only welcome outer padding 4px 0 0 and wrapper pb-7; preserve opening inset 6px 2px 22px and shared ManagePageShell. Code-derived kicker left 34→18px, header gap 42→26px; cards left 32→16px. Device measurements waived; original bottom target withdrawn.
 - [x] Give Driving Range the exact dedicated facilities list; preserve COACHING and every other category.
 - [x] `bunx vitest run src/test/cb102BusinessWelcome.test.tsx`: 9/9. `bunx vitest run`: 3,348/3,348 across 388 files, zero failures, from 3,347/388 (+1 solely “Driving Range has its own facilities list”). Existing tests unchanged. Brief's 3,346 expectation predates the two tagging follow-up cases.
 

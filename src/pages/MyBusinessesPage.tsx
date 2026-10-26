@@ -122,7 +122,7 @@ const MyBusinessesPage = () => {
         {loading && <BusinessHomeHeaderSkeleton />}
 
         {!loading && memberships.length === 0 && (
-          <div className="pt-4 px-4 w-full pb-8">
+          <div className="pt-4 px-4 w-full pb-7">
             <BusinessEmptyState onCreate={handleCreateBusiness} />
           </div>
         )}
