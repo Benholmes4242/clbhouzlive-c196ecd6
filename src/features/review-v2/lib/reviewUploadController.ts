@@ -50,6 +50,7 @@ export interface ReviewUploadInput {
   width?: number | null;
   height?: number | null;
   durationSeconds?: number | null;
+  trackBytes?: boolean;
   uploadedUrl?: string | null;
   streamId?: string | null;
   posterUrl?: string | null;
@@ -91,6 +92,12 @@ function emit(job: Job) {
 
 /** Image XHR exposes real transferred file bytes; functions.invoke cannot do this. */
 async function uploadImage(userId: string, item: ReviewUploadInput, onProgress: (pct: number) => void, signal: AbortSignal): Promise<ReviewUploadResult> {
+  if (!item.trackBytes) {
+    const form = new FormData(); form.append('file', item.file); form.append('fileName', `${userId}-${Date.now()}-${item.file.name}`);
+    const { data, error } = await supabase.functions.invoke('cloudflare-r2-upload', { body: form });
+    if (error || !data?.success || !data?.publicUrl) throw new Error(error?.message || data?.error || 'Image upload failed');
+    return { id: item.id, ok: true, uploadedUrl: data.publicUrl };
+  }
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) throw new Error('Sign in to upload');
   const form = new FormData(); form.append('file', item.file);
@@ -433,7 +440,7 @@ export async function uploadAndPublishReview(
       media_url: r.uploadedUrl ?? '',
       media_type: input.type,
       stream_id: r.streamId ?? null,
-      poster_url: r.posterUrl ?? null,
+      poster_url: input.posterUrl ?? r.posterUrl ?? null,
       width: w,
       height: h,
       aspect_ratio: w && h ? Number((w / h).toFixed(4)) : null,
