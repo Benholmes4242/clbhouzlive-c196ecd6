@@ -24,7 +24,10 @@ class FakeXHR {
 const photo = () => new File(['1234567890'], 'p.jpg', { type: 'image/jpeg' });
 const video = () => new File(['clip'], 'v.mp4', { type: 'video/mp4' });
 let key = 0;
+const urlOrig = { create: Object.getOwnPropertyDescriptor(URL, 'createObjectURL'), revoke: Object.getOwnPropertyDescriptor(URL, 'revokeObjectURL') };
 beforeEach(() => {
+  if (!('createObjectURL' in URL)) Object.defineProperty(URL, 'createObjectURL', { value: vi.fn(() => 'blob:test'), writable: true, configurable: true });
+  if (!('revokeObjectURL' in URL)) Object.defineProperty(URL, 'revokeObjectURL', { value: vi.fn(), writable: true, configurable: true });
   vi.clearAllMocks(); requests.length = 0; vi.stubGlobal('XMLHttpRequest', FakeXHR);
   vi.stubGlobal('Image', class { naturalWidth = 100; naturalHeight = 100; onload?: () => void; set src(_v: string) { queueMicrotask(() => this.onload?.()); } });
   vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:test'); vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
@@ -33,7 +36,11 @@ beforeEach(() => {
   f.probe.mockResolvedValue({ duration: 75, posterUrl: null });
   f.video.mockImplementation((opts: any) => { opts.onSuccess('stream'); return Promise.resolve({ abort: vi.fn() }); });
 });
-afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+afterEach(() => {
+  cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals();
+  if (urlOrig.create) Object.defineProperty(URL, 'createObjectURL', urlOrig.create); else delete (URL as any).createObjectURL;
+  if (urlOrig.revoke) Object.defineProperty(URL, 'revokeObjectURL', urlOrig.revoke); else delete (URL as any).revokeObjectURL;
+});
 it('photos start upload immediately on add without any row insert', async () => {
   const { result } = renderHook(() => useReviewMediaPipeline({ userId: 'member' }));
   await act(async () => { await result.current.addFiles([photo()]); });
