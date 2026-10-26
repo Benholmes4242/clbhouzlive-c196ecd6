@@ -196,8 +196,8 @@ describe('CB82 page', () => {
     expect(screen.queryByText('CONTENT')).toBeNull();
     expect(screen.getByText('ENGAGEMENT')).toBeTruthy();
     // CB84 replaced the locked "Who's viewing you" card with YOUR GOLFERS;
-    // only the Follower growth card still carries the AUDIENCE kicker.
-    expect(screen.getAllByText('AUDIENCE')).toHaveLength(1);
+    // CB86 replaced AUDIENCE · Follower growth with FOLLOWERS, so no AUDIENCE kicker remains.
+    expect(screen.queryAllByText('AUDIENCE')).toHaveLength(0);
     expect(screen.queryByText("Who's viewing you")).toBeNull();
   });
 

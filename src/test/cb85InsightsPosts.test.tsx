@@ -226,7 +226,9 @@ describe('CB85 page', () => {
     await waitFor(() => expect(container.querySelector('[data-card="posts"]')).not.toBeNull());
     expect(queryByText('Top posts')).toBeNull();
     expect(queryByText('CONTENT')).toBeNull();
-    expect(getByText('Follower growth')).toBeTruthy();
+    // CB86: the FOLLOWERS card replaced Follower growth.
+    expect(queryByText('Follower growth')).toBeNull();
+    await waitFor(() => expect(container.querySelector('[data-card="followers"]')).not.toBeNull());
     expect(getByText('ENGAGEMENT')).toBeTruthy();
     expect(getByText('Reviews & reputation')).toBeTruthy();
   });
