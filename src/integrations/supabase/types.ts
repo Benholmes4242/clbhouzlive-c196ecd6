@@ -20595,6 +20595,10 @@ export type Database = {
         Args: { target_business_id: string }
         Returns: Json
       }
+      get_business_review_summary: {
+        Args: { p_business_id: string; p_days?: number }
+        Returns: Json
+      }
       get_business_reviews: {
         Args: {
           p_business_id: string
