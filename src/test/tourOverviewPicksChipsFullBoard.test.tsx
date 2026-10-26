@@ -3,7 +3,7 @@
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import type { HeroState } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
@@ -145,7 +145,6 @@ function mountHero(state: HeroState, onOpenTournament = vi.fn(), s = slide()) {
   return onOpenTournament;
 }
 function LocationProbe() {
-  const { useLocation } = require('react-router-dom') as typeof import('react-router-dom');
   const loc = useLocation();
   return <div data-testid="loc">{loc.pathname + loc.search}</div>;
 }
