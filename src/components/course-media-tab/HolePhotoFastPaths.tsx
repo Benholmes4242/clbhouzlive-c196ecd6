@@ -24,7 +24,7 @@ import { adminTagConfirmation, memberTagConfirmation } from '@/lib/courseMedia/h
 import { ordinal } from '@/lib/text/numbers';
 import './hole-photo-fast.css';
 
-const theme = { '--hole-walk-ink': A.INK, '--hole-walk-canvas': A.CANVAS, '--hole-walk-muted': A.MUTE, '--hole-walk-rule': A.BORDER, '--hole-walk-track': A.TRACK, '--hole-photo-panel': A.PANEL, '--hole-photo-success': A.IMPROVED, '--hole-walk-body': A.BODY, '--hole-walk-dim': A.DIM } as CSSProperties;
+export const theme = { '--hole-walk-ink': A.INK, '--hole-walk-canvas': A.CANVAS, '--hole-walk-muted': A.MUTE, '--hole-walk-rule': A.BORDER, '--hole-walk-track': A.TRACK, '--hole-photo-panel': A.PANEL, '--hole-photo-success': A.IMPROVED, '--hole-walk-body': A.BODY, '--hole-walk-dim': A.DIM } as CSSProperties;
 
 export function HoleKnownPhotoPath({ hole, photos, sources = [], pending, uploadProgress, error, onChoose, onLibrary, onClose }: {
   hole: number; photos: readonly string[]; sources?: readonly OwnMediaSource[]; round?: HolePhotoRound; pending: boolean; uploadProgress?: number | null; result?: HolePhoto | null; error: string | null;
