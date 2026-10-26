@@ -76,7 +76,7 @@ const COPY: Record<Gap, Copy> = {
     body:
       'Once you connect your handicap, every round you play turns up here on its ' +
       'own, scored hole by hole against the course you played it on. Nothing to type in.',
-    path: '/handicap',
+    path: '/manage/handicap',
     src: 'nudge_whs',
     goKey: 'handicap',
   },
