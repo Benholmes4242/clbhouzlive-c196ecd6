@@ -162,13 +162,15 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
     expect(screen.getByRole('button', { name: 'Hole 2' })).toHaveStyle({ opacity: '0.4' });
   });
   it('confirming the last tagged shot reads All tagged and is disabled', () => {
-    const assign = vi.fn();
-    render(<ReviewHoleTags {...props({ shots: [photo, video], assignments: { p: 2 }, assign })} />);
+    const assignments: Record<string, number> = { p: 2 };
+    const assign = vi.fn((id: string, hole: number) => { assignments[id] = hole; });
+    render(<ReviewHoleTags {...props({ shots: [photo, video], assignments, assign })} />);
     fireEvent.click(screen.getByRole('button', { name: 'Tag video 1' }));
     fireEvent.click(screen.getByRole('button', { name: 'Hole 2' }));
     fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
     expect(assign).toHaveBeenCalledWith('v', 2);
     expect(screen.getByRole('button', { name: 'All tagged' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Hole 2' })).toHaveAttribute('aria-pressed', 'false');
   });
   it('opening a row on a tagged shot enters the tagged state; an untagged row starts fresh', () => {
     render(<ReviewHoleTags {...props({ shots: [photo, { ...photo, id: 'q' }], holes: [7, 9], assignments: { p: 7 } })} />);
