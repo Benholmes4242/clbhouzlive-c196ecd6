@@ -33,23 +33,12 @@ import { Button } from '@/components/ui/button';
 import { RailChips } from '@/components/ui/RailChips';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { BIZ } from '@/components/business/businessTokens';
-import { formatNumber } from '@/i18n/format';
 import {
-  A, BIZ_TITLE, BIZ_BODY, bizFigure, BIZ_TRACK_H,
+  A, BIZ_BODY,
 } from '@/features/courses/components/holes/analytical/tokens';
 
 type DateRange = '7d' | '30d' | '90d';
 const RANGE_DAYS: Record<DateRange, number> = { '7d': 7, '30d': 30, '90d': 90 };
-
-/** Bar fill on a dark track: ink at reduced alpha, lighter than A.TRACK, so
- *  the filled part reads as filled rather than as a hole in the track. */
-const BAR_FILL = A.DIM;
-
-
-const cardStyle: React.CSSProperties = { background: BIZ.card, border: `1px solid ${BIZ.hair}` };
-const numFeat: React.CSSProperties = { fontFeatureSettings: '"kern" 1, "liga" 1' };
-
-const formatNum = (n: number) => formatNumber(n ?? 0);
 
 // ─────────────────────────────────────────────────────────────
 // Page

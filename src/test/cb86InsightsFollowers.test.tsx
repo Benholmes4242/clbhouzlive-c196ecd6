@@ -183,6 +183,6 @@ describe('CB86 page', () => {
     expect(queryByText('Follower growth')).toBeNull();
     expect(queryByText('AUDIENCE')).toBeNull();
     expect(queryByText('Engagement rate')).toBeNull();
-    expect(getByText('Reviews & reputation')).toBeTruthy();
+    expect(queryByText('Reviews & reputation')).toBeNull();
   });
 });

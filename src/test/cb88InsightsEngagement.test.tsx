@@ -178,7 +178,7 @@ describe('CB88 states and data', () => {
 
 describe('CB88 page', () => {
   it('Engagement rate gone; sections 1–5, engagement and REVIEWS render', async () => {
-    rpc.mockImplementation((name: string) => Promise.resolve({ data: name === 'get_business_engagement' ? base : {}, error: null }));
+    rpc.mockImplementation((name: string) => Promise.resolve({ data: name === 'get_business_engagement' ? base : name === 'get_business_review_summary' ? { linked: true, total: 0, courses: [], scores: [] } : {}, error: null }));
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     const { container, queryByText, getByText } = render(
       <QueryClientProvider client={qc}><MemoryRouter initialEntries={['/business/b1/insights']}>
@@ -190,11 +190,12 @@ describe('CB88 page', () => {
     await waitFor(() => expect(container.querySelector('[data-section="insights-funnel"]')).not.toBeNull());
     await waitFor(() => expect(container.querySelector('[data-card="visits"]')).not.toBeNull());
     expect(queryByText('Engagement rate')).toBeNull();
-    expect(getByText('Reviews & reputation')).toBeTruthy();
+    await waitFor(() => expect(container.querySelector('[data-card="reviews"]')).not.toBeNull());
+    expect(queryByText('Reviews & reputation')).toBeNull();
     // Engagement sits after the posts card and before REVIEWS.
     const eng = container.querySelector('[data-card="engagement"]')!;
     const posts = container.querySelector('[data-card="posts"]')!;
     expect(posts.compareDocumentPosition(eng) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(eng.compareDocumentPosition(getByText('Reviews & reputation')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(eng.compareDocumentPosition(container.querySelector('[data-card="reviews"]')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });
