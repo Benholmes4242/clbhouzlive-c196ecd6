@@ -26,3 +26,6 @@
 .media-empty-see-all { margin-top: 12px; padding: 0; height: auto; min-height: 32px; font-size: 12.5px; font-weight: 700; color: var(--media-empty-ink); }
 .media-empty-retag-action { display: flex; width: 100%; }
 .media-empty-retag-photo { width: 100%; height: 160px; object-fit: contain; border-radius: 8px; }
+.media-empty-retag-photo.hole-media-preview { width: fit-content; max-width: 100%; height: 160px; margin: 0 auto; overflow: hidden; border-radius: 8px; }
+.media-empty-retag-photo.hole-media-preview img { display: block; height: 100%; width: auto; max-width: 100%; object-fit: contain; border-radius: 8px; }
+.media-empty-dialog { max-height: calc(100dvh - 48px); overflow-y: auto; }
