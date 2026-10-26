@@ -47,9 +47,9 @@ export async function writeComposerHolePhoto(job: ComposerHoleJob | undefined, u
     // Photograph + owner is the duplicate key, never (course, hole, member).
     // A video also matches on its stream id, so a re-upload cannot double-tag.
     const streamId = video ? item.streamId ?? null : null;
-    let read = supabase.from('course_hole_media').select('id')
-      .eq('course_id', job.courseId).eq('user_id', userId).eq('media_url', url);
-    if (streamId) read = read.or(`media_url.eq.${url},stream_id.eq.${streamId}`);
+    const base = supabase.from('course_hole_media').select('id')
+      .eq('course_id', job.courseId).eq('user_id', userId);
+    const read = streamId ? base.or(`media_url.eq.${url},stream_id.eq.${streamId}`) : base.eq('media_url', url);
     const { data: existing, error: readError } = await read.limit(1);
     if (readError || existing?.length) return;
     await supabase.from('course_hole_media').insert(video && streamId ? {
