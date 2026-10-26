@@ -4,7 +4,7 @@
 - [ ] Cursor-page both course rails, dedupe loaded rows, observe rail ends and pause holes pagination beneath fullscreen. Preserve first-page readiness/minimums and existing course tap behavior.
 - [ ] Add pagination/invalidation/loaded-viewer tests; retarget only authorized single-query fixtures and limit assertions. Baseline: 3,131 tests / 366 files, zero failures (CB90.1).
 - [ ] Run targeted and full Vitest suites; report automatic type/build diagnostics and live verification limitations.
-- [ ] Resolve typography conflict: brief freezes card designs and says letter spacing stays zero or positive, while existing cards use -0.05em/-0.03em and latestHolesSection protects these; preserve frozen designs pending ruling.
+- [x] Founder ruling: existing negative card letter spacing and its protecting test stay exactly unchanged; zero-or-positive applies only to new additions.
 
 ## BRIEF_SYNC_WHS_DUE_FAILURE_TYPE
 - [x] Widen retry/failure parameter types to shared EgErrorKind excluding preauth_expired, retaining ok for success. Type-only call-site assertions preserve existing runtime paths; auth early return remains unchanged, member-token reads cannot throw preauth_expired. SyncResult.status already string. not_found/bad_request retain default backoff; all writes/timing unchanged.
