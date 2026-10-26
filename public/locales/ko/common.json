@@ -252,9 +252,7 @@
         "likes_other": "Joayo {{n}}",
         "comments_one": "Daetgeul {{n}}",
         "comments_other": "Daetgeul {{n}}"
-      },
-      "reviewsCount_one": "Ribyu {{n}}",
-      "reviewsCount_other": "Ribyu {{n}}"
+      }
     },
     "team": {
       "member": "Team member",

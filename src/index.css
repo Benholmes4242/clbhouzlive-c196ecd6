@@ -5000,3 +5000,27 @@ em-emoji-picker input:focus {
 .insights-engagement-tile-n { font-size: 22px; font-weight: 700; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
 .insights-engagement-tile-l { margin-top: 2px; font-size: 11.5px; line-height: 1.35; color: var(--team-muted); }
 .insights-engagement-fine { margin: 10px 0 0; font-size: 11.5px; line-height: 1.45; color: var(--team-dim); }
+
+/* CB89 — Insights section 7 "Reviews" */
+.insights-reviews-card { margin: 14px 16px 0; background: var(--team-request-surface); border: 1px solid var(--team-border); border-radius: 18px; padding: 16px; color: var(--team-ink); }
+.insights-reviews-title { margin: 6px 0 0; font-size: 17px; font-weight: 700; letter-spacing: -.01em; line-height: 1.3; }
+.insights-reviews-title [data-avg] { font-variant-numeric: tabular-nums; }
+.insights-reviews-line, .insights-reviews-lowest { margin: 4px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--team-muted); }
+.insights-reviews-line b, .insights-reviews-lowest b, .insights-reviews-reply b { color: var(--team-ink); font-weight: 600; }
+.insights-reviews-courses { margin-top: 12px; }
+.insights-reviews-course { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-top: 1px solid var(--team-hairline); }
+.insights-reviews-course:first-child { border-top: 0; padding-top: 2px; }
+.insights-reviews-course-name { font-size: 13.5px; font-weight: 600; color: var(--team-ink); }
+.insights-reviews-course-sub { margin-top: 2px; font-size: 11.5px; font-weight: 500; color: var(--team-dim); }
+.insights-reviews-course-avg { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.insights-reviews-scores-kicker { margin-top: 18px; }
+.insights-reviews-scores { margin-top: 10px; }
+.insights-reviews-score { display: grid; grid-template-columns: 96px minmax(0,1fr) 36px; gap: 10px; align-items: center; padding: 7px 0; font-size: 12.5px; }
+.insights-reviews-score-l { color: var(--team-muted); }
+.insights-reviews-track { height: 8px; border-radius: 4px; background: var(--team-hairline); position: relative; overflow: hidden; }
+.insights-reviews-track i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; }
+.insights-reviews-score-v { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.insights-reviews-lowest { margin-top: 8px; }
+.insights-reviews-reply { margin-top: 14px; background: var(--insights-inset); border-radius: 13px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 12.5px; line-height: 1.4; color: var(--team-muted); }
+.insights-reviews-reply button { flex-shrink: 0; height: 34px; padding: 0 14px; border-radius: 17px; border: 1px solid rgba(255,255,255,0.9); background: transparent; color: var(--team-ink); font-size: 12.5px; font-weight: 700; }
+.insights-reviews-fine { margin: 10px 0 0; font-size: 11.5px; line-height: 1.45; color: var(--team-dim); }

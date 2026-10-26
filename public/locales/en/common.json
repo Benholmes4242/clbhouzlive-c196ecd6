@@ -769,8 +769,6 @@
         "notAffected": "Not affected by the 7, 30 or 90 days above.",
         "noneTitle": "No golfers follow {{business}} yet."
       },
-      "reviewsCount_one": "{{n}} review",
-      "reviewsCount_other": "{{n}} reviews",
       "visits": {
         "kicker": "Profile visits",
         "weeklyKicker": "Profile visits a week",
@@ -921,6 +919,39 @@
         "lastYesterday": "The last one followed you <b>yesterday</b>.",
         "of": "of {{n}}",
         "mergeFine": "Follows from before 28 Aug 2026 have no date, so they never count as new."
+      },
+      "reviewsCard": {
+        "kicker": "Reviews",
+        "count_one": "{{n}} review",
+        "count_other": "{{n}} reviews",
+        "emptyTitle": "No golfer has reviewed {{business}} yet",
+        "emptyLine": "Reviews show here as golfers rate your course on clbhouz, with what they score and where you rank in your county.",
+        "title": "Golfers rate {{business}} {avg} out of 10",
+        "rankLead": "<b>{{rank}} of {{of}}</b> rated courses in {{county}}. ",
+        "newNone_7": "No new reviews in the last 7 days.",
+        "newOne_7": "1 new review in the last 7 days, scoring {{avg}}.",
+        "newMany_7": "{{n}} new reviews in the last 7 days, averaging {{avg}}.",
+        "newNone_30": "No new reviews in the last 30 days.",
+        "newOne_30": "1 new review in the last 30 days, scoring {{avg}}.",
+        "newMany_30": "{{n}} new reviews in the last 30 days, averaging {{avg}}.",
+        "newNone_90": "No new reviews in the last 90 days.",
+        "newOne_90": "1 new review in the last 90 days, scoring {{avg}}.",
+        "newMany_90": "{{n}} new reviews in the last 90 days, averaging {{avg}}.",
+        "courseReviews_one": "{{n}} review",
+        "courseReviews_other": "{{n}} reviews",
+        "courseRank": " · {{rank}} of {{of}} in {{county}}",
+        "scoresKicker": "What they score",
+        "score_design": "Design",
+        "score_condition": "Condition",
+        "score_facilities": "Facilities",
+        "score_clubhouse": "Clubhouse",
+        "lowest": "<b>{{score}} is your lowest score,</b> {{gap}} below {{highest}}.",
+        "unreplied_one": "<b>{{n}} review</b> hasn't had a reply yet.",
+        "unreplied_other": "<b>{{n}} reviews</b> haven't had a reply yet.",
+        "allReplied": "<b>You've replied to every review.</b>",
+        "reply": "Reply",
+        "seeReviews": "See reviews",
+        "fine": "From reviews on clbhouz. A county rank shows once a course has 5 reviews."
       }
     },
     "week": {

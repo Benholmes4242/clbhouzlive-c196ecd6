@@ -252,9 +252,7 @@
         "likes_other": "{{n}} ii ne",
         "comments_one": "{{n}} komento",
         "comments_other": "{{n}} komento"
-      },
-      "reviewsCount_one": "{{n}} rebyu",
-      "reviewsCount_other": "{{n}} rebyu"
+      }
     },
     "team": {
       "member": "Team member",

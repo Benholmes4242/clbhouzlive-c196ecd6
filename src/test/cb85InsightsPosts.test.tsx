@@ -230,6 +230,6 @@ describe('CB85 page', () => {
     expect(queryByText('Follower growth')).toBeNull();
     await waitFor(() => expect(container.querySelector('[data-card="followers"]')).not.toBeNull());
     expect(queryByText('Engagement rate')).toBeNull();
-    expect(getByText('Reviews & reputation')).toBeTruthy();
+    expect(queryByText('Reviews & reputation')).toBeNull();
   });
 });

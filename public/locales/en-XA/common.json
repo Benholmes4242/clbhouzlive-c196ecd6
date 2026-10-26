@@ -724,8 +724,6 @@
         "notAffected": "[~~Ñőţ áƒƒéĉţéđ ƀý ţĥé 7, 30 őř 90 đáýš áƀőṽé.~~]",
         "noneTitle": "[~~Ñő ĝőļƒéřš ƒőļļőŵ {{business}} ýéţ.~~]"
       },
-      "reviewsCount_one": "[~~{{n}} řéṽíéŵ~~]",
-      "reviewsCount_other": "[~~{{n}} řéṽíéŵš~~]",
       "visits": {
         "kicker": "[~~Profile visits~~]",
         "weeklyKicker": "[~~Profile visits a week~~]",
@@ -876,6 +874,39 @@
         "lastYesterday": "[~~Ţĥé ļášţ őñé ƒőļļőŵéđ ýőú <b>ýéšţéřđáý</b>.~~]",
         "of": "[~~őƒ {{n}}~~]",
         "mergeFine": "[~~Ƒőļļőŵš ƒřőɱ ƀéƒőřé 28 Áúĝ 2026 ĥáṽé ñő đáţé, šő ţĥéý ñéṽéř ĉőúñţ áš ñéŵ.~~]"
+      },
+      "reviewsCard": {
+        "kicker": "[~~Reviews~~]",
+        "count_one": "[~~{{n}} review~~]",
+        "count_other": "[~~{{n}} reviews~~]",
+        "emptyTitle": "[~~No golfer has reviewed {{business}} yet~~]",
+        "emptyLine": "[~~Reviews show here as golfers rate your course on clbhouz, with what they score and where you rank in your county.~~]",
+        "title": "[~~Golfers rate {{business}} {avg} out of 10~~]",
+        "rankLead": "[~~<b>{{rank}} of {{of}}</b> rated courses in {{county}}. ~~]",
+        "newNone_7": "[~~No new reviews in the last 7 days.~~]",
+        "newOne_7": "[~~1 new review in the last 7 days, scoring {{avg}}.~~]",
+        "newMany_7": "[~~{{n}} new reviews in the last 7 days, averaging {{avg}}.~~]",
+        "newNone_30": "[~~No new reviews in the last 30 days.~~]",
+        "newOne_30": "[~~1 new review in the last 30 days, scoring {{avg}}.~~]",
+        "newMany_30": "[~~{{n}} new reviews in the last 30 days, averaging {{avg}}.~~]",
+        "newNone_90": "[~~No new reviews in the last 90 days.~~]",
+        "newOne_90": "[~~1 new review in the last 90 days, scoring {{avg}}.~~]",
+        "newMany_90": "[~~{{n}} new reviews in the last 90 days, averaging {{avg}}.~~]",
+        "courseReviews_one": "[~~{{n}} review~~]",
+        "courseReviews_other": "[~~{{n}} reviews~~]",
+        "courseRank": "[~~ · {{rank}} of {{of}} in {{county}}~~]",
+        "scoresKicker": "[~~What they score~~]",
+        "score_design": "[~~Design~~]",
+        "score_condition": "[~~Condition~~]",
+        "score_facilities": "[~~Facilities~~]",
+        "score_clubhouse": "[~~Clubhouse~~]",
+        "lowest": "[~~<b>{{score}} is your lowest score,</b> {{gap}} below {{highest}}.~~]",
+        "unreplied_one": "[~~<b>{{n}} review</b> hasn't had a reply yet.~~]",
+        "unreplied_other": "[~~<b>{{n}} reviews</b> haven't had a reply yet.~~]",
+        "allReplied": "[~~<b>You've replied to every review.</b>~~]",
+        "reply": "[~~Reply~~]",
+        "seeReviews": "[~~See reviews~~]",
+        "fine": "[~~From reviews on clbhouz. A county rank shows once a course has 5 reviews.~~]"
       }
     },
     "week": {
