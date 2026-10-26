@@ -9,26 +9,24 @@
  *   - NOTHING IS INVENTED. No placeholder rows, no mock bars, no fabricated
  *     locations. A locked section says what it is waiting for and shows the
  *     member's REAL progress towards it.
- *   - A RATE CARRIES ITS DENOMINATOR, and below RATE_MIN_IMPRESSIONS it is not
- *     printed at all: the count is stated and the rate is withheld.
  *
  * Type: the shared BUSINESS TYPE SCALE (BIZ_KICKER / BIZ_LABEL / BIZ_TITLE /
  * BIZ_BODY / bizFigure) from analytical/tokens. Nothing here renders at 800.
  */
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
-import { useBusinessInsights } from '@/hooks/useBusinessInsights';
 import { useBusinessInsightsFunnel } from '@/hooks/useBusinessInsightsFunnel';
 import { InsightsFunnel } from '@/components/business/insights/InsightsFunnel';
 import { InsightsVisitsSection } from '@/components/business/insights/InsightsVisitsSection';
 import { InsightsAudienceSection } from '@/components/business/insights/InsightsAudienceSection';
 import { InsightsFollowersSection } from '@/components/business/insights/InsightsFollowersSection';
 import { InsightsPostsSection } from '@/components/business/insights/InsightsPostsSection';
+import { InsightsEngagementSection } from '@/components/business/insights/InsightsEngagementSection';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Button } from '@/components/ui/button';
@@ -42,10 +40,6 @@ import {
 
 type DateRange = '7d' | '30d' | '90d';
 const RANGE_DAYS: Record<DateRange, number> = { '7d': 7, '30d': 30, '90d': 90 };
-
-/** Below this many impressions the rate is WITHHELD: the page states the
- *  impression count and says why, rather than printing a number it disowns. */
-const RATE_MIN_IMPRESSIONS = 500;
 
 /** Bar fill on a dark track: ink at reduced alpha, lighter than A.TRACK, so
  *  the filled part reads as filled rather than as a hole in the track. */
@@ -150,7 +144,6 @@ const BusinessInsightsPageV2 = () => {
   useHideBottomNav();
   const { data: business, isLoading: businessLoading } = useBusinessProfile(id);
   const { data: membership, isLoading: membershipLoading, isFetched: membershipFetched } = useBusinessMembership(id);
-  const { data: insights, isLoading: insightsLoading } = useBusinessInsights(business?.id, dateRange);
   const { data: funnel, isError: funnelError } = useBusinessInsightsFunnel(business?.id, RANGE_DAYS[dateRange]);
 
   const isLoading = businessLoading || membershipLoading;
@@ -161,14 +154,6 @@ const BusinessInsightsPageV2 = () => {
       navigate(`/business/${id}`, { replace: true });
     }
   }, [membershipFetched, membershipLoading, membership, business, id, navigate]);
-
-  /** The rate AND its denominator - a share without its base is not a fact. */
-  const engagement = useMemo(() => {
-    const impressions = insights.content.reduce((a, c) => a + c.impressions, 0);
-    if (impressions <= 0) return null;
-    const eng = insights.content.reduce((a, c) => a + c.likes + c.comments, 0);
-    return { rate: (eng / impressions) * 100, impressions };
-  }, [insights.content]);
 
   if (isLoading || !membershipFetched) {
     return (
@@ -270,44 +255,12 @@ const BusinessInsightsPageV2 = () => {
           />
         </div>
 
-        {/* ── ENGAGEMENT: the rate carries its denominator, and below the
-            floor it is withheld - the count is stated, the rate is not. ── */}
-        <section className="rounded-[18px] p-4 md:p-5" style={cardStyle}>
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="mb-1.5" style={BIZ_KICKER}>ENGAGEMENT</p>
-              <h3 style={BIZ_TITLE}>Engagement rate</h3>
-            </div>
-            <div className="text-right">
-              {insightsLoading ? (
-                <Skeleton className="h-7 w-14" />
-              ) : engagement !== null && engagement.impressions >= RATE_MIN_IMPRESSIONS ? (
-                <>
-                  <p className="tabular-nums" style={bizFigure(24)}>{`${engagement.rate.toFixed(1)}%`}</p>
-                  <p style={{ ...BIZ_LABEL, marginTop: 6 }}>
-                    {t('business.insights.rate.from', { count: engagement.impressions, n: formatNum(engagement.impressions) })}
-                  </p>
-                </>
-              ) : engagement !== null ? (
-                <>
-                  <p className="tabular-nums" style={bizFigure(24)}>{formatNum(engagement.impressions)}</p>
-                  <p style={{ ...BIZ_LABEL, marginTop: 6 }}>{t('business.insights.rate.impressionsLabel')}</p>
-                </>
-              ) : null}
-            </div>
-          </div>
-          {insightsLoading ? (
-            <Skeleton className="h-4 w-3/4 mt-3" />
-          ) : (
-            <p style={{ ...BIZ_BODY, marginTop: 10 }}>
-              {engagement === null
-                ? t('business.insights.rate.none')
-                : engagement.impressions < RATE_MIN_IMPRESSIONS
-                  ? t('business.insights.rate.tooFew')
-                  : t('business.insights.rate.benchmark')}
-            </p>
-          )}
-        </section>
+        {/* ── CB88: ENGAGEMENT (replaces ENGAGEMENT · Engagement rate). Draws
+            nothing until the first read settles, if it fails, or if the
+            business has never posted; period switches keep the previous card. ── */}
+        <div className="-mx-4 md:-mx-6 !mt-0">
+          <InsightsEngagementSection businessId={business.id} days={RANGE_DAYS[dateRange]} />
+        </div>
 
         {/* ── REPUTATION (course-linked only) ── */}
         {business.club_id && <ReviewsSection businessId={business.id} navigate={navigate} />}
