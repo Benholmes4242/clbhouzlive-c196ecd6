@@ -1,5 +1,9 @@
 # Roadmap
 
+## BRIEF_HOLE_PANEL_VIDEO_AUTOPLAY_V2
+- [ ] Add shared muted active-shot autoplay using the existing tile coordinator; pause beneath tagging dialogs and fullscreen.
+- [ ] Add playback/fallback/integration regressions, run the full suite, and report automatic typecheck/build status against 2,993 tests / 356 files.
+
 ## BRIEF_LATEST_HOLES_SWIPE_AND_CAPTION
 - [x] Separate caption details, rail-wide immediate synthetic run and active-shot course header; frozen entrypoints/offsets unchanged.
 - [x] Retargeted four authorised cases; added nine cases (+2 memberShotPosts, +7 latestHolesSwipeCaption). Full bunx vitest run: 2,917 passed/1 failed, 2,918 total/351 files, from 2,909/350. Only existing Top100CoursesHubPanel.test.tsx:234:55 failure remains: expected '0' to be '237'. Latest automatic typecheck/build23:15:32Z OK; manual typecheck prohibited.
