@@ -1,5 +1,10 @@
 # Roadmap
 
+## Restore Stream uploads and cleanup
+- [ ] Locate the earlier supplied Cloudflare Stream token; reuse securely saved credentials rather than request a replacement.
+- [ ] Restore direct API calls in the two specified functions, preserving validation and ownership; bump versions and deploy.
+- [ ] Verify signed-in upload creation with a redacted response; run full suite against baseline 3,328 tests / 386 files.
+
 ## Review wizard notch canvas
 - [x] Claim review chrome through the existing overlay API on wizard mount; release on unmount. Overlay wrapper uses RV2.canvas; other chrome and tokens unchanged.
 - [x] `bunx vitest run src/test/reviewComposerChrome.test.tsx`: 1/1 passed; `bunx vitest run`: 3,328/3,328 passed across 386 files, zero failures. Baseline 3,327/385 plus one new lifecycle case/file; no existing tests changed, renamed or deleted. CB99 ruling test passes. Automatic build 18:08:34Z OK; native/signed-in visual verification unavailable with external_unmanaged authentication.
