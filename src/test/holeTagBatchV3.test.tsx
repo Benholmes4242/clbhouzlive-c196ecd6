@@ -14,7 +14,7 @@ const photo = (url: string, ownerName?: string): BatchPhoto & { ownerName?: stri
 const shots = (n: number) => Array.from({ length: n }, (_, i) => photo(`/${i + 1}.jpg`));
 const ok = () => vi.fn().mockResolvedValue({ status: 'approved' } as HolePhoto);
 const hero = () => screen.getByAltText('Current photograph');
-const confirmBtn = () => screen.getByRole('button', { name: /Confirm tag|Tagging\.\.\.|All tagged/ });
+const confirmBtn = () => screen.getByRole('button', { name: /Confirm tag|Tagging\.\.\.|All tagged|Remove tag|Removing\.\.\./ });
 const pick = (n: number) => fireEvent.click(screen.getByRole('button', { name: `Hole ${n}` }));
 const confirm = () => fireEvent.click(confirmBtn());
 afterEach(cleanup);
@@ -79,15 +79,27 @@ describe('thumbnails and hero', () => {
     expect(hero()).toHaveAttribute('src', '/2.jpg'); expect(tag).not.toHaveBeenCalled();
     expect(screen.getByRole('button', { name: 'Shot 2 of 3' })).toHaveAttribute('aria-current', 'true');
   });
-  it('a tagged thumbnail cannot be re-tagged', async () => {
-    const tag = ok(); render(<HolePhotoBatchPath photos={shots(3)} knownHoles={[4]} onTag={tag} onClose={() => {}} />);
+  it('a tagged thumbnail reopens for removal with onRemove and stays inert without it', async () => {
+    const tag = ok(); const remove = vi.fn().mockResolvedValue(undefined);
+    const view = render(<HolePhotoBatchPath photos={shots(3)} knownHoles={[4]} onTag={tag} onRemove={remove} onClose={() => {}} />);
     pick(4); confirm();
     const tagged = await screen.findByRole('button', { name: 'Shot 1 of 3, tagged to the 4th' });
-    expect(tagged).toHaveAttribute('aria-disabled', 'true');
+    expect(tagged).not.toHaveAttribute('aria-disabled');
     expect(tagged.querySelector('.hole-photo-batch-badge')?.textContent).toBe('4');
     fireEvent.click(tagged);
+    expect(hero()).toHaveAttribute('src', '/1.jpg');
+    expect(tagged).toHaveAttribute('aria-current', 'true');
+    expect(confirmBtn()).toHaveTextContent('Remove tag');
+    expect(tag).toHaveBeenCalledTimes(1); expect(remove).not.toHaveBeenCalled();
+    view.unmount();
+    const tag2 = ok();
+    render(<HolePhotoBatchPath photos={shots(3)} knownHoles={[4]} onTag={tag2} onClose={() => {}} />);
+    pick(4); confirm();
+    const inert = await screen.findByRole('button', { name: 'Shot 1 of 3, tagged to the 4th' });
+    expect(inert).toHaveAttribute('aria-disabled', 'true');
+    fireEvent.click(inert);
     expect(hero()).toHaveAttribute('src', '/2.jpg');
-    expect(tag).toHaveBeenCalledTimes(1);
+    expect(tag2).toHaveBeenCalledTimes(1);
   });
   it('the chip shows position / n', () => {
     const { baseElement } = render(<HolePhotoBatchPath photos={shots(12)} knownHoles={[4]} onTag={ok()} onClose={() => {}} />);
