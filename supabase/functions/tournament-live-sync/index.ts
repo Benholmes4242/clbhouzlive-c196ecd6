@@ -115,7 +115,7 @@ Deno.serve(async (req) => {
     //    closed, that pass writes the final rounds without the thru gate.
     //    BRIEF_TOUR_CLOSE_ONLY_WHEN_FINAL: an event closes by date only when
     //    that fetch reported a final feed status, or its end_date is more than
-    //    STALE_CLOSE_BACKSTOP_DAYS ago. A date close never sets winner_id.
+    //    STALE_CLOSE_BACKSTOP_DAYS ago. A date close never names a winner.
     const { data: staleCandidates } = await supabase
       .from('sr_tournaments')
       .select('id, sr_id, name, season_id, start_date, end_date, timezone')
