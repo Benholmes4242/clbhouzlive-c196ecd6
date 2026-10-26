@@ -110,6 +110,16 @@ describe('admin block and batch', () => {
     mount(); fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' })); await screen.findByRole('alert'); expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/earlier.jpg');
   });
   it('readback resolves member-owned row without client insert', async () => { const result = await tagAdminHole('course', 'earlier', 7); expect(result.user_id).toBe('member'); expect(result.id).toBe('new-tag'); });
+  it('Remove tag calls admin_untag_hole_media with the row id and refreshes the same keys', async () => {
+    const view = mount(); view.cache.setQueryData(['gam', 'get_latest_hole_media', { p_limit: 30 }], []);
+    fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/later.jpg'));
+    fireEvent.click(screen.getByRole('button', { name: 'Shot 1 of 2, tagged to the 7th' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Remove tag' }));
+    await waitFor(() => expect(f.rpc).toHaveBeenCalledWith('admin_untag_hole_media', { p_tag_id: 'new-tag' }));
+    for (const queryKey of [['hole-photo-tags', 'course'], ['admin-untagged-course-media', 'course'], ['hole-media', 'course', 7]]) expect(view.invalidate).toHaveBeenCalledWith({ queryKey });
+    await waitFor(() => expect(view.cache.getQueryState(['gam', 'get_latest_hole_media', { p_limit: 30 }])?.isInvalidated).toBe(true));
+  });
   it('member own block stays before admin and uses unchanged member write', async () => {
     f.own = true; const { wrapper } = setup(); render(<CourseMediaTabNew courseId="course" />, { wrapper });
     const own = screen.getByRole('heading', { name: 'One of yours is untagged' }); const admin = await screen.findByRole('heading', { name: 'Two untagged shots here' }); expect(own.compareDocumentPosition(admin) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
