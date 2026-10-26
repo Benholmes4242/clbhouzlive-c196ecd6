@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { resolvePostAuthRoute } from '@/lib/auth/postAuthRoute';
-import { followClbhouzOnSignup } from '@/lib/auth/followClbhouz';
+import { isNewSignup } from '@/lib/auth/isNewSignup';
 import type { MedianAppleError, MedianAppleResponse, MedianAppleSuccess } from '@/types/median';
 import {
   trackAuthMethodSelected,
@@ -209,12 +209,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
       if (data?.session?.user) {
         trackLoginSuccess('email', Date.now() - start);
-        // signup_success: verifyOtp lands the session; new users have created_at === last_sign_in_at
-        if (data.user?.created_at && data.user?.last_sign_in_at && data.user.created_at === data.user.last_sign_in_at) {
+        // Confirmation time covers a signup even when the email code was requested much earlier.
+        if (isNewSignup(data.user)) {
           trackSignupSuccess('email', Date.now() - start);
-          // NEW MEMBERS FOLLOW clbhouz. Non-fatal and un-awaited: signup never
-          // waits on it and never fails because of it.
-          void followClbhouzOnSignup(data.session.user.id);
         }
         trackAuthComplete('email');
         onWillNavigate?.();
@@ -312,11 +309,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
         if (data?.session?.user) {
           trackLoginSuccess('apple');
-          // signup_success: signInWithIdToken lands the session; new users have created_at === last_sign_in_at
-          if (data.user?.created_at && data.user?.last_sign_in_at && data.user.created_at === data.user.last_sign_in_at) {
+          // Native account creation and sign-in timestamps can differ by milliseconds.
+          if (isNewSignup(data.user)) {
             trackSignupSuccess('apple');
-            // NEW MEMBERS FOLLOW clbhouz — non-fatal, never blocks signup.
-            void followClbhouzOnSignup(data.session.user.id);
           }
           trackAuthComplete('apple');
           onWillNavigate?.();
@@ -445,11 +440,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
         if (data?.session?.user) {
           trackLoginSuccess('google');
-          // signup_success: signInWithIdToken lands the session; new users have created_at === last_sign_in_at
-          if (data.user?.created_at && data.user?.last_sign_in_at && data.user.created_at === data.user.last_sign_in_at) {
+          // Native account creation and sign-in timestamps can differ by milliseconds.
+          if (isNewSignup(data.user)) {
             trackSignupSuccess('google');
-            // NEW MEMBERS FOLLOW clbhouz — non-fatal, never blocks signup.
-            void followClbhouzOnSignup(data.session.user.id);
           }
           trackAuthComplete('google');
           onWillNavigate?.();
