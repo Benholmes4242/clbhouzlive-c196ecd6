@@ -41,7 +41,8 @@ describe('CB91 Your courses top', () => {
     const last = view.container.querySelector('[data-section="CompetitionSection"]');
     const request = screen.getByText('Missing a course?');
     const privacy = screen.getByText(/Everything on this page is an aggregate/);
-    expect(last?.compareDocumentPosition(request) && Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    if (!last) throw new Error('Missing final course section');
+    expect(last.compareDocumentPosition(request) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(request.compareDocumentPosition(privacy) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
   it('unclaimed retains its notice and top request panel without a loaded subtitle', () => {
