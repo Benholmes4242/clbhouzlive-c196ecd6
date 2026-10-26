@@ -81,7 +81,8 @@ describe.each(kinds)('$kind unlimited rail', spec => {
     pages = [page(spec), page(spec, 50, 3)]; const view = mount(spec);
     await waitFor(() => expect(cards(view, spec)).toHaveLength(spec.size));
     const observer = [...observers].reverse().find(item => item.active);
-    expect(observer?.options).toMatchObject({ root: view.container.querySelector('.scrollbar-hide'), rootMargin: `0px ${spec.width * 2}px 0px 0px` });
+    expect(observer?.options?.root).toBe(view.container.querySelector('.scrollbar-hide'));
+    expect(observer?.options?.rootMargin).toBe(`0px ${spec.width * 2}px 0px 0px`);
     nextVisible(); nextVisible();
     await waitFor(() => expect(cards(view, spec)).toHaveLength(spec.size + 3));
     expect(requests(spec)).toEqual([[spec.name, { p_limit: spec.size }], [spec.name, { p_limit: spec.size, ...cursor(pages[0][spec.size - 1]) }]]);
