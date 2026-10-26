@@ -182,7 +182,7 @@ describe('CB86 page', () => {
     await waitFor(() => expect(container.querySelector('[data-card="visits"]')).not.toBeNull());
     expect(queryByText('Follower growth')).toBeNull();
     expect(queryByText('AUDIENCE')).toBeNull();
-    expect(getByText('ENGAGEMENT')).toBeTruthy();
+    expect(queryByText('Engagement rate')).toBeNull();
     expect(getByText('Reviews & reputation')).toBeTruthy();
   });
 });
