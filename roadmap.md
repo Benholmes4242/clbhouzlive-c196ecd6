@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Restore Stream uploads and cleanup
-- [ ] Locate the earlier supplied Cloudflare Stream token; reuse securely saved credentials rather than request a replacement.
+- [ ] Credential blocker: earlier My Cloudflare API connection is linked but gateway-only; CLOUDFLARE_STREAM_API_TOKEN absent from secret listing. CLOUDFLARE_API_TOKEN exists; awaiting confirmation that it is the supplied Stream token. No secret values read or copied.
 - [ ] Restore direct API calls in the two specified functions, preserving validation and ownership; bump versions and deploy.
 - [ ] Verify signed-in upload creation with a redacted response; run full suite against baseline 3,328 tests / 386 files.
+- [x] Before function changes, bunx vitest run: 3,328/3,328 across 386 files, unchanged baseline; no failures and no test edits. Neither function edited or deployed while credential identity is unresolved.
 
 ## Review wizard notch canvas
 - [x] Claim review chrome through the existing overlay API on wizard mount; release on unmount. Overlay wrapper uses RV2.canvas; other chrome and tokens unchanged.
