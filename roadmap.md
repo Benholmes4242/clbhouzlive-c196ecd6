@@ -2,8 +2,9 @@
 
 ## CB95 — Where the tee sheet has room
 - [x] Extract shared weekRoom without changing CB91 courseLead tests; replace seasonality with tee-sheet week/year card and separate unchanged year-on-year content.
-- [ ] Add edge-case tests, verify CB91 and full-suite counts, report pre-existing upload fixture failures and any new failure.
-- [ ] Verify phone-width card rendering; live authenticated course data unavailable under external-managed auth.
+- [x] Add22 tests in cb95TeeSheet.test.tsx; targeted84/7 pass, unchanged22 CB91 helper tests green. Retarget only cb91CoursesTop section list/mock from SeasonalitySection to TeeSheetSection + YearOnYearSection; no count delta there. Full bunx vitest run3,244 passed/18 pre-existing failed/3,262 total/376 files. Last verified full3,208/373 +14 ownership +18 progress +22 CB95 =3,262/376; no new failures. Existing reviewUploadProgress.test.tsx:30:6 Error: createObjectURL does not exist remains untouched in all18 cases. Harness build OK14:49:41Z; standalone typecheck prohibited, not run.
+- [x] Controlled actual cards438x970: Sundridge, single-day, early and empty states verified without overflow; computed busiest/quiet/ordinary colours match white/0.12/0.28. Screenshots reviewed. Title lettering stays0 under environment rule instead of brief's-0.01em; Geist retained. Report CB95_Tee_sheet_report.md.
+- [ ] Live authenticated course data remains unverified: external-managed auth unavailable; controlled figures are not live read verification.
 
 ## BRIEF_REVIEW_MEDIA_UPLOAD_PROGRESS
 - [x] OWNERSHIP foundation: Cloudflare connection linked; TUS auth.getUser, server Upload-Creator and stripped creator/owner metadata; creator/owned-legacy-row Stream cleanup, owned-row deletion and real signed R2 HEAD/DELETE. Both deployed GET versions confirmed 2026-10-26-review-owner-v1; unsigned POST401 verified. Deno check --node-modules-dir=auto passed after dependency/request-type fixes. No SQL/migrations.
