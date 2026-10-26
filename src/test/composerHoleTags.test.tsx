@@ -71,7 +71,7 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
     expect(heroVideo).not.toBeNull();
     expect(heroVideo).toHaveAttribute('src', '/clip.mp4');
     expect(heroVideo).toHaveAttribute('poster', '/poster.jpg');
-    expect(heroVideo).toHaveAttribute('muted');
+    expect(heroVideo).toHaveProperty('muted', true);
     expect(heroVideo).toHaveAttribute('autoplay');
     expect(heroVideo).toHaveAttribute('loop');
     expect(heroVideo).toHaveAttribute('playsinline');
@@ -144,8 +144,9 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
   });
   it('Remove tag clears the assignment and re-enables the grid', () => {
     const unassign = vi.fn();
-    render(<ReviewHoleTags {...props({ assignments: { p: 9 }, unassign })} />);
+    render(<ReviewHoleTags {...props({ shots: [photo, { ...photo, id: 'q' }], assignments: { p: 9 }, unassign })} />);
     fireEvent.click(screen.getByRole('button', { name: 'Tag photo 1' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Shot 1 of 2, tagged to the 9th' }));
     expect(screen.getByRole('button', { name: 'Remove tag' })).toBeEnabled();
     fireEvent.click(screen.getByRole('button', { name: 'Remove tag' }));
     expect(unassign).toHaveBeenCalledWith('p');
@@ -154,14 +155,12 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
     expect(screen.getByRole('button', { name: 'Confirm tag' })).toBeDisabled();
   });
   it('with every shot tagged the button reads All tagged and is disabled', () => {
-    const assign = vi.fn();
-    render(<ReviewHoleTags {...props({ shots: [photo, video], assignments: { p: 9 }, assign })} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Tag video 1' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 2' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
-    expect(assign).toHaveBeenCalledWith('v', 2);
+    render(<ReviewHoleTags {...props({ shots: [photo, video], assignments: { p: 9, v: 2 } })} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Tag photo 1' }));
     expect(screen.getByRole('button', { name: 'All tagged' })).toBeDisabled();
-    expect(screen.getByRole('dialog')).toHaveTextContent('Video tagged to the 2nd.');
+    expect(screen.queryByRole('button', { name: 'Confirm tag' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Remove tag' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Hole 9' })).toBeDisabled();
   });
   it('the sheet body clears the home indicator and wears the Media tab theme', () => {
     render(<ReviewHoleTags {...props({})} />);

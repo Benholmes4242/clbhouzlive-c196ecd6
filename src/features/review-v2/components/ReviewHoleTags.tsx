@@ -61,7 +61,7 @@ export function ReviewHoleTags(props: Props) {
   });
   const focus = (id: string) => {
     setActiveId(id); setSelected(null); setConfirmation(null); setRemovedNotice(false);
-    setReviewing(props.assignments[id] != null);
+    setReviewing(false); // a row open starts fresh like the batch dialog; a tagged thumb re-enters the tagged state
   };
   const choose = (id: string) => {
     if (id === activeId) {
