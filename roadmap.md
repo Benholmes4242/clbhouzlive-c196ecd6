@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB102.1 — Welcome gutters and Driving Range facilities
+- [ ] Welcome spacing blocked by conflicting clauses: prescribed outer padding leaves the opening's existing 6px top / 2px side inset, so kicker offsets would be 26px / 18px rather than required 20px / 16px. Await ruling before spacing edits.
+- [x] Give Driving Range the exact dedicated facilities list; preserve COACHING and every other category.
+- [ ] Run cb102BusinessWelcome and the full suite; reconcile against the last reported 3,347 tests / 388 files.
+
 ## Review media tray — Add tile leads the strip
 - [x] Moved the one Add control ahead of items.map in MediaTray.tsx so the 72px square sits at the strip's front once anything is picked; empty tray keeps the full-width row, ceiling/disabled still hide it, item order and tile contents unchanged.
 - [x] `bunx vitest run src/test/mediaTrayAddTileFirst.test.tsx`: 4/4; review-v2 group (`src/features/review-v2` + reviewUploadProgress + reviewComposerChrome): 43/43. Full `bunx vitest run`: 3,332/3,332 across 387 files, from 3,328/386 (+4/+1 solely the new file); no existing test changed. Automatic build OK 19:52:47Z. Signed-in/phone visual check unavailable (external_unmanaged).

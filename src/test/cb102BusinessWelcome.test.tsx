@@ -13,6 +13,7 @@ vi.mock('@/components/ui/VerifiedBadge', () => ({ VerifiedBadge: () => <span dat
 
 import { BusinessEmptyState } from '@/components/business/BusinessEmptyState';
 import { BUSINESS_CATEGORIES } from '@/constants/businessCategories';
+import { getFacilitiesForCategory } from '@/components/business/editor/editorTypes';
 
 const ok = (rounds_delta = 45, reviews_delta = 0) =>
   rpc.mockResolvedValue({ data: { rounds: 3985, rounds_delta, golfers: 7777, golfers_delta: 4, reviews: 213, reviews_delta }, error: null });
@@ -95,5 +96,20 @@ describe('CB102 business welcome', () => {
   it('Driving Range sits directly after Golf Academy', () => {
     const i = BUSINESS_CATEGORIES.indexOf('Golf Academy');
     expect(BUSINESS_CATEGORIES[i + 1]).toBe('Driving Range');
+  });
+
+  it('Driving Range has its own facilities list', () => {
+    expect(getFacilitiesForCategory('Driving Range')).toEqual([
+      'Covered bays', 'Floodlit', 'Grass tees', 'Ball-tracking technology',
+      'Short-game area', 'Putting green', 'Lessons', 'Club hire', 'Pro shop',
+      'Cafe / bar', 'Parking',
+    ]);
+    const coaching = [
+      'Indoor bays', 'Launch monitors', 'Video analysis', 'Putting studio',
+      'Short-game area', 'Custom fitting', 'Junior coaching', 'Group clinics',
+    ];
+    expect(getFacilitiesForCategory('Golf Academy')).toEqual(coaching);
+    expect(getFacilitiesForCategory('Coach / Instructor')).toEqual(coaching);
+    expect(getFacilitiesForCategory('Golf Academy')).toBe(getFacilitiesForCategory('Coach / Instructor'));
   });
 });
