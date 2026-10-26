@@ -19,10 +19,10 @@ import BusinessInsightsPageV2 from '@/pages/BusinessInsightsPageV2';
 const base = { available: true, period_days: 30, rounds: 38, prev_rounds: 32, golfers: 17, member_rounds: 29, visitor_rounds: 6, unknown_rounds: 3, visitors: 4, repeat_visitors: 1, courses: [{ course_id: 'e', name: 'Sundridge Park Golf Club (East Course)', rounds: 22 }, { course_id: 'w', name: 'Sundridge Park Golf Club (West Course)', rounds: 16 }], regions: null, elsewhere: null, last_round: null };
 const nav = vi.fn();
 const last = (key: string) => [...calls].reverse().find(c => c.key === `business.insights.courseCard.${key}`);
-const client = () => new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
-function setup(data: unknown = base, error: unknown = null) {
+const client = (gcTime = 0) => new QueryClient({ defaultOptions: { queries: { retry: false, gcTime } } });
+function setup(data: unknown = base, error: unknown = null, gcTime = 0) {
   rpc.mockResolvedValue({ data, error });
-  const qc = client();
+  const qc = client(gcTime);
   const ui = (days: number) => <QueryClientProvider client={qc}><InsightsCourseSection businessId="b1" businessName="Sundridge Park Golf Club" days={days} onNavigate={nav} /></QueryClientProvider>;
   const view = render(ui(30));
   return { ...view, qc, switchDays: (days: number) => view.rerender(ui(days)) };
@@ -60,7 +60,7 @@ describe('CB99 empty and period states', () => {
   it('zero rounds without last date omits the line', async () => { const c = await ready(setup({ ...base, rounds: 0 }).container); expect(c.querySelector('[data-last-round]')).toBeNull(); expect(last('lastRound')).toBeUndefined(); });
   it('date helper includes the year for a prior year', async () => { await ready(setup({ ...base, rounds: 0, last_round: '2020-10-12' }).container); expect(last('lastRound')?.o?.date).toBe('12 Oct 2020'); });
   it('query key and arguments include each picker period; old snapshot remains until settled', async () => {
-    const v = setup(); await ready(v.container);
+    const v = setup(base, null, Infinity); await ready(v.container);
     for (const days of [7, 90]) {
       let resolve: ((v: unknown) => void) | undefined;
       rpc.mockReturnValue(new Promise(r => { resolve = r; }));
