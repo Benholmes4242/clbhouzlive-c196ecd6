@@ -32,8 +32,8 @@ import {
 import { useClubCourseLink } from '@/features/business/clubAnalytics/useClubCourseLink';
 import { useClubCourseAnalytics } from '@/features/business/clubAnalytics/useClubCourseAnalytics';
 import {
-  VerdictStrip, IndexDisagreesSection, SampleSection, HoleBySection,
-  ScoringSection, RecordBookSection, TeesSection, SeasonalitySection, WhoPlaysSection,
+  HowItPlaysSection, IndexDisagreesSection, SampleSection, HoleBySection,
+  RecordBookSection, TeesSection, SeasonalitySection, WhoPlaysSection,
   CompetitionSection,
 } from '@/features/business/clubAnalytics/sections';
 
@@ -138,14 +138,13 @@ const CourseBlock: React.FC<{ course: ClubCourseRef; courseCount: number; busine
                 </p>}
                 <p className="club-course-lead-line">{lead.line}</p>
               </div>}
-              {/* §1b — THE VERDICT STRIP LEADS: mean gross, hardest hole, comp share. */}
-              <SectionGuard><VerdictStrip data={result.data} /></SectionGuard>
+              {/* CB92 — HOW IT PLAYS sits directly under the CB91 sentence. */}
+              <SectionGuard><HowItPlaysSection data={result.data} /></SectionGuard>
               {/* §7 — the sample is stated before the rest of the figures. */}
               <SectionGuard><SampleSection data={result.data} /></SectionGuard>
               <SectionGuard><HoleBySection data={result.data} /></SectionGuard>
               {/* §2 — the ladder is the one thing no other product shows a club. */}
               <SectionGuard><IndexDisagreesSection data={result.data} /></SectionGuard>
-              <SectionGuard><ScoringSection data={result.data} /></SectionGuard>
               {/* §5 — values only. Names live on the course's Champions tab. */}
               <SectionGuard>
                 <RecordBookSection

@@ -6,8 +6,8 @@
  * between them. There is no outer container with internal rules.
  *
  * ORDER, and the order is an argument:
- *   verdict strip, WHERE YOUR INDEX DISAGREES, THE SAMPLE, HOLE BY HOLE,
- *   WHAT GETS MADE HERE, THE COURSE RECORD,
+ *   HOW IT PLAYS (CB92), THE SAMPLE, HOLE BY HOLE, WHERE YOUR INDEX DISAGREES,
+ *   THE COURSE RECORD,
  *   YOUR TEES, WHEN MEMBERS PLAY, WHO PLAYS HERE, COMPETITION OR SOCIAL.
  * The ladder leads because it is the richest thing that renders on the samples
  * clubs currently have. It is a DIFFICULTY order and nothing on this page
