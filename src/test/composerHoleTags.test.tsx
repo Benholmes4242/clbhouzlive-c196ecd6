@@ -4,7 +4,7 @@ import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/re
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, act } from '@testing-library/react';
 
-const f = vi.hoisted(() => ({ insert: vi.fn(), eq: vi.fn(), from: vi.fn(), rpc: vi.fn(), invoke: vi.fn(), matched: vi.fn(), exif: vi.fn(), analysis: { data: { available: true, holes: [{ hole_no: 9 }, { hole_no: 2 }] } }, rounds: [] as any[] }));
+const f = vi.hoisted(() => ({ insert: vi.fn(), eq: vi.fn(), or: vi.fn(), limit: vi.fn(), from: vi.fn(), rpc: vi.fn(), invoke: vi.fn(), matched: vi.fn(), exif: vi.fn(), analysis: { data: { available: true, holes: [{ hole_no: 9 }, { hole_no: 2 }] } }, rounds: [] as any[] }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: f.from, rpc: f.rpc, functions: { invoke: f.invoke } } }));
 vi.mock('@/lib/courseMedia/holePhotoExif', () => ({ readHolePhotoExif: f.exif }));
@@ -19,20 +19,25 @@ import { ReviewHoleTags } from '@/features/review-v2/components/ReviewHoleTags';
 import { useReviewHoleTags } from '@/features/review-v2/hooks/useReviewHoleTags';
 import { writeComposerHolePhoto, composerPhotoVerdict, type ComposerHoleJob } from '@/lib/courseMedia/composerHolePhotos';
 import { uploadAndPublishReview, startReviewUpload } from '@/features/review-v2/lib/reviewUploadController';
+import { useReviewMediaPipeline } from '@/features/review-v2/hooks/useReviewMediaPipeline';
+import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import type { MediaItem } from '@/features/review-v2/types';
 
 const exif = { captureDay: '2026-06-02', capturedAt: '2026-06-02T12:00:00', latitude: null, longitude: null };
 const photo: MediaItem = { id: 'p', type: 'image', previewUrl: '/photo.jpg', status: 'pending', progress: 0, file: new File(['photo'], 'photo.jpg', { type: 'image/jpeg' }) };
+const video: MediaItem = { id: 'v', type: 'video', previewUrl: '/clip.mp4', posterUrl: '/poster.jpg', streamId: 'stream-1', durationSeconds: 75, status: 'pending', progress: 0, file: new File(['video'], 'clip.mp4', { type: 'video/mp4' }) };
 const job: ComposerHoleJob = { courseId: 'course', assignments: { p: 2 }, knownHoles: [2, 9], proofScoreId: null };
-const props = (overrides: Record<string, unknown> = {}) => ({ holes: [2, 9], photos: [photo], rounds: [], chosenRound: null, chooseRound: vi.fn(), assignments: {}, assign: vi.fn(), metadata: {}, capture: () => job, ...overrides } as ReturnType<typeof useReviewHoleTags>);
+const props = (overrides: Record<string, unknown> = {}) => ({ holes: [2, 9], shots: [photo], rounds: [], chosenRound: null, chooseRound: vi.fn(), assignments: {}, assign: vi.fn(), metadata: {}, capture: () => job, ...overrides } as ReturnType<typeof useReviewHoleTags>);
 const wrapper = ({ children }: { children: React.ReactNode }) => <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>{children}</QueryClientProvider>;
 
 beforeEach(() => {
   cleanup(); vi.clearAllMocks();
   f.exif.mockResolvedValue(exif); f.matched.mockResolvedValue([]);
   f.insert.mockResolvedValue({ error: null });
-  const chain: any = { select: () => chain, eq: f.eq, limit: () => Promise.resolve({ data: [], error: null }), insert: f.insert, update: () => chain };
-  f.eq.mockReturnValue(chain); f.from.mockReturnValue(chain);
+  f.limit.mockResolvedValue({ data: [], error: null });
+  const chain: any = { select: () => chain, eq: f.eq, or: f.or, limit: f.limit, insert: f.insert, update: () => chain };
+  f.eq.mockReturnValue(chain); f.or.mockReturnValue(chain); f.from.mockReturnValue(chain);
   f.analysis.data = { available: true, holes: [{ hole_no: 9 }, { hole_no: 2 }] }; f.rounds = [];
 });
 
