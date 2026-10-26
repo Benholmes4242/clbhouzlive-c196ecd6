@@ -277,7 +277,7 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics; businessName?:
       {hasFullRounds && <>
         <RailChips options={[{ id: 'hardest', label: 'Hardest first' }, { id: 'card', label: 'Card order' }]} value={order} onChange={setOrder} ariaLabel="Hole order" style={{ marginTop: 12 }} />
         <div data-testid="hole-table-head" style={{ display: 'grid', gridTemplateColumns: CLUB_HOLE_GRID, gap: 8, marginTop: 12, paddingBottom: 6 }}>
-          {['Hole', 'Par', 'SI', 'Over par', ''].map((label, i) => <span key={i} style={{ ...heading, textAlign: i < 3 ? 'center' : 'left' }}>{label}</span>)}
+          {['Hole', 'Par', 'SI', 'Over par', ''].map((label, i) => <span key={i} style={{ ...heading, textAlign: i < 3 ? 'center' : 'left', ...(i === 0 ? { transform: 'scaleX(0.9)' } : {}) }}>{label}</span>)}
         </div>
         {rows.map(h => {
           const parts = toParParts(h.avg_to_par);
