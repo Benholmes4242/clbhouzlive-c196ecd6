@@ -46,8 +46,29 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
     render(<ReviewHoleTags {...props({ holes: [] })} />);
     expect(screen.queryByRole('region')).toBeNull(); expect(screen.queryAllByRole('button')).toHaveLength(0);
   });
-  it('video-only reviews create no tagging section', () => {
-    render(<ReviewHoleTags {...props({ photos: [] })} />); expect(screen.queryAllByRole('button')).toHaveLength(0);
+  it('a video-only review shows the section with Video 1', () => {
+    render(<ReviewHoleTags {...props({ shots: [video] })} />);
+    expect(screen.getByRole('region', { name: 'Holes for your photos and videos' })).toBeInTheDocument();
+    expect(screen.getByText('Video 1')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Tag video 1' })).toBeInTheDocument();
+  });
+  it('photos and videos number separately with their own aria-labels', () => {
+    render(<ReviewHoleTags {...props({ shots: [photo, video, { ...photo, id: 'q' }] })} />);
+    expect(screen.getByRole('button', { name: 'Tag photo 1' })).toHaveTextContent('Photo 1');
+    expect(screen.getByRole('button', { name: 'Tag video 1' })).toHaveTextContent('Video 1');
+    expect(screen.getByRole('button', { name: 'Tag photo 2' })).toHaveTextContent('Photo 2');
+    expect(screen.getByRole('button', { name: 'Tag video 1' }).querySelector('img')).toHaveAttribute('src', '/poster.jpg');
+    expect(screen.getByRole('button', { name: 'Tag video 1' })).toHaveTextContent('1:15');
+    expect(screen.getByRole('button', { name: 'Tag photo 1' })).toHaveTextContent('No date on file');
+  });
+  it('the video sheet shows the duration badge and Your video, never a Taken chip', () => {
+    render(<ReviewHoleTags {...props({ shots: [video] })} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Tag video 1' }));
+    const sheet = screen.getByRole('dialog');
+    expect(sheet.querySelector('img[alt="Your video"]')).toHaveAttribute('src', '/poster.jpg');
+    expect(sheet).toHaveTextContent('1:15');
+    expect(sheet.textContent).not.toMatch(/Taken|No date/);
+    expect(sheet.querySelector('video')).toBeNull();
   });
   it('nine actual holes yield nine selectable chips without padding', () => {
     render(<ReviewHoleTags {...props({ holes: [1,2,3,4,5,6,7,8,9] })} />);
@@ -64,14 +85,15 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
     expect(assign).toHaveBeenCalledWith('p', 2); expect(screen.queryByRole('dialog')).toBeNull();
   });
   it('two photographs can choose the same used hole', () => {
-    const assign = vi.fn(); render(<ReviewHoleTags {...props({ photos: [photo, { ...photo, id: 'q' }], assignments: { p: 2 }, assign })} />);
+    const assign = vi.fn(); render(<ReviewHoleTags {...props({ shots: [photo, { ...photo, id: 'q' }], assignments: { p: 2 }, assign })} />);
     fireEvent.click(screen.getByRole('button', { name: 'Tag photo 2' }));
     fireEvent.click(screen.getByRole('button', { name: 'Hole 2' })); expect(assign).toHaveBeenCalledWith('q', 2);
   });
-  it('assignments are client-only until capture and exclude removed files and videos', async () => {
-    const { result, rerender } = renderHook(({ items }) => useReviewHoleTags('course', 'member', items), { initialProps: { items: [photo] }, wrapper });
-    act(() => result.current.assign('p', 9));
-    expect(f.insert).not.toHaveBeenCalled(); expect(result.current.capture()?.assignments).toEqual({ p: 9 });
+  it('assignments are client-only until capture, exclude removed files and include tagged videos', async () => {
+    const { result, rerender } = renderHook(({ items }) => useReviewHoleTags('course', 'member', items), { initialProps: { items: [photo, video] }, wrapper });
+    act(() => { result.current.assign('p', 9); result.current.assign('v', 2); });
+    expect(f.insert).not.toHaveBeenCalled(); expect(result.current.capture()?.assignments).toEqual({ p: 9, v: 2 });
+    rerender({ items: [photo] }); expect(result.current.capture()?.assignments).toEqual({ p: 9 });
     rerender({ items: [] }); expect(result.current.capture()?.assignments).toEqual({});
   });
   it('a five-month-old round is not preselected', async () => {
