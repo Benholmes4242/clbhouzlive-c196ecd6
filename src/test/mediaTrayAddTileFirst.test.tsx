@@ -39,7 +39,7 @@ describe('media tray Add tile leads the strip', () => {
     expect(add.style.flexShrink).toBe('0');
     // CAPS action label keeps its positive tracking, never a negative value.
     const label = add.querySelector('span:last-child') as HTMLElement;
-    expect(label.style.letterSpacing).toBe('0.1em');
+    expect(label.style.letterSpacing).toBe('0.10em');
     expect(label.style.textTransform).toBe('uppercase');
 
     // Items keep their order, appended after the Add tile.
