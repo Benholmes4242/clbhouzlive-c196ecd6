@@ -10,6 +10,7 @@ const fixture = vi.hoisted(() => ({ championProps: null as null | { avatarCandid
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/features/tourhub/hooks/useTourHubData', () => ({ useTourLeaderboard: () => ({ data: [{ id: 'winner-row', position: 1, score: -17, player: { sr_id: 'winner-key', full_name: 'Eugenio Lopez-Chacarra' } }] }) }));
 vi.mock('@/features/tourhub/hooks/useBatchCourseImages', () => ({ useBatchCourseImages: () => ({ data: new Map() }) }));
+vi.mock('@/features/tourhub/hooks/useLiveTournaments', async importOriginal => ({ ...(await importOriginal<typeof import('@/features/tourhub/hooks/useLiveTournaments')>()), useLiveTournaments: () => ({ data: [], isLoading: false, isError: false }) }));
 vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand', () => ({ PhotoBand: () => null }));
 vi.mock('@/features/tourhub/components/overview-v3/HybridHeroBands/ChampionStrip', async importOriginal => {
   const actual = await importOriginal<typeof import('@/features/tourhub/components/overview-v3/HybridHeroBands/ChampionStrip')>();
