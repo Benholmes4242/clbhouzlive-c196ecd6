@@ -165,11 +165,12 @@ describe('CB84 not_enough and none', () => {
     await waitFor(() => expect(container.querySelector('[data-state="not_enough"]')).not.toBeNull());
     expect((container.querySelector('.insights-audience-progress i') as HTMLElement).style.width).toBe('0%');
   });
-  it('none renders the none title and no inset', async () => {
+  it('none renders no card', async () => {
     const { container } = renderCard(audience({ state: 'none', followers_total: 0, with_handicap: 0, bands: [], regions: [], elsewhere: null, median: null }));
-    await waitFor(() => expect(container.querySelector('[data-state="none"]')).not.toBeNull());
-    expect(container.querySelector('[data-title]')!.getAttribute('data-title')).toBe('none');
-    expect(container.querySelector('.insights-audience-wait')).toBeNull();
+    await waitFor(() => expect(rpc).toHaveBeenCalled());
+    await new Promise((r) => setTimeout(r, 20));
+    expect(container.querySelector('[data-card="audience"]')).toBeNull();
+    expect(container.querySelector('section')).toBeNull();
   });
   it('a failed read renders no card', async () => {
     rpc.mockResolvedValue({ data: null, error: { code: '42501' } });
