@@ -85,5 +85,4 @@ describe('CB95 chart selection and coverage separation', () => {
     render(<SampleSection data={data({ years: [{ year: 2026, rounds: 7, partial: true }] })} />);
     expect(screen.queryByTestId('sample-years')).toBeNull();
   });
-;
 });
