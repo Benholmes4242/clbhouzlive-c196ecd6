@@ -33,7 +33,7 @@ import { useClubCourseLink } from '@/features/business/clubAnalytics/useClubCour
 import { useClubCourseAnalytics } from '@/features/business/clubAnalytics/useClubCourseAnalytics';
 import {
   HowItPlaysSection, IndexDisagreesSection, SampleSection, HoleBySection,
-  RecordBookSection, TeesSection, SeasonalitySection, WhoPlaysSection,
+  RecordBookSection, TeesSection, TeeSheetSection, YearOnYearSection, WhoPlaysSection,
   CompetitionSection,
 } from '@/features/business/clubAnalytics/sections';
 
@@ -153,7 +153,8 @@ const CourseBlock: React.FC<{ course: ClubCourseRef; courseCount: number; busine
                 />
               </SectionGuard>
               <SectionGuard><TeesSection data={result.data} /></SectionGuard>
-              <SectionGuard><SeasonalitySection data={result.data} /></SectionGuard>
+              <SectionGuard><TeeSheetSection data={result.data} /></SectionGuard>
+              <SectionGuard><YearOnYearSection data={result.data} /></SectionGuard>
               <SectionGuard><WhoPlaysSection data={result.data} /></SectionGuard>
               <SectionGuard><CompetitionSection data={result.data} /></SectionGuard>
             </>

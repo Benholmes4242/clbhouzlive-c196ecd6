@@ -1,6 +1,23 @@
 import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 import type { ClubCourseAnalytics } from './types';
 
+/** CB95: the lead and tee-sheet card share Monday-first ties and the same
+ * adjacent quiet-day rule, so their selected-payload conclusions cannot drift.
+ */
+export function weekRoom(weekdays: ClubCourseAnalytics['weekdays']) {
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const week = days.map((name, i) => ({ name, dow: i + 1, rounds: weekdays.find(day => day.dow === i + 1)?.rounds ?? 0 }));
+  const total = week.reduce((sum, day) => sum + day.rounds, 0);
+  if (total === 0) return null;
+  const busiest = [...week].sort((a, b) => b.rounds - a.rounds || a.dow - b.dow)[0];
+  const quietest = [...week].sort((a, b) => a.rounds - b.rounds || a.dow - b.dow);
+  const [first, second] = quietest;
+  if (!busiest || !first || !second) return null;
+  const pair = Math.abs(first.dow - second.dow) === 1 && (first.rounds + second.rounds) * 10 < total;
+  const quiet = (pair ? [first, second] : [first]).sort((a, b) => a.dow - b.dow);
+  return { total, busiest, quiet, quietRounds: quiet.reduce((sum, day) => sum + day.rounds, 0) };
+}
+
 /** CB91: selected payload only; weekdays are ISO Monday-first, never local dates.
  * Complete-round eligibility belongs to the server; the client only reads rank one.
  */
@@ -17,18 +34,10 @@ export function courseLead(data: ClubCourseAnalytics, { courseCount, businessNam
   const since = first && Number.isFinite(first.getTime()) ? ` since ${first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' })}` : '';
   let line = `From ${data.rounds.toLocaleString('en-GB')} ${data.rounds === 1 ? 'round' : 'rounds'} by ${data.members.toLocaleString('en-GB')} ${data.members === 1 ? 'golfer' : 'golfers'}${since}`;
   line += !hardest && data.rounds > 0 ? ', too few full rounds yet to say which hole plays hardest.' : '.';
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  const week = days.map((name, i) => ({ name, dow: i + 1, rounds: data.weekdays.find(day => day.dow === i + 1)?.rounds ?? 0 }));
-  const total = week.reduce((sum, day) => sum + day.rounds, 0);
-  if (total > 0) {
-    const busiest = [...week].sort((a, b) => b.rounds - a.rounds || a.dow - b.dow)[0];
-    const quiet = [...week].sort((a, b) => a.rounds - b.rounds || a.dow - b.dow).slice(0, 2);
-    const [firstQuiet, secondQuiet] = quiet;
-    if (busiest && firstQuiet && secondQuiet) {
-      const pair = Math.abs(firstQuiet.dow - secondQuiet.dow) === 1 && (firstQuiet.rounds + secondQuiet.rounds) * 10 < total;
-      const room = pair ? quiet.sort((a, b) => a.dow - b.dow).map(day => day.name).join(' and ') : firstQuiet.name;
-      line += ` ${busiest.name} is your busiest day; ${room} ${pair ? 'have' : 'has'} the most room.`;
-    }
+  const week = weekRoom(data.weekdays);
+  if (week) {
+    const room = week.quiet.map(day => day.name).join(' and ');
+    line += ` ${week.busiest.name} is your busiest day; ${room} ${week.quiet.length === 2 ? 'have' : 'has'} the most room.`;
   }
   if (early) line += ' Every figure firms up as more of your members connect.';
   return { early, headline, emphasis, line };

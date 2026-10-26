@@ -1,0 +1,18 @@
+.tee-sheet-card { background:var(--tee-sheet-card); border:1px solid var(--tee-sheet-line); border-radius:18px; padding:16px; font-family:Geist,sans-serif; color:var(--tee-sheet-ink); font-variant-numeric:tabular-nums; font-feature-settings:"kern" 1,"liga" 1; }
+.tee-sheet-kicker { font-size:10.5px; font-weight:800; letter-spacing:.16em; color:var(--tee-sheet-muted); }
+.tee-sheet-title { margin:6px 0 0; font-size:17px; font-weight:700; letter-spacing:0; line-height:1.3; }
+.tee-sheet-line { margin:4px 0 0; font-size:12.5px; line-height:1.45; color:var(--tee-sheet-muted); }
+.tee-sheet-line b { color:var(--tee-sheet-ink); font-weight:600; }
+.tee-sheet-subheading { margin:16px 0 0; font-size:10.5px; font-weight:800; letter-spacing:.14em; color:var(--tee-sheet-dim); }
+.tee-sheet-year-line { margin-top:6px; }
+.tee-sheet-inset { margin-top:12px; background:var(--tee-sheet-inset); border-radius:13px; padding:12px; }
+.tee-sheet-bars { display:flex; align-items:flex-end; gap:5px; height:92px; }
+.tee-sheet-column { flex:1; min-width:0; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; height:100%; }
+.tee-sheet-count { font-size:9.5px; font-weight:700; color:var(--tee-sheet-dim); margin-bottom:3px; }
+.tee-sheet-bar { width:100%; flex:none; border-radius:3px 3px 0 0; background:var(--tee-sheet-bar); }
+.tee-sheet-column[data-tone="quiet"] .tee-sheet-bar { background:var(--tee-sheet-quiet); }
+.tee-sheet-column[data-tone="busiest"] .tee-sheet-bar { background:var(--tee-sheet-ink); }
+.tee-sheet-column[data-tone="busiest"] .tee-sheet-count { color:var(--tee-sheet-ink); }
+.tee-sheet-axis { display:flex; gap:5px; margin-top:5px; font-size:10px; font-weight:700; color:var(--tee-sheet-dim); }
+.tee-sheet-axis span { flex:1; min-width:0; text-align:center; }
+.tee-sheet-fine { margin:10px 0 0; font-size:11.5px; line-height:1.45; color:var(--tee-sheet-dim); }
