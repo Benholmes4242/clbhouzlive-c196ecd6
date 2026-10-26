@@ -18,6 +18,7 @@ import { getActiveRound } from '../_shared/roundState.ts'
 import { dispatchTeeAlerts } from './teeAlerts.ts'
 import { shouldFetchLeaderboard, shouldFetchScorecards, shouldFetchHoleStats, shouldFetchInPlayTeeTimes, shouldResolveStatus, shouldFetchPreEventTeeTimes, nextTeeTimesRound } from '../_shared/sportradarCadence.ts'
 import { logSportradarCall } from '../_shared/sportradarCallLog.ts'
+import { LIVE_POLL_STATUSES, STALE_AUTO_CLOSE_STATUSES, CLOSED_FEED_STATUSES, statusToWrite, soleWinnerSrId } from './liveStatus.ts'
 
 const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
 const getTourBaseUrl = (tour: string = 'pga') =>
@@ -115,7 +116,7 @@ Deno.serve(async (req) => {
     const { data: staleCandidates } = await supabase
       .from('sr_tournaments')
       .select('id, sr_id, name, season_id, start_date, timezone')
-      .eq('status', 'inprogress')
+      .in('status', STALE_AUTO_CLOSE_STATUSES) // never a playoff/suspended event
       .lt('end_date', today);
     for (const t of staleCandidates ?? []) {
       try { await reconcileFinal(supabase, sportradarApiKey, t); }
@@ -124,7 +125,7 @@ Deno.serve(async (req) => {
     const { data: staleTournaments } = await supabase
       .from('sr_tournaments')
       .update({ status: 'closed' })
-      .eq('status', 'inprogress')
+      .in('status', STALE_AUTO_CLOSE_STATUSES)
       .lt('end_date', today)
       .select('id, name');
 
@@ -243,7 +244,7 @@ Deno.serve(async (req) => {
     const { data: liveTournaments, error: queryError } = await supabase
       .from('sr_tournaments')
       .select('id, sr_id, name, status, start_date, end_date, season_id, last_live_sync, timezone')
-      .eq('status', 'inprogress')
+      .in('status', LIVE_POLL_STATUSES) // inprogress + playoff + suspended
       .order('last_live_sync', { ascending: true, nullsFirst: true });
 
     if (queryError) {
@@ -267,7 +268,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`[LiveSync] version=2026-07-25-round-rollover-v3-liveRound-completeGuard`);
+    console.log(`[LiveSync] version=2026-10-26-playoff-suspended-v4`);
     console.log(`[LiveSync] Found ${liveTournaments.length} inprogress tournament(s)`);
 
     // ── Sync all tournaments (gated ones get stamped, not skipped) ────
@@ -368,7 +369,7 @@ async function syncTournament(
 
   // Date check is informational only — trust inprogress status over date range
   if (!dateCheck.isActive) {
-    console.log(`[LiveSync] Note: ${dateCheck.reason} — but status is inprogress, syncing anyway`);
+    console.log(`[LiveSync] Note: ${dateCheck.reason} — but status is inprogress, syncing anyway (status ${tournament.status})`);
   }
 
   // Get season info
@@ -512,24 +513,21 @@ async function syncTournament(
 
   // ── Lifecycle: check if Sportradar reports tournament as closed ───
   let transitionedToClosed = false;
-  const closedStatuses = ['closed', 'complete', 'completed', 'official'];
+  const closedStatuses = CLOSED_FEED_STATUSES;
 
   if (sportradarStatus && closedStatuses.includes(sportradarStatus.toLowerCase())) {
     console.log(`[LiveSync] Sportradar reports ${tournament.name} as '${sportradarStatus}' — transitioning to closed`);
 
-    let winnerId: string | null = null;
-    const { data: winnerEntry } = await supabase
+    // winner_id only for exactly ONE position-1 row with strokes; a tie names nobody.
+    const { data: leaderRows } = await supabase
       .from('sr_leaderboards')
-      .select('player_id, sr_players!inner(sr_id)')
+      .select('position, strokes, sr_players!inner(sr_id)')
       .eq('tournament_id', tournament.id)
       .eq('position', 1)
-      .gt('strokes', 0)
-      .order('strokes', { ascending: true })
-      .limit(1)
-      .maybeSingle();
-
-    if (winnerEntry?.sr_players?.sr_id) {
-      winnerId = winnerEntry.sr_players.sr_id;
+      .gt('strokes', 0);
+    const winnerId: string | null = soleWinnerSrId((leaderRows ?? []).map((r: any) => ({ position: r.position, strokes: r.strokes, sr_id: r.sr_players?.sr_id ?? null })));
+    if (!winnerId && (leaderRows?.length ?? 0) > 1) {
+      console.log(`[LiveSync] ${tournament.name}: ${leaderRows!.length} rows at position 1 — winner_id left null`);
     }
 
     const updatePayload: any = { status: 'closed', last_live_sync: new Date().toISOString() };
@@ -644,6 +642,12 @@ async function syncTournament(
   } else {
     // Update last_live_sync timestamp and current_round
     const updatePayload: any = { last_live_sync: new Date().toISOString() };
+    // Feed playoff/suspended statuses are written through, never replaced by inprogress.
+    const nextStatus = statusToWrite(sportradarStatus, tournament.status);
+    if (nextStatus) {
+      updatePayload.status = nextStatus;
+      console.log(`[LiveSync] ${tournament.name}: status ${tournament.status} → ${nextStatus} (feed '${sportradarStatus}')`);
+    }
     if (roundToWrite !== undefined) {
       updatePayload.current_round = roundToWrite;
       updatePayload.current_round_status = roundStatusToWrite;
