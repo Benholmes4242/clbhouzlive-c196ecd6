@@ -1,5 +1,9 @@
 # Roadmap
 
+## CB94 — Card against course
+- [ ] Replace club IndexDisagreesSection chart with neutral grouped list from buildSiLadder only; shared chart/helper and CB91–CB93 frozen.
+- [ ] Add new behavior tests and audit existing assertions; full-suite baseline3,200/372, zero failures. No SQL/backend/config/native changes.
+
 ## CB93 — Your courses section 3
 - [x] Update HoleBySection: hardest-first default, five-column table, ranked headline, single expanded per-hole split, HIP card paint and full-round empty state; CB91/CB92 and all other sections frozen. Reuse HIP, score colours, ramp, toParParts and howItPlaysShare.
 - [x] User approved passing existing businessName/courseCount through the single page call for CB91's exact label; no new reads.

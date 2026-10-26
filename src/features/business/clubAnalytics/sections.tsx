@@ -35,9 +35,10 @@ import {
   SC_PAR_DARK, SC_BOGEY_DARK, SC_DOUBLE_DARK,
 } from '@/features/courses/components/holes/_constants';
 import { PCT_MIN_N, MIN_BAR_PCT } from './constants';
-import { SiLadder } from '@/features/courses/_shared/SiLadder';
 import RailChips from '@/components/ui/RailChips';
-import { buildSiLadder } from '@/features/courses/_shared/siLadder';
+import { buildSiLadder, SI_PLACES_GATE } from '@/features/courses/_shared/siLadder';
+import { numberWord, ordinal } from '@/lib/text/numbers';
+import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 import type { ClubCourseAnalytics, ClubAnalyticsTee } from './types';
 import { sortTees, yd } from './tees';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
@@ -155,14 +156,47 @@ export const StatStrip: React.FC<{ cells: { figure: string; label: string; tone?
  * card declares no stroke index" panel is gone too: a club with no declared
  * index has no ladder to show, and an explanation of an absent chart is noise.
  */
-export const IndexDisagreesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => (
-  <SiLadder
-    ladder={buildSiLadder(data.holes ?? [], data.complete_rounds)}
-    voice="club"
-    basis={`${fmt(data.complete_rounds)} full rounds`}
-    style={CARD}
-  />
-);
+/** CB94: club-only list presentation. The shared helper alone owns flags and
+ * eligibility; the course-detail SiLadder chart and its rule remain untouched.
+ * Render only flagged rows, shotsFloor and rounds from its result.
+ */
+export const IndexDisagreesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
+  const ladder = buildSiLadder(data.holes ?? [], data.complete_rounds);
+  if (!ladder) return null;
+  const count = ladder.flagged.length;
+  const n = count < 10 ? numberWord(count) : String(count);
+  const title = count === 0 ? 'Every hole plays close to where your card puts it'
+    : `${n} ${count === 1 ? 'hole plays' : 'holes play'} well away from where your card puts ${count === 1 ? 'it' : 'them'}`;
+  const fine = 'This is a difficulty order across every handicap, not a stroke index, which ranks where a higher handicapper needs a shot.';
+  return (
+    <section data-testid="card-against-course" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS, ...FIGS }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>
+        <span>CARD AGAINST COURSE</span>
+        <span style={{ letterSpacing: '0.12em', color: HIP.DIM }}>{fmt(ladder.rounds)} FULL ROUNDS</span>
+      </div>
+      <h3 style={{ margin: '6px 0 0', fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.3, color: HIP.INK }}>{title}</h3>
+      {count === 0 ? <p style={{ margin: '4px 0 0', fontSize: 12.5, lineHeight: 1.45, color: HIP.MUTE }}>No hole sits {SI_PLACES_GATE} or more places, and a meaningful share of a shot, away from its stroke index.</p>
+        : (['harder', 'easier'] as const).map(direction => {
+          const rows = ladder.flagged.filter(row => row.direction === direction).sort((a, b) => a.measuredRank - b.measuredRank);
+          if (rows.length === 0) return null;
+          return <div key={direction} data-testid={`card-group-${direction}`}>
+            <h4 style={{ margin: '14px 0 0', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: HIP.DIM }}>{rows.length === 1 ? `Plays ${direction} than its card` : `Play ${direction} than their card`}</h4>
+            {rows.map((row, i) => <div key={row.holeNo} data-testid="card-against-row" data-hole={row.holeNo} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10, padding: '9px 0', borderTop: i === 0 ? undefined : `1px solid ${A.SOFT}` }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 13.5, fontWeight: 600, color: HIP.INK }}>Hole {row.holeNo} plays {ordinal(row.measuredRank)} hardest</div>
+                <div style={{ marginTop: 2, fontSize: 11.5, color: HIP.DIM }}>Your card makes it {row.strokeIndex}</div>
+              </div>
+              <div style={{ alignSelf: 'center', textAlign: 'right' }}>
+                <div data-testid="card-shots" style={{ fontSize: 13, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: direction === 'harder' ? HIP.INK : HIP.MUTE }}>{fmtToPar(row.shotsGap, 2)}</div>
+                <div style={{ marginTop: 1, fontSize: 10.5, fontWeight: 600, color: HIP.DIM }}>shots</div>
+              </div>
+            </div>)}
+          </div>;
+        })}
+      <p style={{ margin: '10px 0 0', fontSize: 11.5, lineHeight: 1.45, color: HIP.DIM }}>{count > 0 ? `The shots figure is how much harder or easier the hole plays than a hole at its card position usually does here. A hole is listed when it sits ${SI_PLACES_GATE} or more places from its card and at least ${ladder.shotsFloor.toFixed(2)} of a shot away. ` : ''}{fine}</p>
+    </section>
+  );
+};
 
 /* ─────────────────── THE SAMPLE, STATED PLAINLY ─────────────────── */
 
