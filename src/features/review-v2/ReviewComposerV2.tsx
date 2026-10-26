@@ -1,3 +1,4 @@
+import { mediaCountKey } from './lib/mediaUploadSummary';
 /**
  * ReviewComposerV2 - steps 2 and 3 of the unified composer's review path.
  *
@@ -821,9 +822,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     const parts: string[] = [];
     if (hasMedia) {
       parts.push(
-        media.count === 1
-          ? t('review.wizard.step2.summaryPhoto', { count: 1 })
-          : t('review.wizard.step2.summaryPhotos', { count: media.count }),
+        t(`review.wizard.step2.${mediaCountKey(media.items)}`, { count: media.count }),
       );
     }
     if (hasWords) parts.push(t('review.wizard.step2.summaryWords'));

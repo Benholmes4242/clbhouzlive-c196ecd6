@@ -5,6 +5,7 @@
  * own numbering, the tray poster as thumbnail (never a <video>), a duration
  * second line, and a GlassDurationBadge in the sheet instead of a Taken chip.
  */
+import { ReviewMediaPreview } from './ReviewMediaPreview';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet';
@@ -55,7 +56,7 @@ export function ReviewHoleTags(props: Props) {
       const hole = props.assignments[shot.id];
       const length = video && shot.durationSeconds ? formatDuration(shot.durationSeconds) : '';
       return <Button key={shot.id} variant="ghost" aria-label={`Tag ${video ? 'video' : 'photo'} ${n}`} onClick={() => setActiveId(shot.id)} className="w-full h-auto min-h-14 justify-start gap-3 p-2 rounded-lg text-left" style={{ border: `1px solid ${RV2.hairline}` }}>
-        <img src={video ? shot.posterUrl ?? shot.previewUrl : shot.previewUrl} alt="" className="w-10 h-10 object-cover rounded-lg shrink-0" />
+        <div className="w-10 h-10 overflow-hidden rounded-lg shrink-0"><ReviewMediaPreview {...shot} /></div>
         <span className="min-w-0"><span className="block text-[12.5px] font-semibold">{video ? `Video ${n}` : `Photo ${n}`}</span><span className="block text-[10.5px] leading-[1.45]" style={{ color: RV2.muted }}>{video ? length : day ? `Taken ${roundDate(day)}` : 'No date on file'}</span></span>
         <span className="ml-auto shrink-0 rounded-full px-3 py-1 text-[11px] font-bold" style={{ border: `1px ${hole == null ? 'dashed' : 'solid'} ${hole == null ? RV2.hairlineStrong : RV2.ink}`, background: hole == null ? 'transparent' : RV2.ink, color: hole == null ? RV2.secondary : RV2.canvas }}>{hole == null ? 'Tag' : ordinal(hole)}</span>
       </Button>;
@@ -68,7 +69,7 @@ export function ReviewHoleTags(props: Props) {
           <SheetTitle className="text-base font-bold tracking-normal" style={{ color: RV2.ink }}>Which hole is this?</SheetTitle>
           <SheetDescription className="mt-1 text-[12.5px]" style={{ color: RV2.secondary }}>{active ? `${ordinal(props.shots.findIndex(p => p.id === active.id) + 1)} of ${spellPhotoCount(props.shots.length)}.` : ''} {tagged.length > 0 ? `${capitalPhotoCount(tagged.length)} already tagged.` : ''}</SheetDescription>
           {active && (active.type === 'video'
-            ? <div className="relative mt-3 aspect-[4/3] overflow-hidden rounded-lg"><img src={active.posterUrl ?? active.previewUrl} alt="Your video" className="w-full h-full object-cover" /><GlassDurationBadge seconds={active.durationSeconds} bottom={8} right={8} fontSize={11} /></div>
+            ? <div className="relative mt-3 aspect-[4/3] overflow-hidden rounded-lg"><ReviewMediaPreview {...active} alt="Your video" /><GlassDurationBadge seconds={active.durationSeconds} bottom={8} right={8} fontSize={11} /></div>
             : <div className="relative mt-3 aspect-[4/3] overflow-hidden rounded-lg"><img src={active.previewUrl} alt="Your photograph" className="w-full h-full object-cover" /><span className="absolute bottom-2 left-2 rounded px-2 py-1 text-[11px] font-bold" style={{ color: RV2.ink, background: RV2.scrim }}>{info?.exif.captureDay ? `Taken ${dateLabel(info.exif.captureDay, true)}` : 'No date on this file'}</span></div>)}
           <div role="group" aria-label="Hole" className={`grid gap-[6px] mt-4 ${props.holes.length === 9 ? 'grid-cols-5' : 'grid-cols-6'}`}>
             {props.holes.map(hole => <Button key={hole} variant="ghost" aria-label={`Hole ${hole}`} aria-pressed={!!active && props.assignments[active.id] === hole} data-state="open" className="aspect-square h-auto min-w-0 p-0 rounded-lg text-sm font-bold tabular-nums" style={{ border: `1px solid ${RV2.hairlineStrong}`, color: RV2.secondary, background: active && props.assignments[active.id] === hole ? RV2.trackStrong : 'transparent' }} onClick={() => { if (active) props.assign(active.id, hole); setActiveId(null); }}>{hole}</Button>)}

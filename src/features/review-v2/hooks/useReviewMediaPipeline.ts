@@ -23,7 +23,8 @@ import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloud
 import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
 import { usePendingPostsStore, type PendingPost } from '@/uploads/pendingPostsStore';
 import { reviewRetryRegistry } from '@/uploads/reviewRetryRegistry';
-import { startReviewUpload, uploadAndPublishReview } from '../lib/reviewUploadController';
+import { startReviewUpload, uploadAndPublishReview, enqueueReviewUpload, subscribeToPreuploads, removeReviewPreupload, abandonReviewPreuploads, retainReviewPreuploads } from '../lib/reviewUploadController';
+import { probeVideo } from '../lib/probeVideo';
 import { REVIEW_V2_LIMITS } from '../tokens';
 import type { ExistingMedia, MediaItem } from '../types';
 import { writeComposerHolePhoto, type ComposerHoleJob } from '@/lib/courseMedia/composerHolePhotos';
@@ -43,71 +44,6 @@ const SWEEP_THROTTLE_MS = 2000;
 
 function nid(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
-}
-
-/**
- * ONE element load reads both the duration and a poster frame. muted +
- * playsInline are what let iOS decode a frame at all. The frame is drawn on
- * SEEKED (not loadedmetadata). Any failure, or a seek that has not landed
- * within 3s, resolves with a null poster — a missing poster never costs the
- * member their video. Only an element error before metadata rejects.
- */
-function probeVideo(
-  file: File,
-  registerBlob: (url: string) => string,
-): Promise<{ duration: number; posterUrl: string | null }> {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const v = document.createElement('video');
-    v.muted = true;
-    v.playsInline = true;
-    v.preload = 'metadata';
-    let duration: number | null = null;
-    let done = false;
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    const finish = (posterUrl: string | null) => {
-      if (done) return;
-      done = true;
-      if (timer) clearTimeout(timer);
-      URL.revokeObjectURL(url);
-      v.removeAttribute('src');
-      resolve({ duration: duration ?? 0, posterUrl });
-    };
-    v.onloadedmetadata = () => {
-      duration = Number.isFinite(v.duration) ? v.duration : 0;
-      timer = setTimeout(() => finish(null), 3000);
-      try {
-        v.currentTime = Math.min(0.1, (v.duration || 1) / 2);
-      } catch {
-        finish(null);
-      }
-    };
-    v.onseeked = () => {
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = v.videoWidth;
-        canvas.height = v.videoHeight;
-        const ctx = canvas.getContext('2d');
-        if (!ctx || !canvas.width || !canvas.height) return finish(null);
-        ctx.drawImage(v, 0, 0);
-        canvas.toBlob(
-          (blob) => finish(blob ? registerBlob(URL.createObjectURL(blob)) : null),
-          'image/jpeg',
-          0.7,
-        );
-      } catch {
-        finish(null);
-      }
-    };
-    v.onerror = () => {
-      if (duration !== null) return finish(null);
-      if (done) return;
-      done = true;
-      URL.revokeObjectURL(url);
-      reject(new Error('Could not read video metadata'));
-    };
-    v.src = url;
-  });
 }
 
 async function probeImageDims(file: File): Promise<{ width: number; height: number } | null> {
@@ -165,6 +101,8 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
       isExisting: true,
     })),
   );
+  const uploadKeyRef = useRef<string>(`rv2-${nid()}`);
+  const submitted = useRef(false);
   const [pickerError, setPickerError] = useState<string | null>(null);
 
   // Revoke blob URLs on unmount to prevent leaks.
@@ -184,7 +122,16 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
 
   // Refs so callbacks (e.g. retry) always see current items / active job.
   const itemsRef = useRef<MediaItem[]>(items);
-  useEffect(() => { itemsRef.current = items; }, [items]);
+  const patchItems = useCallback((fn: (prev: MediaItem[]) => MediaItem[]) => {
+    itemsRef.current = fn(itemsRef.current); setItems(itemsRef.current);
+  }, []);
+  useEffect(() => subscribeToPreuploads(uploadKeyRef.current, (id, state) => {
+    patchItems(prev => prev.map(item => item.id === id ? { ...item, status: state.status, progress: state.progress,
+      ...(state.result?.ok ? { uploadedUrl: state.result.uploadedUrl, streamId: state.result.streamId, posterUrl: item.posterUrl ?? state.result.posterUrl ?? null } : {}),
+      error: state.result?.error,
+    } : item));
+  }), [patchItems]);
+  useEffect(() => () => { if (!submitted.current) abandonReviewPreuploads(uploadKeyRef.current); }, []);
   const activeJobRef = useRef<ActiveJob | null>(null);
   const identityRef = useRef<ReviewPipelineIdentity | undefined>(identity);
   useEffect(() => { identityRef.current = identity; }, [identity]);
@@ -194,7 +141,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
       setPickerError(null);
 
       // PASS ONE — fully synchronous. Nothing is awaited before setItems.
-      const room = Math.max(0, REVIEW_V2_LIMITS.MAX_MEDIA - items.length);
+      const room = Math.max(0, REVIEW_V2_LIMITS.MAX_MEDIA - itemsRef.current.length);
       if (files.length > room) setPickerError('Reviews carry up to 10 photos or clips.');
       const kept = files.slice(0, room);
       if (kept.length === 0) return;
@@ -205,46 +152,51 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
           ? { id: nid(), file, type: 'video', previewUrl: preview, posterUrl: null,
               status: 'pending', progress: 0, durationSeconds: null, analysing: true }
           : { id: nid(), file, type: 'image', previewUrl: preview,
-              status: 'pending', progress: 0, width: null, height: null, analysing: true };
+              status: 'pending', progress: 0, width: null, height: null, analysing: false };
       });
-      setItems((prev) => [...prev, ...added]);
+      patchItems(prev => [...prev, ...added]);
+      for (const item of added) if (item.type === 'image' && item.file && userId) {
+        void enqueueReviewUpload(uploadKeyRef.current, userId, { id: item.id, type: item.type, file: item.file, trackBytes: true });
+      }
 
-      // PASS TWO — probe every file in parallel, patching each as it lands.
-      const patch = (id: string, p: Partial<MediaItem>) =>
-        setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...p } : i)));
-      await Promise.all(
-        added.map(async (item) => {
-          const file = item.file as File;
-          try {
-            if (item.type === 'video') {
-              const { duration, posterUrl } = await probeVideo(file, registerBlob);
-              if (duration > REVIEW_V2_LIMITS.MAX_VIDEO_SECONDS) {
-                setItems((prev) => prev.filter((i) => i.id !== item.id));
-                setPickerError('Videos need to be 3 minutes or under.');
-                return;
-              }
-              patch(item.id, { durationSeconds: duration, posterUrl, analysing: false });
-            } else {
-              const dims = await probeImageDims(file);
-              patch(item.id, { width: dims?.width ?? null, height: dims?.height ?? null, analysing: false });
-            }
-          } catch {
-            patch(item.id, { analysing: false });
+      // The controller reserves every tile in tray order. Video bytes are gated
+      // by the serial probe, including when publish joins before it settles.
+      const probes = added.map(async item => {
+        const file = item.file;
+        if (!file) return;
+        if (item.type === 'image') {
+          const dims = await probeImageDims(file);
+          patchItems(prev => prev.map(i => i.id === item.id ? { ...i, width: dims?.width ?? null, height: dims?.height ?? null } : i));
+          return;
+        }
+        const preflight = probeVideo(file, registerBlob).then(({ duration, posterUrl }) => {
+          if (duration > REVIEW_V2_LIMITS.MAX_VIDEO_SECONDS) {
+            patchItems(prev => prev.filter(i => i.id !== item.id));
+            setPickerError('Videos need to be 3 minutes or under.'); return null;
           }
-        }),
-      );
+          patchItems(prev => prev.map(i => i.id === item.id ? { ...i, durationSeconds: duration, posterUrl, analysing: false } : i));
+          if (!itemsRef.current.some(i => i.id === item.id) || !userId) return null;
+          return { id: item.id, type: item.type, file, durationSeconds: duration, posterUrl, trackBytes: true };
+        }).catch(() => {
+          patchItems(prev => prev.map(i => i.id === item.id ? { ...i, analysing: false, status: 'failed', error: 'Could not read video' } : i));
+          return null;
+        });
+        if (userId) void enqueueReviewUpload(uploadKeyRef.current, userId, { id: item.id, type: item.type, file, preflight, trackBytes: true });
+        await preflight;
+      });
+      await Promise.all(probes);
     },
-    [items.length],
+    [userId, patchItems],
   );
 
   const removeItem = useCallback(async (id: string) => {
     const target = items.find((i) => i.id === id);
     if (!target) return;
-    setItems((prev) => prev.filter((i) => i.id !== id));
+    patchItems(prev => prev.filter(i => i.id !== id));
+    if (!target.isExisting) { removeReviewPreupload(uploadKeyRef.current, id); return; }
 
     // Existing media -> delete DB row + cleanup asset.
     if (target.isExisting && target.dbRowId) {
-      await supabase.from('course_review_media').delete().eq('id', target.dbRowId);
       supabase.functions
         .invoke('cleanup-review-media', {
           body: {
@@ -278,17 +230,17 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
         })
         .catch((err) => { console.warn('[review-v2] cleanup-review-media failed', err); });
     }
-  }, [items]);
+  }, [items, patchItems]);
 
 
   const updateItem = useCallback((id: string, patch: Partial<MediaItem>) => {
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
+    patchItems(prev => prev.map(i => i.id === id ? { ...i, ...patch } : i));
     // Mirror progress into the pending-card store when a review flush is active.
     const active = activeJobRef.current;
     if (active && typeof patch.progress === 'number') {
       usePendingPostsStore.getState().updateProgress(active.jobId, id, patch.progress);
     }
-  }, []);
+  }, [patchItems]);
 
   const uploadOne = useCallback(
     async (item: MediaItem, reviewId: string): Promise<void> => {
@@ -523,8 +475,6 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
    * ------------------------------------------------------------------- */
 
   /** One stable key per composer instance, so a remount joins its own run. */
-  const uploadKeyRef = useRef<string>(`rv2-${nid()}`);
-
   const insertMediaRow = useCallback(
     async (reviewId: string, item: MediaItem): Promise<string | null> => {
       const dims = item.type === 'image' && item.width && item.height
@@ -583,7 +533,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
           progress: 100,
           uploadedUrl: r.uploadedUrl ?? null,
           streamId: r.streamId ?? null,
-          posterUrl: r.posterUrl ?? null,
+          posterUrl: itemsRef.current.find(i => i.id === r.id)?.posterUrl ?? r.posterUrl ?? null,
           error: undefined,
         });
       } else {
@@ -748,16 +698,26 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
         await uploadOne(it, reviewId);
         return;
       }
+      if (!userId || !it.file) return;
+      if (it.type === 'video' && it.durationSeconds == null) {
+        updateItem(id, { analysing: true });
+        try {
+          const probe = await probeVideo(it.file, registerBlob);
+          if (probe.duration > REVIEW_V2_LIMITS.MAX_VIDEO_SECONDS) { await removeItem(id); setPickerError('Videos need to be 3 minutes or under.'); return; }
+          it.durationSeconds = probe.duration; it.posterUrl = probe.posterUrl;
+          updateItem(id, { ...probe, durationSeconds: probe.duration, analysing: false });
+        } catch { updateItem(id, { analysing: false, status: 'failed' }); return; }
+      }
       updateItem(id, { status: 'pending', progress: 0, error: undefined });
-      await uploadPendingMedia();
+      await enqueueReviewUpload(uploadKeyRef.current, userId, { ...it, file: it.file, trackBytes: true }, true);
     },
-    [uploadOne, updateItem, uploadPendingMedia],
+    [uploadOne, updateItem, userId],
   );
 
   /** Count of files that would actually upload, read from the ref at submit time. */
   const pendingMediaCount = useCallback(
     () => itemsRef.current.filter(
-      (i) => (i.status === 'pending' || i.status === 'failed') && !!i.file,
+      (i) => !i.isExisting && !!i.file,
     ).length,
     [],
   );
@@ -766,13 +726,11 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
   const startBackgroundPublish = useCallback(
     (pendingId: string, opts?: { queryClient?: QueryClient; holeJob?: ComposerHoleJob }) => {
       const pending = itemsRef.current.filter(
-        (i) => (i.status === 'pending' || i.status === 'failed') && !!i.file,
+        (i) => !i.isExisting && !!i.file,
       );
       if (!userId || pending.length === 0) return;
 
-      for (const it of pending) {
-        updateItem(it.id, { status: 'uploading', progress: 0, error: undefined });
-      }
+      submitted.current = true; retainReviewPreuploads(uploadKeyRef.current);
 
       // NOT AWAITED. The QueryClient is captured so the sweep still works
       // after the composer is gone.
@@ -788,6 +746,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
           width: i.width ?? null,
           height: i.height ?? null,
           durationSeconds: i.durationSeconds ?? null,
+          uploadedUrl: i.uploadedUrl, streamId: i.streamId, posterUrl: i.posterUrl, trackBytes: true,
         })),
         () => { if (qc) invalidateCourseRatingCaches(qc); },
         opts?.holeJob,
@@ -811,6 +770,7 @@ export function useReviewMediaPipeline({ userId, existingMedia, identity }: UseR
 
   return {
     items,
+    abandon: () => abandonReviewPreuploads(uploadKeyRef.current),
     addFiles,
     removeItem,
     uploadPendingMedia,

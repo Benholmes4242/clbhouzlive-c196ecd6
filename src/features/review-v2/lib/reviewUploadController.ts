@@ -26,14 +26,15 @@
  *    from the review path") stands; this is modelled on postUploadController,
  *    not routed through it.
  *
- * ORPHANS ARE ACCEPTED, EXPLICITLY. Uploading before the record means an
+ * Preuploads are now cleaned on remove/abandon; published jobs retain ownership.
+ * HISTORICAL ORPHAN NOTE (superseded for normal closes). Uploading before the record means an
  * abandoned composer can leave a file in R2 with no row pointing at it. That
  * is cheap and sweepable; losing a member's photographs is not. If a sweeper
  * is ever written, its input is R2 keys with no matching course_review_media
  * row older than a day.
  */
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, SUPABASE_URL } from '@/integrations/supabase/client';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
 import { toast } from '@/lib/toast';
@@ -49,6 +50,11 @@ export interface ReviewUploadInput {
   width?: number | null;
   height?: number | null;
   durationSeconds?: number | null;
+  preflight?: Promise<ReviewUploadInput | null>;
+  trackBytes?: boolean;
+  uploadedUrl?: string | null;
+  streamId?: string | null;
+  posterUrl?: string | null;
 }
 
 export interface ReviewUploadResult {
@@ -85,53 +91,100 @@ function emit(job: Job) {
   for (const l of job.listeners) l({ ...job.snapshot, progress: { ...job.snapshot.progress } });
 }
 
-async function uploadImage(userId: string, item: ReviewUploadInput): Promise<ReviewUploadResult> {
-  const fileName = `${userId}-${Date.now()}-${Math.random().toString(36).slice(2)}-${item.file.name}`;
-  const formData = new FormData();
-  formData.append('file', item.file);
-  formData.append('fileName', fileName);
-  /*
-   * BUCKET PARAMETER (BRIEF_R1 §1.4a). The client used to append
-   * `bucketName: 'clbhouz-review-images'`; the edge function reads
-   * `bucketType` and nothing else, so that value was ignored for the whole
-   * life of the feature and every one of the 468 live review images sits in
-   * bucket clbhouz-media under <user>/course-media/. The parameter is not
-   * sent at all now, and the constant that named a bucket the code never
-   * used is gone: the function's own fallback (`bucketType || 'course-media'`)
-   * produces exactly today's destination, so no existing url moves. Sending
-   * `bucketType: 'course-media'` would be equivalent; omitting it keeps one
-   * fewer place claiming to choose something it does not choose. Changing
-   * WHERE review images land is a separate migration and is not authorised.
-   */
-
-  const { data, error } = await supabase.functions.invoke('cloudflare-r2-upload', {
-    body: formData,
+/** Image XHR exposes real transferred file bytes; functions.invoke cannot do this. */
+async function uploadImage(userId: string, item: ReviewUploadInput, onProgress: (pct: number) => void, signal: AbortSignal): Promise<ReviewUploadResult> {
+  if (!item.trackBytes) {
+    const form = new FormData(); form.append('file', item.file); form.append('fileName', `${userId}-${Date.now()}-${item.file.name}`);
+    const { data, error } = await supabase.functions.invoke('cloudflare-r2-upload', { body: form });
+    if (error || !data?.success || !data?.publicUrl) throw new Error(error?.message || data?.error || 'Image upload failed');
+    return { id: item.id, ok: true, uploadedUrl: data.publicUrl };
+  }
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('Sign in to upload');
+  const form = new FormData(); form.append('file', item.file);
+  form.append('fileName', `${userId}-${Date.now()}-${item.file.name}`);
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${SUPABASE_URL}/functions/v1/cloudflare-r2-upload`);
+    xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
+    const abort = () => xhr.abort(); signal.addEventListener('abort', abort, { once: true });
+    const finish = () => signal.removeEventListener('abort', abort);
+    xhr.upload.onprogress = event => { if (event.lengthComputable) onProgress(Math.min(100, event.loaded / event.total * 100)); };
+    xhr.onload = () => { finish(); try { const data = JSON.parse(xhr.responseText); if (xhr.status < 200 || xhr.status >= 300 || !data.success || !data.publicUrl) throw new Error(data.error || 'Image upload failed'); resolve({ id: item.id, ok: true, uploadedUrl: data.publicUrl }); } catch (e) { reject(e); } };
+    xhr.onerror = () => { finish(); reject(new Error('Image upload failed')); };
+    xhr.onabort = () => { finish(); reject(new Error('Upload cancelled')); };
+    if (signal.aborted) { finish(); reject(new Error('Upload cancelled')); return; } xhr.send(form);
   });
-  if (error) throw error;
-  if (!data?.success || !data?.publicUrl) throw new Error(data?.error || 'Image upload failed');
-  return { id: item.id, ok: true, uploadedUrl: data.publicUrl as string };
 }
-
-async function uploadVideo(
-  item: ReviewUploadInput,
-  onProgress: (pct: number) => void,
-): Promise<ReviewUploadResult> {
+async function uploadVideo(item: ReviewUploadInput, onProgress: (pct: number) => void, signal: AbortSignal): Promise<ReviewUploadResult> {
   const streamId = await new Promise<string>((resolve, reject) => {
-    uploadVideoResilient({
-      file: item.file,
-      onProgress: (loaded, total) => onProgress(total > 0 ? Math.round((loaded / total) * 100) : 0),
-      onSuccess: (sid) => resolve(sid),
-      onError: (err) => reject(err),
-    }).catch(reject);
+    let abortUpload: (() => void) | undefined;
+    const abort = () => { abortUpload?.(); reject(new Error('Upload cancelled')); };
+    signal.addEventListener('abort', abort, { once: true });
+    uploadVideoResilient({ file: item.file,
+      onProgress: (loaded, total) => onProgress(total > 0 ? loaded / total * 100 : 0),
+      onSuccess: sid => { signal.removeEventListener('abort', abort); resolve(sid); },
+      onError: err => { signal.removeEventListener('abort', abort); reject(err); },
+    }).then(control => { abortUpload = control.abort; if (signal.aborted) abort(); }).catch(reject);
   });
-  return {
-    id: item.id,
-    ok: true,
-    uploadedUrl: generateStreamHlsUrl(streamId),
-    streamId,
-    posterUrl: generateStreamThumbnailUrl(streamId),
-  };
+  return { id: item.id, ok: true, uploadedUrl: generateStreamHlsUrl(streamId), streamId, posterUrl: generateStreamThumbnailUrl(streamId) };
 }
+
+export interface PreuploadState { status: 'pending' | 'uploading' | 'uploaded' | 'failed'; progress: number; result?: ReviewUploadResult; }
+interface PreuploadEntry { input: ReviewUploadInput; userId: string; state: PreuploadState; promise: Promise<ReviewUploadResult>; resolve: (r: ReviewUploadResult) => void; abort: AbortController; removed: boolean; eligible: boolean; }
+const composers = new Map<string, { entries: Map<string, PreuploadEntry>; queue: PreuploadEntry[]; active: number; published: boolean; abandoned: boolean; listeners: Set<(id: string, s: PreuploadState) => void> }>();
+function composerUploads(key: string) { let c = composers.get(key); if (!c) { c = { entries: new Map(), queue: [], active: 0, published: false, abandoned: false, listeners: new Set() }; composers.set(key, c); } return c; }
+export function cleanupPreuploadedAssets(results: ReviewUploadResult[]): void {
+  const mediaItems = results.filter(r => r.ok && r.uploadedUrl).map(r => ({ id: r.id, media_url: r.uploadedUrl, media_type: r.streamId ? 'video' : 'image', stream_id: r.streamId ?? null }));
+  if (mediaItems.length) void supabase.functions.invoke('cleanup-review-media', { body: { mediaItems } }).catch(e => console.warn('[review] cleanup failed', e));
+}
+export function subscribeToPreuploads(key: string, listener: (id: string, state: PreuploadState) => void): () => void {
+  const c = composerUploads(key); c.listeners.add(listener); for (const [id, e] of c.entries) listener(id, e.state); return () => { c.listeners.delete(listener); };
+}
+function pump(key: string): void {
+  const c = composerUploads(key);
+  while (c.active < 2 && c.queue.length && !c.abandoned) {
+    const index = c.queue.findIndex(e => e.eligible && !e.removed);
+    if (index < 0) break;
+    const [e] = c.queue.splice(index, 1); if (!e || e.removed) continue;
+    c.active++; e.state = { status: 'uploading', progress: 0 };
+    const emit = () => { for (const l of c.listeners) l(e.input.id, e.state); }; emit();
+    const progress = (pct: number) => { e.state = { status: 'uploading', progress: pct }; emit(); };
+    void (e.input.type === 'video' ? uploadVideo(e.input, progress, e.abort.signal) : uploadImage(e.userId, e.input, progress, e.abort.signal))
+      .catch(error => ({ id: e.input.id, ok: false, error: error instanceof Error ? error.message : 'Upload failed' } as ReviewUploadResult))
+      .then(result => {
+        e.state = { status: result.ok ? 'uploaded' : 'failed', progress: result.ok ? 100 : e.state.progress, result }; emit();
+        if ((e.removed || c.abandoned) && result.ok) cleanupPreuploadedAssets([result]);
+        e.resolve(result); c.active--; if (!c.abandoned) pump(key);
+      });
+  }
+}
+export function enqueueReviewUpload(key: string, userId: string, input: ReviewUploadInput, retry = false): Promise<ReviewUploadResult> {
+  const c = composerUploads(key); const old = c.entries.get(input.id);
+  if (old && !(retry && old.state.status === 'failed')) return old.promise;
+  let resolve: (r: ReviewUploadResult) => void = () => {};
+  const promise = new Promise<ReviewUploadResult>(r => { resolve = r; });
+  const e: PreuploadEntry = { input, userId, promise, resolve, state: { status: 'pending', progress: 0 }, abort: new AbortController(), removed: false, eligible: !input.preflight };
+  c.entries.set(input.id, e); c.queue.push(e);
+  if (input.preflight) void input.preflight.then(valid => {
+    if (!valid || e.removed || c.abandoned) { e.removed = true; e.resolve({ id: input.id, ok: false, error: 'Video unavailable' }); return; }
+    e.input = valid; e.eligible = true; pump(key);
+  }).catch(() => { e.state = { status: 'failed', progress: 0 }; e.resolve({ id: input.id, ok: false, error: 'Could not read video' }); for (const l of c.listeners) l(input.id, e.state); });
+  pump(key); return promise;
+}
+export function removeReviewPreupload(key: string, id: string): void {
+  const c = composers.get(key); const e = c?.entries.get(id); if (!c || !e) return;
+  e.removed = true; e.abort.abort();
+  if (e.state.result?.ok) cleanupPreuploadedAssets([e.state.result]);
+  if (e.state.status === 'pending') e.resolve({ id, ok: false, error: 'Removed' });
+  c.entries.delete(id);
+}
+export function abandonReviewPreuploads(key: string): void {
+  const c = composers.get(key); if (!c || c.published || c.abandoned) return; c.abandoned = true;
+  for (const id of c.entries.keys()) removeReviewPreupload(key, id);
+  c.queue = []; c.listeners.clear(); composers.delete(key);
+}
+export function retainReviewPreuploads(key: string): void { composerUploads(key).published = true; }
 
 async function runJob(
   job: Job,
@@ -141,37 +194,21 @@ async function runJob(
 ): Promise<ReviewUploadResult[]> {
   const results: ReviewUploadResult[] = [];
 
-  for (const item of items) {
-    const setProgress = (pct: number) => {
-      job.snapshot.progress[item.id] = pct;
-      emit(job);
-    };
-    try {
-      // Images get no native progress from functions.invoke; a single bump to
-      // 30 is honest about "started", and 100 lands on completion.
-      setProgress(item.type === 'video' ? 0 : 30);
-      const res = item.type === 'video'
-        ? await uploadVideo(item, setProgress)
-        : await uploadImage(userId, item);
-      results.push(res);
-      job.snapshot.completed += 1;
-      setProgress(100);
-      // COMPOSER_HOLES_1_R2: independent per-item enrichment. Not awaited by
-      // the upload/review path; original File and detached choices outlive UI.
-      // Videos pass their stream id and poster so the tag can write too.
+  await Promise.all(items.map(async item => {
+    const c = composerUploads(job.snapshot.key);
+    const unsubscribe = subscribeToPreuploads(job.snapshot.key, (id, state) => { if (id === item.id) { job.snapshot.progress[id] = state.progress; emit(job); } });
+    const old = c.entries.get(item.id);
+    const res = item.uploadedUrl
+      ? { id: item.id, ok: true, uploadedUrl: item.uploadedUrl, streamId: item.streamId ?? undefined, posterUrl: item.posterUrl ?? undefined }
+      : await enqueueReviewUpload(job.snapshot.key, userId, item, old?.state.status === 'failed');
+    unsubscribe(); results.push(res);
+    if (res.ok) { job.snapshot.completed++; job.snapshot.progress[item.id] = 100;
       if (res.uploadedUrl) void writeComposerHolePhoto(holeJob, userId, { ...item, streamId: res.streamId ?? null, posterUrl: res.posterUrl ?? null }, res.uploadedUrl);
-    } catch (e) {
-      results.push({
-        id: item.id,
-        ok: false,
-        error: e instanceof Error ? e.message : 'Upload failed',
-      });
-      job.snapshot.failed += 1;
-      emit(job);
-    }
-  }
+    } else job.snapshot.failed++;
+    emit(job);
+  }));
 
-  return results;
+  return items.map(item => results.find(r => r.id === item.id)).filter((r): r is ReviewUploadResult => !!r);
 }
 
 /**
@@ -345,8 +382,8 @@ export function subscribeToReviewPublish(
   const cur = publishStates.get(key);
   if (cur) listener(cur);
   return () => {
-    set!.delete(listener);
-    if (set!.size === 0 && publishListeners.get(key) === set) publishListeners.delete(key);
+    set?.delete(listener);
+    if (set?.size === 0 && publishListeners.get(key) === set) publishListeners.delete(key);
   };
 }
 
@@ -358,6 +395,7 @@ export async function uploadAndPublishReview(
   onPublished?: () => void,
   holeJob?: ComposerHoleJob,
 ): Promise<PublishOutcome> {
+  retainReviewPreuploads(key);
   const byId = new Map(items.map((i) => [i.id, i]));
   setPublishState(key, {
     phase: 'uploading', uploaded: 0, total: items.length, percent: 0,
@@ -402,14 +440,15 @@ export async function uploadAndPublishReview(
   // EVERY FILE OR NOTHING — the RPC re-checks this count and refuses a short
   // array, so a mismatch here can never publish a partial review.
   const media = results.map((r) => {
-    const input = byId.get(r.id)!;
+    const input = byId.get(r.id);
+    if (!input) throw new Error('Missing upload input');
     const w = input.width ?? null;
     const h = input.height ?? null;
     return {
       media_url: r.uploadedUrl ?? '',
       media_type: input.type,
       stream_id: r.streamId ?? null,
-      poster_url: r.posterUrl ?? null,
+      poster_url: input.posterUrl ?? r.posterUrl ?? null,
       width: w,
       height: h,
       aspect_ratio: w && h ? Number((w / h).toFixed(4)) : null,

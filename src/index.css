@@ -20,6 +20,43 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Review-only upload tokens and fixed tile states; post composer stays unchanged. */
+:root {
+  --review-upload-overlay: rgba(10,10,12,0.55);
+  --review-upload-track: rgba(255,255,255,0.25);
+  --review-upload-badge: rgba(0,0,0,0.55);
+  --review-upload-no-preview: #1C1C21;
+  --review-upload-failed: rgba(60,10,12,0.6);
+  --review-upload-improved: #4ADE80;
+  --review-upload-danger: #E5484D;
+  --review-upload-ink: #F8FAFC;
+  --review-upload-body: rgba(248,250,252,0.72);
+  --review-upload-muted: rgba(248,250,252,0.55);
+  --review-upload-dim: rgba(248,250,252,0.42);
+  --review-upload-hairline: rgba(255,255,255,0.10);
+  --review-upload-amber: #F7931E;
+}
+.review-upload-image { width:100%; height:100%; object-fit:cover; display:block; }
+.review-upload-no-preview { width:100%; height:100%; display:grid; place-items:center; background:var(--review-upload-no-preview); color:var(--review-upload-dim); }
+.review-upload-duration { position:absolute; left:4px; bottom:4px; font-size:9.5px; font-weight:700; padding:1px 4px; border-radius:4px; background:var(--review-upload-badge); color:var(--review-upload-ink); font-variant-numeric:tabular-nums; }
+.review-upload-overlay { position:absolute; inset:0; display:grid; place-items:center; background:var(--review-upload-overlay); color:var(--review-upload-ink); border-radius:0; padding:0; height:100%; width:100%; letter-spacing:0; }
+.review-upload-ring { width:36px; height:36px; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); }
+.review-upload-ring-track { stroke:var(--review-upload-track); }
+.review-upload-ring-fill { stroke:var(--review-upload-amber); }
+.review-upload-percent { position:relative; font-size:10px; font-weight:800; font-variant-numeric:tabular-nums; }
+.review-upload-waiting { font-size:9.5px; font-weight:700; color:var(--review-upload-body); }
+.review-upload-failed { background:var(--review-upload-failed); font-size:10.5px; font-weight:800; }
+.review-upload-tick { position:absolute; left:4px; top:4px; width:16px; height:16px; border-radius:50%; display:grid; place-items:center; background:var(--review-upload-badge); color:var(--review-upload-improved); }
+.review-upload-tick svg { width:11px; height:11px; }
+.review-upload-batch { margin-top:6px; color:var(--review-upload-ink); font-size:12.5px; }
+.review-upload-batch-row { display:flex; justify-content:space-between; align-items:baseline; }
+.review-upload-batch-row b { font-weight:700; }
+.review-upload-batch-row span { color:var(--review-upload-muted); font-variant-numeric:tabular-nums; }
+.review-upload-batch-track { height:3px; border-radius:2px; margin-top:7px; overflow:hidden; background:var(--review-upload-hairline); }
+.review-upload-batch-track > div { height:100%; background:var(--review-upload-amber); }
+.review-upload-batch p { margin:7px 0 0; font-size:11.5px; line-height:1.45; color:var(--review-upload-dim); }
+.review-upload-batch-done { color:var(--review-upload-improved); }
+.review-upload-batch-failed { color:var(--review-upload-danger); }
 /* CB75: Team section-one roles; scope excludes the frozen member/invite lists.
    Sheet chrome remains owned by BottomSheet (founder ruling). */
 :root {
