@@ -4,9 +4,12 @@
  */
 
 import React, { useRef } from 'react';
-import { Plus, X, Play, Loader2, RotateCcw, AlertCircle, Camera } from 'lucide-react';
+import { Plus, X, Check, Loader2, AlertCircle, Camera } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { RV2, REVIEW_V2_LIMITS } from '../tokens';
+import { Button } from '@/components/ui/button';
+import { ReviewMediaPreview } from './ReviewMediaPreview';
+import { mediaUploadSummary } from '../lib/mediaUploadSummary';
 import type { MediaItem } from '../types';
 
 interface Props {
@@ -31,6 +34,7 @@ export function MediaTray({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { t } = useTranslation('courses');
 
+  const batch = mediaUploadSummary(items);
   const remaining = REVIEW_V2_LIMITS.MAX_MEDIA - items.length;
   const canAdd = remaining > 0 && !disabled;
   /** Decides the add control's presentation — the only switch. */
@@ -61,115 +65,15 @@ export function MediaTray({
               border: `1px solid ${RV2.hairline}`,
             }}
           >
-            {it.type === 'image' ? (
-              <img
-                src={it.previewUrl}
-                alt=""
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            ) : it.posterUrl ? (
-              <img
-                src={it.posterUrl}
-                alt=""
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            ) : (
-              /* THE #t=0.1 MEDIA FRAGMENT IS WHAT MAKES THE FRAME APPEAR. A
-                 <video> that is never played and never seeked decodes nothing and
-                 paints black — metadata gives dimensions and duration, not a
-                 picture. The fragment tells the browser to position at 0.1s, so
-                 loading metadata also decodes that frame. Same pattern as
-                 PendingPostCard.tsx, which fixed this once already. 0.1 rather
-                 than 0 because a seek to exactly 0 is a no-op in some decoders
-                 and leaves the element unpainted. */
-              <video
-                src={`${it.previewUrl}#t=0.1`}
-                muted
-                playsInline
-                preload="metadata"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            )}
-
-            {it.type === 'video' && !it.analysing && (
-              <div
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  pointerEvents: 'none',
-                  background:
-                    'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.35) 100%)',
-                }}
-              >
-                <Play size={16} color={RV2.onDark} fill={RV2.onDark} />
-              </div>
-            )}
-
-            {!it.analysing && (it.status === 'uploading' || it.status === 'pending') && (
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  height: 3,
-                  background: 'rgba(255,255,255,0.35)',
-                }}
-              >
-                <div
-                  style={{
-                    width: `${it.progress ?? 0}%`,
-                    height: '100%',
-                    background: RV2.amber,
-                    transition: 'width 200ms',
-                  }}
-                />
-              </div>
-            )}
-
-            {it.analysing && (
-              <div
-                aria-label="Preparing"
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'rgba(0,0,0,0.45)',
-                  display: 'grid',
-                  placeItems: 'center',
-                  pointerEvents: 'none',
-                }}
-              >
-                <Loader2 size={20} color={RV2.onDark} className="motion-safe:animate-spin" />
-              </div>
-            )}
-
-            {it.status === 'failed' && (
-              <button
-                type="button"
-                onClick={() => onRetry?.(it.id)}
-                aria-label="Retry upload"
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'rgba(0,0,0,0.55)',
-                  color: RV2.onDark,
-                  border: 'none',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 2,
-                  cursor: 'pointer',
-                }}
-              >
-                <RotateCcw size={16} />
-                <span style={{ /* CAPS ACTION (§5), floor 11. */ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.10em' }}>Retry</span>
-              </button>
-            )}
+            <ReviewMediaPreview {...it} />
+            {it.type === 'video' && it.durationSeconds != null && <span className="review-upload-duration">{Math.floor(it.durationSeconds / 60)}:{String(Math.floor(it.durationSeconds % 60)).padStart(2, '0')}</span>}
+            {it.analysing ? <div className="review-upload-overlay" aria-label="Preparing"><Loader2 size={18} className="motion-safe:animate-spin" /></div>
+              : it.status === 'uploading' ? <div className="review-upload-overlay" role="progressbar" aria-label="Upload progress" aria-valuenow={Math.round(it.progress)} aria-valuemin={0} aria-valuemax={100}>
+                <svg className="review-upload-ring" viewBox="0 0 36 36"><circle className="review-upload-ring-track" cx="18" cy="18" r="15" strokeWidth="3" fill="none" /><circle className="review-upload-ring-fill" cx="18" cy="18" r="15" strokeWidth="3" fill="none" strokeLinecap="round" strokeDasharray={Math.PI * 30} strokeDashoffset={Math.PI * 30 * (1 - Math.max(0, Math.min(100, it.progress)) / 100)} transform="rotate(-90 18 18)" /></svg>
+                <span className="review-upload-percent">{Math.round(it.progress)}%</span>
+              </div> : it.status === 'pending' ? <div className="review-upload-overlay"><span className="review-upload-waiting">Waiting</span></div>
+              : it.status === 'failed' ? <Button variant="ghost" type="button" onClick={() => onRetry?.(it.id)} aria-label="Retry upload" className="review-upload-overlay review-upload-failed">Retry</Button>
+              : it.status === 'uploaded' || it.status === 'ready' ? <span className="review-upload-tick" aria-label="Uploaded"><Check size={11} strokeWidth={3.2} /></span> : null}
 
             <button
               type="button"
@@ -275,6 +179,11 @@ export function MediaTray({
         )}
       </div>
 
+      {batch.total > 0 && <div className="review-upload-batch" aria-live="polite">
+        {batch.active ? <><div className="review-upload-batch-row"><b>{batch.uploaded} of {batch.total} uploaded</b><span>{batch.percent}%</span></div><div className="review-upload-batch-track"><div style={{ width: `${batch.percent}%` }} /></div><p>Keep writing. Uploads carry on in the background, and you can post before they finish.</p></>
+          : batch.failed ? <div className="review-upload-batch-failed">{batch.failed} couldn't upload. Tap a red tile to retry.</div>
+          : <div className="review-upload-batch-done">{batch.total === 1 ? 'Uploaded' : `All ${batch.total} uploaded`}</div>}
+      </div>}
       {pickerError && (
         <div
           style={{
