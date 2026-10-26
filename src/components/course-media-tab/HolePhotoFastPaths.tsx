@@ -106,7 +106,7 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onClose, adminMo
   if (!photo) return null;
   const video = photo.mediaType === 'video';
   const canConfirm = !pending && !allTagged && selected != null && !done(photo.url);
-  return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent style={theme} className="hole-photo-fast hole-photo-fast-sheet hole-photo-batch" onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
+  return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent style={theme} className="hole-photo-fast hole-photo-fast-sheet hole-photo-batch" onOpenAutoFocus={event => { event.preventDefault(); (event.currentTarget as HTMLElement | null)?.focus(); }} onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
     <div className="hole-photo-batch-top">
       <DialogTitle className="hole-photo-fast-title">Which hole is this?</DialogTitle>
       <button type="button" className="hole-photo-batch-close" aria-label="Close" disabled={pending} onClick={() => { if (!pending) onClose(); }}><X size={20} strokeWidth={2.5} /></button>
