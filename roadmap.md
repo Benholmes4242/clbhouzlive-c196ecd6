@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB99 — Insights on the course
+- [x] Added useBusinessCourseActivity and InsightsCourseSection after Reviews; server totals/order/privacy unchanged, sections 1–7 frozen. Added scoped global styles and en/en-XA copy; title tracking stays 0 under environment restriction rather than requested -0.01em.
+- [ ] STOP: src/test/cb99InsightsCourse.test.tsx:75:71, “query key and arguments include each picker period; old snapshot remains until settled”: AssertionError: expected undefined to be truthy. Fixture sets gcTime: 0, so inactive 30-day cache is removed before final assertion. No assertion or fixture correction after failure. Targeted bunx vitest run src/test/cb99InsightsCourse.test.tsx src/test/cb89InsightsReviews.test.tsx src/test/cb88InsightsEngagement.test.tsx: 65 passed/1 failed/66 total/3 files (CB99 24/25; CB89 23/23; CB88 18/18). No existing tests changed. Last full baseline3,293/381; +25 new cases/one file = candidate3,318/382, full run not executed after stop.
+- [ ] Full suite and browser checks blocked by the new test stop. Latest harness build OK16:00:43Z; standalone typecheck not run. External_unmanaged prevents authenticated live read verification. Report CB99_Insights_on_the_course_report.md; no pre-existing failure observed in targeted files.
+
 ## CB95 — Where the tee sheet has room
 - [x] Extract shared weekRoom without changing CB91 courseLead tests; replace seasonality with tee-sheet week/year card and separate unchanged year-on-year content.
 - [x] Add22 tests in cb95TeeSheet.test.tsx; targeted84/7 pass, unchanged22 CB91 helper tests green. Retarget only cb91CoursesTop section list/mock from SeasonalitySection to TeeSheetSection + YearOnYearSection; no count delta there. Full bunx vitest run3,244 passed/18 pre-existing failed/3,262 total/376 files. Last verified full3,208/373 +14 ownership +18 progress +22 CB95 =3,262/376; no new failures. Existing reviewUploadProgress.test.tsx:30:6 Error: createObjectURL does not exist remains untouched in all18 cases. Harness build OK14:49:41Z; standalone typecheck prohibited, not run.

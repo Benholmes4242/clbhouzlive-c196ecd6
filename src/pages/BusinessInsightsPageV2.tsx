@@ -27,6 +27,7 @@ import { InsightsFollowersSection } from '@/components/business/insights/Insight
 import { InsightsPostsSection } from '@/components/business/insights/InsightsPostsSection';
 import { InsightsEngagementSection } from '@/components/business/insights/InsightsEngagementSection';
 import { InsightsReviewsSection } from '@/components/business/insights/InsightsReviewsSection';
+import { InsightsCourseSection } from '@/components/business/insights/InsightsCourseSection';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Button } from '@/components/ui/button';
@@ -178,6 +179,9 @@ const BusinessInsightsPageV2 = () => {
             <InsightsReviewsSection businessId={business.id} businessName={business.name} days={RANGE_DAYS[dateRange]} canManage={!!membership.canManage} onNavigate={navigate} />
           </div>
         )}
+        <div className="-mx-4 md:-mx-6 !mt-0">
+          <InsightsCourseSection businessId={business.id} businessName={business.name} days={RANGE_DAYS[dateRange]} onNavigate={navigate} />
+        </div>
       </div>
     </ManagePageShell>
   );
