@@ -1,10 +1,15 @@
-/** Separate image-only list; MediaTray and the shared counter are not modified.
+/** Separate shot list; MediaTray and the shared counter are not modified.
  * Picker uses actual holes, no floor, and closes on selection. Both sheets use
  * one scroll owner; original file dates alone label photographs.
+ * BRIEF_REVIEW_WIZARD_VIDEO_HOLE_TAGS: videos list beside photos with their
+ * own numbering, the tray poster as thumbnail (never a <video>), a duration
+ * second line, and a GlassDurationBadge in the sheet instead of a Taken chip.
  */
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet';
+import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
+import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { RV2 } from '../tokens';
 import { ordinal } from './ReviewReceipt';
 import { capitalPhotoCount, spellPhotoCount } from '@/lib/courseMedia/holePhotoData';
@@ -22,16 +27,22 @@ const roundDate = (day: string) => {
 export function ReviewHoleTags(props: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [roundOpen, setRoundOpen] = useState(false);
-  if (!props.holes.length || !props.photos.length) return null;
-  const active = props.photos.find(photo => photo.id === activeId);
-  const tagged = props.photos.filter(photo => props.assignments[photo.id] != null);
-  const used = [...new Set(tagged.map(photo => props.assignments[photo.id]))];
+  if (!props.holes.length || !props.shots.length) return null;
+  const active = props.shots.find(shot => shot.id === activeId);
+  const tagged = props.shots.filter(shot => props.assignments[shot.id] != null);
+  const used = [...new Set(tagged.map(shot => props.assignments[shot.id]))];
   const info = active ? props.metadata[active.id] : undefined;
-  const summary = props.photos.length === tagged.length
+  const summary = props.shots.length === tagged.length
     ? `${capitalPhotoCount(tagged.length)} on a hole. All still post with your review.`
-    : `${capitalPhotoCount(tagged.length)} of ${spellPhotoCount(props.photos.length)} on a hole. ${capitalPhotoCount(props.photos.length - tagged.length)} still ${props.photos.length - tagged.length === 1 ? 'posts' : 'post'} with your review — ${props.photos.length - tagged.length === 1 ? 'it' : 'they'} just will not appear on a hole.`;
+    : `${capitalPhotoCount(tagged.length)} of ${spellPhotoCount(props.shots.length)} on a hole. ${capitalPhotoCount(props.shots.length - tagged.length)} still ${props.shots.length - tagged.length === 1 ? 'posts' : 'post'} with your review — ${props.shots.length - tagged.length === 1 ? 'it' : 'they'} just will not appear on a hole.`;
   const note = { borderLeft: `2px solid ${RV2.hairlineStrong}`, paddingLeft: 11, fontSize: 12, lineHeight: 1.5, color: RV2.secondary };
-  return <section aria-label="Photograph holes" style={{ padding: '0 16px 16px', color: RV2.ink }}>
+  let photoNumber = 0; let videoNumber = 0;
+  const numbered = props.shots.map(shot => {
+    const video = shot.type === 'video';
+    const n = video ? ++videoNumber : ++photoNumber;
+    return { shot, video, n };
+  });
+  return <section aria-label="Holes for your photos and videos" style={{ padding: '0 16px 16px', color: RV2.ink }}>
     {props.rounds.length > 0 && <Button variant="ghost" onClick={() => setRoundOpen(true)} className="w-full h-auto min-h-14 justify-between text-left whitespace-normal rounded-lg px-3 py-3" style={{ border: `1px ${props.chosenRound ? 'solid' : 'dashed'} ${RV2.hairlineStrong}`, background: props.chosenRound ? RV2.track : 'transparent' }}>
       <span className="min-w-0"><span className="block text-[13.5px] font-bold tabular-nums">{props.chosenRound ? roundDate(props.chosenRound.playDate) : 'Which round were these from?'}</span>
         <span className="block text-[11.5px] leading-[1.45]" style={{ color: RV2.secondary }}>{props.chosenRound
@@ -40,12 +51,13 @@ export function ReviewHoleTags(props: Props) {
       <span className="ml-2 text-[11.5px] font-bold" style={{ color: RV2.amber }}>{props.chosenRound ? 'Change' : 'Choose'}</span>
     </Button>}
     <h2 className="mt-4 mb-2 text-[11px] font-bold uppercase tracking-normal" style={{ color: RV2.eyebrow }}>Put them on a hole</h2>
-    <div className="flex flex-col gap-2">{props.photos.map((photo, index) => {
-      const day = props.metadata[photo.id]?.exif.captureDay;
-      const hole = props.assignments[photo.id];
-      return <Button key={photo.id} variant="ghost" aria-label={`Tag photo ${index + 1}`} onClick={() => setActiveId(photo.id)} className="w-full h-auto min-h-14 justify-start gap-3 p-2 rounded-lg text-left" style={{ border: `1px solid ${RV2.hairline}` }}>
-        <img src={photo.previewUrl} alt="" className="w-10 h-10 object-cover rounded-lg shrink-0" />
-        <span className="min-w-0"><span className="block text-[12.5px] font-semibold">Photo {index + 1}</span><span className="block text-[10.5px] leading-[1.45]" style={{ color: RV2.muted }}>{day ? `Taken ${roundDate(day)}` : 'No date on file'}</span></span>
+    <div className="flex flex-col gap-2">{numbered.map(({ shot, video, n }) => {
+      const day = props.metadata[shot.id]?.exif.captureDay;
+      const hole = props.assignments[shot.id];
+      const length = video && shot.durationSeconds ? formatDuration(shot.durationSeconds) : '';
+      return <Button key={shot.id} variant="ghost" aria-label={`Tag ${video ? 'video' : 'photo'} ${n}`} onClick={() => setActiveId(shot.id)} className="w-full h-auto min-h-14 justify-start gap-3 p-2 rounded-lg text-left" style={{ border: `1px solid ${RV2.hairline}` }}>
+        <img src={video ? shot.posterUrl ?? shot.previewUrl : shot.previewUrl} alt="" className="w-10 h-10 object-cover rounded-lg shrink-0" />
+        <span className="min-w-0"><span className="block text-[12.5px] font-semibold">{video ? `Video ${n}` : `Photo ${n}`}</span><span className="block text-[10.5px] leading-[1.45]" style={{ color: RV2.muted }}>{video ? length : day ? `Taken ${roundDate(day)}` : 'No date on file'}</span></span>
         <span className="ml-auto shrink-0 rounded-full px-3 py-1 text-[11px] font-bold" style={{ border: `1px ${hole == null ? 'dashed' : 'solid'} ${hole == null ? RV2.hairlineStrong : RV2.ink}`, background: hole == null ? 'transparent' : RV2.ink, color: hole == null ? RV2.secondary : RV2.canvas }}>{hole == null ? 'Tag' : ordinal(hole)}</span>
       </Button>;
     })}</div>
@@ -55,8 +67,10 @@ export function ReviewHoleTags(props: Props) {
         <div className="overflow-y-auto p-[18px]" style={{ willChange: 'transform' }}>
           <div className="w-9 h-1 rounded-full mx-auto mb-4" style={{ background: RV2.trackStrong }} />
           <SheetTitle className="text-base font-bold tracking-normal" style={{ color: RV2.ink }}>Which hole is this?</SheetTitle>
-          <SheetDescription className="mt-1 text-[12.5px]" style={{ color: RV2.secondary }}>{active ? `${ordinal(props.photos.findIndex(p => p.id === active.id) + 1)} of ${spellPhotoCount(props.photos.length)}.` : ''} {tagged.length > 0 ? `${capitalPhotoCount(tagged.length)} already tagged.` : ''}</SheetDescription>
-          {active && <div className="relative mt-3 aspect-[4/3] overflow-hidden rounded-lg"><img src={active.previewUrl} alt="Your photograph" className="w-full h-full object-cover" /><span className="absolute bottom-2 left-2 rounded px-2 py-1 text-[11px] font-bold" style={{ color: RV2.ink, background: RV2.scrim }}>{info?.exif.captureDay ? `Taken ${dateLabel(info.exif.captureDay, true)}` : 'No date on this file'}</span></div>}
+          <SheetDescription className="mt-1 text-[12.5px]" style={{ color: RV2.secondary }}>{active ? `${ordinal(props.shots.findIndex(p => p.id === active.id) + 1)} of ${spellPhotoCount(props.shots.length)}.` : ''} {tagged.length > 0 ? `${capitalPhotoCount(tagged.length)} already tagged.` : ''}</SheetDescription>
+          {active && (active.type === 'video'
+            ? <div className="relative mt-3 aspect-[4/3] overflow-hidden rounded-lg"><img src={active.posterUrl ?? active.previewUrl} alt="Your video" className="w-full h-full object-cover" /><GlassDurationBadge seconds={active.durationSeconds} bottom={8} right={8} fontSize={11} /></div>
+            : <div className="relative mt-3 aspect-[4/3] overflow-hidden rounded-lg"><img src={active.previewUrl} alt="Your photograph" className="w-full h-full object-cover" /><span className="absolute bottom-2 left-2 rounded px-2 py-1 text-[11px] font-bold" style={{ color: RV2.ink, background: RV2.scrim }}>{info?.exif.captureDay ? `Taken ${dateLabel(info.exif.captureDay, true)}` : 'No date on this file'}</span></div>)}
           <div role="group" aria-label="Hole" className={`grid gap-[6px] mt-4 ${props.holes.length === 9 ? 'grid-cols-5' : 'grid-cols-6'}`}>
             {props.holes.map(hole => <Button key={hole} variant="ghost" aria-label={`Hole ${hole}`} aria-pressed={!!active && props.assignments[active.id] === hole} data-state={used.includes(hole) ? 'used' : 'open'} className="aspect-square h-auto min-w-0 p-0 rounded-lg text-sm font-bold tabular-nums" style={{ border: `1px solid ${used.includes(hole) ? RV2.success : RV2.hairlineStrong}`, color: used.includes(hole) ? RV2.success : RV2.secondary, background: active && props.assignments[active.id] === hole ? RV2.trackStrong : 'transparent' }} onClick={() => { if (active) props.assign(active.id, hole); setActiveId(null); }}>{hole}</Button>)}
           </div>

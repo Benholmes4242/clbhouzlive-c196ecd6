@@ -4,7 +4,7 @@ import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/re
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, act } from '@testing-library/react';
 
-const f = vi.hoisted(() => ({ insert: vi.fn(), eq: vi.fn(), from: vi.fn(), rpc: vi.fn(), invoke: vi.fn(), matched: vi.fn(), exif: vi.fn(), analysis: { data: { available: true, holes: [{ hole_no: 9 }, { hole_no: 2 }] } }, rounds: [] as any[] }));
+const f = vi.hoisted(() => ({ insert: vi.fn(), eq: vi.fn(), or: vi.fn(), limit: vi.fn(), from: vi.fn(), rpc: vi.fn(), invoke: vi.fn(), matched: vi.fn(), exif: vi.fn(), analysis: { data: { available: true, holes: [{ hole_no: 9 }, { hole_no: 2 }] } }, rounds: [] as any[] }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: f.from, rpc: f.rpc, functions: { invoke: f.invoke } } }));
 vi.mock('@/lib/courseMedia/holePhotoExif', () => ({ readHolePhotoExif: f.exif }));
@@ -19,20 +19,25 @@ import { ReviewHoleTags } from '@/features/review-v2/components/ReviewHoleTags';
 import { useReviewHoleTags } from '@/features/review-v2/hooks/useReviewHoleTags';
 import { writeComposerHolePhoto, composerPhotoVerdict, type ComposerHoleJob } from '@/lib/courseMedia/composerHolePhotos';
 import { uploadAndPublishReview, startReviewUpload } from '@/features/review-v2/lib/reviewUploadController';
+import { useReviewMediaPipeline } from '@/features/review-v2/hooks/useReviewMediaPipeline';
+import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import type { MediaItem } from '@/features/review-v2/types';
 
 const exif = { captureDay: '2026-06-02', capturedAt: '2026-06-02T12:00:00', latitude: null, longitude: null };
 const photo: MediaItem = { id: 'p', type: 'image', previewUrl: '/photo.jpg', status: 'pending', progress: 0, file: new File(['photo'], 'photo.jpg', { type: 'image/jpeg' }) };
+const video: MediaItem = { id: 'v', type: 'video', previewUrl: '/clip.mp4', posterUrl: '/poster.jpg', streamId: 'stream-1', durationSeconds: 75, status: 'pending', progress: 0, file: new File(['video'], 'clip.mp4', { type: 'video/mp4' }) };
 const job: ComposerHoleJob = { courseId: 'course', assignments: { p: 2 }, knownHoles: [2, 9], proofScoreId: null };
-const props = (overrides: Record<string, unknown> = {}) => ({ holes: [2, 9], photos: [photo], rounds: [], chosenRound: null, chooseRound: vi.fn(), assignments: {}, assign: vi.fn(), metadata: {}, capture: () => job, ...overrides } as ReturnType<typeof useReviewHoleTags>);
+const props = (overrides: Record<string, unknown> = {}) => ({ holes: [2, 9], shots: [photo], rounds: [], chosenRound: null, chooseRound: vi.fn(), assignments: {}, assign: vi.fn(), metadata: {}, capture: () => job, ...overrides } as ReturnType<typeof useReviewHoleTags>);
 const wrapper = ({ children }: { children: React.ReactNode }) => <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>{children}</QueryClientProvider>;
 
 beforeEach(() => {
   cleanup(); vi.clearAllMocks();
   f.exif.mockResolvedValue(exif); f.matched.mockResolvedValue([]);
   f.insert.mockResolvedValue({ error: null });
-  const chain: any = { select: () => chain, eq: f.eq, limit: () => Promise.resolve({ data: [], error: null }), insert: f.insert, update: () => chain };
-  f.eq.mockReturnValue(chain); f.from.mockReturnValue(chain);
+  f.limit.mockResolvedValue({ data: [], error: null });
+  const chain: any = { select: () => chain, eq: f.eq, or: f.or, limit: f.limit, insert: f.insert, update: () => chain };
+  f.eq.mockReturnValue(chain); f.or.mockReturnValue(chain); f.from.mockReturnValue(chain);
   f.analysis.data = { available: true, holes: [{ hole_no: 9 }, { hole_no: 2 }] }; f.rounds = [];
 });
 
@@ -41,8 +46,29 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
     render(<ReviewHoleTags {...props({ holes: [] })} />);
     expect(screen.queryByRole('region')).toBeNull(); expect(screen.queryAllByRole('button')).toHaveLength(0);
   });
-  it('video-only reviews create no tagging section', () => {
-    render(<ReviewHoleTags {...props({ photos: [] })} />); expect(screen.queryAllByRole('button')).toHaveLength(0);
+  it('a video-only review shows the section with Video 1', () => {
+    render(<ReviewHoleTags {...props({ shots: [video] })} />);
+    expect(screen.getByRole('region', { name: 'Holes for your photos and videos' })).toBeInTheDocument();
+    expect(screen.getByText('Video 1')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Tag video 1' })).toBeInTheDocument();
+  });
+  it('photos and videos number separately with their own aria-labels', () => {
+    render(<ReviewHoleTags {...props({ shots: [photo, video, { ...photo, id: 'q' }] })} />);
+    expect(screen.getByRole('button', { name: 'Tag photo 1' })).toHaveTextContent('Photo 1');
+    expect(screen.getByRole('button', { name: 'Tag video 1' })).toHaveTextContent('Video 1');
+    expect(screen.getByRole('button', { name: 'Tag photo 2' })).toHaveTextContent('Photo 2');
+    expect(screen.getByRole('button', { name: 'Tag video 1' }).querySelector('img')).toHaveAttribute('src', '/poster.jpg');
+    expect(screen.getByRole('button', { name: 'Tag video 1' })).toHaveTextContent('1:15');
+    expect(screen.getByRole('button', { name: 'Tag photo 1' })).toHaveTextContent('No date on file');
+  });
+  it('the video sheet shows the duration badge and Your video, never a Taken chip', () => {
+    render(<ReviewHoleTags {...props({ shots: [video] })} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Tag video 1' }));
+    const sheet = screen.getByRole('dialog');
+    expect(sheet.querySelector('img[alt="Your video"]')).toHaveAttribute('src', '/poster.jpg');
+    expect(sheet).toHaveTextContent('1:15');
+    expect(sheet.textContent).not.toMatch(/Taken|No date/);
+    expect(sheet.querySelector('video')).toBeNull();
   });
   it('nine actual holes yield nine selectable chips without padding', () => {
     render(<ReviewHoleTags {...props({ holes: [1,2,3,4,5,6,7,8,9] })} />);
@@ -59,14 +85,15 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
     expect(assign).toHaveBeenCalledWith('p', 2); expect(screen.queryByRole('dialog')).toBeNull();
   });
   it('two photographs can choose the same used hole', () => {
-    const assign = vi.fn(); render(<ReviewHoleTags {...props({ photos: [photo, { ...photo, id: 'q' }], assignments: { p: 2 }, assign })} />);
+    const assign = vi.fn(); render(<ReviewHoleTags {...props({ shots: [photo, { ...photo, id: 'q' }], assignments: { p: 2 }, assign })} />);
     fireEvent.click(screen.getByRole('button', { name: 'Tag photo 2' }));
     fireEvent.click(screen.getByRole('button', { name: 'Hole 2' })); expect(assign).toHaveBeenCalledWith('q', 2);
   });
-  it('assignments are client-only until capture and exclude removed files and videos', async () => {
-    const { result, rerender } = renderHook(({ items }) => useReviewHoleTags('course', 'member', items), { initialProps: { items: [photo] }, wrapper });
-    act(() => result.current.assign('p', 9));
-    expect(f.insert).not.toHaveBeenCalled(); expect(result.current.capture()?.assignments).toEqual({ p: 9 });
+  it('assignments are client-only until capture, exclude removed files and include tagged videos', async () => {
+    const { result, rerender } = renderHook(({ items }) => useReviewHoleTags('course', 'member', items), { initialProps: { items: [photo, video] }, wrapper });
+    act(() => { result.current.assign('p', 9); result.current.assign('v', 2); });
+    expect(f.insert).not.toHaveBeenCalled(); expect(result.current.capture()?.assignments).toEqual({ p: 9, v: 2 });
+    rerender({ items: [photo] }); expect(result.current.capture()?.assignments).toEqual({ p: 9 });
     rerender({ items: [] }); expect(result.current.capture()?.assignments).toEqual({});
   });
   it('a five-month-old round is not preselected', async () => {
@@ -104,7 +131,26 @@ describe('COMPOSER_HOLES_1_R2 independent job writes', () => {
   });
   it('untagged photographs and videos never write hole rows', async () => {
     await writeComposerHolePhoto(job, 'member', { ...photo, id: 'untagged' }, 'url');
-    await writeComposerHolePhoto(job, 'member', { ...photo, type: 'video' }, 'url'); expect(f.from).not.toHaveBeenCalled();
+    await writeComposerHolePhoto(job, 'member', { ...video, id: 'untagged-v' }, 'url'); expect(f.from).not.toHaveBeenCalled();
+  });
+  it('a tagged video writes one row with stream fields from the item', async () => {
+    await writeComposerHolePhoto({ ...job, assignments: { v: 9 } }, 'member', video, generateStreamHlsUrl('stream-1'));
+    expect(f.insert).toHaveBeenCalledTimes(1);
+    expect(f.insert).toHaveBeenCalledWith(expect.objectContaining({
+      course_id: 'course', hole_no: 9, user_id: 'member', media_type: 'video', stream_id: 'stream-1',
+      media_url: generateStreamHlsUrl('stream-1'), poster_url: '/poster.jpg', duration_seconds: 75,
+    }));
+    expect(f.exif).not.toHaveBeenCalled();
+  });
+  it('a tagged video with no streamId writes nothing', async () => {
+    await writeComposerHolePhoto({ ...job, assignments: { v: 9 } }, 'member', { ...video, streamId: null }, 'url');
+    expect(f.from).not.toHaveBeenCalled();
+  });
+  it('the duplicate check matches on stream_id', async () => {
+    f.limit.mockResolvedValueOnce({ data: [{ id: 'dup' }], error: null });
+    await writeComposerHolePhoto({ ...job, assignments: { v: 9 } }, 'member', video, generateStreamHlsUrl('stream-1'));
+    expect(f.or).toHaveBeenCalledWith(`media_url.eq.${generateStreamHlsUrl('stream-1')},stream_id.eq.stream-1`);
+    expect(f.insert).not.toHaveBeenCalled();
   });
   it('hole insert rejection is swallowed and does not reject the job', async () => {
     f.insert.mockRejectedValue(new Error('refused')); await expect(writeComposerHolePhoto(job, 'member', photo, 'url')).resolves.toBeUndefined();
@@ -131,5 +177,17 @@ describe('COMPOSER_HOLES_1_R2 independent job writes', () => {
     finish({ data: { success: true, publicUrl: 'https://example.test/p.jpg' }, error: null });
     await joined; await waitFor(() => expect(f.insert).toHaveBeenCalled());
     expect(f.invoke).toHaveBeenCalledTimes(1);
+  });
+  it('the upload controller passes a video through with its stream id and poster', async () => {
+    vi.mocked(uploadVideoResilient).mockImplementation((opts: any) => { opts.onSuccess('stream-1'); return Promise.resolve({} as Awaited<ReturnType<typeof uploadVideoResilient>>); });
+    f.rpc.mockResolvedValue({ data: 'rating', error: null });
+    const outcome = await uploadAndPublishReview('video-tags', 'member', 'pending', [{ id: 'v', type: 'video', file: video.file as File, durationSeconds: 75 }], undefined, { ...job, assignments: { v: 9 } });
+    expect(outcome.ok).toBe(true);
+    await waitFor(() => expect(f.insert).toHaveBeenCalledWith(expect.objectContaining({ media_type: 'video', stream_id: 'stream-1', hole_no: 9, duration_seconds: 75 })));
+  });
+  it('the media pipeline passes a video through with its stream id and poster', async () => {
+    const { result } = renderHook(() => useReviewMediaPipeline({ userId: 'member', existingMedia: [{ id: 'm1', media_url: generateStreamHlsUrl('stream-1'), media_type: 'video', poster_url: '/poster.jpg', stream_id: 'stream-1' }] }), { wrapper });
+    act(() => result.current.writeUploadedHolePhotos({ ...job, assignments: { 'existing-m1': 2 } }));
+    await waitFor(() => expect(f.insert).toHaveBeenCalledWith(expect.objectContaining({ media_type: 'video', stream_id: 'stream-1', hole_no: 2, poster_url: '/poster.jpg' })));
   });
 });

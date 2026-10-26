@@ -158,7 +158,8 @@ async function runJob(
       setProgress(100);
       // COMPOSER_HOLES_1_R2: independent per-item enrichment. Not awaited by
       // the upload/review path; original File and detached choices outlive UI.
-      if (res.uploadedUrl) void writeComposerHolePhoto(holeJob, userId, item, res.uploadedUrl);
+      // Videos pass their stream id and poster so the tag can write too.
+      if (res.uploadedUrl) void writeComposerHolePhoto(holeJob, userId, { ...item, streamId: res.streamId ?? null, posterUrl: res.posterUrl ?? null }, res.uploadedUrl);
     } catch (e) {
       results.push({
         id: item.id,
@@ -191,7 +192,7 @@ export function startReviewUpload(
     if (holeJob) void existing.promise.then(results => {
       for (const result of results) {
         const item = items.find(input => input.id === result.id);
-        if (item && result.ok && result.uploadedUrl) void writeComposerHolePhoto(holeJob, userId, item, result.uploadedUrl);
+        if (item && result.ok && result.uploadedUrl) void writeComposerHolePhoto(holeJob, userId, { ...item, streamId: result.streamId ?? null, posterUrl: result.posterUrl ?? null }, result.uploadedUrl);
       }
     });
     return existing.promise;
