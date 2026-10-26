@@ -1,5 +1,11 @@
 /** Tour Overview's photographic hero. Renders the HeroState it is GIVEN (OverviewHero derives it once). */
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useLiveTournaments } from '../../hooks/useLiveTournaments';
+import { useTournamentMeta } from '../../leaderboard/useTournamentMeta';
+import { hasStrokeBoard } from '../../_shared/eventFormat';
+import { FullBoardSheet } from '../../tournament-v2/sections/FullBoardSheet';
+import { boardPhaseFor, shouldShowOverviewBoard } from './HybridHeroBands/HeroBoardBand';
 import { useTranslation } from 'react-i18next';
 import '@/styles/hybrid-hero.css';
 
@@ -159,6 +165,26 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
 
   const leader = isInPlayState(state) ? buildLeaderTrio(rows, needsInitials, tournament.tourSlug, t) : null;
 
+  /* "Full board ›" (BRIEF_TOUR_OVERVIEW_PICKS_CHIPS_AND_FULL_BOARD §2): the
+     hero board's own gate plus a stroke format; never upcoming. Behaviour
+     mirrors TournamentPage.openFullBoard — live and in the live list
+     deep-links to Leaderboards, anything else opens the house sheet with the
+     FULL field (rows) and the event meta. */
+  const navigate = useNavigate();
+  const { data: liveList = [] } = useLiveTournaments();
+  const [fullBoardOpen, setFullBoardOpen] = useState(false);
+  const fullBoardAvailable = boardPhaseFor(state) !== 'upcoming'
+    && hasStrokeBoard(tournament.eventType ?? null)
+    && shouldShowOverviewBoard(rows);
+  const { data: fullBoardMeta } = useTournamentMeta(fullBoardAvailable ? tournament.id : null);
+  const openFullBoard = () => {
+    if (isInPlayState(state) && liveList.some((row) => row?.id === tournament.id)) {
+      navigate(`/tourhub?tab=live&event=${tournament.id}`, { state: { from: 'tournament' } });
+      return;
+    }
+    setFullBoardOpen(true);
+  };
+
   const champion = useMemo(() => {
     // Champion gate — the SAME rule as the pick trophy in HeroBoardBand: only a
     // genuinely finished event (isChampionResolvable) with an authoritative
@@ -235,7 +261,16 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
         heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
         onOpen={onOpenTournament}
       />
-      {situation ? <SituationBand segments={situation} /> : null}
+      {situation ? <SituationBand segments={situation} onFullBoard={fullBoardAvailable ? openFullBoard : undefined} /> : null}
+      {fullBoardAvailable ? (
+        <FullBoardSheet
+          open={fullBoardOpen}
+          onClose={() => setFullBoardOpen(false)}
+          tournamentId={tournament.id}
+          meta={fullBoardMeta ?? null}
+          entries={rows}
+        />
+      ) : null}
       {isChampionResolvable(state) && champion ? (
         <ChampionStrip
           name={champion.name}
