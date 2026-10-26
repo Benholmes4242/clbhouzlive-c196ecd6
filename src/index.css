@@ -4987,3 +4987,16 @@ em-emoji-picker input:focus {
 .insights-followers-bar { margin-top: 10px; height: 6px; border-radius: 3px; background: var(--team-hairline); position: relative; }
 .insights-followers-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: var(--team-ink); }
 .insights-followers-fine { margin: 10px 0 0; font-size: 11.5px; line-height: 1.45; color: var(--team-dim); }
+/* CB88 — Insights section 6 "Engagement" */
+.insights-engagement-card { margin: 14px 16px 0; background: var(--team-request-surface); border: 1px solid var(--team-border); border-radius: 18px; padding: 16px; color: var(--team-ink); }
+.insights-engagement-title { margin: 6px 0 0; font-size: 17px; font-weight: 700; letter-spacing: -.01em; line-height: 1.3; }
+.insights-engagement-change { margin-left: 8px; font-size: 13px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
+.insights-engagement-ratio { margin: 4px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--team-muted); }
+.insights-engagement-ratio b { color: var(--team-ink); font-weight: 600; }
+.insights-engagement-bar { margin-top: 12px; height: 6px; border-radius: 3px; background: var(--team-hairline); position: relative; overflow: hidden; }
+.insights-engagement-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: var(--team-ink); }
+.insights-engagement-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.insights-engagement-tile { background: var(--insights-inset); border-radius: 13px; padding: 12px; }
+.insights-engagement-tile-n { font-size: 22px; font-weight: 700; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.insights-engagement-tile-l { margin-top: 2px; font-size: 11.5px; line-height: 1.35; color: var(--team-muted); }
+.insights-engagement-fine { margin: 10px 0 0; font-size: 11.5px; line-height: 1.45; color: var(--team-dim); }
