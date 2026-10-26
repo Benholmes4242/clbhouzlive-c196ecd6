@@ -33,8 +33,7 @@ import { useClubCourseLink } from '@/features/business/clubAnalytics/useClubCour
 import { useClubCourseAnalytics } from '@/features/business/clubAnalytics/useClubCourseAnalytics';
 import {
   HowItPlaysSection, IndexDisagreesSection, SampleSection, HoleBySection,
-  RecordBookSection, TeesSection, TeeSheetSection, YearOnYearSection, WhoPlaysSection,
-  CompetitionSection,
+  RecordBookSection, TeesSection, TeeSheetSection, WhoPlaysSection,
 } from '@/features/business/clubAnalytics/sections';
 
 import type { ClubCourseRef } from '@/features/business/clubAnalytics/types';
@@ -138,13 +137,13 @@ const CourseBlock: React.FC<{ course: ClubCourseRef; courseCount: number; busine
                 </p>}
                 <p className="club-course-lead-line">{lead.line}</p>
               </div>}
-              {/* CB92 — HOW IT PLAYS sits directly under the CB91 sentence. */}
+              {/* CB98 — page order inside the course block. */}
               <SectionGuard><HowItPlaysSection data={result.data} /></SectionGuard>
-              {/* §7 — the sample is stated before the rest of the figures. */}
-              <SectionGuard><SampleSection data={result.data} /></SectionGuard>
               <SectionGuard><HoleBySection data={result.data} businessName={businessName} courseCount={courseCount} /></SectionGuard>
-              {/* §2 — the ladder is the one thing no other product shows a club. */}
               <SectionGuard><IndexDisagreesSection data={result.data} /></SectionGuard>
+              <SectionGuard><TeeSheetSection data={result.data} /></SectionGuard>
+              <SectionGuard><WhoPlaysSection data={result.data} /></SectionGuard>
+              <SectionGuard><TeesSection data={result.data} /></SectionGuard>
               {/* §5 — values only. Names live on the course's Champions tab. */}
               <SectionGuard>
                 <RecordBookSection
@@ -152,11 +151,7 @@ const CourseBlock: React.FC<{ course: ClubCourseRef; courseCount: number; busine
                   onSeeChampions={() => navigate(`/courses/${course.course_id}?tab=legends`)}
                 />
               </SectionGuard>
-              <SectionGuard><TeesSection data={result.data} /></SectionGuard>
-              <SectionGuard><TeeSheetSection data={result.data} /></SectionGuard>
-              <SectionGuard><YearOnYearSection data={result.data} /></SectionGuard>
-              <SectionGuard><WhoPlaysSection data={result.data} /></SectionGuard>
-              <SectionGuard><CompetitionSection data={result.data} /></SectionGuard>
+              <SectionGuard><SampleSection data={result.data} /></SectionGuard>
             </>
           )}
         </div>
@@ -243,6 +238,27 @@ const RequestAnotherCourse: React.FC<{
         existingCourses={existingCourses}
       />
     </div>
+  );
+};
+
+/** CB98 — the loaded page's one-row "Missing a course?" entry; opens the same sheet. */
+const MissingCourseRow: React.FC<{
+  businessId: string; businessName: string; clubId: string; fallbackClubName: string | null;
+  existingCourses: { course_id: string; course_name: string }[];
+}> = ({ businessId, businessName, clubId, fallbackClubName, existingCourses }) => {
+  const [open, setOpen] = React.useState(false);
+  const { data: club } = useQuery({ queryKey: ['golf-club', clubId], queryFn: () => fetchGolfClub(clubId), staleTime: 5 * 60_000 });
+  const clubName = club?.name ?? fallbackClubName ?? businessName;
+  return (
+    <>
+      <button type="button" data-testid="missing-course-row" onClick={() => setOpen(true)}
+        style={{ marginTop: 14, width: '100%', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 18, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit' }}>
+        <span style={{ fontSize: 13, color: 'rgba(248,250,252,0.62)' }}>Missing a course?</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: '#F8FAFC' }}>Request it ›</span>
+      </button>
+      <RequestAnotherCourseSheet open={open} onClose={() => setOpen(false)} businessId={businessId} businessName={businessName}
+        clubId={clubId} clubName={clubName} existingCourses={existingCourses} />
+    </>
   );
 };
 
@@ -403,38 +419,31 @@ export default function ClubAnalyticsPage() {
 
         {selected && <CourseBlock key={selected.course_id} course={selected} courseCount={courses.length} businessName={business.name} />}
 
-        {business.club_id && (
-          <RequestAnotherCourse
-            businessId={business.id}
-            businessName={business.name}
-            clubId={business.club_id}
-            fallbackClubName={business.club_name ?? null}
-            existingCourses={courses.map((c) => ({ course_id: c.course_id, course_name: c.course_name }))}
-            body="Every course your club owns gets its own page on clbhouz — its own scores, reviews and the figures below. If one is missing from this list, tell us and we will add it."
-          />
-        )}
-
-        <p style={{ ...BIZ_BODY, fontSize: 11.5, margin: 0, color: A.DIM }}>
-          Everything on this page is an aggregate across rounds played on your courses. No individual member, round or
-          score is shown here, and none is available to your club.
-        </p>
-
-        <button
-          type="button"
-          onClick={() => navigate(`/business/${business.id}/insights`)}
-          style={{
-            alignSelf: 'flex-start',
-            border: 'none',
-            background: 'transparent',
-            padding: 0,
-            fontSize: 12.5,
-            fontWeight: 600,
-            color: A.MUTE,
-            cursor: 'pointer',
-          }}
-        >
-          See profile insights
-        </button>
+        <div>
+          {business.club_id && (
+            <MissingCourseRow
+              businessId={business.id}
+              businessName={business.name}
+              clubId={business.club_id}
+              fallbackClubName={business.club_name ?? null}
+              existingCourses={courses.map((c) => ({ course_id: c.course_id, course_name: c.course_name }))}
+            />
+          )}
+          <div data-testid="page-foot" style={{ padding: '18px 4px 4px' }}>
+            <p style={{ fontSize: 11.5, lineHeight: 1.45, margin: 0, color: 'rgba(248,250,252,0.42)' }}>
+              Everything on this page is an aggregate across rounds played on your courses. No individual member, round or
+              score is shown here, and none is available to your club.
+            </p>
+            <button type="button" onClick={() => navigate(`/business/${business.id}/insights`)}
+              style={{ marginTop: 12, width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: 'none', background: 'transparent', padding: 0, fontSize: 13, fontWeight: 700, color: '#F8FAFC', cursor: 'pointer', fontFamily: 'inherit' }}>
+              <span>See profile insights</span><span aria-hidden style={{ color: 'rgba(248,250,252,0.62)' }}>›</span>
+            </button>
+            <button type="button" onClick={() => navigate(`/manage/contact?category=other&subject=${encodeURIComponent('Course question — ' + business.name)}`)}
+              style={{ marginTop: 10, width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: 'none', background: 'transparent', padding: 0, fontSize: 13, fontWeight: 600, color: 'rgba(248,250,252,0.62)', cursor: 'pointer', fontFamily: 'inherit' }}>
+              <span>Something else? Contact support</span><span aria-hidden>›</span>
+            </button>
+          </div>
+        </div>
       </div>
     </ManagePageShell>
   );
