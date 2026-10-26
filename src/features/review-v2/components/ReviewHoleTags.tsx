@@ -73,9 +73,9 @@ export function ReviewHoleTags(props: Props) {
           <div role="group" aria-label="Hole" className={`grid gap-[6px] mt-4 ${props.holes.length === 9 ? 'grid-cols-5' : 'grid-cols-6'}`}>
             {props.holes.map(hole => <Button key={hole} variant="ghost" aria-label={`Hole ${hole}`} aria-pressed={!!active && props.assignments[active.id] === hole} data-state="open" className="aspect-square h-auto min-w-0 p-0 rounded-lg text-sm font-bold tabular-nums" style={{ border: `1px solid ${RV2.hairlineStrong}`, color: RV2.secondary, background: active && props.assignments[active.id] === hole ? RV2.trackStrong : 'transparent' }} onClick={() => { if (active) props.assign(active.id, hole); setActiveId(null); }}>{hole}</Button>)}
           </div>
-
         </div>
       </SheetContent>
+
     </Sheet>
     <Sheet open={roundOpen} onOpenChange={setRoundOpen}>
       <SheetContent side="bottom" className="rounded-t-lg sm:max-w-[480px] sm:mx-auto" style={{ background: RV2.canvas, color: RV2.ink }}>
