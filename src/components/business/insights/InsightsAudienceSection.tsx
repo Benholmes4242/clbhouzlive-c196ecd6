@@ -77,11 +77,13 @@ const ReadyCard = ({ a, k }: { a: BusinessAudience; k: (key: string, o?: Record<
   );
 };
 
-export function InsightsAudienceSection({ businessId, businessName }: { businessId: string; businessName: string }) {
+export function InsightsAudienceSection({ businessId }: { businessId: string; businessName?: string }) {
   const { t } = useTranslation('common');
   const q = useBusinessAudience(businessId);
   if (!q.isFetched || q.isError || !q.data) return null;
   const a = q.data;
+  // CB100 — no followers: the Followers card alone says so; this card is absent.
+  if (a.state === 'none') return null;
   const k = (key: string, options: Record<string, unknown> = {}) =>
     t(`business.insights.golfers.${key}`, { ...options, defaultValue: '' });
   const followers = k('followers', { count: a.followers_total, n: formatNumber(a.followers_total) });
@@ -100,12 +102,6 @@ export function InsightsAudienceSection({ businessId, businessName }: { business
               <i data-progress={a.with_handicap} style={{ width: `${Math.min(100, (a.with_handicap / 10) * 100)}%` }} />
             </div>
           </div>
-          <p className="insights-audience-fine">{k('notAffected')}</p>
-        </>
-      )}
-      {a.state === 'none' && (
-        <>
-          <h3 className="insights-audience-title" data-title="none">{k('noneTitle', { business: businessName })}</h3>
           <p className="insights-audience-fine">{k('notAffected')}</p>
         </>
       )}

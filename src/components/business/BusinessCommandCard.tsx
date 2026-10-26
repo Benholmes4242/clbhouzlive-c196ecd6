@@ -267,7 +267,7 @@ export function BusinessCommandCard({
                         label="Your courses"
                         hint={String(clubCourses.length)}
                         onClick={() => goto('/course')}
-                        caption={clubCourses.map((c) => c.name)}
+                        caption={clubCourses.map((c) => courseNameWithinClub(c.name))}
                       />
                     ) : (
                       <ActionRow icon={Flag} label="Your course" onClick={() => goto('/course')} />
