@@ -156,6 +156,15 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   const [activeIdx, setActiveIdx] = useState(0);
   const [playingIdx, setPlayingIdx] = useState(0);
   const [earlyIdx, setEarlyIdx] = useState<number>(-1);
+  /* IN-VIEW GATE. On a profile the feed sits BELOW the hero, so at load no card
+     is on screen, and scrolling back to the hero takes every card off it.
+     CardFeed (which this tracking was ported from) owns a full-screen
+     scroller, so it never meets either state and its picker deliberately
+     keeps the previous card when nothing qualifies. Here that meant post 0
+     played (with sound, if the session is unmuted) from load, and the last
+     card kept playing with the hero on screen. Nothing plays until some card
+     is at least PLAY_IN visible; everything stops once none is PLAY_OUT. */
+  const [feedInView, setFeedInView] = useState(false);
   const [scrollParent, setScrollParent] = useState<HTMLElement | undefined>(undefined);
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const SETTLE_MS = 80;
@@ -232,6 +241,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
         ? Math.max(...eligible)
         : Math.min(...eligible);
     }
+
+    setFeedInView((was) => (was ? bestRatio >= PLAY_OUT : bestRatio >= PLAY_IN));
 
     setActiveIdx((prev) => {
       const prevRatio = prev >= 0 ? (visibilityRef.current.get(prev) ?? 0) : 0;
@@ -409,6 +420,10 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   // the MuteButton produced no audio on personal or business profiles.
   useEffect(() => {
     if (fsIsOpen) return; // overlay branch owns the speaker while open
+    if (!feedInView) {
+      try { VideoEngine.setAudioFocus(null, 'feed'); } catch { /* engine may not be booted yet */ }
+      return;
+    }
     const post = posts[playingIdx];
     if (!post) return;
     const hasVideo = post.mediaItems?.some?.((m) => m?.type === 'video');
@@ -419,7 +434,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
         VideoEngine.setAudioFocus(null, 'feed');
       }
     } catch { /* engine may not be booted yet — safe to ignore */ }
-  }, [fsIsOpen, playingIdx, posts]);
+  }, [fsIsOpen, playingIdx, posts, feedInView]);
 
   useEffect(() => {
     return () => {
@@ -433,6 +448,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   // Activation scorecard — one feed.activate emit per promotion.
   const activateT0Ref = useRef<number>(0);
   useEffect(() => {
+    if (!feedInView) return; // no promotion happens while no card is on screen
     const post = posts[playingIdx];
     if (!post) return;
     const ownerKey = `${post.id}:0`;
@@ -465,7 +481,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       });
     });
     return () => cancelAnimationFrame(raf);
-  }, [playingIdx, posts]);
+  }, [playingIdx, posts, feedInView]);
 
   const setActiveIndex = useClubhouseStore((s) => s.setActiveIndex);
   const setCarouselPosition = useClubhouseStore((s) => s.setCarouselPosition);
@@ -573,9 +589,9 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
           <LightItemGate
             post={post}
             index={index}
-            playingIdx={playingIdx}
+            playingIdx={feedInView ? playingIdx : -1}
             activeIdx={activeIdx}
-            earlyIdx={earlyIdx}
+            earlyIdx={feedInView ? earlyIdx : -1}
           >
             {({ isActive, mountVideo, earlyMotion }) => (
               <FeedCard
@@ -636,6 +652,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       activeIdx,
       playingIdx,
       earlyIdx,
+      feedInView,
       getCarouselChangeHandler,
       getCommentCount,
       getLikeState,
