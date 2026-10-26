@@ -72,6 +72,8 @@ export interface HeroTournament {
   leaderName: string | null;
   currentRound: number | null;
   currentRoundStatus: string | null;
+  /** sr_tournaments.situation_note — hand-set; shown only in its window. */
+  situationNote?: string | null;
   
 }
 
@@ -345,6 +347,7 @@ export function useHeroCarouselData() {
             : null,
           currentRound: (row as any).current_round ?? null,
           currentRoundStatus: (row as any).current_round_status ?? null,
+          situationNote: (row as any).situation_note ?? null,
           
         };
       };
