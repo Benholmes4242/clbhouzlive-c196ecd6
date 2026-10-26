@@ -43,6 +43,7 @@ describe('Stage1 encoded hole-video sources', () => {
 });
 describe('Stage1 hole video display and lifecycle', () => {
   it('video-only hole uses poster and count one and opens the viewer with the stream', async () => {
+    vi.spyOn(window, 'matchMedia').mockImplementation(query => ({ matches: query === '(prefers-reduced-motion: reduce)', media: query, onchange: null, addListener: vi.fn(), removeListener: vi.fn(), addEventListener: vi.fn(), removeEventListener: vi.fn(), dispatchEvent: vi.fn() }));
     const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     f.rpc.mockResolvedValue({ data: [{ ...row, member_id: row.user_id, member_avatar_url: null }], error: null });
     render(<QueryClientProvider client={cache}><HoleWalk available holes={[hole]} rows={[row]} totalMedia={1} onAddFirst={() => {}} /></QueryClientProvider>);
