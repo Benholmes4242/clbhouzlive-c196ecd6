@@ -31,7 +31,7 @@ let observers: Observer[];
 let clients: QueryClient[];
 let pages: Row[][];
 function nextVisible() {
-  const observer = observers.findLast(item => item.active);
+  const observer = [...observers].reverse().find(item => item.active);
   if (!observer?.target) throw new Error('Expected an active rail sentinel observer');
   act(() => observer.callback([{ target: observer.target, isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver));
 }
@@ -72,7 +72,7 @@ describe.each(kinds)('$kind unlimited rail', spec => {
   it('the rail sentinel requests the last raw row cursor and ignores repeated callbacks', async () => {
     pages = [page(spec), page(spec, 50, 3)]; const view = mount(spec);
     await waitFor(() => expect(cards(view, spec)).toHaveLength(spec.size));
-    const observer = observers.findLast(item => item.active);
+    const observer = [...observers].reverse().find(item => item.active);
     expect(observer?.options).toMatchObject({ root: view.container.querySelector('.scrollbar-hide'), rootMargin: `0px ${spec.width * 2}px 0px 0px` });
     nextVisible(); nextVisible();
     await waitFor(() => expect(cards(view, spec)).toHaveLength(spec.size + 3));
@@ -91,7 +91,7 @@ describe.each(kinds)('$kind unlimited rail', spec => {
     await waitFor(() => expect(cards(view, spec)).toHaveLength(spec.size)); nextVisible();
     await waitFor(() => expect(cards(view, spec)).toHaveLength(spec.size + 2));
     const labels = Array.from(cards(view, spec)).map(card => card.getAttribute('aria-label'));
-    expect(labels.filter(label => label?.includes('Course 2,') || label?.includes('Course 2 shot'))).toHaveLength(spec.kind === 'holes' ? 0 : 1);
+    expect(labels.filter(label => label === 'Hole 4, Course 2' || label === 'Open Course 2 shot 1 of 3')).toHaveLength(1);
     expect(labels.slice(-2)).toEqual(spec.kind === 'holes' ? ['Hole 4, Course 50', 'Hole 4, Course 51'] : ['Open Course 50 shot 1 of 3', 'Open Course 51 shot 1 of 3']);
   });
   it('shows exactly one end skeleton only while the next page is in flight', async () => {
@@ -129,7 +129,7 @@ describe('loaded holes run and refresh', () => {
   it('does not page or refetch while fullscreen is open and resumes after closing', async () => {
     pages = [page(spec), page(spec, 50, 3)]; const view = mount(spec);
     await waitFor(() => expect(cards(view, spec)).toHaveLength(20));
-    const previous = observers.findLast(item => item.active);
+    const previous = [...observers].reverse().find(item => item.active);
     act(() => useFullscreenFeedStore.setState({ isOpen: true }));
     if (!previous?.target) throw new Error('Missing sentinel');
     act(() => previous.callback([{ target: previous.target, isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver));
