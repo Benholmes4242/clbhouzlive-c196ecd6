@@ -41,3 +41,25 @@ export function soleWinnerSrId(rows: Array<{ position?: number | null; strokes?:
   if (leaders.length !== 1) return null;
   return leaders[0].sr_id ?? null;
 }
+
+/** Days past end_date after which a stale 'inprogress' event closes regardless of the feed. */
+export const STALE_CLOSE_BACKSTOP_DAYS = 3;
+
+/**
+ * BRIEF_TOUR_CLOSE_ONLY_WHEN_FINAL: a stale 'inprogress' event closes by date
+ * only when its reconcile fetch reported a final feed status, or when its
+ * end_date is more than STALE_CLOSE_BACKSTOP_DAYS before today (the backstop
+ * for events the feed never closes). A date close never sets winner_id.
+ */
+export function shouldDateClose(feedFinal: boolean, endDate: string, today: string): boolean {
+  if (feedFinal) return true;
+  const end = Date.UTC(+endDate.slice(0, 4), +endDate.slice(5, 7) - 1, +endDate.slice(8, 10));
+  const now = Date.UTC(+today.slice(0, 4), +today.slice(5, 7) - 1, +today.slice(8, 10));
+  if (!Number.isFinite(end) || !Number.isFinite(now)) return false;
+  return (now - end) / 86_400_000 > STALE_CLOSE_BACKSTOP_DAYS;
+}
+
+/** The only payload a date close writes: status, never winner_id. */
+export function dateClosePayload(): { status: 'closed' } {
+  return { status: 'closed' };
+}
