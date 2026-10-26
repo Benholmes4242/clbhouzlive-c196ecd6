@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB90 — Reviews neutral paint and one reply close control
+- [x] Read the brief and audit existing reviews assertions; none require retargeting. Preserve reply behaviour, rating foregrounds and outer-band washes.
+- [x] Replace page-only notice/empty/error/mid-rating paint; hide the shared sheet close control only here. Add 12 new cases in cb90ReviewsNeutral.test.tsx; existing tests untouched.
+- [ ] Run targeted/full tests and report exact diff, remaining references, counts and verification limits. Last reported full baseline: 3,119 tests / 365 files / zero failures.
+
 ## CB87 — Signup detection and database-owned clbhouz follow
 - [x] Remove the app-side follow and use parsed confirmation/creation timestamps for all three signup-success events. Exported business ID has no consumers; separate onboarding-nudges local constant unchanged. No other equality sites; no existing tests retargeted.
 - [x] Add 16 helper tests and 7 AuthForm/audit tests. Targeted bunx vitest run src/lib/auth/isNewSignup.test.ts src/test/cb87SignupAnalytics.test.tsx: 23/23. Full bunx vitest run: 3,031 passed / 1 failed, 3,032 total / 359 files, versus 3,009 / 357 (+23 / +2). Prior AdminShell failure did not recur. Automatic build 09:18:17Z OK. Report: CB87_signup_stop_report.md.

@@ -33,9 +33,9 @@ import {
 /* NO PRIVATE PALETTE. This page declared its own INK/HAIR/CARD_BG/GREEN/RED
    and imported nothing, which is why two import-tracing sweeps could not see
    it. Colours come from the shared manage vocabulary (itself derived from the
-   analytical `A` ramp). CB90: no amber on this page — amber is reserved for
-   the clbhouz mark, the verified badge and the input caret. Add a colour here
-   and the next audit is blind again. */
+   analytical `A` ramp). CB90: notice figures stay neutral; rating foregrounds
+   retain the shared score rule. Add a colour here and the next audit is
+   blind again. */
 /* GREEN is gone: its only two uses were band colours, now the canon's.
    RED stays — it is DANGER, used by the 1000-char warning and the delete/error
    blocks, a different quantity on a different scale. */
@@ -43,8 +43,6 @@ import { INK, INK_45, HAIR, CARD_BG, PAGE_BG, DANGER as RED } from '@/components
 import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
-/* Neutral wash for mid ratings, empty-state icon tiles. */
-const NEUTRAL_WASH = 'rgba(255,255,255,0.06)';
 /* Dark ink on the white Retry button. */
 const ON_INK = '#0B0B0D';
 
@@ -58,10 +56,10 @@ const CHIPS: Array<{ key: ChipKey; label: string; filter: BusinessReviewFilter; 
 ];
 
 /* Rating figures follow the canonical display tone; the wash stays structural. */
-export function ratingTone(rating: number): { bg: string; fg: string } {
+function ratingTone(rating: number): { bg: string; fg: string } {
   const fg = courseSubScoreTone(rating);
   if (rating >= 9) return { bg: 'rgba(47,163,90,0.16)', fg };
-  if (rating >= 5) return { bg: NEUTRAL_WASH, fg };
+  if (rating >= 5) return { bg: A.SOFT, fg };
   return { bg: 'rgba(255,107,107,0.16)', fg };
 }
 
@@ -215,11 +213,10 @@ function ReplySheet({
 
 /* ─────────────── Small parts ─────────────── */
 
-export function RatingChip({ rating }: { rating: number }) {
+function RatingChip({ rating }: { rating: number }) {
   const t = ratingTone(rating);
   return (
     <span
-      data-rating-chip=""
       className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11.5px] font-bold tabular-nums"
       style={{ background: t.bg, color: t.fg }}
     >
@@ -497,7 +494,7 @@ export default function BusinessReviewsPage() {
         <main className="px-4 pt-16 pb-22 max-w-lg mx-auto text-center">
           <div
             className="mx-auto mb-4 flex items-center justify-center"
-            style={{ width: 56, height: 56, borderRadius: 16, background: NEUTRAL_WASH }}
+            style={{ width: 56, height: 56, borderRadius: 16, background: A.SOFT }}
           >
             <Star size={24} strokeWidth={2} style={{ color: INK }} />
           </div>
@@ -643,9 +640,9 @@ export default function BusinessReviewsPage() {
             >
               <div
                 className="mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-3"
-                style={{ background: AMBER_SOFT }}
+                style={{ background: A.SOFT }}
               >
-                <Sparkles size={22} style={{ color: AMBER }} />
+                <Sparkles size={22} style={{ color: INK }} />
               </div>
               <div className="text-[16px] font-bold" style={{ color: INK }}>
                 No reviews for the {courseNameWithinClub(selectedCourse.course_name)} yet
@@ -663,9 +660,9 @@ export default function BusinessReviewsPage() {
             >
               <div
                 className="mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-3"
-                style={{ background: AMBER_SOFT }}
+                style={{ background: A.SOFT }}
               >
-                <Sparkles size={22} style={{ color: AMBER }} />
+                <Sparkles size={22} style={{ color: INK }} />
               </div>
               <div className="text-[16px] font-bold" style={{ color: INK }}>
                 No reviews yet
