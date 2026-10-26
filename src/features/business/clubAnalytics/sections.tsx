@@ -38,10 +38,11 @@ import { PCT_MIN_N, MIN_BAR_PCT } from './constants';
 import { SiLadder } from '@/features/courses/_shared/SiLadder';
 import RailChips from '@/components/ui/RailChips';
 import { buildSiLadder } from '@/features/courses/_shared/siLadder';
-import type { ClubCourseAnalytics, ClubAnalyticsHole, ClubAnalyticsTee } from './types';
+import type { ClubCourseAnalytics, ClubAnalyticsTee } from './types';
 import { sortTees, yd } from './tees';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
+import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -207,7 +208,7 @@ export const SampleSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
  * §6.5 — HOLE AND PAR GET THEIR OWN GRID COLUMNS. They had collided into
  * "HOLEPAR" at 26px each.
  */
-const CLUB_HOLE_GRID = '40px 30px 28px 1fr 42px 48px';
+const CLUB_HOLE_GRID = '30px 34px 30px minmax(0,1fr) 44px';
 
 /** §3 / §4 — the four-way split, in scorecard colours. */
 const SPLIT_TIERS = [
@@ -216,28 +217,6 @@ const SPLIT_TIERS = [
   { key: 'bogey' as const, label: 'Bogey', colour: SC_BOGEY_DARK },
   { key: 'double_plus' as const, label: 'Double +', colour: SC_DOUBLE_DARK },
 ];
-
-const DistributionStrip: React.FC<{ counts: number[]; total: number }> = ({ counts, total }) => (
-  <Inset style={{ padding: 12 }}>
-    <div style={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', background: A.TRACK }}>
-      {SPLIT_TIERS.map((t, i) => {
-        const c = counts[i] ?? 0;
-        if (c === 0) return null;
-        return <i key={t.key} style={{ width: `${Math.max(MIN_BAR_PCT, (c / total) * 100)}%`, background: t.colour }} />;
-      })}
-    </div>
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 12 }}>
-      {SPLIT_TIERS.map((t, i) => (
-        <span key={t.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <i style={{ width: 7, height: 7, borderRadius: 2, background: t.colour, flexShrink: 0 }} />
-          <span style={{ ...LABEL }}>{t.label}</span>
-          <span style={bizFigure(12, A.INK)}>{fmt(counts[i])}</span>
-          <span style={bizFigure(11, A.DIM)}>{share(counts[i] ?? 0, total)}</span>
-        </span>
-      ))}
-    </div>
-  </Inset>
-);
 
 /**
  * THIS SECTION DESCRIBES THE COURSE. IT DOES NOT AUDIT THE CARD.
@@ -249,152 +228,93 @@ const DistributionStrip: React.FC<{ counts: number[]; total: number }> = ({ coun
  * a divergence between them, and never word the subline or note so
  * that a reader could take this for a verdict on their card.
  */
-export const HoleBySection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
-  const [hardestFirst, setHardestFirst] = React.useState(false);
+/** CB93: hardest-first is a measured order, never a stroke-index verdict.
+ * Existing identity props supply exactly CB91's course label without new reads.
+ * Null means unmeasured; zero counts remain facts. Only observed numeric means
+ * enter the ramp. The expanded hole survives sorting only while still visible.
+ */
+export const HoleBySection: React.FC<{ data: ClubCourseAnalytics; businessName?: string; courseCount?: number }> = ({ data, businessName = data.course_name, courseCount = data.club_courses.length || 1 }) => {
+  const [order, setOrder] = React.useState('hardest');
   const [openHole, setOpenHole] = React.useState<number | null>(null);
   const holes = data.holes ?? [];
+  const hasFullRounds = data.complete_rounds > 0 && holes.length > 0;
+  React.useEffect(() => {
+    if (!hasFullRounds || !holes.some(h => h.hole_no === openHole)) setOpenHole(null);
+  }, [holes, openHole, hasFullRounds]);
 
-  if (holes.length === 0) {
-    return (
-      <Panel kicker="Hole by hole" style={CARD}>
-        <Body>We hold no hole rows for this course, so there is nothing to rank.</Body>
-      </Panel>
-    );
-  }
-
-  const rows = [...holes].sort((a, b) =>
-    hardestFirst ? a.measured_rank - b.measured_rank : a.hole_no - b.hole_no,
-  );
-
-  // THE RAMP IS TAKEN ACROSS THE OBSERVED SPREAD, min to max, exactly as the
-  // course detail page does it.
-  const values = holes.map((h) => h.avg_to_par);
+  const rows = [...holes].sort((a, b) => order === 'hardest'
+    ? a.measured_rank - b.measured_rank || a.hole_no - b.hole_no
+    : a.hole_no - b.hole_no);
+  const rankRows = [...holes].sort((a, b) => a.measured_rank - b.measured_rank || a.hole_no - b.hole_no);
+  const hardest = rankRows.find(h => h.measured_rank === 1);
+  const easiest = rankRows.at(-1);
+  const values = holes.flatMap(h => typeof h.avg_to_par === 'number' && Number.isFinite(h.avg_to_par) ? [h.avg_to_par] : []);
   const lo = Math.min(...values);
   const hi = Math.max(...values);
-  const tFor = (v: number) => (hi === lo ? 1 : (v - lo) / (hi - lo));
-
-  const o = data.outcomes;
-  const stripCounts = o
-    ? [o.birdie + o.eagle + o.albatross + o.ace, o.par, o.bogey, o.double_plus]
-    : null;
-  const stripTotal = stripCounts ? stripCounts.reduce((s, v) => s + v, 0) : 0;
+  const tFor = (v: number) => hi === lo ? 1 : (v - lo) / (hi - lo);
+  const within = courseNameWithinClub(data.course_name);
+  const courseLabel = courseCount > 1
+    ? (/^the\s/i.test(within) ? within : `the ${within}`)
+    : businessName.trim().replace(/\s+(?:Golf Club|Golf Course|GC)$/i, '').trim();
+  const title = hasFullRounds
+    ? (hardest && easiest ? `Hole ${hardest.hole_no} plays hardest, hole ${easiest.hole_no} easiest` : 'Hole by hole')
+    : 'Hole by hole fills in with the first full round';
+  const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };
+  const heading: React.CSSProperties = { fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM, whiteSpace: 'nowrap' };
 
   return (
-    <Panel
-      kicker="Hole by hole"
-      aside={`${fmt(data.complete_rounds)} full rounds`}
-      subline="How each hole plays for your members, hardest first when you ask for it. Your card's stroke index is shown for reference."
-      style={CARD}
-    >
-      {stripCounts && stripTotal > 0 && (
-        <div style={{ marginBottom: 14 }}>
-          <DistributionStrip counts={stripCounts} total={stripTotal} />
-        </div>
-      )}
-
-      {/* CARD ORDER IS THE DEFAULT. The canonical RailChips choice pair —
-          same treatment as the Explore page sort rails (BRIEF_ONE_CHIP_APP_WIDE). */}
-      <RailChips
-        options={[
-          { id: 'card', label: 'Card order' },
-          { id: 'hardest', label: 'Hardest first' },
-        ]}
-        value={hardestFirst ? 'hardest' : 'card'}
-        onChange={(next) => setHardestFirst(next === 'hardest')}
-        ariaLabel="Hole order"
-        style={{ marginBottom: 10 }}
-      />
-
-      <div style={{ display: 'grid', gridTemplateColumns: CLUB_HOLE_GRID, gap: 8, paddingBottom: 8 }}>
-        <span style={{ ...LABEL, textAlign: 'center' }}>Hole</span>
-        <span style={{ ...LABEL, textAlign: 'center' }}>Par</span>
-        <span style={{ ...LABEL, textAlign: 'center' }}>SI</span>
-        <span style={{ ...LABEL }}>Measured</span>
-        <span style={{ ...LABEL, textAlign: 'right' }}>Difficulty</span>
-        <span style={{ ...LABEL, textAlign: 'right' }}>±Par</span>
+    <section data-testid="hole-by-hole" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS, ...FIGS }}>
+      <div style={{ ...kicker, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <span>HOLE BY HOLE</span>
+        {hasFullRounds && <span style={{ color: HIP.DIM, letterSpacing: '0.12em' }}>{fmt(data.complete_rounds)} FULL ROUNDS</span>}
       </div>
-
-      {rows.map((h) => {
-        const parts = toParParts(h.avg_to_par);
-        const t = tFor(h.avg_to_par);
-        const width = Math.max(4, t * 100);
-        const open = openHole === h.hole_no;
-        const holeTotal = h.birdie_plus + h.par_count + h.bogey + h.double_plus;
-        return (
-          <div key={h.hole_no}>
-            <button
-              type="button"
-              onClick={() => setOpenHole(open ? null : h.hole_no)}
-              aria-expanded={open}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: CLUB_HOLE_GRID,
-                gap: 8,
-                alignItems: 'center',
-                width: '100%',
-                padding: '8px 0',
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-                textAlign: 'left',
-                fontFamily: SANS,
-                ...FIGS,
-              }}
-            >
-              <span style={{ ...NUM, fontSize: 15, color: A.INK, textAlign: 'center' }}>{h.hole_no}</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: A.MUTE, textAlign: 'center' }}>
-                {h.par ?? '\u2014'}
+      <h3 style={{ margin: '6px 0 0', fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.3, color: HIP.INK }}>{title}</h3>
+      <p style={{ margin: '4px 0 0', fontSize: 12.5, lineHeight: 1.45, color: HIP.MUTE }}>
+        {hasFullRounds
+          ? `Strokes over par per hole, ${order === 'hardest' ? 'hardest first' : 'in card order'}. Tap a hole for its birdies, pars and bogeys.`
+          : `Each hole is measured from rounds that carry all 18 holes. ${courseLabel} has ${roundsLabel(data.rounds)} so far, none with every hole.`}
+      </p>
+      {hasFullRounds && <>
+        <RailChips options={[{ id: 'hardest', label: 'Hardest first' }, { id: 'card', label: 'Card order' }]} value={order} onChange={setOrder} ariaLabel="Hole order" style={{ marginTop: 12 }} />
+        <div data-testid="hole-table-head" style={{ display: 'grid', gridTemplateColumns: CLUB_HOLE_GRID, gap: 8, marginTop: 12, paddingBottom: 6 }}>
+          {['Hole', 'Par', 'SI', 'Over par', ''].map((label, i) => <span key={i} style={{ ...heading, textAlign: i < 3 ? 'center' : 'left' }}>{label}</span>)}
+        </div>
+        {rows.map(h => {
+          const parts = toParParts(h.avg_to_par);
+          const t = parts ? tFor(h.avg_to_par) : null;
+          const open = openHole === h.hole_no;
+          const holeTotal = h.birdie_plus + h.par_count + h.bogey + h.double_plus;
+          return <div key={h.hole_no}>
+            <button type="button" aria-label={`Hole ${h.hole_no}`} aria-expanded={open} onClick={() => setOpenHole(open ? null : h.hole_no)} style={{ display: 'grid', gridTemplateColumns: CLUB_HOLE_GRID, gap: 8, alignItems: 'center', width: '100%', padding: '6px 0', border: 'none', borderTop: `1px solid ${A.SOFT}`, background: 'transparent', cursor: 'pointer', textAlign: 'left', fontFamily: SANS, ...FIGS }}>
+              <span style={{ fontSize: 13.5, fontWeight: 700, color: HIP.INK, textAlign: 'center' }}>{h.hole_no}</span>
+              <span style={{ fontSize: 12.5, color: HIP.MUTE, textAlign: 'center' }}>{h.par ?? '—'}</span>
+              <span style={{ fontSize: 12.5, color: HIP.MUTE, textAlign: 'center' }}>{h.stroke_index ?? '—'}</span>
+              <span style={{ height: 6, borderRadius: 3, background: A.SOFT, display: 'block', overflow: 'hidden' }}>
+                {t != null && <i style={{ display: 'block', height: '100%', width: `${Math.max(4, t * 100)}%`, background: difficultyRampColor(t) }} />}
               </span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: A.MUTE, textAlign: 'center' }}>
-                {h.stroke_index ?? '\u2014'}
-              </span>
-              <span style={{ height: 5, borderRadius: 3, background: A.TRACK, display: 'block', overflow: 'hidden' }}>
-                <i style={{ display: 'block', height: '100%', width: `${width}%`, background: difficultyRampColor(t) }} />
-              </span>
-              <span style={{ ...NUM, fontSize: 13, color: A.INK, textAlign: 'right' }}>{h.measured_rank}</span>
-              <span style={{ ...NUM, fontSize: 13, color: parts?.tone ?? A.INK, textAlign: 'right' }}>
-                {parts?.text ?? '\u2014'}
-              </span>
+              <span style={{ fontSize: 13, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: parts?.tone ?? HIP.INK, textAlign: 'right' }}>{parts?.text ?? '—'}</span>
             </button>
-
-            {/* TAP A HOLE for its own split, in scorecard colours. */}
-            {open && holeTotal > 0 && (
-              <div style={{ paddingBottom: 10 }}>
-                <Inset style={{ padding: 12 }}>
-                  <div style={{ ...LABEL, marginBottom: 10 }}>
-                    Hole {h.hole_no} · {fmt(holeTotal)} rounds
-                  </div>
-                  <div style={{ display: 'flex', height: 8, borderRadius: 4, overflow: 'hidden', background: A.TRACK }}>
-                    {SPLIT_TIERS.map((tier) => {
-                      const c = h[tier.key] ?? 0;
-                      if (c === 0) return null;
-                      return <i key={tier.key} style={{ width: `${Math.max(MIN_BAR_PCT, (c / holeTotal) * 100)}%`, background: tier.colour }} />;
-                    })}
-                  </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 10 }}>
-                    {SPLIT_TIERS.map((tier) => (
-                      <span key={tier.key} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                        <i style={{ width: 7, height: 7, borderRadius: 2, background: tier.colour, flexShrink: 0 }} />
-                        <span style={{ ...LABEL }}>{tier.label}</span>
-                        <span style={bizFigure(12, A.INK)}>{fmt(h[tier.key])}</span>
-                      </span>
-                    ))}
-                  </div>
-                </Inset>
+            {open && <div data-testid="hole-inset" style={{ margin: '2px 0 8px', background: HIP.TILE, borderRadius: 12, padding: 12 }}>
+              <div style={{ ...kicker, letterSpacing: '0.14em' }}>HOLE {h.hole_no}{h.yards == null ? '' : ` · ${fmt(h.yards)} YD`} · {fmt(holeTotal)} ROUNDS</div>
+              <div data-testid="hole-split-bar" style={{ display: 'flex', height: 6, borderRadius: 3, overflow: 'hidden', gap: 2, marginTop: 10 }}>
+                {SPLIT_TIERS.map(tier => {
+                  const count = h[tier.key];
+                  return count > 0 && <i key={tier.key} style={{ flexBasis: `${Math.max(MIN_BAR_PCT, count / holeTotal * 100)}%`, flexShrink: 1, background: tier.colour }} />;
+                })}
               </div>
-            )}
-          </div>
-        );
-      })}
-
-      <Body style={{ marginTop: 10, fontSize: 11.5, color: A.DIM }}>
-        Difficulty is where the hole sits on mean strokes over par across
-        {` ${fmt(data.complete_rounds)} `}
-        full rounds, pooled across every handicap. That is not what a stroke index measures {'\u2014'} a stroke
-        index ranks where a higher handicapper needs a shot most relative to a lower one, which is a different
-        measurement, and not one shown anywhere here. Tap a hole for its own split. A dash means we hold no figure for that hole.
-      </Body>
-    </Panel>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 40px', rowGap: 5, columnGap: 10, marginTop: 8, fontSize: 12, alignItems: 'baseline' }}>
+                {SPLIT_TIERS.map(tier => <React.Fragment key={tier.key}>
+                  <div data-testid="hole-split-row" style={{ display: 'flex', gap: 8, alignItems: 'center', color: HIP.MUTE }}><i style={{ width: 8, height: 8, borderRadius: 2, background: tier.colour }} />{tier.label}</div>
+                  <div style={{ color: HIP.INK, textAlign: 'right', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{fmt(h[tier.key])}</div>
+                  <div style={{ color: HIP.DIM, textAlign: 'right', fontSize: 11.5, fontVariantNumeric: 'tabular-nums' }}>{howItPlaysShare(h[tier.key], holeTotal)}</div>
+                </React.Fragment>)}
+              </div>
+            </div>}
+          </div>;
+        })}
+        <p style={{ margin: '10px 0 0', fontSize: 11.5, lineHeight: 1.45, color: HIP.DIM }}>From {fmt(data.complete_rounds)} full rounds, every handicap pooled. This orders holes by how hard they play, which is not what a stroke index measures. A dash means we hold no figure for that hole.</p>
+      </>}
+    </section>
   );
 };
 

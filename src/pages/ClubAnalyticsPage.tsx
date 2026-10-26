@@ -142,7 +142,7 @@ const CourseBlock: React.FC<{ course: ClubCourseRef; courseCount: number; busine
               <SectionGuard><HowItPlaysSection data={result.data} /></SectionGuard>
               {/* §7 — the sample is stated before the rest of the figures. */}
               <SectionGuard><SampleSection data={result.data} /></SectionGuard>
-              <SectionGuard><HoleBySection data={result.data} /></SectionGuard>
+              <SectionGuard><HoleBySection data={result.data} businessName={businessName} courseCount={courseCount} /></SectionGuard>
               {/* §2 — the ladder is the one thing no other product shows a club. */}
               <SectionGuard><IndexDisagreesSection data={result.data} /></SectionGuard>
               {/* §5 — values only. Names live on the course's Champions tab. */}
