@@ -766,8 +766,7 @@
         "lead_other": "{{n}} of your followers play off a handicap.",
         "leadZero": "None of your followers plays off a handicap yet.",
         "notEnoughBody": "Their handicaps and where they play will show once 10 do, so nobody can be picked out.",
-        "notAffected": "Not affected by the 7, 30 or 90 days above.",
-        "noneTitle": "No golfers follow {{business}} yet."
+        "notAffected": "Not affected by the 7, 30 or 90 days above."
       },
       "visits": {
         "kicker": "Profile visits",
