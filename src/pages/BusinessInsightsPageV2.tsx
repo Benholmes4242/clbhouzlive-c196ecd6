@@ -19,7 +19,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
@@ -31,13 +30,13 @@ import { useBusinessInsightsFunnel } from '@/hooks/useBusinessInsightsFunnel';
 import { InsightsFunnel } from '@/components/business/insights/InsightsFunnel';
 import { InsightsVisitsSection } from '@/components/business/insights/InsightsVisitsSection';
 import { InsightsAudienceSection } from '@/components/business/insights/InsightsAudienceSection';
+import { InsightsPostsSection } from '@/components/business/insights/InsightsPostsSection';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { Button } from '@/components/ui/button';
 import { RailChips } from '@/components/ui/RailChips';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { BIZ } from '@/components/business/businessTokens';
-import { stripMentionMarkup } from '@/lib/mentions/format';
 import { formatNumber, formatDayMonthShortGB } from '@/i18n/format';
 import {
   A, BIZ_KICKER, BIZ_LABEL, BIZ_TITLE, BIZ_BODY, bizFigure, BIZ_INSET, BIZ_TRACK_H,
@@ -228,43 +227,6 @@ const FollowersChart = ({ data, emptyTitle, emptyBody }: {
 };
 
 // ─────────────────────────────────────────────────────────────
-// Section: Top posts
-// ─────────────────────────────────────────────────────────────
-const TopPosts = ({ items, onOpen, emptyLabel }: {
-  items: { post_id: string; content_preview: string; created_at: string; impressions: number; likes: number; comments: number }[];
-  onOpen: (postId: string) => void;
-  emptyLabel: string;
-}) => {
-  const { t } = useTranslation('common');
-  if (items.length === 0) return <ChartInset height={140} center><InsetMessage body={emptyLabel} /></ChartInset>;
-  return (
-    <ul className="divide-y" style={{ borderColor: BIZ.hairSoft }}>
-      {items.map(p => (
-        <li key={p.post_id}>
-          <button
-            onClick={() => onOpen(p.post_id)}
-            className="w-full text-left flex items-start gap-3 active:opacity-70"
-            style={{ minHeight: 44, paddingTop: 12, paddingBottom: 12 }}
-          >
-            <div className="min-w-0 flex-1">
-              <p className="truncate" style={{ fontSize: 13.5, fontWeight: 500, color: A.INK }}>
-                {stripMentionMarkup(p.content_preview ?? '').trim() || 'Untitled post'}
-              </p>
-              <div className="mt-1 flex items-center gap-3 tabular-nums" style={{ fontSize: 11.5, color: A.MUTE, ...numFeat }}>
-                <span>{t('business.insights.topPosts.impressions', { count: p.impressions, n: formatNum(p.impressions) })}</span>
-                <span>{t('business.insights.topPosts.likes', { count: p.likes, n: formatNum(p.likes) })}</span>
-                <span>{t('business.insights.topPosts.comments', { count: p.comments, n: formatNum(p.comments) })}</span>
-              </div>
-            </div>
-            <ChevronRight className="h-4 w-4 mt-1 flex-shrink-0" style={{ color: A.DIM }} />
-          </button>
-        </li>
-      ))}
-    </ul>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────
 // Page
 // ─────────────────────────────────────────────────────────────
 const BusinessInsightsPageV2 = () => {
@@ -399,18 +361,18 @@ const BusinessInsightsPageV2 = () => {
             )}
         </InsightCard>
 
-        {/* ── CONTENT ── */}
-        <InsightCard kicker="CONTENT" title="Top posts">
-          {insightsLoading
-            ? <div className="space-y-3"><Skeleton className="h-12" /><Skeleton className="h-12" /><Skeleton className="h-12" /></div>
-            : (
-              <TopPosts
-                items={insights.content}
-                onOpen={(postId) => navigate(`/post/${postId}`)}
-                emptyLabel={t('business.insights.empty.posts')}
-              />
-            )}
-        </InsightCard>
+        {/* ── CB85: YOUR POSTS (replaces CONTENT · Top posts). Draws nothing
+            until the first read settles or if it fails; period switches keep
+            the previous card. ── */}
+        <div className="-mx-4 md:-mx-6 !mt-0">
+          <InsightsPostsSection
+            businessId={business.id}
+            days={RANGE_DAYS[dateRange]}
+            canPost={canPost}
+            onPost={() => usePostStudioStore.getState().openPostStudio({ actorType: 'business', actorId: business.id })}
+            onOpen={(postId) => navigate(`/post/${postId}`)}
+          />
+        </div>
 
         {/* ── ENGAGEMENT: the rate carries its denominator, and below the
             floor it is withheld - the count is stated, the rate is not. ── */}

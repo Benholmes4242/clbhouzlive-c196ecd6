@@ -143,7 +143,7 @@ export function InsightsPostsSection({ businessId, days, canPost, onPost, onOpen
 }) {
   const { t } = useTranslation('common');
   const q = useBusinessPostReach(businessId, days);
-  if (!q.isFetched || q.isError || !q.data) return null;
+  if (q.isError || !q.data) return null;
   const k: K = (key, options = {}) => t(`business.insights.posts.${key}`, { ...options, defaultValue: '' });
   return <Card d={q.data} days={days} k={k} canPost={canPost} onPost={onPost} onOpen={onOpen} />;
 }
