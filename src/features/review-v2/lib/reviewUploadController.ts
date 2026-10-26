@@ -34,7 +34,7 @@
  * row older than a day.
  */
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, SUPABASE_URL } from '@/integrations/supabase/client';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { uploadVideoResilient } from '@/uploads/resilientVideoUpload';
 import { toast } from '@/lib/toast';
@@ -105,7 +105,7 @@ async function uploadImage(userId: string, item: ReviewUploadInput, onProgress: 
   form.append('fileName', `${userId}-${Date.now()}-${item.file.name}`);
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${supabase.supabaseUrl}/functions/v1/cloudflare-r2-upload`);
+    xhr.open('POST', `${SUPABASE_URL}/functions/v1/cloudflare-r2-upload`);
     xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
     const abort = () => xhr.abort(); signal.addEventListener('abort', abort, { once: true });
     const finish = () => signal.removeEventListener('abort', abort);
