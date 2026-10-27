@@ -10,12 +10,15 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { NEARBY_CATEGORIES } from '@/lib/business/businessHero';
 
+/** One key for hero and BusinessYouCard (CB113). */
+export const nearbyCountsKey = (lat: number | null | undefined, lng: number | null | undefined) => ['business-nearby-counts', lat, lng] as const;
+
 export interface NearbyCounts { coursesNear: number | null; top100Near: number | null; courses: Array<{ id: string; name: string }> | null }
 
 export function useBusinessNearbyCounts(category: string | null | undefined, lat: number | null | undefined, lng: number | null | undefined) {
   const enabled = NEARBY_CATEGORIES.has(category ?? '') && lat != null && lng != null;
   return useQuery({
-    queryKey: ['business-nearby-counts', lat, lng],
+    queryKey: nearbyCountsKey(lat, lng),
     enabled,
     staleTime: 10 * 60 * 1000,
     queryFn: async (): Promise<NearbyCounts> => {
