@@ -16,6 +16,7 @@ import { useBusinessNearbyCounts, type NearbyCourse } from '@/hooks/useBusinessN
 import { useNearbyCourseStats, type NearbyCourseStat } from '@/hooks/useNearbyCourseStats';
 import { CourseImageFallback } from '@/components/whs/CourseImageFallback';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { scrollElementIntoView } from '@/lib/getScrollParent';
 
 const T = {
   card: '#17171B', ink: '#F8FAFC', mute: 'rgba(248,250,252,0.62)',
@@ -159,5 +160,5 @@ export function scrollToNearbyCard() {
   document.body.appendChild(probe);
   const offset = probe.getBoundingClientRect().height || parseFloat(getComputedStyle(probe).paddingTop) || 47;
   probe.remove();
-  void import('@/lib/getScrollParent').then(({ scrollElementIntoView }) => scrollElementIntoView(el, { offset, behavior: 'smooth' }));
+  scrollElementIntoView(el, { offset, behavior: 'smooth' });
 }
