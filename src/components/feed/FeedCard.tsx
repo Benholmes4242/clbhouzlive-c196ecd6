@@ -68,6 +68,7 @@ import { featuredRoundFrom, decideFeatured, type FeaturedTrigger } from './featu
 import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard';
 import type { RoundCourseMeta } from './roundPostItem';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
+import type { SubjectContext } from '@/components/sheets/SubjectContextLine';
 
 /** Home's content inset (the header's 12px). The round photo bleeds by it. */
 const ROUND_CARD_INSET = 12;
