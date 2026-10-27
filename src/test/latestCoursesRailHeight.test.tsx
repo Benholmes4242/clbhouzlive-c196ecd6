@@ -48,6 +48,26 @@ describe('BRIEF latest-course tiles share the latest-holes tile height (Ben, 27 
     expect(card.style.gridTemplateColumns).toBe('220px 110px');
   });
 
+  it('the big photo is exactly the size of a Latest holes tile', () => {
+    const view = mount();
+    const card = screen_getCard(view);
+    const big = view.container.querySelector('button[aria-label^="Open "]') as HTMLElement;
+    expect(big).not.toBeNull();
+    expect(LATEST_COURSE_BIG_W).toBe(LATEST_HOLE_W);
+    expect(card.style.gridTemplateColumns).toBe(`${LATEST_HOLE_W}px ${LATEST_COURSE_SMALL_W}px`);
+    // The big cell spans both rows, so its height is the card height: a 220x293 holes tile.
+    expect(big.style.gridRow).toBe('1 / 3');
+    expect(card.style.height).toBe(`${LATEST_HOLE_H}px`);
+    expect(card.style.gap).toBe('2px');
+    expect(LATEST_COURSE_SMALL_H * 2 + 2).toBe(LATEST_HOLE_H);
+  });
+
+  it('the card width is the two photos plus the 2px gap', () => {
+    expect(LATEST_COURSE_W).toBe(332);
+    expect(LATEST_COURSE_SMALL_W).toBe(110);
+    expect(LATEST_COURSE_W).toBe(LATEST_COURSE_BIG_W + 2 + LATEST_COURSE_SMALL_W);
+  });
+
   it('the latest-course skeleton is LATEST_HOLE_H tall', () => {
     const view = render(<MemoryRouter><LatestCourseSkeletonCard /></MemoryRouter>);
     const bar = view.container.querySelector('.latest-course-skeleton-card') as HTMLElement;
