@@ -26,7 +26,7 @@ function chainable() {
   const q: Record<string, unknown> = {};
   for (const m of ['select', 'eq', 'order', 'limit', 'single', 'maybeSingle', 'in', 'gte', 'lte', 'neq', 'is', 'or', 'filter']) q[m] = () => q;
   q.then = (onF: (v: unknown) => unknown, onR?: (e: unknown) => unknown) =>
-    Promise.resolve({ data: state.rows.length ? state.rows : state.courses, error: null }).then((v) => { if (process.env.DBG) console.log('CHAIN', JSON.stringify(v)); return v; }).then(onF, onR);
+    Promise.resolve({ data: state.rows.length ? state.rows : state.courses, error: null }).then(onF, onR);
   return q;
 }
 vi.mock('@/integrations/supabase/client', () => ({
@@ -282,13 +282,14 @@ describe('CB112 clubs unchanged', () => {
     rpc.mockResolvedValue({ data: null, error: null });
     state.courses = [{ id: 'k1', name: 'Sundridge', region: 'Kent', country: 'England', thumbnail_image: null }];
     state.membership = { role: 'owner', canViewInsights: true, canManage: true };
-    state.business = fixture({ club_id: 'c1', category: 'Golf Course', is_verified: true });
+    state.business = fixture({ club_id: 'c1', category: 'Golf Club', is_verified: true });
     const { container } = renderPage();
-    await new Promise((r) => setTimeout(r, 500)); if (process.env.DBG) console.log('HTML', container.innerHTML.slice(0, 3000));
-    await waitFor(() => expect(container.querySelector('[data-club-place]')!.textContent).toContain('Golf club'), { timeout: 3000 });
-    const yc = screen.queryByRole('button', { name: 'Your courses' });
-    if (yc) expect((yc as HTMLElement).style.background).toBe('rgb(248, 250, 252)');
-    expect((container.querySelector('[data-insights-pill]') as HTMLElement).style.background).toBe('rgba(255, 255, 255, 0.07)');
+    // Club: the team row carries Your courses (white) before Insights (glass).
+    await waitFor(() => expect(container.querySelectorAll('[data-club-actions="team"] button')).toHaveLength(4));
+    const row = Array.from(container.querySelectorAll('[data-club-actions="team"] button')) as HTMLElement[];
+    expect(row[0].style.background).toBe('rgb(248, 250, 252)');
+    expect(row[1]).toBe(container.querySelector('[data-insights-pill]'));
+    expect(row[1].style.background).toBe('rgba(255, 255, 255, 0.07)');
     expect(container.querySelector('[data-cell="followers"]')).toBeNull();
     state.membership = null;
     cleanup();
