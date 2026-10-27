@@ -53,7 +53,6 @@ import { MentionText } from '@/components/mentions/MentionText';
 import { REVIEW_SHEET_Z, VIEWER_ABOVE_SHEETS_Z } from '@/lib/zLayers';
 import { footerTapProbeEnabled, recordFooterTap } from './footerTapProbe';
 import { openWithOrigin } from '@/lib/openWithOrigin';
-import { getRatingTierLabel } from '@/lib/ratingTier';
 import { getPublicProfilePath } from '@/lib/profileRoutes';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
@@ -71,7 +70,7 @@ import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toast } from '@/lib/toast';
 import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
-import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /* Dark surface tokens (analytical ramp). BODY sits at 72% rather than the 62%
    a caption would take: this sheet's payload is three paragraphs of member
@@ -417,7 +416,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const canCompareCourse = ratingCount >= REVIEW_SHEET_COMPARE_MIN;
   const showReference =
     rating != null && communityAvg != null && canCompareCourse;
-  const ratingColor = courseSubScoreTone(rating);
 
   // MEDIA (§3c) — prop when a caller has it, otherwise a lazy read.
   const { data: fetchedMedia } = useReviewMedia(reviewId ?? null, isOpen && !media?.length);
