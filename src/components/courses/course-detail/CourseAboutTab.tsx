@@ -231,11 +231,12 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       )}
 
       {course.website_url && (
-        <ExternalLinkSheet
-          isOpen={showWebsiteSheet}
+        <CourseWebsiteSheet
+          open={showWebsiteSheet}
           onClose={() => setShowWebsiteSheet(false)}
-          url={course.website_url}
-          title={`${course.name || 'Course'} Website`}
+          course={course}
+          coords={coords ?? null}
+          onTabChange={onTabChange}
         />
       )}
 

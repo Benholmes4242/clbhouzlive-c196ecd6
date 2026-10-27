@@ -574,10 +574,10 @@ const CourseWebsiteSheet: React.FC<CourseWebsiteSheetProps> = ({
                   }}
                 />
                 <div style={{ fontSize: 13.5, lineHeight: 1.45, color: MUTE }}>
-                  {bandSentence && (
+                  {bandSentence != null && (
                     <span>
                       {t('courseDetail.websiteSheet.bandAverageLead', { defaultValue: 'Golfers off your handicap average' })}{' '}
-                      <strong style={{ color: INK, fontWeight: 700 }}>{Math.round(bandAverage?.avg_gross ?? 0)}</strong>{' '}
+                      <strong style={{ color: INK, fontWeight: 700 }}>{bandSentence}</strong>{' '}
                       {t('courseDetail.websiteSheet.bandAverageTail', { defaultValue: 'here.' })}{' '}
                     </span>
                   )}
@@ -587,7 +587,7 @@ const CourseWebsiteSheet: React.FC<CourseWebsiteSheetProps> = ({
                       <strong style={{ color: INK, fontWeight: 700 }}>{stats.your_best}</strong>
                       {t('courseDetail.websiteSheet.sentenceEnd', { defaultValue: '.' })}
                     </span>
-                  ) : bandSentence ? (
+                  ) : bandSentence != null ? (
                     <span>{t('courseDetail.websiteSheet.notPlayedYet', { defaultValue: "You haven't played it yet." })}</span>
                   ) : null}
                 </div>
