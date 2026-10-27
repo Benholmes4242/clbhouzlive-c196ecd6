@@ -165,3 +165,13 @@ describe('CB104 place line', () => {
     expect(clubPlaceLine({ city: 'Bromley', region: 'Kent', country: 'England', courseCount: 2 }, labels)).toBe('Golf club · Bromley, Kent · 2 courses');
   });
 });
+
+describe('CB104 title typography', () => {
+  it('title carries -0.01em letter-spacing', () => {
+    const css = readFileSync(resolve(process.cwd(), 'src/index.css'), 'utf8');
+    const rule = css.match(/\.club-you-title \{([^}]*)\}/);
+    expect(rule, '.club-you-title rule must exist in src/index.css').not.toBeNull();
+    expect(rule?.[1]).toMatch(/letter-spacing:\s*-0\.01em/);
+    expect(rule?.[1]).not.toMatch(/letter-spacing:\s*0(?![.\d])/);
+  });
+});
