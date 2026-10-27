@@ -303,7 +303,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
           onSubmitPlace={place => { void tagPlace(holeSourceUrl(tagPost.mediaItems[0]), place).then(() => { setTagPost(null); toast(t('media.v2.taggedPlace', { label: PLACE_LABELS[place], defaultValue: `Tagged to ${PLACE_LABELS[place]}.` })); }).catch(() => {}); }}
           onRemovePlace={row => { void removePlace(row).catch(() => {}); }}
           pending={tagging.submit.isPending || places.submit?.isPending || places.remove?.isPending}
-          error={places.submit?.error || places.remove?.error ? holePhotoErrorMessage(places.submit?.error ?? places.remove?.error, 'The tag could not be saved. Nothing was changed.') :{tagging.submit.error ? holePhotoErrorMessage(tagging.submit.error, `The ${tagPost.mediaItems[0]?.type === 'video' ? 'video' : 'photo'} could not be tagged. The tag was not saved.`, tagPost.mediaItems[0]?.type === 'video' ? 'video' : 'image') : null}
+          error={places.submit?.error || places.remove?.error ? holePhotoErrorMessage(places.submit?.error ?? places.remove?.error, 'The tag could not be saved. Nothing was changed.') : tagging.submit.error ? holePhotoErrorMessage(tagging.submit.error, `The ${tagPost.mediaItems[0]?.type === 'video' ? 'video' : 'photo'} could not be tagged. The tag was not saved.`, tagPost.mediaItems[0]?.type === 'video' ? 'video' : 'image') : null}
           onClose={() => setTagPost(null)}
           onSubmit={hole => tagging.submit.mutate({ post: tagPost, hole }, { onSuccess: () => { const count = ownHoleTags.filter(h => h === hole).length + 1; setTagPost(null); toast(memberTagConfirmation(hole, count)); } })} />
       )}
