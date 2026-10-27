@@ -695,7 +695,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   );
   /* THE FOOTER (section A). ONE always-present object, last on every card.
      `compact` is the review card's tightened rows (action row 40, liked-by 26). */
-  const renderFooter = (gutter: number, compact: boolean, mediaFirstSlots?: { caption: React.ReactNode; addComment: React.ReactNode }) => (() => {
+  const renderFooter = (gutter: number, compact: boolean, mediaFirstSlots?: { caption: React.ReactNode; addComment: React.ReactNode; likedByRound?: { subjectId: string; isOwnRound: boolean; subject: SubjectContext | null } }) => (() => {
         /* SHOW WHO LIKED A POST — the liked-by line is the SINGLE entry point on
            a card. The like count in the actions row stays untappable: two
            targets six pixels apart is a mis-tap. Zero likes renders no line and
@@ -771,9 +771,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   The in-flight count and resolved names occupy this same
                   one-line box, so neither height nor x-position moves. */
               <LikedByRow
-                postId={post.id}
+                postId={mediaFirstSlots?.likedByRound?.subjectId ?? post.id}
                 count={likeCount}
-                subject={post.review ? {
+                source={mediaFirstSlots?.likedByRound ? 'round' : 'post'}
+                kind={mediaFirstSlots?.likedByRound ? 'celebrate' : 'like'}
+                isOwnRound={mediaFirstSlots?.likedByRound?.isOwnRound ?? false}
+                subject={mediaFirstSlots?.likedByRound ? mediaFirstSlots.likedByRound.subject : post.review ? {
                   authorName: post.displayName ?? null,
                   courseId: post.review.courseId ?? null,
                   courseName: post.review.courseName ?? null,
