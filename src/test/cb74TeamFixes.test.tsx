@@ -161,7 +161,7 @@ describe('CB74 invite membership guard', () => {
     expect(screen.queryByRole('button', { name: 'Choose someone to invite' })).toBeNull();
     expect(screen.getByTestId('team-destination')).toBeTruthy();
     expect(screen.getByTestId('route-state').textContent).toBe('/business/biz/team:REPLACE');
-    expect(mocks.routeChanges.filter(value => value === '/business/biz/team:REPLACE')).toHaveLength(1);
+    await waitFor(() => expect(mocks.routeChanges.filter(value => value === '/business/biz/team:REPLACE')).toHaveLength(1));
     expect(mocks.formCommits).not.toContain(true);
   });
   it.each(['owner', 'admin'])('%s waits for session and membership before seeing the form without any redirect', async (role) => {
