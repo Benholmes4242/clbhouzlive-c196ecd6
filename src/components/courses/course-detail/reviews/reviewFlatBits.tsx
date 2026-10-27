@@ -21,6 +21,7 @@
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import { ThumbsUp, MoreHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
+import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
 import { A, SANS, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { formatRatingValue } from '@/utils/formatters';
@@ -156,9 +157,6 @@ export const FlatReviewRow: React.FC<FlatReviewRowProps> = ({
   const { t: tCommon } = useTranslation('common');
   const [expanded, setExpanded] = useState(false);
   const name = isMine ? 'You' : displayName;
-  const score = review.rating ?? 0;
-  // Ownership stays on the name; every real rating figure is white.
-  const scoreColor = courseSubScoreTone(score);
   const helpfulCount = review.helpful_count ?? 0;
 
   const stripped = review.review ? stripMentionMarkup(review.review) : '';
@@ -205,13 +203,19 @@ export const FlatReviewRow: React.FC<FlatReviewRowProps> = ({
           </div>
         </div>
 
-        <span style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: scoreColor, ...FIGS }}>
-          {formatRatingValue(score)}
-        </span>
       </div>
 
-      {/* b) the quiet category line */}
-      <CategoryLine review={review} />
+      {/* b) the shared review score row (signed-off mock) under the reviewer line */}
+      <ReviewScoreRow
+        style={{ marginTop: 12 }}
+        overall={review.rating ?? null}
+        breakdown={{
+          design: review.design_score ?? null,
+          condition: review.condition_score ?? null,
+          clubhouse: review.clubhouse_score ?? null,
+          facilities: review.facilities_score ?? null,
+        }}
+      />
 
       {/* c) the prose */}
       {review.review && review.review.trim().length > 0 && (
