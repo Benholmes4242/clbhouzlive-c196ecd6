@@ -13,7 +13,7 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: {
  from: (table: string) => { state.filters.push(['table', table]); const q: Record<string, unknown> = {}; for (const m of ['select','ilike','eq','in','limit']) q[m] = (...args: unknown[]) => { state.filters.push([m, args]); return q; }; q.then = (resolve: (v: unknown) => unknown) => Promise.resolve({ data: state.search, error: null }).then(resolve); return q; },
 } }));
 import { BusinessCoachInvite, BusinessCoachResults, CoachProfileLine, coachStrip, scrollToCoachResults, coachChartPoints } from '@/features/coach/BusinessCoachCards';
-import { CoachNameSheet, YourCoachRow, searchCoachBusinesses } from '@/features/coach/CoachSheets';
+import { CoachNameSheet, CoachNamingFlow, YourCoachRow, searchCoachBusinesses } from '@/features/coach/CoachSheets';
 import { coachSentences } from '@/features/coach/copy';
 import { coachKeys, isCoachCategory, formatCoachChange, type MyCoach } from '@/features/coach/contracts';
 const business = { id: 'academy', name: 'Kestrel', category: 'Golf Academy', slug: 'kestrel' };
@@ -31,6 +31,32 @@ const t = (key: string, opts?: Record<string, unknown>) => { const text = key.sp
 beforeEach(() => { Object.assign(state, { mine: null, member: null, results: null, golfers: null, current: 12, errors: {}, calls: [], filters: [], search: [] }); success.mockClear(); errorToast.mockClear(); });
 afterEach(() => { cleanup(); client?.clear(); });
 describe('CB116 coach naming', () => {
+ it('no_handicap refusal keeps flow open with connect and no toast or invalidation', async () => {
+   state.errors.name_coach = { message: 'no_handicap' };
+   const close = vi.fn();
+   mount(<CoachNamingFlow business={business} current={null} viewerId="me" onClose={close} />);
+   const invalidation = vi.spyOn(client, 'invalidateQueries');
+   await waitFor(() => el('[data-coach-name-action]'));
+   click('[data-coach-name-action]');
+   await waitFor(() => el('[data-coach-connect]'));
+   expect(close).not.toHaveBeenCalled();
+   expect(document.querySelector('[data-coach-name]')).toBeNull();
+   expect(success).not.toHaveBeenCalled();
+   expect(errorToast).not.toHaveBeenCalled();
+   expect(invalidation).not.toHaveBeenCalled();
+ });
+ it('ProfileHero has no coach imports and its absent optional prop leaves the line empty', () => {
+   const hero = readFileSync('src/components/profile/hero/ProfileHero.tsx', 'utf8');
+   expect(hero).not.toMatch(/from\s+['"][^'"]*features\/coach/);
+   expect(hero).toMatch(/coachLine\?: React\.ReactNode/);
+   expect(hero).toContain('afterSubline={coachLine}');
+   expect(hero).not.toMatch(/coachLine\s*=\s*[^,}]/);
+ });
+ it('ProfilePageV2 passes the member and viewer coach line through the hero prop', () => {
+   const page = readFileSync('src/pages/ProfilePageV2.tsx', 'utf8');
+   expect(page).toContain("import { CoachProfileLine } from '@/features/coach/BusinessCoachCards'");
+   expect(page).toContain('coachLine={<CoachProfileLine profileUserId={profile.id} viewerId={user?.id} />}');
+ });
  it.each([{ label: 'signed out', viewerId: undefined }, { label: 'team', isTeam: true }, { label: 'club', isClub: true }, { label: 'other category', business: { ...business, category: 'Driving Range' } }, { label: 'membership unresolved', membershipReady: false }])('hides invitation for $label', async ({ label, ...props }) => { invite(props); await ready(); expect(document.querySelector('[data-coach-invite]')).toBeNull(); });
  it('hides invitation for this coach', async () => { state.mine = coach; invite(); await ready(); expect(document.querySelector('[data-coach-invite]')).toBeNull(); });
  it('offers a different coach with switching line', async () => { state.mine = { ...coach, business_id: 'old' }; invite(); await waitFor(() => el('[data-coach-invite]')); click('[data-coach-invite-action]'); await waitFor(() => el('[data-coach-switch-line]')); expect(state.calls.filter(c => c[0] === 'name_coach')).toHaveLength(0); });

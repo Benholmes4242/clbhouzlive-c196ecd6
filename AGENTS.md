@@ -84,3 +84,4 @@ Report the suite total before and after, and name the source of any delta. A cou
 - Feed layout ownership and review footer-slot composition: see ReviewPostCard.tsx header; feed callers opt in while direct standard cards and separate grid/round cards remain independent.
 - Course review navigation uses the course detail Reviews tab; CourseReviewsTab owns one-shot landing/target consumption and the legacy redirect preserves intent, so club links and bookmarks share one destination.
 - Coach surfaces share session-scoped seven-function caches and mutation invalidation through features/coach; every failed read suppresses its dependent surface even with stale data, so server privacy and measurement remain authoritative.
+- ProfilePageV2 owns the coach-line read and passes an optional node to ProfileHero; the hero never imports coach modules, preserving standalone rendering without a query provider.
