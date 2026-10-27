@@ -118,16 +118,18 @@ describe('CB107 Visiting contacts', () => {
     rerender(<ClubVisiting business={fixture()} />);
     expect(row('book')).toBeTruthy();
   });
-  it('Directions uses address_label and tracks the existing maps handler', () => {
-    card({ location: 'Garden Road', address_label: 'Garden Road, Bromley, BR1', address_line1: 'Other' });
+  it('Directions shows address_label as the title at address precision and tracks the existing maps handler', () => {
+    card({ location: 'Garden Road', location_precision: 'address', address_label: 'Garden Road, Bromley, BR1', address_line1: 'Other' });
     expect(row('directions').querySelector('b')?.textContent).toBe('Garden Road, Bromley, BR1');
+    expect(row('directions').querySelector('i')?.textContent).toBe('Directions');
     fireEvent.click(row('directions'));
     expect(openExternalUrl).toHaveBeenCalledWith('https://www.google.com/maps/search/?api=1&query=Garden%20Road', 'external');
     expect(trackBusinessAction).toHaveBeenCalledWith('b1', 'directions', 'u1');
   });
-  it('Directions joins available street city and postcode', () => {
-    card({ location: 'address', address_line1: 'Garden Road', city: 'Bromley', postcode: 'BR1' });
+  it('Directions joins street city and postcode as the title at address precision', () => {
+    card({ location: 'address', location_precision: 'address', address_line1: 'Garden Road', city: 'Bromley', postcode: 'BR1' });
     expect(row('directions').querySelector('b')?.textContent).toBe('Garden Road, Bromley, BR1');
+    expect(row('directions').querySelector('i')?.textContent).toBe('Directions');
   });
   it('Directions with a pin and no address uses Directions and the course place', () => {
     card({ lat: 0, lng: 0 });
@@ -143,6 +145,21 @@ describe('CB107 Visiting contacts', () => {
   it('Directions is absent without location or a complete pin', () => {
     card({ lat: 1, address_label: 'Not a location' });
     expect(document.querySelector('[data-visiting-row="directions"]')).toBeNull();
+  });
+  it('region-level location shows Directions with the place, not the label', () => {
+    card({ location: 'Sundridge', location_precision: 'region', address_label: 'England, Kent, Britain & Ireland', region: 'Kent' });
+    expect(row('directions').querySelector('b')?.textContent).toBe('Directions');
+    expect(row('directions').querySelector('i')?.textContent).toBe('Kent');
+  });
+  it('a postcode-level address is shown as the title', () => {
+    card({ location: 'Garden Road', location_precision: 'postcode', address_label: 'Garden Road, Bromley, BR1', region: 'Kent' });
+    expect(row('directions').querySelector('b')?.textContent).toBe('Garden Road, Bromley, BR1');
+    expect(row('directions').querySelector('i')?.textContent).toBe('Directions');
+  });
+  it('a pin with no precision shows Directions with the place', () => {
+    card({ lat: 1, lng: 2, location_precision: 'pin', region: 'Kent', address_label: 'England, Kent, Britain & Ireland' });
+    expect(row('directions').querySelector('b')?.textContent).toBe('Directions');
+    expect(row('directions').querySelector('i')?.textContent).toBe('Kent');
   });
   it('website is present only when set and opens a normalized URL with tracking', () => {
     const { rerender } = card();
