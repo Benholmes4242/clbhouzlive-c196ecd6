@@ -35,7 +35,7 @@ describe('review post — score row below the course', () => {
     expect(row.style.gridTemplateColumns).toBe('auto 1fr');
     expect(row.style.justifyContent).toBe('');
     expect(row.firstElementChild?.getAttribute('data-score-cell')).toBe('overall');
-    expect((row.firstElementChild as HTMLElement).style.borderRight).toBe('1px solid rgba(255, 255, 255, 0.1)');
+    expect((row.firstElementChild as HTMLElement).style.borderRight).toBe('1px solid rgba(255,255,255,0.10)');
   });
   it('the overall is white at 9.2 and 8.2', () => {
     expect((card(9.2).querySelector('[data-score-cell="overall"] [data-score-figure]') as HTMLElement).style.color).toBe(toRgb('#FFFFFF'));

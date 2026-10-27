@@ -69,7 +69,7 @@ describe('ReviewScoreRow', () => {
   it('card: the divider shows only with an overall and at least one breakdown value', () => {
     const ov = (c: HTMLElement) => c.querySelector('[data-score-cell="overall"]') as HTMLElement;
     const both = render(<ReviewScoreRow overall={9} breakdown={{ ...full, design: null, condition: null, clubhouse: null }} />).container;
-    expect(ov(both).style.borderRight).toBe('1px solid rgba(255, 255, 255, 0.1)');
+    expect(ov(both).style.borderRight).toBe('1px solid rgba(255,255,255,0.10)');
     expect(ov(both).style.paddingRight).toBe('16px');
     expect(ov(both).style.marginRight).toBe('16px');
   });
