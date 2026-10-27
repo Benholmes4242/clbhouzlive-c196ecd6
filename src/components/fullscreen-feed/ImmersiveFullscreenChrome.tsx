@@ -94,10 +94,6 @@ const META_STRONG = 'rgba(255,255,255,0.78)';
 const MICRO_LABEL = 'rgba(255,255,255,0.50)';
 const FIG: React.CSSProperties = { color: '#FFFFFF', fontWeight: 700 };
 const TABULAR: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums' };
-const BREAKDOWN_CELLS = [
-  ['design', 'DESIGN'], ['conditions', 'CONDITION'],
-  ['clubhouse', 'CLUBHOUSE'], ['facilities', 'FACILITIES'],
-] as const;
 
 function formatCount(n: number | null | undefined): string | null {
   if (n === null || n === undefined || n === 0) return null;
