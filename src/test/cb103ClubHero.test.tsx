@@ -8,10 +8,79 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import BusinessProfilePage from '@/pages/BusinessProfilePage';
+import { openExternalUrl } from '@/utils/median/openExternalUrl';
+import { toast } from '@/lib/toast';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 const rpc = vi.fn();
-vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: (...a: unknown[]) => rpc(...a) } }));
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: { rpc: (...a: unknown[]) => rpc(...a), from: () => chainable() },
+}));
+
+/* ---- page-level render surface (CB103.1) --------------------------------
+   The page's own data hooks are stubbed so the contact rows render from a
+   fixture; the heroes, the menu and the action rows are the real thing. */
+const pageState: { business: Record<string, unknown> | null; courses: unknown[] } = { business: null, courses: [] };
+
+/* Awaitable PostgREST-style chain: every modifier returns the chain, and the
+   chain resolves to the fixture rows the page's club-courses query expects. */
+function chainable() {
+  const q: Record<string, unknown> = {};
+  for (const m of ['select', 'eq', 'order', 'limit', 'single', 'maybeSingle', 'in', 'gte', 'lte', 'neq', 'is', 'or', 'filter']) {
+    q[m] = () => q;
+  }
+  q.then = (onF: (v: unknown) => unknown, onR?: (e: unknown) => unknown) =>
+    Promise.resolve({ data: pageState.courses, error: null }).then(onF, onR);
+  return q;
+}
+
+vi.mock('@/hooks/useHeaderVisibility', () => ({
+  useHideHeader: () => {}, useHeaderVisibility: () => ({}), useHeaderVariant: () => ({}),
+}));
+vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: null, loading: false }) }));
+vi.mock('@/hooks/useBusinessProfile', () => ({
+  useBusinessProfile: () => ({ data: pageState.business, isLoading: false, error: null, refetch: vi.fn() }),
+}));
+vi.mock('@/hooks/useBusinessMembership', () => ({ useBusinessMembership: () => ({ data: null }) }));
+vi.mock('@/hooks/useBusinessPosts', () => ({
+  useBusinessPostsCount: () => ({ data: 0 }), useBusinessPosts: () => ({ data: [] }),
+}));
+vi.mock('@/hooks/useBusinessFollow', () => ({ useBusinessFollowersCount: () => ({ data: 0 }) }));
+vi.mock('@/hooks/useBusinessTeam', () => ({ useBusinessTeam: () => ({ data: [] }) }));
+vi.mock('@/hooks/useBusinessReviewStats', () => ({ useBusinessReviewStats: () => ({ data: null }) }));
+vi.mock('@/hooks/useClubRoundsTracked', () => ({ useClubRoundsTracked: () => null }));
+vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: null }) }));
+vi.mock('@/hooks/useFollowState', () => ({ useFollowState: () => ({ isFollowing: false }) }));
+vi.mock('@/hooks/useToggleFollow', () => ({ useToggleFollow: () => ({ mutate: vi.fn() }) }));
+vi.mock('@/hooks/messaging/useStartConversation', () => ({
+  useStartConversation: () => ({ start: vi.fn(), isStarting: false }),
+}));
+vi.mock('@/components/business/verification/useVerificationEvidence', () => ({
+  useVerificationEvidence: () => ({ line: null }),
+}));
+vi.mock('@/lib/businessAnalyticsTracking', () => ({
+  trackBusinessProfileVisit: vi.fn(), trackBusinessAction: vi.fn(),
+}));
+vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
+vi.mock('@/utils/median/openExternalUrl', () => ({ openExternalUrl: vi.fn() }));
+vi.mock('@/lib/toast', () => ({
+  toast: Object.assign(vi.fn(), { success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn() }),
+}));
+vi.mock('@/lib/business/shareBusinessProfile', () => ({
+  shareBusinessProfile: vi.fn(), withShareSource: (u: string) => u,
+}));
+vi.mock('@/components/posts-tab/PostsTabContent', () => ({ default: () => null }));
+vi.mock('@/components/business/BusinessCoursePanel', () => ({ BusinessCoursePanel: () => null }));
+vi.mock('@/components/business/BusinessProfileInfo', () => ({ BusinessProfileInfo: () => null }));
+vi.mock('@/components/business/BusinessTeamTab', () => ({ BusinessTeamTab: () => null }));
+vi.mock('@/components/moderation/ReportSheet', () => ({ ReportSheet: () => null }));
+vi.mock('@/components/shared/AvatarLightbox', () => ({ AvatarLightbox: () => null }));
+vi.mock('@/components/common/ScrollToTopGlass', () => ({ default: () => null }));
+vi.mock('@/components/layout/PageRoot', () => ({
+  PageRoot: ({ children }: { children: ReactNode }) => <div data-page-root="">{children}</div>,
+}));
 
 import { ClubProfileHero, clubPlaceLine, clubTeamGates } from '@/components/business/hero/ClubProfileHero';
 import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
@@ -202,5 +271,77 @@ describe('CB103 non-club hero unchanged', () => {
     const src = (await import('node:fs')).readFileSync('src/pages/BusinessProfilePage.tsx', 'utf8');
     expect(src).toContain('const isClub = !!business.club_id && courses.length > 0;');
     expect(src).toMatch(/\{isClub \? \(\s*<ClubProfileHero/);
+  });
+});
+
+/* CB103.1 — the page's own contact rows. Rendered for real (heroes, menu and
+   rows are the page's) with only its data hooks stubbed, so a promoted book
+   action can be judged where it is actually drawn. */
+describe('CB103.1 promoted action on a club profile', () => {
+  const courseRow = { id: 'k1', name: 'Sundridge Park', region: 'Kent', country: 'England', thumbnail_image: null };
+  const fixture = (over: Record<string, unknown> = {}) => ({
+    id: 'b1', name: 'Sundridge Park Golf Club', slug: 'sundridge', category: 'golf_club',
+    location: null, lat: null, lng: null,
+    club_id: 'c1', club_key: null, club_name: null,
+    address_label: null, address_line1: null, address_line2: null,
+    city: 'Bromley', region: 'Kent', postcode: null, country: 'England',
+    mapbox_place_id: null, location_precision: null, location_updated_at: null,
+    description: null, website: null, email: null, phone: null,
+    logo_url: null, cover_image_url: null, is_verified: false, is_deleted: false,
+    deleted_at: null, created_at: null, updated_at: null, founded_year: null,
+    booking_url: 'https://tees.example/sundridge', opening_hours: null, social_links: null,
+    amenities: null, show_opening_hours: null, primary_action: 'book', ...over,
+  });
+
+  const renderPage = () => {
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    return render(
+      <QueryClientProvider client={qc}>
+        <MemoryRouter initialEntries={['/business/sundridge']}>
+          <Routes><Route path="/business/:idOrSlug" element={<BusinessProfilePage />} /></Routes>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+  };
+
+  afterEach(() => {
+    vi.mocked(openExternalUrl).mockClear();
+    vi.mocked(toast).mockClear();
+    pageState.business = null; pageState.courses = [];
+  });
+
+  it('club with a promoted book action shows no Book button', async () => {
+    rpc.mockResolvedValue({ data: null, error: null });
+    pageState.business = fixture();
+    pageState.courses = [courseRow];
+    const { container } = renderPage();
+    await waitFor(() => expect(container.querySelector('[data-club-hero]')).not.toBeNull());
+
+    /* Nothing below the hero offers Book: the row that would carry it is
+       absent, because a club's promoted book is treated as no promoted action. */
+    const hero = container.querySelector('[data-club-hero]')!;
+    const below = Array.from(container.querySelectorAll('button')).filter(b => !hero.contains(b));
+    expect(below.some(b => (b.textContent || '').trim() === 'Book')).toBe(false);
+    expect(screen.queryByRole('button', { name: 'Book' })).toBeNull();
+
+    /* The hero's own tee-time pill is unchanged: it still reads Soon and only
+       raises the toast, never opens the booking URL. */
+    const tee = container.querySelector('[data-tee-soon]') as HTMLButtonElement;
+    expect(tee.querySelector('[data-soon-tag]')).not.toBeNull();
+    fireEvent.click(tee);
+    expect(toast).toHaveBeenCalledTimes(1);
+    expect(openExternalUrl).not.toHaveBeenCalled();
+  });
+
+  it('non-club promoted book still works', async () => {
+    rpc.mockResolvedValue({ data: null, error: null });
+    pageState.business = fixture({ club_id: null });
+    pageState.courses = [];
+    const { container } = renderPage();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Book' })).toBeTruthy());
+    expect(container.querySelector('[data-club-hero]')).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Book' }));
+    expect(openExternalUrl).toHaveBeenCalledWith('https://tees.example/sundridge');
   });
 });
