@@ -43,6 +43,7 @@ import { MediaCarousel } from './MediaCarousel';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { FeedFollowPill } from './FeedFollowPill';
 import { LikedByRow } from '@/components/likes/LikedByRow';
+import { courseActivityClubName } from '@/features/courses/_shared/courseLabel';
 import { FeedActorPicker } from './FeedActorPicker';
 import Pressable from '@/components/ui/Pressable';
 import { HeartBurst } from './HeartBurst';

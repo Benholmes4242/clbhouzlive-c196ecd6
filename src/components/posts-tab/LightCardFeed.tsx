@@ -108,6 +108,8 @@ export interface LightCardFeedProps {
   roundMedalMap?: Map<string, RoundMedalCounts>;
   /** Course image/region for round cards (useCourseCardMeta), same as Home. */
   roundCourseMeta?: RoundCourseMeta | null;
+  /** CB108: FeedCard layout; club profiles pass 'mediaFirst'. */
+  layout?: 'standard' | 'mediaFirst';
 }
 
 export const LightCardFeed: React.FC<LightCardFeedProps> = ({
@@ -133,6 +135,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   postScoreIdMap,
   postRoundMap,
   postRoundsSettled = true,
+  layout = 'standard',
   onRoundTap,
   roundShapeMap,
   roundMedalMap,
@@ -638,6 +641,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
                   return sid ? roundMedalMap?.get(sid) : undefined;
                 })()}
                 roundCourseMeta={roundCourseMeta}
+                layout={layout}
                 commentPreviewEnabled
                 commentPreview={commentPreview.map.get(post.id) ?? null}
               />
