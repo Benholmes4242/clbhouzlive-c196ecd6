@@ -72,7 +72,7 @@ vi.mock('@/lib/business/shareBusinessProfile', () => ({
   shareBusinessProfile: vi.fn(), withShareSource: (u: string) => u,
 }));
 vi.mock('@/components/posts-tab/PostsTabContent', () => ({ default: () => null }));
-vi.mock('@/components/business/BusinessCoursePanel', () => ({ BusinessCoursePanel: () => null }));
+vi.mock('@/components/business/ClubHowItPlays', () => ({ ClubHowItPlays: () => null }));
 vi.mock('@/components/business/BusinessProfileInfo', () => ({ BusinessProfileInfo: () => null }));
 vi.mock('@/components/business/BusinessTeamTab', () => ({ BusinessTeamTab: () => null }));
 vi.mock('@/components/moderation/ReportSheet', () => ({ ReportSheet: () => null }));

@@ -63,7 +63,7 @@ import { openExternalUrl } from '@/utils/median/openExternalUrl';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useTranslation } from 'react-i18next';
 import { A, Panel, LABEL, NUM } from '@/features/courses/components/holes/analytical/tokens';
-import { BusinessCoursePanel, type BusinessClubCourse } from '@/components/business/BusinessCoursePanel';
+import { ClubHowItPlays, type BusinessClubCourse } from '@/components/business/ClubHowItPlays';
 import { ClubYouCard } from '@/components/business/ClubYouCard';
 import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
 import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
@@ -557,6 +557,9 @@ const BusinessProfilePage: React.FC = () => {
 
       <ClubYouCard isClub={isClub} viewerId={user?.id} courses={courses} businessName={business.name} />
 
+      {/* CB105 — How it plays (club-only), replaces the retired courses panel. */}
+      <ClubHowItPlays isClub={isClub} courses={courses} onOpen={handleCourseOpen} onFiguresResolved={handleFiguresResolved} />
+
       {/* ----- Bio on canvas (no card) ----- */}
       {!isClub && bioText && (
         <div className="px-4 pt-4 relative z-10 pointer-events-auto">
@@ -701,29 +704,6 @@ const BusinessProfilePage: React.FC = () => {
           </>
         );
       })()}
-
-      {/* ----- Club courses (club-only): ONE panel, one row per course ----- */}
-      {business.club_id && courses.length > 0 && (
-        <div className="px-4">
-          <Panel
-            kicker={t('business.course.kickerPlural')}
-            aside={panelRounds != null ? t('business.course.roundsTotal', { count: panelRounds.toLocaleString() }) : undefined}
-            style={{ marginTop: 12 }}
-          >
-            {courses.map((course, i) => (
-              <BusinessCoursePanel
-                key={course.id}
-                course={course}
-                isFirst={i === 0}
-                position={i}
-                onOpen={handleCourseOpen}
-                onFiguresResolved={handleFiguresResolved}
-              />
-            ))}
-          </Panel>
-        </div>
-      )}
-
 
       <div className="h-4" />
 
