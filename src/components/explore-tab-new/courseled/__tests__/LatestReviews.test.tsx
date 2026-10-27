@@ -54,6 +54,8 @@ function makeCompact(i: number, over: Partial<LatestReview> = {}): LatestReview 
   return make(i, { rating: 7.5, ...over });
 }
 
+const cells = () => Array.from(screen.getByTestId('review-tile-breakdown').querySelectorAll('[data-score-cell]')).map((n) => n.getAttribute('data-score-cell'));
+
 function makeBars(i: number, over: Partial<LatestReview> = {}): LatestReview {
   return make(i, { rating: 9.0, breakdown: { design: 8.5, conditions: null, clubhouse: null, facilities: null }, ...over });
 }
@@ -142,7 +144,7 @@ describe('LatestReviews mosaic', () => {
     expect(own.getAttribute('style')).toContain('255, 178, 94');
   });
 
-  it('renders one breakdown row per scored category', () => {
+  it('renders the overall then one score cell per scored category', () => {
     render(
       <LatestReviews
         reviews={[
@@ -154,12 +156,12 @@ describe('LatestReviews mosaic', () => {
         onSeeAll={() => {}}
       />,
     );
-    const block = screen.getByTestId('review-tile-breakdown');
-    expect(block.children).toHaveLength(4);
+    expect(cells()).toEqual(['overall', 'design', 'condition', 'clubhouse', 'facilities']);
     expect(screen.getByText('5.5')).toBeTruthy();
+    expect(screen.getByText('8.4')).toBeTruthy();
   });
 
-  it('renders only the scored rows when some categories are null', () => {
+  it('renders only the scored cells when some categories are null', () => {
     render(
       <LatestReviews
         reviews={[
@@ -171,10 +173,10 @@ describe('LatestReviews mosaic', () => {
         onSeeAll={() => {}}
       />,
     );
-    expect(screen.getByTestId('review-tile-breakdown').children).toHaveLength(2);
+    expect(cells()).toEqual(['overall', 'design', 'facilities']);
   });
 
-  it('renders no breakdown block at all when no category is scored', () => {
+  it('renders only the overall cell when no category is scored', () => {
     render(
       <LatestReviews
         reviews={[make(1)]}
@@ -182,36 +184,25 @@ describe('LatestReviews mosaic', () => {
         onSeeAll={() => {}}
       />,
     );
-    expect(screen.queryByTestId('review-tile-breakdown')).toBeNull();
+    expect(cells()).toEqual(['overall']);
   });
 
-  /* All-white rating rule: rated figures and fills use A.INK; null stays muted
-     in the helper and contributes no scored row. */
-  it('every rated figure and bar is white A.INK, while null stays muted and omitted', () => {
+  /* All-white rating rule: every figure in the shared row is #FFFFFF; no bars
+     are drawn; a null category contributes no cell. */
+  it('every rated figure is white and no bar is drawn, while null is omitted', () => {
     render(
       <LatestReviews
-        reviews={[
-          // A bars review (overall >= 9 but not every scored category >= 9) renders the coloured tracks.
-          make(1, { rating: 9.0, breakdown: { design: 9.4, conditions: 6.1, clubhouse: 4.2, facilities: null } }),
-        ]}
+        reviews={[make(1, { rating: 9.0, breakdown: { design: 9.4, conditions: 6.1, clubhouse: 4.2, facilities: null } })]}
         onTilePress={() => {}}
         onSeeAll={() => {}}
       />,
     );
-    const fills = Array.from(screen.getByTestId('review-tile-breakdown').querySelectorAll<HTMLElement>('div[style*="height: 3px"] > div'))
-      .map((el) => el.style.background);
-    // jsdom normalises colours; normalise the function's value the same way.
-    const norm = (c: string) => { const el = document.createElement('div'); el.style.background = c; return el.style.background; };
-    expect(fills).toEqual([norm(A.INK), norm(A.INK), norm(A.INK)]);
-    for (const score of ['9.4', '6.1', '4.2']) {
-      const figure = screen.getByText(score);
-      const ink = document.createElement('i');
-      ink.style.color = A.INK;
-      expect(figure.style.color).toBe(ink.style.color);
-    }
-    expect(screen.getByTestId('review-tile-breakdown').children).toHaveLength(3);
+    const block = screen.getByTestId('review-tile-breakdown');
+    expect(block.querySelectorAll('div[style*="height: 3px"]')).toHaveLength(0);
+    const white = (() => { const el = document.createElement('i'); el.style.color = '#FFFFFF'; return el.style.color; })();
+    for (const score of ['9.0', '9.4', '6.1', '4.2']) expect(screen.getByText(score).style.color).toBe(white);
+    expect(cells()).toEqual(['overall', 'design', 'condition', 'clubhouse']);
     expect(courseSubScoreTone(null)).toBe(A.MUTE);
-    // Every real score is white ink (Ben, 27 Oct 2026).
-    expect(norm(courseSubScoreTone(6.1))).toBe(norm(A.INK));
   });
+});
 });
