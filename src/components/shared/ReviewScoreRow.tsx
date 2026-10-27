@@ -5,8 +5,9 @@
  * of scope.
  *  - 'card' (default, signed-off option A): grid `auto 1fr`, left edge,
  *    overall 26px leads behind a 1px hairline, then DESIGN, CONDITION,
- *    CLUBHOUSE, FACILITIES at 16px in four equal left-aligned columns
- *    (columnGap 8); labels 9px. No
+ *    CLUBHOUSE, FACILITIES at 16px spread with even gaps (flex
+ *    space-between, minimum columnGap 8), each figure centred over its own
+ *    label; only present cells render; labels 9px. No
 
  *    overall → no block/divider, breakdown takes the width; no breakdown →
  *    overall alone, no divider.
@@ -37,7 +38,7 @@ const LABEL = 'rgba(255,255,255,0.50)';
 const CARD_LABEL: React.CSSProperties = { marginTop: 5, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap' };
 const TAB = 'tabular-nums lining-nums';
 
-// Query the full-width wrapper, not the narrower breakdown grid. Inline
+// Query the full-width wrapper, not the narrower breakdown row. Inline
 // defaults stay intact for wide cards; only these scoped narrow overrides win.
 const CARD_CONTAINER_RULES = `
 @container (max-width: 400px) {
@@ -77,9 +78,9 @@ export const ReviewScoreRow: React.FC<ReviewScoreRowProps> = ({ overall, breakdo
           </div>
         )}
         {rest.length > 0 && (
-          <div data-score-breakdown style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', columnGap: 8 }}>
+          <div data-score-breakdown style={{ display: 'flex', justifyContent: 'space-between', columnGap: 8 }}>
             {rest.map(([key, label, value]) => (
-              <div key={key} data-score-cell={key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
+              <div key={key} data-score-cell={key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
                 <div data-score-figure style={{ fontSize: 16, fontWeight: 600, lineHeight: 1, color: '#FFFFFF', fontVariantNumeric: TAB }}>{formatRatingValue(value)}</div>
                 <div data-score-label style={CARD_LABEL}>{label}</div>
               </div>
