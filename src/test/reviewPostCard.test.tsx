@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { REVIEW_BODY_CLAMP, REVIEW_CARD_MAX_HEIGHT, REVIEW_COURSE_CLAMP, joinClauses } from '@/components/feed/reviewPostCard';
 
 vi.mock('react-i18next', () => ({
