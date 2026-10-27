@@ -24,8 +24,6 @@ import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, REV
 const GUTTER = 14;
 const NAME_SIZE = 15;
 const NAME_LINE = 1.25;
-/* The "Course " prefix hides below a 260px categories container (container
-   query, never JS); the aria-label keeps the full words for screen readers. */
 
 
 const COURSE_NAME_STYLE: React.CSSProperties = {
