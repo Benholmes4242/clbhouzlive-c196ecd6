@@ -4,9 +4,14 @@
  * CB107.2: an address is the Directions TITLE only at address/poi/postcode
  * precision; any coarser precision (city/region/country/pin/null) shows the
  * hero's place value (shared clubPlace) as the sub instead.
+ * CB108: the club Team tab becomes a "Meet the team" row (last row, before the
+ * facilities chips) shown only when the page's public team count is > 0; it opens
+ * the existing BusinessTeamTab in a bottom sheet.
  */
 import { useState, type ReactNode } from 'react';
-import { ArrowUpRight, CalendarDays, ChevronDown, ChevronUp, ChevronRight, Clock, Globe, Mail, MapPin, Phone, type LucideIcon } from 'lucide-react';
+import { BusinessTeamTab } from '@/components/business/BusinessTeamTab';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import { ArrowUpRight, CalendarDays, Users, ChevronDown, ChevronUp, ChevronRight, Clock, Globe, Mail, MapPin, Phone, type LucideIcon } from 'lucide-react';
 import type { BusinessProfile } from '@/hooks/useBusinessProfile';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/lib/toast';
@@ -26,10 +31,11 @@ function VisitingRow({ id, Icon, title, sub, marker, onClick, expanded }: {
   </Button>;
 }
 
-export function ClubVisiting({ business, viewerId, firstCourseRegion }: {
-  business: BusinessProfile; viewerId?: string | null; firstCourseRegion?: string | null;
+export function ClubVisiting({ business, viewerId, firstCourseRegion, publicTeamCount = 0 }: {
+  business: BusinessProfile; viewerId?: string | null; firstCourseRegion?: string | null; publicTeamCount?: number;
 }) {
   const [weekOpen, setWeekOpen] = useState(false);
+  const [teamOpen, setTeamOpen] = useState(false);
   const todayKey = OPENING_HOURS_DAY_KEYS[(new Date().getDay() + 6) % 7];
   const hours = business.opening_hours ?? {};
   const today = hours[todayKey];
@@ -68,6 +74,13 @@ export function ClubVisiting({ business, viewerId, firstCourseRegion }: {
         </div>)}
       </div>}
     </>}
+    {publicTeamCount > 0 && <VisitingRow id="team" Icon={Users} title="Meet the team" sub={publicTeamCount === 1 ? '1 person at the club' : `${publicTeamCount} people at the club`} marker={<ChevronRight size={15} />} onClick={() => setTeamOpen(true)} />}
+    {publicTeamCount > 0 && <BottomSheet open={teamOpen} onClose={() => setTeamOpen(false)} ariaLabelledBy="club-team-sheet-title">
+      <div data-club-team-sheet style={{ padding: '0 16px 26px' }}>
+        <div id="club-team-sheet-title" style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: '#F8FAFC', marginBottom: 12 }}>The team</div>
+        <BusinessTeamTab businessId={business.id} />
+      </div>
+    </BottomSheet>}
     {!!business.amenities?.length && <div className="club-visiting-amenities">{business.amenities.map((amenity, index) => <span key={`${index}-${amenity}`}>{amenity}</span>)}</div>}
     {!!socials.length && <div className="club-visiting-socials">{socials.map(({ key, Icon, label, buildUrl }) => <Button key={key} type="button" variant="ghost" size="icon" aria-label={label} onClick={() => {
       const value = business.social_links?.[key]?.trim();
