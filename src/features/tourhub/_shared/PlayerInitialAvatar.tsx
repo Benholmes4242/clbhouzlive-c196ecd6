@@ -119,6 +119,7 @@ export function PlayerInitialAvatar({
     >
       <div
         style={{
+          position: 'relative',
           width: size,
           height: size,
           borderRadius: radius,
@@ -129,17 +130,34 @@ export function PlayerInitialAvatar({
           justifyContent: 'center',
         }}
       >
+        {loading ? (
+          <div
+            aria-hidden
+            className="clb-shimmer-dark"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: size,
+              height: size,
+              borderRadius: radius,
+            }}
+          />
+        ) : null}
         {showImage ? (
           <img
+            ref={imgRef}
             src={currentSrc!}
             alt={name}
             loading="lazy"
+            onLoad={() => setLoaded(true)}
             onError={() => setIdx((i) => i + 1)}
             style={{
               width: innerSize,
               height: innerSize,
               objectFit: imageScale < 1 ? 'contain' : 'cover',
               objectPosition: 'center 5%',
+              opacity: loaded ? 1 : 0,
+              transition: 'opacity 180ms ease-out',
             }}
           />
         ) : (
@@ -156,7 +174,7 @@ export function PlayerInitialAvatar({
           </span>
         )}
       </div>
-      {ringColor ? (
+      {ringColor && !loading ? (
         <div
           aria-hidden
           style={{
