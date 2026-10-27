@@ -83,7 +83,6 @@ vi.mock('@/components/layout/PageRoot', () => ({
 }));
 
 import { ClubProfileHero, clubPlaceLine, clubTeamGates } from '@/components/business/hero/ClubProfileHero';
-import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
 import { useBusinessClubMemberCount } from '@/hooks/useBusinessClubMemberCount';
 
 afterEach(() => { cleanup(); rpc.mockReset(); });
@@ -260,11 +259,10 @@ describe('CB103 about text', () => {
 });
 
 describe('CB103 non-club hero unchanged', () => {
-  it('a non-club business still renders BusinessProfileHero, not the club hero', () => {
-    const { container } = render(
-      <BusinessProfileHero name="Fitter" category="Club Fitter" city="London" isClub={false} courseNavEnabled={false} onStatTap={() => {}} followersCount={3} postsCount={2} />,
-    );
-    expect(container.querySelector('[data-club-hero]')).toBeNull();
+  it('a non-club business renders the shared hero without the tee-time pill', () => {
+    const { container } = hero({ name: 'Fitter', placeLine: 'Club fitter · London', secondAction: null });
+    expect(container.querySelector('[data-club-hero]')).not.toBeNull();
+    expect(container.querySelector('[data-tee-soon]')).toBeNull();
     expect(screen.getByRole('heading', { level: 1 }).textContent).toContain('Fitter');
   });
   it('the page picks the club hero only under isClub', async () => {
