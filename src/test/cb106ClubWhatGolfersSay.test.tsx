@@ -113,7 +113,7 @@ describe('CB106 latest review', () => {
   it('clamps the review text to three lines', () => {
     mount();
     const text = card().querySelector('[data-club-say-text]') as HTMLElement;
-    expect(text.style.webkitLineClamp).toBe('3');
+    expect(text.style.getPropertyValue('-webkit-line-clamp')).toBe('3');
     expect(text.style.overflow).toBe('hidden');
   });
   it('meta carries the course short name on multi-course clubs', () => {
