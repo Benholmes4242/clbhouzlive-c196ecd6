@@ -8,11 +8,13 @@
  * and the red bar so they cannot disagree; only when the analysis is
  * unavailable (or under 9 holes) does the cell fall back to hardest_hole_no,
  * and then no strip renders. rounds_tracked counts 18-hole rounds only.
+ * Easiest hole (pickEasiestHole) paints its bar green; hardest still wins a
+ * tie so a hole is never both.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
-import { toParParts } from '@/features/courses/components/holes/analytical/tokens';
+import { A, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { ordinal } from '@/components/courses/course-detail/you/youBits';
 import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 import { formatNumber } from '@/i18n/format';
@@ -27,7 +29,7 @@ export interface BusinessClubCourse {
 const T = {
   card: '#17171B', inset: '#1E1E23', ink: '#F8FAFC', mute: 'rgba(248,250,252,0.62)',
   dim: 'rgba(248,250,252,0.42)', faint: 'rgba(248,250,252,0.28)', hair: 'rgba(255,255,255,0.08)',
-  bar: 'rgba(248,250,252,0.22)', red: '#D9473B',
+  bar: 'rgba(248,250,252,0.22)', red: '#D9473B', green: A.GREEN,
 } as const;
 const TAB = { fontVariantNumeric: 'tabular-nums' } as const;
 
