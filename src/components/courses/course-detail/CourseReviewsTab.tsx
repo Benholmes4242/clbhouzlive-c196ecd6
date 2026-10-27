@@ -27,6 +27,9 @@
  * Panel, tokens.tsx and DiscoverSectionHeading are NOT modified.
  * COURSE exits use highlight-only links; shared/notification review links still
  * open the sheet. Highlight-only timing is independent of the sheet lifecycle.
+ * CB110: at=reviews waits for both review reads and the rendered first row,
+ * then lands below the measured sticky tab band on the canonical page scroller.
+ * Explicit review/highlight targets take precedence; URL consumption replaces history.
  */
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +40,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { openWithOrigin } from '@/lib/openWithOrigin';
+import { getPageScrollTop, getPrimaryScrollElement, scrollPageTo } from '@/lib/getScrollParent';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -113,6 +117,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const [pendingSheetReviewId, setPendingSheetReviewId] = useState<string | null>(null);
   const [pendingHighlightReviewId, setPendingHighlightReviewId] = useState<string | null>(null);
   const highlightOnlyTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reviewRoot = useRef<HTMLDivElement>(null);
 
   const { data: reviewsData, isLoading, isError, refetch, isSuccess: reviewsResolved } = useCourseReviews(
     courseId,
@@ -443,6 +448,35 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const ratingCount = community.ratingCount;
   const distribution = community.distribution;
   const headerResolved = reviewsResolved && sampleResolved;
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('tab') !== 'reviews' || params.get('at') !== 'reviews'
+      || !headerResolved || isLoading || isError || sampleError) return;
+    // Preserve notification-sheet and quoted-review targets carried by old links.
+    const explicitTarget = params.has('review') || params.has('reviewId') || params.has('highlight')
+      || pendingSheetReviewId || pendingHighlightReviewId || highlightedReviewId;
+    const frame = requestAnimationFrame(() => {
+      const row = reviewRoot.current?.querySelector<HTMLElement>('[data-review-id]');
+      if (!explicitTarget && reviews.length > 0 && !row) return;
+      if (!explicitTarget && row) {
+        const scroller = getPrimaryScrollElement();
+        if (!scroller) return;
+        const tabs = reviewRoot.current?.closest('[data-course-detail]')
+          ?.querySelector<HTMLElement>('[data-course-review-tabs]');
+        const stickyTop = tabs ? Number.parseFloat(getComputedStyle(tabs).top) || 0 : 0;
+        const inset = stickyTop + (tabs?.getBoundingClientRect().height ?? 0);
+        scrollPageTo(getPageScrollTop() + row.getBoundingClientRect().top
+          - scroller.getBoundingClientRect().top - inset, 'auto');
+      }
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete('at');
+        return next;
+      }, { replace: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [location.search, headerResolved, isLoading, isError, sampleError, reviews.length,
+    pendingSheetReviewId, pendingHighlightReviewId, highlightedReviewId, setSearchParams]);
   const viewerScore = community.viewerScore;
   const singleReview = reviews.find(review => review.id === sampleRows?.[0]?.id);
 
@@ -513,7 +547,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
-      <div style={{ background: A.CANVAS, minHeight: '100%', paddingBottom: 8, fontFamily: SANS }}>
+      <div ref={reviewRoot} style={{ background: A.CANVAS, minHeight: '100%', paddingBottom: 8, fontFamily: SANS }}>
         {/* REVIEWS_STATE_1: total sample, not viewer-excluding count. */}
         {headerResolved && reviewsCourseState(community.totalRatingCount) === 'none' ? (
           <NobodyHasRated totalRatings={community.totalRatingCount} courseName={courseName} onWriteFirst={() => handleWriteReview('first')} />

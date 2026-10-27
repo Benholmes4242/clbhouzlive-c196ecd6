@@ -359,11 +359,12 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
   if (isInModal) {
     return (
-      <div className="w-full">
+      <div className="w-full" data-course-detail>
         {modalHeroBlock}
         {/* Modal mode: legacy sticky underline tabs (no CompactHeader present) */}
         <div
           className="sticky bg-background"
+          data-course-review-tabs
           style={{ top: 0, zIndex: 20, paddingTop: 'env(safe-area-inset-top, 0px)' }}
         >
           <CourseTabs activeTab={activeTab} onChange={handleTabChange} />
@@ -569,7 +570,7 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
   const navigate = useNavigate();
   const { sentinelRef, stuck: tabsStuck } = useStickySafeAreaState();
   return (
-    <div className="min-h-screen w-full">
+    <div className="min-h-screen w-full" data-course-detail>
       {/* H3: header rendered globally by ChromeIsland (bleed=true, /courses fallback). */}
       {cinematicHero}
       <div ref={sentinelRef} style={{ height: 0 }} aria-hidden />
@@ -581,6 +582,7 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
       <div
         className="sticky"
         data-stuck={tabsStuck ? 'true' : 'false'}
+        data-course-review-tabs
         style={{
           top: 'var(--sat, 0px)',
           zIndex: Z.stickyTabs,

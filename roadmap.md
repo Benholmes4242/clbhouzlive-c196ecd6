@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB110 — Club review links and course Reviews landing
+- [ ] Update club links and add one-shot first-rendered-review landing in CourseReviewsTab.
+- [ ] Audit old page consumers; replace its route with a parameter-preserving redirect and delete only if safe.
+- [ ] Retarget named CB106 link cases, add landing/redirect coverage, run targeted and full suites against 3,514 tests / 401 files, and report verification limits.
+
 ## CB109 — Media-first in every post feed
 - [x] Applied caller layouts and shared review/footer slots; standard, rounds, grids and viewers unchanged. Two-line clamp per Ben's ruling. All five new rendered review-flow checks pass; no existing test retargeted.
 - [x] Ran targeted `bunx vitest run src/test/cb109MediaFirstEverywhere.test.tsx src/test/cb108ClubFeed.test.tsx src/test/reviewPostCard.test.tsx src/test/feedActionsRight.test.tsx`: 33 passed / 4 failed / 37. Full `bunx vitest run`: 3,506 passed / 4 failed / 3,510 across 400 files; baseline 3,501/399 +9 new cases/one file. Existing 3,501 tests pass; no pre-existing failures. Latest automatic build log build OK 13:19:16Z.

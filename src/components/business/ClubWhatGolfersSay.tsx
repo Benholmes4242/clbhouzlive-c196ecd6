@@ -184,11 +184,11 @@ export function ClubWhatGolfersSay({ isClub, businessId, businessName, courses, 
         </div>
       )}
 
-      {latest && <LatestReview review={latest} courses={courses} onOpen={(id) => navigate(`/courses/${id}/reviews`)} />}
+      {latest && <LatestReview review={latest} courses={courses} onOpen={(id) => navigate(`/courses/${id}?tab=reviews&highlight=${encodeURIComponent(latest.id)}`)} />}
 
       {courses.length === 1 ? (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, gap: 12 }}>
-          <button type="button" data-club-say-read-all onClick={() => navigate(`/courses/${courses[0].id}/reviews`)}
+          <button type="button" data-club-say-read-all onClick={() => navigate(`/courses/${courses[0].id}?tab=reviews&at=reviews`)}
             style={{ background: 'transparent', border: 0, padding: 0, fontSize: 14, fontWeight: 600, color: T.ink, cursor: 'pointer' }}>
             Read all {formatNumber(total)} reviews ›
           </button>
@@ -197,7 +197,7 @@ export function ClubWhatGolfersSay({ isClub, businessId, businessName, courses, 
       ) : (
         <>
           {reviewedCourses.map((c, i) => (
-            <button key={c.id} type="button" data-club-say-course={c.id} onClick={() => navigate(`/courses/${c.id}/reviews`)}
+            <button key={c.id} type="button" data-club-say-course={c.id} onClick={() => navigate(`/courses/${c.id}?tab=reviews&at=reviews`)}
               style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center',
                 padding: '11px 0', marginTop: i === 0 ? 14 : 0, background: 'transparent', border: 'none',
                 borderTop: `1px solid ${T.hair}`, fontSize: 14, color: T.ink, cursor: 'pointer', textAlign: 'left' }}>
