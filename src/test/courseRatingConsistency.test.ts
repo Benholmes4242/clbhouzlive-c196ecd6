@@ -109,7 +109,6 @@ describe('C1 course rating consistency', () => {
       'src/components/courses/ReviewRailSlot.tsx',
       'src/components/courses/CourseCommunityRating.tsx',
       'src/components/courses/CourseSearchSheet.tsx',
-      'src/components/business/hero/BusinessProfileHero.tsx',
       'src/components/courses/course-detail/CategoryScores.tsx',
       'src/components/courses/phase5/PersonalReviewCard.tsx',
       'src/components/top100/Top100CourseStatsPanel.tsx',

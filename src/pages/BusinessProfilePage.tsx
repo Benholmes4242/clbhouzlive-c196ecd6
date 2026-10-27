@@ -69,28 +69,17 @@ import { ClubVisiting } from '@/components/business/ClubVisiting';
 import { ClubFromTheClub } from '@/components/business/ClubFromTheClub';
 import { ClubYouCard } from '@/components/business/ClubYouCard';
 import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
-import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
+import { businessCategoryWord, businessPlaceLine, businessSecondPill, businessStripKeys } from '@/lib/business/businessHero';
+import { useBusinessNearbyCounts } from '@/hooks/useBusinessNearbyCounts';
 import { useVerificationEvidence } from '@/components/business/verification/useVerificationEvidence';
-import { HeroPill, HeroGlassCircle } from '@/components/profile/hero/HeroShell';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { ClubProfileHero, clubPlaceLine, clubTeamGates } from '@/components/business/hero/ClubProfileHero';
+import { ClubProfileHero, clubPlace, clubPlaceLine, clubTeamGates } from '@/components/business/hero/ClubProfileHero';
 import { useBusinessClubMemberCount } from '@/hooks/useBusinessClubMemberCount';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { mayHaveClubAnalytics } from '@/features/business/clubAnalytics/useClubCourseLink';
 
 type BusinessTab = 'posts' | 'about' | 'team';
 
-// Country-first subtitle helper: "England, Surrey" (country, region)
-function buildCategoryLocation(category: string | null, country: string | null, region: string | null, city: string | null): string | null {
-  const parts: string[] = [];
-  if (category) parts.push(category);
-  const locBits: string[] = [];
-  if (country) locBits.push(country);
-  if (region) locBits.push(region);
-  else if (city) locBits.push(city);
-  if (locBits.length) parts.push(locBits.join(', '));
-  return parts.length ? parts.join(' . ') : null;
-}
 
 // Normalize URL with protocol
 function ensureProtocol(url: string): string {
@@ -128,6 +117,7 @@ const BusinessProfilePage: React.FC = () => {
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
   const { data: teamMembers } = useBusinessTeam(business?.id);
   const { data: reviewStats } = useBusinessReviewStats(business?.id);
+  const { data: nearby } = useBusinessNearbyCounts(business?.category, business?.lat, business?.lng);
   /* PHASE 5B §2 — the evidence line, derived from the approved request. */
   const verificationEvidence = useVerificationEvidence(business?.id, business?.is_verified);
 
@@ -179,11 +169,9 @@ const BusinessProfilePage: React.FC = () => {
 
 
   const [activeTab, setActiveTab] = useState<BusinessTab>('posts');
-  const [bioExpanded, setBioExpanded] = useState(false);
-  const [isBioClamped, setIsBioClamped] = useState(false);
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
-  const bioRef = useRef<HTMLParagraphElement>(null);
+  const tabsRef = useRef<HTMLElement>(null);
 
   const isOwner = membership?.canManage;
   const isFollowing = cachedFollowing ?? false;
@@ -259,17 +247,6 @@ const BusinessProfilePage: React.FC = () => {
   }, [business?.id, navigate]);
 
 
-  // Clamp detection for bio
-  useEffect(() => {
-    const checkClamped = () => {
-      if (bioRef.current) {
-        setIsBioClamped(bioRef.current.scrollHeight > bioRef.current.clientHeight);
-      }
-    };
-    checkClamped();
-    window.addEventListener('resize', checkClamped);
-    return () => window.removeEventListener('resize', checkClamped);
-  }, [business?.description]);
 
   // ----- actions -----
   const handleFollowToggle = () => {
@@ -354,9 +331,6 @@ const BusinessProfilePage: React.FC = () => {
   const avatarInitials = getInitialsFromName(business.name) || 'B';
   const avatarFallbackKey = business.id || business.name || 'business';
 
-  const subtitleText = buildCategoryLocation(
-    business.category, business.country, business.region, business.city
-  );
 
   // (Contact/social icons row removed - surfaced via action rows + About tab)
 
@@ -427,6 +401,53 @@ const BusinessProfilePage: React.FC = () => {
     onEdit: gates.edit ? () => navigate(`/business/${business.id}/edit`) : undefined,
   } : null;
 
+  // CB112 — non-club team row: Insights (white), Post, Edit; no Your courses.
+  const bizGates = clubTeamGates(membership, false);
+  const bizTeam = bizGates ? {
+    onInsights: bizGates.insights ? () => navigate(`/business/${business.id}/insights`) : undefined,
+    onPost: bizGates.post ? () => usePostStudioStore.getState().openPostStudio({ actorType: 'business', actorId: business.id }) : undefined,
+    onEdit: bizGates.edit ? () => navigate(`/business/${business.id}/edit`) : undefined,
+  } : null;
+
+  const second = businessSecondPill(business, (k, d) => t(k, { defaultValue: d }));
+  const bizSecond = second ? {
+    label: second.label,
+    arrow: second.arrow,
+    soon: second.kind === 'soon',
+    onTap: () => {
+      switch (second.kind) {
+        case 'soon': toast(second.soonToast!); return;
+        case 'book': trackBusinessAction(business.id, 'website', user?.id); openExternalUrl(ensureProtocol(business.booking_url!)); return;
+        case 'website': trackBusinessAction(business.id, 'website', user?.id); openExternalUrl(ensureProtocol(business.website!)); return;
+        case 'call': trackBusinessAction(business.id, 'call', user?.id); window.location.href = `tel:${business.phone}`; return;
+        case 'email': window.location.href = `mailto:${business.email}`; return;
+        case 'directions': {
+          trackBusinessAction(business.id, 'directions', user?.id);
+          const q = business.location ? encodeURIComponent(business.location) : `${business.lat},${business.lng}`;
+          openExternalUrl(`https://www.google.com/maps/search/?api=1&query=${q}`, 'external');
+        }
+      }
+    },
+  } : null;
+
+  const stripValues = { coursesNear: nearby?.coursesNear, top100Near: nearby?.top100Near, followers: followersCount, posts: postsCount };
+  const stripLabels = {
+    coursesNear: t('business.hero.coursesNear', { defaultValue: 'Courses near' }),
+    top100Near: t('business.hero.top100Near', { defaultValue: 'Top 100 near' }),
+    followers: t('business.hero.followers', { defaultValue: 'Followers' }),
+    posts: t('business.hero.posts', { defaultValue: 'Posts' }),
+  };
+  const bizStrip = businessStripKeys(business.category, stripValues).map((k) => ({
+    key: k,
+    value: (stripValues[k] as number).toLocaleString(),
+    label: stripLabels[k],
+    onTap: k === 'followers'
+      ? () => navigate(`/business/${business.slug || business.id}/followers`)
+      : k === 'posts'
+        ? () => { setActiveTab('posts'); tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        : undefined,
+  }));
+
   const tabs: Array<{ id: BusinessTab; label: string }> = [
     { id: 'posts', label: 'Posts' },
     ...(!isClub ? [{ id: 'about' as const, label: 'About' }] : []),
@@ -488,71 +509,32 @@ const BusinessProfilePage: React.FC = () => {
           about={bioText || null}
         />
       ) : (
-      /* ----- Non-club hero (shared HeroShell), unchanged ----- */
-      <BusinessProfileHero
-        name={business.name}
-        logoUrl={business.logo_url}
-        coverUrl={heroUrl || clubCourseImage}
-        fallbackKey={avatarFallbackKey}
-        verified={business.is_verified}
-        evidenceLine={verificationEvidence.line}
-        category={business.category}
-        city={business.city}
-        region={business.region}
-        country={business.country}
-        isClub={!!business.club_id && courses.length > 0}
-        avgRating={reviewStats?.avgRating ?? null}
-        ratingsCount={reviewStats?.totalReviews ?? null}
-        roundsTracked={clubRounds}
-        followersCount={followersCount}
-        postsCount={postsCount}
-        onAvatarTap={() => setIsAvatarLightboxOpen(true)}
-        courseNavEnabled={courses.length === 1}
-        onStatTap={(stat) => {
-          if (stat === 'followers') {
-            navigate(`/business/${business.slug || business.id}/followers`);
-          } else if (stat === 'posts') {
-            setActiveTab('posts');
-          } else if (courses.length === 1) {
-            navigate(
-              stat === 'rated'
-                ? `/courses/${courses[0].id}?tab=reviews`
-                : `/courses/${courses[0].id}`,
-            );
-          }
-        }}
-        headlineAction={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {isOwner ? (
-              <HeroPill label={t('business.hero.edit', 'Edit')} onClick={() => navigate(`/business/${business.id}/edit`)} />
-            ) : (
-              <HeroPill
-                label={isFollowing ? t('business.hero.following', 'Following') : t('business.hero.follow', 'Follow')}
-                onClick={handleFollowToggle}
-              />
-            )}
-            {isOwner && (
-              <HeroGlassCircle label={t('business.hero.manage', 'Manage')} onClick={() => navigate('/businesses/manage')}>
-                <Pencil className="w-3.5 h-3.5 text-white" />
-              </HeroGlassCircle>
-            )}
-            {renderMenu(
-              <button
-                type="button"
-                aria-label="More options"
-                style={{
-                  width: 28, height: 28, flexShrink: 0, borderRadius: 999,
-                  background: 'rgba(255,255,255,0.12)', border: 'none',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-                }}
-              >
-                <MoreHorizontal className="w-4 h-4 text-white" />
-              </button>,
-              true,
-            )}
-          </div>
-        }
-      />
+        /* CB112 — every non-club business renders the shared hero. */
+        <ClubProfileHero
+          name={business.name}
+          logoUrl={business.logo_url}
+          coverUrl={heroUrl || clubCourseImage}
+          fallbackKey={avatarFallbackKey}
+          verified={business.is_verified}
+          evidenceLine={verificationEvidence.line}
+          placeLine={businessPlaceLine(
+            businessCategoryWord(business.category, (k, d) => t(k, { defaultValue: d })),
+            clubPlace({ city: business.city, region: business.region, country: business.country, firstCourseRegion: null }),
+          )}
+          onAvatarTap={() => setIsAvatarLightboxOpen(true)}
+          onShare={handleShare}
+          renderMore={(trigger) => renderMenu(trigger, false)}
+          team={bizTeam}
+          insightsTone="white"
+          isFollowing={isFollowing}
+          onFollowToggle={handleFollowToggle}
+          onBookTeeTime={() => {}}
+          secondAction={bizSecond}
+          onMessage={() => { trackBusinessAction(business.id, 'message', user?.id); startConversation({ actorType: 'business', actorId: business.id }); }}
+          messageDisabled={isStartingDM}
+          stripCells={bizStrip}
+          about={bioText || null}
+        />
       )}
 
       <ClubYouCard isClub={isClub} viewerId={user?.id} courses={courses} businessName={business.name} />
@@ -564,150 +546,6 @@ const BusinessProfilePage: React.FC = () => {
       <ClubWhatGolfersSay isClub={isClub} businessId={business.id} businessName={business.name} courses={courses} viewerId={user?.id} isTeamMember={!!membership} />
       {isClub && <ClubVisiting business={business} viewerId={user?.id} firstCourseRegion={courses[0]?.region} publicTeamCount={showTeamTab ? publicTeamCount : 0} />}
 
-      {/* ----- Bio on canvas (no card) ----- */}
-      {!isClub && bioText && (
-        <div className="px-4 pt-4 relative z-10 pointer-events-auto">
-          <p
-            ref={bioRef}
-            className={cn('whitespace-pre-wrap', !bioExpanded && 'line-clamp-3')}
-            style={{ fontSize: 13.5, lineHeight: 1.55, color: A.BODY, overflowWrap: 'anywhere' }}
-          >
-            {bioText}
-          </p>
-          {(isBioClamped || bioExpanded) && (
-            <button
-              type="button"
-              onClick={() => setBioExpanded(v => !v)}
-              style={{
-                marginTop: 6, background: 'transparent', border: 'none', padding: 0,
-                minHeight: 36, display: 'flex', alignItems: 'center',
-                fontSize: 11, fontWeight: 700, letterSpacing: '0.10em',
-                textTransform: 'uppercase', color: A.INK,
-              }}
-            >
-              {bioExpanded
-                ? t('business.hero.readLess', 'Read less')
-                : t('business.hero.readMore', 'Read more')}
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* ----- Action rows ----- */}
-      {!isClub && (() => {
-        // Secondary action defs
-        type SecKey = 'website' | 'call' | 'directions' | 'email' | 'book';
-        const secDefs: Record<SecKey, { label: string; icon: React.ElementType; onClick: () => void; available: boolean } > = {
-          website: {
-            label: 'Website', icon: Globe, available: !!business.website,
-            onClick: () => {
-              if (!business.website) return;
-              trackBusinessAction(business.id, 'website', user?.id);
-              openExternalUrl(ensureProtocol(business.website));
-            },
-          },
-          call: {
-            label: 'Call', icon: Phone, available: !!business.phone,
-            onClick: () => {
-              if (!business.phone) return;
-              trackBusinessAction(business.id, 'call', user?.id);
-              window.location.href = `tel:${business.phone}`;
-            },
-          },
-          directions: {
-            label: 'Directions', icon: Navigation, available: !!(business.location || (business.lat && business.lng)),
-            onClick: () => {
-              trackBusinessAction(business.id, 'directions', user?.id);
-              const q = business.location
-                ? encodeURIComponent(business.location)
-                : `${business.lat},${business.lng}`;
-              openExternalUrl(`https://www.google.com/maps/search/?api=1&query=${q}`, 'external');
-            },
-          },
-          email: {
-            label: 'Email', icon: Mail, available: !!business.email,
-            onClick: () => { if (business.email) window.location.href = `mailto:${business.email}`; },
-          },
-          book: {
-            label: 'Book', icon: Calendar, available: !!business.booking_url,
-            onClick: () => {
-              if (!business.booking_url) return;
-              trackBusinessAction(business.id, 'website', user?.id);
-              openExternalUrl(ensureProtocol(business.booking_url));
-            },
-          },
-        };
-
-        const pa = (business.primary_action || null) as SecKey | null;
-        /* CB103.1 — on a club the tee-time is the hero's own "Soon" pill, so a
-           promoted book action is no promoted action: the row must not offer a
-           working Book button that contradicts it. Website, call, directions
-           and email still promote exactly as before. */
-        const promoted = pa && secDefs[pa]?.available && !(isClub && pa === 'book') ? pa : null;
-
-        const secOrder: SecKey[] = ['website', 'call', 'directions'];
-        const secondary = secOrder.filter(k => secDefs[k].available && k !== promoted);
-
-        const OutlineBtn: React.FC<{ onClick: () => void; icon: React.ElementType; label: string; className?: string; disabled?: boolean; loading?: boolean }> = ({ onClick, icon: Icon, label, className, disabled, loading }) => (
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={onClick}
-            className={cn('h-11 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]', className)}
-            style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, letterSpacing: '0.10em', minWidth: 0 }}
-          >
-            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" /> : <Icon className="w-3.5 h-3.5 shrink-0" />}
-            <span className="truncate">{label}</span>
-          </button>
-        );
-
-        return (
-          <>
-            {/* Primary row - EDIT / FOLLOW / MANAGE / "..." now live in the
-                hero, so this row carries contact actions only (visitor). */}
-            {!isOwner && (!isClub || promoted) && (
-              <div className="mt-4 px-4 flex items-center gap-2 relative z-10 pointer-events-auto">
-                {!isClub && (<button
-                  className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
-                  style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, letterSpacing: '0.10em' }}
-                  onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startConversation({ actorType: 'business', actorId: business.id }); }}
-                  disabled={isStartingDM}
-                  aria-label={`Message ${business.name}`}
-                >
-                  {isStartingDM
-                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    : <MessageCircle className="w-3.5 h-3.5" />}
-                  Message
-                </button>)}
-                {promoted && (
-                  <OutlineBtn
-                    onClick={secDefs[promoted].onClick}
-                    icon={secDefs[promoted].icon}
-                    label={secDefs[promoted].label}
-                    className="flex-1"
-                  />
-                )}
-              </div>
-            )}
-
-
-            {/* Secondary row (visitor only, hidden when empty) */}
-            {!isOwner && secondary.length > 0 && (
-              <div className="mt-2 px-4 flex items-center gap-2 relative z-10 pointer-events-auto">
-                {secondary.map((k) => (
-                  <OutlineBtn
-                    key={k}
-                    onClick={secDefs[k].onClick}
-                    icon={secDefs[k].icon}
-                    label={secDefs[k].label}
-                    className="flex-1"
-                  />
-                ))}
-              </div>
-            )}
-          </>
-        );
-      })()}
 
       <div className="h-4" />
 
@@ -721,7 +559,7 @@ const BusinessProfilePage: React.FC = () => {
       {/* CB108: clubs have no tabs; From the club is the last section. */}
       {isClub && <ClubFromTheClub businessId={business.id} businessName={business.name} postsCount={postsCount} isOwner={!!isOwner} onPost={clubTeam?.onPost} />}
 
-      {!isClub && tabs.length > 1 && <section className="px-4">
+      {!isClub && tabs.length > 1 && <section ref={tabsRef} data-business-tabs="" className="px-4">
         <div className="flex justify-center" style={{ padding: '10px 0' }}>
           <RailChips
             align="center-when-fit"

@@ -75,7 +75,7 @@ When a brief's stated rule and its signed-off mock disagree, do not pick one. Bo
 
 Report the suite total before and after, and name the source of any delta. A count that moves under an "unchanged" report hides a real change.
 - Video perf spans end only via vperf's moving-frame helper (`vperfArmMoving*`), never on play/playing/firstFrame, so cold, decoded and swapped-in lanes are timed by one definition.
-- Golf-club business profiles render ClubProfileHero (see its header) under the page's isClub condition; BusinessProfileHero and HeroShell stay the non-club and personal heroes, so club changes cannot restyle them.
+- Every business profile renders ClubProfileHero (see its header); non-club pages pass optional secondAction/insightsTone/stripCells whose defaults reproduce the club, with rules in `src/lib/business/businessHero.ts`, so one hero cannot drift into two; personal profiles keep HeroShell.
 - Club viewer cards reuse per-course stats/circle hooks through keyed collectors (see ClubYouCard.tsx); shared activity-name grammar lives in courseLabel and is re-exported for Insights compatibility, preventing stale viewer data and naming drift.
 - Card-title letter-spacing is -0.01em on club, business and Insights surfaces; the zero-letter-spacing note in .lovable/plan/tour-overview-redesign-design-a-2026-09-17.md governs the Tour plan only.
 - Every surface printing ONE review's overall plus breakdown renders `ReviewScoreRow` (src/components/shared), including the fullscreen viewer via align/textShadow props, so single-review score rows cannot drift; course aggregates keep their own layouts.
