@@ -20942,6 +20942,14 @@ export type Database = {
           username: string
         }[]
       }
+      get_course_band_average: {
+        Args: { p_course_id: string; p_index: number }
+        Returns: {
+          avg_gross: number
+          golfers: number
+          rounds: number
+        }[]
+      }
       get_course_countries: {
         Args: never
         Returns: {

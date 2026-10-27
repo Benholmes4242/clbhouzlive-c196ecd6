@@ -7,6 +7,10 @@ export interface ClaimingBusiness {
   slug: string | null;
   is_verified: boolean | null;
   logo_url: string | null;
+  /* BEFORE_YOU_GO sheet: added fields only — every pre-existing field and
+     consumer is unchanged. */
+  booking_url?: string | null;
+  phone?: string | null;
 }
 
 export type CourseClaimState = 'unclaimed' | 'pending' | 'claimed';
@@ -34,7 +38,7 @@ export function useCourseClaim(courseId: string | undefined) {
 
       const { data: businesses, error: businessError } = await supabase
         .from('business_accounts')
-        .select('id, name, slug, is_verified, logo_url')
+        .select('id, name, slug, is_verified, logo_url, booking_url, phone')
         .eq('club_id', course.club_id)
         .eq('is_deleted', false)
         .limit(1);
@@ -65,7 +69,7 @@ export function useCourseClaimStatus(courseId: string | undefined) {
 
       const { data: businesses, error: businessError } = await supabase
         .from('business_accounts')
-        .select('id, name, slug, is_verified, logo_url')
+        .select('id, name, slug, is_verified, logo_url, booking_url, phone')
         .eq('club_id', course.club_id)
         .eq('is_deleted', false)
         .limit(1);

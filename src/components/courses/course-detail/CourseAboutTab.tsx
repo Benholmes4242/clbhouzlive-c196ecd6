@@ -26,7 +26,7 @@ import KeepExploring from './about/KeepExploring';
 import ClaimFooterRow from './about/ClaimFooterRow';
 
 
-import { ExternalLinkSheet } from '@/components/shared/ExternalLinkSheet';
+import CourseWebsiteSheet from './CourseWebsiteSheet';
 import ClaimCourseSheet from './ClaimCourseSheet';
 import ClaimUnderReviewNotice from './ClaimUnderReviewNotice';
 import ClaimedCourseProfileLink from './ClaimedCourseProfileLink';
@@ -231,11 +231,12 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       )}
 
       {course.website_url && (
-        <ExternalLinkSheet
-          isOpen={showWebsiteSheet}
+        <CourseWebsiteSheet
+          open={showWebsiteSheet}
           onClose={() => setShowWebsiteSheet(false)}
-          url={course.website_url}
-          title={`${course.name || 'Course'} Website`}
+          course={course}
+          coords={coords ?? null}
+          onTabChange={onTabChange}
         />
       )}
 
