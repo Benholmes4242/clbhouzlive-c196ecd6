@@ -1,5 +1,11 @@
 # Roadmap
 
+## CB109 — Media-first in every post feed
+- [x] Applied caller layouts and shared review/footer slots; standard, rounds, grids and viewers unchanged. Two-line clamp per Ben's ruling. All five new rendered review-flow checks pass; no existing test retargeted.
+- [x] Ran targeted `bunx vitest run src/test/cb109MediaFirstEverywhere.test.tsx src/test/cb108ClubFeed.test.tsx src/test/reviewPostCard.test.tsx src/test/feedActionsRight.test.tsx`: 33 passed / 4 failed / 37. Full `bunx vitest run`: 3,506 passed / 4 failed / 3,510 across 400 files; baseline 3,501/399 +9 new cases/one file. Existing 3,501 tests pass; no pre-existing failures. Latest automatic build log build OK 13:19:16Z.
+- [ ] STOP: four new source-reading cases fail at src/test/cb109MediaFirstEverywhere.test.tsx:34:34: `Error: ENOENT: no such file or directory, open '/dev-server/src/test/undefined'`. No source/test corrections after failure. Caller-default, personal/business and out-of-scope checks await explicit correction authorisation. Signed-in visual verification unavailable (external_unmanaged).
+- [x] Caller/diff/test report supplied; no backend/config/native changes.
+
 ## Narrow ReviewScoreRow card labels
 - [x] Added full-row inline-size query wrapper and scoped 400px/330px overrides; default grid, caption and null behavior retained. Existing tests unchanged; three query-rule tests added to reviewScoreRow.test.tsx.
 - [x] Targeted `bunx vitest run src/test/reviewScoreRow.test.tsx`: 15/15. Full `bunx vitest run`: 3,480 passed / 2 failed / 3,482 total across 397 files. Latest baseline 3,479/397 +3 new query-rule cases; user's 3,438/395 +CB106 22/1 +CB107 19/1 +this 3/0 =3,482/397. No existing test renamed/retargeted/deleted.

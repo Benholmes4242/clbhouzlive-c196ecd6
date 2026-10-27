@@ -8,6 +8,9 @@
  *
  * Scores render through the shared ReviewScoreRow (all white, centred);
  * shared CategoryScores remains unchanged for course surfaces.
+ * CB109: feed callers opt into mediaFirst; the review block is handed to
+ * FeedCard's footer caption slot, retaining one engagement/comment path.
+ * The two-line body clamp is retained by Ben's explicit CB109 ruling.
  */
 import { CourseNameLink } from '@/components/shared/CourseNameLink';
 import React from 'react';
@@ -48,10 +51,14 @@ export interface ReviewPostCardProps {
   media?: React.ReactNode;
   /** G — the shared footer, unchanged. */
   footer: React.ReactNode;
+  layout?: 'standard' | 'mediaFirst';
+  /** FeedCard owns actions, liked-by, comments and Add-a-comment in both states. */
+  mediaFirstFooter?: (reviewBlock: React.ReactNode) => React.ReactNode;
 }
 
 export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
   post, articleRef, feedIndex, onProfile, onReadReview, onPrefetch, onOpenCourse, followPill, ownerMenu, media, footer,
+  layout = 'standard', mediaFirstFooter,
 }) => {
   const { t } = useTranslation('common');
   const { t: tCourses } = useTranslation('courses');
@@ -78,6 +85,40 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
     facilities: review?.breakdown?.facilities ?? null,
   };
   const body = review?.reviewText || post.caption || '';
+
+  const isMediaFirst = layout === 'mediaFirst';
+  const mediaLeads = isMediaFirst && !!media;
+  const reviewBlock = (
+    <>
+      {/* B — the full-width subject; scores live together in D. */}
+      <div data-review-subject style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 12, padding: mediaLeads ? `12px ${GUTTER}px 12px` : `8px ${GUTTER}px 14px` }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {!courseName ? null : (
+            <CourseNameLink as="div" onNavigate={onOpenCourse} textProps={{ 'data-review-course': '' }} style={COURSE_NAME_STYLE}>
+              {courseName}
+            </CourseNameLink>
+          )}
+          {region ? (
+            <div style={{ marginTop: 3, fontSize: 12, lineHeight: 1.2, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{region}</div>
+          ) : null}
+        </div>
+      </div>
+      <ReviewScoreRow overall={rating} breakdown={scores} style={{ flex: 'none', padding: `0 ${GUTTER}px 14px` }} />
+      {body ? (
+        <div data-review-body-wrap style={{ flex: 'none', display: 'flex', padding: `0 ${GUTTER}px 6px` }}>
+          <div data-review-body style={{ fontSize: 15, lineHeight: 1.4, color: A.INK, ...REVIEW_BODY_CLAMP }}>
+            {mediaLeads ? <><span data-review-body-lead style={{ fontWeight: 600, color: A.INK }}>{post.displayName}</span>{' '}</> : null}
+            <MentionText text={body} />
+          </div>
+        </div>
+      ) : null}
+      <button type="button" data-review-cta onClick={(e) => { e.stopPropagation(); onReadReview(e); }}
+        style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 4, padding: `0 ${GUTTER}px 12px`, background: 'transparent', border: 'none', textAlign: 'left', cursor: 'pointer', fontSize: 13, fontWeight: 700, lineHeight: 1.3, color: A.INK }}>
+        {t('feed.reviewPost.readFullReview')}
+        <span aria-hidden style={{ color: T40 }}>{'\u203A'}</span>
+      </button>
+    </>
+  );
 
   return (
     <article
@@ -130,52 +171,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         </div>
       </div>
 
-      {/* B — the full-width subject; scores live together in D. */}
-      <div data-review-subject style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 12, padding: `8px ${GUTTER}px 14px` }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {!courseName ? null : (
-            <CourseNameLink
-              as="div"
-              onNavigate={onOpenCourse}
-              textProps={{ 'data-review-course': '' }}
-              style={COURSE_NAME_STYLE}
-            >
-              {courseName}
-            </CourseNameLink>
-          )}
-          {region ? (
-            <div style={{ marginTop: 3, fontSize: 12, lineHeight: 1.2, color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{region}</div>
-          ) : null}
-        </div>
-      </div>
-
-      {/* D — the shared review score row (signed-off mock), padded like the old block. */}
-      <ReviewScoreRow overall={rating} breakdown={scores} style={{ flex: 'none', padding: `0 ${GUTTER}px 14px` }} />
-
-      {/* E — the words at the caption's size. Padding lives on the wrapper,
-          never on the clamped box (a padded -webkit-box bleeds a third line). */}
-      {body ? (
-        <div data-review-body-wrap style={{ flex: 'none', display: 'flex', padding: `0 ${GUTTER}px 6px` }}>
-          <div data-review-body style={{ fontSize: 15, lineHeight: 1.4, color: A.INK, ...REVIEW_BODY_CLAMP }}>
-            <MentionText text={body} />
-          </div>
-        </div>
-      ) : null}
-
-      {/* E.2 — the one way into the full review, present in both states. */}
-      <button
-        type="button"
-        data-review-cta
-        onClick={(e) => { e.stopPropagation(); onReadReview(e); }}
-        style={{
-          flex: 'none', display: 'flex', alignItems: 'center', gap: 4, padding: `0 ${GUTTER}px 12px`,
-          background: 'transparent', border: 'none', textAlign: 'left', cursor: 'pointer',
-          fontSize: 13, fontWeight: 700, lineHeight: 1.3, color: A.INK,
-        }}
-      >
-        {t('feed.reviewPost.readFullReview')}
-        <span aria-hidden style={{ color: T40 }}>{'\u203A'}</span>
-      </button>
+      {!mediaLeads ? reviewBlock : null}
 
       {/* F — the media, edge to edge: the ONLY flexible child. 1:1, capped at
           the post's width, shrunk to the remaining height, floored at 120. */}
@@ -189,6 +185,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
             aspectRatio: '1 / 1',
             position: 'relative',
             overflow: 'hidden',
+            ...(mediaLeads ? { marginTop: 10 } : {}),
           }}
         >
           <div style={{ position: 'absolute', inset: 0 }}>{media}</div>
@@ -196,7 +193,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
       ) : null}
 
       {/* G — engagement, unchanged objects */}
-      <div style={{ flex: 'none' }}>{footer}</div>
+      <div style={{ flex: 'none' }}>{isMediaFirst && mediaFirstFooter ? mediaFirstFooter(mediaLeads ? reviewBlock : null) : <>{mediaLeads ? reviewBlock : null}{footer}</>}</div>
     </article>
   );
 };

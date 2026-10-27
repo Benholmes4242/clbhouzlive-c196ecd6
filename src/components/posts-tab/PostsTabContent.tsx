@@ -66,7 +66,7 @@ interface PostsTabContentProps {
   actorId: string;
   isOwnProfile?: boolean;
   businessName?: string;
-  /** CB108: FeedCard layout, default 'standard'. */
+  /** CB109: profile feeds default to mediaFirst; direct cards stay standard. */
   layout?: 'standard' | 'mediaFirst';
   /** CB108 club profile: no filter chip. */
   hideFilter?: boolean;
@@ -79,7 +79,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
   actorId,
   isOwnProfile = false,
   businessName,
-  layout = 'standard',
+  layout = 'mediaFirst',
   hideFilter = false,
   emptyOverride,
 }) => {

@@ -939,6 +939,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
           >
             {({ isActive, mountVideo, earlyMotion }) => (
               <FeedCard
+                layout="mediaFirst"
                 post={post}
                 liked={!!likeState?.liked}
                 likeCount={likeState?.count ?? post.likeCount ?? 0}
