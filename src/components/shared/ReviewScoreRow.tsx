@@ -37,6 +37,20 @@ const LABEL = 'rgba(255,255,255,0.50)';
 const CARD_LABEL: React.CSSProperties = { marginTop: 5, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap' };
 const TAB = 'tabular-nums lining-nums';
 
+// Query the full-width wrapper, not the narrower breakdown grid. Inline
+// defaults stay intact for wide cards; only these scoped narrow overrides win.
+const CARD_CONTAINER_RULES = `
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+`;
+
 const num = (v: number | null | undefined): number | null =>
   v == null || !Number.isFinite(Number(v)) ? null : Number(v);
 
@@ -53,9 +67,11 @@ export const ReviewScoreRow: React.FC<ReviewScoreRowProps> = ({ overall, breakdo
     const ov = cells[0][0] === 'overall' ? cells[0] : null;
     const rest = ov ? cells.slice(1) : cells;
     return (
+      <div data-review-score-container style={{ containerType: 'inline-size', width: '100%', minWidth: 0 }}>
+      <style data-review-score-container-rules>{CARD_CONTAINER_RULES}</style>
       <div data-review-score-row data-variant="card" style={{ display: 'grid', gridTemplateColumns: ov && rest.length ? 'auto 1fr' : '1fr', alignItems: 'end', width: '100%', ...style }}>
         {ov && (
-          <div data-score-cell="overall" style={rest.length ? { paddingRight: 16, marginRight: 16, borderRight: '1px solid rgba(255,255,255,0.10)' } : undefined}>
+          <div data-score-cell="overall" data-score-divider={rest.length ? '' : undefined} style={rest.length ? { paddingRight: 16, marginRight: 16, borderRight: '1px solid rgba(255,255,255,0.10)' } : undefined}>
             <div data-score-figure style={{ fontSize: 26, fontWeight: 700, lineHeight: 1, color: '#FFFFFF', fontVariantNumeric: TAB }}>{formatRatingValue(ov[2])}</div>
             <div data-score-label style={CARD_LABEL}>{ov[1]}</div>
           </div>
@@ -70,6 +86,7 @@ export const ReviewScoreRow: React.FC<ReviewScoreRowProps> = ({ overall, breakdo
             ))}
           </div>
         )}
+      </div>
       </div>
     );
   }

@@ -1,5 +1,9 @@
 # Roadmap
 
+## Narrow ReviewScoreRow card labels
+- [x] Added full-row inline-size query wrapper and scoped 400px/330px overrides; default grid, caption and null behavior retained. Existing tests unchanged; three query-rule tests added to reviewScoreRow.test.tsx.
+- [ ] Run targeted/full suite against latest actual baseline 3,479 tests / 397 files (user's 3,438/395 predates CB106 +22/1 and CB107 +19/1); check automatic diagnostics and rendered widths.
+
 ## CB107 — Club Visiting
 - [x] Added club-only Visiting after What golfers say, shared hours keys/formatOpeningHours in src/lib/business/openingHours.ts and SOCIAL_CONFIG in src/lib/business/socialLinks.ts (also re-exported by BusinessProfileInfo); non-club hours keep the spaced hyphen. Resolved mock choices: week -2px top; Visiting en dash.
 - [x] Removed club contact rows/About tab and hid the single-tab bar. Added 19 cases in cb107ClubVisiting.test.tsx; existing tests unchanged. Audited CB103.1 “club with a promoted book action shows no Book button” and “non-club promoted book still works”, both unchanged and passing; no old About/tab-bar assertion found.
