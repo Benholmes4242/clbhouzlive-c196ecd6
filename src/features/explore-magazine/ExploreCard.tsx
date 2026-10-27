@@ -46,6 +46,8 @@ import type { ReviewBreakdown } from './useReviewPageEnrichment';
 import { useFitOneLine } from './useFitOneLine';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 
+// Ratings over photography use the photo ink; every rating is white, Ben 27 Oct 2026.
+const PHOTO_WHITE = '#FFFFFF';
 
 /**
  * THE UNIT (BRIEF_EXPLORE_MAGAZINE §4).
@@ -278,7 +280,7 @@ function chipsFor(
   if (kind === 'review' && !leadReviewChips && facts.rating != null) {
     const tier = getScoreTier(facts.rating);
     /* Tier owns the verdict gate; every real rating uses white ink. */
-    const exceptionalTone = courseSubScoreTone(facts.rating);
+    const exceptionalTone = PHOTO_WHITE;
     out.push(
       <FigureChip
         key="review"
@@ -334,7 +336,7 @@ function chipsFor(
              score, and the count already lives in the headline. */
           unit={t('amateur.stream.chip.rating', 'rating')}
           /* Neutral stays white because this figure sits on variable photography. */
-          tone={courseSubScoreTone(facts.rating)}
+          tone={PHOTO_WHITE}
         />,
       );
     }

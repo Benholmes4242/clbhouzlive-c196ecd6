@@ -5,7 +5,6 @@ import { StandoutTile } from '@/components/explore-tab-new/courseled/StandoutTil
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { ExploreShelf } from './ExploreShelf';
-import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
 import type { ListEvent } from './listCourseEvents';
 import { ShelfShell } from './ExploreShells';
@@ -84,7 +83,6 @@ export function CourseShelf({
             /* No review count on this tile, so the floor applies (V.3). */
             figure={row.rank != null ? null : ratingRankable(row.rating, row.ratingCount) ? row.rating.toFixed(1) : null}
             /* Neutral keeps the component's white default over photography. */
-            figureTone={row.rank == null && ratingRankable(row.rating, row.ratingCount) ? courseSubScoreTone(row.rating) : undefined}
             whenLabel=""
             who=""
             isOwn={false}

@@ -1,5 +1,9 @@
 # Roadmap
 
+## Final photography-rating correction
+- [ ] Restore PHOTO_WHITE in the two specified ExploreCard photo-chip sites; remove CourseShelf figureTone override, retaining other consumers and defaults.
+- [ ] Retarget only authorised photography assertions; preserve exploreHeroCard.test.tsx unchanged; run full suite against unchanged 3,413/393 inventory and confirm build.
+
 ## Finish all-white ratings — three authorised corrections
 - [x] Removed only the two duplicate A imports; source scan found no other duplicates. Applied exact signature/bar colour assertions and test renames, retaining other assertions.
 - [x] Preview build log: build OK (2026-10-27T08:51:23Z); changed source module HTTP 200. Both corrected test files pass: signature 8/8 and LatestReviews 12/12.

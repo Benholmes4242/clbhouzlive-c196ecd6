@@ -155,12 +155,12 @@ describe('C1 course rating consistency', () => {
     expect(receipt).toContain('const c = courseSubScoreTone(v)');
   });
 
-  it('keeps photography ratings white through the helper', () => {
+  it('keeps photography ratings pure photo white', () => {
     const card = src('src/features/explore-magazine/ExploreCard.tsx');
     const shelf = src('src/features/explore-magazine/CourseShelf.tsx');
-    expect(card.match(/courseSubScoreTone\(facts\.rating\)/g)).toHaveLength(2);
-    expect(card).toContain("tone={courseSubScoreTone(facts.rating)}");
-    expect(shelf).toContain('courseSubScoreTone(row.rating) : undefined');
+    expect(card).not.toContain('courseSubScoreTone(facts.rating)');
+    expect(card).toContain("PHOTO_WHITE = '#FFFFFF'");
+    expect(shelf).not.toContain('figureTone=');
     expect(card).toContain('variable photography');
     expect(shelf).toContain("white default over photography");
   });
