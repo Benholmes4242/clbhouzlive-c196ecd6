@@ -77,3 +77,4 @@ Report the suite total before and after, and name the source of any delta. A cou
 - Video perf spans end only via vperf's moving-frame helper (`vperfArmMoving*`), never on play/playing/firstFrame, so cold, decoded and swapped-in lanes are timed by one definition.
 - Golf-club business profiles render ClubProfileHero (see its header) under the page's isClub condition; BusinessProfileHero and HeroShell stay the non-club and personal heroes, so club changes cannot restyle them.
 - Club viewer cards reuse per-course stats/circle hooks through keyed collectors (see ClubYouCard.tsx); shared activity-name grammar lives in courseLabel and is re-exported for Insights compatibility, preventing stale viewer data and naming drift.
+- Card-title letter-spacing is -0.01em on club, business and Insights surfaces; the zero-letter-spacing note in .lovable/plan/tour-overview-redesign-design-a-2026-09-17.md governs the Tour plan only.
