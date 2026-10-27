@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { getRatingTheme } from '@/lib/globalAchievementMilestoneSystem';
 import { getRatingTier, getRatingTierLabel, ratingTextColor, type RatingTier } from '@/lib/ratingTier';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 interface RatingPillProps {
   /** Rating score (0-10) OR a RatingTier key */
@@ -18,9 +19,7 @@ interface RatingPillProps {
 /**
  * Unified Rating Pill Component
  *
- * Colour follows the canonical graduated tier system
- * (grey poor/fair → amber good/excellent → gold exceptional)
- * via `ratingTextColor` so every surface stays consistent.
+ * Rating text is white on a neutral pill; tier labels and transitions stay.
  */
 export function RatingPill({ score, tier, label, showRatingInPill = false, className }: RatingPillProps) {
   // Midpoint per canonical 5-tier banding (see src/lib/ratingTier.ts).
@@ -63,10 +62,10 @@ export function RatingPill({ score, tier, label, showRatingInPill = false, class
       className={cn(
         'inline-flex items-center justify-center',
         'rounded-sq-sm px-3 py-[6px] text-xs font-semibold uppercase tracking-[0.08em]',
-        'border rating-label-transition text-white',
+        'border rating-label-transition',
         className
       )}
-      style={{ backgroundColor: fill, borderColor: fill }}
+      style={{ backgroundColor: A.SOFT, borderColor: A.BORDER, color: fill }}
       data-transitioning={isTransitioning}
     >
       {displayedLabel.toUpperCase()}

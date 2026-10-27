@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { getOptimizedImageUrl, generateImageSrcSet } from '@/utils/enhancedImageOptimization';
-import { A, FIGS, SANS, SUB_SCORE_GREEN_MIN } from '@/features/courses/components/holes/analytical/tokens';
+import { A, FIGS, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { CategoryScores } from '@/components/courses/course-detail/CategoryScores';
 import type { StatBrowseRow } from './useStatBrowse';
 import { courseRankLabels, RANK_LIST_BY_SLUG as SLUG } from '@/features/courses/_shared/courseRankLabels';
@@ -102,7 +102,7 @@ export function BrowseCourseCard({
   const lead = row.community_rating != null ? (
     <>
       {/* Below nine stays INK: the headline is never dimmed and must not use the category tone helper. */}
-      <div style={{ ...FIGS, fontSize: 24, fontWeight: 800, letterSpacing: '-0.045em', lineHeight: 1, color: row.community_rating >= SUB_SCORE_GREEN_MIN ? A.GREEN : A.INK }}>
+      <div style={{ ...FIGS, fontSize: 24, fontWeight: 800, letterSpacing: '-0.045em', lineHeight: 1, color: A.INK }}>
         {row.community_rating.toFixed(1)}
       </div>
       <div style={{ marginTop: 5, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1, color: A.DIM, whiteSpace: 'nowrap' }}>

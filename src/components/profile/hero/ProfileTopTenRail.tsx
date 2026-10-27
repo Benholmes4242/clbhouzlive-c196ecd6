@@ -54,12 +54,9 @@ const SLOT_NEXT = 'rgba(248,250,252,0.55)';
 const PRESSED_BORDER = 'rgba(247,147,30,0.55)';
 
 /**
- * THE SCORE TONE IS GREEN AT 9.0+, INK OTHERWISE. Deliberately NOT
- * courseSubScoreTone: that helper returns MUTE below 9, which suits a course
- * card where the sub-score is secondary. Here the rating IS the row, so the
- * else-branch is INK. Threshold and green are identical to the helper's.
+ * Every real rating uses INK. Missing ratings retain the row's DIM treatment.
  */
-const scoreTone = (score: number) => (score >= 9 ? A.GREEN : A.INK);
+const scoreTone = (score: number) => A.INK;
 
 /**
  * BRIEF_TOP_TEN_OWNER_NAME_LABEL — the score label beside a rating on a VISITOR's
@@ -305,7 +302,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
     if (r == null) return null;
     return (
       <span style={{ position: 'absolute', bottom: 8, right: 8, display: 'inline-flex', alignItems: 'baseline', gap: 4, background: GLASS, borderRadius: 999, padding: '3px 9px' }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: r >= 9 ? A.GREEN : PHOTO_INK, ...FIGS }}>{r.toFixed(1)}</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: PHOTO_INK, ...FIGS }}>{r.toFixed(1)}</span>
         <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: PILL_KICKER }}>{pillKicker}</span>
       </span>
     );
@@ -400,7 +397,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
                     <RegionRankLine course={c} rank={rankOf(c.course_id)} style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, ...FIGS }} />
                   </span>
                   <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 42, textAlign: 'center', flexShrink: 0 }}>
-                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: g != null ? A.MUTE : A.DIM, whiteSpace: 'nowrap', ...FIGS }}>{g != null ? g.toFixed(1) : '–'}</span>
+                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: g != null ? A.INK : A.DIM, whiteSpace: 'nowrap', ...FIGS }}>{g != null ? g.toFixed(1) : '–'}</span>
                     <span style={{ display: 'block', marginTop: 2, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap' }}>{t('topTen.golfers', 'Golfers')}</span>
                   </span>
                   <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 42, textAlign: 'center', flexShrink: 0 }}>

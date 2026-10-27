@@ -207,12 +207,12 @@ describe('CB103 stat strip', () => {
     expect(strip(container)!.style.gridTemplateColumns).toBe('repeat(1, 1fr)');
     expect(container.querySelectorAll('[data-cell]')).toHaveLength(1);
   });
-  it('rating is green only at 9.0 and above', () => {
+  it('rating is white below and at 9.0', () => {
     const { container, rerender, props } = hero({ avgRating: 8.9, ratingsCount: 3 });
     const v = () => (container.querySelector('[data-cell="rating"] [data-cell-value]') as HTMLElement).style.color;
     expect(v()).toBe(toRgb('#F8FAFC'));
     rerender(<ClubProfileHero {...props} avgRating={9.0} ratingsCount={3} />);
-    expect(v()).toBe(toRgb('#2FA35A'));
+    expect(v()).toBe(toRgb('#F8FAFC'));
   });
   it('members are not tappable', () => {
     const { container } = hero({ membersHere: 21 });

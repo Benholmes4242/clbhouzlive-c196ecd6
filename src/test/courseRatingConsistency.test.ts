@@ -60,7 +60,7 @@ describe('C1 course rating consistency', () => {
     expect(card).toContain('const ratingColor = courseSubScoreTone(rating)');
   });
 
-  it('keeps category figures binary green-or-muted through one helper', () => {
+  it('keeps category figures white through one helper', () => {
     const course = src('src/components/courses/course-detail/about/WhatPeopleSay.tsx');
     const reviews = src('src/components/courses/course-detail/reviews/WhatTheyScored.tsx');
     const row = src('src/components/courses/course-detail/reviews/reviewFlatBits.tsx');
@@ -76,11 +76,11 @@ describe('C1 course rating consistency', () => {
     expect(browse).not.toContain('getRatingTier');
   });
 
-  it('uses the exact 9.0 threshold and muted absent state', () => {
+  it('uses white for real scores and muted for absent scores', () => {
     expect(courseSubScoreTone(undefined)).toBe(A.MUTE);
     expect(courseSubScoreTone(null)).toBe(A.MUTE);
-    expect(courseSubScoreTone(8.94)).toBe(A.MUTE);
-    expect(courseSubScoreTone(9)).toBe(A.GREEN);
+    expect(courseSubScoreTone(8.94)).toBe(A.INK);
+    expect(courseSubScoreTone(9)).toBe(A.INK);
   });
 
   /* WITHDRAWN (BRIEF_COURSE_TAB_1B T1): the hero stat row carried a community
@@ -89,12 +89,12 @@ describe('C1 course rating consistency', () => {
      no rating, so the rule has no surface left on the hero. This is a documented
      rule being withdrawn with its surface, not a test edited to make a build pass. */
 
-  it('renders Berkshire category tones green, muted, green, muted', () => {
+  it('renders all Berkshire category tones white', () => {
     expect([9.3, 8.3, 9.8, 7.1].map(courseSubScoreTone)).toEqual([
-      A.GREEN,
-      A.MUTE,
-      A.GREEN,
-      A.MUTE,
+      A.INK,
+      A.INK,
+      A.INK,
+      A.INK,
     ]);
   });
 
@@ -125,17 +125,18 @@ describe('C1 course rating consistency', () => {
     expect(bands.match(/courseSubScoreTone\(score\)/g)).toHaveLength(4);
     expect(bands).toContain("height: 3");
     expect(bands).toContain('(score / 10) * 100');
-    expect(bands).toContain('actively CHOOSING');
-    expect(bands).toContain('Display surfaces use `courseSubScoreTone`');
+    expect(bands).toContain('including actively chosen composer values');
+    expect(bands).toContain('import { A, courseSubScoreTone }');
   });
 
-  it('preserves viewing-member amber and moves the composer onto the course rule', () => {
+  it('preserves viewing-member identity accents and white composer scores', () => {
     const about = src('src/components/courses/course-detail/about/WhatPeopleSay.tsx');
     const rows = src('src/components/courses/course-detail/reviews/reviewFlatBits.tsx');
     /* CRM1.9: the rule was not withdrawn, the surface changed — viewing-member
        amber now lives in the YOU pill beside the community figure. */
     expect(about).toContain('data-viewer-delta');
-    expect(rows).toContain('isMine ? A.AMBER : courseSubScoreTone(score)');
+    expect(rows).toContain('const scoreColor = courseSubScoreTone(score)');
+    expect(rows).toContain('color: isMine ? A.AMBER : A.INK');
 
     /* THE REVIEW FLOW PRINTS THE COURSE PAGE'S COLOURS. Every score figure in
        the composer and on the receipt takes courseSubScoreTone, so a score
@@ -154,17 +155,17 @@ describe('C1 course rating consistency', () => {
     expect(receipt).toContain('const c = courseSubScoreTone(v)');
   });
 
-  it('keeps photography neutral white while sourcing 9+ green from the helper', () => {
+  it('keeps photography ratings white through the helper', () => {
     const card = src('src/features/explore-magazine/ExploreCard.tsx');
     const shelf = src('src/features/explore-magazine/CourseShelf.tsx');
     expect(card.match(/courseSubScoreTone\(facts\.rating\)/g)).toHaveLength(2);
-    expect(card).toContain(" : '#FFFFFF'");
+    expect(card).toContain("tone={courseSubScoreTone(facts.rating)}");
     expect(shelf).toContain('courseSubScoreTone(row.rating) : undefined');
     expect(card).toContain('variable photography');
     expect(shelf).toContain("white default over photography");
   });
 
-  it('leaves the independent amber sources unchanged for follow-up', () => {
+  it('keeps rating pill and overlay consumers wired through shared themes', () => {
     const pill = src('src/components/ui/RatingPill.tsx');
     const posts = src('src/lib/postHelpers.ts');
     expect(pill).toContain('ratingTextColor(resolvedScore)');
@@ -172,14 +173,14 @@ describe('C1 course rating consistency', () => {
     expect(posts).toContain('tierOverlayThemes[key]');
   });
 
-  it('renders rail and Tralee tones at the canonical threshold', () => {
-    expect(courseSubScoreTone(8.3)).toBe(A.MUTE);
-    expect(courseSubScoreTone(9)).toBe(A.GREEN);
+  it('renders all rail and Tralee rating tones white', () => {
+    expect(courseSubScoreTone(8.3)).toBe(A.INK);
+    expect(courseSubScoreTone(9)).toBe(A.INK);
     expect([9.8, 9.3, 9.1, 8.7].map(courseSubScoreTone)).toEqual([
-      A.GREEN,
-      A.GREEN,
-      A.GREEN,
-      A.MUTE,
+      A.INK,
+      A.INK,
+      A.INK,
+      A.INK,
     ]);
   });
 });

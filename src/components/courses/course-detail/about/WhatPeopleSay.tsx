@@ -148,7 +148,7 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
           {t('courseDetail.reviewsHead.youFirstBody', { score: yours.toFixed(1) })}
         </p>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 13, marginTop: 15 }}>
-          <strong style={{ color: A.AMBER, fontSize: 48, lineHeight: 0.9, fontWeight: 800, ...FIGS }}>{yours.toFixed(1)}</strong>
+          <strong style={{ color: A.INK, fontSize: 48, lineHeight: 0.9, fontWeight: 800, ...FIGS }}>{yours.toFixed(1)}</strong>
           <div style={{ minWidth: 0 }}>
             <div style={{ color: SURFACE.dark.ink, fontSize: 13, fontWeight: 700, lineHeight: 1.2 }}>Yours</div>
             <div style={{ color: SURFACE.dark.dim, fontSize: 11.5, lineHeight: 1.45, marginTop: 2, ...FIGS }}>1 rating</div>
@@ -183,7 +183,7 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
             <div data-community-rater-count={count} style={{ color: SURFACE.dark.dim, fontSize: 11.5, lineHeight: 1.45, marginTop: 2, overflowWrap: 'anywhere', ...FIGS }}>{count} {count === 1 ? 'rating' : 'ratings'}</div>
           </div>
         </div>
-        {ratedViewer && community.delta != null && <div data-viewer-delta style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, padding: '5px 10px', whiteSpace: 'nowrap', flex: '0 0 auto', borderRadius: 999, border: `1px solid ${inkWithAlpha(A.AMBER, 0.35)}`, background: inkWithAlpha(A.AMBER, 0.07) }}><span style={{ color: SURFACE.dark.mute, fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>You</span><b style={{ color: A.AMBER, fontSize: 14, ...FIGS }}>{yours?.toFixed(1)}</b><span style={{ color: A.IMPROVED, fontSize: 10, fontWeight: 800, ...FIGS }}>{community.delta > 0 ? '▲' : community.delta < 0 ? '▼' : ''} {Math.abs(community.delta).toFixed(1)}</span></div>}
+        {ratedViewer && community.delta != null && <div data-viewer-delta style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, padding: '5px 10px', whiteSpace: 'nowrap', flex: '0 0 auto', borderRadius: 999, border: `1px solid ${inkWithAlpha(A.AMBER, 0.35)}`, background: inkWithAlpha(A.AMBER, 0.07) }}><span style={{ color: SURFACE.dark.mute, fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>You</span><b style={{ color: A.INK, fontSize: 14, ...FIGS }}>{yours?.toFixed(1)}</b><span style={{ color: A.INK, fontSize: 10, fontWeight: 800, ...FIGS }}>{community.delta > 0 ? '▲' : community.delta < 0 ? '▼' : ''} {Math.abs(community.delta).toFixed(1)}</span></div>}
       </div>
 
       {/* CRM1.6 — the shared band rows, no kicker, heading or prose; two community ratings and up. */}

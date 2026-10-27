@@ -3,22 +3,21 @@
  * club-linked businesses. Draws nothing until the first read settles, nothing
  * if it fails or the server says the business is not linked; period switches
  * keep the previous card. Every figure (averages, ranks, unreplied) is the
- * server's, displayed as given. Rating/score figures of SUB_SCORE_GREEN_MIN
- * and above read A.GREEN, as on the reviews page. Course rows name the course
+ * server's, displayed as given. All real rating figures read A.INK, as on the reviews page. Course rows name the course
  * inside the club with courseNameWithinClub, as the reviews page does, so a
  * multi-course club reads "East Course", not the stored full name.
  */
 import { useTranslation } from 'react-i18next';
 import { formatNumber } from '@/i18n/format';
 import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
-import { A, SUB_SCORE_GREEN_MIN } from '@/features/courses/components/holes/analytical/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useBusinessReviewSummary, type BusinessReviewSummary, type ReviewSummaryScore } from '@/hooks/useBusinessReviewSummary';
 
 type K = (key: string, o?: Record<string, unknown>) => string;
 type Linked = Extract<BusinessReviewSummary, { linked: true }>;
 
 const INK = '#F8FAFC';
-export const ratingTone = (v: number | null | undefined) => (v != null && v >= SUB_SCORE_GREEN_MIN ? A.GREEN : INK);
+export const ratingTone = (v: number | null | undefined) => A.INK;
 /** Server values arrive at one decimal; this only prints them (9 → "9.0"). */
 export const fig = (v: number) => v.toFixed(1);
 

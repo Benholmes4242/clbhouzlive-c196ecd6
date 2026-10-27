@@ -14,6 +14,8 @@
  * `null` ratings map to POOR (semantically the worst case — no rating exists).
  */
 
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+
 export type RatingTier =
   | 'EXCEPTIONAL'
   | 'EXCELLENT'
@@ -82,6 +84,7 @@ export function rampForRating(rating: number | null | undefined): RatingRamp {
  * number or tier label is shown.
  */
 export function ratingTextColor(rating: number | null | undefined): string {
+  if (rating != null) return A.INK;
   const tier = getRatingTier(rating);
   if (tier === 'EXCEPTIONAL') return '#F0A500'; // deeper gold, legible on light surfaces
   if (tier === 'EXCELLENT' || tier === 'GOOD') return '#D97706';

@@ -5,6 +5,7 @@
  */
 
 import { getRatingTheme, type RatingTheme, COURSE_RATING_THEMES } from './globalAchievementMilestoneSystem';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { getRatingTier, type RatingTier } from '@/lib/ratingTier';
 
@@ -61,10 +62,10 @@ export interface ReviewOverlayTheme extends RatingTheme {
 const amberOverlay: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
   pillBg: 'rgba(245, 158, 11, 0.15)',
   pillBorder: 'rgba(245, 158, 11, 0.5)',
-  pillText: '#f59e0b',
+  pillText: A.INK,
   containerBg: 'rgba(245, 158, 11, 0.08)',
   containerBorder: 'rgba(245, 158, 11, 0.3)',
-  overlayText: '#FFFFFF',
+  overlayText: A.INK,
 };
 
 const tierOverlayThemes = {
@@ -96,7 +97,7 @@ function getTierKey(score: number): keyof typeof tierOverlayThemes {
  */
 export function getOverlayRatingColors(score: number): { main: string; sub: string } {
   // ALL tiers now use amber — consistent with course detail page
-  return { main: '#f59e0b', sub: 'rgba(245,158,11,0.6)' };
+  return { main: A.INK, sub: A.INK };
 }
 
 /**

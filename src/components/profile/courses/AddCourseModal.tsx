@@ -61,7 +61,7 @@ const FIELD_BG = 'rgba(255,255,255,0.06)';
 // Derived from A.AMBER rather than a new local amber literal.
 const SWAP_BORDER = `color-mix(in srgb, ${A.AMBER} 40%, transparent)`;
 
-const scoreTone = (s: number) => (s >= 9 ? A.GREEN : A.INK);
+const scoreTone = (s: number) => A.INK;
 const regionOf = (c: { sub_country?: string | null; region?: string | null; country?: string | null }) =>
   c.sub_country || c.region || c.country || null;
 

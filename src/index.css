@@ -596,12 +596,10 @@ html.lightbox-open {
   /* Tracks - visible grey for white backgrounds */
   --rating-bar-track: #D7DDE3;       /* slate-300 equivalent */
   
-  /* RATING BAR COLOR SYSTEM (Apr 2026 — 5-tier rebanding):
-     - Poor → Excellent: All use slate
-     - Exceptional (≥9.0): Uses gold (the sole gold tier)
-     Old green progression colors have been decommissioned. */
-  --rating-bar-fill-neutral: #64748B;       /* slate-500 - used for Poor → Excellent */
-  --rating-bar-fill-exceptional: #D2B461;   /* Warm trophy gold - Exceptional only */
+  /* Every real course/review rating is white (Ben, 27 Oct 2026). */
+  --rating-score-ink: #F8FAFC;
+  --rating-bar-fill-neutral: var(--rating-score-ink);
+  --rating-bar-fill-exceptional: var(--rating-score-ink);
   --rating-track: #E2E7EC;                /* Neutral grey for bar tracks */
   
   /* ========================================

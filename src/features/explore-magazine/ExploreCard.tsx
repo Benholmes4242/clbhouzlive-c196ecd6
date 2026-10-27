@@ -277,9 +277,8 @@ function chipsFor(
 
   if (kind === 'review' && !leadReviewChips && facts.rating != null) {
     const tier = getScoreTier(facts.rating);
-    /* Tier owns the Exceptional gate; the analytical helper owns colour. Both
-       intentionally meet at the canonical 9.0 threshold. */
-    const exceptionalTone = tier.isExceptional ? courseSubScoreTone(facts.rating) : undefined;
+    /* Tier owns the verdict gate; every real rating uses white ink. */
+    const exceptionalTone = courseSubScoreTone(facts.rating);
     out.push(
       <FigureChip
         key="review"
@@ -288,7 +287,7 @@ function chipsFor(
         unit={tier.isExceptional ? tier.label : undefined}
         unitTone={exceptionalTone}
         /* Neutral stays white because this figure sits on variable photography. */
-        tone={exceptionalTone ?? '#FFFFFF'}
+        tone={exceptionalTone}
         stacked
         locale={locale}
       />,
@@ -335,7 +334,7 @@ function chipsFor(
              score, and the count already lives in the headline. */
           unit={t('amateur.stream.chip.rating', 'rating')}
           /* Neutral stays white because this figure sits on variable photography. */
-          tone={facts.rating >= 9 ? courseSubScoreTone(facts.rating) : '#FFFFFF'}
+          tone={courseSubScoreTone(facts.rating)}
         />,
       );
     }
@@ -784,10 +783,8 @@ function ReviewStatStrip({ breakdown }: { breakdown: ReviewBreakdown | undefined
         const score = breakdown[field] as number;
         const label = t(`review.subscore.${labelKey}`);
         const outOfTen = t('statBrowse.reviews.outOfTen');
-        /* ONE HOME FOR THE 9.0 THRESHOLD (§5): the helper decides, never this
-           card. Below it the numeral takes the on-photo light ink, because
-           A.MUTE is a dark-canvas token and this sits on a photograph. */
-        const tone = courseSubScoreTone(score) === A.GREEN ? A.GREEN : 'rgba(255,255,255,0.92)';
+        /* Every real rating is white, including over photography. */
+        const tone = courseSubScoreTone(score);
         return (
           <li
             key={field}
@@ -1299,13 +1296,8 @@ export function ExploreCard({
       ) : null}
     </span>
   ) : null;
-  /* §3.3 GROUP ONE — the score as a figure with its verdict, and the course with
-     its region, on ONE row. The 9.0 threshold is the helper's, never this
-     card's; below it the figure takes on-photo light ink because A.MUTE is a
-     dark-canvas token and this sits on a photograph. */
-  const reviewScoreTone = item.facts.rating != null && courseSubScoreTone(item.facts.rating) === A.GREEN
-    ? A.GREEN
-    : 'rgba(255,255,255,0.94)';
+  /* Score and verdict stay in their existing row, now white for every score. */
+  const reviewScoreTone = courseSubScoreTone(item.facts.rating);
   const reviewFoot = leadReview ? (
     <span data-review-instrument="true" style={{ display: 'block', minWidth: 0 }}>
       <span style={{ display: 'flex', alignItems: 'flex-end', gap: 12, minWidth: 0 }}>

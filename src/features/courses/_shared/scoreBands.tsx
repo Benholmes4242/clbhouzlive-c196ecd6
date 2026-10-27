@@ -1,22 +1,13 @@
 /**
- * The three-band colour scale for scores a member is actively CHOOSING in the
- * review composer. Display surfaces use `courseSubScoreTone` instead, so the
- * next caller must choose by interaction mode rather than by surface colour.
+ * Course/review ratings are white, including actively chosen composer values.
+ * Absent values keep their existing dim feedback (Ben, 27 Oct 2026).
  *
  * NOTE: this is NOT the difficulty band scale (#C8372B / #0F8F4A) — that
  * measures a different quantity and lives in Top100CourseStatsPanel.
  */
 import React from 'react';
-import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 export {
-  BAND_GREEN,
-  BAND_AMBER,
-  BAND_RED,
-  BAND_GREEN_DARK,
-  BAND_AMBER_DARK,
-  BAND_RED_DARK,
-} from './scoreBandTokens';
-import {
   BAND_GREEN,
   BAND_AMBER,
   BAND_RED,
@@ -33,20 +24,16 @@ import {
  * course meta block and the verdict band. Amber needs no lift — it already
  * clears the glass — so it is deliberately the same hex in both scales.
  */
-/** >= 9.0 green, >= 5.0 amber, below 5.0 red. */
+/** White for every set rating; preserve the untouched state. */
 export function bandColor(score: number | null | undefined): string {
   if (score == null) return '#AEB4BC';
-  if (score >= 9) return BAND_GREEN;
-  if (score >= 5) return BAND_AMBER;
-  return BAND_RED;
+  return A.INK;
 }
 
 /** The same scale, legible on dark glass / photography. */
 export function bandColorOnDark(score: number | null | undefined): string {
   if (score == null) return 'rgba(255,255,255,0.70)';
-  if (score >= 9) return BAND_GREEN_DARK;
-  if (score >= 5) return BAND_AMBER_DARK;
-  return BAND_RED_DARK;
+  return A.INK;
 }
 
 

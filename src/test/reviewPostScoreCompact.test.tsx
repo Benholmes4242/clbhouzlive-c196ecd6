@@ -34,8 +34,8 @@ describe('review post — B2 score below the course', () => {
     expect((c.querySelector('[data-review-score-col]') as HTMLElement).style.textAlign).toBe('center');
     expect((c.querySelector('[data-review-score-block]') as HTMLElement).style.alignItems).toBe('center');
   });
-  it('the score colour follows the rating: green at 9.2, muted at 8.2', () => {
-    expect((card(9.2).querySelector('[data-review-score]') as HTMLElement).style.color).toBe(toRgb(A.GREEN));
-    expect((card(8.2).querySelector('[data-review-score]') as HTMLElement).style.color).toBe(toRgb(A.MUTE));
+  it('the score colour follows the rating: white at 9.2 and 8.2', () => {
+    expect((card(9.2).querySelector('[data-review-score]') as HTMLElement).style.color).toBe(toRgb(A.INK));
+    expect((card(8.2).querySelector('[data-review-score]') as HTMLElement).style.color).toBe(toRgb(A.INK));
   });
 });

@@ -30,10 +30,10 @@ describe('CategoryScores split', () => {
     expect(root?.style.gap).toBe('14px');
   });
 
-  it('uses green at 9.0 and muted at 8.7', () => {
+  it('uses white at 9.0 and 8.7', () => {
     const { container } = render(<CategoryScores scores={scores} layout="split" />);
-    expect(container.querySelector<HTMLElement>('[data-category-score="9.0"]')?.style.color).toBe(normalizedColor(A.GREEN));
-    expect(container.querySelector<HTMLElement>('[data-category-score="8.7"]')?.style.color).toBe(normalizedColor(A.MUTE));
+    expect(container.querySelector<HTMLElement>('[data-category-score="9.0"]')?.style.color).toBe(normalizedColor(A.INK));
+    expect(container.querySelector<HTMLElement>('[data-category-score="8.7"]')?.style.color).toBe(normalizedColor(A.INK));
   });
 
   it('keeps a lead alone without a divider or grid when all categories are absent', () => {
