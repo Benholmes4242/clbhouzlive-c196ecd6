@@ -423,7 +423,7 @@ function GetTheAppSection({ settings, setConfig }: {
         {row('Google Play',
           links?.play_store_url
             ? <span style={{ color: t.inkMuted }}>{strip(links.play_store_url)}</span>
-            : <span style={{ color: t.warnText }}>Not set: Android phones get the website</span>,
+            : <span style={{ color: t.warnText }}>Not set: the download page uses the default Play link</span>,
           links?.play_store_url ? livePill : addPill, () => openEditor('play'))}
         {row('Everything else', <span style={{ color: t.inkMuted }}>clbhouz.co.uk</span>, livePill,
           () => window.open('https://clbhouz.co.uk', '_blank', 'noopener'))}

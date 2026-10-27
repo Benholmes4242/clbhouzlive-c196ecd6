@@ -6,6 +6,7 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export const FALLBACK_STORE_URL = 'https://apps.apple.com/app/id6752538886';
+export const FALLBACK_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.clbhouz.app';
 
 export interface StoreLinks {
   appStore: string | null;

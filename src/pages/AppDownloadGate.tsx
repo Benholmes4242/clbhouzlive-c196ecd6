@@ -39,7 +39,7 @@ import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import { GREEN } from '@/components/manage/ui';
 import wordmark from '@/assets/clbhouz-wordmark.png.asset.json';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
-import { FALLBACK_STORE_URL, fetchStoreLinks, pickStoreUrl } from '@/lib/storeLinks';
+import { FALLBACK_PLAY_URL, FALLBACK_STORE_URL, fetchStoreLinks } from '@/lib/storeLinks';
 
 const CANVAS = PAGE_CANVAS;
 const INK = '#FFFFFF';
@@ -60,28 +60,26 @@ const LABEL: React.CSSProperties = {
 const MARK = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
 
 /**
- * The store link for THIS device via the shared storeLinks helpers
- * (BRIEF_ADMIN_SETTINGS S.11). Android without a Play link keeps today's App
- * Store target, so nothing breaks before the link is added.
+ * Both store links, no device detection: the App Store badge always opens
+ * the App Store and the Google Play badge always opens Google Play. Starts
+ * on the fallbacks; a failed fetch keeps them.
  */
-function useStoreUrl(): string {
-  const [href, setHref] = React.useState(FALLBACK_STORE_URL);
+function useStoreLinks(): { appStore: string; play: string } {
+  const [links, setLinks] = React.useState({ appStore: FALLBACK_STORE_URL, play: FALLBACK_PLAY_URL });
   React.useEffect(() => {
     let alive = true;
     fetchStoreLinks()
-      .then((links) => {
-        if (!alive) return;
-        const url = pickStoreUrl(links, navigator.userAgent) ?? links.appStore;
-        if (url) setHref(url);
+      .then((l) => {
+        if (alive) setLinks({ appStore: l.appStore ?? FALLBACK_STORE_URL, play: l.play ?? FALLBACK_PLAY_URL });
       })
       .catch(() => {
-        // fallback stands
+        // fallbacks stand
       });
     return () => {
       alive = false;
     };
   }, []);
-  return href;
+  return links;
 }
 
 function fmt(n: number, locale: string): string {
@@ -145,7 +143,7 @@ const AppDownloadGate: React.FC = () => {
   const locale = i18n.language || 'en';
   const state = React.useMemo(() => resolveGateState(location.pathname), [location.pathname]);
   const { data: ctx } = useGateContext(state);
-  const storeUrl = useStoreUrl();
+  const { appStore, play } = useStoreLinks();
   const { data: reach, isPending: reachPending, isError: reachError } = usePlatformReach();
 
   // Invite attribution: stash the code so a later signup can credit the
@@ -358,34 +356,34 @@ const AppDownloadGate: React.FC = () => {
             width: '100%',
           }}
         >
-          <a
-            href={storeUrl}
-            aria-label={t('gate.appStore', { defaultValue: 'Download clbhouz on the App Store' })}
-            style={{ display: 'block', lineHeight: 0 }}
-          >
-            <img
-              src="/brand/apple-app-store-badge.svg"
-              alt={t('gate.appStore', { defaultValue: 'Download clbhouz on the App Store' })}
-              style={{ display: 'block', height: 52, width: 'auto' }}
-              draggable={false}
-            />
-          </a>
-
-          {/* A BADGE, NOT A LINK. No href, no tap target, no cursor. */}
           <div
-            aria-disabled
-            style={{
-              ...LABEL,
-              marginTop: 14,
-              padding: '9px 14px',
-              borderRadius: 8,
-              border: `0.5px solid ${HAIR}`,
-              color: MUTE,
-              pointerEvents: 'none',
-              userSelect: 'none',
-            }}
+            data-store-badges=""
+            style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 10 }}
           >
-            {t('gate.playSoon', { defaultValue: 'Coming soon to Google Play' })}
+            <a
+              href={appStore}
+              aria-label={t('gate.appStore', { defaultValue: 'Download clbhouz on the App Store' })}
+              style={{ display: 'block', lineHeight: 0 }}
+            >
+              <img
+                src="/brand/apple-app-store-badge.svg"
+                alt={t('gate.appStore', { defaultValue: 'Download clbhouz on the App Store' })}
+                style={{ display: 'block', height: 46, width: 'auto' }}
+                draggable={false}
+              />
+            </a>
+            <a
+              href={play}
+              aria-label={t('gate.googlePlay', { defaultValue: 'Get clbhouz on Google Play' })}
+              style={{ display: 'block', lineHeight: 0 }}
+            >
+              <img
+                src="/brand/google-play-badge.svg"
+                alt={t('gate.googlePlay', { defaultValue: 'Get clbhouz on Google Play' })}
+                style={{ display: 'block', height: 46, width: 'auto' }}
+                draggable={false}
+              />
+            </a>
           </div>
 
           {/* the signature — amber full stop */}

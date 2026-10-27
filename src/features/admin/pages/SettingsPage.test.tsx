@@ -137,10 +137,10 @@ describe('BRIEF_ADMIN_SETTINGS page', () => {
     expect(screen.getByText('On since 16:24 · by you')).toBeInTheDocument();
   });
 
-  it("an unset Google Play link shows 'Not set: Android phones get the website' and 'Add'", () => {
+  it("an unset Google Play link shows 'Not set: the download page uses the default Play link' and 'Add'", () => {
     f.role.mockReturnValue({ role: 'full', loading: false });
     mount();
-    expect(screen.getByText('Not set: Android phones get the website')).toBeInTheDocument();
+    expect(screen.getByText('Not set: the download page uses the default Play link')).toBeInTheDocument();
     expect(screen.getByText('Add')).toBeInTheDocument();
   });
 
