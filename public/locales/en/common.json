@@ -1086,6 +1086,28 @@
           "openingHours": "opening hours"
         }
       }
+    },
+    "clubHero": {
+      "golfClub": "Golf club",
+      "courses": "{{count}} courses",
+      "follow": "Follow",
+      "following": "Following",
+      "bookTeeTime": "Book a tee time",
+      "soon": "Soon",
+      "teeTimeSoon": "Tee-time booking is coming soon.",
+      "message": "Message",
+      "share": "Share",
+      "more": "More options",
+      "yourCourses": "Your courses",
+      "insights": "Insights",
+      "post": "Post as the business",
+      "edit": "Edit business profile",
+      "reviews": "{{count}} reviews",
+      "reviews_one": "{{count}} review",
+      "roundsTracked": "Rounds tracked",
+      "membersHere": "Members here",
+      "aboutMore": "More",
+      "aboutLess": "Less"
     }
   },
   "handicap": {

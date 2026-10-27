@@ -1,0 +1,206 @@
+/**
+ * CB103 — golf club profile hero. Renders ClubProfileHero directly with the
+ * page's callbacks as spies; the pure place-line and team-gate helpers are
+ * asserted as the page uses them.
+ */
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook } from '@testing-library/react';
+import type { ReactNode } from 'react';
+
+vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
+const rpc = vi.fn();
+vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: (...a: unknown[]) => rpc(...a) } }));
+
+import { ClubProfileHero, clubPlaceLine, clubTeamGates } from '@/components/business/hero/ClubProfileHero';
+import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
+import { useBusinessClubMemberCount } from '@/hooks/useBusinessClubMemberCount';
+
+afterEach(() => { cleanup(); rpc.mockReset(); });
+
+const labels = { golfClub: 'Golf club', courses: (n: number) => `${n} courses` };
+const toRgb = (c: string) => { const d = document.createElement('div'); d.style.color = c; return d.style.color; };
+
+function hero(over: Partial<React.ComponentProps<typeof ClubProfileHero>> = {}) {
+  const props = {
+    name: 'Sundridge Park Golf Club', placeLine: 'Golf club · Kent · 2 courses',
+    onShare: vi.fn(), renderMore: (tr: React.ReactElement) => tr, team: null,
+    isFollowing: false, onFollowToggle: vi.fn(), onBookTeeTime: vi.fn(), onMessage: vi.fn(),
+    ...over,
+  };
+  return { props, ...render(<ClubProfileHero {...props} />) };
+}
+
+describe('CB103 place line', () => {
+  it('joins city and region', () => {
+    expect(clubPlaceLine({ city: 'Bromley', region: 'Kent', courseCount: 1 }, labels)).toBe('Golf club · Bromley, Kent');
+  });
+  it('uses region alone', () => {
+    expect(clubPlaceLine({ region: 'Kent', country: 'England', courseCount: 1 }, labels)).toBe('Golf club · Kent');
+  });
+  it('falls back to the first course region, then country', () => {
+    expect(clubPlaceLine({ firstCourseRegion: 'Kent', country: 'England', courseCount: 1 }, labels)).toBe('Golf club · Kent');
+    expect(clubPlaceLine({ country: 'England', courseCount: 1 }, labels)).toBe('Golf club · England');
+  });
+  it('adds the course count only at two or more', () => {
+    expect(clubPlaceLine({ region: 'Kent', courseCount: 2 }, labels)).toBe('Golf club · Kent · 2 courses');
+    expect(clubPlaceLine({ region: 'Kent', courseCount: 1 }, labels)).not.toContain('courses');
+  });
+});
+
+describe('CB103 visitor row', () => {
+  it('Follow calls the toggle and Following replaces it', () => {
+    const { props, container, rerender } = hero();
+    const actions = container.querySelector('[data-club-actions="visitor"]')!;
+    fireEvent.click(actions.querySelectorAll('button')[0]);
+    expect(props.onFollowToggle).toHaveBeenCalledTimes(1);
+    expect(actions.querySelectorAll('button')[0].querySelector('svg')).not.toBeNull();
+    rerender(<ClubProfileHero {...props} isFollowing />);
+    const first = container.querySelector('[data-club-actions="visitor"] button')!;
+    expect(first.querySelector('svg')).toBeNull();
+    fireEvent.click(first);
+    expect(props.onFollowToggle).toHaveBeenCalledTimes(2);
+  });
+  it('Book a tee time shows Soon and only calls its toast handler', () => {
+    const { props, container } = hero();
+    const tee = container.querySelector('[data-tee-soon]') as HTMLButtonElement;
+    expect(tee.querySelector('[data-soon-tag]')).not.toBeNull();
+    fireEvent.click(tee);
+    expect(props.onBookTeeTime).toHaveBeenCalledTimes(1);
+    expect(props.onMessage).not.toHaveBeenCalled();
+    expect(props.onFollowToggle).not.toHaveBeenCalled();
+  });
+  it('Message starts a conversation and disables while starting', () => {
+    const { props, container, rerender } = hero();
+    const msg = () => container.querySelectorAll('[data-club-actions="visitor"] button')[2] as HTMLButtonElement;
+    fireEvent.click(msg());
+    expect(props.onMessage).toHaveBeenCalledTimes(1);
+    rerender(<ClubProfileHero {...props} messageDisabled />);
+    expect(msg().disabled).toBe(true);
+  });
+});
+
+describe('CB103 team row', () => {
+  it('gates follow the existing permissions', () => {
+    expect(clubTeamGates(null, true)).toBeNull();
+    expect(clubTeamGates({ role: 'owner', canViewInsights: true, canManage: true }, true)).toEqual({ yourCourses: true, insights: true, post: true, edit: true });
+    expect(clubTeamGates({ role: 'editor', canViewInsights: true, canManage: false }, false)).toEqual({ yourCourses: false, insights: true, post: true, edit: true });
+    expect(clubTeamGates({ role: 'analyst', canViewInsights: true, canManage: false }, true)).toEqual({ yourCourses: true, insights: true, post: false, edit: false });
+  });
+  it('renders only the permitted buttons', () => {
+    const onInsights = vi.fn();
+    const { container } = hero({ team: { onInsights } });
+    const row = container.querySelector('[data-club-actions="team"]')!;
+    expect(row.querySelectorAll('button')).toHaveLength(1);
+    fireEvent.click(row.querySelector('button')!);
+    expect(onInsights).toHaveBeenCalled();
+  });
+  it('renders all four for a full team member', () => {
+    const { container } = hero({ team: { onYourCourses: vi.fn(), onInsights: vi.fn(), onPost: vi.fn(), onEdit: vi.fn() } });
+    expect(container.querySelectorAll('[data-club-actions="team"] button')).toHaveLength(4);
+  });
+  it('a member passing no gate sees the visitor row', () => {
+    const { container } = hero({ team: {} });
+    expect(container.querySelector('[data-club-actions="visitor"]')).not.toBeNull();
+  });
+});
+
+describe('CB103 crest row', () => {
+  it('Share calls share and More renders through the page menu', () => {
+    const renderMore = vi.fn((tr: React.ReactElement) => <div data-menu="">{tr}</div>);
+    const { props, container } = hero({ renderMore });
+    const crestRow = container.querySelector('[data-club-crest]')!.parentElement!;
+    const circles = crestRow.querySelectorAll('button:not([data-club-crest])');
+    expect(circles).toHaveLength(2);
+    fireEvent.click(circles[0]);
+    expect(props.onShare).toHaveBeenCalledTimes(1);
+    expect(container.querySelector('[data-menu] button')).toBe(circles[1]);
+  });
+  it('the page menu omits Share profile for the club hero', async () => {
+    const src = (await import('node:fs')).readFileSync('src/pages/BusinessProfilePage.tsx', 'utf8');
+    expect(src).toContain('renderMore={(trigger) => renderMenu(trigger, false)}');
+    expect(src.match(/\{withShare && \(/g)).toHaveLength(2);
+  });
+});
+
+describe('CB103 stat strip', () => {
+  const strip = (c: HTMLElement) => c.querySelector('[data-club-strip]') as HTMLElement | null;
+  it('hides cells at zero or null and drops the strip when empty', () => {
+    const { container } = hero({ avgRating: null, ratingsCount: 0, roundsTracked: 0, membersHere: null });
+    expect(strip(container)).toBeNull();
+  });
+  it('columns adapt to the cells present', () => {
+    const { container, rerender, props } = hero({ avgRating: 8.2, ratingsCount: 5, roundsTracked: 1764, membersHere: 21 });
+    expect(strip(container)!.style.gridTemplateColumns).toBe('repeat(3, 1fr)');
+    expect(container.querySelector('[data-cell="rounds"] [data-cell-value]')!.textContent).toBe((1764).toLocaleString());
+    rerender(<ClubProfileHero {...props} avgRating={8.2} ratingsCount={5} roundsTracked={0} membersHere={null} />);
+    expect(strip(container)!.style.gridTemplateColumns).toBe('repeat(1, 1fr)');
+    expect(container.querySelectorAll('[data-cell]')).toHaveLength(1);
+  });
+  it('rating is green only at 9.0 and above', () => {
+    const { container, rerender, props } = hero({ avgRating: 8.9, ratingsCount: 3 });
+    const v = () => (container.querySelector('[data-cell="rating"] [data-cell-value]') as HTMLElement).style.color;
+    expect(v()).toBe(toRgb('#F8FAFC'));
+    rerender(<ClubProfileHero {...props} avgRating={9.0} ratingsCount={3} />);
+    expect(v()).toBe(toRgb('#2FA35A'));
+  });
+  it('members are not tappable', () => {
+    const { container } = hero({ membersHere: 21 });
+    expect(container.querySelector('[data-cell="members"]')!.tagName).toBe('DIV');
+  });
+});
+
+describe('CB103 members hook', () => {
+  const wrap = () => {
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    return ({ children }: { children: ReactNode }) => <QueryClientProvider client={qc}>{children}</QueryClientProvider>;
+  };
+  it('reads get_business_club_member_count', async () => {
+    rpc.mockResolvedValue({ data: 21, error: null });
+    const { result } = renderHook(() => useBusinessClubMemberCount('b1'), { wrapper: wrap() });
+    await waitFor(() => expect(result.current.data).toBe(21));
+    expect(rpc).toHaveBeenCalledWith('get_business_club_member_count', { p_business_id: 'b1' });
+  });
+  it('is undefined while loading and on error, so the cell is absent', async () => {
+    rpc.mockResolvedValue({ data: null, error: { message: 'boom' } });
+    const { result } = renderHook(() => useBusinessClubMemberCount('b1'), { wrapper: wrap() });
+    expect(result.current.data).toBeUndefined();
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(result.current.data).toBeUndefined();
+    const { container } = hero({ membersHere: result.current.data ?? null });
+    expect(container.querySelector('[data-cell="members"]')).toBeNull();
+  });
+});
+
+describe('CB103 about text', () => {
+  it('shows More only when clamped', () => {
+    const sh = vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(10);
+    const ch = vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(10);
+    const { container, unmount } = hero({ about: 'short' });
+    expect(container.querySelector('[data-club-about-toggle]')).toBeNull();
+    unmount();
+    sh.mockReturnValue(200);
+    const r = hero({ about: 'long text' });
+    const btn = r.container.querySelector('[data-club-about-toggle]') as HTMLButtonElement;
+    expect(btn).not.toBeNull();
+    fireEvent.click(btn);
+    expect(r.container.querySelector('[data-club-about]')!.className).not.toContain('line-clamp-3');
+    sh.mockRestore(); ch.mockRestore();
+  });
+});
+
+describe('CB103 non-club hero unchanged', () => {
+  it('a non-club business still renders BusinessProfileHero, not the club hero', () => {
+    const { container } = render(
+      <BusinessProfileHero name="Fitter" category="Club Fitter" city="London" isClub={false} courseNavEnabled={false} onStatTap={() => {}} followersCount={3} postsCount={2} />,
+    );
+    expect(container.querySelector('[data-club-hero]')).toBeNull();
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toContain('Fitter');
+  });
+  it('the page picks the club hero only under isClub', async () => {
+    const src = (await import('node:fs')).readFileSync('src/pages/BusinessProfilePage.tsx', 'utf8');
+    expect(src).toContain('const isClub = !!business.club_id && courses.length > 0;');
+    expect(src).toMatch(/\{isClub \? \(\s*<ClubProfileHero/);
+  });
+});
