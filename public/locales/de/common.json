@@ -682,5 +682,43 @@
     "unlike": "Gefällt mir nicht mehr",
     "more": "Mehr",
     "sheetTitle": "Kommentare"
+  },
+  "courseDetail": {
+    "websiteSheet": {
+      "officialWebsite": "OFFICIAL WEBSITE",
+      "domainLine": "{{domain}} · opens in your browser",
+      "visitWebsite": "Visit website",
+      "teeTimes": "Tee times",
+      "call": "Call",
+      "directions": "Directions",
+      "copyLink": "Copy link",
+      "copied": "Copied",
+      "share": "Share",
+      "beforeYouGo": "BEFORE YOU GO",
+      "roundsMeasured": "{{n}} ROUNDS MEASURED",
+      "earlyData": "EARLY DATA · {{n}} ROUNDS",
+      "avgOverPar": "AVG OVER PAR",
+      "parTotal": "Par {{par}}",
+      "hardestHole": "HARDEST HOLE",
+      "playsOver": "+{{x}} a round",
+      "ratedOutOfTen": "RATED /10",
+      "reviewsCount": "{{count}} reviews",
+      "noRounds": "No rounds measured here yet. Play it with your handicap connected and yours is the first.",
+      "bandAverageLead": "Golfers off your handicap average",
+      "bandAverageTail": "here.",
+      "yourBestLead": "Your best here is",
+      "sentenceEnd": ".",
+      "notPlayedYet": "You haven't played it yet.",
+      "circleOne": "{{a}} has played here",
+      "circleTwo": "{{a}} and {{b}} have played here",
+      "circleThree": "{{a}}, {{b}} and {{c}} have played here",
+      "circleMany": "{{a}}, {{b}} and {{others}} others you follow have played here",
+      "saveToList": "Save to your list",
+      "onYourList": "On your list",
+      "shareCourse": "Share course",
+      "copiedToast": "Copied to clipboard",
+      "copyFailed": "Failed to copy link",
+      "close": "Close"
+    }
   }
 }
