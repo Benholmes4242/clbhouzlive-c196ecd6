@@ -50,7 +50,7 @@ export function HeroSection({ player, playerStats, selection }: HeroSectionProps
   const nameSize = player.full_name.length > 22 ? 25 : player.full_name.length > 14 ? 29 : 33;
 
   return (
-    <section style={{ position: 'relative', minHeight: TOUR_PLAYER_HERO_H, overflow: 'hidden', background: PAGE_CANVAS }}>
+    <section style={{ position: 'relative', display: 'flex', flexDirection: 'column', minHeight: TOUR_PLAYER_HERO_H, overflow: 'hidden', background: PAGE_CANVAS }}>
       {/* No full-bleed photo: the band is 430x340 landscape and the headshot library is
           mostly 400x533 portrait cut-outs — a full-bleed photo is a 3.2x upscale that no
           CSS can sharpen. Do not reintroduce it. */}
@@ -66,7 +66,7 @@ export function HeroSection({ player, playerStats, selection }: HeroSectionProps
           imagePosition="50% 2%"
         />
       </div>
-      <div style={{ position: 'relative', minHeight: '100%', padding: '24px 16px 16px', paddingRight: 114, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+      <div style={{ position: 'relative', flex: 1, padding: '24px 16px 16px', paddingRight: 114, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6, rowGap: 5, maxWidth: '100%', ...LABEL, color: 'rgba(255,255,255,0.68)' }}>
           <span>{tourLabel(player.tour_codes, t)}</span>
           {country && <><span aria-hidden>{'\u00b7'}</span><CountryFlag country={player.country_code || player.country} size="sm" /><span>{country}</span></>}
