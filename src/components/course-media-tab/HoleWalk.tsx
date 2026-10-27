@@ -237,10 +237,10 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       </div>
       <div className="media-v2-hole-rail">
         {walk.tiles.filter(item => item.photos.length).map(item => <Button key={item.hole.hole_no} variant="ghost" className="media-v2-hole-card" aria-label={`Hole ${item.hole.hole_no}`} aria-pressed={selected === item.hole.hole_no} onClick={() => selectHole(item.hole.hole_no)}>
-          <ReadyShotCover shots={item.photos} /><span className="media-v2-hole-number">{item.hole.hole_no}</span><span className="media-v2-hole-count">{t('media.v2.shots', { count: item.photos.length, defaultValue: "{{count}} shots" })}</span>
+          <ReadyShotCover shots={item.photos} /><span className="media-v2-hole-number">{item.hole.hole_no}</span><span className="media-v2-hole-count">{t('media.v2.shots', { count: item.photos.length, defaultValue: item.photos.length === 1 ? "1 shot" : `${item.photos.length} shots` })}</span>
         </Button>)}
         {walk.openCount > 0 && <Button variant="ghost" className="media-v2-add-card" onClick={onChooseFirst} disabled={!onChooseFirst}>
-          <i><Plus size={16} /></i><b>{t('media.v2.holesToGo', { count: walk.openCount, defaultValue: "{{count}} holes to go" })}</b><span>{t('media.v2.addFirstShot', { defaultValue: "Add the first shot of one" })}</span>
+          <i><Plus size={16} /></i><b>{t('media.v2.holesToGo', { count: walk.openCount, defaultValue: walk.openCount === 1 ? "1 hole to go" : `${walk.openCount} holes to go` })}</b><span>{t('media.v2.addFirstShot', { defaultValue: "Add the first shot of one" })}</span>
         </Button>}
       </div>
       <div className="media-v2-panel">{panel}</div>

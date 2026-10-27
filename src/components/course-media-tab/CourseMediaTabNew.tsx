@@ -262,13 +262,13 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       {photoState !== 'B' && photoState !== 'C' && <CoursePlaceTiles rows={places.tags.data ?? []} onOpen={(place, rows) => { void openPlace(place, rows); }} />}
       {photoState !== 'A' && photoState !== 'B' && photoState !== 'C' && countsReady && mediaCounts.total > 0 && tagging.tags.isSuccess && places.tags.isSuccess && !hasTags && <section className="media-v2-unsorted">
         <div className="media-v2-unsorted-intro"><span className="media-v2-unsorted-icon"><Tag size={17} /></span><div><h3>{t('media.v2.unsortedTitle', { defaultValue: "Sort them by hole or by place" })}</h3><p>{t('media.v2.unsortedBody', { defaultValue: "Tag a shot to a hole, the clubhouse, the food, the practice ground or anything else, and this page builds itself." })}</p></div></div>
-        <Button className="media-v2-primary" disabled={fastPending} onClick={() => untaggedCount ? void beginBatch() : setFirstPhoto(true)}>{untaggedCount ? t('media.v2.tagYour', { count: untaggedCount, defaultValue: "Tag your {{count}} shots" }) : t('media.v2.add', { defaultValue: "Add a photo or video" })}</Button>
+        <Button className="media-v2-primary" disabled={fastPending} onClick={() => untaggedCount ? void beginBatch() : setFirstPhoto(true)}>{untaggedCount ? t('media.v2.tagYour', { count: untaggedCount, defaultValue: untaggedCount === 1 ? "Tag your 1 shot" : `Tag your ${untaggedCount} shots` }) : t('media.v2.add', { defaultValue: "Add a photo or video" })}</Button>
       </section>}
       {countsReady && mediaCounts.total > 0 && photoState !== 'B' && photoState !== 'C' && <div className="media-v2-everything media-v2-head"><h3>{t(hasTags ? 'media.v2.everything' : 'media.v2.allShots', { defaultValue: hasTags ? 'Everything' : 'All shots' })}</h3><span className="media-v2-label">{mediaCounts.total}</span></div>}
       {tagsReady && untaggedCount != null && untaggedCount > 0 && (
         <section>
           <Button variant="ghost" className="media-v2-untagged" disabled={fastPending || !sources.isSuccess} onClick={beginBatch}>
-            <Tag size={15} /><p><b>{t('media.v2.ownCount', { count: untaggedCount, defaultValue: "{{count}} of yours" })}</b> {t('media.v2.untagged', { count: untaggedCount, defaultValue: "aren't tagged yet" })}</p><span>{t('media.v2.tagThem', { defaultValue: "Tag them" })}</span><ChevronRight size={14} />
+            <Tag size={15} /><p><b>{t('media.v2.ownCount', { count: untaggedCount, defaultValue: `${untaggedCount} of yours` })}</b> {t('media.v2.untagged', { count: untaggedCount, defaultValue: untaggedCount === 1 ? "isn't tagged yet" : "aren't tagged yet" })}</p><span>{t('media.v2.tagThem', { defaultValue: "Tag them" })}</span><ChevronRight size={14} />
           </Button>
           {fastError && addHole == null && <p role="alert" className="text-sm">{fastError}</p>}
         </section>
