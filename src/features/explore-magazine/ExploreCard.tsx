@@ -1613,6 +1613,86 @@ export function ExploreCard({
     </CourseImageFallback>
   );
 
+  /* CB111 — SCORE-LED FEED ROUND (FeedCard mediaFirst only; round-scoreled.html
+     is the signed-off spec). Order: author row; the gross-led score block;
+     the course name; the chart (the same plot or photograph the card draws
+     today); the round-feat panel where it already sits. The card renders NO
+     engagement row of its own — FeedCard appends the shared media-first
+     footer, so nothing appears twice. Figures are the ones the card computes
+     today: gross with its to-par, net with its to-par, and the netted
+     handicap; a cell with no value is omitted, so an in-flight round fills
+     in place. */
+  if (feedLayout === 'scoreLed' && item.kind === 'round' && size !== 'pair') {
+    const courseHcp = item.facts.course_handicap ?? null;
+    const received = shape ? feedStrokesReceived(shape, courseHcp) : null;
+    const nettable = courseHcp != null && (shape ? received != null : true);
+    const gross = item.facts.gross ?? null;
+    const net = item.facts.net ?? null;
+    const par = item.facts.course_par ?? null;
+    const grossToParText = toParLabel(item.facts.to_par ?? null);
+    const netShown = nettable && net != null;
+    const netToParText = netShown && par != null ? toParLabel(net - par) : null;
+    const scoreLedCourse = kickerPartsValue.course ?? (item.subject?.course_name?.trim() || null);
+    const cellLabel: React.CSSProperties = { display: 'block', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.DIM };
+    const sideCallout = feedPlot ? homePanelCallout(callout, shape, collectRoundFeats(item.facts)) : callout;
+    return (
+      <button
+        type="button"
+        onClick={onTap}
+        data-round-score-led="true"
+        style={{ display: 'block', width: '100%', padding: 0, border: 0, background: 'transparent', textAlign: 'left', cursor: 'pointer', color: A.INK, fontFamily: SANS, ...FIGS }}
+      >
+        <span style={{ display: 'block', padding: '12px 14px 0' }}>
+          <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} />
+        </span>
+        <span data-round-score-block="true" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '14px 14px 0' }}>
+          {gross != null ? (
+            <span style={{ minWidth: 0 }}>
+              <span data-round-score-gross="true" style={{ ...FIGS, fontSize: 46, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color: A.INK }}>
+                {String(gross)}
+                {grossToParText ? <span style={{ ...NUMF, fontSize: 17, fontWeight: 600, color: A.MUTE, marginLeft: 6 }}>{grossToParText}</span> : null}
+              </span>
+              <span style={{ ...cellLabel, marginTop: 6 }}>{t('amateur.stream.stat.gross', 'Gross')}</span>
+            </span>
+          ) : <span />}
+          <span style={{ display: 'flex', gap: 22, paddingBottom: 16, flex: '0 0 auto' }}>
+            {netShown ? (
+              <span data-round-score-net="true" style={{ textAlign: 'right' }}>
+                <span style={{ ...FIGS, fontSize: 17, fontWeight: 700, color: A.INK }}>
+                  {String(net)}
+                  {netToParText ? <span style={{ ...NUMF, fontSize: 12, fontWeight: 600, color: A.MUTE, marginLeft: 3 }}>{netToParText}</span> : null}
+                </span>
+                <span style={{ ...cellLabel, marginTop: 5 }}>{t('amateur.stream.stat.net', 'Net')}</span>
+              </span>
+            ) : null}
+            {nettable ? (
+              <span data-round-score-handicap="true" style={{ textAlign: 'right' }}>
+                <span style={{ ...FIGS, fontSize: 17, fontWeight: 700, color: A.INK }}>{formatDisplayedHcp(Math.round(courseHcp))}</span>
+                <span style={{ ...cellLabel, marginTop: 5 }}>{t('amateur.stream.stat.handicap', 'Handicap')}</span>
+              </span>
+            ) : null}
+          </span>
+        </span>
+        {scoreLedCourse ? (
+          <span data-feed-round-course="true" style={{ display: 'block', padding: '12px 14px 0', fontSize: 14, fontWeight: 600, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {scoreLedCourse}
+          </span>
+        ) : null}
+        {feedPlot && shape && received ? <RoundTilePlot shape={shape} received={received} /> : null}
+        {!feedPlot ? <span style={{ position: 'relative', display: 'block', marginInline: bleed != null ? -bleed : undefined }}>{photo}</span> : null}
+        {sideCallout ? (
+          <RoundStatStrip
+            callout={sideCallout}
+            scoreId={item.facts.score_id ?? null}
+            featCounts={{ aces: item.facts.holes_in_one ?? null, albatrosses: item.facts.albatrosses ?? null, eagles: item.facts.eagles ?? null }}
+            locale={locale}
+            ownerDisplayName={item.who?.display_name ?? null}
+          />
+        ) : null}
+      </button>
+    );
+  }
+
   /* BRIEF_ROUND_TILE_1_R -- HOME ONLY. feedPlot replaces the photograph: no
      course image, scrim or backdrop is rendered. Order: course name; poster
      and play date; the plot on the canvas; the figures row; the poster row
