@@ -67,6 +67,7 @@ function CourseBlock({ course, position, isFirst, onOpen, onResolved }: {
   const holes = analysis?.available && (analysis.holes?.length ?? 0) >= 9
     ? [...analysis.holes].sort((a, b) => a.hole_no - b.hole_no) : null;
   const hardest = holes ? pickHardestHole(holes) : stats?.hardest_hole_no ?? null;
+  const easiest = holes ? pickEasiestHole(holes) : null;
 
   const cells: { value: string; label: string }[] = [];
   if (rounds > 0) {
@@ -117,7 +118,7 @@ function CourseBlock({ course, position, isFirst, onOpen, onResolved }: {
           <div data-club-plays-strip style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 34, marginTop: 12 }}>
             {holes.map((h, i) => (
               <i key={h.hole_no} data-hole={h.hole_no} data-hardest={h.hole_no === hardest ? 'true' : undefined}
-                style={{ flex: 1, height: `${heights[i]}%`, borderRadius: '2px 2px 0 0', background: h.hole_no === hardest ? T.red : T.bar }} />
+                style={{ flex: 1, height: `${heights[i]}%`, borderRadius: '2px 2px 0 0', background: h.hole_no === hardest ? T.red : h.hole_no === easiest ? T.green : T.bar }} />
             ))}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: T.faint, marginTop: 4, ...TAB }}>
