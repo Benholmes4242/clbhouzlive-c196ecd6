@@ -11,8 +11,7 @@ import { ReactionAction } from './ReactionAction';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 import { A, SANS, FIGS, LABEL, NEW_CARD_RING } from './tokens';
-import { SubScoreBar } from '@/features/courses/_shared/scoreBands';
-import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
 import { autoplayBlocked, registerReviewVideo } from './reviewVideoAutoplay';
 import type { LatestReview } from './hooks/useLatestReviews';
 
@@ -338,48 +337,6 @@ export function ReviewTile({
           </span>
         )}
 
-        {/* SCORE CHIP — GLASS, matching the friends rail, the standout tiles
-            and the tour tiles. The flat, higher-opacity fill is the BASE and
-            the blur is the @supports enhancement: this chip sits over a
-            photograph and unreadable is the failure mode. */}
-        <span
-          style={{
-            position: 'absolute',
-            top: 8,
-            left: 8,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-        <span
-          className="review-tile-chip"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'baseline',
-            gap: 2,
-            padding: '5px 10px',
-            borderRadius: 10,
-          }}
-        >
-          <span
-            style={{
-              fontSize: 16,
-              fontWeight: 700,
-              color: courseSubScoreTone(r.rating),
-              letterSpacing: '-0.02em',
-              lineHeight: 1,
-              ...FIGS,
-            }}
-          >
-            {r.rating.toFixed(1)}
-          </span>
-          <span style={{ ...LABEL, fontSize: 11, color: 'rgba(255,255,255,0.62)' }}>/10</span>
-        </span>
-        </span>
-
-
-
         {/* TOP RIGHT — the FEATURED mark and the reaction, side by side, badge
             outermost (CORRECTION_REVIEW_TILE_FINISHING §2.2/§2.3). The badge
             wears the SAME dark glass as the score chip so it reads as its
@@ -497,62 +454,20 @@ export function ReviewTile({
           reserving the coloured bars for 9+ is what makes them mean something.
           A null category RENDERS NO ROW; a review with no categories at all
           renders NO BLOCK and no gap. */}
-      {rows.length > 0 && resolvedTier === 'compact' && (
-        <div
-          data-testid="review-tile-breakdown"
-          style={{
-            padding: '9px 11px 10px',
-            display: 'grid',
-            gridTemplateColumns: `repeat(${rows.length}, 1fr)`,
-            gap: 6,
+      {/* SCORE ROW — the shared review score row (signed-off mock): overall
+          then each scored category, all white, centred; replaces the photo
+          score chip and the bars/figure columns. Nulls drop their cell. */}
+      <div data-testid="review-tile-breakdown" style={{ padding: isFeatured ? '10px 14px 12px' : '9px 11px 10px' }}>
+        <ReviewScoreRow
+          overall={r.rating ?? null}
+          breakdown={{
+            design: r.breakdown?.design ?? null,
+            condition: r.breakdown?.conditions ?? null,
+            clubhouse: r.breakdown?.clubhouse ?? null,
+            facilities: r.breakdown?.facilities ?? null,
           }}
-        >
-          {rows.map((row) => (
-            <div key={row.key} style={{ minWidth: 0, textAlign: 'center' }}>
-              <div
-                style={{
-                  fontSize: 14,
-                  fontWeight: 600,
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1,
-                  color: A.INK,
-                  ...FIGS,
-                }}
-              >
-                {row.value.toFixed(1)}
-              </div>
-              <div
-                style={{
-                  ...LABEL,
-                  fontSize: 11,
-                  marginTop: 4,
-                  color: A.MUTE,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {row.label}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {rows.length > 0 && resolvedTier !== 'compact' && (
-        <div
-          data-testid="review-tile-breakdown"
-          style={
-            isFeatured
-              ? { padding: '10px 14px 12px', display: 'grid', rowGap: 8 }
-              : { padding: '8px 11px 9px', display: 'grid', rowGap: 6 }
-          }
-        >
-          {rows.map((row) => (
-            <SubScoreBar key={row.key} label={row.label} score={row.value} />
-          ))}
-        </div>
-      )}
+        />
+      </div>
     </div>
 
   );
