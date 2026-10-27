@@ -781,19 +781,19 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           </div>
 
           {/* Review figures — shown, not only linked. Null sub-scores omitted. */}
-          {reviewCells.length > 0 && (
-            <div style={{ marginTop: 11, display: 'flex', gap: 15, textShadow: TEXT_SHADOW }}>
-              {reviewCells.map((c) => (
-                <div key={c.key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                  <span style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1, color: '#FFFFFF', ...TABULAR }}>
-                    {formatRatingValue(c.value)}
-                  </span>
-                  <span style={{ marginTop: 3, fontSize: 7, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: MICRO_LABEL, whiteSpace: 'nowrap' }}>
-                    {c.label}
-                  </span>
-                </div>
-              ))}
-            </div>
+          {review && (
+            <ReviewScoreRow
+              align="left"
+              textShadow={TEXT_SHADOW}
+              style={{ marginTop: 11 }}
+              overall={review.rating ?? null}
+              breakdown={{
+                design: review.breakdown?.design ?? null,
+                condition: review.breakdown?.conditions ?? null,
+                clubhouse: review.breakdown?.clubhouse ?? null,
+                facilities: review.breakdown?.facilities ?? null,
+              }}
+            />
           )}
 
           {/* Caption — measured 3-line cut + one inline CTA. Non-review posts
