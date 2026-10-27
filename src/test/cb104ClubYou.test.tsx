@@ -38,23 +38,23 @@ describe('CB104 own rounds and title', () => {
     expect(clubYouFacts(tied, 'viewer').bestCourse).toEqual(east);
   });
   it('multiple rounds include the within-club best course', () => {
-    expect(clubYouTitle(6, 72, west, 2)).toEqual({ first: "You've played here 6 times.", second: 'Your best is 72, on the West Course.' });
+    expect(clubYouTitle(6, 72, west, 2)).toEqual({ first: "You've played 6 rounds here.", second: 'Your best is 72, on the West Course.' });
   });
   it('single-course clubs omit the best course suffix', () => {
     expect(clubYouTitle(6, 72, east, 1).second).toBe('Your best is 72.');
   });
-  it('one round states once and the score, not best', () => {
-    expect(clubYouTitle(1, 84, east, 1)).toEqual({ first: "You've played here once.", second: 'You went round in 84.' });
+  it('one round says one round and the score, not best', () => {
+    expect(clubYouTitle(1, 84, east, 1)).toEqual({ first: "You've played one round here.", second: 'You went round in 84.' });
   });
   it('rounds without a best have only the first sentence', () => {
-    expect(clubYouTitle(3, null, null, 2)).toEqual({ first: "You've played here 3 times.", second: '' });
-    expect(clubYouTitle(1, null, null, 2)).toEqual({ first: "You've played here once.", second: '' });
+    expect(clubYouTitle(3, null, null, 2)).toEqual({ first: "You've played 3 rounds here.", second: '' });
+    expect(clubYouTitle(1, null, null, 2)).toEqual({ first: "You've played one round here.", second: '' });
   });
-  it('zero rounds states not played', () => {
-    expect(clubYouTitle(0, null, null, 2)).toEqual({ first: "You haven't played here yet.", second: '' });
+  it('zero rounds states no round played yet', () => {
+    expect(clubYouTitle(0, null, null, 2)).toEqual({ first: "You haven't played a round here yet.", second: '' });
   });
   it('groups large round counts with the locale', () => {
-    expect(clubYouTitle(1234, 72, east, 1).first).toBe("You've played here 1,234 times.");
+    expect(clubYouTitle(1234, 72, east, 1).first).toBe("You've played 1,234 rounds here.");
   });
 });
 

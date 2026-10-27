@@ -38,7 +38,7 @@ export function clubYouFacts(results: ClubCourseResult[], viewerId: string) {
 }
 
 export function clubYouTitle(rounds: number, best: number | null, course: BusinessClubCourse | null, courseCount: number) {
-  const first = rounds === 0 ? "You haven't played here yet." : rounds === 1 ? "You've played here once." : `You've played here ${formatNumber(rounds)} times.`;
+  const first = rounds === 0 ? "You haven't played a round here yet." : rounds === 1 ? "You've played one round here." : `You've played ${formatNumber(rounds)} rounds here.`;
   const second = rounds === 0 || best == null ? '' : rounds === 1 ? `You went round in ${formatNumber(best)}.` : `Your best is ${formatNumber(best)}${courseCount > 1 && course ? `, on the ${courseNameWithinClub(course.name)}` : ''}.`;
   return { first, second };
 }
