@@ -64,6 +64,7 @@ import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useTranslation } from 'react-i18next';
 import { A, Panel, LABEL, NUM } from '@/features/courses/components/holes/analytical/tokens';
 import { ClubHowItPlays, type BusinessClubCourse } from '@/components/business/ClubHowItPlays';
+import { ClubWhatGolfersSay } from '@/components/business/ClubWhatGolfersSay';
 import { ClubYouCard } from '@/components/business/ClubYouCard';
 import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
 import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
@@ -556,6 +557,9 @@ const BusinessProfilePage: React.FC = () => {
 
       {/* CB105 — How it plays (club-only), replaces the retired courses panel. */}
       <ClubHowItPlays isClub={isClub} courses={courses} onOpen={handleCourseOpen} onFiguresResolved={handleFiguresResolved} />
+
+      {/* CB106 — What golfers say (club-only), directly after How it plays. */}
+      <ClubWhatGolfersSay isClub={isClub} businessId={business.id} businessName={business.name} courses={courses} viewerId={user?.id} isTeamMember={!!membership} />
 
       {/* ----- Bio on canvas (no card) ----- */}
       {!isClub && bioText && (
