@@ -459,7 +459,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     const explicitTarget = params.has('review') || params.has('reviewId') || params.has('highlight')
       || pendingSheetReviewId || pendingHighlightReviewId || highlightedReviewId;
     const frame = requestAnimationFrame(() => {
-      const tabTop = reviewRoot.current?.querySelector<HTMLElement>('[data-reviews-tab-top]');
+      // The tab-top marker sits ON reviewRoot itself (querySelector would miss it).
+      const tabTop = reviewRoot.current?.hasAttribute('data-reviews-tab-top') ? reviewRoot.current : null;
       if (!explicitTarget && !tabTop) return;
       if (!explicitTarget && tabTop) {
         const tabs = reviewRoot.current?.closest('[data-course-detail]')
