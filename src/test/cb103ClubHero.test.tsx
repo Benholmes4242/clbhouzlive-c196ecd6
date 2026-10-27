@@ -75,7 +75,7 @@ vi.mock('@/components/moderation/ReportSheet', () => ({ ReportSheet: () => null 
 vi.mock('@/components/shared/AvatarLightbox', () => ({ AvatarLightbox: () => null }));
 vi.mock('@/components/common/ScrollToTopGlass', () => ({ default: () => null }));
 vi.mock('@/components/layout/PageRoot', () => ({
-  PageRoot: ({ children }: { children: React.ReactNode }) => <div data-page-root="">{children}</div>,
+  PageRoot: ({ children }: { children: ReactNode }) => <div data-page-root="">{children}</div>,
 }));
 
 import { ClubProfileHero, clubPlaceLine, clubTeamGates } from '@/components/business/hero/ClubProfileHero';
