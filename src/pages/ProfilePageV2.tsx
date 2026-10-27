@@ -43,6 +43,7 @@ import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useTranslation } from 'react-i18next';
 import { ProfileHero } from '@/components/profile/hero/ProfileHero';
+import { CoachProfileLine } from '@/features/coach/BusinessCoachCards';
 import { BandPill, BandDots } from '@/components/profile/hero/ProfileCoverBand';
 import { ProfileTopTenRail } from '@/components/profile/hero/ProfileTopTenRail';
 import { VerifiedAccountsNote } from '@/components/profile/VerifiedAccountsNote';
@@ -887,6 +888,7 @@ const ProfilePageV2Content: React.FC = () => {
           <ProfileHero
             userId={profile.id}
             viewerUserId={user?.id}
+            coachLine={<CoachProfileLine profileUserId={profile.id} viewerId={user?.id} />}
             displayName={displayName}
             avatarUrl={profile.profile_photo_url}
             coverUrl={profile.header_photo_url ?? null}

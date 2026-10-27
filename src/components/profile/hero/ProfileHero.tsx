@@ -34,7 +34,6 @@ import { HeroPill } from './HeroShell';
 import { ProfileCoverBand } from './ProfileCoverBand';
 import { HeroHandicapDisplay } from './HeroHandicapDisplay';
 import { HeroConnectExample } from './HeroConnectExample';
-import { CoachProfileLine } from '@/features/coach/BusinessCoachCards';
 
 const GREEN = INDEX_DELTA.dark.improved;
 const RED = INDEX_DELTA.dark.drifted;
@@ -70,6 +69,8 @@ interface Props {
   socialCountState?: 'ok' | 'loading' | 'error';
   coverUrl?: string | null;
   action?: React.ReactNode;
+  /** Page-owned coach read; absent preserves the standalone hero. */
+  coachLine?: React.ReactNode;
   onAvatarTap?: () => void;
   onStatTap: (stat: HeroStat) => void;
   /** Bio (null when absent or gated). Measurement state is owned by the page. */
@@ -156,6 +157,7 @@ export const ProfileHero: React.FC<Props> = ({
   socialCountState = 'ok',
   coverUrl,
   action,
+  coachLine,
   onAvatarTap,
   onStatTap,
   bio,
@@ -365,7 +367,7 @@ export const ProfileHero: React.FC<Props> = ({
         onAvatarTap={onAvatarTap}
         displayName={displayName}
         subline={subline || null}
-        afterSubline={<CoachProfileLine profileUserId={userId} viewerId={viewerUserId ?? undefined} />}
+        afterSubline={coachLine}
         onAddHomeClub={isSelf ? onEdit : undefined}
         addHomeClubLabel={t('hero.addHomeClub', 'Add your home club')}
         action={action}

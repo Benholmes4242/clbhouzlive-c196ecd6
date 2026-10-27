@@ -35,7 +35,7 @@ export function CoachNameSheet({ business, current, viewerId, open, onClose, onN
       await coachRpc<MyCoach>('name_coach', { p_business_id: business.id, p_show_on_profile: show, p_share_name: share });
       onClose(); toast.success(t('coach.namedToast', { name: business.name })); await invalidate(business.id, current?.business_id);
     } catch (error) {
-      if (String((error as { message?: string })?.message ?? error).includes('no_handicap')) { onClose(); onNoHandicap(); }
+      if (String((error as { message?: string })?.message ?? error).includes('no_handicap')) { onNoHandicap(); }
       else toast.error(t('coach.error'));
     } finally { setBusy(false); }
   };
