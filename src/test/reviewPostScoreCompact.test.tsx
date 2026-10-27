@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '', i18n: { language: 'en' } }) }));
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => <span /> }));
@@ -22,20 +21,22 @@ const card = (rating: number) => render(
   </QueryClientProvider></MemoryRouter>,
 ).container;
 
-describe('review post — B2 score below the course', () => {
-  it('the score figure is 24 / 800 / -0.045em', () => {
-    const s = card(8.2).querySelector('[data-review-score]') as HTMLElement;
-    expect(s.style.fontSize).toBe('24px');
-    expect(s.style.fontWeight).toBe('800');
-    expect(s.style.letterSpacing).toBe('-0.045em');
+describe('review post — score row below the course', () => {
+  it('the overall figure is 13.5 / 700 with no negative tracking', () => {
+    const s = card(8.2).querySelector('[data-score-cell="overall"] [data-score-figure]') as HTMLElement;
+    expect(s.style.fontSize).toBe('13.5px');
+    expect(s.style.fontWeight).toBe('700');
+    expect(s.style.letterSpacing).toBe('');
   });
-  it('the score column is text-centred inside the centred score block', () => {
+  it('the overall cell is a centred column inside the centred row', () => {
     const c = card(8.2);
-    expect((c.querySelector('[data-review-score-col]') as HTMLElement).style.textAlign).toBe('center');
-    expect((c.querySelector('[data-review-score-block]') as HTMLElement).style.alignItems).toBe('center');
+    const cell = c.querySelector('[data-score-cell="overall"]') as HTMLElement;
+    expect(cell.style.textAlign).toBe('center');
+    expect(cell.style.alignItems).toBe('center');
+    expect((c.querySelector('[data-review-score-row]') as HTMLElement).style.justifyContent).toBe('center');
   });
-  it('the score colour follows the rating: white at 9.2 and 8.2', () => {
-    expect((card(9.2).querySelector('[data-review-score]') as HTMLElement).style.color).toBe(toRgb(A.INK));
-    expect((card(8.2).querySelector('[data-review-score]') as HTMLElement).style.color).toBe(toRgb(A.INK));
+  it('the overall is white at 9.2 and 8.2', () => {
+    expect((card(9.2).querySelector('[data-score-cell="overall"] [data-score-figure]') as HTMLElement).style.color).toBe(toRgb('#FFFFFF'));
+    expect((card(8.2).querySelector('[data-score-cell="overall"] [data-score-figure]') as HTMLElement).style.color).toBe(toRgb('#FFFFFF'));
   });
 });

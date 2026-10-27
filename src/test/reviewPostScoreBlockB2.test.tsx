@@ -2,10 +2,7 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { ReviewPostCard } from '@/components/feed/ReviewPostCard';
-import { reviewLabelColor } from '@/components/shared/ReviewGhostScore';
-import { getRatingTierLabel } from '@/lib/ratingTier';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: () => <span /> }));
@@ -26,75 +23,56 @@ function card(rating: number | null, breakdown: Record<string, number | null> = 
   return { container, element, onReadReview };
 }
 
-describe('review post score block B2', () => {
-  it('moves the overall out of the subject into the open block', () => {
-    const { element } = card(9);
-    expect(element('[data-review-subject]').querySelector('[data-review-score]')).toBeNull();
-    expect(element('[data-review-score-block]').querySelector('[data-review-score]')).toBeTruthy();
+const row = (c: HTMLElement) => c.querySelector<HTMLElement>('[data-review-score-row]');
+const figs = (c: HTMLElement) => [...c.querySelectorAll<HTMLElement>('[data-score-figure]')];
+const cells = (c: HTMLElement) => [...c.querySelectorAll('[data-score-cell]')].map((n) => n.getAttribute('data-score-cell'));
+
+describe('review post score row', () => {
+  it('puts the score row below the subject, not inside it', () => {
+    const { element, container } = card(9);
+    expect(element('[data-review-subject]').querySelector('[data-review-score-row]')).toBeNull();
+    expect(row(container)).toBeTruthy();
   });
-  it('renders the overall at 24 / 800 in its rating tone with a right divider', () => {
-    const { element } = card(9);
-    const score = element('[data-review-score]');
-    expect(score.style.fontSize).toBe('24px');
-    expect(score.style.fontWeight).toBe('800');
-    expect(score.style.color).toBe(rgb(reviewLabelColor(9)));
-    expect(element('[data-review-score-col]').style.borderRightWidth).toBe('1px');
-    expect(element('[data-review-score-col]').style.borderRightStyle).toBe('solid');
-    expect(element('[data-review-score-col]').style.borderRightColor.replace(/\s/g, '')).toBe(rgb(A.TRACK).replace(/\s/g, ''));
-    expect(element('[data-review-score-block]').style.gap).toBe('14px');
-    expect(element('[data-review-score-col]').style.paddingRight).toBe('14px');
-    expect(element('[data-review-categories]').style.gridTemplateColumns).toBe('auto minmax(0, 1fr) auto minmax(0, 1fr)');
-    expect(element('[data-review-categories]').style.rowGap).toBe('8px');
-    expect(element('[data-category-label]').style.fontSize).toBe('12px');
-    expect(element('[data-category-label]').style.color).toBe(rgb(A.DIM));
-    expect(element('[data-category-label]').style.minWidth).toBe('0');
-    expect(element('[data-category-label]').style.textOverflow).toBe('ellipsis');
-    expect(element('[data-category-figure]').style.fontSize).toBe('13px');
-    expect(element('[data-category-figure]').style.textAlign).toBe('center');
+  it('pads the row 0 14px 14px like the old block and centres it with gap 15', () => {
+    const r = row(card(9).container)!;
+    expect(r.style.padding).toBe('0px 14px 14px');
+    expect(r.style.justifyContent).toBe('center');
+    expect(r.style.gap).toBe('15px');
   });
-  it('prefixes design and condition with a hidable "Course" span and full aria-labels', () => {
-    const { element } = card(9);
-    for (const [key, full] of [['design', 'Course Design'], ['condition', 'Course Condition']] as const) {
-      const label = element(`[data-category="${key}"] [data-category-label]`);
-      expect(label.getAttribute('aria-label')).toBe(full);
-      const prefix = label.querySelector('[data-label-prefix]');
-      expect(prefix?.textContent?.trim()).toBe('Course');
-    }
-    expect(element('[data-category="clubhouse"] [data-category-label]').querySelector('[data-label-prefix]')).toBeNull();
-    expect(element('[data-category="facilities"] [data-category-label]').querySelector('[data-label-prefix]')).toBeNull();
-  });
-  it('keeps a four-track grid with white 9.5 and 8.9 figures', () => {
-    const { element } = card(9);
-    expect(element('[data-review-categories]').style.gridTemplateColumns).toBe('auto minmax(0, 1fr) auto minmax(0, 1fr)');
-    expect(element('[data-category="condition"] [data-category-figure]').style.color).toBe(rgb(courseSubScoreTone(9.5)));
-    expect(element('[data-category="design"] [data-category-figure]').style.color).toBe(rgb(courseSubScoreTone(8.9)));
-  });
-  it('keeps the missing category cell with a dim dash', () => {
-    const { container, element } = card(9);
-    expect(container.querySelectorAll('[data-category]')).toHaveLength(4);
-    expect(element('[data-category="clubhouse"] [data-category-figure]').textContent).toBe('\u2014');
-    expect(element('[data-category="clubhouse"] [data-category-figure]').style.color).toBe(rgb(A.DIM));
-  });
-  it('renders categories alone with no overall or divider when rating is absent', () => {
-    const { container, element } = card(null);
+  it('drops the verdict word, the two-column grid and the divider', () => {
+    const { container } = card(9);
+    expect(container.querySelector('[data-review-tier]')).toBeNull();
+    expect(container.querySelector('[data-review-categories]')).toBeNull();
     expect(container.querySelector('[data-review-score-col]')).toBeNull();
-    expect(element('[data-review-categories]').style.flex).toBe('1');
-    expect(element('[data-review-score-block]').style.borderRight).toBe('');
+    expect(container.querySelector('[data-review-score-block]')).toBeNull();
+  });
+  it('renders white 9.5 and 8.9 figures', () => {
+    const { container } = card(9);
+    const byCell = (k: string) => container.querySelector<HTMLElement>(`[data-score-cell="${k}"] [data-score-figure]`)!;
+    expect(byCell('condition').textContent).toBe('9.5');
+    expect(byCell('condition').style.color).toBe(rgb('#FFFFFF'));
+    expect(byCell('design').textContent).toBe('8.9');
+    expect(byCell('design').style.color).toBe(rgb('#FFFFFF'));
+  });
+  it('omits a missing category instead of drawing a dash', () => {
+    const { container } = card(9);
+    expect(cells(container)).toEqual(['overall', 'design', 'condition', 'facilities']);
+    expect(container.textContent).not.toContain('\u2014');
+  });
+  it('renders categories alone when rating is absent', () => {
+    expect(cells(card(null).container)).toEqual(['design', 'condition', 'facilities']);
   });
   it('renders only the overall when categories are absent', () => {
     const { container } = card(8, {});
-    expect(container.querySelector('[data-review-score]')).toBeTruthy();
-    expect(container.querySelector('[data-review-categories]')).toBeNull();
+    expect(cells(container)).toEqual(['overall']);
+    expect(figs(container)[0].textContent).toBe('8.0');
   });
-  it('renders no score block when both are absent', () => {
-    expect(card(null, {}).container.querySelector('[data-review-score-block]')).toBeNull();
+  it('renders no score row when both are absent', () => {
+    expect(row(card(null, {}).container)).toBeNull();
   });
-  it('preserves verdict navigation and its accessible score label at 9px', () => {
+  it('keeps the full-review CTA as the way into the review', () => {
     const { element, onReadReview } = card(9);
-    const button = element('[data-review-tier] button');
-    expect(button.getAttribute('aria-label')).toBe(`9.0 ${getRatingTierLabel(9)}`);
-    expect(element('[data-review-tier] span').style.fontSize).toBe('9px');
-    fireEvent.click(button);
+    fireEvent.click(element('[data-review-cta]'));
     expect(onReadReview).toHaveBeenCalledTimes(1);
   });
 });
