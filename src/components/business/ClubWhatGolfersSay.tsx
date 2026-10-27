@@ -65,8 +65,7 @@ function LatestReview({ review, courses, onOpen }: {
             background: T.chip, color: T.ink, ...TAB }}>{review.rating.toFixed(1)}</span>
         )}
       </div>
-      <p data-club-say-text style={{ fontSize: 13.5, lineHeight: 1.5, color: T.body, margin: '8px 0 0',
-        display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+      <p data-club-say-text className="club-say-clamp" style={{ fontSize: 13.5, lineHeight: 1.5, color: T.body, margin: '8px 0 0' }}>
         {review.review}
       </p>
       {meta && <small style={{ display: 'block', fontSize: 12, color: T.dim, marginTop: 6 }}>{meta}</small>}
