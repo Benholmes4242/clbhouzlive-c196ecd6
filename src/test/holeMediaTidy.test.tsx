@@ -75,8 +75,7 @@ describe('HOLE_MEDIA_TIDY hole walk panel', () => {
     expect(chosen).toEqual([7]);
   });
   it('an empty hole keeps "Add the first" and never shows the more button', () => {
-    render(<HoleWalk available holes={[hole(7)]} rows={[]} totalMedia={0} onAddFirst={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));
+    render(<HoleWalk available holes={[hole(1), hole(7)]} rows={[row(1)]} focus={{ hole: 7, id: '', nonce: 1 }} totalMedia={1} onAddFirst={() => {}} />);
     expect(screen.getByRole('button', { name: 'Add the first' })).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Add a photo or video' })).toBeNull();
   });

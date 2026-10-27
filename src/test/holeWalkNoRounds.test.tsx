@@ -17,6 +17,7 @@ vi.mock('@/components/course-media-tab/hooks/useCourseMedia', () => ({ useCourse
 vi.mock('@/uploads/hooks/useMediaUpload', () => ({ useMediaUpload: () => ({ upload: vi.fn() }) }));
 vi.mock('@/components/course-media-tab/CourseMediaCanonGrid', () => ({ CourseMediaCanonGrid: () => null }));
 vi.mock('@/components/course-media-tab/CourseMediaHeader', () => ({ CourseMediaHeader: () => null }));
+vi.mock('@/components/course-media-tab/hooks/useCoursePlaceMedia', () => ({ useCoursePlaceMedia: () => ({ tags: { data: [], isSuccess: true } }) }));
 vi.mock('@/components/common/ScrollToTopGlass', () => ({ default: () => null }));
 
 import { courseWalkHoles, deriveHoleWalk, UNSCORED_HOLE_COUNT } from '@/lib/courseMedia/holeWalk';
@@ -73,15 +74,15 @@ describe('BRIEF_HOLE_WALK_NO_ROUNDS', () => {
     expect(panel.querySelector('.hole-walk-kicker')?.textContent).toBe('The fourth');
     expect(document.querySelector('.hole-walk-quiet')).toBeNull();
   });
-  it('unselected unscored walk shows the exact quiet line without a field-loses claim', () => {
+  it('unselected unscored rail omits the retired quiet line and field-loses claim', () => {
     const view = render(<HoleWalk available scored={false} holes={unscored()} rows={f.rows} totalMedia={8} onAddFirst={() => {}} />);
-    expect(view.container.querySelector('.hole-walk-quiet')?.textContent).toBe(quiet);
+    expect(view.container.querySelector('.hole-walk-quiet')).toBeNull();
     expect(view.container.textContent).not.toMatch(/field loses/i);
   });
-  it('quiet line remains when every unscored hole is photographed and observation is absent', () => {
+  it('fully photographed unscored rail omits retired quiet copy and observation', () => {
     const view = render(<HoleWalk available scored={false} holes={unscored()} rows={numbers.map(n => photo(n))} totalMedia={18} onAddFirst={() => {}} />);
     expect(view.container.querySelector('.hole-walk-observation')).toBeNull();
-    expect(view.container.querySelector('.hole-walk-quiet')?.textContent).toBe(quiet);
+    expect(view.container.querySelector('.hole-walk-quiet')).toBeNull();
   });
   it('omitted scored prop preserves the existing panel title and stats without quiet copy', () => {
     const view = render(<HoleWalk available holes={[hole(4)]} rows={[photo(4)]} totalMedia={1} onAddFirst={() => {}} />);
@@ -91,9 +92,10 @@ describe('BRIEF_HOLE_WALK_NO_ROUNDS', () => {
     expect(panel.querySelector('.hole-walk-stats')).not.toBeNull(); expect(panel).not.toHaveClass('hole-walk-panel-unscored');
     expect(view.container.querySelector('.hole-walk-quiet')).toBeNull();
   });
-  it('Media with photos and empty available analysis renders eighteen walk tiles and enables known holes', () => {
+  it('Media with photos and empty analysis renders four shot cards and eighteen coverage segments', () => {
     const view = mountTab();
-    expect(view.container.querySelectorAll('.hole-walk-tile')).toHaveLength(18);
+    expect(view.container.querySelectorAll('.media-v2-hole-card')).toHaveLength(4);
+    expect(view.container.querySelectorAll('.media-v2-coverage button')).toHaveLength(18);
     expect(f.known).toHaveBeenLastCalledWith(numbers);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
     expect(screen.getByRole('region', { name: 'Hole 4' })).toHaveClass('hole-walk-panel-unscored');
@@ -114,6 +116,6 @@ describe('BRIEF_HOLE_WALK_NO_ROUNDS', () => {
     const panel = screen.getByRole('region', { name: 'Hole 4' });
     expect(panel).not.toHaveClass('hole-walk-panel-unscored'); expect(panel.querySelector('.hole-walk-stats')).not.toBeNull();
     expect(panel.querySelector('.hole-walk-title')?.textContent).toBe('Par 4 · 412 yards');
-    expect(view.container.querySelectorAll('.hole-walk-tile')).toHaveLength(1); expect(f.known).toHaveBeenLastCalledWith([4]);
+    expect(view.container.querySelectorAll('.media-v2-hole-card')).toHaveLength(1); expect(f.known).toHaveBeenLastCalledWith([4]);
   });
 });
