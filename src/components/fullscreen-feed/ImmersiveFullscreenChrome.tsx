@@ -44,6 +44,7 @@
  * NO fade-on-idle. NO score eyebrow. The header chip and, on reviews, the
  * figures row under the author line are the only score surfaces.
  */
+import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
 import React, { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ChevronLeft, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX } from 'lucide-react';
 import { ReactionGlyph, AMBER, reactionKindFor } from '@/lib/reactionKind';
@@ -93,10 +94,6 @@ const META_STRONG = 'rgba(255,255,255,0.78)';
 const MICRO_LABEL = 'rgba(255,255,255,0.50)';
 const FIG: React.CSSProperties = { color: '#FFFFFF', fontWeight: 700 };
 const TABULAR: React.CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nums' };
-const BREAKDOWN_CELLS = [
-  ['design', 'DESIGN'], ['conditions', 'CONDITION'],
-  ['clubhouse', 'CLUBHOUSE'], ['facilities', 'FACILITIES'],
-] as const;
 
 function formatCount(n: number | null | undefined): string | null {
   if (n === null || n === undefined || n === 0) return null;
@@ -533,16 +530,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   }
   if (timeLabel) authorMeta.push(<span key="t" style={{ flexShrink: 0 }}>{timeLabel}</span>);
 
-  // Review figures: overall, golfers, then each filled-in sub-score.
   const review = activePost.isReview ? activePost.review : null;
-  const reviewCells: { key: string; value: number; label: string }[] = [];
-  if (review) {
-    if (review.rating != null) reviewCells.push({ key: 'r', value: Number(review.rating), label: 'OVERALL' });
-    for (const [field, label] of BREAKDOWN_CELLS) {
-      const v = review.breakdown?.[field];
-      if (v != null) reviewCells.push({ key: field, value: Number(v), label });
-    }
-  }
 
   const handleCourseTap = () => {
     const cid = shotCourse?.courseId ?? activePost.review?.courseId ?? golfCourse?.id ?? activePost.courseId;
@@ -781,19 +769,19 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           </div>
 
           {/* Review figures — shown, not only linked. Null sub-scores omitted. */}
-          {reviewCells.length > 0 && (
-            <div style={{ marginTop: 11, display: 'flex', gap: 15, textShadow: TEXT_SHADOW }}>
-              {reviewCells.map((c) => (
-                <div key={c.key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                  <span style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1, color: '#FFFFFF', ...TABULAR }}>
-                    {formatRatingValue(c.value)}
-                  </span>
-                  <span style={{ marginTop: 3, fontSize: 7, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: MICRO_LABEL, whiteSpace: 'nowrap' }}>
-                    {c.label}
-                  </span>
-                </div>
-              ))}
-            </div>
+          {review && (
+            <ReviewScoreRow
+              align="left"
+              textShadow={TEXT_SHADOW}
+              style={{ marginTop: 11 }}
+              overall={review.rating ?? null}
+              breakdown={{
+                design: review.breakdown?.design ?? null,
+                condition: review.breakdown?.conditions ?? null,
+                clubhouse: review.breakdown?.clubhouse ?? null,
+                facilities: review.breakdown?.facilities ?? null,
+              }}
+            />
           )}
 
           {/* Caption — measured 3-line cut + one inline CTA. Non-review posts

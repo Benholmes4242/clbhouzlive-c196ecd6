@@ -49,15 +49,18 @@ describe('REVIEWS_STATE_2', () => {
     fixture.rows = [review];
     const { container } = tab();
     expect(container.querySelector('[data-reviews-state="one"]')).not.toBeNull();
-    expect(container.querySelectorAll('[data-review-score]')).toHaveLength(1);
+    expect(container.querySelectorAll('[data-score-cell="overall"] [data-score-figure]')).toHaveLength(1);
     expect(container.querySelectorAll('[role="progressbar"], [data-category-bar], [data-distribution]')).toHaveLength(0);
     expect(container.querySelectorAll('[data-community-score]')).toHaveLength(1);
   });
-  it('overall score has one prominent home on the rater row', () => {
+  it('overall score has one home, the score row directly under the rater row', () => {
     const { container } = single();
     const row = container.querySelector('[data-rater-row]');
-    expect(row?.querySelector('[data-review-score]')?.textContent).toBe('10.0');
-    expect(container.querySelectorAll('[data-review-score]')).toHaveLength(1);
+    expect(row?.querySelector('[data-score-figure]')).toBeNull();
+    const scores = row?.nextElementSibling;
+    expect(scores?.hasAttribute('data-review-score-row')).toBe(true);
+    expect(scores?.querySelector('[data-score-cell="overall"] [data-score-figure]')?.textContent).toBe('10.0');
+    expect(container.querySelectorAll('[data-score-cell="overall"] [data-score-figure]')).toHaveLength(1);
   });
   it('zero tracked rounds omits the played-here clause', () => {
     const { container } = single(review, { ...context, roundsHere: 0 });

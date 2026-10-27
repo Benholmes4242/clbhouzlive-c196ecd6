@@ -102,24 +102,31 @@ describe('calibration strip', () => {
   });
 });
 
-describe('category ticks', () => {
-  it('ticks and key line at three or more ratings', () => {
+describe('score row', () => {
+  const row = () => document.body.querySelector('[data-review-score-row]') as HTMLElement;
+  it('sits below the comparison cards at three or more ratings, with no header overall, bars, ticks or key line', () => {
     sheet({ count: 3, reviewerAvg: 7.6 });
-    expect(q('[data-review-subscore-tick]').length).toBe(4);
-    expect(q('[data-review-subscore-key]').length).toBe(1);
-  });
-  it.each([1, 2])('no ticks and no key line at %i rating(s)', (n) => {
-    sheet({ count: n, reviewerAvg: 7.6 });
+    const cal = document.body.querySelector('[data-review-calibration]')!;
+    expect(cal.compareDocumentPosition(row()) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect([...row().querySelectorAll('[data-score-figure]')].map((n) => n.textContent)).toEqual(['8.3', '8.8', '8.7', '8.4', '6.5']);
+    expect(q('[data-review-rating]').length).toBe(0);
     expect(q('[data-review-subscore-tick]').length).toBe(0);
     expect(q('[data-review-subscore-key]').length).toBe(0);
-    expect(q('[data-review-subscore-track]').length).toBe(4);
+    expect(q('[data-review-subscore-track]').length).toBe(0);
   });
-  it('a null category shows an em dash and no track', () => {
+  it.each([1, 2])('no bars and no ticks at %i rating(s); the first-rating note follows the row only at one', (n) => {
+    sheet({ count: n, reviewerAvg: 7.6 });
+    expect(q('[data-review-subscore-track]').length).toBe(0);
+    expect(q('[data-review-subscore-tick]').length).toBe(0);
+    const note = document.body.querySelector('[data-review-subscore-first]');
+    if (n === 1) expect(row().nextElementSibling).toBe(note);
+    else expect(note).toBeNull();
+  });
+  it('a null category drops its cell', () => {
     sheet({ count: 3, reviewerAvg: 7.6, breakdown: { ...FULL, clubhouse: null } });
-    const club = document.body.querySelector('[data-review-subscore="clubhouse"]')!;
-    expect(club.textContent).toContain('\u2014');
-    expect(club.querySelector('[data-review-subscore-track]')).toBeNull();
-    expect(q('[data-review-subscore-track]').length).toBe(3);
+    expect([...row().querySelectorAll('[data-score-cell]')].map((n) => n.getAttribute('data-score-cell')))
+      .toEqual(['overall', 'design', 'condition', 'facilities']);
+    expect(row().textContent).not.toContain('\u2014');
   });
 });
 

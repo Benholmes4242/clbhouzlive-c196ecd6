@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { REVIEW_BODY_CLAMP, REVIEW_CARD_MAX_HEIGHT, REVIEW_COURSE_CLAMP, joinClauses } from '@/components/feed/reviewPostCard';
 
 vi.mock('react-i18next', () => ({
@@ -36,31 +35,25 @@ function card(rating: number, breakdown: Record<string, number | null>, text = '
 const all = { design: 9, conditions: 8.9, clubhouse: 7, facilities: 6 };
 
 describe('review post — R.2 score colour', () => {
-  it('9.0 renders white for the figure, the tier word and a category', () => {
+  it('9.0 renders white for the overall and a category, with no tier word', () => {
     const c = card(9, all);
-    expect((c.querySelector('[data-review-score]') as HTMLElement).style.color).toBe(toRgb(A.INK));
-    expect((c.querySelector('[data-review-tier] span') as HTMLElement).style.color).toBe(toRgb(A.INK));
-    const design = c.querySelector('[data-category="design"] [data-category-figure]') as HTMLElement;
-    expect(design.style.color).toBe(toRgb(A.INK));
+    expect((c.querySelector('[data-score-cell="overall"] [data-score-figure]') as HTMLElement).style.color).toBe(toRgb('#FFFFFF'));
+    expect(c.querySelector('[data-review-tier]')).toBeNull();
+    expect((c.querySelector('[data-score-cell="design"] [data-score-figure]') as HTMLElement).style.color).toBe(toRgb('#FFFFFF'));
   });
-  it('8.9 renders white for the figure, the tier word and a category', () => {
+  it('8.9 renders white for the overall and a category, with no tier word', () => {
     const c = card(8.9, all);
-    expect((c.querySelector('[data-review-score]') as HTMLElement).style.color).toBe(toRgb(A.INK));
-    expect((c.querySelector('[data-review-tier] span') as HTMLElement).style.color).toBe(toRgb(A.INK));
-    const cond = c.querySelector('[data-category="condition"] [data-category-figure]') as HTMLElement;
-    expect(cond.style.color).toBe(toRgb(A.INK));
+    expect((c.querySelector('[data-score-cell="overall"] [data-score-figure]') as HTMLElement).style.color).toBe(toRgb('#FFFFFF'));
+    expect(c.querySelector('[data-review-tier]')).toBeNull();
+    expect((c.querySelector('[data-score-cell="condition"] [data-score-figure]') as HTMLElement).style.color).toBe(toRgb('#FFFFFF'));
   });
 });
 
 describe('review post — categories', () => {
-  // B2 explicitly replaces the feed-only empty-cell rule; shared course grids stay unchanged.
-  it('an unscored category renders a dash and the grid keeps four cells in two columns', () => {
+  it('an unscored category drops its cell and the rest keep their order', () => {
     const c = card(8, { ...all, clubhouse: null });
-    expect(c.querySelectorAll('[data-category]').length).toBe(4);
-    expect((c.querySelector('[data-review-categories]') as HTMLElement).style.gridTemplateColumns).toBe('auto minmax(0, 1fr) auto minmax(0, 1fr)');
-    const club = c.querySelector('[data-category="clubhouse"]') as HTMLElement;
-    expect(club.querySelector('[data-category-score]')).toBeNull();
-    expect(club.querySelector('[data-category-figure]')?.textContent).toBe('\u2014');
+    expect([...c.querySelectorAll('[data-score-cell]')].map((n) => n.getAttribute('data-score-cell')))
+      .toEqual(['overall', 'design', 'condition', 'facilities']);
   });
 });
 
@@ -105,7 +98,7 @@ describe('review post — one home', () => {
     const c = card(8, all, 'Words', { review: null, caption: 'Body text', courseRating: 7 });
     expect(c.querySelector('[data-review-post-card]')).toBeTruthy();
     expect(c.querySelector('[data-review-course]')).toBeNull();
-    expect(c.querySelector('[data-review-score]')).toBeNull();
+    expect(c.querySelector('[data-review-score-row]')).toBeNull();
     expect(c.querySelector('[data-review-body]')?.textContent).toContain('Body text');
   });
 });

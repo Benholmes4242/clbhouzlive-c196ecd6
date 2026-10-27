@@ -6,10 +6,7 @@
  * shared footer as slots, so likes, comments, sharing, the owner menu and
  * the fullscreen viewer keep exactly their existing paths.
  *
- * Every score colour resolves through the app's helpers: the overall figure
- * and tier word through reviewLabelColor / ReviewVerdictLabel, every category
- * through courseSubScoreTone. Green at 9.0 and above, mute below.
- * B2: the feed owns its open two-column score layout and missing-value dashes;
+ * Scores render through the shared ReviewScoreRow (all white, centred);
  * shared CategoryScores remains unchanged for course surfaces.
  */
 import { CourseNameLink } from '@/components/shared/CourseNameLink';
@@ -18,10 +15,8 @@ import { useTranslation } from 'react-i18next';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
-import { ReviewVerdictLabel, reviewLabelColor } from '@/components/shared/ReviewGhostScore';
-import { A, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
-import { formatRatingValue } from '@/utils/formatters';
-import { getRatingTierLabel } from '@/lib/ratingTier';
+import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { CARD, LINE, T100, T60, T40 } from './feedTokens';
 import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, REVIEW_COURSE_CLAMP } from './reviewPostCard';
@@ -29,13 +24,6 @@ import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, REV
 const GUTTER = 14;
 const NAME_SIZE = 15;
 const NAME_LINE = 1.25;
-const SCORE_ORDER = ['design', 'condition', 'clubhouse', 'facilities'] as const;
-const SCORE_LABELS = { design: 'Course Design', condition: 'Course Condition', clubhouse: 'Clubhouse', facilities: 'Facilities' };
-/* The "Course " prefix hides below a 260px categories container (container
-   query, never JS); the aria-label keeps the full words for screen readers. */
-const LABEL_PREFIX = 'Course ';
-const PREFIXED_KEYS = new Set<string>(['design', 'condition']);
-const LABEL_PREFIX_QUERY = `@container (width < 260px) { [data-review-categories] [data-label-prefix] { display: none; } }`;
 
 
 const COURSE_NAME_STYLE: React.CSSProperties = {
@@ -89,7 +77,6 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
     clubhouse: review?.breakdown?.clubhouse ?? null,
     facilities: review?.breakdown?.facilities ?? null,
   };
-  const anyScore = Object.values(scores).some((v) => v != null);
   const body = review?.reviewText || post.caption || '';
 
   return (
@@ -162,56 +149,8 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         </div>
       </div>
 
-      {/* D — Sizes match the course card score block (BRIEF_COURSE_CARD_SCORE_BLOCK option B): overall 24, labels 12 (the location line's treatment, BRIEF_REVIEW_POST_CATEGORY_LABELS), figures 13, gaps 14 / 16 / 8. Each half drops independently. */}
-      {rating != null || anyScore ? (
-        <div data-review-score-block style={{ flex: 'none', padding: `0 ${GUTTER}px 14px`, display: 'flex', alignItems: 'center', gap: 14 }}>
-        {rating != null ? (
-        <div data-review-score-col style={{ flex: '0 0 auto', paddingRight: 14, borderRight: `1px solid ${A.TRACK}`, textAlign: 'center' }}>
-          <div
-            data-review-score
-            className="tabular-nums"
-            style={{ ...FIGS, fontSize: 24, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.045em', color: reviewLabelColor(rating) }}
-          >
-            {formatRatingValue(rating)}
-          </div>
-          <div data-review-tier style={{ marginTop: 5, lineHeight: 1 }}>
-            <ReviewVerdictLabel
-              rating={rating}
-              fontSize={9}
-              onClick={onReadReview}
-              ariaLabel={`${formatRatingValue(rating)} ${getRatingTierLabel(rating)}`}
-            />
-          </div>
-        </div>
-        ) : null}
-        {anyScore ? (
-          <div data-review-categories style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: 'auto minmax(0, 1fr) auto minmax(0, 1fr)', columnGap: 0, rowGap: 8, alignItems: 'baseline', containerType: 'inline-size' }}>
-            <style>{LABEL_PREFIX_QUERY}</style>
-            {SCORE_ORDER.map((key) => {
-              const value = scores[key];
-              const label = SCORE_LABELS[key];
-              const prefixed = PREFIXED_KEYS.has(key);
-              // Option B: display:contents wrapper so label and figure are direct grid cells.
-              return (
-                <div key={key} data-category={key} style={{ display: 'contents' }}>
-                  <span
-                    data-category-label
-                    aria-label={label}
-                    style={{ fontSize: 12, lineHeight: 1.2, color: A.DIM, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                  >
-                    {prefixed ? <span data-label-prefix>{LABEL_PREFIX}</span> : null}
-                    {prefixed ? label.slice(LABEL_PREFIX.length) : label}
-                  </span>
-                  <span data-category-figure data-category-score={value == null ? undefined : value.toFixed(1)} className="tabular-nums" style={{ ...FIGS, fontSize: 13, fontWeight: 700, textAlign: 'center', paddingLeft: 8, paddingRight: 8, whiteSpace: 'nowrap', color: value == null ? A.DIM : courseSubScoreTone(value) }}>
-                    {value == null ? '\u2014' : value.toFixed(1)}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        ) : null}
-        </div>
-      ) : null}
+      {/* D — the shared review score row (signed-off mock), padded like the old block. */}
+      <ReviewScoreRow overall={rating} breakdown={scores} style={{ flex: 'none', padding: `0 ${GUTTER}px 14px` }} />
 
       {/* E — the words at the caption's size. Padding lives on the wrapper,
           never on the clamped box (a padded -webkit-box bleeds a third line). */}

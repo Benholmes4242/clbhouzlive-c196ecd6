@@ -21,9 +21,9 @@
 import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import { ThumbsUp, MoreHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
-import { A, SANS, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
+import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { formatRatingValue } from '@/utils/formatters';
 import { MentionText } from '@/components/mentions/MentionText';
 import { ReviewMediaStrip } from '@/components/courses/review/ReviewMediaStrip';
 
@@ -55,49 +55,20 @@ export const formatReviewDate = (dateString?: string | null) => {
   return `${years} ${years === 1 ? 'year' : 'years'} ago`;
 };
 
-/** §4b — the four category figures as one quiet mid-dot line. */
-const CATEGORY_KEYS: { key: keyof CourseReview; label: string }[] = [
-  { key: 'design_score', label: 'Design' },
-  { key: 'condition_score', label: 'Condition' },
-  { key: 'clubhouse_score', label: 'Clubhouse' },
-  { key: 'facilities_score', label: 'Facilities' },
-];
-
-export const CategoryLine: React.FC<{ review: CourseReview }> = ({ review }) => {
-  const items = CATEGORY_KEYS
-    .map((c) => ({ label: c.label, value: review[c.key] as number | null | undefined }))
-    .filter((c) => c.value !== null && c.value !== undefined);
-  if (items.length === 0) return null;
-
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'baseline',
-        gap: 6,
-        fontSize: 11,
-        color: A.DIM,
-        marginTop: 8,
-      }}
-    >
-      {items.map((item, i) => {
-        const value = Number(item.value);
-        return (
-          <React.Fragment key={item.label}>
-            {i > 0 && <span aria-hidden="true" style={{ color: A.DIM }}>·</span>}
-            <span>
-              {item.label}{' '}
-              <span style={{ ...FIGS, color: courseSubScoreTone(value), fontWeight: 700 }}>
-                {formatRatingValue(value)}
-              </span>
-            </span>
-          </React.Fragment>
-        );
-      })}
-    </div>
-  );
-};
+/** §4b — the review's overall and four categories as the shared score row
+ *  (signed-off review-score-row mock), under the reviewer line. */
+export const CategoryLine: React.FC<{ review: CourseReview }> = ({ review }) => (
+  <ReviewScoreRow
+    style={{ marginTop: 12 }}
+    overall={review.rating ?? null}
+    breakdown={{
+      design: review.design_score ?? null,
+      condition: review.condition_score ?? null,
+      clubhouse: review.clubhouse_score ?? null,
+      facilities: review.facilities_score ?? null,
+    }}
+  />
+);
 
 /** §4d — the SHARED strip, extended additively: four equal-width tiles, 66px. */
 const PhotoStrip: React.FC<{
@@ -156,9 +127,6 @@ export const FlatReviewRow: React.FC<FlatReviewRowProps> = ({
   const { t: tCommon } = useTranslation('common');
   const [expanded, setExpanded] = useState(false);
   const name = isMine ? 'You' : displayName;
-  const score = review.rating ?? 0;
-  // Ownership stays on the name; every real rating figure is white.
-  const scoreColor = courseSubScoreTone(score);
   const helpfulCount = review.helpful_count ?? 0;
 
   const stripped = review.review ? stripMentionMarkup(review.review) : '';
@@ -205,12 +173,9 @@ export const FlatReviewRow: React.FC<FlatReviewRowProps> = ({
           </div>
         </div>
 
-        <span style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: scoreColor, ...FIGS }}>
-          {formatRatingValue(score)}
-        </span>
       </div>
 
-      {/* b) the quiet category line */}
+      {/* b) the shared review score row */}
       <CategoryLine review={review} />
 
       {/* c) the prose */}

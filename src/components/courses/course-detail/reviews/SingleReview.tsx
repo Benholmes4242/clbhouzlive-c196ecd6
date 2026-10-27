@@ -16,7 +16,6 @@ import { useSingleReviewContext } from '@/hooks/useSingleReviewContext';
 import { calibrationFacts, isSingleReview, reviewPlayedMonth, type RaterContext } from '@/lib/reviews/singleReview';
 import { SURFACE } from '@/lib/tokens/surface';
 import { MEMBER_PANEL, INK_ON_LIGHT, inkWithAlpha } from '@/lib/tokens/surfaces';
-import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { SC_BOGEY_DARK } from '@/features/courses/components/holes/_constants';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
@@ -103,7 +102,6 @@ export function RaterReviewRow({ review, context, playedMonth, onMediaClick, fla
             {contextItems.map((item, index) => <React.Fragment key={index}>{index > 0 && ' · '}{item}</React.Fragment>)}
           </div>}
         </div>
-        <strong data-review-score style={{ flexShrink: 0, color: flat ? SURFACE.dark.ink : MEDAL_GOLD, fontSize: 19, fontWeight: 800, lineHeight: 1.2, ...FIGS }}>{review.rating?.toFixed(1)}</strong>
       </div>
       <CategoryLine review={review} />
       {review.review?.trim() && <MentionText as="p" text={review.review} style={{ color: SURFACE.dark.body, fontSize: 13, lineHeight: 1.5, margin: '10px 0 0', overflowWrap: 'anywhere' }} />}

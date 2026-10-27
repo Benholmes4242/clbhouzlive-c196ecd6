@@ -12,9 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
 import { formatMonthDayYearShort } from '@/i18n/format';
-import {
-  SubScoreBar,
-} from '@/features/courses/_shared/scoreBands';
+import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
 import { MentionText } from '@/components/mentions/MentionText';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import {
@@ -48,21 +46,11 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
   const dateValue = rating.updated_at || rating.created_at;
   const dateLabel = formatMonthDayYearShort(new Date(dateValue));
 
-  const categories = [
-    { key: 'design', labelKey: 'review.subscore.design', score: rating.design_score },
-    { key: 'condition', labelKey: 'review.subscore.condition', score: rating.condition_score },
-    { key: 'clubhouse', labelKey: 'review.subscore.clubhouse', score: rating.clubhouse_score },
-    { key: 'facilities', labelKey: 'review.subscore.facilities', score: rating.facilities_score },
-  ].filter(
-    (c): c is { key: string; labelKey: string; score: number } => c.score !== null,
-  );
-
   const hasCommunity = communityAverage != null && communityAverage > 0;
 
   // Three-state comparison, unchanged: |diff| < 0.2 reads level, not "+0.1".
-  const items: StatItem[] = [
-    { label: t('courseDetail.you.yours'), value: rating.rating.toFixed(1), tone: courseSubScoreTone(rating.rating) },
-  ];
+  // The member's own overall now lives in ReviewScoreRow; the strip keeps the comparisons.
+  const items: StatItem[] = [];
   if (hasCommunity) {
     const avg = communityAverage as number;
     items.push({
@@ -90,22 +78,17 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
       title={t('courseDetail.you.yourRating')}
       aside={t('phase5.personalReview.reviewedOn', { date: dateLabel })}
     >
-      <StatRow items={items} style={{ marginBottom: categories.length > 0 ? 20 : 0 }} />
-
-      {categories.length > 0 && (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-            columnGap: 18,
-            rowGap: 10,
-          }}
-        >
-          {categories.map((cat) => (
-            <SubScoreBar key={cat.key} label={t(cat.labelKey)} score={cat.score} />
-          ))}
-        </div>
-      )}
+      {/* The shared review score row (signed-off mock): overall plus categories. */}
+      <ReviewScoreRow
+        overall={rating.rating ?? null}
+        breakdown={{
+          design: rating.design_score ?? null,
+          condition: rating.condition_score ?? null,
+          clubhouse: rating.clubhouse_score ?? null,
+          facilities: rating.facilities_score ?? null,
+        }}
+      />
+      {items.length > 0 && <StatRow items={items} style={{ marginTop: 20 }} />}
 
       {review && (
         <>

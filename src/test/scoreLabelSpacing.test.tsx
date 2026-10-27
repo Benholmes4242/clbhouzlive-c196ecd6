@@ -71,7 +71,7 @@ describe('BRIEF_SCORE_LABEL_SPACING — review post overall score', () => {
     },
   } as never;
 
-  it('places the review post tier word at the 5px gap (superseded by BRIEF_REVIEW_POST_SCORE_MATCH_CARDS)', () => {
+  it('the review post carries no tier word; its overall label sits 3px under the figure', () => {
     const { container } = render(
       <MemoryRouter>
         <QueryClientProvider client={new QueryClient()}>
@@ -86,8 +86,9 @@ describe('BRIEF_SCORE_LABEL_SPACING — review post overall score', () => {
         </QueryClientProvider>
       </MemoryRouter>,
     );
-    const tier = container.querySelector<HTMLElement>('[data-review-tier]');
-    expect(tier).not.toBeNull();
-    expect(tier?.style.marginTop).toBe('5px');
+    expect(container.querySelector('[data-review-tier]')).toBeNull();
+    const label = container.querySelector<HTMLElement>('[data-score-cell="overall"] [data-score-label]');
+    expect(label).not.toBeNull();
+    expect(label?.style.marginTop).toBe('3px');
   });
 });

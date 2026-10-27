@@ -57,7 +57,10 @@ describe('C1 course rating consistency', () => {
     expect(course).toContain('data-community-score');
     expect(reviews).toContain('courseSubScoreTone(score)');
     expect(block).toContain('const tone = courseSubScoreTone(score)');
-    expect(card).toContain('const ratingColor = courseSubScoreTone(rating)');
+    /* Review score row brief: the sheet's single-review overall moved into the
+       shared all-white ReviewScoreRow; aggregate headlines keep the helper. */
+    expect(card).toContain('<ReviewScoreRow');
+    expect(card).not.toContain('courseSubScoreTone(rating)');
   });
 
   it('keeps category figures white through one helper', () => {
@@ -70,7 +73,8 @@ describe('C1 course rating consistency', () => {
     expect(block).toContain("const tone = courseSubScoreTone(value)");
     expect(block).toContain("Math.min(100, (value / 10) * 100)");
     expect(reviews).not.toContain('courseSubScoreTone');
-    expect(row).toContain('courseSubScoreTone(value)');
+    expect(row).toContain('<ReviewScoreRow');
+    expect(row).not.toContain('courseSubScoreTone');
     expect(browse).not.toContain('courseSubScoreTone');
     expect(browse).not.toContain('COURSE_RATING_THEMES');
     expect(browse).not.toContain('getRatingTier');
@@ -101,15 +105,11 @@ describe('C1 course rating consistency', () => {
   it('routes every C3 display caller through the canonical helper', () => {
     const files = [
       'src/components/courses/ReviewRailSlot.tsx',
-      'src/components/courses/ReviewFeaturedSlot.tsx',
       'src/components/courses/CourseCommunityRating.tsx',
       'src/components/courses/CourseSearchSheet.tsx',
       'src/components/business/hero/BusinessProfileHero.tsx',
       'src/components/courses/course-detail/CategoryScores.tsx',
       'src/components/courses/phase5/PersonalReviewCard.tsx',
-      'src/components/courses/review/ReviewBlockFlat.tsx',
-      'src/components/explore-tab-new/courseled/ReviewTile.tsx',
-      'src/components/posts/ReviewBottomSheet.tsx',
       'src/components/top100/Top100CourseStatsPanel.tsx',
       'src/pages/BusinessReviewsPage.tsx',
     ].map(src);
@@ -118,6 +118,18 @@ describe('C1 course rating consistency', () => {
       expect(file).toContain('courseSubScoreTone');
       expect(file).not.toContain('bandColorOnDark(');
     }
+    /* Single-review surfaces route through the shared all-white score row. */
+    const single = [
+      'src/components/courses/ReviewFeaturedSlot.tsx',
+      'src/components/courses/review/ReviewBlockFlat.tsx',
+      'src/components/explore-tab-new/courseled/ReviewTile.tsx',
+      'src/components/posts/ReviewBottomSheet.tsx',
+    ].map(src);
+    for (const file of single) {
+      expect(file).toContain('<ReviewScoreRow');
+      expect(file).not.toContain('bandColorOnDark(');
+    }
+    expect(src('src/components/shared/ReviewScoreRow.tsx')).toContain("color: '#FFFFFF'");
   });
 
   it('uses the canonical tone for shared display bars without changing geometry', () => {
@@ -135,7 +147,8 @@ describe('C1 course rating consistency', () => {
     /* CRM1.9: the rule was not withdrawn, the surface changed — viewing-member
        amber now lives in the YOU pill beside the community figure. */
     expect(about).toContain('data-viewer-delta');
-    expect(rows).toContain('const scoreColor = courseSubScoreTone(score)');
+    expect(rows).toContain('<CategoryLine review={review} />');
+    expect(rows).toContain('<ReviewScoreRow');
     expect(rows).toContain('color: isMine ? A.AMBER : A.INK');
 
     /* THE REVIEW FLOW PRINTS THE COURSE PAGE'S COLOURS. Every score figure in

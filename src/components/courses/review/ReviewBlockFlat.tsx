@@ -4,8 +4,7 @@ import { ThumbsUp, ThumbsDown, MoreHorizontal } from 'lucide-react';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { formatRatingValue } from '@/utils/formatters';
-import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
 import { ReviewMediaStrip, ReviewMediaItem } from './ReviewMediaStrip';
 import { MentionText } from '@/components/mentions/MentionText';
 import { stripMentionMarkup } from '@/lib/mentions/format';
@@ -65,24 +64,6 @@ const formatDate = (dateString: string) => {
   return `${years} ${years === 1 ? 'year' : 'years'} ago`;
 };
 
-/** Local formatting helper only — colours come from the canonical display tone. */
-const hexToRgba = (color: string, alpha: number): string => {
-  if (color.startsWith('rgba') || color.startsWith('rgb(')) return color;
-  const hex = color.replace('#', '');
-  const bigint = parseInt(hex, 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-  return `rgba(${r},${g},${b},${alpha})`;
-};
-
-const SUBSCORE_LABELS: { key: keyof Review; labelKey: string }[] = [
-  { key: 'design_score', labelKey: 'review.subscore.design' },
-  { key: 'condition_score', labelKey: 'review.subscore.condition' },
-  { key: 'clubhouse_score', labelKey: 'review.subscore.clubhouse' },
-  { key: 'facilities_score', labelKey: 'review.subscore.facilities' },
-];
-
 export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
   review,
   isMine,
@@ -100,9 +81,6 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
 
   const votingDisabled = disabled || isMock || false;
 
-  const subscores = SUBSCORE_LABELS
-    .map((s) => ({ label: t(s.labelKey), value: review[s.key] as number | null | undefined }))
-    .filter((s) => s.value !== null && s.value !== undefined);
 
   const strippedText = text ? stripMentionMarkup(text) : '';
   const strippedWords = strippedText ? strippedText.split(' ') : [];
@@ -167,18 +145,6 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <span
-            style={{
-              fontSize: 22,
-              fontWeight: 700,
-              letterSpacing: '-0.03em',
-              lineHeight: 1,
-              fontVariantNumeric: 'tabular-nums lining-nums',
-              color: courseSubScoreTone(score),
-            }}
-          >
-            {formatRatingValue(score)}
-          </span>
           {!isMine && onReportClick && (
             <button
               onClick={(e) => {
@@ -203,36 +169,17 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
         </div>
       </div>
 
-      {/* Sub-scores chips */}
-      {subscores.length > 0 && (
-        <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
-          {subscores.map((s) => {
-            const chipColor = courseSubScoreTone(Number(s.value));
-            return (
-              <div
-                key={s.label}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  padding: '4px 9px',
-                  borderRadius: 999,
-                  background: 'rgba(255,255,255,0.06)',
-                  border: `1px solid ${hexToRgba(chipColor, 0.35)}`,
-                }}
-              >
-                <span style={{ fontSize: 11, fontWeight: 700, color: chipColor, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  {s.label}
-                </span>
-                <span style={{ fontSize: 11, fontWeight: 700, color: chipColor, fontVariantNumeric: 'tabular-nums lining-nums' }}>
-                  {formatRatingValue(Number(s.value))}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
+      {/* Shared review score row (signed-off mock) under the reviewer line */}
+      <ReviewScoreRow
+        style={{ marginBottom: 12 }}
+        overall={score ?? null}
+        breakdown={{
+          design: review.design_score ?? null,
+          condition: review.condition_score ?? null,
+          clubhouse: review.clubhouse_score ?? null,
+          facilities: review.facilities_score ?? null,
+        }}
+      />
 
       {/* Review text */}
       {text && text.trim().length > 0 && (
