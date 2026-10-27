@@ -11,7 +11,7 @@
  * + `imageScale<1` to keep the existing tinted-logo look.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { INK_TINT_06 } from './tokens';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 
@@ -65,14 +65,35 @@ export function PlayerInitialAvatar({
   })();
 
   const [idx, setIdx] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const candidatesKey = candidates.join('|');
   // Reset to first candidate whenever the list identity changes.
   useEffect(() => {
     setIdx(0);
-  }, [candidates.join('|')]);
+  }, [candidatesKey]);
+  // The new candidate has not loaded yet — keep the shimmer up.
+  useEffect(() => {
+    setLoaded(false);
+  }, [candidatesKey, idx]);
 
   const exhausted = candidates.length === 0 || idx >= candidates.length;
   const currentSrc = exhausted ? null : candidates[idx];
   const showImage = !!currentSrc;
+  // While a candidate is in flight the rail's skeleton shimmer stands in, so
+  // a failing URL never paints iOS's broken-image glyph.
+  const loading = showImage && !loaded;
+
+  // Cached headshots: if the img is already complete, mark it loaded straight
+  // away (naturalWidth > 0) or treat it as a failed candidate (naturalWidth 0).
+  useEffect(() => {
+    const img = imgRef.current;
+    if (!img || !currentSrc) return;
+    if (img.complete) {
+      if (img.naturalWidth > 0) setLoaded(true);
+      else setIdx((i) => i + 1);
+    }
+  }, [currentSrc]);
 
   // Use the canonical fallback when no explicit `color` override is passed.
   // Logo callers still pass `color` to keep their tinted-badge look.
