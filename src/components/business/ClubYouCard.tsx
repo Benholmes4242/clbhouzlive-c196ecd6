@@ -14,7 +14,7 @@ import { CIRCLE_PLAYERS_LIMIT } from '@/components/courses/course-detail/you/cir
 import { courseActivityClubName, courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 import { formatNumber } from '@/i18n/format';
 import { getInitialsFromName } from '@/lib/avatarFallback';
-import type { BusinessClubCourse } from './BusinessCoursePanel';
+import type { BusinessClubCourse } from './ClubHowItPlays';
 
 export type ClubCourseResult = {
   course: BusinessClubCourse;
