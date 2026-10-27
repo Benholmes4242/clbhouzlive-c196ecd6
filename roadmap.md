@@ -1,5 +1,9 @@
 # Roadmap
 
+## CB104.1 — Club "You and {club}" title letter-spacing — 09:23 brief
+- [x] `.club-you-title` letter-spacing changed 0 → -0.01em in src/index.css:42; no other rule touched. Added cb104ClubYou.test.tsx case "title carries -0.01em letter-spacing" reading the rule from src/index.css (file 29 → 30 cases); AGENTS.md gained one line ruling the Tour-plan zero-spacing note Tour-only.
+- [x] Targeted `bunx vitest run src/test/cb104ClubYou.test.tsx`: 30/30. Full `bunx vitest run`: 3,413 passed / 1 failed / 3,414 total, 392 passed / 1 failed / 393 files; +1 case is the new title test. Sole failure is the inherited ratings-white signature assertion (profileCoursesSignature.test.tsx:86:16). Build OK.
+
 ## Ratings-white follow-up — 09:07 brief
 - [x] Confirmed globalAchievementMilestoneSystem.ts already has one top-level A import; app code unchanged. Renamed and strengthened only the two authorised rating cases with direct A.INK expectations and null helper checks; LatestReviews also checks all three figures and omitted null row. No cases added/deleted; baseline 3,413/393.
 - [ ] STOP: targeted `bunx vitest run src/test/profileCoursesSignature.test.tsx src/components/explore-tab-new/courseled/__tests__/LatestReviews.test.tsx`: 19 passed / 1 failed / 20 total. Full `bunx vitest run`: 3,412 passed / 1 failed / 3,413 total, 392 passed / 1 failed / 393 files. src/test/profileCoursesSignature.test.tsx:86:16: `TypeError: Cannot read properties of null (reading 'style')` at the added `expect(fig('clubhouse').style.color).toBe(norm(A.MUTE))`. Null category has no matching figure; no correction after failure. LatestReviews 12/12. No pre-existing failures; no protected changes. Await explicit test-selector correction authorisation.
