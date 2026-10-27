@@ -32,7 +32,7 @@ export const PAR_SCALE_MIN = -0.2;
 export const PAR_SCALE_MAX = 1.2;
 
 /* PTR1.5 (corrected) — the minimum lead before the block may call one par
-   type the hardest and paint it amber. It governs TWO FIELD AVERAGES being
+   type the hardest and paint it red. It governs TWO FIELD AVERAGES being
    close to each other. It deliberately does NOT share LEVEL_EDGE from
    youDerivations (a player's edge against the field on one hole) even though
    both are 0.05 today: tuning the You tab's edge chart must never change when
