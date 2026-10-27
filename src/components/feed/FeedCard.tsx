@@ -808,11 +808,25 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         );
       })();
 
+  // CB109: ordinary and review media-first posts share this one comment door.
+  const addComment = currentUserId ? (
+    <button
+      type="button"
+      data-feed-section="add-comment"
+      onClick={() => onComment(post, effectiveActor, 'add_comment_row')}
+      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px 16px', width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+    >
+      <SquircleAvatar src={effectiveActor?.avatarUrl ?? null} alt={effectiveActor?.name ?? ''} userId={effectiveActor?.id ?? currentUserId} size={26} hairlineRing />
+      <span style={{ fontSize: 13.5, color: 'rgba(248,250,252,0.42)' }}>Add a comment…</span>
+    </button>
+  ) : null;
+
   /* ONE HOME: every review post, resolved course or not, is ReviewPostCard. */
   if (post.isReview) {
     const reviewOpenCourse = reviewCourseId ? () => navigate(`/courses/${reviewCourseId}`) : undefined;
     return (
       <ReviewPostCard
+        layout={layout}
         post={post}
         articleRef={articleRef}
         feedIndex={feedIndex}
@@ -836,6 +850,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         ) : null}
         media={items.length ? renderMedia(true) : null}
         footer={renderFooter(14, true)}
+        mediaFirstFooter={(caption) => renderFooter(14, true, { caption, addComment })}
       />
     );
   }
@@ -949,17 +964,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             />
           </div>
         );
-        const addComment = currentUserId ? (
-          <button
-            type="button"
-            data-feed-section="add-comment"
-            onClick={() => onComment(post, effectiveActor, 'add_comment_row')}
-            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px 16px', width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}
-          >
-            <SquircleAvatar src={effectiveActor?.avatarUrl ?? null} alt={effectiveActor?.name ?? ''} userId={effectiveActor?.id ?? currentUserId} size={26} hairlineRing />
-            <span style={{ fontSize: 13.5, color: 'rgba(248,250,252,0.42)' }}>Add a comment…</span>
-          </button>
-        ) : null;
         return (
           <>
             {hasMedia ? <div data-feed-section="media">{renderMedia(false)}</div> : caption}
