@@ -99,4 +99,28 @@ describe('ReviewScoreRow', () => {
     expect(cells.map((c) => c.getAttribute('data-score-cell'))).toEqual(['design', 'clubhouse']);
     for (const c of cells) expect(c.style.alignItems).toBe('flex-start');
   });
+  it('card: full row wrapper is an inline-size container; caption is not', () => {
+    const { container, rerender } = render(<ReviewScoreRow overall={9} breakdown={full} />);
+    const wrapper = container.querySelector('[data-review-score-container]') as HTMLElement;
+    expect(wrapper.style.containerType).toBe('inline-size');
+    expect(wrapper.querySelector('[data-review-score-row]')).not.toBeNull();
+    rerender(<ReviewScoreRow variant="caption" overall={9} breakdown={full} />);
+    expect(container.querySelector('[data-review-score-container]')).toBeNull();
+    expect(container.querySelector('[data-review-score-container-rules]')).toBeNull();
+  });
+  it('card: 400px container rule narrows divider spacing, gap and all label tracking', () => {
+    const { container } = render(<ReviewScoreRow overall={9} breakdown={full} />);
+    const css = container.querySelector('[data-review-score-container-rules]')?.textContent ?? '';
+    const rule = css.match(/@container \(max-width: 400px\) \{([\s\S]*?)\n\}/)?.[1] ?? '';
+    expect(rule).toContain('[data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }');
+    expect(rule).toContain('[data-score-breakdown] { column-gap: 6px !important; }');
+    expect(rule).toContain('[data-score-label] { letter-spacing: 0.04em !important; }');
+  });
+  it('card: 330px container rule uses 8px labels and a 23px overall figure only', () => {
+    const { container } = render(<ReviewScoreRow overall={9} breakdown={full} />);
+    const css = container.querySelector('[data-review-score-container-rules]')?.textContent ?? '';
+    const rule = css.match(/@container \(max-width: 330px\) \{([\s\S]*?)\n\}/)?.[1] ?? '';
+    expect(rule).toContain('[data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }');
+    expect(rule).toContain('[data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }');
+  });
 });

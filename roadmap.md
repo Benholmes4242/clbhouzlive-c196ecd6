@@ -1,5 +1,11 @@
 # Roadmap
 
+## Narrow ReviewScoreRow card labels
+- [x] Added full-row inline-size query wrapper and scoped 400px/330px overrides; default grid, caption and null behavior retained. Existing tests unchanged; three query-rule tests added to reviewScoreRow.test.tsx.
+- [x] Targeted `bunx vitest run src/test/reviewScoreRow.test.tsx`: 15/15. Full `bunx vitest run`: 3,480 passed / 2 failed / 3,482 total across 397 files. Latest baseline 3,479/397 +3 new query-rule cases; user's 3,438/395 +CB106 22/1 +CB107 19/1 +this 3/0 =3,482/397. No existing test renamed/retargeted/deleted.
+- [ ] STOP: new wrapper breaks sibling assertions: reviewSheetCalibration.test.tsx:122:51 “no bars and no ticks at 1 rating(s); the first-rating note follows the row only at one”: `AssertionError: expected null to be <div …(2)></div> // Object.is equality`; reviewsState2.test.tsx:61:59 “overall score has one home, the score row directly under the rater row”: `AssertionError: expected false to be true // Object.is equality`. No changes after failure; rendered narrow-width verification not run.
+- [ ] Pre-existing CB107 type errors remain at cb107ClubVisiting.test.tsx(190,72), (263,64), (265,58): `error TS2769: No overload matches this call. The last overload gave the following error. Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.` Unrelated tests untouched; preview not build-clean.
+
 ## CB107 — Club Visiting
 - [x] Added club-only Visiting after What golfers say, shared hours keys/formatOpeningHours in src/lib/business/openingHours.ts and SOCIAL_CONFIG in src/lib/business/socialLinks.ts (also re-exported by BusinessProfileInfo); non-club hours keep the spaced hyphen. Resolved mock choices: week -2px top; Visiting en dash.
 - [x] Removed club contact rows/About tab and hid the single-tab bar. Added 19 cases in cb107ClubVisiting.test.tsx; existing tests unchanged. Audited CB103.1 “club with a promoted book action shows no Book button” and “non-club promoted book still works”, both unchanged and passing; no old About/tab-bar assertion found.
