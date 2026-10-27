@@ -82,14 +82,14 @@ describe('CB106 count, rating and sub-scores', () => {
     expect(screen.getByText('8.2')).toBeTruthy();
     expect(screen.getByText('out of 10')).toBeTruthy();
   });
-  it('renders sub-score rows in order with white fills at score×10%', () => {
+  it('renders sub-score bars in the fixed order with white fills at score×10%', () => {
     mount();
-    const rows = screen.getAllByText(/^(Design|Condition|Facilities|Clubhouse)$/);
-    expect(rows.map((r) => r.textContent)).toEqual(['Design', 'Condition', 'Facilities', 'Clubhouse']);
-    const design = card().querySelector('[data-club-say-sub="design"]') as HTMLElement;
-    const fill = design.querySelector('[data-club-say-fill]') as HTMLElement;
+    const cells = [...card().querySelectorAll('[data-category-bar]')] as HTMLElement[];
+    expect(cells.map((c) => c.getAttribute('data-category-bar'))).toEqual(['design', 'condition', 'clubhouse', 'facilities']);
+    const design = card().querySelector('[data-category-bar="design"]') as HTMLElement;
+    const fill = design.querySelector('[data-category-fill]') as HTMLElement;
     expect(fill.style.width).toBe('81%');
-    expect(fill.style.background).toBe('rgba(248, 250, 252, 0.78)');
+    expect(fill.style.background).toBe('rgb(248, 250, 252)');
     expect(within(design).getByText('8.1')).toBeTruthy();
   });
   it('drops null sub-score rows', () => {

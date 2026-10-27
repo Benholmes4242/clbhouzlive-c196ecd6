@@ -71,19 +71,20 @@ describe('REVIEWS_STATE_3', () => {
     const panel = container.querySelector('[data-reviews-state="few"] [data-testid="review-row"]');
     expect(panel?.getAttribute('data-review-id')).toBe('mark');
     expect(panel?.querySelector('[data-score-cell="overall"] [data-score-figure]')?.textContent).toBe('8.1');
-    expect(container.querySelectorAll('[data-community-score], [data-viewer-delta], [data-category-band], [data-community-caution]')).toHaveLength(0);
+    expect(container.querySelectorAll('[data-community-score], [data-viewer-delta], [data-category-bar], [data-community-caution]')).toHaveLength(0);
     expect(container.querySelector('[data-review-id="viewer"]')).not.toBeNull();
     expect(fewReviewFacts(reviewsCommunitySample(fixture.rows, 'viewer'))).toBeNull();
   });
-  it('every category band is excluding min-to-max and excluding mean', () => {
+  it('every category bar figure is the excluding mean, in the fixed order', () => {
     const { container } = tab();
-    const expected = [['design', 7.9, 8.2, 8.05], ['condition', 8.4, 8.9, 8.65], ['clubhouse', 8.7, 9.5, 9.1], ['facilities', 8.2, 8.5, 8.35]];
-    for (const [key, low, high, mean] of expected) {
-      const band = container.querySelector(`[data-category-band="${key}"]`);
-      expect(Number(band?.getAttribute('data-low'))).toBeCloseTo(Number(low));
-      expect(Number(band?.getAttribute('data-high'))).toBeCloseTo(Number(high));
-      expect(Number(band?.getAttribute('data-mean'))).toBeCloseTo(Number(mean));
+    const bands = fewReviewFacts(reviewsCommunitySample(sundridge, 'viewer'))!.bands;
+    const cells = [...container.querySelectorAll('[data-category-bar]')];
+    expect(cells.map((el) => el.getAttribute('data-category-bar'))).toEqual(['design', 'condition', 'clubhouse', 'facilities']);
+    for (const band of bands) {
+      const cell = container.querySelector(`[data-category-bar="${band.key}"]`);
+      expect(cell?.querySelector('[data-category-figure]')?.textContent).toBe(band.mean.toFixed(1));
     }
+    expect(container.querySelectorAll('[data-low], [data-high], [data-mean]')).toHaveLength(0);
   });
   it('five ratings does not select State 3', () => {
     expect([0, 1, 2, 3, 4, 5].map(isFewReviews)).toEqual([false, false, true, true, true, false]);

@@ -21,7 +21,7 @@ import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { Button } from '@/components/ui/button';
 import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
-import { CategoryBands } from '../CategoryBands';
+import { CategoryBarGrid } from '@/components/shared/CategoryBarGrid';
 import { RaterReviewRow } from './SingleReview';
 
 interface FewReviewsProps {
@@ -88,8 +88,9 @@ export function FewReviews({ community, reviews, viewerId, courseId, courseName,
     {hasCommunityAverage(community.ratingCount) && facts && facts.bands.length > 0 && <section style={section}>
       <div style={kicker}>What they scored</div>
       <h2 style={heading}>Where the score comes from</h2>
-      <p style={{ ...prose, color: SURFACE.dark.mute, marginTop: 8 }}>The bar is the range between the lowest and highest score; the mark is the average.</p>
-      <CategoryBands bands={facts.bands} />
+      <div style={{ marginTop: 16 }}>
+        <CategoryBarGrid items={facts.bands.map(b => ({ key: b.key, label: b.label, value: b.mean }))} />
+      </div>
     </section>}
     {facts && known.length > 0 && <section style={section}><span style={{ display: 'inline-block', color: MEDAL_GOLD, background: inkWithAlpha(MEDAL_GOLD, 0.10), border: `1px solid ${inkWithAlpha(MEDAL_GOLD, 0.28)}`, borderRadius: 999, padding: '3px 9px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', marginBottom: 11 }}>People you know</span>{known.map(review => renderPerson(review, true))}</section>}
     {facts && others.length > 0 && <section style={section}><div style={kicker}>Everyone else</div>{others.map(review => renderPerson(review, true))}</section>}

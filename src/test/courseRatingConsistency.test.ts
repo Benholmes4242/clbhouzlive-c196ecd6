@@ -31,11 +31,13 @@ describe('C1 course rating consistency', () => {
     const course = src('src/components/courses/course-detail/about/WhatPeopleSay.tsx');
     const reviews = src('src/components/courses/course-detail/reviews/WhatTheyScored.tsx');
     const browse = src('src/components/courses/BrowseCourseCard.tsx');
-    for (const file of [reviews, browse]) expect(file).toContain('<CategoryScores');
+    expect(browse).toContain('<CategoryScores');
+    /* Category bars 2×2: the Reviews tab and Course tab now share the
+       signed-off CategoryBarGrid; the card keeps CategoryScores. */
+    expect(reviews).toContain('<CategoryBarGrid');
     /* CRM1.9: the rule was not withdrawn, the surface changed — the Course tab
-       now renders the extracted band rows, whose order is fewReviewFacts' fixed
-       key order. */
-    expect(course).toContain('<CategoryBands');
+       renders the shared 2×2 bars, whose order is the grid's fixed key order. */
+    expect(course).toContain('<CategoryBarGrid');
     const facts = src('src/lib/reviews/fewReviews.ts');
     expect(facts.indexOf("['design'")).toBeLessThan(facts.indexOf("['condition'"));
     expect(facts.indexOf("['condition'")).toBeLessThan(facts.indexOf("['clubhouse'"));
