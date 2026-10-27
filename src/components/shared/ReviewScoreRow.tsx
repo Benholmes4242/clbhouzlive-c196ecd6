@@ -31,11 +31,11 @@ const num = (v: number | null | undefined): number | null =>
 
 export const ReviewScoreRow: React.FC<ReviewScoreRowProps> = ({ overall, breakdown, align = 'center', textShadow, style }) => {
   const cells = ([
-    ['overall', 'Overall', num(overall)],
-    ['design', 'Design', num(breakdown.design)],
-    ['condition', 'Condition', num(breakdown.condition)],
-    ['clubhouse', 'Clubhouse', num(breakdown.clubhouse)],
-    ['facilities', 'Facilities', num(breakdown.facilities)],
+    ['overall', 'OVERALL', num(overall)],
+    ['design', 'DESIGN', num(breakdown.design)],
+    ['condition', 'CONDITION', num(breakdown.condition)],
+    ['clubhouse', 'CLUBHOUSE', num(breakdown.clubhouse)],
+    ['facilities', 'FACILITIES', num(breakdown.facilities)],
   ] as const).filter((c) => c[2] != null) as [string, string, number][];
   if (cells.length === 0) return null;
   return (

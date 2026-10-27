@@ -44,6 +44,7 @@
  * NO fade-on-idle. NO score eyebrow. The header chip and, on reviews, the
  * figures row under the author line are the only score surfaces.
  */
+import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
 import React, { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ChevronLeft, MessageCircle, Send, MoreHorizontal, Volume2, VolumeX } from 'lucide-react';
 import { ReactionGlyph, AMBER, reactionKindFor } from '@/lib/reactionKind';
@@ -533,16 +534,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   }
   if (timeLabel) authorMeta.push(<span key="t" style={{ flexShrink: 0 }}>{timeLabel}</span>);
 
-  // Review figures: overall, golfers, then each filled-in sub-score.
   const review = activePost.isReview ? activePost.review : null;
-  const reviewCells: { key: string; value: number; label: string }[] = [];
-  if (review) {
-    if (review.rating != null) reviewCells.push({ key: 'r', value: Number(review.rating), label: 'OVERALL' });
-    for (const [field, label] of BREAKDOWN_CELLS) {
-      const v = review.breakdown?.[field];
-      if (v != null) reviewCells.push({ key: field, value: Number(v), label });
-    }
-  }
 
   const handleCourseTap = () => {
     const cid = shotCourse?.courseId ?? activePost.review?.courseId ?? golfCourse?.id ?? activePost.courseId;
