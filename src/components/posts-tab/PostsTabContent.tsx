@@ -66,6 +66,12 @@ interface PostsTabContentProps {
   actorId: string;
   isOwnProfile?: boolean;
   businessName?: string;
+  /** CB108: FeedCard layout, default 'standard'. */
+  layout?: 'standard' | 'mediaFirst';
+  /** CB108 club profile: no filter chip. */
+  hideFilter?: boolean;
+  /** CB108 club profile: replaces the default empty state. */
+  emptyOverride?: React.ReactNode;
 }
 
 const PostsTabContent: React.FC<PostsTabContentProps> = ({
@@ -73,6 +79,9 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
   actorId,
   isOwnProfile = false,
   businessName,
+  layout = 'standard',
+  hideFilter = false,
+  emptyOverride,
 }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
@@ -313,7 +322,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
   return (
     <div>
       {/* Filter dropdown */}
-      {posts.length > 0 && (
+      {posts.length > 0 && !hideFilter && (
         <div className="flex justify-end px-4 pt-4 pb-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -359,10 +368,11 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
       )}
 
       {filteredPosts.length === 0 && pendingEntries.length === 0 && pendingReviews.length === 0 ? (
-        emptyState
+        emptyOverride !== undefined ? emptyOverride : emptyState
       ) : filteredPosts.length === 0 ? null : (
         <LightCardFeed
           posts={filteredPosts}
+          layout={layout}
           
           topPadding={0}
           bottomPadding={32}

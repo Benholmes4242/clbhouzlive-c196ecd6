@@ -66,6 +66,7 @@ import { A, Panel, LABEL, NUM } from '@/features/courses/components/holes/analyt
 import { ClubHowItPlays, type BusinessClubCourse } from '@/components/business/ClubHowItPlays';
 import { ClubWhatGolfersSay } from '@/components/business/ClubWhatGolfersSay';
 import { ClubVisiting } from '@/components/business/ClubVisiting';
+import { ClubFromTheClub } from '@/components/business/ClubFromTheClub';
 import { ClubYouCard } from '@/components/business/ClubYouCard';
 import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
 import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
@@ -561,7 +562,7 @@ const BusinessProfilePage: React.FC = () => {
 
       {/* CB106 — What golfers say (club-only), directly after How it plays. */}
       <ClubWhatGolfersSay isClub={isClub} businessId={business.id} businessName={business.name} courses={courses} viewerId={user?.id} isTeamMember={!!membership} />
-      {isClub && <ClubVisiting business={business} viewerId={user?.id} firstCourseRegion={courses[0]?.region} />}
+      {isClub && <ClubVisiting business={business} viewerId={user?.id} firstCourseRegion={courses[0]?.region} publicTeamCount={showTeamTab ? publicTeamCount : 0} />}
 
       {/* ----- Bio on canvas (no card) ----- */}
       {!isClub && bioText && (
@@ -717,7 +718,10 @@ const BusinessProfilePage: React.FC = () => {
           shows through so the strip is continuous with the page. Do NOT
           reintroduce a local background — --background and --bg-page both
           resolve to the canonical Canvas (#0A0A0C). */}
-      {tabs.length > 1 && <section className="px-4">
+      {/* CB108: clubs have no tabs; From the club is the last section. */}
+      {isClub && <ClubFromTheClub businessId={business.id} businessName={business.name} postsCount={postsCount} isOwner={!!isOwner} onPost={clubTeam?.onPost} />}
+
+      {!isClub && tabs.length > 1 && <section className="px-4">
         <div className="flex justify-center" style={{ padding: '10px 0' }}>
           <RailChips
             align="center-when-fit"
@@ -737,9 +741,9 @@ const BusinessProfilePage: React.FC = () => {
       </section>}
 
       {/* ----- Tab content ----- */}
-      <div className={cn('min-h-[60vh]', activeTab === 'posts' ? 'pt-0 px-0' : 'pt-4 px-4')}>
+      {!isClub && <div className={cn('min-h-[60vh]', activeTab === 'posts' ? 'pt-0 px-0' : 'pt-4 px-4')}>
         {renderTab()}
-      </div>
+      </div>}
 
       {/* Bottom spacer */}
       <div style={{ height: 88 }} />

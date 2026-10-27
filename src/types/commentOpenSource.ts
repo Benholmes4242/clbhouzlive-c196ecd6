@@ -5,9 +5,10 @@
  *                  on a card with no comments.
  * 'preview_row'  — one of the up-to-two comment lines inside the footer, or the
  *                  see-all beneath them.
+ * 'add_comment_row' — CB108 mediaFirst "Add a comment…" row (club profile feed).
  * 'sheet'        — the sheet was opened by anything else (default).
  *
  * Carried on the EXISTING post_comment_open event rather than a second event,
  * so before/after comparison is one series.
  */
-export type CommentOpenSource = 'footer_glyph' | 'preview_row' | 'sheet';
+export type CommentOpenSource = 'footer_glyph' | 'preview_row' | 'add_comment_row' | 'sheet';
