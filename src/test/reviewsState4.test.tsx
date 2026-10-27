@@ -78,15 +78,17 @@ describe('REVIEWS_STATE_4', () => {
       expect(fill?.style.width).toBe('0%');
     }
   });
-  it('nine total keeps all category statistics min-to-max excluding viewer', () => {
+  it('nine total keeps the four category bars on excluding means', () => {
     fixture.rows = [...population(8), row('viewer', 1, [1, 1, 1, 1])];
     const { container } = tab();
-    expect(container.querySelectorAll('[data-category-band]')).toHaveLength(4);
-    for (const band of container.querySelectorAll('[data-category-band]')) {
-      expect(Number(band.getAttribute('data-low'))).toBe(7.2);
-      expect(Number(band.getAttribute('data-high'))).toBe(9.5);
+    const bands = fewReviewFacts(reviewsCommunitySample(fixture.rows, 'viewer'))!.bands;
+    expect(bands).toHaveLength(4);
+    expect(container.querySelectorAll('[data-category-bar]')).toHaveLength(4);
+    for (const band of bands) {
+      const cell = container.querySelector(`[data-category-bar="${band.key}"]`);
+      expect(cell?.querySelector('[data-category-figure]')?.textContent).toBe(band.mean.toFixed(1));
     }
-    expect(container.querySelectorAll('[data-played-season], [data-middle80], [data-split]')).toHaveLength(0);
+    expect(container.querySelectorAll('[data-low], [data-high], [data-mean], [data-played-season], [data-middle80], [data-split]')).toHaveLength(0);
   });
   it('State 4 boundary never reclassifies State 3 or ten total', () => {
     expect([4, 5, 9, 10].map(isFiveToNineReviews)).toEqual([false, true, true, false]);
