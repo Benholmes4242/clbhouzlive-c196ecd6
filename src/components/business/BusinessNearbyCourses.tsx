@@ -34,8 +34,19 @@ export function playsLabel(avg: number): string {
   return r > 0 ? `+${r.toFixed(1)}` : `\u2212${Math.abs(r).toFixed(1)}`;
 }
 
-/** Meta parts; stats null = failed read → distance only. */
-export function metaLine(c: NearbyCourse, s: NearbyCourseStat | null | undefined, statsFailed: boolean): { line: string; plays: string | null } {
+type Tr = (key: string, o: { count?: number; n?: string; defaultValue: string }) => string;
+/** English fallback for pure callers; components pass their own t (CB115 tidy). */
+const enTr: Tr = (_k, o) => o.defaultValue.replace('{{n}}', o.n ?? '');
+
+/** Rounds-count copy as i18n keys, plurals by count (CB115 tidy). */
+export function roundsLabel(n: number, tr: Tr = enTr): string {
+  if (n <= 0) return tr('business.nearby.noRounds', { defaultValue: 'No rounds yet' });
+  if (n === 1) return tr('business.nearby.rounds', { count: 1, n: formatNumber(1), defaultValue: '1 round' });
+  return tr('business.nearby.rounds', { count: n, n: formatNumber(n), defaultValue: `${formatNumber(n)} rounds` });
+}
+
+/** Meta parts; stats null = failed or never-run read → distance only. */
+export function metaLine(c: NearbyCourse, s: NearbyCourseStat | null | undefined, statsFailed: boolean, tr: Tr = enTr): { line: string; plays: string | null } {
   const parts: string[] = [];
   if (c.distanceKm != null) parts.push(milesLabel(c.distanceKm));
   let plays: string | null = null;
@@ -43,17 +54,15 @@ export function metaLine(c: NearbyCourse, s: NearbyCourseStat | null | undefined
     const n = s?.rounds_tracked ?? 0;
     if (n >= 3) {
       if (s?.avg_over_par != null) { plays = playsLabel(s.avg_over_par); parts.push(plays); }
-      parts.push(`${formatNumber(n)} rounds`);
-    } else if (n === 2) parts.push('2 rounds');
-    else if (n === 1) parts.push('1 round');
-    else parts.push('No rounds yet');
+    }
+    parts.push(roundsLabel(n, tr));
   }
   return { line: parts.join(' \u00B7 '), plays };
 }
 
 function Row({ c, s, statsFailed, first, onOpen }: { c: NearbyCourse; s?: NearbyCourseStat; statsFailed: boolean; first: boolean; onOpen: () => void }) {
   const { t } = useTranslation();
-  const meta = metaLine(c, s, statsFailed);
+  const meta = metaLine(c, s, statsFailed, t as unknown as Tr);
   return (
     <button type="button" data-nearby-row={c.id} onClick={onOpen}
       style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '11px 0', background: 'transparent', border: 0,
@@ -103,8 +112,9 @@ export function BusinessNearbyCourses({ isClub, viewerId, business }: { isClub: 
   const stats = useNearbyCourseStats(viewerId, courses, eligible);
 
   if (!eligible || nearby.isLoading || nearby.isError || !nearby.data?.courses || courses.length === 0) return null;
-  if (stats.isLoading) return null;
-  const failed = stats.isError;
+  if (viewerId && stats.isLoading) return null;
+  // CB115 tidy: no signed-in viewer means the stats read never runs → unavailable, not "No rounds yet".
+  const failed = stats.isError || !viewerId;
   const byId = new Map((stats.data ?? []).map((s) => [s.id, s]));
   const shown = courses.slice(0, 4);
   const N = nearby.data.coursesNear ?? courses.length;
