@@ -46,7 +46,6 @@ import { BusinessNearbyCourses, metaLine, milesLabel, playsLabel, scrollToNearby
 import { BusinessYouCard } from '@/components/business/BusinessYouCard';
 import { useBusinessNearbyCounts } from '@/hooks/useBusinessNearbyCounts';
 import { scrollElementIntoView } from '@/lib/getScrollParent';
-import { A } from '@/lib/tokens/analytical';
 
 afterEach(() => {
   cleanup();
@@ -221,4 +220,3 @@ describe('CB114 hero link', () => {
   });
 });
 
-void A;
