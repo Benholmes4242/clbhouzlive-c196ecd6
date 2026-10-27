@@ -4,7 +4,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { LatestHolesSection, type LatestHoleMedia } from '@/components/courses/browse/LatestHolesSection';
-import { LatestCoursesSection, type LatestCourseMedia } from '@/components/courses/browse/LatestCoursesSection';
+import { LatestCoursesSection, LATEST_COURSE_W, type LatestCourseMedia } from '@/components/courses/browse/LatestCoursesSection';
 import { AdminHoleTagging } from '@/components/course-media-tab/AdminHoleTagging';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
@@ -19,7 +19,7 @@ vi.mock('@/components/courses/browse/PageLoadGate', () => ({ useSectionReady: f.
 type Row = LatestHoleMedia | LatestCourseMedia;
 const kinds = [
   { kind: 'holes', name: 'get_latest_hole_media', size: 20, width: 220, skeleton: '.latest-hole-skeleton-card', Section: LatestHolesSection },
-  { kind: 'courses', name: 'get_latest_course_media', size: 10, width: 300, skeleton: '.latest-course-skeleton-card', Section: LatestCoursesSection },
+  { kind: 'courses', name: 'get_latest_course_media', size: 10, width: LATEST_COURSE_W, skeleton: '.latest-course-skeleton-card', Section: LatestCoursesSection },
 ] as const;
 type Kind = typeof kinds[number];
 const hole = (i: number): LatestHoleMedia => ({ id: `h-${i}`, course_id: `c-${i}`, course_name: `Course ${i}`, hole_no: 4, media_type: 'image', media_url: `/h-${i}.jpg`, poster_url: null, stream_id: null, duration_seconds: null, exif_captured_at: null, added_at: '2026-10-26T12:00:00Z', created_at: `2026-10-25T12:00:${String(i % 60).padStart(2, '0')}Z`, member_id: 'member', member_name: 'Member', member_avatar_url: null, par: 4, yards: 400 });
