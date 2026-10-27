@@ -306,7 +306,7 @@ describe('CB112 nearby counts hook', () => {
     state.rows = [{ course_id: 'a' }, { course_id: 'a' }];
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     const { result } = renderHook(() => real('Bar / Pub', 51, 0), { wrapper: ({ children }) => <QueryClientProvider client={qc}>{children}</QueryClientProvider> });
-    await waitFor(() => expect(result.current.data).toEqual({ coursesNear: 3, top100Near: 1, courses: [{ id: 'a', name: '' }, { id: 'b', name: '' }, { id: 'c', name: '' }] }));
+    await waitFor(() => expect(result.current.data).toEqual({ coursesNear: 3, top100Near: 1, courses: ['a', 'b', 'c'].map((id) => ({ id, name: '', distanceKm: null, thumbnail: null, ratingAvg: null, reviewCount: 0, isTop100: id === 'a' })) }));
     expect(rpc).toHaveBeenCalledWith('get_nearby_courses', { p_user_lat: 51, p_user_lng: 0, p_radius_km: 16, p_limit: 100 });
   });
   it('is disabled for other categories and without a pin', async () => {

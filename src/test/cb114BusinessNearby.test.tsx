@@ -2,7 +2,7 @@
  * CB114 — BusinessNearbyCourses. Structure only; formatting via pure helpers.
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, waitFor, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { readFileSync } from 'node:fs';
@@ -46,6 +46,7 @@ import { BusinessNearbyCourses, metaLine, milesLabel, playsLabel, scrollToNearby
 import { BusinessYouCard } from '@/components/business/BusinessYouCard';
 import { useBusinessNearbyCounts } from '@/hooks/useBusinessNearbyCounts';
 import { scrollElementIntoView } from '@/lib/getScrollParent';
+import { formatNumber } from '@/i18n/format';
 
 afterEach(() => {
   cleanup();
@@ -130,7 +131,7 @@ describe('CB114 meta line', () => {
   const c = { id: 'c', name: 'C', distanceKm: 1.931, thumbnail: null, ratingAvg: null, reviewCount: 0, isTop100: false };
   const s = (rounds: number | null, avg: number | null = 14.6) => ({ id: 'c', name: 'C', your_rounds: null, your_best: null, rounds_tracked: rounds, avg_over_par: avg });
   it('plays + rounds at 1764, then 2, 1 and 0', () => {
-    expect(metaLine(c, s(1764), false).line).toBe(`1.2 mi \u00B7 +14.6 \u00B7 ${(1764).toLocaleString()} rounds`.replace((1764).toLocaleString(), metaLine(c, s(1764), false).line.split(' \u00B7 ')[2].split(' ')[0]));
+    expect(metaLine(c, s(1764), false).line).toBe(`1.2 mi \u00B7 +14.6 \u00B7 ${formatNumber(1764)} rounds`);
     expect(metaLine(c, s(1764), false).line.split(' \u00B7 ').slice(0, 2)).toEqual(['1.2 mi', '+14.6']);
     expect(metaLine(c, s(2), false).line).toBe('1.2 mi \u00B7 2 rounds');
     expect(metaLine(c, s(1), false).line).toBe('1.2 mi \u00B7 1 round');
@@ -216,7 +217,6 @@ describe('CB114 hero link', () => {
     scrollToNearbyCard();
     expect(vi.mocked(scrollElementIntoView)).toHaveBeenCalledTimes(1);
     expect(vi.mocked(scrollElementIntoView).mock.calls[0][0]).toBe(card());
-    expect(screen.queryAllByText('').length).toBeGreaterThanOrEqual(0);
   });
 });
 
