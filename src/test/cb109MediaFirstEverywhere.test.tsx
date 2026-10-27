@@ -1,6 +1,7 @@
 /** CB109: caller contracts and real FeedCard → ReviewPostCard shared slots. */
 import React from 'react';
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
