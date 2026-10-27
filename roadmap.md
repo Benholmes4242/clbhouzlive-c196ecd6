@@ -1,5 +1,11 @@
 # Roadmap
 
+## Course Media tab — signed-off rail and place tags
+- [ ] Rebuild top/header, sparse hole coverage rail, ready-cover fallback, place tiles and combined untagged counts; preserve hole panel, query/RPC and admin paths.
+- [ ] Add owner-source place hook and canonical credited viewer mapping; course_place_media already exists in generated types, so do not edit generated types or run SQL.
+- [ ] Resolve tagger contradiction before editing its write flow: brief freezes submit/skip behaviour, but current single-shot dialog submits on hole tap and current batch has no Skip; new mock requires a selected choice plus primary button and Skip.
+- [ ] Add/retarget only authorised tests by name; run bunx vitest run against last reported green 3,670 tests / 411 files; verify available preview states. Signed-in persistence unavailable with external_unmanaged.
+
 ## CB116 — Naming a coach
 - [ ] BLOCKED before implementation: brief requires signed-in confirmation of name_coach, get_my_coach, set_coach_options, stop_coach, get_member_coach, get_coach_results and get_coach_golfers. Browser authentication status is external_unmanaged; no managed session is available. No SQL, RPC writes, application edits or test changes performed. Await Ben's signed-in function checks or an explicit ruling permitting implementation without this prerequisite. Last reported green baseline: 3,670 tests / 411 files; no tests run for CB116.
 

@@ -3894,6 +3894,94 @@ export type Database = {
           },
         ]
       }
+      course_place_media: {
+        Row: {
+          added_at: string
+          course_id: string
+          created_at: string
+          duration_seconds: number | null
+          file_name: string | null
+          height: number | null
+          id: string
+          media_type: string
+          media_url: string
+          place: string
+          poster_url: string | null
+          reject_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          stream_id: string | null
+          tagged_by: string | null
+          user_id: string
+          width: number | null
+        }
+        Insert: {
+          added_at?: string
+          course_id: string
+          created_at?: string
+          duration_seconds?: number | null
+          file_name?: string | null
+          height?: number | null
+          id?: string
+          media_type?: string
+          media_url: string
+          place: string
+          poster_url?: string | null
+          reject_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          stream_id?: string | null
+          tagged_by?: string | null
+          user_id: string
+          width?: number | null
+        }
+        Update: {
+          added_at?: string
+          course_id?: string
+          created_at?: string
+          duration_seconds?: number | null
+          file_name?: string | null
+          height?: number | null
+          id?: string
+          media_type?: string
+          media_url?: string
+          place?: string
+          poster_url?: string | null
+          reject_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          stream_id?: string | null
+          tagged_by?: string | null
+          user_id?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_place_media_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "course_pooling_watch"
+            referencedColumns: ["golf_course_id"]
+          },
+          {
+            foreignKeyName: "course_place_media_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_place_media_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+        ]
+      }
       course_prestige_tags: {
         Row: {
           awarded_at: string
