@@ -88,6 +88,8 @@ interface Props {
   displayName: string;
   /** Pre-joined home club · region; null when neither resolves. */
   subline: string | null;
+  /** Optional member coach line, privacy/read ownership remains with its caller. */
+  afterSubline?: React.ReactNode;
   /** Own profile with no subline: "Add your home club" → edit route. */
   onAddHomeClub?: () => void;
   addHomeClubLabel?: string;
@@ -100,6 +102,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
   onAvatarTap,
   displayName,
   subline,
+  afterSubline,
   onAddHomeClub,
   addHomeClubLabel,
   action,
@@ -198,6 +201,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
               {addHomeClubLabel}
             </button>
           ) : null}
+          {afterSubline}
         </div>
 
         {action && (

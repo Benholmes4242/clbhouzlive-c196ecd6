@@ -34,6 +34,7 @@ import { HeroPill } from './HeroShell';
 import { ProfileCoverBand } from './ProfileCoverBand';
 import { HeroHandicapDisplay } from './HeroHandicapDisplay';
 import { HeroConnectExample } from './HeroConnectExample';
+import { CoachProfileLine } from '@/features/coach/BusinessCoachCards';
 
 const GREEN = INDEX_DELTA.dark.improved;
 const RED = INDEX_DELTA.dark.drifted;
@@ -364,6 +365,7 @@ export const ProfileHero: React.FC<Props> = ({
         onAvatarTap={onAvatarTap}
         displayName={displayName}
         subline={subline || null}
+        afterSubline={<CoachProfileLine profileUserId={userId} viewerId={viewerUserId ?? undefined} />}
         onAddHomeClub={isSelf ? onEdit : undefined}
         addHomeClubLabel={t('hero.addHomeClub', 'Add your home club')}
         action={action}

@@ -22,6 +22,9 @@ import { NEARBY_CATEGORIES } from '@/lib/business/businessHero';
 import { useBusinessNearbyCounts } from '@/hooks/useBusinessNearbyCounts';
 import { useNearbyCourseStats } from '@/hooks/useNearbyCourseStats';
 import { YouCardShell, type YouCardFace } from './YouCardShell';
+import { useMyCoach } from '@/features/coach/hooks';
+import { isCoachCategory } from '@/features/coach/contracts';
+import { coachSentences } from '@/features/coach/copy';
 
 type T = (key: string, opts: Record<string, unknown>) => string;
 export interface NearbyStat { id: string; name: string; your_rounds: number | null; your_best: number | null }
@@ -117,6 +120,8 @@ function BusinessYouRead({ business, viewerId }: { business: BusinessYouInput; v
   const tt: T = (k, o) => t(k, o) as string;
   const nearbyEligible = NEARBY_CATEGORIES.has(business.category ?? '') && business.lat != null && business.lng != null;
   const golfers = useFollowedGolfers(viewerId, business.id);
+  const coachEligible = isCoachCategory(business.category);
+  const coachQuery = useMyCoach(viewerId, coachEligible);
   const nearby = useBusinessNearbyCounts(business.category, business.lat, business.lng);
   const courses = nearby.data?.courses ?? [];
   const ids = courses.map((c) => c.id);
@@ -147,6 +152,14 @@ function BusinessYouRead({ business, viewerId }: { business: BusinessYouInput; v
   const kicker = t('business.you.kicker', { name, defaultValue: 'You and {{name}}' });
   const kickerStyle: React.CSSProperties = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', overflowWrap: 'normal' };
   const F = players.length;
+  if (coachEligible) {
+    if (!coachQuery.isSuccess || coachQuery.isError) return null;
+    if (coachQuery.data?.business_id === business.id) {
+      const title = coachSentences(coachQuery.data, name, t);
+      const faces = F > 0 ? { players, max: 3, ...followFaces(players, name, tt) } : null;
+      return <YouCardShell dataAttr="data-business-you" kicker={kicker} kickerStyle={kickerStyle} first={title.first} second={title.second} faces={faces} />;
+    }
+  }
 
   const n = nearby.data?.coursesNear ?? 0;
   if (nearbyEligible && n >= 1 && batch.isSuccess) {
