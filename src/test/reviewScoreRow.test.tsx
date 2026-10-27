@@ -54,7 +54,10 @@ describe('ReviewScoreRow', () => {
     expect(row.style.gridTemplateColumns).toBe('auto 1fr');
     expect(row.style.alignItems).toBe('end');
     expect(row.style.justifyContent).toBe('');
-    expect((row.querySelector('[data-score-breakdown]') as HTMLElement).style.justifyContent).toBe('space-between');
+    const breakdown = row.querySelector('[data-score-breakdown]') as HTMLElement;
+    expect(breakdown.style.display).toBe('grid');
+    expect(breakdown.style.gridTemplateColumns).toBe('repeat(4, minmax(0, 1fr))');
+    expect(breakdown.style.columnGap).toBe('8px');
   });
   it('card: overall 26/700, breakdown 16/600, labels 9px at 0.12em, all white', () => {
     const { container } = render(<ReviewScoreRow overall={9.6} breakdown={full} />);
@@ -85,5 +88,15 @@ describe('ReviewScoreRow', () => {
     expect(container.querySelector('[data-score-cell="overall"]')).toBeNull();
     expect(row.style.gridTemplateColumns).toBe('1fr');
     expect(labels(container)).toEqual(['DESIGN', 'CONDITION', 'FACILITIES']);
+  });
+  it('card: null breakdown values drop their cells; the rest fill the first slots, left-aligned', () => {
+    const { container } = render(<ReviewScoreRow overall={7.4} breakdown={{ ...full, condition: null, facilities: null }} />);
+    const breakdown = container.querySelector('[data-score-breakdown]') as HTMLElement;
+    expect(breakdown.style.display).toBe('grid');
+    expect(breakdown.style.gridTemplateColumns).toBe('repeat(4, minmax(0, 1fr))');
+    expect(breakdown.style.columnGap).toBe('8px');
+    const cells = [...breakdown.querySelectorAll('[data-score-cell]')] as HTMLElement[];
+    expect(cells.map((c) => c.getAttribute('data-score-cell'))).toEqual(['design', 'clubhouse']);
+    for (const c of cells) expect(c.style.alignItems).toBe('flex-start');
   });
 });
