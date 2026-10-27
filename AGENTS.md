@@ -81,3 +81,4 @@ Report the suite total before and after, and name the source of any delta. A cou
 - Every surface printing ONE review's overall plus breakdown renders `ReviewScoreRow` (src/components/shared), including the fullscreen viewer via align/textShadow props, so single-review score rows cannot drift; course aggregates keep their own layouts.
 - Club Visiting and non-club About share opening-hours keys/formatting and SOCIAL_CONFIG in src/lib/business, preserving platform URLs and the non-club separator; see ClubVisiting.tsx for local presentation rules.
 - Feed layout ownership and review footer-slot composition: see ReviewPostCard.tsx header; feed callers opt in while direct standard cards and separate grid/round cards remain independent.
+- Course review navigation uses the course detail Reviews tab; CourseReviewsTab owns one-shot landing/target consumption and the legacy redirect preserves intent, so club links and bookmarks share one destination.

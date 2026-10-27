@@ -48,7 +48,7 @@ const review = (over: Partial<ClubLatestReview> = {}): ClubLatestReview => ({
 
 function LocationProbe() {
   const l = useLocation();
-  return <div data-testid="loc">{l.pathname}</div>;
+  return <div data-testid="loc">{l.pathname}{l.search}</div>;
 }
 
 const mount = (over: Partial<React.ComponentProps<typeof ClubWhatGolfersSay>> = {}) =>
@@ -133,23 +133,23 @@ describe('CB106 latest review', () => {
     expect(reviewMetaDate('2024-05-03', new Date('2026-10-27'))).toBe('3 May 2024');
     expect(reviewMetaDate('2026-05-03', new Date('2026-10-27'))).toBe('3 May');
   });
-  it('tapping the review opens that course’s reviews page', () => {
+  it('tapping the quoted review opens the course Reviews tab with highlight=ratingId', () => {
     mount();
     fireEvent.click(card().querySelector('[data-club-say-review]') as HTMLElement);
-    expect(screen.getByTestId('loc').textContent).toBe('/courses/east/reviews');
+    expect(screen.getByTestId('loc').textContent).toBe('/courses/east?tab=reviews&highlight=r1');
   });
 });
 
 describe('CB106 foot', () => {
-  it('single-course clubs show Read all beside Rate it', () => {
+  it('single-course Read all opens the course Reviews tab at the first review beside Rate it', () => {
     mocks.stats.mockReturnValue({ data: stats({ totalReviews: 12, courses: [{ id: 'east', name: east.name, avgRating: 7.6, reviewCount: 12, recentCount: 0 }] }), isLoading: false });
     mount({ courses: [east] });
     const readAll = screen.getByText('Read all 12 reviews ›');
     fireEvent.click(readAll);
-    expect(screen.getByTestId('loc').textContent).toBe('/courses/east/reviews');
+    expect(screen.getByTestId('loc').textContent).toBe('/courses/east?tab=reviews&at=reviews');
     expect(screen.getByText('Rate it')).toBeTruthy();
   });
-  it('multi-course clubs list per-course rows ordered by review count', () => {
+  it('multi-course rows retain review-count order and open the course Reviews tab at the first review', () => {
     mount();
     const rows = [...card().querySelectorAll('[data-club-say-course]')] as HTMLElement[];
     expect(rows.map((r) => r.getAttribute('data-club-say-course'))).toEqual(['east', 'west']);
@@ -157,7 +157,7 @@ describe('CB106 foot', () => {
     expect(rows[0].textContent).toContain('3 ›');
     expect(rows[1].textContent).toContain('2 ›');
     fireEvent.click(rows[1]);
-    expect(screen.getByTestId('loc').textContent).toBe('/courses/west/reviews');
+    expect(screen.getByTestId('loc').textContent).toBe('/courses/west?tab=reviews&at=reviews');
   });
   it('per-course rows skip courses without reviews', () => {
     mocks.stats.mockReturnValue({ data: stats({ courses: [

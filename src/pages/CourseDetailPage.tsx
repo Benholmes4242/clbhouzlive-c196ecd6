@@ -33,7 +33,10 @@ const CourseDetailPage = () => {
         course_id: courseId,
       });
     }
-  }, [courseId, navigationType]);
+    // CB110: consuming a landing query changes POP/PUSH to REPLACE on the
+    // same mounted course. Only course entry owns this reset, not query cleanup.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId]);
 
 
   if (!courseId) {
