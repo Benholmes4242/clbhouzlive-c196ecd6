@@ -131,7 +131,7 @@ export function PhotoRailShell({ count }: { count: number }) {
   );
 }
 
-/** Latest from the courses: two 300x230 cards, clipped. */
+/** Latest from the courses: two 332x293 cards, clipped. */
 export function LatestCourseSkeletonCard() {
   return <Bar className="latest-course-skeleton-card" style={{ width: LATEST_COURSE_W, height: LATEST_COURSE_H, borderRadius: 0, flex: 'none' }} />;
 }
