@@ -4,7 +4,7 @@
  * ONE source: get_course_hole_analysis. F1: the lede states total_rounds
  * (rounds logged with hole-by-hole detail), never rounds_tracked; with
  * total_rounds 0 or no holes the whole section is absent, with no fallback.
- * The amber/green bars, the Worst hole cell and the observation all read
+ * The red/green bars, the Worst hole cell and the observation all read
  * deriveCourseVerdict, the same computation as the verdict's fact tiles.
  * D4: no cross-course par-type comparison exists, so none is drawn.
  * Replaces HowItPlays on this tab (HowItPlays.tsx is left on disk).
@@ -58,7 +58,7 @@ export function orderParTypes(rows: ParTypeRowInput[]): ParTypeRowInput[] {
   return [...rows].sort((a, b) => b.perHole - a.perHole || b.holes - a.holes || a.par - b.par);
 }
 
-/** PTR1.5 — the par type that may take amber, or null when the leader's gap
+/** PTR1.5 — the par type that may take red, or null when the leader's gap
  *  over the second is under HARDEST_MIN_GAP (a near-tie claims no hardest). */
 export function hardestParType(ordered: ParTypeRowInput[]): ParTypeRowInput | null {
   const [top, second] = ordered;
