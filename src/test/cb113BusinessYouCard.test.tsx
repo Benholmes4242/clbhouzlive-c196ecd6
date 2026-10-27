@@ -171,7 +171,7 @@ describe('CB113 rendered states', () => {
   });
   it('signed out gives no card and reads nothing', async () => {
     golfers(3);
-    const { container } = mount(brand, undefined);
+    const { container } = mount(brand, '');
     await settle();
     expect(card(container)).toBeNull();
     expect(fetchCircleIds).not.toHaveBeenCalled();
