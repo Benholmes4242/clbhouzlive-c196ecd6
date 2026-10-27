@@ -137,6 +137,42 @@ describe('CB111 score-led round in the mediaFirst feed', () => {
     expect(handlers.onRoundTap).toHaveBeenCalledWith(POST, ROUND);
   });
 
+  it('centres each figure over its label, with the gross label under the value row in the same column', () => {
+    const { container } = card();
+    const grossValue = container.querySelector('[data-round-score-gross]') as HTMLElement;
+    const grossCell = grossValue.parentElement as HTMLElement;
+    expect(grossCell.style.alignItems).toBe('center');
+    expect(grossCell.style.textAlign).toBe('center');
+    expect(grossValue.style.whiteSpace).toBe('nowrap');
+    const grossLabel = grossCell.lastElementChild as HTMLElement;
+    expect(grossLabel).not.toBe(grossValue);
+    expect(grossLabel.style.textTransform).toBe('uppercase');
+    expect(grossLabel.style.marginTop).toBe('6px');
+    for (const key of ['net', 'handicap']) {
+      const cell = container.querySelector(`[data-round-score-${key}]`) as HTMLElement;
+      expect(cell.style.textAlign).toBe('center');
+      expect((cell.firstElementChild as HTMLElement).style.whiteSpace).toBe('nowrap');
+      expect((cell.lastElementChild as HTMLElement).style.marginTop).toBe('5px');
+    }
+  });
+
+  it('renders under-par to-par red and level or over-par muted, on gross and net', () => {
+    const RED = 'rgb(226, 75, 63)';
+    const MUTE = 'rgba(248, 250, 252, 0.62)';
+    const under = card({ postRound: { ...ROUND, grossScore: 70, coursePar: 72, netScore: 68 } as PostRound });
+    expect((under.container.querySelector('[data-round-score-gross-topar]') as HTMLElement).style.color).toBe(RED);
+    expect(under.container.querySelector('[data-round-score-gross-topar]')?.textContent).toBe('−2');
+    expect((under.container.querySelector('[data-round-score-net-topar]') as HTMLElement).style.color).toBe(RED);
+    expect(under.container.querySelector('[data-round-score-net-topar]')?.textContent).toBe('−4');
+    under.unmount();
+    /* Thomas Holmes's real round: 85 +14, net 77 +6 on par 71 — both over, both muted. */
+    const over = card({ postRound: { ...ROUND, grossScore: 85, coursePar: 71, netScore: 77 } as PostRound });
+    expect(over.container.querySelector('[data-round-score-gross-topar]')?.textContent).toBe('+14');
+    expect((over.container.querySelector('[data-round-score-gross-topar]') as HTMLElement).style.color).toBe(MUTE);
+    expect(over.container.querySelector('[data-round-score-net-topar]')?.textContent).toBe('+6');
+    expect((over.container.querySelector('[data-round-score-net-topar]') as HTMLElement).style.color).toBe(MUTE);
+  });
+
   it('a round still in flight renders the card and fills the figures in place', () => {
     const { container } = card({ postRound: null, postRoundPending: true });
     expect(container.querySelector('[data-feed-round-card]')).not.toBeNull();
