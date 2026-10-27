@@ -24,6 +24,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams, useNavigate, type Location as RouterLocation } from "react-router-dom";
 import { setNavigateRef, appNavigate } from '@/utils/navigation';
 import ScrollToTop from '@/components/ScrollToTop';
+import CourseReviewsRedirect from '@/pages/CourseReviewsRedirect';
 import { WATCH_SURFACE } from '@/config/featureFlags';
 import { MomentsLibrarySkeleton } from '@/components/skeletons/MediaLibrarySkeletons';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -284,7 +285,6 @@ const UserReviewsRedirect: React.FC = () => {
 
 // Courses page now uses CoursesWrapped (imported above) which handles header/dim reset
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
-const CourseReviewsPage = lazy(() => import("./pages/CourseReviewsPage"));
 // BRIEF_COURSE_TAB_REBUILD §3.10 — the Course tab's one drill-down.
 const CourseHolesPage = lazy(() => import("./pages/CourseHolesPage"));
 const CourseRoundsPage = lazy(() => import("./pages/CourseRoundsPage"));
@@ -643,7 +643,7 @@ function AppRoutes() {
         <Route path="/post-v2" element={<Suspense fallback={<StageLoadingShell />}><PostV2Page /></Suspense>} />
         
         {/* /courses/:courseId/share-review/:reviewId removed in PR-5 Part 2 — orphan surface. ReviewWizard shares inline. */}
-        <Route path="/courses/:courseId/reviews" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseReviewsPage /></Suspense>} />
+        <Route path="/courses/:courseId/reviews" element={<CourseReviewsRedirect />} />
         <Route path="/user/:username/courses" element={<Suspense fallback={<CoursesListSkeleton />}><UserCoursesPage /></Suspense>} />
         
         {/* /community IS DELETED (BRIEF_DISCOVER_ONE_PAGE §3). Its four sections
