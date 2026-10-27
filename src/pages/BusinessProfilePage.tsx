@@ -629,7 +629,11 @@ const BusinessProfilePage: React.FC = () => {
         };
 
         const pa = (business.primary_action || null) as SecKey | null;
-        const promoted = pa && secDefs[pa]?.available ? pa : null;
+        /* CB103.1 — on a club the tee-time is the hero's own "Soon" pill, so a
+           promoted book action is no promoted action: the row must not offer a
+           working Book button that contradicts it. Website, call, directions
+           and email still promote exactly as before. */
+        const promoted = pa && secDefs[pa]?.available && !(isClub && pa === 'book') ? pa : null;
 
         const secOrder: SecKey[] = ['website', 'call', 'directions'];
         const secondary = secOrder.filter(k => secDefs[k].available && k !== promoted);
