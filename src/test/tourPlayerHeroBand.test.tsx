@@ -53,8 +53,12 @@ describe('tour player hero band', () => {
   it('the inset and the avatar door stay exactly as they were', () => {
     const { container } = render(<HeroSection player={player} playerStats={stats} selection={selection} />);
     const content = container.querySelector('h1')!.parentElement!;
-    expect(content.style.padding).toBe('24px 16px 16px');
+    /* Asserted as longhands: the shorthand serialises with the right inset
+       already folded in (24px 114px 16px 16px). */
+    expect(content.style.paddingTop).toBe('24px');
     expect(content.style.paddingRight).toBe('114px');
+    expect(content.style.paddingBottom).toBe('16px');
+    expect(content.style.paddingLeft).toBe('16px');
     const avatarDoor = content.parentElement!.querySelector(':scope > div[style*="absolute"]') as HTMLElement;
     expect(avatarDoor.style.right).toBe('16px');
     expect(avatarDoor.style.top).toBe('50%');
