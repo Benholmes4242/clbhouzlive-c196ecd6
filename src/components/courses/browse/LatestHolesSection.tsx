@@ -1,3 +1,4 @@
+import { HoleInlineVideo } from '@/components/course-media-tab/HoleInlineVideo';
 import { useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,7 +23,7 @@ import './latestHoles.css';
  * The gam_rpc/name prefix preserves AdminHoleTagging predicate invalidation.
  * First-page readiness/minimum are independent of later fetches; fullscreen freezes pagination
  * and receives a snapshot of every loaded row at the moment of the tap.
- * Credit shows the month the member added the shot to clbhouz (added_at), never its EXIF capture date; this rail never starts video playback.
+ * Credit shows the month the member added the shot to clbhouz (added_at), never its EXIF capture date; in-view video tiles play muted and looping through HoleInlineVideo in the page-wide "courses-member-shots" autoplay group (one video at a time).
  * Geometry is shared with the loading shell, not PhotoFigureCard.
  * BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS §2: a tap opens the CANONICAL
  * full-screen viewer (FullscreenFeedOverlay via openWithOrigin, readOnly)
@@ -63,7 +64,9 @@ function LatestHoleCard({ row, onOpen }: { row: LatestHoleMedia; onOpen: (row: L
     <button type="button" className="latest-hole-card" aria-label={`Hole ${row.hole_no}, ${row.course_name}`}
       style={{ width: LATEST_HOLE_W, height: LATEST_HOLE_H, background: A.PANEL, opacity: 1 }}
       onClick={() => onOpen(row)}>
-      <img src={row.media_type === 'video' ? holeMediaPoster(row) : row.media_url} alt="" loading="lazy" onError={event => { event.currentTarget.hidden = true; }} />
+      {row.media_type === 'video'
+        ? <HoleInlineVideo media={row} alt="" fit="cover" autoplayGroup="courses-member-shots" active />
+        : <img src={row.media_url} alt="" loading="lazy" onError={event => { event.currentTarget.hidden = true; }} />}
       <div className="latest-hole-scrim" style={{ background: SCRIM_STANDOUT }} />
       <div className="latest-hole-figure">
         <div className="latest-hole-number">{row.hole_no}</div>
