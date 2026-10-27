@@ -1,0 +1,26 @@
+.shot-tag-sheet { background:var(--media-v2-sheet);color:var(--media-v2-ink);border-radius:28px 28px 0 0;padding:14px 20px calc(34px + env(safe-area-inset-bottom,0px));width:100%;max-width:430px;left:50%;top:auto;bottom:0;transform:translateX(-50%);max-height:calc(100dvh - 48px);overflow-y:auto;gap:0;border:1px solid var(--media-v2-hair);will-change:transform; }
+.shot-tag-grabber { width:36px;height:4px;border-radius:2px;background:var(--media-v2-open-number);margin:0 auto; }
+.shot-tag-top { display:flex;align-items:center;gap:14px;margin-top:18px; }
+.shot-tag-thumb { position:relative;width:64px;height:64px;flex:none;border-radius:12px;overflow:hidden;background:var(--media-v2-inset); }
+.shot-tag-thumb img { width:100%;height:100%;object-fit:cover; }
+.shot-tag-heading { flex:1;min-width:0; }
+.shot-tag-title { font-size:20px;font-weight:700;line-height:1.2;letter-spacing:0;margin:5px 0 0; }
+.shot-tag-position { font-size:9.5px;font-weight:700;letter-spacing:.14em;color:var(--media-v2-dim);text-transform:uppercase; }
+.shot-tag-segments { display:grid;grid-template-columns:1fr 1fr;padding:3px;border-radius:12px;background:var(--media-v2-icon);margin-top:18px;gap:0; }
+.shot-tag-segments button { height:36px;border-radius:9px;background:transparent;color:var(--media-v2-mute);font-size:14px;font-weight:650;padding:0 8px;white-space:normal; }
+.shot-tag-segments [aria-selected=true] { background:var(--media-v2-ink);color:var(--media-v2-canvas); }
+.shot-tag-places { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px; }
+.shot-tag-place { position:relative;height:74px;border-radius:14px;border:1px solid var(--media-v2-hair);background:var(--media-v2-empty);display:flex;flex-direction:column;justify-content:center;gap:8px;color:var(--media-v2-ink);padding:6px;min-width:0; }
+.shot-tag-place span { font-size:12px;font-weight:600;white-space:normal;text-align:center;line-height:1.2; }
+.shot-tag-place[aria-pressed=true] { border-color:var(--media-v2-ink);background:var(--media-v2-hair); }
+.shot-tag-place i { position:absolute;right:7px;top:7px;width:16px;height:16px;border-radius:50%;background:var(--media-v2-ink);color:var(--media-v2-canvas);display:grid;place-items:center; }
+.shot-tag-note { font-size:12.5px;color:var(--media-v2-dim);margin:12px 0 0;line-height:1.4; }
+.shot-tag-buttons { display:flex;gap:8px;margin-top:16px; }
+.shot-tag-skip { width:96px;flex:none;height:50px;border-radius:14px;border:1px solid var(--coach-control-hair);background:transparent;color:var(--media-v2-ink);font-size:14.5px;font-weight:600; }
+.shot-tag-primary { flex:1;min-width:0;width:auto;height:50px;border-radius:14px;background:var(--media-v2-ink);color:var(--media-v2-canvas);font-size:15px;font-weight:650;white-space:normal; }
+.shot-tag-remove { font-size:13px;color:var(--media-v2-mute);background:transparent;margin-top:12px;height:32px; }
+.shot-tag-sheet .hole-photo-batch-strip { margin:14px -20px 0;padding:2px 20px;will-change:transform; }
+.shot-tag-sheet .hole-photo-batch-hero { display:none; }
+.shot-tag-sheet .hole-photo-batch-chip { display:none; }
+.shot-tag-sheet .hole-photo-batch-ok { margin:12px 0 0; }
+.shot-tag-sheet [role=group] { margin-top:14px; }
