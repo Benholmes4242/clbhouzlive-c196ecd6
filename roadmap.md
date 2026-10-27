@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB104 — Club profile: You and the club
+- [ ] Resolve heading placement: written section 2 calls “You and {club}” the title, while the signed-off mock makes it the kicker and rounds copy the title.
+- [ ] Add viewer card from existing per-course stats/circle reads and fix nation-valued city/region fields; preserve club-only scope.
+- [ ] Add CB104 cases and place-line cases; report round definitions and full-suite counts. Prior all-white rating duplicate-import and two colour assertion failures remain pre-existing blockers, outside this brief.
+
 ## All-white course and review ratings — 27 October 2026
 - [ ] Apply colours-only ruling across helpers, local displays and wizard; preserve null dim states and non-rating colours.
 - [ ] Update authorised colour assertions, add two helper cases, audit deliberate remaining hits and report full-suite counts.
