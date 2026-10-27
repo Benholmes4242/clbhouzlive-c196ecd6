@@ -191,6 +191,10 @@ export interface FeedCardProps {
    * Grid hosts that do not batch comment data leave it off.
    */
   commentPreviewEnabled?: boolean;
+  /** CB108: 'mediaFirst' (club profile feed) reorders the existing parts:
+   *  header, media, actions, liked-by, name-led caption, comments, add-a-comment.
+   *  'standard' (default) is the unchanged Clubhouse order. */
+  layout?: 'standard' | 'mediaFirst';
 }
 
 interface CaptionBlockProps {
@@ -200,9 +204,13 @@ interface CaptionBlockProps {
   isClamped: boolean;
   setIsClamped: (v: boolean) => void;
   textRef: React.MutableRefObject<HTMLDivElement | null>;
+  /** CB108 mediaFirst: actor short name, inline before the caption. */
+  lead?: string | null;
+  /** CB108 mediaFirst text-only body typography. */
+  textStyle?: React.CSSProperties;
 }
 
-const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded, isClamped, setIsClamped, textRef }) => {
+const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded, isClamped, setIsClamped, textRef, lead, textStyle }) => {
   useLayoutEffect(() => {
     const el = textRef.current;
     if (!el) return;
@@ -227,6 +235,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
             fontSize: 15,
             lineHeight: 1.4,
             color: T100,
+            ...textStyle,
             ...(!expanded
               ? {
                   display: '-webkit-box',
@@ -237,6 +246,7 @@ const CaptionBlock: React.FC<CaptionBlockProps> = ({ body, expanded, setExpanded
               : {}),
           }}
         >
+          {lead ? <><span data-caption-lead style={{ fontWeight: 600, color: T100 }}>{lead}</span>{' '}</> : null}
           <MentionText text={body} />
           {expanded && isClamped && (
             <button
@@ -315,6 +325,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   commentPreview,
   commentPreviewEnabled = false,
   homeRoundPlot = false,
+  layout = 'standard',
 }) => {
   const storedSlide = useClubhouseStore((s) => {
     if (carouselRestoreTab == null || feedIndex == null) return 0;
@@ -683,7 +694,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   );
   /* THE FOOTER (section A). ONE always-present object, last on every card.
      `compact` is the review card's tightened rows (action row 40, liked-by 26). */
-  const renderFooter = (gutter: number, compact: boolean) => (() => {
+  const renderFooter = (gutter: number, compact: boolean, mediaFirstSlots?: { caption: React.ReactNode; addComment: React.ReactNode }) => (() => {
         /* SHOW WHO LIKED A POST — the liked-by line is the SINGLE entry point on
            a card. The like count in the actions row stays untappable: two
            targets six pixels apart is a mis-tap. Zero likes renders no line and
@@ -708,14 +719,16 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
            bottom padding; everything above it carries none, so the gap above
            the first comment is the comment block's own 10px. */
         const actionsBottom = 0; // the liked-by line is always present (CB56)
-        const likedByBottom = showComments ? 0 : 12;
+        const likedByBottom = showComments || mediaFirstSlots ? 0 : 12;
 
         return (
           <div
+            data-feed-footer
             style={{
               /* 1px, matching PostCourseBand's rules and the card's own top
-                 rule. The app gets ONE hairline weight on this surface. */
-              borderTop: `1px solid ${LINE}`,
+                 rule. The app gets ONE hairline weight on this surface.
+                 CB108 mediaFirst: the signed-off mock draws no rule under the media. */
+              borderTop: mediaFirstSlots ? undefined : `1px solid ${LINE}`,
             }}
           >
             {/* POST ACTIONS RIGHT, ACTOR LEFT (Ben, 20 Oct): matches the
@@ -775,6 +788,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             )}
 
 
+            {mediaFirstSlots?.caption}
+
             {showComments && (
               <FeedCommentPreview
                 preview={commentPreview ?? null}
@@ -787,6 +802,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 padding={`10px ${gutter}px 12px`}
               />
             )}
+            {mediaFirstSlots?.addComment}
           </div>
         );
       })();
@@ -913,6 +929,44 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         </div>
       </div>
 
+      {layout === 'mediaFirst' ? (() => {
+        const hasMedia = items.length > 0;
+        const lead = post.actorType === 'business'
+          ? courseActivityClubName(post.displayName ?? '')
+          : (post.displayName ?? '');
+        const caption = (
+          <div data-feed-section="caption">
+            <CaptionBlock
+              body={post.caption || ''}
+              expanded={captionExpanded}
+              setExpanded={setCaptionExpanded}
+              isClamped={isCaptionClamped}
+              setIsClamped={setIsCaptionClamped}
+              textRef={captionTextRef}
+              lead={hasMedia ? lead : null}
+              textStyle={hasMedia ? undefined : { fontSize: 15.5, lineHeight: 1.5, color: 'rgba(248,250,252,0.92)' }}
+            />
+          </div>
+        );
+        const addComment = currentUserId ? (
+          <button
+            type="button"
+            data-feed-section="add-comment"
+            onClick={() => onComment(post, effectiveActor, 'add_comment_row')}
+            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px 16px', width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+          >
+            <SquircleAvatar src={effectiveActor?.avatarUrl ?? null} alt={effectiveActor?.name ?? ''} userId={effectiveActor?.id ?? currentUserId} size={26} hairlineRing />
+            <span style={{ fontSize: 13.5, color: 'rgba(248,250,252,0.42)' }}>Add a comment…</span>
+          </button>
+        ) : null;
+        return (
+          <>
+            {hasMedia ? <div data-feed-section="media">{renderMedia(false)}</div> : caption}
+            {renderCourseBand()}
+            <div data-feed-section="footer">{renderFooter(FOOTER_GUTTER, false, { caption: hasMedia ? caption : null, addComment })}</div>
+          </>
+        );
+      })() : <>
       {/* Empty-caption spacer: give the header breathing room when no caption block renders */}
       {!post.caption && (
         <div aria-hidden style={{ height: 8 }} />
@@ -935,7 +989,17 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       {/* Course band: identity + figures. The actions row is NO LONGER passed
           in — section A moved it into one always-present footer below, so a
           post with a course and a post without one end on the same object. */}
-      {(() => {
+      {renderCourseBand()}
+
+      {renderFooter(FOOTER_GUTTER, false)}
+      </>}
+
+      </div>
+    </article>
+  );
+
+  function renderCourseBand() {
+    return (() => {
         const courseLocation = [post.courseRegion || post.courseSubCountry, post.courseCountry]
           .filter(Boolean)
           .join(', ');
@@ -986,13 +1050,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             )}
           </>
         );
-      })()}
-
-      {renderFooter(FOOTER_GUTTER, false)}
-
-      </div>
-    </article>
-  );
+      })();
+  }
 };
 
 const SingleMediaTapButton: React.FC<{
