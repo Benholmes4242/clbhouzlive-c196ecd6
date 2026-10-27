@@ -70,6 +70,7 @@ import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toast } from '@/lib/toast';
+import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
 import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 
 /* Dark surface tokens (analytical ramp). BODY sits at 72% rather than the 62%
@@ -586,36 +587,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   )}
                 </div>
 
-                {rating != null && (
-                  <div style={{ flex: '0 0 auto', minWidth: 62, textAlign: 'right' }}>
-                    <div
-                      data-review-rating="true"
-                      style={{
-                        fontSize: 34,
-                        fontWeight: 800,
-                        lineHeight: 0.95,
-                        color: ratingColor,
-                        fontVariantNumeric: 'tabular-nums lining-nums',
-                      }}
-                    >
-                      {rating.toFixed(1)}
-                    </div>
-                    <div
-                      style={{
-                        marginTop: 3,
-                        fontSize: 10,
-                        fontWeight: 800,
-                        lineHeight: 1,
-                        letterSpacing: '0.14em',
-                        textTransform: 'uppercase',
-                        whiteSpace: 'nowrap',
-                        color: ratingColor,
-                      }}
-                    >
-                      {getRatingTierLabel(rating)}
-                    </div>
-                  </div>
-                )}
               </div>
 
               <div data-review-player-row="true" style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
@@ -652,37 +623,20 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 </div>
               )}
 
-              {/* §S.2 — THE SPREAD: label, figure, and a 4px track whose fill is
-                  this score out of ten and whose tick is the course's average
-                  for that category (three ratings or more only). */}
-              {breakdownEntries.length > 0 && (
-                <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 11 }}>
-                  {breakdownEntries.map(({ key, label, value, courseAvg }) => (
-                    <div key={key} data-review-subscore={key} style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', color: A.DIM, textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
-                      <div style={{ marginTop: 2, fontSize: 17, fontWeight: 800, letterSpacing: '-0.03em', color: courseSubScoreTone(value), fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>
-                        {value != null ? value.toFixed(1) : '\u2014'}
-                      </div>
-                      {value != null && (
-                        <div data-review-subscore-track style={{ position: 'relative', height: 4, borderRadius: 999, background: A.TRACK, marginTop: 6 }}>
-                          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(100, value * 10))}%`, borderRadius: 999, background: A.INK }} />
-                          {courseAvg != null && (
-                            <div data-review-subscore-tick style={{ position: 'absolute', top: -2.5, left: `${Math.max(0, Math.min(100, courseAvg * 10))}%`, width: 1.5, height: 9, borderRadius: 1, background: MUTE }} />
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-              {breakdownEntries.length > 0 && anyTick && (
-                <div data-review-subscore-key style={{ marginTop: 9, fontSize: 10.5, color: A.DIM }}>
-                  <span aria-hidden style={{ display: 'inline-block', width: 1.5, height: 8, background: MUTE, margin: '0 5px -1px 0', borderRadius: 1 }} />
-                  The mark is this course&rsquo;s average in that category.
-                </div>
-              )}
+              {/* §S.2 — the shared review score row (signed-off mock), below the
+                  comparison cards; the first-rating note sits directly under it. */}
+              <ReviewScoreRow
+                style={{ marginTop: 16 }}
+                overall={rating ?? null}
+                breakdown={{
+                  design: effectiveBreakdown?.design ?? null,
+                  condition: effectiveBreakdown?.conditions ?? null,
+                  clubhouse: effectiveBreakdown?.clubhouse ?? null,
+                  facilities: effectiveBreakdown?.facilities ?? null,
+                }}
+              />
               {breakdownEntries.length > 0 && !anyTick && ratingCount === 1 && (
-                <div data-review-subscore-first style={{ marginTop: 9, fontSize: 10.5, color: A.DIM }}>
+                <div data-review-subscore-first style={{ marginTop: 10, fontSize: 10.5, color: A.DIM }}>
                   No course average yet &mdash; this is the first rating here.
                 </div>
               )}
