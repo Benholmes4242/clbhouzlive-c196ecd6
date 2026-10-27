@@ -1,5 +1,8 @@
 # Roadmap
 
+## CB116 — Naming a coach
+- [ ] BLOCKED before implementation: brief requires signed-in confirmation of name_coach, get_my_coach, set_coach_options, stop_coach, get_member_coach, get_coach_results and get_coach_golfers. Browser authentication status is external_unmanaged; no managed session is available. No SQL, RPC writes, application edits or test changes performed. Await Ben's signed-in function checks or an explicit ruling permitting implementation without this prerequisite. Last reported green baseline: 3,670 tests / 411 files; no tests run for CB116.
+
 ## CB110 — Club review links and course Reviews landing
 - [x] Updated club links; CourseReviewsTab lands below measured sticky tabs through scrollElementIntoView. CourseDetailPage resets only on course entry, not landing-query cleanup. Public live 404×970 verified row top 48.14px / tabs bottom 48px, at consumed, no runtime errors; signed-in checks unavailable (external_unmanaged).
 - [x] Only old-page importer was App; replaced lazy/page route with CourseReviewsRedirect and deleted CourseReviewsPage.tsx. No direct old-page tests/importers remained. Preserves review/highlight parameters.
