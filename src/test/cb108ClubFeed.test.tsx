@@ -56,7 +56,7 @@ vi.mock('@/components/business/ClubYouCard', () => ({ ClubYouCard: () => null })
 vi.mock('@/store/clubhouseStore', () => ({ useClubhouseStore: (sel: (s: unknown) => unknown) => sel({ carouselPositions: new Map(), carouselPositionsByTab: {} }) }));
 vi.mock('@/stores/reviewSheetStore', () => ({ useReviewSheetStore: () => vi.fn() }));
 vi.mock('@/hooks/useReviewerStats', () => ({ useReviewerStats: () => ({ data: null }) }));
-vi.mock('@/hooks/useManageableBusinessIds', () => ({ useManageableBusinessIds: () => [], useTeamBusinessIds: () => [] }));
+vi.mock('@/hooks/useManageableBusinessIds', () => ({ useManageableBusinessIds: () => new Set(), useTeamBusinessIds: () => new Set() }));
 vi.mock('@/lib/impressions/useImpressionObserver', () => ({ useImpressionObserver: () => {} }));
 vi.mock('@/components/feed/FeedActorPicker', () => ({ FeedActorPicker: () => <div data-testid="actor-picker" /> }));
 vi.mock('@/components/likes/LikedByRow', () => ({ LikedByRow: () => <div data-testid="liked-by-row" /> }));
