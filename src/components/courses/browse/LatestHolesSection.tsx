@@ -14,6 +14,7 @@ import { RAIL_BLEED } from './format';
 import { PHOTO_FIGURE_GAP } from './PhotoFigureCard';
 import { LatestHolesShell, LatestHoleSkeletonCard } from './sectionShells';
 import { dedupeRailRows, useRailPagination } from './useRailPagination';
+import { LATEST_HOLE_H } from './railTileHeights';
 import './latestHoles.css';
 
 /** The RPC owns newest-first ordering, up to two shots per course and public eligibility.
