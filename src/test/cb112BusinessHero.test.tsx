@@ -26,7 +26,7 @@ function chainable() {
   const q: Record<string, unknown> = {};
   for (const m of ['select', 'eq', 'order', 'limit', 'single', 'maybeSingle', 'in', 'gte', 'lte', 'neq', 'is', 'or', 'filter']) q[m] = () => q;
   q.then = (onF: (v: unknown) => unknown, onR?: (e: unknown) => unknown) =>
-    Promise.resolve({ data: state.rows.length ? state.rows : state.courses, error: null }).then(onF, onR);
+    Promise.resolve({ data: state.rows.length ? state.rows : state.courses, error: null }).then((v) => { if (process.env.DBG) console.log('CHAIN', JSON.stringify(v)); return v; }).then(onF, onR);
   return q;
 }
 vi.mock('@/integrations/supabase/client', () => ({
