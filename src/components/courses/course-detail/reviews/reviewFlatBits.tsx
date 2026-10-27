@@ -22,9 +22,8 @@ import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import { ThumbsUp, MoreHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
-import { A, SANS, FIGS, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
-import { formatRatingValue } from '@/utils/formatters';
 import { MentionText } from '@/components/mentions/MentionText';
 import { ReviewMediaStrip } from '@/components/courses/review/ReviewMediaStrip';
 
