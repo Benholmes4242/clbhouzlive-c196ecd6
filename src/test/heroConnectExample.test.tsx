@@ -5,6 +5,8 @@ import { MemoryRouter } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import profileEnglish from '../../public/locales/en/profile.json';
 
+vi.mock('@/features/coach/BusinessCoachCards', async importOriginal => ({ ...(await importOriginal<typeof import('@/features/coach/BusinessCoachCards')>()), CoachProfileLine: () => null }));
+
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 const f = vi.hoisted(() => ({
   decline: vi.fn(),

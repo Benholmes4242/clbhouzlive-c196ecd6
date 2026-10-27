@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Course Media tab — signed-off rail and place tags
+- [ ] Final follow-up: apply exact approved insert/delete mock, add three requested coach-line test mocks (assertions unchanged), run full suite; on green consolidate both Media inventories into final report and delete both obsolete Media reports. Baseline3,731/414; intervening CB116.1 added3 tests →3,734/414.
 - [x] Partial top/header, sparse hole coverage rail, ready-cover fallback, place tiles and combined tag identity implemented; existing panel, hole RPCs and admin component unchanged. Place order follows places.ts by Ben's ruling; mock tile order is illustrative.
 - [x] Added independent owner-source place hook and canonical credited viewer mapping; course_place_media already exists in generated types; no generated types or SQL touched.
 - [x] Ruling received21:11UTC: both member taggers select then primary-submit; Skip closes single, advances batch and closes after last. Opening/errors preserved; admin remains hole-only. Nine-place order unchanged; every new Media t call gets English defaultValue.
