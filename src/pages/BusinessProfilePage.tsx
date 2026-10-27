@@ -71,6 +71,7 @@ import { ClubYouCard } from '@/components/business/ClubYouCard';
 import { BusinessYouCard } from '@/components/business/BusinessYouCard';
 import { BusinessNearbyCourses, scrollToNearbyCard } from '@/components/business/BusinessNearbyCourses';
 import { BusinessFollowersCard } from '@/components/business/BusinessFollowersCard';
+import { BusinessMentionsRail } from '@/components/business/BusinessMentionsRail';
 import { BusinessCoachInvite, BusinessCoachResults, coachStrip, scrollToCoachResults } from '@/features/coach/BusinessCoachCards';
 import { isCoachCategory } from '@/features/coach/contracts';
 import { useCoachResults } from '@/features/coach/hooks';
@@ -564,6 +565,7 @@ const BusinessProfilePage: React.FC = () => {
       <BusinessNearbyCourses isClub={isClub} viewerId={user?.id} business={business} />
       {/* CB115 — Their followers (every non-club business), before the tabs. */}
       <BusinessFollowersCard isClub={isClub} businessId={business.id} viewerId={user?.id} />
+      {!isClub && <BusinessMentionsRail isClub={false} businessId={business.id} viewerId={user?.id} canManage={!!membership?.canManage && !membershipQuery.isError} />}
 
       {/* CB105 — How it plays (club-only), replaces the retired courses panel. */}
       <ClubHowItPlays isClub={isClub} courses={courses} onOpen={handleCourseOpen} onFiguresResolved={handleFiguresResolved} />

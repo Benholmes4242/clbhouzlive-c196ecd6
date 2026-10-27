@@ -1,5 +1,9 @@
 # Roadmap
 
+## CB117 — Mentioned by golfers
+- [ ] Add non-club rail after followers, owner/admin hide/show sheet, server-only qualification and read-error omission; both RPCs exist and deny anon (signed-in checks unavailable external_unmanaged). Baseline3,734/414,zero failures; brief's old Media failures already resolved.
+- [ ] Add requested tests, full suite and report with post route and verification limits.
+
 ## Course Media tab — signed-off rail and place tags
 - [x] Final follow-up: exact approved insert/delete mock and three requested coach-line test mocks applied; all assertions unchanged, no app changes. Full bunx vitest run3,734/3,734 across414 files, zero failures. Delta+3 vs3,731 solely intervening CB116.1; no new tests this turn. Both obsolete Media reports consolidated into MEDIA_TAB_FINAL_REPORT.md and removed after green.
 - [x] Partial top/header, sparse hole coverage rail, ready-cover fallback, place tiles and combined tag identity implemented; existing panel, hole RPCs and admin component unchanged. Place order follows places.ts by Ben's ruling; mock tile order is illustrative.
