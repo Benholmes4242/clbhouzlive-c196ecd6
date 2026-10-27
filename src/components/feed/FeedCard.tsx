@@ -68,6 +68,7 @@ import { featuredRoundFrom, decideFeatured, type FeaturedTrigger } from './featu
 import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard';
 import type { RoundCourseMeta } from './roundPostItem';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
+import type { SubjectContext } from '@/components/sheets/SubjectContextLine';
 
 /** Home's content inset (the header's 12px). The round photo bleeds by it. */
 const ROUND_CARD_INSET = 12;
@@ -510,82 +511,6 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   // here silently disables the round card on Profile Posts. Keep this on
   // round data until post_type reaches the client on every construction site.
   const rendersRoundCard = !!postRound || !!postRoundPending;
-  if (rendersRoundCard) {
-    const item = roundPostItem(post, postRound ?? null, currentUserId, consequenceSources, roundCourseMeta);
-    const roundEngagement = {
-      likeCount,
-      liked,
-      likeAvailable: true,
-      commentCount,
-      onToggleLike: () => onLike(post, effectiveActor),
-      onOpenComments: () => onComment(post, effectiveActor, 'footer_glyph'),
-    };
-    /* FEATURED ROUNDS — Home only (consequence sources are Home's). A
-       qualifying round renders the shared hero; its reaction and comments are
-       the same post-like path as the ordinary card, which routes to
-       content_reactions('round', whs_score_id) — one reaction, one count. */
-    const trigger = consequenceSources && postRound && featuredDecisions
-      ? decideFeatured(featuredDecisions, post, postRound, consequenceSources.records, !!item.subject?.pending, weekPickScoreId)
-      : null;
-    if (trigger && postRound) {
-      return (
-        <article ref={articleRef} data-feed-featured-round="true" style={{ background: CARD, position: 'relative', borderTop: feedIndex === 0 ? undefined : `1px solid ${LINE}` }}>
-          <FeaturedRoundCard
-            round={featuredRoundFrom(post, postRound, trigger, item.subject?.image_url ?? null)}
-            viewerId={currentUserId ?? undefined}
-            shape={roundShape ?? null}
-            medals={roundMedals ?? null}
-            engagement={roundEngagement}
-            square
-            pillLabel={tCourses('courseDetail.featured.featuredPill')}
-            isFollowed={mountFollowPill ? !!post.isFollowedByMe : undefined}
-            onFollow={mountFollowPill ? () => onFollow!(post) : undefined}
-            onOpen={() => onRoundTap?.(post, postRound)}
-          />
-        </article>
-      );
-    }
-    return (
-      <article
-        ref={articleRef}
-        data-feed-round-card="true"
-        style={{
-          background: CARD,
-          overflow: 'hidden',
-          position: 'relative',
-          paddingInline: ROUND_CARD_INSET,
-          paddingBottom: 14,
-          borderTop: feedIndex === 0 ? undefined : `1px solid ${LINE}`,
-        }}
-      >
-        <ExploreCard
-          item={item}
-          size="std"
-          bleed={ROUND_CARD_INSET}
-          shape={postRound ? (roundShape === undefined ? undefined : roundShape) : undefined}
-          feedPlot={homeRoundPlot}
-          medals={roundMedals}
-          onTap={() => { if (postRound) onRoundTap?.(post, postRound); }}
-          onWhoTap={() => onProfile(post)}
-          isFollowed={mountFollowPill ? !!post.isFollowedByMe : undefined}
-          onFollow={mountFollowPill ? () => onFollow!(post) : undefined}
-          engagement={{
-            kind: 'celebrate',
-            likeCount,
-            liked,
-            likeAvailable: true,
-            commentCount,
-            commentAvailable: true,
-            onToggleLike: () => onLike(post, effectiveActor),
-            onOpenComments: () => onComment(post, effectiveActor, 'footer_glyph'),
-            reactionSubjectId: postRound?.whsScoreId ?? null,
-            ownerName: post.displayName ?? null,
-            isOwnRound: item.who?.is_viewer === true,
-          }}
-        />
-      </article>
-    );
-  }
 
   /* The media frame and the footer are shared by the standard card and the
      review card, so likes, comments, sharing, the owner menu and the
@@ -695,7 +620,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   );
   /* THE FOOTER (section A). ONE always-present object, last on every card.
      `compact` is the review card's tightened rows (action row 40, liked-by 26). */
-  const renderFooter = (gutter: number, compact: boolean, mediaFirstSlots?: { caption: React.ReactNode; addComment: React.ReactNode }) => (() => {
+  const renderFooter = (gutter: number, compact: boolean, mediaFirstSlots?: { caption: React.ReactNode; addComment: React.ReactNode; likedByRound?: { subjectId: string; isOwnRound: boolean; subject: SubjectContext | null } }) => (() => {
         /* SHOW WHO LIKED A POST — the liked-by line is the SINGLE entry point on
            a card. The like count in the actions row stays untappable: two
            targets six pixels apart is a mis-tap. Zero likes renders no line and
@@ -771,9 +696,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                   The in-flight count and resolved names occupy this same
                   one-line box, so neither height nor x-position moves. */
               <LikedByRow
-                postId={post.id}
+                postId={mediaFirstSlots?.likedByRound?.subjectId ?? post.id}
                 count={likeCount}
-                subject={post.review ? {
+                source={mediaFirstSlots?.likedByRound ? 'round' : 'post'}
+                kind={mediaFirstSlots?.likedByRound ? 'celebrate' : 'like'}
+                isOwnRound={mediaFirstSlots?.likedByRound?.isOwnRound ?? false}
+                subject={mediaFirstSlots?.likedByRound ? mediaFirstSlots.likedByRound.subject : post.review ? {
                   authorName: post.displayName ?? null,
                   courseId: post.review.courseId ?? null,
                   courseName: post.review.courseName ?? null,
@@ -820,6 +748,108 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       <span style={{ fontSize: 13.5, color: 'rgba(248,250,252,0.42)' }}>Add a comment…</span>
     </button>
   ) : null;
+
+  if (rendersRoundCard) {
+    const item = roundPostItem(post, postRound ?? null, currentUserId, consequenceSources, roundCourseMeta);
+    const roundEngagement = {
+      likeCount,
+      liked,
+      likeAvailable: true,
+      commentCount,
+      onToggleLike: () => onLike(post, effectiveActor),
+      onOpenComments: () => onComment(post, effectiveActor, 'footer_glyph'),
+    };
+    /* FEATURED ROUNDS — Home only (consequence sources are Home's). A
+       qualifying round renders the shared hero; its reaction and comments are
+       the same post-like path as the ordinary card, which routes to
+       content_reactions('round', whs_score_id) — one reaction, one count. */
+    const trigger = consequenceSources && postRound && featuredDecisions
+      ? decideFeatured(featuredDecisions, post, postRound, consequenceSources.records, !!item.subject?.pending, weekPickScoreId)
+      : null;
+    if (trigger && postRound) {
+      return (
+        <article ref={articleRef} data-feed-featured-round="true" style={{ background: CARD, position: 'relative', borderTop: feedIndex === 0 ? undefined : `1px solid ${LINE}` }}>
+          <FeaturedRoundCard
+            round={featuredRoundFrom(post, postRound, trigger, item.subject?.image_url ?? null)}
+            viewerId={currentUserId ?? undefined}
+            shape={roundShape ?? null}
+            medals={roundMedals ?? null}
+            engagement={roundEngagement}
+            square
+            pillLabel={tCourses('courseDetail.featured.featuredPill')}
+            isFollowed={mountFollowPill ? !!post.isFollowedByMe : undefined}
+            onFollow={mountFollowPill ? () => onFollow!(post) : undefined}
+            onOpen={() => onRoundTap?.(post, postRound)}
+          />
+        </article>
+      );
+    }
+    /* CB111 — mediaFirst feeds (Clubhouse, profile posts) render the round
+       SCORE-LED: ExploreCard draws author, score block, course and chart with
+       no engagement of its own, and the shared media-first footer ends the
+       card exactly like every other post. The celebrated line keeps the
+       round's own reaction path (source 'round', whs_score_id). The standard
+       layout is byte-identical to before. */
+    const scoreLed = layout === 'mediaFirst';
+    return (
+      <article
+        ref={articleRef}
+        data-feed-round-card="true"
+        style={{
+          background: CARD,
+          overflow: 'hidden',
+          position: 'relative',
+          paddingInline: scoreLed ? 0 : ROUND_CARD_INSET,
+          paddingBottom: scoreLed ? 0 : 14,
+          borderTop: feedIndex === 0 ? undefined : `1px solid ${LINE}`,
+        }}
+      >
+        <ExploreCard
+          item={item}
+          size="std"
+          bleed={scoreLed ? 0 : ROUND_CARD_INSET}
+          shape={postRound ? (roundShape === undefined ? undefined : roundShape) : undefined}
+          feedPlot={homeRoundPlot}
+          feedLayout={scoreLed ? 'scoreLed' : undefined}
+          medals={roundMedals}
+          onTap={() => { if (postRound) onRoundTap?.(post, postRound); }}
+          onWhoTap={() => onProfile(post)}
+          isFollowed={mountFollowPill ? !!post.isFollowedByMe : undefined}
+          onFollow={mountFollowPill ? () => onFollow!(post) : undefined}
+          engagement={scoreLed ? undefined : {
+            kind: 'celebrate',
+            likeCount,
+            liked,
+            likeAvailable: true,
+            commentCount,
+            commentAvailable: true,
+            onToggleLike: () => onLike(post, effectiveActor),
+            onOpenComments: () => onComment(post, effectiveActor, 'footer_glyph'),
+            reactionSubjectId: postRound?.whsScoreId ?? null,
+            ownerName: post.displayName ?? null,
+            isOwnRound: item.who?.is_viewer === true,
+          }}
+        />
+        {scoreLed ? renderFooter(FOOTER_GUTTER, false, {
+          caption: null,
+          addComment,
+          likedByRound: postRound?.whsScoreId ? {
+            subjectId: postRound.whsScoreId,
+            isOwnRound: item.who?.is_viewer === true,
+            subject: {
+              authorName: post.displayName ?? null,
+              courseId: item.subject?.course_id ?? null,
+              courseName: item.subject?.course_name ?? null,
+              kind: 'round',
+              gross: item.facts.gross ?? null,
+              toPar: item.facts.to_par ?? null,
+              rating: null,
+            },
+          } : undefined,
+        }) : null}
+      </article>
+    );
+  }
 
   /* ONE HOME: every review post, resolved course or not, is ReviewPostCard. */
   if (post.isReview) {
