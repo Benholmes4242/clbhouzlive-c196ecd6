@@ -1108,6 +1108,31 @@
       "membersHere": "Members here",
       "aboutMore": "More",
       "aboutLess": "Less"
+    },
+    "nearby": {
+      "noRounds": "No rounds yet",
+      "rounds_one": "{{n}} round",
+      "rounds_other": "{{n}} rounds"
+    },
+    "followers": {
+      "kicker": "Their followers",
+      "withHandicap_one": "{{n}} with a handicap",
+      "withHandicap_other": "{{n}} with a handicap",
+      "band": {
+        "under5": "Under 5",
+        "b5": "5–10",
+        "b10": "10–15",
+        "b15": "15–20",
+        "b20": "20+"
+      },
+      "you": "You",
+      "wherePlay": "Where they play most",
+      "firstRounds_one": "{{n}} of their rounds in the last 12 months",
+      "firstRounds_other": "{{n}} of their rounds in the last 12 months",
+      "rounds_one": "{{n}} round",
+      "rounds_other": "{{n}} rounds",
+      "footCourses": "From followers who show their handicap publicly. A course appears once 3 of them have played it.",
+      "footMix": "From followers who show their handicap publicly."
     }
   },
   "handicap": {
