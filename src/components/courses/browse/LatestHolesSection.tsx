@@ -32,7 +32,7 @@ import './latestHoles.css';
  * unchanged.
  */
 export const LATEST_HOLE_W = 220;
-export const LATEST_HOLE_H = 293;
+export { LATEST_HOLE_H };
 export const LATEST_HOLE_PAGE_SIZE = 20;
 const holesViewerOpen = () => useFullscreenFeedStore.getState().isOpen;
 
