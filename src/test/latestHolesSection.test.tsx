@@ -7,8 +7,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { CourseHole, CourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 
-const f = vi.hoisted(() => ({ latest: [] as import('@/components/courses/browse/LatestHolesSection').LatestHoleMedia[], loading: false, error: false, rpc: vi.fn(), analysis: null as CourseHoleAnalysis | null, rows: [] as HolePhoto[], total: 8, known: vi.fn(), holeRpc: vi.fn(), open: vi.fn() }));
-vi.mock('@/lib/reviewVideoAutoplay', async o => ({ ...await o<object>(), registerReviewVideo: (...a: unknown[]) => { f.register(...a); return () => {}; } }));
+const f = vi.hoisted(() => ({ latest: [] as import('@/components/courses/browse/LatestHolesSection').LatestHoleMedia[], loading: false, error: false, rpc: vi.fn(), analysis: null as CourseHoleAnalysis | null, rows: [] as HolePhoto[], total: 8, known: vi.fn(), holeRpc: vi.fn(), open: vi.fn(), register: vi.fn() }));
+vi.mock('@/components/explore-tab-new/courseled/reviewVideoAutoplay', async o => ({ ...await o<object>(), registerReviewVideo: (...a: unknown[]) => { f.register(...a); return () => {}; } }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: (...args: unknown[]) => f.holeRpc(...args) } }));
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: (...args: unknown[]) => f.open(...args) }));

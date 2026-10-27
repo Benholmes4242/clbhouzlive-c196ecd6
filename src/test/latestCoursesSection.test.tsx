@@ -13,7 +13,7 @@ const f = vi.hoisted(() => ({
   gallery: { data: undefined as unknown, isError: false },
   open: vi.fn(),
 }));
-vi.mock('@/lib/reviewVideoAutoplay', async o => ({ ...await o<object>(), registerReviewVideo: (...a: unknown[]) => { f.register(...a); return () => {}; } }));
+vi.mock('@/components/explore-tab-new/courseled/reviewVideoAutoplay', async o => ({ ...await o<object>(), registerReviewVideo: (...a: unknown[]) => { f.register(...a); return () => {}; } }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'member' } }) }));
 vi.mock('@tanstack/react-query', async importOriginal => ({ ...await importOriginal<typeof import('@tanstack/react-query')>(), useInfiniteQuery: (options: unknown) => { f.rpc(options); return { data: { pages: [f.rows] }, isLoading: f.loading, isError: f.error, hasNextPage: false, isFetching: f.loading, isFetchingNextPage: false, fetchNextPage: vi.fn() }; } }));
