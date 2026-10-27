@@ -648,7 +648,7 @@ const CourseWebsiteSheet: React.FC<CourseWebsiteSheetProps> = ({
                     </div>
                   ))}
                 </div>
-                <span style={{ flex: 1, fontSize: 13, color: MUTE }}>{circleText.text}</span>
+                <span style={{ flex: 1, fontSize: 13, color: MUTE }}>{circleText}</span>
                 <ChevronRight style={{ width: 16, height: 16, color: DIM, flexShrink: 0 }} />
               </button>
             )}

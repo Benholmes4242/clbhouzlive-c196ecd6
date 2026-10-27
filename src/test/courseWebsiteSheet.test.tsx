@@ -310,7 +310,8 @@ describe('CourseWebsiteSheet — actions', () => {
     Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
     setup();
     fireEvent.click(screen.getByRole('button', { name: 'Copy link' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Copied' })).toBeTruthy());
+    await vi.advanceTimersByTimeAsync(0);
+    expect(screen.getByRole('button', { name: 'Copied' })).toBeTruthy();
     expect(writeText).toHaveBeenCalledWith('https://www.royalexample.co.uk/visit');
     expect(mocks.toastSuccess).toHaveBeenCalledWith('Copied to clipboard');
     await vi.advanceTimersByTimeAsync(2100);
