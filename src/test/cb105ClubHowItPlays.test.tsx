@@ -1,7 +1,8 @@
 /** CB105 — golf club profile section 3, "How it plays". */
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render } from '@testing-library/react';
-import { ClubHowItPlays, pickHardestHole, type BusinessClubCourse } from '@/components/business/ClubHowItPlays';
+import { ClubHowItPlays, pickEasiestHole, pickHardestHole, type BusinessClubCourse } from '@/components/business/ClubHowItPlays';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
@@ -125,4 +126,29 @@ describe('CB105 How it plays', () => {
     mocks.stats = { east: st(20) };
     expect(render2([east], vi.fn(), false).querySelector('[data-club-how-it-plays]')).toBeNull();
   });
+
+  it('pickEasiestHole takes the lowest average, ties going to the higher stroke index', () => {
+    const holes = [hole(1, 0.5, 7), hole(2, 0.5, 12), hole(3, 0.5, null)];
+    expect(pickEasiestHole(holes)).toBe(2);
+  });
+
+  it('easiest hole takes the green bar while hardest keeps red and others stay neutral', () => {
+    const holes = Array.from({ length: 18 }, (_, i) => hole(i + 1, 0.3));
+    holes[3] = hole(4, 1.4);
+    holes[16] = hole(17, -0.2);
+    mocks.stats = { east: st(20) };
+    mocks.holes = { east: analysis(holes) };
+    expect(pickEasiestHole(holes)).toBe(17);
+    const b = block(render2([east]), 'east');
+    const bars = b.querySelectorAll<HTMLElement>('[data-club-plays-strip] i');
+    expect(bars[16].style.background).toBe(norm(A.GREEN));
+    expect(bars[3].style.background).toBe(norm('#D9473B'));
+    expect(bars[0].style.background).not.toBe(norm(A.GREEN));
+    expect(bars[0].style.background).not.toBe(norm('#D9473B'));
+  });
 });
+
+const norm = (hex: string) => {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgb(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255})`;
+};
