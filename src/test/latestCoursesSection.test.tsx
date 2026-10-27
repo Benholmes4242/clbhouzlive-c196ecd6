@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const f = vi.hoisted(() => ({
   rows: [] as import('@/components/courses/browse/LatestCoursesSection').LatestCourseMedia[],
-  loading: false,
+  loading: false, register: vi.fn(),
   error: false,
   rpc: vi.fn(),
   gallery: { data: undefined as unknown, isError: false },
