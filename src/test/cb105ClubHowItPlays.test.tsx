@@ -142,9 +142,9 @@ describe('CB105 How it plays', () => {
     const b = block(render2([east]), 'east');
     const bars = b.querySelectorAll<HTMLElement>('[data-club-plays-strip] i');
     expect(bars[16].style.background).toBe(norm(A.GREEN));
-    expect(bars[3].style.background).toBe(norm('#D9473B'));
+    expect(bars[3].style.background).toBe(norm(A.RED));
     expect(bars[0].style.background).not.toBe(norm(A.GREEN));
-    expect(bars[0].style.background).not.toBe(norm('#D9473B'));
+    expect(bars[0].style.background).not.toBe(norm(A.RED));
   });
 });
 

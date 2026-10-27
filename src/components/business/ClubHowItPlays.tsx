@@ -29,7 +29,7 @@ export interface BusinessClubCourse {
 const T = {
   card: '#17171B', inset: '#1E1E23', ink: '#F8FAFC', mute: 'rgba(248,250,252,0.62)',
   dim: 'rgba(248,250,252,0.42)', faint: 'rgba(248,250,252,0.28)', hair: 'rgba(255,255,255,0.08)',
-  bar: 'rgba(248,250,252,0.22)', red: '#D9473B', green: A.GREEN,
+  bar: 'rgba(248,250,252,0.22)', red: A.RED, green: A.GREEN,
 } as const;
 const TAB = { fontVariantNumeric: 'tabular-nums' } as const;
 
