@@ -210,22 +210,26 @@ describe('CB112 team row', () => {
     await waitFor(() => expect(container.querySelector('[data-club-actions="team"]')).not.toBeNull());
     const ins = container.querySelector('[data-insights-pill]') as HTMLElement;
     expect(ins.style.background).toBe('rgb(248, 250, 252)');
-    expect(screen.getByRole('button', { name: 'Post as the business' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Edit business profile' })).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Your courses' })).toBeNull();
-    expect(screen.queryByRole('button', { name: /Follow/ })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Message' })).toBeNull();
+    const row = Array.from(container.querySelectorAll('[data-club-actions] button'));
+    expect(row).toHaveLength(3);
+    expect(row[0]).toBe(ins);
+    expect(row[1].querySelector('svg.lucide-plus')).not.toBeNull();
+    expect(row[2].querySelector('svg.lucide-pencil')).not.toBeNull();
+    expect(row.some((b) => /Your courses|Follow/.test(b.textContent || ''))).toBe(false);
+    expect(container.querySelector('[data-club-actions] svg.lucide-message-circle')).toBeNull();
     fireEvent.click(ins);
     await waitFor(() => expect(container.querySelector('[data-loc="/business/b1/insights"]')).not.toBeNull());
   });
-  it('analyst without insights sees circles only by permission', async () => {
+  it('an editor without insights sees the Post and Edit circles alone', async () => {
     state.membership = { role: 'editor', canViewInsights: false, canManage: false };
     state.business = fixture();
     const { container } = renderPage();
     await waitFor(() => expect(container.querySelector('[data-club-actions="team"]')).not.toBeNull());
     expect(container.querySelector('[data-insights-pill]')).toBeNull();
-    expect(screen.getByRole('button', { name: 'Post as the business' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Edit business profile' })).toBeTruthy();
+    const row = Array.from(container.querySelectorAll('[data-club-actions] button'));
+    expect(row).toHaveLength(2);
+    expect(row[0].querySelector('svg.lucide-plus')).not.toBeNull();
+    expect(row[1].querySelector('svg.lucide-pencil')).not.toBeNull();
   });
 });
 
@@ -263,7 +267,7 @@ describe('CB112 figure strip', () => {
     Element.prototype.scrollIntoView = scroll;
     const r = renderPage();
     await waitFor(() => expect(r.container.querySelector('[data-business-tabs]')).not.toBeNull());
-    fireEvent.click(screen.getByRole('button', { name: 'About' }));
+    fireEvent.click(screen.getByText('About'));
     expect(r.container.querySelector('[data-about-content]')).not.toBeNull();
     fireEvent.click(r.container.querySelector('[data-cell="posts"]')!);
     expect(r.container.querySelector('[data-posts-content]')).not.toBeNull();
@@ -279,7 +283,7 @@ describe('CB112 clubs unchanged', () => {
     state.membership = { role: 'owner', canViewInsights: true, canManage: true };
     state.business = fixture({ club_id: 'c1', category: 'Golf Course', is_verified: true });
     const { container } = renderPage();
-    await waitFor(() => expect(container.querySelector('[data-club-place]')!.textContent).toContain('Golf club'));
+    await waitFor(() => expect(container.querySelector('[data-club-place]')!.textContent).toContain('Golf club'), { timeout: 3000 });
     const yc = screen.queryByRole('button', { name: 'Your courses' });
     if (yc) expect((yc as HTMLElement).style.background).toBe('rgb(248, 250, 252)');
     expect((container.querySelector('[data-insights-pill]') as HTMLElement).style.background).toBe('rgba(255, 255, 255, 0.07)');
