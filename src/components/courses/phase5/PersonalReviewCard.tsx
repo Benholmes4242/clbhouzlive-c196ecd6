@@ -12,9 +12,6 @@ import { useTranslation } from 'react-i18next';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
 import { formatMonthDayYearShort } from '@/i18n/format';
-import {
-  SubScoreBar,
-} from '@/features/courses/_shared/scoreBands';
 import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
 import { MentionText } from '@/components/mentions/MentionText';
 import { stripMentionMarkup } from '@/lib/mentions/format';
