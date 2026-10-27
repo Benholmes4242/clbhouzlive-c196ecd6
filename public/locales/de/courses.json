@@ -1465,7 +1465,55 @@
     "signInBody": "See photos and videos from golfers who've played here.",
     "signInCta": "Sign in",
     "signInTitle": "Sign in to view media",
-    "uploadVideo": "Upload a video"
+    "uploadVideo": "Upload a video",
+    "v2": {
+      "kicker": "Through members' eyes",
+      "sorted": "{{total}} shots, sorted by the golfers who took them",
+      "unsorted": "{{total}} shots, none sorted yet",
+      "sub": "By hole and around the club. Tap any of them to walk it.",
+      "holeByHole": "Hole by hole",
+      "coverage": "{{shot}} of {{holes}} holes",
+      "coverageHole": "Coverage hole {{hole}}",
+      "holesToGo_one": "{{count}} hole to go",
+      "holesToGo_other": "{{count}} holes to go",
+      "addFirstShot": "Add the first shot of one",
+      "shots_one": "{{count}} shot",
+      "shots_other": "{{count}} shots",
+      "around": "Around the club",
+      "everything": "Everything",
+      "allShots": "All shots",
+      "unsortedTitle": "Sort them by hole or by place",
+      "unsortedBody": "Tag a shot to a hole, the clubhouse, the food, the practice ground or anything else, and this page builds itself.",
+      "tagYour_one": "Tag your {{count}} shot",
+      "tagYour_other": "Tag your {{count}} shots",
+      "add": "Add a photo or video",
+      "ownCount": "{{count}} of yours",
+      "untagged_one": "isn't tagged yet",
+      "untagged_other": "aren't tagged yet",
+      "tagThem": "Tag them",
+      "processing": "Processing",
+      "places": {
+        "clubhouse": "Clubhouse",
+        "food_drink": "Food & drink",
+        "practice": "Practice",
+        "pro_shop": "Pro shop",
+        "views": "Views",
+        "golfers": "Golfers",
+        "conditions": "Conditions",
+        "stay": "Stay",
+        "other": "Something else"
+      },
+      "age": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "days_one": "{{count}} day ago",
+        "days_other": "{{count}} days ago",
+        "weeks_one": "{{count}} week ago",
+        "weeks_other": "{{count}} weeks ago",
+        "months_one": "{{count}} month ago",
+        "months_other": "{{count}} months ago"
+      }
+    }
   },
   "network": {
     "badge": {
