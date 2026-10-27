@@ -128,7 +128,9 @@ describe('active hole tile autoplay', () => {
   it('batch-open pauses the underlying walk and Close releases it', async () => {
     render(<MemoryRouter><QueryClientProvider client={new QueryClient()}><CourseMediaTabNew courseId="course" /></QueryClientProvider></MemoryRouter>);
     expect(f.walkProps.mock.lastCall?.[0].mediaPaused).toBe(false);
-    fireEvent.click(screen.getByRole('button', { name: 'Tag them' })); await screen.findByRole('dialog');
+    const row = document.querySelector('.media-v2-untagged');
+    if (!row) throw new Error('Missing member untagged row');
+    fireEvent.click(row); await screen.findByRole('dialog');
     expect(f.walkProps.mock.lastCall?.[0].mediaPaused).toBe(true);
     fireEvent.click(screen.getByRole('button', { name: 'Close' })); expect(f.walkProps.mock.lastCall?.[0].mediaPaused).toBe(false);
   });
