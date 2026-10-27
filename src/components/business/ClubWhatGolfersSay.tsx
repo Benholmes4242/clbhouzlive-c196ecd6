@@ -116,8 +116,8 @@ export function ClubWhatGolfersSay({ isClub, businessId, businessName, courses, 
         {courses.map((c) => (
           <button key={c.id} type="button" data-club-say-pick={c.id} onClick={() => openRate(c.id)}
             style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center',
-              padding: '14px 0', borderTop: `1px solid ${T.hair}`, background: 'transparent', border: 'none',
-              borderTopStyle: 'solid', borderTopWidth: 1, borderTopColor: T.hair,
+              padding: '14px 0', background: 'transparent', border: 0,
+              borderTop: `1px solid ${T.hair}`,
               fontSize: 15, fontWeight: 600, color: T.ink, cursor: 'pointer', textAlign: 'left' }}>
             {courseNameWithinClub(c.name)}
             <span style={{ fontSize: 12.5, color: T.dim, fontWeight: 400 }}>›</span>

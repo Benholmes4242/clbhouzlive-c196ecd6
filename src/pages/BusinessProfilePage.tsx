@@ -557,6 +557,9 @@ const BusinessProfilePage: React.FC = () => {
       {/* CB105 — How it plays (club-only), replaces the retired courses panel. */}
       <ClubHowItPlays isClub={isClub} courses={courses} onOpen={handleCourseOpen} onFiguresResolved={handleFiguresResolved} />
 
+      {/* CB106 — What golfers say (club-only), directly after How it plays. */}
+      <ClubWhatGolfersSay isClub={isClub} businessId={business.id} businessName={business.name} courses={courses} viewerId={user?.id} isTeamMember={!!membership} />
+
       {/* ----- Bio on canvas (no card) ----- */}
       {!isClub && bioText && (
         <div className="px-4 pt-4 relative z-10 pointer-events-auto">
