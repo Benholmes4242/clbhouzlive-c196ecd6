@@ -20827,6 +20827,7 @@ export type Database = {
         Args: { p_business_id: string }
         Returns: Json
       }
+      get_business_mentions: { Args: { p_business_id: string }; Returns: Json }
       get_business_post_reach: {
         Args: { p_business_id: string; p_days?: number }
         Returns: Json
@@ -25454,6 +25455,10 @@ export type Database = {
           p_user_profile_id: string
         }
         Returns: Json
+      }
+      set_business_mention_hidden: {
+        Args: { p_business_id: string; p_hidden: boolean; p_post_id: string }
+        Returns: undefined
       }
       set_coach_options: {
         Args: { p_share_name: boolean; p_show_on_profile: boolean }

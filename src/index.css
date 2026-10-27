@@ -21,6 +21,14 @@
 @tailwind utilities;
 
 :root {
+  --business-mention-canvas:#0B0B0D;
+  --business-mention-photo-ink:#FFFFFF;
+  --business-mention-mute:rgba(248,250,252,.62);
+  --business-mention-dim:rgba(248,250,252,.42);
+  --business-mention-play:rgba(0,0,0,.5);
+  --business-mention-menu:rgba(0,0,0,.55);
+  --business-mention-ring:rgba(255,255,255,.2);
+  --business-mention-gradient:linear-gradient(180deg,rgba(0,0,0,0) 50%,rgba(0,0,0,.65) 100%);
   --coach-canvas:#0B0B0D;
   --coach-green:#34D399;
   --coach-danger:#F87171;

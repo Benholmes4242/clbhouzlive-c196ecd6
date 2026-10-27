@@ -1,0 +1,27 @@
+.business-mentions-head { display:flex; justify-content:space-between; align-items:baseline; gap:12px; padding:22px 18px 12px; }
+.business-mentions-head h2 { margin:0; font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--business-mention-mute); }
+.business-mentions-count { font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--business-mention-dim); white-space:nowrap; }
+.business-mentions-rail { display:flex; gap:8px; padding:0 16px; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; will-change:transform; }
+.business-mentions-rail::-webkit-scrollbar { display:none; }
+.business-mention-tile { position:relative; flex:0 0 132px; width:132px; height:165px; border-radius:14px; overflow:hidden; background:var(--business-mention-canvas); scroll-snap-align:start; }
+.business-mention-open { display:block; position:absolute; inset:0; width:100%; height:100%; padding:0; border:0; border-radius:0; background:transparent; color:var(--business-mention-photo-ink); }
+.business-mention-open:hover { background:transparent; }
+.business-mention-image { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.business-mention-tile[data-hidden=true] .business-mention-image { opacity:.4; }
+.business-mention-gradient { position:absolute; inset:0; background:var(--business-mention-gradient); pointer-events:none; }
+.business-mention-who { position:absolute; bottom:8px; left:8px; right:8px; display:flex; align-items:center; gap:6px; }
+.business-mention-who-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11.5px; font-weight:600; }
+.business-mention-play { position:absolute; top:8px; right:8px; width:22px; height:22px; border-radius:50%; display:flex; justify-content:center; align-items:center; background:var(--business-mention-play); pointer-events:none; }
+.business-mention-play svg { width:10px; height:10px; fill:currentColor; }
+.business-mention-more { position:absolute; z-index:1; top:8px; left:8px; width:24px; min-width:24px; height:24px; padding:0; border:0; border-radius:50%; background:var(--business-mention-menu); color:var(--business-mention-photo-ink); }
+.business-mention-more:hover { background:var(--business-mention-menu); }
+.business-mention-more svg { width:13px; height:13px; }
+.business-mention-hidden { position:absolute; top:10px; left:36px; padding:2px 7px; border-radius:999px; background:var(--business-mention-menu); color:var(--business-mention-photo-ink); font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; pointer-events:none; }
+.business-mention-sheet { padding:0 16px 22px; }
+.business-mention-choice { display:flex; width:100%; height:auto; justify-content:flex-start; gap:12px; padding:14px 0; white-space:normal; text-align:left; }
+.business-mention-choice-icon { width:32px; height:32px; flex:none; border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--tee-sheet-inset); }
+.business-mention-choice-icon svg { width:16px; height:16px; }
+.business-mention-choice-copy { min-width:0; }
+.business-mention-choice-copy b { display:block; font-size:15px; font-weight:600; }
+.business-mention-choice-copy small { display:block; margin-top:2px; font-size:12.5px; font-weight:400; color:var(--business-mention-mute); line-height:1.45; }
+.business-mention-cancel { display:flex; width:100%; }

@@ -1,0 +1,42 @@
+import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MemoryRouter, useLocation } from 'react-router-dom';
+import { readFileSync } from 'node:fs';
+vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
+const f = vi.hoisted(() => ({ payload: { count: 1, posts: [] as unknown[] }, readError: false, writeError: false, rpc: vi.fn(), toast: vi.fn() }));
+vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: async (name: string, args: unknown) => {
+  f.rpc(name, args);
+  return name === 'get_business_mentions' ? { data: f.payload, error: f.readError ? { message: 'denied' } : null } : { data: null, error: f.writeError ? { message: 'not_allowed' } : null };
+} } }));
+vi.mock('@/lib/toast', () => ({ toast: { error: f.toast } }));
+import { BusinessMentionsRail, type BusinessMentionPost } from '@/components/business/BusinessMentionsRail';
+const post: BusinessMentionPost = { post_id: 'p1', created_at: '2026-10-27', author_id: 'golfer', display_name: 'Sam', profile_photo_url: null, media_type: 'image', media_url: '/a.jpg', poster_url: '/poster.jpg', hidden: false };
+let client: QueryClient;
+function Location() { return <div data-location>{useLocation().pathname}</div>; }
+function mount(props: Partial<React.ComponentProps<typeof BusinessMentionsRail>> = {}) {
+  client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(<QueryClientProvider client={client}><MemoryRouter><BusinessMentionsRail businessId="biz" viewerId="me" isClub={false} {...props} /><Location /></MemoryRouter></QueryClientProvider>);
+}
+const node = (selector: string) => { const el = document.querySelector(selector); if (!(el instanceof HTMLElement)) throw new Error(`Missing ${selector}`); return el; };
+const ready = () => waitFor(() => expect(client.isFetching()).toBe(0));
+beforeEach(() => { f.payload = { count: 1, posts: [post] }; f.readError = false; f.writeError = false; vi.clearAllMocks(); });
+afterEach(() => { cleanup(); client?.clear(); });
+describe('CB117 business mentions', () => {
+  it('shows server posts without deriving the count or refiltering', async () => { f.payload.count = 42; mount(); await waitFor(() => node('[data-business-mentions]')); expect(node('[data-mentions-count]')).toHaveTextContent('42'); expect(document.querySelectorAll('[data-mention-post]')).toHaveLength(1); expect(f.rpc).toHaveBeenCalledWith('get_business_mentions', { p_business_id: 'biz' }); });
+  it('renders nothing until read settles', () => { mount(); expect(document.querySelector('[data-business-mentions]')).toBeNull(); });
+  it('omits empty posts', async () => { f.payload.posts = []; mount(); await ready(); expect(document.querySelector('[data-business-mentions]')).toBeNull(); });
+  it('omits failed reads even with stale data', async () => { mount(); await waitFor(() => node('[data-business-mentions]')); f.readError = true; await client.refetchQueries(); await waitFor(() => expect(document.querySelector('[data-business-mentions]')).toBeNull()); });
+  it('omits zero visible count while retaining hidden team rows', async () => { f.payload = { count: 0, posts: [{ ...post, hidden: true }] }; mount({ canManage: true }); await waitFor(() => node('[data-business-mentions]')); expect(document.querySelector('[data-mentions-count]')).toBeNull(); expect(node('[data-mention-post]')).toHaveAttribute('data-hidden', 'true'); });
+  it('has singular and plural count keys', () => { const en = JSON.parse(readFileSync('public/locales/en/common.json', 'utf8')); expect(en.business.mentions.posts_one).toBe('{{count}} post'); expect(en.business.mentions.posts_other).toBe('{{count}} posts'); });
+  it('uses media image', async () => { mount(); await waitFor(() => node('.business-mention-image')); expect(node('.business-mention-image')).toHaveAttribute('src', '/a.jpg'); expect(document.querySelector('[data-mention-video]')).toBeNull(); });
+  it.each(['video', 'clip'])('%s uses poster and play mark', async media_type => { f.payload.posts = [{ ...post, media_type }]; mount(); await waitFor(() => node('[data-mention-video]')); expect(node('.business-mention-image')).toHaveAttribute('src', '/poster.jpg'); });
+  it('video without poster retains tile without image', async () => { f.payload.posts = [{ ...post, media_type: 'video', poster_url: null }]; mount(); await waitFor(() => node('[data-mention-video]')); expect(document.querySelector('.business-mention-image')).toBeNull(); expect(node('[data-mention-post]')).toBeInTheDocument(); });
+  it('opens existing single post route', async () => { mount(); await waitFor(() => node('[data-mention-open]')); fireEvent.click(node('[data-mention-open]')); expect(node('[data-location]')).toHaveTextContent('/post/p1'); });
+  it.each(['owner', 'admin', 'editor', 'analyst', 'visitor'])('management button obeys %s capability', async role => { mount({ canManage: role === 'owner' || role === 'admin' }); await waitFor(() => node('[data-mention-post]')); expect(!!document.querySelector('[data-mention-menu]')).toBe(role === 'owner' || role === 'admin'); });
+  it.each([false, true])('hidden=%s calls correct mutation and refetches without post navigation', async hidden => { f.payload.posts = [{ ...post, hidden }]; mount({ canManage: true }); await waitFor(() => node('[data-mention-menu]')); const refetch = vi.spyOn(client, 'fetchQuery'); const reads = f.rpc.mock.calls.filter(c => c[0] === 'get_business_mentions').length; fireEvent.click(node('[data-mention-menu]')); await waitFor(() => node('[data-mention-toggle]')); expect(node('[data-location]')).toHaveTextContent('/'); fireEvent.click(node('[data-mention-toggle]')); await waitFor(() => expect(f.rpc).toHaveBeenCalledWith('set_business_mention_hidden', { p_business_id: 'biz', p_post_id: 'p1', p_hidden: !hidden })); await waitFor(() => expect(f.rpc.mock.calls.filter(c => c[0] === 'get_business_mentions').length).toBeGreaterThan(reads)); expect(document.querySelector('[data-mention-sheet]')).toBeNull(); refetch.mockRestore(); });
+  it('hidden row retains label and shows restore action', async () => { f.payload.posts = [{ ...post, hidden: true }]; mount({ canManage: true }); await waitFor(() => node('[data-mention-hidden]')); expect(node('[data-mention-post]')).toHaveAttribute('data-hidden', 'true'); fireEvent.click(node('[data-mention-menu]')); await waitFor(() => node('[data-mention-toggle]')); expect(node('[data-mention-toggle]')).toBeEnabled(); const en = JSON.parse(readFileSync('public/locales/en/common.json', 'utf8')); expect(en.business.mentions.show).toBe('Show on our page'); });
+  it('write error toasts and leaves rail and sheet unchanged with no refetch', async () => { f.writeError = true; mount({ canManage: true }); await waitFor(() => node('[data-mention-menu]')); const reads = f.rpc.mock.calls.filter(c => c[0] === 'get_business_mentions').length; fireEvent.click(node('[data-mention-menu]')); await waitFor(() => node('[data-mention-toggle]')); fireEvent.click(node('[data-mention-toggle]')); await waitFor(() => expect(f.toast).toHaveBeenCalledTimes(1)); expect(node('[data-mention-post]')).toHaveAttribute('data-hidden', 'false'); expect(node('[data-mention-sheet]')).toBeInTheDocument(); expect(f.rpc.mock.calls.filter(c => c[0] === 'get_business_mentions')).toHaveLength(reads); });
+  it('never renders or reads on a club', async () => { mount({ isClub: true }); await ready(); expect(document.querySelector('[data-business-mentions]')).toBeNull(); expect(f.rpc).not.toHaveBeenCalled(); });
+  it('page places nonclub rail after followers and before tabs using membership capability', () => { const page = readFileSync('src/pages/BusinessProfilePage.tsx', 'utf8'); const followers = page.indexOf('<BusinessFollowersCard'); const mentions = page.indexOf('<BusinessMentionsRail'); expect(mentions).toBeGreaterThan(followers); expect(mentions).toBeLessThan(page.indexOf('data-business-tabs')); expect(page).toContain('{!isClub && <BusinessMentionsRail'); expect(page).toContain('canManage={!!membership?.canManage && !membershipQuery.isError}'); });
+});

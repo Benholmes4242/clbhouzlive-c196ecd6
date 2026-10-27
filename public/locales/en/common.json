@@ -1210,6 +1210,20 @@
       "rounds_one": "{{n}} round",
       "rounds_other": "{{n}} rounds"
     },
+    "mentions": {
+      "heading": "Mentioned by golfers",
+      "posts_one": "{{count}} post",
+      "posts_other": "{{count}} posts",
+      "open": "Open post by {{name}}",
+      "manage": "Manage mention",
+      "hidden": "Hidden",
+      "hide": "Hide from our page",
+      "hideSub": "The post stays on clbhouz; it just won't show here.",
+      "show": "Show on our page",
+      "showSub": "It will show here again.",
+      "cancel": "Cancel",
+      "error": "Something went wrong. Please try again."
+    },
     "followers": {
       "kicker": "Their followers",
       "withHandicap_one": "{{n}} with a handicap",
