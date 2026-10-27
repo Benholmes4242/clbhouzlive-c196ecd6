@@ -7,12 +7,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const f = vi.hoisted(() => ({
   rows: [] as import('@/components/courses/browse/LatestCoursesSection').LatestCourseMedia[],
-  loading: false,
+  loading: false, register: vi.fn(),
   error: false,
   rpc: vi.fn(),
   gallery: { data: undefined as unknown, isError: false },
   open: vi.fn(),
 }));
+vi.mock('@/components/explore-tab-new/courseled/reviewVideoAutoplay', async o => ({ ...await o<object>(), registerReviewVideo: (...a: unknown[]) => { f.register(...a); return () => {}; } }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'member' } }) }));
 vi.mock('@tanstack/react-query', async importOriginal => ({ ...await importOriginal<typeof import('@tanstack/react-query')>(), useInfiniteQuery: (options: unknown) => { f.rpc(options); return { data: { pages: [f.rows] }, isLoading: f.loading, isError: f.error, hasNextPage: false, isFetching: f.loading, isFetchingNextPage: false, fetchNextPage: vi.fn() }; } }));
@@ -127,6 +128,15 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     expect(betaThree.textContent).not.toContain('+');
   });
 
+  it('only the big slot can render a video, in the courses-member-shots group; small slots and photos never do', () => {
+    f.rows = [course('alpha', { tiles: [tile('a-1', { media_type: 'video', poster_url: '/a-1-poster.jpg' }), tile('a-2', { media_type: 'video', poster_url: '/a-2-poster.jpg' }), tile('a-3', { media_type: 'video' })] }), course('beta'), course('gamma')];
+    mount();
+    expect(screen.getByLabelText('Open Course alpha shot 1 of 14').querySelector('video')).not.toBeNull();
+    expect(screen.getByLabelText('Open Course alpha shot 2 of 14').querySelector('video')).toBeNull();
+    expect(screen.getByLabelText('Open Course alpha shot 3 of 14').querySelector('video')).toBeNull();
+    expect(document.querySelectorAll('video')).toHaveLength(1);
+    expect(f.register).toHaveBeenCalledWith('courses-member-shots', expect.anything(), expect.any(Function), { threshold: 0.5, maxPlaying: 1 });
+  });
   it('video tiles show the glass disc; image tiles do not', () => {
     f.rows = [
       course('alpha', { tiles: [tile('a-1'), tile('a-2', { media_type: 'video', poster_url: '/a-2-poster.jpg' }), tile('a-3', { media_type: 'video', poster_url: '/a-3-poster.jpg' })] }),

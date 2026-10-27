@@ -9,8 +9,10 @@
  * starting on the tapped shot. The set is still the course's media from
  * get_course_media_v2 via useGalleryCourseMedia, in the Media tab's order,
  * flattened post-then-media into one sideways carousel, each credited to the
- * member who added it. This rail never starts video playback; video tiles
- * draw their poster. */
+ * member who added it. Only the big slot autoplays: when it is a video it plays
+ * muted and looping through HoleInlineVideo in the page-wide
+ * "courses-member-shots" group (one video at a time); small slots draw their poster. */
+import { HoleInlineVideo } from '@/components/course-media-tab/HoleInlineVideo';
 import { useEffect, useMemo, useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -125,13 +127,15 @@ function LatestCourseCard({ row, pending, onOpen }: {
             onClick={() => onOpen(tile)}
             style={{ ...cellStyle, padding: 0, border: 0, cursor: 'pointer', textAlign: 'left' }}
           >
-            <img
+            {i === 0 && tile.media_type === 'video'
+              ? <HoleInlineVideo media={tile} alt="" fit="cover" autoplayGroup="courses-member-shots" active />
+              : <img
               src={tileImage(tile)}
               alt=""
               loading="lazy"
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
               onError={event => { event.currentTarget.hidden = true; }}
-            />
+            />}
             {i === 0 && <>
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 45%)' }} />
               <div style={{ position: 'absolute', top: 14, left: 14 }}>

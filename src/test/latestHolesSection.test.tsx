@@ -7,7 +7,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { CourseHole, CourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import type { HolePhoto } from '@/lib/courseMedia/holePhotoData';
 
-const f = vi.hoisted(() => ({ latest: [] as import('@/components/courses/browse/LatestHolesSection').LatestHoleMedia[], loading: false, error: false, rpc: vi.fn(), analysis: null as CourseHoleAnalysis | null, rows: [] as HolePhoto[], total: 8, known: vi.fn(), holeRpc: vi.fn(), open: vi.fn() }));
+const f = vi.hoisted(() => ({ latest: [] as import('@/components/courses/browse/LatestHolesSection').LatestHoleMedia[], loading: false, error: false, rpc: vi.fn(), analysis: null as CourseHoleAnalysis | null, rows: [] as HolePhoto[], total: 8, known: vi.fn(), holeRpc: vi.fn(), open: vi.fn(), register: vi.fn() }));
+vi.mock('@/components/explore-tab-new/courseled/reviewVideoAutoplay', async o => ({ ...await o<object>(), registerReviewVideo: (...a: unknown[]) => { f.register(...a); return () => {}; } }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: (...args: unknown[]) => f.holeRpc(...args) } }));
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: (...args: unknown[]) => f.open(...args) }));
@@ -103,7 +104,14 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
   it('video uses its shared poster and rounded duration while images have no chip', () => {
     const video = latest('first', { media_type: 'video', poster_url: '/video-poster.jpg', duration_seconds: 14.2 }); f.latest[0] = video;
     const view = mountRail(); const cards = screen.getAllByRole('button'); expect(cards[0].querySelector('img')).toHaveAttribute('src', holeMediaPoster(video));
-    expect(cards[0].querySelector('.glass-chip')?.textContent).toBe('0:14'); expect(cards[1].querySelector('.glass-chip')).toBeNull(); expect(view.container.querySelector('video')).toBeNull();
+    expect(cards[0].querySelector('.glass-chip')?.textContent).toBe('0:14'); expect(cards[1].querySelector('.glass-chip')).toBeNull(); expect(view.container.querySelectorAll('video')).toHaveLength(1); expect(cards[0].querySelector('video')).not.toBeNull();
+  });
+  it('a video tile renders HoleInlineVideo in the courses-member-shots group; photo tiles never render a video', () => {
+    f.latest[0] = latest('first', { media_type: 'video', poster_url: '/video-poster.jpg' });
+    mountRail(); const cards = screen.getAllByRole('button');
+    expect(cards[0].querySelector('video')).not.toBeNull();
+    expect(f.register).toHaveBeenCalledWith('courses-member-shots', expect.anything(), expect.any(Function), { threshold: 0.5, maxPlaying: 1 });
+    expect(cards[1].querySelector('video')).toBeNull(); expect(cards[2].querySelector('video')).toBeNull();
   });
   it('video duration formats longer than one minute', () => { f.latest[0] = latest('first', { media_type: 'video', duration_seconds: 75 }); mountRail(); expect(screen.getByText('1:15')).toBeInTheDocument(); });
   it('the kicker reads "Hole by hole"', () => {
