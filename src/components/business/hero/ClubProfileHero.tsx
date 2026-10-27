@@ -1,15 +1,17 @@
 /**
  * ClubProfileHero (CB103) — the golf-club business profile hero, built from
  * the signed-off club-s1-hero mock. Rendered ONLY when the page's isClub
- * condition holds (club_id and at least one course); non-club businesses keep
- * BusinessProfileHero and personal profiles keep HeroShell, both untouched.
+ * condition holds (club_id and at least one course). CB112: non-club
+ * businesses render this same hero through optional props (secondAction,
+ * insightsTone, stripCells) whose defaults reproduce the club exactly;
+ * personal profiles keep HeroShell.
  *
  * The page owns every action (follow, share, menu, message, navigation) and
  * the permission flags; this component only lays them out.
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Share, MoreHorizontal, Plus, MessageCircle, Pencil } from 'lucide-react';
+import { Share, MoreHorizontal, Plus, MessageCircle, Pencil, ArrowUpRight } from 'lucide-react';
 import { getInitialsFromName, getAvatarFallbackColor } from '@/lib/avatarFallback';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { HERO_CONTENT_INSET } from '@/components/profile/hero/HeroShell';
@@ -107,6 +109,12 @@ interface Props {
   onRatingTap?: () => void;
   onRoundsTap?: () => void;
   about?: string | null;
+  /** CB112 — replaces the tee-time pill. Omitted = club tee-time; null = no pill. */
+  secondAction?: { label: string; arrow?: boolean; soon?: boolean; onTap: () => void } | null;
+  /** CB112 — Insights pill tone in the team row; clubs keep glass. */
+  insightsTone?: 'white' | 'glass';
+  /** CB112 — overrides the club's rating/rounds/members cells. */
+  stripCells?: Array<{ key: string; value: string; label: string; onTap?: () => void }>;
 }
 
 const pill = (kind: 'white' | 'glass'): React.CSSProperties => ({
@@ -129,18 +137,18 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
   const showEvidence = !!p.verified && !!p.evidenceLine;
   const team = p.team && Object.values(p.team).some(Boolean) ? p.team : null;
 
-  const cells: Array<{ key: string; value: string; label: string; color?: string; onTap?: () => void }> = [];
-  if (p.avgRating != null && p.avgRating >= 1 && (p.ratingsCount ?? 0) >= 1) {
+  const cells: Array<{ key: string; value: string; label: string; color?: string; onTap?: () => void }> = p.stripCells ? [...p.stripCells] : [];
+  if (!p.stripCells && p.avgRating != null && p.avgRating >= 1 && (p.ratingsCount ?? 0) >= 1) {
     cells.push({
       key: 'rating', value: p.avgRating.toFixed(1),
       label: t('business.clubHero.reviews', { count: p.ratingsCount!, defaultValue: '{{count}} reviews' }),
       color: A.INK, onTap: p.onRatingTap,
     });
   }
-  if ((p.roundsTracked ?? 0) >= 1) {
+  if (!p.stripCells && (p.roundsTracked ?? 0) >= 1) {
     cells.push({ key: 'rounds', value: p.roundsTracked!.toLocaleString(), label: t('business.clubHero.roundsTracked', 'Rounds tracked'), onTap: p.onRoundsTap });
   }
-  if ((p.membersHere ?? 0) >= 1) {
+  if (!p.stripCells && (p.membersHere ?? 0) >= 1) {
     cells.push({ key: 'members', value: p.membersHere!.toLocaleString(), label: t('business.clubHero.membersHere', 'Members here') });
   }
 
@@ -208,7 +216,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
             </span>
           )}
         </h1>
-        <div data-club-place="" style={{ marginTop: 4, fontSize: 14, lineHeight: 1.4, color: MUTE }}>{p.placeLine}</div>
+        {p.placeLine && <div data-club-place="" style={{ marginTop: 4, fontSize: 14, lineHeight: 1.4, color: MUTE }}>{p.placeLine}</div>}
         {showEvidence && (
           <div style={{ marginTop: 1, fontSize: 14, lineHeight: 1.4, color: A.AMBER, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {p.evidenceLine}
@@ -223,7 +231,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
           {team ? (
             <>
               {team.onYourCourses && <button type="button" style={pill('white')} onClick={team.onYourCourses}>{t('business.clubHero.yourCourses', 'Your courses')}</button>}
-              {team.onInsights && <button type="button" style={pill('glass')} onClick={team.onInsights}>{t('business.clubHero.insights', 'Insights')}</button>}
+              {team.onInsights && <button type="button" data-insights-pill="" style={pill(p.insightsTone ?? 'glass')} onClick={team.onInsights}>{t('business.clubHero.insights', 'Insights')}</button>}
               {team.onPost && <button type="button" aria-label={t('business.clubHero.post', 'Post as the business')} style={circle(38)} onClick={team.onPost}><Plus {...ICON} /></button>}
               {team.onEdit && <button type="button" aria-label={t('business.clubHero.edit', 'Edit business profile')} style={circle(38)} onClick={team.onEdit}><Pencil {...ICON} /></button>}
             </>
@@ -237,6 +245,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
                   {t('business.clubHero.follow', 'Follow')}
                 </button>
               )}
+              {p.secondAction === undefined ? (
               <button
                 type="button"
                 data-tee-soon=""
@@ -248,6 +257,22 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
                   {t('business.clubHero.soon', 'Soon')}
                 </span>
               </button>
+              ) : p.secondAction ? (
+                <button
+                  type="button"
+                  data-second-pill=""
+                  style={p.secondAction.soon ? { ...pill('glass'), color: 'rgba(248,250,252,0.5)', borderColor: HAIR } : pill('glass')}
+                  onClick={p.secondAction.onTap}
+                >
+                  {p.secondAction.label}
+                  {p.secondAction.soon && (
+                    <span data-soon-tag="" style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: DIM, border: GLASS_BORDER, borderRadius: 999, padding: '2px 7px' }}>
+                      {t('business.clubHero.soon', 'Soon')}
+                    </span>
+                  )}
+                  {p.secondAction.arrow && <ArrowUpRight data-arrow="" size={14} strokeWidth={1.9} />}
+                </button>
+              ) : null}
               <button type="button" aria-label={t('business.clubHero.message', 'Message')} style={circle(38)} onClick={p.onMessage} disabled={p.messageDisabled}>
                 <MessageCircle {...ICON} />
               </button>
