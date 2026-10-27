@@ -119,12 +119,12 @@ describe('CB90 reviews neutral paint and reply close', () => {
     iconTile(view.container, 'sparkles');
   });
   it.each([
-    [4.0, 'rgba(255,107,107,0.16)', 'rgba(248,250,252,0.62)'],
-    [5.0, 'rgba(255,255,255,0.06)', 'rgba(248,250,252,0.62)'],
-    [7.5, 'rgba(255,255,255,0.06)', 'rgba(248,250,252,0.62)'],
-    [8.9, 'rgba(255,255,255,0.06)', 'rgba(248,250,252,0.62)'],
-    [9.2, 'rgba(47,163,90,0.16)', '#2FA35A'],
-  ] as const)('rating %s keeps the required wash and canonical foreground', (rating, bg, fg) => {
+    [4.0, 'rgba(255,255,255,0.06)', '#F8FAFC'],
+    [5.0, 'rgba(255,255,255,0.06)', '#F8FAFC'],
+    [7.5, 'rgba(255,255,255,0.06)', '#F8FAFC'],
+    [8.9, 'rgba(255,255,255,0.06)', '#F8FAFC'],
+    [9.2, 'rgba(255,255,255,0.06)', '#F8FAFC'],
+  ] as const)('rating %s has a neutral wash and white foreground', (rating, bg, fg) => {
     state.data = { ...result(), reviews: [{ ...review, rating }] };
     mount();
     fireEvent.click(screen.getByRole('button', { name: 'Write a reply' }));

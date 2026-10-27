@@ -32,7 +32,7 @@ const course = (id: string, reviews: number, avg: number, rank: number | null = 
 const base = { linked: true, period_days: 30, total: 12, avg: 8.4, new_count: 3, new_avg: 8.1, unreplied: 2, courses: [course('a', 12, 8.4)], scores: sc(8.6, 8.2, 7.9, 8.8) };
 
 const rgb = (hex: string) => { const h = hex.replace('#', ''); return `rgb(${parseInt(h.slice(0, 2), 16)}, ${parseInt(h.slice(2, 4), 16)}, ${parseInt(h.slice(4, 6), 16)})`; };
-const GREEN = rgb(A.GREEN);
+const WHITE = rgb(A.INK);
 const nav = vi.fn();
 
 const renderCard = (data: unknown, days = 30, canManage = true, error: unknown = null) => {
@@ -66,15 +66,15 @@ describe('CB89 states', () => {
 });
 
 describe('CB89 title', () => {
-  it('avg below 9.0 is ink; at 9.0 is green', async () => {
+  it('avg below and at 9.0 is white', async () => {
     expect(SUB_SCORE_GREEN_MIN).toBe(9);
     const a = renderCard({ ...base, avg: 8.9 });
-    expect(((await card(a.container)).querySelector('[data-avg]') as HTMLElement).style.color).not.toBe(GREEN);
+    expect(((await card(a.container)).querySelector('[data-avg]') as HTMLElement).style.color).toBe(WHITE);
     a.unmount();
     const b = renderCard({ ...base, avg: 9 });
     const el = (await card(b.container)).querySelector('[data-avg]') as HTMLElement;
     expect(el.textContent).toBe('9.0');
-    expect(el.style.color).toBe(GREEN);
+    expect(el.style.color).toBe(WHITE);
     expect(last('count')?.o).toMatchObject({ count: 12 });
   });
 });
@@ -103,8 +103,8 @@ describe('CB89 courses and rank', () => {
     expect(rows[1].querySelector('[data-course-rank="no"]')).not.toBeNull();
     expect(tCalls.filter(t => t.key === KEY + 'courseReviews').map(t => t.o?.count)).toEqual([11, 1]);
     expect(last('courseRank')?.o).toMatchObject({ rank: '2nd', of: '30' });
-    expect((rows[0].querySelector('[data-course-avg]') as HTMLElement).style.color).toBe(GREEN);
-    expect((rows[1].querySelector('[data-course-avg]') as HTMLElement).style.color).not.toBe(GREEN);
+    expect((rows[0].querySelector('[data-course-avg]') as HTMLElement).style.color).toBe(WHITE);
+    expect((rows[1].querySelector('[data-course-avg]') as HTMLElement).style.color).toBe(WHITE);
   });
   it('CB89.1 a parenthesised course name prints only the course', async () => {
     const c = await card(renderCard({
@@ -146,17 +146,17 @@ describe('CB89 new-reviews line', () => {
 });
 
 describe('CB89 scores', () => {
-  it('shown from a single review; only non-null rows; width avg×10; green at 9.0', async () => {
+  it('shown from a single review; only non-null rows; width avg×10; white at every score', async () => {
     const c = await card(renderCard({ ...base, total: 1, courses: [course('a', 1, 9)], scores: sc(9, null, 7.5, null) }).container);
     const rows = [...c.querySelectorAll('[data-score]')];
     expect(rows.map(r => r.getAttribute('data-score'))).toEqual(['design', 'facilities']);
     const bar = (r: Element) => r.querySelector('[data-bar]') as HTMLElement;
     expect(bar(rows[0]).style.width).toBe('90%');
     expect(bar(rows[1]).style.width).toBe('75%');
-    expect(bar(rows[0]).style.background).toBe(GREEN);
-    expect((rows[0].querySelector('[data-value]') as HTMLElement).style.color).toBe(GREEN);
-    expect(bar(rows[1]).style.background).not.toBe(GREEN);
-    expect((rows[1].querySelector('[data-value]') as HTMLElement).style.color).not.toBe(GREEN);
+    expect(bar(rows[0]).style.background).toBe(WHITE);
+    expect((rows[0].querySelector('[data-value]') as HTMLElement).style.color).toBe(WHITE);
+    expect(bar(rows[1]).style.background).toBe(WHITE);
+    expect((rows[1].querySelector('[data-value]') as HTMLElement).style.color).toBe(WHITE);
   });
   it('lowest sentence and highlight', async () => {
     const c = await card(renderCard(base).container);

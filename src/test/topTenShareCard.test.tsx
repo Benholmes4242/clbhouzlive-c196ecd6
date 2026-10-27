@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 
 /**
  * BRIEF_TOP_TEN_SHARE_CARD_V2 §TESTS — the one render test of TopTenShareCard
- * (story): ten courses draw hero + two tiles + seven rows; a 9.4 is A.GREEN
+ * (story): ten courses draw hero + two tiles + seven rows; a 9.4 is A.INK
  * and an 8.6 is A.INK; the stat line drops HCP when showHandicap is false;
  * no "clbhouz.co.uk" and no "stay in play." anywhere on the card.
  *
@@ -59,13 +59,13 @@ describe('BRIEF_TOP_TEN_SHARE_CARD_V2 card render (story)', () => {
     expect(container.querySelector('[data-share-row="10"]')?.textContent).toContain('Annesley');
   });
 
-  it('a 9.4 rating is tournament green and an 8.6 is ink', () => {
+  it('a 9.4 rating and an 8.6 are both ink', () => {
     const { container } = renderCard(true);
     const green = Array.from(container.querySelectorAll('span, div')).find((el) => el.textContent === '9.4');
     const ink = Array.from(container.querySelectorAll('span, div')).find((el) => el.textContent === '8.6');
     expect(green).toBeTruthy();
     expect(ink).toBeTruthy();
-    expect((green as HTMLElement).style.color).toBe(A.GREEN.startsWith('#') ? `rgb(47, 163, 90)` : A.GREEN);
+    expect((green as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
     expect((ink as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
   });
 

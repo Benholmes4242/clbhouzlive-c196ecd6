@@ -3,33 +3,31 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
 import {
-  REVIEW_LABEL_COLOR_NEUTRAL_LIGHT,
   ReviewVerdictLabel,
   reviewLabelColor,
   reviewTierColor,
 } from '@/components/shared/ReviewGhostScore';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { BAND_GREEN } from '@/features/courses/_shared/scoreBandTokens';
 
 describe('shared displayed review score tones', () => {
   it('uses the canonical dark display rule for verdict labels', () => {
-    expect(reviewLabelColor(9)).toBe(A.GREEN);
-    expect(reviewLabelColor(9.9)).toBe(A.GREEN);
-    expect(reviewLabelColor(8.3)).toBe(A.MUTE);
-    expect(reviewLabelColor(4.1)).toBe(A.MUTE);
+    expect(reviewLabelColor(9)).toBe(A.INK);
+    expect(reviewLabelColor(9.9)).toBe(A.INK);
+    expect(reviewLabelColor(8.3)).toBe(A.INK);
+    expect(reviewLabelColor(4.1)).toBe(A.INK);
   });
 
-  it('uses the light rating equivalents on a genuine light ground', () => {
-    expect(reviewLabelColor(9, 'light')).toBe(BAND_GREEN);
-    expect(reviewLabelColor(8.3, 'light')).toBe(REVIEW_LABEL_COLOR_NEUTRAL_LIGHT);
+  it('uses white rating ink on a genuine light ground', () => {
+    expect(reviewLabelColor(9, 'light')).toBe(A.INK);
+    expect(reviewLabelColor(8.3, 'light')).toBe(A.INK);
   });
 
   it('keeps the separate tier-name API wired through its retained midpoints', () => {
-    expect(reviewTierColor('EXCEPTIONAL', 'dark')).toBe(A.GREEN);
-    expect(reviewTierColor('EXCELLENT', 'dark')).toBe(A.MUTE);
-    expect(reviewTierColor('GOOD', 'dark')).toBe(A.MUTE);
-    expect(reviewTierColor('FAIR', 'dark')).toBe(A.MUTE);
-    expect(reviewTierColor('POOR', 'dark')).toBe(A.MUTE);
+    expect(reviewTierColor('EXCEPTIONAL', 'dark')).toBe(A.INK);
+    expect(reviewTierColor('EXCELLENT', 'dark')).toBe(A.INK);
+    expect(reviewTierColor('GOOD', 'dark')).toBe(A.INK);
+    expect(reviewTierColor('FAIR', 'dark')).toBe(A.INK);
+    expect(reviewTierColor('POOR', 'dark')).toBe(A.INK);
   });
 
   it('renders the verdict label for both reported ratings', () => {
@@ -40,7 +38,7 @@ describe('shared displayed review score tones', () => {
     );
     expect(exceptional).toContain('Exceptional');
     expect(exceptional).toContain('text-transform:uppercase');
-    expect(exceptional).toContain(`color:${A.GREEN}`);
+    expect(exceptional).toContain(`color:${A.INK}`);
 
     const excellent = renderToStaticMarkup(
       <div>
@@ -49,6 +47,6 @@ describe('shared displayed review score tones', () => {
     );
     expect(excellent).toContain('Excellent');
     expect(excellent).toContain('text-transform:uppercase');
-    expect(excellent).toContain(`color:${A.MUTE}`);
+    expect(excellent).toContain(`color:${A.INK}`);
   });
 });

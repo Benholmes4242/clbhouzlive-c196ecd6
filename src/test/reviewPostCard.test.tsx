@@ -36,19 +36,19 @@ function card(rating: number, breakdown: Record<string, number | null>, text = '
 const all = { design: 9, conditions: 8.9, clubhouse: 7, facilities: 6 };
 
 describe('review post — R.2 score colour', () => {
-  it('9.0 renders green for the figure, the tier word and a category', () => {
+  it('9.0 renders white for the figure, the tier word and a category', () => {
     const c = card(9, all);
-    expect((c.querySelector('[data-review-score]') as HTMLElement).style.color).toBe(toRgb(A.GREEN));
-    expect((c.querySelector('[data-review-tier] span') as HTMLElement).style.color).toBe(toRgb(A.GREEN));
+    expect((c.querySelector('[data-review-score]') as HTMLElement).style.color).toBe(toRgb(A.INK));
+    expect((c.querySelector('[data-review-tier] span') as HTMLElement).style.color).toBe(toRgb(A.INK));
     const design = c.querySelector('[data-category="design"] [data-category-figure]') as HTMLElement;
-    expect(design.style.color).toBe(toRgb(A.GREEN));
+    expect(design.style.color).toBe(toRgb(A.INK));
   });
-  it('8.9 renders muted for the figure, the tier word and a category', () => {
+  it('8.9 renders white for the figure, the tier word and a category', () => {
     const c = card(8.9, all);
-    expect((c.querySelector('[data-review-score]') as HTMLElement).style.color).toBe(toRgb(A.MUTE));
-    expect((c.querySelector('[data-review-tier] span') as HTMLElement).style.color).toBe(toRgb(A.MUTE));
+    expect((c.querySelector('[data-review-score]') as HTMLElement).style.color).toBe(toRgb(A.INK));
+    expect((c.querySelector('[data-review-tier] span') as HTMLElement).style.color).toBe(toRgb(A.INK));
     const cond = c.querySelector('[data-category="condition"] [data-category-figure]') as HTMLElement;
-    expect(cond.style.color).toBe(toRgb(A.MUTE));
+    expect(cond.style.color).toBe(toRgb(A.INK));
   });
 });
 
