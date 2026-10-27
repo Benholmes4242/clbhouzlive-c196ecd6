@@ -103,7 +103,6 @@ export function RaterReviewRow({ review, context, playedMonth, onMediaClick, fla
             {contextItems.map((item, index) => <React.Fragment key={index}>{index > 0 && ' · '}{item}</React.Fragment>)}
           </div>}
         </div>
-        <strong data-review-score style={{ flexShrink: 0, color: flat ? SURFACE.dark.ink : MEDAL_GOLD, fontSize: 19, fontWeight: 800, lineHeight: 1.2, ...FIGS }}>{review.rating?.toFixed(1)}</strong>
       </div>
       <CategoryLine review={review} />
       {review.review?.trim() && <MentionText as="p" text={review.review} style={{ color: SURFACE.dark.body, fontSize: 13, lineHeight: 1.5, margin: '10px 0 0', overflowWrap: 'anywhere' }} />}
