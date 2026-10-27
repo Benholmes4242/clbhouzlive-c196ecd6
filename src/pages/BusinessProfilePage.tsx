@@ -654,7 +654,7 @@ const BusinessProfilePage: React.FC = () => {
           <>
             {/* Primary row - EDIT / FOLLOW / MANAGE / "..." now live in the
                 hero, so this row carries contact actions only (visitor). */}
-            {!isOwner && (
+            {!isOwner && (!isClub || promoted) && (
               <div className="mt-4 px-4 flex items-center gap-2 relative z-10 pointer-events-auto">
                 {!isClub && (<button
                   className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
