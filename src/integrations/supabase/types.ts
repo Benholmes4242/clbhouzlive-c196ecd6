@@ -20613,6 +20613,10 @@ export type Database = {
         Returns: string
       }
       get_business_audience: { Args: { p_business_id: string }; Returns: Json }
+      get_business_club_member_count: {
+        Args: { p_business_id: string }
+        Returns: number
+      }
       get_business_course_activity: {
         Args: { p_business_id: string; p_days?: number }
         Returns: Json
