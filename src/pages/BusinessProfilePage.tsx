@@ -69,6 +69,7 @@ import { ClubVisiting } from '@/components/business/ClubVisiting';
 import { ClubFromTheClub } from '@/components/business/ClubFromTheClub';
 import { ClubYouCard } from '@/components/business/ClubYouCard';
 import { BusinessYouCard } from '@/components/business/BusinessYouCard';
+import { BusinessNearbyCourses, scrollToNearbyCard } from '@/components/business/BusinessNearbyCourses';
 import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
 import { businessCategoryWord, businessPlaceLine, businessSecondPill, businessStripKeys } from '@/lib/business/businessHero';
 import { useBusinessNearbyCounts } from '@/hooks/useBusinessNearbyCounts';
@@ -446,7 +447,9 @@ const BusinessProfilePage: React.FC = () => {
       ? () => navigate(`/business/${business.slug || business.id}/followers`)
       : k === 'posts'
         ? () => { setActiveTab('posts'); tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-        : undefined,
+        : k === 'coursesNear' || k === 'top100Near'
+          ? scrollToNearbyCard
+          : undefined,
   }));
 
   const tabs: Array<{ id: BusinessTab; label: string }> = [
@@ -541,6 +544,8 @@ const BusinessProfilePage: React.FC = () => {
       <ClubYouCard isClub={isClub} viewerId={user?.id} courses={courses} businessName={business.name} />
       {/* CB113 — the non-club "You and …" card in ClubYouCard's place. */}
       <BusinessYouCard isClub={isClub} viewerId={user?.id} business={business} />
+      {/* CB114 — Courses nearby (non-club nearby categories), before the tabs. */}
+      <BusinessNearbyCourses isClub={isClub} viewerId={user?.id} business={business} />
 
       {/* CB105 — How it plays (club-only), replaces the retired courses panel. */}
       <ClubHowItPlays isClub={isClub} courses={courses} onOpen={handleCourseOpen} onFiguresResolved={handleFiguresResolved} />

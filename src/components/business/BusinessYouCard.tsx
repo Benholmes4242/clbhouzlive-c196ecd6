@@ -5,7 +5,8 @@
  *      business (newest first), names/avatars from user_profiles;
  *  (2) get_visible_handicaps for those golfers (average needs >= 3);
  *  (3) nearby categories with a pin: the hero's useBusinessNearbyCounts
- *      (same key) then ONE get_course_stats_batch over those ids.
+ *      (same key) then useNearbyCourseStats (ONE get_course_stats_batch,
+ *      key shared with BusinessNearbyCourses).
  * Nothing renders until every read settles; a failed read is empty, and a
  * failed batch drops the nearby sentences rather than printing a figure.
  */
@@ -19,6 +20,7 @@ import { formatNumber } from '@/i18n/format';
 import { shortCourseName } from '@/features/courses/_shared/courseLabel';
 import { NEARBY_CATEGORIES } from '@/lib/business/businessHero';
 import { useBusinessNearbyCounts } from '@/hooks/useBusinessNearbyCounts';
+import { useNearbyCourseStats } from '@/hooks/useNearbyCourseStats';
 import { YouCardShell, type YouCardFace } from './YouCardShell';
 
 type T = (key: string, opts: Record<string, unknown>) => string;
@@ -110,15 +112,6 @@ function useFollowedGolfers(viewerId: string, businessId: string) {
   });
 }
 
-/** Rows are get_course_stats_detail rows; tolerate a wrapping column. */
-function unwrap(row: unknown): Record<string, unknown> | null {
-  if (!row || typeof row !== 'object') return null;
-  const o = row as Record<string, unknown>;
-  if ('course_id' in o) return o;
-  const inner = Object.values(o).find((v) => v && typeof v === 'object' && 'course_id' in (v as object));
-  return (inner as Record<string, unknown>) ?? null;
-}
-
 function BusinessYouRead({ business, viewerId }: { business: BusinessYouInput; viewerId: string }) {
   const { t } = useTranslation();
   const tt: T = (k, o) => t(k, o) as string;
@@ -127,19 +120,7 @@ function BusinessYouRead({ business, viewerId }: { business: BusinessYouInput; v
   const nearby = useBusinessNearbyCounts(business.category, business.lat, business.lng);
   const courses = nearby.data?.courses ?? [];
   const ids = courses.map((c) => c.id);
-  const batch = useQuery({
-    queryKey: ['business-you-stats-batch', viewerId, ids],
-    enabled: nearbyEligible && ids.length > 0,
-    staleTime: 60_000,
-    queryFn: async (): Promise<NearbyStat[]> => {
-      const { data, error } = await (supabase as unknown as { rpc: (n: string, a: unknown) => Promise<{ data: unknown; error: unknown }> })
-        .rpc('get_course_stats_batch', { p_course_ids: ids });
-      if (error) throw error;
-      const byId = new Map<string, Record<string, unknown>>();
-      for (const r of (Array.isArray(data) ? data : [])) { const u = unwrap(r); if (u) byId.set(String(u.course_id), u); }
-      return courses.map((c) => ({ id: c.id, name: c.name, your_rounds: (byId.get(c.id)?.your_rounds as number | null) ?? null, your_best: (byId.get(c.id)?.your_best as number | null) ?? null }));
-    },
-  });
+  const batch = useNearbyCourseStats(viewerId, courses, nearbyEligible);
   const players = golfers.isError ? [] : golfers.data ?? [];
   const hcp = useQuery({
     queryKey: ['business-you-hcp', players.map((p) => p.user_id)],
