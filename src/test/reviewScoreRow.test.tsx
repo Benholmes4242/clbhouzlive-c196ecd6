@@ -55,9 +55,10 @@ describe('ReviewScoreRow', () => {
     expect(row.style.alignItems).toBe('end');
     expect(row.style.justifyContent).toBe('');
     const breakdown = row.querySelector('[data-score-breakdown]') as HTMLElement;
-    expect(breakdown.style.display).toBe('grid');
-    expect(breakdown.style.gridTemplateColumns).toBe('repeat(4, minmax(0, 1fr))');
+    expect(breakdown.style.display).toBe('flex');
+    expect(breakdown.style.justifyContent).toBe('space-between');
     expect(breakdown.style.columnGap).toBe('8px');
+    for (const c of breakdown.querySelectorAll<HTMLElement>('[data-score-cell]')) { expect(c.style.alignItems).toBe('center'); expect(c.style.textAlign).toBe('center'); }
   });
   it('card: overall 26/700, breakdown 16/600, labels 9px at 0.12em, all white', () => {
     const { container } = render(<ReviewScoreRow overall={9.6} breakdown={full} />);
@@ -89,15 +90,14 @@ describe('ReviewScoreRow', () => {
     expect(row.style.gridTemplateColumns).toBe('1fr');
     expect(labels(container)).toEqual(['DESIGN', 'CONDITION', 'FACILITIES']);
   });
-  it('card: null breakdown values drop their cells; the rest fill the first slots, left-aligned', () => {
+  it('card: two null breakdown values drop their cells; the remaining two render in order, centred', () => {
     const { container } = render(<ReviewScoreRow overall={7.4} breakdown={{ ...full, condition: null, facilities: null }} />);
     const breakdown = container.querySelector('[data-score-breakdown]') as HTMLElement;
-    expect(breakdown.style.display).toBe('grid');
-    expect(breakdown.style.gridTemplateColumns).toBe('repeat(4, minmax(0, 1fr))');
-    expect(breakdown.style.columnGap).toBe('8px');
+    expect(breakdown.style.display).toBe('flex');
+    expect(breakdown.style.justifyContent).toBe('space-between');
     const cells = [...breakdown.querySelectorAll('[data-score-cell]')] as HTMLElement[];
     expect(cells.map((c) => c.getAttribute('data-score-cell'))).toEqual(['design', 'clubhouse']);
-    for (const c of cells) expect(c.style.alignItems).toBe('flex-start');
+    for (const c of cells) { expect(c.style.alignItems).toBe('center'); expect(c.style.textAlign).toBe('center'); }
   });
   it('card: full row wrapper is an inline-size container; caption is not', () => {
     const { container, rerender } = render(<ReviewScoreRow overall={9} breakdown={full} />);
