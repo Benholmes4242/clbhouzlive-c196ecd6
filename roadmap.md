@@ -1,5 +1,9 @@
 # Roadmap
 
+## All-white course and review ratings — 27 October 2026
+- [ ] Apply colours-only ruling across helpers, local displays and wizard; preserve null dim states and non-rating colours.
+- [ ] Update authorised colour assertions, add two helper cases, audit deliberate remaining hits and report full-suite counts.
+
 ## CB102.1 — Welcome gutters and Driving Range facilities
 - [x] Corrected ruling: apply only welcome outer padding 4px 0 0 and wrapper pb-7; preserve opening inset 6px 2px 22px and shared ManagePageShell. Code-derived kicker left 34→18px, header gap 42→26px; cards left 32→16px. Device measurements waived; original bottom target withdrawn.
 - [x] Give Driving Range the exact dedicated facilities list; preserve COACHING and every other category.

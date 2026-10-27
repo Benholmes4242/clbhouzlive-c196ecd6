@@ -4,30 +4,22 @@
  * card rebuild (BRIEF_REVIEW_POST_REBUILD B.3); nothing else rendered it.
  *
  *   - The tier verdict label (EXCEPTIONAL / EXCELLENT / GOOD / FAIR / POOR)
- *     uses the canonical display rule: GREEN at 9.0 and above, MUTE below.
- *     The three-band scale belongs only to score-composer feedback.
+ *     uses A.INK for every rating, on both surfaces (Ben, 27 Oct 2026).
  */
 import React from 'react';
 import { getRatingTierLabel, type RatingTier } from '@/lib/ratingTier';
-import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
-import { BAND_GREEN } from '@/features/courses/_shared/scoreBandTokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 export type ReviewGhostSurface = 'dark' | 'light';
 
 export const REVIEW_LABEL_COLOR_NEUTRAL_LIGHT = 'var(--rating-bar-fill-neutral)';
 
-/** Canonical display colour, not the composer bands. The scoreBands.tsx light
- * values fail on the dark feed and its amber/red meanings do not apply here.
- * A genuine light ground uses the established light rating green and neutral;
- * current feed, activity, profile and sheet surfaces use the dark branch. */
+/** Every real rating verdict uses the same white ink on both surfaces. */
 export function reviewLabelColor(
   rating: number,
   surface: ReviewGhostSurface = 'dark',
 ): string {
-  if (surface === 'light') {
-    return rating >= 9 ? BAND_GREEN : REVIEW_LABEL_COLOR_NEUTRAL_LIGHT;
-  }
-  return courseSubScoreTone(rating);
+  return A.INK;
 }
 
 /**
@@ -70,7 +62,7 @@ interface ReviewVerdictLabelProps {
 
 /**
  * The tier verdict word (EXCEPTIONAL / EXCELLENT / GOOD / FAIR / POOR).
- * Colour follows the canonical display rule: >= 9.0 green, below 9.0 mute.
+ * Every verdict word is white; tier names and thresholds are unchanged.
  */
 export const ReviewVerdictLabel: React.FC<ReviewVerdictLabelProps> = ({
   rating,
