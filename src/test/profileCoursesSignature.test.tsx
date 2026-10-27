@@ -73,7 +73,7 @@ describe('profile courses signature', () => {
     }
   });
 
-  it('every rated figure is white A.INK, unrated categories show no figure, and no bar is drawn', () => {
+  it('every rated figure is white A.INK, the helper keeps null muted, and no bar is drawn', () => {
     const rows = Array.from({ length: 5 }, () => row({ design_score: 9, condition_score: 8.9 }));
     const { container } = render(<YourSignatureSection rows={rows} />);
     const norm = (c: string) => { const el = document.createElement('i'); el.style.color = c; return el.style.color; };
