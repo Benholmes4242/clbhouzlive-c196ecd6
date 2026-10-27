@@ -490,7 +490,7 @@ const BusinessProfilePage: React.FC = () => {
           about={bioText || null}
         />
       ) : (
-      {/* ----- Hero (shared HeroShell, identical to the personal profile) ----- */}
+      /* ----- Non-club hero (shared HeroShell), unchanged ----- */
       <BusinessProfileHero
         name={business.name}
         logoUrl={business.logo_url}
