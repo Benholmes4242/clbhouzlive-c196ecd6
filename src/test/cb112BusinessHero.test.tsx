@@ -284,6 +284,7 @@ describe('CB112 clubs unchanged', () => {
     state.membership = { role: 'owner', canViewInsights: true, canManage: true };
     state.business = fixture({ club_id: 'c1', category: 'Golf Course', is_verified: true });
     const { container } = renderPage();
+    await new Promise((r) => setTimeout(r, 500)); if (process.env.DBG) console.log('HTML', container.innerHTML.slice(0, 3000));
     await waitFor(() => expect(container.querySelector('[data-club-place]')!.textContent).toContain('Golf club'), { timeout: 3000 });
     const yc = screen.queryByRole('button', { name: 'Your courses' });
     if (yc) expect((yc as HTMLElement).style.background).toBe('rgb(248, 250, 252)');
