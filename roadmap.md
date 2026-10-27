@@ -1,5 +1,9 @@
 # Roadmap
 
+## Ratings-white follow-up — 09:07 brief
+- [x] Confirmed globalAchievementMilestoneSystem.ts already has one top-level A import; app code unchanged. Renamed and strengthened only the two authorised rating cases with direct A.INK expectations and null helper checks; LatestReviews also checks all three figures and omitted null row. No cases added/deleted; baseline 3,413/393.
+- [ ] STOP: targeted `bunx vitest run src/test/profileCoursesSignature.test.tsx src/components/explore-tab-new/courseled/__tests__/LatestReviews.test.tsx`: 19 passed / 1 failed / 20 total. Full `bunx vitest run`: 3,412 passed / 1 failed / 3,413 total, 392 passed / 1 failed / 393 files. src/test/profileCoursesSignature.test.tsx:86:16: `TypeError: Cannot read properties of null (reading 'style')` at the added `expect(fig('clubhouse').style.color).toBe(norm(A.MUTE))`. Null category has no matching figure; no correction after failure. LatestReviews 12/12. No pre-existing failures; no protected changes. Await explicit test-selector correction authorisation.
+
 ## Final photography-rating correction
 - [x] Restored PHOTO_WHITE in the two specified ExploreCard photo-chip sites; removed CourseShelf figureTone override. ExploreCard retains its helper import for two other existing consumers.
 - [x] Renamed/retargeted only the authorised courseRatingConsistency photography case; retained both comment checks. Audit found no other colour expectations to retarget; exploreHeroCard.test.tsx unchanged, 30/30 passing. Full `bunx vitest run`: 3,413/3,413 across 393 files, unchanged inventory, zero failures. Build OK at 2026-10-27T09:00:42Z; ExploreCard module HTTP 200. All inherited ratings blockers below resolved; CB104's independent data-definition/sign-in verification remains unavailable.
