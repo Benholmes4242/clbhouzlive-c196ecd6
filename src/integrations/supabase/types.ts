@@ -20625,6 +20625,10 @@ export type Database = {
         Args: { p_business_id: string; p_days?: number }
         Returns: Json
       }
+      get_business_follower_golf: {
+        Args: { p_business_id: string }
+        Returns: Json
+      }
       get_business_followers: {
         Args: { p_business_id: string; p_days?: number }
         Returns: Json
