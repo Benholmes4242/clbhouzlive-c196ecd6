@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB107 — Club Visiting
+- [ ] Add the signed-off club-only Visiting card after What golfers say; reuse hours/social definitions and existing actions; preserve non-club profiles.
+- [ ] Remove club contact rows/About tab; hide a single-tab bar; add requested behavior tests and report inventory against 3,460 tests / 396 files.
+- [ ] Run targeted/full tests and check preview; report any failure verbatim and any unavailable live verification.
+
 ## CB104.1 — Club "You and {club}" title letter-spacing — 09:23 brief
 - [x] `.club-you-title` letter-spacing changed 0 → -0.01em in src/index.css:42; no other rule touched. Added cb104ClubYou.test.tsx case "title carries -0.01em letter-spacing" reading the rule from src/index.css (file 29 → 30 cases); AGENTS.md gained one line ruling the Tour-plan zero-spacing note Tour-only.
 - [x] Targeted `bunx vitest run src/test/cb104ClubYou.test.tsx`: 30/30. Full `bunx vitest run`: 3,413 passed / 1 failed / 3,414 total, 392 passed / 1 failed / 393 files; +1 case is the new title test. Sole failure is the inherited ratings-white signature assertion (profileCoursesSignature.test.tsx:86:16). Build OK.
