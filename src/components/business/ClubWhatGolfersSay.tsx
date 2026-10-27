@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
 import { useClubLatestReview, type ClubLatestReview } from '@/hooks/useClubLatestReview';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { CategoryBarGrid } from '@/components/shared/CategoryBarGrid';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { courseActivityClubName, courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 import { formatNumber } from '@/i18n/format';
@@ -171,16 +172,7 @@ export function ClubWhatGolfersSay({ isClub, businessId, businessName, courses, 
 
       {subRows.length > 0 && (
         <div style={{ marginTop: 12 }}>
-          {subRows.map((row) => (
-            <div key={row.key} data-club-say-sub={row.key}
-              style={{ display: 'grid', gridTemplateColumns: '84px minmax(0, 1fr) 30px', alignItems: 'center', gap: 10, padding: '6px 0', fontSize: 13, ...TAB }}>
-              <span style={{ color: T.mute }}>{row.label}</span>
-              <span style={{ height: 6, borderRadius: 3, background: T.track, overflow: 'hidden', display: 'block' }}>
-                <i data-club-say-fill style={{ display: 'block', height: '100%', width: `${row.value * 10}%`, background: T.fill, borderRadius: 3 }} />
-              </span>
-              <span style={{ textAlign: 'right', fontWeight: 600, color: T.ink }}>{row.value.toFixed(1)}</span>
-            </div>
-          ))}
+          <CategoryBarGrid items={subRows.map(r => ({ key: r.key, label: r.label, value: r.value }))} />
         </div>
       )}
 

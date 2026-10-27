@@ -18,9 +18,9 @@
  * ERROR (CRM2.2): a failed fetch renders NOTHING, exactly like loading — the
  * "No one's scored yet" invitation may only run on a successful empty fetch.
  *
- * CATEGORY BANDS (CRM1.5/1.6): the extracted CategoryBands rows render
+ * CATEGORY BARS (CRM1.5/1.6, 2×2 grid): the shared CategoryBarGrid renders
  * directly beneath the figure block whenever there are at least two community
- * ratings, at every count above; below two, nothing takes their place. The
+ * ratings, at every count above; below two, nothing takes its place. The
  * CategoryScores "pairs" block is removed from this component only.
  *
  * ONLY-RATER STATE (CRM1.7b): when the single rating is the viewer's own,
@@ -39,7 +39,7 @@ import { getRatingTierLabel } from '@/lib/ratingTier';
 import { SURFACE } from '@/lib/tokens/surface';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { CategoryBands } from '../CategoryBands';
+import { CategoryBarGrid } from '@/components/shared/CategoryBarGrid';
 import AboutSection, { AboutHairline } from './AboutSection';
 import { shotsInWords } from './courseVerdict';
 
@@ -186,8 +186,12 @@ const WhatPeopleSay: React.FC<WhatPeopleSayProps> = ({
         {ratedViewer && community.delta != null && <div data-viewer-delta style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, padding: '5px 10px', whiteSpace: 'nowrap', flex: '0 0 auto', borderRadius: 999, border: `1px solid ${inkWithAlpha(A.AMBER, 0.35)}`, background: inkWithAlpha(A.AMBER, 0.07) }}><span style={{ color: SURFACE.dark.mute, fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>You</span><b style={{ color: A.INK, fontSize: 14, ...FIGS }}>{yours?.toFixed(1)}</b><span style={{ color: A.INK, fontSize: 10, fontWeight: 800, ...FIGS }}>{community.delta > 0 ? '▲' : community.delta < 0 ? '▼' : ''} {Math.abs(community.delta).toFixed(1)}</span></div>}
       </div>
 
-      {/* CRM1.6 — the shared band rows, no kicker, heading or prose; two community ratings and up. */}
-      {facts && facts.bands.length > 0 && <CategoryBands bands={facts.bands} />}
+      {/* CRM1.6 — the shared 2×2 category bars, no kicker, heading or prose; two community ratings and up. */}
+      {facts && facts.bands.length > 0 && (
+        <div style={{ marginTop: 16 }}>
+          <CategoryBarGrid items={facts.bands.map(b => ({ key: b.key, label: b.label, value: b.mean }))} />
+        </div>
+      )}
 
       {rateAction}
 
