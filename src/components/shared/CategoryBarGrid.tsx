@@ -6,8 +6,8 @@
  * and the business profile's "What golfers say" (ClubWhatGolfersSay).
  *
  * ALL WHITE: the fill is the same A.INK as the figure — no green, no grey and
- * no tone function (courseSubScoreTone and categoryFillPercent are never used
- * here). Null values are left out; when nothing is left, nothing renders. The
+ * no score-tone or fill-percent helper anywhere in this component. Null values
+ * are left out; when nothing is left, nothing renders. The
  * four known categories always print design, condition, clubhouse, facilities
  * whatever order they arrive in; any other key follows in arrival order.
  */
