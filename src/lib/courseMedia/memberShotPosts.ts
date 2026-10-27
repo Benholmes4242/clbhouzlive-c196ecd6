@@ -97,6 +97,20 @@ export function holeShotsToFeedPosts(rows: readonly MemberShotRow[], courseName 
     `${courseName} · The ${holeOrdinal(holeNo)}`, thumbnail, holeShotItems(rows, courseName, holeNo));
 }
 
+/** Place rows arrive with contributor identity resolved by the public-profile
+ * read. One place is one ready-only sideways run, never a real post. */
+export function placeShotsToFeedPosts(rows: readonly MemberShotRow[], courseName: string,
+  courseId: string, place: string, label: string): FeedPost[] {
+  const ordered = [...rows].sort((a, b) => Date.parse(b.added_at ?? '') - Date.parse(a.added_at ?? ''));
+  const shots = holeShotItems(ordered, courseName, 0).map(shot => ({
+    ...shot, item: { ...shot.item, memberShot: { ...shot.item.memberShot,
+      kicker: label, title: shortCoursePart(courseName), detail: undefined,
+      credit: shot.item.memberShot?.credit ?? '', memberName: shot.item.memberShot?.memberName ?? '',
+    } },
+  }));
+  return syntheticPost(`shots:place:${courseId}:${place}`, courseId, courseName, label, null, shots);
+}
+
 /** Every ready rail row is one slide, in RPC order; the header follows its course. */
 export function latestHolesToFeedPosts(rows: readonly MemberShotRow[]): FeedPost[] {
   return syntheticPost('shots:latest-holes', '', '', 'Latest holes', null,
