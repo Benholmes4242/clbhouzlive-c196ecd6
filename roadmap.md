@@ -1,9 +1,10 @@
 # Roadmap
 
 ## CB109 — Media-first in every post feed
-- [ ] Apply caller layouts and shared review/footer slot ordering; preserve standard, round, grid and viewer paths. Two-line clamp per Ben's ruling.
-- [ ] Add CB109 tests, audit unchanged direct-standard tests, run targeted and full suite against 3,501 tests / 399 files.
-- [ ] Report caller list, diff, test inventory and verification limitations.
+- [x] Applied caller layouts and shared review/footer slots; standard, rounds, grids and viewers unchanged. Two-line clamp per Ben's ruling. All five new rendered review-flow checks pass; no existing test retargeted.
+- [x] Ran targeted `bunx vitest run src/test/cb109MediaFirstEverywhere.test.tsx src/test/cb108ClubFeed.test.tsx src/test/reviewPostCard.test.tsx src/test/feedActionsRight.test.tsx`: 33 passed / 4 failed / 37. Full `bunx vitest run`: 3,506 passed / 4 failed / 3,510 across 400 files; baseline 3,501/399 +9 new cases/one file. Existing 3,501 tests pass; no pre-existing failures. Latest automatic build log build OK 13:19:16Z.
+- [ ] STOP: four new source-reading cases fail at src/test/cb109MediaFirstEverywhere.test.tsx:34:34: `Error: ENOENT: no such file or directory, open '/dev-server/src/test/undefined'`. No source/test corrections after failure. Caller-default, personal/business and out-of-scope checks await explicit correction authorisation. Signed-in visual verification unavailable (external_unmanaged).
+- [x] Caller/diff/test report supplied; no backend/config/native changes.
 
 ## Narrow ReviewScoreRow card labels
 - [x] Added full-row inline-size query wrapper and scoped 400px/330px overrides; default grid, caption and null behavior retained. Existing tests unchanged; three query-rule tests added to reviewScoreRow.test.tsx.
