@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 vi.mock('@/integrations/supabase/client', () => ({ supabase: {} }));
 vi.mock('react-router-dom', () => ({ useNavigate: () => vi.fn() }));
 import { buildSignature } from '@/components/profile/courses/yourSignature';
-import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { YourSignatureSection } from '@/components/profile/courses/YourSignatureSection';
 
 const row = (o: Partial<Record<string, number | null>> = {}) => ({
@@ -73,12 +73,13 @@ describe('profile courses signature', () => {
     }
   });
 
-  it('figures take the canonical sub-score tone and no bar is drawn', () => {
+  it('figures take the canonical sub-score tone (white for every score) and no bar is drawn', () => {
     const rows = Array.from({ length: 5 }, () => row({ design_score: 9, condition_score: 8.9 }));
     const { container } = render(<YourSignatureSection rows={rows} />);
     const norm = (c: string) => { const el = document.createElement('i'); el.style.color = c; return el.style.color; };
     const fig = (k: string) => container.querySelector(`[data-category="${k}"] [data-category-figure]`) as HTMLElement;
-    expect(courseSubScoreTone(9)).not.toBe(courseSubScoreTone(8.9));
+    expect(courseSubScoreTone(9)).toBe(A.INK);
+    expect(courseSubScoreTone(8.9)).toBe(A.INK);
     expect(fig('design').style.color).toBe(norm(courseSubScoreTone(9)));
     expect(fig('condition').style.color).toBe(norm(courseSubScoreTone(8.9)));
     expect(container.querySelector('[data-category-score] ')?.hasAttribute('data-category-figure')).toBe(true);

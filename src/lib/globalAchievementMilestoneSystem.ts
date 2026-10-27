@@ -330,7 +330,6 @@ export function getRingColorForThreshold(threshold: number): string {
  * @returns Hex color string for avatar ring
  */
 export { getRingColorForTotalPlayed } from './clbhouzAchievementPalette';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /**
  * Get theme for any achievement type
@@ -442,4 +441,3 @@ export const RATING_CSS_VARS = {
 
 // Re-export palette and helpers
 export { CLBHOUZ_ACHIEVEMENT_PALETTE, THEME_COLORS, buildTheme } from './clbhouzAchievementPalette';
-import { A } from '@/features/courses/components/holes/analytical/tokens';

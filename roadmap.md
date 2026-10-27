@@ -1,5 +1,9 @@
 # Roadmap
 
+## Finish all-white ratings — three authorised corrections
+- [x] Removed only the two duplicate A imports; source scan found no other duplicates. Applied exact signature/bar colour assertions and test renames, retaining other assertions.
+- [ ] Run full suite and confirm preview compilation; reconcile against 3,384/392 plus intervening CB104's 29 cases/one file, expected unchanged inventory 3,413/393.
+
 ## CB104 — Club profile: You and the club
 - [x] Founder chose mock arrangement: small uppercase club kicker and larger rounds/best sentences. Added keyed per-course collectors reusing stats/circle hooks, merged followed golfers and nation-valued place filtering; shared activity-name helper re-export preserves Insights consumers.
 - [x] Added cb104ClubYou.test.tsx: 29/29, including four place-line cases. Existing tests unchanged. `bunx vitest run src/test/cb104ClubYou.test.tsx src/test/cb103ClubHero.test.tsx src/test/cb99InsightsCourse.test.tsx`: 78/78 across 3 files.
