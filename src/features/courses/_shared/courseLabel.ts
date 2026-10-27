@@ -19,6 +19,9 @@ const CLUB_SUFFIX =
 
 const TRAILING_CONNECTIVE = /\s+(?:and|&|\+)\s*$/i;
 
+/** Club name for personal/activity copy; shared without changing suffix rules. */
+export const courseActivityClubName = (name: string) => name.trim().replace(/\s+(?:Golf Club|Golf Course|GC)$/i, '').trim();
+
 export function shortCourseName(name: string, max = 26): string {
   if (!name) return '';
 
