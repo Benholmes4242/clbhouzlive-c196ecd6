@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, waitFor } from '@testing-library/react';
 import { ClubYouCard, clubYouFacts, clubYouFaces, clubYouTitle, type ClubCourseResult } from '@/components/business/ClubYouCard';
@@ -161,5 +163,15 @@ describe('CB104 place line', () => {
   });
   it('real city and region remain Bromley, Kent', () => {
     expect(clubPlaceLine({ city: 'Bromley', region: 'Kent', country: 'England', courseCount: 2 }, labels)).toBe('Golf club · Bromley, Kent · 2 courses');
+  });
+});
+
+describe('CB104 title typography', () => {
+  it('title carries -0.01em letter-spacing', () => {
+    const css = readFileSync(resolve(process.cwd(), 'src/index.css'), 'utf8');
+    const rule = css.match(/\.club-you-title \{([^}]*)\}/);
+    expect(rule, '.club-you-title rule must exist in src/index.css').not.toBeNull();
+    expect(rule?.[1]).toMatch(/letter-spacing:\s*-0\.01em/);
+    expect(rule?.[1]).not.toMatch(/letter-spacing:\s*0(?![.\d])/);
   });
 });
