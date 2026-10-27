@@ -6,6 +6,16 @@
  */
 export const OPENING_HOURS_DAY_KEYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
+export const OPENING_HOURS_DAY_LABELS: Record<string, string> = {
+  Mon: 'Monday', Tue: 'Tuesday', Wed: 'Wednesday', Thu: 'Thursday',
+  Fri: 'Friday', Sat: 'Saturday', Sun: 'Sunday',
+};
+export type OpeningHoursEntry = { open: string; close: string; closed: boolean };
+// About keeps its historical separator; Visiting explicitly opts into the signed-off en dash.
+export function formatOpeningHours(entry: OpeningHoursEntry, separator = ' - '): string {
+  return entry.closed ? 'Closed' : `${entry.open}${separator}${entry.close}`;
+}
+
 export function displaysOpeningHours(business: {
   show_opening_hours?: boolean | null;
   opening_hours?: unknown;

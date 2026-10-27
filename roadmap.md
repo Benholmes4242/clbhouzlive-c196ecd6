@@ -1,5 +1,11 @@
 # Roadmap
 
+## CB107 — Club Visiting
+- [x] Added club-only Visiting after What golfers say, shared hours keys/formatOpeningHours in src/lib/business/openingHours.ts and SOCIAL_CONFIG in src/lib/business/socialLinks.ts (also re-exported by BusinessProfileInfo); non-club hours keep the spaced hyphen. Resolved mock choices: week -2px top; Visiting en dash.
+- [x] Removed club contact rows/About tab and hid the single-tab bar. Added 19 cases in cb107ClubVisiting.test.tsx; existing tests unchanged. Audited CB103.1 “club with a promoted book action shows no Book button” and “non-club promoted book still works”, both unchanged and passing; no old About/tab-bar assertion found.
+- [x] Targeted `bunx vitest run src/test/cb107ClubVisiting.test.tsx src/test/cb103ClubHero.test.tsx`: 43/43. Full `bunx vitest run`: 3,479/3,479 across 397 files, baseline 3,460/396 +19/+1 solely new file; no pre-existing failures.
+- [ ] STOP: harness 2026-10-27T11:35:17Z reports src/test/cb107ClubVisiting.test.tsx(190,72), (263,64), (265,58): error TS2769: No overload matches this call. The last overload gave the following error. Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'. No correction after completed-edit stop; preview not verified. Live signed-in check unavailable (external_unmanaged); controlled screenshot harness also failed with React refresh preamble missing, no screenshots/visual-match claim.
+
 ## CB104.1 — Club "You and {club}" title letter-spacing — 09:23 brief
 - [x] `.club-you-title` letter-spacing changed 0 → -0.01em in src/index.css:42; no other rule touched. Added cb104ClubYou.test.tsx case "title carries -0.01em letter-spacing" reading the rule from src/index.css (file 29 → 30 cases); AGENTS.md gained one line ruling the Tour-plan zero-spacing note Tour-only.
 - [x] Targeted `bunx vitest run src/test/cb104ClubYou.test.tsx`: 30/30. Full `bunx vitest run`: 3,413 passed / 1 failed / 3,414 total, 392 passed / 1 failed / 393 files; +1 case is the new title test. Sole failure is the inherited ratings-white signature assertion (profileCoursesSignature.test.tsx:86:16). Build OK.

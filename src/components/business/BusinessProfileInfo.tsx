@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, ArrowUpRight, Flag } from 'lucide-react';
-import { SiInstagram, SiX, SiFacebook, SiTiktok, SiYoutube } from 'react-icons/si';
 import { useTranslation } from 'react-i18next';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
 import { A, Panel, Action, LABEL } from '@/features/courses/components/holes/analytical/tokens';
@@ -9,7 +8,9 @@ import { openExternalUrl } from '@/utils/median/openExternalUrl';
 import { trackBusinessAction } from '@/lib/businessAnalyticsTracking';
 import { useNearestCourse } from '@/hooks/useNearestCourse';
 import { formatDistanceKm } from '@/utils/formatDistance';
-import { displaysOpeningHours } from '@/lib/business/openingHours';
+import { displaysOpeningHours, OPENING_HOURS_DAY_KEYS as DAY_KEYS, OPENING_HOURS_DAY_LABELS as DAY_LABELS, formatOpeningHours } from '@/lib/business/openingHours';
+import { SOCIAL_CONFIG, ensureProtocol } from '@/lib/business/socialLinks';
+export { SOCIAL_CONFIG } from '@/lib/business/socialLinks';
 
 const HOSPITALITY_CATEGORIES = new Set<string>([
   'Hotel / Accommodation',
@@ -62,11 +63,6 @@ function ContactRow({
 }
 
 /* Opening hours helpers */
-const DAY_KEYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
-const DAY_LABELS: Record<string, string> = {
-  Mon: 'Monday', Tue: 'Tuesday', Wed: 'Wednesday', Thu: 'Thursday',
-  Fri: 'Friday', Sat: 'Saturday', Sun: 'Sunday',
-};
 
 function isOpenNow(oh: Record<string, { open: string; close: string; closed: boolean }>): boolean {
   const now = new Date();
@@ -103,7 +99,7 @@ function OpeningHoursSection({
             <div key={k} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
               <span style={{ ...LABEL, color: A.MUTE }}>{DAY_LABELS[k]}</span>
               <span style={{ fontSize: 13, fontWeight: 700, color: h.closed ? A.DIM : A.INK }}>
-                {h.closed ? 'Closed' : `${h.open} - ${h.close}`}
+                {formatOpeningHours(h)}
               </span>
             </div>
           );
@@ -111,25 +107,6 @@ function OpeningHoursSection({
       </div>
     </Panel>
   );
-}
-
-/* Socials - the brand marks ARE the identification, so they stay. */
-const SOCIAL_CONFIG: {
-  key: keyof NonNullable<BusinessProfile['social_links']>;
-  Icon: React.ElementType;
-  label: string;
-  buildUrl: (value: string) => string;
-}[] = [
-  { key: 'instagram', Icon: SiInstagram, label: 'Instagram', buildUrl: (h) => `https://instagram.com/${h.replace(/^@/, '')}` },
-  { key: 'twitter',   Icon: SiX,         label: 'X',         buildUrl: (h) => `https://x.com/${h.replace(/^@/, '')}` },
-  { key: 'facebook',  Icon: SiFacebook,  label: 'Facebook',  buildUrl: ensureProtocol },
-  { key: 'tiktok',    Icon: SiTiktok,    label: 'TikTok',    buildUrl: (h) => `https://tiktok.com/@${h.replace(/^@/, '')}` },
-  { key: 'youtube',   Icon: SiYoutube,   label: 'YouTube',   buildUrl: ensureProtocol },
-];
-
-function ensureProtocol(url: string): string {
-  if (!url) return '';
-  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
 }
 
 /* Main */

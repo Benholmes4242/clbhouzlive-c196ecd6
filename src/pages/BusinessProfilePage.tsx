@@ -65,6 +65,7 @@ import { useTranslation } from 'react-i18next';
 import { A, Panel, LABEL, NUM } from '@/features/courses/components/holes/analytical/tokens';
 import { ClubHowItPlays, type BusinessClubCourse } from '@/components/business/ClubHowItPlays';
 import { ClubWhatGolfersSay } from '@/components/business/ClubWhatGolfersSay';
+import { ClubVisiting } from '@/components/business/ClubVisiting';
 import { ClubYouCard } from '@/components/business/ClubYouCard';
 import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
 import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
@@ -427,7 +428,7 @@ const BusinessProfilePage: React.FC = () => {
 
   const tabs: Array<{ id: BusinessTab; label: string }> = [
     { id: 'posts', label: 'Posts' },
-    { id: 'about', label: 'About' },
+    ...(!isClub ? [{ id: 'about' as const, label: 'About' }] : []),
     ...(showTeamTab ? [{ id: 'team' as const, label: 'Team' }] : []),
   ];
 
@@ -443,7 +444,7 @@ const BusinessProfilePage: React.FC = () => {
           />
         );
       case 'about':
-        return <BusinessProfileInfo business={business} canManage={isOwner} userId={user?.id} />;
+        return isClub ? <PostsTabContent actorType="business" actorId={business.id} isOwnProfile={isOwner || false} businessName={business.name} /> : <BusinessProfileInfo business={business} canManage={isOwner} userId={user?.id} />;
       case 'team':
         return <BusinessTeamTab businessId={business.id} />;
       default:
@@ -560,6 +561,7 @@ const BusinessProfilePage: React.FC = () => {
 
       {/* CB106 — What golfers say (club-only), directly after How it plays. */}
       <ClubWhatGolfersSay isClub={isClub} businessId={business.id} businessName={business.name} courses={courses} viewerId={user?.id} isTeamMember={!!membership} />
+      {isClub && <ClubVisiting business={business} viewerId={user?.id} firstCourseRegion={courses[0]?.region} />}
 
       {/* ----- Bio on canvas (no card) ----- */}
       {!isClub && bioText && (
@@ -591,7 +593,7 @@ const BusinessProfilePage: React.FC = () => {
       )}
 
       {/* ----- Action rows ----- */}
-      {(() => {
+      {!isClub && (() => {
         // Secondary action defs
         type SecKey = 'website' | 'call' | 'directions' | 'email' | 'book';
         const secDefs: Record<SecKey, { label: string; icon: React.ElementType; onClick: () => void; available: boolean } > = {
@@ -715,7 +717,7 @@ const BusinessProfilePage: React.FC = () => {
           shows through so the strip is continuous with the page. Do NOT
           reintroduce a local background — --background and --bg-page both
           resolve to the canonical Canvas (#0A0A0C). */}
-      <section className="px-4">
+      {tabs.length > 1 && <section className="px-4">
         <div className="flex justify-center" style={{ padding: '10px 0' }}>
           <RailChips
             align="center-when-fit"
@@ -732,7 +734,7 @@ const BusinessProfilePage: React.FC = () => {
           />
 
         </div>
-      </section>
+      </section>}
 
       {/* ----- Tab content ----- */}
       <div className={cn('min-h-[60vh]', activeTab === 'posts' ? 'pt-0 px-0' : 'pt-4 px-4')}>
