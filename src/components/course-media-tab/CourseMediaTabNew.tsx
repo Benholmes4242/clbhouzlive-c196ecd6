@@ -11,6 +11,9 @@ import { placeShotsToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { supabase } from '@/integrations/supabase/client';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { PLACE_LABELS } from './ShotTagChoices';
+import { fetchOwnMediaSources } from '@/lib/courseMedia/holePhotoData';
+import { useQuery } from '@tanstack/react-query';
 import type { CoursePlace } from '@/lib/courseMedia/places';
 import './media-v2.css';
 import { useCourseMedia, type CourseMediaFilter } from './hooks/useCourseMedia';
@@ -58,6 +61,10 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const knownHoles = walkHoles ? [...walkHoles.holes].sort((a, b) => a.hole_no - b.hole_no).map(hole => hole.hole_no) : null;
   const tagging = useHolePhotoTagging(courseId, user?.id, knownHoles);
   const places = useCoursePlaceMedia(courseId, user?.id);
+  const placeOnlySources = useQuery({ queryKey: ['own-course-photo-sources', courseId, user?.id], enabled: !!user && analysis.isSuccess && !knownHoles, queryFn: () => user ? fetchOwnMediaSources(courseId, user.id) : Promise.resolve([]) });
+  const sources = knownHoles ? tagging.sources : placeOnlySources;
+  const tagsReady = tagging.ready || (!knownHoles && sources.isSuccess && places.tags.isSuccess);
+
   const [tagPost, setTagPost] = useState<FeedPost | null>(null);
   const [addHole, setAddHole] = useState<number | null>(null);
   const [batch, setBatch] = useState<(BatchPhoto & Partial<OwnMediaSource>)[] | null>(null);
@@ -116,10 +123,17 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
     combinedTaggedUrls.add(holeMediaKey({ url: row.media_url, mediaType: row.media_type, streamId: row.stream_id }));
   }
   const isTaggedSource = (source: OwnMediaSource) => combinedTaggedUrls.has(source.url) || combinedTaggedUrls.has(holeMediaKey(source));
-  const untaggedCount = tagging.ready ? (tagging.sources.data ?? []).filter(source => !isTaggedSource(source)).length : null;
-  const ownOptions = (tagging.sources.data ?? []).filter(source => !isTaggedSource(source)).map(source => source.url);
+  const untaggedCount = tagsReady && places.tags.isSuccess ? (sources.data ?? []).filter(source => !isTaggedSource(source)).length : null;
+  const ownOptions = (sources.data ?? []).filter(source => !isTaggedSource(source)).map(source => source.url);
+  const findSource = (url: string) => sources.data?.find(s => s.url === url);
+  const tagPlace = async (url: string, place: CoursePlace) => {
+    const source = findSource(url); if (!source) throw new Error('This shot is not yours at this course.');
+    const row = await places.submit.mutateAsync({ source, place });
+    void analyticsEvents.track('media_place_tag', { place, course_id: courseId }); return row;
+  };
+  const removePlace = async (row: PlaceMedia) => { await places.remove.mutateAsync({ row }); void analyticsEvents.track('media_place_untag', { place: row.place, course_id: courseId }); };
   const sourcePost = (url: string): FeedPost => {
-    const source = tagging.sources.data?.find(s => s.url === url);
+    const source = sources.data?.find(s => s.url === url);
     const found = posts.find(post => post.userId === user?.id && holeSourceUrl(post.mediaItems[0]) === url);
     if (found && !source) return found;
     return { id: url, userId: user?.id ?? '', actorType: 'personal', actorId: user?.id ?? '', username: '', displayName: '', avatarUrl: '', isVerified: false, creatorRelation: 'none', caption: '', mediaItems: [{ id: url, type: source?.mediaType ?? 'image', imageUrl: url, streamId: source?.streamId ?? undefined, thumbnailUrl: source?.posterUrl ?? undefined, duration: source?.durationSeconds ?? undefined, width: source?.width ?? 0, height: source?.height ?? 0 }], createdAt: source?.createdAt ?? '', likeCount: 0, commentCount: 0, shareCount: 0, review: null, isReview: false, isLikedByMe: false, isFollowedByMe: false };
@@ -130,7 +144,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
     if (addHole == null) return;
     setFastPending(true); setFastError(null);
     try { await tagging.submit.mutateAsync({ post: sourcePost(url), hole: addHole }); setAddHole(null); }
-    catch (error) { console.error('[hole-tag] failed', error); const video = tagging.sources.data?.find(s => s.url === url)?.mediaType === 'video'; setFastError(holePhotoErrorMessage(error, `The ${video ? 'video' : 'photo'} could not be tagged. The tag was not saved.`, video ? 'video' : 'image')); }
+    catch (error) { console.error('[hole-tag] failed', error); const video = sources.data?.find(s => s.url === url)?.mediaType === 'video'; setFastError(holePhotoErrorMessage(error, `The ${video ? 'video' : 'photo'} could not be tagged. The tag was not saved.`, video ? 'video' : 'image')); }
     finally { setFastPending(false); }
   };
   const tagLibrary = async (file: File, hole = addHole) => {
@@ -167,10 +181,10 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
     finally { setFastPending(false); setUploadProgress(null); }
   };
   const beginBatch = async () => {
-    if (!tagging.sources.isSuccess) return;
+    if (!sources.isSuccess) return;
     setFastPending(true); setFastError(null);
     try {
-      const photos = await Promise.all(tagging.sources.data.filter(photo => !isTaggedSource(photo)).map(async photo => ({ ...photo, exif: (await prepareHolePhoto(photo.url)).exif })));
+      const photos = await Promise.all(sources.data.filter(photo => !isTaggedSource(photo)).map(async photo => ({ ...photo, exif: (await prepareHolePhoto(photo.url)).exif })));
       if (photos.length) setBatch(orderedBatch(photos));
     } catch { setFastError('The photos or videos could not be prepared for tagging. No tags were saved.'); }
     finally { setFastPending(false); }
@@ -178,7 +192,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const authors = new Map(posts.filter(post => post.actorType === 'personal' && post.displayName).map(post => [post.userId, post.displayName]));
   // Loaded zero is a fact; default/loading zero is not State B or C.
   const photoState = countsReady && analysis.isSuccess && analysis.data
-    ? coursePhotoState(mediaCounts.total > 0 || (tagging.tags.data ?? []).some(row => row.status === 'approved'), walkHoles != null)
+    ? coursePhotoState(mediaCounts.total > 0 || (tagging.tags.data ?? []).some(row => row.status === 'approved') || (places.tags.data ?? []).some(row => row.status === 'approved'), walkHoles != null)
     : null;
   // The member's own non-rejected tags, one entry per tag, so confirmations can
   // say "your second tag on the 9th" (BRIEF_HOLE_TAG_BATCH_V3).
@@ -198,7 +212,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       const members = new Map(profiles.map(profile => [profile.id, profile]));
       const mapped = ready.map(row => ({ ...row, member_id: row.user_id, member_name: members.get(row.user_id)?.display_name,
         member_avatar_url: members.get(row.user_id)?.profile_photo_url }));
-      const posts = placeShotsToFeedPosts(mapped, courseName ?? '', courseId, place, t(`media.v2.places.${place}`));
+      const posts = placeShotsToFeedPosts(mapped, courseName ?? '', courseId, place, t(`media.v2.places.${place}`, { defaultValue: PLACE_LABELS[place] }));
       if (!posts.length) return;
       openWithOrigin({ posts, index: 0, originEl: null, posterUrl: ready[0].media_type === 'video' ? ready[0].poster_url ?? '' : ready[0].media_url,
         mediaId: ready[0].id, openedFrom: 'course-media', options: { readOnly: true, syntheticPosts: true } });
@@ -238,23 +252,23 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         courseId={courseId}
       />}
       {countsReady && mediaCounts.total > 0 && photoState !== 'B' && photoState !== 'C' && <header className="media-v2-top">
-        <span style={VERDICT_KICKER}>{t('media.v2.kicker')}</span>
-        <h2>{t(hasTags ? 'media.v2.sorted' : 'media.v2.unsorted', { total: mediaCounts.total })}</h2>
-        {hasTags && <p>{t('media.v2.sub')}</p>}
+        <span style={VERDICT_KICKER}>{t('media.v2.kicker', { defaultValue: "Through members' eyes" })}</span>
+        <h2>{t(hasTags ? 'media.v2.sorted' : 'media.v2.unsorted', { total: mediaCounts.total, defaultValue: hasTags ? `${mediaCounts.total} shots, sorted by the golfers who took them` : `${mediaCounts.total} shots, none sorted yet` })}</h2>
+        {hasTags && <p>{t('media.v2.sub', { defaultValue: "By hole and around the club. Tap any of them to walk it." })}</p>}
       </header>}
       {photoState === 'B' && walkHoles && <CourseMediaNoPhotographs courseName={courseName} holes={walkHoles.holes} onHole={addFirst} onAddFirst={() => { setFastError(null); setFirstPhoto(true); }} />}
       {photoState === 'C' && <CourseMediaNothing courseName={courseName} onReview={() => navigate(`/courses/${courseId}/rate`)} />}
       {photoState !== 'B' && photoState !== 'C' && walkHoles && tagging.tags.isSuccess && <HoleWalk available={true} holes={walkHoles.holes} scored={walkHoles.scored} rows={tagging.tags.data ?? []} totalMedia={mediaCounts.total} courseName={courseName} authors={authors} onAddFirst={addFirst} onChooseFirst={() => { setFastError(null); setFirstPhoto(true); }} memberId={user?.id} onMove={knownHoles && knownHoles.length > 0 ? row => { tagging.move.reset(); setMovePhoto(row); } : undefined} onRemove={knownHoles && knownHoles.length > 0 ? row => { tagging.remove.reset(); setRemovePhoto(row); } : undefined} focus={walkFocus} mediaPaused={!!(batch || tagPost || addHole != null || firstPhoto || retagPhoto || movePhoto || removePhoto)} />}
       {photoState !== 'B' && photoState !== 'C' && <CoursePlaceTiles rows={places.tags.data ?? []} onOpen={(place, rows) => { void openPlace(place, rows); }} />}
       {photoState !== 'A' && photoState !== 'B' && photoState !== 'C' && countsReady && mediaCounts.total > 0 && tagging.tags.isSuccess && places.tags.isSuccess && !hasTags && <section className="media-v2-unsorted">
-        <div className="media-v2-unsorted-intro"><span className="media-v2-unsorted-icon"><Tag size={17} /></span><div><h3>{t('media.v2.unsortedTitle')}</h3><p>{t('media.v2.unsortedBody')}</p></div></div>
-        <Button className="media-v2-primary" disabled={fastPending} onClick={() => untaggedCount ? void beginBatch() : setFirstPhoto(true)}>{untaggedCount ? t('media.v2.tagYour', { count: untaggedCount }) : t('media.v2.add')}</Button>
+        <div className="media-v2-unsorted-intro"><span className="media-v2-unsorted-icon"><Tag size={17} /></span><div><h3>{t('media.v2.unsortedTitle', { defaultValue: "Sort them by hole or by place" })}</h3><p>{t('media.v2.unsortedBody', { defaultValue: "Tag a shot to a hole, the clubhouse, the food, the practice ground or anything else, and this page builds itself." })}</p></div></div>
+        <Button className="media-v2-primary" disabled={fastPending} onClick={() => untaggedCount ? void beginBatch() : setFirstPhoto(true)}>{untaggedCount ? t('media.v2.tagYour', { count: untaggedCount, defaultValue: "Tag your {{count}} shots" }) : t('media.v2.add', { defaultValue: "Add a photo or video" })}</Button>
       </section>}
-      {countsReady && mediaCounts.total > 0 && photoState !== 'B' && photoState !== 'C' && <div className="media-v2-everything media-v2-head"><h3>{t(hasTags ? 'media.v2.everything' : 'media.v2.allShots')}</h3><span className="media-v2-label">{mediaCounts.total}</span></div>}
-      {tagging.ready && untaggedCount != null && untaggedCount > 0 && (
+      {countsReady && mediaCounts.total > 0 && photoState !== 'B' && photoState !== 'C' && <div className="media-v2-everything media-v2-head"><h3>{t(hasTags ? 'media.v2.everything' : 'media.v2.allShots', { defaultValue: hasTags ? 'Everything' : 'All shots' })}</h3><span className="media-v2-label">{mediaCounts.total}</span></div>}
+      {tagsReady && untaggedCount != null && untaggedCount > 0 && (
         <section>
-          <Button variant="ghost" className="media-v2-untagged" disabled={fastPending || !tagging.sources.isSuccess} onClick={beginBatch}>
-            <Tag size={15} /><p><b>{t('media.v2.ownCount', { count: untaggedCount })}</b> {t('media.v2.untagged', { count: untaggedCount })}</p><span>{t('media.v2.tagThem')}</span><ChevronRight size={14} />
+          <Button variant="ghost" className="media-v2-untagged" disabled={fastPending || !sources.isSuccess} onClick={beginBatch}>
+            <Tag size={15} /><p><b>{t('media.v2.ownCount', { count: untaggedCount, defaultValue: "{{count}} of yours" })}</b> {t('media.v2.untagged', { count: untaggedCount, defaultValue: "aren't tagged yet" })}</p><span>{t('media.v2.tagThem', { defaultValue: "Tag them" })}</span><ChevronRight size={14} />
           </Button>
           {fastError && addHole == null && <p role="alert" className="text-sm">{fastError}</p>}
         </section>
@@ -272,21 +286,24 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         refetch={refetch}
         courseName={courseName}
         courseId={courseId}
-        tagging={tagging.ready && user && knownHoles ? { memberId: user.id, holeCount: knownHoles.length, taggedUrls: combinedTaggedUrls, taggedHoles: new Map((tagging.tags.data ?? []).filter(row => row.status === 'approved' && row.user_id === user.id).map(row => [row.media_url, row.hole_no])), onTag: startTag } : undefined}
+        tagging={tagsReady && user ? { memberId: user.id, holeCount: knownHoles?.length ?? 1, taggedUrls: combinedTaggedUrls, taggedHoles: new Map((tagging.tags.data ?? []).filter(row => row.status === 'approved' && row.user_id === user.id).map(row => [row.media_url, row.hole_no])), onTag: startTag } : undefined}
       />}
       <CourseMediaNotLive rows={tagging.tags.data ?? []} memberId={user.id} courseId={courseId} onRetag={knownHoles && knownHoles.length > 0 ? row => { tagging.retag.reset(); setRetagPhoto(row); } : undefined} />
       {retagPhoto && knownHoles && <CoursePhotoRetagPicker key={retagPhoto.id} row={retagPhoto} knownHoles={knownHoles} pending={tagging.retag.isPending} error={tagging.retag.error ? holePhotoErrorMessage(tagging.retag.error, `The ${retagPhoto.media_type === 'video' ? 'video' : 'photo'} could not be retagged. The new tag was not saved.`) : null} onClose={() => setRetagPhoto(null)} onSubmit={hole => tagging.retag.mutate({ row: retagPhoto, hole }, { onSuccess: () => setRetagPhoto(null) })} />}
       {movePhoto && knownHoles && <CoursePhotoRetagPicker key={`move-${movePhoto.id}`} mode="move" row={movePhoto} knownHoles={knownHoles} pending={tagging.move.isPending} error={tagging.move.error ? holePhotoErrorMessage(tagging.move.error, `The ${kindOf(movePhoto)} could not be moved. It is still on the ${ordinalOf(movePhoto.hole_no)}.`) : null} onClose={() => setMovePhoto(null)} onSubmit={hole => tagging.move.mutate({ row: movePhoto, hole }, { onSuccess: () => { setMovePhoto(null); setWalkFocus({ hole, id: movePhoto.id, nonce: Date.now() }); } })} />}
-      {removePhoto && <HoleTagRemoveDialog key={`remove-${removePhoto.id}`} row={removePhoto} fromPost={tagging.sources.isSuccess ? isHoleTagFromPost(removePhoto, tagging.sources.data ?? []) : tagging.sources.isError ? false : null} pending={tagging.remove.isPending} error={tagging.remove.error ? holePhotoErrorMessage(tagging.remove.error, `The ${kindOf(removePhoto)} could not be removed. It is still on the ${ordinalOf(removePhoto.hole_no)}.`) : null} onClose={() => setRemovePhoto(null)} onConfirm={() => tagging.remove.mutate({ row: removePhoto }, { onSuccess: () => setRemovePhoto(null) })} />}
-      {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} sources={tagging.sources.data} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); }} />}
+      {removePhoto && <HoleTagRemoveDialog key={`remove-${removePhoto.id}`} row={removePhoto} fromPost={sources.isSuccess ? isHoleTagFromPost(removePhoto, sources.data ?? []) : sources.isError ? false : null} pending={tagging.remove.isPending} error={tagging.remove.error ? holePhotoErrorMessage(tagging.remove.error, `The ${kindOf(removePhoto)} could not be removed. It is still on the ${ordinalOf(removePhoto.hole_no)}.`) : null} onClose={() => setRemovePhoto(null)} onConfirm={() => tagging.remove.mutate({ row: removePhoto }, { onSuccess: () => setRemovePhoto(null) })} />}
+      {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} sources={sources.data} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); }} />}
       {firstPhoto && knownHoles && <CourseFirstPhotoPicker knownHoles={knownHoles} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onSubmit={tagLibrary} onClose={() => { setFirstPhoto(false); }} />}
-      {batch && knownHoles && <HolePhotoBatchPath photos={batch} knownHoles={knownHoles} existingHoleTags={ownHoleTags} onClose={() => setBatch(null)} onTag={(url, hole) => tagging.submit.mutateAsync({ post: sourcePost(url), hole })} onRemove={row => tagging.remove.mutateAsync({ row })} />}
-      {tagPost && knownHoles && (
-        <HolePhotoTagDialog key={addHole == null ? tagPost.mediaItems[0]?.id : `add-${addHole}`} imageUrl={holeSourceUrl(tagPost.mediaItems[0])} mediaSource={tagging.sources.data?.find(s => s.url === holeSourceUrl(tagPost.mediaItems[0]) || holeMediaKey(s) === holeMediaKey(tagPost.mediaItems[0]))} mediaSources={tagging.sources.data}
+      {batch && <HolePhotoBatchPath photos={batch} knownHoles={knownHoles ?? []} existingPlaceTags={(places.tags.data ?? []).filter(row => row.user_id === user.id)} onTagPlace={tagPlace} onRemovePlace={removePlace} existingHoleTags={ownHoleTags} onClose={() => setBatch(null)} onTag={(url, hole) => tagging.submit.mutateAsync({ post: sourcePost(url), hole })} onRemove={row => tagging.remove.mutateAsync({ row })} />}
+      {tagPost && (
+        <HolePhotoTagDialog key={addHole == null ? tagPost.mediaItems[0]?.id : `add-${addHole}`} imageUrl={holeSourceUrl(tagPost.mediaItems[0])} mediaSource={sources.data?.find(s => s.url === holeSourceUrl(tagPost.mediaItems[0]) || holeMediaKey(s) === holeMediaKey(tagPost.mediaItems[0]))} mediaSources={sources.data}
           initialHole={addHole} imageOptions={addHole == null ? undefined : ownOptions} onImageChange={url => setTagPost(sourcePost(url))}
-          holeCount={knownHoles.length} knownHoleNumbers={knownHoles}
-          pending={tagging.submit.isPending}
-          error={tagging.submit.error ? holePhotoErrorMessage(tagging.submit.error, `The ${tagPost.mediaItems[0]?.type === 'video' ? 'video' : 'photo'} could not be tagged. The tag was not saved.`, tagPost.mediaItems[0]?.type === 'video' ? 'video' : 'image') : null}
+          holeCount={knownHoles?.length ?? 0} knownHoleNumbers={knownHoles ?? []}
+          initialPlaceTag={(places.tags.data ?? []).find(row => row.user_id === user.id && holeMediaKey({ url: row.media_url, mediaType: row.media_type, streamId: row.stream_id }) === holeMediaKey(tagPost.mediaItems[0]))}
+          onSubmitPlace={place => { void tagPlace(holeSourceUrl(tagPost.mediaItems[0]), place).then(() => { setTagPost(null); toast(t('media.v2.taggedPlace', { label: PLACE_LABELS[place], defaultValue: `Tagged to ${PLACE_LABELS[place]}.` })); }).catch(() => {}); }}
+          onRemovePlace={row => { void removePlace(row).catch(() => {}); }}
+          pending={tagging.submit.isPending || places.submit?.isPending || places.remove?.isPending}
+          error={places.submit?.error || places.remove?.error ? holePhotoErrorMessage(places.submit?.error ?? places.remove?.error, 'The tag could not be saved. Nothing was changed.') :{tagging.submit.error ? holePhotoErrorMessage(tagging.submit.error, `The ${tagPost.mediaItems[0]?.type === 'video' ? 'video' : 'photo'} could not be tagged. The tag was not saved.`, tagPost.mediaItems[0]?.type === 'video' ? 'video' : 'image') : null}
           onClose={() => setTagPost(null)}
           onSubmit={hole => tagging.submit.mutate({ post: tagPost, hole }, { onSuccess: () => { const count = ownHoleTags.filter(h => h === hole).length + 1; setTagPost(null); toast(memberTagConfirmation(hole, count)); } })} />
       )}

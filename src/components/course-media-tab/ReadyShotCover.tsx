@@ -17,7 +17,7 @@ export function ReadyShotCover({ shots }: { shots: readonly CoverShot[] }) {
   useEffect(() => {
     if (image.current?.complete && image.current.naturalWidth > 0) setState({ identity, index: current.index, loaded: true });
   }, [identity, current.index]);
-  if (!src) return <span className="media-v2-processing">{t('media.v2.processing')}</span>;
+  if (!src) return <span className="media-v2-processing">{t('media.v2.processing', { defaultValue: "Processing" })}</span>;
   return <>
     {!current.loaded && <span className="media-v2-cover-shimmer clb-shimmer-dark" />}
     <img ref={image} className={`media-v2-cover${current.loaded ? ' is-loaded' : ''}`} src={src} alt=""
