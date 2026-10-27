@@ -2,7 +2,8 @@
 
 ## Finish all-white ratings — three authorised corrections
 - [x] Removed only the two duplicate A imports; source scan found no other duplicates. Applied exact signature/bar colour assertions and test renames, retaining other assertions.
-- [ ] Run full suite and confirm preview compilation; reconcile against 3,384/392 plus intervening CB104's 29 cases/one file, expected unchanged inventory 3,413/393.
+- [x] Preview build log: build OK (2026-10-27T08:51:23Z); changed source module HTTP 200. Both corrected test files pass: signature 8/8 and LatestReviews 12/12.
+- [ ] STOP: full `bunx vitest run`: 3,412 passed / 1 failed / 3,413 executed, 392 passed / 1 failed / 393 files. Inventory unchanged from intervening CB104 (3,384/392 + 29 cases/one file); zero tests added/deleted. Newly exposed failure src/test/exploreHeroCard.test.tsx:185:95: `AssertionError: expected 'rgb(248, 250, 252)' to be 'rgb(255, 255, 255)' // Object.is equality`. Previously blocked collection hid this case. No further corrections; the three authorised inherited blockers are resolved.
 
 ## CB104 — Club profile: You and the club
 - [x] Founder chose mock arrangement: small uppercase club kicker and larger rounds/best sentences. Added keyed per-course collectors reusing stats/circle hooks, merged followed golfers and nation-valued place filtering; shared activity-name helper re-export preserves Insights consumers.
