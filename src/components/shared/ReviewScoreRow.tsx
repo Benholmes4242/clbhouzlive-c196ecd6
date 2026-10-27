@@ -5,7 +5,9 @@
  * of scope.
  *  - 'card' (default, signed-off option A): grid `auto 1fr`, left edge,
  *    overall 26px leads behind a 1px hairline, then DESIGN, CONDITION,
- *    CLUBHOUSE, FACILITIES at 16px spread space-between; labels 9px. No
+ *    CLUBHOUSE, FACILITIES at 16px in four equal left-aligned columns
+ *    (columnGap 8); labels 9px. No
+
  *    overall → no block/divider, breakdown takes the width; no breakdown →
  *    overall alone, no divider.
  *  - 'caption': the fullscreen viewer's small row (13.5px figures, 7px
@@ -59,7 +61,7 @@ export const ReviewScoreRow: React.FC<ReviewScoreRowProps> = ({ overall, breakdo
           </div>
         )}
         {rest.length > 0 && (
-          <div data-score-breakdown style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div data-score-breakdown style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', columnGap: 8 }}>
             {rest.map(([key, label, value]) => (
               <div key={key} data-score-cell={key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
                 <div data-score-figure style={{ fontSize: 16, fontWeight: 600, lineHeight: 1, color: '#FFFFFF', fontVariantNumeric: TAB }}>{formatRatingValue(value)}</div>
