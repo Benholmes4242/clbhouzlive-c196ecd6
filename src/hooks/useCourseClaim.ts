@@ -7,6 +7,10 @@ export interface ClaimingBusiness {
   slug: string | null;
   is_verified: boolean | null;
   logo_url: string | null;
+  /* BEFORE_YOU_GO sheet: added fields only — every pre-existing field and
+     consumer is unchanged. */
+  booking_url?: string | null;
+  phone?: string | null;
 }
 
 export type CourseClaimState = 'unclaimed' | 'pending' | 'claimed';
