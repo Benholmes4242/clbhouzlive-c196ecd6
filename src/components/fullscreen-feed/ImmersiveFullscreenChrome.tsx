@@ -771,6 +771,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           {/* Review figures — shown, not only linked. Null sub-scores omitted. */}
           {review && (
             <ReviewScoreRow
+              variant="caption"
               align="left"
               textShadow={TEXT_SHADOW}
               style={{ marginTop: 11 }}
