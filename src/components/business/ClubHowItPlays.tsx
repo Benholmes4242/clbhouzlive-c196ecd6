@@ -8,11 +8,13 @@
  * and the red bar so they cannot disagree; only when the analysis is
  * unavailable (or under 9 holes) does the cell fall back to hardest_hole_no,
  * and then no strip renders. rounds_tracked counts 18-hole rounds only.
+ * Easiest hole (pickEasiestHole) paints its bar green; hardest still wins a
+ * tie so a hole is never both.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
-import { toParParts } from '@/features/courses/components/holes/analytical/tokens';
+import { A, toParParts } from '@/features/courses/components/holes/analytical/tokens';
 import { ordinal } from '@/components/courses/course-detail/you/youBits';
 import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 import { formatNumber } from '@/i18n/format';
@@ -27,7 +29,7 @@ export interface BusinessClubCourse {
 const T = {
   card: '#17171B', inset: '#1E1E23', ink: '#F8FAFC', mute: 'rgba(248,250,252,0.62)',
   dim: 'rgba(248,250,252,0.42)', faint: 'rgba(248,250,252,0.28)', hair: 'rgba(255,255,255,0.08)',
-  bar: 'rgba(248,250,252,0.22)', red: '#D9473B',
+  bar: 'rgba(248,250,252,0.22)', red: '#D9473B', green: A.GREEN,
 } as const;
 const TAB = { fontVariantNumeric: 'tabular-nums' } as const;
 
@@ -38,6 +40,14 @@ export function pickHardestHole(holes: CourseHole[]): number | null {
   if (!holes.length) return null;
   const si = (h: CourseHole) => h.stroke_index ?? Infinity;
   return [...holes].sort((a, b) => b.avg_to_par - a.avg_to_par || si(a) - si(b) || a.hole_no - b.hole_no)[0].hole_no;
+}
+
+/** Lowest avg_to_par; ties → higher stroke index (easier by rating, nulls last),
+ *  then lower hole number. */
+export function pickEasiestHole(holes: CourseHole[]): number | null {
+  if (!holes.length) return null;
+  const si = (h: CourseHole) => h.stroke_index ?? -Infinity;
+  return [...holes].sort((a, b) => a.avg_to_par - b.avg_to_par || si(b) - si(a) || a.hole_no - b.hole_no)[0].hole_no;
 }
 
 /** Bar height %: max(8, avg_to_par ÷ course max × 100); at/under par sits at the floor. */
@@ -57,6 +67,7 @@ function CourseBlock({ course, position, isFirst, onOpen, onResolved }: {
   const holes = analysis?.available && (analysis.holes?.length ?? 0) >= 9
     ? [...analysis.holes].sort((a, b) => a.hole_no - b.hole_no) : null;
   const hardest = holes ? pickHardestHole(holes) : stats?.hardest_hole_no ?? null;
+  const easiest = holes ? pickEasiestHole(holes) : null;
 
   const cells: { value: string; label: string }[] = [];
   if (rounds > 0) {
@@ -107,7 +118,7 @@ function CourseBlock({ course, position, isFirst, onOpen, onResolved }: {
           <div data-club-plays-strip style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 34, marginTop: 12 }}>
             {holes.map((h, i) => (
               <i key={h.hole_no} data-hole={h.hole_no} data-hardest={h.hole_no === hardest ? 'true' : undefined}
-                style={{ flex: 1, height: `${heights[i]}%`, borderRadius: '2px 2px 0 0', background: h.hole_no === hardest ? T.red : T.bar }} />
+                style={{ flex: 1, height: `${heights[i]}%`, borderRadius: '2px 2px 0 0', background: h.hole_no === hardest ? T.red : h.hole_no === easiest ? T.green : T.bar }} />
             ))}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: T.faint, marginTop: 4, ...TAB }}>

@@ -4,7 +4,7 @@
  * ONE source: get_course_hole_analysis. F1: the lede states total_rounds
  * (rounds logged with hole-by-hole detail), never rounds_tracked; with
  * total_rounds 0 or no holes the whole section is absent, with no fallback.
- * The amber/green bars, the Worst hole cell and the observation all read
+ * The red/green bars, the Worst hole cell and the observation all read
  * deriveCourseVerdict, the same computation as the verdict's fact tiles.
  * D4: no cross-course par-type comparison exists, so none is drawn.
  * Replaces HowItPlays on this tab (HowItPlays.tsx is left on disk).
@@ -32,7 +32,7 @@ export const PAR_SCALE_MIN = -0.2;
 export const PAR_SCALE_MAX = 1.2;
 
 /* PTR1.5 (corrected) — the minimum lead before the block may call one par
-   type the hardest and paint it amber. It governs TWO FIELD AVERAGES being
+   type the hardest and paint it red. It governs TWO FIELD AVERAGES being
    close to each other. It deliberately does NOT share LEVEL_EDGE from
    youDerivations (a player's edge against the field on one hole) even though
    both are 0.05 today: tuning the You tab's edge chart must never change when
@@ -58,7 +58,7 @@ export function orderParTypes(rows: ParTypeRowInput[]): ParTypeRowInput[] {
   return [...rows].sort((a, b) => b.perHole - a.perHole || b.holes - a.holes || a.par - b.par);
 }
 
-/** PTR1.5 — the par type that may take amber, or null when the leader's gap
+/** PTR1.5 — the par type that may take red, or null when the leader's gap
  *  over the second is under HARDEST_MIN_GAP (a near-tie claims no hardest). */
 export function hardestParType(ordered: ParTypeRowInput[]): ParTypeRowInput | null {
   const [top, second] = ordered;
@@ -148,14 +148,14 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
                 height: Math.max(2, (Math.max(0, h.avg_to_par) / max) * CHART_H),
                 borderRadius: 1.5,
                 background:
-                  h.hole_no === v.hardest.hole_no ? A.AMBER : h.hole_no === v.easiest.hole_no ? A.GREEN : BAR_NEUTRAL,
+                  h.hole_no === v.hardest.hole_no ? A.RED : h.hole_no === v.easiest.hole_no ? A.GREEN : BAR_NEUTRAL,
               }}
             />
           ))}
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: `repeat(${v.holes.length}, minmax(0, 1fr))`, gap: 4, marginTop: 6 }}>
           {v.holes.map((h) => {
-            const hi = h.hole_no === v.hardest.hole_no ? A.AMBER : h.hole_no === v.easiest.hole_no ? A.GREEN : null;
+            const hi = h.hole_no === v.hardest.hole_no ? A.RED : h.hole_no === v.easiest.hole_no ? A.GREEN : null;
             return (
               <span
                 key={h.hole_no}
@@ -233,7 +233,7 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
                     height: 9,
                     borderRadius: '50%',
                     transform: 'translate(-50%, -50%)',
-                    background: amber ? A.AMBER : 'rgba(248,250,252,0.62)',
+                    background: amber ? A.RED : 'rgba(248,250,252,0.62)',
                   }}
                 />
               </div>
@@ -244,7 +244,7 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
                   fontSize: 15,
                   fontWeight: 800,
                   letterSpacing: '-0.03em',
-                  color: amber ? A.AMBER : A.INK,
+                  color: amber ? A.RED : A.INK,
                   ...FIGS,
                 }}
               >
