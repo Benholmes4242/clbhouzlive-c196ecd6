@@ -1,0 +1,64 @@
+.coach-card { background:var(--club-you-card);border:1px solid var(--club-you-hair);border-radius:18px;padding:16px;margin:14px 16px;color:var(--club-you-ink); }
+.coach-kicker { display:flex;justify-content:space-between;gap:12px;font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--club-you-muted);margin-bottom:10px; }
+.coach-kicker span:last-child { color:var(--tee-sheet-dim);letter-spacing:.12em;white-space:nowrap; }
+.coach-title { font-size:17px;font-weight:700;letter-spacing:-.01em;line-height:1.3;margin:0;overflow-wrap:anywhere; }
+.coach-lead { font-size:13.5px;line-height:1.5;color:var(--club-you-muted);margin:6px 0 0; }
+.coach-foot-row { display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;flex-wrap:wrap; }
+.coach-action { background:var(--club-you-ink);color:var(--coach-canvas);border-radius:999px;height:36px;padding:0 16px;font-size:14px;font-weight:600;white-space:normal; }
+.coach-action:hover { background:var(--club-you-ink);opacity:.9; }
+.coach-link { color:var(--club-you-muted);background:transparent;height:44px;padding:0;font-size:14px;font-weight:600;white-space:normal; }
+.coach-link:hover { background:transparent;color:var(--club-you-ink); }
+.coach-sheet { padding:8px 16px max(22px, env(safe-area-inset-bottom));color:var(--club-you-ink); }
+.coach-sheet h2 { font-size:19px;font-weight:700;margin:0;line-height:1.3; }
+.coach-sheet .coach-action { height:48px;font-size:15.5px;width:100%;margin-top:16px; }
+.coach-sheet>.coach-link { width:100%; }
+.coach-steps { margin-top:14px; }
+.coach-step { display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--club-you-hair); }
+.coach-step:first-child { border-top:0; }
+.coach-step>span { width:24px;height:24px;border-radius:8px;background:var(--tee-sheet-inset);display:flex;justify-content:center;align-items:center;flex:none;font-size:12px;font-weight:700; }
+.coach-step p { font-size:13.5px;line-height:1.45;color:var(--club-you-muted);margin:0; }
+.coach-step b { color:var(--club-you-ink);font-weight:600; }
+.coach-options,.coach-pick { background:var(--tee-sheet-inset);border-radius:14px;padding:4px 14px;margin-top:14px; }
+.coach-option { display:flex;align-items:center;gap:12px;padding:13px 0;border-top:1px solid var(--club-you-hair); }
+.coach-option:first-child { border-top:0; }
+.coach-option>span { flex:1;min-width:0; }
+.coach-option b { display:block;font-size:14.5px;font-weight:600; }
+.coach-option small { display:block;font-size:12.5px;color:var(--club-you-muted);margin-top:2px; }
+.coach-danger { width:100%;height:46px;border-radius:999px;border:1px solid var(--coach-control-hair);background:transparent;color:var(--coach-danger);margin-top:10px;font-size:15px;font-weight:600;white-space:normal; }
+.coach-person-row { display:flex;align-items:center;justify-content:flex-start;gap:12px;padding:11px 0;border-top:1px solid var(--club-you-hair);background:transparent;border-radius:0;width:100%;height:auto;text-align:left;color:var(--club-you-ink); }
+.coach-person-row>span { flex:1;min-width:0; }
+.coach-person-row b { display:block;font-size:14.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.coach-person-row small { display:block;color:var(--club-you-muted);font-size:12.5px;font-variant-numeric:tabular-nums;margin-top:2px;white-space:normal; }
+.coach-pick { display:flex;gap:12px;align-items:center;padding:12px; }
+.coach-pick b { display:block;font-size:14.5px;font-weight:600; }
+.coach-pick small { display:block;font-size:12.5px;color:var(--club-you-muted); }
+.coach-foot { color:var(--tee-sheet-dim);font-size:12px;line-height:1.45;margin:12px 0 0; }
+.coach-profile-line { display:flex;justify-content:flex-start;gap:7px;margin-top:6px;padding:0;background:transparent;color:var(--club-you-muted);font-size:13.5px;height:auto;border-radius:0;max-width:100%;white-space:normal;text-align:left; }
+.coach-profile-line b { color:var(--club-you-ink);font-weight:600; }
+.coach-edit-row { width:100%;display:flex;justify-content:space-between;text-align:left;height:auto;padding:13px 0;border-top:1px solid var(--club-you-hair);border-radius:0;background:transparent;color:var(--club-you-ink); }
+.coach-edit-row>span:first-child { font-size:14.5px;font-weight:600; }
+.coach-edit-row>span:last-child { text-align:right;font-size:13.5px;color:var(--club-you-muted); }
+.coach-edit-row small { display:block;font-size:12px;margin-top:3px; }
+.coach-search { margin-top:14px; }
+.coach-big { display:flex;align-items:baseline;gap:10px; }
+.coach-big b { font-size:44px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1;flex:none; }
+.coach-big span { max-width:220px;font-size:13.5px;line-height:1.35;color:var(--club-you-muted); }
+.coach-improved { color:var(--coach-green); }
+.coach-split { display:flex;height:8px;border-radius:4px;gap:2px;overflow:hidden;margin-top:16px; }
+.coach-down { background:var(--coach-green); }
+.coach-level { background:var(--coach-level); }
+.coach-up { background:var(--coach-up); }
+.coach-legend { display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:12px;color:var(--club-you-muted);font-variant-numeric:tabular-nums; }
+.coach-legend b { color:var(--club-you-ink);font-weight:600; }
+.coach-legend i { width:7px;height:7px;display:inline-block;margin-right:5px;border-radius:2px; }
+.coach-chart { margin-top:16px;padding-top:14px;border-top:1px solid var(--club-you-hair); }
+.coach-chart-label { font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tee-sheet-dim);margin-bottom:8px; }
+.coach-chart svg { display:block;width:100%;height:110px;overflow:visible; }
+.coach-chart line { stroke:var(--coach-grid); }
+.coach-chart path { fill:none;stroke:var(--club-you-ink);stroke-width:2; }
+.coach-chart path[data-dashed=true] { stroke:var(--coach-level);stroke-dasharray:3 4; }
+.coach-chart circle { fill:var(--club-you-ink); }
+.coach-chart text { fill:var(--club-you-muted);font-size:11px;font-weight:600; }
+.coach-axis { display:flex;justify-content:space-between;color:var(--tee-sheet-dim);font-size:10.5px; }
+.coach-progress { height:6px;border-radius:3px;background:var(--coach-grid);overflow:hidden;margin-top:12px; }
+.coach-progress i { display:block;height:100%;background:var(--coach-progress); }
