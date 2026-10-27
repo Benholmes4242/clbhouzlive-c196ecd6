@@ -233,7 +233,7 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
                     height: 9,
                     borderRadius: '50%',
                     transform: 'translate(-50%, -50%)',
-                    background: amber ? A.AMBER : 'rgba(248,250,252,0.62)',
+                    background: amber ? A.RED : 'rgba(248,250,252,0.62)',
                   }}
                 />
               </div>
@@ -244,7 +244,7 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
                   fontSize: 15,
                   fontWeight: 800,
                   letterSpacing: '-0.03em',
-                  color: amber ? A.AMBER : A.INK,
+                  color: amber ? A.RED : A.INK,
                   ...FIGS,
                 }}
               >
