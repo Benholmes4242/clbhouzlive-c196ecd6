@@ -42,6 +42,14 @@ export function pickHardestHole(holes: CourseHole[]): number | null {
   return [...holes].sort((a, b) => b.avg_to_par - a.avg_to_par || si(a) - si(b) || a.hole_no - b.hole_no)[0].hole_no;
 }
 
+/** Lowest avg_to_par; ties → higher stroke index (easier by rating, nulls last),
+ *  then lower hole number. */
+export function pickEasiestHole(holes: CourseHole[]): number | null {
+  if (!holes.length) return null;
+  const si = (h: CourseHole) => h.stroke_index ?? -Infinity;
+  return [...holes].sort((a, b) => a.avg_to_par - b.avg_to_par || si(b) - si(a) || a.hole_no - b.hole_no)[0].hole_no;
+}
+
 /** Bar height %: max(8, avg_to_par ÷ course max × 100); at/under par sits at the floor. */
 export function holeBarHeights(holes: CourseHole[]): number[] {
   const max = Math.max(0, ...holes.map((h) => h.avg_to_par));
