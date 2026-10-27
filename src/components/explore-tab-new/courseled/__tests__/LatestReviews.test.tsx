@@ -185,9 +185,9 @@ describe('LatestReviews mosaic', () => {
     expect(screen.queryByTestId('review-tile-breakdown')).toBeNull();
   });
 
-  /* BRIEF_TEST_SUITE_TRIAGE_PART_2 §3 — the two-tone sub-score rule, asserted
-     THROUGH courseSubScoreTone so the threshold and tokens may move. */
-  it('fills every bar with white ink, whatever the score', () => {
+  /* All-white rating rule: rated figures and fills use A.INK; null stays muted
+     in the helper and contributes no scored row. */
+  it('every rated figure and bar is white A.INK, while null stays muted and omitted', () => {
     render(
       <LatestReviews
         reviews={[
@@ -198,12 +198,19 @@ describe('LatestReviews mosaic', () => {
         onSeeAll={() => {}}
       />,
     );
-    const html = screen.getByTestId('review-tile-breakdown').innerHTML;
     const fills = Array.from(screen.getByTestId('review-tile-breakdown').querySelectorAll<HTMLElement>('div[style*="height: 3px"] > div'))
       .map((el) => el.style.background);
     // jsdom normalises colours; normalise the function's value the same way.
     const norm = (c: string) => { const el = document.createElement('div'); el.style.background = c; return el.style.background; };
-    expect(fills).toEqual([9.4, 6.1, 4.2].map((v) => norm(courseSubScoreTone(v))));
+    expect(fills).toEqual([norm(A.INK), norm(A.INK), norm(A.INK)]);
+    for (const score of ['9.4', '6.1', '4.2']) {
+      const figure = screen.getByText(score);
+      const ink = document.createElement('i');
+      ink.style.color = A.INK;
+      expect(figure.style.color).toBe(ink.style.color);
+    }
+    expect(screen.getByTestId('review-tile-breakdown').children).toHaveLength(3);
+    expect(courseSubScoreTone(null)).toBe(A.MUTE);
     // Every real score is white ink (Ben, 27 Oct 2026).
     expect(norm(courseSubScoreTone(6.1))).toBe(norm(A.INK));
   });
