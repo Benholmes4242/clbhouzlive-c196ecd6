@@ -13,7 +13,7 @@ import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFil
 import { CIRCLE_PLAYERS_LIMIT } from '@/components/courses/course-detail/you/circleNamesLine';
 import { courseActivityClubName, courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 import { formatNumber } from '@/i18n/format';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { YouCardShell } from './YouCardShell';
 import type { BusinessClubCourse } from './ClubHowItPlays';
 
 export type ClubCourseResult = {
@@ -74,14 +74,13 @@ function ClubYouReadCard({ courses, viewerId, businessName }: { courses: Busines
   const visible = settled && (facts.rounds > 0 || facts.players.length > 0);
   return <>
     {courses.map(course => <CourseRead key={course.id} course={course} viewerId={viewerId} report={report} />)}
-    {visible && <section className="club-you-card" data-club-you="">
-      <p className="club-you-kicker">You and {courseActivityClubName(businessName)}</p>
-      <h2 className="club-you-title">{title.first}{title.second && <> <span>{title.second}</span></>}</h2>
-      {facts.players.length > 0 && <div className="club-you-faces" data-club-you-faces="">
-        <div className="club-you-stack" aria-hidden="true">{facts.players.slice(0, 4).map((player, index) => <span key={player.user_id} data-face={player.user_id} style={{ marginLeft: index === 0 ? 0 : -8, display: 'inline-flex' }}><SquircleAvatar size={28} src={player.profile_photo_url} alt={player.display_name ?? ''} userId={player.user_id} hairlineRing /></span>)}</div>
-        <p>{faces.names && <b>{faces.names}</b>}{faces.rest}</p>
-      </div>}
-    </section>}
+    {visible && <YouCardShell
+      dataAttr="data-club-you"
+      kicker={<>You and {courseActivityClubName(businessName)}</>}
+      first={title.first}
+      second={title.second}
+      faces={facts.players.length > 0 ? { players: facts.players, max: 4, names: faces.names, rest: faces.rest } : null}
+    />}
   </>;
 }
 

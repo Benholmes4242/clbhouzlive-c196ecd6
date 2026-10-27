@@ -21225,6 +21225,10 @@ export type Database = {
           rounds_90d: number
         }[]
       }
+      get_course_stats_batch: {
+        Args: { p_course_ids: string[] }
+        Returns: Json[]
+      }
       get_course_stats_detail: {
         Args: { p_course_id: string }
         Returns: {

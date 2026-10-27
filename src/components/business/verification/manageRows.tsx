@@ -337,7 +337,7 @@ export function PlainButton({
 
 /**
  * §4.2 THE BUSINESS ROW — their own logo, resolved exactly as
- * BusinessProfileHero does: logoUrl, falling back to initials on
+ * ClubProfileHero's crest does: logoUrl, falling back to initials on
  * getAvatarFallbackColor(fallbackKey || name). No placeholder, no stock image.
  */
 export function BusinessRow({

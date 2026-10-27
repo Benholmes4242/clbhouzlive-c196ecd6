@@ -1,6 +1,6 @@
 /**
  * HeroShell - the ONE dark profile hero block, shared by the personal profile
- * (ProfileHero) and the business profile (BusinessProfileHero).
+ * (ProfileHero); business profiles use ClubProfileHero (CB112).
  *
  * BRIEF_BUSINESS_PROFILE_HERO rule 5: extract, do not fork. Everything that is
  * geometry, scrim, cover fallback, identity row, headline block and counter
