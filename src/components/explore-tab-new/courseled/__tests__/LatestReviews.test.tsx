@@ -205,4 +205,3 @@ describe('LatestReviews mosaic', () => {
     expect(courseSubScoreTone(null)).toBe(A.MUTE);
   });
 });
-});
