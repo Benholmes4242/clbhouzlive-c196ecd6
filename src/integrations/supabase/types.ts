@@ -2351,6 +2351,88 @@ export type Database = {
           },
         ]
       }
+      coach_links: {
+        Row: {
+          business_id: string
+          created_at: string
+          end_index: number | null
+          ended_at: string | null
+          id: string
+          share_name: boolean
+          show_on_profile: boolean
+          start_index: number
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          end_index?: number | null
+          ended_at?: string | null
+          id?: string
+          share_name?: boolean
+          show_on_profile?: boolean
+          start_index: number
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          end_index?: number | null
+          ended_at?: string | null
+          id?: string
+          share_name?: boolean
+          show_on_profile?: boolean
+          start_index?: number
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_links_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coach_links_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "coach_links_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "coach_links_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coach_links_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coach_links_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       coach_profiles: {
         Row: {
           bio: string | null
@@ -19839,6 +19921,18 @@ export type Database = {
         Returns: undefined
       }
       club_key_v2: { Args: { p_name: string }; Returns: string }
+      coach_index_at: {
+        Args: { p_at: string; p_user: string }
+        Returns: number
+      }
+      coach_link_change: {
+        Args: { p_link: Database["public"]["Tables"]["coach_links"]["Row"] }
+        Returns: number
+      }
+      coach_link_measured: {
+        Args: { p_link: Database["public"]["Tables"]["coach_links"]["Row"] }
+        Returns: boolean
+      }
       compute_all_friend_featured_rounds: { Args: never; Returns: number }
       compute_all_friend_rivalries: { Args: never; Returns: number }
       compute_friend_featured_round: {
@@ -20850,6 +20944,8 @@ export type Database = {
           years: Json
         }[]
       }
+      get_coach_golfers: { Args: { p_business_id: string }; Returns: Json }
+      get_coach_results: { Args: { p_business_id: string }; Returns: Json }
       get_competition_boards: {
         Args: {
           p_limit?: number
@@ -22264,6 +22360,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_member_coach: { Args: { p_user_id: string }; Returns: Json }
       get_member_record_split: {
         Args: { p_user_id: string }
         Returns: {
@@ -22293,6 +22390,7 @@ export type Database = {
           value: number
         }[]
       }
+      get_my_coach: { Args: never; Returns: Json }
       get_my_course_best: {
         Args: { p_course_id: string }
         Returns: {
@@ -24848,6 +24946,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      name_coach: {
+        Args: {
+          p_business_id: string
+          p_share_name?: boolean
+          p_show_on_profile?: boolean
+        }
+        Returns: Json
+      }
       nearby_golfers: {
         Args: {
           limit_rows?: number
@@ -25259,6 +25365,10 @@ export type Database = {
           p_business_id: string
           p_user_profile_id: string
         }
+        Returns: Json
+      }
+      set_coach_options: {
+        Args: { p_share_name: boolean; p_show_on_profile: boolean }
         Returns: Json
       }
       set_home_club: {
@@ -25905,6 +26015,7 @@ export type Database = {
         Returns: string
       }
       stat_browse_total_categories: { Args: never; Returns: number }
+      stop_coach: { Args: never; Returns: undefined }
       submit_course_review_v2: {
         Args: {
           p_clubhouse: number
