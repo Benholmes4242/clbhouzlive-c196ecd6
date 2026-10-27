@@ -69,6 +69,10 @@ import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileH
 import { useVerificationEvidence } from '@/components/business/verification/useVerificationEvidence';
 import { HeroPill, HeroGlassCircle } from '@/components/profile/hero/HeroShell';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { ClubProfileHero, clubPlaceLine } from '@/components/business/hero/ClubProfileHero';
+import { useBusinessClubMemberCount } from '@/hooks/useBusinessClubMemberCount';
+import { usePostStudioStore } from '@/stores/usePostStudioStore';
+import { mayHaveClubAnalytics } from '@/features/business/clubAnalytics/useClubCourseLink';
 
 type BusinessTab = 'posts' | 'about' | 'team';
 
@@ -146,6 +150,8 @@ const BusinessProfilePage: React.FC = () => {
   // Hero ROUNDS figure: summed across EVERY course of the club, reusing the
   // same `course-stats-detail` cache entries the course panels populate.
   const clubRounds = useClubRoundsTracked(courses.map((c) => c.id));
+  // CB103 — members figure for the club hero (server-owned count).
+  const { data: clubMemberCount } = useBusinessClubMemberCount(business?.club_id ? business.id : undefined);
 
   // Cover fallback for a club with no cover of its own: its course hero image.
   const clubCourseImage =
@@ -353,6 +359,76 @@ const BusinessProfilePage: React.FC = () => {
 
   // (Contact/social icons row removed - surfaced via action rows + About tab)
 
+  // CB103 — the existing menu, shared by both heroes; the club hero drops
+  // "Share profile" because Share has its own circle beside it.
+  const renderMenu = (trigger: React.ReactElement, withShare: boolean) => (
+    <DropdownMenu>
+              <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {isOwner ? (
+                  <>
+                    <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
+                      <Pencil className="h-4 w-4 mr-2" />
+                      Edit business profile
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+{withShare && (
+                    <DropdownMenuItem onClick={handleShare}>
+                      <Share2 className="h-4 w-4 mr-2" />
+                      Share profile
+                    </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem onClick={handleCopyLink}>
+                      <Link2 className="h-4 w-4 mr-2" />
+                      Copy link
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    {/* CB78: editors can edit the profile too. */}
+                    {membership?.role === 'editor' && (
+                      <>
+                        <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
+                          <Pencil className="h-4 w-4 mr-2" />
+                          Edit business profile
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </>
+                    )}
+{withShare && (
+                    <DropdownMenuItem onClick={handleShare}>
+                      <Share2 className="h-4 w-4 mr-2" />
+                      Share profile
+                    </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem onClick={handleCopyLink}>
+                      <Link2 className="h-4 w-4 mr-2" />
+                      Copy link
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-destructive">
+                      <Flag className="h-4 w-4 mr-2" />
+                      Report
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+  );
+
+  const isClub = !!business.club_id && courses.length > 0;
+  // CB103 team row, each button gated by the permission the app already uses:
+  // Your courses = mayHaveClubAnalytics (BusinessCommandCard.showClubAnalytics),
+  // Insights = canViewInsights, Post = role !== 'analyst' (BusinessHomeHeader
+  // canPost), Edit = canManage or editor (this page's existing edit menu item).
+  const memberRole = membership?.role;
+  const clubTeam = membership ? {
+    onYourCourses: mayHaveClubAnalytics(business.category, business.is_verified, business.club_id) ? () => navigate(`/business/${business.id}/course`) : undefined,
+    onInsights: membership.canViewInsights ? () => navigate(`/business/${business.id}/insights`) : undefined,
+    onPost: memberRole !== 'analyst' ? () => usePostStudioStore.getState().openPostStudio({ actorType: 'business', actorId: business.id }) : undefined,
+    onEdit: membership.canManage || memberRole === 'editor' ? () => navigate(`/business/${business.id}/edit`) : undefined,
+  } : null;
+
   const tabs: Array<{ id: BusinessTab; label: string }> = [
     { id: 'posts', label: 'Posts' },
     { id: 'about', label: 'About' },
@@ -381,6 +457,39 @@ const BusinessProfilePage: React.FC = () => {
 
   return (
     <PageRoot className="min-h-screen" style={{ background: 'var(--bg-page)' }} immersiveStatusBar immersive>
+      {isClub ? (
+        <ClubProfileHero
+          name={business.name}
+          logoUrl={business.logo_url}
+          coverUrl={heroUrl || clubCourseImage}
+          fallbackKey={avatarFallbackKey}
+          verified={business.is_verified}
+          evidenceLine={verificationEvidence.line}
+          placeLine={clubPlaceLine(
+            { city: business.city, region: business.region, country: business.country, firstCourseRegion: courses[0]?.region ?? null, courseCount: courses.length },
+            {
+              golfClub: t('business.clubHero.golfClub', 'Golf club'),
+              courses: (n) => t('business.clubHero.courses', { count: n, defaultValue: '{{count}} courses' }),
+            },
+          )}
+          onAvatarTap={() => setIsAvatarLightboxOpen(true)}
+          onShare={handleShare}
+          renderMore={(trigger) => renderMenu(trigger, false)}
+          team={clubTeam}
+          isFollowing={isFollowing}
+          onFollowToggle={handleFollowToggle}
+          onBookTeeTime={() => toast('Tee-time booking is coming soon.')}
+          onMessage={() => { trackBusinessAction(business.id, 'message', user?.id); startConversation({ actorType: 'business', actorId: business.id }); }}
+          messageDisabled={isStartingDM}
+          avgRating={reviewStats?.avgRating ?? null}
+          ratingsCount={reviewStats?.totalReviews ?? null}
+          roundsTracked={clubRounds}
+          membersHere={clubMemberCount ?? null}
+          onRatingTap={courses.length === 1 ? () => { void analyticsEvents.track('business_hero_stat_tap', { stat: 'rated' }); navigate(`/courses/${courses[0].id}?tab=reviews`); } : undefined}
+          onRoundsTap={courses.length === 1 ? () => { void analyticsEvents.track('business_hero_stat_tap', { stat: 'rounds' }); navigate(`/courses/${courses[0].id}`); } : undefined}
+          about={bioText || null}
+        />
+      ) : (
       {/* ----- Hero (shared HeroShell, identical to the personal profile) ----- */}
       <BusinessProfileHero
         name={business.name}
@@ -429,72 +538,27 @@ const BusinessProfilePage: React.FC = () => {
                 <Pencil className="w-3.5 h-3.5 text-white" />
               </HeroGlassCircle>
             )}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  aria-label="More options"
-                  style={{
-                    width: 28, height: 28, flexShrink: 0, borderRadius: 999,
-                    background: 'rgba(255,255,255,0.12)', border: 'none',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-                  }}
-                >
-                  <MoreHorizontal className="w-4 h-4 text-white" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {isOwner ? (
-                  <>
-                    <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
-                      <Pencil className="h-4 w-4 mr-2" />
-                      Edit business profile
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleShare}>
-                      <Share2 className="h-4 w-4 mr-2" />
-                      Share profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleCopyLink}>
-                      <Link2 className="h-4 w-4 mr-2" />
-                      Copy link
-                    </DropdownMenuItem>
-                  </>
-                ) : (
-                  <>
-                    {/* CB78: editors can edit the profile too. */}
-                    {membership?.role === 'editor' && (
-                      <>
-                        <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
-                          <Pencil className="h-4 w-4 mr-2" />
-                          Edit business profile
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                      </>
-                    )}
-                    <DropdownMenuItem onClick={handleShare}>
-                      <Share2 className="h-4 w-4 mr-2" />
-                      Share profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleCopyLink}>
-                      <Link2 className="h-4 w-4 mr-2" />
-                      Copy link
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-destructive">
-                      <Flag className="h-4 w-4 mr-2" />
-                      Report
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {renderMenu(
+              <button
+                type="button"
+                aria-label="More options"
+                style={{
+                  width: 28, height: 28, flexShrink: 0, borderRadius: 999,
+                  background: 'rgba(255,255,255,0.12)', border: 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
+                }}
+              >
+                <MoreHorizontal className="w-4 h-4 text-white" />
+              </button>,
+              true,
+            )}
           </div>
         }
       />
+      )}
 
       {/* ----- Bio on canvas (no card) ----- */}
-      {bioText && (
+      {!isClub && bioText && (
         <div className="px-4 pt-4 relative z-10 pointer-events-auto">
           <p
             ref={bioRef}
@@ -592,7 +656,7 @@ const BusinessProfilePage: React.FC = () => {
                 hero, so this row carries contact actions only (visitor). */}
             {!isOwner && (
               <div className="mt-4 px-4 flex items-center gap-2 relative z-10 pointer-events-auto">
-                <button
+                {!isClub && (<button
                   className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]"
                   style={{ background: 'transparent', border: `0.5px solid ${A.BORDER}`, color: A.INK, ...LABEL, letterSpacing: '0.10em' }}
                   onClick={() => { trackBusinessAction(business.id, 'message', user?.id); startConversation({ actorType: 'business', actorId: business.id }); }}
@@ -603,7 +667,7 @@ const BusinessProfilePage: React.FC = () => {
                     ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     : <MessageCircle className="w-3.5 h-3.5" />}
                   Message
-                </button>
+                </button>)}
                 {promoted && (
                   <OutlineBtn
                     onClick={secDefs[promoted].onClick}
