@@ -16,7 +16,6 @@ import { useSingleReviewContext } from '@/hooks/useSingleReviewContext';
 import { calibrationFacts, isSingleReview, reviewPlayedMonth, type RaterContext } from '@/lib/reviews/singleReview';
 import { SURFACE } from '@/lib/tokens/surface';
 import { MEMBER_PANEL, INK_ON_LIGHT, inkWithAlpha } from '@/lib/tokens/surfaces';
-import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { SC_BOGEY_DARK } from '@/features/courses/components/holes/_constants';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
