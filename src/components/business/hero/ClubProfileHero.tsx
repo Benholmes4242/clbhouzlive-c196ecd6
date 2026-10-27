@@ -46,6 +46,25 @@ export function clubPlaceLine(
     .join(' \u00B7 ');
 }
 
+/**
+ * CB103 team-row gates — each reuses the permission the app already applies:
+ * Your courses = mayHaveClubAnalytics (BusinessCommandCard.showClubAnalytics),
+ * Insights = canViewInsights, Post = role !== 'analyst' (BusinessHomeHeader
+ * canPost), Edit = canManage or editor (the profile's edit menu item).
+ */
+export function clubTeamGates(
+  membership: { role: string; canViewInsights: boolean; canManage: boolean } | null | undefined,
+  clubAnalytics: boolean,
+) {
+  if (!membership) return null;
+  return {
+    yourCourses: clubAnalytics,
+    insights: membership.canViewInsights,
+    post: membership.role !== 'analyst',
+    edit: membership.canManage || membership.role === 'editor',
+  };
+}
+
 export interface ClubTeamActions {
   onYourCourses?: () => void;
   onInsights?: () => void;

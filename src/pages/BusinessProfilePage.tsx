@@ -69,7 +69,7 @@ import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileH
 import { useVerificationEvidence } from '@/components/business/verification/useVerificationEvidence';
 import { HeroPill, HeroGlassCircle } from '@/components/profile/hero/HeroShell';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { ClubProfileHero, clubPlaceLine } from '@/components/business/hero/ClubProfileHero';
+import { ClubProfileHero, clubPlaceLine, clubTeamGates } from '@/components/business/hero/ClubProfileHero';
 import { useBusinessClubMemberCount } from '@/hooks/useBusinessClubMemberCount';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { mayHaveClubAnalytics } from '@/features/business/clubAnalytics/useClubCourseLink';
@@ -417,16 +417,13 @@ const BusinessProfilePage: React.FC = () => {
   );
 
   const isClub = !!business.club_id && courses.length > 0;
-  // CB103 team row, each button gated by the permission the app already uses:
-  // Your courses = mayHaveClubAnalytics (BusinessCommandCard.showClubAnalytics),
-  // Insights = canViewInsights, Post = role !== 'analyst' (BusinessHomeHeader
-  // canPost), Edit = canManage or editor (this page's existing edit menu item).
-  const memberRole = membership?.role;
-  const clubTeam = membership ? {
-    onYourCourses: mayHaveClubAnalytics(business.category, business.is_verified, business.club_id) ? () => navigate(`/business/${business.id}/course`) : undefined,
-    onInsights: membership.canViewInsights ? () => navigate(`/business/${business.id}/insights`) : undefined,
-    onPost: memberRole !== 'analyst' ? () => usePostStudioStore.getState().openPostStudio({ actorType: 'business', actorId: business.id }) : undefined,
-    onEdit: membership.canManage || memberRole === 'editor' ? () => navigate(`/business/${business.id}/edit`) : undefined,
+  // CB103 team row — gates documented on clubTeamGates.
+  const gates = clubTeamGates(membership, mayHaveClubAnalytics(business.category, business.is_verified, business.club_id));
+  const clubTeam = gates ? {
+    onYourCourses: gates.yourCourses ? () => navigate(`/business/${business.id}/course`) : undefined,
+    onInsights: gates.insights ? () => navigate(`/business/${business.id}/insights`) : undefined,
+    onPost: gates.post ? () => usePostStudioStore.getState().openPostStudio({ actorType: 'business', actorId: business.id }) : undefined,
+    onEdit: gates.edit ? () => navigate(`/business/${business.id}/edit`) : undefined,
   } : null;
 
   const tabs: Array<{ id: BusinessTab; label: string }> = [
