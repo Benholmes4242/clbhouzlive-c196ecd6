@@ -129,8 +129,8 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
   });
 
   it('only the big slot can render a video, in the courses-member-shots group; small slots and photos never do', () => {
-    f.rows = [course('alpha', { tiles: [tile('a-1', { media_type: 'video', poster_url: '/a-1-poster.jpg' }), tile('a-2', { media_type: 'video', poster_url: '/a-2-poster.jpg' }), tile('a-3', { media_type: 'video' })] }), course('beta')];
-    render(<LatestCoursesSection />);
+    f.rows = [course('alpha', { tiles: [tile('a-1', { media_type: 'video', poster_url: '/a-1-poster.jpg' }), tile('a-2', { media_type: 'video', poster_url: '/a-2-poster.jpg' }), tile('a-3', { media_type: 'video' })] }), course('beta'), course('gamma')];
+    mount();
     expect(screen.getByLabelText('Open Course alpha shot 1 of 14').querySelector('video')).not.toBeNull();
     expect(screen.getByLabelText('Open Course alpha shot 2 of 14').querySelector('video')).toBeNull();
     expect(screen.getByLabelText('Open Course alpha shot 3 of 14').querySelector('video')).toBeNull();
