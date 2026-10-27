@@ -1,9 +1,10 @@
 # Roadmap
 
 ## CB110 — Club review links and course Reviews landing
-- [ ] Update club links and add one-shot first-rendered-review landing in CourseReviewsTab.
-- [ ] Audit old page consumers; replace its route with a parameter-preserving redirect and delete only if safe.
-- [ ] Retarget named CB106 link cases, add landing/redirect coverage, run targeted and full suites against 3,514 tests / 401 files, and report verification limits.
+- [x] Updated club links; CourseReviewsTab lands below measured sticky tabs through scrollElementIntoView. CourseDetailPage resets only on course entry, not landing-query cleanup. Public live 404×970 verified row top 48.14px / tabs bottom 48px, at consumed, no runtime errors; signed-in checks unavailable (external_unmanaged).
+- [x] Only old-page importer was App; replaced lazy/page route with CourseReviewsRedirect and deleted CourseReviewsPage.tsx. No direct old-page tests/importers remained. Preserves review/highlight parameters.
+- [x] Three CB106 link cases retargeted/renamed; new cb110CourseReviewsLanding.test.tsx adds 12 cases. Targeted bunx vitest run src/test/cb110CourseReviewsLanding.test.tsx src/test/cb106ClubWhatGolfersSay.test.tsx src/test/reviewCourseNoReopen.test.tsx:44/44. Baseline3,514/401 →3,526/402 (+12 solely new file). Initial bunx vitest run3,526/3,526; final run3,525 passed/1 failed/3,526 across402 files. Build OK13:58:16Z; separate typecheck not run (harness only).
+- [ ] STOP: final full suite unexpected src/test/cb74TeamFixes.test.tsx:164:88, “CB74 invite membership guard > non-member redirects with replace and never renders the form”: `AssertionError: expected [] to have a length of 1 but got +0`. No edits or retests after failure. No pre-existing failing cases at start; this unchanged unrelated test passed in first full run. Requires a ruling before further investigation/correction.
 
 ## CB109 — Media-first in every post feed
 - [x] Applied caller layouts and shared review/footer slots; standard, rounds, grids and viewers unchanged. Two-line clamp per Ben's ruling. All five new rendered review-flow checks pass; no existing test retargeted.
