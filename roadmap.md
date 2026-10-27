@@ -3,6 +3,8 @@
 ## All-white course and review ratings — 27 October 2026
 - [ ] Apply colours-only ruling across helpers, local displays and wizard; preserve null dim states and non-rating colours.
 - [ ] Update authorised colour assertions, add two helper cases, audit deliberate remaining hits and report full-suite counts.
+- [x] Affected tests: 120/120 across 11 files. Added exactly two helper cases in ratingsWhite.test.ts; no deletions. Full `bunx vitest run`: 3,224 passed / 2 failed / 3,226 executed, 376 passed / 16 failed / 392 total files. Candidate inventory 3,384/392 = prior 3,378/390 + unchanged CB104 four cases/one file + this task two cases/one file; 14 collection failures prevent verifying that full count.
+- [ ] STOP: globalAchievementMilestoneSystem.ts(55,10),(333,10),(445,10): `error TS2300: Duplicate identifier 'A'.` profileCoursesSignature.test.tsx:81:39: `AssertionError: expected '#F8FAFC' not to be '#F8FAFC' // Object.is equality`. LatestReviews.test.tsx:208:43: `AssertionError: expected 'rgb(248, 250, 252)' to be 'rgba(248, 250, 252, 0.62)' // Object.is equality`. No corrections after failure; full report in Files. No pre-existing failures; live signed-in check unavailable (external_unmanaged).
 
 ## CB102.1 — Welcome gutters and Driving Range facilities
 - [x] Corrected ruling: apply only welcome outer padding 4px 0 0 and wrapper pb-7; preserve opening inset 6px 2px 22px and shared ManagePageShell. Code-derived kicker left 34→18px, header gap 42→26px; cards left 32→16px. Device measurements waived; original bottom target withdrawn.
