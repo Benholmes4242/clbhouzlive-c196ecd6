@@ -143,7 +143,7 @@ function BusinessYouRead({ business, viewerId }: { business: BusinessYouInput; v
   const players = golfers.isError ? [] : golfers.data ?? [];
   const hcp = useQuery({
     queryKey: ['business-you-hcp', players.map((p) => p.user_id)],
-    enabled: !nearbyEligible && players.length >= 3,
+    enabled: players.length >= 3,
     staleTime: 60_000,
     queryFn: async (): Promise<Record<string, number>> => {
       const { data, error } = await (supabase as unknown as { rpc: (n: string, a: unknown) => Promise<{ data: unknown; error: unknown }> })
@@ -159,7 +159,7 @@ function BusinessYouRead({ business, viewerId }: { business: BusinessYouInput; v
 
   const settled = !golfers.isLoading
     && (!nearbyEligible || (!nearby.isLoading && (ids.length === 0 || !batch.isLoading)))
-    && (nearbyEligible || players.length < 3 || !hcp.isLoading);
+    && (players.length < 3 || !hcp.isLoading);
   if (!settled) return null;
 
   const name = business.name;
