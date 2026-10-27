@@ -266,13 +266,12 @@ describe('CB107 page integration', () => {
     expect(screen.queryByRole('tablist')).toBeNull();
     expect(container.querySelector('[data-posts-content]')).toBeTruthy();
   });
-  it('Team stays conditional and tappable alongside Posts', async () => {
+  it('Team stays conditional and moves into Visiting as Meet the team', async () => {
     team = [{ is_public: true }];
     const { container } = page();
     await waitFor(() => expect(container.querySelector('[data-club-visiting]')).toBeTruthy());
-    expect(screen.getAllByRole('tab').map(e => e.textContent)).toEqual(['Posts','Team']);
-    fireEvent.click(screen.getByRole('tab', { name: 'Team' }));
-    expect(screen.getByRole('tab', { name: 'Team' }).getAttribute('aria-selected')).toBe('true');
+    expect(screen.queryByRole('tablist')).toBeNull();
+    expect(container.querySelector('[data-club-visiting] [data-visiting-row="team"]')).toBeTruthy();
   });
   it('a non-club retains contacts About tab and Posts tab bar without Visiting', async () => {
     const { container } = page({ club_id: null, website: 'club.example', booking_url: 'https://book.example', primary_action: 'book' });
