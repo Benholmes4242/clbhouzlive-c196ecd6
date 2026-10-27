@@ -315,6 +315,7 @@ const CourseWebsiteSheet: React.FC<CourseWebsiteSheetProps> = ({
       <SheetContent
         side="bottom"
         hideCloseButton
+        aria-describedby={undefined}
         className="gap-0 border-t-0 p-0"
         style={{
           background: BG,
