@@ -22,18 +22,20 @@ const card = (rating: number) => render(
 ).container;
 
 describe('review post — score row below the course', () => {
-  it('the overall figure is 13.5 / 700 with no negative tracking', () => {
+  it('the overall figure is 26 / 700 with no negative tracking', () => {
     const s = card(8.2).querySelector('[data-score-cell="overall"] [data-score-figure]') as HTMLElement;
-    expect(s.style.fontSize).toBe('13.5px');
+    expect(s.style.fontSize).toBe('26px');
     expect(s.style.fontWeight).toBe('700');
     expect(s.style.letterSpacing).toBe('');
   });
-  it('the overall cell is a centred column inside the centred row', () => {
+  it('the overall leads from the left edge of an auto 1fr grid, behind a hairline', () => {
     const c = card(8.2);
-    const cell = c.querySelector('[data-score-cell="overall"]') as HTMLElement;
-    expect(cell.style.textAlign).toBe('center');
-    expect(cell.style.alignItems).toBe('center');
-    expect((c.querySelector('[data-review-score-row]') as HTMLElement).style.justifyContent).toBe('center');
+    const row = c.querySelector('[data-review-score-row]') as HTMLElement;
+    expect(row.style.display).toBe('grid');
+    expect(row.style.gridTemplateColumns).toBe('auto 1fr');
+    expect(row.style.justifyContent).toBe('');
+    expect(row.firstElementChild?.getAttribute('data-score-cell')).toBe('overall');
+    expect((row.firstElementChild as HTMLElement).style.borderRight).toBe('1px solid rgba(255,255,255,0.10)');
   });
   it('the overall is white at 9.2 and 8.2', () => {
     expect((card(9.2).querySelector('[data-score-cell="overall"] [data-score-figure]') as HTMLElement).style.color).toBe(toRgb('#FFFFFF'));

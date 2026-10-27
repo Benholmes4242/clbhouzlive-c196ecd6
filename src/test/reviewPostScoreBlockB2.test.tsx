@@ -33,11 +33,13 @@ describe('review post score row', () => {
     expect(element('[data-review-subject]').querySelector('[data-review-score-row]')).toBeNull();
     expect(row(container)).toBeTruthy();
   });
-  it('pads the row 0 14px 14px like the old block and centres it with gap 15', () => {
-    const r = row(card(9).container)!;
+  it('pads the row 0 14px 14px like the old block, 14px under the region line, as the card grid', () => {
+    const c = card(9).container;
+    const r = row(c)!;
     expect(r.style.padding).toBe('0px 14px 14px');
-    expect(r.style.justifyContent).toBe('center');
-    expect(r.style.gap).toBe('15px');
+    expect((c.querySelector('[data-review-subject]') as HTMLElement).style.padding).toBe('8px 14px 14px');
+    expect(r.style.display).toBe('grid');
+    expect(r.style.gridTemplateColumns).toBe('auto 1fr');
   });
   it('drops the verdict word, the two-column grid and the divider', () => {
     const { container } = card(9);

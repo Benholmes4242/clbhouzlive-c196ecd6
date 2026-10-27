@@ -426,6 +426,7 @@ export function ReviewTile({
           score chip and the bars/figure columns. Nulls drop their cell. */}
       <div data-testid="review-tile-breakdown" style={{ padding: isFeatured ? '10px 14px 12px' : '9px 11px 10px' }}>
         <ReviewScoreRow
+          variant={isFeatured ? 'card' : 'caption'}
           overall={r.rating ?? null}
           breakdown={{
             design: r.breakdown?.design ?? null,
