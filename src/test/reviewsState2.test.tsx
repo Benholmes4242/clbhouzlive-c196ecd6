@@ -58,7 +58,8 @@ describe('REVIEWS_STATE_2', () => {
     const row = container.querySelector('[data-rater-row]');
     expect(row?.querySelector('[data-score-figure]')).toBeNull();
     const scores = row?.nextElementSibling;
-    expect(scores?.hasAttribute('data-review-score-row')).toBe(true);
+    expect(scores?.hasAttribute('data-review-score-container')).toBe(true);
+    expect(scores?.querySelector('[data-review-score-row]')).not.toBeNull();
     expect(scores?.querySelector('[data-score-cell="overall"] [data-score-figure]')?.textContent).toBe('10.0');
     expect(container.querySelectorAll('[data-score-cell="overall"] [data-score-figure]')).toHaveLength(1);
   });
