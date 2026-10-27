@@ -283,20 +283,8 @@ const CourseWebsiteSheet: React.FC<CourseWebsiteSheetProps> = ({
   /* ── The "you" panel ── */
   const bandSentence =
     user && index != null && bandAverage && bandAverage.rounds >= 5 && bandAverage.golfers >= 3
-      ? t('courseDetail.websiteSheet.bandAverage', {
-          defaultValue: 'Golfers off your handicap average {{gross}} here.',
-          gross: Math.round(bandAverage.avg_gross),
-        })
+      ? Math.round(bandAverage.avg_gross)
       : null;
-  const bestSentence =
-    yourRounds > 0 && stats?.your_best != null
-      ? t('courseDetail.websiteSheet.yourBest', {
-          defaultValue: 'Your best here is {{best}}.',
-          best: stats.your_best,
-        })
-      : yourRounds > 0
-        ? null
-        : t('courseDetail.websiteSheet.notPlayedYet', { defaultValue: "You haven't played it yet." });
   const showYouPanel = Boolean(user) && (bandSentence != null || yourRounds > 0);
 
   /* ── People you follow ── */
@@ -304,16 +292,16 @@ const CourseWebsiteSheet: React.FC<CourseWebsiteSheetProps> = ({
     if (circle.count <= 0) return null;
     const [a, b, c] = circle.shown.map((p) => p.display_name as string);
     if (circle.count === 1) {
-      return { names: [a], text: t('courseDetail.websiteSheet.circleOne', { defaultValue: '{{a}} has played here', a }) };
+      return t('courseDetail.websiteSheet.circleOne', { defaultValue: '{{a}} has played here', a });
     }
     if (circle.count === 2) {
-      return { names: [a, b], text: t('courseDetail.websiteSheet.circleTwo', { defaultValue: '{{a}} and {{b}} have played here', a, b }) };
+      return t('courseDetail.websiteSheet.circleTwo', { defaultValue: '{{a}} and {{b}} have played here', a, b });
     }
     if (circle.count === 3) {
-      return { names: [a, b, c], text: t('courseDetail.websiteSheet.circleThree', { defaultValue: '{{a}}, {{b}} and {{c}} have played here', a, b, c }) };
+      return t('courseDetail.websiteSheet.circleThree', { defaultValue: '{{a}}, {{b}} and {{c}} have played here', a, b, c });
     }
     const others = circle.capped ? '500+' : String(circle.count - 2);
-    return { names: [a, b], text: t('courseDetail.websiteSheet.circleMany', { defaultValue: '{{a}}, {{b}} and {{others}} others you follow have played here', a, b, others }) };
+    return t('courseDetail.websiteSheet.circleMany', { defaultValue: '{{a}}, {{b}} and {{others}} others you follow have played here', a, b, others });
   })();
 
   const onList = personalStatus.status?.status === 'want_to_play';
