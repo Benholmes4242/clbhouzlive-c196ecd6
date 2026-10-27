@@ -20,6 +20,7 @@ vi.mock('@/uploads/hooks/useMediaUpload', () => ({ useMediaUpload: () => ({ uplo
 vi.mock('@/components/course-media-tab/AdminHoleTagging', () => ({ AdminHoleTagging: () => null }));
 vi.mock('@/components/course-media-tab/CourseMediaCanonGrid', () => ({ CourseMediaCanonGrid: () => null }));
 vi.mock('@/components/course-media-tab/CourseMediaHeader', () => ({ CourseMediaHeader: () => null }));
+vi.mock('@/components/course-media-tab/hooks/useCoursePlaceMedia', () => ({ useCoursePlaceMedia: () => ({ tags: { data: [], isSuccess: true } }) }));
 vi.mock('@/components/common/ScrollToTopGlass', () => ({ default: () => null }));
 vi.mock('@/components/course-media-tab/HoleWalk', async importOriginal => {
   const original = await importOriginal<typeof import('@/components/course-media-tab/HoleWalk')>();

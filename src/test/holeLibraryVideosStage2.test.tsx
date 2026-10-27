@@ -20,6 +20,7 @@ vi.mock('@/components/course-media-tab/hooks/useHolePhotoTagging', () => ({ useH
 vi.mock('@/components/course-media-tab/hooks/useCourseMedia', () => ({ useCourseMedia: () => ({ posts: [], postsForFullscreen: [], mediaCounts: { total: 0, photos: 0, videos: 0 }, countsReady: true }) }));
 vi.mock('@/components/course-media-tab/CourseMediaCanonGrid', () => ({ CourseMediaCanonGrid: () => null }));
 vi.mock('@/components/course-media-tab/CourseMediaHeader', () => ({ CourseMediaHeader: () => null }));
+vi.mock('@/components/course-media-tab/hooks/useCoursePlaceMedia', () => ({ useCoursePlaceMedia: () => ({ tags: { data: [], isSuccess: true } }) }));
 vi.mock('@/components/common/ScrollToTopGlass', () => ({ default: () => null }));
 
 import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';

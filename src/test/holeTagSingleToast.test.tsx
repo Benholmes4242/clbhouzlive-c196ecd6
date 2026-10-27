@@ -24,6 +24,7 @@ vi.mock('@/components/course-media-tab/hooks/useCourseMedia', () => ({ useCourse
 vi.mock('@/uploads/hooks/useMediaUpload', () => ({ useMediaUpload: () => ({ upload: vi.fn() }) }));
 vi.mock('@/components/course-media-tab/CourseMediaCanonGrid', () => ({ CourseMediaCanonGrid: React.forwardRef((props: { posts: unknown[]; tagging?: { onTag: (p: unknown) => void } }, _ref) => props.tagging ? <button type="button" onClick={() => props.tagging!.onTag(props.posts[0])}>open-tag</button> : null) }));
 vi.mock('@/components/course-media-tab/CourseMediaHeader', () => ({ CourseMediaHeader: () => null }));
+vi.mock('@/components/course-media-tab/hooks/useCoursePlaceMedia', () => ({ useCoursePlaceMedia: () => ({ tags: { data: [], isSuccess: true } }) }));
 vi.mock('@/components/common/ScrollToTopGlass', () => ({ default: () => null }));
 vi.mock('@/components/course-media-tab/AdminHoleTagging', () => ({ AdminHoleTagging: () => null }));
 import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';

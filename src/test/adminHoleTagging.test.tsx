@@ -13,6 +13,7 @@ vi.mock('@/components/course-media-tab/hooks/useCourseMedia', () => ({ useCourse
 vi.mock('@/uploads/hooks/useMediaUpload', () => ({ useMediaUpload: () => ({ upload: vi.fn() }) }));
 vi.mock('@/components/course-media-tab/CourseMediaCanonGrid', () => ({ CourseMediaCanonGrid: () => null }));
 vi.mock('@/components/course-media-tab/CourseMediaHeader', () => ({ CourseMediaHeader: () => null }));
+vi.mock('@/components/course-media-tab/hooks/useCoursePlaceMedia', () => ({ useCoursePlaceMedia: () => ({ tags: { data: [], isSuccess: true } }) }));
 vi.mock('@/components/common/ScrollToTopGlass', () => ({ default: () => null }));
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useAdminUntaggedCourseMedia, type AdminUntaggedMedia } from '@/hooks/useAdminUntaggedCourseMedia';
@@ -122,8 +123,8 @@ describe('admin block and batch', () => {
   });
   it('member own block stays before admin and uses unchanged member write', async () => {
     f.own = true; const { wrapper } = setup(); render(<CourseMediaTabNew courseId="course" />, { wrapper });
-    const own = screen.getByRole('heading', { name: 'One of yours is untagged' }); const admin = await screen.findByRole('heading', { name: 'Two untagged shots here' }); expect(own.compareDocumentPosition(admin) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    fireEvent.click(screen.getAllByRole('button', { name: 'Tag them' })[0] as HTMLElement); await screen.findByRole('dialog'); fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    const own = document.querySelector('.media-v2-untagged'); if (!own) throw new Error('Member tag row missing'); const admin = await screen.findByRole('heading', { name: 'Two untagged shots here' }); expect(own.compareDocumentPosition(admin) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(own); await screen.findByRole('dialog'); fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
     await waitFor(() => expect(f.memberSubmit).toHaveBeenCalled()); expect(f.memberSubmit).toHaveBeenCalledWith(expect.objectContaining({ hole: 7, post: expect.objectContaining({ userId: 'admin' }) })); expect(f.rpc).not.toHaveBeenCalledWith('admin_tag_hole_media', expect.anything());
   });
 });

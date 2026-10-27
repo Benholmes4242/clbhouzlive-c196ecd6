@@ -21,6 +21,23 @@
 @tailwind utilities;
 
 :root {
+  --media-v2-ink: #F8FAFC;
+  --media-v2-photo-ink: #FFFFFF;
+  --media-v2-canvas: #0A0A0C;
+  --media-v2-sheet: #16161A;
+  --media-v2-mute: rgba(248,250,252,.62);
+  --media-v2-dim: rgba(248,250,252,.42);
+  --media-v2-open-number: rgba(248,250,252,.22);
+  --media-v2-hair: rgba(255,255,255,.08);
+  --media-v2-track: rgba(255,255,255,.10);
+  --media-v2-inset: rgba(255,255,255,.04);
+  --media-v2-empty: rgba(255,255,255,.03);
+  --media-v2-icon: rgba(255,255,255,.06);
+  --media-v2-shot-count: rgba(255,255,255,.85);
+  --media-v2-place-count: rgba(255,255,255,.8);
+  --media-v2-time: rgba(0,0,0,.45);
+  --media-v2-hole-gradient: linear-gradient(180deg,rgba(0,0,0,.35) 0%,transparent 35%,transparent 60%,rgba(0,0,0,.55) 100%);
+  --media-v2-place-gradient: linear-gradient(180deg,transparent 30%,rgba(0,0,0,.7) 100%);
   --club-you-card: #17171B;
   --club-you-hair: rgba(255,255,255,0.08);
   --club-you-ink: #F8FAFC;

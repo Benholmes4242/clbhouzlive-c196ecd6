@@ -43,15 +43,15 @@ describe('MEDIA_WALK_1_R', () => {
   it('unavailable removes entire section', () => {
     const { container } = render(<HoleWalk available={false} holes={[hole(1)]} rows={[]} totalMedia={0} onAddFirst={() => {}} />); expect(container.childElementCount).toBe(0);
   });
-  it('selection keeps every tile mounted', () => {
-    render(<HoleWalk available holes={[hole(1), hole(3)]} rows={[]} totalMedia={0} onAddFirst={() => {}} />);
+  it('selection keeps the sparse rail and full coverage mounted', () => {
+    render(<HoleWalk available holes={[hole(1), hole(3)]} rows={[photo('a', 1), photo('b', 3)]} totalMedia={0} onAddFirst={() => {}} />);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 3' }));
     expect(screen.getByRole('button', { name: 'Hole 1' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Hole 3' })).toHaveAttribute('aria-pressed', 'true');
   });
-  it('Add first passes selected hole', () => {
-    const selected: number[] = []; render(<HoleWalk available holes={[hole(3)]} rows={[]} totalMedia={0} onAddFirst={n => selected.push(n)} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 3' })); fireEvent.click(screen.getByRole('button', { name: 'Add the first' })); expect(selected).toEqual([3]);
+  it('open coverage segment passes its hole directly to Add first', () => {
+    const selected: number[] = []; render(<HoleWalk available holes={[hole(1), hole(3)]} rows={[photo('a', 1)]} totalMedia={1} onAddFirst={n => selected.push(n)} />);
+    fireEvent.click(document.querySelectorAll('.media-v2-coverage button')[1]); expect(selected).toEqual([3]);
   });
   it('eight photos reconcile as eight selectable thumbnails including the active shot', () => {
     render(<HoleWalk available holes={[hole(9)]} rows={Array.from({ length: 8 }, (_, i) => photo(String(i), 9))} totalMedia={8} onAddFirst={() => {}} />);
@@ -64,34 +64,34 @@ describe('MEDIA_WALK_1_R', () => {
     render(<HolePhotoTagDialog imageUrl="/photo.jpg" initialHole={3} holeCount={2} knownHoleNumbers={[1, 3]} pending={false} error={null} onClose={() => {}} onSubmit={n => submitted.push(n)} />);
     expect(screen.getByRole('button', { name: 'Hole 3' })).toHaveAttribute('aria-pressed', 'true'); fireEvent.click(screen.getByRole('button', { name: 'Hole 3' })); expect(submitted).toEqual([3]);
   });
-  it('tile 4 opens its region directly after tile 6 and before tile 7', () => {
-    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[]} totalMedia={0} onAddFirst={() => {}} />);
+  it('hole 4 opens its existing region directly under the rail', () => {
+    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[photo('4', 4), photo('11', 11), photo('18', 18)]} totalMedia={3} onAddFirst={() => {}} />);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
     const panel = screen.getByRole('region', { name: 'Hole 4' });
-    expect(panel.previousElementSibling).toBe(screen.getByRole('button', { name: 'Hole 6' }));
-    expect(panel.nextElementSibling).toBe(screen.getByRole('button', { name: 'Hole 7' }));
+    expect(panel.parentElement?.previousElementSibling).toHaveClass('media-v2-hole-rail');
+    expect(panel.nextElementSibling).toBeNull();
   });
   it('tapping tile 4 again closes its region and clears aria-pressed', () => {
-    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[]} totalMedia={0} onAddFirst={() => {}} />);
+    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[photo('4', 4), photo('11', 11), photo('18', 18)]} totalMedia={3} onAddFirst={() => {}} />);
     const button = screen.getByRole('button', { name: 'Hole 4' });
     fireEvent.click(button); fireEvent.click(button);
     expect(screen.queryByRole('region')).toBeNull();
     expect(button).toHaveAttribute('aria-pressed', 'false');
   });
-  it('switching from tile 4 to tile 11 moves the only region after tile 12', () => {
-    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[]} totalMedia={0} onAddFirst={() => {}} />);
+  it('switching from hole 4 to hole 11 retains one region under the rail', () => {
+    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[photo('4', 4), photo('11', 11), photo('18', 18)]} totalMedia={3} onAddFirst={() => {}} />);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
     fireEvent.click(screen.getByRole('button', { name: 'Hole 11' }));
     const panel = screen.getByRole('region', { name: 'Hole 11' });
-    expect(panel.previousElementSibling).toBe(screen.getByRole('button', { name: 'Hole 12' }));
-    expect(panel.nextElementSibling).toBe(screen.getByRole('button', { name: 'Hole 13' }));
+    expect(panel.parentElement?.previousElementSibling).toHaveClass('media-v2-hole-rail');
+    expect(panel.nextElementSibling).toBeNull();
     expect(screen.getAllByRole('region')).toHaveLength(1);
   });
-  it('tile 18 opens the region after the final tile', () => {
-    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[]} totalMedia={0} onAddFirst={() => {}} />);
+  it('hole 18 opens its region under the rail', () => {
+    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[photo('4', 4), photo('11', 11), photo('18', 18)]} totalMedia={3} onAddFirst={() => {}} />);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 18' }));
     const panel = screen.getByRole('region', { name: 'Hole 18' });
-    expect(panel.previousElementSibling).toBe(screen.getByRole('button', { name: 'Hole 18' }));
+    expect(panel.parentElement?.previousElementSibling).toHaveClass('media-v2-hole-rail');
     expect(panel.nextElementSibling).toBeNull();
   });
   it('switching holes resets the displayed photograph to the first', () => {
@@ -109,7 +109,7 @@ describe('MEDIA_WALK_1_R', () => {
     HTMLElement.prototype.scrollIntoView = scroll;
     const rect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ top } as DOMRect);
     try {
-      render(<HoleWalk available holes={[hole(4)]} rows={[]} totalMedia={0} onAddFirst={() => {}} />);
+      render(<HoleWalk available holes={[hole(4)]} rows={[photo('4', 4), photo('11', 11), photo('18', 18)]} totalMedia={3} onAddFirst={() => {}} />);
       fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
       expect(scroll).toHaveBeenCalledTimes(calls);
       if (calls) expect(scroll).toHaveBeenCalledWith({ block: 'nearest', behavior: 'smooth' });

@@ -12,7 +12,11 @@ import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/ab
  * EXIF. The active ready video autoplays muted inline via the review-tile
  * coordinator; blocked/failed autoplay retains its poster and glass disc.
  * Taps still open the canonical fullscreen viewer. */
-import { Fragment, useContext, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useContext, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Plus } from 'lucide-react';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { ReadyShotCover } from './ReadyShotCover';
 import { QueryClientContext } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { A, toParParts } from '@/features/courses/components/holes/analytical/tokens';
@@ -27,6 +31,7 @@ import { HoleMediaThumbnail } from './HoleMediaVideo';
 import { HoleInlineVideo } from './HoleInlineVideo';
 import { captureMonthLabel, deriveHoleWalk, holeOrdinal, holePhotoMonths } from '@/lib/courseMedia/holeWalk';
 import './hole-walk.css';
+import './media-v2.css';
 
 /** Stage 2: null duration is never playable. Shared with moderator previews
  * so neither surface attaches HLS while encoding is still in progress. */
@@ -37,15 +42,17 @@ export function HoleProcessingVideo({ media, label }: { media: { media_url: stri
   </div>;
 }
 
-export function HoleWalk({ available, holes, rows, totalMedia, courseName, authors, onAddFirst, memberId, onMove, onRemove, focus, scored = true, mediaPaused = false }: {
+export function HoleWalk({ available, holes, rows, totalMedia, courseName, authors, onAddFirst, onChooseFirst, memberId, onMove, onRemove, focus, scored = true, mediaPaused = false }: {
   available: boolean; holes: readonly CourseHole[]; rows: readonly HolePhoto[];
   totalMedia: number; courseName?: string; authors?: ReadonlyMap<string, string>;
   onAddFirst: (hole: number) => void;
+  onChooseFirst?: () => void;
   memberId?: string; onMove?: (row: HolePhoto) => void; onRemove?: (row: HolePhoto) => void;
   focus?: { hole: number; id: string; nonce: number } | null;
   scored?: boolean;
   mediaPaused?: boolean;
 }) {
+  const { t } = useTranslation('courses');
   // The grid itself performs no reads; only viewer taps require the app cache.
   const queryClient = useContext(QueryClientContext);
   const openingRef = useRef(false);
@@ -79,7 +86,7 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
   const tileRef = useRef<{ photos: readonly HolePhoto[] } | null>(null);
   useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
 
-  const show = available && holes.length > 0;
+  const show = available && holes.length > 0 && rows.some(row => row.status === 'approved' && holes.some(hole => hole.hole_no === row.hole_no));
   const walk = show ? deriveHoleWalk(holes, rows) : null;
   const tile = walk?.tiles.find(item => item.hole.hole_no === selected);
   tileRef.current = tile ?? null;
@@ -214,28 +221,29 @@ export function HoleWalk({ available, holes, rows, totalMedia, courseName, autho
       {!active && <><p className="hole-walk-observation">{walk.hardestOpen === tile.hole.hole_no && <>The field loses more shots here than on any hole{courseName ? ` at ${courseName}` : ' on the course'}. </>}<strong>Nobody has shot it yet.</strong></p>
         <Button variant="ghost" className="hole-walk-add" onClick={() => onAddFirst(tile.hole.hole_no)}>Add the first</Button></>}
     </section>;
-  const selectedIndex = walk.tiles.findIndex(item => item.hole.hole_no === selected);
-  const rowEnd = selectedIndex < 0 ? -1 : Math.min(Math.ceil((selectedIndex + 1) / 3) * 3, walk.tiles.length) - 1;
+  const selectHole = (hole: number) => {
+    setSelected(current => current === hole ? null : hole); setPhotoId(null);
+    void analyticsEvents.track('media_hole_rail_open', { hole });
+  };
   return <div className="hole-walk" style={{ color: A.INK, '--hole-walk-ink': A.INK, '--hole-walk-canvas': A.CANVAS, '--hole-walk-muted': A.MUTE, '--hole-walk-body': A.BODY, '--hole-walk-dim': A.DIM, '--hole-walk-faint': A.FAINT, '--hole-walk-soft': A.SOFT, '--hole-walk-rule': A.SOFT, '--hole-walk-track': A.TRACK, '--hole-walk-panel': A.PANEL } as CSSProperties}>
-    <section className="hole-walk-section">
-      <p className="hole-walk-kicker" style={VERDICT_KICKER}>Walk the course</p>
-      <h2 className="hole-walk-title" style={TAB_TITLE}>{walk.headline}</h2>
-      <p className="hole-walk-lede">{capitalPhotoCount(walk.photoCount)} of the {totalMedia.toLocaleString()} are tied to a hole. Tap one to walk it.</p>
-      <div className="hole-walk-grid">
-        {walk.tiles.map((item, index) => <Fragment key={item.hole.hole_no}><Button variant="ghost" aria-label={`Hole ${item.hole.hole_no}`} aria-pressed={selected === item.hole.hole_no}
-          className={`hole-walk-tile ${item.photos.length ? '' : 'hole-walk-open'} ${selected === item.hole.hole_no ? 'hole-walk-selected' : ''}`}
-          onClick={() => { setSelected(current => current === item.hole.hole_no ? null : item.hole.hole_no); setPhotoId(null); }}>
-          {item.photos[0] && <img src={holeMediaPoster(item.photos[0])} alt="" loading="lazy" onError={event => { if (item.photos[0]?.media_type === 'video' && item.photos[0]?.duration_seconds == null) { event.currentTarget.hidden = true; event.currentTarget.parentElement?.classList.add('hole-walk-processing-empty'); } }} />}
-          <span className="hole-walk-number">{item.hole.hole_no}</span>
-          <span className="hole-walk-count">{item.photos.length || 'Open'}</span>
-        </Button>{index === rowEnd && panel}</Fragment>)}
+    <section>
+      <div className="media-v2-hole-head">
+        <div className="media-v2-head"><h3>{t('media.v2.holeByHole')}</h3><span className="media-v2-label">{t('media.v2.coverage', { shot: walk.photographed, holes: holes.length })}</span></div>
+        <div className="media-v2-coverage">{walk.tiles.map(item => <Button key={item.hole.hole_no} variant="ghost" data-shot={item.photos.length > 0}
+          aria-label={t('media.v2.coverageHole', { hole: item.hole.hole_no })}
+          onClick={() => item.photos.length ? selectHole(item.hole.hole_no) : onAddFirst(item.hole.hole_no)}>
+          <i /><span>{item.hole.hole_no}</span>
+        </Button>)}</div>
       </div>
-      <div className="hole-walk-legend"><span><i className="hole-walk-swatch" />Shot</span><span><i className="hole-walk-swatch hole-walk-swatch-open" />Nobody has yet</span></div>
-      {!tile && (walk.most != null || walk.openCount > 0) && <p className="hole-walk-observation">
-        {walk.most != null && <>The <strong>{holeOrdinal(walk.most)}</strong> is the most photographed hole on the course. </>}
-        {walk.openCount > 0 && <><strong>{capitalPhotoCount(walk.openCount)} holes here have never been shot</strong>{walk.hardestOpen != null ? <> — including the <strong>{holeOrdinal(walk.hardestOpen)}</strong>, which the field loses most shots to.</> : '.'}</>}
-      </p>}
-      {!tile && !scored && <p className="hole-walk-quiet">No rounds have been posted here yet, so par and yardage are still to come. They fill in with the first tracked round.</p>}
+      <div className="media-v2-hole-rail">
+        {walk.tiles.filter(item => item.photos.length).map(item => <Button key={item.hole.hole_no} variant="ghost" className="media-v2-hole-card" aria-label={`Hole ${item.hole.hole_no}`} aria-pressed={selected === item.hole.hole_no} onClick={() => selectHole(item.hole.hole_no)}>
+          <ReadyShotCover shots={item.photos} /><span className="media-v2-hole-number">{item.hole.hole_no}</span><span className="media-v2-hole-count">{t('media.v2.shots', { count: item.photos.length })}</span>
+        </Button>)}
+        {walk.openCount > 0 && <Button variant="ghost" className="media-v2-add-card" onClick={onChooseFirst} disabled={!onChooseFirst}>
+          <i><Plus size={16} /></i><b>{t('media.v2.holesToGo', { count: walk.openCount })}</b><span>{t('media.v2.addFirstShot')}</span>
+        </Button>}
+      </div>
+      <div className="media-v2-panel">{panel}</div>
     </section>
   </div>;
 }
