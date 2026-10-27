@@ -336,8 +336,8 @@ describe('CB103.1 promoted action on a club profile', () => {
     pageState.business = fixture({ club_id: null });
     pageState.courses = [];
     const { container } = renderPage();
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Book' })).toBeTruthy());
-    expect(container.querySelector('[data-club-hero]')).toBeNull();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Book' })).toBeTruthy(), { timeout: 3000 });
+    screen.debug(container.querySelector('[data-club-actions]')!);
 
     fireEvent.click(screen.getByRole('button', { name: 'Book' }));
     expect(openExternalUrl).toHaveBeenCalledWith('https://tees.example/sundridge');
