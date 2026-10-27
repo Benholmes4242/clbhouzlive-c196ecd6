@@ -11,7 +11,72 @@ import type { ReactNode } from 'react';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 const rpc = vi.fn();
-vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: (...a: unknown[]) => rpc(...a) } }));
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: { rpc: (...a: unknown[]) => rpc(...a), from: () => chainable() },
+}));
+
+/* ---- page-level render surface (CB103.1) --------------------------------
+   The page's own data hooks are stubbed so the contact rows render from a
+   fixture; the heroes, the menu and the action rows are the real thing. */
+const pageState: { business: Record<string, unknown> | null; courses: unknown[] } = { business: null, courses: [] };
+
+/* Awaitable PostgREST-style chain: every modifier returns the chain, and the
+   chain resolves to the fixture rows the page's club-courses query expects. */
+function chainable() {
+  const q: Record<string, unknown> = {};
+  for (const m of ['select', 'eq', 'order', 'limit', 'single', 'maybeSingle', 'in', 'gte', 'lte', 'neq', 'is', 'or', 'filter']) {
+    q[m] = () => q;
+  }
+  q.then = (onF: (v: unknown) => unknown, onR?: (e: unknown) => unknown) =>
+    Promise.resolve({ data: pageState.courses, error: null }).then(onF, onR);
+  return q;
+}
+
+vi.mock('@/hooks/useHeaderVisibility', () => ({
+  useHideHeader: () => {}, useHeaderVisibility: () => ({}), useHeaderVariant: () => ({}),
+}));
+vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: null, loading: false }) }));
+vi.mock('@/hooks/useBusinessProfile', () => ({
+  useBusinessProfile: () => ({ data: pageState.business, isLoading: false, error: null, refetch: vi.fn() }),
+}));
+vi.mock('@/hooks/useBusinessMembership', () => ({ useBusinessMembership: () => ({ data: null }) }));
+vi.mock('@/hooks/useBusinessPosts', () => ({
+  useBusinessPostsCount: () => ({ data: 0 }), useBusinessPosts: () => ({ data: [] }),
+}));
+vi.mock('@/hooks/useBusinessFollow', () => ({ useBusinessFollowersCount: () => ({ data: 0 }) }));
+vi.mock('@/hooks/useBusinessTeam', () => ({ useBusinessTeam: () => ({ data: [] }) }));
+vi.mock('@/hooks/useBusinessReviewStats', () => ({ useBusinessReviewStats: () => ({ data: null }) }));
+vi.mock('@/hooks/useClubRoundsTracked', () => ({ useClubRoundsTracked: () => null }));
+vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: null }) }));
+vi.mock('@/hooks/useFollowState', () => ({ useFollowState: () => ({ isFollowing: false }) }));
+vi.mock('@/hooks/useToggleFollow', () => ({ useToggleFollow: () => ({ mutate: vi.fn() }) }));
+vi.mock('@/hooks/messaging/useStartConversation', () => ({
+  useStartConversation: () => ({ start: vi.fn(), isStarting: false }),
+}));
+vi.mock('@/components/business/verification/useVerificationEvidence', () => ({
+  useVerificationEvidence: () => ({ line: null }),
+}));
+vi.mock('@/lib/businessAnalyticsTracking', () => ({
+  trackBusinessProfileVisit: vi.fn(), trackBusinessAction: vi.fn(),
+}));
+vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
+vi.mock('@/utils/median/openExternalUrl', () => ({ openExternalUrl: vi.fn() }));
+vi.mock('@/lib/toast', () => ({
+  toast: Object.assign(vi.fn(), { success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn() }),
+}));
+vi.mock('@/lib/business/shareBusinessProfile', () => ({
+  shareBusinessProfile: vi.fn(), withShareSource: (u: string) => u,
+}));
+vi.mock('@/components/posts-tab/PostsTabContent', () => ({ default: () => null }));
+vi.mock('@/components/business/BusinessCoursePanel', () => ({ BusinessCoursePanel: () => null }));
+vi.mock('@/components/business/BusinessProfileInfo', () => ({ BusinessProfileInfo: () => null }));
+vi.mock('@/components/business/BusinessTeamTab', () => ({ BusinessTeamTab: () => null }));
+vi.mock('@/components/moderation/ReportSheet', () => ({ ReportSheet: () => null }));
+vi.mock('@/components/shared/AvatarLightbox', () => ({ AvatarLightbox: () => null }));
+vi.mock('@/components/common/ScrollToTopGlass', () => ({ default: () => null }));
+vi.mock('@/components/layout/PageRoot', () => ({
+  PageRoot: ({ children }: { children: React.ReactNode }) => <div data-page-root="">{children}</div>,
+}));
 
 import { ClubProfileHero, clubPlaceLine, clubTeamGates } from '@/components/business/hero/ClubProfileHero';
 import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
