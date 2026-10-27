@@ -55,7 +55,7 @@ beforeEach(() => {
   scroll.mockClear(); center.mockClear(); openSheet.mockClear();
   Object.defineProperty(Element.prototype, 'scrollIntoView', { configurable: true, value: center });
   vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (this: Element) {
-    const top = this.id === 'root' ? 10 : this.hasAttribute('data-review-id') ? 640 : 0;
+    const top = this.id === 'root' ? 10 : this.hasAttribute('data-review-id') ? 640 : this.hasAttribute('data-reviews-tab-top') ? 200 : 0;
     const height = this.hasAttribute('data-course-review-tabs') ? 44 : 100;
     return { top, bottom: top + height, height, left: 0, right: 400, width: 400, x: 0, y: top, toJSON: () => ({}) };
   });
@@ -63,20 +63,20 @@ beforeEach(() => {
 });
 afterEach(() => { cleanup(); root.remove(); __resetScrollerCache(); vi.useRealTimers(); vi.restoreAllMocks(); });
 
-describe('CB110 first-review landing', () => {
-  it.each([1, 3, 6, 10])('lands the first rendered review below sticky tabs for %i ratings and replaces at', (count) => {
+describe('CB110 reviews-tab-top landing', () => {
+  it.each([1, 3, 6, 10])('lands the Reviews tab top below sticky tabs for %i ratings and replaces at', (count) => {
     fixture.rows = fixture.rows.slice(0, count);
     mount('/courses/course?tab=reviews&at=reviews&keep=yes');
     expect(scroll).not.toHaveBeenCalled();
     act(() => vi.advanceTimersByTime(20));
-    expect(scroll).toHaveBeenCalledExactlyOnceWith({ top: 639, left: 0, behavior: 'auto' });
+    expect(scroll).toHaveBeenCalledExactlyOnceWith({ top: 199, left: 0, behavior: 'auto' });
     expect(screen.getByTestId('location').textContent).toBe('/courses/course?tab=reviews&keep=yes');
     expect(document.querySelector('.animate-soft-pulse')).toBeNull();
     expect(openSheet).not.toHaveBeenCalled();
     act(() => vi.advanceTimersByTime(100));
     expect(scroll).toHaveBeenCalledOnce();
   });
-  it('waits for first-page reviews to render before scrolling and clearing at', () => {
+  it('waits for the tab content to render before scrolling and clearing at', () => {
     fixture.loading = true;
     const view = mount('/courses/course?tab=reviews&at=reviews');
     act(() => vi.advanceTimersByTime(100));
@@ -84,19 +84,19 @@ describe('CB110 first-review landing', () => {
     expect(screen.getByTestId('location').textContent).toContain('at=reviews');
     fixture.loading = false; view.rerender(view.tree());
     act(() => vi.advanceTimersByTime(20));
-    expect(scroll).toHaveBeenCalledExactlyOnceWith({ top: 639, left: 0, behavior: 'auto' });
+    expect(scroll).toHaveBeenCalledExactlyOnceWith({ top: 199, left: 0, behavior: 'auto' });
     expect(screen.getByTestId('location').textContent).toBe('/courses/course?tab=reviews');
   });
-  it('does not target a row for tab=reviews alone', () => {
+  it('does not scroll for tab=reviews alone', () => {
     mount('/courses/course?tab=reviews');
     act(() => vi.advanceTimersByTime(20));
     expect(scroll).not.toHaveBeenCalled();
     expect(center).not.toHaveBeenCalled();
   });
-  it('clears at without scrolling when the resolved first page has no reviews', () => {
+  it('lands on the tab top when the course has no ratings and clears at', () => {
     fixture.rows = []; mount('/courses/course?tab=reviews&at=reviews');
     act(() => vi.advanceTimersByTime(20));
-    expect(scroll).not.toHaveBeenCalled();
+    expect(scroll).toHaveBeenCalledExactlyOnceWith({ top: 199, left: 0, behavior: 'auto' });
     expect(screen.getByTestId('location').textContent).toBe('/courses/course?tab=reviews');
   });
   it.each(['review', 'highlight'])('lets an explicit %s target take precedence over at', (param) => {
