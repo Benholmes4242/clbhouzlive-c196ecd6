@@ -12,6 +12,12 @@ vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: ()
 const mocks = vi.hoisted(() => ({ stats: vi.fn(), players: vi.fn() }));
 vi.mock('@/hooks/feed/useCourseStatsDetail', () => ({ useCourseStatsDetail: (...args: unknown[]) => mocks.stats(...args) }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useBoardCoursePlayers', () => ({ useBoardCoursePlayers: (...args: unknown[]) => mocks.players(...args) }));
+vi.mock('@/components/ui/SquircleAvatar', () => {
+  const MockSquircleAvatar = (props: { userId?: string; src?: string | null; hairlineRing?: boolean }) => (
+    <div data-testid="squircle-avatar" data-user-id={props.userId} data-src={props.src ?? ''} data-hairline-ring={props.hairlineRing ? 'true' : 'false'} />
+  );
+  return { SquircleAvatar: MockSquircleAvatar, default: MockSquircleAvatar };
+});
 
 const east = { id: 'east', name: 'Sundridge Park Golf Club (East Course)', country: 'England', region: 'Kent' };
 const west = { ...east, id: 'west', name: 'Sundridge Park Golf Club (West Course)' };
@@ -143,11 +149,20 @@ describe('CB104 card visibility and existing reads', () => {
       expect(mocks.players).toHaveBeenCalledWith('viewer', course.id, { ...DEFAULT_FILTERS, scope: 'circle', window: 'all' }, { limit: CIRCLE_PLAYERS_LIMIT });
     }
   });
-  it('faces row is inert and has at most four avatars', () => {
-    mocks.players.mockReturnValue({ data: ['a', 'b', 'c', 'd', 'e'].map(id => player(id, `Name ${id}`)), isLoading: false });
+  it('faces render as SquircleAvatar with each player\'s userId and src, at most four', () => {
+    mocks.players.mockReturnValue({ data: ['a', 'b', 'c', 'd', 'e'].map(id => ({ ...player(id, `Name ${id}`), profile_photo_url: `https://cdn.example/${id}.jpg` })), isLoading: false });
     const { container } = mount();
-    expect(container.querySelectorAll('[data-face]')).toHaveLength(4);
+    const faces = [...container.querySelectorAll('[data-testid="squircle-avatar"]')] as HTMLElement[];
+    expect(faces).toHaveLength(4);
+    expect(faces.map(f => f.dataset.userId)).toEqual(['a', 'b', 'c', 'd']);
+    expect(faces.map(f => f.dataset.src)).toEqual(['a', 'b', 'c', 'd'].map(id => `https://cdn.example/${id}.jpg`));
     expect(container.querySelectorAll('button, a')).toHaveLength(0);
+  });
+  it('faces render as SquircleAvatar with hairlineRing', () => {
+    const { container } = mount();
+    const faces = [...container.querySelectorAll('[data-testid="squircle-avatar"]')] as HTMLElement[];
+    expect(faces.length).toBeGreaterThan(0);
+    for (const face of faces) expect(face.dataset.hairlineRing).toBe('true');
   });
 });
 
