@@ -64,6 +64,7 @@ import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useTranslation } from 'react-i18next';
 import { A, Panel, LABEL, NUM } from '@/features/courses/components/holes/analytical/tokens';
 import { ClubHowItPlays, type BusinessClubCourse } from '@/components/business/ClubHowItPlays';
+import { ClubWhatGolfersSay } from '@/components/business/ClubWhatGolfersSay';
 import { ClubYouCard } from '@/components/business/ClubYouCard';
 import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
 import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
