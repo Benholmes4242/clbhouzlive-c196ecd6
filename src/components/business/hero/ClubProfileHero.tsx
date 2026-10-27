@@ -195,7 +195,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
           {team ? (
             <>
               {team.onYourCourses && <button type="button" style={pill('white')} onClick={team.onYourCourses}>{t('business.clubHero.yourCourses', 'Your courses')}</button>}
-              {team.onInsights && <button type="button" style={pill(team.onYourCourses ? 'glass' : 'white')} onClick={team.onInsights}>{t('business.clubHero.insights', 'Insights')}</button>}
+              {team.onInsights && <button type="button" style={pill('glass')} onClick={team.onInsights}>{t('business.clubHero.insights', 'Insights')}</button>}
               {team.onPost && <button type="button" aria-label={t('business.clubHero.post', 'Post as the business')} style={circle(38)} onClick={team.onPost}><Plus {...ICON} /></button>}
               {team.onEdit && <button type="button" aria-label={t('business.clubHero.edit', 'Edit business profile')} style={circle(38)} onClick={team.onEdit}><Pencil {...ICON} /></button>}
             </>
@@ -240,7 +240,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
                 <span style={{ display: 'block', marginTop: 4, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: DIM }}>{c.label}</span>
               </>
             );
-            const style: React.CSSProperties = { textAlign: 'center', borderLeft: i > 0 ? `1px solid ${HAIR}` : undefined, background: 'none', border: 'none', borderLeftWidth: i > 0 ? 1 : 0, borderLeftStyle: 'solid', borderLeftColor: HAIR, padding: 0, color: INK, fontFamily: SANS };
+            const style: React.CSSProperties = { textAlign: 'center', background: 'none', border: 0, borderLeft: i > 0 ? `1px solid ${HAIR}` : 'none', padding: 0, color: INK, fontFamily: SANS };
             return c.onTap ? (
               <button key={c.key} type="button" data-cell={c.key} style={style} onClick={c.onTap}>{body}</button>
             ) : (
