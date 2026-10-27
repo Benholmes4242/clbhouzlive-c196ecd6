@@ -27,8 +27,11 @@
  * Panel, tokens.tsx and DiscoverSectionHeading are NOT modified.
  * COURSE exits use highlight-only links; shared/notification review links still
  * open the sheet. Highlight-only timing is independent of the sheet lifecycle.
- * CB110: at=reviews waits for both review reads and the rendered first row,
+ * CB110: at=reviews waits for both review reads and the rendered tab content,
  * then lands below the measured sticky tab band on the canonical page scroller.
+ * CB110.2: the landing target is the TOP of the tab's content (the summary
+ * block, marked data-reviews-tab-top), never the first review row — with no
+ * ratings it lands on whatever the tab shows first.
  * Explicit review/highlight targets take precedence; URL consumption replaces history.
  */
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -456,14 +459,15 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     const explicitTarget = params.has('review') || params.has('reviewId') || params.has('highlight')
       || pendingSheetReviewId || pendingHighlightReviewId || highlightedReviewId;
     const frame = requestAnimationFrame(() => {
-      const row = reviewRoot.current?.querySelector<HTMLElement>('[data-review-id]');
-      if (!explicitTarget && reviews.length > 0 && !row) return;
-      if (!explicitTarget && row) {
+      // The tab-top marker sits ON reviewRoot itself (querySelector would miss it).
+      const tabTop = reviewRoot.current?.hasAttribute('data-reviews-tab-top') ? reviewRoot.current : null;
+      if (!explicitTarget && !tabTop) return;
+      if (!explicitTarget && tabTop) {
         const tabs = reviewRoot.current?.closest('[data-course-detail]')
           ?.querySelector<HTMLElement>('[data-course-review-tabs]');
         const stickyTop = tabs ? Number.parseFloat(getComputedStyle(tabs).top) || 0 : 0;
         const inset = stickyTop + (tabs?.getBoundingClientRect().height ?? 0);
-        scrollElementIntoView(row, { offset: inset, behavior: 'auto' });
+        scrollElementIntoView(tabTop, { offset: inset, behavior: 'auto' });
       }
       setSearchParams((prev) => {
         const next = new URLSearchParams(prev);
@@ -544,7 +548,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   return (
     <PullToRefreshContainer onRefresh={handlePullToRefresh}>
-      <div ref={reviewRoot} style={{ background: A.CANVAS, minHeight: '100%', paddingBottom: 8, fontFamily: SANS }}>
+      <div ref={reviewRoot} data-reviews-tab-top style={{ background: A.CANVAS, minHeight: '100%', paddingBottom: 8, fontFamily: SANS }}>
         {/* REVIEWS_STATE_1: total sample, not viewer-excluding count. */}
         {headerResolved && reviewsCourseState(community.totalRatingCount) === 'none' ? (
           <NobodyHasRated totalRatings={community.totalRatingCount} courseName={courseName} onWriteFirst={() => handleWriteReview('first')} />
