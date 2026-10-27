@@ -70,7 +70,7 @@ describe('REVIEWS_STATE_3', () => {
     const { container } = tab();
     const panel = container.querySelector('[data-reviews-state="few"] [data-testid="review-row"]');
     expect(panel?.getAttribute('data-review-id')).toBe('mark');
-    expect(panel?.querySelector('[data-review-score]')?.textContent).toBe('8.1');
+    expect(panel?.querySelector('[data-score-cell="overall"] [data-score-figure]')?.textContent).toBe('8.1');
     expect(container.querySelectorAll('[data-community-score], [data-viewer-delta], [data-category-band], [data-community-caution]')).toHaveLength(0);
     expect(container.querySelector('[data-review-id="viewer"]')).not.toBeNull();
     expect(fewReviewFacts(reviewsCommunitySample(fixture.rows, 'viewer'))).toBeNull();
