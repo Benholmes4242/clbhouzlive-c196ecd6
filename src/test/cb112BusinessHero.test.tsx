@@ -279,6 +279,7 @@ describe('CB112 figure strip', () => {
 
 describe('CB112 clubs unchanged', () => {
   it('club keeps the tee-time pill, Your courses white and its own cells', async () => {
+    rpc.mockResolvedValue({ data: null, error: null });
     state.courses = [{ id: 'k1', name: 'Sundridge', region: 'Kent', country: 'England', thumbnail_image: null }];
     state.membership = { role: 'owner', canViewInsights: true, canManage: true };
     state.business = fixture({ club_id: 'c1', category: 'Golf Course', is_verified: true });
