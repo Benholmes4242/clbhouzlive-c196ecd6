@@ -9,8 +9,9 @@
 
 ## CB116 — Naming a coach
 - [x] Signed-in prerequisite waived by Ben 21:01 UTC; Ben confirms COACH_LINKS_V1 checks and scratch-tested seven-function shapes. No agent SQL or hosted-verification claim. Read errors hide the whole dependent card/line; connect route /manage/handicap.
-- [ ] Implement shared coach reads/writes, invitation/name/connect/manage/find sheets, You card sentences, personal hero line, team/public results and coach hero strip.
-- [ ] Add cb116NameCoach.test.tsx, run full suite; baseline last executed3,679/412 (3,677 passing), last green3,670/411. Pre-existing failures: holeInlineAutoplay.test.tsx:131:28 label lookup and holeMediaVideos.test.tsx:52:52 retired count selector; both remain outside CB116 and must be named, not corrected.
+- [x] Implemented shared coach reads/writes, invitation/name/connect/manage/find sheets, You card sentences, personal hero line, team/public results and coach hero strip. No hosted writes/SQL/config changes.
+- [x] Added41 tests in cb116NameCoach.test.tsx; no existing test changes/removals. Targeted40 passing/1 failing; full bunx vitest run3,693 passing/27 failing/3,720 total across413 files (+41/+1 from previous3,679/412; +9 earlier Media tests from last green3,670/411).
+- [ ] STOP: new cb116NameCoach.test.tsx:40:332 “server no_handicap opens connect and no success toast”: Error: Missing [data-coach-connect]. New24 profile regression failures share Error: No QueryClient set, use QueryClientProvider to set one at features/coach/hooks.ts:15:10 / BusinessCoachCards.tsx:20:77 (heroConnectExample14, heroConnectPanel5, profileBioFull5). No corrections after stop; exact cases in CB116_STOP_REPORT.md. Pre-existing holeInlineAutoplay.test.tsx:131:28 and holeMediaVideos.test.tsx:52:52 still fail untouched. Build OK21:06:55Z; authenticated/visual verification unavailable. Await explicit correction ruling.
 
 ## CB110 — Club review links and course Reviews landing
 - [x] Updated club links; CourseReviewsTab lands below measured sticky tabs through scrollElementIntoView. CourseDetailPage resets only on course entry, not landing-query cleanup. Public live 404×970 verified row top 48.14px / tabs bottom 48px, at consumed, no runtime errors; signed-in checks unavailable (external_unmanaged).
