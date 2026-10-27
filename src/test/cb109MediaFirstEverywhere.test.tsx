@@ -32,7 +32,7 @@ import { FeedCard } from '@/components/feed/FeedCard';
 import { ReviewPostCard } from '@/components/feed/ReviewPostCard';
 import { REVIEW_BODY_CLAMP } from '@/components/feed/reviewPostCard';
 
-const source = (path: string) => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
+const source = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8');
 const POST = {
   id: 'p1', userId: 'u9', actorType: 'personal', actorId: 'u9', displayName: 'Reviewer', avatarUrl: '',
   createdAt: '2026-10-26T00:00:00Z', caption: 'Review words', isReview: true, mediaItems: [],
