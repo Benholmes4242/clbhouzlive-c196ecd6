@@ -125,7 +125,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
     cells.push({
       key: 'rating', value: p.avgRating.toFixed(1),
       label: t('business.clubHero.reviews', { count: p.ratingsCount!, defaultValue: '{{count}} reviews' }),
-      color: p.avgRating >= 9 ? A.GREEN : INK, onTap: p.onRatingTap,
+      color: A.INK, onTap: p.onRatingTap,
     });
   }
   if ((p.roundsTracked ?? 0) >= 1) {

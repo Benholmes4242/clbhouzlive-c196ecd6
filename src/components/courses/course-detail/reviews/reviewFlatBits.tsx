@@ -157,8 +157,8 @@ export const FlatReviewRow: React.FC<FlatReviewRowProps> = ({
   const [expanded, setExpanded] = useState(false);
   const name = isMine ? 'You' : displayName;
   const score = review.rating ?? 0;
-  // Amber here means "yours", not a score band.
-  const scoreColor = isMine ? A.AMBER : courseSubScoreTone(score);
+  // Ownership stays on the name; every real rating figure is white.
+  const scoreColor = courseSubScoreTone(score);
   const helpfulCount = review.helpful_count ?? 0;
 
   const stripped = review.review ? stripMentionMarkup(review.review) : '';

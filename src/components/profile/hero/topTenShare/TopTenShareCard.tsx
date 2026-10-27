@@ -68,7 +68,7 @@ const FOOT_RULE = 'rgba(255,255,255,0.12)';
 /** §6: descender protection for overflow-hidden lines, spacing-neutral. */
 const CLIP: React.CSSProperties = { paddingBottom: 2, marginBottom: -2 };
 
-const scoreColor = (r: number | null | undefined) => (r != null && r >= 9 ? A.GREEN : A.INK);
+const scoreColor = (r: number | null | undefined) => A.INK;
 
 /** Story tiles/rows: "variant · region"; no variant: "region, sub_country". */
 const richPlace = (c: TopTenShareCourse, variant: string | null) =>

@@ -57,10 +57,7 @@ const CHIPS: Array<{ key: ChipKey; label: string; filter: BusinessReviewFilter; 
 
 /* Rating figures follow the canonical display tone; the wash stays structural. */
 function ratingTone(rating: number): { bg: string; fg: string } {
-  const fg = courseSubScoreTone(rating);
-  if (rating >= 9) return { bg: 'rgba(47,163,90,0.16)', fg };
-  if (rating >= 5) return { bg: A.SOFT, fg };
-  return { bg: 'rgba(255,107,107,0.16)', fg };
+  return { bg: A.SOFT, fg: A.INK };
 }
 
 function fmtRating(v: number | null): string {
@@ -227,12 +224,7 @@ function RatingChip({ rating }: { rating: number }) {
 function Distribution({ dist }: { dist: Array<{ bucket: number; count: number }> }) {
   const max = Math.max(...dist.map((d) => d.count), 1);
   const labels: Record<number, string> = { 5: '9-10', 4: '7-8', 3: '5-6', 2: '3-4', 1: '0-2' };
-  /* Each bucket spans a range, so it takes a REPRESENTATIVE score and the
-     canon colours it. courseSubScoreTone is BINARY: A.GREEN at 9.0 and
-     above, A.MUTE below. So bucket 5 is the only green bar, and that is
-     why the band boundary is 9.0 and not 8.0 — green on this page must
-     mean what green means on every course card. If the SQL banding ever
-     moves off 9, this colour stops being true. */
+  /* Rating bucket fills share white ink; bucket boundaries stay unchanged. */
   const BUCKET_REP_SCORE: Record<number, number> = {
     5: 9.5,   // 9-10
     4: 7.5,   // 7-8

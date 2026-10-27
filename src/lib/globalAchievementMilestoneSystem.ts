@@ -52,6 +52,7 @@ import {
   getRingColorForTotalPlayed,
   type AchievementColorTheme,
 } from './clbhouzAchievementPalette';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // MILESTONE THEMES (5 → 400 Club)
@@ -99,7 +100,7 @@ export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = Object.fr
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // COURSE RATING THEMES (Poor → Exceptional) — 5-tier system (April 2026 rebalance)
-// All tiers render amber per the unified single-color rating decision.
+// All rating tiers render white; achievement and milestone themes stay untouched.
 // Bandings: EXCEPTIONAL ≥9.0 · EXCELLENT 7.5–8.9 · GOOD 6.0–7.4 · FAIR 4.0–5.9 · POOR <4.0
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
@@ -126,14 +127,14 @@ export interface RatingTheme {
 // constants below back to distinct theme objects.
 const RATING_AMBER = '#f59e0b';
 const amberTheme = {
-  accent: RATING_AMBER,
+  accent: A.INK,
   bgLight: '#f59e0b0D',
   bgDark: '#f59e0b1A',
   bgClass: 'bg-[#f59e0b]/10',
   borderClass: 'border-[#f59e0b]/30',
-  textClass: 'text-[#d97706]',
-  barFillClass: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
-  gradient: 'linear-gradient(to right, #f59e0b, #fbbf24)',
+  textClass: 'text-[color:var(--rating-score-ink)]',
+  barFillClass: 'bg-[color:var(--rating-score-ink)]',
+  gradient: `linear-gradient(to right, ${A.INK}, ${A.INK})`,
 };
 
 // All five rating tiers currently resolve to the same amber; never use a
@@ -329,6 +330,7 @@ export function getRingColorForThreshold(threshold: number): string {
  * @returns Hex color string for avatar ring
  */
 export { getRingColorForTotalPlayed } from './clbhouzAchievementPalette';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /**
  * Get theme for any achievement type
@@ -440,3 +442,4 @@ export const RATING_CSS_VARS = {
 
 // Re-export palette and helpers
 export { CLBHOUZ_ACHIEVEMENT_PALETTE, THEME_COLORS, buildTheme } from './clbhouzAchievementPalette';
+import { A } from '@/features/courses/components/holes/analytical/tokens';

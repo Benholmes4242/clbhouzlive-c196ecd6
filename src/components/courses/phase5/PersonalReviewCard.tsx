@@ -13,7 +13,7 @@ import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { useNavigate } from 'react-router-dom';
 import { formatMonthDayYearShort } from '@/i18n/format';
 import {
-  SubScoreBar, BAND_GREEN_DARK, BAND_RED_DARK,
+  SubScoreBar,
 } from '@/features/courses/_shared/scoreBands';
 import { MentionText } from '@/components/mentions/MentionText';
 import { stripMentionMarkup } from '@/lib/mentions/format';
@@ -22,12 +22,10 @@ import {
 } from '@/features/courses/components/holes/analytical/tokens';
 
 /**
- * Dark-canvas score inks (BRIEF_ONE_GREEN). The local '#0F8F4A' / '#C8372B'
- * pair was a second byte-identical copy of an ink tuned for white; scoreBands
- * documents that failure and supplies the dark variants.
+ * Rating comparisons use white ink, not handicap or to-par movement colours.
  */
-const UNDER = BAND_GREEN_DARK;
-const OVER = BAND_RED_DARK;
+const UNDER = A.INK;
+const OVER = A.INK;
 
 interface PersonalReviewCardProps {
   courseId: string;

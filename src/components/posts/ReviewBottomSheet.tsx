@@ -665,7 +665,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                       </div>
                       {value != null && (
                         <div data-review-subscore-track style={{ position: 'relative', height: 4, borderRadius: 999, background: A.TRACK, marginTop: 6 }}>
-                          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(100, value * 10))}%`, borderRadius: 999, background: value >= 9 ? A.GREEN : A.DIM }} />
+                          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(100, value * 10))}%`, borderRadius: 999, background: A.INK }} />
                           {courseAvg != null && (
                             <div data-review-subscore-tick style={{ position: 'absolute', top: -2.5, left: `${Math.max(0, Math.min(100, courseAvg * 10))}%`, width: 1.5, height: 9, borderRadius: 1, background: MUTE }} />
                           )}

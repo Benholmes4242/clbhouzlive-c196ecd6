@@ -20,7 +20,7 @@ import { RankFlagBadge } from './RankFlagBadge';
  * are siblings by construction, not by discipline.
  *
  * ONE FIGURE PER TILE. A Top 100 course wears its RANK CHIP; anything else
- * wears its RATING, green at 9.0 and above. Never both, and never an invented
+ * wears its RATING, white for every real value. Never both, and never an invented
  * figure — a course with neither renders no chip at all.
  */
 
@@ -84,7 +84,7 @@ export function CourseShelf({
             /* No review count on this tile, so the floor applies (V.3). */
             figure={row.rank != null ? null : ratingRankable(row.rating, row.ratingCount) ? row.rating.toFixed(1) : null}
             /* Neutral keeps the component's white default over photography. */
-            figureTone={row.rank == null && ratingRankable(row.rating, row.ratingCount) && row.rating >= 9 ? courseSubScoreTone(row.rating) : undefined}
+            figureTone={row.rank == null && ratingRankable(row.rating, row.ratingCount) ? courseSubScoreTone(row.rating) : undefined}
             whenLabel=""
             who=""
             isOwn={false}
