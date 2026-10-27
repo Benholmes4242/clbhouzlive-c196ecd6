@@ -5,12 +5,12 @@ import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { formatNumber } from '@/i18n/format';
-import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
+import { courseNameWithinClub, courseActivityClubName } from '@/features/courses/_shared/courseLabel';
 import { useBusinessCourseActivity } from '@/hooks/useBusinessCourseActivity';
 import { changeOf, changeText } from './InsightsFunnel';
 import { postDate } from './InsightsPostsSection';
 
-export const courseActivityClubName = (name: string) => name.trim().replace(/\s+(?:Golf Club|Golf Course|GC)$/i, '').trim();
+export { courseActivityClubName } from '@/features/courses/_shared/courseLabel';
 const bolded = (s: string) => s.split(/<b>(.*?)<\/b>/g).map((part, i) => i % 2 ? <b key={i}>{part}</b> : part);
 
 export function InsightsCourseSection({ businessId, businessName, days, onNavigate }: {

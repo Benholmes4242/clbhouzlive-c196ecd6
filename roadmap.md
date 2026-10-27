@@ -1,9 +1,10 @@
 # Roadmap
 
 ## CB104 — Club profile: You and the club
-- [ ] Resolve heading placement: written section 2 calls “You and {club}” the title, while the signed-off mock makes it the kicker and rounds copy the title.
-- [ ] Add viewer card from existing per-course stats/circle reads and fix nation-valued city/region fields; preserve club-only scope.
-- [ ] Add CB104 cases and place-line cases; report round definitions and full-suite counts. Prior all-white rating duplicate-import and two colour assertion failures remain pre-existing blockers, outside this brief.
+- [x] Founder chose mock arrangement: small uppercase club kicker and larger rounds/best sentences. Added keyed per-course collectors reusing stats/circle hooks, merged followed golfers and nation-valued place filtering; shared activity-name helper re-export preserves Insights consumers.
+- [x] Added cb104ClubYou.test.tsx: 29/29, including four place-line cases. Existing tests unchanged. `bunx vitest run src/test/cb104ClubYou.test.tsx src/test/cb103ClubHero.test.tsx src/test/cb99InsightsCourse.test.tsx`: 78/78 across 3 files.
+- [ ] Full verification blocked by inherited all-white failures: `bunx vitest run`: 3,253 passed / 2 failed / 3,255 executed, 377 passed / 16 failed / 393 total files; +29/+1 from prior executed 3,226/392, solely cb104ClubYou.test.tsx. Candidate inventory 3,413/393, not successfully collected. Same 14 duplicate-import collection failures and two colour assertions; no new failures. Build still reports globalAchievementMilestoneSystem.ts(55,10),(333,10),(445,10): `error TS2300: Duplicate identifier 'A'.` No out-of-scope corrections made.
+- [ ] your_rounds/your_best RPC definition absent locally: hole count, gross basis and window cannot be verified without Ben's authoritative definition. Existing fields used unchanged. Screenshot shows inherited compiler overlay, not club card; live signed-in verification also unavailable (external_unmanaged). Report in Files.
 
 ## All-white course and review ratings — 27 October 2026
 - [ ] Apply colours-only ruling across helpers, local displays and wizard; preserve null dim states and non-rating colours.

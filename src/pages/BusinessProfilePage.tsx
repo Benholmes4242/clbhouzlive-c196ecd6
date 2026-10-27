@@ -64,6 +64,7 @@ import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useTranslation } from 'react-i18next';
 import { A, Panel, LABEL, NUM } from '@/features/courses/components/holes/analytical/tokens';
 import { BusinessCoursePanel, type BusinessClubCourse } from '@/components/business/BusinessCoursePanel';
+import { ClubYouCard } from '@/components/business/ClubYouCard';
 import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
 import { BusinessProfileHero } from '@/components/business/hero/BusinessProfileHero';
 import { useVerificationEvidence } from '@/components/business/verification/useVerificationEvidence';
@@ -553,6 +554,8 @@ const BusinessProfilePage: React.FC = () => {
         }
       />
       )}
+
+      <ClubYouCard isClub={isClub} viewerId={user?.id} courses={courses} businessName={business.name} />
 
       {/* ----- Bio on canvas (no card) ----- */}
       {!isClub && bioText && (

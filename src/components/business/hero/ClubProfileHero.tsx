@@ -39,7 +39,8 @@ export function clubPlaceLine(
   { city, region, country, firstCourseRegion, courseCount }: ClubPlaceInput,
   labels: { golfClub: string; courses: (n: number) => string },
 ): string {
-  const own = [city, region].map((s) => s?.trim()).filter(Boolean).join(', ');
+  const nations = new Set(['england', 'scotland', 'wales', 'northern ireland', 'ireland', 'republic of ireland', 'united kingdom', 'uk', 'great britain', 'britain', 'britain & ireland', country?.trim().toLowerCase()]);
+  const own = [city, region].map((s) => s?.trim()).filter((s) => s && !nations.has(s.toLowerCase())).join(', ');
   const place = own || firstCourseRegion?.trim() || country?.trim() || '';
   return [labels.golfClub, place, courseCount >= 2 ? labels.courses(courseCount) : '']
     .filter(Boolean)

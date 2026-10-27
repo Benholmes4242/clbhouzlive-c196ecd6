@@ -21,6 +21,11 @@
 @tailwind utilities;
 
 :root {
+  --club-you-card: #17171B;
+  --club-you-hair: rgba(255,255,255,0.08);
+  --club-you-ink: #F8FAFC;
+  --club-you-muted: rgba(248,250,252,0.62);
+  --club-you-avatar: #3a3a42;
   --tee-sheet-card:#17171B;
   --tee-sheet-line:rgba(255,255,255,.08);
   --tee-sheet-inset:#1E1E23;
@@ -30,6 +35,19 @@
   --tee-sheet-bar:rgba(248,250,252,.28);
   --tee-sheet-quiet:rgba(248,250,252,.12);
 }
+
+/* CB104 is a local signed-off card/face-stack treatment, not shared avatars. */
+.club-you-card { background:var(--club-you-card); border:1px solid var(--club-you-hair); border-radius:18px; padding:16px; margin:16px 16px 14px; color:var(--club-you-ink); }
+.club-you-kicker { font-size:10.5px; font-weight:800; letter-spacing:0.16em; text-transform:uppercase; color:var(--club-you-muted); margin:0 0 10px; overflow-wrap:anywhere; }
+.club-you-title { font-size:17px; font-weight:700; line-height:1.3; letter-spacing:0; margin:0; overflow-wrap:anywhere; }
+.club-you-title span { color:var(--club-you-muted); }
+.club-you-faces { display:flex; align-items:center; gap:10px; margin-top:14px; padding-top:12px; border-top:1px solid var(--club-you-hair); }
+.club-you-stack { display:flex; flex:none; }
+.club-you-avatar { box-sizing:border-box; width:28px; height:28px; border-radius:50%; border:2px solid var(--club-you-card); background:var(--club-you-avatar); margin-left:-8px; display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:700; overflow:hidden; color:var(--club-you-ink); }
+.club-you-avatar:first-child { margin-left:0; }
+.club-you-avatar img { width:100%; height:100%; object-fit:cover; }
+.club-you-faces p { min-width:0; margin:0; font-size:13px; line-height:1.4; color:var(--club-you-muted); overflow-wrap:anywhere; }
+.club-you-faces b { color:var(--club-you-ink); font-weight:600; }
 
 /* Review-only upload tokens and fixed tile states; post composer stays unchanged. */
 :root {
