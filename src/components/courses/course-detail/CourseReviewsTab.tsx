@@ -40,7 +40,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { openWithOrigin } from '@/lib/openWithOrigin';
-import { getPageScrollTop, getPrimaryScrollElement, scrollPageTo } from '@/lib/getScrollParent';
+import { scrollElementIntoView } from '@/lib/getScrollParent';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
@@ -459,14 +459,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       const row = reviewRoot.current?.querySelector<HTMLElement>('[data-review-id]');
       if (!explicitTarget && reviews.length > 0 && !row) return;
       if (!explicitTarget && row) {
-        const scroller = getPrimaryScrollElement();
-        if (!scroller) return;
         const tabs = reviewRoot.current?.closest('[data-course-detail]')
           ?.querySelector<HTMLElement>('[data-course-review-tabs]');
         const stickyTop = tabs ? Number.parseFloat(getComputedStyle(tabs).top) || 0 : 0;
         const inset = stickyTop + (tabs?.getBoundingClientRect().height ?? 0);
-        scrollPageTo(getPageScrollTop() + row.getBoundingClientRect().top
-          - scroller.getBoundingClientRect().top - inset, 'auto');
+        scrollElementIntoView(row, { offset: inset, behavior: 'auto' });
       }
       setSearchParams((prev) => {
         const next = new URLSearchParams(prev);
