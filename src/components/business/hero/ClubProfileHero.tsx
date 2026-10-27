@@ -114,7 +114,7 @@ interface Props {
   /** CB112 — Insights pill tone in the team row; clubs keep glass. */
   insightsTone?: 'white' | 'glass';
   /** CB112 — overrides the club's rating/rounds/members cells. */
-  stripCells?: Array<{ key: string; value: string; label: string; onTap?: () => void }>;
+  stripCells?: Array<{ key: string; value: string; label: string; color?: string; onTap?: () => void }>;
 }
 
 const pill = (kind: 'white' | 'glass'): React.CSSProperties => ({

@@ -71,6 +71,9 @@ import { ClubYouCard } from '@/components/business/ClubYouCard';
 import { BusinessYouCard } from '@/components/business/BusinessYouCard';
 import { BusinessNearbyCourses, scrollToNearbyCard } from '@/components/business/BusinessNearbyCourses';
 import { BusinessFollowersCard } from '@/components/business/BusinessFollowersCard';
+import { BusinessCoachInvite, BusinessCoachResults, coachStrip, scrollToCoachResults } from '@/features/coach/BusinessCoachCards';
+import { isCoachCategory } from '@/features/coach/contracts';
+import { useCoachResults } from '@/features/coach/hooks';
 import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
 import { businessCategoryWord, businessPlaceLine, businessSecondPill, businessStripKeys } from '@/lib/business/businessHero';
 import { useBusinessNearbyCounts } from '@/hooks/useBusinessNearbyCounts';
@@ -115,7 +118,9 @@ const BusinessProfilePage: React.FC = () => {
   // Status bar transparency is owned by AppRoutes/applyRouteChrome (single owner).
 
   const { data: business, isLoading, error, refetch } = useBusinessProfile(idOrSlug);
-  const { data: membership } = useBusinessMembership(business?.id);
+  const membershipQuery = useBusinessMembership(business?.id);
+  const { data: membership } = membershipQuery;
+  const coachResults = useCoachResults(business?.id, user?.id, isCoachCategory(business?.category) && !business?.club_id);
   const { data: postsCount = 0 } = useBusinessPostsCount(business?.id);
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
   const { data: teamMembers } = useBusinessTeam(business?.id);
@@ -440,7 +445,7 @@ const BusinessProfilePage: React.FC = () => {
     followers: t('business.hero.followers', { defaultValue: 'Followers' }),
     posts: t('business.hero.posts', { defaultValue: 'Posts' }),
   };
-  const bizStrip = businessStripKeys(business.category, stripValues).map((k) => ({
+  const standardBizStrip = businessStripKeys(business.category, stripValues).map((k) => ({
     key: k,
     value: (stripValues[k] as number).toLocaleString(),
     label: stripLabels[k],
@@ -452,6 +457,14 @@ const BusinessProfilePage: React.FC = () => {
           ? scrollToNearbyCard
           : undefined,
   }));
+  const bizStrip = !isClub && isCoachCategory(business.category)
+    ? coachStrip(coachResults.isSuccess && !coachResults.isError ? coachResults.data : null, followersCount, postsCount).map(cell => ({
+      ...cell, color: cell.improved ? 'var(--coach-green)' : undefined,
+      label: t(`coach.strip.${cell.key}`),
+      onTap: cell.key === 'coached' || cell.key === 'avgChange' ? scrollToCoachResults
+        : cell.key === 'followers' ? () => navigate(`/business/${business.slug || business.id}/followers`)
+        : () => { setActiveTab('posts'); tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); },
+    })) : standardBizStrip;
 
   const tabs: Array<{ id: BusinessTab; label: string }> = [
     { id: 'posts', label: 'Posts' },
@@ -545,6 +558,8 @@ const BusinessProfilePage: React.FC = () => {
       <ClubYouCard isClub={isClub} viewerId={user?.id} courses={courses} businessName={business.name} />
       {/* CB113 — the non-club "You and …" card in ClubYouCard's place. */}
       <BusinessYouCard isClub={isClub} viewerId={user?.id} business={business} />
+      <BusinessCoachInvite business={business} viewerId={user?.id} isClub={isClub} isTeam={!!membership} membershipReady={membershipQuery.isSuccess && !membershipQuery.isError} />
+      <BusinessCoachResults business={business} viewerId={user?.id} isClub={isClub} isTeam={!!membership && !membershipQuery.isError} />
       {/* CB114 — Courses nearby (non-club nearby categories), before the tabs. */}
       <BusinessNearbyCourses isClub={isClub} viewerId={user?.id} business={business} />
       {/* CB115 — Their followers (every non-club business), before the tabs. */}

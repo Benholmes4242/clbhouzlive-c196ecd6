@@ -1,4 +1,100 @@
 {
+  "coach": {
+    "inviteKicker": "Coached here?",
+    "inviteTitle": "Name {{name}} as your coach.",
+    "inviteSwitch": "Switch your coach to {{name}}?",
+    "inviteLead": "Your official handicap will show what their coaching is doing for you, and it counts towards their results, without your name.",
+    "how": "How it works",
+    "nameAction": "Name as my coach",
+    "switchAction": "Switch coach",
+    "nameTitle": "Name {{name}} as your coach",
+    "switchTitle": "Switch your coach to {{name}}",
+    "switchLine": "{{name}} stops counting today. Your time with them stays in their totals, without your name.",
+    "steps": {
+      "1": {
+        "title": "Counting starts today.",
+        "body": "Your official handicap from today onwards is measured. Rounds before today never count."
+      },
+      "2": {
+        "title": "It shows you your progress.",
+        "body": "Their page and yours show how far your handicap has moved since today."
+      },
+      "3": {
+        "title": "It counts towards their results.",
+        "body": "Their page shows the average change across everyone who has named them. Your handicap is in that total; your name is not, unless you allow it below."
+      },
+      "4": {
+        "title": "One coach at a time.",
+        "body": "Change or stop any time in Edit profile, Your coach."
+      }
+    },
+    "show": "Show on my profile",
+    "showSub": "\"Coached at {{name}}\" under your name",
+    "share": "Let them see my name",
+    "shareSub": "In their list of golfers. Off: you're only in their totals",
+    "notNow": "Not now",
+    "namedToast": "{{name}} is now your coach. Your progress counts from today.",
+    "error": "Something went wrong. Please try again.",
+    "you": "You named {{name}} as your coach {{when}}.",
+    "when": {
+      "today": "today",
+      "month": "in {{month}}",
+      "year": "in {{month}} {{year}}"
+    },
+    "nextRound": "Your progress shows here after your next round.",
+    "downSince": "You're down {{change}} since, from {{start}} to {{current}}.",
+    "upSince": "You're up {{change}} since, from {{start}} to {{current}}.",
+    "levelSince": "You're level since, at {{current}}.",
+    "connectTitle": "Connect your handicap first",
+    "connectBody": "Naming a coach measures your official handicap from today. Connect your England Golf handicap and you can name {{name}} straight after.",
+    "connectAction": "Connect my handicap",
+    "coachedAt": "Coached at",
+    "yourCoach": "Your coach",
+    "notSet": "Not set",
+    "since": "Since {{date}}",
+    "sinceProgress": "Since {{date}}. {{progress}}",
+    "progressNext": "Progress shows after your next round.",
+    "progressDown": "Down {{change}} since.",
+    "progressUp": "Up {{change}} since.",
+    "progressLevel": "Level since.",
+    "listDown": "Down {{change}}",
+    "listUp": "Up {{change}}",
+    "listLevel": "Level",
+    "stopBody": "If you stop, your progress stops counting from that day. The time you were with them stays in their totals, without your name, so leaving can never make anyone's results look better or worse than they were.",
+    "stopAction": "Stop naming them as my coach",
+    "stoppedToast": "You've stopped naming {{name}} as your coach.",
+    "changeAction": "Change coach",
+    "findTitle": "Find your coach",
+    "resultsKicker": "Their golfers' results",
+    "golfers_one": "{{count}} golfer",
+    "golfers_other": "{{count}} golfers",
+    "avgBody": "average change in handicap since golfers named {{name}} as their coach",
+    "legend": {
+      "down": "down",
+      "level": "within 0.5",
+      "up": "up"
+    },
+    "chartLabel": "Average handicap, months since naming them",
+    "start": "Start",
+    "months12": "12 months",
+    "resultsFoot": "From official handicaps, starting the day each golfer named them. The line turns dashed where fewer than 10 golfers reach that month. Shown once 10 golfers have played a round since naming them.",
+    "resultsHow": "How these results work",
+    "teamKicker": "Your golfers' results",
+    "ofTen": "{{n}} of 10",
+    "activeTitle_one": "{{count}} golfer has named you as their coach.",
+    "activeTitle_other": "{{count}} golfers have named you as their coach.",
+    "teamLead": "Your results show on your page once 10 have. Golfers name you from your page or their profile.",
+    "namedKicker": "Golfers who named you",
+    "namedOf": "{{n}} of {{active}}",
+    "more_one": "{{count}} more has named you without sharing their name.",
+    "more_other": "{{count}} more have named you without sharing their name.",
+    "strip": {
+      "coached": "Golfers coached",
+      "avgChange": "Avg handicap",
+      "followers": "Followers",
+      "posts": "Posts"
+    }
+  },
   "profile": {
     "courses": {
       "map": {

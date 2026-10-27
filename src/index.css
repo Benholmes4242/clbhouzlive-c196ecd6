@@ -21,6 +21,14 @@
 @tailwind utilities;
 
 :root {
+  --coach-canvas:#0B0B0D;
+  --coach-green:#34D399;
+  --coach-danger:#F87171;
+  --coach-level:rgba(248,250,252,.35);
+  --coach-up:rgba(248,250,252,.14);
+  --coach-grid:rgba(255,255,255,.06);
+  --coach-progress:rgba(248,250,252,.78);
+  --coach-control-hair:rgba(255,255,255,.14);
   --media-v2-ink: #F8FAFC;
   --media-v2-photo-ink: #FFFFFF;
   --media-v2-canvas: #0A0A0C;

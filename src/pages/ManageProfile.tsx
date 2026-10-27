@@ -45,6 +45,7 @@ import { PERSONAL_COVER_ASPECT, PERSONAL_COVER_ASPECT_CSS } from '@/lib/tokens/c
 import { CoverGuidance } from '@/components/profile/edit-v2/CoverGuidance';
 import { ProfilePhotoCard, type ProfilePhotoCardHandle } from '@/components/profile/edit-v2/ProfilePhotoCard';
 import { HomeClubCard } from '@/components/profile/edit-v2/HomeClubCard';
+import { YourCoachRow } from '@/features/coach/CoachSheets';
 import { useHomeClubStatus } from '@/features/home-club/useHomeClubStatus';
 import { AdditionalClubsList } from '@/components/profile/edit-v2/AdditionalClubsList';
 import { VisibilityRow, type VisibilityValue } from '@/components/profile/edit-v2/VisibilityDropdown';
@@ -706,6 +707,7 @@ function ProfileTabBody({
               Your home club appears on your profile and leaderboards
             </Nudge>
           )}
+          <YourCoachRow viewerId={user?.id} />
         </ManageCard>
 
         <ManageCard>
