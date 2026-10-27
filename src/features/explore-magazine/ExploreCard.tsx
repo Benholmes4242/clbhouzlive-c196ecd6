@@ -910,6 +910,7 @@ export function ExploreCard({
   medals,
   bleed,
   feedPlot,
+  feedLayout,
   isFollowed,
   onFollow,
 }: {
@@ -942,6 +943,13 @@ export function ExploreCard({
    *  in the scorecard ramp. Explore and Profile never pass it, so their tiles
    *  are byte-identical. */
   feedPlot?: boolean;
+  /** CB111 — FEEDCARD MEDIAFIRST ROUNDS ONLY. 'scoreLed' reorders the round
+   *  card: author row, the gross-led score block, the course name, the chart,
+   *  and NO engagement of the card's own (FeedCard appends the shared
+   *  media-first footer). Absent everywhere else, so ExploreMagazine,
+   *  FeaturedRoundCard and FeedCard's standard layout render exactly as
+   *  today. */
+  feedLayout?: 'scoreLed';
 }) {
   const { t, i18n } = useTranslation('courses');
   const locale = i18n.language || 'en';
