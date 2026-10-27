@@ -106,6 +106,7 @@ export function placeShotsToFeedPosts(rows: readonly MemberShotRow[], courseName
     ...shot, item: { ...shot.item, memberShot: { ...shot.item.memberShot,
       kicker: label, title: shortCoursePart(courseName), detail: undefined,
       credit: shot.item.memberShot?.credit ?? '', memberName: shot.item.memberShot?.memberName ?? '',
+      avatarUrl: shot.item.memberShot?.avatarUrl ?? null,
     } },
   }));
   return syntheticPost(`shots:place:${courseId}:${place}`, courseId, courseName, label, null, shots);
