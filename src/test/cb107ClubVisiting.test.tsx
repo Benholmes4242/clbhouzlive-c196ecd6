@@ -156,20 +156,28 @@ describe('CB107 Visiting contacts', () => {
     fireEvent.click(row('website')); expect(openExternalUrl).toHaveBeenLastCalledWith('https://club.example');
   });
   it('phone is present only when set and invokes tel with call tracking', () => {
+    const location = { href: '' } as Location;
+    const locationSpy = vi.spyOn(window, 'location', 'get').mockReturnValue(location);
     const { rerender } = card();
     expect(document.querySelector('[data-visiting-row="phone"]')).toBeNull();
     rerender(<ClubVisiting business={fixture({ phone: '02000000000' })} viewerId="u1" />);
     fireEvent.click(row('phone'));
+    expect(location.href).toBe('tel:02000000000');
     expect(trackBusinessAction).toHaveBeenCalledWith('b1', 'call', 'u1');
     expect(openExternalUrl).not.toHaveBeenCalled();
+    locationSpy.mockRestore();
   });
   it('email is present only when set and invokes mailto without action tracking', () => {
+    const location = { href: '' } as Location;
+    const locationSpy = vi.spyOn(window, 'location', 'get').mockReturnValue(location);
     const { rerender } = card();
     expect(document.querySelector('[data-visiting-row="email"]')).toBeNull();
     rerender(<ClubVisiting business={fixture({ email: 'office@club.example' })} viewerId="u1" />);
     expect(row('email').querySelector('i')?.textContent).toBe('office@club.example');
     fireEvent.click(row('email')); expect(trackBusinessAction).not.toHaveBeenCalled();
+    expect(location.href).toBe('mailto:office@club.example');
     expect(openExternalUrl).not.toHaveBeenCalled();
+    locationSpy.mockRestore();
   });
   it('facilities retain stored order', () => {
     const { container } = card({ amenities: ['Pro shop', 'Driving range', 'Restaurant'] });
