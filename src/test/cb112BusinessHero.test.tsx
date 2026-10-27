@@ -62,10 +62,8 @@ vi.mock('@/components/common/ScrollToTopGlass', () => ({ default: () => null }))
 vi.mock('@/components/layout/PageRoot', () => ({ PageRoot: ({ children }: { children: ReactNode }) => <div data-page-root="">{children}</div> }));
 vi.mock('@/hooks/useBusinessNearbyCounts', async (orig) => ({
   ...(await orig<typeof import('@/hooks/useBusinessNearbyCounts')>()),
-  useBusinessNearbyCounts: (...a: unknown[]) => (state.nearbyReal ? state.nearbyReal(...a) : { data: state.nearby }),
+  useBusinessNearbyCounts: () => ({ data: state.nearby }),
 }));
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(state as any).nearbyReal = null;
 
 import BusinessProfilePage from '@/pages/BusinessProfilePage';
 import { openExternalUrl } from '@/utils/median/openExternalUrl';
@@ -279,7 +277,7 @@ describe('CB112 clubs unchanged', () => {
   it('club keeps the tee-time pill, Your courses white and its own cells', async () => {
     state.courses = [{ id: 'k1', name: 'Sundridge', region: 'Kent', country: 'England', thumbnail_image: null }];
     state.membership = { role: 'owner', canViewInsights: true, canManage: true };
-    state.business = fixture({ club_id: 'c1', category: 'Golf Course', is_verified: true, followers: 0 });
+    state.business = fixture({ club_id: 'c1', category: 'Golf Course', is_verified: true });
     const { container } = renderPage();
     await waitFor(() => expect(container.querySelector('[data-club-place]')!.textContent).toContain('Golf club'));
     const yc = screen.queryByRole('button', { name: 'Your courses' });
