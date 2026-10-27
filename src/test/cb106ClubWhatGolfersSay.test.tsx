@@ -113,8 +113,10 @@ describe('CB106 latest review', () => {
   it('clamps the review text to three lines', () => {
     mount();
     const text = card().querySelector('[data-club-say-text]') as HTMLElement;
-    expect(text.getAttribute('style')).toContain('-webkit-line-clamp: 3');
-    expect(text.style.overflow).toBe('hidden');
+    expect(text.className).toContain('club-say-clamp');
+    const css = readFileSync(resolve(__dirname, '../index.css'), 'utf8');
+    expect(css).toMatch(/\.club-say-clamp\s*\{[^}]*-webkit-line-clamp:\s*3/);
+    expect(css).toMatch(/\.club-say-clamp\s*\{[^}]*overflow:\s*hidden/);
   });
   it('meta carries the course short name on multi-course clubs', () => {
     mount();
