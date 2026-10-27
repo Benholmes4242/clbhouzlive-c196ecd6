@@ -49,7 +49,7 @@ describe('Stage1 hole video display and lifecycle', () => {
     render(<QueryClientProvider client={cache}><HoleWalk available holes={[hole]} rows={[row]} totalMedia={1} onAddFirst={() => {}} /></QueryClientProvider>);
     const tile = screen.getByRole('button', { name: 'Hole 7' });
     expect(tile.querySelector('img')).toHaveAttribute('src', '/poster.jpg');
-    expect(tile.querySelector('.hole-walk-count')).toHaveTextContent('1');
+    expect(tile.querySelector('.media-v2-hole-count')).toHaveTextContent('1 shot');
     fireEvent.click(tile);
     const panel = screen.getByRole('region');
     expect(screen.queryByRole('button', { name: 'Play video' })).toBeNull();

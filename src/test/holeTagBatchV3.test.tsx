@@ -120,9 +120,9 @@ describe('thumbnails and hero', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Shot 5 of 12' }));
     expect(baseElement.querySelector('[data-chip]')?.textContent).toBe('5 / 12');
   });
-  it('no Skip or Done button exists', () => {
+  it('member Skip exists and Done remains absent', () => {
     render(<HolePhotoBatchPath photos={shots(2)} knownHoles={[4]} onTag={ok()} onClose={() => {}} />);
-    expect(screen.queryByRole('button', { name: /Skip/ })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Skip' })).toBeEnabled();
     expect(screen.queryByRole('button', { name: /^Done$/ })).toBeNull();
   });
   it('renders all 100 shots in one non-wrapping row; sheet keeps its max-height rules', () => {
@@ -193,10 +193,11 @@ describe('picker has no used-hole treatment', () => {
     const src = readFileSync('src/components/course-media-tab/HolePhotoPicker.tsx', 'utf8');
     expect(src).not.toMatch(/IMPROVED|usedHoles|already tagged/);
   });
-  it('tag dialog keeps tap-to-tag with no note', () => {
+  it('tag dialog selects then confirms with no note', () => {
     const submit = vi.fn();
     render(<HolePhotoTagDialog imageUrl="/p.jpg" holeCount={3} knownHoleNumbers={[1, 2, 3]} pending={false} error={null} onClose={() => {}} onSubmit={submit} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 2' })); expect(submit).toHaveBeenCalledWith(2);
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 2' })); expect(submit).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' })); expect(submit).toHaveBeenCalledWith(2);
     expect(screen.queryByText(/already tagged/)).toBeNull();
   });
 });

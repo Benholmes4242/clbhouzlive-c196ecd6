@@ -36,6 +36,7 @@ describe('single-shot toast', () => {
     render(<MemoryRouter><QueryClientProvider client={qc}><CourseMediaTabNew courseId="course" /></QueryClientProvider></MemoryRouter>);
     fireEvent.click(await screen.findByRole('button', { name: 'open-tag' }));
     fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Hole 9' }));
+    fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Confirm tag' }));
     await waitFor(() => expect(f.toast).toHaveBeenCalledWith('Tag confirmed. This is your second tag on the 9th.'));
     expect(screen.queryByRole('dialog')).toBeNull();
   });

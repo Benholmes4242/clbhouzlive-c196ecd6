@@ -71,6 +71,13 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
     const row = existingPlaceTags.find(r => holeMediaKey({ url: r.media_url, mediaType: r.media_type, streamId: r.stream_id }) === holeMediaKey(p as OwnMediaSource));
     return row ? [[p.url, row]] : [];
   })));
+  useEffect(() => {
+    const first = photos[0];
+    const row = first ? placeRows[first.url] : undefined;
+    if (row) { setPlace(row.place as CoursePlace); setSegment('place'); }
+    // The opening selection is consumed once; subsequent thumbnails own selection.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [existing] = useState(() => [...existingHoleTags]);
   const [currentUrl, setCurrentUrl] = useState<string | undefined>(() => photos[0]?.url);
   const [tags, setTags] = useState<Readonly<Record<string, number>>>({});
