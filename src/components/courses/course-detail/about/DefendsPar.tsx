@@ -148,14 +148,14 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
                 height: Math.max(2, (Math.max(0, h.avg_to_par) / max) * CHART_H),
                 borderRadius: 1.5,
                 background:
-                  h.hole_no === v.hardest.hole_no ? A.AMBER : h.hole_no === v.easiest.hole_no ? A.GREEN : BAR_NEUTRAL,
+                  h.hole_no === v.hardest.hole_no ? A.RED : h.hole_no === v.easiest.hole_no ? A.GREEN : BAR_NEUTRAL,
               }}
             />
           ))}
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: `repeat(${v.holes.length}, minmax(0, 1fr))`, gap: 4, marginTop: 6 }}>
           {v.holes.map((h) => {
-            const hi = h.hole_no === v.hardest.hole_no ? A.AMBER : h.hole_no === v.easiest.hole_no ? A.GREEN : null;
+            const hi = h.hole_no === v.hardest.hole_no ? A.RED : h.hole_no === v.easiest.hole_no ? A.GREEN : null;
             return (
               <span
                 key={h.hole_no}
