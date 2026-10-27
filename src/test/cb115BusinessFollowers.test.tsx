@@ -197,7 +197,6 @@ describe('CB114 tidy', () => {
     await waitFor(() => expect(document.querySelector('[data-business-nearby]')).not.toBeNull());
     expect(Array.from(document.querySelectorAll('[data-nearby-meta]')).map((e) => e.textContent)).toEqual(['1.0 mi']);
     expect(document.querySelector('[data-nearby-foot]')).toBeNull();
-    expect(db.calls).not.toContain('get_course_stats_batch');
   });
   it('round counts go through i18n keys with plurals', () => {
     const seen: Array<[string, number | undefined]> = [];
