@@ -1,5 +1,9 @@
 # Roadmap
 
+## Final photography-rating correction
+- [x] Restored PHOTO_WHITE in the two specified ExploreCard photo-chip sites; removed CourseShelf figureTone override. ExploreCard retains its helper import for two other existing consumers.
+- [x] Renamed/retargeted only the authorised courseRatingConsistency photography case; retained both comment checks. Audit found no other colour expectations to retarget; exploreHeroCard.test.tsx unchanged, 30/30 passing. Full `bunx vitest run`: 3,413/3,413 across 393 files, unchanged inventory, zero failures. Build OK at 2026-10-27T09:00:42Z; ExploreCard module HTTP 200. All inherited ratings blockers below resolved; CB104's independent data-definition/sign-in verification remains unavailable.
+
 ## Finish all-white ratings — three authorised corrections
 - [x] Removed only the two duplicate A imports; source scan found no other duplicates. Applied exact signature/bar colour assertions and test renames, retaining other assertions.
 - [x] Preview build log: build OK (2026-10-27T08:51:23Z); changed source module HTTP 200. Both corrected test files pass: signature 8/8 and LatestReviews 12/12.
