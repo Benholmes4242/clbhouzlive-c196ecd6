@@ -313,7 +313,7 @@ describe('CB103.1 promoted action on a club profile', () => {
     pageState.business = fixture();
     pageState.courses = [courseRow];
     const { container } = renderPage();
-    await waitFor(() => expect(container.querySelector('[data-club-hero]')).not.toBeNull());
+    await waitFor(() => expect(container.querySelector('[data-tee-soon]')).not.toBeNull());
 
     /* Nothing below the hero offers Book: the row that would carry it is
        absent, because a club's promoted book is treated as no promoted action. */
@@ -336,8 +336,8 @@ describe('CB103.1 promoted action on a club profile', () => {
     pageState.business = fixture({ club_id: null });
     pageState.courses = [];
     const { container } = renderPage();
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Book' })).toBeTruthy(), { timeout: 3000 });
-    screen.debug(container.querySelector('[data-club-actions]')!);
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Book' })).toBeTruthy());
+    expect(container.querySelector('[data-tee-soon]')).toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: 'Book' }));
     expect(openExternalUrl).toHaveBeenCalledWith('https://tees.example/sundridge');

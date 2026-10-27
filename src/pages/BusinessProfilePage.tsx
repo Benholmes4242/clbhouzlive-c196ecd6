@@ -409,7 +409,7 @@ const BusinessProfilePage: React.FC = () => {
     onEdit: bizGates.edit ? () => navigate(`/business/${business.id}/edit`) : undefined,
   } : null;
 
-  const second = businessSecondPill(business, (k, d) => t(k, d));
+  const second = businessSecondPill(business, (k, d) => t(k, { defaultValue: d }));
   const bizSecond = second ? {
     label: second.label,
     arrow: second.arrow,
@@ -432,10 +432,10 @@ const BusinessProfilePage: React.FC = () => {
 
   const stripValues = { coursesNear: nearby?.coursesNear, top100Near: nearby?.top100Near, followers: followersCount, posts: postsCount };
   const stripLabels = {
-    coursesNear: t('business.hero.coursesNear', 'Courses near'),
-    top100Near: t('business.hero.top100Near', 'Top 100 near'),
-    followers: t('business.hero.followers', 'Followers'),
-    posts: t('business.hero.posts', 'Posts'),
+    coursesNear: t('business.hero.coursesNear', { defaultValue: 'Courses near' }),
+    top100Near: t('business.hero.top100Near', { defaultValue: 'Top 100 near' }),
+    followers: t('business.hero.followers', { defaultValue: 'Followers' }),
+    posts: t('business.hero.posts', { defaultValue: 'Posts' }),
   };
   const bizStrip = businessStripKeys(business.category, stripValues).map((k) => ({
     key: k,
@@ -518,7 +518,7 @@ const BusinessProfilePage: React.FC = () => {
           verified={business.is_verified}
           evidenceLine={verificationEvidence.line}
           placeLine={businessPlaceLine(
-            businessCategoryWord(business.category, (k, d) => t(k, d)),
+            businessCategoryWord(business.category, (k, d) => t(k, { defaultValue: d })),
             clubPlace({ city: business.city, region: business.region, country: business.country, firstCourseRegion: null }),
           )}
           onAvatarTap={() => setIsAvatarLightboxOpen(true)}
