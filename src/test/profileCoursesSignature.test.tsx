@@ -73,7 +73,7 @@ describe('profile courses signature', () => {
     }
   });
 
-  it('every rated figure is white A.INK, null stays muted, and no bar is drawn', () => {
+  it('every rated figure is white A.INK, unrated categories show no figure, and no bar is drawn', () => {
     const rows = Array.from({ length: 5 }, () => row({ design_score: 9, condition_score: 8.9 }));
     const { container } = render(<YourSignatureSection rows={rows} />);
     const norm = (c: string) => { const el = document.createElement('i'); el.style.color = c; return el.style.color; };
@@ -83,8 +83,8 @@ describe('profile courses signature', () => {
     expect(fig('design').style.color).toBe(norm(A.INK));
     expect(fig('condition').style.color).toBe(norm(A.INK));
     expect(courseSubScoreTone(null)).toBe(A.MUTE);
-    expect(fig('clubhouse').style.color).toBe(norm(A.MUTE));
-    expect(fig('facilities').style.color).toBe(norm(A.MUTE));
+    expect(fig('clubhouse')).toBeNull();
+    expect(fig('facilities')).toBeNull();
     expect(container.querySelector('[data-category-score] ')?.hasAttribute('data-category-figure')).toBe(true);
     expect([...container.querySelectorAll<HTMLElement>('div')].some((d) => d.style.height === '8px')).toBe(false);
   });
