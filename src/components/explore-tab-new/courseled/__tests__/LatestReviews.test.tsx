@@ -11,7 +11,7 @@ vi.mock('react-i18next', () => ({
 
 import { LatestReviews } from '@/components/explore-tab-new/courseled/LatestReviews';
 import { REVIEW_TILE_HEIGHT, REVIEW_TILE_FEATURED_HEIGHT } from '@/components/explore-tab-new/courseled/ReviewTile';
-import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 
 /** The mosaic reads reactions through React Query; the tree needs a client. */
@@ -187,7 +187,7 @@ describe('LatestReviews mosaic', () => {
 
   /* BRIEF_TEST_SUITE_TRIAGE_PART_2 §3 — the two-tone sub-score rule, asserted
      THROUGH courseSubScoreTone so the threshold and tokens may move. */
-  it('tints bars with the two-tone sub-score rule, sub-threshold bars in neutral ink', () => {
+  it('fills every bar with white ink, whatever the score', () => {
     render(
       <LatestReviews
         reviews={[
@@ -204,7 +204,7 @@ describe('LatestReviews mosaic', () => {
     // jsdom normalises colours; normalise the function's value the same way.
     const norm = (c: string) => { const el = document.createElement('div'); el.style.background = c; return el.style.background; };
     expect(fills).toEqual([9.4, 6.1, 4.2].map((v) => norm(courseSubScoreTone(v))));
-    // The design claim: below threshold is neutral ink, never a hue.
-    expect(norm(courseSubScoreTone(6.1))).toBe('rgba(248, 250, 252, 0.62)');
+    // Every real score is white ink (Ben, 27 Oct 2026).
+    expect(norm(courseSubScoreTone(6.1))).toBe(norm(A.INK));
   });
 });
