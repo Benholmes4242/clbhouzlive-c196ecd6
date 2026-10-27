@@ -27,14 +27,16 @@ import { RAIL_BLEED } from './format';
 import { PHOTO_FIGURE_GAP } from './PhotoFigureCard';
 import { LatestCoursesShell, LatestCourseSkeletonCard } from './sectionShells';
 import { dedupeRailRows, useRailPagination } from './useRailPagination';
-import { LATEST_HOLE_H } from './railTileHeights';
+import { LATEST_HOLE_W, LATEST_HOLE_H } from './railTileHeights';
 
 /* Card geometry, read by the card AND its shell (BRIEF_COURSES_SKELETONS 2.3). */
-export const LATEST_COURSE_W = 300;
 // The two rails share one tile height (Ben, 27 Oct 2026).
 export const LATEST_COURSE_H = LATEST_HOLE_H;
-export const LATEST_COURSE_BIG_W = 198;
-export const LATEST_COURSE_SMALL_W = 100;
+// The big photo is exactly the size of a Latest holes tile (Ben, 27 Oct 2026).
+export const LATEST_COURSE_BIG_W = LATEST_HOLE_W;
+export const LATEST_COURSE_SMALL_W = 110;
+// The 2 is the grid gap: the card is the two photos plus the gap between them.
+export const LATEST_COURSE_W = LATEST_COURSE_BIG_W + 2 + LATEST_COURSE_SMALL_W;
 // The 2 is the grid gap: the two small photos stack exactly to the tile height.
 export const LATEST_COURSE_SMALL_H = (LATEST_COURSE_H - 2) / 2;
 export const LATEST_COURSE_PAGE_SIZE = 10;
