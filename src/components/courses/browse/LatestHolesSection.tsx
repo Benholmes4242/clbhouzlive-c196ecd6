@@ -14,6 +14,7 @@ import { RAIL_BLEED } from './format';
 import { PHOTO_FIGURE_GAP } from './PhotoFigureCard';
 import { LatestHolesShell, LatestHoleSkeletonCard } from './sectionShells';
 import { dedupeRailRows, useRailPagination } from './useRailPagination';
+import { LATEST_HOLE_H } from './railTileHeights';
 import './latestHoles.css';
 
 /** The RPC owns newest-first ordering, up to two shots per course and public eligibility.
@@ -31,7 +32,7 @@ import './latestHoles.css';
  * unchanged.
  */
 export const LATEST_HOLE_W = 220;
-export const LATEST_HOLE_H = 293;
+export { LATEST_HOLE_H };
 export const LATEST_HOLE_PAGE_SIZE = 20;
 const holesViewerOpen = () => useFullscreenFeedStore.getState().isOpen;
 
