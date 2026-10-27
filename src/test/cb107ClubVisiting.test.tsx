@@ -187,7 +187,7 @@ describe('CB107 Visiting contacts', () => {
     const links = { instagram: '@club', twitter: '@club', facebook: 'facebook.com/club', tiktok: '@club', youtube: 'youtube.com/club' };
     const { rerender, container } = card({ social_links: links });
     for (const config of SOCIAL_CONFIG) {
-      fireEvent.click(screen.getByRole('button', { name: config.label, exact: true }));
+      fireEvent.click(screen.getByRole('button', { name: config.label }));
       expect(openExternalUrl).toHaveBeenLastCalledWith(config.buildUrl(links[config.key]));
     }
     rerender(<ClubVisiting business={fixture({ social_links: { instagram: ' ' } })} />);
@@ -260,9 +260,9 @@ describe('CB107 page integration', () => {
   it('a non-club retains contacts About tab and Posts tab bar without Visiting', async () => {
     const { container } = page({ club_id: null, website: 'club.example', booking_url: 'https://book.example', primary_action: 'book' });
     expect(container.querySelector('[data-club-visiting]')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Book', exact: true }));
+    fireEvent.click(screen.getByRole('button', { name: 'Book' }));
     expect(openExternalUrl).toHaveBeenCalledWith('https://book.example');
-    expect(screen.getByRole('button', { name: 'Website', exact: true })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Website' })).toBeTruthy();
     fireEvent.click(screen.getByRole('tab', { name: 'About' }));
     expect(container.querySelector('[data-about-content]')).toBeTruthy();
     expect(screen.getByRole('tab', { name: 'Posts' })).toBeTruthy();
