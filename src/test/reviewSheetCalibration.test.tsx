@@ -119,7 +119,7 @@ describe('score row', () => {
     expect(q('[data-review-subscore-track]').length).toBe(0);
     expect(q('[data-review-subscore-tick]').length).toBe(0);
     const note = document.body.querySelector('[data-review-subscore-first]');
-    if (n === 1) expect(row().nextElementSibling).toBe(note);
+    if (n === 1) expect(row().closest('[data-review-score-container]')?.nextElementSibling).toBe(note);
     else expect(note).toBeNull();
   });
   it('a null category drops its cell', () => {
