@@ -105,7 +105,9 @@ describe('CB111 score-led round in the mediaFirst feed', () => {
     const { container } = card();
     expect(container.querySelector('[data-round-score-gross]')?.textContent).toBe('89+21');
     expect(container.querySelector('[data-round-score-net]')?.textContent).toBe('81+13');
-    expect(container.querySelector('[data-round-score-handicap]')?.textContent).toBe('8Handicap');
+    const hcp = container.querySelector('[data-round-score-handicap]') as HTMLElement;
+    expect(hcp?.textContent).toBe('8');
+    expect((hcp?.lastElementChild as HTMLElement)?.style.textTransform).toBe('uppercase');
     expect(container.querySelector('[data-feed-round-course]')?.textContent).toBe('Sundridge Park Golf Club (West Course)');
   });
 
@@ -120,9 +122,10 @@ describe('CB111 score-led round in the mediaFirst feed', () => {
     const { container, handlers } = card();
     const footer = container.querySelector('[data-feed-footer]') as HTMLElement;
     const buttons = [...footer.querySelectorAll('button')];
-    fireEvent.click(buttons[0]);
+    const tap = (el: Element) => { fireEvent.pointerDown(el, { pointerId: 1 }); fireEvent.pointerUp(el, { pointerId: 1 }); };
+    tap(buttons[0]);
     expect(handlers.onLike).toHaveBeenCalledWith(POST, null);
-    fireEvent.click(buttons[2]);
+    tap(buttons[2]);
     expect(handlers.onShare).toHaveBeenCalledWith(POST);
     expect(likedByProps.last).toMatchObject({ postId: 'score-1', source: 'round', kind: 'celebrate', isOwnRound: false });
     expect(likedByProps.last?.subject).toMatchObject({ kind: 'round', courseName: 'Sundridge Park Golf Club (West Course)', gross: 89, toPar: 21 });
