@@ -14,8 +14,8 @@ vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: vi.fn() }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia', () => ({ useGalleryCourseMedia: () => ({ data: null, isError: false }) }));
 vi.mock('@tanstack/react-query', async importOriginal => ({ ...await importOriginal<typeof import('@tanstack/react-query')>(), useInfiniteQuery: (options: unknown) => { f.rpc(options); return { data: { pages: [f.latest] }, isLoading: false, isError: false, hasNextPage: false, isFetching: false, isFetchingNextPage: false, fetchNextPage: vi.fn() }; } }));
 
-import { LATEST_COURSE_W, LATEST_COURSE_H, LATEST_COURSE_SMALL_H, LatestCoursesSection } from '@/components/courses/browse/LatestCoursesSection';
-import { LATEST_HOLE_H } from '@/components/courses/browse/LatestHolesSection';
+import { LATEST_COURSE_W, LATEST_COURSE_H, LATEST_COURSE_SMALL_H, LATEST_COURSE_BIG_W, LATEST_COURSE_SMALL_W, LatestCoursesSection } from '@/components/courses/browse/LatestCoursesSection';
+import { LATEST_HOLE_W, LATEST_HOLE_H } from '@/components/courses/browse/LatestHolesSection';
 import { LatestCourseSkeletonCard } from '@/components/courses/browse/sectionShells';
 
 const tile = (n: number): LatestCourseMedia['tiles'][number] => ({ post_id: `p${n}`, media_id: `m${n}`, media_type: 'image', media_url: `/t${n}.jpg`, poster_url: null, stream_id: null, duration_seconds: null, created_at: '2026-10-24T12:00:00Z' });
@@ -45,7 +45,7 @@ describe('BRIEF latest-course tiles share the latest-holes tile height (Ben, 27 
     expect(card.style.height).toBe(`${LATEST_HOLE_H}px`);
     expect(card.style.width).toBe(`${LATEST_COURSE_W}px`);
     expect(card.style.gridTemplateRows).toBe(`${LATEST_COURSE_SMALL_H}px ${LATEST_COURSE_SMALL_H}px`);
-    expect(card.style.gridTemplateColumns).toBe('198px 100px');
+    expect(card.style.gridTemplateColumns).toBe('220px 110px');
   });
 
   it('the latest-course skeleton is LATEST_HOLE_H tall', () => {
