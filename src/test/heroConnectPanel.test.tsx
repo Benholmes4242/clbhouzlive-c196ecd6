@@ -13,6 +13,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
+vi.mock('@/features/coach/BusinessCoachCards', async importOriginal => ({ ...(await importOriginal<typeof import('@/features/coach/BusinessCoachCards')>()), CoachProfileLine: () => null }));
+
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (k: string, o?: { defaultValue?: string } | string) => (typeof o === 'string' ? o : o?.defaultValue ?? `[${k}]`) }) }));
 
 const chip = vi.hoisted(() => ({ state: { connected: false, settled: true, connection: null as unknown, trend: null as unknown, anyError: false } }));
