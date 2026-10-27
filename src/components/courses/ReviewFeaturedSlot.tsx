@@ -17,9 +17,9 @@ import React from 'react';
 import { MentionText } from '@/components/mentions/MentionText';
 import { useTranslation } from 'react-i18next';
 
-import { SubScoreStack } from '@/features/courses/_shared/scoreBands';
+import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
 import { HAIRLINE_INK_8, INK, INK_FAINT, INK_MUTE, SURFACE } from '@/features/courses/_shared/tokens';
-import { A, LABEL, courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+import { A, LABEL } from '@/features/courses/components/holes/analytical/tokens';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
 
@@ -65,25 +65,7 @@ export const ReviewFeaturedSlot: React.FC<Props> = ({ review: r, onReviewPress }
           cursor: 'pointer',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-          <span
-            style={{
-              ...FIGS,
-              fontSize: 30,
-              fontWeight: 700,
-              lineHeight: 1,
-              letterSpacing: '-0.03em',
-              color: courseSubScoreTone(r.rating),
-            }}
-          >
-            {r.rating.toFixed(1)}
-          </span>
-          <span style={{ ...LABEL, color: INK_FAINT }}>
-            {t('statBrowse.reviews.outOfTen')}
-          </span>
-        </div>
-
-        <p style={{ marginTop: 10, fontSize: 15, lineHeight: 1.5, color: INK }}><MentionText text={r.quote} disableNavigation /></p>
+        <p style={{ marginTop: 0, fontSize: 15, lineHeight: 1.5, color: INK }}><MentionText text={r.quote} disableNavigation /></p>
 
         <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
           {r.reviewerAvatar ? (
@@ -119,13 +101,17 @@ export const ReviewFeaturedSlot: React.FC<Props> = ({ review: r, onReviewPress }
           <span style={{ fontSize: 12.5, color: INK_MUTE, whiteSpace: 'nowrap' }}>{name}</span>
         </div>
 
-        {/* The four-up. Even columns, 3px tracks, one shared scale. */}
-        <div style={{ marginTop: 14, display: 'flex', gap: 10 }}>
-          <SubScoreStack label={t('top100.stats.design')} score={Number(b.design)} />
-          <SubScoreStack label={t('top100.stats.condition')} score={Number(b.conditions)} />
-          <SubScoreStack label={t('top100.stats.clubhouse')} score={Number(b.clubhouse)} />
-          <SubScoreStack label={t('top100.stats.facilities')} score={Number(b.facilities)} />
-        </div>
+        {/* The shared review score row (signed-off mock), where the four-up sat. */}
+        <ReviewScoreRow
+          style={{ marginTop: 14 }}
+          overall={r.rating ?? null}
+          breakdown={{
+            design: b.design ?? null,
+            condition: b.conditions ?? null,
+            clubhouse: b.clubhouse ?? null,
+            facilities: b.facilities ?? null,
+          }}
+        />
       </div>
     </section>
   );

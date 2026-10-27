@@ -209,23 +209,6 @@ export function ReviewTile({
     }
   }, [active, r.mediaUrl]);
 
-  // BREAKDOWN ROWS — only the categories the member actually scored. Nulls are
-  // the common case in the composer, so an absent category is simply absent:
-  // no empty track, no zero, no "n/a".
-  const rows = (
-    [
-      // SAME KEYS AS Top100CourseStatsPanel — the two surfaces render these
-      // labels through the same SubScoreBar, so they cannot drift and every
-      // language comes free.
-      ['design', t('top100.stats.design', 'Design'), r.breakdown?.design],
-      ['conditions', t('top100.stats.condition', 'Condition'), r.breakdown?.conditions],
-      ['clubhouse', t('top100.stats.clubhouse', 'Clubhouse'), r.breakdown?.clubhouse],
-      ['facilities', t('top100.stats.facilities', 'Facilities'), r.breakdown?.facilities],
-    ] as Array<[string, string, number | null | undefined]>
-  )
-    .filter((row): row is [string, string, number] => row[2] != null && !Number.isNaN(Number(row[2])))
-    .map(([key, label, value]) => ({ key, label, value: Number(value) }));
-
   return (
     // CB69 — a non-button tile (ReviewOverlayCore's pattern) so the course
     // name inside can be a real button.
@@ -419,12 +402,6 @@ export function ReviewTile({
       </CourseImageFallback>
       </span>
 
-      {/* BREAKDOWN — the four category scores, already on the row and never
-          rendered until now. The ROW is scoreBands' shipped SubScoreBar (the
-          same component the review composer uses), so the label/track/figure
-          metrics and the band colour come from there, not from this file.
-          A null category RENDERS NO ROW; a review with no categories at all
-          renders NO BLOCK and no gap. */}
       {/* THE QUOTE — FEATURED ONLY (§2.2), three lines, beneath the photo and
           above the bars. useLatestReviews rejects any review whose prose is
           empty after trim, so every review here has words: no null case. */}
@@ -444,16 +421,6 @@ export function ReviewTile({
         </div>
       )}
 
-      {/* BREAKDOWN — the four category scores.
-          BARS / FEATURED: scoreBands' shipped SubScoreBar (the same component
-          the review composer uses), so the label/track/figure metrics and the
-          band colour come from there, not from this file. Featured renders the
-          same rows at the slightly looser scale the wider tile allows (§2.6).
-          COMPACT (§4.2): four equal columns, figure over label, NO track, NO
-          fill, NO band colour — a sub-9 review carries amber on most rows, and
-          reserving the coloured bars for 9+ is what makes them mean something.
-          A null category RENDERS NO ROW; a review with no categories at all
-          renders NO BLOCK and no gap. */}
       {/* SCORE ROW — the shared review score row (signed-off mock): overall
           then each scored category, all white, centred; replaces the photo
           score chip and the bars/figure columns. Nulls drop their cell. */}
