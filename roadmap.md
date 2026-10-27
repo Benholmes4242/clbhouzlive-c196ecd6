@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB109 — Media-first in every post feed
+- [ ] Apply caller layouts and shared review/footer slot ordering; preserve standard, round, grid and viewer paths. Two-line clamp per Ben's ruling.
+- [ ] Add CB109 tests, audit unchanged direct-standard tests, run targeted and full suite against 3,501 tests / 399 files.
+- [ ] Report caller list, diff, test inventory and verification limitations.
+
 ## Narrow ReviewScoreRow card labels
 - [x] Added full-row inline-size query wrapper and scoped 400px/330px overrides; default grid, caption and null behavior retained. Existing tests unchanged; three query-rule tests added to reviewScoreRow.test.tsx.
 - [x] Targeted `bunx vitest run src/test/reviewScoreRow.test.tsx`: 15/15. Full `bunx vitest run`: 3,480 passed / 2 failed / 3,482 total across 397 files. Latest baseline 3,479/397 +3 new query-rule cases; user's 3,438/395 +CB106 22/1 +CB107 19/1 +this 3/0 =3,482/397. No existing test renamed/retargeted/deleted.
