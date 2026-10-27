@@ -248,7 +248,7 @@ describe('CB112 figure strip', () => {
     const { container } = renderPage();
     await waitFor(() => expect(container.querySelector('[data-club-strip]')).not.toBeNull());
     expect(cellKeys(container)).toEqual(['coursesNear', 'top100Near', 'followers']);
-    expect(container.querySelector('[data-cell="coursesNear"]')!.tagName).toBe('DIV');
+    expect(container.querySelector('[data-cell="coursesNear"]')!.tagName).toBe('BUTTON');
   });
   it('no pin shows Followers · Posts; zero values give no strip', async () => {
     Object.assign(state, { business: fixture(), nearby: undefined, followers: 3, posts: 2 });

@@ -110,7 +110,7 @@ describe('CB114 rows, All row and sheet', () => {
     await waitFor(() => expect(card()).not.toBeNull());
     expect(Array.from(card()!.querySelectorAll('[data-nearby-row]')).map((e) => e.getAttribute('data-nearby-row'))).toEqual(['c0', 'c1', 'c2', 'c3']);
     const all = card()!.querySelector('[data-nearby-all]')!;
-    expect(all.textContent).toContain(container.querySelector('[data-hero-n]')!.textContent!);
+    expect(all.getAttribute('data-nearby-all')).toBe(container.querySelector('[data-hero-n]')!.textContent);
     expect(container.querySelector('[data-hero-n]')!.textContent).toBe('6');
     fireEvent.click(all);
     await waitFor(() => expect(document.querySelector('[data-nearby-sheet]')).not.toBeNull());

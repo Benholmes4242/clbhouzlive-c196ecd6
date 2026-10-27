@@ -128,7 +128,7 @@ export function BusinessNearbyCourses({ isClub, viewerId, business }: { isClub: 
         </p>
       )}
       {courses.length > 4 && (
-        <button type="button" data-nearby-all onClick={() => setSheet(true)}
+        <button type="button" data-nearby-all={N} onClick={() => setSheet(true)}
           style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: 12, paddingTop: 12,
             background: 'transparent', border: 0, borderTop: `1px solid ${T.hair}`, cursor: 'pointer', textAlign: 'left' }}>
           <span style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>
