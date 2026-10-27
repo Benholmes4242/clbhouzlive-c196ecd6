@@ -230,13 +230,10 @@ const BusinessProfilePage: React.FC = () => {
   const panelFiguresRef = useRef<Map<string, boolean>>(new Map());
   const panelRoundsRef = useRef<Map<string, number>>(new Map());
   const panelReportedRef = useRef(false);
-  const [panelRounds, setPanelRounds] = React.useState<number | null>(null);
   const handleFiguresResolved = React.useCallback((courseId: string, hasFigures: boolean, rounds: number) => {
     panelFiguresRef.current.set(courseId, hasFigures);
     panelRoundsRef.current.set(courseId, rounds);
     if (courses.length === 0 || panelRoundsRef.current.size < courses.length) return;
-    const total = Array.from(panelRoundsRef.current.values()).reduce((s, n) => s + n, 0);
-    setPanelRounds(total > 0 ? total : null);
     if (panelReportedRef.current || !business?.id) return;
     panelReportedRef.current = true;
     const withStats = Array.from(panelFiguresRef.current.values()).filter(Boolean).length;
