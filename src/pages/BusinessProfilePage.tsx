@@ -425,9 +425,9 @@ const BusinessProfilePage: React.FC = () => {
     soon: second.kind === 'soon',
     onTap: () => {
       switch (second.kind) {
-        case 'soon': toast(second.soonToast!); return;
-        case 'book': trackBusinessAction(business.id, 'website', user?.id); openExternalUrl(ensureProtocol(business.booking_url!)); return;
-        case 'website': trackBusinessAction(business.id, 'website', user?.id); openExternalUrl(ensureProtocol(business.website!)); return;
+        case 'soon': second.soonToast && toast(second.soonToast); return;
+        case 'book': trackBusinessAction(business.id, 'website', user?.id); openExternalUrl(ensureProtocol(business.booking_url ?? '')); return;
+        case 'website': trackBusinessAction(business.id, 'website', user?.id); openExternalUrl(ensureProtocol(business.website ?? '')); return;
         case 'call': trackBusinessAction(business.id, 'call', user?.id); window.location.href = `tel:${business.phone}`; return;
         case 'email': window.location.href = `mailto:${business.email}`; return;
         case 'directions': {
@@ -566,6 +566,8 @@ const BusinessProfilePage: React.FC = () => {
       {/* CB115 — Their followers (every non-club business), before the tabs. */}
       <BusinessFollowersCard isClub={isClub} businessId={business.id} viewerId={user?.id} />
       {!isClub && <BusinessMentionsRail isClub={false} businessId={business.id} viewerId={user?.id} canManage={!!membership?.canManage && !membershipQuery.isError} />}
+
+      {!isClub && <ClubVisiting business={business} viewerId={user?.id} nonClub onBook={bizSecond?.onTap} publicTeamCount={publicTeamCount} />}
 
       {/* CB105 — How it plays (club-only), replaces the retired courses panel. */}
       <ClubHowItPlays isClub={isClub} courses={courses} onOpen={handleCourseOpen} onFiguresResolved={handleFiguresResolved} />

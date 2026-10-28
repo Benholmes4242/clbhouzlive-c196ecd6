@@ -273,13 +273,16 @@ describe('CB107 page integration', () => {
     expect(screen.queryByRole('tablist')).toBeNull();
     expect(container.querySelector('[data-club-visiting] [data-visiting-row="team"]')).toBeTruthy();
   });
-  it('a non-club keeps contacts in its About tab and the Posts tab bar without Visiting', async () => {
+  it('a non-club adds Visiting contacts while keeping its About and Posts tabs', async () => {
     const { container } = page({ club_id: null, website: 'club.example', booking_url: 'https://book.example', primary_action: 'book' });
-    expect(container.querySelector('[data-club-visiting]')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Book' }));
+    expect(container.querySelector('[data-club-visiting]')).toBeTruthy();
+    const hero = container.querySelector<HTMLElement>('[data-club-hero]');
+    if (!hero) throw new Error('Missing hero');
+    fireEvent.click(within(hero).getByRole('button', { name: 'Book' }));
     expect(openExternalUrl).toHaveBeenCalledWith('https://book.example');
     /* CB112 §7: the Website/Call/Directions row under the hero is gone. */
-    expect(screen.queryByRole('button', { name: 'Website' })).toBeNull();
+    expect(container.querySelector('[data-club-visiting] [data-visiting-row="website"]')).toBeTruthy();
+    expect(within(hero).queryByRole('button', { name: 'Website' })).toBeNull();
     fireEvent.click(screen.getByRole('tab', { name: 'About' }));
     expect(container.querySelector('[data-about-content]')).toBeTruthy();
     expect(screen.getByRole('tab', { name: 'Posts' })).toBeTruthy();

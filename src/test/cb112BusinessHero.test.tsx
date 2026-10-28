@@ -4,7 +4,7 @@
  * page is rendered for real with its data hooks stubbed.
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, renderHook, screen, waitFor, within } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
@@ -117,7 +117,12 @@ describe('CB112 shared hero on the non-club page', () => {
     expect(container.querySelector('[data-tee-soon]')).toBeNull();
     expect(screen.queryByRole('button', { name: /read more/i })).toBeNull();
     expect(screen.queryByRole('button', { name: /^Message /i })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Call' })).toBeNull();
+    const hero = container.querySelector<HTMLElement>('[data-club-hero]');
+    if (!hero) throw new Error('Missing hero');
+    expect(within(hero).queryByRole('button', { name: 'Call' })).toBeNull();
+    const calls = screen.getAllByRole('button', { name: /^Call/ });
+    expect(calls).toHaveLength(1);
+    expect(calls[0].closest('[data-club-visiting]')).not.toBeNull();
     expect(container.querySelector('[data-club-about]')!.textContent).toBe('A long bio about the inn.');
     expect(container.querySelector('[data-club-place]')!.textContent).toBe('Hotel · London');
   });
@@ -174,7 +179,9 @@ describe('CB112 second pill rules', () => {
   it('hotel with a booking link: Book a stay with arrow opens it', async () => {
     state.business = fixture({ booking_url: 'https://stay.example' });
     const { container } = renderPage();
-    const btn = await screen.findByRole('button', { name: 'Book a stay' });
+    const hero = container.querySelector<HTMLElement>('[data-club-hero]');
+    if (!hero) throw new Error('Missing hero');
+    const btn = within(hero).getByRole('button', { name: 'Book a stay' });
     expect(btn.querySelector('[data-arrow]')).not.toBeNull();
     fireEvent.click(btn);
     expect(openExternalUrl).toHaveBeenCalledWith('https://stay.example');
@@ -182,8 +189,10 @@ describe('CB112 second pill rules', () => {
   });
   it('academy without a link: Book a lesson + Soon toasts', async () => {
     state.business = fixture({ category: 'Golf Academy' });
-    renderPage();
-    const btn = await screen.findByRole('button', { name: /Book a lesson/ });
+    const { container } = renderPage();
+    const hero = container.querySelector<HTMLElement>('[data-club-hero]');
+    if (!hero) throw new Error('Missing hero');
+    const btn = within(hero).getByRole('button', { name: /Book a lesson/ });
     expect(btn.querySelector('[data-soon-tag]')).not.toBeNull();
     fireEvent.click(btn);
     expect(toast).toHaveBeenCalledWith('Lesson booking is coming soon.');
@@ -192,7 +201,9 @@ describe('CB112 second pill rules', () => {
   it('brand with primary website: Website + arrow; none renders no second pill', async () => {
     state.business = fixture({ category: 'Brand / Manufacturer', website: 'brand.com', primary_action: 'website' });
     const r = renderPage();
-    const btn = await screen.findByRole('button', { name: 'Website' });
+    const hero = r.container.querySelector<HTMLElement>('[data-club-hero]');
+    if (!hero) throw new Error('Missing hero');
+    const btn = within(hero).getByRole('button', { name: 'Website' });
     expect(btn.querySelector('[data-arrow]')).not.toBeNull();
     r.unmount();
     state.business = fixture({ category: 'Creator' });
