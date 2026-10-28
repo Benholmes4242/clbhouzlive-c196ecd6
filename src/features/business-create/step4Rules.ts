@@ -11,7 +11,7 @@ export function foundedYearError(value: string, currentYear = new Date().getFull
 }
 export function draftHeroIdentity(d: BusinessCreateDraft) {
   const name = d.category === 'Golf Club' ? d.selectedClub?.name ?? ''
-    : d.category === 'University / College' ? d.selectedCollege?.name ?? '' : d.businessName;
+    : d.category === 'University / College' ? d.selectedCollege?.college_name ?? '' : d.businessName;
   const place = d.category === 'Golf Club' ? d.selectedClub?.sub_country || d.selectedClub?.region || '' : d.address?.city ?? '';
   return { name, line: businessPlaceLine(categoryDisplayLabel(d.category) ?? '', place) };
 }
