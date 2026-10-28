@@ -25,7 +25,7 @@ const SOC_GLYPH: Record<string, string> = { instagram: 'IG', tiktok: 'TT', twitt
 
 /** The shared BC3 bottom sheet: Done, a scrim tap and a swipe down all close
  * it and keep the edits (the draft is already updated live). */
-export function BizcSheet({ title, sub, onDone, children, testId, hideHeader = false }: { title: string; sub?: string; onDone: () => void; children: ReactNode; testId: string; hideHeader?: boolean }) {
+export function BizcSheet({ title, sub, onDone, children, testId, hideHeader = false, actionLabel = 'Done', onAction, actionDisabled = false, hideAction = false }: { title: string; sub?: string; onDone: () => void; children: ReactNode; testId: string; hideHeader?: boolean; actionLabel?: string; onAction?: () => void; actionDisabled?: boolean; hideAction?: boolean }) {
   const touchY = useRef<number | null>(null);
   return (
     <>
@@ -44,7 +44,7 @@ export function BizcSheet({ title, sub, onDone, children, testId, hideHeader = f
         <div className="bizc-sheet-grab" aria-hidden="true" />
         {!hideHeader && <div className="bizc-sheet-head">
           <span className="bizc-sheet-title">{title}</span>
-          <button type="button" className="bizc-sheet-done" onClick={onDone}>Done</button>
+          {!hideAction && <button type="button" className="bizc-sheet-done" disabled={actionDisabled} onClick={onAction ?? onDone}>{actionLabel}</button>}
         </div>}
         {sub && <p className="bizc-sheet-sub">{sub}</p>}
         {children}
