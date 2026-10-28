@@ -1,9 +1,9 @@
 # Roadmap
 
 ## CB118 — Visiting or Contact for non-club businesses
-- [ ] Generalise the existing ClubVisiting with unchanged club defaults; insert non-club card after mentions and preserve tabs.
-- [ ] Add CB118 tests and change only the explicitly approved contradictory CB107 non-club case; run targeted and full suites against 3,756/415.
-- [ ] Report diff, test inventory and visual/authenticated limitations; no SQL, migrations, deployed functions, feed_config, cap or native changes.
+- [x] Generalised ClubVisiting with opt-in non-club rows and shared hero booking callback; inserted after mentions, tabs retained. Added 33 CB118 tests and only user-authorized CB107/CB112 corrections.
+- [ ] STOP: protected cb107ClubVisiting.test.tsx:257:107 `AssertionError: expected false to be true // Object.is equality`; :273:43 `AssertionError: expected <div role="tablist" …(3)>…(3)</div> to be null`. New card resolves fixture waits before club-course query settles; no correction after stop. Await authorization for protected wait correction.
+- [x] Full bunx vitest run 3,787 passed/2 new failures/3,789 total across416 files, +33/+1 from3,756/415 solely CB118. No pre-existing failures; Media stays green. Latest automatic build06:56:55Z OK. CB118_REPORT.md records diff and all five approved existing-test changes; no removals. Authenticated/visual checks unavailable external_unmanaged; protected backend/config/native scope untouched.
 
 ## CB117 — Mentioned by golfers
 - [x] Added non-club rail after followers, owner/admin hide/show sheet, server-only qualification and read-error omission; both RPCs exist and deny anon with401/42501 permission denied (signed-in checks unavailable external_unmanaged). Existing post route /post/:postId. No app scope beyond non-club insertion.
