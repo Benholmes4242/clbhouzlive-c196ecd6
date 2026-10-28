@@ -534,7 +534,7 @@ export const AvatarCell: React.FC<{
       }}
     >
       <SquircleAvatar src={activeActor.avatarUrl} alt={activeActor.name} userId={activeActor.id}
-        size={36} ringWidth={1.5} ringColor="#F7931E" className="[&>div:first-child]:!aspect-square" />
+        size={36} ringWidth={1} ringColor="rgba(255,255,255,0.10)" className="[&>div:first-child]:!aspect-square" />
       {activeUnreadCount > 0 ? (
         <span
           aria-label={`${activeUnreadCount} unread`}

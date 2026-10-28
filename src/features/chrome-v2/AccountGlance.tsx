@@ -70,7 +70,7 @@ export default function AccountGlance(props: AccountGlanceProps) {
   return <GlanceShell label="Your account" anchorRef={anchorRef} onClose={onClose}>
     <div className="account-glance">
       <Button variant="ghost" className="account-button account-identity" onClick={() => onNavigate(props.viewProfileRoute)}>
-        <span aria-hidden="true" style={{ display: 'inline-flex', flexShrink: 0 }}><SquircleAvatar size={44} src={currentActor.avatarUrl} alt={currentActor.name} userId={currentActor.id} ringWidth={1.5} ringColor="var(--account-amber)" className="[&>div:first-child]:!aspect-square" /></span>
+        <span aria-hidden="true" style={{ display: 'inline-flex', flexShrink: 0 }}><SquircleAvatar size={44} src={currentActor.avatarUrl} alt={currentActor.name} userId={currentActor.id} ringWidth={1} ringColor="rgba(255,255,255,0.10)" className="[&>div:first-child]:!aspect-square" /></span>
         <span className="account-text"><span className="account-name">{currentActor.name}</span><span className="account-subline">{business ? `${props.categoryLabel ? `${props.categoryLabel} · ` : ''}View page` : 'View profile'}</span></span>
         <ChevronRight className="account-chevron" size={16} strokeWidth={2} />
       </Button>
