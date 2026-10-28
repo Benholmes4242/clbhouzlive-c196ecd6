@@ -84,6 +84,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { exact: '/' },                        spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark',  bleed: true } },
   { match: { exact: '/clubhouse' },               spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark',  bleed: true } },
   { match: { exact: '/auth' },                    spec: { chrome: 'none', tone: 'dark',  bleed: false } },
+  { match: { exact: '/welcome' },                 spec: { chrome: 'none', tone: 'dark',  bleed: false } },
   { match: { exact: '/auth/callback' },           spec: { chrome: 'none', tone: 'dark',  bleed: false } },
   { match: { exact: '/signup' },                  spec: { chrome: 'none', tone: 'dark',  bleed: false } },
   { match: { exact: '/onboarding' },              spec: { chrome: 'none', tone: 'light', bleed: false } },

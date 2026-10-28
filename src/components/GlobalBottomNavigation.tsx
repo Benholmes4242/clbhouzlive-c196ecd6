@@ -44,6 +44,7 @@ export { NAV_CLEARANCE } from '@/lib/navClearance';
 // Routes where bottom navigation should be hidden
 const HIDDEN_ROUTES = [
   '/auth',
+  '/welcome',
   '/onboarding',
   
   '/notificationmessages',

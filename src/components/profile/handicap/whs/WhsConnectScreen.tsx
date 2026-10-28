@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { callConnectWhs } from '@/lib/whs/api';
 import type { ConnectWhsSuccess } from '@/lib/whs/types';
 import { useSelectedCountry } from '@/lib/whs/useSelectedCountry';
-import type { WhsCountry } from '@/lib/whs/whsCountries';
+import { getCountryById, type WhsCountry } from '@/lib/whs/whsCountries';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -117,6 +117,8 @@ interface Props {
   /** OB1 reuses credentials/errors/instrumentation, bypassing intro and payoff. */
   initialCountryId?: string;
   completeOnSuccess?: boolean;
+  /** OB1.2: the host owns back/title; the connect top chrome is not drawn. */
+  hideChrome?: boolean;
 }
 
 type Stage = 'intro' | 'country' | 'form' | 'comingSoon' | 'sync' | 'done' | 'declined';
@@ -127,8 +129,12 @@ export const WhsConnectScreen: React.FC<Props> = ({
   layout = 'page',
   initialCountryId,
   completeOnSuccess = false,
+  hideChrome = false,
 }) => {
-  const { country, setCountryId } = useSelectedCountry();
+  const { country: storedCountry, setCountryId } = useSelectedCountry();
+  /* A host-chosen country wins from the first frame, so the stored pick can
+     never flash the country list or another federation first. */
+  const country = (initialCountryId ? getCountryById(initialCountryId) : undefined) ?? storedCountry;
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
@@ -407,7 +413,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
           : { flex: '1 1 auto', minHeight: 0 }),
       }}
     >
-      <ConnectTopChrome stage={stage} title={HEADER_TITLE} onBack={BACKS[stage]} immersive={immersive} />
+      {!hideChrome && <ConnectTopChrome stage={stage} title={HEADER_TITLE} onBack={BACKS[stage]} immersive={immersive} />}
       {activeScreen}
     </div>
   );

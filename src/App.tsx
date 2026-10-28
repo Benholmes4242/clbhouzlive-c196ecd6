@@ -195,6 +195,9 @@ if (typeof window !== 'undefined') {
 }
 
 
+/** OB1.2: /welcome loads on the plain welcome canvas, never the BootHold mark. */
+const WelcomeHold: React.FC = () => <div aria-hidden data-welcome-hold style={{ position: 'fixed', inset: 0, background: 'var(--welcome-canvas)' }} />;
+
 const RootGate: React.FC = () => {
   const { user, loading: authLoading } = useSupabaseSession();
   const suspension = useSuspensionStatus(user?.id);
@@ -574,7 +577,7 @@ function AppRoutes() {
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/auth/callback" element={<Suspense fallback={<BootHold />}><AuthCallback /></Suspense>} />
         <Route path="/signup" element={<Suspense fallback={<GenericPageSkeleton />}><Signup /></Suspense>} />
-        <Route path="/welcome" element={<Suspense fallback={<BootHold />}><WelcomePage /></Suspense>} />
+        <Route path="/welcome" element={<Suspense fallback={<WelcomeHold />}><WelcomePage /></Suspense>} />
         <Route path="/onboarding/account-type" element={<Navigate to="/welcome" replace />} />
         <Route path="/create-profile" element={<CreateProfileRedirect />} />
         <Route path="/profile" element={<ProfileWrapped />} />
