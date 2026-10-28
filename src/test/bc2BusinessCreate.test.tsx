@@ -462,7 +462,7 @@ describe('BC2 history and draft keeping', () => {
     fireEvent.click(screen.getByText('Sundridge Park Golf Club'));
     await screen.findByTestId('bizc-club-card');
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
-    await waitFor(() => expect(document.querySelector('[data-value="Golf Club]')).toBeNull());
+    await waitFor(() => expect(document.querySelector('[data-value="Driving Range"]')).toBeTruthy());
     fireEvent.click(document.querySelector('[data-value="Driving Range"]') as HTMLButtonElement);
     fireEvent.click(screen.getByTestId('bizc-continue'));
     await screen.findByTestId('bizc-step-2');
