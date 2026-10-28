@@ -155,7 +155,7 @@ describe('loaded holes run and refresh', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Tag them' }));
     fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
     pages = [page(spec, 50, 3)];
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    fireEvent.click(screen.getByRole('button', { name: /^Tag to the / }));
     await screen.findByRole('button', { name: 'Hole 4, Course 50', hidden: true });
     expect(requests(spec)).toHaveLength(2);
     expect(f.rpc).toHaveBeenCalledWith('admin_tag_hole_media', { p_course_id: 'course', p_media_id: 'untagged', p_hole_no: 4 });

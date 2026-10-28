@@ -14,7 +14,8 @@ const photo = (url: string, ownerName?: string): BatchPhoto & { ownerName?: stri
 const shots = (n: number) => Array.from({ length: n }, (_, i) => photo(`/${i + 1}.jpg`));
 const ok = () => vi.fn().mockResolvedValue({ status: 'approved' } as HolePhoto);
 const hero = () => screen.getByAltText('Current photograph');
-const confirmBtn = () => screen.getByRole('button', { name: /Confirm tag|Tagging\.\.\.|All tagged|Remove tag|Removing\.\.\./ });
+const confirmBtn = () => { const button = document.querySelector<HTMLButtonElement>('[data-tag-primary]'); if (!button) throw new Error('Primary tag button missing'); return button; };
+const removeBtn = () => screen.getByRole('button', { name: /Remove tag|Removing\.\.\./ });
 const pick = (n: number) => fireEvent.click(screen.getByRole('button', { name: `Hole ${n}` }));
 const confirm = () => fireEvent.click(confirmBtn());
 afterEach(cleanup);
@@ -26,7 +27,7 @@ describe('selection and confirm', () => {
     expect(tag).not.toHaveBeenCalled();
     expect(screen.getByRole('button', { name: 'Hole 7' })).toHaveAttribute('aria-pressed', 'true');
   });
-  it('tapping the selected hole again deselects it and disables Confirm tag; a different tap moves the selection', () => {
+  it('tapping the selected hole again deselects it and disables Tag; a different tap moves the selection', () => {
     const tag = ok(); render(<HolePhotoBatchPath photos={shots(2)} knownHoles={[4, 7]} onTag={tag} onClose={() => {}} />);
     pick(7);
     expect(screen.getByRole('button', { name: 'Hole 7' })).toHaveAttribute('aria-pressed', 'true');
@@ -39,9 +40,9 @@ describe('selection and confirm', () => {
     expect(confirmBtn()).toBeEnabled();
     expect(tag).not.toHaveBeenCalled();
   });
-  it('Confirm tag is disabled with no selection, enabled with one, and tags the current url and hole', async () => {
+  it('Tag is disabled with no selection, enabled with one, and tags the current url and hole', async () => {
     const tag = ok(); render(<HolePhotoBatchPath photos={shots(2)} knownHoles={[4, 7]} onTag={tag} onClose={() => {}} />);
-    expect(confirmBtn()).toBeDisabled(); expect(confirmBtn()).toHaveTextContent('Confirm tag');
+    expect(confirmBtn()).toBeDisabled(); expect(confirmBtn()).toHaveTextContent('Tag');
     pick(4); expect(confirmBtn()).toBeEnabled();
     confirm(); await waitFor(() => expect(tag).toHaveBeenCalledWith('/1.jpg', 4));
   });
@@ -63,10 +64,10 @@ describe('selection and confirm', () => {
     pick(4); confirm();
     await waitFor(() => expect(hero()).toHaveAttribute('src', '/1.jpg'));
   });
-  it('"All tagged" when nothing is left, window still open, grid disabled', async () => {
+  it('disabled Tag when nothing is left, window still open, grid disabled', async () => {
     const close = vi.fn(); render(<HolePhotoBatchPath photos={shots(1)} knownHoles={[4, 7]} onTag={ok()} onClose={close} />);
     pick(7); confirm();
-    await waitFor(() => expect(confirmBtn()).toHaveTextContent('All tagged'));
+    await waitFor(() => expect(confirmBtn()).toHaveTextContent('Tag'));
     expect(confirmBtn()).toBeDisabled(); expect(close).not.toHaveBeenCalled();
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(hero()).toHaveAttribute('src', '/1.jpg');
@@ -77,7 +78,7 @@ describe('selection and confirm', () => {
     const tag = vi.fn(() => new Promise<HolePhoto>(res => { release = res; }));
     const close = vi.fn(); render(<HolePhotoBatchPath photos={shots(2)} knownHoles={[4]} onTag={tag} onClose={close} />);
     pick(4); confirm();
-    await waitFor(() => expect(confirmBtn()).toHaveTextContent('Tagging...'));
+    await waitFor(() => expect(confirmBtn()).toBeDisabled());
     expect(confirmBtn()).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Close' })).toBeDisabled();
     await act(async () => { release({ status: 'approved' } as HolePhoto); });
@@ -102,7 +103,7 @@ describe('thumbnails and hero', () => {
     fireEvent.click(tagged);
     expect(hero()).toHaveAttribute('src', '/1.jpg');
     expect(tagged).toHaveAttribute('aria-current', 'true');
-    expect(confirmBtn()).toHaveTextContent('Remove tag');
+    expect(removeBtn()).toHaveTextContent('Remove tag');
     expect(tag).toHaveBeenCalledTimes(1); expect(remove).not.toHaveBeenCalled();
     view.unmount();
     const tag2 = ok();
@@ -114,25 +115,26 @@ describe('thumbnails and hero', () => {
     expect(hero()).toHaveAttribute('src', '/2.jpg');
     expect(tag2).toHaveBeenCalledTimes(1);
   });
-  it('the chip shows position / n', () => {
+  it('the header shows position OF n', () => {
     const { baseElement } = render(<HolePhotoBatchPath photos={shots(12)} knownHoles={[4]} onTag={ok()} onClose={() => {}} />);
-    expect(baseElement.querySelector('[data-chip]')?.textContent).toBe('1 / 12');
+    expect(baseElement.querySelector('[data-tag-position]')?.textContent).toBe('1 OF 12');
     fireEvent.click(screen.getByRole('button', { name: 'Shot 5 of 12' }));
-    expect(baseElement.querySelector('[data-chip]')?.textContent).toBe('5 / 12');
+    expect(baseElement.querySelector('[data-tag-position]')?.textContent).toBe('5 OF 12');
   });
   it('member Skip exists and Done remains absent', () => {
     render(<HolePhotoBatchPath photos={shots(2)} knownHoles={[4]} onTag={ok()} onClose={() => {}} />);
     expect(screen.getByRole('button', { name: 'Skip' })).toBeEnabled();
     expect(screen.queryByRole('button', { name: /^Done$/ })).toBeNull();
   });
-  it('renders all 100 shots in one non-wrapping row; sheet keeps its max-height rules', () => {
+  it('renders all 100 shots in one non-wrapping row; glass card keeps its max-height rules', () => {
     const { baseElement } = render(<HolePhotoBatchPath photos={shots(100)} knownHoles={[4]} onTag={ok()} onClose={() => {}} />);
-    const row = baseElement.querySelector('.hole-photo-batch-row');
-    expect(row?.querySelectorAll('.hole-photo-batch-thumb')).toHaveLength(100);
-    const css = readFileSync('src/components/course-media-tab/hole-photo-fast.css', 'utf8');
-    expect(css).toMatch(/\.hole-photo-batch-row \{[^}]*flex-wrap: nowrap/);
-    expect(css).toMatch(/\.hole-photo-batch-strip \{[^}]*overflow-x: auto/);
-    expect(css).toMatch(/\.hole-photo-fast-sheet \{[^}]*max-height: calc\(100vh - 48px\); max-height: calc\(100dvh - 48px\); overflow-y: auto/);
+    const row = baseElement.querySelector('.media-v3-tag-row');
+    expect(row?.querySelectorAll('.media-v3-tag-thumb')).toHaveLength(100);
+    const css = readFileSync('src/components/course-media-tab/media-v3.css', 'utf8');
+    const overlay = baseElement.querySelector('[data-scorecard-glass-card]');
+    expect(css).toMatch(/\.media-v3-tag-row \{[^}]*flex-wrap:nowrap/);
+    expect(css).toMatch(/\.media-v3-tag-strip \{[^}]*overflow-x:auto/);
+    expect(overlay).toHaveStyle({ maxHeight: '82dvh' });
   });
 });
 
@@ -178,7 +180,7 @@ describe('confirmation copy', () => {
     expect(first).toHaveAttribute('data-unavailable', 'true'); expect(first).toHaveAttribute('aria-disabled', 'true');
     expect(first.querySelector('.hole-photo-batch-badge')).toBeNull();
     pick(4); confirm();
-    await waitFor(() => expect(confirmBtn()).toHaveTextContent('All tagged'));
+    await waitFor(() => expect(confirmBtn()).toHaveTextContent('Tag'));
   });
 });
 
@@ -197,7 +199,7 @@ describe('picker has no used-hole treatment', () => {
     const submit = vi.fn();
     render(<HolePhotoTagDialog imageUrl="/p.jpg" holeCount={3} knownHoleNumbers={[1, 2, 3]} pending={false} error={null} onClose={() => {}} onSubmit={submit} />);
     fireEvent.click(screen.getByRole('button', { name: 'Hole 2' })); expect(submit).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' })); expect(submit).toHaveBeenCalledWith(2);
+    fireEvent.click(screen.getByRole('button', { name: /^Tag to the / })); expect(submit).toHaveBeenCalledWith(2);
     expect(screen.queryByText(/already tagged/)).toBeNull();
   });
 });
@@ -215,28 +217,28 @@ describe('remove tag in the batch window', () => {
     expect(screen.getByRole('button', { name: 'Hole 4' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('button', { name: 'Hole 4' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Hole 7' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Hole 7' }).style.opacity).toBe('0.4');
-    expect(screen.getByRole('button', { name: 'Hole 4' }).style.opacity).not.toBe('0.4');
+    expect(screen.getByRole('button', { name: 'Hole 7' })).toHaveAttribute('data-dim', 'true');
+    expect(screen.getByRole('button', { name: 'Hole 4' })).not.toHaveAttribute('data-dim');
     expect(screen.getByRole('status')).toHaveTextContent('Tagged to the 4th. Remove the tag to choose a different hole.');
     expect(screen.getByRole('status').querySelector('svg')).toBeNull();
-    expect(confirmBtn()).toHaveTextContent('Remove tag'); expect(confirmBtn()).toBeEnabled();
+    expect(removeBtn()).toHaveTextContent('Remove tag'); expect(removeBtn()).toBeEnabled();
   });
   it('Remove tag calls onRemove with the stored row; success clears the badge and re-enables the grid', async () => {
     const row = { id: 'tag-1', hole_no: 4, status: 'approved' } as HolePhoto;
     const tag = vi.fn().mockResolvedValue(row); const remove = vi.fn().mockResolvedValue(undefined);
     await tagOne(tag, remove);
-    fireEvent.click(confirmBtn());
+    fireEvent.click(removeBtn());
     await waitFor(() => expect(remove).toHaveBeenCalledWith(row));
     await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Tag removed. Pick the right hole.'));
     expect(screen.getByRole('button', { name: 'Shot 1 of 3' }).querySelector('.hole-photo-batch-badge')).toBeNull();
     expect(hero()).toHaveAttribute('src', '/1.jpg');
     expect(screen.getByRole('button', { name: 'Hole 7' })).toBeEnabled();
-    expect(screen.getByRole('button', { name: 'Hole 7' }).style.opacity).not.toBe('0.4');
-    expect(confirmBtn()).toHaveTextContent('Confirm tag'); expect(confirmBtn()).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Hole 7' })).not.toHaveAttribute('data-dim');
+    expect(confirmBtn()).toHaveTextContent('Tag'); expect(confirmBtn()).toBeDisabled();
   });
   it('the freed shot can be confirmed on a different hole', async () => {
     const tag = ok(); await tagOne(tag);
-    fireEvent.click(confirmBtn());
+    fireEvent.click(removeBtn());
     await screen.findByText('Tag removed. Pick the right hole.');
     pick(7); confirm();
     await waitFor(() => expect(tag).toHaveBeenCalledWith('/1.jpg', 7));
@@ -248,7 +250,7 @@ describe('remove tag in the batch window', () => {
     pick(9); confirm();
     expect(await screen.findByRole('status')).toHaveTextContent('Tag confirmed. This is your second tag on the 9th.');
     fireEvent.click(await screen.findByRole('button', { name: 'Shot 1 of 2, tagged to the 9th' }));
-    fireEvent.click(confirmBtn());
+    fireEvent.click(removeBtn());
     await screen.findByText('Tag removed. Pick the right hole.');
     pick(9); confirm();
     await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Tag confirmed. This is your second tag on the 9th.'));
@@ -256,18 +258,18 @@ describe('remove tag in the batch window', () => {
   it('a remove error keeps the tag and shows the message', async () => {
     const remove = vi.fn().mockRejectedValue(new Error('nope'));
     await tagOne(ok(), remove);
-    fireEvent.click(confirmBtn());
+    fireEvent.click(removeBtn());
     expect(await screen.findByRole('alert')).toHaveTextContent('The photo could not be removed. It is still on the 4th.');
     expect(screen.getByRole('button', { name: 'Shot 1 of 3, tagged to the 4th' }).querySelector('.hole-photo-batch-badge')?.textContent).toBe('4');
-    expect(confirmBtn()).toHaveTextContent('Remove tag');
+    expect(removeBtn()).toHaveTextContent('Remove tag');
     expect(screen.getByRole('button', { name: 'Hole 4' })).toHaveAttribute('aria-pressed', 'true');
   });
   it('"Removing..." disables the button and the cross', async () => {
     let release!: () => void;
     const remove = vi.fn(() => new Promise<void>(res => { release = res; }));
     await tagOne(ok(), remove);
-    fireEvent.click(confirmBtn());
-    await waitFor(() => expect(confirmBtn()).toHaveTextContent('Removing...'));
+    fireEvent.click(removeBtn());
+    await waitFor(() => expect(removeBtn()).toHaveTextContent('Removing...'));
     expect(confirmBtn()).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Close' })).toBeDisabled();
     await act(async () => { release(); });
@@ -282,15 +284,15 @@ describe('remove tag in the batch window', () => {
     expect(first).toHaveAttribute('aria-disabled', 'true');
     fireEvent.click(first);
     expect(hero()).toHaveAttribute('src', '/2.jpg');
-    expect(confirmBtn()).not.toHaveTextContent('Remove tag');
+    expect(screen.queryByRole('button', { name: 'Remove tag' })).toBeNull();
   });
-  it('from "All tagged", tapping a thumbnail shows Remove tag', async () => {
+  it('from a completed batch, tapping a thumbnail shows Remove tag', async () => {
     render(<HolePhotoBatchPath photos={shots(1)} knownHoles={[4]} onTag={ok()} onRemove={vi.fn().mockResolvedValue(undefined)} onClose={() => {}} />);
     pick(4); confirm();
-    await waitFor(() => expect(confirmBtn()).toHaveTextContent('All tagged'));
+    await waitFor(() => expect(confirmBtn()).toHaveTextContent('Tag'));
     expect(confirmBtn()).toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: 'Shot 1 of 1, tagged to the 4th' }));
-    expect(confirmBtn()).toHaveTextContent('Remove tag'); expect(confirmBtn()).toBeEnabled();
+    expect(removeBtn()).toHaveTextContent('Remove tag'); expect(removeBtn()).toBeEnabled();
     expect(screen.getByRole('status')).toHaveTextContent('Tagged to the 4th. Remove the tag to choose a different hole.');
   });
 });

@@ -73,11 +73,11 @@ describe('admin block and batch', () => {
   it('empty queue has no block', async () => {
     rows = []; mount(); await waitFor(() => expect(f.rpc).toHaveBeenCalledWith('admin_get_untagged_course_media', expect.anything())); expect(screen.queryByText('Admin')).toBeNull();
   });
-  it('no walk disables the admin queue and block', async () => {
-    mount(null); await waitFor(() => expect(f.rpc).toHaveBeenCalledWith('is_admin')); expect(screen.queryByText('Admin')).toBeNull(); expect(f.rpc).not.toHaveBeenCalledWith('admin_get_untagged_course_media', expect.anything());
+  it('no hole list keeps the admin place-only queue and block', async () => {
+    mount(null); await screen.findByRole('heading', { name: 'Two untagged shots here' }); expect(f.rpc).toHaveBeenCalledWith('admin_get_untagged_course_media', { p_course_id: 'course' });
   });
   it('admin block shows count, own attribution copy and Tag them', async () => {
-    mount(); expect(await screen.findByRole('heading', { name: 'Two untagged shots here' })).toBeInTheDocument(); expect(screen.getByText("Each tag is saved as the member's own.")).toBeInTheDocument(); expect(screen.getByRole('button', { name: 'Tag them' })).toBeEnabled();
+    mount(); expect(await screen.findByRole('heading', { name: 'Two untagged shots here' })).toBeInTheDocument(); expect(screen.queryByText("Each tag is saved as the member's own.")).toBeNull(); expect(screen.getByRole('button', { name: 'Tag them' })).toBeEnabled();
   });
   it('single item says shot', async () => { rows = [rows[0] as AdminUntaggedMedia]; mount(); expect(await screen.findByRole('heading', { name: 'One untagged shot here' })).toBeInTheDocument(); });
   it('opens oldest-first batch and active owner month', async () => {
@@ -94,7 +94,7 @@ describe('admin block and batch', () => {
   });
   it('tag passes media id/hole, reads returned row and refreshes all required keys', async () => {
     const view = mount(); view.cache.setQueryData(['gam', 'get_latest_hole_media', { p_limit: 30 }], []);
-    fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); fireEvent.click(screen.getByRole('button', { name: /^Tag to the / }));
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/later.jpg'));
     expect(f.rpc).toHaveBeenCalledWith('admin_tag_hole_media', { p_course_id: 'course', p_media_id: 'earlier', p_hole_no: 7 });
     expect(f.from).toHaveBeenCalledWith('course_hole_media'); expect(f.select).toHaveBeenCalledWith('*'); expect(f.eq).toHaveBeenCalledWith('id', 'new-tag');
@@ -103,17 +103,17 @@ describe('admin block and batch', () => {
   });
   it('23505 displays message and advances without member mutation', async () => {
     const original = f.rpc.getMockImplementation(); f.rpc.mockImplementation((name: string, args: unknown) => name === 'admin_tag_hole_media' ? Promise.resolve({ data: null, error: { code: '23505' } }) : original?.(name, args));
-    mount(); fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    mount(); fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: /^Tag to the / }));
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/later.jpg')); expect(screen.getByRole('alert')).toHaveTextContent('That shot is already tagged.'); expect(f.memberSubmit).not.toHaveBeenCalled();
   });
   it('other error keeps current shot and existing error handling', async () => {
     const original = f.rpc.getMockImplementation(); f.rpc.mockImplementation((name: string, args: unknown) => name === 'admin_tag_hole_media' ? Promise.resolve({ data: null, error: { code: '42501' } }) : original?.(name, args));
-    mount(); fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' })); await screen.findByRole('alert'); expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/earlier.jpg');
+    mount(); fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: /^Tag to the / })); await screen.findByRole('alert'); expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/earlier.jpg');
   });
   it('readback resolves member-owned row without client insert', async () => { const result = await tagAdminHole('course', 'earlier', 7); expect(result.user_id).toBe('member'); expect(result.id).toBe('new-tag'); });
   it('Remove tag calls admin_untag_hole_media with the row id and refreshes the same keys', async () => {
     const view = mount(); view.cache.setQueryData(['gam', 'get_latest_hole_media', { p_limit: 30 }], []);
-    fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Tag them' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); fireEvent.click(screen.getByRole('button', { name: /^Tag to the / }));
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/later.jpg'));
     fireEvent.click(screen.getByRole('button', { name: 'Shot 1 of 2, tagged to the 7th' }));
     fireEvent.click(await screen.findByRole('button', { name: 'Remove tag' }));
@@ -124,7 +124,7 @@ describe('admin block and batch', () => {
   it('member own block stays before admin and uses unchanged member write', async () => {
     f.own = true; const { wrapper } = setup(); render(<CourseMediaTabNew courseId="course" />, { wrapper });
     const own = document.querySelector('.media-v2-untagged'); if (!own) throw new Error('Member tag row missing'); const admin = await screen.findByRole('heading', { name: 'Two untagged shots here' }); expect(own.compareDocumentPosition(admin) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    fireEvent.click(own); await screen.findByRole('dialog'); fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    fireEvent.click(own); await screen.findByRole('dialog'); fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); fireEvent.click(screen.getByRole('button', { name: /^Tag to the / }));
     await waitFor(() => expect(f.memberSubmit).toHaveBeenCalled()); expect(f.memberSubmit).toHaveBeenCalledWith(expect.objectContaining({ hole: 7, post: expect.objectContaining({ userId: 'admin' }) })); expect(f.rpc).not.toHaveBeenCalledWith('admin_tag_hole_media', expect.anything());
   });
 });
