@@ -99,17 +99,27 @@ const HCP_DRIFTING = '#FF5A4E';
 const HCP_MOVE_MAX_AGE_DAYS = 30;
 const HCP_MOVE_EPSILON = 0.05;
 
-type HcpMove = 'improving' | 'drifting' | 'none';
+export type HcpMove = 'improving' | 'drifting' | 'none';
 
-function lastIndexMove(
+export interface HcpMoveDetail {
+  direction: HcpMove;
+  /** |current − the previous distinct value|, null when direction is 'none'. */
+  size: number | null;
+  /** When the last move landed (ms epoch), null when direction is 'none'. */
+  movedAt: number | null;
+}
+
+const NO_MOVE: HcpMoveDetail = { direction: 'none', size: null, movedAt: null };
+
+export function lastIndexMove(
   history: { observed_at: string; handicap_index: number }[] | undefined,
-): HcpMove {
-  if (!history || history.length < 2) return 'none';
+): HcpMoveDetail {
+  if (!history || history.length < 2) return NO_MOVE;
   // history is ascending; walk back to the first point that differs from the
   // latest value — that boundary is the last actual change.
   const latest = history[history.length - 1];
   const current = Number(latest.handicap_index);
-  if (!Number.isFinite(current)) return 'none';
+  if (!Number.isFinite(current)) return NO_MOVE;
 
   for (let i = history.length - 2; i >= 0; i--) {
     const prev = Number(history[i].handicap_index);
@@ -120,26 +130,32 @@ function lastIndexMove(
     // current value after the previous one.
     const movedAt = new Date(history[i + 1].observed_at).getTime();
     const ageDays = (Date.now() - movedAt) / 86_400_000;
-    if (!Number.isFinite(ageDays) || ageDays > HCP_MOVE_MAX_AGE_DAYS) return 'none';
+    if (!Number.isFinite(ageDays) || ageDays > HCP_MOVE_MAX_AGE_DAYS) return NO_MOVE;
 
-    return current < prev ? 'improving' : 'drifting';
+    return {
+      direction: current < prev ? 'improving' : 'drifting',
+      size: Math.abs(current - prev),
+      movedAt,
+    };
   }
 
-  return 'none';
+  return NO_MOVE;
 }
 
 function glassStyle(tone: ChromeTone): React.CSSProperties {
   const isLight = tone === 'light';
   return {
     height: ISLAND_H,
-    borderRadius: r.xl,
+    borderRadius: 23,
+    // Light-tone routes keep their current colours and take only the new
+    // geometry (BRIEF_ISLANDS_NAV §SHARED GLASS); dark uses ISLAND_GLASS.
     ...(isLight ? {
       background: 'rgba(255,255,255,0.72)',
       border: '1px solid rgba(0,0,0,0.06)',
       backdropFilter: 'blur(16px)',
       WebkitBackdropFilter: 'blur(16px)',
-    } : DARK_CHROME_GLASS_MATERIAL),
-    boxShadow: '0 4px 20px rgba(0,0,0,0.10)',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.10)',
+    } : ISLAND_GLASS),
     pointerEvents: 'auto',
     display: 'flex',
     alignItems: 'center',
