@@ -47,6 +47,7 @@ function lockFullscreenViewportScroll(): () => void {
 
 
 import { ImmersiveFullscreenChrome } from '@/components/fullscreen-feed/ImmersiveFullscreenChrome';
+import { CourseGalleryChrome } from './CourseGalleryChrome';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { likeOnlyOnDoubleTap } from '@/components/fullscreen-feed/scrubberMath';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -214,6 +215,7 @@ export function FullscreenFeedOverlay() {
   const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
   const readOnly = useFullscreenFeedStore(s => s.readOnly);
   const syntheticPosts = useFullscreenFeedStore(s => s.syntheticPosts);
+  const courseGallery = useFullscreenFeedStore(s => s.courseGallery);
   const origin = useFullscreenFeedStore(s => s.origin);
   const borrow = useFullscreenFeedStore(s => s.borrow);
   const clearBorrow = useFullscreenFeedStore(s => s.clearBorrow);
@@ -1023,7 +1025,7 @@ export function FullscreenFeedOverlay() {
                     readOnly={readOnly}
                   />
 
-                  <ImmersiveFullscreenChrome
+                  {courseGallery ? <CourseGalleryChrome onClose={handleClose} /> : <ImmersiveFullscreenChrome
                     posts={posts}
                     activeIndex={activeIndex}
                     onClose={handleClose}
@@ -1046,7 +1048,7 @@ export function FullscreenFeedOverlay() {
                     syntheticPosts={syntheticPosts}
                     onBeforeNavigate={() => handleClose({ reason: 'navigating' })}
                     feedEnded={showFeedEnd && !hasNextPage && activeIndex >= posts.length}
-                  />
+                  />}
 
                   <FullscreenScrubber
                     activePost={activePost}

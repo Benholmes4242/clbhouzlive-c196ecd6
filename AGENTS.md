@@ -38,9 +38,10 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Small-sample Reviews reuse SingleReview's RaterReviewRow, so context and media cannot drift.
 - Course tab gaps and canon: see tabCanon.css and AboutSection.tsx; null chains stay aligned.
 - Course photo publication and metadata live in `src/lib/courseMedia`; shared payloads prevent entrypoint drift.
+- Course Media gallery ordering/identity lives in courseGallery and chrome overlays the canonical fullscreen engine; gallery replacements never nest opens, so playback and synthetic request gates remain shared.
 - Media place catalogue, independent owner-source contributions and ready-cover selection are shared by tab surfaces; see places.ts and useCoursePlaceMedia.ts headers, so hole writes and admin paths remain isolated.
 - Media state/RPC ownership: see CourseMediaEmptyStates.tsx header.
-- Latest holes rail query/order/geometry ownership: see LatestHolesSection.tsx header; Media consumes initial URL focus once and HoleWalk retains shot fallback ownership.
+- Latest holes rail query/order/geometry ownership: see LatestHolesSection.tsx header; Media consumes initial URL focus once and useCourseGallery retains shot fallback ownership.
 - Course rails share rail-local observation and stable deduplication in useRailPagination.ts; each section owns its RPC cursor and first-page rules, so pagination cannot drift into page scrolling or viewer fetching.
 - Leaders' group round selection ownership: see leadersGroupRules.ts header; shared board helpers remain authoritative for score and thru cells.
 - Insights visits/source snapshot and UTC bucket ownership: see InsightsVisitsSection.tsx and visitBuckets.ts headers; club analytics remains independent.

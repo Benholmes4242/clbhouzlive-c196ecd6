@@ -7,6 +7,7 @@ import { buildHlsUrl } from '@/utils/streamId';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
 import { audioDuck } from '@/audio/audioDuckStore';
 import './hole-walk.css';
+import { ReadyShotCover } from './ReadyShotCover';
 
 /** Stage1: shared manual player for member hole panels and moderator preview.
  * One local speaker and the existing global audioDuck silence engine lanes.
@@ -86,6 +87,6 @@ export function HoleMediaVideo({ media, label }: {
 export function HoleMediaThumbnail({ url, mediaType = 'image', posterUrl, streamId, durationSeconds, alt }: {
   url: string; mediaType?: string; posterUrl?: string | null; streamId?: string | null; durationSeconds?: number | null; alt: string;
 }) {
-  return <><img src={holeMediaPoster({ media_url: url, media_type: mediaType, poster_url: posterUrl, stream_id: streamId })} alt={alt} />
+  return <><ReadyShotCover fallbackIcon alt={alt} shots={[{ id: url, media_url: url, media_type: mediaType, poster_url: posterUrl, stream_id: streamId, duration_seconds: durationSeconds }]} />
     {mediaType === 'video' && <GlassDurationBadge seconds={durationSeconds} fontSize={9} bottom={3} right={3} />}</>;
 }

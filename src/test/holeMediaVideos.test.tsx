@@ -1,3 +1,4 @@
+import { holeShotsToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -42,28 +43,8 @@ describe('Stage1 encoded hole-video sources', () => {
   it('processing video is not eligible', () => expect(canTagHolePhoto({ ...post, mediaItems: [{ ...post.mediaItems[0], isProcessing: true }] }, 'member', 1, new Set())).toBe(false));
 });
 describe('Stage1 hole video display and lifecycle', () => {
-  it('video-only hole uses poster and count one and opens the viewer with the stream', async () => {
-    vi.spyOn(window, 'matchMedia').mockImplementation(query => ({ matches: query === '(prefers-reduced-motion: reduce)', media: query, onchange: null, addListener: vi.fn(), removeListener: vi.fn(), addEventListener: vi.fn(), removeEventListener: vi.fn(), dispatchEvent: vi.fn() }));
-    const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-    f.rpc.mockResolvedValue({ data: [{ ...row, member_id: row.user_id, member_avatar_url: null }], error: null });
-    render(<QueryClientProvider client={cache}><HoleWalk available holes={[hole]} rows={[row]} totalMedia={1} onAddFirst={() => {}} /></QueryClientProvider>);
-    const tile = screen.getByRole('button', { name: 'Hole 7' });
-    expect(tile.querySelector('img')).toHaveAttribute('src', '/poster.jpg');
-    expect(tile.querySelector('.media-v2-hole-count')).toHaveTextContent('1 shot');
-    fireEvent.click(tile);
-    const panel = screen.getByRole('region');
-    expect(screen.queryByRole('button', { name: 'Play video' })).toBeNull();
-    const slide = panel.querySelector('.hole-walk-slide') as HTMLElement;
-    expect(slide.querySelector('img')).toHaveAttribute('src', '/poster.jpg');
-    expect(slide.querySelector('.hole-walk-play-disc')).toBeTruthy();
-    fireEvent.click(slide);
-    await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
-    const args = f.open.mock.calls[0][0] as { posts: Array<{ mediaItems: Array<{ type: string; hlsUrl?: string }> }>; options?: { readOnly?: boolean } };
-    expect(args.posts).toHaveLength(1);
-    expect(args.posts[0].mediaItems[0].type).toBe('video');
-    expect(args.posts[0].mediaItems[0].hlsUrl).toContain(`/${source.stream_id}/manifest/video.m3u8`);
-    expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
-    expect(f.attach).not.toHaveBeenCalled();
+  it('video-only hole uses poster and count one and opens the viewer with the stream — course gallery', () => {
+    const open=vi.fn(); render(<HoleWalk available holes={[hole]} rows={[row]} totalMedia={1} onAddFirst={()=>{}} onOpen={open} />); const tile=screen.getByRole('button',{name:'Hole 7'}); expect(tile.querySelector('img')).toHaveAttribute('src','/poster.jpg'); expect(tile.querySelector('.media-v2-hole-count')).toHaveTextContent('1 shot'); fireEvent.click(tile); expect(open).toHaveBeenCalledWith(7,tile,'hole-card'); expect(screen.queryByRole('region')).toBeNull(); const posts=holeShotsToFeedPosts([{...row,member_id:row.user_id}], '', 'course',7); expect(posts).toHaveLength(1); expect(posts[0].mediaItems[0].type).toBe('video'); expect(posts[0].mediaItems[0].hlsUrl).toContain(`/${source.stream_id}/manifest/video.m3u8`); expect(f.attach).not.toHaveBeenCalled();
   });
   it('known-hole pile shows eligible video poster and duration', () => { render(<HoleKnownPhotoPath hole={7} photos={[url]} sources={[{ url, createdAt: '', mediaType: 'video', streamId: source.stream_id, posterUrl: '/poster.jpg', durationSeconds: 42, width: 640, height: 480 }]} pending={false} error={null} onChoose={() => {}} onLibrary={() => {}} onClose={() => {}} />); expect(screen.getByRole('button', { name: 'Choose video' }).querySelector('img')).toHaveAttribute('src', '/poster.jpg'); });
   it('batch uses video poster rather than manifest', () => { render(<HolePhotoBatchPath photos={[{ url, createdAt: '', mediaType: 'video', posterUrl: '/poster.jpg', durationSeconds: 42, exif: { capturedAt: null, captureDay: null, latitude: null, longitude: null } }]} knownHoles={[7]} onTag={async () => row} onClose={() => {}} />); expect(screen.getByAltText('Current video')).toHaveAttribute('src', '/poster.jpg'); });

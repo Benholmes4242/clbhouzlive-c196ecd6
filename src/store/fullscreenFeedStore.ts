@@ -11,6 +11,7 @@ import { VideoEngine } from '@/video/VideoEngine';
 import { originHostRegistry } from '@/video/originHostRegistry';
 import { setLastCloseSnapshot } from '@/perf/positionContinuity';
 import { FS_OVERLAY_Z } from '@/lib/zLayers';
+import type { CourseGalleryOptions, GalleryData } from '@/lib/courseMedia/courseGallery';
 
 /**
  * The fullscreen viewer paints media and nothing else. A post with an empty or
@@ -68,6 +69,8 @@ export interface CloseInfo {
 }
 
 interface OpenOptions {
+  courseGallery?: CourseGalleryOptions;
+  galleryData?: GalleryData;
   openCommentsInitially?: boolean;
   /** Origin geometry for the FLIP tile→viewer expand transition. When
    *  omitted (deep-link / notification), the overlay falls back to a plain
@@ -130,6 +133,8 @@ interface OpenOptions {
  * no longer on screen.
  */
 export interface FullscreenEntry {
+  courseGallery: CourseGalleryOptions | null;
+  galleryData: GalleryData | null;
   posts: FeedPost[];
   startIndex: number;
   activeIndex: number;
@@ -145,6 +150,9 @@ export interface FullscreenEntry {
 
 
 interface FullscreenFeedState {
+  courseGallery: CourseGalleryOptions | null;
+  galleryData: GalleryData | null;
+  replaceGallery: (posts: FeedPost[], options: CourseGalleryOptions, data?: GalleryData) => void;
   isOpen: boolean;
   posts: FeedPost[];
   startIndex: number;
@@ -231,6 +239,15 @@ interface FullscreenFeedState {
 }
 
 export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => ({
+  courseGallery: null,
+  galleryData: null,
+  replaceGallery: (posts, options, data) => {
+    if (!get().courseGallery) return;
+    const media = posts[0]?.mediaItems ?? [];
+    const index = Math.max(0, media.findIndex(item => item.id === options.startShotId));
+    set({ posts, courseGallery: options, galleryData: data ?? get().galleryData, startIndex: 0, activeIndex: 0,
+      mediaId: options.startShotId ?? media[0]?.id ?? null, mediaIndex: index, activePagerIdx: index });
+  },
   isOpen: false,
   posts: [],
   startIndex: 0,
@@ -370,6 +387,8 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
     const restoreStack = prev.isOpen
       ? [...prev.restoreStack, {
           posts: prev.posts,
+          courseGallery: prev.courseGallery,
+          galleryData: prev.galleryData,
           startIndex: prev.startIndex,
           activeIndex: prev.activeIndex,
           readOnly: prev.readOnly,
@@ -384,6 +403,8 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
       : [];
     set({
       isOpen: true,
+      courseGallery: options?.courseGallery ?? null,
+      galleryData: options?.galleryData ?? null,
       restoreStack,
       zIndex: options?.zIndex ?? FS_OVERLAY_Z,
       posts,
@@ -542,6 +563,8 @@ export const useFullscreenFeedStore = create<FullscreenFeedState>((set, get) => 
     }
     set({
       isOpen: false,
+      courseGallery: null,
+      galleryData: null,
       posts: [],
       activeIndex: 0,
       openCommentsInitially: false,

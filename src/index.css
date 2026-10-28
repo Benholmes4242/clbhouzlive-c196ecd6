@@ -21,6 +21,14 @@
 @tailwind utilities;
 
 :root {
+  --course-gallery-glass:rgba(20,22,28,.55);
+  --course-gallery-border:rgba(255,255,255,.14);
+  --course-gallery-divider:rgba(255,255,255,.12);
+  --course-gallery-selected-count:rgba(10,10,12,.55);
+  --course-gallery-empty-number:rgba(248,250,252,.3);
+  --course-gallery-duration:rgba(0,0,0,.5);
+  --course-gallery-media-gradient:linear-gradient(180deg,rgba(0,0,0,.6) 0%,transparent 26%,transparent 52%,rgba(0,0,0,.85) 100%);
+  --course-gallery-grid-gradient:linear-gradient(180deg,#0A0A0C 70%,transparent);
   --business-mention-canvas:#0B0B0D;
   --business-mention-photo-ink:#FFFFFF;
   --business-mention-mute:rgba(248,250,252,.62);

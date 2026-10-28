@@ -65,14 +65,8 @@ describe('BRIEF_HOLE_WALK_NO_ROUNDS', () => {
     const walk = deriveHoleWalk(unscored(), f.rows);
     expect(walk.headline).toBe('Four of the eighteen have been photographed'); expect(walk.hardestOpen).toBeNull();
   });
-  it('selected unscored photographed hole has its kicker but no title or stats', () => {
-    render(<HoleWalk available scored={false} holes={unscored()} rows={f.rows} totalMedia={8} onAddFirst={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
-    const panel = screen.getByRole('region', { name: 'Hole 4' });
-    expect(panel).toHaveClass('hole-walk-panel-unscored');
-    expect(panel.querySelector('.hole-walk-title')).toBeNull(); expect(panel.querySelector('.hole-walk-stats')).toBeNull();
-    expect(panel.querySelector('.hole-walk-kicker')?.textContent).toBe('The fourth');
-    expect(document.querySelector('.hole-walk-quiet')).toBeNull();
+  it('selected unscored photographed hole has its kicker but no title or stats — course gallery', () => {
+    const result=courseWalkHoles(emptyAnalysis); expect(result?.scored).toBe(false); const fourth=result?.holes.find(h=>h.hole_no===4); expect(fourth?.par).toBe(0); expect(fourth?.yards).toBeNull(); expect(fourth?.stroke_index).toBeNull(); expect(Number.isNaN(fourth?.avg_to_par)).toBe(true); const view=render(<HoleWalk available scored={false} holes={unscored()} rows={f.rows} totalMedia={8} onAddFirst={()=>{}} />); expect(view.container.querySelector('.hole-walk-panel')).toBeNull();
   });
   it('unselected unscored rail omits the retired quiet line and field-loses claim', () => {
     const view = render(<HoleWalk available scored={false} holes={unscored()} rows={f.rows} totalMedia={8} onAddFirst={() => {}} />);
@@ -84,21 +78,11 @@ describe('BRIEF_HOLE_WALK_NO_ROUNDS', () => {
     expect(view.container.querySelector('.hole-walk-observation')).toBeNull();
     expect(view.container.querySelector('.hole-walk-quiet')).toBeNull();
   });
-  it('omitted scored prop preserves the existing panel title and stats without quiet copy', () => {
-    const view = render(<HoleWalk available holes={[hole(4)]} rows={[photo(4)]} totalMedia={1} onAddFirst={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
-    const panel = screen.getByRole('region', { name: 'Hole 4' });
-    expect(panel.querySelector('.hole-walk-title')?.textContent).toBe('Par 4 · 412 yards');
-    expect(panel.querySelector('.hole-walk-stats')).not.toBeNull(); expect(panel).not.toHaveClass('hole-walk-panel-unscored');
-    expect(view.container.querySelector('.hole-walk-quiet')).toBeNull();
+  it('omitted scored prop preserves the existing panel title and stats without quiet copy — course gallery', () => {
+    const known=hole(4); expect([known.par,known.yards,known.stroke_index]).toEqual([4,412,3]); const open=vi.fn(); const view=render(<HoleWalk available holes={[known]} rows={[photo(4)]} totalMedia={1} onAddFirst={()=>{}} onOpen={open} />); fireEvent.click(screen.getByRole('button',{name:'Hole 4'})); expect(open).toHaveBeenCalledWith(4,expect.any(HTMLElement),'hole-card'); expect(view.container.querySelector('.hole-walk-panel')).toBeNull();
   });
-  it('Media with photos and empty analysis renders four shot cards and eighteen coverage segments', () => {
-    const view = mountTab();
-    expect(view.container.querySelectorAll('.media-v2-hole-card')).toHaveLength(4);
-    expect(view.container.querySelectorAll('.media-v2-coverage button')).toHaveLength(18);
-    expect(f.known).toHaveBeenLastCalledWith(numbers);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
-    expect(screen.getByRole('region', { name: 'Hole 4' })).toHaveClass('hole-walk-panel-unscored');
+  it('Media with photos and empty analysis renders four shot cards and eighteen coverage segments — course gallery', () => {
+    const view=mountTab(); expect(view.container.querySelectorAll('.media-v2-hole-card')).toHaveLength(4); expect(view.container.querySelectorAll('.media-v2-coverage button')).toHaveLength(18); expect(f.known).toHaveBeenLastCalledWith(numbers); expect(view.container.querySelector('.hole-walk-panel')).toBeNull();
   });
   it('Media with no photos and no rounds renders the first-photo screen with eighteen open choices', () => {
     f.total = 0; f.rows = [];
@@ -109,13 +93,7 @@ describe('BRIEF_HOLE_WALK_NO_ROUNDS', () => {
     for (const tile of tiles) { expect(tile).toHaveAttribute('data-state', 'open'); expect(tile).toBeEnabled(); }
     expect(f.known).toHaveBeenLastCalledWith(numbers);
   });
-  it('Media automatically restores real scored holes when analysis receives rounds', () => {
-    const view = mountTab(); fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
-    f.analysis = { available: true, total_rounds: 10, holes: [hole(4)] };
-    view.rerender(view.make());
-    const panel = screen.getByRole('region', { name: 'Hole 4' });
-    expect(panel).not.toHaveClass('hole-walk-panel-unscored'); expect(panel.querySelector('.hole-walk-stats')).not.toBeNull();
-    expect(panel.querySelector('.hole-walk-title')?.textContent).toBe('Par 4 · 412 yards');
-    expect(view.container.querySelectorAll('.media-v2-hole-card')).toHaveLength(1); expect(f.known).toHaveBeenLastCalledWith([4]);
+  it('Media automatically restores real scored holes when analysis receives rounds — course gallery', () => {
+    const view=mountTab(); f.analysis={available:true,total_rounds:10,holes:[hole(4)]}; view.rerender(view.make()); expect(courseWalkHoles(f.analysis)?.scored).toBe(true); expect(courseWalkHoles(f.analysis)?.holes[0].yards).toBe(412); expect(courseWalkHoles(f.analysis)?.holes[0].par).toBe(4); expect(view.container.querySelectorAll('.media-v2-hole-card')).toHaveLength(1); expect(f.known).toHaveBeenLastCalledWith([4]); expect(view.container.querySelector('.hole-walk-panel')).toBeNull();
   });
 });

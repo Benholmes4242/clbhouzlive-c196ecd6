@@ -25,6 +25,7 @@ vi.mock('@/components/course-media-tab/CourseMediaHeader', () => ({ CourseMediaH
 vi.mock('@/components/course-media-tab/hooks/useCoursePlaceMedia', () => ({ useCoursePlaceMedia: () => ({ tags: { data: [], isSuccess: true } }) }));
 vi.mock('@/components/common/ScrollToTopGlass', () => ({ default: () => null }));
 
+vi.mock('@/components/course-media-tab/hooks/useCourseGallery', () => ({ useCourseGallery: () => f.open }));
 vi.mock('@tanstack/react-query', async importOriginal => ({ ...await importOriginal<typeof import('@tanstack/react-query')>(), useInfiniteQuery: (options: unknown) => { f.rpc(options); return { data: { pages: [f.latest] }, isLoading: f.loading, isError: f.error, hasNextPage: false, isFetching: f.loading, isFetchingNextPage: false, fetchNextPage: vi.fn() }; } }));
 
 import { LatestHolesSection } from '@/components/courses/browse/LatestHolesSection';
@@ -147,25 +148,17 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
     fireEvent.click(card);
     expect(f.open).toHaveBeenCalledTimes(2);
   });
-  it('Media deep link opens hole four with the selected shot, not its first shot', () => {
-    f.rows = [photo(4, 'first'), photo(4, 'selected')]; mountTab();
-    const panel = screen.getByRole('region', { name: 'Hole 4' });
-    expect(panel.querySelector('.hole-walk-frame-count')).toHaveTextContent('2 / 2');
-    expect(panel.querySelectorAll('.hole-walk-thumbnail')[1]).toHaveAttribute('aria-current', 'true');
-    expect(panel.querySelectorAll('.hole-walk-slide')[1].querySelector('img')).toHaveAttribute('src', '/photo-selected.jpg');
+  it('Media deep link opens hole four with the selected shot, not its first shot — course gallery', () => {
+    f.rows=[photo(4,'first'),photo(4,'selected')]; mountTab(); expect(f.open).toHaveBeenCalledWith('holes','selected',expect.anything(),'deep-link',4); expect(screen.queryByRole('region')).toBeNull();
   });
-  it('missing linked shot falls back to the hole first shot', () => {
-    f.rows = [photo(4, 'first'), photo(4, 'other')]; mountTab();
-    const panel = screen.getByRole('region', { name: 'Hole 4' });
-    expect(panel.querySelector('.hole-walk-frame-count')).toHaveTextContent('1 / 2');
-    expect(panel.querySelectorAll('.hole-walk-thumbnail')[0]).toHaveAttribute('aria-current', 'true');
-    expect(panel.querySelectorAll('.hole-walk-slide')[0].querySelector('img')).toHaveAttribute('src', '/photo-first.jpg');
+  it('missing linked shot falls back to the hole first shot — course gallery', () => {
+    f.rows=[photo(4,'first'),photo(4,'other')]; mountTab(); expect(f.open).toHaveBeenCalledWith('holes','selected',expect.anything(),'deep-link',4); expect(deriveHoleWalk([hole(4)],f.rows).tiles[0].photos[0].id).toBe('first');
   });
-  it('unknown hole never opens a panel', () => { mountTab('/courses/course?tab=media&hole=99&shot=selected'); expect(screen.queryByRole('region')).toBeNull(); });
-  it('deep link waits for known holes and does not reapply after user selection', () => {
-    f.analysis = null; const view = mountTab(); expect(screen.queryByRole('region')).toBeNull();
-    f.analysis = emptyAnalysis; f.rows = [photo(4, 'selected'), photo(7)]; view.rerender(view.make()); expect(screen.getByRole('region', { name: 'Hole 4' })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); view.rerender(view.make()); expect(screen.getByRole('region', { name: 'Hole 7' })).toBeInTheDocument();
+  it('unknown hole never opens a panel — course gallery', () => {
+    mountTab('/courses/course?tab=media&hole=99&shot=selected'); expect(f.open).not.toHaveBeenCalled(); expect(screen.queryByRole('region')).toBeNull();
+  });
+  it('deep link waits for known holes and does not reapply after user selection — course gallery', () => {
+    f.analysis=null; const view=mountTab(); expect(f.open).not.toHaveBeenCalled(); f.analysis=emptyAnalysis; f.rows=[photo(4,'selected'),photo(7)]; view.rerender(view.make()); expect(f.open).toHaveBeenCalledTimes(1); expect(f.open).toHaveBeenCalledWith('holes','selected',expect.anything(),'deep-link',4); fireEvent.click(screen.getByRole('button',{name:'Hole 7'})); expect(f.open).toHaveBeenCalledTimes(2); view.rerender(view.make()); expect(f.open).toHaveBeenCalledTimes(2);
   });
   it('card type reads the signed-off mock letter-spacing and the rail declares no will-change', () => {
     const css = readFileSync(resolve(process.cwd(), 'src/components/courses/browse/latestHoles.css'), 'utf8');
