@@ -1,5 +1,10 @@
 # Roadmap
 
+## BC4 — Create a business profile appearance
+- [ ] Reconcile step 3 with panels 3A–3E; record each difference.
+- [ ] Add draft-only step 4, shared cropper options, image actions and history-preserved finish.
+- [ ] Add BC4 rule/flow tests; run full suite against 4,060/433 inventory and report the inherited welcome upload failure.
+
 ## One neutral floating-glass material
 - [x] Share card/backdrop/island tokens across the specified glances, scorecard and review; update badge edges only.
 - [x] Audit other old glass values without changing them; full `bunx vitest run`: 4,059 passed / 1 failed / 4,060 tests across 433 files, unchanged inventory from 4,060/433 baseline. No tests edited, added, removed or renamed. Automatic build 18:18:13Z OK.
