@@ -1,5 +1,10 @@
 # Roadmap
 
+## Rounds gate — Look, then lock
+- [ ] Replace cropped gate with visit-local scroll/timer lock and signed-off glass card/tile; preserve state, reads and page sections.
+- [ ] Audit score/index blur attributes; cover timing, navigation, accessibility and analytics; run full suite against 4,085/435 and report inventory.
+- [ ] Check available preview and automatic diagnostics; name any unavailable authenticated checks.
+
 ## BC4 — Create a business profile appearance
 - [x] Reconcile step 3 with panels 3A–3E: chips, sheet grabber, phone chip, hours helper/time pairs/day sizing/switches and fixed footer.
 - [x] Add draft-only step 4, shared cropper options, image actions and history-preserved finish.
