@@ -263,6 +263,7 @@ const MediaLibraryPage = lazy(() => import("./features/media-library/MediaLibrar
 
 
 const ManageProfilePage = lazy(() => import("./pages/ManageProfile"));
+const WelcomePage = lazy(() => import('./pages/Welcome'));
 const ManageEmailPage = lazy(() => import("./pages/manage/EmailPage"));
 const ManageBlockedPage = lazy(() => import("./pages/manage/BlockedPage"));
 const ManageNotificationsPage = lazy(() => import("./pages/manage/NotificationsPage"));
@@ -573,7 +574,8 @@ function AppRoutes() {
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/auth/callback" element={<Suspense fallback={<BootHold />}><AuthCallback /></Suspense>} />
         <Route path="/signup" element={<Suspense fallback={<GenericPageSkeleton />}><Signup /></Suspense>} />
-        <Route path="/onboarding/account-type" element={<Navigate to="/edit-profile?onboarding=1" replace />} />
+        <Route path="/welcome" element={<Suspense fallback={<BootHold />}><WelcomePage /></Suspense>} />
+        <Route path="/onboarding/account-type" element={<Navigate to="/welcome" replace />} />
         <Route path="/create-profile" element={<CreateProfileRedirect />} />
         <Route path="/profile" element={<ProfileWrapped />} />
         <Route path="/profile/handicap" element={<Navigate to="/profile?tab=handicap" replace />} />

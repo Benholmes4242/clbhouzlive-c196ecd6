@@ -21,6 +21,20 @@
 @tailwind utilities;
 
 :root {
+  --welcome-canvas:#0B0B0D;
+  --welcome-card:#17171B;
+  --welcome-inset:#1E1E23;
+  --welcome-ink:#F8FAFC;
+  --welcome-mute:rgba(248,250,252,.62);
+  --welcome-dim:rgba(248,250,252,.42);
+  --welcome-hair:rgba(255,255,255,.08);
+  --welcome-progress:rgba(255,255,255,.12);
+  --welcome-photo-hair:rgba(255,255,255,.22);
+  --welcome-glass:rgba(255,255,255,.07);
+  --welcome-glass-hair:rgba(255,255,255,.14);
+  --welcome-green:#34D399;
+  --welcome-focus:#F7931E;
+  --welcome-course-fade:linear-gradient(180deg,transparent 40%,#17171B 100%);
   --course-gallery-glass:rgba(20,22,28,.55);
   --course-gallery-border:rgba(255,255,255,.14);
   --course-gallery-divider:rgba(255,255,255,.12);
