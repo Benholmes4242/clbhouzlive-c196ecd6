@@ -12,12 +12,13 @@ import { LeaderboardTab } from '@/features/tourhub/leaderboard/LeaderboardTab';
 import { NewsTab } from '@/features/tourhub/news/NewsTab';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
-import { TourSelectionProvider } from '../context/TourSelectionContext';
-import { TourSideMenu } from '../components/TourSideMenu';
-import { TourIslandLeft } from '../components/TourIslandLeft';
-import { TourPickerSheet, useTourShortLabel } from '../components/TourPickerSheet';
-import { TourPickerControl } from '../components/TourPickerControl';
-import { AppHeaderBurger } from '@/components/chrome/AppHeader';
+import { TourSelectionProvider, useTourSelection } from '../context/TourSelectionContext';
+import { TourIsland } from '../components/TourIsland';
+import { TourGlance } from '@/features/chrome-v2/TourGlance';
+import { useTourPickerRows } from '../hooks/useTourPickerRows';
+import { useActiveMensMajor } from '../hooks/useActiveMensMajor';
+import { islandDescriptor } from '../components/tourIslandRules';
+import { TourIcon } from '../components/tourIslandIcons';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { safeGoBack } from '@/utils/navigation';
@@ -33,78 +34,79 @@ const TAB_TITLES: Record<string, string> = {
 };
 
 /**
- * TourHubChromeBridge — registers the ChromeIsland left-capsule slot with
- * a burger + short tour label. Mounted inside TourSelectionProvider so
- * useTourShortLabel resolves. Owns the menu + picker sheet state so the
- * slot node stays a stable, prop-driven element.
+ * TourHubChromeBridge — registers the ChromeIsland left-capsule slot with the
+ * ONE tour control (BRIEF_TOUR_ISLAND): the TourIsland showing the tour in
+ * view plus one line of context, opening TourGlance. The burger drawer and
+ * the picker sheet are no longer rendered by this page; Profile, Settings and
+ * Sign out live in the account tile. SeasonStatsIndex and
+ * TourSwitcherAffordance still open TourPickerSheet, and NewsChromeBridge
+ * still opens TourSideMenu — those surfaces are unchanged.
  */
 function TourHubChromeBridge({
   activeTab,
   onSelectTab,
-  onSettings,
-  onProfile,
-  onSignOut,
   backMode,
   onBack,
-  menuOpen,
-  setMenuOpen,
-  pickerOpen,
-  setPickerOpen,
+  glanceAnchor,
+  glanceOpen,
+  openGlance,
+  closeGlance,
 }: {
   activeTab: TourHubTab;
   onSelectTab: (tabId: string) => void;
-  onSettings: () => void;
-  onProfile: () => void;
-  onSignOut: () => void;
   backMode: boolean;
   onBack: () => void;
-  menuOpen: boolean;
-  setMenuOpen: (v: boolean) => void;
-  pickerOpen: boolean;
-  setPickerOpen: (v: boolean) => void;
+  glanceAnchor: HTMLElement | null;
+  glanceOpen: boolean;
+  openGlance: (anchor: HTMLElement) => void;
+  closeGlance: () => void;
 }) {
-  const label = useTourShortLabel();
+  const { rows } = useTourPickerRows();
+  const { selectedTourSlug, viewingTourSlug, appliedTourSlug } = useTourSelection();
+  const activeMajor = useActiveMensMajor();
+  const { data: liveTournaments } = useLiveTournaments();
+  const liveRows = Array.isArray(liveTournaments)
+    ? liveTournaments.filter((tt) => (tt.status || '').toLowerCase() === 'inprogress')
+    : [];
+  const liveRoundById = new Map(liveRows.map((tt) => [tt.id, tt.currentRound] as const));
+
+  const activeTourSlug = appliedTourSlug ?? selectedTourSlug ?? viewingTourSlug ?? 'all';
+  const d = islandDescriptor({
+    activeTab,
+    activeTourSlug,
+    rows,
+    liveCount: liveRows.length,
+    major: activeMajor,
+    liveRound: (id) => (id ? liveRoundById.get(id) ?? null : null),
+  });
 
   const slot = useMemo(
     () => (
-      <TourIslandLeft
-        label={label}
+      <TourIsland
+        label={d.label}
+        caption={d.caption}
+        captionLive={d.captionLive}
+        logoSlug={d.logoSlug}
+        glyph={d.glyph}
         mode={backMode ? 'back' : 'menu'}
         onBackTap={onBack}
-        onMenuTap={() => setMenuOpen(true)}
-        onPickerTap={() => {
-          /* The picker is NO LONGER scoped to the overview. The sub-pages used
-             to carry their own sticky tour-pills row; that row is gone, so the
-             island IS the tour control on every tour tab EXCEPT the live
-             leaderboard, which is deliberately cross-tour (concurrent events on
-             several tours at once) and uses its tournament pills as its own
-             selector. A tour label there would state something false. */
-          setPickerOpen(true);
-        }}
-        showPicker={activeTab !== 'live'}
+        onOpen={openGlance}
       />
     ),
-    [label, backMode, onBack, setMenuOpen, setPickerOpen, activeTab],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [d.label, d.caption, d.captionLive, d.logoSlug, d.glyph, backMode, onBack, openGlance],
   );
   useSetChromeLeftSlot(slot);
 
+  if (!glanceOpen || !glanceAnchor) return null;
   return (
-    <>
-      <TourSideMenu
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        activeTab={activeTab}
-        onSelectTab={(id) => {
-          onSelectTab(id);
-          setMenuOpen(false);
-        }}
-        onSettings={onSettings}
-        onProfile={onProfile}
-        onSignOut={onSignOut}
-      />
-      <TourPickerSheet open={pickerOpen} onClose={() => setPickerOpen(false)} />
-
-    </>
+    <TourGlance
+      onClose={closeGlance}
+      anchorRef={{ current: glanceAnchor }}
+      activeTab={activeTab}
+      onSelectTab={onSelectTab}
+      sectionsOnly={activeTab === 'live'}
+    />
   );
 }
 
