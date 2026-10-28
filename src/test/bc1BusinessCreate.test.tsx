@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { readFileSync } from 'node:fs';
 import { BUSINESS_CATEGORIES } from '@/constants/businessCategories';
 import { CREATE_CATEGORY_TILES } from '@/features/business-create/createRules';
@@ -19,15 +20,18 @@ vi.mock('@/features/business/claimClub', () => ({
 import BusinessCreate from '@/pages/BusinessCreate';
 
 function renderAt(entries: (string | { pathname: string; search?: string })[], index?: number) {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
-    <MemoryRouter initialEntries={entries} initialIndex={index}>
-      <Routes>
-        <Route path="/business/create-v2" element={<BusinessCreate />} />
-        <Route path="/auth" element={<p>auth page</p>} />
-        <Route path="/profile" element={<p>profile page</p>} />
-        <Route path="/before" element={<p>before page</p>} />
-      </Routes>
-    </MemoryRouter>,
+    <QueryClientProvider client={qc}>
+      <MemoryRouter initialEntries={entries} initialIndex={index}>
+        <Routes>
+          <Route path="/business/create-v2" element={<BusinessCreate />} />
+          <Route path="/auth" element={<p>auth page</p>} />
+          <Route path="/profile" element={<p>profile page</p>} />
+          <Route path="/before" element={<p>before page</p>} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 const tile = (value: string) => document.querySelector(`[data-value="${value}"]`) as HTMLButtonElement;
