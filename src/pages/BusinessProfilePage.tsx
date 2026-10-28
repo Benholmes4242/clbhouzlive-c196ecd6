@@ -6,7 +6,6 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useParams, useLocation, useSearchParams } from 'react-router-dom';
-import { cn } from '@/lib/utils';
 import {
   Phone, Globe, MoreHorizontal, Loader2,
   Share2, Link2, Flag, Pencil, MessageCircle,

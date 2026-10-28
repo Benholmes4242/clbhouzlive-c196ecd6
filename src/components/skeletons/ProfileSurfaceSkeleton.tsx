@@ -226,7 +226,7 @@ export const ProfileSurfaceSkeleton: React.FC<ProfileSurfaceSkeletonProps> = ({
     />
     <BioSkeleton />
     {topTen && <TopTenSkeleton />}
-    <TabsSkeleton count={tabs} />
+    {tabs > 0 && <TabsSkeleton count={tabs} />}
   </div>
 );
 
