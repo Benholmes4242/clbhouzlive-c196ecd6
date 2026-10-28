@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -50,7 +50,7 @@ function WelcomeFlow({ user, profile }: { user: NonNullable<ReturnType<typeof us
   const closeConnect = () => { if (location.key !== 'default') navigate(-1); else navigate('/welcome', { replace: true, state: null }); };
   const pickPhoto = (file: File | undefined) => { if (!file) return; const reader = new FileReader(); reader.onload = () => setCropSrc(reader.result as string); reader.readAsDataURL(file); };
   const usePhoto = (file: File) => { setField('profilePhotoBlob', file); const url = URL.createObjectURL(file); setField('profilePhotoUrl', url); setPhotoPreview(url); setCropSrc(null); };
-  const nextOnEnter = (next: () => void) => (e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { e.preventDefault(); next(); } }; const base = usernameSeed(first, last); const connection = useWhsConnection(user.id);
+  const nextOnEnter = (next: () => void) => (e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { e.preventDefault(); next(); } }; const base = usernameSeed(first, last); const connection = useWhsConnection(user.id);
   const [query, setQuery] = useState(''); const search = useCourseSearch(query, { includeClub: true });
   const checkAvailability = useCallback(async (candidateBase: string, edited: boolean) => {
     if (!WELCOME_USERNAME_RE.test(candidateBase)) return { candidate: candidateBase, available: false };
