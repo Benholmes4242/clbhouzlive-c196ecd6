@@ -1,5 +1,10 @@
 # Roadmap
 
+## CB118 — Visiting or Contact for non-club businesses
+- [ ] Generalise the existing ClubVisiting with unchanged club defaults; insert non-club card after mentions and preserve tabs.
+- [ ] Add CB118 tests and change only the explicitly approved contradictory CB107 non-club case; run targeted and full suites against 3,756/415.
+- [ ] Report diff, test inventory and visual/authenticated limitations; no SQL, migrations, deployed functions, feed_config, cap or native changes.
+
 ## CB117 — Mentioned by golfers
 - [x] Added non-club rail after followers, owner/admin hide/show sheet, server-only qualification and read-error omission; both RPCs exist and deny anon with401/42501 permission denied (signed-in checks unavailable external_unmanaged). Existing post route /post/:postId. No app scope beyond non-club insertion.
 - [x] Added22 tests in cb117BusinessMentions.test.tsx; no existing tests changed/deleted/renamed. Full bunx vitest run3,756/3,756 across415 files (+22/+1 from3,734/414), zero failures. Build OK21:39:19Z. Both earlier coursePlaceTagging failures already resolved and remain green. Diff/inventory/limitations in CB117_REPORT.md; authenticated visual and real hide/show readback unavailable.
