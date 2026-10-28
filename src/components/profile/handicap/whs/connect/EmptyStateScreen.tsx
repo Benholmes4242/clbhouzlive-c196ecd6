@@ -222,8 +222,10 @@ export const primaryCtaStyle: React.CSSProperties = {
   cursor: 'pointer',
 };
 
+export const declineButtonStyle: React.CSSProperties = { height: 36, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', fontFamily: FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: QUIET, cursor: 'pointer' };
+
 export const DeclineButton: React.FC<{ onClick: () => void; style?: React.CSSProperties; disabled?: boolean }> = ({ onClick, style, disabled }) => (
-  <button type="button" disabled={disabled} onClick={onClick} style={{ height: 36, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', fontFamily: FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: QUIET, cursor: 'pointer', ...style }}>
+  <button type="button" disabled={disabled} onClick={onClick} style={{ ...declineButtonStyle, ...style }}>
     <IntroText k="decline" />
   </button>
 );

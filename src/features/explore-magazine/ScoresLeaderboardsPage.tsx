@@ -246,6 +246,7 @@ function CompactRow({
   self,
   gapAbove,
   onPress,
+  blurFigures = false,
 }: {
   pos: number | null;
   tie: boolean;
@@ -256,6 +257,8 @@ function CompactRow({
   photo: string | null;
   secondary: string | null;
   value: string;
+  /** Only index/score figures, not Top 100 course counts. */
+  blurFigures?: boolean;
   caption?: string | null;
   /** OPTIONAL 0–1 bar under the name (Top 100 only). Absent = the row as before. */
   progress?: number;
@@ -346,11 +349,11 @@ function CompactRow({
         ) : null}
       </span>
       <span style={{ flexShrink: 0, textAlign: 'right' }}>
-        <span className="tabular-nums" style={{ display: 'block', fontSize: ROW_VALUE_SIZE, fontWeight: SEASON_ROW_METRICS.figureWeight, letterSpacing: SEASON_ROW_METRICS.figureTracking, lineHeight: caption ? SEASON_ROW_METRICS.figureLine : undefined, color: valueTone ?? A.INK }}>
+        <span data-gate-blur={blurFigures ? '' : undefined} className="tabular-nums" style={{ display: 'block', fontSize: ROW_VALUE_SIZE, fontWeight: SEASON_ROW_METRICS.figureWeight, letterSpacing: SEASON_ROW_METRICS.figureTracking, lineHeight: caption ? SEASON_ROW_METRICS.figureLine : undefined, color: valueTone ?? A.INK }}>
           {value}
         </span>
         {caption ? (
-          <span className="tabular-nums" style={{ display: 'block', fontSize: SEASON_ROW_METRICS.secondarySize, fontWeight: SEASON_ROW_METRICS.secondaryWeight, lineHeight: SEASON_ROW_METRICS.secondaryLine, color: captionTone ?? A.DIM }}>
+          <span data-gate-blur={blurFigures ? '' : undefined} className="tabular-nums" style={{ display: 'block', fontSize: SEASON_ROW_METRICS.secondarySize, fontWeight: SEASON_ROW_METRICS.secondaryWeight, lineHeight: SEASON_ROW_METRICS.secondaryLine, color: captionTone ?? A.DIM }}>
             {caption}
           </span>
         ) : null}
@@ -477,6 +480,7 @@ export function ScoresLeaderboardsPage({
         avatarName={r.display_name}
         photo={r.photo_url}
         secondary={journey}
+        blurFigures
         value={onShare ? shareMain : cut}
         valueTone={onShare && pct == null ? undefined : pair?.delta?.tone}
         caption={onShare ? shareSecondary : strokesSecondary}

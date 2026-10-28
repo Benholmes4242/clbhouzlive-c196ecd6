@@ -1,6 +1,6 @@
 import React, { StrictMode } from 'react';
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
@@ -17,7 +17,9 @@ beforeAll(async () => {
     interpolation: { escapeValue: false },
   });
 });
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => { vi.clearAllMocks(); vi.useFakeTimers(); });
+afterEach(() => { cleanup(); vi.useRealTimers(); });
+function lock() { act(() => vi.advanceTimersByTime(3000)); }
 
 function LocationProbe() {
   return <output data-testid="destination">{useLocation().pathname}</output>;
@@ -29,7 +31,7 @@ function Page({ userId = 'viewer', isSuccess = true, data = null }: {
   userId?: string; isSuccess?: boolean; data?: unknown;
 }) {
   const gate = roundsGateState(userId || undefined, { isSuccess, data });
-  return <>{gate === 'gated' ? <RoundsGate><div>Live rounds</div></RoundsGate> : null}<LocationProbe /></>;
+  return <>{gate === 'gated' ? <RoundsGate><div data-board-row="">Live rounds</div></RoundsGate> : null}<LocationProbe /></>;
 }
 
 function fixture(props: React.ComponentProps<typeof Page> = {}) {
@@ -43,6 +45,16 @@ function openSheet() {
 }
 
 describe('CB15 — gate reporting', () => {
+  it('reports viewed only on scroll lock, once per mount with the scroll trigger', () => {
+    render(fixture());
+    const scroller = document.scrollingElement ?? document.documentElement;
+    scroller.scrollTop = 80; fireEvent.scroll(window);
+    expect(analyticsEvents.track).not.toHaveBeenCalledWith('rounds_gate_viewed', expect.anything());
+    scroller.scrollTop = 81; fireEvent.scroll(window);
+    expect(analyticsEvents.track).toHaveBeenCalledWith('rounds_gate_viewed', { gate_state: 'gated', trigger: 'scroll' });
+    scroller.scrollTop = 0; fireEvent.scroll(window); lock();
+    expect(vi.mocked(analyticsEvents.track).mock.calls.filter(([event]) => event === 'rounds_gate_viewed')).toHaveLength(1);
+  });
   it('reports once per gated mount despite StrictMode replay and settled query rerenders', () => {
     const view = render(fixture({ isSuccess: false }));
     expect(analyticsEvents.track).not.toHaveBeenCalled();
@@ -50,7 +62,11 @@ describe('CB15 — gate reporting', () => {
     view.rerender(fixture({ data: null }));
     view.rerender(fixture());
     expect(analyticsEvents.track).toHaveBeenCalledTimes(1);
-    expect(analyticsEvents.track).toHaveBeenCalledWith('rounds_gate_viewed', { gate_state: 'gated' });
+    expect(analyticsEvents.track).toHaveBeenCalledWith('rounds_gate_look_started', { gate_state: 'gated' });
+    lock();
+    expect(analyticsEvents.track).toHaveBeenCalledWith('rounds_gate_viewed', { gate_state: 'gated', trigger: 'timer' });
+    act(() => vi.advanceTimersByTime(11000));
+    expect(vi.mocked(analyticsEvents.track).mock.calls.filter(([event]) => event === 'rounds_gate_viewed')).toHaveLength(1);
   });
 
   it.each([
@@ -68,13 +84,14 @@ describe('CB15 — gate reporting', () => {
     render(fixture());
     expect(analyticsEvents.track).toHaveBeenCalledTimes(2);
     expect(vi.mocked(analyticsEvents.track).mock.calls).toEqual([
-      ['rounds_gate_viewed', { gate_state: 'gated' }],
-      ['rounds_gate_viewed', { gate_state: 'gated' }],
+      ['rounds_gate_look_started', { gate_state: 'gated' }],
+      ['rounds_gate_look_started', { gate_state: 'gated' }],
     ]);
   });
 
   it('reports the white CTA tap before retaining its connect destination', () => {
     render(fixture());
+    lock();
     vi.mocked(analyticsEvents.track).mockClear();
     fireEvent.click(screen.getByRole('button', { name: enCourses.amateur.gate.cta }));
     expect(vi.mocked(analyticsEvents.track).mock.calls).toEqual([
@@ -83,22 +100,24 @@ describe('CB15 — gate reporting', () => {
     expect(screen.getByTestId('destination').textContent).toBe('/manage/handicap');
   });
 
-  it('reports the no-handicap tap once and opens the existing sheet', () => {
+  it('reports the no-handicap tap once and opens the glass tile', () => {
     render(fixture());
+    lock();
     vi.mocked(analyticsEvents.track).mockClear();
     openSheet();
     expect(vi.mocked(analyticsEvents.track).mock.calls).toEqual([
       ['rounds_gate_no_handicap_tap', { gate_state: 'gated' }],
     ]);
-    expect(screen.getByRole('button', { name: /England iGolf/ })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /iGolf, in England/ })).toBeTruthy();
   });
 
   it('reports the england row without identifiers and retains its external destination', () => {
     const open = vi.spyOn(window, 'open').mockImplementation(() => null);
     render(fixture());
+    lock();
     openSheet();
     vi.mocked(analyticsEvents.track).mockClear();
-    fireEvent.click(screen.getByRole('button', { name: /England iGolf/ }));
+    fireEvent.click(screen.getByRole('button', { name: /iGolf, in England/ }));
     expect(vi.mocked(analyticsEvents.track).mock.calls).toEqual([
       ['rounds_gate_sheet_row_tap', { gate_state: 'gated', row: 'england' }],
     ]);
@@ -109,6 +128,7 @@ describe('CB15 — gate reporting', () => {
   it('reports the club row, closes the sheet and navigates to Courses', () => {
     const open = vi.spyOn(window, 'open').mockImplementation(() => null);
     render(fixture());
+    lock();
     openSheet();
     vi.mocked(analyticsEvents.track).mockClear();
     fireEvent.click(screen.getByText(enCourses.amateur.gate.club));

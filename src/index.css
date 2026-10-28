@@ -21,6 +21,17 @@
 @tailwind utilities;
 
 :root {
+  --rounds-gate-ink: #F8FAFC;
+  --rounds-gate-amber: #F7931E;
+  --rounds-gate-mute: rgba(248,250,252,0.62);
+  --rounds-gate-dim: rgba(248,250,252,0.42);
+  --rounds-gate-quiet: #9AA3AF;
+  --rounds-gate-rule: rgba(255,255,255,0.08);
+  --rounds-gate-icon: rgba(255,255,255,0.06);
+  --rounds-gate-ghost: rgba(247,147,30,0.06);
+  --rounds-gate-dash: rgba(247,147,30,0.6);
+  --rounds-gate-slot: rgba(247,147,30,0.45);
+  --rounds-gate-shade: linear-gradient(180deg, rgba(10,10,12,0) 0%, rgba(10,10,12,0.85) 35%, #0A0A0C 60%);
   --welcome-canvas:#0B0B0D;
   --welcome-card:#17171B;
   --welcome-inset:#1E1E23;
