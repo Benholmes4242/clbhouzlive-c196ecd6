@@ -15,6 +15,7 @@ import { fetchGolfClub, clubRowToSelected } from '@/features/business/claimClub'
 import { CREATE_CATEGORY_GROUPS, CREATE_STEPS, initialDraft, type BusinessCreateDraft } from '@/features/business-create/createRules';
 import { BusinessCreateStep2 } from '@/features/business-create/BusinessCreateStep2';
 import { BusinessCreateStep3 } from '@/features/business-create/BusinessCreateStep3';
+import { BusinessCreateStep4 } from '@/features/business-create/BusinessCreateStep4';
 import type { BusinessCategoryValue } from '@/constants/businessCategories';
 import '@/features/business-create/business-create.css';
 
@@ -30,6 +31,10 @@ export default function BusinessCreate() {
 
   const [draft, setDraft] = useState<BusinessCreateDraft>(() => initialDraft(searchParams));
   const step = ((location.state as { bizStep?: number } | null)?.bizStep ?? 1);
+  // The flow, not the individual step, owns committed object URLs so Back
+  // preserves photographs. Replaced URLs and flow departure release them.
+  useEffect(() => { const url = draft.cover.localPreview; return () => { if (url) URL.revokeObjectURL(url); }; }, [draft.cover.localPreview]);
+  useEffect(() => { const url = draft.logo.localPreview; return () => { if (url) URL.revokeObjectURL(url); }; }, [draft.logo.localPreview]);
 
   const clubId = searchParams.get('clubId');
   useEffect(() => {
@@ -87,8 +92,8 @@ export default function BusinessCreate() {
         </div>
         {/* BC3: step 3 is skippable — everything on it is optional and Skip
             keeps whatever is filled, exactly like Continue. */}
-        {step === 3 && (
-          <button type="button" className="bizc-skip" data-testid="bizc-skip" onClick={() => goStep(4)}>
+        {(step === 3 || step === 4) && (
+          <button type="button" className="bizc-skip" data-testid="bizc-skip" onClick={() => goStep(step + 1)}>
             {t('businessCreate.skip', { defaultValue: 'Skip' })}
           </button>
         )}
@@ -123,11 +128,12 @@ export default function BusinessCreate() {
         <BusinessCreateStep2 draft={draft} setDraft={setDraft} userId={user.id} onContinue={() => goStep(3)} />
       ) : step === 3 ? (
         <BusinessCreateStep3 draft={draft} setDraft={setDraft} onContinue={() => goStep(4)} />
+      ) : step === 4 ? (
+        <BusinessCreateStep4 draft={draft} setDraft={setDraft} onFinish={() => goStep(5)} />
       ) : (
-        /* BC3: step 4 is a placeholder until BC4 — segment 4 filled, back works. */
-        <main className="bizc-body" data-testid="bizc-step-4">
-          <div className="bizc-kicker">{t('businessCreate.kicker', { defaultValue: 'Put your business on clbhouz' })}</div>
-          <p className="bizc-sub">{t('businessCreate.step4Placeholder', { defaultValue: 'Step 4 arrives with BC4.' })}</p>
+        <main className="bizc-body" data-testid="bizc-finish">
+          <div className="bizc-kicker">Your profile</div>
+          <p className="bizc-sub">Nothing has been saved yet.</p>
         </main>
       )}
     </div>
