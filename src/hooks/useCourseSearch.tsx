@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Course {
+  club_id?: string | null;
   id: string;
   name: string;
   country: string;
@@ -19,13 +20,14 @@ interface SearchResult extends Course {
 }
 
 interface UseCourseSearchOptions {
+  includeClub?: boolean;
   debounceMs?: number;
   limit?: number;
   userId?: string;
 }
 
 export function useCourseSearch(query: string, options: UseCourseSearchOptions = {}) {
-  const { debounceMs = 250, limit = 20, userId } = options;
+  const { debounceMs = 250, limit = 20, userId, includeClub = false } = options;
   const [data, setData] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +56,7 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
         // Search courses
         const { data: courses, error: coursesError } = await supabase
           .from('golf_courses')
-          .select('id, name, country, sub_country, region, thumbnail_image, global_rank, regional_rank, usa_rank')
+          .select(includeClub ? 'id, name, country, sub_country, region, thumbnail_image, global_rank, regional_rank, usa_rank, club_id' : 'id, name, country, sub_country, region, thumbnail_image, global_rank, regional_rank, usa_rank')
           .ilike('name', `%${query}%`)
           .limit(limit);
 
@@ -68,10 +70,11 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
         }
 
         // If userId provided, fetch user's ratings and played status
-        let enrichedResults: SearchResult[] = courses;
+        const catalogueRows = courses as unknown as SearchResult[];
+        let enrichedResults: SearchResult[] = catalogueRows;
 
         if (userId) {
-          const courseIds = courses.map(c => c.id);
+          const courseIds = catalogueRows.map(c => c.id);
           
           // Get user ratings (ratings-only: rated = played)
           const { data: ratings } = await supabase
@@ -85,7 +88,7 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
           const ratingsMap = new Map(ratings?.map(r => [r.course_id, r.rating]) || []);
 
           // In ratings-only system, played = has rating
-          enrichedResults = courses.map(course => ({
+          enrichedResults = catalogueRows.map(course => ({
             ...course,
             rating: ratingsMap.get(course.id),
             played: ratingsMap.has(course.id)
@@ -105,7 +108,7 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
     }, debounceMs);
 
     return () => clearTimeout(timeoutId);
-  }, [query, debounceMs, limit, userId, refetchToken]);
+  }, [query, debounceMs, limit, userId, includeClub, refetchToken]);
 
   const refetch = () => setRefetchToken((n) => n + 1);
 

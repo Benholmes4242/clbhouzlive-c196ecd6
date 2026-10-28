@@ -57,7 +57,7 @@ export default function AuthCallback() {
           .maybeSingle();
 
         if (!profile || !profile.has_completed_onboarding) {
-          navigate('/edit-profile?onboarding=1', { replace: true });
+          navigate('/welcome', { replace: true });
         } else {
           navigate('/', { replace: true });
         }

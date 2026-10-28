@@ -114,6 +114,9 @@ interface Props {
   onDecline?: () => void;
   /** 'page' fills viewport height and pins CTAs. 'embedded' sizes to content. */
   layout?: 'page' | 'embedded';
+  /** OB1 reuses credentials/errors/instrumentation, bypassing intro and payoff. */
+  initialCountryId?: string;
+  completeOnSuccess?: boolean;
 }
 
 type Stage = 'intro' | 'country' | 'form' | 'comingSoon' | 'sync' | 'done' | 'declined';
@@ -122,6 +125,8 @@ export const WhsConnectScreen: React.FC<Props> = ({
   onConnected,
   onDecline,
   layout = 'page',
+  initialCountryId,
+  completeOnSuccess = false,
 }) => {
   const { country, setCountryId } = useSelectedCountry();
   const location = useLocation();
@@ -129,7 +134,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const { data: connection } = useWhsConnection(user?.id);
-  const [step, setStep] = useState<'intro' | 'country' | 'chosen' | 'declined'>('intro');
+  const [step, setStep] = useState<'intro' | 'country' | 'chosen' | 'declined'>(initialCountryId ? 'chosen' : 'intro');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   /* The form's state comes from error_code, never from the display copy. */
@@ -148,7 +153,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
      /handicap tab. `page` in props already carries the path. */
   const entryPoint = immersive ? 'manage_handicap' : 'handicap_embedded';
   const preselected = Boolean(
-    (location.state as { preselectCountryId?: string } | null)?.preselectCountryId,
+    initialCountryId ?? (location.state as { preselectCountryId?: string } | null)?.preselectCountryId,
   );
 
   // whs_connect_viewed — the screen mounted. Fires once per mount.
@@ -207,7 +212,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
   }, [immersive]);
 
   useEffect(() => {
-    const preselect = (location.state as { preselectCountryId?: string } | null)?.preselectCountryId;
+    const preselect = initialCountryId ?? (location.state as { preselectCountryId?: string } | null)?.preselectCountryId;
     if (preselect) {
       setCountryId(preselect);
       setStep('chosen');
@@ -269,6 +274,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
          ref, so succeeded and abandoned can never both fire (acceptance D). */
       succeededRef.current = true;
       analyticsEvents.track('whs_connect_succeeded', { country: country?.id ?? null });
+      if (completeOnSuccess) { await onConnected(); return; }
       setSuccessData(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
@@ -285,7 +291,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
 
   const stage: Stage = successData
     ? 'done'
-    : submitting
+    : submitting && !completeOnSuccess
     ? 'sync'
     : step === 'declined'
     ? 'declined'
@@ -377,7 +383,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
             onSubmit={handleSubmit}
             error={error}
             errorKind={errorKind}
-            submitting={false}
+            submitting={completeOnSuccess && submitting}
             bodyName={country?.body}
             bodyShort={country?.bodyShort ?? country?.body}
           />

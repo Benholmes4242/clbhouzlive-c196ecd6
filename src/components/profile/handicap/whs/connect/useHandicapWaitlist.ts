@@ -100,6 +100,9 @@ export function useHandicapWaitlist(userId: string | undefined) {
   };
 
   return {
+    isSettled: joinedQ.isSuccess && countsQ.isSuccess,
+    isError: joinedQ.isError || countsQ.isError,
+    refetch: () => Promise.all([joinedQ.refetch(), countsQ.refetch()]),
     joined: joinedQ.data ?? new Set<string>(),
     counts: countsQ.data ?? {},
     join,

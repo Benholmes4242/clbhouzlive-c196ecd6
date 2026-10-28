@@ -32,6 +32,7 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Review course names link only through `CourseNameLink` (see its header), so the id-or-plain-text rule and tap isolation live once.
 
 - Owner copy uses `profileOwnerVoice` to share grammar.
+- First-sign-in uses the isolated welcome feature with opt-in partial profile saves and canonical connect-controller options; defaults preserve normal profile editing and handicap setup.
 - Club analytics opening copy is computed by courseLead from the selected CourseBlock payload only; no seed fallback or additional reads, so chip switches cannot mix courses.
 - Club weekday conclusions share weekRoom between the lead and tee-sheet card; selected-course conclusions must not drift between surfaces.
 - Sheet handicap ownership: see HcpStrip.tsx header; prevents connect-card flashes.

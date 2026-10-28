@@ -18,7 +18,7 @@ export function useProfileSave(userId: string) {
 
   const save = async (
     form: ProfileFormData,
-    opts: { isOnboarding?: boolean; hasWhsConnection?: boolean } = {}
+    opts: { isOnboarding?: boolean; hasWhsConnection?: boolean; welcomeFields?: 'identity' | 'course' } = {}
   ): Promise<boolean | 'username_taken'> => {
     const { isOnboarding = false, hasWhsConnection = false } = opts;
     setIsSaving(true);
@@ -102,6 +102,21 @@ export function useProfileSave(userId: string) {
       if (isOnboarding && form.username.trim()) {
         updatePayload.username = form.username.trim();
         updatePayload.username_is_custom = true;
+      }
+
+      // OB1 saves only the completed screen through this upload/save path.
+      // It cannot finish onboarding or replace unrelated clubs/privacy fields.
+      if (opts.welcomeFields) {
+        const payload = opts.welcomeFields === 'identity'
+          ? { first_name: form.firstName.trim(), last_name: form.lastName.trim(), display_name: `${form.firstName.trim()} ${form.lastName.trim()}`.trim(), username: form.username.trim().toLowerCase(), username_is_custom: true, profile_photo_url: profilePhotoUrl, updated_at: updatePayload.updated_at }
+          : { primary_club_id: form.primaryClubId, home_club: form.homeClubName, updated_at: updatePayload.updated_at };
+        const { data, error } = await supabase.from('user_profiles').update(payload).eq('id', userId).select('id').single();
+        if (error?.code === '23505') return 'username_taken';
+        if (error) throw error;
+        if (!data) throw new Error('Profile update did not match any row');
+        await queryClient.invalidateQueries({ queryKey: ['profile', userId] });
+        if (opts.welcomeFields === 'course') await queryClient.invalidateQueries({ queryKey: ['suggested-golfers', userId] });
+        return true;
       }
 
       // Capture prior gender so a changed gender value can trigger the same

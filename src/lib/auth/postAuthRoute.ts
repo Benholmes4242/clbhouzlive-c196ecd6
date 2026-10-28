@@ -20,7 +20,7 @@ export async function resolvePostAuthRoute(
     if (error) return redirectPath || '/';
     const hasProfile = !!data;
     const done = data?.has_completed_onboarding ?? false;
-    if (!hasProfile || !done) return '/edit-profile?onboarding=1';
+    if (!hasProfile || !done) return '/welcome';
     return redirectPath || '/';
   } catch {
     return redirectPath || '/';

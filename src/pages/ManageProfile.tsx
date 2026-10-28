@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, Loader2, ChevronDown, ChevronUp, Flag, Sparkles, ArrowRight, CheckCircle2, Check } from 'lucide-react';
 import { A, bizFigure } from '@/features/courses/components/holes/analytical/tokens';
@@ -234,6 +234,8 @@ export default function ManageProfile() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.firstName, form.lastName, hasTouchedDisplayName]);
+
+  if (searchParams.get('onboarding') === '1') return <Navigate to="/welcome" replace />;
 
   if (profileError && !isNewUser.current) {
     return (
@@ -707,6 +709,9 @@ function ProfileTabBody({
               Your home club appears on your profile and leaderboards
             </Nudge>
           )}
+        </ManageCard>
+
+        <ManageCard>
           <YourCoachRow viewerId={user?.id} />
         </ManageCard>
 

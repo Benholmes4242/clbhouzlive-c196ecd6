@@ -1,5 +1,10 @@
 # Roadmap
 
+## OB1 — Five-screen first sign-in
+- [x] Built five-screen /welcome, existing-source adapters, partial saves, old-entry redirects and separate coach card; no gallery code/test edits.
+- [ ] STOP: OB1 tests36 passed/3 failed/39; full `bunx vitest run`3,907 passed/4 failed/3,911 across421 files. Outside OB1/gallery3,832/3,832 passed. New failures ob1Welcome.test.tsx:50:322 save spy0 calls; :65:311 skipped expected step3 but empty fixture advanced4; :71:295 completion event absent. No corrections after stop; OB1_STOP_REPORT.md names exact errors, retained branches, APIs and39-case inventory. Before3,872/420; +39/+1 solely OB1. Additional first-look gate coverage awaits stop resolution.
+- [ ] Course tile uses existing live catalogue count or “Every course”; no fixed snapshot. Verify usable screens where authentication permits; report external-unmanaged live-check limit.
+
 ## Course gallery — signed-off viewer
 - [ ] STOP after authorized component correction: eligible tagger header/strip posters bypass processing; gallery cards retain readiness. Full `bunx vitest run`:3,871 passed/1 failed/3,872 total across420 files (+1 courseGallery regression). Unchanged holeMediaTidy9/9 passes. New courseGallery.test.tsx:53:95: `AssertionError: expected [] to deeply equal [ '/poster.jpg', '/poster.jpg' ]` because overlay is portalled outside render container. Surviving type error courseGallery.test.tsx(50,40): `error TS2322: Type '{ url: string; mediaType: string; posterUrl: string; streamId: string; }' is not assignable to type 'TagShot'.` No correction/rerun; stop report retained.
 - [x] Added canonical gallery mode/chrome, shared catalogue order, grid/info, same-shot tagging and ready-thumbnail paths.
