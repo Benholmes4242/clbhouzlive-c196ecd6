@@ -333,6 +333,14 @@ export const WhsConnectScreen: React.FC<Props> = ({
     ? 'comingSoon'
     : 'form';
 
+  /* OB1.5: the host swaps its heading and hides back/Skip while a connect is
+     in flight. Fires on every transition and once more (false) on unmount. */
+  const syncing = stage === 'sync';
+  useEffect(() => {
+    onSyncingChange?.(syncing);
+  }, [syncing, onSyncingChange]);
+  useEffect(() => () => onSyncingChange?.(false), [onSyncingChange]);
+
   /** ONE title on every stage. Each screen's own headline carries the voice,
    *  so the header never restates it - and never names a federation. */
   const HEADER_TITLE = 'Handicap';
