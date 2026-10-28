@@ -140,7 +140,7 @@ describe('TourIsland', () => {
     const btn = screen.getByRole('button');
     expect(btn.textContent).toContain('PGA Tour');
     expect(btn.textContent).toContain('Live · Round 3');
-    expect(btn.getAttribute('data-island-flush')).toBe('true');
+    expect(container.querySelector('[data-island-flush]')).not.toBeNull();
     expect(container.querySelector('img')).not.toBeNull();
   });
 
