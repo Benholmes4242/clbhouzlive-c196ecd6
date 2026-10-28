@@ -22515,6 +22515,16 @@ export type Database = {
           total_over_par: number
         }[]
       }
+      get_my_handicap_friends_on_clbhouz: {
+        Args: never
+        Returns: {
+          display_name: string
+          is_following: boolean
+          profile_photo_url: string
+          user_id: string
+          username: string
+        }[]
+      }
       get_my_handicap_percentile: { Args: never; Returns: Json }
       get_my_hole_performance: {
         Args: { p_course_id: string; p_user_id: string }
