@@ -122,6 +122,7 @@ describe('Islands round two wordmark', () => {
     expect(wordmark()).toBeDefined();
     const image = wordmark();
     if (!image) throw new Error('Missing wordmark');
+    expect(image.getAttribute('src')).toBe('/brand/clbhouz-wordmark-white@3x.png');
     expect(image.style.height).toBe('20px');
     expect(image.style.opacity).toBe('0');
     expect(image.style.maxWidth).toBe('0');

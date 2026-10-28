@@ -290,7 +290,7 @@ const LeftCapsule: React.FC<{
       />
       {showWordmark && (
         <img
-          src={wordmarkWhite.url}
+          src="/brand/clbhouz-wordmark-white@3x.png"
           alt="clbhouz"
           style={{
             display: 'block',
