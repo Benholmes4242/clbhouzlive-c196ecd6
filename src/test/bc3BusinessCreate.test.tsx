@@ -120,8 +120,9 @@ function toStep2(category: string) {
   fireEvent.click(screen.getByTestId('bizc-continue'));
 }
 
-/** Other branch: name → continue to step 3. */
+/** Other branch: render → category → name → continue to step 3. */
 async function otherToStep3(name = 'The Range Cafe') {
+  renderAt(['/business/create-v2']);
   toStep2('Restaurant / Cafe');
   fireEvent.change(screen.getByTestId('bizc-name').querySelector('input') as HTMLInputElement, { target: { value: name } });
   await waitFor(() => expect((screen.getByTestId('bizc-continue-2') as HTMLButtonElement).disabled).toBe(false));
