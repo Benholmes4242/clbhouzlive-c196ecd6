@@ -57,47 +57,61 @@ export function CourseGalleryChrome({ onClose }: { onClose: () => void }) {
   const placeCount = place ? filteredGallery(data.shots, place.id).length : 0;
   const age = place ? placeAge(filteredGallery(data.shots, place.id)[0]?.addedAt ?? '') : null;
   const action = shot ? galleryAction(shot, user?.id, admin) : null;
+  const run = galleryRun(data.shots, shot);
+  const runIndex = shot ? Math.max(0, run.findIndex(row => row.id === shot.id)) : 0;
+  const currentHole = !grid ? shot?.holeTag?.hole_no : undefined;
+  const holeShots = (n: number) => list.filter(row => row.holeTag?.hole_no === n);
+  const jumpHole = (n: number) => {
+    const first = holeShots(n)[0];
+    if (!first) return;
+    if (!grid) { jump(first.id); return; }
+    const scroller = gridRef.current;
+    const group = scroller?.querySelector<HTMLElement>(`[data-gallery-group="hole:${n}"]`);
+    if (scroller && group) scroller.scrollTop = group.offsetTop;
+  };
+  const shotWord = (n: number) => n === 1 ? 'shot' : 'shots';
   return <div className={`course-gallery-chrome${grid ? ' is-grid' : ''}`} data-course-gallery data-gallery-filter={options.filter}>
-    {grid && <div className="course-gallery-grid-wash" />}
-    <div className="course-gallery-top">
-      <Button variant="ghost" className="course-gallery-circle" aria-label={t('media.gallery.close', { defaultValue: 'Close' })} onClick={onClose}><X size={17} /></Button>
-      <div className="course-gallery-heading"><b>{options.courseName}</b><span>{grid ? t('media.gallery.gridCount', { count: list.length, filter: label(options.filter), defaultValue: `${list.length} shots · ${label(options.filter)}` }) : t('media.gallery.count', { i: Math.min(pager + 1, list.length), n: list.length, filter: label(options.filter), defaultValue: `${Math.min(pager + 1, list.length)} of ${list.length} · ${label(options.filter)}` })}</span></div>
-      <Button variant="ghost" className="course-gallery-circle" aria-label={t('media.gallery.grid', { defaultValue: 'Grid view' })} aria-pressed={grid} onClick={() => { setGrid(on => !on); void analyticsEvents.track('course_gallery_grid_toggle', { on: !grid }); }}><Grid2X2 size={16} /></Button>
+    <div className="course-gallery-panel" ref={panelRef} data-gallery-panel>
+      <div className="course-gallery-top">
+        <Button variant="ghost" className="course-gallery-circle" aria-label={t('media.gallery.close', { defaultValue: 'Close' })} onClick={onClose}><X size={16} /></Button>
+        <div className="course-gallery-heading"><b>{options.courseName}</b><span data-gallery-count>{grid ? t('media.gallery.gridCount', { count: list.length, filter: label(options.filter), defaultValue: `${list.length} ${shotWord(list.length)} · ${label(options.filter)}` }) : t('media.gallery.count', { i: Math.min(pager + 1, list.length), n: list.length, filter: label(options.filter), defaultValue: `${Math.min(pager + 1, list.length)} of ${list.length} · ${label(options.filter)}` })}</span></div>
+        <Button variant="ghost" className="course-gallery-circle course-gallery-grid-toggle" aria-label={t(grid ? 'media.gallery.fullscreen' : 'media.gallery.grid', { defaultValue: grid ? 'Full screen' : 'Grid view' })} aria-pressed={grid} onClick={() => { setGrid(on => !on); void analyticsEvents.track('course_gallery_grid_toggle', { on: !grid }); }}>{grid ? <ImageIcon size={16} /> : <Grid2X2 size={16} />}</Button>
+      </div>
+      <div className="course-gallery-filters">{galleryFilters(data.shots).map(({ filter, count }) => {
+        const Icon = filter === 'holes' ? Flag : COURSE_PLACES.find(place => place.id === filter)?.icon;
+        return <Button key={filter} variant="ghost" className="course-gallery-chip" aria-pressed={filter === options.filter} onClick={() => changeFilter(filter)}>{Icon && <Icon size={14} />}{label(filter)}<span>{count}</span></Button>;
+      })}</div>
+      {options.filter === 'holes' && <div className="course-gallery-jump" data-gallery-jump>
+        <div className="course-gallery-jump-head"><span className="course-gallery-label">{t('media.gallery.jump', { defaultValue: 'JUMP TO A HOLE' })}</span>
+          {!grid && shot?.holeTag && <span className="course-gallery-label is-ink" data-gallery-position>{t('media.gallery.position', { ordinal: shortOrdinal(shot.holeTag.hole_no).toUpperCase(), i: runIndex + 1, n: run.length, defaultValue: `THE ${shortOrdinal(shot.holeTag.hole_no).toUpperCase()} · SHOT ${runIndex + 1} OF ${run.length}` })}</span>}</div>
+        <div className="course-gallery-holes">{Array.from({ length: 18 }, (_, i) => {
+          const n = i + 1; const rows = holeShots(n);
+          return <Button key={n} variant="ghost" data-shot={rows.length > 0} aria-label={t('media.gallery.hole', { hole: n, defaultValue: `Hole ${n}` })} aria-current={currentHole === n ? 'true' : undefined} onClick={() => jumpHole(n)}>
+            <i className="course-gallery-bar">{rows.length ? rows.map(row => <em key={row.id} data-piece={currentHole === n ? row.id === shot?.id ? 'current' : 'hole' : 'shot'} />) : <em data-piece="empty" />}</i>
+            <span>{n}</span></Button>;
+        })}</div>
+      </div>}
     </div>
-    <div className="course-gallery-filters">{galleryFilters(data.shots).map(({ filter, count }) => {
-      const Icon = filter === 'holes' ? Flag : COURSE_PLACES.find(place => place.id === filter)?.icon;
-      return <Button key={filter} variant="ghost" className="course-gallery-chip" aria-pressed={filter === options.filter} onClick={() => changeFilter(filter)}>{Icon && <Icon size={14} />}{label(filter)}<span>{count}</span></Button>;
-    })}</div>
-    {!grid && options.filter === 'holes' && <div className="course-gallery-holes">{Array.from({ length: 18 }, (_, i) => {
-      const n = i + 1; const first = list.find(shot => shot.holeTag?.hole_no === n);
-      return <Button key={n} variant="ghost" data-shot={!!first} aria-label={t('media.gallery.hole', { hole: n, defaultValue: `Hole ${n}` })} aria-current={shot?.holeTag?.hole_no === n ? 'true' : undefined} onClick={() => { if (first) jump(first.id); }}><i /><span>{n}</span></Button>;
-    })}</div>}
-    {grid ? <div className="course-gallery-grid" data-gallery-grid>{galleryGroups(data.shots, options.filter).map(group => <section key={group.key} data-gallery-group={group.key}>
-      <header><span style={VERDICT_KICKER}>{group.hole ? t('media.gallery.holeKicker', { ordinal: holeOrdinal(group.hole), defaultValue: `The ${holeOrdinal(group.hole)}` }) : group.place ? label(group.place) : t('media.gallery.notTagged', { defaultValue: 'Not tagged' })}</span><span className="course-gallery-label">{t('media.gallery.shots', { count: group.shots.length, defaultValue: `${group.shots.length} ${group.shots.length === 1 ? 'shot' : 'shots'}` })}</span></header>
+    {grid ? <div className="course-gallery-grid" data-gallery-grid ref={gridRef} style={{ top: gridTop }}>{galleryGroups(data.shots, options.filter).map(group => <section key={group.key} data-gallery-group={group.key}>
+      {group.hole != null && <header><span style={VERDICT_KICKER}>{t('media.gallery.holeKicker', { ordinal: holeOrdinal(group.hole), defaultValue: `The ${holeOrdinal(group.hole)}` })}</span><span className="course-gallery-label">{t('media.gallery.shots', { count: group.shots.length, defaultValue: `${group.shots.length} ${shotWord(group.shots.length)}` })}</span></header>}
       <div className="course-gallery-squares">{group.shots.map(square => <Button variant="ghost" key={square.id} className="course-gallery-square" aria-label={t('media.gallery.viewShot', { id: square.id, defaultValue: `View shot ${square.id}` })} onClick={() => { jump(square.id); setGrid(false); }}>
         <ReadyShotCover fallbackIcon shots={[{ id: square.id, media_url: square.item.imageUrl ?? '', media_type: square.item.type, poster_url: square.item.thumbnailUrl, stream_id: square.item.streamId, duration_seconds: square.item.duration }]} />
         {square.item.type === 'video' && square.item.duration != null && <span className="course-gallery-duration">{Math.floor(square.item.duration / 60)}:{String(Math.floor(square.item.duration % 60)).padStart(2, '0')}</span>}
       </Button>)}</div>
     </section>)}</div> : shot && <div className="course-gallery-info">
+      {run.length > 1 && <div className="course-gallery-progress" data-gallery-progress>{run.map(row => <i key={row.id} data-current={row.id === shot.id} />)}</div>}
       {shot.holeTag ? <>
-        <span style={VERDICT_KICKER}>{t('media.gallery.holeKicker', { ordinal: holeOrdinal(shot.holeTag.hole_no), defaultValue: `The ${holeOrdinal(shot.holeTag.hole_no)}` })}</span>
+        <div className="course-gallery-kicker-row"><span style={VERDICT_KICKER}>{t('media.gallery.holeKicker', { ordinal: holeOrdinal(shot.holeTag.hole_no), defaultValue: `The ${holeOrdinal(shot.holeTag.hole_no)}` })}</span>{run.length > 1 && <span className="course-gallery-label is-mute">{t('media.gallery.shotOf', { i: runIndex + 1, n: run.length, defaultValue: `SHOT ${runIndex + 1} OF ${run.length}` })}</span>}</div>
         <h2>{data.scored && hole ? hole.yards != null ? t('media.gallery.parYards', { par: hole.par, yards: hole.yards, defaultValue: `Par ${hole.par} · ${hole.yards} yards` }) : t('media.gallery.par', { par: hole.par, defaultValue: `Par ${hole.par}` }) : t('media.gallery.holeTitle', { ordinal: holeOrdinal(shot.holeTag.hole_no), defaultValue: `The ${holeOrdinal(shot.holeTag.hole_no)} hole` })}</h2>
-        <div className="course-gallery-stats">
-          {data.scored && hole?.stroke_index != null && <div><b>{hole.stroke_index}</b><span>{t('media.gallery.strokeIndex', { defaultValue: 'Stroke index' })}</span></div>}
-          {data.scored && field && <div><b style={{ color: field.tone }}>{field.text}</b><span>{t('media.gallery.fieldLoses', { defaultValue: 'Field loses' })}</span></div>}
-          <div><b>{data.shots.filter(row => row.holeTag?.hole_no === shot.holeTag?.hole_no).length}</b><span>{t('media.gallery.shotsOfIt', { count: data.shots.filter(row => row.holeTag?.hole_no === shot.holeTag?.hole_no).length, defaultValue: data.shots.filter(row => row.holeTag?.hole_no === shot.holeTag?.hole_no).length === 1 ? 'Shot of it' : 'Shots of it' })}</span></div>
-        </div>
+        {data.scored && (hole?.stroke_index != null || field) && <div className="course-gallery-stats">
+          {hole?.stroke_index != null && <div><b>{hole.stroke_index}</b><span>{t('media.gallery.strokeIndex', { defaultValue: 'Stroke index' })}</span></div>}
+          {field && <div><b style={{ color: field.tone }}>{field.text}</b><span>{t('media.gallery.fieldLoses', { defaultValue: 'Field loses' })}</span></div>}
+        </div>}
       </> : place ? <>
-        <div className="course-gallery-place-kicker"><place.icon size={14} strokeWidth={2.2} /><span style={VERDICT_KICKER}>{label(place.id)}</span></div>
+        <div className="course-gallery-kicker-row"><div className="course-gallery-place-kicker"><place.icon size={14} strokeWidth={2.2} /><span style={VERDICT_KICKER}>{label(place.id)}</span></div>{run.length > 1 && <span className="course-gallery-label is-mute">{t('media.gallery.shotOf', { i: runIndex + 1, n: run.length, defaultValue: `SHOT ${runIndex + 1} OF ${run.length}` })}</span>}</div>
         <h2>{t(`media.gallery.titles.${place.id}`, { defaultValue: PLACE_TITLES[place.id] })}</h2>
-        <p>{t('media.gallery.membersShots', { count: placeCount, defaultValue: `${placeCount} ${placeCount === 1 ? 'shot' : 'shots'} from members` })}{place.id === 'conditions' && age && <> · {t('media.gallery.latest', { age: t(`media.gallery.age.${age.key}`, { count: age.count, defaultValue: age.key === 'today' ? 'Today' : age.key === 'yesterday' ? 'Yesterday' : `${age.count} ${age.key} ago` }), defaultValue: `Latest ${age.key === 'today' ? 'Today' : age.key === 'yesterday' ? 'Yesterday' : `${age.count} ${age.key} ago`}` })}</>}</p>
-      </> : <span className="course-gallery-label course-gallery-untagged">{t('media.gallery.notTaggedYet', { defaultValue: 'Not tagged yet' })}</span>}
-      {(shot.holeTag || shot.placeTag) && <hr />}
-      <div className="course-gallery-credit-row"><div className="course-gallery-credit"><span className="course-gallery-avatar">{shot.avatar ? <img src={shot.avatar} alt="" /> : shot.name.split(/\s+/).map(word => word[0]).slice(0, 2).join('')}</span><span><b>{shot.name}</b>{addedMonthLabel(shot.addedAt) && ` · ${addedMonthLabel(shot.addedAt)}`}</span></div><div className="course-gallery-actions">
-        {action && <Button variant="ghost" className={`course-gallery-tag${action === 'tag' ? ' is-primary' : ''}`} onClick={() => { setTagShot(shot); void analyticsEvents.track('course_gallery_tag_open', { mode: action }); }}><Tag size={15} />{t(action === 'tag' ? 'media.gallery.tag' : 'media.gallery.retag', { defaultValue: action === 'tag' ? 'Tag this shot' : 'Retag' })}</Button>}
-        <Button variant="ghost" className="course-gallery-circle" aria-label={t('media.gallery.share', { defaultValue: 'Share' })} onClick={() => void share()}><Share size={16} /></Button>
-      </div></div>
-    </div>}
+        <p>{t('media.gallery.membersShots', { count: placeCount, defaultValue: `${placeCount} ${shotWord(placeCount)} from members` })}{place.id === 'conditions' && age && <> · {t('media.gallery.latest', { age: t(`media.gallery.age.${age.key}`, { count: age.count, defaultValue: age.key === 'today' ? 'Today' : age.key === 'yesterday' ? 'Yesterday' : `${age.count} ${age.key} ago` }), defaultValue: `Latest ${age.key === 'today' ? 'Today' : age.key === 'yesterday' ? 'Yesterday' : `${age.count} ${age.key} ago`}` })}</>}</p>
+      </> : null}
     {tagShot && <CourseGalleryTagger courseId={options.courseId} shot={tagShot} holes={data.holes.map(hole => hole.hole_no)} onClose={() => setTagShot(null)} onSaved={(holeTag, placeTag) => {
       const nextData = { ...data, shots: data.shots.map(row => row.id === tagShot.id ? { ...row, holeTag, placeTag } : row) };
       let nextFilter = options.filter;
