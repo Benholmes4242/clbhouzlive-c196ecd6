@@ -46,7 +46,7 @@ export function ShotTagCard({ shot, position, credit, holes, hole, place, onHole
       <div className="media-v3-tag-header">
         <Button variant="ghost" className="media-v3-tag-thumbnail" aria-label={t('media.v3.viewShot', { defaultValue: 'View shot' })}
           onClick={event => { if (!gallerySingle) openTagShot(shot, event.currentTarget); }}>
-          <HoleMediaThumbnail {...shot} alt={shot.mediaType === 'video' ? 'Current video' : 'Current photograph'} />
+          <HoleMediaThumbnail {...shot} alreadyEligible alt={shot.mediaType === 'video' ? 'Current video' : 'Current photograph'} />
         </Button>
         <div className="media-v3-tag-heading">
           {position && <span className="media-v2-label" data-tag-position>{t('media.v3.position', { ...position, defaultValue: `${position.i} OF ${position.n}` })}</span>}

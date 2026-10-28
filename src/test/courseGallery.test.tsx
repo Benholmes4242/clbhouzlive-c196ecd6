@@ -10,6 +10,7 @@ import { ReadyShotCover } from '@/components/course-media-tab/ReadyShotCover';
 import { HoleMediaThumbnail } from '@/components/course-media-tab/HoleMediaVideo';
 import { HoleWalk } from '@/components/course-media-tab/HoleWalk';
 import { CoursePlaceTiles } from '@/components/course-media-tab/CoursePlaceTiles';
+import { ShotTagCard } from '@/components/course-media-tab/ShotTagCard';
 const f = vi.hoisted(() => ({ viewer: 'me', admin: false, saved: null as ((hole?: HolePhoto, place?: PlaceMedia) => void) | null }));
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: f.viewer } }) }));
@@ -33,6 +34,25 @@ function mount(filter: 'all' | 'holes' | 'views' | 'conditions' = 'all', startSh
 beforeEach(() => { f.admin=false; f.viewer='me'; f.saved=null; useFullscreenFeedStore.setState({ isOpen: false, courseGallery:null, galleryData:null, restoreStack:[] }); });
 afterEach(() => { cleanup(); useFullscreenFeedStore.setState({ isOpen:false,courseGallery:null,galleryData:null,restoreStack:[] }); });
 describe('course gallery rules', () => {
+  it('eligible tagger video without duration shows its poster while its gallery square keeps the processing fallback', () => {
+    const video = post('processing');
+    video.mediaItems = [{ id: 'processing', type: 'video', imageUrl: '/video.m3u8', thumbnailUrl: '/poster.jpg', streamId: 'a'.repeat(32), width: 1000, height: 1000 }];
+    const data = { shots: galleryShots([video], [], []), holes: [], scored: false };
+    const options = { courseId: 'course', courseName: 'Course', filter: 'all' as const };
+    useFullscreenFeedStore.setState({ isOpen: true, courseGallery: options, galleryData: data, posts: galleryPost(data.shots, options), activePagerIdx: 0, syntheticPosts: true, readOnly: true });
+    const gallery = render(<CourseGalleryChrome onClose={vi.fn()} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Grid view' }));
+    const square = screen.getByRole('button', { name: 'View shot processing' });
+    expect(square.querySelector('img')).toBeNull();
+    expect(square.querySelector('.course-gallery-thumb-fallback svg')).not.toBeNull();
+    gallery.unmount();
+    const shot = { url: '/video.m3u8', mediaType: 'video', posterUrl: '/poster.jpg', streamId: 'a'.repeat(32) };
+    const tagger = render(<ShotTagCard shot={shot} holes={[1]} hole={null} place={null} onHole={vi.fn()} onPlace={vi.fn()} pending={false} canSubmit={false} onSubmit={vi.fn()} onSkip={vi.fn()} onClose={vi.fn()}
+      strip={<HoleMediaThumbnail {...shot} alreadyEligible alt="" />} />);
+    expect(screen.getByAltText('Current video')).toHaveAttribute('src', '/poster.jpg');
+    expect([...tagger.container.querySelectorAll('img')].map(img => img.getAttribute('src'))).toEqual(['/poster.jpg', '/poster.jpg']);
+    expect(tagger.container.querySelector('.course-gallery-thumb-fallback')).toBeNull();
+  });
   it('All preserves Everything order', () => expect(filteredGallery(shots(),'all').map(s=>s.id)).toEqual(['h3','h1','v','c','u']));
   it('Holes orders hole number then existing panel order', () => { const list=galleryShots([post('b'),post('a'),post('c')],[holeTag('b',1),holeTag('a',1),holeTag('c',3)],[]); expect(filteredGallery(list,'holes').map(s=>s.id)).toEqual(['a','b','c']); });
   it('place filter sorts newest first', () => { const tags=[placeTag('a','views'), {...placeTag('b','views'),added_at:'2026-10-29'}]; expect(filteredGallery(galleryShots([post('a'),post('b')],[],tags),'views').map(s=>s.id)).toEqual(['b','a']); });

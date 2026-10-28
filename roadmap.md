@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Course gallery — signed-off viewer
+- [ ] Authorized component correction: eligible tagger header/strip posters bypass processing; gallery cards retain readiness. Add one regression, run full suite against3,871/420, then remove stop report only if green.
 - [x] Added canonical gallery mode/chrome, shared catalogue order, grid/info, same-shot tagging and ready-thumbnail paths.
 - [x] Routed Media entries/deep links to gallery; removed inline panel and obsolete focus/scroll state; added39 cases and authorized retarget inventory.
 - [ ] STOP: full `bunx vitest run` 3,870 passed/1 failed/3,871 total across420 files. `holeMediaTidy.test.tsx:53:19`: `TestingLibraryElementError: Unable to find an element with the alt text: Current video`. Await explicit ruling; no correction or rerun after stop. Before3,832/419; delta+39/+1 solely courseGallery.test.tsx; no deletions/pre-existing failures. Automatic build OK09:32:24Z. COURSE_GALLERY_STOP_REPORT.md contains exact assertion and old/new inventory.

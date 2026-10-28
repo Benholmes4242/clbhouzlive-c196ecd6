@@ -206,7 +206,7 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
         aria-label={`Shot ${i + 1} of ${photos.length}${hole != null ? `, tagged to the ${ordinal(hole)}` : ''}`}
         aria-current={current ? 'true' : undefined} aria-disabled={gone || (hole != null && !onRemove) ? 'true' : undefined}
         data-tagged={hole ?? undefined} data-unavailable={gone || undefined} onClick={() => choose(item.url)}>
-        <HoleMediaThumbnail {...item} alt="" />
+        <HoleMediaThumbnail {...item} alreadyEligible alt="" />
         {hole != null && <span className="hole-photo-batch-badge">{hole}</span>}
       </Button>;
     })}</div></div>}>

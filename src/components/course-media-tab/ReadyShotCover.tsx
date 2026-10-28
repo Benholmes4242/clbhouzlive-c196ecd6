@@ -7,9 +7,11 @@ export interface CoverShot { id: string; media_url: string; media_type?: string;
 export function readyCoverShots<T extends CoverShot>(shots: readonly T[]): T[] {
   return shots.filter(shot => shot.media_type !== 'video' || shot.duration_seconds != null);
 }
-export function ReadyShotCover({ shots, fallbackIcon = false, alt = '' }: { shots: readonly CoverShot[]; fallbackIcon?: boolean; alt?: string }) {
+/** Tagger sources are already eligible; only their thumbnails bypass processing.
+ * Public hole/place cards and gallery squares retain the default ready-cover gate. */
+export function ReadyShotCover({ shots, fallbackIcon = false, alt = '', alreadyEligible = false }: { shots: readonly CoverShot[]; fallbackIcon?: boolean; alt?: string; alreadyEligible?: boolean }) {
   const { t } = useTranslation('courses');
-  const candidates = [...new Set(readyCoverShots(shots).flatMap(shot => {
+  const candidates = [...new Set((alreadyEligible ? shots : readyCoverShots(shots)).flatMap(shot => {
     const poster = holeMediaPoster(shot);
     const generated = shot.media_type === 'video' ? holeMediaPoster({ ...shot, poster_url: null }) : shot.poster_url;
     return [poster, generated].filter((url): url is string => !!url);
