@@ -2,7 +2,8 @@
 
 ## POST / REVIEW — Centred option B
 - [x] Apply cap-trimmed words, cropped 14×11.9 arrows and centred 3.5px gaps; preserve other tabs and behaviour.
-- [ ] Run full suite against 4,112 tests / 436 files; report authorized test updates and rendered gaps if available.
+- [x] Full `bunx vitest run`: 4,111 passed / 1 failed / 4,112 total across 436 files; inventory unchanged. Known ob1Welcome flake passes all 74 tests untouched.
+- [ ] STOP: postReviewTab.test.tsx:38:55 expected text-box 'trim-both cap alphabetic', received ''. Automatic typecheck: GlobalBottomNavigation.tsx(44,21) TS2353, textBox absent from React.CSSProperties. No corrections/reruns after failure; rendered gaps unavailable. See POST_REVIEW_CENTRED_REPORT.md.
 
 ## Rounds gate — Look, then lock (DONE)
 - [x] Approved follow-up: scroll distance now starts at mount; isolated scrollers and repaired React remount fixture. Targeted four gate files 43/43; full suite 4,111 passed / 1 failed / 4,112 total across 436 files (+2 restored-position cases). No other test edited.
