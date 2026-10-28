@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { HoleMediaThumbnail } from './HoleMediaVideo';
 import type { OwnMediaSource } from '@/lib/courseMedia/holePhotoData';
@@ -14,7 +12,6 @@ export function HolePhotoTagDialog({ imageUrl, mediaSource, mediaSources = [], i
   error: string | null; onClose: () => void; onSubmit: (hole: number) => void;
   initialPlaceTag?: PlaceMedia; onSubmitPlace?: (place: CoursePlace) => void; onRemovePlace?: (row: PlaceMedia) => void;
 }) {
-  const { t } = useTranslation('courses');
   const [hole, setHole] = useState<number | null>(initialHole);
   const [place, setPlace] = useState<CoursePlace | null>(initialPlaceTag?.place as CoursePlace ?? null);
   const canSubmit = !pending && !!imageUrl && !initialPlaceTag && (hole != null || (place != null && !!onSubmitPlace));

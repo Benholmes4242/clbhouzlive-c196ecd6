@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { COURSE_PLACES, type CoursePlace } from '@/lib/courseMedia/places';
-import './shot-tag-choices.css';
+import './media-v3.css';
 export const PLACE_LABELS: Record<CoursePlace, string> = { clubhouse: 'Clubhouse', food_drink: 'Food & drink', practice: 'Practice', pro_shop: 'Pro shop', views: 'Views', golfers: 'Golfers', conditions: 'Conditions', stay: 'Stay', other: 'Something else' };
 export function ShotTagChoices({ holes, hole, onHole, place, onPlace, disabled, lockedHole = false }: {
   holes: readonly number[];

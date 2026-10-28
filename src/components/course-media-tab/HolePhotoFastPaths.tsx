@@ -2,7 +2,7 @@
  * real course rounds, complete sources and authoritative writes. URL-only sources
  * carry empty EXIF without downloading media (MEDIA_TAGFIX_1).
  * The known-hole path never renders HolePhotoPicker. Selecting a hole or a
- * thumbnail never writes; only Confirm tag calls onTag.
+ * thumbnail never writes; only the primary submit calls onTag.
  */
 import { useTranslation } from 'react-i18next';
 import { PLACE_LABELS } from './ShotTagChoices';
@@ -12,18 +12,15 @@ import type { PlaceMedia } from './hooks/useCoursePlaceMedia';
 import { holeMediaKey } from '@/lib/courseMedia/holePhotoData';
 import { toast } from 'sonner';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { Check, Loader2, X } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { HolePhotoPicker } from './HolePhotoPicker';
 import { holeOrdinal } from '@/lib/courseMedia/holeWalk';
-import { capitalPhotoCount, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
+import { type HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { type BatchPhoto } from '@/lib/courseMedia/holePhotoBatch';
 import type { HolePhotoRound } from '@/lib/courseMedia/holePhotoVerdict';
 import { HoleMediaThumbnail } from './HoleMediaVideo';
-import { HoleInlineVideo } from './HoleInlineVideo';
-import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import type { OwnMediaSource } from '@/lib/courseMedia/holePhotoData';
 import { holePhotoErrorMessage } from '@/lib/courseMedia/holePhotoError';
 import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
@@ -50,7 +47,7 @@ export function HoleKnownPhotoPath({ hole, photos, sources = [], pending, upload
 
 /** BRIEF_HOLE_TAG_BATCH_V3: one large current shot, a single sideways row of
  * tappable thumbnails, a hole grid that only selects, and "Confirm tag" that
- * writes. Member Skip advances without saving and closes at the last shot; admin stays unchanged.
+ * writes. Skip advances without saving and closes at the last shot; shared glass owns presentation.
  * BRIEF_HOLE_TAG_BATCH_REMOVE_TAG: with onRemove, tapping a tagged thumbnail
  * reopens it in a locked "tagged" state whose only write is Remove tag. */
 export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClose, adminMode = false, existingHoleTags = [], existingPlaceTags = [], onTagPlace, onRemovePlace }: {
@@ -191,7 +188,6 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
   };
   if (!photo) return null;
   const canConfirm = !pending && !allTagged && !inTaggedState && selected != null && !done(photo.url);
-  const canRemove = inTaggedState && !pending;
   const locked = inTaggedState || !!currentPlaceRow || allTagged;
   const credit = adminMode && photo.ownerName ? [photo.ownerName, addedMonthLabel(photo.createdAt)].filter(Boolean).join(' · ') : undefined;
   return <ShotTagCard shot={photo} position={{ i: index + 1, n: photos.length }} credit={credit}
