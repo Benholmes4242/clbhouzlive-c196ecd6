@@ -32,7 +32,7 @@ import { MentionText } from '@/components/mentions/MentionText';
 
 function resolveViewerRect(width: number, height: number, viewport: ReturnType<typeof getCurrentViewport>, type: 'image' | 'video'): RestingRect {
   if (!useFullscreenFeedStore.getState().courseGallery) return resolveRestingRect(width, height, viewport, type);
-  return { top: 0, left: 0, width: viewport.width, height: viewport.height, fit: galleryFit(width, height) };
+  return { top: 0, left: 0, width: viewport.w, height: viewport.h, fit: galleryFit(width, height) };
 }
 
 const normalizeOwnerKey = (key: string | null | undefined): string | null => {
