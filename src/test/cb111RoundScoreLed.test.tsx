@@ -101,14 +101,29 @@ describe('CB111 score-led round in the mediaFirst feed', () => {
     ]);
   });
 
-  it('prints the same gross, to-par, net and handicap figures the card computes today', () => {
+  it('prints the same gross, to-par, net and handicap figures, net big and gross before handicap on the right', () => {
     const { container } = card();
     expect(container.querySelector('[data-round-score-gross]')?.textContent).toBe('89+21');
     expect(container.querySelector('[data-round-score-net]')?.textContent).toBe('81+13');
     const hcp = container.querySelector('[data-round-score-handicap]') as HTMLElement;
     expect(hcp?.textContent).toBe('8');
     expect((hcp?.lastElementChild as HTMLElement)?.style.textTransform).toBe('uppercase');
+    const block = container.querySelector('[data-round-score-block]') as HTMLElement;
+    const [big, right] = [...block.children] as HTMLElement[];
+    expect(big.contains(container.querySelector('[data-round-score-net]'))).toBe(true);
+    expect((container.querySelector('[data-round-score-net]') as HTMLElement).style.fontSize).toBe('46px');
+    expect([...right.children].map((c) => Object.keys((c as HTMLElement).dataset)[0])).toEqual(['roundScoreGross', 'roundScoreHandicap']);
     expect(container.querySelector('[data-feed-round-course]')?.textContent).toBe('Sundridge Park Golf Club (West Course)');
+  });
+
+  it('with no course handicap the big figure is gross and the right group has no gross cell', () => {
+    const { container } = card({ postRound: { ...ROUND, courseHandicap: null } as PostRound });
+    const block = container.querySelector('[data-round-score-block]') as HTMLElement;
+    const [big, right] = [...block.children] as HTMLElement[];
+    expect(container.querySelectorAll('[data-round-score-gross]')).toHaveLength(1);
+    expect(big.querySelector('[data-round-score-gross]')?.textContent).toBe('89+21');
+    expect(right.querySelector('[data-round-score-gross]')).toBeNull();
+    expect(container.querySelector('[data-round-score-net]')).toBeNull();
   });
 
   it('renders no engagement row of the round card’s own — the shared footer is the only one', () => {
@@ -137,18 +152,18 @@ describe('CB111 score-led round in the mediaFirst feed', () => {
     expect(handlers.onRoundTap).toHaveBeenCalledWith(POST, ROUND);
   });
 
-  it('centres each figure over its label, with the gross label under the value row in the same column', () => {
+  it('centres each figure over its label, with the net label under the value row in the same column', () => {
     const { container } = card();
-    const grossValue = container.querySelector('[data-round-score-gross]') as HTMLElement;
-    const grossCell = grossValue.parentElement as HTMLElement;
-    expect(grossCell.style.alignItems).toBe('center');
-    expect(grossCell.style.textAlign).toBe('center');
-    expect(grossValue.style.whiteSpace).toBe('nowrap');
-    const grossLabel = grossCell.lastElementChild as HTMLElement;
-    expect(grossLabel).not.toBe(grossValue);
-    expect(grossLabel.style.textTransform).toBe('uppercase');
-    expect(grossLabel.style.marginTop).toBe('6px');
-    for (const key of ['net', 'handicap']) {
+    const netValue = container.querySelector('[data-round-score-net]') as HTMLElement;
+    const netCell = netValue.parentElement as HTMLElement;
+    expect(netCell.style.alignItems).toBe('center');
+    expect(netCell.style.textAlign).toBe('center');
+    expect(netValue.style.whiteSpace).toBe('nowrap');
+    const netLabel = netCell.lastElementChild as HTMLElement;
+    expect(netLabel).not.toBe(netValue);
+    expect(netLabel.style.textTransform).toBe('uppercase');
+    expect(netLabel.style.marginTop).toBe('6px');
+    for (const key of ['gross', 'handicap']) {
       const cell = container.querySelector(`[data-round-score-${key}]`) as HTMLElement;
       expect(cell.style.textAlign).toBe('center');
       expect((cell.firstElementChild as HTMLElement).style.whiteSpace).toBe('nowrap');
