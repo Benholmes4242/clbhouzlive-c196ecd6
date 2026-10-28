@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MapPin, ChevronDown, Search, X } from 'lucide-react';
+import { MapPin, ChevronDown, ChevronRight, Search, X } from 'lucide-react';
 import { MAP_CONFIG } from '@/config/maps';
 import { Label } from '@/components/manage/ui';
 import { FIELD_PAINT_CLASS, FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
@@ -50,10 +50,12 @@ interface Props {
   city: string;
   onCountryChange: (v: string) => void;
   onCityChange: (v: string) => void;
+  /** EP2 opt-in: two BC2 field cards ("Country", "Town or city"); default unchanged. */
+  appearance?: 'default' | 'card';
 }
 
 // ─── Country Picker ───────────────────────────────────────────────────────────
-function CountryPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function CountryPicker({ value, onChange, card = false }: { value: string; onChange: (v: string) => void; card?: boolean }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const ref = useRef<HTMLDivElement>(null);
@@ -73,7 +75,12 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
-      <button
+      {card ? (
+        <button type="button" className="bizc-field ep-loc-field" data-testid="ep-country" onClick={() => { setOpen(v => !v); setSearch(''); }}>
+          <span className="bizc-field-label">Country</span>
+          <span className="ep-loc-value"><span className={value ? '' : 'ep-loc-ph'}>{value || 'Select country'}</span><ChevronRight size={18} className="ep-loc-chev" /></span>
+        </button>
+      ) : <button
         type="button"
         onClick={() => { setOpen(v => !v); setSearch(''); }}
         className="w-full bg-[rgba(255,255,255,0.06)] border border-border/[0.06] rounded-[11px] px-4 py-3 text-[15px] text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.22)] focus:bg-background transition-colors"
@@ -85,7 +92,7 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
           className="text-muted-foreground flex-shrink-0 transition-transform"
           style={{ transform: open ? 'rotate(180deg)' : 'none' }}
         />
-      </button>
+      </button>}
 
       {open && (
         <div
@@ -140,7 +147,7 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
 }
 
 // ─── City Search ──────────────────────────────────────────────────────────────
-function CitySearch({ value, onChange, country }: { value: string; onChange: (v: string) => void; country: string }) {
+function CitySearch({ value, onChange, country, card = false }: { value: string; onChange: (v: string) => void; country: string; card?: boolean }) {
   const [query, setQuery] = useState(value);
   const [results, setResults] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
@@ -198,7 +205,15 @@ function CitySearch({ value, onChange, country }: { value: string; onChange: (v:
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
-      <div className="relative">
+      {card ? (
+        <label className="bizc-field ep-loc-field">
+          <span className="bizc-field-label">Town or city</span>
+          <span className="ep-loc-value">
+            <input type="text" className="bizc-field-input ep-loc-input" aria-label="Town or city" value={query} onChange={e => handleInput(e.target.value)} onFocus={() => { if (results.length > 0) setOpen(true); }} placeholder={country ? `Town or city in ${country}` : 'Select a country first'} disabled={!country} />
+            {query && <button type="button" className="ep-loc-clear" aria-label="Clear town or city" onClick={() => { setQuery(''); onChange(''); setResults([]); }}><X size={16} /></button>}
+          </span>
+        </label>
+      ) : <div className="relative">
         <MapPin size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <input
           type="text"
@@ -221,7 +236,7 @@ function CitySearch({ value, onChange, country }: { value: string; onChange: (v:
         {loading && (
           <div style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', width: 12, height: 12, border: `2px solid ${A.INK}`, borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
         )}
-      </div>
+      </div>}
 
       {open && results.length > 0 && (
         <div
@@ -249,12 +264,21 @@ function CitySearch({ value, onChange, country }: { value: string; onChange: (v:
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
-export function LocationSection({ country, city, onCountryChange, onCityChange }: Props) {
+export function LocationSection({ country, city, onCountryChange, onCityChange, appearance = 'default' }: Props) {
   const handleCountryChange = (v: string) => {
     onCountryChange(v);
     // Clear city when country changes to avoid stale city/country mismatch
     if (v !== country) onCityChange('');
   };
+
+  if (appearance === 'card') {
+    return (
+      <div className="ep-loc">
+        <CountryPicker card value={country} onChange={handleCountryChange} />
+        <CitySearch card value={city} onChange={onCityChange} country={country} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
