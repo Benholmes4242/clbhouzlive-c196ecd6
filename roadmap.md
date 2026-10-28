@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Signed-off account tile
-- [ ] Replace mobile avatar sheet with AccountGlance and shared modal lifecycle; preserve desktop dropdown and close-first actions.
-- [ ] Remove exclusive sheet components, retain shared readers and course analytics; reconcile retired tests and run the full suite against 4,007/429.
-- [ ] Verify available preview and report authenticated-check limitations.
+- [x] Replace mobile avatar sheet with AccountGlance and shared modal lifecycle; preserve desktop dropdown and close-first actions.
+- [x] Removed exclusive sheet components; retained shared readers/course analytics. Full `bunx vitest run`: 3,999 passed/5 new failures/4,004 executed across429 files; baseline4,007 −28 retired cases +25 new cases. ACCOUNT_TILE_STOP_REPORT.md quotes removed assertions and exact errors.
+- [ ] STOP: five new exact accessible-name queries fail because the real avatar fallback prefixes `?`; no corrections after failure. Await authorization for new test-query corrections. Authenticated real-account/visual checks unavailable (external_unmanaged); latest automatic build16:00:30Z OK.
 
 ## Logo island Option B tidy-up
 - [x] No disc, 30px mark, signed-off rest/scrolled spacing and 20px wordmark slot; 1.5px avatar ring; system-font glances; plain shared-style Connect CTA.
