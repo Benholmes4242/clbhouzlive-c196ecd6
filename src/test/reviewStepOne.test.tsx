@@ -140,7 +140,7 @@ describe('photo row', () => {
 
 const tags = (assignments: Record<string, number> = {}) => ({
   holes: [1, 2, 3], shots: [item('a'), item('b')], assignments, assign: vi.fn(), unassign: vi.fn(),
-  metadata: {}, rounds: [], chosenRound: null, chooseRound: vi.fn(),
+  metadata: {},
 }) as unknown as Parameters<typeof ReviewHoleTags>[0];
 
 describe('hole tagger from the chip', () => {

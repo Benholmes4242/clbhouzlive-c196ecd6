@@ -34,17 +34,9 @@ type Props = ReturnType<typeof useReviewHoleTags> & {
   /** Called when the sheet closes so the opener can clear its request. */
   onFocusClosed?: () => void;
 };
-const dateLabel = (day: string, year = false) => new Date(`${day.slice(0, 10)}T12:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', ...(year ? { year: 'numeric' as const } : {}) });
-const roundDate = (day: string) => {
-  const today = new Date();
-  const yesterday = new Date(); yesterday.setDate(today.getDate() - 1);
-  const localDay = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  return day.slice(0, 10) === localDay(today) ? 'Today' : day.slice(0, 10) === localDay(yesterday) ? 'Yesterday' : dateLabel(day);
-};
 
 export function ReviewHoleTags(props: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [roundOpen, setRoundOpen] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
   const [confirmation, setConfirmation] = useState<string | null>(null);
   const [reviewing, setReviewing] = useState(false);
@@ -105,14 +97,7 @@ export function ReviewHoleTags(props: Props) {
   const confirmEnabled = inTaggedState || (!allTagged && selected != null);
   const closeSheet = () => { setActiveId(null); props.onFocusClosed?.(); };
   const list = !props.hideShotList;
-  return <section aria-label="Holes for your photos and videos" style={{ padding: list ? '0 16px 16px' : props.rounds.length > 0 ? '16px 20px 0' : 0, color: RV2.ink }}>
-    {props.rounds.length > 0 && <Button variant="ghost" onClick={() => setRoundOpen(true)} className="w-full h-auto min-h-14 justify-between text-left whitespace-normal rounded-lg px-3 py-3" style={{ border: `1px ${props.chosenRound ? 'solid' : 'dashed'} ${RV2.hairlineStrong}`, background: props.chosenRound ? RV2.track : 'transparent' }}>
-      <span className="min-w-0"><span className="block text-[13.5px] font-bold tabular-nums">{props.chosenRound ? roundDate(props.chosenRound.playDate) : 'Which round were these from?'}</span>
-        <span className="block text-[11.5px] leading-[1.45]" style={{ color: RV2.secondary }}>{props.chosenRound
-          ? [props.chosenRound.grossScore != null ? `You shot ${props.chosenRound.grossScore}` : null, props.chosenRound.teeMarker ? `${props.chosenRound.teeMarker} tees` : null].filter(Boolean).join(' · ')
-          : `You have ${props.rounds.length} ${props.rounds.length === 1 ? 'round' : 'rounds'} here · Optional`}</span></span>
-      <span className="ml-2 text-[11.5px] font-bold" style={{ color: RV2.amber }}>{props.chosenRound ? 'Change' : 'Choose'}</span>
-    </Button>}
+  return <section aria-label="Holes for your photos and videos" style={{ padding: list ? '0 16px 16px' : 0, color: RV2.ink }}>
     {list && <><h2 className="mt-4 mb-2 text-[11px] font-bold uppercase tracking-normal" style={{ color: RV2.eyebrow }}>Put them on a hole</h2>
     <div className="flex flex-col gap-2">{numbered.map(({ shot, video, n }) => {
       const day = props.metadata[shot.id]?.exif.captureDay;
@@ -163,16 +148,6 @@ export function ReviewHoleTags(props: Props) {
             <HolePhotoPicker holeCount={props.holes.length} knownHoleNumbers={props.holes} selectedHole={inTaggedState ? activeHole ?? null : selected} disabled={allTagged || inTaggedState} dimOthers={inTaggedState} onSelect={hole => { if (!allTagged && !inTaggedState) setSelected(prev => (prev === hole ? null : hole)); }} />
             <button type="button" className="hole-photo-batch-confirm" disabled={!confirmEnabled} data-enabled={confirmEnabled || undefined} onClick={() => { if (inTaggedState) removeTag(); else confirmTag(); }}>{inTaggedState ? 'Remove tag' : allTagged ? 'All tagged' : 'Confirm tag'}</button>
           </>}
-        </div>
-      </SheetContent>
-    </Sheet>
-    <Sheet open={roundOpen} onOpenChange={setRoundOpen}>
-      <SheetContent side="bottom" className="rounded-t-lg sm:max-w-[480px] sm:mx-auto" style={{ background: RV2.canvas, color: RV2.ink }}>
-        <SheetTitle style={{ color: RV2.ink }}>Which round were these from?</SheetTitle>
-        <SheetDescription style={{ color: RV2.secondary }}>Optional</SheetDescription>
-        <div className="overflow-y-auto flex flex-col gap-2" style={{ willChange: 'transform' }}>
-          <Button variant="ghost" onClick={() => { props.chooseRound(null); setRoundOpen(false); }}>No round</Button>
-          {props.rounds.map(round => <Button key={round.whsScoreId} variant="ghost" aria-pressed={props.chosenRound?.whsScoreId === round.whsScoreId} className="h-auto min-h-12 justify-between tabular-nums" onClick={() => { props.chooseRound(round.whsScoreId); setRoundOpen(false); }}><span>{dateLabel(round.playDate, true)}</span><span>{round.grossScore != null ? `You shot ${round.grossScore}` : ''}{round.teeMarker ? ` · ${round.teeMarker} tees` : ''}</span></Button>)}
         </div>
       </SheetContent>
     </Sheet>

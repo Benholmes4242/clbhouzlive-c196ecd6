@@ -10,7 +10,6 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: f.from, rpc
 vi.mock('@/lib/courseMedia/holePhotoExif', () => ({ readHolePhotoExif: f.exif }));
 vi.mock('@/lib/courseMedia/holePhotoData', () => ({ matchedPhotoRounds: f.matched, prepareHolePhoto: vi.fn(), spellPhotoCount: (n: number) => ['zero', 'one', 'two', 'three'][n] ?? String(n), capitalPhotoCount: (n: number) => ['Zero', 'One', 'Two', 'Three'][n] ?? String(n) }));
 vi.mock('@/hooks/gam/useCourseHoleAnalysis', () => ({ useCourseHoleAnalysis: () => f.analysis }));
-vi.mock('@/hooks/feed/useMyRoundsAtCourse', async importOriginal => ({ ...await importOriginal<typeof import('@/hooks/feed/useMyRoundsAtCourse')>(), useMyRoundsAtCourse: () => ({ data: f.rounds, isSuccess: true }) }));
 vi.mock('@/lib/toast', () => ({ toast: { error: vi.fn() } }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 vi.mock('@/uploads/resilientVideoUpload', () => ({ uploadVideoResilient: vi.fn() }));
@@ -30,7 +29,7 @@ const exif = { captureDay: '2026-06-02', capturedAt: '2026-06-02T12:00:00', lati
 const photo: MediaItem = { id: 'p', type: 'image', previewUrl: '/photo.jpg', status: 'pending', progress: 0, file: new File(['photo'], 'photo.jpg', { type: 'image/jpeg' }) };
 const video: MediaItem = { id: 'v', type: 'video', previewUrl: '/clip.mp4', posterUrl: '/poster.jpg', streamId: 'stream-1', durationSeconds: 75, status: 'pending', progress: 0, file: new File(['video'], 'clip.mp4', { type: 'video/mp4' }) };
 const job: ComposerHoleJob = { courseId: 'course', assignments: { p: 2 }, knownHoles: [2, 9], proofScoreId: null };
-const props = (overrides: Record<string, unknown> = {}) => ({ holes: [2, 9], shots: [photo], rounds: [], chosenRound: null, chooseRound: vi.fn(), assignments: {}, assign: vi.fn(), unassign: vi.fn(), metadata: {}, capture: () => job, ...overrides } as ReturnType<typeof useReviewHoleTags>);
+const props = (overrides: Record<string, unknown> = {}) => ({ holes: [2, 9], shots: [photo], assignments: {}, assign: vi.fn(), unassign: vi.fn(), metadata: {}, capture: () => job, ...overrides } as ReturnType<typeof useReviewHoleTags>);
 const wrapper = ({ children }: { children: React.ReactNode }) => <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>{children}</QueryClientProvider>;
 
 beforeEach(() => {
@@ -218,17 +217,13 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
     rerender({ items: [photo] }); expect(result.current.capture()?.assignments).toEqual({ p: 9 });
     rerender({ items: [] }); expect(result.current.capture()?.assignments).toEqual({});
   });
-  it('a five-month-old round is not preselected', async () => {
-    f.rounds = [{ whsScoreId: 'old', playDate: '2026-05-01', grossScore: 82, teeMarker: null }];
+  it('capture() returns proofScoreId null and the hook makes no rounds query', async () => {
     const { result } = renderHook(() => useReviewHoleTags('course', 'member', [photo]), { wrapper });
-    await waitFor(() => expect(result.current.rounds).toHaveLength(1)); expect(result.current.chosenRound).toBeNull();
-  });
-  it('a today round is preselected using the existing helper and captured as proof', async () => {
-    const d = new Date(); const day = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    f.rounds = [{ whsScoreId: 'today', playDate: day, grossScore: 82, teeMarker: null }];
-    const { result } = renderHook(() => useReviewHoleTags('course', 'member', [photo]), { wrapper });
-    await waitFor(() => expect(result.current.chosenRound?.whsScoreId).toBe('today'));
-    expect(result.current.capture()?.proofScoreId).toBe('today');
+    act(() => { result.current.assign('p', 2); });
+    expect(result.current.capture()?.proofScoreId).toBeNull();
+    expect('rounds' in result.current).toBe(false);
+    expect(f.from.mock.calls.map(c => c[0])).not.toContain('whs_scores');
+    expect(readFileSync('src/features/review-v2/hooks/useReviewHoleTags.ts', 'utf8')).not.toContain('useMyRoundsAtCourse');
   });
 });
 
