@@ -18,7 +18,11 @@ import { postingAsCopy } from '@/lib/postingAsCopy';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useLogout } from '@/hooks/useLogout';
-import ProfileSheetV2 from '@/features/profile-sheet-v2/ProfileSheetV2';
+import AccountGlance from '@/features/chrome-v2/AccountGlance';
+import YourCourseAnalyticsSheet from '@/features/profile-sheet-v2/components/YourCourseAnalyticsSheet';
+import { useInviteSheet } from '@/hooks/useInviteSheet';
+import { useWhsConnection } from '@/lib/whs/hooks';
+import { businessCategoryWord } from '@/lib/business/businessHero';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { getActorRoute } from '@/types/actor';
 
@@ -48,6 +52,9 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   );
   
   const [uploadCenterOpen, setUploadCenterOpen] = useState(false);
+  const [analyticsSheetOpen, setAnalyticsSheetOpen] = useState(false);
+  const fallbackAnchorRef = useRef<HTMLElement>(null);
+  const { openInviteSheet } = useInviteSheet();
   const { hasPending, hasFailed } = useUploadJobs();
   const showUploadIndicator = hasPending || hasFailed;
   const isMobile = useIsMobile();
@@ -171,7 +178,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const displayName = userProfile?.display_name || user?.user_metadata?.full_name || 'User';
   const email = user?.email || '';
 
-  // Build profiles array for ProfileSheetV2
+  // Account tile uses the same actor identities as the desktop switcher.
   const profiles = availableActors.map(actor => ({
     id: actor.id,
     type: actor.type as 'personal' | 'business',
@@ -180,7 +187,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     subtitle: actor.type === 'personal' ? email : 'Business',
   }));
 
-  // Current actor for ProfileSheetV2
+  // Current actor for AccountGlance
   const currentActorData = {
     type: (activeActor?.type || 'personal') as 'personal' | 'business',
     id: activeActor?.id || user?.id || '',
@@ -211,6 +218,9 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const settingsRoute = isBusinessActor && activeActor?.id
     ? `/business/${activeActor.id}/edit`
     : '/edit-profile?tab=settings';
+  const { data: analyticsConnection } = useWhsConnection(analyticsSheetOpen && !isBusinessActor ? user?.id : undefined);
+  const category = typeof activeActor?.meta?.category === 'string' ? activeActor.meta.category : undefined;
+  const categoryLabel = category === 'Golf Club' ? 'Golf club' : businessCategoryWord(category, (_key, fallback) => fallback);
 
   // Handle navigation from ProfileSheetV2.
   // A1: every branch that navigates must close the sheet FIRST so the sheet
@@ -221,6 +231,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     if (route === '/upload') {
       setUploadCenterOpen(true);
     } else if (route === '/logout') {
+      onClose();
       handleLogout();
     } else if (route === '/settings/business') {
       handleNavigate('/businesses/manage');
@@ -238,7 +249,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
 
 
   // ===========================================
-  // MOBILE: ProfileSheetV2 bottom sheet
+  // MOBILE: shared glass account glance; desktop dropdown below stays unchanged.
   // ===========================================
   if (isMobile) {
     return (
@@ -249,16 +260,27 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             onClose={() => setUploadCenterOpen(false)} 
           />
         )}
-        <ProfileSheetV2
+        <AccountGlance
           open={isOpen}
           onClose={onClose}
+          anchorRef={anchorRef ?? fallbackAnchorRef}
           currentActor={currentActorData}
           profiles={profiles}
           onSwitchProfile={handleSwitchProfile}
           onNavigate={handleAccountHubNavigate}
           isAdmin={hasAdminAccess || false}
-          isLoading={isProfileLoading}
+          viewProfileRoute={viewProfileRoute}
+          settingsRoute={settingsRoute}
+          categoryLabel={categoryLabel}
+          countFor={actorUnreadFor}
+          unreadMessages={unreadMessageCount}
+          unreadNotifications={unreadNotificationCount ?? 0}
+          onOpenCourses={() => { onClose(); setTimeout(() => setAnalyticsSheetOpen(true), 250); }}
+          onInviteFriends={() => { onClose(); setTimeout(() => openInviteSheet('profile_sheet'), 250); }}
         />
+        <YourCourseAnalyticsSheet open={analyticsSheetOpen} onClose={() => setAnalyticsSheetOpen(false)}
+          synced={!!analyticsConnection && !(analyticsConnection as { deleted_at?: string | null }).deleted_at}
+          onNavigate={(route) => { setAnalyticsSheetOpen(false); setTimeout(() => handleNavigate(route), 140); }} />
       </>
     );
   }

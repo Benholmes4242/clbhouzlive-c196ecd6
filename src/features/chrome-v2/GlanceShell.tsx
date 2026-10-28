@@ -8,7 +8,7 @@ import './index-glance.css';
 
 export interface GlanceShellProps {
   onClose: () => void;
-  anchorRef: React.RefObject<HTMLButtonElement | null>;
+  anchorRef: React.RefObject<HTMLElement | null>;
   label: string;
   children: React.ReactNode;
 }

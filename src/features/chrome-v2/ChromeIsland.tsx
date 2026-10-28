@@ -483,8 +483,9 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ 
 export const AvatarCell: React.FC<{
   tone: ChromeTone;
   onOpen: () => void;
+  isOpen?: boolean;
   triggerRef: React.RefObject<HTMLButtonElement>;
-}> = ({ tone, onOpen, triggerRef }) => {
+}> = ({ tone, onOpen, isOpen = false, triggerRef }) => {
   const { activeActor, isLoading } = useActiveActor();
   const { countFor } = useActorUnreadCounts();
 
@@ -516,10 +517,13 @@ export const AvatarCell: React.FC<{
       type="button"
       onClick={onOpen}
       aria-label="Open profile menu"
+      aria-expanded={isOpen}
       style={{
         position: 'relative',
         width: 36,
         height: 36,
+        borderRadius: '34%',
+        boxShadow: isOpen ? 'var(--account-open-ring)' : undefined,
         padding: 0,
         background: 'transparent',
         border: 'none',
@@ -789,6 +793,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
 
           <AvatarCell
             tone={tone}
+            isOpen={menuOpen}
             triggerRef={avatarRef}
             onOpen={() => setMenuOpen((v) => !v)}
           />

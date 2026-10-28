@@ -1,0 +1,43 @@
+:root {
+  --account-ink: #F8FAFC;
+  --account-mute: rgba(248,250,252,.62);
+  --account-dim: rgba(248,250,252,.42);
+  --account-amber: #F7931E;
+  --account-rule: rgba(255,255,255,.08);
+  --account-control: rgba(255,255,255,.06);
+  --account-count-ink: #0A0A0C;
+  --account-badge-edge: #1E2129;
+  --account-open-ring: 0 0 0 3px rgba(248,250,252,.16);
+}
+.account-glance { color: var(--account-ink); letter-spacing: 0; }
+.account-glance button.account-button { display: flex; align-items: center; justify-content: flex-start; width: 100%; min-width: 0; padding: 0; border: 0; background: transparent; color: inherit; border-radius: 0; height: auto; font-family: inherit; letter-spacing: 0; }
+.account-glance button.account-button:focus-visible { outline: 2px solid var(--account-amber); outline-offset: 3px; }
+.account-glance button.account-button svg { flex-shrink: 0; }
+.account-glance button.account-identity { gap: 12px; text-align: left; }
+.account-text { flex: 1; min-width: 0; text-align: left; }
+.account-name { display: block; font-size: 17px; font-weight: 700; line-height: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-subline { display: block; margin-top: 3px; font-size: 12.5px; font-weight: 400; line-height: normal; color: var(--account-mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-chevron { color: var(--account-dim); }
+.account-glance button.account-switch { margin-top: 14px; height: 34px; border-radius: 17px; background: var(--account-control); padding: 0 10px 0 6px; gap: 8px; }
+.account-faces { display: flex; flex-shrink: 0; }
+.account-faces > span:first-child:not(:last-child) { margin-right: -6px; }
+.account-switch-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; font-size: 13px; font-weight: 650; color: var(--account-mute); }
+.account-list { margin-top: 8px; display: flex; flex-direction: column; gap: 2px; }
+.account-glance button.account-actor { height: 38px; padding: 0 6px; gap: 10px; }
+.account-actor-name { flex: 1; min-width: 0; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 600; }
+.account-count { flex-shrink: 0; display: inline-flex; justify-content: center; align-items: center; box-sizing: border-box; min-width: 18px; height: 18px; border-radius: 9px; background: var(--account-ink); color: var(--account-count-ink); padding: 0 5px; font-size: 10px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.account-doors { display: flex; margin-top: 12px; gap: 8px; }
+.account-glance button.account-door { flex: 1; height: 48px; border-radius: 14px; background: var(--account-control); padding: 0 12px; gap: 13px; }
+.account-door-label { font-size: 13px; font-weight: 650; white-space: nowrap; }
+.account-door-icon { position: relative; flex-shrink: 0; color: var(--account-mute); }
+.account-glance button.account-door svg { width: 18px; height: 18px; }
+.account-count.account-badge { position: absolute; top: -7px; right: -9px; min-width: 16px; height: 16px; border-radius: 8px; font-size: 9.5px; padding: 0 4px; border: 2px solid var(--account-badge-edge); }
+.account-rows { margin-top: 8px; }
+.account-glance button.account-row { height: 46px; border-bottom: 1px solid var(--account-rule); }
+.account-glance button.account-row:last-child { border-bottom: 0; }
+.account-row-label { flex: 1; text-align: left; font-size: 15px; font-weight: 600; }
+.account-admin { font-size: 9.5px; font-weight: 800; letter-spacing: .13em; color: var(--account-dim); }
+.account-signout { margin-top: 6px; padding-top: 12px; border-top: 1px solid var(--account-rule); }
+.account-glance button.account-signout-button { justify-content: center; font-size: 11px; font-weight: 700; letter-spacing: .16em; color: var(--account-dim); line-height: normal; }
+.account-glance button.account-identity svg, .account-glance button.account-row svg { width: 16px; height: 16px; }
+.account-glance button.account-switch svg { width: 15px; height: 15px; }

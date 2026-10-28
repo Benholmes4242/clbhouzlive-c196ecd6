@@ -35,7 +35,7 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - First-sign-in uses the isolated welcome feature with opt-in partial profile saves and canonical connect-controller options; defaults preserve normal profile editing and handicap setup.
 - Club analytics opening copy is computed by courseLead from the selected CourseBlock payload only; no seed fallback or additional reads, so chip switches cannot mix courses.
 - Club weekday conclusions share weekRoom between the lead and tee-sheet card; selected-course conclusions must not drift between surfaces.
-- Sheet handicap ownership: see HcpStrip.tsx header; prevents connect-card flashes.
+- AccountGlance content ownership: see AccountGlance.tsx header; PostingAsMenu retains actor routing and source ownership while GlanceShell supplies the shared modal lifecycle.
 - Small-sample Reviews reuse SingleReview's RaterReviewRow, so context and media cannot drift.
 - Course tab gaps and canon: see tabCanon.css and AboutSection.tsx; null chains stay aligned.
 - Course photo publication and metadata live in `src/lib/courseMedia`; shared payloads prevent entrypoint drift.
