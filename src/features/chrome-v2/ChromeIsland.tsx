@@ -307,24 +307,21 @@ const LeftCapsule: React.FC<{
           }}
         />
       </span>
-      {scrolledTitle != null && (
-        <span
+      {showWordmark && (
+        <img
+          src={wordmarkWhite.url}
+          alt="clbhouz"
           style={{
-            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-            fontWeight: 700,
-            fontSize: 16,
-            color: inkFor(tone),
-            whiteSpace: 'nowrap',
-            opacity: showTitle ? 1 : 0,
-            // Snap under reduced motion; otherwise the title fades in over 180ms.
+            display: 'block',
+            height: 16,
+            width: 'auto',
+            opacity: showWordmarkNow ? 1 : 0,
+            // Snap under reduced motion; otherwise the wordmark fades in over 180ms.
             transition: REDUCED_MOTION ? 'none' : 'opacity 180ms linear',
-            // Keep the island logo-sized until the title appears.
-            maxWidth: showTitle ? 160 : 0,
-            overflow: 'hidden',
+            // Keep the island logo-sized until the wordmark appears.
+            maxWidth: showWordmarkNow ? 52 : 0,
           }}
-        >
-          {scrolledTitle}
-        </span>
+        />
       )}
     </button>
   );
