@@ -7,18 +7,35 @@
  */
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { courseActivityClubName } from '@/features/courses/_shared/courseLabel';
+import { scrollElementIntoView } from '@/lib/getScrollParent';
 
 const INK = '#F8FAFC';
 
-export function ClubFromTheClub({ businessId, businessName, postsCount, isOwner, onPost }: {
+/** CB119 — the hero Posts figure lands here below the top chrome, like the nearby card. */
+export function scrollToBusinessFeed() {
+  const el = document.querySelector<HTMLElement>('[data-club-feed]');
+  if (!el) return;
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;top:0;height:0;padding-top:max(env(safe-area-inset-top, 0px), 47px);visibility:hidden';
+  document.body.appendChild(probe);
+  const offset = probe.getBoundingClientRect().height || parseFloat(getComputedStyle(probe).paddingTop) || 47;
+  probe.remove();
+  scrollElementIntoView(el, { offset, behavior: 'smooth' });
+}
+
+/** CB119: optional title / emptyName default to the club output. Non-clubs
+ * pass "From {name}" (one line, ellipsis) and the full business name. */
+export function ClubFromTheClub({ businessId, businessName, postsCount, isOwner, onPost, title, emptyName }: {
   businessId: string; businessName: string; postsCount?: number | null; isOwner: boolean; onPost?: () => void;
+  title?: string; emptyName?: string;
 }) {
+  const heading = title ?? 'From the club';
   const empty = (
     <div data-club-feed-empty style={{ background: '#17171B', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 18, padding: 16, margin: '0 16px 14px' }}>
       <div style={{ fontSize: 14, lineHeight: 1.45, color: 'rgba(248,250,252,0.62)' }}>
         {onPost
           ? "Your first post shows here and in your followers' Clubhouse feeds."
-          : `${courseActivityClubName(businessName)} hasn't posted yet. Follow to see the first one in your Clubhouse feed.`}
+          : `${emptyName ?? courseActivityClubName(businessName)} hasn't posted yet. Follow to see the first one in your Clubhouse feed.`}
       </div>
       {onPost && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
@@ -32,11 +49,11 @@ export function ClubFromTheClub({ businessId, businessName, postsCount, isOwner,
     </div>
   );
   return (
-    <section data-club-feed aria-label="From the club">
+    <section data-club-feed aria-label={heading}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '26px 18px 12px' }}>
-        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.62)' }}>From the club</span>
+        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.62)', ...(title !== undefined ? { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 } : {}) }} data-club-feed-title>{heading}</span>
         {!!postsCount && postsCount > 0 && (
-          <span data-club-feed-count style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)' }}>
+          <span data-club-feed-count style={{ ...(title !== undefined ? { flex: 'none', marginLeft: 12 } : {}), fontSize: 10.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)' }}>
             {postsCount === 1 ? '1 post' : `${postsCount} posts`}
           </span>
         )}

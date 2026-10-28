@@ -36,10 +36,8 @@ import { Button } from '@/components/ui/button';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
-import { BusinessTeamTab } from '@/components/business/BusinessTeamTab';
 import { ProfileSurfaceSkeleton } from '@/components/skeletons/ProfileSurfaceSkeleton';
 
-import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 // FloatingPageHeader removed (H3) - chrome now driven by ChromeIsland registry.
 
 import {
