@@ -10,7 +10,7 @@
  * Confirm can land on the just-tagged shot and read "All tagged" once every
  * shot is tagged, exactly like the dialog.
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Check, X } from 'lucide-react';
 import { ReviewMediaPreview } from './ReviewMediaPreview';
 import { Button } from '@/components/ui/button';
@@ -26,7 +26,14 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import type { useReviewHoleTags } from '../hooks/useReviewHoleTags';
 import '@/components/course-media-tab/hole-photo-fast.css';
 
-type Props = ReturnType<typeof useReviewHoleTags>;
+type Props = ReturnType<typeof useReviewHoleTags> & {
+  /** BRIEF_REVIEW_STEP_ONE §4: the tray's hole chips replace the shot list. */
+  hideShotList?: boolean;
+  /** Open the tagging sheet on this shot (set by a tray chip). */
+  focusShotId?: string | null;
+  /** Called when the sheet closes so the opener can clear its request. */
+  onFocusClosed?: () => void;
+};
 const dateLabel = (day: string, year = false) => new Date(`${day.slice(0, 10)}T12:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', ...(year ? { year: 'numeric' as const } : {}) });
 const roundDate = (day: string) => {
   const today = new Date();
@@ -42,6 +49,13 @@ export function ReviewHoleTags(props: Props) {
   const [confirmation, setConfirmation] = useState<string | null>(null);
   const [reviewing, setReviewing] = useState(false);
   const [removedNotice, setRemovedNotice] = useState(false);
+  const { focusShotId } = props;
+  useEffect(() => {
+    if (!focusShotId) return;
+    setActiveId(focusShotId); setSelected(null); setConfirmation(null); setRemovedNotice(false);
+    setReviewing(props.assignments[focusShotId] != null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusShotId]);
   if (!props.holes.length || !props.shots.length) return null;
   const active = props.shots.find(shot => shot.id === activeId);
   const tagged = props.shots.filter(shot => props.assignments[shot.id] != null);
@@ -89,7 +103,9 @@ export function ReviewHoleTags(props: Props) {
     setReviewing(false); setSelected(null); setConfirmation(null); setRemovedNotice(true);
   };
   const confirmEnabled = inTaggedState || (!allTagged && selected != null);
-  return <section aria-label="Holes for your photos and videos" style={{ padding: '0 16px 16px', color: RV2.ink }}>
+  const closeSheet = () => { setActiveId(null); props.onFocusClosed?.(); };
+  const list = !props.hideShotList;
+  return <section aria-label="Holes for your photos and videos" style={{ padding: list ? '0 16px 16px' : props.rounds.length > 0 ? '16px 20px 0' : 0, color: RV2.ink }}>
     {props.rounds.length > 0 && <Button variant="ghost" onClick={() => setRoundOpen(true)} className="w-full h-auto min-h-14 justify-between text-left whitespace-normal rounded-lg px-3 py-3" style={{ border: `1px ${props.chosenRound ? 'solid' : 'dashed'} ${RV2.hairlineStrong}`, background: props.chosenRound ? RV2.track : 'transparent' }}>
       <span className="min-w-0"><span className="block text-[13.5px] font-bold tabular-nums">{props.chosenRound ? roundDate(props.chosenRound.playDate) : 'Which round were these from?'}</span>
         <span className="block text-[11.5px] leading-[1.45]" style={{ color: RV2.secondary }}>{props.chosenRound
@@ -97,7 +113,7 @@ export function ReviewHoleTags(props: Props) {
           : `You have ${props.rounds.length} ${props.rounds.length === 1 ? 'round' : 'rounds'} here · Optional`}</span></span>
       <span className="ml-2 text-[11.5px] font-bold" style={{ color: RV2.amber }}>{props.chosenRound ? 'Change' : 'Choose'}</span>
     </Button>}
-    <h2 className="mt-4 mb-2 text-[11px] font-bold uppercase tracking-normal" style={{ color: RV2.eyebrow }}>Put them on a hole</h2>
+    {list && <><h2 className="mt-4 mb-2 text-[11px] font-bold uppercase tracking-normal" style={{ color: RV2.eyebrow }}>Put them on a hole</h2>
     <div className="flex flex-col gap-2">{numbered.map(({ shot, video, n }) => {
       const day = props.metadata[shot.id]?.exif.captureDay;
       const hole = props.assignments[shot.id];
@@ -108,14 +124,14 @@ export function ReviewHoleTags(props: Props) {
         <span className="ml-auto shrink-0 rounded-full px-3 py-1 text-[11px] font-bold" style={{ border: `1px ${hole == null ? 'dashed' : 'solid'} ${hole == null ? RV2.hairlineStrong : RV2.ink}`, background: hole == null ? 'transparent' : RV2.ink, color: hole == null ? RV2.secondary : RV2.canvas }}>{hole == null ? 'Tag' : ordinal(hole)}</span>
       </Button>;
     })}</div>
-    <p className="mt-3" style={note}>{summary}</p>
-    <Sheet open={!!active} onOpenChange={open => { if (!open) setActiveId(null); }}>
+    <p className="mt-3" style={note}>{summary}</p></>}
+    <Sheet open={!!active} onOpenChange={open => { if (!open) closeSheet(); }}>
       <SheetContent side="bottom" hideCloseButton className="hole-photo-batch p-0 gap-0 rounded-t-[14px] sm:max-w-[480px] sm:mx-auto" style={{ background: RV2.canvas, color: RV2.ink, borderColor: RV2.hairline, ...theme }}>
         <div data-sheet-body className="overflow-y-auto flex flex-col gap-3" style={{ paddingTop: 10, paddingLeft: 16, paddingRight: 16, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)', willChange: 'transform' }}>
           <div className="w-9 h-1 rounded-full mx-auto mb-[2px]" style={{ background: 'rgba(255,255,255,0.18)' }} />
           <div className="hole-photo-batch-top" style={{ marginTop: -6 }}>
             <SheetTitle className="hole-photo-fast-title">Which hole is this?</SheetTitle>
-            <button type="button" className="hole-photo-batch-close" aria-label="Close" onClick={() => setActiveId(null)}><X size={20} strokeWidth={2.5} /></button>
+            <button type="button" className="hole-photo-batch-close" aria-label="Close" onClick={closeSheet}><X size={20} strokeWidth={2.5} /></button>
           </div>
           <SheetDescription className="hole-photo-fast-lede">{capitalPhotoCount(props.shots.length)} photos or videos. Tap any one to tag it.</SheetDescription>
           {active && <>
