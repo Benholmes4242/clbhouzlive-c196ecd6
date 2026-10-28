@@ -1,5 +1,9 @@
 # Roadmap
 
+## One neutral floating-glass material
+- [ ] Share card/backdrop/island tokens across the specified glances, scorecard and review; update badge edges only.
+- [ ] Audit other old glass values without changing them; run the full suite against 4,060 tests / 433 files and report every changed file.
+
 ## Signed-off account tile
 - [x] Replace mobile avatar sheet with AccountGlance and shared modal lifecycle; preserve desktop dropdown and close-first actions.
 - [x] Removed exclusive sheet components; retained shared readers/course analytics. Full `bunx vitest run`: 3,999 passed/5 new failures/4,004 executed across429 files; baseline4,007 −28 retired cases +25 new cases. ACCOUNT_TILE_STOP_REPORT.md quotes removed assertions and exact errors.

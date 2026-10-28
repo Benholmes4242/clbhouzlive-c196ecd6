@@ -6,6 +6,7 @@ import { pushSheetEntry, releaseSheetEntry } from '@/components/ui/sheetHistory'
 import { Z } from '@/config/zIndex';
 import { CHROME_CLEARANCE } from '@/lib/chromeClearance';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { GLASS_CARD, GLASS_BACKDROP } from '@/lib/tokens/glass';
 
 const AXIS_LOCK_PX = 8;
 const AXIS_RATIO = 1.2;
@@ -315,9 +316,7 @@ export function ScorecardGlassOverlay({
         position: 'fixed',
         inset: 0,
         zIndex: Z.sheetBackdrop,
-        background: 'rgba(6,8,11,0.5)',
-        backdropFilter: 'blur(3px)',
-        WebkitBackdropFilter: 'blur(3px)',
+        ...GLASS_BACKDROP,
         opacity: entered ? 1 : 0,
         transition: `opacity ${open ? ENTER_OPACITY_MS : EXIT_MS}ms ${open ? 'ease-out' : 'ease-in'}`,
       }}
@@ -344,16 +343,8 @@ export function ScorecardGlassOverlay({
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
-          /* 0.74 -> 0.88, MATCHING ReviewBottomSheet's card exactly. Every other
-             property on these two cards is already the same; this was the only
-             divergence, and at 0.74 the card grid was hard to read over a busy
-             feed behind it. Change both together if either ever moves. */
-          background: 'rgba(24,27,35,0.88)',
-          backdropFilter: 'blur(30px) saturate(160%)',
-          WebkitBackdropFilter: 'blur(30px) saturate(160%)',
-          border: '1px solid rgba(255,255,255,0.14)',
-          borderRadius: 24,
-          boxShadow: '0 28px 70px rgba(0,0,0,0.55)',
+          /* Shared GLASS_CARD owns the material with glances and reviews. */
+          ...GLASS_CARD,
           opacity: entered ? 1 : 0,
           transform: `translateY(calc(-50% + ${dragY}px)) scale(${entered ? 1 : open ? 0.96 : 0.97})`,
           transition: dragY > 0
