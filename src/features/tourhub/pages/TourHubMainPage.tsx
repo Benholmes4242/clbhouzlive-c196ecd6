@@ -119,10 +119,15 @@ export function TourHubMainPage() {
   const backMode = false;
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
-  const [menuOpen, setMenuOpen] = useState(false);
   /* Owned here, not in the bridge: the sub-page shell suppresses the island, so
-     its own header carries the picker trigger and needs the same state. */
-  const [pickerOpen, setPickerOpen] = useState(false);
+     its own header carries the tour control and needs the same tile state. */
+  const [glanceOpen, setGlanceOpen] = useState(false);
+  const [glanceAnchor, setGlanceAnchor] = useState<HTMLElement | null>(null);
+  const openGlance = useCallback((anchor: HTMLElement) => {
+    setGlanceAnchor(anchor);
+    setGlanceOpen(true);
+  }, []);
+  const closeGlance = useCallback(() => setGlanceOpen(false), []);
 
   useTournamentStatusRealtime();
 
@@ -224,15 +229,12 @@ export function TourHubMainPage() {
         <TourHubChromeBridge
           activeTab={activeTab}
           onSelectTab={handleSelectTab}
-          onSettings={() => navigate('/edit-profile?tab=settings')}
-          onProfile={() => navigate('/profile')}
-          onSignOut={() => { void logout(); }}
           backMode={backMode}
           onBack={() => safeGoBack(navigate, '/tourhub')}
-          menuOpen={menuOpen}
-          setMenuOpen={setMenuOpen}
-          pickerOpen={pickerOpen}
-          setPickerOpen={setPickerOpen}
+          glanceAnchor={glanceAnchor}
+          glanceOpen={glanceOpen}
+          openGlance={openGlance}
+          closeGlance={closeGlance}
         />
         {/* The overview is the immersive exception: the hero starts at the
             physical top and the shared left/right islands float over it. Legacy
