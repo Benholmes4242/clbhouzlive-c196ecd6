@@ -19,7 +19,7 @@ vi.mock('@/lib/whs/hooks', () => ({ useWhsConnection: () => ({ data: null }) }))
 vi.mock('@/components/settings/SettingsTabContent', () => ({ SettingsTabContent: () => <div data-testid="settings-tab-content" /> }));
 vi.mock('@/components/skeletons/ManagePageSkeleton', () => ({ ManagePageSkeleton: () => <div data-testid="skeleton" /> }));
 vi.mock('@/integrations/supabase/client', () => {
-  const chain = { select: () => chain, ilike: () => chain, neq: async () => ({ count: h.takenCount, error: null }) };
+  const chain: Record<string, unknown> = { select: () => chain, eq: () => chain, in: () => chain, order: () => chain, ilike: () => chain, then: (r: (v: unknown) => unknown) => r({ data: [], error: null }), neq: async () => ({ count: h.takenCount, error: null }) };
   return { supabase: { from: () => chain, rpc: (n: string, a: unknown) => h.rpc(n, a) } };
 });
 
