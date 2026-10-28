@@ -73,6 +73,9 @@ export const EVENT_LABELS: Record<string, string> = {
   // ─── Direct Post or Review entry ──────────────────────────────
   composer_post_source: 'Composer post source',
   composer_course_source: 'Composer course source',
+  review_search_opened: 'Review search opened',
+  review_search_pick: 'Review search pick',
+  review_course_request_tap: 'Review course request tap',
 
   post_composer_opened: 'Post composer opened',
   post_media_added: 'Post media added',

@@ -20,9 +20,9 @@ vi.mock('@/features/composer-flow/composerFlowStore', () => ({ useComposerFlowSt
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: h.track } }));
 vi.mock('@/components/ui/sheetHistory', () => ({ afterSheetHistorySettled: (fn: () => void) => { h.settled(fn); } }));
 vi.mock('@/features/post-v2/components/BottomSheet', () => ({ default: ({ open, children, fullHeight }: any) => open ? <div data-testid="sheet" data-full-height={String(!!fullHeight)}>{children}</div> : null }));
-vi.mock('@/features/post-v2/components/CourseTagSheet', () => ({ default: (props: any) => {
+vi.mock('@/features/composer-flow/ReviewCourseSearchSheet', () => ({ default: (props: any) => {
   h.picker = props;
-  return props.open ? <div data-testid="picker"><button onClick={() => props.onDone([{ id: 'picked', name: 'Picked' }])}>pick</button><button onClick={props.onClose}>cancel-picker</button></div> : null;
+  return props.open ? <div data-testid="picker"><button onClick={() => props.onPick('picked')}>pick</button><button onClick={props.onClose}>cancel-picker</button></div> : null;
 } }));
 import ComposerFlowSheet from '@/features/composer-flow/ComposerFlowSheet';
 import ComposerStepHeader from '@/features/composer-flow/components/ComposerStepHeader';
@@ -92,13 +92,11 @@ describe('direct entry sheet', () => {
     expect(h.openPost).toHaveBeenCalledWith({ media: files.slice(0, 10), returnPath: undefined });
     expect(h.track).toHaveBeenCalledWith('composer_post_source', { source: 'library', count: 10 });
   });
-  it('search uses the existing single-course picker and only navigates after close settles', async () => {
+  it('search opens the Review a course sheet and only navigates after close settles', async () => {
     mount();
     fireEvent.click(screen.getByRole('button', { name: 'Find a course to review' }));
-    expect(h.picker.title).toBe('Find a course to review');
-    expect(h.picker.selectionMode).toBe('single');
+    expect(screen.getByTestId('picker')).toBeInTheDocument();
     expect(h.picker.userId).toBe('member');
-    expect(h.picker.excludeReviewedForUserId).toBe('member');
     fireEvent.click(screen.getByRole('button', { name: 'pick' }));
     expect(screen.queryByTestId('sheet')).toBeNull();
     expect(h.track).toHaveBeenCalledWith('composer_course_source', { source: 'search' });
