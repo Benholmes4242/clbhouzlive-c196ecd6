@@ -165,6 +165,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { prefix: '/privacy' },                spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/terms' },                  spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/businesses/manage' },      spec: { chrome: 'none', tone: 'light', bleed: false } },
+  { match: { exact: '/business/create-v2' },     spec: { chrome: 'none', tone: 'dark',  bleed: false } },
   { match: { prefix: '/business/create' },        spec: { chrome: 'none', tone: 'light', bleed: false, note: 'business create wizard - shell owns chrome' } },
   { match: { prefix: '/business/invite/accept' }, spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { prefix: '/admin-invite/accept' }, spec: { chrome: 'none', tone: 'dark', bleed: false } },

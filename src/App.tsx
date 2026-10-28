@@ -426,6 +426,7 @@ const BusinessProfilePage = lazy(() => import("./pages/BusinessProfilePage"));
 
 const MyBusinessesPage = lazy(() => import("./pages/MyBusinessesPage"));
 const BusinessProfileEditor = lazy(() => import("./pages/BusinessProfileEditor"));
+const BusinessCreatePage = lazy(() => import("./pages/BusinessCreate"));
 
 
 const BusinessProfileLiveSuccessPage = lazy(() => import("./pages/BusinessProfileLiveSuccessPage"));
@@ -707,6 +708,7 @@ function AppRoutes() {
         {/* Business routes */}
         <Route path="/businesses/manage" element={<Suspense fallback={<GenericPageSkeleton />}><MyBusinessesPage /></Suspense>} />
         
+        <Route path="/business/create-v2" element={<Suspense fallback={null}><BusinessCreatePage /></Suspense>} />
         <Route path="/business/create" element={<Suspense fallback={<ManagePageSkeleton />}><BusinessProfileEditor /></Suspense>} />
         <Route path="/business/:id/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPageV2 /></Suspense>} />
         {/* Club Analytics — verified Golf Clubs only; the page carries the gate. */}
