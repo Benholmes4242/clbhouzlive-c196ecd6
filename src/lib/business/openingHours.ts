@@ -1,7 +1,7 @@
 /**
  * The ONE rule for whether a business profile displays opening hours:
  * show_opening_hours is true AND at least one day is set (closed, or an
- * open and close time). BusinessProfileInfo renders by it and the business
+ * open and close time). ClubVisiting renders by it and the business
  * home's profile completeness (CB68) counts by it, so they cannot disagree.
  */
 export const OPENING_HOURS_DAY_KEYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
