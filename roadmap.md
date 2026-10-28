@@ -1,8 +1,9 @@
 # Roadmap
 
 ## CB118.1 — Club identity during course loading
-- [ ] Gate the existing skeleton on enabled pending club-courses; keep query, hooks, error fallback and non-clubs unchanged.
-- [ ] Add four regression tests in cb118BusinessVisiting; preserve both CB107 tests unedited; run targeted/full suites and report against3,808/417 with existing Media failure and two CB107 failures.
+- [x] Added two-line existing-skeleton gate on pending club-courses; query/hooks/error fallback/non-clubs unchanged. Both CB107 failures now pass UNEDITED in targeted/full runs; automatic build07:36:05Z OK.
+- [x] Added four regression tests in cb118BusinessVisiting (33→37); no old assertion/name changes or removals. Targeted58 passed/1 failed/59; full bunx vitest run3,804 passed/8 failed/3,812 total/417 files, +4 solely CB118.1. CB118_1_STOP_REPORT.md records diff, all errors and inventory.
+- [ ] STOP: cb118BusinessVisiting.test.tsx:274:28 `AssertionError: expected [ …(1) ] to have a length of +0 but got 1`; watcher mistakes legitimate club PostsTabContent for a non-club node. Existing Media Hole7 lookup failure remains, plus six newly observed unchanged Media-case 5000ms timeouts named in report. No correction/retest/browser check after stop; await authorization.
 
 ## Media tab round 3
 - [x] Applied page order, Everything controls, 128×164 place rail and picker titles; shared option B glass card and existing admin place RPCs with queue/place/hole refresh. No protected backend/config changes.
