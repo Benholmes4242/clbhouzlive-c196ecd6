@@ -729,9 +729,53 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
   const dividerColor =
     tone === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.14)';
 
+  // Top fade (BRIEF_ISLANDS_NAV §1/§2): scrim routes render one fixed layer
+  // behind the islands; when the page scrolls past 24px it cross-fades in
+  // 180ms to the solid band. Both layers are pointer-events:none.
+  const scrimTransition = REDUCED_MOTION ? 'none' : 'opacity 180ms linear';
 
   return (
     <>
+
+      {spec.scrim && (
+        <>
+          <div
+            aria-hidden
+            data-chrome="island-scrim"
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 'calc(var(--sat, 0px) + 80px)',
+              background: 'linear-gradient(180deg, rgba(10,10,12,0.95) 0%, rgba(10,10,12,0.75) 45%, rgba(10,10,12,0) 100%)',
+              pointerEvents: 'none',
+              zIndex: Z.header - 1,
+              opacity: scrolled ? 0 : 1,
+              transition: scrimTransition,
+            }}
+          />
+          <div
+            aria-hidden
+            data-chrome="island-scrim-band"
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 'calc(var(--sat, 0px) + 68px)',
+              background: 'rgba(10,10,12,0.88)',
+              backdropFilter: 'blur(20px) saturate(150%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(150%)',
+              borderBottom: '1px solid rgba(255,255,255,0.06)',
+              pointerEvents: 'none',
+              zIndex: Z.header - 1,
+              opacity: scrolled ? 1 : 0,
+              transition: scrimTransition,
+            }}
+          />
+        </>
+      )}
 
       <div
         data-chrome="island"
@@ -757,10 +801,11 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
 
         {/* RIGHT capsule */}
         <div
+          data-island-right
           style={{
             ...glassStyle(tone),
-            padding: '0 5px 0 13px',
-            gap: 9,
+            padding: '0 5px 0 12px',
+            gap: 10,
             position: 'relative',
           }}
         >
@@ -781,7 +826,23 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
                 alignItems: 'center',
               }}
             >
-              <Search size={14} color={inkFor(tone)} strokeWidth={2.4} />
+              {/* The signed-off magnifier: 19px, stroke 1.9 (mock's exact glyph,
+                  not the lucide Search path). */}
+              <svg
+                width={19}
+                height={19}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke={inkFor(tone)}
+                strokeWidth={1.9}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                style={{ display: 'block' }}
+              >
+                <circle cx={11} cy={11} r={7} />
+                <path d="m20 20-3.5-3.5" />
+              </svg>
             </button>
           )}
 
