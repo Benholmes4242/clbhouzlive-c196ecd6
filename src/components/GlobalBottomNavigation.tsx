@@ -68,7 +68,6 @@ export { NAV_CLEARANCE } from '@/lib/navClearance';
 const HIDDEN_ROUTES = [
   '/auth',
   '/welcome',
-  '/business/create-v2',
   '/onboarding',
   
   '/notificationmessages',

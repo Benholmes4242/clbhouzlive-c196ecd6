@@ -25,6 +25,7 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate, useParams, useNavi
 import { setNavigateRef, appNavigate } from '@/utils/navigation';
 import ScrollToTop from '@/components/ScrollToTop';
 import CourseReviewsRedirect from '@/pages/CourseReviewsRedirect';
+import BusinessCreateRedirect from '@/features/business-create/BusinessCreateRedirect';
 import { WATCH_SURFACE } from '@/config/featureFlags';
 import { MomentsLibrarySkeleton } from '@/components/skeletons/MediaLibrarySkeletons';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -708,8 +709,8 @@ function AppRoutes() {
         {/* Business routes */}
         <Route path="/businesses/manage" element={<Suspense fallback={<GenericPageSkeleton />}><MyBusinessesPage /></Suspense>} />
         
-        <Route path="/business/create-v2" element={<Suspense fallback={null}><BusinessCreatePage /></Suspense>} />
-        <Route path="/business/create" element={<Suspense fallback={<ManagePageSkeleton />}><BusinessProfileEditor /></Suspense>} />
+        <Route path="/business/create-v2" element={<BusinessCreateRedirect />} />
+        <Route path="/business/create" element={<Suspense fallback={null}><BusinessCreatePage /></Suspense>} />
         <Route path="/business/:id/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPageV2 /></Suspense>} />
         {/* Club Analytics — verified Golf Clubs only; the page carries the gate. */}
         <Route path="/business/:id/course" element={<Suspense fallback={<GenericPageSkeleton />}><ClubAnalyticsPage /></Suspense>} />
