@@ -1,4 +1,5 @@
 import React from 'react';
+import { readFileSync } from 'node:fs';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -222,7 +223,7 @@ describe('COMPOSER_HOLES_1 optional assignments', () => {
     act(() => { result.current.assign('p', 2); });
     expect(result.current.capture()?.proofScoreId).toBeNull();
     expect('rounds' in result.current).toBe(false);
-    expect(f.from.mock.calls.map(c => c[0])).not.toContain('whs_scores');
+    expect(f.from.mock.calls.map(c => c[0])).not.toContain('gam_round_stats');
     expect(readFileSync('src/features/review-v2/hooks/useReviewHoleTags.ts', 'utf8')).not.toContain('useMyRoundsAtCourse');
   });
 });

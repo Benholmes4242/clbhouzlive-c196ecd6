@@ -35,6 +35,15 @@ type Props = ReturnType<typeof useReviewHoleTags> & {
   onFocusClosed?: () => void;
 };
 
+const dateLabel = (day: string) => new Date(`${day.slice(0, 10)}T12:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+/** Photo capture-date label for the shot list (Today / Yesterday / 3 Jun). */
+const roundDate = (day: string) => {
+  const today = new Date();
+  const yesterday = new Date(); yesterday.setDate(today.getDate() - 1);
+  const localDay = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return day.slice(0, 10) === localDay(today) ? 'Today' : day.slice(0, 10) === localDay(yesterday) ? 'Yesterday' : dateLabel(day);
+};
+
 export function ReviewHoleTags(props: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
