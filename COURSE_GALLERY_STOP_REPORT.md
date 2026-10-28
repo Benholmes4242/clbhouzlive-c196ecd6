@@ -1,5 +1,15 @@
 # Course gallery — completed-edit stop report
 
+## 09:46 UTC follow-up stop — eligible tagging posters
+- Component change: opt-in `alreadyEligible` bypasses only processing filtering in shared cover candidate selection; ShotTagCard header and both tagging strips opt in. Poster retries, shimmer, fade and final icons remain shared; hole/place/gallery cover defaults stay unchanged.
+- Existing `holeMediaTidy.test.tsx` unchanged and passes all nine cases, including the previously failing poster assertion.
+- One test added in `courseGallery.test.tsx`: `eligible tagger video without duration shows its poster while its gallery square keeps the processing fallback`. No existing tests edited, renamed or removed.
+- Full command `bunx vitest run`: **3,871 passed / 1 failed / 3,872 total across 420 files** versus **3,871 / 420**; delta **+1 / 0** solely that added case.
+- New failure `src/test/courseGallery.test.tsx:53:95`: `AssertionError: expected [] to deeply equal [ '/poster.jpg', '/poster.jpg' ]`. Header poster assertion passes; strip assertion queries the render container, while the overlay is portalled outside it.
+- Surviving preview error `src/test/courseGallery.test.tsx(50,40)`: `error TS2322: Type '{ url: string; mediaType: string; posterUrl: string; streamId: string; }' is not assignable to type 'TagShot'.` Details: `Type 'string' is not assignable to type '"image" | "video"'.`
+- The sole pre-existing failure was the unchanged holeMediaTidy poster case; it now passes. No correction or rerun after the new failure. This report is retained because full green was not achieved.
+- Protected SQL/backend/config/native scope unchanged.
+
 ## Result
 Stopped after the first full suite failure. No app or test correction and no rerun followed the failure.
 
