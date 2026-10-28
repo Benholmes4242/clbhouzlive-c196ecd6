@@ -1,6 +1,9 @@
 /** OB1 progress is identity-scoped and records completed screens, never draft
  * names or credentials. Existing profile validation defines username syntax. */
-export const WELCOME_USERNAME_RE = /^[a-z0-9_.]{3,20}$/;
+/** The one username length rule shared by setup and change_username (3–20). */
+export const USERNAME_RULE_MIN = 3;
+export const USERNAME_RULE_MAX = 20;
+export const WELCOME_USERNAME_RE = new RegExp(`^[a-z0-9_.]{${USERNAME_RULE_MIN},${USERNAME_RULE_MAX}}$`);
 export type WelcomeStep = 1 | 2 | 3 | 4 | 5;
 export interface WelcomeCourse { id: string; name: string; region?: string | null; country?: string | null; thumbnail_image?: string | null; club_id?: string | null }
 export interface WelcomeProgress { completed: number; course: WelcomeCourse | null; follows: number }
