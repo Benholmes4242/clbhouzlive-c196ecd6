@@ -41,7 +41,8 @@ import { holePhotoErrorMessage } from '@/lib/courseMedia/holePhotoError';
 import { coursePhotoState } from '@/lib/courseMedia/emptyStates';
 import { memberTagConfirmation } from '@/lib/courseMedia/holeTagConfirmation';
 import { toast } from 'sonner';
-import { CourseFirstPhotoPicker, CoursePhotoRetagPicker, HoleTagRemoveDialog, CourseMediaNoPhotographs, CourseMediaNothing, CourseMediaNoHoleList, CourseMediaNotLive } from './CourseMediaEmptyStates';
+import { CoursePhotoRetagPicker, CourseMediaNoShots, CourseMediaNotLive } from './CourseMediaEmptyStates';
+import { useAddShotFlow } from './CourseMediaAddShot';
 
 interface CourseMediaTabNewProps {
   courseId: string;
@@ -66,7 +67,6 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const [tagPost, setTagPost] = useState<FeedPost | null>(null);
   const [addHole, setAddHole] = useState<number | null>(null);
   const [batch, setBatch] = useState<(BatchPhoto & Partial<OwnMediaSource>)[] | null>(null);
-  const [firstPhoto, setFirstPhoto] = useState(false);
   const [retagPhoto, setRetagPhoto] = useState<HolePhoto | null>(null);
   // Route focus is consumed once after both reads settle; HoleWalk owns shot fallback.
   const [searchParams] = useSearchParams();
@@ -165,7 +165,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         if (!uploaded.success || !uploaded.mediaUrl) throw new Error('Upload failed');
         await submitLibraryHolePhoto(file, uploaded.mediaUrl, courseId, user.id, hole, knownHoles);
       }
-      setAddHole(null); setFirstPhoto(false);
+      setAddHole(null);
       await cache.invalidateQueries({ queryKey: ['hole-photo-tags', courseId, user.id] });
       await cache.invalidateQueries({ queryKey: ['course-media-counts', courseId] });
       await cache.invalidateQueries({ queryKey: ['course-media-feed', courseId] });
@@ -189,6 +189,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   // The member's own non-rejected tags, one entry per tag, so confirmations can
   // say "your second tag on the 9th" (BRIEF_HOLE_TAG_BATCH_V3).
   const ownHoleTags = user ? (tagging.tags.data ?? []).filter(row => row.user_id === user.id && row.status !== 'rejected').map(row => row.hole_no) : [];
+  const addShot = useAddShotFlow({ courseId, memberId: user?.id, knownHoles, ownHoleTags });
   const hasTags = (tagging.tags.data ?? []).some(row => row.status === 'approved') || (places.tags.data ?? []).some(row => row.status === 'approved');
   const openGallery = useCourseGallery({ courseId, courseName: courseName ?? '', userId: user?.id,
     holes: walkHoles?.holes ?? [], scored: walkHoles?.scored ?? false,
@@ -227,18 +228,17 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
 
   return (
     <div className="animate-in fade-in duration-200 flex flex-col" style={{ background: A.CANVAS, minHeight: '100%' }}>
-      {countsReady && mediaCounts.total > 0 && photoState !== 'B' && photoState !== 'C' && <header className="media-v2-top">
+      <header className="media-v2-top">
         <span style={VERDICT_KICKER}>{t('media.v2.kicker', { defaultValue: "Through members' eyes" })}</span>
-        <h2>{t(hasTags ? 'media.v2.sorted' : 'media.v2.unsorted', { total: mediaCounts.total, defaultValue: hasTags ? `${mediaCounts.total} shots, sorted by the golfers who took them` : `${mediaCounts.total} shots, none sorted yet` })}</h2>
-        {hasTags && <p>{t('media.v2.sub', { defaultValue: "By hole and around the club. Tap any of them to walk it." })}</p>}
-      </header>}
-      {photoState === 'B' && walkHoles && <CourseMediaNoPhotographs courseName={courseName} holes={walkHoles.holes} onHole={addFirst} onAddFirst={() => { setFastError(null); setFirstPhoto(true); }} />}
-      {photoState === 'C' && <CourseMediaNothing courseName={courseName} onReview={() => navigate(`/courses/${courseId}/rate`)} />}
-      {photoState !== 'B' && photoState !== 'C' && walkHoles && tagging.tags.isSuccess && <HoleWalk available holes={walkHoles.holes} scored={walkHoles.scored} rows={tagging.tags.data ?? []} totalMedia={mediaCounts.total} onAddFirst={addFirst} onChooseFirst={() => { setFastError(null); setFirstPhoto(true); }} onOpen={(hole, origin, entry) => { void openGallery('holes', undefined, origin, entry, hole); }} />}
+        <h2>{t('media.empty.headTitle', { defaultValue: "How it really looks, from the golfers who've played it" })}</h2>
+        {hasTags && <p>{t('media.empty.headSub', { defaultValue: 'By hole and around the club. Tap any shot to open it.' })}</p>}
+      </header>
+      {(photoState === 'B' || photoState === 'C') && <CourseMediaNoShots courseName={courseName} hasHoles={photoState === 'B'} onAdd={addShot.open} />}
+      {photoState !== 'B' && photoState !== 'C' && walkHoles && tagging.tags.isSuccess && <HoleWalk available holes={walkHoles.holes} scored={walkHoles.scored} rows={tagging.tags.data ?? []} totalMedia={mediaCounts.total} onAddFirst={addFirst} onChooseFirst={addShot.open} onOpen={(hole, origin, entry) => { void openGallery('holes', undefined, origin, entry, hole); }} />}
       {photoState !== 'B' && photoState !== 'C' && <CoursePlaceTiles rows={places.tags.data ?? []} onOpen={(place, rows, origin) => { void openGallery(place, rows[0]?.id, origin, 'place-card'); }} />}
       {photoState !== 'B' && photoState !== 'C' && countsReady && mediaCounts.total > 0 && tagging.tags.isSuccess && places.tags.isSuccess && !hasTags && <section className="media-v2-unsorted">
         <div className="media-v2-unsorted-intro"><span className="media-v2-unsorted-icon"><Tag size={17} /></span><div><h3>{t('media.v2.unsortedTitle', { defaultValue: "Sort them by hole or by place" })}</h3><p>{t('media.v2.unsortedBody', { defaultValue: "Tag a shot to a hole, the clubhouse, the food, the practice ground or anything else, and this page builds itself." })}</p></div></div>
-        <Button className="media-v2-primary" disabled={fastPending} onClick={() => untaggedCount ? void beginBatch() : setFirstPhoto(true)}>{untaggedCount ? t('media.v2.tagYour', { count: untaggedCount, defaultValue: untaggedCount === 1 ? "Tag your 1 shot" : `Tag your ${untaggedCount} shots` }) : t('media.v2.add', { defaultValue: "Add a photo or video" })}</Button>
+        <Button className="media-v2-primary" disabled={fastPending} onClick={() => untaggedCount ? void beginBatch() : addShot.open()}>{untaggedCount ? t('media.v2.tagYour', { count: untaggedCount, defaultValue: untaggedCount === 1 ? "Tag your 1 shot" : `Tag your ${untaggedCount} shots` }) : t('media.v2.add', { defaultValue: "Add a photo or video" })}</Button>
       </section>}
       {countsReady && mediaCounts.total > 0 && photoState !== 'B' && photoState !== 'C' && <div className="media-v3-everything media-v2-head" data-media-everything><h3>{t(hasTags ? 'media.v2.everything' : 'media.v2.allShots', { defaultValue: hasTags ? 'Everything' : 'All shots' })}</h3><Button variant="ghost" className="media-v3-add" aria-label={t('media.v3.add', { defaultValue: 'Add a photo or video' })} onClick={() => navigate(`/courses/${courseId}/rate`)}><Plus size={17} strokeWidth={2.4} /></Button></div>}
       {countsReady && mediaCounts.photos > 0 && mediaCounts.videos > 0 && photoState !== 'B' && photoState !== 'C' && <div className="media-v3-filters"><RailChips ariaLabel={t('media.v3.filters', { defaultValue: 'Media filters' })} options={[
@@ -275,7 +275,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
 
 
       {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} sources={sources.data} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); }} />}
-      {firstPhoto && knownHoles && <CourseFirstPhotoPicker hasShots={mediaCounts.total > 0} knownHoles={knownHoles} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onSubmit={tagLibrary} onClose={() => { setFirstPhoto(false); }} />}
+      {addShot.node}
       {batch && <HolePhotoBatchPath photos={batch} knownHoles={knownHoles ?? []} existingPlaceTags={(places.tags.data ?? []).filter(row => row.user_id === user.id)} onTagPlace={tagPlace} onRemovePlace={removePlace} existingHoleTags={ownHoleTags} onClose={() => setBatch(null)} onTag={(url, hole) => tagging.submit.mutateAsync({ post: sourcePost(url), hole })} onRemove={row => tagging.remove.mutateAsync({ row })} />}
       {tagPost && (
         <HolePhotoTagDialog key={addHole == null ? tagPost.mediaItems[0]?.id : `add-${addHole}`} imageUrl={holeSourceUrl(tagPost.mediaItems[0])} mediaSource={sources.data?.find(s => s.url === holeSourceUrl(tagPost.mediaItems[0]) || holeMediaKey(s) === holeMediaKey(tagPost.mediaItems[0]))} mediaSources={sources.data}
