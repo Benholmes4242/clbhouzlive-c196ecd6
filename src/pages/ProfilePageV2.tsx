@@ -9,7 +9,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { AnimatedNumber } from '@/components/ui/motion';
 import { cn } from '@/lib/utils';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
@@ -207,7 +207,17 @@ const ProfilePageV2Content: React.FC = () => {
         : pubQuery.eq('username', routeUsername!)
       ).maybeSingle();
       if (pubError) throw pubError;
-      if (!pub) return { id: null as string | null, deleted: false, notFound: true };
+      if (!pub) {
+        // EP2: old links keep working — a previous username resolves to the
+        // current one (resolve_previous_username); any failure is not-found.
+        if (!isUuid(routeUsername!)) {
+          try {
+            const { data: current } = await supabase.rpc('resolve_previous_username', { p_username: routeUsername! });
+            if (typeof current === 'string' && current && current !== routeUsername) return { id: null as string | null, deleted: false, notFound: false, current };
+          } catch { /* fall through to not-found */ }
+        }
+        return { id: null as string | null, deleted: false, notFound: true };
+      }
       return { id: pub.id, deleted: false, notFound: false };
     },
   });
@@ -217,6 +227,14 @@ const ProfilePageV2Content: React.FC = () => {
     : user?.id;
   const isProfileDeleted = resolvedProfileId?.deleted === true;
   const profileNotFound = resolvedProfileId?.notFound === true;
+  const renamedTo = (resolvedProfileId as { current?: string } | undefined)?.current;
+  const location = useLocation();
+  useEffect(() => {
+    if (!renamedTo || !routeUsername) return;
+    const prefix = `/profile/${routeUsername}`;
+    const rest = location.pathname.startsWith(prefix) ? location.pathname.slice(prefix.length) : '';
+    navigate(`/profile/${renamedTo}${rest}${location.search}${location.hash}`, { replace: true });
+  }, [renamedTo, routeUsername, location.pathname, location.search, location.hash, navigate]);
   
   const { t } = useTranslation('profile');
   const { data: profile, isLoading: profileLoading, isError: profileError, refetch: refetchProfile } = useUserProfile(profileUserId);
