@@ -10,12 +10,10 @@ import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers
 import { navigationTabs } from './bottom-navigation/navigationTabs';
 import { useDiscoverNewTotal } from '@/stores/discoverNewStore';
 
-import { useNavTheme } from '@/hooks/useNavTheme';
 import { useNavScrollState, pushForceExpand, resetToExpanded } from '@/hooks/useScrollDirection';
-import { cn } from '@/lib/utils';
 import { scrollPageToTop } from '@/lib/getScrollParent';
-import { r } from '@/lib/radius';
 import { LIVE_INK } from '@/features/tourhub/_shared/tokens';
+import { ISLAND_GLASS } from '@/features/chrome-v2/ChromeIsland';
 import { useAnyTourLive } from '@/features/tourhub/hooks/useAnyTourLive';
 import ComposerFlowSheet from '@/features/composer-flow/ComposerFlowSheet';
 import { useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
@@ -85,35 +83,11 @@ interface GlobalBottomNavigationProps {
   chromeState?: 'visible' | 'hidden';
 }
 
-// --- Theme tokens ------------------------------------------------------------
-type ThemeTokens = {
-  fill: string;
-  hairline: string;
-  shadow: string;
-  ink: string;
-  dim: string;
-  lozenge: string;
-};
-
-const DARK_TOKENS: ThemeTokens = {
-  fill: surfaceWithAlpha(MEMBER_PANEL, 0.86),
-  hairline: '1px solid rgba(255,255,255,0.10)',
-  // Specular top-rim highlight + drop shadow (kept in both no-blur and blur paths).
-  shadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 10px 30px rgba(0,0,0,0.45)',
-  ink: '#FFFFFF',
-  dim: 'rgba(255,255,255,0.62)',
-  lozenge: 'rgba(255,255,255,0.10)',
-};
-
-const LIGHT_TOKENS: ThemeTokens = {
-  fill: 'rgba(250,251,253,0.88)',
-  hairline: '1px solid rgba(15,23,42,0.08)',
-  shadow: 'inset 0 1px 0 rgba(255,255,255,0.70), 0 10px 30px rgba(15,23,42,0.16)',
-  ink: '#0F172A',
-  dim: 'rgba(15,23,42,0.62)',
-  lozenge: 'rgba(15,23,42,0.07)',
-};
-
+// --- Ink tokens (BRIEF_ISLANDS_NAV §1) ---------------------------------------
+// One glass — ISLAND_GLASS, shared with the top islands — and one ink pair.
+// The old light/dark theme token sets went with the lozenge design.
+const NAV_INK = '#F8FAFC';
+const NAV_DIM = 'rgba(248,250,252,0.5)';
 
 const REDUCED_MOTION =
   typeof window !== 'undefined' &&
