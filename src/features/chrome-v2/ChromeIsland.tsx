@@ -42,6 +42,7 @@ import { useChromeScrolled } from '@/hooks/useScrollDirection';
 import { IndexGlance } from './IndexGlance';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ConnectGlance } from './ConnectGlance';
+import wordmarkWhite from '@/assets/clbhouz-wordmark-white.svg.asset.json';
 
 import { safeGoBack } from '@/utils/navigation';
 import { subscribeIslandEdge, getIslandEdgeScrolled } from './islandEdge';
@@ -262,8 +263,8 @@ const LeftCapsule: React.FC<{
   // everywhere else it keeps the CompactHeader non-back branch:
   // navigate('/clubhouse'). (Brief said '/watch'; the source of truth is
   // CompactHeader — see report.)
-  const scrolledTitle = spec.left?.kind === 'logo' ? spec.left.scrolledTitle : undefined;
-  const showTitle = scrolled && scrolledTitle != null;
+  const showWordmark = spec.left?.kind === 'logo' ? spec.left.scrolledWordmark === true : false;
+  const showWordmarkNow = scrolled && showWordmark;
   const onLogoTap = () => {
     if (location.pathname === '/' || location.pathname === '/clubhouse') {
       window.dispatchEvent(new CustomEvent('clbhouz-active-tab-retap', { detail: { tabId: 'clubhouse' } }));
@@ -278,7 +279,7 @@ const LeftCapsule: React.FC<{
       aria-label="Go to home"
       style={{
         ...glassStyle(tone),
-        padding: showTitle ? '0 16px 0 6px' : '0 6px',
+        padding: showWordmarkNow ? '0 15px 0 6px' : '0 6px',
         gap: 9,
         cursor: 'pointer',
       }}
@@ -306,24 +307,21 @@ const LeftCapsule: React.FC<{
           }}
         />
       </span>
-      {scrolledTitle != null && (
-        <span
+      {showWordmark && (
+        <img
+          src={wordmarkWhite.url}
+          alt="clbhouz"
           style={{
-            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-            fontWeight: 700,
-            fontSize: 16,
-            color: inkFor(tone),
-            whiteSpace: 'nowrap',
-            opacity: showTitle ? 1 : 0,
-            // Snap under reduced motion; otherwise the title fades in over 180ms.
+            display: 'block',
+            height: 16,
+            width: 'auto',
+            opacity: showWordmarkNow ? 1 : 0,
+            // Snap under reduced motion; otherwise the wordmark fades in over 180ms.
             transition: REDUCED_MOTION ? 'none' : 'opacity 180ms linear',
-            // Keep the island logo-sized until the title appears.
-            maxWidth: showTitle ? 160 : 0,
-            overflow: 'hidden',
+            // Keep the island logo-sized until the wordmark appears.
+            maxWidth: showWordmarkNow ? 52 : 0,
           }}
-        >
-          {scrolledTitle}
-        </span>
+        />
       )}
     </button>
   );
