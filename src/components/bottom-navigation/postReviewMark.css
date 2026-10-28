@@ -1,0 +1,5 @@
+/* Post/review centre tab: cap-trimmed words live here because jsdom drops
+   React's inline `textBox`; the browser rule is authoritative. */
+.post-review-word {
+  text-box: trim-both cap alphabetic;
+}

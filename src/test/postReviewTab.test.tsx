@@ -1,6 +1,8 @@
 /** Post/review centre tab: POST / ink-cropped two-way arrows / REVIEW,
  *  aria-label "Post or review", tap opens step 1. */
 import React from 'react';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -33,9 +35,11 @@ describe('Post or review centre tab', () => {
     expect(svg.getAttribute('stroke-width')).toBe('2.4');
     expect(svg.querySelectorAll('path')[0].getAttribute('d')).toBe('M8 7H20M16 3l4 4-4 4');
     expect(svg.querySelectorAll('path')[1].getAttribute('d')).toBe('M16 17H4M8 13l-4 4 4 4');
+    const cssText = readFileSync(resolve(__dirname, '../components/bottom-navigation/postReviewMark.css'), 'utf8');
     for (const word of container.querySelectorAll<HTMLElement>('span[data-post-review-row]')) {
       expect(word.style.display).toBe('block');
-      expect(word.style.getPropertyValue('text-box')).toBe('trim-both cap alphabetic');
+      expect(word.classList.contains('post-review-word')).toBe(true);
+      expect(cssText).toContain('text-box: trim-both cap alphabetic');
     }
   });
 
