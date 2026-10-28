@@ -1,8 +1,9 @@
 # Roadmap
 
 ## Media v3 — Glass modal accessibility finish
-- [ ] Hide background with aria-hidden hideOthers while an overlay card is open/mounted; undo on close/unmount; preserve appearance, focus and gestures.
-- [ ] Verify unchanged admin Hole7 selector and both unchanged CB107 cases; add shared-overlay lifecycle tests and run full suite. Current inventory3,812/417 includes four intervening CB118.1 tests beyond requested3,808/417. Delete MEDIA_V3_STOP_REPORT only after full green.
+- [x] Hide background with aria-hidden hideOthers while an overlay card is open/mounted; undo on close/unmount; appearance, focus and gestures unchanged.
+- [x] Unchanged admin Hole7 selector and both unchanged CB107 cases pass; four new shared-overlay lifecycle tests pass. Complete bunx vitest run:3,815 passed/1 pre-existing CB118.1 failure/3,816 total/418 files. Delta vs3,808/417 is four intervening CB118.1 tests plus four new accessibility tests/new file. No existing tests edited. MEDIA_V3_ACCESSIBILITY_REPORT.md records diff and results.
+- [ ] Full green/report deletion blocked by unchanged cb118BusinessVisiting.test.tsx:274:28 `AssertionError: expected [ …(1) ] to have a length of +0 but got 1`; observer misclassifies legitimate club PostsTabContent. Needs authorization to correct that specific CB118.1 lookup; retain MEDIA_V3_STOP_REPORT.md until green.
 
 ## CB118.1 — Club identity during course loading
 - [x] Added two-line existing-skeleton gate on pending club-courses; query/hooks/error fallback/non-clubs unchanged. Both CB107 failures now pass UNEDITED in targeted/full runs; automatic build07:36:05Z OK.
