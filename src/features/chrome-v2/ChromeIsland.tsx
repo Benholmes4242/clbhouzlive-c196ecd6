@@ -8,7 +8,7 @@
  *   - resolveChrome(pathname, searchParams) drives everything.
  *   - spec.chrome === 'none' -> renders nothing, publishes --header-h: 0.
  *   - spec.chrome === 'island' -> fixed twin-capsule layer at top,
- *     publishes --header-h: 64 (10 top gap + 44 island + 10 breathing).
+ *     publishes --header-h: 72 (10 top gap + 46 island + 16 breathing).
  *
  * Reuses (not forks):
  *   - Handicap cell: useWhsConnection + useHandicapTrend + useHandicapHistory (last change)
@@ -26,23 +26,24 @@
 
 import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Search, ArrowLeft } from 'lucide-react';
-import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
+import { ArrowLeft } from 'lucide-react';
 import { resolveChrome, type ChromeSpec, type ChromeTone } from './registry';
 import { useChromeLeftOverride, useChromeLeftSlot, useChromeSuppressed } from './leftOverride';
 import { Z } from '@/config/zIndex';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useHandicapHistory } from '@/lib/whs/hooks';
 import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
+import { useChromeScrolled } from '@/hooks/useScrollDirection';
+import { IndexGlance } from './IndexGlance';
+import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
+import { getDirectImageUrl } from '@/utils/r2ImageUtils';
 
 import { safeGoBack } from '@/utils/navigation';
-import { r } from '@/lib/radius';
 import { subscribeIslandEdge, getIslandEdgeScrolled } from './islandEdge';
 import {
   CHROME_BREATHING,
@@ -52,9 +53,13 @@ import {
   CHROME_TOP_GAP,
 } from '@/lib/chromeClearance';
 
-const ISLAND_H = 44;
+const REDUCED_MOTION =
+  typeof window !== 'undefined' &&
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+const ISLAND_H = 46;
 const TOP_GAP = 10;
-const HEADER_H = 70; // 10 gap + 44 island + 16 canon islandClearance
+const HEADER_H = 72; // 10 gap + 46 island + 16 canon islandClearance
 
 /** Shared dark glass material for controls that visually belong to the chrome islands. */
 export const DARK_CHROME_GLASS_MATERIAL: React.CSSProperties = {
@@ -64,10 +69,24 @@ export const DARK_CHROME_GLASS_MATERIAL: React.CSSProperties = {
   WebkitBackdropFilter: 'blur(16px)',
 };
 
+/**
+ * THE ONE ISLAND GLASS (BRIEF_ISLANDS_NAV §SHARED GLASS). Both islands AND the
+ * bottom nav pill use exactly this. Distinct from DARK_CHROME_GLASS_MATERIAL,
+ * which PhotoBand and the tournament HeroSection still use — out of scope here.
+ */
+export const ISLAND_GLASS: React.CSSProperties = {
+  background: 'rgba(14,15,19,0.84)',
+  backdropFilter: 'blur(22px) saturate(150%)',
+  WebkitBackdropFilter: 'blur(22px) saturate(150%)',
+  border: '1px solid rgba(255,255,255,0.10)',
+  boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
+};
+
 export const CHROME_LOGO_SRC = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
 
-const HCP_IMPROVING = '#16a34a';
-const HCP_DRIFTING = '#dc2626';
+// Move colours (BRIEF_ISLANDS_NAV §1): improving is the existing LIVE_INK token.
+const HCP_IMPROVING = '#34D77F';
+const HCP_DRIFTING = '#FF5A4E';
 
 // ---------------------------------------------------------------------------
 // Last-change arrow (BRIEF_CHIP_LAST_CHANGE)
@@ -85,17 +104,27 @@ const HCP_DRIFTING = '#dc2626';
 const HCP_MOVE_MAX_AGE_DAYS = 30;
 const HCP_MOVE_EPSILON = 0.05;
 
-type HcpMove = 'improving' | 'drifting' | 'none';
+export type HcpMove = 'improving' | 'drifting' | 'none';
 
-function lastIndexMove(
+export interface HcpMoveDetail {
+  direction: HcpMove;
+  /** |current − the previous distinct value|, null when direction is 'none'. */
+  size: number | null;
+  /** When the last move landed (ms epoch), null when direction is 'none'. */
+  movedAt: number | null;
+}
+
+const NO_MOVE: HcpMoveDetail = { direction: 'none', size: null, movedAt: null };
+
+export function lastIndexMove(
   history: { observed_at: string; handicap_index: number }[] | undefined,
-): HcpMove {
-  if (!history || history.length < 2) return 'none';
+): HcpMoveDetail {
+  if (!history || history.length < 2) return NO_MOVE;
   // history is ascending; walk back to the first point that differs from the
   // latest value — that boundary is the last actual change.
   const latest = history[history.length - 1];
   const current = Number(latest.handicap_index);
-  if (!Number.isFinite(current)) return 'none';
+  if (!Number.isFinite(current)) return NO_MOVE;
 
   for (let i = history.length - 2; i >= 0; i--) {
     const prev = Number(history[i].handicap_index);
@@ -106,26 +135,32 @@ function lastIndexMove(
     // current value after the previous one.
     const movedAt = new Date(history[i + 1].observed_at).getTime();
     const ageDays = (Date.now() - movedAt) / 86_400_000;
-    if (!Number.isFinite(ageDays) || ageDays > HCP_MOVE_MAX_AGE_DAYS) return 'none';
+    if (!Number.isFinite(ageDays) || ageDays > HCP_MOVE_MAX_AGE_DAYS) return NO_MOVE;
 
-    return current < prev ? 'improving' : 'drifting';
+    return {
+      direction: current < prev ? 'improving' : 'drifting',
+      size: Math.abs(current - prev),
+      movedAt,
+    };
   }
 
-  return 'none';
+  return NO_MOVE;
 }
 
 function glassStyle(tone: ChromeTone): React.CSSProperties {
   const isLight = tone === 'light';
   return {
     height: ISLAND_H,
-    borderRadius: r.xl,
+    borderRadius: 23,
+    // Light-tone routes keep their current colours and take only the new
+    // geometry (BRIEF_ISLANDS_NAV §SHARED GLASS); dark uses ISLAND_GLASS.
     ...(isLight ? {
       background: 'rgba(255,255,255,0.72)',
       border: '1px solid rgba(0,0,0,0.06)',
       backdropFilter: 'blur(16px)',
       WebkitBackdropFilter: 'blur(16px)',
-    } : DARK_CHROME_GLASS_MATERIAL),
-    boxShadow: '0 4px 20px rgba(0,0,0,0.10)',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.10)',
+    } : ISLAND_GLASS),
     pointerEvents: 'auto',
     display: 'flex',
     alignItems: 'center',
@@ -145,6 +180,8 @@ const LeftCapsule: React.FC<{
   slot: ReturnType<typeof useChromeLeftSlot>;
 }> = ({ spec, override, slot }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const scrolled = useChromeScrolled();
   const tone = spec.tone;
 
   // Slot wins over back-override AND the registry rule.
@@ -220,31 +257,74 @@ const LeftCapsule: React.FC<{
   }
 
 
-  // Default: logo. Match CompactHeader.handleLogoClick non-back branch:
+  // Default: logo. On '/' and '/clubhouse' the tap scrolls the feed to the
+  // top via the SAME clbhouz-active-tab-retap event the Home tab sends;
+  // everywhere else it keeps the CompactHeader non-back branch:
   // navigate('/clubhouse'). (Brief said '/watch'; the source of truth is
   // CompactHeader — see report.)
+  const scrolledTitle = spec.left?.kind === 'logo' ? spec.left.scrolledTitle : undefined;
+  const showTitle = scrolled && scrolledTitle != null;
+  const onLogoTap = () => {
+    if (location.pathname === '/' || location.pathname === '/clubhouse') {
+      window.dispatchEvent(new CustomEvent('clbhouz-active-tab-retap', { detail: { tabId: 'clubhouse' } }));
+      return;
+    }
+    navigate('/clubhouse');
+  };
   return (
     <button
       type="button"
-      onClick={() => navigate('/clubhouse')}
+      onClick={onLogoTap}
       aria-label="Go to home"
       style={{
         ...glassStyle(tone),
-        padding: '0 12px',
+        padding: showTitle ? '0 16px 0 6px' : '0 6px',
+        gap: 9,
         cursor: 'pointer',
       }}
     >
-      <img
-        src={CHROME_LOGO_SRC}
-        alt="clbhouz"
+      <span
         style={{
-          height: 26,
-          width: 26,
-          objectFit: 'contain',
-          // The amber mark is the brand on EVERY tone — never inverted to white.
+          width: 34,
+          height: 34,
+          borderRadius: 17,
+          background: '#16161A',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
         }}
-
-      />
+      >
+        <img
+          src={CHROME_LOGO_SRC}
+          alt="clbhouz"
+          style={{
+            height: 24,
+            width: 24,
+            objectFit: 'contain',
+            // The amber mark is the brand on EVERY tone — never inverted to white.
+          }}
+        />
+      </span>
+      {scrolledTitle != null && (
+        <span
+          style={{
+            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+            fontWeight: 700,
+            fontSize: 16,
+            color: inkFor(tone),
+            whiteSpace: 'nowrap',
+            opacity: showTitle ? 1 : 0,
+            // Snap under reduced motion; otherwise the title fades in over 180ms.
+            transition: REDUCED_MOTION ? 'none' : 'opacity 180ms linear',
+            // Keep the island logo-sized until the title appears.
+            maxWidth: showTitle ? 160 : 0,
+            overflow: 'hidden',
+          }}
+        >
+          {scrolledTitle}
+        </span>
+      )}
     </button>
   );
 };
@@ -285,9 +365,9 @@ const HCP_LABEL_TYPE: React.CSSProperties = {
   whiteSpace: 'nowrap',
 };
 
-/** Grid wrapper that reserves the widest outcome's width for its child. */
+/** The 1px rule between the search glyph and the index cell. */
 const HcpDivider: React.FC<{ color: string }> = ({ color }) => (
-  <span aria-hidden style={{ width: 1, height: 18, background: color, flexShrink: 0 }} />
+  <span aria-hidden style={{ width: 1, height: 20, background: color, flexShrink: 0 }} />
 );
 
 export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, dividerColor }) => {
@@ -296,6 +376,8 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ 
   const { activeActor } = useActiveActor();
   const isBusinessActor = activeActor?.type === 'business';
   const { data: profile, isFetched: profileFetched, isError: profileError } = useUserProfile(user?.id);
+  const [glanceOpen, setGlanceOpen] = useState(false);
+  const indexButtonRef = useRef<HTMLButtonElement>(null);
 
   // ONE DEFINITION, SHARED: useHandicapChipState owns "is this member connected"
   // and "has that read settled", so the Explore Scores connect invitation and
@@ -347,46 +429,77 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ 
     }
 
     const indexValue = Number(trendData!.current).toFixed(1);
-    const direction = lastMove;
-    const showArrow = direction === 'improving' || direction === 'drifting';
-    const arrowColor = direction === 'improving' ? HCP_IMPROVING : HCP_DRIFTING;
-    const triangleDir = direction === 'improving' ? 'down' : 'up';
+    const showMove = lastMove.direction !== 'none' && lastMove.size != null;
+    const moveColor = lastMove.direction === 'improving' ? HCP_IMPROVING : HCP_DRIFTING;
 
+    // Two-line index cell (BRIEF_ISLANDS_NAV §1): index + last move on line 1,
+    // the INDEX caption 3px below. Tapping opens the IndexGlance — it no
+    // longer navigates. ("Connect HCP" above still navigates.)
     return (
-      <button
-        type="button"
-        onClick={() => navigate('/handicap')}
-        aria-label={`Handicap ${indexValue}`}
-        style={{
-          background: 'none',
-          border: 'none',
-          padding: 0,
-          cursor: 'pointer',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 4,
-          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-        }}
-      >
-        <span
+      <>
+        <button
+          ref={indexButtonRef}
+          type="button"
+          onClick={() => setGlanceOpen(true)}
+          aria-label={`Handicap index ${indexValue}`}
           style={{
-            fontWeight: 700,
-            fontSize: 12.5,
-            color: inkFor(tone),
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.01em',
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            lineHeight: 1,
+            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           }}
         >
-          {indexValue}
-        </span>
-        {showArrow && (
-          <IndexMovementTriangle
-            direction={triangleDir}
-            color={arrowColor}
-            size={7}
+          <span style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+            <span
+              style={{
+                fontWeight: 700,
+                fontSize: 16,
+                color: inkFor(tone),
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {indexValue}
+            </span>
+            {showMove && (
+              <span
+                style={{
+                  fontWeight: 700,
+                  fontSize: 11,
+                  color: moveColor,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {lastMove.direction === 'improving' ? '▾' : '▴'}{lastMove.size!.toFixed(1)}
+              </span>
+            )}
+          </span>
+          <span
+            style={{
+              fontWeight: 700,
+              fontSize: 8.5,
+              letterSpacing: '0.12em',
+              color: tone === 'light' ? 'rgba(15,23,42,0.42)' : 'rgba(248,250,252,0.42)',
+              marginTop: 3,
+            }}
+          >
+            INDEX
+          </span>
+        </button>
+        {glanceOpen && connection && (
+          <IndexGlance
+            onClose={() => setGlanceOpen(false)}
+            anchorRef={indexButtonRef}
+            connectionId={connection.id}
+            currentIndex={Number(trendData!.current)}
+            move={lastMove}
           />
         )}
-      </button>
+      </>
     );
   })();
 
@@ -410,6 +523,7 @@ export const AvatarCell: React.FC<{
 }> = ({ tone, onOpen, triggerRef }) => {
   const { activeActor, isLoading } = useActiveActor();
   const { countFor } = useActorUnreadCounts();
+  const [imgFailed, setImgFailed] = useState(false);
 
   const activeUnread = activeActor
     ? countFor(activeActor.type as 'personal' | 'business', activeActor.id)
@@ -421,14 +535,20 @@ export const AvatarCell: React.FC<{
       <div
         aria-hidden
         style={{
-          width: 34,
-          height: 34,
-          borderRadius: '34%',
+          width: 36,
+          height: 36,
+          borderRadius: 18,
           background: tone === 'light' ? 'rgba(15,23,42,0.06)' : 'rgba(255,255,255,0.08)',
         }}
       />
     );
   }
+
+  // BRIEF_ISLANDS_NAV §1: the island avatar is a 36px CIRCLE with a 2px amber
+  // frame — a signed-off departure from the canonical squircle, scoped to this
+  // cell. Fallback inside the circle is the shared initials-on-gradient.
+  const avatarSrc = activeActor.avatarUrl ? getDirectImageUrl(activeActor.avatarUrl) : null;
+  const showImg = avatarSrc != null && !imgFailed;
 
   return (
     <button
@@ -438,8 +558,8 @@ export const AvatarCell: React.FC<{
       aria-label="Open profile menu"
       style={{
         position: 'relative',
-        width: 34,
-        height: 34,
+        width: 36,
+        height: 36,
         padding: 0,
         background: 'transparent',
         border: 'none',
@@ -449,36 +569,59 @@ export const AvatarCell: React.FC<{
         justifyContent: 'center',
       }}
     >
-      <span style={{ display: 'inline-flex', borderRadius: '34%' }}>
-        <SquircleAvatar
-          size={34}
-          src={activeActor.avatarUrl}
-          alt={activeActor.name}
-          userId={activeActor.id}
-          hairlineRing
-        />
+      <span
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 18,
+          border: '2px solid #F7931E',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: getAvatarFallbackGradient(activeActor.id),
+          color: '#FFFFFF',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+          fontWeight: 700,
+          fontSize: 13,
+        }}
+      >
+        {showImg ? (
+          <img
+            src={avatarSrc}
+            alt={activeActor.name}
+            onError={() => setImgFailed(true)}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+        ) : (
+          getInitialsFromName(activeActor.name)
+        )}
       </span>
       {activeUnreadCount > 0 ? (
         <span
           aria-label={`${activeUnreadCount} unread`}
           style={{
             position: 'absolute',
-            top: -3,
+            top: -2,
             right: -3,
-            minWidth: 12,
-            height: 12,
+            minWidth: 17,
+            height: 17,
             padding: '0 3px',
-            borderRadius: 999,
-            background: '#F7931E',
+            borderRadius: 9,
+            background: '#FF5A4E',
             color: '#FFFFFF',
             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-            fontWeight: 700,
-            fontSize: 8,
-            lineHeight: '12px',
+            fontWeight: 800,
+            fontSize: 9.5,
+            lineHeight: '13px',
             textAlign: 'center',
             fontVariantNumeric: 'tabular-nums',
-            border: '1px solid #FFFFFF',
-            boxSizing: 'content-box',
+            border: '2px solid #0E0F13',
+            boxSizing: 'border-box',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           {activeUnreadCount > 99 ? '99+' : activeUnreadCount}
@@ -526,6 +669,9 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
     getIslandEdgeScrolled,
     () => false,
   );
+  // Page scrolled past 24px (useScrollDirection store) — drives the scrim
+  // cross-fade; LeftCapsule reads the same flag for its scrolled title.
+  const scrolled = useChromeScrolled();
 
   const suppressed = hidden || runtimeSuppressed || spec.chrome === 'none';
   // bleed island routes let the page own top padding — publish 0 so content
@@ -585,9 +731,53 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
   const dividerColor =
     tone === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.14)';
 
+  // Top fade (BRIEF_ISLANDS_NAV §1/§2): scrim routes render one fixed layer
+  // behind the islands; when the page scrolls past 24px it cross-fades in
+  // 180ms to the solid band. Both layers are pointer-events:none.
+  const scrimTransition = REDUCED_MOTION ? 'none' : 'opacity 180ms linear';
 
   return (
     <>
+
+      {spec.scrim && (
+        <>
+          <div
+            aria-hidden
+            data-chrome="island-scrim"
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 'calc(var(--sat, 0px) + 80px)',
+              background: 'linear-gradient(180deg, rgba(10,10,12,0.95) 0%, rgba(10,10,12,0.75) 45%, rgba(10,10,12,0) 100%)',
+              pointerEvents: 'none',
+              zIndex: Z.header - 1,
+              opacity: scrolled ? 0 : 1,
+              transition: scrimTransition,
+            }}
+          />
+          <div
+            aria-hidden
+            data-chrome="island-scrim-band"
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 'calc(var(--sat, 0px) + 68px)',
+              background: 'rgba(10,10,12,0.88)',
+              backdropFilter: 'blur(20px) saturate(150%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(150%)',
+              borderBottom: '1px solid rgba(255,255,255,0.06)',
+              pointerEvents: 'none',
+              zIndex: Z.header - 1,
+              opacity: scrolled ? 1 : 0,
+              transition: scrimTransition,
+            }}
+          />
+        </>
+      )}
 
       <div
         data-chrome="island"
@@ -613,10 +803,11 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
 
         {/* RIGHT capsule */}
         <div
+          data-island-right
           style={{
             ...glassStyle(tone),
-            padding: '0 5px 0 13px',
-            gap: 9,
+            padding: '0 5px 0 12px',
+            gap: 10,
             position: 'relative',
           }}
         >
@@ -637,7 +828,23 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
                 alignItems: 'center',
               }}
             >
-              <Search size={14} color={inkFor(tone)} strokeWidth={2.4} />
+              {/* The signed-off magnifier: 19px, stroke 1.9 (mock's exact glyph,
+                  not the lucide Search path). */}
+              <svg
+                width={19}
+                height={19}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke={inkFor(tone)}
+                strokeWidth={1.9}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                style={{ display: 'block' }}
+              >
+                <circle cx={11} cy={11} r={7} />
+                <path d="m20 20-3.5-3.5" />
+              </svg>
             </button>
           )}
 

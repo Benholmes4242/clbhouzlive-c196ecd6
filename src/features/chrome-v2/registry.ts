@@ -28,7 +28,14 @@ export type ChromeTone = 'light' | 'dark';
 
 
 export type LeftCell =
-  | { kind: 'logo' }
+  | {
+      kind: 'logo';
+      /**
+       * Page name the logo island grows to show once the page is scrolled
+       * (BRIEF_ISLANDS_NAV §2). Absent = the island never grows a title.
+       */
+      scrolledTitle?: string;
+    }
   | {
       kind: 'back';
       title: string | null;
@@ -59,6 +66,12 @@ export interface ChromeSpec {
    * the notch and becomes the entire stuck header.
    */
   scrollAway?: boolean;
+  /**
+   * Render the fixed top fade behind the islands (BRIEF_ISLANDS_NAV §1), and
+   * cross-fade it to the solid scrolled band (§2). Set only on '/' and
+   * '/clubhouse' for this build.
+   */
+  scrim?: boolean;
   note?: string;
 }
 
@@ -81,8 +94,8 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   // '/' is Clubhouse landing — dark, immersive, page owns chrome.
   // H4b: Clubhouse feed. Island paints; page provides left slot
   // (Suggested/Friends toggle). No logo (slot overrides), no HCP.
-  { match: { exact: '/' },                        spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark',  bleed: true } },
-  { match: { exact: '/clubhouse' },               spec: { chrome: 'island', left: { kind: 'logo' }, tone: 'dark',  bleed: true } },
+  { match: { exact: '/' },                        spec: { chrome: 'island', left: { kind: 'logo', scrolledTitle: 'Clubhouse' }, tone: 'dark',  bleed: true, scrim: true } },
+  { match: { exact: '/clubhouse' },               spec: { chrome: 'island', left: { kind: 'logo', scrolledTitle: 'Clubhouse' }, tone: 'dark',  bleed: true, scrim: true } },
   { match: { exact: '/auth' },                    spec: { chrome: 'none', tone: 'dark',  bleed: false } },
   { match: { exact: '/welcome' },                 spec: { chrome: 'none', tone: 'dark',  bleed: false } },
   { match: { exact: '/auth/callback' },           spec: { chrome: 'none', tone: 'dark',  bleed: false } },

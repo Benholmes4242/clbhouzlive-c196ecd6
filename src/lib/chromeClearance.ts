@@ -24,8 +24,8 @@ export const CHROME_TOP_GAP = 10;
 /** Breathing room between the island's bottom edge and the first row of content. */
 export const CHROME_BREATHING = 16;
 
-/** Used until the island row has been measured (single 44px capsule). */
-export const CHROME_ISLAND_H_FALLBACK = 44;
+/** Used until the island row has been measured (single 46px capsule). */
+export const CHROME_ISLAND_H_FALLBACK = 46;
 
 /** CSS custom property the island writes its measured height into. */
 export const CHROME_ISLAND_H_VAR = '--chrome-island-h';
