@@ -233,7 +233,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
           />
 
           {error && !rejected && !refreshing ? (
-            <div role="alert" data-connect-error={errorKind ?? 'other'} style={{ fontSize: 13.5, color: BAD, marginTop: 24, lineHeight: 1.5 }}>{error}{errorKind === 'linked_elsewhere' && <span style={{ display: 'block', marginTop: 4 }}>Sign in to that account to see it, or use a different membership number.</span>}</div>
+            <div data-connect-error={errorKind ?? 'other'} style={{ fontSize: 13.5, color: BAD, marginTop: 24, lineHeight: 1.5 }}>{error}{errorKind === 'linked_elsewhere' && <span style={{ display: 'block', marginTop: 4 }}>Sign in to that account to see it, or use a different membership number.</span>}</div>
           ) : null}
 
           {rejected ? (
