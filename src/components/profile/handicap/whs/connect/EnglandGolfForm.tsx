@@ -271,7 +271,8 @@ export const EnglandGolfForm: React.FC<Props> = ({
         <div style={{ height: 28, flexShrink: 0 }} />
       </Stage>
 
-      <FooterBar style={setupEmbedded ? { padding: '16px 20px 8px', paddingBottom: 'calc(34px + env(safe-area-inset-bottom, 0px))' } : undefined}>
+      {/* setupEmbedded: the host body already owns the 20px sides, so the pill spans the inputs' width (OB1.5.1). */}
+      <FooterBar style={setupEmbedded ? { padding: '16px 0 8px', paddingBottom: 'calc(34px + env(safe-area-inset-bottom, 0px))' } : undefined}>
         <PrimaryButton type="submit" disabled={disabled} className={setupEmbedded ? 'welcome-primary' : undefined}>
           {rejected || refreshing ? 'Try again' : `Connect to ${bodyName}`}
         </PrimaryButton>
