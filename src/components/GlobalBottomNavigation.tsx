@@ -440,7 +440,41 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
 
 
                   return (
-                    <li key={tab.id} style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                    <li key={tab.id} data-nav-slot={tab.id} style={{ flex: tab.id === 'post' ? 1.15 : 0.96, display: 'flex', justifyContent: 'center' }}>
+                      {tab.id === 'post' ? (
+                        <button
+                          type="button"
+                          aria-label="Post or review"
+                          aria-current={isActive ? 'page' : undefined}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleTabClickWithCamera(tab);
+                          }}
+                          style={{
+                            appearance: 'none',
+                            border: 0,
+                            background: isActive ? tokens.lozenge : 'transparent',
+                            color: iconColor,
+                            padding: '0 3px 5.5px',
+                            boxSizing: 'border-box',
+                            height: 46,
+                            borderRadius: r.md,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            gap: 3,
+                            width: '100%',
+                            minWidth: 0,
+                            fontFamily: 'inherit',
+                            cursor: 'pointer',
+                            transition: BUTTON_TRANSITION,
+                          }}
+                        >
+                          <PostReviewMark color={iconColor} />
+                        </button>
+                      ) : (
                       <button
                         type="button"
                         aria-label={tab.label}
