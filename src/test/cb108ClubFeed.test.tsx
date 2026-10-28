@@ -44,7 +44,6 @@ vi.mock('@/components/posts-tab/PostsTabContent', () => ({
   default: (props: Record<string, unknown>) => { feedState.lastProps = props; return <div data-posts-content>{feedState.empty ? props.emptyOverride as ReactNode : null}</div>; },
 }));
 vi.mock('@/components/business/ClubHowItPlays', () => ({ ClubHowItPlays: () => null }));
-vi.mock('@/components/business/BusinessProfileInfo', () => ({ BusinessProfileInfo: () => <div data-about-content /> }));
 vi.mock('@/components/business/BusinessTeamTab', () => ({ BusinessTeamTab: ({ businessId }: { businessId: string }) => <div data-team-tab={businessId} /> }));
 vi.mock('@/components/moderation/ReportSheet', () => ({ ReportSheet: () => null }));
 vi.mock('@/components/shared/AvatarLightbox', () => ({ AvatarLightbox: () => null }));

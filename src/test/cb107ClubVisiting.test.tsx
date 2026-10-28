@@ -70,7 +70,6 @@ vi.mock('@/lib/business/shareBusinessProfile', () => ({
 }));
 vi.mock('@/components/posts-tab/PostsTabContent', () => ({ default: () => <div data-posts-content /> }));
 vi.mock('@/components/business/ClubHowItPlays', () => ({ ClubHowItPlays: () => null }));
-vi.mock('@/components/business/BusinessProfileInfo', () => ({ BusinessProfileInfo: () => <div data-about-content /> }));
 vi.mock('@/components/business/BusinessTeamTab', () => ({ BusinessTeamTab: () => null }));
 vi.mock('@/components/moderation/ReportSheet', () => ({ ReportSheet: () => null }));
 vi.mock('@/components/shared/AvatarLightbox', () => ({ AvatarLightbox: () => null }));
