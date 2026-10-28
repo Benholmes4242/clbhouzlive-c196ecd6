@@ -42,6 +42,8 @@ import { useChromeScrolled } from '@/hooks/useScrollDirection';
 import { IndexGlance } from './IndexGlance';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ConnectGlance } from './ConnectGlance';
+import { ISLAND_GLASS } from '@/lib/tokens/glass';
+export { ISLAND_GLASS } from '@/lib/tokens/glass';
 
 import { safeGoBack } from '@/utils/navigation';
 import { subscribeIslandEdge, getIslandEdgeScrolled } from './islandEdge';
@@ -67,19 +69,6 @@ export const DARK_CHROME_GLASS_MATERIAL: React.CSSProperties = {
   border: '1px solid rgba(255,255,255,0.12)',
   backdropFilter: 'blur(16px)',
   WebkitBackdropFilter: 'blur(16px)',
-};
-
-/**
- * THE ONE ISLAND GLASS (BRIEF_ISLANDS_NAV §SHARED GLASS). Both islands AND the
- * island controls use exactly this. Distinct from DARK_CHROME_GLASS_MATERIAL,
- * which PhotoBand and the tournament HeroSection still use — out of scope here.
- */
-export const ISLAND_GLASS: React.CSSProperties = {
-  background: 'rgba(14,15,19,0.84)',
-  backdropFilter: 'blur(22px) saturate(150%)',
-  WebkitBackdropFilter: 'blur(22px) saturate(150%)',
-  border: '1px solid rgba(255,255,255,0.10)',
-  boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
 };
 
 export const CHROME_LOGO_SRC = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
@@ -560,7 +549,7 @@ export const AvatarCell: React.FC<{
             lineHeight: '13px',
             textAlign: 'center',
             fontVariantNumeric: 'tabular-nums',
-            border: '2px solid #0E0F13',
+            border: '2px solid #0E0E10',
             boxSizing: 'border-box',
             display: 'flex',
             alignItems: 'center',

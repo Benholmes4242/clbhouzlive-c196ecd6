@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { hideOthers } from 'aria-hidden';
 import { Z } from '@/config/zIndex';
+import { GLASS_CARD, GLASS_BACKDROP } from '@/lib/tokens/glass';
 import './index-glance.css';
 
 export interface GlanceShellProps {
@@ -69,9 +70,10 @@ export function GlanceShell({ onClose, anchorRef, label, children, align = 'righ
   }, []);
 
   return createPortal(<>
-    <div aria-hidden data-testid="index-glance-backdrop" onClick={onClose} className="index-glance-backdrop" style={{ zIndex: Z.header - 1 }} />
+    <div aria-hidden data-testid="index-glance-backdrop" onClick={onClose} className="index-glance-backdrop" style={{ ...GLASS_BACKDROP, zIndex: Z.header - 1 }} />
     <div ref={cardRef} role="dialog" aria-modal="true" aria-label={label} tabIndex={-1} className="index-glance-shell"
       style={{
+        ...GLASS_CARD,
         top: pos?.top ?? 0,
         ...(align === 'left' ? { left: pos?.left ?? 12 } : { right: pos?.right ?? 12 }),
         visibility: pos ? 'visible' : 'hidden', zIndex: Z.header + 1,

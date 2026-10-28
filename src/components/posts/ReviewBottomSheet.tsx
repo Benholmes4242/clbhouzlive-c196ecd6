@@ -32,6 +32,7 @@ import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
  * now glass with a deliberately denser fill than the scorecard: prose needs more
  * separation from the full-bleed photograph or paused video that may remain
  * mounted beneath it. Blur stays 30px; density, not heavier blur, does the work.
+ * 28 Oct 2026: moved to the shared neutral GLASS_CARD with the glances.
  */
 
 
@@ -56,6 +57,7 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import { getPublicProfilePath } from '@/lib/profileRoutes';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
+import { GLASS_CARD, GLASS_BACKDROP } from '@/lib/tokens/glass';
 import { SheetDoorButton } from '@/features/courses/_shared/scorecard/SheetDoorButton';
 import { LikedByRow } from '@/components/likes/LikedByRow';
 /* ReactionAction is now reached through RoundEngagementActions, which owns the
@@ -167,10 +169,6 @@ const BREAKDOWN_LABELS: Record<typeof BREAKDOWN_KEYS[number], string> = {
   clubhouse: 'CLUBHOUSE',
   facilities: 'FACILITIES',
 };
-
-/** BRIEF_REVIEW_SHEET §S.4 — the panel's own fill, shared by the scroll fade so
- *  the text runs UNDER the boundary into exactly the surface it sits on. */
-const PANEL_FILL = 'rgba(24,27,35,0.88)';
 
 /** §S.1 / §S.2 — one threshold for every comparison against the course. Below
  *  three ratings the course "average" is substantially this review. */
@@ -484,9 +482,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               position: 'fixed',
               inset: 0,
               zIndex: REVIEW_SHEET_Z,
-              background: 'rgba(6,8,11,0.5)',
-              backdropFilter: 'blur(3px)',
-              WebkitBackdropFilter: 'blur(3px)',
+              ...GLASS_BACKDROP,
             }}
           />
 
@@ -519,12 +515,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
-              borderRadius: 24,
-              background: 'rgba(24,27,35,0.88)',
-              backdropFilter: 'blur(30px) saturate(160%)',
-              WebkitBackdropFilter: 'blur(30px) saturate(160%)',
-              border: '1px solid rgba(255,255,255,0.14)',
-              boxShadow: '0 28px 70px rgba(0,0,0,0.55)',
+              ...GLASS_CARD,
               color: INK,
               fontFamily: FONT_SF,
               translate: `0 calc(-50% + ${dragY}px)`,
@@ -868,7 +859,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   marginLeft: -18,
                   marginRight: -18,
                   pointerEvents: 'none',
-                  background: `linear-gradient(to bottom, transparent, ${PANEL_FILL})`,
+                  background: `linear-gradient(to bottom, transparent, ${GLASS_CARD.background})`,
                 }}
               />
             </div>

@@ -6,7 +6,7 @@
   --account-rule: rgba(255,255,255,.08);
   --account-control: rgba(255,255,255,.06);
   --account-count-ink: #0A0A0C;
-  --account-badge-edge: #1E2129;
+  --account-badge-edge: #242428;
   --account-open-ring: 0 0 0 3px rgba(248,250,252,.16);
 }
 .account-glance { color: var(--account-ink); letter-spacing: 0; }

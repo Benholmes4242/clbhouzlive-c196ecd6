@@ -1,5 +1,10 @@
 # Roadmap
 
+## One neutral floating-glass material
+- [x] Share card/backdrop/island tokens across the specified glances, scorecard and review; update badge edges only.
+- [x] Audit other old glass values without changing them; full `bunx vitest run`: 4,059 passed / 1 failed / 4,060 tests across 433 files, unchanged inventory from 4,060/433 baseline. No tests edited, added, removed or renamed. Automatic build 18:18:13Z OK.
+- [ ] STOP: src/test/ob1Welcome.test.tsx:109:980, “cropper has no slider, grid or reset and Use photo hands the file to the existing upload”: `AssertionError: expected "spy" to be called with arguments: [ 'profilePhotoBlob', Any<File> ]` / `Number of calls: 0`. No corrections or reruns after failure; no known pre-existing failures at baseline. Authenticated visual checks not performed after stop. See Neutral_glass_report.md in Files.
+
 ## Signed-off account tile
 - [x] Replace mobile avatar sheet with AccountGlance and shared modal lifecycle; preserve desktop dropdown and close-first actions.
 - [x] Removed exclusive sheet components; retained shared readers/course analytics. Full `bunx vitest run`: 3,999 passed/5 new failures/4,004 executed across429 files; baseline4,007 −28 retired cases +25 new cases. ACCOUNT_TILE_STOP_REPORT.md quotes removed assertions and exact errors.
