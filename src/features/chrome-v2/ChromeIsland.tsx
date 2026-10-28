@@ -366,9 +366,9 @@ const HCP_LABEL_TYPE: React.CSSProperties = {
   whiteSpace: 'nowrap',
 };
 
-/** Grid wrapper that reserves the widest outcome's width for its child. */
+/** The 1px rule between the search glyph and the index cell. */
 const HcpDivider: React.FC<{ color: string }> = ({ color }) => (
-  <span aria-hidden style={{ width: 1, height: 18, background: color, flexShrink: 0 }} />
+  <span aria-hidden style={{ width: 1, height: 20, background: color, flexShrink: 0 }} />
 );
 
 export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, dividerColor }) => {
@@ -377,6 +377,8 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ 
   const { activeActor } = useActiveActor();
   const isBusinessActor = activeActor?.type === 'business';
   const { data: profile, isFetched: profileFetched, isError: profileError } = useUserProfile(user?.id);
+  const [glanceOpen, setGlanceOpen] = useState(false);
+  const indexButtonRef = useRef<HTMLButtonElement>(null);
 
   // ONE DEFINITION, SHARED: useHandicapChipState owns "is this member connected"
   // and "has that read settled", so the Explore Scores connect invitation and
@@ -428,46 +430,77 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ 
     }
 
     const indexValue = Number(trendData!.current).toFixed(1);
-    const direction = lastMove;
-    const showArrow = direction === 'improving' || direction === 'drifting';
-    const arrowColor = direction === 'improving' ? HCP_IMPROVING : HCP_DRIFTING;
-    const triangleDir = direction === 'improving' ? 'down' : 'up';
+    const showMove = lastMove.direction !== 'none' && lastMove.size != null;
+    const moveColor = lastMove.direction === 'improving' ? HCP_IMPROVING : HCP_DRIFTING;
 
+    // Two-line index cell (BRIEF_ISLANDS_NAV §1): index + last move on line 1,
+    // the INDEX caption 3px below. Tapping opens the IndexGlance — it no
+    // longer navigates. ("Connect HCP" above still navigates.)
     return (
-      <button
-        type="button"
-        onClick={() => navigate('/handicap')}
-        aria-label={`Handicap ${indexValue}`}
-        style={{
-          background: 'none',
-          border: 'none',
-          padding: 0,
-          cursor: 'pointer',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 4,
-          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-        }}
-      >
-        <span
+      <>
+        <button
+          ref={indexButtonRef}
+          type="button"
+          onClick={() => setGlanceOpen(true)}
+          aria-label={`Handicap index ${indexValue}`}
           style={{
-            fontWeight: 700,
-            fontSize: 12.5,
-            color: inkFor(tone),
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '-0.01em',
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            lineHeight: 1,
+            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           }}
         >
-          {indexValue}
-        </span>
-        {showArrow && (
-          <IndexMovementTriangle
-            direction={triangleDir}
-            color={arrowColor}
-            size={7}
+          <span style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+            <span
+              style={{
+                fontWeight: 700,
+                fontSize: 16,
+                color: inkFor(tone),
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {indexValue}
+            </span>
+            {showMove && (
+              <span
+                style={{
+                  fontWeight: 700,
+                  fontSize: 11,
+                  color: moveColor,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {lastMove.direction === 'improving' ? '▾' : '▴'}{lastMove.size!.toFixed(1)}
+              </span>
+            )}
+          </span>
+          <span
+            style={{
+              fontWeight: 700,
+              fontSize: 8.5,
+              letterSpacing: '0.12em',
+              color: tone === 'light' ? 'rgba(15,23,42,0.42)' : 'rgba(248,250,252,0.42)',
+              marginTop: 3,
+            }}
+          >
+            INDEX
+          </span>
+        </button>
+        {glanceOpen && connection && (
+          <IndexGlance
+            onClose={() => setGlanceOpen(false)}
+            anchorRef={indexButtonRef}
+            connectionId={connection.id}
+            currentIndex={Number(trendData!.current)}
+            move={lastMove}
           />
         )}
-      </button>
+      </>
     );
   })();
 
