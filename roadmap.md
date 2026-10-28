@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Media tab round 3
-- [ ] Apply signed-off page order, Everything controls, place rail and picker titles.
-- [ ] Share the option B glass card across member single/batch/admin; preserve member saves and add existing admin place RPCs with cache refresh.
-- [ ] Add requested checks, retarget only superseded presentation assertions, delete MEDIA_TAB_FINAL_REPORT.md and report full-suite accounting against 3,734/414 (intervening CB117 +22, CB118 +33; current 3,789/416 with two known CB107 failures).
+- [x] Applied page order, Everything controls, 128×164 place rail and picker titles; shared option B glass card and existing admin place RPCs with queue/place/hole refresh. No protected backend/config changes.
+- [x] Added19 mediaV3 tests, retargeted superseded presentation checks with inventory in MEDIA_V3_STOP_REPORT.md; deleted MEDIA_TAB_FINAL_REPORT.md. Full bunx vitest run3,805 passed/3 failed/3,808 total across417 files =3,734/414 +CB11722/1 +CB11833/1 +MediaV319/1. Automatic build07:26:48Z OK.
+- [ ] STOP: new adminHoleTagging.test.tsx:127:85 `TestingLibraryElementError: Found multiple elements with the role "button" and name "Hole 7"`; document lookup sees background and glass grids. No correction after failure. Two pre-existing CB107 failures:257:107 and273:43 remain; no visual/authenticated flow verification after stop. Await authorization to resolve new failure and separately owned CB107 failures.
 
 ## CB118 — Visiting or Contact for non-club businesses
 - [x] Generalised ClubVisiting with opt-in non-club rows and shared hero booking callback; inserted after mentions, tabs retained. Added 33 CB118 tests and only user-authorized CB107/CB112 corrections.
