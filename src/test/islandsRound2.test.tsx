@@ -97,7 +97,7 @@ describe('Islands round two disconnected glance', () => {
   });
   it('hands the shared avatar its amber ring and member identity', () => {
     render(<AvatarCell tone="dark" onOpen={() => {}} triggerRef={React.createRef<HTMLButtonElement>()} />);
-    expect(mocks.avatar).toHaveBeenCalledWith(expect.objectContaining({ ringColor: '#F7931E', size: 36, userId: 'member', src: '/avatar.jpg', alt: 'Ben' }));
+    expect(mocks.avatar).toHaveBeenCalledWith(expect.objectContaining({ ringWidth: 1.5, ringColor: '#F7931E', size: 36, userId: 'member', src: '/avatar.jpg', alt: 'Ben' }));
   });
 });
 
@@ -120,14 +120,22 @@ describe('Islands round two wordmark', () => {
 
     // Registered in the '/' rule; present but collapsed and invisible at rest.
     expect(wordmark()).toBeDefined();
-    expect(wordmark()!.style.height).toBe('16px');
-    expect(wordmark()!.style.opacity).toBe('0');
-    expect(wordmark()!.style.maxWidth).toBe('0');
+    const image = wordmark();
+    if (!image) throw new Error('Missing wordmark');
+    expect(image.style.height).toBe('20px');
+    expect(image.style.opacity).toBe('0');
+    expect(image.style.maxWidth).toBe('0');
     // The plain-text "Clubhouse" title is gone in favour of the artwork.
     expect(view.container.textContent).not.toContain('Clubhouse');
 
     const capsule = screen.getByRole('button', { name: 'Go to home' });
-    expect(capsule.style.padding).toBe('0px 6px');
+    expect(capsule.style.padding).toBe('0px 7px');
+    expect(capsule.style.gap).toBe('0');
+    const mark = capsule.querySelector('img');
+    expect(mark?.parentElement).toBe(capsule);
+    expect(mark?.style.width).toBe('30px');
+    expect(mark?.style.height).toBe('30px');
+    expect(capsule.querySelector('span')).toBeNull();
 
     const scroller = document.createElement('div');
     document.body.appendChild(scroller);
@@ -138,14 +146,15 @@ describe('Islands round two wordmark', () => {
       await new Promise((r) => requestAnimationFrame(() => r(null)));
     });
 
-    expect(wordmark()!.style.opacity).toBe('1');
-    expect(wordmark()!.style.maxWidth).toBe('52px');
-    expect(capsule.style.padding).toBe('0px 15px 0px 6px');
+    expect(image.style.opacity).toBe('1');
+    expect(image.style.maxWidth).toBe('64px');
+    expect(capsule.style.padding).toBe('0px 15px 0px 11px');
+    expect(capsule.style.gap).toBe('9px');
 
     act(() => resetToExpanded());
-    expect(wordmark()!.style.opacity).toBe('0');
-    expect(wordmark()!.style.maxWidth).toBe('0');
-    expect(capsule.style.padding).toBe('0px 6px');
+    expect(image.style.opacity).toBe('0');
+    expect(image.style.maxWidth).toBe('0');
+    expect(capsule.style.padding).toBe('0px 7px');
 
     unregister();
     scroller.remove();

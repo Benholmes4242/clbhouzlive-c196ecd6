@@ -279,47 +279,29 @@ const LeftCapsule: React.FC<{
       aria-label="Go to home"
       style={{
         ...glassStyle(tone),
-        padding: showWordmarkNow ? '0 15px 0 6px' : '0 6px',
-        gap: 9,
+        padding: showWordmarkNow ? '0 15px 0 11px' : '0 7px',
+        gap: showWordmarkNow ? 9 : 0,
         cursor: 'pointer',
       }}
     >
-      <span
-        style={{
-          width: 34,
-          height: 34,
-          borderRadius: 17,
-          background: '#16161A',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}
-      >
-        <img
-          src={CHROME_LOGO_SRC}
-          alt="clbhouz"
-          style={{
-            height: 24,
-            width: 24,
-            objectFit: 'contain',
-            // The amber mark is the brand on EVERY tone — never inverted to white.
-          }}
-        />
-      </span>
+      <img
+        src={CHROME_LOGO_SRC}
+        alt="clbhouz"
+        style={{ height: 30, width: 30, objectFit: 'contain', flexShrink: 0 }}
+      />
       {showWordmark && (
         <img
           src={wordmarkWhite.url}
           alt="clbhouz"
           style={{
             display: 'block',
-            height: 16,
+            height: 20,
             width: 'auto',
             opacity: showWordmarkNow ? 1 : 0,
             // Snap under reduced motion; otherwise the wordmark fades in over 180ms.
             transition: REDUCED_MOTION ? 'none' : 'opacity 180ms linear',
             // Keep the island logo-sized until the wordmark appears.
-            maxWidth: showWordmarkNow ? 52 : 0,
+            maxWidth: showWordmarkNow ? 64 : 0,
           }}
         />
       )}
@@ -549,7 +531,7 @@ export const AvatarCell: React.FC<{
       }}
     >
       <SquircleAvatar src={activeActor.avatarUrl} alt={activeActor.name} userId={activeActor.id}
-        size={36} ringColor="#F7931E" className="[&>div:first-child]:!aspect-square" />
+        size={36} ringWidth={1.5} ringColor="#F7931E" className="[&>div:first-child]:!aspect-square" />
       {activeUnreadCount > 0 ? (
         <span
           aria-label={`${activeUnreadCount} unread`}
