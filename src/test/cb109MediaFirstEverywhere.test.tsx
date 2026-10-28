@@ -66,8 +66,11 @@ describe('CB109 media-first everywhere', () => {
     const tab = source('src/components/posts-tab/PostsTabContent.tsx');
     expect(tab).toContain("layout = 'mediaFirst'");
     expect(tab).toMatch(/<LightCardFeed[\s\S]*?layout=\{layout\}/);
-    const path = actorType === 'personal' ? 'src/pages/ProfilePageV2.tsx' : 'src/pages/BusinessProfilePage.tsx';
+    const path = actorType === 'personal' ? 'src/pages/ProfilePageV2.tsx' : 'src/components/business/ClubFromTheClub.tsx';
     expect(source(path)).toMatch(new RegExp(`<PostsTabContent\\s+actorType="${actorType}"`));
+    if (actorType === 'business') {
+      expect(source(path)).toMatch(/<PostsTabContent\s+actorType="business"[^>]*\blayout="mediaFirst"/);
+    }
     expect(source('src/components/posts-tab/LightCardFeed.tsx')).toMatch(/<FeedCard[\s\S]*?layout=\{layout\}/);
   });
   it('out-of-scope grids use the separate tile FeedCard and RecentRoundsCard owns its round card', () => {
