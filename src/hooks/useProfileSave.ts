@@ -18,7 +18,7 @@ export function useProfileSave(userId: string) {
 
   const save = async (
     form: ProfileFormData,
-    opts: { isOnboarding?: boolean; hasWhsConnection?: boolean; welcomeFields?: 'identity' | 'course'; photoField?: 'profile' | 'header' } = {}
+    opts: { isOnboarding?: boolean; hasWhsConnection?: boolean; welcomeFields?: 'identity' | 'course'; photoField?: 'profile' | 'header'; profileFields?: 'name' | 'bio' | 'location' | 'gender' } = {}
   ): Promise<boolean | 'username_taken'> => {
     const { isOnboarding = false, hasWhsConnection = false } = opts;
     setIsSaving(true);
@@ -114,6 +114,24 @@ export function useProfileSave(userId: string) {
         if (error) throw error;
         if (!data) throw new Error('Profile update did not match any row');
         await queryClient.invalidateQueries({ queryKey: ['profile', userId] });
+        return true;
+      }
+
+      // EP2 opt-in: each Edit profile sheet writes only its own columns.
+      if (opts.profileFields) {
+        const f = opts.profileFields;
+        const payload: Record<string, unknown> = f === 'name'
+          ? { first_name: form.firstName.trim(), last_name: form.lastName.trim(), display_name: form.displayName.trim() }
+          : f === 'bio' ? { bio: form.bio.trim() }
+          : f === 'location' ? { country: form.country.trim(), city: form.city.trim() }
+          : { gender: form.gender || null };
+        payload.updated_at = updatePayload.updated_at;
+        const { data, error } = await supabase.from('user_profiles').update(payload as any).eq('id', userId).select('id').single();
+        if (error) throw error;
+        if (!data) throw new Error('Profile update did not match any row');
+        await queryClient.invalidateQueries({ queryKey: ['profile', userId] });
+        await queryClient.invalidateQueries({ queryKey: ['user-profile'], refetchType: 'all' });
+        if (f === 'gender') await queryClient.invalidateQueries({ queryKey: whsKeys.percentile(userId), refetchType: 'all' });
         return true;
       }
 
