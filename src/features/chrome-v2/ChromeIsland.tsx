@@ -524,6 +524,7 @@ export const AvatarCell: React.FC<{
 }> = ({ tone, onOpen, triggerRef }) => {
   const { activeActor, isLoading } = useActiveActor();
   const { countFor } = useActorUnreadCounts();
+  const [imgFailed, setImgFailed] = useState(false);
 
   const activeUnread = activeActor
     ? countFor(activeActor.type as 'personal' | 'business', activeActor.id)
@@ -535,14 +536,20 @@ export const AvatarCell: React.FC<{
       <div
         aria-hidden
         style={{
-          width: 34,
-          height: 34,
-          borderRadius: '34%',
+          width: 36,
+          height: 36,
+          borderRadius: 18,
           background: tone === 'light' ? 'rgba(15,23,42,0.06)' : 'rgba(255,255,255,0.08)',
         }}
       />
     );
   }
+
+  // BRIEF_ISLANDS_NAV §1: the island avatar is a 36px CIRCLE with a 2px amber
+  // frame — a signed-off departure from the canonical squircle, scoped to this
+  // cell. Fallback inside the circle is the shared initials-on-gradient.
+  const avatarSrc = activeActor.avatarUrl ? getDirectImageUrl(activeActor.avatarUrl) : null;
+  const showImg = avatarSrc != null && !imgFailed;
 
   return (
     <button
@@ -552,8 +559,8 @@ export const AvatarCell: React.FC<{
       aria-label="Open profile menu"
       style={{
         position: 'relative',
-        width: 34,
-        height: 34,
+        width: 36,
+        height: 36,
         padding: 0,
         background: 'transparent',
         border: 'none',
@@ -563,36 +570,59 @@ export const AvatarCell: React.FC<{
         justifyContent: 'center',
       }}
     >
-      <span style={{ display: 'inline-flex', borderRadius: '34%' }}>
-        <SquircleAvatar
-          size={34}
-          src={activeActor.avatarUrl}
-          alt={activeActor.name}
-          userId={activeActor.id}
-          hairlineRing
-        />
+      <span
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 18,
+          border: '2px solid #F7931E',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: getAvatarFallbackGradient(activeActor.id),
+          color: '#FFFFFF',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+          fontWeight: 700,
+          fontSize: 13,
+        }}
+      >
+        {showImg ? (
+          <img
+            src={avatarSrc}
+            alt={activeActor.name}
+            onError={() => setImgFailed(true)}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+        ) : (
+          getInitialsFromName(activeActor.name)
+        )}
       </span>
       {activeUnreadCount > 0 ? (
         <span
           aria-label={`${activeUnreadCount} unread`}
           style={{
             position: 'absolute',
-            top: -3,
+            top: -2,
             right: -3,
-            minWidth: 12,
-            height: 12,
+            minWidth: 17,
+            height: 17,
             padding: '0 3px',
-            borderRadius: 999,
-            background: '#F7931E',
+            borderRadius: 9,
+            background: '#FF5A4E',
             color: '#FFFFFF',
             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-            fontWeight: 700,
-            fontSize: 8,
-            lineHeight: '12px',
+            fontWeight: 800,
+            fontSize: 9.5,
+            lineHeight: '13px',
             textAlign: 'center',
             fontVariantNumeric: 'tabular-nums',
-            border: '1px solid #FFFFFF',
-            boxSizing: 'content-box',
+            border: '2px solid #0E0F13',
+            boxSizing: 'border-box',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           {activeUnreadCount > 99 ? '99+' : activeUnreadCount}
