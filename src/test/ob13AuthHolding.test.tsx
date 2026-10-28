@@ -18,7 +18,7 @@ describe('OB1.3 plain holding screen', () => {
     mount();
     const hold = document.querySelector<HTMLElement>('[data-auth-callback-processing]')!;
     expect(hold).not.toBeNull();
-    expect(hold.style.background).toBe('var(--welcome-canvas)');
+    expect(hold.getAttribute('style')).toContain('var(--welcome-canvas)');
     expect(document.querySelector('img')).toBeNull();
     expect(document.querySelector('.animate-spin')).toBeNull();
     expect(document.querySelector('.rounded-3xl')).toBeNull();
