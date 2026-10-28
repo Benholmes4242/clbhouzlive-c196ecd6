@@ -13,11 +13,14 @@ import WhsConnectScreen from '@/components/profile/handicap/whs/WhsConnectScreen
  * as a history entry, so the in-flow back button and iOS edge-swipe both pop
  * back to screen 4 instead of leaving /welcome. Provider errors, credential
  * safety and WHS analytics stay owned by WhsConnectScreen. */
-export function WelcomeHandicap({ userId, connectCountryId, onOpenConnect, onConnected }: { userId: string; connectCountryId: string | null; onOpenConnect: (country: WhsCountry) => void; onConnected: () => void }) {
+export function WelcomeHandicap({ userId, connectCountryId, onOpenConnect, onConnected, onSyncingChange }: { userId: string; connectCountryId: string | null; onOpenConnect: (country: WhsCountry) => void; onConnected: () => void; onSyncingChange?: (syncing: boolean) => void }) {
   const { t } = useTranslation('auth'); const waitlist = useHandicapWaitlist(userId); const [sheet, setSheet] = useState(false);
   const country = connectCountryId ? getCountryById(connectCountryId) : null;
   const pick = (c: WhsCountry) => { if (!c.supported) return; setSheet(false); onOpenConnect(c); };
-  if (country) return <div className="welcome-connect" data-welcome-connect={country.id}><h1>{country.body}</h1><WhsConnectScreen key={country.id} layout="embedded" initialCountryId={country.id} completeOnSuccess hideChrome onConnected={onConnected} /></div>;
+  /* OB1.5: the one heading ("Sign in to {body}." / "Pulling your record.") is
+     owned by Welcome above this embed; setupEmbedded strips the form's own
+     StageHead and Stage sides and shows the syncing screen while connecting. */
+  if (country) return <div className="welcome-connect" data-welcome-connect={country.id}><WhsConnectScreen key={country.id} layout="embedded" initialCountryId={country.id} completeOnSuccess hideChrome setupEmbedded onSyncingChange={onSyncingChange} onConnected={onConnected} /></div>;
   if (!waitlist.isSettled && !waitlist.isError) return <p role="status">{t('welcome.loading', { defaultValue: 'Loading…' })}</p>;
   if (waitlist.isError) return <Button variant="ghost" onClick={() => void waitlist.refetch()}>{t('welcome.retry', { defaultValue: 'Try again' })}</Button>;
   const live = WHS_COUNTRIES.filter(c => c.supported); const agreed = WHS_COUNTRIES.filter(c => !c.supported && c.comingSoon); const rest = WHS_COUNTRIES.filter(c => !c.supported && !c.comingSoon);

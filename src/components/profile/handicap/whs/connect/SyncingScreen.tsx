@@ -35,7 +35,12 @@ const MARK: React.CSSProperties = {
   boxSizing: 'border-box',
 };
 
-export const SyncingScreen: React.FC = () => {
+export const SyncingScreen: React.FC<{
+  /** OB1.5: embedded in /welcome setup. No StageHead (the host owns the one
+   *  heading) and the Stage drops its 24px sides; the steps start 36px below
+   *  the host's sub-line. Passed only by WelcomeHandicap's host. */
+  setupEmbedded?: boolean;
+}> = ({ setupEmbedded = false }) => {
   const { t } = useTranslation('handicap');
   const [current, setCurrent] = useState(0);
 
@@ -51,14 +56,16 @@ export const SyncingScreen: React.FC = () => {
   }, []);
 
   return (
-    <Stage>
-      <StageHead
-        kicker={t('whsConnect.steps.sync')}
-        headline={t('whsConnect.sync.headline')}
-        lead={t('whsConnect.sync.sub')}
-      />
+    <Stage style={setupEmbedded ? { padding: '10px 0 0', background: 'transparent', border: 'none' } : undefined}>
+      {!setupEmbedded && (
+        <StageHead
+          kicker={t('whsConnect.steps.sync')}
+          headline={t('whsConnect.sync.headline')}
+          lead={t('whsConnect.sync.sub')}
+        />
+      )}
 
-      <div style={{ marginTop: 40, paddingBottom: 28 }}>
+      <div style={{ marginTop: setupEmbedded ? 36 : 40, paddingBottom: 28 }}>
         {STEP_KEYS.map((key, i) => {
           const passed = i < current;
           const isCurrent = i === current;

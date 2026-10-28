@@ -18,6 +18,11 @@ interface Props {
   bodyShort?: string;
   /** Kept for API compatibility - the header back control owns this now. */
   onChangeCountry?: () => void;
+  /** OB1.5: embedded in /welcome setup. No StageHead (the host owns the one
+   *  heading), the Stage drops its 24px sides so fields sit on the setup's
+   *  20px edges, and the submit button is the welcome primary pill in the
+   *  setup footer position. Passed only by WelcomeHandicap. */
+  setupEmbedded?: boolean;
 }
 
 /**
@@ -123,6 +128,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
   submitting,
   bodyName = 'England Golf',
   errorKind = null,
+  setupEmbedded = false,
 }) => {
   const { t } = useTranslation('handicap');
   const [membershipNumber, setMembershipNumber] = useState('');
@@ -148,13 +154,15 @@ export const EnglandGolfForm: React.FC<Props> = ({
       className="flex flex-col flex-1 min-h-0"
       style={{ fontFamily: FONT }}
     >
-      <Stage fill>
-        <StageHead
-          small
-          kicker={t('whsConnect.steps.form', { body: bodyName })}
-          headline="Sign in once."
-          lead={`The same details you use for the ${bodyName} app.`}
-        />
+      <Stage fill style={setupEmbedded ? { padding: '10px 0 0', background: 'transparent', border: 'none' } : undefined}>
+        {!setupEmbedded && (
+          <StageHead
+            small
+            kicker={t('whsConnect.steps.form', { body: bodyName })}
+            headline="Sign in once."
+            lead={`The same details you use for the ${bodyName} app.`}
+          />
+        )}
 
         {refreshing ? (
           <div
@@ -175,7 +183,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
           </div>
         ) : null}
 
-        <div style={{ marginTop: refreshing ? 30 : 36 }}>
+        <div style={{ marginTop: refreshing ? 30 : setupEmbedded ? 24 : 36 }}>
           <Field
             first
             label="Membership number"
@@ -263,8 +271,8 @@ export const EnglandGolfForm: React.FC<Props> = ({
         <div style={{ height: 28, flexShrink: 0 }} />
       </Stage>
 
-      <FooterBar>
-        <PrimaryButton type="submit" disabled={disabled}>
+      <FooterBar style={setupEmbedded ? { padding: '16px 20px 8px', paddingBottom: 'calc(34px + env(safe-area-inset-bottom, 0px))' } : undefined}>
+        <PrimaryButton type="submit" disabled={disabled} className={setupEmbedded ? 'welcome-primary' : undefined}>
           {rejected || refreshing ? 'Try again' : `Connect to ${bodyName}`}
         </PrimaryButton>
       </FooterBar>
