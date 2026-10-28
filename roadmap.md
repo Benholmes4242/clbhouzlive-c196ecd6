@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Rounds gate — Look, then lock
-- [ ] Replace cropped gate with visit-local scroll/timer lock and signed-off glass card/tile; preserve state, reads and page sections.
-- [ ] Audit score/index blur attributes; cover timing, navigation, accessibility and analytics; run full suite against 4,085/435 and report inventory.
-- [ ] Check available preview and automatic diagnostics; name any unavailable authenticated checks.
+- [x] Replace cropped gate with visit-local scroll/timer lock and signed-off glass card/tile; preserve state, reads and page sections. Ben confirmed CB39 scope switch/test remain unchanged.
+- [x] Audit score/index blur attributes and run `bunx vitest run`: 4,107 passed / 3 failed / 4,110 total across 436 files; +24 new look-lock cases and +1 analytics case from 4,085/435. Predicate and CB39 tests pass unchanged.
+- [ ] STOP: roundsGateAnalytics.test.tsx:64:35 expected spy 1 call but got 2; :85:35 expected 2 but got 4; roundsGateLookLock.test.tsx:32:310 Cannot update an unmounted root. No corrections after failure; await explicit authorization. Full errors/inventory in ROUNDS_GATE_LOOK_LOCK_REPORT.md.
+- [x] Automatic build 20:36:24Z build OK; earlier missing glimpseFits diagnostic superseded. Authenticated visual checks unavailable (external_unmanaged); browser checks not attempted after stop.
 
 ## BC4 — Create a business profile appearance
 - [x] Reconcile step 3 with panels 3A–3E: chips, sheet grabber, phone chip, hours helper/time pairs/day sizing/switches and fixed footer.
