@@ -5,6 +5,7 @@ import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/ab
  * A owns its photograph mosaic and closing invitation, with no tagging controls.
  */
 import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Loader2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
@@ -120,14 +121,16 @@ export function CourseMediaNothing({ courseName, onReview }: { courseName?: stri
   </section>;
 }
 
-export function CourseFirstPhotoPicker({ knownHoles, pending, uploadProgress, error, onSubmit, onClose }: {
+export function CourseFirstPhotoPicker({ knownHoles, pending, uploadProgress, error, onSubmit, onClose, hasShots = false }: {
+  hasShots?: boolean;
   knownHoles: readonly number[]; pending: boolean; uploadProgress?: number | null; result?: HolePhoto | null; error: string | null;
   onSubmit: (file: File, hole: number) => void; onClose: () => void;
 }) {
   const [hole, setHole] = useState<number | null>(null);
+  const { t } = useTranslation('courses');
   const input = useRef<HTMLInputElement>(null);
   return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent className="media-empty" style={{ ...theme, background: A.PANEL }} onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
-    <DialogTitle>Add the first photograph</DialogTitle>
+    <DialogTitle>{t(hasShots ? 'media.v3.add' : 'media.v3.addFirst', { defaultValue: hasShots ? 'Add a photo or video' : 'Add the first photo or video' })}</DialogTitle>
     <DialogDescription className="sr-only">Choose the hole and a photograph from your library.</DialogDescription>
     <HolePhotoPicker holeCount={knownHoles.length} knownHoleNumbers={knownHoles} selectedHole={hole} onSelect={n => { if (!pending) setHole(prev => (prev === n ? null : n)); }} />
     <input ref={input} type="file" accept="image/*,video/*" hidden disabled={pending} onChange={event => { const file = event.target.files?.[0]; if (file && hole != null) onSubmit(file, hole); event.target.value = ''; }} />

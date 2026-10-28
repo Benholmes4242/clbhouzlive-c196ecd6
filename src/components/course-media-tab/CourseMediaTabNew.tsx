@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Camera, Tag, ChevronRight } from 'lucide-react';
+import { Camera, Tag, ChevronRight, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCoursePlaceMedia, type PlaceMedia } from './hooks/useCoursePlaceMedia';
 import { CoursePlaceTiles } from './CoursePlaceTiles';
@@ -17,7 +17,8 @@ import { useQuery } from '@tanstack/react-query';
 import type { CoursePlace } from '@/lib/courseMedia/places';
 import './media-v2.css';
 import { useCourseMedia, type CourseMediaFilter } from './hooks/useCourseMedia';
-import { CourseMediaHeader } from './CourseMediaHeader';
+import { RailChips } from '@/components/ui/RailChips';
+import './media-v3.css';
 import { CourseMediaCanonGrid } from './CourseMediaCanonGrid';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
@@ -113,6 +114,10 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
     setActiveFilter(filter);
     resetSeen();
   };
+
+  useEffect(() => {
+    if (countsReady && !(mediaCounts.photos > 0 && mediaCounts.videos > 0) && activeFilter !== 'all') handleFilterChange('all');
+  }, [countsReady, mediaCounts.photos, mediaCounts.videos, activeFilter]);
 
   const gridRef = React.useRef<HTMLDivElement>(null);
   // Untagged identity matches the tag store: raw canonical URL or stream-UID key.
@@ -245,12 +250,6 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
 
   return (
     <div className="animate-in fade-in duration-200 flex flex-col" style={{ background: A.CANVAS, minHeight: '100%' }}>
-      {photoState !== 'B' && photoState !== 'C' && <CourseMediaHeader
-        mediaCounts={mediaCounts}
-        activeFilter={activeFilter}
-        onFilterChange={handleFilterChange}
-        courseId={courseId}
-      />}
       {countsReady && mediaCounts.total > 0 && photoState !== 'B' && photoState !== 'C' && <header className="media-v2-top">
         <span style={VERDICT_KICKER}>{t('media.v2.kicker', { defaultValue: "Through members' eyes" })}</span>
         <h2>{t(hasTags ? 'media.v2.sorted' : 'media.v2.unsorted', { total: mediaCounts.total, defaultValue: hasTags ? `${mediaCounts.total} shots, sorted by the golfers who took them` : `${mediaCounts.total} shots, none sorted yet` })}</h2>
@@ -260,11 +259,16 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       {photoState === 'C' && <CourseMediaNothing courseName={courseName} onReview={() => navigate(`/courses/${courseId}/rate`)} />}
       {photoState !== 'B' && photoState !== 'C' && walkHoles && tagging.tags.isSuccess && <HoleWalk available={true} holes={walkHoles.holes} scored={walkHoles.scored} rows={tagging.tags.data ?? []} totalMedia={mediaCounts.total} courseName={courseName} authors={authors} onAddFirst={addFirst} onChooseFirst={() => { setFastError(null); setFirstPhoto(true); }} memberId={user?.id} onMove={knownHoles && knownHoles.length > 0 ? row => { tagging.move.reset(); setMovePhoto(row); } : undefined} onRemove={knownHoles && knownHoles.length > 0 ? row => { tagging.remove.reset(); setRemovePhoto(row); } : undefined} focus={walkFocus} mediaPaused={!!(batch || tagPost || addHole != null || firstPhoto || retagPhoto || movePhoto || removePhoto)} />}
       {photoState !== 'B' && photoState !== 'C' && <CoursePlaceTiles rows={places.tags.data ?? []} onOpen={(place, rows) => { void openPlace(place, rows); }} />}
-      {photoState !== 'A' && photoState !== 'B' && photoState !== 'C' && countsReady && mediaCounts.total > 0 && tagging.tags.isSuccess && places.tags.isSuccess && !hasTags && <section className="media-v2-unsorted">
+      {photoState !== 'B' && photoState !== 'C' && countsReady && mediaCounts.total > 0 && tagging.tags.isSuccess && places.tags.isSuccess && !hasTags && <section className="media-v2-unsorted">
         <div className="media-v2-unsorted-intro"><span className="media-v2-unsorted-icon"><Tag size={17} /></span><div><h3>{t('media.v2.unsortedTitle', { defaultValue: "Sort them by hole or by place" })}</h3><p>{t('media.v2.unsortedBody', { defaultValue: "Tag a shot to a hole, the clubhouse, the food, the practice ground or anything else, and this page builds itself." })}</p></div></div>
         <Button className="media-v2-primary" disabled={fastPending} onClick={() => untaggedCount ? void beginBatch() : setFirstPhoto(true)}>{untaggedCount ? t('media.v2.tagYour', { count: untaggedCount, defaultValue: untaggedCount === 1 ? "Tag your 1 shot" : `Tag your ${untaggedCount} shots` }) : t('media.v2.add', { defaultValue: "Add a photo or video" })}</Button>
       </section>}
-      {countsReady && mediaCounts.total > 0 && photoState !== 'B' && photoState !== 'C' && <div className="media-v2-everything media-v2-head"><h3>{t(hasTags ? 'media.v2.everything' : 'media.v2.allShots', { defaultValue: hasTags ? 'Everything' : 'All shots' })}</h3><span className="media-v2-label">{mediaCounts.total}</span></div>}
+      {countsReady && mediaCounts.total > 0 && photoState !== 'B' && photoState !== 'C' && <div className="media-v3-everything media-v2-head" data-media-everything><h3>{t(hasTags ? 'media.v2.everything' : 'media.v2.allShots', { defaultValue: hasTags ? 'Everything' : 'All shots' })}</h3><Button variant="ghost" className="media-v3-add" aria-label={t('media.v3.add', { defaultValue: 'Add a photo or video' })} onClick={() => navigate(`/courses/${courseId}/rate`)}><Plus size={17} strokeWidth={2.4} /></Button></div>}
+      {countsReady && mediaCounts.photos > 0 && mediaCounts.videos > 0 && photoState !== 'B' && photoState !== 'C' && <div className="media-v3-filters"><RailChips ariaLabel={t('media.v3.filters', { defaultValue: 'Media filters' })} options={[
+        { id: 'all', label: t('media.v3.all', { defaultValue: 'All' }), value: mediaCounts.total },
+        { id: 'photos', label: t('media.v3.photos', { defaultValue: 'Photos' }), value: mediaCounts.photos },
+        { id: 'videos', label: t('media.v3.videos', { defaultValue: 'Videos' }), value: mediaCounts.videos },
+      ]} value={activeFilter} onChange={next => handleFilterChange(next as CourseMediaFilter)} /></div>}
       {tagsReady && untaggedCount != null && untaggedCount > 0 && (
         <section>
           <Button variant="ghost" className="media-v2-untagged" disabled={fastPending || !sources.isSuccess} onClick={beginBatch}>
@@ -274,7 +278,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         </section>
       )}
       <AdminHoleTagging key={courseId} courseId={courseId} knownHoles={knownHoles} />
-      {photoState !== 'B' && photoState !== 'C' && <CourseMediaCanonGrid
+      {photoState !== 'B' && photoState !== 'C' && <div className="media-v3-grid"><CourseMediaCanonGrid
         ref={gridRef}
         posts={posts}
         postsForFullscreen={postsForFullscreen}
@@ -287,13 +291,13 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         courseName={courseName}
         courseId={courseId}
         tagging={tagsReady && user ? { memberId: user.id, holeCount: knownHoles?.length ?? 1, taggedUrls: combinedTaggedUrls, taggedHoles: new Map((tagging.tags.data ?? []).filter(row => row.status === 'approved' && row.user_id === user.id).map(row => [row.media_url, row.hole_no])), onTag: startTag } : undefined}
-      />}
+      /></div>}
       <CourseMediaNotLive rows={tagging.tags.data ?? []} memberId={user.id} courseId={courseId} onRetag={knownHoles && knownHoles.length > 0 ? row => { tagging.retag.reset(); setRetagPhoto(row); } : undefined} />
       {retagPhoto && knownHoles && <CoursePhotoRetagPicker key={retagPhoto.id} row={retagPhoto} knownHoles={knownHoles} pending={tagging.retag.isPending} error={tagging.retag.error ? holePhotoErrorMessage(tagging.retag.error, `The ${retagPhoto.media_type === 'video' ? 'video' : 'photo'} could not be retagged. The new tag was not saved.`) : null} onClose={() => setRetagPhoto(null)} onSubmit={hole => tagging.retag.mutate({ row: retagPhoto, hole }, { onSuccess: () => setRetagPhoto(null) })} />}
       {movePhoto && knownHoles && <CoursePhotoRetagPicker key={`move-${movePhoto.id}`} mode="move" row={movePhoto} knownHoles={knownHoles} pending={tagging.move.isPending} error={tagging.move.error ? holePhotoErrorMessage(tagging.move.error, `The ${kindOf(movePhoto)} could not be moved. It is still on the ${ordinalOf(movePhoto.hole_no)}.`) : null} onClose={() => setMovePhoto(null)} onSubmit={hole => tagging.move.mutate({ row: movePhoto, hole }, { onSuccess: () => { setMovePhoto(null); setWalkFocus({ hole, id: movePhoto.id, nonce: Date.now() }); } })} />}
       {removePhoto && <HoleTagRemoveDialog key={`remove-${removePhoto.id}`} row={removePhoto} fromPost={sources.isSuccess ? isHoleTagFromPost(removePhoto, sources.data ?? []) : sources.isError ? false : null} pending={tagging.remove.isPending} error={tagging.remove.error ? holePhotoErrorMessage(tagging.remove.error, `The ${kindOf(removePhoto)} could not be removed. It is still on the ${ordinalOf(removePhoto.hole_no)}.`) : null} onClose={() => setRemovePhoto(null)} onConfirm={() => tagging.remove.mutate({ row: removePhoto }, { onSuccess: () => setRemovePhoto(null) })} />}
       {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} sources={sources.data} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); }} />}
-      {firstPhoto && knownHoles && <CourseFirstPhotoPicker knownHoles={knownHoles} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onSubmit={tagLibrary} onClose={() => { setFirstPhoto(false); }} />}
+      {firstPhoto && knownHoles && <CourseFirstPhotoPicker hasShots={mediaCounts.total > 0} knownHoles={knownHoles} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onSubmit={tagLibrary} onClose={() => { setFirstPhoto(false); }} />}
       {batch && <HolePhotoBatchPath photos={batch} knownHoles={knownHoles ?? []} existingPlaceTags={(places.tags.data ?? []).filter(row => row.user_id === user.id)} onTagPlace={tagPlace} onRemovePlace={removePlace} existingHoleTags={ownHoleTags} onClose={() => setBatch(null)} onTag={(url, hole) => tagging.submit.mutateAsync({ post: sourcePost(url), hole })} onRemove={row => tagging.remove.mutateAsync({ row })} />}
       {tagPost && (
         <HolePhotoTagDialog key={addHole == null ? tagPost.mediaItems[0]?.id : `add-${addHole}`} imageUrl={holeSourceUrl(tagPost.mediaItems[0])} mediaSource={sources.data?.find(s => s.url === holeSourceUrl(tagPost.mediaItems[0]) || holeMediaKey(s) === holeMediaKey(tagPost.mediaItems[0]))} mediaSources={sources.data}

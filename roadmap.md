@@ -1,5 +1,10 @@
 # Roadmap
 
+## Media tab round 3
+- [x] Applied page order, Everything controls, 128×164 place rail and picker titles; shared option B glass card and existing admin place RPCs with queue/place/hole refresh. No protected backend/config changes.
+- [x] Added19 mediaV3 tests, retargeted superseded presentation checks with inventory in MEDIA_V3_STOP_REPORT.md; deleted MEDIA_TAB_FINAL_REPORT.md. Full bunx vitest run3,805 passed/3 failed/3,808 total across417 files =3,734/414 +CB11722/1 +CB11833/1 +MediaV319/1. Automatic build07:26:48Z OK.
+- [ ] STOP: new adminHoleTagging.test.tsx:127:85 `TestingLibraryElementError: Found multiple elements with the role "button" and name "Hole 7"`; document lookup sees background and glass grids. No correction after failure. Two pre-existing CB107 failures:257:107 and273:43 remain; no visual/authenticated flow verification after stop. Await authorization to resolve new failure and separately owned CB107 failures.
+
 ## CB118 — Visiting or Contact for non-club businesses
 - [x] Generalised ClubVisiting with opt-in non-club rows and shared hero booking callback; inserted after mentions, tabs retained. Added 33 CB118 tests and only user-authorized CB107/CB112 corrections.
 - [ ] STOP: protected cb107ClubVisiting.test.tsx:257:107 `AssertionError: expected false to be true // Object.is equality`; :273:43 `AssertionError: expected <div role="tablist" …(3)>…(3)</div> to be null`. New card resolves fixture waits before club-course query settles; no correction after stop. Await authorization for protected wait correction.

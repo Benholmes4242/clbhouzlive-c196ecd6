@@ -72,7 +72,7 @@ describe('MEDIA_FAST_1', () => {
   it('successful next tags exact URL and hole then advances', async () => {
     const tag = vi.fn().mockResolvedValue({ status: 'approved' } as HolePhoto);
     render(<HolePhotoBatchPath photos={[photo('/a.jpg'), photo('/b.jpg')]} rounds={[round]} memberId="member" courseId="course" knownHoles={[4, 7]} onTag={tag} onClose={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 7' })); fireEvent.click(screen.getByRole('button', { name: /^Tag to the / }));
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/b.jpg'));
     expect(tag).toHaveBeenCalledWith('/a.jpg', 7); expect(screen.getByRole('button', { name: 'Hole 4' })).toBeEnabled();
   });
@@ -80,13 +80,13 @@ describe('MEDIA_FAST_1', () => {
     const tag = vi.fn().mockResolvedValue({ status: 'approved' } as HolePhoto);
     const close = vi.fn();
     render(<HolePhotoBatchPath photos={[photo('/a.jpg'), photo('/b.jpg'), photo('/c.jpg')]} knownHoles={[4, 7]} onTag={tag} onClose={close} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: /^Tag to the / }));
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/b.jpg'));
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: /^Tag to the / }));
     await waitFor(() => expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/c.jpg'));
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: /^Tag to the / }));
     // The batch now stays open showing "All tagged"; only Close closes it.
-    await waitFor(() => expect(screen.getByRole('button', { name: 'All tagged' })).toBeDisabled());
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Tag' })).toBeDisabled());
     expect(close).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Close' })); expect(close).toHaveBeenCalledTimes(1);
     expect(tag.mock.calls).toEqual([['/a.jpg', 4], ['/b.jpg', 4], ['/c.jpg', 4]]);
@@ -94,7 +94,7 @@ describe('MEDIA_FAST_1', () => {
   it('batch unique violations identify the duplicate photo and do not advance', async () => {
     const tag = vi.fn().mockRejectedValue({ code: '23505' });
     render(<HolePhotoBatchPath photos={[photo('/a.jpg'), photo('/b.jpg')]} knownHoles={[4]} onTag={tag} onClose={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Confirm tag' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: /^Tag to the / }));
     await screen.findByRole('alert');
     expect(screen.getByAltText('Current photograph')).toHaveAttribute('src', '/a.jpg');
     expect(tag).toHaveBeenCalledWith('/a.jpg', 4);

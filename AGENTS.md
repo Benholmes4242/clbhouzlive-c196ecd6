@@ -45,7 +45,7 @@ When AGENTS.md approaches its limit, always move an architecture note into a fil
 - Leaders' group round selection ownership: see leadersGroupRules.ts header; shared board helpers remain authoritative for score and thru cells.
 - Insights visits/source snapshot and UTC bucket ownership: see InsightsVisitsSection.tsx and visitBuckets.ts headers; club analytics remains independent.
 - Insights course pulse read and conditional ownership: see useBusinessCourseActivity.ts and InsightsCourseSection.tsx headers; server availability and privacy must not be inferred by sibling cards.
-- Admin hole tagging is an opt-in batch mode backed only by the admin RPCs; AdminHoleTagging.tsx owns attribution and cache refresh so member writes stay untouched.
+- Admin tagging is an opt-in batch mode backed only by the admin RPCs; AdminHoleTagging.tsx owns attribution and queue/place/hole cache refresh so member writes stay untouched. ShotTagCard owns the shared glass presentation for member single/batch and admin tagging, preventing their grids and viewer entrypoint from drifting.
 - Review preupload ownership and item joins live in reviewUploadController; cleanup verifies server-stamped Stream creators or owned legacy reviews and canonical caller-folder R2 keys before deletion, so composer departure cannot duplicate uploads or authorize foreign asset removal.
 
 ## Briefs

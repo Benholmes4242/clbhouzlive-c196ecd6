@@ -53,7 +53,10 @@
   --media-v2-place-count: rgba(255,255,255,.8);
   --media-v2-time: rgba(0,0,0,.45);
   --media-v2-hole-gradient: linear-gradient(180deg,rgba(0,0,0,.35) 0%,transparent 35%,transparent 60%,rgba(0,0,0,.55) 100%);
-  --media-v2-place-gradient: linear-gradient(180deg,transparent 30%,rgba(0,0,0,.7) 100%);
+  --media-v2-place-gradient: linear-gradient(180deg,rgba(0,0,0,.35) 0%,transparent 35%,transparent 55%,rgba(0,0,0,.6) 100%);
+  --media-v3-control: rgba(255,255,255,.08);
+  --media-v3-selected: rgba(255,255,255,.12);
+  --media-v3-border: rgba(255,255,255,.14);
   --club-you-card: #17171B;
   --club-you-hair: rgba(255,255,255,0.08);
   --club-you-ink: #F8FAFC;

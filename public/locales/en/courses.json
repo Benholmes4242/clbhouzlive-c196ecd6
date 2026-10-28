@@ -2517,17 +2517,6 @@
     "signInTitle": "Sign in to view media",
     "uploadVideo": "Upload a video",
     "v2": {
-      "tagTitle": "What's in this shot?",
-      "tagDescription": "Choose a hole or a place for your shot.",
-      "position": "{{i}} OF {{n}}",
-      "tagKind": "Shot type",
-      "aHole": "A hole",
-      "alsoHole": "Taken on the course too? You can also tag it to a hole.",
-      "skip": "Skip",
-      "confirmHole": "Confirm tag",
-      "tagging": "Tagging...",
-      "tagAs": "Tag as {{label}}",
-      "removeTag": "Remove tag",
       "taggedPlace": "Tagged to {{label}}.",
       "kicker": "Through members' eyes",
       "sorted": "{{total}} shots, sorted by the golfers who took them",
@@ -2575,6 +2564,29 @@
         "months_one": "{{count}} month ago",
         "months_other": "{{count}} months ago"
       }
+    },
+    "v3": {
+      "title": "What's in this shot?",
+      "position": "{{i}} OF {{n}}",
+      "viewShot": "View shot",
+      "close": "Close",
+      "holes": "A hole on the course",
+      "hole": "Hole {{n}}",
+      "around": "Around the club",
+      "tagHole": "Tag to the {{ordinal}}",
+      "tagPlace": "Tag as {{label}}",
+      "tag": "Tag",
+      "skip": "Skip",
+      "remove": "Remove tag",
+      "removing": "Removing...",
+      "add": "Add a photo or video",
+      "addFirst": "Add the first photo or video",
+      "filters": "Media filters",
+      "all": "All",
+      "photos": "Photos",
+      "videos": "Videos",
+      "shots_one": "{{count}} shot",
+      "shots_other": "{{count}} shots"
     }
   },
   "network": {

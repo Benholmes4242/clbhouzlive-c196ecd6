@@ -113,17 +113,16 @@ describe('active hole tile autoplay', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Show shot 2 of 2' }));
     expect(document.querySelector('.hole-media-processing')).not.toBeNull(); expect(f.register).not.toHaveBeenCalled(); expect(document.querySelector('video')).toBeNull();
   });
-  it('batch hero elects contain video, keeps its still thumbnails and duration, and restarts on shot change', () => {
+  it('batch glass thumbnail stays still and opens the canonical read-only video viewer', () => {
     const exif = { capturedAt: null, captureDay: null, latitude: null, longitude: null };
     const photos = ['a', 'b'].map(id => ({ url: `https://example.test/${id}.m3u8`, createdAt: '', exif, mediaType: 'video' as const, streamId: id.repeat(32), posterUrl: `/${id}.jpg`, durationSeconds: 42 }));
     render(<HolePhotoBatchPath photos={photos} knownHoles={[1]} onTag={async () => row('a')} onClose={() => {}} />);
-    expect(f.register).toHaveBeenCalledWith('hole-tag-batch', expect.any(Element), expect.any(Function), { threshold: 0.5, maxPlaying: 1 });
-    expect(document.querySelector('.hole-photo-batch-hero video')?.getAttribute('style')).toContain('object-fit: contain');
-    expect(screen.getByAltText('Current video')).toHaveAttribute('src', '/a.jpg'); expect(document.querySelector('.hole-photo-batch-hero')).toHaveTextContent('0:42');
-    expect(document.querySelector('.hole-photo-batch-strip video')).toBeNull(); win();
-    const first = document.querySelector('.hole-photo-batch-hero video'); fireEvent.click(screen.getByRole('button', { name: 'Shot 2 of 2' }));
-    expect(f.detach).toHaveBeenCalledTimes(1); expect(document.querySelector('.hole-photo-batch-hero video')).not.toBe(first); expect(screen.getByAltText('Current video')).toHaveAttribute('src', '/b.jpg');
-    win(); expect(f.attach).toHaveBeenCalledTimes(2);
+    expect(f.register).not.toHaveBeenCalled(); expect(document.querySelector('video')).toBeNull();
+    expect(screen.getByAltText('Current video')).toHaveAttribute('src', '/a.jpg');
+    fireEvent.click(screen.getByRole('button', { name: 'View shot' }));
+    expect(f.open).toHaveBeenCalledWith(expect.objectContaining({ options: { readOnly: true, syntheticPosts: true } }));
+    fireEvent.click(screen.getByRole('button', { name: 'Shot 2 of 2' }));
+    expect(screen.getByAltText('Current video')).toHaveAttribute('src', '/b.jpg');
   });
   it('batch-open pauses the underlying walk and Close releases it', async () => {
     render(<MemoryRouter><QueryClientProvider client={new QueryClient()}><CourseMediaTabNew courseId="course" /></QueryClientProvider></MemoryRouter>);
