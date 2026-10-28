@@ -2,7 +2,7 @@
 
 ## Islands round 2
 - [x] Restored exact prior bottom nav; squircle avatar; shared connected/disconnected glance and decline; local-time test correction.
-- [ ] Wordmark section blocked: exact clbhouz-wordmark-white@3x.png was not attached; no substitute artwork or partial registry change.
+- [x] Wordmark landed: Ben supplied the exact artwork as clbhouz_white_transparent.svg; uploaded as src/assets/clbhouz-wordmark-white.svg.asset.json. Registry scrolledTitle→scrolledWordmark on '/' and '/clubhouse'; LeftCapsule shows the mark + wordmark img (height 16, alt clbhouz, 180ms fade, maxWidth collapse, grown padding 0 15px 0 6px). New wordmark-only test; targeted 27/27; full suite 4,005/4,005 across 428 files.
 - [x] Targeted87/87; full suite twice4004/4004 across428 files including Europe/London; report in ISLANDS_ROUND2_REPORT.md. Live member preview unavailable: external_unmanaged, public browser redirects /auth with no errors.
 
 ## OB1 — Five-screen first sign-in
