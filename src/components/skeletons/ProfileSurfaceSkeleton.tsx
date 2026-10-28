@@ -180,6 +180,7 @@ function TopTenSkeleton() {
 function TabsSkeleton({ count }: { count: number }) {
   return (
     <div
+      data-skeleton-tabs=""
       style={{
         marginTop: 20,
         display: 'flex',
