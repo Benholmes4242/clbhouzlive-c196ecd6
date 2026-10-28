@@ -8,7 +8,7 @@
  *   - resolveChrome(pathname, searchParams) drives everything.
  *   - spec.chrome === 'none' -> renders nothing, publishes --header-h: 0.
  *   - spec.chrome === 'island' -> fixed twin-capsule layer at top,
- *     publishes --header-h: 64 (10 top gap + 44 island + 10 breathing).
+ *     publishes --header-h: 72 (10 top gap + 46 island + 16 breathing).
  *
  * Reuses (not forks):
  *   - Handicap cell: useWhsConnection + useHandicapTrend + useHandicapHistory (last change)
@@ -52,9 +52,9 @@ import {
   CHROME_TOP_GAP,
 } from '@/lib/chromeClearance';
 
-const ISLAND_H = 44;
+const ISLAND_H = 46;
 const TOP_GAP = 10;
-const HEADER_H = 70; // 10 gap + 44 island + 16 canon islandClearance
+const HEADER_H = 72; // 10 gap + 46 island + 16 canon islandClearance
 
 /** Shared dark glass material for controls that visually belong to the chrome islands. */
 export const DARK_CHROME_GLASS_MATERIAL: React.CSSProperties = {
@@ -64,10 +64,24 @@ export const DARK_CHROME_GLASS_MATERIAL: React.CSSProperties = {
   WebkitBackdropFilter: 'blur(16px)',
 };
 
+/**
+ * THE ONE ISLAND GLASS (BRIEF_ISLANDS_NAV §SHARED GLASS). Both islands AND the
+ * bottom nav pill use exactly this. Distinct from DARK_CHROME_GLASS_MATERIAL,
+ * which PhotoBand and the tournament HeroSection still use — out of scope here.
+ */
+export const ISLAND_GLASS: React.CSSProperties = {
+  background: 'rgba(14,15,19,0.84)',
+  backdropFilter: 'blur(22px) saturate(150%)',
+  WebkitBackdropFilter: 'blur(22px) saturate(150%)',
+  border: '1px solid rgba(255,255,255,0.10)',
+  boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
+};
+
 export const CHROME_LOGO_SRC = '/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png';
 
-const HCP_IMPROVING = '#16a34a';
-const HCP_DRIFTING = '#dc2626';
+// Move colours (BRIEF_ISLANDS_NAV §1): improving is the existing LIVE_INK token.
+const HCP_IMPROVING = '#34D77F';
+const HCP_DRIFTING = '#FF5A4E';
 
 // ---------------------------------------------------------------------------
 // Last-change arrow (BRIEF_CHIP_LAST_CHANGE)
