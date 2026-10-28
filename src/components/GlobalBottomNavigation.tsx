@@ -38,7 +38,7 @@ const LIVE_DIM = (() => {
    share even gaps; unsupported text-box keeps centred line-height boxes.
    Labels share the other tabs' style; the -0.13em right margin cancels
    trailing tracking so each word centres. */
-const POST_REVIEW_WORD: React.CSSProperties = {
+const POST_REVIEW_WORD: React.CSSProperties & { textBox: string } = {
   fontSize: 9, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase',
   lineHeight: 1, whiteSpace: 'nowrap', marginRight: '-0.13em',
   display: 'block', textBox: 'trim-both cap alphabetic',

@@ -28,7 +28,7 @@ import ComposerFlowSheet from '@/features/composer-flow/ComposerFlowSheet';
 import ComposerStepHeader from '@/features/composer-flow/components/ComposerStepHeader';
 
 const i18n = createInstance();
-void i18n.init({ lng: 'en', fallbackLng: 'en', resources: { en: { composerFlow: en } }, initImmediate: false });
+void i18n.init({ lng: 'en', fallbackLng: 'en', resources: { en: { composerFlow: en } }, initAsync: false });
 function Host({ returnPath }: { returnPath?: string }) {
   const [open, setOpen] = useState(true);
   const location = useLocation();

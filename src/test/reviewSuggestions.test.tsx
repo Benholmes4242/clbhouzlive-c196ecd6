@@ -33,7 +33,7 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: (table: str
 } } }));
 import { buildReviewSuggestions, loadReviewSuggestions, useReviewSuggestions, type SuggestionRating } from '@/features/composer-flow/hooks/useReviewSuggestions';
 const i18n = createInstance();
-void i18n.init({ lng: 'en', resources: { en: { composerFlow: en } }, initImmediate: false });
+void i18n.init({ lng: 'en', resources: { en: { composerFlow: en } }, initAsync: false });
 const t = i18n.getFixedT('en', 'composerFlow');
 const course = (id: string) => ({ id, name: `Course ${id}`, thumbnail_image: `${id}.jpg` });
 const rating = (course_id: string, user_id = 'follow', created_at = '2026-10-25T00:00:00Z'): SuggestionRating => ({ course_id, user_id, created_at });
