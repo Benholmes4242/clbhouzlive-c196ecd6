@@ -11,8 +11,9 @@ export interface NearbyCourseStat {
   id: string; name: string;
   your_rounds: number | null; your_best: number | null;
   avg_over_par: number | null; rounds_tracked: number | null;
-  /** BC2: the create-flow club card shows a single-course club's hardest hole. */
-  hardest_hole_no: number | null;
+  /** BC2: the create-flow club card shows a single-course club's hardest hole.
+   *  Optional so existing fixtures and consumers are untouched. */
+  hardest_hole_no?: number | null;
 }
 
 export const nearbyCourseStatsKey = (viewerId: string | null | undefined, ids: string[]) =>
