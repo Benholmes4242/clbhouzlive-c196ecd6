@@ -63,6 +63,8 @@ export interface SquircleAvatarProps {
   alt?: string;
   /** Achievement ring color (hex). If provided, overrides top100Count-derived color */
   ringColor?: string | null;
+  /** Optional explicit ring thickness; omitted preserves existing ring variants. */
+  ringWidth?: number;
   /** Top 100 courses played count - used to derive tier-based ring color */
   top100Count?: number;
   /** Hide ring entirely (no grey or colored ring) */
@@ -106,6 +108,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   srcCandidates,
   alt = '',
   ringColor,
+  ringWidth,
   top100Count,
   hideRing = false,
   thinRing = false,
@@ -320,7 +323,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   );
 
   // Ring thickness: 2px standard, 1px thin, 0.5px hairline
-  const ringThickness = hairlineRing ? 0.5 : thinRing ? 1 : 2;
+  const ringThickness = ringWidth ?? (hairlineRing ? 0.5 : thinRing ? 1 : 2);
 
   // Hairline ring is rendered as an overlay with a real border so it traces
   // the full squircle — inset box-shadow gets clipped by overflow:hidden at
@@ -331,7 +334,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
       className="absolute inset-0 pointer-events-none"
       style={{
         borderRadius: '34%',
-        border: `1px solid ${effectiveRingColor || DARK_HAIRLINE}`,
+        border: `${ringWidth ?? 1}px solid ${effectiveRingColor || DARK_HAIRLINE}`,
       }}
     />
   ) : null;

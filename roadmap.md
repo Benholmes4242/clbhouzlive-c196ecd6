@@ -1,5 +1,10 @@
 # Roadmap
 
+## Logo island Option B tidy-up
+- [x] No disc, 30px mark, signed-off rest/scrolled spacing and 20px wordmark slot; 1.5px avatar ring; system-font glances; plain shared-style Connect CTA.
+- [ ] Replace SVG with exact 192×60 PNG and verify PNG src: supplied uploads contain no standalone PNG, and the new HTML embeds only the old SVG wordmark. Existing SVG retained rather than breaking/substituting artwork.
+- [x] Full `bunx vitest run`: 4,007/4,007 across 429 files; +2/+1 solely SquircleAvatar.ringWidth.test.tsx. Two existing island cases updated by brief authority, no deletions/renames. LOGO_ISLAND_OPTION_B_REPORT.md names every changed file and PNG blocker. Signed-in visual checks unavailable (external_unmanaged); automatic diagnostic mount inaccessible.
+
 ## Islands round 2
 - [x] Restored exact prior bottom nav; squircle avatar; shared connected/disconnected glance and decline; local-time test correction.
 - [x] Wordmark landed: Ben supplied the exact artwork as clbhouz_white_transparent.svg; uploaded as src/assets/clbhouz-wordmark-white.svg.asset.json. Registry scrolledTitle→scrolledWordmark on '/' and '/clubhouse'; LeftCapsule shows the mark + wordmark img (height 16, alt clbhouz, 180ms fade, maxWidth collapse, grown padding 0 15px 0 6px). New wordmark-only test; targeted 27/27; full suite 4,005/4,005 across 428 files.

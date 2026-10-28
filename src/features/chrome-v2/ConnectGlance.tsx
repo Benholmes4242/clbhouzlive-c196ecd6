@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
-import { Button } from '@/components/ui/button';
 import { primaryCtaStyle, DeclineButton } from '@/components/profile/handicap/whs/connect/EmptyStateScreen';
 import { GlanceShell, type GlanceShellProps } from './GlanceShell';
 
@@ -43,7 +42,7 @@ export function ConnectGlance({ onClose, anchorRef, userId }: Pick<GlanceShellPr
         <div className="connect-glance-stat-label">{label}</div>
       </div>)}
     </div>
-    <Button aria-label="Connect your handicap" onClick={() => { onClose(); navigate('/manage/handicap'); }} style={{ ...primaryCtaStyle, marginTop: 14 }}>{t('whsConnect.intro.connectCta')}</Button>
+    <button type="button" aria-label="Connect your handicap" onClick={() => { onClose(); navigate('/manage/handicap'); }} style={{ ...primaryCtaStyle, marginTop: 14 }}>{t('whsConnect.intro.connectCta')}</button>
     <DeclineButton disabled={updating} onClick={() => void decline()} style={{ marginTop: 12, height: 'auto', minHeight: 36, textAlign: 'center', lineHeight: 1.5 }} />
   </GlanceShell>;
 }
