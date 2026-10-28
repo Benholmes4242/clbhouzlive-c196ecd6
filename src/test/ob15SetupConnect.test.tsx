@@ -95,6 +95,10 @@ describe('setup sign-in (setupEmbedded)', () => {
     const stage = container.querySelector('form')!.firstElementChild as HTMLElement;
     expect(stage.style.paddingLeft).toBe('0px');
     expect(stage.style.paddingRight).toBe('0px');
+    // The FooterBar drops its 24px sides too (OB1.5.1): the pill spans the inputs' width.
+    const footer = container.querySelector('form')!.lastElementChild as HTMLElement;
+    expect(footer.style.paddingLeft).toBe('0px');
+    expect(footer.style.paddingRight).toBe('0px');
     // The submit button is the welcome primary pill.
     const submit = screen.getByRole('button', { name: 'Connect to England Golf' });
     expect(submit).toHaveClass('welcome-primary');
@@ -152,6 +156,10 @@ describe('profile flow (no setupEmbedded) is unchanged', () => {
     expect(h1!.textContent).toBe('Sign in once.');
     const stage = container.querySelector('form')!.firstElementChild as HTMLElement;
     expect(stage.style.paddingLeft).toBe('24px');
+    // The FooterBar keeps its 24px sides (OB1.5.1 only applies to setupEmbedded).
+    const footer = container.querySelector('form')!.lastElementChild as HTMLElement;
+    expect(footer.style.paddingLeft).toBe('24px');
+    expect(footer.style.paddingRight).toBe('24px');
     // The default pill, not the welcome class.
     expect(screen.getByRole('button', { name: 'Connect to England Golf' })).not.toHaveClass('welcome-primary');
     // In flight, the sync stage shows exactly as before.
