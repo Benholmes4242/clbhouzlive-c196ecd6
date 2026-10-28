@@ -26,8 +26,7 @@
 
 import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Search, ArrowLeft } from 'lucide-react';
-import { IndexMovementTriangle } from '@/components/explore-tab-new/friendRoundParts';
+import { ArrowLeft } from 'lucide-react';
 import { resolveChrome, type ChromeSpec, type ChromeTone } from './registry';
 import { useChromeLeftOverride, useChromeLeftSlot, useChromeSuppressed } from './leftOverride';
 import { Z } from '@/config/zIndex';
@@ -175,6 +174,8 @@ const LeftCapsule: React.FC<{
   slot: ReturnType<typeof useChromeLeftSlot>;
 }> = ({ spec, override, slot }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const scrolled = useChromeScrolled();
   const tone = spec.tone;
 
   // Slot wins over back-override AND the registry rule.
