@@ -19,6 +19,8 @@ export default function AuthCallback() {
 
   const navigate = useNavigate();
   const [message, setMessage] = useState(t('callback.signingIn'));
+  /* OB1.3: processing is a plain canvas; only a failure shows the card. */
+  const [failed, setFailed] = useState(false);
 
   const isInMedianApp =
     typeof window !== 'undefined' && (
@@ -38,6 +40,7 @@ export default function AuthCallback() {
         const { data: { session } } = await supabase.auth.getSession();
 
         if (!session) {
+          setFailed(true);
           setMessage(t('callback.sessionNotFound'));
           setTimeout(() => navigate('/auth', { replace: true }), 1500);
           return;
@@ -64,6 +67,7 @@ export default function AuthCallback() {
 
       } catch (err) {
         console.error('[AuthCallback]', err);
+        setFailed(true);
         setMessage(t('callback.somethingWentWrong'));
         setTimeout(() => navigate('/auth', { replace: true }), 1500);
       }
@@ -130,6 +134,14 @@ export default function AuthCallback() {
         <div style={{ position: 'fixed', bottom: 28, left: 0, right: 0, textAlign: 'center', fontSize: 11, color: DIM_INK, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
           {t('callback.brandTagline')}
         </div>
+      </div>
+    );
+  }
+
+  if (!failed) {
+    return (
+      <div data-auth-callback-processing style={{ position: 'fixed', inset: 0, background: 'var(--welcome-canvas)' }}>
+        <p className="sr-only" role="status" aria-live="polite">{message}</p>
       </div>
     );
   }

@@ -93,7 +93,8 @@ const Auth: React.FC<AuthProps> = () => {
     return (
       <div
         aria-hidden
-        style={{ position: 'fixed', inset: 0, background: PAGE_CANVAS, zIndex: 50 }}
+        data-auth-signed-in-hold
+        style={{ position: 'fixed', inset: 0, background: 'var(--welcome-canvas)', zIndex: 50 }}
       />
     );
   }
