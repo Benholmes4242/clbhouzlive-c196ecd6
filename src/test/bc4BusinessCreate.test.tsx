@@ -41,7 +41,7 @@ describe('BC4 hero identity', () => {
     expect(draftHeroIdentity(fixture({ address: null })).line).toBe('Retailer / Pro Shop');
   });
   it('uses the selected club name and sub-country before region', () => {
-    expect(draftHeroIdentity(fixture({ category: 'Golf Club', selectedClub: { id: 'club', name: 'Park', country: 'United Kingdom', sub_country: 'Kent', region: 'South East' } })).line).toBe('Golf Club · Kent');
+    expect(draftHeroIdentity(fixture({ category: 'Golf Club', selectedClub: { id: 'club', name: 'Park', country: 'United Kingdom', sub_country: 'Kent', region: 'South East', club_key: 'park', latitude: 51.4, longitude: 0.03 } })).line).toBe('Golf Club · Kent');
   });
   it('uses the selected college name', () => {
     expect(draftHeroIdentity(fixture({ category: 'University / College', selectedCollege: { id: 'uni', college_name: 'College', normalized_name: 'college' } })).name).toBe('College');
