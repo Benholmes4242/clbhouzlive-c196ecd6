@@ -1,18 +1,15 @@
 import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
-/** MEDIA_EMPTY_1: B and C have distinct layouts and write entrypoints.
- * Only B's untapped Add first chooses a hole. Tile taps use the existing
- * known-hole path; C can only navigate to the existing review composer.
- * A owns its photograph mosaic and closing invitation, with no tagging controls.
+/** MEDIA_EMPTY_2: B and C share one no-shots card (CourseMediaNoShots); its
+ * button opens the shared add flow (CourseMediaAddShot). A owns its photograph mosaic and closing invitation, with no tagging controls.
  */
-import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader2, X } from 'lucide-react';
+import { Camera, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { MEDIA_CATALOGUE_TOTAL, MEDIA_EMPTY_SNAPSHOT, privateHolePhotos, photoDayLabel } from '@/lib/courseMedia/emptyStates';
 import { memberReasonSentence } from '@/lib/courseMedia/memberReasonSentence';
-import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
 import { capitalPhotoCount, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
 import { HoleMediaThumbnail } from './HoleMediaVideo';
 import { HolePhotoPicker } from './HolePhotoPicker';
@@ -98,43 +95,24 @@ function ordinalSuffix(n: number) {
   return n % 10 === 1 ? 'st' : n % 10 === 2 ? 'nd' : n % 10 === 3 ? 'rd' : 'th';
 }
 
-export function CourseMediaNoPhotographs({ courseName, holes, onHole, onAddFirst }: {
-  courseName?: string; holes: readonly CourseHole[]; onHole: (hole: number) => void; onAddFirst: () => void;
-}) {
-  return <section className="media-empty media-empty-section" style={theme}>
-    <p className="media-empty-kicker" style={VERDICT_KICKER}>Walk the course</p>
-    <h2 className="media-empty-title" style={TAB_TITLE}>You would be the first</h2>
-    <p className="media-empty-lede">Nobody has shot {courseName || 'this course'}. Every hole is open.</p>
-    <div className="media-empty-grid">{[...holes].sort((a, b) => a.hole_no - b.hole_no).map(hole => <Button key={hole.hole_no} variant="ghost" aria-label={`Hole ${hole.hole_no}`} data-state="open" className="media-empty-hole" onClick={() => onHole(hole.hole_no)}><span className="media-empty-hole-number">{hole.hole_no}</span><span className="media-empty-hole-open">Open</span></Button>)}</div>
-    <p className="media-empty-said"><strong>{MEDIA_EMPTY_SNAPSHOT.withoutPhotos.toLocaleString('en-GB')} of the {MEDIA_CATALOGUE_TOTAL.toLocaleString('en-GB')} courses</strong> we track have no photograph at all. <strong>No publisher will ever shoot them.</strong> Members are the only way this gets filled, one hole at a time.</p>
-    <Button variant="ghost" className="media-empty-action" onClick={() => onAddFirst()}>Add the first</Button>
-  </section>;
-}
-
-export function CourseMediaNothing({ courseName, onReview }: { courseName?: string; onReview: () => void }) {
-  return <section className="media-empty media-empty-section" style={theme}>
-    <p className="media-empty-kicker" style={VERDICT_KICKER}>Nobody has been here yet</p>
-    <h2 className="media-empty-title" style={TAB_TITLE}>No photographs of {courseName || 'this course'}</h2>
-    <p className="media-empty-lede">And no rounds, so clbhouz does not yet know its holes.</p>
-    <p className="media-empty-said">Photographs reach a course through a review. <strong>Write one and your pictures land here</strong> — and the first round posted opens the hole walk for everybody after you.</p>
-    <Button variant="ghost" className="media-empty-action" onClick={onReview}>Review this course</Button>
-  </section>;
-}
-
-export function CourseFirstPhotoPicker({ knownHoles, pending, uploadProgress, error, onSubmit, onClose, hasShots = false }: {
-  hasShots?: boolean;
-  knownHoles: readonly number[]; pending: boolean; uploadProgress?: number | null; result?: HolePhoto | null; error: string | null;
-  onSubmit: (file: File, hole: number) => void; onClose: () => void;
-}) {
-  const [hole, setHole] = useState<number | null>(null);
+/** No shots at all (with or without a hole list): one invite card, same chrome
+ * as the nothing-tagged invite. Its button opens the shared add flow. */
+export function CourseMediaNoShots({ courseName, hasHoles, onAdd }: { courseName?: string; hasHoles: boolean; onAdd: () => void }) {
   const { t } = useTranslation('courses');
-  const input = useRef<HTMLInputElement>(null);
-  return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent className="media-empty" style={{ ...theme, background: A.PANEL }} onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
-    <DialogTitle>{t(hasShots ? 'media.v3.add' : 'media.v3.addFirst', { defaultValue: hasShots ? 'Add a photo or video' : 'Add the first photo or video' })}</DialogTitle>
-    <DialogDescription className="sr-only">Choose the hole and a photograph from your library.</DialogDescription>
-    <HolePhotoPicker holeCount={knownHoles.length} knownHoleNumbers={knownHoles} selectedHole={hole} onSelect={n => { if (!pending) setHole(prev => (prev === n ? null : n)); }} />
-    <input ref={input} type="file" accept="image/*,video/*" hidden disabled={pending} onChange={event => { const file = event.target.files?.[0]; if (file && hole != null) onSubmit(file, hole); event.target.value = ''; }} />
-    {error && <p role="alert" className="media-empty-lede">{error}</p>}
-    <Button variant="ghost" className="media-empty-action" disabled={pending || hole == null} onClick={() => input.current?.click()}>{pending ? <><Loader2 className="animate-spin" />{uploadProgress != null ? `Uploading ${uploadProgress}%` : 'Tagging'}</> : 'Choose from your library'}</Button>
-  </DialogContent></Dialog>;
+  const name = courseName || 'this course';
+  const withoutPhotos = MEDIA_EMPTY_SNAPSHOT.withoutPhotos.toLocaleString('en-GB');
+  const total = MEDIA_CATALOGUE_TOTAL.toLocaleString('en-GB');
+  return <section className="media-empty-noshots" data-media-no-shots data-has-holes={hasHoles || undefined} style={{ margin: '20px 20px 0', padding: 16, borderRadius: 16, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+    <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+      <span style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#F8FAFC' }}><Camera size={17} /></span>
+      <div>
+        <h3 style={{ fontSize: 15, fontWeight: 600, color: '#F8FAFC', margin: 0 }}>{t('media.empty.title', { defaultValue: 'Be the first to show it' })}</h3>
+        <p data-no-shots-body style={{ fontSize: 13, lineHeight: 1.45, color: 'rgba(248,250,252,0.62)', marginTop: 4, marginBottom: 0 }}>{hasHoles
+          ? t('media.empty.bodyHoles', { courseName: name, defaultValue: `Nobody has added a photo or video of ${name} yet. Add yours and tag it to a hole, the clubhouse, the food or anything else.` })
+          : t('media.empty.bodyPlaces', { courseName: name, defaultValue: `Nobody has added a photo or video of ${name} yet. Add yours and tag it to the clubhouse, the views or anything else. Holes open up once rounds are logged here.` })}</p>
+      </div>
+    </div>
+    <button type="button" onClick={onAdd} style={{ marginTop: 14, width: '100%', height: 44, borderRadius: 12, background: '#F8FAFC', color: '#0A0A0C', fontSize: 14.5, fontWeight: 650, border: 0 }}>{t('media.empty.add', { defaultValue: 'Add a photo or video' })}</button>
+    <p data-no-shots-foot style={{ fontSize: 12, lineHeight: 1.5, color: 'rgba(248,250,252,0.42)', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>{t('media.empty.footer', { withoutPhotos, total, defaultValue: `${withoutPhotos} of the ${total} courses on clbhouz have never been photographed. Members are the only way that changes.` })}</p>
+  </section>;
 }
