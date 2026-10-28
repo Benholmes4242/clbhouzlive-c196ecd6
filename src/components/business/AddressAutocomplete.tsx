@@ -271,7 +271,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         </div>
       )}
       
-      {!countryCode && (
+      {!bare && !countryCode && (
         <p className="text-xs text-muted-foreground mt-2">
           Select a country first to enable address search.
         </p>
@@ -323,7 +323,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       )}
 
       {/* Drop pin link */}
-      {!value && onDropPinClick && countryCode && (
+      {!bare && !value && onDropPinClick && countryCode && (
         <button
           type="button"
           onClick={onDropPinClick}
