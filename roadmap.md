@@ -1,8 +1,8 @@
 # Roadmap
 
 ## OB1 — Five-screen first sign-in
-- [ ] Build /welcome with existing profile/photo/course/social/handicap sources, settled decisions, saved resume and analytics; redirect old onboarding entries and separate coach card.
-- [ ] Add OB1 coverage and authorized routing retargets; report all non-gallery results and full-suite totals. Gallery code/tests and inherited gallery failures belong to a separate thread and remain untouched.
+- [x] Built five-screen /welcome, existing-source adapters, partial saves, old-entry redirects and separate coach card; no gallery code/test edits.
+- [ ] STOP: OB1 tests36 passed/3 failed/39; full `bunx vitest run`3,907 passed/4 failed/3,911 across421 files. Outside OB1/gallery3,832/3,832 passed. New failures ob1Welcome.test.tsx:50:322 save spy0 calls; :65:311 skipped expected step3 but empty fixture advanced4; :71:295 completion event absent. No corrections after stop; OB1_STOP_REPORT.md names exact errors, retained branches, APIs and39-case inventory. Before3,872/420; +39/+1 solely OB1. Additional first-look gate coverage awaits stop resolution.
 - [ ] Course tile uses existing live catalogue count or “Every course”; no fixed snapshot. Verify usable screens where authentication permits; report external-unmanaged live-check limit.
 
 ## Course gallery — signed-off viewer
