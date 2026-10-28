@@ -1,10 +1,10 @@
 # Roadmap
 
 ## Course gallery — signed-off viewer
-- [ ] Add course gallery mode to the canonical viewer; shared filter order, hole info, grid and same-shot tagging.
-- [ ] Route every Media entry/deep link into the gallery; remove inline hole panel and obsolete focus logic.
-- [ ] Add ready thumbnail fallbacks, gallery translations and rule tests; inventory authorized retargets and run full suite against 3,832/419 (brief baseline 3,816/418 predates CB119).
-- [ ] Verify available browser flow and report protected scope and environmental limitations.
+- [x] Added canonical gallery mode/chrome, shared catalogue order, grid/info, same-shot tagging and ready-thumbnail paths.
+- [x] Routed Media entries/deep links to gallery; removed inline panel and obsolete focus/scroll state; added39 cases and authorized retarget inventory.
+- [ ] STOP: full `bunx vitest run` 3,870 passed/1 failed/3,871 total across420 files. `holeMediaTidy.test.tsx:53:19`: `TestingLibraryElementError: Unable to find an element with the alt text: Current video`. Await explicit ruling; no correction or rerun after stop. Before3,832/419; delta+39/+1 solely courseGallery.test.tsx; no deletions/pre-existing failures. Automatic build OK09:32:24Z. COURSE_GALLERY_STOP_REPORT.md contains exact assertion and old/new inventory.
+- [ ] Authenticated real gallery/tagging and mock-match visual checks unavailable with external_unmanaged authentication; not attempted after test stop. No protected SQL/backend/config/cap/native changes.
 
 ## CB118.2 — Correct loading watcher and isolate Media timeouts
 - [x] Watch only non-club tablist, business card roots and non-club Visiting variant; all assertions and accepted loading gate unchanged. Exact marker/old-new selector inventory in CB118_2_REPORT.md.
