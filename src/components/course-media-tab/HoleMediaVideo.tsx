@@ -84,9 +84,9 @@ export function HoleMediaVideo({ media, label }: {
   </div>;
 }
 
-export function HoleMediaThumbnail({ url, mediaType = 'image', posterUrl, streamId, durationSeconds, alt }: {
-  url: string; mediaType?: string; posterUrl?: string | null; streamId?: string | null; durationSeconds?: number | null; alt: string;
+export function HoleMediaThumbnail({ url, mediaType = 'image', posterUrl, streamId, durationSeconds, alt, alreadyEligible = false }: {
+  url: string; mediaType?: string; posterUrl?: string | null; streamId?: string | null; durationSeconds?: number | null; alt: string; alreadyEligible?: boolean;
 }) {
-  return <><ReadyShotCover fallbackIcon alt={alt} shots={[{ id: url, media_url: url, media_type: mediaType, poster_url: posterUrl, stream_id: streamId, duration_seconds: durationSeconds }]} />
+  return <><ReadyShotCover fallbackIcon alreadyEligible={alreadyEligible} alt={alt} shots={[{ id: url, media_url: url, media_type: mediaType, poster_url: posterUrl, stream_id: streamId, duration_seconds: durationSeconds }]} />
     {mediaType === 'video' && <GlassDurationBadge seconds={durationSeconds} fontSize={9} bottom={3} right={3} />}</>;
 }

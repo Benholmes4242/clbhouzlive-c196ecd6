@@ -21,7 +21,7 @@ export function HolePhotoTagDialog({ imageUrl, mediaSource, mediaSources = [], i
     onPlace={value => { if (!pending && !initialPlaceTag) { setPlace(value); setHole(null); } }}
     onSubmit={() => { if (!canSubmit) return; if (hole != null) onSubmit(hole); else if (place) onSubmitPlace?.(place); }}
     remove={initialPlaceTag && onRemovePlace ? { onClick: () => onRemovePlace(initialPlaceTag) } : undefined}
-    strip={imageOptions && imageOptions.length > 1 ? <div className="media-v3-tag-strip"><div className="media-v3-tag-row">{imageOptions.map(url => <Button key={url} variant="ghost" aria-label={mediaSources.find(s => s.url === url)?.mediaType === 'video' ? 'Choose video' : 'Choose photograph'} aria-pressed={url === imageUrl} disabled={pending} className={`media-v3-tag-thumb${url === imageUrl ? ' is-current' : ''}`} onClick={() => onImageChange?.(url)}><HoleMediaThumbnail url={url} {...mediaSources.find(s => s.url === url)} alt="" /></Button>)}</div></div> : undefined}>
+    strip={imageOptions && imageOptions.length > 1 ? <div className="media-v3-tag-strip"><div className="media-v3-tag-row">{imageOptions.map(url => <Button key={url} variant="ghost" aria-label={mediaSources.find(s => s.url === url)?.mediaType === 'video' ? 'Choose video' : 'Choose photograph'} aria-pressed={url === imageUrl} disabled={pending} className={`media-v3-tag-thumb${url === imageUrl ? ' is-current' : ''}`} onClick={() => onImageChange?.(url)}><HoleMediaThumbnail url={url} {...mediaSources.find(s => s.url === url)} alreadyEligible alt="" /></Button>)}</div></div> : undefined}>
     {error && <p role="alert" className="media-v3-tag-status">{error}</p>}
   </ShotTagCard>;
 }
