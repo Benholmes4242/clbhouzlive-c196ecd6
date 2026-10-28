@@ -5,7 +5,7 @@ import { MUTE, DIM, BAD, FONT, LABEL_LG, INK, BORDER, PANEL } from './designToke
 import { PrimaryButton, FooterBar, Action, Stage, StageHead } from './Primitives';
 
 /** Derived from the server's error_code in WhsConnectScreen. Never from copy. */
-export type FormErrorKind = 'rejected' | 'refreshing' | 'other' | null;
+export type FormErrorKind = 'rejected' | 'refreshing' | 'linked_elsewhere' | 'other' | null;
 
 interface Props {
   errorKind?: FormErrorKind;
@@ -233,7 +233,7 @@ export const EnglandGolfForm: React.FC<Props> = ({
           />
 
           {error && !rejected && !refreshing ? (
-            <div style={{ fontSize: 13.5, color: BAD, marginTop: 24, lineHeight: 1.5 }}>{error}</div>
+            <div data-connect-error={errorKind ?? 'other'} style={{ fontSize: 13.5, color: BAD, marginTop: 24, lineHeight: 1.5 }}>{error}{errorKind === 'linked_elsewhere' && <span style={{ display: 'block', marginTop: 4 }}>Sign in to that account to see it, or use a different membership number.</span>}</div>
           ) : null}
 
           {rejected ? (

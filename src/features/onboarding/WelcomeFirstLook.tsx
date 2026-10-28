@@ -1,33 +1,54 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
+import { ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
-import { useBoardCoursePlayers } from '@/components/explore-tab-new/courseled/hooks/useBoardCoursePlayers';
-import { DEFAULT_FILTERS } from '@/components/explore-tab-new/courseled/boardFilters';
-import { circleNamesLine, CIRCLE_PLAYERS_LIMIT } from '@/components/courses/course-detail/you/circleNamesLine';
-import { useHandicapTrend, useHandicapHistory } from '@/lib/whs/hooks';
-import { useHandicapTrend12mo } from '@/hooks/useHandicapTrend12mo';
-import { useHandicapPercentile } from '@/lib/whs/usePercentile';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useSocialCounts } from '@/hooks/useSocialCounts';
+import { useHandicapTrend } from '@/lib/whs/hooks';
 import { useImportedCounts } from '@/components/profile/handicap/whs/connect/useImportedCounts';
 import { formatHcp } from '@/lib/formatHcp';
 import { formatNumber } from '@/i18n/format';
-import { ordinal } from '@/lib/text/numbers';
-import { courseStatsVisible, type WelcomeCourse } from './welcomeRules';
-import { WelcomeFriendsList, type WelcomeFriend } from './WelcomeGolfers';
+import type { WelcomeCourse } from './welcomeRules';
+import { useFollowAll, type WelcomeFriend } from './WelcomeGolfers';
 
-export function WelcomeFirstLook({ userId, first, course, connectionId, onFollow }: { userId: string; first: string; course: WelcomeCourse | null; connectionId?: string; onFollow: (n: number) => void }) {
-  const { t } = useTranslation('auth'); const navigate = useNavigate(); const stats = useCourseStatsDetail(course?.id, !!course);
-  const circle = useBoardCoursePlayers(userId, course?.id ?? null, { ...DEFAULT_FILTERS, scope: 'circle', window: 'all' }, { limit: CIRCLE_PLAYERS_LIMIT, enabled: !!course });
-  const rating = useQuery({ queryKey: ['welcome-course-rating', course?.id], enabled: !!course, retry: false, queryFn: async () => { if (!course) return null; const { data, error } = await supabase.rpc('get_post_course_context', { p_course_ids: [course.id] } as never); if (error) throw error; return (data as unknown as { community_rating: number | null; rating_count: number | null }[])?.[0] ?? null; } });
+export type WelcomeDestination = 'clubhouse' | 'courses' | 'top100';
+
+/**
+ * OB1.4 final page (design A). Reads only what it shows: Following count via
+ * useSocialCounts (the profile page's get_actor_social_counts source; the
+ * follow cache bumps it after Follow all), the handicap index, imported
+ * counts, handicap friends and the live catalogue count. Rows hand their
+ * destination to the parent's single completion path.
+ */
+export function WelcomeFirstLook({ userId, first, fullName, username, photoUrl, course, connectionId, busy, onFollow, onOpen }: { userId: string; first: string; fullName: string; username: string; photoUrl?: string | null; course: WelcomeCourse | null; connectionId?: string; busy: boolean; onFollow: (n: number) => void; onOpen: (destination: WelcomeDestination) => void }) {
+  const { t } = useTranslation('auth');
+  const social = useSocialCounts({ type: 'personal', id: userId });
+  const trend = useHandicapTrend(connectionId); const counts = useImportedCounts(connectionId);
   const friends = useQuery({ queryKey: ['welcome-handicap-friends', userId], enabled: !!connectionId, retry: false, queryFn: async () => { const { data, error } = await supabase.rpc('get_my_handicap_friends_on_clbhouz'); if (error) throw error; return (data ?? []) as WelcomeFriend[]; } });
-  const trend = useHandicapTrend(connectionId); const history = useHandicapHistory(connectionId, 'all'); const annual = useHandicapTrend12mo(connectionId); const percentile = useHandicapPercentile(connectionId ? userId : undefined); const counts = useImportedCounts(connectionId);
-  // Catalogue count reuses the exact head/count source used by course admin.
-  // Failure/null means unavailable, never a fixed snapshot or invented zero.
-  const catalogue = useQuery({ queryKey: ['welcome-catalogue-count'], enabled: !connectionId, retry: false, queryFn: async () => { const { count, error } = await supabase.from('golf_courses').select('id', { count: 'exact', head: true }); if (error) throw error; return count; } });
-  const ready = (!course || (!stats.isPending && !circle.isPending && !rating.isPending)) && (connectionId ? !trend.isPending && !history.isPending && !percentile.isPending && !counts.isPending && !friends.isPending : !catalogue.isPending);
+  // Catalogue count: exact head/count; failure/null shows a chevron, never a fixed number.
+  const catalogue = useQuery({ queryKey: ['welcome-catalogue-count'], retry: false, queryFn: async () => { const { count, error } = await supabase.from('golf_courses').select('id', { count: 'exact', head: true }); if (error) throw error; return count; } });
+  const followAll = useFollowAll(friends.data ?? [], userId, onFollow);
+  const ready = !social.isPending && !catalogue.isPending && (!connectionId || (!trend.isPending && !counts.isPending && !friends.isPending));
   if (!ready) return <p role="status">{t('welcome.loading', { defaultValue: 'Loading…' })}</p>;
-  const s = stats.isError ? null : stats.data; const over = s?.avg_over_par != null ? `${s.avg_over_par >= 0 ? '+' : ''}${s.avg_over_par.toFixed(1)}` : null; const players = circle.isError ? { count: 0, capped: false } : circleNamesLine(circle.data?.filter(p => p.user_id !== userId));
-  return <><h1>{t(connectionId ? 'welcome.gameTitle' : 'welcome.inTitle', { first, defaultValue: connectionId ? `Here's your game, ${first}.` : `You're in, ${first}.` })}</h1>{connectionId && !trend.isError && trend.data?.current != null && <div className="welcome-first-card"><span className="welcome-kicker">{t('welcome.index', { defaultValue: 'Handicap index' })}</span><div className="welcome-index"><b>{formatHcp(trend.data.current)}</b>{!history.isError && annual.delta != null && <span className={annual.direction === 'down' ? 'welcome-green' : ''}>{t('welcome.yearChange', { change: Math.abs(annual.delta).toFixed(1), arrow: annual.direction === 'down' ? '▼' : annual.direction === 'up' ? '▲' : '•', defaultValue: `${annual.direction === 'down' ? '▼' : annual.direction === 'up' ? '▲' : '•'} ${Math.abs(annual.delta).toFixed(1)} this year` })}</span>}</div><p className="welcome-line">{!percentile.isError && percentile.data?.available && t('welcome.lowerThan', { percent: 100 - percentile.data.percentile_top, defaultValue: `Lower than ${100 - percentile.data.percentile_top}% of golfers on clbhouz.` })} {!counts.isError && (counts.data ? t('welcome.imported', { count: counts.data.rounds, defaultValue: `${formatNumber(counts.data.rounds)} rounds brought in.` }) : t('welcome.importing', { defaultValue: 'Your rounds are coming in now.' }))}</p></div>}{course && <div className="welcome-first-card"><span className="welcome-kicker">{t('welcome.yourCourse', { defaultValue: 'Your course' })}</span>{!connectionId && <h2>{course.name}</h2>}{courseStatsVisible(s) ? <p className="welcome-course-sentence">{connectionId ? over && t('welcome.membersCourse', { course: course.name, score: over, defaultValue: `Members play the ${course.name} at ${over}.` }) : <>{over && t('welcome.membersAt', { score: over, defaultValue: `Members play it at ${over}` })}{s?.harder_than_pct != null && t('welcome.harderThan', { percent: s.harder_than_pct, defaultValue: `, harder than ${s.harder_than_pct}% of courses` })}.{s?.hardest_hole_no != null && <> {t('welcome.hardestSentence', { hole: ordinal(s.hardest_hole_no), defaultValue: `The hardest hole is the ${ordinal(s.hardest_hole_no)}.` })}</>}</>}</p> : !stats.isError && <p>{t('welcome.noRounds', { defaultValue: 'No rounds tracked here yet.' })}</p>}{connectionId && s?.your_best != null && (s.your_rounds ?? 0) > 0 && <p>{t('welcome.yourBest', { best: s.your_best, count: s.your_rounds, defaultValue: `Your best there is ${s.your_best}, from ${formatNumber(s.your_rounds ?? 0)} rounds.` })}</p>}{!connectionId && ((!rating.isError && (rating.data?.rating_count ?? 0) > 0 && rating.data?.community_rating != null) || players.count > 0) && <p className="welcome-line">{!rating.isError && (rating.data?.rating_count ?? 0) > 0 && rating.data?.community_rating != null && t('welcome.rated', { rating: rating.data.community_rating.toFixed(1), count: rating.data.rating_count, defaultValue: `Rated ${rating.data.community_rating.toFixed(1)} by ${formatNumber(rating.data.rating_count ?? 0)} golfers.` })} {players.count > 0 && t('welcome.circle', { count: `${formatNumber(players.count)}${players.capped ? '+' : ''}`, defaultValue: `${formatNumber(players.count)}${players.capped ? '+' : ''} golfers you follow play here.` })}</p>}</div>}{connectionId ? !friends.isError && (friends.data?.length ?? 0) > 0 && <div className="welcome-handicap-friends"><p><b>{t('welcome.friendsHere', { count: friends.data?.length, defaultValue: `${friends.data?.length} golf friends are already here` })}</b><span>{t('welcome.fromHandicap', { defaultValue: 'From your handicap account' })}</span></p><WelcomeFriendsList rows={friends.data ?? []} viewerId={userId} onFollow={onFollow} followAll /></div> : <><div className="welcome-tiles"><Button variant="ghost" onClick={() => navigate('/courses')}><b>{!catalogue.isError && catalogue.data != null ? formatNumber(catalogue.data) : t('welcome.everyCourse', { defaultValue: 'Every course' })}</b><span>{t('welcome.exploreCourses', { defaultValue: 'Courses to explore' })}</span></Button><Button variant="ghost" onClick={() => navigate('/courses?tab=top100')}><b>{t('welcome.top100', { defaultValue: 'Top 100' })}</b><span>{t('welcome.top100Sub', { defaultValue: "See how many you've played" })}</span></Button></div><p className="welcome-alt">{t('welcome.handicapLater', { defaultValue: 'Got an official handicap later? Connect it from your profile and your rounds come in.' })}</p></>}</>;
+  const following = social.isError ? null : social.data?.following ?? null;
+  const index = connectionId && !trend.isError && trend.data?.current != null ? formatHcp(trend.data.current) : '—';
+  const friendRows = connectionId && !friends.isError ? friends.data ?? [] : [];
+  const chevron = <ChevronRight size={18} className="welcome-final-chev" aria-hidden />;
+  const rows: { dest: WelcomeDestination; title: string; sub: string; value?: string | null }[] = [
+    { dest: 'courses', title: t('welcome.rowCourses', { defaultValue: 'Courses' }), sub: t('welcome.rowCoursesSub', { defaultValue: 'How every course really plays' }), value: !catalogue.isError && catalogue.data != null ? formatNumber(catalogue.data) : null },
+    { dest: 'top100', title: t('welcome.rowTop100', { defaultValue: 'Top 100' }), sub: t('welcome.rowTop100Sub', { defaultValue: "Tick off the ones you've played" }) },
+    { dest: 'clubhouse', title: t('welcome.rowClubhouse', { defaultValue: 'Your Clubhouse' }), sub: t('welcome.rowClubhouseSub', { defaultValue: 'Rounds and posts from golfers you follow' }) },
+  ];
+  return <div className="welcome-final">
+    <h1>{t('welcome.inTitle', { first, defaultValue: `You're in, ${first}.` })}</h1>
+    <p className="welcome-sub">{t('welcome.finalSub', { defaultValue: 'This is how golfers will see you.' })}</p>
+    <div className="welcome-final-card" data-welcome-profile-card>
+      <div className="welcome-final-prof"><SquircleAvatar size={64} src={photoUrl} alt={fullName} hideRing /><div className="welcome-final-id"><b>{fullName}</b><span>@{username}</span>{course && <span className="welcome-final-course" data-welcome-home-course>{course.name}</span>}</div></div>
+      <div className="welcome-final-facts"><div data-welcome-fact="following"><b>{following != null ? formatNumber(following) : '—'}</b><i>{t('welcome.factFollowing', { defaultValue: 'Following' })}</i></div><div data-welcome-fact="handicap"><b>{index}</b><i>{t('welcome.factHandicap', { defaultValue: 'Handicap' })}</i></div></div>
+      {connectionId && !counts.isError && <p className="welcome-final-line" data-welcome-rounds>{counts.data ? t('welcome.roundsBrought', { count: counts.data.rounds, defaultValue: `${formatNumber(counts.data.rounds)} rounds brought in from your handicap account.` }) : t('welcome.importing', { defaultValue: 'Your rounds are coming in now.' })}</p>}
+    </div>
+    {friendRows.length > 0 && <div className="welcome-final-friends" data-welcome-friends><div><b>{t('welcome.friendsHere', { count: friendRows.length, defaultValue: friendRows.length === 1 ? '1 golf friend is already here' : `${friendRows.length} golf friends are already here` })}</b><span>{t('welcome.fromHandicap', { defaultValue: 'From your handicap account' })}</span></div><button type="button" className={`welcome-follow${followAll.done ? ' is-following' : ''}`} data-welcome-follow-all disabled={followAll.busy || followAll.done} onClick={() => void followAll.all()}>{t(followAll.done ? 'welcome.following' : 'welcome.followAll', { defaultValue: followAll.done ? 'Following' : 'Follow all' })}</button></div>}
+    <div className="welcome-final-sec">{t('welcome.startHere', { defaultValue: 'Start here' })}</div>
+    <div className="welcome-final-rows">{rows.map(row => <button type="button" key={row.dest} data-welcome-row={row.dest} disabled={busy} onClick={() => onOpen(row.dest)}><span className="welcome-final-row-copy"><b>{row.title}</b><span>{row.sub}</span></span>{row.value ? <span className="welcome-final-value">{row.value}</span> : chevron}</button>)}</div>
+  </div>;
 }

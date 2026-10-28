@@ -330,7 +330,11 @@ export async function callConnectWhs(membership_number: string, password: string
     body: JSON.stringify({ membership_number, password }),
   });
   try {
-    return (await res.json()) as ConnectWhsResponse;
+    /* A non-2xx (e.g. a 500 internal_error) still resolves here with its JSON
+       body; normalise a body without `ok` to a failure so the caller maps it. */
+    const body = (await res.json()) as ConnectWhsResponse;
+    if (!res.ok && (body as { ok?: boolean }).ok !== false) return { ...(body as object), ok: false, error_code: (body as { error_code?: string }).error_code ?? 'internal_error' } as ConnectWhsResponse;
+    return body;
   } catch {
     return { ok: false, error_code: 'internal_error', message: 'Unexpected response from server.' };
   }
