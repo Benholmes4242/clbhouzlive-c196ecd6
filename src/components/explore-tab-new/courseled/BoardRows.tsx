@@ -501,6 +501,7 @@ export function BoardRowView({
           {chip != null ? (
             <span
               data-index-chip
+          data-gate-blur=""
               className="tabular-nums"
               style={{
                 flexShrink: 0,
@@ -553,6 +554,7 @@ export function BoardRowView({
             18.5 — fixed min-width tracks so right edges align. */}
         <span
           data-board-main
+          data-gate-blur=""
           className="tabular-nums"
           style={{ minWidth: MAIN_FIG_MIN_W, textAlign: 'right', fontSize: M.figureSize, fontWeight: M.figureWeight, letterSpacing: M.figureTracking, lineHeight: 1, color: value.tone }}
         >
@@ -561,6 +563,7 @@ export function BoardRowView({
         {second ? (
           <span
             data-board-secondary
+          data-gate-blur=""
             className="tabular-nums"
             style={{ minWidth: SECOND_FIG_MIN_W, textAlign: 'left', fontSize: M.secondarySize, fontWeight: M.secondaryWeight, lineHeight: 1, color: second.tone }}
           >
