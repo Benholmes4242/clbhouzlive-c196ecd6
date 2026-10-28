@@ -201,7 +201,6 @@ describe('canonical member surface tokens', () => {
       'src/features/watch-v2/components/HubVideoRow.tsx',
       'src/features/watch-v2/components/HubMixedGrid.tsx',
       'src/features/watch-v2/components/HubClipsRow.tsx',
-      'src/features/profile-sheet-v2/ProfileSheetV2.tsx',
     ];
     for (const path of darkSkeletonPaths) {
       expect(readFileSync(resolve(process.cwd(), path), 'utf8'), path).not.toContain('clb-shimmer-light');

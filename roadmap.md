@@ -1,5 +1,10 @@
 # Roadmap
 
+## Signed-off account tile
+- [ ] Replace mobile avatar sheet with AccountGlance and shared modal lifecycle; preserve desktop dropdown and close-first actions.
+- [ ] Remove exclusive sheet components, retain shared readers and course analytics; reconcile retired tests and run the full suite against 4,007/429.
+- [ ] Verify available preview and report authenticated-check limitations.
+
 ## Logo island Option B tidy-up
 - [x] No disc, 30px mark, signed-off rest/scrolled spacing and 20px wordmark slot; 1.5px avatar ring; system-font glances; plain shared-style Connect CTA.
 - [ ] Replace SVG with exact 192×60 PNG and verify PNG src: supplied uploads contain no standalone PNG, and the new HTML embeds only the old SVG wordmark. Existing SVG retained rather than breaking/substituting artwork.
