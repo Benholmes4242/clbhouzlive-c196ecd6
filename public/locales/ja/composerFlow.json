@@ -1,33 +1,27 @@
 {
- "step": "ステップ {{n}} / {{m}}",
- "close": "閉じる",
- "back": "戻る",
- "step1": {
-  "title": "何を共有しますか？"
- },
- "tiles": {
-  "review": {
-   "title": "コースのレビュー",
-   "sub": "ゴルフコースを評価して感想を投稿します"
-  },
+  "step": "ステップ {{n}} / {{m}}",
+  "close": "閉じる",
+  "back": "戻る",
+  "title": "Post or review",
   "post": {
-   "title": "投稿",
-   "sub": "写真やひとことを仲間に共有します"
+    "title": "Post",
+    "line": "Photos or video for your circle's feed",
+    "camera": "Post from camera",
+    "library": "Post from library"
+  },
+  "or": "OR",
+  "review": {
+    "title": "Review a course",
+    "line": "Score it out of 10 and say how it plays",
+    "search": "Find a course to review",
+    "cta": "Review"
+  },
+  "reason": {
+    "club": "Your club",
+    "posted": "You posted from here on {{when}}",
+    "followed_one": "Reviewed by {{name}}",
+    "followed_other": "Reviewed by {{name}} + {{n}} you follow",
+    "popular_one": "{{count}} review this month",
+    "popular_other": "{{count}} reviews this month"
   }
- },
- "course": {
-  "which": "どのコース？",
-  "searchAll": "すべてのコースを検索",
-  "pickerTitle": "コースを選ぶ",
-  "recent": "最近プレーしたコース",
-  "played": "{{when}}にプレー",
-  "emptyTitle": "ラウンドがまだありません",
-  "emptyBody": "ハンディキャップを連携すると、プレーしたコースが自動でここに表示されます。それまでは上から検索してください。",
-  "allReviewedTitle": "すべて完了",
-  "allReviewedBody": "最近プレーしたコースはすべてレビュー済みです。上で検索して別のコースを評価しましょう。"
- },
- "footer": {
-  "pickCourse": "続けるにはコースを選んでください",
-  "next": "次へ"
- }
 }
