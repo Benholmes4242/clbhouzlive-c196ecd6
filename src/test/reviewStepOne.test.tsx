@@ -69,7 +69,7 @@ describe('header forms', () => {
     expect(container.querySelector('[data-photo-header] img')?.getAttribute('src')).toBe(props.thumbnail);
     expect(container.querySelector('[data-header-score] b')?.textContent).toBe('8.6');
     expect(container.querySelector('[data-header-rank]')?.textContent).toBe('#16 World');
-    expect((container.querySelector('header') as HTMLElement).style.height).toContain('172px');
+    expect(container.querySelector('header')?.getAttribute('data-header-form')).toBe('photo');
   });
   it('omits the score at 0 reviews and the rank when none', () => {
     const { container } = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: null, count: 0, rank: null }} />);
