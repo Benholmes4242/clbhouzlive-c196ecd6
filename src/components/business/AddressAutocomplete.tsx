@@ -227,7 +227,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   return (
     <div ref={containerRef} className={cn('relative', className)}>
       <div className="relative">
-        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+        {!bare && <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />}
         <Input
           ref={inputRef}
           value={displayValue}
@@ -237,7 +237,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
           }}
           placeholder={placeholder}
           className={cn(
-            "pl-9 pr-9 h-10",
+            !bare && "pl-9 pr-9 h-10",
             value && "text-foreground",
             showError && "border-destructive focus-visible:ring-destructive"
           )}
@@ -258,7 +258,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       </div>
 
       {/* Helper text - cleaner copy */}
-      {!showError && !showPrecisionWarning && countryCode && (
+      {!bare && !showError && !showPrecisionWarning && countryCode && (
         <div className="mt-2 space-y-1">
           <p className="text-xs text-muted-foreground">
             Add your street address and postcode/ZIP so your map pin is accurate.
