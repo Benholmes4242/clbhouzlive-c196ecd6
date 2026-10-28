@@ -106,13 +106,13 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const discoverNewCount = useDiscoverNewTotal();
   const [createOpen, setCreateOpen] = useState(false);
 
-  const theme = useNavTheme();
-  const tokens = theme === 'dark' ? DARK_TOKENS : LIGHT_TOKENS;
   const navState = useNavScrollState();
   // Live state for the Tour tab. Fails closed (false) while loading or on error.
   const tourLive = useAnyTourLive();
 
-  const condensed = navState === 'condensed' && !REDUCED_MOTION;
+  // Reduced motion SNAPS to the condensed capsule rather than staying
+  // expanded — only the transition is dropped (BRIEF_ISLANDS_NAV §2).
+  const condensed = navState === 'condensed';
 
   const navRef = useRef<HTMLDivElement | null>(null);
 
