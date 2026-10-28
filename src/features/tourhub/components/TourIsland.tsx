@@ -16,10 +16,40 @@ import React from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { getTourLogo } from '../utils/tourLogos';
 import { TourIcon, TourLiveDot } from './tourIslandIcons';
+import { islandDescriptor, type IslandDescriptor } from './tourIslandRules';
+import { useTourPickerRows } from '../hooks/useTourPickerRows';
+import { useActiveMensMajor } from '../hooks/useActiveMensMajor';
+import { useLiveTournaments } from '../hooks/useLiveTournaments';
+import { useTourSelection } from '../context/TourSelectionContext';
 
 const INK = '#F8FAFC';
 const DIM = 'rgba(248,250,252,0.42)';
 const GREEN = '#34D77F';
+
+/**
+ * What the island shows for the current tab and tour in view. Shared by the
+ * ChromeIsland slot (TourHubChromeBridge) and the sub-tab header control, so
+ * both surfaces of the same page never disagree.
+ */
+export function useTourIslandDescriptor(activeTab: string): IslandDescriptor {
+  const { rows } = useTourPickerRows();
+  const { selectedTourSlug, viewingTourSlug, appliedTourSlug } = useTourSelection();
+  const activeMajor = useActiveMensMajor();
+  const { data: liveTournaments } = useLiveTournaments();
+  const liveRows = Array.isArray(liveTournaments)
+    ? liveTournaments.filter((tt) => (tt.status || '').toLowerCase() === 'inprogress')
+    : [];
+  const liveRoundById = new Map(liveRows.map((tt) => [tt.id, tt.currentRound] as const));
+  const activeTourSlug = appliedTourSlug ?? selectedTourSlug ?? viewingTourSlug ?? 'all';
+  return islandDescriptor({
+    activeTab,
+    activeTourSlug,
+    rows,
+    liveCount: liveRows.length,
+    major: activeMajor,
+    liveRound: (id) => (id ? liveRoundById.get(id) ?? null : null),
+  });
+}
 
 export interface TourIslandProps {
   label: string;
