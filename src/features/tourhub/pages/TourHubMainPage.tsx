@@ -230,13 +230,10 @@ export function TourHubMainPage() {
               onBack={() => handleSelectTab('overview')}
               backFallback="/tourhub"
               leftSlot={
-                /* The left slot is the variant slot: burger + tour picker as one
-                   left-aligned group. NOTHING renders between the header border
-                   and the hero — the chip rail that used to sit there is gone. */
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                  <AppHeaderBurger onTap={() => setMenuOpen(true)} label="Tour menu" />
-                  {activeTab !== 'live' && <TourPickerControl onTap={() => setPickerOpen(true)} />}
-                </div>
+                /* BRIEF_TOUR_ISLAND §1: one control everywhere — the sub-tab
+                   header carries the same tour label, opening the same
+                   TourGlance tile. The burger drawer is gone from the hub. */
+                <SubTabTourControl activeTab={activeTab} onOpen={openGlance} />
               }
             >
               {renderTab()}
