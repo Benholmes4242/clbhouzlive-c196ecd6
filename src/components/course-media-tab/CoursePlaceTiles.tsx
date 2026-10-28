@@ -29,12 +29,13 @@ export function CoursePlaceTiles({ rows, onOpen }: { rows: readonly PlaceMedia[]
   const count = groups.reduce((sum, group) => sum + group.shots.length, 0);
   return <section className="media-v2-places">
     <div className="media-v2-head"><h3>{t('media.v2.around', { defaultValue: "Around the club" })}</h3><span className="media-v2-label">{t('media.v2.shots', { count, defaultValue: "{{count}} shots" })}</span></div>
-    <div className="media-v2-place-grid">{groups.map(({ id, icon: Icon, shots }) => {
+    <div className="media-v3-place-rail">{groups.map(({ id, icon: Icon, shots }) => {
       const label = t(`media.v2.places.${id}`, { defaultValue: PLACE_LABELS[id] });
       const age = placeAge(shots[0].added_at);
       return <Button variant="ghost" className="media-v2-place-tile" key={id} aria-label={label} onClick={() => onOpen(id, shots)}>
         <ReadyShotCover shots={shots} />
-        <span className="media-v2-place-caption"><Icon size={15} strokeWidth={2} /><b>{label}</b><span>{shots.length}</span></span>
+        <Icon className="media-v3-place-icon" size={17} strokeWidth={2} />
+        <span className="media-v2-place-caption"><b>{label}</b><span>{t('media.v3.shots', { count: shots.length, defaultValue: `${shots.length} ${shots.length === 1 ? 'shot' : 'shots'}` })}</span></span>
         {id === 'conditions' && <span className="media-v2-condition media-v2-label">{t(`media.v2.age.${age.key}`, { count: age.count, defaultValue: age.key === 'today' ? 'Today' : age.key === 'yesterday' ? 'Yesterday' : `${age.count} ${age.key} ago` })}</span>}
       </Button>;
     })}</div>
