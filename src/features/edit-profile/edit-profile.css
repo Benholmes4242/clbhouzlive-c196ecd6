@@ -1,0 +1,29 @@
+/* EP1: new Edit profile frame and top card (ep1-top.html 1A). Scoped to .ep-shell.
+   The bizc-* variables let the shared BC4 change-or-remove sheet render here. */
+.ep-shell{--ep-canvas:#0B0B0D;--ep-card:#17171B;--ep-inset:#1E1E23;--ep-hair:rgba(255,255,255,0.08);--ep-ink:#F8FAFC;--ep-mute:rgba(248,250,252,0.62);--ep-dim:rgba(248,250,252,0.42);--bizc-canvas:#0B0B0D;--bizc-card:#17171B;--bizc-hair:rgba(255,255,255,0.08);--bizc-ink:#F8FAFC;--bizc-mute:rgba(248,250,252,0.62);--bizc-dim:rgba(248,250,252,0.42);min-height:100dvh;display:flex;flex-direction:column;background:var(--ep-canvas);color:var(--ep-ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",system-ui,sans-serif;max-width:520px;margin:0 auto;width:100%}
+.ep-head{padding:calc(58px + env(safe-area-inset-top,0px)) 16px 0;display:flex;align-items:center;gap:12px;min-height:calc(94px + env(safe-area-inset-top,0px))}
+.ep-back{width:36px;height:36px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:none;color:var(--ep-ink);display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer}
+.ep-title{flex:1;text-align:center;margin-right:48px;font-size:17px;font-weight:700}
+.ep-tabs{display:flex;gap:24px;padding:0 0 0 20px;border-bottom:1px solid var(--ep-hair)}
+.ep-tab{position:relative;padding:12px 0;background:none;border:0;font-size:15px;font-weight:600;color:var(--ep-mute);cursor:pointer;font-family:inherit}
+.ep-tab[aria-selected="true"]{color:var(--ep-ink)}
+.ep-tab[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--ep-ink)}
+.ep-body{padding:12px 16px;flex:1;overflow-y:auto}
+.ep-saved{font-size:12px;color:var(--ep-dim);text-align:center;margin:0 0 10px;background:none;border:0;width:100%;font-family:inherit;display:block}
+.ep-saved[data-state="error"]{cursor:pointer}
+.ep-card{background:var(--ep-card);border:1px solid rgba(255,255,255,0.08);border-radius:20px;overflow:hidden}
+.ep-cover{position:relative;display:block;width:100%;padding:0;border:0;background:var(--ep-inset);cursor:pointer;overflow:hidden}
+.ep-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ep-cover-fade{position:absolute;left:0;right:0;bottom:0;height:45%;background:linear-gradient(180deg,rgba(23,23,27,0) 0%,#17171B 100%)}
+.ep-edit-chip{position:absolute;top:10px;right:10px;height:30px;padding:0 12px;border-radius:999px;background:rgba(11,11,13,0.6);border:1px solid rgba(255,255,255,0.18);font-size:12.5px;font-weight:600;color:var(--ep-ink);display:flex;align-items:center;gap:6px}
+.ep-identity{padding:0 16px 16px;margin-top:-40px;position:relative;min-width:0}
+.ep-avatar{position:relative;display:inline-flex;padding:0;border:0;background:none;cursor:pointer}
+.ep-avatar-face{box-shadow:0 0 0 3px var(--ep-card)}
+.ep-avatar-badge{position:absolute;right:-6px;bottom:-6px;width:26px;height:26px;border-radius:50%;background:var(--ep-ink);color:var(--ep-canvas);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:2px solid var(--ep-card);box-sizing:border-box}
+.ep-name{font-size:22px;font-weight:700;letter-spacing:-0.02em;margin-top:10px}
+.ep-line{font-size:13.5px;color:var(--ep-mute);margin-top:2px}
+.ep-tags{display:flex;gap:8px;margin-top:10px;min-width:0}
+.ep-tag{height:28px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:4px;flex:none;white-space:nowrap}
+.ep-tag b{font-variant-numeric:tabular-nums;font-weight:700}
+.ep-tag-club{flex:0 1 auto;min-width:0;display:block;line-height:26px;overflow:hidden;text-overflow:ellipsis}
+.ep-back:focus-visible,.ep-tab:focus-visible,.ep-cover:focus-visible,.ep-avatar:focus-visible,.ep-saved:focus-visible{outline:2px solid #F7931E;outline-offset:2px}
