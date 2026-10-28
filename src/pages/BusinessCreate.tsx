@@ -42,7 +42,7 @@ export default function BusinessCreate() {
   const creatingRef = useRef(false);
   const [result, setResult] = useState<CreateBusinessResult | null>(null);
   const [ownerless, setOwnerless] = useState<OwnerlessNotice | null>(null);
-  const step = result ? 5 : ((location.state as { bizStep?: number } | null)?.bizStep ?? (searchParams.get('clubId') ? 2 : 1));
+  const step = result ? 5 : ((location.state as { bizStep?: number } | null)?.bizStep ?? (searchParams.get('clubId') && location.pathname === '/business/create' ? 2 : 1));
   const initial = useRef(JSON.stringify(initialDraft(searchParams)));
   const dirty = JSON.stringify(draft) !== initial.current;
   const departure = useCreateDeparture(dirty, creating || !!ownerless, !!result, step);
@@ -89,7 +89,7 @@ export default function BusinessCreate() {
     try {
       const saved = await createBusiness(draft, { userId: user.id, sourceCourseId: searchParams.get('sourceCourseId'), queryClient });
       if (saved.ownerless) { setOwnerless(saved.ownerless); return; }
-      setResult(saved);
+      departure.allowExit(); setResult(saved);
       const current = window.history.state?.idx;
       const start = firstHistoryIndex.current;
       if (typeof current === 'number' && start != null && current > start) navigate(start - current);
@@ -172,7 +172,7 @@ export default function BusinessCreate() {
       ) : (
         result && <BusinessCreateFinish draft={draft} result={result} userId={user.id} />
       )}
-      <BusinessOwnerlessNotice notice={ownerless} onDismiss={() => { const target = ownerless?.target; setOwnerless(null); if (target) navigate(target, { replace: true }); }} />
+      <BusinessOwnerlessNotice notice={ownerless} onDismiss={() => { const target = ownerless?.target; departure.allowExit(); setOwnerless(null); if (target) navigate(target, { replace: true }); }} />
       <BusinessDiscardNotice open={departure.confirmOpen} onOpenChange={departure.setConfirmOpen} onDiscard={departure.discard} />
     </div>
   );

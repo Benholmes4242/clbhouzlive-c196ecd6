@@ -1,9 +1,11 @@
 # Roadmap
 
 ## BC5 — Create business and finish
-- [ ] Extract editor creation unchanged into one shared path; preserve editor tests and safeguards.
-- [ ] Add creating, saved finish/partials/claim actions and dirty departure confirmation.
-- [ ] Switch canonical create route and redirect alias; run full suite and report existing POST / REVIEW stop separately.
+- [x] Ben approved recording returned-empty photo failures as partials in both shared callers; editor uses its existing warning toast.
+- [x] Extract shared creation/error reporting/owner notice, preserve editor toasts and edit writes; approved photo-failure recording added.
+- [x] Add creating, saved finish/partials/claim actions, canonical route/alias and dirty departure guard. Retarget superseded BC1/BC4 expectations; BC2/BC3 unedited.
+- [x] Full `bunx vitest run`: 4,146 passed / 2 failed / 4,148 total across 439 files, +36 cases/+3 files from 4,112/436. New tests: bc5CreateBusiness 13, bc5BusinessFinish 14, bc5BusinessFlow 9.
+- [ ] STOP: new bc5BusinessFlow.test.tsx:38 case reaches BusinessCreate.tsx:64:19 `TypeError: Cannot read properties of undefined (reading 'then')`; mock fetchClub returned undefined. No corrections/reruns. Existing postReviewTab.test.tsx:38:55 failure and GlobalBottomNavigation.tsx(44,21) TS2353 remain. BC5_REPORT.md records full inventory. Authenticated real creation and visual checks unavailable/unperformed; external_unmanaged.
 
 ## POST / REVIEW — Centred option B
 - [x] Apply cap-trimmed words, cropped 14×11.9 arrows and centred 3.5px gaps; preserve other tabs and behaviour.

@@ -48,16 +48,17 @@ describe('BC1 route and chrome', () => {
     renderAt(['/business/create-v2']);
     expect(screen.getByText('auth page')).toBeTruthy();
   });
-  it('hides chrome islands and bottom nav on /business/create-v2', () => {
-    expect(resolveChrome('/business/create-v2', new URLSearchParams())).toMatchObject({ chrome: 'none', tone: 'dark', bleed: false });
+  it('hides chrome islands and bottom nav on canonical /business/create', () => {
+    expect(resolveChrome('/business/create', new URLSearchParams())).toMatchObject({ chrome: 'none', tone: 'dark', bleed: false });
     const nav = readFileSync('src/components/GlobalBottomNavigation.tsx', 'utf8');
-    const hidden = nav.slice(nav.indexOf('const HIDDEN_ROUTES'), nav.indexOf('const HIDDEN_ROUTE_PREFIXES'));
-    expect(hidden).toContain("'/business/create-v2'");
+    const hidden = nav.slice(nav.indexOf('const HIDDEN_ROUTES'), nav.indexOf('const HIDDEN_ROUTE_PATTERNS'));
+    expect(hidden).toContain("'/business/create'");
+    expect(hidden).not.toContain("'/business/create-v2'");
   });
-  it('/business/create still renders the current BusinessProfileEditor', () => {
+  it('/business/create renders the new flow and create-v2 redirects', () => {
     const app = readFileSync('src/App.tsx', 'utf8');
-    expect(app).toMatch(/path="\/business\/create" element=\{<Suspense fallback=\{<ManagePageSkeleton \/>\}><BusinessProfileEditor \/>/);
-    expect(app).toMatch(/path="\/business\/create-v2" element=\{<Suspense fallback=\{null\}><BusinessCreatePage \/>/);
+    expect(app).toMatch(/path="\/business\/create" element=\{<Suspense fallback=\{null\}><BusinessCreatePage \/>/);
+    expect(app).toMatch(/path="\/business\/create-v2" element=\{<BusinessCreateRedirect \/>/);
   });
 });
 
@@ -111,6 +112,8 @@ describe('BC1 history', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
     await waitFor(() => expect(tile('Creator').getAttribute('aria-pressed')).toBe('true'));
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    expect(screen.getByRole('alertdialog')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Discard' }));
     await waitFor(() => expect(screen.getByText('before page')).toBeTruthy());
   });
   it('back on step 1 with no history goes to /profile', async () => {
