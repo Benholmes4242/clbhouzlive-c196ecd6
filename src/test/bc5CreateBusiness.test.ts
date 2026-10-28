@@ -10,8 +10,8 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: (table: str
 vi.mock('@/utils/r2OnlyUpload', () => ({ uploadToR2Only: (...args: unknown[]) => { s.order.push('upload'); return s.upload(...args); } }));
 vi.mock('@/lib/logger', () => ({ AppLog: { error: s.log } }));
 import { createBusiness } from '@/features/business-create/createBusiness';
-const club = { id: 'club', name: 'Park Golf Club', club_key: 'park', country: 'United Kingdom', latitude: 51.4, longitude: 0.03 };
-const draft = () => ({ ...initialDraft(new URLSearchParams()), category: 'Golf Club' as const, selectedClub: club, claimProofNote: '  Manager  ', address: { label: 'Bromley', city: 'Bromley', precision: 'city' as const } });
+const club = { id: 'club', name: 'Park Golf Club', club_key: 'park', country: 'United Kingdom', region: 'Kent', sub_country: 'Bromley', latitude: 51.4, longitude: 0.03 };
+const draft = () => { const d = initialDraft(new URLSearchParams()); return { ...d, logo: { ...d.logo }, cover: { ...d.cover }, category: 'Golf Club' as const, selectedClub: club, claimProofNote: '  Manager  ', address: { label: 'Bromley', city: 'Bromley', precision: 'city' as const } }; };
 const run = (d = draft(), qc = new QueryClient()) => createBusiness(d, { userId: 'me', sourceCourseId: 'course', queryClient: qc });
 beforeEach(() => { vi.clearAllMocks(); s.order = []; s.insert.mockReset(); s.update.mockReset(); s.member.mockReset(); s.invoke.mockReset(); s.upload.mockReset(); s.upload.mockResolvedValue({ success: true, publicUrl: '/saved.jpg' }); });
 describe('BC5 shared creation', () => {

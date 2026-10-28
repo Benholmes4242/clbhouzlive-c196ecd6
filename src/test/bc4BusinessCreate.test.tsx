@@ -13,7 +13,7 @@ vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user
 vi.mock('@/hooks/useBottomNavVisibility', () => ({ useHideBottomNav: vi.fn() }));
 vi.mock('@/features/business/claimClub', () => ({ fetchGolfClub: vi.fn(), clubRowToSelected: vi.fn() }));
 vi.mock('@/features/business-create/BusinessCreateStep2', () => ({ BusinessCreateStep2: () => null }));
-const bc5Create = vi.hoisted(() => vi.fn(async () => ({ id: 'created', slug: 'created', partials: [], claim: 'none' as const })));
+const bc5Create = vi.hoisted(() => vi.fn(async (_draft: unknown, _options: unknown) => ({ id: 'created', slug: 'created', partials: [], claim: 'none' as const })));
 vi.mock('@/features/business-create/createBusiness', () => ({ createBusiness: bc5Create }));
 vi.mock('@/components/profile/edit-v2/ImageCropperModal', () => ({ getCroppedImg: vi.fn(async () => new Blob(['cropped'], { type: 'image/jpeg' })) }));
 vi.mock('react-easy-crop', () => ({ default: (p: { aspect: number; onCropComplete: (a: unknown, b: unknown) => void }) => <div data-testid="bc4-crop-engine" data-aspect={p.aspect}><button onClick={() => p.onCropComplete({}, { x: 0, y: 0, width: 100, height: 100 })}>Position photo</button></div> }));

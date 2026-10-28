@@ -10,7 +10,7 @@ vi.mock('@/lib/business/shareBusinessProfile', () => ({ shareBusinessProfile: s.
 afterEach(() => { cleanup(); vi.clearAllMocks(); usePostStudioStore.getState().closePostStudio(); });
 const loc = () => { const l = useLocation(); return <output data-testid="location">{l.pathname}{l.search}</output>; };
 function setup(category: 'Golf Club' | 'Golf Academy' | 'Coach / Instructor' | 'Creator' = 'Golf Academy', claim: 'none' | 'filed' | 'failed' = 'none') {
-  const draft = { ...initialDraft(new URLSearchParams()), category, businessName: 'Kestrel Academy', selectedClub: category === 'Golf Club' ? { id: 'club', name: 'Park Golf Club', club_key: 'park', latitude: 51.4, longitude: 0.03 } : null };
+  const draft = { ...initialDraft(new URLSearchParams()), category, businessName: 'Kestrel Academy', selectedClub: category === 'Golf Club' ? { id: 'club', name: 'Park Golf Club', club_key: 'park', country: 'United Kingdom', region: 'Kent', sub_country: 'Bromley', latitude: 51.4, longitude: 0.03 } : null };
   render(<MemoryRouter><Routes><Route path="/" element={<BusinessCreateFinish draft={draft} result={{ id: 'new', slug: 'kestrel', claim, partials: [] }} userId="me" />} /><Route path="/business/*" Component={loc} /></Routes></MemoryRouter>);
 }
 describe('BC5 finish destinations', () => {
