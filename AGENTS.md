@@ -89,3 +89,4 @@ Report the suite total before and after, and name the source of any delta. A cou
 - ProfilePageV2 owns the coach-line read and passes an optional node to ProfileHero; the hero never imports coach modules, preserving standalone rendering without a query provider.
 - Business mention qualification and visibility belong to the mentions RPCs; BusinessMentionsRail owns viewer-scoped reads and non-optimistic hide/show so cached team rows cannot cross identities.
 - Connected and disconnected island glances share GlanceShell lifecycle and positioning; the disconnected variant never imports read hooks, keeping invitation figures absent rather than invented.
+- The BC create-business flow (hidden /business/create-v2) keeps step state in history and one draft typed from editorTypes; display labels live only in business-create/createRules.ts and the draft stores canonical category values, so stored categories never drift.
