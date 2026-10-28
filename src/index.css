@@ -21,6 +21,20 @@
 @tailwind utilities;
 
 :root {
+  --post-review-sheet: #16161A;
+  --post-review-ink: #F8FAFC;
+  --post-review-mute: rgba(248,250,252,0.62);
+  --post-review-dim: rgba(248,250,252,0.42);
+  --post-review-close: rgba(255,255,255,0.07);
+  --post-review-box: rgba(255,255,255,0.045);
+  --post-review-box-edge: rgba(255,255,255,0.14);
+  --post-review-control: rgba(255,255,255,0.08);
+  --post-review-library: #F3F5F7;
+  --post-review-on-library: #0A0A0C;
+  --post-review-search: rgba(255,255,255,0.05);
+  --post-review-search-edge: rgba(255,255,255,0.12);
+  --post-review-pill-edge: rgba(255,255,255,0.18);
+  --post-review-photo-fallback: linear-gradient(145deg,#2F5A3C,#16281D);
   --rounds-gate-ink: #F8FAFC;
   --rounds-gate-amber: #F7931E;
   --rounds-gate-mute: rgba(248,250,252,0.62);

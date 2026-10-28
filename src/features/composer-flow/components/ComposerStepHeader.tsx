@@ -22,7 +22,7 @@ export const COMPOSER_HEADER_HEIGHT = 52;
 interface Props {
   /** 1-based. */
   step: number;
-  /** 3 on the review path, 2 on the post path. */
+  /** Displayed total; entry sheet is unnumbered. One hides the counter. */
   total: number;
   /** Step 1 shows ×; later steps show ←. Ignored when left is 'none'. */
   onLeft?: () => void;
@@ -69,12 +69,12 @@ export default function ComposerStepHeader({ step, total, onLeft, left }: Props)
           {isFirst ? <X size={20} strokeWidth={2.2} /> : <ArrowLeft size={20} strokeWidth={2.2} />}
         </button>
         )}
-        <span style={{ fontSize: 12, fontWeight: 700, color: CT.muted }}>
+        {total > 1 && <span style={{ fontSize: 12, fontWeight: 700, color: CT.muted }}>
           {t('step', { n: step, m: total })}
-        </span>
+        </span>}
       </div>
 
-      <div
+      {total > 1 && <div
         aria-hidden
         style={{ display: 'flex', gap: 4, padding: '0 16px 12px' }}
       >
@@ -89,7 +89,7 @@ export default function ComposerStepHeader({ step, total, onLeft, left }: Props)
             }}
           />
         ))}
-      </div>
+      </div>}
     </div>
   );
 }
