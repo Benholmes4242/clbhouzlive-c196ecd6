@@ -97,18 +97,22 @@ export const rowStyle = (first: boolean, n = 12): React.CSSProperties => ({
   borderTop: first ? undefined : `1px solid ${BORDER}`,
 });
 
-/** Primary button. ONE per screen, in a footer bar. */
+/** Primary button. ONE per screen, in a footer bar. When className is given
+ *  (OB1.5 setup embed) it REPLACES the inline visual style, so the host's
+ *  pill class paints the button; the disabled state comes with that class. */
 export const PrimaryButton: React.FC<{
   children: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
   type?: 'button' | 'submit';
-}> = ({ children, onClick, disabled, type = 'button' }) => (
+  className?: string;
+}> = ({ children, onClick, disabled, type = 'button', className }) => (
   <button
     type={type}
     onClick={onClick}
     disabled={disabled}
-    style={{
+    className={className}
+    style={className ? undefined : {
       width: '100%',
       padding: '15px 18px',
       borderRadius: 12,
@@ -256,13 +260,14 @@ export const BackRow: React.FC<{
  * 16/22/8 padding PLUS max(env(safe-area-inset-bottom), 20px), so text clears
  * the home indicator on a notched device and still gets 20px on a notchless one.
  */
-export const FooterBar: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+export const FooterBar: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
   <div
     style={{
       padding: '16px 24px 8px',
       paddingBottom: 'calc(8px + max(env(safe-area-inset-bottom, 0px), 20px))',
       background: 'transparent',
       flexShrink: 0,
+      ...style,
     }}
   >
     {children}
@@ -278,7 +283,7 @@ export const FooterBar: React.FC<{ children: React.ReactNode }> = ({ children })
  * safe-area inset, owned by the host) stops - together they put the kicker
  * about 54px below the physical top edge on a notched device.
  */
-export const Stage = React.forwardRef<HTMLDivElement, { children: React.ReactNode; fill?: boolean }>(({ children, fill = false }, ref) => (
+export const Stage = React.forwardRef<HTMLDivElement, { children: React.ReactNode; fill?: boolean; style?: React.CSSProperties }>(({ children, fill = false, style }, ref) => (
   <div
     ref={ref}
     style={{
@@ -288,6 +293,7 @@ export const Stage = React.forwardRef<HTMLDivElement, { children: React.ReactNod
       WebkitOverflowScrolling: 'touch',
       padding: '10px 24px 0',
       ...(fill ? { display: 'flex', flexDirection: 'column' } : null),
+      ...style,
     }}
   >
     {children}
