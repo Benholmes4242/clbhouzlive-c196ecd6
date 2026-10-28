@@ -14,6 +14,7 @@ import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { fetchGolfClub, clubRowToSelected } from '@/features/business/claimClub';
 import { CREATE_CATEGORY_GROUPS, CREATE_STEPS, initialDraft, type BusinessCreateDraft } from '@/features/business-create/createRules';
 import { BusinessCreateStep2 } from '@/features/business-create/BusinessCreateStep2';
+import { BusinessCreateStep3 } from '@/features/business-create/BusinessCreateStep3';
 import type { BusinessCategoryValue } from '@/constants/businessCategories';
 import '@/features/business-create/business-create.css';
 
@@ -84,6 +85,13 @@ export default function BusinessCreate() {
         <div className="bizc-progress" aria-hidden="true" data-testid="bizc-progress">
           {Array.from({ length: CREATE_STEPS }, (_, i) => <i key={i} data-complete={i < step} />)}
         </div>
+        {/* BC3: step 3 is skippable — everything on it is optional and Skip
+            keeps whatever is filled, exactly like Continue. */}
+        {step === 3 && (
+          <button type="button" className="bizc-skip" data-testid="bizc-skip" onClick={() => goStep(4)}>
+            {t('businessCreate.skip', { defaultValue: 'Skip' })}
+          </button>
+        )}
       </div>
       {step === 1 ? (
         <>
@@ -113,11 +121,13 @@ export default function BusinessCreate() {
         </>
       ) : step === 2 ? (
         <BusinessCreateStep2 draft={draft} setDraft={setDraft} userId={user.id} onContinue={() => goStep(3)} />
+      ) : step === 3 ? (
+        <BusinessCreateStep3 draft={draft} setDraft={setDraft} onContinue={() => goStep(4)} />
       ) : (
-        /* BC2: step 3 is a placeholder until BC3 — segment 3 filled, back works. */
-        <main className="bizc-body" data-testid="bizc-step-3">
+        /* BC3: step 4 is a placeholder until BC4 — segment 4 filled, back works. */
+        <main className="bizc-body" data-testid="bizc-step-4">
           <div className="bizc-kicker">{t('businessCreate.kicker', { defaultValue: 'Put your business on clbhouz' })}</div>
-          <p className="bizc-sub">{t('businessCreate.step3Placeholder', { defaultValue: 'Step 3 arrives with BC3.' })}</p>
+          <p className="bizc-sub">{t('businessCreate.step4Placeholder', { defaultValue: 'Step 4 arrives with BC4.' })}</p>
         </main>
       )}
     </div>
