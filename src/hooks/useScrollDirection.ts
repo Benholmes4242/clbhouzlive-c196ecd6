@@ -25,6 +25,20 @@ const UP_THRESHOLD = 12;
 const TOP_ZONE = 80;
 const JITTER = 2;
 
+/* SCROLLED FLAG (BRIEF_ISLANDS_NAV §2). A second piece of state computed in
+   the SAME rAF handler — no new scroll listener. True once the active
+   scroller's top passes 24px; drives the top scrim's cross-fade to the solid
+   band and the logo island's scrolled title. Resets with resetToExpanded. */
+const SCROLLED_THRESHOLD = 24;
+let scrolled = false;
+
+function setScrolled(next: boolean) {
+  if (scrolled !== next) {
+    scrolled = next;
+    emit();
+  }
+}
+
 // Per-scroller state
 type ScrollerRecord = {
   target: HTMLElement | Window;
@@ -68,6 +82,7 @@ function makeHandler(record: ScrollerRecord) {
       const top = Math.max(0, getScrollTop(record.target));
       const delta = top - record.lastTop;
       record.lastTop = top;
+      setScrolled(top > SCROLLED_THRESHOLD);
 
       if (top < TOP_ZONE) {
         record.accum = 0;
@@ -134,6 +149,7 @@ export function resetToExpanded() {
     rec.lastTop = getScrollTop(rec.target);
   }
   setState('expanded');
+  setScrolled(false);
 }
 
 function subscribe(l: () => void) {
@@ -146,6 +162,15 @@ function getSnapshot() {
 
 export function useNavScrollState(): NavState {
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+}
+
+function getScrolledSnapshot() {
+  return scrolled;
+}
+
+/** True once the active scroller passes 24px. See SCROLLED_THRESHOLD above. */
+export function useChromeScrolled(): boolean {
+  return useSyncExternalStore(subscribe, getScrolledSnapshot, getScrolledSnapshot);
 }
 
 // Auto-register document-level scrollers (SSR-safe).
