@@ -31,7 +31,6 @@
 .welcome-glass-button{height:52px;border-radius:999px;width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);color:var(--welcome-ink);font-size:16px;font-weight:600;box-shadow:none}
 .welcome-glass-button:hover,.welcome-glass-button:active{background:rgba(255,255,255,0.07);color:var(--welcome-ink)}
 .welcome-back{width:34px;height:34px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);color:var(--welcome-ink);font-size:18px;line-height:1}
-.welcome-connect>h1{margin-bottom:8px}
 /* Full-screen squircle cropper */
 .welcome-cropper{position:fixed;inset:0;z-index:2147483100;background:#000;color:#F8FAFC}
 .welcome-cropper .welcome-crop-area{border-radius:31%;border:1.5px solid rgba(255,255,255,0.9)!important;box-shadow:0 0 0 9999em rgba(0,0,0,0.62)!important;color:rgba(0,0,0,0.62)}
