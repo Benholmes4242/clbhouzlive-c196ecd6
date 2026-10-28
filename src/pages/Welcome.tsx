@@ -48,6 +48,10 @@ function WelcomeFlow({ user, profile }: { user: NonNullable<ReturnType<typeof us
   // button and iOS edge-swipe pop to screen 4 rather than leaving the flow.
   const connectCountryId = step === 4 ? ((location.state as { welcomeConnect?: string } | null)?.welcomeConnect ?? null) : null; const connectOpen = !!connectCountryId;
   const closeConnect = () => { if (location.key !== 'default') navigate(-1); else navigate('/welcome', { replace: true, state: null }); };
+  // OB1.5: while the connect call is in flight the heading swaps to the
+  // syncing copy and the back button and Skip hide; the bar stays on step 4.
+  const [syncing, setSyncing] = useState(false);
+  const connectBody = connectCountryId ? getCountryById(connectCountryId)?.body ?? null : null;
   const pickPhoto = (file: File | undefined) => { if (!file) return; const reader = new FileReader(); reader.onload = () => setCropSrc(reader.result as string); reader.readAsDataURL(file); };
   const usePhoto = (file: File) => { setField('profilePhotoBlob', file); const url = URL.createObjectURL(file); setField('profilePhotoUrl', url); setPhotoPreview(url); setCropSrc(null); };
   const nextOnEnter = (next: () => void) => (e: KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') { e.preventDefault(); next(); } }; const base = usernameSeed(first, last); const connection = useWhsConnection(user.id);
