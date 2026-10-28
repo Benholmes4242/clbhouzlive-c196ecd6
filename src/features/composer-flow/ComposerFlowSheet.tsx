@@ -25,7 +25,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import BottomSheet from '@/features/post-v2/components/BottomSheet';
-import CourseTagSheet from '@/features/post-v2/components/CourseTagSheet';
+import ReviewCourseSearchSheet from './ReviewCourseSearchSheet';
 import { MAX_MEDIA } from '@/features/post-v2/hooks/useStageComposer';
 import { useComposerFlowStore } from './composerFlowStore';
 import { useReviewSuggestions } from './hooks/useReviewSuggestions';
@@ -104,13 +104,12 @@ export default function ComposerFlowSheet({ open, onClose, returnPath }: Props) 
         </div>
       </div>
     </BottomSheet>
-    <CourseTagSheet open={courseOpen} title={t('review.search')} selectionMode="single" onClose={() => setCourseOpen(false)} selected={[]}
-      userId={profile?.id ?? null} excludeReviewedForUserId={profile?.id ?? null} onDone={cs => {
-        const c = cs[0];
+    <ReviewCourseSearchSheet open={courseOpen} userId={profile?.id ?? null} onClose={() => setCourseOpen(false)}
+      onBeforeRequest={() => setCourseOpen(false)}
+      onPick={id => {
         setCourseOpen(false);
-        if (!c) return;
         analyticsEvents.track('composer_course_source', { source: 'search' });
-        review(c.id);
+        review(id);
       }} />
   </>;
 }

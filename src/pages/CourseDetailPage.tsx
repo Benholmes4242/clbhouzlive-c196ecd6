@@ -9,6 +9,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { recordRecentCourseView } from '@/lib/recentCourseViews';
 
 const CourseDetailPage = () => {
   const params = useParams();
@@ -32,6 +33,7 @@ const CourseDetailPage = () => {
       analyticsEvents.track('course_view', {
         course_id: courseId,
       });
+      recordRecentCourseView(courseId);
     }
     // CB110: consuming a landing query changes POP/PUSH to REPLACE on the
     // same mounted course. Only course entry owns this reset, not query cleanup.
