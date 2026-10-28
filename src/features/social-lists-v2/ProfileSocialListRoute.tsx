@@ -34,16 +34,15 @@ export default function ProfileSocialListRoute({ direction }: Props) {
      ProfilePageV2 does; the URL is replaced keeping direction, query and hash.
      Any failure or empty answer falls through to the not-found state. */
   const missing = !isLoading && !isError && !profile && !!username;
-  const [lookup, setLookup] = useState<'idle' | 'pending' | 'done'>('idle');
+  const [notFoundFor, setNotFoundFor] = useState<string | null>(null);
   useEffect(() => {
     if (!missing) return;
     let cancelled = false;
-    setLookup('pending');
     void resolvePreviousUsername(username!).then((current) => {
       if (cancelled) return;
       if (current) {
         navigate(renamedProfilePath(location.pathname, username!, current, location.search, location.hash), { replace: true });
-      } else setLookup('done');
+      } else setNotFoundFor(username!);
     });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -60,7 +59,7 @@ export default function ProfileSocialListRoute({ direction }: Props) {
     }
   }, [profile?.id, initialTab]);
 
-  if (isLoading || (missing && lookup !== 'done')) {
+  if (isLoading || (missing && notFoundFor !== username)) {
     return (
       <div style={{ minHeight: '100dvh', background: A.CANVAS, paddingTop: 'calc(var(--chrome-total-h, 0px) + 24px)' }}>
         <ListSkeleton />

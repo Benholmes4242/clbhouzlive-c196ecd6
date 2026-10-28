@@ -21,7 +21,7 @@ import { WelcomeCourseCard } from '@/features/onboarding/WelcomeCourseCard';
 import { WelcomeGolfers } from '@/features/onboarding/WelcomeGolfers';
 import { WelcomeHandicap } from '@/features/onboarding/WelcomeHandicap';
 import { WelcomeFirstLook, type WelcomeDestination } from '@/features/onboarding/WelcomeFirstLook';
-import { canContinueIdentity, readWelcomeProgress, welcomeName, usernameSeed, usernameWithSuffix, WELCOME_USERNAME_RE, writeWelcomeProgress, type WelcomeProgress, type WelcomeStep } from '@/features/onboarding/welcomeRules';
+import { canContinueIdentity, readWelcomeProgress, welcomeName, usernameSeed, usernameWithSuffix, USERNAME_RULE_MAX, WELCOME_USERNAME_RE, writeWelcomeProgress, type WelcomeProgress, type WelcomeStep } from '@/features/onboarding/welcomeRules';
 import '@/styles/welcome.css';
 
 /** OB1 owns first-sign-in only. Partial saves reuse useProfileSave; normal
