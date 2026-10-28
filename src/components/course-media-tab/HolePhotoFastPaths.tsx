@@ -66,7 +66,6 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
   onClose: () => void;
 }) {
   const { t } = useTranslation('courses');
-  const [segment, setSegment] = useState<'hole' | 'place'>(knownHoles.length ? 'hole' : 'place');
   const [place, setPlace] = useState<CoursePlace | null>(null);
   const [placeRows, setPlaceRows] = useState<Record<string, PlaceMedia>>(() => Object.fromEntries(photos.flatMap(p => {
     const row = existingPlaceTags.find(r => holeMediaKey({ url: r.media_url, mediaType: r.media_type, streamId: r.stream_id }) === holeMediaKey(p as OwnMediaSource));
@@ -75,7 +74,7 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
   useEffect(() => {
     const first = photos[0];
     const row = first ? placeRows[first.url] : undefined;
-    if (row) { setPlace(row.place as CoursePlace); setSegment('place'); }
+    if (row) { setPlace(row.place as CoursePlace); }
     // The opening selection is consumed once; subsequent thumbnails own selection.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -116,7 +115,7 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
       const row = await onTagPlace(photo.url, place); setPlaceRows({ ...placeRows, [photo.url]: row });
       toast(t('media.v2.taggedPlace', { label: PLACE_LABELS[place], defaultValue: `Tagged to ${PLACE_LABELS[place]}.` }));
       setPlace(null); setSelected(null); setReviewing(false); setRemovedNotice(false);
-      if (photos[index + 1]) { const next = photos[index + 1]; setCurrentUrl(next.url); setPlace(placeRows[next.url]?.place as CoursePlace ?? null); } else onClose();
+      if (photos[index + 1]) { const next = photos[index + 1]; setCurrentUrl(next.url); setPlace(placeRows[next.url]?.place as CoursePlace ?? null); } else if (!adminMode) onClose();
     } catch (error) { setError(holePhotoErrorMessage(error, `The ${photo.mediaType === 'video' ? 'video' : 'photo'} could not be tagged. The tag was not saved.`)); }
     finally { setPending(false); }
   };
@@ -187,7 +186,7 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
       if (hole != null) { setReviewing(true); setConfirmation(null); setRemovedNotice(false); }
       return;
     }
-    setCurrentUrl(url); setSelected(null); setPlace(placeRows[url]?.place as CoursePlace ?? null); setSegment(placeRows[url] ? 'place' : knownHoles.length ? 'hole' : 'place'); setConfirmation(null); setRemovedNotice(false);
+    setCurrentUrl(url); setSelected(null); setPlace(placeRows[url]?.place as CoursePlace ?? null); setConfirmation(null); setRemovedNotice(false);
     setReviewing(hole != null);
   };
   if (!photo) return null;
@@ -198,12 +197,12 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
   return <ShotTagCard shot={photo} position={{ i: index + 1, n: photos.length }} credit={credit}
     holes={knownHoles} hole={inTaggedState ? taggedHole ?? null : selected} place={taggedPlace ?? place}
     pending={pending} locked={locked}
-    onHole={hole => { if (!pending && !locked && !done(photo.url)) { setSelected(prev => prev === hole ? null : hole); setPlace(null); setSegment('hole'); } }}
-    onPlace={value => { if (!pending && !locked && !done(photo.url)) { setPlace(value); setSelected(null); setSegment('place'); } }}
+    onHole={hole => { if (!pending && !locked && !done(photo.url)) { setSelected(prev => prev === hole ? null : hole); setPlace(null); } }}
+    onPlace={value => { if (!pending && !locked && !done(photo.url)) { setPlace(value); setSelected(null); } }}
     canSubmit={place != null ? !pending && !currentPlaceRow && !inTaggedState && !!onTagPlace : canConfirm}
     onSubmit={() => { if (place) void confirmPlace(); else void confirm(); }}
     onSkip={skip} onClose={onClose}
-    remove={canRemove || (currentPlaceRow && onRemovePlace) ? { onClick: () => { if (currentPlaceRow) void removePlace(); else void remove(); }, pending } : undefined}
+    remove={inTaggedState || (currentPlaceRow && onRemovePlace) ? { onClick: () => { if (currentPlaceRow) void removePlace(); else void remove(); }, pending } : undefined}
     strip={<div className="media-v3-tag-strip" data-strip><div className="media-v3-tag-row">{photos.map((item, i) => {
       const hole = tags[item.url]; const gone = unavailable.has(item.url); const current = item.url === photo.url;
       return <Button key={item.url} variant="ghost" ref={el => { if (el) thumbs.current.set(item.url, el); else thumbs.current.delete(item.url); }}
