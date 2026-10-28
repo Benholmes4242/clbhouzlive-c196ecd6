@@ -357,6 +357,8 @@ describe('GlobalBottomNavigation', () => {
     }));
     vi.doMock('@/features/composer-flow/composerFlowStore', () => ({
       useComposerFlowStore: (sel: any) => sel({ handoff: null, reopenRequested: false }),
+    }));
+    vi.doMock('@/features/composer-flow/handoffRules', () => ({
       nextHandoffAction: () => ({ type: 'clear' }),
     }));
     vi.doMock('@/features/composer-flow/ComposerFlowSheet', () => ({ default: () => null }));
