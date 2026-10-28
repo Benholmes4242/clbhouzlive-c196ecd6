@@ -1,6 +1,7 @@
 # Roadmap
 
 ## BC5 — Create business and finish
+- [x] Ben approved recording returned-empty photo failures as partials in both shared callers; editor uses its existing warning toast.
 - [ ] Extract editor creation unchanged into one shared path; preserve editor tests and safeguards.
 - [ ] Add creating, saved finish/partials/claim actions and dirty departure confirmation.
 - [ ] Switch canonical create route and redirect alias; run full suite and report existing POST / REVIEW stop separately.
