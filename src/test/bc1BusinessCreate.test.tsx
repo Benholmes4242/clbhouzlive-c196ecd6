@@ -104,8 +104,9 @@ describe('BC1 history', () => {
     renderAt(['/before', '/business/create-v2'], 1);
     fireEvent.click(tile('Creator'));
     fireEvent.click(cont());
-    expect(screen.getByTestId('bizc-step-2')).toBeTruthy();
-    expect(screen.getByTestId('bizc-chosen').textContent).toBe('Creator');
+    /* BC2: step 2 is now the real branch screen; Creator takes the
+     * everyone-else branch. */
+    expect(screen.getByTestId('bizc-step-2').getAttribute('data-branch')).toBe('other');
     expect(screen.getByTestId('bizc-progress').querySelectorAll('i[data-complete="true"]').length).toBe(2);
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
     await waitFor(() => expect(tile('Creator').getAttribute('aria-pressed')).toBe('true'));
