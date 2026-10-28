@@ -98,7 +98,7 @@ export default function BusinessCreate() {
                   {g.tiles.map(tile => {
                     const Icon = tile.icon;
                     return (
-                      <button key={tile.value} type="button" className="bizc-tile" data-value={tile.value} aria-pressed={draft.category === tile.value} onClick={() => setDraft(d => ({ ...d, category: tile.value }))}>
+                      <button key={tile.value} type="button" className="bizc-tile" data-value={tile.value} aria-pressed={draft.category === tile.value} onClick={() => setCategory(tile.value)}>
                         <Icon strokeWidth={1.8} aria-hidden="true" />{tile.label}
                       </button>
                     );
@@ -111,10 +111,13 @@ export default function BusinessCreate() {
             <button type="button" className="bizc-primary" data-testid="bizc-continue" disabled={!draft.category} onClick={() => goStep(2)}>{t('businessCreate.continue', { defaultValue: 'Continue' })}</button>
           </div>
         </>
+      ) : step === 2 ? (
+        <BusinessCreateStep2 draft={draft} setDraft={setDraft} userId={user.id} onContinue={() => goStep(3)} />
       ) : (
-        <main className="bizc-body" data-testid="bizc-step-2">
+        /* BC2: step 3 is a placeholder until BC3 — segment 3 filled, back works. */
+        <main className="bizc-body" data-testid="bizc-step-3">
           <div className="bizc-kicker">{t('businessCreate.kicker', { defaultValue: 'Put your business on clbhouz' })}</div>
-          <p className="bizc-sub" data-testid="bizc-chosen">{categoryDisplayLabel(draft.category)}</p>
+          <p className="bizc-sub">{t('businessCreate.step3Placeholder', { defaultValue: 'Step 3 arrives with BC3.' })}</p>
         </main>
       )}
     </div>
