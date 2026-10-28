@@ -94,7 +94,7 @@ function page(over: Partial<BusinessProfile> = {}) {
 }
 const nonClub = (over: Partial<BusinessProfile> = {}) => page({ club_id: null, category: 'Retail / Pro Shop', name: LONG, ...over });
 
-beforeEach(() => { rpc.mockResolvedValue({ data: null, error: null }); team = []; postsCount = 0; feedState.empty = true; membership = null; });
+beforeEach(() => { Element.prototype.scrollTo = vi.fn() as never; rpc.mockResolvedValue({ data: null, error: null }); team = []; postsCount = 0; feedState.empty = true; membership = null; });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 describe('CB119 ClubFromTheClub non-club props', () => {
@@ -135,7 +135,7 @@ describe('CB119 ClubFromTheClub non-club props', () => {
 
 describe('CB119 non-club page', () => {
   it('From {name} is the last section, directly after Visiting', async () => {
-    const { container } = nonClub();
+    const { container } = nonClub({ website: 'shop.example' });
     await waitFor(() => expect(container.querySelector('[data-club-feed]')).not.toBeNull());
     const feed = container.querySelector('[data-club-feed]')!;
     expect(feed.getAttribute('aria-label')).toBe(`From ${LONG}`);

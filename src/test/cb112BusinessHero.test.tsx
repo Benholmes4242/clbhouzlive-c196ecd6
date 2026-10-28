@@ -276,6 +276,7 @@ describe('CB112 figure strip', () => {
     const r = renderPage();
     await waitFor(() => expect(r.container.querySelector('[data-club-feed]')).not.toBeNull());
     expect(r.container.querySelector('[data-business-tabs]')).toBeNull();
+    Element.prototype.scrollTo = vi.fn() as never;
     const spy = vi.spyOn(document, 'querySelector');
     fireEvent.click(r.container.querySelector('[data-cell="posts"]')!);
     expect(spy).toHaveBeenCalledWith('[data-club-feed]');
