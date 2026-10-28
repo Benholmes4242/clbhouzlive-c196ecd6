@@ -58,24 +58,7 @@ function TourHubChromeBridge({
   openGlance: (anchor: HTMLElement) => void;
   closeGlance: () => void;
 }) {
-  const { rows } = useTourPickerRows();
-  const { selectedTourSlug, viewingTourSlug, appliedTourSlug } = useTourSelection();
-  const activeMajor = useActiveMensMajor();
-  const { data: liveTournaments } = useLiveTournaments();
-  const liveRows = Array.isArray(liveTournaments)
-    ? liveTournaments.filter((tt) => (tt.status || '').toLowerCase() === 'inprogress')
-    : [];
-  const liveRoundById = new Map(liveRows.map((tt) => [tt.id, tt.currentRound] as const));
-
-  const activeTourSlug = appliedTourSlug ?? selectedTourSlug ?? viewingTourSlug ?? 'all';
-  const d = islandDescriptor({
-    activeTab,
-    activeTourSlug,
-    rows,
-    liveCount: liveRows.length,
-    major: activeMajor,
-    liveRound: (id) => (id ? liveRoundById.get(id) ?? null : null),
-  });
+  const d = useTourIslandDescriptor(activeTab);
 
   const slot = useMemo(
     () => (
