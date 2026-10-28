@@ -23,9 +23,15 @@ interface Props {
   /** 'pill' (default) = compact inline control. 'chooser' = the empty-field
    *  presentation: Say it / Type it cards, full-width live states. Same
    *  recorder and transcribe path in both — two presentations, one implementation. */
-  idleVariant?: 'pill' | 'chooser';
+  idleVariant?: 'pill' | 'chooser' | 'hero';
   /** Chooser only: "Type it". Must not touch the recorder. */
   onChooseType?: () => void;
+  /** Hero only: the box already holds words ("Speak to add more"). */
+  hasText?: boolean;
+  /** Reports recording-or-transcribing so the composer can fold its header. */
+  onActiveChange?: (active: boolean) => void;
+  /** Hero only: fired when a recording starts from the card. */
+  onStart?: () => void;
 }
 
 const BAR_COUNT = 24;
@@ -54,9 +60,11 @@ function formatTime(sec: number) {
 function LiveWaveform({
   stream,
   reduced,
+  height = 22,
 }: {
   stream: MediaStream | null;
   reduced: boolean;
+  height?: number;
 }) {
   const [levels, setLevels] = useState<number[]>(() => new Array(BAR_COUNT).fill(0));
   const rafRef = useRef<number>(0);
@@ -141,11 +149,11 @@ function LiveWaveform({
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: 2,
-        height: 22,
+        height,
       }}
     >
       {bars.map((v, i) => {
-        const h = Math.max(2, Math.round(2 + v * 20));
+        const h = Math.max(2, Math.round(2 + v * (height - 2)));
         return (
           <span
             key={i}
@@ -208,7 +216,7 @@ function ProcessingStrip({ reduced }: { reduced: boolean }) {
   );
 }
 
-export function VoiceDictateButton({ onAppend, idleVariant = 'pill', onChooseType }: Props) {
+export function VoiceDictateButton({ onAppend, idleVariant = 'pill', onChooseType, hasText = false, onActiveChange, onStart }: Props) {
   const { t } = useTranslation('courses');
   const rec = useVoiceRecorder();
   const [processing, setProcessing] = useState(false);
@@ -236,10 +244,30 @@ export function VoiceDictateButton({ onAppend, idleVariant = 'pill', onChooseTyp
   }, [rec.audioBlob]);
 
   const listening = rec.isRecording;
+  const active = listening || processing;
+  useEffect(() => { onActiveChange?.(active); }, [active, onActiveChange]);
   /** The ONE start path — the pill and the chooser's "Say it" both call this. */
   const startRecording = () => rec.startRecording();
   const chooser = idleVariant === 'chooser';
   const sayMore = t('review.wizard.step2.sayMore');
+
+  if (idleVariant === 'hero') {
+    return (
+      <SpeakHeroCard
+        state={listening ? 'listening' : processing ? 'writing' : 'idle'}
+        hasText={hasText}
+        duration={rec.duration}
+        stream={rec.stream}
+        reduced={reduced}
+        onPress={() => {
+          if (listening) { rec.stopRecording(); return; }
+          if (processing) return;
+          onStart?.();
+          startRecording();
+        }}
+      />
+    );
+  }
 
   // Idle chooser (empty field)
   if (chooser && !listening && !processing) {
@@ -427,5 +455,81 @@ export function VoiceDictateButton({ onAppend, idleVariant = 'pill', onChooseTyp
         </div>
       )}
     </div>
+  );
+}
+
+/** STEP 1 HERO CARD (BRIEF_REVIEW_STEP_ONE §3). One button over the same
+ * recorder and transcribe path as the pill and chooser; words arrive only when
+ * transcription returns. Four states: idle (empty / has text), listening, writing. */
+function SpeakHeroCard({ state, hasText, duration, stream, reduced, onPress }: {
+  state: 'idle' | 'listening' | 'writing';
+  hasText: boolean;
+  duration: number;
+  stream: MediaStream | null;
+  reduced: boolean;
+  onPress: () => void;
+}) {
+  const { t } = useTranslation('courses');
+  const live = state !== 'idle';
+  const k = 'review.wizard.stepOne.';
+  const title = state === 'listening' ? t(`${k}listeningTitle`) : state === 'writing' ? t(`${k}writingTitle`)
+    : hasText ? t(`${k}speakMoreTitle`) : t(`${k}speakTitle`);
+  const sub = state === 'listening' ? t(`${k}listeningSub`) : state === 'writing' ? t(`${k}writingSub`)
+    : hasText ? t(`${k}speakMoreSub`) : t(`${k}speakSub`);
+  const heroState = state === 'idle' ? (hasText ? 'idle-more' : 'idle') : state;
+  return (
+    <button
+      type="button"
+      onClick={onPress}
+      data-speak-state={heroState}
+      role={live ? 'status' : undefined}
+      aria-live={live ? 'polite' : undefined}
+      style={{
+        display: 'block', width: '100%', boxSizing: 'border-box', textAlign: 'left',
+        borderRadius: 18, padding: 16, cursor: 'pointer', color: '#F8FAFC',
+        background: live ? 'rgba(247,147,30,0.10)' : 'rgba(247,147,30,0.07)',
+        border: `1.5px solid ${live ? 'rgba(247,147,30,0.60)' : 'rgba(247,147,30,0.32)'}`,
+      }}
+    >
+      <span style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <span
+          data-speak-circle
+          aria-hidden
+          style={{
+            width: 56, height: 56, borderRadius: 999, flexShrink: 0, display: 'grid', placeItems: 'center',
+            background: state === 'writing' ? 'rgba(247,147,30,0.35)' : '#F7931E',
+            boxShadow: state === 'listening' ? '0 0 0 7px rgba(247,147,30,0.18)' : 'none',
+          }}
+        >
+          {state === 'idle' && <Mic size={26} strokeWidth={2.2} color="#0A0A0C" />}
+          {state === 'listening' && <span data-speak-stop style={{ width: 18, height: 18, borderRadius: 4, background: '#0A0A0C' }} />}
+          {state === 'writing' && (
+            <span
+              data-speak-spinner
+              style={{
+                width: 22, height: 22, boxSizing: 'border-box', borderRadius: 999,
+                border: '3px solid rgba(10,10,12,0.25)', borderTopColor: '#0A0A0C',
+                animation: reduced ? 'none' : 'rv2-hero-spin 0.9s linear infinite',
+              }}
+            />
+          )}
+        </span>
+        <span style={{ flex: 1, minWidth: 0, display: 'block' }}>
+          <span data-speak-title style={{ display: 'block', fontSize: 17, fontWeight: 700, color: '#F8FAFC' }}>{title}</span>
+          <span data-speak-sub style={{ display: 'block', marginTop: 4, fontSize: 12.5, lineHeight: 1.4, color: 'rgba(248,250,252,0.62)' }}>{sub}</span>
+        </span>
+        {state === 'listening' && (
+          <span data-speak-timer style={{ fontSize: 13, fontWeight: 700, color: '#F7931E', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+            {formatTime(duration)}
+          </span>
+        )}
+      </span>
+      {state === 'listening' && (
+        <span data-speak-wave style={{ display: 'flex', marginTop: 12, width: '100%' }}>
+          <LiveWaveform stream={stream} reduced={reduced} height={24} />
+        </span>
+      )}
+      <style>{`@keyframes rv2-hero-spin { to { transform: rotate(360deg); } }`}</style>
+    </button>
   );
 }

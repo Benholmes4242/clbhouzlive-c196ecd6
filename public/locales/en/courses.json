@@ -2940,8 +2940,6 @@
         "heading": "Break it down"
       },
       "step2": {
-        "heading": "Photos and a few words",
-        "lede": "Anything from your day at {{course}}.",
         "optionalNote": "Optional. Everything below is too.",
         "photosEyebrow": "Photos and videos",
         "placeholder": "What should another golfer know before they play here?",
@@ -2988,7 +2986,30 @@
         "confirmPost": "Post at {{score}}",
         "confirmSave": "Save at {{score}}"
       },
-      "uploadingMedia": "Uploading photos..."
+      "uploadingMedia": "Uploading photos...",
+      "stepOne": {
+        "headingStep1": "What was it like?",
+        "ledeStep1": "Everything here is optional. Your score comes next.",
+        "speakTitle": "Speak your review",
+        "speakSub": "Tap and talk, like you'd tell a mate in the bar. We'll write it down.",
+        "speakMoreTitle": "Speak to add more",
+        "speakMoreSub": "Each go adds to what's already there.",
+        "listeningTitle": "Listening…",
+        "listeningSub": "Tap the square when you've finished.",
+        "writingTitle": "Writing it down…",
+        "writingSub": "Your words appear below in a moment.",
+        "orTypeIt": "OR TYPE IT",
+        "typePlaceholder": "Type your review here",
+        "photosUpTo": "Up to 10",
+        "photosCount": "{{n}} of 10",
+        "tagHole": "Tag hole",
+        "holeGuideHint": "Tag a photo to its hole and it joins {{course}}'s hole guide on the course page.",
+        "continueToScore": "Continue to your score",
+        "skipToScore": "Skip to your score",
+        "wordsHeading": "YOUR WORDS",
+        "photosHeading": "PHOTOS AND VIDEOS",
+        "fromMembers": "from {{count}} members"
+      }
     },
     "write": {
       "body": "Your rating helps golfers worldwide",

@@ -30,7 +30,6 @@ import { claimOverlayChrome, releaseOverlayChrome } from '@/lib/routeChrome';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { notifyComposerCompleted } from '@/features/composer-flow/composerFlowStore';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Trash2 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
@@ -57,6 +56,9 @@ import { OverallScrubber } from './components/OverallScrubber';
 import { CategoryGrid, type CategoryCopy } from './components/CategoryGrid';
 import { MediaTray } from './components/MediaTray';
 import { ReviewHoleTags } from './components/ReviewHoleTags';
+import { ReviewComposerHeader } from './components/ReviewComposerHeader';
+import { useReviewHeaderFacts } from './hooks/useReviewHeaderFacts';
+import { usePhotoHeaderForm } from './lib/stepOneFold';
 import { useReviewHoleTags } from './hooks/useReviewHoleTags';
 import { ShareToggle } from './components/ShareToggle';
 import { SubmitBar } from './components/SubmitBar';
@@ -91,6 +93,11 @@ const RV2_HEADER_H_CSS = `calc(env(safe-area-inset-top, 0px) + ${RV2_HEADER_CHRO
 /** Breathing room between the header rule and the step strip. */
 const RV2_HEADER_GAP = 14;
 
+
+/** Step 1 section heading (BRIEF_REVIEW_STEP_ONE §3). */
+const STEP1_HEADING: React.CSSProperties = {
+  fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)',
+};
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
@@ -457,8 +464,11 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   const [removeOpen, setRemoveOpen] = useState(false);
 
   const [dictationFlashKey, setDictationFlashKey] = useState(0);
-  /** Set true only by the chooser's "Type it"; never reset. */
-  const [choseToType, setChoseToType] = useState(false);
+  /** Recording or transcribing from the Speak card (folds the photo header). */
+  const [voiceActive, setVoiceActive] = useState(false);
+  /** The tray chip's request to open the tagging sheet on one shot. */
+  const [tagShotId, setTagShotId] = useState<string | null>(null);
+  const headerFacts = useReviewHeaderFacts(course.id);
 
   const step = composer.step;
   const shortName = shortCourseName(course.name ?? '');
@@ -794,7 +804,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   if (submit.submitting) {
     buttonLabel = isEditMode ? t('review.wizard.saving') : t('review.wizard.posting');
   } else if (step === FIRST_STEP) {
-    buttonLabel = t('review.wizard.continue');
+    buttonLabel = t('review.wizard.stepOne.continueToScore');
   } else if (remaining > 0) {
     buttonLabel = t('review.wizard.step3.catsGate', { count: remaining });
   } else if (!composer.overallTouched) {
@@ -808,8 +818,17 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   /* THE FOOTER SUMMARY names what is actually there, and is omitted - never a
      placeholder - when there is nothing to name. */
   const hasWords = composer.state.reviewText.trim().length > 0;
-  /** Chooser vs field: empty text AND the member has not chosen to type. */
-  const showWordsChooser = composer.state.reviewText.length === 0 && !choseToType;
+  const hasAnyText = composer.state.reviewText.length > 0;
+  /* THE EMPTY RULE (BRIEF_REVIEW_STEP_ONE §1). Photo header and heading only
+     while step 1 holds nothing and nothing is under way; once anything starts
+     the header folds and stays compact for the rest of the flow. */
+  const photoForm = usePhotoHeaderForm({
+    onFirstStep: step === FIRST_STEP,
+    textLength: composer.state.reviewText.length,
+    mediaCount: media.count,
+    voiceActive,
+    isEditMode,
+  });
   const appendDictation = (text: string) => {
     const prev = composer.state.reviewText;
     const joiner = prev.length === 0 || /\s$/.test(prev) ? '' : ' ';
@@ -859,7 +878,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   const skipLabel = step3Skip
     ? t('review.wizard.step3.skipToPost')
     : step === FIRST_STEP && !hasMedia && !hasWords
-      ? t('review.wizard.step2.skip')
+      ? t('review.wizard.stepOne.skipToScore')
       : null;
 
   /* CARRYING THE WORK ACROSS (§6). The local Files go over INTACT — the same
@@ -937,85 +956,19 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         flexDirection: 'column',
       }}
     >
-      {/* Header */}
-      <header
+      {/* Header (BRIEF_REVIEW_STEP_ONE §1): photo while empty, compact after. */}
+      <ReviewComposerHeader
         ref={headerRef}
-
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          margin: '0 auto',
-          width: '100%',
-          maxWidth: 480,
-          zIndex: 50,
-          background: RV2.canvas,
-          borderBottom: `1px solid ${RV2.hairline}`,
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 12px 10px' }}>
-          <button
-            type="button"
-            onClick={handleBack}
-            aria-label={leadingIsClose ? t('review.wizard.closeA11y') : t('review.wizard.backA11y')}
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 10,
-              border: 'none',
-              background: 'transparent',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              fontSize: 21,
-              lineHeight: 1,
-              color: RV2.ink,
-            }}
-          >
-            {leadingIsClose ? '\u00D7' : '\u2039'}
-          </button>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                fontSize: 15,
-                fontWeight: 700,
-                letterSpacing: '-0.015em',
-                color: RV2.ink,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {course.name}
-            </div>
-            <div style={{ fontSize: 12, color: RV2.secondary }}>{region}</div>
-          </div>
-          {isEditMode && (
-            <button
-              type="button"
-              onClick={() => setRemoveOpen(true)}
-              aria-label={t('review.wizard.deleteA11y')}
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 10,
-                border: 'none',
-                background: 'transparent',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                color: RV2.danger,
-              }}
-            >
-              <Trash2 size={16} />
-            </button>
-          )}
-        </div>
-      </header>
+        form={photoForm ? 'photo' : 'compact'}
+        name={course.name}
+        region={region}
+        thumbnail={course.thumbnail_image}
+        facts={headerFacts}
+        leadingIsClose={leadingIsClose}
+        onBack={handleBack}
+        isEditMode={isEditMode}
+        onDelete={() => setRemoveOpen(true)}
+      />
       {/* THE RESERVATION for the FIXED header above.
           This page renders BOTH as a route at /courses/:courseId/rate inside
           .app-shell AND as a fixed overlay (position: fixed; inset: 0, the
@@ -1198,82 +1151,57 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           behaviour, different cache sweeps - not to be unified or adapted. */}
       {step === FIRST_STEP && (
         <>
-          <section style={{ padding: '0 16px 16px' }}>
-            <h1
-              style={{
-                fontSize: 20,
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                marginBottom: 4,
-                color: RV2.ink,
-              }}
-            >
-              {t('review.wizard.step2.heading')}
-            </h1>
-            <p style={{ fontSize: 14, color: RV2.secondary, lineHeight: 1.5, margin: 0 }}>
-              {t('review.wizard.step2.lede', { course: shortName })}
-            </p>
-          </section>
+          {/* THE HEADING folds away with the photo header (§2). */}
+          {photoForm && (
+            <section data-step1-heading style={{ padding: '18px 20px 0' }}>
+              <h1 style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, margin: 0, color: '#F8FAFC' }}>
+                {t('review.wizard.stepOne.headingStep1')}
+              </h1>
+              <p style={{ marginTop: 6, marginBottom: 0, fontSize: 13.5, color: 'rgba(248,250,252,0.62)' }}>
+                {t('review.wizard.stepOne.ledeStep1')}
+              </p>
+            </section>
+          )}
 
-          <section style={{ padding: '0 16px 16px' }}>
-            <Eyebrow>{t('review.wizard.step2.photosEyebrow')}</Eyebrow>
-            {/* R1 §1.3c — onRetry was never passed, so a failed tile's Retry
-                was a button that did nothing. Wired: with no reviewId the item
-                returns to pending and the pending set re-uploads. */}
-            <MediaTray
-              items={media.items}
-              onPick={media.addFiles}
-              onRemove={media.removeItem}
-              onRetry={(id) => { void media.retryItem(id); }}
-              pickerError={media.pickerError}
-              onClearError={media.clearPickerError}
-            />
-          </section>
-
-          <ReviewHoleTags {...holeTags} />
-          <section style={{ padding: '0 16px 16px' }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 12,
-              }}
-            >
-              <div
-                style={{
-                  /* READ floor. 10.5 -> 11. */
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: RV2.eyebrow,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.14em',
-                }}
-              >
-                {t('review.wizard.step2.wordsEyebrow')}
-              </div>
-              {!showWordsChooser && (
-                <VoiceDictateButton onAppend={appendDictation} />
-              )}
+          {/* YOUR WORDS (§3). The box is always present; the Speak card sits above it. */}
+          <section data-step1-words style={{ padding: '0 20px' }}>
+            <div style={{ ...STEP1_HEADING, marginTop: photoForm ? 20 : 16 }}>
+              {t('review.wizard.stepOne.wordsHeading')}
             </div>
-            {showWordsChooser ? (
+            <div style={{ marginTop: 10 }}>
               <VoiceDictateButton
-                idleVariant="chooser"
+                idleVariant="hero"
+                hasText={hasAnyText}
                 onAppend={appendDictation}
-                onChooseType={() => setChoseToType(true)}
+                onActiveChange={setVoiceActive}
+                onStart={() => {
+                  // Analytics callsite: review_voice_started
+                  analyticsEvents.track('review_voice_started', { has_text: hasAnyText });
+                }}
               />
-            ) : (
+            </div>
+            {!hasAnyText && (
+              <div data-or-type-it aria-hidden style={{ margin: '14px 2px 0', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', color: 'rgba(248,250,252,0.42)' }}>
+                  {t('review.wizard.stepOne.orTypeIt')}
+                </span>
+                <span style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
+              </div>
+            )}
             <div
               key={dictationFlashKey}
+              data-step1-box
               style={{
-                background: RV2.cardBg,
+                marginTop: hasAnyText ? 10 : 12,
+                background: 'rgba(255,255,255,0.05)',
                 // The flash keyframe cannot read a JS token, so the resting
                 // colour is published to CSS as a custom property (§2.3).
-                ['--rv2-flash-rest' as string]: RV2.cardBg,
-                border: `1px solid ${RV2.hairline}`,
-                borderRadius: 14,
-                padding: 14,
-                minHeight: 100,
+                ['--rv2-flash-rest' as string]: 'rgba(255,255,255,0.05)',
+                border: `1px solid ${hasAnyText ? 'rgba(255,255,255,0.20)' : 'rgba(255,255,255,0.12)'}`,
+                borderRadius: 16,
+                padding: '13px 14px',
+                minHeight: hasAnyText ? 110 : 76,
                 boxSizing: 'border-box',
                 animation: dictationFlashKey > 0 ? 'rv2-dictation-flash 900ms ease-out' : 'none',
               }}
@@ -1290,32 +1218,85 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
               <MentionsComposerInput
                 value={composer.state.reviewText}
                 onChange={composer.setReviewText}
-                placeholder={t('review.wizard.step2.placeholder')}
+                placeholder={t('review.wizard.stepOne.typePlaceholder')}
                 currentUserId={userId}
-                autoFocus={choseToType}
                 textStyle={{
-                  /* YOUR WORDS is PINNED here, not inherited. 14 -> 15 so the
-                     review composer sits at the floor alongside the comment
-                     composer (15, inherited) and the post caption (16/17). */
                   fontSize: 15,
                   // PX, NOT A FACTOR: a unitless line-height is computed per
-                  // element, so the two layers can resolve it differently. 15 x 1.55.
-                  lineHeight: '23px',
-                  minHeight: 72,
+                  // element, so the two layers can resolve it differently.
+                  lineHeight: '22px',
+                  minHeight: 44,
                   maxHeight: 260,
                   padding: '0',
-                  color: RV2.ink,
-                  caretColor: RV2.ink,
-                  /* The only consumer that was not passing one — the shared
-                     component's default is the canonical dark tier anyway, but
-                     three composers should not disagree about whether they
-                     state it (MICRO_BRIEF_MENTIONS_COMPOSER_BROKEN §4). */
-                  placeholderColor: 'rgba(255,255,255,0.38)',
+                  color: '#F8FAFC',
+                  caretColor: '#F8FAFC',
+                  placeholderColor: 'rgba(248,250,252,0.42)',
                 }}
               />
             </div>
-            )}
           </section>
+
+          {/* PHOTOS AND VIDEOS (§4). Tray chips open the existing tagging sheet. */}
+          <section data-step1-photos style={{ padding: '0 20px' }}>
+            <div style={{ marginTop: hasMedia || hasAnyText ? 18 : 22, marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={STEP1_HEADING}>{t('review.wizard.stepOne.photosHeading')}</div>
+              <div data-photos-count style={{ fontSize: 11.5, color: 'rgba(248,250,252,0.42)' }}>
+                {hasMedia ? t('review.wizard.stepOne.photosCount', { n: media.count }) : t('review.wizard.stepOne.photosUpTo')}
+              </div>
+            </div>
+            {/* R1 §1.3c — onRetry wired: with no reviewId the item returns to
+                pending and the pending set re-uploads. */}
+            <MediaTray
+              appearance="step1"
+              items={media.items}
+              onPick={media.addFiles}
+              onRemove={media.removeItem}
+              onRetry={(id) => { void media.retryItem(id); }}
+              pickerError={media.pickerError}
+              onClearError={media.clearPickerError}
+              emptyAside={holeTags.holes.length > 0 ? (
+                <span data-hole-guide-hint style={{ fontSize: 12, lineHeight: 1.45, color: 'rgba(248,250,252,0.62)' }}>
+                  {t('review.wizard.stepOne.holeGuideHint', { course: shortName })}
+                </span>
+              ) : null}
+              renderChip={holeTags.holes.length > 0 ? (it) => {
+                const hole = holeTags.assignments[it.id];
+                const tagged = hole != null;
+                return (
+                  <button
+                    type="button"
+                    data-hole-chip={tagged ? 'tagged' : 'untagged'}
+                    aria-label={tagged ? `Tagged to the ${ordinal(hole)}` : 'Tag hole'}
+                    onClick={(e) => { e.stopPropagation(); setTagShotId(it.id); }}
+                    style={{
+                      position: 'absolute', left: 6, bottom: 6, height: 22, borderRadius: 7, padding: '0 7px',
+                      border: 'none', display: 'inline-flex', alignItems: 'center', gap: 4,
+                      fontSize: 10.5, fontWeight: 700, cursor: 'pointer', zIndex: 2,
+                      background: tagged ? 'rgba(14,14,16,0.78)' : 'rgba(243,245,247,0.94)',
+                      color: tagged ? '#F8FAFC' : '#0A0A0C',
+                    }}
+                  >
+                    {tagged ? (
+                      <>
+                        <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          <path d="M5 21V4" />
+                          <path d="M5 4h11l-2 4 2 4H5" />
+                        </svg>
+                        {ordinal(hole)}
+                      </>
+                    ) : t('review.wizard.stepOne.tagHole')}
+                  </button>
+                );
+              } : undefined}
+            />
+          </section>
+
+          <ReviewHoleTags
+            {...holeTags}
+            hideShotList
+            focusShotId={tagShotId}
+            onFocusClosed={() => setTagShotId(null)}
+          />
         </>
       )}
 
@@ -1433,6 +1414,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
       <div style={{ flex: 1, minHeight: 16 }} />
 
       <SubmitBar
+        appearance={step === FIRST_STEP ? 'step1' : 'default'}
         label={buttonLabel}
         enabled={gateMet && !submit.submitting}
         onPress={handlePrimary}

@@ -20,6 +20,12 @@ interface Props {
   pickerError?: string | null;
   onClearError?: () => void;
   disabled?: boolean;
+  /** 'step1' = BRIEF_REVIEW_STEP_ONE §4: 88px tiles, add tile after them, an
+   *  88px dashed Add while empty with `emptyAside` beside it. Default unchanged. */
+  appearance?: 'default' | 'step1';
+  /** Step 1 only: the hole chip drawn on a tile (null for none). */
+  renderChip?: (item: MediaItem) => React.ReactNode;
+  emptyAside?: React.ReactNode;
 }
 
 export function MediaTray({
@@ -30,6 +36,9 @@ export function MediaTray({
   pickerError,
   onClearError,
   disabled,
+  appearance = 'default',
+  renderChip,
+  emptyAside,
 }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { t } = useTranslation('courses');
@@ -39,6 +48,24 @@ export function MediaTray({
   const canAdd = remaining > 0 && !disabled;
   /** Decides the add control's presentation — the only switch. */
   const empty = items.length === 0;
+  const step1 = appearance === 'step1';
+  const dashed = '1.5px dashed rgba(255,255,255,0.22)';
+  const step1Add = canAdd ? (
+    <button
+      type="button"
+      onClick={() => inputRef.current?.click()}
+      aria-label="Add photo or video"
+      data-step1-add={empty ? 'empty' : 'more'}
+      style={{
+        width: empty ? 88 : 56, height: 88, flexShrink: 0, borderRadius: 14, border: dashed,
+        background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', gap: 6, cursor: 'pointer', padding: 0,
+      }}
+    >
+      <Plus size={empty ? 20 : 18} strokeWidth={2} color={empty ? '#F8FAFC' : 'rgba(248,250,252,0.62)'} />
+      {empty && <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(248,250,252,0.62)' }}>Add</span>}
+    </button>
+  ) : null;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -57,7 +84,11 @@ export function MediaTray({
             on it is the 72px square at the FRONT of the strip, so it is never
             parked past the right edge of the screen. Same onClick, same
             hidden input, same aria-label. Items follow it in the order chosen. */}
-        {canAdd && (
+        {step1 && empty && step1Add}
+        {step1 && empty && emptyAside ? (
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8 }}>{emptyAside}</div>
+        ) : null}
+        {!step1 && canAdd && (
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
@@ -134,16 +165,17 @@ export function MediaTray({
             key={it.id}
             style={{
               position: 'relative',
-              width: 72,
-              height: 72,
-              borderRadius: 12,
+              width: step1 ? 88 : 72,
+              height: step1 ? 88 : 72,
+              borderRadius: step1 ? 14 : 12,
               overflow: 'hidden',
               background: RV2.ghost,
               flexShrink: 0,
-              border: `1px solid ${RV2.hairline}`,
+              border: step1 ? 'none' : `1px solid ${RV2.hairline}`,
             }}
           >
             <ReviewMediaPreview {...it} />
+            {step1 && renderChip ? renderChip(it) : null}
             {it.type === 'video' && it.durationSeconds != null && <span className="review-upload-duration">{Math.floor(it.durationSeconds / 60)}:{String(Math.floor(it.durationSeconds % 60)).padStart(2, '0')}</span>}
             {it.analysing ? <div className="review-upload-overlay" aria-label="Preparing"><Loader2 size={18} className="motion-safe:animate-spin" /></div>
               : it.status === 'uploading' ? <div className="review-upload-overlay" role="progressbar" aria-label="Upload progress" aria-valuenow={Math.round(it.progress)} aria-valuemin={0} aria-valuemax={100}>
@@ -178,6 +210,7 @@ export function MediaTray({
             </button>
           </div>
         ))}
+        {step1 && !empty && step1Add}
       </div>
 
       {batch.total > 0 && <div className="review-upload-batch" aria-live="polite">

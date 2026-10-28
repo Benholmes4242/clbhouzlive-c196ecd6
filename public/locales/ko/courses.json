@@ -1841,8 +1841,6 @@
         "heading": "세부 평가"
       },
       "step2": {
-        "heading": "사진과 짧은 글",
-        "lede": "{{course}}에서 보람 하루의 무엇이든.",
         "optionalNote": "선택 사항입니다. 아래 항목도 모두 선택 사항입니다.",
         "photosEyebrow": "사진",
         "placeholder": "다른 골퍼가 플레이 전에 알아야 할 점은?",
@@ -1888,7 +1886,30 @@
         "confirmPost": "{{score}}점으로 게시",
         "confirmSave": "{{score}}점으로 저장"
       },
-      "uploadingMedia": "사진 업로드 중..."
+      "uploadingMedia": "사진 업로드 중...",
+      "stepOne": {
+        "headingStep1": "What was it like?",
+        "ledeStep1": "Everything here is optional. Your score comes next.",
+        "speakTitle": "Speak your review",
+        "speakSub": "Tap and talk, like you'd tell a mate in the bar. We'll write it down.",
+        "speakMoreTitle": "Speak to add more",
+        "speakMoreSub": "Each go adds to what's already there.",
+        "listeningTitle": "Listening…",
+        "listeningSub": "Tap the square when you've finished.",
+        "writingTitle": "Writing it down…",
+        "writingSub": "Your words appear below in a moment.",
+        "orTypeIt": "OR TYPE IT",
+        "typePlaceholder": "Type your review here",
+        "photosUpTo": "Up to 10",
+        "photosCount": "{{n}} of 10",
+        "tagHole": "Tag hole",
+        "holeGuideHint": "Tag a photo to its hole and it joins {{course}}'s hole guide on the course page.",
+        "continueToScore": "Continue to your score",
+        "skipToScore": "Skip to your score",
+        "wordsHeading": "YOUR WORDS",
+        "photosHeading": "PHOTOS AND VIDEOS",
+        "fromMembers": "from {{count}} members"
+      }
     },
     "write": {
       "body": "Your rating helps golfers worldwide",

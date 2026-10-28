@@ -22,9 +22,55 @@ interface Props {
   summary?: string | null;
   skipLabel?: string | null;
   onSkip?: () => void;
+  /** 'step1' = BRIEF_REVIEW_STEP_ONE §5 restyle; default unchanged. */
+  appearance?: 'default' | 'step1';
 }
 
-export function SubmitBar({ label, enabled, onPress, summary, skipLabel, onSkip }: Props) {
+export function SubmitBar({ label, enabled, onPress, summary, skipLabel, onSkip, appearance = 'default' }: Props) {
+  if (appearance === 'step1') {
+    return (
+      <div
+        data-submit-appearance="step1"
+        style={{
+          position: 'sticky',
+          bottom: 0,
+          background: 'linear-gradient(180deg, rgba(22,22,26,0) 0%, #16161A 22%)',
+          padding: '24px 20px calc(env(safe-area-inset-bottom, 0px) + 18px)',
+        }}
+      >
+        {summary ? (
+          <div style={{ fontSize: 12, lineHeight: 1.4, color: 'rgba(248,250,252,0.62)', textAlign: 'center', marginBottom: 10 }}>
+            {summary}
+          </div>
+        ) : null}
+        <button
+          type="button"
+          disabled={!enabled}
+          onClick={onPress}
+          style={{
+            width: '100%', height: 54, borderRadius: 16, border: 'none',
+            background: '#F3F5F7', color: '#0A0A0C', fontSize: 16.5, fontWeight: 700,
+            cursor: enabled ? 'pointer' : 'not-allowed', opacity: enabled ? 1 : 0.6,
+          }}
+        >
+          {label}
+        </button>
+        {skipLabel && onSkip ? (
+          <button
+            type="button"
+            onClick={onSkip}
+            data-step1-skip
+            style={{
+              display: 'block', width: '100%', marginTop: 12, background: 'transparent', border: 'none',
+              padding: 0, fontSize: 13, fontWeight: 650, color: 'rgba(248,250,252,0.62)', textAlign: 'center', cursor: 'pointer',
+            }}
+          >
+            {skipLabel}
+          </button>
+        ) : null}
+      </div>
+    );
+  }
   return (
     <div
       style={{
