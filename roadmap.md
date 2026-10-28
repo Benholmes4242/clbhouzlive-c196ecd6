@@ -1,5 +1,10 @@
 # Roadmap
 
+## Media tab round 3
+- [ ] Apply signed-off page order, Everything controls, place rail and picker titles.
+- [ ] Share the option B glass card across member single/batch/admin; preserve member saves and add existing admin place RPCs with cache refresh.
+- [ ] Add requested checks, retarget only superseded presentation assertions, delete MEDIA_TAB_FINAL_REPORT.md and report full-suite accounting against 3,734/414 (intervening CB117 +22, CB118 +33; current 3,789/416 with two known CB107 failures).
+
 ## CB118 — Visiting or Contact for non-club businesses
 - [x] Generalised ClubVisiting with opt-in non-club rows and shared hero booking callback; inserted after mentions, tabs retained. Added 33 CB118 tests and only user-authorized CB107/CB112 corrections.
 - [ ] STOP: protected cb107ClubVisiting.test.tsx:257:107 `AssertionError: expected false to be true // Object.is equality`; :273:43 `AssertionError: expected <div role="tablist" …(3)>…(3)</div> to be null`. New card resolves fixture waits before club-course query settles; no correction after stop. Await authorization for protected wait correction.
