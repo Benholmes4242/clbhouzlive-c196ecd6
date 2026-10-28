@@ -42,6 +42,10 @@ interface AddressAutocompleteProps {
   className?: string;
   disabled?: boolean;
   error?: string;
+  /** BC2: bare mode for the create-flow field card — no leading icon, no helper
+   *  text and no drop-pin link (the step's own country line covers both). The
+   *  precision warning and suggestions behaviour are unchanged. Default false. */
+  bare?: boolean;
 }
 
 interface AddressResult {
@@ -78,6 +82,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   className,
   disabled = false,
   error,
+  bare = false,
 }) => {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<AddressResult[]>([]);
