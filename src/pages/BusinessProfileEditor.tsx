@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
  *   /business/create         → create mode (no :id)
  *   /business/:id/edit       → edit mode  (loads existing)
  */
-import { fetchGolfClub, clubRowToSelected, clubInsertFields } from '@/features/business/claimClub';
+import { fetchGolfClub, clubRowToSelected } from '@/features/business/claimClub';
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -17,7 +17,6 @@ import { ManagePageSkeleton } from '@/components/skeletons/ManagePageSkeleton';
 import { toast } from '@/lib/toast';
 
 import { supabase } from '@/integrations/supabase/client';
-import { FunctionsHttpError } from '@supabase/supabase-js';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
@@ -75,35 +74,14 @@ import {
 
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 
-import type { Database, Json } from '@/integrations/supabase/types';
+import type { Json } from '@/integrations/supabase/types';
 import { Check } from 'lucide-react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { FIELD_LABEL, FIELD_INPUT_CLASS, FIELD_INPUT_STYLE, FIELD_PLACEHOLDER_CLASS } from '@/components/manage/fieldTreatment';
 
-/* ── save-failure reporting ─────────────────────────
- * A failed create names its own failure: the Postgres code/message/details/
- * hint as returned, the category, create vs edit, and the failing step. */
-class SaveStepError extends Error {
-  constructor(public step: string, public cause: unknown) {
-    super(errorText(cause) || step);
-  }
-}
-function pgFields(err: unknown) {
-  const e = (err ?? {}) as { code?: string; message?: string; details?: string; hint?: string };
-  return { code: e.code ?? null, message: e.message ?? String(err), details: e.details ?? null, hint: e.hint ?? null };
-}
-function errorText(err: unknown): string {
-  const { code, message, details } = pgFields(err);
-  return [message, details, code ? `(${code})` : null].filter(Boolean).join(' ');
-}
-const SESSION_ENDED_MSG = 'Your session has ended. Please sign in again; nothing has been saved yet.';
-function isAuthError(err: unknown): boolean {
-  const { code, message } = pgFields(err);
-  return code === 'PGRST301' || code === '42501' || /jwt|not authenticated|row-level security/i.test(message ?? '');
-}
-function logSaveFailure(step: string, err: unknown, ctx: Record<string, unknown>) {
-  AppLog.error('BusinessProfileEditor', `save failed at step: ${step}`, { step, ...ctx, ...pgFields(err), error: err });
-}
+import { createBusiness } from '@/features/business-create/createBusiness';
+import { BusinessOwnerlessNotice } from '@/features/business-create/BusinessCreationNotices';
+import { SaveStepError, pgFields, errorText, SESSION_ENDED_MSG, isAuthError, logSaveFailure } from '@/features/business-create/creationErrors';
 /** Mirrors public.normalize_club_key(): lower(trim(name)) with non [a-z0-9] removed. */
 function normalizeClubKey(name: string): string {
   return name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '');
@@ -190,7 +168,6 @@ export default function BusinessProfileEditor() {
   /* Ownerless-business notice: must be acknowledged, never times out. The
    * business id is the only way support can recover it. */
   const [ownerlessNotice, setOwnerlessNotice] = useState<{ name: string; id: string; target: string } | null>(null);
-  const [ownerlessCopied, setOwnerlessCopied] = useState(false);
   const [existingBusinessForClub, setExistingBusinessForClub] = useState<
     { id: string; name: string } | null
   >(null);
@@ -539,167 +516,10 @@ export default function BusinessProfileEditor() {
       const hasSocial = Object.values(socialLinks).some(Boolean);
 
       if (mode === 'create') {
-        const insertData: Database['public']['Tables']['business_accounts']['Insert'] = {
-          name: resolvedName,
-          category,
-          description: description || null,
-          founded_year: foundedYear ? parseInt(foundedYear, 10) : null,
-          website: website.trim() || null,
-          email: email.trim() || null,
-          phone: phone?.fullNumber || null,
-          booking_url: bookingUrl.trim() || null,
-          opening_hours: openingHours as unknown as Json,
-          social_links: hasSocial ? (socialLinks as unknown as Json) : null,
-          is_verified: false,
-          amenities,
-          primary_action: primaryAction || null,
-          show_opening_hours: showOpeningHours,
-        };
-
-
-
-
-        if (isGolfClub && selectedClub) {
-          // NOTE: club_id / club_key are intentionally NOT written here.
-          // Ownership of the course is granted only when an admin approves a
-          // course_claim_request (filed below after the business is created).
-          // Display fields (lat/lng/country) are safe to populate up-front.
-          const fromClub = clubInsertFields(selectedClub);
-          insertData.club_name = fromClub.club_name;
-          insertData.lat = fromClub.lat;
-          insertData.lng = fromClub.lng;
-          insertData.country = fromClub.country;
-        }
-
-        if (address) {
-          insertData.location = address.label;
-          insertData.address_label = address.label;
-          insertData.address_line1 = address.addressLine1 || null;
-          insertData.address_line2 = address.addressLine2 || null;
-          insertData.city = address.city || null;
-          insertData.region = address.region || null;
-          insertData.postcode = address.postcode || null;
-          if (!insertData.country) insertData.country = address.country || null;
-          if (insertData.lat == null) insertData.lat = address.lat ?? null;
-          if (insertData.lng == null) insertData.lng = address.lng ?? null;
-          insertData.mapbox_place_id = address.mapboxPlaceId || null;
-          insertData.location_precision = dbLocationPrecision(address.precision);
-        }
-
-        const { data: row, error: insertErr } = await supabase
-          .from('business_accounts')
-          .insert(insertData)
-          .select('id, slug')
-          .single();
-        if (insertErr) throw new SaveStepError('insert', insertErr);
-        const newId = row.id;
-
-        // images after insert
-        const partials: string[] = [];
-        let logoUrl: string | null = null;
-        let coverUrlVal: string | null = null;
-        if (logo.pendingFile) {
-          // direct upload path — useBusinessImageUpload requires id, so call it directly via a transient hook is awkward.
-          // Instead inline the same supabase update once we have the id.
-          // Simpler: use a one-off uploader by calling the same hook signature via a helper.
-          try { logoUrl = await uploadImageDirect(newId, logo.pendingFile, 'logo'); }
-          catch (e) { logSaveFailure('logo upload', e, { category, mode, businessId: newId }); partials.push('logo'); }
-        }
-        if (cover.pendingFile) {
-          try { coverUrlVal = await uploadImageDirect(newId, cover.pendingFile, 'cover'); }
-          catch (e) { logSaveFailure('cover upload', e, { category, mode, businessId: newId }); partials.push('cover photo'); }
-        }
-        if (logoUrl || coverUrlVal) {
-          const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
-          if (logoUrl) patch.logo_url = logoUrl;
-          if (coverUrlVal) patch.cover_image_url = coverUrlVal;
-          const { error: patchErr } = await supabase.from('business_accounts').update(patch).eq('id', newId);
-          if (patchErr) {
-            logSaveFailure('image patch', patchErr, { category, mode, businessId: newId });
-            partials.push('photos');
-          }
-        }
-
-        // owner row. A DB trigger is believed to auto-create the owner
-        // membership, but that trigger is NOT in this repo's migrations, so
-        // this upsert may be the only writer. A failure leaves an ownerless
-        // business: data damage, not a warning. It is reported loudly (fatal
-        // severity) but the business is NOT deleted — a known half-created
-        // business is recoverable; a deleted one with uploaded images is not.
-        const { error: memberErr } = await supabase
-          .from('business_members')
-          .upsert(
-            { business_id: newId, user_profile_id: user.id, role: 'owner' },
-            { onConflict: 'business_id,user_profile_id', ignoreDuplicates: true },
-          );
-        if (memberErr) {
-          logSaveFailure('members upsert (FATAL: ownerless business)', memberErr, {
-            severity: 'fatal', category, mode, businessId: newId, businessName: resolvedName,
-          });
-          // Persistent, acknowledged panel — navigation happens on dismiss.
-          setOwnerlessCopied(false);
-          setOwnerlessNotice({ name: resolvedName, id: newId, target: `/business/${row.slug || newId}` });
-          return;
-        }
-
-        // For golf-club businesses: file a course-claim request for admin review.
-        // The business is already created; the claim links club ownership only on approval.
-        // Do NOT hard-fail the save if the claim submit errors — surface softly.
-        let claimFiled = false;
-        let claimError: string | null = null;
-        if (isGolfClub && selectedClub) {
-          const { error: claimErr } = await supabase.functions.invoke('request-course-claim', {
-            body: {
-              business_id: newId,
-              club_id: selectedClub.id,
-              club_key: selectedClub.club_key || null,
-              // Editor path may be a whole-club claim or originate from a course page.
-              source_course_id: searchParams.get('sourceCourseId') || null,
-              proof_note: claimProofNote.trim() || null,
-            },
-          });
-          if (claimErr) {
-            // FunctionsHttpError's `.message` is generic ("non-2xx status code").
-            // The real message lives in the JSON response body.
-            let msg = 'This club may already be claimed or under review.';
-            if (claimErr instanceof FunctionsHttpError) {
-              try {
-                const body = await claimErr.context.json();
-                if (body?.error) msg = body.error;
-                else if (body?.message) msg = body.message;
-              } catch {
-                /* keep fallback */
-              }
-            } else if (claimErr.message) {
-              msg = claimErr.message;
-            }
-            claimError = msg;
-            logSaveFailure('claim invoke', claimErr, { category, mode, businessId: newId, body: msg });
-          } else {
-            claimFiled = true;
-          }
-        }
-
-        // The business exists from here on. A refresh failure must never reach
-        // the outer catch and report a failed create (which invites a duplicate).
-        try {
-          await queryClient.invalidateQueries({
-            predicate: (query) => {
-              const k = query.queryKey;
-              if (!Array.isArray(k) || typeof k[0] !== 'string') return false;
-              const key = k[0];
-              return (
-                key === 'my-businesses' ||
-                key === 'business-profile' ||
-                key === 'business-directory' ||
-                key === 'suggestedBusinesses' ||
-                key.startsWith('business-')
-              );
-            },
-          });
-        } catch (e) {
-          logSaveFailure('query refresh after create', e, { category, mode, businessId: newId });
-        }
+        const result = await createBusiness({ category, selectedClub, selectedCollege, businessName, description, foundedYear, claimProofNote, address, countrySelection, phone, email, website, bookingUrl, openingHours, showOpeningHours, logo, cover, social, amenities, primaryAction }, { userId: user.id, sourceCourseId: searchParams.get('sourceCourseId'), queryClient });
+        if (result.ownerless) { setOwnerlessNotice(result.ownerless); return; }
+        const { partials, claimError } = result;
+        const claimFiled = result.claim === 'filed';
         if (partials.length) {
           toast.warning(`Your ${partials.join(' and ')} didn't save. You can add ${partials.length > 1 ? 'them' : 'it'} in Edit.`);
         }
@@ -712,7 +532,7 @@ export default function BusinessProfileEditor() {
               : 'Business created',
           );
         }
-        navigate(`/business/${row.slug || newId}`);
+        navigate(`/business/${result.slug || result.id}`);
         return;
       }
 
@@ -1095,43 +915,7 @@ export default function BusinessProfileEditor() {
 
 
 
-      {/* Ownerless business — must be acknowledged */}
-      <AlertDialog open={!!ownerlessNotice} onOpenChange={() => { /* dismiss only via the button */ }}>
-        <AlertDialogContent onEscapeKeyDown={(e) => e.preventDefault()}>
-          <AlertDialogHeader>
-            <AlertDialogTitle>You are not yet listed as the owner</AlertDialogTitle>
-            <AlertDialogDescription>
-              "{ownerlessNotice?.name}" was created, but you are not yet listed as its owner.
-              Contact support to fix it and quote this business id.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="flex items-center gap-2 rounded-md border border-border bg-muted px-3 py-2">
-            <code className="flex-1 break-all text-[13px] tabular-nums text-foreground">{ownerlessNotice?.id}</code>
-            <button
-              type="button"
-              className="text-[13px] font-semibold text-primary"
-              onClick={async () => {
-                if (!ownerlessNotice) return;
-                try { await navigator.clipboard.writeText(ownerlessNotice.id); setOwnerlessCopied(true); }
-                catch { setOwnerlessCopied(false); }
-              }}
-            >
-              {ownerlessCopied ? 'Copied' : 'Copy id'}
-            </button>
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogAction
-              onClick={() => {
-                const t = ownerlessNotice?.target;
-                setOwnerlessNotice(null);
-                if (t) navigate(t);
-              }}
-            >
-              I've noted it
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <BusinessOwnerlessNotice notice={ownerlessNotice} onDismiss={() => { const target = ownerlessNotice?.target; setOwnerlessNotice(null); if (target) navigate(target); }} />
 
       {/* Close confirm */}
       <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
@@ -1187,24 +971,3 @@ export default function BusinessProfileEditor() {
   );
 }
 
-/* ─────────────────────── helpers ─────────────────────── */
-
-// Inline image uploader for create mode — mirrors useBusinessImageUpload but
-// works against a freshly-inserted business id without requiring the hook to
-// re-bind.
-async function uploadImageDirect(
-  businessId: string,
-  file: File,
-  kind: 'logo' | 'cover'
-): Promise<string | null> {
-  const { uploadToR2Only } = await import('@/utils/r2OnlyUpload');
-  const bucket = kind === 'logo' ? 'clbhouz-club-logos' : 'clbhouz-profile-banners';
-  const ext = file.name.split('.').pop();
-  const path = `${businessId}/${kind}-${Date.now()}.${ext}`;
-  const result = await uploadToR2Only(file, bucket, path);
-  if (!result.success) {
-    AppLog.error('[BusinessProfileEditor]', `${kind} upload failed`, result.error);
-    return null;
-  }
-  return result.publicUrl || null;
-}
