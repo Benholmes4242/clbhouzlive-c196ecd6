@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { TourHubShell } from '../components/TourHubShell';
@@ -19,8 +19,6 @@ import { TourIcon } from '../components/tourIslandIcons';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { safeGoBack } from '@/utils/navigation';
-
-import { useLogout } from '@/hooks/useLogout';
 
 /**
  * SubTabTourControl — the sub-tab header's tour control (BRIEF_TOUR_ISLAND):
@@ -48,7 +46,8 @@ function SubTabTourControl({ activeTab, onOpen }: { activeTab: string; onOpen: (
 
 const TAB_TITLES: Record<string, string> = {
   news: 'News',
-  live: 'Live',
+  /* BRIEF_TOUR_ISLAND §4: the tab reads "Leaderboards", not "Live". */
+  live: 'Leaderboards',
   schedule: 'Schedule',
   players: 'Players',
   leaderboards: 'Leaders',
@@ -168,8 +167,6 @@ export function TourHubMainPage() {
     window.addEventListener('clbhouz-active-tab-retap', onRetap);
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
   }, [setSearchParams]);
-
-  const { logout } = useLogout();
 
   const renderTab = () => {
     switch (activeTab) {
