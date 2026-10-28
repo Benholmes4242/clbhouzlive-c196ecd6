@@ -133,7 +133,7 @@ const BusinessProfilePage: React.FC = () => {
   // Club courses (club_id only): EVERY course under the business's club.
   // A 36-hole club has two and a resort may have more; returning one row
   // silently hid half of the club's golf.
-  const { data: clubCourses } = useQuery({
+  const { data: clubCourses, isPending: clubCoursesPending } = useQuery({
     queryKey: ['business-club-courses', business?.club_id],
     enabled: !!business?.club_id,
     staleTime: 5 * 60 * 1000,
@@ -279,7 +279,7 @@ const BusinessProfilePage: React.FC = () => {
   };
 
   // ----- early returns -----
-  if (authLoading || isLoading) {
+  if (authLoading || isLoading || (business?.club_id && clubCoursesPending)) {
     // Same skeleton as the personal profile, configured: hero + headline
     // figure + four-cell strip, no Top 10 rail, three chip tabs.
     return <ProfileSurfaceSkeleton headline counters={4} tabs={3} />;
