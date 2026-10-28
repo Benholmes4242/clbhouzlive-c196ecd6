@@ -1,5 +1,11 @@
 # Roadmap
 
+## Course gallery — signed-off viewer
+- [ ] Add course gallery mode to the canonical viewer; shared filter order, hole info, grid and same-shot tagging.
+- [ ] Route every Media entry/deep link into the gallery; remove inline hole panel and obsolete focus logic.
+- [ ] Add ready thumbnail fallbacks, gallery translations and rule tests; inventory authorized retargets and run full suite against 3,832/419 (brief baseline 3,816/418 predates CB119).
+- [ ] Verify available browser flow and report protected scope and environmental limitations.
+
 ## CB118.2 — Correct loading watcher and isolate Media timeouts
 - [x] Watch only non-club tablist, business card roots and non-club Visiting variant; all assertions and accepted loading gate unchanged. Exact marker/old-new selector inventory in CB118_2_REPORT.md.
 - [x] Five Media files and all six timeout cases pass in isolation; business59/59. Single full bunx vitest run3,816/3,816 across418 files, zero failures, no test count delta. Media code/timeouts/Hole7 test unchanged; delete prior Media stop report after preserving historical inventory.
