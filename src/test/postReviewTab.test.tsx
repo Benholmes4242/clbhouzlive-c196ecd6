@@ -1,5 +1,5 @@
-/** Post/review centre tab: POST / two-way arrows / REVIEW, arrows as wide as
- *  the measured word POST, aria-label "Post or review", tap opens step 1. */
+/** Post/review centre tab: POST / fixed 16×16 two-way arrows / REVIEW,
+ *  aria-label "Post or review", tap opens step 1. */
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
@@ -21,15 +21,17 @@ import { navigationTabs } from '@/components/bottom-navigation/navigationTabs';
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 describe('Post or review centre tab', () => {
-  it('renders POST, the arrows and REVIEW in order, arrows exactly as wide as POST', () => {
-    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ width: 31.5, height: 9 } as DOMRect);
+  it('renders POST, the arrows and REVIEW in order, arrows a fixed 16 x 16 svg', () => {
     const { container } = render(<PostReviewMark color="#F7931E" />);
     const rows = [...container.querySelectorAll('[data-post-review-row]')].map((el) => el.getAttribute('data-post-review-row'));
     expect(rows).toEqual(['post', 'arrows', 'review']);
     const svg = container.querySelector('svg')!;
-    expect(svg.getAttribute('width')).toBe('31.5');
-    expect(svg.getAttribute('viewBox')).toBe('0 0 31.5 14');
-    expect(svg.querySelectorAll('path')[0].getAttribute('d')).toBe('M1 4H30.5M26.5 0.8 30.5 4 26.5 7.2');
+    expect(svg.getAttribute('width')).toBe('16');
+    expect(svg.getAttribute('height')).toBe('16');
+    expect(svg.getAttribute('viewBox')).toBe('0 0 24 24');
+    expect(svg.getAttribute('stroke-width')).toBe('2.4');
+    expect(svg.querySelectorAll('path')[0].getAttribute('d')).toBe('M8 7H20M16 3l4 4-4 4');
+    expect(svg.querySelectorAll('path')[1].getAttribute('d')).toBe('M16 17H4M8 13l-4 4 4 4');
   });
 
   it('labels the tab "Post or review", keeps id post, and opens ComposerFlowSheet on tap', () => {
