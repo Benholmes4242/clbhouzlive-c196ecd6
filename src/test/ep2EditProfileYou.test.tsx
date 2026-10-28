@@ -118,7 +118,7 @@ describe('EP2 Username', () => {
   });
   it('input follows the setup rules', () => {
     mount(); open('username'); const i = screen.getByRole('textbox', { name: 'Username' });
-    expect(i).toHaveAttribute('autocapitalize', 'none'); expect(i).toHaveAttribute('autocorrect', 'off'); expect(i).toHaveAttribute('spellcheck', 'false'); expect(i).toHaveAttribute('maxlength', '30');
+    expect(i).toHaveAttribute('autocapitalize', 'none'); expect(i).toHaveAttribute('autocorrect', 'off'); expect(i).toHaveAttribute('spellcheck', 'false'); expect(i).toHaveAttribute('maxlength', '20');
   });
   it('ok calls change_username, closes and updates the card and the row', async () => {
     mount(); open('username'); await type('benholmes');

@@ -7,8 +7,9 @@
  * fallback override for old deep links.
  */
 
-import { useEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { renamedProfilePath, resolvePreviousUsername } from '@/lib/profile/previousUsername';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -27,6 +28,25 @@ export default function ProfileSocialListRoute({ direction }: Props) {
     searchTab === 'followers' || searchTab === 'following' ? searchTab : direction;
   const { data: profile, isLoading, isError, refetch } = useUserByUsername(username);
   const { user: viewer } = useSupabaseSession();
+  const location = useLocation();
+  const navigate = useNavigate();
+  /* EP2.1: an old username resolves to the current one, exactly as
+     ProfilePageV2 does; the URL is replaced keeping direction, query and hash.
+     Any failure or empty answer falls through to the not-found state. */
+  const missing = !isLoading && !isError && !profile && !!username;
+  const [notFoundFor, setNotFoundFor] = useState<string | null>(null);
+  useEffect(() => {
+    if (!missing) return;
+    let cancelled = false;
+    void resolvePreviousUsername(username!).then((current) => {
+      if (cancelled) return;
+      if (current) {
+        navigate(renamedProfilePath(location.pathname, username!, current, location.search, location.hash), { replace: true });
+      } else setNotFoundFor(username!);
+    });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [missing, username]);
   const isOwnProfile = !!viewer?.id && !!profile?.id && viewer.id === profile.id;
 
   useEffect(() => {
@@ -39,7 +59,7 @@ export default function ProfileSocialListRoute({ direction }: Props) {
     }
   }, [profile?.id, initialTab]);
 
-  if (isLoading) {
+  if (isLoading || (missing && notFoundFor !== username)) {
     return (
       <div style={{ minHeight: '100dvh', background: A.CANVAS, paddingTop: 'calc(var(--chrome-total-h, 0px) + 24px)' }}>
         <ListSkeleton />

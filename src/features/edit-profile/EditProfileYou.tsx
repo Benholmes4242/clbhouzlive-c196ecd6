@@ -11,7 +11,8 @@ import { Check, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { BizcSheet } from '@/features/business-create/BusinessCreateStep3';
 import { LocationSection } from '@/components/profile/edit-v2/LocationSection';
-import { BIO_MAX, DISPLAY_NAME_MAX, USERNAME_MAX } from '@/components/profile/profile-wizard/types';
+import { BIO_MAX, DISPLAY_NAME_MAX } from '@/components/profile/profile-wizard/types';
+import { USERNAME_RULE_MAX } from '@/features/onboarding/welcomeRules';
 import { GENDER_OPTIONS, USERNAME_RE, fullName, genderLabel, locationValue, shownName, startsWithDifferentName, usernameTooSoon } from './youRules';
 
 export type YouFields = 'name' | 'bio' | 'location' | 'gender';
@@ -171,7 +172,7 @@ function UsernameSheet({ userId, username, usernameChangedAt, onClose, onUsernam
         <span className="bizc-field-label">{t('editProfile.username', { defaultValue: 'Username' })}</span>
         <span className="ep-loc-value">
           <span className="ep-at">@</span>
-          <input className="bizc-field-input ep-loc-input" aria-label="Username" value={value} readOnly={!!soon} autoCapitalize="none" autoCorrect="off" spellCheck={false} autoComplete="username" maxLength={USERNAME_MAX}
+          <input className="bizc-field-input ep-loc-input" aria-label="Username" value={value} readOnly={!!soon} autoCapitalize="none" autoCorrect="off" spellCheck={false} autoComplete="username" maxLength={USERNAME_RULE_MAX}
             onChange={e => setValue(e.target.value.toLowerCase())} />
           {status === 'available' && <span className="ep-available" data-testid="ep-available"><Check size={12} />{t('welcome.available', { defaultValue: 'Available' })}</span>}
         </span>
