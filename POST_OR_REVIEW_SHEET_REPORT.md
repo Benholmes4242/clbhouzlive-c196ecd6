@@ -68,3 +68,12 @@ Deleted source: `src/features/composer-flow/hooks/useRecentCoursesForComposer.ts
 Project memory updated to preserve the signed-off sheet requirements.
 
 No SQL, migration files, deployed RPC/edge changes, feed_config, round_pool_cap or native/Median configuration changes.
+
+## Follow-up — preview typing errors corrected
+The follow-up explicitly requested correction of every preview type error, including inherited ones.
+- `src/test/postOrReviewSheet.test.tsx:31` and `src/test/reviewSuggestions.test.tsx:36`: `initImmediate: false` -> supported `initAsync: false`; assertions/case names unchanged.
+- `src/components/GlobalBottomNavigation.tsx:41`: type the existing word style as `React.CSSProperties & { textBox: string }`; no rendered values, arrows, labels or behavior changed. This is one additional changed file beyond the inventory above.
+- Automatic preview check at 2026-10-28T21:38:07Z: **build OK**. The three earlier type errors are resolved.
+- Targeted command: `bunx vitest run src/test/postOrReviewSheet.test.tsx src/test/reviewSuggestions.test.tsx src/features/post-v2/__tests__/postPhase3.test.ts` — 45/45 across 3 files.
+- Full command: `bunx vitest run` — **4,182 passed / 2 pre-existing failures / 4,184 total across 441 files**, unchanged from the previous run. The same BC5 TypeError and POST/REVIEW text-box assertion reproduced exactly as quoted above; neither failing test was edited. No new failures, additions, removals, renamed cases or changed assertions in this follow-up.
+- Full log: `/tmp/post-or-review/typefix-full-suite.log`.
