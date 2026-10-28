@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import React, { useEffect, useLayoutEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
@@ -33,6 +33,34 @@ const LIVE_DIM = (() => {
   const n = parseInt(h, 16);
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},0.62)`;
 })();
+
+/* Centre tab (post-review-tab brief): POST / two-way arrows / REVIEW. The
+   arrows are exactly as wide as the rendered word POST, measured in a layout
+   effect (27px before measuring). Labels share the other tabs' style; the
+   -0.13em right margin cancels trailing tracking so each word centres. */
+const POST_REVIEW_WORD: React.CSSProperties = {
+  fontSize: 9, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase',
+  lineHeight: 1, whiteSpace: 'nowrap', marginRight: '-0.13em',
+};
+export function PostReviewMark({ color }: { color: string }) {
+  const postRef = useRef<HTMLSpanElement>(null);
+  const [w, setW] = useState(27);
+  useLayoutEffect(() => {
+    const measured = postRef.current?.getBoundingClientRect().width;
+    if (measured && measured > 0) setW(measured);
+  }, []);
+  return (
+    <>
+      <span ref={postRef} aria-hidden="true" data-post-review-row="post" style={{ ...POST_REVIEW_WORD, color }}>Post</span>
+      <svg aria-hidden="true" data-post-review-row="arrows" width={w} height={14} viewBox={`0 0 ${w} 14`} style={{ display: 'block' }}
+        fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <path d={`M1 4H${w - 1}M${w - 5} 0.8 ${w - 1} 4 ${w - 5} 7.2`} />
+        <path d={`M${w - 1} 10H1M5 6.8 1 10 5 13.2`} />
+      </svg>
+      <span aria-hidden="true" data-post-review-row="review" style={{ ...POST_REVIEW_WORD, color }}>Review</span>
+    </>
+  );
+}
 
 
 // ---- Public token: total vertical space to reserve at the bottom of any
@@ -440,7 +468,41 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
 
 
                   return (
-                    <li key={tab.id} style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                    <li key={tab.id} data-nav-slot={tab.id} style={{ flex: tab.id === 'post' ? 1.15 : 0.96, display: 'flex', justifyContent: 'center' }}>
+                      {tab.id === 'post' ? (
+                        <button
+                          type="button"
+                          aria-label="Post or review"
+                          aria-current={isActive ? 'page' : undefined}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleTabClickWithCamera(tab);
+                          }}
+                          style={{
+                            appearance: 'none',
+                            border: 0,
+                            background: isActive ? tokens.lozenge : 'transparent',
+                            color: iconColor,
+                            padding: '0 3px 5.5px',
+                            boxSizing: 'border-box',
+                            height: 46,
+                            borderRadius: r.md,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            gap: 3,
+                            width: '100%',
+                            minWidth: 0,
+                            fontFamily: 'inherit',
+                            cursor: 'pointer',
+                            transition: BUTTON_TRANSITION,
+                          }}
+                        >
+                          <PostReviewMark color={iconColor} />
+                        </button>
+                      ) : (
                       <button
                         type="button"
                         aria-label={tab.label}
@@ -530,6 +592,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                           {tab.label}
                         </span>
                       </button>
+                      )}
                     </li>
                   );
                 })}

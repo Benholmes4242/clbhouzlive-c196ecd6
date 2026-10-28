@@ -944,7 +944,7 @@ export function ExploreCard({
    *  are byte-identical. */
   feedPlot?: boolean;
   /** CB111 — FEEDCARD MEDIAFIRST ROUNDS ONLY. 'scoreLed' reorders the round
-   *  card: author row, the gross-led score block, the course name, the chart,
+   *  card: author row, the net-led score block, the course name, the chart,
    *  and NO engagement of the card's own (FeedCard appends the shared
    *  media-first footer). Absent everywhere else, so ExploreMagazine,
    *  FeaturedRoundCard and FeedCard's standard layout render exactly as
@@ -1614,7 +1614,10 @@ export function ExploreCard({
   );
 
   /* CB111 — SCORE-LED FEED ROUND (FeedCard mediaFirst only; round-scoreled.html
-     is the signed-off spec). Order: author row; the gross-led score block;
+     is the signed-off spec). Order: author row; the net-led score block
+     (big net; gross then handicap small on the right; big gross only when
+     net cannot be shown, and then gross is never printed twice);
+     28 Oct 2026: corrected to net-led; gross moved to the right group.
      the course name; the chart (the same plot or photograph the card draws
      today); the round-feat panel where it already sits. The card renders NO
      engagement row of its own — FeedCard appends the shared media-first
@@ -1651,7 +1654,15 @@ export function ExploreCard({
           <RoundAuthorRow item={item} onWhoTap={onWhoTap} isFollowed={isFollowed} onFollow={onFollow} />
         </span>
         <span data-round-score-block="true" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '14px 14px 0' }}>
-          {gross != null ? (
+          {netShown ? (
+            <span style={{ minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <span data-round-score-net="true" style={{ ...FIGS, fontSize: 46, fontWeight: 700, letterSpacing: 0, lineHeight: 1, color: A.INK, whiteSpace: 'nowrap' }}>
+                {String(net)}
+                {netToParText ? <span data-round-score-net-topar="true" style={{ ...NUMF, fontSize: 17, fontWeight: 600, color: toParColor(netToPar), marginLeft: 6 }}>{netToParText}</span> : null}
+              </span>
+              <span style={{ ...cellLabel, marginTop: 6 }}>{t('amateur.stream.stat.net', 'Net')}</span>
+            </span>
+          ) : gross != null ? (
             <span style={{ minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
               <span data-round-score-gross="true" style={{ ...FIGS, fontSize: 46, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color: A.INK, whiteSpace: 'nowrap' }}>
                 {String(gross)}
@@ -1661,13 +1672,13 @@ export function ExploreCard({
             </span>
           ) : <span />}
           <span style={{ display: 'flex', gap: 22, paddingBottom: 16, flex: '0 0 auto' }}>
-            {netShown ? (
-              <span data-round-score-net="true" style={{ textAlign: 'center' }}>
+            {netShown && gross != null ? (
+              <span data-round-score-gross="true" style={{ textAlign: 'center' }}>
                 <span style={{ ...FIGS, fontSize: 17, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap' }}>
-                  {String(net)}
-                  {netToParText ? <span data-round-score-net-topar="true" style={{ ...NUMF, fontSize: 12, fontWeight: 600, color: toParColor(netToPar), marginLeft: 3 }}>{netToParText}</span> : null}
+                  {String(gross)}
+                  {grossToParText ? <span data-round-score-gross-topar="true" style={{ ...NUMF, fontSize: 12, fontWeight: 600, color: toParColor(grossToPar), marginLeft: 3 }}>{grossToParText}</span> : null}
                 </span>
-                <span style={{ ...cellLabel, marginTop: 5 }}>{t('amateur.stream.stat.net', 'Net')}</span>
+                <span style={{ ...cellLabel, marginTop: 5 }}>{t('amateur.stream.stat.gross', 'Gross')}</span>
               </span>
             ) : null}
             {nettable ? (
