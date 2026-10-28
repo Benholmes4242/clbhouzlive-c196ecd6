@@ -27,13 +27,14 @@ export function openTagShot(shot: TagShot, originEl: HTMLElement) {
 }
 
 export function ShotTagCard({ shot, position, credit, holes, hole, place, onHole, onPlace,
-  pending, locked = false, canSubmit, onSubmit, onSkip, onClose, remove, children, strip }: {
+  pending, locked = false, canSubmit, onSubmit, onSkip, onClose, remove, children, strip, gallerySingle = false }: {
   shot: TagShot; position?: { i: number; n: number }; credit?: string;
   holes: readonly number[]; hole: number | null; place: CoursePlace | null;
   onHole: (hole: number) => void; onPlace: (place: CoursePlace) => void;
   pending: boolean; locked?: boolean; canSubmit: boolean; onSubmit: () => void;
   onSkip: () => void; onClose: () => void; remove?: { onClick: () => void; pending?: boolean };
   children?: ReactNode; strip?: ReactNode;
+  gallerySingle?: boolean;
 }) {
   const { t } = useTranslation('courses');
   const close = () => { if (!pending) onClose(); };
@@ -44,7 +45,7 @@ export function ShotTagCard({ shot, position, credit, holes, hole, place, onHole
     <div className="media-v3-tag-card" data-scorecard-scroll onClick={event => event.stopPropagation()}>
       <div className="media-v3-tag-header">
         <Button variant="ghost" className="media-v3-tag-thumbnail" aria-label={t('media.v3.viewShot', { defaultValue: 'View shot' })}
-          onClick={event => openTagShot(shot, event.currentTarget)}>
+          onClick={event => { if (!gallerySingle) openTagShot(shot, event.currentTarget); }}>
           <HoleMediaThumbnail {...shot} alt={shot.mediaType === 'video' ? 'Current video' : 'Current photograph'} />
         </Button>
         <div className="media-v3-tag-heading">
@@ -59,7 +60,7 @@ export function ShotTagCard({ shot, position, credit, holes, hole, place, onHole
       <ShotTagChoices holes={holes} hole={hole} onHole={onHole} place={place} onPlace={onPlace} disabled={pending || locked} lockedHole={locked} />
       {remove && <Button variant="ghost" className="media-v3-tag-remove" disabled={pending} onClick={remove.onClick}>{remove.pending ? t('media.v3.removing', { defaultValue: 'Removing...' }) : t('media.v3.remove', { defaultValue: 'Remove tag' })}</Button>}
       <div className="media-v3-tag-buttons">
-        <Button variant="outline" className="media-v3-tag-skip" disabled={pending} onClick={onSkip}>{t('media.v3.skip', { defaultValue: 'Skip' })}</Button>
+        <Button variant="outline" className="media-v3-tag-skip" disabled={pending} onClick={onSkip}>{gallerySingle ? t('media.gallery.cancel', { defaultValue: 'Cancel' }) : t('media.v3.skip', { defaultValue: 'Skip' })}</Button>
         <Button className="media-v3-tag-primary" data-tag-primary disabled={!canSubmit || pending} onClick={onSubmit}>{primary}</Button>
       </div>
     </div>

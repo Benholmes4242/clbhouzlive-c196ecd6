@@ -15,6 +15,7 @@
  * falls back to today's plain opacity fade.
  */
 import type { FeedPost } from '@/components/media-system/types/media';
+import type { CourseGalleryOptions, GalleryData } from '@/lib/courseMedia/courseGallery';
 import { useFullscreenFeedStore, type OpenOrigin, type BorrowDescriptor } from '@/store/fullscreenFeedStore';
 import { VideoEngine } from '@/video/VideoEngine';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
@@ -121,6 +122,8 @@ interface OpenWithOriginArgs {
   zIndex?: number;
 
   options?: {
+    courseGallery?: CourseGalleryOptions;
+    galleryData?: GalleryData;
     openCommentsInitially?: boolean;
     initialCommentId?: string | null;
     onClose?: () => void;
