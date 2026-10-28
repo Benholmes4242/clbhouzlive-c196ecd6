@@ -6,7 +6,6 @@ import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { resolvePostAuthRoute } from '@/lib/auth/postAuthRoute';
-import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 interface AuthProps {
   defaultSignUp?: boolean;
@@ -93,7 +92,8 @@ const Auth: React.FC<AuthProps> = () => {
     return (
       <div
         aria-hidden
-        style={{ position: 'fixed', inset: 0, background: PAGE_CANVAS, zIndex: 50 }}
+        data-auth-signed-in-hold
+        style={{ position: 'fixed', inset: 0, background: 'var(--welcome-canvas)', zIndex: 50 }}
       />
     );
   }
