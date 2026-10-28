@@ -77,6 +77,7 @@ const HIDDEN_ROUTES = [
   '/messages',
   '/join',
   '/post-v2',
+  '/edit-profile-v2',
 ];
 
 const HIDDEN_ROUTE_PREFIXES = [

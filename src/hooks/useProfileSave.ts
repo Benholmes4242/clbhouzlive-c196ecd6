@@ -18,7 +18,7 @@ export function useProfileSave(userId: string) {
 
   const save = async (
     form: ProfileFormData,
-    opts: { isOnboarding?: boolean; hasWhsConnection?: boolean; welcomeFields?: 'identity' | 'course' } = {}
+    opts: { isOnboarding?: boolean; hasWhsConnection?: boolean; welcomeFields?: 'identity' | 'course'; photoField?: 'profile' | 'header' } = {}
   ): Promise<boolean | 'username_taken'> => {
     const { isOnboarding = false, hasWhsConnection = false } = opts;
     setIsSaving(true);
@@ -102,6 +102,19 @@ export function useProfileSave(userId: string) {
       if (isOnboarding && form.username.trim()) {
         updatePayload.username = form.username.trim();
         updatePayload.username_is_custom = true;
+      }
+
+      // EP1 opt-in: Edit profile saves one photo field at once through the
+      // same upload above, never the rest of the form.
+      if (opts.photoField) {
+        const payload = opts.photoField === 'profile'
+          ? { profile_photo_url: profilePhotoUrl, updated_at: updatePayload.updated_at }
+          : { header_photo_url: headerPhotoUrl, updated_at: updatePayload.updated_at };
+        const { data, error } = await supabase.from('user_profiles').update(payload).eq('id', userId).select('id').single();
+        if (error) throw error;
+        if (!data) throw new Error('Profile update did not match any row');
+        await queryClient.invalidateQueries({ queryKey: ['profile', userId] });
+        return true;
       }
 
       // OB1 saves only the completed screen through this upload/save path.
