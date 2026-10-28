@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type React from 'react';
 import { cleanup, render } from '@testing-library/react';
 
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { auth: { getSession: async () => ({ data: { session: { access_token: 'tok' } } }) } } }));
@@ -30,13 +31,13 @@ describe('OB1.4 handicap already linked to another account', () => {
     expect(isLinkedElsewhere('eg_auth_failed', RULE)).toBe(false);
   });
   it('the form shows the already-linked copy with its second line in the existing error style', () => {
-    const view = render(<EnglandGolfForm {...({ onSubmit: vi.fn(), submitting: false, error: 'This handicap is already linked to another clbhouz account.', errorKind: 'linked_elsewhere' } as never)} />);
+    const view = render(<EnglandGolfForm {...({ onSubmit: vi.fn(), submitting: false, error: 'This handicap is already linked to another clbhouz account.', errorKind: 'linked_elsewhere' } as unknown as React.ComponentProps<typeof EnglandGolfForm>)} />);
     const el = view.container.querySelector('[data-connect-error="linked_elsewhere"]');
     expect(el?.textContent).toContain('This handicap is already linked to another clbhouz account.');
     expect(el?.textContent).toContain('Sign in to that account to see it, or use a different membership number.');
   });
   it('a generic internal_error shows no second line', () => {
-    const view = render(<EnglandGolfForm {...({ onSubmit: vi.fn(), submitting: false, error: 'Something went wrong on our side. Please try again in a moment.', errorKind: 'other' } as never)} />);
+    const view = render(<EnglandGolfForm {...({ onSubmit: vi.fn(), submitting: false, error: 'Something went wrong on our side. Please try again in a moment.', errorKind: 'other' } as unknown as React.ComponentProps<typeof EnglandGolfForm>)} />);
     expect(view.container.querySelector('[data-connect-error="other"]')?.textContent).not.toContain('Sign in to that account');
   });
 });
