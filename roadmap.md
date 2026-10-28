@@ -1,5 +1,11 @@
 # Roadmap
 
+## BC4 — Create a business profile appearance
+- [x] Reconcile step 3 with panels 3A–3E: chips, sheet grabber, phone chip, hours helper/time pairs/day sizing/switches and fixed footer.
+- [x] Add draft-only step 4, shared cropper options, image actions and history-preserved finish.
+- [x] Full `bunx vitest run`: 4,082/4,082 across 434 files; +22/+1 solely bc4BusinessCreate.test.tsx. All existing tests untouched; inherited ob1Welcome upload test passes unchanged.
+- [ ] STOP: src/test/bc4BusinessCreate.test.tsx(44,63): error TS2739: Type '{ id: string; name: string; country: string; sub_country: string; region: string; }' is missing the following properties from type 'SelectedClub': club_key, latitude, longitude. No corrections or reruns after this completed-edit error. Authenticated visual verification unavailable (external_unmanaged); BC4_REPORT.md records the diff and reconcile list.
+
 ## One neutral floating-glass material
 - [x] Share card/backdrop/island tokens across the specified glances, scorecard and review; update badge edges only.
 - [x] Audit other old glass values without changing them; full `bunx vitest run`: 4,059 passed / 1 failed / 4,060 tests across 433 files, unchanged inventory from 4,060/433 baseline. No tests edited, added, removed or renamed. Automatic build 18:18:13Z OK.

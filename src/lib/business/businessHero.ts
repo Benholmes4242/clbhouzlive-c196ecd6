@@ -48,25 +48,31 @@ export interface SecondInput {
 
 const LESSON = new Set(['Golf Academy', 'Coach / Instructor']);
 
+/** Shared action labels; selection priority remains owned by businessSecondPill. */
+export function businessActionLabel(kind: Exclude<SecondKind, 'soon'>, category: string | null | undefined, t: T): string {
+  if (kind !== 'book') return t(`business.hero.${kind}`, { website: 'Website', call: 'Call', email: 'Email', directions: 'Directions' }[kind]);
+  const c = category ?? '';
+  return c === 'Hotel / Accommodation' || c === 'Resort' ? t('business.hero.bookStay', 'Book a stay')
+    : c === 'Restaurant / Cafe' || c === 'Bar / Pub' ? t('business.hero.bookTable', 'Book a table')
+    : LESSON.has(c) ? t('business.hero.bookLesson', 'Book a lesson')
+    : c === 'Driving Range' ? t('business.hero.bookBay', 'Book a bay')
+    : t('business.hero.book', 'Book');
+}
+
 /** CB112 §3 — first rule that applies: (a) booking link, (b) Soon, (c) promoted contact, (d) none. */
 export function businessSecondPill(b: SecondInput, t: T): SecondPill | null {
   const c = b.category ?? '';
   if (b.booking_url) {
-    const label =
-      c === 'Hotel / Accommodation' || c === 'Resort' ? t('business.hero.bookStay', 'Book a stay')
-      : c === 'Restaurant / Cafe' || c === 'Bar / Pub' ? t('business.hero.bookTable', 'Book a table')
-      : LESSON.has(c) ? t('business.hero.bookLesson', 'Book a lesson')
-      : c === 'Driving Range' ? t('business.hero.bookBay', 'Book a bay')
-      : t('business.hero.book', 'Book');
+    const label = businessActionLabel('book', c, t);
     return { kind: 'book', label, arrow: true };
   }
   if (LESSON.has(c)) return { kind: 'soon', label: t('business.hero.bookLesson', 'Book a lesson'), arrow: false, soonToast: t('business.hero.lessonSoon', 'Lesson booking is coming soon.') };
   if (c === 'Driving Range') return { kind: 'soon', label: t('business.hero.bookBay', 'Book a bay'), arrow: false, soonToast: t('business.hero.baySoon', 'Bay booking is coming soon.') };
   const pa = b.primary_action;
-  if (pa === 'website' && b.website) return { kind: 'website', label: t('business.hero.website', 'Website'), arrow: true };
-  if (pa === 'call' && b.phone) return { kind: 'call', label: t('business.hero.call', 'Call'), arrow: false };
-  if (pa === 'email' && b.email) return { kind: 'email', label: t('business.hero.email', 'Email'), arrow: false };
-  if (pa === 'directions' && (b.location || (b.lat != null && b.lng != null))) return { kind: 'directions', label: t('business.hero.directions', 'Directions'), arrow: true };
+  if (pa === 'website' && b.website) return { kind: 'website', label: businessActionLabel('website', c, t), arrow: true };
+  if (pa === 'call' && b.phone) return { kind: 'call', label: businessActionLabel('call', c, t), arrow: false };
+  if (pa === 'email' && b.email) return { kind: 'email', label: businessActionLabel('email', c, t), arrow: false };
+  if (pa === 'directions' && (b.location || (b.lat != null && b.lng != null))) return { kind: 'directions', label: businessActionLabel('directions', c, t), arrow: true };
   return null;
 }
 

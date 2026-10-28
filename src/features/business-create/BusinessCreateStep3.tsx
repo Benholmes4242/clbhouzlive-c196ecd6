@@ -25,7 +25,7 @@ const SOC_GLYPH: Record<string, string> = { instagram: 'IG', tiktok: 'TT', twitt
 
 /** The shared BC3 bottom sheet: Done, a scrim tap and a swipe down all close
  * it and keep the edits (the draft is already updated live). */
-function BizcSheet({ title, sub, onDone, children, testId }: { title: string; sub: string; onDone: () => void; children: ReactNode; testId: string }) {
+export function BizcSheet({ title, sub, onDone, children, testId, hideHeader = false }: { title: string; sub?: string; onDone: () => void; children: ReactNode; testId: string; hideHeader?: boolean }) {
   const touchY = useRef<number | null>(null);
   return (
     <>
@@ -42,20 +42,20 @@ function BizcSheet({ title, sub, onDone, children, testId }: { title: string; su
         }}
       >
         <div className="bizc-sheet-grab" aria-hidden="true" />
-        <div className="bizc-sheet-head">
+        {!hideHeader && <div className="bizc-sheet-head">
           <span className="bizc-sheet-title">{title}</span>
           <button type="button" className="bizc-sheet-done" onClick={onDone}>Done</button>
-        </div>
-        <p className="bizc-sheet-sub">{sub}</p>
+        </div>}
+        {sub && <p className="bizc-sheet-sub">{sub}</p>}
         {children}
       </div>
     </>
   );
 }
 
-function Switch({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
+function Switch({ checked, onChange, label, small = false }: { checked: boolean; onChange: (v: boolean) => void; label: string; small?: boolean }) {
   return (
-    <button type="button" role="switch" aria-checked={checked} aria-label={label} className="bizc-switch" onClick={() => onChange(!checked)}>
+    <button type="button" role="switch" aria-checked={checked} aria-label={label} className={`bizc-switch${small ? ' small' : ''}`} onClick={() => onChange(!checked)}>
       <i aria-hidden="true" />
     </button>
   );
@@ -245,15 +245,14 @@ export function BusinessCreateStep3({ draft, setDraft, onContinue }: Props) {
 
       {/* 3D Opening hours */}
       {sheet === 'hours' && (
-        <BizcSheet testId="bizc-sheet-hours" title={t('businessCreate.openingHours', { defaultValue: 'Opening hours' })} sub={t('businessCreate.hoursSub', { defaultValue: 'Turn off if your hours vary.' })} onDone={() => setSheet(null)}>
-          <div className="bizc-rows">
-            <div className="bizc-row">
+        <BizcSheet testId="bizc-sheet-hours" title={t('businessCreate.openingHours', { defaultValue: 'Opening hours' })} onDone={() => setSheet(null)}>
+            <div className="bizc-row bizc-hours-master">
               <span className="bizc-xrow-text">
                 <span className="bizc-xrow-title">{t('businessCreate.showOnProfile', { defaultValue: 'Show on my profile' })}</span>
+                <span className="bizc-xrow-sub">{t('businessCreate.hoursSub', { defaultValue: 'Turn off if your hours vary.' })}</span>
               </span>
               <Switch label="Show opening hours" checked={draft.showOpeningHours} onChange={(v) => setDraft(d => ({ ...d, showOpeningHours: v }))} />
             </div>
-          </div>
           {draft.showOpeningHours && (
             <>
               <div className="bizc-rows" data-testid="bizc-hours-days">
@@ -265,12 +264,13 @@ export function BusinessCreateStep3({ draft, setDraft, onContinue }: Props) {
                       {entry.closed ? (
                         <span className="bizc-day-closed">{t('businessCreate.closed', { defaultValue: 'Closed' })}</span>
                       ) : (
-                        <span style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span className="bizc-time-pair">
                           <input type="time" className="bizc-tchip" data-testid={`bizc-open-${day}`} value={entry.open} onChange={(e) => updateDay(day, { open: e.target.value })} />
+                          <span aria-hidden="true">–</span>
                           <input type="time" className="bizc-tchip" data-testid={`bizc-close-${day}`} value={entry.close} onChange={(e) => updateDay(day, { close: e.target.value })} />
                         </span>
                       )}
-                      <Switch label={`${day} open`} checked={!entry.closed} onChange={(v) => updateDay(day, { closed: !v })} />
+                      <Switch small label={`${day} open`} checked={!entry.closed} onChange={(v) => updateDay(day, { closed: !v })} />
                     </div>
                   );
                 })}
