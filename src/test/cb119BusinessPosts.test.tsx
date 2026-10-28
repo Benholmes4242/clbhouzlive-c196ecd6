@@ -109,7 +109,7 @@ describe('CB119 ClubFromTheClub non-club props', () => {
     expect(title.style.minWidth).toBe('0');
     const count = document.querySelector<HTMLElement>('[data-club-feed-count]')!;
     expect(count.textContent).toBe('4 posts');
-    expect(count.style.flex).toContain('none');
+    expect(count.style.flexShrink).toBe('0');
   });
   it('one post reads 1 post', () => {
     render(<ClubFromTheClub businessId="b1" businessName="Shop" postsCount={1} isOwner={false} title="From Shop" emptyName="Shop" />);
