@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Course {
+  club_id?: string | null;
   id: string;
   name: string;
   country: string;
@@ -19,13 +20,14 @@ interface SearchResult extends Course {
 }
 
 interface UseCourseSearchOptions {
+  includeClub?: boolean;
   debounceMs?: number;
   limit?: number;
   userId?: string;
 }
 
 export function useCourseSearch(query: string, options: UseCourseSearchOptions = {}) {
-  const { debounceMs = 250, limit = 20, userId } = options;
+  const { debounceMs = 250, limit = 20, userId, includeClub = false } = options;
   const [data, setData] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +56,7 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
         // Search courses
         const { data: courses, error: coursesError } = await supabase
           .from('golf_courses')
-          .select('id, name, country, sub_country, region, thumbnail_image, global_rank, regional_rank, usa_rank')
+          .select(includeClub ? 'id, name, country, sub_country, region, thumbnail_image, global_rank, regional_rank, usa_rank, club_id' : 'id, name, country, sub_country, region, thumbnail_image, global_rank, regional_rank, usa_rank')
           .ilike('name', `%${query}%`)
           .limit(limit);
 
@@ -105,7 +107,7 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
     }, debounceMs);
 
     return () => clearTimeout(timeoutId);
-  }, [query, debounceMs, limit, userId, refetchToken]);
+  }, [query, debounceMs, limit, userId, includeClub, refetchToken]);
 
   const refetch = () => setRefetchToken((n) => n + 1);
 
