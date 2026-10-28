@@ -2,32 +2,26 @@
   "step": "Schritt {{n}} von {{m}}",
   "close": "Schließen",
   "back": "Zurück",
-  "step1": {
-    "title": "Was möchtest du teilen?"
+  "title": "Post or review",
+  "post": {
+    "title": "Post",
+    "line": "Photos or video for your circle's feed",
+    "camera": "Post from camera",
+    "library": "Post from library"
   },
-  "tiles": {
-    "review": {
-      "title": "Eine Platzbewertung",
-      "sub": "Bewerte einen Golfplatz und teile deine Erfahrung"
-    },
-    "post": {
-      "title": "Ein Beitrag",
-      "sub": "Fotos oder ein paar Worte für deinen Kreis"
-    }
+  "or": "OR",
+  "review": {
+    "title": "Review a course",
+    "line": "Score it out of 10 and say how it plays",
+    "search": "Find a course to review",
+    "cta": "Review"
   },
-  "course": {
-    "which": "Welcher Platz?",
-    "searchAll": "Alle Plätze durchsuchen",
-    "pickerTitle": "Platz auswählen",
-    "recent": "Zuletzt gespielt",
-    "played": "Gespielt {{when}}",
-    "emptyTitle": "Noch keine Runden",
-    "emptyBody": "Sobald dein Handicap verbunden ist, erscheinen die von dir gespielten Plätze hier automatisch. Bis dahin suche oben nach einem Platz.",
-    "allReviewedTitle": "Alles erledigt",
-    "allReviewedBody": "Du hast jeden Platz bewertet, den du zuletzt gespielt hast. Suche oben, um einen weiteren zu bewerten."
-  },
-  "footer": {
-    "pickCourse": "Wähle einen Platz, um weiterzumachen",
-    "next": "WEITER"
+  "reason": {
+    "club": "Your club",
+    "posted": "You posted from here on {{when}}",
+    "followed_one": "Reviewed by {{name}}",
+    "followed_other": "Reviewed by {{name}} + {{n}} you follow",
+    "popular_one": "{{count}} review this month",
+    "popular_other": "{{count}} reviews this month"
   }
 }

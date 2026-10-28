@@ -1,33 +1,27 @@
 {
- "step": "Step {{n}} of {{m}}",
- "close": "Close",
- "back": "Back",
- "step1": {
-  "title": "What are you sharing?"
- },
- "tiles": {
-  "review": {
-   "title": "A course review",
-   "sub": "Rate, review and submit your experience of a golf course"
-  },
+  "step": "Step {{n}} of {{m}}",
+  "close": "Close",
+  "back": "Back",
+  "title": "Post or review",
   "post": {
-   "title": "A post",
-   "sub": "Photos or a few words, shared with your circle"
+    "title": "Post",
+    "line": "Photos or video for your circle's feed",
+    "camera": "Post from camera",
+    "library": "Post from library"
+  },
+  "or": "OR",
+  "review": {
+    "title": "Review a course",
+    "line": "Score it out of 10 and say how it plays",
+    "search": "Find a course to review",
+    "cta": "Review"
+  },
+  "reason": {
+    "club": "Your club",
+    "posted": "You posted from here on {{when}}",
+    "followed_one": "Reviewed by {{name}}",
+    "followed_other": "Reviewed by {{name}} + {{n}} you follow",
+    "popular_one": "{{count}} review this month",
+    "popular_other": "{{count}} reviews this month"
   }
- },
- "course": {
-  "which": "Which course?",
-  "searchAll": "Search all courses",
-  "pickerTitle": "Choose a course",
-  "recent": "Recently played",
-  "played": "Played {{when}}",
-  "emptyTitle": "No rounds yet",
-  "emptyBody": "Once your handicap is connected, the courses you play show up here on their own. Until then, search for one above.",
-  "allReviewedTitle": "All caught up",
-  "allReviewedBody": "You've reviewed every course you've played recently. Search above to rate another one."
- },
- "footer": {
-  "pickCourse": "Pick a course to carry on",
-  "next": "NEXT"
- }
 }

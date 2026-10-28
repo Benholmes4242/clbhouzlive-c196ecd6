@@ -2,32 +2,26 @@
   "step": "Paso {{n}} de {{m}}",
   "close": "Cerrar",
   "back": "Atrás",
-  "step1": {
-    "title": "¿Qué quieres compartir?"
+  "title": "Post or review",
+  "post": {
+    "title": "Post",
+    "line": "Photos or video for your circle's feed",
+    "camera": "Post from camera",
+    "library": "Post from library"
   },
-  "tiles": {
-    "review": {
-      "title": "Una reseña de campo",
-      "sub": "Puntúa un campo de golf y comparte tu experiencia"
-    },
-    "post": {
-      "title": "Una publicación",
-      "sub": "Fotos o unas palabras para tu círculo"
-    }
+  "or": "OR",
+  "review": {
+    "title": "Review a course",
+    "line": "Score it out of 10 and say how it plays",
+    "search": "Find a course to review",
+    "cta": "Review"
   },
-  "course": {
-    "which": "¿Qué campo?",
-    "searchAll": "Buscar todos los campos",
-    "pickerTitle": "Elige un campo",
-    "recent": "Jugados recientemente",
-    "played": "Jugado {{when}}",
-    "emptyTitle": "Aún no hay vueltas",
-    "emptyBody": "Cuando conectes tu hándicap, los campos que juegues apareceran aquí por su cuenta. Hasta entonces, busca uno arriba.",
-    "allReviewedTitle": "Todo al día",
-    "allReviewedBody": "Has reseñado todos los campos que has jugado últimamente. Busca arriba para valorar otro."
-  },
-  "footer": {
-    "pickCourse": "Elige un campo para continuar",
-    "next": "SIGUIENTE"
+  "reason": {
+    "club": "Your club",
+    "posted": "You posted from here on {{when}}",
+    "followed_one": "Reviewed by {{name}}",
+    "followed_other": "Reviewed by {{name}} + {{n}} you follow",
+    "popular_one": "{{count}} review this month",
+    "popular_other": "{{count}} reviews this month"
   }
 }

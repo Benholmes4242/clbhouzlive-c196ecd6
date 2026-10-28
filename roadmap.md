@@ -1,5 +1,12 @@
 # Roadmap
 
+## Post or review sheet
+- [x] Replace the numbered kind/course/NEXT form with signed-off Post and Review boxes and direct picker/handoff actions.
+- [x] Add member-scoped paginated review suggestions without round reads; update displayed composer counters, locales and analytics label.
+- [x] Full `bunx vitest run`: 4,182 passed / 2 pre-existing failures / 4,184 total across 441 files. +36 tests: postOrReviewSheet 15, reviewSuggestions 21; one postPhase3 counter assertion updated, no cases removed.
+- [x] Follow-up corrected both test setup options to initAsync and typed the existing nav textBox extension without assertion/style changes. Automatic build 21:38:07Z OK; targeted 45/45. Full suite unchanged: 4,182 passed / 2 inherited failures / 4,184 total / 441 files.
+- [ ] Existing BC5 TypeError and POST/REVIEW text-box assertion still fail; their tests remain untouched. See POST_OR_REVIEW_SHEET_REPORT.md. Authenticated/visual checks not performed after stop.
+
 ## BC5 — Create business and finish
 - [x] Ben approved recording returned-empty photo failures as partials in both shared callers; editor uses its existing warning toast.
 - [x] Extract shared creation/error reporting/owner notice, preserve editor toasts and edit writes; approved photo-failure recording added.

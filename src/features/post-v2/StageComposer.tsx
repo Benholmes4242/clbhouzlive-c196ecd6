@@ -1037,7 +1037,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
       {/* THE SHARED HEADER, on both paths. No local counter: there is no
           "1 / 2" or "2 / 2" text left in this file. */}
       <div style={{ flex: 'none', paddingTop: 'max(env(safe-area-inset-top), 12px)' }}>
-        <ComposerStepHeader step={2} total={2} left={leadingControl} onLeft={handleLeading} />
+        <ComposerStepHeader step={1} total={1} left={leadingControl} onLeft={handleLeading} />
       </div>
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />

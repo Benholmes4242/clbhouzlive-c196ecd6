@@ -1059,7 +1059,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           whole flow. left="none": the fixed header above already owns the one
           leading control (back arrow, or × when nothing is behind us), and two
           back buttons on one screen is a worse answer than a counter beneath. */}
-      <ComposerStepHeader step={step} total={REVIEW_TOTAL_STEPS} left="none" />
+      <ComposerStepHeader step={step - 1} total={REVIEW_TOTAL_STEPS - 1} left="none" />
 
       {/* RESTORED EDIT DRAFT (_04 §1). Says so out loud, and offers the way back
           to the published version. Not amber: amber means the viewing member. */}

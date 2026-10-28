@@ -1,33 +1,27 @@
 {
- "step": "{{m}}단계 중 {{n}}단계",
- "close": "닫기",
- "back": "뒤로",
- "step1": {
-  "title": "무엇을 공유하시겠어요?"
- },
- "tiles": {
-  "review": {
-   "title": "코스 리뷰",
-   "sub": "골프 코스를 평가하고 경험을 남기세요"
-  },
+  "step": "{{m}}단계 중 {{n}}단계",
+  "close": "닫기",
+  "back": "뒤로",
+  "title": "Post or review",
   "post": {
-   "title": "게시물",
-   "sub": "사진이나 짧은 글을 친구들과 공유하세요"
+    "title": "Post",
+    "line": "Photos or video for your circle's feed",
+    "camera": "Post from camera",
+    "library": "Post from library"
+  },
+  "or": "OR",
+  "review": {
+    "title": "Review a course",
+    "line": "Score it out of 10 and say how it plays",
+    "search": "Find a course to review",
+    "cta": "Review"
+  },
+  "reason": {
+    "club": "Your club",
+    "posted": "You posted from here on {{when}}",
+    "followed_one": "Reviewed by {{name}}",
+    "followed_other": "Reviewed by {{name}} + {{n}} you follow",
+    "popular_one": "{{count}} review this month",
+    "popular_other": "{{count}} reviews this month"
   }
- },
- "course": {
-  "which": "어느 코스인가요?",
-  "searchAll": "모든 코스 검색",
-  "pickerTitle": "코스 선택",
-  "recent": "최근 플레이한 코스",
-  "played": "{{when}} 플레이",
-  "emptyTitle": "아직 라운드가 없습니다",
-  "emptyBody": "핸디캡을 연결하면 플레이한 코스가 이곳에 자동으로 표시됩니다. 그때까지는 위에서 검색해 주세요.",
-  "allReviewedTitle": "모두 완료",
-  "allReviewedBody": "최근 플레이한 모든 코스를 리뷰했습니다. 위에서 검색해 다른 코스를 평가해 보세요."
- },
- "footer": {
-  "pickCourse": "계속하려면 코스를 선택하세요",
-  "next": "다음"
- }
 }

@@ -1,0 +1,39 @@
+/* Entry-sheet geometry is opt-in; other post-v2 sheets retain their chrome. */
+.post-or-review-surface {
+  background: var(--post-review-sheet) !important;
+  border-radius: 24px 24px 0 0 !important;
+  padding-bottom: 0 !important;
+  position: relative;
+}
+.post-or-review-surface > div:first-child { position: absolute; top: 0; left: 0; right: 0; pointer-events: none; }
+.post-or-review { color: var(--post-review-ink); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); letter-spacing: 0; }
+.post-or-review-header { display: flex; align-items: center; padding: 26px 16px 0 20px; }
+.post-or-review-header h1 { flex: 1; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 0; }
+.post-or-review .post-or-review-close { width: 34px; height: 34px; padding: 0; border-radius: 50%; background: var(--post-review-close); color: var(--post-review-mute); }
+.post-or-review .post-or-review-close svg { width: 17px; height: 17px; }
+.post-or-review-body { margin-top: 18px; }
+.post-or-review-box { margin: 0 16px; border-radius: 22px; background: var(--post-review-box); border: 1px solid var(--post-review-box-edge); padding: 16px; }
+.post-or-review-box-head { display: flex; align-items: center; gap: 12px; }
+.post-or-review-icon { width: 40px; height: 40px; flex-shrink: 0; border-radius: 13px; background: var(--post-review-control); display: grid; place-items: center; }
+.post-or-review-box-head h2 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 0; }
+.post-or-review-box-head p { margin: 2px 0 0; font-size: 12.5px; color: var(--post-review-mute); }
+.post-or-review-actions { display: flex; margin-top: 14px; gap: 8px; }
+.post-or-review-input-owner { flex: 1; min-width: 0; }
+.post-or-review .post-or-review-camera, .post-or-review .post-or-review-library { display: flex; width: 100%; height: 46px; padding: 0 2px; border-radius: 14px; gap: 7px; font-size: 13.5px; font-weight: 700; white-space: normal; line-height: 1.2; }
+.post-or-review .post-or-review-camera { background: var(--post-review-control); color: var(--post-review-ink); }
+.post-or-review .post-or-review-library { background: var(--post-review-library); color: var(--post-review-on-library); }
+.post-or-review-divider { display: flex; align-items: center; gap: 12px; margin: 12px 30px; }
+.post-or-review-divider > span { flex: 1; height: 1px; background: var(--post-review-control); }
+.post-or-review-divider b { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; color: var(--post-review-dim); }
+.post-or-review .post-or-review-search { display: flex; justify-content: flex-start; width: 100%; height: 44px; margin-top: 14px; border-radius: 14px; background: var(--post-review-search); border: 1px solid var(--post-review-search-edge); padding: 0 14px; gap: 10px; color: var(--post-review-mute); font-size: 14px; font-weight: 600; }
+.post-or-review .post-or-review-search svg { width: 18px; height: 18px; }
+.post-or-review-suggestions { margin-top: 2px; }
+.post-or-review .post-or-review-suggestion { display: flex; width: 100%; height: auto; justify-content: flex-start; gap: 12px; padding: 11px 0; border-radius: 0; background: transparent; color: var(--post-review-ink); text-align: left; border-bottom: 1px solid var(--post-review-control); }
+.post-or-review .post-or-review-suggestion:last-child { border-bottom: 0; }
+.post-or-review-thumbnail { width: 44px; height: 44px; border-radius: 12px; overflow: hidden; flex-shrink: 0; background: var(--post-review-photo-fallback); }
+.post-or-review-thumbnail img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.post-or-review-course { flex: 1; min-width: 0; }
+.post-or-review-course strong, .post-or-review-course small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.post-or-review-course strong { font-size: 15px; font-weight: 700; }
+.post-or-review-course small { margin-top: 3px; font-size: 12px; color: var(--post-review-mute); }
+.post-or-review-pill { height: 32px; border-radius: 16px; border: 1px solid var(--post-review-pill-edge); padding: 0 13px; display: flex; align-items: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }

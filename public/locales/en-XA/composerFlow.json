@@ -1,33 +1,27 @@
 {
- "step": "[~~Šţéƥ {{n}} őƒ {{m}}~~]",
- "close": "[~~Ĉļőšé~~]",
- "back": "[~~Ɓáĉǩ~~]",
- "step1": {
-  "title": "[~~Ŵĥáţ ářé ýőú šĥáříñĝ?~~]"
- },
- "tiles": {
-  "review": {
-   "title": "[~~Á ĉőúřšé řéṽíéŵ~~]",
-   "sub": "[~~Řáţé, řéṽíéŵ áñđ šúƀɱíţ ýőúř éẋƥéříéñĉé őƒ á ĝőļƒ ĉőúřšé~~]"
-  },
+  "step": "[~~Šţéƥ {{n}} őƒ {{m}}~~]",
+  "close": "[~~Ĉļőšé~~]",
+  "back": "[~~Ɓáĉǩ~~]",
+  "title": "Post or review",
   "post": {
-   "title": "[~~Á ƥőšţ~~]",
-   "sub": "[~~Ƥĥőţőš őř á ƒéŵ ŵőřđš, šĥářéđ ŵíţĥ ýőúř ĉářĉļé~~]"
+    "title": "Post",
+    "line": "Photos or video for your circle's feed",
+    "camera": "Post from camera",
+    "library": "Post from library"
+  },
+  "or": "OR",
+  "review": {
+    "title": "Review a course",
+    "line": "Score it out of 10 and say how it plays",
+    "search": "Find a course to review",
+    "cta": "Review"
+  },
+  "reason": {
+    "club": "Your club",
+    "posted": "You posted from here on {{when}}",
+    "followed_one": "Reviewed by {{name}}",
+    "followed_other": "Reviewed by {{name}} + {{n}} you follow",
+    "popular_one": "{{count}} review this month",
+    "popular_other": "{{count}} reviews this month"
   }
- },
- "course": {
-  "which": "[~~Ŵĥíĉĥ ĉőúřšé?~~]",
-  "searchAll": "[~~Šéářĉĥ áļļ ĉőúřšéš~~]",
-  "pickerTitle": "[~~Ĉĥőőšé á ĉőúřšé~~]",
-  "recent": "[~~Řéĉéñţļý ƥļáýéđ~~]",
-  "played": "[~~Ƥļáýéđ {{when}}~~]",
-  "emptyTitle": "[~~Ñő řőúñđš ýéţ~~]",
-  "emptyBody": "[~~Őñĉé ýőúř ĥáñđíĉáƥ íš ĉőññéĉţéđ, ţĥé ĉőúřšéš ýőú ƥļáý šĥőŵ úƥ ĥéřé őñ ţĥéář őŵñ. Úñţíļ ţĥéñ, šéářĉĥ ƒőř őñé áƀőṽé.~~]",
-  "allReviewedTitle": "[~~All ĉáúghţ úp~~]",
-  "allReviewedBody": "[~~Yőú'vé řévíéwéd évéřy ĉőúřšé yőú'vé pláyéd řéĉéñţly. Séářĉh ábővé ţő řáţé áñőţhéř őñé.~~]"
- },
- "footer": {
-  "pickCourse": "[~~Ƥíĉǩ á ĉőúřšé ţő ĉářřý őñ~~]",
-  "next": "[~~ÑÉẊŢ~~]"
- }
 }

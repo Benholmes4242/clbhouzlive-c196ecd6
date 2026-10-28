@@ -19,9 +19,11 @@ interface Props {
   fixedHeight?: string;
   /** Extra bottom padding on the backdrop; lifts the sheet above the iOS keyboard. */
   bottomOffset?: number;
+  /** Opt-in entry-sheet material/geometry; default composer sheets unchanged. */
+  surfaceClassName?: string;
 }
 
-export default function BottomSheet({ open, title, onClose, children, fullHeight, fixedHeight, bottomOffset }: Props) {
+export default function BottomSheet({ open, title, onClose, children, fullHeight, fixedHeight, bottomOffset, surfaceClassName }: Props) {
   const { t } = useTranslation('common');
 
   /* BRIEF_SHEET_BACK_BEHAVIOUR §2 — THE SECOND PRIMITIVE.
@@ -68,6 +70,7 @@ export default function BottomSheet({ open, title, onClose, children, fullHeight
       onClick={onClose}
     >
       <div
+        className={surfaceClassName}
         onClick={(e) => e.stopPropagation()}
         style={{
           width: '100%',

@@ -1,10 +1,9 @@
 /**
  * ComposerStepHeader — THE ONE HEADER for every step of the unified composer.
  *
- * Step 1 lives in a sheet and steps 2 and 3 live in the composers, so a member
- * crosses a container boundary mid-flow. They must not be able to tell: same
- * height, same segment geometry, same type sizes, one implementation. A second
- * header would drift and the handoff would read as two different apps.
+ * The entry sheet is unnumbered. Post displays one step with no counter;
+ * review displays two steps while its internal wizard numbering stays intact.
+ * Leading-control ownership stays with each host; numbering is display-only.
  *
  * LEFT SLOT: × on step 1 (closes the flow), ← on every later step (returns to
  * the previous step with state intact). `left="none"` is for a host that
@@ -22,7 +21,7 @@ export const COMPOSER_HEADER_HEIGHT = 52;
 interface Props {
   /** 1-based. */
   step: number;
-  /** 3 on the review path, 2 on the post path. */
+  /** Displayed total; entry sheet is unnumbered. One hides the counter. */
   total: number;
   /** Step 1 shows ×; later steps show ←. Ignored when left is 'none'. */
   onLeft?: () => void;
@@ -69,12 +68,12 @@ export default function ComposerStepHeader({ step, total, onLeft, left }: Props)
           {isFirst ? <X size={20} strokeWidth={2.2} /> : <ArrowLeft size={20} strokeWidth={2.2} />}
         </button>
         )}
-        <span style={{ fontSize: 12, fontWeight: 700, color: CT.muted }}>
+        {total > 1 && <span style={{ fontSize: 12, fontWeight: 700, color: CT.muted }}>
           {t('step', { n: step, m: total })}
-        </span>
+        </span>}
       </div>
 
-      <div
+      {total > 1 && <div
         aria-hidden
         style={{ display: 'flex', gap: 4, padding: '0 16px 12px' }}
       >
@@ -89,7 +88,7 @@ export default function ComposerStepHeader({ step, total, onLeft, left }: Props)
             }}
           />
         ))}
-      </div>
+      </div>}
     </div>
   );
 }
