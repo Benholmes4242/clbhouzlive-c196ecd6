@@ -1,5 +1,9 @@
 # Roadmap
 
+## Media v3 — Glass modal accessibility finish
+- [ ] Hide background with aria-hidden hideOthers while an overlay card is open/mounted; undo on close/unmount; preserve appearance, focus and gestures.
+- [ ] Verify unchanged admin Hole7 selector and both unchanged CB107 cases; add shared-overlay lifecycle tests and run full suite. Current inventory3,812/417 includes four intervening CB118.1 tests beyond requested3,808/417. Delete MEDIA_V3_STOP_REPORT only after full green.
+
 ## CB118.1 — Club identity during course loading
 - [x] Added two-line existing-skeleton gate on pending club-courses; query/hooks/error fallback/non-clubs unchanged. Both CB107 failures now pass UNEDITED in targeted/full runs; automatic build07:36:05Z OK.
 - [x] Added four regression tests in cb118BusinessVisiting (33→37); no old assertion/name changes or removals. Targeted58 passed/1 failed/59; full bunx vitest run3,804 passed/8 failed/3,812 total/417 files, +4 solely CB118.1. CB118_1_STOP_REPORT.md records diff, all errors and inventory.

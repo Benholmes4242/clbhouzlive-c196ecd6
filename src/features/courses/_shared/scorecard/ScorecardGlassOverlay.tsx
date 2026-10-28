@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { hideOthers } from 'aria-hidden';
 
 import { pushSheetEntry, releaseSheetEntry } from '@/components/ui/sheetHistory';
 import { Z } from '@/config/zIndex';
@@ -76,6 +77,14 @@ export function ScorecardGlassOverlay({
   } | null>(null);
   closeRef.current = onClose;
   horizontalRef.current = onHorizontalDrag;
+
+  // Every floating glass card is modal to assistive technology. Restore the
+  // background on close (including its exit animation) and on unmount.
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!open || !mounted || presentation !== 'overlay' || !card) return;
+    return hideOthers(card);
+  }, [open, mounted, presentation]);
 
   useLayoutEffect(() => {
     const card = cardRef.current;
