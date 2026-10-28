@@ -64,7 +64,7 @@ describe('suggestion priority and reasons', () => {
   });
   it('own posts are newest-first and format their actual d MMM date', () => {
     const s = base(); s.posts = [{ course_id: 'other', created_at: '2026-09-13T12:00:00Z' }, { course_id: 'post', created_at: '2026-09-14T12:00:00Z' }];
-    expect(buildReviewSuggestions(s, t).map(r => [r.courseId, r.reason])).toEqual([['post', 'You posted from here on 14 Sept'], ['other', 'You posted from here on 13 Sept']]);
+    expect(buildReviewSuggestions(s, t).map(r => [r.courseId, r.reason])).toEqual([['post', 'You posted from here on 14 Sep'], ['other', 'You posted from here on 13 Sep']]);
   });
   it('one followed reviewer uses the most recent first name', () => {
     const s = base(); s.followed = [rating('followed')];

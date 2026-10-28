@@ -1,10 +1,9 @@
 /**
  * ComposerStepHeader — THE ONE HEADER for every step of the unified composer.
  *
- * Step 1 lives in a sheet and steps 2 and 3 live in the composers, so a member
- * crosses a container boundary mid-flow. They must not be able to tell: same
- * height, same segment geometry, same type sizes, one implementation. A second
- * header would drift and the handoff would read as two different apps.
+ * The entry sheet is unnumbered. Post displays one step with no counter;
+ * review displays two steps while its internal wizard numbering stays intact.
+ * Leading-control ownership stays with each host; numbering is display-only.
  *
  * LEFT SLOT: × on step 1 (closes the flow), ← on every later step (returns to
  * the previous step with state intact). `left="none"` is for a host that

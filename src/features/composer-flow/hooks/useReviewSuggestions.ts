@@ -9,6 +9,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
+import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfileData } from '@/hooks/useProfileData';
 
@@ -47,7 +48,7 @@ export function buildReviewSuggestions(s: Sources, t: TFunction<'composerFlow'>)
   };
   for (const c of s.club) offer(c.id, 'club', t('reason.club'));
   for (const p of [...s.posts].sort((a, b) => b.created_at.localeCompare(a.created_at))) {
-    const when = new Date(p.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    const when = format(new Date(p.created_at), 'd MMM');
     offer(p.course_id, 'posted', t('reason.posted', { when }));
   }
   const followed = new Map<string, { people: Set<string>; latest: SuggestionRating }>();
@@ -109,10 +110,11 @@ export async function loadReviewSuggestions(userId: string, t: TFunction<'compos
     readAll<{ following_id: string }>(() => supabase.from('user_follows').select('following_id').eq('follower_id', userId).order('id')),
   ]);
   if (profile.error) throw profile.error;
+  const clubId = profile.data?.primary_club_id;
   const followingIds = [...new Set(follows.map(f => f.following_id))];
   const [club, followed] = await Promise.all([
-    profile.data?.primary_club_id ? readAll<SuggestionCourse>(() => supabase.from('golf_courses')
-      .select('id, name, thumbnail_image').eq('club_id', profile.data.primary_club_id).order('name').order('id')) : Promise.resolve([]),
+    clubId ? readAll<SuggestionCourse>(() => supabase.from('golf_courses')
+      .select('id, name, thumbnail_image').eq('club_id', clubId).order('name').order('id')) : Promise.resolve([]),
     readIds<SuggestionRating>(followingIds, ids => supabase.from('course_ratings').select('course_id, user_id, created_at')
       .in('user_id', ids).gte('created_at', from(90)).order('created_at', { ascending: false }).order('id')),
   ]);
