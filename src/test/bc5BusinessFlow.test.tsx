@@ -16,7 +16,7 @@ function Status() { const loc = useLocation(); const type = useNavigationType();
 function setup(step = 4, search = '') {
   render(<QueryClientProvider client={new QueryClient()}><MemoryRouter initialEntries={['/before', { pathname: '/business/create', search, state: { bizStep: step } }]} initialIndex={1}><Status /><Routes><Route path="/business/create" element={<BusinessCreate />} /><Route path="/before" element={<p data-testid="before" />} /><Route path="/profile" element={<p data-testid="profile" />} /></Routes></MemoryRouter></QueryClientProvider>);
 }
-beforeEach(() => { s.create.mockReset(); s.create.mockResolvedValue({ id: 'new', slug: 'new', claim: 'none', partials: [] }); s.fetch.mockReset(); s.toast.mockReset(); });
+beforeEach(() => { s.create.mockReset(); s.create.mockResolvedValue({ id: 'new', slug: 'new', claim: 'none', partials: [] }); s.fetch.mockReset(); s.fetch.mockResolvedValue({ id: 'club', name: 'Park Golf Club', country: 'United Kingdom', region: 'South East', sub_country: 'Kent', club_key: 'park', latitude: 51.4, longitude: 0.03 }); s.toast.mockReset(); });
 afterEach(() => { cleanup(); vi.clearAllMocks(); });
 describe('BC5 creating and history', () => {
   it('disables create, Back and Skip during pending save', async () => {
