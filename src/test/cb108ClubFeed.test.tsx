@@ -211,10 +211,11 @@ describe('CB108 club page tabs', () => {
     rerender(<ClubVisiting business={fixture()} publicTeamCount={1} />);
     expect(document.querySelector('[data-visiting-row="team"] i')?.textContent).toBe('1 person at the club');
   });
-  it('a non-club profile keeps its tabs', async () => {
+  it('a non-club profile has no tabs and ends with From {name}', async () => {
     team = [{ is_public: true }];
     page({ club_id: null });
-    await waitFor(() => expect(screen.getAllByRole('tab').map((e) => e.textContent)).toEqual(['Posts', 'About', 'Team']));
-    expect(document.querySelector('[data-club-feed]')).toBeNull();
+    await waitFor(() => expect(document.querySelector('[data-club-feed]')).not.toBeNull());
+    expect(screen.queryByRole('tab')).toBeNull();
+    expect(document.querySelector('[data-club-feed]')?.getAttribute('aria-label')).not.toBe('From the club');
   });
 });

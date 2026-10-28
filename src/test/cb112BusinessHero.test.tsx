@@ -271,17 +271,15 @@ describe('CB112 figure strip', () => {
     await waitFor(() => expect(container.querySelector('[data-club-hero]')).not.toBeNull());
     expect(container.querySelector('[data-club-strip]')).toBeNull();
   });
-  it('Followers tap navigates; Posts tap selects the Posts tab', async () => {
+  it('Followers tap navigates; Posts tap scrolls to From {name}', async () => {
     Object.assign(state, { business: fixture({ category: 'Creator' }), followers: 3, posts: 2 });
-    const scroll = vi.fn();
-    Element.prototype.scrollIntoView = scroll;
     const r = renderPage();
-    await waitFor(() => expect(r.container.querySelector('[data-business-tabs]')).not.toBeNull());
-    fireEvent.click(screen.getByText('About'));
-    expect(r.container.querySelector('[data-about-content]')).not.toBeNull();
+    await waitFor(() => expect(r.container.querySelector('[data-club-feed]')).not.toBeNull());
+    expect(r.container.querySelector('[data-business-tabs]')).toBeNull();
+    const feed = r.container.querySelector<HTMLElement>('[data-club-feed]')!;
+    const spy = vi.spyOn(feed, 'getBoundingClientRect');
     fireEvent.click(r.container.querySelector('[data-cell="posts"]')!);
-    expect(r.container.querySelector('[data-posts-content]')).not.toBeNull();
-    expect(scroll).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalled();
     fireEvent.click(r.container.querySelector('[data-cell="followers"]')!);
     await waitFor(() => expect(r.container.querySelector('[data-loc="/business/fairway/followers"]')).not.toBeNull());
   });
