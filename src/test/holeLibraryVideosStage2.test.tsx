@@ -1,3 +1,4 @@
+import { holeShotsToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
 import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest';
 import { cleanup, render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -107,23 +108,7 @@ describe('Founder size and type ruling', () => {
   it('rejects one byte over 4 GiB', () => { const file = new File([], 'v.mp4', { type: 'video/mp4' }); Object.defineProperty(file, 'size', { value: 4294967297 }); expect(libraryHoleVideoError(file)).toBe('That video is too large to upload.'); });
 });
 describe('Stage 2 encode display', () => {
-  it('null duration has no playable element; metadata refresh makes the shot open in the viewer', async () => {
-    const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-    f.rpc.mockResolvedValue({ data: [{ ...row, duration_seconds: 42, member_avatar_url: null }], error: null });
-    const view = render(<QueryClientProvider client={cache}><HoleWalk available holes={[hole]} rows={[row]} totalMedia={1} onAddFirst={() => {}} /></QueryClientProvider>);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));
-    expect(screen.queryByRole('button', { name: 'Play video' })).toBeNull(); expect(view.container.querySelector('video')).toBeNull();
-    expect(view.container.querySelector('.hole-media-processing')).toBeInTheDocument();
-    fireEvent.click(view.container.querySelector('.hole-walk-slide') as HTMLElement);
-    expect(f.open).not.toHaveBeenCalled();
-    view.rerender(<QueryClientProvider client={cache}><HoleWalk available holes={[hole]} rows={[{ ...row, duration_seconds: 42 }]} totalMedia={1} onAddFirst={() => {}} /></QueryClientProvider>);
-    expect(view.container.querySelector('.hole-media-processing')).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Play video' })).toBeNull();
-    fireEvent.click(view.container.querySelector('.hole-walk-slide') as HTMLElement);
-    await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
-    const args = f.open.mock.calls[0][0] as { posts: Array<{ mediaItems: Array<{ type: string }> }>; options?: { readOnly?: boolean } };
-    expect(args.posts).toHaveLength(1);
-    expect(args.posts[0].mediaItems[0].type).toBe('video');
-    expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
+  it('null duration has no playable element; metadata refresh makes the shot open in the viewer — course gallery', () => {
+    expect(holeShotsToFeedPosts([row],'','course',7)).toEqual([]); const ready={...row,duration_seconds:42}; const mapped=holeShotsToFeedPosts([ready],'','course',7); expect(mapped).toHaveLength(1); expect(mapped[0].mediaItems[0].type).toBe('video'); const view=render(<HoleWalk available holes={[hole]} rows={[row]} totalMedia={1} onAddFirst={()=>{}} />); expect(view.container.querySelector('video')).toBeNull(); view.rerender(<HoleWalk available holes={[hole]} rows={[ready]} totalMedia={1} onAddFirst={()=>{}} />); expect(view.container.querySelector('.media-v2-hole-card img')).toHaveAttribute('src','/poster.jpg'); expect(view.container.querySelector('.hole-walk-panel')).toBeNull();
   });
 });

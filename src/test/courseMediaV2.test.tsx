@@ -21,7 +21,7 @@ describe('Media place catalogue and readiness', () => {
     const open = vi.fn(); const view = render(<CoursePlaceTiles rows={[row('a', 'views'), row('b', 'golfers'), row('c', 'conditions')]} onOpen={open} />);
     const tiles = view.container.querySelectorAll('.media-v2-place-tile');
     expect(tiles).toHaveLength(3);
-    fireEvent.click(tiles[0]); expect(open).toHaveBeenCalledWith('views', [row('a', 'views')]);
+    fireEvent.click(tiles[0]); expect(open).toHaveBeenCalledWith('views', [row('a', 'views')], tiles[0]);
   });
   it('empty or private-only place groups render nothing', () => {
     const view = render(<CoursePlaceTiles rows={[row('a', 'views', 'rejected')]} onOpen={() => {}} />);

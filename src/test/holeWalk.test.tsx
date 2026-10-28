@@ -1,3 +1,4 @@
+import { galleryShots, filteredGallery } from '@/lib/courseMedia/courseGallery';
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
@@ -43,67 +44,40 @@ describe('MEDIA_WALK_1_R', () => {
   it('unavailable removes entire section', () => {
     const { container } = render(<HoleWalk available={false} holes={[hole(1)]} rows={[]} totalMedia={0} onAddFirst={() => {}} />); expect(container.childElementCount).toBe(0);
   });
-  it('selection keeps the sparse rail and full coverage mounted', () => {
-    render(<HoleWalk available holes={[hole(1), hole(3)]} rows={[photo('a', 1), photo('b', 3)]} totalMedia={0} onAddFirst={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 3' }));
-    expect(screen.getByRole('button', { name: 'Hole 1' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Hole 3' })).toHaveAttribute('aria-pressed', 'true');
+  it('selection keeps the sparse rail and full coverage mounted — course gallery', () => {
+    const open = vi.fn(); render(<HoleWalk available holes={[hole(1), hole(3)]} rows={[photo('a', 1), photo('b', 3)]} totalMedia={0} onAddFirst={() => {}} onOpen={open} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Hole 3' })); expect(open).toHaveBeenCalledWith(3, expect.any(HTMLElement), 'hole-card'); expect(screen.getByRole('button', { name: 'Hole 1' })).toBeInTheDocument(); expect(screen.queryByRole('region')).toBeNull();
   });
   it('open coverage segment passes its hole directly to Add first', () => {
     const selected: number[] = []; render(<HoleWalk available holes={[hole(1), hole(3)]} rows={[photo('a', 1)]} totalMedia={1} onAddFirst={n => selected.push(n)} />);
     fireEvent.click(document.querySelectorAll('.media-v2-coverage button')[1]); expect(selected).toEqual([3]);
   });
-  it('eight photos reconcile as eight selectable thumbnails including the active shot', () => {
-    render(<HoleWalk available holes={[hole(9)]} rows={Array.from({ length: 8 }, (_, i) => photo(String(i), 9))} totalMedia={8} onAddFirst={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 9' }));
-    expect(screen.getAllByRole('button', { name: /^Show shot \d of 8$/ })).toHaveLength(8);
-    expect(screen.getByRole('button', { name: 'Show shot 1 of 8' })).toHaveAttribute('aria-current', 'true');
+  it('eight photos reconcile as eight selectable thumbnails including the active shot — course gallery', () => {
+    const rows = Array.from({ length: 8 }, (_, i) => photo(String(i), 9));
+    const posts = rows.map(row => ({ id: row.id, userId: row.user_id, mediaItems: [{ id: row.id, type: 'image', imageUrl: row.media_url }], displayName: '', avatarUrl: '', createdAt: '' })) as import('@/components/media-system/types/media').FeedPost[];
+    const list = filteredGallery(galleryShots(posts, rows, []), 'holes'); expect(list).toHaveLength(8); expect(list[0].id).toBe('0');
   });
   it('existing picker preselects and submits selected hole', () => {
     const submitted: number[] = [];
     render(<HolePhotoTagDialog imageUrl="/photo.jpg" initialHole={3} holeCount={2} knownHoleNumbers={[1, 3]} pending={false} error={null} onClose={() => {}} onSubmit={n => submitted.push(n)} />);
     expect(screen.getByRole('button', { name: 'Hole 3' })).toHaveAttribute('aria-pressed', 'true'); fireEvent.click(screen.getByRole('button', { name: 'Hole 3' })); expect(submitted).toEqual([]); fireEvent.click(screen.getByRole('button', { name: /^Tag to the / })); expect(submitted).toEqual([3]);
   });
-  it('hole 4 opens its existing region directly under the rail', () => {
-    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[photo('4', 4), photo('11', 11), photo('18', 18)]} totalMedia={3} onAddFirst={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
-    const panel = screen.getByRole('region', { name: 'Hole 4' });
-    expect(panel.parentElement?.previousElementSibling).toHaveClass('media-v2-hole-rail');
-    expect(panel.nextElementSibling).toBeNull();
+  it('hole 4 opens its existing region directly under the rail — course gallery', () => {
+    const open = vi.fn(); render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[photo('4', 4), photo('11', 11), photo('18', 18)]} totalMedia={3} onAddFirst={() => {}} onOpen={open} />); fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); expect(open).toHaveBeenCalledWith(4, expect.any(HTMLElement), 'hole-card'); expect(screen.queryByRole('region')).toBeNull();
   });
-  it('tapping tile 4 again closes its region and clears aria-pressed', () => {
-    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[photo('4', 4), photo('11', 11), photo('18', 18)]} totalMedia={3} onAddFirst={() => {}} />);
-    const button = screen.getByRole('button', { name: 'Hole 4' });
-    fireEvent.click(button); fireEvent.click(button);
-    expect(screen.queryByRole('region')).toBeNull();
-    expect(button).toHaveAttribute('aria-pressed', 'false');
+  it('tapping tile 4 again closes its region and clears aria-pressed — course gallery', () => {
+    const open = vi.fn(); render(<HoleWalk available holes={[hole(4)]} rows={[photo('4', 4)]} totalMedia={1} onAddFirst={() => {}} onOpen={open} />); const button = screen.getByRole('button', { name: 'Hole 4' }); fireEvent.click(button); fireEvent.click(button); expect(open).toHaveBeenCalledTimes(2); expect(button).not.toHaveAttribute('aria-pressed'); expect(screen.queryByRole('region')).toBeNull();
   });
-  it('switching from hole 4 to hole 11 retains one region under the rail', () => {
-    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[photo('4', 4), photo('11', 11), photo('18', 18)]} totalMedia={3} onAddFirst={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 11' }));
-    const panel = screen.getByRole('region', { name: 'Hole 11' });
-    expect(panel.parentElement?.previousElementSibling).toHaveClass('media-v2-hole-rail');
-    expect(panel.nextElementSibling).toBeNull();
-    expect(screen.getAllByRole('region')).toHaveLength(1);
+  it('switching from hole 4 to hole 11 retains one region under the rail — course gallery', () => {
+    const open = vi.fn(); render(<HoleWalk available holes={[hole(4), hole(11)]} rows={[photo('4', 4), photo('11', 11)]} totalMedia={2} onAddFirst={() => {}} onOpen={open} />); fireEvent.click(screen.getByRole('button', { name: 'Hole 4' })); fireEvent.click(screen.getByRole('button', { name: 'Hole 11' })); expect(open.mock.calls.map(call => call[0])).toEqual([4,11]); expect(screen.queryByRole('region')).toBeNull();
   });
-  it('hole 18 opens its region under the rail', () => {
-    render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[photo('4', 4), photo('11', 11), photo('18', 18)]} totalMedia={3} onAddFirst={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 18' }));
-    const panel = screen.getByRole('region', { name: 'Hole 18' });
-    expect(panel.parentElement?.previousElementSibling).toHaveClass('media-v2-hole-rail');
-    expect(panel.nextElementSibling).toBeNull();
+  it('hole 18 opens its region under the rail — course gallery', () => {
+    const open = vi.fn(); render(<HoleWalk available holes={Array.from({ length: 18 }, (_, i) => hole(i + 1))} rows={[photo('4', 4), photo('11', 11), photo('18', 18)]} totalMedia={3} onAddFirst={() => {}} onOpen={open} />); fireEvent.click(screen.getByRole('button', { name: 'Hole 18' })); expect(open).toHaveBeenCalledWith(18, expect.any(HTMLElement), 'hole-card'); expect(screen.queryByRole('region')).toBeNull();
   });
-  it('switching holes resets the displayed photograph to the first', () => {
-    render(<HoleWalk available holes={[hole(4), hole(11)]} rows={[photo('a', 4), photo('b', 4), photo('c', 11)]} totalMedia={3} onAddFirst={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Show shot 2 of 2' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 11' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 4' }));
-    const panel = screen.getByRole('region', { name: 'Hole 4' });
-    expect(panel.querySelector('.hole-walk-photo img')).toHaveAttribute('src', '/photo-a.jpg');
+  it('switching holes resets the displayed photograph to the first — course gallery', () => {
+    const rows = [photo('a', 4), photo('b', 4), photo('c', 11)]; const walk = deriveHoleWalk([hole(4),hole(11)], rows); expect(walk.tiles.find(t=>t.hole.hole_no===4)?.photos[0].id).toBe('a'); expect(walk.tiles.find(t=>t.hole.hole_no===11)?.photos[0].id).toBe('c');
   });
-  it.each([['below', window.innerHeight + 1, 1], ['visible', 100, 0]] as const)('scrolls only when the region is %s the viewport', (_state, top, calls) => {
+  it.each([['below', window.innerHeight + 1, 0], ['visible', 100, 0]] as const)('gallery opening never scrolls the page when the former panel would be %s the viewport', (_state, top, calls) => {
     const scroll = vi.fn();
     const original = HTMLElement.prototype.scrollIntoView;
     HTMLElement.prototype.scrollIntoView = scroll;

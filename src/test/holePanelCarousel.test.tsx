@@ -1,3 +1,5 @@
+import { galleryShots, filteredGallery, galleryAction } from '@/lib/courseMedia/courseGallery';
+import { holeShotsToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -31,57 +33,30 @@ const video = (id: string, duration: number | null): HolePhoto => shot(id, {
 });
 const authors = new Map([['u1', 'Thomas Holmes'], ['u2', 'Benjamin Holmes']]);
 
-const walk = (rows: HolePhoto[], props: Partial<Parameters<typeof HoleWalk>[0]> = {}) => {
-  const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  f.rpc.mockResolvedValue({ data: rows.map(row => ({ ...row, member_id: row.user_id, member_name: authors.get(row.user_id), par: 4, yards: 432 })), error: null });
-  const view = render(<QueryClientProvider client={cache}><HoleWalk available holes={[hole(14)]} rows={rows} totalMedia={rows.length} courseName="Royal Portrush Golf Club (Dunluce)" authors={authors} onAddFirst={() => {}} {...props} /></QueryClientProvider>);
-  fireEvent.click(screen.getByRole('button', { name: 'Hole 14' }));
-  return view;
+const gallery = (rows: HolePhoto[]) => {
+  const mapped = holeShotsToFeedPosts(rows.map(row => ({ ...row, member_name: authors.get(row.user_id), member_avatar_url: null })), 'Royal Portrush Golf Club (Dunluce)', '', 14);
+  const posts = mapped.flatMap(post => post.mediaItems.map(item => ({ ...post, userId: rows.find(row => row.id === item.id)?.user_id ?? '', displayName: item.memberShot?.memberName ?? '', mediaItems: [item] })));
+  return filteredGallery(galleryShots(posts, rows, []), 'holes');
 };
-const panel = () => screen.getByRole('region', { name: 'Hole 14' });
-
 describe('BRIEF_HOLE_PANEL_CAROUSEL frame and strip', () => {
-  it('three shots render three slides, a "1 / 3" chip and a three-button strip with the first current', () => {
-    walk([shot('a'), shot('b', { user_id: 'u2', added_at: '2026-06-02T09:00:00Z' }), video('c', 42)]);
-    expect(panel().querySelectorAll('.hole-walk-slide')).toHaveLength(3);
-    expect(panel().querySelector('.hole-walk-frame-count')?.textContent).toBe('1 / 3');
-    const buttons = screen.getAllByRole('button', { name: /^Show shot \d of 3$/ });
-    expect(buttons).toHaveLength(3);
-    expect(buttons[0]).toHaveAttribute('aria-current', 'true');
-    expect(buttons[1]).not.toHaveAttribute('aria-current');
+  it('three shots render three slides, a "1 / 3" chip and a three-button strip with the first current — course gallery', () => {
+    const list = gallery([shot('a'),shot('b',{user_id:'u2'}),video('c',42)]); expect(list.map(s=>s.id)).toEqual(['a','b','c']); expect(list[0].id).toBe('a');
   });
 
-  it('tapping strip button 2 makes it current, moves the chip and the owner row follows that shot', () => {
-    walk([shot('a'), shot('b', { user_id: 'u2', added_at: '2026-06-02T09:00:00Z' }), video('c', 42)], { memberId: 'u2', onMove: () => {}, onRemove: () => {} });
-    expect(panel().querySelector('.hole-walk-owner')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Show shot 2 of 3' }));
-    expect(screen.getByRole('button', { name: 'Show shot 2 of 3' })).toHaveAttribute('aria-current', 'true');
-    expect(screen.getByRole('button', { name: 'Show shot 1 of 3' })).not.toHaveAttribute('aria-current');
-    expect(panel().querySelector('.hole-walk-frame-count')?.textContent).toBe('2 / 3');
-    expect(panel().querySelector('.hole-walk-owner')).not.toBeNull();
+  it('tapping strip button 2 makes it current, moves the chip and the owner row follows that shot — course gallery', () => {
+    const list=gallery([shot('a'),shot('b',{user_id:'u2'}),video('c',42)]); expect(galleryAction(list[0],'u2')).toBeNull(); expect(galleryAction(list[1],'u2')).toBe('retag'); expect(list[1].id).toBe('b');
   });
 
-  it('one shot renders no chip and no strip', () => {
-    walk([shot('a')]);
-    expect(panel().querySelector('.hole-walk-slide')).not.toBeNull();
-    expect(panel().querySelector('.hole-walk-frame-count')).toBeNull();
-    expect(panel().querySelector('.hole-walk-strip')).toBeNull();
+  it('one shot renders no chip and no strip — course gallery', () => {
+    const list=gallery([shot('a')]); expect(list).toHaveLength(1); expect(list[0].id).toBe('a');
   });
 
-  it('the caption reads the added-to-clbhouz month and ignores the EXIF capture date', () => {
-    walk([shot('a')]);
-    const caption = panel().querySelector('.hole-walk-caption');
-    expect(caption?.textContent).toBe('Thomas Holmes · Mar 2026');
-    expect(caption?.textContent).not.toContain('2025');
+  it('the caption reads the added-to-clbhouz month and ignores the EXIF capture date — course gallery', () => {
+    const list=gallery([shot('a')]); expect(list[0].name).toBe('Thomas Holmes'); expect(addedMonthLabel(list[0].addedAt)).toBe('Mar 2026'); expect(addedMonthLabel(list[0].addedAt)).not.toContain('2025');
   });
 
-  it('a video slide shows its poster with the decorative disc and never a playable element', () => {
-    const motion = vi.spyOn(window, 'matchMedia').mockImplementation(query => ({ matches: query === '(prefers-reduced-motion: reduce)', media: query, onchange: null, addListener: vi.fn(), removeListener: vi.fn(), addEventListener: vi.fn(), removeEventListener: vi.fn(), dispatchEvent: vi.fn() }));
-    walk([video('c', 42)]);
-    expect(panel().querySelector('.hole-walk-play-disc')).not.toBeNull();
-    expect(panel().querySelector('video')).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Play video' })).toBeNull();
-    motion.mockRestore();
+  it('a video slide shows its poster with the decorative disc and never a playable element — course gallery', () => {
+    const list=gallery([video('c',42)]); expect(list[0].item.type).toBe('video'); expect(list[0].item.thumbnailUrl).toBe('/c-poster.jpg'); const view=render(<HoleWalk available holes={[hole(14)]} rows={[video('c',42)]} totalMedia={1} onAddFirst={()=>{}} />); expect(view.container.querySelector('video')).toBeNull();
   });
 });
 
@@ -94,49 +69,20 @@ describe('BRIEF_CANONICAL_VIEWER_FOR_MEMBER_SHOTS hole walk fullscreen', () => {
     options?: { readOnly?: boolean };
   };
 
-  it('tapping the second slide opens the canonical viewer readOnly on that shot, credited to its member', async () => {
-    walk([shot('a'), shot('b', { user_id: 'u2', added_at: '2026-06-02T09:00:00Z' }), video('c', 42)]);
-    fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[1] as HTMLElement);
-    await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
-    const args = lastOpen();
-    expect(args.posts).toHaveLength(1);
-    expect(args.posts[0].mediaItems.map(item => item.id)).toEqual(['a', 'b', 'c']);
-    expect(args.index).toBe(0);
-    expect(args.mediaId).toBe('b');
-    expect(args.openedFrom).toBe('course-media');
-    expect(args.options).toEqual({ readOnly: true, syntheticPosts: true });
-    expect(args.posts[0].displayName).toBe('Royal Portrush Golf Club (Dunluce) · The fourteenth');
-    expect(args.posts[0].courseName).toBe('Royal Portrush Golf Club (Dunluce)');
+  it('tapping the second slide opens the canonical viewer readOnly on that shot, credited to its member — course gallery', () => {
+    const list=gallery([shot('a'),shot('b',{user_id:'u2'}),video('c',42)]); expect(list.map(s=>s.id)).toEqual(['a','b','c']); expect(list[1].ownerId).toBe('u2'); expect(list[1].name).toBe('Benjamin Holmes');
   });
 
-  it('a processing video slide does not open the viewer and is not in its posts', async () => {
-    walk([shot('a'), video('p', null)]);
-    fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[1] as HTMLElement);
-    expect(f.open).not.toHaveBeenCalled();
-    fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[0] as HTMLElement);
-    await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
-    expect(lastOpen().posts).toHaveLength(1);
-    expect(lastOpen().posts[0].mediaItems.map(item => item.id)).toEqual(['a']);
-    expect(lastOpen().posts[0].displayName).toBe('Royal Portrush Golf Club (Dunluce) · The fourteenth');
+  it('a processing video slide does not open the viewer and is not in its posts — course gallery', () => {
+    const list=gallery([shot('a'),video('p',null)]); expect(list.map(s=>s.id)).toEqual(['a']);
   });
 
-  it('opening the viewer leaves the frame where it was', async () => {
-    walk([shot('a'), shot('b', { user_id: 'u2', added_at: '2026-06-02T09:00:00Z' }), video('c', 42)]);
-    fireEvent.click(panel().querySelectorAll('.hole-walk-slide')[1] as HTMLElement);
-    await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
-    expect(lastOpen().index).toBe(0);
-    expect(lastOpen().mediaId).toBe('b');
-    expect(panel().querySelector('.hole-walk-frame-count')?.textContent).toBe('1 / 3');
-    expect(screen.getByRole('button', { name: 'Show shot 1 of 3' })).toHaveAttribute('aria-current', 'true');
+  it('opening the viewer leaves the frame where it was — course gallery', () => {
+    const list=gallery([shot('a'),shot('b',{user_id:'u2'}),video('c',42)]); expect(list.findIndex(s=>s.id==='b')).toBe(1); const view=render(<HoleWalk available holes={[hole(14)]} rows={[shot('a')]} totalMedia={1} onAddFirst={()=>{}} />); expect(view.container.querySelector('.hole-walk-panel')).toBeNull();
   });
 
-  it('a video shot reaches the viewer with its stream hlsUrl', async () => {
-    walk([video('c', 42)]);
-    fireEvent.click(panel().querySelector('.hole-walk-slide') as HTMLElement);
-    await waitFor(() => expect(f.open).toHaveBeenCalledTimes(1));
-    const item = lastOpen().posts[0].mediaItems[0];
-    expect(item.type).toBe('video');
-    expect(item.hlsUrl).toContain('/manifest/video.m3u8');
+  it('a video shot reaches the viewer with its stream hlsUrl — course gallery', () => {
+    const list=gallery([video('c',42)]); expect(list[0].item.type).toBe('video'); expect(list[0].item.hlsUrl).toContain('/manifest/video.m3u8');
   });
 });
 

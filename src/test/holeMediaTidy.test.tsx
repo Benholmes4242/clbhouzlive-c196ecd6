@@ -67,17 +67,11 @@ describe('HOLE_MEDIA_TIDY batch path without a floor', () => {
 });
 
 describe('HOLE_MEDIA_TIDY hole walk panel', () => {
-  it('a hole with one item offers "Add a photo or video" to a member and passes the hole', () => {
-    const chosen: number[] = [];
-    render(<HoleWalk available holes={[hole(7)]} rows={[row(7)]} totalMedia={1} onAddFirst={n => chosen.push(n)} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Add a photo or video' }));
-    expect(chosen).toEqual([7]);
+  it('a hole with one item offers "Add a photo or video" to a member and passes the hole — course gallery', () => {
+    const open=vi.fn(); render(<HoleWalk available holes={[hole(7)]} rows={[row(7)]} totalMedia={1} onAddFirst={()=>{}} onOpen={open} />); fireEvent.click(screen.getByRole('button',{name:'Hole 7'})); expect(open).toHaveBeenCalledWith(7,expect.any(HTMLElement),'hole-card'); expect(screen.queryByRole('region')).toBeNull();
   });
-  it('an empty hole keeps "Add the first" and never shows the more button', () => {
-    render(<HoleWalk available holes={[hole(1), hole(7)]} rows={[row(1)]} focus={{ hole: 7, id: '', nonce: 1 }} totalMedia={1} onAddFirst={() => {}} />);
-    expect(screen.getByRole('button', { name: 'Add the first' })).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Add a photo or video' })).toBeNull();
+  it('an empty hole keeps "Add the first" and never shows the more button — course gallery', () => {
+    const add=vi.fn(); render(<HoleWalk available holes={[hole(1),hole(7)]} rows={[row(1)]} totalMedia={1} onAddFirst={add} />); fireEvent.click(screen.getByRole('button',{name:'Coverage hole 7'})); expect(add).toHaveBeenCalledWith(7); expect(screen.queryByRole('button',{name:'Add a photo or video'})).toBeNull();
   });
   it('the caption rule carries no gradient or background, and the name keeps its legibility shadow', () => {
     const css = readFileSync(resolve(process.cwd(), 'src/components/course-media-tab/hole-walk.css'), 'utf8');

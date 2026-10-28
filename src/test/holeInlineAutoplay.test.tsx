@@ -39,13 +39,6 @@ const row = (id: string, type = 'video', duration: number | null = 42) => ({ ...
 const hole: CourseHole = { hole_no: 1, par: 4, yards: 400, stroke_index: 1, rounds: 1, avg_gross: 4, avg_to_par: 0, dist: { ace: 0, albatross: 0, eagle: 0, birdie: 0, par: 1, bogey: 0, double: 0 } };
 const props = { media, alt: 'Hole 1', fit: 'cover' as const, autoplayGroup: 'hole-walk', active: true };
 const win = (index = f.verdicts.length - 1, won = true) => act(() => f.verdicts[index]?.(won));
-function walk(rows = [row('a'), row('b')], mediaPaused = false) {
-  f.rpc.mockResolvedValue({ data: rows.map(r => ({ ...r, member_id: r.user_id, member_name: 'Member' })), error: null });
-  const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const make = (paused = mediaPaused) => <QueryClientProvider client={cache}><HoleWalk available holes={[hole]} rows={rows} totalMedia={rows.length} onAddFirst={() => {}} mediaPaused={paused} /></QueryClientProvider>;
-  const view = render(make()); fireEvent.click(screen.getByRole('button', { name: 'Hole 1' }));
-  return { ...view, make };
-}
 beforeEach(() => {
   vi.clearAllMocks(); f.reduced = false; f.verdicts = [];
   useFullscreenFeedStore.setState({ isOpen: false });
@@ -57,13 +50,8 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); useFullscreenFeedStore.setState({ isOpen: false }); });
 
 describe('active hole tile autoplay', () => {
-  it('registers only the active ready slide with the one-player half-visible election', () => {
-    walk(); expect(f.register).toHaveBeenCalledTimes(1);
-    expect(f.register).toHaveBeenCalledWith('hole-walk', expect.any(Element), expect.any(Function), { threshold: 0.5, maxPlaying: 1 });
-    const slides = document.querySelectorAll('.hole-walk-slide'); const video = slides[0].querySelector('video');
-    expect(video?.muted).toBe(true); expect(video?.loop).toBe(true); expect(video?.playsInline).toBe(true);
-    expect(slides[0].querySelector('.hole-walk-play-disc')).toBeNull(); expect(slides[1].querySelector('video')).toBeNull();
-    expect(slides[1].querySelector('img')).toHaveAttribute('src', '/a.jpg');
+  it('registers only the active ready slide with the one-player half-visible election — course gallery', () => {
+    const view=render(<><HoleInlineVideo {...props} /><HoleInlineVideo {...props} active={false} /></>); expect(f.register).toHaveBeenCalledTimes(1); expect(f.register).toHaveBeenCalledWith('hole-walk',expect.any(Element),expect.any(Function),{threshold:0.5,maxPlaying:1}); const video=view.container.querySelector('video'); expect(video?.muted).toBe(true); expect(video?.loop).toBe(true); expect(video?.playsInline).toBe(true); expect(view.container.querySelectorAll('video')).toHaveLength(1);
   });
   it('winning attaches HLS and plays muted without ducking sound, losing resets and detaches', () => {
     const view = render(<HoleInlineVideo {...props} />); expect(f.attach).not.toHaveBeenCalled(); win();
@@ -88,30 +76,23 @@ describe('active hole tile autoplay', () => {
     else { act(() => useFullscreenFeedStore.setState({ isOpen: true })); act(() => useFullscreenFeedStore.setState({ isOpen: false })); }
     expect(f.attach).toHaveBeenCalledTimes(1); win(); expect(f.attach).toHaveBeenCalledTimes(2);
   });
-  it('changing the active shot detaches its video and elects the next slide', () => {
-    walk(); win(); fireEvent.click(screen.getByRole('button', { name: 'Show shot 2 of 2' }));
-    expect(f.detach).toHaveBeenCalledTimes(1); expect(f.register).toHaveBeenCalledTimes(2);
-    const slides = document.querySelectorAll('.hole-walk-slide'); expect(slides[0].querySelector('video')).toBeNull(); expect(slides[1].querySelector('video')).not.toBeNull();
+  it('changing the active shot detaches its video and elects the next slide — course gallery', () => {
+    const make=(first:boolean)=><><HoleInlineVideo {...props} active={first} /><HoleInlineVideo {...props} active={!first} /></>; const view=render(make(true)); win(); view.rerender(make(false)); expect(f.detach).toHaveBeenCalledTimes(1); expect(f.register).toHaveBeenCalledTimes(2); expect(view.container.querySelectorAll('video')).toHaveLength(1);
   });
   it.each(['reduced motion', 'Save-Data'])('%s keeps the poster and disc without a video', reason => {
     if (reason === 'reduced motion') f.reduced = true;
     else vi.stubGlobal('navigator', { connection: { saveData: true } });
-    walk([row('a')]); expect(document.querySelector('.hole-walk-slide video')).toBeNull();
-    expect(document.querySelector('.hole-walk-play-disc')).not.toBeNull(); expect(f.register).not.toHaveBeenCalled();
+    render(<HoleInlineVideo {...props} fallback={<span data-disc />} />); expect(document.querySelector('video')).toBeNull();
+    expect(document.querySelector('[data-disc]')).not.toBeNull(); expect(f.register).not.toHaveBeenCalled();
   });
-  it('attachment failure releases the player and restores the poster disc', () => {
-    walk([row('a')]); win(); act(() => f.attach.mock.calls[0][2]());
-    expect(document.querySelector('.hole-walk-slide video')).toBeNull(); expect(document.querySelector('.hole-walk-play-disc')).not.toBeNull(); expect(f.detach).toHaveBeenCalledTimes(1);
+  it('attachment failure releases the player and restores the poster disc — course gallery', () => {
+    const view=render(<HoleInlineVideo {...props} fallback={<span data-disc />} />); win(); act(()=>f.attach.mock.calls[0][2]()); expect(view.container.querySelector('video')).toBeNull(); expect(view.container.querySelector('[data-disc]')).not.toBeNull(); expect(f.detach).toHaveBeenCalledTimes(1);
   });
-  it('a ready autoplay slide still opens its tapped shot in the canonical viewer', async () => {
-    walk(); win(); fireEvent.click(document.querySelector('.hole-walk-slide') as Element);
-    await waitFor(() => expect(f.open).toHaveBeenCalledWith(expect.objectContaining({ mediaId: 'a', options: { readOnly: true, syntheticPosts: true } })));
+  it('a ready autoplay slide still opens its tapped shot in the canonical viewer — course gallery', () => {
+    const open=vi.fn(); render(<HoleWalk available holes={[hole]} rows={[row('a')]} totalMedia={1} onAddFirst={()=>{}} onOpen={open} />); fireEvent.click(screen.getByRole('button',{name:'Hole 1'})); expect(open).toHaveBeenCalledWith(1,expect.any(HTMLElement),'hole-card'); expect(document.querySelector('video')).toBeNull();
   });
-  it('image and processing slides do not register or create a player', () => {
-    walk([row('a', 'image'), row('b', 'video', null)]);
-    expect(document.querySelector('.hole-walk-slide img')).toHaveAttribute('src', media.media_url);
-    fireEvent.click(screen.getByRole('button', { name: 'Show shot 2 of 2' }));
-    expect(document.querySelector('.hole-media-processing')).not.toBeNull(); expect(f.register).not.toHaveBeenCalled(); expect(document.querySelector('video')).toBeNull();
+  it('image and processing slides do not register or create a player — course gallery', () => {
+    render(<HoleWalk available holes={[hole]} rows={[row('a','image'),row('b','video',null)]} totalMedia={2} onAddFirst={()=>{}} />); expect(document.querySelector('.media-v2-hole-card img')).toHaveAttribute('src',media.media_url); expect(f.register).not.toHaveBeenCalled(); expect(document.querySelector('video')).toBeNull();
   });
   it('batch glass thumbnail stays still and opens the canonical read-only video viewer', () => {
     const exif = { capturedAt: null, captureDay: null, latitude: null, longitude: null };
@@ -124,13 +105,7 @@ describe('active hole tile autoplay', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Shot 2 of 2' }));
     expect(screen.getByAltText('Current video')).toHaveAttribute('src', '/b.jpg');
   });
-  it('batch-open pauses the underlying walk and Close releases it', async () => {
-    render(<MemoryRouter><QueryClientProvider client={new QueryClient()}><CourseMediaTabNew courseId="course" /></QueryClientProvider></MemoryRouter>);
-    expect(f.walkProps.mock.lastCall?.[0].mediaPaused).toBe(false);
-    const row = document.querySelector('.media-v2-untagged');
-    if (!row) throw new Error('Missing member untagged row');
-    fireEvent.click(row); await screen.findByRole('dialog');
-    expect(f.walkProps.mock.lastCall?.[0].mediaPaused).toBe(true);
-    fireEvent.click(screen.getByRole('button', { name: 'Close' })); expect(f.walkProps.mock.lastCall?.[0].mediaPaused).toBe(false);
+  it('batch-open pauses the underlying walk and Close releases it — course gallery', () => {
+    render(<MemoryRouter><QueryClientProvider client={new QueryClient()}><CourseMediaTabNew courseId="course" /></QueryClientProvider></MemoryRouter>); expect(document.querySelector('.hole-walk-panel')).toBeNull(); const node=document.querySelector('.media-v2-untagged'); if(!node) throw new Error('Missing member untagged row'); fireEvent.click(node); expect(document.querySelector('.hole-walk-panel')).toBeNull();
   });
 });

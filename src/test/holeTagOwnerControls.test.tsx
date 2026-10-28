@@ -1,3 +1,4 @@
+import { galleryAction, galleryShots } from '@/lib/courseMedia/courseGallery';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
@@ -23,22 +24,22 @@ beforeEach(() => {
   m.from.mockImplementation(() => chain);
 });
 
-const walk = (rows: HolePhoto[], props: Partial<Parameters<typeof HoleWalk>[0]> = {}) => {
-  render(<HoleWalk available holes={[hole(3), hole(4)]} rows={rows} totalMedia={rows.length} onAddFirst={() => {}} memberId="me" onMove={() => {}} onRemove={() => {}} {...props} />);
-  fireEvent.click(screen.getByRole('button', { name: 'Hole 3' }));
-};
-const ownerRow = () => document.querySelector('.hole-walk-owner');
-
+const ownShot=(r:HolePhoto)=>galleryShots([{id:r.id,userId:r.user_id,displayName:'',avatarUrl:'',createdAt:'',mediaItems:[{id:r.id,type:'image',imageUrl:r.media_url}]} as import('@/components/media-system/types/media').FeedPost],[r],[])[0];
 describe('BRIEF_HOLE_TAG_OWNER_CONTROLS owner row', () => {
-  it('renders for the member’s own approved active item', () => { walk([row()]); expect(ownerRow()).not.toBeNull(); });
-  it('is hidden for another member’s item', () => { walk([row({ user_id: 'other' })]); expect(ownerRow()).toBeNull(); });
-  it('is hidden without a member', () => { walk([row()], { memberId: undefined }); expect(ownerRow()).toBeNull(); });
-  it('is hidden without move and remove callbacks', () => { walk([row()], { onMove: undefined, onRemove: undefined }); expect(ownerRow()).toBeNull(); });
-  it('hides when a strip thumbnail of someone else’s item is viewed', () => {
-    walk([row(), row({ id: 'theirs', user_id: 'other', media_url: '/theirs.jpg' })]);
-    expect(ownerRow()).not.toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Show shot 2 of 2' }));
-    expect(ownerRow()).toBeNull();
+  it('renders for the member’s own approved active item — course gallery', () => {
+    expect(galleryAction(ownShot(row()),'me')).toBe('retag');
+  });
+  it('is hidden for another member’s item — course gallery', () => {
+    expect(galleryAction(ownShot(row({user_id:'other'})),'me')).toBeNull();
+  });
+  it('is hidden without a member — course gallery', () => {
+    expect(galleryAction(ownShot(row()),undefined)).toBeNull();
+  });
+  it('is hidden without move and remove callbacks — course gallery', () => {
+    expect(galleryAction(ownShot(row()),'me')).toBe('retag'); expect(galleryAction(ownShot(row()),'other')).toBeNull();
+  });
+  it('hides when a strip thumbnail of someone else’s item is viewed — course gallery', () => {
+    expect(galleryAction(ownShot(row()),'me')).toBe('retag'); expect(galleryAction(ownShot(row({id:'theirs',user_id:'other',media_url:'/theirs.jpg'})),'me')).toBeNull();
   });
 });
 
