@@ -50,6 +50,7 @@ export function useNearbyCourseStats(
           id: c.id, name: c.name,
           your_rounds: num(r?.your_rounds), your_best: num(r?.your_best),
           avg_over_par: num(r?.avg_over_par), rounds_tracked: num(r?.rounds_tracked),
+          hardest_hole_no: num(r?.hardest_hole_no),
         };
       });
     },
