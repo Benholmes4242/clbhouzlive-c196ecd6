@@ -6,7 +6,6 @@ import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { resolvePostAuthRoute } from '@/lib/auth/postAuthRoute';
-import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 
 interface AuthProps {
   defaultSignUp?: boolean;
