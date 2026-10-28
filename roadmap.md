@@ -1,5 +1,10 @@
 # Roadmap
 
+## BC5 — Create business and finish
+- [ ] Extract editor creation unchanged into one shared path; preserve editor tests and safeguards.
+- [ ] Add creating, saved finish/partials/claim actions and dirty departure confirmation.
+- [ ] Switch canonical create route and redirect alias; run full suite and report existing POST / REVIEW stop separately.
+
 ## POST / REVIEW — Centred option B
 - [x] Apply cap-trimmed words, cropped 14×11.9 arrows and centred 3.5px gaps; preserve other tabs and behaviour.
 - [x] Full `bunx vitest run`: 4,111 passed / 1 failed / 4,112 total across 436 files; inventory unchanged. Known ob1Welcome flake passes all 74 tests untouched.
