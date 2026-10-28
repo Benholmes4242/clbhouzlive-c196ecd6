@@ -73,7 +73,6 @@ vi.mock('@/lib/business/shareBusinessProfile', () => ({
 }));
 vi.mock('@/components/posts-tab/PostsTabContent', () => ({ default: () => <div data-posts-content /> }));
 vi.mock('@/components/business/ClubHowItPlays', () => ({ ClubHowItPlays: () => null }));
-vi.mock('@/components/business/BusinessProfileInfo', () => ({ BusinessProfileInfo: () => <div data-about-content /> }));
 vi.mock('@/components/business/BusinessTeamTab', () => ({ BusinessTeamTab: () => null }));
 vi.mock('@/components/moderation/ReportSheet', () => ({ ReportSheet: () => null }));
 vi.mock('@/components/shared/AvatarLightbox', () => ({ AvatarLightbox: () => null }));
@@ -226,12 +225,12 @@ describe('CB118 business Visiting', () => {
     fireEvent.click(row('book')); expect(toast).toHaveBeenCalledWith('Tee-time booking is coming soon.');
     expect(openExternalUrl).not.toHaveBeenCalled();
   });
-  it('page places the card directly after mentions and before unchanged tabs with shared booking callback', () => {
+  it('page places the card directly after mentions and before From {name} with shared booking callback', () => {
     const source = readFileSync('src/pages/BusinessProfilePage.tsx','utf8');
     const mentions = source.indexOf('<BusinessMentionsRail');
     const visiting = source.indexOf('<ClubVisiting', mentions);
     expect(visiting).toBeGreaterThan(mentions);
-    expect(visiting).toBeLessThan(source.indexOf('data-business-tabs'));
+    expect(visiting).toBeLessThan(source.indexOf('<ClubFromTheClub', visiting));
     expect(source.slice(visiting, source.indexOf('/>', visiting))).toContain('onBook={bizSecond?.onTap}');
   });
 });
@@ -282,16 +281,17 @@ describe('CB118.1 club courses loading identity', () => {
     const { container, client } = mount();
     await waitFor(() => expect(client.getQueryState(['business-club-courses','c1'])?.status).toBe('error'));
     expect(container.querySelector('[data-club-visiting]')).not.toBeNull();
-    expect(container.querySelector('[data-business-tabs]')).not.toBeNull();
-    expect(screen.getByRole('tab', { name:'About' })).toBeInTheDocument();
-    expect(container.querySelector('[data-posts-content]')).not.toBeNull();
+    expect(container.querySelector('[data-business-tabs]')).toBeNull();
+    expect(screen.queryByRole('tab', { name:'About' })).toBeNull();
+    expect(container.querySelector('[data-club-feed] [data-posts-content]')).not.toBeNull();
   });
   it('business without club_id never waits for pending club courses', () => {
     delayedCourses(); const { container, client } = mount({ club_id:null, category:'Brand / Manufacturer' });
     expect(client.getQueryState(['business-club-courses',null])?.fetchStatus).toBe('idle');
     expect(container.querySelector('[data-page-root]')).not.toBeNull();
     expect(container.querySelector('[data-club-visiting]')).not.toBeNull();
-    expect(screen.getByRole('tab', { name:'About' })).toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name:'About' })).toBeNull();
+    expect(container.querySelector('[data-club-feed]')).not.toBeNull();
     expect(container.firstElementChild).not.toHaveAttribute('aria-hidden','true');
   });
 });

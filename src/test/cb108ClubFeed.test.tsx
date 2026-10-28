@@ -44,7 +44,6 @@ vi.mock('@/components/posts-tab/PostsTabContent', () => ({
   default: (props: Record<string, unknown>) => { feedState.lastProps = props; return <div data-posts-content>{feedState.empty ? props.emptyOverride as ReactNode : null}</div>; },
 }));
 vi.mock('@/components/business/ClubHowItPlays', () => ({ ClubHowItPlays: () => null }));
-vi.mock('@/components/business/BusinessProfileInfo', () => ({ BusinessProfileInfo: () => <div data-about-content /> }));
 vi.mock('@/components/business/BusinessTeamTab', () => ({ BusinessTeamTab: ({ businessId }: { businessId: string }) => <div data-team-tab={businessId} /> }));
 vi.mock('@/components/moderation/ReportSheet', () => ({ ReportSheet: () => null }));
 vi.mock('@/components/shared/AvatarLightbox', () => ({ AvatarLightbox: () => null }));
@@ -212,10 +211,11 @@ describe('CB108 club page tabs', () => {
     rerender(<ClubVisiting business={fixture()} publicTeamCount={1} />);
     expect(document.querySelector('[data-visiting-row="team"] i')?.textContent).toBe('1 person at the club');
   });
-  it('a non-club profile keeps its tabs', async () => {
+  it('a non-club profile has no tabs and ends with From {name}', async () => {
     team = [{ is_public: true }];
     page({ club_id: null });
-    await waitFor(() => expect(screen.getAllByRole('tab').map((e) => e.textContent)).toEqual(['Posts', 'About', 'Team']));
-    expect(document.querySelector('[data-club-feed]')).toBeNull();
+    await waitFor(() => expect(document.querySelector('[data-club-feed]')).not.toBeNull());
+    expect(screen.queryByRole('tab')).toBeNull();
+    expect(document.querySelector('[data-club-feed]')?.getAttribute('aria-label')).not.toBe('From the club');
   });
 });

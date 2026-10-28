@@ -1,12 +1,11 @@
 /**
  * BusinessProfilePage - Phase 1 rebuild
  * Immersive header (mirrors personal profile, business-appropriate),
- * 3 tabs: Posts . About . Team (Team is conditional on >=1 public member).
+ * CB119: no tabs; clubs and non-clubs both end with ClubFromTheClub.
  */
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useParams, useLocation, useSearchParams } from 'react-router-dom';
-import { cn } from '@/lib/utils';
 import {
   Phone, Globe, MoreHorizontal, Loader2,
   Share2, Link2, Flag, Pencil, MessageCircle,
@@ -34,14 +33,10 @@ import { useStartConversation } from '@/hooks/messaging/useStartConversation';
 
 import { Button } from '@/components/ui/button';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
-import { RailChips } from '@/components/ui/RailChips';
 
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
-import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
-import { BusinessTeamTab } from '@/components/business/BusinessTeamTab';
 import { ProfileSurfaceSkeleton } from '@/components/skeletons/ProfileSurfaceSkeleton';
 
-import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 // FloatingPageHeader removed (H3) - chrome now driven by ChromeIsland registry.
 
 import {
@@ -66,7 +61,7 @@ import { A, Panel, LABEL, NUM } from '@/features/courses/components/holes/analyt
 import { ClubHowItPlays, type BusinessClubCourse } from '@/components/business/ClubHowItPlays';
 import { ClubWhatGolfersSay } from '@/components/business/ClubWhatGolfersSay';
 import { ClubVisiting } from '@/components/business/ClubVisiting';
-import { ClubFromTheClub } from '@/components/business/ClubFromTheClub';
+import { ClubFromTheClub, scrollToBusinessFeed } from '@/components/business/ClubFromTheClub';
 import { ClubYouCard } from '@/components/business/ClubYouCard';
 import { BusinessYouCard } from '@/components/business/BusinessYouCard';
 import { BusinessNearbyCourses, scrollToNearbyCard } from '@/components/business/BusinessNearbyCourses';
@@ -85,7 +80,6 @@ import { useBusinessClubMemberCount } from '@/hooks/useBusinessClubMemberCount';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { mayHaveClubAnalytics } from '@/features/business/clubAnalytics/useClubCourseLink';
 
-type BusinessTab = 'posts' | 'about' | 'team';
 
 
 // Normalize URL with protocol
@@ -177,10 +171,8 @@ const BusinessProfilePage: React.FC = () => {
   const { start: startConversation, isStarting: isStartingDM } = useStartConversation();
 
 
-  const [activeTab, setActiveTab] = useState<BusinessTab>('posts');
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
-  const tabsRef = useRef<HTMLElement>(null);
 
   const isOwner = membership?.canManage;
   const isFollowing = cachedFollowing ?? false;
@@ -192,10 +184,6 @@ const BusinessProfilePage: React.FC = () => {
   );
   const showTeamTab = publicTeamCount > 0;
 
-  // If user lands on `team` but it gets hidden later, fall back to posts
-  useEffect(() => {
-    if (activeTab === 'team' && !showTeamTab) setActiveTab('posts');
-  }, [activeTab, showTeamTab]);
 
   // Track profile visit - pass a real source from navigation state / query.
   const location = useLocation();
@@ -281,8 +269,8 @@ const BusinessProfilePage: React.FC = () => {
   // ----- early returns -----
   if (authLoading || isLoading || (business?.club_id && clubCoursesPending)) {
     // Same skeleton as the personal profile, configured: hero + headline
-    // figure + four-cell strip, no Top 10 rail, three chip tabs.
-    return <ProfileSurfaceSkeleton headline counters={4} tabs={3} />;
+    // figure + four-cell strip, no Top 10 rail; CB119: no tab row.
+    return <ProfileSurfaceSkeleton headline counters={4} tabs={0} />;
   }
 
   // Sentinel string from useBusinessProfile - keep in sync.
@@ -453,7 +441,7 @@ const BusinessProfilePage: React.FC = () => {
     onTap: k === 'followers'
       ? () => navigate(`/business/${business.slug || business.id}/followers`)
       : k === 'posts'
-        ? () => { setActiveTab('posts'); tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        ? scrollToBusinessFeed
         : k === 'coursesNear' || k === 'top100Near'
           ? scrollToNearbyCard
           : undefined,
@@ -464,34 +452,8 @@ const BusinessProfilePage: React.FC = () => {
       label: t(`coach.strip.${cell.key}`),
       onTap: cell.key === 'coached' || cell.key === 'avgChange' ? scrollToCoachResults
         : cell.key === 'followers' ? () => navigate(`/business/${business.slug || business.id}/followers`)
-        : () => { setActiveTab('posts'); tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); },
+        : scrollToBusinessFeed,
     })) : standardBizStrip;
-
-  const tabs: Array<{ id: BusinessTab; label: string }> = [
-    { id: 'posts', label: 'Posts' },
-    ...(!isClub ? [{ id: 'about' as const, label: 'About' }] : []),
-    ...(showTeamTab ? [{ id: 'team' as const, label: 'Team' }] : []),
-  ];
-
-  const renderTab = () => {
-    switch (activeTab) {
-      case 'posts':
-        return (
-          <PostsTabContent
-            actorType="business"
-            actorId={business.id}
-            isOwnProfile={isOwner || false}
-            businessName={business.name}
-          />
-        );
-      case 'about':
-        return isClub ? <PostsTabContent actorType="business" actorId={business.id} isOwnProfile={isOwner || false} businessName={business.name} /> : <BusinessProfileInfo business={business} canManage={isOwner} userId={user?.id} />;
-      case 'team':
-        return <BusinessTeamTab businessId={business.id} />;
-      default:
-        return null;
-    }
-  };
 
   return (
     <PageRoot className="min-h-screen" style={{ background: 'var(--bg-page)' }} immersiveStatusBar immersive>
@@ -568,6 +530,9 @@ const BusinessProfilePage: React.FC = () => {
       {!isClub && <BusinessMentionsRail isClub={false} businessId={business.id} viewerId={user?.id} canManage={!!membership?.canManage && !membershipQuery.isError} />}
 
       {!isClub && <ClubVisiting business={business} viewerId={user?.id} nonClub onBook={bizSecond?.onTap} publicTeamCount={publicTeamCount} />}
+      {/* CB119 — From {business}: the last non-club section, after Visiting / Contact. */}
+      {!isClub && <ClubFromTheClub businessId={business.id} businessName={business.name} postsCount={postsCount} isOwner={!!isOwner} onPost={bizTeam?.onPost}
+        title={`From ${business.name}`} emptyName={business.name} />}
 
       {/* CB105 — How it plays (club-only), replaces the retired courses panel. */}
       <ClubHowItPlays isClub={isClub} courses={courses} onOpen={handleCourseOpen} onFiguresResolved={handleFiguresResolved} />
@@ -588,30 +553,6 @@ const BusinessProfilePage: React.FC = () => {
           resolve to the canonical Canvas (#0A0A0C). */}
       {/* CB108: clubs have no tabs; From the club is the last section. */}
       {isClub && <ClubFromTheClub businessId={business.id} businessName={business.name} postsCount={postsCount} isOwner={!!isOwner} onPost={clubTeam?.onPost} />}
-
-      {!isClub && tabs.length > 1 && <section ref={tabsRef} data-business-tabs="" className="px-4">
-        <div className="flex justify-center" style={{ padding: '10px 0' }}>
-          <RailChips
-            align="center-when-fit"
-            options={tabs.map((tab) => ({ id: tab.id, label: tab.label }))}
-            value={activeTab}
-            onChange={(id) => {
-              setActiveTab(id as BusinessTab);
-              void analyticsEvents.track('business_tab_changed', {
-                business_id: business.id,
-                to: id,
-              });
-            }}
-            ariaLabel="Business profile sections"
-          />
-
-        </div>
-      </section>}
-
-      {/* ----- Tab content ----- */}
-      {!isClub && <div className={cn('min-h-[60vh]', activeTab === 'posts' ? 'pt-0 px-0' : 'pt-4 px-4')}>
-        {renderTab()}
-      </div>}
 
       {/* Bottom spacer */}
       <div style={{ height: 88 }} />

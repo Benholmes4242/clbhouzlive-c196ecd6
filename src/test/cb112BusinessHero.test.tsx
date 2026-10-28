@@ -54,7 +54,6 @@ vi.mock('@/lib/toast', () => ({ toast: Object.assign(vi.fn(), { success: vi.fn()
 vi.mock('@/lib/business/shareBusinessProfile', () => ({ shareBusinessProfile: vi.fn(), withShareSource: (u: string) => u }));
 vi.mock('@/components/posts-tab/PostsTabContent', () => ({ default: () => <div data-posts-content="" /> }));
 vi.mock('@/components/business/ClubHowItPlays', () => ({ ClubHowItPlays: () => null }));
-vi.mock('@/components/business/BusinessProfileInfo', () => ({ BusinessProfileInfo: () => <div data-about-content="" /> }));
 vi.mock('@/components/business/BusinessTeamTab', () => ({ BusinessTeamTab: () => null }));
 vi.mock('@/components/moderation/ReportSheet', () => ({ ReportSheet: () => null }));
 vi.mock('@/components/shared/AvatarLightbox', () => ({ AvatarLightbox: () => null }));
@@ -272,17 +271,16 @@ describe('CB112 figure strip', () => {
     await waitFor(() => expect(container.querySelector('[data-club-hero]')).not.toBeNull());
     expect(container.querySelector('[data-club-strip]')).toBeNull();
   });
-  it('Followers tap navigates; Posts tap selects the Posts tab', async () => {
+  it('Followers tap navigates; Posts tap scrolls to From {name}', async () => {
     Object.assign(state, { business: fixture({ category: 'Creator' }), followers: 3, posts: 2 });
-    const scroll = vi.fn();
-    Element.prototype.scrollIntoView = scroll;
     const r = renderPage();
-    await waitFor(() => expect(r.container.querySelector('[data-business-tabs]')).not.toBeNull());
-    fireEvent.click(screen.getByText('About'));
-    expect(r.container.querySelector('[data-about-content]')).not.toBeNull();
+    await waitFor(() => expect(r.container.querySelector('[data-club-feed]')).not.toBeNull());
+    expect(r.container.querySelector('[data-business-tabs]')).toBeNull();
+    Element.prototype.scrollTo = vi.fn() as never;
+    const spy = vi.spyOn(document, 'querySelector');
     fireEvent.click(r.container.querySelector('[data-cell="posts"]')!);
-    expect(r.container.querySelector('[data-posts-content]')).not.toBeNull();
-    expect(scroll).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledWith('[data-club-feed]');
+    spy.mockRestore();
     fireEvent.click(r.container.querySelector('[data-cell="followers"]')!);
     await waitFor(() => expect(r.container.querySelector('[data-loc="/business/fairway/followers"]')).not.toBeNull());
   });

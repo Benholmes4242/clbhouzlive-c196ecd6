@@ -180,6 +180,7 @@ function TopTenSkeleton() {
 function TabsSkeleton({ count }: { count: number }) {
   return (
     <div
+      data-skeleton-tabs=""
       style={{
         marginTop: 20,
         display: 'flex',
@@ -226,7 +227,7 @@ export const ProfileSurfaceSkeleton: React.FC<ProfileSurfaceSkeletonProps> = ({
     />
     <BioSkeleton />
     {topTen && <TopTenSkeleton />}
-    <TabsSkeleton count={tabs} />
+    {tabs > 0 && <TabsSkeleton count={tabs} />}
   </div>
 );
 
