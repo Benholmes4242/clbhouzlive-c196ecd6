@@ -1,6 +1,6 @@
 import React from 'react';
 import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, cleanup, act } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -23,7 +23,7 @@ vi.mock('@/components/ui/SquircleAvatar', () => ({ SquircleAvatar: (props: unkno
 vi.mock('@/features/search-v2/SearchOverlayV2', () => ({ SearchOverlayV2: () => null }));
 vi.mock('@/components/header/PostingAsMenu', () => ({ PostingAsMenu: () => null }));
 
-import { HcpCell, AvatarCell } from '@/features/chrome-v2/ChromeIsland';
+import { HcpCell, AvatarCell, ChromeIsland } from '@/features/chrome-v2/ChromeIsland';
 
 function LocationProbe() { const location = useLocation(); return <output data-testid="path">{location.pathname}</output>; }
 function setup() {
