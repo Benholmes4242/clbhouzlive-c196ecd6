@@ -1,5 +1,10 @@
 # Roadmap
 
+## Post or review sheet
+- [ ] Replace the numbered kind/course/NEXT form with signed-off Post and Review boxes and direct picker/handoff actions.
+- [ ] Add member-scoped review suggestions without round reads; update displayed composer counters, locales and analytics label.
+- [ ] Retarget superseded tests, run the full suite and report exact inventory/file changes; inherited BC5 and POST/REVIEW stops remain separate.
+
 ## BC5 — Create business and finish
 - [x] Ben approved recording returned-empty photo failures as partials in both shared callers; editor uses its existing warning toast.
 - [x] Extract shared creation/error reporting/owner notice, preserve editor toasts and edit writes; approved photo-failure recording added.
