@@ -63,7 +63,15 @@ const ERROR_MESSAGES: Record<string, string> = {
     'Our connection to England Golf is being refreshed. This is on our side, not yours. Try again shortly.',
   eg_unavailable: 'England Golf is temporarily unreachable. Please try again in a few minutes.',
   internal_error: 'Something went wrong on our side. Please try again in a moment.',
+  linked_elsewhere: 'This handicap is already linked to another clbhouz account.',
 };
+
+/** OB1.4: the edge function reports a second account linking the same record
+ * as internal_error carrying the unique rule name. Client-side mapping only. */
+export const LINKED_ELSEWHERE_RULE = 'whs_connections_passport_provider_unique';
+export function isLinkedElsewhere(code: string | null | undefined, message: string | null | undefined): boolean {
+  return (code ?? 'internal_error') === 'internal_error' && !!message && message.includes(LINKED_ELSEWHERE_RULE);
+}
 
 /**
  * BRIEF_WHS_CONNECT_INSTRUMENTATION — error categories for
@@ -248,8 +256,9 @@ export const WhsConnectScreen: React.FC<Props> = ({
       const data = await callConnectWhs(membershipNumber, password);
       if (data.ok === false) {
         const code = data.error_code ?? 'internal_error';
-        setError(ERROR_MESSAGES[code] ?? data.message ?? ERROR_MESSAGES.internal_error);
-        setErrorKind(errorKindFor(code));
+        const linked = isLinkedElsewhere(code, data.message);
+        setError(linked ? ERROR_MESSAGES.linked_elsewhere : ERROR_MESSAGES[code] ?? data.message ?? ERROR_MESSAGES.internal_error);
+        setErrorKind(linked ? 'linked_elsewhere' : errorKindFor(code));
         // Categorised, never the raw message (S3.2).
         analyticsEvents.track('whs_connect_failed', {
           category: categorizeWhsError(code, null),
@@ -283,8 +292,9 @@ export const WhsConnectScreen: React.FC<Props> = ({
       if (completeOnSuccess) { await onConnected(); return; }
       setSuccessData(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
-      setErrorKind('other');
+      const linked = err instanceof Error && isLinkedElsewhere('internal_error', err.message);
+      setError(linked ? ERROR_MESSAGES.linked_elsewhere : err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setErrorKind(linked ? 'linked_elsewhere' : 'other');
       // Name/shape only — the message string never leaves this function (S3.2).
       analyticsEvents.track('whs_connect_failed', {
         category: categorizeWhsError(null, err),
