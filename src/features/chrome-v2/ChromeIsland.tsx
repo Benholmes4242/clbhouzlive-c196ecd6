@@ -39,9 +39,12 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useHandicapHistory } from '@/lib/whs/hooks';
 import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
+import { useChromeScrolled } from '@/hooks/useScrollDirection';
+import { IndexGlance } from './IndexGlance';
+import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
+import { getDirectImageUrl } from '@/utils/r2ImageUtils';
 
 import { safeGoBack } from '@/utils/navigation';
-import { r } from '@/lib/radius';
 import { subscribeIslandEdge, getIslandEdgeScrolled } from './islandEdge';
 import {
   CHROME_BREATHING,
@@ -50,6 +53,10 @@ import {
   CHROME_ISLAND_H_VAR,
   CHROME_TOP_GAP,
 } from '@/lib/chromeClearance';
+
+const REDUCED_MOTION =
+  typeof window !== 'undefined' &&
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 const ISLAND_H = 46;
 const TOP_GAP = 10;
