@@ -101,13 +101,13 @@ describe('EP2 Name', () => {
 });
 
 describe('EP2 Username', () => {
-  const type = async (v: string) => { fireEvent.change(screen.getByLabelText('Username'), { target: { value: v } }); await act(async () => { await new Promise(r => setTimeout(r, 450)); }); };
+  const type = async (v: string) => { fireEvent.change(screen.getByRole('textbox', { name: 'Username' }), { target: { value: v } }); await act(async () => { await new Promise(r => setTimeout(r, 450)); }); };
   const saveBtn = () => within(screen.getByTestId('ep-sheet-username')).queryByRole('button', { name: 'Save' });
   it('availability: available enables Save; taken and invalid show the setup messages', async () => {
     mount(); open('username');
     expect(saveBtn()).toBeDisabled();
     await type('BenHolmes');
-    expect((screen.getByLabelText('Username') as HTMLInputElement).value).toBe('benholmes');
+    expect((screen.getByRole('textbox', { name: 'Username' }) as HTMLInputElement).value).toBe('benholmes');
     expect(screen.getByTestId('ep-available')).toBeInTheDocument();
     expect(saveBtn()).not.toBeDisabled();
     h.takenCount = 1; await type('taken1');
@@ -117,7 +117,7 @@ describe('EP2 Username', () => {
     expect(screen.getByTestId('ep-username-error')).toHaveAttribute('data-reason', 'invalid');
   });
   it('input follows the setup rules', () => {
-    mount(); open('username'); const i = screen.getByLabelText('Username');
+    mount(); open('username'); const i = screen.getByRole('textbox', { name: 'Username' });
     expect(i).toHaveAttribute('autocapitalize', 'none'); expect(i).toHaveAttribute('autocorrect', 'off'); expect(i).toHaveAttribute('spellcheck', 'false'); expect(i).toHaveAttribute('maxlength', '30');
   });
   it('ok calls change_username, closes and updates the card and the row', async () => {
@@ -138,7 +138,7 @@ describe('EP2 Username', () => {
     h.rpc.mockResolvedValue({ data: { ok: false, reason: 'too_soon', next_change_at: new Date(Date.now() + 10 * 86_400_000).toISOString() }, error: null });
     mount(); open('username'); await type('benholmes'); fireEvent.click(saveBtn()!);
     await waitFor(() => expect(saveBtn()).toBeNull());
-    expect(screen.getByLabelText('Username')).toHaveAttribute('readonly');
+    expect(screen.getByRole('textbox', { name: 'Username' })).toHaveAttribute('readonly');
   });
   it('too-soon state shows both en-GB dates, no action and a read-only field', () => {
     const at = new Date(Date.now() - 2 * 86_400_000);
@@ -147,7 +147,7 @@ describe('EP2 Username', () => {
     const sheet = screen.getByTestId('ep-sheet-username');
     expect(sheet.querySelector('.bizc-sheet-sub')?.textContent).toBe(`You changed it on ${fmt(at)}. You can change it again on ${fmt(new Date(at.getTime() + 30 * 86_400_000))}.`);
     expect(sheet.querySelector('.bizc-sheet-done')).toBeNull();
-    expect(screen.getByLabelText('Username')).toHaveAttribute('readonly');
+    expect(screen.getByRole('textbox', { name: 'Username' })).toHaveAttribute('readonly');
     expect(sheet.querySelector('.ep-username')).toHaveAttribute('data-soon', 'true');
   });
   it('a change older than 30 days is allowed', () => {
@@ -180,7 +180,7 @@ describe('EP2 old username links', () => {
 describe('EP2 Bio, Location, Gender', () => {
   it('bio counter and 300 limit; Done saves bio', async () => {
     mount(); open('bio');
-    const ta = screen.getByLabelText('Bio') as HTMLTextAreaElement;
+    const ta = screen.getByRole('textbox', { name: 'Bio' }) as HTMLTextAreaElement;
     expect(ta).toHaveAttribute('maxlength', '300');
     expect(screen.getByTestId('ep-bio-count').textContent).toBe('19 / 300');
     fireEvent.change(ta, { target: { value: 'x'.repeat(320) } });
