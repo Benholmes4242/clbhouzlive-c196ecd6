@@ -276,10 +276,10 @@ describe('CB112 figure strip', () => {
     const r = renderPage();
     await waitFor(() => expect(r.container.querySelector('[data-club-feed]')).not.toBeNull());
     expect(r.container.querySelector('[data-business-tabs]')).toBeNull();
-    const feed = r.container.querySelector<HTMLElement>('[data-club-feed]')!;
-    const spy = vi.spyOn(feed, 'getBoundingClientRect');
+    const spy = vi.spyOn(document, 'querySelector');
     fireEvent.click(r.container.querySelector('[data-cell="posts"]')!);
-    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledWith('[data-club-feed]');
+    spy.mockRestore();
     fireEvent.click(r.container.querySelector('[data-cell="followers"]')!);
     await waitFor(() => expect(r.container.querySelector('[data-loc="/business/fairway/followers"]')).not.toBeNull());
   });
