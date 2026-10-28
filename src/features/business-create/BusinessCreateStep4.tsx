@@ -14,9 +14,9 @@ import type { BusinessCreateDraft } from './createRules';
 import '@/styles/welcome.css';
 
 type PhotoKind = 'cover' | 'logo';
-interface Props { draft: BusinessCreateDraft; setDraft: (fn: (d: BusinessCreateDraft) => BusinessCreateDraft) => void; onFinish: () => void }
+interface Props { draft: BusinessCreateDraft; setDraft: (fn: (d: BusinessCreateDraft) => BusinessCreateDraft) => void; onFinish: () => void; creating?: boolean }
 
-export function BusinessCreateStep4({ draft, setDraft, onFinish }: Props) {
+export function BusinessCreateStep4({ draft, setDraft, onFinish, creating = false }: Props) {
   const coverInput = useRef<HTMLInputElement>(null);
   const logoInput = useRef<HTMLInputElement>(null);
   const aboutInput = useRef<HTMLTextAreaElement>(null);
@@ -84,7 +84,7 @@ export function BusinessCreateStep4({ draft, setDraft, onFinish }: Props) {
       <input ref={coverInput} type="file" accept="image/*" hidden data-testid="bizc-cover-picker" onChange={e => picked('cover', e.currentTarget)} />
       <input ref={logoInput} type="file" accept="image/*" hidden data-testid="bizc-logo-picker" onChange={e => picked('logo', e.currentTarget)} />
     </main>
-    <div className="bizc-foot"><Button variant="ghost" className="bizc-primary" onClick={finish}>Create my profile</Button></div>
+    <div className="bizc-foot"><Button variant="ghost" className="bizc-primary" disabled={creating} onClick={finish}>{creating ? 'Creating…' : 'Create my profile'}</Button></div>
     {sheet && <BizcSheet title={sheet === 'cover' ? 'Cover photo' : 'Logo'} hideHeader testId="bizc-photo-actions" onDone={() => setSheet(null)}>
       <Button variant="ghost" className="bizc-photo-action" onClick={() => pick(sheet)}>Choose another photo</Button>
       <Button variant="ghost" className="bizc-photo-action destructive" onClick={() => { const kind = sheet; setDraft(d => ({ ...d, [kind]: { ...emptyImage } })); setSheet(null); }}>{sheet === 'cover' ? 'Remove cover photo' : 'Remove logo'}</Button>

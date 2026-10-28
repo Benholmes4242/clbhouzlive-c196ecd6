@@ -1,5 +1,5 @@
 /**
- * BC1 — Create-a-business flow rules (hidden route /business/create-v2).
+ * BC5 — canonical Create-a-business flow rules (/business/create).
  * Display labels below exist for this flow only; the draft always stores the
  * canonical BUSINESS_CATEGORIES value, never the display label.
  */

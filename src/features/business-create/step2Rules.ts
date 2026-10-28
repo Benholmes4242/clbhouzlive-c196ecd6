@@ -1,5 +1,5 @@
 /**
- * BC2 — Create-a-business step 2 pure rules (hidden route /business/create-v2).
+ * BC2 — canonical Create-a-business step 2 pure rules (/business/create).
  * Club-card figures, place lines and small text helpers live here so the three
  * branch components stay presentational and the arithmetic is testable without
  * a render. Nothing here touches the database.

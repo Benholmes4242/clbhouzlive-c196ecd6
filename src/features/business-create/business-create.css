@@ -153,3 +153,15 @@ textarea.bizc-field-input{font-size:14.5px;font-weight:400;line-height:1.5;resiz
 .welcome-cropper[data-appearance=business] .welcome-cropper-head span{margin-top:4px}
 .welcome-cropper[data-appearance=business] .welcome-cropper-foot p{margin-bottom:36px}
 .welcome-cropper[data-appearance=business] .welcome-cropper-foot button{font-size:15.5px}
+
+/* BC5: saved finish keeps the existing frame and miniature, without actions. */
+.bizc-shell{--bizc-crest-bg:#E8EEF5;--bizc-crest-ink:#1f2a3a}
+.bizc-finish-body h1,.bizc-finish-body .bizc-mini-name{letter-spacing:0}
+.bizc-finish-cover{height:110px;display:block}
+.bizc-finish-crest{display:flex;align-items:center;justify-content:center;background:var(--bizc-crest-bg);color:var(--bizc-crest-ink);font-size:18px;font-weight:700;flex-shrink:0}
+.bizc-finish-note{font-size:13px;line-height:1.45;color:var(--bizc-mute);margin-top:10px}
+.bizc-next-label{margin-top:16px}.bizc-next-rows{margin-top:0}
+.bizc-next-row{display:flex;align-items:center;justify-content:flex-start;gap:12px;padding:13px 0;border:0;border-top:1px solid var(--bizc-hair);width:100%;height:auto;border-radius:0;white-space:normal;text-align:left;color:var(--bizc-ink);background:none;font-family:inherit}
+.bizc-next-row:first-child{border-top:0}.bizc-next-icon{width:34px;height:34px;border-radius:11px;background:var(--bizc-inset);border:1px solid var(--bizc-hair);display:flex;align-items:center;justify-content:center;flex:none}
+.bizc-next-icon[data-info=true],.bizc-next-chevron{color:var(--bizc-dim)}
+.bizc-next-text{flex:1;min-width:0}.bizc-next-text b{display:block;font-size:15px;font-weight:600}.bizc-next-text>span{display:block;font-size:13px;font-weight:400;color:var(--bizc-mute);margin-top:2px}
