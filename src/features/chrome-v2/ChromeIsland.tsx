@@ -32,7 +32,6 @@ import { useChromeLeftOverride, useChromeLeftSlot, useChromeSuppressed } from '.
 import { Z } from '@/config/zIndex';
 import { SearchOverlayV2 } from '@/features/search-v2/SearchOverlayV2';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useActorUnreadCounts } from '@/hooks/useActorUnreadCounts';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -670,6 +669,9 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
     getIslandEdgeScrolled,
     () => false,
   );
+  // Page scrolled past 24px (useScrollDirection store) — drives the scrim
+  // cross-fade; LeftCapsule reads the same flag for its scrolled title.
+  const scrolled = useChromeScrolled();
 
   const suppressed = hidden || runtimeSuppressed || spec.chrome === 'none';
   // bleed island routes let the page own top padding — publish 0 so content
