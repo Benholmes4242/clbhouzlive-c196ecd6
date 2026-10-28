@@ -1,46 +1,60 @@
-# Media tab round 3 — stop report
+# CB118.2 — Loading watcher correction and Media isolation checks
 
 ## Result
 
-Implemented the reordered Media page, Everything add/filter controls, ordered 128×164 place rail, photo/video picker title variants and shared option B glass tagging card. Member single/batch and admin batches share ShotTagCard and ScorecardGlassOverlay. Hole/place selection is exclusive; member saves remain on their existing paths. Admin place tag/untag calls use the existing RPCs and refresh queue/place/hole keys. Thumbnail opens use the canonical read-only synthetic viewer. Existing hole cards and unrelated upload/retag pickers were not redesigned.
+`bunx vitest run`: **3,816 passed / 0 failed / 3,816 tests across 418 files**, duration **306.02s**. Business-profile tests and all Media tests pass. Automatic preview check: **build OK, 2026-10-28T08:07:43Z**.
 
-Deleted `MEDIA_TAB_FINAL_REPORT.md` as requested. No SQL, migration, deployed RPC/edge-function, feed_config or native/Median changes. round_pool_cap remains 30.
+Before/after inventory: **3,816/418 → 3,816/418**, no count delta. Against the prior Media v3 baseline **3,808/417**, the eight additional tests remain the four intervening CB118.1 loading tests and the four shared glass accessibility tests in one new file. No tests added, deleted or renamed in CB118.2.
 
-The work is **not accepted as green**. No app/test correction followed the new test failure. Only the mandatory full-suite run and reporting followed it.
+## Watcher diff
 
-## Verification and inventory
+Only the explicitly authorized test **CB118.1 club courses loading identity > resolved club courses render the club layout without an intermediate non-club card** in `src/test/cb118BusinessVisiting.test.tsx` changed.
 
-- Targeted command: `bunx vitest run src/test/mediaV3.test.tsx src/test/coursePlaceTagging.test.tsx src/test/courseMediaV2.test.tsx src/test/holeTagBatchV3.test.tsx src/test/adminHoleTagging.test.tsx src/test/holePhotoFastPaths.test.tsx src/test/holeInlineAutoplay.test.tsx src/test/holeMediaTidy.test.tsx src/test/holeTagSingleToast.test.tsx src/test/holeWalk.test.tsx src/test/coursesRailsUnlimited.test.tsx`
-- Targeted: **163 passed / 1 failed / 164 total, 11 files**.
-- Full command: `bunx vitest run`
-- Full: **3,805 passed / 3 failed / 3,808 total, 417 files**. No skipped tests reported.
-- Requested historical green baseline: **3,734 / 414**. Intervening CB117 added 22 tests in `cb117BusinessMentions.test.tsx` (+1 file); CB118 added 33 in `cb118BusinessVisiting.test.tsx` (+1 file), reaching 3,789 / 416 with two CB107 failures. This turn adds **19 tests in mediaV3.test.tsx** (+1 file), reaching 3,808 / 417. Total delta against requested baseline: **+74 tests / +3 files**.
-- No existing test deleted; existing case counts unchanged. Renames and retargets listed below.
-- Latest automatic preview check: **build OK, 2026-10-28T07:26:48Z**. Earlier intermediate segment-prop errors cleared during the multi-file edit.
-- Authenticated live save/readback and signed-off visual geometry were not verified. No browser check was performed after the test stop.
+Old watched selector:
+`[data-business-tabs], [data-about-content], [data-posts-content]`
 
-## New failure (stop)
+New watched selector:
+`[role="tablist"], [data-business-you], [data-business-nearby], [data-business-followers], [data-business-mentions], [data-visiting-variant="business"]`
 
-`src/test/adminHoleTagging.test.tsx:127:85`
+Exact card roots:
+- BusinessYouCard: `data-business-you` (emitted by its shared YouCardShell).
+- BusinessNearbyCourses: `data-business-nearby`.
+- BusinessFollowersCard: `data-business-followers`.
+- BusinessMentionsRail: `data-business-mentions`.
+- Non-club ClubVisiting: newly added `data-visiting-variant="business"`.
 
-Case: **admin block and batch > member own block stays before admin and uses unchanged member write**
+The watcher still checks added elements and their descendants throughout pending-to-resolved rendering. Shared PostsTabContent is no longer misclassified as non-club. Every assertion stays unchanged, including `expect(nonClubNodes).toHaveLength(0)` and the resolved Visiting-after-What-golfers-say assertion. Reason: the club legitimately renders PostsTabContent in ClubFromTheClub.
 
-Tool words: `TestingLibraryElementError: Found multiple elements with the role "button" and name "Hole 7"`
+The only application-file change is the brief's explicit diagnostic-attribute exception: `data-visiting-variant={nonClub ? 'business' : undefined}` on ClubVisiting's section. Club markup omits the attribute, and appearance/behavior are unchanged. The accepted two-line loading gate is untouched.
 
-The document-wide Hole 7 lookup now matches the background no-photographs grid and the glass card's Hole 7. The former Dialog modal hid the background from accessible queries; the shared glass overlay does not. The requested member-write assertion was not reached. No selector, component or test correction was made after the failure.
+## Isolation results
 
-## Pre-existing failures, still present
+Each file was run alone, sequentially, using `bunx vitest run src/test/<file>.test.tsx --reporter=verbose`. None of the Media files, selectors or timeouts changed.
 
-These were new in the preceding CB118 task and pre-existing for this Media task:
+| File | Result | File duration | Named formerly timing-out case | Case time |
+| --- | --- | --- | --- | --- |
+| adminHoleTagging.test.tsx | 19/19 passed | 11.10s | Remove tag calls admin_untag_hole_media with the row id and refreshes the same keys | 982ms |
+| coursesRailsUnlimited.test.tsx | 15/15 passed | 8.22s | admin hole-tag predicate invalidation refetches the active infinite holes rail | 1786ms |
+| holePhotoFastPaths.test.tsx | 16/16 passed | 8.40s | MEDIA_FAST_1 > successful next tags exact URL and hole then advances | 545ms |
+| holePhotoFastPaths.test.tsx | same file run | same run | MEDIA_FAST_1 > a second and third photograph can be tagged to the same hole | 1351ms |
+| holeTagBatchV3.test.tsx | 28/28 passed | 19.59s | tapping the selected hole again deselects it and disables Tag; a different tap moves the selection | 1036ms |
+| mediaV3.test.tsx | 19/19 passed | 10.71s | single has one selection across holes and places, and only submits on primary | 1306ms |
 
-1. `src/test/cb107ClubVisiting.test.tsx:257:107` — **CB107 page integration > club Visiting follows What golfers say; contact rows and About are gone**.
-   Tool words: `AssertionError: expected false to be true // Object.is equality`.
-2. `src/test/cb107ClubVisiting.test.tsx:273:43` — **CB107 page integration > Team stays conditional and moves into Visiting as Meet the team**.
-   Tool words: `AssertionError: expected <div role="tablist" …(3)>…(3)</div> to be null`.
+All six are **pre-existing, Media-owned, load-dependent timeout failures** from the earlier run; none reproduces in isolation or in this turn's single full run. No timeout increases or Media fixes were made.
 
-Neither protected test was changed. No other failure was reported.
+Business check: `bunx vitest run src/test/cb118BusinessVisiting.test.tsx src/test/cb107ClubVisiting.test.tsx`: **59/59 passed across 2 files**, duration **6.98s**.
 
-## Existing test retargets and renames
+## Historical Hole 7 failure
+
+**admin block and batch > member own block stays before admin and uses unchanged member write** was the pre-existing Media-owned multiple-Hole-7 failure. Its selector and assertions remain unchanged here. The preceding shared-overlay accessibility correction already fixed it; it passes this isolation run (**723ms**) and this full run. No Media edit was made in CB118.2.
+
+## Protected scope
+
+No SQL, migrations, migration files, deployed RPC/edge function edits, feed_config changes or native/Median configuration edits. round_pool_cap remains 30. No authenticated live checks were required for this test-only correction.
+
+With full green confirmed, `MEDIA_V3_STOP_REPORT.md` is deleted as previously requested. Its historical test-change inventory is preserved below; those historical edits were not repeated in CB118.2.
+## Historical Media v3 test-change inventory (unchanged this turn)
+
 
 The new brief explicitly supersedes primary-button wording, large preview, segmented selection, header and glass presentation. The following cases retain write/ownership/state assertions and retarget those superseded controls. No existing test was removed.
 
@@ -108,6 +122,3 @@ Shared helper now targets `[data-tag-primary]`; removal flows target the separat
 - **admin-unavailable shots stay non-interactive with onRemove present**: asserts absent separate Remove tag instead of old primary not reading Remove tag; unavailable/inert/current shot assertions retained.
 - **from "All tagged", tapping a thumbnail shows Remove tag** → **from a completed batch, tapping a thumbnail shows Remove tag**: disabled Tag then enabled separate Remove tag; same stored-hole confirmation retained.
 
-## Remaining acceptance
-
-Resolve the new member integration accessibility/lookup failure only after authorization, then rerun the targeted and full suite. Two inherited CB107 failures also prevent the required all-passing result. Real signed-in admin/member save/readback and visual comparison remain unverified. No completion claim is made.

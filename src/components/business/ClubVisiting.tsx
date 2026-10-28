@@ -73,7 +73,7 @@ export function ClubVisiting({ business, viewerId, firstCourseRegion, publicTeam
     openExternalUrl(`https://www.google.com/maps/search/?api=1&query=${q}`, 'external');
   };
   if (nonClub && !booking && !hasDirections && !business.website && !business.phone && !business.email && !hasHours && publicTeamCount <= 0 && !business.amenities?.length && !socials.length) return null;
-  return <section className="club-visiting-card" data-club-visiting aria-label={nonClub ? kicker : 'Visiting'}>
+  return <section className="club-visiting-card" data-club-visiting data-visiting-variant={nonClub ? 'business' : undefined} aria-label={nonClub ? kicker : 'Visiting'}>
     <div className="club-visiting-kicker">{nonClub ? kicker : 'Visiting'}</div>
     {!nonClub && <VisitingRow id="book" Icon={CalendarDays} title="Book a tee time" sub="Coming soon to clbhouz" marker={<span className="club-visiting-tag">Soon</span>} onClick={() => toast('Tee-time booking is coming soon.')} />}
     {nonClub && booking && <VisitingRow id="book" Icon={CalendarDays} title={booking.label} sub={booking.kind === 'book' ? business.booking_url?.replace(/^https?:\/\//i, '').replace(/\/$/, '') : copy('comingSoon', 'Coming soon to clbhouz')} soon={booking.kind === 'soon'} marker={booking.kind === 'soon' ? <span className="club-visiting-tag">{copy('soon', 'Soon')}</span> : <ArrowUpRight size={15} />} onClick={handleBook} />}

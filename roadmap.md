@@ -1,14 +1,18 @@
 # Roadmap
 
+## CB118.2 — Correct loading watcher and isolate Media timeouts
+- [x] Watch only non-club tablist, business card roots and non-club Visiting variant; all assertions and accepted loading gate unchanged. Exact marker/old-new selector inventory in CB118_2_REPORT.md.
+- [x] Five Media files and all six timeout cases pass in isolation; business59/59. Single full bunx vitest run3,816/3,816 across418 files, zero failures, no test count delta. Media code/timeouts/Hole7 test unchanged; delete prior Media stop report after preserving historical inventory.
+
 ## Media v3 — Glass modal accessibility finish
 - [x] Hide background with aria-hidden hideOthers while an overlay card is open/mounted; undo on close/unmount; appearance, focus and gestures unchanged.
 - [x] Unchanged admin Hole7 selector and both unchanged CB107 cases pass; four new shared-overlay lifecycle tests pass. Complete bunx vitest run:3,815 passed/1 pre-existing CB118.1 failure/3,816 total/418 files. Delta vs3,808/417 is four intervening CB118.1 tests plus four new accessibility tests/new file. No existing tests edited. MEDIA_V3_ACCESSIBILITY_REPORT.md records diff and results.
-- [ ] Full green/report deletion blocked by unchanged cb118BusinessVisiting.test.tsx:274:28 `AssertionError: expected [ …(1) ] to have a length of +0 but got 1`; observer misclassifies legitimate club PostsTabContent. Needs authorization to correct that specific CB118.1 lookup; retain MEDIA_V3_STOP_REPORT.md until green.
+- [x] CB118.2 authorized correction of the watcher; full green3,816/418 confirmed. Historical Media inventory preserved in CB118_2_REPORT.md before deleting MEDIA_V3_STOP_REPORT.md.
 
 ## CB118.1 — Club identity during course loading
 - [x] Added two-line existing-skeleton gate on pending club-courses; query/hooks/error fallback/non-clubs unchanged. Both CB107 failures now pass UNEDITED in targeted/full runs; automatic build07:36:05Z OK.
 - [x] Added four regression tests in cb118BusinessVisiting (33→37); no old assertion/name changes or removals. Targeted58 passed/1 failed/59; full bunx vitest run3,804 passed/8 failed/3,812 total/417 files, +4 solely CB118.1. CB118_1_STOP_REPORT.md records diff, all errors and inventory.
-- [ ] STOP: cb118BusinessVisiting.test.tsx:274:28 `AssertionError: expected [ …(1) ] to have a length of +0 but got 1`; watcher mistakes legitimate club PostsTabContent for a non-club node. Existing Media Hole7 lookup failure remains, plus six newly observed unchanged Media-case 5000ms timeouts named in report. No correction/retest/browser check after stop; await authorization.
+- [x] CB118.2 corrected the authorized watcher without changing assertions; business tests green. Historical Media Hole7 failure resolved by preceding accessibility fix; six Media-owned load timeouts pass in isolation and full run unchanged.
 
 ## Media tab round 3
 - [x] Applied page order, Everything controls, 128×164 place rail and picker titles; shared option B glass card and existing admin place RPCs with queue/place/hole refresh. No protected backend/config changes.
