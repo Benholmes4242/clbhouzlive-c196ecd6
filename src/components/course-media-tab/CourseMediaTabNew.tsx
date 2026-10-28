@@ -39,7 +39,6 @@ import { pollStreamMetadata } from '@/utils/pollStreamMetadata';
 import { orderedBatch, type BatchPhoto } from '@/lib/courseMedia/holePhotoBatch';
 import { holePhotoErrorMessage } from '@/lib/courseMedia/holePhotoError';
 import { coursePhotoState } from '@/lib/courseMedia/emptyStates';
-import { isHoleTagFromPost } from '@/lib/courseMedia/removeHoleTag';
 import { memberTagConfirmation } from '@/lib/courseMedia/holeTagConfirmation';
 import { toast } from 'sonner';
 import { CourseFirstPhotoPicker, CoursePhotoRetagPicker, HoleTagRemoveDialog, CourseMediaNoPhotographs, CourseMediaNothing, CourseMediaNoHoleList, CourseMediaNotLive } from './CourseMediaEmptyStates';
@@ -69,14 +68,11 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const [batch, setBatch] = useState<(BatchPhoto & Partial<OwnMediaSource>)[] | null>(null);
   const [firstPhoto, setFirstPhoto] = useState(false);
   const [retagPhoto, setRetagPhoto] = useState<HolePhoto | null>(null);
-  const [removePhoto, setRemovePhoto] = useState<HolePhoto | null>(null);
   // Route focus is consumed once after both reads settle; HoleWalk owns shot fallback.
   const [searchParams] = useSearchParams();
   const deepLinkFocused = useRef(false);
   const linkedHole = searchParams.get('hole');
   const linkedShot = searchParams.get('shot');
-  const kindOf = (row: HolePhoto) => row.media_type === 'video' ? 'video' : 'photo';
-  const ordinalOf = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? 'th' : n % 10 === 1 ? 'st' : n % 10 === 2 ? 'nd' : n % 10 === 3 ? 'rd' : 'th'}`;
   const [fastPending, setFastPending] = useState(false);
   const [fastError, setFastError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
@@ -277,7 +273,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       <CourseMediaNotLive rows={tagging.tags.data ?? []} memberId={user.id} courseId={courseId} onRetag={knownHoles && knownHoles.length > 0 ? row => { tagging.retag.reset(); setRetagPhoto(row); } : undefined} />
       {retagPhoto && knownHoles && <CoursePhotoRetagPicker key={retagPhoto.id} row={retagPhoto} knownHoles={knownHoles} pending={tagging.retag.isPending} error={tagging.retag.error ? holePhotoErrorMessage(tagging.retag.error, `The ${retagPhoto.media_type === 'video' ? 'video' : 'photo'} could not be retagged. The new tag was not saved.`) : null} onClose={() => setRetagPhoto(null)} onSubmit={hole => tagging.retag.mutate({ row: retagPhoto, hole }, { onSuccess: () => setRetagPhoto(null) })} />}
 
-      {removePhoto && <HoleTagRemoveDialog key={`remove-${removePhoto.id}`} row={removePhoto} fromPost={sources.isSuccess ? isHoleTagFromPost(removePhoto, sources.data ?? []) : sources.isError ? false : null} pending={tagging.remove.isPending} error={tagging.remove.error ? holePhotoErrorMessage(tagging.remove.error, `The ${kindOf(removePhoto)} could not be removed. It is still on the ${ordinalOf(removePhoto.hole_no)}.`) : null} onClose={() => setRemovePhoto(null)} onConfirm={() => tagging.remove.mutate({ row: removePhoto }, { onSuccess: () => setRemovePhoto(null) })} />}
+
       {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} sources={sources.data} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); }} />}
       {firstPhoto && knownHoles && <CourseFirstPhotoPicker hasShots={mediaCounts.total > 0} knownHoles={knownHoles} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onSubmit={tagLibrary} onClose={() => { setFirstPhoto(false); }} />}
       {batch && <HolePhotoBatchPath photos={batch} knownHoles={knownHoles ?? []} existingPlaceTags={(places.tags.data ?? []).filter(row => row.user_id === user.id)} onTagPlace={tagPlace} onRemovePlace={removePlace} existingHoleTags={ownHoleTags} onClose={() => setBatch(null)} onTag={(url, hole) => tagging.submit.mutateAsync({ post: sourcePost(url), hole })} onRemove={row => tagging.remove.mutateAsync({ row })} />}

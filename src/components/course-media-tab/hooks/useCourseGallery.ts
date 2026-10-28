@@ -63,7 +63,10 @@ export function useCourseGallery({ courseId, courseName, userId, holes, scored, 
         const tag = [...publicHoles, ...publicPlaces].find(row => holeMediaKey({ url: row.media_url, mediaType: row.media_type, streamId: row.stream_id }) === key);
         return { ...post, id: item.id, userId: tag?.user_id ?? '', displayName: item.memberShot?.memberName ?? '', avatarUrl: item.memberShot?.avatarUrl ?? '', createdAt: tag?.added_at ?? '', mediaItems: [item] };
       }));
-      const data = { shots: galleryShots([...posts, ...taggedPosts], publicHoles, publicPlaces), holes, scored };
+      const data = { shots: galleryShots([...posts, ...taggedPosts], publicHoles, publicPlaces).map(shot => {
+        const authoritative = taggedPosts.find(post => holeMediaKey(post.mediaItems[0]) === holeMediaKey(shot.item));
+        return authoritative ? { ...shot, item: { ...shot.item, ...authoritative.mediaItems[0], id: shot.id }, ownerId: authoritative.userId, name: authoritative.displayName, avatar: authoritative.avatarUrl } : shot;
+      }), holes, scored };
       const list = filteredGallery(data.shots, filter);
       const start = list.find(shot => shot.id === startShotId || shot.holeTag?.id === startShotId || shot.placeTag?.id === startShotId)
         ?? (holeNo ? list.find(shot => shot.holeTag?.hole_no === holeNo) : undefined) ?? list[0];
