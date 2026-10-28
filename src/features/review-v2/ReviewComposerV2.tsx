@@ -58,6 +58,7 @@ import { MediaTray } from './components/MediaTray';
 import { ReviewHoleTags } from './components/ReviewHoleTags';
 import { ReviewComposerHeader } from './components/ReviewComposerHeader';
 import { useReviewHeaderFacts } from './hooks/useReviewHeaderFacts';
+import { usePhotoHeaderForm } from './lib/stepOneFold';
 import { useReviewHoleTags } from './hooks/useReviewHoleTags';
 import { ShareToggle } from './components/ShareToggle';
 import { SubmitBar } from './components/SubmitBar';
@@ -821,11 +822,13 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   /* THE EMPTY RULE (BRIEF_REVIEW_STEP_ONE §1). Photo header and heading only
      while step 1 holds nothing and nothing is under way; once anything starts
      the header folds and stays compact for the rest of the flow. */
-  const emptyNow =
-    step === FIRST_STEP && !hasAnyText && media.count === 0 && !voiceActive && !isEditMode;
-  const [started, setStarted] = useState(!emptyNow);
-  useLayoutEffect(() => { if (!emptyNow && !started) setStarted(true); }, [emptyNow, started]);
-  const photoForm = emptyNow && !started;
+  const photoForm = usePhotoHeaderForm({
+    onFirstStep: step === FIRST_STEP,
+    textLength: composer.state.reviewText.length,
+    mediaCount: media.count,
+    voiceActive,
+    isEditMode,
+  });
   const appendDictation = (text: string) => {
     const prev = composer.state.reviewText;
     const joiner = prev.length === 0 || /\s$/.test(prev) ? '' : ' ';
