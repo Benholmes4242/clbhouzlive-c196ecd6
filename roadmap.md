@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Rounds gate — Look, then lock
+- [ ] Approved follow-up: measure scroll distance from mount, isolate both test scrollers, repair React remount fixture, add two restored-position regressions and run targeted/full suites.
 - [x] Replace cropped gate with visit-local scroll/timer lock and signed-off glass card/tile; preserve state, reads and page sections. Ben confirmed CB39 scope switch/test remain unchanged.
 - [x] Audit score/index blur attributes and run `bunx vitest run`: 4,107 passed / 3 failed / 4,110 total across 436 files; +24 new look-lock cases and +1 analytics case from 4,085/435. Predicate and CB39 tests pass unchanged.
 - [ ] STOP: roundsGateAnalytics.test.tsx:64:35 expected spy 1 call but got 2; :85:35 expected 2 but got 4; roundsGateLookLock.test.tsx:32:310 Cannot update an unmounted root. No corrections after failure; await explicit authorization. Full errors/inventory in ROUNDS_GATE_LOOK_LOCK_REPORT.md.
