@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { TourHubShell } from '../components/TourHubShell';
@@ -13,98 +13,103 @@ import { NewsTab } from '@/features/tourhub/news/NewsTab';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
 import { TourSelectionProvider } from '../context/TourSelectionContext';
-import { TourSideMenu } from '../components/TourSideMenu';
-import { TourIslandLeft } from '../components/TourIslandLeft';
-import { TourPickerSheet, useTourShortLabel } from '../components/TourPickerSheet';
-import { TourPickerControl } from '../components/TourPickerControl';
-import { AppHeaderBurger } from '@/components/chrome/AppHeader';
+import { TourIsland, useTourIslandDescriptor } from '../components/TourIsland';
+import { TourGlance } from '@/features/chrome-v2/TourGlance';
+import { TourIcon } from '../components/tourIslandIcons';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { safeGoBack } from '@/utils/navigation';
 
-import { useLogout } from '@/hooks/useLogout';
+/**
+ * SubTabTourControl — the sub-tab header's tour control (BRIEF_TOUR_ISLAND):
+ * the same sentence-case label as the island, opening the same TourGlance
+ * tile. The burger drawer is gone from the Tour hub.
+ */
+function SubTabTourControl({ activeTab, onOpen }: { activeTab: string; onOpen: (anchor: HTMLElement) => void }) {
+  const d = useTourIslandDescriptor(activeTab);
+  return (
+    <button
+      type="button"
+      aria-label="Change tour"
+      onClick={(e) => onOpen(e.currentTarget)}
+      style={{
+        height: 36, display: 'flex', alignItems: 'center', gap: 7, padding: '0 10px',
+        background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+        color: '#F8FAFC', fontSize: 14, fontWeight: 700,
+      }}
+    >
+      <span>{d.label}</span>
+      <TourIcon n="chev" s={11.4} c="rgba(248,250,252,0.42)" w={2.2} />
+    </button>
+  );
+}
 
 const TAB_TITLES: Record<string, string> = {
   news: 'News',
-  live: 'Live',
+  /* BRIEF_TOUR_ISLAND §4: the tab reads "Leaderboards", not "Live". */
+  live: 'Leaderboards',
   schedule: 'Schedule',
   players: 'Players',
   leaderboards: 'Leaders',
 };
 
 /**
- * TourHubChromeBridge — registers the ChromeIsland left-capsule slot with
- * a burger + short tour label. Mounted inside TourSelectionProvider so
- * useTourShortLabel resolves. Owns the menu + picker sheet state so the
- * slot node stays a stable, prop-driven element.
+ * TourHubChromeBridge — registers the ChromeIsland left-capsule slot with the
+ * ONE tour control (BRIEF_TOUR_ISLAND): the TourIsland showing the tour in
+ * view plus one line of context, opening TourGlance. The burger drawer and
+ * the picker sheet are no longer rendered by this page; Profile, Settings and
+ * Sign out live in the account tile. SeasonStatsIndex and
+ * TourSwitcherAffordance still open TourPickerSheet, and NewsChromeBridge
+ * still opens TourSideMenu — those surfaces are unchanged.
  */
 function TourHubChromeBridge({
   activeTab,
   onSelectTab,
-  onSettings,
-  onProfile,
-  onSignOut,
   backMode,
   onBack,
-  menuOpen,
-  setMenuOpen,
-  pickerOpen,
-  setPickerOpen,
+  glanceAnchor,
+  glanceOpen,
+  openGlance,
+  closeGlance,
 }: {
   activeTab: TourHubTab;
   onSelectTab: (tabId: string) => void;
-  onSettings: () => void;
-  onProfile: () => void;
-  onSignOut: () => void;
   backMode: boolean;
   onBack: () => void;
-  menuOpen: boolean;
-  setMenuOpen: (v: boolean) => void;
-  pickerOpen: boolean;
-  setPickerOpen: (v: boolean) => void;
+  glanceAnchor: HTMLElement | null;
+  glanceOpen: boolean;
+  openGlance: (anchor: HTMLElement) => void;
+  closeGlance: () => void;
 }) {
-  const label = useTourShortLabel();
+  const d = useTourIslandDescriptor(activeTab);
 
   const slot = useMemo(
     () => (
-      <TourIslandLeft
-        label={label}
+      <TourIsland
+        label={d.label}
+        caption={d.caption}
+        captionLive={d.captionLive}
+        logoSlug={d.logoSlug}
+        glyph={d.glyph}
         mode={backMode ? 'back' : 'menu'}
         onBackTap={onBack}
-        onMenuTap={() => setMenuOpen(true)}
-        onPickerTap={() => {
-          /* The picker is NO LONGER scoped to the overview. The sub-pages used
-             to carry their own sticky tour-pills row; that row is gone, so the
-             island IS the tour control on every tour tab EXCEPT the live
-             leaderboard, which is deliberately cross-tour (concurrent events on
-             several tours at once) and uses its tournament pills as its own
-             selector. A tour label there would state something false. */
-          setPickerOpen(true);
-        }}
-        showPicker={activeTab !== 'live'}
+        onOpen={openGlance}
       />
     ),
-    [label, backMode, onBack, setMenuOpen, setPickerOpen, activeTab],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [d.label, d.caption, d.captionLive, d.logoSlug, d.glyph, backMode, onBack, openGlance],
   );
   useSetChromeLeftSlot(slot);
 
+  if (!glanceOpen || !glanceAnchor) return null;
   return (
-    <>
-      <TourSideMenu
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        activeTab={activeTab}
-        onSelectTab={(id) => {
-          onSelectTab(id);
-          setMenuOpen(false);
-        }}
-        onSettings={onSettings}
-        onProfile={onProfile}
-        onSignOut={onSignOut}
-      />
-      <TourPickerSheet open={pickerOpen} onClose={() => setPickerOpen(false)} />
-
-    </>
+    <TourGlance
+      onClose={closeGlance}
+      anchorRef={{ current: glanceAnchor }}
+      activeTab={activeTab}
+      onSelectTab={onSelectTab}
+      sectionsOnly={activeTab === 'live'}
+    />
   );
 }
 
@@ -117,10 +122,15 @@ export function TourHubMainPage() {
   const backMode = false;
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
-  const [menuOpen, setMenuOpen] = useState(false);
   /* Owned here, not in the bridge: the sub-page shell suppresses the island, so
-     its own header carries the picker trigger and needs the same state. */
-  const [pickerOpen, setPickerOpen] = useState(false);
+     its own header carries the tour control and needs the same tile state. */
+  const [glanceOpen, setGlanceOpen] = useState(false);
+  const [glanceAnchor, setGlanceAnchor] = useState<HTMLElement | null>(null);
+  const openGlance = useCallback((anchor: HTMLElement) => {
+    setGlanceAnchor(anchor);
+    setGlanceOpen(true);
+  }, []);
+  const closeGlance = useCallback(() => setGlanceOpen(false), []);
 
   useTournamentStatusRealtime();
 
@@ -157,8 +167,6 @@ export function TourHubMainPage() {
     window.addEventListener('clbhouz-active-tab-retap', onRetap);
     return () => window.removeEventListener('clbhouz-active-tab-retap', onRetap);
   }, [setSearchParams]);
-
-  const { logout } = useLogout();
 
   const renderTab = () => {
     switch (activeTab) {
@@ -222,15 +230,12 @@ export function TourHubMainPage() {
         <TourHubChromeBridge
           activeTab={activeTab}
           onSelectTab={handleSelectTab}
-          onSettings={() => navigate('/edit-profile?tab=settings')}
-          onProfile={() => navigate('/profile')}
-          onSignOut={() => { void logout(); }}
           backMode={backMode}
           onBack={() => safeGoBack(navigate, '/tourhub')}
-          menuOpen={menuOpen}
-          setMenuOpen={setMenuOpen}
-          pickerOpen={pickerOpen}
-          setPickerOpen={setPickerOpen}
+          glanceAnchor={glanceAnchor}
+          glanceOpen={glanceOpen}
+          openGlance={openGlance}
+          closeGlance={closeGlance}
         />
         {/* The overview is the immersive exception: the hero starts at the
             physical top and the shared left/right islands float over it. Legacy
@@ -246,13 +251,10 @@ export function TourHubMainPage() {
               onBack={() => handleSelectTab('overview')}
               backFallback="/tourhub"
               leftSlot={
-                /* The left slot is the variant slot: burger + tour picker as one
-                   left-aligned group. NOTHING renders between the header border
-                   and the hero — the chip rail that used to sit there is gone. */
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                  <AppHeaderBurger onTap={() => setMenuOpen(true)} label="Tour menu" />
-                  {activeTab !== 'live' && <TourPickerControl onTap={() => setPickerOpen(true)} />}
-                </div>
+                /* BRIEF_TOUR_ISLAND §1: one control everywhere — the sub-tab
+                   header carries the same tour label, opening the same
+                   TourGlance tile. The burger drawer is gone from the hub. */
+                <SubTabTourControl activeTab={activeTab} onOpen={openGlance} />
               }
             >
               {renderTab()}

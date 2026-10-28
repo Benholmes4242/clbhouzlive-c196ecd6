@@ -975,6 +975,13 @@
     }
   },
   "tour": {
+    "glance": {
+      "thisWeek": "THIS WEEK",
+      "chooseTour": "Choose the tour you see",
+      "allToursSub": "Every tour, soonest first",
+      "live": "Live",
+      "final": "Final"
+    },
     "roundInProgress": "R{{n}} in progress",
     "roundShort": "R{{n}}",
     "roundUpcoming": "R{{n}} upcoming",

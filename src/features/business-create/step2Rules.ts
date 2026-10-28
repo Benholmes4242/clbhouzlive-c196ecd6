@@ -36,7 +36,7 @@ export function clubPlaceLine(club: ClubGeo, courseCount: number): string {
 export interface ClubCourseStatRow {
   rounds_tracked: number | null;
   avg_over_par: number | null;
-  hardest_hole_no: number | null;
+  hardest_hole_no?: number | null;
 }
 
 export interface ClubFacts {
