@@ -1,5 +1,9 @@
 # Roadmap
 
+## CB118.1 — Club identity during course loading
+- [ ] Gate the existing skeleton on enabled pending club-courses; keep query, hooks, error fallback and non-clubs unchanged.
+- [ ] Add four regression tests in cb118BusinessVisiting; preserve both CB107 tests unedited; run targeted/full suites and report against3,808/417 with existing Media failure and two CB107 failures.
+
 ## Media tab round 3
 - [x] Applied page order, Everything controls, 128×164 place rail and picker titles; shared option B glass card and existing admin place RPCs with queue/place/hole refresh. No protected backend/config changes.
 - [x] Added19 mediaV3 tests, retargeted superseded presentation checks with inventory in MEDIA_V3_STOP_REPORT.md; deleted MEDIA_TAB_FINAL_REPORT.md. Full bunx vitest run3,805 passed/3 failed/3,808 total across417 files =3,734/414 +CB11722/1 +CB11833/1 +MediaV319/1. Automatic build07:26:48Z OK.

@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { businessSecondPill } from '@/lib/business/businessHero';
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
@@ -15,23 +15,24 @@ vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: ()
 const rpc = vi.fn();
 let team: { is_public: boolean }[] = [];
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: { rpc: (...a: unknown[]) => rpc(...a), from: () => chainable() },
+  supabase: { rpc: (...a: unknown[]) => rpc(...a), from: (table: string) => chainable(table) },
 }));
 
 /* ---- page-level render surface (CB103.1) --------------------------------
    The page's own data hooks are stubbed so the contact rows render from a
    fixture; the heroes, the menu and the action rows are the real thing. */
 const pageState: { business: Record<string, unknown> | null; courses: unknown[] } = { business: null, courses: [] };
+let clubCoursesResponse: Promise<{ data: unknown[] | null; error: Error | null }> | undefined;
 
 /* Awaitable PostgREST-style chain: every modifier returns the chain, and the
    chain resolves to the fixture rows the page's club-courses query expects. */
-function chainable() {
+function chainable(table: string) {
   const q: Record<string, unknown> = {};
   for (const m of ['select', 'eq', 'order', 'limit', 'single', 'maybeSingle', 'in', 'gte', 'lte', 'neq', 'is', 'or', 'filter']) {
     q[m] = () => q;
   }
   q.then = (onF: (v: unknown) => unknown, onR?: (e: unknown) => unknown) =>
-    Promise.resolve({ data: pageState.courses, error: null }).then(onF, onR);
+    (table === 'golf_courses' && clubCoursesResponse ? clubCoursesResponse : Promise.resolve({ data: pageState.courses, error: null })).then(onF, onR);
   return q;
 }
 
@@ -108,7 +109,7 @@ function row(id: string): HTMLButtonElement {
 }
 const entry = { open: '07:00', close: '20:00', closed: false };
 beforeEach(() => { vi.clearAllMocks(); rpc.mockResolvedValue({ data: null, error: null }); team = []; });
-afterEach(() => { cleanup(); vi.useRealTimers(); pageState.business = null; pageState.courses = []; });
+afterEach(() => { cleanup(); vi.useRealTimers(); pageState.business = null; pageState.courses = []; clubCoursesResponse = undefined; });
 
 
 const en = JSON.parse(readFileSync('public/locales/en/common.json', 'utf8'));
@@ -232,5 +233,62 @@ describe('CB118 business Visiting', () => {
     expect(visiting).toBeGreaterThan(mentions);
     expect(visiting).toBeLessThan(source.indexOf('data-business-tabs'));
     expect(source.slice(visiting, source.indexOf('/>', visiting))).toContain('onBook={bizSecond?.onTap}');
+  });
+});
+
+describe('CB118.1 club courses loading identity', () => {
+  function mount(over: Partial<BusinessProfile> = {}) {
+    pageState.business = fixture({ website: 'club.example', ...over }) as unknown as Record<string, unknown>;
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    return { client, ...render(<QueryClientProvider client={client}><MemoryRouter initialEntries={['/business/test-club']}><Routes><Route path="/business/:idOrSlug" element={<BusinessProfilePage />} /></Routes></MemoryRouter></QueryClientProvider>) };
+  }
+  function delayedCourses() {
+    let resolve: ((value: { data: unknown[] | null; error: Error | null }) => void) | undefined;
+    clubCoursesResponse = new Promise(done => { resolve = done; });
+    return (value: { data: unknown[] | null; error: Error | null }) => { if (!resolve) throw new Error('Course response resolver missing'); resolve(value); };
+  }
+  it('club_id with pending courses shows the existing skeleton and no Visiting, tabs or non-club sections', () => {
+    delayedCourses(); const { container, client } = mount();
+    expect(client.getQueryState(['business-club-courses','c1'])?.status).toBe('pending');
+    expect(container.firstElementChild).toHaveAttribute('aria-hidden','true');
+    expect(container.querySelector('.clb-shimmer-dark')).not.toBeNull();
+    expect(container.querySelector('[data-page-root]')).toBeNull();
+    expect(container.querySelector('[data-club-visiting]')).toBeNull();
+    expect(screen.queryByRole('tablist')).toBeNull();
+    expect(container.querySelector('[data-business-nearby], [data-business-mentions], [data-about-content], [data-posts-content]')).toBeNull();
+  });
+  it('resolved club courses render the club layout without an intermediate non-club card', async () => {
+    const resolve = delayedCourses(); const { container } = mount();
+    const nonClubNodes: Element[] = [];
+    const observer = new MutationObserver(records => { for (const record of records) for (const node of record.addedNodes) {
+      if (!(node instanceof Element)) continue;
+      if (node.matches('[data-business-tabs], [data-about-content], [data-posts-content]')) nonClubNodes.push(node);
+      nonClubNodes.push(...node.querySelectorAll('[data-business-tabs], [data-about-content], [data-posts-content]'));
+    } });
+    observer.observe(container, { subtree: true, childList: true });
+    try {
+      await act(async () => resolve({ data: [{ id:'k1', name:'Course', region:'Kent', country:'England', thumbnail_image:null }], error:null }));
+      await waitFor(() => expect(container.querySelector('[data-say]')?.nextElementSibling).toHaveAttribute('data-club-visiting'));
+      expect(container.querySelector('[data-page-root]')).not.toBeNull();
+      expect(screen.queryByRole('tablist')).toBeNull();
+      expect(nonClubNodes).toHaveLength(0);
+    } finally { observer.disconnect(); }
+  });
+  it('courses query error keeps the existing non-club fallback', async () => {
+    clubCoursesResponse = Promise.resolve({ data:null, error:new Error('Course read refused') });
+    const { container, client } = mount();
+    await waitFor(() => expect(client.getQueryState(['business-club-courses','c1'])?.status).toBe('error'));
+    expect(container.querySelector('[data-club-visiting]')).not.toBeNull();
+    expect(container.querySelector('[data-business-tabs]')).not.toBeNull();
+    expect(screen.getByRole('tab', { name:'About' })).toBeInTheDocument();
+    expect(container.querySelector('[data-posts-content]')).not.toBeNull();
+  });
+  it('business without club_id never waits for pending club courses', () => {
+    delayedCourses(); const { container, client } = mount({ club_id:null, category:'Brand / Manufacturer' });
+    expect(client.getQueryState(['business-club-courses',null])?.fetchStatus).toBe('idle');
+    expect(container.querySelector('[data-page-root]')).not.toBeNull();
+    expect(container.querySelector('[data-club-visiting]')).not.toBeNull();
+    expect(screen.getByRole('tab', { name:'About' })).toBeInTheDocument();
+    expect(container.firstElementChild).not.toHaveAttribute('aria-hidden','true');
   });
 });
