@@ -12,7 +12,9 @@ import { toast } from '@/lib/toast';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { fetchGolfClub, clubRowToSelected } from '@/features/business/claimClub';
-import { CREATE_CATEGORY_GROUPS, CREATE_STEPS, categoryDisplayLabel, initialDraft, type BusinessCreateDraft } from '@/features/business-create/createRules';
+import { CREATE_CATEGORY_GROUPS, CREATE_STEPS, initialDraft, type BusinessCreateDraft } from '@/features/business-create/createRules';
+import { BusinessCreateStep2 } from '@/features/business-create/BusinessCreateStep2';
+import type { BusinessCategoryValue } from '@/constants/businessCategories';
 import '@/features/business-create/business-create.css';
 
 const SESSION_ENDED_MSG = 'Your session has ended. Please sign in again; nothing has been saved yet.';
@@ -54,6 +56,26 @@ export default function BusinessCreate() {
     if (step > 1 || location.key !== 'default') navigate(-1);
     else navigate('/profile');
   };
+
+  /* BC2: changing the category clears the step 2 fields that belong to the
+   * branch being left, so a stale club, college, name or address never
+   * follows the member into a different branch. */
+  const setCategory = (value: BusinessCategoryValue) => setDraft(d => {
+    if (d.category === value) return d;
+    const next = { ...d, category: value };
+    if (d.category === 'Golf Club') {
+      next.selectedClub = null;
+      next.claimProofNote = '';
+      next.address = null;
+    } else if (d.category === 'University / College') {
+      next.selectedCollege = null;
+    } else if (d.category) {
+      next.businessName = '';
+      next.address = null;
+      next.countrySelection = null;
+    }
+    return next;
+  });
 
   return (
     <div className="bizc-shell" data-testid="business-create">
