@@ -263,8 +263,8 @@ const LeftCapsule: React.FC<{
   // everywhere else it keeps the CompactHeader non-back branch:
   // navigate('/clubhouse'). (Brief said '/watch'; the source of truth is
   // CompactHeader — see report.)
-  const scrolledTitle = spec.left?.kind === 'logo' ? spec.left.scrolledTitle : undefined;
-  const showTitle = scrolled && scrolledTitle != null;
+  const showWordmark = spec.left?.kind === 'logo' ? spec.left.scrolledWordmark === true : false;
+  const showWordmarkNow = scrolled && showWordmark;
   const onLogoTap = () => {
     if (location.pathname === '/' || location.pathname === '/clubhouse') {
       window.dispatchEvent(new CustomEvent('clbhouz-active-tab-retap', { detail: { tabId: 'clubhouse' } }));
@@ -279,7 +279,7 @@ const LeftCapsule: React.FC<{
       aria-label="Go to home"
       style={{
         ...glassStyle(tone),
-        padding: showTitle ? '0 16px 0 6px' : '0 6px',
+        padding: showWordmarkNow ? '0 15px 0 6px' : '0 6px',
         gap: 9,
         cursor: 'pointer',
       }}
