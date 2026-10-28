@@ -1,8 +1,9 @@
 # Roadmap
 
 ## Islands round 2
-- [ ] Restore exact prior bottom nav; wordmark artwork; squircle avatar; shared connected/disconnected glance and decline; local-time test correction.
-- [ ] Run targeted tests and full suite twice including Europe/London; report file/test inventory and any artwork blocker.
+- [x] Restored exact prior bottom nav; squircle avatar; shared connected/disconnected glance and decline; local-time test correction.
+- [ ] Wordmark section blocked: exact clbhouz-wordmark-white@3x.png was not attached; no substitute artwork or partial registry change.
+- [x] Targeted87/87; full suite twice4004/4004 across428 files including Europe/London; report in ISLANDS_ROUND2_REPORT.md. Live member preview unavailable: external_unmanaged, public browser redirects /auth with no errors.
 
 ## OB1 — Five-screen first sign-in
 - [x] Built five-screen /welcome, existing-source adapters, partial saves, old-entry redirects and separate coach card; no gallery code/test edits.
