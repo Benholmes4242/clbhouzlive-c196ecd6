@@ -127,6 +127,16 @@ interface Props {
   completeOnSuccess?: boolean;
   /** OB1.2: the host owns back/title; the connect top chrome is not drawn. */
   hideChrome?: boolean;
+  /** OB1.5: embedded in /welcome setup ONLY. The form and sync stages drop
+   *  their StageHead and 24px Stage sides (the host owns the one heading and
+   *  the 20px edges), the submit button is the welcome primary pill, and a
+   *  connect in flight shows the syncing screen. Passed only by
+   *  WelcomeHandicap — never keyed off layout/hideChrome, which other hosts
+   *  use. */
+  setupEmbedded?: boolean;
+  /** OB1.5: tells the host when a connect is in flight so it can swap its
+   *  heading and hide its back/Skip controls. Fires false on unmount. */
+  onSyncingChange?: (syncing: boolean) => void;
 }
 
 type Stage = 'intro' | 'country' | 'form' | 'comingSoon' | 'sync' | 'done' | 'declined';
@@ -138,6 +148,8 @@ export const WhsConnectScreen: React.FC<Props> = ({
   initialCountryId,
   completeOnSuccess = false,
   hideChrome = false,
+  setupEmbedded = false,
+  onSyncingChange,
 }) => {
   const { country: storedCountry, setCountryId } = useSelectedCountry();
   /* A host-chosen country wins from the first frame, so the stored pick can
@@ -305,9 +317,11 @@ export const WhsConnectScreen: React.FC<Props> = ({
     }
   };
 
+  /* OB1.5: in setup the syncing screen shows whenever a connect is in flight
+     (completeOnSuccess hosts used to keep the greyed-out form instead). */
   const stage: Stage = successData
     ? 'done'
-    : submitting && !completeOnSuccess
+    : submitting && (!completeOnSuccess || setupEmbedded)
     ? 'sync'
     : step === 'declined'
     ? 'declined'
@@ -358,7 +372,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
           />
         );
       case 'sync':
-        return <SyncingScreen />;
+        return <SyncingScreen setupEmbedded={setupEmbedded} />;
       case 'declined':
         return (
           <DeclinedScreen
@@ -402,6 +416,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
             submitting={completeOnSuccess && submitting}
             bodyName={country?.body}
             bodyShort={country?.bodyShort ?? country?.body}
+            setupEmbedded={setupEmbedded}
           />
         );
     }
