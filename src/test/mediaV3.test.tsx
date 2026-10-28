@@ -23,7 +23,6 @@ import { HolePhotoTagDialog } from '@/components/course-media-tab/HolePhotoTagDi
 import { HolePhotoBatchPath } from '@/components/course-media-tab/HolePhotoFastPaths';
 import { AdminHoleTagging } from '@/components/course-media-tab/AdminHoleTagging';
 import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';
-import { CourseFirstPhotoPicker } from '@/components/course-media-tab/CourseMediaEmptyStates';
 
 const photo = (url: string) => ({ url, createdAt: '2026-10-01', exif: { capturedAt: null, captureDay: null, latitude: null, longitude: null } });
 const placeRow = { id: 'saved', place: 'views', course_id: 'course', user_id: 'owner', media_url: '/a.jpg', media_type: 'image' } as PlaceMedia;
@@ -128,10 +127,10 @@ describe('Media v3 signed-off presentation', () => {
     expect(css).toMatch(/\.media-v2-place-tile \{[^}]*height:164px; width:128px/);
     expect(css).toMatch(/\.media-v2-condition \{[^}]*right:9px; top:9px/);
   });
-  it.each([false,true])('picker title uses existing-shots state %s without changing its file chooser', hasShots => {
-    render(<CourseFirstPhotoPicker knownHoles={[1]} hasShots={hasShots} pending={false} error={null} onSubmit={vi.fn()} onClose={vi.fn()} />);
-    expect(screen.getByRole('heading').textContent).toBe(hasShots?'Add a photo or video':'Add the first photo or video');
-    expect(document.querySelector('input[type=file]')).toHaveAttribute('accept','image/*,video/*');
+  it('invite fallback opens the add flow library chooser for photos and videos', () => {
+    f.tagged=false; f.counts={total:2,photos:2,videos:0}; const view=provider(<CourseMediaTabNew courseId="course" />);
+    const input=view.container.querySelector<HTMLInputElement>('input[data-add-shot-input]'); expect(input).toHaveAttribute('accept','image/*,video/*');
+    const click=vi.spyOn(input as HTMLInputElement,'click'); fireEvent.click(screen.getByRole('button',{name:'Add a photo or video'})); expect(click).toHaveBeenCalledOnce();
   });
   it('single and member batch use ScorecardGlassOverlay', () => {
     const view=render(<HolePhotoTagDialog imageUrl="/a.jpg" holeCount={1} knownHoleNumbers={[1]} pending={false} error={null} onClose={vi.fn()} onSubmit={vi.fn()} />);
