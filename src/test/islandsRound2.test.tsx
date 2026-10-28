@@ -95,9 +95,9 @@ describe('Islands round two disconnected glance', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(document.activeElement).toBe(cell);
   });
-  it('hands the shared avatar its amber ring and member identity', () => {
+  it('hands the shared avatar the island hairline ring and member identity', () => {
     render(<AvatarCell tone="dark" onOpen={() => {}} triggerRef={React.createRef<HTMLButtonElement>()} />);
-    expect(mocks.avatar).toHaveBeenCalledWith(expect.objectContaining({ ringWidth: 1.5, ringColor: '#F7931E', size: 36, userId: 'member', src: '/avatar.jpg', alt: 'Ben' }));
+    expect(mocks.avatar).toHaveBeenCalledWith(expect.objectContaining({ ringWidth: 1, ringColor: 'rgba(255,255,255,0.10)', size: 36, userId: 'member', src: '/avatar.jpg', alt: 'Ben' }));
   });
 });
 
