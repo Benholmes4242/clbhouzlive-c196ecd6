@@ -7,9 +7,7 @@ import { Camera, Tag, ChevronRight, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCoursePlaceMedia, type PlaceMedia } from './hooks/useCoursePlaceMedia';
 import { CoursePlaceTiles } from './CoursePlaceTiles';
-import { placeShotsToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
-import { openWithOrigin } from '@/lib/openWithOrigin';
-import { supabase } from '@/integrations/supabase/client';
+import { useCourseGallery } from './hooks/useCourseGallery';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { PLACE_LABELS } from './ShotTagChoices';
 import { fetchOwnMediaSources } from '@/lib/courseMedia/holePhotoData';
@@ -71,19 +69,12 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const [batch, setBatch] = useState<(BatchPhoto & Partial<OwnMediaSource>)[] | null>(null);
   const [firstPhoto, setFirstPhoto] = useState(false);
   const [retagPhoto, setRetagPhoto] = useState<HolePhoto | null>(null);
-  const [movePhoto, setMovePhoto] = useState<HolePhoto | null>(null);
   const [removePhoto, setRemovePhoto] = useState<HolePhoto | null>(null);
-  const [walkFocus, setWalkFocus] = useState<{ hole: number; id: string; nonce: number } | null>(null);
   // Route focus is consumed once after both reads settle; HoleWalk owns shot fallback.
   const [searchParams] = useSearchParams();
   const deepLinkFocused = useRef(false);
   const linkedHole = searchParams.get('hole');
   const linkedShot = searchParams.get('shot');
-  useEffect(() => {
-    if (deepLinkFocused.current || !walkHoles || !tagging.tags.isSuccess || !knownHoles?.includes(Number(linkedHole))) return;
-    deepLinkFocused.current = true;
-    setWalkFocus({ hole: Number(linkedHole), id: linkedShot ?? '', nonce: Date.now() });
-  }, [walkHoles, tagging.tags.isSuccess, knownHoles, linkedHole, linkedShot]);
   const kindOf = (row: HolePhoto) => row.media_type === 'video' ? 'video' : 'photo';
   const ordinalOf = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? 'th' : n % 10 === 1 ? 'st' : n % 10 === 2 ? 'nd' : n % 10 === 3 ? 'rd' : 'th'}`;
   const [fastPending, setFastPending] = useState(false);
@@ -203,26 +194,16 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   // say "your second tag on the 9th" (BRIEF_HOLE_TAG_BATCH_V3).
   const ownHoleTags = user ? (tagging.tags.data ?? []).filter(row => row.user_id === user.id && row.status !== 'rejected').map(row => row.hole_no) : [];
   const hasTags = (tagging.tags.data ?? []).some(row => row.status === 'approved') || (places.tags.data ?? []).some(row => row.status === 'approved');
-  const openPlace = async (place: CoursePlace, rows: PlaceMedia[]) => {
-    void analyticsEvents.track('media_place_open', { place });
-    const ready = rows.filter(row => row.media_type !== 'video' || row.duration_seconds != null);
-    if (!ready.length) return;
-    try {
-      const ids = [...new Set(ready.map(row => row.user_id))];
-      const profiles = await cache.fetchQuery({ queryKey: ['course-place-contributors', ids], queryFn: async () => {
-        const { data, error } = await supabase.from('user_profiles').select('id, display_name, profile_photo_url').in('id', ids);
-        if (error) throw error;
-        return data ?? [];
-      } });
-      const members = new Map(profiles.map(profile => [profile.id, profile]));
-      const mapped = ready.map(row => ({ ...row, member_id: row.user_id, member_name: members.get(row.user_id)?.display_name,
-        member_avatar_url: members.get(row.user_id)?.profile_photo_url }));
-      const posts = placeShotsToFeedPosts(mapped, courseName ?? '', courseId, place, t(`media.v2.places.${place}`, { defaultValue: PLACE_LABELS[place] }));
-      if (!posts.length) return;
-      openWithOrigin({ posts, index: 0, originEl: null, posterUrl: ready[0].media_type === 'video' ? ready[0].poster_url ?? '' : ready[0].media_url,
-        mediaId: ready[0].id, openedFrom: 'course-media', options: { readOnly: true, syntheticPosts: true } });
-    } catch { /* Refused identities never open an invented member caption. */ }
-  };
+  const openGallery = useCourseGallery({ courseId, courseName: courseName ?? '', userId: user?.id,
+    holes: walkHoles?.holes ?? [], scored: walkHoles?.scored ?? false,
+    holeTags: tagging.tags.data ?? [], placeTags: places.tags.data ?? [] });
+  useEffect(() => {
+    if (deepLinkFocused.current || !linkedShot && !linkedHole || !tagging.tags.isSuccess || !places.tags.isSuccess || !analysis.isSuccess) return;
+    if (linkedHole && !knownHoles?.includes(Number(linkedHole))) return;
+    deepLinkFocused.current = true;
+    const origin = gridRef.current ?? document.querySelector<HTMLElement>('.hole-walk');
+    void openGallery(linkedHole ? 'holes' : 'all', linkedShot ?? undefined, origin, 'deep-link', linkedHole ? Number(linkedHole) : undefined);
+  }, [linkedHole, linkedShot, tagging.tags.isSuccess, places.tags.isSuccess, analysis.isSuccess, knownHoles, openGallery]);
 
   if (!user) {
     return (
@@ -257,8 +238,8 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       </header>}
       {photoState === 'B' && walkHoles && <CourseMediaNoPhotographs courseName={courseName} holes={walkHoles.holes} onHole={addFirst} onAddFirst={() => { setFastError(null); setFirstPhoto(true); }} />}
       {photoState === 'C' && <CourseMediaNothing courseName={courseName} onReview={() => navigate(`/courses/${courseId}/rate`)} />}
-      {photoState !== 'B' && photoState !== 'C' && walkHoles && tagging.tags.isSuccess && <HoleWalk available={true} holes={walkHoles.holes} scored={walkHoles.scored} rows={tagging.tags.data ?? []} totalMedia={mediaCounts.total} courseName={courseName} authors={authors} onAddFirst={addFirst} onChooseFirst={() => { setFastError(null); setFirstPhoto(true); }} memberId={user?.id} onMove={knownHoles && knownHoles.length > 0 ? row => { tagging.move.reset(); setMovePhoto(row); } : undefined} onRemove={knownHoles && knownHoles.length > 0 ? row => { tagging.remove.reset(); setRemovePhoto(row); } : undefined} focus={walkFocus} mediaPaused={!!(batch || tagPost || addHole != null || firstPhoto || retagPhoto || movePhoto || removePhoto)} />}
-      {photoState !== 'B' && photoState !== 'C' && <CoursePlaceTiles rows={places.tags.data ?? []} onOpen={(place, rows) => { void openPlace(place, rows); }} />}
+      {photoState !== 'B' && photoState !== 'C' && walkHoles && tagging.tags.isSuccess && <HoleWalk available holes={walkHoles.holes} scored={walkHoles.scored} rows={tagging.tags.data ?? []} totalMedia={mediaCounts.total} onAddFirst={addFirst} onChooseFirst={() => { setFastError(null); setFirstPhoto(true); }} onOpen={(hole, origin, entry) => { void openGallery('holes', undefined, origin, entry, hole); }} />}
+      {photoState !== 'B' && photoState !== 'C' && <CoursePlaceTiles rows={places.tags.data ?? []} onOpen={(place, rows, origin) => { void openGallery(place, rows[0]?.id, origin, 'place-card'); }} />}
       {photoState !== 'B' && photoState !== 'C' && countsReady && mediaCounts.total > 0 && tagging.tags.isSuccess && places.tags.isSuccess && !hasTags && <section className="media-v2-unsorted">
         <div className="media-v2-unsorted-intro"><span className="media-v2-unsorted-icon"><Tag size={17} /></span><div><h3>{t('media.v2.unsortedTitle', { defaultValue: "Sort them by hole or by place" })}</h3><p>{t('media.v2.unsortedBody', { defaultValue: "Tag a shot to a hole, the clubhouse, the food, the practice ground or anything else, and this page builds itself." })}</p></div></div>
         <Button className="media-v2-primary" disabled={fastPending} onClick={() => untaggedCount ? void beginBatch() : setFirstPhoto(true)}>{untaggedCount ? t('media.v2.tagYour', { count: untaggedCount, defaultValue: untaggedCount === 1 ? "Tag your 1 shot" : `Tag your ${untaggedCount} shots` }) : t('media.v2.add', { defaultValue: "Add a photo or video" })}</Button>
@@ -281,6 +262,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       {photoState !== 'B' && photoState !== 'C' && <div className="media-v3-grid"><CourseMediaCanonGrid
         ref={gridRef}
         posts={posts}
+        onOpenGallery={(post, origin) => { void openGallery('all', post.mediaItems[0]?.id, origin, 'everything'); }}
         postsForFullscreen={postsForFullscreen}
         isLoading={isLoading}
         isError={isError}
@@ -294,7 +276,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       /></div>}
       <CourseMediaNotLive rows={tagging.tags.data ?? []} memberId={user.id} courseId={courseId} onRetag={knownHoles && knownHoles.length > 0 ? row => { tagging.retag.reset(); setRetagPhoto(row); } : undefined} />
       {retagPhoto && knownHoles && <CoursePhotoRetagPicker key={retagPhoto.id} row={retagPhoto} knownHoles={knownHoles} pending={tagging.retag.isPending} error={tagging.retag.error ? holePhotoErrorMessage(tagging.retag.error, `The ${retagPhoto.media_type === 'video' ? 'video' : 'photo'} could not be retagged. The new tag was not saved.`) : null} onClose={() => setRetagPhoto(null)} onSubmit={hole => tagging.retag.mutate({ row: retagPhoto, hole }, { onSuccess: () => setRetagPhoto(null) })} />}
-      {movePhoto && knownHoles && <CoursePhotoRetagPicker key={`move-${movePhoto.id}`} mode="move" row={movePhoto} knownHoles={knownHoles} pending={tagging.move.isPending} error={tagging.move.error ? holePhotoErrorMessage(tagging.move.error, `The ${kindOf(movePhoto)} could not be moved. It is still on the ${ordinalOf(movePhoto.hole_no)}.`) : null} onClose={() => setMovePhoto(null)} onSubmit={hole => tagging.move.mutate({ row: movePhoto, hole }, { onSuccess: () => { setMovePhoto(null); setWalkFocus({ hole, id: movePhoto.id, nonce: Date.now() }); } })} />}
+
       {removePhoto && <HoleTagRemoveDialog key={`remove-${removePhoto.id}`} row={removePhoto} fromPost={sources.isSuccess ? isHoleTagFromPost(removePhoto, sources.data ?? []) : sources.isError ? false : null} pending={tagging.remove.isPending} error={tagging.remove.error ? holePhotoErrorMessage(tagging.remove.error, `The ${kindOf(removePhoto)} could not be removed. It is still on the ${ordinalOf(removePhoto.hole_no)}.`) : null} onClose={() => setRemovePhoto(null)} onConfirm={() => tagging.remove.mutate({ row: removePhoto }, { onSuccess: () => setRemovePhoto(null) })} />}
       {addHole != null && <HoleKnownPhotoPath hole={addHole} photos={ownOptions} sources={sources.data} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onChoose={tagKnown} onLibrary={tagLibrary} onClose={() => { setAddHole(null); }} />}
       {firstPhoto && knownHoles && <CourseFirstPhotoPicker hasShots={mediaCounts.total > 0} knownHoles={knownHoles} pending={fastPending} uploadProgress={uploadProgress} error={fastError} onSubmit={tagLibrary} onClose={() => { setFirstPhoto(false); }} />}

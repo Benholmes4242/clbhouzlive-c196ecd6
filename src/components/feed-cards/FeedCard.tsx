@@ -64,6 +64,7 @@ export function FeedCard({
   bareTile = false,
   readOnlyFullscreen = false,
   hideLikeCount = false,
+  onOpenMedia,
   tileRadius = 4,
   tileGap = 4,
 }: {
@@ -113,6 +114,7 @@ export function FeedCard({
   hideLikeCount?: boolean;
   /** Tile corner radius. Defaults to today's 4px so every existing consumer
    *  renders byte-identically; the mosaic walls pass r.xs. */
+  onOpenMedia?: (post: FeedPost, origin: HTMLElement | null) => void;
   tileRadius?: number;
   /** Vertical gap beneath a bare tile, matched to its grid's column gutter.
    *  Defaults to today's 4px. Ignored for full cards. */
@@ -164,6 +166,7 @@ export function FeedCard({
 
   const handlePress = () => {
     if (imageFailed && !isVideo) return;
+    if (onOpenMedia) { onOpenMedia(feedPost, rootRef.current); return; }
     openWithOrigin({
       openedFrom,
       posts,

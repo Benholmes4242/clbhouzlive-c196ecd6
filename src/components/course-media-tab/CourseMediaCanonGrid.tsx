@@ -41,6 +41,7 @@ const FONT_FAMILY =
 
 interface CourseMediaCanonGridProps {
   posts: FeedPost[];
+  onOpenGallery?: (post: FeedPost, origin: HTMLElement | null) => void;
   postsForFullscreen?: FeedPost[];
   isLoading: boolean;
   isError: boolean;
@@ -105,6 +106,7 @@ function SkeletonTile() {
 
 export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonGridProps>(({
   posts,
+  onOpenGallery,
   postsForFullscreen: _postsForFullscreen,
   isLoading,
   isError,
@@ -156,7 +158,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
   const setPaginationState = useFullscreenFeedStore((s) => s.setPaginationState);
 
   useEffect(() => {
-    if (!isViewerOwnedHere) return;
+    if (!isViewerOwnedHere || useFullscreenFeedStore.getState().courseGallery) return;
     setPaginationState({
       hasNextPage: hasNextPage ?? false,
       isFetchingNextPage: isFetchingNextPage ?? false,
@@ -167,7 +169,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
   // order), so later pages append flat too — a grouped append would mix
   // carousels into a per-photo swipe and skip or repeat photos.
   useEffect(() => {
-    if (!isViewerOwnedHere) return;
+    if (!isViewerOwnedHere || useFullscreenFeedStore.getState().courseGallery) return;
     useFullscreenFeedStore.getState().appendPosts(posts);
   }, [isViewerOwnedHere, posts]);
 
@@ -247,7 +249,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
   if (noHolePreviewCount != null && !showAll) {
     return <div ref={setGridRef}>
       <div className="media-empty-mosaic">{cardRows.slice(0, 4).map((item, i) => <div key={posts[i]?.mediaItems[0]?.id ?? `${item.post_id}-${i}`} className="media-empty-mosaic-tile">
-        <FeedCard row={item} feedPost={posts[i]} posts={posts} flatIndex={i} isAutoplayActive={activeIndices.has(i)} openedFrom="course-media" hideCourseAttribution hideFormatBadge bareTile readOnlyFullscreen hideLikeCount />
+        <FeedCard row={item} feedPost={posts[i]} posts={posts} flatIndex={i} isAutoplayActive={activeIndices.has(i)} openedFrom="course-media" hideCourseAttribution hideFormatBadge bareTile readOnlyFullscreen onOpenMedia={onOpenGallery} hideLikeCount />
       </div>)}</div>
       <Button variant="ghost" className="media-empty-see-all" onClick={() => { setShowAll(true); if (hasNextPage && !isFetchingNextPage) fetchNextPage(); }}>See all {spellPhotoCount(noHolePreviewCount)}</Button>
     </div>;
@@ -284,6 +286,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
                 hideFormatBadge
               bareTile
                 readOnlyFullscreen
+                onOpenMedia={onOpenGallery}
                 hideLikeCount
               />
               {tagging && <HolePhotoTagButton post={posts[i]} {...tagging} />}
@@ -307,6 +310,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
                 hideFormatBadge
               bareTile
                 readOnlyFullscreen
+                onOpenMedia={onOpenGallery}
                 hideLikeCount
               />
               {tagging && <HolePhotoTagButton post={posts[i]} {...tagging} />}

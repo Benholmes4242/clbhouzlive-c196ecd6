@@ -22,7 +22,7 @@ export function approvedPlaceGroups(rows: readonly PlaceMedia[]) {
     return shots.length ? [{ ...place, shots }] : [];
   });
 }
-export function CoursePlaceTiles({ rows, onOpen }: { rows: readonly PlaceMedia[]; onOpen: (place: CoursePlace, rows: PlaceMedia[]) => void }) {
+export function CoursePlaceTiles({ rows, onOpen }: { rows: readonly PlaceMedia[]; onOpen: (place: CoursePlace, rows: PlaceMedia[], origin: HTMLElement) => void }) {
   const { t } = useTranslation('courses');
   const groups = approvedPlaceGroups(rows);
   if (!groups.length) return null;
@@ -32,7 +32,7 @@ export function CoursePlaceTiles({ rows, onOpen }: { rows: readonly PlaceMedia[]
     <div className="media-v3-place-rail">{groups.map(({ id, icon: Icon, shots }) => {
       const label = t(`media.v2.places.${id}`, { defaultValue: PLACE_LABELS[id] });
       const age = placeAge(shots[0].added_at);
-      return <Button variant="ghost" className="media-v2-place-tile" key={id} aria-label={label} onClick={() => onOpen(id, shots)}>
+      return <Button variant="ghost" className="media-v2-place-tile" key={id} aria-label={label} onClick={event => onOpen(id, shots, event.currentTarget)}>
         <ReadyShotCover shots={shots} />
         <Icon className="media-v3-place-icon" size={17} strokeWidth={2} />
         <span className="media-v2-place-caption"><b>{label}</b><span>{t('media.v3.shots', { count: shots.length, defaultValue: `${shots.length} ${shots.length === 1 ? 'shot' : 'shots'}` })}</span></span>
