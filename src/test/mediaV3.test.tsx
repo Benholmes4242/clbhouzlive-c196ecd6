@@ -130,7 +130,7 @@ describe('Media v3 signed-off presentation', () => {
   it('invite fallback opens the add flow library chooser for photos and videos', () => {
     f.tagged=false; f.counts={total:2,photos:2,videos:0}; const view=provider(<CourseMediaTabNew courseId="course" />);
     const input=view.container.querySelector<HTMLInputElement>('input[data-add-shot-input]'); expect(input).toHaveAttribute('accept','image/*,video/*');
-    const click=vi.spyOn(input as HTMLInputElement,'click'); fireEvent.click(screen.getByRole('button',{name:'Add a photo or video'})); expect(click).toHaveBeenCalledOnce();
+    const click=vi.spyOn(input as HTMLInputElement,'click'); fireEvent.click(view.container.querySelector('.media-v2-unsorted .media-v2-primary') as HTMLElement); expect(click).toHaveBeenCalledOnce();
   });
   it('single and member batch use ScorecardGlassOverlay', () => {
     const view=render(<HolePhotoTagDialog imageUrl="/a.jpg" holeCount={1} knownHoleNumbers={[1]} pending={false} error={null} onClose={vi.fn()} onSubmit={vi.fn()} />);
