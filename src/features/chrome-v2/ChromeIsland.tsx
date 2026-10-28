@@ -193,11 +193,17 @@ const LeftCapsule: React.FC<{
     // capsule. The marker keeps that a per-slot decision, not a global flip.
     const grow =
       React.isValidElement(slot) && (slot.props as Record<string, unknown>)['data-island-grow'] === true;
+    // data-island-flush: the slot owns the capsule's padding entirely
+    // (BRIEF_TOUR_ISLAND — the Tour island's signed-off padding is the whole
+    // control, so the capsule adds none of its own).
+    const flush =
+      React.isValidElement(slot) && (slot.props as Record<string, unknown>)['data-island-flush'] === true;
     return (
       <div
+        data-island-left
         style={{
           ...glassStyle(tone),
-          padding: grow ? '0 8px 0 10px' : '0 14px 0 13px',
+          padding: flush ? 0 : grow ? '0 8px 0 10px' : '0 14px 0 13px',
           ...(grow ? { flex: '1 1 auto', minWidth: 0 } : null),
         }}
       >
@@ -676,7 +682,27 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
   return (
     <>
 
-      {spec.scrim && (
+      {/* BRIEF_TOUR_ISLAND §1: the '/tourhub' top fade is a single static
+          layer (height 140, no scrolled band) — a registry scrim variant so
+          the Clubhouse scrim is unchanged. */}
+      {spec.scrim === 'hero' && (
+        <div
+          aria-hidden
+          data-chrome="island-scrim-hero"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 140,
+            background: 'linear-gradient(180deg, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0.25) 55%, rgba(10,10,12,0) 100%)',
+            pointerEvents: 'none',
+            zIndex: Z.header - 1,
+          }}
+        />
+      )}
+
+      {spec.scrim === true && (
         <>
           <div
             aria-hidden
