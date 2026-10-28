@@ -15572,6 +15572,7 @@ export type Database = {
           updated_at: string | null
           user_type: Database["public"]["Enums"]["user_type"] | null
           username: string | null
+          username_changed_at: string | null
           username_is_custom: boolean
           verification_notes: string | null
           verification_requested_at: string | null
@@ -15701,6 +15702,7 @@ export type Database = {
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
+          username_changed_at?: string | null
           username_is_custom?: boolean
           verification_notes?: string | null
           verification_requested_at?: string | null
@@ -15830,6 +15832,7 @@ export type Database = {
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
+          username_changed_at?: string | null
           username_is_custom?: boolean
           verification_notes?: string | null
           verification_requested_at?: string | null
@@ -16818,6 +16821,24 @@ export type Database = {
           id?: string
           metadata?: Json | null
           reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      username_history: {
+        Row: {
+          changed_at: string
+          old_username: string
+          user_id: string
+        }
+        Insert: {
+          changed_at?: string
+          old_username: string
+          user_id: string
+        }
+        Update: {
+          changed_at?: string
+          old_username?: string
           user_id?: string
         }
         Relationships: []
@@ -19974,6 +19995,7 @@ export type Database = {
         Args: { p_season_id: string }
         Returns: undefined
       }
+      change_username: { Args: { p_username: string }; Returns: Json }
       check_and_award_badges: {
         Args: { user_id_param: string }
         Returns: {
@@ -25345,6 +25367,10 @@ export type Database = {
           p_request_id: string
         }
         Returns: Json
+      }
+      resolve_previous_username: {
+        Args: { p_username: string }
+        Returns: string
       }
       retag_hole_photo: {
         Args: { p_hole_no: number; p_id: string }
