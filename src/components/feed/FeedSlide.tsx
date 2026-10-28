@@ -24,10 +24,16 @@ import { FS_TRANSITION_MODE } from '@/lib/media/transitionMode';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { VideoProcessingCard } from './VideoProcessingCard';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { galleryFit } from '@/lib/courseMedia/courseGallery';
 
 
 import { usePostViewTracker } from '@/hooks/usePostViewTracker';
 import { MentionText } from '@/components/mentions/MentionText';
+
+function resolveViewerRect(width: number, height: number, viewport: ReturnType<typeof getCurrentViewport>, type: 'image' | 'video'): RestingRect {
+  if (!useFullscreenFeedStore.getState().courseGallery) return resolveRestingRect(width, height, viewport, type);
+  return { top: 0, left: 0, width: viewport.width, height: viewport.height, fit: galleryFit(width, height) };
+}
 
 const normalizeOwnerKey = (key: string | null | undefined): string | null => {
   if (!key) return null;
@@ -85,6 +91,7 @@ export const FeedSlide = memo(function FeedSlide({
   const { user } = useSupabaseSession();
   // Synthetic member-shot fullscreen opens must never insert post_views.
   const syntheticPosts = useFullscreenFeedStore(s => s.syntheticPosts);
+  const gallery = useFullscreenFeedStore(s => s.courseGallery);
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
   const activeIndex = activeIndexOverride ?? storeActiveIndex;
   const isActive = activeIndex === index;
@@ -334,7 +341,7 @@ export const FeedSlide = memo(function FeedSlide({
     <div
       ref={setRef}
       data-index={index}
-      className="relative w-full overflow-hidden flex-shrink-0"
+      className={`relative w-full overflow-hidden flex-shrink-0${gallery && isFullscreen ? ' course-gallery-slide' : ''}`}
       aria-hidden={!isActive}
       {...(!isActive ? { inert: '' } : {})}
       style={{
@@ -355,6 +362,7 @@ export const FeedSlide = memo(function FeedSlide({
 
       {singleBackdropSrc != null && <FullscreenBackdrop src={singleBackdropSrc} />}
       {renderContent()}
+      {gallery && isFullscreen && <div className="course-gallery-media-gradient" />}
 
       {/* Inline carousel dots — top-right, always visible, multi-media non-editorial only */}
       {showInlineDots && (
@@ -408,11 +416,11 @@ const FullscreenImageSlot: React.FC<{
   zoomStyle: React.CSSProperties;
 }> = ({ imgSrc, mediaW, mediaH, isActive, zoomRef, imgRef, zoomStyle }) => {
   const [fsRect, setFsRect] = React.useState<RestingRect>(() =>
-    resolveRestingRect(mediaW, mediaH, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'image'),
+    resolveViewerRect(mediaW, mediaH, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'image'),
   );
   React.useLayoutEffect(() => {
     const measure = () => {
-      const next = resolveRestingRect(mediaW, mediaH, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'image');
+      const next = resolveViewerRect(mediaW, mediaH, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'image');
       setFsRect((prev) =>
         prev.top === next.top && prev.left === next.left
           && prev.width === next.width && prev.height === next.height
@@ -565,7 +573,7 @@ const FullscreenVideoSlot: React.FC<{
     return { w: mediaW, h: mediaH };
   }, [laneAspect, mediaW, mediaH]);
   const [settledRect, setSettledRect] = React.useState<RestingRect>(() =>
-    resolveRestingRect(dims.w, dims.h, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'video'),
+    resolveViewerRect(dims.w, dims.h, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'video'),
   );
   // Poll the engine for the lane's intrinsic aspect until metadata lands.
   React.useEffect(() => {
@@ -592,7 +600,7 @@ const FullscreenVideoSlot: React.FC<{
   React.useLayoutEffect(() => {
     if (isBorrowSlide) return;
     const measure = () => {
-      const next = resolveRestingRect(dims.w, dims.h, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'video');
+      const next = resolveViewerRect(dims.w, dims.h, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'video');
       setSettledRect((prev) =>
         prev.top === next.top && prev.left === next.left
           && prev.width === next.width && prev.height === next.height
@@ -1039,7 +1047,7 @@ const BorrowedFullscreenSlot: React.FC<{
       mw = vp.w;
       mh = Math.max(1, Math.round(vp.w * 0.5625));
     }
-    return resolveRestingRect(mw, mh, vp, 'video');
+    return resolveViewerRect(mw, mh, vp, 'video');
     // borrow is stable for the lifetime of this component.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -1188,7 +1196,7 @@ const BorrowedFullscreenSlot: React.FC<{
         laneId: borrow.laneId, source, mw, mh,
       });
     }
-    const rect = resolveRestingRect(mw, mh, vp, 'video');
+    const rect = resolveViewerRect(mw, mh, vp, 'video');
     targetRectRef.current = rect;
     restingFitRef.current = rect.fit;
     // If the resting fit is CONTAIN, start the underlay fade concurrently
@@ -1211,7 +1219,7 @@ const BorrowedFullscreenSlot: React.FC<{
         if (cancelled) return true;
         const a = VideoEngine.getLaneAspect(borrow.laneId);
         if (!a || a <= 0) return false;
-        const nextRect = resolveRestingRect(a * 1000, 1000, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'video');
+        const nextRect = resolveViewerRect(a * 1000, 1000, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'video');
         const cur = targetRectRef.current;
         if (!cur || (cur.fit === nextRect.fit && Math.abs(cur.height - nextRect.height) < 1)) return true;
         targetRectRef.current = nextRect;
@@ -1544,6 +1552,8 @@ const FullscreenMediaPager: React.FC<{
     if (!el) return;
     const raf = requestAnimationFrame(() => {
       el.scrollLeft = openIdx * el.clientWidth;
+      setActivePagerIdx(openIdx);
+      setStoreActivePagerIdx(openIdx);
     });
     return () => cancelAnimationFrame(raf);
   }, [openIdx]);
@@ -1840,7 +1850,7 @@ const FullscreenPagerPage: React.FC<{
       (!(m as any).isProcessing && (m as any).streamId
         ? generateStreamHlsUrl((m as any).streamId)
         : null);
-    const videoRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'video');
+    const videoRect = resolveViewerRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'video');
     if (isActivePage && mHlsUrl) {
       return (
         <FullscreenVideoSlot
@@ -1884,7 +1894,7 @@ const FullscreenPagerPage: React.FC<{
 
   if (m?.type === 'image') {
     const imgSrc = m.imageUrl || m.thumbnailUrl || '';
-    const imgRect = resolveRestingRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'image');
+    const imgRect = resolveViewerRect(m.width ?? 0, m.height ?? 0, getCurrentViewport(useFullscreenFeedStore.getState().syntheticPosts), 'image');
     return (
       <div className="absolute inset-0 overflow-hidden">
         {/* Active page: transparent over the single backdrop behind the
@@ -1959,9 +1969,9 @@ const FullscreenBackdrop: React.FC<{ src: string }> = ({ src }) => {
           decoding="async"
           draggable={false}
           style={{
-            position: 'absolute', inset: 0, width: '100%', height: '100%',
+            position: 'absolute', inset: useFullscreenFeedStore.getState().courseGallery ? -40 : 0, width: useFullscreenFeedStore.getState().courseGallery ? 'calc(100% + 80px)' : '100%', height: useFullscreenFeedStore.getState().courseGallery ? 'calc(100% + 80px)' : '100%',
             objectFit: 'cover',
-            filter: 'blur(40px) brightness(0.5) saturate(1.2)',
+            filter: useFullscreenFeedStore.getState().courseGallery ? 'blur(36px) brightness(0.45) saturate(1.2)' : 'blur(40px) brightness(0.5) saturate(1.2)',
             transform: 'scale(1.2)',
             opacity: l.key === shown || layers.length === 1 ? 1 : 0,
             transition: 'opacity 180ms linear',
