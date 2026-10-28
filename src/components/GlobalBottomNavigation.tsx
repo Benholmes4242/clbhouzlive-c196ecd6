@@ -35,27 +35,21 @@ const LIVE_DIM = (() => {
 })();
 
 /* Centre tab (post-review-tab brief): POST / two-way arrows / REVIEW. The
-   arrows are exactly as wide as the rendered word POST, measured in a layout
-   effect (27px before measuring). Labels share the other tabs' style; the
-   -0.13em right margin cancels trailing tracking so each word centres. */
+   arrows are the fixed 16×16 two-way mark from the signed-off option 1.
+   Labels share the other tabs' style; the -0.13em right margin cancels
+   trailing tracking so each word centres. */
 const POST_REVIEW_WORD: React.CSSProperties = {
   fontSize: 9, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase',
   lineHeight: 1, whiteSpace: 'nowrap', marginRight: '-0.13em',
 };
 export function PostReviewMark({ color }: { color: string }) {
-  const postRef = useRef<HTMLSpanElement>(null);
-  const [w, setW] = useState(27);
-  useLayoutEffect(() => {
-    const measured = postRef.current?.getBoundingClientRect().width;
-    if (measured && measured > 0) setW(measured);
-  }, []);
   return (
     <>
-      <span ref={postRef} aria-hidden="true" data-post-review-row="post" style={{ ...POST_REVIEW_WORD, color }}>Post</span>
-      <svg aria-hidden="true" data-post-review-row="arrows" width={w} height={14} viewBox={`0 0 ${w} 14`} style={{ display: 'block' }}
-        fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-        <path d={`M1 4H${w - 1}M${w - 5} 0.8 ${w - 1} 4 ${w - 5} 7.2`} />
-        <path d={`M${w - 1} 10H1M5 6.8 1 10 5 13.2`} />
+      <span aria-hidden="true" data-post-review-row="post" style={{ ...POST_REVIEW_WORD, color }}>Post</span>
+      <svg aria-hidden="true" data-post-review-row="arrows" width={16} height={16} viewBox="0 0 24 24" style={{ display: 'block' }}
+        fill="none" stroke={color} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 7H20M16 3l4 4-4 4" />
+        <path d="M16 17H4M8 13l-4 4 4 4" />
       </svg>
       <span aria-hidden="true" data-post-review-row="review" style={{ ...POST_REVIEW_WORD, color }}>Review</span>
     </>
