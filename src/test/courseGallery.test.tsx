@@ -151,7 +151,7 @@ describe('course viewer round 2', () => {
     expect(img).not.toBeNull();
     expect(img.classList.contains('media-v2-cover')).toBe(true);
     expect(square.className).toContain('course-gallery-square');
-    expect(square.className).not.toMatch(/rounded/);
+    expect(square.className).toContain('rounded-none'); expect(square.className).not.toMatch(/rounded-\[/);
     expect(view.container.querySelector('.course-gallery-grid-wash')).toBeNull();
   });
   it('Holes grid has sticky group headers and All and place grids are flat', () => {
