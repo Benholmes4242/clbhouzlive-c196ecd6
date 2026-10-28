@@ -1,6 +1,7 @@
 /**
  * CB13 — THE HANDICAP GATE ON THE ROUNDS TAB: look, then lock.
- * 28 Oct 2026: free look, then lock on 80px of scroll or 3 seconds (founder sign-off).
+ * 28 Oct 2026: free look, then lock beyond 80px from the scroll position at mount
+ * or 3 seconds (founder sign-off).
  * ScoresLeaderboardsPage mounts this only for gated; its four-state predicate,
  * CB45 failed-read fallback and existing reads/count source stay authoritative.
  * The real full-height page is accessible until lock; only its body then becomes
@@ -141,6 +142,7 @@ export function RoundsGate({ children, roundCount = null, scope = null }: { chil
     if (impressionTracked.current) return;
     const scroller = getPrimaryScrollElement();
     const target = scroller === document.documentElement || scroller === document.body ? window : scroller;
+    const startTop = scroller?.scrollTop ?? 0;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let fallback: ReturnType<typeof setTimeout> | undefined;
     let observer: MutationObserver | undefined;
@@ -153,7 +155,7 @@ export function RoundsGate({ children, roundCount = null, scope = null }: { chil
       setLocked(true);
       analyticsEvents.track('rounds_gate_viewed', { gate_state: 'gated', trigger });
     };
-    const onScroll = () => { if ((scroller?.scrollTop ?? 0) > 80) lock('scroll'); };
+    const onScroll = () => { if (Math.abs((scroller?.scrollTop ?? 0) - startTop) > 80) lock('scroll'); };
     const startTimer = () => {
       if (timerStarted || impressionTracked.current) return;
       timerStarted = true;
@@ -165,7 +167,7 @@ export function RoundsGate({ children, roundCount = null, scope = null }: { chil
     if (wrapperRef.current) observer.observe(wrapperRef.current, { childList: true, subtree: true });
     fallback = setTimeout(startTimer, 8000);
     target?.addEventListener('scroll', onScroll, { passive: true });
-    checkRow(); onScroll();
+    checkRow();
     return cleanup;
   }, []);
   useLayoutEffect(() => {

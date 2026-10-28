@@ -7,6 +7,7 @@ import { I18nextProvider, initReactI18next } from 'react-i18next';
 import enCourses from '../../public/locales/en/courses.json';
 import { RoundsGate, roundsGateState } from '@/features/explore-magazine/RoundsGate';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { __resetScrollerCache } from '@/lib/getScrollParent';
 
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
 
@@ -17,8 +18,14 @@ beforeAll(async () => {
     interpolation: { escapeValue: false },
   });
 });
-beforeEach(() => { vi.clearAllMocks(); vi.useFakeTimers(); });
-afterEach(() => { cleanup(); vi.useRealTimers(); });
+function resetScroller() {
+  if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  __resetScrollerCache();
+}
+beforeEach(() => { resetScroller(); vi.clearAllMocks(); vi.useFakeTimers(); });
+afterEach(() => { cleanup(); resetScroller(); vi.useRealTimers(); });
 function lock() { act(() => vi.advanceTimersByTime(3000)); }
 
 function LocationProbe() {
@@ -45,6 +52,19 @@ function openSheet() {
 }
 
 describe('CB15 — gate reporting', () => {
+  it('starts unlocked at 300px and reports scroll lock only beyond 80px from arrival', () => {
+    const scroller = document.scrollingElement ?? document.documentElement;
+    scroller.scrollTop = 300;
+    const view = render(fixture());
+    expect(view.container.querySelector('[data-rounds-locked]')).toBeNull();
+    expect(analyticsEvents.track).not.toHaveBeenCalledWith('rounds_gate_viewed', expect.anything());
+    scroller.scrollTop = 380; fireEvent.scroll(window);
+    expect(view.container.querySelector('[data-rounds-locked]')).toBeNull();
+    expect(analyticsEvents.track).not.toHaveBeenCalledWith('rounds_gate_viewed', expect.anything());
+    scroller.scrollTop = 381; fireEvent.scroll(window);
+    expect(view.container.querySelector('[data-rounds-locked]')).not.toBeNull();
+    expect(analyticsEvents.track).toHaveBeenCalledWith('rounds_gate_viewed', { gate_state: 'gated', trigger: 'scroll' });
+  });
   it('reports viewed only on scroll lock, once per mount with the scroll trigger', () => {
     render(fixture());
     const scroller = document.scrollingElement ?? document.documentElement;
