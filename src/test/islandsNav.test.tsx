@@ -174,6 +174,7 @@ describe('IndexGlance', () => {
 
   it('shows the move, sparkline and stats once data settles', () => {
     mockHistory = [
+      { observed_at: iso(300), handicap_index: 12.2 },
       { observed_at: iso(10), handicap_index: 12.6 },
       { observed_at: iso(2), handicap_index: 12.4 },
     ];
@@ -393,6 +394,6 @@ describe('GlobalBottomNavigation', () => {
     const label = Array.from(home.querySelectorAll('span')).find((s) => s.textContent === 'Home');
     expect(label).toBeDefined();
     expect(label!.style.opacity).toBe('0');
-    expect(label!.style.maxHeight).toBe('0px');
+    expect(['0', '0px']).toContain(label!.style.maxHeight);
   });
 });
