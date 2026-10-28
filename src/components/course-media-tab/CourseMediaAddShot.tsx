@@ -15,7 +15,9 @@ import { submitLibraryPlacePhoto, submitLibraryPlaceVideo } from '@/lib/courseMe
 import { holePhotoErrorMessage } from '@/lib/courseMedia/holePhotoError';
 import { memberTagConfirmation } from '@/lib/courseMedia/holeTagConfirmation';
 import type { CoursePlace } from '@/lib/courseMedia/places';
-import { placeMediaKey } from './hooks/useCoursePlaceMedia';
+// Same key as placeMediaKey in useCoursePlaceMedia; spelt here so callers that
+// stub that hook keep the refresh.
+const placeMediaKey = (courseId: string, memberId?: string) => ['course-place-media', courseId, memberId] as const;
 import { ShotTagCard } from './ShotTagCard';
 import { PLACE_LABELS } from './ShotTagChoices';
 
