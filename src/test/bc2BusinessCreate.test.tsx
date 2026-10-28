@@ -90,7 +90,7 @@ vi.mock('@/components/business/AddressAutocomplete', async () => {
   return {
     dbLocationPrecision: (p: string | null | undefined) => p ?? null,
     AddressAutocomplete: (p: { value: { label: string } | null; onChange: (v: unknown) => void; countryCode: string; disabled?: boolean }) =>
-      h('div', { 'data-testid': 'address-autocomplete', 'data-country': p.countryCode, 'data-disabled': p.disabled ? 'true' : 'false' },
+      h('div', { 'data-testid': 'address-autocomplete', 'data-country': p.countryCode, 'data-disabled': (p.disabled || !p.countryCode) ? 'true' : 'false' },
         p.value ? h('span', { 'data-testid': 'address-value' }, p.value.label) : null,
         h('button', { type: 'button', 'data-testid': 'address-pick', onClick: () => p.onChange({ label: 'Hayes Lane, Bromley BR2', lat: 51.376, lng: 0.015, precision: 'address', countryCode: p.countryCode }) }),
       ),

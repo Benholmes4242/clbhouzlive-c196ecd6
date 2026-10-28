@@ -73,9 +73,18 @@ export function clubCardFacts(courseCount: number, stats: ClubCourseStatRow[]): 
   return { rounds, plays, third };
 }
 
-/** Crest-tile initials: first letters of the first two words, uppercase. */
+/** College crest-tile initials: first letter of the first and last word
+ *  ("University of Stirling" → "US"), one letter for a single word. */
 export function nameInitials(name: string): string {
-  return name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]!.toUpperCase()).join('');
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return '';
+  if (words.length === 1) return words[0][0]!.toUpperCase();
+  return `${words[0][0]!.toUpperCase()}${words[words.length - 1][0]!.toUpperCase()}`;
+}
+
+/** Business name-match tile: a single initial ("Kestrel Golf Academy" → "K"). */
+export function nameInitial(name: string): string {
+  return name.trim()[0]?.toUpperCase() ?? '';
 }
 
 export const CLAIM_PROOF_NOTE_MAX = 500;
