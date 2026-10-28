@@ -42,6 +42,7 @@ import { useChromeScrolled } from '@/hooks/useScrollDirection';
 import { IndexGlance } from './IndexGlance';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ConnectGlance } from './ConnectGlance';
+import wordmarkWhite from '@/assets/clbhouz-wordmark-white.svg.asset.json';
 
 import { safeGoBack } from '@/utils/navigation';
 import { subscribeIslandEdge, getIslandEdgeScrolled } from './islandEdge';
