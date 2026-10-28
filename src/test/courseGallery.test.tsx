@@ -46,12 +46,14 @@ describe('course gallery rules', () => {
     expect(square.querySelector('img')).toBeNull();
     expect(square.querySelector('.course-gallery-thumb-fallback svg')).not.toBeNull();
     gallery.unmount();
-    const shot = { url: '/video.m3u8', mediaType: 'video', posterUrl: '/poster.jpg', streamId: 'a'.repeat(32) };
+    const shot = { url: '/video.m3u8', mediaType: 'video' as const, posterUrl: '/poster.jpg', streamId: 'a'.repeat(32) };
     const tagger = render(<ShotTagCard shot={shot} holes={[1]} hole={null} place={null} onHole={vi.fn()} onPlace={vi.fn()} pending={false} canSubmit={false} onSubmit={vi.fn()} onSkip={vi.fn()} onClose={vi.fn()}
       strip={<HoleMediaThumbnail {...shot} alreadyEligible alt="" />} />);
     expect(screen.getByAltText('Current video')).toHaveAttribute('src', '/poster.jpg');
-    expect([...tagger.container.querySelectorAll('img')].map(img => img.getAttribute('src'))).toEqual(['/poster.jpg', '/poster.jpg']);
-    expect(tagger.container.querySelector('.course-gallery-thumb-fallback')).toBeNull();
+    const dialog = tagger.container.querySelector('[role="dialog"]') ?? document.body.querySelector('[role="dialog"]');
+    expect(dialog).not.toBeNull();
+    expect([...(dialog as Element).querySelectorAll('img')].map(img => img.getAttribute('src'))).toEqual(['/poster.jpg', '/poster.jpg']);
+    expect((dialog as Element).querySelector('.course-gallery-thumb-fallback')).toBeNull();
   });
   it('All preserves Everything order', () => expect(filteredGallery(shots(),'all').map(s=>s.id)).toEqual(['h3','h1','v','c','u']));
   it('Holes orders hole number then existing panel order', () => { const list=galleryShots([post('b'),post('a'),post('c')],[holeTag('b',1),holeTag('a',1),holeTag('c',3)],[]); expect(filteredGallery(list,'holes').map(s=>s.id)).toEqual(['a','b','c']); });
