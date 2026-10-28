@@ -8,6 +8,7 @@ import { useAppPrefetch } from '@/hooks/useAppPrefetch';
 import { warmChunk } from '@/routes/chunkLoaders';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 import { navigationTabs } from './bottom-navigation/navigationTabs';
+import './bottom-navigation/postReviewMark.css';
 import { useDiscoverNewTotal } from '@/stores/discoverNewStore';
 
 import { useNavTheme } from '@/hooks/useNavTheme';
@@ -38,21 +39,21 @@ const LIVE_DIM = (() => {
    share even gaps; unsupported text-box keeps centred line-height boxes.
    Labels share the other tabs' style; the -0.13em right margin cancels
    trailing tracking so each word centres. */
-const POST_REVIEW_WORD: React.CSSProperties & { textBox: string } = {
+const POST_REVIEW_WORD: React.CSSProperties = {
   fontSize: 9, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase',
   lineHeight: 1, whiteSpace: 'nowrap', marginRight: '-0.13em',
-  display: 'block', textBox: 'trim-both cap alphabetic',
+  display: 'block',
 };
 export function PostReviewMark({ color }: { color: string }) {
   return (
     <>
-      <span aria-hidden="true" data-post-review-row="post" style={{ ...POST_REVIEW_WORD, color }}>Post</span>
+      <span aria-hidden="true" className="post-review-word" data-post-review-row="post" style={{ ...POST_REVIEW_WORD, color }}>Post</span>
       <svg aria-hidden="true" data-post-review-row="arrows" width={14} height={11.9} viewBox="0 1.8 24 20.4" style={{ display: 'block' }}
         fill="none" stroke={color} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
         <path d="M8 7H20M16 3l4 4-4 4" />
         <path d="M16 17H4M8 13l-4 4 4 4" />
       </svg>
-      <span aria-hidden="true" data-post-review-row="review" style={{ ...POST_REVIEW_WORD, color }}>Review</span>
+      <span aria-hidden="true" className="post-review-word" data-post-review-row="review" style={{ ...POST_REVIEW_WORD, color }}>Review</span>
     </>
   );
 }
