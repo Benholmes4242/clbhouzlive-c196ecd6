@@ -1,13 +1,11 @@
-import {
-  HomeNavIcon,
-  ExploreNavIcon,
-  ShareNavIcon,
-  CoursesNavIcon,
-  TourNavIcon,
-} from './navIcons';
+import MapPinIcon from '@/components/icons/MapPinIcon';
+import HouseIcon from '@/components/icons/HouseIcon';
+import CompassRoseIcon from '@/components/icons/CompassRoseIcon';
+import PlusSquareIcon from '@/components/icons/PlusSquareIcon';
+import TrophyIcon from '@/components/icons/TrophyIcon';
 
 // NOTE: tab IDs are historical and do NOT match labels.
-//   id 'clubhouse' = the immersive swipe FEED at '/'   (label "Home")
+//   id 'clubhouse' = the immersive swipe FEED at '/'   (label "Explore")
 //   id 'watch'     = the Explore destination, SERVED AT '/amateur' (label "Explore").
 //                    KNOWN, DELIBERATE MISMATCH: the label says Explore, the path
 //                    says /amateur, and '/explore' is a redirect shim pointing AT
@@ -24,15 +22,27 @@ import {
 //                    asks "What are you sharing?" and offers a review OR a
 //                    post, so the label names both; "Post" named only one.
 // Change labels/icons freely; do NOT rename IDs (scroll-to-top logic + analytics depend on them).
-// THE NAV ICON SET IS OUTLINE, NOT FILLED (BRIEF_ISLANDS_NAV): 24 viewBox,
-// round caps and joins, stroke-only — see navIcons.tsx. The old filled set in
-// src/components/icons/ stays for its other consumers.
+// THE NAV ICON SET IS FILLED, NOT STROKED. Any new icon is a filled path matched
+// optically to the existing marks.
 
 export const navigationTabs = [
-  { id: 'clubhouse', label: 'Home',      icon: HomeNavIcon,  path: '/' },
-  { id: 'watch',     label: 'Explore',   icon: ExploreNavIcon, path: '/amateur' },
-  { id: 'post',      label: 'Share',     icon: ShareNavIcon, path: null, isAction: true },
-  { id: 'courses',   label: 'Courses',   icon: CoursesNavIcon, path: '/courses' },
-  { id: 'tourhub',   label: 'Tour',      icon: TourNavIcon, path: '/tourhub' },
+  { id: 'clubhouse', label: 'Home',      icon: HouseIcon,  path: '/' },
+  { id: 'watch',     label: 'Explore',   icon: CompassRoseIcon, path: '/amateur' },
+  { id: 'post',      label: 'Share',     icon: PlusSquareIcon, path: null, isAction: true },
+  { id: 'courses',   label: 'Courses',   icon: MapPinIcon, path: '/courses' },
+  { id: 'tourhub',   label: 'Tour',      icon: TrophyIcon, path: '/tourhub' },
 
 ];
+
+// Per-tab optical size map (expanded). Keyed by the REAL tab ids above.
+// The labelled bar uses a shared 23px optical box across all five marks.
+export const ICON_SIZE: Record<string, number> = {
+  clubhouse: 23,
+  watch: 23,
+  post: 23,
+  courses: 23,
+  tourhub: 23,
+};
+
+// Uniform icon-box (tap target / centering). Sized to the largest glyph.
+export const ICON_BOX = 23;

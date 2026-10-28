@@ -10,16 +10,18 @@ import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers
 import { navigationTabs } from './bottom-navigation/navigationTabs';
 import { useDiscoverNewTotal } from '@/stores/discoverNewStore';
 
+import { useNavTheme } from '@/hooks/useNavTheme';
 import { useNavScrollState, pushForceExpand, resetToExpanded } from '@/hooks/useScrollDirection';
+import { cn } from '@/lib/utils';
 import { scrollPageToTop } from '@/lib/getScrollParent';
+import { r } from '@/lib/radius';
 import { LIVE_INK } from '@/features/tourhub/_shared/tokens';
-import { ISLAND_GLASS } from '@/features/chrome-v2/ChromeIsland';
 import { useAnyTourLive } from '@/features/tourhub/hooks/useAnyTourLive';
 import ComposerFlowSheet from '@/features/composer-flow/ComposerFlowSheet';
 import { useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
 import { nextHandoffAction } from '@/features/composer-flow/handoffRules';
 import { NAV_CLEARANCE, NAV_PILL_H_FALLBACK, NAV_PILL_H_VAR } from '@/lib/navClearance';
-import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
+import { INK_ON_LIGHT, MEMBER_PANEL, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
 
 /**
@@ -83,11 +85,35 @@ interface GlobalBottomNavigationProps {
   chromeState?: 'visible' | 'hidden';
 }
 
-// --- Ink tokens (BRIEF_ISLANDS_NAV §1) ---------------------------------------
-// One glass — ISLAND_GLASS, shared with the top islands — and one ink pair.
-// The old light/dark theme token sets went with the lozenge design.
-const NAV_INK = '#F8FAFC';
-const NAV_DIM = 'rgba(248,250,252,0.5)';
+// --- Theme tokens ------------------------------------------------------------
+type ThemeTokens = {
+  fill: string;
+  hairline: string;
+  shadow: string;
+  ink: string;
+  dim: string;
+  lozenge: string;
+};
+
+const DARK_TOKENS: ThemeTokens = {
+  fill: surfaceWithAlpha(MEMBER_PANEL, 0.86),
+  hairline: '1px solid rgba(255,255,255,0.10)',
+  // Specular top-rim highlight + drop shadow (kept in both no-blur and blur paths).
+  shadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 10px 30px rgba(0,0,0,0.45)',
+  ink: '#FFFFFF',
+  dim: 'rgba(255,255,255,0.62)',
+  lozenge: 'rgba(255,255,255,0.10)',
+};
+
+const LIGHT_TOKENS: ThemeTokens = {
+  fill: 'rgba(250,251,253,0.88)',
+  hairline: '1px solid rgba(15,23,42,0.08)',
+  shadow: 'inset 0 1px 0 rgba(255,255,255,0.70), 0 10px 30px rgba(15,23,42,0.16)',
+  ink: '#0F172A',
+  dim: 'rgba(15,23,42,0.62)',
+  lozenge: 'rgba(15,23,42,0.07)',
+};
+
 
 const REDUCED_MOTION =
   typeof window !== 'undefined' &&
@@ -106,13 +132,13 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const discoverNewCount = useDiscoverNewTotal();
   const [createOpen, setCreateOpen] = useState(false);
 
+  const theme = useNavTheme();
+  const tokens = theme === 'dark' ? DARK_TOKENS : LIGHT_TOKENS;
   const navState = useNavScrollState();
   // Live state for the Tour tab. Fails closed (false) while loading or on error.
   const tourLive = useAnyTourLive();
 
-  // Reduced motion SNAPS to the condensed capsule rather than staying
-  // expanded — only the transition is dropped (BRIEF_ISLANDS_NAV §2).
-  const condensed = navState === 'condensed';
+  const condensed = navState === 'condensed' && !REDUCED_MOTION;
 
   const navRef = useRef<HTMLDivElement | null>(null);
 
@@ -290,51 +316,47 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     handleTabClick(tab);
   };
 
-  // Geometry (BRIEF_ISLANDS_NAV §1/§2). Expanded: one 66px glass pill,
-  // min(358px, 100vw − 32px). Condensed: a centred icon-only capsule, 52px.
-  // The condensed max-width is the capsule's exact content width
-  // (4 × 44 slots + 40 share + 4 × 6 gaps + 2 × 8 padding).
-  const PILL_MAX_EXPANDED = 358;
-  const PILL_MAX_CONDENSED = 256;
-  const iconSize = condensed ? 20 : 22;
+  // Labelled navigation: glyph, 3px gap, then the column-header label.
+  const PILL_MAX_EXPANDED = 'min(396px, 100vw - 22px)';
+  const PILL_MAX_CONDENSED = 'min(324px, 100vw - 36px)';
+  const iconSize = 23;
+
+  const pillPadding = '6px 7px';
 
   const badges = useMemo<Record<string, number>>(() => ({ courses: discoverNewCount }), [discoverNewCount]);
 
-  // Motion tokens — only max-width + padding may animate on the blurred pill.
-  // Never animate an explicit height/width on the pill itself.
+  // Motion tokens — only max-width + padding + icon size may animate on the
+  // blurred pill. Never animate an explicit height/width on the pill itself.
   const PILL_TRANSITION = REDUCED_MOTION
     ? 'none'
     : 'max-width 220ms cubic-bezier(0.2,0.8,0.2,1), padding 220ms cubic-bezier(0.2,0.8,0.2,1)';
-  // (Icon size snaps between states — no SVG resize transition.)
+  // (Icon size snaps between states — see note in the SVG style block below.)
 
   const BUTTON_TRANSITION = REDUCED_MOTION
     ? 'none'
-    : 'background 180ms linear, color 180ms linear';
-  // Labels fade out over 120ms as the capsule condenses.
-  const LABEL_TRANSITION = REDUCED_MOTION
-    ? 'none'
-    : 'opacity 120ms linear, max-height 120ms linear';
+    : 'background 180ms linear, color 180ms linear, padding 220ms cubic-bezier(0.2,0.8,0.2,1)';
 
   return (
     <>
-      {/* Bottom fade (BRIEF_ISLANDS_NAV §1): one fixed layer just below the
-          nav's z-index whenever the nav shows. */}
-      {showNavigation && (
-        <div
-          aria-hidden
-          data-chrome="bottom-nav-fade"
-          style={{
-            position: 'fixed',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: 150,
-            background: 'linear-gradient(0deg, rgba(10,10,12,0.92) 0%, rgba(10,10,12,0.6) 50%, rgba(10,10,12,0) 100%)',
-            pointerEvents: 'none',
-            zIndex: 99,
-          }}
-        />
-      )}
+      {/* One-off style: gate translucency + backdrop-filter so unsupported
+          WebViews degrade to the opaque token fill. Blur-supported paths get
+          a more transparent liquid-glass fill so page content shows through. */}
+      <style>{`
+        .glass-nav-pill { }
+        @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+          .glass-nav-pill {
+            backdrop-filter: blur(22px) saturate(180%);
+            -webkit-backdrop-filter: blur(22px) saturate(180%);
+          }
+          .glass-nav-pill[data-theme='dark'] {
+             background: ${surfaceWithAlpha(MEMBER_PANEL, 0.62)} !important;
+          }
+          .glass-nav-pill[data-theme='light'] {
+            background: rgba(250,251,253,0.66) !important;
+          }
+        }
+      `}</style>
+
 
       <AnimatePresence>
         {showNavigation && (
@@ -363,19 +385,21 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 navRef.current = el;
               }}
               data-chrome="bottom-nav"
+              data-theme={theme}
+              className={cn('glass-nav-pill')}
 
               style={{
                 pointerEvents: 'auto',
                 margin: '0 auto',
                 maxWidth: condensed ? PILL_MAX_CONDENSED : PILL_MAX_EXPANDED,
-                width: condensed ? 'auto' : 'calc(100vw - 32px)',
-                height: condensed ? 52 : 66,
-                borderRadius: condensed ? 26 : 33,
-                ...ISLAND_GLASS,
-                padding: condensed ? '0 8px' : '0 6px',
+                width: '100%',
+                background: tokens.fill,
+                border: tokens.hairline,
+                boxShadow: tokens.shadow,
+                borderRadius: r.xl,
+                padding: pillPadding,
                 transition: PILL_TRANSITION,
                 WebkitTapHighlightColor: 'transparent',
-                boxSizing: 'border-box',
               }}
             >
               <ul
@@ -383,11 +407,10 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                   listStyle: 'none',
                   margin: 0,
                   padding: 0,
-                  height: '100%',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: condensed ? 'center' : 'space-around',
-                  gap: condensed ? 6 : 0,
+                  justifyContent: 'space-between',
+                  gap: 2,
                 }}
               >
                 {navigationTabs.map((tab) => {
@@ -400,52 +423,23 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                   // pair, except that Tour swaps ink/dim for the live green
                   // pair while play is genuinely in progress (state, not
                   // identity). Same active/inactive relationship, same alpha.
-                  const ink =
-                    tab.id === 'tourhub' && tourLive
+                  const iconColor =
+                    tab.id === 'post'
                       ? isActive
-                        ? LIVE_INK
-                        : LIVE_DIM
-                      : isActive
-                        ? NAV_INK
-                        : NAV_DIM;
+                        ? '#F7931E'
+                        : 'rgba(247,147,30,0.72)'
+                      : tab.id === 'tourhub' && tourLive
+                        ? isActive
+                          ? LIVE_INK
+                          : LIVE_DIM
+                        : isActive
+                          ? tokens.ink
+                          : tokens.dim;
+                  const labelColor = iconColor;
 
-                  // Share — the centre tab. A solid amber circle holding a
-                  // plus; no visible label (aria-label "Share" stays).
-                  if (tab.isAction) {
-                    return (
-                      <li key={tab.id} style={{ display: 'flex', justifyContent: 'center' }}>
-                        <button
-                          type="button"
-                          aria-label={tab.label}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleTabClickWithCamera(tab);
-                          }}
-                          style={{
-                            appearance: 'none',
-                            border: 0,
-                            width: condensed ? 40 : 54,
-                            height: condensed ? 40 : 54,
-                            borderRadius: condensed ? 20 : 27,
-                            background: '#F7931E',
-                            boxShadow: condensed ? 'none' : '0 8px 24px rgba(247,147,30,0.35)',
-                            marginTop: condensed ? 0 : -2,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            transition: BUTTON_TRANSITION,
-                          }}
-                        >
-                          <Icon size={condensed ? 21 : 26} color="#0A0A0C" strokeWidth={2.6} />
-                        </button>
-                      </li>
-                    );
-                  }
 
                   return (
-                    <li key={tab.id} style={{ display: 'flex', justifyContent: 'center' }}>
+                    <li key={tab.id} style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
                       <button
                         type="button"
                         aria-label={tab.label}
@@ -460,22 +454,18 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                         style={{
                           appearance: 'none',
                           border: 0,
-                          background: condensed
-                            ? isActive
-                              ? 'rgba(255,255,255,0.12)'
-                              : 'transparent'
-                            : 'transparent',
-                          color: ink,
-                          padding: 0,
-                          ...(condensed
-                            ? { width: 44, height: 40, borderRadius: 20 }
-                            : { width: 62, height: '100%' }),
-                          position: 'relative',
+                          background: isActive ? tokens.lozenge : 'transparent',
+                          color: iconColor,
+                          padding: '0 3px',
+                          height: 46,
+                          borderRadius: r.md,
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          gap: condensed ? 0 : 5,
+                          gap: 3,
+                          width: '100%',
+                          minWidth: 0,
                           fontFamily: 'inherit',
                           cursor: 'pointer',
                           transition: BUTTON_TRANSITION,
@@ -483,10 +473,22 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                       >
                         <span style={{ position: 'relative', display: 'inline-flex', flex: '0 0 auto' }}>
                           <Icon
-                            size={iconSize}
-                            color={ink}
-                            strokeWidth={isActive ? 2.2 : 1.8}
+                            aria-hidden="true"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            shapeRendering="geometricPrecision"
+                            vectorEffect="non-scaling-stroke"
+                            {...(tab.id === 'post'
+                              ? { plusColor: '#F7931E' }
+                              : {})}
+                            style={{
+                              width: iconSize,
+                              height: iconSize,
+                              // Snap sizes between states — no SVG resize
+                              // transition (raster mid-tween reads soft).
+                            }}
                           />
+
 
                           {badgeCount > 0 && (
                             <span
@@ -505,7 +507,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                                 fontWeight: 700,
                                 lineHeight: '14px',
                                 textAlign: 'center',
-                                boxShadow: '0 0 0 1.5px rgba(14,15,19,0.9)',
+                                boxShadow: theme === 'dark' ? `0 0 0 1.5px ${surfaceWithAlpha(MEMBER_PANEL, 0.9)}` : '0 0 0 1.5px rgba(250,251,253,0.9)',
                               }}
                             >
                               {badgeCount > 99 ? '99+' : badgeCount}
@@ -515,34 +517,17 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                         <span
                           aria-hidden="true"
                           style={{
-                            color: ink,
-                            fontSize: 10.5,
-                            fontWeight: isActive ? 700 : 600,
+                            color: labelColor,
+                            fontSize: 9,
+                            fontWeight: 700,
+                            letterSpacing: '0.13em',
                             lineHeight: 1,
+                            textTransform: 'uppercase',
                             whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            maxHeight: condensed ? 0 : 14,
-                            opacity: condensed ? 0 : 1,
-                            transition: LABEL_TRANSITION,
                           }}
                         >
                           {tab.label}
                         </span>
-                        {!condensed && isActive && (
-                          <span
-                            aria-hidden="true"
-                            style={{
-                              position: 'absolute',
-                              bottom: 3,
-                              left: '50%',
-                              transform: 'translateX(-50%)',
-                              width: 16,
-                              height: 3,
-                              borderRadius: 2,
-                              background: ink,
-                            }}
-                          />
-                        )}
                       </button>
                     </li>
                   );
