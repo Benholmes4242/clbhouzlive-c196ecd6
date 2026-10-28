@@ -19,7 +19,7 @@ import { milesLabel } from '@/components/business/BusinessNearbyCourses';
 import { countryNameToCode } from '@/utils/countryCodeMapping';
 import { formatNumber } from '@/i18n/format';
 import { AppLog } from '@/lib/logger';
-import { nameInitials } from './step2Rules';
+import { nameInitial } from './step2Rules';
 import { Field } from './step2Bits';
 import type { BusinessCreateDraft } from './createRules';
 
@@ -165,7 +165,7 @@ export function Step2Other({ draft, setDraft, userId, onContinue }: Props) {
           <div className="bizc-note" data-testid="bizc-name-match" style={{ marginTop: 10 }}>
             <div className="bizc-idrow">
               <span className="bizc-crest" aria-hidden="true">
-                {match.logo_url ? <img src={match.logo_url} alt="" /> : nameInitials(match.name)}
+                {match.logo_url ? <img src={match.logo_url} alt="" /> : nameInitial(match.name)}
               </span>
               <span className="bizc-res-text">
                 <b style={{ display: 'block', fontSize: 15, fontWeight: 600 }}>{match.name} is already on clbhouz.</b>
