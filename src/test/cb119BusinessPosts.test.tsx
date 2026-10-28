@@ -106,7 +106,7 @@ describe('CB119 ClubFromTheClub non-club props', () => {
     expect(title.style.whiteSpace).toBe('nowrap');
     expect(title.style.overflow).toBe('hidden');
     expect(title.style.textOverflow).toBe('ellipsis');
-    expect(title.style.minWidth).toBe('0px');
+    expect(title.style.minWidth).toBe('0');
     const count = document.querySelector<HTMLElement>('[data-club-feed-count]')!;
     expect(count.textContent).toBe('4 posts');
     expect(count.style.flex).toContain('none');
