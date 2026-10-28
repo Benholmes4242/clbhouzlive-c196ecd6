@@ -61,7 +61,7 @@ export function EditProfileYou(p: Props) {
           </button>
         ))}
       </div>
-      {sheet === 'name' && <NameSheet {...p} onClose={close} onSave={patch => save('name', patch)} />}
+      {sheet === 'name' && <NameSheet displayName={p.displayName} firstName={p.firstName} lastName={p.lastName} onClose={close} onSave={patch => save('name', patch)} />}
       {sheet === 'username' && <UsernameSheet {...p} onClose={close} />}
       {sheet === 'bio' && <BioSheet bio={p.bio} onClose={close} onSave={bio => save('bio', { bio })} />}
       {sheet === 'location' && <LocationSheet city={p.city} country={p.country} onClose={close} onSave={(country, city) => save('location', { country, city })} />}
@@ -80,7 +80,7 @@ export function EditProfileYou(p: Props) {
   );
 }
 
-function NameSheet({ displayName, firstName, lastName, onClose, onSave }: Props & { onClose: () => void; onSave: (patch: YouPatch) => Promise<void> }) {
+function NameSheet({ displayName, firstName, lastName, onClose, onSave }: { displayName: string; firstName: string; lastName: string; onClose: () => void; onSave: (patch: YouPatch) => Promise<void> }) {
   const { t } = useTranslation();
   const [first, setFirst] = useState(firstName);
   const [last, setLast] = useState(lastName);
