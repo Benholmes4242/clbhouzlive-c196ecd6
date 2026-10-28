@@ -1,0 +1,42 @@
+/* Review a course sheet (review-course-search-signed-off.html). No negative letter-spacing. */
+.rcs { --rcs-ink: #F8FAFC; --rcs-mute: rgba(248,250,252,0.62); --rcs-dim: rgba(248,250,252,0.42); --rcs-rule: rgba(255,255,255,0.08);
+  height: 100%; display: flex; flex-direction: column; min-height: 0; color: var(--rcs-ink); letter-spacing: 0; }
+.rcs-head { display: flex; align-items: center; padding: 24px 16px 0 20px; flex: none; }
+.rcs-head h1 { flex: 1; margin: 0; font-size: 22px; font-weight: 700; color: var(--rcs-ink); letter-spacing: 0; }
+.rcs .rcs-close { width: 34px; height: 34px; padding: 0; border-radius: 50%; background: rgba(255,255,255,0.07); color: var(--rcs-mute); }
+.rcs .rcs-close svg { width: 17px; height: 17px; }
+.rcs-field { margin: 14px 16px 0; height: 48px; border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 0 14px; display: flex; align-items: center; gap: 10px; flex: none; box-sizing: border-box; color: var(--rcs-mute); }
+.rcs-field[data-filled=true] { border-color: rgba(255,255,255,0.30); }
+.rcs-field svg { flex-shrink: 0; }
+.rcs-field input { flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; color: var(--rcs-ink); font-size: 15.5px; font-weight: 600; font-family: inherit; padding: 0; caret-color: var(--rcs-ink); -webkit-appearance: none; appearance: none; }
+.rcs-field input::placeholder { color: var(--rcs-mute); }
+.rcs-field input::-webkit-search-cancel-button { display: none; }
+.rcs-clear { margin-left: auto; background: none; border: 0; padding: 0; display: flex; color: var(--rcs-dim); cursor: pointer; }
+.rcs-content { flex: 1; min-height: 0; overflow-y: auto; padding: 0 20px calc(env(safe-area-inset-bottom, 0px) + 20px); }
+.rcs-section { margin-top: 22px; }
+.rcs-section h2 { margin: 0; font-size: 10.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--rcs-dim); line-height: 1; }
+.rcs-section p { margin: 7px 0 0; font-size: 12px; color: var(--rcs-mute); line-height: 1.4; }
+.rcs-rows { margin-top: 4px; }
+.rcs-count { margin-top: 12px; font-size: 12px; color: var(--rcs-dim); }
+.rcs-results { margin-top: 2px; }
+.rcs-row { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 0; border: 0; border-bottom: 1px solid var(--rcs-rule); background: none; color: var(--rcs-ink); text-align: left; font-family: inherit; cursor: pointer; }
+.rcs-rows > .rcs-row:last-child, .rcs-results > .rcs-row:last-child { border-bottom: 0; }
+.rcs-thumb { width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0; overflow: hidden; background: linear-gradient(145deg, #2F5A3C, #16281D); }
+.rcs-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rcs-text { flex: 1; min-width: 0; display: block; }
+.rcs-name { display: block; font-size: 15px; font-weight: 700; color: var(--rcs-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rcs-hit { color: var(--rcs-ink); }
+.rcs-miss { color: var(--rcs-mute); }
+.rcs-place { display: flex; align-items: center; margin-top: 4px; font-size: 12px; color: var(--rcs-mute); white-space: nowrap; min-width: 0; }
+.rcs-place-text { overflow: hidden; text-overflow: ellipsis; }
+.rcs-rank { display: inline-flex; align-items: center; height: 18px; padding: 0 6px; border-radius: 6px; margin-left: 6px; background: rgba(255,255,255,0.08); font-size: 10.5px; font-weight: 700; color: var(--rcs-ink); flex: none; }
+.rcs-right { text-align: right; flex: none; display: flex; flex-direction: column; align-items: flex-end; }
+.rcs-right b { display: block; font-variant-numeric: tabular-nums; }
+.rcs-right small { display: block; margin-top: 3px; font-size: 10.5px; color: var(--rcs-dim); font-variant-numeric: tabular-nums; }
+.rcs-mine { font-size: 15px; font-weight: 700; color: var(--rcs-ink); }
+.rcs-right small.rcs-yours { font-weight: 700; letter-spacing: 0.08em; }
+.rcs-score { font-size: 17px; font-weight: 700; color: var(--rcs-ink); }
+.rcs-be { font-size: 12.5px; font-weight: 700; color: var(--rcs-mute); }
+.rcs-ask { margin-top: 6px; padding: 12px 0; width: 100%; border: 0; border-top: 1px solid var(--rcs-rule); background: none; display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 650; color: var(--rcs-mute); font-family: inherit; cursor: pointer; text-align: left; }
+.rcs-ask[data-alone=true] { margin-top: 12px; }
+.rcs-row:focus-visible, .rcs-ask:focus-visible, .rcs-clear:focus-visible { outline: 2px solid #F7931E; outline-offset: 2px; }
