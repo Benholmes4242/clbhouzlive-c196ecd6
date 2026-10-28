@@ -34,6 +34,34 @@ const LIVE_DIM = (() => {
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},0.62)`;
 })();
 
+/* Centre tab (post-review-tab brief): POST / two-way arrows / REVIEW. The
+   arrows are exactly as wide as the rendered word POST, measured in a layout
+   effect (27px before measuring). Labels share the other tabs' style; the
+   -0.13em right margin cancels trailing tracking so each word centres. */
+const POST_REVIEW_WORD: React.CSSProperties = {
+  fontSize: 9, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase',
+  lineHeight: 1, whiteSpace: 'nowrap', marginRight: '-0.13em',
+};
+export function PostReviewMark({ color }: { color: string }) {
+  const postRef = useRef<HTMLSpanElement>(null);
+  const [w, setW] = useState(27);
+  useLayoutEffect(() => {
+    const measured = postRef.current?.getBoundingClientRect().width;
+    if (measured && measured > 0) setW(measured);
+  }, []);
+  return (
+    <>
+      <span ref={postRef} aria-hidden="true" data-post-review-row="post" style={{ ...POST_REVIEW_WORD, color }}>Post</span>
+      <svg aria-hidden="true" data-post-review-row="arrows" width={w} height={14} viewBox={`0 0 ${w} 14`} style={{ display: 'block' }}
+        fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <path d={`M1 4H${w - 1}M${w - 5} 0.8 ${w - 1} 4 ${w - 5} 7.2`} />
+        <path d={`M${w - 1} 10H1M5 6.8 1 10 5 13.2`} />
+      </svg>
+      <span aria-hidden="true" data-post-review-row="review" style={{ ...POST_REVIEW_WORD, color }}>Review</span>
+    </>
+  );
+}
+
 
 // ---- Public token: total vertical space to reserve at the bottom of any
 // scrollable page so its last content clears the floating control. Owned by
@@ -564,6 +592,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                           {tab.label}
                         </span>
                       </button>
+                      )}
                     </li>
                   );
                 })}
