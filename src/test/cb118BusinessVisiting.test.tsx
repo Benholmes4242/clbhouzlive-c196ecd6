@@ -260,10 +260,13 @@ describe('CB118.1 club courses loading identity', () => {
   it('resolved club courses render the club layout without an intermediate non-club card', async () => {
     const resolve = delayedCourses(); const { container } = mount();
     const nonClubNodes: Element[] = [];
+    // ClubFromTheClub legitimately renders PostsTabContent; watch only
+    // non-club layout roots, including the shared Visiting card's variant.
+    const nonClubSelector = '[role="tablist"], [data-business-you], [data-business-nearby], [data-business-followers], [data-business-mentions], [data-visiting-variant="business"]';
     const observer = new MutationObserver(records => { for (const record of records) for (const node of record.addedNodes) {
       if (!(node instanceof Element)) continue;
-      if (node.matches('[data-business-tabs], [data-about-content], [data-posts-content]')) nonClubNodes.push(node);
-      nonClubNodes.push(...node.querySelectorAll('[data-business-tabs], [data-about-content], [data-posts-content]'));
+      if (node.matches(nonClubSelector)) nonClubNodes.push(node);
+      nonClubNodes.push(...node.querySelectorAll(nonClubSelector));
     } });
     observer.observe(container, { subtree: true, childList: true });
     try {

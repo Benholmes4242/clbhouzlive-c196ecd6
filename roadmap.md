@@ -1,5 +1,9 @@
 # Roadmap
 
+## CB118.2 — Correct loading watcher and isolate Media timeouts
+- [ ] Watch only non-club tablist, business card roots and non-club Visiting variant; preserve all assertions and accepted loading gate.
+- [ ] Run five Media timeout files separately, report six case times, run full suite; do not change Media code or timeouts. Preserve unchanged Hole7 test and report its current status.
+
 ## Media v3 — Glass modal accessibility finish
 - [x] Hide background with aria-hidden hideOthers while an overlay card is open/mounted; undo on close/unmount; appearance, focus and gestures unchanged.
 - [x] Unchanged admin Hole7 selector and both unchanged CB107 cases pass; four new shared-overlay lifecycle tests pass. Complete bunx vitest run:3,815 passed/1 pre-existing CB118.1 failure/3,816 total/418 files. Delta vs3,808/417 is four intervening CB118.1 tests plus four new accessibility tests/new file. No existing tests edited. MEDIA_V3_ACCESSIBILITY_REPORT.md records diff and results.
