@@ -59,7 +59,7 @@ The new brief explicitly supersedes primary-button wording, large preview, segme
 - **successful next tags exact URL and hole then advances**; **a second and third photograph can be tagged to the same hole**; **batch unique violations identify the duplicate photo and do not advance**: same primary lookup retarget; retained exact URL/hole writes, advance and error assertions.
 - In **a second and third photograph can be tagged to the same hole**, `name: 'All tagged'` → `name: 'Tag'` with disabled assertion retained, because v3's disabled primary reads Tag.
 
-### src/test/holeMediaTidy.test.tsx (11 → 11)
+### src/test/holeMediaTidy.test.tsx (9 → 9)
 
 - **the tag dialog renders the poster, never an img holding a video URL**: `getByAltText('Your video')` → `getByAltText('Current video')`; retained poster URL and no-manifest-image assertion. Reason: shared current-shot thumbnail.
 - **after tagging an item to hole 4, holes 1-3 stay enabled and no closed-holes paragraph renders**: primary lookup retarget only; retained exact write and enabled-hole assertions.
@@ -68,7 +68,7 @@ The new brief explicitly supersedes primary-button wording, large preview, segme
 
 - **counts the member own non-rejected tags on that hole plus one**: primary lookup retarget; `expect(screen.queryByRole('dialog')).toBeNull()` now waits for the glass overlay's existing exit animation. Exact toast assertion retained.
 
-### src/test/holeWalk.test.tsx (14 → 14)
+### src/test/holeWalk.test.tsx (21 → 21)
 
 - **existing picker preselects and submits selected hole**: primary lookup retarget only. Retained `aria-pressed: true`, no write on selection and submitted `[3]` assertions. HoleWalk tests otherwise unchanged.
 
@@ -81,7 +81,7 @@ The new brief explicitly supersedes primary-button wording, large preview, segme
 - **batch hero elects contain video, keeps its still thumbnails and duration, and restarts on shot change** → **batch glass thumbnail stays still and opens the canonical read-only video viewer**.
   Old assertions: registration in `hole-tag-batch`, `object-fit: contain`, `0:42` hero duration, detach and attach on changing shot. New assertions: no video/registration in the compact glass thumbnail, correct current poster, canonical open options `{ readOnly: true, syntheticPosts: true }`, updated poster on thumbnail change. Reason: brief removes the large batch preview and makes the 52px thumbnail open fullscreen. Underlying HoleWalk autoplay and batch-open pause tests unchanged.
 
-### src/test/holeTagBatchV3.test.tsx (29 → 29)
+### src/test/holeTagBatchV3.test.tsx (28 → 28)
 
 Shared helper now targets `[data-tag-primary]`; removal flows target the separate Remove tag text control instead of the old overloaded primary. Every helper-consuming case is named here, including cases whose concrete mutation assertions are unchanged:
 
