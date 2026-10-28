@@ -1533,9 +1533,6 @@
     "v2": {
       "taggedPlace": "Tagged to {{label}}.",
       "kicker": "Through members' eyes",
-      "sorted": "{{total}} shots, sorted by the golfers who took them",
-      "unsorted": "{{total}} shots, none sorted yet",
-      "sub": "By hole and around the club. Tap any of them to walk it.",
       "holeByHole": "Hole by hole",
       "coverage": "{{shot}} of {{holes}} holes",
       "coverageHole": "Coverage hole {{hole}}",
@@ -1594,13 +1591,21 @@
       "remove": "Remove tag",
       "removing": "Removing...",
       "add": "Add a photo or video",
-      "addFirst": "Add the first photo or video",
       "filters": "Media filters",
       "all": "All",
       "photos": "Photos",
       "videos": "Videos",
       "shots_one": "{{count}} shot",
       "shots_other": "{{count}} shots"
+    },
+    "empty": {
+      "headTitle": "How it really looks, from the golfers who've played it",
+      "headSub": "By hole and around the club. Tap any shot to open it.",
+      "title": "Be the first to show it",
+      "bodyHoles": "Nobody has added a photo or video of {{courseName}} yet. Add yours and tag it to a hole, the clubhouse, the food or anything else.",
+      "bodyPlaces": "Nobody has added a photo or video of {{courseName}} yet. Add yours and tag it to the clubhouse, the views or anything else. Holes open up once rounds are logged here.",
+      "add": "Add a photo or video",
+      "footer": "{{withoutPhotos}} of the {{total}} courses on clbhouz have never been photographed. Members are the only way that changes."
     }
   },
   "network": {

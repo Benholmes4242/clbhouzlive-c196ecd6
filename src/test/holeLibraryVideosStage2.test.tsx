@@ -47,12 +47,15 @@ function mount() {
   const view = render(<MemoryRouter><QueryClientProvider client={cache}><CourseMediaTabNew courseId="course" /></QueryClientProvider></MemoryRouter>);
   return { ...view, invalidate };
 }
-function choose(view: ReturnType<typeof mount>, file: File, first = false) {
-  fireEvent.click(screen.getByRole('button', { name: first ? 'Add the first' : 'Hole 7' }));
-  if (first) fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));
-  const input = document.querySelector<HTMLInputElement>('input[type=file]');
+function choose(_view: ReturnType<typeof mount>, file: File) {
+  fireEvent.click(screen.getByRole('button', { name: 'Add a photo or video' }));
+  const input = document.querySelector<HTMLInputElement>('input[data-add-shot-input]');
   if (!input) throw new Error('Library input missing');
   fireEvent.change(input, { target: { files: [file] } });
+  fireEvent.click(screen.getByRole('button', { name: 'Hole 7' }));
+  const primary = document.querySelector<HTMLButtonElement>('[data-tag-primary]');
+  if (!primary) throw new Error('Tag primary missing');
+  fireEvent.click(primary);
 }
 describe('Stage 2 library routing and persistence', () => {
   it('images retain the R2 upload and original File EXIF path', async () => {
@@ -62,7 +65,7 @@ describe('Stage 2 library routing and persistence', () => {
     expect(f.exif).toHaveBeenCalledWith(file); expect(f.resilient).not.toHaveBeenCalled();
   });
   it('video success inserts Stream URLs and null encode metadata, closes and refreshes all three reads', async () => {
-    const view = mount(); const file = new File(['video'], 'v.mov', { type: 'video/quicktime' }); choose(view, file, true);
+    const view = mount(); const file = new File(['video'], 'v.mov', { type: 'video/quicktime' }); choose(view, file);
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(f.resilient).toHaveBeenCalledWith(expect.objectContaining({ file })); expect(f.upload).not.toHaveBeenCalled(); expect(f.exif).not.toHaveBeenCalled();
     expect(f.insert).toHaveBeenCalledWith(expect.objectContaining({ media_type: 'video', stream_id: sid, media_url: generateStreamHlsUrl(sid), poster_url: generateStreamThumbnailUrl(sid), duration_seconds: null, width: null, height: null, file_name: 'v.mov', hole_no: 7, status: 'approved', proof_score_id: null, exif_captured_at: null }));
@@ -81,7 +84,7 @@ describe('Stage 2 library routing and persistence', () => {
     f.resilient.mockImplementation(async (options: TusUploadOptions) => { options.onError(new Error('Upload failed')); });
     const view = mount(); choose(view, new File(['video'], 'v.mp4', { type: 'video/mp4' }));
     await screen.findByRole('alert'); expect(screen.getByRole('dialog')).toBeInTheDocument(); expect(f.insert).not.toHaveBeenCalled();
-    expect(screen.getByRole('button', { name: 'Choose from your library' })).toBeEnabled();
+    expect(document.querySelector('[data-tag-primary]')).toBeEnabled();
   });
   it('poll completion refreshes tags independently after the sheet closed', async () => {
     let finish: (() => void) | undefined; f.poll.mockImplementation(() => new Promise<void>(resolve => { finish = resolve; }));

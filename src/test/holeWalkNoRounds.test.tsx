@@ -84,13 +84,11 @@ describe('BRIEF_HOLE_WALK_NO_ROUNDS', () => {
   it('Media with photos and empty analysis renders four shot cards and eighteen coverage segments — course gallery', () => {
     const view=mountTab(); expect(view.container.querySelectorAll('.media-v2-hole-card')).toHaveLength(4); expect(view.container.querySelectorAll('.media-v2-coverage button')).toHaveLength(18); expect(f.known).toHaveBeenLastCalledWith(numbers); expect(view.container.querySelector('.hole-walk-panel')).toBeNull();
   });
-  it('Media with no photos and no rounds renders the first-photo screen with eighteen open choices', () => {
+  it('Media with no photos and no rounds renders the no-shots card for the eighteen-hole list', () => {
     f.total = 0; f.rows = [];
-    mountTab();
-    expect(screen.getByRole('heading', { name: 'You would be the first' })).toBeInTheDocument();
-    const tiles = screen.getAllByRole('button').filter(b => b.hasAttribute('data-state'));
-    expect(tiles.map(b => b.getAttribute('aria-label'))).toEqual(numbers.map(n => `Hole ${n}`));
-    for (const tile of tiles) { expect(tile).toHaveAttribute('data-state', 'open'); expect(tile).toBeEnabled(); }
+    const view = mountTab();
+    expect(view.container.querySelector('[data-media-no-shots]')).toHaveAttribute('data-has-holes', 'true');
+    expect(view.container.querySelector('.media-v2-hole-card')).toBeNull();
     expect(f.known).toHaveBeenLastCalledWith(numbers);
   });
   it('Media automatically restores real scored holes when analysis receives rounds — course gallery', () => {
