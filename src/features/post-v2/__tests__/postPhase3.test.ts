@@ -56,6 +56,6 @@ describe('the media sheet cannot unmount the rail or the caption', () => {
   });
 
   it('draws the shared header, not a counter of its own', () => {
-    expect(SRC).toContain('<ComposerStepHeader step={2} total={2}');
+    expect(SRC).toContain('<ComposerStepHeader step={1} total={1}');
   });
 });
