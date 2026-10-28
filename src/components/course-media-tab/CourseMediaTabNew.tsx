@@ -193,7 +193,8 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   const hasTags = (tagging.tags.data ?? []).some(row => row.status === 'approved') || (places.tags.data ?? []).some(row => row.status === 'approved');
   const openGallery = useCourseGallery({ courseId, courseName: courseName ?? '', userId: user?.id,
     holes: walkHoles?.holes ?? [], scored: walkHoles?.scored ?? false,
-    holeTags: tagging.tags.data ?? [], placeTags: places.tags.data ?? [] });
+    holeTags: tagging.tags.data ?? [], placeTags: places.tags.data ?? [], pagePosts: posts,
+    tagsReady: tagging.tags.isSuccess && places.tags.isSuccess });
   useEffect(() => {
     if (deepLinkFocused.current || !linkedShot && !linkedHole || !tagging.tags.isSuccess || !places.tags.isSuccess || !analysis.isSuccess) return;
     if (linkedHole && !knownHoles?.includes(Number(linkedHole))) return;

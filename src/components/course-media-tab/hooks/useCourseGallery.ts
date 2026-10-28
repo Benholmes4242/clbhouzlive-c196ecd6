@@ -59,7 +59,7 @@ export async function buildCourseGallery(cache: QueryClient, a: BuildArgs): Prom
     return placeShotsToFeedPosts(publicPlaces.map(row => ({ ...row, member_id: row.user_id, member_name: members.get(row.user_id)?.display_name, member_avatar_url: members.get(row.user_id)?.profile_photo_url })), a.courseName, a.courseId, 'all', '');
   })();
   const [posts, holePosts, placePosts] = await Promise.all([pages, holeReads, placeRead]);
-  const tags = new Map([...approvedTagsByKey(publicPlaces), ...approvedTagsByKey(publicHoles)].reverse());
+  const tags = new Map([...approvedTagsByKey(publicPlaces), ...approvedTagsByKey(publicHoles)]);
   const taggedPosts = [...holePosts.flat(), ...placePosts].flatMap(post => post.mediaItems.map(item => {
     const tag = tags.get(holeMediaKey(item));
     return { ...post, id: item.id, userId: tag?.user_id ?? '', displayName: item.memberShot?.memberName ?? '', avatarUrl: item.memberShot?.avatarUrl ?? '', createdAt: tag?.added_at ?? '', mediaItems: [item] };
