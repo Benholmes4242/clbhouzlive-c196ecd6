@@ -11,6 +11,9 @@ export interface NearbyCourseStat {
   id: string; name: string;
   your_rounds: number | null; your_best: number | null;
   avg_over_par: number | null; rounds_tracked: number | null;
+  /** BC2: the create-flow club card shows a single-course club's hardest hole.
+   *  Optional so existing fixtures and consumers are untouched. */
+  hardest_hole_no?: number | null;
 }
 
 export const nearbyCourseStatsKey = (viewerId: string | null | undefined, ids: string[]) =>
@@ -48,6 +51,7 @@ export function useNearbyCourseStats(
           id: c.id, name: c.name,
           your_rounds: num(r?.your_rounds), your_best: num(r?.your_best),
           avg_over_par: num(r?.avg_over_par), rounds_tracked: num(r?.rounds_tracked),
+          hardest_hole_no: num(r?.hardest_hole_no),
         };
       });
     },

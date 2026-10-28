@@ -12,7 +12,9 @@ import { toast } from '@/lib/toast';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { fetchGolfClub, clubRowToSelected } from '@/features/business/claimClub';
-import { CREATE_CATEGORY_GROUPS, CREATE_STEPS, categoryDisplayLabel, initialDraft, type BusinessCreateDraft } from '@/features/business-create/createRules';
+import { CREATE_CATEGORY_GROUPS, CREATE_STEPS, initialDraft, type BusinessCreateDraft } from '@/features/business-create/createRules';
+import { BusinessCreateStep2 } from '@/features/business-create/BusinessCreateStep2';
+import type { BusinessCategoryValue } from '@/constants/businessCategories';
 import '@/features/business-create/business-create.css';
 
 const SESSION_ENDED_MSG = 'Your session has ended. Please sign in again; nothing has been saved yet.';
@@ -55,6 +57,26 @@ export default function BusinessCreate() {
     else navigate('/profile');
   };
 
+  /* BC2: changing the category clears the step 2 fields that belong to the
+   * branch being left, so a stale club, college, name or address never
+   * follows the member into a different branch. */
+  const setCategory = (value: BusinessCategoryValue) => setDraft(d => {
+    if (d.category === value) return d;
+    const next = { ...d, category: value };
+    if (d.category === 'Golf Club') {
+      next.selectedClub = null;
+      next.claimProofNote = '';
+      next.address = null;
+    } else if (d.category === 'University / College') {
+      next.selectedCollege = null;
+    } else if (d.category) {
+      next.businessName = '';
+      next.address = null;
+      next.countrySelection = null;
+    }
+    return next;
+  });
+
   return (
     <div className="bizc-shell" data-testid="business-create">
       <div className="bizc-top">
@@ -76,7 +98,7 @@ export default function BusinessCreate() {
                   {g.tiles.map(tile => {
                     const Icon = tile.icon;
                     return (
-                      <button key={tile.value} type="button" className="bizc-tile" data-value={tile.value} aria-pressed={draft.category === tile.value} onClick={() => setDraft(d => ({ ...d, category: tile.value }))}>
+                      <button key={tile.value} type="button" className="bizc-tile" data-value={tile.value} aria-pressed={draft.category === tile.value} onClick={() => setCategory(tile.value)}>
                         <Icon strokeWidth={1.8} aria-hidden="true" />{tile.label}
                       </button>
                     );
@@ -89,10 +111,13 @@ export default function BusinessCreate() {
             <button type="button" className="bizc-primary" data-testid="bizc-continue" disabled={!draft.category} onClick={() => goStep(2)}>{t('businessCreate.continue', { defaultValue: 'Continue' })}</button>
           </div>
         </>
+      ) : step === 2 ? (
+        <BusinessCreateStep2 draft={draft} setDraft={setDraft} userId={user.id} onContinue={() => goStep(3)} />
       ) : (
-        <main className="bizc-body" data-testid="bizc-step-2">
+        /* BC2: step 3 is a placeholder until BC3 — segment 3 filled, back works. */
+        <main className="bizc-body" data-testid="bizc-step-3">
           <div className="bizc-kicker">{t('businessCreate.kicker', { defaultValue: 'Put your business on clbhouz' })}</div>
-          <p className="bizc-sub" data-testid="bizc-chosen">{categoryDisplayLabel(draft.category)}</p>
+          <p className="bizc-sub">{t('businessCreate.step3Placeholder', { defaultValue: 'Step 3 arrives with BC3.' })}</p>
         </main>
       )}
     </div>

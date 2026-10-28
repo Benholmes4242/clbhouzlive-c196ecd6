@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { readFileSync } from 'node:fs';
 import { BUSINESS_CATEGORIES } from '@/constants/businessCategories';
 import { CREATE_CATEGORY_TILES } from '@/features/business-create/createRules';
@@ -19,15 +20,18 @@ vi.mock('@/features/business/claimClub', () => ({
 import BusinessCreate from '@/pages/BusinessCreate';
 
 function renderAt(entries: (string | { pathname: string; search?: string })[], index?: number) {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
-    <MemoryRouter initialEntries={entries} initialIndex={index}>
-      <Routes>
-        <Route path="/business/create-v2" element={<BusinessCreate />} />
-        <Route path="/auth" element={<p>auth page</p>} />
-        <Route path="/profile" element={<p>profile page</p>} />
-        <Route path="/before" element={<p>before page</p>} />
-      </Routes>
-    </MemoryRouter>,
+    <QueryClientProvider client={qc}>
+      <MemoryRouter initialEntries={entries} initialIndex={index}>
+        <Routes>
+          <Route path="/business/create-v2" element={<BusinessCreate />} />
+          <Route path="/auth" element={<p>auth page</p>} />
+          <Route path="/profile" element={<p>profile page</p>} />
+          <Route path="/before" element={<p>before page</p>} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 const tile = (value: string) => document.querySelector(`[data-value="${value}"]`) as HTMLButtonElement;
@@ -100,8 +104,9 @@ describe('BC1 history', () => {
     renderAt(['/before', '/business/create-v2'], 1);
     fireEvent.click(tile('Creator'));
     fireEvent.click(cont());
-    expect(screen.getByTestId('bizc-step-2')).toBeTruthy();
-    expect(screen.getByTestId('bizc-chosen').textContent).toBe('Creator');
+    /* BC2: step 2 is now the real branch screen; Creator takes the
+     * everyone-else branch. */
+    expect(screen.getByTestId('bizc-step-2').getAttribute('data-branch')).toBe('other');
     expect(screen.getByTestId('bizc-progress').querySelectorAll('i[data-complete="true"]').length).toBe(2);
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
     await waitFor(() => expect(tile('Creator').getAttribute('aria-pressed')).toBe('true'));
