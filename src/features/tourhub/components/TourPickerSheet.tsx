@@ -103,51 +103,12 @@ export interface TourPickerSheetProps {
 }
 
 export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose }) => {
-  const { data: heroSlides } = useHeroCarouselData();
-  const { data: cache } = useTournamentsCache();
-  const activeMajor = useActiveMensMajor();
-  const { selectedTourSlug, selectTour, viewingTourSlug, viewingTournamentId, appliedTourSlug, isSlugAcceptable } = useTourSelection();
+  // THE ROW MODEL IS SHARED (BRIEF_TOUR_ISLAND §2): useTourPickerRows owns
+  // which rows appear, their order, season-complete/no-event and the
+  // isSlugAcceptable gate; this sheet only owns how a row LOOKS.
+  const { rows } = useTourPickerRows();
+  const { selectTour } = useTourSelection();
   const { t } = useTranslation('tourhub');
-
-  const activeTourSlug = appliedTourSlug ?? selectedTourSlug ?? viewingTourSlug ?? 'all';
-  const isMajorActive = activeTourSlug === 'major';
-
-  const slidesByTour = useMemo(() => {
-    const map: Record<string, HeroSlide[]> = {};
-    (heroSlides ?? []).forEach((s) => {
-      const slug = s.tournament.tourSlug;
-      if (slug === 'major') return;
-      if (!map[slug]) map[slug] = [];
-      map[slug].push(s);
-    });
-    return map;
-  }, [heroSlides]);
-
-  // SEASON COMPLETE (MICRO_BRIEF_TOUR_SEASON_COMPLETE_WINDOW §3). A tour past
-  // the hero's RESULTS_CAP_DAYS with no upcoming event is omitted from the
-  // carousel, so its picker row has no slide to describe. Read the last result
-  // straight from the (wider) completed bucket instead. No date claim about the
-  // next season — the feed may not carry it yet.
-  const seasonCompleteByTour = useMemo(() => {
-    const map: Record<string, { name: string; winner: string | null }> = {};
-    if (!cache) return map;
-    const hasUpcoming = new Set(
-      cache.upcoming.map((t) => mapTourSlugForPicker(t.season?.tour_name || '')),
-    );
-    const hasLive = new Set(
-      cache.live.map((t) => mapTourSlugForPicker(t.season?.tour_name || '')),
-    );
-    [...cache.completed]
-      .sort((a, b) => (b.end_date || '').localeCompare(a.end_date || ''))
-      .forEach((t) => {
-        const slug = mapTourSlugForPicker(t.season?.tour_name || '');
-        if (map[slug] || hasUpcoming.has(slug) || hasLive.has(slug)) return;
-        const age = daysSinceEndDate(t.end_date);
-        if (age == null || age <= RESULTS_CAP_DAYS) return;
-        map[slug] = { name: t.name, winner: t.defending_champion ?? null };
-      });
-    return map;
-  }, [cache]);
 
   return (
     <BottomSheet
