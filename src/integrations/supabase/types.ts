@@ -19779,7 +19779,12 @@ export type Database = {
         Args: { p_course_id: string; p_hole_no: number; p_media_id: string }
         Returns: string
       }
+      admin_tag_place_media: {
+        Args: { p_course_id: string; p_media_id: string; p_place: string }
+        Returns: string
+      }
       admin_untag_hole_media: { Args: { p_tag_id: string }; Returns: string }
+      admin_untag_place_media: { Args: { p_tag_id: string }; Returns: string }
       admin_waitlist_summary: {
         Args: never
         Returns: {
