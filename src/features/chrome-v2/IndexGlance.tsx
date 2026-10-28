@@ -2,8 +2,7 @@
  * IndexGlance — the handicap index glance card (BRIEF_ISLANDS_NAV §3).
  *
  * Tapping the connected index cell in the right island opens this card
- * portalled to body; it no longer navigates. ("Connect HCP" still navigates
- * to /manage/handicap — that path never reaches this component.)
+ * portalled to body; it no longer navigates. (The disconnected variant uses the same GlanceShell without loading WHS data.)
  *
  * DATA LOADS ONLY WHILE OPEN: HcpCell mounts this component only when the
  * glance is open, so useAllScores / useHandicapHistory / useLastRound run
@@ -21,11 +20,9 @@
  * above the backdrop via z-index.
  */
 
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { hideOthers } from 'aria-hidden';
-import { Z } from '@/config/zIndex';
+import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { GlanceShell } from './GlanceShell';
 import { useAllScores, useHandicapHistory, useLastRound } from '@/lib/whs/hooks';
 import type { HcpMoveDetail } from './ChromeIsland';
 
@@ -81,55 +78,10 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
   move,
 }) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [pos, setPos] = useState<{ top: number; right: number } | null>(null);
 
   const { data: scores } = useAllScores(connectionId);
   const { data: history } = useHandicapHistory(connectionId, 'all');
   const { data: lastRound } = useLastRound(connectionId);
-
-  // Position: align the card's right edge to the right island's right edge,
-  // top = island bottom + 10. Fall back to the index cell's own rect when the
-  // cell is mounted outside the island row (AppHeader, NewsChromeBridge).
-  useLayoutEffect(() => {
-    const anchor = anchorRef.current;
-    if (!anchor) return;
-    const host = (anchor.closest('[data-island-right]') as HTMLElement | null) ?? anchor;
-    const rect = host.getBoundingClientRect();
-    setPos({ top: rect.bottom + 10, right: window.innerWidth - rect.right });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Close on Escape.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
-  // Close on route change (skip the mount render).
-  const mountedPathRef = useRef(location.pathname);
-  useEffect(() => {
-    if (location.pathname !== mountedPathRef.current) onClose();
-  }, [location.pathname, onClose]);
-
-  // Focus the card on open; return focus to the index cell on close.
-  useEffect(() => {
-    const card = cardRef.current;
-    card?.focus();
-    return () => anchorRef.current?.focus();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Modal to assistive technology, exactly as ScorecardGlassOverlay.
-  useEffect(() => {
-    const card = cardRef.current;
-    if (!card) return;
-    return hideOthers(card);
-  }, []);
 
   // Sparkline points: last 20 rounds by play_date carrying an index, oldest
   // first, then the current index appended as the final point.
@@ -191,45 +143,8 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
     navigate('/handicap');
   };
 
-  return createPortal(
-    <>
-      <div
-        aria-hidden
-        data-testid="index-glance-backdrop"
-        onClick={onClose}
-        style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(6,8,11,0.45)',
-          backdropFilter: 'blur(3px)',
-          WebkitBackdropFilter: 'blur(3px)',
-          zIndex: Z.header - 1,
-        }}
-      />
-      <div
-        ref={cardRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Your handicap index"
-        tabIndex={-1}
-        style={{
-          position: 'fixed',
-          top: pos?.top ?? 0,
-          right: pos?.right ?? 12,
-          width: 300,
-          visibility: pos ? 'visible' : 'hidden',
-          borderRadius: 22,
-          background: 'rgba(24,27,35,0.9)',
-          backdropFilter: 'blur(30px) saturate(160%)',
-          WebkitBackdropFilter: 'blur(30px) saturate(160%)',
-          border: '1px solid rgba(255,255,255,0.14)',
-          boxShadow: '0 28px 70px rgba(0,0,0,0.55)',
-          padding: 16,
-          zIndex: Z.header + 1,
-          fontFamily: SANS,
-          outline: 'none',
-        }}
-      >
+  return (
+    <GlanceShell onClose={onClose} anchorRef={anchorRef} label="Your handicap index">
         <div
           style={{
             fontSize: 9.5,
@@ -357,9 +272,7 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
             <path d="m9 18 6-6-6-6" />
           </svg>
         </button>
-      </div>
-    </>,
-    document.body,
+    </GlanceShell>
   );
 };
 

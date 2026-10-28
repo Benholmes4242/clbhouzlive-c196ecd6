@@ -18,8 +18,8 @@ export const NAV_PILL_BOTTOM = 20;
 /** Breathing room between the last row and the pill's top edge. */
 export const NAV_BREATHING = 16;
 
-/** Used until the pill has been measured (labelled pill = 66px tall). */
-export const NAV_PILL_H_FALLBACK = 66;
+/** Used until the pill has been measured (labelled pill = 64px tall). */
+export const NAV_PILL_H_FALLBACK = 64;
 
 /** CSS custom property the pill writes its measured height into. */
 export const NAV_PILL_H_VAR = '--nav-pill-h';

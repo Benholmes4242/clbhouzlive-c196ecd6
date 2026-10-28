@@ -206,7 +206,7 @@ const LegacyFallback: React.FC<Props> = ({ onPickCountry, onDecline, layout = 'p
   );
 };
 
-const primaryCtaStyle: React.CSSProperties = {
+export const primaryCtaStyle: React.CSSProperties = {
   width: '100%',
   height: 56,
   borderRadius: 16,
@@ -222,8 +222,8 @@ const primaryCtaStyle: React.CSSProperties = {
   cursor: 'pointer',
 };
 
-const DeclineButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
-  <button type="button" onClick={onClick} style={{ height: 36, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', fontFamily: FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: QUIET, cursor: 'pointer' }}>
+export const DeclineButton: React.FC<{ onClick: () => void; style?: React.CSSProperties; disabled?: boolean }> = ({ onClick, style, disabled }) => (
+  <button type="button" disabled={disabled} onClick={onClick} style={{ height: 36, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', fontFamily: FONT, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: QUIET, cursor: 'pointer', ...style }}>
     <IntroText k="decline" />
   </button>
 );

@@ -209,7 +209,8 @@ describe('Tour Overview correctness gates', () => {
 
   it('shows weekday alone beyond 24 hours and adds time inside 24 hours', () => {
     expect(statusFor(slide('upcoming', '2026-09-19T15:00:00Z'), NOW)).toBe('Starts Saturday');
-    expect(statusFor(slide('upcoming', '2026-09-17T15:42:00Z'), NOW)).toContain('15:42');
+    const localTime = new Intl.DateTimeFormat('en', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date('2026-09-17T15:42:00Z'));
+    expect(statusFor(slide('upcoming', '2026-09-17T15:42:00Z'), NOW)).toContain(localTime);
   });
 
   it('uses the same full tour kicker grammar in both tournament lists', () => {
