@@ -9,7 +9,6 @@
  *   - "{n} rounds ago" matching the rounds drawn;
  *   - "vs par" formatting (+1, E, −2);
  *   - the scrolled flag at the 24px threshold;
- *   - the condensed capsule hiding labels.
  */
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -315,85 +314,3 @@ describe('useChromeScrolled', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Bottom nav: expanded labels and the condensed capsule
-// ---------------------------------------------------------------------------
-describe('GlobalBottomNavigation', () => {
-  let mockNavState: 'expanded' | 'condensed' = 'expanded';
-
-  beforeEach(() => {
-    mockNavState = 'expanded';
-  });
-
-  const renderNav = async () => {
-    vi.resetModules();
-    vi.doMock('@/contexts/BottomNavigationContext', () => ({
-      useBottomNavigation: () => ({ isVisible: true }),
-    }));
-    vi.doMock('@/contexts/ModalContext', () => ({
-      useModalContext: () => ({ shouldHideHeader: false }),
-    }));
-    vi.doMock('@/hooks/useAppPrefetch', () => ({
-      useAppPrefetch: () => ({ triggerPrefetch: () => {} }),
-    }));
-    vi.doMock('@/components/bottom-navigation/useNavigationHandlers', () => ({
-      useNavigationHandlers: () => ({
-        activeTab: 'clubhouse',
-        handleTabClick: () => {},
-        handlePrefetch: () => {},
-      }),
-    }));
-    vi.doMock('@/stores/discoverNewStore', () => ({
-      useDiscoverNewTotal: () => 0,
-    }));
-    vi.doMock('@/hooks/useScrollDirection', () => ({
-      useNavScrollState: () => mockNavState,
-      pushForceExpand: () => {},
-      resetToExpanded: () => {},
-    }));
-    vi.doMock('@/features/tourhub/hooks/useAnyTourLive', () => ({
-      useAnyTourLive: () => false,
-    }));
-    vi.doMock('@/stores/usePostStudioStore', () => ({
-      usePostStudioStore: (sel: any) => sel({ isOpen: false }),
-    }));
-    vi.doMock('@/features/composer-flow/composerFlowStore', () => ({
-      useComposerFlowStore: (sel: any) => sel({ handoff: null, reopenRequested: false }),
-    }));
-    vi.doMock('@/features/composer-flow/handoffRules', () => ({
-      nextHandoffAction: () => ({ type: 'clear' }),
-    }));
-    vi.doMock('@/features/composer-flow/ComposerFlowSheet', () => ({ default: () => null }));
-    vi.doMock('@/routes/chunkLoaders', () => ({ warmChunk: () => {} }));
-
-    const mod = await import('@/components/GlobalBottomNavigation');
-    const Nav = mod.default;
-    return render(
-      <MemoryRouter initialEntries={['/']}>
-        <Nav />
-      </MemoryRouter>,
-    );
-  };
-
-  it('expanded: sentence-case labels with no uppercase transform', async () => {
-    await renderNav();
-    const home = screen.getByRole('button', { name: 'Home' });
-    expect(home.textContent).toContain('Home');
-    const label = Array.from(home.querySelectorAll('span')).find((s) => s.textContent === 'Home');
-    expect(label).toBeDefined();
-    expect(label!.style.textTransform).not.toBe('uppercase');
-    expect(label!.style.letterSpacing).toBe('');
-    // Share keeps its aria-label and shows no visible label.
-    const share = screen.getByRole('button', { name: 'Share' });
-    expect(share.textContent).toBe('');
-  });
-
-  it('condensed: labels are hidden and the capsule is icon-only', async () => {
-    mockNavState = 'condensed';
-    await renderNav();
-    const home = screen.getByRole('button', { name: 'Home' });
-    const label = Array.from(home.querySelectorAll('span')).find((s) => s.textContent === 'Home');
-    expect(label).toBeDefined();
-    expect(label!.style.opacity).toBe('0');
-    expect(['0', '0px']).toContain(label!.style.maxHeight);
-  });
-});

@@ -40,8 +40,8 @@ import { useHandicapHistory } from '@/lib/whs/hooks';
 import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
 import { useChromeScrolled } from '@/hooks/useScrollDirection';
 import { IndexGlance } from './IndexGlance';
-import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
-import { getDirectImageUrl } from '@/utils/r2ImageUtils';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { ConnectGlance } from './ConnectGlance';
 
 import { safeGoBack } from '@/utils/navigation';
 import { subscribeIslandEdge, getIslandEdgeScrolled } from './islandEdge';
@@ -71,7 +71,7 @@ export const DARK_CHROME_GLASS_MATERIAL: React.CSSProperties = {
 
 /**
  * THE ONE ISLAND GLASS (BRIEF_ISLANDS_NAV §SHARED GLASS). Both islands AND the
- * bottom nav pill use exactly this. Distinct from DARK_CHROME_GLASS_MATERIAL,
+ * island controls use exactly this. Distinct from DARK_CHROME_GLASS_MATERIAL,
  * which PhotoBand and the tournament HeroSection still use — out of scope here.
  */
 export const ISLAND_GLASS: React.CSSProperties = {
@@ -356,22 +356,12 @@ const LeftCapsule: React.FC<{
 // the capsule never holds the wide "Connect HCP" label when the index is short.
 // The gain is that it resizes ONCE, when the answer is known.
 // ---------------------------------------------------------------------------
-const HCP_RESERVE_LABEL = 'Connect HCP';
-const HCP_LABEL_TYPE: React.CSSProperties = {
-  fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-  fontSize: 11.5,
-  fontWeight: 700,
-  letterSpacing: '0.01em',
-  whiteSpace: 'nowrap',
-};
-
 /** The 1px rule between the search glyph and the index cell. */
 const HcpDivider: React.FC<{ color: string }> = ({ color }) => (
   <span aria-hidden style={{ width: 1, height: 20, background: color, flexShrink: 0 }} />
 );
 
 export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, dividerColor }) => {
-  const navigate = useNavigate();
   const { user, loading: sessionLoading } = useSupabaseSession();
   const { activeActor } = useActiveActor();
   const isBusinessActor = activeActor?.type === 'business';
@@ -409,26 +399,21 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ 
 
 
     if (disconnected) {
-      return (
-        <button
-          type="button"
-          onClick={() => navigate('/manage/handicap')}
-          aria-label="Connect handicap"
-          style={{
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-            color: '#F7931E',
-            ...HCP_LABEL_TYPE,
-          }}
-        >
-          {HCP_RESERVE_LABEL}
+      return <>
+        <button ref={indexButtonRef} type="button" onClick={() => setGlanceOpen(true)} aria-label="Connect your handicap"
+          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#F7931E', fontSize: 14, fontWeight: 700 }}>
+            <svg aria-hidden width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round"><path d="M12 5v14 M5 12h14" /></svg>
+            Connect
+          </span>
+          <span style={{ marginTop: 4, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(248,250,252,0.42)' }}>HANDICAP</span>
         </button>
-      );
+        {glanceOpen && <ConnectGlance onClose={() => setGlanceOpen(false)} anchorRef={indexButtonRef} userId={user.id} />}
+      </>;
     }
 
-    const indexValue = Number(trendData!.current).toFixed(1);
+    if (!trendData) return null;
+    const indexValue = Number(trendData.current).toFixed(1);
     const showMove = lastMove.direction !== 'none' && lastMove.size != null;
     const moveColor = lastMove.direction === 'improving' ? HCP_IMPROVING : HCP_DRIFTING;
 
@@ -474,7 +459,7 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ 
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
-                {lastMove.direction === 'improving' ? '▾' : '▴'}{lastMove.size!.toFixed(1)}
+                {lastMove.direction === 'improving' ? '▾' : '▴'}{lastMove.size?.toFixed(1)}
               </span>
             )}
           </span>
@@ -495,7 +480,7 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ 
             onClose={() => setGlanceOpen(false)}
             anchorRef={indexButtonRef}
             connectionId={connection.id}
-            currentIndex={Number(trendData!.current)}
+            currentIndex={Number(trendData.current)}
             move={lastMove}
           />
         )}
@@ -523,7 +508,6 @@ export const AvatarCell: React.FC<{
 }> = ({ tone, onOpen, triggerRef }) => {
   const { activeActor, isLoading } = useActiveActor();
   const { countFor } = useActorUnreadCounts();
-  const [imgFailed, setImgFailed] = useState(false);
 
   const activeUnread = activeActor
     ? countFor(activeActor.type as 'personal' | 'business', activeActor.id)
@@ -537,19 +521,16 @@ export const AvatarCell: React.FC<{
         style={{
           width: 36,
           height: 36,
-          borderRadius: 18,
+          borderRadius: '34%',
           background: tone === 'light' ? 'rgba(15,23,42,0.06)' : 'rgba(255,255,255,0.08)',
         }}
       />
     );
   }
 
-  // BRIEF_ISLANDS_NAV §1: the island avatar is a 36px CIRCLE with a 2px amber
-  // frame — a signed-off departure from the canonical squircle, scoped to this
-  // cell. Fallback inside the circle is the shared initials-on-gradient.
-  const avatarSrc = activeActor.avatarUrl ? getDirectImageUrl(activeActor.avatarUrl) : null;
-  const showImg = avatarSrc != null && !imgFailed;
-
+  // Explicit island amber-ring exception; SquircleAvatar owns image/fallback.
+  // Its border is inside the CSS width. Override the slight height overhang
+  // locally so the outer box remains exactly 36 × 36 without clipping.
   return (
     <button
       ref={triggerRef}
@@ -569,35 +550,8 @@ export const AvatarCell: React.FC<{
         justifyContent: 'center',
       }}
     >
-      <span
-        style={{
-          width: 36,
-          height: 36,
-          borderRadius: 18,
-          border: '2px solid #F7931E',
-          boxSizing: 'border-box',
-          overflow: 'hidden',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: getAvatarFallbackGradient(activeActor.id),
-          color: '#FFFFFF',
-          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-          fontWeight: 700,
-          fontSize: 13,
-        }}
-      >
-        {showImg ? (
-          <img
-            src={avatarSrc}
-            alt={activeActor.name}
-            onError={() => setImgFailed(true)}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-          />
-        ) : (
-          getInitialsFromName(activeActor.name)
-        )}
-      </span>
+      <SquircleAvatar src={activeActor.avatarUrl} alt={activeActor.name} userId={activeActor.id}
+        size={36} ringColor="#F7931E" className="[&>div:first-child]:!aspect-square" />
       {activeUnreadCount > 0 ? (
         <span
           aria-label={`${activeUnreadCount} unread`}
