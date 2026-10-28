@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BUSINESS_COVER_ASPECT } from '@/lib/tokens/coverAspect';
 import { businessSecondPill } from '@/lib/business/businessHero';
 import { initialDraft, type BusinessCreateDraft } from '@/features/business-create/createRules';
@@ -12,6 +13,8 @@ vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user
 vi.mock('@/hooks/useBottomNavVisibility', () => ({ useHideBottomNav: vi.fn() }));
 vi.mock('@/features/business/claimClub', () => ({ fetchGolfClub: vi.fn(), clubRowToSelected: vi.fn() }));
 vi.mock('@/features/business-create/BusinessCreateStep2', () => ({ BusinessCreateStep2: () => null }));
+const bc5Create = vi.hoisted(() => vi.fn(async () => ({ id: 'created', slug: 'created', partials: [], claim: 'none' as const })));
+vi.mock('@/features/business-create/createBusiness', () => ({ createBusiness: bc5Create }));
 vi.mock('@/components/profile/edit-v2/ImageCropperModal', () => ({ getCroppedImg: vi.fn(async () => new Blob(['cropped'], { type: 'image/jpeg' })) }));
 vi.mock('react-easy-crop', () => ({ default: (p: { aspect: number; onCropComplete: (a: unknown, b: unknown) => void }) => <div data-testid="bc4-crop-engine" data-aspect={p.aspect}><button onClick={() => p.onCropComplete({}, { x: 0, y: 0, width: 100, height: 100 })}>Position photo</button></div> }));
 
@@ -109,17 +112,14 @@ describe('BC4 text and year', () => {
 });
 
 describe('BC4 history', () => {
-  it.each(['Create my profile', 'Skip'])('%s reaches finish; Back retains photos, About and year', async action => {
-    render(<MemoryRouter initialEntries={[{ pathname: '/business/create-v2', state: { bizStep: 4 } }]}><Routes><Route path="/business/create-v2" element={<BusinessCreate />} /></Routes></MemoryRouter>);
+  it.each(['Create my profile', 'Skip'])('%s saves photos, About and year and reaches a finish without Back', async action => {
+    render(<QueryClientProvider client={new QueryClient()}><MemoryRouter initialEntries={[{ pathname: '/business/create-v2', state: { bizStep: 4 } }]}><Routes><Route path="/business/create-v2" element={<BusinessCreate />} /></Routes></MemoryRouter></QueryClientProvider>);
     fireEvent.change(screen.getByRole('textbox', { name: 'About' }), { target: { value: 'Our story' } });
     fireEvent.change(screen.getByRole('textbox', { name: 'Year founded' }), { target: { value: '2014' } });
     choose('cover'); fireEvent.click(screen.getByRole('button', { name: 'Position photo' })); fireEvent.click(screen.getByRole('button', { name: 'Use photo' }));
     await waitFor(() => expect(screen.queryByTestId('bc4-crop-engine')).toBeNull());
-    const url = document.querySelector('.bizc-mini-cover img')?.getAttribute('src');
-    fireEvent.click(screen.getByRole('button', { name: action })); expect(screen.getByTestId('bizc-finish')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Back' })); expect(screen.getByTestId('bizc-step-4')).toBeTruthy();
-    expect((screen.getByRole('textbox', { name: 'About' }) as HTMLTextAreaElement).value).toBe('Our story');
-    expect((screen.getByRole('textbox', { name: 'Year founded' }) as HTMLInputElement).value).toBe('2014');
-    expect(document.querySelector('.bizc-mini-cover img')?.getAttribute('src')).toBe(url);
+    fireEvent.click(screen.getByRole('button', { name: action })); await screen.findByTestId('bizc-finish');
+    expect(screen.queryByRole('button', { name: 'Back' })).toBeNull();
+    expect(bc5Create.mock.calls[0]?.[0]).toMatchObject({ description: 'Our story', foundedYear: '2014', cover: { pendingFile: expect.any(File), localPreview: expect.stringMatching(/^blob:bc4-/) } });
   });
 });

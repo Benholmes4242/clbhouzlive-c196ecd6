@@ -1,6 +1,6 @@
 /** BC5: single creation transaction path; editor and guided flow retain the same
  * insert, post-insert uploads, owner safeguard, claim and refresh boundaries.
- * An uploader's null result is retained (not reinterpreted) for editor compatibility. */
+ * Ben's BC5 ruling records returned-empty upload failures as partials in both callers. */
 import { supabase } from '@/integrations/supabase/client';
 import { FunctionsHttpError } from '@supabase/supabase-js';
 import type { QueryClient } from '@tanstack/react-query';
@@ -198,7 +198,8 @@ async function uploadImageDirect(
   const result = await uploadToR2Only(file, bucket, path);
   if (!result.success) {
     AppLog.error('[BusinessProfileEditor]', `${kind} upload failed`, result.error);
-    return null;
+    throw new Error(result.error || 'Upload failed');
   }
-  return result.publicUrl || null;
+  if (!result.publicUrl) throw new Error('Upload failed');
+  return result.publicUrl;
 }

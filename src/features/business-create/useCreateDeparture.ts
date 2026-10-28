@@ -15,12 +15,13 @@ export function useCreateDeparture(dirty: boolean, busy: boolean, complete: bool
   const requestExit = (action: () => void) => {
     if (state.current.busy) return;
     if (state.current.dirty && !state.current.complete) { pending.current = action; setConfirmOpen(true); }
-    else action();
+    else { allowed.current = true; action(); }
   };
   useEffect(() => {
     const originalGo = navigator.go.bind(navigator);
     navigator.go = delta => {
       const s = state.current;
+      if (s.busy) return;
       if (!allowed.current && delta < 0 && s.step === 1 && !s.complete) requestExit(() => { allowed.current = true; originalGo(delta); });
       else originalGo(delta);
     };
@@ -46,7 +47,7 @@ export function useCreateDeparture(dirty: boolean, busy: boolean, complete: bool
       const idx = event.state?.idx;
       const from = currentIndex.current;
       const s = state.current;
-      if (allowed.current || s.complete || (!s.dirty && !s.busy) || typeof idx !== 'number' || from == null || entries.current.has(idx)) return;
+      if (allowed.current || s.complete || (!s.dirty && !s.busy) || typeof idx !== 'number' || from == null || (!s.busy && entries.current.has(idx))) return;
       event.stopImmediatePropagation();
       restoring = true;
       window.history.go(from - idx);
@@ -57,5 +58,5 @@ export function useCreateDeparture(dirty: boolean, busy: boolean, complete: bool
     window.addEventListener('beforeunload', unload);
     return () => { window.removeEventListener('popstate', pop, true); window.removeEventListener('beforeunload', unload); };
   }, []);
-  return { confirmOpen, setConfirmOpen, requestExit, discard: () => { setConfirmOpen(false); const action = pending.current; pending.current = null; action?.(); } };
+  return { confirmOpen, setConfirmOpen, requestExit, allowExit: () => { allowed.current = true; }, discard: () => { setConfirmOpen(false); allowed.current = true; const action = pending.current; pending.current = null; action?.(); } };
 }
