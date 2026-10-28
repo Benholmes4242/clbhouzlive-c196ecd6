@@ -351,12 +351,10 @@ function CourseRow({
   row,
   onToggle,
   selected = false,
-  reviewed = false,
 }: {
   row: Row;
   onToggle: (c: StageCourse) => void;
   selected?: boolean;
-  reviewed?: boolean;
 }) {
   const locality = row.isHomeClub ? 'Your home club' : (row.sub_country || row.country || null);
   return (
