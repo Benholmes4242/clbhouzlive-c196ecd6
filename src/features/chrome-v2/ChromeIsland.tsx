@@ -250,31 +250,74 @@ const LeftCapsule: React.FC<{
   }
 
 
-  // Default: logo. Match CompactHeader.handleLogoClick non-back branch:
+  // Default: logo. On '/' and '/clubhouse' the tap scrolls the feed to the
+  // top via the SAME clbhouz-active-tab-retap event the Home tab sends;
+  // everywhere else it keeps the CompactHeader non-back branch:
   // navigate('/clubhouse'). (Brief said '/watch'; the source of truth is
   // CompactHeader — see report.)
+  const scrolledTitle = spec.left?.kind === 'logo' ? spec.left.scrolledTitle : undefined;
+  const showTitle = scrolled && scrolledTitle != null;
+  const onLogoTap = () => {
+    if (location.pathname === '/' || location.pathname === '/clubhouse') {
+      window.dispatchEvent(new CustomEvent('clbhouz-active-tab-retap', { detail: { tabId: 'clubhouse' } }));
+      return;
+    }
+    navigate('/clubhouse');
+  };
   return (
     <button
       type="button"
-      onClick={() => navigate('/clubhouse')}
+      onClick={onLogoTap}
       aria-label="Go to home"
       style={{
         ...glassStyle(tone),
-        padding: '0 12px',
+        padding: showTitle ? '0 16px 0 6px' : '0 6px',
+        gap: 9,
         cursor: 'pointer',
       }}
     >
-      <img
-        src={CHROME_LOGO_SRC}
-        alt="clbhouz"
+      <span
         style={{
-          height: 26,
-          width: 26,
-          objectFit: 'contain',
-          // The amber mark is the brand on EVERY tone — never inverted to white.
+          width: 34,
+          height: 34,
+          borderRadius: 17,
+          background: '#16161A',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
         }}
-
-      />
+      >
+        <img
+          src={CHROME_LOGO_SRC}
+          alt="clbhouz"
+          style={{
+            height: 24,
+            width: 24,
+            objectFit: 'contain',
+            // The amber mark is the brand on EVERY tone — never inverted to white.
+          }}
+        />
+      </span>
+      {scrolledTitle != null && (
+        <span
+          style={{
+            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+            fontWeight: 700,
+            fontSize: 16,
+            color: inkFor(tone),
+            whiteSpace: 'nowrap',
+            opacity: showTitle ? 1 : 0,
+            // Snap under reduced motion; otherwise the title fades in over 180ms.
+            transition: REDUCED_MOTION ? 'none' : 'opacity 180ms linear',
+            // Keep the island logo-sized until the title appears.
+            maxWidth: showTitle ? 160 : 0,
+            overflow: 'hidden',
+          }}
+        >
+          {scrolledTitle}
+        </span>
+      )}
     </button>
   );
 };
