@@ -413,6 +413,15 @@
     "deltaNinety": "{{delta}} 90d"
   },
   "business": {
+    "visiting": {
+      "visiting": "Visiting", "contact": "Contact", "directions": "Directions",
+      "website": "Website", "call": "Call", "email": "Email",
+      "comingSoon": "Coming soon to clbhouz", "soon": "Soon",
+      "hours": "Opening hours", "closedToday": "Closed today", "openToday": "Open today · {{time}}", "closed": "Closed",
+      "meetCoaches": "Meet the coaches", "meetTeam": "Meet the team", "coaches": "The coaches", "team": "The team",
+      "people_one": "{{count}} person", "people_other": "{{count}} people",
+      "days": { "Mon": "Monday", "Tue": "Tuesday", "Wed": "Wednesday", "Thu": "Thursday", "Fri": "Friday", "Sat": "Saturday", "Sun": "Sunday" }
+    },
     "reach": {
       "rated": "RATINGS",
       "ratedFrom": "from {{count}}",
