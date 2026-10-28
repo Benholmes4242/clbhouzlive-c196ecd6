@@ -37,7 +37,7 @@ function WelcomeFlow({ user, profile }: { user: NonNullable<ReturnType<typeof us
   const { t } = useTranslation('auth'); const navigate = useNavigate(); const qc = useQueryClient();
   const [progress, setProgress] = useState<WelcomeProgress>(() => readWelcomeProgress(user.id));
   const [step, setStep] = useState<WelcomeStep>(() => Math.min(5, readWelcomeProgress(user.id).completed + 1) as WelcomeStep);
-  const { form, setField } = useProfileForm(profile, false); const { save, isSaving } = useProfileSave(user.id);
+  const { form, setField } = useProfileForm({ ...profile, social_links: undefined }, false); const { save, isSaving } = useProfileSave(user.id);
   const initialName = welcomeName(profile, user.user_metadata); const [first, setFirst] = useState(initialName.first); const [last, setLast] = useState(initialName.last);
   const [editing, setEditing] = useState(false); const [username, setUsername] = useState(''); const [usernameEdited, setUsernameEdited] = useState(false);
   const [busy, setBusy] = useState(false); const [message, setMessage] = useState(''); const [connectOpen, setConnectOpen] = useState(false); const [connectedNow, setConnectedNow] = useState(false);

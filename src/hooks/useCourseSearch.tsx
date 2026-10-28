@@ -70,10 +70,11 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
         }
 
         // If userId provided, fetch user's ratings and played status
-        let enrichedResults: SearchResult[] = courses;
+        const catalogueRows = courses as unknown as SearchResult[];
+        let enrichedResults: SearchResult[] = catalogueRows;
 
         if (userId) {
-          const courseIds = courses.map(c => c.id);
+          const courseIds = catalogueRows.map(c => c.id);
           
           // Get user ratings (ratings-only: rated = played)
           const { data: ratings } = await supabase
@@ -87,7 +88,7 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
           const ratingsMap = new Map(ratings?.map(r => [r.course_id, r.rating]) || []);
 
           // In ratings-only system, played = has rating
-          enrichedResults = courses.map(course => ({
+          enrichedResults = catalogueRows.map(course => ({
             ...course,
             rating: ratingsMap.get(course.id),
             played: ratingsMap.has(course.id)
