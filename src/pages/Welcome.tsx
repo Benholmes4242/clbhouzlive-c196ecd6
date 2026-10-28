@@ -43,18 +43,29 @@ function WelcomeFlow({ user, profile }: { user: NonNullable<ReturnType<typeof us
   const [busy, setBusy] = useState(false); const [message, setMessage] = useState(''); const [connectOpen, setConnectOpen] = useState(false); const [connectedNow, setConnectedNow] = useState(false);
   const photoPicker = useRef<ProfilePhotoCardHandle>(null); const base = usernameSeed(first, last); const connection = useWhsConnection(user.id);
   const [query, setQuery] = useState(''); const search = useCourseSearch(query, { includeClub: true });
-  const availability = useQuery({ queryKey: ['welcome-username', user.id, usernameEdited ? username : base, usernameEdited], enabled: step === 1 && !!base, retry: false, queryFn: async () => {
-    const candidateBase = usernameEdited ? username : base;
+  const checkAvailability = useCallback(async (candidateBase: string, edited: boolean) => {
     if (!WELCOME_USERNAME_RE.test(candidateBase)) return { candidate: candidateBase, available: false };
     for (let suffix = 0; suffix < 100; suffix++) {
       const candidate = usernameWithSuffix(candidateBase, suffix);
       const { count, error } = await supabase.from('user_profiles').select('id', { count: 'exact', head: true }).ilike('username', candidate.replace(/[\\%_]/g, '\\$&')).neq('id', user.id);
       if (error) throw error;
       if ((count ?? 0) === 0) return { candidate, available: true };
-      if (usernameEdited) return { candidate, available: false };
+      if (edited) return { candidate, available: false };
     }
     return { candidate: candidateBase, available: false };
-  } });
+  }, [user.id]);
+  const [seedReady, setSeedReady] = useState(false);
+  // The seed is chosen by checking availability, so that known-good result is
+  // recorded under the screen's query key: "Available" and Continue are ready
+  // the moment the seed appears, with no second round trip. Edited usernames
+  // still check through the query as before.
+  useEffect(() => {
+    if (step !== 1 || usernameEdited || !base || seedReady) return;
+    let alive = true;
+    void checkAvailability(base, false).then(result => { if (!alive) return; qc.setQueryData(['welcome-username', user.id, base, false], result); setSeedReady(true); }).catch(() => { if (alive) setSeedReady(true); });
+    return () => { alive = false; };
+  }, [step, usernameEdited, base, seedReady, checkAvailability, qc, user.id]);
+  const availability = useQuery({ queryKey: ['welcome-username', user.id, usernameEdited ? username : base, usernameEdited], enabled: step === 1 && !!base && (usernameEdited || seedReady), retry: false, staleTime: Infinity, queryFn: () => checkAvailability(usernameEdited ? username : base, usernameEdited) });
   const candidate = usernameEdited ? username : availability.data?.candidate ?? base;
   const persist = useCallback((next: WelcomeProgress) => { writeWelcomeProgress(user.id, next); setProgress(next); }, [user.id]);
   const complete = useCallback((current: WelcomeStep, choice: string) => { analyticsEvents.track('onboarding_step_completed', { step: current, choice }); const next = { ...progress, completed: Math.max(progress.completed, current) }; persist(next); setStep(Math.min(5, current + 1) as WelcomeStep); }, [progress, persist]);
