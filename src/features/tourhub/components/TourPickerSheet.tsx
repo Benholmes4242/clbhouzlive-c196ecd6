@@ -52,14 +52,10 @@ const TOUR_LABEL_SHORT: Record<string, string> = {
 };
 
 /**
- * THE ROW LIST IS NOT THE LABEL MAP. It used to be: the sheet looped
- * Object.entries(TOUR_LABEL), which carries `all` (and now `major`) for the
- * readout hooks — so a second, permanently-disabled "ALL TOURS" row rendered
- * below the real one and read as a duplicate. `all` and `major` have their own
- * hand-built rows at the top of the sheet; only real tours belong in the loop.
+ * THE ROW LIST IS NOT THE LABEL MAP. `all` and `major` have their own
+ * hand-built rows at the top; only real tours belong in the loop. The loop
+ * itself (TOUR_ROW_SLUGS) lives in useTourPickerRows, the shared row model.
  */
-const TOUR_ROW_SLUGS = ['pga', 'lpga', 'euro', 'pgad', 'champ', 'liv'] as const;
-
 
 const GOLD_TINT_10 = 'rgba(255,184,0,0.10)';
 const GOLD_TINT_18 = 'rgba(255,184,0,0.18)';
