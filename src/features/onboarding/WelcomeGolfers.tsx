@@ -16,9 +16,14 @@ function Golfer({ row, viewerId, onFollow }: { row: WelcomeFriend & { meta?: str
   const following = state.isFollowing ?? row.is_following;
   return <div className="welcome-person"><span className="welcome-person-avatar">{row.profile_photo_url ? <img src={row.profile_photo_url} alt="" /> : <PlayerSilhouette />}</span><div className="welcome-person-copy"><b>{row.display_name || row.username}</b><span>{row.meta}</span></div><Button className={`welcome-follow${following ? ' is-following' : ''}`} disabled={following === undefined || toggle.isPending} onClick={async () => { const result = await toggle.mutateAsync({ viewerActorType: 'personal', viewerActorId: viewerId, viewerUserId: viewerId, targetActorType: 'personal', targetActorId: row.user_id, targetUserId: row.user_id, isFollowing: !!following }); onFollow(result.next ? 1 : -1); }}>{t(following ? 'welcome.following' : 'welcome.follow', { defaultValue: following ? 'Following' : 'Follow' })}</Button></div>;
 }
-export function WelcomeFriendsList({ rows, viewerId, onFollow, title, followAll = false }: { rows: (WelcomeFriend & { meta?: string })[]; viewerId: string; onFollow: (n: number) => void; title?: string; followAll?: boolean }) {
-  const { t } = useTranslation('auth'); const qc = useQueryClient(); const toggle = useToggleFollow(); const [busy, setBusy] = useState(false); const [done, setDone] = useState(false);
+/** Follow-all over the existing toggle path; shared by screen 3 and the final page. */
+export function useFollowAll(rows: WelcomeFriend[], viewerId: string, onFollow: (n: number) => void) {
+  const qc = useQueryClient(); const toggle = useToggleFollow(); const [busy, setBusy] = useState(false); const [done, setDone] = useState(false);
   const all = async () => { setBusy(true); try { for (const row of rows) { const cached = qc.getQueryData<boolean | { isFollowing: boolean }>(['follow-status', 'personal', viewerId, 'personal', row.user_id]); const follows = typeof cached === 'boolean' ? cached : cached?.isFollowing ?? row.is_following; if (follows === undefined) return; if (!follows) { await toggle.mutateAsync({ viewerActorType: 'personal', viewerActorId: viewerId, viewerUserId: viewerId, targetActorType: 'personal', targetActorId: row.user_id, targetUserId: row.user_id, isFollowing: false }); onFollow(1); } } setDone(true); } finally { setBusy(false); } };
+  return { all, busy, done };
+}
+export function WelcomeFriendsList({ rows, viewerId, onFollow, title, followAll = false }: { rows: (WelcomeFriend & { meta?: string })[]; viewerId: string; onFollow: (n: number) => void; title?: string; followAll?: boolean }) {
+  const { t } = useTranslation('auth'); const { all, busy, done } = useFollowAll(rows, viewerId, onFollow);
   return <><div className="welcome-section-heading"><span>{title}</span>{followAll && <Button variant="ghost" disabled={busy} onClick={() => void all()}>{t(done ? 'welcome.following' : 'welcome.followAll', { defaultValue: done ? 'Following' : 'Follow all' })}</Button>}</div><div className="welcome-list">{rows.map(row => <Golfer key={row.user_id} row={row} viewerId={viewerId} onFollow={onFollow} />)}</div></>;
 }
 export function WelcomeGolfers({ viewerId, club, onEmpty, onFollow }: { viewerId: string; club: string; onEmpty: () => void; onFollow: (n: number) => void }) {
