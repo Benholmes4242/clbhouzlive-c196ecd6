@@ -7,19 +7,13 @@
  * Also exports useTourPillLabel(): the pill label logic that reflects
  * whichever tour is currently in view on the hero.
  */
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Check, Globe2, Trophy } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SheetHeader } from '@/components/ui/SheetHeader';
 import { getTourLogo } from '../utils/tourLogos';
-import { useHeroCarouselData, mapTourSlug as mapTourSlugForPicker, type HeroSlide } from '../hooks/useHeroCarouselData';
-import { useActiveMensMajor } from '../hooks/useActiveMensMajor';
-import { useTournamentsCache } from '@/hooks/useTournamentsCache';
-import {
-  RESULTS_CAP_DAYS,
-  daysSinceEndDate,
-} from './overview-v3/HybridHero.utils';
+import { useTourPickerRows } from '../hooks/useTourPickerRows';
 import { useTourSelection } from '../context/TourSelectionContext';
 import {
   AMBER_TINT_04,
