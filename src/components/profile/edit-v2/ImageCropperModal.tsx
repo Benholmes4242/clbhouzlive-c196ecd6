@@ -24,7 +24,7 @@ interface ImageCropperModalProps {
 /**
  * Creates a cropped image blob from the source image and crop area
  */
-const getCroppedImg = async (
+export const getCroppedImg = async (
   imageSrc: string,
   pixelCrop: Area,
   rotation = 0
