@@ -34,19 +34,20 @@ const LIVE_DIM = (() => {
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},0.62)`;
 })();
 
-/* Centre tab (post-review-tab brief): POST / two-way arrows / REVIEW. The
-   arrows are the fixed 16×16 two-way mark from the signed-off option 1.
+/* Centre tab (centred option B): cap-trimmed words and ink-cropped arrows
+   share even gaps; unsupported text-box keeps centred line-height boxes.
    Labels share the other tabs' style; the -0.13em right margin cancels
    trailing tracking so each word centres. */
 const POST_REVIEW_WORD: React.CSSProperties = {
   fontSize: 9, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase',
   lineHeight: 1, whiteSpace: 'nowrap', marginRight: '-0.13em',
+  display: 'block', textBox: 'trim-both cap alphabetic',
 };
 export function PostReviewMark({ color }: { color: string }) {
   return (
     <>
       <span aria-hidden="true" data-post-review-row="post" style={{ ...POST_REVIEW_WORD, color }}>Post</span>
-      <svg aria-hidden="true" data-post-review-row="arrows" width={16} height={16} viewBox="0 0 24 24" style={{ display: 'block' }}
+      <svg aria-hidden="true" data-post-review-row="arrows" width={14} height={11.9} viewBox="0 1.8 24 20.4" style={{ display: 'block' }}
         fill="none" stroke={color} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
         <path d="M8 7H20M16 3l4 4-4 4" />
         <path d="M16 17H4M8 13l-4 4 4 4" />
@@ -478,15 +479,15 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                             border: 0,
                             background: isActive ? tokens.lozenge : 'transparent',
                             color: iconColor,
-                            padding: '0 3px 5.5px',
+                            padding: '0 3px',
                             boxSizing: 'border-box',
                             height: 46,
                             borderRadius: r.md,
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
-                            justifyContent: 'flex-end',
-                            gap: 3,
+                            justifyContent: 'center',
+                            gap: 3.5,
                             width: '100%',
                             minWidth: 0,
                             fontFamily: 'inherit',

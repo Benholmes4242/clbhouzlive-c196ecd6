@@ -1,5 +1,9 @@
 # Roadmap
 
+## POST / REVIEW — Centred option B
+- [x] Apply cap-trimmed words, cropped 14×11.9 arrows and centred 3.5px gaps; preserve other tabs and behaviour.
+- [ ] Run full suite against 4,112 tests / 436 files; report authorized test updates and rendered gaps if available.
+
 ## Rounds gate — Look, then lock (DONE)
 - [x] Approved follow-up: scroll distance now starts at mount; isolated scrollers and repaired React remount fixture. Targeted four gate files 43/43; full suite 4,111 passed / 1 failed / 4,112 total across 436 files (+2 restored-position cases). No other test edited.
 - [x] Replace cropped gate with visit-local scroll/timer lock and signed-off glass card/tile; preserve state, reads and page sections. Ben confirmed CB39 scope switch/test remain unchanged.
