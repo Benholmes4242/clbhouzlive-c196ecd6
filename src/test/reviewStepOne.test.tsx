@@ -145,10 +145,10 @@ const tags = (assignments: Record<string, number> = {}) => ({
 
 describe('hole tagger from the chip', () => {
   it('hides the shot list and opens the sheet on the requested shot', () => {
-    const { queryByLabelText, rerender, getByRole } = render(<ReviewHoleTags {...tags()} hideShotList focusShotId={null} />);
+    const { queryByLabelText, rerender } = render(<ReviewHoleTags {...tags()} hideShotList focusShotId={null} />);
     expect(queryByLabelText('Tag photo 1')).toBeNull();
     rerender(<ReviewHoleTags {...tags()} hideShotList focusShotId="b" />);
-    const current = getByRole('button', { current: 'true' } as never);
+    const current = document.querySelector('[aria-current="true"]') as HTMLElement;
     expect(current.getAttribute('aria-label')).toContain('Shot 2 of 2');
   });
   it('a tagged shot opens in the tagged state', () => {
