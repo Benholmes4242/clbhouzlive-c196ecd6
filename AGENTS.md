@@ -88,3 +88,4 @@ Report the suite total before and after, and name the source of any delta. A cou
 - Coach surfaces share session-scoped seven-function caches and mutation invalidation through features/coach; every failed read suppresses its dependent surface even with stale data, so server privacy and measurement remain authoritative.
 - ProfilePageV2 owns the coach-line read and passes an optional node to ProfileHero; the hero never imports coach modules, preserving standalone rendering without a query provider.
 - Business mention qualification and visibility belong to the mentions RPCs; BusinessMentionsRail owns viewer-scoped reads and non-optimistic hide/show so cached team rows cannot cross identities.
+- Connected and disconnected island glances share GlanceShell lifecycle and positioning; the disconnected variant never imports read hooks, keeping invitation figures absent rather than invented.
