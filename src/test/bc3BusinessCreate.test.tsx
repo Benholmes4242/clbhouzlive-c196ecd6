@@ -175,14 +175,21 @@ describe('BC3 main button', () => {
   });
 
   it('with only Book and Website missing the hint names them', async () => {
-    await otherToStep3();
-    fireEvent.click(screen.getByLabelText('Back'));
-    await screen.findByTestId('bizc-step-2');
-    fireEvent.click(screen.getByTestId('address-pick'));
-    fireEvent.click(screen.getByTestId('bizc-continue-2'));
+    // Club branch: the picked club prefills the address (Directions) and its
+    // country defaults the dial code, so a typed number counts as Call.
+    s.tables['golf_clubs'] = [CLUB];
+    s.tables['golf_courses'] = [];
+    renderAt(['/business/create-v2']);
+    toStep2('Golf Club');
+    fireEvent.change(screen.getByTestId('bizc-club-search').querySelector('input') as HTMLInputElement, { target: { value: 'Sundridge' } });
+    await waitFor(() => expect(screen.getByTestId('bizc-club-results')).toBeTruthy());
+    fireEvent.click(screen.getByText('Sundridge Park Golf Club'));
+    await screen.findByTestId('bizc-club-card');
+    fireEvent.click(screen.getByTestId('bizc-claim'));
     await screen.findByTestId('bizc-step-3');
-    fireEvent.change(screen.getByTestId('bizc-input-email'), { target: { value: 'hi@cafe.example' } });
+    fireEvent.change(screen.getByTestId('bizc-input-email'), { target: { value: 'hi@club.example' } });
     const phoneInput = document.querySelector('.bizc-phone input') as HTMLInputElement;
+    await waitFor(() => expect((document.querySelector('.bizc-phone button') as HTMLButtonElement).textContent).toContain('+44'));
     fireEvent.change(phoneInput, { target: { value: '7700900123' } });
     await waitFor(() => expect(screen.getByTestId('bizc-main-hint').textContent).toBe('Book and Website appear once you add their links.'));
   });
