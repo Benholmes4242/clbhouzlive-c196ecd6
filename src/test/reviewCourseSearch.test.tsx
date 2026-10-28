@@ -175,7 +175,7 @@ describe('ReviewCourseSearchSheet', () => {
 
   it('empty lists do not render, heading included', async () => {
     mount();
-    await waitFor(() => expect(h.calls.some(c => c.table === 'course_rating_aggregates' || c.table === 'golf_courses')).toBe(true));
+    await waitFor(() => expect(h.calls.some(c => c.table === 'course_ratings')).toBe(true));
     await act(async () => { await new Promise(r => setTimeout(r, 20)); });
     expect(list('recent')).toBeNull(); expect(list('threshold')).toBeNull(); expect(list('popular')).toBeNull();
     expect(screen.queryByText('Looked at recently')).toBeNull();
