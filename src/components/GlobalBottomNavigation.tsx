@@ -290,25 +290,30 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     handleTabClick(tab);
   };
 
-  // Labelled navigation: glyph, 3px gap, then the column-header label.
-  const PILL_MAX_EXPANDED = 'min(396px, 100vw - 22px)';
-  const PILL_MAX_CONDENSED = 'min(324px, 100vw - 36px)';
-  const iconSize = 23;
-
-  const pillPadding = '6px 7px';
+  // Geometry (BRIEF_ISLANDS_NAV §1/§2). Expanded: one 66px glass pill,
+  // min(358px, 100vw − 32px). Condensed: a centred icon-only capsule, 52px.
+  // The condensed max-width is the capsule's exact content width
+  // (4 × 44 slots + 40 share + 4 × 6 gaps + 2 × 8 padding).
+  const PILL_MAX_EXPANDED = 358;
+  const PILL_MAX_CONDENSED = 256;
+  const iconSize = condensed ? 20 : 22;
 
   const badges = useMemo<Record<string, number>>(() => ({ courses: discoverNewCount }), [discoverNewCount]);
 
-  // Motion tokens — only max-width + padding + icon size may animate on the
-  // blurred pill. Never animate an explicit height/width on the pill itself.
+  // Motion tokens — only max-width + padding may animate on the blurred pill.
+  // Never animate an explicit height/width on the pill itself.
   const PILL_TRANSITION = REDUCED_MOTION
     ? 'none'
     : 'max-width 220ms cubic-bezier(0.2,0.8,0.2,1), padding 220ms cubic-bezier(0.2,0.8,0.2,1)';
-  // (Icon size snaps between states — see note in the SVG style block below.)
+  // (Icon size snaps between states — no SVG resize transition.)
 
   const BUTTON_TRANSITION = REDUCED_MOTION
     ? 'none'
-    : 'background 180ms linear, color 180ms linear, padding 220ms cubic-bezier(0.2,0.8,0.2,1)';
+    : 'background 180ms linear, color 180ms linear';
+  // Labels fade out over 120ms as the capsule condenses.
+  const LABEL_TRANSITION = REDUCED_MOTION
+    ? 'none'
+    : 'opacity 120ms linear, max-height 120ms linear';
 
   return (
     <>
