@@ -1,6 +1,7 @@
 /** EP1 — new Edit profile (hidden /edit-profile-v2 until EP5). Auth, back and
  * the ?tab= param behave as ManageProfile's do; photos save one field at once
- * through useProfileSave's opt-in photoField partial. Sections arrive in EP2+. */
+ * through useProfileSave's opt-in photoField partial. EP2 adds the You group,
+ * whose sheets save their own columns through the profileFields partial. */
 import { useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
@@ -15,6 +16,7 @@ import { DANGER } from '@/components/manage/ui';
 import { ManagePageSkeleton } from '@/components/skeletons/ManagePageSkeleton';
 import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 import { EditProfileCard, type PhotoKind } from '@/features/edit-profile/EditProfileCard';
+import { EditProfileYou, type YouFields, type YouPatch } from '@/features/edit-profile/EditProfileYou';
 import '@/features/business-create/business-create.css';
 import '@/features/edit-profile/edit-profile.css';
 
@@ -42,21 +44,33 @@ export default function EditProfile() {
     setSearchParams(next, { replace: true });
   };
 
-  const savePhoto = (kind: PhotoKind, file: File | null) => {
-    const run = async () => {
+  const [usernameNow, setUsernameNow] = useState<{ username: string; at: string } | null>(null);
+  const [youNow, setYouNow] = useState<YouPatch>({});
+
+  const runSave = (next: typeof form, opts: Parameters<typeof save>[1], onOk?: () => void) => {
+    const run = async (): Promise<boolean> => {
       running.current += 1; setState('saving');
-      const next = kind === 'avatar'
-        ? { ...form, profilePhotoBlob: file, profilePhotoUrl: file ? form.profilePhotoUrl : null }
-        : { ...form, headerPhotoBlob: file, headerPhotoUrl: file ? form.headerPhotoUrl : null };
       let ok = false;
-      try { ok = (await save(next, { photoField: kind === 'avatar' ? 'profile' : 'header' })) === true; } catch { ok = false; }
+      try { ok = (await save(next, opts)) === true; } catch { ok = false; }
       running.current -= 1;
-      if (!ok) { lastFailed.current = run; setState('error'); return; }
+      if (!ok) { lastFailed.current = () => { void run(); }; setState('error'); return false; }
       lastFailed.current = null;
+      onOk?.();
       if (running.current === 0) setState('idle');
+      return true;
     };
-    void run();
+    return run();
   };
+
+  const savePhoto = (kind: PhotoKind, file: File | null) => {
+    const next = kind === 'avatar'
+      ? { ...form, profilePhotoBlob: file, profilePhotoUrl: file ? form.profilePhotoUrl : null }
+      : { ...form, headerPhotoBlob: file, headerPhotoUrl: file ? form.headerPhotoUrl : null };
+    void runSave(next, { photoField: kind === 'avatar' ? 'profile' : 'header' });
+  };
+
+  const saveYou = (fields: YouFields, patch: YouPatch) =>
+    runSave({ ...form, ...youNow, ...patch } as typeof form, { profileFields: fields }, () => setYouNow(v => ({ ...v, ...patch })));
 
   if (loading && !profile) return <ManagePageSkeleton />;
 
@@ -65,7 +79,17 @@ export default function EditProfile() {
     manualHandicapIndex: profile?.manual_handicap_index ?? null,
     hasWhsConnection: !!whs,
   });
-  const name = profile?.display_name || `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`.trim();
+  const you = {
+    firstName: youNow.firstName ?? profile?.first_name ?? '',
+    lastName: youNow.lastName ?? profile?.last_name ?? '',
+    displayName: youNow.displayName ?? profile?.display_name ?? '',
+    bio: youNow.bio ?? profile?.bio ?? '',
+    city: youNow.city ?? profile?.city ?? '',
+    country: youNow.country ?? profile?.country ?? '',
+    gender: youNow.gender ?? profile?.gender ?? '',
+  };
+  const name = you.displayName || `${you.firstName} ${you.lastName}`.trim();
+  const username = usernameNow?.username ?? profile?.username ?? '';
 
   return (
     <div className="ep-shell" data-testid="ep-page">
@@ -85,13 +109,22 @@ export default function EditProfile() {
             : <div className="ep-saved" data-state={state} data-testid="ep-saved" role="status">{state === 'saving' ? 'Saving…' : 'All changes saved'}</div>}
           {profile && <EditProfileCard
             name={name}
-            username={profile.username ?? ''}
-            city={profile.city ?? ''}
+            username={username}
+            city={you.city}
             coverUrl={profile.header_photo_url ?? null}
             avatarUrl={profile.profile_photo_url ?? null}
             indexLabel={resolved.value != null ? formatHcp(resolved.value) : null}
             homeClub={profile.home_club?.trim() || null}
             onSavePhoto={savePhoto}
+          />}
+          {profile && <EditProfileYou
+            userId={user?.id ?? ''}
+            {...you}
+            displayName={name}
+            username={username}
+            usernameChangedAt={usernameNow?.at ?? profile.username_changed_at ?? null}
+            onSave={saveYou}
+            onUsernameChanged={(u, at) => setUsernameNow({ username: u, at })}
           />}
         </main>
       )}
