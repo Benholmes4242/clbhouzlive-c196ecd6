@@ -29,12 +29,6 @@ interface Props {
   selected: StageCourse[];
   userId?: string | null;
   title?: string;
-  /**
-   * Review-flow only. When set:
-   *  - popular suggestions exclude courses this user has already reviewed
-   *  - search results still include them, with a small amber REVIEWED badge
-   */
-  excludeReviewedForUserId?: string | null;
   /** 'single' commits on tap and closes. Default 'multi' for post tagging. */
   selectionMode?: 'single' | 'multi';
 }
@@ -53,7 +47,6 @@ export default function CourseTagSheet({
   selected,
   userId,
   title = 'Tag a course',
-  excludeReviewedForUserId = null,
   selectionMode = 'multi',
 }: Props) {
   const isSingle = selectionMode === 'single';
@@ -62,10 +55,7 @@ export default function CourseTagSheet({
   const [searching, setSearching] = useState(false);
   const [fieldFocused, setFieldFocused] = useState(false);
   const [draft, setDraft] = useState<StageCourse[]>(selected);
-  const { rows: popular, loaded: popularLoaded } = usePopularCourses(open, {
-    excludeReviewedForUserId,
-  });
-  const [reviewedIds, setReviewedIds] = useState<Set<string>>(new Set());
+  const { rows: popular, loaded: popularLoaded } = usePopularCourses(open);
   const keyboardHeight = useKeyboardHeight();
 
   // Re-prime the draft whenever the sheet opens.
@@ -73,25 +63,6 @@ export default function CourseTagSheet({
     if (open) setDraft(selected);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
-
-  // Pull the user's reviewed course ids so search results can be badged.
-  useEffect(() => {
-    if (!open || !excludeReviewedForUserId) { setReviewedIds(new Set()); return; }
-    let cancelled = false;
-    (async () => {
-      const { data } = await supabase
-        .from('course_ratings')
-        .select('course_id')
-        .eq('user_id', excludeReviewedForUserId);
-      if (cancelled) return;
-      setReviewedIds(new Set(
-        ((data ?? []) as Array<{ course_id: string | null }>)
-          .map((r) => r.course_id)
-          .filter((v): v is string => !!v),
-      ));
-    })();
-    return () => { cancelled = true; };
-  }, [open, excludeReviewedForUserId]);
 
   useEffect(() => {
     if (!open) return;
@@ -290,7 +261,6 @@ export default function CourseTagSheet({
                   <CourseRow
                     key={r.id}
                     row={r}
-                    reviewed={reviewedIds.has(r.id)}
                     selected={selectedIds.has(r.id)}
                     onToggle={toggle}
                   />
@@ -464,22 +434,6 @@ function CourseRow({
           </span>
         )}
       </span>
-      {reviewed && !selected && (
-        <div
-          style={{
-            flex: 'none',
-            padding: '3px 8px',
-            borderRadius: 999,
-            background: 'rgba(247,147,30,0.12)',
-            color: CT.amberDeep,
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-          }}
-        >
-          REVIEWED
-        </div>
-      )}
       {selected && <Check size={17} strokeWidth={3} color={CT.success} style={{ flexShrink: 0 }} />}
     </button>
   );
