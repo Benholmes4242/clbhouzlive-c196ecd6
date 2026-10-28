@@ -10,6 +10,7 @@ import { motion } from 'framer-motion';
 import { AnimatedNumber } from '@/components/ui/motion';
 import { cn } from '@/lib/utils';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { renamedProfilePath, resolvePreviousUsername } from '@/lib/profile/previousUsername';
 import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOpenFriendSheet } from '@/components/friend-sheet/FriendSheetProvider';
@@ -211,10 +212,8 @@ const ProfilePageV2Content: React.FC = () => {
         // EP2: old links keep working — a previous username resolves to the
         // current one (resolve_previous_username); any failure is not-found.
         if (!isUuid(routeUsername!)) {
-          try {
-            const { data: current } = await supabase.rpc('resolve_previous_username', { p_username: routeUsername! });
-            if (typeof current === 'string' && current && current !== routeUsername) return { id: null as string | null, deleted: false, notFound: false, current };
-          } catch { /* fall through to not-found */ }
+          const current = await resolvePreviousUsername(routeUsername!);
+          if (current) return { id: null as string | null, deleted: false, notFound: false, current };
         }
         return { id: null as string | null, deleted: false, notFound: true };
       }
@@ -231,9 +230,7 @@ const ProfilePageV2Content: React.FC = () => {
   const location = useLocation();
   useEffect(() => {
     if (!renamedTo || !routeUsername) return;
-    const prefix = `/profile/${routeUsername}`;
-    const rest = location.pathname.startsWith(prefix) ? location.pathname.slice(prefix.length) : '';
-    navigate(`/profile/${renamedTo}${rest}${location.search}${location.hash}`, { replace: true });
+    navigate(renamedProfilePath(location.pathname, routeUsername, renamedTo, location.search, location.hash), { replace: true });
   }, [renamedTo, routeUsername, location.pathname, location.search, location.hash, navigate]);
   
   const { t } = useTranslation('profile');
