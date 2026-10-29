@@ -2,7 +2,8 @@
 
 ## Review Step 1 — Photo under the notch
 - [x] Key the review-composer claim to the actual header form before paint; preserve route rules, geometry and one unmount release.
-- [ ] Add claim transition/step/edit coverage and run the full suite against 4,400 tests / 452 files.
+- [x] Add four claim transition/step/edit cases replacing one old case; run full bunx vitest run: 4,399 passed / 4 failed / 4,403 total across 452 files (+3).
+- [ ] STOP: all four reviewComposerChrome cases fail at ReviewComposerHeader.tsx:41:17: No "headerScore" export is defined on the useReviewHeaderFacts mock. No fix/rerun; no pre-existing failures. See REVIEW_PHOTO_NOTCH_STOP_REPORT.md. Signed-in device checks and automatic build diagnostics unavailable.
 
 ## Review steps — Approved three-test correction
 - [x] Move unchanged safe-area heights/fold transition into stylesheet; update only authorised height/counter tests and add long-name truncation coverage.
