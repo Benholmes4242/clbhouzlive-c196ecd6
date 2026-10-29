@@ -2,8 +2,8 @@
  * PHASE 2 — the review path's new order, written down.
  *
  * These are the conditions the brief asked to be tested rather than described:
- * the step indices, the 9.0 default guarded by a touched flag, edit mode
- * starting satisfied, and a draft from the old numbering being discarded rather
+ * the step indices, the empty overall and derived score gate, edit mode
+ * retaining its existing rating, and a draft from the old numbering being discarded rather
  * than restored onto the wrong screen.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
@@ -12,7 +12,6 @@ import {
   FIRST_STEP,
   LAST_STEP,
   REVIEW_TOTAL_STEPS,
-  DEFAULT_OVERALL,
   DRAFT_VERSION,
 } from '../hooks/useReviewComposer';
 
@@ -26,21 +25,22 @@ describe('the new step order', () => {
     expect(REVIEW_TOTAL_STEPS).toBe(3);
   });
 
-  it('opens the dial at 9.0', () => {
-    expect(DEFAULT_OVERALL).toBe(9);
+  it('starts the overall empty rather than supplying a score', () => {
+    expect(src(HOOK)).toContain('overall: null');
+    expect(src(HOOK)).not.toContain('DEFAULT_OVERALL');
   });
 });
 
 describe('the touched flag', () => {
   const hook = src(HOOK);
 
-  it('exists as its own boolean and gates the rating step', () => {
-    expect(hook).toContain('overallTouched');
+  it('derives score presence and gates the rating step', () => {
+    expect(hook).toContain('const overallTouched = state.overall != null');
     expect(hook).toMatch(/ratingGate\s*=\s*overallTouched/);
   });
 
   it('starts satisfied in edit mode, because the member already has a score', () => {
-    expect(hook).toContain('() => isEditMode || restored?.overallTouched === true');
+    expect(hook).toContain('overall: existing.rating ?? null');
   });
 });
 
@@ -99,8 +99,7 @@ describe('what came off the composer', () => {
   it('marks the dial axis with numerals, not three band names', () => {
     const scrubber = src('src/features/review-v2/components/OverallScrubber.tsx');
     expect(scrubber).not.toContain('bandLabels');
-    expect(scrubber).toContain('>1</span>');
-    expect(scrubber).toContain('>5</span>');
-    expect(scrubber).toContain('>10</span>');
+    expect(scrubber).toContain('Array.from({ length: 10 }');
+    expect(scrubber).toContain('{i + 1}</span>');
   });
 });
