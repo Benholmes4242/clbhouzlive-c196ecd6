@@ -8,7 +8,7 @@ function rail() {
   vi.spyOn(slider, 'getBoundingClientRect').mockReturnValue({ left: 0, width: 180 } as DOMRect);
   return slider;
 }
-function pointer(target: EventTarget, type: string, x: number) {
+function pointer(target: Element | Window, type: string, x: number) {
   const event = new Event(type, { bubbles: true });
   Object.defineProperty(event, 'clientX', { value: x });
   fireEvent(target, event);

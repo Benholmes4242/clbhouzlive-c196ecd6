@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PERSONAL_COVER_ASPECT, PERSONAL_COVER_ASPECT_CSS } from '@/lib/tokens/coverAspect';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
@@ -14,6 +15,9 @@ vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user
 vi.mock('@/hooks/useProfileData', () => ({ useProfileData: () => ({ profile: h.profile, loading: false, isError: false, refetch: vi.fn() }) }));
 vi.mock('@/hooks/useProfileSave', () => ({ useProfileSave: () => ({ save: h.save, isSaving: false }) }));
 vi.mock('@/lib/whs/hooks', () => ({ useWhsConnection: () => ({ data: null }) }));
+vi.mock('@/features/home-club/useHomeClubStatus', () => ({ useHomeClubStatus: () => ({ state: 'none', pendingName: null }) }));
+vi.mock('@/hooks/useUserTopTenCourses', () => ({ useUserTopTenCourses: () => ({ topTen: [] }) }));
+vi.mock('@/features/coach/hooks', () => ({ useMyCoach: () => ({ data: null, isSuccess: true, isError: false }), useInvalidateCoach: () => vi.fn(), useCoachHandicap: () => ({ current: 1, loading: false }), coachRpc: vi.fn() }));
 vi.mock('@/components/settings/SettingsTabContent', () => ({ SettingsTabContent: () => <div data-testid="settings-tab-content" /> }));
 vi.mock('@/components/skeletons/ManagePageSkeleton', () => ({ ManagePageSkeleton: () => <div data-testid="skeleton" /> }));
 vi.mock('@/components/profile/edit-v2/ImageCropperModal', () => ({ getCroppedImg: vi.fn(async () => new Blob(['c'], { type: 'image/jpeg' })) }));
@@ -22,9 +26,10 @@ vi.mock('react-easy-crop', () => ({ default: (p: { aspect: number; onCropComplet
 import EditProfile from '@/pages/EditProfile';
 
 const base = { id: 'me', display_name: 'Benjamin Holmes', username: 'benjaminholmes', city: 'London', home_club: 'Sundridge Park', manual_handicap_index: 1.5, eg_handicap_index: null, header_photo_url: null, profile_photo_url: null, has_completed_onboarding: true };
-const mount = (path = '/edit-profile-v2') => render(<MemoryRouter initialEntries={[path]}><Routes><Route path="/edit-profile-v2" element={<EditProfile />} /></Routes></MemoryRouter>);
-beforeEach(() => { h.user = { id: 'me' }; h.profile = { ...base }; h.save.mockReset(); h.save.mockResolvedValue(true); URL.createObjectURL = vi.fn(() => 'blob:x'); URL.revokeObjectURL = vi.fn(); });
-afterEach(() => cleanup());
+let queryClient: QueryClient;
+const mount = (path = '/edit-profile-v2') => render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={[path]}><Routes><Route path="/edit-profile-v2" element={<EditProfile />} /></Routes></MemoryRouter></QueryClientProvider>);
+beforeEach(() => { queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } }); h.user = { id: 'me' }; h.profile = { ...base }; h.save.mockReset(); h.save.mockResolvedValue(true); URL.createObjectURL = vi.fn(() => 'blob:x'); URL.revokeObjectURL = vi.fn(); });
+afterEach(() => { cleanup(); queryClient.clear(); });
 
 async function cropAndUse(kind: 'cover' | 'avatar') {
   fireEvent.change(screen.getByTestId(`ep-${kind}-picker`), { target: { files: [new File(['a'], 'a.png', { type: 'image/png' })] } });
