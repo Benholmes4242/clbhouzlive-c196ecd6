@@ -906,6 +906,10 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         region={region}
         thumbnail={course.thumbnail_image}
         facts={headerFacts}
+        courseId={course.id}
+        courseRegion={course.region}
+        subCountry={course.sub_country}
+        country={course.country}
         leadingIsClose={leadingIsClose}
         onBack={handleBack}
         isEditMode={isEditMode}
