@@ -207,3 +207,19 @@ describe('situation row "Full board"', () => {
     expect(onOpen).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('Full board before anyone has teed off', () => {
+  const unstarted = Array.from({ length: 6 }, (_, i) => ({ id: `u${i}`, position: 1, position_tied: true, score: 0, today: null, thru: null, player: { id: `p${i}`, full_name: `Player ${i}` } }));
+  it('shows no full-board entry and mounts no FullBoardSheet before the first tee', () => {
+    f.rows = unstarted;
+    mountHero(LIVE);
+    expect(document.querySelector('[data-overview-full-board]')).toBeNull();
+    expect(f.sheet).not.toHaveBeenCalled();
+  });
+  it('shows both once one row has started', () => {
+    f.rows = [{ ...unstarted[0], thru: 1 }, ...unstarted.slice(1)];
+    mountHero(LIVE);
+    expect(document.querySelector('[data-overview-full-board]')).not.toBeNull();
+    expect(f.sheet).toHaveBeenCalled();
+  });
+});

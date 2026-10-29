@@ -200,3 +200,24 @@ describe('CB58 render and tap behavior', () => {
     expect(view.container.querySelector('[data-scorecard-open]')).not.toBeNull();
   });
 });
+describe('Leaders group before anyone has teed off', () => {
+  const unstarted = (id: string): BoardEntry => ({ id: `row-${id}`, position: 1, position_tied: true, score: 0, today: null, today_round: null, thru: null as unknown as number, player: { id, full_name: `Player ${id}` } });
+  const field = ['a', 'b', 'c', 'd', 'e'].map(unstarted);
+  it('leadersGroupVisible is false with every row at T1, 0 and no round cells or thru', () => {
+    expect(leadersGroupVisible('live', false, field, false)).toBe(false);
+  });
+  it('leadersGroupVisible is true once one row has thru 1', () => {
+    expect(leadersGroupVisible('live', false, [{ ...field[0], thru: 1 }, ...field.slice(1)], false)).toBe(true);
+  });
+  it('LeadersGroup renders nothing before the first tee, and renders once a row has started', () => {
+    fixture.groups = [g]; fixture.loading = false;
+    const view = mount(<LeadersGroup {...props} entries={field} />);
+    expect(view.container.childElementCount).toBe(0);
+    cleanup();
+    const started = mount(<LeadersGroup {...props} />);
+    expect(started.container.querySelector('[data-leaders-group]')).not.toBeNull();
+  });
+  it('completed phase stays hidden', () => {
+    expect(leadersGroupVisible('completed', false, entries, false)).toBe(false);
+  });
+});
