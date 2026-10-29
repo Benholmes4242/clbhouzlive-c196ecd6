@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { r } from '@/lib/radius';
 import { LIVE_INK } from '@/features/tourhub/_shared/tokens';
+import { Z } from '@/config/zIndex';
 import { useAnyTourLive } from '@/features/tourhub/hooks/useAnyTourLive';
 import ComposerFlowSheet from '@/features/composer-flow/ComposerFlowSheet';
 import { useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
@@ -393,7 +394,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               left: 0,
               right: 0,
               bottom: 20,
-              zIndex: 100,
+              zIndex: Z.nav,
               pointerEvents: 'none',
               display: 'flex',
               justifyContent: 'center',

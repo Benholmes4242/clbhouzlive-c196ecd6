@@ -1,5 +1,10 @@
 # Roadmap
 
+## Rounds gate — Keep bottom navigation live
+- [x] Diagnose actual nav layer 100 versus body-level shade/card 997/998 and absent lock expansion lease.
+- [x] Use canonical Z.nav without remounting navigation; hold expansion while locked; preserve card/fade/tile geometry and behavior.
+- [ ] Add locked-nav stacking/accessibility/navigation/lease regressions; check 390×844 browser geometry; run full suite and report every changed file.
+
 ## Review Step 1 — Photo under the notch
 - [x] Key the review-composer claim to the actual header form before paint; preserve route rules, geometry and one unmount release.
 - [x] Add four claim transition/step/edit cases replacing one old case; run full bunx vitest run: 4,399 passed / 4 failed / 4,403 total across 452 files (+3).
