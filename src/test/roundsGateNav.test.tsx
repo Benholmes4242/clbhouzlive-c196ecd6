@@ -50,8 +50,9 @@ function ancestorContexts(el: Element) {
   return contexts;
 }
 describe('Locked rounds navigation', () => {
-  it('renders accessible visible nav above the body shade and card in the same effective stacking context', () => {
+  it('renders accessible visible nav above the body shade and card in the same effective stacking context', async () => {
     mount(); lock();
+    await act(async () => { await Promise.resolve(); vi.advanceTimersByTime(300); await Promise.resolve(); });
     const nav = screen.getByRole('navigation', { name: 'Main' });
     const pill = nav.querySelector<HTMLElement>('[data-chrome="bottom-nav"]');
     const shade = document.querySelector<HTMLElement>('[data-rounds-gate-shade]');
