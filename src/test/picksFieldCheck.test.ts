@@ -70,6 +70,22 @@ describe('validatePicksAgainstField — leaderboard branch', () => {
     expect(out.topContenders[2].promoted).toBe(true);
     expect(out.withdrawnPicks[0]).toMatchObject({ playerId: 'b', withdrawnStatus: 'WD' });
   });
+  it('open with leaderboard rows: promotion skips an alternate with no row and one who is WD, taking the first eligible alternate', async () => {
+    db.board = boardOf(20, [{ player_id: 'a', status: 'active' }, { player_id: 'b', status: 'WD' }, { player_id: 'c', status: 'active' }, { player_id: 'alt3', status: 'active' }]);
+    const p = { ...preds(), darkHorses: [{ playerId: 'alt1' }, { playerId: 'alt2' }, { playerId: 'alt3' }] };
+    const out: any = await validatePicksAgainstField('t', p, true);
+    expect(out.topContenders.map((x: any) => x.playerId)).toEqual(['a', 'c', 'alt3']);
+    expect(out.topContenders[2].promoted).toBe(true);
+    expect(out.withdrawnPicks.map((x: any) => x.playerId)).toEqual(['b']);
+  });
+  it('open with leaderboard rows: with no eligible alternate nobody is promoted and the WD pick stays in withdrawnPicks', async () => {
+    db.board = boardOf(20, [{ player_id: 'a', status: 'active' }, { player_id: 'b', status: 'WD' }, { player_id: 'c', status: 'active' }]);
+    const p = { ...preds(), darkHorses: [{ playerId: 'alt1' }, { playerId: 'alt2' }] };
+    const out: any = await validatePicksAgainstField('t', p, true);
+    expect(out.topContenders.map((x: any) => x.playerId)).toEqual(['a', 'c']);
+    expect(out.topContenders.some((x: any) => x.promoted)).toBe(false);
+    expect(out.withdrawnPicks.map((x: any) => x.playerId)).toEqual(['b']);
+  });
   it('matches statuses on player_id', async () => {
     db.board = [{ player_id: 'c', status: 'WD' }];
     const out: any = await validatePicksAgainstField('t', preds(), false);
