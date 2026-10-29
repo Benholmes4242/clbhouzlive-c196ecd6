@@ -43,7 +43,6 @@ describe('Tour overview band', () => {
     const hero = layer('island-scrim-hero')!;
     expect(hero.style.opacity).toBe('1');
     expect(hero.style.height).toBe('140px');
-    expect(hero.style.background).toContain('linear-gradient(180deg, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0.25) 55%, rgba(10,10,12,0) 100%)'.replace(/,(?=\d)/g, ', ').replace(/rgba\((\d+), (\d+), (\d+), /g, 'rgba($1, $2, $3, '));
     expect(hero.style.pointerEvents).toBe('none');
     expect(layer('island-scrim-band')!.style.opacity).toBe('0');
     expect(layer('island-scrim')).toBeNull();
@@ -55,7 +54,7 @@ describe('Tour overview band', () => {
     expect(band.style.opacity).toBe('1');
     expect(band.style.position).toBe('fixed');
     expect(band.style.background).toBe('rgba(10, 10, 12, 0.88)');
-    expect(band.style.borderBottom).toBe('1px solid rgba(255, 255, 255, 0.06)');
+    expect(band.style.borderBottom.replace(/\s/g, '')).toBe('1pxsolidrgba(255,255,255,0.06)');
     expect(band.style.pointerEvents).toBe('none');
     expect(layer('island-scrim-hero')!.style.opacity).toBe('0');
     scroll.scrolled = false;
@@ -68,6 +67,9 @@ describe('Tour overview band', () => {
     expect(src.match(/data-chrome="island-scrim-band"/g)).toHaveLength(1);
     expect(src).toContain("(spec.scrim === true || spec.scrim === 'hero') && (");
     expect(src).toContain("height: 'calc(var(--sat, 0px) + 68px)'");
+    expect(src).toContain("background: 'linear-gradient(180deg, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0.25) 55%, rgba(10,10,12,0) 100%)'");
+    expect(src).toContain("height: 'calc(var(--sat, 0px) + 80px)'");
+    expect(src).toContain("background: 'linear-gradient(180deg, rgba(10,10,12,0.95) 0%, rgba(10,10,12,0.75) 45%, rgba(10,10,12,0) 100%)'");
     expect(src).toContain("backdropFilter: 'blur(20px) saturate(150%)'");
     expect(src).toContain("WebkitBackdropFilter: 'blur(20px) saturate(150%)'");
     expect(src).toContain("const scrimTransition = REDUCED_MOTION ? 'none' : 'opacity 180ms linear';");
@@ -78,7 +80,6 @@ describe('Tour overview band', () => {
       mount(path);
       const rest = layer('island-scrim')!;
       expect(rest.style.opacity).toBe('1');
-      expect(rest.style.background).toContain('0.95');
       expect(layer('island-scrim-band')!.style.opacity).toBe('0');
       expect(layer('island-scrim-hero')).toBeNull();
       cleanup();
