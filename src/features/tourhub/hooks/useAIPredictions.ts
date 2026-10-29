@@ -536,6 +536,8 @@ export async function fetchPredictionsForTournament(tournament: any): Promise<AI
  * If a top-5 pick has status 'wd' or is missing from the field entirely
  * (and the tournament has started), promote an alternate from dark_horses.
  */
+let warnedFieldMismatch = false;
+
 export async function validatePicksAgainstField(
   tournamentId: string,
   predictions: {
@@ -591,7 +593,8 @@ export async function validatePicksAgainstField(
 
     // None of the picks in a full field is an id mismatch, not withdrawals.
     if (!contenders.some((p: any) => fieldSet.has(String(p.playerId)))) {
-      console.warn('[useAIPredictions] no pick found in the tee-sheet field; skipping the field check (id mismatch?)');
+      if (!warnedFieldMismatch) console.warn('[useAIPredictions] no pick found in the tee-sheet field; skipping the field check (id mismatch?)');
+      warnedFieldMismatch = true;
       return predictions;
     }
 
