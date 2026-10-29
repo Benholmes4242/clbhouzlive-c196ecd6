@@ -9,6 +9,8 @@
  * Scroll ownership is the canonical #root container via getPrimaryScrollElement.
  * Timers/listeners/observer belong to this mount, never storage. Gate and tile
  * share connect CTA styles and floating glass; tile owns modal focus/aria lifecycle.
+ * Locked gates hold the canonical nav expansion lease; the nav uses Z.nav,
+ * above the body-level shade/card at Z.nav - 2/-1 (no separate nav mount).
  */
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
@@ -20,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { primaryCtaStyle, declineButtonStyle } from '@/components/profile/handicap/whs/connect/EmptyStateScreen';
 import { GLASS_CARD, GLASS_BACKDROP } from '@/lib/tokens/glass';
 import { getPrimaryScrollElement } from '@/lib/getScrollParent';
+import { pushForceExpand } from '@/hooks/useScrollDirection';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { Z } from '@/config/zIndex';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -170,6 +173,9 @@ export function RoundsGate({ children, roundCount = null, scope = null }: { chil
     checkRow();
     return cleanup;
   }, []);
+  useLayoutEffect(() => {
+    if (locked) return pushForceExpand();
+  }, [locked]);
   useLayoutEffect(() => {
     if (!locked) return;
     const body = bodyRef.current;

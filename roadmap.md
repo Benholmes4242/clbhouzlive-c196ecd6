@@ -1,5 +1,11 @@
 # Roadmap
 
+## Rounds gate — Keep bottom navigation live
+- [x] Diagnose actual nav layer 100 versus body-level shade/card 997/998 and absent lock expansion lease.
+- [x] Use canonical Z.nav without remounting navigation; hold expansion while locked; preserve card/fade/tile geometry and behavior.
+- [x] Added five locked-nav regressions without changing existing tests; full bunx vitest run: 4,407 passed / 1 failed / 4,408 total across 453 files (+5/+1 from 4,403/452).
+- [ ] STOP: new roundsGateNav.test.tsx:56:17 `Error: expect(element).toBeVisible()`; Framer Motion's nav has `opacity: 0` in the fake-timer mount. No correction/rerun; no pre-existing failures. Automatic build OK09:40:16Z. Authenticated locked-page/browser check unavailable (external_unmanaged); see ROUNDS_GATE_NAV_STOP_REPORT.md.
+
 ## Review Step 1 — Photo under the notch
 - [x] Key the review-composer claim to the actual header form before paint; preserve route rules, geometry and one unmount release.
 - [x] Add four claim transition/step/edit cases replacing one old case; run full bunx vitest run: 4,399 passed / 4 failed / 4,403 total across 452 files (+3).
