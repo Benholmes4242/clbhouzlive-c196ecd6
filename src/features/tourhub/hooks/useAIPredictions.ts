@@ -536,7 +536,9 @@ export async function fetchPredictionsForTournament(tournament: any): Promise<AI
  * If a top-5 pick has status 'wd' or is missing from the field entirely
  * (and the tournament has started), promote an alternate from dark_horses.
  */
-async function validatePicksAgainstField(
+let warnedFieldMismatch = false;
+
+export async function validatePicksAgainstField(
   tournamentId: string,
   predictions: {
     topContenders: any[];
@@ -583,16 +585,24 @@ async function validatePicksAgainstField(
     if (!ttRows || ttRows.length === 0) return predictions;
 
     // Build set of players confirmed in the field via tee times
-    const fieldSet = new Set(ttRows.map((r: any) => (r.sr_players as any)?.id).filter(Boolean));
+    // player_id is sr_players.id — the same id AITopContender.playerId carries.
+    const fieldSet = new Set(ttRows.map((r: any) => (r.player_id != null ? String(r.player_id) : null)).filter(Boolean));
 
     // If field data exists but is very small, don't filter (might be partial data)
     if (fieldSet.size < 20) return predictions;
+
+    // None of the picks in a full field is an id mismatch, not withdrawals.
+    if (!contenders.some((p: any) => fieldSet.has(String(p.playerId)))) {
+      if (!warnedFieldMismatch) console.warn('[useAIPredictions] no pick found in the tee-sheet field; skipping the field check (id mismatch?)');
+      warnedFieldMismatch = true;
+      return predictions;
+    }
 
     // Check if any top-5 picks are NOT in the tee-time field
     const validContenders: any[] = [];
     const withdrawnPicks: any[] = [];
     for (const p of contenders) {
-      if (fieldSet.has(p.playerId)) {
+      if (fieldSet.has(String(p.playerId))) {
         validContenders.push(p);
       } else {
         withdrawnPicks.push({ ...p, withdrawnStatus: 'wd' });
@@ -603,7 +613,7 @@ async function validatePicksAgainstField(
     let promoted = 0;
     for (const alt of alternates) {
       if (validContenders.length >= 5) break;
-      if (fieldSet.has(alt.playerId)) {
+      if (fieldSet.has(String(alt.playerId))) {
         validContenders.push({
           ...alt,
           rank: validContenders.length + 1,
