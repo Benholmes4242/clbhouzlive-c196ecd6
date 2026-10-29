@@ -35,10 +35,15 @@ import { MediaTray } from '@/features/review-v2/components/MediaTray';
 import { ReviewHoleTags } from '@/features/review-v2/components/ReviewHoleTags';
 import { SubmitBar } from '@/features/review-v2/components/SubmitBar';
 import { headerScore } from '@/features/review-v2/hooks/useReviewHeaderFacts';
+import { courseMastheadKicker } from '@/features/courses/_shared/courseRankLabels';
+import { HERO_CANON_WASH } from '@/features/tourhub/_shared/heroGradient';
 import type { MediaItem } from '@/features/review-v2/types';
 
 afterEach(cleanup);
-beforeEach(() => { rec.isRecording = false; rec.audioBlob = null; rec.duration = 0; vi.clearAllMocks(); });
+beforeEach(() => {
+  rec.isRecording = false; rec.audioBlob = null; rec.duration = 0; vi.clearAllMocks();
+  mockStanding = null; mockRefLine = null;
+});
 
 const base: StepOneInput = { onFirstStep: true, textLength: 0, mediaCount: 0, voiceActive: false, isEditMode: false };
 
