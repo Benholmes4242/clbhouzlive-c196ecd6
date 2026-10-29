@@ -1,7 +1,7 @@
 /* Picks tee line (option A). Mocks copied from tourOverviewPicksChipsFullBoard. */
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
@@ -38,7 +38,7 @@ vi.mock('@/features/tourhub/tournament-v2/sections/FullBoardSheet', () => ({
 }));
 
 import { HeroBoardSection, pickTeeDayLabel, pickTeeText } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
-import { formatDayMonthShortGB, formatTimeHm, formatWeekdayLong, formatWeekdayShortGB } from '@/i18n/format';
+import { formatDayMonthShortGB, formatTimeHm24, formatWeekdayLong, formatWeekdayShortGB } from '@/i18n/format';
 
 const at = (days: number) => { const d = new Date(); d.setDate(d.getDate() + days); d.setHours(14, 5, 0, 0); return d.toISOString(); };
 const idle = (id: string) => ({ id: `r${id}`, position: 1, position_tied: true, score: 0, player: { id, full_name: `Player ${id}` } }) as unknown as BoardEntry;
@@ -58,16 +58,16 @@ describe('picks tee line', () => {
     f.tees = { data: new Map([['p1', at(0)]]) };
     mount([{ ...idle('p1'), position: null } as unknown as BoardEntry]);
     expect(card().querySelector('[data-overview-pick-tee]')).not.toBeNull();
-    expect(card().querySelector('[data-overview-pick-tee-time]')?.textContent).toBe(formatTimeHm(at(0)));
+    expect(card().querySelector('[data-overview-pick-tee-time]')?.textContent).toBe(formatTimeHm24(at(0)));
   });
   it('the card shows the time only: no TEES label, no weekday', () => {
-    expect(pickTeeText(at(1))).toBe(formatTimeHm(at(1)));
-    expect(pickTeeText(at(0))).toBe(formatTimeHm(at(0)));
+    expect(pickTeeText(at(1))).toBe(formatTimeHm24(at(1)));
+    expect(pickTeeText(at(0))).toBe(formatTimeHm24(at(0)));
     f.picks = [{ playerId: 'p1', playerName: 'Player p1' }];
     f.tees = { data: new Map([['p1', at(3)]]) };
     mount([{ ...idle('p1'), position: null } as unknown as BoardEntry]);
     const tee = card().querySelector('[data-overview-pick-tee]')!;
-    expect(tee.textContent).toBe(formatTimeHm(at(3)));
+    expect(tee.textContent).toBe(formatTimeHm24(at(3)));
     expect(tee.children.length).toBe(0);
   });
   it('a started pick shows position and score and no tee line', () => {
@@ -142,5 +142,39 @@ describe('picks heading tee day', () => {
       </QueryClientProvider>,
     );
     expect(heading()).toBeNull();
+  });
+
+  it('card shows the 24-hour time and keeps the avatar', () => {
+    f.picks = [{ playerId: 'p1', playerName: 'Player p1' }];
+    f.tees = { data: new Map([['p1', at(0)]]) };
+    mount([{ ...idle('p1'), position: null } as unknown as BoardEntry]);
+    expect(card().querySelector('[data-overview-pick-tee]')?.textContent).toMatch(/^\d{2}:\d{2}$/);
+    expect(card().querySelector('[data-overview-pick-avatar]')).not.toBeNull();
+  });
+  it('heading: full label when the row fits, day alone when it would overflow, back when it widens', () => {
+    let rowW = 400;
+    const cw = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth')!;
+    const ow = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth')!;
+    const observers: Array<() => void> = [];
+    const RO = globalThis.ResizeObserver;
+    (globalThis as any).ResizeObserver = class { cb: () => void; constructor(cb: () => void) { this.cb = cb; observers.push(cb); } observe() {} disconnect() {} };
+    Object.defineProperty(HTMLElement.prototype, 'clientWidth', { configurable: true, get(this: HTMLElement) { return this.hasAttribute('data-overview-picks-heading') ? rowW : 0; } });
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', { configurable: true, get(this: HTMLElement) { return this.hasAttribute('data-overview-picks-tee-measure') ? 129 : 145; } });
+    try {
+      f.picks = [{ playerId: 'p1', playerName: 'Player p1' }];
+      f.tees = { data: new Map([['p1', at(3)]]) };
+      mount([{ ...idle('p1'), position: null } as unknown as BoardEntry]);
+      const day = formatWeekdayLong(at(3)).toLocaleUpperCase();
+      const label = () => document.querySelector('[data-overview-picks-tee-day]')?.textContent;
+      expect(label()).toBe(`TEE TIMES · ${day}`);
+      rowW = 320; act(() => observers.forEach((cb) => cb()));
+      expect(label()).toBe(day);
+      rowW = 400; act(() => observers.forEach((cb) => cb()));
+      expect(label()).toBe(`TEE TIMES · ${day}`);
+    } finally {
+      Object.defineProperty(HTMLElement.prototype, 'clientWidth', cw);
+      Object.defineProperty(HTMLElement.prototype, 'offsetWidth', ow);
+      (globalThis as any).ResizeObserver = RO;
+    }
   });
 });
