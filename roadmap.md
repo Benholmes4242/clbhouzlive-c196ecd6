@@ -1,9 +1,10 @@
 # Roadmap
 
 ## EP5.1 — Edit profile snags and white cursors
-- [ ] Correct avatar framing, top/bottom safe-area spacing and shared mute labels.
-- [ ] Extract stable content-height search shell; club-only autofocus/keyboard docking, canonical confirmation/save/request paths and direct editor entrypoints.
-- [ ] Sweep amber/undefined carets, add regression coverage, keep review tests unchanged, run full suite against 4,378/450 and report all changes.
+- [x] Correct avatar framing, top/bottom safe-area spacing and scoped shared mute labels; visual checks not completed after stop.
+- [x] Extract stable content-height search shell; club-only autofocus/keyboard docking, canonical confirmation/save/request paths and direct editor entrypoints. Review tests and retained browser regression unchanged/passing.
+- [x] Sweep amber/undefined carets; targeted91/91 and full bunx vitest run4,386/4,386 across451 files (+8 new ep51SearchAndCarets tests).
+- [ ] STOP: automatic typecheck src/test/ep51SearchAndCarets.test.tsx(20,551): TS2769, "Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'." No correction or rerun after stop. No pre-existing failures. See EP5_1_STOP_REPORT.md; signed-in/native keyboard and remaining visual checks unavailable/unperformed.
 
 ## Review a course — Content height, max 85dvh
 - [x] Remove fullHeight; short lists fit content and long lists scroll beneath pinned header/search at 85dvh.
