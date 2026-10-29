@@ -153,8 +153,9 @@ describe('picks heading tee day', () => {
   });
   it('heading: full label when the row fits, day alone when it would overflow, back when it widens', () => {
     let rowW = 400;
-    const cw = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth')!;
-    const ow = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth')!;
+    const cw = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth');
+    const ow = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth');
+    const restore = (k: string, d?: PropertyDescriptor) => { if (d) Object.defineProperty(HTMLElement.prototype, k, d); else delete (HTMLElement.prototype as any)[k]; };
     const observers: Array<() => void> = [];
     const RO = globalThis.ResizeObserver;
     (globalThis as any).ResizeObserver = class { cb: () => void; constructor(cb: () => void) { this.cb = cb; observers.push(cb); } observe() {} disconnect() {} };
@@ -172,8 +173,8 @@ describe('picks heading tee day', () => {
       rowW = 400; act(() => observers.forEach((cb) => cb()));
       expect(label()).toBe(`TEE TIMES · ${day}`);
     } finally {
-      Object.defineProperty(HTMLElement.prototype, 'clientWidth', cw);
-      Object.defineProperty(HTMLElement.prototype, 'offsetWidth', ow);
+      restore('clientWidth', cw);
+      restore('offsetWidth', ow);
       (globalThis as any).ResizeObserver = RO;
     }
   });
