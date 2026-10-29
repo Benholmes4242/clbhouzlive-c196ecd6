@@ -1,7 +1,7 @@
 /** EP4 link sheets use the existing partial saver; handicap visibility has no
  * local writer: usePrivacySettings and profile-cache refresh remain authoritative
  * across this group and unchanged SettingsTabContent. Legacy editor stays separate. */
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronRight, Instagram, Youtube, X } from 'lucide-react';
 import { nanoid } from 'nanoid';
 import { Button } from '@/components/ui/button';
@@ -69,6 +69,12 @@ export function EditProfileLinksPrivacy(p: Props) {
 function WebsitesSheet(p: { websites: ProfileFormData['websites']; busy: boolean; onClose: () => void; onSave: (websites: ProfileFormData['websites']) => Promise<void> }) {
   const [sites, setSites] = useState(p.websites.filter(w => w.url));
   const [error, setError] = useState(false);
+  const inputRefs = useRef(new Map<string, HTMLInputElement>());
+  const addedId = useRef<string | null>(null);
+  useEffect(() => {
+    const id = addedId.current;
+    if (id) { inputRefs.current.get(id)?.focus(); addedId.current = null; }
+  }, [sites]);
   const save = () => {
     if (sites.some(w => !personalWebsiteValid(w.url))) { setError(true); return; }
     void p.onSave(sites.filter(w => w.url));
@@ -76,10 +82,10 @@ function WebsitesSheet(p: { websites: ProfileFormData['websites']; busy: boolean
   return <BizcSheet title="Websites" testId="ep-sheet-websites" onDone={p.onClose} onAction={save} actionDisabled={p.busy}>
     <div className="ep-rows ep-links-options">
       {sites.map((w, index) => <div className="ep-link-input-row" key={w.id}>
-        <input className="ep-link-input" aria-label={`Website ${index + 1}`} inputMode="url" autoCapitalize="none" autoCorrect="off" value={w.url} disabled={p.busy} onChange={e => { setSites(old => old.map(s => s.id === w.id ? { ...s, url: e.target.value } : s)); setError(false); }} />
+        <input ref={node => { if (node) inputRefs.current.set(w.id, node); else inputRefs.current.delete(w.id); }} className="ep-link-input" aria-label={`Website ${index + 1}`} inputMode="url" autoCapitalize="none" autoCorrect="off" value={w.url} disabled={p.busy} onChange={e => { setSites(old => old.map(s => s.id === w.id ? { ...s, url: e.target.value } : s)); setError(false); }} />
         <Button variant="ghost" size="icon" className="ep-link-remove" aria-label={`Remove website ${index + 1}`} disabled={p.busy} onClick={() => setSites(old => old.filter(s => s.id !== w.id))}><X size={16} /></Button>
       </div>)}
-      {sites.length < PERSONAL_WEBSITE_LIMIT && <div className="ep-link-input-row"><input className="ep-link-input" aria-label="Add another website" placeholder="Add another website" inputMode="url" autoCapitalize="none" autoCorrect="off" value="" disabled={p.busy} onChange={e => { if (e.target.value) { setSites(old => [...old, { id: nanoid(), url: e.target.value }]); setError(false); } }} /></div>}
+      {sites.length < PERSONAL_WEBSITE_LIMIT && <div className="ep-link-input-row"><input className="ep-link-input" aria-label="Add another website" placeholder="Add another website" inputMode="url" autoCapitalize="none" autoCorrect="off" value="" disabled={p.busy} onChange={e => { if (e.target.value) { const id = nanoid(); addedId.current = id; setSites(old => [...old, { id, url: e.target.value }]); setError(false); } }} /></div>}
     </div>
     {error && <p className="ep-err" role="alert">{PERSONAL_WEBSITE_ERROR}</p>}
     <p className="ep-links-hint">Up to three.</p>
