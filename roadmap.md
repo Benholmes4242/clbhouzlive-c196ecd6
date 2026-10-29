@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Review a course — Content height, max 85dvh
-- [ ] Remove fixed-height sizing, keep short lists natural and long lists internally scrolling.
-- [ ] Hold the opening content height from first typed character until clear; preserve keyboard handling.
-- [ ] Add regression coverage, run full suite against 4,376/450 baseline, and report every changed file.
+- [x] Remove fullHeight; short lists fit content and long lists scroll beneath pinned header/search at 85dvh.
+- [x] Hold first-character content height until clear/close; keyboard handling unchanged.
+- [x] Full bunx vitest run 4,378/4,378 across 450 files (+2 solely reviewCourseSearch.test.tsx); no existing cases/assertions changed. Retained browser regression passes: 349px short sheet, 668.09px capped sheet at 430×786. Automatic build OK06:18:59Z. See REVIEW_COURSE_SEARCH_HEIGHT_REPORT.md; authenticated entrypoint/native keyboard unverified (external_unmanaged).
 
 ## EP4.1 + EP5 — Completion card and switch-over
 - [x] Complete only EP4's useDeleteAccount mock; Part 1 full suite 4,340/4,340 across 449 files, no assertion changes.
