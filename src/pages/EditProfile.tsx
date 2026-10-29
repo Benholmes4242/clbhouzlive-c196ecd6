@@ -19,6 +19,7 @@ import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 import { EditProfileCard, type PhotoKind } from '@/features/edit-profile/EditProfileCard';
 import { EditProfileYou, type YouFields, type YouPatch } from '@/features/edit-profile/EditProfileYou';
 import { EditProfileGolf, type GolfFields, type GolfPatch } from '@/features/edit-profile/EditProfileGolf';
+import { EditProfileLinksPrivacy, type LinksPrivacyFields, type LinksPrivacyPatch } from '@/features/edit-profile/EditProfileLinksPrivacy';
 import '@/features/business-create/business-create.css';
 import '@/features/edit-profile/edit-profile.css';
 
@@ -49,6 +50,7 @@ export default function EditProfile() {
   const [usernameNow, setUsernameNow] = useState<{ username: string; at: string } | null>(null);
   const [youNow, setYouNow] = useState<YouPatch>({});
   const [golfNow, setGolfNow] = useState<GolfPatch>({});
+  const [linksPrivacyNow, setLinksPrivacyNow] = useState<LinksPrivacyPatch>({});
 
   const runSave = (next: typeof form, opts: Parameters<typeof save>[1], onOk?: () => void) => {
     const run = async (): Promise<boolean> => {
@@ -76,6 +78,8 @@ export default function EditProfile() {
     runSave({ ...form, ...youNow, ...patch } as typeof form, { profileFields: fields }, () => setYouNow(v => ({ ...v, ...patch })));
   const saveGolf = (fields: GolfFields, patch: GolfPatch) =>
     runSave({ ...form, ...golfNow, ...patch }, { profileFields: fields, hasWhsConnection: !!whs }, () => setGolfNow(v => ({ ...v, ...patch })));
+  const saveLinksPrivacy = (fields: LinksPrivacyFields, patch: LinksPrivacyPatch) =>
+    runSave({ ...form, ...linksPrivacyNow, ...patch }, { profileFields: fields }, () => setLinksPrivacyNow(v => ({ ...v, ...patch })));
 
   if (loading && !profile) return <ManagePageSkeleton />;
 
@@ -132,6 +136,7 @@ export default function EditProfile() {
             onUsernameChanged={(u, at) => setUsernameNow({ username: u, at })}
           />}
           {profile && <EditProfileGolf userId={user?.id ?? ''} form={{ ...form, ...golfNow }} egHandicapIndex={profile.eg_handicap_index ?? null} manualHandicapIndex={golfNow.handicapIndex !== undefined ? parseHcpFormString(golfNow.handicapIndex) : profile.manual_handicap_index ?? null} connection={whs} onSave={saveGolf} />}
+          {profile && <EditProfileLinksPrivacy userId={user?.id ?? ''} form={{ ...form, ...linksPrivacyNow }} handicapVisibility={profile.handicap_visibility === 'friends' || profile.handicap_visibility === 'private' ? profile.handicap_visibility : 'public'} onSave={saveLinksPrivacy} />}
         </main>
       )}
     </div>

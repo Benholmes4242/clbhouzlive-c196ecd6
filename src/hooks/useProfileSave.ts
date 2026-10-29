@@ -18,7 +18,7 @@ export function useProfileSave(userId: string) {
 
   const save = async (
     form: ProfileFormData,
-    opts: { isOnboarding?: boolean; hasWhsConnection?: boolean; welcomeFields?: 'identity' | 'course'; photoField?: 'profile' | 'header'; profileFields?: 'name' | 'bio' | 'location' | 'gender' | 'handicap' | 'homeClub' | 'additionalClubs' } = {}
+    opts: { isOnboarding?: boolean; hasWhsConnection?: boolean; welcomeFields?: 'identity' | 'course'; photoField?: 'profile' | 'header'; profileFields?: 'name' | 'bio' | 'location' | 'gender' | 'handicap' | 'homeClub' | 'additionalClubs' | 'websites' | 'socials' | 'homeClubVisibility' | 'additionalClubsVisibility' | 'topTenVisibility' } = {}
   ): Promise<boolean | 'username_taken'> => {
     const { isOnboarding = false, hasWhsConnection = false } = opts;
     setIsSaving(true);
@@ -140,6 +140,11 @@ export function useProfileSave(userId: string) {
           : f === 'location' ? { country: form.country.trim(), city: form.city.trim() }
           : f === 'handicap' ? { manual_handicap_index: parseHcpFormString(form.handicapIndex) }
           : f === 'homeClub' ? { home_club: form.homeClubName, primary_club_id: form.primaryClubId }
+          : f === 'websites' ? { websites: form.websites.map(w => w.url).filter(Boolean) }
+          : f === 'socials' ? { instagram_handle: form.instagramHandle.replace('@', '').trim(), twitter_handle: form.twitterHandle.replace('@', '').trim(), tiktok_handle: form.tiktokHandle.replace('@', '').trim(), youtube_handle: form.youtubeHandle.replace('@', '').trim() }
+          : f === 'homeClubVisibility' ? { home_club_visibility: form.homeClubVisibility }
+          : f === 'additionalClubsVisibility' ? { additional_clubs_visibility: form.additionalClubsVisibility }
+          : f === 'topTenVisibility' ? { top_ten_visibility: form.topTenVisibility }
           : { gender: form.gender || null };
         payload.updated_at = updatePayload.updated_at;
         const { data, error } = await supabase.from('user_profiles').update(payload as any).eq('id', userId).select('id').single();
