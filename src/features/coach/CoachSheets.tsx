@@ -13,6 +13,7 @@ import { coachRpc, useInvalidateCoach, useMyCoach, useCoachHandicap } from './ho
 import { COACH_CATEGORIES, coachDate, type CoachBusiness, type MyCoach } from './contracts';
 import { coachProgress } from './copy';
 import './coach.css';
+import { ChevronRight } from 'lucide-react';
 export function CoachSteps() {
   const { t } = useTranslation();
   return <div className="coach-steps" data-coach-steps>{[1, 2, 3, 4].map(n => <div key={n} className="coach-step" data-coach-step={n}><span>{n}</span><p><b>{t(`coach.steps.${n}.title`)}</b> {t(`coach.steps.${n}.body`)}</p></div>)}</div>;
@@ -74,9 +75,9 @@ function CoachManageSheet({ coach, viewerId, onClose, onChange }: { coach: MyCoa
   };
   return <BottomSheet open onClose={() => { if (!busy) onClose(); }} scrollBody><div className="coach-sheet" data-coach-manage><h2>{t('coach.yourCoach')}</h2><div className="coach-pick"><SquircleAvatar size={36} src={coach.logo_url} alt={coach.name} fallback={coach.name.charAt(0)} hairlineRing /><span><b>{coach.name}</b><small>{t('coach.sinceProgress', { date: coachDate(coach.started_at), progress: coachProgress(coach.measured ? coach.change : null, t) })}</small></span></div><CoachOptions name={coach.name} show={options.show} share={options.share} disabled={busy} onShow={v => void update('show', v)} onShare={v => void update('share', v)} /><p className="coach-lead">{t('coach.stopBody')}</p><Button variant="outline" className="coach-danger" data-coach-stop disabled={busy} onClick={() => void stop()}>{t('coach.stopAction')}</Button><Button variant="ghost" className="coach-link" data-coach-change disabled={busy} onClick={onChange}>{t('coach.changeAction')}</Button></div></BottomSheet>;
 }
-export function YourCoachRow({ viewerId }: { viewerId?: string }) {
+export function YourCoachRow({ viewerId, appearance }: { viewerId?: string; appearance?: 'editProfile' }) {
   const { t } = useTranslation(); const q = useMyCoach(viewerId); const [mode, setMode] = useState<'manage' | 'find' | null>(null);
   if (!viewerId || !q.isSuccess || q.isError) return null;
   const coach = q.data;
-  return <><Button variant="ghost" className="coach-edit-row" data-your-coach onClick={() => setMode(coach ? 'manage' : 'find')}><span>{t('coach.yourCoach')}</span><span>{coach?.name ?? t('coach.notSet')}{coach && <small>{t('coach.since', { date: coachDate(coach.started_at) })}</small>}</span></Button>{mode === 'manage' && coach && <CoachManageSheet key={coach.link_id} coach={coach} viewerId={viewerId} onClose={() => setMode(null)} onChange={() => setMode('find')} />}{mode === 'find' && <CoachFindSheet viewerId={viewerId} current={coach} onClose={() => setMode(null)} />}</>;
+  return <><Button variant="ghost" className={appearance ? 'ep-row' : 'coach-edit-row'} data-your-coach data-row={appearance ? 'coach' : undefined} onClick={() => setMode(coach ? 'manage' : 'find')}>{appearance ? <><span className="ep-row-label">Coach</span><span className={`ep-row-value${coach ? '' : ' ph'}`} data-testid="ep-golf-coach">{coach?.name ?? 'Name your coach'}</span><ChevronRight size={18} className="ep-row-chev" aria-hidden="true" /></> : <><span>{t('coach.yourCoach')}</span><span>{coach?.name ?? t('coach.notSet')}{coach && <small>{t('coach.since', { date: coachDate(coach.started_at) })}</small>}</span></>}</Button>{mode === 'manage' && coach && <CoachManageSheet key={coach.link_id} coach={coach} viewerId={viewerId} onClose={() => setMode(null)} onChange={() => setMode('find')} />}{mode === 'find' && <CoachFindSheet viewerId={viewerId} current={coach} onClose={() => setMode(null)} />}</>;
 }

@@ -1,7 +1,8 @@
 /** EP1 — new Edit profile (hidden /edit-profile-v2 until EP5). Auth, back and
  * the ?tab= param behave as ManageProfile's do; photos save one field at once
  * through useProfileSave's opt-in photoField partial. EP2 adds the You group,
- * whose sheets save their own columns through the profileFields partial. */
+ * whose sheets save their own columns through the profileFields partial.
+ * EP3 golf patches share that saved/retry line without touching visibility. */
 import { useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
@@ -11,12 +12,13 @@ import { useProfileForm } from '@/hooks/useProfileForm';
 import { useProfileSave } from '@/hooks/useProfileSave';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
-import { formatHcp } from '@/lib/formatHcp';
+import { formatHcp, parseHcpFormString } from '@/lib/formatHcp';
 import { DANGER } from '@/components/manage/ui';
 import { ManagePageSkeleton } from '@/components/skeletons/ManagePageSkeleton';
 import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
 import { EditProfileCard, type PhotoKind } from '@/features/edit-profile/EditProfileCard';
 import { EditProfileYou, type YouFields, type YouPatch } from '@/features/edit-profile/EditProfileYou';
+import { EditProfileGolf, type GolfFields, type GolfPatch } from '@/features/edit-profile/EditProfileGolf';
 import '@/features/business-create/business-create.css';
 import '@/features/edit-profile/edit-profile.css';
 
@@ -46,6 +48,7 @@ export default function EditProfile() {
 
   const [usernameNow, setUsernameNow] = useState<{ username: string; at: string } | null>(null);
   const [youNow, setYouNow] = useState<YouPatch>({});
+  const [golfNow, setGolfNow] = useState<GolfPatch>({});
 
   const runSave = (next: typeof form, opts: Parameters<typeof save>[1], onOk?: () => void) => {
     const run = async (): Promise<boolean> => {
@@ -71,12 +74,14 @@ export default function EditProfile() {
 
   const saveYou = (fields: YouFields, patch: YouPatch) =>
     runSave({ ...form, ...youNow, ...patch } as typeof form, { profileFields: fields }, () => setYouNow(v => ({ ...v, ...patch })));
+  const saveGolf = (fields: GolfFields, patch: GolfPatch) =>
+    runSave({ ...form, ...golfNow, ...patch }, { profileFields: fields, hasWhsConnection: !!whs }, () => setGolfNow(v => ({ ...v, ...patch })));
 
   if (loading && !profile) return <ManagePageSkeleton />;
 
   const resolved = resolveDisplayHandicap({
     egHandicapIndex: profile?.eg_handicap_index ?? null,
-    manualHandicapIndex: profile?.manual_handicap_index ?? null,
+    manualHandicapIndex: golfNow.handicapIndex !== undefined ? parseHcpFormString(golfNow.handicapIndex) : profile?.manual_handicap_index ?? null,
     hasWhsConnection: !!whs,
   });
   const you = {
@@ -114,7 +119,7 @@ export default function EditProfile() {
             coverUrl={profile.header_photo_url ?? null}
             avatarUrl={profile.profile_photo_url ?? null}
             indexLabel={resolved.value != null ? formatHcp(resolved.value) : null}
-            homeClub={profile.home_club?.trim() || null}
+            homeClub={(golfNow.homeClubName ?? profile.home_club)?.trim() || null}
             onSavePhoto={savePhoto}
           />}
           {profile && <EditProfileYou
@@ -126,6 +131,7 @@ export default function EditProfile() {
             onSave={saveYou}
             onUsernameChanged={(u, at) => setUsernameNow({ username: u, at })}
           />}
+          {profile && <EditProfileGolf userId={user?.id ?? ''} form={{ ...form, ...golfNow }} egHandicapIndex={profile.eg_handicap_index ?? null} manualHandicapIndex={golfNow.handicapIndex !== undefined ? parseHcpFormString(golfNow.handicapIndex) : profile.manual_handicap_index ?? null} connection={whs} onSave={saveGolf} />}
         </main>
       )}
     </div>
