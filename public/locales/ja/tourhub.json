@@ -108,7 +108,10 @@
       "stateLive": "ライブ",
       "stateFinal": "結果",
       "statePlayoff": "PLAYOFF",
-      "factRound": "ラウンド"
+      "factRound": "ラウンド",
+      "picksTeeTimes": "TEE TIMES · {{day}}",
+      "picksTeeToday": "TODAY",
+      "picksTeeTomorrow": "TOMORROW"
     },
     "leaderboardBand": {
       "ctaUpcoming": "View tournament",

@@ -157,7 +157,9 @@
       "leadersOut": "Leaders out · R{{round}}",
       "roundNode": "R{{round}}",
       "tiedCaps": "{{words}} tied",
-      "picksTees": "TEES"
+      "picksTeeTimes": "TEE TIMES · {{day}}",
+      "picksTeeToday": "TODAY",
+      "picksTeeTomorrow": "TOMORROW"
     },
     "leaderboardBand": {
       "ctaUpcoming": "View tournament",

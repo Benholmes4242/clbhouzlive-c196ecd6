@@ -65,7 +65,7 @@ import { PicksSheet } from './PicksSheet';
 import type { HeroState } from '../HybridHero.utils';
 import { fieldHasStarted, rowHasStarted } from '../../../overview/boardStarted';
 import { usePickTeeTimes } from '../../../tournament-v2/data/usePickTeeTimes';
-import { formatTimeHm, formatWeekdayShort } from '@/i18n/format';
+import { formatDayMonthShortGB, formatTimeHm, formatWeekdayLong, formatWeekdayShortGB } from '@/i18n/format';
 import { boardMovementMap, todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
 import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
 import { OVERVIEW, pickMovementCards, type MovementCard } from '../overviewTokens';
@@ -517,13 +517,37 @@ export function HeroBoardSection({
   );
 }
 
-/** "14:05" today in the viewer's local time, else "THU 14:05". */
-export function pickTeeText(iso: string, now: Date = new Date()): string | null {
+/** The card shows the time only ("14:05", viewer's local time); the day moves
+ *  to the picks heading via pickTeeDayLabel (BRIEF — PICK TEE TIMES: THE DAY
+ *  MOVES TO THE HEADING). */
+export function pickTeeText(iso: string): string | null {
   const d = new Date(iso);
   if (!Number.isFinite(d.getTime())) return null;
-  const time = formatTimeHm(d);
-  const today = d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
-  return today ? time : `${formatWeekdayShort(d).toLocaleUpperCase()} ${time}`;
+  return formatTimeHm(d);
+}
+
+type TeeT = (key: string, opts?: Record<string, unknown>) => string;
+const localDayIndex = (d: Date) => Math.round(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() / 86_400_000);
+
+/** Heading label for the shown tee times, in the viewer's local time:
+ *  TODAY / TOMORROW / full weekday (2–6 days) / short weekday + date (7+);
+ *  shown times on different local days give "WED–THU". Null when none. */
+export function pickTeeDayLabel(isos: string[], now: Date, t: TeeT): string | null {
+  const ds = isos.map((s) => new Date(s)).filter((d) => Number.isFinite(d.getTime())).sort((a, b) => a.getTime() - b.getTime());
+  if (!ds.length) return null;
+  const first = ds[0];
+  const last = ds[ds.length - 1];
+  let day: string;
+  if (localDayIndex(first) !== localDayIndex(last)) {
+    day = `${formatWeekdayShortGB(first)}\u2013${formatWeekdayShortGB(last)}`;
+  } else {
+    const ahead = localDayIndex(first) - localDayIndex(now);
+    if (ahead <= 0) day = t('overview.hero.picksTeeToday', { defaultValue: 'TODAY' });
+    else if (ahead === 1) day = t('overview.hero.picksTeeTomorrow', { defaultValue: 'TOMORROW' });
+    else if (ahead <= 6) day = formatWeekdayLong(first);
+    else day = `${formatWeekdayShortGB(first)} ${formatDayMonthShortGB(first)}`;
+  }
+  return t('overview.hero.picksTeeTimes', { day: day.toLocaleUpperCase(), defaultValue: `TEE TIMES \u00b7 ${day.toLocaleUpperCase()}` });
 }
 
 /**
@@ -568,6 +592,18 @@ function PicksBlock({
 }) {
   const { t } = useTranslation('tourhub');
   const cards = picks.slice(0, 3);
+  /* A card shows a tee time only with no figure line and no start — the same
+     rule the card applies below; the heading's day reads exactly these. */
+  const teeFor = (p: AITopContender): string | null => {
+    const id = String(p.playerId);
+    const line = boardByPlayer.get(id);
+    const hasFigure = phase === 'completed' ? !!settledFigureFor(line) : phase === 'live' && !!line && line.position != null;
+    if (hasFigure || startedPlayers.has(id)) return null;
+    const iso = teeByPlayer?.get(id) ?? null;
+    return iso && pickTeeText(iso) ? iso : null;
+  };
+  const shownTees = cards.map(teeFor).filter((x): x is string => !!x);
+  const teeDay = shownTees.length ? pickTeeDayLabel(shownTees, new Date(), t as unknown as TeeT) : null;
 
   return (
     <div data-overview-picks style={{ background: PAGE_CANVAS }}>
@@ -576,6 +612,9 @@ function PicksBlock({
         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
             key, so band and sheet cannot drift apart in translation. */}
         <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
+        {teeDay ? (
+          <span data-overview-picks-tee-day style={{ marginLeft: 'auto', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap' }}>{teeDay}</span>
+        ) : null}
       </div>
       {intro ? (
         <p data-overview-picks-intro style={{ margin: '0 20px 9px', marginTop: 0, fontSize: 12.5, lineHeight: 1.5, color: OVERVIEW.soft }}>{intro}</p>
@@ -617,7 +656,7 @@ function PicksBlock({
             // and no win % on upcoming picks — an unlabelled number is not data.
             figureLine = null;
           }
-          const tee = !figureLine && !startedPlayers.has(String(p.playerId)) ? teeByPlayer?.get(String(p.playerId)) ?? null : null;
+          const tee = !figureLine ? teeFor(p) : null;
           const teeText = tee ? pickTeeText(tee) : null;
 
           return (
@@ -652,10 +691,7 @@ function PicksBlock({
                     {figureLine}
                   </div>
                 ) : teeText ? (
-                  <div data-overview-pick-tee style={{ marginTop: 3, display: 'flex', alignItems: 'baseline', whiteSpace: 'nowrap', ...FIGS }}>
-                    <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', color: 'rgba(248,250,252,0.42)', marginRight: 5, flex: 'none' }}>{t('overview.hero.picksTees', { defaultValue: 'TEES' })}</span>
-                    <span data-overview-pick-tee-time style={{ fontSize: 12.5, fontWeight: 700, color: '#F8FAFC', fontVariantNumeric: 'tabular-nums', flex: 'none' }}>{teeText}</span>
-                  </div>
+                  <div data-overview-pick-tee data-overview-pick-tee-time style={{ marginTop: 3, fontSize: 12.5, fontWeight: 700, color: '#F8FAFC', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', flex: 'none', ...FIGS }}>{teeText}</div>
                 ) : null}
                 {/* CORRECTIONS I.2: a pick leading or level has nothing to reach — no
                     line at all. The dash is only for a target genuinely out of reach. */}

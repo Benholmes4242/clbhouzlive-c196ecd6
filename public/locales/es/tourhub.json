@@ -107,7 +107,10 @@
     "hero": {
       "stateLive": "EN VIVO",
       "stateFinal": "RESULTADOS",
-      "factRound": "RONDA"
+      "factRound": "RONDA",
+      "picksTeeTimes": "TEE TIMES · {{day}}",
+      "picksTeeToday": "TODAY",
+      "picksTeeTomorrow": "TOMORROW"
     },
     "leaderboardBand": {
       "ctaUpcoming": "View tournament",

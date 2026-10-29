@@ -130,7 +130,10 @@
       "firstTee": "[First tee]",
       "defending": "[Defending]",
       "roundNode": "[~~Ř{{round}}~~]",
-      "tiedCaps": "[~~{{words}} ţíéđ~~]"
+      "tiedCaps": "[~~{{words}} ţíéđ~~]",
+      "picksTeeTimes": "TEE TIMES · {{day}}",
+      "picksTeeToday": "TODAY",
+      "picksTeeTomorrow": "TOMORROW"
     },
     "leaderboardBand": {
       "ctaUpcoming": "[~~View tournament~~]",

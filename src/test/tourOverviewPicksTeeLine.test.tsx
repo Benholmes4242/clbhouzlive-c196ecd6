@@ -37,8 +37,8 @@ vi.mock('@/features/tourhub/tournament-v2/sections/FullBoardSheet', () => ({
   FullBoardSheet: (props: { open: boolean; entries: unknown[]; meta: unknown }) => { f.sheet(props); return props.open ? <div data-testid="full-board-sheet" /> : null; },
 }));
 
-import { HeroBoardSection, pickTeeText } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
-import { formatTimeHm, formatWeekdayShort } from '@/i18n/format';
+import { HeroBoardSection, pickTeeDayLabel, pickTeeText } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
+import { formatDayMonthShortGB, formatTimeHm, formatWeekdayLong, formatWeekdayShortGB } from '@/i18n/format';
 
 const at = (days: number) => { const d = new Date(); d.setDate(d.getDate() + days); d.setHours(14, 5, 0, 0); return d.toISOString(); };
 const idle = (id: string) => ({ id: `r${id}`, position: 1, position_tied: true, score: 0, player: { id, full_name: `Player ${id}` } }) as unknown as BoardEntry;
@@ -53,16 +53,22 @@ const card = () => document.querySelector('[data-overview-pick-card]') as HTMLEl
 
 describe('picks tee line', () => {
   afterEach(() => { cleanup(); f.tees = { data: undefined }; });
-  it('unstarted pick with a tee time today shows TEES and the time', () => {
+  it('unstarted pick with a tee time today shows the viewer-local time', () => {
     f.picks = [{ playerId: 'p1', playerName: 'Player p1' }];
     f.tees = { data: new Map([['p1', at(0)]]) };
     mount([{ ...idle('p1'), position: null } as unknown as BoardEntry]);
     expect(card().querySelector('[data-overview-pick-tee]')).not.toBeNull();
     expect(card().querySelector('[data-overview-pick-tee-time]')?.textContent).toBe(formatTimeHm(at(0)));
   });
-  it('tomorrow shows the weekday before the time', () => {
-    expect(pickTeeText(at(1))).toBe(`${formatWeekdayShort(at(1)).toLocaleUpperCase()} ${formatTimeHm(at(1))}`);
+  it('the card shows the time only: no TEES label, no weekday', () => {
+    expect(pickTeeText(at(1))).toBe(formatTimeHm(at(1)));
     expect(pickTeeText(at(0))).toBe(formatTimeHm(at(0)));
+    f.picks = [{ playerId: 'p1', playerName: 'Player p1' }];
+    f.tees = { data: new Map([['p1', at(3)]]) };
+    mount([{ ...idle('p1'), position: null } as unknown as BoardEntry]);
+    const tee = card().querySelector('[data-overview-pick-tee]')!;
+    expect(tee.textContent).toBe(formatTimeHm(at(3)));
+    expect(tee.children.length).toBe(0);
   });
   it('a started pick shows position and score and no tee line', () => {
     f.picks = [{ playerId: 'p1', playerName: 'Player p1' }];
@@ -83,5 +89,58 @@ describe('picks tee line', () => {
     mount([{ ...idle('p1'), position: 1, position_tied: false, score: -10, round_1: -10 } as BoardEntry], 'completed');
     expect(card().querySelector('[data-overview-pick-tee]')).toBeNull();
     expect(card().querySelector('[data-overview-pick-figure]')).not.toBeNull();
+  });
+});
+
+const T = (k: string, o?: Record<string, unknown>) => k.endsWith('picksTeeTimes') ? `TEE TIMES · ${o?.day}` : k.endsWith('Today') ? 'TODAY' : 'TOMORROW';
+const on = (base: Date, days: number, h = 14) => { const d = new Date(base); d.setDate(d.getDate() + days); d.setHours(h, 5, 0, 0); return d.toISOString(); };
+
+describe('picks heading tee day', () => {
+  const now = new Date(2026, 9, 28, 9, 0, 0); // Wed 28 Oct, local
+  afterEach(() => { cleanup(); f.tees = { data: undefined }; });
+  it('today', () => { expect(pickTeeDayLabel([on(now, 0)], now, T)).toBe('TEE TIMES · TODAY'); });
+  it('tomorrow', () => { expect(pickTeeDayLabel([on(now, 1)], now, T)).toBe('TEE TIMES · TOMORROW'); });
+  it('three days ahead: full weekday', () => {
+    expect(pickTeeDayLabel([on(now, 3)], now, T)).toBe(`TEE TIMES · ${formatWeekdayLong(on(now, 3)).toLocaleUpperCase()}`);
+  });
+  it('nine days ahead: short weekday and date', () => {
+    const d = on(now, 9);
+    expect(pickTeeDayLabel([d], now, T)).toBe(`TEE TIMES · ${`${formatWeekdayShortGB(d)} ${formatDayMonthShortGB(d)}`.toLocaleUpperCase()}`);
+  });
+  it('tee times on different local days: WED–THU', () => {
+    expect(pickTeeDayLabel([on(now, 1, 8), on(now, 0, 23)], now, T)).toBe(`TEE TIMES · ${formatWeekdayShortGB(on(now, 0)).toLocaleUpperCase()}–${formatWeekdayShortGB(on(now, 1)).toLocaleUpperCase()}`);
+  });
+  it('no label without tee times', () => { expect(pickTeeDayLabel([], now, T)).toBeNull(); });
+  const heading = () => document.querySelector('[data-overview-picks-tee-day]');
+  it('heading shows the label while a card shows a tee time', () => {
+    f.picks = [{ playerId: 'p1', playerName: 'Player p1' }];
+    f.tees = { data: new Map([['p1', at(0)]]) };
+    mount([{ ...idle('p1'), position: null } as unknown as BoardEntry]);
+    expect(heading()).not.toBeNull();
+  });
+  it('no heading label with no tee sheet', () => {
+    f.picks = [{ playerId: 'p1', playerName: 'Player p1' }];
+    mount([{ ...idle('p1'), position: null } as unknown as BoardEntry]);
+    expect(heading()).toBeNull();
+  });
+  it('no heading label when completed', () => {
+    f.picks = [{ playerId: 'p1', playerName: 'Player p1' }];
+    f.tees = { data: new Map([['p1', at(0)]]) };
+    mount([{ ...idle('p1'), position: 1, position_tied: false, score: -10, round_1: -10 } as BoardEntry], 'completed');
+    expect(heading()).toBeNull();
+  });
+  it('the label disappears when the last pick starts', () => {
+    f.picks = [{ playerId: 'p1', playerName: 'Player p1' }];
+    f.tees = { data: new Map([['p1', at(0)]]) };
+    const r = mount([{ ...idle('p1'), position: null } as unknown as BoardEntry]);
+    expect(heading()).not.toBeNull();
+    r.rerender(
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+        <MemoryRouter>
+          <HeroBoardSection tournamentId="event" entries={[{ ...idle('p1'), score: -1, thru: 2, position_tied: false } as BoardEntry, { ...idle('p2'), position: 2 } as BoardEntry]} phase="live" currentRound={1} totalRounds={4} venuePar={72} />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+    expect(heading()).toBeNull();
   });
 });

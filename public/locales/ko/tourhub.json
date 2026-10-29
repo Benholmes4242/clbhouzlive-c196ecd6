@@ -107,7 +107,10 @@
     "hero": {
       "stateLive": "라이부",
       "stateFinal": "결과",
-      "factRound": "라운드"
+      "factRound": "라운드",
+      "picksTeeTimes": "TEE TIMES · {{day}}",
+      "picksTeeToday": "TODAY",
+      "picksTeeTomorrow": "TOMORROW"
     },
     "leaderboardBand": {
       "ctaUpcoming": "View tournament",
