@@ -11,6 +11,15 @@ import { resolve } from 'node:path';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 
+// The photo hero's two reads, mocked so the header tests stay about the header.
+let mockStanding: { globalRank: number | null; regionalRank: number | null; usaRank: number | null } | null = null;
+let mockRefLine: string | null = null;
+vi.mock('@/hooks/useCourseTop100Standing', () => ({ useCourseTop100Standing: () => ({ data: mockStanding }) }));
+vi.mock('@/components/courses/course-detail/about/useHeroReferenceLine', () => ({
+  TEE_CHANGED_EVENT: 'clb:course-tee-changed',
+  useHeroReferenceLine: () => mockRefLine,
+}));
+
 const rec = {
   isRecording: false, duration: 0, stream: null as MediaStream | null, audioBlob: null as Blob | null,
   startRecording: vi.fn(), stopRecording: vi.fn(), resetRecording: vi.fn(),
