@@ -6,6 +6,7 @@
  * Continue and Skip both move to step 4 keeping whatever is filled.
  */
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { PhoneInputWithDialCode } from '@/components/business/PhoneInputWithDialCode';
 import { DAYS_ORDER, PRIMARY_ACTION_OPTIONS, SOCIAL_PLATFORMS, getFacilitiesForCategory, type Day, type OpeningHoursEntry, type PrimaryActionKey, type SocialFields } from '@/components/business/editor/editorTypes';
@@ -27,7 +28,8 @@ const SOC_GLYPH: Record<string, string> = { instagram: 'IG', tiktok: 'TT', twitt
  * it and keep the edits (the draft is already updated live). */
 export function BizcSheet({ title, sub, onDone, children, testId, hideHeader = false, actionLabel = 'Done', onAction, actionDisabled = false, hideAction = false }: { title: string; sub?: string; onDone: () => void; children: ReactNode; testId: string; hideHeader?: boolean; actionLabel?: string; onAction?: () => void; actionDisabled?: boolean; hideAction?: boolean }) {
   const touchY = useRef<number | null>(null);
-  return (
+  // Portalled to body so no ancestor transform can become its containing block.
+  return createPortal(
     <>
       <div className="bizc-sheet-scrim" onClick={onDone} aria-hidden="true" />
       <div
@@ -49,7 +51,8 @@ export function BizcSheet({ title, sub, onDone, children, testId, hideHeader = f
         {sub && <p className="bizc-sheet-sub">{sub}</p>}
         {children}
       </div>
-    </>
+    </>,
+    document.body,
   );
 }
 
