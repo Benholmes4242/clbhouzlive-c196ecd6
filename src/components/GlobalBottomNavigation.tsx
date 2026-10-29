@@ -394,7 +394,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               left: 0,
               right: 0,
               bottom: 20,
-              zIndex: Z.nav,
+              zIndex: Z.bottomNav,
               pointerEvents: 'none',
               display: 'flex',
               justifyContent: 'center',
