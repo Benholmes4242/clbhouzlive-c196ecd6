@@ -517,13 +517,37 @@ export function HeroBoardSection({
   );
 }
 
-/** "14:05" today in the viewer's local time, else "THU 14:05". */
-export function pickTeeText(iso: string, now: Date = new Date()): string | null {
+/** The card shows the time only ("14:05", viewer's local time); the day moves
+ *  to the picks heading via pickTeeDayLabel (BRIEF — PICK TEE TIMES: THE DAY
+ *  MOVES TO THE HEADING). */
+export function pickTeeText(iso: string): string | null {
   const d = new Date(iso);
   if (!Number.isFinite(d.getTime())) return null;
-  const time = formatTimeHm(d);
-  const today = d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
-  return today ? time : `${formatWeekdayShort(d).toLocaleUpperCase()} ${time}`;
+  return formatTimeHm(d);
+}
+
+type TeeT = (key: string, opts?: Record<string, unknown>) => string;
+const localDayIndex = (d: Date) => Math.round(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() / 86_400_000);
+
+/** Heading label for the shown tee times, in the viewer's local time:
+ *  TODAY / TOMORROW / full weekday (2–6 days) / short weekday + date (7+);
+ *  shown times on different local days give "WED–THU". Null when none. */
+export function pickTeeDayLabel(isos: string[], now: Date, t: TeeT): string | null {
+  const ds = isos.map((s) => new Date(s)).filter((d) => Number.isFinite(d.getTime())).sort((a, b) => a.getTime() - b.getTime());
+  if (!ds.length) return null;
+  const first = ds[0];
+  const last = ds[ds.length - 1];
+  let day: string;
+  if (localDayIndex(first) !== localDayIndex(last)) {
+    day = `${formatWeekdayShortGB(first)}\u2013${formatWeekdayShortGB(last)}`;
+  } else {
+    const ahead = localDayIndex(first) - localDayIndex(now);
+    if (ahead <= 0) day = t('overview.hero.picksTeeToday', { defaultValue: 'TODAY' });
+    else if (ahead === 1) day = t('overview.hero.picksTeeTomorrow', { defaultValue: 'TOMORROW' });
+    else if (ahead <= 6) day = formatWeekdayLong(first);
+    else day = `${formatWeekdayShortGB(first)} ${formatDayMonthShortGB(first)}`;
+  }
+  return t('overview.hero.picksTeeTimes', { day: day.toLocaleUpperCase(), defaultValue: `TEE TIMES \u00b7 ${day.toLocaleUpperCase()}` });
 }
 
 /**
