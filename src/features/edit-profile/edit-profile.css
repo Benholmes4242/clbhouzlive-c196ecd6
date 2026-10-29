@@ -116,3 +116,15 @@
 .ep-shell .ep-links-options .ep-opt{height:auto;border-radius:0;justify-content:space-between;box-shadow:none;transition:none;padding:13px 0;color:var(--ep-ink);font-weight:600}
 .ep-visibility-row{display:block;border-top:1px solid var(--ep-hair)}
 .ep-shell .ep-visibility-row .ep-row{border-top:0}
+
+/* EP5 completion card owns its two seams; all paint is local semantic material. */
+.ep-shell{--ep-progress-missing:rgba(255,255,255,0.12);--ep-chip-ground:rgba(255,255,255,0.07);--ep-chip-hair:rgba(255,255,255,0.14)}
+.ep-completion{background:var(--ep-card);border:1px solid var(--ep-hair);border-radius:18px;padding:14px 16px;margin-top:12px}
+.ep-completion>b{font-size:15px;font-weight:600}
+.ep-completion>p{font-size:13px;color:var(--ep-mute);margin-top:2px}
+.ep-completion-bar{display:flex;gap:4px;margin-top:12px}
+.ep-completion-bar i{flex:1;height:4px;border-radius:2px;background:var(--ep-progress-missing)}
+.ep-completion-bar i[data-done=true]{background:var(--ep-ink)}
+.ep-completion-chips{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.ep-shell .ep-completion-chip{height:32px;padding:0 12px;border-radius:999px;background:var(--ep-chip-ground);border:1px solid var(--ep-chip-hair);color:var(--ep-ink);font-size:13px;font-weight:600}
+.ep-completion+.ep-group{margin-top:12px}

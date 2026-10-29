@@ -4,7 +4,7 @@
  * sheet open while the page's saved line shows the existing retry copy.
  * Username changes only through the change_username RPC, which owns the
  * 30-day rule; the live check mirrors setup's query. */
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { Check, ChevronRight } from 'lucide-react';
@@ -35,9 +35,11 @@ interface Props {
 
 type Sheet = 'name' | 'username' | 'bio' | 'location' | 'gender' | null;
 
-export function EditProfileYou(p: Props) {
+export interface YouActions { open: (sheet: 'bio' | 'username') => void }
+export const EditProfileYou = forwardRef<YouActions, Props>(function EditProfileYou(p, ref) {
   const { t } = useTranslation();
   const [sheet, setSheet] = useState<Sheet>(null);
+  useImperativeHandle(ref, () => ({ open: setSheet }));
   const close = () => setSheet(null);
   const save = async (fields: YouFields, patch: YouPatch) => { if (await p.onSave(fields, patch)) close(); };
   const loc = locationValue(p.city, p.country);
@@ -79,7 +81,7 @@ export function EditProfileYou(p: Props) {
       )}
     </>
   );
-}
+});
 
 function NameSheet({ displayName, firstName, lastName, onClose, onSave }: { displayName: string; firstName: string; lastName: string; onClose: () => void; onSave: (patch: YouPatch) => Promise<void> }) {
   const { t } = useTranslation();

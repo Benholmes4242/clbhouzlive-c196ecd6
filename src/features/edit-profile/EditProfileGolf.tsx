@@ -1,8 +1,8 @@
-/** EP3 owns only hidden Edit profile golf presentation. Canonical handicap
+/** EP3 owns only Edit profile golf presentation. Canonical handicap
  * resolution, home-club picker, coach sheets and AddCourseModal remain shared.
  * Golf saves are isolated: membership uses user_home_clubs, not an invented
  * additional_clubs profile column. Visibility is never part of these patches. */
-import { useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, ChevronRight, MapPin, Plus, X } from 'lucide-react';
@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { BizcSheet } from '@/features/business-create/BusinessCreateStep3';
 import { openHomeClubPicker } from '@/features/home-club/homeClubPickerStore';
 import { useHomeClubStatus } from '@/features/home-club/useHomeClubStatus';
-import { YourCoachRow } from '@/features/coach/CoachSheets';
+import { YourCoachRow, type CoachRowActions } from '@/features/coach/CoachSheets';
 import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { supabase } from '@/integrations/supabase/client';
@@ -32,12 +32,15 @@ interface Props {
   onSave: (fields: GolfFields, patch: GolfPatch) => Promise<boolean>;
 }
 
-export function EditProfileGolf(p: Props) {
+export interface GolfActions { open: (sheet: 'homeClub' | 'handicap' | 'topTen' | 'coach') => void }
+export const EditProfileGolf = forwardRef<GolfActions, Props>(function EditProfileGolf(p, ref) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const home = useHomeClubStatus(p.userId);
   const { topTen } = useUserTopTenCourses(p.userId);
   const [sheet, setSheet] = useState<GolfFields | 'topTen' | null>(null);
+  const coachRow = useRef<CoachRowActions>(null);
+  useImperativeHandle(ref, () => ({ open: key => { if (key === 'coach') coachRow.current?.open(); else setSheet(key); } }));
   const [busy, setBusy] = useState(false);
   const close = () => { if (!busy) setSheet(null); };
   const resolved = resolveDisplayHandicap({ egHandicapIndex: p.egHandicapIndex, manualHandicapIndex: p.manualHandicapIndex, hasWhsConnection: !!p.connection });
@@ -67,7 +70,7 @@ export function EditProfileGolf(p: Props) {
       {row('handicap', 'Handicap', resolved.value != null ? <>{formatHcp(resolved.value)}{resolved.source === 'whs' ? ` · ${body}` : <span className="ep-golf-mute"> Your own</span>}</> : 'Connect your handicap', resolved.value == null, () => setSheet('handicap'), resolved.source === 'whs' && resolved.value != null ? 'Synced' : undefined)}
       {row('homeClub', 'Home club', pending ? <>{pending} · <span className="ep-golf-mute">pending</span></> : p.form.homeClubName || 'Add your home club', !pending && !p.form.homeClubName, () => setSheet('homeClub'))}
       {row('additionalClubs', 'Other clubs', clubs.length ? <>{clubs[0]?.name}{clubs.length > 1 && <span className="ep-golf-mute"> +{clubs.length - 1}</span>}</> : 'Add a club', !clubs.length, () => setSheet('additionalClubs'))}
-      <YourCoachRow viewerId={p.userId} appearance="editProfile" />
+      <YourCoachRow ref={coachRow} viewerId={p.userId} appearance="editProfile" />
       {row('topTen', 'Top 10', topTen.length ? `${topTen.length} of 10 chosen` : 'Pick your ten courses', !topTen.length, () => setSheet('topTen'))}
     </div>
     {sheet === 'handicap' && <HandicapSheet connected={!!p.connection} value={resolved.value} own={p.form.handicapIndex || formHcpFromDb(p.manualHandicapIndex)} body={body} syncedAt={p.connection?.last_synced_at ?? null} busy={busy} onClose={close} onNavigate={path => { close(); navigate(path); }} onSave={async handicapIndex => { if (await save('handicap', { handicapIndex })) setSheet(null); }} />}
@@ -83,7 +86,7 @@ export function EditProfileGolf(p: Props) {
     </BizcSheet>}
     {sheet === 'topTen' && <AddCourseModal userId={p.userId} existingCourseIds={[]} initialTab="manage" onClose={() => { close(); void qc.invalidateQueries({ queryKey: ['user-top-ten-courses', p.userId] }); }} />}
   </>;
-}
+});
 
 function HandicapSheet(p: { connected: boolean; value: number | null; own: string; body: string; syncedAt: string | null; busy: boolean; onClose: () => void; onNavigate: (path: string) => void; onSave: (value: string) => Promise<void> }) {
   const [value, setValue] = useState(p.own);

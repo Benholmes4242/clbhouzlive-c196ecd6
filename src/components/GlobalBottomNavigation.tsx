@@ -77,7 +77,7 @@ const HIDDEN_ROUTES = [
   '/messages',
   '/join',
   '/post-v2',
-  '/edit-profile-v2',
+  '/edit-profile',
 ];
 
 const HIDDEN_ROUTE_PREFIXES = [
@@ -272,14 +272,10 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   }, [triggerPrefetch, handlePrefetch]);
 
   // Route hide detection.
-  const isOnboardingEditProfile =
-    location.pathname === '/edit-profile' &&
-    new URLSearchParams(location.search).get('onboarding') === '1';
   const shouldHideForRoute =
     HIDDEN_ROUTES.includes(location.pathname) ||
     HIDDEN_ROUTE_PREFIXES.some(prefix => location.pathname.startsWith(prefix)) ||
-    HIDDEN_ROUTE_PATTERNS.some(re => re.test(location.pathname)) ||
-    isOnboardingEditProfile;
+    HIDDEN_ROUTE_PATTERNS.some(re => re.test(location.pathname));
   const showNavigation = isVisible && !shouldHideForRoute;
 
   // The pill MEASURES ITSELF into --nav-pill-h, and --bottom-nav-height carries

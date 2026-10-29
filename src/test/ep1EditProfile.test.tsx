@@ -27,7 +27,7 @@ import EditProfile from '@/pages/EditProfile';
 
 const base = { id: 'me', display_name: 'Benjamin Holmes', username: 'benjaminholmes', city: 'London', home_club: 'Sundridge Park', manual_handicap_index: 1.5, eg_handicap_index: null, header_photo_url: null, profile_photo_url: null, has_completed_onboarding: true };
 let queryClient: QueryClient;
-const mount = (path = '/edit-profile-v2') => render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={[path]}><Routes><Route path="/edit-profile-v2" element={<EditProfile />} /></Routes></MemoryRouter></QueryClientProvider>);
+const mount = (path = '/edit-profile') => render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={[path]}><Routes><Route path="/edit-profile" element={<EditProfile />} /></Routes></MemoryRouter></QueryClientProvider>);
 beforeEach(() => { queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } }); h.user = { id: 'me' }; h.profile = { ...base }; h.save.mockReset(); h.save.mockResolvedValue(true); URL.createObjectURL = vi.fn(() => 'blob:x'); URL.revokeObjectURL = vi.fn(); });
 afterEach(() => { cleanup(); queryClient.clear(); });
 
@@ -44,8 +44,8 @@ describe('EP1 frame', () => {
     h.user = null; h.profile = null; mount(); expect(screen.queryByTestId('ep-card')).toBeNull();
   });
   it('bottom nav hides and chrome registry has an exact entry', () => {
-    expect(readFileSync('src/components/GlobalBottomNavigation.tsx', 'utf8')).toMatch(/HIDDEN_ROUTES = \[[^\]]*'\/edit-profile-v2'/);
-    expect(readFileSync('src/features/chrome-v2/registry.ts', 'utf8')).toMatch(/exact: '\/edit-profile-v2' \},\s+spec: \{ chrome: 'none'/);
+    expect(readFileSync('src/components/GlobalBottomNavigation.tsx', 'utf8')).toMatch(/HIDDEN_ROUTES = \[[^\]]*'\/edit-profile'/);
+    expect(readFileSync('src/features/chrome-v2/registry.ts', 'utf8')).toMatch(/exact: '\/edit-profile' \},\s+spec: \{ chrome: 'none'/);
   });
   it('tabs switch and Settings renders SettingsTabContent', () => {
     mount(); expect(screen.queryByTestId('settings-tab-content')).toBeNull();
@@ -53,9 +53,9 @@ describe('EP1 frame', () => {
     expect(screen.getByTestId('settings-tab-content')).toBeInTheDocument();
     expect(screen.queryByTestId('ep-card')).toBeNull();
   });
-  it('?tab=settings opens Settings', () => { mount('/edit-profile-v2?tab=settings'); expect(screen.getByTestId('settings-tab-content')).toBeInTheDocument(); });
-  it('/edit-profile still routes to ManageProfile', () => {
-    expect(readFileSync('src/App.tsx', 'utf8')).toMatch(/path="\/edit-profile" element=\{<Suspense fallback=\{<ManagePageSkeleton \/>\}><ManageProfilePage \/>/);
+  it('?tab=settings opens Settings', () => { mount('/edit-profile?tab=settings'); expect(screen.getByTestId('settings-tab-content')).toBeInTheDocument(); });
+  it('/edit-profile routes to the new EditProfile page', () => {
+    expect(readFileSync('src/App.tsx', 'utf8')).toMatch(/path="\/edit-profile" element=\{<Suspense fallback=\{<ManagePageSkeleton \/>\}><EditProfilePage \/>/);
   });
 });
 
