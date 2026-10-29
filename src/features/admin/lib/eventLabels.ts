@@ -84,7 +84,7 @@ export const EVENT_LABELS: Record<string, string> = {
   post_draft_saved: 'Post draft saved',
   post_composer_abandoned: 'Post composer abandoned',
   post_submitted: 'Post submitted',
-  review_skipped_to_post: 'Review skipped to post',
+  review_score_nudge: 'Review score nudge',
   review_voice_started: 'Review voice started',
 
   rating_modal_opened: 'Rating opened',

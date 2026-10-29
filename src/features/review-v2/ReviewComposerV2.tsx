@@ -100,24 +100,6 @@ const STEP1_HEADING: React.CSSProperties = {
   fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)',
 };
 
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        /* READ floor. 10.5 -> 11. */
-        fontSize: 11,
-        fontWeight: 700,
-        color: RV2.eyebrow,
-        textTransform: 'uppercase',
-        letterSpacing: '0.14em',
-        marginBottom: 12,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
 /* THE TEE ROW IS GONE FROM THE COMPOSER (phase 2 §7).
  *
  * A tee is a fact about the ROUND, not part of a review, and no screen in the
@@ -480,8 +462,6 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
      course page, or an edit has no step behind them, so their leading control
      is a CLOSE, not a back arrow that would go somewhere they never were. */
   const cameFromStepOne = useComposerFlowStore((st) => st.handoff != null);
-  const handoffReturnPath = useComposerFlowStore((st) => st.handoff?.returnPath ?? null);
-  const openPostStudio = usePostStudioStore((st) => st.openPostStudio);
   const leadingIsClose = step === FIRST_STEP && !cameFromStepOne;
 
   /* THE THRESHOLD LINE'S TWO FACTS: how many ratings this course already has,
@@ -603,8 +583,6 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
    */
 
   const draftDirty =
-    /* The dial DISPLAYS 9.0 from the moment step 3 opens, so "there is a score"
-       is no longer evidence the member put anything in. The touched flag is. */
     composer.overallTouched ||
     composer.catsSet > 0 ||
     composer.state.reviewText.trim().length > 0 ||
@@ -633,10 +611,9 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
    * uploads every file then publishes in one transaction — or marks the
    * staged row failed. The review never exists half-finished.
    */
-  const overallTouchedAtSubmitRef = useRef<boolean | null>(null);
   const handleSubmit = useCallback(async () => {
-    const overallTouched = overallTouchedAtSubmitRef.current ?? composer.overallTouched;
-    overallTouchedAtSubmitRef.current = null;
+    if (!composer.canSubmit || submit.submitting) return;
+    const overallTouched = composer.state.overall != null;
     try {
       const mediaExpected = media.pendingMediaCount();
       const holeJob = holeTags.capture();
@@ -727,32 +704,41 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submit, media, composer, course.id, course.name, qc, isEditMode, mode, holeTags]);
 
+  const overallCardRef = useRef<HTMLDivElement>(null);
+  const scoreRowsRef = useRef<HTMLDivElement>(null);
+  const [flaggedCategories, setFlaggedCategories] = useState<CategoryKey[]>([]);
+  const [overallPulsing, setOverallPulsing] = useState(false);
+  const pulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (pulseTimer.current) clearTimeout(pulseTimer.current); }, []);
   const handlePrimary = useCallback(() => {
-    if (step === FIRST_STEP) {
-      // review_step_completed
-      analyticsEvents.track('review_step_completed', {
-        course_id: course.id,
-        step,
-        ms_on_step: Math.round(Date.now() - stepEnteredAtRef.current),
-      });
-      composer.setStep(LAST_STEP);
-      return;
+    if (submit.submitting) return;
+    if (step === LAST_STEP) {
+      const missing = missingScores(composer.state);
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (missing.overall) {
+        analyticsEvents.track('review_score_nudge', { missing: 'overall', count: 1 });
+        if (overallCardRef.current) scrollElementIntoView(overallCardRef.current, { offset: 100, behavior: reduced ? 'auto' : 'smooth' });
+        if (!reduced) {
+          setOverallPulsing(true);
+          if (pulseTimer.current) clearTimeout(pulseTimer.current);
+          pulseTimer.current = setTimeout(() => setOverallPulsing(false), 600);
+        }
+        return;
+      }
+      if (missing.categories.length) {
+        analyticsEvents.track('review_score_nudge', { missing: 'categories', count: missing.categories.length });
+        setFlaggedCategories(missing.categories);
+        const row = scoreRowsRef.current?.querySelector(`[data-score-category="${missing.categories[0]}"]`);
+        if (row) scrollElementIntoView(row, { offset: 100, behavior: reduced ? 'auto' : 'smooth' });
+        return;
+      }
     }
     analyticsEvents.track('review_step_completed', {
-      course_id: course.id,
-      step,
-      ms_on_step: Math.round(Date.now() - stepEnteredAtRef.current),
+      course_id: course.id, step, ms_on_step: Math.round(Date.now() - stepEnteredAtRef.current),
     });
-    // Captured BEFORE the confirm press flips it, for review_submitted.
-    overallTouchedAtSubmitRef.current = composer.overallTouched;
-    if (!composer.overallTouched) {
-      // Pressing a button that names the score IS setting the score.
-      // setOverall writes the same value and marks it touched, so the
-      // draft, the analytics and the submitted row all agree.
-      composer.setOverall(composer.state.overall ?? 9);
-    }
-    void handleSubmit();
-  }, [step, composer, course.id, handleSubmit]);
+    if (step === FIRST_STEP) composer.setStep(LAST_STEP);
+    else void handleSubmit();
+  }, [step, composer, course.id, handleSubmit, submit.submitting]);
 
   const handleRemove = useCallback(async () => {
     if (!existing) return;
@@ -791,30 +777,11 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   // outlives this instance across the create-to-edit remount.
 
 
-  // ---- gates and label -------------------------------------------------
-  // The dial no longer blocks the button: an untouched dial is confirmed by
-  // the press itself ("Post at 9.0"). The four categories are still required.
-  // composer.ratingGate is left untouched for anything else that reads it.
-  const gateMet = step === FIRST_STEP ? composer.wordsGate : composer.catsSet === 4;
-  const remaining = 4 - composer.catsSet;
-  const confirmScore = (composer.state.overall ?? 9).toFixed(1);
-
-  /* LABELS, IN ORDER: categories outstanding are counted; an untouched dial
-     names the score the press will commit; only then the plain submit. */
-  let buttonLabel: string;
-  if (submit.submitting) {
-    buttonLabel = isEditMode ? t('review.wizard.saving') : t('review.wizard.posting');
-  } else if (step === FIRST_STEP) {
-    buttonLabel = t('review.wizard.stepOne.continueToScore');
-  } else if (remaining > 0) {
-    buttonLabel = t('review.wizard.step3.catsGate', { count: remaining });
-  } else if (!composer.overallTouched) {
-    buttonLabel = isEditMode
-      ? t('review.wizard.step3.confirmSave', { score: confirmScore })
-      : t('review.wizard.step3.confirmPost', { score: confirmScore });
-  } else {
-    buttonLabel = isEditMode ? t('review.wizard.save') : t('review.wizard.step3.submit');
-  }
+  // Incomplete actions remain enabled: they guide, never implicitly score.
+  const action = scoreAction(composer.state, isEditMode, submit.submitting);
+  const buttonLabel = step === FIRST_STEP && !submit.submitting
+    ? t('review.wizard.stepOne.continueToScore')
+    : t(`review.wizard.${action.key}`, { count: action.count, category: action.category ? t(`review.subscore.${action.category}`) : undefined });
 
   /* THE FOOTER SUMMARY names what is actually there, and is omitted - never a
      placeholder - when there is nothing to name. */
@@ -852,60 +819,17 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         what: parts.join(t('review.wizard.step2.summaryJoin')),
       });
     }
-  } else if (composer.state.overall != null) {
-    footerSummary =
-      t('review.wizard.step3.summary', {
-        course: shortName,
-        score: composer.state.overall.toFixed(1),
-      }) + (composer.state.shareToFeed ? t('review.wizard.step3.summaryShare') : '');
   }
 
-  /* THE THRESHOLD LINE. Shown only while this course is still short of
-     t100_subscore_min_ratings, naming where the member's rating lands and what
-     it unlocks. Never a placeholder: no count, no line. */
   const existingRatings = ratingCountQ.data;
-  const thresholdLine =
-    existingRatings != null && existingRatings < subscoreMinRatings
-      ? t('review.wizard.step3.threshold', { ordinal: ordinal(existingRatings + 1) })
-      : null;
-
-  /* THE TWO SKIP LINKS.
-     STEP 2: shown only when the member has attached nothing and typed nothing —
-     passing with nothing is deliberate, so the link names what they get.
-     STEP 3: "post without rating it" changes PATH rather than skipping a field,
-     so it is never offered in EDIT MODE — a member editing a review they have
-     already published is not choosing between a review and a post. */
-  const step3Skip = step === LAST_STEP && !isEditMode;
-  const skipLabel = step3Skip
-    ? t('review.wizard.step3.skipToPost')
-    : step === FIRST_STEP && !hasMedia && !hasWords
-      ? t('review.wizard.stepOne.skipToScore')
-      : null;
-
-  /* CARRYING THE WORK ACROSS (§6). The local Files go over INTACT — the same
-     File objects the pipeline is holding, not copies and not re-encodes — so the
-     post composer's own pipeline receives exactly what the member picked. Items
-     WITHOUT a `file` are server media, which exist only in edit mode, and this
-     link is not offered there.
-     The review draft for this course is cleared: a member who chose not to write
-     a review must not be offered a restore of one later. */
-  const handleSkipToPost = useCallback(() => {
-    const files = media.items.map((it) => it.file).filter((f): f is File => !!f);
-    // Analytics callsite: review_skipped_to_post
-    analyticsEvents.track('review_skipped_to_post', {
-      media_count: files.length,
-      text_len: composer.state.reviewText.trim().length,
-    });
-    composer.clearDraft();
-    openPostStudio({
-      media: files,
-      caption: composer.state.reviewText,
-      entry: 'review_skip',
-      // The page step 1 was opened from, so closing the post composer lands
-      // where the flow began rather than back on the rate route.
-      returnPath: handoffReturnPath ?? '/',
-    });
-  }, [media.items, composer, openPostStudio, handoffReturnPath]);
+  const thresholdLine = existingRatings != null && existingRatings < subscoreMinRatings
+    ? t('review.wizard.step3.threshold', { ordinal: ordinal(existingRatings + 1) }) : null;
+  if (step === LAST_STEP) {
+    const line = scoreFooter(composer.state, thresholdLine);
+    footerSummary = line ? ('threshold' in line ? line.threshold : t(`review.wizard.${line.key}`, { score: line.score })) : null;
+  }
+  // Step 1's empty-state skip remains; the score step has no path-changing skip.
+  const skipLabel = step === FIRST_STEP && !hasMedia && !hasWords ? t('review.wizard.stepOne.skipToScore') : null;
 
   const cats: CategoryCopy[] = [
     { key: 'design', label: t('review.subscore.design'), hint: t('review.wizard.hint.design') },
@@ -1301,128 +1225,48 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         </>
       )}
 
-      {/* ================= STEP 3 of 3 - THE RATING =================
-          The dial and the breakdown are ONE screen now, with the live feedback
-          between them and the share row at the foot. */}
+      {/* Signed-off Step 2: the frozen compact/shared headers remain above. */}
       {step === LAST_STEP && (
-        <>
-          <section style={{ padding: '0 16px 16px' }}>
-            <h1
-              style={{
-                fontSize: 20,
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                marginBottom: 4,
-                color: RV2.ink,
-              }}
-            >
-              {t('review.wizard.step3.heading')}
-            </h1>
-            <p style={{ fontSize: 14, color: RV2.secondary, lineHeight: 1.5, margin: '0 0 16px' }}>
-              {t('review.wizard.step3.lede', { course: shortName })}
-            </p>
-            <div
-              style={{
-                background: RV2.cardBg,
-                borderRadius: RV2.cardRadius,
-                border: `1px solid ${RV2.hairline}`,
-                padding: '18px 18px 16px',
-              }}
-            >
-              <OverallScrubber
-                value={composer.state.overall}
-                onChange={composer.setOverall}
-                muted={!composer.overallTouched}
-                caption={composer.overallTouched
-                  ? t('review.wizard.step3.caption')
-                  : t('review.wizard.step3.captionUntouched', { score: (composer.state.overall ?? 9).toFixed(1) })}
-                ariaLabel={t('review.wizard.step0.a11y')}
-              />
-
-              {/* LIVE FEEDBACK — both conditional, neither invented. A hairline
-                  separates it from the dial; nothing renders at all when neither
-                  condition is met. */}
-              {(calibration || thresholdLine) && (
-                <div
-                  style={{
-                    marginTop: 16,
-                    paddingTop: 14,
-                    borderTop: `1px solid ${RV2.hairline}`,
-                    display: 'grid',
-                    gap: 6,
-                  }}
-                >
-                  {calibration && (
-                    <div style={{ fontSize: 13, lineHeight: 1.45, color: RV2.success }}>
-                      {t('review.wizard.step0.calibration', {
-                        ordinal: ordinal(calibration.ordinal),
-                        count: calibration.total,
-                      })}
-                    </div>
-                  )}
-                  {thresholdLine && (
-                    <div style={{ fontSize: 13, lineHeight: 1.45, color: RV2.success }}>
-                      {thresholdLine}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+        <div className="review-score-theme">
+          <h1 className="review-score-heading">{t('review.wizard.step3.heading')}</h1>
+          <div ref={overallCardRef} className="review-overall-card" data-pulsing={overallPulsing}>
+            <OverallScrubber value={composer.state.overall} onChange={composer.setOverall}
+              caption={t('review.wizard.step3.rulerHint')} ariaLabel={t('review.wizard.step0.a11y')}
+              calibration={calibration ? t(`review.wizard.step3.${calibration.ordinal === 1 ? 'calibrationFirst' : 'calibration'}`, {
+                ordinal: ordinal(calibration.ordinal), count: calibration.total,
+              }) : null} />
+          </div>
+          <div className="review-score-cats-intro">
+            <div className="review-score-kicker">{t('review.wizard.step3.breakdownLabel')}</div>
+            <p>{t('review.wizard.step3.catsIntro')}</p>
+          </div>
+          <div ref={scoreRowsRef}>
+            <CategoryGrid values={composer.state.scores} cats={cats} flagged={flaggedCategories}
+              tapToScore={t('review.wizard.step3.tapToScore')} stillToScore={t('review.wizard.step3.stillToScore')}
+              onChange={(key, value) => { composer.setCategory(key, value); setFlaggedCategories(old => old.filter(k => k !== key)); }} />
+          </div>
+          <section className="review-score-share-section">
+            <ShareToggle appearance="score" value={composer.state.shareToFeed} onChange={composer.setShareToFeed}
+              title={t('review.wizard.step3.shareTitle')}
+              sub={t(`review.wizard.step3.${scoreShareKey(media.count, hasWords)}`, { count: media.count })} />
           </section>
-
-          <section style={{ padding: '0 16px 16px' }}>
-            <Eyebrow>{t('review.wizard.step3.breakdownLabel')}</Eyebrow>
-            <p
-              style={{
-                fontSize: 13,
-                color: RV2.secondary,
-                lineHeight: 1.55,
-                margin: '0 0 16px',
-              }}
-            >
-              {t('review.wizard.step3.breakdownBody')}
-            </p>
-            <CategoryGrid
-              values={composer.state.scores}
-              onChange={composer.setCategory}
-              cats={cats}
-            />
-          </section>
-
-          {/* SHARE — ONE ROW, not a card, and the sub-line says what will
-              actually appear: a review when there are words or photographs, a
-              bare rating when there are neither. Default ON: 38% of all posts on
-              the platform come from this toggle. It is no longer a surprise
-              because the footer names it and the button says SUBMIT REVIEW. */}
-          <section style={{ padding: '0 16px 8px' }}>
-            <div style={{ borderTop: `1px solid ${RV2.hairline}` }}>
-              <ShareToggle
-                value={composer.state.shareToFeed}
-                onChange={composer.setShareToFeed}
-                bare
-                title={t('review.wizard.step3.shareTitle')}
-                sub={
-                  hasWords || hasMedia
-                    ? t('review.wizard.step3.shareSubReview')
-                    : t('review.wizard.step3.shareSubRatingOnly')
-                }
-              />
-            </div>
-          </section>
-        </>
+        </div>
       )}
 
       <div style={{ flex: 1, minHeight: 16 }} />
 
+      <div className={step === LAST_STEP ? "review-score-theme" : undefined}>
       <SubmitBar
-        appearance={step === FIRST_STEP ? 'step1' : 'default'}
+        appearance={step === FIRST_STEP ? 'step1' : 'score'}
+        quiet={action.quiet}
         label={buttonLabel}
-        enabled={gateMet && !submit.submitting}
+        enabled={!submit.submitting}
         onPress={handlePrimary}
         summary={footerSummary}
         skipLabel={skipLabel}
-        onSkip={!skipLabel ? undefined : step3Skip ? handleSkipToPost : handlePrimary}
+        onSkip={skipLabel ? handlePrimary : undefined}
       />
+      </div>
 
       {/* §1a: the one question before several paragraphs are thrown away. */}
       <DiscardDraftDialog
