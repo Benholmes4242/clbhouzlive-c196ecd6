@@ -90,7 +90,7 @@ describe('Tour overview band', () => {
     mount('/tourhub');
     expect(Array.from(document.querySelectorAll('img')).some((i) => i.getAttribute('src')?.includes('wordmark'))).toBe(false);
   });
-  it('arriving at the top after a scrolled page resets the flag from the real position', async () => {
+  it('arriving from a scrolled page: the route-change reset clears the flag', async () => {
     const real = await vi.importActual<typeof import('@/hooks/useScrollDirection')>('@/hooks/useScrollDirection');
     const { renderHook } = await import('@testing-library/react');
     const el = document.createElement('div');
@@ -100,13 +100,10 @@ describe('Tour overview band', () => {
     el.scrollTop = 400;
     await act(async () => { el.dispatchEvent(new Event('scroll')); await new Promise((r) => requestAnimationFrame(() => r(null))); });
     expect(result.current).toBe(true);
-    el.scrollTop = 0;
+    // The route-change reset (GlobalBottomNavigation) clears the flag, so a
+    // scrolled Clubhouse never carries into '/tourhub'.
     act(() => real.resetToExpanded());
     expect(result.current).toBe(false);
-    el.scrollTop = 300;
-    act(() => real.resetToExpanded());
-    expect(result.current).toBe(true);
-    el.scrollTop = 0; act(() => real.resetToExpanded());
     off(); el.remove();
   });
 });

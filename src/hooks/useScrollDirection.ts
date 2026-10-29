@@ -149,6 +149,73 @@ export function resetToExpanded() {
     rec.lastTop = getScrollTop(rec.target);
   }
   setState('expanded');
+  setScrolled(false);
+
+      if (top < TOP_ZONE) {
+        record.accum = 0;
+        record.dir = null;
+        setState('expanded');
+        return;
+      }
+      if (Math.abs(delta) < JITTER) return;
+
+      const dir: 'up' | 'down' = delta > 0 ? 'down' : 'up';
+      if (dir !== record.dir) {
+        record.dir = dir;
+        record.accum = 0;
+      }
+      record.accum += Math.abs(delta);
+
+      if (dir === 'down' && record.accum > DOWN_THRESHOLD) {
+        setState('condensed');
+      } else if (dir === 'up' && record.accum > UP_THRESHOLD) {
+        setState('expanded');
+      }
+    });
+  };
+}
+
+export function registerNavScroller(target: HTMLElement | Window | 'window' | null | undefined): () => void {
+  if (typeof window === 'undefined' || !target) return () => {};
+  const el: HTMLElement | Window = target === 'window' ? window : target;
+  if (scrollers.has(el)) return () => unregister(el);
+
+  const record: ScrollerRecord = {
+    target: el,
+    lastTop: getScrollTop(el),
+    accum: 0,
+    dir: null,
+    onScroll: () => {},
+  };
+  record.onScroll = makeHandler(record);
+  el.addEventListener('scroll', record.onScroll, { passive: true } as AddEventListenerOptions);
+  scrollers.set(el, record);
+
+  return () => unregister(el);
+}
+
+function unregister(el: HTMLElement | Window) {
+  const rec = scrollers.get(el);
+  if (!rec) return;
+  el.removeEventListener('scroll', rec.onScroll as EventListener);
+  scrollers.delete(el);
+}
+
+export function pushForceExpand(): () => void {
+  forceExpandCount++;
+  setState('expanded');
+  return () => {
+    forceExpandCount = Math.max(0, forceExpandCount - 1);
+  };
+}
+
+export function resetToExpanded() {
+  for (const rec of scrollers.values()) {
+    rec.accum = 0;
+    rec.dir = null;
+    rec.lastTop = getScrollTop(rec.target);
+  }
+  setState('expanded');
   // The new page's real position decides, so a scrolled flag never carries
   // across routes (BRIEF_TOUR_OVERVIEW_BAND §3).
   let top = 0;
