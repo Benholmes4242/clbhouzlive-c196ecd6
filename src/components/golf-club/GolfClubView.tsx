@@ -498,7 +498,7 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
     <div className="absolute inset-x-0 bottom-4 px-4 z-[1] flex flex-col gap-2">
       <CourseMasthead
         as="h1"
-        kicker={[course.sub_country || course.region, ...courseRankLabels(rankEntries)].filter(Boolean).join(' \u00B7 ') || null}
+        kicker={courseMastheadKicker(course, standing)}
         name={course.name}
         place={course.country || null}
       >
