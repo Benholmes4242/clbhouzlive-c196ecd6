@@ -25,7 +25,7 @@ describe('has-started rule', () => {
     expect(rowHasStarted({ thru: 0 })).toBe(false);
     expect(rowHasStarted({ thru: 1 })).toBe(true);
     expect(rowHasStarted({ round_1: 0 })).toBe(true);
-    expect(fieldHasStarted(field)).toBe(false);
+    expect(fieldHasStarted(field as any)).toBe(false);
   });
   it('earliest tee time is the minimum', () => {
     expect(earliestTeeTime([{ teeTime: '2026-10-29T14:10:00Z' }, { teeTime: '2026-10-29T13:00:00Z' }])).toBe('2026-10-29T13:00:00Z');
