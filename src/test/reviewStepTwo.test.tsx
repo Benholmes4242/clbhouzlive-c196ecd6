@@ -10,6 +10,8 @@ import { ShareToggle } from '@/features/review-v2/components/ShareToggle';
 import { calibrationRank } from '@/features/review-v2/hooks/useMyRatedScores';
 import { missingScores, scoreAction, scoreFooter, scoreShareKey, snapScore } from '@/features/review-v2/lib/scoreStepRules';
 import type { ExistingReview, ReviewComposerState } from '@/features/review-v2/types';
+import { categoryAverage } from '@/features/review-v2/lib/categoryAverage';
+import { ReviewStepHeading, ReviewCategoriesHeading } from '@/features/review-v2/components/ReviewScoreHeadings';
 
 const mocks = vi.hoisted(() => ({ rpc: vi.fn() }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: mocks.rpc } }));
@@ -81,13 +83,53 @@ describe('footer priority and share content', () => {
   it('threshold is absent without overall', () => { expect(scoreFooter(state, 'threshold')).toBeNull(); });
   it('threshold wins when overall is set, even while incomplete', () => { expect(scoreFooter({ ...state, overall: 8 }, 'threshold')).toEqual({ threshold: 'threshold' }); });
   it('incomplete with overall and no threshold has no line', () => { expect(scoreFooter({ ...state, overall: 8 }, null)).toBeNull(); });
-  it.each([[true, 'step3.postingLine'], [false, 'step3.savingLine']] as const)('ready share=%s has %s', (shareToFeed, key) => { expect(scoreFooter({ ...complete, shareToFeed }, null)).toEqual({ key, score: '8.6' }); });
+  it.each([true, false])('ready share=%s has no posting or saving line', shareToFeed => { expect(scoreFooter({ ...complete, shareToFeed }, null)).toBeNull(); });
   it.each([[3, true, 'shareMediaWords'], [3, false, 'shareMedia'], [0, true, 'shareWords'], [0, false, 'shareScore']] as const)('media=%s words=%s selects %s', (count, words, key) => { expect(scoreShareKey(count, words)).toBe(key); });
   it('share retains true-toggle behavior', () => {
     const change = vi.fn();
     render(<ShareToggle appearance="score" value onChange={change} title="x" sub="y" />);
     fireEvent.click(screen.getByRole('switch'));
     expect(change).toHaveBeenCalledWith(false);
+  });
+});
+
+describe('one-screen score composition', () => {
+  it('uses a heading counter on step 2 and retains the shared strip on step 1', () => {
+    const { container, rerender } = render(<ReviewStepHeading step={2} total={2} />);
+    expect(container.querySelector('[data-score-step-heading] h1')).not.toBeNull();
+    expect(container.querySelector('.review-score-step-label')).not.toBeNull();
+    expect(container.querySelector('[aria-hidden]')).toBeNull();
+    rerender(<ReviewStepHeading step={1} total={2} />);
+    expect(container.querySelector('[data-score-step-heading]')).toBeNull();
+    expect(container.querySelector('[aria-hidden]')?.children).toHaveLength(2);
+  });
+  it('rounds 9.2, 8.0, 7.4, 8.8 half up to 8.4 independently of overall', () => {
+    expect(categoryAverage(complete.scores)).toBe(8.4);
+  });
+  it.each(['design', 'condition', 'clubhouse', 'facilities'] as const)('has no average with %s missing', key => {
+    expect(categoryAverage({ ...complete.scores, [key]: null })).toBeNull();
+  });
+  it('hides average without a placeholder then shows the category mean', () => {
+    const { container, rerender } = render(<ReviewCategoriesHeading scores={state.scores} />);
+    expect(container.querySelector('[data-category-average]')).toBeNull();
+    rerender(<ReviewCategoriesHeading scores={complete.scores} />);
+    expect(container.querySelector('[data-category-average] b')?.textContent).toBe('8.4');
+    rerender(<ReviewCategoriesHeading scores={{ ...complete.scores, design: null }} />);
+    expect(container.querySelector('[data-category-average]')).toBeNull();
+  });
+  it('places the live share switch inside the footer above its action and retains threshold', () => {
+    const change = vi.fn();
+    const { container, rerender } = render(<SubmitBar appearance="score" label="action" enabled onPress={vi.fn()} summary="threshold"
+      share={<ShareToggle appearance="score" value onChange={change} title="share" sub="context" />} />);
+    const footer = container.querySelector('[data-submit-appearance="score"]');
+    const share = footer?.querySelector('.review-score-footer-share');
+    expect(share?.querySelector('[role="switch"]')).not.toBeNull();
+    expect(share?.nextElementSibling?.classList.contains('review-score-action')).toBe(true);
+    expect(footer?.firstElementChild?.classList.contains('review-score-footer-line')).toBe(true);
+    fireEvent.click(screen.getByRole('switch'));
+    expect(change).toHaveBeenCalledWith(false);
+    rerender(<SubmitBar appearance="score" label="action" enabled onPress={vi.fn()} summary={scoreFooter(complete, null)?.threshold} />);
+    expect(container.querySelector('.review-score-footer-line')).toBeNull();
   });
 });
 
