@@ -124,7 +124,12 @@ describe('header forms', () => {
     expect(kickerEl).toBeTruthy();
     expect(kickerEl.style.textTransform).toBe('uppercase');
     const nameEl = Array.from(masthead.querySelectorAll('div')).find((d) => d.textContent === 'Kingsbarns') as HTMLElement;
-    expect(nameEl.style.getPropertyValue('-webkit-line-clamp')).toBe('2');
+    // jsdom drops -webkit-line-clamp, so the two-line clamp is proven by its
+    // box siblings and by the nameClamp the header hands CourseMasthead.
+    expect(nameEl.style.display).toBe('-webkit-box');
+    expect(nameEl.style.overflow).toBe('hidden');
+    const headerSrc = readFileSync(resolve(__dirname, '../features/review-v2/components/ReviewComposerHeader.tsx'), 'utf8');
+    expect(headerSrc).toContain('nameClamp={2}');
     expect(Array.from(masthead.querySelectorAll('div')).some((d) => d.textContent === 'Scotland')).toBe(true);
   });
   it('keeps CourseTitleOverlay\u2019s kicker rule in the shared helper, country deciding the regional list', () => {
