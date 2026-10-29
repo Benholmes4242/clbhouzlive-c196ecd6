@@ -108,7 +108,10 @@
       "stateLive": "LIVE",
       "stateFinal": "ERGEBNISSE",
       "statePlayoff": "PLAYOFF",
-      "factRound": "RUNDE"
+      "factRound": "RUNDE",
+      "picksTeeTimes": "TEE TIMES · {{day}}",
+      "picksTeeToday": "TODAY",
+      "picksTeeTomorrow": "TOMORROW"
     },
     "leaderboardBand": {
       "ctaUpcoming": "View tournament",
