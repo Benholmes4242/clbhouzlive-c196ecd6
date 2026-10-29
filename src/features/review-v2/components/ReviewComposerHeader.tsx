@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { RV2 } from '../tokens';
 import type { ReviewHeaderFacts } from '../hooks/useReviewHeaderFacts';
 import { headerScore } from '../hooks/useReviewHeaderFacts';
+import './reviewComposerHeader.css';
 
 interface Props {
   form: 'photo' | 'compact';
@@ -28,7 +29,6 @@ interface Props {
   onDelete: () => void;
 }
 
-const COMPACT_H = 68; // 8 top pad + 6 + 44 row + 10
 // Photo + name block: 136 + 14 top + 33 name + 5 gap + 18.75 metadata.
 export const PHOTO_HEADER_H_CSS = 'calc(env(safe-area-inset-top, 0px) + 206.75px)';
 
@@ -47,7 +47,7 @@ export const ReviewComposerHeader = forwardRef<HTMLElement, Props>(function Revi
     <header
       ref={ref}
       data-header-form={form}
-      className="rv2-fold-header"
+      className={`rv2-fold-header rv2-header--${form}`}
       style={{
         position: 'fixed',
         top: 0,
@@ -60,17 +60,12 @@ export const ReviewComposerHeader = forwardRef<HTMLElement, Props>(function Revi
         overflow: 'hidden',
         background: RV2.canvas,
         borderBottom: photo ? 'none' : `1px solid ${RV2.hairline}`,
-        height: photo
-          ? PHOTO_HEADER_H_CSS
-          : `calc(env(safe-area-inset-top, 0px) + ${COMPACT_H}px)`,
         boxSizing: 'border-box',
-        transition: 'height 200ms ease',
       }}
     >
-      <style>{`@media (prefers-reduced-motion: reduce) { .rv2-fold-header, .rv2-fold-header * { transition: none !important; } }`}</style>
       {photo ? (
         <>
-        <div data-photo-header style={{ position: 'relative', height: 'calc(env(safe-area-inset-top, 0px) + 136px)' }}>
+        <div data-photo-header className="rv2-photo" style={{ position: 'relative' }}>
           {thumbnail ? (
             <img src={thumbnail} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 65%' }} />
           ) : (
@@ -92,12 +87,12 @@ export const ReviewComposerHeader = forwardRef<HTMLElement, Props>(function Revi
         </div>
           <div data-photo-name-block style={{ padding: '14px 20px 0', background: RV2.canvas }}>
             <div style={{ fontSize: 22, lineHeight: 1.5, fontWeight: 700, color: RV2.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
-            <div data-photo-meta style={{ marginTop: 5, display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, lineHeight: 1.5, color: 'var(--post-review-mute)', minWidth: 0 }}>
-              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{region}</span>
+            <div data-photo-meta style={{ marginTop: 5, display: 'flex', flexWrap: 'nowrap', whiteSpace: 'nowrap', alignItems: 'center', gap: 8, fontSize: 12.5, lineHeight: 1.5, color: 'var(--post-review-mute)', minWidth: 0 }}>
+              <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{region}</span>
               {score && (
                 <>
                   <span aria-hidden style={{ width: 3, height: 3, borderRadius: 999, background: 'var(--post-review-dim)', flexShrink: 0 }} />
-                  <span data-header-score style={{ whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
+                  <span data-header-score style={{ flexShrink: 0, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
                     <b style={{ fontWeight: 700, color: RV2.ink }}>{score.avg}</b> {fromMembers}
                   </span>
                 </>

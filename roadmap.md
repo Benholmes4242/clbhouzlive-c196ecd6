@@ -1,5 +1,9 @@
 # Roadmap
 
+## Review steps — Approved three-test correction
+- [x] Move unchanged safe-area heights/fold transition into stylesheet; update only authorised height/counter tests and add long-name truncation coverage.
+- [ ] Full suite and automatic-check report; EP5.1 test untouched (already fixed by EP5.1.1).
+
 ## Review Step 2 — One screen and category average
 - [x] Replace only Step 2 strip with heading counter; share half-up categories average with receipt; move share to solid fixed footer with measured bottom reserve.
 - [x] Add9 cases and update3 authorised existing cases; full bunx vitest run executed.

@@ -6,6 +6,8 @@
 import React from 'react';
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, cleanup, fireEvent, act, renderHook, waitFor } from '@testing-library/react';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 
@@ -88,13 +90,31 @@ describe('header forms', () => {
     const facts = { avg: null, count: 0, rank: null };
     const { container, rerender } = render(<ReviewComposerHeader ref={ref} {...props} form="photo" facts={facts} />);
     const header = ref.current;
-    expect((container.querySelector('[data-photo-header]') as HTMLElement).style.height).toBe('calc(env(safe-area-inset-top, 0px) + 136px)');
-    expect(header?.style.height).toBe('calc(env(safe-area-inset-top, 0px) + 206.75px)');
-    expect(header?.style.transition).toBe('height 200ms ease');
+    expect(container.querySelector('[data-photo-header]')).toHaveClass('rv2-photo');
+    expect(header).toHaveClass('rv2-header--photo');
+    const cssText = readFileSync(resolve(__dirname, '../features/review-v2/components/reviewComposerHeader.css'), 'utf8');
+    expect(cssText).toContain('.rv2-header--photo { height: calc(env(safe-area-inset-top, 0px) + 206.75px); }');
+    expect(cssText).toContain('.rv2-header--compact { height: calc(env(safe-area-inset-top, 0px) + 68px); }');
+    expect(cssText).toContain('.rv2-photo { height: calc(env(safe-area-inset-top, 0px) + 136px); }');
+    expect(cssText).toContain('transition: height 200ms ease');
     rerender(<ReviewComposerHeader ref={ref} {...props} form="compact" facts={facts} />);
     expect(ref.current).toBe(header);
-    expect(header?.style.height).toBe('calc(env(safe-area-inset-top, 0px) + 68px)');
+    expect(header).toHaveClass('rv2-header--compact');
     expect(container.querySelector('[data-photo-name-block]')).toBeNull();
+  });
+  it('keeps long course names on one ellipsized line and gives region truncation priority', () => {
+    const { container } = render(<ReviewComposerHeader {...props} name="Royal Portrush Golf Club (Dunluce Links)"
+      region="Causeway Coast and Glens, Northern Ireland" form="photo" facts={{ avg: 8.64, count: 12, rank: '#16 World' }} />);
+    const name = container.querySelector('[data-photo-name-block]')?.firstElementChild as HTMLElement;
+    expect(name.style.whiteSpace).toBe('nowrap');
+    expect(name.style.overflow).toBe('hidden');
+    expect(name.style.textOverflow).toBe('ellipsis');
+    const meta = container.querySelector('[data-photo-meta]') as HTMLElement;
+    const region = meta.firstElementChild as HTMLElement;
+    expect(meta.style.flexWrap).toBe('nowrap');
+    expect(region.style.minWidth).toBe('0');
+    expect(region.style.textOverflow).toBe('ellipsis');
+    for (const item of Array.from(meta.children).slice(1)) expect((item as HTMLElement).style.flexShrink).toBe('0');
   });
   it('omits the score at 0 reviews and the rank when none', () => {
     const { container } = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: null, count: 0, rank: null }} />);
