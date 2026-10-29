@@ -1,5 +1,10 @@
 # Roadmap
 
+## Review Step 2 — The score
+- [ ] Match signed-off empty overall/rulers/category states/share and footer; preserve compact/shared headers and Step 1.
+- [ ] Remove implicit score confirmation and exclusive skip event/copy; add incomplete nudges and required-score tests.
+- [ ] Run full suite against 4,283 total / 447 files (11 known EP1 provider failures), report every test change and failure.
+
 ## EP3 — Edit profile Your golf
 - [x] Add five golf rows and signed-off handicap/home/other-club sheets with isolated saves and unchanged visibility.
 - [x] Reuse coach sheets and profile Top 10 editor; new EP3 tests 27/27, preview build OK.
