@@ -8,7 +8,7 @@
 .ep-tab{position:relative;padding:12px 0;background:none;border:0;font-size:15px;font-weight:600;color:var(--ep-mute);cursor:pointer;font-family:inherit}
 .ep-tab[aria-selected="true"]{color:var(--ep-ink)}
 .ep-tab[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--ep-ink)}
-.ep-body{padding:12px 16px calc(24px + env(safe-area-inset-bottom,0px));flex:1;min-height:0;overflow-y:auto;will-change:transform}
+.ep-body{padding:12px 16px calc(24px + env(safe-area-inset-bottom,0px));flex:1;min-height:0;overflow-y:auto}
 .ep-shell{height:100dvh;min-height:0}
 .ep-tabs{flex-shrink:0}
 .ep-saved{font-size:12px;color:var(--ep-dim);text-align:center;margin:0 0 10px;background:none;border:0;width:100%;font-family:inherit;display:block}

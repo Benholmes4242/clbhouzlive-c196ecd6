@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import Cropper, { type Area, type Point } from 'react-easy-crop';
+import './welcome-cropper.css';
 import { getCroppedImg } from '@/components/profile/edit-v2/ImageCropperModal';
 
 /** OB1.2 full-screen squircle cropper, first sign-in only. Pinch/drag only:

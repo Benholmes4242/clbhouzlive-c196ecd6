@@ -62,3 +62,6 @@
 .coach-axis { display:flex;justify-content:space-between;color:var(--tee-sheet-dim);font-size:10.5px; }
 .coach-progress { height:6px;border-radius:3px;background:var(--coach-grid);overflow:hidden;margin-top:12px; }
 .coach-progress i { display:block;height:100%;background:var(--coach-progress); }
+
+.coach-search-state, .coach-search-state p { font-size:13px;line-height:1.5;color:var(--club-you-muted);margin:12px 0 0; }
+.coach-search-state p + p { margin-top:4px; }

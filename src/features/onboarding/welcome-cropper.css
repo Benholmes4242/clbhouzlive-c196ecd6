@@ -1,0 +1,12 @@
+/* WelcomeCropper owns its stylesheet so every screen using it (setup, Create a business, Edit profile) gets the same chrome. Moved verbatim from welcome.css. */
+/* Full-screen squircle cropper */
+.welcome-cropper{position:fixed;inset:0;z-index:2147483100;background:#000;color:#F8FAFC}
+.welcome-cropper .welcome-crop-area{border-radius:31%;border:1.5px solid rgba(255,255,255,0.9)!important;box-shadow:0 0 0 9999em rgba(0,0,0,0.62)!important;color:rgba(0,0,0,0.62)}
+.welcome-cropper-head{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 16px);text-align:center;pointer-events:none}
+.welcome-cropper-head b{display:block;font-size:17px;font-weight:700}.welcome-cropper-head span{display:block;font-size:13px;color:var(--welcome-mute);margin-top:2px}
+.welcome-cropper-foot{position:absolute;left:20px;right:20px;bottom:calc(34px + env(safe-area-inset-bottom,0px))}
+.welcome-cropper-foot p{font-size:13px;color:var(--welcome-mute);text-align:center;margin-bottom:14px}
+.welcome-cropper-foot>div{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.welcome-cropper-foot button{height:50px;border-radius:999px;font-size:16px;font-weight:600}
+.welcome-cropper-cancel{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);color:#F8FAFC}
+.welcome-cropper-use{background:#F8FAFC;color:var(--welcome-canvas)}.welcome-cropper-use:disabled{opacity:.4}
