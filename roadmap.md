@@ -2,16 +2,16 @@
 
 ## Review steps — Approved three-test correction
 - [x] Move unchanged safe-area heights/fold transition into stylesheet; update only authorised height/counter tests and add long-name truncation coverage.
-- [ ] Full suite and automatic-check report; EP5.1 test untouched (already fixed by EP5.1.1).
+- [x] Full bunx vitest run4,398/4,398 across451 files (+1 long-name case); all3 prior failures clear. Automatic build OK07:10:46Z, no type errors. EP5.1 test untouched (already fixed by EP5.1.1). See REVIEW_STEPS_TEST_FIX_REPORT.md.
 
 ## Review Step 2 — One screen and category average
 - [x] Replace only Step 2 strip with heading counter; share half-up categories average with receipt; move share to solid fixed footer with measured bottom reserve.
 - [x] Add9 cases and update3 authorised existing cases; full bunx vitest run executed.
-- [ ] STOP:4,394 passed /3 failed of4,397 across451 files. Two unchanged postOrReviewSheet counter-source cases now fail; inherited reviewStepOne height case and EP5.1 TS2769 remain. No fixes/reruns after stop. Phone geometry apparatus timed out, authenticated flow unavailable; see REVIEW_STEP_TWO_ONE_SCREEN_STOP_REPORT.md.
+- [ ] Phone geometry and authenticated flow remain unverified. Test/type blockers from REVIEW_STEP_TWO_ONE_SCREEN_STOP_REPORT.md cleared by EP5.1.1 and approved review correction (4,398/4,398, build OK); external unmanaged session prevents authenticated checking.
 
 ## Review Step 1 — Photo header Option A
 - [x] Straight-cut safe-area photograph; course name/score below; preserve compact header and sticky fold, measured spacer; empty lede/words gaps 14/18.
-- [ ] STOP: full bunx vitest run 4,386 passed / 2 failed of 4,388 across451 files. New reviewStepOne safe-area style assertion fails (jsdom returns empty); unchanged ob1Welcome photo-upload spy also fails. Inherited EP5.1 TS2769 remains. No fixes/reruns after stop; see REVIEW_STEP_ONE_HEADER_STOP_REPORT.md. Signed-in visual unavailable (external_unmanaged).
+- [ ] Signed-in visual unavailable (external_unmanaged). Test/type blockers from REVIEW_STEP_ONE_HEADER_STOP_REPORT.md cleared by EP5.1.1 and approved review correction (4,398/4,398, build OK); ob1Welcome also passes.
 
 ## EP5.1 — Edit profile snags and white cursors
 - [x] Correct avatar framing, top/bottom safe-area spacing and scoped shared mute labels; visual checks not completed after stop.
