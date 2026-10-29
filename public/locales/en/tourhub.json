@@ -156,7 +156,8 @@
       "lastYear": "Last year",
       "leadersOut": "Leaders out · R{{round}}",
       "roundNode": "R{{round}}",
-      "tiedCaps": "{{words}} tied"
+      "tiedCaps": "{{words}} tied",
+      "picksTees": "TEES"
     },
     "leaderboardBand": {
       "ctaUpcoming": "View tournament",

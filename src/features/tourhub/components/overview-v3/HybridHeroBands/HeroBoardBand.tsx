@@ -63,7 +63,9 @@ import { inRequiredRoundWindow, leaderOf, neededGross } from './whatsNext';
 import { surnameOf } from '../../../_shared/playerName';
 import { PicksSheet } from './PicksSheet';
 import type { HeroState } from '../HybridHero.utils';
-import { fieldHasStarted } from '../../../overview/boardStarted';
+import { fieldHasStarted, rowHasStarted } from '../../../overview/boardStarted';
+import { usePickTeeTimes } from '../../../tournament-v2/data/usePickTeeTimes';
+import { formatTimeHm, formatWeekdayShort } from '@/i18n/format';
 import { boardMovementMap, todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
 import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
 import { OVERVIEW, pickMovementCards, type MovementCard } from '../overviewTokens';
@@ -312,6 +314,20 @@ export function HeroBoardSection({
     return ids.size > 0 ? ids : undefined;
   }, [picks]);
 
+  /* Picks tee line: the stored tee sheet for the current round (round 1 when
+     upcoming), and which picks have started under the one has-started rule. */
+  const teeRound = phase === 'upcoming' ? 1 : (currentRound ?? 1);
+  const { data: pickTees } = usePickTeeTimes(picksTid, teeRound, picks.map((p) => String(p?.playerId ?? '')), { enabled: phase !== 'completed' });
+  const startedPlayers = useMemo(() => {
+    const set = new Set<string>();
+    for (const entry of entries) {
+      if (!rowHasStarted(entry)) continue;
+      if (entry?.player?.id) set.add(String(entry.player.id));
+      for (const m of entry?.team?.members ?? []) if (m?.player?.id) set.add(String(m.player.id));
+    }
+    return set;
+  }, [entries]);
+
   const boardByPlayer = useMemo(() => {
     const map = new Map<string, { position: number | null; tied: boolean; score: number | null }>();
     for (const entry of entries) {
@@ -472,6 +488,8 @@ export function HeroBoardSection({
           tourCode={pickTourCode}
           phase={phase}
           boardByPlayer={boardByPlayer}
+          teeByPlayer={phase === 'completed' ? null : pickTees ?? null}
+          startedPlayers={startedPlayers}
           championPlayerId={championPlayerId}
           championPlayerIds={championPlayerIds}
           intro={picksIntro}
@@ -499,6 +517,15 @@ export function HeroBoardSection({
   );
 }
 
+/** "14:05" today in the viewer's local time, else "THU 14:05". */
+export function pickTeeText(iso: string, now: Date = new Date()): string | null {
+  const d = new Date(iso);
+  if (!Number.isFinite(d.getTime())) return null;
+  const time = formatTimeHm(d);
+  const today = d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+  return today ? time : `${formatWeekdayShort(d).toLocaleUpperCase()} ${time}`;
+}
+
 /**
  * §3 — THE PICKS BLOCK. Amber OUR TOURNAMENT PICKS header and a FIXED grid of
  * up to three cards (never padded, never scrolling). Each card opens PicksSheet.
@@ -508,6 +535,8 @@ function PicksBlock({
   tourCode,
   phase,
   boardByPlayer,
+  teeByPlayer,
+  startedPlayers,
   championPlayerId,
   championPlayerIds,
   intro,
@@ -516,6 +545,9 @@ function PicksBlock({
   leaderTotal,
   onOpenPick,
 }: {
+  /** Pick tee times by sr_players.id; null/empty renders no tee line. */
+  teeByPlayer: Map<string, string> | null;
+  startedPlayers: Set<string>;
   /** The leader's to-par; a pick at or ahead of it has nothing to reach. */
   leaderTotal: number | null;
   onOpenPick: () => void;
@@ -585,6 +617,8 @@ function PicksBlock({
             // and no win % on upcoming picks — an unlabelled number is not data.
             figureLine = null;
           }
+          const tee = !figureLine && !startedPlayers.has(String(p.playerId)) ? teeByPlayer?.get(String(p.playerId)) ?? null : null;
+          const teeText = tee ? pickTeeText(tee) : null;
 
           return (
             <button
@@ -616,6 +650,11 @@ function PicksBlock({
                 {figureLine ? (
                   <div data-overview-pick-figure style={{ marginTop: 2, fontSize: 11.5, fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-start', gap: 4, whiteSpace: 'nowrap', ...FIGS }}>
                     {figureLine}
+                  </div>
+                ) : teeText ? (
+                  <div data-overview-pick-tee style={{ marginTop: 3, display: 'flex', alignItems: 'baseline', whiteSpace: 'nowrap', ...FIGS }}>
+                    <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', color: 'rgba(248,250,252,0.42)', marginRight: 5, flex: 'none' }}>{t('overview.hero.picksTees', { defaultValue: 'TEES' })}</span>
+                    <span data-overview-pick-tee-time style={{ fontSize: 12.5, fontWeight: 700, color: '#F8FAFC', fontVariantNumeric: 'tabular-nums', flex: 'none' }}>{teeText}</span>
                   </div>
                 ) : null}
                 {/* CORRECTIONS I.2: a pick leading or level has nothing to reach — no
