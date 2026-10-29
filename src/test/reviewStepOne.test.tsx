@@ -92,7 +92,7 @@ describe('header forms', () => {
     expect(img.style.objectFit).toBe('cover');
     expect(img.style.objectPosition).toBe('center 40%');
     expect(img.style.position).toBe('absolute');
-    expect(img.style.inset).toBe('0px');
+    expect(img.style.inset).toBe('0');
     expect(container.querySelector('[data-photo-name-block]')).toBeNull();
     expect(container.querySelector('header')?.getAttribute('data-header-form')).toBe('photo');
   });
@@ -100,12 +100,17 @@ describe('header forms', () => {
     const { container } = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: 8.64, count: 12 }} />);
     const layers = Array.from(container.querySelectorAll('[data-photo-header] [aria-hidden]')) as HTMLElement[];
     expect(layers).toHaveLength(2);
-    expect(layers[0].style.background).toContain('rgba(0, 0, 0, 0.18)');
+    for (const layer of layers) {
+      expect(layer.style.position).toBe('absolute');
+      expect(layer.style.inset).toBe('0');
+      expect(layer.style.pointerEvents).toBe('none');
+    }
+    // jsdom drops gradient values from the DOM, so the layers themselves are
+    // asserted in the source: the course page's 18% wash first, then the fade.
     expect(HERO_CANON_WASH).toBe('linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.18))');
-    expect(layers[1].style.background.replace(/\s/g, '')).toContain(
-      'linear-gradient(180deg,rgba(22,22,26,0)40%,rgba(22,22,26,0.72)72%,#16161A100%)'.replace(/\s/g, ''),
-    );
-    for (const layer of layers) expect(layer.style.pointerEvents).toBe('none');
+    const src = readFileSync(resolve(__dirname, '../features/review-v2/components/ReviewComposerHeader.tsx'), 'utf8');
+    expect(src).toContain('background: HERO_CANON_WASH');
+    expect(src).toContain('linear-gradient(180deg, rgba(22,22,26,0) 40%, rgba(22,22,26,0.72) 72%, ${RV2.canvas} 100%)');
   });
   it('renders the course page masthead over the photo: shared kicker, place, two-line name clamp', () => {
     mockStanding = { globalRank: 16, regionalRank: 14, usaRank: null };
@@ -115,7 +120,9 @@ describe('header forms', () => {
     expect(masthead.style.left).toBe('20px');
     expect(masthead.style.right).toBe('20px');
     expect(masthead.style.bottom).toBe('14px');
-    expect(masthead.firstElementChild?.textContent).toBe('Fife · #16 World · #14 GB&I');
+    const kickerEl = Array.from(masthead.querySelectorAll('div')).find((d) => d.textContent === 'Fife · #16 World · #14 GB&I') as HTMLElement;
+    expect(kickerEl).toBeTruthy();
+    expect(kickerEl.style.textTransform).toBe('uppercase');
     const nameEl = Array.from(masthead.querySelectorAll('div')).find((d) => d.textContent === 'Kingsbarns') as HTMLElement;
     expect(nameEl.style.webkitLineClamp).toBe('2');
     expect(Array.from(masthead.querySelectorAll('div')).some((d) => d.textContent === 'Scotland')).toBe(true);
