@@ -1,225 +1,40 @@
-/**
- * CategoryGrid - step 1. Four rows, fixed order, each 1.0 to 10.0 in 0.1 steps.
- * There is deliberately no reference to the overall score on this step.
- */
-
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { RV2 } from '../tokens';
-import { FIGURE } from '@/lib/tokens/type';
-/* The course page's rule, imported — see OverallScrubber. The category values
-   and their bar fills preview exactly what the course page will print. */
-import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
+/** Step 2 category rows follow courseSubScoreTone's white rule, never overall-derived scores. */
+import React from 'react';
+import { useScoreRuler } from '../hooks/useScoreRuler';
+import { scorePercent } from '../lib/scoreStepRules';
 import type { CategoryKey } from '../types';
 
-export interface CategoryCopy {
-  key: CategoryKey;
-  label: string;
-  hint: string;
-}
-
+export interface CategoryCopy { key: CategoryKey; label: string; hint: string; }
 interface Props {
   values: Record<CategoryKey, number | null>;
-  onChange: (key: CategoryKey, v: number) => void;
+  onChange: (key: CategoryKey, value: number) => void;
   cats: CategoryCopy[];
+  flagged?: CategoryKey[];
+  tapToScore?: string;
+  stillToScore?: string;
 }
-
-const MIN = 1;
-const MAX = 10;
-const clamp = (n: number) => Math.max(MIN, Math.min(MAX, n));
-const snap = (n: number) => Math.round(clamp(n) * 10) / 10;
-const toPct = (v: number) => ((v - MIN) / (MAX - MIN)) * 100;
-
-function CategoryRow({
-  label,
-  hint,
-  value,
-  onChange,
-  last,
-}: {
-  label: string;
-  hint: string;
-  value: number | null;
-  onChange: (v: number) => void;
-  last: boolean;
+function CategoryRow({ category, value, onChange, flagged, tapToScore, stillToScore }: {
+  category: CategoryCopy; value: number | null; onChange: (value: number) => void;
+  flagged: boolean; tapToScore: string; stillToScore: string;
 }) {
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const [dragging, setDragging] = useState(false);
-  const ghostDragRef = useRef(false);
-  const movedRef = useRef(false);
-  const color = courseSubScoreTone(value);
-  const fillPct = value == null ? 0 : toPct(value);
-
-  const pointerToValue = useCallback((clientX: number) => {
-    const rail = trackRef.current;
-    if (!rail) return;
-    const r = rail.getBoundingClientRect();
-    const pct = (clientX - r.left) / r.width;
-    onChange(snap(MIN + pct * (MAX - MIN)));
-  }, [onChange]);
-
-  const startDrag = useCallback((fromGhost: boolean) => {
-    setDragging(true);
-    ghostDragRef.current = fromGhost;
-    movedRef.current = false;
-  }, []);
-
-  const endDrag = useCallback(() => {
-    setDragging(false);
-    ghostDragRef.current = false;
-    movedRef.current = false;
-  }, []);
-
-  useEffect(() => {
-    if (!dragging) return;
-    const onMove = (e: PointerEvent) => {
-      if (ghostDragRef.current && value == null && !movedRef.current) {
-        movedRef.current = true;
-      }
-      pointerToValue(e.clientX);
-    };
-    const onUp = () => endDrag();
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-    window.addEventListener('pointercancel', onUp);
-    return () => {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-      window.removeEventListener('pointercancel', onUp);
-    };
-  }, [dragging, pointerToValue, endDrag, value]);
-
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    const current = value ?? MIN;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      onChange(snap(current + 0.1));
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
-      e.preventDefault();
-      onChange(snap(current - 0.1));
-    } else if (e.key === 'Home') {
-      e.preventDefault();
-      onChange(MIN);
-    } else if (e.key === 'End') {
-      e.preventDefault();
-      onChange(MAX);
-    }
-  };
-
-  return (
-    <div
-      style={{
-        padding: '13px 0',
-        borderBottom: last ? 'none' : `1px solid ${RV2.hairline}`,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 14, fontWeight: 600, color: RV2.ink }}>{label}</span>
-        <span
-          style={{
-            fontSize: 18,
-            ...FIGURE,
-            letterSpacing: '-0.03em',
-            color: value == null ? RV2.muted : color,
-          }}
-        >
-          {value == null ? '\u2014' : value.toFixed(1)}
-        </span>
-      </div>
-      <div style={{ fontSize: 11, color: RV2.secondary, marginBottom: 10 }}>{hint}</div>
-      <div
-        role="slider"
-        tabIndex={0}
-        aria-valuemin={1}
-        aria-valuemax={10}
-        aria-valuenow={value ?? undefined}
-        aria-valuetext={value == null ? 'Not scored' : undefined}
-        aria-label={label}
-        onPointerDown={(e) => {
-          startDrag(false);
-          pointerToValue(e.clientX);
-        }}
-        onKeyDown={onKeyDown}
-        style={{
-          padding: '18.5px 0',
-          margin: '-0.5px 0',
-          background: 'transparent',
-          cursor: 'pointer',
-          touchAction: 'none',
-        }}
-      >
-      <div
-        ref={trackRef}
-        style={{
-          position: 'relative',
-          height: 7,
-          borderRadius: 999,
-          background: RV2.track,
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: `${fillPct}%`,
-            background: value == null ? 'transparent' : color,
-            borderRadius: 999,
-            transition: dragging ? 'none' : 'width 120ms ease',
-          }}
-        />
-        {/* THE HANDLE — identical unset and set (see OverallScrubber). The row's
-            unset state is the empty track and the em-dash, never a weaker dot. */}
-        <div
-          aria-hidden
-          onPointerDown={value == null ? (e) => {
-            // Tap is not a score: arm the drag, commit only on pointermove.
-            e.stopPropagation();
-            startDrag(true);
-          } : undefined}
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: `${fillPct}%`,
-            transform: 'translate(-50%, -50%)',
-            width: 18,
-            height: 18,
-            borderRadius: '50%',
-            background: RV2.ink,
-            border: `2px solid ${color}`,
-            boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-            pointerEvents: value == null ? 'auto' : 'none',
-            cursor: value == null ? 'pointer' : undefined,
-            touchAction: 'none',
-            transition: dragging ? 'none' : 'left 120ms ease',
-          }}
-        />
-      </div>
-      </div>
+  const ruler = useScoreRuler(value, onChange);
+  const scored = value != null;
+  const pct = scored ? scorePercent(value) : 0;
+  return <div className="review-score-category" data-score-category={category.key} data-flagged={flagged && !scored} data-dragging={ruler.dragging}>
+    <div className="review-score-category-head">
+      <span aria-hidden className="review-score-check" data-scored={scored}>{scored && <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>}</span>
+      <div className="review-score-category-copy"><div className="review-score-category-name">{category.label}</div><div className="review-score-category-hint">{category.hint}</div></div>
+      {scored ? <div className="review-score-number review-score-category-value">{value.toFixed(1)}</div> : <div className="review-score-category-prompt">{flagged ? stillToScore : tapToScore}</div>}
     </div>
-  );
+    <div ref={ruler.ref} role="slider" tabIndex={0} aria-valuemin={1} aria-valuemax={10} aria-valuenow={value ?? undefined}
+      aria-valuetext={scored ? undefined : 'Not scored'} aria-label={category.label}
+      onPointerDown={ruler.onPointerDown} onKeyDown={ruler.onKeyDown} className="review-score-ruler">
+      <div className="review-score-track" data-dashed={!scored} />
+      {scored && <><div className="review-score-fill" style={{ width: `${pct}%` }} /><div aria-hidden data-score-thumb className="review-score-thumb" style={{ left: `${pct}%` }} /></>}
+    </div>
+  </div>;
 }
-
-export function CategoryGrid({ values, onChange, cats }: Props) {
-  return (
-    <div
-      style={{
-        background: RV2.cardBg,
-        borderRadius: 18,
-        border: `1px solid ${RV2.hairline}`,
-        padding: '2px 16px',
-      }}
-    >
-      {cats.map((c, i) => (
-        <CategoryRow
-          key={c.key}
-          label={c.label}
-          hint={c.hint}
-          value={values[c.key]}
-          onChange={(v) => onChange(c.key, v)}
-          last={i === cats.length - 1}
-        />
-      ))}
-    </div>
-  );
+export function CategoryGrid({ values, onChange, cats, flagged = [], tapToScore = '', stillToScore = '' }: Props) {
+  return <div className="review-score-categories">{cats.map(category => <CategoryRow key={category.key} category={category}
+    value={values[category.key]} onChange={value => onChange(category.key, value)} flagged={flagged.includes(category.key)} tapToScore={tapToScore} stillToScore={stillToScore} />)}</div>;
 }
