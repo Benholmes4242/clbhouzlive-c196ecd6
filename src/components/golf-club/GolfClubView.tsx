@@ -10,7 +10,7 @@ import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
 import '@/components/courses/course-detail/tabCanon.css';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
 import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';
-import { courseRankLabels, type RankList } from '@/features/courses/_shared/courseRankLabels';
+import { courseMastheadKicker } from '@/features/courses/_shared/courseRankLabels';
 import { CourseTabs, type CourseTabId } from '@/components/courses/course-detail/CourseTabs';
 import CourseDetailShellTabs from '@/features/courses/components/CourseDetailShellTabs';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
@@ -475,14 +475,8 @@ const CourseTitleOverlay: React.FC<CourseTitleOverlayProps> = ({
    * US course regional_rank actually holds the USA rank.
    */
   const { data: standing } = useCourseTop100Standing(courseId);
-  // Same country rule CourseRankBadges used to decide what "regional" means.
-  const rankEntries: Array<{ list: RankList; rank: number }> = [];
-  if (standing?.globalRank) rankEntries.push({ list: 'global', rank: standing.globalRank });
-  const c = course.country ?? '';
-  const isGBI = ['United Kingdom', 'Ireland', 'England', 'Scotland', 'Wales', 'Northern Ireland', 'Isle of Man', 'Britain & Ireland'].includes(c);
-  if (isGBI && standing?.regionalRank) rankEntries.push({ list: 'gbi', rank: standing.regionalRank });
-  else if (['United States', 'USA'].includes(c) && standing?.usaRank) rankEntries.push({ list: 'usa', rank: standing.usaRank });
-  else if (c === 'Continental Europe' && standing?.regionalRank) rankEntries.push({ list: 'europe', rank: standing.regionalRank });
+  // The kicker rule (region + rank labels, country decides "regional") lives in
+  // courseMastheadKicker beside courseRankLabels, shared with the review hero.
 
   const shownRef = useRef<string | null>(null);
   useEffect(() => {
