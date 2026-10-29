@@ -1,5 +1,10 @@
 # Roadmap
 
+## EP4 — Links and Who sees what
+- [ ] Add signed-off link sheets and visibility groups below Your golf, preserving Settings and legacy editor.
+- [ ] Reuse existing validation/normalisation, partial saves and handicap privacy hook; add concrete isolation and sync tests.
+- [ ] Run full suite from 4,314/4,314 across 448 files; report diff, inventory and any failures.
+
 ## Review Step 2 — The score
 - [x] Match signed-off empty overall/rulers/category states/share and footer; preserve compact/shared headers and Step 1.
 - [x] Remove implicit score confirmation and exclusive skip event/copy; add incomplete nudges and 31 required-score/interaction cases.
