@@ -1,20 +1,21 @@
 # Roadmap
 
 ## EP4 — Links and Who sees what
-- [ ] Add signed-off link sheets and visibility groups below Your golf, preserving Settings and legacy editor.
-- [ ] Reuse existing validation/normalisation, partial saves and handicap privacy hook; add concrete isolation and sync tests.
-- [ ] Run full suite from 4,314/4,314 across 448 files; report diff, inventory and any failures.
+- [x] Add signed-off link sheets and visibility groups below Your golf, preserving Settings and legacy editor.
+- [x] Reuse existing validation/normalisation, partial saves and handicap privacy hook; add 26 isolation/sync cases.
+- [x] Full bunx vitest run: 4,339 passed / 1 failed / 4,340 total / 449 files (+26/+1 solely EP4); existing tests unchanged. Automatic build OK05:42:32Z.
+- [ ] STOP: ep4LinksPrivacy.test.tsx:137:49 cannot find settings-handicap; unchanged SettingsTabContent.tsx:417:80 throws TypeError reading length because new useDeleteAccount mock lacks ownedBusinessNames. Await mock completion authorisation; no correction/rerun. See EP4_REPORT.md. Live/visual checks unavailable/unperformed.
 
 ## Review Step 2 — The score
 - [x] Match signed-off empty overall/rulers/category states/share and footer; preserve compact/shared headers and Step 1.
 - [x] Remove implicit score confirmation and exclusive skip event/copy; add incomplete nudges and 31 required-score/interaction cases.
 - [x] Full bunx vitest run: 4,303 passed / 11 known EP1 failures / 4,314 total / 448 files (+31/+1). Existing review cases retargeted by brief, no removals; REVIEW_STEP_TWO_REPORT.md records each assertion.
-- [ ] STOP: scrubberEmptyState.test.tsx(14,13) TS2345 EventTarget is not assignable to Document | Element | Node | Window. Await helper typing authorisation; no corrections after completed-edit check. Signed-in/visual checks unavailable/unperformed.
+- [x] Approved helper type-only correction EventTarget → Element | Window; automatic build OK05:28:23Z and full reruns4,314/4,314 across448 files. No assertions/cases changed. Signed-in/visual checks unavailable/unperformed.
 
 ## EP3 — Edit profile Your golf
 - [x] Add five golf rows and signed-off handicap/home/other-club sheets with isolated saves and unchanged visibility.
 - [x] Reuse coach sheets and profile Top 10 editor; new EP3 tests 27/27, preview build OK.
-- [ ] STOP: full suite 4,272 passed / 11 failed / 4,283 total across 447 files. Existing EP1 tests lack QueryClientProvider after the new golf group adds queries. Await authorisation to update that test wrapper; no assertions changed. See EP3_REPORT.md.
+- [x] EP3.1 authorised EP1 QueryClientProvider/golf-read mocks; all14 EP1 tests pass without assertion changes. Full suite4,314/4,314 across448 files; prior11 provider failures resolved. See EP3_1_REPORT.md in Files.
 
 ## Post or review sheet
 - [x] Replace the numbered kind/course/NEXT form with signed-off Post and Review boxes and direct picker/handoff actions.
