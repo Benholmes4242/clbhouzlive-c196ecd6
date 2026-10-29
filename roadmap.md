@@ -1,5 +1,11 @@
 # Roadmap
 
+## EP4.1 + EP5 — Completion card and switch-over
+- [ ] Complete only EP4's useDeleteAccount mock and run the full suite before EP5.
+- [ ] Add settled-input completion card, action chips and arrival deep links.
+- [ ] Switch the canonical editor, preserve alias queries/back/entrypoints, and update route comments.
+- [ ] Add required tests and report full-suite inventory, diffs and verification limits.
+
 ## EP4 — Links and Who sees what
 - [x] Add signed-off link sheets and visibility groups below Your golf, preserving Settings and legacy editor.
 - [x] Reuse existing validation/normalisation, partial saves and handicap privacy hook; add 26 isolation/sync cases.
