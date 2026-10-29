@@ -66,7 +66,8 @@ import type { HeroState } from '../HybridHero.utils';
 import { fieldHasStarted, rowHasStarted } from '../../../overview/boardStarted';
 import { usePickTeeTimes } from '../../../tournament-v2/data/usePickTeeTimes';
 import { formatDayMonthShortGB, formatTimeHm24, formatWeekdayLong, formatWeekdayShortGB } from '@/i18n/format';
-import { boardMovementMap, todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
+import { boardMovementMap, statusWord, todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
+import { normalizeStatus } from '../../../_shared/resultStatus';
 import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
 import { OVERVIEW, pickMovementCards, type MovementCard } from '../overviewTokens';
 import { fmtScore } from '../../../utils/fmtScore';
@@ -336,9 +337,9 @@ export function HeroBoardSection({
   }, [entries]);
 
   const boardByPlayer = useMemo(() => {
-    const map = new Map<string, { position: number | null; tied: boolean; score: number | null }>();
+    const map = new Map<string, { position: number | null; tied: boolean; score: number | null; status?: string | null }>();
     for (const entry of entries) {
-      const line = { position: entry.position ?? null, tied: Boolean(entry.position_tied), score: entry.score ?? null };
+      const line = { position: entry.position ?? null, tied: Boolean(entry.position_tied), score: entry.score ?? null, status: entry.status ?? null };
       const id = entry?.player?.id;
       if (id) {
         map.set(String(id), line);
@@ -568,6 +569,13 @@ export function pickTeeDayLabel(isos: string[], now: Date, t: TeeT, dayOnly = fa
  * §3 — THE PICKS BLOCK. Amber OUR TOURNAMENT PICKS header and a FIXED grid of
  * up to three cards (never padded, never scrolling). Each card opens PicksSheet.
  */
+/** The status token a pick card shows instead of a position, as BoardTable labels it. */
+export function pickStatusToken(raw: string | null | undefined): string | null {
+  const s = normalizeStatus(raw);
+  if (!s || !['WD', 'DQ', 'DNS', 'CUT', 'MC', 'MDF'].includes(s)) return null;
+  return statusWord(s);
+}
+
 function PicksBlock({
   picks,
   tourCode,
@@ -598,7 +606,7 @@ function PicksBlock({
   /** The event's tour, for the shared headshot resolver. */
   tourCode: string;
   phase: 'live' | 'upcoming' | 'completed';
-  boardByPlayer: Map<string, { position: number | null; tied: boolean; score: number | null }>;
+  boardByPlayer: Map<string, { position: number | null; tied: boolean; score: number | null; status?: string | null }>;
   /** The champion, by player id — settledFigureFor can only see a POSITION,
    *  and a playoff winner's position is T1, so identity comes in separately. */
   championPlayerId: string | null;
@@ -611,6 +619,7 @@ function PicksBlock({
   const teeFor = (p: AITopContender): string | null => {
     const id = String(p.playerId);
     const line = boardByPlayer.get(id);
+    if (phase !== 'upcoming' && pickStatusToken(line?.status)) return null;
     const hasFigure = phase === 'completed' ? !!settledFigureFor(line) : false;
     if (hasFigure || startedPlayers.has(id)) return null;
     const iso = teeByPlayer?.get(id) ?? null;
@@ -677,8 +686,13 @@ function PicksBlock({
           const pickStarted = startedPlayers.has(String(p.playerId));
           const liveLine = phase === 'live' && pickStarted && line && line.position != null ? line : null;
 
+          /* A WD/DQ/DNS/CUT/MDF pick shows the board's own token, never a
+             position or score; locked picks are never swapped (CB54). */
+          const statusToken = phase !== 'upcoming' && !isChampion ? pickStatusToken(line?.status) : null;
           let figureLine: React.ReactNode;
-          if (liveLine) {
+          if (statusToken) {
+            figureLine = <span data-overview-pick-status style={{ color: WHITE_ALPHA_65 }}>{statusToken}</span>;
+          } else if (liveLine) {
             figureLine = (
               <>
                 <span style={{ color: WHITE_ALPHA_65 }}>{`${liveLine.tied ? 'T' : ''}${liveLine.position}`}</span>
@@ -737,7 +751,7 @@ function PicksBlock({
                 ) : null}
                 {/* CORRECTIONS I.2: a pick leading or level has nothing to reach — no
                     line at all. The dash is only for a target genuinely out of reach. */}
-                {neededByPlayer && toReachScore && (phase !== 'live' || pickStarted) && !(line?.score != null && leaderTotal != null && line.score <= leaderTotal) ? (
+                {!statusToken && neededByPlayer && toReachScore && (phase !== 'live' || pickStarted) && !(line?.score != null && leaderTotal != null && line.score <= leaderTotal) ? (
                   <div data-overview-pick-to-reach style={{ marginTop: 2, fontSize: 10, fontWeight: 700, color: OVERVIEW.mute, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...FIGS }}>
                     {`${t('overview.picksToReach', { score: toReachScore })} ${neededByPlayer.get(String(p.playerId)) ?? '\u2014'}`}
                   </div>

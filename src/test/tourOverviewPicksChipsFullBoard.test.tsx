@@ -223,3 +223,25 @@ describe('Full board before anyone has teed off', () => {
     expect(f.sheet).toHaveBeenCalled();
   });
 });
+
+describe('a pick with a non-scoring status shows the board token', () => {
+  const withStatus = (statuses: Record<string, string>) => field.map((e) => ({ ...e, status: statuses[String(e.player?.id)] ?? 'active' }));
+  const cases: Array<[string, string]> = [['WD', 'WD'], ['DQ', 'DQ'], ['CUT', 'CUT'], ['MC', 'CUT'], ['MDF', 'MDF'], ['DNS', 'DNS']];
+  it.each(['live', 'completed'] as const)('in %s events: token in place of position, no score, no numeral', (phase) => {
+    for (const [raw, token] of cases) {
+      f.picks = [{ playerId: 'p1', playerName: 'A One' }, { playerId: 'p2', playerName: 'B Two' }];
+      const { container } = mountPicks({ phase, entries: withStatus({ p1: raw }), currentRound: 3 });
+      const cards = container.querySelectorAll('[data-overview-pick-card]');
+      const fig = cards[0].querySelector('[data-overview-pick-figure]') as HTMLElement;
+      expect(fig.textContent).toBe(token);
+      expect(fig.textContent).not.toMatch(/\d/);
+      expect((fig.querySelector('[data-overview-pick-status]') as HTMLElement).style.color).toBe('rgba(255, 255, 255, 0.65)');
+      expect(cards[0].querySelector('[data-overview-pick-to-reach]')).toBeNull();
+      expect(cards[0].querySelector('[data-overview-pick-tee]')).toBeNull();
+      // An active pick is unchanged.
+      expect(cards[1].querySelector('[data-overview-pick-status]')).toBeNull();
+      expect(cards[1].querySelector('[data-overview-pick-figure]')?.textContent).toMatch(/\d/);
+      cleanup();
+    }
+  });
+});
