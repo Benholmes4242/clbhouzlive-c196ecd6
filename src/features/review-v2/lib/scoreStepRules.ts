@@ -19,8 +19,7 @@ export function scoreAction(state: Pick<ReviewComposerState, 'overall' | 'scores
 export function scoreFooter(state: Pick<ReviewComposerState, 'overall' | 'scores' | 'shareToFeed'>, threshold: string | null) {
   if (state.overall == null) return null;
   if (threshold) return { threshold };
-  if (!missingScores(state).ready) return null;
-  return { key: state.shareToFeed ? 'step3.postingLine' : 'step3.savingLine', score: state.overall.toFixed(1) };
+  return null;
 }
 export function scoreShareKey(mediaCount: number, hasWords: boolean) {
   if (mediaCount > 0) return hasWords ? 'shareMediaWords' : 'shareMedia';

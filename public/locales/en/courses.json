@@ -2971,6 +2971,7 @@
         "calibration": "Your {{ordinal}} highest of the {{count}} courses you've rated",
         "calibrationFirst": "Your highest of the {{count}} courses you've rated",
         "breakdownLabel": "Now score these four",
+        "average": "Average",
         "catsIntro": "Score these on their own, not against your overall.",
         "tapToScore": "Tap to score",
         "stillToScore": "Still to score",
