@@ -1,4 +1,8 @@
-/** Step 2 owns required-score nudges and footer priority; no round/handicap reads. */
+/** Step 2 owns required-score nudges and footer priority; no round/handicap reads.
+ * Shared score-step requirements/footer priority live here; useScoreRuler owns
+ * tap/drag/keyboard bounds so overall/category controls cannot diverge.
+ * categoryAverage owns the receipt/heading mean, never the overall. SubmitBar
+ * owns the fixed score footer and its measured reservation callback. */
 import type { CategoryKey, ReviewComposerState } from '../types';
 
 export const SCORE_CATEGORIES: CategoryKey[] = ['design', 'condition', 'clubhouse', 'facilities'];
