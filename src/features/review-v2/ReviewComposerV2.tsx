@@ -71,8 +71,9 @@ import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSke
 import ComposerStepHeader from '@/features/composer-flow/components/ComposerStepHeader';
 import { shortCourseName } from '@/features/courses/_shared/courseLabel';
 import { useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
-import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
+import { missingScores, scoreAction, scoreFooter, scoreShareKey } from './lib/scoreStepRules';
+import { scrollElementIntoView } from '@/lib/getScrollParent';
 
 /**
  * THE HEADER'S OWN GEOMETRY — one expression, two consumers.
