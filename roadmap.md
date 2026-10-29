@@ -1,5 +1,9 @@
 # Roadmap
 
+## EP3 — Edit profile Your golf
+- [ ] Add five golf rows and signed-off handicap/home/other-club sheets with isolated saves and unchanged visibility.
+- [ ] Reuse coach sheets and profile Top 10 editor; verify tests and report baseline 4,256 / 446 files.
+
 ## Post or review sheet
 - [x] Replace the numbered kind/course/NEXT form with signed-off Post and Review boxes and direct picker/handoff actions.
 - [x] Add member-scoped paginated review suggestions without round reads; update displayed composer counters, locales and analytics label.
