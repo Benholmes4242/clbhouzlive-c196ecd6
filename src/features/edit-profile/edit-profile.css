@@ -69,3 +69,34 @@
 .ep-opt[aria-checked=true] .ep-radio{border:6px solid var(--ep-ink)}
 .ep-loc{display:flex;flex-direction:column}
 .ep-loc .bizc-field:first-child{margin-top:14px}
+
+/* EP3, isolated to the existing editor and shared sheets. */
+.ep-shell .ep-row{height:auto;border-radius:0;justify-content:flex-start;box-shadow:none;transition:none}
+.ep-shell .ep-row svg{width:18px;height:18px}
+.ep-golf-mute,.ep-golf-source{color:var(--ep-mute)}
+.ep-golf-source{font-size:13.5px;flex:none}
+.ep-golf-index{display:flex;align-items:baseline;gap:10px;margin-top:14px;flex-wrap:wrap}
+.ep-golf-index b{font-size:44px;font-weight:700;line-height:1;font-feature-settings:"kern" 1,"liga" 1}
+.ep-golf-index span{font-size:13.5px;color:var(--ep-mute)}
+.ep-golf-list{margin-top:14px}
+.ep-golf-action{font-size:15px;font-weight:600;justify-content:space-between!important}
+.ep-golf-connect{background:var(--ep-card);border:1px solid var(--ep-hair);border-radius:18px;padding:16px;margin-top:14px}
+.ep-golf-connect b{display:block;font-size:16px;font-weight:600}
+.ep-golf-connect p{font-size:13.5px;line-height:1.5;color:var(--ep-mute);margin-top:6px}
+.ep-shell .ep-golf-connect-button{height:40px;padding:0 18px;border-radius:999px;background:var(--ep-ink);color:var(--ep-canvas);font-size:14.5px;font-weight:600;margin-top:12px}
+.ep-golf-or{display:flex;align-items:center;gap:10px;margin:16px 0 4px;font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--ep-dim);text-transform:uppercase}
+.ep-golf-or::before,.ep-golf-or::after{content:"";flex:1;height:1px;background:var(--ep-hair)}
+.ep-golf-hint{font-size:12.5px;color:var(--ep-dim);margin-top:8px;line-height:1.45}
+.ep-shell .ep-golf-search{display:block;width:100%;height:auto;text-align:left;border:1px solid var(--ep-hair);border-radius:16px;padding:12px 14px;margin-top:14px;background:var(--ep-card)}
+.ep-golf-search-value{display:block;font-size:16px;font-weight:500;color:var(--ep-dim);margin-top:6px}
+.ep-golf-club{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--ep-hair)}
+.ep-golf-club:first-child{border-top:0}
+.ep-golf-thumb{width:44px;height:44px;border-radius:10px;flex:none;background:var(--ep-inset);overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--ep-dim)}
+.ep-golf-thumb img{width:100%;height:100%;object-fit:cover}
+.ep-golf-club-text{flex:1;min-width:0}
+.ep-golf-club-text b{display:block;font-size:15px;font-weight:600;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ep-golf-club-text small{display:block;font-size:12.5px;color:var(--ep-mute);margin-top:2px}
+.ep-golf-tick{color:var(--ep-success,#34D399)}
+.ep-shell .ep-golf-remove{color:var(--ep-dim);padding:0;background:none;border:0}
+.ep-shell .ep-golf-add{display:flex;width:100%;height:auto;align-items:center;justify-content:flex-start;gap:10px;font-size:15px;font-weight:600;padding:13px 0;border:0;border-top:1px solid var(--ep-hair);border-radius:0;color:var(--ep-ink)}
+.ep-golf-add span{width:26px;height:26px;border-radius:50%;border:1px solid var(--ep-hair);display:flex;align-items:center;justify-content:center;color:var(--ep-mute)}

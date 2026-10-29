@@ -18,7 +18,7 @@ export function useProfileSave(userId: string) {
 
   const save = async (
     form: ProfileFormData,
-    opts: { isOnboarding?: boolean; hasWhsConnection?: boolean; welcomeFields?: 'identity' | 'course'; photoField?: 'profile' | 'header'; profileFields?: 'name' | 'bio' | 'location' | 'gender' } = {}
+    opts: { isOnboarding?: boolean; hasWhsConnection?: boolean; welcomeFields?: 'identity' | 'course'; photoField?: 'profile' | 'header'; profileFields?: 'name' | 'bio' | 'location' | 'gender' | 'handicap' | 'homeClub' | 'additionalClubs' } = {}
   ): Promise<boolean | 'username_taken'> => {
     const { isOnboarding = false, hasWhsConnection = false } = opts;
     setIsSaving(true);
@@ -120,10 +120,26 @@ export function useProfileSave(userId: string) {
       // EP2 opt-in: each Edit profile sheet writes only its own columns.
       if (opts.profileFields) {
         const f = opts.profileFields;
+        // EP3 memberships retain the existing user_home_clubs source of truth.
+        // This opt-in never writes profile or visibility columns.
+        if (f === 'additionalClubs') {
+          const { error: delError } = await supabase.from('user_home_clubs').delete().eq('user_profile_id', userId);
+          if (delError) throw delError;
+          const ids = [...new Set(form.additionalClubs.map(c => c.clubId).filter((id): id is string => !!id && id !== form.primaryClubId))];
+          if (ids.length) {
+            const { error } = await supabase.from('user_home_clubs').insert(ids.map(club_id => ({ user_profile_id: userId, club_id })));
+            if (error) throw error;
+          }
+          await Promise.all(INVALIDATE_KEYS.map(key => queryClient.invalidateQueries({ queryKey: [key], refetchType: 'all' })));
+          return true;
+        }
+        if (f === 'handicap' && hasWhsConnection) return false;
         const payload: Record<string, unknown> = f === 'name'
           ? { first_name: form.firstName.trim(), last_name: form.lastName.trim(), display_name: form.displayName.trim() }
           : f === 'bio' ? { bio: form.bio.trim() }
           : f === 'location' ? { country: form.country.trim(), city: form.city.trim() }
+          : f === 'handicap' ? { manual_handicap_index: parseHcpFormString(form.handicapIndex) }
+          : f === 'homeClub' ? { home_club: form.homeClubName, primary_club_id: form.primaryClubId }
           : { gender: form.gender || null };
         payload.updated_at = updatePayload.updated_at;
         const { data, error } = await supabase.from('user_profiles').update(payload as any).eq('id', userId).select('id').single();
@@ -132,6 +148,7 @@ export function useProfileSave(userId: string) {
         await queryClient.invalidateQueries({ queryKey: ['profile', userId] });
         await queryClient.invalidateQueries({ queryKey: ['user-profile'], refetchType: 'all' });
         if (f === 'gender') await queryClient.invalidateQueries({ queryKey: whsKeys.percentile(userId), refetchType: 'all' });
+        if (f === 'homeClub') await Promise.all([...INVALIDATE_KEYS, 'home-club-status'].map(key => queryClient.invalidateQueries({ queryKey: [key], refetchType: 'all' })));
         return true;
       }
 

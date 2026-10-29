@@ -1,5 +1,10 @@
 # Roadmap
 
+## EP3 — Edit profile Your golf
+- [x] Add five golf rows and signed-off handicap/home/other-club sheets with isolated saves and unchanged visibility.
+- [x] Reuse coach sheets and profile Top 10 editor; new EP3 tests 27/27, preview build OK.
+- [ ] STOP: full suite 4,272 passed / 11 failed / 4,283 total across 447 files. Existing EP1 tests lack QueryClientProvider after the new golf group adds queries. Await authorisation to update that test wrapper; no assertions changed. See EP3_REPORT.md.
+
 ## Post or review sheet
 - [x] Replace the numbered kind/course/NEXT form with signed-off Post and Review boxes and direct picker/handoff actions.
 - [x] Add member-scoped paginated review suggestions without round reads; update displayed composer counters, locales and analytics label.
