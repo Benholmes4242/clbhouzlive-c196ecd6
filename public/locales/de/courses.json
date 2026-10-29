@@ -1955,7 +1955,8 @@
         "skipToScore": "Skip to your score",
         "wordsHeading": "YOUR WORDS",
         "photosHeading": "PHOTOS AND VIDEOS",
-        "fromMembers": "from {{count}} members"
+        "fromMembers_one": "from {{count}} member",
+        "fromMembers_other": "from {{count}} members"
       }
     },
     "write": {
