@@ -1,5 +1,9 @@
 # Roadmap
 
+## Review Step 1 — Photo header Option A
+- [x] Straight-cut safe-area photograph; course name/score below; preserve compact header and sticky fold, measured spacer; empty lede/words gaps 14/18.
+- [ ] Run full suite, report changed files and inherited EP5.1 type-check blocker; authenticated visual check unavailable on external unmanaged service.
+
 ## EP5.1 — Edit profile snags and white cursors
 - [x] Correct avatar framing, top/bottom safe-area spacing and scoped shared mute labels; visual checks not completed after stop.
 - [x] Extract stable content-height search shell; club-only autofocus/keyboard docking, canonical confirmation/save/request paths and direct editor entrypoints. Review tests and retained browser regression unchanged/passing.
