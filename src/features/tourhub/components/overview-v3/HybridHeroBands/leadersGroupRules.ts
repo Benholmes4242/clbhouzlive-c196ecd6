@@ -3,6 +3,7 @@
  * (live sync's roundCell gate), so scope stale top-level TODAY/THRU before
  * calling the board's own todayFromEntry/thruLabel. No input is mutated.
  */
+import { fieldHasStarted } from '../../../overview/boardStarted';
 import { todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
 import { thruLabel } from '../../../tournament-v2/sections/MiniBoard';
 import type { TeeGroup } from '../../../tournament-v2/data/useTeeTimesAll';
@@ -78,7 +79,7 @@ export function leadersShownRound(baseRound: number, groups: TeeGroup[], leaders
   return candidates.length > 0 && fieldComplete && next != null ? next : baseRound;
 }
 export function leadersGroupVisible(phase: string, teamEvent: boolean, entries: BoardEntry[], loading: boolean): boolean {
-  return phase === 'live' && !teamEvent && !loading && entries.some(e => typeof e.score === 'number' && Number.isFinite(e.score));
+  return phase === 'live' && !teamEvent && !loading && fieldHasStarted(entries) && entries.some(e => typeof e.score === 'number' && Number.isFinite(e.score));
 }
 export function otherLeaders(group: TeeGroup, leaders: BoardEntry[], groups: TeeGroup[]): BoardEntry[] {
   const shown = new Set(group.players.map(p => p.id));

@@ -81,7 +81,12 @@ import { LeadersGroup } from './LeadersGroup';
  */
 export const HERO_BOARD_ROWS = 5;
 
-export function shouldShowOverviewBoard(entries: Array<{ position?: number | null; score?: number | null }>): boolean {
+export function shouldShowOverviewBoard(entries: Array<{
+  position?: number | null; score?: number | null;
+  round_1?: number | null; round_2?: number | null; round_3?: number | null; round_4?: number | null; thru?: number | null;
+}>): boolean {
+  // Before the first tee every row is T1 at 0; nothing renders until someone starts.
+  if (!fieldHasStarted(entries)) return false;
   const rows = entries.slice(0, HERO_BOARD_ROWS);
   if (rows.length === 0) return false;
   return rows.some((row) => row.position != null || (row.score != null && row.score !== 0));
@@ -301,7 +306,7 @@ export function HeroBoardSection({
   const { t } = useTranslation('tourhub');
   /* Before the first tee the feed gives every row position 1 and a 0 score;
      a board of T1 E is false, so the board waits for the first started row. */
-  const hasBoard = phase !== 'upcoming' && shouldShowOverviewBoard(entries) && fieldHasStarted(entries);
+  const hasBoard = phase !== 'upcoming' && shouldShowOverviewBoard(entries);
 
   const { viewingTournamentId, viewingTourSlug } = useTourSelection();
   const pickTourCode = viewingTourSlug ?? 'pga';

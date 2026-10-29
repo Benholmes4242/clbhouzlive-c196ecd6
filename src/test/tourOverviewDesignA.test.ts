@@ -139,8 +139,8 @@ describe('Tour Overview correctness gates', () => {
 
   it('withholds level-par field-order rows until a position or score is posted', () => {
     expect(shouldShowOverviewBoard([{ position: null, score: 0 }, { position: null, score: 0 }])).toBe(false);
-    expect(shouldShowOverviewBoard([{ position: 1, score: 0 }])).toBe(true);
-    expect(shouldShowOverviewBoard([{ position: null, score: -1 }])).toBe(true);
+    expect(shouldShowOverviewBoard([{ position: 1, score: 0, thru: 1 }])).toBe(true);
+    expect(shouldShowOverviewBoard([{ position: null, score: -1, round_1: -1 }])).toBe(true);
   });
 
   it('shows prize when ANY row in the tournament has money, whatever the slice', () => {
