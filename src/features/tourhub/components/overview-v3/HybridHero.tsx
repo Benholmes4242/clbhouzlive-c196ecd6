@@ -114,11 +114,6 @@ export function buildLeaderTrio(
   tourSlug: string | null | undefined,
   t: (key: string, opts?: Record<string, unknown>) => string,
 ): HeroLeaderTrio | null {
-  // Live before anyone tees off: the situation names the first tee time, read
-  // from the same tee-time source LeadersGroup uses.
-  const notStarted = state.kind === 'live' && !fieldHasStarted(rows);
-  const { data: currentTees } = useTeeTimesAll(tournament.id, state.kind === 'live' ? state.round : 1, { enabled: notStarted });
-  const firstTeeTime = notStarted ? earliestTeeTime(currentTees) : null;
   const top = rows[0];
   if (top?.position !== 1 || top.score == null) return null;
   const leaders = rows.filter((entry) => entry.position === 1);
@@ -164,6 +159,11 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
   const venueImageUrl = tournament.id ? imageMap?.get(tournament.id) ?? null : null;
   const { data: leaderboard = [] } = useTourLeaderboard(state.kind === 'upcoming' ? '' : tournament.id);
   const rows = Array.isArray(leaderboard) ? leaderboard : [];
+  // Live before anyone tees off: the situation names the first tee time, read
+  // from the same tee-time source LeadersGroup uses.
+  const notStarted = state.kind === 'live' && !fieldHasStarted(rows);
+  const { data: currentTees } = useTeeTimesAll(tournament.id, state.kind === 'live' ? state.round : 1, { enabled: notStarted });
+  const firstTeeTime = notStarted ? earliestTeeTime(currentTees) : null;
   const top = rows[0];
   const topPosition = top?.position;
   const tiedCount = topPosition === 1
