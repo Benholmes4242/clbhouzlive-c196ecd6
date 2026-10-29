@@ -451,7 +451,8 @@ function resolveLayout(
 /* Status vocabulary lives in _shared/resultStatus.ts — see MDF note there. */
 const isDemoted = isDemotedStatus;
 
-function statusWord(s?: string | null): string {
+/** Board label for a status; shared with the overview pick cards so both agree. */
+export function statusWord(s?: string | null): string {
   const u = (s || '').toUpperCase();
   if (u === 'CUT' || u === 'MC') return 'CUT';
   if (u === 'MDF') return 'MDF';

@@ -13,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import type { TournamentPhase, NextTournamentPreview } from './aiPredictionTypes';
 import { PREDICTION_LOGIC_VERSION } from '../lib/predictionLogicVersion';
-import { isWithdrawn } from '../_shared/resultStatus';
+import { isWithdrawn, normalizeStatus } from '../_shared/resultStatus';
 
 // =============================================
 // TYPES
@@ -519,7 +519,8 @@ export async function fetchPredictionsForTournament(tournament: any): Promise<AI
   // WD validation: check if any predicted players have withdrawn
   const validatedPredictions = await validatePicksAgainstField(
     tournament.id,
-    rawPredictions
+    rawPredictions,
+    tournamentOpenForPicks,
   );
 
   return formatPredictions(
@@ -537,6 +538,7 @@ export async function fetchPredictionsForTournament(tournament: any): Promise<AI
  * (and the tournament has started), promote an alternate from dark_horses.
  */
 let warnedFieldMismatch = false;
+let warnedBoardMismatch = false;
 
 export async function validatePicksAgainstField(
   tournamentId: string,
@@ -545,7 +547,10 @@ export async function validatePicksAgainstField(
     darkHorses: any[];
     courseAnalysis: any;
     confidence: number;
-  }
+  },
+  /** CB54 lock: true while status is 'scheduled'/'created'. Once locked,
+   *  picks are never swapped; WD/DQ picks stay in place and are only marked. */
+  openForPicks = true,
 ) {
   const contenders = [...(predictions.topContenders || [])];
   const alternates = [...(predictions.darkHorses || [])];
@@ -563,10 +568,11 @@ export async function validatePicksAgainstField(
   // Query leaderboard for these players' statuses
   const { data: lbRows } = await supabase
     .from('sr_leaderboards')
-    .select('player_id, status, sr_players!inner(sr_id)')
+    .select('player_id, status')
     .eq('tournament_id', tournamentId);
 
   if (!lbRows || lbRows.length === 0) {
+    if (!openForPicks) return predictions;
     // No leaderboard data yet (pre-tournament) — check tee times instead
     // sr_tee_time_players -> sr_tee_times (via tee_time_id) -> tournament_id
     const { data: teeTimeIds } = await supabase
@@ -605,7 +611,7 @@ export async function validatePicksAgainstField(
       if (fieldSet.has(String(p.playerId))) {
         validContenders.push(p);
       } else {
-        withdrawnPicks.push({ ...p, withdrawnStatus: 'wd' });
+        withdrawnPicks.push({ ...p, withdrawnStatus: 'WD' });
       }
     }
 
@@ -634,32 +640,50 @@ export async function validatePicksAgainstField(
     };
   }
 
-  // Build status map keyed by sr_id
+  // Status map keyed by player_id (sr_players.id — the id AITopContender.playerId carries).
   const statusMap = new Map<string, string>();
   lbRows.forEach((row: any) => {
-    const srId = (row.sr_players as any)?.id;
-    if (srId) statusMap.set(srId, row.status || 'active');
+    if (row.player_id != null) statusMap.set(String(row.player_id), row.status || 'active');
   });
 
-  // Filter out withdrawn picks
+  // None of the picks among a full board is an id mismatch, not withdrawals.
+  if (lbRows.length >= 20 && !contenders.some((p: any) => statusMap.has(String(p.playerId)))) {
+    if (!warnedBoardMismatch) console.warn('[useAIPredictions] no pick found on the leaderboard; skipping the field check (id mismatch?)');
+    warnedBoardMismatch = true;
+    return predictions;
+  }
+
+  // Locked (play has started): never promote or reorder; mark WD/DQ in place.
+  if (!openForPicks) {
+    const withdrawnPicks: any[] = [];
+    const topContenders = contenders.map((p: any) => {
+      const status = statusMap.get(String(p.playerId));
+      if (!isWithdrawn(status)) return p;
+      const marked = { ...p, withdrawnStatus: normalizeStatus(status) };
+      withdrawnPicks.push(marked);
+      return marked;
+    });
+    return { ...predictions, topContenders, withdrawnPicks };
+  }
+
+  // Open for picks: replace withdrawn picks with alternates.
   const validContenders: any[] = [];
   const withdrawnPicks: any[] = [];
 
   for (const p of contenders) {
-    const status = statusMap.get(p.playerId);
+    const status = statusMap.get(String(p.playerId));
     // 'dsq' never existed in the table; the real value is DQ. See _shared/resultStatus.ts.
     if (isWithdrawn(status)) {
-      withdrawnPicks.push({ ...p, withdrawnStatus: status });
+      withdrawnPicks.push({ ...p, withdrawnStatus: normalizeStatus(status) });
     } else {
       validContenders.push(p);
     }
   }
 
-  // Promote alternates
   let promoted = 0;
   for (const alt of alternates) {
     if (validContenders.length >= 5) break;
-    const altStatus = statusMap.get(alt.playerId);
+    const altStatus = statusMap.get(String(alt.playerId));
     if (!isWithdrawn(altStatus)) {
       validContenders.push({
         ...alt,
