@@ -260,7 +260,7 @@ export const CHROME_REGISTRY: ChromeRule[] = [
 
   // Tour Hub overview: the page-provided left slot carries burger + tour picker;
   // the standard controls remain in the right island over the full-bleed hero.
-  { match: { exact: '/tourhub' },                 spec: { chrome: 'island', tone: 'dark', bleed: true, scrim: 'hero', note: 'Tour overview — shared fixed islands over the full-bleed hero; chrome owns the safe area; 'hero' is the 140px photo fade at rest that cross-fades to the shared scrolled band past 24px (BRIEF_TOUR_OVERVIEW_BAND, signed off 29 Oct 2026).' } },
+  { match: { exact: '/tourhub' },                 spec: { chrome: 'island', tone: 'dark', bleed: true, scrim: 'hero', note: 'Tour overview — shared fixed islands over the full-bleed hero; chrome owns the safe area; \'hero\' is the 140px photo fade at rest that cross-fades to the shared scrolled band past 24px (BRIEF_TOUR_OVERVIEW_BAND, signed off 29 Oct 2026).' } },
   // Wire index + stories are non-bleeding solid-bar pages. Their page-provided
   // slots add the fixed section label and deliberately suppress the tour picker.
   {
