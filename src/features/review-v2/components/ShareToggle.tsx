@@ -12,6 +12,7 @@
 
 import React from 'react';
 import { RV2 } from '../tokens';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   value: boolean;
@@ -22,11 +23,18 @@ interface Props {
   sub?: string;
   /** True: no card background, border or radius — one row. */
   bare?: boolean;
+  appearance?: 'score';
 }
 
 const TRACK_ON = RV2.ink;
 
-export function ShareToggle({ value, onChange, title, sub, bare }: Props) {
+export function ShareToggle({ value, onChange, title, sub, bare, appearance }: Props) {
+  if (appearance === 'score') return (
+    <Button variant="ghost" type="button" role="switch" aria-checked={value} onClick={() => onChange(!value)} className="review-score-share">
+      <div className="review-score-share-copy"><div className="review-score-share-title">{title}</div><div className="review-score-share-sub">{sub}</div></div>
+      <div aria-hidden className="review-score-switch" data-on={value}><i /></div>
+    </Button>
+  );
   return (
     <button
       type="button"

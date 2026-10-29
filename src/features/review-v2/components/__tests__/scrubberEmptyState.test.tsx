@@ -1,61 +1,41 @@
-/**
- * The unset scrubber: a solid handle that a TAP must not turn into a 1.0.
- *
- * The handle now looks identical whether or not the course has been scored, so
- * the only thing standing between a stray tap and a silently-recorded 1.0 is
- * the "commit on move, never on down" rule. That rule gets a test.
- */
+/** Signed-off empty ruler: no thumb until set; taps and drags both commit. */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { OverallScrubber } from '../OverallScrubber';
-
-/** The handle is the last child of the track, inside the slider. */
-function handleOf(container: HTMLElement): HTMLElement {
-  const slider = container.querySelector('[role="slider"]')!;
-  const track = slider.firstElementChild!;
-  return track.lastElementChild as HTMLElement;
+const props = { caption: '', ariaLabel: 'Overall' };
+function rail() {
+  const slider = screen.getByRole('slider');
+  vi.spyOn(slider, 'getBoundingClientRect').mockReturnValue({ left: 0, width: 180 } as DOMRect);
+  return slider;
 }
-
-/* The three band LABELS are gone: under the course page's two-tone rule the
-   first two colours are identical and a three-colour legend reads as broken, so
-   the axis now marks the track with 1 / 5 / 10 in one quiet tone. */
-const props = {
-  caption: '',
-  ariaLabel: 'Overall',
-};
-
+function pointer(target: EventTarget, type: string, x: number) {
+  const event = new Event(type, { bubbles: true });
+  Object.defineProperty(event, 'clientX', { value: x });
+  fireEvent(target, event);
+}
 describe('OverallScrubber empty state', () => {
   it('renders a single em-dash, not skeleton-looking double hyphens', () => {
     render(<OverallScrubber value={null} onChange={() => {}} {...props} />);
-    expect(screen.getByText('\u2014')).toBeTruthy();
+    expect(screen.getByText('—')).toBeTruthy();
   });
-
   it('does not report a value to assistive tech when unscored', () => {
     render(<OverallScrubber value={null} onChange={() => {}} {...props} />);
-    const slider = screen.getByRole('slider');
-    expect(slider.getAttribute('aria-valuenow')).toBeNull();
-    expect(slider.getAttribute('aria-valuetext')).toBe('Not scored');
+    expect(screen.getByRole('slider').getAttribute('aria-valuenow')).toBeNull();
+    expect(screen.getByRole('slider').getAttribute('aria-valuetext')).toBe('Not scored');
   });
-
-  it('leaves the scrubber null when the handle is tapped without movement', () => {
+  it('commits a ruler tap immediately without a ghost handle', () => {
     const onChange = vi.fn();
-    const { container } = render(
-      <OverallScrubber value={null} onChange={onChange} {...props} />,
-    );
-    const target = handleOf(container);
-    fireEvent.pointerDown(target, { clientX: 10 });
+    const { container } = render(<OverallScrubber value={null} onChange={onChange} {...props} />);
+    expect(container.querySelector('[data-score-thumb]')).toBeNull();
+    pointer(rail(), 'pointerdown', 90);
     fireEvent.pointerUp(window);
-    expect(onChange).not.toHaveBeenCalled();
+    expect(onChange).toHaveBeenCalledWith(5.5);
   });
-
   it('commits when the pointer actually moves', () => {
     const onChange = vi.fn();
-    const { container } = render(
-      <OverallScrubber value={null} onChange={onChange} {...props} />,
-    );
-    const target = handleOf(container);
-    fireEvent.pointerDown(target, { clientX: 10 });
-    fireEvent.pointerMove(window, { clientX: 120 });
-    expect(onChange).toHaveBeenCalled();
+    render(<OverallScrubber value={null} onChange={onChange} {...props} />);
+    pointer(rail(), 'pointerdown', 0);
+    pointer(window, 'pointermove', 123);
+    expect(onChange).toHaveBeenLastCalledWith(7.2);
   });
 });

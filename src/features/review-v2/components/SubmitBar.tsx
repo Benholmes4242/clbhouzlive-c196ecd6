@@ -14,6 +14,7 @@
 import React from 'react';
 import { RV2 } from '../tokens';
 import { PAGE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   label: string;
@@ -23,10 +24,17 @@ interface Props {
   skipLabel?: string | null;
   onSkip?: () => void;
   /** 'step1' = BRIEF_REVIEW_STEP_ONE §5 restyle; default unchanged. */
-  appearance?: 'default' | 'step1';
+  appearance?: 'default' | 'step1' | 'score';
+  quiet?: boolean;
 }
 
-export function SubmitBar({ label, enabled, onPress, summary, skipLabel, onSkip, appearance = 'default' }: Props) {
+export function SubmitBar({ label, enabled, onPress, summary, skipLabel, onSkip, appearance = 'default', quiet }: Props) {
+  if (appearance === 'score') return (
+    <div className="review-score-footer" data-submit-appearance="score">
+      {summary && <div className="review-score-footer-line">{summary}</div>}
+      <Button variant="ghost" disabled={!enabled} onClick={onPress} className="review-score-action" data-quiet={quiet}>{label}</Button>
+    </div>
+  );
   if (appearance === 'step1') {
     return (
       <div

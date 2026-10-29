@@ -94,3 +94,4 @@ Report the suite total before and after, and name the source of any delta. A cou
 - Business creation and the live business hero share action labels in businessHero; WelcomeCropper's shape/aspect options are opt-in and preserve setup defaults, so draft previews cannot fork labels or onboarding geometry.
 - Rounds gate lifecycle ownership lives in RoundsGate.tsx; shared score atoms expose inert blur markers and connect primary/decline styles have one owner, preventing gated presentation from changing ungated figures or connect controls.
 - Composer entry and suggestion ownership: see ComposerFlowSheet.tsx and useReviewSuggestions.ts headers; displayed counters exclude entry without renumbering wizard state or analytics, preserving handoff and draft compatibility.
+- Review score-step requirements and footer priority share scoreStepRules; useScoreRuler owns tap/drag/keyboard bounds so overall and category controls cannot diverge.
