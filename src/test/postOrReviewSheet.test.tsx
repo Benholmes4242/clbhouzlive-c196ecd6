@@ -26,6 +26,8 @@ vi.mock('@/features/composer-flow/ReviewCourseSearchSheet', () => ({ default: (p
 } }));
 import ComposerFlowSheet from '@/features/composer-flow/ComposerFlowSheet';
 import ComposerStepHeader from '@/features/composer-flow/components/ComposerStepHeader';
+import { ReviewStepHeading } from '@/features/review-v2/components/ReviewScoreHeadings';
+import { REVIEW_TOTAL_STEPS } from '@/features/review-v2/hooks/useReviewComposer';
 
 const i18n = createInstance();
 void i18n.init({ lng: 'en', fallbackLng: 'en', resources: { en: { composerFlow: en } }, initAsync: false });
@@ -140,9 +142,19 @@ describe('display-only counters', () => {
     expect(container.querySelector('[aria-hidden]')).toBeNull();
   });
   it.each([2, 3])('internal review step %s displays one fewer out of two', step => {
-    render(<I18nextProvider i18n={i18n}><ComposerStepHeader step={step - 1} total={2} left="none" /></I18nextProvider>);
+    const { container } = render(<I18nextProvider i18n={i18n}><ReviewStepHeading step={step - 1} total={REVIEW_TOTAL_STEPS - 1} /></I18nextProvider>);
     expect(screen.getByText(`Step ${step - 1} of 2`)).toBeInTheDocument();
     const source = readFileSync('src/features/review-v2/ReviewComposerV2.tsx', 'utf8');
-    expect(source).toContain('<ComposerStepHeader step={step - 1} total={REVIEW_TOTAL_STEPS - 1} left="none"');
+    expect(source).toContain('<ReviewStepHeading step={step - 1} total={REVIEW_TOTAL_STEPS - 1}');
+    const headingSource = readFileSync('src/features/review-v2/components/ReviewScoreHeadings.tsx', 'utf8');
+    expect(headingSource).toContain('if (step !== total) return <ComposerStepHeader step={step} total={total} left="none"');
+    if (step === 2) {
+      expect(container.querySelector('[data-score-step-heading]')).toBeNull();
+      expect(container.querySelector('[aria-hidden]')?.children).toHaveLength(2);
+    } else {
+      expect(container.querySelector('[data-score-step-heading]')).not.toBeNull();
+      expect(container.querySelector('.review-score-step-label')).toHaveTextContent('Step 2 of 2');
+      expect(container.querySelector('[aria-hidden]')).toBeNull();
+    }
   });
 });
