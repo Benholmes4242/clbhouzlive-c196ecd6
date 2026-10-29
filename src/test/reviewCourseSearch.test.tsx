@@ -154,6 +154,40 @@ describe('ReviewCourseSearchSheet', () => {
     expect(h.track.mock.calls.filter(c => c[0] === 'review_search_opened').length).toBe(1);
   });
 
+  it('holds the height captured on the first character through changing results, then releases on clear', async () => {
+    seed(); mount();
+    await waitFor(() => expect(list('popular')).not.toBeNull());
+    const body = screen.getByTestId('review-course-search');
+    const measure = vi.spyOn(body, 'getBoundingClientRect').mockReturnValue({ height: 420 } as DOMRect);
+    const input = screen.getByRole('searchbox');
+    fireEvent.change(input, { target: { value: 'z' } });
+    expect(body.style.minHeight).toBe('420px');
+    measure.mockReturnValue({ height: 560 } as DOMRect);
+    fireEvent.change(input, { target: { value: 'zzz' } });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Not here? Ask us to add it' })).toBeInTheDocument());
+    expect(body.style.minHeight).toBe('420px');
+    expect(measure).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Clear search' }));
+    expect(body.style.minHeight).toBe('');
+    expect(list('popular')).not.toBeNull();
+    measure.mockRestore();
+  });
+
+  it('releases the hold when the field is deleted and measures again on the next first character', () => {
+    mount();
+    const body = screen.getByTestId('review-course-search');
+    const measure = vi.spyOn(body, 'getBoundingClientRect').mockReturnValue({ height: 300 } as DOMRect);
+    const input = screen.getByRole('searchbox');
+    fireEvent.change(input, { target: { value: 'a' } });
+    expect(body.style.minHeight).toBe('300px');
+    fireEvent.change(input, { target: { value: '' } });
+    expect(body.style.minHeight).toBe('');
+    measure.mockReturnValue({ height: 350 } as DOMRect);
+    fireEvent.change(input, { target: { value: 'b' } });
+    expect(body.style.minHeight).toBe('350px');
+    measure.mockRestore();
+  });
+
   it('renders the three lists with their rules', async () => {
     seed(); mount();
     await waitFor(() => expect(list('popular')).not.toBeNull());

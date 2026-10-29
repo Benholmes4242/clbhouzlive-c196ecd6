@@ -2,7 +2,10 @@
  * (review-course-search-signed-off.html). Opened from the Post or review
  * sheet; a pick hands the course id back so ComposerFlowSheet's close-first
  * navigation owns the route. List rules live in reviewCourseSearchRules.ts,
- * reads in hooks/useReviewCourseSearch.ts. The field never autofocuses. */
+ * reads in hooks/useReviewCourseSearch.ts. The field never autofocuses.
+ * Content-height sizing belongs here: the first nonempty edit captures the
+ * current content height before results change; clearing/closing releases it.
+ * The shared sheet owns the viewport cap and keyboard behaviour. */
 import { useEffect, useRef, useState } from 'react';
 import { Plus, Search, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -27,13 +30,20 @@ interface Props {
 export default function ReviewCourseSearchSheet({ open, userId, onClose, onPick, onBeforeRequest }: Props) {
   const { t } = useTranslation('composerFlow');
   const [q, setQ] = useState('');
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [heldHeight, setHeldHeight] = useState<number | null>(null);
+  const changeQuery = (next: string) => {
+    if (!next.length) setHeldHeight(null);
+    else if (!q.length) setHeldHeight(contentRef.current?.getBoundingClientRect().height ?? null);
+    setQ(next);
+  };
   const { subscoreMinRatings: min } = useTop100Config();
   const idle = useReviewCourseIdle(open, userId, min);
   const results = useReviewCourseResults(open, userId, q);
   const opened = useRef(false);
   useEffect(() => {
     if (open && !opened.current) { opened.current = true; analyticsEvents.track('review_search_opened', {}); }
-    if (!open) { opened.current = false; setQ(''); }
+    if (!open) { opened.current = false; setQ(''); setHeldHeight(null); }
   }, [open]);
 
   const searching = q.trim().length >= SEARCH_MIN_CHARS;
@@ -52,17 +62,17 @@ export default function ReviewCourseSearchSheet({ open, userId, onClose, onPick,
   const ready = searching && results.term === q.trim() && results.isSuccess;
 
   return (
-    <BottomSheet open={open} onClose={onClose} fullHeight surfaceClassName="post-or-review-surface">
-      <div className="rcs" data-testid="review-course-search">
+    <BottomSheet open={open} onClose={onClose} surfaceClassName="post-or-review-surface">
+      <div ref={contentRef} className="rcs" data-testid="review-course-search" style={{ minHeight: heldHeight ?? undefined }}>
         <header className="rcs-head">
           <h1>{t('reviewSearch.title', { defaultValue: 'Review a course' })}</h1>
           <Button variant="ghost" size="icon" className="rcs-close" aria-label={t('close', { defaultValue: 'Close' })} onClick={onClose}><X size={17} strokeWidth={2.2} /></Button>
         </header>
         <label className="rcs-field" data-filled={q.length > 0}>
           <Search size={18} aria-hidden="true" />
-          <input type="search" value={q} onChange={e => setQ(e.target.value)} placeholder={t('reviewSearch.placeholder', { defaultValue: 'Search 23,000 courses' })}
+          <input type="search" value={q} onChange={e => changeQuery(e.target.value)} placeholder={t('reviewSearch.placeholder', { defaultValue: 'Search 23,000 courses' })}
             aria-label={t('reviewSearch.placeholder', { defaultValue: 'Search 23,000 courses' })} autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="search" />
-          {q.length > 0 && <button type="button" className="rcs-clear" aria-label={t('reviewSearch.clear', { defaultValue: 'Clear search' })} onClick={() => setQ('')}><X size={16} /></button>}
+          {q.length > 0 && <button type="button" className="rcs-clear" aria-label={t('reviewSearch.clear', { defaultValue: 'Clear search' })} onClick={() => changeQuery('')}><X size={16} /></button>}
         </label>
         <div className="rcs-content">
           {searching ? (ready && <>
