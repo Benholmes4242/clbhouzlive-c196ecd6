@@ -671,9 +671,8 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
   return (
     <>
 
-      {/* BRIEF_TOUR_ISLAND §1: the '/tourhub' top fade is a single static
-          layer (height 140, no scrolled band) — a registry scrim variant so
-          the Clubhouse scrim is unchanged. */}
+      {/* BRIEF_TOUR_OVERVIEW_BAND: the '/tourhub' 140px photo fade at rest,
+          cross-fading to the shared scrolled band past 24px. */}
       {spec.scrim === 'hero' && (
         <div
           aria-hidden
@@ -687,48 +686,53 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
             background: 'linear-gradient(180deg, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0.25) 55%, rgba(10,10,12,0) 100%)',
             pointerEvents: 'none',
             zIndex: Z.header - 1,
+            opacity: scrolled ? 0 : 1,
+            transition: scrimTransition,
           }}
         />
       )}
 
       {spec.scrim === true && (
-        <>
-          <div
-            aria-hidden
-            data-chrome="island-scrim"
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 'calc(var(--sat, 0px) + 80px)',
-              background: 'linear-gradient(180deg, rgba(10,10,12,0.95) 0%, rgba(10,10,12,0.75) 45%, rgba(10,10,12,0) 100%)',
-              pointerEvents: 'none',
-              zIndex: Z.header - 1,
-              opacity: scrolled ? 0 : 1,
-              transition: scrimTransition,
-            }}
-          />
-          <div
-            aria-hidden
-            data-chrome="island-scrim-band"
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 'calc(var(--sat, 0px) + 68px)',
-              background: 'rgba(10,10,12,0.88)',
-              backdropFilter: 'blur(20px) saturate(150%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(150%)',
-              borderBottom: '1px solid rgba(255,255,255,0.06)',
-              pointerEvents: 'none',
-              zIndex: Z.header - 1,
-              opacity: scrolled ? 1 : 0,
-              transition: scrimTransition,
-            }}
-          />
-        </>
+        <div
+          aria-hidden
+          data-chrome="island-scrim"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 'calc(var(--sat, 0px) + 80px)',
+            background: 'linear-gradient(180deg, rgba(10,10,12,0.95) 0%, rgba(10,10,12,0.75) 45%, rgba(10,10,12,0) 100%)',
+            pointerEvents: 'none',
+            zIndex: Z.header - 1,
+            opacity: scrolled ? 0 : 1,
+            transition: scrimTransition,
+          }}
+        />
+      )}
+
+      {/* ONE shared scrolled band for scrim === true and 'hero', so the
+          Clubhouse and the Tour overview can never drift. */}
+      {(spec.scrim === true || spec.scrim === 'hero') && (
+        <div
+          aria-hidden
+          data-chrome="island-scrim-band"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 'calc(var(--sat, 0px) + 68px)',
+            background: 'rgba(10,10,12,0.88)',
+            backdropFilter: 'blur(20px) saturate(150%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(150%)',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            pointerEvents: 'none',
+            zIndex: Z.header - 1,
+            opacity: scrolled ? 1 : 0,
+            transition: scrimTransition,
+          }}
+        />
       )}
 
       <div
