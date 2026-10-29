@@ -477,11 +477,17 @@ export function formatMonthLongDayYear(d: DateInput): string {
 
 /** "Jul 16, 15:45" — short month + numeric day + 24h HH:MM.
  *  Matches date-fns `MMM d, HH:mm` — comma from en-US locale ordering. */
+/** "08:51" / "14:05" / "00:10" — local 24-hour clock, two-digit hours and
+ *  minutes. The one 24-hour rule; formatMonthDayHm24 reads it. */
+export function formatTimeHm24(d: DateInput): string {
+  const date = toDate(d);
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
 export function formatMonthDayHm24(d: DateInput): string {
   const date = toDate(d);
   const md = new Intl.DateTimeFormat(formattingLocale(), { month: 'short', day: 'numeric' }).format(date);
-  const hm = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-  return `${md}, ${hm}`;
+  return `${md}, ${formatTimeHm24(date)}`;
 }
 
 /** "16 July, 2026" — en-GB day + long month + comma + year. Matches date-fns `d MMMM, yyyy`. */

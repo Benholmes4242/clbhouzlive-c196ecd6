@@ -46,7 +46,7 @@
  * placeholder or reserved height.
  */
 
-import React, { useMemo, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trophy } from 'lucide-react';
 
@@ -65,7 +65,7 @@ import { PicksSheet } from './PicksSheet';
 import type { HeroState } from '../HybridHero.utils';
 import { fieldHasStarted, rowHasStarted } from '../../../overview/boardStarted';
 import { usePickTeeTimes } from '../../../tournament-v2/data/usePickTeeTimes';
-import { formatDayMonthShortGB, formatTimeHm, formatWeekdayLong, formatWeekdayShortGB } from '@/i18n/format';
+import { formatDayMonthShortGB, formatTimeHm24, formatWeekdayLong, formatWeekdayShortGB } from '@/i18n/format';
 import { boardMovementMap, todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
 import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
 import { OVERVIEW, pickMovementCards, type MovementCard } from '../overviewTokens';
@@ -517,13 +517,13 @@ export function HeroBoardSection({
   );
 }
 
-/** The card shows the time only ("14:05", viewer's local time); the day moves
+/** The card shows the time only, 24-hour ("14:05", viewer's local time); the day moves
  *  to the picks heading via pickTeeDayLabel (BRIEF — PICK TEE TIMES: THE DAY
  *  MOVES TO THE HEADING). */
 export function pickTeeText(iso: string): string | null {
   const d = new Date(iso);
   if (!Number.isFinite(d.getTime())) return null;
-  return formatTimeHm(d);
+  return formatTimeHm24(d);
 }
 
 type TeeT = (key: string, opts?: Record<string, unknown>) => string;
@@ -532,7 +532,13 @@ const localDayIndex = (d: Date) => Math.round(new Date(d.getFullYear(), d.getMon
 /** Heading label for the shown tee times, in the viewer's local time:
  *  TODAY / TOMORROW / full weekday (2–6 days) / short weekday + date (7+);
  *  shown times on different local days give "WED–THU". Null when none. */
-export function pickTeeDayLabel(isos: string[], now: Date, t: TeeT): string | null {
+/** Whether "OUR TOURNAMENT PICKS" + gap + the full tee label fit the row's
+ *  content box, measured on the device (no breakpoint). */
+export function teeHeadingFits(rowContentWidth: number, picksWidth: number, fullLabelWidth: number, gap = 8): boolean {
+  return picksWidth + gap + fullLabelWidth <= rowContentWidth;
+}
+
+export function pickTeeDayLabel(isos: string[], now: Date, t: TeeT, dayOnly = false): string | null {
   const ds = isos.map((s) => new Date(s)).filter((d) => Number.isFinite(d.getTime())).sort((a, b) => a.getTime() - b.getTime());
   if (!ds.length) return null;
   const first = ds[0];
@@ -547,6 +553,7 @@ export function pickTeeDayLabel(isos: string[], now: Date, t: TeeT): string | nu
     else if (ahead <= 6) day = formatWeekdayLong(first);
     else day = `${formatWeekdayShortGB(first)} ${formatDayMonthShortGB(first)}`;
   }
+  if (dayOnly) return day.toLocaleUpperCase();
   return t('overview.hero.picksTeeTimes', { day: day.toLocaleUpperCase(), defaultValue: `TEE TIMES \u00b7 ${day.toLocaleUpperCase()}` });
 }
 
@@ -604,16 +611,41 @@ function PicksBlock({
   };
   const shownTees = cards.map(teeFor).filter((x): x is string => !!x);
   const teeDay = shownTees.length ? pickTeeDayLabel(shownTees, new Date(), t as unknown as TeeT) : null;
+  const teeDayOnly = shownTees.length ? pickTeeDayLabel(shownTees, new Date(), t as unknown as TeeT, true) : null;
+  /* STOP 2 ruling: the full label first; the day alone when the row would
+     overflow. A hidden twin of the full label is always measured, so the row
+     can switch back when it widens. */
+  const rowRef = useRef<HTMLDivElement>(null);
+  const picksRef = useRef<HTMLSpanElement>(null);
+  const fullRef = useRef<HTMLSpanElement>(null);
+  const [teeFits, setTeeFits] = useState(true);
+  useLayoutEffect(() => {
+    const row = rowRef.current;
+    if (!row || !teeDay) return;
+    const measure = () => {
+      const cs = getComputedStyle(row);
+      const content = row.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+      setTeeFits(teeHeadingFits(content, picksRef.current?.offsetWidth ?? 0, fullRef.current?.offsetWidth ?? 0));
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(row);
+    return () => ro.disconnect();
+  }, [teeDay]);
 
   return (
     <div data-overview-picks style={{ background: PAGE_CANVAS }}>
-      <div style={{ padding: '14px 20px 9px', display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div ref={rowRef} data-overview-picks-heading style={{ position: 'relative', padding: '14px 20px 9px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
             key, so band and sheet cannot drift apart in translation. */}
-        <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER }}>{t('overview.hero.ourPicks')}</span>
+        <span ref={picksRef} style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
         {teeDay ? (
-          <span data-overview-picks-tee-day style={{ marginLeft: 'auto', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap' }}>{teeDay}</span>
+          <>
+            <span data-overview-picks-tee-day style={{ marginLeft: 'auto', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap', flex: 'none' }}>{teeFits ? teeDay : teeDayOnly}</span>
+            <span ref={fullRef} data-overview-picks-tee-measure aria-hidden style={{ position: 'absolute', visibility: 'hidden', pointerEvents: 'none', left: 0, top: 0, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{teeDay}</span>
+          </>
         ) : null}
       </div>
       {intro ? (
