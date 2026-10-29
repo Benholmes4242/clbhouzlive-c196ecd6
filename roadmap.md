@@ -1,5 +1,10 @@
 # Roadmap
 
+## Review a course — Content height, max 85dvh
+- [ ] Remove fixed-height sizing, keep short lists natural and long lists internally scrolling.
+- [ ] Hold the opening content height from first typed character until clear; preserve keyboard handling.
+- [ ] Add regression coverage, run full suite against 4,376/450 baseline, and report every changed file.
+
 ## EP4.1 + EP5 — Completion card and switch-over
 - [x] Complete only EP4's useDeleteAccount mock; Part 1 full suite 4,340/4,340 across 449 files, no assertion changes.
 - [x] Add settled-input completion card, action chips and arrival deep links.
