@@ -130,7 +130,7 @@ export default function EditProfile() {
           <button key={t} type="button" role="tab" className="ep-tab" aria-selected={tab === t} onClick={() => onTab(t)}>{t === 'profile' ? 'Profile' : 'Settings'}</button>
         ))}
       </div>
-      {tab === 'settings' ? <SettingsTabContent /> : (
+      {tab === 'settings' ? <main className="ep-body"><SettingsTabContent /></main> : (
         <main className="ep-body">
           {state === 'error'
             ? <button type="button" className="ep-saved" data-state="error" data-testid="ep-saved" style={{ color: DANGER }} onClick={() => lastFailed.current?.()}>Couldn't save. Try again.</button>

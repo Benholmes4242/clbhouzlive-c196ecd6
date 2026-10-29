@@ -315,7 +315,7 @@ export default function BusinessInvitePage() {
               autoComplete="off"
               autoCorrect="off"
               className="flex-1 min-w-0 bg-transparent outline-none placeholder:text-[rgba(248,250,252,0.42)]"
-              style={{ fontSize: 15, color: INK, caretColor: '#F7931E' }}
+              style={{ fontSize: 15, color: INK, caretColor: INK }}
             />
           </div>
         )}

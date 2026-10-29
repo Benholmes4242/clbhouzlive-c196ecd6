@@ -7,10 +7,9 @@
  * current content height before results change; clearing/closing releases it.
  * The shared sheet owns the viewport cap and keyboard behaviour. */
 import { useEffect, useRef, useState } from 'react';
-import { Plus, Search, X } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
-import BottomSheet from '@/features/post-v2/components/BottomSheet';
+import KeyboardSearchSheet from './KeyboardSearchSheet';
 import { openRequestCourseSheet } from '@/components/courses/requestCourseSheetStore';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -30,20 +29,13 @@ interface Props {
 export default function ReviewCourseSearchSheet({ open, userId, onClose, onPick, onBeforeRequest }: Props) {
   const { t } = useTranslation('composerFlow');
   const [q, setQ] = useState('');
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [heldHeight, setHeldHeight] = useState<number | null>(null);
-  const changeQuery = (next: string) => {
-    if (!next.length) setHeldHeight(null);
-    else if (!q.length) setHeldHeight(contentRef.current?.getBoundingClientRect().height ?? null);
-    setQ(next);
-  };
   const { subscoreMinRatings: min } = useTop100Config();
   const idle = useReviewCourseIdle(open, userId, min);
   const results = useReviewCourseResults(open, userId, q);
   const opened = useRef(false);
   useEffect(() => {
     if (open && !opened.current) { opened.current = true; analyticsEvents.track('review_search_opened', {}); }
-    if (!open) { opened.current = false; setQ(''); setHeldHeight(null); }
+    if (!open) { opened.current = false; setQ(''); }
   }, [open]);
 
   const searching = q.trim().length >= SEARCH_MIN_CHARS;
@@ -62,19 +54,9 @@ export default function ReviewCourseSearchSheet({ open, userId, onClose, onPick,
   const ready = searching && results.term === q.trim() && results.isSuccess;
 
   return (
-    <BottomSheet open={open} onClose={onClose} surfaceClassName="post-or-review-surface">
-      <div ref={contentRef} className="rcs" data-testid="review-course-search" style={{ minHeight: heldHeight ?? undefined }}>
-        <header className="rcs-head">
-          <h1>{t('reviewSearch.title', { defaultValue: 'Review a course' })}</h1>
-          <Button variant="ghost" size="icon" className="rcs-close" aria-label={t('close', { defaultValue: 'Close' })} onClick={onClose}><X size={17} strokeWidth={2.2} /></Button>
-        </header>
-        <label className="rcs-field" data-filled={q.length > 0}>
-          <Search size={18} aria-hidden="true" />
-          <input type="search" value={q} onChange={e => changeQuery(e.target.value)} placeholder={t('reviewSearch.placeholder', { defaultValue: 'Search 23,000 courses' })}
-            aria-label={t('reviewSearch.placeholder', { defaultValue: 'Search 23,000 courses' })} autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="search" />
-          {q.length > 0 && <button type="button" className="rcs-clear" aria-label={t('reviewSearch.clear', { defaultValue: 'Clear search' })} onClick={() => changeQuery('')}><X size={16} /></button>}
-        </label>
-        <div className="rcs-content">
+    <KeyboardSearchSheet open={open} onClose={onClose} query={q} onQueryChange={setQ} testId="review-course-search"
+      title={t('reviewSearch.title', { defaultValue: 'Review a course' })} closeLabel={t('close', { defaultValue: 'Close' })}
+      clearLabel={t('reviewSearch.clear', { defaultValue: 'Clear search' })} placeholder={t('reviewSearch.placeholder', { defaultValue: 'Search 23,000 courses' })}>
           {searching ? (ready && <>
             {rows.length > 0 && <>
               <div className="rcs-count" data-testid="rcs-count">{`${rows.length} ${rows.length === 1 ? 'course' : 'courses'}`}</div>
@@ -86,9 +68,7 @@ export default function ReviewCourseSearchSheet({ open, userId, onClose, onPick,
             <Section list="threshold" title={t('reviewSearch.threshold', { defaultValue: 'One review from its full scores' })} explainer={thresholdExplainer(min)} rows={lists.threshold} min={min} onPick={pick} />
             <Section list="popular" title={t('reviewSearch.popular', { defaultValue: 'Most reviewed this month' })} rows={lists.popular} min={min} onPick={pick} />
           </>}
-        </div>
-      </div>
-    </BottomSheet>
+    </KeyboardSearchSheet>
   );
 }
 

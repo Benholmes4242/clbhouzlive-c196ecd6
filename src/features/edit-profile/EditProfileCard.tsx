@@ -53,7 +53,7 @@ export const EditProfileCard = forwardRef<PhotoActions, Props>(function EditProf
       </button>
       <div className="ep-identity">
         <button type="button" className="ep-avatar" aria-label={avatarUrl ? 'Change photo' : 'Add a photo'} data-testid="ep-avatar" onClick={() => open('avatar')}>
-          <span aria-hidden="true" style={{ display: 'inline-flex' }}><SquircleAvatar size={76} src={avatarUrl} alt={name} className="ep-avatar-face" /></span>
+          <span aria-hidden="true" style={{ display: 'inline-flex' }}><SquircleAvatar size={76} src={avatarUrl} alt={name} hairlineRing ringWidth={1} className="ep-avatar-face" /></span>
           <span className="ep-avatar-badge" aria-hidden="true">+</span>
         </button>
         <div className="ep-name" data-testid="ep-name">{name}</div>

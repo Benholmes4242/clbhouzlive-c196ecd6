@@ -1,5 +1,10 @@
 # Roadmap
 
+## EP5.1 — Edit profile snags and white cursors
+- [ ] Correct avatar framing, top/bottom safe-area spacing and shared mute labels.
+- [ ] Extract stable content-height search shell; club-only autofocus/keyboard docking, canonical confirmation/save/request paths and direct editor entrypoints.
+- [ ] Sweep amber/undefined carets, add regression coverage, keep review tests unchanged, run full suite against 4,378/450 and report all changes.
+
 ## Review a course — Content height, max 85dvh
 - [x] Remove fullHeight; short lists fit content and long lists scroll beneath pinned header/search at 85dvh.
 - [x] Hold first-character content height until clear/close; keyboard handling unchanged.

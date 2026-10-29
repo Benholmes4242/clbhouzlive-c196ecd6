@@ -1,14 +1,16 @@
 /* EP1: new Edit profile frame and top card (ep1-top.html 1A). Scoped to .ep-shell.
    The bizc-* variables let the shared BC4 change-or-remove sheet render here. */
 .ep-shell{--ep-canvas:#0B0B0D;--ep-card:#17171B;--ep-inset:#1E1E23;--ep-hair:rgba(255,255,255,0.08);--ep-ink:#F8FAFC;--ep-mute:rgba(248,250,252,0.62);--ep-dim:rgba(248,250,252,0.42);--bizc-canvas:#0B0B0D;--bizc-card:#17171B;--bizc-hair:rgba(255,255,255,0.08);--bizc-ink:#F8FAFC;--bizc-mute:rgba(248,250,252,0.62);--bizc-dim:rgba(248,250,252,0.42);min-height:100dvh;display:flex;flex-direction:column;background:var(--ep-canvas);color:var(--ep-ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",system-ui,sans-serif;max-width:520px;margin:0 auto;width:100%}
-.ep-head{padding:calc(58px + env(safe-area-inset-top,0px)) 16px 0;display:flex;align-items:center;gap:12px;min-height:calc(94px + env(safe-area-inset-top,0px))}
+.ep-head{padding:calc(env(safe-area-inset-top,0px) + 14px) 16px 0;display:flex;align-items:center;gap:12px;min-height:calc(env(safe-area-inset-top,0px) + 50px);flex-shrink:0}
 .ep-back{width:36px;height:36px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:none;color:var(--ep-ink);display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer}
 .ep-title{flex:1;text-align:center;margin-right:48px;font-size:17px;font-weight:700}
 .ep-tabs{display:flex;gap:24px;padding:0 0 0 20px;border-bottom:1px solid var(--ep-hair)}
 .ep-tab{position:relative;padding:12px 0;background:none;border:0;font-size:15px;font-weight:600;color:var(--ep-mute);cursor:pointer;font-family:inherit}
 .ep-tab[aria-selected="true"]{color:var(--ep-ink)}
 .ep-tab[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--ep-ink)}
-.ep-body{padding:12px 16px;flex:1;overflow-y:auto}
+.ep-body{padding:12px 16px calc(24px + env(safe-area-inset-bottom,0px));flex:1;min-height:0;overflow-y:auto;will-change:transform}
+.ep-shell{height:100dvh;min-height:0}
+.ep-tabs{flex-shrink:0}
 .ep-saved{font-size:12px;color:var(--ep-dim);text-align:center;margin:0 0 10px;background:none;border:0;width:100%;font-family:inherit;display:block}
 .ep-saved[data-state="error"]{cursor:pointer}
 .ep-card{background:var(--ep-card);border:1px solid rgba(255,255,255,0.08);border-radius:20px;overflow:hidden}
@@ -18,7 +20,6 @@
 .ep-edit-chip{position:absolute;top:10px;right:10px;height:30px;padding:0 12px;border-radius:999px;background:rgba(11,11,13,0.6);border:1px solid rgba(255,255,255,0.18);font-size:12.5px;font-weight:600;color:var(--ep-ink);display:flex;align-items:center;gap:6px}
 .ep-identity{padding:0 16px 16px;margin-top:-40px;position:relative;min-width:0}
 .ep-avatar{position:relative;display:inline-flex;padding:0;border:0;background:none;cursor:pointer}
-.ep-avatar-face{box-shadow:0 0 0 3px var(--ep-card)}
 .ep-avatar-badge{position:absolute;right:-6px;bottom:-6px;width:26px;height:26px;border-radius:50%;background:var(--ep-ink);color:var(--ep-canvas);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:2px solid var(--ep-card);box-sizing:border-box}
 .ep-name{font-size:22px;font-weight:700;letter-spacing:-0.02em;margin-top:10px}
 .ep-line{font-size:13.5px;color:var(--ep-mute);margin-top:2px}
@@ -33,7 +34,7 @@
 .ep-rows{background:var(--ep-card);border:1px solid var(--ep-hair);border-radius:18px;padding:0 16px}
 .ep-row{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:13px 0;border:0;border-top:1px solid var(--ep-hair);background:none;color:var(--ep-ink);text-align:left;font-family:inherit;cursor:pointer}
 .ep-row:first-child{border-top:0}
-.ep-row-label{width:96px;flex:none;font-size:14px;color:var(--ep-mute)}
+.ep-shell .ep-row-label{width:96px;flex:none;font-size:14px;color:var(--ep-mute)}
 .ep-row-value{flex:1;min-width:0;font-size:15px;font-weight:500;color:var(--ep-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ep-row-value.two{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.4}
 .ep-row-value.ph{color:rgba(248,250,252,0.36)}
