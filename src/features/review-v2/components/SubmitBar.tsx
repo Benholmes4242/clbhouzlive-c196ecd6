@@ -11,7 +11,7 @@
  *             what they lose.
  */
 
-import React from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import { RV2 } from '../tokens';
 import { PAGE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import { Button } from '@/components/ui/button';
@@ -26,12 +26,28 @@ interface Props {
   /** 'step1' = BRIEF_REVIEW_STEP_ONE §5 restyle; default unchanged. */
   appearance?: 'default' | 'step1' | 'score';
   quiet?: boolean;
+  share?: React.ReactNode;
+  onHeightChange?: (height: number) => void;
 }
 
-export function SubmitBar({ label, enabled, onPress, summary, skipLabel, onSkip, appearance = 'default', quiet }: Props) {
+export function SubmitBar({ label, enabled, onPress, summary, skipLabel, onSkip, appearance = 'default', quiet, share, onHeightChange }: Props) {
+  const scoreFooterRef = useRef<HTMLDivElement>(null);
+  // Only the fixed score footer reserves measured space; other appearances
+  // keep their historical sticky lifecycle and geometry.
+  useLayoutEffect(() => {
+    const footer = scoreFooterRef.current;
+    if (appearance !== 'score' || !footer || !onHeightChange) return;
+    const read = () => onHeightChange(footer.getBoundingClientRect().height);
+    read();
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(read) : null;
+    observer?.observe(footer);
+    window.addEventListener('resize', read);
+    return () => { observer?.disconnect(); window.removeEventListener('resize', read); };
+  }, [appearance, onHeightChange]);
   if (appearance === 'score') return (
-    <div className="review-score-footer" data-submit-appearance="score">
+    <div ref={scoreFooterRef} className="review-score-footer" data-submit-appearance="score">
       {summary && <div className="review-score-footer-line">{summary}</div>}
+      {share && <div className="review-score-footer-share">{share}</div>}
       <Button variant="ghost" disabled={!enabled} onClick={onPress} className="review-score-action" data-quiet={quiet}>{label}</Button>
     </div>
   );

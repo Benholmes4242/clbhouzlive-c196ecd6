@@ -1,5 +1,10 @@
 # Roadmap
 
+## Review Step 2 — One screen and category average
+- [x] Replace only Step 2 strip with heading counter; share half-up categories average with receipt; move share to solid fixed footer with measured bottom reserve.
+- [x] Add9 cases and update3 authorised existing cases; full bunx vitest run executed.
+- [ ] STOP:4,394 passed /3 failed of4,397 across451 files. Two unchanged postOrReviewSheet counter-source cases now fail; inherited reviewStepOne height case and EP5.1 TS2769 remain. No fixes/reruns after stop. Phone geometry apparatus timed out, authenticated flow unavailable; see REVIEW_STEP_TWO_ONE_SCREEN_STOP_REPORT.md.
+
 ## Review Step 1 — Photo header Option A
 - [x] Straight-cut safe-area photograph; course name/score below; preserve compact header and sticky fold, measured spacer; empty lede/words gaps 14/18.
 - [ ] STOP: full bunx vitest run 4,386 passed / 2 failed of 4,388 across451 files. New reviewStepOne safe-area style assertion fails (jsdom returns empty); unchanged ob1Welcome photo-upload spy also fails. Inherited EP5.1 TS2769 remains. No fixes/reruns after stop; see REVIEW_STEP_ONE_HEADER_STOP_REPORT.md. Signed-in visual unavailable (external_unmanaged).

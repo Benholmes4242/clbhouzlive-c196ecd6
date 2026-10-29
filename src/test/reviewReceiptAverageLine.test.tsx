@@ -35,6 +35,13 @@ const firstLine = () => screen.getByText((_text, element) => {
 });
 
 describe('receipt displayed-average comparison', () => {
+  it('receipt uses the same half-up category mean of 8.4 rather than the overall', () => {
+    const { container } = render(<I18nextProvider i18n={i18n}><ReviewReceipt ratingId={null}
+      course={{ id: 'course', name: 'Quinta do Lago Laranjal' }} overall={2}
+      scores={{ design: 9.2, condition: 8, clubhouse: 7.4, facilities: 8.8 }} shareToFeed={false}
+      onClubhouse={() => {}} onBack={() => {}} onNextCourse={() => {}} /></I18nextProvider>);
+    expect(Array.from(container.querySelectorAll('span')).filter(node => node.textContent === '8.4')).toHaveLength(1);
+  });
   it('names the displayed average and measures 7.3 against 7.8, not avg_before 8.1', () => {
     receipt();
     expect(firstLine()).toBeTruthy();

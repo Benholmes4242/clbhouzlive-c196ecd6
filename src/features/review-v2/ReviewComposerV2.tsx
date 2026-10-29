@@ -15,10 +15,9 @@ import { mediaCountKey } from './lib/mediaUploadSummary';
  * breakdown joins the dial on one screen, and the rating - the thing the flow
  * exists for - is the last thing asked rather than the first.
  *
- * THE COUNTER IS SHARED. ComposerStepHeader draws "Step N of 3" and the
- * segmented bar on every step of the flow, including these two; this file no
- * longer draws a step strip of its own, so a member crossing the sheet/route
- * boundary mid-flow cannot tell.
+ * Step 1 retains the shared strip; Step 2 uses its heading's display-only
+ * counter. ReviewScoreHeadings owns this choice and the shared category
+ * average; SubmitBar measures its fixed score footer for the bottom reserve.
  *
  * All writes flow through the v2 RPCs - the client never touches
  * course_ratings, posts, notifications, user_courses, or
@@ -68,7 +67,7 @@ import { useMyRatedScores, calibrationRank } from './hooks/useMyRatedScores';
 import { RemoveReviewSheetV2 } from './components/RemoveReviewSheetV2';
 import type { CategoryKey, ExistingMedia, ExistingReview, ReviewV2Course } from './types';
 import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
-import ComposerStepHeader from '@/features/composer-flow/components/ComposerStepHeader';
+import { ReviewStepHeading, ReviewCategoriesHeading } from './components/ReviewScoreHeadings';
 import { shortCourseName } from '@/features/courses/_shared/courseLabel';
 import { useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
 import { useTop100Config } from '@/hooks/top100/useTop100Config';
@@ -826,7 +825,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     ? t('review.wizard.step3.threshold', { ordinal: ordinal(existingRatings + 1) }) : null;
   if (step === LAST_STEP) {
     const line = scoreFooter(composer.state, thresholdLine);
-    footerSummary = line ? ('threshold' in line ? line.threshold : t(`review.wizard.${line.key}`, { score: line.score })) : null;
+    footerSummary = line?.threshold ?? null;
   }
   // Step 1's empty-state skip remains; the score step has no path-changing skip.
   const skipLabel = step === FIRST_STEP && !hasMedia && !hasWords ? t('review.wizard.stepOne.skipToScore') : null;
@@ -848,6 +847,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
   const headerRef = useRef<HTMLElement | null>(null);
   const spacerRef = useRef<HTMLDivElement | null>(null);
   const [spacerH, setSpacerH] = useState<number | null>(null);
+  const [scoreFooterH, setScoreFooterH] = useState(0);
   useEffect(() => {
     const header = headerRef.current;
     const spacer = spacerRef.current;
@@ -879,6 +879,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         color: RV2.ink,
         display: 'flex',
         flexDirection: 'column',
+        paddingBottom: step === LAST_STEP ? scoreFooterH : undefined,
       }}
     >
       {/* Header (BRIEF_REVIEW_STEP_ONE §1): photo while empty, compact after. */}
@@ -937,7 +938,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           whole flow. left="none": the fixed header above already owns the one
           leading control (back arrow, or × when nothing is behind us), and two
           back buttons on one screen is a worse answer than a counter beneath. */}
-      <ComposerStepHeader step={step - 1} total={REVIEW_TOTAL_STEPS - 1} left="none" />
+      {step === FIRST_STEP && <ReviewStepHeading step={step - 1} total={REVIEW_TOTAL_STEPS - 1} />}
 
       {/* RESTORED EDIT DRAFT (_04 §1). Says so out loud, and offers the way back
           to the published version. Not amber: amber means the viewing member. */}
@@ -1228,7 +1229,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
       {/* Signed-off Step 2: the frozen compact/shared headers remain above. */}
       {step === LAST_STEP && (
         <div className="review-score-theme">
-          <h1 className="review-score-heading">{t('review.wizard.step3.heading')}</h1>
+          <ReviewStepHeading step={step - 1} total={REVIEW_TOTAL_STEPS - 1} />
           <div ref={overallCardRef} className="review-overall-card" data-pulsing={overallPulsing}>
             <OverallScrubber value={composer.state.overall} onChange={composer.setOverall}
               caption={t('review.wizard.step3.rulerHint')} ariaLabel={t('review.wizard.step0.a11y')}
@@ -1236,24 +1237,16 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
                 ordinal: ordinal(calibration.ordinal), count: calibration.total,
               }) : null} />
           </div>
-          <div className="review-score-cats-intro">
-            <div className="review-score-kicker">{t('review.wizard.step3.breakdownLabel')}</div>
-            <p>{t('review.wizard.step3.catsIntro')}</p>
-          </div>
+          <ReviewCategoriesHeading scores={composer.state.scores} />
           <div ref={scoreRowsRef}>
             <CategoryGrid values={composer.state.scores} cats={cats} flagged={flaggedCategories}
               tapToScore={t('review.wizard.step3.tapToScore')} stillToScore={t('review.wizard.step3.stillToScore')}
               onChange={(key, value) => { composer.setCategory(key, value); setFlaggedCategories(old => old.filter(k => k !== key)); }} />
           </div>
-          <section className="review-score-share-section">
-            <ShareToggle appearance="score" value={composer.state.shareToFeed} onChange={composer.setShareToFeed}
-              title={t('review.wizard.step3.shareTitle')}
-              sub={t(`review.wizard.step3.${scoreShareKey(media.count, hasWords)}`, { count: media.count })} />
-          </section>
         </div>
       )}
 
-      <div style={{ flex: 1, minHeight: 16 }} />
+      {step !== LAST_STEP && <div style={{ flex: 1, minHeight: 16 }} />}
 
       <div className={step === LAST_STEP ? "review-score-theme" : undefined}>
       <SubmitBar
@@ -1263,6 +1256,10 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         enabled={!submit.submitting}
         onPress={handlePrimary}
         summary={footerSummary}
+        onHeightChange={step === LAST_STEP ? setScoreFooterH : undefined}
+        share={step === LAST_STEP ? <ShareToggle appearance="score" value={composer.state.shareToFeed} onChange={composer.setShareToFeed}
+          title={t('review.wizard.step3.shareTitle')}
+          sub={t(`review.wizard.step3.${scoreShareKey(media.count, hasWords)}`, { count: media.count })} /> : undefined}
         skipLabel={skipLabel}
         onSkip={skipLabel ? handlePrimary : undefined}
       />

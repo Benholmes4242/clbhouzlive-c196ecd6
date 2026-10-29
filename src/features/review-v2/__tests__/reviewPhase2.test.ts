@@ -76,8 +76,9 @@ describe('what came off the composer', () => {
     expect(composer).not.toMatch(/track\w*\(\s*'review_tee_selected'/);
   });
 
-  it('renders the one shared counter instead of its own step rail', () => {
-    expect(composer).toContain('<ComposerStepHeader');
+  it('keeps the shared counter on step 1 and uses the score heading on step 2', () => {
+    expect(composer).toContain('{step === FIRST_STEP && <ReviewStepHeading');
+    expect(src('src/features/review-v2/components/ReviewScoreHeadings.tsx')).toContain('if (step !== total) return <ComposerStepHeader');
     expect(composer).not.toContain('stepLabels');
   });
 
