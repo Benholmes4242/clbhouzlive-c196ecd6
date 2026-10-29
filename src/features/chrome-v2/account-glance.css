@@ -26,9 +26,13 @@
 .account-glance button.account-actor { height: 38px; padding: 0 6px; gap: 10px; }
 .account-actor-name { flex: 1; min-width: 0; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 600; }
 .account-count { flex-shrink: 0; display: inline-flex; justify-content: center; align-items: center; box-sizing: border-box; min-width: 18px; height: 18px; border-radius: 9px; background: var(--account-ink); color: var(--account-count-ink); padding: 0 5px; font-size: 10px; font-weight: 800; font-variant-numeric: tabular-nums; }
-.account-doors { display: flex; margin-top: 12px; gap: 8px; }
-.account-glance button.account-door { flex: 1; height: 48px; border-radius: 14px; background: var(--account-control); padding: 0 12px; gap: 13px; }
-.account-door-label { font-size: 13px; font-weight: 650; white-space: nowrap; }
+.account-doors { display: flex; margin-top: 12px; gap: 8px; container-type: inline-size; }
+.account-glance button.account-door { flex: 1 1 0; min-width: 0; height: 48px; border-radius: 14px; background: var(--account-control); padding: 0 10px; gap: 9px; justify-content: flex-start; overflow: hidden; }
+.account-door-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 13px; font-weight: 650; white-space: nowrap; }
+@container (max-width: 300px) {
+  .account-glance button.account-door { gap: 8px; }
+  .account-door-label { font-size: 12px; }
+}
 .account-door-icon { position: relative; flex-shrink: 0; color: var(--account-mute); }
 .account-glance button.account-door svg { width: 18px; height: 18px; }
 .account-count.account-badge { position: absolute; top: -7px; right: -9px; min-width: 16px; height: 16px; border-radius: 8px; font-size: 9.5px; padding: 0 4px; border: 2px solid var(--account-badge-edge); }
