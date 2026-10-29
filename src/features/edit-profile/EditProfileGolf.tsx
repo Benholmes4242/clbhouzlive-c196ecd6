@@ -1,4 +1,5 @@
-/** EP3 owns only Edit profile golf presentation. Canonical handicap
+/** Edit-profile group ownership lives in the feature file headers.
+ * EP3 owns only Edit profile golf presentation. Canonical handicap
  * resolution, home-club picker, coach sheets and AddCourseModal remain shared.
  * Golf saves are isolated: membership uses user_home_clubs, not an invented
  * additional_clubs profile column. Visibility is never part of these patches. */
