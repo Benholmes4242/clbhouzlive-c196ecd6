@@ -30,3 +30,40 @@ export function courseRankLabels(entries: Array<{ list: RankList; rank: number }
     .sort((a, b) => ORDER.indexOf(a.list) - ORDER.indexOf(b.list))
     .map((e) => `#${e.rank} ${RANK_LIST_LABEL[e.list]}`);
 }
+
+/**
+ * THE ONE MASTHEAD KICKER RULE (BRIEF_REVIEW_STEP_ONE_COURSE_HERO §2).
+ *
+ * Every course masthead — the course page's CourseTitleOverlay and the review
+ * composer's photo hero — builds its kicker here: the sub-country (or region),
+ * then the rank labels, joined with " · ". The country decides what "regional"
+ * means (the rule CourseRankBadges established): GB&I countries read the GB&I
+ * list, the USA reads the USA list, Continental Europe reads the Europe list.
+ * Moved out of CourseTitleOverlay so the two surfaces can never disagree.
+ */
+export interface MastheadKickerCourse {
+  sub_country?: string | null;
+  region?: string | null;
+  country?: string | null;
+}
+export interface MastheadKickerStanding {
+  globalRank?: number | null;
+  regionalRank?: number | null;
+  usaRank?: number | null;
+}
+
+const GBI_COUNTRIES = ['United Kingdom', 'Ireland', 'England', 'Scotland', 'Wales', 'Northern Ireland', 'Isle of Man', 'Britain & Ireland'];
+const USA_COUNTRIES = ['United States', 'USA'];
+
+export function courseMastheadKicker(
+  course: MastheadKickerCourse,
+  standing: MastheadKickerStanding | null | undefined,
+): string | null {
+  const entries: Array<{ list: RankList; rank: number }> = [];
+  if (standing?.globalRank) entries.push({ list: 'global', rank: standing.globalRank });
+  const c = course.country ?? '';
+  if (GBI_COUNTRIES.includes(c) && standing?.regionalRank) entries.push({ list: 'gbi', rank: standing.regionalRank });
+  else if (USA_COUNTRIES.includes(c) && standing?.usaRank) entries.push({ list: 'usa', rank: standing.usaRank });
+  else if (c === 'Continental Europe' && standing?.regionalRank) entries.push({ list: 'europe', rank: standing.regionalRank });
+  return [course.sub_country || course.region, ...courseRankLabels(entries)].filter(Boolean).join(' · ') || null;
+}
