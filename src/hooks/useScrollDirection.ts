@@ -216,11 +216,7 @@ export function resetToExpanded() {
     rec.lastTop = getScrollTop(rec.target);
   }
   setState('expanded');
-  // The new page's real position decides, so a scrolled flag never carries
-  // across routes (BRIEF_TOUR_OVERVIEW_BAND §3).
-  let top = 0;
-  for (const rec of scrollers.values()) top = Math.max(top, rec.lastTop);
-  setScrolled(top > SCROLLED_THRESHOLD);
+  setScrolled(false);
 }
 
 function subscribe(l: () => void) {
