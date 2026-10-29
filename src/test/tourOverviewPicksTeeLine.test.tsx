@@ -56,7 +56,7 @@ describe('picks tee line', () => {
   it('unstarted pick with a tee time today shows TEES and the time', () => {
     f.picks = [{ playerId: 'p1', playerName: 'Player p1' }];
     f.tees = { data: new Map([['p1', at(0)]]) };
-    mount([idle('p1'), idle('p2')]);
+    mount([{ ...idle('p1'), position: null } as unknown as BoardEntry]);
     expect(card().querySelector('[data-overview-pick-tee]')).not.toBeNull();
     expect(card().querySelector('[data-overview-pick-tee-time]')?.textContent).toBe(formatTimeHm(at(0)));
   });
