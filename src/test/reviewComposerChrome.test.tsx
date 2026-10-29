@@ -17,7 +17,7 @@ vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ active
 vi.mock('@/features/review-v2/hooks/useReviewMediaPipeline', () => ({ useReviewMediaPipeline: () => ({ items: [], count: 0, pickerError: null }) }));
 vi.mock('@/features/review-v2/hooks/useReviewSubmit', () => ({ useReviewSubmit: () => ({ submitting: false }) }));
 vi.mock('@/features/review-v2/hooks/useReviewHoleTags', () => ({ useReviewHoleTags: () => ({ holes: [], assignments: {} }) }));
-vi.mock('@/features/review-v2/hooks/useReviewHeaderFacts', () => ({ useReviewHeaderFacts: () => ({ avg: null, count: 0, rank: null }) }));
+vi.mock('@/features/review-v2/hooks/useReviewHeaderFacts', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/features/review-v2/hooks/useReviewHeaderFacts')>()), useReviewHeaderFacts: () => ({ avg: null, count: 0, rank: null }) }));
 vi.mock('@/features/review-v2/hooks/useMyRatedScores', () => ({ useMyRatedScores: () => ({ data: [] }), calibrationRank: () => null }));
 vi.mock('@/hooks/top100/useTop100Config', () => ({ useTop100Config: () => ({ subscoreMinRatings: 10 }) }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn(), ratings: { modalOpened: vi.fn(), sliderChanged: vi.fn() } } }));
