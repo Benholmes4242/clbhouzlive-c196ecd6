@@ -241,7 +241,7 @@ export function CourseSearchSheet({
                   style={{
                     backgroundColor: isFocused ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)',
                     color: 'rgba(255,255,255,0.96)',
-                    caretColor: '#F7931E',
+                    caretColor: '#F8FAFC',
                     border: isFocused ? '1px solid rgba(255,255,255,0.28)' : '1px solid rgba(255,255,255,0.10)',
                     transition: 'background 140ms ease, border-color 140ms ease',
                   }}

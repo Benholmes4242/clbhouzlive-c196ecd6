@@ -20,6 +20,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  /* Default only: explicit white/grey composer carets remain authoritative. */
+  input, textarea, [contenteditable="true"] { caret-color: #F8FAFC; }
+}
+
 :root {
   --post-review-sheet: #16161A;
   --post-review-ink: #F8FAFC;

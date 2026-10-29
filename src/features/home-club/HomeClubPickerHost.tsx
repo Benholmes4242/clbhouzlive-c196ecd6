@@ -1,4 +1,5 @@
 import { HomeClubPickerSheet } from './HomeClubPickerSheet';
+import { KeyboardClubSearchSheet } from './KeyboardClubSearchSheet';
 import { useHomeClubPickerState, closeHomeClubPicker } from './homeClubPickerStore';
 
 /**
@@ -7,7 +8,8 @@ import { useHomeClubPickerState, closeHomeClubPicker } from './homeClubPickerSto
  * onboarding form) unmounting.
  */
 export function HomeClubPickerHost() {
-  const { open, onSelected } = useHomeClubPickerState();
+  const { open, onSelected, keyboardSearch, pendingName } = useHomeClubPickerState();
+  if (keyboardSearch) return <KeyboardClubSearchSheet open={open} onClose={closeHomeClubPicker} onSelected={onSelected} pendingName={pendingName} />;
   return (
     <HomeClubPickerSheet
       open={open}

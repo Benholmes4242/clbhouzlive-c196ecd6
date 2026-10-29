@@ -1,11 +1,12 @@
-/** EP3 owns only Edit profile golf presentation. Canonical handicap
+/** Edit-profile group ownership lives in the feature file headers.
+ * EP3 owns only Edit profile golf presentation. Canonical handicap
  * resolution, home-club picker, coach sheets and AddCourseModal remain shared.
  * Golf saves are isolated: membership uses user_home_clubs, not an invented
  * additional_clubs profile column. Visibility is never part of these patches. */
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Check, ChevronRight, MapPin, Plus, X } from 'lucide-react';
+import { ChevronRight, MapPin, Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BizcSheet } from '@/features/business-create/BusinessCreateStep3';
 import { openHomeClubPicker } from '@/features/home-club/homeClubPickerStore';
@@ -40,7 +41,7 @@ export const EditProfileGolf = forwardRef<GolfActions, Props>(function EditProfi
   const { topTen } = useUserTopTenCourses(p.userId);
   const [sheet, setSheet] = useState<GolfFields | 'topTen' | null>(null);
   const coachRow = useRef<CoachRowActions>(null);
-  useImperativeHandle(ref, () => ({ open: key => { if (key === 'coach') coachRow.current?.open(); else setSheet(key); } }));
+  useImperativeHandle(ref, () => ({ open: key => { if (key === 'coach') coachRow.current?.open(); else if (key === 'homeClub') pick(false); else setSheet(key); } }));
   const [busy, setBusy] = useState(false);
   const close = () => { if (!busy) setSheet(null); };
   const resolved = resolveDisplayHandicap({ egHandicapIndex: p.egHandicapIndex, manualHandicapIndex: p.manualHandicapIndex, hasWhsConnection: !!p.connection });
@@ -52,7 +53,7 @@ export const EditProfileGolf = forwardRef<GolfActions, Props>(function EditProfi
     setBusy(true);
     try { return await p.onSave(fields, patch); } finally { setBusy(false); }
   };
-  const pick = (additional: boolean) => openHomeClubPicker({ onSelected: club => {
+  const pick = (additional: boolean) => openHomeClubPicker({ keyboardSearch: true, pendingName: additional ? null : pending, onSelected: club => {
     if (additional) {
       if (club.id === p.form.primaryClubId || clubs.some(c => c.clubId === club.id || c.name === club.name)) return;
       void save('additionalClubs', { additionalClubs: [...clubs, { id: club.id, clubId: club.id, name: club.name }] });
@@ -68,17 +69,12 @@ export const EditProfileGolf = forwardRef<GolfActions, Props>(function EditProfi
     <div className="ep-group">Your golf</div>
     <div className="ep-rows" data-testid="ep-golf">
       {row('handicap', 'Handicap', resolved.value != null ? <>{formatHcp(resolved.value)}{resolved.source === 'whs' ? ` · ${body}` : <span className="ep-golf-mute"> Your own</span>}</> : 'Connect your handicap', resolved.value == null, () => setSheet('handicap'), resolved.source === 'whs' && resolved.value != null ? 'Synced' : undefined)}
-      {row('homeClub', 'Home club', pending ? <>{pending} · <span className="ep-golf-mute">pending</span></> : p.form.homeClubName || 'Add your home club', !pending && !p.form.homeClubName, () => setSheet('homeClub'))}
+      {row('homeClub', 'Home club', pending ? <>{pending} · <span className="ep-golf-mute">pending</span></> : p.form.homeClubName || 'Add your home club', !pending && !p.form.homeClubName, () => pick(false))}
       {row('additionalClubs', 'Other clubs', clubs.length ? <>{clubs[0]?.name}{clubs.length > 1 && <span className="ep-golf-mute"> +{clubs.length - 1}</span>}</> : 'Add a club', !clubs.length, () => setSheet('additionalClubs'))}
       <YourCoachRow ref={coachRow} viewerId={p.userId} appearance="editProfile" />
       {row('topTen', 'Top 10', topTen.length ? `${topTen.length} of 10 chosen` : 'Pick your ten courses', !topTen.length, () => setSheet('topTen'))}
     </div>
     {sheet === 'handicap' && <HandicapSheet connected={!!p.connection} value={resolved.value} own={p.form.handicapIndex || formHcpFromDb(p.manualHandicapIndex)} body={body} syncedAt={p.connection?.last_synced_at ?? null} busy={busy} onClose={close} onNavigate={path => { close(); navigate(path); }} onSave={async handicapIndex => { if (await save('handicap', { handicapIndex })) setSheet(null); }} />}
-    {sheet === 'homeClub' && <BizcSheet title="Home club" testId="ep-sheet-homeClub" onDone={close} actionDisabled={busy}>
-      <Button variant="ghost" className="bizc-field ep-golf-search" onClick={() => pick(false)} disabled={busy}><span className="bizc-field-label">Search clubs</span><span className="ep-golf-search-value">Search for your club</span></Button>
-      {pending && <p className="ep-golf-hint">We're adding this club — you'll be connected automatically.</p>}
-      {p.form.primaryClubId && <div className="ep-rows ep-golf-list"><ClubRow id={p.form.primaryClubId} name={p.form.homeClubName}><Check className="ep-golf-tick" size={16} aria-hidden="true" /></ClubRow></div>}
-    </BizcSheet>}
     {sheet === 'additionalClubs' && <BizcSheet title="Other clubs" testId="ep-sheet-additionalClubs" onDone={close} actionDisabled={busy}>
       <div className="ep-rows ep-golf-list">{clubs.map(c => <ClubRow key={c.id} id={c.clubId} name={c.name}><Button variant="ghost" size="icon" className="ep-golf-remove" aria-label={`Remove ${c.name}`} disabled={busy} onClick={() => void save('additionalClubs', { additionalClubs: clubs.filter(other => other.id !== c.id) })}><X size={16} /></Button></ClubRow>)}
         <Button variant="ghost" className="ep-golf-add" disabled={busy} onClick={() => pick(true)}><span aria-hidden="true"><Plus size={16} /></span>Add a club</Button>
