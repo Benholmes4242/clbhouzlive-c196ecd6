@@ -1,10 +1,16 @@
 # Roadmap
 
+## EP4.1 + EP5 — Completion card and switch-over
+- [x] Complete only EP4's useDeleteAccount mock; Part 1 full suite 4,340/4,340 across 449 files, no assertion changes.
+- [x] Add settled-input completion card, action chips and arrival deep links.
+- [x] Switch the canonical editor, preserve alias queries/back/entrypoints, and update route comments; remove redundant onboarding nav special case.
+- [x] Add 36 EP5 tests; full suite 4,376/4,376 across 450 files. Automatic build OK06:03:24Z; alias/Settings shell and hidden nav checked publicly, no runtime errors. Real signed-in actions/persistence and populated visual match remain unverified (external_unmanaged). See EP4_1_EP5_REPORT.md.
+
 ## EP4 — Links and Who sees what
 - [x] Add signed-off link sheets and visibility groups below Your golf, preserving Settings and legacy editor.
 - [x] Reuse existing validation/normalisation, partial saves and handicap privacy hook; add 26 isolation/sync cases.
 - [x] Full bunx vitest run: 4,339 passed / 1 failed / 4,340 total / 449 files (+26/+1 solely EP4); existing tests unchanged. Automatic build OK05:42:32Z.
-- [ ] STOP: ep4LinksPrivacy.test.tsx:137:49 cannot find settings-handicap; unchanged SettingsTabContent.tsx:417:80 throws TypeError reading length because new useDeleteAccount mock lacks ownedBusinessNames. Await mock completion authorisation; no correction/rerun. See EP4_REPORT.md. Live/visual checks unavailable/unperformed.
+- [x] EP4.1 authorised full useDeleteAccount mock clears the settings-handicap / ownedBusinessNames failure; bidirectional test passes unchanged. Historical error preserved in EP4_REPORT.md.
 
 ## Review Step 2 — The score
 - [x] Match signed-off empty overall/rulers/category states/share and footer; preserve compact/shared headers and Step 1.

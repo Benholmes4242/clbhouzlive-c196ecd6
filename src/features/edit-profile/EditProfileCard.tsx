@@ -1,7 +1,7 @@
 /** EP1 profile card (1A) plus the photo flows (1B–1D). Photos save one field
  * at a time through the parent's onSavePhoto; this file owns only the picker,
  * the crop source and the change-or-remove sheet. */
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -27,7 +27,8 @@ export function identityLine(username: string, city: string) {
   return c ? `@${username} · ${c}` : `@${username}`;
 }
 
-export function EditProfileCard({ name, username, city, coverUrl, avatarUrl, indexLabel, homeClub, onSavePhoto }: Props) {
+export interface PhotoActions { open: (kind: PhotoKind) => void }
+export const EditProfileCard = forwardRef<PhotoActions, Props>(function EditProfileCard({ name, username, city, coverUrl, avatarUrl, indexLabel, homeClub, onSavePhoto }, ref) {
   const coverInput = useRef<HTMLInputElement>(null);
   const avatarInput = useRef<HTMLInputElement>(null);
   const [sheet, setSheet] = useState<PhotoKind | null>(null);
@@ -36,6 +37,7 @@ export function EditProfileCard({ name, username, city, coverUrl, avatarUrl, ind
 
   const pick = (kind: PhotoKind) => { setSheet(null); (kind === 'cover' ? coverInput : avatarInput).current?.click(); };
   const open = (kind: PhotoKind) => { if (kind === 'cover' ? coverUrl : avatarUrl) setSheet(kind); else pick(kind); };
+  useImperativeHandle(ref, () => ({ open }));
   const picked = (kind: PhotoKind, input: HTMLInputElement) => {
     const file = input.files?.[0]; input.value = '';
     if (!file) return;
@@ -78,4 +80,4 @@ export function EditProfileCard({ name, username, city, coverUrl, avatarUrl, ind
       onUse={(file) => { const kind = crop.kind; setCrop(null); onSavePhoto(kind, file); }}
     />}
   </>;
-}
+});

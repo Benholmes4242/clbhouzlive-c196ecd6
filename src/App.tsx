@@ -266,8 +266,9 @@ const MediaLibraryPage = lazy(() => import("./features/media-library/MediaLibrar
 
 
 
-const ManageProfilePage = lazy(() => import("./pages/ManageProfile"));
-const EditProfileV2Page = lazy(() => import("./pages/EditProfile"));
+
+const EditProfilePage = lazy(() => import("./pages/EditProfile"));
+import { EditProfileAlias } from '@/features/edit-profile/EditProfileAlias';
 const WelcomePage = lazy(() => import('./pages/Welcome'));
 const ManageEmailPage = lazy(() => import("./pages/manage/EmailPage"));
 const ManageBlockedPage = lazy(() => import("./pages/manage/BlockedPage"));
@@ -597,8 +598,8 @@ function AppRoutes() {
         <Route path="/profile/quest" element={<Navigate to="/profile?tab=handicap" replace />} />
         <Route path="/profile/quest/index" element={<Navigate to="/profile?tab=handicap" replace />} />
         <Route path="/profile/quest/replay" element={<Navigate to="/profile?tab=handicap" replace />} />
-        <Route path="/edit-profile" element={<Suspense fallback={<ManagePageSkeleton />}><ManageProfilePage /></Suspense>} />
-        <Route path="/edit-profile-v2" element={<Suspense fallback={<ManagePageSkeleton />}><EditProfileV2Page /></Suspense>} />
+        <Route path="/edit-profile" element={<Suspense fallback={<ManagePageSkeleton />}><EditProfilePage /></Suspense>} />
+        <Route path="/edit-profile-v2" element={<EditProfileAlias />} />
         <Route path="/manage/email" element={<Suspense fallback={<ManagePageSkeleton />}><ManageEmailPage /></Suspense>} />
         <Route path="/manage/blocked" element={<Suspense fallback={<ManagePageSkeleton />}><ManageBlockedPage /></Suspense>} />
         <Route path="/manage/notifications" element={<Suspense fallback={<ManagePageSkeleton />}><ManageNotificationsPage /></Suspense>} />

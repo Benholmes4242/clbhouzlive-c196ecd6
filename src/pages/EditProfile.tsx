@@ -1,9 +1,9 @@
-/** EP1 — new Edit profile (hidden /edit-profile-v2 until EP5). Auth, back and
+/** Canonical Edit profile. Auth, back and
  * the ?tab= param behave as ManageProfile's do; photos save one field at once
  * through useProfileSave's opt-in photoField partial. EP2 adds the You group,
  * whose sheets save their own columns through the profileFields partial.
  * EP3 golf patches share that saved/retry line without touching visibility. */
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -16,10 +16,12 @@ import { formatHcp, parseHcpFormString } from '@/lib/formatHcp';
 import { DANGER } from '@/components/manage/ui';
 import { ManagePageSkeleton } from '@/components/skeletons/ManagePageSkeleton';
 import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
-import { EditProfileCard, type PhotoKind } from '@/features/edit-profile/EditProfileCard';
-import { EditProfileYou, type YouFields, type YouPatch } from '@/features/edit-profile/EditProfileYou';
-import { EditProfileGolf, type GolfFields, type GolfPatch } from '@/features/edit-profile/EditProfileGolf';
+import { EditProfileCard, type PhotoKind, type PhotoActions } from '@/features/edit-profile/EditProfileCard';
+import { EditProfileYou, type YouFields, type YouPatch, type YouActions } from '@/features/edit-profile/EditProfileYou';
+import { EditProfileGolf, type GolfFields, type GolfPatch, type GolfActions } from '@/features/edit-profile/EditProfileGolf';
 import { EditProfileLinksPrivacy, type LinksPrivacyFields, type LinksPrivacyPatch } from '@/features/edit-profile/EditProfileLinksPrivacy';
+import { EditProfileCompletion } from '@/features/edit-profile/EditProfileCompletion';
+import { arrivalAction, type CompletionAction } from '@/features/edit-profile/completionRules';
 import '@/features/business-create/business-create.css';
 import '@/features/edit-profile/edit-profile.css';
 
@@ -33,12 +35,29 @@ export default function EditProfile() {
   const profile = raw as Record<string, any> | null | undefined;
   const { form } = useProfileForm(profile as any, loading);
   const { save } = useProfileSave(user?.id ?? '');
-  const { data: whs } = useWhsConnection(user?.id);
+  const { data: whs, isLoading: whsLoading, isError: whsError } = useWhsConnection(user?.id);
   const [searchParams, setSearchParams] = useSearchParams();
   const [tab, setTab] = useState<TabId>(searchParams.get('tab') === 'settings' ? 'settings' : 'profile');
   const [state, setState] = useState<SaveState>('idle');
   const running = useRef(0);
   const lastFailed = useRef<(() => void) | null>(null);
+
+  const photos = useRef<PhotoActions>(null);
+  const youActions = useRef<YouActions>(null);
+  const golfActions = useRef<GolfActions>(null);
+  const consumedArrival = useRef(false);
+  useEffect(() => {
+    if (loading || !profile || consumedArrival.current || tab !== 'profile') return;
+    consumedArrival.current = true;
+    const action = arrivalAction(searchParams.get('src'));
+    if (action === 'username') youActions.current?.open(action);
+    if (action === 'homeClub') golfActions.current?.open(action);
+  }, [loading, profile, searchParams, tab]);
+  const openCompletion = (action: CompletionAction) => {
+    if (action === 'avatar' || action === 'cover') photos.current?.open(action);
+    else if (action === 'bio') youActions.current?.open(action);
+    else golfActions.current?.open(action);
+  };
 
   const onTab = (t: TabId) => {
     setTab(t);
@@ -117,6 +136,7 @@ export default function EditProfile() {
             ? <button type="button" className="ep-saved" data-state="error" data-testid="ep-saved" style={{ color: DANGER }} onClick={() => lastFailed.current?.()}>Couldn't save. Try again.</button>
             : <div className="ep-saved" data-state={state} data-testid="ep-saved" role="status">{state === 'saving' ? 'Saving…' : 'All changes saved'}</div>}
           {profile && <EditProfileCard
+            ref={photos}
             name={name}
             username={username}
             city={you.city}
@@ -126,7 +146,9 @@ export default function EditProfile() {
             homeClub={(golfNow.homeClubName ?? profile.home_club)?.trim() || null}
             onSavePhoto={savePhoto}
           />}
+          {profile && <EditProfileCompletion userId={user?.id ?? ''} inputs={{ avatar: profile.profile_photo_url, cover: profile.header_photo_url, bio: you.bio, homeClub: !!(golfNow.primaryClubId ?? profile.primary_club_id) || !!(golfNow.homeClubName ?? profile.home_club)?.trim(), handicap: resolved.value }} loading={loading || !!whsLoading || !!whsError} onAction={openCompletion} />}
           {profile && <EditProfileYou
+            ref={youActions}
             userId={user?.id ?? ''}
             {...you}
             displayName={name}
@@ -135,7 +157,7 @@ export default function EditProfile() {
             onSave={saveYou}
             onUsernameChanged={(u, at) => setUsernameNow({ username: u, at })}
           />}
-          {profile && <EditProfileGolf userId={user?.id ?? ''} form={{ ...form, ...golfNow }} egHandicapIndex={profile.eg_handicap_index ?? null} manualHandicapIndex={golfNow.handicapIndex !== undefined ? parseHcpFormString(golfNow.handicapIndex) : profile.manual_handicap_index ?? null} connection={whs} onSave={saveGolf} />}
+          {profile && <EditProfileGolf ref={golfActions} userId={user?.id ?? ''} form={{ ...form, ...golfNow }} egHandicapIndex={profile.eg_handicap_index ?? null} manualHandicapIndex={golfNow.handicapIndex !== undefined ? parseHcpFormString(golfNow.handicapIndex) : profile.manual_handicap_index ?? null} connection={whs} onSave={saveGolf} />}
           {profile && <EditProfileLinksPrivacy userId={user?.id ?? ''} form={{ ...form, ...linksPrivacyNow }} handicapVisibility={profile.handicap_visibility === 'friends' || profile.handicap_visibility === 'private' ? profile.handicap_visibility : 'public'} onSave={saveLinksPrivacy} />}
         </main>
       )}

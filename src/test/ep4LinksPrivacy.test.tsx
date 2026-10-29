@@ -20,7 +20,12 @@ vi.mock('@/hooks/useProfileData', async () => {
 });
 vi.mock('@/hooks/useMyBusinesses', () => ({ useHasBusinesses: () => ({ hasBusinesses: false, count: 0 }) }));
 vi.mock('@/hooks/useInviteSheet', () => ({ useInviteSheet: () => ({ openInviteSheet: vi.fn() }) }));
-vi.mock('@/hooks/useDeleteAccount', () => ({ useDeleteAccount: () => ({}) }));
+vi.mock('@/hooks/useDeleteAccount', () => ({ useDeleteAccount: () => ({
+  showDeleteConfirm: false, setShowDeleteConfirm: vi.fn(),
+  showBusinessWarning: false, setShowBusinessWarning: vi.fn(),
+  ownedBusinessNames: [], deleteConfirmText: '', setDeleteConfirmText: vi.fn(),
+  isDeleting: false, initiateDelete: vi.fn(), confirmDelete: vi.fn(),
+}) }));
 vi.mock('@/hooks/useLogout', () => ({ useLogout: () => ({ logout: vi.fn() }) }));
 vi.mock('@/lib/whs/hooks', () => ({ useWhsConnection: () => ({ data: null }), whsKeys: { percentile: (id: string) => ['whs-percentile', id] } }));
 vi.mock('@/components/settings/ui', () => ({

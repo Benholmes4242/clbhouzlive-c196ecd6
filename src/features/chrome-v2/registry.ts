@@ -117,7 +117,6 @@ export const CHROME_REGISTRY: ChromeRule[] = [
   { match: { exact: '/golferstofollow' },         spec: { chrome: 'none', tone: 'dark',  bleed: false } },
   { match: { exact: '/notificationmessages' },    spec: { chrome: 'none', tone: 'light', bleed: false } },
   { match: { exact: '/edit-profile' },            spec: { chrome: 'none', tone: 'light', bleed: false } },
-  { match: { exact: '/edit-profile-v2' },         spec: { chrome: 'none', tone: 'light', bleed: false } },
   // ── /handicap family — ISLAND (H3): dark tone, back fallback '/profile',
   // HCP cell hidden. Rivalry sub-routes declared first so they win before the
   // /handicap/ prefix.
