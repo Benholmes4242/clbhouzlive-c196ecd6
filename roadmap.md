@@ -1,5 +1,9 @@
 # Roadmap
 
+## Review Step 1 — Photo header Option A
+- [x] Straight-cut safe-area photograph; course name/score below; preserve compact header and sticky fold, measured spacer; empty lede/words gaps 14/18.
+- [ ] STOP: full bunx vitest run 4,386 passed / 2 failed of 4,388 across451 files. New reviewStepOne safe-area style assertion fails (jsdom returns empty); unchanged ob1Welcome photo-upload spy also fails. Inherited EP5.1 TS2769 remains. No fixes/reruns after stop; see REVIEW_STEP_ONE_HEADER_STOP_REPORT.md. Signed-in visual unavailable (external_unmanaged).
+
 ## EP5.1 — Edit profile snags and white cursors
 - [x] Correct avatar framing, top/bottom safe-area spacing and scoped shared mute labels; visual checks not completed after stop.
 - [x] Extract stable content-height search shell; club-only autofocus/keyboard docking, canonical confirmation/save/request paths and direct editor entrypoints. Review tests and retained browser regression unchanged/passing.

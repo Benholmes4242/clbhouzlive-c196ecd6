@@ -40,6 +40,7 @@
   --post-review-search-edge: rgba(255,255,255,0.12);
   --post-review-pill-edge: rgba(255,255,255,0.18);
   --post-review-photo-fallback: linear-gradient(145deg,#2F5A3C,#16281D);
+  --review-header-back: rgba(14,14,16,0.6);
   --rounds-gate-ink: #F8FAFC;
   --rounds-gate-amber: #F7931E;
   --rounds-gate-mute: rgba(248,250,252,0.62);

@@ -71,6 +71,31 @@ describe('header forms', () => {
     expect(container.querySelector('[data-header-rank]')?.textContent).toBe('#16 World');
     expect(container.querySelector('header')?.getAttribute('data-header-form')).toBe('photo');
   });
+  it('keeps the name and score outside the straight-cut photo with no overlay', () => {
+    const { container } = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: 8.64, count: 12, rank: '#16 World' }} />);
+    const photo = container.querySelector('[data-photo-header]');
+    const block = container.querySelector('[data-photo-name-block]');
+    expect(photo?.children).toHaveLength(2);
+    expect(photo?.querySelector('[aria-hidden]')).toBeNull();
+    expect(photo?.querySelector('[data-header-score]')).toBeNull();
+    expect(photo?.contains(block)).toBe(false);
+    expect(photo?.nextElementSibling).toBe(block);
+    expect(block?.querySelector('[data-header-score] b')?.textContent).toBe('8.6');
+    expect(block?.firstElementChild?.textContent).toBe(props.name);
+  });
+  it('preserves the safe-area photo height and compact height through the measured fold', () => {
+    const ref = React.createRef<HTMLElement>();
+    const facts = { avg: null, count: 0, rank: null };
+    const { container, rerender } = render(<ReviewComposerHeader ref={ref} {...props} form="photo" facts={facts} />);
+    const header = ref.current;
+    expect((container.querySelector('[data-photo-header]') as HTMLElement).style.height).toBe('calc(env(safe-area-inset-top, 0px) + 136px)');
+    expect(header?.style.height).toBe('calc(env(safe-area-inset-top, 0px) + 206.75px)');
+    expect(header?.style.transition).toBe('height 200ms ease');
+    rerender(<ReviewComposerHeader ref={ref} {...props} form="compact" facts={facts} />);
+    expect(ref.current).toBe(header);
+    expect(header?.style.height).toBe('calc(env(safe-area-inset-top, 0px) + 68px)');
+    expect(container.querySelector('[data-photo-name-block]')).toBeNull();
+  });
   it('omits the score at 0 reviews and the rank when none', () => {
     const { container } = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: null, count: 0, rank: null }} />);
     expect(container.querySelector('[data-header-score]')).toBeNull();

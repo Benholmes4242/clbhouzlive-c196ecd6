@@ -5,7 +5,9 @@
  * only while step 1 is empty; `compact` is the long-standing bar. The element
  * keeps one ref so the composer's spacer measures its bottom edge in both
  * forms and follows the 200ms fold (a snap under reduced motion). The composer
- * owns the empty rule and its stickiness; this file only draws.
+ * owns the empty rule and its stickiness; this file only draws. Option A keeps
+ * the photograph and name block as siblings within this one measured header;
+ * its explicit height preserves the existing height transition on folding.
  */
 import React, { forwardRef } from 'react';
 import { Trash2 } from 'lucide-react';
@@ -26,8 +28,9 @@ interface Props {
   onDelete: () => void;
 }
 
-const MUTED = 'rgba(248,250,252,0.62)';
 const COMPACT_H = 68; // 8 top pad + 6 + 44 row + 10
+// Photo + name block: 136 + 14 top + 33 name + 5 gap + 18.75 metadata.
+export const PHOTO_HEADER_H_CSS = 'calc(env(safe-area-inset-top, 0px) + 206.75px)';
 
 export const ReviewComposerHeader = forwardRef<HTMLElement, Props>(function ReviewComposerHeader(
   { form, name, region, thumbnail, facts, leadingIsClose, onBack, isEditMode, onDelete },
@@ -58,7 +61,7 @@ export const ReviewComposerHeader = forwardRef<HTMLElement, Props>(function Revi
         background: RV2.canvas,
         borderBottom: photo ? 'none' : `1px solid ${RV2.hairline}`,
         height: photo
-          ? 'calc(env(safe-area-inset-top, 0px) + 172px)'
+          ? PHOTO_HEADER_H_CSS
           : `calc(env(safe-area-inset-top, 0px) + ${COMPACT_H}px)`,
         boxSizing: 'border-box',
         transition: 'height 200ms ease',
@@ -66,46 +69,47 @@ export const ReviewComposerHeader = forwardRef<HTMLElement, Props>(function Revi
     >
       <style>{`@media (prefers-reduced-motion: reduce) { .rv2-fold-header, .rv2-fold-header * { transition: none !important; } }`}</style>
       {photo ? (
-        <div data-photo-header style={{ position: 'absolute', inset: 0 }}>
+        <>
+        <div data-photo-header style={{ position: 'relative', height: 'calc(env(safe-area-inset-top, 0px) + 136px)' }}>
           {thumbnail ? (
             <img src={thumbnail} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 65%' }} />
           ) : (
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(145deg,#2F5A3C,#16281D)' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'var(--post-review-photo-fallback)' }} />
           )}
-          <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0.10) 35%, rgba(22,22,26,0.96) 100%)' }} />
           <button
             type="button"
             onClick={onBack}
             aria-label={backLabel}
             style={{
               position: 'absolute', top: 'calc(env(safe-area-inset-top, 0px) + 6px)', left: 14,
-              width: 36, height: 36, borderRadius: 999, border: 'none', background: 'rgba(14,14,16,0.6)',
-              color: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 36, height: 36, borderRadius: 999, border: 'none', background: 'var(--review-header-back)',
+              color: RV2.ink, display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 21, lineHeight: 1, cursor: 'pointer',
             }}
           >
             {glyph}
           </button>
-          <div style={{ position: 'absolute', left: 20, right: 20, bottom: 12 }}>
-            <div style={{ fontSize: 23, fontWeight: 700, color: '#F8FAFC', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
-            <div data-photo-meta style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: MUTED, minWidth: 0 }}>
+        </div>
+          <div data-photo-name-block style={{ padding: '14px 20px 0', background: RV2.canvas }}>
+            <div style={{ fontSize: 22, lineHeight: 1.5, fontWeight: 700, color: RV2.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
+            <div data-photo-meta style={{ marginTop: 5, display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, lineHeight: 1.5, color: 'var(--post-review-mute)', minWidth: 0 }}>
               <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{region}</span>
               {score && (
                 <>
-                  <span aria-hidden style={{ width: 3, height: 3, borderRadius: 999, background: 'rgba(248,250,252,0.42)', flexShrink: 0 }} />
+                  <span aria-hidden style={{ width: 3, height: 3, borderRadius: 999, background: 'var(--post-review-dim)', flexShrink: 0 }} />
                   <span data-header-score style={{ whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
-                    <b style={{ fontWeight: 700, color: '#F8FAFC' }}>{score.avg}</b> {fromMembers}
+                    <b style={{ fontWeight: 700, color: RV2.ink }}>{score.avg}</b> {fromMembers}
                   </span>
                 </>
               )}
               {facts.rank && (
-                <span data-header-rank style={{ height: 18, borderRadius: 6, padding: '0 6px', background: 'rgba(255,255,255,0.08)', fontSize: 10.5, fontWeight: 700, color: '#F8FAFC', display: 'inline-flex', alignItems: 'center', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                <span data-header-rank style={{ height: 18, borderRadius: 6, padding: '0 6px', background: 'var(--post-review-control)', fontSize: 10.5, fontWeight: 700, color: RV2.ink, display: 'inline-flex', alignItems: 'center', whiteSpace: 'nowrap', flexShrink: 0 }}>
                   {facts.rank}
                 </span>
               )}
             </div>
           </div>
-        </div>
+        </>
       ) : (
         <div style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 12px 10px' }}>
