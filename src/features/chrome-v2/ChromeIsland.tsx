@@ -693,22 +693,22 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
       )}
 
       {spec.scrim === true && (
-      <div
-        aria-hidden
-        data-chrome="island-scrim"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 'calc(var(--sat, 0px) + 80px)',
-          background: 'linear-gradient(180deg, rgba(10,10,12,0.95) 0%, rgba(10,10,12,0.75) 45%, rgba(10,10,12,0) 100%)',
-          pointerEvents: 'none',
-          zIndex: Z.header - 1,
-          opacity: scrolled ? 0 : 1,
-          transition: scrimTransition,
-        }}
-      />
+        <div
+          aria-hidden
+          data-chrome="island-scrim"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 'calc(var(--sat, 0px) + 80px)',
+            background: 'linear-gradient(180deg, rgba(10,10,12,0.95) 0%, rgba(10,10,12,0.75) 45%, rgba(10,10,12,0) 100%)',
+            pointerEvents: 'none',
+            zIndex: Z.header - 1,
+            opacity: scrolled ? 0 : 1,
+            transition: scrimTransition,
+          }}
+        />
       )}
 
       {/* ONE shared scrolled band for scrim === true and 'hero', so the
