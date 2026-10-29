@@ -19,7 +19,7 @@ const t = ((key: string, values?: Record<string, unknown>) => {
   return value;
 }) as any;
 const tournament = { id: '1', name: 'The Open', venueName: 'Royal Portrush', defendingChampion: null } as any;
-const row = (name: string, score: number) => ({ score, player: { full_name: name } });
+const row = (name: string, score: number) => ({ score, round_1: score, player: { full_name: name } });
 
 const live = { kind: 'live', round: 2, totalRounds: 4 } as any;
 const result = (variant = 'final') => ({ kind: 'results', variant, finishDate: '', meta: '' }) as any;
