@@ -124,7 +124,7 @@ describe('header forms', () => {
     expect(kickerEl).toBeTruthy();
     expect(kickerEl.style.textTransform).toBe('uppercase');
     const nameEl = Array.from(masthead.querySelectorAll('div')).find((d) => d.textContent === 'Kingsbarns') as HTMLElement;
-    expect(nameEl.style.webkitLineClamp).toBe('2');
+    expect(nameEl.style.getPropertyValue('-webkit-line-clamp')).toBe('2');
     expect(Array.from(masthead.querySelectorAll('div')).some((d) => d.textContent === 'Scotland')).toBe(true);
   });
   it('keeps CourseTitleOverlay\u2019s kicker rule in the shared helper, country deciding the regional list', () => {
