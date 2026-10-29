@@ -33,4 +33,4 @@ Why: the approved brief replaces unconditional canvas-on-mount with actual-heade
 - `REVIEW_PHOTO_NOTCH_STOP_REPORT.md`
 
 ## Verification limits
-The suite did not reach the intended claim assertions because the header mock omitted an export. No authenticated browser/device visual verification was completed; route/overlay coverage is a test harness, not a real signed-in visual check. Automatic build/typecheck result unavailable in the sandbox diagnostics. No manual project build/typecheck was run.
+The suite did not reach the intended claim assertions because the header mock omitted an export. No authenticated browser/device visual verification was completed; route/overlay coverage is a test harness, not a real signed-in visual check. Automatic diagnostics reported **build OK at 2026-10-29T08:45:07Z**, with no surviving type/build error. No manual project build/typecheck was run.
