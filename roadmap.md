@@ -1,5 +1,9 @@
 # Roadmap
 
+## Review Step 1 — Photo under the notch
+- [x] Key the review-composer claim to the actual header form before paint; preserve route rules, geometry and one unmount release.
+- [ ] Add claim transition/step/edit coverage and run the full suite against 4,400 tests / 452 files.
+
 ## Review steps — Approved three-test correction
 - [x] Move unchanged safe-area heights/fold transition into stylesheet; update only authorised height/counter tests and add long-name truncation coverage.
 - [x] Full bunx vitest run4,398/4,398 across451 files (+1 long-name case); all3 prior failures clear. Automatic build OK07:10:46Z, no type errors. EP5.1 test untouched (already fixed by EP5.1.1). See REVIEW_STEPS_TEST_FIX_REPORT.md.

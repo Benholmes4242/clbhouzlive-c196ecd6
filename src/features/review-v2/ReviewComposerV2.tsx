@@ -136,6 +136,19 @@ function InnerComposer() {
   // keyed <Composer /> remount that follows a successful submit.
   const [success, setSuccess] = useState<ReceiptState | null>(null);
   const submittedRef = useRef(false);
+  const [photoHeader, setPhotoHeader] = useState(false);
+
+  // The claim stack owns the notch in both route and overlay contexts.
+  // Only the photo form is transparent; loading, compact and receipt retain canvas.
+  useLayoutEffect(() => {
+    claimOverlayChrome({
+      id: 'review-composer',
+      statusBarStyle: 'light',
+      statusBarColor: photoHeader ? '00000000' : 'FF' + RV2.canvas.replace('#', '').toUpperCase(),
+      shieldColor: photoHeader ? 'transparent' : RV2.canvas,
+    });
+  }, [photoHeader]);
+  useLayoutEffect(() => () => releaseOverlayChrome('review-composer'), []);
 
 
   const courseQ = useQuery({
@@ -301,6 +314,7 @@ function InnerComposer() {
       userId={userId}
       existing={existingQ.data}
       existingMedia={existingMediaQ.data ?? []}
+      onHeaderFormChange={setPhotoHeader}
       submittedRef={submittedRef}
       onSuccess={(payload) => {
         submittedRef.current = true;
@@ -330,6 +344,7 @@ function InnerComposer() {
 
 
 interface ComposerProps {
+  onHeaderFormChange: (photo: boolean) => void;
   course: ReviewV2Course;
   userId: string | null;
   existing: ExistingReview | null | undefined;
@@ -341,7 +356,7 @@ interface ComposerProps {
   onSuccess: (payload: ReceiptState) => void;
 }
 
-function Composer({ course, userId, existing, existingMedia, author, onExit, submittedRef, onSuccess }: ComposerProps) {
+function Composer({ course, userId, existing, existingMedia, author, onExit, submittedRef, onSuccess, onHeaderFormChange }: ComposerProps) {
 
   const isEditMode = !!existing;
   const mode = isEditMode ? 'edit' : 'new';
@@ -796,6 +811,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     voiceActive,
     isEditMode,
   });
+  useLayoutEffect(() => { onHeaderFormChange(photoForm); }, [photoForm, onHeaderFormChange]);
   const appendDictation = (text: string) => {
     const prev = composer.state.reviewText;
     const joiner = prev.length === 0 || /\s$/.test(prev) ? '' : ' ';
@@ -1283,18 +1299,6 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 }
 
 export default function ReviewComposerV2() {
-  // Route and overlay mounts delegate notch ownership to the claim stack,
-  // so route reassertions cannot repaint it while the wizard is open.
-  useLayoutEffect(() => {
-    claimOverlayChrome({
-      id: 'review-composer',
-      statusBarStyle: 'light',
-      statusBarColor: 'FF' + RV2.canvas.replace('#', '').toUpperCase(),
-      shieldColor: RV2.canvas,
-    });
-    return () => releaseOverlayChrome('review-composer');
-  }, []);
-
   return (
     <AccessControl requireAuth={true} noBlockingLoader={true}>
       <div className="w-full md:max-w-[440px] md:mx-auto">
