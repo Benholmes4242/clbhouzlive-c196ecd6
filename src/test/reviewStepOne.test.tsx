@@ -79,68 +79,121 @@ describe('header fold', () => {
 });
 
 describe('header forms', () => {
-  const props = { name: 'Kingsbarns', region: 'Fife, Scotland', thumbnail: 'https://x.test/k.jpg', leadingIsClose: false, onBack: vi.fn(), isEditMode: false, onDelete: vi.fn() };
-  it('photo header draws the photograph, score and rank', () => {
-    const { container } = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: 8.64, count: 12, rank: '#16 World' }} />);
-    expect(container.querySelector('[data-photo-header] img')?.getAttribute('src')).toBe(props.thumbnail);
-    expect(container.querySelector('[data-header-score] b')?.textContent).toBe('8.6');
-    expect(container.querySelector('[data-header-rank]')?.textContent).toBe('#16 World');
+  const props = {
+    name: 'Kingsbarns', region: 'Fife, Scotland', thumbnail: 'https://x.test/k.jpg',
+    courseId: 'course-1', courseRegion: 'Fife', subCountry: null as string | null, country: 'Scotland',
+    leadingIsClose: false, onBack: vi.fn(), isEditMode: false, onDelete: vi.fn(),
+  };
+  it('photo header is one block the photograph covers, with the name block below it gone', () => {
+    const { container } = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: 8.64, count: 12 }} />);
+    const photo = container.querySelector('[data-photo-header]');
+    const img = photo?.querySelector('img') as HTMLImageElement;
+    expect(img.getAttribute('src')).toBe(props.thumbnail);
+    expect(img.style.objectFit).toBe('cover');
+    expect(img.style.objectPosition).toBe('center 40%');
+    expect(img.style.position).toBe('absolute');
+    expect(img.style.inset).toBe('0px');
+    expect(container.querySelector('[data-photo-name-block]')).toBeNull();
     expect(container.querySelector('header')?.getAttribute('data-header-form')).toBe('photo');
   });
-  it('keeps the name and score outside the straight-cut photo with no overlay', () => {
-    const { container } = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: 8.64, count: 12, rank: '#16 World' }} />);
-    const photo = container.querySelector('[data-photo-header]');
-    const block = container.querySelector('[data-photo-name-block]');
-    expect(photo?.children).toHaveLength(2);
-    expect(photo?.querySelector('[aria-hidden]')).toBeNull();
-    expect(photo?.querySelector('[data-header-score]')).toBeNull();
-    expect(photo?.contains(block)).toBe(false);
-    expect(photo?.nextElementSibling).toBe(block);
-    expect(block?.querySelector('[data-header-score] b')?.textContent).toBe('8.6');
-    expect(block?.firstElementChild?.textContent).toBe(props.name);
+  it('lays the course page wash and the fade into the page over the photo, neither taking taps', () => {
+    const { container } = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: 8.64, count: 12 }} />);
+    const layers = Array.from(container.querySelectorAll('[data-photo-header] [aria-hidden]')) as HTMLElement[];
+    expect(layers).toHaveLength(2);
+    expect(layers[0].style.background).toContain('rgba(0, 0, 0, 0.18)');
+    expect(HERO_CANON_WASH).toBe('linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.18))');
+    expect(layers[1].style.background.replace(/\s/g, '')).toContain(
+      'linear-gradient(180deg,rgba(22,22,26,0)40%,rgba(22,22,26,0.72)72%,#16161A100%)'.replace(/\s/g, ''),
+    );
+    for (const layer of layers) expect(layer.style.pointerEvents).toBe('none');
+  });
+  it('renders the course page masthead over the photo: shared kicker, place, two-line name clamp', () => {
+    mockStanding = { globalRank: 16, regionalRank: 14, usaRank: null };
+    const { container } = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: 8.64, count: 12 }} />);
+    const masthead = container.querySelector('[data-photo-header] > div:last-child') as HTMLElement;
+    expect(masthead.style.position).toBe('absolute');
+    expect(masthead.style.left).toBe('20px');
+    expect(masthead.style.right).toBe('20px');
+    expect(masthead.style.bottom).toBe('14px');
+    expect(masthead.firstElementChild?.textContent).toBe('Fife · #16 World · #14 GB&I');
+    const nameEl = Array.from(masthead.querySelectorAll('div')).find((d) => d.textContent === 'Kingsbarns') as HTMLElement;
+    expect(nameEl.style.webkitLineClamp).toBe('2');
+    expect(Array.from(masthead.querySelectorAll('div')).some((d) => d.textContent === 'Scotland')).toBe(true);
+  });
+  it('keeps CourseTitleOverlay\u2019s kicker rule in the shared helper, country deciding the regional list', () => {
+    const standing = { globalRank: 16, regionalRank: 14, usaRank: 9 };
+    expect(courseMastheadKicker({ sub_country: null, region: 'Fife', country: 'Scotland' }, standing)).toBe('Fife · #16 World · #14 GB&I');
+    expect(courseMastheadKicker({ sub_country: 'Norfolk', region: 'East', country: 'England' }, standing)).toBe('Norfolk · #16 World · #14 GB&I');
+    expect(courseMastheadKicker({ sub_country: null, region: 'California', country: 'United States' }, standing)).toBe('California · #16 World · #9 USA');
+    expect(courseMastheadKicker({ sub_country: null, region: 'Algarve', country: 'Continental Europe' }, standing)).toBe('Algarve · #16 World · #14 Europe');
+    expect(courseMastheadKicker({ sub_country: null, region: 'Fife', country: 'Scotland' }, null)).toBe('Fife');
+    expect(courseMastheadKicker({ sub_country: null, region: null, country: 'Scotland' }, null)).toBeNull();
+  });
+  it('leads the reference line with the members\u2019 score, then the tee parts', () => {
+    mockRefLine = 'Par 72 · 6,915 yds · 73.6 / 135';
+    const { container } = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: 8.24, count: 1 }} />);
+    const line = container.querySelector('[data-header-reference]') as HTMLElement;
+    expect(line).not.toBeNull();
+    expect(line.style.fontSize).toBe('13px');
+    expect(line.style.fontWeight).toBe('600');
+    const score = line.querySelector('b') as HTMLElement;
+    expect(score.textContent).toBe('8.2');
+    expect(score.style.fontWeight).toBe('700');
+    expect(line.textContent).toContain('Par 72');
+    expect(line.textContent).toContain('6,915 yds');
+    expect(line.textContent).toContain('73.6 / 135');
+  });
+  it('omits the score with 0 reviews and drops the hairline row with neither score nor reference', () => {
+    mockRefLine = 'Par 72';
+    const withRef = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: null, count: 0 }} />);
+    const line = withRef.container.querySelector('[data-header-reference]') as HTMLElement;
+    expect(line.querySelector('b')).toBeNull();
+    expect(line.textContent).toBe('Par 72');
+    expect(headerScore({ avg: 9, count: 0 })).toBeNull();
+    withRef.unmount();
+    mockRefLine = null;
+    const bare = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: null, count: 0 }} />);
+    expect(bare.container.querySelector('[data-header-reference]')).toBeNull();
+    const divs = Array.from(bare.container.querySelectorAll('div')) as HTMLElement[];
+    expect(divs.some((d) => d.style.borderTop.includes('rgba(255, 255, 255, 0.18)'))).toBe(false);
   });
   it('preserves the safe-area photo height and compact height through the measured fold', () => {
     const ref = React.createRef<HTMLElement>();
-    const facts = { avg: null, count: 0, rank: null };
+    const facts = { avg: null, count: 0 };
     const { container, rerender } = render(<ReviewComposerHeader ref={ref} {...props} form="photo" facts={facts} />);
     const header = ref.current;
     expect(container.querySelector('[data-photo-header]')).toHaveClass('rv2-photo');
     expect(header).toHaveClass('rv2-header--photo');
     const cssText = readFileSync(resolve(__dirname, '../features/review-v2/components/reviewComposerHeader.css'), 'utf8');
-    expect(cssText).toContain('.rv2-header--photo { height: calc(env(safe-area-inset-top, 0px) + 206.75px); }');
+    expect(cssText).toContain('.rv2-header--photo { height: calc(env(safe-area-inset-top, 0px) + 246px); }');
     expect(cssText).toContain('.rv2-header--compact { height: calc(env(safe-area-inset-top, 0px) + 68px); }');
-    expect(cssText).toContain('.rv2-photo { height: calc(env(safe-area-inset-top, 0px) + 136px); }');
+    expect(cssText).toContain('.rv2-photo { height: 100%; }');
     expect(cssText).toContain('transition: height 200ms ease');
     rerender(<ReviewComposerHeader ref={ref} {...props} form="compact" facts={facts} />);
     expect(ref.current).toBe(header);
     expect(header).toHaveClass('rv2-header--compact');
-    expect(container.querySelector('[data-photo-name-block]')).toBeNull();
+    expect(container.querySelector('[data-photo-header]')).toBeNull();
   });
-  it('keeps long course names on one ellipsized line and gives region truncation priority', () => {
-    const { container } = render(<ReviewComposerHeader {...props} name="Royal Portrush Golf Club (Dunluce Links)"
-      region="Causeway Coast and Glens, Northern Ireland" form="photo" facts={{ avg: 8.64, count: 12, rank: '#16 World' }} />);
-    const name = container.querySelector('[data-photo-name-block]')?.firstElementChild as HTMLElement;
-    expect(name.style.whiteSpace).toBe('nowrap');
-    expect(name.style.overflow).toBe('hidden');
-    expect(name.style.textOverflow).toBe('ellipsis');
-    const meta = container.querySelector('[data-photo-meta]') as HTMLElement;
-    const region = meta.firstElementChild as HTMLElement;
-    expect(meta.style.flexWrap).toBe('nowrap');
-    expect(region.style.minWidth).toBe('0');
-    expect(region.style.textOverflow).toBe('ellipsis');
-    for (const item of Array.from(meta.children).slice(1)) expect((item as HTMLElement).style.flexShrink).toBe('0');
-  });
-  it('omits the score at 0 reviews and the rank when none', () => {
-    const { container } = render(<ReviewComposerHeader {...props} form="photo" facts={{ avg: null, count: 0, rank: null }} />);
-    expect(container.querySelector('[data-header-score]')).toBeNull();
-    expect(container.querySelector('[data-header-rank]')).toBeNull();
-    expect(headerScore({ avg: 9, count: 0, rank: null })).toBeNull();
+  it('splits the members copy into singular and plural in every locale', () => {
+    for (const loc of ['en', 'en-XA', 'de', 'es', 'ja', 'ko']) {
+      const json = JSON.parse(readFileSync(resolve(__dirname, `../../public/locales/${loc}/courses.json`), 'utf8'));
+      const stepOne = json.review.wizard.stepOne;
+      expect(stepOne.fromMembers).toBeUndefined();
+      expect(stepOne.fromMembers_one).toBe('from {{count}} member');
+      expect(stepOne.fromMembers_other).toBe('from {{count}} members');
+    }
   });
   it('compact header carries region only at 0 reviews and keeps delete in edit mode', () => {
-    const { container, getAllByRole } = render(<ReviewComposerHeader {...props} form="compact" isEditMode facts={{ avg: null, count: 0, rank: null }} />);
+    const { container, getAllByRole } = render(<ReviewComposerHeader {...props} form="compact" isEditMode facts={{ avg: null, count: 0 }} />);
     expect(container.querySelector('[data-photo-header]')).toBeNull();
     expect(container.querySelector('[data-compact-meta]')?.textContent).toBe('Fife, Scotland');
     expect(getAllByRole('button')).toHaveLength(2);
+  });
+  it('compact header leads with region and the score when reviewed', () => {
+    const { container } = render(<ReviewComposerHeader {...props} form="compact" facts={{ avg: 8.64, count: 3 }} />);
+    const meta = container.querySelector('[data-compact-meta]');
+    expect(meta?.textContent).toContain('Fife, Scotland');
+    expect(meta?.textContent).toContain('8.6');
   });
 });
 
