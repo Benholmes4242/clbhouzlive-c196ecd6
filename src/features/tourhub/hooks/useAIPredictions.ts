@@ -683,8 +683,10 @@ export async function validatePicksAgainstField(
   let promoted = 0;
   for (const alt of alternates) {
     if (validContenders.length >= 5) break;
+    // Only an alternate who is actually in the field (a leaderboard row) can be
+    // promoted; an undefined status means they are not in this week's field.
     const altStatus = statusMap.get(String(alt.playerId));
-    if (!isWithdrawn(altStatus)) {
+    if (statusMap.has(String(alt.playerId)) && !isWithdrawn(altStatus)) {
       validContenders.push({
         ...alt,
         rank: validContenders.length + 1,
