@@ -11,6 +11,8 @@ type State = {
   open: boolean;
   /** When set, the picker hands the club back instead of writing it itself. */
   onSelected?: (club: { id: string; name: string }) => void;
+  keyboardSearch?: boolean;
+  pendingName?: string | null;
 };
 
 let state: State = { open: false };
@@ -20,8 +22,8 @@ function emit() {
   for (const l of listeners) l();
 }
 
-export function openHomeClubPicker(opts?: { onSelected?: (club: { id: string; name: string }) => void }) {
-  state = { open: true, onSelected: opts?.onSelected };
+export function openHomeClubPicker(opts?: { onSelected?: (club: { id: string; name: string }) => void; keyboardSearch?: boolean; pendingName?: string | null }) {
+  state = { open: true, onSelected: opts?.onSelected, keyboardSearch: opts?.keyboardSearch, pendingName: opts?.pendingName };
   emit();
 }
 
