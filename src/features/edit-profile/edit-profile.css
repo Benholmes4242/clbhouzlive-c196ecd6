@@ -100,3 +100,19 @@
 .ep-shell .ep-golf-remove{color:var(--ep-dim);padding:0;background:none;border:0}
 .ep-shell .ep-golf-add{display:flex;width:100%;height:auto;align-items:center;justify-content:flex-start;gap:10px;font-size:15px;font-weight:600;padding:13px 0;border:0;border-top:1px solid var(--ep-hair);border-radius:0;color:var(--ep-ink)}
 .ep-golf-add span{width:26px;height:26px;border-radius:50%;border:1px solid var(--ep-hair);display:flex;align-items:center;justify-content:center;color:var(--ep-mute)}
+
+/* EP4 inline link inputs and existing EP2 radio inside a rows card. */
+.ep-links-options{margin-top:14px}
+.ep-links-hint{font-size:12.5px;color:var(--ep-dim);margin-top:8px;line-height:1.45}
+.ep-privacy-hint{margin:8px 4px 0}
+.ep-link-input-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--ep-hair);min-height:52px}
+.ep-link-input-row:first-child{border-top:0}
+.ep-link-input{flex:1;min-width:0;width:100%;background:none;border:0;outline:0;color:var(--ep-ink);font-size:15px;font-weight:500;font-family:inherit}
+.ep-link-input::placeholder{color:var(--ep-dim)}
+.ep-link-input:focus-visible{outline:1px solid var(--ep-hair);outline-offset:4px}
+.ep-shell .ep-link-remove{padding:0;width:24px;height:24px;background:none;border:0;color:var(--ep-dim)}
+.ep-social-icon{width:30px;height:30px;border-radius:9px;background:var(--ep-inset);border:1px solid var(--ep-hair);display:flex;align-items:center;justify-content:center;flex:none}
+.ep-social-input-row{gap:16px;padding:13px 0}
+.ep-shell .ep-links-options .ep-opt{height:auto;border-radius:0;justify-content:space-between;box-shadow:none;transition:none;padding:13px 0;color:var(--ep-ink);font-weight:600}
+.ep-visibility-row{display:block;border-top:1px solid var(--ep-hair)}
+.ep-shell .ep-visibility-row .ep-row{border-top:0}
