@@ -299,7 +299,9 @@ export function HeroBoardSection({
   eventType = null,
 }: HeroBoardSectionProps) {
   const { t } = useTranslation('tourhub');
-  const hasBoard = phase !== 'upcoming' && shouldShowOverviewBoard(entries);
+  /* Before the first tee the feed gives every row position 1 and a 0 score;
+     a board of T1 E is false, so the board waits for the first started row. */
+  const hasBoard = phase !== 'upcoming' && shouldShowOverviewBoard(entries) && fieldHasStarted(entries);
 
   const { viewingTournamentId, viewingTourSlug } = useTourSelection();
   const pickTourCode = viewingTourSlug ?? 'pga';
@@ -604,7 +606,7 @@ function PicksBlock({
   const teeFor = (p: AITopContender): string | null => {
     const id = String(p.playerId);
     const line = boardByPlayer.get(id);
-    const hasFigure = phase === 'completed' ? !!settledFigureFor(line) : phase === 'live' && !!line && line.position != null;
+    const hasFigure = phase === 'completed' ? !!settledFigureFor(line) : false;
     if (hasFigure || startedPlayers.has(id)) return null;
     const iso = teeByPlayer?.get(id) ?? null;
     return iso && pickTeeText(iso) ? iso : null;
@@ -665,7 +667,10 @@ function PicksBlock({
           const settled = settledRaw && isChampion
             ? { ...settledRaw, right: WON_LABEL, rightColor: GOLD }
             : settledRaw;
-          const liveLine = phase === 'live' && line && line.position != null ? line : null;
+          /* Ben's ruling: a live pick who has not started (one has-started rule)
+             gets no position and no score — the feed's T1 E is false. */
+          const pickStarted = startedPlayers.has(String(p.playerId));
+          const liveLine = phase === 'live' && pickStarted && line && line.position != null ? line : null;
 
           let figureLine: React.ReactNode;
           if (liveLine) {
@@ -727,7 +732,7 @@ function PicksBlock({
                 ) : null}
                 {/* CORRECTIONS I.2: a pick leading or level has nothing to reach — no
                     line at all. The dash is only for a target genuinely out of reach. */}
-                {neededByPlayer && toReachScore && !(line?.score != null && leaderTotal != null && line.score <= leaderTotal) ? (
+                {neededByPlayer && toReachScore && (phase !== 'live' || pickStarted) && !(line?.score != null && leaderTotal != null && line.score <= leaderTotal) ? (
                   <div data-overview-pick-to-reach style={{ marginTop: 2, fontSize: 10, fontWeight: 700, color: OVERVIEW.mute, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...FIGS }}>
                     {`${t('overview.picksToReach', { score: toReachScore })} ${neededByPlayer.get(String(p.playerId)) ?? '\u2014'}`}
                   </div>
