@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Review Step 2 — The score
-- [ ] Match signed-off empty overall/rulers/category states/share and footer; preserve compact/shared headers and Step 1.
-- [ ] Remove implicit score confirmation and exclusive skip event/copy; add incomplete nudges and required-score tests.
-- [ ] Run full suite against 4,283 total / 447 files (11 known EP1 provider failures), report every test change and failure.
+- [x] Match signed-off empty overall/rulers/category states/share and footer; preserve compact/shared headers and Step 1.
+- [x] Remove implicit score confirmation and exclusive skip event/copy; add incomplete nudges and 31 required-score/interaction cases.
+- [x] Full bunx vitest run: 4,303 passed / 11 known EP1 failures / 4,314 total / 448 files (+31/+1). Existing review cases retargeted by brief, no removals; REVIEW_STEP_TWO_REPORT.md records each assertion.
+- [ ] STOP: scrubberEmptyState.test.tsx(14,13) TS2345 EventTarget is not assignable to Document | Element | Node | Window. Await helper typing authorisation; no corrections after completed-edit check. Signed-in/visual checks unavailable/unperformed.
 
 ## EP3 — Edit profile Your golf
 - [x] Add five golf rows and signed-off handicap/home/other-club sheets with isolated saves and unchanged visibility.
