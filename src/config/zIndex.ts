@@ -11,6 +11,8 @@ export const Z = {
   // Base UI layers
   header: 1000,
   nav: 999,
+  // The floating bottom nav's real layer; deliberately below sheets, drawers, dialogs and croppers.
+  bottomNav: 100,
   // Sticky content chrome: the inset scrim sits directly below its row.
   stickyTabs: 30,
   stickySafeArea: 29,

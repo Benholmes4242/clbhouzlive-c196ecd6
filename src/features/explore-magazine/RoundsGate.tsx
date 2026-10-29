@@ -9,8 +9,8 @@
  * Scroll ownership is the canonical #root container via getPrimaryScrollElement.
  * Timers/listeners/observer belong to this mount, never storage. Gate and tile
  * share connect CTA styles and floating glass; tile owns modal focus/aria lifecycle.
- * Locked gates hold the canonical nav expansion lease; the nav uses Z.nav,
- * above the body-level shade/card at Z.nav - 2/-1 (no separate nav mount).
+ * Locked gates hold the canonical nav expansion lease; the nav uses Z.bottomNav,
+ * above the body-level shade/card at Z.bottomNav - 2/-1 (no separate nav mount).
  */
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
@@ -117,7 +117,7 @@ function GateCard({ roundCount, scope, onConnect, onNoHandicap, declineRef }: {
   const counted = roundCount != null && roundCount > 0 && scope != null;
   const restKey = scope === 'circle' ? 'headRestCircle' : scope === 'club' ? 'headRestClub' : 'headRestEveryone';
   useLayoutEffect(() => { cardRef.current?.focus({ preventScroll: true }); }, []);
-  return createPortal(<div ref={cardRef} data-rounds-gate-card="" className="rounds-gate-floating rounds-gate-enter" role="dialog" aria-modal="false" aria-labelledby="rounds-gate-title" tabIndex={-1} style={{ ...GLASS_CARD, zIndex: Z.nav - 1 }}>
+  return createPortal(<div ref={cardRef} data-rounds-gate-card="" className="rounds-gate-floating rounds-gate-enter" role="dialog" aria-modal="false" aria-labelledby="rounds-gate-title" tabIndex={-1} style={{ ...GLASS_CARD, zIndex: Z.bottomNav - 1 }}>
     <div className="rounds-gate-kicker">{t('amateur.gate.membersKicker')}</div>
     <h2 id="rounds-gate-title" className="rounds-gate-head">{counted ? <><span data-rounds-gate-count="" className="rounds-gate-amber">{t('amateur.gate.bodyCount', { count: roundCount })}</span>{' '}{t(`amateur.gate.${restKey}`)}</> : t('amateur.gate.title')}</h2>
     <p className="rounds-gate-copy">{t('amateur.gate.lockBody')}</p>
@@ -193,7 +193,7 @@ export function RoundsGate({ children, roundCount = null, scope = null }: { chil
   return <div ref={wrapperRef} data-rounds-gate="" data-rounds-locked={locked ? '' : undefined}>
     <div ref={bodyRef} data-rounds-gate-body="" aria-hidden={locked ? true : undefined}>{children}</div>
     {locked ? <>
-      {createPortal(<div data-rounds-gate-shade="" aria-hidden="true" className="rounds-gate-shade" style={{ zIndex: Z.nav - 2 }} />, document.body)}
+      {createPortal(<div data-rounds-gate-shade="" aria-hidden="true" className="rounds-gate-shade" style={{ zIndex: Z.bottomNav - 2 }} />, document.body)}
       <GateCard roundCount={roundCount} scope={scope} declineRef={declineRef} onConnect={() => { analyticsEvents.track('rounds_gate_connect_tap', { gate_state: 'gated' }); navigate('/manage/handicap'); }} onNoHandicap={() => { analyticsEvents.track('rounds_gate_no_handicap_tap', { gate_state: 'gated' }); setTileOpen(true); }} />
       {tileOpen ? <NoHandicapTile onClose={() => setTileOpen(false)} returnRef={declineRef} /> : null}
     </> : null}

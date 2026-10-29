@@ -1,10 +1,11 @@
 import React from 'react';
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { createInstance } from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
 import enCourses from '../../public/locales/en/courses.json';
+import { MotionGlobalConfig } from 'framer-motion';
 import { Z } from '@/config/zIndex';
 import { RoundsGate } from '@/features/explore-magazine/RoundsGate';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
@@ -23,6 +24,9 @@ vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user
 vi.mock('@/features/composer-flow/ComposerFlowSheet', () => ({ default: ({ open }: { open: boolean }) => open ? <div data-composer-flow-sheet="" /> : null }));
 
 const i18n = createInstance();
+let prevSkip = false;
+beforeAll(() => { prevSkip = MotionGlobalConfig.skipAnimations; MotionGlobalConfig.skipAnimations = true; });
+afterAll(() => { MotionGlobalConfig.skipAnimations = prevSkip; });
 beforeAll(async () => { await i18n.use(initReactI18next).init({ lng: 'en', resources: { en: { courses: enCourses } }, interpolation: { escapeValue: false } }); });
 let root: HTMLDivElement;
 beforeEach(() => {
@@ -59,9 +63,14 @@ describe('Locked rounds navigation', () => {
     expect(ancestorContexts(nav)).toEqual(ancestorContexts(shade));
     expect(ancestorContexts(nav)).toEqual(ancestorContexts(card));
     expect(shade.parentElement).toBe(document.body); expect(card.parentElement).toBe(document.body);
-    expect(getComputedStyle(nav).zIndex).toBe(String(Z.nav));
-    expect(shade.style.zIndex).toBe(String(Z.nav - 2)); expect(card.style.zIndex).toBe(String(Z.nav - 1));
+    expect(getComputedStyle(nav).zIndex).toBe('100');
+    expect(shade.style.zIndex).toBe('98'); expect(card.style.zIndex).toBe('99');
     expect(screen.getByRole('button', { name: 'Explore' })).toHaveAttribute('aria-current', 'page');
+  });
+  it('keeps the nav at Z.bottomNav (100), below alert dialogs (200)', () => {
+    mount(); const nav = screen.getByRole('navigation', { name: 'Main' });
+    expect(Z.bottomNav).toBe(100); expect(Number(getComputedStyle(nav).zIndex)).toBe(Z.bottomNav);
+    expect(Number(getComputedStyle(nav).zIndex)).toBeLessThan(200);
   });
   it('holds the expansion lease only while locked and releases it on unmount', () => {
     const release = vi.fn(); const push = vi.spyOn(scrollStore, 'pushForceExpand').mockReturnValue(release);
