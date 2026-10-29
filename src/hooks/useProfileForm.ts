@@ -3,6 +3,7 @@ import { ProfileFormData, ClubEntry } from '@/components/profile/profile-wizard/
 import { nanoid } from 'nanoid';
 import { formHcpFromDb } from '@/lib/formatHcp';
 import { supabase } from '@/integrations/supabase/client';
+import { personalWebsiteValid, PERSONAL_WEBSITE_ERROR } from '@/lib/profile/websiteValidation';
 
 interface RawProfile {
   id?: string;
@@ -175,8 +176,8 @@ export function useProfileForm(profile: RawProfile | null | undefined, loading?:
     if (form.displayName.length > 50) e.displayName = 'Max 50 characters';
     if (form.bio.length > 300) e.bio = 'Max 300 characters';
     form.websites.forEach((w) => {
-      if (w.url && !/^https?:\/\/.+/.test(w.url)) {
-        e.websites = 'URLs must start with http:// or https://';
+      if (!personalWebsiteValid(w.url)) {
+        e.websites = PERSONAL_WEBSITE_ERROR;
       }
     });
     return e;
