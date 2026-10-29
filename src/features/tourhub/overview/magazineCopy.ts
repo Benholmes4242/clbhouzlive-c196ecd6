@@ -3,12 +3,16 @@ import type { TFunction } from 'i18next';
 import type { HeroTournament } from '../hooks/useHeroCarouselData';
 import type { HeroState } from '../components/overview-v3/HybridHero.utils';
 import { surnameOf } from '../_shared/playerName';
+import { formatTimeHm } from '@/i18n/format';
+import { rowHasStarted } from './boardStarted';
 
 type BoardEntry = {
   score?: number | null;
   total?: number | null;
   position?: number | null;
   position_tied?: boolean | null;
+  round_1?: number | null; round_2?: number | null; round_3?: number | null; round_4?: number | null;
+  thru?: number | null;
   player?: { full_name?: string | null; first_name?: string | null; last_name?: string | null } | null;
 };
 
@@ -39,7 +43,7 @@ export function spokenCount(n: number, t: TFunction): string {
 
 function marginFacts(entries: BoardEntry[]) {
   const sorted = [...entries]
-    .filter((entry) => scoreOf(entry) != null)
+    .filter((entry) => rowHasStarted(entry) && scoreOf(entry) != null)
     .sort((a, b) => (scoreOf(a) as number) - (scoreOf(b) as number));
   const leaderScore = scoreOf(sorted[0]);
   if (leaderScore == null) return { leaders: [] as BoardEntry[], margin: null, score: null };
@@ -60,6 +64,8 @@ type HeadlineArgs = {
   t: TFunction;
   /** Results only: the champion's gross final-round score, when known. */
   closingRound?: number | null;
+  /** Live only: earliest known tee time (ISO) for the current round. */
+  firstTeeTime?: string | null;
 };
 
 /**
@@ -84,7 +90,7 @@ function namedTie(leaders: BoardEntry[]) {
   return null;
 }
 
-function headlineSpec({ tournament, state, leaderboard, t, closingRound }: HeadlineArgs): HeadlineSpec | null {
+function headlineSpec({ tournament, state, leaderboard, t, closingRound, firstTeeTime }: HeadlineArgs): HeadlineSpec | null {
   const facts = marginFacts(leaderboard);
   const leader = playerName(facts.leaders[0]);
   const score = facts.score == null ? null : spokenToPar(facts.score, t);
@@ -118,6 +124,13 @@ function headlineSpec({ tournament, state, leaderboard, t, closingRound }: Headl
   // Live — the photo band prints venue and round; the board prints the top
   // five. The sentence says neither again.
   if (state.kind === 'live') {
+    // Nobody has a hole recorded: say when play begins, never a tie at level.
+    if (!leaderboard.some(rowHasStarted)) {
+      const time = firstTeeTime ? formatTimeHm(firstTeeTime) : '';
+      return time
+        ? spec('overview.magazine.liveNotStartedTime', { time }, ['time'])
+        : spec('overview.magazine.liveNotStarted');
+    }
     if (facts.leaders.length > 1) {
       if (tie) return score
         ? spec(`overview.magazine.liveTie${tie.size}Score`, { ...tie.values, score }, ['score'])

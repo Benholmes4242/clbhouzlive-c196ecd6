@@ -63,6 +63,7 @@ import { inRequiredRoundWindow, leaderOf, neededGross } from './whatsNext';
 import { surnameOf } from '../../../_shared/playerName';
 import { PicksSheet } from './PicksSheet';
 import type { HeroState } from '../HybridHero.utils';
+import { fieldHasStarted } from '../../../overview/boardStarted';
 import { boardMovementMap, todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
 import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
 import { OVERVIEW, pickMovementCards, type MovementCard } from '../overviewTokens';
@@ -367,7 +368,7 @@ export function HeroBoardSection({
      used, so the guard is identical to the old hasMovement: in play, a prior
      round to rank against, at least one non-zero delta. */
   const movementCards = useMemo<MovementCard[]>(() => {
-    if (!inPlay || currentRound == null || currentRound < 2) return [];
+    if (!inPlay || currentRound == null || currentRound < 2 || !fieldHasStarted(entries)) return [];
     const map = boardMovementMap(entries, currentRound);
     const cards: MovementCard[] = [];
     for (const e of entries) {
@@ -391,7 +392,7 @@ export function HeroBoardSection({
   /* §E.1 — where the picks stand. A fixed sentence from the board: the
      best-placed pick and its gap to the lead. Absent when no pick is on it. */
   const picksIntro = useMemo(() => {
-    if (!inPlay || !leader || leader.total == null) return null;
+    if (!inPlay || !leader || leader.total == null || !fieldHasStarted(entries)) return null;
     let best: { name: string; position: number; tied: boolean; score: number } | null = null;
     for (const p of picks) {
       const line = p?.playerId ? boardByPlayer.get(String(p.playerId)) : undefined;
@@ -405,7 +406,7 @@ export function HeroBoardSection({
     const gap = best.score - leader.total;
     if (gap <= 0) return t('overview.picksIntro.level', { name: best.name, pos, score });
     return t('overview.picksIntro.behind', { name: best.name, pos, count: gap, score });
-  }, [inPlay, leader, picks, boardByPlayer, t]);
+  }, [inPlay, leader, picks, boardByPlayer, entries, t]);
   const toReachWindow = inPlay && leader?.total != null && totalRounds != null && inRequiredRoundWindow(currentRound, totalRounds);
 
 
