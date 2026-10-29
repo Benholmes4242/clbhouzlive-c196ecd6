@@ -56,7 +56,7 @@ import { OverallScrubber } from './components/OverallScrubber';
 import { CategoryGrid, type CategoryCopy } from './components/CategoryGrid';
 import { MediaTray } from './components/MediaTray';
 import { ReviewHoleTags } from './components/ReviewHoleTags';
-import { ReviewComposerHeader } from './components/ReviewComposerHeader';
+import { ReviewComposerHeader, PHOTO_HEADER_H_CSS } from './components/ReviewComposerHeader';
 import { useReviewHeaderFacts } from './hooks/useReviewHeaderFacts';
 import { usePhotoHeaderForm } from './lib/stepOneFold';
 import { useReviewHoleTags } from './hooks/useReviewHoleTags';
@@ -854,7 +854,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
     if (!header || !spacer) return;
     const read = () => {
       const overlap = header.getBoundingClientRect().bottom - spacer.getBoundingClientRect().top;
-      setSpacerH(Math.max(0, Math.round(overlap)) + RV2_HEADER_GAP);
+      setSpacerH(Math.max(0, Math.round(overlap)) + (photoForm ? 6 : RV2_HEADER_GAP));
     };
     read();
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(read) : null;
@@ -867,7 +867,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
       window.clearTimeout(timer);
       window.removeEventListener('resize', read);
     };
-  }, []);
+  }, [photoForm]);
 
 
   return (
@@ -923,7 +923,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           height:
             spacerH != null
               ? `${spacerH}px`
-              : `calc(${RV2_HEADER_H_CSS} + ${RV2_HEADER_GAP}px)`,
+              : `calc(${photoForm ? PHOTO_HEADER_H_CSS : RV2_HEADER_H_CSS} + ${photoForm ? 6 : RV2_HEADER_GAP}px)`,
           flexShrink: 0,
         }}
       />
@@ -1078,7 +1078,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         <>
           {/* THE HEADING folds away with the photo header (§2). */}
           {photoForm && (
-            <section data-step1-heading style={{ padding: '18px 20px 0' }}>
+            <section data-step1-heading style={{ padding: '14px 20px 0' }}>
               <h1 style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, margin: 0, color: '#F8FAFC' }}>
                 {t('review.wizard.stepOne.headingStep1')}
               </h1>
@@ -1090,7 +1090,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
           {/* YOUR WORDS (§3). The box is always present; the Speak card sits above it. */}
           <section data-step1-words style={{ padding: '0 20px' }}>
-            <div style={{ ...STEP1_HEADING, marginTop: photoForm ? 20 : 16 }}>
+            <div style={{ ...STEP1_HEADING, marginTop: photoForm ? 18 : 16 }}>
               {t('review.wizard.stepOne.wordsHeading')}
             </div>
             <div style={{ marginTop: 10 }}>
