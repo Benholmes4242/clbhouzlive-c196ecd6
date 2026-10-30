@@ -1,5 +1,11 @@
 # Roadmap
 
+## ST5 — Settings Your data
+- [ ] Add the connection/total-gated rounds row and signed-off export sheet between Account and Friends.
+- [ ] Add only email-my-rounds, caller-owned CSV email and ten-minute sent suppression; preserve existing functions and SQL.
+- [ ] Add UI/CSV regressions, run full suite --maxWorkers=2 against 4,579/466, verify available browser states and write report.
+- [ ] Remove root ST2/ST3/ST4 reports as requested.
+
 ## Review confirmation — Authorised height-class correction
 - [x] Move receipt height to opt-in photo class; preserve default Step 1 output and replace only the authorised height assertion.
 - [x] Targeted68/68; full shards4578 passed/1 pre-existing Alerts failure/4579 total across466. +20 review confirmation/+12ST4 reconciled. Final CSS-order safeguard targeted68/68; browser390px receipt196 andStep1246, safe area0. See REVIEW_CONFIRMATION_HEIGHT_REPORT.md.
