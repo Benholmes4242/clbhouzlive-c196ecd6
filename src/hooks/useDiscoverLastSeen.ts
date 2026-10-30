@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { supabase } from '@/integrations/supabase/client';
 import { resetDiscoverNewCounts } from '@/stores/discoverNewStore';
+import { useIsGuest } from '@/features/guest/useIsGuest';
 
 /**
  * useDiscoverLastSeen (BRIEF_DISCOVER_NEW_SINCE + server storage pass).
@@ -96,6 +97,7 @@ export function useDiscoverLastSeen(userId?: string | null): DiscoverLastSeen {
    * p_seen_at so nobody's existing position is lost. Never after that.
    */
   const migrateStamp = useRef<number | null>(null);
+  const isGuest = useIsGuest();
 
   // The session resolves after mount, so the baseline loads as soon as the
   // member identity is known — once per identity, never again on re-render.
