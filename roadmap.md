@@ -1,5 +1,10 @@
 # Roadmap
 
+## Review media — Authorised test corrections and finish
+- [x] Apply only the authorised absent-ratio assertions and optional objectFit mock type; no visual changes.
+- [x] Targeted45/45; automatic build/type validation OK11:26:38Z; full shards2257/235 +2364/234 =4621/4621 across469. Reconcile4579/466 +ST5 UI18/CSV13 +review11; no failures, sheetTopV5 unchanged2/2 pass.
+- [x] Real FeedCard sample at390x844: review and normal4:5 media both390x487.5px; shared computed cap539px, both open callbacks work, no browser errors. Assertions and changed files recorded in REVIEW_FEED_MEDIA_HEIGHT_STOP_REPORT.md.
+
 ## ST5.1 — Authorised duplicate-test removal
 - [x] Delete only case19 and move its dialog assertion into case7; remove historical literal from report and rename to ST5_REPORT.md. sheetTopV5 unchanged.
 - [x] Full bunx vitest run --maxWorkers=2:4618 passed/3 pre-existing review-media failures/4621 total across469. ST5 UI18/18, CSV13/13, sheetTopV5 2/2 pass. No new failures; ST5_REPORT.md records names/errors/count reconciliation. Review test/type failures remain untouched.
@@ -7,8 +12,8 @@
 ## Review posts — Match normal feed media sizing
 - [x] Share intrinsic ratio/cap rules and opt media-first reviews with media into natural-height flow; preserve standard/no-media reviews.
 - [x] Add11 sizing cases; targeted42 passed/3 failed/45 across4. Existing34/34 pass; no old assertions changed. Candidate4622/469 =4579/466 +ST532/2 +this11/1.
-- [ ] STOP: reviewFeedMediaSizing.test.tsx:67:39 (two photo cases) and80:65 (carousel): AssertionError expected undefined to be ''. Three assertions remain untouched. Mock-only type fix uses React.CSSProperties['objectFit']; automatic build OK11:25:39Z and video-only targeted1/1 pass (10 skipped). Last full4618 passed/3 pre-existing failures/4621 across469; inventory unchanged. Report REVIEW_FEED_MEDIA_HEIGHT_STOP_REPORT.md.
-- [ ] Measure4:5 review/normal at390x844 after stop resolution; no browser measurement claimed. Prior ST5 sheetTopV5 failure remains untouched.
+- [x] Authorised absent-ratio assertions and optional mock type clear all three stops: targeted45/45, full4621/4621 across469; automatic build/type validation OK. Historical failures preserved in REVIEW_FEED_MEDIA_HEIGHT_STOP_REPORT.md.
+- [x] Sample4:5 review/normal at390x844 both487.5px high; screenshot dimensions inspected, media taps work. Separate ST5.1 already cleared sheetTopV5, unchanged2/2 passes here.
 
 ## ST5 — Settings Your data
 - [x] Add the connection/total-gated rounds row and signed-off export sheet between Account and Friends.

@@ -16,7 +16,7 @@ vi.mock('@/lib/impressions/useImpressionObserver', () => ({ useImpressionObserve
 vi.mock('@/components/feed/FeedActorPicker', () => ({ FeedActorPicker: () => null }));
 vi.mock('@/components/likes/LikedByRow', () => ({ LikedByRow: () => null }));
 vi.mock('@/components/feed/MediaCarousel', () => ({ MediaCarousel: ({ maxHeight }: { maxHeight?: string }) => <div data-carousel style={{ maxHeight }} /> }));
-vi.mock('@/components/feed/InlineVideo', () => ({ InlineVideo: ({ objectFit }: { objectFit: React.CSSProperties['objectFit'] }) => <video data-inline-video style={{ objectFit }} /> }));
+vi.mock('@/components/feed/InlineVideo', () => ({ InlineVideo: ({ objectFit }: { objectFit?: React.CSSProperties['objectFit'] }) => <video data-inline-video style={{ objectFit }} /> }));
 vi.mock('@/components/feed/CourseStatsSheet', () => ({ CourseStatsSheet: () => null }));
 vi.mock('@/components/feed/PostCourseBand', () => ({ PostCourseBand: () => null }));
 vi.mock('@/components/feed/FeedFollowPill', () => ({ FeedFollowPill: () => null }));
@@ -64,7 +64,7 @@ describe('shared feed media sizing', () => {
     const box = element(c, 'button[data-post-id] > div');
     expect(box.style.aspectRatio).toBe(ratio); expect(box.style.maxHeight).toBe(mediaMaxHeight());
     expect(element(c, '[data-review-media] img').style.objectFit).toBe('cover');
-    expect(wrapper.style.aspectRatio).toBe(''); expect(wrapper.style.maxHeight).toBe('');
+    expect(wrapper.style.aspectRatio ?? '').toBe(''); expect(wrapper.getAttribute('style') ?? '').not.toContain('aspect-ratio'); expect(wrapper.style.maxHeight).toBe('');
     expect(wrapper.style.minHeight).toBe(''); expect(wrapper.style.flex).toBe('');
     expect(wrapper.style.marginTop).toBe('10px'); expect(wrapper.firstElementChild?.getAttribute('style')).not.toContain('absolute');
   });
@@ -77,7 +77,8 @@ describe('shared feed media sizing', () => {
   it('review carousel receives the shared viewport cap without an outer square frame', () => {
     const c = card([PHOTO, { ...PHOTO, id: 'm2', width: 1920, height: 1005 }]);
     expect(element(c, '[data-carousel]').style.maxHeight).toBe(mediaMaxHeight());
-    expect(element(c, '[data-review-media]').style.aspectRatio).toBe('');
+    expect(element(c, '[data-review-media]').style.aspectRatio ?? '').toBe('');
+    expect(element(c, '[data-review-media]').getAttribute('style') ?? '').not.toContain('aspect-ratio');
   });
   it('media-first review with media has no whole-card height cap and retains its footer below', () => {
     const c = card([PHOTO]);
