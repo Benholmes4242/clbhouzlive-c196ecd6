@@ -68,7 +68,7 @@ afterEach(cleanup);
 describe('the switch', () => {
   it('ships preview-only', () => {
     const src = readFileSync('src/features/guest/guestConfig.ts', 'utf8');
-    expect(src).toContain('GUEST_BROWSING_ENABLED = isPreviewHost()');
+    expect(src).toContain('GUEST_BROWSING_ENABLED = guestEnabledForHost(isPreviewHost(), import.meta.env.MODE)');
   });
 });
 

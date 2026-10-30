@@ -131,6 +131,6 @@ describe('useProfileData guest', () => {
   it('still reads the profile for a member', async () => {
     const { result } = renderHook(() => useProfileData(), { wrapper });
     await waitFor(() => expect(h.fromCalls).toContain('user_profiles'));
-    expect(result.current.loading).toBe(false);
+    await waitFor(() => expect(result.current.loading).toBe(false));
   });
 });
