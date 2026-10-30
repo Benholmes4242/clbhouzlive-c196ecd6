@@ -1,5 +1,9 @@
 # Roadmap
 
+## Review confirmation — Authorised height-class correction
+- [x] Move receipt height to opt-in photo class; preserve default Step 1 output and replace only the authorised height assertion.
+- [ ] Run targeted and full suite in shards; verify receipt196/Step1246 plus safe area at390px and report counts/files.
+
 ## ST4 — Settings Notifications and Friends
 - [x] Share unchanged notification categories; replace only Notifications/Friends using existing push/invite actions.
 - [x] Add 12 ST4 cases (all pass) and complete ST3_ST4_SETTINGS_REPORT.md; existing tests untouched.

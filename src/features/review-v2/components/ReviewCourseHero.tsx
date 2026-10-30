@@ -1,16 +1,18 @@
 /** Photo/wash/fade/masthead have one owner. Only the composer's photo form
- * supplies the reference slot; receipt never imports the reference-line read. */
+ * supplies the reference slot; receipt never imports the reference-line read.
+ * Receipt height is CSS-owned via an opt-in photo class; default Step 1 keeps
+ * its existing inline 100% height inside the canonical photo header. */
 import type { ReactNode } from 'react';
 import { CourseMasthead } from '@/components/courses/CourseMasthead';
 import { HERO_CANON_WASH } from '@/features/tourhub/_shared/heroGradient';
 import { courseMastheadKicker } from '@/features/courses/_shared/courseRankLabels';
 import { useCourseTop100Standing } from '@/hooks/useCourseTop100Standing';
 import { RV2 } from '../tokens';
-interface Props { courseId?: string; courseRegion?: string | null; subCountry?: string | null; country?: string | null; name?: string | null; thumbnail?: string | null; height?: string; children?: ReactNode; reference?: ReactNode }
-export function ReviewCourseHero({ courseId, courseRegion, subCountry, country, name, thumbnail, height = '100%', children, reference }: Props) {
+interface Props { courseId?: string; courseRegion?: string | null; subCountry?: string | null; country?: string | null; name?: string | null; thumbnail?: string | null; height?: string; className?: string; children?: ReactNode; reference?: ReactNode }
+export function ReviewCourseHero({ courseId, courseRegion, subCountry, country, name, thumbnail, height, className, children, reference }: Props) {
   const { data: standing } = useCourseTop100Standing(courseId);
   const kicker = courseMastheadKicker({ sub_country: subCountry, region: courseRegion, country }, standing);
-  return <div data-photo-header className="rv2-photo" style={{ position: 'relative', height }}>
+  return <div data-photo-header className={`rv2-photo${className ? ` ${className}` : ''}`} style={{ position: 'relative', height: height ?? (className ? undefined : '100%') }}>
     {thumbnail ? <img src={thumbnail} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 40%' }} />
       : <div style={{ position: 'absolute', inset: 0, background: 'var(--post-review-photo-fallback)' }} />}
     <div aria-hidden style={{ position: 'absolute', inset: 0, background: HERO_CANON_WASH, pointerEvents: 'none' }} />
