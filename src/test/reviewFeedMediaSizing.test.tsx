@@ -16,7 +16,7 @@ vi.mock('@/lib/impressions/useImpressionObserver', () => ({ useImpressionObserve
 vi.mock('@/components/feed/FeedActorPicker', () => ({ FeedActorPicker: () => null }));
 vi.mock('@/components/likes/LikedByRow', () => ({ LikedByRow: () => null }));
 vi.mock('@/components/feed/MediaCarousel', () => ({ MediaCarousel: ({ maxHeight }: { maxHeight?: string }) => <div data-carousel style={{ maxHeight }} /> }));
-vi.mock('@/components/feed/InlineVideo', () => ({ InlineVideo: ({ objectFit }: { objectFit: string }) => <video data-inline-video style={{ objectFit }} /> }));
+vi.mock('@/components/feed/InlineVideo', () => ({ InlineVideo: ({ objectFit }: { objectFit: React.CSSProperties['objectFit'] }) => <video data-inline-video style={{ objectFit }} /> }));
 vi.mock('@/components/feed/CourseStatsSheet', () => ({ CourseStatsSheet: () => null }));
 vi.mock('@/components/feed/PostCourseBand', () => ({ PostCourseBand: () => null }));
 vi.mock('@/components/feed/FeedFollowPill', () => ({ FeedFollowPill: () => null }));
