@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export type Course = {
@@ -40,6 +40,10 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [topTen, setTopTenState] = useState<(Course | undefined)[]>(EMPTY10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Persist only after the member actually changes the list. Loading the list
+  // must never write it back — that upsert fired on every app open (and was
+  // the write the guest guard rejected).
+  const dirtyRef = useRef(false);
 
   // --- Load from database on mount ---
   useEffect(() => {
@@ -75,16 +79,18 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     loadTopTen();
   }, []);
 
-  // --- Persist (debounced) to database ---
+  // --- Persist (debounced) to database, only after a real change ---
   useEffect(() => {
-    if (loading) return;
-    
+    if (loading || !dirtyRef.current) return;
+
     const saveToDatabase = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
+        // Guests never write.
+        if (user.is_anonymous) return;
 
-        await supabase
+        const { error: saveError } = await supabase
           .from('user_top_ten_lists')
           .upsert({
             user_id: user.id,
@@ -92,6 +98,7 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           }, {
             onConflict: 'user_id'
           });
+        if (!saveError) dirtyRef.current = false;
       } catch (e) {
         console.error("Failed to save Top 10:", e);
       }
