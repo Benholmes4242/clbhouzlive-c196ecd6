@@ -24,6 +24,7 @@ vi.mock('@/hooks/useInviteSheet', () => ({ useInviteSheet: () => ({ openInviteSh
 vi.mock('@/hooks/useLogout', () => ({ useLogout: () => ({ logout: vi.fn() }) }));
 vi.mock('@/hooks/useDeleteAccount', () => ({ useDeleteAccount: () => ({ showDeleteConfirm: false, setShowDeleteConfirm: vi.fn(), showBusinessWarning: false, setShowBusinessWarning: vi.fn(), ownedBusinessNames: [], deleteConfirmText: '', setDeleteConfirmText: vi.fn(), isDeleting: false, initiateDelete: vi.fn(), confirmDelete: vi.fn() }) }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
+vi.mock('@/components/settings/useSettingsBlockedCount', () => ({ useSettingsBlockedCount: () => null }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: () => Promise.resolve({ error: null }), from: (table: string) => {
   h.from(table);
   const chain = { select: (...args: unknown[]) => { h.select(...args); return chain; }, eq: (...args: unknown[]) => { h.eq(...args); return chain; }, order: (...args: unknown[]) => { h.order(...args); return chain; }, limit: (...args: unknown[]) => { h.limit(...args); return chain; }, update: (payload: unknown) => { h.update(payload); return chain; }, then: (resolve: (value: unknown) => unknown) => h.hold && table === 'user_profiles' ? new Promise<{ error: null }>(r => { h.release = r; }).then(resolve) : Promise.resolve({ data: h.data, error: table === 'whs_scores' ? h.readError : null }).then(resolve) };
