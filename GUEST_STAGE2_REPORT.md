@@ -251,3 +251,34 @@ Guest Explore is now 2,257px tall (it was 1,891px with the feats missing). The 1
 - Island "Log in" → /auth (`3_island_login`); island "Join free" opens the card (`4a_joinfree`), then "Continue with email" → join email form (`4_island_email`).
 - Each time Back returns to /courses still browsing as a guest (session `is_anonymous: true`; `3b_back`). No page errors, no replaceState error. Codes were not submitted, so a live conversion was not run.
 - These four taps are now part of every guest proof.
+
+---
+
+## Stage 2.5 stop (folded in from GUEST_STAGE25_STOP_REPORT.md) and Stage 2.6 resolution
+
+### What 2.5 found
+The 2.5 build claimed navigation *after* `signInWithIdToken` resolved. Supabase emits SIGNED_IN before that promise resolves, so Auth's redirect could fire first (5c failed: `resolvePostAuthRoute("m1", null)` ran while the Apple name write was pending). Apple/Google had no catch, so a failed guest conversion refresh was silent (5d failed: no `toast.error`). The one-way `hasNavigated` flag also left Auth stood down after a failed attempt until remount.
+
+### Rulings applied in 2.6
+1. Claim before the call, with a release. `Auth.tsx` passes `claimNavigation()`, which sets a "form owns navigation" ref + state and returns `release()`. While claimed, Auth's redirect effect, both visibilitychange checks (existing session, OAuth handshake) and the dark signed-in hold stand down; AuthForm stays mounted. `release()` clears the claim and, if a member (non-anonymous) session exists, runs Auth's normal redirect exactly once; otherwise Auth is fully live again.
+2. Catch and toast. Apple and Google handlers are try / catch / finally: catch logs and shows the existing "Could not complete Apple/Google Sign-In. Please try again or use email." toast; email keeps its inline otpError. finally releases unless `navigate` was called, then clears the submitting state. Every early error return goes through that finally.
+
+Claims happen immediately before `verifyOtp` (both email paths) and before `signInOrLinkIdToken` (covers linkIdentity and both signInWithIdToken paths, once per attempt). Removed: the two 2.5 post-call claims and the three `onWillNavigate` calls; the `onWillNavigate` prop no longer exists.
+
+### Member Apple name bug
+The code confirms the race: before 2.6 nothing stopped Auth's redirect effect from firing on SIGNED_IN (emitted inside `signInWithIdToken`), and the signed-in hold then unmounted AuthForm while the Apple name `update` was still in flight (or before it started). Apple sends the name only on first sign-in, so a lost race meant the name was never saved — a likely cause of the Apple name-capture fault. Test h now pins name write before the only navigation. The diagnostic logging in the Apple handler is left in place for Ben's phone test.
+
+### Tests (`src/test/guestStage25.test.tsx`, kept; 5a–5d unchanged and passing)
+Added (+5):
+- e. failed attempt with no member session: Auth live again, OAuth handshake navigates once
+- f. failed attempt where a member session exists: release redirects exactly once
+- g. a cancelled Apple sheet releases and navigates nowhere
+- g. a cancelled Google sheet releases and navigates nowhere
+- h. member Apple first sign-in: the name write completes before the only navigation
+Every case asserts the full navigation list (never more than one). Only test-file change besides additions: the supabase mock's `setSession` now points at a hoisted `g.setSession` so test e can drive the handshake.
+
+### Suite
+`bunx vitest run --maxWorkers=2` in two shards: 2,318 + 2,414 = 4,732/4,732 across 482 files. Against 4,727/482: +5, all the named tests above (the 2 previous failures 5c/5d now pass).
+
+### Preview taps (390×844, guest)
+Card "Log in", card "Continue with email", island "Log in", island "Join free → Continue with email": each reached /auth with the guest session intact, Back returned to /courses, no page errors. Screenshots: /tmp/browser/s26/shots/. Live Apple/Google conversion needs the native app (not testable here).
