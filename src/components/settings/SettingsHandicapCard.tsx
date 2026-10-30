@@ -29,8 +29,8 @@ export function SettingsHandicapCard(p: Props) {
   const first = useMemberFirstRoundYear(p.connection ? p.userId : undefined);
   const index = resolveDisplayHandicap({ egHandicapIndex: p.egHandicapIndex, manualHandicapIndex: p.manualHandicapIndex, hasWhsConnection: !!p.connection }).value;
   const indexKnown = p.connectionReady && !p.profileError && index != null && Number.isFinite(index);
-  const total = rounds.state === 'ok' ? rounds.total : null;
-  const year = first.state === 'ok' && total !== 0 ? first.year : null;
+  const total = p.connectionReady && rounds.state === 'ok' ? rounds.total : null;
+  const year = p.connectionReady && first.state === 'ok' && total !== 0 ? first.year : null;
   const connected = !!p.connection;
   const switchTitle = connected ? 'Index in the top bar' : 'Connect prompts';
   const figure = (label: string, value: string | number | null) => (
@@ -38,7 +38,7 @@ export function SettingsHandicapCard(p: Props) {
       <b className="tabular-nums" data-unknown={value == null}>{value ?? '–'}</b><span>{label}</span>
     </div>
   );
-  return <section className="st2-handicap" data-testid="settings-handicap">
+  return <section className="st2-handicap" data-testid="st2-handicap-card">
     {connected ? <>
       <Button variant="ghost" className="st2-top" onClick={p.onManage}>
         <span className="st2-identity"><span className="st2-name">{bodyNameForProvider(p.connection?.provider)}</span>
