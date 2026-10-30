@@ -28,13 +28,14 @@ export function signedOutOutcome(args: {
   return 'auth';
 }
 
-// ONE anonymous sign-in per app session, however many holds ask for it
+// ONE in-flight anonymous sign-in, however many holds ask for it at once
 // (RootGate at '/' and the app-level GuestSessionHold on deep links).
 let inflight: ReturnType<typeof supabase.auth.signInAnonymously> | null = null;
 function signInGuestOnce() {
   if (!inflight) {
     inflight = supabase.auth.signInAnonymously();
-    inflight.then(({ error }) => { if (error) inflight = null; }, () => { inflight = null; });
+    // Shared only while in flight; once settled the session (or its absence) decides.
+    inflight.then(() => { inflight = null; }, () => { inflight = null; });
   }
   return inflight;
 }
