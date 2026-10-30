@@ -265,10 +265,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
     const start = Date.now();
 
     try {
+      // A guest who joined by email confirms the change on the anonymous user.
+      const emailLinked = GUEST_BROWSING_ENABLED && emailLinkModeRef.current;
       const { data, error } = await supabase.auth.verifyOtp({
         email: email.trim().toLowerCase(),
         token,
-        type: 'email',
+        type: emailLinked ? 'email_change' : 'email',
       });
 
       if (error) {
@@ -293,8 +295,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
       if (data?.session?.user) {
         trackLoginSuccess('email', Date.now() - start);
-        // Email OTP cannot link — a converting guest's session is replaced.
-        trackGuestConversionIfPending('email', false);
+        // Linked (updateUser) keeps the guest id; otherwise the session is replaced.
+        trackGuestConversionIfPending('email', emailLinked);
         // Confirmation time covers a signup even when the email code was requested much earlier.
         if (isNewSignup(data.user)) {
           trackSignupSuccess('email', Date.now() - start);
