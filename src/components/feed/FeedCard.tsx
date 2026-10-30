@@ -28,6 +28,7 @@ import { reactionGlyph, ReactionGlyph, AMBER } from '@/lib/reactionKind';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds, useTeamBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
+import { gateGuestActionNow } from '@/features/guest/useGuestActionGate';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
 import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
