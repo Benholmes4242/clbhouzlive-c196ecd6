@@ -82,6 +82,37 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
   const sendStartRef = useRef<number>(0);
   const oauthPendingRef = useRef(false);
 
+  // ---- GUEST BROWSING §6: converting a guest -------------------------------
+  // When a guest picks a join method, AuthForm runs with ?guest=1&start=<m>.
+  // Apple/Google LINK the identity onto the anonymous user (same account,
+  // same id); if the identity already belongs to another account the call
+  // falls back to a normal sign-in so the flow still completes. Email OTP
+  // cannot link — it signs the email user in, replacing the guest session.
+  const guestAutoStarted = useRef(false);
+
+  const signInOrLinkIdToken = useCallback(
+    async (provider: 'apple' | 'google', token: string) => {
+      if (peekGuestConversion().guestUserId && getGuestUser()) {
+        const linked = await supabase.auth.linkIdentity({ provider, token });
+        if (!linked.error) return { data: linked.data, error: null, linked: true };
+        console.warn(`[guest-convert] linkIdentity(${provider}) failed, falling back to sign-in:`, linked.error.message);
+      }
+      const res = await supabase.auth.signInWithIdToken({ provider, token });
+      return { ...res, linked: false };
+    },
+    [],
+  );
+
+  const trackGuestConversionIfPending = useCallback(
+    (method: 'apple' | 'google' | 'email' | 'login', linked: boolean) => {
+      const conv = peekGuestConversion();
+      if (!conv.guestUserId) return;
+      trackGuestConverted({ method, linked, surface: conv.surface, guestUserId: conv.guestUserId });
+      clearGuestConversion();
+    },
+    [],
+  );
+
   // Safety net: if the app returns to foreground while we are stuck in
   // a submitting state started by a native OAuth sheet that never fired
   // its callback, clear the spinner so the user can retry. Guard against
