@@ -1,5 +1,10 @@
 # Roadmap
 
+## ST1 — Settings Account, Help and end card
+- [ ] Reorder only the specified groups and reuse profile rows for Account/Help/end actions; preserve existing confirmations and deferred groups.
+- [ ] Add ST1 coverage, run full suite with --maxWorkers=2 and report baseline/delta and every changed file.
+- [ ] Check preview/build signals; authenticated flow requires an available managed session.
+
 ## Rounds gate — Keep bottom navigation live
 - [x] Diagnose actual nav layer 100 versus body-level shade/card 997/998 and absent lock expansion lease.
 - [x] Use canonical Z.nav without remounting navigation; hold expansion while locked; preserve card/fade/tile geometry and behavior.
