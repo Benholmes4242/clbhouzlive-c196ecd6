@@ -1,47 +1,33 @@
-/**
- * ReviewReceipt - the confirmation screen shown after a review posts.
- * Hero and breakdown render from client state immediately; everything below
- * waits on get_review_receipt and renders nothing until it arrives.
- * Row a compares the client's overall with the displayed post-review community
- * average, never avg_before; first-rating receipts omit the comparison line.
- */
-
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Loader2 } from 'lucide-react';
-import { subscribeToReviewPublish, type ReviewPublishState } from '../lib/reviewUploadController';
+/** Confirmation owns presentation and upload lifecycle only. Client scores/media
+ * snapshot render immediately; receipt figures wait for the RPC. Suggestions
+ * reuse the review search's idle lists, never round-derived receipt fields. */
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
+import { Check, LineChart, Search, Trophy, Users, X } from 'lucide-react';
 import { Trans, useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { RV2 } from '../tokens';
-import { FIGURE } from '@/lib/tokens/type';
-/* THE BREAKDOWN BARS ONLY (BRIEF phase 2 §8): the four category values and
-   their fills take the course page's two-tone rule so the receipt shows what
-   the course page will show. The hero overall and the community average keep
-   the three-band composer scale; the brief scopes the change to the breakdown. */
-import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
-import { useReviewReceipt } from '../hooks/useReviewReceipt';
+import { useTop100Config } from '@/hooks/top100/useTop100Config';
+import ReviewCourseSearchSheet, { CourseRow } from '@/features/composer-flow/ReviewCourseSearchSheet';
+import { useReviewCourseIdle } from '@/features/composer-flow/hooks/useReviewCourseSearch';
+import { ordinalWord } from '@/features/composer-flow/reviewCourseSearchRules';
 import { shortCourseName } from '@/features/courses/_shared/courseLabel';
-import type { CategoryKey, ReviewV2Course } from '../types';
+import { subscribeToReviewPublish, type ReviewPublishState } from '../lib/reviewUploadController';
+import { useReviewReceipt } from '../hooks/useReviewReceipt';
+import { CALIBRATION_MIN_PEERS } from '../hooks/useMyRatedScores';
 import { categoryAverage } from '../lib/categoryAverage';
-
+import { scoreShareKey } from '../lib/scoreStepRules';
+import { receiptSuggestions } from '../lib/receiptSuggestions';
+import { ReviewCourseHero } from './ReviewCourseHero';
+import type { CategoryKey, ReviewV2Course } from '../types';
+import './reviewReceipt.css';
 interface Props {
-  ratingId: string | null;
-  pending?: boolean;
-  course: ReviewV2Course;
-  overall: number | null;
-  scores: Record<CategoryKey, number | null>;
-  shareToFeed: boolean;
-  onClubhouse: () => void;
-  onBack: () => void;
-  onNextCourse: (courseId: string) => void;
-  /** Controller key for the staged upload; null = no live progress to show. */
-  uploadKey?: string | null;
-  onPublished?: (ratingId: string) => void;
+  ratingId: string | null; pending?: boolean; course: ReviewV2Course; overall: number | null;
+  scores: Record<CategoryKey, number | null>; shareToFeed: boolean; mediaCount?: number; hasText?: boolean; userId?: string | null;
+  onClubhouse: () => void; onBack: () => void; onNextCourse: (courseId: string) => void;
+  uploadKey?: string | null; onPublished?: (ratingId: string) => void;
 }
-
 const CAT_ORDER: CategoryKey[] = ['design', 'condition', 'clubhouse', 'facilities'];
-
-/* One of several ordinal implementations in the app; a consolidation
-   sweep is pending. Do not add a ninth — import an existing export. */
 export function ordinal(n: number): string {
   const rem100 = n % 100;
   if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
@@ -52,610 +38,72 @@ export function ordinal(n: number): string {
   return `${n}th`;
 }
 
-function formatPlayedDate(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  return `${d.getDate()} ${d.toLocaleDateString('en-GB', { month: 'long' })}`;
-}
-
-function regionLine(course: ReviewV2Course): string {
-  return [course.region, course.sub_country || course.country].filter(Boolean).join(', ');
-}
-
-export function ReviewReceipt({
-  ratingId,
-  pending,
-  course,
-  overall,
-  scores,
-  shareToFeed,
-  onClubhouse,
-  onBack,
-  onNextCourse,
-  uploadKey,
-  onPublished,
-}: Props) {
+export function ReviewReceipt({ ratingId, pending, course, overall, scores, shareToFeed, mediaCount = 0, hasText = false, userId = null, onClubhouse, onBack, onNextCourse, uploadKey, onPublished }: Props) {
   const { t } = useTranslation('courses');
-  const { data: receipt } = useReviewReceipt(ratingId);
-  const heroColor = courseSubScoreTone(overall);
-  const short = shortCourseName(course.name);
-
   const [pub, setPub] = useState<ReviewPublishState | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
   useEffect(() => {
+    setPub(null);
     if (!pending || !uploadKey) return;
     return subscribeToReviewPublish(uploadKey, setPub);
   }, [pending, uploadKey]);
+  useEffect(() => { if (pub?.phase === 'published' && pub.ratingId) onPublished?.(pub.ratingId); }, [pub, onPublished]);
+  const live = !pending || pub?.phase === 'published';
+  const { data: receipt } = useReviewReceipt(pub?.ratingId ?? ratingId);
+  const { subscoreMinRatings } = useTop100Config();
+  const idle = useReviewCourseIdle(live, userId, subscoreMinRatings);
+  const suggestions = receiptSuggestions(idle.isError ? null : idle.data, course.id);
+  const viewed = useRef<string | null>(null);
   useEffect(() => {
-    if (pub?.phase === 'published' && pub.ratingId) onPublished?.(pub.ratingId);
-  }, [pub, onPublished]);
+    if (!live || !receipt || (!idle.isSuccess && !idle.isError) || viewed.current === course.id) return;
+    viewed.current = course.id;
+    analyticsEvents.track('review_receipt_viewed', { course_id: course.id, unlocked_subscores: !!receipt.subscore_threshold_met, is_top100: receipt.top100_rank != null, next_count: suggestions.length });
+  }, [live, receipt, idle.isSuccess, idle.isError, course.id, suggestions.length]);
+  const footerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const footer = footerRef.current; const content = contentRef.current;
+    if (!footer || !content) return;
+    const measure = () => content.style.setProperty('--receipt-footer-height', `${footer.getBoundingClientRect().height}px`);
+    measure(); const observer = new ResizeObserver(measure); observer.observe(footer); return () => observer.disconnect();
+  }, [live, shareToFeed]);
+  const short = shortCourseName(course.name);
+  const avg = categoryAverage(scores);
+  const score = overall == null ? '—' : overall.toFixed(1);
+  const peers = receipt?.your_total_rated == null ? 0 : receipt.your_total_rated - 1;
+  const calibration = receipt?.your_rank_of_rated != null && peers >= CALIBRATION_MIN_PEERS
+    ? t(`review.wizard.step3.${receipt.your_rank_of_rated === 1 ? 'calibrationFirst' : 'calibration'}`, { ordinal: ordinal(receipt.your_rank_of_rated), count: receipt.your_total_rated }) : null;
+  const first = receipt && ((receipt.rating_count ?? 0) <= 1 || receipt.community_avg == null);
+  const delta = overall != null && receipt?.community_avg != null ? Math.round(Math.abs(overall - receipt.community_avg) * 10) / 10 : null;
+  const action = (which: 'back' | 'close' | 'clubhouse') => { analyticsEvents.track('review_receipt_action', { course_id: course.id, action: which }); if (which === 'clubhouse') onClubhouse(); else onBack(); };
+  const key = (name: string) => `review.wizard.receipt.${name}`;
+  const bold = { b: <b /> };
   const phase = pub?.phase ?? 'uploading';
-
-  const viewedRef = useRef(false);
-  useEffect(() => {
-    if (!receipt || viewedRef.current) return;
-    viewedRef.current = true;
-    // review_receipt_viewed
-    analyticsEvents.track('review_receipt_viewed', {
-      course_id: course.id,
-      unlocked_subscores: !!receipt.unlocked_subscores,
-      is_top100: receipt.top100_rank != null,
-      unrated_count: receipt.unrated_count ?? 0,
-    });
-  }, [receipt, course.id]);
-
-  const catLabels: Record<CategoryKey, string> = {
-    design: t('review.subscore.design'),
-    condition: t('review.subscore.condition'),
-    clubhouse: t('review.subscore.clubhouse'),
-    facilities: t('review.subscore.facilities'),
-  };
-  // The overall is NOT derived from the categories - these are five
-  // independent columns. This average only makes the divergence legible.
-  // With any null category we omit the line rather than average three.
-  const catAvg = categoryAverage(scores);
-
-
-  // Row list is variable: build the rendered set first so the divider logic
-  // never assumes a fixed count.
-  const rows = useMemo(() => {
-    if (!receipt) return [] as Array<'a' | 'b' | 'c' | 'd'>;
-    const list: Array<'a' | 'b' | 'c' | 'd'> = ['a'];
-    if (receipt.unlocked_subscores) list.push('b');
-    if (receipt.top100_rank != null) list.push('c');
-    list.push('d');
-    return list;
-  }, [receipt]);
-
-  const delta =
-    receipt && receipt.community_avg != null && overall != null
-      ? Math.round(Math.abs(overall - Number(receipt.community_avg)) * 10) / 10
-      : null;
-  const firstRating = !!receipt && ((receipt.rating_count ?? 0) <= 1 || receipt.community_avg == null);
-  const deltaAbove =
-    receipt && receipt.community_avg != null && overall != null
-      ? overall > Number(receipt.community_avg)
-      : false;
-
-  const rowStyle = (i: number): React.CSSProperties => ({
-    padding: '13px 0',
-    borderBottom: i === rows.length - 1 ? 'none' : `1px solid ${RV2.hairline}`,
-  });
-
-  const figure = (color: string): React.CSSProperties => ({ ...FIGURE, color });
-
-  return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: RV2.canvas,
-        color: RV2.ink,
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <div style={{ flex: 1, overflowY: 'auto' }}>
-        {/* Hero */}
-        <div
-          style={{
-            /* Notch Safety: clear the island band (safe-area + 62px island
-             * row) so the hero never slides under the chrome. */
-            padding:
-              'calc(max(env(safe-area-inset-top, 0px), var(--sat, 0px)) + 62px + 16px) 20px 22px',
-            textAlign: 'center',
-          }}
-        >
-          <div
-            style={{
-              /* READ floor — a kicker is language. 10 -> 11. */
-              fontSize: 11,
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.14em',
-              color: RV2.eyebrow,
-              marginBottom: 12,
-            }}
-          >
-            {!pending
-              ? t('review.wizard.receipt.eyebrow')
-              : !uploadKey
-                ? t('review.wizard.receipt.eyebrowPending')
-                : phase === 'failed'
-                  ? t('review.wizard.receipt.eyebrowFailed')
-                  : phase === 'publishing' || phase === 'published'
-                    ? t('review.wizard.receipt.eyebrowPublishing')
-                    : t('review.wizard.receipt.eyebrowUploading')}
-          </div>
-          <div
-            style={{
-              fontSize: 68,
-              ...FIGURE,
-              lineHeight: 1,
-              letterSpacing: '-0.035em',
-              color: heroColor,
-            }}
-          >
-            {overall == null ? '--' : overall.toFixed(1)}
-          </div>
-          <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.015em', marginTop: 12 }}>
-            {course.name}
-          </div>
-          <div style={{ fontSize: 12, color: RV2.secondary, marginTop: 2 }}>
-            {regionLine(course)}
-          </div>
-          {pending && !uploadKey && (
-            <div style={{ fontSize: 13, lineHeight: 1.45, color: RV2.secondary, marginTop: 14 }}>
-              {t('review.wizard.receipt.pendingBody')}
-            </div>
-          )}
-          {pending && uploadKey && phase === 'uploading' && (
-            <div style={{ marginTop: 14 }}>
-              <div
-                role="progressbar"
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={pub?.percent ?? 0}
-                style={{ height: 4, borderRadius: 999, background: RV2.track, overflow: 'hidden' }}
-              >
-                <div
-                  style={{
-                    height: '100%',
-                    width: `${pub?.percent ?? 0}%`,
-                    background: RV2.success,
-                    transition: 'width 120ms ease',
-                  }}
-                />
-              </div>
-              <div style={{ fontSize: 12, color: RV2.secondary, marginTop: 8, ...FIGURE }}>
-                {t('review.wizard.receipt.uploadingCount', {
-                  done: pub?.uploaded ?? 0,
-                  total: pub?.total ?? 0,
-                })}
-              </div>
-              <div style={{ fontSize: 13, lineHeight: 1.45, color: RV2.secondary, marginTop: 10 }}>
-                {t('review.wizard.receipt.uploadingBody')}
-              </div>
-            </div>
-          )}
-          {pending && uploadKey && (phase === 'publishing' || phase === 'published') && (
-            <div style={{ marginTop: 14 }}>
-              <Loader2
-                aria-hidden
-                className="animate-spin"
-                style={{ width: 16, height: 16, color: RV2.secondary }}
-              />
-              <div style={{ fontSize: 13, lineHeight: 1.45, color: RV2.secondary, marginTop: 10 }}>
-                {t('review.wizard.receipt.uploadingBody')}
-              </div>
-            </div>
-          )}
-          {pending && uploadKey && phase === 'failed' && (
-            <div style={{ fontSize: 13, lineHeight: 1.45, color: RV2.secondary, marginTop: 14 }}>
-              {t('review.wizard.receipt.failedBody')}
-            </div>
-          )}
-        </div>
-
-        {/* Breakdown card */}
-        <div style={{ padding: '0 20px 20px' }}>
-          <div
-            style={{
-              background: RV2.cardBg,
-              borderRadius: 18,
-              border: `1px solid ${RV2.hairline}`,
-              padding: '15px 16px',
-              display: 'grid',
-              gap: 11,
-            }}
-          >
-            {CAT_ORDER.map((key) => {
-              const v = scores[key];
-              const c = courseSubScoreTone(v);
-              return (
-                <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                  <span style={{ fontSize: 12, color: RV2.secondary, width: 66, flexShrink: 0 }}>
-                    {catLabels[key]}
-                  </span>
-                  <span
-                    style={{
-                      flex: 1,
-                      minWidth: 0,
-                      height: 3,
-                      background: RV2.track,
-                      position: 'relative',
-                    }}
-                  >
-                    <span
-                      style={{
-                        position: 'absolute',
-                        left: 0,
-                        top: 0,
-                        bottom: 0,
-                        width: `${v == null ? 0 : (v / 10) * 100}%`,
-                        background: c,
-                      }}
-                    />
-                  </span>
-                  <span
-                    style={{
-                      fontSize: 12.5,
-                      ...FIGURE,
-                      letterSpacing: '-0.03em',
-                      color: c,
-                      width: 26,
-                      textAlign: 'right',
-                    }}
-                  >
-                    {v == null ? '--' : v.toFixed(1)}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-          {catAvg != null && (
-            <div
-              style={{
-                fontSize: 12,
-                lineHeight: '17px',
-                color: RV2.secondary,
-                marginTop: 10,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              <Trans
-                i18nKey="review.wizard.receipt.categoryAverage"
-                ns="courses"
-                values={{ avg: catAvg.toFixed(1) }}
-                components={{
-                  avg: (
-                    <span
-                      style={{
-                        fontWeight: 700,
-                        color: courseSubScoreTone(catAvg),
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    />
-                  ),
-                }}
-              />
-            </div>
-          )}
-
-        </div>
-
-
-        {!pending && receipt && (
-          <>
-            {/* What your rating did */}
-            <div style={{ padding: '0 20px 22px' }}>
-              <div
-                style={{
-                  /* READ floor. 10 -> 11. */
-                  fontSize: 11,
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.14em',
-                  color: RV2.secondary,
-                  marginBottom: 10,
-                }}
-              >
-                {t('review.wizard.receipt.didEyebrow')}
-              </div>
-              <div
-                style={{
-                  background: RV2.cardBg,
-                  borderRadius: 18,
-                  border: `1px solid ${RV2.hairline}`,
-                  padding: '2px 16px',
-                }}
-              >
-                {rows.map((row, i) => {
-                  if (row === 'a') {
-                    return (
-                      <div key="a" style={rowStyle(i)}>
-                        <div style={{ fontSize: 14, color: RV2.ink, lineHeight: 1.45 }}>
-                          {firstRating ? t('review.wizard.receipt.rowAFirst', {
-                            course: shortCourseName(receipt.course_name || course.name),
-                          }) : <Trans
-                            i18nKey="review.wizard.receipt.rowA"
-                            ns="courses"
-                            values={{
-                              course: shortCourseName(receipt.course_name || course.name),
-                              avg: receipt.community_avg == null ? '--' : Number(receipt.community_avg).toFixed(1),
-                              count: receipt.rating_count ?? 0,
-                            }}
-                            components={{
-                              avg: <span style={figure(courseSubScoreTone(Number(receipt.community_avg)))} />,
-                              cnt: <span style={figure(RV2.ink)} />,
-                            }}
-                          />}
-                        </div>
-                        {!firstRating && delta != null && overall != null && (
-                          <div style={{ fontSize: 12, color: RV2.secondary, marginTop: 4 }}>
-                            {t(delta < 0.1
-                              ? 'review.wizard.receipt.rowADeltaEqual'
-                              : deltaAbove
-                                ? 'review.wizard.receipt.rowADeltaAbove'
-                                : 'review.wizard.receipt.rowADeltaBelow', {
-                              score: overall.toFixed(1), delta: delta.toFixed(1),
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }
-                  if (row === 'b') {
-                    return (
-                      <div key="b" style={rowStyle(i)}>
-                        <div style={{ fontSize: 14, color: RV2.ink, lineHeight: 1.45 }}>
-                          {t('review.wizard.receipt.rowB')}
-                        </div>
-                        <div style={{ fontSize: 12, color: RV2.secondary, marginTop: 4 }}>
-                          {t('review.wizard.receipt.rowBSub')}
-                        </div>
-                      </div>
-                    );
-                  }
-                  if (row === 'c') {
-                    return (
-                      <div
-                        key="c"
-                        style={{ ...rowStyle(i), display: 'flex', alignItems: 'center', gap: 10 }}
-                      >
-                        <div style={{ flex: 1, minWidth: 0, fontSize: 14, color: RV2.ink }}>
-                          <Trans
-                            i18nKey="review.wizard.receipt.rowC"
-                            ns="courses"
-                            values={{
-                              rank: receipt.top100_rank ?? 0,
-                              list: receipt.top100_list ?? '',
-                            }}
-                            components={{ b: <span style={{ fontWeight: 700 }} /> }}
-                          />
-                        </div>
-                        <div
-                          style={{
-                            fontSize: 12,
-                            fontWeight: 700,
-                            color: RV2.secondary,
-                            flexShrink: 0,
-                          }}
-                        >
-                          {t('review.wizard.receipt.rowCRight', {
-                            count: receipt.your_rated_in_list ?? 0,
-                          })}
-                        </div>
-                      </div>
-                    );
-                  }
-                  return (
-                    <div
-                      key="d"
-                      style={{ ...rowStyle(i), display: 'flex', alignItems: 'center', gap: 10 }}
-                    >
-                      <div style={{ flex: 1, minWidth: 0, fontSize: 14, color: RV2.ink }}>
-                        <Trans
-                          i18nKey="review.wizard.receipt.rowD"
-                          ns="courses"
-                          values={{ ordinal: ordinal(receipt.your_rank_of_rated ?? 1) }}
-                          components={{ b: <span style={{ fontWeight: 700 }} /> }}
-                        />
-                      </div>
-                      <div
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 700,
-                          color: RV2.secondary,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {t('review.wizard.receipt.rowDRight', {
-                          count: receipt.your_total_rated ?? 0,
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* The next course */}
-            {receipt.next_course_id && (
-              <div style={{ padding: '0 20px 22px' }}>
-                <div
-                  style={{
-                    /* READ floor — the unrated-courses kicker. 10 -> 11. */
-                    fontSize: 11,
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.14em',
-                    color: RV2.secondary,
-                    marginBottom: 10,
-                  }}
-                >
-                  {t('review.wizard.receipt.nextEyebrow', {
-                    count: receipt.unrated_count ?? 0,
-                  })}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    // review_next_course_tapped
-                    analyticsEvents.track('review_next_course_tapped', {
-                      from_course_id: course.id,
-                      to_course_id: receipt.next_course_id,
-                    });
-                    onNextCourse(receipt.next_course_id!);
-                  }}
-                  style={{
-                    width: '100%',
-                    background: RV2.cardBg,
-                    borderRadius: 18,
-                    border: `1px solid ${RV2.hairline}`,
-                    padding: '14px 16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                >
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 700,
-                        color: RV2.ink,
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {receipt.next_course_name}
-                    </div>
-                    {receipt.next_played_at && (
-                      <div style={{ fontSize: 12, color: RV2.secondary }}>
-                        {t('review.wizard.receipt.nextPlayed', {
-                          date: formatPlayedDate(receipt.next_played_at),
-                        })}
-                      </div>
-                    )}
-                  </div>
-                  <span
-                    style={{
-                      padding: '7px 13px',
-                      borderRadius: 999,
-                      background: RV2.amberSoft,
-                      color: RV2.amber,
-                      /* CAPS ACTION (§5) — two points down, floor 11. */
-                      fontSize: 11,
-                      fontWeight: 700,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.10em',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {t('review.wizard.receipt.nextRate')}
-                  </span>
-                </button>
-              </div>
-            )}
-          </>
-        )}
+  const progress = pending && uploadKey && (phase === 'uploading' || phase === 'publishing');
+  const percent = phase === 'publishing' ? 100 : pub?.percent ?? 0;
+  const pendingTitle = !uploadKey ? 'pendingTitle' : phase === 'failed' ? 'failedTitle' : phase === 'publishing' ? 'publishingTitle' : 'uploadingTitle';
+  const impact = (id: string, icon: ReactNode, title: ReactNode, sub: ReactNode) => <div className="receipt-impact" data-testid={`receipt-${id}`}><span className="receipt-impact-icon" aria-hidden>{icon}</span><div><div className="receipt-impact-title">{title}</div>{sub && <div className="receipt-impact-sub">{sub}</div>}</div></div>;
+  return <div className="review-receipt">
+    <div className="receipt-content" ref={contentRef}>
+      <ReviewCourseHero courseId={course.id} name={course.name} courseRegion={course.region} subCountry={course.sub_country} country={course.country} thumbnail={course.thumbnail_image} height="calc(env(safe-area-inset-top, 0px) + 196px)">
+        <Button variant="ghost" className="receipt-close" aria-label={t(key('close'))} onClick={() => action('close')}><X size={17} strokeWidth={2.2} /></Button>
+      </ReviewCourseHero>
+      {live ? <div className="receipt-status" data-testid="receipt-status"><span className="receipt-check" aria-hidden><Check size={13.2} strokeWidth={3} /></span><div><div className="receipt-status-title">{t(key(shareToFeed ? 'statusPosted' : 'statusSaved'))}</div><div className="receipt-status-sub">{shareToFeed ? t(`review.wizard.step3.${scoreShareKey(mediaCount, hasText)}`, { count: mediaCount }) : t(key('statusSavedSub'))}</div></div></div>
+        : <div className="receipt-pending" data-testid="receipt-status"><div className="receipt-pending-head"><span>{t(key(pendingTitle))}</span>{progress && phase === 'uploading' && <span>{t(key('uploadingCount'), { done: pub?.uploaded ?? 0, total: pub?.total ?? mediaCount })}</span>}</div>
+          {progress && <div className="receipt-progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}><div style={{ width: `${percent}%` }} /></div>}
+          <p>{t(key(phase === 'failed' ? 'failedBody' : progress ? 'uploadingBody' : 'pendingBody'))}</p></div>}
+      <div className="receipt-score-card" data-testid="receipt-score-card"><div className="receipt-score-head"><h2>{t(key('yourScore'))}</h2>{avg != null && <span>{t(key('average'))} <b>{avg.toFixed(1)}</b></span>}</div>
+        <div className="receipt-overall"><b>{score}</b><span>/ 10</span></div><div className="receipt-calibration" data-testid="receipt-calibration">{calibration}</div>
+        <div className="receipt-categories">{CAT_ORDER.map(category => <div className="receipt-category" key={category} data-category={category}><span>{t(`review.subscore.${category}`)}</span><div className="receipt-category-track"><i style={{ width: `${(scores[category] ?? 0) * 10}%` }} /></div><b data-empty={scores[category] == null}>{scores[category] == null ? '—' : scores[category]?.toFixed(1)}</b></div>)}</div>
       </div>
-
-      {/* Actions */}
-      <div
-        style={{
-          borderTop: `1px solid ${RV2.hairline}`,
-          padding: '14px 20px 20px',
-        }}
-      >
-        {shareToFeed ? (
-          <>
-            <button
-              type="button"
-              onClick={() => {
-                // review_receipt_action
-                analyticsEvents.track('review_receipt_action', {
-                  course_id: course.id,
-                  action: 'clubhouse',
-                });
-                onClubhouse();
-              }}
-              style={{
-                width: '100%',
-                padding: 15,
-                borderRadius: 14,
-                border: 'none',
-                background: RV2.ink,
-                color: RV2.canvas,
-                /* CAPS ACTION (§5) — two points down, height unchanged. */
-                fontSize: 12,
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.10em',
-                cursor: 'pointer',
-              }}
-            >
-              {t('review.wizard.receipt.actionClubhouse')}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                analyticsEvents.track('review_receipt_action', {
-                  course_id: course.id,
-                  action: 'back',
-                });
-                onBack();
-              }}
-              style={{
-                width: '100%',
-                padding: 13,
-                marginTop: 9,
-                borderRadius: 14,
-                border: 'none',
-                background: 'transparent',
-                color: RV2.secondary,
-                /* CAPS ACTION (§5) — two points down, floor 11. */
-                fontSize: 11,
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.10em',
-                cursor: 'pointer',
-              }}
-            >
-              {t('review.wizard.receipt.actionBack', { course: short })}
-            </button>
-          </>
-        ) : (
-          <button
-            type="button"
-            onClick={() => {
-              analyticsEvents.track('review_receipt_action', {
-                course_id: course.id,
-                action: 'back',
-              });
-              onBack();
-            }}
-            style={{
-              width: '100%',
-              padding: 15,
-              borderRadius: 14,
-              border: 'none',
-              background: RV2.ink,
-              color: RV2.canvas,
-              /* CAPS ACTION (§5) — two points down, height unchanged. */
-              fontSize: 12,
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.10em',
-              cursor: 'pointer',
-            }}
-          >
-            {t('review.wizard.receipt.actionBack', { course: short })}
-          </button>
-        )}
-      </div>
+      {live && receipt && <section className="receipt-did"><h2>{t(key('didEyebrow'))}</h2><div className="receipt-impacts">
+        {impact('members', <Users size={15} strokeWidth={2.2} />, <Trans ns="courses" i18nKey={key(first ? 'membersFirst' : 'members')} values={{ course: short, avg: receipt.community_avg?.toFixed(1), count: receipt.rating_count }} components={bold} />, first ? overall != null && t(key('firstSub'), { score }) : delta != null && t(key(delta < 0.1 ? 'deltaEqual' : overall != null && overall > Number(receipt.community_avg) ? 'deltaAbove' : 'deltaBelow'), { score, delta: delta.toFixed(1) }))}
+        {receipt.subscore_threshold_met && impact('full-scores', <LineChart size={15} strokeWidth={2.2} />, <Trans ns="courses" i18nKey={key('fullScores')} values={{ ordinal: ordinalWord(subscoreMinRatings) }} components={bold} />, t(key('fullScoresSub')))}
+        {receipt.top100_rank != null && impact('top100', <Trophy size={15} strokeWidth={2.2} />, <Trans ns="courses" i18nKey={key('top100')} values={{ rank: receipt.top100_rank, list: receipt.top100_list }} components={bold} />, t(key('top100Sub'), { count: receipt.your_rated_in_list ?? 0 }))}
+      </div></section>}
+      {live && <section className="receipt-next"><h2>{t(key('nextEyebrow'))}</h2><div className="rcs-rows">{suggestions.map(({ row, list }) => <CourseRow key={row.id} row={row} list={list} min={subscoreMinRatings} onPick={(r, l) => { analyticsEvents.track('review_next_course_tapped', { from_course_id: course.id, to_course_id: r.id, list: l }); onNextCourse(r.id); }} />)}</div><Button variant="ghost" className="receipt-find" onClick={() => setSearchOpen(true)}><Search size={16} strokeWidth={2.2} />{t(key('findAnother'))}</Button></section>}
     </div>
-  );
+    <div className="receipt-footer" ref={footerRef}><Button variant="ghost" className="receipt-back" onClick={() => action('back')}>{t(key('back'), { course: short })}</Button>{live && shareToFeed && <Button variant="ghost" className="receipt-clubhouse" onClick={() => action('clubhouse')}>{t(key('clubhouse'))}</Button>}</div>
+    <ReviewCourseSearchSheet open={searchOpen} userId={userId} onClose={() => setSearchOpen(false)} onBeforeRequest={() => setSearchOpen(false)} onPick={id => { setSearchOpen(false); onNextCourse(id); }} />
+  </div>;
 }

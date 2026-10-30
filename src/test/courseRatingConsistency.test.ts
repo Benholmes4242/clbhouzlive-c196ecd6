@@ -159,14 +159,13 @@ describe('C1 course rating consistency', () => {
     const onCourseRule = [
       'src/features/review-v2/components/OverallScrubber.tsx',
       'src/features/review-v2/components/CategoryGrid.tsx',
-      'src/features/review-v2/components/ReviewReceipt.tsx',
     ].map(src);
     for (const file of onCourseRule) {
       expect(file).toContain('courseSubScoreTone');
       expect(file).not.toContain("from '../bandColor'");
     }
-    const receipt = src('src/features/review-v2/components/ReviewReceipt.tsx');
-    expect(receipt).toContain('const c = courseSubScoreTone(v)');
+    const receipt = src('src/features/review-v2/components/reviewReceipt.css');
+    expect(receipt).toContain('.receipt-category-track>i{display:block;height:100%;border-radius:3px;background:var(--receipt-ink)}');
   });
 
   it('keeps photography ratings pure photo white', () => {

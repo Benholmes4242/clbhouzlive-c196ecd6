@@ -108,7 +108,7 @@ describe('header forms', () => {
     // jsdom drops gradient values from the DOM, so the layers themselves are
     // asserted in the source: the course page's 18% wash first, then the fade.
     expect(HERO_CANON_WASH).toBe('linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.18))');
-    const src = readFileSync(resolve(__dirname, '../features/review-v2/components/ReviewComposerHeader.tsx'), 'utf8');
+    const src = readFileSync(resolve(__dirname, '../features/review-v2/components/ReviewCourseHero.tsx'), 'utf8');
     expect(src).toContain('background: HERO_CANON_WASH');
     expect(src).toContain('linear-gradient(180deg, rgba(22,22,26,0) 40%, rgba(22,22,26,0.72) 72%, ${RV2.canvas} 100%)');
   });
@@ -128,7 +128,7 @@ describe('header forms', () => {
     // box siblings and by the nameClamp the header hands CourseMasthead.
     expect(nameEl.style.display).toBe('-webkit-box');
     expect(nameEl.style.overflow).toBe('hidden');
-    const headerSrc = readFileSync(resolve(__dirname, '../features/review-v2/components/ReviewComposerHeader.tsx'), 'utf8');
+    const headerSrc = readFileSync(resolve(__dirname, '../features/review-v2/components/ReviewCourseHero.tsx'), 'utf8');
     expect(headerSrc).toContain('nameClamp={2}');
     expect(Array.from(masthead.querySelectorAll('div')).some((d) => d.textContent === 'Scotland')).toBe(true);
   });

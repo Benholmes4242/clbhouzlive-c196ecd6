@@ -118,6 +118,8 @@ const STEP1_HEADING: React.CSSProperties = {
  */
 
 interface ReceiptState {
+  mediaCount: number;
+  hasText: boolean;
   ratingId: string | null;
   pending?: boolean;
   uploadKey?: string | null;
@@ -294,6 +296,9 @@ function InnerComposer() {
         overall={success.overall}
         scores={success.scores}
         shareToFeed={success.shareToFeed}
+        mediaCount={success.mediaCount}
+        hasText={success.hasText}
+        userId={userId}
         onClubhouse={() => navigate('/clubhouse')}
         onBack={() => navigate(`/courses/${courseQ.data!.id}`, { replace: true })}
         onNextCourse={(nextId) => {
@@ -653,6 +658,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
         invalidateCourseRatingCaches(qc);
         onSuccess({
           ratingId,
+          mediaCount: media.items.length,
+          hasText: composer.state.reviewText.trim().length > 0,
           pending: false,
           shareToFeed: composer.state.shareToFeed,
           overall: composer.state.overall,
@@ -676,6 +683,8 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
 
         onSuccess({
           ratingId: null,
+          mediaCount: media.items.length,
+          hasText: composer.state.reviewText.trim().length > 0,
           pending: true,
           uploadKey: media.uploadKey,
           shareToFeed: composer.state.shareToFeed,

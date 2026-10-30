@@ -1,9 +1,14 @@
 # Roadmap
 
+## Review confirmation redesign
+- [x] Shared course hero, corrected receipt contract, client media/text snapshot and signed-off receipt layout implemented; not verified complete.
+- [x] Review-only suggestions and search, live upload states, measured footer and all-locale English copy implemented.
+- [ ] STOP: reviewConfirmationRedesign.test.tsx:28:361 — expected 'position: relative;' to contain '196px'. 67/68 targeted pass; no assertion edits after failure. Full suite/Chromium blocked by stop. See REVIEW_CONFIRMATION_STOP_REPORT.md.
+
 ## ST3 — Settings Privacy
-- [ ] Replace only Privacy with live summary, sheet rows, unchanged auto-post handler and scoped blocked count.
-- [ ] Add ST3 regressions and retarget the two obsolete EP4 Settings-handicap tests explicitly; delete ST2 report.
-- [ ] Full suite --maxWorkers=2 against 4,528/463; inspect card/sheets and report every failure/changed file.
+- [x] Replace only Privacy with live summary, sheet rows, unchanged auto-post handler and scoped blocked count.
+- [x] Add 19 ST3 regressions and retarget the two obsolete EP4 Settings-handicap tests explicitly; delete ST2 report.
+- [x] Full suite --maxWorkers=2: 4,547/4,547 across464; Chromium sample card/sheets at390/375 checked, no overflow; live persistence unavailable external_unmanaged. Written report pending.
 
 ## Awards follow-ups — Ring and widest fit
 - [x] Change only the score-led ring to FEED_CARD_SURFACE; add one ring regression without changing other callers.
