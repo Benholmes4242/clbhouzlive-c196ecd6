@@ -7,6 +7,7 @@ import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpe
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { restoreAmateurScroll, takeAmateurScroll } from '@/features/amateur/amateurScrollMemory';
 import { ExploreMagazine } from '@/features/explore-magazine/ExploreMagazine';
+import { useGuestScrollGate } from '@/features/guest/useGuestSurfaceGate';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useDiscoverLastSeen, useMarkDiscoverSeenOnExit } from '@/hooks/useDiscoverLastSeen';

@@ -1,6 +1,7 @@
 import React from 'react';
 import CoursesContent from '@/components/courses/CoursesContent';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { useGuestScrollGate } from '@/features/guest/useGuestSurfaceGate';
 
 const Courses = () => {
   // GUEST BROWSING §4: Courses locks for a guest 1.5 viewport heights down.

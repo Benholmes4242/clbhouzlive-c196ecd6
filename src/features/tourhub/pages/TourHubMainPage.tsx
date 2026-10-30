@@ -137,6 +137,13 @@ export function TourHubMainPage() {
   const { data: liveTournaments, isFetched: liveFetched, isError: liveError } = useLiveTournaments();
   const showLive = (liveTournaments?.length ?? 0) > 0;
 
+  // GUEST BROWSING §4: the Tour locks for a guest 1.5 viewport heights down;
+  // the live event name feeds the guest card's headline.
+  useGuestScrollGate('tour');
+  useEffect(() => {
+    setGuestTourContext({ liveEventName: liveTournaments?.[0]?.name ?? null });
+  }, [liveTournaments]);
+
   useEffect(() => {
     if (tabParam === ('player-stats' as string)) {
       setSearchParams({ tab: 'leaderboards' }, { replace: true });

@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
+import { useGuestClubhouseGate } from '@/features/guest/useGuestSurfaceGate';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
