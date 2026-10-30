@@ -72,7 +72,7 @@ describe('BRIEF_COURSES_LATEST_HOLES', () => {
   });
   it('three cards retain RPC order and the specified query contract', () => {
     mountRail(); expect(screen.getAllByRole('button').map(b => b.getAttribute('aria-label'))).toEqual(['Hole 4, Course first', 'Hole 4, Course second', 'Hole 4, Course third']);
-    expect(f.rpc).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['gam_rpc', 'get_latest_hole_media', 'infinite'], staleTime: 60_000 }));
+    expect(f.rpc).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['gam_rpc', 'get_latest_hole_media', 'infinite', expect.anything(), false], staleTime: 60_000 }));
     const options = f.rpc.mock.calls[0][0];
     const request = options.queryFn({ pageParam: undefined });
     expect(f.holeRpc).toHaveBeenCalledWith('get_latest_hole_media', { p_limit: 20 });
