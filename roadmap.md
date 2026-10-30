@@ -1,5 +1,10 @@
 # Roadmap
 
+## Awards follow-ups — Ring and widest fit
+- [ ] Change only the score-led ring to FEED_CARD_SURFACE; add one ring regression without changing other callers.
+- [ ] Check gross 102 (+30), handicap 28, awards 4/5/3 at 375px; report widths/touching without shrinking.
+- [ ] Run full suite against 4,527/463 baseline and report every changed file.
+
 ## ST2 — Settings Your handicap card
 - [x] Replace only the interim handicap row and move its switch out of Privacy; preserve existing handler and destinations.
 - [x] Add connection-scoped earliest-round-year reader with three-state gating and 22 regressions for figures/actions/toggle; existing tests unchanged.
