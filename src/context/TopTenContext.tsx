@@ -131,14 +131,14 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       return;
     }
     copy[targetIndex] = course;
-    setTopTenState(copy);
+    applyTopTen(copy);
   };
 
   const addCourseAtIndex = (course: Course, index: number) => {
     if (isInTopTen(course.id)) return; // prevent dupes
     const copy = [...topTen];
     copy[index] = course;
-    setTopTenState(copy);
+    applyTopTen(copy);
   };
 
   const moveCourse = (fromIndex: number, toIndex: number) => {
@@ -149,16 +149,16 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     copy.splice(toIndex, 0, item);
     // ensure length 10 (splice shifts); remove overflow at end
     copy.length = 10;
-    setTopTenState(copy);
+    applyTopTen(copy);
   };
 
   const removeCourse = (index: number) => {
     const copy = [...topTen];
     copy[index] = undefined;
-    setTopTenState(copy);
+    applyTopTen(copy);
   };
 
-  const clearAll = () => setTopTenState(EMPTY10);
+  const clearAll = () => applyTopTen(EMPTY10);
 
   const value = useMemo(
     () => ({
