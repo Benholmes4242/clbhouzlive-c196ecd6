@@ -10,6 +10,7 @@ import { latestHolesToFeedPosts } from '@/lib/courseMedia/memberShotPosts';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { useSectionReady } from './PageLoadGate';
+import { useIsGuest } from '@/features/guest/useIsGuest';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { RAIL_BLEED } from './format';
 import { PHOTO_FIGURE_GAP } from './PhotoFigureCard';
@@ -86,6 +87,8 @@ function LatestHoleCard({ row, onOpen }: { row: LatestHoleMedia; onOpen: (row: L
 
 export function LatestHolesSection() {
   const viewerOpen = useFullscreenFeedStore(state => state.isOpen);
+  // Guests: the RPC is member-only (401 for anonymous sessions) — never fire it.
+  const isGuest = useIsGuest();
   const { data, isLoading, isError, hasNextPage, isFetching, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
     queryKey: ['gam_rpc', 'get_latest_hole_media', 'infinite'],
     initialPageParam: undefined as { at: string; id: string } | undefined,
@@ -101,7 +104,7 @@ export function LatestHolesSection() {
       return page.length < LATEST_HOLE_PAGE_SIZE || !last ? undefined : { at: last.created_at, id: last.id };
     },
     staleTime: 60_000,
-    enabled: !viewerOpen,
+    enabled: !viewerOpen && !isGuest,
   });
   useSectionReady('latestHoles', !isLoading);
   const rows = useMemo(() => dedupeRailRows(data?.pages ?? [], row => row.id), [data]);

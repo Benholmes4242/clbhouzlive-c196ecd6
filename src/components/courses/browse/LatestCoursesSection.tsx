@@ -17,6 +17,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useIsGuest } from '@/features/guest/useIsGuest';
 import { useGalleryCourseMedia } from '@/components/explore-tab-new/courseled/hooks/useGalleryCourseMedia';
 import { coursePostsToShotPosts } from '@/lib/courseMedia/memberShotPosts';
 import { openWithOrigin } from '@/lib/openWithOrigin';
@@ -188,6 +189,8 @@ function LatestCourseCard({ row, pending, onOpen }: {
 
 export function LatestCoursesSection() {
   const { user } = useSupabaseSession();
+  // Guests: the RPC is member-only (401 for anonymous sessions) — never fire it.
+  const isGuest = useIsGuest();
   const { data, isLoading, isError, hasNextPage, isFetching, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
     queryKey: ['gam_rpc', 'get_latest_course_media', 'infinite'],
     initialPageParam: undefined as { at: string; id: string } | undefined,
@@ -202,6 +205,7 @@ export function LatestCoursesSection() {
       return page.length < LATEST_COURSE_PAGE_SIZE || !last ? undefined : { at: last.latest_at, id: last.course_id };
     },
     staleTime: 60_000,
+    enabled: !isGuest,
   });
   useSectionReady('latestCourses', !isLoading);
   const rows = useMemo(() => dedupeRailRows(data?.pages ?? [], row => row.course_id), [data]);
