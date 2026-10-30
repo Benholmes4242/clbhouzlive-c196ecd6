@@ -28,6 +28,14 @@ export function isGuestAllowedPath(pathname: string): boolean {
   return false;
 }
 
+/** Where a blocked route may return a guest: surfaces and /post/:id only. */
+export function isGuestReturnPath(pathname: string): boolean {
+  return surfaceForPath(pathname) !== null || /^\/post\/[^/]+/.test(pathname);
+}
+
+/** Test seam. */
+export function __resetGuestReturnPath() { lastAllowedPath = '/'; }
+
 /** The action a blocked route stands for, so the card reads the right copy. */
 export function guestActionForPath(pathname: string): GuestAction {
   if (/^\/courses\/[^/]+\/rate\/?$/.test(pathname) || pathname.startsWith('/rate-course')) return 'rate';
@@ -52,7 +60,12 @@ export function GuestRouteGuard() {
   const isGuest = useIsGuest();
   const location = useLocation();
   const blocked = isGuest && !isGuestAllowedPath(location.pathname);
-  if (isGuest && !blocked) lastAllowedPath = location.pathname + location.search + location.hash;
+  // Stage 2.4: only free-look surfaces and post links are places to return
+  // to — never /auth, legal or gate pages, or a blocked route could send the
+  // guest back into sign-in (the /auth ↔ /welcome loop).
+  if (isGuest && !blocked && isGuestReturnPath(location.pathname)) {
+    lastAllowedPath = location.pathname + location.search + location.hash;
+  }
 
   useEffect(() => {
     if (!blocked) return;

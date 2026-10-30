@@ -298,6 +298,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
       }
 
       if (data?.session?.user) {
+        // Stage 2.4: claim navigation before the refresh turns the guest into
+        // a member, so Auth's redirect effect and this one never both fire.
+        onWillNavigate?.();
         await refreshGuestConversion(emailLinked);
         trackLoginSuccess('email', Date.now() - start);
         // Linked (updateUser) keeps the guest id; otherwise the session is replaced.
@@ -307,7 +310,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
           trackSignupSuccess('email', Date.now() - start);
         }
         trackAuthComplete('email');
-        onWillNavigate?.();
         const dest = await resolvePostAuthRoute(
           data.session.user.id,
           searchParams.get('redirect'),

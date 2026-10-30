@@ -16,6 +16,9 @@ const Auth: React.FC<AuthProps> = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const hasNavigated = useRef(false);
+  // Stage 2.4: a guest (anonymous session) is signed out as far as sign-in is
+  // concerned — no redirect, no hold, never resolvePostAuthRoute.
+  const member = user && user.is_anonymous !== true ? user : null;
 
   useHideBottomNav();
   useHideHeader();
@@ -27,14 +30,14 @@ const Auth: React.FC<AuthProps> = () => {
 
   // Redirect if user is already authenticated
   useEffect(() => {
-    if (user && !hasNavigated.current) {
+    if (member && !hasNavigated.current) {
       hasNavigated.current = true;
       (async () => {
-        const dest = await resolvePostAuthRoute(user.id, searchParams.get('redirect'));
+        const dest = await resolvePostAuthRoute(member.id, searchParams.get('redirect'));
         navigate(dest, { replace: true });
       })();
     }
-  }, [user, navigate, searchParams]);
+  }, [member, navigate, searchParams]);
 
   // Catch session from OAuth (Apple/Google) completed in SFSafariViewController.
   // The callback page writes tokens to localStorage; we read them when the app resumes.
@@ -46,7 +49,7 @@ const Auth: React.FC<AuthProps> = () => {
 
       // 1. Direct session check (works if Supabase resolved via URL hash)
       const { data: { session: existingSession } } = await supabase.auth.getSession();
-      if (existingSession?.user) {
+      if (existingSession?.user && existingSession.user.is_anonymous !== true) {
         hasNavigated.current = true;
         const dest = await resolvePostAuthRoute(existingSession.user.id, searchParams.get('redirect'));
         navigate(dest, { replace: true });
@@ -73,7 +76,7 @@ const Auth: React.FC<AuthProps> = () => {
         // Clean up handshake token regardless
         localStorage.removeItem('clbhouz_oauth_session');
 
-        if (error || !session?.user) return;
+        if (error || !session?.user || session.user.is_anonymous === true) return;
 
         hasNavigated.current = true;
         const dest = await resolvePostAuthRoute(session.user.id, searchParams.get('redirect'));
@@ -85,7 +88,7 @@ const Auth: React.FC<AuthProps> = () => {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [navigate, searchParams]);
 
-  if (user) {
+  if (member) {
     // Redirect effect above is resolving the destination; hold a quiet dark
     // frame instead of flashing the sign-in hero (also covers the frame
     // between a successful verify and route change).
