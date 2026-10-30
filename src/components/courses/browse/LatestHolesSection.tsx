@@ -11,6 +11,7 @@ import { openWithOrigin } from '@/lib/openWithOrigin';
 import { SCRIM_STANDOUT } from '@/styles/photoScrim';
 import { useSectionReady } from './PageLoadGate';
 import { useIsGuest } from '@/features/guest/useIsGuest';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
 import { RAIL_BLEED } from './format';
 import { PHOTO_FIGURE_GAP } from './PhotoFigureCard';
