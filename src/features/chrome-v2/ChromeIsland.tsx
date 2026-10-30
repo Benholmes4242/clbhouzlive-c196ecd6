@@ -890,8 +890,9 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
         )}
       </div>
 
-      {/* Controlled host — identical to CompactHeader wiring */}
-      {user && (
+      {/* Controlled host — identical to CompactHeader wiring. Guests never
+          see the member menu; their capsule has no avatar trigger. */}
+      {user && !isGuest && (
         <PostingAsMenu
           isOpen={menuOpen}
           onClose={() => setMenuOpen(false)}

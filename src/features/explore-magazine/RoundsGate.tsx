@@ -146,6 +146,7 @@ export function RoundsGate({ children, roundCount = null, scope = null }: { chil
   const impressionTracked = useRef(false);
   const lookTracked = useRef(false);
   useEffect(() => {
+    if (isGuest) return;
     if (!lookTracked.current) { lookTracked.current = true; analyticsEvents.track('rounds_gate_look_started', { gate_state: 'gated' }); }
     if (impressionTracked.current) return;
     const scroller = getPrimaryScrollElement();
