@@ -2,7 +2,7 @@
 
 ## ST5.1 — Authorised duplicate-test removal
 - [x] Delete only case19 and move its dialog assertion into case7; remove historical literal from report and rename to ST5_REPORT.md. sheetTopV5 unchanged.
-- [ ] Run full bunx vitest run --maxWorkers=2; report result against4610/468 ST5-only and4621/469 including intervening11 review-media cases. Existing review test/type failures remain untouched.
+- [x] Full bunx vitest run --maxWorkers=2:4618 passed/3 pre-existing review-media failures/4621 total across469. ST5 UI18/18, CSV13/13, sheetTopV5 2/2 pass. No new failures; ST5_REPORT.md records names/errors/count reconciliation. Review test/type failures remain untouched.
 
 ## Review posts — Match normal feed media sizing
 - [x] Share intrinsic ratio/cap rules and opt media-first reviews with media into natural-height flow; preserve standard/no-media reviews.
@@ -14,7 +14,7 @@
 - [x] Add the connection/total-gated rounds row and signed-off export sheet between Account and Friends.
 - [x] Add only email-my-rounds, caller-owned CSV email and ten-minute sent suppression; preserve existing functions and SQL. Required RESEND_API_KEY saved securely.
 - [x] Add 19 UI and 13 CSV regressions; targeted 105/106 across7 files. No existing tests changed.
-- [ ] STOP: sheetTopV5.test.tsx:12, retained account vocabulary rules > no component renders "Your rounds" as a door: AssertionError expected new ST5 test's literal selector grep hit to be ''. No assertion changes/retests after failure. Full suite and browser checks not run; last green4,579/466, candidate4,611/468. Await authorisation to correct the new test selector only.
+- [x] ST5.1 clears vocabulary stop by authorised case19 deletion and dialog assertion move into case7; unchanged sheetTopV5 passes2/2. Full4618 passed/3 pre-existing review-media failures/4621 total across469; ST5-only addition31 reconciled in ST5_REPORT.md.
 - [x] Remove the only remaining root ST2/ST3/ST4 report, ST3_ST4_SETTINGS_REPORT.md.
 - [ ] Live authenticated email/summary verification unavailable: external_unmanaged. No real email sent or delivery claimed.
 
