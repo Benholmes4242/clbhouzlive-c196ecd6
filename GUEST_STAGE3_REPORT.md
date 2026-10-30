@@ -70,3 +70,15 @@ The new test copied the required react-i18next mock (including initReactI18next 
 
 ## Preview proof and limitations
 Fresh Chromium at localhost, 1280×1800, opened `/` with a real anonymous session, no remaining guest hold and no page errors. Screenshot `/tmp/browser/guest-stage3/preview.png` shows Clubhouse, guest Log in/Join free and the existing locked guest card. One anonymous preview session was created. No live member sign-in, actual native first-install or real production-web check was performed. Native late-bridge and member launch checks above are controlled tests. No phone Apple sign-in was attempted; diagnostics are retained for Ben.
+## Resolution — approved mock fix (2026-10-30 23:11 UTC)
+Ben approved a test-only fix: the `react-i18next` mock in `src/test/guestStage3.test.tsx` now supplies `i18n: { language: 'en', changeLanguage: () => Promise.resolve() }` alongside the unchanged `initReactI18next` and defaultValue-only `t`, so the real `AppDownloadGate` renders. No app code changed.
+
+- Old mock: `useTranslation: () => ({ t: (_k, o) => o?.defaultValue ?? '' })`
+- New mock: `useTranslation: () => ({ t: (_k, o) => o?.defaultValue ?? '', i18n: { language: 'en', changeLanguage: () => Promise.resolve() } })`
+
+## Final result
+- Targeted: `bunx vitest run src/test/guestStage3.test.tsx`: **5 passed / 5**, including the previously failing production-web case.
+- Full: `bunx vitest run --maxWorkers=2`: **4,743 passed / 4,743 across 485 files**, zero failures; duration 415.97s.
+- Reconciliation against **4,738 / 484**: +5 tests, +1 file, entirely `guestStage3.test.tsx`; no other test changed, added or removed.
+
+Guest browsing Stage 3 is green and ready for Ben to publish.
