@@ -108,9 +108,16 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return () => clearTimeout(tid);
   }, [topTen, loading]);
 
+  // Every member-initiated change goes through here so the dirty flag is set
+  // in exactly one place; the load effect above uses setTopTenState directly.
+  const applyTopTen = (next: (Course | undefined)[]) => {
+    dirtyRef.current = true;
+    setTopTenState(next);
+  };
+
   const setTopTen = (next: (Course | undefined)[]) => {
     if (next.length !== 10) throw new Error("TopTen must have 10 slots");
-    setTopTenState(next);
+    applyTopTen(next);
   };
 
   const isInTopTen = (courseId: string) => topTen.some((c) => c?.id === courseId);
