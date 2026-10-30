@@ -180,10 +180,10 @@ export function RoundsGate({ children, roundCount = null, scope = null }: { chil
     return cleanup;
   }, []);
   useLayoutEffect(() => {
-    if (locked) return pushForceExpand();
-  }, [locked]);
+    if (locked && !isGuest) return pushForceExpand();
+  }, [locked, isGuest]);
   useLayoutEffect(() => {
-    if (!locked) return;
+    if (!locked || isGuest) return;
     const body = bodyRef.current;
     body?.setAttribute('inert', '');
     const scroller = getPrimaryScrollElement();
@@ -195,7 +195,9 @@ export function RoundsGate({ children, roundCount = null, scope = null }: { chil
     }
     lockBodyScroll();
     return () => { unlockBodyScroll(); body?.removeAttribute('inert'); };
-  }, [locked]);
+  }, [locked, isGuest]);
+  // Guests: the page renders ungated — the guest surface gate owns any lock.
+  if (isGuest) return <>{children}</>;
   return <div ref={wrapperRef} data-rounds-gate="" data-rounds-locked={locked ? '' : undefined}>
     <div ref={bodyRef} data-rounds-gate-body="" aria-hidden={locked ? true : undefined}>{children}</div>
     {locked ? <>
