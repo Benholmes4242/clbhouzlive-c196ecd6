@@ -44,6 +44,10 @@ import DeletedAccountGate from "@/components/DeletedAccountGate";
 import BootHold from "@/components/BootHold";
 import { hasStoredSession } from "@/utils/auth/hasStoredSession";
 import { PAGE_CANVAS } from "@/lib/tokens/surfaces";
+import { GUEST_BROWSING_ENABLED } from '@/features/guest/guestConfig';
+import { trackGuestSessionFailed, trackGuestSessionStarted } from '@/features/guest/guestAnalytics';
+import { GuestGateHost } from '@/features/guest/GuestGateHost';
+import { GuestRouteGuard } from '@/features/guest/guestRoutes';
 
 // REMOVED: FullscreenPlayerProvider — Phase 5 fullscreen system deleted
 import { RehydrationProvider } from './contexts/RehydrationContext';
