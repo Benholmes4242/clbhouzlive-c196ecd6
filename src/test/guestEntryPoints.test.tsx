@@ -4,7 +4,7 @@
  * react-i18next mock copied in full per project rule.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render, renderHook, waitFor } from '@testing-library/react';
+import { cleanup, renderHook, waitFor } from '@testing-library/react';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 
@@ -131,5 +131,3 @@ describe('write-layer backstop', () => {
   });
 });
 
-// render is imported for parity with sibling guest suites' harness.
-void render;
