@@ -2,7 +2,7 @@
 
 ## Review confirmation — Authorised height-class correction
 - [x] Move receipt height to opt-in photo class; preserve default Step 1 output and replace only the authorised height assertion.
-- [ ] Run targeted and full suite in shards; verify receipt196/Step1246 plus safe area at390px and report counts/files.
+- [x] Targeted68/68; full shards4578 passed/1 pre-existing Alerts failure/4579 total across466. +20 review confirmation/+12ST4 reconciled. Final CSS-order safeguard targeted68/68; browser390px receipt196 andStep1246, safe area0. See REVIEW_CONFIRMATION_HEIGHT_REPORT.md.
 
 ## ST4 — Settings Notifications and Friends
 - [x] Share unchanged notification categories; replace only Notifications/Friends using existing push/invite actions.
@@ -13,7 +13,7 @@
 ## Review confirmation redesign
 - [x] Shared course hero, corrected receipt contract, client media/text snapshot and signed-off receipt layout implemented; not verified complete.
 - [x] Review-only suggestions and search, live upload states, measured footer and all-locale English copy implemented.
-- [ ] STOP: reviewConfirmationRedesign.test.tsx:28:361 — expected 'position: relative;' to contain '196px'. 67/68 targeted pass; no assertion edits after failure. Full suite/Chromium blocked by stop. See REVIEW_CONFIRMATION_STOP_REPORT.md.
+- [x] Hero-height stop cleared by authorised CSS-class/assertion correction; targeted68/68 and browser390px receipt196/Step1246. Full4579-test execution retains only separately owned ST4 Alerts failure. See REVIEW_CONFIRMATION_HEIGHT_REPORT.md; historical report retained.
 
 ## ST3 — Settings Privacy
 - [x] Replace only Privacy with live summary, sheet rows, unchanged auto-post handler and scoped blocked count.
