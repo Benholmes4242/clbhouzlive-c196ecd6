@@ -197,3 +197,19 @@ Guest Explore is now 2,257px tall (it was 1,891px with the feats missing). The 1
 
 ### Suite
 4,708/4,708 across 479 files (shards 2,309 + 2,399). vs 4,701/478: +7 tests and +1 file, both from `guestSessionHold.test.tsx`.
+
+## Stage 2.3 — scroller cache, course sheets, hold timeout (STOPPED: one conflict)
+
+### Changes
+- `src/lib/getScrollParent.ts`: `getDocumentScrollParent()` returns `#root` whenever it exists, with no overflow check; caches only `#root`; the `document.scrollingElement` fallback is used only while `#root` is absent and is never cached.
+- `src/features/guest/useGuestSurfaceGate.ts`: page gate uses the shared resolver again (direct `#root` read removed). New `useGuestSheetScrollGate(courseId, open)` — same rule on the sheet's own scroller (1.5 sheet heights or within 120px of its end, only after a scroll), same `course:<id>` key as the page, opens the card at once if the course is already locked.
+- Wired into `AllHolesSheet.tsx`, `YourHolesSheet.tsx`, `YourRoundsSheet.tsx` (callback ref on each sheet's scroll region).
+- Layering: sheets sit at 1400/1401, above the nav (100) and card (98/99). While a course sheet is open, `GuestJoinCard` raises shade/card to 1402/1403 and `GlobalBottomNavigation` raises the nav to 1404 (only when a guest card is up), via `registerGuestCourseSheet` / `useGuestCourseSheetOpen` in `guestGateStore.ts`. Nothing changes for members.
+- `src/features/guest/guestSession.ts`: 8s timeout (`GUEST_SIGN_IN_TIMEOUT_MS`); on timeout tracks `guest_session_failed { reason: 'timeout' }` and fails the attempt (signed-out behaviour); a late success is signed out.
+
+### Tests
+- New `src/test/guestStage23.test.tsx` (+8): scroller cache ×2, sheet threshold, locked course shows card on sheet open, sheet lock locks course, other course unaffected, hold timeout, late success signed out.
+
+### Suite
+- 4,715 passed, 1 failed, 4,716 across 480 files (baseline 4,708/479; +8 tests/+1 file = guestStage23).
+- FAILURE (new, caused by §1): `src/test/pageScroller.test.ts:66` "falls back to the scrolling element when #root is not a scroll container" — `AssertionError: expected 'root' not to be 'root'`. This test encodes the old overflow-checked rule that §1 removes, while the brief also says "the existing scroll tests must pass unchanged". The two clauses contradict; not edited. Awaiting ruling.
