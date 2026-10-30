@@ -4,8 +4,10 @@
  *
  * - Clubhouse: the top of the fourth post entering the viewport locks the
  *   surface (IntersectionObserver on the feed's [data-card-index="3"]).
- * - Every other free-look surface: scrolling more than 1.5 viewport heights
- *   from where the page started locks it.
+ * - Every other free-look surface (Stage 2.2 ruling): locks at 1.5 viewport
+ *   heights scrolled OR within 120px of the page's end, whichever comes
+ *   first — and only once the user has actually scrolled (scrollTop > 0).
+ *   A page that cannot scroll never locks by scroll; actions still gate.
  *
  * Once locked, a surface stays locked for the app session (guestGateStore);
  * returning to it re-shows the card at the top (GuestGateHost owns that).
@@ -72,17 +74,37 @@ export function useGuestClubhouseGate(): void {
   }, [isGuest]);
 }
 
-/** Every other free-look surface: locks past 1.5 viewport heights scrolled. */
+export const GUEST_END_PROXIMITY_PX = 120;
+export const GUEST_SCROLL_VIEWPORTS = 1.5;
+
+/** Pure rule for the non-Clubhouse scroll lock. */
+export function shouldScrollLock(m: {
+  top: number; startTop: number; viewportHeight: number; scrollHeight: number; clientHeight: number;
+}): boolean {
+  if (m.top <= 0) return false; // never scrolled — a page that cannot scroll never locks
+  if (m.top - m.startTop > m.viewportHeight * GUEST_SCROLL_VIEWPORTS) return true;
+  const maxTop = m.scrollHeight - m.clientHeight;
+  if (maxTop <= 0) return false;
+  return maxTop - m.top <= GUEST_END_PROXIMITY_PX;
+}
+
+/** Every other free-look surface: 1.5 viewports or the page's end. */
 export function useGuestScrollGate(surface: GuestSurfaceKey): void {
   const isGuest = useIsGuest();
   useEffect(() => {
     if (!isGuest || isSurfaceLocked(surface)) return;
     const scroller = getPrimaryScrollElement();
     const startTop = scroller?.scrollTop ?? 0;
-    const threshold = window.innerHeight * 1.5;
     const onScroll = () => {
-      const top = scroller?.scrollTop ?? 0;
-      if (top - startTop > threshold) lockAndShow(surface);
+      if (isSurfaceLocked(surface)) return;
+      const el = scroller ?? document.documentElement;
+      if (shouldScrollLock({
+        top: el.scrollTop,
+        startTop,
+        viewportHeight: window.innerHeight,
+        scrollHeight: el.scrollHeight,
+        clientHeight: el.clientHeight,
+      })) lockAndShow(surface);
     };
     const target: (HTMLElement | Window) & EventTarget =
       scroller && scroller !== document.documentElement && scroller !== document.body ? scroller : window;
