@@ -68,7 +68,8 @@ describe('useGuestClubhouseGate', () => {
   it('still locks when the fourth post enters the viewport', () => {
     let cb: ((e: Array<{ isIntersecting: boolean }>) => void) | null = null;
     const observed: Element[] = [];
-    vi.stubGlobal('IntersectionObserver', class { constructor(f: typeof cb) { cb = f; } observe(e: Element) { observed.push(e); } disconnect() {} });
+    const prevIO = window.IntersectionObserver;
+    (window as unknown as { IntersectionObserver: unknown }).IntersectionObserver = class { constructor(f: typeof cb) { cb = f; } observe(e: Element) { observed.push(e); } disconnect() {} };
     const root = document.createElement('div'); root.id = 'root';
     root.innerHTML = [0, 1, 2, 3].map(i => `<div data-card-index="${i}"></div>`).join('');
     document.body.appendChild(root);
@@ -77,6 +78,6 @@ describe('useGuestClubhouseGate', () => {
     act(() => cb?.([{ isIntersecting: true }]));
     expect(isSurfaceLocked('clubhouse')).toBe(true);
     expect(h.track).toHaveBeenCalledWith({ surface: 'clubhouse', trigger: 'scroll' });
-    vi.unstubAllGlobals();
+    (window as unknown as { IntersectionObserver: unknown }).IntersectionObserver = prevIO;
   });
 });
