@@ -292,7 +292,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                if (showFollowPlus) onFollow();
+                if (showFollowPlus) gatedOnFollow();
               }}
               aria-label={showJustFollowed ? 'Following' : 'Follow'}
               aria-pressed={showJustFollowed}
@@ -367,7 +367,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               }}
             >
               <ActionButton
-                onClick={onLike}
+                onClick={gatedOnLike}
                 ariaLabel={hasLiked ? 'Unlike' : 'Like'}
                 animateKey={likeAnimKey}
               >
@@ -401,7 +401,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
             </div>
           ) : (
             <ActionButton
-              onClick={onLike}
+              onClick={gatedOnLike}
               ariaLabel={hasLiked ? 'Unlike' : 'Like'}
               count={formatCount(likesCount)}
               accentCount={hasLiked}
@@ -413,7 +413,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
 
           {/* Comment */}
           <ActionButton
-            onClick={onComment}
+            onClick={gatedOnComment}
             ariaLabel="Comments"
             count={formatCount(commentsCount)}
           >
@@ -421,7 +421,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
           </ActionButton>
 
           {/* Share */}
-          <ActionButton onClick={onShare} ariaLabel="Send">
+          <ActionButton onClick={gatedOnShare} ariaLabel="Send">
             <Send size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
           </ActionButton>
 
@@ -431,7 +431,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               {moreSlot}
             </div>
           ) : (
-            <ActionButton onClick={onMore} ariaLabel="More options">
+            <ActionButton onClick={gatedOnMore} ariaLabel="More options">
               <MoreHorizontal size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
             </ActionButton>
           )}
