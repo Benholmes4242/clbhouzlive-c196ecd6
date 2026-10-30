@@ -1,5 +1,10 @@
 # Roadmap
 
+## Guest browsing Stage 3 — Switch on
+- [x] Enable outside tests; guest creation continues to use settled envStatus for native/preview only. Preserve production web and Apple diagnostic logging.
+- [x] Late-native, preview and member launch regressions pass; live preview guest Clubhouse verified. Full suite 4,742 passed/1 failed/4,743 across485, +5/+1 in guestStage3.test.tsx. Existing 4,738 tests pass; report names all switch assertion changes.
+- [ ] STOP: new production-web test at AppDownloadGate.tsx:143:23: `TypeError: Cannot read properties of undefined (reading 'language')`. New translation mock lacks i18n; no correction after failure. Await authorized harness fix, then production-web/full-suite rerun before Ben publishes. See GUEST_STAGE3_REPORT.md.
+
 ## Guest browsing Stage 2 — Preview only
 - [x] Enable preview bootstrap, refresh same-user conversions and exclude anonymous onboarding.
 - [x] Handle exact server guest refusals with the existing action card; preserve read errors/data.
