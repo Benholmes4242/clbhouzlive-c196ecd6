@@ -1,10 +1,12 @@
 # Roadmap
 
 ## ST5 — Settings Your data
-- [ ] Add the connection/total-gated rounds row and signed-off export sheet between Account and Friends.
-- [ ] Add only email-my-rounds, caller-owned CSV email and ten-minute sent suppression; preserve existing functions and SQL.
-- [ ] Add UI/CSV regressions, run full suite --maxWorkers=2 against 4,579/466, verify available browser states and write report.
-- [ ] Remove root ST2/ST3/ST4 reports as requested.
+- [x] Add the connection/total-gated rounds row and signed-off export sheet between Account and Friends.
+- [x] Add only email-my-rounds, caller-owned CSV email and ten-minute sent suppression; preserve existing functions and SQL. Required RESEND_API_KEY saved securely.
+- [x] Add 19 UI and 13 CSV regressions; targeted 105/106 across7 files. No existing tests changed.
+- [ ] STOP: sheetTopV5.test.tsx:12, retained account vocabulary rules > no component renders "Your rounds" as a door: AssertionError expected new ST5 test's literal selector grep hit to be ''. No assertion changes/retests after failure. Full suite and browser checks not run; last green4,579/466, candidate4,611/468. Await authorisation to correct the new test selector only.
+- [x] Remove the only remaining root ST2/ST3/ST4 report, ST3_ST4_SETTINGS_REPORT.md.
+- [ ] Live authenticated email/summary verification unavailable: external_unmanaged. No real email sent or delivery claimed.
 
 ## Review confirmation — Authorised height-class correction
 - [x] Move receipt height to opt-in photo class; preserve default Step 1 output and replace only the authorised height assertion.
