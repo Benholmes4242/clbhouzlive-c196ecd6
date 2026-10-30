@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
-const h = vi.hoisted(() => ({ preview: true, anonymous: true, refresh: vi.fn(), profile: vi.fn(), track: vi.fn(), anon: vi.fn() }));
+const h = vi.hoisted(() => ({ preview: true, anonymous: true, refresh: vi.fn(), profile: vi.fn(), track: vi.fn(), anon: vi.fn(), listener: undefined as undefined | ((e: string, s: unknown) => void) }));
 vi.mock('@/utils/native/isNativeApp', () => ({ isPreviewHost: () => h.preview }));
 vi.mock('@/features/guest/guestConfig', () => ({ GUEST_BROWSING_ENABLED: true }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'same', is_anonymous: h.anonymous } }) }));
