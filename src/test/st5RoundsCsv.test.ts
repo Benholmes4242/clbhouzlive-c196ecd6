@@ -1,0 +1,19 @@
+import { describe, expect, it } from 'vitest';
+import { CSV_HEADERS, roundsCsv, roundsFilename, sentRecently, utf8Base64, type ExportRound } from '../../supabase/functions/email-my-rounds/csv';
+const round = (patch: Partial<ExportRound> = {}): ExportRound => ({ play_date: '2026-10-30', course: 'Sundridge Park', country: 'England', holes_played: 18, course_rating: 72, slope_rating: 125, course_handicap: 28, index_at_time: 27.5, gross: 102, adjusted_gross: 100, net: 74, stableford: 34, differential: 25.3, counted: true, competition: false, hole_scores: Array.from({ length: 18 }, (_, i) => ({ hole: i + 1, par: 4, score: i + 1 })), ...patch });
+function cells(r: ExportRound) { return roundsCsv([r]).split('\r\n')[1].split(','); }
+describe('ST5 rounds CSV', () => {
+  it('uses the exact metadata header order then H1 through H18', () => { expect(CSV_HEADERS).toEqual(['Date', 'Course', 'Country', 'Holes', 'Par', 'Course rating', 'Slope', 'Course handicap', 'Index at the time', 'Gross', 'Adjusted gross', 'Net', 'Stableford', 'Differential', 'Counting round', 'Competition', ...Array.from({ length: 18 }, (_, i) => `H${i + 1}`)]); });
+  it('starts with UTF-8 BOM and uses CRLF row endings', () => { const csv = roundsCsv([round()]); expect(csv.charCodeAt(0)).toBe(0xFEFF); expect(csv.endsWith('\r\n')).toBe(true); expect(csv.split('\r\n')).toHaveLength(3); });
+  it('RFC4180 quotes course commas, quotes and newlines', () => { expect(roundsCsv([round({ course: 'Club, "North"\nCourse' })])).toContain('"Club, ""North""\nCourse"'); });
+  it('fills all eighteen hole scores in hole-number order', () => { expect(cells(round({ hole_scores: [...round().hole_scores as unknown[]].reverse() })).slice(16)).toEqual(Array.from({ length: 18 }, (_, i) => String(i + 1))); });
+  it('front nine leaves H10–H18 blank', () => { expect(cells(round({ holes_played: 9, hole_scores: Array.from({ length: 9 }, (_, i) => ({ hole: i + 1, par: 4, score: 5 })) })).slice(16)).toEqual([...Array(9).fill('5'), ...Array(9).fill('')]); });
+  it('back nine leaves H1–H9 blank without shifting scores', () => { expect(cells(round({ holes_played: 9, hole_scores: Array.from({ length: 9 }, (_, i) => ({ hole: i + 10, par: 4, score: 5 })) })).slice(16)).toEqual([...Array(9).fill(''), ...Array(9).fill('5')]); });
+  it('sums played pars and leaves Par blank with no holes', () => { expect(cells(round())[4]).toBe('72'); expect(cells(round({ hole_scores: [] }))[4]).toBe(''); });
+  it('writes counting and competition as Yes/No', () => { expect(cells(round()).slice(14, 16)).toEqual(['Yes', 'No']); expect(cells(round({ counted: false, competition: true })).slice(14, 16)).toEqual(['No', 'Yes']); });
+  it('sorts newest round first without mutating input', () => { const rounds = [round({ play_date: '2025-01-01' }), round()]; expect(roundsCsv(rounds).split('\r\n')[1]).toMatch(/^2026-10-30,/); expect(rounds[0].play_date).toBe('2025-01-01'); });
+  it('uses the UTC filename date', () => { expect(roundsFilename(new Date('2026-10-30T23:30:00Z'))).toBe('clbhouz-rounds-2026-10-30.csv'); });
+  it('base64 preserves BOM and non-ASCII UTF-8', () => { const csv = roundsCsv([round({ course: 'Club Élan' })]); const bytes = Uint8Array.from(atob(utf8Base64(csv)), c => c.charCodeAt(0)); expect(Array.from(bytes.slice(0, 3))).toEqual([239, 187, 191]); expect(new TextDecoder('utf-8', { ignoreBOM: true }).decode(bytes)).toBe(csv); });
+  it('a sent row within ten minutes suppresses another export', () => { expect(sentRecently('2026-10-30T10:45:00Z', new Date('2026-10-30T10:52:00Z'))).toBe(true); });
+  it('a sent row older than ten minutes allows an export', () => { expect(sentRecently('2026-10-30T10:41:59Z', new Date('2026-10-30T10:52:00Z'))).toBe(false); });
+});

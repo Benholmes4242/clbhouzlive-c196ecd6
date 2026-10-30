@@ -1,0 +1,36 @@
+import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest';
+import { cleanup, render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SettingsYourData } from '@/components/settings/SettingsYourData';
+
+vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
+const h = vi.hoisted(() => ({ total: 252 as number | null, state: 'ok' as 'ok' | 'loading' | 'error', rpc: vi.fn(), invoke: vi.fn() }));
+vi.mock('@/hooks/profile/useMemberRoundTotal', () => ({ useMemberRoundTotal: () => ({ total: h.total, state: h.state }) }));
+vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: h.rpc, functions: { invoke: h.invoke } } }));
+let qc: QueryClient;
+function mount(connected = true) { return render(<QueryClientProvider client={qc}><div className="ep-shell"><SettingsYourData userId="me" email="ben@example.com" connected={connected} /></div></QueryClientProvider>); }
+function open() { fireEvent.click(screen.getByRole('button', { name: /Rounds Download all 252/ })); }
+async function send(status: string, ok = status === 'sent' || status === 'recent') { h.invoke.mockResolvedValue({ data: { status, ok, rounds: 252 }, error: null }); mount(); open(); fireEvent.click(screen.getByRole('button', { name: 'Email it to me' })); await waitFor(() => expect(h.invoke).toHaveBeenCalledWith('email-my-rounds')); }
+beforeEach(() => { vi.clearAllMocks(); qc = new QueryClient({ defaultOptions: { queries: { retry: false } } }); h.total = 252; h.state = 'ok'; h.rpc.mockResolvedValue({ data: { rounds: 252, holes: 4512, courses: 61 }, error: null }); });
+afterEach(() => { cleanup(); qc.clear(); });
+
+describe('ST5 Settings Your data', () => {
+  it('hides the whole group without a live connection', () => { const { container } = mount(false); expect(container.textContent).toBe(''); });
+  it('hides the whole group for zero rounds', () => { h.total = 0; const { container } = mount(); expect(container.textContent).toBe(''); });
+  it.each(['loading', 'error'] as const)('hides the whole group with a stale %s total', state => { h.state = state; const { container } = mount(); expect(container.textContent).toBe(''); });
+  it('hides the whole group for an unknown total', () => { h.total = null; const { container } = mount(); expect(container.textContent).toBe(''); });
+  it('uses the live 252 total and does not read the summary before opening', () => { mount(); expect(screen.getByRole('button', { name: 'Rounds Download all 252' })).toBeEnabled(); expect(h.rpc).not.toHaveBeenCalled(); });
+  it('reads the three facts only when opened, with no header action', async () => { mount(); open(); await waitFor(() => expect(screen.getByTestId('st5-holes')).toHaveTextContent('4,512')); expect(screen.getByTestId('st5-rounds')).toHaveTextContent('252'); expect(screen.getByTestId('st5-courses')).toHaveTextContent('61'); expect(h.rpc).toHaveBeenCalledWith('my_rounds_export_summary'); expect(screen.getByTestId('st5-your-data-sheet').querySelector('.bizc-sheet-done')).toBeNull(); });
+  it('shows dashes while the summary is loading', () => { h.rpc.mockReturnValue(new Promise(() => {})); mount(); open(); for (const key of ['rounds', 'holes', 'courses']) expect(screen.getByTestId(`st5-${key}`)).toHaveTextContent('–'); });
+  it('shows dashes on summary error including stale cached facts', async () => { qc.setQueryData(['settings', 'rounds-export-summary', 'me'], { rounds: 252, holes: 4512, courses: 61 }); h.rpc.mockResolvedValue({ data: null, error: new Error('refused') }); mount(); open(); await waitFor(() => expect(qc.getQueryState(['settings', 'rounds-export-summary', 'me'])?.status).toBe('error')); for (const key of ['rounds', 'holes', 'courses']) expect(screen.getByTestId(`st5-${key}`)).toHaveTextContent('–'); });
+  it('treats an invalid summary as unknown facts', async () => { h.rpc.mockResolvedValue({ data: {}, error: null }); mount(); open(); await waitFor(() => expect(qc.getQueryState(['settings', 'rounds-export-summary', 'me'])?.status).toBe('error')); expect(screen.getByTestId('st5-rounds')).toHaveTextContent('–'); });
+  it('masks the own email with ST1 masking in the idle line', () => { mount(); open(); expect(screen.getByRole('status')).toHaveTextContent('Sent to be••@example.com, usually within a few minutes.'); });
+  it('sent disables the button and renders the exact receipt line', async () => { await send('sent'); await waitFor(() => expect(screen.getByRole('button', { name: 'Sent' })).toBeDisabled()); expect(screen.getByRole('status')).toHaveTextContent('Check be••@example.com. It can take a few minutes to arrive.'); });
+  it('recent disables the button and uses the recent-send line', async () => { await send('recent'); await waitFor(() => expect(screen.getByRole('button', { name: 'Sent' })).toBeDisabled()); expect(screen.getByRole('status')).toHaveTextContent('We sent it a few minutes ago. Check your inbox.'); });
+  it('failed enables retry with the exact failure line', async () => { await send('failed', false); await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent("Couldn't send it. Try again.")); expect(screen.getByRole('button', { name: 'Email it to me' })).toBeEnabled(); });
+  it('empty disables sending and uses the empty line', async () => { await send('empty', false); await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('No rounds to send yet.')); expect(screen.getByRole('button', { name: 'Email it to me' })).toBeDisabled(); });
+  it('network error enables retry without changing facts', async () => { h.invoke.mockRejectedValue(new Error('offline')); mount(); open(); await waitFor(() => expect(screen.getByTestId('st5-rounds')).toHaveTextContent('252')); fireEvent.click(screen.getByRole('button', { name: 'Email it to me' })); await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent("Couldn't send it. Try again.")); expect(screen.getByRole('button', { name: 'Email it to me' })).toBeEnabled(); expect(screen.getByTestId('st5-rounds')).toHaveTextContent('252'); });
+  it('disables the sending button and prevents duplicate invocation', () => { h.invoke.mockReturnValue(new Promise(() => {})); mount(); open(); fireEvent.click(screen.getByRole('button', { name: 'Email it to me' })); const sending = screen.getByRole('button', { name: 'Sending…' }); expect(sending).toBeDisabled(); fireEvent.click(sending); expect(h.invoke).toHaveBeenCalledTimes(1); });
+  it('an unknown response fails closed into retry', async () => { await send('unexpected', true); await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent("Couldn't send it. Try again.")); });
+  it('never uses Your rounds as a door label', () => { const { container } = mount(); open(); expect(container.querySelector('[label="Your rounds"]')).toBeNull(); expect(document.querySelector('[label="Your rounds"]')).toBeNull(); expect(screen.getByRole('dialog', { name: 'Your rounds' })).toBeInTheDocument(); });
+});

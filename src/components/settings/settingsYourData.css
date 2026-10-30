@@ -1,0 +1,17 @@
+/* ST5 only; sheet tokens are local because BizcSheet portals to body. */
+.bizc-sheet[data-testid=st5-your-data-sheet]{--st5-inset:#1E1E23;--st5-quiet:rgba(255,255,255,.08);--st5-quiet-hair:rgba(255,255,255,.14);letter-spacing:0}
+.bizc-sheet[data-testid=st5-your-data-sheet] .bizc-sheet-title{font-size:20px;font-weight:700;letter-spacing:0}
+.bizc-sheet[data-testid=st5-your-data-sheet] .bizc-sheet-sub{font-size:13.5px;line-height:1.45;margin-top:6px}
+.st5-facts{background:var(--st5-inset);border-radius:14px;padding:4px 14px;margin-top:16px}
+.st5-fact{display:flex;align-items:center;gap:12px;min-height:44px;padding:10px 0;border-top:1px solid var(--bizc-hair)}
+.st5-fact:first-child{border-top:0}
+.st5-fact-label{width:96px;flex:none;font-size:14px;color:var(--bizc-mute)}
+.st5-fact-value{flex:1;min-width:0;font-size:15px;font-weight:500;line-height:1.4;color:var(--bizc-ink)}
+.st5-fact-value[data-unknown=true]{color:var(--bizc-dim)}
+.bizc-sheet .st5-email{width:100%;height:50px;border-radius:999px;background:var(--bizc-ink);color:var(--bizc-canvas);font-size:16px;font-weight:600;margin-top:18px;border:1px solid transparent;box-shadow:none;letter-spacing:0}
+.bizc-sheet .st5-email:hover{background:var(--bizc-ink)}
+.bizc-sheet .st5-email:disabled{opacity:1}
+.bizc-sheet .st5-email[data-state=sending]{opacity:.5}
+.bizc-sheet .st5-email[data-state=sent],.bizc-sheet .st5-email[data-state=recent]{background:var(--st5-quiet);border-color:var(--st5-quiet-hair);color:var(--bizc-ink)}
+.st5-message{text-align:center;font-size:13px;color:var(--bizc-dim);margin:12px 0 0;line-height:1.45;overflow-wrap:anywhere}
+.st5-message[data-state=sent]{color:var(--bizc-mute)}
