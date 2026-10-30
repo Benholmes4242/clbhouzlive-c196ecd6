@@ -65,6 +65,10 @@ export const GuestGateHost: React.FC = () => {
       closeGuestCard();
       return;
     }
+    // Remember the guest id + surface before any flow that can replace the
+    // guest session, so guest_converted can trace the conversion (brief §6).
+    const guest = getGuestUser();
+    if (guest) rememberGuestConversion(guest.id, activeSurface);
     if (choice === 'login') {
       closeGuestCard();
       navigate('/auth');

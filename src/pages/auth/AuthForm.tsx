@@ -21,6 +21,12 @@ import {
 import AuthHeroScreen from './components/AuthHeroScreen';
 import AuthBottomSheet from './components/AuthBottomSheet';
 import OtpSheetContent from './components/OtpSheetContent';
+import {
+  clearGuestConversion,
+  peekGuestConversion,
+} from '@/features/guest/guestConversion';
+import { getGuestUser } from '@/features/guest/guestGateStore';
+import { trackGuestConverted } from '@/features/guest/guestAnalytics';
 
 type AppleClaims = {
   aud?: string;
