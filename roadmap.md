@@ -1,16 +1,20 @@
 # Roadmap
 
+## ST5.1 — Authorised duplicate-test removal
+- [x] Delete only case19 and move its dialog assertion into case7; remove historical literal from report and rename to ST5_REPORT.md. sheetTopV5 unchanged.
+- [x] Full bunx vitest run --maxWorkers=2:4618 passed/3 pre-existing review-media failures/4621 total across469. ST5 UI18/18, CSV13/13, sheetTopV5 2/2 pass. No new failures; ST5_REPORT.md records names/errors/count reconciliation. Review test/type failures remain untouched.
+
 ## Review posts — Match normal feed media sizing
 - [x] Share intrinsic ratio/cap rules and opt media-first reviews with media into natural-height flow; preserve standard/no-media reviews.
 - [x] Add11 sizing cases; targeted42 passed/3 failed/45 across4. Existing34/34 pass; no old assertions changed. Candidate4622/469 =4579/466 +ST532/2 +this11/1.
-- [ ] STOP: reviewFeedMediaSizing.test.tsx:67:39 (two photo cases) and80:65 (carousel): AssertionError expected undefined to be ''. Automatic typecheck19:140 TS2322 Type 'string' is not assignable to type 'ObjectFit'. No assertion corrections/retests; full suite awaits stop resolution. Report REVIEW_FEED_MEDIA_HEIGHT_STOP_REPORT.md.
+- [ ] STOP: reviewFeedMediaSizing.test.tsx:67:39 (two photo cases) and80:65 (carousel): AssertionError expected undefined to be ''. Three assertions remain untouched. Mock-only type fix uses React.CSSProperties['objectFit']; automatic build OK11:25:39Z and video-only targeted1/1 pass (10 skipped). Last full4618 passed/3 pre-existing failures/4621 across469; inventory unchanged. Report REVIEW_FEED_MEDIA_HEIGHT_STOP_REPORT.md.
 - [ ] Measure4:5 review/normal at390x844 after stop resolution; no browser measurement claimed. Prior ST5 sheetTopV5 failure remains untouched.
 
 ## ST5 — Settings Your data
 - [x] Add the connection/total-gated rounds row and signed-off export sheet between Account and Friends.
 - [x] Add only email-my-rounds, caller-owned CSV email and ten-minute sent suppression; preserve existing functions and SQL. Required RESEND_API_KEY saved securely.
 - [x] Add 19 UI and 13 CSV regressions; targeted 105/106 across7 files. No existing tests changed.
-- [ ] STOP: sheetTopV5.test.tsx:12, retained account vocabulary rules > no component renders "Your rounds" as a door: AssertionError expected new ST5 test's literal selector grep hit to be ''. No assertion changes/retests after failure. Full suite and browser checks not run; last green4,579/466, candidate4,611/468. Await authorisation to correct the new test selector only.
+- [x] ST5.1 clears vocabulary stop by authorised case19 deletion and dialog assertion move into case7; unchanged sheetTopV5 passes2/2. Full4618 passed/3 pre-existing review-media failures/4621 total across469; ST5-only addition31 reconciled in ST5_REPORT.md.
 - [x] Remove the only remaining root ST2/ST3/ST4 report, ST3_ST4_SETTINGS_REPORT.md.
 - [ ] Live authenticated email/summary verification unavailable: external_unmanaged. No real email sent or delivery claimed.
 

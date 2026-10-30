@@ -1,4 +1,4 @@
-# ST5 — Your data: stop report
+# ST5 — Your data report
 
 ## Result and diff
 - Added Your data between Account and Friends. Its Rounds row uses `useMemberRoundTotal`, and is absent without a settled live connection or positive successful total.
@@ -24,7 +24,7 @@ AssertionError: expected 'src/test/st5SettingsYourData.test.tsx…' to be '' // 
 - Expected
 + Received
 
-+ src/test/st5SettingsYourData.test.tsx:35:  it('never uses Your rounds as a door label', () => { const { container } = mount(); open(); expect(container.querySelector('[label="Your rounds"]')).toBeNull(); expect(document.querySelector('[label="Your rounds"]')).toBeNull(); expect(screen.getByRole('dialog', { name: 'Your rounds' })).toBeInTheDocument(); });
++ src/test/st5SettingsYourData.test.tsx:35: removed case's selector assertions matched the vocabulary scan. Historical assertions are quoted with escaped double quotes in the ST5.1 section below.
 ```
 
 The standing grep scans tests as well as application code. The new test's literal selector is itself a match; the new application renders the phrase as a sheet title, not a door label. No test or application correction and no rerun occurred after the failure. `sheetTopV5.test.tsx` is unchanged. No pre-existing failures were observed; all earlier Settings cases and all 32 new ST5 cases passed. The former review-confirmation failure was cleared before this task (last reported full green below), not a current pre-existing failure.
@@ -98,3 +98,25 @@ Latest observed automatic build: **build OK, 2026-10-30T10:58:28Z**. No manual b
 Browser checks were not run after the test stop. Authenticated summary/email/readback checks are unavailable for this externally managed Supabase project; no actual email was sent, no inbox delivery or deployed-function version is claimed. CSV helper tests do not independently verify hosted authentication, log permissions or Resend delivery.
 
 No SQL, migrations, migration files, existing edge functions, deployed RPCs, feed_config, round_pool_cap or native/Median configuration were changed. Cap remains 30.
+
+## ST5.1 — Authorised correction
+- Deleted case19, `never uses Your rounds as a door label`:19 →18 cases in `src/test/st5SettingsYourData.test.tsx`.
+- Removed redundant assertions (double quotes escaped to avoid preserving the forbidden literal): `expect(container.querySelector('[label=\u0022Your rounds\u0022]')).toBeNull()` and `expect(document.querySelector('[label=\u0022Your rounds\u0022]')).toBeNull()`. The unchanged `sheetTopV5.test.tsx` already owns this app-wide rule.
+- Moved `expect(screen.getByRole('dialog', { name: 'Your rounds' })).toBeInTheDocument()` unchanged from case19 into case7, `reads the three facts only when opened, with no header action`; all other case7 assertions retained.
+- Renamed this report from `ST5_YOUR_DATA_STOP_REPORT.md` to `ST5_REPORT.md`; removed its historical literal selector text too, so the source and report cannot self-match.
+- Full command: `bunx vitest run --maxWorkers=2`. **4,618 passed /3 pre-existing failures /4,621 executed across469 files** (468 passed/1 failed). Duration744.79s. ST5 UI18/18, CSV13/13, and unchanged `sheetTopV5.test.tsx`2/2 all pass. No new failures.
+- Expected ST5-only inventory:4,610 across468 files =4,579 +18 UI +13 CSV. The intervening review-media task added11 cases in one file, so current whole-project candidate inventory is4,621 across469 files, not4,610/468; those tests are not removed or altered here.
+- Known pre-existing review-media failures: `reviewFeedMediaSizing.test.tsx:67:39`, photo1080x1350 and1920x1005; `:80:65`, carousel. Each reported `AssertionError: expected undefined to be '' // Object.is equality`. Its mock also reported `:19:140 TS2322: Type 'string' is not assignable to type 'ObjectFit'.` No permission was given to change that file.
+- ST5.1 files changed: `src/test/st5SettingsYourData.test.tsx`, renamed `ST5_REPORT.md`, and `roadmap.md`. No application or service code changed.
+
+### Final full-suite failure inventory
+All three failures predate ST5.1 and remain untouched in `src/test/reviewFeedMediaSizing.test.tsx`, suite `shared feed media sizing`:
+1. `review photo 1080x1350 uses intrinsic ratio 0.8 and shared cap`, line67:39.
+2. `review photo 1920x1005 uses intrinsic ratio 1.91 and shared cap`, line67:39.
+3. `review carousel receives the shared viewport cap without an outer square frame`, line80:65.
+
+Each emits exactly `AssertionError: expected undefined to be '' // Object.is equality`. The earlier ST5 vocabulary failure now passes; no review-confirmation failure or other failing case was reported. The prior review-media mock type error is separately known, not a Vitest failure, and was not changed by this test-only task.
+
+Count reconciliation: previous whole-project candidate4,622/469 minus the one authorised removed ST5 case = **4,621/469**. Against last full green4,579/466: +18 ST5 UI +13 ST5 CSV +11 intervening review-media cases =+42 cases/+3 files. Of those,4,610 tests across468 files outside the review-media file pass; the additional review-media file contributes8 passing/3 failing cases. No exclusions or filters were used.
+
+The exact unescaped forbidden selector text was absent from the repository text scan (including hidden files, excluding dependency/generated output and Git metadata). Historical removed assertions above use Unicode escapes to preserve their meaning without reintroducing the self-match. `sheetTopV5.test.tsx` was not edited.
