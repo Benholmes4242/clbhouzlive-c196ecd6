@@ -79,6 +79,9 @@ export function useToggleFollow() {
     },
 
     onMutate: async (params) => {
+      // Guest taps are gated in mutationFn; never optimistically patch for
+      // a guest (the join card opened instead).
+      if (getGuestUser()) return { wasFollowing: params.isFollowing };
       const next = !params.isFollowing;
 
       // Cancel only the canonical follow-status key for this target — broad
