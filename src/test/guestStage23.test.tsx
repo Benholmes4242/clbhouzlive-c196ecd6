@@ -32,6 +32,9 @@ import { getDocumentScrollParent, __resetScrollerCache } from '@/lib/getScrollPa
 import { useGuestSheetScrollGate } from '@/features/guest/useGuestSurfaceGate';
 import { courseSurfaceKey, getGuestCardRequest, isSurfaceLocked, lockSurface, resetGuestGateState } from '@/features/guest/guestGateStore';
 import { GuestSessionHold } from '@/features/guest/GuestSessionHold';
+import { GuestGateHost } from '@/features/guest/GuestGateHost';
+import { openGuestCard, registerGuestCourseSheet, useGuestCourseSheetOpen } from '@/features/guest/guestGateStore';
+import { useNavigate } from 'react-router-dom';
 import { __resetGuestSignIn, GUEST_SIGN_IN_TIMEOUT_MS } from '@/features/guest/guestSession';
 
 function makeScroller(scrollHeight: number, clientHeight: number) {
@@ -113,5 +116,28 @@ describe('Stage 2.3 §3 — the hold cannot hang', () => {
     act(() => { vi.advanceTimersByTime(GUEST_SIGN_IN_TIMEOUT_MS); });
     await act(async () => { h.resolve?.({ data: { session: {} }, error: null }); await Promise.resolve(); await Promise.resolve(); });
     expect(h.signOut).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('Stage 2.3 — leaving a locked course clears its card; raise only with a sheet', () => {
+  it('a course scroll card is cleared when another tab is opened', () => {
+    let go: (p: string) => void = () => {};
+    const Nav = () => { const n = useNavigate(); go = n; return null; };
+    lockSurface(courseSurfaceKey('c6'));
+    openGuestCard({ kind: 'scroll', surface: courseSurfaceKey('c6') });
+    render(<MemoryRouter initialEntries={['/courses/c6']}><Nav /><GuestGateHost /></MemoryRouter>);
+    expect(document.querySelector('[data-guest-gate-card]')).not.toBeNull();
+    act(() => go('/tourhub'));
+    expect(getGuestCardRequest()).toBeNull();
+    expect(document.querySelector('[data-guest-gate-card]')).toBeNull();
+  });
+  it('the raised layer is on only while a course sheet is registered', () => {
+    const { result } = renderHook(() => useGuestCourseSheetOpen());
+    expect(result.current).toBe(false);
+    let release: () => void = () => {};
+    act(() => { release = registerGuestCourseSheet(); });
+    expect(result.current).toBe(true);
+    act(() => release());
+    expect(result.current).toBe(false);
   });
 });
