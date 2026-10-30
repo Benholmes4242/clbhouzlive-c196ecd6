@@ -4,7 +4,8 @@
 - [x] Fix peekGuestConversion surface; AuthForm independent of guest code when off, fault-safe when on; link/email-change conversion.
 - [x] Gate feed/report/claim/route doors and like/comment writes; RootGate guest logic extracted; 23 new tests.
 - [x] Read-only server audit in GUEST_STAGE1_REPORT.md.
-- [ ] BLOCKED (stop rule): gateScopeSwitch.test.tsx fails because useIsGuest reads the session with the switch off; proposed code-only fix awaits approval.
+- [x] useIsGuest and the guest store no longer touch auth when the switch is off; gateScopeSwitch passes unchanged.
+- [ ] Sheet styles: ep52SheetsCropperCoach parent assertion awaits an authorised test change.
 
 ## Review media — Authorised test corrections and finish
 - [x] Apply only the authorised absent-ratio assertions and optional objectFit mock type; no visual changes.
