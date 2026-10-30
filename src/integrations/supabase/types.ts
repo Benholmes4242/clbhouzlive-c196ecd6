@@ -10494,6 +10494,30 @@ export type Database = {
           },
         ]
       }
+      round_exports: {
+        Row: {
+          id: number
+          requested_at: string
+          rounds: number | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          id?: number
+          requested_at?: string
+          rounds?: number | null
+          status: string
+          user_id: string
+        }
+        Update: {
+          id?: number
+          requested_at?: string
+          rounds?: number | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       round_weather: {
         Row: {
           fetched_at: string
@@ -20241,6 +20265,27 @@ export type Database = {
           website_url: string
         }[]
       }
+      export_my_rounds: {
+        Args: never
+        Returns: {
+          adjusted_gross: number
+          competition: boolean
+          counted: boolean
+          country: string
+          course: string
+          course_handicap: number
+          course_rating: number
+          differential: number
+          gross: number
+          hole_scores: Json
+          holes_played: number
+          index_at_time: number
+          net: number
+          play_date: string
+          slope_rating: number
+          stableford: number
+        }[]
+      }
       fetch_social_feed_posts: {
         Args: {
           current_offset: number
@@ -25072,6 +25117,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      my_rounds_export_summary: { Args: never; Returns: Json }
       name_coach: {
         Args: {
           p_business_id: string
