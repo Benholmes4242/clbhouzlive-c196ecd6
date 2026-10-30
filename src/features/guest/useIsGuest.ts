@@ -12,6 +12,10 @@ export function isGuestUser(user: User | null | undefined): boolean {
 }
 
 export function useIsGuest(): boolean {
+  // Switch off: never read the session. GUEST_BROWSING_ENABLED is a module
+  // constant, so this branch is fixed for the app's life and hook order holds.
+  if (!GUEST_BROWSING_ENABLED) return false;
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { user } = useSupabaseSession();
-  return GUEST_BROWSING_ENABLED && isGuestUser(user);
+  return isGuestUser(user);
 }

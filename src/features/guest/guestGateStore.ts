@@ -124,7 +124,8 @@ export function useGuestCardRequest(): GuestCardRequest | null {
 // Current user mirror (for non-React writers)
 // ---------------------------------------------------------------------------
 let currentUser: User | null = null;
-try {
+// Switch off: no auth subscription at all.
+if (GUEST_BROWSING_ENABLED) try {
   supabase.auth.onAuthStateChange((_event, session) => {
     currentUser = session?.user ?? null;
   });

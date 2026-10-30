@@ -1,7 +1,6 @@
-# GUEST BROWSING — Stage 1 + "The sign-in" correction — STOP REPORT
+# GUEST BROWSING — Stage 1 + "The sign-in" correction — DONE
 
-Status: **STOPPED** on one unexpected full-suite failure (section 6). Everything
-else in both briefs is built. The switch `GUEST_BROWSING_ENABLED` is `false`.
+Status: **Stage 1 done** (section 8 clears the section 6 stop). The switch `GUEST_BROWSING_ENABLED` is `false`.
 No SQL, no migrations, no server/edge/feed_config/native changes.
 
 ## 1. The sign-in break
@@ -162,3 +161,17 @@ No pre-existing failures were observed.
 
 Not verified: a real native cold start, real anonymous sign-in and real
 identity linking (the switch is off and anonymous sign-in is a server setting).
+
+## 8. The last failure — fixed (approved code change, no test edits)
+- `src/features/guest/useIsGuest.ts`: switch off → returns false before calling `useSupabaseSession` (module constant, stable hook order).
+- `src/features/guest/guestGateStore.ts`: same fault found — it subscribed to `onAuthStateChange` at module load even when off. Now subscribes only when the switch is on.
+- Checked and already fine with the switch off (all derive from `useIsGuest`/`getGuestUser`, no session read, render nothing): `useGuestActionGate` (incl. `useGuestSheetGate`, `gateGuestActionNow`, `assertNotGuestWrite`), `useGuestSurfaceGate` / `useGuestClubhouseGate` / `useGuestScrollGate`, `GuestGateHost`, `GuestRouteGuard`, `guestSession` (bootstrap returns early), `guestConversion`, `guestAnalytics`, `guestCopy`.
+- New test `src/test/guestSwitchOff.test.tsx` (2): useIsGuest off never reads the session; the store never subscribes to auth.
+
+`gateScopeSwitch.test.tsx` passes unchanged (3/3).
+
+Full suite, shards 1–3 (`--maxWorkers=2`): 1,534/1,535 · 1,419/1,419 · 1,717/1,717 = 4,670 passed of 4,671 across 473 files, plus `guestSwitchOff` 2/2 (it landed in shard 1, which began before the file was written; run on its own) → **4,673 tests across 474 files, 4,672 passed.**
+Against 4,667/472: +3 `bizcSheetRoot.test.tsx` and +1 st3 case (sheet-styles fix), +2 `guestSwitchOff.test.tsx`.
+The one failure is outside guest: `ep52SheetsCropperCoach.test.tsx` "BizcSheet renders into document.body, not inside .ep-body". It comes from the sheet-styles fix and is waiting on its authorised test change (see EP52_SHEET_STYLES_STOP_REPORT.md). Every guest file passes.
+
+Files changed this step: src/features/guest/useIsGuest.ts, src/features/guest/guestGateStore.ts, src/test/guestSwitchOff.test.tsx (new), GUEST_STAGE1_REPORT.md.
