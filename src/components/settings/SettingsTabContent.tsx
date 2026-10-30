@@ -9,6 +9,8 @@ import { useWhsConnection } from '@/lib/whs/hooks';
 import { SettingsHandicapCard } from './SettingsHandicapCard';
 import { SettingsPrivacyCard } from './SettingsPrivacyCard';
 import { SettingsNotificationsCard } from './SettingsNotificationsCard';
+import { SettingsYourData } from './SettingsYourData';
+import { maskEmail } from './maskEmail';
 
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -41,12 +43,6 @@ import { useLogout } from '@/hooks/useLogout';
 
 const APP_VERSION = '1.0.0';
 
-function maskEmail(email: string): string {
-  const [local, domain] = email.split('@');
-  if (!domain) return email;
-  const visible = local.slice(0, 2);
-  return `${visible}${'\u2022'.repeat(Math.max(2, local.length - 2))}@${domain}`;
-}
 
 /**
  * Settings content for the Manage Profile -> Settings tab.
@@ -194,6 +190,8 @@ export function SettingsTabContent() {
           {row('Businesses', '/businesses/manage', count ? `${count} ${count === 1 ? 'profile' : 'profiles'}` : 'Set one up', !count)}
           {row('Verification', '/manage/contact?category=account&subject=Verification%20enquiry', 'How it works')}
         </div>
+
+        <SettingsYourData userId={user?.id} email={user?.email} connected={!!whsConnection && !!connectionFetched && !connectionError} />
 
         {/* Friends */}
         <div className="ep-group">Friends</div>
