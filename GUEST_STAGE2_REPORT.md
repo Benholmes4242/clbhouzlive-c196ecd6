@@ -282,3 +282,37 @@ Every case asserts the full navigation list (never more than one). Only test-fil
 
 ### Preview taps (390×844, guest)
 Card "Log in", card "Continue with email", island "Log in", island "Join free → Continue with email": each reached /auth with the guest session intact, Back returned to /courses, no page errors. Screenshots: /tmp/browser/s26/shots/. Live Apple/Google conversion needs the native app (not testable here).
+
+---
+
+## Stage 2.7 — the Clubhouse never locked on a phone
+
+### Cause (confirmed)
+`useGuestClubhouseGate` observed one `[data-card-index="3"]` node; the virtualised feed replaces item nodes, so on a phone (fourth post off screen at first paint) the observer watched a detached node and never fired.
+
+### Fix (`src/features/guest/useGuestSurfaceGate.ts`)
+- New pure check `clubhouseShouldLock()`: locks when the top of any rendered post with `data-card-index >= 3` is above the viewport bottom (in view, or already flung past), read from the nodes that exist at that moment.
+- Checked on every scroll (one `document` listener, `{ capture: true, passive: true }`, throttled to one check per animation frame), once after mount, and on feed changes (a MutationObserver on `#root` that only schedules the same check — no node is held).
+- Single-node IntersectionObserver and its MutationObserver pair removed. Listener, observer and pending frame are cleaned up on unmount and once locked.
+- Returning to a locked Clubhouse: the hook's locked branch now re-opens the scroll card (if none is open) instead of returning silently; `GuestGateHost` already did this too, so both agree.
+
+### Tests
+Removed (rewritten rule): `guestScrollLockShortPage.test.tsx` › "useGuestClubhouseGate › still locks when the fourth post enters the viewport" — asserted `expect(observed[0]?.getAttribute('data-card-index')).toBe('3')` and locking on an IntersectionObserver callback. It encoded the single-node observer this brief removes; its locking behaviour is covered by the new cases below.
+
+Added, `src/test/guestStage27.test.tsx` (+5):
+- the node carrying index 3 is replaced after mount, then scrolled into view: it locks
+- a fling where index 3 never renders but index 6 is in view: it locks
+- at the top of the feed, with only posts 0 to 2 in view: no lock
+- a member never locks
+- returning to a locked Clubhouse shows the card
+
+Added, `src/test/guestStage27SwitchOff.test.tsx` (+1, own file because it needs the switch mocked off): the switch off never locks the Clubhouse.
+
+Suite (`--maxWorkers=2`, two shards): 2,328 + 2,409 = **4,737/4,737 across 484 files**. Against 4,732/482: −1 removed + 6 added = +5 tests; +2 files.
+
+### Proof (preview, real guest, 390×844, fresh browser each run, starting at the top of the feed)
+- Slow scroll (60px steps): at start only posts 0 (top 72px) and 1 were in view; locked at step 11 with post 1 at −259px, post 2 at 404px and the fourth post's top at 794px (just inside the 844px viewport). Further wheel input left every post exactly where it was — the feed stopped. Screenshot `/tmp/browser/s27/shots/1_slow_lock.png`: the Sunningdale review and the card risen over the next round.
+- Fresh window, hard fling (10 × 4,000px): locked; posts 7 and 8 were the ones rendered. `2_fling.png`.
+- Explore (/amateur) then back to Clubhouse: the card was there. `3_return.png`.
+- The four 2.4 sign-in taps (card Log in, card Continue with email, island Log in, island Join free → email): each reached /auth with the guest session intact, Back returned to /courses, no page errors. `/tmp/browser/s27b/shots/`.
+Not tested: a real iPhone (Safari momentum scrolling); worth Ben repeating his test.
