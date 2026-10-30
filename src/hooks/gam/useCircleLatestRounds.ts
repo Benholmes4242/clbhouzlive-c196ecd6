@@ -215,6 +215,7 @@ export function useCircleLatestRounds(
   }: Options = {},
 ) {
   const courseFilter = courseIds == null ? null : Array.from(new Set(courseIds)).sort();
+  const isGuest = useIsGuest();
   return useQuery({
     queryKey: [
       'circle-latest-rounds',
