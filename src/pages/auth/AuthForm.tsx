@@ -121,6 +121,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
         if (shouldLink) {
           const linked = await supabase.auth.linkIdentity({ provider, token });
           if (!linked.error) {
+            // Stage 2.5: claim navigation before the refresh turns the guest
+            // into a member, so Auth's redirect never fires mid-conversion.
+            onWillNavigate?.();
             await refreshGuestConversion(true);
             return { data: linked.data, error: null, linked: true };
           }
@@ -128,9 +131,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
         }
       }
       const res = await supabase.auth.signInWithIdToken({ provider, token });
+      // Stage 2.5: a member session has arrived; claim navigation before the
+      // handler's awaited writes (Apple name persist, Google avatar harvest).
+      if (!res.error && res.data?.session) onWillNavigate?.();
       return { ...res, linked: false };
     },
-    [],
+    [onWillNavigate],
   );
 
   const trackGuestConversionIfPending = useCallback(
