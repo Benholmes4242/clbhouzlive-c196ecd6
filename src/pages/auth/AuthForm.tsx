@@ -27,6 +27,7 @@ import {
 } from '@/features/guest/guestConversion';
 import { getGuestUser } from '@/features/guest/guestGateStore';
 import { trackGuestConverted } from '@/features/guest/guestAnalytics';
+import { GUEST_BROWSING_ENABLED } from '@/features/guest/guestConfig';
 
 type AppleClaims = {
   aud?: string;
@@ -89,13 +90,38 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
   // falls back to a normal sign-in so the flow still completes. Email OTP
   // cannot link — it signs the email user in, replacing the guest session.
   const guestAutoStarted = useRef(false);
+  const emailLinkModeRef = useRef(false);
 
+  /** True only when the switch is on, the card handed off (?guest=1) and the
+   *  current session is anonymous. Never throws. */
+  const isGuestConverting = (): boolean => {
+    if (!GUEST_BROWSING_ENABLED) return false;
+    try {
+      return searchParams.get('guest') === '1' && Boolean(getGuestUser());
+    } catch (err) {
+      console.warn('[guest-convert] guest check failed:', err);
+      return false;
+    }
+  };
+
+  // The sign-in path never depends on guest code: with the switch off both
+  // helpers short-circuit before touching any guest module, and with it on a
+  // fault in guest bookkeeping is logged and swallowed so sign-in still
+  // navigates.
   const signInOrLinkIdToken = useCallback(
     async (provider: 'apple' | 'google', token: string) => {
-      if (peekGuestConversion().guestUserId && getGuestUser()) {
-        const linked = await supabase.auth.linkIdentity({ provider, token });
-        if (!linked.error) return { data: linked.data, error: null, linked: true };
-        console.warn(`[guest-convert] linkIdentity(${provider}) failed, falling back to sign-in:`, linked.error.message);
+      if (GUEST_BROWSING_ENABLED) {
+        let shouldLink = false;
+        try {
+          shouldLink = Boolean(peekGuestConversion().guestUserId && getGuestUser());
+        } catch (err) {
+          console.warn('[guest-convert] guest check failed, signing in normally:', err);
+        }
+        if (shouldLink) {
+          const linked = await supabase.auth.linkIdentity({ provider, token });
+          if (!linked.error) return { data: linked.data, error: null, linked: true };
+          console.warn(`[guest-convert] linkIdentity(${provider}) failed, falling back to sign-in:`, linked.error.message);
+        }
       }
       const res = await supabase.auth.signInWithIdToken({ provider, token });
       return { ...res, linked: false };
@@ -105,10 +131,15 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
   const trackGuestConversionIfPending = useCallback(
     (method: 'apple' | 'google' | 'email' | 'login', linked: boolean) => {
-      const conv = peekGuestConversion();
-      if (!conv.guestUserId) return;
-      trackGuestConverted({ method, linked, surface: conv.surface, guestUserId: conv.guestUserId });
-      clearGuestConversion();
+      if (!GUEST_BROWSING_ENABLED) return;
+      try {
+        const conv = peekGuestConversion();
+        if (!conv.guestUserId) return;
+        trackGuestConverted({ method, linked, surface: conv.surface, guestUserId: conv.guestUserId });
+        clearGuestConversion();
+      } catch (err) {
+        console.warn('[guest-convert] conversion tracking failed:', err);
+      }
     },
     [],
   );
@@ -155,6 +186,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
     sendStartRef.current = Date.now();
 
     try {
+      // GUEST §6 email join: put the email on the anonymous user so the id is
+      // kept; if it already belongs to an account, the normal email sign-in.
+      emailLinkModeRef.current = false;
+      if (GUEST_BROWSING_ENABLED && isGuestConverting()) {
+        const linkRes = await supabase.auth.updateUser({ email: normalised });
+        if (!linkRes.error) {
+          emailLinkModeRef.current = true;
+          trackAuthInitiated('email', Date.now() - sendStartRef.current);
+          trackSignupInitiated('email');
+          setEmailState(normalised);
+          setResendCooldown(RESEND_COOLDOWN_SECONDS);
+          setSubmittingMethod(null);
+          return true;
+        }
+        console.warn('[guest-convert] updateUser(email) failed, using normal email sign-in:', linkRes.error.message);
+      }
       const { error } = await supabase.auth.signInWithOtp({
         email: normalised,
         options: { shouldCreateUser: true },
@@ -218,10 +265,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
     const start = Date.now();
 
     try {
+      // A guest who joined by email confirms the change on the anonymous user.
+      const emailLinked = GUEST_BROWSING_ENABLED && emailLinkModeRef.current;
       const { data, error } = await supabase.auth.verifyOtp({
         email: email.trim().toLowerCase(),
         token,
-        type: 'email',
+        type: emailLinked ? 'email_change' : 'email',
       });
 
       if (error) {
@@ -246,8 +295,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
       if (data?.session?.user) {
         trackLoginSuccess('email', Date.now() - start);
-        // Email OTP cannot link — a converting guest's session is replaced.
-        trackGuestConversionIfPending('email', false);
+        // Linked (updateUser) keeps the guest id; otherwise the session is replaced.
+        trackGuestConversionIfPending('email', emailLinked);
         // Confirmation time covers a signup even when the email code was requested much earlier.
         if (isNewSignup(data.user)) {
           trackSignupSuccess('email', Date.now() - start);
@@ -511,10 +560,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
   // Apple and Google start their native sheets immediately (one tap in the
   // card, one native prompt — no second tap on the auth screen). Email stays
   // on the hero, where the email field already lives.
-  const guestStart = searchParams.get('guest') === '1' ? searchParams.get('start') : null;
+  const guestStart =
+    GUEST_BROWSING_ENABLED && searchParams.get('guest') === '1' ? searchParams.get('start') : null;
   useEffect(() => {
     if (!guestStart || guestAutoStarted.current) return;
-    if (!getGuestUser()) return;
+    if (!isGuestConverting()) return;
     guestAutoStarted.current = true;
     if (guestStart === 'apple') handleAppleSignIn();
     else if (guestStart === 'google') handleGoogleSignIn();

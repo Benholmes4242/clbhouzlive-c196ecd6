@@ -4,7 +4,8 @@
  * card, tracks guest_gate_shown with trigger 'action', and returns true so
  * the caller stops — NOTHING is written. Members get false and act as today.
  */
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
+import { GUEST_BROWSING_ENABLED } from './guestConfig';
 import { useLocation } from 'react-router-dom';
 import { useIsGuest } from './useIsGuest';
 import {
@@ -43,4 +44,36 @@ export function useGuestActionGate() {
     },
     [isGuest, location.pathname],
   );
+}
+
+/**
+ * Sheet form (report, claim): a guest who reaches a sheet that writes never
+ * sees it — the sheet asks to close and the action card opens instead. With
+ * the switch off this returns `open` untouched and runs nothing.
+ */
+export function useGuestSheetGate(open: boolean, close: () => void, action: GuestAction): boolean {
+  const blocked = GUEST_BROWSING_ENABLED && open && getGuestUser() !== null;
+  useEffect(() => {
+    if (!blocked) return;
+    close();
+    gateGuestActionNow(action);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blocked]);
+  return open && !blocked;
+}
+
+/** Thrown from a mutation's onMutate when a guest reaches a write; the
+ *  action card is already open and nothing is sent. */
+export class GuestGatedError extends Error {
+  constructor(action: GuestAction) {
+    super(`guest_gated:${action}`);
+    this.name = 'GuestGatedError';
+  }
+}
+
+/** Write-layer backstop for mutations: opens the card and throws so the
+ *  mutationFn never runs. No-op for members and with the switch off. */
+export function assertNotGuestWrite(action: GuestAction, ctx: GuestActionContext = {}): void {
+  if (!GUEST_BROWSING_ENABLED) return;
+  if (gateGuestActionNow(action, ctx)) throw new GuestGatedError(action);
 }

@@ -1,6 +1,6 @@
 import { applyMemberGolfQueryDefaults } from '@/lib/memberDataFreshness';
 import { useVideoWakeLock } from '@/video/useVideoWakeLock';
-import React, { Suspense, useEffect, useLayoutEffect, useMemo, useState } from "react";
+import React, { Suspense, useEffect, useLayoutEffect, useMemo } from "react";
 import { trackedLazy } from '@/perf/navTiming';
 // Shadow React.lazy so EVERY route-level lazy import is automatically tracked
 // for nav-timing chunk-fetch ms. trackedLazy falls back to React.lazy when
@@ -45,7 +45,7 @@ import BootHold from "@/components/BootHold";
 import { hasStoredSession } from "@/utils/auth/hasStoredSession";
 import { PAGE_CANVAS } from "@/lib/tokens/surfaces";
 import { GUEST_BROWSING_ENABLED } from '@/features/guest/guestConfig';
-import { trackGuestSessionFailed, trackGuestSessionStarted } from '@/features/guest/guestAnalytics';
+import { signedOutOutcome, useGuestSessionBootstrap } from '@/features/guest/guestSession';
 import { GuestGateHost } from '@/features/guest/GuestGateHost';
 import { GuestRouteGuard } from '@/features/guest/guestRoutes';
 
@@ -220,29 +220,7 @@ const RootGate: React.FC = () => {
   // session, sign in anonymously ONCE and render the Clubhouse instead of
   // redirecting to /auth. While the call is in flight the existing canvas
   // hold shows; if it fails, today's /auth redirect takes over.
-  const [guestAttempt, setGuestAttempt] = useState<'idle' | 'pending' | 'failed'>('idle');
-  useEffect(() => {
-    if (!GUEST_BROWSING_ENABLED) return;
-    if (envStatus !== 'native') return;
-    if (authLoading || user) return;
-    if (hasStoredSession()) return;
-    if (guestAttempt !== 'idle') return;
-    setGuestAttempt('pending');
-    supabase.auth
-      .signInAnonymously()
-      .then(({ error }) => {
-        if (error) {
-          trackGuestSessionFailed(error.message || 'anonymous_sign_in_failed');
-          setGuestAttempt('failed');
-        } else {
-          trackGuestSessionStarted();
-        }
-      })
-      .catch((err: unknown) => {
-        trackGuestSessionFailed(err instanceof Error ? err.message : 'anonymous_sign_in_failed');
-        setGuestAttempt('failed');
-      });
-  }, [envStatus, authLoading, user, guestAttempt]);
+  const guestAttempt = useGuestSessionBootstrap({ envStatus, authLoading, hasUser: !!user });
 
   if (envStatus === 'pending') return <BootHold />;
   if (envStatus === 'web') return <AppDownloadGate />;
@@ -262,10 +240,12 @@ const RootGate: React.FC = () => {
   if (!user) {
     // Guest browsing: hold the canvas while the anonymous session is minted.
     if (
-      GUEST_BROWSING_ENABLED &&
-      envStatus === 'native' &&
-      guestAttempt !== 'failed' &&
-      !hasStoredSession()
+      signedOutOutcome({
+        enabled: GUEST_BROWSING_ENABLED,
+        envStatus,
+        guestAttempt,
+        stored: hasStoredSession(),
+      }) === 'hold'
     ) {
       return (
         <div

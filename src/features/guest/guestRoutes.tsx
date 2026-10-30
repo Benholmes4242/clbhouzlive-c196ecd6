@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { GUEST_BROWSING_ENABLED } from './guestConfig';
 import { useIsGuest } from './useIsGuest';
-import { openGuestCard, surfaceForPath } from './guestGateStore';
+import { openGuestCard, surfaceForPath, type GuestAction } from './guestGateStore';
 import { trackGuestGateShown } from './guestAnalytics';
 
 export function isGuestAllowedPath(pathname: string): boolean {
@@ -29,28 +29,43 @@ export function isGuestAllowedPath(pathname: string): boolean {
   return false;
 }
 
+/** The action a blocked route stands for, so the card reads the right copy. */
+export function guestActionForPath(pathname: string): GuestAction {
+  if (/^\/courses\/[^/]+\/rate\/?$/.test(pathname) || pathname.startsWith('/rate-course')) return 'rate';
+  if (pathname === '/profile' || pathname.startsWith('/edit-profile') || pathname === '/settings') return 'own_profile';
+  if (pathname === '/manage/handicap' || pathname.startsWith('/connect')) return 'connect_handicap';
+  if (pathname.startsWith('/messages') || pathname.startsWith('/messaging')) return 'message';
+  if (pathname.startsWith('/business/create') || pathname.startsWith('/claim')) return 'claim_course';
+  return 'other';
+}
+
+// The last route a guest was allowed on, so a blocked route opens the card
+// "on the current page" — the guest is put back where they tapped.
+let lastAllowedPath: string = '/';
+
 /**
  * Mounted once above the routes. When a guest lands on a route outside the
  * free-look surfaces, the action card opens and the guest is returned to the
- * Clubhouse — the card, not the route, is the answer.
+ * page they came from (the Clubhouse on a cold deep link) — the card, not
+ * the route, is the answer.
  */
 export function GuestRouteGuard() {
   const isGuest = useIsGuest();
   const location = useLocation();
   const blocked = isGuest && !isGuestAllowedPath(location.pathname);
+  if (isGuest && !blocked) lastAllowedPath = location.pathname + location.search + location.hash;
 
   useEffect(() => {
     if (!blocked) return;
-    trackGuestGateShown({
-      surface: surfaceForPath(location.pathname),
-      trigger: 'action',
-      action: 'other',
-    });
-    openGuestCard({ kind: 'action', surface: surfaceForPath(location.pathname), action: 'other' });
+    const back = lastAllowedPath;
+    const surface = surfaceForPath(back.split(/[?#]/)[0]);
+    const action = guestActionForPath(location.pathname);
+    trackGuestGateShown({ surface, trigger: 'action', action });
+    openGuestCard({ kind: 'action', surface, action });
   }, [blocked, location.pathname]);
 
   if (!blocked) return null;
-  return <Navigate to="/" replace />;
+  return <Navigate to={lastAllowedPath} replace />;
 }
 
 export default GuestRouteGuard;

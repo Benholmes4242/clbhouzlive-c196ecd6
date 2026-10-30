@@ -17,6 +17,7 @@ import { useReactionPostIds } from '@/components/explore-tab-new/courseled/hooks
 import { commentsKeys, commentsScope, viewerId } from '@/lib/queryKeys';
 import { resolveReactionActor, isReactionByActor } from '@/lib/reactionActor';
 import { visibleCommentCount, hiddenCommentCount } from '../lib/threadCounts';
+import { assertNotGuestWrite } from '@/features/guest/useGuestActionGate';
 
 /**
  * 'tour_story' | 'amateur_story' (BRIEF_STORY_ENGAGEMENT §S5). Both story beats
@@ -425,6 +426,8 @@ export function useCommentsV2({
       actorType?: 'personal' | 'business';
       actorId?: string;
     }) => {
+      // GUEST §5 backstop: a guest's comment never reaches add_comment_v2.
+      assertNotGuestWrite('comment');
       const { data, error } = await supabase.rpc('add_comment_v2', {
         p_target_type: targetType,
         p_target_id: targetId,

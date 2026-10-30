@@ -28,6 +28,7 @@ import { reactionGlyph, ReactionGlyph, AMBER } from '@/lib/reactionKind';
 import { PostOwnerMenu } from '@/components/posts/PostOwnerMenu';
 import { useManageableBusinessIds, useTeamBusinessIds } from '@/hooks/useManageableBusinessIds';
 import { canManagePost } from '@/lib/canManagePost';
+import { gateGuestActionNow } from '@/features/guest/useGuestActionGate';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FeedCommentPreview } from '@/components/feed/FeedCommentPreview';
 import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
@@ -283,9 +284,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   liked,
   likeCount,
   commentCount,
-  onLike,
-  onComment,
-  onShare,
+  onLike: onLikeProp,
+  onComment: onCommentProp,
+  onShare: onShareProp,
   onOpenMedia,
   onProfile,
   onReviewTap,
@@ -296,7 +297,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   initialMediaIndex: initialMediaIndexProp,
   carouselRestoreTab,
   onCarouselIndexChange,
-  onFollow,
+  onFollow: onFollowProp,
   currentUserId,
   feedIndex,
   isFirstCard = false,
@@ -316,6 +317,28 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   homeRoundPlot = false,
   layout = 'standard',
 }) => {
+  // GUEST §5: every like, comment (footer glyph, preview row and the
+  // "Add a comment…" row), share and follow door on the card passes through
+  // here; a guest gets the action card and the caller's handler never runs.
+  // Members (and the switch off) reach the original handlers unchanged.
+  const guestCtx = {
+    firstName: post.displayName?.trim().split(/\s+/)[0] || undefined,
+    postKind: (post.isReview ? 'review' : postRound || postRoundPending ? 'round' : 'post') as 'post' | 'round' | 'review',
+  };
+  const onLike: FeedCardProps['onLike'] = (p, a) => {
+    if (!gateGuestActionNow('like', guestCtx)) onLikeProp(p, a);
+  };
+  const onComment: FeedCardProps['onComment'] = (p, a, s) => {
+    if (!gateGuestActionNow('comment', guestCtx)) onCommentProp(p, a, s);
+  };
+  const onShare: FeedCardProps['onShare'] = (p) => {
+    if (!gateGuestActionNow('share', guestCtx)) onShareProp(p);
+  };
+  const onFollow: FeedCardProps['onFollow'] = onFollowProp
+    ? (p) => {
+        if (!gateGuestActionNow('follow', guestCtx)) onFollowProp(p);
+      }
+    : undefined;
   const storedSlide = useClubhouseStore((s) => {
     if (carouselRestoreTab == null || feedIndex == null) return 0;
     const map = carouselRestoreTab

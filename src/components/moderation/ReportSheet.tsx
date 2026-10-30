@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react';
+import { useGuestSheetGate } from '@/features/guest/useGuestActionGate';
 import { Loader2 } from 'lucide-react';
 import {
   Sheet,
@@ -40,7 +41,7 @@ const REPORT_REASONS = [
 ];
 
 export function ReportSheet({
-  open,
+  open: openProp,
   onOpenChange,
   reportedUserId,
   reportedConversationId,
@@ -48,6 +49,8 @@ export function ReportSheet({
   reportedMessageId,
   reportType,
 }: ReportSheetProps) {
+  // GUEST §5: a guest never reaches the report form; the action card opens.
+  const open = useGuestSheetGate(openProp, () => onOpenChange(false), 'report');
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [details, setDetails] = useState('');
   const [submitting, setSubmitting] = useState(false);
