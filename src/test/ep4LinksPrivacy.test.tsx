@@ -134,20 +134,22 @@ describe('EP4 handicap shares unchanged Settings source', () => {
     fireEvent.click(radios[1]); await waitFor(() => expect(h.update).toHaveBeenCalledWith({ handicap_visibility: 'friends' }));
     expect(h.save).not.toHaveBeenCalled(); expect(screen.queryByRole('dialog')).toBeNull();
   });
-  it('a change in each surface reads back in the other through profile refresh', async () => {
+  it('Profile handicap changes read back in Settings summary through profile refresh', async () => {
     function Both() {
       const { profile } = useProfileData();
       return <><EditProfileLinksPrivacy userId="me" form={form} handicapVisibility={profile?.handicap_visibility === 'friends' || profile?.handicap_visibility === 'private' ? profile.handicap_visibility : 'public'} onSave={h.save} /><SettingsTabContent /></>;
     }
-    render(<Both />, { wrapper }); await screen.findByTestId('settings-handicap');
+    render(<Both />, { wrapper }); await screen.findByTestId('stranger-summary');
     open('visibility', 'handicap'); fireEvent.click(within(screen.getByRole('dialog')).getAllByRole('radio')[1]);
-    await waitFor(() => expect(screen.getByTestId('settings-handicap')).toHaveAttribute('data-value', 'friends'));
-    fireEvent.click(screen.getByRole('button', { name: 'Settings private' }));
-    await waitFor(() => expect(screen.getByTestId('ep-links-handicap').textContent).toBe('Only me'));
+    await waitFor(() => expect(screen.getByTestId('stranger-summary')).toHaveTextContent('Only friends see your handicap.'));
+    open('visibility', 'handicap'); fireEvent.click(within(screen.getByRole('dialog')).getAllByRole('radio')[2]);
+    await waitFor(() => expect(screen.getByTestId('stranger-summary')).toHaveTextContent('Only you see your handicap.'));
     expect(h.update.mock.calls).toEqual([[{ handicap_visibility: 'friends' }], [{ handicap_visibility: 'private' }]]);
   });
-  it('legacy ManageProfile is independent and Settings keeps the same hook', () => {
+  it('legacy ManageProfile is independent and Settings reads the same hook without a handicap writer', () => {
     expect(readFileSync('src/pages/ManageProfile.tsx', 'utf8')).not.toContain('EditProfileLinksPrivacy');
-    expect(readFileSync('src/components/settings/SettingsTabContent.tsx', 'utf8')).toContain('onChange={privacy.setHandicapVisibilityLevel}');
+    const settings = readFileSync('src/components/settings/SettingsTabContent.tsx', 'utf8');
+    expect(settings).toContain('const privacy = usePrivacySettings(');
+    expect(settings).not.toContain('onChange={privacy.setHandicapVisibilityLevel}');
   });
 });
