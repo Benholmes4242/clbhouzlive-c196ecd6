@@ -1,6 +1,6 @@
 import { applyMemberGolfQueryDefaults } from '@/lib/memberDataFreshness';
 import { useVideoWakeLock } from '@/video/useVideoWakeLock';
-import React, { Suspense, useEffect, useLayoutEffect, useMemo } from "react";
+import React, { Suspense, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { trackedLazy } from '@/perf/navTiming';
 // Shadow React.lazy so EVERY route-level lazy import is automatically tracked
 // for nav-timing chunk-fetch ms. trackedLazy falls back to React.lazy when
@@ -211,6 +211,35 @@ const RootGate: React.FC = () => {
   // gate holds or the web gate is showing.
   const envStatus = useEnvStatus();
 
+  // GUEST BROWSING (Stage 1; the switch lives in features/guest/guestConfig
+  // and stays OFF until Stage 2). On a native cold start with no stored
+  // session, sign in anonymously ONCE and render the Clubhouse instead of
+  // redirecting to /auth. While the call is in flight the existing canvas
+  // hold shows; if it fails, today's /auth redirect takes over.
+  const [guestAttempt, setGuestAttempt] = useState<'idle' | 'pending' | 'failed'>('idle');
+  useEffect(() => {
+    if (!GUEST_BROWSING_ENABLED) return;
+    if (envStatus !== 'native') return;
+    if (authLoading || user) return;
+    if (hasStoredSession()) return;
+    if (guestAttempt !== 'idle') return;
+    setGuestAttempt('pending');
+    supabase.auth
+      .signInAnonymously()
+      .then(({ error }) => {
+        if (error) {
+          trackGuestSessionFailed(error.message || 'anonymous_sign_in_failed');
+          setGuestAttempt('failed');
+        } else {
+          trackGuestSessionStarted();
+        }
+      })
+      .catch((err: unknown) => {
+        trackGuestSessionFailed(err instanceof Error ? err.message : 'anonymous_sign_in_failed');
+        setGuestAttempt('failed');
+      });
+  }, [envStatus, authLoading, user, guestAttempt]);
+
   if (envStatus === 'pending') return <BootHold />;
   if (envStatus === 'web') return <AppDownloadGate />;
 
@@ -226,7 +255,24 @@ const RootGate: React.FC = () => {
       />
     );
   }
-  if (!user) return isActive ? <Navigate to="/auth" replace /> : null;
+  if (!user) {
+    // Guest browsing: hold the canvas while the anonymous session is minted.
+    if (
+      GUEST_BROWSING_ENABLED &&
+      envStatus === 'native' &&
+      guestAttempt !== 'failed' &&
+      !hasStoredSession()
+    ) {
+      return (
+        <div
+          aria-hidden
+          data-guest-session-hold
+          style={{ position: 'fixed', inset: 0, background: PAGE_CANVAS, zIndex: 2147483000 }}
+        />
+      );
+    }
+    return isActive ? <Navigate to="/auth" replace /> : null;
+  }
 
   if (suspension.status === 'suspended') {
     return <SuspendedScreen suspension={suspension.suspension} />;
@@ -567,6 +613,11 @@ function AppRoutes() {
     <>
       {/* Set navigate ref for use in toast actions and other non-component code */}
       <NavigationRefSetter />
+
+      {/* Guest browsing (Stage 1, switch OFF): route guard + join card host. */}
+      <GuestRouteGuard />
+      <GuestGateHost />
+
       
       {/* Keep-Alive Portal Container - Preserves Clubhouse state across tab navigation */}
       <KeepAliveOutlet keepAliveRoutes={keepAliveRoutes} maxCached={2} />
