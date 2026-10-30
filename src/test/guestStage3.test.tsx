@@ -30,7 +30,7 @@ vi.mock('@/hooks/useSupabaseSession', () => ({
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { auth: { signInAnonymously: h.anon } } }));
 vi.mock('@/utils/auth/hasStoredSession', () => ({ hasStoredSession: () => false }));
 vi.mock('@/features/guest/guestAnalytics', () => ({ trackGuestSessionStarted: vi.fn(), trackGuestSessionFailed: vi.fn() }));
-vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
+vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '', i18n: { language: 'en', changeLanguage: () => Promise.resolve() } }) }));
 vi.mock('@/pages/gate/useGateContext', () => ({ useGateContext: () => ({ data: null }) }));
 vi.mock('@/hooks/usePlatformReach', () => ({ usePlatformReach: () => ({ data: null, isPending: false, isError: true }) }));
 vi.mock('@/lib/storeLinks', () => ({ FALLBACK_PLAY_URL: 'https://play.google.com/store', FALLBACK_STORE_URL: 'https://apps.apple.com', fetchStoreLinks: async () => ({ appStore: null, play: null }) }));
