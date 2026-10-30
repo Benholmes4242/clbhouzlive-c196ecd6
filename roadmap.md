@@ -1,9 +1,10 @@
 # Roadmap
 
 ## ST2 — Settings Your handicap card
-- [ ] Replace only the interim handicap row and move its switch out of Privacy; preserve existing handler and destinations.
-- [ ] Add connection-scoped earliest-round-year reader with three-state gating and regressions for figures/actions/toggle.
-- [ ] Run full suite with --maxWorkers=2 against 4,505/462 baseline and verify card states/build; signed-in checks depend on session availability.
+- [x] Replace only the interim handicap row and move its switch out of Privacy; preserve existing handler and destinations.
+- [x] Add connection-scoped earliest-round-year reader with three-state gating and 22 regressions for figures/actions/toggle; existing tests unchanged.
+- [x] Full bunx vitest run --maxWorkers=2: 4,527/4,527 across 463 files, +22/+1 from 4,505/462. Automatic build OK. Real-card sample fixture verifies connected/disconnected/unknown states, switch and destinations at 390px.
+- [ ] Live authenticated Settings persistence unavailable: external_unmanaged session; sample fixture is presentation-only verification.
 
 ## Round awards — Signed-off score-led card
 - [x] Restore the awards figure after handicap using canonical medal counts/marks; no-awards and other card surfaces unchanged.
