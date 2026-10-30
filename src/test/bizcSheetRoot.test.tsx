@@ -14,7 +14,7 @@ const privacy = readFileSync('src/components/settings/settingsPrivacy.css', 'utf
 /** Every custom property declared in rules whose selector is exactly `sel`. */
 function vars(css: string, sel: string): Record<string, string> {
   const out: Record<string, string> = {};
-  const re = new RegExp(`(?:^|\\}|\\*/)\\s*${sel.replace('.', '\\.')}\\s*\\{([^}]*)\\}`, 'g');
+  const re = new RegExp(`(?:^|\\}|\\*/)\\s*${sel.replace('.', '\\.')}\\s*\\{([^}]*)\\}`, 'gm');
   for (const m of css.matchAll(re)) {
     for (const d of m[1].matchAll(/(--[\w-]+)\s*:\s*([^;]+)/g)) out[d[1]] = d[2].trim();
   }
