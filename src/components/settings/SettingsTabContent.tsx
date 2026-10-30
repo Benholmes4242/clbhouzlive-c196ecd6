@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  ChevronRight, Bell, Shield, UserX, Eye, BarChart2, UserPlus,
-  Flag,
+  ChevronRight, Bell, UserPlus,
 } from 'lucide-react';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { SettingsHandicapCard } from './SettingsHandicapCard';
+import { SettingsPrivacyCard } from './SettingsPrivacyCard';
 
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -20,8 +20,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
 import {
   SettingsChevronRow,
-  SettingsToggleRow,
-  SettingsLevelRow,
   SettingsSkeleton,
 } from './ui';
 import type { VisibilityLevel } from '@/hooks/usePrivacySettings';
@@ -54,7 +52,8 @@ function maskEmail(email: string): string {
  * Settings content for the Manage Profile -> Settings tab.
  * Rows navigate to /manage/* sub-pages (Phase 3). Destructive confirms stay
  * as overlays. ST1 Account/Help/end rows reuse the editor grammar; deferred
- * Privacy/Notifications/Friends keep their existing controls. Request visibility
+ * Notifications/Friends keep their existing controls. ST3 Privacy reuses the
+ * canonical setters; Profile alone edits handicap visibility. Request visibility
  * comes only from a settled, successful useMyRequestsList read, including errors
  * with stale data. Shared settings/ui remains unchanged for other consumers.
  */
@@ -183,56 +182,7 @@ export function SettingsTabContent() {
 
         {/* Privacy */}
         <div className="ep-group">Privacy</div>
-        <div className="ep-rows">
-          <SettingsToggleRow
-            icon={<Eye size={15} />}
-            title="Public Profile"
-            subtitle="Anyone can view your profile and posts"
-            checked={privacy.isPublic}
-            disabled={privacy.isUpdatingPrivacy}
-            onCheckedChange={privacy.togglePublic}
-          />
-          <SettingsLevelRow
-            icon={<Shield size={15} />}
-            title="Who can see your handicap"
-            subtitle="Controls the handicap number wherever it's shown as yours"
-            value={privacy.handicapVisibility}
-            disabled={privacy.isUpdatingHandicapVisibility}
-            onChange={privacy.setHandicapVisibilityLevel}
-          />
-          <SettingsLevelRow
-            icon={<BarChart2 size={15} />}
-            title="Who can see you in leaderboards"
-            subtitle="Controls whether you appear in ranked boards, including Course Champions and course records"
-            value={privacy.leaderboardVisibility}
-            disabled={privacy.isUpdatingLeaderboardVisibility}
-            onChange={privacy.setLeaderboardVisibilityLevel}
-          />
-          <SettingsLevelRow
-            icon={<Flag size={15} />}
-            title="Courses you've played"
-            subtitle="Your Top 100 lists and your Courses tab, wherever they appear — leaderboards, Explore and your profile. Your counts stay on the boards either way."
-            value={privacy.top100Visibility}
-            disabled={privacy.isUpdatingTop100Visibility}
-            onChange={privacy.setTop100VisibilityLevel}
-            publicLabel="Everyone"
-            friendsLabel="Friends"
-            privateLabel="Only me"
-          />
-          <SettingsToggleRow
-            icon={<Eye size={15} />}
-            title={t('settings.autoPostRounds.title')}
-            subtitle={t('settings.autoPostRounds.subtitle')}
-            checked={privacy.autoPostRounds}
-            disabled={privacy.isUpdatingAutoPostRounds}
-            onCheckedChange={handleToggleAutoPostRounds}
-          />
-          <SettingsChevronRow
-            icon={<UserX size={15} />}
-            title="Blocked Users"
-            onClick={() => navigate('/manage/blocked')}
-          />
-        </div>
+        <SettingsPrivacyCard userId={user?.id} privacy={privacy} onToggleRounds={handleToggleAutoPostRounds} onBlocked={() => navigate('/manage/blocked')} />
 
         {/* Notifications */}
         <div className="ep-group">Notifications</div>
