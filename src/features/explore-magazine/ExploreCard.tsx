@@ -40,6 +40,7 @@ import { RANK_SCOPE_LABEL, useTop100RankIndex, type RankListSlug } from './useTo
 import { RankFlagBadge } from './RankFlagBadge';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { AwardCluster } from './AwardCluster';
+import { FEED_CARD_SURFACE } from '@/lib/tokens/surfaces';
 import { NUMF } from '@/components/explore-tab-new/courseled/tokens';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import type { ReviewBreakdown } from './useReviewPageEnrichment';
@@ -1691,7 +1692,7 @@ export function ExploreCard({
             ) : null}
             {hasAwards && medals ? (
               <span data-round-score-awards="true" style={{ textAlign: 'center', flex: 'none' }}>
-                <AwardCluster gold={medals.gold} silver={medals.silver} bronze={medals.bronze} surfaceColor={A.CANVAS} figureSize={17} />
+                <AwardCluster gold={medals.gold} silver={medals.silver} bronze={medals.bronze} surfaceColor={FEED_CARD_SURFACE} figureSize={17} />
                 <span style={{ ...cellLabel, marginTop: 5 }}>{t('amateur.stream.stat.awards', 'Awards')}</span>
               </span>
             ) : null}

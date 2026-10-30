@@ -200,6 +200,15 @@ describe('CB111 score-led round in the mediaFirst feed', () => {
 });
 
 describe('Signed-off score-led round awards', () => {
+  it('uses FEED_CARD_SURFACE for every score-led medal ring', () => {
+    const { container } = card({ roundMedals: { gold: 4, silver: 5, bronze: 3 } });
+    const marks = container.querySelector('[data-round-score-awards] [data-award-cluster]')?.firstElementChild?.children;
+    expect(marks).toHaveLength(3);
+    for (const mark of Array.from(marks ?? [])) {
+      expect((mark as HTMLElement).style.boxShadow).toBe('0 0 0 1.5px #16161A');
+    }
+    expect(source('src/features/explore-magazine/ExploreCard.tsx')).toContain('surfaceColor={FEED_CARD_SURFACE} figureSize={17}');
+  });
   it('places all present tiers after handicap and prints the total at 17px', () => {
     const { container } = card({ roundMedals: { gold: 1, silver: 2, bronze: 1 } });
     const awards = container.querySelector('[data-round-score-awards]') as HTMLElement;
