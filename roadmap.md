@@ -1,5 +1,10 @@
 # Roadmap
 
+## Review posts — Match normal feed media sizing
+- [x] Share intrinsic ratio/cap rules and opt media-first reviews with media into natural-height flow; preserve standard/no-media reviews.
+- [ ] Add requested sizing coverage, run full suite, reconcile counts and list changed files.
+- [ ] Measure 4:5 review/normal media at390x844; live authenticated Clubhouse may be unavailable.
+
 ## ST5 — Settings Your data
 - [x] Add the connection/total-gated rounds row and signed-off export sheet between Account and Friends.
 - [x] Add only email-my-rounds, caller-owned CSV email and ten-minute sent suppression; preserve existing functions and SQL. Required RESEND_API_KEY saved securely.

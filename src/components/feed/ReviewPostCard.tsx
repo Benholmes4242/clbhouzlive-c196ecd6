@@ -11,6 +11,8 @@
  * CB109: feed callers opt into mediaFirst; the review block is handed to
  * FeedCard's footer caption slot, retaining one engagement/comment path.
  * The two-line body clamp is retained by Ben's explicit CB109 ruling.
+ * Media-first reviews with media use FeedCard's intrinsic media sizing and
+ * natural article height; only words-first/no-media reviews retain the cap.
  */
 import { CourseNameLink } from '@/components/shared/CourseNameLink';
 import React from 'react';
@@ -47,7 +49,7 @@ export interface ReviewPostCardProps {
   followPill?: React.ReactNode;
   /** The owner menu: inline on the meta line, before the date, as a normal post does. */
   ownerMenu?: React.ReactNode;
-  /** F — the media frame's content (single media or carousel), sized to fill. */
+  /** F — shared media; intrinsic for mediaFirst, sized to fill for standard. */
   media?: React.ReactNode;
   /** G — the shared footer, unchanged. */
   footer: React.ReactNode;
@@ -129,7 +131,7 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
         display: 'flex',
         flexDirection: 'column',
         containerType: 'inline-size',
-        maxHeight: REVIEW_CARD_MAX_HEIGHT,
+        maxHeight: mediaLeads ? undefined : REVIEW_CARD_MAX_HEIGHT,
         marginInline: 0,
         background: CARD,
         borderTop: feedIndex === 0 ? undefined : `1px solid ${LINE}`,
@@ -173,22 +175,21 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
 
       {!mediaLeads ? reviewBlock : null}
 
-      {/* F — the media, edge to edge: the ONLY flexible child. 1:1, capped at
-          the post's width, shrunk to the remaining height, floored at 120. */}
+      {/* F — media-first media flows at its own size. Standard retains the
+          only flexible child: square cap and remaining-height 120px floor. */}
       {media ? (
         <div
           data-review-media
-          style={{
+          style={mediaLeads ? { display: 'block', marginTop: 10 } : {
             flex: '1 1 auto',
             minHeight: REVIEW_MEDIA_MIN_HEIGHT,
             maxHeight: '100cqw',
             aspectRatio: '1 / 1',
             position: 'relative',
             overflow: 'hidden',
-            ...(mediaLeads ? { marginTop: 10 } : {}),
           }}
         >
-          <div style={{ position: 'absolute', inset: 0 }}>{media}</div>
+          {mediaLeads ? media : <div style={{ position: 'absolute', inset: 0 }}>{media}</div>}
         </div>
       ) : null}
 

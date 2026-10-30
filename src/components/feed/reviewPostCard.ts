@@ -7,6 +7,8 @@ import { NAV_CLEARANCE } from '@/lib/navClearance';
 
 /**
  * R.1 — THE CARD FITS BETWEEN THE ISLANDS.
+ * Applies to words-first and no-media reviews only. Media-first reviews
+ * with media share feedMediaSizing and flow their content below the media.
  *
  * THE PATTERN, written down because this card is the first surface to do it:
  * a surface that must fit whole between the top islands and the bottom pill
