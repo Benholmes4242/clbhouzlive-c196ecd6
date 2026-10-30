@@ -149,8 +149,9 @@ export function useDiscoverLastSeen(userId?: string | null): DiscoverLastSeen {
   }, []);
 
   const markSeen = useCallback(() => {
-    // Signed out: nothing to stamp.
-    if (!userId) return;
+    // Signed out: nothing to stamp. Guests: mark_surface_seen is a write the
+    // server refuses (403) — never send it.
+    if (!userId || isGuest) return;
 
     const now = Date.now();
     const carry = migrateStamp.current;
@@ -179,7 +180,7 @@ export function useDiscoverLastSeen(userId?: string | null): DiscoverLastSeen {
           if (carry != null) migrateStamp.current = carry;
         }
       });
-  }, [userId]);
+  }, [userId, isGuest]);
 
   return { lastSeen, markSeen };
 }
