@@ -1,7 +1,7 @@
 /**
  * GUEST SESSION BOOTSTRAP (brief §1). RootGate's only guest logic lives here
  * so it can be tested without mounting the app:
- *   - useGuestSessionBootstrap mints ONE anonymous session on a native cold
+ *   - useGuestSessionBootstrap mints ONE anonymous session on a native or preview cold
  *     start with no stored session, tracking started/failed;
  *   - signedOutOutcome says what a signed-out RootGate renders: the canvas
  *     hold while the anonymous call is in flight, otherwise today's /auth.
@@ -22,7 +22,7 @@ export function signedOutOutcome(args: {
   guestAttempt: GuestAttempt;
   stored: boolean;
 }): 'hold' | 'auth' {
-  if (args.enabled && args.envStatus === 'native' && args.guestAttempt !== 'failed' && !args.stored) {
+  if (args.enabled && (args.envStatus === 'native' || args.envStatus === 'preview') && args.guestAttempt !== 'failed' && !args.stored) {
     return 'hold';
   }
   return 'auth';
@@ -37,7 +37,7 @@ export function useGuestSessionBootstrap(args: {
   const [guestAttempt, setGuestAttempt] = useState<GuestAttempt>('idle');
   useEffect(() => {
     if (!GUEST_BROWSING_ENABLED) return;
-    if (envStatus !== 'native') return;
+    if (envStatus !== 'native' && envStatus !== 'preview') return;
     if (authLoading || hasUser) return;
     if (hasStoredSession()) return;
     if (guestAttempt !== 'idle') return;

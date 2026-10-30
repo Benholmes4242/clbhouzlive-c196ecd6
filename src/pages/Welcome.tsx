@@ -30,6 +30,7 @@ export default function Welcome() {
   useHideBottomNav(); useHideHeader();
   const { user, loading: sessionLoading } = useSupabaseSession(); const profile = useProfileData();
   const { t } = useTranslation('auth');
+  if (user?.is_anonymous === true) return <Navigate to="/" replace />;
   if (sessionLoading || profile.loading) return <main className="welcome-shell"><p role="status">{t('welcome.loading', { defaultValue: 'Loading…' })}</p></main>;
   if (!user) return <Navigate to="/auth" replace />;
   if (profile.isError || !profile.profile) return <main className="welcome-shell"><Button onClick={() => void profile.refetch()}>{t('welcome.retry', { defaultValue: 'Try again' })}</Button></main>;

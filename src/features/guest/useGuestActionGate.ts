@@ -15,6 +15,22 @@ import {
   type GuestAction,
 } from './guestGateStore';
 import { trackGuestGateShown } from './guestAnalytics';
+import { registerGuestServerHandler } from './guestServerResponse';
+import { getGuestCardRequest } from './guestGateStore';
+
+// A transport refusal is never turned into invented/hidden data. Only the
+// exact server guest marker opens the existing closable "anything else" card.
+let serverCard = false;
+registerGuestServerHandler(() => {
+  if (!getGuestUser()) return false;
+  const surface = surfaceForPath(window.location.pathname);
+  if (!serverCard || getGuestCardRequest()?.kind !== 'action') {
+    trackGuestGateShown({ surface, trigger: 'server', action: 'other' });
+    openGuestCard({ kind: 'action', surface, action: 'other' });
+  }
+  serverCard = true;
+  return true;
+}, () => serverCard && !!getGuestUser() && getGuestCardRequest()?.kind === 'action');
 
 export interface GuestActionContext {
   firstName?: string;

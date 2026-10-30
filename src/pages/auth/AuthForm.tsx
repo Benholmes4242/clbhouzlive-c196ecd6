@@ -88,7 +88,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
   // Apple/Google LINK the identity onto the anonymous user (same account,
   // same id); if the identity already belongs to another account the call
   // falls back to a normal sign-in so the flow still completes. Email OTP
-  // cannot link — it signs the email user in, replacing the guest session.
+  // confirms updateUser on the same user, or signs in an existing email account.
   const guestAutoStarted = useRef(false);
   const emailLinkModeRef = useRef(false);
 
@@ -119,7 +119,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
         }
         if (shouldLink) {
           const linked = await supabase.auth.linkIdentity({ provider, token });
-          if (!linked.error) return { data: linked.data, error: null, linked: true };
+          if (!linked.error) {
+            await refreshGuestConversion(true);
+            return { data: linked.data, error: null, linked: true };
+          }
           console.warn(`[guest-convert] linkIdentity(${provider}) failed, falling back to sign-in:`, linked.error.message);
         }
       }
@@ -294,6 +297,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
       }
 
       if (data?.session?.user) {
+        await refreshGuestConversion(emailLinked);
         trackLoginSuccess('email', Date.now() - start);
         // Linked (updateUser) keeps the guest id; otherwise the session is replaced.
         trackGuestConversionIfPending('email', emailLinked);

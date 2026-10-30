@@ -6,7 +6,11 @@
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { GuestAction, GuestSurfaceKey } from './guestGateStore';
 
-export type GuestGateTrigger = 'scroll' | 'action' | 'join_button';
+export type GuestGateTrigger = 'scroll' | 'action' | 'join_button' | 'server';
+
+export const GUEST_GATE_TRIGGER_LABELS: Record<GuestGateTrigger, string> = {
+  scroll: 'Scroll limit', action: 'Account action', join_button: 'Join button', server: 'Server refused guest write',
+};
 export type GuestGateChoice = 'apple' | 'google' | 'email' | 'login' | 'close';
 
 export function trackGuestSessionStarted(): void {
