@@ -6,7 +6,7 @@
 import React from 'react';
 import { readFileSync } from 'node:fs';
 import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup, act } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
@@ -21,7 +21,16 @@ vi.mock('@/hooks/useSupabaseSession', () => ({
   useSupabaseSession: () => ({ user: { id: 'guest-1', is_anonymous: true }, loading: false }),
 }));
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: { auth: { onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: () => {} } } })) } },
+  supabase: {
+    auth: {
+      // Fire the listener once with the guest session so the store's
+      // non-React mirror (getGuestUser) sees the anonymous user.
+      onAuthStateChange: (cb: (event: string, session: unknown) => void) => {
+        cb('INITIAL_SESSION', { user: { id: 'guest-1', is_anonymous: true } });
+        return { data: { subscription: { unsubscribe: () => {} } } };
+      },
+    },
+  },
 }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: mocks.track } }));
 vi.mock('@/utils/median/isMedianApp', () => ({ isMedianApp: () => mocks.inMedian }));
