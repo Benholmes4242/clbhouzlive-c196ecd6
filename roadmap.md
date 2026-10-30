@@ -1,5 +1,11 @@
 # Roadmap
 
+## Guest browsing Stage 2 — Preview only
+- [x] Enable preview bootstrap, refresh same-user conversions and exclude anonymous onboarding.
+- [x] Handle exact server guest refusals with the existing action card; preserve read errors/data.
+- [ ] STOP: full shards4683 passed/1 failed/4684 across475 (+guestStage2 11); nested gateScopeSwitch.test.tsx:57:63 fails with auth-mock error. Separate sheet8/8 passes. Await authorised resolution; see GUEST_STAGE2_REPORT.md.
+- [ ] Live four-surface guest browse observed; course/holes/rounds and six tap checks incomplete at stop. Real email confirmation and member session unavailable; phone provider linking requires a phone build. Top Ten guest write/schema failures reported for server decision.
+
 ## Guest browsing Stage 1 + sign-in correction
 - [x] Fix peekGuestConversion surface; AuthForm independent of guest code when off, fault-safe when on; link/email-change conversion.
 - [x] Gate feed/report/claim/route doors and like/comment writes; RootGate guest logic extracted; 23 new tests.

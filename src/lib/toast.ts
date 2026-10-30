@@ -1,4 +1,5 @@
 import { toast as sonnerToast, type ExternalToast } from 'sonner';
+import { suppressGuestServerToast } from '@/features/guest/guestServerResponse';
 
 const DEFAULT_DURATION = 2500;
 const ERROR_DURATION = 4000;
@@ -30,7 +31,7 @@ export const toast = Object.assign(base, {
   success: (m: Msg, o?: ExternalToast) =>
     sonnerToast.success(m, withDefaults(m, o, DEFAULT_DURATION)),
   error: (m: Msg, o?: ExternalToast) =>
-    sonnerToast.error(m, withDefaults(m, o, ERROR_DURATION)),
+    suppressGuestServerToast() ? '' : sonnerToast.error(m, withDefaults(m, o, ERROR_DURATION)),
   info: (m: Msg, o?: ExternalToast) =>
     sonnerToast.info(m, withDefaults(m, o, DEFAULT_DURATION)),
   warning: (m: Msg, o?: ExternalToast) =>

@@ -19,9 +19,8 @@ export function isGuestAllowedPath(pathname: string): boolean {
   if (surfaceForPath(pathname) !== null) return true;
   // Post deep links.
   if (/^\/post\/[^/]+/.test(pathname)) return true;
-  // Auth and first-sign-in.
+  // Auth only: anonymous guests must never enter onboarding.
   if (pathname === '/auth' || pathname.startsWith('/auth/')) return true;
-  if (pathname === '/welcome' || pathname === '/signup') return true;
   // Public legal / gate pages.
   if (pathname === '/delete-account' || pathname.startsWith('/legal')) return true;
   if (pathname === '/privacy' || pathname === '/terms') return true;

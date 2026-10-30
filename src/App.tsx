@@ -215,8 +215,8 @@ const RootGate: React.FC = () => {
   // gate holds or the web gate is showing.
   const envStatus = useEnvStatus();
 
-  // GUEST BROWSING (Stage 1; the switch lives in features/guest/guestConfig
-  // and stays OFF until Stage 2). On a native cold start with no stored
+  // GUEST BROWSING (Stage 2; preview-only switch in guestConfig).
+  // On a native or preview cold start with no stored
   // session, sign in anonymously ONCE and render the Clubhouse instead of
   // redirecting to /auth. While the call is in flight the existing canvas
   // hold shows; if it fails, today's /auth redirect takes over.
