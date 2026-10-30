@@ -43,6 +43,8 @@ let lastResolved: { userId: string | undefined } | null = null;
 
 export default function AmateurPage() {
   const live = useSupabaseSession();
+  // GUEST BROWSING §4: Explore locks for a guest 1.5 viewport heights down.
+  useGuestScrollGate('explore');
   if (!live.loading) lastResolved = { userId: live.user?.id };
   const sessionKnown = !live.loading || lastResolved !== null;
   const user = live.loading ? (lastResolved?.userId ? { id: lastResolved.userId } : null) : live.user;

@@ -105,6 +105,9 @@ const FEED_TAB = 'foryou';
 
 const ClubhouseContent = () => {
   const { isRehydrating } = useRehydrationSafe();
+  // GUEST BROWSING §4: the top of the fourth post locks the Clubhouse for
+  // guests (no-op for members and while the switch is off).
+  useGuestClubhouseGate();
 
 
 
