@@ -134,6 +134,10 @@ function GateCard({ roundCount, scope, onConnect, onNoHandicap, declineRef }: {
 
 export function RoundsGate({ children, roundCount = null, scope = null }: { children: ReactNode; roundCount?: number | null; scope?: GateScope | null }) {
   const navigate = useNavigate();
+  // GUEST BROWSING §4: RoundsGate never shows to a guest — the guest join
+  // card takes precedence on Explore. The page renders ungated; the guest
+  // surface gate owns the lock.
+  const isGuest = useIsGuest();
   const [locked, setLocked] = useState(false);
   const [tileOpen, setTileOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);

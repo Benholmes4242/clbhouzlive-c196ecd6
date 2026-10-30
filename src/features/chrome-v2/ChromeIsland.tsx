@@ -823,7 +823,11 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
         <LeftCapsule spec={spec} override={leftOverride} slot={leftSlot} />
 
 
-        {/* RIGHT capsule */}
+        {/* RIGHT capsule — guests get Log in / Join free instead of the
+            member content (search, index, avatar). */}
+        {isGuest ? (
+          <GuestRightCapsule tone={tone} />
+        ) : (
         <div
           data-island-right
           style={{
