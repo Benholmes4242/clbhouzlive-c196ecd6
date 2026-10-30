@@ -19,6 +19,8 @@ import { TourIcon } from '../components/tourIslandIcons';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { safeGoBack } from '@/utils/navigation';
+import { useGuestScrollGate } from '@/features/guest/useGuestSurfaceGate';
+import { setGuestTourContext } from '@/features/guest/guestGateStore';
 
 /**
  * SubTabTourControl — the sub-tab header's tour control (BRIEF_TOUR_ISLAND):

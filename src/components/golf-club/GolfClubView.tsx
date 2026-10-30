@@ -140,6 +140,17 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   // One course, one destination page the member deliberately navigated to —
   // see the hook header: the "never prefetch" rule is about N courses in a feed.
   const { data: courseStats } = useCourseStatsDetail(courseId, true);
+
+  // GUEST BROWSING §7: publish this course's copy context (short name and
+  // the live rounds count) so the guest join card never reads anything.
+  useEffect(() => {
+    if (!course?.id) return;
+    setGuestCourseContext({
+      courseId: course.id,
+      shortName: shortCourseName(course.name ?? ''),
+      roundsTracked: typeof courseStats?.rounds_tracked === 'number' ? courseStats.rounds_tracked : null,
+    });
+  }, [course?.id, course?.name, courseStats?.rounds_tracked]);
   const communityRating = ratingAggregate?.avg_overall_score ?? null;
   const reviewCount = ratingAggregate?.review_count ?? 0;
   const [statsSheetOpen, setStatsSheetOpen] = useState(false);
