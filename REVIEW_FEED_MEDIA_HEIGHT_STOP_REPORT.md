@@ -1,4 +1,59 @@
-# Review feed media height — STOP
+# Review feed media height — Final verification
+
+## Final result — Authorised test fixes
+**4,621/4,621 tests pass across469 files**, with no failures. Targeted four-file run passes45/45. Automatic preview build/type validation reports `build OK` at2026-10-30T11:26:38Z; no manual build/typecheck was run because this environment requires the automatic harness.
+
+At **390 ×844**, real `FeedCard` sample-data `mediaFirst` rendering measures:
+- Review4:5 photo: **390 ×487.5px**.
+- Normal4:5 photo: **390 ×487.5px**.
+- Both computed ratio0.8/1, shared computed max-height539px and object-fit cover. Review wrapper height487.5px, style `display: block; margin-top: 10px;`, article max-height `none`.
+- Both media taps called the existing open callback with their respective post IDs. No browser page errors. Element screenshots inspected and match dimensions. Temporary fixture and sample bitmap live only in `/tmp/browser/review-media/`; no application route or asset added.
+- The fixture initially imported provider modules without Vite's cache-query identity and reported a Router-context error; correcting only the temporary fixture imports resolved it. No app code changed for the fixture. This is sample presentation verification, not authenticated feed data or fullscreen-viewer verification.
+
+### Exact authorised assertions — Old → new
+The parameterised photo case covers two executed cases (1080x1350 and1920x1005):
+```tsx
+// Old
+expect(wrapper.style.aspectRatio).toBe('');
+// New
+expect(wrapper.style.aspectRatio ?? '').toBe('');
+expect(wrapper.getAttribute('style') ?? '').not.toContain('aspect-ratio');
+```
+Carousel case:
+```tsx
+// Old
+expect(element(c, '[data-review-media]').style.aspectRatio).toBe('');
+// New
+expect(element(c, '[data-review-media]').style.aspectRatio ?? '').toBe('');
+expect(element(c, '[data-review-media]').getAttribute('style') ?? '').not.toContain('aspect-ratio');
+```
+These tolerate jsdom's unset-property representation but still reject a reintroduced ratio in both the style property and serialized style. Every other assertion and case name remains unchanged. No test removed or renamed in this review correction; inventory stays11 cases in the file.
+
+InlineVideo mock final prop type: `({ objectFit }: { objectFit?: React.CSSProperties['objectFit'] })`; React was already imported. The preceding type-only fix had changed `string` to the same CSS type without the optional marker; this brief adds only the requested optional marker. No app or visual change in this correction.
+
+### Commands and complete count reconciliation
+```text
+bunx vitest run src/test/reviewFeedMediaSizing.test.tsx src/test/cb109MediaFirstEverywhere.test.tsx src/test/cb108ClubFeed.test.tsx src/test/reviewPostCard.test.tsx --maxWorkers=2
+bunx vitest run --maxWorkers=2 --shard=1/2
+bunx vitest run --maxWorkers=2 --shard=2/2
+```
+- Targeted:45/45 across4 files.
+- Shard1:2,257/2,257 across235 files,329.63s.
+- Shard2:2,364/2,364 across234 files,395.60s.
+- Full aggregate: **4,621/4,621 across469 files**; all included files executed, no filtering or exclusions beyond normal Vitest configuration.
+- Last full green4,579 across466 +`st5SettingsYourData.test.tsx`18 +`st5RoundsCsv.test.ts`13 +`reviewFeedMediaSizing.test.tsx`11 =4,621 across469 (+42 cases/+3 files).
+- ST5 initially added19 UI cases; ST5.1 separately authorised removing case19 `never uses Your rounds as a door label` and moving its dialog assertion into case7. That accounts for4,622 →4,621; its old assertions/removal rationale are quoted in `ST5_REPORT.md`, not silently removed here.
+- The three pre-existing review-media failures recorded below now pass under the authorised assertion changes. The separate historical `sheetTopV5.test.tsx:12:18`, `retained account vocabulary rules > no component renders "Your rounds" as a door`, was cleared by ST5.1 before this task; unchanged vocabulary file passes2/2 here. No current pre-existing or new failures. Its source and ST5 tests were not edited in this review correction.
+
+### Files changed by this finish brief
+1. `src/test/reviewFeedMediaSizing.test.tsx` — only two assertion sites (three executed cases) and optional mock prop type.
+2. `roadmap.md` — finish task/results and resolved blockers.
+3. `REVIEW_FEED_MEDIA_HEIGHT_STOP_REPORT.md` — final report, preserving historical stop below.
+
+The original implementation's complete file list is preserved below. This finish brief adds no source/module/asset changes, no negative letter-spacing, no SQL/migrations, no deployed RPC/edge changes, no feed_config/cap/native changes.
+
+---
+## Historical stop — Preserved audit record
 
 ## Implemented diff
 - Added `src/components/feed/feedMediaSizing.ts`: unchanged ratio bounds 0.8/1.91, fallback4/5, clamp calculation, reserve305 and viewport cap shared by both post types.
