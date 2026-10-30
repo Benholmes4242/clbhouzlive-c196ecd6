@@ -1,5 +1,10 @@
 # Roadmap
 
+## ST3 — Settings Privacy
+- [ ] Replace only Privacy with live summary, sheet rows, unchanged auto-post handler and scoped blocked count.
+- [ ] Add ST3 regressions and retarget the two obsolete EP4 Settings-handicap tests explicitly; delete ST2 report.
+- [ ] Full suite --maxWorkers=2 against 4,528/463; inspect card/sheets and report every failure/changed file.
+
 ## Awards follow-ups — Ring and widest fit
 - [x] Change only the score-led ring to FEED_CARD_SURFACE; add one ring regression without changing other callers.
 - [x] Chromium widest case: gross102 (+30), handicap28, net74 (+2), awards4/5/3 total12 at375px. scrollWidth375/clientWidth375; right group is61.796875px clear of net, no touching/overlap/shrinking.
