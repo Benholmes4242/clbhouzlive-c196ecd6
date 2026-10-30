@@ -45,7 +45,7 @@ describe('receipt displayed-average comparison', () => {
       course={{ id: 'course', name: 'Quinta do Lago Laranjal' }} overall={2}
       scores={{ design: 9.2, condition: 8, clubhouse: 7.4, facilities: 8.8 }} shareToFeed={false}
       onClubhouse={() => {}} onBack={() => {}} onNextCourse={() => {}} /></Providers>);
-    expect(Array.from(container.querySelectorAll('span')).filter(node => node.textContent === '8.4')).toHaveLength(1);
+    expect(container.querySelector('.receipt-score-head b')?.textContent).toBe('8.4');
   });
   it('names the displayed average and measures 7.3 against 7.8, not avg_before 8.1', () => {
     receipt();
