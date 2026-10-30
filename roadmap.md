@@ -1,5 +1,10 @@
 # Roadmap
 
+## Review media — Authorised test corrections and finish
+- [x] Apply only the authorised absent-ratio assertions and optional objectFit mock type; no visual changes.
+- [ ] Run four targeted files, automatic typecheck and full suite in shards; reconcile4579/466 +ST5 UI18/CSV13 +review11.
+- [ ] Compare sample-data FeedCard review/normal4:5 media at390x844 and record heights, assertions and changed files.
+
 ## ST5.1 — Authorised duplicate-test removal
 - [x] Delete only case19 and move its dialog assertion into case7; remove historical literal from report and rename to ST5_REPORT.md. sheetTopV5 unchanged.
 - [x] Full bunx vitest run --maxWorkers=2:4618 passed/3 pre-existing review-media failures/4621 total across469. ST5 UI18/18, CSV13/13, sheetTopV5 2/2 pass. No new failures; ST5_REPORT.md records names/errors/count reconciliation. Review test/type failures remain untouched.
