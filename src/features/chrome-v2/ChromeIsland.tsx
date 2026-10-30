@@ -43,6 +43,10 @@ import { IndexGlance } from './IndexGlance';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ConnectGlance } from './ConnectGlance';
 import { ISLAND_GLASS } from '@/lib/tokens/glass';
+import { useIsGuest } from '@/features/guest/useIsGuest';
+import { openGuestCard, surfaceForPath } from '@/features/guest/guestGateStore';
+import { GUEST_ISLAND_COPY } from '@/features/guest/guestCopy';
+import { trackGuestGateShown } from '@/features/guest/guestAnalytics';
 export { ISLAND_GLASS } from '@/lib/tokens/glass';
 
 import { safeGoBack } from '@/utils/navigation';
@@ -564,12 +568,74 @@ export const AvatarCell: React.FC<{
 };
 
 // ---------------------------------------------------------------------------
+// Guest right capsule (GUEST BROWSING §2, signed-off mock frame 1): the
+// member content (search, index, avatar) is replaced by "Log in" and a white
+// "Join free" pill. The left logo island is unchanged.
+// ---------------------------------------------------------------------------
+const GuestRightCapsule: React.FC<{ tone: ChromeTone }> = ({ tone }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const surface = surfaceForPath(location.pathname);
+  return (
+    <div
+      data-island-right
+      data-guest-island=""
+      style={{
+        ...glassStyle(tone),
+        padding: '0 6px 0 16px',
+        gap: 12,
+        position: 'relative',
+      }}
+    >
+      <button
+        type="button"
+        onClick={() => navigate('/auth')}
+        style={{
+          background: 'none',
+          border: 'none',
+          padding: 0,
+          cursor: 'pointer',
+          fontSize: 14,
+          fontWeight: 700,
+          color: 'rgba(248,250,252,0.62)',
+        }}
+      >
+        {GUEST_ISLAND_COPY.login}
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          trackGuestGateShown({ surface, trigger: 'join_button' });
+          openGuestCard({ kind: 'join_button', surface: surface ?? 'clubhouse' });
+        }}
+        style={{
+          height: 34,
+          padding: '0 16px',
+          borderRadius: 17,
+          background: '#F3F5F7',
+          border: 'none',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          fontSize: 14,
+          fontWeight: 700,
+          color: '#0A0A0C',
+        }}
+      >
+        {GUEST_ISLAND_COPY.join}
+      </button>
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------
 // ChromeIsland (root)
 // ---------------------------------------------------------------------------
 export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false }) => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { user } = useSupabaseSession();
+  const isGuest = useIsGuest();
   const spec = resolveChrome(location.pathname, searchParams);
   const leftOverride = useChromeLeftOverride();
   const leftSlot = useChromeLeftSlot();
@@ -757,7 +823,11 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
         <LeftCapsule spec={spec} override={leftOverride} slot={leftSlot} />
 
 
-        {/* RIGHT capsule */}
+        {/* RIGHT capsule — guests get Log in / Join free instead of the
+            member content (search, index, avatar). */}
+        {isGuest ? (
+          <GuestRightCapsule tone={tone} />
+        ) : (
         <div
           data-island-right
           style={{
@@ -817,10 +887,12 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
             onOpen={() => setMenuOpen((v) => !v)}
           />
         </div>
+        )}
       </div>
 
-      {/* Controlled host — identical to CompactHeader wiring */}
-      {user && (
+      {/* Controlled host — identical to CompactHeader wiring. Guests never
+          see the member menu; their capsule has no avatar trigger. */}
+      {user && !isGuest && (
         <PostingAsMenu
           isOpen={menuOpen}
           onClose={() => setMenuOpen(false)}

@@ -26,6 +26,7 @@ import { pushForceExpand } from '@/hooks/useScrollDirection';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { Z } from '@/config/zIndex';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useIsGuest } from '@/features/guest/useIsGuest';
 import './roundsGate.css';
 
 export type RoundsGateState = 'signedOut' | 'loading' | 'gated' | 'connected';
@@ -133,6 +134,10 @@ function GateCard({ roundCount, scope, onConnect, onNoHandicap, declineRef }: {
 
 export function RoundsGate({ children, roundCount = null, scope = null }: { children: ReactNode; roundCount?: number | null; scope?: GateScope | null }) {
   const navigate = useNavigate();
+  // GUEST BROWSING §4: RoundsGate never shows to a guest — the guest join
+  // card takes precedence on Explore. The page renders ungated; the guest
+  // surface gate owns the lock.
+  const isGuest = useIsGuest();
   const [locked, setLocked] = useState(false);
   const [tileOpen, setTileOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -141,6 +146,7 @@ export function RoundsGate({ children, roundCount = null, scope = null }: { chil
   const impressionTracked = useRef(false);
   const lookTracked = useRef(false);
   useEffect(() => {
+    if (isGuest) return;
     if (!lookTracked.current) { lookTracked.current = true; analyticsEvents.track('rounds_gate_look_started', { gate_state: 'gated' }); }
     if (impressionTracked.current) return;
     const scroller = getPrimaryScrollElement();
@@ -174,10 +180,10 @@ export function RoundsGate({ children, roundCount = null, scope = null }: { chil
     return cleanup;
   }, []);
   useLayoutEffect(() => {
-    if (locked) return pushForceExpand();
-  }, [locked]);
+    if (locked && !isGuest) return pushForceExpand();
+  }, [locked, isGuest]);
   useLayoutEffect(() => {
-    if (!locked) return;
+    if (!locked || isGuest) return;
     const body = bodyRef.current;
     body?.setAttribute('inert', '');
     const scroller = getPrimaryScrollElement();
@@ -189,7 +195,9 @@ export function RoundsGate({ children, roundCount = null, scope = null }: { chil
     }
     lockBodyScroll();
     return () => { unlockBodyScroll(); body?.removeAttribute('inert'); };
-  }, [locked]);
+  }, [locked, isGuest]);
+  // Guests: the page renders ungated — the guest surface gate owns any lock.
+  if (isGuest) return <>{children}</>;
   return <div ref={wrapperRef} data-rounds-gate="" data-rounds-locked={locked ? '' : undefined}>
     <div ref={bodyRef} data-rounds-gate-body="" aria-hidden={locked ? true : undefined}>{children}</div>
     {locked ? <>

@@ -21,6 +21,12 @@ import {
 import AuthHeroScreen from './components/AuthHeroScreen';
 import AuthBottomSheet from './components/AuthBottomSheet';
 import OtpSheetContent from './components/OtpSheetContent';
+import {
+  clearGuestConversion,
+  peekGuestConversion,
+} from '@/features/guest/guestConversion';
+import { getGuestUser } from '@/features/guest/guestGateStore';
+import { trackGuestConverted } from '@/features/guest/guestAnalytics';
 
 type AppleClaims = {
   aud?: string;
@@ -75,6 +81,37 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
   const sendStartRef = useRef<number>(0);
   const oauthPendingRef = useRef(false);
+
+  // ---- GUEST BROWSING §6: converting a guest -------------------------------
+  // When a guest picks a join method, AuthForm runs with ?guest=1&start=<m>.
+  // Apple/Google LINK the identity onto the anonymous user (same account,
+  // same id); if the identity already belongs to another account the call
+  // falls back to a normal sign-in so the flow still completes. Email OTP
+  // cannot link — it signs the email user in, replacing the guest session.
+  const guestAutoStarted = useRef(false);
+
+  const signInOrLinkIdToken = useCallback(
+    async (provider: 'apple' | 'google', token: string) => {
+      if (peekGuestConversion().guestUserId && getGuestUser()) {
+        const linked = await supabase.auth.linkIdentity({ provider, token });
+        if (!linked.error) return { data: linked.data, error: null, linked: true };
+        console.warn(`[guest-convert] linkIdentity(${provider}) failed, falling back to sign-in:`, linked.error.message);
+      }
+      const res = await supabase.auth.signInWithIdToken({ provider, token });
+      return { ...res, linked: false };
+    },
+    [],
+  );
+
+  const trackGuestConversionIfPending = useCallback(
+    (method: 'apple' | 'google' | 'email' | 'login', linked: boolean) => {
+      const conv = peekGuestConversion();
+      if (!conv.guestUserId) return;
+      trackGuestConverted({ method, linked, surface: conv.surface, guestUserId: conv.guestUserId });
+      clearGuestConversion();
+    },
+    [],
+  );
 
   // Safety net: if the app returns to foreground while we are stuck in
   // a submitting state started by a native OAuth sheet that never fired
@@ -209,6 +246,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
       if (data?.session?.user) {
         trackLoginSuccess('email', Date.now() - start);
+        // Email OTP cannot link — a converting guest's session is replaced.
+        trackGuestConversionIfPending('email', false);
         // Confirmation time covers a signup even when the email code was requested much earlier.
         if (isNewSignup(data.user)) {
           trackSignupSuccess('email', Date.now() - start);
@@ -278,10 +317,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
         console.log('[apple-auth] raw response keys:', Object.keys(response ?? {}));
         console.log('[apple-auth] raw response:', JSON.stringify(responseForLog));
 
-        const { data, error } = await supabase.auth.signInWithIdToken({
-          provider: 'apple',
-          token: idToken,
-        });
+        const { data, error, linked } = await signInOrLinkIdToken('apple', idToken);
 
         if (error) {
           console.error('[apple-auth] supabase rejection:', (error as { status?: number }).status, error.message);
@@ -309,6 +345,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
         if (data?.session?.user) {
           trackLoginSuccess('apple');
+          trackGuestConversionIfPending('apple', linked);
           // Native account creation and sign-in timestamps can differ by milliseconds.
           if (isNewSignup(data.user)) {
             trackSignupSuccess('apple');
@@ -383,10 +420,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
           /* non-fatal */
         }
 
-        const { data, error } = await supabase.auth.signInWithIdToken({
-          provider: 'google',
-          token: idToken,
-        });
+        const { data, error, linked } = await signInOrLinkIdToken('google', idToken);
 
         if (error) {
           console.error('[google-auth] supabase rejection:', (error as { status?: number }).status, error.message);
@@ -440,6 +474,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
         if (data?.session?.user) {
           trackLoginSuccess('google');
+          trackGuestConversionIfPending('google', linked);
           // Native account creation and sign-in timestamps can differ by milliseconds.
           if (isNewSignup(data.user)) {
             trackSignupSuccess('google');
@@ -472,7 +507,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
     median.socialLogin.google.login({ callback: handleGoogleCallback });
   }, [handleGoogleCallback]);
 
-
+  // GUEST BROWSING §6: the join card hands off with ?guest=1&start=<method>.
+  // Apple and Google start their native sheets immediately (one tap in the
+  // card, one native prompt — no second tap on the auth screen). Email stays
+  // on the hero, where the email field already lives.
+  const guestStart = searchParams.get('guest') === '1' ? searchParams.get('start') : null;
+  useEffect(() => {
+    if (!guestStart || guestAutoStarted.current) return;
+    if (!getGuestUser()) return;
+    guestAutoStarted.current = true;
+    if (guestStart === 'apple') handleAppleSignIn();
+    else if (guestStart === 'google') handleGoogleSignIn();
+  }, [guestStart, handleAppleSignIn, handleGoogleSignIn]);
 
   const isSheetOpen = step === 'otp';
 

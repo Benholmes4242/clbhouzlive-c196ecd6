@@ -18,6 +18,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { patchFollow, type FollowTarget } from '@/lib/followCache';
+import { getGuestUser } from '@/features/guest/guestGateStore';
+import { gateGuestActionNow } from '@/features/guest/useGuestActionGate';
 
 export interface ToggleFollowParams extends FollowTarget {
   /** Current state BEFORE toggle. We invert it inside the mutation. */
@@ -29,6 +31,9 @@ export function useToggleFollow() {
 
   return useMutation({
     mutationFn: async (params: ToggleFollowParams) => {
+      // GUEST BROWSING §5: a guest follow tap opens the join card; nothing
+      // is written (no optimistic patch, no insert).
+      if (gateGuestActionNow('follow')) return { next: params.isFollowing };
       const next = !params.isFollowing;
 
       const followerActorType = params.viewerActorType ?? 'personal';
@@ -76,6 +81,9 @@ export function useToggleFollow() {
     },
 
     onMutate: async (params) => {
+      // Guest taps are gated in mutationFn; never optimistically patch for
+      // a guest (the join card opened instead).
+      if (getGuestUser()) return { wasFollowing: params.isFollowing };
       const next = !params.isFollowing;
 
       // Cancel only the canonical follow-status key for this target — broad

@@ -10,12 +10,18 @@ import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { recordRecentCourseView } from '@/lib/recentCourseViews';
+import { useGuestScrollGate } from '@/features/guest/useGuestSurfaceGate';
+import { courseSurfaceKey } from '@/features/guest/guestGateStore';
 
 const CourseDetailPage = () => {
   const params = useParams();
   const courseId = params?.courseId;
   const navigate = useNavigate();
   const navigationType = useNavigationType();
+
+  // GUEST BROWSING §4: each course page is its own free-look surface,
+  // locking 1.5 viewport heights down.
+  useGuestScrollGate(courseId ? courseSurfaceKey(courseId) : 'courses');
 
   usePreventOverscroll();
 

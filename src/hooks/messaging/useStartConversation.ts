@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useMessagingActor } from '@/hooks/messaging/useMessagingActor';
+import { gateGuestActionNow } from '@/features/guest/useGuestActionGate';
 
 type TargetActor = {
   actorType: 'personal' | 'business';
@@ -49,6 +50,9 @@ export function useStartConversation(): UseStartConversationReturn {
       const sender = options?.asActor ?? actor;
       if (!sender) return;
       if (isStarting) return;
+      // GUEST BROWSING §5: a guest message tap opens the join card; no
+      // conversation is created and nothing is navigated to.
+      if (gateGuestActionNow('message')) return;
       setIsStarting(true);
       try {
         const { data, error } = await supabase.rpc('msg_start_direct', {

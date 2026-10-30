@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useSetChromeLeftSlot } from '@/features/chrome-v2/leftOverride';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
+import { useGuestClubhouseGate } from '@/features/guest/useGuestSurfaceGate';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
@@ -105,6 +106,9 @@ const FEED_TAB = 'foryou';
 
 const ClubhouseContent = () => {
   const { isRehydrating } = useRehydrationSafe();
+  // GUEST BROWSING §4: the top of the fourth post locks the Clubhouse for
+  // guests (no-op for members and while the switch is off).
+  useGuestClubhouseGate();
 
 
 

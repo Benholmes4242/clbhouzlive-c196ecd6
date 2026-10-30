@@ -419,13 +419,33 @@
   },
   "business": {
     "visiting": {
-      "visiting": "Visiting", "contact": "Contact", "directions": "Directions",
-      "website": "Website", "call": "Call", "email": "Email",
-      "comingSoon": "Coming soon to clbhouz", "soon": "Soon",
-      "hours": "Opening hours", "closedToday": "Closed today", "openToday": "Open today · {{time}}", "closed": "Closed",
-      "meetCoaches": "Meet the coaches", "meetTeam": "Meet the team", "coaches": "The coaches", "team": "The team",
-      "people_one": "{{count}} person", "people_other": "{{count}} people",
-      "days": { "Mon": "Monday", "Tue": "Tuesday", "Wed": "Wednesday", "Thu": "Thursday", "Fri": "Friday", "Sat": "Saturday", "Sun": "Sunday" }
+      "visiting": "Visiting",
+      "contact": "Contact",
+      "directions": "Directions",
+      "website": "Website",
+      "call": "Call",
+      "email": "Email",
+      "comingSoon": "Coming soon to clbhouz",
+      "soon": "Soon",
+      "hours": "Opening hours",
+      "closedToday": "Closed today",
+      "openToday": "Open today · {{time}}",
+      "closed": "Closed",
+      "meetCoaches": "Meet the coaches",
+      "meetTeam": "Meet the team",
+      "coaches": "The coaches",
+      "team": "The team",
+      "people_one": "{{count}} person",
+      "people_other": "{{count}} people",
+      "days": {
+        "Mon": "Monday",
+        "Tue": "Tuesday",
+        "Wed": "Wednesday",
+        "Thu": "Thursday",
+        "Fri": "Friday",
+        "Sat": "Saturday",
+        "Sun": "Sunday"
+      }
     },
     "reach": {
       "rated": "RATINGS",
@@ -1898,6 +1918,26 @@
       "copiedToast": "Copied to clipboard",
       "copyFailed": "Failed to copy link",
       "close": "Close"
+    }
+  },
+  "guest": {
+    "island": {
+      "login": "Log in",
+      "join": "Join free"
+    },
+    "card": {
+      "apple": "Continue with Apple",
+      "google": "Continue with Google",
+      "email": "Continue with email",
+      "login": "ALREADY A MEMBER? LOG IN",
+      "close": "Close",
+      "joinInKicker": "Join to join in",
+      "socialBody": "It’s free. Your likes, comments and follows start the moment you’re in.",
+      "quickBody": "It’s free and takes a minute.",
+      "clubhouseKicker": "You’ve had a look",
+      "exploreKicker": "Explore",
+      "coursesKicker": "Courses",
+      "tourKicker": "Tour"
     }
   }
 }

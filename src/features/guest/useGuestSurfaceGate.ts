@@ -1,0 +1,97 @@
+/**
+ * GUEST SCROLL TRIGGERS (brief §4). Scroll depth, NEVER a timer — there is
+ * no setTimeout/setInterval in this file by rule.
+ *
+ * - Clubhouse: the top of the fourth post entering the viewport locks the
+ *   surface (IntersectionObserver on the feed's [data-card-index="3"]).
+ * - Every other free-look surface: scrolling more than 1.5 viewport heights
+ *   from where the page started locks it.
+ *
+ * Once locked, a surface stays locked for the app session (guestGateStore);
+ * returning to it re-shows the card at the top (GuestGateHost owns that).
+ */
+import { useEffect } from 'react';
+import { getPrimaryScrollElement } from '@/lib/getScrollParent';
+import { useIsGuest } from './useIsGuest';
+import {
+  isSurfaceLocked,
+  lockSurface,
+  openGuestCard,
+  type GuestSurfaceKey,
+} from './guestGateStore';
+import { trackGuestGateShown } from './guestAnalytics';
+
+function lockAndShow(surface: GuestSurfaceKey): void {
+  if (lockSurface(surface)) {
+    trackGuestGateShown({ surface, trigger: 'scroll' });
+  }
+  openGuestCard({ kind: 'scroll', surface });
+}
+
+/** Clubhouse: locks when the top of the fourth post enters the viewport. */
+export function useGuestClubhouseGate(): void {
+  const isGuest = useIsGuest();
+  useEffect(() => {
+    if (!isGuest || isSurfaceLocked('clubhouse')) return;
+    const root = document.getElementById('root');
+    if (!root) return;
+
+    let observer: IntersectionObserver | null = null;
+    const watch = (el: Element) => {
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            observer?.disconnect();
+            lockAndShow('clubhouse');
+          }
+        },
+        { root: null, threshold: 0 },
+      );
+      observer.observe(el);
+    };
+
+    const existing = root.querySelector('[data-card-index="3"]');
+    if (existing) {
+      watch(existing);
+      return () => observer?.disconnect();
+    }
+
+    // The feed virtualises; the fourth post may not exist yet.
+    const mo = new MutationObserver(() => {
+      const el = root.querySelector('[data-card-index="3"]');
+      if (el) {
+        mo.disconnect();
+        watch(el);
+      }
+    });
+    mo.observe(root, { childList: true, subtree: true });
+    return () => {
+      mo.disconnect();
+      observer?.disconnect();
+    };
+  }, [isGuest]);
+}
+
+/** Every other free-look surface: locks past 1.5 viewport heights scrolled. */
+export function useGuestScrollGate(surface: GuestSurfaceKey): void {
+  const isGuest = useIsGuest();
+  useEffect(() => {
+    if (!isGuest || isSurfaceLocked(surface)) return;
+    const scroller = getPrimaryScrollElement();
+    const startTop = scroller?.scrollTop ?? 0;
+    const threshold = window.innerHeight * 1.5;
+    const onScroll = () => {
+      const top = scroller?.scrollTop ?? 0;
+      if (top - startTop > threshold) lockAndShow(surface);
+    };
+    const target: (HTMLElement | Window) & EventTarget =
+      scroller && scroller !== document.documentElement && scroller !== document.body ? scroller : window;
+    target.addEventListener('scroll', onScroll, { passive: true });
+    return () => target.removeEventListener('scroll', onScroll);
+  }, [isGuest, surface]);
+}
+
+/** Generic dispatcher for non-Clubhouse surfaces. */
+export function useGuestSurfaceGate(surface: GuestSurfaceKey): void {
+  useGuestScrollGate(surface);
+}

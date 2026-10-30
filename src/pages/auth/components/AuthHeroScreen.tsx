@@ -22,7 +22,8 @@ interface AuthHeroScreenProps {
   errorNonce?: number;
 }
 
-const AppleLogo: React.FC<{ size?: number; color?: string }> = ({ size = 17, color = '#0B0D12' }) => (
+// Exported for the guest join card (brief: the Apple logo AuthHeroScreen uses).
+export const AppleLogo: React.FC<{ size?: number; color?: string }> = ({ size = 17, color = '#0B0D12' }) => (
   <svg
     width={size}
     height={size}
@@ -35,7 +36,8 @@ const AppleLogo: React.FC<{ size?: number; color?: string }> = ({ size = 17, col
   </svg>
 );
 
-const GoogleLogo: React.FC<{ size?: number }> = ({ size = 18 }) => (
+// Exported for the guest join card (brief: the existing GoogleLogo).
+export const GoogleLogo: React.FC<{ size?: number }> = ({ size = 18 }) => (
   <svg
     width={size}
     height={size}

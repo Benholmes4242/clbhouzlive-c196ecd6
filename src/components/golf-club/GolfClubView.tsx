@@ -11,6 +11,8 @@ import '@/components/courses/course-detail/tabCanon.css';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
 import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';
 import { courseMastheadKicker } from '@/features/courses/_shared/courseRankLabels';
+import { shortCourseName } from '@/features/courses/_shared/courseLabel';
+import { setGuestCourseContext } from '@/features/guest/guestGateStore';
 import { CourseTabs, type CourseTabId } from '@/components/courses/course-detail/CourseTabs';
 import CourseDetailShellTabs from '@/features/courses/components/CourseDetailShellTabs';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
@@ -140,6 +142,17 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   // One course, one destination page the member deliberately navigated to —
   // see the hook header: the "never prefetch" rule is about N courses in a feed.
   const { data: courseStats } = useCourseStatsDetail(courseId, true);
+
+  // GUEST BROWSING §7: publish this course's copy context (short name and
+  // the live rounds count) so the guest join card never reads anything.
+  useEffect(() => {
+    if (!course?.id) return;
+    setGuestCourseContext({
+      courseId: course.id,
+      shortName: shortCourseName(course.name ?? ''),
+      roundsTracked: typeof courseStats?.rounds_tracked === 'number' ? courseStats.rounds_tracked : null,
+    });
+  }, [course?.id, course?.name, courseStats?.rounds_tracked]);
   const communityRating = ratingAggregate?.avg_overall_score ?? null;
   const reviewCount = ratingAggregate?.review_count ?? 0;
   const [statsSheetOpen, setStatsSheetOpen] = useState(false);

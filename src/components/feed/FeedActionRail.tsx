@@ -21,6 +21,7 @@ import { MuteButton } from '@/audio/MuteButton';
 import { Z } from '@/config/zIndex';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatCountKilo } from '@/i18n/format';
+import { useGuestActionGate } from '@/features/guest/useGuestActionGate';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
 
@@ -194,6 +195,16 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
   const showFollowPlus = !readOnly && !isOwnPost && !isFollowing && !!creator;
   const showJustFollowed = !readOnly && !isOwnPost && justFollowed && !!creator;
 
+  // GUEST BROWSING §5: every rail action needs an account. A guest tap opens
+  // the join card instead; nothing is written. Members pass straight through.
+  const gateGuestAction = useGuestActionGate();
+  const creatorFirstName = creator?.displayName?.trim().split(/\s+/)[0] || undefined;
+  const gatedOnFollow = () => { if (!gateGuestAction('follow', { firstName: creatorFirstName })) onFollow(); };
+  const gatedOnLike = () => { if (!gateGuestAction('like', { firstName: creatorFirstName })) onLike(); };
+  const gatedOnComment = () => { if (!gateGuestAction('comment', { firstName: creatorFirstName })) onComment(); };
+  const gatedOnShare = () => { if (!gateGuestAction('share', { firstName: creatorFirstName })) onShare(); };
+  const gatedOnMore = () => { if (!gateGuestAction('other', { firstName: creatorFirstName })) onMore(); };
+
   const muteButton = isVideo ? (
     <MuteButton size="md" laneId="active" />
   ) : null;
@@ -281,7 +292,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                if (showFollowPlus) onFollow();
+                if (showFollowPlus) gatedOnFollow();
               }}
               aria-label={showJustFollowed ? 'Following' : 'Follow'}
               aria-pressed={showJustFollowed}
@@ -356,7 +367,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               }}
             >
               <ActionButton
-                onClick={onLike}
+                onClick={gatedOnLike}
                 ariaLabel={hasLiked ? 'Unlike' : 'Like'}
                 animateKey={likeAnimKey}
               >
@@ -390,7 +401,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
             </div>
           ) : (
             <ActionButton
-              onClick={onLike}
+              onClick={gatedOnLike}
               ariaLabel={hasLiked ? 'Unlike' : 'Like'}
               count={formatCount(likesCount)}
               accentCount={hasLiked}
@@ -402,7 +413,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
 
           {/* Comment */}
           <ActionButton
-            onClick={onComment}
+            onClick={gatedOnComment}
             ariaLabel="Comments"
             count={formatCount(commentsCount)}
           >
@@ -410,7 +421,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
           </ActionButton>
 
           {/* Share */}
-          <ActionButton onClick={onShare} ariaLabel="Send">
+          <ActionButton onClick={gatedOnShare} ariaLabel="Send">
             <Send size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
           </ActionButton>
 
@@ -420,7 +431,7 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
               {moreSlot}
             </div>
           ) : (
-            <ActionButton onClick={onMore} ariaLabel="More options">
+            <ActionButton onClick={gatedOnMore} ariaLabel="More options">
               <MoreHorizontal size={28} stroke="#fff" strokeWidth={FLOAT_STROKE} />
             </ActionButton>
           )}

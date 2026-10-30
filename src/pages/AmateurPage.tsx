@@ -7,6 +7,7 @@ import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpe
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { restoreAmateurScroll, takeAmateurScroll } from '@/features/amateur/amateurScrollMemory';
 import { ExploreMagazine } from '@/features/explore-magazine/ExploreMagazine';
+import { useGuestScrollGate } from '@/features/guest/useGuestSurfaceGate';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useDiscoverLastSeen, useMarkDiscoverSeenOnExit } from '@/hooks/useDiscoverLastSeen';
@@ -43,6 +44,8 @@ let lastResolved: { userId: string | undefined } | null = null;
 
 export default function AmateurPage() {
   const live = useSupabaseSession();
+  // GUEST BROWSING §4: Explore locks for a guest 1.5 viewport heights down.
+  useGuestScrollGate('explore');
   if (!live.loading) lastResolved = { userId: live.user?.id };
   const sessionKnown = !live.loading || lastResolved !== null;
   const user = live.loading ? (lastResolved?.userId ? { id: lastResolved.userId } : null) : live.user;

@@ -11,6 +11,7 @@ import { navigationTabs } from './bottom-navigation/navigationTabs';
 import './bottom-navigation/postReviewMark.css';
 import { useDiscoverNewTotal } from '@/stores/discoverNewStore';
 
+import { gateGuestActionNow } from '@/features/guest/useGuestActionGate';
 import { useNavTheme } from '@/hooks/useNavTheme';
 import { useNavScrollState, pushForceExpand, resetToExpanded } from '@/hooks/useScrollDirection';
 import { cn } from '@/lib/utils';
@@ -318,6 +319,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
 
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
+      // GUEST BROWSING §5: a guest gets the join card instead of the composer.
+      if (gateGuestActionNow('post')) return;
       // The + only ever opens step 1 of the composer (ComposerFlowSheet).
       // Nothing here fires a native picker: the file inputs live in
       // StageComposer's media rail, each one anchored over the control that
