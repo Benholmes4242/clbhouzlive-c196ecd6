@@ -27,6 +27,7 @@ import {
 } from '@/features/guest/guestConversion';
 import { getGuestUser } from '@/features/guest/guestGateStore';
 import { trackGuestConverted } from '@/features/guest/guestAnalytics';
+import { GUEST_BROWSING_ENABLED } from '@/features/guest/guestConfig';
 
 type AppleClaims = {
   aud?: string;
@@ -90,12 +91,24 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
   // cannot link — it signs the email user in, replacing the guest session.
   const guestAutoStarted = useRef(false);
 
+  // The sign-in path never depends on guest code: with the switch off both
+  // helpers short-circuit before touching any guest module, and with it on a
+  // fault in guest bookkeeping is logged and swallowed so sign-in still
+  // navigates.
   const signInOrLinkIdToken = useCallback(
     async (provider: 'apple' | 'google', token: string) => {
-      if (peekGuestConversion().guestUserId && getGuestUser()) {
-        const linked = await supabase.auth.linkIdentity({ provider, token });
-        if (!linked.error) return { data: linked.data, error: null, linked: true };
-        console.warn(`[guest-convert] linkIdentity(${provider}) failed, falling back to sign-in:`, linked.error.message);
+      if (GUEST_BROWSING_ENABLED) {
+        let shouldLink = false;
+        try {
+          shouldLink = Boolean(peekGuestConversion().guestUserId && getGuestUser());
+        } catch (err) {
+          console.warn('[guest-convert] guest check failed, signing in normally:', err);
+        }
+        if (shouldLink) {
+          const linked = await supabase.auth.linkIdentity({ provider, token });
+          if (!linked.error) return { data: linked.data, error: null, linked: true };
+          console.warn(`[guest-convert] linkIdentity(${provider}) failed, falling back to sign-in:`, linked.error.message);
+        }
       }
       const res = await supabase.auth.signInWithIdToken({ provider, token });
       return { ...res, linked: false };
@@ -105,10 +118,15 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
   const trackGuestConversionIfPending = useCallback(
     (method: 'apple' | 'google' | 'email' | 'login', linked: boolean) => {
-      const conv = peekGuestConversion();
-      if (!conv.guestUserId) return;
-      trackGuestConverted({ method, linked, surface: conv.surface, guestUserId: conv.guestUserId });
-      clearGuestConversion();
+      if (!GUEST_BROWSING_ENABLED) return;
+      try {
+        const conv = peekGuestConversion();
+        if (!conv.guestUserId) return;
+        trackGuestConverted({ method, linked, surface: conv.surface, guestUserId: conv.guestUserId });
+        clearGuestConversion();
+      } catch (err) {
+        console.warn('[guest-convert] conversion tracking failed:', err);
+      }
     },
     [],
   );
