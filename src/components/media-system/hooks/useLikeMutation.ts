@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { patchEngagement, seedViewerInLikers } from '@/lib/engagementCache';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { assertNotGuestWrite, GuestGatedError } from '@/features/guest/useGuestActionGate';
 
 interface LikeMutationParams {
   postId: string;
@@ -37,6 +38,8 @@ export function useLikeMutation() {
     },
     // Viewer seed: the likers list moves on the same tap as the count.
     onMutate: ({ postId, userId, actorId, actorType, isLiked }: LikeMutationParams) => {
+      // GUEST §5 backstop: a guest's like never reaches toggle_post_like.
+      assertNotGuestWrite('like');
       const a = availableActors.find((x) => x.id === actorId && x.type === actorType);
       const revertLikers = seedViewerInLikers(queryClient, postId, 'post', {
         userId, actorType, actorId,
@@ -47,6 +50,7 @@ export function useLikeMutation() {
       return { revertLikers };
     },
     onError: (error, _vars, ctx) => {
+      if (error instanceof GuestGatedError) return;
       console.error('[Like] Mutation failed:', error);
       ctx?.revertLikers?.();
     },

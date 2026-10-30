@@ -37,6 +37,7 @@ import { pickHardestHole, holeBarHeights } from '@/components/business/ClubHowIt
 import { ordinal } from '@/lib/text/numbers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { AppLog } from '@/lib/logger';
+import { useGuestSheetGate } from '@/features/guest/useGuestActionGate';
 
 interface ClaimCourseSheetProps {
   open: boolean;
@@ -127,11 +128,13 @@ const Footnote: React.FC<{ text: string }> = ({ text }) => (
 );
 
 const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
-  open,
+  open: openProp,
   onClose,
   clubId,
   sourceCourseId,
 }) => {
+  // GUEST §5: a guest never reaches the claim sheet; the action card opens.
+  const open = useGuestSheetGate(openProp, onClose, 'claim_course');
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
