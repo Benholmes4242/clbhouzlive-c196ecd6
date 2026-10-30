@@ -1,5 +1,11 @@
 # Roadmap
 
+## Guest browsing Stage 2 — Preview only
+- [ ] Enable preview bootstrap, refresh same-user conversions and exclude anonymous onboarding.
+- [ ] Handle exact server guest refusals with the existing action card; preserve read errors/data.
+- [ ] Add regressions, run full shards against 4673/474 and report separate sheet status.
+- [ ] Verify guest pages/actions and conversion/member flows where real sessions are available; report blocked checks.
+
 ## Guest browsing Stage 1 + sign-in correction
 - [x] Fix peekGuestConversion surface; AuthForm independent of guest code when off, fault-safe when on; link/email-change conversion.
 - [x] Gate feed/report/claim/route doors and like/comment writes; RootGate guest logic extracted; 23 new tests.

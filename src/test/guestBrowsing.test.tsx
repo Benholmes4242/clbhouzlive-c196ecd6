@@ -66,9 +66,9 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('the switch', () => {
-  it('ships OFF by default', () => {
+  it('ships preview-only', () => {
     const src = readFileSync('src/features/guest/guestConfig.ts', 'utf8');
-    expect(src).toContain('GUEST_BROWSING_ENABLED = false');
+    expect(src).toContain('GUEST_BROWSING_ENABLED = isPreviewHost()');
   });
 });
 
@@ -99,12 +99,12 @@ describe('surface mapping', () => {
 
 describe('route rules', () => {
   it('allows the free-look surfaces, deep links, auth and legal pages', () => {
-    for (const p of ['/', '/amateur', '/courses', '/courses/abc', '/courses/abc/rounds', '/tourhub', '/tourhub/players', '/post/xyz', '/auth', '/welcome', '/delete-account']) {
+    for (const p of ['/', '/amateur', '/courses', '/courses/abc', '/courses/abc/rounds', '/tourhub', '/tourhub/players', '/post/xyz', '/auth', '/delete-account']) {
       expect(isGuestAllowedPath(p)).toBe(true);
     }
   });
   it('blocks everything else', () => {
-    for (const p of ['/profile/ben', '/settings', '/messages', '/manage/handicap', '/media', '/watch']) {
+    for (const p of ['/welcome', '/signup', '/profile/ben', '/settings', '/messages', '/manage/handicap', '/media', '/watch']) {
       expect(isGuestAllowedPath(p)).toBe(false);
     }
   });

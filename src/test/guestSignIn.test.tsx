@@ -16,6 +16,7 @@ const g = vi.hoisted(() => ({
   otp: vi.fn(), verify: vi.fn(), idToken: vi.fn(), link: vi.fn(), updateUser: vi.fn(),
   route: vi.fn(), apple: vi.fn(), google: vi.fn(),
   peek: vi.fn(), clear: vi.fn(), guestUser: vi.fn(), converted: vi.fn(),
+  refresh: vi.fn(),
 }));
 
 vi.mock('@/features/guest/guestConfig', () => ({
@@ -28,6 +29,7 @@ vi.mock('@/features/guest/guestConversion', () => ({
 }));
 vi.mock('@/features/guest/guestGateStore', () => ({ getGuestUser: g.guestUser }));
 vi.mock('@/features/guest/guestAnalytics', () => ({ trackGuestConverted: g.converted }));
+vi.mock('@/features/guest/refreshGuestConversion', () => ({ refreshGuestConversion: g.refresh }));
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     auth: {
@@ -75,6 +77,7 @@ async function signIn(method: 'email' | 'apple' | 'google') {
 beforeEach(() => {
   vi.clearAllMocks();
   g.on = false;
+  g.refresh.mockResolvedValue(undefined);
   g.otp.mockResolvedValue({ error: null });
   g.verify.mockResolvedValue(ok);
   g.idToken.mockResolvedValue(ok);

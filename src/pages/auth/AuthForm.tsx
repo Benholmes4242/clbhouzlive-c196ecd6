@@ -28,6 +28,7 @@ import {
 import { getGuestUser } from '@/features/guest/guestGateStore';
 import { trackGuestConverted } from '@/features/guest/guestAnalytics';
 import { GUEST_BROWSING_ENABLED } from '@/features/guest/guestConfig';
+import { refreshGuestConversion } from '@/features/guest/refreshGuestConversion';
 
 type AppleClaims = {
   aud?: string;
