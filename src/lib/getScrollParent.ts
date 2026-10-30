@@ -24,18 +24,14 @@ const PAGE_SCROLLER_ID = 'root';
 
 let cachedScroller: HTMLElement | null = null;
 
-function isScrollContainerY(element: HTMLElement): boolean {
-  /* Deliberately NOT scrollHeight > clientHeight: a page shorter than the
-     viewport is still the scroller, and asking about overflow mid-drag would
-     hand back a different element. */
-  const { overflowY } = window.getComputedStyle(element);
-  return overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay';
-}
-
 /**
- * Resolves the element that owns document-level scrolling. `#root` when it is a
- * scroll container, else `document.scrollingElement`. Cached; re-resolved only
- * when the cached node leaves the document.
+ * Resolves the element that owns document-level scrolling: `#root` whenever it
+ * exists — no overflow check (Stage 2.3). lockBodyScroll() sets #root's
+ * overflow-y to hidden while a sheet is open, and early in boot #root's styles
+ * may not be applied; checking overflow in either window cached <html> for the
+ * rest of the session. Only `#root` is cached; the fallback
+ * (`document.scrollingElement`) is used only while #root is absent and is
+ * never cached.
  */
 export function getDocumentScrollParent(): HTMLElement | undefined {
   if (typeof document === 'undefined' || typeof window === 'undefined') return undefined;
@@ -44,17 +40,13 @@ export function getDocumentScrollParent(): HTMLElement | undefined {
   cachedScroller = null;
 
   const root = document.getElementById(PAGE_SCROLLER_ID);
-  if (root instanceof HTMLElement && isScrollContainerY(root)) {
+  if (root instanceof HTMLElement) {
     cachedScroller = root;
     return root;
   }
 
   const el = document.scrollingElement as HTMLElement | null;
-  if (el instanceof HTMLElement) {
-    cachedScroller = el;
-    return el;
-  }
-
+  if (el instanceof HTMLElement) return el;
   if (document.documentElement instanceof HTMLElement) return document.documentElement;
   if (document.body instanceof HTMLElement) return document.body;
   return undefined;

@@ -93,12 +93,9 @@ export function useGuestScrollGate(surface: GuestSurfaceKey): void {
   const isGuest = useIsGuest();
   useEffect(() => {
     if (!isGuest || isSurfaceLocked(surface)) return;
-    // #root is the page scroller (canon). Listen there directly: the shared
-    // resolver can cache <html> if first asked before #root became the scroll
-    // container (observed on the preview), and then this listener never fired.
-    const root = document.getElementById('root');
-    const resolved = getPrimaryScrollElement();
-    const scroller = root ?? resolved;
+    // One definition of the page scroller (Stage 2.3: the shared resolver
+    // now always returns #root when it exists).
+    const scroller = getPrimaryScrollElement();
     const startTop = scroller?.scrollTop ?? 0;
     const onScroll = () => {
       const el = scroller ?? document.documentElement;
