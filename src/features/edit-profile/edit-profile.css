@@ -138,3 +138,30 @@
 .ep-settings-end .ep-row-value{flex:none;font-size:15px;font-weight:600}
 .ep-settings-end .ep-settings-delete{color:var(--ep-settings-danger)}
 .ep-settings-version{text-align:center;font-size:12px;color:var(--ep-dim);margin-top:22px}
+
+/* ST2: handicap card only; canonical bizc switch stays unchanged elsewhere. */
+.ep-settings{--st2-cell-hair:rgba(255,255,255,0.06);--st2-switch-off:rgba(255,255,255,0.16)}
+.st2-handicap{background:var(--ep-card);border:1px solid var(--ep-hair);border-radius:18px;padding:16px 16px 0}
+.ep-shell .st2-top{display:flex;align-items:flex-start;gap:12px;width:100%;height:auto;padding:0;border:0;border-radius:0;justify-content:flex-start;color:var(--ep-ink);text-align:left;font-family:inherit;box-shadow:none}
+.st2-identity{display:block;min-width:0;flex:1}
+.st2-name{display:block;font-size:17px;font-weight:700;letter-spacing:-0.01em;margin:0;line-height:normal}
+.st2-status{display:block;font-size:12.5px;color:var(--ep-mute);white-space:nowrap;margin-top:3px;overflow:hidden;text-overflow:ellipsis}
+.st2-manage{margin-left:auto;font-size:14px;font-weight:600;display:flex;align-items:center;gap:2px;flex:none;padding-top:2px}
+.ep-shell .st2-manage svg{width:18px;height:18px;color:var(--ep-dim)}
+.st2-figures{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--ep-inset);border-radius:14px;margin-top:14px}
+.st2-figure{padding:12px 12px 11px;border-left:1px solid var(--st2-cell-hair);min-width:0}
+.st2-figure:first-child{border-left:0}
+.st2-figure b{display:block;font-size:22px;font-weight:700;letter-spacing:-0.03em;font-feature-settings:"kern" 1,"liga" 1;color:var(--ep-ink)}
+.st2-figure b[data-unknown=true]{color:var(--ep-dim)}
+.st2-figure>span{display:block;font-size:9.5px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--ep-dim);margin-top:3px}
+.st2-line{font-size:13px;line-height:1.45;color:var(--ep-mute);margin:12px 0 0}
+.st2-disconnected-line{margin-top:6px}
+.ep-shell .st2-connect{display:inline-flex;height:40px;padding:0 18px;border-radius:999px;background:var(--ep-ink);color:var(--ep-canvas);font-size:14.5px;font-weight:600;margin-top:14px}
+.st2-switch-row{display:flex;align-items:center;gap:12px;min-height:52px;padding:13px 0;border-top:1px solid var(--ep-hair);margin-top:12px}
+.st2-disconnected-switch{margin-top:16px}
+.st2-switch-copy{flex:1;min-width:0;font-size:15px;font-weight:500;color:var(--ep-ink)}
+.st2-switch-copy small{display:block;font-size:12.5px;color:var(--ep-dim);font-weight:400;margin-top:2px}
+.ep-shell .st2-switch{position:relative;flex:none;width:44px;height:26px;padding:0;border:0;border-radius:999px;background:var(--st2-switch-off);box-shadow:none}
+.ep-shell .st2-switch[aria-checked=true]{background:var(--ep-ink)}
+.ep-shell .st2-switch i{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--ep-ink)}
+.ep-shell .st2-switch[aria-checked=true] i{left:21px;background:var(--ep-canvas)}

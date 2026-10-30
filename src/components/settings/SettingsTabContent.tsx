@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatRelativeAgoLong } from '@/i18n/format';
 import {
-  ChevronRight, Bell, Shield, UserX, Eye, BarChart2, Link2, UserPlus,
+  ChevronRight, Bell, Shield, UserX, Eye, BarChart2, UserPlus,
   Flag,
 } from 'lucide-react';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { useWhsConnection } from '@/lib/whs/hooks';
-import { bodyNameForProvider } from '@/lib/whs/whsCountries';
+import { SettingsHandicapCard } from './SettingsHandicapCard';
 
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -84,7 +83,7 @@ export function SettingsTabContent() {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
   const { user, loading: sessionLoading } = useSupabaseSession();
-  const { profile: profileRaw, loading } = useProfileData();
+  const { profile: profileRaw, loading, error: profileError } = useProfileData();
   const profile = profileRaw as SettingsProfileRow;
   const { count } = useHasBusinesses(user?.id);
   const requests = useMyRequestsList();
@@ -115,7 +114,7 @@ export function SettingsTabContent() {
   };
 
   const deleteAccount = useDeleteAccount(user?.id);
-  const { data: whsConnection } = useWhsConnection(user?.id);
+  const { data: whsConnection, isFetched: connectionFetched, isError: connectionError } = useWhsConnection(user?.id);
 
   const { logout } = useLogout();
   const [signOutOpen, setSignOutOpen] = useState(false);
@@ -163,20 +162,6 @@ export function SettingsTabContent() {
 
   if (sessionLoading || loading || !profile) return <SettingsSkeleton />;
 
-  const p = profile;
-  // The row must never name a federation a member has nothing to do with:
-  // sixteen more governing bodies are pending, so the title is sourced from the
-  // connection's OWN provider (bodyNameForProvider) and is neutral until one
-  // exists. Adding the next federation needs no edit here.
-  const whsRowTitle = whsConnection
-    ? bodyNameForProvider((whsConnection as { provider?: string | null }).provider)
-    : 'Official handicap';
-  const whsSubtitle = whsConnection
-    ? whsConnection.last_synced_at
-      ? `Connected \u00B7 synced ${formatRelativeAgoLong(whsConnection.last_synced_at)}`
-      : 'Connected'
-    : 'Sync your official handicap';
-
 
   const requestRows = !requests.isLoading && !requests.isError && !requests.error ? requests.data : undefined;
   const openCount = requestRows?.filter(r => r.status === 'open' || r.status === 'in_progress').length ?? 0;
@@ -192,14 +177,9 @@ export function SettingsTabContent() {
     <>
       <div className="ep-settings">
         <div className="ep-group">Your handicap</div>
-        <div className="ep-rows">
-          <SettingsChevronRow
-            icon={<Link2 size={15} />}
-            title={whsRowTitle}
-            subtitle={whsSubtitle}
-            onClick={() => navigate('/manage/handicap')}
-          />
-        </div>
+        <SettingsHandicapCard userId={user?.id} connection={whsConnection} connectionReady={!!connectionFetched && !connectionError}
+          profileError={!!profileError} egHandicapIndex={profile.eg_handicap_index} manualHandicapIndex={profile.manual_handicap_index}
+          checked={!hideHandicapChip} updating={chipUpdating} onToggle={handleToggleHandicapChip} onManage={() => navigate('/manage/handicap')} />
 
         {/* Privacy */}
         <div className="ep-group">Privacy</div>
@@ -211,15 +191,6 @@ export function SettingsTabContent() {
             checked={privacy.isPublic}
             disabled={privacy.isUpdatingPrivacy}
             onCheckedChange={privacy.togglePublic}
-          />
-          <SettingsToggleRow
-            icon={<Eye size={15} />}
-            title="Handicap button"
-            subtitle="Shows the connect-handicap prompts on your profile and the handicap button at the top of the screen, and you can always connect from here."
-
-            checked={!hideHandicapChip}
-            disabled={chipUpdating}
-            onCheckedChange={handleToggleHandicapChip}
           />
           <SettingsLevelRow
             icon={<Shield size={15} />}
