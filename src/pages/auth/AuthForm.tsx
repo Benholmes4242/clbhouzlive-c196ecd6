@@ -315,10 +315,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
         console.log('[apple-auth] raw response keys:', Object.keys(response ?? {}));
         console.log('[apple-auth] raw response:', JSON.stringify(responseForLog));
 
-        const { data, error } = await supabase.auth.signInWithIdToken({
-          provider: 'apple',
-          token: idToken,
-        });
+        const { data, error, linked } = await signInOrLinkIdToken('apple', idToken);
 
         if (error) {
           console.error('[apple-auth] supabase rejection:', (error as { status?: number }).status, error.message);
@@ -346,6 +343,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
         if (data?.session?.user) {
           trackLoginSuccess('apple');
+          trackGuestConversionIfPending('apple', linked);
           // Native account creation and sign-in timestamps can differ by milliseconds.
           if (isNewSignup(data.user)) {
             trackSignupSuccess('apple');
@@ -420,10 +418,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
           /* non-fatal */
         }
 
-        const { data, error } = await supabase.auth.signInWithIdToken({
-          provider: 'google',
-          token: idToken,
-        });
+        const { data, error, linked } = await signInOrLinkIdToken('google', idToken);
 
         if (error) {
           console.error('[google-auth] supabase rejection:', (error as { status?: number }).status, error.message);
