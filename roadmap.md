@@ -1,5 +1,11 @@
 # Roadmap
 
+## Review posts — Match normal feed media sizing
+- [x] Share intrinsic ratio/cap rules and opt media-first reviews with media into natural-height flow; preserve standard/no-media reviews.
+- [x] Add11 sizing cases; targeted42 passed/3 failed/45 across4. Existing34/34 pass; no old assertions changed. Candidate4622/469 =4579/466 +ST532/2 +this11/1.
+- [ ] STOP: reviewFeedMediaSizing.test.tsx:67:39 (two photo cases) and80:65 (carousel): AssertionError expected undefined to be ''. Automatic typecheck19:140 TS2322 Type 'string' is not assignable to type 'ObjectFit'. No assertion corrections/retests; full suite awaits stop resolution. Report REVIEW_FEED_MEDIA_HEIGHT_STOP_REPORT.md.
+- [ ] Measure4:5 review/normal at390x844 after stop resolution; no browser measurement claimed. Prior ST5 sheetTopV5 failure remains untouched.
+
 ## ST5 — Settings Your data
 - [x] Add the connection/total-gated rounds row and signed-off export sheet between Account and Friends.
 - [x] Add only email-my-rounds, caller-owned CSV email and ten-minute sent suppression; preserve existing functions and SQL. Required RESEND_API_KEY saved securely.
