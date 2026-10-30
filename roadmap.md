@@ -1,5 +1,11 @@
 # Roadmap
 
+## Guest browsing Stage 1 + sign-in correction
+- [x] Fix peekGuestConversion surface; AuthForm independent of guest code when off, fault-safe when on; link/email-change conversion.
+- [x] Gate feed/report/claim/route doors and like/comment writes; RootGate guest logic extracted; 23 new tests.
+- [x] Read-only server audit in GUEST_STAGE1_REPORT.md.
+- [ ] BLOCKED (stop rule): gateScopeSwitch.test.tsx fails because useIsGuest reads the session with the switch off; proposed code-only fix awaits approval.
+
 ## Review media — Authorised test corrections and finish
 - [x] Apply only the authorised absent-ratio assertions and optional objectFit mock type; no visual changes.
 - [x] Targeted45/45; automatic build/type validation OK11:26:38Z; full shards2257/235 +2364/234 =4621/4621 across469. Reconcile4579/466 +ST5 UI18/CSV13 +review11; no failures, sheetTopV5 unchanged2/2 pass.
