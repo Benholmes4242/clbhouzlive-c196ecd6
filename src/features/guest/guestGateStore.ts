@@ -140,6 +140,31 @@ export function getGuestUser(): User | null {
 }
 
 // ---------------------------------------------------------------------------
+// Open course sheets (Stage 2.3). While a course holes/rounds sheet is open
+// the card, shade and nav are raised above the sheet so the nav stays the
+// way out. Counted, so overlapping sheets release correctly.
+// ---------------------------------------------------------------------------
+let openCourseSheets = 0;
+const sheetListeners = new Set<() => void>();
+export function registerGuestCourseSheet(): () => void {
+  openCourseSheets += 1;
+  sheetListeners.forEach((fn) => fn());
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    openCourseSheets = Math.max(0, openCourseSheets - 1);
+    sheetListeners.forEach((fn) => fn());
+  };
+}
+function subscribeSheets(fn: () => void) { sheetListeners.add(fn); return () => { sheetListeners.delete(fn); }; }
+export function useGuestCourseSheetOpen(): boolean {
+  return useSyncExternalStore(subscribeSheets, () => openCourseSheets > 0, () => false);
+}
+/** BottomSheet's default base is 1400 (surface 1401); raised layers sit above. */
+export const GUEST_RAISED_Z = { shade: 1402, card: 1403, nav: 1404 } as const;
+
+// ---------------------------------------------------------------------------
 // Course / tour copy context — published by the pages that already hold the
 // data, so the card never reads anything itself.
 // ---------------------------------------------------------------------------
@@ -170,5 +195,7 @@ export function resetGuestGateState(): void {
   cardRequest = null;
   courseContext = null;
   tourContext = null;
+  openCourseSheets = 0;
   emit();
+  sheetListeners.forEach((fn) => fn());
 }

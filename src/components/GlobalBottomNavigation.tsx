@@ -19,6 +19,7 @@ import { scrollPageToTop } from '@/lib/getScrollParent';
 import { r } from '@/lib/radius';
 import { LIVE_INK } from '@/features/tourhub/_shared/tokens';
 import { Z } from '@/config/zIndex';
+import { GUEST_RAISED_Z, useGuestCardRequest, useGuestCourseSheetOpen } from '@/features/guest/guestGateStore';
 import { useAnyTourLive } from '@/features/tourhub/hooks/useAnyTourLive';
 import ComposerFlowSheet from '@/features/composer-flow/ComposerFlowSheet';
 import { useComposerFlowStore } from '@/features/composer-flow/composerFlowStore';
@@ -147,6 +148,11 @@ const REDUCED_MOTION =
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeState = 'visible' }) => {
+  // Guest Stage 2.3: while the join card is up over an open course sheet, the
+  // nav rises above both so it stays the way out.
+  const guestSheetOpen = useGuestCourseSheetOpen();
+  const guestCard = useGuestCardRequest();
+  const guestRaised = guestSheetOpen && guestCard !== null;
   const location = useLocation();
   const { isVisible } = useBottomNavigation();
   const { shouldHideHeader } = useModalContext();
@@ -397,7 +403,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               left: 0,
               right: 0,
               bottom: 20,
-              zIndex: Z.bottomNav,
+              zIndex: guestRaised ? GUEST_RAISED_Z.nav : Z.bottomNav,
               pointerEvents: 'none',
               display: 'flex',
               justifyContent: 'center',

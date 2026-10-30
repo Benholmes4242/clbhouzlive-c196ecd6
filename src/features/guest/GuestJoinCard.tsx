@@ -17,6 +17,7 @@ import React, { useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { Z } from '@/config/zIndex';
+import { GUEST_RAISED_Z, useGuestCourseSheetOpen } from './guestGateStore';
 import { getPrimaryScrollElement } from '@/lib/getScrollParent';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { pushForceExpand } from '@/hooks/useScrollDirection';
@@ -63,10 +64,12 @@ export const GuestJoinCard: React.FC<GuestJoinCardProps> = ({ copy, closable, on
   }, []);
 
   const inMedian = isMedianApp();
+  // Stage 2.3: above an open course sheet; nav is raised above both.
+  const raised = useGuestCourseSheetOpen();
 
   return createPortal(
     <>
-      <div data-guest-gate-shade="" aria-hidden="true" className="guest-gate-shade guest-gate-enter" style={{ zIndex: Z.bottomNav - 2 }} />
+      <div data-guest-gate-shade="" aria-hidden="true" className="guest-gate-shade guest-gate-enter" style={{ zIndex: raised ? GUEST_RAISED_Z.shade : Z.bottomNav - 2 }} />
       <div
         ref={cardRef}
         data-guest-gate-card=""
@@ -75,7 +78,7 @@ export const GuestJoinCard: React.FC<GuestJoinCardProps> = ({ copy, closable, on
         aria-modal="false"
         aria-label={copy.kicker}
         tabIndex={-1}
-        style={{ zIndex: Z.bottomNav - 1 }}
+        style={{ zIndex: raised ? GUEST_RAISED_Z.card : Z.bottomNav - 1 }}
       >
         {closable && (
           <button type="button" className="guest-gate-close" aria-label={GUEST_CARD_CHROME_COPY.close} onClick={onClose}>
