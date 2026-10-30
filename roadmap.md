@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Awards follow-ups — Ring and widest fit
-- [ ] Change only the score-led ring to FEED_CARD_SURFACE; add one ring regression without changing other callers.
-- [ ] Check gross 102 (+30), handicap 28, awards 4/5/3 at 375px; report widths/touching without shrinking.
-- [ ] Run full suite against 4,527/463 baseline and report every changed file.
+- [x] Change only the score-led ring to FEED_CARD_SURFACE; add one ring regression without changing other callers.
+- [x] Chromium widest case: gross102 (+30), handicap28, net74 (+2), awards4/5/3 total12 at375px. scrollWidth375/clientWidth375; right group is61.796875px clear of net, no touching/overlap/shrinking.
+- [x] Full bunx vitest run --maxWorkers=2: 4,528/4,528 across463 files, +1 from4,527/463; no failures. Build OK. See AWARDS_FOLLOWUPS_REPORT.md for changed files and limits.
 
 ## ST2 — Settings Your handicap card
 - [x] Replace only the interim handicap row and move its switch out of Privacy; preserve existing handler and destinations.
