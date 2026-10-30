@@ -16,6 +16,7 @@ vi.mock('@/hooks/useDeleteAccount', () => ({ useDeleteAccount: () => ({ showDele
 vi.mock('@/hooks/useLogout', () => ({ useLogout: () => ({ logout: h.logout }) }));
 vi.mock('@/lib/whs/hooks', () => ({ useWhsConnection: () => ({ data: null }) }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));
+vi.mock('@/components/settings/useSettingsBlockedCount', () => ({ useSettingsBlockedCount: () => null }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: () => Promise.resolve({ error: null }) } }));
 
 import { SettingsTabContent } from '@/components/settings/SettingsTabContent';
