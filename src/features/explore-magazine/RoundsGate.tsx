@@ -26,6 +26,7 @@ import { pushForceExpand } from '@/hooks/useScrollDirection';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { Z } from '@/config/zIndex';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useIsGuest } from '@/features/guest/useIsGuest';
 import './roundsGate.css';
 
 export type RoundsGateState = 'signedOut' | 'loading' | 'gated' | 'connected';
