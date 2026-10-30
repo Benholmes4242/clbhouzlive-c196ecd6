@@ -6,7 +6,7 @@
 - `src/hooks/profile/useMemberFirstRoundYear.ts` (new): reads only `play_date` from `whs_scores`, scoped to `connection_id`, ascending with limit 1. Mirrors useMemberRoundTotal’s `ok/loading/error` contract and `isFetched` gate; no fallback or invented year and errors discard stale values.
 - `src/features/edit-profile/edit-profile.css`: ST2-scoped styling using existing card/ink/inset/mute/dim tokens. Matches the 18px card, 14px figure strip, typography, seams and local 44×26 ink-track bizc-switch geometry; no shared switch styling changes.
 - `src/test/st2SettingsHandicapCard.test.tsx` (new): 22 cases covering provider/sync/navigation, resolved index, unknown/error/zero figures, inverse hide flag in both states, save disabling, removed Privacy row and scoped first-year query/state behavior.
-- `AGENTS.md`: ownership pointer to the card and reader headers.
+- Ownership is documented in the new card/reader headers; `AGENTS.md` is unchanged because its size budget rejects adding another rule.
 - `roadmap.md`: ST2 verification status.
 - `ST2_SETTINGS_HANDICAP_REPORT.md`: this report.
 
