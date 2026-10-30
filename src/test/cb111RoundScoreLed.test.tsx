@@ -199,6 +199,56 @@ describe('CB111 score-led round in the mediaFirst feed', () => {
   });
 });
 
+describe('Signed-off score-led round awards', () => {
+  it('places all present tiers after handicap and prints the total at 17px', () => {
+    const { container } = card({ roundMedals: { gold: 1, silver: 2, bronze: 1 } });
+    const awards = container.querySelector('[data-round-score-awards]') as HTMLElement;
+    expect(awards).not.toBeNull();
+    expect([...awards.parentElement?.children ?? []].map(c => Object.keys((c as HTMLElement).dataset)[0])).toEqual(['roundScoreGross', 'roundScoreHandicap', 'roundScoreAwards']);
+    const cluster = awards.querySelector('[data-award-cluster]') as HTMLElement;
+    expect(cluster.dataset.awardCluster).toBe('gold silver bronze');
+    expect(cluster.querySelectorAll('svg')).toHaveLength(3);
+    expect(cluster.lastElementChild?.textContent).toBe('4');
+    expect((cluster.lastElementChild as HTMLElement).style.fontSize).toBe('17px');
+    expect(awards.parentElement?.style.gap).toBe('18px');
+    expect((awards.lastElementChild as HTMLElement).style.textTransform).toBe('uppercase');
+    expect((awards.lastElementChild as HTMLElement).style.marginTop).toBe('5px');
+  });
+  it('a single gold award renders only one canonical row-size mark', () => {
+    const { container } = card({ roundMedals: { gold: 1, silver: 0, bronze: 0 } });
+    const cluster = container.querySelector('[data-round-score-awards] [data-award-cluster]') as HTMLElement;
+    expect(cluster.dataset.awardCluster).toBe('gold'); expect(cluster.lastElementChild?.textContent).toBe('1');
+    expect(cluster.querySelectorAll('svg')).toHaveLength(1);
+    const mark = cluster.firstElementChild?.firstElementChild as HTMLElement;
+    expect(mark.style.width).toBe('15px'); expect(mark.style.height).toBe('18px');
+  });
+  it('omits absent tiers and preserves canonical overlap order', () => {
+    const { container } = card({ roundMedals: { gold: 0, silver: 2, bronze: 1 } });
+    const cluster = container.querySelector('[data-round-score-awards] [data-award-cluster]') as HTMLElement;
+    expect(cluster.dataset.awardCluster).toBe('silver bronze'); expect(cluster.lastElementChild?.textContent).toBe('3');
+    const marks = [...cluster.firstElementChild?.children ?? []] as HTMLElement[];
+    expect(marks.map(mark => mark.style.marginLeft)).toEqual(['0px', '-4px']);
+  });
+  it.each([undefined, { gold: 0, silver: 0, bronze: 0 }])('no awards retains the two figures and 22px gap (%s)', medals => {
+    const { container } = card({ roundMedals: medals });
+    expect(container.querySelector('[data-round-score-awards]')).toBeNull();
+    const right = container.querySelector('[data-round-score-handicap]')?.parentElement;
+    expect(right?.children).toHaveLength(2); expect(right?.style.gap).toBe('22px');
+  });
+  it('awards never invent a missing handicap or duplicate gross', () => {
+    const { container } = card({ postRound: { ...ROUND, courseHandicap: null } as PostRound, roundMedals: { gold: 1, silver: 0, bronze: 0 } });
+    expect(container.querySelectorAll('[data-round-score-gross]')).toHaveLength(1);
+    expect(container.querySelector('[data-round-score-handicap]')).toBeNull();
+    expect(container.querySelector('[data-round-score-awards]')).not.toBeNull();
+  });
+  it('standard cards keep the existing cluster figure size and no score-led awards cell', () => {
+    const { container } = card({ layout: 'standard', roundMedals: { gold: 1, silver: 0, bronze: 0 } });
+    expect(container.querySelector('[data-round-score-awards]')).toBeNull();
+    const cluster = container.querySelector('[data-award-cluster]') as HTMLElement;
+    expect(cluster).not.toBeNull(); expect((cluster.lastElementChild as HTMLElement).style.fontSize).toBe('15px');
+  });
+});
+
 describe('CB111 out-of-scope surfaces are unchanged', () => {
   const streamItem = {
     id: 'round:score-1', kind: 'round', ring: 'own', lane: 'news', score: 1, consequence: null,

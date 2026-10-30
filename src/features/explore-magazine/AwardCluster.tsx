@@ -12,6 +12,8 @@
  *
  * The aria-label joins the counted tier keys: "4 gold, 11 silver".
  * scale: 'row' beside 15px figures (Explore); 'pill' beside 11.5px (Scores).
+ * figureSize is opt-in for the score-led feed's 17px total; mark geometry and
+ * existing consumers retain their scale defaults.
  */
 import { useTranslation } from 'react-i18next';
 import { A } from '@/components/explore-tab-new/courseled/tokens';
@@ -23,12 +25,13 @@ export interface AwardClusterProps {
   bronze: number;
   surfaceColor: string;
   scale?: 'row' | 'pill';
+  figureSize?: number;
 }
 
 const FIGURE = { row: 15, pill: 11.5 } as const;
 const DEFAULTS = { gold: '{{count}} gold', silver: '{{count}} silver', bronze: '{{count}} bronze' } as const;
 
-export function AwardCluster({ gold, silver, bronze, surfaceColor, scale = 'row' }: AwardClusterProps) {
+export function AwardCluster({ gold, silver, bronze, surfaceColor, scale = 'row', figureSize }: AwardClusterProps) {
   const { t } = useTranslation('courses');
   const tiers = ([['gold', gold], ['silver', silver], ['bronze', bronze]] as Array<[AwardTier, number]>).filter(([, n]) => n > 0);
   if (tiers.length === 0) return null;
@@ -42,7 +45,7 @@ export function AwardCluster({ gold, silver, bronze, surfaceColor, scale = 'row'
           <AwardMark key={tier} tier={tier} size={scale} ring={surfaceColor} style={{ marginLeft: i === 0 ? 0 : -4, position: 'relative', zIndex: tiers.length - i }} />
         ))}
       </span>
-      <span aria-hidden style={{ fontSize: FIGURE[scale], fontWeight: 700, color: A.INK, fontVariantNumeric: 'tabular-nums' }}>{total}</span>
+      <span aria-hidden style={{ fontSize: figureSize ?? FIGURE[scale], fontWeight: 700, color: A.INK, fontVariantNumeric: 'tabular-nums' }}>{total}</span>
     </span>
   );
 }

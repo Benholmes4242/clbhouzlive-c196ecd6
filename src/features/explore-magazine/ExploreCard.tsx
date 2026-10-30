@@ -1624,7 +1624,8 @@ export function ExploreCard({
      footer, so nothing appears twice. Figures are the ones the card computes
      today: gross with its to-par, net with its to-par, and the netted
      handicap; a cell with no value is omitted, so an in-flight round fills
-     in place. */
+     in place. Awards consume only the already-batched medals prop, sharing
+     AwardCluster's canonical tier marks; absent awards leave the row unchanged. */
   if (feedLayout === 'scoreLed' && item.kind === 'round' && size !== 'pair') {
     const courseHcp = item.facts.course_handicap ?? null;
     const received = shape ? feedStrokesReceived(shape, courseHcp) : null;
@@ -1641,6 +1642,7 @@ export function ExploreCard({
        red, level or over is A.MUTE. Never red over par. */
     const toParColor = (v: number | null) => (v ?? 0) < 0 ? TOPAR_UNDER_DARK : A.MUTE;
     const scoreLedCourse = kickerPartsValue.course ?? (item.subject?.course_name?.trim() || null);
+    const hasAwards = !!medals && (medals.gold > 0 || medals.silver > 0 || medals.bronze > 0);
     const cellLabel: React.CSSProperties = { display: 'block', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.DIM };
     const sideCallout = feedPlot ? homePanelCallout(callout, shape, collectRoundFeats(item.facts)) : callout;
     return (
@@ -1671,7 +1673,7 @@ export function ExploreCard({
               <span style={{ ...cellLabel, marginTop: 6 }}>{t('amateur.stream.stat.gross', 'Gross')}</span>
             </span>
           ) : <span />}
-          <span style={{ display: 'flex', gap: 22, paddingBottom: 16, flex: '0 0 auto' }}>
+          <span style={{ display: 'flex', gap: hasAwards ? 18 : 22, paddingBottom: 16, flex: '0 0 auto' }}>
             {netShown && gross != null ? (
               <span data-round-score-gross="true" style={{ textAlign: 'center' }}>
                 <span style={{ ...FIGS, fontSize: 17, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap' }}>
@@ -1685,6 +1687,12 @@ export function ExploreCard({
               <span data-round-score-handicap="true" style={{ textAlign: 'center' }}>
                 <span style={{ ...FIGS, fontSize: 17, fontWeight: 700, color: A.INK, whiteSpace: 'nowrap' }}>{formatDisplayedHcp(Math.round(courseHcp))}</span>
                 <span style={{ ...cellLabel, marginTop: 5 }}>{t('amateur.stream.stat.handicap', 'Handicap')}</span>
+              </span>
+            ) : null}
+            {hasAwards && medals ? (
+              <span data-round-score-awards="true" style={{ textAlign: 'center', flex: 'none' }}>
+                <AwardCluster gold={medals.gold} silver={medals.silver} bronze={medals.bronze} surfaceColor={A.CANVAS} figureSize={17} />
+                <span style={{ ...cellLabel, marginTop: 5 }}>{t('amateur.stream.stat.awards', 'Awards')}</span>
               </span>
             ) : null}
           </span>

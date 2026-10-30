@@ -1,9 +1,14 @@
 # Roadmap
 
+## Round awards — Signed-off score-led card
+- [x] Restore the awards figure after handicap using canonical medal counts/marks; no-awards and other card surfaces unchanged.
+- [x] Added seven regressions without rewriting/removing existing cases; full bunx vitest run --maxWorkers=2: 4,505/4,505 across 462 files, +7 from 4,498/462. First foreground run timed out; uninterrupted rerun passed. Build OK.
+- [x] Real ExploreCard sample-data browser fixture fits at 375/390/430px, with 17px totals, 18px/22px gaps and working tap. Authenticated live feed unavailable (external_unmanaged).
+
 ## ST1 — Settings Account, Help and end card
-- [ ] Reorder only the specified groups and reuse profile rows for Account/Help/end actions; preserve existing confirmations and deferred groups.
-- [ ] Add ST1 coverage, run full suite with --maxWorkers=2 and report baseline/delta and every changed file.
-- [ ] Check preview/build signals; authenticated flow requires an available managed session.
+- [x] Reorder only the specified groups and reuse profile rows for Account/Help/end actions; preserve existing confirmations and deferred groups.
+- [x] ST1 adds 19 tests, no existing cases changed; bunx vitest run --maxWorkers=2: 4,498/4,498 across 462 files, up from 4,479/461. Automatic build OK.
+- [ ] Authenticated flow verification unavailable: external_unmanaged session.
 
 ## Rounds gate — Keep bottom navigation live
 - [x] Diagnose actual nav layer 100 versus body-level shade/card 997/998 and absent lock expansion lease.
