@@ -2,18 +2,14 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatRelativeAgoLong } from '@/i18n/format';
 import {
-  ChevronRight, Mail, Bell, Shield, UserX,
-  HelpCircle, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Link2, Briefcase, UserPlus, BadgeCheck,
+  ChevronRight, Bell, Shield, UserX, Eye, BarChart2, Link2, UserPlus,
   Flag,
 } from 'lucide-react';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { bodyNameForProvider } from '@/lib/whs/whsCountries';
-import { A } from '@/features/courses/components/holes/analytical/tokens';
 
-import { formatHcp } from '@/lib/formatHcp';
-import { resolveDisplayHandicap } from '@/lib/handicap/resolveHandicap';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePrivacySettings } from '@/hooks/usePrivacySettings';
@@ -24,7 +20,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
 import {
-  SettingsSection,
   SettingsChevronRow,
   SettingsToggleRow,
   SettingsLevelRow,
@@ -41,7 +36,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { Button } from '@/components/ui/button';
+import { useMyRequestsList } from '@/hooks/useMyRequests';
 import DeleteAccountConfirmSheet from '@/components/manage/overlays/DeleteAccountConfirmSheet';
 import { useLogout } from '@/hooks/useLogout';
 
@@ -58,7 +54,10 @@ function maskEmail(email: string): string {
 /**
  * Settings content for the Manage Profile -> Settings tab.
  * Rows navigate to /manage/* sub-pages (Phase 3). Destructive confirms stay
- * as overlays.
+ * as overlays. ST1 Account/Help/end rows reuse the editor grammar; deferred
+ * Privacy/Notifications/Friends keep their existing controls. Request visibility
+ * comes only from a settled, successful useMyRequestsList read, including errors
+ * with stale data. Shared settings/ui remains unchanged for other consumers.
  */
 type SettingsProfileRow = {
   id?: string;
@@ -87,7 +86,8 @@ export function SettingsTabContent() {
   const { user, loading: sessionLoading } = useSupabaseSession();
   const { profile: profileRaw, loading } = useProfileData();
   const profile = profileRaw as SettingsProfileRow;
-  const { hasBusinesses, count } = useHasBusinesses(user?.id);
+  const { count } = useHasBusinesses(user?.id);
+  const requests = useMyRequestsList();
   const { openInviteSheet } = useInviteSheet();
 
   useEffect(() => {
@@ -164,15 +164,6 @@ export function SettingsTabContent() {
   if (sessionLoading || loading || !profile) return <SettingsSkeleton />;
 
   const p = profile;
-  const resolvedHcp = resolveDisplayHandicap({
-    egHandicapIndex: p?.eg_handicap_index ?? null,
-    manualHandicapIndex: p?.manual_handicap_index ?? null,
-    hasWhsConnection: !!whsConnection,
-  });
-  const handicapSuffix = resolvedHcp.value != null
-    ? ` \u00B7 ${formatHcp(resolvedHcp.value)} hcp`
-    : '';
-
   // The row must never name a federation a member has nothing to do with:
   // sixteen more governing bodies are pending, so the title is sourced from the
   // connection's OWN provider (bodyNameForProvider) and is neutral until one
@@ -187,59 +178,32 @@ export function SettingsTabContent() {
     : 'Sync your official handicap';
 
 
+  const requestRows = !requests.isLoading && !requests.isError && !requests.error ? requests.data : undefined;
+  const openCount = requestRows?.filter(r => r.status === 'open' || r.status === 'in_progress').length ?? 0;
+  const row = (label: string, path: string, value?: string, placeholder = false) => (
+    <Button variant="ghost" className="ep-row" onClick={() => navigate(path)}>
+      <span className="ep-row-label">{label}</span>
+      <span className={`ep-row-value${placeholder ? ' ph' : ''}`}>{value}</span>
+      <ChevronRight size={18} className="ep-row-chev" aria-hidden="true" />
+    </Button>
+  );
+
   return (
     <>
-      {/* Profile mini-card */}
-      <div className="px-4 pb-4">
-        <button
-          onClick={() => navigate(`/profile/${p?.username}`)}
-          className="w-full flex items-center gap-3 p-4 rounded-2xl text-left active:opacity-70"
-          style={{ background: A.PANEL, border: `1px solid ${A.BORDER}` }}
-        >
-          <SquircleAvatar
-            src={p?.profile_photo_url}
-            alt={p?.display_name || ''}
-            userId={p?.id ?? user?.id ?? null}
-            size={52}
-            fallback={p?.display_name?.charAt(0) || '?'}
-            hairlineRing
-          />
-          <div className="flex-1 min-w-0">
-            <p className="text-[16px] font-semibold text-foreground truncate">
-              {p?.display_name || 'Your Profile'}
-            </p>
-            <p className="text-[13px] text-muted-foreground truncate">
-              @{p?.username}{handicapSuffix}
-            </p>
-          </div>
-          <ChevronRight size={18} className="text-muted-foreground/40 flex-shrink-0" />
-        </button>
-      </div>
-
-      <div className="px-4 pb-0 space-y-6">
-        {/* Account */}
-        <SettingsSection title="Account">
+      <div className="ep-settings">
+        <div className="ep-group">Your handicap</div>
+        <div className="ep-rows">
           <SettingsChevronRow
-            icon={<Mail size={15} />}
-            title="Email"
-            value={user?.email ? maskEmail(user.email) : undefined}
-            onClick={() => navigate('/manage/email')}
+            icon={<Link2 size={15} />}
+            title={whsRowTitle}
+            subtitle={whsSubtitle}
+            onClick={() => navigate('/manage/handicap')}
           />
-        </SettingsSection>
-
-        {/* Business */}
-        <SettingsSection title="Business">
-          <SettingsChevronRow
-            icon={<Briefcase size={15} />}
-            title={hasBusinesses ? 'Manage businesses' : 'Set up a business profile'}
-            value={hasBusinesses ? String(count) : undefined}
-            valueIsFigure
-            onClick={() => navigate('/businesses/manage')}
-          />
-        </SettingsSection>
+        </div>
 
         {/* Privacy */}
-        <SettingsSection title="Privacy">
+        <div className="ep-group">Privacy</div>
+        <div className="ep-rows">
           <SettingsToggleRow
             icon={<Eye size={15} />}
             title="Public Profile"
@@ -297,92 +261,49 @@ export function SettingsTabContent() {
             title="Blocked Users"
             onClick={() => navigate('/manage/blocked')}
           />
-        </SettingsSection>
+        </div>
 
         {/* Notifications */}
-        <SettingsSection title="Notifications">
+        <div className="ep-group">Notifications</div>
+        <div className="ep-rows">
           <SettingsChevronRow
             icon={<Bell size={15} />}
             title="Notification Preferences"
             onClick={() => navigate('/manage/notifications')}
           />
-        </SettingsSection>
+        </div>
 
-        {/* Connections */}
-        <SettingsSection title="Connections">
-          <SettingsChevronRow
-            icon={<Link2 size={15} />}
-            title={whsRowTitle}
-            subtitle={whsSubtitle}
-            onClick={() => navigate('/manage/handicap')}
-          />
-        </SettingsSection>
+        <div className="ep-group">Account</div>
+        <div className="ep-rows" data-testid="settings-account">
+          {row('Email', '/manage/email', user?.email ? maskEmail(user.email) : undefined)}
+          {row('Businesses', '/businesses/manage', count ? `${count} ${count === 1 ? 'profile' : 'profiles'}` : 'Set one up', !count)}
+          {row('Verification', '/manage/contact?category=account&subject=Verification%20enquiry', 'How it works')}
+        </div>
 
         {/* Friends */}
-        <SettingsSection title="Friends">
+        <div className="ep-group">Friends</div>
+        <div className="ep-rows">
           <SettingsChevronRow
             icon={<UserPlus size={15} />}
             title="Invite friends"
             subtitle={"Share your link \u2014 golf's better with your circle"}
             onClick={() => openInviteSheet('settings')}
           />
-        </SettingsSection>
-
-        {/* Support & Legal */}
-        <SettingsSection title="Support & Legal">
-          <SettingsChevronRow
-            icon={<HelpCircle size={15} />}
-            title="Help Centre"
-            onClick={() => navigate('/manage/help')}
-          />
-          <SettingsChevronRow
-            icon={<BadgeCheck size={15} />}
-            title="Verified accounts"
-            subtitle="How verification works"
-            onClick={() =>
-              navigate('/manage/contact?category=account&subject=Verification%20enquiry')
-            }
-          />
-          <SettingsChevronRow
-            icon={<MessageSquare size={15} />}
-            title="Contact Us"
-            onClick={() => navigate('/manage/contact')}
-          />
-          <SettingsChevronRow
-            icon={<MessageSquare size={15} />}
-            title="My requests"
-            onClick={() => navigate('/manage/requests')}
-          />
-          <SettingsChevronRow
-            icon={<FileText size={15} />}
-            title="Legal & Policies"
-            onClick={() => navigate('/manage/legal')}
-          />
-        </SettingsSection>
-
-        {/* Account Actions */}
-        <SettingsSection title="Account Actions" variant="danger">
-          <SettingsChevronRow
-            icon={<LogOut size={15} />}
-            title="Sign Out"
-            onClick={() => setSignOutOpen(true)}
-            iconTheme="default"
-          />
-          <SettingsChevronRow
-            icon={<Trash2 size={15} />}
-            title="Delete Account"
-            onClick={deleteAccount.initiateDelete}
-            iconTheme="danger"
-          />
-        </SettingsSection>
-
-        {/* Version footer */}
-        <div
-          className="pt-4 text-center"
-          style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', fontSize: 12, color: A.MUTE, letterSpacing: '0.01em' }}
-        >
-          {`clbhouz \u00B7 v${APP_VERSION}`}
         </div>
+
+        <div className="ep-group">Help</div>
+        <div className="ep-rows" data-testid="settings-help">
+          {row('Help centre', '/manage/help')}
+          {row('Contact us', '/manage/contact')}
+          {!!requestRows?.length && row('Your requests', '/manage/requests', openCount ? `${openCount} open` : 'None open')}
+          {row('Legal', '/manage/legal', 'Terms and privacy', true)}
+        </div>
+
+        <div className="ep-rows ep-settings-end">
+          <Button variant="ghost" className="ep-row" onClick={() => setSignOutOpen(true)}><span className="ep-row-value">Sign out</span></Button>
+          <Button variant="ghost" className="ep-row" onClick={deleteAccount.initiateDelete}><span className="ep-row-value ep-settings-delete">Delete account</span></Button>
+        </div>
+        <div className="ep-settings-version">{`clbhouz \u00B7 v${APP_VERSION}`}</div>
       </div>
 
       {/* Sign out confirm */}
