@@ -1,8 +1,9 @@
 # Roadmap
 
 ## Round awards — Signed-off score-led card
-- [ ] Restore the awards figure after handicap using canonical medal counts/marks; no-awards and other card surfaces unchanged.
-- [ ] Add regressions, verify fit at 375/390/430px and run full suite with two workers against 4,498/462 baseline.
+- [x] Restore the awards figure after handicap using canonical medal counts/marks; no-awards and other card surfaces unchanged.
+- [x] Added seven regressions without rewriting/removing existing cases; full bunx vitest run --maxWorkers=2: 4,505/4,505 across 462 files, +7 from 4,498/462. First foreground run timed out; uninterrupted rerun passed. Build OK.
+- [x] Real ExploreCard sample-data browser fixture fits at 375/390/430px, with 17px totals, 18px/22px gaps and working tap. Authenticated live feed unavailable (external_unmanaged).
 
 ## ST1 — Settings Account, Help and end card
 - [x] Reorder only the specified groups and reuse profile rows for Account/Help/end actions; preserve existing confirmations and deferred groups.
