@@ -85,7 +85,7 @@ export function ReviewReceipt({ ratingId, pending, course, overall, scores, shar
   const impact = (id: string, icon: ReactNode, title: ReactNode, sub: ReactNode) => <div className="receipt-impact" data-testid={`receipt-${id}`}><span className="receipt-impact-icon" aria-hidden>{icon}</span><div><div className="receipt-impact-title">{title}</div>{sub && <div className="receipt-impact-sub">{sub}</div>}</div></div>;
   return <div className="review-receipt">
     <div className="receipt-content" ref={contentRef}>
-      <ReviewCourseHero courseId={course.id} name={course.name} courseRegion={course.region} subCountry={course.sub_country} country={course.country} thumbnail={course.thumbnail_image} height="calc(env(safe-area-inset-top, 0px) + 196px)">
+      <ReviewCourseHero courseId={course.id} name={course.name} courseRegion={course.region} subCountry={course.sub_country} country={course.country} thumbnail={course.thumbnail_image} className="rv2-receipt-hero">
         <Button variant="ghost" className="receipt-close" aria-label={t(key('close'))} onClick={() => action('close')}><X size={17} strokeWidth={2.2} /></Button>
       </ReviewCourseHero>
       {live ? <div className="receipt-status" data-testid="receipt-status"><span className="receipt-check" aria-hidden><Check size={13.2} strokeWidth={3} /></span><div><div className="receipt-status-title">{t(key(shareToFeed ? 'statusPosted' : 'statusSaved'))}</div><div className="receipt-status-sub">{shareToFeed ? t(`review.wizard.step3.${scoreShareKey(mediaCount, hasText)}`, { count: mediaCount }) : t(key('statusSavedSub'))}</div></div></div>

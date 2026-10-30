@@ -1,4 +1,7 @@
 /* Receipt-only semantic tokens, exact signed-off geometry. */
+.rv2-receipt-hero { height: calc(env(safe-area-inset-top, 0px) + 196px); }
+/* Keep receipt height authoritative even if Step 1's generic photo CSS loads later. */
+.review-receipt .rv2-receipt-hero { height: calc(env(safe-area-inset-top, 0px) + 196px); }
 .review-receipt{--receipt-canvas:#16161A;--receipt-ink:#F8FAFC;--receipt-mute:rgba(248,250,252,.62);--receipt-dim:rgba(248,250,252,.42);--receipt-rule:rgba(255,255,255,.08);--receipt-card:rgba(255,255,255,.045);--receipt-border:rgba(255,255,255,.12);--receipt-track:rgba(255,255,255,.10);--receipt-tile:rgba(255,255,255,.07);--receipt-button:#F3F5F7;--receipt-on-button:#0A0A0C;--receipt-close:rgba(14,14,16,.6);--rcs-ink:var(--receipt-ink);--rcs-mute:var(--receipt-mute);--rcs-dim:var(--receipt-dim);--rcs-rule:var(--receipt-rule);min-height:100dvh;background:var(--receipt-canvas);color:var(--receipt-ink);letter-spacing:0}
 .receipt-content{padding-bottom:var(--receipt-footer-height,130px)}
 .review-receipt .receipt-close{position:absolute;top:calc(env(safe-area-inset-top,0px) + 6px);right:14px;width:36px;height:36px;border-radius:50%;background:var(--receipt-close);color:var(--receipt-ink);padding:0;border:0;z-index:1}
