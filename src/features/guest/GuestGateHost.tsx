@@ -15,6 +15,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useIsGuest } from './useIsGuest';
 import {
   closeGuestCard,
+  getGuestCardRequest,
   isSurfaceLocked,
   openGuestCard,
   surfaceForPath,
@@ -35,7 +36,7 @@ export const GuestGateHost: React.FC = () => {
   // Returning to a locked surface re-shows the scroll card at the top.
   useEffect(() => {
     if (!isGuest || !surface) return;
-    if (isSurfaceLocked(surface) && !useGuestCardRequestSnapshot()) {
+    if (isSurfaceLocked(surface) && !getGuestCardRequest()) {
       openGuestCard({ kind: 'scroll', surface });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,11 +76,5 @@ export const GuestGateHost: React.FC = () => {
 
   return <GuestJoinCard copy={copy} closable={closable} onChoice={onChoice} onClose={() => onChoice('close')} />;
 };
-
-// Snapshot helper kept separate so the effect above doesn't subscribe.
-import { getGuestCardRequest } from './guestGateStore';
-function useGuestCardRequestSnapshot() {
-  return getGuestCardRequest();
-}
 
 export default GuestGateHost;
