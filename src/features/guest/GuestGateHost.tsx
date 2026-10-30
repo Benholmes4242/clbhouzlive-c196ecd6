@@ -23,7 +23,7 @@ import {
   type GuestSurfaceKey,
 } from './guestGateStore';
 import { guestActionCopy, guestSurfaceCopy, type GuestCardCopy } from './guestCopy';
-import { trackGuestGateChoice, trackGuestGateShown, type GuestGateChoice } from './guestAnalytics';
+import { trackGuestGateChoice, type GuestGateChoice } from './guestAnalytics';
 import { GuestJoinCard } from './GuestJoinCard';
 
 export const GuestGateHost: React.FC = () => {
