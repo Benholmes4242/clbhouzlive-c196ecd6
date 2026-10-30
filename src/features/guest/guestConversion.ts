@@ -15,7 +15,7 @@ export function rememberGuestConversion(userId: string, surface: GuestSurfaceKey
 }
 
 export function peekGuestConversion(): { guestUserId: string | null; surface: GuestSurfaceKey | null } {
-  return { guestUserId, surface };
+  return { guestUserId, surface: guestSurface };
 }
 
 export function clearGuestConversion(): void {
