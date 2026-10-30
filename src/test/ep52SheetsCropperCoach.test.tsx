@@ -22,7 +22,10 @@ describe('EP5.2 sheets', () => {
   it('BizcSheet renders into document.body, not inside .ep-body', () => {
     render(<div className="ep-body" data-host><BizcSheet title="T" testId="sheet" onDone={() => {}}><p>x</p></BizcSheet></div>);
     const sheet = document.querySelector('[data-testid="sheet"]') as HTMLElement;
-    expect(sheet.parentElement).toBe(document.body);
+    const wrapper = document.querySelector('.bizc-sheet-root') as HTMLElement;
+    expect(wrapper.parentElement).toBe(document.body);
+    expect(wrapper.contains(sheet)).toBe(true);
+    expect(document.querySelector('[data-host]')?.contains(sheet)).toBe(false);
     expect(document.querySelector('[data-host]')?.contains(sheet)).toBe(false);
     expect(document.querySelector('[data-host] .bizc-sheet-scrim')).toBeNull();
   });
