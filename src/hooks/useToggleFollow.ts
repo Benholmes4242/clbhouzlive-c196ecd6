@@ -18,6 +18,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { patchFollow, type FollowTarget } from '@/lib/followCache';
+import { getGuestUser } from '@/features/guest/guestGateStore';
+import { gateGuestActionNow } from '@/features/guest/useGuestActionGate';
 
 export interface ToggleFollowParams extends FollowTarget {
   /** Current state BEFORE toggle. We invert it inside the mutation. */

@@ -11,6 +11,7 @@ import { navigationTabs } from './bottom-navigation/navigationTabs';
 import './bottom-navigation/postReviewMark.css';
 import { useDiscoverNewTotal } from '@/stores/discoverNewStore';
 
+import { gateGuestActionNow } from '@/features/guest/useGuestActionGate';
 import { useNavTheme } from '@/hooks/useNavTheme';
 import { useNavScrollState, pushForceExpand, resetToExpanded } from '@/hooks/useScrollDirection';
 import { cn } from '@/lib/utils';
