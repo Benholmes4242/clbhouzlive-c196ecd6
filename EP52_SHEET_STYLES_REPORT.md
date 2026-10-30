@@ -1,4 +1,4 @@
-# FIX — sheets lost their colours and styles (EP5.2) — STOP REPORT
+# FIX — sheets lost their colours and styles (EP5.2) — REPORT
 
 ## Code
 - BizcSheet (`BusinessCreateStep3.tsx`): portal content wrapped in `<div className="bizc-sheet-root">` (scrim + sheet).
