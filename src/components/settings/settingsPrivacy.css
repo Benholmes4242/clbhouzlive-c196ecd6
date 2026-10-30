@@ -7,10 +7,10 @@
 .ep-shell .st3-privacy .st3-seen+.ep-row{border-top:0}
 .st3-note{font-size:12.5px;line-height:1.45;color:var(--ep-dim);margin:8px 4px 0}
 .st3-rounds{cursor:default}
-.ep-shell .st3-switch{width:44px;height:26px;padding:0;box-shadow:none;background:var(--st2-switch-off)}
-.ep-shell .st3-switch[aria-checked=true]{background:var(--ep-ink)}
-.ep-shell .st3-switch i{width:20px;height:20px;background:var(--ep-ink)}
-.ep-shell .st3-switch[aria-checked=true] i{left:21px;background:var(--ep-canvas)}
+:is(.ep-shell, .bizc-sheet-root) .st3-switch{width:44px;height:26px;padding:0;box-shadow:none;background:var(--st2-switch-off)}
+:is(.ep-shell, .bizc-sheet-root) .st3-switch[aria-checked=true]{background:var(--ep-ink)}
+:is(.ep-shell, .bizc-sheet-root) .st3-switch i{width:20px;height:20px;background:var(--ep-ink)}
+:is(.ep-shell, .bizc-sheet-root) .st3-switch[aria-checked=true] i{left:21px;background:var(--ep-canvas)}
 .bizc-sheet[data-testid=st3-privacy-sheet] .bizc-sheet-sub{margin-top:6px}
 .st3-options{margin-top:10px}
 .st3-options .ep-opt{height:auto;border-radius:0;padding:14px 0;align-items:flex-start;gap:14px;box-shadow:none;white-space:normal;line-height:normal;border:0;border-top:1px solid var(--bizc-hair);color:var(--bizc-ink)}
