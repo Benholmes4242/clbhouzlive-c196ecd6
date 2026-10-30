@@ -560,10 +560,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
   // Apple and Google start their native sheets immediately (one tap in the
   // card, one native prompt — no second tap on the auth screen). Email stays
   // on the hero, where the email field already lives.
-  const guestStart = searchParams.get('guest') === '1' ? searchParams.get('start') : null;
+  const guestStart =
+    GUEST_BROWSING_ENABLED && searchParams.get('guest') === '1' ? searchParams.get('start') : null;
   useEffect(() => {
     if (!guestStart || guestAutoStarted.current) return;
-    if (!getGuestUser()) return;
+    if (!isGuestConverting()) return;
     guestAutoStarted.current = true;
     if (guestStart === 'apple') handleAppleSignIn();
     else if (guestStart === 'google') handleGoogleSignIn();
