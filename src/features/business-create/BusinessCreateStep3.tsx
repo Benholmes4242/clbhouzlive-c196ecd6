@@ -29,8 +29,10 @@ const SOC_GLYPH: Record<string, string> = { instagram: 'IG', tiktok: 'TT', twitt
 export function BizcSheet({ title, sub, onDone, children, testId, hideHeader = false, actionLabel = 'Done', onAction, actionDisabled = false, hideAction = false }: { title: string; sub?: string; onDone: () => void; children: ReactNode; testId: string; hideHeader?: boolean; actionLabel?: string; onAction?: () => void; actionDisabled?: boolean; hideAction?: boolean }) {
   const touchY = useRef<number | null>(null);
   // Portalled to body so no ancestor transform can become its containing block.
+  // .bizc-sheet-root (display: contents) carries the shell custom properties
+  // and scope class, since the portal sits outside .ep-shell/.bizc-shell.
   return createPortal(
-    <>
+    <div className="bizc-sheet-root">
       <div className="bizc-sheet-scrim" onClick={onDone} aria-hidden="true" />
       <div
         className="bizc-sheet"
@@ -51,7 +53,7 @@ export function BizcSheet({ title, sub, onDone, children, testId, hideHeader = f
         {sub && <p className="bizc-sheet-sub">{sub}</p>}
         {children}
       </div>
-    </>,
+    </div>,
     document.body,
   );
 }

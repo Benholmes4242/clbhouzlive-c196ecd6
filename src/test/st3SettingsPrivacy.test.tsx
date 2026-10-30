@@ -89,6 +89,7 @@ describe('ST3 Settings Privacy controls', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull()); expect(h.update).toHaveBeenCalledWith(payload);
     expect(screen.getByTestId('stranger-summary')).toHaveTextContent(summary);
   });
+  it('EP5.2 fix: the checked option carries aria-checked=true and its .ep-radio, inside .bizc-sheet-root on body', () => { mount(); fireEvent.click(screen.getByRole('button', { name: 'Profile Everyone' })); const dialog = screen.getByRole('dialog'); expect(dialog.closest('.bizc-sheet-root')?.parentElement).toBe(document.body); const checked = within(dialog).getAllByRole('radio').filter((r) => r.getAttribute('aria-checked') === 'true'); expect(checked).toHaveLength(1); expect(checked[0].querySelector('.ep-radio')).not.toBeNull(); });
   it('Done closes without writing', () => { mount(); fireEvent.click(screen.getByRole('button', { name: 'Profile Everyone' })); fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Done' })); expect(screen.queryByRole('dialog')).toBeNull(); expect(h.update).not.toHaveBeenCalled(); });
   it('refreshed Profile handicap visibility updates the Settings summary', async () => {
     const view = mount(); h.profile = { ...h.profile, handicap_visibility: 'friends' }; view.rerender(<Wrapper><div className="ep-shell"><SettingsTabContent /></div></Wrapper>);

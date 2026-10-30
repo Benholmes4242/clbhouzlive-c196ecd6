@@ -167,3 +167,8 @@ textarea.bizc-field-input{font-size:14.5px;font-weight:400;line-height:1.5;resiz
 .bizc-next-text{flex:1;min-width:0}.bizc-next-text b{display:block;font-size:15px;font-weight:600}.bizc-next-text>span{display:block;font-size:13px;font-weight:400;color:var(--bizc-mute);margin-top:2px}
 .bizc-top:has(.bizc-progress:first-child){min-height:48px}
 .bizc-next-row .bizc-next-icon svg{width:17px;height:17px}.bizc-next-row .bizc-next-chevron{width:18px;height:18px}
+
+/* EP5.2 fix: BizcSheet portals to <body>, outside .ep-shell/.bizc-shell. This
+   display:contents wrapper re-declares every shell custom property (values
+   must equal .ep-shell, .bizc-shell and .ep-settings; a test compares them). */
+.bizc-sheet-root{display:contents;--ep-canvas:#0B0B0D;--ep-card:#17171B;--ep-inset:#1E1E23;--ep-hair:rgba(255,255,255,0.08);--ep-ink:#F8FAFC;--ep-mute:rgba(248,250,252,0.62);--ep-dim:rgba(248,250,252,0.42);--ep-progress-missing:rgba(255,255,255,0.12);--ep-chip-ground:rgba(255,255,255,0.07);--ep-chip-hair:rgba(255,255,255,0.14);--ep-settings-danger:#FF6B60;--st2-cell-hair:rgba(255,255,255,0.06);--st2-switch-off:rgba(255,255,255,0.16);--bizc-canvas:#0B0B0D;--bizc-card:#17171B;--bizc-hair:rgba(255,255,255,0.08);--bizc-ink:#F8FAFC;--bizc-mute:rgba(248,250,252,0.62);--bizc-dim:rgba(248,250,252,0.42);--bizc-inset:#1E1E23;--bizc-glass:rgba(255,255,255,0.07);--bizc-glass-hair:rgba(255,255,255,0.14);--bizc-destructive:#F87171;--bizc-cover-fade:linear-gradient(180deg,transparent 50%,var(--bizc-card) 100%);--bizc-crest-bg:#E8EEF5;--bizc-crest-ink:#1f2a3a}
