@@ -19,7 +19,7 @@ const g = vi.hoisted(() => {
     poll: vi.fn(), update: vi.fn(),
     route: vi.fn(async () => '/'),
     toastError: vi.fn(),
-    apple: vi.fn(), google: vi.fn(),
+    apple: vi.fn(), google: vi.fn(), setSession: vi.fn(),
   };
 });
 const emitUser = (user: { id: string; is_anonymous?: boolean } | null) => { g.state = { user, loading: false }; g.listeners.forEach(l => l()); };
@@ -43,7 +43,7 @@ vi.mock('@/integrations/supabase/client', () => ({
     auth: {
       linkIdentity: g.link, signInWithIdToken: g.idToken, refreshSession: g.refresh,
       signInWithOtp: vi.fn(), verifyOtp: vi.fn(), updateUser: vi.fn(),
-      getSession: async () => ({ data: { session: null } }), setSession: vi.fn(),
+      getSession: async () => ({ data: { session: null } }), setSession: g.setSession,
     },
     from: () => ({
       select: () => ({ eq: () => ({ maybeSingle: () => g.poll() }) }),
@@ -158,5 +158,70 @@ describe('Stage 2.5 — Apple and Google claim navigation first', () => {
     expect(g.route).not.toHaveBeenCalled();
     expect(navs).toEqual(['/auth']);
     expect(g.toastError).toHaveBeenCalled();
+  });
+});
+
+describe('Stage 2.6 — one owner, released on failure', () => {
+  const visible = async () => { Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'visible' }); document.dispatchEvent(new Event('visibilitychange')); await flush(); };
+
+  it('e. failed attempt with no member session: Auth is live again and an OAuth handshake navigates once', async () => {
+    g.guest = null; emitUser(null);
+    g.idToken.mockResolvedValue({ data: null, error: { message: 'bad token' } });
+    g.apple.mockImplementation((cb: (r: unknown) => void) => cb({ idToken: 'h.e30.s' }));
+    mount();
+    fireEvent.click(screen.getByRole('button', { name: 'Apple' }));
+    await flush();
+    expect(g.toastError).toHaveBeenCalledTimes(1);
+    expect(navs).toEqual(['/auth']);
+    localStorage.setItem('clbhouz_oauth_session', JSON.stringify({ access_token: 'a', refresh_token: 'r', ts: Date.now() }));
+    g.setSession.mockResolvedValue({ data: { session: { user: MEMBER } }, error: null });
+    await visible();
+    await waitFor(() => expect(screen.getByTestId('home')).toBeTruthy());
+    await visible();
+    expect(g.route).toHaveBeenCalledTimes(1);
+    expect(navs).toEqual(['/auth', '/']);
+  });
+
+  it('f. failed attempt where a member session exists: release redirects exactly once', async () => {
+    g.guest = GUEST; emitUser(GUEST);
+    g.link.mockResolvedValue(session());
+    g.refresh.mockImplementation(async () => { emitUser(MEMBER); return { data: { session: { user: MEMBER } }, error: null }; });
+    g.poll.mockResolvedValue({ data: null, error: new Error('poll failed') });
+    g.apple.mockImplementation((cb: (r: unknown) => void) => cb({ idToken: 'h.e30.s' }));
+    mount();
+    fireEvent.click(screen.getByRole('button', { name: 'Apple' }));
+    await waitFor(() => expect(screen.getByTestId('home')).toBeTruthy());
+    await flush();
+    expect(g.toastError).toHaveBeenCalledTimes(1);
+    expect(g.route).toHaveBeenCalledTimes(1);
+    expect(navs).toEqual(['/auth', '/']);
+  });
+
+  it.each(['Apple', 'Google'])('g. a cancelled %s sheet releases and navigates nowhere', async (name) => {
+    g.guest = null; emitUser(null);
+    const cb = (c: (r: unknown) => void) => c({ error: 'user cancelled' });
+    g.apple.mockImplementation(cb); g.google.mockImplementation(cb);
+    mount();
+    fireEvent.click(screen.getByRole('button', { name }));
+    await flush();
+    expect(g.idToken).not.toHaveBeenCalled();
+    expect(g.toastError).not.toHaveBeenCalled();
+    expect(g.route).not.toHaveBeenCalled();
+    expect(navs).toEqual(['/auth']);
+  });
+
+  it('h. member Apple first sign-in: the name write completes before the only navigation', async () => {
+    g.guest = null; emitUser(null);
+    const order: string[] = [];
+    g.idToken.mockImplementation(async () => { emitUser(MEMBER); return session(); });
+    g.update.mockImplementation(async () => { order.push('name'); return { error: null }; });
+    g.route.mockImplementation(async () => { order.push('route'); return '/'; });
+    g.apple.mockImplementation((cb: (r: unknown) => void) => cb({ idToken: 'h.e30.s', firstName: 'Ann', lastName: 'Lee' }));
+    mount();
+    fireEvent.click(screen.getByRole('button', { name: 'Apple' }));
+    await waitFor(() => expect(screen.getByTestId('home')).toBeTruthy());
+    await flush();
+    expect(order).toEqual(['name', 'route']);
+    expect(navs).toEqual(['/auth', '/']);
   });
 });
