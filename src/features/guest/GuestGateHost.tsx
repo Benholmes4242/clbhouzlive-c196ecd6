@@ -35,6 +35,13 @@ export const GuestGateHost: React.FC = () => {
   const request = useGuestCardRequest();
   const surface = surfaceForPath(location.pathname);
 
+  // Stage 2.3: a scroll card belongs to its surface; leaving it (e.g. a nav
+  // tab tapped from a locked course sheet) clears it so nothing is left behind.
+  useEffect(() => {
+    const open = getGuestCardRequest();
+    if (open && open.kind === 'scroll' && open.surface !== surface) closeGuestCard();
+  }, [surface]);
+
   // Returning to a locked surface re-shows the scroll card at the top.
   useEffect(() => {
     if (!isGuest || !surface) return;

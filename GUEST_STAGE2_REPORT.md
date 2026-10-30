@@ -198,7 +198,7 @@ Guest Explore is now 2,257px tall (it was 1,891px with the feats missing). The 1
 ### Suite
 4,708/4,708 across 479 files (shards 2,309 + 2,399). vs 4,701/478: +7 tests and +1 file, both from `guestSessionHold.test.tsx`.
 
-## Stage 2.3 — scroller cache, course sheets, hold timeout (STOPPED: one conflict)
+## Stage 2.3 — scroller cache, course sheets, hold timeout (FINISHED)
 
 ### Changes
 - `src/lib/getScrollParent.ts`: `getDocumentScrollParent()` returns `#root` whenever it exists, with no overflow check; caches only `#root`; the `document.scrollingElement` fallback is used only while `#root` is absent and is never cached.
@@ -213,3 +213,17 @@ Guest Explore is now 2,257px tall (it was 1,891px with the feats missing). The 1
 ### Suite
 - 4,715 passed, 1 failed, 4,716 across 480 files (baseline 4,708/479; +8 tests/+1 file = guestStage23).
 - FAILURE (new, caused by §1): `src/test/pageScroller.test.ts:66` "falls back to the scrolling element when #root is not a scroll container" — `AssertionError: expected 'root' not to be 'root'`. This test encodes the old overflow-checked rule that §1 removes, while the brief also says "the existing scroll tests must pass unchanged". The two clauses contradict; not edited. Awaiting ruling.
+
+### Stage 2.3 finish
+- Approved test change, `src/test/pageScroller.test.ts`:
+  - old: `it('falls back to the scrolling element when #root is not a scroll container')` with `mountRoot('visible')` and `expect(resolved?.id).not.toBe('root')`
+  - new: `it('returns #root even when its overflow is hidden')` with `mountRoot('hidden')` and `expect(resolved?.id).toBe('root')`
+- Bug found in the preview and fixed: after tapping Tour from a locked course sheet, the course's scroll card followed to Tour. `GuestGateHost.tsx` now clears a scroll card whose surface is not the current one. +2 tests in `guestStage23.test.tsx`: the card clears when another tab is opened; the raised layer is on only while a course sheet is registered.
+- Suite: 4,718/4,718 across 480 files (4,716 + those 2).
+
+### Preview check (guest, 390×844), screenshots in Files `guest-stage23/`
+- Every sheet's content was short for a guest (all-holes 623/623px: "Only 9 rounds…"; your-holes and your-rounds are empty), so no sheet could scroll to its own lock in the preview. Sheet-threshold locking is proven only by unit tests. Each sheet was therefore checked after locking the course page by scrolling (#root locked at 1,400px).
+- `1_allholes_locked`, `2_yourholes_locked`, `3_yourrounds_locked`: shade 1402 and card 1403 above the sheet (1400/1401), nav 1404; for all five tabs, elementFromPoint at each tab's centre hits that tab. Signed-off card, no close button.
+- `4_othertab`: Tour tapped; no dialog, shade or card left, body overflow restored, #root scrolled to 300.
+- `5_return`: back on the course, the card shows at the top. `6_return_sheet`: opening All 18 holes shows the card straight away (raised layers).
+- Today's layering: with an unlocked course sheet open (`1_allholes_open`, guest with no card) the nav stays at z 100 beneath the sheet, unchanged. A member session could not be signed in (`external_unmanaged`); with the switch off, `openGuestCard` is a no-op, so the raise cannot happen. That path is covered by code and tests, not seen in the browser.
