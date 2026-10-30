@@ -198,14 +198,14 @@ describe('the gate host', () => {
 
   it('the scroll-triggered card has no close button', () => {
     render(<Host />);
-    openGuestCard({ kind: 'scroll', surface: 'clubhouse' });
+    act(() => openGuestCard({ kind: 'scroll', surface: 'clubhouse' }));
     expect(screen.getByRole('dialog')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
   });
 
   it('the action card is closable and closes on the X', () => {
     render(<Host />);
-    openGuestCard({ kind: 'action', surface: 'clubhouse', action: 'like', firstName: 'Ben' });
+    act(() => openGuestCard({ kind: 'action', surface: 'clubhouse', action: 'like', firstName: 'Ben' }));
     const dialog = screen.getByRole('dialog');
     expect(dialog.textContent).toContain('Ben');
     fireEvent.click(screen.getByRole('button', { name: 'Close' }));
@@ -215,14 +215,14 @@ describe('the gate host', () => {
 
   it('email hands off to /auth with the start intent', () => {
     render(<Host />);
-    openGuestCard({ kind: 'join_button', surface: 'clubhouse' });
+    act(() => openGuestCard({ kind: 'join_button', surface: 'clubhouse' }));
     fireEvent.click(screen.getByRole('button', { name: 'Continue with email' }));
     expect(screen.getByTestId('path').textContent).toBe('/auth?guest=1&start=email');
   });
 
   it('the login row goes to the normal /auth', () => {
     render(<Host />);
-    openGuestCard({ kind: 'join_button', surface: 'clubhouse' });
+    act(() => openGuestCard({ kind: 'join_button', surface: 'clubhouse' }));
     fireEvent.click(screen.getByRole('button', { name: 'ALREADY A MEMBER? LOG IN' }));
     expect(screen.getByTestId('path').textContent).toBe('/auth');
   });
