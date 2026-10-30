@@ -96,7 +96,6 @@ export function useGuestScrollGate(surface: GuestSurfaceKey): void {
     const scroller = getPrimaryScrollElement();
     const startTop = scroller?.scrollTop ?? 0;
     const onScroll = () => {
-      if (isSurfaceLocked(surface)) return;
       const el = scroller ?? document.documentElement;
       if (shouldScrollLock({
         top: el.scrollTop,
