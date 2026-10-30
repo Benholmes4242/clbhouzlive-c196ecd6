@@ -1,3 +1,4 @@
+import { useGuestSheetScrollGate } from '@/features/guest/useGuestSurfaceGate';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -69,6 +70,7 @@ const DistributionBar: React.FC<{ row: PersonalHole }> = ({ row }) => {
 };
 
 const YourHolesSheet: React.FC<Props> = ({ open, onClose, courseId, courseName }) => {
+  const guestSheetRef = useGuestSheetScrollGate(courseId, open);
   const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
   const { data: analysis, isLoading: fieldLoading } = useCourseHoleAnalysis(courseId);
@@ -197,7 +199,7 @@ const YourHolesSheet: React.FC<Props> = ({ open, onClose, courseId, courseName }
         ) : null}
       </header>
 
-      <div style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', willChange: 'transform', paddingBottom: 24 }}>
+      <div ref={guestSheetRef} data-guest-sheet-scroll="" style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', willChange: 'transform', paddingBottom: 24 }}>
         {loading ? (
           <p style={{ margin: '24px 20px', fontSize: 13, color: A.MUTE }}>{t('courseDetail.yourHolesSheet.loading')}</p>
         ) : rows.length === 0 ? (

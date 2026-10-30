@@ -12,13 +12,15 @@
  * Once locked, a surface stays locked for the app session (guestGateStore);
  * returning to it re-shows the card at the top (GuestGateHost owns that).
  */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { getPrimaryScrollElement } from '@/lib/getScrollParent';
 import { useIsGuest } from './useIsGuest';
 import {
   isSurfaceLocked,
   lockSurface,
   openGuestCard,
+  courseSurfaceKey,
+  registerGuestCourseSheet,
   type GuestSurfaceKey,
 } from './guestGateStore';
 import { trackGuestGateShown } from './guestAnalytics';
@@ -93,12 +95,9 @@ export function useGuestScrollGate(surface: GuestSurfaceKey): void {
   const isGuest = useIsGuest();
   useEffect(() => {
     if (!isGuest || isSurfaceLocked(surface)) return;
-    // #root is the page scroller (canon). Listen there directly: the shared
-    // resolver can cache <html> if first asked before #root became the scroll
-    // container (observed on the preview), and then this listener never fired.
-    const root = document.getElementById('root');
-    const resolved = getPrimaryScrollElement();
-    const scroller = root ?? resolved;
+    // One definition of the page scroller (Stage 2.3: the shared resolver
+    // now always returns #root when it exists).
+    const scroller = getPrimaryScrollElement();
     const startTop = scroller?.scrollTop ?? 0;
     const onScroll = () => {
       const el = scroller ?? document.documentElement;
@@ -120,4 +119,43 @@ export function useGuestScrollGate(surface: GuestSurfaceKey): void {
 /** Generic dispatcher for non-Clubhouse surfaces. */
 export function useGuestSurfaceGate(surface: GuestSurfaceKey): void {
   useGuestScrollGate(surface);
+}
+
+/**
+ * Stage 2.3 — a course's holes and rounds sheets share the course page's free
+ * look: same lock key, same rule measured on the sheet's own scroller (1.5
+ * sheet heights or within 120px of its end, only after the user scrolled it).
+ * A locked course shows the card as soon as its sheet opens. Returns a
+ * callback ref for the sheet's scrolling region.
+ */
+export function useGuestSheetScrollGate(courseId: string | undefined, open: boolean): (el: HTMLElement | null) => void {
+  const isGuest = useIsGuest();
+  const [scroller, setScroller] = useState<HTMLElement | null>(null);
+  const surface = courseId ? courseSurfaceKey(courseId) : null;
+
+  useEffect(() => {
+    if (!isGuest || !open || !surface) return;
+    const release = registerGuestCourseSheet();
+    if (isSurfaceLocked(surface)) openGuestCard({ kind: 'scroll', surface });
+    return release;
+  }, [isGuest, open, surface]);
+
+  useEffect(() => {
+    if (!isGuest || !open || !surface || !scroller || isSurfaceLocked(surface)) return;
+    const startTop = scroller.scrollTop;
+    const onScroll = () => {
+      if (isSurfaceLocked(surface)) return;
+      if (shouldScrollLock({
+        top: scroller.scrollTop,
+        startTop,
+        viewportHeight: scroller.clientHeight,
+        scrollHeight: scroller.scrollHeight,
+        clientHeight: scroller.clientHeight,
+      })) lockAndShow(surface);
+    };
+    scroller.addEventListener('scroll', onScroll, { passive: true });
+    return () => scroller.removeEventListener('scroll', onScroll);
+  }, [isGuest, open, surface, scroller]);
+
+  return setScroller;
 }

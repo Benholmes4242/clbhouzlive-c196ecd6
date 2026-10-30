@@ -1,3 +1,4 @@
+import { useGuestSheetScrollGate } from '@/features/guest/useGuestSurfaceGate';
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -56,6 +57,7 @@ const HeadFigure: React.FC<{ label: string; value: string; amber?: boolean }> = 
 );
 
 const YourRoundsSheet: React.FC<Props> = ({ open, onClose, courseId, courseName, fieldOverPar, fieldRounds, coursePar }) => {
+  const guestSheetRef = useGuestSheetScrollGate(courseId, open);
   const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
   const { data, isLoading, isError } = useAllMyRoundsAtCourse(courseId, open);
@@ -139,7 +141,7 @@ const YourRoundsSheet: React.FC<Props> = ({ open, onClose, courseId, courseName,
           ) : null}
         </header>
 
-        <div style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', willChange: 'transform', padding: '0 20px 24px' }}>
+        <div ref={guestSheetRef} data-guest-sheet-scroll="" style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', willChange: 'transform', padding: '0 20px 24px' }}>
           {isLoading ? (
             <p style={{ margin: '24px 0', fontSize: 13, lineHeight: 1.55, color: A.MUTE }}>{t('courseDetail.yourRoundsSheet.loading')}</p>
           ) : isError ? (

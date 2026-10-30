@@ -14,6 +14,8 @@ import { hasStoredSession } from '@/utils/auth/hasStoredSession';
 import { GUEST_BROWSING_ENABLED } from './guestConfig';
 import { trackGuestSessionFailed, trackGuestSessionStarted } from './guestAnalytics';
 
+export const GUEST_SIGN_IN_TIMEOUT_MS = 8000;
+
 export type GuestAttempt = 'idle' | 'pending' | 'failed';
 
 export function signedOutOutcome(args: {
@@ -83,8 +85,22 @@ export function useGuestSessionBootstrap(args: {
     if (hasStoredSession()) return;
     if (guestAttempt !== 'idle') return;
     setGuestAttempt('pending');
+    // Stage 2.3: the hold must not hang. After GUEST_SIGN_IN_TIMEOUT_MS the
+    // attempt fails and today's signed-out behaviour takes over; a late
+    // success is signed out again so no orphan guest stays in use.
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      trackGuestSessionFailed('timeout');
+      setGuestAttempt('failed');
+    }, GUEST_SIGN_IN_TIMEOUT_MS);
     signInGuestOnce()
       .then(({ error }) => {
+        clearTimeout(timer);
+        if (timedOut) {
+          if (!error) void Promise.resolve(supabase.auth.signOut()).catch(() => {});
+          return;
+        }
         if (error) {
           trackGuestSessionFailed(error.message || 'anonymous_sign_in_failed');
           setGuestAttempt('failed');
@@ -93,6 +109,8 @@ export function useGuestSessionBootstrap(args: {
         }
       })
       .catch((err: unknown) => {
+        clearTimeout(timer);
+        if (timedOut) return;
         trackGuestSessionFailed(err instanceof Error ? err.message : 'anonymous_sign_in_failed');
         setGuestAttempt('failed');
       });

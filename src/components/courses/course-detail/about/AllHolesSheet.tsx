@@ -1,3 +1,4 @@
+import { useGuestSheetScrollGate } from '@/features/guest/useGuestSurfaceGate';
 import { PopulationCaption } from '@/features/courses/components/holes/analytical/PopulationCaption';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -267,6 +268,7 @@ interface AllHolesSheetProps {
 }
 
 const AllHolesSheet: React.FC<AllHolesSheetProps> = ({ open, onClose, courseId, courseName }) => {
+  const guestSheetRef = useGuestSheetScrollGate(courseId, open);
   const { t } = useTranslation('courses');
   const { user } = useSupabaseSession();
   const { data: connection } = useWhsConnection(user?.id);
@@ -353,7 +355,7 @@ const AllHolesSheet: React.FC<AllHolesSheetProps> = ({ open, onClose, courseId, 
         ) : null}
       </header>
 
-      <div style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 24 }}>
+      <div ref={guestSheetRef} data-guest-sheet-scroll="" style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 24 }}>
         {!drawable ? (
           <div style={{ padding: '24px 20px', fontFamily: SANS, fontSize: 13, lineHeight: 1.55, color: A.MUTE }}>
             {t('courseDetail.plays.notEnoughRounds', { count: rounds, rounds: formatNumber(rounds) })}
