@@ -28,14 +28,16 @@ beforeEach(() => {
 });
 
 describe('Stage 2 preview', () => {
-  it('enables the switch on preview hosts', async () => {
+  it('enables the switch on preview hosts only outside test mode', async () => {
     const actual = await vi.importActual<typeof import('@/features/guest/guestConfig')>('@/features/guest/guestConfig');
-    expect(actual.GUEST_BROWSING_ENABLED).toBe(true);
+    expect(actual.guestEnabledForHost(true, 'development')).toBe(true);
+    expect(actual.guestEnabledForHost(true, 'production')).toBe(true);
   });
-  it('keeps production hosts off', async () => {
-    h.preview = false; vi.resetModules();
+  it('keeps production hosts and every test run off', async () => {
     const actual = await vi.importActual<typeof import('@/features/guest/guestConfig')>('@/features/guest/guestConfig');
-    expect(actual.GUEST_BROWSING_ENABLED).toBe(false);
+    expect(actual.guestEnabledForHost(false, 'development')).toBe(false);
+    // jsdom is a preview host; the MODE guard keeps the switch off under test.
+    expect(actual.guestEnabledForHost(true, 'test')).toBe(false);
   });
   it('bootstraps a preview guest once', async () => {
     renderHook(() => useGuestSessionBootstrap({ envStatus: 'preview', authLoading: false, hasUser: false }));
