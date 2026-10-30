@@ -189,7 +189,7 @@ function LatestCourseCard({ row, pending, onOpen }: {
 
 export function LatestCoursesSection() {
   const { user } = useSupabaseSession();
-  // Guests: the RPC is member-only (401 for anonymous sessions) — never fire it.
+  // Guests read this exactly as members do; the guest flag stays in the key.
   const isGuest = useIsGuest();
   const { data, isLoading, isError, hasNextPage, isFetching, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
     queryKey: ['gam_rpc', 'get_latest_course_media', 'infinite', user?.id, isGuest],
@@ -205,7 +205,6 @@ export function LatestCoursesSection() {
       return page.length < LATEST_COURSE_PAGE_SIZE || !last ? undefined : { at: last.latest_at, id: last.course_id };
     },
     staleTime: 60_000,
-    enabled: !isGuest,
   });
   useSectionReady('latestCourses', !isLoading);
   const rows = useMemo(() => dedupeRailRows(data?.pages ?? [], row => row.course_id), [data]);

@@ -47,11 +47,12 @@ export interface FeatYearRow {
 export type FeatWindow = 'year' | 'all';
 
 export function useFeatsWindow(userId: string | undefined, window: FeatWindow, enabled = true) {
-  // Guests: the RPC is member-only (401 for anonymous sessions) — never fire it.
+  // Guests read this exactly as members do (granted to anon + authenticated).
+  // The guest flag stays in the key so conversion re-reads the viewer figures.
   const isGuest = useIsGuest();
   return useQuery<FeatYearRow[]>({
     queryKey: ['explore', 'feats-window', userId, window, isGuest],
-    enabled: enabled && !isGuest,
+    enabled,
     staleTime: 60_000,
     // Hold the previous window's rows while the next loads so the rail keeps its height.
     placeholderData: (prev) => prev,

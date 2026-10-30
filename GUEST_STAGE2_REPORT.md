@@ -163,3 +163,37 @@ Open for a ruling: holes/rounds sheets never scroll-lock.
 
 ### Suite
 4,701/4,701 across 478 files (shards 2,302 + 2,399). vs 4,690/476: +5 `guestStage22.test.tsx`, +6 `guestScrollLockShortPage.test.tsx`, +2 files. No tests deleted.
+
+---
+
+## Stage 2.2 addendum (replaces §3) — the 401s were a client fault
+
+### Cause (measured, fresh preview browser, gates removed, 390×844)
+Every failing request carried the **anon key only** (JWT role `anon`, no `sub`) — no guest token existed at all:
+- `get_latest_course_media` 401 `42501` "permission denied for function get_latest_course_media"
+- `get_latest_hole_media` 401 `42501` "permission denied for function get_latest_hole_media"
+- `get_feats_window` 401 `42501` "permission denied for view whs_friend_matches"
+- `whs_score_holes` 401 (empty body)
+
+- Same one supabase client everywhere; no raw fetch or proxy in these hooks.
+- Not an expired token: localStorage held **no session**, and no `/auth/v1/signup` request was ever sent.
+- **Root cause:** the guest bootstrap and canvas hold lived only in `RootGate`, which is mounted only at `/`. A cold deep link to `/courses`, `/amateur`, `/tourhub` or a course page rendered with no session and fetched as anon. Stage 2.1's runs started at `/`, which hid it.
+
+### Fix
+- New `GuestSessionHold` wraps every route in `AppInner`. On a preview/native cold start with no stored session, it shows the plain canvas and mounts **no route** until the anonymous session exists. If the attempt fails, today's signed-out behaviour takes over. `/auth`, `/legal`, `/privacy`, `/terms` and `/delete-account` are exempt and never mint a guest. Switch off: it passes children through and reads nothing.
+- `signInAnonymously` is now single-flight (shared while in flight), so RootGate plus the hold mint one guest.
+- Removed the client gate on `get_feats_window`, `get_latest_course_media` and `get_latest_hole_media`. Their keys keep `[..., userId, isGuest]`, so conversion re-reads the viewer figures. The circle-rounds `whs_score_holes` gate stays.
+- After: all three, plus the remaining `whs_score_holes` reads, carry the guest's access token (role `authenticated`, `is_anonymous: true`) and return 200 with data. The first request leaves after the signup returns.
+
+### Explore re-measured
+Guest Explore is now 2,257px tall (it was 1,891px with the feats missing). The 1.5-viewport rule fires first, at 1,320px, before the end rule (max scroll 1,413px). Courses, Tour, course page: 1,320px. Clubhouse: fourth post. All `guest_gate_shown` events have trigger `scroll`; 0 failed requests on every surface.
+
+### Tests
+- New `guestSessionHold.test.tsx` (+7): a deep link mounts nothing until the session exists, then the page reads as a guest; two holds share one sign-in; auth never holds or mints; four rule cases.
+- `guestStage22.test.tsx` (my own tests from this stage, rewritten because the gate is removed):
+  - "get_feats_window fires after conversion" (asserted `toBe(0)` for the guest) → "fires for a guest, and again after conversion" (1 → 2).
+  - "get_latest_course_media and get_latest_hole_media fire after conversion" (0 for the guest) → fire for the guest, then again after conversion (1 → 2).
+  - Count unchanged at 5.
+
+### Suite
+4,708/4,708 across 479 files (shards 2,309 + 2,399). vs 4,701/478: +7 tests and +1 file, both from `guestSessionHold.test.tsx`.
