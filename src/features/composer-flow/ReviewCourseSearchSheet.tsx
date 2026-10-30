@@ -83,7 +83,7 @@ function Section({ list, title, explainer, rows, min, onPick }: { list: PickList
   );
 }
 
-function CourseRow({ row, list, min, q, onPick }: { row: ReviewCourseRow; list: PickList; min: number; q?: string; onPick: (r: ReviewCourseRow, l: PickList) => void }) {
+export function CourseRow({ row, list, min, q, onPick }: { row: ReviewCourseRow; list: PickList; min: number; q?: string; onPick: (r: ReviewCourseRow, l: PickList) => void }) {
   const right = rightState(row, list, min);
   return (
     <button type="button" className="rcs-row" data-course={row.id} onClick={() => onPick(row, list)}>

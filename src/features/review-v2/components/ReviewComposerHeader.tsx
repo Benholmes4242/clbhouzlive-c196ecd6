@@ -18,10 +18,7 @@ import { Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { RV2 } from '../tokens';
 import { SURFACE } from '@/lib/tokens/surface';
-import { HERO_CANON_WASH } from '@/features/tourhub/_shared/heroGradient';
-import { CourseMasthead } from '@/components/courses/CourseMasthead';
-import { courseMastheadKicker } from '@/features/courses/_shared/courseRankLabels';
-import { useCourseTop100Standing } from '@/hooks/useCourseTop100Standing';
+import { ReviewCourseHero } from './ReviewCourseHero';
 import { useHeroReferenceLine } from '@/components/courses/course-detail/about/useHeroReferenceLine';
 import type { ReviewHeaderFacts } from '../hooks/useReviewHeaderFacts';
 import { headerScore } from '../hooks/useReviewHeaderFacts';
@@ -65,8 +62,6 @@ function PhotoHero({
   onBack: () => void;
 }) {
   const { t } = useTranslation('courses');
-  const { data: standing } = useCourseTop100Standing(courseId);
-  const kicker = courseMastheadKicker({ sub_country: subCountry, region: courseRegion, country }, standing);
   // null rounds: the expensive stats read stays off this page.
   const referenceLine = useHeroReferenceLine(courseId ?? null, null);
   const score = headerScore(facts);
@@ -75,16 +70,12 @@ function PhotoHero({
   const hasReference = !!score || refParts.length > 0;
 
   return (
-    <div data-photo-header className="rv2-photo" style={{ position: 'relative' }}>
-      {thumbnail ? (
-        <img src={thumbnail} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 40%' }} />
-      ) : (
-        <div style={{ position: 'absolute', inset: 0, background: 'var(--post-review-photo-fallback)' }} />
-      )}
-      {/* The course page's 18% wash, then the fade that dissolves the photo
-          into the page with no edge. Neither layer intercepts taps. */}
-      <div aria-hidden style={{ position: 'absolute', inset: 0, background: HERO_CANON_WASH, pointerEvents: 'none' }} />
-      <div aria-hidden style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, rgba(22,22,26,0) 40%, rgba(22,22,26,0.72) 72%, ${RV2.canvas} 100%)`, pointerEvents: 'none' }} />
+    <ReviewCourseHero courseId={courseId} courseRegion={courseRegion} subCountry={subCountry} country={country} name={name} thumbnail={thumbnail} reference={hasReference ? (
+      <div data-header-reference className="tabular-nums lining-nums" style={{ fontSize: 13, fontWeight: 600, color: SURFACE.dark.body }}>
+        {score && <><b style={{ fontWeight: 700, color: '#F8FAFC' }}>{score.avg}</b> {fromMembers}{refParts.length > 0 && <RefSep />}</>}
+        {refParts.map((part, i) => <Fragment key={i}>{i > 0 && <RefSep />}{part}</Fragment>)}
+      </div>
+    ) : null}>
       <button
         type="button"
         onClick={onBack}
@@ -98,27 +89,7 @@ function PhotoHero({
       >
         {glyph}
       </button>
-      <div style={{ position: 'absolute', left: 20, right: 20, bottom: 14 }}>
-        <CourseMasthead as="div" nameClamp={2} kicker={kicker} name={name ?? ''} place={country || null}>
-          {hasReference ? (
-            <div data-header-reference className="tabular-nums lining-nums" style={{ fontSize: 13, fontWeight: 600, color: SURFACE.dark.body }}>
-              {score && (
-                <>
-                  <b style={{ fontWeight: 700, color: '#F8FAFC' }}>{score.avg}</b> {fromMembers}
-                  {refParts.length > 0 && <RefSep />}
-                </>
-              )}
-              {refParts.map((part, i) => (
-                <Fragment key={i}>
-                  {i > 0 && <RefSep />}
-                  {part}
-                </Fragment>
-              ))}
-            </div>
-          ) : null}
-        </CourseMasthead>
-      </div>
-    </div>
+    </ReviewCourseHero>
   );
 }
 
