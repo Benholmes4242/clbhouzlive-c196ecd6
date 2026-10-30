@@ -101,7 +101,9 @@ export function usePostLikers(
         businessIds.length > 0
           ? supabase
               .from('business_accounts')
-              .select('id, business_type')
+              // The column is `category`; `business_type` does not exist on
+              // business_accounts and made this read fail with a 400.
+              .select('id, category')
               .in('id', businessIds)
           : Promise.resolve({ data: [] as any[], error: null }),
         user?.id && personalIds.length > 0
@@ -121,7 +123,7 @@ export function usePostLikers(
       }
       const types = new Map<string, string | null>();
       for (const b of (businessesRes.data ?? []) as any[]) {
-        types.set(b.id, b.business_type ?? null);
+        types.set(b.id, b.category ?? null);
       }
       const following = new Set<string>(
         ((followsRes.data ?? []) as any[]).map((f) => f.following_id),

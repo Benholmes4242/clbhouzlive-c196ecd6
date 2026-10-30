@@ -16,12 +16,16 @@ export const useProfileData = () => {
     queryKey: ['profile', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
+      // Guests (anonymous sessions) have no profile by design — never read it.
+      if (user.is_anonymous) return null;
 
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*') // Full profile needed - many components depend on various fields
         .eq('id', user.id)
-        .single();
+        // maybeSingle: the row can legitimately be missing (e.g. the moment
+        // after a guest converts, before the server trigger creates it).
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching profile:', error);
