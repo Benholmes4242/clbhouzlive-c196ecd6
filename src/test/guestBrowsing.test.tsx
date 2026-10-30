@@ -1,6 +1,6 @@
 /**
  * GUEST BROWSING Stage 1 tests. The switch (guestConfig) is mocked ON here;
- * one test reads the source to prove the shipped default stays false.
+ * one test reads the source to prove Stage 3 is on everywhere outside tests.
  * react-i18next mock copied in full per project rule.
  */
 import React from 'react';
@@ -66,9 +66,11 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('the switch', () => {
-  it('ships preview-only', () => {
+  it('ships on everywhere outside test mode without module-load host detection', () => {
     const src = readFileSync('src/features/guest/guestConfig.ts', 'utf8');
-    expect(src).toContain('GUEST_BROWSING_ENABLED = guestEnabledForHost(isPreviewHost(), import.meta.env.MODE)');
+    expect(src).toContain("GUEST_BROWSING_ENABLED = import.meta.env.MODE !== 'test'");
+    expect(src).not.toContain('isNativeAppSync');
+    expect(src).not.toContain('isPreviewHost()');
   });
 });
 

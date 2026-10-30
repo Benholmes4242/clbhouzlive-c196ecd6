@@ -1,5 +1,9 @@
 # Roadmap
 
+## Guest browsing Stage 3 — Switch on
+- [x] Enable outside tests; guest creation continues to use settled envStatus for native/preview only. Preserve production web and Apple diagnostic logging.
+- [ ] Verify production-web, late-native, preview and member launch behavior; run full suite against 4,738/484 and report every test change.
+
 ## Guest browsing Stage 2 — Preview only
 - [x] Enable preview bootstrap, refresh same-user conversions and exclude anonymous onboarding.
 - [x] Handle exact server guest refusals with the existing action card; preserve read errors/data.
