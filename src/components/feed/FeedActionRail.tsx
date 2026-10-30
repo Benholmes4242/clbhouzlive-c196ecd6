@@ -199,6 +199,11 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
   // the join card instead; nothing is written. Members pass straight through.
   const gateGuestAction = useGuestActionGate();
   const creatorFirstName = creator?.displayName?.trim().split(/\s+/)[0] || undefined;
+  const gatedOnFollow = () => { if (!gateGuestAction('follow', { firstName: creatorFirstName })) onFollow(); };
+  const gatedOnLike = () => { if (!gateGuestAction('like', { firstName: creatorFirstName })) onLike(); };
+  const gatedOnComment = () => { if (!gateGuestAction('comment', { firstName: creatorFirstName })) onComment(); };
+  const gatedOnShare = () => { if (!gateGuestAction('share', { firstName: creatorFirstName })) onShare(); };
+  const gatedOnMore = () => { if (!gateGuestAction('other', { firstName: creatorFirstName })) onMore(); };
 
   const muteButton = isVideo ? (
     <MuteButton size="md" laneId="active" />
