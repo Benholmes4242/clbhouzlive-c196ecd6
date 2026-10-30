@@ -887,6 +887,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
             onOpen={() => setMenuOpen((v) => !v)}
           />
         </div>
+        )}
       </div>
 
       {/* Controlled host — identical to CompactHeader wiring */}
