@@ -6,7 +6,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, renderHook } from '@testing-library/react';
 
 const h = vi.hoisted(() => ({ track: vi.fn(), scroller: null as HTMLElement | null }));
-vi.mock('./../features/guest/useIsGuest', () => ({ useIsGuest: () => true, isGuestUser: () => true }));
 vi.mock('@/features/guest/useIsGuest', () => ({ useIsGuest: () => true, isGuestUser: () => true }));
 vi.mock('@/features/guest/guestAnalytics', () => ({ trackGuestGateShown: (a: unknown) => h.track(a) }));
 vi.mock('@/lib/getScrollParent', () => ({ getPrimaryScrollElement: () => h.scroller ?? undefined }));
