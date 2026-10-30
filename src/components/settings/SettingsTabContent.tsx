@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  ChevronRight, Bell, UserPlus,
+  ChevronRight,
 } from 'lucide-react';
 import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { useWhsConnection } from '@/lib/whs/hooks';
 import { SettingsHandicapCard } from './SettingsHandicapCard';
 import { SettingsPrivacyCard } from './SettingsPrivacyCard';
+import { SettingsNotificationsCard } from './SettingsNotificationsCard';
 
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -19,7 +20,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/lib/toast';
 import {
-  SettingsChevronRow,
   SettingsSkeleton,
 } from './ui';
 import type { VisibilityLevel } from '@/hooks/usePrivacySettings';
@@ -52,7 +52,7 @@ function maskEmail(email: string): string {
  * Settings content for the Manage Profile -> Settings tab.
  * Rows navigate to /manage/* sub-pages (Phase 3). Destructive confirms stay
  * as overlays. ST1 Account/Help/end rows reuse the editor grammar; deferred
- * Notifications/Friends keep their existing controls. ST3 Privacy reuses the
+ * ST4 Notifications/Friends reuse existing push and invite actions. ST3 Privacy reuses the
  * canonical setters; Profile alone edits handicap visibility. Request visibility
  * comes only from a settled, successful useMyRequestsList read, including errors
  * with stale data. Shared settings/ui remains unchanged for other consumers.
@@ -186,13 +186,7 @@ export function SettingsTabContent() {
 
         {/* Notifications */}
         <div className="ep-group">Notifications</div>
-        <div className="ep-rows">
-          <SettingsChevronRow
-            icon={<Bell size={15} />}
-            title="Notification Preferences"
-            onClick={() => navigate('/manage/notifications')}
-          />
-        </div>
+        <SettingsNotificationsCard userId={user?.id} onAlerts={() => navigate('/manage/notifications')} />
 
         <div className="ep-group">Account</div>
         <div className="ep-rows" data-testid="settings-account">
@@ -203,13 +197,10 @@ export function SettingsTabContent() {
 
         {/* Friends */}
         <div className="ep-group">Friends</div>
-        <div className="ep-rows">
-          <SettingsChevronRow
-            icon={<UserPlus size={15} />}
-            title="Invite friends"
-            subtitle={"Share your link \u2014 golf's better with your circle"}
-            onClick={() => openInviteSheet('settings')}
-          />
+        <div className="st4-friends">
+          <b>Golf's better with your circle.</b>
+          <p>Bring your playing partners and their rounds sit next to yours.</p>
+          <Button variant="ghost" className="st4-invite" onClick={() => openInviteSheet('settings')}>Share your link</Button>
         </div>
 
         <div className="ep-group">Help</div>

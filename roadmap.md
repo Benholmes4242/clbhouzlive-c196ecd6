@@ -1,5 +1,11 @@
 # Roadmap
 
+## ST4 — Settings Notifications and Friends
+- [x] Share unchanged notification categories; replace only Notifications/Friends using existing push/invite actions.
+- [x] Add 12 ST4 cases (all pass) and complete ST3_ST4_SETTINGS_REPORT.md; existing tests untouched.
+- [ ] STOP: sheetTopV5.test.tsx:7 forbids the required Alerts label; retained assertion unchanged. Full suite timed out at600s:350 completed files,3884 passed/2 failed/3886 executed; pre-existing review hero failure remains. Expected inventory4579/466, not a full result. Await specific vocabulary-rule exception before correction/rerun.
+- [ ] Live authenticated action/readback unavailable with external_unmanaged; fixture checks do not verify persistence.
+
 ## Review confirmation redesign
 - [x] Shared course hero, corrected receipt contract, client media/text snapshot and signed-off receipt layout implemented; not verified complete.
 - [x] Review-only suggestions and search, live upload states, measured footer and all-locale English copy implemented.
@@ -8,7 +14,7 @@
 ## ST3 — Settings Privacy
 - [x] Replace only Privacy with live summary, sheet rows, unchanged auto-post handler and scoped blocked count.
 - [x] Add 19 ST3 regressions and retarget the two obsolete EP4 Settings-handicap tests explicitly; delete ST2 report.
-- [x] Full suite --maxWorkers=2: 4,547/4,547 across464; Chromium sample card/sheets at390/375 checked, no overflow; live persistence unavailable external_unmanaged. Written report pending.
+- [x] Full suite --maxWorkers=2: 4,547/4,547 across464; Chromium sample card/sheets at390/375 checked, no overflow; live persistence unavailable external_unmanaged. Report completed in ST3_ST4_SETTINGS_REPORT.md, including historical assertion-recovery limits.
 
 ## Awards follow-ups — Ring and widest fit
 - [x] Change only the score-led ring to FEED_CARD_SURFACE; add one ring regression without changing other callers.

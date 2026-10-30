@@ -96,4 +96,4 @@ Report the suite total before and after, and name the source of any delta. A cou
 - Composer entry and suggestion ownership: see ComposerFlowSheet.tsx and useReviewSuggestions.ts headers; displayed counters exclude entry without renumbering wizard state or analytics, preserving handoff and draft compatibility.
 - Review score ownership: see scoreStepRules.ts header.
 - Search shell ownership: see KeyboardSearchSheet.tsx header.
-- Settings Privacy/count ownership: see SettingsPrivacyCard.tsx and useSettingsBlockedCount.ts headers.
+- Settings ownership: see Privacy, blocked-count and Notifications module headers.
