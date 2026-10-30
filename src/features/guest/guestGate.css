@@ -17,6 +17,10 @@
   bottom: calc(var(--nav-pill-h, 64px) + 36px + env(safe-area-inset-bottom, 0px) + 12px);
   background: #16161a;
   border: 1px solid rgba(255, 255, 255, 0.12);
+  /* The container takes programmatic focus on open (tabIndex={-1}); Safari's
+     focus-visible heuristic draws the UA ring on some appearances. Keep the
+     programmatic focus for screen readers, never draw its outline. */
+  outline: none;
   border-radius: 24px;
   padding: 20px 18px 16px;
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
@@ -150,4 +154,15 @@
   align-items: center;
   justify-content: center;
   color: rgba(248, 250, 252, 0.62);
+}
+
+/* Buttons keep a keyboard-only ring: no ring on tap, the :focus-visible ring
+   only when the card is driven from the keyboard. */
+.guest-gate-card button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.guest-gate-card button:focus-visible {
+  outline: 2px solid rgba(248, 250, 252, 0.6);
+  outline-offset: 2px;
 }
