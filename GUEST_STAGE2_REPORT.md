@@ -227,3 +227,27 @@ Guest Explore is now 2,257px tall (it was 1,891px with the feats missing). The 1
 - `4_othertab`: Tour tapped; no dialog, shade or card left, body overflow restored, #root scrolled to 300.
 - `5_return`: back on the course, the card shows at the top. `6_return_sheet`: opening All 18 holes shows the card straight away (raised layers).
 - Today's layering: with an unlocked course sheet open (`1_allholes_open`, guest with no card) the nav stays at z 100 beneath the sheet, unchanged. A member session could not be signed in (`external_unmanaged`); with the switch off, `openGuestCard` is a no-op, so the raise cannot happen. That path is covered by code and tests, not seen in the browser.
+
+## Stage 2.4 — every way into sign-in (FINISHED)
+
+### Changes
+- `src/pages/Auth.tsx`: only a non-anonymous user counts as signed in. The redirect effect, the signed-in hold and both visibilitychange checks (existing session, OAuth handshake) ignore guests, so a guest sees AuthForm and `resolvePostAuthRoute` is never called for an anonymous user.
+- `src/pages/auth/AuthForm.tsx`: the email path calls `onWillNavigate()` before `refreshGuestConversion`. The refresh turns the guest into a member, so Auth's redirect could otherwise fire alongside AuthForm's own navigation; now only one fires.
+- `src/features/guest/guestRoutes.tsx`: `lastAllowedPath` records only free-look surfaces and `/post/:id` (`isGuestReturnPath`), never /auth, legal or gate pages; with none recorded it stays `/`. Test seam `__resetGuestReturnPath`.
+- `src/pages/auth/AuthCallback.tsx`: an anonymous session goes straight to `/`, not through `/welcome`.
+- Loop audit, one exit each: Welcome → `/` for a guest (a surface, so no further redirect); guard → last surface or `/`; RootGate sends a session-less visitor to /auth, which shows the form (no user, no redirect); the hold exempts /auth, and its 8s timeout fails into today's signed-out behaviour.
+
+### Tests (+5 in new `src/test/guestStage24.test.tsx`)
+- a guest on /auth sees the sign-in form and is not navigated (navigations `['/auth']`)
+- a guest on /auth?guest=1&start=email reaches the email join step (`['/auth?guest=1&start=email']`)
+- after a guest signs in as a member, Auth redirects once (`['/auth','/']`, resolver called once)
+- a guest on a blocked route from /auth goes to the last surface, not /auth (`/settings` → `/courses`)
+- with no surface browsed, a blocked route from /auth goes to `/`
+- Note: AuthForm is mocked in these tests, so "email join step" means Auth hands AuthForm the join query; AuthForm's internal steps stay covered by `guestSignIn.test.tsx`.
+- Suite: 4,723/4,723 across 481 files (4,718/480 + guestStage24).
+
+### Preview proof (real anonymous session, 390×844; Files `guest-stage24/`)
+- Join card "ALREADY A MEMBER? LOG IN" → /auth email form (`1_card_login`); "Continue with email" → /auth?guest=1&start=email email form (`2_card_email`).
+- Island "Log in" → /auth (`3_island_login`); island "Join free" opens the card (`4a_joinfree`), then "Continue with email" → join email form (`4_island_email`).
+- Each time Back returns to /courses still browsing as a guest (session `is_anonymous: true`; `3b_back`). No page errors, no replaceState error. Codes were not submitted, so a live conversion was not run.
+- These four taps are now part of every guest proof.

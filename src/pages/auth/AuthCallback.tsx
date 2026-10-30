@@ -46,6 +46,12 @@ export default function AuthCallback() {
           return;
         }
 
+        // Stage 2.4: a guest session is not a sign-in; straight back to browsing.
+        if (session.user.is_anonymous === true) {
+          navigate('/', { replace: true });
+          return;
+        }
+
         // Password reset flow has been removed (passwordless OTP); fall through to
         // the normal onboarding-aware redirect below.
 
