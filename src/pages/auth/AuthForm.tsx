@@ -246,6 +246,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
       if (data?.session?.user) {
         trackLoginSuccess('email', Date.now() - start);
+        // Email OTP cannot link — a converting guest's session is replaced.
+        trackGuestConversionIfPending('email', false);
         // Confirmation time covers a signup even when the email code was requested much earlier.
         if (isNewSignup(data.user)) {
           trackSignupSuccess('email', Date.now() - start);
@@ -472,6 +474,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
 
         if (data?.session?.user) {
           trackLoginSuccess('google');
+          trackGuestConversionIfPending('google', linked);
           // Native account creation and sign-in timestamps can differ by milliseconds.
           if (isNewSignup(data.user)) {
             trackSignupSuccess('google');
