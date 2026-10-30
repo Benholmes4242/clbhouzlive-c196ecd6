@@ -511,7 +511,10 @@ export function ScoresLeaderboardsPage({
   // B.8 — nothing vanishes: all four feats, in RPC order, every window.
   const featTotals = featsYear.isSuccess ? featRows[0] ?? null : null;
   // First load only: isFetched drops on key change while placeholderData holds rows; isSuccess does not.
-  const featsFirstLoad = !featsYear.isSuccess && featRows.length === 0;
+  // A disabled read (guests: pending + idle) is not a load — no placeholder
+  // held open; the section is absent exactly as for a member with no data.
+  const featsHeld = featsYear.isPending && featsYear.fetchStatus === 'idle';
+  const featsFirstLoad = !featsYear.isSuccess && featRows.length === 0 && !featsHeld;
 
   /* ------------------------------------------------- §7 short board */
   const shortBoard = (
