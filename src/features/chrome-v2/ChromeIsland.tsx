@@ -43,6 +43,10 @@ import { IndexGlance } from './IndexGlance';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ConnectGlance } from './ConnectGlance';
 import { ISLAND_GLASS } from '@/lib/tokens/glass';
+import { useIsGuest } from '@/features/guest/useIsGuest';
+import { openGuestCard, surfaceForPath } from '@/features/guest/guestGateStore';
+import { GUEST_ISLAND_COPY } from '@/features/guest/guestCopy';
+import { trackGuestGateShown } from '@/features/guest/guestAnalytics';
 export { ISLAND_GLASS } from '@/lib/tokens/glass';
 
 import { safeGoBack } from '@/utils/navigation';
