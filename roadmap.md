@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Review confirmation redesign
-- [ ] Shared course hero, corrected receipt contract, client media/text snapshot and signed-off receipt layout.
-- [ ] Review-only suggestions and search, live upload states, measured footer and all-locale English copy.
-- [ ] Retarget old layout tests with quoted changes, add regressions, full suite against 4,547/464, Chromium checks and report.
+- [x] Shared course hero, corrected receipt contract, client media/text snapshot and signed-off receipt layout implemented; not verified complete.
+- [x] Review-only suggestions and search, live upload states, measured footer and all-locale English copy implemented.
+- [ ] STOP: reviewConfirmationRedesign.test.tsx:28:361 — expected 'position: relative;' to contain '196px'. 67/68 targeted pass; no assertion edits after failure. Full suite/Chromium blocked by stop. See REVIEW_CONFIRMATION_STOP_REPORT.md.
 
 ## ST3 — Settings Privacy
 - [x] Replace only Privacy with live summary, sheet rows, unchanged auto-post handler and scoped blocked count.
