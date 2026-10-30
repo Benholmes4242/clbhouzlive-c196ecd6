@@ -53,6 +53,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { useFeatsWindow } from '@/features/explore-magazine/useFeatsWindow';
 import { LatestCoursesSection } from '@/components/courses/browse/LatestCoursesSection';
 import { LatestHolesSection } from '@/components/courses/browse/LatestHolesSection';
+import { useDiscoverLastSeen } from '@/hooks/useDiscoverLastSeen';
 
 const client = () => new QueryClient({ defaultOptions: { queries: { retry: false, refetchOnMount: true } } });
 const wrap = (c: QueryClient) => ({ children }: { children: React.ReactNode }) => (
@@ -106,5 +107,11 @@ describe('Guest Stage 2.2 — conversion refetches guest-skipped queries', () =>
     expect(src('src/components/courses/browse/LatestHolesSection.tsx')).toContain("'infinite', user?.id, isGuest]");
     expect(src('src/hooks/gam/useCircleLatestRounds.ts')).toMatch(/'circle-latest-rounds',\s*userId,\s*isGuest,/);
     expect(src('src/context/TopTenContext.tsx')).toContain('[loadUserId, loadIsGuest]');
+  });
+
+  it('a guest leaving Discover never sends mark_surface_seen (server 403s guest writes)', () => {
+    const { result } = renderHook(() => useDiscoverLastSeen('u1'), { wrapper: wrap(client()) });
+    act(() => result.current.markSeen());
+    expect(calls('mark_surface_seen')).toBe(0);
   });
 });
