@@ -21,6 +21,7 @@ import { MuteButton } from '@/audio/MuteButton';
 import { Z } from '@/config/zIndex';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatCountKilo } from '@/i18n/format';
+import { useGuestActionGate } from '@/features/guest/useGuestActionGate';
 
 /* Like glyph comes from reactionGlyph('like') — the one place that decides it. */
 
@@ -193,6 +194,11 @@ export const FeedActionRail: React.FC<FeedActionRailProps> = ({
 
   const showFollowPlus = !readOnly && !isOwnPost && !isFollowing && !!creator;
   const showJustFollowed = !readOnly && !isOwnPost && justFollowed && !!creator;
+
+  // GUEST BROWSING §5: every rail action needs an account. A guest tap opens
+  // the join card instead; nothing is written. Members pass straight through.
+  const gateGuestAction = useGuestActionGate();
+  const creatorFirstName = creator?.displayName?.trim().split(/\s+/)[0] || undefined;
 
   const muteButton = isVideo ? (
     <MuteButton size="md" laneId="active" />
