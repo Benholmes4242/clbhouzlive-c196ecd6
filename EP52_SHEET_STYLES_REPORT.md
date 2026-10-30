@@ -1,4 +1,4 @@
-# FIX — sheets lost their colours and styles (EP5.2) — STOP REPORT
+# FIX — sheets lost their colours and styles (EP5.2) — REPORT
 
 ## Code
 - BizcSheet (`BusinessCreateStep3.tsx`): portal content wrapped in `<div className="bizc-sheet-root">` (scrim + sheet).
@@ -17,8 +17,28 @@ Visual check on device/Chromium against the mocks: NOT done (signed-in screens u
 ## Tests
 Added `src/test/bizcSheetRoot.test.tsx` (3: root in body holds scrim + sheet; root variables equal shell values read from CSS; no shell-scoped selector for known classes). Added one case to `st3SettingsPrivacy.test.tsx` (checked option has aria-checked=true and `.ep-radio`, inside the root on body). No test edited.
 
-## Full suite — STOP
+## Full suite — STOP (superseded by EP5.2.1 below)
 `bunx vitest run --maxWorkers=2 --shard=N/3`: 1,534/1,535 · 1,419/1,419 · 1,716/1,717 → **4,671 tests across 473 files, 4,669 passed, 2 failed**. Against 4,667/472: +3 (bizcSheetRoot) +1 (st3) and +1 file. Reconciles.
 
 1. NEW — `src/test/ep52SheetsCropperCoach.test.tsx` "EP5.2 sheets > BizcSheet renders into document.body, not inside .ep-body": `AssertionError: expected <div class="bizc-sheet-root">…</div> to be <body>…</body>`. The test asserts the sheet's direct parent is `body`; the brief's wrapper now sits between them (the root itself is a direct child of body). Proposed authorised change: assert `sheet.closest('.bizc-sheet-root')?.parentElement === document.body`. Not edited.
 2. PRE-EXISTING (guest Stage 1 stop) — `gateScopeSwitch.test.tsx:57` "CB39 scope switch > is absent in the gated state", plus the unhandled `onAuthStateChange` error. Awaiting the useIsGuest fix approval.
+
+## EP5.2.1 — authorised test change; final result
+
+**The one authorised test change** (src/test/ep52SheetsCropperCoach.test.tsx, "EP5.2 sheets > BizcSheet renders into document.body, not inside .ep-body"):
+
+- Old assertion: `expect(sheet.parentElement).toBe(document.body)` — the sheet itself had to be a direct child of `body`, which the wrapper now sits between.
+- New assertions: the sheet's `.bizc-sheet-root` wrapper is a direct child of `document.body` (`expect(wrapper.parentElement).toBe(document.body)`), the wrapper contains the sheet (`expect(wrapper.contains(sheet)).toBe(true)`), and the sheet is not inside `.ep-body` (`expect(document.querySelector('[data-host]')?.contains(sheet)).toBe(false)`), with the scrim assertions retained. No other test or source change. Note: the `[data-host]` containment assertion is written twice in the block (lines 28–29); harmless duplication, left as-is.
+
+**Full suite** — `bunx vitest run --maxWorkers=2` (background run, EXIT 0, Duration 623.59s, started 13:52, finished 14:02):
+
+**474 files, 4,673 tests, 4,673 passed, 0 failed.**
+
+Against the expected 4,671 across 473 files with only the CB39 failure, every difference reconciles by name:
+
+- `gateScopeSwitch.test.tsx` (3 tests, 1 file) no longer failing: the guest-check fix and guest tests landed in the working tree from the other chat; no change was made to it or any guest file here. This removes the 1 failure.
+- `src/test/guestSwitchOff.test.tsx` (+1 file, +2 tests), also from the guest work.
+
+4,671 + 2 = 4,673 tests; 473 + 1 = 474 files. `ep52SheetsCropperCoach.test.tsx` passes with only the authorised assertion change; `sheetTopV5.test.tsx`, `bizcSheetRoot.test.tsx` and `st3SettingsPrivacy.test.tsx` all pass.
+
+**Visual check on device/Chromium against the mocks: still NOT done** (signed-in screens unavailable in this environment).
