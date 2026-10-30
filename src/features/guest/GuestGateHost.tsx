@@ -56,7 +56,7 @@ export const GuestGateHost: React.FC = () => {
       ? guestActionCopy(active.action, { firstName: active.firstName, postKind: active.postKind })
       : guestSurfaceCopy(active.surface);
 
-  const activeSurface: GuestSurfaceKey | null = active.kind === 'action' ? active.surface : active.surface;
+  const activeSurface: GuestSurfaceKey | null = active.surface;
   const closable = active.kind !== 'scroll';
 
   const onChoice = (choice: GuestGateChoice) => {
