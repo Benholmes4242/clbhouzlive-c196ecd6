@@ -76,25 +76,25 @@ describe('Guest Stage 2.2 — conversion refetches guest-skipped queries', () =>
     expect(h.profileReads).toBe(1);
   });
 
-  it('get_feats_window fires after conversion', async () => {
+  it('get_feats_window fires for a guest, and again after conversion', async () => {
     const c = client();
     renderHook(() => useFeatsWindow('u1', 'year'), { wrapper: wrap(c) });
-    await new Promise(r => setTimeout(r, 0));
-    expect(calls('get_feats_window')).toBe(0);
-    act(() => h.convert());
     await waitFor(() => expect(calls('get_feats_window')).toBe(1));
+    act(() => h.convert());
+    await waitFor(() => expect(calls('get_feats_window')).toBe(2));
   });
 
-  it('get_latest_course_media and get_latest_hole_media fire after conversion', async () => {
+  it('get_latest_course_media and get_latest_hole_media fire for a guest, and again after conversion', async () => {
     const c = client();
     render(<><LatestCoursesSection /><LatestHolesSection /></>, { wrapper: wrap(c) });
-    await new Promise(r => setTimeout(r, 0));
-    expect(calls('get_latest_course_media')).toBe(0);
-    expect(calls('get_latest_hole_media')).toBe(0);
-    act(() => h.convert());
     await waitFor(() => {
       expect(calls('get_latest_course_media')).toBe(1);
       expect(calls('get_latest_hole_media')).toBe(1);
+    });
+    act(() => h.convert());
+    await waitFor(() => {
+      expect(calls('get_latest_course_media')).toBe(2);
+      expect(calls('get_latest_hole_media')).toBe(2);
     });
   });
 
