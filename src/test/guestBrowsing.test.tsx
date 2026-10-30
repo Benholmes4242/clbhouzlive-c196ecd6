@@ -182,7 +182,7 @@ describe('the join card', () => {
   it('suppresses the container focus ring and keeps the button ring keyboard-only', () => {
     const css = readFileSync('src/features/guest/guestGate.css', 'utf8');
     // The card container (the tabIndex={-1} focus target) never shows an outline.
-    expect(css).toMatch(/\.guest-gate-card \{[^}]*outline: none;/s);
+    expect(css).toMatch(/\.guest-gate-card \{[\s\S]*?outline: none;/);
     // A tap focus draws no ring; only keyboard focus draws the approved one.
     expect(css).toContain('.guest-gate-card button:focus:not(:focus-visible) {\n  outline: none;\n}');
     expect(css).toContain(
