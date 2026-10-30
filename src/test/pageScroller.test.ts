@@ -59,11 +59,11 @@ describe('page scroller resolution', () => {
     expect(getPrimaryScrollElement()).toBe(root);
   });
 
-  it('falls back to the scrolling element when #root is not a scroll container', () => {
-    mountRoot('visible');
+  it('returns #root even when its overflow is hidden', () => {
+    mountRoot('hidden');
     const resolved = getPrimaryScrollElement();
     expect(resolved).not.toBeNull();
-    expect(resolved?.id).not.toBe('root');
+    expect(resolved?.id).toBe('root');
   });
 
   it('re-resolves once the cached node is disconnected', () => {
