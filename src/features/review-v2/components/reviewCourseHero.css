@@ -1,7 +1,0 @@
-.review-course-hero{position:relative;--review-hero-fade:linear-gradient(180deg,rgba(22,22,26,0) 40%,rgba(22,22,26,0.72) 72%,#16161A 100%)}
-.review-course-hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%}
-.review-course-photo-fallback,.review-course-wash,.review-course-fade{position:absolute;inset:0}
-.review-course-photo-fallback{background:var(--post-review-photo-fallback)}
-.review-course-wash,.review-course-fade{pointer-events:none}
-.review-course-fade{background:var(--review-hero-fade)}
-.review-course-masthead{position:absolute;left:20px;right:20px;bottom:14px}
