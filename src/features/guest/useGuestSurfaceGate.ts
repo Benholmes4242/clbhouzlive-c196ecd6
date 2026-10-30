@@ -2,8 +2,10 @@
  * GUEST SCROLL TRIGGERS (brief §4). Scroll depth, NEVER a timer — there is
  * no setTimeout/setInterval in this file by rule.
  *
- * - Clubhouse: the top of the fourth post entering the viewport locks the
- *   surface (IntersectionObserver on the feed's [data-card-index="3"]).
+ * - Clubhouse: the top of any post with data-card-index >= 3 inside the
+ *   viewport locks the surface, checked against live nodes on every scroll,
+ *   after mount and on feed changes (no single-node observer: Virtuoso
+ *   replaces item nodes).
  * - Every other free-look surface (Stage 2.2 ruling): locks at 1.5 viewport
  *   heights scrolled OR within 120px of the page's end, whichever comes
  *   first — and only once the user has actually scrolled (scrollTop > 0).
@@ -21,6 +23,7 @@ import {
   openGuestCard,
   courseSurfaceKey,
   registerGuestCourseSheet,
+  getGuestCardRequest,
   type GuestSurfaceKey,
 } from './guestGateStore';
 import { trackGuestGateShown } from './guestAnalytics';
@@ -32,47 +35,62 @@ function lockAndShow(surface: GuestSurfaceKey): void {
   openGuestCard({ kind: 'scroll', surface });
 }
 
-/** Clubhouse: locks when the top of the fourth post enters the viewport. */
+/** True when the top of any rendered post with data-card-index >= 3 is
+ *  inside the viewport. Reads whatever nodes exist right now, because the
+ *  virtualised feed replaces item nodes freely (Stage 2.7). */
+export function clubhouseShouldLock(root: ParentNode = document): boolean {
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+  const nodes = root.querySelectorAll('[data-card-index]');
+  for (const el of Array.from(nodes)) {
+    const idx = Number(el.getAttribute('data-card-index'));
+    if (!Number.isFinite(idx) || idx < 3) continue;
+    const top = el.getBoundingClientRect().top;
+    // At or above the viewport bottom: either in view or already flung past.
+    if (top < vh) return true;
+  }
+  return false;
+}
+
+/** Clubhouse: locks when the top of the fourth (or any later) post is in view.
+ *  Checked on every scroll (document capture, one check per frame), once
+ *  after mount, and whenever the feed's items change. */
 export function useGuestClubhouseGate(): void {
   const isGuest = useIsGuest();
   useEffect(() => {
-    if (!isGuest || isSurfaceLocked('clubhouse')) return;
-    const root = document.getElementById('root');
-    if (!root) return;
-
-    let observer: IntersectionObserver | null = null;
-    const watch = (el: Element) => {
-      observer = new IntersectionObserver(
-        (entries) => {
-          if (entries.some((entry) => entry.isIntersecting)) {
-            observer?.disconnect();
-            lockAndShow('clubhouse');
-          }
-        },
-        { root: null, threshold: 0 },
-      );
-      observer.observe(el);
-    };
-
-    const existing = root.querySelector('[data-card-index="3"]');
-    if (existing) {
-      watch(existing);
-      return () => observer?.disconnect();
+    if (!isGuest) return;
+    if (isSurfaceLocked('clubhouse')) {
+      // Returning to a locked Clubhouse re-shows the card at the top.
+      if (!getGuestCardRequest()) openGuestCard({ kind: 'scroll', surface: 'clubhouse' });
+      return;
     }
-
-    // The feed virtualises; the fourth post may not exist yet.
-    const mo = new MutationObserver(() => {
-      const el = root.querySelector('[data-card-index="3"]');
-      if (el) {
-        mo.disconnect();
-        watch(el);
-      }
-    });
-    mo.observe(root, { childList: true, subtree: true });
-    return () => {
-      mo.disconnect();
-      observer?.disconnect();
+    let raf = 0;
+    let done = false;
+    const cleanup = () => {
+      done = true;
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      document.removeEventListener('scroll', schedule, true);
+      mo?.disconnect();
     };
+    const check = () => {
+      raf = 0;
+      if (done) return;
+      if (clubhouseShouldLock()) {
+        cleanup();
+        lockAndShow('clubhouse');
+      }
+    };
+    function schedule() {
+      if (done || raf) return;
+      raf = requestAnimationFrame(check);
+    }
+    document.addEventListener('scroll', schedule, { capture: true, passive: true });
+    // Re-check when the feed's items change (skeleton swap, merges, slides).
+    const root = document.getElementById('root');
+    const mo = root && typeof MutationObserver !== 'undefined' ? new MutationObserver(schedule) : null;
+    mo?.observe(root as HTMLElement, { childList: true, subtree: true });
+    schedule();
+    return cleanup;
   }, [isGuest]);
 }
 

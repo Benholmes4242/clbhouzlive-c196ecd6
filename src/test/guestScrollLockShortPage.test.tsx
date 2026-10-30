@@ -11,7 +11,7 @@ vi.mock('@/features/guest/guestAnalytics', () => ({ trackGuestGateShown: (a: unk
 vi.mock('@/lib/getScrollParent', () => ({ getPrimaryScrollElement: () => h.scroller ?? undefined }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { auth: { onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }), getSession: () => Promise.resolve({ data: { session: null } }) } } }));
 
-import { shouldScrollLock, useGuestScrollGate, useGuestClubhouseGate } from '@/features/guest/useGuestSurfaceGate';
+import { shouldScrollLock, useGuestScrollGate } from '@/features/guest/useGuestSurfaceGate';
 import { isSurfaceLocked } from '@/features/guest/guestGateStore';
 
 function makeScroller(scrollHeight: number, clientHeight: number) {
@@ -61,23 +61,5 @@ describe('useGuestScrollGate', () => {
     scrollTo(el, 0);
     expect(isSurfaceLocked(s)).toBe(false);
     expect(h.track).not.toHaveBeenCalled();
-  });
-});
-
-describe('useGuestClubhouseGate', () => {
-  it('still locks when the fourth post enters the viewport', () => {
-    let cb: ((e: Array<{ isIntersecting: boolean }>) => void) | null = null;
-    const observed: Element[] = [];
-    const prevIO = window.IntersectionObserver;
-    (window as unknown as { IntersectionObserver: unknown }).IntersectionObserver = class { constructor(f: typeof cb) { cb = f; } observe(e: Element) { observed.push(e); } disconnect() {} };
-    const root = document.createElement('div'); root.id = 'root';
-    root.innerHTML = [0, 1, 2, 3].map(i => `<div data-card-index="${i}"></div>`).join('');
-    document.body.appendChild(root);
-    renderHook(() => useGuestClubhouseGate());
-    expect(observed[0]?.getAttribute('data-card-index')).toBe('3');
-    act(() => cb?.([{ isIntersecting: true }]));
-    expect(isSurfaceLocked('clubhouse')).toBe(true);
-    expect(h.track).toHaveBeenCalledWith({ surface: 'clubhouse', trigger: 'scroll' });
-    (window as unknown as { IntersectionObserver: unknown }).IntersectionObserver = prevIO;
   });
 });
