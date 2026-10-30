@@ -11,6 +11,8 @@ import '@/components/courses/course-detail/tabCanon.css';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
 import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';
 import { courseMastheadKicker } from '@/features/courses/_shared/courseRankLabels';
+import { shortCourseName } from '@/features/courses/_shared/courseLabel';
+import { setGuestCourseContext } from '@/features/guest/guestGateStore';
 import { CourseTabs, type CourseTabId } from '@/components/courses/course-detail/CourseTabs';
 import CourseDetailShellTabs from '@/features/courses/components/CourseDetailShellTabs';
 // FloatingPageHeader removed (H3) — chrome now driven by ChromeIsland registry.
