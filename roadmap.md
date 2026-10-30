@@ -1,5 +1,9 @@
 # Roadmap
 
+## ST5.1 — Authorised duplicate-test removal
+- [x] Delete only case19 and move its dialog assertion into case7; remove historical literal from report and rename to ST5_REPORT.md. sheetTopV5 unchanged.
+- [ ] Run full bunx vitest run --maxWorkers=2; report result against4610/468 ST5-only and4621/469 including intervening11 review-media cases. Existing review test/type failures remain untouched.
+
 ## Review posts — Match normal feed media sizing
 - [x] Share intrinsic ratio/cap rules and opt media-first reviews with media into natural-height flow; preserve standard/no-media reviews.
 - [x] Add11 sizing cases; targeted42 passed/3 failed/45 across4. Existing34/34 pass; no old assertions changed. Candidate4622/469 =4579/466 +ST532/2 +this11/1.
