@@ -1,5 +1,10 @@
 # Roadmap
 
+## ST4 — Settings Notifications and Friends
+- [x] Share unchanged notification categories; replace only Notifications/Friends using existing push/invite actions.
+- [ ] Add ST4 rules tests, run full suite with --maxWorkers=2, and complete combined ST3/ST4 report.
+- [ ] Live authenticated action/readback unavailable with external_unmanaged; fixture checks do not verify persistence.
+
 ## Review confirmation redesign
 - [x] Shared course hero, corrected receipt contract, client media/text snapshot and signed-off receipt layout implemented; not verified complete.
 - [x] Review-only suggestions and search, live upload states, measured footer and all-locale English copy implemented.
