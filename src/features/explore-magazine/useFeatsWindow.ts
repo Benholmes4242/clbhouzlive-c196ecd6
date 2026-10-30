@@ -50,7 +50,7 @@ export function useFeatsWindow(userId: string | undefined, window: FeatWindow, e
   // Guests: the RPC is member-only (401 for anonymous sessions) — never fire it.
   const isGuest = useIsGuest();
   return useQuery<FeatYearRow[]>({
-    queryKey: ['explore', 'feats-window', userId, window],
+    queryKey: ['explore', 'feats-window', userId, window, isGuest],
     enabled: enabled && !isGuest,
     staleTime: 60_000,
     // Hold the previous window's rows while the next loads so the rail keeps its height.

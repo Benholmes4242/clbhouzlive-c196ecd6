@@ -75,7 +75,7 @@ describe.each(kinds)('$kind unlimited rail', spec => {
     pages = [page(spec)]; const view = mount(spec);
     await waitFor(() => expect(cards(view, spec)).toHaveLength(spec.size));
     expect(requests(spec)).toEqual([[spec.name, { p_limit: spec.size }]]);
-    expect(view.cache.getQueryCache().find({ queryKey: ['gam_rpc', spec.name, 'infinite'] })?.options).toMatchObject({ staleTime: 60000 });
+    expect(view.cache.getQueryCache().find({ queryKey: ['gam_rpc', spec.name, 'infinite', 'admin', false] })?.options).toMatchObject({ staleTime: 60000 });
   });
   it('the rail sentinel requests the last raw row cursor and ignores repeated callbacks', async () => {
     pages = [page(spec), page(spec, 50, 3)]; const view = mount(spec);
@@ -117,7 +117,7 @@ describe.each(kinds)('$kind unlimited rail', spec => {
   });
   it('first-page minimum prevents observation and further requests', async () => {
     pages = [page(spec, 0, 2)]; const view = mount(spec);
-    await waitFor(() => expect(view.cache.getQueryState(['gam_rpc', spec.name, 'infinite'])?.status).toBe('success'));
+    await waitFor(() => expect(view.cache.getQueryState(['gam_rpc', spec.name, 'infinite', 'admin', false])?.status).toBe('success'));
     expect(cards(view, spec)).toHaveLength(0);
     expect(observers).toHaveLength(0);
     expect(requests(spec)).toHaveLength(1);
@@ -159,6 +159,6 @@ describe('loaded holes run and refresh', () => {
     await screen.findByRole('button', { name: 'Hole 4, Course 50', hidden: true });
     expect(requests(spec)).toHaveLength(2);
     expect(f.rpc).toHaveBeenCalledWith('admin_tag_hole_media', { p_course_id: 'course', p_media_id: 'untagged', p_hole_no: 4 });
-    expect(view.cache.getQueryData(['gam_rpc', spec.name, 'infinite'])).toMatchObject({ pages });
+    expect(view.cache.getQueryData(['gam_rpc', spec.name, 'infinite', 'admin', false])).toMatchObject({ pages });
   });
 });

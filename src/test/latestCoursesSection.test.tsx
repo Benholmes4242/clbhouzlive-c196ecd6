@@ -91,7 +91,7 @@ describe('BRIEF_COURSES_LATEST_FROM_COURSES Latest from the courses', () => {
     expect(screen.getAllByText('Member shots')).toHaveLength(3);
     expect(screen.getByText('Course alpha')).toBeInTheDocument();
     expect(screen.getAllByText('Mark Eldridge and 2 others')).toHaveLength(3);
-    expect(f.rpc).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['gam_rpc', 'get_latest_course_media', 'infinite'], staleTime: 60_000 }));
+    expect(f.rpc).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['gam_rpc', 'get_latest_course_media', 'infinite', expect.anything(), false], staleTime: 60_000 }));
   });
 
   it('credit grammar: one other, no others, and an empty name omits the line', () => {

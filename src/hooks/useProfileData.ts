@@ -1,10 +1,15 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { isGuestUser } from '@/features/guest/useIsGuest';
 
 export const useProfileData = () => {
   const { user, loading: sessionLoading } = useSupabaseSession();
   const queryClient = useQueryClient();
+  // Guest flag in the key: a guest keeps the same id when they join, so a
+  // user-id-only key would keep the cached guest null after conversion.
+  const isGuest = isGuestUser(user);
+  const key = ['profile', user?.id, isGuest] as const;
 
   // Get profile data using React Query
   const { 
@@ -13,7 +18,7 @@ export const useProfileData = () => {
     error: profileError,
     refetch: fetchProfile 
   } = useQuery({
-    queryKey: ['profile', user?.id],
+    queryKey: key,
     queryFn: async () => {
       if (!user?.id) return null;
       // Guests (anonymous sessions) have no profile by design — never read it.
@@ -53,7 +58,7 @@ export const useProfileData = () => {
   type ProfileRow = NonNullable<typeof profile>;
 
   const setProfile = (newProfile: ProfileRow | null) => {
-    queryClient.setQueryData(['profile', user?.id], newProfile);
+    queryClient.setQueryData(key, newProfile);
   };
 
   const updateProfileField = async <K extends keyof ProfileRow>(field: K & string, value: ProfileRow[K]) => {
@@ -68,7 +73,7 @@ export const useProfileData = () => {
       if (error) throw error;
 
       // Update the cached profile data
-      queryClient.setQueryData(['profile', user?.id], (oldProfile: ProfileRow | null | undefined) => ({
+      queryClient.setQueryData(key, (oldProfile: ProfileRow | null | undefined) => ({
         ...(oldProfile ?? {}),
         [field]: value,
       }));

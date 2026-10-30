@@ -220,6 +220,7 @@ export function useCircleLatestRounds(
     queryKey: [
       'circle-latest-rounds',
       userId,
+      isGuest,
       limit,
       allowMultiplePerFriend,
       includeSuggested,

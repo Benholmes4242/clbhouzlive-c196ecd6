@@ -192,7 +192,7 @@ export function LatestCoursesSection() {
   // Guests: the RPC is member-only (401 for anonymous sessions) — never fire it.
   const isGuest = useIsGuest();
   const { data, isLoading, isError, hasNextPage, isFetching, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
-    queryKey: ['gam_rpc', 'get_latest_course_media', 'infinite'],
+    queryKey: ['gam_rpc', 'get_latest_course_media', 'infinite', user?.id, isGuest],
     initialPageParam: undefined as { at: string; id: string } | undefined,
     queryFn: async ({ pageParam }) => {
       const args = { p_limit: LATEST_COURSE_PAGE_SIZE, ...(pageParam ? { p_before_at: pageParam.at, p_before_id: pageParam.id } : {}) };

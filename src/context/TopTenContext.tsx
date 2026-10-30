@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSupabaseSession } from "@/hooks/useSupabaseSession";
+import { isGuestUser } from "@/features/guest/useIsGuest";
 
 export type Course = {
   id: string;
@@ -44,6 +46,11 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // must never write it back — that upsert fired on every app open (and was
   // the write the guest guard rejected).
   const dirtyRef = useRef(false);
+  // Load keyed on [userId, isGuest]: a guest keeps their id when they join, so
+  // the flip alone must reload. A missing row is an empty list (maybeSingle).
+  const { user: sessionUser } = useSupabaseSession();
+  const loadUserId = sessionUser?.id ?? null;
+  const loadIsGuest = isGuestUser(sessionUser);
 
   // --- Load from database on mount ---
   useEffect(() => {
@@ -51,7 +58,9 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       try {
         setLoading(true);
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
+        if (!user || user.is_anonymous) {
+          // No session, or a guest: nothing stored — an empty list.
+          setTopTenState(EMPTY10);
           setLoading(false);
           return;
         }
@@ -77,7 +86,7 @@ export const TopTenProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
 
     loadTopTen();
-  }, []);
+  }, [loadUserId, loadIsGuest]);
 
   // --- Persist (debounced) to database, only after a real change ---
   useEffect(() => {
