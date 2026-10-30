@@ -9,7 +9,7 @@ import { useLocation } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useEnvStatus } from '@/utils/native/envStatus';
 import { hasStoredSession } from '@/utils/auth/hasStoredSession';
-import { PAGE_CANVAS } from '@/lib/tokens/pageCanvas';
+import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { GUEST_BROWSING_ENABLED } from './guestConfig';
 import { guestHoldActive, isGuestHoldExemptPath, useGuestSessionBootstrap } from './guestSession';
 

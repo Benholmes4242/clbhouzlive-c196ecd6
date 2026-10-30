@@ -48,6 +48,7 @@ import { GUEST_BROWSING_ENABLED } from '@/features/guest/guestConfig';
 import { signedOutOutcome, useGuestSessionBootstrap } from '@/features/guest/guestSession';
 import { GuestGateHost } from '@/features/guest/GuestGateHost';
 import { GuestRouteGuard } from '@/features/guest/guestRoutes';
+import { GuestSessionHold } from '@/features/guest/GuestSessionHold';
 
 // REMOVED: FullscreenPlayerProvider — Phase 5 fullscreen system deleted
 import { RehydrationProvider } from './contexts/RehydrationContext';
@@ -594,7 +595,7 @@ function AppRoutes() {
 
 
   return (
-    <>
+    <GuestSessionHold>
       {/* Set navigate ref for use in toast actions and other non-component code */}
       <NavigationRefSetter />
 
