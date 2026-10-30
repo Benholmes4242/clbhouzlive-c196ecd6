@@ -815,5 +815,25 @@
       "copyFailed": "Failed to copy link",
       "close": "Close"
     }
+  },
+  "guest": {
+    "island": {
+      "login": "Log in",
+      "join": "Join free"
+    },
+    "card": {
+      "apple": "Continue with Apple",
+      "google": "Continue with Google",
+      "email": "Continue with email",
+      "login": "ALREADY A MEMBER? LOG IN",
+      "close": "Close",
+      "joinInKicker": "Join to join in",
+      "socialBody": "It’s free. Your likes, comments and follows start the moment you’re in.",
+      "quickBody": "It’s free and takes a minute.",
+      "clubhouseKicker": "You’ve had a look",
+      "exploreKicker": "Explore",
+      "coursesKicker": "Courses",
+      "tourKicker": "Tour"
+    }
   }
 }

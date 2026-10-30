@@ -31,6 +31,13 @@ export const EVENT_LABELS: Record<string, string> = {
   login_failed: 'Login failed',
   profile_fallback_created: 'Profile fallback created',
 
+  // ─── Guest browsing (GUEST BROWSING Stage 1) ──────────────────
+  guest_session_started: 'Guest session started',
+  guest_session_failed: 'Guest session failed',
+  guest_gate_shown: 'Guest join card shown',
+  guest_gate_choice: 'Guest join card choice',
+  guest_converted: 'Guest converted to member',
+
   // ─── Feed / posts / video ─────────────────────────────────────
   feed_follow: 'Follow from feed',
   post_like: 'Post liked',
