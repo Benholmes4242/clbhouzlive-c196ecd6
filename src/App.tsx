@@ -860,7 +860,7 @@ function AppRoutes() {
 
       
       {/* VideoPlayerModal removed in PR-5 (queue family strip). */}
-    </>
+    </GuestSessionHold>
   );
 }
 
