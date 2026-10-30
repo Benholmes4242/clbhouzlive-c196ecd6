@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { deriveRoundFeats, type RoundFeat } from '@/lib/gam/roundFeats';
 import { fetchCircleIds } from '@/lib/social/circle';
+import { useIsGuest } from '@/features/guest/useIsGuest';
 
 /**
  * useCircleLatestRounds
@@ -214,6 +215,7 @@ export function useCircleLatestRounds(
   }: Options = {},
 ) {
   const courseFilter = courseIds == null ? null : Array.from(new Set(courseIds)).sort();
+  const isGuest = useIsGuest();
   return useQuery({
     queryKey: [
       'circle-latest-rounds',
@@ -761,7 +763,9 @@ export function useCircleLatestRounds(
 
       return out;
     },
-    enabled: !!userId,
+    // Guests: the circle reads (incl. whs_score_holes) are member-only and
+    // 401 for anonymous sessions — never fire them.
+    enabled: !!userId && !isGuest,
     // The source is the England Golf sync, which lands roughly DAILY. A
     // one-minute threshold checked ~1,400 times for something that arrives
     // once, on a mobile WebView. No polling here, then or now.

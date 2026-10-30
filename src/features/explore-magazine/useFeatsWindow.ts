@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useIsGuest } from '@/features/guest/useIsGuest';
 
 export type FeatKind = 'ace' | 'albatross' | 'eagle' | 'clean_card';
 
@@ -46,9 +47,11 @@ export interface FeatYearRow {
 export type FeatWindow = 'year' | 'all';
 
 export function useFeatsWindow(userId: string | undefined, window: FeatWindow, enabled = true) {
+  // Guests: the RPC is member-only (401 for anonymous sessions) — never fire it.
+  const isGuest = useIsGuest();
   return useQuery<FeatYearRow[]>({
     queryKey: ['explore', 'feats-window', userId, window],
-    enabled,
+    enabled: enabled && !isGuest,
     staleTime: 60_000,
     // Hold the previous window's rows while the next loads so the rail keeps its height.
     placeholderData: (prev) => prev,
