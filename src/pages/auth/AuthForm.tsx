@@ -90,6 +90,19 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
   // falls back to a normal sign-in so the flow still completes. Email OTP
   // cannot link — it signs the email user in, replacing the guest session.
   const guestAutoStarted = useRef(false);
+  const emailLinkModeRef = useRef(false);
+
+  /** True only when the switch is on, the card handed off (?guest=1) and the
+   *  current session is anonymous. Never throws. */
+  const isGuestConverting = (): boolean => {
+    if (!GUEST_BROWSING_ENABLED) return false;
+    try {
+      return searchParams.get('guest') === '1' && Boolean(getGuestUser());
+    } catch (err) {
+      console.warn('[guest-convert] guest check failed:', err);
+      return false;
+    }
+  };
 
   // The sign-in path never depends on guest code: with the switch off both
   // helpers short-circuit before touching any guest module, and with it on a
@@ -173,6 +186,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
     sendStartRef.current = Date.now();
 
     try {
+      // GUEST §6 email join: put the email on the anonymous user so the id is
+      // kept; if it already belongs to an account, the normal email sign-in.
+      emailLinkModeRef.current = false;
+      if (GUEST_BROWSING_ENABLED && isGuestConverting()) {
+        const linkRes = await supabase.auth.updateUser({ email: normalised });
+        if (!linkRes.error) {
+          emailLinkModeRef.current = true;
+          trackAuthInitiated('email', Date.now() - sendStartRef.current);
+          trackSignupInitiated('email');
+          setEmailState(normalised);
+          setResendCooldown(RESEND_COOLDOWN_SECONDS);
+          setSubmittingMethod(null);
+          return true;
+        }
+        console.warn('[guest-convert] updateUser(email) failed, using normal email sign-in:', linkRes.error.message);
+      }
       const { error } = await supabase.auth.signInWithOtp({
         email: normalised,
         options: { shouldCreateUser: true },
