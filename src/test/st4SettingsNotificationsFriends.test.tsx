@@ -40,8 +40,8 @@ describe('ST4 Push', () => {
   it.each([[true, 'enabled'], [false, 'unknown']])('shows no value and a disabled switch while loading (%s, %s)', (loading, state) => { Object.assign(h, { loading, state }); mount(); expect(screen.getByTestId('settings-push-value').textContent).toBe(''); expect(push()).toBeDisabled(); });
 });
 
-describe('ST4 Alerts', () => {
-  it('shows All 11 on with nothing muted and opens Notifications', async () => { mount(); await waitFor(() => expect(alert().textContent).toBe('All 11 on')); fireEvent.click(screen.getByRole('button', { name: /^Alerts/ })); expect(screen.getByTestId('location').textContent).toBe('/manage/notifications'); });
+describe('ST4 Types', () => {
+  it('shows All 11 on with nothing muted and opens Notifications', async () => { mount(); await waitFor(() => expect(alert().textContent).toBe('All 11 on')); fireEvent.click(screen.getByRole('button', { name: /^Types/ })); expect(screen.getByTestId('location').textContent).toBe('/manage/notifications'); });
   it('counts a category off when one of its types is muted', async () => { h.muted = [CATEGORIES[0].types[0], CATEGORIES[1].types[1]]; mount(); await waitFor(() => expect(alert().textContent).toBe('9 of 11 on')); });
   it('shows All off when every category is muted', async () => { h.muted = CATEGORIES.map(c => c.types[0]); mount(); await waitFor(() => expect(alert().textContent).toBe('All off')); });
   it('shows nothing on preference read error', async () => { h.prefError = new Error('refused'); mount(); await waitFor(() => expect(qc.getQueryState(['settings-alert-summary', 'me'])?.status).toBe('error')); expect(alert().textContent).toBe(''); });
