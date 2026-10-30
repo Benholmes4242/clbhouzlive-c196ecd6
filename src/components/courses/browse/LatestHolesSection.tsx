@@ -89,8 +89,9 @@ export function LatestHolesSection() {
   const viewerOpen = useFullscreenFeedStore(state => state.isOpen);
   // Guests: the RPC is member-only (401 for anonymous sessions) — never fire it.
   const isGuest = useIsGuest();
+  const { user } = useSupabaseSession();
   const { data, isLoading, isError, hasNextPage, isFetching, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
-    queryKey: ['gam_rpc', 'get_latest_hole_media', 'infinite'],
+    queryKey: ['gam_rpc', 'get_latest_hole_media', 'infinite', user?.id, isGuest],
     initialPageParam: undefined as { at: string; id: string } | undefined,
     queryFn: async ({ pageParam }) => {
       const args = { p_limit: LATEST_HOLE_PAGE_SIZE, ...(pageParam ? { p_before_at: pageParam.at, p_before_id: pageParam.id } : {}) };

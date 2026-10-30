@@ -81,7 +81,9 @@ export const useProfileData = () => {
     return () => {
       isMounted = false;
     };
-  }, [user?.id, sessionLoading]); // Include sessionLoading in dependencies
+    // is_anonymous in the deps: a guest keeps their id when they join, so the
+    // profile must refetch on the flip alone.
+  }, [user?.id, user?.is_anonymous, sessionLoading]); // Include sessionLoading in dependencies
 
   return {
     user,
