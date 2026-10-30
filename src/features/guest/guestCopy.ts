@@ -37,7 +37,7 @@ export const GUEST_CARD_CHROME_COPY = {
 export function guestSurfaceCopy(surface: GuestSurfaceKey): GuestCardCopy {
   if (surface === 'clubhouse') {
     return {
-      kicker: 'You’ve had a look',
+      kicker: 'Join the community',
       headline: [
         { text: '23,000 courses', amber: true },
         { text: ' and the golfers who play them.' },

@@ -125,6 +125,7 @@ describe('surface locks', () => {
 
 describe('copy table', () => {
   it('course copy uses the short name as kicker and live rounds in the headline', () => {
+    expect(guestSurfaceCopy('clubhouse').kicker).toBe('Join the community');
     setGuestCourseContext({ courseId: 'c1', shortName: 'St Andrews', roundsTracked: 1234 });
     const copy = guestSurfaceCopy('course:c1');
     expect(copy.kicker).toBe('St Andrews');
