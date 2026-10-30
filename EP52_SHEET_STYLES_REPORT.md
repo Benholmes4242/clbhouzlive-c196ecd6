@@ -17,7 +17,7 @@ Visual check on device/Chromium against the mocks: NOT done (signed-in screens u
 ## Tests
 Added `src/test/bizcSheetRoot.test.tsx` (3: root in body holds scrim + sheet; root variables equal shell values read from CSS; no shell-scoped selector for known classes). Added one case to `st3SettingsPrivacy.test.tsx` (checked option has aria-checked=true and `.ep-radio`, inside the root on body). No test edited.
 
-## Full suite — STOP
+## Full suite — STOP (superseded by EP5.2.1 below)
 `bunx vitest run --maxWorkers=2 --shard=N/3`: 1,534/1,535 · 1,419/1,419 · 1,716/1,717 → **4,671 tests across 473 files, 4,669 passed, 2 failed**. Against 4,667/472: +3 (bizcSheetRoot) +1 (st3) and +1 file. Reconciles.
 
 1. NEW — `src/test/ep52SheetsCropperCoach.test.tsx` "EP5.2 sheets > BizcSheet renders into document.body, not inside .ep-body": `AssertionError: expected <div class="bizc-sheet-root">…</div> to be <body>…</body>`. The test asserts the sheet's direct parent is `body`; the brief's wrapper now sits between them (the root itself is a direct child of body). Proposed authorised change: assert `sheet.closest('.bizc-sheet-root')?.parentElement === document.body`. Not edited.
