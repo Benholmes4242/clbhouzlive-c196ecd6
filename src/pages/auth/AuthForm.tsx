@@ -507,7 +507,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ onWillNavigate }) => {
     median.socialLogin.google.login({ callback: handleGoogleCallback });
   }, [handleGoogleCallback]);
 
-
+  // GUEST BROWSING §6: the join card hands off with ?guest=1&start=<method>.
+  // Apple and Google start their native sheets immediately (one tap in the
+  // card, one native prompt — no second tap on the auth screen). Email stays
+  // on the hero, where the email field already lives.
+  const guestStart = searchParams.get('guest') === '1' ? searchParams.get('start') : null;
+  useEffect(() => {
+    if (!guestStart || guestAutoStarted.current) return;
+    if (!getGuestUser()) return;
+    guestAutoStarted.current = true;
+    if (guestStart === 'apple') handleAppleSignIn();
+    else if (guestStart === 'google') handleGoogleSignIn();
+  }, [guestStart, handleAppleSignIn, handleGoogleSignIn]);
 
   const isSheetOpen = step === 'otp';
 
