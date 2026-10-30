@@ -49,6 +49,9 @@ export function useStartConversation(): UseStartConversationReturn {
       const sender = options?.asActor ?? actor;
       if (!sender) return;
       if (isStarting) return;
+      // GUEST BROWSING §5: a guest message tap opens the join card; no
+      // conversation is created and nothing is navigated to.
+      if (gateGuestActionNow('message')) return;
       setIsStarting(true);
       try {
         const { data, error } = await supabase.rpc('msg_start_direct', {

@@ -29,6 +29,9 @@ export function useToggleFollow() {
 
   return useMutation({
     mutationFn: async (params: ToggleFollowParams) => {
+      // GUEST BROWSING §5: a guest follow tap opens the join card; nothing
+      // is written (no optimistic patch, no insert).
+      if (gateGuestActionNow('follow')) return { next: params.isFollowing };
       const next = !params.isFollowing;
 
       const followerActorType = params.viewerActorType ?? 'personal';
