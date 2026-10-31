@@ -925,22 +925,6 @@ export default function BusinessProfileEditor() {
           */}
           <div className="px-4 pt-6 pb-2">
             {mode === 'edit' && <Button type="button" variant="ghost" className="ep-saved be2-saved" data-state={partialStatus} aria-live="polite" onClick={() => { if (partialStatus === 'error') void partialRetry.current?.(); }}>{partialStatus === 'saving' ? 'Saving…' : partialStatus === 'error' ? "Couldn't save. Try again." : 'All changes saved'}</Button>}
-            {false ? (
-              <div
-                style={{
-                  height: 22,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 5,
-                  ...FIELD_LABEL,
-                  color: A.MUTE,
-                }}
-              >
-                <Check size={11} strokeWidth={3} />
-                All changes saved
-              </div>
-            ) : (
               <button
                 onClick={handleSave}
                 disabled={!saveEnabled}
@@ -967,7 +951,6 @@ export default function BusinessProfileEditor() {
                   'Save changes'
                 )}
               </button>
-            )}
           </div>
 
         </div>
