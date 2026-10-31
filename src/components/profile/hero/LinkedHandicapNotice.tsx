@@ -12,7 +12,9 @@ export function LinkedHandicapNotice({ provider }: { provider?: string | null })
   const body = bodyNameForProvider(provider);
   return <div data-linked-handicap-notice="" style={{ marginTop: 14 }}>
     <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: A.MUTE }}>
-      {t('hero.linkedNoIndex', { provider: body, defaultValue: `Connected to ${body}. Your index and rounds appear here as soon as ${body} has them.` })}
+      {t('hero.linkedNoIndex', { provider: body, defaultValue: `You're connected. Your rounds will start arriving once ${body} gives you an official handicap.` })}
+      <br />
+      {t('hero.linkedNoIndexNext', { defaultValue: "Not got one yet? Keep submitting scores and they'll show here soon after it arrives." })}
     </p>
     <Button variant="ghost" className="h-auto rounded-none p-0" onClick={() => navigate('/manage/handicap')} style={{ marginTop: 11, padding: 0, border: 0, background: 'transparent', fontFamily: SANS, fontSize: 13, fontWeight: 700, color: A.INK }}>
       {t('hero.linkedManage', { provider: body, defaultValue: `${body} ›` })}

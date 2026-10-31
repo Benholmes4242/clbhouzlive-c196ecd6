@@ -16,6 +16,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import ParRings from './ParRings';
 import { stripClubSuffix } from './useConnectIntroCourse';
 import { useRingSize } from './useRingSize';
+import { bodyNameForProvider } from '@/lib/whs/whsCountries';
 
 interface Props {
   firstName: string;
@@ -25,6 +26,7 @@ interface Props {
   scoresImported?: number;
   friendsImported?: number;
   connectionId?: string | null;
+  provider?: string | null;
   onContinue: () => void;
 }
 
@@ -87,6 +89,7 @@ const fmtIndex = (h: number | null) => {
 export const WelcomeAboardScreen: React.FC<Props> = ({
   handicapIndex,
   connectionId,
+  provider,
   onContinue,
 }) => {
   const { t } = useTranslation('handicap');
@@ -168,7 +171,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
     : t('whsConnect.done.headline');
 
   const lead = countersPending ? t('whsConnect.done.subPending') : emptyRecord
-    ? t(handicapIndex == null ? 'whsConnect.done.subConnectedEmpty' : 'whsConnect.done.subIndexOnly')
+    ? t(handicapIndex == null ? 'whsConnect.done.subConnectedEmpty' : 'whsConnect.done.subIndexOnly', { provider: bodyNameForProvider(provider) })
     : t('whsConnect.done.sub');
 
   const par3 = breakdown?.par3 ?? null;

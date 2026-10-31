@@ -1,5 +1,9 @@
 # Roadmap
 
+## Linked-without-index wording amendment
+- [ ] Update Profile, zero-round/no-index Done and Manage messages in English in every locale; preserve index-present wording and provider naming.
+- [ ] Run relevant tests and full suite against 4,890/494; record results and hosted-verification limits.
+
 ## Linked member with no index yet
 - [x] Add shared linked state; island/profile/Scores/empty owner Rounds invitations suppressed, index-connected rules preserved.
 - [x] Add no-index island/manage entry, shared owner explanation and zero-record completion; all12 locale files updated. Completion-only confirmed-zero count read preserves legacy callers.
