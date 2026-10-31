@@ -1320,4 +1320,4 @@
 - [x] Restored from the earlier ruling that had renamed this test and dropped 'audience' from the awaited selector list; CB101.1 rules the strong form (name unchanged, audience awaited), and cb84 "none renders no card" already covers the empty-state absence.
 - [x] cb99 file 25/25. Full bunx vitest run 3,332 passed / 387 files / 0 failed. Baseline 3,321/384 at CB101 plus profileFeedInViewGate (+6/+1), review-wizard overlay-chrome lifecycle test (+1/+1), mediaTrayAddTileFirst (+4/+1). tsgo not run (test-only change); harness build OK. No SQL/migrations/RPC/edge-function/feed_config changes; round_pool_cap stays 30.
 
-- [ ] POST PAGE rebuilt around golf — built; BLOCKED: profileFeedInViewGate.test.tsx needs a usePostGolfTags mock (awaiting approval); post_with types regeneration outstanding
+- [ ] POST PAGE follow-up — mock and editor pill implemented; 4,965/4,965 tests pass. STOP: src/test/postPageFollowup.test.tsx:53:35 TS2741 missing frame in the new photo fixture. Screenshots not taken; post_with generated types outstanding.

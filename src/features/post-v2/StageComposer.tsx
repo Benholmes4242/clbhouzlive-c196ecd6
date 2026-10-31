@@ -899,6 +899,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
           tag={tagIndex !== null ? shotTags[state.media[tagIndex]?.id] ?? null : null}
           onChoose={(t) => { const it = tagIndex !== null ? state.media[tagIndex] : null; if (it) chooseShotTag(it.id, t); }}
           onClose={() => setTagIndex(null)}
+          onEditPhoto={() => { if (tagIndex !== null) { setActiveIndex(tagIndex); setOpenMediaIndex(tagIndex); } }}
         />
         <FindSomeoneSheet
           open={findOpen}
