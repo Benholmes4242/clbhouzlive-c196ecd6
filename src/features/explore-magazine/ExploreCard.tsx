@@ -1703,7 +1703,7 @@ export function ExploreCard({
             {scoreLedCourse}
           </span>
         ) : null}
-        {feedPlot && shape && received ? <RoundTilePlot shape={shape} received={received} /> : null}
+        {feedPlot && shape && received ? <RoundTilePlot shape={shape} received={received} scoreId={item.facts.score_id ?? null} /> : null}
         {!feedPlot ? <span style={{ position: 'relative', display: 'block', marginInline: bleed != null ? -bleed : undefined }}>{photo}</span> : null}
         {sideCallout ? (
           <RoundStatStrip
@@ -1747,7 +1747,7 @@ export function ExploreCard({
             </span>
           ) : null}
         </span>
-        {shape && received ? <RoundTilePlot shape={shape} received={received} /> : null}
+        {shape && received ? <RoundTilePlot shape={shape} received={received} scoreId={item.facts.score_id ?? null} /> : null}
         {/* BRIEF_ROUND_TILE_1_R2 -- the round-feat panel, beneath the plot and
             above the figures. When the plot's gold mark already names a rare
             hole (ace / albatross / eagle) and the panel's headline is that

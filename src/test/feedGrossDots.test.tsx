@@ -23,15 +23,15 @@ function round(strokes: number[]): HoleShape {
   };
 }
 
-describe('FGD1 gross dots on the net trace', () => {
-  it('renders a gross birdie on a stroke hole in the birdie tone, not gold', () => {
+describe('FGD1 gross strip beneath the net trace', () => {
+  it('renders a gross birdie strip cell on a stroke hole in the birdie tone, not gold', () => {
     const shape = round([3, ...Array(17).fill(4)]);
     const received = feedStrokesReceived(shape, 1);
     if (!received) throw new Error('Expected eighteen-hole allowance');
     expect(received[0]).toBe(1);
     expect(feedNetSeries(shape, received)[1]).toBe(-2);
     const { container } = render(<RoundTilePlot shape={shape} received={received} />);
-    const firstDot = container.querySelector('circle');
+    const firstDot = container.querySelector('[data-plot-hole]');
     expect(firstDot?.getAttribute('fill')).toBe(TOPAR_UNDER_DARK);
     expect(firstDot?.getAttribute('fill')).not.toBe(SC_FILL_GOLD);
   });
@@ -45,12 +45,12 @@ describe('FGD1 gross dots on the net trace', () => {
     expect(feedHoleDots(shape).filter((dot) => dot.tone === SC_BOGEY_DARK)).toHaveLength(16);
   });
 
-  it('five gross birdies off three retain five red dots and no allowance-created gold dots', () => {
+  it('five gross birdies off three retain five red cells and no allowance-created gold cells', () => {
     const shape = round([...Array(5).fill(3), ...Array(13).fill(4)]);
     const received = feedStrokesReceived(shape, 3);
     if (!received) throw new Error('Expected eighteen-hole allowance');
     const { container } = render(<RoundTilePlot shape={shape} received={received} />);
-    const tones = Array.from(container.querySelectorAll('circle')).map((dot) => dot.getAttribute('fill'));
+    const tones = Array.from(container.querySelectorAll('[data-plot-hole]')).map((dot) => dot.getAttribute('fill'));
     expect(tones.filter((tone) => tone === TOPAR_UNDER_DARK)).toHaveLength(5);
     expect(tones.filter((tone) => tone === SC_FILL_GOLD)).toHaveLength(0);
   });
