@@ -175,6 +175,8 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   const [withTagged, setWithTagged] = useState<WithCandidate[]>([]);
   const [visibility, setVisibility] = useState<PostVisibility>('anyone');
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [findOpen, setFindOpen] = useState(false);
+  const [visibilityOpen, setVisibilityOpen] = useState(false);
   const initialVisibilityRef = useRef<PostVisibility>('anyone');
   const initialWithIdsRef = useRef<string[]>([]);
   const existingTagsRef = useRef<ExistingTags>({ holes: [], places: [] });
@@ -882,10 +884,28 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
         <CourseTagSheet
           open={sheet === 'course'}
           onClose={() => setSheet(null)}
-          onDone={setCourses}
+          onDone={(list) => chooseCourses(list)}
           selected={state.courses}
           userId={profile?.id ?? null}
         />
+        <ShotTagSheet
+          open={tagIndex !== null}
+          item={tagIndex !== null ? state.media[tagIndex] ?? null : null}
+          courses={state.courses}
+          courseIndex={tagCourseIdx}
+          onCourseIndex={setTagCourseIdx}
+          holes={tagHoles}
+          tag={tagIndex !== null ? shotTags[state.media[tagIndex]?.id] ?? null : null}
+          onChoose={(t) => { const it = tagIndex !== null ? state.media[tagIndex] : null; if (it) chooseShotTag(it.id, t); }}
+          onClose={() => setTagIndex(null)}
+        />
+        <FindSomeoneSheet
+          open={findOpen}
+          onClose={() => setFindOpen(false)}
+          search={searchPeople}
+          onPick={(p) => setWithTagged((cur) => cur.some((x) => x.id === p.id) ? cur : toggleWith(cur, p, profile?.id ?? null))}
+        />
+        <VisibilitySheet open={visibilityOpen} value={visibility} onChange={setVisibility} onClose={() => setVisibilityOpen(false)} />
         <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => selectActor(a)} selectedId={activeActor?.id ?? null} />
   
         <ScheduleSheetV2
@@ -1122,80 +1142,87 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
     </div>
   );
 
+  const openShot = (i: number) => {
+    setActiveIndex(i);
+    // A tagged course turns a tap into "What's in this shot?"; without one the
+    // tap keeps opening the photo editor exactly as before.
+    if (state.courses.length > 0) { setTagCourseIdx(0); setTagIndex(i); }
+    else setOpenMediaIndex(i);
+  };
+  const searchPeople = useCallback((q: string) => searchMembers(q, profile?.id ?? null), [profile?.id]);
+  const withNames = withTagged.map((p) => p.name.split(/\s+/)[0]);
+
+  const metaRow = (label: string, value: React.ReactNode, onClick: () => void, first: boolean) => (
+    <button type="button" onClick={onClick} style={{ ...page2RowStyle(!first), padding: '14px 16px' }}>
+      <span style={{ fontSize: 14.5, fontWeight: 600, color: GP.ink }}>{label}</span>
+      <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, color: GP.mute }}>{value}</span>
+      <ChevronRight size={14} color={GP.dim} style={{ marginLeft: 6, flex: 'none' }} />
+    </button>
+  );
+
   const tagAndDetails = (
     <>
-      {/* Tag a course — suggestion-first, Search is the fallback */}
-      <div style={{ background: PAGE2.panel, border: `1px solid ${PAGE2.line}`, borderRadius: 16, margin: '18px 16px 0', overflow: 'hidden' }}>
-        <div style={{ padding: '14px 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.tagCourse')}</span>
-            <button
-              onClick={() => { openDetail('course'); setSheet('course'); }}
-              style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, border: 0, background: 'transparent', color: PAGE2.ink, fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}
-            >
-              {t('stage.search')}
-              <ChevronRight size={12} strokeWidth={2.5} />
+      <WhereSection
+        course={state.courses[0] ?? null}
+        reason={courseReason}
+        changing={whereChanging}
+        recent={recentCourses.filter((c) => c.id !== state.courses[0]?.id)}
+        onChange={() => setWhereChanging(true)}
+        onCancel={() => setWhereChanging(false)}
+        onUntag={() => chooseCourses(state.courses.slice(1))}
+        onSearch={() => { openDetail('course'); setSheet('course'); }}
+        onPick={(c) => chooseCourses([c, ...state.courses.filter((x) => x.id !== c.id && x.id !== state.courses[0]?.id)])}
+      />
+      {state.courses.length > 1 && (
+        <div style={{ display: 'flex', gap: 6, margin: '10px 16px 0', flexWrap: 'wrap' }}>
+          {state.courses.slice(1).map((c) => (
+            <button key={`tagged-${c.id}`} type="button" aria-label={t('stage.untag', { name: c.name })}
+              onClick={() => setCourses(state.courses.filter((x) => x.id !== c.id))}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${GP.line2}`, background: 'transparent', borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: GP.ink }}>
+              {c.name}<span style={{ fontSize: 13, opacity: 0.85 }}>×</span>
             </button>
-          </div>
-
-          {/* Tagging is SEARCH-ONLY (MICRO_BRIEF_POST_WIZARD_FIELDS §4): the
-              recent-rounds suggestion chips are gone. Only a course the
-              member actually chose renders here, and it stays removable. */}
-          {state.courses.length > 0 && (
-            <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
-              {state.courses.map((c) => (
-                <button
-                  key={`tagged-${c.id}`}
-                  onClick={() => setCourses(state.courses.filter((x) => x.id !== c.id))}
-                  aria-label={t('stage.untag', { name: c.name })}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${PAGE2.ink}`, background: PAGE2.ink, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: PAGE2.canvas }}
-                >
-                  {c.name}
-                  <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.85 }}>×</span>
-                </button>
-              ))}
-            </div>
-          )}
+          ))}
         </div>
-      </div>
+      )}
+      {isPersonalActor && (
+        <PlayedWithSection
+          suggestions={withSuggestions}
+          tagged={withTagged}
+          onToggle={(p) => setWithTagged((cur) => toggleWith(cur, p, profile?.id ?? null))}
+          onFind={() => setFindOpen(true)}
+        />
+      )}
 
-      {/* Detail rows — Drafts appears only when drafts exist */}
-      <div style={{ background: PAGE2.panel, border: `1px solid ${PAGE2.line}`, borderRadius: 16, margin: '12px 16px 0', overflow: 'hidden' }}>
-        <button onClick={() => { openDetail('actor'); setSheet('actor'); }} style={page2RowStyle(false)}>
-          <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.postingAs')}</span>
-          <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 13, color: PAGE2.mute, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{authorName}</span>
-            <SquircleAvatar src={authorAvatar} alt={authorName} size={26} fallback={authorUsername?.[0]} hairlineRing ringColor={DARK_HAIRLINE} />
-          </span>
-          <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
-        </button>
-        {showScheduleRow && (
-          <button onClick={() => { openDetail('schedule'); setSheet('schedule'); }} style={page2RowStyle(true)}>
-            <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.scheduleForLater')}</span>
-            <span style={{ marginLeft: 'auto', fontSize: 13, color: state.scheduledAt ? PAGE2.ink : PAGE2.mute }}>
-              {state.scheduledAt ? state.scheduledAt.toLocaleString() : t('stage.off')}
-            </span>
-            <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
-          </button>
-        )}
-        {!isEditMode && drafts.drafts.length > 0 && (
-          <button onClick={() => setSheet('drafts')} style={page2RowStyle(true)}>
-            <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.drafts')}</span>
-            <span style={{ marginLeft: 'auto', fontSize: 13, color: PAGE2.mute, fontVariantNumeric: 'tabular-nums' }}>{drafts.drafts.length}</span>
-            <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
-          </button>
-        )}
+      <div data-testid="meta-panel" style={{ background: GP.panel, border: `1px solid ${GP.line}`, borderRadius: 16, margin: '18px 16px 0', overflow: 'hidden' }}>
+        {metaRow(t('stage.postingAs'), <>
+          <span style={{ maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{authorName}</span>
+          <SquircleAvatar src={authorAvatar} alt={authorName} size={26} fallback={authorUsername?.[0]} hairlineRing ringColor={DARK_HAIRLINE} />
+        </>, () => { openDetail('actor'); setSheet('actor'); }, true)}
+        {metaRow('Who can see this', visibilityLabel(visibility), () => setVisibilityOpen(true), false)}
+        {showScheduleRow && metaRow(t('stage.scheduleForLater'),
+          <span style={{ color: state.scheduledAt ? GP.ink : GP.mute }}>{state.scheduledAt ? state.scheduledAt.toLocaleString() : t('stage.off')}</span>,
+          () => { openDetail('schedule'); setSheet('schedule'); }, false)}
+        {!isEditMode && drafts.drafts.length > 0 && metaRow(t('stage.drafts'),
+          <span style={{ fontVariantNumeric: 'tabular-nums' }}>{drafts.drafts.length}</span>, () => setSheet('drafts'), false)}
       </div>
+      <div style={{ height: 24 }} />
     </>
   );
 
   // ---- STEP 2 — ONE SCREEN --------------------------------------------------
   return (
-    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: PAGE2.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: POST_COMPOSER_Z }}>
-      {/* THE SHARED HEADER, on both paths. No local counter: there is no
-          "1 / 2" or "2 / 2" text left in this file. */}
-      <div style={{ flex: 'none', paddingTop: 'max(env(safe-area-inset-top), 12px)' }}>
+    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: GP.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: POST_COMPOSER_Z }}>
+      {/* THE SHARED HEADER, on both paths, with the page title and Preview
+          laid over it. No local counter. */}
+      <div style={{ flex: 'none', paddingTop: 'max(env(safe-area-inset-top), 12px)', position: 'relative' }}>
         <ComposerStepHeader step={1} total={1} left={leadingControl} onLeft={handleLeading} />
+        <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+          <span style={{ fontSize: 15, fontWeight: 700, color: GP.ink }}>{isEditMode ? 'Edit post' : 'New post'}</span>
+          <button type="button" onClick={() => setPreviewOpen(true)} disabled={!canSubmit}
+            style={{ position: 'absolute', right: 16, pointerEvents: 'auto', height: 32, padding: '0 14px', borderRadius: 999, border: `1px solid ${GP.line2}`, background: 'transparent', fontSize: 13, fontWeight: 700, color: GP.ink, cursor: 'pointer', opacity: canSubmit ? 1 : 0.4 }}>
+            Preview
+          </button>
+        </div>
       </div>
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
@@ -1203,125 +1230,53 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
       {emptyStage ? (
         /* EMPTY STATE keeps its original single-scroller layout. */
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '2px 0 16px', display: 'flex', flexDirection: 'column' }}>
-          {/* THE MEDIA RAIL. Nothing here auto-fires a picker: no effect opens a
-              file input on mount. That behaviour was deleted in August and must
-              not come back. */}
-          {/* Both inputs live HERE, each one anchored EXACTLY OVER ITS OWN
-              BUTTON so the iOS chooser menu opens from the control that was
-              tapped rather than over the footer. Do not consolidate them. */}
+          {/* Nothing here auto-fires a picker: no effect opens a file input on
+              mount. Both inputs are anchored EXACTLY OVER THEIR OWN BUTTON so
+              the iOS chooser opens from the control tapped. Do not consolidate. */}
             <div style={{ padding: '4px 16px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ position: 'relative' }}>
                 <button onClick={() => emptyLibraryInputRef.current?.click()} style={emptyPrimaryButtonStyle}>
                   {t('stage.chooseFromLibrary')}
                 </button>
-                <input
-                  ref={emptyLibraryInputRef}
-                  type="file"
-                  accept="image/*,video/*"
-                  multiple
-                  onChange={handleStageAddFiles}
-                  tabIndex={-1}
-                  aria-hidden="true"
-                  style={anchoredInputStyle}
-                />
+                <input ref={emptyLibraryInputRef} type="file" accept="image/*,video/*" multiple onChange={handleStageAddFiles} tabIndex={-1} aria-hidden="true" style={anchoredInputStyle} />
               </div>
               <div style={{ position: 'relative' }}>
                 <button onClick={() => emptyCameraInputRef.current?.click()} style={emptySecondaryButtonStyle}>
                   {t('stage.takePhotoOrVideo')}
                 </button>
-                <input
-                  ref={emptyCameraInputRef}
-                  type="file"
-                  accept="image/*,video/*"
-                  capture="environment"
-                  onChange={handleStageAddFiles}
-                  tabIndex={-1}
-                  aria-hidden="true"
-                  style={anchoredInputStyle}
-                />
+                <input ref={emptyCameraInputRef} type="file" accept="image/*,video/*" capture="environment" onChange={handleStageAddFiles} tabIndex={-1} aria-hidden="true" style={anchoredInputStyle} />
               </div>
             </div>
           <div style={{ padding: '10px 16px 0' }}>
-            <CaptionField
-              value={state.caption}
-              onChange={handleSetCaption}
-              currentUserId={profile?.id ?? null}
-              variant="dark"
-              minHeight={96}
-              placeholder={t('stage.captionPlaceholder')}
-              autoFocus={!isEditMode}
-              inputRef={(el) => { captionElRef.current = el; }}
-            />
+            <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} variant="dark" minHeight={96}
+              placeholder={t('stage.captionPlaceholder')} autoFocus={!isEditMode} inputRef={(el) => { captionElRef.current = el; }} />
             <div style={{ fontSize: 11, color: PAGE2.dim, marginTop: 2 }}>{t('stage.mentionHint')}</div>
           </div>
           {tagAndDetails}
         </div>
       ) : (
-        <>
-          {/* BAND 1 — FIXED. THE MEDIA RAIL. Nothing here auto-fires a picker: no
-              effect opens a file input on mount. That behaviour was deleted in
-              August and must not come back. */}
-          <div style={{ flex: 'none', paddingTop: 2 }}>
-            <div style={{ display: 'flex', gap: 6, padding: '2px 16px 0', overflowX: 'auto' }}>
-              {state.media.map((m, i) => (
-                <button
-                  key={m.id}
-                  onClick={() => { setActiveIndex(i); setOpenMediaIndex(i); }}
-                  aria-label={t('stage.editItem', { n: i + 1 })}
-                  style={{ position: 'relative', width: 72, height: 72, borderRadius: 10, overflow: 'hidden', flex: 'none', border: `1px solid ${PAGE2.line}`, padding: 0, background: PAGE2.panel, cursor: 'pointer' }}
-                >
-                  <SlideThumb item={m} glyph={20} />
-                </button>
-              ))}
-              <button
-                onClick={handleStageAdd}
-                aria-label={t('stage.addMedia')}
-                style={{ width: 72, height: 72, borderRadius: 10, flex: 'none', border: `1px dashed ${PAGE2.dim}`, background: 'transparent', color: PAGE2.mute, fontSize: 18, cursor: 'pointer' }}
-              >+</button>
-            </div>
-            <div style={{ padding: '6px 18px 0', fontSize: 11, color: PAGE2.dim }}>{t('stage.tapToEdit')}</div>
+        /* ONE SCROLLER: strip, hole line, caption, Where, Played with, meta. */
+        <div data-testid="golf-page" style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <GolfShotStrip media={state.media} tags={shotTags} courseName={state.courses[0]?.name ?? null} onTap={openShot} onAdd={handleStageAdd} />
+          <div style={{ padding: '14px 16px 0' }}>
+            <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} variant="dark" minHeight={60}
+              placeholder={t('stage.captionPlaceholder')} autoFocus={!isEditMode} inputRef={(el) => { captionElRef.current = el; }} />
+            <div style={{ fontSize: 11.5, color: GP.dim, marginTop: 2 }}>{t('stage.mentionHint')}</div>
           </div>
-
-          {/* BAND 2 — THE ONLY SCROLLER. The caption grows; this band scrolls and
-              absorbs all viewport loss (keyboard included). */}
-          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '10px 16px 0' }}>
-          <CaptionField
-            value={state.caption}
-            onChange={handleSetCaption}
-            currentUserId={profile?.id ?? null}
-            variant="dark"
-            minHeight={96}
-            placeholder={t('stage.captionPlaceholder')}
-            autoFocus={!isEditMode}
-            inputRef={(el) => { captionElRef.current = el; }}
-          />
-          </div>
-
-          {/* BAND 3 — FIXED. Mention hint, Tag a course, detail rows. */}
-          <div style={{ flex: 'none', paddingBottom: 16 }}>
-            <div style={{ fontSize: 11, color: PAGE2.dim, padding: '2px 16px 0' }}>{t('stage.mentionHint')}</div>
-            {tagAndDetails}
-          </div>
-        </>
+          {tagAndDetails}
+        </div>
       )}
 
-
-      {/* Share */}
-      <div style={{ flex: 'none', background: PAGE2.canvas, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
+      {/* SHARE — 54px pill and its sub-line. */}
+      <div style={{ flex: 'none', background: GP.canvas, borderTop: `1px solid ${GP.line}`, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
         <button
           onClick={onPrimary}
           disabled={!canSubmit}
           style={{
-            width: '100%',
-            padding: '14px 20px',
-            borderRadius: 999,
-            border: 'none',
-            /* CAPS ACTION. */
-            fontSize: 13,
-            fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.10em',
-            background: canSubmit ? PAGE2.ink : inkWithAlpha(SURFACE.dark.ink, 0.1),
-            color: canSubmit ? PAGE2.canvas : PAGE2.dim,
+            width: '100%', height: 54, borderRadius: 999, border: 'none',
+            fontSize: 15, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.14em',
+            background: canSubmit ? GP.ink : inkWithAlpha(SURFACE.dark.ink, 0.1),
+            color: canSubmit ? GP.onInk : PAGE2.dim,
             cursor: canSubmit ? 'pointer' : 'not-allowed',
           }}
         >
@@ -1329,8 +1284,24 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
             ? <Loader2 size={16} className="animate-spin" style={{ display: 'block', margin: '0 auto' }} />
             : primaryLabel}
         </button>
+        <div data-testid="share-sub" style={{ textAlign: 'center', fontSize: 11.5, color: GP.dim, marginTop: 8 }}>
+          {shareSubLine(isPersonalActor ? withNames : [], holeShotCount)}
+        </div>
       </div>
 
+      {profile?.id && (
+        <PostPreview
+          open={previewOpen}
+          onBack={() => setPreviewOpen(false)}
+          post={buildDraftFeedPost({
+            caption: state.caption, media: state.media, course: state.courses[0] ?? null, userId: profile.id,
+            actor: { id: activeActor?.id ?? profile.id, type: activeActor?.type === 'business' ? 'business' : 'personal', name: authorName, avatarUrl: authorAvatar, username: authorUsername },
+          })}
+          tags={shotTags}
+          pars={tagPars}
+          withPeople={isPersonalActor ? withTagged : []}
+        />
+      )}
       {mediaSheet}
       {sheets}
     </div>
