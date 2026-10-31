@@ -69,6 +69,15 @@ import StageLoadingShell from './StageLoadingShell';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 import { STATUS_BAR_CANVAS } from '@/lib/tokens/surfaces';
+import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
+import { courseWalkHoles } from '@/lib/courseMedia/holeWalk';
+import { GolfShotStrip, ShotTagSheet, WhereSection, PlayedWithSection, FindSomeoneSheet, VisibilitySheet } from './components/golf/GolfPostSections';
+import { PostPreview, buildDraftFeedPost } from './components/golf/PostPreview';
+import { GP } from './components/golf/golfPageTokens';
+import { isHoleTag, roundReason, shareSubLine, toggleWith, visibilityLabel, type PostVisibility, type ShotTag, type WithCandidate } from './lib/golfPostRules';
+import { fetchPlayedWithSuggestions, fetchRecentCourses, findRoundCourse, firstCaptureDay, searchMembers } from './lib/golfPostReads';
+import { readPostWith, syncPostWith } from './lib/postWith';
+import { existingMediaUrl, existingTagFor, readExistingShotTags, rewriteExistingShotTag, type ExistingTags, type ShotTagChoice } from './lib/shotTagWrites';
 
 interface Props {
   onClose: () => void;
@@ -152,18 +161,41 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   // is unreliable in the WebView.
   const captionElRef = useRef<HTMLTextAreaElement | null>(null);
 
+  /* ---- THE POST PAGE, REBUILT AROUND GOLF ------------------------------
+     Per-photo tags, the course found from the photo date, Played with, Who
+     can see this and Preview. Rules: lib/golfPostRules.ts. */
+  const [shotTagMap, setShotTagMap] = useState<Record<string, ShotTagChoice>>({});
+  const [tagIndex, setTagIndex] = useState<number | null>(null);
+  const [tagCourseIdx, setTagCourseIdx] = useState(0);
+  const [courseReason, setCourseReason] = useState<string | null>(null);
+  const [whereChanging, setWhereChanging] = useState(false);
+  const [recentCourses, setRecentCourses] = useState<Array<{ id: string; name: string; country: string | null }>>([]);
+  const [roundFind, setRoundFind] = useState<{ courseId: string; day: string } | null>(null);
+  const [withSuggestions, setWithSuggestions] = useState<WithCandidate[]>([]);
+  const [withTagged, setWithTagged] = useState<WithCandidate[]>([]);
+  const [visibility, setVisibility] = useState<PostVisibility>('anyone');
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const initialVisibilityRef = useRef<PostVisibility>('anyone');
+  const initialWithIdsRef = useRef<string[]>([]);
+  const existingTagsRef = useRef<ExistingTags>({ holes: [], places: [] });
+  const initialExistingTagsRef = useRef<Record<string, ShotTag>>({});
+  /** A course the member chose is never overridden by the date lookup. */
+  const memberChoseCourseRef = useRef(false);
+  const roundLookupRef = useRef(false);
+
   // Fetch the post's status + scheduled_at (useEditablePost doesn't return them).
   useEffect(() => {
     if (!editPostId) return;
     let cancelled = false;
     supabase
       .from('posts')
-      .select('status, scheduled_at')
+      .select('status, scheduled_at, visibility')
       .eq('id', editPostId)
       .maybeSingle()
       .then(({ data }) => {
         if (cancelled) return;
-        const row = data as { status?: string | null; scheduled_at?: string | null } | null;
+        const row = data as { status?: string | null; scheduled_at?: string | null; visibility?: PostVisibility | null } | null;
+        if (row?.visibility) { setVisibility(row.visibility); initialVisibilityRef.current = row.visibility; }
         setEditStatus({
           status: row?.status ?? null,
           scheduledAt: row?.scheduled_at ?? null,
