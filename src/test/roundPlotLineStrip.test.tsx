@@ -114,6 +114,68 @@ describe('Signed-off round line and strip', () => {
     geometry(); plot('remount'); trigger(0.6); act(() => vi.advanceTimersByTime(120)); frame(1200); cleanup(); vi.mocked(requestAnimationFrame).mockClear();
     const v = plot('remount'); expect(v.container.querySelector('[data-plot-reveal]')?.getAttribute('width')).toBe('390'); trigger(0.6); expect(requestAnimationFrame).not.toHaveBeenCalled();
   });
+  it('plays both round plots when the second enters view later', () => {
+    geometry();
+    const first = plot('independent-first');
+    const firstIntersection = intersection;
+    const second = plot('independent-second');
+    act(() => firstIntersection([{ isIntersecting: true, intersectionRatio: 0.6 }]));
+    act(() => vi.advanceTimersByTime(120)); frame(600);
+    expect(first.container.querySelector('[data-plot-reveal]')?.getAttribute('width')).toBe('195');
+    frame(1200);
+    expect(second.container.querySelector('[data-plot-reveal]')?.getAttribute('width')).toBe('0');
+    trigger(0.6); act(() => vi.advanceTimersByTime(120)); frame(1800);
+    expect(second.container.querySelector('[data-plot-reveal]')?.getAttribute('width')).toBe('195');
+    frame(2400);
+    expect(second.container.querySelector('[data-plot-reveal]')?.getAttribute('width')).toBe('390');
+  });
+  it.each(['delay', 'draw'] as const)('restarts after a width change during the %s and marks only completion', phase => {
+    geometry(); const id = `resize-${phase}`; const v = plot(id);
+    trigger(0.6);
+    if (phase === 'delay') act(() => vi.advanceTimersByTime(60));
+    else { act(() => vi.advanceTimersByTime(120)); frame(600); }
+    const restartTime = clock;
+    act(() => resize([{ contentRect: { width: 375 } }]));
+    expect(v.container.querySelector('[data-plot-reveal]')?.getAttribute('width')).toBe('0');
+    expect(v.container.querySelector<SVGCircleElement>('[data-plot-head]')?.style.opacity).toBe('0');
+    expect(cancelAnimationFrame).toHaveBeenCalled();
+    vi.mocked(requestAnimationFrame).mockClear();
+    trigger(0.59); act(() => vi.advanceTimersByTime(120));
+    expect(requestAnimationFrame).not.toHaveBeenCalled();
+    trigger(0.6); act(() => vi.advanceTimersByTime(119));
+    expect(requestAnimationFrame).not.toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(1)); frame(restartTime + 600);
+    expect(Number(v.container.querySelector('[data-plot-reveal]')?.getAttribute('width'))).toBe(187.5);
+    frame(restartTime + 1200);
+    expect(v.container.querySelector('[data-plot-reveal]')?.getAttribute('width')).toBe('375');
+    v.unmount(); vi.mocked(requestAnimationFrame).mockClear();
+    const done = plot(id);
+    expect(done.container.querySelector('[data-plot-reveal]')?.getAttribute('width')).toBe('390');
+    expect(requestAnimationFrame).not.toHaveBeenCalled();
+  });
+  it('replays an interrupted draw from the start after the same round remounts', () => {
+    geometry(); const v = plot('interrupted-remount'); trigger(0.6);
+    act(() => vi.advanceTimersByTime(120)); frame(600);
+    expect(v.container.querySelector('[data-plot-reveal]')?.getAttribute('width')).toBe('195');
+    v.unmount(); vi.mocked(requestAnimationFrame).mockClear();
+    const again = plot('interrupted-remount');
+    expect(again.container.querySelector('[data-plot-reveal]')?.getAttribute('width')).toBe('0');
+    trigger(0.6); act(() => vi.advanceTimersByTime(119)); expect(requestAnimationFrame).not.toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(1)); frame(600);
+    expect(again.container.querySelector('[data-plot-reveal]')?.getAttribute('width')).toBe('16');
+    frame(1200); expect(again.container.querySelector('[data-plot-reveal]')?.getAttribute('width')).toBe('195');
+    frame(1800); expect(again.container.querySelector('[data-plot-reveal]')?.getAttribute('width')).toBe('390');
+  });
+  it('keeps a completed draw finished across width changes without replay', () => {
+    geometry(); const v = plot('completed-resize'); trigger(0.6);
+    act(() => vi.advanceTimersByTime(120)); frame(1200);
+    vi.mocked(requestAnimationFrame).mockClear();
+    act(() => resize([{ contentRect: { width: 375 } }]));
+    expect(v.container.querySelector('[data-plot-reveal]')?.getAttribute('width')).toBe('375');
+    expect(v.container.querySelector<SVGCircleElement>('[data-plot-end]')?.style.opacity).toBe('1');
+    act(() => vi.advanceTimersByTime(1500));
+    expect(requestAnimationFrame).not.toHaveBeenCalled();
+  });
   it('finishes immediately with reduced motion', () => {
     geometry(); vi.stubGlobal('matchMedia', () => ({ matches: true })); const v = plot('reduced');
     expect(v.container.querySelector('[data-plot-reveal]')?.getAttribute('width')).toBe('390'); expect(requestAnimationFrame).not.toHaveBeenCalled();
