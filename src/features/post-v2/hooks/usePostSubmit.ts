@@ -17,6 +17,9 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { startPostUpload } from '../lib/postUploadController';
 import { extractMentions } from '@/lib/mentions/format';
 import type { StageMediaItem, StageCourse } from './useStageComposer';
+import type { ShotTagJob } from '../lib/shotTagWrites';
+import type { PostVisibility } from '../lib/golfPostRules';
+import { writePostWith } from '../lib/postWith';
 
 export interface SubmitInput {
   caption: string;
@@ -32,6 +35,12 @@ export interface SubmitInput {
   authorName: string;
   authorAvatarUrl: string | null;
   authorUsername: string | null;
+  /** Who can see this — a post_visibility value. Defaults to 'anyone'. */
+  visibility?: PostVisibility;
+  /** Played with: member ids written to post_with after the post exists. */
+  playedWith?: string[];
+  /** Per-photo course tags, carried with the upload job. */
+  shotTags?: ShotTagJob;
 }
 
 export type SubmitResultKind = 'published' | 'scheduled' | 'uploading';
@@ -132,8 +141,7 @@ export function usePostSubmit() {
       }
 
       // Birth the post via RPC (SECURITY INVOKER; RLS enforces actor rights).
-      // Visibility selector was deliberately removed in the v2 composer -
-      // all posts are public ('anyone'). Owner decision 2026-07-19.
+      // Visibility: the member's "Who can see this" choice (default 'anyone').
       const { data: born, error: bornErr } = await supabase.rpc('create_post_v2', {
         p_actor_id: input.actorId,
         p_actor_type: input.actorType,
@@ -141,7 +149,7 @@ export function usePostSubmit() {
         p_course_id: input.course?.id ?? undefined,
         p_has_media: hasMedia,
         p_scheduled_at: input.scheduledAt ? input.scheduledAt.toISOString() : undefined,
-        p_visibility: 'anyone',
+        p_visibility: input.visibility ?? 'anyone',
       });
       if (bornErr) throw bornErr;
       const bornObj = (born ?? {}) as { post_id?: string; status?: string; scheduled_at?: string };
@@ -186,6 +194,10 @@ export function usePostSubmit() {
         if (mErr) console.warn('[post-v2] mentions write failed:', mErr);
       }
 
+      // Played with: rows after the post exists. The notification is a
+      // database trigger on post_with; nothing is sent from here.
+      if (input.playedWith?.length) await writePostWith(postId, userId, input.playedWith);
+
 
 
       // Text-only or scheduled-text: single-shot. finalize is implicit on the server.
@@ -214,6 +226,7 @@ export function usePostSubmit() {
           actorId: input.actorId,
           isScheduled: !!input.scheduledAt,
           scheduledAt: input.scheduledAt?.toISOString(),
+          shotTags: input.shotTags,
         },
         input.media,
       );
