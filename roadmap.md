@@ -1,8 +1,8 @@
 # Roadmap
 
 ## BE2 — Business preview and Business rows
-- [ ] Implement edit-only preview/completion/sheets and immediate protected saves with baseline synchronisation; preserve create and lower form.
-- [ ] Add BE2 tests, run existing editor/BE1 tests and full shards; report inventory and visual/authenticated limits. About helper wraps per ruling.
+- [x] Implement edit-only preview/completion/sheets and immediate protected saves with baseline synchronisation; create/lower form retained. About helper wraps per ruling.
+- [ ] STOP: BE2 28/31; category label expected Other but reused helper returns Something else; two crop tests blocked by missing URL.createObjectURL. Full4811 passed/3 failed/4814 across488 plus2 unhandled errors; no correction after failure. BE1 26/26 and round-plot20/20 pass. See BE2_REPORT.md; live visual/persistence unavailable.
 
 ## BE1 — Edit business frame and Settings
 - [x] BE1.1: redundant title badge aria-hidden; font override removed; 26/26 BE1 tests pass, existing assertions unchanged. Full shards 4,779 passed/4 pre-existing round-plot failures/4,783 across487, +1 font case. Build OK; see BE1_REPORT.md (done).
