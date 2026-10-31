@@ -4,6 +4,7 @@
  */
 import { useEffect, useState } from 'react';
 import { Search, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { ShotTagChoices } from '@/components/course-media-tab/ShotTagChoices';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import BottomSheet from '../BottomSheet';
@@ -54,9 +55,9 @@ export function GolfShotStrip({ media, tags, courseName, onTap, onAdd }: {
 }
 
 /* ---- WHAT'S IN THIS SHOT? ---------------------------------------------- */
-export function ShotTagSheet({ open, item, courses, courseIndex, onCourseIndex, holes, tag, onChoose, onClose }: {
+export function ShotTagSheet({ open, item, courses, courseIndex, onCourseIndex, holes, tag, onChoose, onClose, onEditPhoto }: {
   open: boolean; item: StageMediaItem | null; courses: StageCourse[]; courseIndex: number; onCourseIndex: (i: number) => void;
-  holes: readonly number[]; tag: ShotTag | null; onChoose: (t: ShotTag | null) => void; onClose: () => void;
+  holes: readonly number[]; tag: ShotTag | null; onChoose: (t: ShotTag | null) => void; onClose: () => void; onEditPhoto: () => void;
 }) {
   const course = courses[courseIndex] ?? courses[0];
   return (
@@ -71,10 +72,12 @@ export function ShotTagSheet({ open, item, courses, courseIndex, onCourseIndex, 
         )}
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           <span style={{ position: 'relative', width: 64, height: 80, borderRadius: 12, overflow: 'hidden', flex: 'none' }}>{item && <SlideThumb item={item} glyph={0} />}</span>
-          <div>
+          <div style={{ minWidth: 0, flex: 1 }}>
             <h3 style={{ margin: 0, fontSize: 18 }}>What's in this shot?</h3>
             <p style={{ margin: '3px 0 0', fontSize: 12.5, color: GP.mute }}>{course?.name}</p>
           </div>
+          <Button type="button" variant="outline" size="sm" onClick={() => { onClose(); onEditPhoto(); }}
+            style={{ ...chipStyle(false), height: 32, padding: '0 12px', fontSize: 12.5, fontWeight: 700 }}>Edit photo</Button>
         </div>
         <div style={{ marginTop: 18 }}>
           <ShotTagChoices

@@ -30,6 +30,7 @@ vi.mock('@/perf/vperf', () => ({
   vperfFeedScrollTick: vi.fn(),
 }));
 vi.mock('@/hooks/feed/useFeedCommentPreview', () => ({ useFeedCommentPreview: () => ({ map: new Map() }) }));
+vi.mock('@/hooks/feed/usePostGolfTags', () => ({ usePostGolfTags: () => ({ withByPost: new Map(), slideTags: new Map() }) }));
 vi.mock('@/lib/getScrollParent', () => ({ getPrimaryScrollElement: () => document.body }));
 vi.mock('react-virtuoso', () => ({
   Virtuoso: ({ data, itemContent, computeItemKey }: any) => (
