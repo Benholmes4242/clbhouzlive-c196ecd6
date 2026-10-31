@@ -1,5 +1,10 @@
 # Roadmap
 
+## Two follow-ups — linked invitation and Tour 4(a)
+- [ ] Suppress Edit profile completion invitation using the live link; add regressions and final shared-chip consumer audit.
+- [ ] Apply approved draw-preserving play-evidence completion rule; test Baddeley/Moore placeholders and real draw blockers.
+- [ ] Recheck guest player joins and capture real tee-filled board/pre-round group at 390×844 if readable; run full shards against 4,915/496 and report BE2 status only.
+
 ## BE4 — Business Profile and Links
 - [x] Replace edit-only legacy sections with Main button, Hours, Facilities and Socials sheets; canonical preview and final saved status. Remove edit dirty/save/departure blocks, preserve create; BE1–BE3 all pass with reported authorized retargets.
 - [ ] STOP: new BE4 `Add a logo opens a sheet` document-wide query matches two buttons at be4BusinessProfileLinks.test.tsx:54:431. Full 4,914 passed/1 failed/4,915 across496 (+22 BE4/+1 from4,893/495). No pre-existing failures or unhandled errors; two unsupported exact options removed only for mandatory compiler cleanliness, not to fix ambiguity.

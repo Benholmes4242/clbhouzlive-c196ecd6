@@ -132,7 +132,7 @@ describe('CB58 render and tap behavior', () => {
   it('CB58.1 CUT/MC/WD/DQ/MDF/DNS without R2 cards and scoreless entries do not block R2 to R3', () => {
     const finishers = entries.slice(0, 3).map(e => ({ ...e, today_round: 2, thru: 18, round_1: -1, round_2: e.today }));
     const excluded = ['CUT', 'MC', 'WD', 'DQ', 'MDF', 'DNS'].map(status => ({ ...entry(status, 55, null), round_1: -1, round_2: null, status }));
-    const field = [...finishers, ...excluded, { ...entry('scoreless', 99, null), score: null }];
+    const field = [...finishers, ...excluded, { ...entry('scoreless', 99, null), score: null, position: null, thru: null }];
     expect(leadersShownRound(2, [g], allLeaders(field), field, [2, 3], 4)).toBe(3);
   });
   it('CB58.2 unstarted afternoon tee-sheet players (no row or score null) keep Round 1 despite a published R2 draw', () => {

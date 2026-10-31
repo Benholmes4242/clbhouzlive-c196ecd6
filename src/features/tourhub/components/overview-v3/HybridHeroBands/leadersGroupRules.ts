@@ -2,6 +2,9 @@
  * scheduled current_round rollover. Historical round cells are completed cards
  * (live sync's roundCell gate), so scope stale top-level TODAY/THRU before
  * calling the board's own todayFromEntry/thruLabel. No input is mutated.
+ * Tour 4(a): every real base-draw player remains in the completion union;
+ * leaderboard-only rows need a card, position, thru or canonical terminal
+ * status. A total score alone (including zero) is not participation evidence.
  */
 import { fieldHasStarted } from '../../../overview/boardStarted';
 import { todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
@@ -73,13 +76,19 @@ export function leadersShownRound(baseRound: number, groups: TeeGroup[], leaders
   const next = nextDrawnRound(baseRound, drawnRounds, totalRounds);
   // CB58.1: a finished morning leaders' group does not finish the field.
   // CB58.2: the field is the base round's tee sheet (`groups` must be the
-  // base round's groups, never the shown round's) UNION every scored entry,
+  // base round's groups, never the shown round's) UNION play-evidenced entries,
   // minus canonical demoted statuses (CUT/MC/WD/DQ/MDF/DNS). A tee-sheet
   // player with no leaderboard row or no finished card blocks the handover.
-  const byId = new Map(entries.filter(e => e.player?.id).map(e => [e.player!.id, e]));
+  const byId = new Map<string, BoardEntry>();
+  for (const e of entries) if (e.player?.id) byId.set(e.player.id, e);
   const ids = new Set<string>();
   for (const g of groups) for (const p of g.players) if (p.id != null) ids.add(p.id);
-  for (const e of entries) if (e.score != null && e.player?.id) ids.add(e.player.id);
+  for (const e of entries) {
+    const evidence = [e.round_1, e.round_2, e.round_3, e.round_4].some(card => card != null)
+      || e.position != null || e.thru != null || isDemotedStatus(e.status)
+      || e.status?.trim().toUpperCase() === 'COMPLETE';
+    if (evidence && e.player?.id) ids.add(e.player.id);
+  }
   const field = [...ids].filter(id => !isDemotedStatus(byId.get(id)?.status));
   const fieldComplete = field.length > 0 && field.every(id => {
     const raw = byId.get(id);
