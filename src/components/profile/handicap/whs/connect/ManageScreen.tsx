@@ -279,7 +279,7 @@ export const ManageScreen: React.FC<Props> = ({
         <>
           <div style={TITLE}>No rounds yet</div>
           <div style={{ fontSize: 12.5, lineHeight: 1.5, color: MUTE, marginTop: 4 }}>
-            {chip.linked && !chip.loading && chip.value == null
+            {chip.linked && chip.settled && !chip.anyError && chip.trend?.current == null
               ? t('whsConnect.done.subConnectedEmpty', { provider })
               : `${provider} has no rounds on your record. The next one you play will arrive here on its own.`}
           </div>
