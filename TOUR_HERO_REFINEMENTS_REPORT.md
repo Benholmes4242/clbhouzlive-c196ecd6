@@ -1,5 +1,60 @@
 # Tour hero refinements — partial completion, data stop on 4(a)
 
+## Follow-ups and revised 13:13 ruling — STOP on one new test
+
+The earlier approved full-field/play-evidence implementation passed its initial tests and full suite, but fresh real guest reads established Baddeley and Moore both occur in the actual R1 and R2 draws. Ben's revised ruling replaces that rule entirely. Production now checks only the selected leaders' base-round group; every member needs the round's card, scoped 18/F, or MC/CUT/WD/DQ. N+1 must be immediately next, within total rounds, published, and contain a current position-1 leader. `LeadersGroup` reads actual next-round joined groups before deciding. No draw, tee sheet, status or outside-field row is changed.
+
+### Fresh guest joins and real proof
+Mexico Open guest reads returned HTTP 200, no read error:
+| Round | Tee rows | Nested links / resolved players | Empty groups |
+|---|---:|---:|---:|
+| 1 | 40 | 121 / 121 | 0 |
+| 2 | 40 | 123 / 123 | 0 |
+| 3 | 23 | 68 / 68 | 0 |
+Baddeley and Moore each still have score 0, position/thru/status/today/today_round/all round cards null; both joined actual rounds 1 and 2. No invented status applied.
+
+Before the revised edit, real 390×844 `/tourhub` showed R3 hero tee times (Novak 17:51, other leaders 17:40/17:51), no page errors, and R2 Finished leaders because the old full-field rule preserved those two draw blockers. Screenshots captured and inspected: `/tmp/browser/two-followups/tour-real-390.png`, `leaders-real-390.png`, `mock-390.png`. These are real guest/source-reference captures, not fabricated groups. Revised R3 pre-tee screenshot is **not yet verified**, because the new test failure stopped verification. A later attempted reader-audit script was interrupted by the incoming revision and hit a missing old upload path; it establishes no additional reader results.
+
+### Other sr_tee_time_players readers
+Browser readers: `useTeeTimesAll.ts` (AllTeeTimesSheet, TeeTimesRail/FirstGroups, TournamentPage, HybridHero pre-start, OnTheCourse, MiniBoard hero tees, LeadersGroup); `usePickTeeTimes.ts` (picks tee line); `useTournamentTeeTimes.ts` (round-1 teaser); `useTourHubData.ts:712` (pre-tournament LeaderboardTab enriched tees); `useAIPredictions.ts:577–600` (confirmed-field fallback).
+The shared full-draw read and hero cells are confirmed populated. Separate picks/teaser/enriched/fallback reads and each dependent UI were **not individually verified** before the stop; do not claim all surfaces show players. Server readers remain schedule-predictions, generate-predictions and tournament-live-sync/teeAlerts; not executed/modified. sportradar-sync is a writer, untouched.
+
+### Exact surviving failure
+Command: `bunx vitest run src/test/ep5Completion.test.tsx src/test/tourRoundHandoverEvidence.test.ts src/test/cb58LeadersGroup.test.tsx --maxWorkers=2`.
+Result: **100 passed / 1 failed / 101 total**, three files. EP5 39/39; revised handover 14/14; CB58 47/48.
+`src/test/cb58LeadersGroup.test.tsx:74:92`, `CB58 pure leaders group rules > only the selected leaders group gates handover, not another leaders group`:
+```
+AssertionError: expected 1 to be 2 // Object.is equality
+- Expected
++ Received
+- 2
++ 1
+```
+The fixture's unfinished d/e group contains two current leaders versus the finished a/b/c group's one. Existing most-leaders selection therefore correctly selects the unfinished group; the rewritten expectation of 2 is wrong. No post-failure test or production correction made. Proposed authorized correction: retain expected 1 and describe the selected unfinished most-leaders group (or explicitly change the fixture so the finished group is selected). Full revised-suite and revised visual verification are pending authorization. No pre-existing failure at this task's start; **BE2 historical from-your-club failure passed 33/33**, file untouched.
+
+### Counts and exact test changes
+Last baseline 4,915/496. Added EP5 three cases and `tourRoundHandoverEvidence.test.ts` fourteen cases → **4,932/497**, no count lost.
+Before the revised ruling:
+- `bunx vitest run --maxWorkers=2 --shard=1/2`: 2,419/2,419, 249 files.
+- `bunx vitest run --maxWorkers=2 --shard=2/2`: 2,513/2,513, 248 files.
+- Full **4,932/4,932**, no failures/unhandled errors. This is **not** a full-suite result for the later revised edit.
+
+`cb58LeadersGroup.test.tsx` remains 48 tests. Revised rule implicitly authorizes these named retargets, reported explicitly:
+- `keeps finished groups until the next draw is published`: outside afternoon row expectation `toBe(1)` → `toBe(2)`; no-draw `toBe(1)` retained.
+- `does not switch when another leaders group is unfinished` → `only the selected leaders group gates handover, not another leaders group`: `toBe(1)` → `toBe(2)`; this is the surviving incorrect fixture expectation above.
+- `CB58.1 keeps Round 1 finished leaders while the afternoon field plays despite a published R2 draw` → `Tour 4(a) advances a finished leaders group despite unfinished players elsewhere`: round `toBe(1)` → `toBe(2)`; state query `finished` → `before`.
+- `CB58.1 moves to Round 2 before-tee state only when the whole field finishes R1` → `Tour 4(a) moves to Round 2 before-tee state when the selected group finishes R1`: assertions retained.
+- `CB58.1 suspended unfinished R1 stays on R1 overnight regardless of early current-round advancement` → `Tour 4(a) unfinished selected-group player stays on R1 overnight despite scheduled advancement`: delayed outside player replaced with unfinished b and finished c inside selected group; `toBe(1)` retained.
+- `CB58.1 CUT/MC/WD/DQ/MDF/DNS without R2 cards and scoreless entries do not block R2 to R3` → `Tour 4(a) terminal and scoreless rows outside the selected group do not block R2 to R3`: `toBe(3)` retained; scoreless fixture position/thru made null during earlier evidence rule.
+- `CB58.2 unstarted afternoon tee-sheet players (no row or score null) keep Round 1 despite a published R2 draw` → `Tour 4(a) unstarted other draw players no longer gate the selected group`: `toBe(1)` → `toBe(2)`.
+- `CB58.2 afternoon tee-sheet players finished moves to Round 2` → `Tour 4(a) completed selected group moves to Round 2 with the whole draw preserved`: `toBe(2)` retained.
+- `CB58.2 a WD tee-sheet player with no card does not block` → `Tour 4(a) a WD elsewhere in the draw does not block`: `toBe(2)` retained.
+All direct selector tests now supply an actual next draw with current leader membership; unrelated assertions untouched.
+
+The new `tourRoundHandoverEvidence.test.ts` was rewritten under the revised rule, keeping 14 cases: Saturday placeholders in other real draws advance to 3 and group state before; Friday no draw retains 2/finished; early PGA R2 with unfinished R1 retains 1; on-course leader retains 2; four MC/CUT/WD/DQ selected-member cases advance to 3 without mutating status; zero round card advances; scoped 18 advances; stale earlier thru retains 2; unknown selected member retains 2; next draw without leader retains 2; no immediate N+1 retains 2. Earlier 14 full-field/evidence cases were superseded, not silently removed: Saturday placeholder case, real evidence-free draw blocker, missing real draw blocker, four evidence-only participation cases, six terminal cases, COMPLETE evidence case. Their former assertions were advance 3, block 2, block 2, block 2 then finished 3, terminal advance 3, COMPLETE block 2 respectively; replaced because outside players no longer gate this section and completion terminal set is now specifically MC/CUT/WD/DQ.
+
+Latest automatic validation `2026-10-31T13:15:19Z — build OK`. No manual build/typecheck run. Changed source: completionRules.ts, EditProfile.tsx, leadersGroupRules.ts, LeadersGroup.tsx. Tests: ep5Completion.test.tsx, cb58LeadersGroup.test.tsx, new tourRoundHandoverEvidence.test.ts. Docs: this report, LINKED_NO_INDEX_REPORT.md, roadmap.md; memory records revised rule. No SQL, migrations, RPC/deployed edge edits, feed_config or native/Median changes; round_pool_cap remains 30.
+
 ## 4(a) unblock recheck — 31 October 2026, 10:51–11:05 UTC
 
 **Still blocked in the connected preview.** Fresh guest sessions on `http://localhost:8080/tourhub` read the connected project `ybxkehyomcakqjvuhnna`. `session.user.is_anonymous` was true. The canonical nested GET returned HTTP 200 without a query error, but no player links. A separate uncached REST GET (`cache: no-store`, Cache-Control: no-cache) returned HTTP 200 with the same zero links; a direct guest GET of `sr_tee_time_players?select=player_id,tee_time_id&limit=1` returned HTTP 200 and `[]`. No SQL or policy modification was run. This confirms observed guest visibility, not the installed policy definition or underlying admin-visible row count. Ben reports the public SELECT policy was added; the preview result does not yet reflect populated player joins.
