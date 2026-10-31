@@ -27,7 +27,7 @@ import { setGuestTourContext } from '@/features/guest/guestGateStore';
  * the same sentence-case label as the island, opening the same TourGlance
  * tile. The burger drawer is gone from the Tour hub.
  */
-function SubTabTourControl({ activeTab, onOpen }: { activeTab: string; onOpen: (anchor: HTMLElement) => void }) {
+export function SubTabTourControl({ activeTab, onOpen }: { activeTab: string; onOpen: (anchor: HTMLElement) => void }) {
   const d = useTourIslandDescriptor(activeTab);
   return (
     <button
