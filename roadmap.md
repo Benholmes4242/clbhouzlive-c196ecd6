@@ -2,9 +2,9 @@
 
 ## Tour leaderboard rebuild
 - [x] Source confirms whole-field sr_scorecards sync; tour_player_follows already typed; FullBoardSheet already shares BoardTable's column header.
-- [ ] STOP: preserve scoreColor.ts conflicts with explicit/mock over-par ink and level 0.55; existing helper returns over 0.62 and level 0.42. Await colour ruling; see TOUR_LEADERBOARD_REBUILD_STOP_REPORT.md. No app/test edits.
-- [ ] Rebuild event header, followed-player rows, board and matching FullBoardSheet; add inline rounds and follows.
-- [ ] Run targeted tests and full suite in shards against 4,972/500, reconcile all assertion changes, and capture four guest views at 390×844 beside the mock.
+- [x] Colour ruling resolved: preserve existing scoreColor.ts and system typography; hero untouched.
+- [x] Rebuilt event header, followed-player rows, board and matching FullBoardSheet; added inline rounds and member follows.
+- [x] Targeted 93/93; full shards 2445+2559=5004/5004 across502, +32/+2 over4972/500. Four 390×844 guest comparisons captured. Your players member persistence is unit-tested only as briefed. See TOUR_LEADERBOARD_REBUILD_REPORT.md.
 
 ## Review suggestions — played courses only
 - [x] Confirmed cause: Royal Norwich post is business-actor; Sunningdale (Old) is personal. Posted now personal-only; played source (gam_round_stats, mapped golf_courses id) added ahead of posted; reason.played in all six locales. Suite 4,944/4,944 across 497 (+5, reconciled in REVIEW_SUGGESTIONS_PLAYED_REPORT.md). Ben's sheet now: Rochester & Cobham Park (played 4 Aug), Vale do Lobo Ocean (played 9 May).

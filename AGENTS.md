@@ -97,3 +97,4 @@ Report the suite total before and after, and name the source of any delta. A cou
 - Review score ownership: see scoreStepRules.ts header.
 - Search shell ownership: see KeyboardSearchSheet.tsx header.
 - Settings/export/handicap and business Profile/Links ownership: see their module headers.
+- Tour boards: LiveBoard.

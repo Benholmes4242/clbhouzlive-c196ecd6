@@ -13,7 +13,8 @@ import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { TITLE, FIGS as TFIGS } from '@/lib/tokens/type';
-import { BoardTable, todayFromEntry, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
+import { LiveBoard } from '../../leaderboard/LiveBoard';
+import { todayFromEntry, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import type { TournamentMeta } from '../../leaderboard/useTournamentMeta';
 import { resolveCutDisplay, tournamentIsFinished } from '../../_shared/cutDisplay';
@@ -93,7 +94,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
           {meta?.name && (
             <h2
               id="tournament-full-board-sheet-title"
-              style={{ margin: '3px 0 0', ...TITLE, color: A.INK }}
+              style={{ margin: '3px 0 0', fontSize:21,fontWeight:800,letterSpacing:0,color:A.INK,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis' }}
             >
               {meta.name}
             </h2>
@@ -106,16 +107,17 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
 
         {/* Column header moved INTO BoardTable in lockstep with the
             single-line row: one grid definition, no duplicate strip here. */}
-        <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
-          <BoardTable
+        <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, willChange:'transform', background:'var(--tour-board-canvas)' }}>
+          <LiveBoard
+            tournamentId={tournamentId}
+            enabled={open}
+            tourSlug={meta?.tour_code}
             entries={entries}
             cutState={cutState}
             currentRound={meta?.current_round ?? null}
             complete={tournamentIsFinished(meta?.status)}
-            onRowClick={handleRow}
-            teamInitials={needsInitials}
+            onFull={handleRow}
             headerTop={0}
-            surface={SHEET_SURFACE}
           />
         </div>
       </div>

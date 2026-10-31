@@ -31,7 +31,14 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { INK as TOUR_INK, INK_SOFT as TOUR_INK_SOFT, INK_FAINT as TOUR_INK_FAINT, TOUR_CANVAS } from '../_shared/tokens';
 import { SearchFieldBox } from '@/features/search-v2/components/SearchField';
 import { resolveVenuePlace } from './venuePlace';
-import { RailChips } from '@/components/ui/RailChips';
+import { Button } from '@/components/ui/button';
+import { LiveBoard } from './LiveBoard';
+import { fieldAverageToday, leaderSummary, eventLeaderLabel } from './leaderboardRules';
+import { surnameOf } from '../_shared/playerName';
+import { getScoreColor } from '../_shared/scoreColor';
+import { fmtScore } from '../utils/fmtScore';
+import { computeBoardColumns } from './BoardTable';
+import './leaderboard.css';
 
 
 
@@ -126,33 +133,6 @@ function LiveMarker({
       </span>
     </span>
   );
-}
-
-/** Minimum completed rounds before a field average means anything. */
-const FIELD_GATE = 20;
-
-interface FieldAverage { avg: number; count: number }
-
-/**
- * Average round-to-par across players who have COMPLETED the given round,
- * from the entries already loaded. No new query. Null below the gate.
- */
-function fieldAverageToday(
-  entries: BoardEntry[],
-  round: number | null | undefined,
-): FieldAverage | null {
-  if (round == null || round < 1 || round > 4) return null;
-  let sum = 0;
-  let count = 0;
-  for (const e of entries) {
-    const v = [e.round_1, e.round_2, e.round_3, e.round_4][round - 1];
-    if (v == null) continue;
-    if (e.thru != null && e.thru < 18) continue;
-    sum += v;
-    count += 1;
-  }
-  if (count < FIELD_GATE) return null;
-  return { avg: sum / count, count };
 }
 
 function fmtAvgToPar(v: number): string {
@@ -363,17 +343,11 @@ export function LeaderboardTab() {
     stateCode: meta?.venue_state,
     courseSubCountry: meta?.course_sub_country,
   });
-  const placeSegments = [
-    venue || null,
-    cityNation,
-  ].filter(Boolean) as string[];
-  const figureSegments = [
-    par != null ? t('tour.parValue', { par }) : null,
-    yardage != null ? t('tour.yardsValue', { yards: yardage.toLocaleString() }) : null,
-    field != null
-      ? t('tour.fieldInline', { v: fmtAvgToPar(field.avg), n: String(field.count) })
-      : null,
-  ].filter(Boolean) as string[];
+  const inProgress = computeBoardColumns(boardEntries,currentRound,tournamentIsFinished(metaStatus)).showThru;
+  const onCourse = inProgress ? boardEntries.filter(e => e.thru != null && e.thru > 0 && e.thru < 18 && todayFromEntry(e,currentRound) != null).length : 0;
+  const lead = leaderSummary(boardEntries);
+  const summarySegments = [venue, par != null ? t('tour.parValue',{par}) : null, yardage != null ? t('tour.yardsValue',{yards:yardage.toLocaleString()}) : null,
+    inProgress ? t('rebuilt.onCourse',{count:onCourse,field:boardEntries.length}) : null].filter(Boolean);
 
 
   // Column header is owned by BoardTable now (ONE grid definition).
@@ -394,119 +368,18 @@ export function LeaderboardTab() {
   };
 
   return (
-    <div style={{ background: SURFACE, minHeight: '60vh', fontFamily: F }}>
-      {/* MASTHEAD */}
-      <div style={{ padding: '16px 16px 12px', background: SURFACE }}>
-        {/* LINE ONE - title, live round, search. Broadcast strip: the round
-            marker sits immediately right of the title. */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-          }}
-        >
-          <h1
-            style={{
-              margin: 0,
-              flex: 1,
-              minWidth: 0,
-              fontFamily: F,
-              fontSize: 22,
-              fontWeight: 700,
-              color: A.INK,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.12,
-            }}
-          >
-            {meta?.name ?? selected.name}
-          </h1>
-
-          {(metaStatus || currentRound != null) && (
-            <span style={{ flex: 'none' }}>
-              <LiveMarker status={metaStatus} currentRound={currentRound} />
-            </span>
-          )}
-
-
-          <button
-            type="button"
-            onClick={() => {
-              if (searchOpen) {
-                setSearchQuery('');
-                setSearchOpen(false);
-              } else {
-                setSearchOpen(true);
-              }
-            }}
-            aria-label={searchOpen ? t('board.search.closeAria') : t('board.search.openAria')}
-            style={{
-              flex: 'none',
-              background: 'none',
-              border: 'none',
-              padding: 4,
-              cursor: 'pointer',
-              display: 'flex',
-            }}
-
-          >
-            {searchOpen ? (
-              <X size={16} color={INK} strokeWidth={2.5} />
-            ) : (
-              <Search size={16} color={INK} strokeWidth={2.5} />
-            )}
-          </button>
+    <div className="tour-board-shell" style={{minHeight:'60vh'}}>
+      {showTabs && <div className="tour-board-events" aria-label={t('leaderboard.a11y.events')}>
+        {liveTournaments.map(tt => <Button key={tt.id} variant="outline" className="tour-event-pill" aria-pressed={selected.id===tt.id} onClick={()=>onSelectEvent(tt.id)}>
+          {shortEventName(tt.name)}<span className="tour-event-leader">{eventLeaderLabel(tt.leaderName,tt.leaderCount,tt.leaderToPar)}</span>
+        </Button>)}
+      </div>}
+      <div className="tour-board-event">
+        <div className="tour-event-title-line"><h1>{meta?.name ?? selected.name}</h1>
+          {(metaStatus || currentRound != null) && <LiveMarker status={metaStatus} currentRound={currentRound} />}
+          <Button variant="ghost" size="icon" style={{height:24,width:24,padding:0,color:'var(--tour-board-ink)'}} aria-label={searchOpen ? t('board.search.closeAria') : t('board.search.openAria')} onClick={()=>{if(searchOpen)setSearchQuery('');setSearchOpen(!searchOpen);}}>{searchOpen ? <X size={16}/> : <Search size={16}/>}</Button>
         </div>
-
-        {/* META LINES - fixed place and figures lines, dot separated, MUTE ink, tabular.
-            ORDERING IS LOAD-BEARING: par and yards ALWAYS precede the field
-            average. The deleted stat tile used a FIXED grid rather than
-            space-around so PAR could not move horizontally between a
-            two-stat and a three-stat event one pill-tap apart; the same
-            hazard exists here because the field average appears and
-            disappears through the day. Keeping the volatile segment LAST
-            means nothing after it can shift.
-            These figures are NOT scores: they take MUTE ink, never a score
-            colour. */}
-        {placeSegments.length > 0 && (
-          <div
-            style={{
-              marginTop: 5,
-              fontFamily: F,
-              fontSize: 12.5,
-              lineHeight: 1.42,
-              fontWeight: 500,
-              color: A.MUTE,
-              ...FIGS,
-            }}
-          >
-            {placeSegments.join(' \u00B7 ')}
-          </div>
-        )}
-        {figureSegments.length > 0 && (
-          <div
-            style={{
-              fontFamily: F,
-              fontSize: 12.5,
-              lineHeight: 1.42,
-              fontWeight: 500,
-              color: A.MUTE,
-              ...FIGS,
-            }}
-          >
-            {figureSegments.join(' \u00B7 ')}
-          </div>
-        )}
-        {field != null && (
-          <FieldAverageTracker
-            count={field.count}
-            tournamentId={selected.id}
-            round={fieldRound}
-          />
-        )}
-
-
-
+        {summarySegments.length > 0 && <div className="tour-event-sub">{summarySegments.join(' · ')}</div>}
         {/* SEARCH - the canonical box in its own full-width row. */}
         {searchOpen && (
           <div style={{ marginTop: 10, display: 'flex' }}>
@@ -519,32 +392,12 @@ export function LeaderboardTab() {
           </div>
         )}
 
-        {/* The bordered par/yards stat tile and the separate round/date meta
-            row are deleted: the round moved onto line one and the figures
-            onto the meta line above. Dates dropped from the masthead - a
-            live board tells you it is live; they remain on the tournament
-            page and the schedule. To restore, append `dates` to
-             figureSegments. */}
-
-
-
       </div>
-
-      {/* LIVE EVENTS — the canonical RailChips row, bounded at 190px because
-          event names run long; the full name is the page title above. No
-          `distribute`: the chip count changes week to week. */}
-      {showTabs && (
-        <div style={{ padding: '10px 16px 12px', background: SURFACE }}>
-          <RailChips
-            options={liveTournaments.map((tt) => ({ id: tt.id, label: shortEventName(tt.name) }))}
-            value={selected.id}
-            onChange={onSelectEvent}
-            ariaLabel={t('leaderboard.a11y.events', 'Live events')}
-            maxChipWidth={190}
-          />
-        </div>
-      )}
-
+      {(lead || field) && <div className="tour-board-stats">
+        {lead && <div className="tour-board-stat" data-stat="lead"><div className="tour-stat-value">{lead.count > 1 ? lead.count : lead.lead ?? '—'}<small>{t(lead.count>1 ? 'rebuilt.tied' : 'rebuilt.shots')}</small></div><div className="tour-stat-label">{lead.count>1 ? t('rebuilt.atTop') : t('rebuilt.lead',{name:surnameOf(lead.leader.player?.full_name ?? lead.leader.team?.display_name ?? '').toUpperCase()})}</div></div>}
+        {field && <><div className="tour-board-stat" data-stat="average"><div className="tour-stat-value" style={{color:getScoreColor(field.avg,'dark')}}>{fmtAvgToPar(field.avg)}</div><div className="tour-stat-label">{t('rebuilt.fieldAverage')}</div></div>
+        <div className="tour-board-stat" data-stat="low"><div className="tour-stat-value" style={{color:getScoreColor(field.low,'dark')}}>{fmtScore(field.low)}<small>{field.lowPlayers.length>1 ? t('rebuilt.players',{count:field.lowPlayers.length}) : surnameOf(field.lowPlayers[0]?.player?.full_name ?? field.lowPlayers[0]?.team?.display_name ?? '')}</small></div><div className="tour-stat-label">{t('rebuilt.lowToday')}</div></div><FieldAverageTracker count={field.count} tournamentId={selected.id} round={fieldRound}/></>}
+      </div>}
 
       {/* COLUMN HEADER — rendered by BoardTable itself, sticky under the
           TourPageShell header, so header and rows share ONE grid definition. */}
@@ -583,15 +436,17 @@ export function LeaderboardTab() {
         />
 
       ) : (
-        <BoardTable
+        <LiveBoard
+          tournamentId={selected.id}
+          fullEntries={boardEntries}
+          tourSlug={selected.tourSlug}
           entries={filteredEntries}
           cutState={cutState}
           currentRound={currentRound}
           complete={tournamentIsFinished(metaStatus)}
           headerTop={'var(--tour-header-h, 0px)'}
-          surface={SURFACE}
           teeTimes={teeTimes}
-          onRowClick={(row) => {
+          onFull={(row) => {
             if (!row.player?.id) return;
             setSheetTarget({
               playerId: row.player.id,
@@ -608,18 +463,6 @@ export function LeaderboardTab() {
           }}
         />
       )}
-
-      {/* MOVEMENT LEGEND — the triangles have no per-row label. */}
-      <div
-        style={{
-          ...LABEL,
-          color: A.INK,
-          textAlign: 'center',
-          padding: '14px 16px 0',
-        }}
-      >
-        {t('tour.movementLegend')}
-      </div>
 
       {/* FOOTNOTE */}
       <div

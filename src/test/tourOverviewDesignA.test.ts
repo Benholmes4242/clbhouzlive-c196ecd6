@@ -452,20 +452,20 @@ describe('one board geometry', () => {
     createElement(MemoryRouter, null, el),
   );
 
-  it('BoardTable right-aligns THRU and round columns and keeps POS centred', () => {
+  it('BoardTable centres THRU and round columns and keeps POS centred', () => {
     const view = render(wrap(createElement(BoardTable, {
       entries: liveEntries, cutState: { kind: 'none', cutline: null, extraCount: 0 }, currentRound: 2, showHeader: true,
     })));
     const c = view.container;
     const thruHeader = c.querySelector<HTMLElement>('[data-board-thru-header]');
-    expect(thruHeader?.style.textAlign).toBe('right');
+    expect(thruHeader?.style.textAlign).toBe('center');
     const thruCells = c.querySelectorAll<HTMLElement>('[data-board-thru-cell]');
     expect(thruCells.length).toBeGreaterThan(0);
-    thruCells.forEach((el) => expect(el.style.textAlign).toBe('right'));
+    thruCells.forEach((el) => expect(el.style.textAlign).toBe('center'));
     const roundHeaders = c.querySelectorAll<HTMLElement>('[data-board-round-header]');
     expect(roundHeaders.length).toBeGreaterThan(0);
-    roundHeaders.forEach((el) => expect(el.style.textAlign).toBe('right'));
-    c.querySelectorAll<HTMLElement>('[data-board-round-cell]').forEach((el) => expect(el.style.textAlign).toBe('right'));
+    roundHeaders.forEach((el) => expect(el.style.textAlign).toBe('center'));
+    c.querySelectorAll<HTMLElement>('[data-board-round-cell]').forEach((el) => expect(el.style.textAlign).toBe('center'));
     expect(c.querySelector<HTMLElement>('[data-board-pos-header]')?.style.textAlign).toBe('center');
   });
 
