@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Tour hero — Centred columns and next-round tee times
-- [ ] Match hero-only geometry/centring, scheduled-round tee cells, Needs cards, leaders order/alignment and spacing; preserve full board and protected services.
-- [ ] Diagnose stuck leaders round from read-only published draw, run targeted/full suite, record changed assertions/counts and phone-size proof. R3 draw exists but player joins return empty in anon and actual guest-session reads; item 4(a) data-dependent fix blocked, no workaround.
+- [x] Hero-only geometry/centring, scheduled-round tee cells, Needs cards, leaders order/alignment and spacing; full board and protected services unchanged. Targeted149/149; full shards4828/4828 across489 (+12 named tests); build OK. See TOUR_HERO_REFINEMENTS_REPORT.md.
+- [ ] 4(a) and live before/during group proof blocked: R3 exists (Mexico23 rows, last17:51UTC) but canonical player joins return empty for all103 event rows in anon and actual guest-session reads. No invented group or handover workaround; member access unavailable external_unmanaged. Real390×844 centred board/Needs screenshot and reference captured, no page errors.
 
 ## BE2 — Business preview and Business rows
 - [x] BE2.1: stored category labels; authorised URL/crop-name setup; editor-photo protection and completed-card absence tests added. Targeted72/72; full shards4816/4816 across488, zero failures/unhandled errors; +2 named tests over4814/488. Build OK09:42:02Z. BE2_REPORT.md updated; hosted persistence unavailable external_unmanaged.
