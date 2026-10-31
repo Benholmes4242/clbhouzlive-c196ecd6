@@ -31,31 +31,41 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { from: (table: str
   };
   return q;
 } } }));
-import { buildReviewSuggestions, loadReviewSuggestions, useReviewSuggestions, type SuggestionRating } from '@/features/composer-flow/hooks/useReviewSuggestions';
+import { buildReviewSuggestions, loadReviewSuggestions, useReviewSuggestions, type SuggestionPlayed, type SuggestionPost, type SuggestionRating } from '@/features/composer-flow/hooks/useReviewSuggestions';
 const i18n = createInstance();
 void i18n.init({ lng: 'en', resources: { en: { composerFlow: en } }, initAsync: false });
 const t = i18n.getFixedT('en', 'composerFlow');
 const course = (id: string) => ({ id, name: `Course ${id}`, thumbnail_image: `${id}.jpg` });
 const rating = (course_id: string, user_id = 'follow', created_at = '2026-10-25T00:00:00Z'): SuggestionRating => ({ course_id, user_id, created_at });
-const base = () => ({ courses: ['club', 'post', 'followed', 'popular', 'other'].map(course), club: [] as ReturnType<typeof course>[], posts: [] as { course_id: string; created_at: string }[], followed: [] as SuggestionRating[], profiles: [{ id: 'follow', display_name: 'Thomas Smith', username: null }, { id: 'new', display_name: 'Ben Jones', username: null }], reviewed: [] as string[], popular: [] as SuggestionRating[] });
-beforeEach(() => { cleanup(); h.profile = { id: 'member' }; h.fail = ''; h.requests = []; h.tables = { user_profiles: [{ id: 'member', primary_club_id: null }], golf_courses: [], course_ratings: [], posts: [], user_follows: [] }; });
+const post = (course_id: string, created_at = '2026-10-26T00:00:00Z', actor_type: string | null = 'personal', actor_id: string | null = 'member'): SuggestionPost => ({ course_id, created_at, actor_type, actor_id });
+const played = (course_id: string, play_date = '2026-10-20'): SuggestionPlayed => ({ course_id, play_date });
+const base = () => ({ courses: ['club', 'post', 'followed', 'popular', 'other'].map(course), club: [] as ReturnType<typeof course>[], played: [] as SuggestionPlayed[], posts: [] as SuggestionPost[], followed: [] as SuggestionRating[], profiles: [{ id: 'follow', display_name: 'Thomas Smith', username: null }, { id: 'new', display_name: 'Ben Jones', username: null }], reviewed: [] as string[], popular: [] as SuggestionRating[] });
+beforeEach(() => { cleanup(); h.profile = { id: 'member' }; h.fail = ''; h.requests = []; h.tables = { user_profiles: [{ id: 'member', primary_club_id: null }], golf_courses: [], course_ratings: [], posts: [], gam_round_stats: [], user_follows: [] }; });
 afterEach(cleanup);
 
 describe('suggestion priority and reasons', () => {
-  it('club precedes own post and caps at two before followed courses', () => {
-    const s = base(); s.club = [course('club')]; s.posts = [{ course_id: 'post', created_at: '2026-09-14T12:00:00Z' }]; s.followed = [rating('followed')];
-    expect(buildReviewSuggestions(s, t).map(r => [r.courseId, r.reasonKind])).toEqual([['club', 'club'], ['post', 'posted']]);
+  it('club precedes played and own post, capping at two before followed courses', () => {
+    const s = base(); s.club = [course('club')]; s.played = [played('other')]; s.posts = [post('post', '2026-09-14T12:00:00Z')]; s.followed = [rating('followed')];
+    expect(buildReviewSuggestions(s, t).map(r => [r.courseId, r.reasonKind])).toEqual([['club', 'club'], ['other', 'played']]);
+  });
+  it('a played course outranks a posted one and formats its latest d MMM play date', () => {
+    const s = base(); s.played = [played('other', '2026-10-11'), played('other', '2026-09-01')]; s.posts = [post('post', '2026-10-26T00:00:00Z')];
+    expect(buildReviewSuggestions(s, t).map(r => [r.courseId, r.reason])).toEqual([['other', 'You played here on 11 Oct'], ['post', 'You posted from here on 26 Oct']]);
+  });
+  it('played courses are most-recent first', () => {
+    const s = base(); s.played = [played('other', '2026-08-04'), played('post', '2026-10-15')];
+    expect(buildReviewSuggestions(s, t).map(r => r.courseId)).toEqual(['post', 'other']);
   });
   it('deduplicates a course across sources before filling slot two', () => {
-    const s = base(); s.club = [course('club')]; s.posts = [{ course_id: 'club', created_at: '2026-10-26T00:00:00Z' }]; s.followed = [rating('followed')];
+    const s = base(); s.club = [course('club')]; s.posts = [post('club')]; s.followed = [rating('followed')];
     expect(buildReviewSuggestions(s, t).map(r => r.courseId)).toEqual(['club', 'followed']);
   });
   it('excludes every course already reviewed by the member', () => {
-    const s = base(); s.club = [course('club')]; s.reviewed = ['club', 'post']; s.posts = [{ course_id: 'post', created_at: '2026-10-26' }]; s.followed = [rating('followed')];
+    const s = base(); s.club = [course('club')]; s.reviewed = ['club', 'post', 'other']; s.played = [played('other')]; s.posts = [post('post')]; s.followed = [rating('followed')];
     expect(buildReviewSuggestions(s, t).map(r => r.courseId)).toEqual(['followed']);
   });
   it('only returns courses that resolve to golf_courses rows', () => {
-    const s = base(); s.posts = [{ course_id: 'missing', created_at: '2026-10-26' }]; s.followed = [rating('followed')];
+    const s = base(); s.played = [played('missing')]; s.posts = [post('missing')]; s.followed = [rating('followed')];
     expect(buildReviewSuggestions(s, t).map(r => r.courseId)).toEqual(['followed']);
   });
   it('club reason uses the signed-off club phrase', () => {
@@ -63,7 +73,7 @@ describe('suggestion priority and reasons', () => {
     expect(buildReviewSuggestions(s, t)[0].reason).toBe('Your club');
   });
   it('own posts are newest-first and format their actual d MMM date', () => {
-    const s = base(); s.posts = [{ course_id: 'other', created_at: '2026-09-13T12:00:00Z' }, { course_id: 'post', created_at: '2026-09-14T12:00:00Z' }];
+    const s = base(); s.posts = [post('other', '2026-09-13T12:00:00Z'), post('post', '2026-09-14T12:00:00Z')];
     expect(buildReviewSuggestions(s, t).map(r => [r.courseId, r.reason])).toEqual([['post', 'You posted from here on 14 Sep'], ['other', 'You posted from here on 13 Sep']]);
   });
   it('one followed reviewer uses the most recent first name', () => {
@@ -99,7 +109,7 @@ describe('member-scoped source reads', () => {
     expect(h.requests.some(r => r.table === 'course_ratings' && r.filters.some((f: any[]) => f[1] === 'is_mock'))).toBe(false);
   });
   it('only reads own composer posts with non-null course and null reference ids', async () => {
-    const common = { created_at: '2026-10-27', whs_score_id: null, source_review_id: null };
+    const common = { created_at: '2026-10-27', whs_score_id: null, source_review_id: null, actor_type: 'personal', actor_id: 'member' };
     h.tables.posts = [
       { ...common, id: '1', user_id: 'member', course_id: 'post' },
       { ...common, id: '2', user_id: 'someone', course_id: 'other' },
@@ -109,6 +119,36 @@ describe('member-scoped source reads', () => {
     ];
     h.tables.golf_courses = [course('post'), course('other')];
     expect((await loadReviewSuggestions('member', t)).map(r => r.courseId)).toEqual(['post']);
+  });
+  it('a business-actor post never produces a posted suggestion; a personal post does', async () => {
+    const common = { created_at: '2026-10-27', whs_score_id: null, source_review_id: null, user_id: 'member' };
+    h.tables.posts = [
+      { ...common, id: '1', course_id: 'other', actor_type: 'business', actor_id: 'biz-1' },
+      { ...common, id: '2', course_id: 'post', actor_type: 'personal', actor_id: 'member' },
+    ];
+    h.tables.golf_courses = [course('post'), course('other')];
+    const result = await loadReviewSuggestions('member', t);
+    expect(result.map(r => [r.courseId, r.reasonKind])).toEqual([['post', 'posted']]);
+  });
+  it('a legacy post with null actor_type counts only when actor_id is the member', async () => {
+    const common = { created_at: '2026-10-27', whs_score_id: null, source_review_id: null, user_id: 'member', actor_type: null };
+    h.tables.posts = [
+      { ...common, id: '1', course_id: 'other', actor_id: 'biz-1' },
+      { ...common, id: '2', course_id: 'post', actor_id: 'member' },
+    ];
+    h.tables.golf_courses = [course('post'), course('other')];
+    expect((await loadReviewSuggestions('member', t)).map(r => r.courseId)).toEqual(['post']);
+  });
+  it('played courses come from gam_round_stats and outrank posted ones', async () => {
+    h.tables.gam_round_stats = [
+      { id: '1', user_id: 'member', course_id: 'other', play_date: '2026-10-11' },
+      { id: '2', user_id: 'member', course_id: 'other', play_date: '2026-09-01' },
+      { id: '3', user_id: 'someone', course_id: 'post', play_date: '2026-10-29' },
+    ];
+    h.tables.posts = [{ id: '4', user_id: 'member', course_id: 'post', created_at: '2026-10-27', whs_score_id: null, source_review_id: null, actor_type: 'personal', actor_id: 'member' }];
+    h.tables.golf_courses = [course('post'), course('other')];
+    const result = await loadReviewSuggestions('member', t);
+    expect(result.map(r => [r.courseId, r.reason])).toEqual([['other', 'You played here on 11 Oct'], ['post', 'You posted from here on 27 Oct']]);
   });
   it('uses outgoing user_follows and the inclusive 90-day created_at boundary', async () => {
     h.tables.user_follows = [{ id: '1', follower_id: 'member', following_id: 'follow' }, { id: '2', follower_id: 'other', following_id: 'member' }];
@@ -164,7 +204,7 @@ describe('member-scoped source reads', () => {
     const hook = renderHook(() => useReviewSuggestions(true), { wrapper });
     await waitFor(() => expect(hook.result.current.isSuccess).toBe(true));
     expect(client.getQueryCache().getAll().map(q => q.queryKey)).toEqual([['composer-review-suggestions', 'member']]);
-    expect(h.requests.every(r => !['gam_round_stats', 'whs_scores', 'whs_rounds'].includes(r.table))).toBe(true);
+    expect(h.requests.every(r => !['whs_scores', 'whs_rounds'].includes(r.table))).toBe(true);
     client.clear();
   });
 });

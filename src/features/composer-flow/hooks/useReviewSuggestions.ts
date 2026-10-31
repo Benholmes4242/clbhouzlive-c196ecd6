@@ -1,9 +1,14 @@
 /**
  * Review suggestions own one member-scoped query and complete, paginated reads.
- * Priority is club -> own composer posts -> followed reviewers; popularity is
- * used only when no drawable personal candidate exists. Counts are distinct
- * followed reviewers, not reviews. Missing courses/names never invent a row.
- * Reads fail closed: a failed exclusion or count read must not offer a course.
+ * Priority is club -> played (synced rounds, most recent first) -> own personal
+ * composer posts -> followed reviewers; popularity is used only when no
+ * drawable personal candidate exists. "Posted" counts only the member's own
+ * personal posts: actor_type = 'personal', or actor_id = the member where
+ * actor_type is null on older rows; business-actor posts never count. Played
+ * courses come from gam_round_stats, whose course_id is the mapped
+ * golf_courses id. Counts are distinct followed reviewers, not reviews.
+ * Missing courses/names never invent a row. Reads fail closed: a failed
+ * exclusion or count read must not offer a course.
  * user_follows.follower_id -> following_id is the app's outgoing people graph.
  */
 import { useQuery } from '@tanstack/react-query';
@@ -13,7 +18,7 @@ import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfileData } from '@/hooks/useProfileData';
 
-export type ReviewReasonKind = 'club' | 'posted' | 'followed' | 'popular';
+export type ReviewReasonKind = 'club' | 'played' | 'posted' | 'followed' | 'popular';
 export interface ReviewSuggestion {
   courseId: string;
   courseName: string;
@@ -22,12 +27,14 @@ export interface ReviewSuggestion {
   reasonKind: ReviewReasonKind;
 }
 export interface SuggestionCourse { id: string; name: string; thumbnail_image: string | null }
-export interface SuggestionPost { course_id: string | null; created_at: string }
+export interface SuggestionPost { course_id: string | null; created_at: string; actor_type: string | null; actor_id: string | null }
+export interface SuggestionPlayed { course_id: string; play_date: string }
 export interface SuggestionRating { course_id: string; user_id: string | null; created_at: string }
 export interface SuggestionProfile { id: string; display_name: string | null; username: string | null }
 interface Sources {
   courses: SuggestionCourse[];
   club: SuggestionCourse[];
+  played: SuggestionPlayed[];
   posts: SuggestionPost[];
   followed: SuggestionRating[];
   profiles: SuggestionProfile[];
@@ -47,6 +54,10 @@ export function buildReviewSuggestions(s: Sources, t: TFunction<'composerFlow'>)
     result.push({ courseId: id, courseName: c.name, thumbnail: c.thumbnail_image, reasonKind, reason });
   };
   for (const c of s.club) offer(c.id, 'club', t('reason.club'));
+  for (const p of [...s.played].sort((a, b) => b.play_date.localeCompare(a.play_date))) {
+    const when = format(new Date(p.play_date), 'd MMM');
+    offer(p.course_id, 'played', t('reason.played', { when }));
+  }
   for (const p of [...s.posts].sort((a, b) => b.created_at.localeCompare(a.created_at))) {
     const when = format(new Date(p.created_at), 'd MMM');
     offer(p.course_id, 'posted', t('reason.posted', { when }));
@@ -101,14 +112,18 @@ async function readIds<T>(ids: string[], make: (chunk: string[]) => any): Promis
 
 export async function loadReviewSuggestions(userId: string, t: TFunction<'composerFlow'>, now = new Date()): Promise<ReviewSuggestion[]> {
   const from = (days: number) => new Date(now.getTime() - days * 86400000).toISOString();
-  const [profile, reviewed, posts, follows] = await Promise.all([
+  const [profile, reviewed, rawPosts, played, follows] = await Promise.all([
     supabase.from('user_profiles').select('primary_club_id').eq('id', userId).maybeSingle(),
     readAll<{ course_id: string }>(() => supabase.from('course_ratings').select('course_id').eq('user_id', userId).order('id')),
-    readAll<SuggestionPost>(() => supabase.from('posts').select('course_id, created_at').eq('user_id', userId)
+    readAll<SuggestionPost>(() => supabase.from('posts').select('course_id, created_at, actor_type, actor_id').eq('user_id', userId)
       .not('course_id', 'is', null).is('whs_score_id', null).is('source_review_id', null)
       .order('created_at', { ascending: false }).order('id')),
+    readAll<SuggestionPlayed>(() => supabase.from('gam_round_stats').select('course_id, play_date').eq('user_id', userId)
+      .not('course_id', 'is', null).order('play_date', { ascending: false }).order('id')),
     readAll<{ following_id: string }>(() => supabase.from('user_follows').select('following_id').eq('follower_id', userId).order('id')),
   ]);
+  // Only the member's own personal posts count; business-actor posts never do.
+  const posts = rawPosts.filter(p => p.actor_type === 'personal' || (p.actor_type == null && p.actor_id === userId));
   if (profile.error) throw profile.error;
   const clubId = profile.data?.primary_club_id;
   const followingIds = [...new Set(follows.map(f => f.following_id))];
@@ -118,13 +133,13 @@ export async function loadReviewSuggestions(userId: string, t: TFunction<'compos
     readIds<SuggestionRating>(followingIds, ids => supabase.from('course_ratings').select('course_id, user_id, created_at')
       .in('user_id', ids).gte('created_at', from(90)).order('created_at', { ascending: false }).order('id')),
   ]);
-  const ids = [...new Set([...club.map(c => c.id), ...posts.flatMap(p => p.course_id ? [p.course_id] : []), ...followed.map(r => r.course_id)])];
+  const ids = [...new Set([...club.map(c => c.id), ...played.map(p => p.course_id), ...posts.flatMap(p => p.course_id ? [p.course_id] : []), ...followed.map(r => r.course_id)])];
   const [courses, profiles] = await Promise.all([
     readIds<SuggestionCourse>(ids, chunk => supabase.from('golf_courses').select('id, name, thumbnail_image').in('id', chunk).order('id')),
     readIds<SuggestionProfile>([...new Set(followed.flatMap(r => r.user_id ? [r.user_id] : []))], chunk =>
       supabase.from('user_profiles').select('id, display_name, username').in('id', chunk).order('id')),
   ]);
-  const sources: Sources = { courses, club, posts, followed, profiles, reviewed: reviewed.map(r => r.course_id), popular: [] };
+  const sources: Sources = { courses, club, played, posts, followed, profiles, reviewed: reviewed.map(r => r.course_id), popular: [] };
   const personal = buildReviewSuggestions(sources, t);
   if (personal.length) return personal;
   const popular = await readAll<SuggestionRating>(() => supabase.from('course_ratings').select('course_id, user_id, created_at')
