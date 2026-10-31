@@ -1,4 +1,4 @@
-# BE4 — completed edits, stopped at verification
+# BE4 — completed and verified
 
 ## Result and scope
 Edit-only On your profile and Links groups/sheets implemented: canonical businessSecondPill preview/action priority, read-only booking/soon, data-gated Main button radios, Hours switch/day editing/copy-to-all, category facilities, ordered socials and unchanged handle stripping/null-empty payload. Parent saves only each sheet's fields through protectBusinessPayload, invalidates business queries and updates local saved values. Saved status moved beneath the final Links card. CreateBusiness.ts and businessHero.ts untouched.
