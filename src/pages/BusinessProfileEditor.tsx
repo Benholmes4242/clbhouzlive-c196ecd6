@@ -59,13 +59,12 @@ import { addressPayload, savedPhone } from '@/components/business/editor/busines
 
 import { FacilitiesSection } from '@/components/business/editor/FacilitiesSection';
 import { PrimaryActionSection } from '@/components/business/editor/PrimaryActionSection';
-import { BookingComingSoonSection } from '@/components/business/editor/BookingComingSoonSection';
 import { OpeningHoursSection } from '@/components/business/editor/OpeningHoursSection';
 import { SocialSection } from '@/components/business/editor/SocialSection';
 import { BusinessEditFrame } from '@/components/business/editor/BusinessEditFrame';
 import { Button } from '@/components/ui/button';
 import { BusinessEditPreview, type BusinessIdentityField, type BusinessPhotoKind } from '@/components/business/editor/BusinessEditPreview';
-import { scrollElementIntoView } from '@/lib/getScrollParent';
+import { BusinessEditProfileLinks, type ProfileLinkSave, type ProfileLinkSheet } from '@/components/business/editor/BusinessEditProfileLinks';
 import type { BusinessCompletionKey } from '@/components/business/editor/businessCompletion';
 import { BusinessEditSettings } from '@/components/business/editor/BusinessEditSettings';
 import { canEditBusinessProfile, protectBusinessPayload } from '@/components/business/editor/editorPermissions';
@@ -180,8 +179,7 @@ export default function BusinessProfileEditor() {
   const [partialStatus, setPartialStatus] = useState<'saved' | 'saving' | 'error'>('saved');
   const partialRetry = useRef<(() => Promise<boolean>) | null>(null);
   const partialBusy = useRef(false);
-  const legacyFields = useRef<HTMLDivElement>(null);
-  const legacyHours = useRef<HTMLDivElement>(null);
+  const [profileRequest, setProfileRequest] = useState<{ kind: ProfileLinkSheet; serial: number } | null>(null);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   /* Ownerless-business notice: must be acknowledged, never times out. The
    * business id is the only way support can recover it. */
@@ -235,9 +233,9 @@ export default function BusinessProfileEditor() {
   }, [mode, membershipLoading, membership, id, navigate]);
 
   /* ── populate from existing business ──────────────── */
-  const initialSnapshotRef = useRef<string | null>(null);
+  const populated = useRef(false);
   useEffect(() => {
-    if (mode !== 'edit' || !business || initialSnapshotRef.current) return;
+    if (mode !== 'edit' || !business || populated.current) return;
 
     setCategory(business.category || '');
     setBusinessName(business.name || '');
@@ -304,15 +302,7 @@ export default function BusinessProfileEditor() {
     setLogo({ ...emptyImage, url: business.logo_url || null });
     setCover({ ...emptyImage, url: business.cover_image_url || null });
 
-    // snapshot for dirty detection (stringify a stable subset)
-    initialSnapshotRef.current = JSON.stringify({
-      n: business.name || '', d: business.description || '', fy: business.founded_year || null,
-      w: business.website || '', e: business.email || '', p: business.phone || null,
-      oh: business.opening_hours || { ...DEFAULT_OPENING_HOURS }, sl: { instagram: sl.instagram || '', tiktok: sl.tiktok || '', twitter: sl.twitter || '', facebook: sl.facebook || '', youtube: sl.youtube || '' }, addr: business.address_label || business.location || null, loc: business.address_label || business.location || null,
-      am: business.amenities || [],
-      pa: business.primary_action || null,
-      soh: !!business.show_opening_hours,
-    });
+    populated.current = true;
   }, [mode, business]);
 
   /* ── club-linked & duplicate-check ────────────────── */
@@ -434,28 +424,8 @@ export default function BusinessProfileEditor() {
     return resolvedName.length > 0 || isClubLinked;
   }, [mode, category, isGolfClub, isUniversity, selectedClub, selectedCollege, existingBusinessForClub, clubClaimPending, resolvedName, isClubLinked]);
 
-  /* ── dirty (edit mode) ────────────────────────────── */
-  const currentSnapshot = useMemo(() => {
-    if (mode !== 'edit') return '';
-    return JSON.stringify({
-      n: businessName, d: description, fy: foundedYear ? parseInt(foundedYear, 10) : null,
-      w: website, e: email, p: phone?.fullNumber || null,
-      oh: openingHours, sl: social,
-      addr: address?.label || null, loc: address?.label || null,
-      am: amenities, pa: primaryAction, soh: showOpeningHours,
-    });
-  }, [mode, businessName, description, foundedYear, website, email, phone, openingHours, social, address, amenities, primaryAction, showOpeningHours]);
-
-  const isDirty = useMemo(() => {
-    if (mode === 'create') {
-      return !!(category || businessName || selectedClub || selectedCollege || description);
-    }
-    if (!initialSnapshotRef.current) return false;
-    const fieldsDirty = currentSnapshot !== initialSnapshotRef.current;
-    const imagesDirty =
-      !!logo.pendingFile || !!cover.pendingFile || logo.pendingRemove || cover.pendingRemove;
-    return fieldsDirty || imagesDirty;
-  }, [mode, category, businessName, selectedClub, selectedCollege, description, currentSnapshot, logo, cover]);
+  // Only the retained create branch has deferred fields and a departure guard.
+  const isDirty = mode === 'create' && !!(category || businessName || selectedClub || selectedCollege || description);
 
   /* ── image handlers ──────────────────────────────── */
   const onLogoFile = (file: File) => {
@@ -526,11 +496,6 @@ export default function BusinessProfileEditor() {
     if (key === 'name' && (isClubLinked || isEditor)) throw new Error('Name is read-only');
     const { error } = await supabase.from('business_accounts').update(protectBusinessPayload({ [key]: value }, membership?.role)).eq('id', id ?? '');
     if (error) throw error;
-    if (initialSnapshotRef.current) {
-      const snapshot = JSON.parse(initialSnapshotRef.current);
-      snapshot[key === 'name' ? 'n' : key === 'description' ? 'd' : 'fy'] = value ?? (key === 'founded_year' ? null : '');
-      initialSnapshotRef.current = JSON.stringify(snapshot);
-    }
     if (key === 'name') setBusinessName(String(value ?? ''));
     else if (key === 'description') setDescription(String(value ?? ''));
     else setFoundedYear(value == null ? '' : String(value));
@@ -544,8 +509,7 @@ export default function BusinessProfileEditor() {
     } else await (kind === 'logo' ? removeLogo() : removeCover());
     (kind === 'logo' ? setLogo : setCover)({ ...emptyImage, url });
   });
-  // BE3 field sheets advance only their own baseline. Retained Save changes
-  // owns facilities/main action/hours/socials and never resends these fields.
+  // Edit sheets write only their own fields; no deferred edit baseline.
   const saveContact = (save: ContactSave) => runPartial(async () => {
     if (save.kind === 'address' && isClubLinked) throw new Error('Address is read-only');
     const payload = save.kind === 'address' ? addressPayload(save.value)
@@ -553,27 +517,29 @@ export default function BusinessProfileEditor() {
       : { [save.kind]: save.value || null };
     const { error } = await supabase.from('business_accounts').update(protectBusinessPayload(payload, membership?.role)).eq('id', id ?? '');
     if (error) throw error;
-    if (initialSnapshotRef.current) {
-      const snapshot = JSON.parse(initialSnapshotRef.current);
-      if (save.kind === 'address') { snapshot.addr = save.value?.label || null; snapshot.loc = save.value?.label || null; }
-      else if (save.kind === 'phone') snapshot.p = save.value?.fullNumber || null;
-      else snapshot[save.kind === 'email' ? 'e' : 'w'] = save.value;
-      initialSnapshotRef.current = JSON.stringify(snapshot);
-    }
     if (save.kind === 'address') { setAddress(save.value); setCountrySelection(save.value?.country || countrySelection); }
     else if (save.kind === 'phone') setPhone(save.value);
     else if (save.kind === 'email') setEmail(save.value);
     else setWebsite(save.value);
   });
-  const focusLegacy = (key: BusinessCompletionKey) => {
+  const openCompletionSheet = (key: BusinessCompletionKey) => {
     if (key === 'address' || key === 'phone' || key === 'website') {
-      setContactRequest(previous => ({ kind: key, serial: (previous?.serial ?? 0) + 1 })); return;
-    }
-    const section = key === 'hours' ? legacyHours.current : legacyFields.current;
-    const target = key === 'hours' ? section?.querySelector<HTMLElement>('[role=switch]')
-      : section?.querySelector<HTMLElement>('input:not([type=hidden]), button');
-    if (target) { scrollElementIntoView(target, { offset: 90, behavior: 'smooth' }); target.focus({ preventScroll: true }); }
+      setContactRequest(previous => ({ kind: key, serial: (previous?.serial ?? 0) + 1 }));
+    } else if (key === 'hours') setProfileRequest(previous => ({ kind: 'hours', serial: (previous?.serial ?? 0) + 1 }));
   };
+  const saveProfileLink = (save: ProfileLinkSave) => runPartial(async () => {
+    const links = save.kind === 'socials' ? Object.fromEntries(Object.entries(save.value).map(([key, value]) => [key, value || null])) : null;
+    const payload = save.kind === 'main' ? { primary_action: save.value }
+      : save.kind === 'hours' ? { show_opening_hours: save.shown, opening_hours: save.value }
+      : save.kind === 'facilities' ? { amenities: save.value }
+      : { social_links: links && Object.values(links).some(Boolean) ? links : null };
+    const { error } = await supabase.from('business_accounts').update(protectBusinessPayload(payload, membership?.role)).eq('id', id ?? '');
+    if (error) throw error;
+    if (save.kind === 'main') setPrimaryAction(save.value);
+    else if (save.kind === 'hours') { setOpeningHours(save.value); setShowOpeningHours(save.shown); }
+    else if (save.kind === 'facilities') setAmenities(save.value);
+    else setSocial(save.value);
+  });
 
   const handleSave = useCallback(async () => {
     if (!user?.id) {
@@ -585,15 +551,6 @@ export default function BusinessProfileEditor() {
     if (!isValid) return;
     setSaving(true);
     try {
-      const socialLinks = {
-        instagram: social.instagram || null,
-        tiktok:    social.tiktok    || null,
-        twitter:   social.twitter   || null,
-        facebook:  social.facebook  || null,
-        youtube:   social.youtube   || null,
-      };
-      const hasSocial = Object.values(socialLinks).some(Boolean);
-
       if (mode === 'create') {
         const result = await createBusiness({ category, selectedClub, selectedCollege, businessName, description, foundedYear, claimProofNote, address, countrySelection, phone, email, website, bookingUrl, openingHours, showOpeningHours, logo, cover, social, amenities, primaryAction }, { userId: user.id, sourceCourseId: searchParams.get('sourceCourseId'), queryClient });
         if (result.ownerless) { setOwnerlessNotice(result.ownerless); return; }
@@ -615,52 +572,6 @@ export default function BusinessProfileEditor() {
         return;
       }
 
-      // EDIT
-      if (!id) throw new Error('Missing business id');
-
-      // deferred image ops first
-      if (logo.pendingRemove) await removeLogo();
-      else if (logo.pendingFile) await uploadLogo(logo.pendingFile);
-      if (cover.pendingRemove) await removeCover();
-      else if (cover.pendingFile) await uploadCover(cover.pendingFile);
-
-      const updatePayload: Record<string, unknown> = {
-        booking_url: bookingUrl || null,
-        opening_hours: openingHours as unknown as Json,
-        social_links: hasSocial ? (socialLinks as unknown as Json) : null,
-        amenities,
-        primary_action: primaryAction || null,
-        show_opening_hours: showOpeningHours,
-
-        updated_at: new Date().toISOString(),
-      };
-
-      const { error: updateErr } = await supabase
-        .from('business_accounts')
-        .update(protectBusinessPayload(updatePayload, membership?.role))
-        .eq('id', id);
-      if (updateErr) throw new SaveStepError('update', updateErr);
-
-      await queryClient.invalidateQueries({
-        predicate: (query) => {
-          const k = query.queryKey;
-          if (!Array.isArray(k) || typeof k[0] !== 'string') return false;
-          const key = k[0];
-          return (
-            key === 'my-businesses' ||
-            key === 'business-profile' ||
-            key === 'business-directory' ||
-            key === 'suggestedBusinesses' ||
-            key.startsWith('business-')
-          );
-        },
-      });
-
-      if (logo.localPreview) URL.revokeObjectURL(logo.localPreview);
-      if (cover.localPreview) URL.revokeObjectURL(cover.localPreview);
-
-      toast.success('Changes saved');
-      navigate(`/business/${id}`);
     } catch (e) {
       const step = e instanceof SaveStepError ? e.step : mode === 'create' ? 'create' : 'edit';
       const cause = e instanceof SaveStepError ? e.cause : e;
@@ -704,14 +615,14 @@ export default function BusinessProfileEditor() {
           {!isNotFound && (
             <button
               onClick={() => refetchBusiness()}
-              className="inline-flex items-center justify-center h-11 px-6 rounded-[10px] text-white text-[14px] font-semibold mb-3"
-              style={{ background: BIZ.amber }}
+              className="inline-flex items-center justify-center h-11 px-6 rounded-[10px] text-[14px] font-semibold mb-3"
+              style={{ background: A.INK, color: A.CANVAS }}
             >
               Retry
             </button>
           )}
           <div>
-            <button onClick={() => navigate(-1)} className="text-[14px] font-semibold" style={{ color: BIZ.amber }}>
+            <button onClick={() => navigate(-1)} className="text-[14px] font-semibold" style={{ color: A.INK }}>
               Go back
             </button>
           </div>
@@ -735,9 +646,9 @@ export default function BusinessProfileEditor() {
       >
         <div className="flex-1 overflow-y-auto" style={{ background: BIZ.pageBg }}>
 
-          {mode === 'edit' ? <BusinessEditPreview name={businessName} category={category} city={business?.city || business?.location || ''} primaryAction={(business?.primary_action as PrimaryActionKey | null) ?? null}
-            completion={{ logo: logo.url, cover: cover.url, description, foundedYear, lat: address?.lat, lng: address?.lng, phone: phone?.fullNumber || '', website, showOpeningHours: !!business?.show_opening_hours, openingHours: business?.opening_hours || DEFAULT_OPENING_HOURS }}
-            clubLinked={isClubLinked} editor={isEditor} busy={partialStatus === 'saving'} onSave={saveIdentity} onPhoto={savePhoto} onFocusLegacy={focusLegacy} /> : <>
+          {mode === 'edit' ? <BusinessEditPreview name={businessName} category={category} city={business?.city || business?.location || ''} primaryAction={primaryAction} actionData={{ category, primary_action: primaryAction, booking_url: bookingUrl, phone: phone?.fullNumber, email, website, location: address?.label || business?.location, lat: address?.lat, lng: address?.lng }}
+            completion={{ logo: logo.url, cover: cover.url, description, foundedYear, lat: address?.lat, lng: address?.lng, phone: phone?.fullNumber || '', website, showOpeningHours, openingHours }}
+            clubLinked={isClubLinked} editor={isEditor} busy={partialStatus === 'saving'} onSave={saveIdentity} onPhoto={savePhoto} onFocusLegacy={openCompletionSheet} /> : <>
           {/* 1. HERO — cover + squircle logo at top (matches personal edit-v2) */}
           <div className="px-4 pt-2 pb-4">
             <div
@@ -860,6 +771,9 @@ export default function BusinessProfileEditor() {
 
           {mode === 'edit' && <BusinessEditWhereContact address={address} country={countrySelection} phone={phone?.fullNumber || ''} email={email} website={website} clubLinked={isClubLinked} busy={partialStatus === 'saving'} requested={contactRequest} onSave={saveContact} />}
 
+          {mode === 'edit' && <BusinessEditProfileLinks action={{ category, primary_action: primaryAction, booking_url: bookingUrl, website, phone: phone?.fullNumber, email, location: address?.label || business?.location, lat: address?.lat, lng: address?.lng }} street={address?.addressLine1} town={address?.city || business?.city || business?.location || ''} hours={openingHours} shown={showOpeningHours} amenities={amenities} social={social} busy={partialStatus === 'saving'} requested={profileRequest} onSave={saveProfileLink} />}
+
+          {mode === 'create' && <>
           {/* 3. FACILITIES (category-aware) */}
           <FacilitiesSection
             category={category}
@@ -868,7 +782,7 @@ export default function BusinessProfileEditor() {
           />
 
           {/* 4. LOCATION & CONTACT */}
-          {mode === 'create' && <div ref={legacyFields}><LocationContactSection
+          {mode === 'create' && <div><LocationContactSection
             mode={mode}
             isClubLinked={isClubLinked}
             isGolfClub={isGolfClub}
@@ -901,7 +815,7 @@ export default function BusinessProfileEditor() {
           
 
           {/* 7. OPENING HOURS with master toggle */}
-          <div ref={legacyHours} className={mode === 'edit' ? 'be2-legacy-neutral' : undefined}><OpeningHoursSection
+          <div><OpeningHoursSection
             enabled={showOpeningHours}
             setEnabled={setShowOpeningHours}
             openingHours={openingHours}
@@ -922,7 +836,6 @@ export default function BusinessProfileEditor() {
             renders a line, never a dead slab. What SAVES is unchanged.
           */}
           <div className="px-4 pt-6 pb-2">
-            {mode === 'edit' && <Button type="button" variant="ghost" className="ep-saved be2-saved" data-state={partialStatus} aria-live="polite" onClick={() => { if (partialStatus === 'error') void partialRetry.current?.(); }}>{partialStatus === 'saving' ? 'Saving…' : partialStatus === 'error' ? "Couldn't save. Try again." : 'All changes saved'}</Button>}
               <button
                 onClick={handleSave}
                 disabled={!saveEnabled}
@@ -943,13 +856,13 @@ export default function BusinessProfileEditor() {
                   <>
                     <Loader2 size={18} className="animate-spin mr-2" /> Saving...
                   </>
-                ) : mode === 'create' ? (
-                  'Create business'
                 ) : (
-                  'Save changes'
+                  'Create business'
                 )}
               </button>
           </div>
+          </>}
+          {mode === 'edit' && <div className="be4-status"><Button type="button" variant="ghost" className="ep-saved be2-saved" data-state={partialStatus} aria-live="polite" onClick={() => { if (partialStatus === 'error') void partialRetry.current?.(); }}>{partialStatus === 'saving' ? 'Saving…' : partialStatus === 'error' ? "Couldn't save. Try again." : 'All changes saved'}</Button></div>}
 
         </div>
       </BusinessEditFrame>
@@ -959,7 +872,7 @@ export default function BusinessProfileEditor() {
       <BusinessOwnerlessNotice notice={ownerlessNotice} onDismiss={() => { const target = ownerlessNotice?.target; setOwnerlessNotice(null); if (target) navigate(target); }} />
 
       {/* Close confirm */}
-      <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
+      {mode === 'create' && <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Discard changes?</AlertDialogTitle>
@@ -977,7 +890,7 @@ export default function BusinessProfileEditor() {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog>}
 
       {/* Pin drop */}
       {mode === 'create' && <PinDropModal
