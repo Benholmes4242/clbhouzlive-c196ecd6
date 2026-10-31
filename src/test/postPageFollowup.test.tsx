@@ -48,7 +48,7 @@ describe('tag-sheet photo editor handoff', () => {
     function Handoff() {
       const [open, setOpen] = useState(true);
       const [editing, setEditing] = useState<string | null>(null);
-      const item = { id: 'photo-2', type: 'image' as const, previewUrl: 'https://example.test/photo.jpg' };
+      const item = { id: 'photo-2', type: 'image' as const, previewUrl: 'https://example.test/photo.jpg', frame: 'original' as const };
       return <>
         <ShotTagSheet open={open} item={item} courses={[{ id: 'c1', name: 'Sundridge Park', country: null }]}
           courseIndex={0} onCourseIndex={vi.fn()} holes={[1, 2, 7]} tag={{ hole: 7 }} onChoose={vi.fn()}
