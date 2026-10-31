@@ -1,4 +1,24 @@
 {
+  "rebuilt": {
+    "yourPlayers": "YOUR PLAYERS",
+    "followed": "{{count}} followed",
+    "leaderboard": "LEADERBOARD",
+    "placesSince": "▲▼ places since round {{round}}",
+    "roundThru": "ROUND {{round}} · THRU {{thru}}",
+    "fullScorecard": "Full scorecard ›",
+    "follow": "☆ Follow",
+    "following": "★ Following",
+    "playerPage": "Player page",
+    "followError": "Could not update your follow. Try again.",
+    "onCourse": "{{count}} of {{field}} on course",
+    "tied": "tied",
+    "shots": "shots",
+    "atTop": "AT THE TOP",
+    "lead": "{{name}}’S LEAD",
+    "fieldAverage": "FIELD AVG TODAY",
+    "lowToday": "LOW TODAY",
+    "players": "{{count}} players"
+  },
   "status": {
     "live": "ライブ",
     "upcoming": "まもなく",
