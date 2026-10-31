@@ -1,7 +1,8 @@
 # Roadmap
 
 ## Tour leaderboard rebuild
-- [ ] Confirm whole-field sr_scorecards coverage before hole-strip work; preserve hero board and all protected scoring/cut/guest rules.
+- [x] Source confirms whole-field sr_scorecards sync; tour_player_follows already typed; FullBoardSheet already shares BoardTable's column header.
+- [ ] STOP: preserve scoreColor.ts conflicts with explicit/mock over-par ink and level 0.55; existing helper returns over 0.62 and level 0.42. Await colour ruling; see TOUR_LEADERBOARD_REBUILD_STOP_REPORT.md. No app/test edits.
 - [ ] Rebuild event header, followed-player rows, board and matching FullBoardSheet; add inline rounds and follows.
 - [ ] Run targeted tests and full suite in shards against 4,972/500, reconcile all assertion changes, and capture four guest views at 390×844 beside the mock.
 
