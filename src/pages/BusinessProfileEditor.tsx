@@ -570,9 +570,7 @@ export default function BusinessProfileEditor() {
       setContactRequest(previous => ({ kind: key, serial: (previous?.serial ?? 0) + 1 })); return;
     }
     const section = key === 'hours' ? legacyHours.current : legacyFields.current;
-    const target = key === 'website' ? section?.querySelector<HTMLInputElement>('input[type=url]')
-      : key === 'phone' ? section?.querySelector<HTMLInputElement>('input[type=tel]')
-      : key === 'hours' ? section?.querySelector<HTMLElement>('[role=switch]')
+    const target = key === 'hours' ? section?.querySelector<HTMLElement>('[role=switch]')
       : section?.querySelector<HTMLElement>('input:not([type=hidden]), button');
     if (target) { scrollElementIntoView(target, { offset: 90, behavior: 'smooth' }); target.focus({ preventScroll: true }); }
   };
