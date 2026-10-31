@@ -1,5 +1,10 @@
 # Roadmap
 
+## BE1 — Edit business frame and Settings
+- [x] Reuse Edit profile frame for edit mode; preserve Profile save and departure, move Notifications, delete obsolete verification nudge.
+- [ ] STOP: Settings implemented; BE1 24 passed/1 failed at be1BusinessEditSettings.test.tsx:86:43, heading expected Verified but canonical badge produces Verified Verified. Full shards 4,761 passed/21 failed/4,782 across487; previous20 round-plot failures unchanged. No correction after failure; see BE1_REPORT.md.
+- [ ] Report prior round-plot test setup failures unchanged; guest tests out of scope. Member preview remains external_unmanaged.
+
 ## Round plot — Line and hole strip
 - [x] Implement measured-width net trace, gross strip, earned red and complete-card OUT/IN; preserve feat and taps.
 - [ ] STOP: session-once draw-on and 14 new cases implemented; full shards 4,737 passed/20 failed/4,757 total across486. Endpoint width spy fails jsdom; new observer stub cannot redefine ResizeObserver. No correction after failures; see ROUND_PLOT_LINE_STRIP_REPORT.md.

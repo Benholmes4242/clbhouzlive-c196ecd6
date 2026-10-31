@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BIZ } from '@/components/business/businessTokens';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { Button } from '@/components/ui/button';
 
 type ToggleDef = { key: string; label: string; help: string };
 
@@ -28,9 +29,11 @@ const TOGGLES: ToggleDef[] = [
 
 interface Props {
   businessId: string;
+  settingsAppearance?: boolean;
+  canManage?: boolean;
 }
 
-export function NotificationsSection({ businessId }: Props) {
+export function NotificationsSection({ businessId, settingsAppearance = false, canManage = true }: Props) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [muted, setMuted] = useState<Set<string>>(new Set());
@@ -56,6 +59,7 @@ export function NotificationsSection({ businessId }: Props) {
   }, [businessId]);
 
   const toggle = async (key: string) => {
+    if (!canManage || loading || saving) return;
     const next = new Set(muted);
     // "Enabled" UI means NOT in muted_types → toggling OFF adds it.
     const willMute = !next.has(key);
@@ -74,6 +78,20 @@ export function NotificationsSection({ businessId }: Props) {
       toast.error('Could not save notification preference');
     }
   };
+
+  if (settingsAppearance) return <>
+    <h2 className="ep-group">Notifications</h2>
+    <div className="ep-rows">
+      {TOGGLES.map((def, index) => <div key={def.key} className="ep-row be1-notification" data-readonly={!canManage}>
+        <span className="ep-row-value">{def.label}<span className="be1-small">{[
+          'Someone likes a post from this business', 'New comments and replies on your posts',
+          'Someone follows this business', 'This business is @-mentioned', 'New conversations and messages',
+        ][index]}</span></span>
+        <Button type="button" variant="ghost" role="switch" aria-label={def.label} aria-checked={!muted.has(def.key)} disabled={!canManage || loading || !!saving} className="bizc-switch" onClick={() => void toggle(def.key)}><i /></Button>
+      </div>)}
+    </div>
+    <p className="be1-note">{canManage ? 'These apply to every manager of this business, in the inbox and on push.' : 'Only owners and admins can change these. They apply to every manager, in the inbox and on push.'}</p>
+  </>;
 
   return (
     <SectionCard>

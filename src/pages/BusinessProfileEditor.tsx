@@ -59,9 +59,9 @@ import { FacilitiesSection } from '@/components/business/editor/FacilitiesSectio
 import { PrimaryActionSection } from '@/components/business/editor/PrimaryActionSection';
 import { BookingComingSoonSection } from '@/components/business/editor/BookingComingSoonSection';
 import { OpeningHoursSection } from '@/components/business/editor/OpeningHoursSection';
-import { VerificationNudgeSection } from '@/components/business/editor/VerificationNudgeSection';
 import { SocialSection } from '@/components/business/editor/SocialSection';
-import { NotificationsSection } from '@/components/business/editor/NotificationsSection';
+import { BusinessEditFrame } from '@/components/business/editor/BusinessEditFrame';
+import { BusinessEditSettings } from '@/components/business/editor/BusinessEditSettings';
 import { canEditBusinessProfile, protectBusinessPayload } from '@/components/business/editor/editorPermissions';
 import {
   DEFAULT_OPENING_HOURS,
@@ -102,7 +102,13 @@ export default function BusinessProfileEditor() {
   const { id } = useParams<{ id: string }>();
   const mode: Mode = id ? 'edit' : 'create';
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get('tab') === 'settings' ? 'settings' : 'profile';
+  const onTab = (value: 'profile' | 'settings') => {
+    const next = new URLSearchParams(searchParams);
+    if (value === 'profile') next.delete('tab'); else next.set('tab', value);
+    setSearchParams(next, { replace: true });
+  };
   const queryClient = useQueryClient();
   const { user, loading: authLoading } = useSupabaseSession();
 
@@ -674,10 +680,10 @@ export default function BusinessProfileEditor() {
   /* ── render ──────────────────────────────────────── */
   return (
     <>
-      <ManagePageShell
-        title={mode === 'create' ? 'Create a business' : 'Edit business'}
+      <BusinessEditFrame
+        editing={mode === 'edit'} tab={tab} onTab={onTab}
         onBack={handleClose}
-       
+        settings={mode === 'edit' && business ? <BusinessEditSettings business={business} role={membership?.role} userId={user?.id ?? ''} /> : null}
       >
         <div className="flex-1 overflow-y-auto" style={{ background: BIZ.pageBg }}>
 
@@ -849,12 +855,6 @@ export default function BusinessProfileEditor() {
           {/* 8. SOCIAL */}
           <SocialSection social={social} setSocial={setSocial} />
 
-          {mode === 'edit' && business?.id && !isEditor && (
-            <NotificationsSection businessId={business.id} />
-          )}
-
-          {/* 9. VERIFICATION NUDGE */}
-          {!isEditor && <VerificationNudgeSection />}
 
 
 
@@ -911,7 +911,7 @@ export default function BusinessProfileEditor() {
           </div>
 
         </div>
-      </ManagePageShell>
+      </BusinessEditFrame>
 
 
 
