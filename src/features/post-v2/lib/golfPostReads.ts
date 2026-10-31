@@ -15,6 +15,7 @@
  *   the two follow rows' created_at. Eight at most, never the poster.
  */
 import { supabase } from '@/integrations/supabase/client';
+import { searchMentionMembers } from '@/components/mentions/MentionsComposerInput';
 import { readHolePhotoExif } from '@/lib/courseMedia/holePhotoExif';
 import type { StageCourse } from '../hooks/useStageComposer';
 import { MAX_RECENT_COURSES, rankPlayedWith, roundCourseForDay, type WithCandidate } from './golfPostRules';
@@ -82,8 +83,7 @@ export async function searchMembers(q: string, selfId: string | null): Promise<W
   const query = q.trim();
   if (!query) return [];
   const like = `%${query.replace(/[%_]/g, (ch) => '\\' + ch)}%`;
-  const { data } = await supabase.from('user_profiles').select('id, display_name, username, profile_photo_url')
-    .or(`display_name.ilike.${like},username.ilike.${like},first_name.ilike.${like}`).eq('is_suspended', false).limit(8);
+  const { data } = await searchMentionMembers(like, 8);
   return (data ?? []).filter((u) => u.id !== selfId).map((u) => ({
     id: u.id, name: u.display_name || u.username || 'Golfer', avatarUrl: u.profile_photo_url ?? null, sameRound: false, lastInteraction: '',
   }));
