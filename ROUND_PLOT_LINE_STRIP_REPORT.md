@@ -1,4 +1,31 @@
-# Round plot line and hole strip — STOP report
+# Round plot line and hole strip — test setup complete
+
+## Final authorised setup correction — 31 October 2026
+
+**Targeted 68/68 across 7 files; full suite 4,783/4,783 across 487 files. Zero failures.**
+
+Only the approved fake-timer setup line in `src/test/roundPlotLineStrip.test.tsx` changed:
+```ts
+// Old
+vi.useFakeTimers();
+// New
+vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] });
+```
+This preserves the file's requestAnimationFrame/cancelAnimationFrame mocks and performance.now spy. Direct animation-frame assignment was not needed: the existing stubs work once fake timers stop replacing them. No assertion, expected value, app file, test name or case changed. `src/test/be1BusinessEditSettings.test.tsx`, `src/test/feedEndDot.test.tsx` and `src/test/setup.ts` were untouched.
+
+### Commands and reconciliation
+- `bunx vitest run src/test/roundPlotLineStrip.test.tsx src/test/roundTilePlot.test.tsx src/test/feedEndDot.test.tsx src/test/feedGrossDots.test.tsx src/test/feedRoundUnderParFill.test.tsx src/test/feedRoundNet.test.tsx src/test/roundPlotScale.test.ts --maxWorkers=2`: **68/68 across 7 files**.
+- `bunx vitest run --maxWorkers=2 --shard=1/2`: **2,360/2,360 across 244 files**.
+- `bunx vitest run --maxWorkers=2 --shard=2/2`: **2,423/2,423 across 243 files**.
+- Combined complete scope: **4,783/4,783 across 487 files**, no failures or remaining pre-existing failures.
+- Before/after this correction: **4,783 tests / 487 files**, unchanged; previous run was **4,779 passed / 4 failed**. Against the requested **4,782 / 487** baseline, the intervening **+1** is BE1.1's “inherits the app font without a font-family declaration in business-edit.css” in `src/test/be1BusinessEditSettings.test.tsx`. This brief added/removed/renamed/rewrote **zero tests**.
+- BE1 status only: **26/26 passed**, including the unchanged verified-title assertion and separate font test; no BE1 file edited here.
+
+The four pre-existing animation setup failures (“never draws before threshold and plays after the 120ms delay”, “renders a remounted round finished without replaying”, “finishes immediately with reduced motion”, “cancels pending animation on unmount”) all pass now. Their previous exact errors remain documented below. The animation/no-replay/tap regressions now execute successfully; authenticated member-preview proof remains unavailable as previously reported.
+
+Changed files in this final correction: `src/test/roundPlotLineStrip.test.tsx`, `ROUND_PLOT_LINE_STRIP_REPORT.md`, `roadmap.md`. Latest automatic preview validation: **build OK**, `2026-10-31T09:08:11Z`. No SQL, migrations, deployed RPC/edge changes, protected configuration edits, new negative tracking or publication.
+
+## Historical setup stops
 
 ## Approved setup-only rerun — 31 October 2026
 
