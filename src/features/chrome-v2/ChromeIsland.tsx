@@ -43,6 +43,8 @@ import { IndexGlance } from './IndexGlance';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ConnectGlance } from './ConnectGlance';
 import { ISLAND_GLASS } from '@/lib/tokens/glass';
+import { Button } from '@/components/ui/button';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useIsGuest } from '@/features/guest/useIsGuest';
 import { openGuestCard, surfaceForPath } from '@/features/guest/guestGateStore';
 import { GUEST_ISLAND_COPY } from '@/features/guest/guestCopy';
@@ -340,6 +342,7 @@ const HcpDivider: React.FC<{ color: string }> = ({ color }) => (
 );
 
 export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ tone, dividerColor }) => {
+  const navigate = useNavigate();
   const { user, loading: sessionLoading } = useSupabaseSession();
   const { activeActor } = useActiveActor();
   const isBusinessActor = activeActor?.type === 'business';
@@ -373,7 +376,7 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ 
   const body = (() => {
 
 
-    const disconnected = !hcp.connected;
+    const disconnected = !hcp.linked;
 
 
     if (disconnected) {
@@ -388,6 +391,14 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ 
         </button>
         {glanceOpen && <ConnectGlance onClose={() => setGlanceOpen(false)} anchorRef={indexButtonRef} userId={user.id} />}
       </>;
+    }
+
+    if (hcp.linked && !hcp.connected) {
+      return <Button variant="ghost" className="h-auto rounded-none p-0" onClick={() => navigate('/manage/handicap')} aria-label="Manage your handicap"
+        style={{ background: 'none', border: 'none', padding: 0, display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1, gap: 0 }}>
+        <span style={{ fontWeight: 700, fontSize: 16, color: A.MUTE, fontVariantNumeric: 'tabular-nums' }}>—</span>
+        <span style={{ fontWeight: 700, fontSize: 8.5, letterSpacing: '0.12em', color: tone === 'light' ? 'rgba(15,23,42,0.42)' : 'rgba(248,250,252,0.42)', marginTop: 3 }}>INDEX</span>
+      </Button>;
     }
 
     if (!trendData) return null;

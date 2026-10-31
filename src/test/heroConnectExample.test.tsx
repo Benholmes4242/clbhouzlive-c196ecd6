@@ -12,7 +12,7 @@ const f = vi.hoisted(() => ({
   decline: vi.fn(),
   navigate: vi.fn(),
   history: [] as Array<{ observed_at: string; handicap_index: number }>,
-  state: { connected: false, settled: true, connection: null, trend: null, anyError: false },
+  state: { linked: false, connected: false, settled: true, connection: null, trend: null, anyError: false },
 }));
 vi.mock('react-router-dom', async (importOriginal) => ({
   ...await importOriginal<typeof import('react-router-dom')>(),
@@ -47,7 +47,7 @@ const english = createInstance();
 void english.init({ lng: 'en', defaultNS: 'profile', resources: { en: { profile: profileEnglish } } });
 const t = english.getFixedT('en', 'profile');
 beforeEach(() => {
-  f.state = { connected: false, settled: true, connection: null, trend: null, anyError: false };
+  f.state = { linked: false, connected: false, settled: true, connection: null, trend: null, anyError: false };
   f.decline.mockReset().mockResolvedValue(undefined);
   f.navigate.mockReset();
   f.history = [];
@@ -120,6 +120,7 @@ describe('CE1 fixed connected example', () => {
     expect(panel()).not.toBeNull();
   });
   it('connected chart and index omit example handles and retain their analytics calls', () => {
+    f.state.linked = true;
     f.state.connected = true;
     f.history = [
       { observed_at: '2026-01-01', handicap_index: 42.7 },
@@ -146,6 +147,7 @@ describe('CE1 fixed connected example', () => {
     expect(panel()).toBeNull();
   });
   it('is absent for a connected member', () => {
+    f.state.linked = true;
     f.state.connected = true;
     render(hero());
     expect(panel()).toBeNull();

@@ -309,6 +309,10 @@
       "step4": "Comparing you to the field at each course"
     },
     "done": {
+      "headlineConnectedEmpty": "You're connected.",
+      "headlineIndexOnly": "Your index is here.",
+      "subConnectedEmpty": "England Golf has no handicap index or rounds on your record yet. Your first round will arrive here on its own.",
+      "subIndexOnly": "Your first round will arrive here on its own.",
       "kicker": "Connected",
       "headline": "Your record is all here.",
       "headlineYears": "{{years}} years of golf, all here.",

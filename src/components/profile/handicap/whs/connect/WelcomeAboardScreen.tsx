@@ -93,7 +93,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const ringSize = useRingSize(92, 78);
-  const { data: counts, isFetching: countsFetching } = useImportedCounts(connectionId);
+  const { data: counts, isFetching: countsFetching } = useImportedCounts(connectionId, { allowZero: true });
   const { data: history, isFetching: historyFetching } = useHandicapHistory(
     connectionId ?? undefined,
     'all',
@@ -156,15 +156,20 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
   /* The copy must not assert completion the member cannot see. While the
      figures are still landing the headline states what is happening. */
   const rounds = counts?.rounds ?? null;
+  const emptyRecord = rounds === 0;
   const headline = countersPending
     ? t('whsConnect.done.headlinePending')
+    : emptyRecord
+    ? t(handicapIndex == null ? 'whsConnect.done.headlineConnectedEmpty' : 'whsConnect.done.headlineIndexOnly')
     : rounds
     ? t('whsConnect.done.headlineRounds', { rounds })
     : years && years > 1
     ? t('whsConnect.done.headlineYears', { years })
     : t('whsConnect.done.headline');
 
-  const lead = countersPending ? t('whsConnect.done.subPending') : t('whsConnect.done.sub');
+  const lead = countersPending ? t('whsConnect.done.subPending') : emptyRecord
+    ? t(handicapIndex == null ? 'whsConnect.done.subConnectedEmpty' : 'whsConnect.done.subIndexOnly')
+    : t('whsConnect.done.sub');
 
   const par3 = breakdown?.par3 ?? null;
   const par4 = breakdown?.par4 ?? null;
@@ -195,7 +200,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
         />
 
         {/* a. THE INDEX. No card - the figure is the screen. */}
-        <div style={{ marginTop: 40 }}>
+        {(!emptyRecord || handicapIndex != null) && <div data-done-index="" style={{ marginTop: 40 }}>
           <div style={{ ...LABEL_LG, marginBottom: 12 }}>{t('whsConnect.done.indexLabel')}</div>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16 }}>
             <div style={HERO_FIG}>
@@ -221,15 +226,15 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
               </div>
             ) : null}
           </div>
-          {counts?.courses && sinceYear ? (
+          {!emptyRecord && counts?.courses && sinceYear ? (
             <div style={{ ...LABEL_LG, color: DIM, marginTop: 14 }}>
               {t('whsConnect.done.coursesSince', { courses: counts.courses, year: sinceYear })}
             </div>
           ) : null}
-        </div>
+        </div>}
 
         {/* b. WHERE YOUR SHOTS GO */}
-        {ringsReady ? (
+        {!emptyRecord && ringsReady ? (
           <div style={{ marginTop: 44 }}>
             <div style={{ ...LABEL_LG, marginBottom: 6 }}>{t('whsConnect.done.shotsLabel')}</div>
             <div style={{ ...CAPTION, color: MUTE, marginBottom: 22 }}>
@@ -251,7 +256,7 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
         ) : null}
 
         {/* STILL LANDING: the flag on each score flips after this screen mounts. */}
-        {breakdownLanding ? (
+        {!emptyRecord && breakdownLanding ? (
           <div style={{ marginTop: 44 }}>
             <div style={{ ...LABEL_LG, marginBottom: 10 }}>{t('whsConnect.done.shotsLabel')}</div>
             <div style={{ ...CAPTION, color: MUTE }}>{t('whsConnect.done.shotsLanding')}</div>
@@ -259,14 +264,14 @@ export const WelcomeAboardScreen: React.FC<Props> = ({
         ) : null}
 
         {/* GENUINELY THIN: one honest line. No empty rings, no zero bars. */}
-        {belowFloor ? (
+        {!emptyRecord && belowFloor ? (
           <div style={{ ...CAPTION, color: MUTE, marginTop: 44 }}>
             {t('whsConnect.done.floor')}
           </div>
         ) : null}
 
         {/* c. THE HOLES THAT COST MOST. White squares on SURFACE. */}
-        {holesReady ? (
+        {!emptyRecord && holesReady ? (
           <div style={{ marginTop: 44 }}>
             <div
               style={{

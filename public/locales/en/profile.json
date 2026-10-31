@@ -1,5 +1,7 @@
 {
   "hero": {
+    "linkedNoIndex": "Connected to {{provider}}. Your index and rounds appear here as soon as {{provider}} has them.",
+    "linkedManage": "{{provider}} ›",
     "handicapIndex": "Handicap index",
     "trendWindow": "12mo",
     "rounds": "Rounds",

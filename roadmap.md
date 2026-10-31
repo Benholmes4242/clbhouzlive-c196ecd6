@@ -1,5 +1,11 @@
 # Roadmap
 
+## Linked member with no index yet
+- [x] Add shared linked state; island/profile/Scores/empty owner Rounds invitations suppressed, index-connected rules preserved.
+- [x] Add no-index island/manage entry, shared owner explanation and zero-record completion; all12 locale files updated. Completion-only confirmed-zero count read preserves legacy callers.
+- [x] Targeted78/78; full shards4889 passed/1 pre-existing BE2 failure/4890 across494, +21 named tests/+4 files from4869. Existing fixture updates retain assertions; report LINKED_NO_INDEX_REPORT.md.
+- [ ] STOP: existing BE2 multiple /from your club/ match and BusinessProfileEditor.tsx573/574 TS2367 remain unchanged. Additional Edit profile completion invitation p.handicap!=null needs follow-up; no further app/test edits after stop. Ben verifies affected member phone; external_unmanaged prevents hosted checks.
+
 ## Tour hero 4(a) — Published player joins unblocked
 - [x] Rechecked fresh and uncached guest reads: R1 40/R2 40/R3 23 tee rows, zero nested links/resolved players in each; direct links HTTP200 []. Baddeley/Moore still zero-only placeholders. No rule changed; conditional draw-preserving proposal in TOUR_HERO_REFINEMENTS_REPORT.md.
 - [x] Audited all client/server readers; real 390×844 preview has blank R3 tee cells and absent leaders, no page errors.
