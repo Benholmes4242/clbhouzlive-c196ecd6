@@ -1,5 +1,10 @@
 # Roadmap
 
+## Tour leaderboard rebuild
+- [ ] Confirm whole-field sr_scorecards coverage before hole-strip work; preserve hero board and all protected scoring/cut/guest rules.
+- [ ] Rebuild event header, followed-player rows, board and matching FullBoardSheet; add inline rounds and follows.
+- [ ] Run targeted tests and full suite in shards against 4,972/500, reconcile all assertion changes, and capture four guest views at 390×844 beside the mock.
+
 ## Review suggestions — played courses only
 - [x] Confirmed cause: Royal Norwich post is business-actor; Sunningdale (Old) is personal. Posted now personal-only; played source (gam_round_stats, mapped golf_courses id) added ahead of posted; reason.played in all six locales. Suite 4,944/4,944 across 497 (+5, reconciled in REVIEW_SUGGESTIONS_PLAYED_REPORT.md). Ben's sheet now: Rochester & Cobham Park (played 4 Aug), Vale do Lobo Ocean (played 9 May).
 
