@@ -61,6 +61,10 @@ import { BookingComingSoonSection } from '@/components/business/editor/BookingCo
 import { OpeningHoursSection } from '@/components/business/editor/OpeningHoursSection';
 import { SocialSection } from '@/components/business/editor/SocialSection';
 import { BusinessEditFrame } from '@/components/business/editor/BusinessEditFrame';
+import { Button } from '@/components/ui/button';
+import { BusinessEditPreview, type BusinessIdentityField, type BusinessPhotoKind } from '@/components/business/editor/BusinessEditPreview';
+import { scrollElementIntoView } from '@/lib/getScrollParent';
+import type { BusinessCompletionKey } from '@/components/business/editor/businessCompletion';
 import { BusinessEditSettings } from '@/components/business/editor/BusinessEditSettings';
 import { canEditBusinessProfile, protectBusinessPayload } from '@/components/business/editor/editorPermissions';
 import {
@@ -170,6 +174,11 @@ export default function BusinessProfileEditor() {
 
   /* ── flow state ───────────────────────────────────── */
   const [saving, setSaving] = useState(false);
+  const [partialStatus, setPartialStatus] = useState<'saved' | 'saving' | 'error'>('saved');
+  const partialRetry = useRef<(() => Promise<boolean>) | null>(null);
+  const partialBusy = useRef(false);
+  const legacyFields = useRef<HTMLDivElement>(null);
+  const legacyHours = useRef<HTMLDivElement>(null);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   /* Ownerless-business notice: must be acknowledged, never times out. The
    * business id is the only way support can recover it. */
@@ -298,9 +307,9 @@ export default function BusinessProfileEditor() {
 
     // snapshot for dirty detection (stringify a stable subset)
     initialSnapshotRef.current = JSON.stringify({
-      n: business.name, d: business.description, fy: business.founded_year,
-      w: business.website, e: business.email, p: business.phone,
-      oh: business.opening_hours, sl, addr: business.address_label, loc: business.location,
+      n: business.name || '', d: business.description || '', fy: business.founded_year || null,
+      w: business.website || '', e: business.email || '', p: business.phone || null,
+      oh: business.opening_hours || { ...DEFAULT_OPENING_HOURS }, sl: { instagram: sl.instagram || '', tiktok: sl.tiktok || '', twitter: sl.twitter || '', facebook: sl.facebook || '', youtube: sl.youtube || '' }, addr: business.address_label || business.location || null, loc: business.address_label || business.location || null,
       am: business.amenities || [],
       pa: business.primary_action || null,
       soh: !!business.show_opening_hours,
@@ -499,8 +508,51 @@ export default function BusinessProfileEditor() {
 
   /* ── save: edit mode uses this hook (needs id) ───── */
   const { uploadLogo, removeLogo, uploadCover, removeCover } = useBusinessImageUpload(
-    mode === 'edit' ? id : undefined
+    mode === 'edit' ? id : undefined, mode === 'edit' ? { role: membership?.role } : undefined
   );
+
+  const invalidateBusiness = () => queryClient.invalidateQueries({ predicate: query => {
+    const key = query.queryKey[0];
+    return typeof key === 'string' && (key === 'my-businesses' || key === 'business-profile' || key === 'business-directory' || key === 'suggestedBusinesses' || key.startsWith('business-'));
+  } });
+  const runPartial = async (operation: () => Promise<void>): Promise<boolean> => {
+    if (partialBusy.current || !id || !user?.id || !canEditProfile) return false;
+    partialBusy.current = true; setPartialStatus('saving');
+    partialRetry.current = () => runPartial(operation);
+    try { await operation(); await invalidateBusiness(); setPartialStatus('saved'); partialRetry.current = null; return true; }
+    catch { setPartialStatus('error'); return false; }
+    finally { partialBusy.current = false; }
+  };
+  const saveIdentity = (key: BusinessIdentityField, value: string | number | null) => runPartial(async () => {
+    if (key === 'name' && (isClubLinked || isEditor)) throw new Error('Name is read-only');
+    const { error } = await supabase.from('business_accounts').update(protectBusinessPayload({ [key]: value }, membership?.role)).eq('id', id ?? '');
+    if (error) throw error;
+    if (initialSnapshotRef.current) {
+      const snapshot = JSON.parse(initialSnapshotRef.current);
+      snapshot[key === 'name' ? 'n' : key === 'description' ? 'd' : 'fy'] = value ?? (key === 'founded_year' ? null : '');
+      initialSnapshotRef.current = JSON.stringify(snapshot);
+    }
+    if (key === 'name') setBusinessName(String(value ?? ''));
+    else if (key === 'description') setDescription(String(value ?? ''));
+    else setFoundedYear(value == null ? '' : String(value));
+  });
+  const savePhoto = (kind: BusinessPhotoKind, file: File | null) => runPartial(async () => {
+    let url: string | null = null;
+    if (file) {
+      const result = await (kind === 'logo' ? uploadLogo(file) : uploadCover(file));
+      if (!result) throw new Error('Photo did not save');
+      url = result;
+    } else await (kind === 'logo' ? removeLogo() : removeCover());
+    (kind === 'logo' ? setLogo : setCover)({ ...emptyImage, url });
+  });
+  const focusLegacy = (key: BusinessCompletionKey) => {
+    const section = key === 'hours' ? legacyHours.current : legacyFields.current;
+    const target = key === 'website' ? section?.querySelector<HTMLInputElement>('input[type=url]')
+      : key === 'phone' ? section?.querySelector<HTMLInputElement>('input[type=tel]')
+      : key === 'hours' ? section?.querySelector<HTMLElement>('[role=switch]')
+      : section?.querySelector<HTMLElement>('input:not([type=hidden]), button');
+    if (target) { scrollElementIntoView(target, { offset: 90, behavior: 'smooth' }); target.focus({ preventScroll: true }); }
+  };
 
   const handleSave = useCallback(async () => {
     if (!user?.id) {
@@ -675,7 +727,7 @@ export default function BusinessProfileEditor() {
 
   /* ── save button enabled ─────────────────────────── */
   const saveEnabled =
-    isValid && !saving && (mode === 'create' ? true : isDirty);
+    isValid && !saving && partialStatus !== 'saving' && (mode === 'create' ? true : isDirty);
 
   /* ── render ──────────────────────────────────────── */
   return (
@@ -687,6 +739,9 @@ export default function BusinessProfileEditor() {
       >
         <div className="flex-1 overflow-y-auto" style={{ background: BIZ.pageBg }}>
 
+          {mode === 'edit' ? <BusinessEditPreview name={businessName} category={category} city={business?.city || business?.location || ''} primaryAction={(business?.primary_action as PrimaryActionKey | null) ?? null}
+            completion={{ logo: logo.url, cover: cover.url, description, foundedYear, lat: business?.lat, lng: business?.lng, phone: business?.phone || '', website: business?.website || '', showOpeningHours: !!business?.show_opening_hours, openingHours: business?.opening_hours || DEFAULT_OPENING_HOURS }}
+            clubLinked={isClubLinked} editor={isEditor} busy={partialStatus === 'saving'} onSave={saveIdentity} onPhoto={savePhoto} onFocusLegacy={focusLegacy} /> : <>
           {/* 1. HERO — cover + squircle logo at top (matches personal edit-v2) */}
           <div className="px-4 pt-2 pb-4">
             <div
@@ -745,6 +800,8 @@ export default function BusinessProfileEditor() {
             foundedYear={foundedYear}
             setFoundedYear={setFoundedYear}
           />
+
+          </>}
 
           {/* Inline notice — a claim for this club is already under review. */}
           {mode === 'create' && isGolfClub && selectedClub && !existingBusinessForClub && clubClaimPending && (
@@ -813,7 +870,7 @@ export default function BusinessProfileEditor() {
           />
 
           {/* 4. LOCATION & CONTACT */}
-          <LocationContactSection
+          <div ref={legacyFields} className={mode === 'edit' ? 'be2-legacy-neutral' : undefined}><LocationContactSection
             mode={mode}
             isClubLinked={isClubLinked}
             isGolfClub={isGolfClub}
@@ -839,19 +896,21 @@ export default function BusinessProfileEditor() {
             businessLocationFallback={business?.location ?? null}
           />
 
+          </div>
           {/* 5. PRIMARY BUTTON */}
           <PrimaryActionSection value={primaryAction} onChange={setPrimaryAction} />
 
           
 
           {/* 7. OPENING HOURS with master toggle */}
-          <OpeningHoursSection
+          <div ref={legacyHours} className={mode === 'edit' ? 'be2-legacy-neutral' : undefined}><OpeningHoursSection
             enabled={showOpeningHours}
             setEnabled={setShowOpeningHours}
             openingHours={openingHours}
             setOpeningHours={setOpeningHours}
           />
 
+          </div>
           {/* 8. SOCIAL */}
           <SocialSection social={social} setSocial={setSocial} />
 
@@ -865,7 +924,8 @@ export default function BusinessProfileEditor() {
             renders a line, never a dead slab. What SAVES is unchanged.
           */}
           <div className="px-4 pt-6 pb-2">
-            {mode === 'edit' && !isDirty && !saving ? (
+            {mode === 'edit' && <Button type="button" variant="ghost" className="ep-saved be2-saved" data-state={partialStatus} aria-live="polite" onClick={() => { if (partialStatus === 'error') void partialRetry.current?.(); }}>{partialStatus === 'saving' ? 'Saving…' : partialStatus === 'error' ? "Couldn't save. Try again." : 'All changes saved'}</Button>}
+            {false ? (
               <div
                 style={{
                   height: 22,
