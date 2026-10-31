@@ -69,6 +69,15 @@ import StageLoadingShell from './StageLoadingShell';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
 import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 import { STATUS_BAR_CANVAS } from '@/lib/tokens/surfaces';
+import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
+import { courseWalkHoles } from '@/lib/courseMedia/holeWalk';
+import { GolfShotStrip, ShotTagSheet, WhereSection, PlayedWithSection, FindSomeoneSheet, VisibilitySheet } from './components/golf/GolfPostSections';
+import { PostPreview, buildDraftFeedPost } from './components/golf/PostPreview';
+import { GP } from './components/golf/golfPageTokens';
+import { isHoleTag, roundReason, shareSubLine, toggleWith, visibilityLabel, type PostVisibility, type ShotTag, type WithCandidate } from './lib/golfPostRules';
+import { fetchPlayedWithSuggestions, fetchRecentCourses, findRoundCourse, firstCaptureDay, searchMembers } from './lib/golfPostReads';
+import { readPostWith, syncPostWith } from './lib/postWith';
+import { existingMediaUrl, existingTagFor, readExistingShotTags, rewriteExistingShotTag, type ExistingTags, type ShotTagChoice } from './lib/shotTagWrites';
 
 interface Props {
   onClose: () => void;
@@ -152,18 +161,43 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   // is unreliable in the WebView.
   const captionElRef = useRef<HTMLTextAreaElement | null>(null);
 
+  /* ---- THE POST PAGE, REBUILT AROUND GOLF ------------------------------
+     Per-photo tags, the course found from the photo date, Played with, Who
+     can see this and Preview. Rules: lib/golfPostRules.ts. */
+  const [shotTagMap, setShotTagMap] = useState<Record<string, ShotTagChoice>>({});
+  const [tagIndex, setTagIndex] = useState<number | null>(null);
+  const [tagCourseIdx, setTagCourseIdx] = useState(0);
+  const [courseReason, setCourseReason] = useState<string | null>(null);
+  const [whereChanging, setWhereChanging] = useState(false);
+  const [recentCourses, setRecentCourses] = useState<typeof state.courses>([]);
+  const [roundFind, setRoundFind] = useState<{ courseId: string; day: string } | null>(null);
+  const [withSuggestions, setWithSuggestions] = useState<WithCandidate[]>([]);
+  const [withTagged, setWithTagged] = useState<WithCandidate[]>([]);
+  const [visibility, setVisibility] = useState<PostVisibility>('anyone');
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [findOpen, setFindOpen] = useState(false);
+  const [visibilityOpen, setVisibilityOpen] = useState(false);
+  const initialVisibilityRef = useRef<PostVisibility>('anyone');
+  const initialWithIdsRef = useRef<string[]>([]);
+  const existingTagsRef = useRef<ExistingTags>({ holes: [], places: [] });
+  const initialExistingTagsRef = useRef<Record<string, ShotTag>>({});
+  /** A course the member chose is never overridden by the date lookup. */
+  const memberChoseCourseRef = useRef(false);
+  const roundLookupRef = useRef(false);
+
   // Fetch the post's status + scheduled_at (useEditablePost doesn't return them).
   useEffect(() => {
     if (!editPostId) return;
     let cancelled = false;
     supabase
       .from('posts')
-      .select('status, scheduled_at')
+      .select('status, scheduled_at, visibility')
       .eq('id', editPostId)
       .maybeSingle()
       .then(({ data }) => {
         if (cancelled) return;
-        const row = data as { status?: string | null; scheduled_at?: string | null } | null;
+        const row = data as { status?: string | null; scheduled_at?: string | null; visibility?: PostVisibility | null } | null;
+        if (row?.visibility) { setVisibility(row.visibility); initialVisibilityRef.current = row.visibility; }
         setEditStatus({
           status: row?.status ?? null,
           scheduledAt: row?.scheduled_at ?? null,
@@ -343,6 +377,105 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
 
   const active = state.media[state.activeIndex] ?? null;
 
+  /* ---- GOLF PAGE: derived values and reads ---------------------------- */
+  const shotTags = useMemo(() => Object.fromEntries(Object.entries(shotTagMap).map(([k, v]) => [k, v.tag])) as Record<string, ShotTag>, [shotTagMap]);
+  const tagCourse = state.courses[tagCourseIdx] ?? state.courses[0] ?? null;
+  const holeAnalysis = useCourseHoleAnalysis(tagCourse?.id);
+  const { tagHoles, tagPars } = useMemo(() => {
+    const walk = courseWalkHoles(holeAnalysis.data);
+    const holes = walk ? [...walk.holes].sort((a, b) => a.hole_no - b.hole_no) : [];
+    const pars = new Map<number, number>();
+    for (const h of holes) if (h.par > 0) pars.set(h.hole_no, h.par);
+    // No scored hole data: holes 1 to 18 without pars (Oct 24 rule).
+    return { tagHoles: holes.length ? holes.map((h) => h.hole_no) : Array.from({ length: 18 }, (_, i) => i + 1), tagPars: pars };
+  }, [holeAnalysis.data]);
+  const holeShotCount = state.media.filter((m) => isHoleTag(shotTags[m.id])).length;
+
+  /** Member course choice: never overridden; a new primary course clears photo tags. */
+  const chooseCourses = useCallback((list: typeof state.courses, reason: string | null = null) => {
+    memberChoseCourseRef.current = true;
+    if ((list[0]?.id ?? null) !== (state.courses[0]?.id ?? null)) { setShotTagMap({}); setTagCourseIdx(0); }
+    setCourseReason(reason);
+    setRoundFind(null);
+    setWhereChanging(false);
+    setCourses(list);
+  }, [setCourses, state.courses]);
+
+  // Recent-round courses for the WHERE fallback chips.
+  useEffect(() => {
+    if (!profile?.id) return;
+    let cancelled = false;
+    void fetchRecentCourses(profile.id).then((rows) => { if (!cancelled) setRecentCourses(rows); });
+    return () => { cancelled = true; };
+  }, [profile?.id]);
+
+  // THE COURSE FINDS ITSELF: first arrival, new posts only, never over a choice.
+  const coursesRef = useRef(state.courses);
+  coursesRef.current = state.courses;
+  useEffect(() => {
+    if (isEditMode || draftId || prefillCourse || !profile?.id || roundLookupRef.current) return;
+    if (state.media.length === 0) return;
+    roundLookupRef.current = true;
+    const userId = profile.id;
+    const first = state.media[0];
+    void (async () => {
+      const day = await firstCaptureDay(first);
+      if (!day) return;
+      const course = await findRoundCourse(userId, day);
+      if (!course || memberChoseCourseRef.current || coursesRef.current.length > 0) return;
+      setCourses([course]);
+      setCourseReason(roundReason(day));
+      setRoundFind({ courseId: course.id, day });
+    })();
+  }, [isEditMode, draftId, prefillCourse, profile?.id, state.media, setCourses]);
+
+  // Played with suggestions (re-ranked when a round course/day is found).
+  useEffect(() => {
+    if (!profile?.id) return;
+    let cancelled = false;
+    void fetchPlayedWithSuggestions(profile.id, roundFind).then((rows) => { if (!cancelled) setWithSuggestions(rows); });
+    return () => { cancelled = true; };
+  }, [profile?.id, roundFind]);
+
+  // Edit mode: the post's Played with rows and its media's existing tags.
+  const editHydratedGolfRef = useRef(false);
+  useEffect(() => {
+    if (!isEditMode || !hydrated || !editPostId || !profile?.id || editHydratedGolfRef.current) return;
+    editHydratedGolfRef.current = true;
+    const userId = profile.id;
+    void readPostWith([editPostId]).then((rows) => {
+      const people = rows.map((r) => ({ id: r.userId, name: r.name, avatarUrl: r.avatarUrl, sameRound: false, lastInteraction: '' }));
+      initialWithIdsRef.current = people.map((p) => p.id);
+      setWithTagged(people);
+    });
+    const course = state.courses[0];
+    const existing = state.media.filter((m) => m.existingId);
+    if (course && existing.length) {
+      void readExistingShotTags(course.id, userId, existing.map(existingMediaUrl)).then((tags) => {
+        existingTagsRef.current = tags;
+        const map: Record<string, ShotTagChoice> = {};
+        const initial: Record<string, ShotTag> = {};
+        for (const m of existing) {
+          const t = existingTagFor(existingMediaUrl(m), tags);
+          if (t) { map[m.id] = { tag: t, courseId: course.id, knownHoles: [] }; initial[m.id] = t; }
+        }
+        initialExistingTagsRef.current = initial;
+        setShotTagMap((cur) => ({ ...map, ...cur }));
+      });
+    }
+  }, [isEditMode, hydrated, editPostId, profile?.id, state.courses, state.media]);
+
+  const searchPeople = useCallback((q: string) => searchMembers(q, profile?.id ?? null), [profile?.id]);
+  const chooseShotTag = (itemId: string, tag: ShotTag | null) => {
+    setShotTagMap((cur) => {
+      const next = { ...cur };
+      if (!tag || !tagCourse) delete next[itemId];
+      else next[itemId] = { tag, courseId: tagCourse.id, knownHoles: tagHoles };
+      return next;
+    });
+    setTagIndex(null);
+  };
+
   // Refreshed every render so the unmount cleanup reads teardown values.
   abandonRef.current = {
     hasMedia: state.media.length > 0,
@@ -428,6 +561,14 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   const authorAvatar = activeActor?.avatarUrl ?? profile?.profile_photo_url ?? null;
   const authorUsername = activeActor?.slug ?? profile?.username ?? null;
 
+  const isPersonalActor = activeActor?.type !== 'business';
+  /** Tags for photos still to upload, carried by the upload job. */
+  const newShotTagJob = useCallback((items: typeof state.media) => {
+    const out: Record<string, ShotTagChoice> = {};
+    for (const m of items) if (!m.existingId && shotTagMap[m.id]) out[m.id] = shotTagMap[m.id];
+    return Object.keys(out).length ? { items: out } : undefined;
+  }, [shotTagMap]);
+
   const doCreate = async () => {
     if (!canSubmit || !activeActor) return;
     try {
@@ -443,6 +584,9 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
         authorName,
         authorAvatarUrl: authorAvatar,
         authorUsername,
+        visibility,
+        playedWith: isPersonalActor ? withTagged.map((p) => p.id) : [],
+        shotTags: newShotTagJob(state.media),
       });
       submittedRef.current = true;
       // A finished job is not a change of mind: the composer-flow step 1 must
@@ -477,6 +621,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
         content: state.caption?.length ? state.caption : null,
         course_id: state.course?.id ?? null,
         tagged_course_ids: state.courses.map((c) => c.id),
+        ...(visibility !== initialVisibilityRef.current ? { visibility } : {}),
 
       };
       // Only touch scheduled_at when the post is still scheduled.
@@ -547,12 +692,28 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
             scheduledAt: state.scheduledAt?.toISOString(),
             skipFinalize: true,
             displayOrderOffset: kept.length,
+            shotTags: newShotTagJob(newMedia),
           },
           newMedia,
         );
       }
 
+      // Played with: bring post_with to the chosen people (trigger notifies).
+      if (editable.data.actorType !== 'business') {
+        await syncPostWith(editPostId, editable.data.userId, initialWithIdsRef.current, withTagged.map((p) => p.id));
+      }
+      // Existing photos whose tag changed: remove the old, add the new.
+      if (state.course && profile?.id) {
+        for (const m of kept) {
+          const before = initialExistingTagsRef.current[m.id] ?? null;
+          const after = shotTags[m.id] ?? null;
+          if (JSON.stringify(before) === JSON.stringify(after)) continue;
+          await rewriteExistingShotTag(state.course.id, profile.id, tagHoles, m, after, existingTagsRef.current, editable.data.userId);
+        }
+      }
+
       // Invalidate common caches.
+      queryClient.invalidateQueries({ queryKey: ['post-golf-tags'] });
       queryClient.invalidateQueries({ queryKey: ['editable-post', editPostId] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       queryClient.invalidateQueries({ queryKey: ['feed'] });
@@ -579,7 +740,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
     } finally {
       setSaving(false);
     }
-  }, [editPostId, editable.data, state, saving, editStatus, removedExistingIds, queryClient, activeActor, mode]);
+  }, [editPostId, editable.data, state, saving, editStatus, removedExistingIds, queryClient, activeActor, mode, visibility, withTagged, shotTags, profile?.id, tagHoles, newShotTagJob]);
 
   const onPrimary = () => {
     if (isEditMode) return void doSaveEdit();
@@ -724,10 +885,28 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
         <CourseTagSheet
           open={sheet === 'course'}
           onClose={() => setSheet(null)}
-          onDone={setCourses}
+          onDone={(list) => chooseCourses(list)}
           selected={state.courses}
           userId={profile?.id ?? null}
         />
+        <ShotTagSheet
+          open={tagIndex !== null}
+          item={tagIndex !== null ? state.media[tagIndex] ?? null : null}
+          courses={state.courses}
+          courseIndex={tagCourseIdx}
+          onCourseIndex={setTagCourseIdx}
+          holes={tagHoles}
+          tag={tagIndex !== null ? shotTags[state.media[tagIndex]?.id] ?? null : null}
+          onChoose={(t) => { const it = tagIndex !== null ? state.media[tagIndex] : null; if (it) chooseShotTag(it.id, t); }}
+          onClose={() => setTagIndex(null)}
+        />
+        <FindSomeoneSheet
+          open={findOpen}
+          onClose={() => setFindOpen(false)}
+          search={searchPeople}
+          onPick={(p) => setWithTagged((cur) => cur.some((x) => x.id === p.id) ? cur : toggleWith(cur, p, profile?.id ?? null))}
+        />
+        <VisibilitySheet open={visibilityOpen} value={visibility} onChange={setVisibility} onClose={() => setVisibilityOpen(false)} />
         <ActorSheet open={sheet === 'actor'} onClose={() => setSheet(null)} onSelect={(a) => selectActor(a)} selectedId={activeActor?.id ?? null} />
   
         <ScheduleSheetV2
@@ -964,80 +1143,86 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
     </div>
   );
 
+  const openShot = (i: number) => {
+    setActiveIndex(i);
+    // A tagged course turns a tap into "What's in this shot?"; without one the
+    // tap keeps opening the photo editor exactly as before.
+    if (state.courses.length > 0) { setTagCourseIdx(0); setTagIndex(i); }
+    else setOpenMediaIndex(i);
+  };
+  const withNames = withTagged.map((p) => p.name.split(/\s+/)[0]);
+
+  const metaRow = (label: string, value: React.ReactNode, onClick: () => void, first: boolean) => (
+    <button type="button" onClick={onClick} style={{ ...page2RowStyle(!first), padding: '14px 16px' }}>
+      <span style={{ fontSize: 14.5, fontWeight: 600, color: GP.ink }}>{label}</span>
+      <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, color: GP.mute }}>{value}</span>
+      <ChevronRight size={14} color={GP.dim} style={{ marginLeft: 6, flex: 'none' }} />
+    </button>
+  );
+
   const tagAndDetails = (
     <>
-      {/* Tag a course — suggestion-first, Search is the fallback */}
-      <div style={{ background: PAGE2.panel, border: `1px solid ${PAGE2.line}`, borderRadius: 16, margin: '18px 16px 0', overflow: 'hidden' }}>
-        <div style={{ padding: '14px 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.tagCourse')}</span>
-            <button
-              onClick={() => { openDetail('course'); setSheet('course'); }}
-              style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, border: 0, background: 'transparent', color: PAGE2.ink, fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer' }}
-            >
-              {t('stage.search')}
-              <ChevronRight size={12} strokeWidth={2.5} />
+      <WhereSection
+        course={state.courses[0] ?? null}
+        reason={courseReason}
+        changing={whereChanging}
+        recent={recentCourses.filter((c) => c.id !== state.courses[0]?.id)}
+        onChange={() => setWhereChanging(true)}
+        onCancel={() => setWhereChanging(false)}
+        onUntag={() => chooseCourses(state.courses.slice(1))}
+        onSearch={() => { openDetail('course'); setSheet('course'); }}
+        onPick={(c) => chooseCourses([c, ...state.courses.filter((x) => x.id !== c.id && x.id !== state.courses[0]?.id)])}
+      />
+      {state.courses.length > 1 && (
+        <div style={{ display: 'flex', gap: 6, margin: '10px 16px 0', flexWrap: 'wrap' }}>
+          {state.courses.slice(1).map((c) => (
+            <button key={`tagged-${c.id}`} type="button" aria-label={t('stage.untag', { name: c.name })}
+              onClick={() => setCourses(state.courses.filter((x) => x.id !== c.id))}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${GP.line2}`, background: 'transparent', borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: GP.ink }}>
+              {c.name}<span style={{ fontSize: 13, opacity: 0.85 }}>×</span>
             </button>
-          </div>
-
-          {/* Tagging is SEARCH-ONLY (MICRO_BRIEF_POST_WIZARD_FIELDS §4): the
-              recent-rounds suggestion chips are gone. Only a course the
-              member actually chose renders here, and it stays removable. */}
-          {state.courses.length > 0 && (
-            <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
-              {state.courses.map((c) => (
-                <button
-                  key={`tagged-${c.id}`}
-                  onClick={() => setCourses(state.courses.filter((x) => x.id !== c.id))}
-                  aria-label={t('stage.untag', { name: c.name })}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${PAGE2.ink}`, background: PAGE2.ink, borderRadius: 999, padding: '8px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: PAGE2.canvas }}
-                >
-                  {c.name}
-                  <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.85 }}>×</span>
-                </button>
-              ))}
-            </div>
-          )}
+          ))}
         </div>
-      </div>
+      )}
+      {isPersonalActor && (
+        <PlayedWithSection
+          suggestions={withSuggestions}
+          tagged={withTagged}
+          onToggle={(p) => setWithTagged((cur) => toggleWith(cur, p, profile?.id ?? null))}
+          onFind={() => setFindOpen(true)}
+        />
+      )}
 
-      {/* Detail rows — Drafts appears only when drafts exist */}
-      <div style={{ background: PAGE2.panel, border: `1px solid ${PAGE2.line}`, borderRadius: 16, margin: '12px 16px 0', overflow: 'hidden' }}>
-        <button onClick={() => { openDetail('actor'); setSheet('actor'); }} style={page2RowStyle(false)}>
-          <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.postingAs')}</span>
-          <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 13, color: PAGE2.mute, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{authorName}</span>
-            <SquircleAvatar src={authorAvatar} alt={authorName} size={26} fallback={authorUsername?.[0]} hairlineRing ringColor={DARK_HAIRLINE} />
-          </span>
-          <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
-        </button>
-        {showScheduleRow && (
-          <button onClick={() => { openDetail('schedule'); setSheet('schedule'); }} style={page2RowStyle(true)}>
-            <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.scheduleForLater')}</span>
-            <span style={{ marginLeft: 'auto', fontSize: 13, color: state.scheduledAt ? PAGE2.ink : PAGE2.mute }}>
-              {state.scheduledAt ? state.scheduledAt.toLocaleString() : t('stage.off')}
-            </span>
-            <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
-          </button>
-        )}
-        {!isEditMode && drafts.drafts.length > 0 && (
-          <button onClick={() => setSheet('drafts')} style={page2RowStyle(true)}>
-            <span style={{ fontSize: 14.5, fontWeight: 700, color: PAGE2.ink }}>{t('stage.drafts')}</span>
-            <span style={{ marginLeft: 'auto', fontSize: 13, color: PAGE2.mute, fontVariantNumeric: 'tabular-nums' }}>{drafts.drafts.length}</span>
-            <ChevronRight size={14} color={PAGE2.dim} style={{ marginLeft: 6, flex: 'none' }} />
-          </button>
-        )}
+      <div data-testid="meta-panel" style={{ background: GP.panel, border: `1px solid ${GP.line}`, borderRadius: 16, margin: '18px 16px 0', overflow: 'hidden' }}>
+        {metaRow(t('stage.postingAs'), <>
+          <span style={{ maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{authorName}</span>
+          <SquircleAvatar src={authorAvatar} alt={authorName} size={26} fallback={authorUsername?.[0]} hairlineRing ringColor={DARK_HAIRLINE} />
+        </>, () => { openDetail('actor'); setSheet('actor'); }, true)}
+        {metaRow('Who can see this', visibilityLabel(visibility), () => setVisibilityOpen(true), false)}
+        {showScheduleRow && metaRow(t('stage.scheduleForLater'),
+          <span style={{ color: state.scheduledAt ? GP.ink : GP.mute }}>{state.scheduledAt ? state.scheduledAt.toLocaleString() : t('stage.off')}</span>,
+          () => { openDetail('schedule'); setSheet('schedule'); }, false)}
+        {!isEditMode && drafts.drafts.length > 0 && metaRow(t('stage.drafts'),
+          <span style={{ fontVariantNumeric: 'tabular-nums' }}>{drafts.drafts.length}</span>, () => setSheet('drafts'), false)}
       </div>
+      <div style={{ height: 24 }} />
     </>
   );
 
   // ---- STEP 2 — ONE SCREEN --------------------------------------------------
   return (
-    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: PAGE2.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: POST_COMPOSER_Z }}>
-      {/* THE SHARED HEADER, on both paths. No local counter: there is no
-          "1 / 2" or "2 / 2" text left in this file. */}
-      <div style={{ flex: 'none', paddingTop: 'max(env(safe-area-inset-top), 12px)' }}>
+    <div style={{ position: 'fixed', inset: 0, height: '100dvh', background: GP.canvas, display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: POST_COMPOSER_Z }}>
+      {/* THE SHARED HEADER, on both paths, with the page title and Preview
+          laid over it. No local counter. */}
+      <div style={{ flex: 'none', paddingTop: 'max(env(safe-area-inset-top), 12px)', position: 'relative' }}>
         <ComposerStepHeader step={1} total={1} left={leadingControl} onLeft={handleLeading} />
+        <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+          <span style={{ fontSize: 15, fontWeight: 700, color: GP.ink }}>{isEditMode ? 'Edit post' : 'New post'}</span>
+          <button type="button" onClick={() => setPreviewOpen(true)} disabled={!canSubmit}
+            style={{ position: 'absolute', right: 16, pointerEvents: 'auto', height: 32, padding: '0 14px', borderRadius: 999, border: `1px solid ${GP.line2}`, background: 'transparent', fontSize: 13, fontWeight: 700, color: GP.ink, cursor: 'pointer', opacity: canSubmit ? 1 : 0.4 }}>
+            Preview
+          </button>
+        </div>
       </div>
 
       <input ref={stageAddInputRef} type="file" accept="image/*,video/*" multiple hidden onChange={handleStageAddFiles} />
@@ -1045,125 +1230,53 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
       {emptyStage ? (
         /* EMPTY STATE keeps its original single-scroller layout. */
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '2px 0 16px', display: 'flex', flexDirection: 'column' }}>
-          {/* THE MEDIA RAIL. Nothing here auto-fires a picker: no effect opens a
-              file input on mount. That behaviour was deleted in August and must
-              not come back. */}
-          {/* Both inputs live HERE, each one anchored EXACTLY OVER ITS OWN
-              BUTTON so the iOS chooser menu opens from the control that was
-              tapped rather than over the footer. Do not consolidate them. */}
+          {/* Nothing here auto-fires a picker: no effect opens a file input on
+              mount. Both inputs are anchored EXACTLY OVER THEIR OWN BUTTON so
+              the iOS chooser opens from the control tapped. Do not consolidate. */}
             <div style={{ padding: '4px 16px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ position: 'relative' }}>
                 <button onClick={() => emptyLibraryInputRef.current?.click()} style={emptyPrimaryButtonStyle}>
                   {t('stage.chooseFromLibrary')}
                 </button>
-                <input
-                  ref={emptyLibraryInputRef}
-                  type="file"
-                  accept="image/*,video/*"
-                  multiple
-                  onChange={handleStageAddFiles}
-                  tabIndex={-1}
-                  aria-hidden="true"
-                  style={anchoredInputStyle}
-                />
+                <input ref={emptyLibraryInputRef} type="file" accept="image/*,video/*" multiple onChange={handleStageAddFiles} tabIndex={-1} aria-hidden="true" style={anchoredInputStyle} />
               </div>
               <div style={{ position: 'relative' }}>
                 <button onClick={() => emptyCameraInputRef.current?.click()} style={emptySecondaryButtonStyle}>
                   {t('stage.takePhotoOrVideo')}
                 </button>
-                <input
-                  ref={emptyCameraInputRef}
-                  type="file"
-                  accept="image/*,video/*"
-                  capture="environment"
-                  onChange={handleStageAddFiles}
-                  tabIndex={-1}
-                  aria-hidden="true"
-                  style={anchoredInputStyle}
-                />
+                <input ref={emptyCameraInputRef} type="file" accept="image/*,video/*" capture="environment" onChange={handleStageAddFiles} tabIndex={-1} aria-hidden="true" style={anchoredInputStyle} />
               </div>
             </div>
           <div style={{ padding: '10px 16px 0' }}>
-            <CaptionField
-              value={state.caption}
-              onChange={handleSetCaption}
-              currentUserId={profile?.id ?? null}
-              variant="dark"
-              minHeight={96}
-              placeholder={t('stage.captionPlaceholder')}
-              autoFocus={!isEditMode}
-              inputRef={(el) => { captionElRef.current = el; }}
-            />
+            <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} variant="dark" minHeight={96}
+              placeholder={t('stage.captionPlaceholder')} autoFocus={!isEditMode} inputRef={(el) => { captionElRef.current = el; }} />
             <div style={{ fontSize: 11, color: PAGE2.dim, marginTop: 2 }}>{t('stage.mentionHint')}</div>
           </div>
           {tagAndDetails}
         </div>
       ) : (
-        <>
-          {/* BAND 1 — FIXED. THE MEDIA RAIL. Nothing here auto-fires a picker: no
-              effect opens a file input on mount. That behaviour was deleted in
-              August and must not come back. */}
-          <div style={{ flex: 'none', paddingTop: 2 }}>
-            <div style={{ display: 'flex', gap: 6, padding: '2px 16px 0', overflowX: 'auto' }}>
-              {state.media.map((m, i) => (
-                <button
-                  key={m.id}
-                  onClick={() => { setActiveIndex(i); setOpenMediaIndex(i); }}
-                  aria-label={t('stage.editItem', { n: i + 1 })}
-                  style={{ position: 'relative', width: 72, height: 72, borderRadius: 10, overflow: 'hidden', flex: 'none', border: `1px solid ${PAGE2.line}`, padding: 0, background: PAGE2.panel, cursor: 'pointer' }}
-                >
-                  <SlideThumb item={m} glyph={20} />
-                </button>
-              ))}
-              <button
-                onClick={handleStageAdd}
-                aria-label={t('stage.addMedia')}
-                style={{ width: 72, height: 72, borderRadius: 10, flex: 'none', border: `1px dashed ${PAGE2.dim}`, background: 'transparent', color: PAGE2.mute, fontSize: 18, cursor: 'pointer' }}
-              >+</button>
-            </div>
-            <div style={{ padding: '6px 18px 0', fontSize: 11, color: PAGE2.dim }}>{t('stage.tapToEdit')}</div>
+        /* ONE SCROLLER: strip, hole line, caption, Where, Played with, meta. */
+        <div data-testid="golf-page" style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <GolfShotStrip media={state.media} tags={shotTags} courseName={state.courses[0]?.name ?? null} onTap={openShot} onAdd={handleStageAdd} />
+          <div style={{ padding: '14px 16px 0' }}>
+            <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} variant="dark" minHeight={60}
+              placeholder={t('stage.captionPlaceholder')} autoFocus={!isEditMode} inputRef={(el) => { captionElRef.current = el; }} />
+            <div style={{ fontSize: 11.5, color: GP.dim, marginTop: 2 }}>{t('stage.mentionHint')}</div>
           </div>
-
-          {/* BAND 2 — THE ONLY SCROLLER. The caption grows; this band scrolls and
-              absorbs all viewport loss (keyboard included). */}
-          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '10px 16px 0' }}>
-          <CaptionField
-            value={state.caption}
-            onChange={handleSetCaption}
-            currentUserId={profile?.id ?? null}
-            variant="dark"
-            minHeight={96}
-            placeholder={t('stage.captionPlaceholder')}
-            autoFocus={!isEditMode}
-            inputRef={(el) => { captionElRef.current = el; }}
-          />
-          </div>
-
-          {/* BAND 3 — FIXED. Mention hint, Tag a course, detail rows. */}
-          <div style={{ flex: 'none', paddingBottom: 16 }}>
-            <div style={{ fontSize: 11, color: PAGE2.dim, padding: '2px 16px 0' }}>{t('stage.mentionHint')}</div>
-            {tagAndDetails}
-          </div>
-        </>
+          {tagAndDetails}
+        </div>
       )}
 
-
-      {/* Share */}
-      <div style={{ flex: 'none', background: PAGE2.canvas, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
+      {/* SHARE — 54px pill and its sub-line. */}
+      <div style={{ flex: 'none', background: GP.canvas, borderTop: `1px solid ${GP.line}`, padding: '10px 16px max(env(safe-area-inset-bottom), 14px)' }}>
         <button
           onClick={onPrimary}
           disabled={!canSubmit}
           style={{
-            width: '100%',
-            padding: '14px 20px',
-            borderRadius: 999,
-            border: 'none',
-            /* CAPS ACTION. */
-            fontSize: 13,
-            fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.10em',
-            background: canSubmit ? PAGE2.ink : inkWithAlpha(SURFACE.dark.ink, 0.1),
-            color: canSubmit ? PAGE2.canvas : PAGE2.dim,
+            width: '100%', height: 54, borderRadius: 999, border: 'none',
+            fontSize: 15, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.14em',
+            background: canSubmit ? GP.ink : inkWithAlpha(SURFACE.dark.ink, 0.1),
+            color: canSubmit ? GP.onInk : PAGE2.dim,
             cursor: canSubmit ? 'pointer' : 'not-allowed',
           }}
         >
@@ -1171,8 +1284,24 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
             ? <Loader2 size={16} className="animate-spin" style={{ display: 'block', margin: '0 auto' }} />
             : primaryLabel}
         </button>
+        <div data-testid="share-sub" style={{ textAlign: 'center', fontSize: 11.5, color: GP.dim, marginTop: 8 }}>
+          {shareSubLine(isPersonalActor ? withNames : [], holeShotCount)}
+        </div>
       </div>
 
+      {profile?.id && (
+        <PostPreview
+          open={previewOpen}
+          onBack={() => setPreviewOpen(false)}
+          post={buildDraftFeedPost({
+            caption: state.caption, media: state.media, course: state.courses[0] ?? null, userId: profile.id,
+            actor: { id: activeActor?.id ?? profile.id, type: activeActor?.type === 'business' ? 'business' : 'personal', name: authorName, avatarUrl: authorAvatar, username: authorUsername },
+          })}
+          tags={shotTags}
+          pars={tagPars}
+          withPeople={isPersonalActor ? withTagged : []}
+        />
+      )}
       {mediaSheet}
       {sheets}
     </div>

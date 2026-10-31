@@ -9465,6 +9465,46 @@ export type Database = {
           },
         ]
       }
+      post_with: {
+        Row: {
+          created_at: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_with_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_with_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "review_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "post_with_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           achievement_badge_id: string | null

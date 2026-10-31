@@ -70,6 +70,17 @@ interface RichSuggestion extends SuggestionDataItem {
   kind: 'user' | 'business';
 }
 
+/** The member half of @mention search. Shared with the post page's
+ * "Find someone" (members only, no businesses) so both search one way. */
+export function searchMentionMembers(like: string, limit = 6) {
+  return supabase
+    .from('user_profiles')
+    .select('id, display_name, username, profile_photo_url, is_verified')
+    .or(`display_name.ilike.${like},username.ilike.${like},first_name.ilike.${like}`)
+    .eq('is_suspended', false)
+    .limit(limit);
+}
+
 async function searchMentions(
   query: string,
   render: (data: SuggestionDataItem[]) => void,
@@ -83,12 +94,7 @@ async function searchMentions(
   const like = `%${q.replace(/[%_]/g, ch => '\\' + ch)}%`;
   try {
     const [users, businesses] = await Promise.all([
-      supabase
-        .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, is_verified')
-        .or(`display_name.ilike.${like},username.ilike.${like},first_name.ilike.${like}`)
-        .eq('is_suspended', false)
-        .limit(6),
+      searchMentionMembers(like),
       supabase
         .from('business_accounts')
         .select('id, name, logo_url, is_verified, city, country')

@@ -13,11 +13,9 @@
  *   That consequence is deliberate: signing would touch every render path in
  *   the app to protect something nothing currently relies on, and clbhouz is a
  *   photo-sharing golf app.
- * - There has never been a member-facing visibility picker. Every post is
- *   created with 'anyone' (usePostSubmit.ts), so no member has ever been
- *   offered an alternative or promised that a file is private. The one
- *   followers-only row in the base came from create_round_posts, not from a
- *   member choosing anything.
+ * - The post page's "Who can see this" row (golf post page brief) chooses
+ *   the post's visibility for THE FEED only. Its copy must never promise a
+ *   private file: files stay at bare permanent urls whatever is chosen.
  * - RLS on post_media therefore only ever gated METADATA, not files. The
  *   blanket public-read policy was dropped to stop anonymous ENUMERATION of
  *   every url in one request, and to stop a future exif column publishing
@@ -47,6 +45,7 @@ import { derivePosterUrl } from '@/uploads/posterUrl';
 import { trackError } from '@/lib/errorTracking';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import type { StageMediaItem } from '../hooks/useStageComposer';
+import { writeShotTagAfterUpload, type ShotTagJob } from './shotTagWrites';
 
 export interface UploadJobContext {
   jobId: string;
@@ -64,6 +63,9 @@ export interface UploadJobContext {
   skipFinalize?: boolean;
   /** Continue numbering post_media.display_order from this offset (edit adds). */
   displayOrderOffset?: number;
+  /** Per-photo course tags, written when each item's upload completes
+   *  (see shotTagWrites.ts). Rides the job so it survives the composer. */
+  shotTags?: ShotTagJob;
 }
 
 export type UploadJobPhase = 'running' | 'complete' | 'failed';
@@ -215,6 +217,7 @@ async function runImage(job: InternalJob, item: StageMediaItem, displayOrder: nu
     height: compressed.height ?? null,
     studio_edits: { frame: item.frame, crop: item.crop ?? null },
   });
+  await writeShotTagAfterUpload(ctx.shotTags, ctx.userId, item, { url: result.publicUrl });
 
   uploadEventBus.emit('file:upload-complete', {
     type: 'file:upload-complete',
@@ -293,6 +296,7 @@ async function runVideo(job: InternalJob, item: StageMediaItem, displayOrder: nu
     poster_url: posterUrl,
     studio_edits: { frame: item.frame, crop: item.crop ?? null },
   });
+  await writeShotTagAfterUpload(ctx.shotTags, ctx.userId, item, { streamId });
 
   uploadEventBus.emit('file:upload-complete', {
     type: 'file:upload-complete',

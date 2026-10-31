@@ -23,6 +23,7 @@ import { onLentLaneReturned } from '@/video/fullscreenVerticalWarm';
 import { dropUnresolvedRounds } from '@/components/feed/dropUnresolvedRounds';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
+import { usePostGolfTags } from '@/hooks/feed/usePostGolfTags';
 import { Virtuoso } from 'react-virtuoso';
 import type { CommentOpenSource } from '@/types/commentOpenSource';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -155,6 +156,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
    */
   const feedPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
   const commentPreview = useFeedCommentPreview(feedPostIds, 'posts:cards');
+  // ONE batch for Played with + per-slide course tags.
+  const golfTags = usePostGolfTags(posts, 'posts:cards');
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [playingIdx, setPlayingIdx] = useState(0);
@@ -644,6 +647,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
                 layout={layout}
                 commentPreviewEnabled
                 commentPreview={commentPreview.map.get(post.id) ?? null}
+                playedWith={golfTags.withByPost.get(post.id)}
+                slideTags={golfTags.slideTags}
               />
             )}
           </LightItemGate>
@@ -679,6 +684,7 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       roundMedalMap,
       roundCourseMeta,
       commentPreview.map,
+      golfTags,
     ],
   );
 

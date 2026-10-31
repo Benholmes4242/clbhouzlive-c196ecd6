@@ -41,6 +41,7 @@ import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted,
 import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 
 import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
+import { usePostGolfTags } from '@/hooks/feed/usePostGolfTags';
 import { FeedCard } from './FeedCard';
 import type { PostRound } from '@/hooks/feed/usePostRounds';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
@@ -310,6 +311,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   // ONE comments_v2 read per loaded page for the inline comment preview.
   const feedPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
   const commentPreview = useFeedCommentPreview(feedPostIds, 'clubhouse:cards');
+  // ONE batch for Played with + per-slide course tags.
+  const golfTags = usePostGolfTags(posts, 'clubhouse:cards');
 
   /* SECTION E: derived, never spliced. Recomputed whenever the loaded array
      changes, so a later page containing a recent post moves the divider down
@@ -990,6 +993,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                 featuredDecisions={featuredDecisions}
                 commentPreviewEnabled
                 commentPreview={commentPreview.map.get(post.id) ?? null}
+                playedWith={golfTags.withByPost.get(post.id)}
+                slideTags={golfTags.slideTags}
                 homeRoundPlot={homeRoundPlot}
               />
             )}
@@ -1040,6 +1045,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       homeRails,
       homeRoundPlot,
       commentPreview.map,
+      golfTags,
       dividerIndex,
 
     ],
