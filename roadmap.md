@@ -1,5 +1,10 @@
 # Roadmap
 
+## Tour hero 4(a) — Published player joins unblocked
+- [ ] Recheck Mexico Open nested player counts through the preview guest session; inspect Saturday handover without discarding real draw players or inventing statuses.
+- [ ] Capture real tee-filled hero and pre-round leaders at 390×844 beside reference; audit all tee-player reader surfaces.
+- [ ] Run full shards against 4,828, reconcile intervening BE3 tests and report existing failures separately; no unrelated fixes.
+
 ## BE3 — Business Where and Contact
 - [x] Implement edit-only immediate address/contact sheets, GB resolution, precise postcodes, neutral note, white map pin and chip routing; club Map pin hidden per ruling, create retained. BE3 41/41.
 - [ ] STOP: BE2 club Name query be2BusinessPreview.test.tsx:76:263 finds both required from-your-club labels; BusinessProfileEditor.tsx:573/574 TS2367 unreachable website/phone legacy comparisons. No fixes after failure. Targeted139/140; full4868 passed/1 failed/4869 across490, +41 BE3; no unhandled errors. BE3_REPORT.md records diff/assertions. Preview not build-clean; hosted member persistence unavailable external_unmanaged.
