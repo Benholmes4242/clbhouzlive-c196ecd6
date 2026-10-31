@@ -14,9 +14,9 @@ export interface ImportedCounts {
  * A null result means "not readable yet" - the caller must render the
  * still-importing state, NEVER a zero.
  */
-export function useImportedCounts(connectionId: string | null | undefined) {
+export function useImportedCounts(connectionId: string | null | undefined, options?: { allowZero?: boolean }) {
   return useQuery<ImportedCounts | null>({
-    queryKey: ['whs-imported-counts', connectionId],
+    queryKey: options?.allowZero ? ['whs-imported-counts', connectionId, 'including-zero'] : ['whs-imported-counts', connectionId],
     enabled: !!connectionId,
     refetchInterval: (q) => (q.state.data ? false : 2500),
     queryFn: async () => {
@@ -32,7 +32,9 @@ export function useImportedCounts(connectionId: string | null | undefined) {
       if (!row) return null;
       // bigints arrive as strings over PostgREST - coerce before rendering.
       const rounds = Number(row.rounds ?? 0);
-      if (rounds === 0) return null;
+      // Completion can show a confirmed empty record; legacy polling callers
+      // retain their null-on-zero behavior and independent cache shape.
+      if (rounds === 0 && !options?.allowZero) return null;
       return {
         rounds,
         courses: Number(row.courses ?? 0),

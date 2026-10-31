@@ -13,6 +13,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
+import { LinkedHandicapNotice } from '../hero/LinkedHandicapNotice';
+import { Button } from '@/components/ui/button';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { CHART } from '@/components/profile/handicap/whs/charts/tokens';
 import { MEMBER_CELL } from '@/lib/tokens/surfaces';
@@ -58,6 +61,7 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, own
   const navigate = useNavigate();
   const { data: rounds = [], isLoading } = useProfileRounds(userId);
   const { data: ownVisibility } = useOwnHandicapVisibility(userId, isOwnProfile);
+  const chip = useHandicapChipState(isOwnProfile ? userId : undefined);
   const [sort, setSort] = React.useState<Sort>('recent');
   const [showAll, setShowAll] = React.useState(false);
   const [openId, setOpenId] = React.useState<string | null>(null);
@@ -77,6 +81,10 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, own
 
   if (rounds.length === 0) {
     if (!isOwnProfile) return null;
+    if (!chip.settled) return null;
+    if (chip.linked) return <div style={{ padding: '24px 20px 32px', fontFamily: SANS }}>
+      <LinkedHandicapNotice provider={chip.connection?.provider} />
+    </div>;
     return (
       <div style={{ padding: '24px 20px 32px', fontFamily: SANS }}>
         <div style={{ fontSize: 16, fontWeight: 700, color: CHART.INK }}>

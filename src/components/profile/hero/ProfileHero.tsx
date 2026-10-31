@@ -34,6 +34,7 @@ import { HeroPill } from './HeroShell';
 import { ProfileCoverBand } from './ProfileCoverBand';
 import { HeroHandicapDisplay } from './HeroHandicapDisplay';
 import { HeroConnectExample } from './HeroConnectExample';
+import { LinkedHandicapNotice } from './LinkedHandicapNotice';
 
 const GREEN = INDEX_DELTA.dark.improved;
 const RED = INDEX_DELTA.dark.drifted;
@@ -346,7 +347,8 @@ export const ProfileHero: React.FC<Props> = ({
   const badgesCount = figures.isFetched && figures.data ? figures.data.badges : null;
 
   const showIndexBlocks = chip.settled && chip.connected;
-  const showConnectCard = chip.settled && !chip.connected && isSelf && !hideConnectPrompt;
+  const showConnectCard = chip.settled && !chip.linked && !chip.connected && isSelf && !hideConnectPrompt;
+  const showLinkedNotice = chip.settled && chip.linked && !chip.connected && isSelf;
 
   const counters: Array<{ key: HeroStat; label: string; value: number | null; state?: 'ok' | 'loading' | 'error' }> = [];
   if (isSelf) counters.push({ key: 'rounds', label: t('hero.rounds', 'Rounds'), value: roundsCount, state: roundsCountState });
@@ -425,7 +427,7 @@ export const ProfileHero: React.FC<Props> = ({
 
         {actionsRow && <ActionsRow>{actionsRow}</ActionsRow>}
 
-        {(showIndexBlocks || showConnectCard) && <div style={{ height: 1, background: A.SOFT, marginTop: 14 }} />}
+        {(showIndexBlocks || showConnectCard || showLinkedNotice) && <div style={{ height: 1, background: A.SOFT, marginTop: 14 }} />}
 
         {showIndexBlocks && (
           <HeroHandicapDisplay
@@ -439,6 +441,7 @@ export const ProfileHero: React.FC<Props> = ({
         )}
 
         {showConnectCard && <HeroConnectExample t={t} onConnect={onConnect} />}
+        {showLinkedNotice && <LinkedHandicapNotice provider={chip.connection?.provider} />}
 
         {counters.length > 0 && (
           <div

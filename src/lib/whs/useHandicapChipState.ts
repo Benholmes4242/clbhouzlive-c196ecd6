@@ -5,11 +5,9 @@ import { useHandicapTrend, useWhsConnection } from './hooks';
  * "Connect HCP" chip and any surface that invites the member to connect can
  * never disagree.
  *
- * The predicate is the one the header chip has always used: a live
- * whs_connections row AND a readable current index. A connection with no index
- * yet is NOT connected for display purposes - that is the state the chip has
- * always treated as disconnected, and two surfaces disagreeing about it is
- * exactly the fault this hook exists to prevent.
+ * `linked` means the live row returned by useWhsConnection (deleted rows are
+ * excluded by its reader). Invitations use !linked; index displays continue
+ * to use `connected`: a live row AND a readable current index.
  *
  * SETTLED IS NOT "NOT LOADING" (see useWhsConnection). Both reads are disabled
  * until their input resolves, so callers must gate on `settled` and render
@@ -18,6 +16,7 @@ import { useHandicapTrend, useWhsConnection } from './hooks';
  * mirroring the chip.
  */
 export interface HandicapChipState {
+  linked: boolean;
   connected: boolean;
   settled: boolean;
   connection: ReturnType<typeof useWhsConnection>['data'];
@@ -31,7 +30,8 @@ export function useHandicapChipState(userId: string | undefined): HandicapChipSt
 
   const anyError = connError || trendError;
   const settled = anyError || (!!userId && connFetched && (!connection || trendFetched));
-  const connected = !!connection && trend?.current != null;
+  const linked = !!connection;
+  const connected = linked && trend?.current != null;
 
-  return { connected, settled, connection, trend, anyError };
+  return { linked, connected, settled, connection, trend, anyError };
 }

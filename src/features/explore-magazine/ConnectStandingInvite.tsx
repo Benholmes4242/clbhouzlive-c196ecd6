@@ -16,7 +16,7 @@ import { StandingShelf } from './StandingShelf';
  * NEVER appears on All, and it appears at most once on the page because the
  * standing slot itself appears at most once.
  *
- * CONNECTED IS DECIDED BY useHandicapChipState — the same predicate the header's
+ * LINKED IS DECIDED BY useHandicapChipState — the same predicate the header's
  * "Connect HCP" chip uses — so the chip and this invitation can never disagree.
  * While that read is unsettled the slot renders NOTHING: not a shell, because a
  * shell here would be a claim about which of two surfaces is coming.
@@ -39,6 +39,7 @@ export function ScoresStandingSlot({
 
   if (!state.settled) return null;
   if (state.connected) return <StandingShelf viewerId={viewerId} pos={pos} />;
+  if (state.linked) return null;
   return <ConnectStandingInvite pos={pos} />;
 }
 
