@@ -1,5 +1,8 @@
 # Roadmap
 
+## Review suggestions — played courses only
+- [x] Confirmed cause: Royal Norwich post is business-actor; Sunningdale (Old) is personal. Posted now personal-only; played source (gam_round_stats, mapped golf_courses id) added ahead of posted; reason.played in all six locales. Suite 4,944/4,944 across 497 (+5, reconciled in REVIEW_SUGGESTIONS_PLAYED_REPORT.md). Ben's sheet now: Rochester & Cobham Park (played 4 Aug), Vale do Lobo Ocean (played 9 May).
+
 ## Round plot — interrupted draw-on
 - [x] Confirm start-time replay guard cause; commit session identity only on completed draw, resetting interrupted head dot.
 - [x] Five regressions added; targeted73/73 and full shards2420+2519=4939/4939 across497, +5 over4934/497; automatic build OK13:40:22Z.
