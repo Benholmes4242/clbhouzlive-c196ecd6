@@ -27,7 +27,7 @@ vi.mock('@/components/profile/edit-v2/HeaderPhotoCard', () => ({ HeaderPhotoCard
 vi.mock('@/components/profile/edit-v2/ProfilePhotoCard', () => ({ ProfilePhotoCard: () => null }));
 vi.mock('@/components/profile/edit-v2/CoverGuidance', () => ({ CoverGuidance: () => null }));
 vi.mock('@/components/business/editor/IdentitySection', () => ({ IdentitySection: ({ businessName, setBusinessName }: { businessName: string; setBusinessName: (s: string) => void }) => <input aria-label="Business name" value={businessName} onChange={e => setBusinessName(e.target.value)} /> }));
-vi.mock('@/components/business/editor/LocationContactSection', () => ({ LocationContactSection: () => null }));
+vi.mock('@/components/business/editor/LocationContactSection', () => ({ LocationContactSection: ({ website, setWebsite }: { website: string; setWebsite: (value: string) => void }) => <input aria-label="Website" value={website} onChange={event => setWebsite(event.target.value)} /> }));
 vi.mock('@/components/business/editor/FacilitiesSection', () => ({ FacilitiesSection: () => null }));
 vi.mock('@/components/business/editor/PrimaryActionSection', () => ({ PrimaryActionSection: () => null }));
 vi.mock('@/components/business/editor/OpeningHoursSection', () => ({ OpeningHoursSection: () => null }));
@@ -73,12 +73,10 @@ describe('BE1 business editor Settings', () => {
     expect(profile?.textContent).not.toContain('Notifications'); expect(profile?.textContent).not.toContain('Get verified');
   });
   it('preserves unsaved changes and the existing back guard across tabs', () => {
-    editor('/business/b1/edit'); fireEvent.click(screen.getByRole('button', { name: /^Name / })); fireEvent.change(screen.getByRole('textbox', { name: 'Business name' }), { target: { value: 'Changed' } });
+    editor('/business/b1/edit'); fireEvent.change(screen.getByRole('textbox', { name: 'Website' }), { target: { value: 'https://changed.test' } });
     fireEvent.click(screen.getByRole('tab', { name: 'Settings' })); fireEvent.click(screen.getByRole('tab', { name: 'Profile' }));
-    expect(screen.getByRole('textbox', { name: 'Business name' })).toHaveValue('Changed');
-    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
-    expect(screen.queryByRole('alertdialog', { name: 'Discard changes?' })).toBeNull();
+    expect(screen.getByRole('textbox', { name: 'Website' })).toHaveValue('https://changed.test'); fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    expect(screen.getByRole('alertdialog', { name: 'Discard changes?' })).toBeInTheDocument();
   });
   for (const [status, title, body, pill] of [
     ['none', 'Not verified yet', 'Verified businesses carry the badge next to their name and unlock Insights.', 'Start verification'],
