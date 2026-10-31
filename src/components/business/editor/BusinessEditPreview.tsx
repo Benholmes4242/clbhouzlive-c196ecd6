@@ -9,7 +9,8 @@ import { BizcSheet } from '@/features/business-create/BusinessCreateStep3';
 import { WelcomeCropper } from '@/features/onboarding/WelcomeCropper';
 import { ABOUT_LIMIT, foundedYearError } from '@/features/business-create/step4Rules';
 import { BUSINESS_COVER_ASPECT } from '@/lib/tokens/coverAspect';
-import { PRIMARY_ACTION_OPTIONS, type PrimaryActionKey } from './editorTypes';
+import { type PrimaryActionKey } from './editorTypes';
+import { businessSecondPill, type SecondInput } from '@/lib/business/businessHero';
 import { businessCompletion, type BusinessCompletionInput, type BusinessCompletionKey } from './businessCompletion';
 import { toast } from '@/lib/toast';
 
@@ -17,6 +18,7 @@ export type BusinessIdentityField = 'name' | 'description' | 'founded_year';
 export type BusinessPhotoKind = 'logo' | 'cover';
 interface Props {
   name: string; category: string; city: string; primaryAction: PrimaryActionKey | null;
+  actionData?: SecondInput;
   completion: BusinessCompletionInput; clubLinked: boolean; editor: boolean; busy: boolean;
   onSave: (key: BusinessIdentityField, value: string | number | null) => Promise<boolean>;
   onPhoto: (kind: BusinessPhotoKind, file: File | null) => Promise<boolean>;
@@ -32,7 +34,7 @@ export function BusinessEditPreview(props: Props) {
   useEffect(() => { const url = crop?.url; return () => { if (url) URL.revokeObjectURL(url); }; }, [crop?.url]);
   const result = businessCompletion(completion);
   const label = category;
-  const actionLabel = PRIMARY_ACTION_OPTIONS.find(option => option.key === primaryAction)?.label;
+  const actionLabel = businessSecondPill({ category, primary_action: primaryAction, website: completion.website, phone: completion.phone, lat: completion.lat, lng: completion.lng, ...props.actionData }, (_key, fallback) => fallback)?.label;
   const open = (key: BusinessCompletionKey | 'name') => {
     if (busy) return;
     if (['address', 'phone', 'website', 'hours'].includes(key)) { props.onFocusLegacy(key as BusinessCompletionKey); return; }

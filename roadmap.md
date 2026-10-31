@@ -1,5 +1,10 @@
 # Roadmap
 
+## BE4 — Business Profile and Links
+- [x] Replace edit-only legacy sections with Main button, Hours, Facilities and Socials sheets; canonical preview and final saved status. Remove edit dirty/save/departure blocks, preserve create; BE1–BE3 all pass with reported authorized retargets.
+- [ ] STOP: new BE4 `Add a logo opens a sheet` document-wide query matches two buttons at be4BusinessProfileLinks.test.tsx:54:431. Full 4,914 passed/1 failed/4,915 across496 (+22 BE4/+1 from4,893/495). No pre-existing failures or unhandled errors; two unsupported exact options removed only for mandatory compiler cleanliness, not to fix ambiguity.
+- [ ] Await authorized failing-query correction; finish missing value/line/status coverage and visual check, then remove BE1–BE3 reports only after all pass. Hosted member persistence unavailable external_unmanaged. See BE4_REPORT.md.
+
 ## Linked-without-index wording amendment
 - [x] Update Profile, zero-round/no-index Done and Manage messages in English in every locale; preserve index-present wording and provider naming.
 - [x] Targeted 22/22; full suite 4,893/4,893 across 495, +3 named Manage branch tests/+1 file from 4,890/494. Report updated; authenticated member verification unavailable external_unmanaged, Ben checks affected phone.

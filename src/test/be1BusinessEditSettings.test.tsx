@@ -72,11 +72,12 @@ describe('BE1 business editor Settings', () => {
     expect(profile).not.toBeNull(); expect(screen.getByRole('button', { name: /^Name / })).toBeInTheDocument();
     expect(profile?.textContent).not.toContain('Notifications'); expect(profile?.textContent).not.toContain('Get verified');
   });
-  it('preserves unsaved changes and the existing back guard across tabs', () => {
-    editor('/business/b1/edit'); fireEvent.change(screen.getByRole('textbox', { name: 'Facilities' }), { target: { value: 'Practice green' } });
+  it('preserves immediately saved facilities across tabs and leaves without a discard guard', async () => {
+    editor('/business/b1/edit'); fireEvent.click(screen.getByRole('button', { name: /^Facilities / })); fireEvent.click(screen.getByRole('button', { name: 'Parking' })); fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+    await waitFor(() => expect(screen.queryByTestId('be4-profile-sheet')).toBeNull());
     fireEvent.click(screen.getByRole('tab', { name: 'Settings' })); fireEvent.click(screen.getByRole('tab', { name: 'Profile' }));
-    expect(screen.getByRole('textbox', { name: 'Facilities' })).toHaveValue('Practice green'); fireEvent.click(screen.getByRole('button', { name: 'Back' }));
-    expect(screen.getByRole('alertdialog', { name: 'Discard changes?' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Facilities Parking' })).toBeInTheDocument(); fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    expect(screen.queryByRole('alertdialog', { name: 'Discard changes?' })).toBeNull(); expect(screen.getByTestId('location')).toHaveTextContent('/business/b1');
   });
   for (const [status, title, body, pill] of [
     ['none', 'Not verified yet', 'Verified businesses carry the badge next to their name and unlock Insights.', 'Start verification'],
