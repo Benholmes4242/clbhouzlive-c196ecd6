@@ -1,5 +1,6 @@
 /** BE2 owns edit-only preview, completion and sheet drafts. Parent alone saves
- * fields/media and advances the dirty baseline; creation keeps its old shell. */
+ * fields/media and advances the dirty baseline; creation keeps its old shell.
+ * Edit identity prints stored categories, never creation-picker display labels. */
 import { useEffect, useRef, useState } from 'react';
 import { ChevronRight, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,6 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BizcSheet } from '@/features/business-create/BusinessCreateStep3';
 import { WelcomeCropper } from '@/features/onboarding/WelcomeCropper';
 import { ABOUT_LIMIT, foundedYearError } from '@/features/business-create/step4Rules';
-import { categoryDisplayLabel } from '@/features/business-create/createRules';
 import { BUSINESS_COVER_ASPECT } from '@/lib/tokens/coverAspect';
 import { PRIMARY_ACTION_OPTIONS, type PrimaryActionKey } from './editorTypes';
 import { businessCompletion, type BusinessCompletionInput, type BusinessCompletionKey } from './businessCompletion';
@@ -31,7 +31,7 @@ export function BusinessEditPreview(props: Props) {
   const coverInput = useRef<HTMLInputElement>(null);
   useEffect(() => { const url = crop?.url; return () => { if (url) URL.revokeObjectURL(url); }; }, [crop?.url]);
   const result = businessCompletion(completion);
-  const label = categoryDisplayLabel(category) ?? category;
+  const label = category;
   const actionLabel = PRIMARY_ACTION_OPTIONS.find(option => option.key === primaryAction)?.label;
   const open = (key: BusinessCompletionKey | 'name') => {
     if (busy) return;

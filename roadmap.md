@@ -1,6 +1,7 @@
 # Roadmap
 
 ## BE2 — Business preview and Business rows
+- [ ] BE2.1: use stored category labels; authorise URL/crop-name test setup, add editor-photo protection and completed-card absence tests; run full suite against 4,814/488 (expected 4,816/488) and update BE2_REPORT.md.
 - [x] Implement edit-only preview/completion/sheets and immediate protected saves with baseline synchronisation; create/lower form retained. About helper wraps per ruling.
 - [ ] STOP: BE2 28/31; category label expected Other but reused helper returns Something else; two crop tests blocked by missing URL.createObjectURL. Full4811 passed/3 failed/4814 across488 plus2 unhandled errors; no correction after failure. BE1 26/26 and round-plot20/20 pass. See BE2_REPORT.md; live visual/persistence unavailable.
 
