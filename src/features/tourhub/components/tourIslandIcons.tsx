@@ -8,7 +8,9 @@ import React from 'react';
 
 type PathSpec = ['circle', { cx: number; cy: number; r: number }] | ['rect', { x: number; y: number; width: number; height: number; rx: number }] | ['path', string];
 
-export const TOUR_ICON_PATHS: Record<string, PathSpec[]> = {
+// `satisfies` (not a Record annotation) keeps the literal keys, so
+// TourIconName is a real union and an unknown name fails to compile.
+export const TOUR_ICON_PATHS = {
   globe: [['circle', { cx: 12, cy: 12, r: 9 }], ['path', 'M3 12h18'], ['path', 'M12 3a14 14 0 0 1 0 18'], ['path', 'M12 3a14 14 0 0 0 0 18']],
   down: [['path', 'm6 9 6 6 6-6']],
   check: [['path', 'M20 6 9 17l-5-5']],

@@ -41,7 +41,7 @@ function SubTabTourControl({ activeTab, onOpen }: { activeTab: string; onOpen: (
       }}
     >
       <span>{d.label}</span>
-      <TourIcon n="chev" s={11.4} c="rgba(248,250,252,0.42)" w={2.2} />
+      <TourIcon n="down" s={11.4} c="rgba(248,250,252,0.42)" w={2.2} />
     </button>
   );
 }
