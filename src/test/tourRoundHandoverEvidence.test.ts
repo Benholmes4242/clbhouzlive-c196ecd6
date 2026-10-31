@@ -4,48 +4,57 @@ import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import type { TeeGroup } from '@/features/tourhub/tournament-v2/data/useTeeTimesAll';
 
 const finished: BoardEntry = { id: 'novak-row', player: { id: 'novak', full_name: 'Andrew Novak' }, position: 1, score: -14, round_1: -4, round_2: -10, today: -10, today_round: 2, thru: 18 };
-const placeholder = (id: string, name: string): BoardEntry => ({ id: `${id}-row`, player: { id, full_name: name }, score: 0, position: null, thru: null, status: null, today: null, today_round: null, round_1: null, round_2: null, round_3: null, round_4: null });
-const baddeley = placeholder('baddeley', 'Aaron Baddeley');
-const moore = placeholder('moore', 'Taylor Moore');
+const placeholder = (id: string): BoardEntry => ({ id: `${id}-row`, player: { id, full_name: id }, score: 0, position: null, thru: null, status: null, today: null, today_round: null, round_1: null, round_2: null, round_3: null, round_4: null });
+const baddeley = placeholder('Aaron Baddeley'), moore = placeholder('Taylor Moore');
 const draw = (ids: string[], teeTime = '2026-10-30T19:24:00Z'): TeeGroup => ({ teeTime, startingHole: 1, players: ids.map(id => ({ id, name: id })) });
-const baseDraw = [draw(['novak'])];
-const shown = (entries: BoardEntry[], groups = baseDraw) => leadersShownRound(2, groups, allLeaders(entries), entries, [1, 2, 3], 4);
+const baseDraw = [draw(['novak'])], nextDraw = [draw(['novak'], '2026-10-31T17:51:00Z')];
+const shown = (entries: BoardEntry[], groups = baseDraw, next = nextDraw, rounds = [1, 2, 3]) => leadersShownRound(2, groups, allLeaders(entries), entries, rounds, 4, next);
 
-describe('Tour 4(a) draw-preserving completion evidence', () => {
-  it('Saturday Baddeley and Moore zero-only placeholders do not block the Round 3 pre-tee group', () => {
+describe('Tour 4(a) revised leaders-only handover', () => {
+  it('Saturday finished R2 leaders hand over to the published R3 group despite Baddeley and Moore in other real draw groups', () => {
     const entries = [finished, baddeley, moore];
-    const snapshot = structuredClone(entries);
+    const groups = [...baseDraw, draw(['Aaron Baddeley', 'Taylor Moore'])];
+    const snapshot = structuredClone({ entries, groups });
     expect(leadersBaseRound(allLeaders(entries), 3)).toBe(2);
-    expect(shown(entries)).toBe(3);
-    const nextDraw = [draw(['novak'], '2026-10-31T17:51:00Z')];
+    expect(shown(entries, groups)).toBe(3);
     const selected = pickLeadersGroup(nextDraw, allLeaders(entries), entries, 3);
     expect(selected).toBe(nextDraw[0]);
     if (!selected) throw new Error('Expected the published Round 3 group');
     expect(groupState(selected, entries, 3)).toBe('before');
-    expect(entries).toEqual(snapshot);
+    expect({ entries, groups }).toEqual(snapshot);
   });
-  it('preserves an evidence-free real draw player as a handover blocker', () => {
-    expect(shown([finished, baddeley, moore], [draw(['novak', 'baddeley', 'moore'])])).toBe(2);
+  it('Friday finished R2 group stays Finished before the R3 draw exists', () => {
+    expect(shown([finished], baseDraw, [], [1, 2])).toBe(2);
+    expect(groupState(baseDraw[0], [finished], 2)).toBe('finished');
   });
-  it('preserves a real draw player without any leaderboard row', () => {
+  it('early PGA R2 draw never advances an unfinished R1 leaders group', () => {
+    const playing = { ...finished, round_1: null, round_2: null, today_round: 1, today: -2, thru: 12 };
+    expect(leadersShownRound(1, baseDraw, allLeaders([playing]), [playing], [1, 2], 4, nextDraw)).toBe(1);
+  });
+  it('leader still on course in R2 prevents handover despite a published R3 draw', () => {
+    expect(shown([{ ...finished, round_2: null, thru: 12 }])).toBe(2);
+  });
+  it.each(['MC', 'CUT', 'WD', 'DQ'])('a %s inside the leaders group counts as complete', status => {
+    const member = { ...baddeley, status };
+    expect(shown([finished, member], [draw(['novak', 'Aaron Baddeley'])])).toBe(3);
+    expect(member.status).toBe(status);
+  });
+  it('a zero-valued round N card completes the group even with a stale partial thru', () => {
+    expect(shown([{ ...finished, round_2: 0, today: 0, thru: 3 }])).toBe(3);
+  });
+  it('round-scoped thru 18 completes the group without a round card', () => {
+    expect(shown([{ ...finished, round_2: null, thru: 18 }])).toBe(3);
+  });
+  it('stale earlier-round thru 18 never completes the base round', () => {
+    expect(shown([{ ...finished, round_2: null, today_round: 1, thru: 18 }])).toBe(2);
+  });
+  it('an unknown member within the selected leaders group still blocks handover', () => {
     expect(shown([finished], [draw(['novak', 'missing'])])).toBe(2);
   });
-  it.each([
-    ['zero round card', { round_1: 0 }],
-    ['position', { position: 42 }],
-    ['zero thru value', { thru: 0 }],
-    ['positive thru value', { thru: 1 }],
-  ] as const)('leaderboard-only %s evidence joins the completion check even without a total score', (_name, evidence) => {
-    const participant = { ...baddeley, score: null, ...evidence };
-    expect(shown([finished, participant])).toBe(2);
-    expect(shown([finished, { ...participant, round_2: 0, today: 0, today_round: 2, thru: 18 }])).toBe(3);
+  it('next draw without a current position-1 leader does not advance', () => {
+    expect(shown([finished], baseDraw, [draw(['other'])])).toBe(2);
   });
-  it.each(['CUT', 'MC', 'WD', 'DQ', 'MDF', 'DNS'])('canonical terminal %s retains the existing exemption without inventing status', status => {
-    const participant = { ...baddeley, status };
-    expect(shown([finished, participant], [draw(['novak', 'baddeley'])])).toBe(3);
-    expect(participant.status).toBe(status);
-  });
-  it('COMPLETE is evidence, not an invented finished round card', () => {
-    expect(shown([finished, { ...baddeley, status: 'COMPLETE' }])).toBe(2);
+  it('never skips an unpublished N+1 round to a later draw', () => {
+    expect(shown([finished], baseDraw, nextDraw, [1, 2, 4])).toBe(2);
   });
 });

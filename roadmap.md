@@ -1,9 +1,11 @@
 # Roadmap
 
 ## Two follow-ups — linked invitation and Tour 4(a)
-- [ ] Suppress Edit profile completion invitation using the live link; add regressions and final shared-chip consumer audit.
-- [ ] Apply approved draw-preserving play-evidence completion rule; test Baddeley/Moore placeholders and real draw blockers.
-- [ ] Recheck guest player joins and capture real tee-filled board/pre-round group at 390×844 if readable; run full shards against 4,915/496 and report BE2 status only.
+- [x] Suppress remaining completionRules.ts invitation using editor's live linked input; EP5 39/39 and final five-file/six-call shared-chip consumer audit in LINKED_NO_INDEX_REPORT.md.
+- [x] Guest joins populated R1 121/R2 123/R3 68; real tee-filled hero captured 390×844. Baddeley/Moore confirmed in actual R1/R2 draws, no status invented.
+- [x] Initial full-field/evidence edit full shards 4,932/4,932 across497 (+3 EP5/+14 Tour/+1 file over4,915/496); BE2 33/33, no unhandled errors. Superseded by revised 13:13 leaders-only rule.
+- [x] Revised leaders-only production selection and next-draw membership implemented; automatic build OK13:15:19Z; revised 14-case rule tests all pass.
+- [ ] STOP: cb58LeadersGroup.test.tsx:74:92 `AssertionError: expected 1 to be 2 // Object.is equality`. Fixture selects unfinished d/e group with two leaders rather than finished group with one; expected advance is incorrect. Await authorization; no post-failure correction. Revised targeted100/101; revised full shards and R3 pre-tee visual proof pending. See TOUR_HERO_REFINEMENTS_REPORT.md.
 
 ## BE4 — Business Profile and Links
 - [x] Replace edit-only legacy sections with Main button, Hours, Facilities and Socials sheets; canonical preview and final saved status. Remove edit dirty/save/departure blocks, preserve create; BE1–BE3 all pass with reported authorized retargets.

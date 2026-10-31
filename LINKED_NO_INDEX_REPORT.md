@@ -1,5 +1,19 @@
 # Linked, no index yet — implemented states, verification stop
 
+## Remaining editor invitation — 31 October 2026 follow-up
+The remaining invitation was `src/features/edit-profile/completionRules.ts:10` (now line 12): `done: p.handicap != null`. It now reads `done: p.linked ?? (p.handicap != null)`. The canonical editor at `src/pages/EditProfile.tsx:149` explicitly supplies `linked: !!whs` from its existing live connection read; therefore its invitation is missing only for `!linked`, independently of a manual/current index. Optional-input fallback preserves standalone legacy cards. Coach eligibility still requires a display index. Loading/error suppression is unchanged.
+
+Final production `useHandicapChipState` consumers (five files, six calls):
+- `ChromeIsland.tsx:356`, HcpCell: settled/error and hide-chip checks first; `!linked` invites, `linked && !connected` opens management, `connected` shows real index/glance.
+- `ProfileHero.tsx:183–184`: owner `settled && !linked` invites; `settled && linked && !connected` shows notice; `settled && connected` shows real index blocks. Visitor comparison separately uses `viewerChip.connected` and its non-null current trend.
+- `ProfileRoundsTab.tsx:61`: empty own history waits for settlement; linked shows provider notice, !linked invites.
+- `ConnectStandingInvite.tsx:38`, ScoresStandingSlot: unsettled returns null; connected shows StandingShelf; linked/no-index returns null; only remaining !linked state invites.
+- `ManageScreen.tsx:86`: `linked && settled && !anyError && trend.current == null` selects no-index empty-record explanation; present index retains existing body.
+The editor itself reuses `useWhsConnection`, not an additional shared-chip consumer.
+
+Added three tests in `ep5Completion.test.tsx`: `live link completes handicap even with no index, without making coach applicable`; `an unlinked manual index does not complete the live connection action`; `editor suppresses its connection chip for a live link with no index or rounds`. Hook fixture now exposes a resettable connection; existing assertions retained. File inventory 36 → 39.
+Initial follow-up full shards passed 2,419 + 2,513 = 4,932/4,932 across 497 files, no unhandled errors. Latest revised Tour targeted run retains EP5 39/39 but has one new Tour failure; see TOUR_HERO_REFINEMENTS_REPORT.md. Historical BE2 club-lock failure passed 33/33 in the full suite, untouched here. No authenticated member check available (`external_unmanaged`).
+
 ## Result and limits
 Added linked independently of index-connected. Island no-index management, owner profile notice, empty owner Rounds invitation suppression, Scores invitation suppression and zero-round done states are implemented. No SQL, migrations, deployed functions/RPCs, feed_config, cap or native changes. No new negative letter-spacing.
 
