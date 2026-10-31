@@ -2,8 +2,9 @@
  * scheduled current_round rollover. Historical round cells are completed cards
  * (live sync's roundCell gate), so scope stale top-level TODAY/THRU before
  * calling the board's own todayFromEntry/thruLabel. No input is mutated.
- * Tour 4(a) revised: only the selected leaders' base-round group gates
- * handover. Every member needs that round's card, scoped 18/F or MC/CUT/WD/DQ;
+ * Tour 4(a): every current leader (every position-1 player, wherever they are
+ * in the draw), and every other player in the selected leaders' group, must
+ * have completed round N: its card, scoped 18/F or MC/CUT/WD/DQ;
  * the immediately next published draw must contain a current position-1 leader.
  * Other field rows never gate this section. Draws themselves are never filtered.
  */
@@ -74,7 +75,8 @@ export function leadersShownRound(baseRound: number, groups: TeeGroup[], leaders
   const next = baseRound + 1;
   const group = pickLeadersGroup(groups, leaders, entries, baseRound);
   if (!group || next > totalRounds || !drawnRounds.includes(next) || candidateGroups(nextGroups, leaders).length === 0) return baseRound;
-  const groupComplete = group.players.length > 0 && group.players.every(player => {
+  const completionPlayers = [...group.players, ...leaders.map(leader => ({ id: leader.player?.id ?? null }))];
+  const groupComplete = group.players.length > 0 && completionPlayers.every(player => {
     const raw = entries.find(entry => player.id != null && entry.player?.id === player.id);
     if (!raw) return false;
     if (['MC', 'CUT', 'WD', 'DQ'].includes(raw.status?.trim().toUpperCase() ?? '')) return true;

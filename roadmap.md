@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Two follow-ups — linked invitation and Tour 4(a)
+- [ ] 13:18 approval: fix named CB58 expectation, add finished d/e mirror, require every current leader plus selected-group companions; finish visual and full-shard checks.
 - [x] Suppress remaining completionRules.ts invitation using editor's live linked input; EP5 39/39 and final five-file/six-call shared-chip consumer audit in LINKED_NO_INDEX_REPORT.md.
 - [x] Guest joins populated R1 121/R2 123/R3 68; real tee-filled hero captured 390×844. Baddeley/Moore confirmed in actual R1/R2 draws, no status invented.
 - [x] Initial full-field/evidence edit full shards 4,932/4,932 across497 (+3 EP5/+14 Tour/+1 file over4,915/496); BE2 33/33, no unhandled errors. Superseded by revised 13:13 leaders-only rule.
