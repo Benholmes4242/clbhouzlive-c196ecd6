@@ -47,6 +47,7 @@ import { derivePosterUrl } from '@/uploads/posterUrl';
 import { trackError } from '@/lib/errorTracking';
 import { bakeFrameCrop } from './bakeFrameCrop';
 import type { StageMediaItem } from '../hooks/useStageComposer';
+import { writeShotTagAfterUpload, type ShotTagJob } from './shotTagWrites';
 
 export interface UploadJobContext {
   jobId: string;
@@ -64,6 +65,9 @@ export interface UploadJobContext {
   skipFinalize?: boolean;
   /** Continue numbering post_media.display_order from this offset (edit adds). */
   displayOrderOffset?: number;
+  /** Per-photo course tags, written when each item's upload completes
+   *  (see shotTagWrites.ts). Rides the job so it survives the composer. */
+  shotTags?: ShotTagJob;
 }
 
 export type UploadJobPhase = 'running' | 'complete' | 'failed';
