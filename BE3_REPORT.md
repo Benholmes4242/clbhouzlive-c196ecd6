@@ -48,3 +48,12 @@ BE2 “keeps legacy dirty values while advancing only the saved field baseline�
 Ben explicitly chose **Hide Map pin** for club-linked businesses over the BE3-A example showing it; implementation/test follows his ruling. Reference-only decorative/old negative tracking not introduced. Header/shell/create visual elements retained.
 
 No live authenticated editor/address/contact persistence or screenshot match claimed: member session unavailable (`external_unmanaged`), and current preview has surviving type errors. Test-only map/PinDrop mocks verify props/handoff, not real map marker pixels or delivery/search service availability. Stop cleared only after authorised follow-up and a fresh targeted/full validation.
+
+## BE3.1 — authorised fixes (2026-10-31)
+1. BE2 test scope (test-only), `src/test/be2BusinessPreview.test.tsx:76` "makes Name read-only for club". Old: document-wide `expect(screen.getByText(kind === 'club' ? /from your club/ : /owners and admins/)).toBeInTheDocument()`. New: scoped to the Name row — `const nameRow = screen.getByText('Name').closest('.ep-row'); expect(within(nameRow as HTMLElement).getByText(...)).toBeInTheDocument()` — plus one added assertion that the Address row also shows `from your club` (club kind only). No app code or other test changed; inventory stays 33.
+2. TS2367 at `BusinessProfileEditor.tsx` 573/574: already resolved — the unreachable `key === 'website'`/`key === 'phone'` branches and the `input[type=url]/[type=tel]` lookups were removed in the linked-without-index pass; current `focusLegacy` keeps only the hours and remaining-field lookups. No further source change.
+
+## BE3.1 validation
+- `npx vitest run src/test/be2BusinessPreview.test.tsx`: 33/33.
+- Full suite in two shards (`--shard=1/2`, `--shard=2/2`, `--maxWorkers=2`): **4,890 passed / 4,890 across 494 files** (2,389 + 2,501), zero failures, zero unhandled errors. Reconciles against the BE3 baseline 4,869/490 +21 tests/+4 files from the concurrent linked-without-index changes; the one pre-existing BE2 failure above is now fixed and no test was deleted, renamed or rewritten beyond the single scoped assertion.
+- `tsgo --noEmit` clean; `vite build` OK. Preview is build-clean.
