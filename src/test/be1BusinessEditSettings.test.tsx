@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import businessEditCss from '@/components/business/editor/business-edit.css?raw';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 const state = vi.hoisted(() => ({ role: 'owner', request: null as null | { status: string }, verified: false, team: [1], teamLoading: false, teamError: false, muted: [] as string[], updateError: false }));
@@ -48,6 +49,9 @@ beforeEach(() => { Object.assign(state, { role: 'owner', request: null, verified
 afterEach(cleanup);
 
 describe('BE1 business editor Settings', () => {
+  it('inherits the app font without a font-family declaration in business-edit.css', () => {
+    expect(businessEditCss).not.toMatch(/font-family\s*:/i);
+  });
   it('renders the edit frame with Profile and Settings tabs', () => {
     const v = editor('/business/b1/edit');
     expect(v.container.querySelector('.ep-title')?.textContent).toBe('Edit business');

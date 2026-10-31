@@ -1,6 +1,7 @@
 # Roadmap
 
 ## BE1 — Edit business frame and Settings
+- [ ] BE1.1: hide the redundant title badge from accessibility, remove the font override, add the authorised font test and rerun full shards; round-plot work stays untouched.
 - [x] Reuse Edit profile frame for edit mode; preserve Profile save and departure, move Notifications, delete obsolete verification nudge.
 - [ ] STOP: Settings implemented; BE1 24 passed/1 failed at be1BusinessEditSettings.test.tsx:86:43, heading expected Verified but canonical badge produces Verified Verified. Full shards 4,761 passed/21 failed/4,782 across487; previous20 round-plot failures unchanged. No correction after failure; see BE1_REPORT.md.
 - [ ] Report prior round-plot test setup failures unchanged; guest tests out of scope. Member preview remains external_unmanaged.
