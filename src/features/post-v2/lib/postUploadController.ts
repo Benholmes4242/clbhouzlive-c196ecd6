@@ -219,6 +219,7 @@ async function runImage(job: InternalJob, item: StageMediaItem, displayOrder: nu
     height: compressed.height ?? null,
     studio_edits: { frame: item.frame, crop: item.crop ?? null },
   });
+  await writeShotTagAfterUpload(ctx.shotTags, ctx.userId, item, { url: result.publicUrl });
 
   uploadEventBus.emit('file:upload-complete', {
     type: 'file:upload-complete',
@@ -297,6 +298,7 @@ async function runVideo(job: InternalJob, item: StageMediaItem, displayOrder: nu
     poster_url: posterUrl,
     studio_edits: { frame: item.frame, crop: item.crop ?? null },
   });
+  await writeShotTagAfterUpload(ctx.shotTags, ctx.userId, item, { streamId });
 
   uploadEventBus.emit('file:upload-complete', {
     type: 'file:upload-complete',
