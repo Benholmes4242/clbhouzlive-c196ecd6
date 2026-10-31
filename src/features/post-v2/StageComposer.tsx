@@ -169,7 +169,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   const [tagCourseIdx, setTagCourseIdx] = useState(0);
   const [courseReason, setCourseReason] = useState<string | null>(null);
   const [whereChanging, setWhereChanging] = useState(false);
-  const [recentCourses, setRecentCourses] = useState<Array<{ id: string; name: string; country: string | null }>>([]);
+  const [recentCourses, setRecentCourses] = useState<typeof state.courses>([]);
   const [roundFind, setRoundFind] = useState<{ courseId: string; day: string } | null>(null);
   const [withSuggestions, setWithSuggestions] = useState<WithCandidate[]>([]);
   const [withTagged, setWithTagged] = useState<WithCandidate[]>([]);
@@ -465,6 +465,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
     }
   }, [isEditMode, hydrated, editPostId, profile?.id, state.courses, state.media]);
 
+  const searchPeople = useCallback((q: string) => searchMembers(q, profile?.id ?? null), [profile?.id]);
   const chooseShotTag = (itemId: string, tag: ShotTag | null) => {
     setShotTagMap((cur) => {
       const next = { ...cur };
@@ -1149,7 +1150,6 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
     if (state.courses.length > 0) { setTagCourseIdx(0); setTagIndex(i); }
     else setOpenMediaIndex(i);
   };
-  const searchPeople = useCallback((q: string) => searchMembers(q, profile?.id ?? null), [profile?.id]);
   const withNames = withTagged.map((p) => p.name.split(/\s+/)[0]);
 
   const metaRow = (label: string, value: React.ReactNode, onClick: () => void, first: boolean) => (
