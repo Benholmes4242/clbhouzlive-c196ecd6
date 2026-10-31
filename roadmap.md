@@ -1,5 +1,9 @@
 # Roadmap
 
+## BE2 — Business preview and Business rows
+- [ ] Implement edit-only preview/completion/sheets and immediate protected saves with baseline synchronisation; preserve create and lower form.
+- [ ] Add BE2 tests, run existing editor/BE1 tests and full shards; report inventory and visual/authenticated limits. About helper wraps per ruling.
+
 ## BE1 — Edit business frame and Settings
 - [x] BE1.1: redundant title badge aria-hidden; font override removed; 26/26 BE1 tests pass, existing assertions unchanged. Full shards 4,779 passed/4 pre-existing round-plot failures/4,783 across487, +1 font case. Build OK; see BE1_REPORT.md (done).
 - [x] Reuse Edit profile frame for edit mode; preserve Profile save and departure, move Notifications, delete obsolete verification nudge.
