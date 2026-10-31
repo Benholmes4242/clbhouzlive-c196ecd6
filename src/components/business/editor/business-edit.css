@@ -1,7 +1,6 @@
 /* BE1: all overrides are opt-in. Existing personal editor and BC switches
    retain their dimensions and focus material. No amber in business Settings
    except the canonical VerifiedBadge. */
-.be1-shell{font-family:Geist,sans-serif}
 .be1-shell .ep-back,.be1-shell .ep-tab{height:auto;box-shadow:none;transition:none;gap:0}
 .be1-shell .ep-back{height:36px;padding:0;border-radius:999px}
 .be1-shell .ep-tab{border-radius:0;padding:12px 0}

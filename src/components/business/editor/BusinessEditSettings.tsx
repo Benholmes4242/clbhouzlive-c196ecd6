@@ -33,7 +33,7 @@ export function BusinessEditSettings({ business, role, userId }: {
   return <div className="be1-settings ep-settings">
     <h2 className="ep-group">Verification</h2>
     <div className="be1-verification">
-      <h2>{title}{state === 'verified' ? <VerifiedBadge size="sm" /> : null}</h2>
+      <h2>{title}{state === 'verified' ? <span aria-hidden="true"><VerifiedBadge size="sm" /></span> : null}</h2>
       <p>{body}</p>
       {action && canManage ? <Button type="button" variant="ghost" className="be1-pill" onClick={() => navigate(`/business/${business.id}/verification`)}>{action}</Button> : null}
     </div>

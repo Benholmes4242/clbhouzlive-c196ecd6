@@ -1,4 +1,36 @@
-# BE1 — Edit business frame and Settings — STOP
+# BE1 — Edit business frame and Settings — done
+
+## BE1.1 final result — 31 October 2026
+Both authorised corrections are complete. BE1 **26/26** passes, including the unchanged verified-heading expectation. No new failures; the full suite has only four pre-existing round-plot failures, untouched here.
+
+### BE1.1 diff and test inventory
+- `src/components/business/editor/BusinessEditSettings.tsx`: title-only badge changed from `<VerifiedBadge size="sm" />` to `<span aria-hidden="true"><VerifiedBadge size="sm" /></span>`. Visible title/badge retained; accessible heading is `Verified`. Shared VerifiedBadge is unchanged.
+- `src/components/business/editor/business-edit.css`: removed `.be1-shell{font-family:Geist,sans-serif}`. BE1 inherits the app's system stack; no replacement font declaration.
+- `src/test/be1BusinessEditSettings.test.tsx`: added only “inherits the app font without a font-family declaration in business-edit.css”, with raw stylesheet import and assertion `expect(businessEditCss).not.toMatch(/font-family\s*:/i)`. All 25 existing cases and assertions are unchanged; no deletion, renaming or rewriting.
+- `BE1_REPORT.md`: status changed from STOP to done; final result added. Historical failure evidence remains below.
+- `roadmap.md`: BE1.1 completion and current result.
+- Project typography memory corrected to reflect the user's ruling that Geist is retired and features inherit the system stack. No app-wide typography code change.
+
+### Commands and exact counts
+- `bunx vitest run src/test/be1BusinessEditSettings.test.tsx src/test/bc5CreateBusiness.test.ts --maxWorkers=2`: **39/39 across 2 files** (BE1 26, unchanged BC5 13).
+- `bunx vitest run --maxWorkers=2 --shard=1/2`: **2,360/2,360 across 244 files**.
+- `bunx vitest run --maxWorkers=2 --shard=2/2`: **2,419 passed / 4 failed / 2,423 total across 243 files**.
+- Combined: **4,779 passed / 4 failed / 4,783 total across 487 files**.
+- Before BE1.1: **4,782 tests / 487 files**, 4,777 passed and 5 failed. After: **4,783 / 487**, +1 named font test in `be1BusinessEditSettings.test.tsx`; verified-heading failure cleared. Against round-plot baseline **4,757 / 486**, BE1 adds 25 original cases plus this 1 = **4,783 / 487**.
+- Automatic preview validation: **build OK**, `2026-10-31T08:56:24Z`. Authenticated live business-editor verification remains unavailable (`external_unmanaged`); test routing/rendering is verified, not live persistence.
+
+### Pre-existing failures — untouched by BE1.1
+The brief's 20 failures describe the earlier round-plot run. The separately authorised setup correction immediately before BE1.1 cleared the six endpoint failures and exposed four animation setup failures. This BE1.1 run confirms `feedEndDot.test.tsx` **6/6** and `roundPlotLineStrip.test.tsx` **10 passed / 4 failed / 14**. Neither file was edited here.
+
+All remaining failures are in `src/test/roundPlotLineStrip.test.tsx`:
+1. “never draws before threshold and plays after the 120ms delay”, **107:103**: `TypeError: [Function requestAnimationFrame] is not a spy or a call to a spy!`
+2. “renders a remounted round finished without replaying”, **24:59**, called from **114:88**: `TypeError: raf is not a function`
+3. “finishes immediately with reduced motion”, **119:131**: `TypeError: [Function requestAnimationFrame] is not a spy or a call to a spy!`
+4. “cancels pending animation on unmount”, **125:144**: `TypeError: [Function requestAnimationFrame] is not a spy or a call to a spy!`
+
+No SQL, migrations or migration files, deployed RPC/edge changes, feed_config edits or native/Median changes. round_pool_cap remains 30. No publication.
+
+## Historical BE1 implementation report
 
 ## Diff
 - `src/pages/BusinessProfileEditor.tsx`: edit mode uses BusinessEditFrame and URL-backed Profile/Settings selection; preserves handleClose, dirty-state guard, current form and Save changes flow. Both old Notifications/verification-nudge render blocks removed. Create mode retains ManagePageShell through the new frame, without the deleted nudge.
@@ -62,4 +94,4 @@ These are the same twenty failures reported before BE1, in feedEndDot.test.tsx (
 ## Validation and limitations
 Automatic preview build last observed `build OK` at 2026-10-31T08:33:43Z. Authenticated end-to-end preview checks are unavailable (`external_unmanaged`); live writes, manager reads, actual deletion, and signed-off screenshot comparison were not performed. Tests use real routing/providers and canonical deletion dialog with only the destructive mutation mocked; opening the dialog does not delete a business.
 
-Frozen Profile form retains its existing gutters, save styling and fields rather than adopting unrelated mock styles. Shared frame geometry remains EditProfile's canonical CSS; business-only font uses Geist. No SQL, migrations, deployed RPC/edge, feed_config, round_pool_cap, or native/Median configuration changes. No publication.
+Frozen Profile form retains its existing gutters, save styling and fields rather than adopting unrelated mock styles. Shared frame geometry remains EditProfile's canonical CSS; the original Geist override was removed by BE1.1 above. No SQL, migrations, deployed RPC/edge, feed_config, round_pool_cap, or native/Median configuration changes. No publication.
