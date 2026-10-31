@@ -931,6 +931,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           <SquircleAvatar src={post.avatarUrl} alt={post.displayName} userId={post.actorId ?? post.userId} size={34} hairlineRing />
         </button>
         <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', minWidth: 0, gap: 5 }}>
           <button
             type="button"
             onClick={() => onProfile(post)}
@@ -947,11 +948,15 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               maxWidth: '100%',
+              flexShrink: 1,
+              minWidth: 0,
               cursor: 'pointer',
             }}
           >
             {post.displayName}
           </button>
+          {playedWith && playedWith.length > 0 && <PostWithLine people={playedWith} />}
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 1 }}>
             {canManage && (
               <PostOwnerMenu
@@ -961,6 +966,9 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                 actorId={post.actorId}
                 variant="inline"
               />
+            )}
+            {!canManage && currentUserId && playedWith?.some((p) => p.userId === currentUserId) && (
+              <RemoveMeMenu postId={post.id} memberId={currentUserId} />
             )}
             <span style={{ fontSize: 12, color: T60 }}>{subLine}</span>
             {mountFollowPill && (
