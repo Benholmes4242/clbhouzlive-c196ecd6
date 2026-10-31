@@ -1,4 +1,38 @@
-# Tour hero refinements — partial completion, data stop on 4(a)
+# Tour hero refinements — 4(a) completed and verified
+
+## Final 13:18 approval — completed
+
+Condition (a): **every current leader (every position-1 player, wherever they are in the draw), and every other player in the selected leaders' group, has completed round N**. Completion uses a round N card, scoped thru F/18, or MC/CUT/WD/DQ. Condition (b) is unchanged: immediately next published draw contains at least one current leader. Nobody else in the field gates this section. Draws, tee sheets and statuses remain untouched.
+
+The code comment now states that exact rule. The completion check includes all current leaders alongside selected-group companions, so an unfinished tied leader in another group cannot be overlooked. The existing shared selector and board scoring/position order remain authoritative.
+
+### Authorized test correction — quoted old → new
+`src/test/cb58LeadersGroup.test.tsx`, previously line 74:
+- Old name: `only the selected leaders group gates handover, not another leaders group`.
+- New name: `no handover while any leader is still playing round N`.
+- Old assertion: `expect(leadersShownRound(1, [g, group(['d', 'e'])], allLeaders(field), field, [2], 4)).toBe(2)`.
+- New assertion: `expect(leadersShownRound(1, [g, group(['d', 'e'])], allLeaders(field), field, [2], 4)).toBe(1)`.
+- Why: explicitly authorized; unfinished d/e hold two tied leaders and prevent handover.
+Added mirror `hands over when the d/e leaders group has also finished round N`, asserting the same selector `toBe(2)` once every row has thru 18. CB58 inventory **48 → 49**; no case deleted.
+Added `a tied leader outside the selected finished group blocks until that leader completes round N` to `tourRoundHandoverEvidence.test.ts`: finished two-leader selected group plus unfinished third leader elsewhere asserts `toBe(2)`; completing that third leader asserts `toBe(3)`. Inventory **14 → 15**. No other existing test assertion changed in this approval.
+
+### Verification and continuous counts
+- `bunx vitest run src/test/ep5Completion.test.tsx src/test/tourRoundHandoverEvidence.test.ts src/test/cb58LeadersGroup.test.tsx src/test/tourHeroRefinements.test.tsx src/test/tourOverviewDesignA.test.ts src/test/tourOverviewPicksChipsFullBoard.test.tsx src/test/pickTees24Hour.test.tsx --maxWorkers=2`: **195/195**, seven files.
+- `bunx vitest run --maxWorkers=2 --shard=1/2`: **2,420/2,420**, 249 files.
+- `bunx vitest run --maxWorkers=2 --shard=2/2`: **2,514/2,514**, 248 files.
+- Final full suite **4,934/4,934 across 497 files**, zero failures and zero unhandled errors. Last full baseline 4,932/497 → +1 CB58 finished d/e mirror +1 separate tied-leader test = 4,934/497. Original follow-up baseline 4,915/496 → +3 EP5 +15 new Tour file +1 CB58 mirror = +19 cases/+1 file. The intervening 100/101 targeted stop is resolved, not represented as a full-suite baseline.
+- Pre-existing at this approval: the named CB58 stop above, now passing. Historical `be2BusinessPreview` from-your-club failure: **33/33 passed**, file untouched; status only, no business-workstream changes.
+- Automatic preview validation **2026-10-31T13:18:56Z — build OK**. No manual build/typecheck executed.
+
+### Real 390×844 guest proof beside the mock
+Fresh Chromium `/tourhub` guest flow reproduced the actual between-round Mexico Open. Real hero R3 cells show published 17:51/17:40 tees. Leaders' group reads **`Round 3 · Tees off Sat 5:51 pm`**, with Andrew Novak, Kihei Akina and Matthieu Pavon, ordered 1/T2/T2. All six Thru/Today cells are empty before tee-off; no page errors. No date, feed, group, status or session was fabricated.
+Captured and inspected `/tmp/browser/two-followups/tour-real-390.png`, `leaders-real-390.png`, and `mock-390.png`; screenshots are each 390×844. The source mock uses example times/names and annotation boxes; real data retains published times, actual players and existing local-time grammar (hero 24-hour, leaders existing formatted local time). No frozen geometry or unrelated styling changed. Revised screenshot now replaces the earlier R2 Finished capture.
+
+Guest read counts remain R1 **40 tee rows /121 resolved links**, R2 **40/123**, R3 **23/68**, zero empty groups. Separate real guest reads confirm round-1 teaser **8 rows/24 players**, enriched R3 **23/68**, pick inner-join R3 **23/68**, confirmed-field fallback **312 links/123 unique players**; no read errors. These validate every browser reader's player-source query; not every dependent UI was opened individually. Hero and leaders UI verified live; member-only persistence remains unavailable on external unmanaged auth. Server readers untouched/unexecuted.
+
+The handicap invitation and full shared-chip consumer audit remain completed in LINKED_NO_INDEX_REPORT.md; no additional handicap changes in this approval. Changed this approval: leadersGroupRules.ts, cb58LeadersGroup.test.tsx, tourRoundHandoverEvidence.test.ts, this report, roadmap.md and the final handover memory. Local rule lives in the existing module header under the established root AGENTS ownership pointer; no new architecture module. No SQL, migrations, deployed RPC/edge, feed_config, native/Median changes; round_pool_cap stays 30.
+
+## Historical checks and stops (superseded by final verification above)
 
 ## Follow-ups and revised 13:13 ruling — STOP on one new test
 

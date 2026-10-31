@@ -11,6 +11,13 @@ const baseDraw = [draw(['novak'])], nextDraw = [draw(['novak'], '2026-10-31T17:5
 const shown = (entries: BoardEntry[], groups = baseDraw, next = nextDraw, rounds = [1, 2, 3]) => leadersShownRound(2, groups, allLeaders(entries), entries, rounds, 4, next);
 
 describe('Tour 4(a) revised leaders-only handover', () => {
+  it('a tied leader outside the selected finished group blocks until that leader completes round N', () => {
+    const second = { ...finished, id: 'second-row', player: { id: 'second', full_name: 'Second leader' } };
+    const playing = { ...finished, id: 'third-row', player: { id: 'third', full_name: 'Third leader' }, round_2: null, thru: 12 };
+    const groups = [draw(['novak', 'second']), draw(['third'])];
+    expect(shown([finished, second, playing], groups)).toBe(2);
+    expect(shown([finished, second, { ...playing, thru: 18 }], groups)).toBe(3);
+  });
   it('Saturday finished R2 leaders hand over to the published R3 group despite Baddeley and Moore in other real draw groups', () => {
     const entries = [finished, baddeley, moore];
     const groups = [...baseDraw, draw(['Aaron Baddeley', 'Taylor Moore'])];

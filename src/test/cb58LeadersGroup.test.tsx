@@ -69,8 +69,12 @@ describe('CB58 pure leaders group rules', () => {
     expect(leadersShownRound(1, [g, group(['d', 'e'])], allLeaders(morningField), morningField, [1, 2], 4)).toBe(2);
     expect(leadersShownRound(1, [g, group(['d', 'e'])], allLeaders(field), field, [1, 2], 4)).toBe(2);
   });
-  it('only the selected leaders group gates handover, not another leaders group', () => {
+  it('no handover while any leader is still playing round N', () => {
     const field = entries.map(e => e.player?.id === 'a' || e.player?.id === 'b' || e.player?.id === 'c' ? { ...e, thru: 18 } : e);
+    expect(leadersShownRound(1, [g, group(['d', 'e'])], allLeaders(field), field, [2], 4)).toBe(1);
+  });
+  it('hands over when the d/e leaders group has also finished round N', () => {
+    const field = entries.map(e => ({ ...e, thru: 18 }));
     expect(leadersShownRound(1, [g, group(['d', 'e'])], allLeaders(field), field, [2], 4)).toBe(2);
   });
   it('ignores early current-round advancement and supports late advancement', () => {
