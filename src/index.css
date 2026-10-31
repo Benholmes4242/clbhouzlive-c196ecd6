@@ -26,6 +26,22 @@
 }
 
 :root {
+  --tour-board-canvas: #0A0A0C;
+  --tour-board-panel: #16161A;
+  --tour-board-ink: #F8FAFC;
+  --tour-board-mute: rgba(248,250,252,.62);
+  --tour-board-dim: rgba(248,250,252,.42);
+  --tour-board-faint: rgba(255,255,255,.22);
+  --tour-board-empty: rgba(255,255,255,.06);
+  --tour-board-line: rgba(255,255,255,.08);
+  --tour-board-pill-line: rgba(255,255,255,.16);
+  --tour-board-tie: rgba(255,255,255,.20);
+  --tour-board-leader: rgba(255,255,255,.035);
+  --tour-board-mine: rgba(247,147,30,.06);
+  --tour-board-amber: #F7931E;
+  --tour-board-head: rgba(10,10,12,.94);
+  --tour-board-live: #3DDC97;
+  --tour-board-live-halo: rgba(61,220,151,.18);
   --post-review-sheet: #16161A;
   --post-review-ink: #F8FAFC;
   --post-review-mute: rgba(248,250,252,0.62);
