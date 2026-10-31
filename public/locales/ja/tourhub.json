@@ -72,6 +72,7 @@
     }
   },
   "overview": {
+    "picksNeeds": "Needs",
     "ticker": {
       "top10Label": "TOP 10",
       "alsoOutLabel": "その他の選手",

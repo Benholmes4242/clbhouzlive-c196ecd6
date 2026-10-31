@@ -652,11 +652,11 @@ function PicksBlock({
 
   return (
     <div data-overview-picks style={{ background: PAGE_CANVAS }}>
-      <div ref={rowRef} data-overview-picks-heading style={{ position: 'relative', padding: '14px 20px 9px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
+      <div ref={rowRef} data-overview-picks-heading style={{ position: 'relative', padding: '22px 20px 8px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
             key, so band and sheet cannot drift apart in translation. */}
-        <span ref={picksRef} style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: AMBER, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
+        <span ref={picksRef} style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: AMBER, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
         {teeDay ? (
           <>
             <span data-overview-picks-tee-day style={{ marginLeft: 'auto', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap', flex: 'none' }}>{teeFits ? teeDay : teeDayOnly}</span>
@@ -665,10 +665,10 @@ function PicksBlock({
         ) : null}
       </div>
       {intro ? (
-        <p data-overview-picks-intro style={{ margin: '0 20px 9px', marginTop: 0, fontSize: 12.5, lineHeight: 1.5, color: OVERVIEW.soft }}>{intro}</p>
+        <p data-overview-picks-intro style={{ margin: '0 20px 12px', marginTop: 0, fontSize: 14, lineHeight: 1.45, color: OVERVIEW.mute }}>{intro}</p>
       ) : null}
 
-      <div data-overview-picks-grid style={{ padding: '0 16px 14px', display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>
+      <div data-overview-picks-grid style={{ padding: '0 20px', display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>
         {cards.map((p, i) => {
           const line = boardByPlayer.get(String(p.playerId));
           const settledRaw = phase === 'completed' ? settledFigureFor(line) : null;
@@ -752,8 +752,8 @@ function PicksBlock({
                 {/* CORRECTIONS I.2: a pick leading or level has nothing to reach — no
                     line at all. The dash is only for a target genuinely out of reach. */}
                 {!statusToken && neededByPlayer && toReachScore && (phase !== 'live' || pickStarted) && !(line?.score != null && leaderTotal != null && line.score <= leaderTotal) ? (
-                  <div data-overview-pick-to-reach style={{ marginTop: 2, fontSize: 10, fontWeight: 700, color: OVERVIEW.mute, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...FIGS }}>
-                    {`${t('overview.picksToReach', { score: toReachScore })} ${neededByPlayer.get(String(p.playerId)) ?? '\u2014'}`}
+                  <div data-overview-pick-to-reach style={{ marginTop: 2, display: 'flex', gap: 4, fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: OVERVIEW.mute, whiteSpace: 'nowrap', ...FIGS }}>
+                    <span>{t('overview.picksNeeds', { defaultValue: 'Needs' })}</span><span style={{ color: OVERVIEW.ink }}>{neededByPlayer.get(String(p.playerId)) ?? '\u2014'}</span>
                   </div>
                 ) : null}
               </div>

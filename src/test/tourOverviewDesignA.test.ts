@@ -179,7 +179,7 @@ describe('Tour Overview correctness gates', () => {
     expect(playedHeader?.textContent).toContain('R1');
     expect(playedHeader?.textContent).toContain('R2');
     expect(playedHeader?.textContent).toContain('R3');
-    expect(playedHeader?.style.gridTemplateColumns).toBe('24px minmax(0, 1fr) 26px 26px 26px 40px');
+    expect(playedHeader?.style.gridTemplateColumns).toBe('24px minmax(0, 1fr) 32px 32px 32px 40px');
     played.unmount();
 
     const totalsOnly = render(board([row('1', {}), row('2', {})]));
@@ -388,7 +388,7 @@ describe('MiniBoard heroBoard render', () => {
     ] as unknown as BoardEntry[];
     const view = mountBoard(entries, 2, 'live');
     const header = view.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(header?.style.gridTemplateColumns).toBe('26px minmax(0,1fr) 40px 44px 42px');
+    expect(header?.style.gridTemplateColumns).toBe('24px minmax(0,1fr) 40px 44px 40px');
     expect(view.container.querySelectorAll('[data-hero-shape]').length).toBe(2);
   });
   it('renders no THRU cell and no MOV track in any phase', () => {
@@ -436,7 +436,7 @@ describe('MiniBoard hero rows', () => {
     ] as unknown as BoardEntry[];
     const view = mount(entries, 2);
     const header = view.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(header?.style.gridTemplateColumns.startsWith('26px minmax(0,1fr)')).toBe(true);
+    expect(header?.style.gridTemplateColumns.startsWith('24px minmax(0,1fr)')).toBe(true);
     expect(view.container.textContent).not.toContain('\u25B2');
   });
 });
@@ -469,11 +469,11 @@ describe('one board geometry', () => {
     expect(c.querySelector<HTMLElement>('[data-board-pos-header]')?.style.textAlign).toBe('center');
   });
 
-  it('the hero board draws round cells at BoardTable\'s round-cell width', () => {
+  it('the hero board draws independent 32px round cells without changing BoardTable', () => {
     const entries = liveEntries.map((e) => ({ ...e, thru: 18 }));
     const view = render(wrap(createElement(MiniBoard, { tournamentId: 'event', entries, limit: 5, phase: 'completed', theme: 'heroBoard' })));
     const header = view.container.querySelector<HTMLElement>('[data-overview-board-header]');
-    expect(header?.style.gridTemplateColumns).toContain(`${BOARD_GEOMETRY.cell}px ${BOARD_GEOMETRY.cell}px`);
+    expect(header?.style.gridTemplateColumns).toContain('32px 32px');
     expect(header?.style.gridTemplateColumns.endsWith(`${BOARD_GEOMETRY.tot}px`)).toBe(true);
   });
 });

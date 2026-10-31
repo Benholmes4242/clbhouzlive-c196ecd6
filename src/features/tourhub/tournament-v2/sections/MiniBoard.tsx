@@ -9,11 +9,11 @@ import { useTranslation } from 'react-i18next';
 
 import CountryFlag from '@/components/ui/country-flag';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { BOARD_GEOMETRY, computeBoardColumns, todayFromEntry, type BoardEntry } from '../../leaderboard/BoardTable';
+import { computeBoardColumns, todayFromEntry, type BoardEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
-  WHITE_ALPHA_65, WHITE_ALPHA_12, WHITE_ALPHA_06, AMBER,
+  WHITE_ALPHA_65, WHITE_ALPHA_45, WHITE_ALPHA_12, WHITE_ALPHA_06, AMBER,
 } from '../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { fmtScore } from '../../utils/fmtScore';
@@ -25,6 +25,8 @@ import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar
 import { OVERVIEW, countInWords } from '../../components/overview-v3/overviewTokens';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Button } from '@/components/ui/button';
+import { useTeeTimesAll } from '../data/useTeeTimesAll';
+import { formatTimeHm24 } from '@/i18n/format';
 
 import { TrajectorySparkline } from '../../components/overview-v3/HybridHeroBands/TrajectorySparkline';
 
@@ -84,14 +86,27 @@ const THEME_TOKENS = {
   heroBoard: { surface: PAGE_CANVAS, ink: '#FFFFFF', mute: WHITE_ALPHA_65, faint: WHITE_ALPHA_65, hairline: WHITE_ALPHA_06, press: 'active:bg-white/[0.06]' },
 } as const;
 
-/* THE HERO DEFINES NO WIDTH OF ITS OWN. Every track reads BOARD_GEOMETRY
-   from BoardTable, so the two boards cannot drift. TODAY has its own
-   `today` width (it is not a round). The only deliberate difference is
-   row padding: 20 here, because this board aligns with the picks block in
-   the same band (CB57); BoardTable keeps 16 for its seven columns. */
+/* Signed-off hero-only geometry. Full BoardTable owns its independent tracks;
+   changing these constants must never resize the full leaderboard. */
 const HERO_PAD_X = 20;
+const HERO_POS_W = 24;
+const HERO_ROUND_W = 32;
+const HERO_TODAY_W = 40;
+const HERO_TOT_W = 40;
+const HERO_SHAPE_W = 44;
+const HERO_GAP = 4;
 /** Every numeric cell on the hero board: digits stack down a column. */
-const HERO_NUM = { fontVariantNumeric: 'tabular-nums lining-nums' as const, textAlign: 'right' as const };
+const HERO_NUM = { fontVariantNumeric: 'tabular-nums lining-nums' as const, textAlign: 'center' as const };
+
+export function heroRoundScore(entry: BoardEntry, round: number, currentRound?: number | null): number | null {
+  return round === currentRound ? todayFromEntry(entry, currentRound) : [entry.round_1, entry.round_2, entry.round_3, entry.round_4][round - 1] ?? null;
+}
+/** Only an entirely unscored scheduled column needs a draw. Never fetch a
+ * played round for a straggler with missing data, or a completed event. */
+export function heroTeeRound(entries: BoardEntry[], rows: BoardEntry[], rounds: number[], currentRound: number | null | undefined, completed: boolean): number | null {
+  if (completed || !currentRound || rows.length === 0) return null;
+  return rounds.find(round => round === currentRound && rows.some(row => !!row.player?.id) && entries.every(row => heroRoundScore(row, round, currentRound) == null)) ?? null;
+}
 
 /** THE HERO BOARD'S COLUMNS, as a broadcast board sets them.
  *
@@ -133,7 +148,7 @@ export function heroBoardColumns(opts: { roundCount: number; roundInProgress: bo
 
 /** The live hero grid, exactly as the mock sets it. */
 export function heroLiveGrid(showToday: boolean): string {
-  return ['26px', 'minmax(0,1fr)', showToday ? '40px' : null, '44px', '42px'].filter(Boolean).join(' ');
+  return [`${HERO_POS_W}px`, 'minmax(0,1fr)', showToday ? `${HERO_TODAY_W}px` : null, `${HERO_SHAPE_W}px`, `${HERO_TOT_W}px`].filter(Boolean).join(' ');
 }
 
 /** The TOP group when it is a tie over the visible rows: its length, else 0. */
@@ -263,19 +278,30 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
   const showHeroToday = theme === 'heroBoard' && heroColumnRule.today;
   const showHeroRounds = theme === 'heroBoard' && heroHasRoundData && heroColumnRule.rounds;
   const heroRounds = showHeroRounds ? heroCols.rounds : [];
-  const heroRoundTracks = heroRounds.map(() => `${BOARD_GEOMETRY.cell}px`).join(' ');
+  const heroRoundTracks = heroRounds.map(() => `${HERO_ROUND_W}px`).join(' ');
   const showHeroShape = theme === 'heroBoard' && heroColumnRule.shape;
   const topTieLength = theme === 'heroBoard' && showHeroShape ? heroTopTieLength(rows) : 0;
   const topTieCount = topTieLength > 0 ? entries.filter((e) => e.position === 1).length : 0;
   const legacyGrid = [
-    showOverviewPosition ? `${BOARD_GEOMETRY.pos}px` : null,
+    showOverviewPosition ? `${HERO_POS_W}px` : null,
     'minmax(0, 1fr)',
-    showHeroToday ? `${BOARD_GEOMETRY.today}px` : null,
+    showHeroToday ? `${HERO_TODAY_W}px` : null,
     heroRoundTracks || null,
-    `${BOARD_GEOMETRY.tot}px`,
+    `${HERO_TOT_W}px`,
   ].filter(Boolean).join(' ');
   const overviewGrid = showHeroShape ? heroLiveGrid(showHeroToday) : legacyGrid;
-  const heroGap = showHeroShape ? 4 : BOARD_GEOMETRY.gap;
+  const heroGap = HERO_GAP;
+  const teeRound = theme === 'heroBoard' ? heroTeeRound(entries, rows, heroRounds, currentRound, phase === 'completed') : null;
+  const { data: teeGroups } = useTeeTimesAll(tournamentId, teeRound ?? 1, { enabled: teeRound != null });
+  const teesByPlayer = useMemo(() => {
+    const map = new Map<string, string>();
+    if (teeRound == null) return map;
+    for (const group of teeGroups ?? []) {
+      if (!Number.isFinite(Date.parse(group.teeTime))) continue;
+      for (const player of group.players) if (player.id) map.set(player.id, formatTimeHm24(group.teeTime));
+    }
+    return map;
+  }, [teeRound, teeGroups]);
   const shapeSlots = Math.max(totalRounds ?? 0, heroCols.rounds.length, currentRound ?? 0);
 
   const showPanelThru = theme !== 'heroBoard' && phase !== 'completed' && roundInProgress;
@@ -327,14 +353,14 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
           <div data-overview-board-header style={{ display: 'grid', gridTemplateColumns: overviewGrid, alignItems: 'center', gap: heroGap, minHeight: 26, padding: `4px ${HERO_PAD_X}px`, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: OVERVIEW.mute, textTransform: 'uppercase' }}>
             {showHeroShape || showOverviewPosition ? <div>{t('board.columns.pos')}</div> : null}
             <div ref={nameTrackRef}>{t('board.columns.player')}</div>
-            {showHeroToday ? <div style={{ textAlign: 'right' }}>{t('board.columns.today')}</div> : null}
-            {showHeroShape ? <div style={{ textAlign: 'right' }}>{t('board.columns.rounds')}</div> : null}
+            {showHeroToday ? <div style={{ textAlign: 'center' }}>{t('board.columns.today')}</div> : null}
+            {showHeroShape ? <div style={{ textAlign: 'center' }}>{t('board.columns.rounds')}</div> : null}
             {heroRounds.map((rd) => (
-              <div key={rd} style={{ textAlign: 'right', color: heroCols.liveRound === rd ? AMBER : T.faint }}>
+              <div key={rd} style={{ textAlign: 'center', color: heroCols.liveRound === rd ? AMBER : T.faint }}>
                 {`R${rd}`}
               </div>
             ))}
-            <div style={{ textAlign: 'right' }}>{t('board.columns.tot')}</div>
+            <div style={{ textAlign: 'center' }}>{t('board.columns.tot')}</div>
           </div>
           {(() => {
           const renderRow = (r: Row, rowIndex: number, inTopTie: boolean) => {
@@ -384,7 +410,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 {showHeroShape || showOverviewPosition ? (
                   /* CB57: capped and lower ties use the SAME stretched grid
                      cell and bracket; the cap still owns the visible T1 label. */
-                  <div data-hero-tie={inTopTie ? 'capped' : tieRole} style={{ position: 'relative', alignSelf: 'stretch', display: 'flex', alignItems: 'center', fontSize: 11, fontWeight: 800, letterSpacing: '0.04em', color: T.mute, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+                  <div data-hero-tie={inTopTie ? 'capped' : tieRole} style={{ position: 'relative', alignSelf: 'stretch', display: 'flex', alignItems: 'center', fontSize: 12.5, fontWeight: 700, letterSpacing: 0, color: T.ink, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                     {/* ONE MARKER PER TIE: capped/later rows are screen-reader only. */}
                     {inTopTie || tieRole === 'middle' || tieRole === 'last' ? <span className="sr-only">{posText}</span> : posText}
                     {tieRole !== 'solo' ? (
@@ -409,15 +435,15 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                     <SquircleAvatar size={22} srcCandidates={r.player ? resolvePlayerAvatarCandidates({ name: r.player.full_name, photoUrl: r.player.photo_url ?? null, tourSlug }) : []} alt={entity.prose || entity.lines[0] || ''} userId={r.player?.id ?? r.id} hideRing />
                   ) : null}
                   {entity.kind === 'team' ? renderEntityName(entity, T.ink) : (
-                    <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.15, fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em', color: T.ink }}>{overviewName(entity.lines[0])}</span>
+                    <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.15, fontSize: 13, fontWeight: 600, letterSpacing: 0, color: T.ink }}>{overviewName(entity.lines[0])}</span>
                   )}
                   {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </div>
                 {showHeroToday ? (
-                  <div style={{ ...HERO_NUM, fontSize: 13, fontWeight: 700, color: getScoreColor(today, scoreTheme) }}>{today == null ? BLANK : fmtScore(today)}</div>
+                  <div style={{ ...HERO_NUM, fontSize: 12, fontWeight: 700, color: getScoreColor(today, scoreTheme) }}>{today == null ? BLANK : fmtScore(today)}</div>
                 ) : null}
                 {showHeroShape ? (
-                  <div data-hero-shape style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', minWidth: 0 }}>
+                  <div data-hero-shape style={{ ...HERO_NUM, display: 'flex', justifyContent: 'center', alignItems: 'flex-end', minWidth: 0 }}>
                     <TrajectorySparkline
                       variant="bars"
                       rounds={[]}
@@ -432,12 +458,11 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   </div>
                 ) : null}
                 {heroRounds.map((rd) => {
-                  const val = rd === currentRound
-                    ? today
-                    : ([r.round_1, r.round_2, r.round_3, r.round_4][rd - 1] ?? null);
+                  const val = heroRoundScore(r, rd, currentRound);
+                  const tee = val == null && rd === teeRound && r.player?.id ? teesByPlayer.get(r.player.id) : null;
                   return (
-                    <div key={rd} style={{ ...HERO_NUM, fontSize: 12, fontWeight: heroCols.liveRound === rd ? 700 : 600, color: getScoreColor(val, scoreTheme) }}>
-                      {val == null ? BLANK : fmtScore(val)}
+                    <div key={rd} data-hero-round={rd} data-hero-tee={tee ? true : undefined} style={{ ...HERO_NUM, fontSize: tee ? 11 : 12, fontWeight: heroCols.liveRound === rd ? 700 : 600, color: tee ? WHITE_ALPHA_45 : getScoreColor(val, scoreTheme) }}>
+                      {val == null ? tee ?? BLANK : fmtScore(val)}
                     </div>
                   );
                 })}
