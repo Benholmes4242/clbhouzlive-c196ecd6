@@ -25,11 +25,12 @@
  * played holes only, MIN_PLAYED_HOLES fallback — all enforced inside the hook.
  * This file draws nothing and fetches nothing beyond what it is handed.
  */
-import { useId } from 'react';
+import { useId, useLayoutEffect, useRef, useState } from 'react';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { smoothPath } from '@/lib/charts/smoothPath';
-import { UnderParGradientFill } from '@/lib/charts/UnderParGradientFill';
-import { A } from '@/components/explore-tab-new/courseled/tokens';
+import { FEED_CARD_SURFACE } from '@/lib/tokens/surfaces';
+import { T40, T60 } from './feedTokens';
+
 import {
   SC_FILL_GOLD,
   SC_BOGEY_DARK,
@@ -40,7 +41,14 @@ import type { AchievementCallout } from '@/features/explore-magazine/cardTreatme
 import type { ExploreRoundFeat } from '@/features/explore-magazine/roundFeatCollection';
 import { scorecardFeatFor, type ScorecardFeatKind } from '@/features/courses/_shared/scorecard/scorecardFeat';
 
-const PAD_X = 6;
+// Signed-off line/strip supersedes BEA5/FUP1/FED1 presentation only.
+// This module owns measured geometry and an in-memory session replay guard;
+// callers supply score identity and retain all scorecard navigation.
+const playedRoundPlots = new Set<string>();
+const PLOT_INK = '#F2F4F7';
+const PLOT_HAIR = 'rgba(255,255,255,0.14)';
+const PLOT_MISSING = 'rgba(255,255,255,0.06)';
+const plotToPar = (n: number) => n === 0 ? 'E' : n > 0 ? `+${n}` : `−${Math.abs(n)}`;
 
 // TOPAR_EVEN_DARK rgba(242,244,247,0.42) composited on Home's CARD
 // (FEED_CARD_SURFACE #16161A), rounded per channel: #727377. Alpha cannot
@@ -193,111 +201,149 @@ export function homePanelCallout(
   return { kind: first.kind, count: first.count, hole, feats: kept, tier: callout.tier };
 }
 
-export function RoundTilePlot({
-  shape,
-  width = 340,
-  height = 102, // 112px total plot footprint including the unchanged 10px seam.
-  received,
-}: {
+export function RoundTilePlot({ shape, received, scoreId }: {
   shape: HoleShape;
-  width?: number;
-  height?: number;
-  /** FN1 — strokes received per played hole (feedStrokesReceived). */
   received?: readonly number[] | null;
+  scoreId?: string | null;
 }) {
   const instanceId = useId().replace(/[^a-zA-Z0-9_-]/g, '');
+  const rootRef = useRef<HTMLDivElement>(null);
+  const pathRef = useRef<SVGPathElement>(null);
+  const revealRef = useRef<SVGRectElement>(null);
+  const headRef = useRef<SVGCircleElement>(null);
+  const endRef = useRef<SVGCircleElement>(null);
+  const [width, setWidth] = useState(0);
   const values = received ? feedNetSeries(shape, received) : shape.series;
-  if (!values || values.length < 2) return null;
-
   const { lo, hi } = roundPlotRange(values);
-  const span = hi - lo;
-  const top = 8;
-  const bottom = height - 8;
-  const xFor = (i: number) => PAD_X + (i / Math.max(values.length - 1, 1)) * (width - PAD_X * 2);
-  const yFor = (v: number) => bottom - ((v - lo) / span) * (bottom - top);
+  const xFor = (i: number) => 16 + (i / Math.max(values.length - 1, 1)) * (width - 32);
+  const yFor = (v: number) => 72 - ((v - lo) / (hi - lo)) * 64;
   const points = values.map((v, i) => ({ x: xFor(i), y: yFor(v) }));
   const path = smoothPath(points);
   const baselineY = yFor(0);
   const wentUnder = Math.min(...values) < 0;
-  const dots = feedHoleDots(shape);
   const feat = feedFeat(shape);
   const last = points.at(-1);
+  const completed = !!scoreId && playedRoundPlots.has(scoreId);
 
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const measure = () => setWidth(root.getBoundingClientRect().width);
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(entries => {
+      const entry = entries[0];
+      if (entry) setWidth(entry.contentRect.width);
+    });
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, []);
+
+  useLayoutEffect(() => {
+    const root = rootRef.current, trace = pathRef.current;
+    const reveal = revealRef.current, head = headRef.current, end = endRef.current;
+    if (!root || !trace || !reveal || !head || !end || width <= 32) return;
+    let frame = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let started = false;
+    const finish = (animate = false) => {
+      reveal.setAttribute('width', String(width));
+      head.style.opacity = '0';
+      end.style.transition = animate ? 'opacity 160ms ease, transform 220ms cubic-bezier(.3,1.6,.5,1)' : 'none';
+      end.style.opacity = '1';
+      end.style.transform = 'scale(1)';
+    };
+    if (completed || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      finish();
+      return;
+    }
+    let samples: { x: number; y: number }[] = [];
+    try {
+      const length = trace.getTotalLength();
+      if (!Number.isFinite(length) || length <= 0) throw new Error('Unavailable path length');
+      samples = Array.from({ length: 240 }, (_, k) => {
+        const p = trace.getPointAtLength(length * k / 239);
+        if (!Number.isFinite(p.x) || !Number.isFinite(p.y)) throw new Error('Unavailable path point');
+        return { x: p.x, y: p.y };
+      });
+    } catch {
+      finish();
+      return;
+    }
+    reveal.setAttribute('width', '0');
+    end.style.opacity = '0';
+    end.style.transform = 'scale(0.4)';
+    const play = () => {
+      if (started) return;
+      started = true;
+      if (scoreId && playedRoundPlots.has(scoreId)) { finish(); return; }
+      if (scoreId) playedRoundPlots.add(scoreId);
+      timer = setTimeout(() => {
+        const start = performance.now();
+        head.style.opacity = '1';
+        const step = (now: number) => {
+          const t = Math.min(1, Math.max(0, (now - start) / 1200));
+          const eased = t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2;
+          const x = 16 + eased * (width - 32) + (t === 1 ? 16 : 0);
+          reveal.setAttribute('width', String(x));
+          const headX = Math.min(x, width - 16);
+          let nearest = samples[0];
+          for (const p of samples) if (nearest && Math.abs(p.x - headX) < Math.abs(nearest.x - headX)) nearest = p;
+          head.setAttribute('cx', String(headX));
+          if (nearest) head.setAttribute('cy', String(nearest.y));
+          if (t < 1) frame = requestAnimationFrame(step);
+          else finish(true);
+        };
+        frame = requestAnimationFrame(step);
+      }, 120);
+    };
+    if (typeof IntersectionObserver === 'undefined') { finish(); return; }
+    const observer = new IntersectionObserver(entries => {
+      if (entries.some(e => e.isIntersecting && e.intersectionRatio >= 0.6)) { play(); observer.disconnect(); }
+    }, { threshold: 0.6 });
+    observer.observe(root);
+    return () => { observer.disconnect(); if (timer) clearTimeout(timer); cancelAnimationFrame(frame); };
+  }, [width, path, completed, scoreId]);
+
+  if (values.length < 2) return null;
   return (
-    <div data-feed-round-plot="true" style={{ position: 'relative', marginTop: 10 }}>
+    <div ref={rootRef} data-feed-round-plot="true" style={{ position: 'relative', marginTop: 10 }}>
       {feat ? (
-        <span
-          data-feed-round-feat="true"
-          style={{
-            position: 'absolute',
-            top: -2,
-            right: PAD_X,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 5,
-            fontFamily: 'Geist, sans-serif',
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: SC_FILL_GOLD,
-          }}
-        >
-          <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: SC_FILL_GOLD }} />
-          {feat.word}
+        <span data-feed-round-feat="true" style={{ position: 'absolute', top: -2, right: 6, display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'Geist, sans-serif', fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: SC_FILL_GOLD }}>
+          <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: SC_FILL_GOLD }} />{feat.word}
         </span>
       ) : null}
-      <svg
-        width="100%"
-        height={height}
-        viewBox={`0 0 ${width} ${height}`}
-        preserveAspectRatio="none"
-        aria-hidden
-        style={{ display: 'block' }}
-      >
-        {wentUnder ? (
-          <UnderParGradientFill
-            path={path} points={points} baselineY={baselineY} bottom={bottom} width={width}
-            clipId={`feed-round-under-clip-${instanceId}`}
-            gradientId={`feed-round-under-gradient-${instanceId}`}
-            color={TOPAR_UNDER_DARK}
-          />
-        ) : null}
-        <line
-          x1={PAD_X}
-          x2={width - PAD_X}
-          y1={baselineY}
-          y2={baselineY}
-          stroke={A.HAIRLINE}
-          strokeWidth={1}
-          strokeDasharray="3 3"
-          vectorEffect="non-scaling-stroke"
-        />
-        <path
-          d={path}
-          fill="none"
-          stroke={A.INK}
-          strokeWidth={1.8}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
-        />
-        {dots.map((dot) => {
-          const p = points[dot.i];
-          if (!p) return null;
-          return (
-            <circle
-              key={`${instanceId}-${dot.i}`}
-              cx={p.x}
-              cy={p.y}
-              r={dot.r}
-              fill={dot.tone}
-              vectorEffect="non-scaling-stroke"
-            />
-          );
+      <svg width="100%" height={96} viewBox={`0 0 ${width} 96`} aria-hidden style={{ display: 'block' }}>
+        <defs>
+          <clipPath id={`feed-reveal-${instanceId}`}><rect ref={revealRef} data-plot-reveal x={0} y={-10} width={completed ? width : 0} height={116} /></clipPath>
+          {wentUnder ? <>
+            <clipPath id={`feed-under-${instanceId}`} data-under-clip><rect x={0} y={baselineY} width={width} height={Math.max(72 - baselineY, 0)} /></clipPath>
+            <linearGradient id={`feed-gradient-${instanceId}`} gradientUnits="userSpaceOnUse" x1={0} y1={baselineY} x2={0} y2={72}>
+              <stop offset="0%" stopColor={TOPAR_UNDER_DARK} stopOpacity={0.06} /><stop offset="100%" stopColor={TOPAR_UNDER_DARK} stopOpacity={0.32} />
+            </linearGradient>
+          </> : null}
+        </defs>
+        {wentUnder ? <line data-plot-level x1={16} x2={width - 16} y1={baselineY} y2={baselineY} stroke={PLOT_HAIR} strokeWidth={1} strokeDasharray="2 4" /> : null}
+        <g data-plot-animated clipPath={`url(#feed-reveal-${instanceId})`}>
+          {wentUnder && last ? <path data-round-under-par-fill d={`${path} L${last.x},${baselineY} L16,${baselineY} Z`} fill={`url(#feed-gradient-${instanceId})`} clipPath={`url(#feed-under-${instanceId})`} /> : null}
+          <path ref={pathRef} data-plot-trace d={path} fill="none" stroke={PLOT_INK} strokeOpacity={0.92} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+          {wentUnder ? <path data-plot-under-stroke d={path} fill="none" stroke={TOPAR_UNDER_DARK} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" clipPath={`url(#feed-under-${instanceId})`} /> : null}
+        </g>
+        {shape.holes.map((hole, i) => {
+          const count = values.length - 1;
+          if (i >= count) return null;
+          const left = xFor(i) + (i === 0 ? 0 : count === 18 && i === 9 ? 3.5 : 1.25);
+          const right = xFor(i + 1) - (i === count - 1 ? 0 : count === 18 && i === 8 ? 3.5 : 1.25);
+          const d = hole.par == null || hole.strokes == null ? null : hole.strokes - hole.par;
+          const fill = d == null ? PLOT_MISSING : d <= -2 ? SC_FILL_GOLD : d === -1 ? TOPAR_UNDER_DARK : d === 0 ? PLOT_HAIR : d === 1 ? SC_BOGEY_DARK : SC_DOUBLE_DARK;
+          return <rect key={i} data-plot-hole={i + 1} x={left} y={90} width={Math.max(0, right - left)} height={6} rx={2} fill={fill} fillOpacity={d === 1 ? 0.55 : 1} />;
         })}
-        {last && !dots.some((dot) => dot.i === points.length - 1) ? <circle cx={last.x} cy={last.y} r={2.6} fill={A.INK} /> : null}
+        <circle ref={headRef} data-plot-head cx={16} cy={points[0]?.y} r={3} fill={PLOT_INK} style={{ opacity: 0 }} />
+        {last ? <circle ref={endRef} data-plot-end cx={last.x} cy={last.y} r={4} fill={PLOT_INK} stroke={FEED_CARD_SURFACE} strokeWidth={2} style={{ opacity: completed ? 1 : 0, transform: completed ? 'scale(1)' : 'scale(0.4)', transformOrigin: `${last.x}px ${last.y}px` }} /> : null}
       </svg>
+      {shape.holes.length === 18 && values.length === 19 ? <div data-plot-foot style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 16px 0', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', fontVariantNumeric: 'tabular-nums', color: T40 }}>
+        <span>OUT <b style={{ color: T60 }}>{plotToPar(values[9])}</b></span><span>IN <b style={{ color: T60 }}>{plotToPar(values[18] - values[9])}</b></span>
+      </div> : null}
     </div>
   );
 }
