@@ -2,9 +2,10 @@
  * scheduled current_round rollover. Historical round cells are completed cards
  * (live sync's roundCell gate), so scope stale top-level TODAY/THRU before
  * calling the board's own todayFromEntry/thruLabel. No input is mutated.
- * Tour 4(a): every real base-draw player remains in the completion union;
- * leaderboard-only rows need a card, position, thru or canonical terminal
- * status. A total score alone (including zero) is not participation evidence.
+ * Tour 4(a) revised: only the selected leaders' base-round group gates
+ * handover. Every member needs that round's card, scoped 18/F or MC/CUT/WD/DQ;
+ * the immediately next published draw must contain a current position-1 leader.
+ * Other field rows never gate this section. Draws themselves are never filtered.
  */
 import { fieldHasStarted } from '../../../overview/boardStarted';
 import { todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
@@ -12,8 +13,6 @@ import { thruLabel } from '../../../tournament-v2/sections/MiniBoard';
 import type { TeeGroup } from '../../../tournament-v2/data/useTeeTimesAll';
 import type { TeeGroupPlayer } from '../../../tournament-v2/data/useTeeTimesAll';
 import { surnameOf } from '../../../_shared/playerName';
-import { isDemotedStatus } from '../../../_shared/resultStatus';
-import { nextDrawnRound } from './whatsNext';
 
 export type GroupState = 'before' | 'onCourse' | 'finished';
 /** Display order only: retain draw order for tied/missing positions; terminal
@@ -71,32 +70,21 @@ export function leadersBaseRound(leaders: BoardEntry[], currentRound: number): n
   });
   return Math.min(currentRound, Math.max(1, ...played));
 }
-export function leadersShownRound(baseRound: number, groups: TeeGroup[], leaders: BoardEntry[], entries: BoardEntry[], drawnRounds: number[], totalRounds: number): number {
-  const candidates = candidateGroups(groups, leaders);
-  const next = nextDrawnRound(baseRound, drawnRounds, totalRounds);
-  // CB58.1: a finished morning leaders' group does not finish the field.
-  // CB58.2: the field is the base round's tee sheet (`groups` must be the
-  // base round's groups, never the shown round's) UNION play-evidenced entries,
-  // minus canonical demoted statuses (CUT/MC/WD/DQ/MDF/DNS). A tee-sheet
-  // player with no leaderboard row or no finished card blocks the handover.
-  const byId = new Map<string, BoardEntry>();
-  for (const e of entries) if (e.player?.id) byId.set(e.player.id, e);
-  const ids = new Set<string>();
-  for (const g of groups) for (const p of g.players) if (p.id != null) ids.add(p.id);
-  for (const e of entries) {
-    const evidence = [e.round_1, e.round_2, e.round_3, e.round_4].some(card => card != null)
-      || e.position != null || e.thru != null || isDemotedStatus(e.status)
-      || e.status?.trim().toUpperCase() === 'COMPLETE';
-    if (evidence && e.player?.id) ids.add(e.player.id);
-  }
-  const field = [...ids].filter(id => !isDemotedStatus(byId.get(id)?.status));
-  const fieldComplete = field.length > 0 && field.every(id => {
-    const raw = byId.get(id);
+export function leadersShownRound(baseRound: number, groups: TeeGroup[], leaders: BoardEntry[], entries: BoardEntry[], drawnRounds: number[], totalRounds: number, nextGroups: TeeGroup[] = []): number {
+  const next = baseRound + 1;
+  const group = pickLeadersGroup(groups, leaders, entries, baseRound);
+  if (!group || next > totalRounds || !drawnRounds.includes(next) || candidateGroups(nextGroups, leaders).length === 0) return baseRound;
+  const groupComplete = group.players.length > 0 && group.players.every(player => {
+    const raw = entries.find(entry => player.id != null && entry.player?.id === player.id);
     if (!raw) return false;
+    if (['MC', 'CUT', 'WD', 'DQ'].includes(raw.status?.trim().toUpperCase() ?? '')) return true;
+    if ([raw.round_1, raw.round_2, raw.round_3, raw.round_4][baseRound - 1] != null) return true;
     const e = roundEntry(raw, baseRound);
-    return thruLabel(e, todayFromEntry(e, baseRound)) === 'F';
+    // A stale top-level thru from an earlier round must not finish this one.
+    return (raw.today_round == null || raw.today_round === baseRound)
+      && (e.thru === 18 || thruLabel(e, todayFromEntry(e, baseRound)) === 'F');
   });
-  return candidates.length > 0 && fieldComplete && next != null ? next : baseRound;
+  return groupComplete ? next : baseRound;
 }
 export function leadersGroupVisible(phase: string, teamEvent: boolean, entries: BoardEntry[], loading: boolean): boolean {
   return phase === 'live' && !teamEvent && !loading && fieldHasStarted(entries) && entries.some(e => typeof e.score === 'number' && Number.isFinite(e.score));

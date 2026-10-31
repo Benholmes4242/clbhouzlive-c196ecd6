@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Two follow-ups — linked invitation and Tour 4(a)
+- [ ] Revised 13:13 ruling: only the selected leaders' base-round group gates handover; require a current leader in the immediately next published draw. Replace full-field tests explicitly and capture real Saturday group.
 - [ ] Suppress Edit profile completion invitation using the live link; add regressions and final shared-chip consumer audit.
 - [ ] Apply approved draw-preserving play-evidence completion rule; test Baddeley/Moore placeholders and real draw blockers.
 - [ ] Recheck guest player joins and capture real tee-filled board/pre-round group at 390×844 if readable; run full shards against 4,915/496 and report BE2 status only.

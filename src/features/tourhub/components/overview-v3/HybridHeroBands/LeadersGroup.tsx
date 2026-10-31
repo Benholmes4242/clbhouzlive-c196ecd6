@@ -32,8 +32,10 @@ export function LeadersGroup(props: Props) {
   const current = useTeeTimesAll(tournamentId, baseRound, { enabled: eligible });
   const needsDraw = eligible && baseRound < (totalRounds ?? baseRound);
   const draw = useDrawnRounds(tournamentId, { enabled: needsDraw });
-  const shownRound = leadersShownRound(baseRound, current.data ?? [], leaders, entries, draw.data ?? [], totalRounds ?? baseRound);
-  const next = useTeeTimesAll(tournamentId, shownRound, { enabled: eligible && shownRound !== baseRound });
+  // Read actual next-round membership before handover, not merely round existence.
+  const nextRound = baseRound + 1;
+  const next = useTeeTimesAll(tournamentId, nextRound, { enabled: needsDraw && (draw.data ?? []).includes(nextRound) });
+  const shownRound = leadersShownRound(baseRound, current.data ?? [], leaders, entries, draw.data ?? [], totalRounds ?? baseRound, next.data ?? []);
   const selected = shownRound === baseRound ? current : next;
   const groups = selected.data ?? [];
   const group = pickLeadersGroup(groups, leaders, entries, shownRound);
