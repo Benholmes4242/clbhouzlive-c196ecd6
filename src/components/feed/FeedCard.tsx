@@ -71,6 +71,9 @@ import { FeaturedRoundCard } from '@/features/explore-magazine/FeaturedRoundCard
 import type { RoundCourseMeta } from './roundPostItem';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
 import type { SubjectContext } from '@/components/sheets/SubjectContextLine';
+import { PostWithLine, RemoveMeMenu, SlideTagChip } from './PostGolfTags';
+import type { SlideTag } from '@/features/post-v2/lib/golfPostRules';
+import { holeMediaKey } from '@/lib/courseMedia/holePhotoData';
 
 /** Home's content inset (the header's 12px). The round photo bleeds by it. */
 const ROUND_CARD_INSET = 12;
@@ -185,6 +188,10 @@ export interface FeedCardProps {
    *  header, media, actions, liked-by, name-led caption, comments, add-a-comment.
    *  'standard' (default) is the unchanged Clubhouse order. */
   layout?: 'standard' | 'mediaFirst';
+  /** Played with (post_with), batched by the host feed — never per card. */
+  playedWith?: ReadonlyArray<{ userId: string; name: string; avatarUrl?: string | null }>;
+  /** Per-slide course tags keyed by holeMediaKey(mediaItem), batched by the host. */
+  slideTags?: ReadonlyMap<string, SlideTag>;
 }
 
 interface CaptionBlockProps {
@@ -316,6 +323,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   commentPreviewEnabled = false,
   homeRoundPlot = false,
   layout = 'standard',
+  playedWith,
+  slideTags,
 }) => {
   // GUEST §5: every like, comment (footer glyph, preview row and the
   // "Add a comment…" row), share and follow door on the card passes through
@@ -347,6 +356,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     return map.get(feedIndex) ?? 0;
   });
   const initialMediaIndex = initialMediaIndexProp ?? storedSlide;
+  /* The hole chip follows the VISIBLE slide. */
+  const [visibleSlide, setVisibleSlide] = useState(initialMediaIndex ?? 0);
   
   const { activeActor, setActiveActor } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
@@ -527,6 +538,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 {/* Media. A round post never reaches here: it returns the round card
           above, whose photograph is the course's, not post_media's. */}
       <div style={{ position: 'relative', zIndex: 1, ...(fill ? { height: '100%' } : {}) }}>
+        <SlideTagChip tag={slideTags && items[isMulti ? visibleSlide : 0] ? slideTags.get(holeMediaKey(items[isMulti ? visibleSlide : 0])) : null} />
         {isMulti ? (
           <MediaCarousel
             items={items}
@@ -535,7 +547,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             maxHeight={fill ? '100%' : mediaMaxHeight()}
             mountVideo={mountVideo}
             postId={post.id}
-            onIndexChange={(idx) => onCarouselIndexChange?.(post, idx)}
+            onIndexChange={(idx) => { setVisibleSlide(idx); onCarouselIndexChange?.(post, idx); }}
             onOpen={(idx, mediaId, originEl, ownerKey) => {
               const slide = items[idx];
               const posterUrl = slide?.thumbnailUrl ?? (slide as any)?.imageUrl ?? null;
