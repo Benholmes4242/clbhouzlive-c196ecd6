@@ -558,6 +558,14 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
   const authorAvatar = activeActor?.avatarUrl ?? profile?.profile_photo_url ?? null;
   const authorUsername = activeActor?.slug ?? profile?.username ?? null;
 
+  const isPersonalActor = activeActor?.type !== 'business';
+  /** Tags for photos still to upload, carried by the upload job. */
+  const newShotTagJob = useCallback((items: typeof state.media) => {
+    const out: Record<string, ShotTagChoice> = {};
+    for (const m of items) if (!m.existingId && shotTagMap[m.id]) out[m.id] = shotTagMap[m.id];
+    return Object.keys(out).length ? { items: out } : undefined;
+  }, [shotTagMap]);
+
   const doCreate = async () => {
     if (!canSubmit || !activeActor) return;
     try {
@@ -573,6 +581,9 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
         authorName,
         authorAvatarUrl: authorAvatar,
         authorUsername,
+        visibility,
+        playedWith: isPersonalActor ? withTagged.map((p) => p.id) : [],
+        shotTags: newShotTagJob(state.media),
       });
       submittedRef.current = true;
       // A finished job is not a change of mind: the composer-flow step 1 must
@@ -607,6 +618,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
         content: state.caption?.length ? state.caption : null,
         course_id: state.course?.id ?? null,
         tagged_course_ids: state.courses.map((c) => c.id),
+        ...(visibility !== initialVisibilityRef.current ? { visibility } : {}),
 
       };
       // Only touch scheduled_at when the post is still scheduled.
@@ -677,12 +689,28 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
             scheduledAt: state.scheduledAt?.toISOString(),
             skipFinalize: true,
             displayOrderOffset: kept.length,
+            shotTags: newShotTagJob(newMedia),
           },
           newMedia,
         );
       }
 
+      // Played with: bring post_with to the chosen people (trigger notifies).
+      if (editable.data.actorType !== 'business') {
+        await syncPostWith(editPostId, editable.data.userId, initialWithIdsRef.current, withTagged.map((p) => p.id));
+      }
+      // Existing photos whose tag changed: remove the old, add the new.
+      if (state.course && profile?.id) {
+        for (const m of kept) {
+          const before = initialExistingTagsRef.current[m.id] ?? null;
+          const after = shotTags[m.id] ?? null;
+          if (JSON.stringify(before) === JSON.stringify(after)) continue;
+          await rewriteExistingShotTag(state.course.id, profile.id, tagHoles, m, after, existingTagsRef.current, editable.data.userId);
+        }
+      }
+
       // Invalidate common caches.
+      queryClient.invalidateQueries({ queryKey: ['post-golf-tags'] });
       queryClient.invalidateQueries({ queryKey: ['editable-post', editPostId] });
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       queryClient.invalidateQueries({ queryKey: ['feed'] });
@@ -709,7 +737,7 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
     } finally {
       setSaving(false);
     }
-  }, [editPostId, editable.data, state, saving, editStatus, removedExistingIds, queryClient, activeActor, mode]);
+  }, [editPostId, editable.data, state, saving, editStatus, removedExistingIds, queryClient, activeActor, mode, visibility, withTagged, shotTags, profile?.id, tagHoles, newShotTagJob]);
 
   const onPrimary = () => {
     if (isEditMode) return void doSaveEdit();
