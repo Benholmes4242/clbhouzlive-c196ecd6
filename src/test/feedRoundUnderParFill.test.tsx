@@ -19,7 +19,7 @@ describe('FUP1 Home earned under-par area', () => {
     const area = container.querySelector('[data-round-under-par-fill]');
     expect(area).not.toBeNull();
     expect(area?.getAttribute('d')).toMatch(/C.* Z$/);
-    const clip = container.querySelector('clipPath');
+    const clip = container.querySelector('[data-under-clip]');
     expect(area?.getAttribute('clip-path')).toBe(`url(#${clip?.id})`);
   });
 
@@ -28,17 +28,19 @@ describe('FUP1 Home earned under-par area', () => {
     expect(container.querySelector('[data-round-under-par-fill]')).not.toBeNull();
   });
 
-  it('adds neither fill nor definitions when a round never dipped under', () => {
+  it('adds no under-par fill, gradient or level rule when a round never dipped under', () => {
     const { container } = render(<RoundTilePlot shape={shape([0, 2, 1, 3])} />);
     expect(container.querySelector('[data-round-under-par-fill]')).toBeNull();
-    expect(container.querySelector('defs')).toBeNull();
-    expect(container.querySelectorAll('svg > path')).toHaveLength(1);
+    expect(container.querySelector('linearGradient')).toBeNull();
+    expect(container.querySelector('[data-plot-level]')).toBeNull();
+    expect(container.querySelectorAll('[data-plot-trace]')).toHaveLength(1);
   });
 
   it('keeps a flat level round without an area', () => {
     const { container } = render(<RoundTilePlot shape={shape([0, 0, 0])} />);
     expect(container.querySelector('[data-round-under-par-fill]')).toBeNull();
-    expect(container.querySelector('defs')).toBeNull();
+    expect(container.querySelector('linearGradient')).toBeNull();
+    expect(container.querySelector('[data-plot-level]')).toBeNull();
   });
 
   it('gives two mixed rounds distinct clip and gradient ids with local references', () => {
@@ -47,12 +49,12 @@ describe('FUP1 Home earned under-par area', () => {
       <RoundTilePlot shape={shape([0, -2, 1])} />
     </>);
     const ids = Array.from(container.querySelectorAll('[id]'), el => el.id);
-    expect(ids).toHaveLength(4);
-    expect(new Set(ids).size).toBe(4);
+    expect(ids).toHaveLength(6);
+    expect(new Set(ids).size).toBe(6);
     for (const plot of container.querySelectorAll('svg')) {
       const area = plot.querySelector('[data-round-under-par-fill]');
       expect(area?.getAttribute('fill')).toBe(`url(#${plot.querySelector('linearGradient')?.id})`);
-      expect(area?.getAttribute('clip-path')).toBe(`url(#${plot.querySelector('clipPath')?.id})`);
+      expect(area?.getAttribute('clip-path')).toBe(`url(#${plot.querySelector('[data-under-clip]')?.id})`);
     }
   });
 });

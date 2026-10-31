@@ -102,10 +102,10 @@ describe('FN1.2 / FN1.4 dots and fill follow net', () => {
 
   it('a round under its handicap renders the fill; one that never is renders none', () => {
     const under = render(<RoundTilePlot shape={flat(4)} received={feedStrokesReceived(flat(4), 5)} />);
-    expect(under.container.querySelector('clipPath')).not.toBeNull();
+    expect(under.container.querySelector('[data-under-clip]')).not.toBeNull();
     cleanup();
     const over = render(<RoundTilePlot shape={flat(6)} received={feedStrokesReceived(flat(6), 5)} />);
-    expect(over.container.querySelector('clipPath')).toBeNull();
+    expect(over.container.querySelector('[data-under-clip]')).toBeNull();
   });
 });
 

@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import { RoundTilePlot } from '@/components/feed/roundTilePlot';
 import { RoundShape } from '@/components/explore-tab-new/courseled/RoundShape';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
@@ -8,6 +8,9 @@ import { A } from '@/components/explore-tab-new/courseled/tokens';
 import { SC_DOUBLE_DARK } from '@/features/courses/components/holes/_constants';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { goodHoleDots } from '@/features/explore-magazine/roundTreatment';
+
+beforeEach(() => vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ width: 340 } as DOMRect));
+afterEach(() => vi.restoreAllMocks());
 
 const row = { round_id: 'finish-marker', front_nine_to_par: null, back_nine_to_par: null } as CircleRoundRow;
 
@@ -28,36 +31,36 @@ function finalMarks(container: HTMLElement, x: number) {
 }
 
 describe('FED1 Home finish marker', () => {
-  it('last-hole birdie keeps its tone with no ink overlay', () => {
+  it('last-hole birdie has the neutral end mark and gross birdie strip', () => {
     const { container } = render(<RoundTilePlot shape={shape(3)} received={[0, 0]} />);
-    const marks = finalMarks(container, 334);
+    const marks = finalMarks(container, 324);
     expect(marks).toHaveLength(1);
-    expect(marks[0].getAttribute('fill')).toBe(TOPAR_UNDER_DARK);
-    expect(marks[0].getAttribute('r')).toBe('2.8');
+    expect(marks[0].getAttribute('fill')).toBe('#F2F4F7');
+    expect(marks[0].getAttribute('r')).toBe('4');
   });
 
-  it('last-hole par keeps its quiet par dot with no ink overlay', () => {
+  it('last-hole par has the neutral end mark and quiet par strip', () => {
     const { container } = render(<RoundTilePlot shape={shape(4)} received={[0, 0]} />);
-    const marks = finalMarks(container, 334);
+    const marks = finalMarks(container, 324);
     expect(marks).toHaveLength(1);
-    expect(marks[0].getAttribute('fill')).toBe('#727377');
-    expect(marks[0].getAttribute('r')).toBe('2.4');
+    expect(marks[0].getAttribute('fill')).toBe('#F2F4F7');
+    expect(marks[0].getAttribute('r')).toBe('4');
   });
 
-  it('last-hole double keeps its grade with no ink overlay', () => {
+  it('last-hole double has the neutral end mark and gross double strip', () => {
     const { container } = render(<RoundTilePlot shape={shape(6)} received={[0, 0]} />);
-    const marks = finalMarks(container, 334);
+    const marks = finalMarks(container, 324);
     expect(marks).toHaveLength(1);
-    expect(marks[0].getAttribute('fill')).toBe(SC_DOUBLE_DARK);
-    expect(marks[0].getAttribute('r')).toBe('2.8');
+    expect(marks[0].getAttribute('fill')).toBe('#F2F4F7');
+    expect(marks[0].getAttribute('r')).toBe('4');
   });
 
-  it('an unscored final point retains the unchanged ink terminus', () => {
+  it('an unscored final point has the neutral four-pixel terminus', () => {
     const { container } = render(<RoundTilePlot shape={shape(null)} received={[0, 0]} />);
-    const marks = finalMarks(container, 334);
+    const marks = finalMarks(container, 324);
     expect(marks).toHaveLength(1);
-    expect(marks[0].getAttribute('fill')).toBe(A.INK);
-    expect(marks[0].getAttribute('r')).toBe('2.6');
+    expect(marks[0].getAttribute('fill')).toBe('#F2F4F7');
+    expect(marks[0].getAttribute('r')).toBe('4');
   });
 });
 
