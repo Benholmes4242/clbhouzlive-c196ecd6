@@ -530,7 +530,7 @@ export default function BusinessProfileEditor() {
   const saveProfileLink = (save: ProfileLinkSave) => runPartial(async () => {
     const links = save.kind === 'socials' ? Object.fromEntries(Object.entries(save.value).map(([key, value]) => [key, value || null])) : null;
     const payload = save.kind === 'main' ? { primary_action: save.value }
-      : save.kind === 'hours' ? { show_opening_hours: save.shown, opening_hours: save.value }
+      : save.kind === 'hours' ? { show_opening_hours: save.shown, opening_hours: save.value as unknown as Json }
       : save.kind === 'facilities' ? { amenities: save.value }
       : { social_links: links && Object.values(links).some(Boolean) ? links : null };
     const { error } = await supabase.from('business_accounts').update(protectBusinessPayload(payload, membership?.role)).eq('id', id ?? '');
