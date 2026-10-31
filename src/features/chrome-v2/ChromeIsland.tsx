@@ -376,7 +376,7 @@ export const HcpCell: React.FC<{ tone: ChromeTone; dividerColor: string }> = ({ 
   const body = (() => {
 
 
-    const disconnected = !hcp.linked && !hcp.connected;
+    const disconnected = !hcp.linked;
 
 
     if (disconnected) {

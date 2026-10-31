@@ -13,6 +13,8 @@ export interface ImportedCounts {
  * whs_scores / whs_friends still scopes a member to their own connection.
  * A null result means "not readable yet" - the caller must render the
  * still-importing state, NEVER a zero.
+ * Completion alone opts into confirmed zero on an isolated cache key; other
+ * consumers keep polling/null semantics. email-my-rounds owns its CSV helper.
  */
 export function useImportedCounts(connectionId: string | null | undefined, options?: { allowZero?: boolean }) {
   return useQuery<ImportedCounts | null>({

@@ -347,7 +347,7 @@ export const ProfileHero: React.FC<Props> = ({
   const badgesCount = figures.isFetched && figures.data ? figures.data.badges : null;
 
   const showIndexBlocks = chip.settled && chip.connected;
-  const showConnectCard = chip.settled && !chip.linked && !chip.connected && isSelf && !hideConnectPrompt;
+  const showConnectCard = chip.settled && !chip.linked && isSelf && !hideConnectPrompt;
   const showLinkedNotice = chip.settled && chip.linked && !chip.connected && isSelf;
 
   const counters: Array<{ key: HeroStat; label: string; value: number | null; state?: 'ok' | 'loading' | 'error' }> = [];
