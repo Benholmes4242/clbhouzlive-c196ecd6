@@ -375,6 +375,104 @@ export default function StageComposer({ onClose, onPosted, initialMedia = [], ed
 
   const active = state.media[state.activeIndex] ?? null;
 
+  /* ---- GOLF PAGE: derived values and reads ---------------------------- */
+  const shotTags = useMemo(() => Object.fromEntries(Object.entries(shotTagMap).map(([k, v]) => [k, v.tag])) as Record<string, ShotTag>, [shotTagMap]);
+  const tagCourse = state.courses[tagCourseIdx] ?? state.courses[0] ?? null;
+  const holeAnalysis = useCourseHoleAnalysis(tagCourse?.id);
+  const { tagHoles, tagPars } = useMemo(() => {
+    const walk = courseWalkHoles(holeAnalysis.data);
+    const holes = walk ? [...walk.holes].sort((a, b) => a.hole_no - b.hole_no) : [];
+    const pars = new Map<number, number>();
+    for (const h of holes) if (h.par > 0) pars.set(h.hole_no, h.par);
+    // No scored hole data: holes 1 to 18 without pars (Oct 24 rule).
+    return { tagHoles: holes.length ? holes.map((h) => h.hole_no) : Array.from({ length: 18 }, (_, i) => i + 1), tagPars: pars };
+  }, [holeAnalysis.data]);
+  const holeShotCount = state.media.filter((m) => isHoleTag(shotTags[m.id])).length;
+
+  /** Member course choice: never overridden; a new primary course clears photo tags. */
+  const chooseCourses = useCallback((list: typeof state.courses, reason: string | null = null) => {
+    memberChoseCourseRef.current = true;
+    if ((list[0]?.id ?? null) !== (state.courses[0]?.id ?? null)) { setShotTagMap({}); setTagCourseIdx(0); }
+    setCourseReason(reason);
+    setRoundFind(null);
+    setWhereChanging(false);
+    setCourses(list);
+  }, [setCourses, state.courses]);
+
+  // Recent-round courses for the WHERE fallback chips.
+  useEffect(() => {
+    if (!profile?.id) return;
+    let cancelled = false;
+    void fetchRecentCourses(profile.id).then((rows) => { if (!cancelled) setRecentCourses(rows); });
+    return () => { cancelled = true; };
+  }, [profile?.id]);
+
+  // THE COURSE FINDS ITSELF: first arrival, new posts only, never over a choice.
+  const coursesRef = useRef(state.courses);
+  coursesRef.current = state.courses;
+  useEffect(() => {
+    if (isEditMode || draftId || prefillCourse || !profile?.id || roundLookupRef.current) return;
+    if (state.media.length === 0) return;
+    roundLookupRef.current = true;
+    const userId = profile.id;
+    const first = state.media[0];
+    void (async () => {
+      const day = await firstCaptureDay(first);
+      if (!day) return;
+      const course = await findRoundCourse(userId, day);
+      if (!course || memberChoseCourseRef.current || coursesRef.current.length > 0) return;
+      setCourses([course]);
+      setCourseReason(roundReason(day));
+      setRoundFind({ courseId: course.id, day });
+    })();
+  }, [isEditMode, draftId, prefillCourse, profile?.id, state.media, setCourses]);
+
+  // Played with suggestions (re-ranked when a round course/day is found).
+  useEffect(() => {
+    if (!profile?.id) return;
+    let cancelled = false;
+    void fetchPlayedWithSuggestions(profile.id, roundFind).then((rows) => { if (!cancelled) setWithSuggestions(rows); });
+    return () => { cancelled = true; };
+  }, [profile?.id, roundFind]);
+
+  // Edit mode: the post's Played with rows and its media's existing tags.
+  const editHydratedGolfRef = useRef(false);
+  useEffect(() => {
+    if (!isEditMode || !hydrated || !editPostId || !profile?.id || editHydratedGolfRef.current) return;
+    editHydratedGolfRef.current = true;
+    const userId = profile.id;
+    void readPostWith([editPostId]).then((rows) => {
+      const people = rows.map((r) => ({ id: r.userId, name: r.name, avatarUrl: r.avatarUrl, sameRound: false, lastInteraction: '' }));
+      initialWithIdsRef.current = people.map((p) => p.id);
+      setWithTagged(people);
+    });
+    const course = state.courses[0];
+    const existing = state.media.filter((m) => m.existingId);
+    if (course && existing.length) {
+      void readExistingShotTags(course.id, userId, existing.map(existingMediaUrl)).then((tags) => {
+        existingTagsRef.current = tags;
+        const map: Record<string, ShotTagChoice> = {};
+        const initial: Record<string, ShotTag> = {};
+        for (const m of existing) {
+          const t = existingTagFor(existingMediaUrl(m), tags);
+          if (t) { map[m.id] = { tag: t, courseId: course.id, knownHoles: [] }; initial[m.id] = t; }
+        }
+        initialExistingTagsRef.current = initial;
+        setShotTagMap((cur) => ({ ...map, ...cur }));
+      });
+    }
+  }, [isEditMode, hydrated, editPostId, profile?.id, state.courses, state.media]);
+
+  const chooseShotTag = (itemId: string, tag: ShotTag | null) => {
+    setShotTagMap((cur) => {
+      const next = { ...cur };
+      if (!tag || !tagCourse) delete next[itemId];
+      else next[itemId] = { tag, courseId: tagCourse.id, knownHoles: tagHoles };
+      return next;
+    });
+    setTagIndex(null);
+  };
+
   // Refreshed every render so the unmount cleanup reads teardown values.
   abandonRef.current = {
     hasMedia: state.media.length > 0,
