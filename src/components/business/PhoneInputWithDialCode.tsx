@@ -19,6 +19,8 @@ interface Props {
   className?: string;
   disabled?: boolean;
   defaultCountryIso?: string | null;
+  /** BE3 only: labelled field boxes; defaults preserve other phone controls. */
+  fieldBoxes?: boolean;
 }
 
 const sanitizePhoneNumber = (v: string) => v.replace(/[^\d\s\-]/g, '');
@@ -30,6 +32,7 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
   className,
   disabled = false,
   defaultCountryIso,
+  fieldBoxes = false,
 }) => {
   const dialCode = value?.dialCode || '';
   const localNumber = value?.localNumber || '';
@@ -102,7 +105,8 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
 
   return (
     <div className={cn('flex gap-2', className)}>
-      <div ref={wrapRef} className="relative shrink-0">
+      <div ref={wrapRef} className={cn('relative shrink-0', fieldBoxes && 'be3-fld be3-phone-code')}>
+        {fieldBoxes && <span className="be3-field-label">Code</span>}
         <button
           type="button"
           disabled={disabled}
@@ -184,8 +188,11 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
         )}
       </div>
 
+      <label className={fieldBoxes ? 'be3-fld be3-phone-number' : 'contents'}>
+      {fieldBoxes && <span className="be3-field-label">Number</span>}
       <input
         type="tel"
+        aria-label={fieldBoxes ? 'Number' : undefined}
         value={localNumber}
         onChange={setLocal}
         placeholder="Phone number"
@@ -195,6 +202,7 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
         // Nulled so FIELD_PAINT_CLASS wins (inline beats class).
         style={{ ...FIELD_INPUT_STYLE, background: undefined, borderRadius: undefined, padding: 0, paddingLeft: 14, paddingRight: 14, fontSize: 15 }}
       />
+      </label>
     </div>
   );
 };

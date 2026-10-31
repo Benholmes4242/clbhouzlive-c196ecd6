@@ -10,6 +10,7 @@ import { MiniFlag } from '@/components/profile/handicap/whs/connect/MiniFlag';
 // Get country display name from stored value (name or ISO code).
 export function getCountryDisplayName(value: string | null): string {
   if (!value) return '';
+  if (getCountryCode(value) === 'GB') return 'United Kingdom';
   const byName = findCountryByName(value);
   if (byName) return byName.name;
   const byCode = COUNTRIES.find(c => c.code === value.toUpperCase());
@@ -19,6 +20,8 @@ export function getCountryDisplayName(value: string | null): string {
 // Get ISO code for Mapbox API.
 export function getCountryCode(value: string | null): string {
   if (!value) return '';
+  // Stored home nations resolve for display/search only, never storage writes.
+  if (['england', 'scotland', 'wales', 'northern ireland', 'uk', 'great britain'].includes(value.trim().toLowerCase())) return 'GB';
   const byName = findCountryByName(value);
   if (byName) return byName.code;
   if (value.length === 2) return value.toUpperCase();
@@ -44,7 +47,7 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const displayValue = getCountryDisplayName(value);
-  const selected = findCountryByName(value);
+  const selected = COUNTRIES.find(country => country.code === getCountryCode(value));
 
   const filtered = useMemo(() => {
     if (!searchQuery) return COUNTRIES;

@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MapPin, Loader2, X, AlertCircle, AlertTriangle } from 'lucide-react';
+import { MapPin, Loader2, X, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { AppLog } from '@/lib/logger';
+import './editor/business-where-contact.css';
 
 export type LocationPrecision = 'address' | 'poi' | 'postcode' | 'city' | 'region' | 'country' | 'pin' | 'unknown';
 
@@ -46,6 +47,9 @@ interface AddressAutocompleteProps {
    *  text and no drop-pin link (the step's own country line covers both). The
    *  precision warning and suggestions behaviour are unchanged. Default false. */
   bare?: boolean;
+  /** BE3: unresolved query text is not a saved address. */
+  onUnresolvedChange?: (unresolved: boolean) => void;
+  neutral?: boolean;
 }
 
 interface AddressResult {
@@ -68,8 +72,8 @@ interface AddressSearchResponse {
 }
 
 // Check if precision is precise enough
-function isPreciseEnough(precision: LocationPrecision): boolean {
-  return ['address', 'poi', 'pin'].includes(precision);
+export function isPreciseEnough(precision: LocationPrecision): boolean {
+  return ['address', 'poi', 'postcode', 'pin'].includes(precision);
 }
 
 export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
@@ -83,6 +87,8 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   disabled = false,
   error,
   bare = false,
+  onUnresolvedChange,
+  neutral = false,
 }) => {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<AddressResult[]>([]);
@@ -92,6 +98,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => () => { if (debounceRef.current) clearTimeout(debounceRef.current); }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -159,6 +166,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newQuery = e.target.value;
     setQuery(newQuery);
+    onUnresolvedChange?.(newQuery.length > 0);
     setSearchError(null);
     
     // Clear the selected value when user starts typing
@@ -199,6 +207,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     };
 
     onChange(addressValue);
+    onUnresolvedChange?.(false);
     setQuery(result.label);
     setShowDropdown(false);
     setSuggestions([]);
@@ -208,15 +217,11 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   const handleClear = () => {
     setQuery('');
     onChange(null);
+    onUnresolvedChange?.(false);
     setSuggestions([]);
     setShowDropdown(false);
     setSearchError(null);
     inputRef.current?.focus();
-  };
-
-  const handleRefine = () => {
-    inputRef.current?.focus();
-    inputRef.current?.select();
   };
 
   // Display the selected value or the query
@@ -287,38 +292,10 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
       {/* Precision warning */}
       {showPrecisionWarning && (
-        <div className="mt-3 p-3 rounded-sq-sm bg-muted border border-border/10">
-          <div className="flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-[#f59e0b] flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="text-sm font-medium text-foreground">That location is too general</p>
-              <p className="text-xs text-foreground mt-0.5">
-                Add a street address or postcode/ZIP to place your map pin accurately.
-              </p>
-              <div className="flex items-center gap-2 mt-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleRefine}
-                  className="h-7 text-xs"
-                >
-                  Refine address
-                </Button>
-                {onDropPinClick && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={onDropPinClick}
-                    className="h-7 text-xs"
-                  >
-                    Drop a pin on map
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
+        <div className="business-precision-note" data-testid="business-precision-note">
+          <h3>That's a whole town</h3>
+          <p>Add a street or postcode so golfers find your door, or place the pin yourself.</p>
+          {onDropPinClick && <Button type="button" variant="ghost" className="business-place-pin" onClick={onDropPinClick}>Place the pin</Button>}
         </div>
       )}
 
@@ -348,7 +325,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               >
                 <MapPin className={cn(
                   "h-4 w-4 shrink-0 mt-0.5",
-                  isPrecise ? "text-[#d97706]" : "text-muted-foreground"
+                  isPrecise && !neutral ? "text-[#d97706]" : "text-muted-foreground"
                 )} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{result.primary}</p>

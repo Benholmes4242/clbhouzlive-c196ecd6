@@ -30,7 +30,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
   name = 'Location',
   height = MAP_CONFIG.HEIGHT.PREVIEW,
   zoom = MAP_CONFIG.ZOOM.PREVIEW,
-  markerColor = MAP_CONFIG.MARKER_COLOR,
+  markerColor,
   showExpandButton = true,
   onExpand,
   interactive = false,
@@ -90,8 +90,9 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
       });
 
       // Add glassy orange marker (xs size for previews)
-      const markerEl = createGlassyMarkerElement('xs');
-      markerRef.current = new mapboxgl.Marker({ element: markerEl, anchor: 'bottom' })
+      // Explicit colours are honoured; omitted callers retain their glass pin.
+      const markerOptions = markerColor ? { color: markerColor } : { element: createGlassyMarkerElement('xs'), anchor: 'bottom' as const };
+      markerRef.current = new mapboxgl.Marker(markerOptions)
         .setLngLat([lng, lat])
         .addTo(map);
     };
@@ -122,7 +123,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
         mapRef.current = null;
       }
     };
-  }, [lat, lng, zoom, interactive, colorful, hasValidCoords]);
+  }, [lat, lng, zoom, interactive, colorful, hasValidCoords, markerColor]);
 
   // Reset map when coordinates change
   useEffect(() => {
