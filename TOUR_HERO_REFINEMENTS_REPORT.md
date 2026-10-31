@@ -1,5 +1,50 @@
 # Tour hero refinements — partial completion, data stop on 4(a)
 
+## 4(a) unblock recheck — 31 October 2026, 10:51–11:05 UTC
+
+**Still blocked in the connected preview.** Fresh guest sessions on `http://localhost:8080/tourhub` read the connected project `ybxkehyomcakqjvuhnna`. `session.user.is_anonymous` was true. The canonical nested GET returned HTTP 200 without a query error, but no player links. A separate uncached REST GET (`cache: no-store`, Cache-Control: no-cache) returned HTTP 200 with the same zero links; a direct guest GET of `sr_tee_time_players?select=player_id,tee_time_id&limit=1` returned HTTP 200 and `[]`. No SQL or policy modification was run. This confirms observed guest visibility, not the installed policy definition or underlying admin-visible row count. Ben reports the public SELECT policy was added; the preview result does not yet reflect populated player joins.
+
+Event: VidantaWorld Mexico Open, `fa65c3bc-18ef-4058-8048-cf61808fea78`.
+
+| Round | Tee-time rows | Nested links | Resolved players | Empty groups |
+|---|---:|---:|---:|---:|
+| 1 | 40 | 0 | 0 | 40 |
+| 2 | 40 | 0 | 0 | 40 |
+| 3 | 23 | 0 | 0 | 23 |
+
+**No production code or tests changed in this recheck.** The initial manual uncached diagnostic accidentally referenced a non-exported key and returned 401 Invalid API key; the diagnostic was corrected to use the running client's configured public key. The successful uncached results above supersede that instrumentation error. Session tokens were never printed or saved in the evidence JSON. Temporary scripts/read results live under `/tmp/browser/tour-unblocked`.
+
+### Saturday blocker records and proposed rule — not applied
+Guest-readable leaderboard data still has:
+- Aaron Baddeley: score 0, strokes 0, position null, status null, thru null, today/today_round null, all four round cards null; updated_at `2026-10-29T01:55:08.038865+00:00`.
+- Taylor Moore: identical score/strokes/position/status/thru/today/card shape; updated_at `2026-10-29T13:50:06.147368+00:00`.
+- Both raw payloads contain round sequences 1 and 2 with score 0, strokes 0 and thru 0, with every count zero. There is no terminal-status evidence in either row.
+
+Current `leadersShownRound` includes both because total score is non-null, then neither resolves to F. They are potential independent blockers, but the unreadable draw prevents verifying their real tee-sheet membership and reproducing the full Saturday field. No player discarded, status inferred, selector changed or fabricated Saturday regression added.
+
+**Proposed narrow rule for Ben's ruling after readable draw verification:** always retain every base-round tee-sheet player as a completion blocker unless an existing canonical terminal status exempts them. For leaderboard-only rows absent from that real draw, do not treat a zero-only placeholder as proof of participation: require actual play evidence (a completed round card, or positive thru/strokes) before adding it to the completion union. Zero is a valid score and must never be excluded on its own. This preserves CB58.2's real unstarted tee-sheet blockers and does not invent a terminal status. If either Baddeley or Moore appears in the base draw, this proposed rule deliberately does not unblock them; authoritative feed correction/ruling is then required.
+
+### Reader audit
+All browser readers below remain unconfirmed as populated: the shared nested player read is still empty. No claim that member displays are fixed; authenticated member checks remain unavailable (`external_unmanaged`).
+- `tournament-v2/data/useTeeTimesAll.ts:23–49`: tournament tee-times rail/full AllTeeTimesSheet, overview OnTheCourse, LeadersGroup and MiniBoard scheduled-round cells. Per-event/per-round chronological full draw.
+- `tournament-v2/data/usePickTeeTimes.ts:12–31`: picks' tee-time map/tee line, filtered to selected player IDs and round via the inner link join.
+- `hooks/useTournamentTeeTimes.ts:23–44`: round-1 teaser, first eight tee rows with joined player names.
+- `hooks/useTourHubData.ts:712–744`: enriched tee-time reader, optional round filter. Includes joined link rows/player detail.
+- `hooks/useAIPredictions.ts:577–600`: confirmed-field fallback when no leaderboard is available; direct links filtered to tournament tee-time IDs.
+- Server readers (not member UI and not executed/modified): `schedule-predictions/index.ts:101–117` field-size links; `generate-predictions/index.ts:155–164,317–324` field count/confirmed entrants; `tournament-live-sync/teeAlerts.ts:38–40` joined alert names. Their elevated access behavior is not established by the guest failure.
+- `sportradar-sync/index.ts:1241–1245` is a writer, not another player display; untouched.
+
+### Proof and full suite
+Real Chromium 390×844 `/tourhub` screenshot `/tmp/browser/tour-unblocked/initial.png` confirms empty scheduled R3 board cells and an absent leaders group, with no page errors. The tee-filled hero/pre-round leaders proof beside `tour-hero-signed-off.html` cannot truthfully be taken while the real draw is unreadable; no fixture was substituted.
+
+- `bunx vitest run --maxWorkers=2 --shard=1/2`: **2,372/2,372**, 245 files.
+- `bunx vitest run --maxWorkers=2 --shard=2/2`: **2,496 passed / 1 failed / 2,497 total**, 245 files.
+- Full: **4,868 passed / 1 pre-existing failure / 4,869 total**, 490 files, zero unhandled errors. Against requested 4,828/489: **+41 cases/+1 file**, all intervening `be3BusinessWhereContact.test.tsx`; no additions/removals/renames/rewrites in this task. Last reported BE3 total 4,869/490 is unchanged.
+- Exact existing failure: `src/test/be2BusinessPreview.test.tsx:76:263`, `BE2 immediate editing > makes Name read-only for club`: `TestingLibraryElementError: Found multiple elements with the text: /from your club/`. Already reported by BE3; not edited or rerun after this full-suite failure.
+- Latest available automatic build entry: `2026-10-31T10:50:56Z — build OK`. Earlier BE3 TS2367 diagnostics are historical; no manual typecheck was run and no claim of an independent typecheck result is made.
+
+Changed files in this recheck: this report and `roadmap.md` only. All SQL/migrations/deployed functions/RPCs/feed_config/cap/native configuration remained untouched. **STOP: guest player joins still empty, plus the separately owned pre-existing BE2 test prevents an all-green suite.** Next required action: Ben verify the public-read policy applies to this connected project and that the guest's table SELECT is not restricted by another policy; no further selector change before draw membership and the proposed rule can be decided.
+
 ## 4(a) read-only published draw check — first
 Checked 31 October 2026 through Supabase REST GET only, with the existing publishable client key. No SQL was run. All reads returned HTTP 200. Below: UTC first/last tee time and max created_at; counts are tee-time rows, not players.
 
