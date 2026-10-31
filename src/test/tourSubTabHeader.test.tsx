@@ -39,7 +39,6 @@ import { SubTabTourControl } from '@/features/tourhub/pages/TourHubMainPage';
 import { TourIcon, TOUR_ICON_PATHS, type TourIconName } from '@/features/tourhub/components/tourIslandIcons';
 
 describe('SubTabTourControl — every Tour sub-tab header renders without throwing', () => {
-  afterEachCleanup();
   for (const tab of ['news', 'live', 'schedule', 'players', 'leaderboards']) {
     it(`renders the ${tab} header`, () => {
       cleanup();
@@ -50,10 +49,6 @@ describe('SubTabTourControl — every Tour sub-tab header renders without throwi
     });
   }
 });
-
-function afterEachCleanup() {
-  // cleanup is invoked per-test above; this helper keeps the loop readable.
-}
 
 describe('TourIcon — defensive unknown name', () => {
   it('renders nothing and does not throw for an unknown name', () => {
