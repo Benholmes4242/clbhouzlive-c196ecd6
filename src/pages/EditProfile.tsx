@@ -146,7 +146,7 @@ export default function EditProfile() {
             homeClub={(golfNow.homeClubName ?? profile.home_club)?.trim() || null}
             onSavePhoto={savePhoto}
           />}
-          {profile && <EditProfileCompletion userId={user?.id ?? ''} inputs={{ avatar: profile.profile_photo_url, cover: profile.header_photo_url, bio: you.bio, homeClub: !!(golfNow.primaryClubId ?? profile.primary_club_id) || !!(golfNow.homeClubName ?? profile.home_club)?.trim(), handicap: resolved.value }} loading={loading || !!whsLoading || !!whsError} onAction={openCompletion} />}
+          {profile && <EditProfileCompletion userId={user?.id ?? ''} inputs={{ avatar: profile.profile_photo_url, cover: profile.header_photo_url, bio: you.bio, homeClub: !!(golfNow.primaryClubId ?? profile.primary_club_id) || !!(golfNow.homeClubName ?? profile.home_club)?.trim(), handicap: resolved.value, linked: !!whs }} loading={loading || !!whsLoading || !!whsError} onAction={openCompletion} />}
           {profile && <EditProfileYou
             ref={youActions}
             userId={user?.id ?? ''}

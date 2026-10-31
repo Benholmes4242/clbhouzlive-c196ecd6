@@ -4,12 +4,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { readFileSync } from 'node:fs';
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
-const h = vi.hoisted(() => ({ profile: {} as Record<string, unknown>, loading: false, homeLoading: false, topLoading: false, whsLoading: false, coachSuccess: true, coachError: false, coach: null as unknown, top: [] as unknown[], pending: false, picker: vi.fn() }));
+const h = vi.hoisted(() => ({ profile: {} as Record<string, unknown>, connection: null as unknown, loading: false, homeLoading: false, topLoading: false, whsLoading: false, coachSuccess: true, coachError: false, coach: null as unknown, top: [] as unknown[], pending: false, picker: vi.fn() }));
 vi.mock('@/features/home-club/homeClubPickerStore', () => ({ openHomeClubPicker: h.picker }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: { id: 'me' }, loading: false }) }));
 vi.mock('@/hooks/useProfileData', () => ({ useProfileData: () => ({ profile: h.profile, loading: h.loading }) }));
 vi.mock('@/hooks/useProfileSave', () => ({ useProfileSave: () => ({ save: vi.fn(async () => true) }) }));
-vi.mock('@/lib/whs/hooks', () => ({ useWhsConnection: () => ({ data: null, isLoading: h.whsLoading }) }));
+vi.mock('@/lib/whs/hooks', () => ({ useWhsConnection: () => ({ data: h.connection, isLoading: h.whsLoading }) }));
 vi.mock('@/features/home-club/useHomeClubStatus', () => ({ useHomeClubStatus: () => ({ state: h.pending ? 'pending' : 'none', pendingName: h.pending ? 'Pending' : null, isLoading: h.homeLoading }) }));
 vi.mock('@/hooks/useUserTopTenCourses', () => ({ useUserTopTenCourses: () => ({ topTen: h.top, isLoading: h.topLoading }) }));
 vi.mock('@/features/coach/hooks', () => ({ useMyCoach: () => ({ data: h.coach, isSuccess: h.coachSuccess, isError: h.coachError }), useInvalidateCoach: () => vi.fn(), useCoachHandicap: () => ({ current: 1, loading: false }), coachRpc: vi.fn() }));
@@ -28,9 +28,12 @@ function Location() { const l = useLocation(); return <output data-testid="locat
 function mount(path = '/edit-profile', back = false) {
  return render(<QueryClientProvider client={qc}><MemoryRouter initialEntries={back ? ['/origin', path] : [path]}><Location /><Routes><Route path="/edit-profile" element={<EditProfile />} /><Route path="/edit-profile-v2" element={<EditProfileAlias />} /><Route path="/create-profile" element={<CreateProfileRedirect />} /><Route path="/origin" element={<div data-testid="origin" />} /></Routes></MemoryRouter></QueryClientProvider>);
 }
-beforeEach(() => { h.picker.mockClear(); qc = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } }); h.profile = { ...base }; h.loading = h.homeLoading = h.topLoading = h.whsLoading = h.coachError = h.pending = false; h.coachSuccess = true; h.coach = null; h.top = []; });
+beforeEach(() => { h.picker.mockClear(); qc = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } }); h.profile = { ...base }; h.connection = null; h.loading = h.homeLoading = h.topLoading = h.whsLoading = h.coachError = h.pending = false; h.coachSuccess = true; h.coach = null; h.top = []; });
 afterEach(() => { cleanup(); qc.clear(); });
 describe('EP5 completion eligibility', () => {
+ it('live link completes handicap even with no index, without making coach applicable', () => { const items = completionItems({ ...complete, linked: true, handicap: null }); expect(items.find(i => i.key === 'handicap')?.done).toBe(true); expect(items.map(i => i.key)).not.toContain('coach'); });
+ it('an unlinked manual index does not complete the live connection action', () => { expect(completionItems({ ...complete, linked: false, handicap: 0 }).find(i => i.key === 'handicap')?.done).toBe(false); });
+ it('editor suppresses its connection chip for a live link with no index or rounds', () => { h.connection = { provider: 'england_golf', deleted_at: null }; h.profile.manual_handicap_index = null; h.profile.eg_handicap_index = null; mount(); expect(screen.getByTestId('ep-completion').querySelector('[data-action="handicap"]')).toBeNull(); expect(screen.getByRole('progressbar').querySelector('[data-item="handicap"]')).toHaveAttribute('data-done', 'true'); expect(screen.getByRole('progressbar').querySelector('[data-item="coach"]')).toBeNull(); });
  it.each([['avatar', { avatar: null }], ['cover', { cover: null }], ['bio', { bio: '  ' }], ['homeClub', { homeClub: false }], ['handicap', { handicap: null }], ['coach', { coach: false }], ['topTen', { topTen: 0 }]] as const)('%s has its own missing rule', (key, patch) => { expect(completionItems({ ...complete, ...patch }).find(i => i.key === key)?.done).toBe(false); expect(completionItems(complete).find(i => i.key === key)?.done).toBe(true); });
  it('pending home club is complete without a named club', () => { expect(completionItems({ ...complete, homeClub: false, pendingClub: true }).find(i => i.key === 'homeClub')?.done).toBe(true); });
  it('coach counts with zero handicap but not an absent handicap', () => { expect(completionItems(complete).map(i => i.key)).toContain('coach'); expect(completionItems({ ...complete, handicap: null }).map(i => i.key)).not.toContain('coach'); });
