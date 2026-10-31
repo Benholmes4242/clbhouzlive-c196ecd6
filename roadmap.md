@@ -1,5 +1,11 @@
 # Roadmap
 
+## Tour hero 4(a) — Published player joins unblocked
+- [x] Rechecked fresh and uncached guest reads: R1 40/R2 40/R3 23 tee rows, zero nested links/resolved players in each; direct links HTTP200 []. Baddeley/Moore still zero-only placeholders. No rule changed; conditional draw-preserving proposal in TOUR_HERO_REFINEMENTS_REPORT.md.
+- [x] Audited all client/server readers; real 390×844 preview has blank R3 tee cells and absent leaders, no page errors.
+- [ ] STOP: readable groups/pre-round proof still unavailable; Ben must verify policy on connected ybxkehyomcakqjvuhnna. No invented players/statuses or selector workaround.
+- [x] Full shards4868 passed/1 pre-existing BE2 failure/4869 across490, no unhandled errors; +41 BE3 cases/+1 file against4828. No tests/app changes. Existing be2BusinessPreview.test.tsx:76:263 multiple /from your club/ match untouched; latest automatic build OK10:50:56Z.
+
 ## BE3 — Business Where and Contact
 - [x] Implement edit-only immediate address/contact sheets, GB resolution, precise postcodes, neutral note, white map pin and chip routing; club Map pin hidden per ruling, create retained. BE3 41/41.
 - [ ] STOP: BE2 club Name query be2BusinessPreview.test.tsx:76:263 finds both required from-your-club labels; BusinessProfileEditor.tsx:573/574 TS2367 unreachable website/phone legacy comparisons. No fixes after failure. Targeted139/140; full4868 passed/1 failed/4869 across490, +41 BE3; no unhandled errors. BE3_REPORT.md records diff/assertions. Preview not build-clean; hosted member persistence unavailable external_unmanaged.
