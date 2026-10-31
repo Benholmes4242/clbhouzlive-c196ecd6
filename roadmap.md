@@ -1,9 +1,9 @@
 # Roadmap
 
 ## BE4 — Business Profile and Links
-- [ ] Replace edit-only legacy sections with Main button, Hours, Facilities and Socials sheets; canonical preview, all completion chips and final saved status.
-- [ ] Remove edit dirty/save/departure blocks, preserve create; add BE4 tests and explicitly retarget affected BE tests.
-- [ ] Full suite against 4,893/495 and automatic validation; report removals/assertion changes; remove BE1–BE3 reports only after passing.
+- [x] Replace edit-only legacy sections with Main button, Hours, Facilities and Socials sheets; canonical preview and final saved status. Remove edit dirty/save/departure blocks, preserve create; BE1–BE3 all pass with reported authorized retargets.
+- [ ] STOP: new BE4 `Add a logo opens a sheet` document-wide query matches two buttons at be4BusinessProfileLinks.test.tsx:54:431. Full 4,914 passed/1 failed/4,915 across496 (+22 BE4/+1 from4,893/495). No pre-existing failures or unhandled errors; two unsupported exact options removed only for mandatory compiler cleanliness, not to fix ambiguity.
+- [ ] Await authorized failing-query correction; finish missing value/line/status coverage and visual check, then remove BE1–BE3 reports only after all pass. Hosted member persistence unavailable external_unmanaged. See BE4_REPORT.md.
 
 ## Linked-without-index wording amendment
 - [x] Update Profile, zero-round/no-index Done and Manage messages in English in every locale; preserve index-present wording and provider naming.
