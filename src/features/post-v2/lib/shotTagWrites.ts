@@ -25,21 +25,23 @@ import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { isHoleTag, type ShotTag } from './golfPostRules';
 
+/** One photo's choice: its tag and the course it was tagged against. */
+export interface ShotTagChoice { tag: ShotTag; courseId: string; knownHoles: readonly number[] }
 export interface ShotTagJob {
-  courseId: string;
-  knownHoles: readonly number[];
   /** Keyed by StageMediaItem.id. */
-  tags: Readonly<Record<string, ShotTag>>;
+  items: Readonly<Record<string, ShotTagChoice>>;
 }
 
 export async function writeShotTagAfterUpload(
-  job: ShotTagJob | undefined,
+  tagJob: ShotTagJob | undefined,
   memberId: string,
   item: { id: string; type: 'image' | 'video'; file?: File },
   uploaded: { url?: string; streamId?: string },
 ): Promise<void> {
-  const tag = job?.tags[item.id];
-  if (!job || !tag || !item.file) return;
+  const choice = tagJob?.items[item.id];
+  if (!choice || !item.file) return;
+  const { tag } = choice;
+  const job = choice;
   try {
     if (isHoleTag(tag)) {
       if (item.type === 'video') {
