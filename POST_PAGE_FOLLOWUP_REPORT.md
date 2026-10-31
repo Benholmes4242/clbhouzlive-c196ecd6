@@ -35,11 +35,12 @@ Per the approved change, `src/test/postPageFollowup.test.tsx:53` now sets `frame
 - `bunx vitest run src/test/postPageFollowup.test.tsx`: 3/3 passed, 1 file.
 - Automatic preview build at 2026-10-31T17:10:29Z: build OK.
 
-## Outstanding proof and types
+## Outstanding proof
 - The requested 390×844 page, hole-tagged photo/two people, tag sheet and Preview screenshots remain uncaptured. Driving `/post-v2` signed out redirects to the clubhouse guest view (the guest allowlist covers free-look surfaces and `/post/:id` only), and this project's browser auth status is `external_unmanaged`, so no signed-in composer session can be restored or minted from the sandbox; no credentials were requested or fabricated.
 - Hosted authenticated end-to-end posting, tagging and inbox delivery checks are unavailable.
 - Median/iPhone picker DateTimeOriginal survival for photo and video remains unverified; no native changes.
-- `post_with` is still absent from the generated database types. `lovable supabase --help` exposes diagnostics only, not types generation; the available platform tool inventory has no independent types-regeneration tool. The supplied integration guidance prohibits hand-editing the generated types. Regeneration therefore remains outstanding.
-- Untyped access remains centralised at `src/features/post-v2/lib/postWith.ts:18`, `postWithTable()`, via `(supabase as any).from('post_with')`.
+
+## post_with types (31 Oct 2026, 17:30 UTC)
+`public.post_with` is now present in `src/integrations/supabase/types.ts` (Row `{ post_id, user_id, created_at }`, optional `created_at` on Insert/Update, Relationships for `post_id` → `posts.id` plus the two drift views), matching the live table exactly. The untyped cast at `postWithTable()` (`src/features/post-v2/lib/postWith.ts`) is removed — every access is typed; the "UNTYPED ON PURPOSE" header note was updated to match. `bunx tsgo --noEmit`: clean (exit 0). Full suite: **4,965/4,965 across 499 files** (`--shard=1/2`: 2,423/2,423, 250 files; `--shard=2/2`: 2,542/2,542, 249 files), reconciling exactly with the recorded baseline. The types entry was already present in the generated file when this turn began; only the cast was removed here.
 
 No SQL, migrations, trigger/RPC/edge changes, feed_config changes or native/Median changes. `round_pool_cap` stays 30.
