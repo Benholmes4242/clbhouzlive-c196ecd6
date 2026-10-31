@@ -1,5 +1,10 @@
 # Roadmap
 
+## Round plot — interrupted draw-on
+- [x] Confirm start-time replay guard cause; commit session identity only on completed draw, resetting interrupted head dot.
+- [x] Five regressions added; targeted73/73 and full shards2420+2519=4939/4939 across497, +5 over4934/497; automatic build OK13:40:22Z.
+- [ ] Four-card 390×844 guest proof blocked by existing Join the community gate: Old Fold Manor visibly draws; two Sundridge cards not visibly captured; fourth not reached. Evidence and per-card outcomes in ROUND_PLOT_DRAW_REPLAY_REPORT.md. Requires access beyond guest gate; no policy bypass.
+
 ## Two follow-ups — linked invitation and Tour 4(a)
 - [x] 13:18 approval: named CB58 expectation corrected; finished d/e mirror plus separate tied-leader regression added. Every current leader and selected-group companion gates completion; other field rows do not.
 - [x] Suppress remaining completionRules.ts invitation using editor's live linked input; EP5 39/39 and final five-file/six-call shared-chip consumer audit in LINKED_NO_INDEX_REPORT.md.
