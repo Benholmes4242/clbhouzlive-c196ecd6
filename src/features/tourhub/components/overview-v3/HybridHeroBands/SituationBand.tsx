@@ -21,7 +21,7 @@ export function SituationBand({ segments, onFullBoard, note }: { segments: Headl
     </div>
   );
   return (
-    <div data-overview-situation style={{ padding: '15px 20px' }}>
+    <div data-overview-situation style={{ padding: '15px 20px 12px' }}>
       {onFullBoard ? (
         <div data-overview-situation-row style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           {label}

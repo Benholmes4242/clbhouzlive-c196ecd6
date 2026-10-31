@@ -7,11 +7,22 @@ import { fieldHasStarted } from '../../../overview/boardStarted';
 import { todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
 import { thruLabel } from '../../../tournament-v2/sections/MiniBoard';
 import type { TeeGroup } from '../../../tournament-v2/data/useTeeTimesAll';
+import type { TeeGroupPlayer } from '../../../tournament-v2/data/useTeeTimesAll';
 import { surnameOf } from '../../../_shared/playerName';
 import { isDemotedStatus } from '../../../_shared/resultStatus';
 import { nextDrawnRound } from './whatsNext';
 
 export type GroupState = 'before' | 'onCourse' | 'finished';
+/** Display order only: retain draw order for tied/missing positions; terminal
+ * MC/CUT/WD entries follow ranked players. Never mutate the published group. */
+export function leadersPositionOrder(players: TeeGroupPlayer[], entries: BoardEntry[]): TeeGroupPlayer[] {
+  const rank = (player: TeeGroupPlayer) => {
+    const entry = entries.find(e => player.id != null && e.player?.id === player.id);
+    if (['MC', 'CUT', 'WD'].includes(entry?.status?.toUpperCase() ?? '')) return Number.POSITIVE_INFINITY;
+    return entry?.position ?? Number.MAX_SAFE_INTEGER;
+  };
+  return players.map((player, index) => ({ player, index })).sort((a, b) => rank(a.player) - rank(b.player) || a.index - b.index).map(item => item.player);
+}
 export function allLeaders(entries: BoardEntry[]): BoardEntry[] {
   return entries.filter(e => e.position === 1 && e.player?.id);
 }

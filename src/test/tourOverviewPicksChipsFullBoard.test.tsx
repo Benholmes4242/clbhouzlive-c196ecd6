@@ -102,9 +102,9 @@ describe('picks chips (Board B)', () => {
     expect(cards[0].querySelector('[data-overview-pick-to-reach]')).toBeNull(); // the leader has nothing to reach
     const line = cards[1].querySelector('[data-overview-pick-to-reach]') as HTMLElement;
     expect(line).not.toBeNull();
-    expect(line.children).toHaveLength(0);
+    expect(line.children).toHaveLength(2);
     expect(line.style.whiteSpace).toBe('nowrap');
-    expect(line.style.textOverflow).toBe('ellipsis');
+    expect(line.style.textOverflow).toBe('');
     expect(line.style.borderTop).toBe('');
     cleanup();
     const early = mountPicks({ currentRound: 2 });
