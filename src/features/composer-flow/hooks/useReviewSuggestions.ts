@@ -1,9 +1,14 @@
 /**
  * Review suggestions own one member-scoped query and complete, paginated reads.
- * Priority is club -> own composer posts -> followed reviewers; popularity is
- * used only when no drawable personal candidate exists. Counts are distinct
- * followed reviewers, not reviews. Missing courses/names never invent a row.
- * Reads fail closed: a failed exclusion or count read must not offer a course.
+ * Priority is club -> played (synced rounds, most recent first) -> own personal
+ * composer posts -> followed reviewers; popularity is used only when no
+ * drawable personal candidate exists. "Posted" counts only the member's own
+ * personal posts: actor_type = 'personal', or actor_id = the member where
+ * actor_type is null on older rows; business-actor posts never count. Played
+ * courses come from gam_round_stats, whose course_id is the mapped
+ * golf_courses id. Counts are distinct followed reviewers, not reviews.
+ * Missing courses/names never invent a row. Reads fail closed: a failed
+ * exclusion or count read must not offer a course.
  * user_follows.follower_id -> following_id is the app's outgoing people graph.
  */
 import { useQuery } from '@tanstack/react-query';
@@ -13,7 +18,7 @@ import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfileData } from '@/hooks/useProfileData';
 
-export type ReviewReasonKind = 'club' | 'posted' | 'followed' | 'popular';
+export type ReviewReasonKind = 'club' | 'played' | 'posted' | 'followed' | 'popular';
 export interface ReviewSuggestion {
   courseId: string;
   courseName: string;
@@ -22,12 +27,14 @@ export interface ReviewSuggestion {
   reasonKind: ReviewReasonKind;
 }
 export interface SuggestionCourse { id: string; name: string; thumbnail_image: string | null }
-export interface SuggestionPost { course_id: string | null; created_at: string }
+export interface SuggestionPost { course_id: string | null; created_at: string; actor_type: string | null; actor_id: string | null }
+export interface SuggestionPlayed { course_id: string; play_date: string }
 export interface SuggestionRating { course_id: string; user_id: string | null; created_at: string }
 export interface SuggestionProfile { id: string; display_name: string | null; username: string | null }
 interface Sources {
   courses: SuggestionCourse[];
   club: SuggestionCourse[];
+  played: SuggestionPlayed[];
   posts: SuggestionPost[];
   followed: SuggestionRating[];
   profiles: SuggestionProfile[];
@@ -47,6 +54,10 @@ export function buildReviewSuggestions(s: Sources, t: TFunction<'composerFlow'>)
     result.push({ courseId: id, courseName: c.name, thumbnail: c.thumbnail_image, reasonKind, reason });
   };
   for (const c of s.club) offer(c.id, 'club', t('reason.club'));
+  for (const p of [...s.played].sort((a, b) => b.play_date.localeCompare(a.play_date))) {
+    const when = format(new Date(p.play_date), 'd MMM');
+    offer(p.course_id, 'played', t('reason.played', { when }));
+  }
   for (const p of [...s.posts].sort((a, b) => b.created_at.localeCompare(a.created_at))) {
     const when = format(new Date(p.created_at), 'd MMM');
     offer(p.course_id, 'posted', t('reason.posted', { when }));
