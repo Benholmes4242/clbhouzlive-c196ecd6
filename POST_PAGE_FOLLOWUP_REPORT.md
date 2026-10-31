@@ -29,16 +29,15 @@ The +3 tests are all in new `src/test/postPageFollowup.test.tsx`:
 
 No tests were deleted, renamed or rewritten; the approved mock adds no test case and changes no assertion.
 
-## Stop — automatic type validation
-The latest automatic preview validation at `2026-10-31T16:59:25Z` reported:
-```text
-src/test/postPageFollowup.test.tsx(53,35): error TS2741: Property 'frame' is missing in type '{ id: string; type: 'image'; previewUrl: string; }' but required in type 'StageMediaItem'.
-```
-This is a new test-fixture error introduced in this follow-up, not a pre-existing error. Work stopped when that surviving error was read. The prior build at `2026-10-31T16:58:35Z` was OK, but it does not establish the current build is clean. No manual build or typecheck was run.
+## Approved fixture correction (31 Oct 2026, 17:10 UTC)
+Per the approved change, `src/test/postPageFollowup.test.tsx:53` now sets `frame: 'original'` on the StageMediaItem fixture — the same default `useStageComposer.ts:135` and `StageComposer.tsx:238` give every new item. Nothing else changed.
+- `bunx tsgo --noEmit`: clean (exit 0).
+- `bunx vitest run src/test/postPageFollowup.test.tsx`: 3/3 passed, 1 file.
+- Automatic preview build at 2026-10-31T17:10:29Z: build OK.
 
 ## Outstanding proof and types
-- The requested 390×844 page, hole-tagged photo/two people, tag sheet and Preview comparisons were not captured because of the stop above.
-- This project's browser auth status is `external_unmanaged`; hosted authenticated end-to-end posting, tagging and inbox delivery checks are unavailable. No credentials were requested or fabricated.
+- The requested 390×844 page, hole-tagged photo/two people, tag sheet and Preview screenshots remain uncaptured. Driving `/post-v2` signed out redirects to the clubhouse guest view (the guest allowlist covers free-look surfaces and `/post/:id` only), and this project's browser auth status is `external_unmanaged`, so no signed-in composer session can be restored or minted from the sandbox; no credentials were requested or fabricated.
+- Hosted authenticated end-to-end posting, tagging and inbox delivery checks are unavailable.
 - Median/iPhone picker DateTimeOriginal survival for photo and video remains unverified; no native changes.
 - `post_with` is still absent from the generated database types. `lovable supabase --help` exposes diagnostics only, not types generation; the available platform tool inventory has no independent types-regeneration tool. The supplied integration guidance prohibits hand-editing the generated types. Regeneration therefore remains outstanding.
 - Untyped access remains centralised at `src/features/post-v2/lib/postWith.ts:18`, `postWithTable()`, via `(supabase as any).from('post_with')`.
