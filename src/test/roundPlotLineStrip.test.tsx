@@ -35,7 +35,7 @@ beforeEach(() => {
   vi.stubGlobal('cancelAnimationFrame', vi.fn());
   vi.spyOn(performance, 'now').mockImplementation(() => clock);
   vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false })));
-  vi.useFakeTimers();
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] });
 });
 afterEach(() => {
   cleanup();
