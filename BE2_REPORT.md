@@ -11,7 +11,7 @@ Implementation is present but not signed off. After completed edits, targeted te
 - `src/hooks/useBusinessImageUpload.ts`: optional BE2 mode passes changed-photo-only writes through the existing protection helper and propagates failures; defaults retain original behaviour, timestamps and toast handling.
 - `src/test/be2BusinessPreview.test.tsx` (new): **31 cases**, **28 pass / 3 fail**. Completion checks, identity saves/baselines, read-only names, validation, count, removals and save/retry tests executed. Choose/crop upload paths are blocked by missing jsdom URL setup.
 - `src/test/be1BusinessEditSettings.test.tsx`: two existing cases retargeted below; test count remains **26**.
-- `roadmap.md`, `AGENTS.md`: task status and module ownership notes.
+- `roadmap.md`: task status. Module ownership notes are in the new preview/completion and image-hook headers; the attempted AGENTS.md addition was refused by its size budget and was not applied. No architecture rule was compressed or removed.
 - Project memory: recorded BE2 requirements and wrapping helper ruling.
 
 No SQL, migrations or migration files, deployed RPC/edge changes, feed_config changes, guest changes or native/Median changes. round_pool_cap stays 30. No publication.
