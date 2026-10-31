@@ -1,6 +1,7 @@
 {
   "hero": {
-    "linkedNoIndex": "Connected to {{provider}}. Your index and rounds appear here as soon as {{provider}} has them.",
+    "linkedNoIndex": "You're connected. Your rounds will start arriving once {{provider}} gives you an official handicap.",
+    "linkedNoIndexNext": "Not got one yet? Keep submitting scores and they'll show here soon after it arrives.",
     "linkedManage": "{{provider}} ›",
     "handicapIndex": "Handicap index",
     "trendWindow": "12mo",

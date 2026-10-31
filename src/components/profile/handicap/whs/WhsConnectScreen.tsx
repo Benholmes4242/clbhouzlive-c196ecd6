@@ -373,6 +373,7 @@ export const WhsConnectScreen: React.FC<Props> = ({
             handicapIndex={successData?.handicap_index ?? null}
             homeClub={successData?.home_club ?? null}
             connectionId={connection?.id ?? null}
+            provider={connection?.provider}
             onContinue={async () => {
               await onConnected();
               setSuccessData(null);

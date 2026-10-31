@@ -11,6 +11,10 @@ import { handicapTabRoute } from '@/lib/handicap/handicapTabRoute';
 import { INK, MUTE, BORDER, GOOD, BAD, DIM, AMBER, CAPTION, NUM, FONT } from './designTokens';
 import { Panel, PanelGap, Figure, RefRow, Action, SecondaryButton } from './Primitives';
 import { useImportedCounts } from './useImportedCounts';
+import { useHandicapChipState } from '@/lib/whs/useHandicapChipState';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { bodyNameForProvider } from '@/lib/whs/whsCountries';
+import { useTranslation } from 'react-i18next';
 
 const Dot: React.FC<{ color: string; style?: React.CSSProperties }> = ({ color, style }) => (
   <span style={{ width: 8, height: 8, borderRadius: '50%', background: color, flexShrink: 0, ...style }} />
@@ -77,6 +81,10 @@ export const ManageScreen: React.FC<Props> = ({
   onSynced,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('handicap');
+  const { user } = useSupabaseSession();
+  const chip = useHandicapChipState(user?.id);
+  const provider = bodyNameForProvider(connection.provider);
   const health = getSyncHealth(connection);
   const { data: counts } = useImportedCounts(connection.id);
   const { data: lastRound } = useLastRound(connection.id);
@@ -271,8 +279,9 @@ export const ManageScreen: React.FC<Props> = ({
         <>
           <div style={TITLE}>No rounds yet</div>
           <div style={{ fontSize: 12.5, lineHeight: 1.5, color: MUTE, marginTop: 4 }}>
-            England Golf has no rounds on your record. The next one you play will arrive here on
-            its own.
+            {chip.linked && chip.settled && !chip.anyError && chip.trend?.current == null
+              ? t('whsConnect.done.subConnectedEmpty', { provider })
+              : `${provider} has no rounds on your record. The next one you play will arrive here on its own.`}
           </div>
         </>
       )}

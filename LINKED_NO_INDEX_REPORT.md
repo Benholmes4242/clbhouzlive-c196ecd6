@@ -54,4 +54,26 @@ Production: src/lib/whs/useHandicapChipState.ts; src/features/chrome-v2/ChromeIs
 
 Locales: public/locales/{en,en-XA,de,es,ja,ko}/{handicap,profile}.json (12).
 
+## Wording amendment — 31 October 2026
+
+Updated only the requested messages and the inputs needed to select them:
+- Profile notice now starts “You're connected. Your rounds will start arriving once {{provider}} gives you an official handicap.” Its next sentence starts on its own line with the same existing paragraph style; provider management action remains beneath. The shared empty Rounds notice inherits this copy.
+- Done/no-index/zero-round headline remains “You're connected.” Its body is “Your rounds will start arriving once {{provider}} gives you an official handicap. Not got one yet? Keep submitting scores and they'll show here soon after it arrives.” Connection provider is passed from WhsConnectScreen through an optional prop; existing callers retain the canonical fallback.
+- Manage’s No rounds yet body selects that same locale key only for a settled, successful linked/no-index read from the existing shared chip hook. Index-present members (including index 0) retain the previous body. Failed/unsettled reads do not assert a missing index. No sync, navigation, counters, or save behaviour changed.
+- All six locales carry the amended English copy. Other strings are untouched.
+
+Changed source files: LinkedHandicapNotice.tsx, WelcomeAboardScreen.tsx, WhsConnectScreen.tsx, ManageScreen.tsx. Changed locale files: public/locales/{en,en-XA,de,es,ja,ko}/{profile,handicap}.json. Documentation: this report, roadmap.md, linked-no-index preference memory.
+
+No existing test was deleted, renamed, rewritten, or changed. New file src/test/linkedHandicapManage.test.tsx adds three cases: `selects the official-handicap explanation with the connection provider when no index exists`; `retains the existing empty-record branch for a present zero index`; `does not interpret a failed index read as a confirmed missing index`. Assertions cover branch selection/provider input, not translated words or styling.
+
+Verification:
+- `bunx vitest run src/test/linkedHandicapManage.test.tsx src/test/linkedHandicapDone.test.tsx src/test/linkedHandicapProfile.test.tsx src/test/linkedHandicapState.test.tsx --maxWorkers=2`: 22/22, four files.
+- `bunx vitest run --maxWorkers=2 --shard=1/2`: 2,394/2,394, 248 files.
+- `bunx vitest run --maxWorkers=2 --shard=2/2`: 2,499/2,499, 247 files.
+- Full suite 4,893/4,893 across 495 files, no failures or unhandled errors. Previous BE3.1 baseline 4,890/494 → 4,893/495: exactly the three new Manage tests and one new file. The historical BE2 multiple-match failure and TS2367 errors were cleared by BE3.1 before this amendment; neither recurred.
+- Automatic preview validation returned `build OK` after the finished source edits; no manual build/typecheck run. An intermediate chip property mismatch during editing was corrected before tests.
+- Authenticated member checks remain unavailable (`external_unmanaged`); Ben should verify the affected member’s Profile, Done and Manage messages on their phone. No real-member visual/persistence verification is claimed.
+
+No SQL, migrations, deployed RPC/edge edits, feed_config, native/Median changes; round_pool_cap stays 30.
+
 Tests: four new linked*.test.tsx files named above; three existing fixture files named above. Documentation: AGENTS.md, roadmap.md, this report; preference memory linked-no-index.md/index. AGENTS budget prevented adding a new line; its Settings/export ownership pointer was replaced with a module-header pointer and CSV ownership retained in the module header, not removed.
