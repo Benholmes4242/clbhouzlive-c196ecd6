@@ -1,5 +1,48 @@
 # Round plot line and hole strip — STOP report
 
+## Approved setup-only rerun — 31 October 2026
+
+**Stopped: 64/68 targeted tests pass; full suite 4,777 passed, 5 failed, 4,782 total across 487 files.** No further test correction was made after the new errors surfaced. No application code, assertions, expected values, test names or test inventory changed in this correction.
+
+### Changed files and quoted setup changes
+- `src/test/feedEndDot.test.tsx`: replaced the inherited-method spy with the authorised own-property override in `beforeEach`:
+  ```ts
+  Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', { configurable: true, value: () => ({ width: 340, height: 0, top: 0, left: 0, right: 340, bottom: 0, x: 0, y: 0, toJSON() {} }) });
+  ```
+  `afterEach` now includes `Reflect.deleteProperty(HTMLElement.prototype, 'getBoundingClientRect');`, restoring the inherited Element method. All six endpoint cases pass.
+- `src/test/roundPlotLineStrip.test.tsx`: the same rectangle override uses width/right **390** and the same `Reflect.deleteProperty` cleanup. Replaced observer `vi.stubGlobal` calls with direct assignment, saving/restoring both original constructors; shared setup also defines IntersectionObserver without configurability:
+  ```ts
+  originalResizeObserver = window.ResizeObserver;
+  originalIntersectionObserver = window.IntersectionObserver;
+  window.ResizeObserver = class { constructor(cb: typeof resize) { resize = cb; } observe() {} disconnect() {} } as unknown as typeof window.ResizeObserver;
+  window.IntersectionObserver = class { constructor(cb: typeof intersection) { intersection = cb; } observe() {} disconnect() {} } as unknown as typeof window.IntersectionObserver;
+  // afterEach, after cleanup():
+  window.ResizeObserver = originalResizeObserver;
+  window.IntersectionObserver = originalIntersectionObserver;
+  ```
+  `src/test/setup.ts` is unchanged. The observer redefinition and invalid Element receiver errors no longer occur.
+- `ROUND_PLOT_LINE_STRIP_REPORT.md`: added this rerun entry; historical implementation report retained below. No other files changed by this correction.
+
+### Commands and counts
+- `bunx vitest run src/test/roundPlotLineStrip.test.tsx src/test/roundTilePlot.test.tsx src/test/feedEndDot.test.tsx src/test/feedGrossDots.test.tsx src/test/feedRoundUnderParFill.test.tsx src/test/feedRoundNet.test.tsx src/test/roundPlotScale.test.ts --maxWorkers=2`: **64 passed / 4 failed / 68 total across 7 files**.
+- `bunx vitest run --maxWorkers=2 --shard=1/2`: **2,358 passed / 1 failed / 2,359 total across 244 files**.
+- `bunx vitest run --maxWorkers=2 --shard=2/2`: **2,419 passed / 4 failed / 2,423 total across 243 files**.
+- Combined full scope: **4,777 passed / 5 failed / 4,782 total across 487 files**.
+- Inventory before and after this setup-only edit: **4,782 tests / 487 files**, unchanged. Against the requested **4,757 / 486** baseline, the intervening **+25 tests / +1 file** are the existing `src/test/be1BusinessEditSettings.test.tsx` from BE1. This correction added, removed, renamed or rewrote **zero cases** and changed **zero assertions**.
+
+### Newly exposed failures — no follow-up edits
+All four are in `src/test/roundPlotLineStrip.test.tsx`:
+1. “never draws before threshold and plays after the 120ms delay”, **107:103**: `TypeError: [Function requestAnimationFrame] is not a spy or a call to a spy!`
+2. “renders a remounted round finished without replaying”, **24:59**, called from **114:88**: `TypeError: raf is not a function`
+3. “finishes immediately with reduced motion”, **119:131**: `TypeError: [Function requestAnimationFrame] is not a spy or a call to a spy!`
+4. “cancels pending animation on unmount”, **125:144**: `TypeError: [Function requestAnimationFrame] is not a spy or a call to a spy!`
+
+The original 20 setup failures were pre-existing on entry; their exact errors have cleared, revealing these four previously blocked failures. One unrelated pre-existing BE1 failure remains unchanged: `src/test/be1BusinessEditSettings.test.tsx:86:43`, “renders verification state verified with its correct action”: `TestingLibraryElementError: Unable to find an accessible element with the role "heading" and name "Verified"`. The accessible heading is `Verified Verified`. BE1 is outside this approval and was not touched.
+
+Latest available automatic preview check: **build OK**, `2026-10-31T08:43:37Z`. No app/visual change or browser verification was requested or made. All protected SQL, migration, configuration and deployment restrictions remain intact. Not all passing; not ready to sign off.
+
+## Historical implementation result
+
 ## Result
 Not ready for sign-off. Source edits are finished; no test or source correction was made after the unexpected test failures. No pre-existing failures were known against the supplied green baseline.
 
