@@ -1,5 +1,10 @@
 # Roadmap
 
+## Round plot — Line and hole strip
+- [ ] Match measured-width net trace, gross strip, earned red and complete-card OUT/IN; preserve feat and taps.
+- [ ] Add session-once draw-on and named regression updates; full suite against 4,743/485.
+- [ ] Compare finished/mid-draw at 390×844; member preview unavailable with external_unmanaged, report fixture limits.
+
 ## Guest browsing Stage 3 — Switch on
 - [x] Enable outside tests; guest creation continues to use settled envStatus for native/preview only. Preserve production web and Apple diagnostic logging.
 - [x] Late-native, preview and member launch regressions pass; live preview guest Clubhouse verified. Full suite 4,742 passed/1 failed/4,743 across485, +5/+1 in guestStage3.test.tsx. Existing 4,738 tests pass; report names all switch assertion changes.
