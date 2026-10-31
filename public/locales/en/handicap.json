@@ -311,7 +311,7 @@
     "done": {
       "headlineConnectedEmpty": "You're connected.",
       "headlineIndexOnly": "Your index is here.",
-      "subConnectedEmpty": "England Golf has no handicap index or rounds on your record yet. Your first round will arrive here on its own.",
+      "subConnectedEmpty": "Your rounds will start arriving once {{provider}} gives you an official handicap. Not got one yet? Keep submitting scores and they'll show here soon after it arrives.",
       "subIndexOnly": "Your first round will arrive here on its own.",
       "kicker": "Connected",
       "headline": "Your record is all here.",
