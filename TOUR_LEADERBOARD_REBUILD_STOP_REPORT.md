@@ -1,6 +1,6 @@
-# Tour leaderboard rebuild — specification stop
+# Tour leaderboard rebuild — resolved specification stop
 
-No application files or tests changed. No SQL, migrations, provider calls or protected configuration changes.
+Historical pre-implementation stop, now resolved by Ben's choice to preserve existing colours. Completed work and checks are recorded in TOUR_LEADERBOARD_REBUILD_REPORT.md. No SQL, migrations, extra provider calls or protected configuration changes.
 
 ## Contradictory score-colour requirements
 
@@ -12,7 +12,7 @@ The existing canonical helper does not output those colours:
 - `src/features/tourhub/_shared/tokens.ts:199`: `TOPAR_OVER_DARK = 'rgba(242,244,247,0.62)'`.
 - `src/features/tourhub/_shared/tokens.ts:201`: `TOPAR_EVEN_DARK = 'rgba(242,244,247,0.42)'`.
 
-Preserving the helper exactly and rendering the specified/mock colours cannot both hold. Await Ben's ruling; do not silently repoint shared tokens because the hero is frozen.
+Preserving the helper exactly and rendering the specified/mock colours cannot both hold. Ben selected preserving the existing helper; shared score tokens and the hero remain unchanged.
 
 ## Confirmed prerequisites
 
@@ -28,4 +28,4 @@ The mock loads Geist, whereas the existing global typography rule freezes system
 
 Last reported baseline: 4,972 tests across 500 files. No tests added, deleted, renamed or rewritten; no test run undertaken before the specification ruling. Latest available automatic preview log: `2026-10-31T18:46:54Z — build OK`.
 
-Implementation, sharded suite and four 390×844 screenshot comparisons remain pending this ruling. Your players is to be unit-tested only as the brief requires.
+Implementation, sharded suite and four 390×844 screenshot comparisons are now complete; see the final report. Your players is unit-tested only as the brief requires.
