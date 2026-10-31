@@ -112,14 +112,18 @@ async function readIds<T>(ids: string[], make: (chunk: string[]) => any): Promis
 
 export async function loadReviewSuggestions(userId: string, t: TFunction<'composerFlow'>, now = new Date()): Promise<ReviewSuggestion[]> {
   const from = (days: number) => new Date(now.getTime() - days * 86400000).toISOString();
-  const [profile, reviewed, posts, follows] = await Promise.all([
+  const [profile, reviewed, rawPosts, played, follows] = await Promise.all([
     supabase.from('user_profiles').select('primary_club_id').eq('id', userId).maybeSingle(),
     readAll<{ course_id: string }>(() => supabase.from('course_ratings').select('course_id').eq('user_id', userId).order('id')),
-    readAll<SuggestionPost>(() => supabase.from('posts').select('course_id, created_at').eq('user_id', userId)
+    readAll<SuggestionPost>(() => supabase.from('posts').select('course_id, created_at, actor_type, actor_id').eq('user_id', userId)
       .not('course_id', 'is', null).is('whs_score_id', null).is('source_review_id', null)
       .order('created_at', { ascending: false }).order('id')),
+    readAll<SuggestionPlayed>(() => supabase.from('gam_round_stats').select('course_id, play_date').eq('user_id', userId)
+      .not('course_id', 'is', null).order('play_date', { ascending: false }).order('id')),
     readAll<{ following_id: string }>(() => supabase.from('user_follows').select('following_id').eq('follower_id', userId).order('id')),
   ]);
+  // Only the member's own personal posts count; business-actor posts never do.
+  const posts = rawPosts.filter(p => p.actor_type === 'personal' || (p.actor_type == null && p.actor_id === userId));
   if (profile.error) throw profile.error;
   const clubId = profile.data?.primary_club_id;
   const followingIds = [...new Set(follows.map(f => f.following_id))];
@@ -129,13 +133,13 @@ export async function loadReviewSuggestions(userId: string, t: TFunction<'compos
     readIds<SuggestionRating>(followingIds, ids => supabase.from('course_ratings').select('course_id, user_id, created_at')
       .in('user_id', ids).gte('created_at', from(90)).order('created_at', { ascending: false }).order('id')),
   ]);
-  const ids = [...new Set([...club.map(c => c.id), ...posts.flatMap(p => p.course_id ? [p.course_id] : []), ...followed.map(r => r.course_id)])];
+  const ids = [...new Set([...club.map(c => c.id), ...played.map(p => p.course_id), ...posts.flatMap(p => p.course_id ? [p.course_id] : []), ...followed.map(r => r.course_id)])];
   const [courses, profiles] = await Promise.all([
     readIds<SuggestionCourse>(ids, chunk => supabase.from('golf_courses').select('id, name, thumbnail_image').in('id', chunk).order('id')),
     readIds<SuggestionProfile>([...new Set(followed.flatMap(r => r.user_id ? [r.user_id] : []))], chunk =>
       supabase.from('user_profiles').select('id, display_name, username').in('id', chunk).order('id')),
   ]);
-  const sources: Sources = { courses, club, posts, followed, profiles, reviewed: reviewed.map(r => r.course_id), popular: [] };
+  const sources: Sources = { courses, club, played, posts, followed, profiles, reviewed: reviewed.map(r => r.course_id), popular: [] };
   const personal = buildReviewSuggestions(sources, t);
   if (personal.length) return personal;
   const popular = await readAll<SuggestionRating>(() => supabase.from('course_ratings').select('course_id, user_id, created_at')
