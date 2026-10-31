@@ -8,7 +8,7 @@
 
 ## Round plot — Line and hole strip
 - [x] Implement measured-width net trace, gross strip, earned red and complete-card OUT/IN; preserve feat and taps.
-- [ ] STOP: session-once draw-on and 14 new cases implemented; full shards 4,737 passed/20 failed/4,757 total across486. Endpoint width spy fails jsdom; new observer stub cannot redefine ResizeObserver. No correction after failures; see ROUND_PLOT_LINE_STRIP_REPORT.md.
+- [x] Authorised setup-only corrections complete: timer scope preserves rAF/performance spies; targeted68/68 and full shards4783/4783 across487. No assertions or app code changed; BE1 untouched26/26. +1 over4782 is intervening BE1.1 font test. See ROUND_PLOT_LINE_STRIP_REPORT.md.
 - [ ] Compare finished/mid-draw at 390×844; member preview unavailable with external_unmanaged, report fixture limits.
 
 ## Guest browsing Stage 3 — Switch on
