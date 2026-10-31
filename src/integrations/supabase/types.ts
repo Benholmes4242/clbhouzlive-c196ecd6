@@ -13618,6 +13618,32 @@ export type Database = {
           },
         ]
       }
+      tour_player_follows: {
+        Row: {
+          created_at: string
+          player_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          player_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          player_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_player_follows_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "sr_players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tour_push_rotation: {
         Row: {
           enabled: boolean
