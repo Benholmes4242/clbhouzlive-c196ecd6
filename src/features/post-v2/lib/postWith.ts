@@ -1,9 +1,7 @@
 /** PLAYED WITH — public.post_with (post_id, user_id) writes and reads.
  *
- * UNTYPED ON PURPOSE: post_with was created by Ben's hand-run SQL and is not
- * yet in the generated Supabase types, so every access goes through
- * `postWithTable()` below. When the types are regenerated, replace that one
- * cast with `supabase.from('post_with')`.
+ * public.post_with is in the generated Supabase types, so every access is
+ * typed through `postWithTable()` below.
  *
  * NO CLIENT NOTIFICATION. A database trigger on post_with inserts creates the
  * 'tag' notification; the app sends nothing itself.
@@ -14,8 +12,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { MAX_PLAYED_WITH } from './golfPostRules';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const postWithTable = () => (supabase as any).from('post_with');
+export const postWithTable = () => supabase.from('post_with');
 
 /** Written after the post row exists. Never self, never past eight. */
 export async function writePostWith(postId: string, authorId: string, userIds: readonly string[]): Promise<void> {
