@@ -1,0 +1,30 @@
+/* BE1: all overrides are opt-in. Existing personal editor and BC switches
+   retain their dimensions and focus material. No amber in business Settings
+   except the canonical VerifiedBadge. */
+.be1-shell{font-family:Geist,sans-serif}
+.be1-shell .ep-back,.be1-shell .ep-tab{height:auto;box-shadow:none;transition:none;gap:0}
+.be1-shell .ep-back{height:36px;padding:0;border-radius:999px}
+.be1-shell .ep-tab{border-radius:0;padding:12px 0}
+.be1-shell .ep-back:focus-visible,.be1-shell .ep-tab:focus-visible,.be1-settings button:focus-visible{outline:2px solid var(--ep-ink);outline-offset:2px}
+.be1-profile-body{padding:0 0 calc(24px + env(safe-area-inset-bottom,0px))}
+.be1-profile-body[hidden]{display:none}
+.be1-settings{--be1-danger:#FF6B60}
+.be1-settings>.ep-group:first-child{margin-top:10px}
+.be1-verification{background:var(--ep-card);border:1px solid var(--ep-hair);border-radius:18px;padding:16px}
+.be1-verification h2{font-size:17px;font-weight:700;line-height:normal;display:flex;align-items:center;gap:6px;margin:0}
+.be1-verification p{font-size:13px;color:var(--ep-mute);line-height:1.45;margin:6px 0 0}
+.be1-shell .be1-pill{height:40px;padding:0 18px;border:0;border-radius:999px;background:var(--ep-ink);color:var(--ep-canvas);font-size:14.5px;font-weight:600;margin-top:14px;box-shadow:none;transition:none}
+.be1-settings .ep-row{height:auto;border-radius:0;box-shadow:none;transition:none;padding:13px 0;justify-content:flex-start}
+.be1-settings .be1-notification{cursor:default}
+.be1-notification[data-readonly=true]{opacity:.45}
+.be1-notification .ep-row-value{white-space:normal}
+.be1-small{display:block;font-size:12.5px;color:var(--ep-dim);font-weight:400;margin-top:2px;line-height:normal}
+.be1-note{font-size:12.5px;color:var(--ep-dim);line-height:1.45;margin:8px 4px 0}
+.be1-settings .bizc-switch{width:44px;height:26px;padding:0;min-height:0;border-radius:999px;border:0;box-shadow:none;transition:none;background:var(--ep-hair)}
+.be1-settings .bizc-switch[aria-checked=false]{background:rgba(255,255,255,.16)}
+.be1-settings .bizc-switch[aria-checked=true]{background:var(--ep-ink)}
+.be1-settings .bizc-switch:disabled{opacity:1;cursor:default}
+.be1-settings .bizc-switch i{width:20px;height:20px}
+.be1-settings .bizc-switch[aria-checked=true] i{left:21px}
+.be1-settings .ep-settings-end .ep-row{justify-content:center}
+.be1-settings .be1-delete{color:var(--be1-danger);font-size:15px;font-weight:600}

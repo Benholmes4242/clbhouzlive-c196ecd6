@@ -1,5 +1,10 @@
 # Roadmap
 
+## BE1 — Edit business frame and Settings
+- [ ] Reuse Edit profile frame for edit mode; preserve Profile save and departure, move Notifications, delete obsolete verification nudge.
+- [ ] Add five-state verification, existing preferences switches, Managers and owner delete; role regressions and full suite.
+- [ ] Report prior round-plot test setup failures unchanged; guest tests out of scope. Member preview remains external_unmanaged.
+
 ## Round plot — Line and hole strip
 - [x] Implement measured-width net trace, gross strip, earned red and complete-card OUT/IN; preserve feat and taps.
 - [ ] STOP: session-once draw-on and 14 new cases implemented; full shards 4,737 passed/20 failed/4,757 total across486. Endpoint width spy fails jsdom; new observer stub cannot redefine ResizeObserver. No correction after failures; see ROUND_PLOT_LINE_STRIP_REPORT.md.
