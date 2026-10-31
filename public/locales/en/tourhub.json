@@ -303,6 +303,7 @@
       "level": "Our best-placed pick, {{name}}, is {{pos}}, level with the lead. Each card shows the round they would need to reach {{score}}."
     },
     "picksToReach": "To reach {{score}}",
+    "picksNeeds": "Needs",
     "biggestMovers": "Round {{round}} biggest movers"
   },
   "empty": {

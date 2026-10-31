@@ -13,7 +13,7 @@ import { computeBoardColumns, todayFromEntry, type BoardEntry } from '../../lead
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
   FONT, INK, INK_MUTE, INK_FAINT, HAIRLINE_INK_8, SURFACE,
-  WHITE_ALPHA_65, WHITE_ALPHA_12, WHITE_ALPHA_06, AMBER,
+  WHITE_ALPHA_65, WHITE_ALPHA_45, WHITE_ALPHA_12, WHITE_ALPHA_06, AMBER,
 } from '../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { fmtScore } from '../../utils/fmtScore';
@@ -461,7 +461,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                   const val = heroRoundScore(r, rd, currentRound);
                   const tee = val == null && rd === teeRound && r.player?.id ? teesByPlayer.get(r.player.id) : null;
                   return (
-                    <div key={rd} data-hero-round={rd} data-hero-tee={tee ? true : undefined} style={{ ...HERO_NUM, fontSize: tee ? 11 : 12, fontWeight: heroCols.liveRound === rd ? 700 : 600, color: tee ? OVERVIEW.soft : getScoreColor(val, scoreTheme) }}>
+                    <div key={rd} data-hero-round={rd} data-hero-tee={tee ? true : undefined} style={{ ...HERO_NUM, fontSize: tee ? 11 : 12, fontWeight: heroCols.liveRound === rd ? 700 : 600, color: tee ? WHITE_ALPHA_45 : getScoreColor(val, scoreTheme) }}>
                       {val == null ? tee ?? BLANK : fmtScore(val)}
                     </div>
                   );
