@@ -8,7 +8,9 @@ import React from 'react';
 
 type PathSpec = ['circle', { cx: number; cy: number; r: number }] | ['rect', { x: number; y: number; width: number; height: number; rx: number }] | ['path', string];
 
-export const TOUR_ICON_PATHS: Record<string, PathSpec[]> = {
+// `satisfies` (not a Record annotation) keeps the literal keys, so
+// TourIconName is a real union and an unknown name fails to compile.
+export const TOUR_ICON_PATHS = {
   globe: [['circle', { cx: 12, cy: 12, r: 9 }], ['path', 'M3 12h18'], ['path', 'M12 3a14 14 0 0 1 0 18'], ['path', 'M12 3a14 14 0 0 0 0 18']],
   down: [['path', 'm6 9 6 6 6-6']],
   check: [['path', 'M20 6 9 17l-5-5']],
@@ -18,14 +20,27 @@ export const TOUR_ICON_PATHS: Record<string, PathSpec[]> = {
   cal: [['rect', { x: 4, y: 5, width: 16, height: 15, rx: 2.5 }], ['path', 'M4 10h16'], ['path', 'M9 3v4'], ['path', 'M15 3v4']],
   users: [['circle', { cx: 9, cy: 8, r: 3.5 }], ['path', 'M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6'], ['path', 'M16 4.5a3.5 3.5 0 0 1 0 7'], ['path', 'M18 14c2 .7 3 2.6 3 6']],
   board: [['path', 'M4 20V10'], ['path', 'M10 20V4'], ['path', 'M16 20v-7'], ['path', 'M3 20h18']],
-};
+} satisfies Record<string, PathSpec[]>;
 
 export type TourIconName = keyof typeof TOUR_ICON_PATHS;
 
+const warnedUnknown = new Set<string>();
+
 export function TourIcon({ n, s = 20, c = '#F8FAFC', w = 1.9 }: { n: TourIconName; s?: number; c?: string; w?: number }) {
+  // Defensive: an unknown name renders nothing (and logs once in dev)
+  // instead of throwing, so one bad icon can never take a page down.
+  const paths = TOUR_ICON_PATHS[n] as PathSpec[] | undefined;
+  if (!paths) {
+    if (import.meta.env.DEV && !warnedUnknown.has(n)) {
+      warnedUnknown.add(n);
+      // eslint-disable-next-line no-console
+      console.warn(`[TourIcon] unknown icon name: ${String(n)}`);
+    }
+    return null;
+  }
   return (
     <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={w} strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block', flexShrink: 0 }} aria-hidden="true">
-      {TOUR_ICON_PATHS[n].map((spec, i) => {
+      {paths.map((spec, i) => {
         const [tag, a] = spec;
         return tag === 'path'
           ? <path key={i} d={a as string} />
