@@ -54,6 +54,8 @@ import { getCountryCodeFromClub } from '@/utils/countryCodeMapping';
 
 import { IdentitySection } from '@/components/business/editor/IdentitySection';
 import { LocationContactSection } from '@/components/business/editor/LocationContactSection';
+import { BusinessEditWhereContact, type ContactSave, type ContactSheet } from '@/components/business/editor/BusinessEditWhereContact';
+import { addressPayload, savedPhone } from '@/components/business/editor/businessContactRules';
 
 import { FacilitiesSection } from '@/components/business/editor/FacilitiesSection';
 import { PrimaryActionSection } from '@/components/business/editor/PrimaryActionSection';
@@ -153,6 +155,7 @@ export default function BusinessProfileEditor() {
   const [openingHours, setOpeningHours] = useState<OpeningHours>({ ...DEFAULT_OPENING_HOURS });
   const [showPinDropModal, setShowPinDropModal] = useState(false);
   const [addressError, setAddressError] = useState<string | null>(null);
+  const [contactRequest, setContactRequest] = useState<{ kind: ContactSheet; serial: number } | null>(null);
 
   /* ── branding ─────────────────────────────────────── */
   const [logo, setLogo] = useState<ImageState>(emptyImage);
@@ -280,11 +283,7 @@ export default function BusinessProfileEditor() {
     }
 
     if (business.phone) {
-      setPhone({
-        dialCode: '',
-        localNumber: business.phone.replace(/^\+\d+\s*/, ''),
-        fullNumber: business.phone,
-      });
+      setPhone(savedPhone(business.phone, business.country || null));
     }
 
     setShowOpeningHours(!!business.show_opening_hours);
@@ -545,7 +544,31 @@ export default function BusinessProfileEditor() {
     } else await (kind === 'logo' ? removeLogo() : removeCover());
     (kind === 'logo' ? setLogo : setCover)({ ...emptyImage, url });
   });
+  // BE3 field sheets advance only their own baseline. Retained Save changes
+  // owns facilities/main action/hours/socials and never resends these fields.
+  const saveContact = (save: ContactSave) => runPartial(async () => {
+    if (save.kind === 'address' && isClubLinked) throw new Error('Address is read-only');
+    const payload = save.kind === 'address' ? addressPayload(save.value)
+      : save.kind === 'phone' ? { phone: save.value?.fullNumber || null }
+      : { [save.kind]: save.value || null };
+    const { error } = await supabase.from('business_accounts').update(protectBusinessPayload(payload, membership?.role)).eq('id', id ?? '');
+    if (error) throw error;
+    if (initialSnapshotRef.current) {
+      const snapshot = JSON.parse(initialSnapshotRef.current);
+      if (save.kind === 'address') { snapshot.addr = save.value?.label || null; snapshot.loc = save.value?.label || null; }
+      else if (save.kind === 'phone') snapshot.p = save.value?.fullNumber || null;
+      else snapshot[save.kind === 'email' ? 'e' : 'w'] = save.value;
+      initialSnapshotRef.current = JSON.stringify(snapshot);
+    }
+    if (save.kind === 'address') { setAddress(save.value); setCountrySelection(save.value?.country || countrySelection); }
+    else if (save.kind === 'phone') setPhone(save.value);
+    else if (save.kind === 'email') setEmail(save.value);
+    else setWebsite(save.value);
+  });
   const focusLegacy = (key: BusinessCompletionKey) => {
+    if (key === 'address' || key === 'phone' || key === 'website') {
+      setContactRequest(previous => ({ kind: key, serial: (previous?.serial ?? 0) + 1 })); return;
+    }
     const section = key === 'hours' ? legacyHours.current : legacyFields.current;
     const target = key === 'website' ? section?.querySelector<HTMLInputElement>('input[type=url]')
       : key === 'phone' ? section?.querySelector<HTMLInputElement>('input[type=tel]')
@@ -604,11 +627,6 @@ export default function BusinessProfileEditor() {
       else if (cover.pendingFile) await uploadCover(cover.pendingFile);
 
       const updatePayload: Record<string, unknown> = {
-        description: description || null,
-        founded_year: foundedYear ? parseInt(foundedYear, 10) : null,
-        website: website || null,
-        email: email || null,
-        phone: phone?.fullNumber || null,
         booking_url: bookingUrl || null,
         opening_hours: openingHours as unknown as Json,
         social_links: hasSocial ? (socialLinks as unknown as Json) : null,
@@ -618,26 +636,6 @@ export default function BusinessProfileEditor() {
 
         updated_at: new Date().toISOString(),
       };
-      if (!isClubLinked && !isEditor) {
-        updatePayload.name = businessName;
-      }
-      if (!isClubLinked && address) {
-        Object.assign(updatePayload, {
-          location: address.label,
-          address_label: address.label,
-          address_line1: address.addressLine1 || null,
-          address_line2: address.addressLine2 || null,
-          city: address.city || null,
-          region: address.region || null,
-          postcode: address.postcode || null,
-          country: address.country || null,
-          lat: address.lat ?? null,
-          lng: address.lng ?? null,
-          mapbox_place_id: address.mapboxPlaceId || null,
-          location_precision: dbLocationPrecision(address.precision),
-          location_updated_at: new Date().toISOString(),
-        });
-      }
 
       const { error: updateErr } = await supabase
         .from('business_accounts')
@@ -740,7 +738,7 @@ export default function BusinessProfileEditor() {
         <div className="flex-1 overflow-y-auto" style={{ background: BIZ.pageBg }}>
 
           {mode === 'edit' ? <BusinessEditPreview name={businessName} category={category} city={business?.city || business?.location || ''} primaryAction={(business?.primary_action as PrimaryActionKey | null) ?? null}
-            completion={{ logo: logo.url, cover: cover.url, description, foundedYear, lat: business?.lat, lng: business?.lng, phone: business?.phone || '', website: business?.website || '', showOpeningHours: !!business?.show_opening_hours, openingHours: business?.opening_hours || DEFAULT_OPENING_HOURS }}
+            completion={{ logo: logo.url, cover: cover.url, description, foundedYear, lat: address?.lat, lng: address?.lng, phone: phone?.fullNumber || '', website, showOpeningHours: !!business?.show_opening_hours, openingHours: business?.opening_hours || DEFAULT_OPENING_HOURS }}
             clubLinked={isClubLinked} editor={isEditor} busy={partialStatus === 'saving'} onSave={saveIdentity} onPhoto={savePhoto} onFocusLegacy={focusLegacy} /> : <>
           {/* 1. HERO — cover + squircle logo at top (matches personal edit-v2) */}
           <div className="px-4 pt-2 pb-4">
@@ -862,6 +860,8 @@ export default function BusinessProfileEditor() {
             </div>
           )}
 
+          {mode === 'edit' && <BusinessEditWhereContact address={address} country={countrySelection} phone={phone?.fullNumber || ''} email={email} website={website} clubLinked={isClubLinked} busy={partialStatus === 'saving'} requested={contactRequest} onSave={saveContact} />}
+
           {/* 3. FACILITIES (category-aware) */}
           <FacilitiesSection
             category={category}
@@ -870,7 +870,7 @@ export default function BusinessProfileEditor() {
           />
 
           {/* 4. LOCATION & CONTACT */}
-          <div ref={legacyFields} className={mode === 'edit' ? 'be2-legacy-neutral' : undefined}><LocationContactSection
+          {mode === 'create' && <div ref={legacyFields}><LocationContactSection
             mode={mode}
             isClubLinked={isClubLinked}
             isGolfClub={isGolfClub}
@@ -896,7 +896,7 @@ export default function BusinessProfileEditor() {
             businessLocationFallback={business?.location ?? null}
           />
 
-          </div>
+          </div>}
           {/* 5. PRIMARY BUTTON */}
           <PrimaryActionSection value={primaryAction} onChange={setPrimaryAction} />
 
@@ -982,7 +982,7 @@ export default function BusinessProfileEditor() {
       </AlertDialog>
 
       {/* Pin drop */}
-      <PinDropModal
+      {mode === 'create' && <PinDropModal
         open={showPinDropModal}
         onOpenChange={setShowPinDropModal}
         onConfirm={(val) => {
@@ -990,7 +990,7 @@ export default function BusinessProfileEditor() {
           setAddressError(null);
         }}
         initialCenter={address?.lat && address?.lng ? { lat: address.lat, lng: address.lng } : undefined}
-      />
+      />}
 
       {/* Request access (already-claimed club) */}
       {existingBusinessForClub && user && (

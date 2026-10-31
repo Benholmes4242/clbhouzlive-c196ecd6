@@ -1,0 +1,26 @@
+/* BE3 opt-in field layout; the shared neutral precision note uses fallback
+   tokens for non-editor consumers without changing their field geometry. */
+.be3-groups{padding:0 16px}
+.be3-groups .ep-row{height:auto;min-height:52px;border-radius:0;box-shadow:none;justify-content:flex-start;padding:13px 0;transition:none}
+.be3-groups .ph{color:var(--ep-dim)}
+.be3-lock{font-size:13px;color:var(--ep-dim)}
+.be3-sheet .be3-fld{display:block;background:var(--ep-inset);border:1px solid var(--ep-hair);border-radius:14px;padding:10px 14px;margin-top:10px;min-width:0}
+.be3-fld>span,.be3-field-label{display:block;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--ep-dim)}
+.be3-fld input,.be3-fld .be3-country>button,.be3-phone-code>button{display:flex;width:100%;height:auto;min-height:0;padding:0!important;margin-top:4px;border:0!important;box-shadow:none!important;outline:none;background:none!important;color:var(--ep-ink);caret-color:var(--ep-ink);font-size:15.5px;font-weight:500;border-radius:0!important}
+.be3-fld .be3-country>button span.text-\[15px\]{font-size:15.5px}
+.be3-phone-code{flex:none;width:112px}
+.be3-phone-number{flex:1;min-width:0}
+.be3-phone-code svg.lucide-chevron-down{display:none}
+.be3-sheet .be3-phone-code>button{min-width:0!important;gap:8px}
+.be3-sheet .be3-phone-code>button>span{font-size:15.5px}
+.be3-sheet .be3-phone-code [data-flag] {flex:none}
+.be3-map{border-radius:14px;overflow:hidden;margin-top:14px}
+.be3-mapfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13.5px;color:var(--ep-mute);margin-top:10px}
+.be3-sheet .be3-text-button{height:auto;min-height:0;padding:0;border:0;border-radius:0;background:none;color:var(--ep-ink);font-size:13.5px;font-weight:600;box-shadow:none;white-space:nowrap}
+.be3-helper{font-size:13px;line-height:1.45;color:var(--ep-dim);margin:12px 0 0}
+.be3-error{color:var(--be1-danger,var(--destructive));font-size:13px;margin-top:8px}
+.business-precision-note{background:var(--ep-inset,#1E1E23);border-radius:14px;padding:12px 14px;margin-top:12px;color:var(--ep-ink,#F8FAFC)}
+.business-precision-note h3{font-size:14.5px;font-weight:600;margin:0;line-height:normal}
+.business-precision-note p{font-size:13px;color:var(--ep-mute,rgba(248,250,252,.62));line-height:1.45;margin:3px 0 0}
+.business-precision-note .business-place-pin{height:auto;min-height:0;padding:0;margin-top:10px;border:0;border-radius:0;background:none;color:inherit;font-size:14px;font-weight:600;box-shadow:none}
+.be3-sheet input:focus-visible{outline:none}

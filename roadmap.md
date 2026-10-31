@@ -1,5 +1,9 @@
 # Roadmap
 
+## BE3 — Business Where and Contact
+- [x] Implement edit-only immediate address/contact sheets, GB resolution, precise postcodes, neutral note, white map pin and chip routing; club Map pin hidden per ruling, create retained. BE3 41/41.
+- [ ] STOP: BE2 club Name query be2BusinessPreview.test.tsx:76:263 finds both required from-your-club labels; BusinessProfileEditor.tsx:573/574 TS2367 unreachable website/phone legacy comparisons. No fixes after failure. Targeted139/140; full4868 passed/1 failed/4869 across490, +41 BE3; no unhandled errors. BE3_REPORT.md records diff/assertions. Preview not build-clean; hosted member persistence unavailable external_unmanaged.
+
 ## Tour hero — Centred columns and next-round tee times
 - [x] Hero-only geometry/centring, scheduled-round tee cells, Needs cards, leaders order/alignment and spacing; full board and protected services unchanged. Targeted149/149; full shards4828/4828 across489 (+12 named tests); build OK. See TOUR_HERO_REFINEMENTS_REPORT.md.
 - [ ] 4(a) and live before/during group proof blocked: R3 exists (Mexico23 rows, last17:51UTC) but canonical player joins return empty for all103 event rows in anon and actual guest-session reads. No invented group or handover workaround; member access unavailable external_unmanaged. Real390×844 centred board/Needs screenshot and reference captured, no page errors.
