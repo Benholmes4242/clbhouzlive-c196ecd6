@@ -69,14 +69,16 @@ describe('BE1 business editor Settings', () => {
   });
   it('keeps the Profile form without Notifications or the obsolete verification box', () => {
     const v = editor('/business/b1/edit'); const profile = v.container.querySelector('.be1-profile-body');
-    expect(profile).not.toBeNull(); expect(screen.getByRole('textbox', { name: 'Business name' })).toBeInTheDocument();
+    expect(profile).not.toBeNull(); expect(screen.getByRole('button', { name: /^Name / })).toBeInTheDocument();
     expect(profile?.textContent).not.toContain('Notifications'); expect(profile?.textContent).not.toContain('Get verified');
   });
   it('preserves unsaved changes and the existing back guard across tabs', () => {
-    editor('/business/b1/edit'); fireEvent.change(screen.getByRole('textbox', { name: 'Business name' }), { target: { value: 'Changed' } });
+    editor('/business/b1/edit'); fireEvent.click(screen.getByRole('button', { name: /^Name / })); fireEvent.change(screen.getByRole('textbox', { name: 'Business name' }), { target: { value: 'Changed' } });
     fireEvent.click(screen.getByRole('tab', { name: 'Settings' })); fireEvent.click(screen.getByRole('tab', { name: 'Profile' }));
-    expect(screen.getByRole('textbox', { name: 'Business name' })).toHaveValue('Changed'); fireEvent.click(screen.getByRole('button', { name: 'Back' }));
-    expect(screen.getByRole('alertdialog', { name: 'Discard changes?' })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Business name' })).toHaveValue('Changed');
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    expect(screen.queryByRole('alertdialog', { name: 'Discard changes?' })).toBeNull();
   });
   for (const [status, title, body, pill] of [
     ['none', 'Not verified yet', 'Verified businesses carry the badge next to their name and unlock Insights.', 'Start verification'],
