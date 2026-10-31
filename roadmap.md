@@ -1,5 +1,10 @@
 # Roadmap
 
+## Round plot — interrupted draw-on
+- [ ] Confirm start-time replay guard cause; commit session identity only on completed draw.
+- [ ] Add independent-card, delay/draw resize, interrupted remount and completed resize regressions; full suite in shards from 4,934/497.
+- [ ] Check at least four genuine guest-feed round cards at 390×844; report each and any proof limitation.
+
 ## Two follow-ups — linked invitation and Tour 4(a)
 - [x] 13:18 approval: named CB58 expectation corrected; finished d/e mirror plus separate tied-leader regression added. Every current leader and selected-group companion gates completion; other field rows do not.
 - [x] Suppress remaining completionRules.ts invitation using editor's live linked input; EP5 39/39 and final five-file/six-call shared-chip consumer audit in LINKED_NO_INDEX_REPORT.md.

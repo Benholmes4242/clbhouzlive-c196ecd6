@@ -44,6 +44,8 @@ import { scorecardFeatFor, type ScorecardFeatKind } from '@/features/courses/_sh
 // Signed-off line/strip supersedes BEA5/FUP1/FED1 presentation only.
 // This module owns measured geometry and an in-memory session replay guard;
 // callers supply score identity and retain all scorecard navigation.
+// Only a completed draw consumes the session guard. Measurement changes or
+// virtualised unmounts cancel unfinished work, which restarts at the threshold.
 const playedRoundPlots = new Set<string>();
 const PLOT_INK = '#F2F4F7';
 const PLOT_HAIR = 'rgba(255,255,255,0.14)';
@@ -247,6 +249,7 @@ export function RoundTilePlot({ shape, received, scoreId }: {
     let timer: ReturnType<typeof setTimeout> | undefined;
     let started = false;
     const finish = (animate = false) => {
+      if (animate && scoreId) playedRoundPlots.add(scoreId);
       reveal.setAttribute('width', String(width));
       head.style.opacity = '0';
       end.style.transition = animate ? 'opacity 160ms ease, transform 220ms cubic-bezier(.3,1.6,.5,1)' : 'none';
@@ -271,13 +274,13 @@ export function RoundTilePlot({ shape, received, scoreId }: {
       return;
     }
     reveal.setAttribute('width', '0');
+    head.style.opacity = '0';
     end.style.opacity = '0';
     end.style.transform = 'scale(0.4)';
     const play = () => {
       if (started) return;
       started = true;
       if (scoreId && playedRoundPlots.has(scoreId)) { finish(); return; }
-      if (scoreId) playedRoundPlots.add(scoreId);
       timer = setTimeout(() => {
         const start = performance.now();
         head.style.opacity = '1';
