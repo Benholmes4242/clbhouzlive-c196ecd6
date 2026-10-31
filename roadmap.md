@@ -1,5 +1,10 @@
 # Roadmap
 
+## BE4 — Business Profile and Links
+- [ ] Replace edit-only legacy sections with Main button, Hours, Facilities and Socials sheets; canonical preview, all completion chips and final saved status.
+- [ ] Remove edit dirty/save/departure blocks, preserve create; add BE4 tests and explicitly retarget affected BE tests.
+- [ ] Full suite against 4,893/495 and automatic validation; report removals/assertion changes; remove BE1–BE3 reports only after passing.
+
 ## Linked-without-index wording amendment
 - [x] Update Profile, zero-round/no-index Done and Manage messages in English in every locale; preserve index-present wording and provider naming.
 - [x] Targeted 22/22; full suite 4,893/4,893 across 495, +3 named Manage branch tests/+1 file from 4,890/494. Report updated; authenticated member verification unavailable external_unmanaged, Ben checks affected phone.
