@@ -1,5 +1,10 @@
 # Roadmap
 
+## Linked member with no index yet
+- [ ] Add shared linked state; suppress connection invitations without changing index-connected rules.
+- [ ] Add no-index island/manage entry, own-profile explanation and empty-record completion states in all locales.
+- [ ] Cover all three states and audit consumers; full shards with baseline4,869/490, report pre-existing BE2 failure separately. Ben verifies affected member phone; no SQL/config changes.
+
 ## Tour hero 4(a) — Published player joins unblocked
 - [x] Rechecked fresh and uncached guest reads: R1 40/R2 40/R3 23 tee rows, zero nested links/resolved players in each; direct links HTTP200 []. Baddeley/Moore still zero-only placeholders. No rule changed; conditional draw-preserving proposal in TOUR_HERO_REFINEMENTS_REPORT.md.
 - [x] Audited all client/server readers; real 390×844 preview has blank R3 tee cells and absent leaders, no page errors.
