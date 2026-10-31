@@ -9,7 +9,7 @@ import en from '../../public/locales/en/tourhub.json';
 import { formatTimeHm, formatWeekdayShort } from '@/i18n/format';
 import { LeadersGroup, LeadersGroupContent } from '@/features/tourhub/components/overview-v3/HybridHeroBands/LeadersGroup';
 import { HeroBoardSection } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
-import { allLeaders, groupState, leadersBaseRound, leadersShownRound, leadersGroupVisible, pickLeadersGroup, otherLeaders, leadersNote, roundEntry } from '@/features/tourhub/components/overview-v3/HybridHeroBands/leadersGroupRules';
+import { allLeaders, groupState, leadersBaseRound, leadersShownRound as selectShownRound, leadersGroupVisible, pickLeadersGroup, otherLeaders, leadersNote, roundEntry } from '@/features/tourhub/components/overview-v3/HybridHeroBands/leadersGroupRules';
 import { todayFromEntry, type BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import type { TeeGroup } from '@/features/tourhub/tournament-v2/data/useTeeTimesAll';
 
@@ -29,6 +29,8 @@ const entry = (id: string, position = 1, today: number | null = -8, thru = 13): 
   player: { id, full_name: id === 'a' ? 'Ben Kohles' : `Player ${id}` },
 });
 const group = (ids: string[], time = '2026-10-23T15:38:00Z'): TeeGroup => ({ teeTime: time, startingHole: 1, players: ids.map(id => ({ id, name: `Player ${id}` })) });
+// Actual next draw membership is now required by the revised Tour 4(a) ruling.
+const leadersShownRound = (base: number, groups: TeeGroup[], leaders: BoardEntry[], field: BoardEntry[], rounds: number[], total: number) => selectShownRound(base, groups, leaders, field, rounds, total, [group(leaders.map(e => e.player?.id ?? ''))]);
 const entries = [entry('a'), entry('b', 9), entry('c', 41), entry('d'), entry('e')];
 const g = group(['a', 'b', 'c']);
 const props = { tournamentId: 'event', phase: 'live' as const, entries, currentRound: 1, totalRounds: 4, tourSlug: 'pga' };
@@ -62,14 +64,14 @@ describe('CB58 pure leaders group rules', () => {
   it('keeps finished groups until the next draw is published', () => {
     const field = entries.map(e => ({ ...e, thru: 18 }));
     expect(leadersShownRound(1, [g, group(['d', 'e'])], allLeaders(field), field, [1], 4)).toBe(1);
-    // CB58.1 retarget: published draw + finished leaders alone is insufficient.
+    // Revised Tour 4(a): unfinished players outside the selected group do not gate it.
     const morningField = [...field, entry('afternoon', 25, -2, 8)];
-    expect(leadersShownRound(1, [g, group(['d', 'e'])], allLeaders(morningField), morningField, [1, 2], 4)).toBe(1);
+    expect(leadersShownRound(1, [g, group(['d', 'e'])], allLeaders(morningField), morningField, [1, 2], 4)).toBe(2);
     expect(leadersShownRound(1, [g, group(['d', 'e'])], allLeaders(field), field, [1, 2], 4)).toBe(2);
   });
-  it('does not switch when another leaders group is unfinished', () => {
+  it('only the selected leaders group gates handover, not another leaders group', () => {
     const field = entries.map(e => e.player?.id === 'a' || e.player?.id === 'b' || e.player?.id === 'c' ? { ...e, thru: 18 } : e);
-    expect(leadersShownRound(1, [g, group(['d', 'e'])], allLeaders(field), field, [2], 4)).toBe(1);
+    expect(leadersShownRound(1, [g, group(['d', 'e'])], allLeaders(field), field, [2], 4)).toBe(2);
   });
   it('ignores early current-round advancement and supports late advancement', () => {
     const leaders = [entry('a', 1, -8, 18)];
@@ -104,14 +106,14 @@ describe('CB58 pure leaders group rules', () => {
 });
 
 describe('CB58 render and tap behavior', () => {
-  it('CB58.1 keeps Round 1 finished leaders while the afternoon field plays despite a published R2 draw', () => {
+  it('Tour 4(a) advances a finished leaders group despite unfinished players elsewhere', () => {
     const field = [entry('a', 1, -8, 18), entry('b', 9, -5, 18), entry('c', 41, -2, 18), entry('afternoon', 25, -1, 8)];
     const round = leadersShownRound(1, [g], allLeaders(field), field, [1, 2], 4);
-    expect(round).toBe(1);
+    expect(round).toBe(2);
     const view = mount(<LeadersGroupContent {...props} entries={field} group={g} groups={[g]} round={round} />);
-    expect(view.container.querySelector('[data-group-state="finished"]')).not.toBeNull();
+    expect(view.container.querySelector('[data-group-state="before"]')).not.toBeNull();
   });
-  it('CB58.1 moves to Round 2 before-tee state only when the whole field finishes R1', () => {
+  it('Tour 4(a) moves to Round 2 before-tee state when the selected group finishes R1', () => {
     const field = [...entries.slice(0, 3), entry('afternoon', 25)].map(e => ({ ...e, thru: 18, round_1: e.today }));
     const round = leadersShownRound(1, [g], allLeaders(field), field, [1, 2], 4);
     expect(round).toBe(2);
@@ -119,34 +121,34 @@ describe('CB58 render and tap behavior', () => {
     expect(view.container.querySelector('[data-group-state="before"]')).not.toBeNull();
     expect([...view.container.querySelectorAll('[data-group-thru], [data-group-today]')].every(e => e.textContent === '')).toBe(true);
   });
-  it('CB58.1 suspended unfinished R1 stays on R1 overnight regardless of early current-round advancement', () => {
+  it('Tour 4(a) unfinished selected-group player stays on R1 overnight despite scheduled advancement', () => {
     vi.useFakeTimers();
     try {
       vi.setSystemTime(new Date('2026-10-24T03:00:00Z'));
-      const field = [entry('a', 1, -8, 18), entry('delayed', 25, -2, 12)];
+      const field = [entry('a', 1, -8, 18), entry('b', 25, -2, 12), entry('c', 41, -2, 18)];
       const base = leadersBaseRound(allLeaders(field), 2);
       expect(base).toBe(1);
       expect(leadersShownRound(base, [g], allLeaders(field), field, [1, 2], 4)).toBe(1);
     } finally { vi.useRealTimers(); }
   });
-  it('CB58.1 CUT/MC/WD/DQ/MDF/DNS without R2 cards and scoreless entries do not block R2 to R3', () => {
+  it('Tour 4(a) terminal and scoreless rows outside the selected group do not block R2 to R3', () => {
     const finishers = entries.slice(0, 3).map(e => ({ ...e, today_round: 2, thru: 18, round_1: -1, round_2: e.today }));
     const excluded = ['CUT', 'MC', 'WD', 'DQ', 'MDF', 'DNS'].map(status => ({ ...entry(status, 55, null), round_1: -1, round_2: null, status }));
     const field = [...finishers, ...excluded, { ...entry('scoreless', 99, null), score: null, position: null, thru: null }];
     expect(leadersShownRound(2, [g], allLeaders(field), field, [2, 3], 4)).toBe(3);
   });
-  it('CB58.2 unstarted afternoon tee-sheet players (no row or score null) keep Round 1 despite a published R2 draw', () => {
+  it('Tour 4(a) unstarted other draw players no longer gate the selected group', () => {
     const morning = [entry('a', 1, -8, 18), entry('b', 9, -5, 18), entry('c', 41, -2, 18)];
     const field = [...morning, { ...entry('pm1', 50, null, 0), score: null, thru: null as unknown as number }];
     const sheet = [g, group(['pm1', 'pm2'], '2026-10-23T19:00:00Z')];
-    expect(leadersShownRound(1, sheet, allLeaders(field), field, [1, 2], 4)).toBe(1);
+    expect(leadersShownRound(1, sheet, allLeaders(field), field, [1, 2], 4)).toBe(2);
   });
-  it('CB58.2 afternoon tee-sheet players finished moves to Round 2', () => {
+  it('Tour 4(a) completed selected group moves to Round 2 with the whole draw preserved', () => {
     const field = [entry('a', 1, -8, 18), entry('b', 9, -5, 18), entry('c', 41, -2, 18), entry('pm1', 20, -1, 18), entry('pm2', 30, 0, 18)];
     const sheet = [g, group(['pm1', 'pm2'], '2026-10-23T19:00:00Z')];
     expect(leadersShownRound(1, sheet, allLeaders(field), field, [1, 2], 4)).toBe(2);
   });
-  it('CB58.2 a WD tee-sheet player with no card does not block', () => {
+  it('Tour 4(a) a WD elsewhere in the draw does not block', () => {
     const field = [entry('a', 1, -8, 18), entry('b', 9, -5, 18), entry('c', 41, -2, 18), { ...entry('wd', 99, null, 0), score: null, status: 'WD' }];
     const sheet = [g, group(['wd'], '2026-10-23T19:00:00Z')];
     expect(leadersShownRound(1, sheet, allLeaders(field), field, [1, 2], 4)).toBe(2);
