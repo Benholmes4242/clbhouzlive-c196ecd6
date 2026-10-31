@@ -18,22 +18,32 @@ let intersection: (entries: Partial<IntersectionObserverEntry>[]) => void;
 let resize: (entries: { contentRect: { width: number } }[]) => void;
 let raf: FrameRequestCallback;
 let clock = 0;
+let originalResizeObserver: typeof window.ResizeObserver;
+let originalIntersectionObserver: typeof window.IntersectionObserver;
 const trigger = (ratio: number) => act(() => intersection([{ isIntersecting: true, intersectionRatio: ratio }]));
 const frame = (time: number) => act(() => { clock = time; raf(time); });
 const plot = (id = 'animation', diff = [1, 0, 1]) => render(<RoundTilePlot shape={shape(diff)} scoreId={id} />);
 
 beforeEach(() => {
   clock = 0;
-  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ width: 390 } as DOMRect);
-  vi.stubGlobal('ResizeObserver', class { constructor(cb: typeof resize) { resize = cb; } observe() {} disconnect() {} });
-  vi.stubGlobal('IntersectionObserver', class { constructor(cb: typeof intersection) { intersection = cb; } observe() {} disconnect() {} });
+  Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', { configurable: true, value: () => ({ width: 390, height: 0, top: 0, left: 0, right: 390, bottom: 0, x: 0, y: 0, toJSON() {} }) });
+  originalResizeObserver = window.ResizeObserver;
+  originalIntersectionObserver = window.IntersectionObserver;
+  window.ResizeObserver = class { constructor(cb: typeof resize) { resize = cb; } observe() {} disconnect() {} } as unknown as typeof window.ResizeObserver;
+  window.IntersectionObserver = class { constructor(cb: typeof intersection) { intersection = cb; } observe() {} disconnect() {} } as unknown as typeof window.IntersectionObserver;
   vi.stubGlobal('requestAnimationFrame', vi.fn((cb: FrameRequestCallback) => { raf = cb; return 1; }));
   vi.stubGlobal('cancelAnimationFrame', vi.fn());
   vi.spyOn(performance, 'now').mockImplementation(() => clock);
   vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false })));
   vi.useFakeTimers();
 });
-afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+afterEach(() => {
+  cleanup();
+  window.ResizeObserver = originalResizeObserver;
+  window.IntersectionObserver = originalIntersectionObserver;
+  Reflect.deleteProperty(HTMLElement.prototype, 'getBoundingClientRect');
+  vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals();
+});
 const geometry = () => {
   Object.defineProperty(SVGElement.prototype, 'getTotalLength', { configurable: true, value: () => 358 });
   Object.defineProperty(SVGElement.prototype, 'getPointAtLength', { configurable: true, value: (n: number) => ({ x: 16 + n, y: 50 }) });

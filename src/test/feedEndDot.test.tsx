@@ -9,8 +9,10 @@ import { SC_DOUBLE_DARK } from '@/features/courses/components/holes/_constants';
 import { TOPAR_UNDER_DARK } from '@/features/tourhub/_shared/tokens';
 import { goodHoleDots } from '@/features/explore-magazine/roundTreatment';
 
-beforeEach(() => vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ width: 340 } as DOMRect));
-afterEach(() => vi.restoreAllMocks());
+beforeEach(() => {
+  Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', { configurable: true, value: () => ({ width: 340, height: 0, top: 0, left: 0, right: 340, bottom: 0, x: 0, y: 0, toJSON() {} }) });
+});
+afterEach(() => { Reflect.deleteProperty(HTMLElement.prototype, 'getBoundingClientRect'); vi.restoreAllMocks(); });
 
 const row = { round_id: 'finish-marker', front_nine_to_par: null, back_nine_to_par: null } as CircleRoundRow;
 
