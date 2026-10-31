@@ -4,8 +4,11 @@ import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { toast } from '@/lib/toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { AppLog } from '@/lib/logger';
+import { protectBusinessPayload } from '@/components/business/editor/editorPermissions';
 
-export function useBusinessImageUpload(businessId: string | undefined) {
+// BE2 opts into changed-field-only protected writes and propagated failures;
+// all existing callers retain their timestamps, toasts and swallowed errors.
+export function useBusinessImageUpload(businessId: string | undefined, immediate?: { role?: string }) {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const queryClient = useQueryClient();
@@ -33,7 +36,7 @@ export function useBusinessImageUpload(businessId: string | undefined) {
 
       const { error } = await supabase
         .from('business_accounts')
-        .update({ logo_url: uploadResult.publicUrl, updated_at: new Date().toISOString() })
+        .update(immediate ? protectBusinessPayload({ logo_url: uploadResult.publicUrl }, immediate.role) : { logo_url: uploadResult.publicUrl, updated_at: new Date().toISOString() })
         .eq('id', businessId);
 
       if (error) throw error;
@@ -45,11 +48,12 @@ export function useBusinessImageUpload(businessId: string | undefined) {
     } catch (error) {
       AppLog.error('[useBusinessImageUpload]', 'Error uploading logo:', error);
       toast.error("Couldn't upload logo");
+      if (immediate) throw error;
       return null;
     } finally {
       setUploadingLogo(false);
     }
-  }, [businessId, invalidateAllBusinessQueries]);
+  }, [businessId, invalidateAllBusinessQueries, immediate?.role, !!immediate]);
 
   const removeLogo = useCallback(async () => {
     if (!businessId) return;
@@ -57,7 +61,7 @@ export function useBusinessImageUpload(businessId: string | undefined) {
     try {
       const { error } = await supabase
         .from('business_accounts')
-        .update({ logo_url: null, updated_at: new Date().toISOString() })
+        .update(immediate ? protectBusinessPayload({ logo_url: null }, immediate.role) : { logo_url: null, updated_at: new Date().toISOString() })
         .eq('id', businessId);
 
       if (error) throw error;
@@ -67,8 +71,9 @@ export function useBusinessImageUpload(businessId: string | undefined) {
     } catch (error) {
       AppLog.error('[useBusinessImageUpload]', 'Error removing logo:', error);
       toast.error("Couldn't remove logo");
+      if (immediate) throw error;
     }
-  }, [businessId, invalidateAllBusinessQueries]);
+  }, [businessId, invalidateAllBusinessQueries, immediate?.role, !!immediate]);
 
   const uploadCover = useCallback(async (file: File) => {
     if (!businessId) return;
@@ -86,7 +91,7 @@ export function useBusinessImageUpload(businessId: string | undefined) {
 
       const { error } = await supabase
         .from('business_accounts')
-        .update({ cover_image_url: uploadResult.publicUrl, updated_at: new Date().toISOString() })
+        .update(immediate ? protectBusinessPayload({ cover_image_url: uploadResult.publicUrl }, immediate.role) : { cover_image_url: uploadResult.publicUrl, updated_at: new Date().toISOString() })
         .eq('id', businessId);
 
       if (error) throw error;
@@ -98,11 +103,12 @@ export function useBusinessImageUpload(businessId: string | undefined) {
     } catch (error) {
       AppLog.error('[useBusinessImageUpload]', 'Error uploading cover:', error);
       toast.error("Couldn't upload cover");
+      if (immediate) throw error;
       return null;
     } finally {
       setUploadingCover(false);
     }
-  }, [businessId, invalidateAllBusinessQueries]);
+  }, [businessId, invalidateAllBusinessQueries, immediate?.role, !!immediate]);
 
   const removeCover = useCallback(async () => {
     if (!businessId) return;
@@ -110,7 +116,7 @@ export function useBusinessImageUpload(businessId: string | undefined) {
     try {
       const { error } = await supabase
         .from('business_accounts')
-        .update({ cover_image_url: null, updated_at: new Date().toISOString() })
+        .update(immediate ? protectBusinessPayload({ cover_image_url: null }, immediate.role) : { cover_image_url: null, updated_at: new Date().toISOString() })
         .eq('id', businessId);
 
       if (error) throw error;
@@ -120,8 +126,9 @@ export function useBusinessImageUpload(businessId: string | undefined) {
     } catch (error) {
       AppLog.error('[useBusinessImageUpload]', 'Error removing cover:', error);
       toast.error("Couldn't remove cover");
+      if (immediate) throw error;
     }
-  }, [businessId, invalidateAllBusinessQueries]);
+  }, [businessId, invalidateAllBusinessQueries, immediate?.role, !!immediate]);
 
   return {
     uploadLogo,
