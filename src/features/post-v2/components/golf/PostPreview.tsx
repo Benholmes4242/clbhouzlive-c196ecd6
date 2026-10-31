@@ -21,7 +21,7 @@ export function buildDraftFeedPost(d: {
   return {
     id: 'draft-preview', userId: d.userId, actorType: d.actor.type, actorId: d.actor.id,
     username: d.actor.username ?? '', displayName: d.actor.name, avatarUrl: d.actor.avatarUrl ?? '', isVerified: false,
-    creatorRelation: 'self' as FeedPost['creatorRelation'], caption: d.caption,
+    creatorRelation: 'none', caption: d.caption,
     mediaItems: d.media.map((m, i) => ({
       id: m.id, type: m.type, width: m.naturalWidth ?? 1080, height: m.naturalHeight ?? 1350, displayOrder: i,
       ...(m.type === 'image' ? { imageUrl: m.previewUrl } : { mp4Url: m.previewUrl, thumbnailUrl: m.posterUrl ?? undefined }),
