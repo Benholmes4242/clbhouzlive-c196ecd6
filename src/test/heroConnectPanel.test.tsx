@@ -17,7 +17,7 @@ vi.mock('@/features/coach/BusinessCoachCards', async importOriginal => ({ ...(aw
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (k: string, o?: { defaultValue?: string } | string) => (typeof o === 'string' ? o : o?.defaultValue ?? `[${k}]`) }) }));
 
-const chip = vi.hoisted(() => ({ state: { connected: false, settled: true, connection: null as unknown, trend: null as unknown, anyError: false } }));
+const chip = vi.hoisted(() => ({ state: { linked: false, connected: false, settled: true, connection: null as unknown, trend: null as unknown, anyError: false } }));
 const rounds = vi.hoisted(() => ({ data: [] as unknown[] }));
 
 vi.mock('@/lib/whs/useDeclineHandicapChip', () => ({ useDeclineHandicapChip: () => vi.fn() }));
@@ -66,7 +66,7 @@ function renderHero(p: { isSelf?: boolean; hideConnectPrompt?: boolean; indexVal
 const panel = () => screen.queryByTestId('hero-connect-panel');
 
 beforeEach(() => {
-  chip.state = { connected: false, settled: true, connection: null, trend: null, anyError: false };
+  chip.state = { linked: false, connected: false, settled: true, connection: null, trend: null, anyError: false };
   rounds.data = [];
 });
 
@@ -90,7 +90,7 @@ describe('CP1 connect panel', () => {
   });
 
   it('does not render for a connected member', () => {
-    chip.state = { ...chip.state, connected: true, trend: { current: 12.3 } };
+    chip.state = { ...chip.state, linked: true, connected: true, trend: { current: 12.3 } };
     renderHero({ indexValue: 12.3 });
     expect(panel()).toBeNull();
   });
@@ -101,7 +101,7 @@ describe('CP1 connect panel', () => {
     expect(ghost.every((s) => !!s)).toBe(true);
     unmount();
 
-    chip.state = { ...chip.state, connected: true, trend: { current: 12.3 } };
+    chip.state = { ...chip.state, linked: true, connected: true, trend: { current: 12.3 } };
     rounds.data = Array.from({ length: 5 }, (_, i) => ({
       whs_score_id: `r${i}`, play_date: `2026-10-0${i + 1}`, gross_score: 80 + i, handicap_differential: 12 + i, handicap_index_at_time: 12.3,
       course_id: 'c', course_name: 'Course', is_nine_hole: false, is_counter: null,

@@ -20,6 +20,7 @@ vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: ()
 
 // --- Shared mutable fixtures -------------------------------------------------
 const mockHcp = {
+  linked: true,
   connected: true,
   settled: true,
   connection: { id: 'c1' } as any,
