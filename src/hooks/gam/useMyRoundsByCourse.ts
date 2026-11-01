@@ -9,8 +9,10 @@
  * denormalised: user_id, course_id, gross_score, course_par, play_date) so
  * the two surfaces cannot disagree.
  *
- * Oldest first per course, capped at the most recent 20 rounds so a member
- * with 200 rounds at their home club still draws a readable trend.
+ * YC2: retain every returned 18-hole round per course, oldest first, within
+ * the unchanged global 2,000-row ceiling. The opened card owns its last-15
+ * chart window; trend count/average/best use all returned points, not the
+ * course-row round count. No extra reads or per-course truncation.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,8 +25,6 @@ export interface CourseRoundPoint {
   toPar: number;
 }
 
-/** Most recent rounds kept per course. */
-const PER_COURSE_CAP = 20;
 /** Row ceiling for the single read. */
 const ROW_CAP = 2000;
 
@@ -54,9 +54,6 @@ export function useMyRoundsByCourse(options?: { enabled?: boolean }) {
       for (const r of data ?? []) {
         const id = r.course_id as string;
         const arr = byCourse.get(id);
-        // Rows arrive newest first, so a full bucket already holds the most
-        // recent PER_COURSE_CAP rounds.
-        if (arr && arr.length >= PER_COURSE_CAP) continue;
         const point: CourseRoundPoint = {
           date: String(r.play_date).slice(0, 10),
           toPar: (r.gross_score as number) - (r.course_par as number),

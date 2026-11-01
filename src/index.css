@@ -1,4 +1,3 @@
-/* Typography: SF Pro via the system stack — no webfont requests. */
 
 
 @import './styles/hub-warm.css';
@@ -26,6 +25,13 @@
 }
 
 :root {
+  --yc2-ink: #F8FAFC;
+  --yc2-mute: rgba(248,250,252,.62);
+  --yc2-dim: rgba(248,250,252,.42);
+  --yc2-improved: #34D399;
+  --yc2-average: rgba(248,250,252,.25);
+  --yc2-rule: rgba(255,255,255,.08);
+  --yc2-fact-rule: rgba(255,255,255,.06);
   --invite-panel: #1E1E23;
   --invite-ink: #F8FAFC;
   --invite-on-ink: #0B0B0D;
