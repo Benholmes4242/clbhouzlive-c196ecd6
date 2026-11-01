@@ -836,5 +836,59 @@
       "coursesKicker": "Courses",
       "tourKicker": "Tour"
     }
+  },
+  "findPeople": {
+    "title": "Encontrar gente",
+    "searchPlaceholder": "Buscar golfistas y negocios",
+    "chip": {
+      "suggested": "Sugeridos",
+      "golfers": "Golfistas",
+      "businesses": "Negocios"
+    },
+    "loading": "Cargando…",
+    "empty": "Aún no hay sugerencias. Busca arriba o invita a amigos.",
+    "noResults": "Sin resultados.",
+    "follow": "Seguir",
+    "following": "Siguiendo",
+    "followAll": "Seguir a los {{count}}",
+    "followingAll": "Siguiendo a todos",
+    "followers": "{{count}} seguidores",
+    "followers_one": "{{count}} seguidor",
+    "inviteLine": "Invita a amigos que aún no están en clbhouz",
+    "inviteAction": "Invitar amigos",
+    "reason": {
+      "club": "Miembro de {{club}}",
+      "playedWith": "{{course}}, {{date}}",
+      "playedWithCourse": "{{course}}",
+      "playedWithDate": "{{date}}",
+      "playedWithFallback": "Jugó contigo",
+      "reciprocal": "Te sigue",
+      "course": "Juega en {{course}}",
+      "clubmateMutual": "Seguido por {{count}} de {{club}}",
+      "mutual": "Seguido por {{count}} a quienes sigues",
+      "popular": "Popular en clbhouz",
+      "active": "{{count}} rondas en las últimas dos semanas",
+      "recentlyJoined": "Nuevo en clbhouz"
+    },
+    "bizReason": {
+      "yourClubSuggested": "Tu club · {{category}}",
+      "yourClubCity": "{{category}} · {{city}}",
+      "categoryOnly": "{{category}}",
+      "nearClubMiles": "{{category}} · {{miles}} millas",
+      "popularCity": "{{category}} · {{city}}"
+    },
+    "group": {
+      "fromClub": "De {{club}}",
+      "playedWith": "Jugó contigo",
+      "playsCourses": "Juega en tus campos",
+      "popular": "Popular en clbhouz",
+      "followsYou": "Te sigue",
+      "known": "Seguido por gente que conoces",
+      "active": "Jugando últimamente",
+      "new": "Nuevo en clbhouz",
+      "yourClub": "Tu club",
+      "nearClub": "Cerca de {{club}}",
+      "coaches": "Entrenadores y academias"
+    }
   }
 }

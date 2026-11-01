@@ -835,5 +835,59 @@
       "coursesKicker": "Courses",
       "tourKicker": "Tour"
     }
+  },
+  "findPeople": {
+    "title": "사람 찾기",
+    "searchPlaceholder": "골퍼와 비즈니스 검색",
+    "chip": {
+      "suggested": "추천",
+      "golfers": "골퍼",
+      "businesses": "비즈니스"
+    },
+    "loading": "불러오는 중…",
+    "empty": "아직 추천이 없습니다. 위에서 검색하거나 친구를 초대하세요.",
+    "noResults": "일치하는 결과가 없습니다.",
+    "follow": "팔로우",
+    "following": "팔로잉",
+    "followAll": "{{count}}명 모두 팔로우",
+    "followingAll": "모두 팔로잉",
+    "followers": "팔로워 {{count}}명",
+    "followers_one": "팔로워 {{count}}명",
+    "inviteLine": "아직 clbhouz에 없는 친구를 초대하세요",
+    "inviteAction": "친구 초대",
+    "reason": {
+      "club": "{{club}} 멤버",
+      "playedWith": "{{course}}, {{date}}",
+      "playedWithCourse": "{{course}}",
+      "playedWithDate": "{{date}}",
+      "playedWithFallback": "함께 플레이했습니다",
+      "reciprocal": "나를 팔로우합니다",
+      "course": "{{course}}에서 플레이",
+      "clubmateMutual": "{{club}}의 {{count}}명이 팔로우",
+      "mutual": "내가 팔로우하는 {{count}}명이 팔로우",
+      "popular": "clbhouz에서 인기",
+      "active": "지난 2주간 {{count}}라운드",
+      "recentlyJoined": "clbhouz 신규 가입"
+    },
+    "bizReason": {
+      "yourClubSuggested": "내 클럽 · {{category}}",
+      "yourClubCity": "{{category}} · {{city}}",
+      "categoryOnly": "{{category}}",
+      "nearClubMiles": "{{category}} · {{miles}}마일",
+      "popularCity": "{{category}} · {{city}}"
+    },
+    "group": {
+      "fromClub": "{{club}}",
+      "playedWith": "함께 플레이한 사람",
+      "playsCourses": "내 코스에서 플레이",
+      "popular": "clbhouz에서 인기",
+      "followsYou": "나를 팔로우",
+      "known": "아는 사람이 팔로우",
+      "active": "최근 플레이 중",
+      "new": "clbhouz 신규 가입",
+      "yourClub": "내 클럽",
+      "nearClub": "{{club}} 근처",
+      "coaches": "코치와 아카데미"
+    }
   }
 }

@@ -835,5 +835,59 @@
       "coursesKicker": "Courses",
       "tourKicker": "Tour"
     }
+  },
+  "findPeople": {
+    "title": "人を探す",
+    "searchPlaceholder": "ゴルファーとビジネスを検索",
+    "chip": {
+      "suggested": "おすすめ",
+      "golfers": "ゴルファー",
+      "businesses": "ビジネス"
+    },
+    "loading": "読み込み中…",
+    "empty": "まだおすすめがありません。上で検索するか、友達を招待しましょう。",
+    "noResults": "一致する結果がありません。",
+    "follow": "フォロー",
+    "following": "フォロー中",
+    "followAll": "{{count}}人全員をフォロー",
+    "followingAll": "全員をフォロー中",
+    "followers": "フォロワー {{count}}人",
+    "followers_one": "フォロワー {{count}}人",
+    "inviteLine": "clbhouzにまだいない友達を招待",
+    "inviteAction": "友達を招待",
+    "reason": {
+      "club": "{{club}}のメンバー",
+      "playedWith": "{{course}}, {{date}}",
+      "playedWithCourse": "{{course}}",
+      "playedWithDate": "{{date}}",
+      "playedWithFallback": "一緒にプレーしました",
+      "reciprocal": "あなたをフォローしています",
+      "course": "{{course}}でプレー",
+      "clubmateMutual": "{{club}}の{{count}}人がフォロー",
+      "mutual": "あなたがフォローする{{count}}人がフォロー",
+      "popular": "clbhouzで人気",
+      "active": "過去2週間に{{count}}ラウンド",
+      "recentlyJoined": "clbhouzに新規参加"
+    },
+    "bizReason": {
+      "yourClubSuggested": "あなたのクラブ · {{category}}",
+      "yourClubCity": "{{category}} · {{city}}",
+      "categoryOnly": "{{category}}",
+      "nearClubMiles": "{{category}} · {{miles}}マイル",
+      "popularCity": "{{category}} · {{city}}"
+    },
+    "group": {
+      "fromClub": "{{club}}から",
+      "playedWith": "一緒にプレーした人",
+      "playsCourses": "あなたのコースでプレー",
+      "popular": "clbhouzで人気",
+      "followsYou": "あなたをフォロー",
+      "known": "知り合いがフォロー",
+      "active": "最近プレーしている人",
+      "new": "clbhouzに新規参加",
+      "yourClub": "あなたのクラブ",
+      "nearClub": "{{club}}の近く",
+      "coaches": "コーチとアカデミー"
+    }
   }
 }

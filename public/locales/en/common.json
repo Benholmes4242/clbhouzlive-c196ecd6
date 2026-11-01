@@ -1939,5 +1939,59 @@
       "coursesKicker": "Courses",
       "tourKicker": "Tour"
     }
+  },
+  "findPeople": {
+    "title": "Find people",
+    "searchPlaceholder": "Search golfers and businesses",
+    "chip": {
+      "suggested": "Suggested",
+      "golfers": "Golfers",
+      "businesses": "Businesses"
+    },
+    "loading": "Loading…",
+    "empty": "No suggestions yet. Search above, or invite friends.",
+    "noResults": "No matches.",
+    "follow": "Follow",
+    "following": "Following",
+    "followAll": "Follow all {{count}}",
+    "followingAll": "Following all",
+    "followers": "{{count}} followers",
+    "followers_one": "{{count}} follower",
+    "inviteLine": "Invite friends who aren't on clbhouz",
+    "inviteAction": "Invite friends",
+    "reason": {
+      "club": "Member at {{club}}",
+      "playedWith": "{{course}}, {{date}}",
+      "playedWithCourse": "{{course}}",
+      "playedWithDate": "{{date}}",
+      "playedWithFallback": "Played with you",
+      "reciprocal": "Follows you",
+      "course": "Plays {{course}}",
+      "clubmateMutual": "Followed by {{count}} from {{club}}",
+      "mutual": "Followed by {{count}} you follow",
+      "popular": "Popular on clbhouz",
+      "active": "{{count}} rounds in the last two weeks",
+      "recentlyJoined": "New to clbhouz"
+    },
+    "bizReason": {
+      "yourClubSuggested": "Your club · {{category}}",
+      "yourClubCity": "{{category}} · {{city}}",
+      "categoryOnly": "{{category}}",
+      "nearClubMiles": "{{category}} · {{miles}} miles",
+      "popularCity": "{{category}} · {{city}}"
+    },
+    "group": {
+      "fromClub": "From {{club}}",
+      "playedWith": "Played with you",
+      "playsCourses": "Plays your courses",
+      "popular": "Popular on clbhouz",
+      "followsYou": "Follows you",
+      "known": "Followed by people you know",
+      "active": "Playing lately",
+      "new": "New to clbhouz",
+      "yourClub": "Your club",
+      "nearClub": "Near {{club}}",
+      "coaches": "Coaches and academies"
+    }
   }
 }

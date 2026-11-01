@@ -12915,6 +12915,27 @@ export type Database = {
           },
         ]
       }
+      suggestion_dismissals: {
+        Row: {
+          actor_id: string
+          actor_type: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          actor_id: string
+          actor_type: string
+          created_at?: string
+          user_id?: string
+        }
+        Update: {
+          actor_id?: string
+          actor_type?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       support_messages: {
         Row: {
           body: string
@@ -22871,6 +22892,24 @@ export type Database = {
           verdict: string
         }[]
       }
+      get_people_suggestions: {
+        Args: { p_limit?: number }
+        Returns: {
+          display_name: string
+          handicap_index: number
+          is_verified: boolean
+          mutual_count: number
+          profile_photo_url: string
+          reason_club_name: string
+          reason_course_name: string
+          reason_date: string
+          reason_type: string
+          recent_rounds: number
+          rounds_total: number
+          user_id: string
+          username: string
+        }[]
+      }
       get_personal_bests: {
         Args: { p_days?: number; p_limit?: number; p_per_member?: number }
         Returns: {
@@ -23559,6 +23598,21 @@ export type Database = {
         }[]
       }
       get_stroke_index_verdict: { Args: { p_course_id: string }; Returns: Json }
+      get_suggested_businesses: {
+        Args: { p_limit?: number }
+        Returns: {
+          business_id: string
+          category: string
+          city: string
+          distance_miles: number
+          followers: number
+          is_verified: boolean
+          logo_url: string
+          name: string
+          reason_type: string
+          slug: string
+        }[]
+      }
       get_suggested_creators: {
         Args: { p_limit?: number; p_user_id: string }
         Returns: {
