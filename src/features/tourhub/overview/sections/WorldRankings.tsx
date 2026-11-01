@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { RailChips } from '@/components/ui/RailChips';
 import CountryFlag from '@/components/ui/country-flag';
 import { useRankingsBoards, type RankingsBoard, type RankingsRow } from '../data/useRankingsBoards';
-import { DANGER, FONT, INK, INK_MUTE, TREND_UP } from '../../_shared/tokens';
+import { FONT, INK, INK_MUTE, TREND_UP } from '../../_shared/tokens';
 import { OverviewSectionHead } from './OverviewSectionHead';
 
 const BOARDS: { id: RankingsBoard; label: string }[] = [{ id: 'owgr', label: 'World' }, { id: 'r2d', label: 'Race to Dubai' }, { id: 'cme', label: 'LPGA' }, { id: 'kft', label: 'Korn Ferry' }];
@@ -12,14 +12,12 @@ const BOARDS: { id: RankingsBoard; label: string }[] = [{ id: 'owgr', label: 'Wo
 const UNMOVED_INK = 'rgba(248,250,252,0.3)';
 
 /**
- * H11.4 — the delta is a RANK delta, in member-analytics polarity:
- * green when a player climbed, red when they fell. It NEVER goes through
- * getScoreColor, which carries the to-par polarity (red = good). Second time
- * this has needed saying; the comment stays.
+ * Rank rises retain TREND_UP; falls are muted. Red only means under par on
+ * Tour, the same rule as the leaderboard. Rank deltas never use scoreColor.
  */
-function Movement({ value }: { value: number | null }) {
+export function Movement({ value }: { value: number | null }) {
   const up = value != null && value > 0; const down = value != null && value < 0;
-  return <span style={{ textAlign: 'right', fontSize: 11.5, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: up ? TREND_UP : down ? DANGER : UNMOVED_INK }}>{up ? `\u25B2${value}` : down ? `\u25BC${Math.abs(value)}` : '\u2013'}</span>;
+  return <span data-movement-tone={up ? 'rise' : down ? 'fall' : 'unchanged'} style={{ textAlign: 'right', fontSize: 11.5, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: up ? TREND_UP : down ? 'var(--tour-board-dim)' : UNMOVED_INK }}>{up ? `\u25B2${value}` : down ? `\u25BC${Math.abs(value)}` : '\u2013'}</span>;
 }
 
 function RankingRow({ row, onOpen, showMovement }: { row: RankingsRow; onOpen?: () => void; showMovement: boolean }) {

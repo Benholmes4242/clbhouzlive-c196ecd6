@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Tour Overview — Also this week
-- [ ] Resolve eligibility conflict: the brief freezes isAlsoThisWeek (completed events excluded), while section 4 and the signed-off mock require finished events.
-- [ ] Rebuild event presentation, batched reads, shared leaderboard rules and locale strings; preserve navigation, score colours and guest gating.
-- [ ] Make World Rankings falls muted; run full suite in shards against 5,004/502 and capture 390×844 comparisons.
+- [x] Eligibility ruling: completed slides from the last three days join unchanged live/upcoming rules; preserve order, viewing-event exclusion and four-event cap.
+- [x] Rebuilt event presentation, batched reads and shared score/tie helpers; added English locale strings and muted World Rankings falls.
+- [ ] STOP: harness type error in new test fixture (alsoWeekRebuild.test.tsx:14 initImmediate); full suite unexpected islandsNav.test.tsx:190 month-boundary failure. See ALSO_THIS_WEEK_REPORT.md. No test fixes applied.
+- [ ] Complete remaining locale/test coverage and architecture-note placement after stop is cleared; rerun validation. Guest comparison captured: one live + one finished event; no starting event eligible in current data.
 
 ## Tour leaderboard rebuild
 - [x] Source confirms whole-field sr_scorecards sync; tour_player_follows already typed; FullBoardSheet already shares BoardTable's column header.

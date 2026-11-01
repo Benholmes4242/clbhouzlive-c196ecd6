@@ -166,7 +166,7 @@ function houseColor(score: number | null | undefined, emphasis: 'standard' | 'le
 /** Board cells: an absent figure is an empty cell, never "E". */
 const fmtBoardScore = (score: number | null | undefined): string => fmtScore(score, { absent: '' });
 
-function fmtThru(thru: number | null | undefined): string {
+export function fmtThru(thru: number | null | undefined): string {
   if (thru == null) return '';
   if (thru >= 18) return 'F';
   return String(thru);

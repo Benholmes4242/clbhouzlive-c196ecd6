@@ -26,6 +26,9 @@
 }
 
 :root {
+  --also-live-halo: rgba(61,220,151,.16);
+  --also-rule: rgba(255,255,255,.10);
+  --also-faint: rgba(248,250,252,.22);
   --tour-board-canvas: #0A0A0C;
   --tour-board-panel: #16161A;
   --tour-board-ink: #F8FAFC;
