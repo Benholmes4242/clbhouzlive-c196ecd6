@@ -1,10 +1,12 @@
 # Roadmap
 
 ## Courses photo cards — top scrims and Latest holes kicker
+- [x] SCRIMS 2 authorises gradient-only test selector and explicit isolated media-0/scrim-1/text-2 stacks in Latest holes and Latest courses; shared player unchanged.
+- [x] Focused57/57; all full shards5,380/5,380 across516 (1332+1260+1387+1401), +3/+0 vs expected5,377/516; +10/+1 vs last green5,370/515, all coursesPhotoTopScrims. No failures. Renamed COURSES_PHOTO_TOP_SCRIMS_REPORT.md records authorised selector/assertion details.
 - [x] Add the shared 40% top scrim to the four requested card types; preserve every bottom scrim and all other sections.
 - [x] Change only Latest holes kicker; retarget its existing protecting test under brief authority.
-- [ ] Caption investigation: source and passing 0:11 video fixture retain course/member/date text; specific live row/data cause remains unverified. No caption fix made.
-- [ ] STOP: coursesPhotoTopScrims.test.tsx:52:20, LatestCoursesSection layer assertion: “expected [ …(3) ] to have a length of 2 but got 3”. Selector also counts the positioned image. No correction/rerun after failure; await authorization. Focused53 passed/1 failed/54 across4; full shards not run. Expected inventory5,377/516 (+7/+1 vs5,370/515), not a verified full result. See COURSES_PHOTO_TOP_SCRIMS_STOP_REPORT.md. Historical News failures already resolved by approved prior correction; News untouched.
+- [x] Actual first0:11 video at /courses visibly shows hole2/par5/584yds/Tralee Golf Club/Andrew Yetzes · Apr2026. Computed isolated0/1/2 stack confirmed; inspected /tmp/browser/courses-scrims2/first-hole.png. Missing caption was stacking, not missing data.
+- [x] Historical selector STOP cleared under SCRIMS 2 authorization, expectation2 retained. News untouched; its three historical observer failures already resolved and all pass in full run. Automatic build OK17:41:30Z.
 
 ## News observer — approved test-only correction
 - [x] Direct observer assignment/restoration in overviewNewsRebuild only; all59 assertion statements exactly preserved, all66 cases retained. No component changes.

@@ -64,22 +64,24 @@ function LatestHoleCard({ row, onOpen }: { row: LatestHoleMedia; onOpen: (row: L
   const duration = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   return (
     <button type="button" className="latest-hole-card" aria-label={`Hole ${row.hole_no}, ${row.course_name}`}
-      style={{ width: LATEST_HOLE_W, height: LATEST_HOLE_H, background: A.PANEL, opacity: 1 }}
+      style={{ width: LATEST_HOLE_W, height: LATEST_HOLE_H, background: A.PANEL, opacity: 1, isolation: 'isolate' }}
       onClick={() => onOpen(row)}>
+      <div className="latest-hole-media" style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
       {row.media_type === 'video'
         ? <HoleInlineVideo media={row} alt="" fit="cover" autoplayGroup="courses-member-shots" active />
         : <img src={row.media_url} alt="" loading="lazy" onError={event => { event.currentTarget.hidden = true; }} />}
-      <div className="latest-hole-scrim" style={{ background: SCRIM_STANDOUT }} />
-      <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT_TOP }} />
-      <div className="latest-hole-figure">
+      </div>
+      <div className="latest-hole-scrim" style={{ background: SCRIM_STANDOUT, zIndex: 1 }} />
+      <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT_TOP, zIndex: 1 }} />
+      <div className="latest-hole-figure" style={{ zIndex: 2 }}>
         <div className="latest-hole-number">{row.hole_no}</div>
         <div className="latest-hole-label">{row.par != null ? `Par ${row.par}${row.yards != null ? ` · ${row.yards} yds` : ''}` : 'Hole'}</div>
       </div>
-      <div className="latest-hole-name">
+      <div className="latest-hole-name" style={{ zIndex: 2 }}>
         <div className="latest-hole-course">{row.course_name}</div>
         {credit && <div className="latest-hole-credit">{credit}</div>}
       </div>
-      {row.media_type === 'video' && <span className="glass-chip latest-hole-video">
+      {row.media_type === 'video' && <span className="glass-chip latest-hole-video" style={{ zIndex: 2 }}>
         <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M3 1.5v9l7.5-4.5z" /></svg>
         {duration}
       </span>}
