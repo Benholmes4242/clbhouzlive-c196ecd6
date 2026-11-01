@@ -1,5 +1,9 @@
 # Roadmap
 
+## Courses hero — place line and scrim
+- [ ] Combine current location/list/tail beneath name in amber, remove Courses kicker, add opt-in masthead colour and taller scrim; detail hero unchanged.
+- [ ] Run focused and sharded checks; name inherited News observer failures without correcting them; report diff and test-count delta.
+
 ## Tour Overview — News rebuild
 - [x] Implemented Overview-only opt-in shapes, freshness/details/player chips and one filtered board read observing the existing tournament cache; six locale catalogues updated. Existing selector and News defaults unchanged.
 - [ ] STOP: overviewNewsRebuild.test.tsx:43:8 (two cases) and :52:8 (one case): `TypeError: Cannot redefine property: IntersectionObserver`. No test correction or full-suite run after failure. Targeted145 passed/3 failed/148; added76 across2 files; expected full inventory5360/514 vs5284/512, not executed. See TOUR_NEWS_STOP_REPORT.md.
