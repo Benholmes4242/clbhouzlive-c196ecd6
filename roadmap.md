@@ -1,5 +1,12 @@
 # Roadmap
 
+## AC2 — Activity folding rounds and crown rows
+- [ ] Fold 3+ read round rows in non-New day sections into one row at the newest's position; unread never fold; other types untouched (All and Friends chips only).
+- [ ] Folded row: up-to-three avatar stack, "{n} golfers posted rounds", Best line from lowest 18-hole to_par, "See all {n} ›"; no score tile.
+- [ ] Open in place: AC1 rows ordered to_par ascending, not-ready last; day label gains "· {n} golfers posted rounds"; Show less refolds; read state unchanged; open state survives refetches, resets on leave.
+- [ ] Crown/legend rows pass bolded course name through shortCourseName; copy/tiles otherwise unchanged.
+- [ ] New src/test/ac2ActivityFold.test.tsx; AC1 and existing activity tests stay green; full sharded suite vs 5,458/520 baseline; report.
+
 ## AC1 — Activity round rows, unread and Tour
 - [x] Add one summary RPC read per loaded feed page, keyed by sorted round ids; loading/errors remain not ready.
 - [x] Render signed-off round sentence/meta, score tile and hole strip; preserve scorecard taps, grouping and Records wording.
