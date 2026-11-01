@@ -3,6 +3,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { ComingUp } from '../ComingUp';
 import { BrowserRouter } from 'react-router-dom';
 import * as useComingUpHook from '../../data/useComingUp';
+vi.mock('../../../hooks/useBatchCourseImages', () => ({ useBatchCourseImages: () => ({ data: new Map() }) }));
+vi.mock('../../../hooks/useTournamentLastYearTop4', () => ({ useTournamentLastYearTop4: () => ({ data: null }) }));
+vi.mock('../../data/useComingUpOwnRounds', () => ({ useComingUpOwnRounds: () => undefined }));
 
 vi.mock('../../data/useComingUp', () => ({
   useComingUp: vi.fn(),
@@ -24,7 +27,7 @@ const mockData = [
 ];
 
 describe('ComingUp component', () => {
-  it('renders correctly as a rail with 6 items', () => {
+  it('renders the next panel and at most four later events', () => {
     vi.mocked(useComingUpHook.useComingUp).mockReturnValue({
       data: mockData,
       isLoading: false,
@@ -39,15 +42,13 @@ describe('ComingUp component', () => {
     // Check title
     expect(screen.getByText('overview.comingUp.title')).toBeDefined();
 
-    // Check if 6 items are rendered (by their names)
-    mockData.forEach(item => {
+    mockData.slice(0, 5).forEach(item => {
       expect(screen.getByText(item.name)).toBeDefined();
     });
 
-    // Verify it's a horizontal rail (we check for overflowX: auto style on the container)
-    // We need to find the container. In the new implementation it will have overflowX: 'auto'.
-    const rail = screen.getByRole('list'); // We should use a role or data-testid
-    expect(rail.style.overflowX).toBe('auto');
-    expect(screen.getAllByRole('listitem')).toHaveLength(6);
+    expect(screen.queryByText(mockData[5].name)).toBeNull();
+    expect(document.querySelectorAll('[data-coming-next]')).toHaveLength(1);
+    expect(document.querySelectorAll('[data-coming-up-item]')).toHaveLength(4);
+    expect(document.querySelector('[data-coming-up-rail]')).toBeNull();
   });
 });
