@@ -1,5 +1,11 @@
 # Roadmap
 
+## Courses photo cards — top scrims and Latest holes kicker
+- [x] Add the shared 40% top scrim to the four requested card types; preserve every bottom scrim and all other sections.
+- [x] Change only Latest holes kicker; retarget its existing protecting test under brief authority.
+- [ ] Investigate the captionless 0:11 video; fix only a proven LatestHolesSection rendering fault, otherwise report the row.
+- [ ] Run focused checks and full shards; reconcile against 5,370/515, report historical News failures without changing News.
+
 ## News observer — approved test-only correction
 - [x] Direct observer assignment/restoration in overviewNewsRebuild only; all59 assertion statements exactly preserved, all66 cases retained. No component changes.
 - [x] Focused148/148; full5370/5370 across515, +132/+4 vs5238/511 (YC2 46, News66+10, Courses10). Fresh390×844 comparison inspected; guest card covers News, visuals unit-tested. See TOUR_NEWS_OBSERVER_FIX_REPORT.md.

@@ -13,6 +13,7 @@
  * muted and looping through HoleInlineVideo in the page-wide
  * "courses-member-shots" group (one video at a time); small slots draw their poster. */
 import { HoleInlineVideo } from '@/components/course-media-tab/HoleInlineVideo';
+import { SCRIM_STANDOUT_TOP } from '@/styles/photoScrim';
 import { useEffect, useMemo, useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -139,6 +140,7 @@ function LatestCourseCard({ row, pending, onOpen }: {
             />}
             {i === 0 && <>
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 45%)' }} />
+              <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT_TOP }} />
               <div style={{ position: 'absolute', top: 14, left: 14 }}>
                 <div style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.05em', lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: '#FFFFFF', textShadow: '0 2px 10px rgba(0,0,0,0.6)' }}>
                   {row.media_count}

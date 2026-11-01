@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
-import { SCRIM_STANDOUT } from '@/styles/photoScrim';
+import { SCRIM_STANDOUT, SCRIM_STANDOUT_TOP } from '@/styles/photoScrim';
 import type { StatBrowseRow } from '../useStatBrowse';
 
 /**
@@ -38,6 +38,7 @@ export function PhotoFigureCard({ row, figure, figureColor = '#FFFFFF', figureLa
     >
       <CourseImageFallback courseId={row.course_id} courseName={row.name} imageUrl={row.image_url} style={{ height: '100%' }}>
         <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
+        <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT_TOP }} />
         <div style={{ position: 'absolute', top: 16, right: 16, textAlign: 'right' }}>
           <div style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-0.05em', color: figureColor, lineHeight: 1, fontVariantNumeric: 'tabular-nums', textShadow: '0 2px 10px rgba(0,0,0,0.6)' }}>
             {figure}

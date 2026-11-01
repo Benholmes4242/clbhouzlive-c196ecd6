@@ -41,6 +41,10 @@ import type { CSSProperties } from 'react';
 export const SCRIM_STANDOUT =
   'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 32%)';
 
+/** For figures that sit at the top of a photo. */
+export const SCRIM_STANDOUT_TOP =
+  'linear-gradient(180deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 40%)';
+
 /** Taller than SCRIM_STANDOUT to cover the Courses hero's name, place, blurb and fact. */
 export const SCRIM_HERO_TALL =
   'linear-gradient(0deg, rgba(10,14,10,0.82) 0%, rgba(10,14,10,0) 60%)';

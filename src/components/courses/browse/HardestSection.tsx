@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
-import { SCRIM_STANDOUT } from '@/styles/photoScrim';
+import { SCRIM_STANDOUT, SCRIM_STANDOUT_TOP } from '@/styles/photoScrim';
 import { useStatBrowseList, type StatBrowseRow } from '../useStatBrowse';
 import { useSectionReady } from './PageLoadGate';
 import { SectionHead, SECTION_WRAP, HEAD_GAP } from './SectionHead';
@@ -55,6 +55,7 @@ export function HardestSection() {
             style={{ height: TOUGH_TILE_H, padding: 0, border: 'none', textAlign: 'left', cursor: 'pointer', background: 'transparent' }}>
             <CourseImageFallback courseId={row.course_id} courseName={row.name} imageUrl={row.image_url} style={{ height: '100%' }}>
               <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
+              <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT_TOP }} />
               <div style={{ position: 'absolute', left: 11, top: 10, fontSize: 23, fontWeight: 700, letterSpacing: '-0.045em', color: '#FFFFFF', lineHeight: 1, fontVariantNumeric: 'tabular-nums', textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>
                 {fmtToPar(row.avg_to_par) ?? '-'}
               </div>
