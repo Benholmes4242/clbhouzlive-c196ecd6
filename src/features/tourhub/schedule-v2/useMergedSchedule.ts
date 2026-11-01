@@ -30,7 +30,7 @@ import {
 } from '../hooks/useTournamentLeadersWinners';
 import { useScheduleDefendingChampionPhotos } from '../hooks/useScheduleDefendingChampionPhotos';
 import { isInCurrentWeek } from '../utils/getCurrentWeek';
-import { weekKey, todayNoonMs, daysUntil } from './timelineUtils';
+import { weekKey, todayNoonMs, daysUntil, currentRoundFromScores } from './timelineUtils';
 import { rowTourIndex } from './scheduleRules';
 import type {
   SeasonEvent,
