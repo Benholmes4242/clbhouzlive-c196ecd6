@@ -1,5 +1,9 @@
 # Roadmap
 
+## News observer — approved test-only correction
+- [ ] Replace observer redefinition with direct assignment/restoration in overviewNewsRebuild only; preserve all assertions and components.
+- [ ] Run focused checks and full shards; reconcile against5238/511 and capture390×844 News comparison beside mock.
+
 ## Courses hero — place line and scrim
 - [x] Combined current location/list/tail beneath name in amber; no Courses kicker; opt-in masthead colour and taller scrim. Detail hero unchanged.
 - [x] Focused14/14; all full shards executed5370/515:5367 passed and the same3 inherited News observer failures, no new failures. Added10/+1, no existing assertion edits. See COURSES_HERO_PLACE_SCRIM_REPORT.md.
