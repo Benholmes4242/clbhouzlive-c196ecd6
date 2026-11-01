@@ -225,6 +225,8 @@ const ThreadV2Page: React.FC = () => {
     refetch,
   } = useThread(conversationId || null);
   const { retry } = useSendMessage(conversationId);
+  // MS3 §4 — one get_round_share_cards call per loaded page, keyed on sorted ids.
+  const roundShareCards = useRoundShareCards(messages);
   const keyboardHeight = useKeyboardHeight();
   const [composerHeight, setComposerHeight] = useState(56);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -618,6 +620,7 @@ const ThreadV2Page: React.FC = () => {
                   isLastOfRun={f.isLastOfRun}
                   showTicks={f.isOutgoing && i === lastOutgoingIndex}
                   onRetry={handleRetry}
+                  roundShareCard={roundShareCards[m.id]}
                 />
               );
             })}
