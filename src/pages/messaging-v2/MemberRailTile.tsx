@@ -13,6 +13,8 @@ interface Props {
   userId: string | null;
   name: string;
   label: string;
+  /** MS1 §6 — a small dim line UNDER the first name (e.g. the last-played date). */
+  subLabel?: string | null;
   bubble?: React.ReactNode;
   width?: number;
   nameGap?: number;
@@ -21,7 +23,7 @@ interface Props {
 }
 
 export const MemberRailTile: React.FC<Props> = ({
-  avatarUrl, userId, name, label, bubble, width = 62, nameGap = 5, hairlineRing, onClick,
+  avatarUrl, userId, name, label, subLabel, bubble, width = 62, nameGap = 5, hairlineRing, onClick,
 }) => (
   <button
     type="button"
@@ -36,6 +38,11 @@ export const MemberRailTile: React.FC<Props> = ({
     <div style={{ marginTop: nameGap, fontSize: 11, color: MSG.INK_2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
       {label}
     </div>
+    {subLabel ? (
+      <div style={{ marginTop: 1, fontSize: 11, color: MSG.INK_3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        {subLabel}
+      </div>
+    ) : null}
   </button>
 );
 

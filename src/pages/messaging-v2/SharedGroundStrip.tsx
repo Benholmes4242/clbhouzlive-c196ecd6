@@ -1,9 +1,14 @@
 /**
  * BRIEF_MESSAGES_ECHO_PALETTE §4 — THE SHARED-GROUND STRIP.
+ * MS1 §4 — RESTYLED TO THE SIGNED-OFF MOCK (ms1-head-to-head.html).
  *
  * The one thing no other messenger can show: the golf the two of you have
- * played together. Glass cards, course and both scores and when, YOUR SCORE IN
- * AMBER because amber is the viewing member (§6).
+ * played together. Cards are 150px on #17171B, the course is the SHORT name
+ * (shortCourseName), both gross scores are 18px with the LOWER score in ink
+ * and the higher dimmed (a tie leaves both ink), and the line under reads
+ * "{d MMM} · you won" / "{name} won" / "halved" from gross_outcome.
+ * MS1 §9 — NO AMBER: the member's own score is no longer amber; ink/dim
+ * carries the result.
  *
  * §4.1 NO SHARED ROUNDS -> NO STRIP. This component returns null; it never
  * renders an empty rail or a "no rounds yet" apology.
@@ -22,8 +27,13 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useWhsConnection, useAllScores } from '@/lib/whs/hooks';
 import { RoundDetailSheet } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { formatDayMonthShortGB } from '@/i18n/format';
-import { MSG, MT } from '@/features/messaging-dark/tokens';
+import { shortCourseName } from '@/lib/courses/shortCourseName';
+import { MSG } from '@/features/messaging-dark/tokens';
 import type { SharedGround } from '@/hooks/messaging/useSharedGround';
+
+const CARD_BG = '#17171B';
+const CARD_EDGE = 'rgba(255,255,255,0.08)';
+const DIM = 'rgba(248,250,252,0.42)';
 
 interface Props {
   ground: SharedGround;
@@ -60,75 +70,118 @@ export const SharedGroundStrip: React.FC<Props> = ({ ground, rivalFirstName }) =
 
   return (
     <>
-      <div style={{ paddingTop: 12, paddingBottom: 12 }}>
-        <div style={{ ...MT.EYEBROW, padding: '0 14px 8px' }}>
-          {t('shared.eyebrow', {
-            name: rivalFirstName,
-            count: ground.count,
-            defaultValue: `Played with ${rivalFirstName} · ${ground.count}`,
-          })}
-        </div>
-
-        <div className="msg-rail" style={{ padding: '0 14px' }}>
-          {ground.rounds.slice(0, 12).map((r) => {
-            const scoreId = resolveScoreId(r.play_date, r.course_id, r.course_name);
-            const tappable = !!scoreId;
-            return (
-              <div
-                key={`${r.play_date}-${r.course_id}`}
-                role={tappable ? 'button' : undefined}
-                tabIndex={tappable ? 0 : undefined}
-                onClick={() => scoreId && setOpenScoreId(scoreId)}
-                onKeyDown={(e) => {
-                  if (!scoreId) return;
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setOpenScoreId(scoreId);
-                  }
-                }}
-                className="ec-glass"
+      <div className="msg-rail" style={{ padding: '10px 16px 12px', gap: 8 }}>
+        {ground.rounds.slice(0, 12).map((r) => {
+          const scoreId = resolveScoreId(r.play_date, r.course_id, r.course_name);
+          const tappable = !!scoreId;
+          const tied = r.gross_outcome === 'T';
+          const youWon = r.gross_outcome === 'W';
+          const outcome =
+            r.gross_outcome === 'W'
+              ? t('shared.youWon', { defaultValue: 'you won' })
+              : r.gross_outcome === 'L'
+                ? t('shared.rivalWon', {
+                    name: rivalFirstName,
+                    defaultValue: `${rivalFirstName} won`,
+                  })
+                : t('shared.halved', { defaultValue: 'halved' });
+          return (
+            <div
+              key={`${r.play_date}-${r.course_id}`}
+              role={tappable ? 'button' : undefined}
+              tabIndex={tappable ? 0 : undefined}
+              onClick={() => scoreId && setOpenScoreId(scoreId)}
+              onKeyDown={(e) => {
+                if (!scoreId) return;
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setOpenScoreId(scoreId);
+                }
+              }}
+              data-testid="shared-round-card"
+              style={{
+                flex: '0 0 auto',
+                width: 150,
+                background: CARD_BG,
+                border: `1px solid ${CARD_EDGE}`,
+                borderRadius: 14,
+                padding: '10px 12px',
+                cursor: tappable ? 'pointer' : 'default',
+              }}
+            >
+              <span
+                className="truncate"
                 style={{
-                  flex: '0 0 auto',
-                  width: 168,
-                  borderRadius: 12,
-                  padding: '10px 12px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 8,
-                  cursor: tappable ? 'pointer' : 'default',
+                  display: 'block',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: MSG.INK,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                 }}
               >
-                <span
-                  className="truncate"
-                  style={{ ...MT.NAME, color: MSG.INK, fontSize: 13, minWidth: 0 }}
-                >
-                  {r.course_name}
-                </span>
+                {shortCourseName(r.course_name)}
+              </span>
 
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    {/* §6 AMBER IS THE VIEWING MEMBER. */}
-                    <span style={{ ...MT.SCORE, color: MSG.AMBER }}>{r.user_gross}</span>
-                    <span style={MT.MICRO}>{t('shared.you', { defaultValue: 'You' })}</span>
-                  </div>
-                  <span style={{ ...MT.SCORE, color: MSG.INK_3, fontSize: 13, paddingBottom: 3 }}>
-                    ·
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 12,
+                  marginTop: 6,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                <div style={{ fontSize: 18, fontWeight: 700, color: tied || youWon ? MSG.INK : DIM }}>
+                  {r.user_gross}
+                  <span
+                    style={{
+                      display: 'block',
+                      fontSize: 10.5,
+                      fontWeight: 600,
+                      color: DIM,
+                      marginTop: 1,
+                    }}
+                  >
+                    {t('shared.you', { defaultValue: 'You' })}
                   </span>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ ...MT.SCORE, color: MSG.INK }}>{r.rival_gross}</span>
-                    {/* MICRO went 9 -> 11, so the same first name needs ~22% more
-                        room: 62 -> 72, inside a 168px card (144px inner). */}
-                    <span className="truncate" style={{ ...MT.MICRO, maxWidth: 72 }}>
-                      {rivalFirstName}
-                    </span>
-                  </div>
                 </div>
-
-                <span style={MT.CONTEXT}>{formatDayMonthShortGB(r.play_date)}</span>
+                <div
+                  className="truncate"
+                  style={{ fontSize: 18, fontWeight: 700, color: tied || !youWon ? MSG.INK : DIM }}
+                >
+                  {r.rival_gross}
+                  <span
+                    style={{
+                      display: 'block',
+                      fontSize: 10.5,
+                      fontWeight: 600,
+                      color: DIM,
+                      marginTop: 1,
+                      maxWidth: 72,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {rivalFirstName}
+                  </span>
+                </div>
               </div>
-            );
-          })}
-        </div>
+
+              <span
+                style={{
+                  display: 'block',
+                  fontSize: 11.5,
+                  color: DIM,
+                  marginTop: 6,
+                }}
+              >
+                {formatDayMonthShortGB(r.play_date)} · {outcome}
+              </span>
+            </div>
+          );
+        })}
       </div>
 
       <RoundDetailSheet
