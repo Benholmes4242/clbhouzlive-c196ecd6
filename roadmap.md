@@ -1,5 +1,12 @@
 # Roadmap
 
+## Tour Overview — Coming up rebuild
+- [ ] Resolve signed-off conflicts: frozen six-event selector versus next panel plus four rows; row weekday/month two lines in brief versus one line in mock.
+- [ ] Replace rail with next-event preview and month list; preserve tour scoping, exclusion, heading, routes and guest gating.
+- [ ] Add batched own-rounds figures, course photos, next-event defending result, calendar helper and shipped locales; no SQL or migrations.
+- [ ] Tests and full suite shards against 5,068/505; report changed assertions and new files. Guest LPGA/other-tour comparisons at 390×844.
+- [ ] Real-device Median Calendar handoff needs Ben's device; do not invent fallback or claim verification.
+
 ## Tour Overview — Also this week
 - [x] Eligibility ruling: completed slides from the last three days join unchanged live/upcoming rules; preserve order, viewing-event exclusion and four-event cap.
 - [x] Rebuilt event presentation, batched reads and shared score/tie helpers; added English locale strings and muted World Rankings falls.
