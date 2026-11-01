@@ -278,8 +278,10 @@ describe('WhoToFollowRail', () => {
     ];
     h.biz = [];
     renderRail(1);
-    expect(screen.getByText('Also a member at Sundridge Park')).toBeTruthy();
-    expect(screen.getByText('Played Sundridge Park · West with you')).toBeTruthy();
+    // The i18n mock returns the defaultValue uninterpolated; the pure-rules
+    // tests above pin the interpolation vars.
+    expect(screen.getByText('Also a member at {{club}}')).toBeTruthy();
+    expect(screen.getByText('Played {{course}} with you')).toBeTruthy();
     expect(screen.getByText('New to clbhouz')).toBeTruthy();
     expect(screen.getByText('4.1 hcp · 63 rounds')).toBeTruthy();
     expect(screen.getByText('12.8 hcp · 41 rounds')).toBeTruthy();
@@ -377,9 +379,11 @@ describe('WhoToFollowRail', () => {
 
   it('closes the rail when every card in the slot is gone', () => {
     vi.useFakeTimers();
-    h.people = people(3);
+    h.people = people(4);
     h.biz = [];
     renderRail(1);
+    // Dismissing three of four leaves one card — below the 3-card minimum —
+    // so the rail closes and unmounts.
     for (const name of ['Golfer 1', 'Golfer 2', 'Golfer 3']) {
       fireEvent.click(screen.getByLabelText(`Hide ${name}`));
       act(() => { vi.advanceTimersByTime(250); });
@@ -501,7 +505,8 @@ describe('SuggestedGolfersBlock', () => {
       person({ user_id: 'u3', display_name: 'Popular Pam', reason_type: 'popular', handicap_index: -1.2, rounds_total: 212 }),
     ];
     renderBlock();
-    expect(screen.getByText('Member at Sundridge Park')).toBeTruthy();
+    // i18n mock returns the defaultValue uninterpolated.
+    expect(screen.getByText('Member at {{club}}')).toBeTruthy();
     expect(screen.getByText('Follows you')).toBeTruthy();
     expect(screen.getByText('Popular on clbhouz')).toBeTruthy();
     expect(screen.getByText('4.1 hcp · 63 rounds')).toBeTruthy();
@@ -514,8 +519,11 @@ describe('SuggestedGolfersBlock', () => {
 
   it('See all is mute, not amber', () => {
     h.people = people(3);
-    renderBlock();
-    const seeAll = screen.getByText('See all');
+    const { container } = renderBlock();
+    // The header's See all is the first button in the section (its label
+    // comes from the catalogue, which the i18n mock renders as '').
+    const seeAll = container.querySelector('section button') as HTMLElement;
+    expect(seeAll).toBeTruthy();
     expect(seeAll.style.color).toBe('rgba(248, 250, 252, 0.62)');
     expect(seeAll.style.color).not.toBe('#F7931E');
   });
