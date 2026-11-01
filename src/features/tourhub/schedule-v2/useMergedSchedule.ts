@@ -172,6 +172,8 @@ export function useMergedSchedule(options?: { enabled?: boolean }): {
         coursePlace: linkedTournamentPlace(r.golf_course_id, r.course),
         venueCountry: r.venue_country,
         purse: r.purse,
+        eventType: r.event_type ?? null,
+        golfCourseId: r.golf_course_id ?? null,
         startDate: r.start_date,
         endDate: r.end_date,
         status: r.status,

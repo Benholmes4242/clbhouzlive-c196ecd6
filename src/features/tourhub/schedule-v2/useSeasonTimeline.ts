@@ -351,12 +351,15 @@ export function useSeasonTimeline(
 
       const evt: SeasonEvent = {
         id: r.id,
+        tourSlug: tour,
         name: r.name,
         venueName: r.venue_name,
         venueCity: r.venue_city,
         coursePlace: linkedTournamentPlace(r.golf_course_id, r.course),
         venueCountry: r.venue_country,
         purse: r.purse,
+        eventType: r.event_type ?? null,
+        golfCourseId: r.golf_course_id ?? null,
         startDate: r.start_date,
         endDate: r.end_date,
         status: r.status,
