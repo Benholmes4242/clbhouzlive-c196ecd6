@@ -90,12 +90,12 @@ function biz(over: Partial<BusinessSuggestion>): BusinessSuggestion {
 const FULL_PEOPLE: PersonSuggestion[] = [
   person({ user_id: 'u-club', display_name: 'Niall Devins', reason_type: 'club' }),
   person({ user_id: 'u-played', display_name: 'Chris Leeson', reason_type: 'played_with', reason_course_name: 'Sundridge Park Golf Club (West)', reason_date: '2026-10-11', handicap_index: 12.8, rounds_total: 41 }),
-  person({ user_id: 'u-recip', display_name: 'Recip Rory', reason_type: 'reciprocal' }),
+  person({ user_id: 'u-recip', display_name: 'Recip Rory', reason_type: 'reciprocal', handicap_index: null, rounds_total: 12 }),
   person({ user_id: 'u-course', display_name: 'James Spencer', reason_type: 'course', reason_course_name: 'West Kent Golf Club', handicap_index: 15.2, rounds_total: 37 }),
-  person({ user_id: 'u-cm', display_name: 'Clubmate Meg', reason_type: 'clubmate_mutual', mutual_count: 4 }),
-  person({ user_id: 'u-mut', display_name: 'Mutual Mo', reason_type: 'mutual', mutual_count: 7 }),
+  person({ user_id: 'u-cm', display_name: 'Clubmate Meg', reason_type: 'clubmate_mutual', mutual_count: 4, handicap_index: 22.4, rounds_total: 9 }),
+  person({ user_id: 'u-mut', display_name: 'Mutual Mo', reason_type: 'mutual', mutual_count: 7, handicap_index: null, rounds_total: 5 }),
   person({ user_id: 'u-pop', display_name: 'Danny Holmes', reason_type: 'popular', handicap_index: -1.2, rounds_total: 212, is_verified: true }),
-  person({ user_id: 'u-act', display_name: 'Active Ann', reason_type: 'active', recent_rounds: 6 }),
+  person({ user_id: 'u-act', display_name: 'Active Ann', reason_type: 'active', recent_rounds: 6, handicap_index: 18.0, rounds_total: 30 }),
   person({ user_id: 'u-new', display_name: 'New Ned', reason_type: 'recently_joined', handicap_index: null, rounds_total: 0 }),
 ];
 const FULL_BIZ: BusinessSuggestion[] = [
@@ -239,7 +239,17 @@ describe('WF1 pure rules', () => {
 
 describe('WF1 Find people page', () => {
   it('redirects /golferstofollow to /find-people keeping the query string', async () => {
-    renderPage('/golferstofollow?tab=golfers');
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={qc}>
+        <MemoryRouter initialEntries={['/golferstofollow?tab=golfers']}>
+          <Routes>
+            <Route path="/golferstofollow" element={<GolfersToFollowRedirect />} />
+            <Route path="/find-people" element={<Probe />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
     await waitFor(() => expect(screen.getByTestId('probe').textContent).toBe('/find-people?tab=golfers'));
   });
 
@@ -256,9 +266,9 @@ describe('WF1 Find people page', () => {
 
   it('groups the Suggested tab with Follow all on the club group and hides empty groups', () => {
     renderPage();
-    const labels = ['From {{club}}', 'Played with you', 'Plays your courses', 'Popular on clbhouz'];
-    for (const l of labels) expect(screen.getByText(l)).toBeTruthy();
-    expect(screen.queryByText('Follows you')).toBeNull();
+    const labels = screen.getAllByTestId('group-label').map((el) => el.textContent);
+    expect(labels).toEqual(['From {{club}}', 'Played with you', 'Plays your courses', 'Popular on clbhouz']);
+    expect(labels).not.toContain('Follows you');
     expect(screen.getByText('Follow all 2')).toBeTruthy();
     // The your_club business leads the From-club group, before club golfers.
     expect(screen.getByText('Your club · {{category}}')).toBeTruthy();
@@ -271,25 +281,18 @@ describe('WF1 Find people page', () => {
       'From {{club}}', 'Played with you', 'Follows you', 'Plays your courses',
       'Followed by people you know', 'Popular on clbhouz', 'Playing lately', 'New to clbhouz',
     ];
-    const found = order.map((l) => screen.getByText(l));
-    const tops = found.map((el) => el.compareDocumentPosition.bind(el));
-    expect(found).toHaveLength(8);
-    void tops;
-    // Document order check: each label appears after the previous one.
-    for (let i = 1; i < found.length; i++) {
-      expect(found[i - 1].compareDocumentPosition(found[i]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    }
+    expect(screen.getAllByTestId('group-label').map((el) => el.textContent)).toEqual(order);
   });
 
   it('groups the Businesses tab and shows per-tab reason lines', () => {
     renderPage('/find-people?tab=businesses');
-    for (const l of ['Your club', 'Near {{club}}', 'Coaches and academies', 'Popular on clbhouz']) {
-      expect(screen.getByText(l)).toBeTruthy();
-    }
+    expect(screen.getAllByTestId('group-label').map((el) => el.textContent)).toEqual(
+      ['Your club', 'Near {{club}}', 'Coaches and academies', 'Popular on clbhouz'],
+    );
     // your_club on Businesses reads "{category} · {city}", not "Your club · …".
     expect(screen.getByText('{{category}} · {{city}}')).toBeTruthy();
     expect(screen.queryByText('Your club · {{category}}')).toBeNull();
-    expect(screen.getByText('{{category}} · {{miles}} miles')).toBeTruthy();
+    expect(screen.getAllByText('{{category}} · {{miles}} miles')).toHaveLength(2);
   });
 
   it('shows the tab empty state when nothing is suggested', () => {
@@ -301,9 +304,7 @@ describe('WF1 Find people page', () => {
 
   it('renders golfer figures with and without a handicap, and verified badges', () => {
     renderPage('/find-people?tab=golfers');
-    const m = screen.getAllByText('4.1 hcp · 63 rounds');
-    console.log('FIGMATCH', m.length, JSON.stringify(m.map((e) => e.tagName + '|' + (e.closest('section')?.querySelector('span')?.textContent ?? '?'))));
-    expect(m.length).toBeGreaterThan(0);
+    expect(screen.getByText('4.1 hcp · 63 rounds')).toBeTruthy();
     expect(screen.getByText('+1.2 hcp · 212 rounds')).toBeTruthy();
     // New Ned: no handicap, no rounds → no figures line at all.
     const ned = screen.getByText('New Ned').closest('button')!;
