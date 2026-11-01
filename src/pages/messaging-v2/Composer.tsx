@@ -5,6 +5,12 @@ import { useSendMessage } from '@/hooks/messaging/useSendMessage';
 import { useKeyboardHeight } from '@/hooks/messaging/useKeyboardHeight';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useWhsConnection, useAllScores } from '@/lib/whs/hooks';
+import { shortCourseName } from '@/lib/courses/shortCourseName';
+import { ShareActionSheet, ShareRoundSheet, ShareCourseSheet } from './ShareSheets';
+import type { WhsScore } from '@/lib/whs/types';
+import type { CourseSearchResult } from '@/hooks/gam/useCourseSearch';
 
 
 /**
@@ -64,6 +70,17 @@ export const Composer: React.FC<Props> = ({
 
   const { send, sendMedia } = useSendMessage(conversationId);
   const [picking, setPicking] = useState(false);
+  // MS3 §1 — the + sheet and its two pickers.
+  const [sheet, setSheet] = useState<null | 'actions' | 'round' | 'course'>(null);
+  const { user } = useSupabaseSession();
+  const connection = useWhsConnection(user?.id);
+  const allScores = useAllScores(connection.data?.id);
+  const rounds = useMemo(
+    () => (allScores.data ?? []).filter((s) => s.adjusted_gross != null),
+    [allScores.data],
+  );
+  // MS3 §1 — Share a round hides with no WHS connection or no rounds.
+  const canShareRound = !!connection.data && rounds.length > 0;
   const keyboardHeight = useKeyboardHeight();
   const [text, setText] = useState(initialText ?? '');
   const [pending, setPending] = useState<PendingAttachment[]>([]);
