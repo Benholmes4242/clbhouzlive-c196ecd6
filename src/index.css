@@ -25,6 +25,29 @@
 }
 
 :root {
+  --pf-canvas: #0A0A0C;
+  --pf-sheet: #16161A;
+  --pf-panel: #1C1C21;
+  --pf-ink: #F8FAFC;
+  --pf-mute: rgba(248,250,252,.62);
+  --pf-dim: rgba(248,250,252,.42);
+  --pf-hair: rgba(255,255,255,.08);
+  --pf-line: rgba(255,255,255,.12);
+  --pf-focus: rgba(255,255,255,.32);
+  --pf-picked-line: rgba(248,250,252,.6);
+  --pf-picked: rgba(255,255,255,.04);
+  --pf-tile: rgba(255,255,255,.06);
+  --pf-close: rgba(255,255,255,.07);
+  --pf-ring: rgba(255,255,255,.22);
+  --pf-pill-line: rgba(255,255,255,.18);
+  --pf-track: rgba(255,255,255,.10);
+  --pf-hour: rgba(248,250,252,.22);
+  --pf-past: rgba(248,250,252,.08);
+  --pf-on-dim: rgba(10,10,12,.6);
+  --pf-underline: rgba(248,250,252,.5);
+  --pf-green: #3DDC97;
+  --pf-amber: #F7931E;
+  --pf-neutral-accent: radial-gradient(120% 60% at 50% 0%, rgba(255,255,255,.07), transparent 60%);
   --yc2-ink: #F8FAFC;
   --yc2-mute: rgba(248,250,252,.62);
   --yc2-dim: rgba(248,250,252,.42);
