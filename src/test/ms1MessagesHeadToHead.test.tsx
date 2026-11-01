@@ -342,10 +342,17 @@ describe('inboxRecordLine', () => {
 
 describe('ConversationRow', () => {
   it('shows the record line in the third row with the record in ink', () => {
-    const g = groundOf([round({}), round({ play_date: '2026-10-11', stableford_outcome: 'L', gross_outcome: 'L' })], 9);
+    const g = groundOf(
+      [
+        round({}),
+        round({ play_date: '2026-10-22' }),
+        round({ play_date: '2026-10-11', stableford_outcome: 'L', gross_outcome: 'L' }),
+      ],
+      9,
+    );
     const { container } = renderRow(g);
     const em = container.querySelector('em')!;
-    expect(em.textContent).toBe('you lead 1–1');
+    expect(em.textContent).toBe('you lead 2–1');
     expect(em.style.fontWeight).toBe('600');
     expect(container.textContent).toContain('9 rounds together');
   });
@@ -497,6 +504,6 @@ describe('MessageBubble incoming avatar (MS1 §7)', () => {
       </MemoryRouter>,
     );
     expect(screen.queryByTestId('incoming-avatar-slot')).toBeNull();
-    expect((container.firstElementChild as HTMLElement).style.paddingLeft).toBe('');
+    expect((container.firstElementChild as HTMLElement).style.paddingLeft).toBe('0px');
   });
 });
