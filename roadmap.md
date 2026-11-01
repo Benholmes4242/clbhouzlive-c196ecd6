@@ -1429,10 +1429,6 @@
 - [x] Approved MS1 line-400 cast applied; tsc fully clean. New ms3MessagesShare.test.tsx (14). Full sharded suite 5,569/5,569 across 525 files (+14/+1 vs 5,555/524). Signed-in live verification unavailable.
 
 ## TOUR SCHEDULE REBUILT (schedule-signed-off.html)
-- [ ] Remove charles schwab cup championship from CHAMPIONS_MAJOR_KEYWORDS; list getContextLabel/isMajor consumers in report
-- [ ] Week grouping (Mon-Sun) + sticky week headers + THIS WEEK shading in useSeasonTimeline/useMergedSchedule/ScheduleTab
-- [ ] Next-major card replacing next-major header figure
-- [ ] SeasonRow rebuild: date block, tag priority, venue city, date spans, right column DEFENDS/PURSE/LEADS/LEAD/WON, headshots
-- [ ] Amber member lines (followed leader/winner, in-the-field, played here); batched field/own-rounds reads
-- [ ] Restyled This week button (shown when section off screen, smooth scroll)
-- [ ] Locales x6, new tests, rewrite scheduleSeasonRow.test.tsx (quote old/new), full sharded suite, 390x844 screenshots
+- [x] All sections built; see TOUR_SCHEDULE_REBUILD_REPORT.md. Schwab keyword removed (consumers listed); week grouping + sticky headers + THIS WEEK shading; next-major card; SeasonRow rebuilt; amber member lines; This week pill; locales x6.
+- [x] scheduleRebuild.test.tsx (+15) + scheduleSeasonRow.test.tsx rewritten (5->11, old/new assertions quoted in report). Full shards 5,590/5,590 across 526 files (+21/+1 vs 5,569/525); tsgo clean.
+- [x] 390x844 capture: guest gate redirects /tour?tab=schedule to / signed-out, so page visuals are unit-tested; member-only amber lines unit-tested via the you prop. Signed-in device check outstanding.
