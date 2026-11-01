@@ -20620,6 +20620,23 @@ export type Database = {
           requester_username: string
         }[]
       }
+      get_activity_round_summaries: {
+        Args: { p_score_ids: string[] }
+        Returns: {
+          at_viewer_club: boolean
+          avg_to_par_here: number
+          course_id: string
+          course_name: string
+          course_par: number
+          gross: number
+          hole_to_par: number[]
+          holes_played: number
+          other_rounds_here: number
+          to_par: number
+          user_id: string
+          whs_score_id: string
+        }[]
+      }
       get_actor_dm_unread_counts: {
         Args: never
         Returns: {
