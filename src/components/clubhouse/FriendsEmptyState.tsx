@@ -371,7 +371,7 @@ export const FriendsEmptyState: React.FC<FriendsEmptyStateProps> = ({ userId, on
               {/* See all row */}
               <button
                 type="button"
-                onClick={() => navigate('/golferstofollow')}
+                onClick={() => navigate('/find-people')}
                 style={{
                   width: '100%',
                   padding: '14px 16px',

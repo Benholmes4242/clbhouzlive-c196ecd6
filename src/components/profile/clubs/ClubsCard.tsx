@@ -347,7 +347,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
         {n > 0 && (
           <div
             role="button"
-            onClick={() => navigate('/golferstofollow')}
+            onClick={() => navigate('/find-people')}
             style={{
               marginTop: 13,
               paddingTop: 12,

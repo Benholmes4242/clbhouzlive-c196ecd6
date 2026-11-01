@@ -45,7 +45,7 @@ export function SuggestedGolfersBlock({ rows = 3 }: { rows?: number }) {
         </div>
         <button
           type="button"
-          onClick={() => navigate('/golferstofollow')}
+          onClick={() => navigate('/find-people')}
           style={{
             background: 'transparent',
             border: 'none',
