@@ -11,9 +11,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 
-const rpcMock = vi.fn(() => Promise.resolve({ data: null, error: null }));
+const rpcMock = vi.fn((..._args: any[]) => Promise.resolve({ data: null as unknown, error: null as unknown }));
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: { rpc: (...args: unknown[]) => rpcMock(...args) },
+  supabase: { rpc: (...args: any[]) => rpcMock(...args) },
 }));
 vi.mock('@/lib/toast', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 vi.mock('@/hooks/messaging/useMessagingActor', () => ({
