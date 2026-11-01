@@ -12,6 +12,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { formatWeekdayShortGB } from '@/i18n/format';
 import { resolvePlayerAvatarCandidates } from '../_shared/resolvePlayerAvatar';
 import { getScoreColor } from '../_shared/scoreColor';
 import type { SeasonEvent } from './useSeasonTimeline';
@@ -57,9 +58,7 @@ function startDay(iso: string): string {
   return iso.slice(8, 10);
 }
 function startWeekday(iso: string): string {
-  return new Date(`${iso.slice(0, 10)}T12:00:00Z`)
-    .toLocaleDateString(undefined, { weekday: 'short', timeZone: 'UTC' })
-    .toUpperCase();
+  return formatWeekdayShortGB(new Date(`${iso.slice(0, 10)}T12:00:00Z`)).toUpperCase();
 }
 
 const Headshot: React.FC<{
