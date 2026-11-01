@@ -32,6 +32,8 @@ import { SuggestedGolfersBlock } from '@/features/social-suggestions/SuggestedGo
 import { NobodySawThatRound } from '@/features/social-suggestions/NobodySawThatRound';
 import { PAGE_CANVAS, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import { activityRoundId, useActivityRoundPages } from './hooks/useActivityRoundSummaries';
+import { foldKey, openOrder, segmentRows, type FoldSegment } from './activityFoldRules';
+import { ActivityFoldedRoundsRow } from './components/ActivityFoldedRoundsRow';
 
 const SF_STACK =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -226,6 +228,9 @@ export const ActivityPageV2: React.FC = () => {
 
   const [sheetRow, setSheetRow] = useState<ActivityFeedRowV2 | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  /** AC2: open fold identities. Page state only — survives feed refetches,
+   * resets when the page unmounts. Opening never marks anything read. */
+  const [openFolds, setOpenFolds] = useState<Set<string>>(new Set());
 
   const firstPage = feed.data?.pages?.[0] ?? [];
   const allRows: ActivityFeedRowV2[] = useMemo(
@@ -435,19 +440,58 @@ export const ActivityPageV2: React.FC = () => {
     </button>
   ) : undefined;
 
+  // AC2 §1: folding applies on the All and Friends chips only; the New
+  // section/chip, Mentions and Records never fold.
+  const foldEnabled = chip === 'all' || chip === 'friends';
+
   const renderBucket = (
     label: string,
     rows: ActivityFeedRowV2[],
     tone: 'new' | 'date' = 'date',
   ) => {
     if (rows.length === 0) return null;
+    const segments = segmentRows(rows, foldEnabled && tone !== 'new');
+    const openFold = segments.find(
+      (s): s is Extract<FoldSegment, { kind: 'fold' }> =>
+        s.kind === 'fold' && openFolds.has(foldKey(label, s.rows)),
+    );
+    const headerLabel = openFold
+      ? `${label} · ${openFold.rows.length} golfers posted rounds`
+      : label;
+    const toggleFold = (key: string, open: boolean) =>
+      setOpenFolds((prev) => {
+        const next = new Set(prev);
+        if (open) next.add(key);
+        else next.delete(key);
+        return next;
+      });
     return (
       <section key={label}>
-        <SectionHeader label={label} tone={tone} />
+        <SectionHeader label={headerLabel} tone={tone} />
         <div>
-          {rows.map((r) => (
-            <LedgerRow key={r.notif_id} row={r} roundSummary={roundSummaries.get(activityRoundId(r) ?? '')} onMarkRead={markRead} onLongPress={openSheet} />
-          ))}
+          {segments.map((seg) => {
+            if (seg.kind === 'row') {
+              return (
+                <LedgerRow key={seg.row.notif_id} row={seg.row} roundSummary={roundSummaries.get(activityRoundId(seg.row) ?? '')} onMarkRead={markRead} onLongPress={openSheet} />
+              );
+            }
+            const key = foldKey(label, seg.rows);
+            if (openFolds.has(key)) {
+              return (
+                <React.Fragment key={key}>
+                  {openOrder(seg.rows, roundSummaries).map((r) => (
+                    <LedgerRow key={r.notif_id} row={r} roundSummary={roundSummaries.get(activityRoundId(r) ?? '')} onMarkRead={markRead} onLongPress={openSheet} />
+                  ))}
+                  <button type="button" className="activity-fold-less" onClick={() => toggleFold(key, false)}>
+                    Show less
+                  </button>
+                </React.Fragment>
+              );
+            }
+            return (
+              <ActivityFoldedRoundsRow key={key} rows={seg.rows} summaries={roundSummaries} onOpen={() => toggleFold(key, true)} />
+            );
+          })}
         </div>
       </section>
     );
