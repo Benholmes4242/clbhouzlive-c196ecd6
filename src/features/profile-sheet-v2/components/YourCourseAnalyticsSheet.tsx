@@ -626,7 +626,7 @@ function AnalyticsCourseRow({
   const shell: React.CSSProperties = {
     display: 'block',
     width: '100%',
-    padding: '14px 20px',
+    padding: '14px 16px',
     background: 'transparent',
     border: 0,
     textAlign: 'left',
@@ -636,7 +636,7 @@ function AnalyticsCourseRow({
   // No distribution: same card, right chevron, tap-to-navigate.
   if (!hasScoring) {
     return (
-      <div style={CARD()}>
+      <div style={COURSE_CARD()}>
         <button
           type="button"
           onClick={() => onOpen('row')}
@@ -650,13 +650,13 @@ function AnalyticsCourseRow({
   }
 
   return (
-    <div style={CARD(expanded)}>
+    <div style={COURSE_CARD(expanded)}>
 
       <button type="button" onClick={onToggle} aria-expanded={expanded} style={{ ...shell, cursor: 'pointer' }}>
         {body}
       </button>
       {expanded && (
-        <div style={{ padding: '0 20px 14px' }}>
+        <div style={{ padding: '0 16px 14px' }}>
           {/* The bar and its percentages belong together. */}
           <div style={{ marginBottom: 8 }}>
             <DistributionBar segs={segs} />
